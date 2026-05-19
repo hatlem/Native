@@ -79,6 +79,7 @@ export default async function RequestPage({
       <p className="muted">
         {t("status")}: {request.status}
       </p>
+      <DataLayerEvent event="rfq_submitted" id={request.id} />
       {quote?.order ? (
         <DataLayerEvent
           event="order_confirmed"
