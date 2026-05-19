@@ -5,6 +5,7 @@ import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
 import { Link } from "@/i18n/navigation";
 import { updateBooking } from "@/app/publisher-actions";
+import { StatusBadge } from "@/app/status-badge";
 
 export const dynamic = "force-dynamic";
 
@@ -66,7 +67,7 @@ export default async function PublisherOrdersPage({
                 <h3>{meta?.titleName ?? line.productId}</h3>
                 <div className="muted">
                   {meta ? tType(meta.type) : ""} · {t("status")}:{" "}
-                  {line.order.status}
+                  <StatusBadge value={line.order.status} />
                 </div>
                 {line.booking ? (
                   <form action={updateBooking} style={{ marginTop: 10 }}>

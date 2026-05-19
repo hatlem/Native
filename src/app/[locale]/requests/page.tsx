@@ -4,6 +4,7 @@ import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
 import { getWorkspace } from "@/lib/workspace";
 import { Link } from "@/i18n/navigation";
+import { StatusBadge } from "@/app/status-badge";
 
 export const dynamic = "force-dynamic";
 
@@ -44,7 +45,7 @@ export default async function RequestsPage({
             <article className="card" key={r.id}>
               <h3>{r.plan.name}</h3>
               <div className="muted">
-                {t("status")}: {r.status}
+                {t("status")}: <StatusBadge value={r.status} />
               </div>
               <div className="muted">
                 {t("items")}: {r.plan.items.length}

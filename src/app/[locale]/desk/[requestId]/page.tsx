@@ -4,6 +4,7 @@ import { prisma } from "@/lib/prisma";
 import { Link } from "@/i18n/navigation";
 import { formatMoney } from "@/lib/money";
 import { generateQuote } from "@/app/actions";
+import { StatusBadge } from "@/app/status-badge";
 
 export const dynamic = "force-dynamic";
 
@@ -45,7 +46,7 @@ export default async function DeskRequestPage({
         {t("request")} · {request.organization.name}
       </h1>
       <p className="muted">
-        {t("status")}: {request.status}
+        {t("status")}: <StatusBadge value={request.status} />
       </p>
       {request.briefSummary ? (
         <p className="muted">

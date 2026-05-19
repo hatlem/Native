@@ -10,6 +10,7 @@ import {
   setAssetStatus,
   issueInvoice,
 } from "@/app/desk-actions";
+import { StatusBadge } from "@/app/status-badge";
 
 export const dynamic = "force-dynamic";
 
@@ -56,7 +57,7 @@ export default async function DeskOrderPage({
         {t("title")} · {order.organization.name}
       </h1>
       <p className="muted">
-        {t("status")}: <strong>{order.status}</strong>
+        {t("status")}: <StatusBadge value={order.status} />
       </p>
 
       <div style={{ display: "flex", gap: 12, flexWrap: "wrap" }}>
@@ -114,7 +115,8 @@ export default async function DeskOrderPage({
                   className="muted"
                   style={{ borderTop: "1px solid var(--border)", marginTop: 8, paddingTop: 8 }}
                 >
-                  {tp("version")} {a.version} — {tp("status")}: {a.status}
+                  {tp("version")} {a.version} — {tp("status")}:{" "}
+                  <StatusBadge value={a.status} />
                   {a.specPassed === true ? ` · ✅ ${tp("specPass")}` : null}
                   {a.specPassed === false ? ` · ⚠ ${tp("specFail")}` : null}
                   {a.reviewNotes ? <div>{a.reviewNotes}</div> : null}

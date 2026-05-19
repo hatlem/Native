@@ -2,6 +2,7 @@ import { getTranslations } from "next-intl/server";
 import { notFound } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import { formatMoney } from "@/lib/money";
+import { StatusBadge } from "@/app/status-badge";
 
 export const dynamic = "force-dynamic";
 
@@ -25,7 +26,7 @@ export default async function InvoicePage({
         {t("title")} #{invoice.id.slice(-8).toUpperCase()}
       </h1>
       <p className="muted">
-        {t("status")}: {invoice.status}
+        {t("status")}: <StatusBadge value={invoice.status} />
       </p>
       <p className="muted">
         {t("billTo")}: {invoice.organization.name}

@@ -7,6 +7,7 @@ import { DataLayerEvent } from "@/app/data-layer-event";
 import { Link } from "@/i18n/navigation";
 import { formatMoney } from "@/lib/money";
 import { acceptQuote } from "@/app/actions";
+import { StatusBadge } from "@/app/status-badge";
 
 export const dynamic = "force-dynamic";
 
@@ -77,7 +78,7 @@ export default async function RequestPage({
         {t("title")} · {request.organization.name}
       </h1>
       <p className="muted">
-        {t("status")}: {request.status}
+        {t("status")}: <StatusBadge value={request.status} />
       </p>
       <DataLayerEvent event="rfq_submitted" id={request.id} />
       {quote?.order ? (
@@ -135,7 +136,8 @@ export default async function RequestPage({
 
             {quote.order ? (
               <p className="note">
-                {t("accepted")} — {t("orderStatus")}: {quote.order.status}
+                {t("accepted")} — {t("orderStatus")}:{" "}
+                <StatusBadge value={quote.order.status} />
               </p>
             ) : (
               <form action={acceptQuote} style={{ marginTop: 12 }}>
@@ -157,7 +159,7 @@ export default async function RequestPage({
         return (
           <>
             <h2 style={{ marginTop: 24 }}>
-              {t("order")} · {order.status}
+              {t("order")} · <StatusBadge value={order.status} />
             </h2>
             <div className="grid">
               {order.lines.map((line) => {
@@ -169,7 +171,11 @@ export default async function RequestPage({
                     <div className="muted">{p ? tType(p.type) : ""}</div>
                     <div className="muted">
                       {tp("status")}:{" "}
-                      {asset ? asset.status : tp("noAssets")}
+                      {asset ? (
+                        <StatusBadge value={asset.status} />
+                      ) : (
+                        tp("noAssets")
+                      )}
                       {asset?.specPassed === true ? ` · ✅` : null}
                     </div>
                   </article>

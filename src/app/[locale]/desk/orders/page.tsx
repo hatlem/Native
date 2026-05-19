@@ -1,6 +1,7 @@
 import { getTranslations } from "next-intl/server";
 import { prisma } from "@/lib/prisma";
 import { Link } from "@/i18n/navigation";
+import { StatusBadge } from "@/app/status-badge";
 
 export const dynamic = "force-dynamic";
 
@@ -35,7 +36,7 @@ export default async function DeskOrdersPage({
             <article className="card" key={o.id}>
               <h3>{o.organization.name}</h3>
               <div className="muted">
-                {t("status")}: {o.status}
+                {t("status")}: <StatusBadge value={o.status} />
               </div>
               <div className="muted">
                 {t("lines")}: {o._count.lines}
