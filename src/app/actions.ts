@@ -11,7 +11,12 @@ import {
   serializeBasket,
   type BasketItem,
 } from "@/lib/basket";
-import { firmLineTotal, withVat } from "@/lib/money";
+import {
+  computeQuoteLines,
+  quoteTotals,
+  toRateRules,
+  type QuotableItem,
+} from "@/lib/money";
 
 const COOKIE_OPTS = {
   httpOnly: true,
@@ -28,6 +33,30 @@ async function writeBasket(items: BasketItem[]) {
 function str(formData: FormData, key: string): string {
   const v = formData.get(key);
   return typeof v === "string" ? v.trim() : "";
+}
+
+type ProductWithRules = {
+  id: string;
+  name: string;
+  basePrice: unknown;
+  priceRules: {
+    marginPct: unknown;
+    seasonalMultiplier: unknown;
+    minVolume: number;
+  }[];
+};
+
+function toQuotable(
+  p: ProductWithRules,
+  quantity: number,
+): QuotableItem {
+  return {
+    productId: p.id,
+    name: p.name,
+    quantity,
+    basePrice: Number(p.basePrice),
+    rules: toRateRules(p.priceRules),
+  };
 }
 
 export async function addToPlan(formData: FormData) {
@@ -129,26 +158,10 @@ export async function submitRequest(formData: FormData) {
     });
 
     if (allFirm) {
-      const lines = items.map((i) => {
-        const p = byId.get(i.productId)!;
-        const rule = p.priceRules[0];
-        const unitCost = Number(p.basePrice);
-        const marginPct = rule ? Number(rule.marginPct) : 15;
-        const seasonal = rule ? Number(rule.seasonalMultiplier) : 1;
-        const lineTotal = Math.round(
-          firmLineTotal(unitCost, marginPct, i.quantity, seasonal),
-        );
-        return {
-          productId: p.id,
-          description: p.name,
-          quantity: i.quantity,
-          unitCost,
-          marginPct,
-          lineTotal,
-        };
-      });
-      const subtotal = lines.reduce((s, l) => s + l.lineTotal, 0);
-      const total = Math.round(withVat(subtotal, vatPct));
+      const lines = computeQuoteLines(
+        items.map((i) => toQuotable(byId.get(i.productId)!, i.quantity)),
+      );
+      const { subtotal, total } = quoteTotals(lines, vatPct);
 
       const quote = await tx.quote.create({
         data: {
@@ -226,30 +239,16 @@ export async function generateQuote(formData: FormData) {
   });
   const byId = new Map(products.map((p) => [p.id, p]));
 
-  const lines = request.plan.items
-    .map((item) => {
-      const product = byId.get(item.productId);
-      if (!product) return null;
-      const rule = product.priceRules[0];
-      const unitCost = Number(product.basePrice);
-      const marginPct = rule ? Number(rule.marginPct) : 15;
-      const seasonal = rule ? Number(rule.seasonalMultiplier) : 1;
-      const lineTotal = Math.round(
-        firmLineTotal(unitCost, marginPct, item.quantity, seasonal),
-      );
-      return {
-        productId: product.id,
-        description: product.name,
-        quantity: item.quantity,
-        unitCost,
-        marginPct,
-        lineTotal,
-      };
-    })
-    .filter((l): l is NonNullable<typeof l> => l !== null);
+  const lines = computeQuoteLines(
+    request.plan.items
+      .map((item) => {
+        const product = byId.get(item.productId);
+        return product ? toQuotable(product, item.quantity) : null;
+      })
+      .filter((q): q is QuotableItem => q !== null),
+  );
 
-  const subtotal = lines.reduce((s, l) => s + l.lineTotal, 0);
-  const total = Math.round(withVat(subtotal, vatPct));
+  const { subtotal, total } = quoteTotals(lines, vatPct);
   const validUntil = new Date(Date.now() + 14 * 24 * 60 * 60 * 1000);
 
   await prisma.$transaction([

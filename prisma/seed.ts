@@ -140,30 +140,57 @@ function slugify(value: string) {
     .replace(/(^-|-$)/g, "");
 }
 
+type RateCardTier = {
+  label: string;
+  minVolume: number;
+  marginPct: number;
+  seasonalMultiplier: number;
+};
+
 const PRODUCT_BLUEPRINT: {
   type: ProductType;
   perThousandReach: number;
   leadTimeDays: number;
   visibility: PriceVisibility;
+  rateCard: RateCardTier[];
 }[] = [
   {
     type: ProductType.NATIVE_ARTICLE,
     perThousandReach: 25,
     leadTimeDays: 12,
     visibility: PriceVisibility.INDICATIVE,
+    rateCard: [
+      { label: "standard", minVolume: 1, marginPct: 22, seasonalMultiplier: 1 },
+      // Editorial series — volume discount from 3 placements.
+      { label: "series", minVolume: 3, marginPct: 18, seasonalMultiplier: 1 },
+    ],
   },
   {
     type: ProductType.ADVERTORIAL,
     perThousandReach: 18,
     leadTimeDays: 10,
     visibility: PriceVisibility.INDICATIVE,
+    rateCard: [
+      { label: "standard", minVolume: 1, marginPct: 18, seasonalMultiplier: 1 },
+      { label: "series", minVolume: 3, marginPct: 15, seasonalMultiplier: 1 },
+    ],
   },
   // Standardised display inventory is firm-priced -> self-serve instant book.
+  // Carries a high-season premium; bulk buyers get a better margin.
   {
     type: ProductType.NATIVE_DISPLAY,
     perThousandReach: 12,
     leadTimeDays: 7,
     visibility: PriceVisibility.FIRM,
+    rateCard: [
+      {
+        label: "standard",
+        minVolume: 1,
+        marginPct: 12,
+        seasonalMultiplier: 1.1,
+      },
+      { label: "bulk", minVolume: 5, marginPct: 9, seasonalMultiplier: 1.1 },
+    ],
   },
 ];
 
@@ -226,11 +253,12 @@ async function main() {
               visibility: bp.visibility,
               leadTimeDays: bp.leadTimeDays,
               priceRules: {
-                create: {
-                  label: "default",
-                  marginPct: 15,
-                  seasonalMultiplier: 1,
-                },
+                create: bp.rateCard.map((rc) => ({
+                  label: rc.label,
+                  minVolume: rc.minVolume,
+                  marginPct: rc.marginPct,
+                  seasonalMultiplier: rc.seasonalMultiplier,
+                })),
               },
               spec: {
                 create: {

@@ -2,7 +2,7 @@ import { getTranslations } from "next-intl/server";
 import { notFound } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import { Link } from "@/i18n/navigation";
-import { indicativePrice, formatMoney } from "@/lib/money";
+import { indicativeFromRules, toRateRules, formatMoney } from "@/lib/money";
 import { addToPlan } from "@/app/actions";
 
 export const dynamic = "force-dynamic";
@@ -50,11 +50,9 @@ export default async function TitleDetailPage({
 
       <div className="grid">
         {title.products.map((p) => {
-          const rule = p.priceRules[0];
-          const price = indicativePrice(
+          const price = indicativeFromRules(
             Number(p.basePrice),
-            rule ? Number(rule.marginPct) : 15,
-            rule ? Number(rule.seasonalMultiplier) : 1,
+            toRateRules(p.priceRules),
           );
           return (
             <article className="card" key={p.id}>

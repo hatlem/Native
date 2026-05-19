@@ -2,7 +2,7 @@ import { getTranslations } from "next-intl/server";
 import { MarketCode, ProductType, Prisma } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
 import { Link } from "@/i18n/navigation";
-import { indicativePrice, formatMoney } from "@/lib/money";
+import { indicativeFromRules, toRateRules, formatMoney } from "@/lib/money";
 
 export const dynamic = "force-dynamic";
 
@@ -111,14 +111,9 @@ export default async function CatalogPage({
       ) : (
         <div className="grid">
           {titles.map((title) => {
-            const prices = title.products.map((p) => {
-              const rule = p.priceRules[0];
-              return indicativePrice(
-                Number(p.basePrice),
-                rule ? Number(rule.marginPct) : 15,
-                rule ? Number(rule.seasonalMultiplier) : 1,
-              );
-            });
+            const prices = title.products.map((p) =>
+              indicativeFromRules(Number(p.basePrice), toRateRules(p.priceRules)),
+            );
             const from = prices.length ? Math.min(...prices) : null;
             const currency = title.products[0]?.currency ?? title.market.currency;
 

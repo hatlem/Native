@@ -3,7 +3,7 @@ import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
 import { Link } from "@/i18n/navigation";
 import { readBasket } from "@/lib/basket";
-import { indicativePrice, formatMoney } from "@/lib/money";
+import { indicativeFromRules, toRateRules, formatMoney } from "@/lib/money";
 import { removeFromPlan, submitRequest } from "@/app/actions";
 
 export const dynamic = "force-dynamic";
@@ -45,11 +45,10 @@ export default async function PlanPage({
     .map((b) => {
       const p = byId.get(b.productId);
       if (!p) return null;
-      const rule = p.priceRules[0];
-      const unit = indicativePrice(
+      const unit = indicativeFromRules(
         Number(p.basePrice),
-        rule ? Number(rule.marginPct) : 15,
-        rule ? Number(rule.seasonalMultiplier) : 1,
+        toRateRules(p.priceRules),
+        b.quantity,
       );
       return { product: p, quantity: b.quantity, lineTotal: unit * b.quantity };
     })
