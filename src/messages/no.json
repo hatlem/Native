@@ -6,7 +6,24 @@
     "plan": "Plan",
     "desk": "Desk",
     "publisher": "Utgiver",
-    "requests": "Mine forespørsler"
+    "requests": "Mine forespørsler",
+    "reports": "Rapporter"
+  },
+  "reports": {
+    "title": "Rapporter",
+    "subtitle": "Plattform-KPI-er — etterspørsel, konvertering og omsetning.",
+    "requests": "Forespørsler",
+    "orders": "Bestillinger",
+    "conversion": "Forespørsel → bestilling",
+    "gmv": "Bruttoverdi",
+    "aov": "Gj.snittlig ordreverdi",
+    "byStatus": "Bestillinger etter status",
+    "byMarket": "Omsetning etter valuta",
+    "byCategory": "Bestillinger etter kategori",
+    "invoices": "Fakturaer etter status",
+    "none": "Ingen data ennå.",
+    "mySpend": "Mitt forbruk",
+    "mySubtitle": "Organisasjonens bestillinger og forbruk."
   },
   "home": {
     "title": "Kjøp native-innhold i nordiske aviser og magasiner",

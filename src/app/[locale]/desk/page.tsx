@@ -12,6 +12,7 @@ export default async function DeskListPage({
   const { locale } = await params;
   const t = await getTranslations({ locale, namespace: "desk" });
   const to = await getTranslations({ locale, namespace: "order" });
+  const tr = await getTranslations({ locale, namespace: "reports" });
 
   const requests = await prisma.request.findMany({
     orderBy: { createdAt: "desc" },
@@ -28,6 +29,8 @@ export default async function DeskListPage({
       <p className="muted">{t("subtitle")}</p>
       <p>
         <Link href="/desk/orders">{to("orders")} →</Link>
+        {"  ·  "}
+        <Link href="/desk/reports">{tr("title")} →</Link>
       </p>
 
       {requests.length === 0 ? (

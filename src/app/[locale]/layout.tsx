@@ -47,7 +47,10 @@ export default async function LocaleLayout({
                 <Link href="/catalog">{t("catalog")}</Link>
                 <Link href="/plan">{t("plan")}</Link>
                 {session?.user?.role === "BUYER" ? (
-                  <Link href="/requests">{t("requests")}</Link>
+                  <>
+                    <Link href="/requests">{t("requests")}</Link>
+                    <Link href="/reports">{t("reports")}</Link>
+                  </>
                 ) : null}
                 <Link href="/desk">{t("desk")}</Link>
                 <Link href="/publisher">{t("publisher")}</Link>

@@ -6,7 +6,24 @@
     "plan": "Plan",
     "desk": "Desk",
     "publisher": "Publisher",
-    "requests": "My requests"
+    "requests": "My requests",
+    "reports": "Reports"
+  },
+  "reports": {
+    "title": "Reports",
+    "subtitle": "Platform KPIs — demand, conversion and revenue.",
+    "requests": "Requests",
+    "orders": "Orders",
+    "conversion": "RFQ → order",
+    "gmv": "Gross value",
+    "aov": "Avg order value",
+    "byStatus": "Orders by status",
+    "byMarket": "Revenue by currency",
+    "byCategory": "Orders by category",
+    "invoices": "Invoices by status",
+    "none": "No data yet.",
+    "mySpend": "My spend",
+    "mySubtitle": "Your organization's orders and spend."
   },
   "home": {
     "title": "Buy native content in Nordic newspapers and magazines",
