@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
 import { getWorkspace } from "@/lib/workspace";
+import { DataLayerEvent } from "@/app/data-layer-event";
 import { Link } from "@/i18n/navigation";
 import { formatMoney } from "@/lib/money";
 import { acceptQuote } from "@/app/actions";
@@ -78,6 +79,14 @@ export default async function RequestPage({
       <p className="muted">
         {t("status")}: {request.status}
       </p>
+      {quote?.order ? (
+        <DataLayerEvent
+          event="order_confirmed"
+          id={quote.order.id}
+          value={Number(quote.total)}
+          currency={quote.currency}
+        />
+      ) : null}
 
       <h2 style={{ marginTop: 24 }}>{t("items")}</h2>
       <div className="grid">

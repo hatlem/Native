@@ -6,6 +6,7 @@ import { routing } from "@/i18n/routing";
 import { Link } from "@/i18n/navigation";
 import { auth } from "@/auth";
 import { logout } from "@/app/auth-actions";
+import { GtmScripts, GtmNoscript } from "@/app/gtm";
 import "../globals.css";
 
 export const metadata = {
@@ -36,6 +37,8 @@ export default async function LocaleLayout({
   return (
     <html lang={locale}>
       <body>
+        <GtmNoscript />
+        <GtmScripts />
         <NextIntlClientProvider messages={messages}>
           <header className="site-header">
             <div className="container">
