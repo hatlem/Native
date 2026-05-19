@@ -153,6 +153,12 @@
     "vat": "Moms",
     "total": "Total"
   },
+  "firm": {
+    "badge": "Bestil direkte",
+    "planTitle": "Bekræft din ordre",
+    "planNote": "Alle poster har fast pris — at indsende bekræfter din ordre med det samme, ingen ventetid på indkøbsteamet.",
+    "planSubmit": "Bekræft ordre"
+  },
   "productType": {
     "NATIVE_ARTICLE": "Native-artikel",
     "ADVERTORIAL": "Advertorial",

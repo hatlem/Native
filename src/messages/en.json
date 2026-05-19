@@ -153,6 +153,12 @@
     "vat": "VAT",
     "total": "Total"
   },
+  "firm": {
+    "badge": "Instant book",
+    "planTitle": "Confirm your order",
+    "planNote": "All items are firm-priced — submitting confirms your order instantly, no buying-desk wait.",
+    "planSubmit": "Confirm order"
+  },
   "productType": {
     "NATIVE_ARTICLE": "Native article",
     "ADVERTORIAL": "Advertorial",

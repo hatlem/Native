@@ -14,6 +14,7 @@ export default async function TitleDetailPage({
 }) {
   const { locale, slug } = await params;
   const t = await getTranslations({ locale, namespace: "titleDetail" });
+  const tf = await getTranslations({ locale, namespace: "firm" });
   const tType = await getTranslations({ locale, namespace: "productType" });
   const tMarket = await getTranslations({ locale, namespace: "market" });
 
@@ -61,6 +62,9 @@ export default async function TitleDetailPage({
               <div className="price">
                 {t("from")} {formatMoney(price, p.currency, locale)}
               </div>
+              {p.visibility === "FIRM" ? (
+                <span className="tag">⚡ {tf("badge")}</span>
+              ) : null}
               <div className="muted" style={{ marginTop: 6 }}>
                 {t("leadTime")}: {p.leadTimeDays} {t("days")}
               </div>

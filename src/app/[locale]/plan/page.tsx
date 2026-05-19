@@ -20,6 +20,7 @@ export default async function PlanPage({
   const { locale } = await params;
   const sp = await searchParams;
   const t = await getTranslations({ locale, namespace: "plan" });
+  const tf = await getTranslations({ locale, namespace: "firm" });
   const tr = await getTranslations({ locale, namespace: "rfq" });
   const tType = await getTranslations({ locale, namespace: "productType" });
   const tMarket = await getTranslations({ locale, namespace: "market" });
@@ -54,6 +55,9 @@ export default async function PlanPage({
       (totals.get(l.product.currency) ?? 0) + l.lineTotal,
     );
   }
+
+  const allFirm =
+    lines.length > 0 && lines.every((l) => l.product.visibility === "FIRM");
 
   return (
     <section>
@@ -98,7 +102,10 @@ export default async function PlanPage({
               .join(" · ")}
           </p>
 
-          <h2 style={{ marginTop: 32 }}>{t("rfqTitle")}</h2>
+          <h2 style={{ marginTop: 32 }}>
+            {allFirm ? tf("planTitle") : t("rfqTitle")}
+          </h2>
+          {allFirm ? <p className="note">{tf("planNote")}</p> : null}
           <form action={submitRequest} className="filters">
             <input type="hidden" name="locale" value={locale} />
             <div>
@@ -147,7 +154,9 @@ export default async function PlanPage({
               <label htmlFor="brief">{tr("brief")}</label>
               <input id="brief" name="brief" />
             </div>
-            <button type="submit">{tr("submit")}</button>
+            <button type="submit">
+              {allFirm ? tf("planSubmit") : tr("submit")}
+            </button>
           </form>
         </>
       )}

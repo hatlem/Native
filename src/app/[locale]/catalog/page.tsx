@@ -25,6 +25,7 @@ export default async function CatalogPage({
   const { locale } = await params;
   const sp = await searchParams;
   const t = await getTranslations({ locale, namespace: "catalog" });
+  const tf = await getTranslations({ locale, namespace: "firm" });
   const tType = await getTranslations({ locale, namespace: "productType" });
   const tMarket = await getTranslations({ locale, namespace: "market" });
 
@@ -136,6 +137,9 @@ export default async function CatalogPage({
                       {tType(p.type)}
                     </span>
                   ))}
+                  {title.products.some((p) => p.visibility === "FIRM") ? (
+                    <span className="tag">⚡ {tf("badge")}</span>
+                  ) : null}
                 </div>
                 {title.monthlyReach ? (
                   <div className="muted" style={{ marginTop: 10 }}>

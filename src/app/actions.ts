@@ -79,13 +79,20 @@ export async function submitRequest(formData: FormData) {
   });
   const currency = market?.currency ?? "EUR";
 
+  const vatPct = market ? Number(market.vatRatePct) : 25;
   const products = await prisma.product.findMany({
     where: { id: { in: basket.map((b) => b.productId) }, active: true },
-    select: { id: true },
+    include: { priceRules: true },
   });
-  const validIds = new Set(products.map((p) => p.id));
-  const items = basket.filter((b) => validIds.has(b.productId));
+  const byId = new Map(products.map((p) => [p.id, p]));
+  const items = basket.filter((b) => byId.has(b.productId));
   if (items.length === 0) redirect(`/${locale}/plan?error=1`);
+
+  // Self-serve: an all-firm-priced basket needs no desk — auto-quote,
+  // auto-accept and confirm the order immediately.
+  const allFirm = items.every(
+    (i) => byId.get(i.productId)?.visibility === "FIRM",
+  );
 
   const request = await prisma.$transaction(async (tx) => {
     const org = await tx.organization.create({
@@ -126,14 +133,74 @@ export async function submitRequest(formData: FormData) {
       },
     });
 
-    return tx.request.create({
+    const req = await tx.request.create({
       data: {
         organizationId: org.id,
         planId: plan.id,
-        status: "SUBMITTED",
+        status: allFirm ? "CLOSED" : "SUBMITTED",
         briefSummary: brief || null,
       },
     });
+
+    if (allFirm) {
+      const lines = items.map((i) => {
+        const p = byId.get(i.productId)!;
+        const rule = p.priceRules[0];
+        const unitCost = Number(p.basePrice);
+        const marginPct = rule ? Number(rule.marginPct) : 15;
+        const seasonal = rule ? Number(rule.seasonalMultiplier) : 1;
+        const lineTotal = Math.round(
+          firmLineTotal(unitCost, marginPct, i.quantity, seasonal),
+        );
+        return {
+          productId: p.id,
+          description: p.name,
+          quantity: i.quantity,
+          unitCost,
+          marginPct,
+          lineTotal,
+        };
+      });
+      const subtotal = lines.reduce((s, l) => s + l.lineTotal, 0);
+      const total = Math.round(withVat(subtotal, vatPct));
+
+      const quote = await tx.quote.create({
+        data: {
+          requestId: req.id,
+          status: "ACCEPTED",
+          currency,
+          subtotal,
+          vatPct,
+          total,
+          validUntil: new Date(Date.now() + 14 * 24 * 60 * 60 * 1000),
+          lines: { create: lines },
+        },
+      });
+      const order = await tx.order.create({
+        data: {
+          organizationId: org.id,
+          quoteId: quote.id,
+          status: "CONFIRMED",
+          lines: {
+            create: lines.map((l) => ({
+              productId: l.productId,
+              quantity: l.quantity,
+              lineTotal: l.lineTotal,
+            })),
+          },
+        },
+        include: { lines: true },
+      });
+      await tx.contentBrief.createMany({
+        data: order.lines.map((l) => ({
+          orderLineId: l.id,
+          message: goal || null,
+          audience: audience || null,
+        })),
+      });
+    }
+
+    return req;
   });
 
   const store = await cookies();

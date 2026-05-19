@@ -1,4 +1,9 @@
-import { PrismaClient, MarketCode, ProductType } from "@prisma/client";
+import {
+  PrismaClient,
+  MarketCode,
+  ProductType,
+  PriceVisibility,
+} from "@prisma/client";
 import bcrypt from "bcryptjs";
 
 const prisma = new PrismaClient();
@@ -130,10 +135,27 @@ const PRODUCT_BLUEPRINT: {
   type: ProductType;
   perThousandReach: number;
   leadTimeDays: number;
+  visibility: PriceVisibility;
 }[] = [
-  { type: ProductType.NATIVE_ARTICLE, perThousandReach: 25, leadTimeDays: 12 },
-  { type: ProductType.ADVERTORIAL, perThousandReach: 18, leadTimeDays: 10 },
-  { type: ProductType.NATIVE_DISPLAY, perThousandReach: 12, leadTimeDays: 7 },
+  {
+    type: ProductType.NATIVE_ARTICLE,
+    perThousandReach: 25,
+    leadTimeDays: 12,
+    visibility: PriceVisibility.INDICATIVE,
+  },
+  {
+    type: ProductType.ADVERTORIAL,
+    perThousandReach: 18,
+    leadTimeDays: 10,
+    visibility: PriceVisibility.INDICATIVE,
+  },
+  // Standardised display inventory is firm-priced -> self-serve instant book.
+  {
+    type: ProductType.NATIVE_DISPLAY,
+    perThousandReach: 12,
+    leadTimeDays: 7,
+    visibility: PriceVisibility.FIRM,
+  },
 ];
 
 async function main() {
@@ -192,6 +214,7 @@ async function main() {
               name: `${titleSeed.name} — ${bp.type}`,
               currency: m.currency,
               basePrice,
+              visibility: bp.visibility,
               leadTimeDays: bp.leadTimeDays,
               priceRules: {
                 create: {

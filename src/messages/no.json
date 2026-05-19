@@ -153,6 +153,12 @@
     "vat": "MVA",
     "total": "Totalt"
   },
+  "firm": {
+    "badge": "Bestill direkte",
+    "planTitle": "Bekreft bestillingen",
+    "planNote": "Alle elementer har fast pris — innsending bekrefter bestillingen umiddelbart, uten venting på kjøpsteamet.",
+    "planSubmit": "Bekreft bestilling"
+  },
   "productType": {
     "NATIVE_ARTICLE": "Native-artikkel",
     "ADVERTORIAL": "Advertorial",

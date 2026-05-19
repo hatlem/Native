@@ -153,6 +153,12 @@
     "vat": "Moms",
     "total": "Totalt"
   },
+  "firm": {
+    "badge": "Boka direkt",
+    "planTitle": "Bekräfta din order",
+    "planNote": "Alla poster har fast pris — att skicka in bekräftar din order direkt, ingen väntan på inköpsteamet.",
+    "planSubmit": "Bekräfta order"
+  },
   "productType": {
     "NATIVE_ARTICLE": "Native-artikel",
     "ADVERTORIAL": "Advertorial",
