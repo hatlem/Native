@@ -1,4 +1,5 @@
 import type { ReactNode } from "react";
+import type { Metadata, Viewport } from "next";
 import { NextIntlClientProvider } from "next-intl";
 import { getMessages, getTranslations } from "next-intl/server";
 import { notFound } from "next/navigation";
@@ -9,10 +10,52 @@ import { logout } from "@/app/auth-actions";
 import { GtmScripts, GtmNoscript } from "@/app/gtm";
 import "../globals.css";
 
-export const metadata = {
-  title: "BeNative",
-  description:
-    "Nordic marketplace for buying native content and native advertising in newspapers and magazines.",
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ locale: string }>;
+}): Promise<Metadata> {
+  const { locale } = await params;
+  const loc = (routing.locales as readonly string[]).includes(locale)
+    ? locale
+    : routing.defaultLocale;
+  const tc = await getTranslations({ locale: loc, namespace: "common" });
+  const th = await getTranslations({ locale: loc, namespace: "home" });
+  const appName = tc("appName");
+  const title = `${appName} · ${th("title")}`;
+  const description = th("subtitle");
+
+  return {
+    metadataBase: new URL(
+      process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000",
+    ),
+    applicationName: appName,
+    title: { default: title, template: `%s · ${appName}` },
+    description,
+    alternates: {
+      canonical: `/${loc}`,
+      languages: Object.fromEntries(
+        routing.locales.map((l) => [l, `/${l}`]),
+      ),
+    },
+    openGraph: {
+      type: "website",
+      siteName: appName,
+      title,
+      description,
+      url: `/${loc}`,
+      locale: loc,
+    },
+    twitter: { card: "summary_large_image", title, description },
+    robots: { index: true, follow: true },
+  };
+}
+
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  colorScheme: "light",
+  themeColor: "#f6f7f9",
 };
 
 export default async function LocaleLayout({
