@@ -2,6 +2,7 @@ import { getTranslations } from "next-intl/server";
 import { prisma } from "@/lib/prisma";
 import { Link } from "@/i18n/navigation";
 import { StatusBadge } from "@/app/status-badge";
+import { EmptyState } from "@/app/empty-state";
 
 export const dynamic = "force-dynamic";
 
@@ -29,7 +30,11 @@ export default async function DeskOrdersPage({
       <h1>{t("orders")}</h1>
 
       {orders.length === 0 ? (
-        <p className="note">{t("noOrders")}</p>
+        <EmptyState
+          title={t("noOrders")}
+          primaryHref="/desk"
+          primaryLabel={t("back")}
+        />
       ) : (
         <div className="grid">
           {orders.map((o) => (

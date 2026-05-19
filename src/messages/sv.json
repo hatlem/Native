@@ -89,7 +89,8 @@
       "days": "dagar"
     },
     "indicativeNote": "Priserna är vägledande. Ett fast pris bekräftas av vårt inköpsteam baserat på tillgänglighet, säsong och volym.",
-    "noResults": "Inga titlar matchar dessa filter."
+    "noResults": "Inga titlar matchar dessa filter.",
+    "clearFilters": "Rensa filter"
   },
   "titleDetail": {
     "back": "Tillbaka till katalogen",

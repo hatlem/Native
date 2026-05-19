@@ -3,6 +3,7 @@ import { MarketCode, ProductType, Prisma } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
 import { Link } from "@/i18n/navigation";
 import { indicativeFromRules, toRateRules, formatMoney } from "@/lib/money";
+import { EmptyState } from "@/app/empty-state";
 
 export const dynamic = "force-dynamic";
 
@@ -107,7 +108,11 @@ export default async function CatalogPage({
       </form>
 
       {titles.length === 0 ? (
-        <p className="note">{t("noResults")}</p>
+        <EmptyState
+          title={t("noResults")}
+          primaryHref="/catalog"
+          primaryLabel={t("clearFilters")}
+        />
       ) : (
         <div className="grid">
           {titles.map((title) => {

@@ -89,7 +89,8 @@
       "days": "dage"
     },
     "indicativeNote": "Priserne er vejledende. En fast pris bekræftes af vores indkøbsteam baseret på tilgængelighed, sæson og volumen.",
-    "noResults": "Ingen titler matcher disse filtre."
+    "noResults": "Ingen titler matcher disse filtre.",
+    "clearFilters": "Ryd filtre"
   },
   "titleDetail": {
     "back": "Tilbage til kataloget",

@@ -89,7 +89,8 @@
       "days": "dager"
     },
     "indicativeNote": "Prisene er veiledende. Endelig pris bekreftes av kjøpsteamet basert på tilgjengelighet, sesong og volum.",
-    "noResults": "Ingen titler matcher disse filtrene."
+    "noResults": "Ingen titler matcher disse filtrene.",
+    "clearFilters": "Nullstill filtre"
   },
   "titleDetail": {
     "back": "Tilbake til katalogen",

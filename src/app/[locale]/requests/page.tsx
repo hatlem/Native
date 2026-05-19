@@ -5,6 +5,7 @@ import { prisma } from "@/lib/prisma";
 import { getWorkspace } from "@/lib/workspace";
 import { Link } from "@/i18n/navigation";
 import { StatusBadge } from "@/app/status-badge";
+import { EmptyState } from "@/app/empty-state";
 
 export const dynamic = "force-dynamic";
 
@@ -36,9 +37,11 @@ export default async function RequestsPage({
     <section>
       <h1>{t("listTitle")}</h1>
       {requests.length === 0 ? (
-        <p>
-          {t("none")} <Link href="/catalog">{tNav("catalog")}</Link>
-        </p>
+        <EmptyState
+          title={t("none")}
+          primaryHref="/catalog"
+          primaryLabel={tNav("catalog")}
+        />
       ) : (
         <div className="grid">
           {requests.map((r) => (

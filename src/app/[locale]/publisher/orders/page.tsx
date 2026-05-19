@@ -6,6 +6,7 @@ import { prisma } from "@/lib/prisma";
 import { Link } from "@/i18n/navigation";
 import { updateBooking } from "@/app/publisher-actions";
 import { StatusBadge } from "@/app/status-badge";
+import { EmptyState } from "@/app/empty-state";
 
 export const dynamic = "force-dynamic";
 
@@ -57,7 +58,11 @@ export default async function PublisherOrdersPage({
       <h1>{t("ordersTitle")}</h1>
 
       {lines.length === 0 ? (
-        <p className="note">{t("noOrders")}</p>
+        <EmptyState
+          title={t("noOrders")}
+          primaryHref="/publisher"
+          primaryLabel={t("title")}
+        />
       ) : (
         <div className="grid">
           {lines.map((line) => {

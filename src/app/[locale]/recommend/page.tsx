@@ -1,8 +1,8 @@
 import { getTranslations } from "next-intl/server";
 import { MarketCode } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
-import { Link } from "@/i18n/navigation";
 import { indicativeFromRules, toRateRules, formatMoney } from "@/lib/money";
+import { EmptyState } from "@/app/empty-state";
 import { recommendMix, type Candidate } from "@/lib/recommend";
 import { addRecommendedPlan } from "@/app/actions";
 
@@ -121,7 +121,11 @@ export default async function RecommendPage({
 
       {result ? (
         result.picks.length === 0 ? (
-          <p className="note">{t("none")}</p>
+          <EmptyState
+            title={t("none")}
+            primaryHref="/catalog"
+            primaryLabel={t("browse")}
+          />
         ) : (
           <>
             <p className="note">
@@ -158,9 +162,11 @@ export default async function RecommendPage({
           </>
         )
       ) : (
-        <p className="note">
-          {t("hint")} <Link href="/catalog">{t("browse")}</Link>
-        </p>
+        <EmptyState
+          title={t("hint")}
+          primaryHref="/catalog"
+          primaryLabel={t("browse")}
+        />
       )}
     </section>
   );

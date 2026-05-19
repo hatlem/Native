@@ -89,7 +89,8 @@
       "days": "days"
     },
     "indicativeNote": "Prices are indicative. A firm price is confirmed by our buying desk based on availability, season and volume.",
-    "noResults": "No titles match these filters."
+    "noResults": "No titles match these filters.",
+    "clearFilters": "Clear filters"
   },
   "titleDetail": {
     "back": "Back to catalog",

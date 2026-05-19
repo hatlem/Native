@@ -6,6 +6,7 @@ import { Link } from "@/i18n/navigation";
 import { readBasket } from "@/lib/basket";
 import { indicativeFromRules, toRateRules, formatMoney } from "@/lib/money";
 import { removeFromPlan, submitRequest } from "@/app/actions";
+import { EmptyState } from "@/app/empty-state";
 
 export const dynamic = "force-dynamic";
 
@@ -75,9 +76,13 @@ export default async function PlanPage({
       {sp.error ? <p className="note">{t("error")}</p> : null}
 
       {lines.length === 0 ? (
-        <p>
-          {t("empty")} <Link href="/catalog">{t("browse")}</Link>
-        </p>
+        <EmptyState
+          title={t("empty")}
+          primaryHref="/catalog"
+          primaryLabel={t("browse")}
+          secondaryHref="/recommend"
+          secondaryLabel={tNav("recommend")}
+        />
       ) : (
         <>
           <div className="grid">
