@@ -50,7 +50,8 @@
     "images": "Images (min)",
     "disclosure": "Disclosure label",
     "addToPlan": "Add to plan",
-    "indicativeNote": "Indicative price. The firm price is confirmed by our buying desk."
+    "indicativeNote": "Indicative price. The firm price is confirmed by our buying desk.",
+    "unavailable": "Currently unavailable for booking."
   },
   "plan": {
     "title": "Your plan",
@@ -174,7 +175,16 @@
     "status": "Order status",
     "booking": "Booking status",
     "liveUrl": "Live URL",
-    "noBooking": "No booking record."
+    "noBooking": "No booking record.",
+    "bookable": "Available to book",
+    "specTitle": "Content spec",
+    "wordMin": "Min words",
+    "wordMax": "Max words",
+    "imagesMin": "Min images",
+    "disclosure": "Disclosure label",
+    "fileFormats": "File formats",
+    "requirements": "Requirements",
+    "saveSpec": "Save spec"
   },
   "productType": {
     "NATIVE_ARTICLE": "Native article",

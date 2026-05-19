@@ -50,7 +50,8 @@
     "images": "Bilder (min.)",
     "disclosure": "Märkning",
     "addToPlan": "Lägg till i plan",
-    "indicativeNote": "Vägledande pris. Det fasta priset bekräftas av vårt inköpsteam."
+    "indicativeNote": "Vägledande pris. Det fasta priset bekräftas av vårt inköpsteam.",
+    "unavailable": "För närvarande inte tillgänglig för bokning."
   },
   "plan": {
     "title": "Din plan",
@@ -174,7 +175,16 @@
     "status": "Orderstatus",
     "booking": "Bokningsstatus",
     "liveUrl": "Live-URL",
-    "noBooking": "Ingen bokning registrerad."
+    "noBooking": "Ingen bokning registrerad.",
+    "bookable": "Tillgänglig för bokning",
+    "specTitle": "Innehållsspecifikation",
+    "wordMin": "Min. ord",
+    "wordMax": "Max ord",
+    "imagesMin": "Min. bilder",
+    "disclosure": "Märkning",
+    "fileFormats": "Filformat",
+    "requirements": "Krav",
+    "saveSpec": "Spara specifikation"
   },
   "productType": {
     "NATIVE_ARTICLE": "Native-artikel",

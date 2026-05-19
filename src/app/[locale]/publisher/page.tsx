@@ -4,7 +4,7 @@ import { PriceVisibility } from "@prisma/client";
 import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
 import { Link } from "@/i18n/navigation";
-import { updateProduct } from "@/app/publisher-actions";
+import { updateProduct, updateSpec } from "@/app/publisher-actions";
 
 export const dynamic = "force-dynamic";
 
@@ -31,7 +31,9 @@ export default async function PublisherDashboard({
     include: {
       titles: {
         orderBy: { name: "asc" },
-        include: { products: { orderBy: { type: "asc" } } },
+        include: {
+          products: { orderBy: { type: "asc" }, include: { spec: true } },
+        },
       },
     },
   });
@@ -89,11 +91,90 @@ export default async function PublisherDashboard({
                     min="1"
                     defaultValue={p.leadTimeDays}
                   />
+                  <label
+                    className="muted"
+                    htmlFor={`bk-${p.id}`}
+                    style={{ display: "block", marginTop: 8 }}
+                  >
+                    <input
+                      id={`bk-${p.id}`}
+                      name="bookable"
+                      type="checkbox"
+                      defaultChecked={p.bookable}
+                    />{" "}
+                    {t("bookable")}
+                  </label>
                   <button
                     type="submit"
                     style={{ marginTop: 10, display: "block" }}
                   >
                     {t("save")}
+                  </button>
+                </form>
+
+                <form action={updateSpec} style={{ marginTop: 12 }}>
+                  <input type="hidden" name="locale" value={locale} />
+                  <input type="hidden" name="productId" value={p.id} />
+                  <strong className="muted">{t("specTitle")}</strong>
+                  <label className="muted" htmlFor={`wn-${p.id}`}>
+                    {t("wordMin")}
+                  </label>
+                  <input
+                    id={`wn-${p.id}`}
+                    name="wordCountMin"
+                    type="number"
+                    min="0"
+                    defaultValue={p.spec?.wordCountMin ?? ""}
+                  />
+                  <label className="muted" htmlFor={`wx-${p.id}`}>
+                    {t("wordMax")}
+                  </label>
+                  <input
+                    id={`wx-${p.id}`}
+                    name="wordCountMax"
+                    type="number"
+                    min="0"
+                    defaultValue={p.spec?.wordCountMax ?? ""}
+                  />
+                  <label className="muted" htmlFor={`im-${p.id}`}>
+                    {t("imagesMin")}
+                  </label>
+                  <input
+                    id={`im-${p.id}`}
+                    name="imagesMin"
+                    type="number"
+                    min="0"
+                    defaultValue={p.spec?.imagesMin ?? ""}
+                  />
+                  <label className="muted" htmlFor={`dl-${p.id}`}>
+                    {t("disclosure")}
+                  </label>
+                  <input
+                    id={`dl-${p.id}`}
+                    name="disclosureLabel"
+                    defaultValue={p.spec?.disclosureLabel ?? ""}
+                  />
+                  <label className="muted" htmlFor={`ff-${p.id}`}>
+                    {t("fileFormats")}
+                  </label>
+                  <input
+                    id={`ff-${p.id}`}
+                    name="fileFormats"
+                    defaultValue={p.spec?.fileFormats ?? ""}
+                  />
+                  <label className="muted" htmlFor={`rq-${p.id}`}>
+                    {t("requirements")}
+                  </label>
+                  <input
+                    id={`rq-${p.id}`}
+                    name="requirements"
+                    defaultValue={p.spec?.requirements ?? ""}
+                  />
+                  <button
+                    type="submit"
+                    style={{ marginTop: 10, display: "block" }}
+                  >
+                    {t("saveSpec")}
                   </button>
                 </form>
               </article>

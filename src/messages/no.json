@@ -50,7 +50,8 @@
     "images": "Bilder (min.)",
     "disclosure": "Merking",
     "addToPlan": "Legg til i plan",
-    "indicativeNote": "Veiledende pris. Endelig pris bekreftes av kjøpsteamet."
+    "indicativeNote": "Veiledende pris. Endelig pris bekreftes av kjøpsteamet.",
+    "unavailable": "For øyeblikket ikke tilgjengelig for bestilling."
   },
   "plan": {
     "title": "Din plan",
@@ -174,7 +175,16 @@
     "status": "Bestillingsstatus",
     "booking": "Bookingstatus",
     "liveUrl": "Live-URL",
-    "noBooking": "Ingen booking registrert."
+    "noBooking": "Ingen booking registrert.",
+    "bookable": "Tilgjengelig for bestilling",
+    "specTitle": "Innholdsspesifikasjon",
+    "wordMin": "Min. ord",
+    "wordMax": "Maks. ord",
+    "imagesMin": "Min. bilder",
+    "disclosure": "Merking",
+    "fileFormats": "Filformater",
+    "requirements": "Krav",
+    "saveSpec": "Lagre spesifikasjon"
   },
   "productType": {
     "NATIVE_ARTICLE": "Native-artikkel",

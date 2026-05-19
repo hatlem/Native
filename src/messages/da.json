@@ -50,7 +50,8 @@
     "images": "Billeder (min.)",
     "disclosure": "Mærkning",
     "addToPlan": "Tilføj til plan",
-    "indicativeNote": "Vejledende pris. Den faste pris bekræftes af vores indkøbsteam."
+    "indicativeNote": "Vejledende pris. Den faste pris bekræftes af vores indkøbsteam.",
+    "unavailable": "I øjeblikket ikke tilgængelig til booking."
   },
   "plan": {
     "title": "Din plan",
@@ -174,7 +175,16 @@
     "status": "Ordrestatus",
     "booking": "Bookingstatus",
     "liveUrl": "Live-URL",
-    "noBooking": "Ingen booking registreret."
+    "noBooking": "Ingen booking registreret.",
+    "bookable": "Tilgængelig til booking",
+    "specTitle": "Indholdsspecifikation",
+    "wordMin": "Min. ord",
+    "wordMax": "Maks. ord",
+    "imagesMin": "Min. billeder",
+    "disclosure": "Mærkning",
+    "fileFormats": "Filformater",
+    "requirements": "Krav",
+    "saveSpec": "Gem specifikation"
   },
   "productType": {
     "NATIVE_ARTICLE": "Native-artikel",

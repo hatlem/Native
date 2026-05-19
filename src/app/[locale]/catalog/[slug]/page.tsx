@@ -87,13 +87,21 @@ export default async function TitleDetailPage({
                   ) : null}
                 </div>
               ) : null}
-              <form action={addToPlan} style={{ marginTop: 12 }}>
-                <input type="hidden" name="locale" value={locale} />
-                <input type="hidden" name="productId" value={p.id} />
-                <button type="submit" className="btn" style={{ marginTop: 0 }}>
-                  {t("addToPlan")}
-                </button>
-              </form>
+              {p.bookable ? (
+                <form action={addToPlan} style={{ marginTop: 12 }}>
+                  <input type="hidden" name="locale" value={locale} />
+                  <input type="hidden" name="productId" value={p.id} />
+                  <button
+                    type="submit"
+                    className="btn"
+                    style={{ marginTop: 0 }}
+                  >
+                    {t("addToPlan")}
+                  </button>
+                </form>
+              ) : (
+                <p className="note">{t("unavailable")}</p>
+              )}
             </article>
           );
         })}

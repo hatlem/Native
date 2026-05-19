@@ -81,7 +81,11 @@ export async function submitRequest(formData: FormData) {
 
   const vatPct = market ? Number(market.vatRatePct) : 25;
   const products = await prisma.product.findMany({
-    where: { id: { in: basket.map((b) => b.productId) }, active: true },
+    where: {
+      id: { in: basket.map((b) => b.productId) },
+      active: true,
+      bookable: true,
+    },
     include: { priceRules: true },
   });
   const byId = new Map(products.map((p) => [p.id, p]));

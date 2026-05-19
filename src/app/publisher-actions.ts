@@ -51,6 +51,7 @@ export async function updateProduct(formData: FormData) {
       data: {
         basePrice,
         visibility,
+        bookable: formData.get("bookable") === "on",
         leadTimeDays:
           Number.isFinite(leadTimeDays) && leadTimeDays > 0
             ? Math.trunc(leadTimeDays)
@@ -58,6 +59,41 @@ export async function updateProduct(formData: FormData) {
       },
     });
   }
+  redirect(`/${locale}/publisher`);
+}
+
+function intOrNull(formData: FormData, key: string): number | null {
+  const n = Number(field(formData, key));
+  return Number.isFinite(n) && n > 0 ? Math.trunc(n) : null;
+}
+
+export async function updateSpec(formData: FormData) {
+  const locale = field(formData, "locale") || "en";
+  const publisherId = await requirePublisher(locale);
+  const productId = field(formData, "productId");
+
+  const product = await prisma.product.findUnique({
+    where: { id: productId },
+    include: { title: { select: { publisherId: true } } },
+  });
+  if (product?.title.publisherId !== publisherId) {
+    redirect(`/${locale}/publisher`);
+  }
+
+  const data = {
+    wordCountMin: intOrNull(formData, "wordCountMin"),
+    wordCountMax: intOrNull(formData, "wordCountMax"),
+    imagesMin: intOrNull(formData, "imagesMin"),
+    disclosureLabel: field(formData, "disclosureLabel") || null,
+    fileFormats: field(formData, "fileFormats") || null,
+    requirements: field(formData, "requirements") || null,
+  };
+
+  await prisma.spec.upsert({
+    where: { productId },
+    update: data,
+    create: { productId, ...data },
+  });
   redirect(`/${locale}/publisher`);
 }
 

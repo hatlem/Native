@@ -170,6 +170,7 @@ model Product {
   visibility   PriceVisibility @default(INDICATIVE)
   leadTimeDays Int             @default(10)
   active       Boolean         @default(true)
+  bookable     Boolean         @default(true)
   createdAt    DateTime        @default(now())
   updatedAt    DateTime        @updatedAt
 
