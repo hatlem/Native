@@ -115,6 +115,44 @@
     "signin": "Logga in",
     "signout": "Logga ut"
   },
+  "order": {
+    "title": "Order",
+    "status": "Status",
+    "advance": "Flytta status framåt",
+    "lines": "Rader",
+    "orders": "Ordrar",
+    "noOrders": "Inga ordrar än.",
+    "open": "Öppna",
+    "back": "Tillbaka till desk",
+    "issueInvoice": "Skapa faktura",
+    "viewInvoice": "Visa faktura"
+  },
+  "production": {
+    "brief": "Brief",
+    "audience": "Målgrupp",
+    "noAssets": "Inget innehåll än.",
+    "version": "Version",
+    "status": "Status",
+    "specPass": "Specifikation godkänd",
+    "specFail": "Specifikationsavvikelser",
+    "specCheck": "Kör specifikationskoll",
+    "submitReview": "Skicka för granskning",
+    "approve": "Godkänn",
+    "finalize": "Slutför",
+    "requestChanges": "Begär ändringar",
+    "draftLabel": "Ny utkastversion",
+    "saveDraft": "Spara utkast"
+  },
+  "invoice": {
+    "title": "Faktura",
+    "status": "Status",
+    "billTo": "Faktureras till",
+    "issued": "Utfärdad",
+    "due": "Förfaller",
+    "subtotal": "Delsumma",
+    "vat": "Moms",
+    "total": "Totalt"
+  },
   "productType": {
     "NATIVE_ARTICLE": "Native-artikel",
     "ADVERTORIAL": "Advertorial",

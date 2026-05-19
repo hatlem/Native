@@ -16,6 +16,8 @@ export default async function RequestPage({
   const t = await getTranslations({ locale, namespace: "requests" });
   const tType = await getTranslations({ locale, namespace: "productType" });
   const tNav = await getTranslations({ locale, namespace: "nav" });
+  const tp = await getTranslations({ locale, namespace: "production" });
+  const ti = await getTranslations({ locale, namespace: "invoice" });
 
   const request = await prisma.request.findUnique({
     where: { id },
@@ -24,7 +26,23 @@ export default async function RequestPage({
       plan: { include: { items: true } },
       quotes: {
         orderBy: { createdAt: "desc" },
-        include: { lines: true, order: true },
+        include: {
+          lines: true,
+          order: {
+            include: {
+              invoices: true,
+              lines: {
+                include: {
+                  brief: {
+                    include: {
+                      assets: { orderBy: { version: "desc" }, take: 1 },
+                    },
+                  },
+                },
+              },
+            },
+          },
+        },
       },
     },
   });
@@ -106,6 +124,43 @@ export default async function RequestPage({
           </div>
         </>
       )}
+
+      {(() => {
+        const order = quote?.order;
+        if (!order) return null;
+        const orderInvoice = order.invoices[0];
+        return (
+          <>
+            <h2 style={{ marginTop: 24 }}>
+              {t("order")} · {order.status}
+            </h2>
+            <div className="grid">
+              {order.lines.map((line) => {
+                const p = byId.get(line.productId);
+                const asset = line.brief?.assets[0];
+                return (
+                  <article className="card" key={line.id}>
+                    <h3>{p?.title.name ?? line.productId}</h3>
+                    <div className="muted">{p ? tType(p.type) : ""}</div>
+                    <div className="muted">
+                      {tp("status")}:{" "}
+                      {asset ? asset.status : tp("noAssets")}
+                      {asset?.specPassed === true ? ` · ✅` : null}
+                    </div>
+                  </article>
+                );
+              })}
+            </div>
+            {orderInvoice ? (
+              <p className="note">
+                <Link href={`/invoices/${orderInvoice.id}`}>
+                  {ti("title")} →
+                </Link>
+              </p>
+            ) : null}
+          </>
+        );
+      })()}
 
       <p className="note" style={{ marginTop: 24 }}>
         <Link href="/catalog">← {tNav("catalog")}</Link>

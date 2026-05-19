@@ -358,6 +358,7 @@ model ContentAsset {
   brief       ContentBrief       @relation(fields: [briefId], references: [id])
   version     Int                @default(1)
   status      ContentAssetStatus @default(DRAFT)
+  body        String?
   bodyUrl     String? // pointer into object storage
   specPassed  Boolean?
   reviewNotes String?

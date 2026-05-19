@@ -11,6 +11,7 @@ export default async function DeskListPage({
 }) {
   const { locale } = await params;
   const t = await getTranslations({ locale, namespace: "desk" });
+  const to = await getTranslations({ locale, namespace: "order" });
 
   const requests = await prisma.request.findMany({
     orderBy: { createdAt: "desc" },
@@ -25,6 +26,9 @@ export default async function DeskListPage({
     <section>
       <h1>{t("title")}</h1>
       <p className="muted">{t("subtitle")}</p>
+      <p>
+        <Link href="/desk/orders">{to("orders")} →</Link>
+      </p>
 
       {requests.length === 0 ? (
         <p className="note">{t("noRequests")}</p>

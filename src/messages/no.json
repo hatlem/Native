@@ -115,6 +115,44 @@
     "signin": "Logg inn",
     "signout": "Logg ut"
   },
+  "order": {
+    "title": "Bestilling",
+    "status": "Status",
+    "advance": "Flytt status videre",
+    "lines": "Linjer",
+    "orders": "Bestillinger",
+    "noOrders": "Ingen bestillinger ennå.",
+    "open": "Åpne",
+    "back": "Tilbake til desk",
+    "issueInvoice": "Send faktura",
+    "viewInvoice": "Se faktura"
+  },
+  "production": {
+    "brief": "Brief",
+    "audience": "Målgruppe",
+    "noAssets": "Ingen innhold ennå.",
+    "version": "Versjon",
+    "status": "Status",
+    "specPass": "Spesifikasjon godkjent",
+    "specFail": "Spesifikasjonsavvik",
+    "specCheck": "Kjør spesifikasjonssjekk",
+    "submitReview": "Send til gjennomgang",
+    "approve": "Godkjenn",
+    "finalize": "Ferdigstill",
+    "requestChanges": "Be om endringer",
+    "draftLabel": "Ny utkastsversjon",
+    "saveDraft": "Lagre utkast"
+  },
+  "invoice": {
+    "title": "Faktura",
+    "status": "Status",
+    "billTo": "Faktureres til",
+    "issued": "Utstedt",
+    "due": "Forfaller",
+    "subtotal": "Delsum",
+    "vat": "MVA",
+    "total": "Totalt"
+  },
   "productType": {
     "NATIVE_ARTICLE": "Native-artikkel",
     "ADVERTORIAL": "Advertorial",

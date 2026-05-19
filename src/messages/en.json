@@ -115,6 +115,44 @@
     "signin": "Sign in",
     "signout": "Sign out"
   },
+  "order": {
+    "title": "Order",
+    "status": "Status",
+    "advance": "Advance status",
+    "lines": "Lines",
+    "orders": "Orders",
+    "noOrders": "No orders yet.",
+    "open": "Open",
+    "back": "Back to desk",
+    "issueInvoice": "Issue invoice",
+    "viewInvoice": "View invoice"
+  },
+  "production": {
+    "brief": "Brief",
+    "audience": "Audience",
+    "noAssets": "No content yet.",
+    "version": "Version",
+    "status": "Status",
+    "specPass": "Spec passed",
+    "specFail": "Spec issues",
+    "specCheck": "Run spec check",
+    "submitReview": "Submit for review",
+    "approve": "Approve",
+    "finalize": "Finalize",
+    "requestChanges": "Request changes",
+    "draftLabel": "New draft version",
+    "saveDraft": "Save draft"
+  },
+  "invoice": {
+    "title": "Invoice",
+    "status": "Status",
+    "billTo": "Bill to",
+    "issued": "Issued",
+    "due": "Due",
+    "subtotal": "Subtotal",
+    "vat": "VAT",
+    "total": "Total"
+  },
   "productType": {
     "NATIVE_ARTICLE": "Native article",
     "ADVERTORIAL": "Advertorial",

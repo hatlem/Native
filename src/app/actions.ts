@@ -224,15 +224,21 @@ export async function acceptQuote(formData: FormData) {
 
   const quote = await prisma.quote.findUnique({
     where: { id: quoteId },
-    include: { lines: true, request: true, order: true },
+    include: {
+      lines: true,
+      order: true,
+      request: { include: { plan: true } },
+    },
   });
   if (!quote) redirect(`/${locale}/catalog`);
   if (quote.order) {
     redirect(`/${locale}/requests/${quote.requestId}`);
   }
 
-  await prisma.$transaction([
-    prisma.order.create({
+  const plan = quote.request.plan;
+
+  await prisma.$transaction(async (tx) => {
+    const order = await tx.order.create({
       data: {
         organizationId: quote.request.organizationId,
         quoteId: quote.id,
@@ -245,16 +251,26 @@ export async function acceptQuote(formData: FormData) {
           })),
         },
       },
-    }),
-    prisma.quote.update({
+      include: { lines: true },
+    });
+
+    await tx.contentBrief.createMany({
+      data: order.lines.map((line) => ({
+        orderLineId: line.id,
+        message: plan.goal,
+        audience: plan.audienceNote,
+      })),
+    });
+
+    await tx.quote.update({
       where: { id: quote.id },
       data: { status: "ACCEPTED" },
-    }),
-    prisma.request.update({
+    });
+    await tx.request.update({
       where: { id: quote.requestId },
       data: { status: "CLOSED" },
-    }),
-  ]);
+    });
+  });
 
   redirect(`/${locale}/requests/${quote.requestId}`);
 }

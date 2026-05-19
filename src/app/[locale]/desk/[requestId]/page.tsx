@@ -97,7 +97,13 @@ export default async function DeskRequestPage({
               </span>
             </div>
             <p className="note">
-              {quote.order ? t("acceptedOrder") : t("awaiting")}
+              {quote.order ? (
+                <Link href={`/desk/orders/${quote.order.id}`}>
+                  {t("acceptedOrder")} →
+                </Link>
+              ) : (
+                t("awaiting")
+              )}
             </p>
           </div>
         </>
