@@ -22,12 +22,17 @@ multilingual public catalog.
 ## Setup
 
 ```bash
-cp .env.example .env          # adjust DATABASE_URL if needed
+cp .env.example .env          # set DATABASE_URL and AUTH_SECRET
 pnpm install
 pnpm prisma migrate deploy    # or: pnpm prisma:migrate (dev)
-pnpm db:seed                  # seed Nordic markets, publishers, titles
+pnpm db:seed                  # seed Nordic catalog + desk admin user
 pnpm dev                      # http://localhost:3000  -> redirects to /en
 ```
+
+The internal desk console (`/[locale]/desk`) requires a `DESK` /
+`SUPERADMIN` login. The seed creates a demo account:
+`desk@benative.example` / `benative-desk` (override via
+`DESK_ADMIN_EMAIL` / `DESK_ADMIN_PASSWORD`).
 
 Catalog: `/en/catalog` (also `/no`, `/sv`, `/da`). Filter by market, format and
 free-text search.

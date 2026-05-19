@@ -105,6 +105,16 @@
     "awaiting": "Awaiting customer acceptance.",
     "acceptedOrder": "Accepted — order created."
   },
+  "auth": {
+    "title": "Sign in",
+    "email": "Email",
+    "password": "Password",
+    "submit": "Sign in",
+    "failed": "Invalid email or password.",
+    "hint": "Demo desk login: desk@benative.example / benative-desk",
+    "signin": "Sign in",
+    "signout": "Sign out"
+  },
   "productType": {
     "NATIVE_ARTICLE": "Native article",
     "ADVERTORIAL": "Advertorial",

@@ -1,6 +1,12 @@
 import { PrismaClient, MarketCode, ProductType } from "@prisma/client";
+import bcrypt from "bcryptjs";
 
 const prisma = new PrismaClient();
+
+const DESK_EMAIL = (
+  process.env.DESK_ADMIN_EMAIL || "desk@benative.example"
+).toLowerCase();
+const DESK_PASSWORD = process.env.DESK_ADMIN_PASSWORD || "benative-desk";
 
 type SeedMarket = {
   code: MarketCode;
@@ -215,10 +221,22 @@ async function main() {
     }
   }
 
+  const passwordHash = await bcrypt.hash(DESK_PASSWORD, 10);
+  await prisma.user.upsert({
+    where: { email: DESK_EMAIL },
+    update: { passwordHash, role: "DESK" },
+    create: {
+      email: DESK_EMAIL,
+      name: "Desk Admin",
+      role: "DESK",
+      passwordHash,
+    },
+  });
+
   const titleCount = await prisma.title.count();
   const productCount = await prisma.product.count();
   console.log(
-    `Seeded ${MARKETS.length} markets, ${titleCount} titles, ${productCount} products.`,
+    `Seeded ${MARKETS.length} markets, ${titleCount} titles, ${productCount} products, desk user ${DESK_EMAIL}.`,
   );
 }
 

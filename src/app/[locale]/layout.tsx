@@ -4,6 +4,8 @@ import { getMessages, getTranslations } from "next-intl/server";
 import { notFound } from "next/navigation";
 import { routing } from "@/i18n/routing";
 import { Link } from "@/i18n/navigation";
+import { auth } from "@/auth";
+import { logout } from "@/app/auth-actions";
 import "../globals.css";
 
 export const metadata = {
@@ -28,6 +30,8 @@ export default async function LocaleLayout({
   const messages = await getMessages();
   const t = await getTranslations({ locale, namespace: "nav" });
   const tc = await getTranslations({ locale, namespace: "common" });
+  const ta = await getTranslations({ locale, namespace: "auth" });
+  const session = await auth();
 
   return (
     <html lang={locale}>
@@ -43,6 +47,18 @@ export default async function LocaleLayout({
                 <Link href="/catalog">{t("catalog")}</Link>
                 <Link href="/plan">{t("plan")}</Link>
                 <Link href="/desk">{t("desk")}</Link>
+                {session?.user ? (
+                  <form
+                    action={logout}
+                    style={{ display: "inline", marginLeft: 18 }}
+                  >
+                    <input type="hidden" name="locale" value={locale} />
+                    <span className="muted">{session.user.email}</span>{" "}
+                    <button type="submit">{ta("signout")}</button>
+                  </form>
+                ) : (
+                  <Link href="/signin">{ta("signin")}</Link>
+                )}
               </nav>
             </div>
           </header>

@@ -105,6 +105,16 @@
     "awaiting": "Väntar på kundens godkännande.",
     "acceptedOrder": "Accepterad — order skapad."
   },
+  "auth": {
+    "title": "Logga in",
+    "email": "E-post",
+    "password": "Lösenord",
+    "submit": "Logga in",
+    "failed": "Ogiltig e-post eller lösenord.",
+    "hint": "Demo desk-inloggning: desk@benative.example / benative-desk",
+    "signin": "Logga in",
+    "signout": "Logga ut"
+  },
   "productType": {
     "NATIVE_ARTICLE": "Native-artikel",
     "ADVERTORIAL": "Advertorial",

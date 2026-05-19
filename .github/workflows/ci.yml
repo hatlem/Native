@@ -26,6 +26,7 @@ jobs:
 
     env:
       DATABASE_URL: "postgresql://benative:benative@127.0.0.1:5432/benative?schema=public"
+      AUTH_SECRET: "ci-test-secret"
 
     steps:
       - uses: actions/checkout@v4
