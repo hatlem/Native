@@ -82,7 +82,14 @@ export default async function LocaleLayout({
           <main className="container">{children}</main>
           <footer>
             <div className="container">
-              BeNative · Phase 0 scaffold — see PLAN.md
+              <span>
+                © {new Date().getFullYear()} {tc("appName")}
+              </span>
+              <span>
+                <Link href="/catalog">{t("catalog")}</Link>
+                {" · "}
+                <Link href="/recommend">{t("recommend")}</Link>
+              </span>
             </div>
           </footer>
         </NextIntlClientProvider>
