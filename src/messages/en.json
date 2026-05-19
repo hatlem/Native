@@ -1,6 +1,11 @@
 {
   "common": { "appName": "BeNative" },
-  "nav": { "home": "Home", "catalog": "Catalog" },
+  "nav": {
+    "home": "Home",
+    "catalog": "Catalog",
+    "plan": "Plan",
+    "desk": "Desk"
+  },
   "home": {
     "title": "Buy native content in Nordic newspapers and magazines",
     "subtitle": "See every title that offers native, with transparent pricing. Brief us once — we write it, we book it, even where programmatic isn't possible.",
@@ -31,6 +36,74 @@
     },
     "indicativeNote": "Prices are indicative. A firm price is confirmed by our buying desk based on availability, season and volume.",
     "noResults": "No titles match these filters."
+  },
+  "titleDetail": {
+    "back": "Back to catalog",
+    "publishedBy": "Published by",
+    "reach": "Monthly reach",
+    "leadTime": "Lead time",
+    "days": "days",
+    "from": "From",
+    "spec": "Content spec",
+    "words": "Words",
+    "images": "Images (min)",
+    "disclosure": "Disclosure label",
+    "addToPlan": "Add to plan",
+    "indicativeNote": "Indicative price. The firm price is confirmed by our buying desk."
+  },
+  "plan": {
+    "title": "Your plan",
+    "empty": "Your plan is empty.",
+    "browse": "Browse the catalog",
+    "remove": "Remove",
+    "qty": "Qty",
+    "estTotal": "Estimated indicative total",
+    "rfqTitle": "Request a firm quote",
+    "error": "Add at least one placement and fill in company, email and market."
+  },
+  "rfq": {
+    "org": "Company",
+    "contactName": "Contact name",
+    "contactEmail": "Contact email",
+    "market": "Billing market",
+    "budget": "Budget (optional)",
+    "audience": "Target audience (optional)",
+    "goal": "Campaign goal (optional)",
+    "brief": "Content brief (optional)",
+    "submit": "Submit request"
+  },
+  "requests": {
+    "title": "Request",
+    "status": "Status",
+    "items": "Selected placements",
+    "quote": "Your quote",
+    "subtotal": "Subtotal",
+    "vat": "VAT",
+    "total": "Total",
+    "validUntil": "Valid until",
+    "accept": "Accept quote",
+    "pending": "Your request was submitted. Our buying desk will prepare a firm quote.",
+    "accepted": "Quote accepted — order confirmed.",
+    "order": "Order",
+    "orderStatus": "Order status"
+  },
+  "desk": {
+    "title": "Desk console",
+    "subtitle": "Internal — incoming requests, quoting and orders.",
+    "noRequests": "No requests yet.",
+    "org": "Company",
+    "status": "Status",
+    "items": "Items",
+    "open": "Open",
+    "request": "Request",
+    "brief": "Brief",
+    "generate": "Generate quote",
+    "quote": "Quote",
+    "subtotal": "Subtotal",
+    "vat": "VAT",
+    "total": "Total",
+    "awaiting": "Awaiting customer acceptance.",
+    "acceptedOrder": "Accepted — order created."
   },
   "productType": {
     "NATIVE_ARTICLE": "Native article",

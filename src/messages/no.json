@@ -1,6 +1,11 @@
 {
   "common": { "appName": "BeNative" },
-  "nav": { "home": "Hjem", "catalog": "Katalog" },
+  "nav": {
+    "home": "Hjem",
+    "catalog": "Katalog",
+    "plan": "Plan",
+    "desk": "Desk"
+  },
   "home": {
     "title": "Kjøp native-innhold i nordiske aviser og magasiner",
     "subtitle": "Se alle titler som tilbyr native, med åpne priser. Gi oss en brief — vi skriver det og bestiller det, også der programmatisk ikke er mulig.",
@@ -31,6 +36,74 @@
     },
     "indicativeNote": "Prisene er veiledende. Endelig pris bekreftes av kjøpsteamet basert på tilgjengelighet, sesong og volum.",
     "noResults": "Ingen titler matcher disse filtrene."
+  },
+  "titleDetail": {
+    "back": "Tilbake til katalogen",
+    "publishedBy": "Utgis av",
+    "reach": "Månedlig rekkevidde",
+    "leadTime": "Ledetid",
+    "days": "dager",
+    "from": "Fra",
+    "spec": "Innholdsspesifikasjon",
+    "words": "Ord",
+    "images": "Bilder (min.)",
+    "disclosure": "Merking",
+    "addToPlan": "Legg til i plan",
+    "indicativeNote": "Veiledende pris. Endelig pris bekreftes av kjøpsteamet."
+  },
+  "plan": {
+    "title": "Din plan",
+    "empty": "Planen din er tom.",
+    "browse": "Se katalogen",
+    "remove": "Fjern",
+    "qty": "Antall",
+    "estTotal": "Estimert veiledende total",
+    "rfqTitle": "Be om et fast tilbud",
+    "error": "Legg til minst én plassering og fyll inn selskap, e-post og marked."
+  },
+  "rfq": {
+    "org": "Selskap",
+    "contactName": "Kontaktperson",
+    "contactEmail": "Kontakt-e-post",
+    "market": "Faktureringsmarked",
+    "budget": "Budsjett (valgfritt)",
+    "audience": "Målgruppe (valgfritt)",
+    "goal": "Kampanjemål (valgfritt)",
+    "brief": "Innholdsbrief (valgfritt)",
+    "submit": "Send forespørsel"
+  },
+  "requests": {
+    "title": "Forespørsel",
+    "status": "Status",
+    "items": "Valgte plasseringer",
+    "quote": "Ditt tilbud",
+    "subtotal": "Delsum",
+    "vat": "MVA",
+    "total": "Totalt",
+    "validUntil": "Gyldig til",
+    "accept": "Godta tilbud",
+    "pending": "Forespørselen er sendt. Kjøpsteamet utarbeider et fast tilbud.",
+    "accepted": "Tilbud godtatt — bestilling bekreftet.",
+    "order": "Bestilling",
+    "orderStatus": "Bestillingsstatus"
+  },
+  "desk": {
+    "title": "Desk-konsoll",
+    "subtitle": "Internt — innkommende forespørsler, tilbud og bestillinger.",
+    "noRequests": "Ingen forespørsler ennå.",
+    "org": "Selskap",
+    "status": "Status",
+    "items": "Linjer",
+    "open": "Åpne",
+    "request": "Forespørsel",
+    "brief": "Brief",
+    "generate": "Lag tilbud",
+    "quote": "Tilbud",
+    "subtotal": "Delsum",
+    "vat": "MVA",
+    "total": "Totalt",
+    "awaiting": "Venter på at kunden godtar.",
+    "acceptedOrder": "Godtatt — bestilling opprettet."
   },
   "productType": {
     "NATIVE_ARTICLE": "Native-artikkel",

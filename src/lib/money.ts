@@ -30,3 +30,17 @@ export function formatMoney(
     maximumFractionDigits: 0,
   }).format(amount);
 }
+
+// Firm line total used by the desk when producing a Quote.
+export function firmLineTotal(
+  basePrice: number,
+  marginPct: number,
+  quantity: number,
+  seasonalMultiplier = 1,
+): number {
+  return basePrice * (1 + marginPct / 100) * seasonalMultiplier * quantity;
+}
+
+export function withVat(amount: number, vatPct: number): number {
+  return amount * (1 + vatPct / 100);
+}

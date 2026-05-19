@@ -1,6 +1,11 @@
 {
   "common": { "appName": "BeNative" },
-  "nav": { "home": "Hem", "catalog": "Katalog" },
+  "nav": {
+    "home": "Hem",
+    "catalog": "Katalog",
+    "plan": "Plan",
+    "desk": "Desk"
+  },
   "home": {
     "title": "Köp native-innehåll i nordiska tidningar och magasin",
     "subtitle": "Se alla titlar som erbjuder native, med transparenta priser. Ge oss en brief — vi skriver det och bokar det, även där programmatiskt inte är möjligt.",
@@ -31,6 +36,74 @@
     },
     "indicativeNote": "Priserna är vägledande. Ett fast pris bekräftas av vårt inköpsteam baserat på tillgänglighet, säsong och volym.",
     "noResults": "Inga titlar matchar dessa filter."
+  },
+  "titleDetail": {
+    "back": "Tillbaka till katalogen",
+    "publishedBy": "Ges ut av",
+    "reach": "Månatlig räckvidd",
+    "leadTime": "Ledtid",
+    "days": "dagar",
+    "from": "Från",
+    "spec": "Innehållsspecifikation",
+    "words": "Ord",
+    "images": "Bilder (min.)",
+    "disclosure": "Märkning",
+    "addToPlan": "Lägg till i plan",
+    "indicativeNote": "Vägledande pris. Det fasta priset bekräftas av vårt inköpsteam."
+  },
+  "plan": {
+    "title": "Din plan",
+    "empty": "Din plan är tom.",
+    "browse": "Se katalogen",
+    "remove": "Ta bort",
+    "qty": "Antal",
+    "estTotal": "Uppskattad vägledande summa",
+    "rfqTitle": "Begär en fast offert",
+    "error": "Lägg till minst en placering och fyll i företag, e-post och marknad."
+  },
+  "rfq": {
+    "org": "Företag",
+    "contactName": "Kontaktperson",
+    "contactEmail": "Kontakt-e-post",
+    "market": "Faktureringsmarknad",
+    "budget": "Budget (valfritt)",
+    "audience": "Målgrupp (valfritt)",
+    "goal": "Kampanjmål (valfritt)",
+    "brief": "Innehållsbrief (valfritt)",
+    "submit": "Skicka förfrågan"
+  },
+  "requests": {
+    "title": "Förfrågan",
+    "status": "Status",
+    "items": "Valda placeringar",
+    "quote": "Din offert",
+    "subtotal": "Delsumma",
+    "vat": "Moms",
+    "total": "Totalt",
+    "validUntil": "Giltig till",
+    "accept": "Acceptera offert",
+    "pending": "Din förfrågan har skickats. Vårt inköpsteam förbereder en fast offert.",
+    "accepted": "Offert accepterad — order bekräftad.",
+    "order": "Order",
+    "orderStatus": "Orderstatus"
+  },
+  "desk": {
+    "title": "Desk-konsol",
+    "subtitle": "Internt — inkommande förfrågningar, offerter och order.",
+    "noRequests": "Inga förfrågningar än.",
+    "org": "Företag",
+    "status": "Status",
+    "items": "Rader",
+    "open": "Öppna",
+    "request": "Förfrågan",
+    "brief": "Brief",
+    "generate": "Skapa offert",
+    "quote": "Offert",
+    "subtotal": "Delsumma",
+    "vat": "Moms",
+    "total": "Totalt",
+    "awaiting": "Väntar på kundens godkännande.",
+    "acceptedOrder": "Accepterad — order skapad."
   },
   "productType": {
     "NATIVE_ARTICLE": "Native-artikel",

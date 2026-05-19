@@ -1,6 +1,11 @@
 {
   "common": { "appName": "BeNative" },
-  "nav": { "home": "Hjem", "catalog": "Katalog" },
+  "nav": {
+    "home": "Hjem",
+    "catalog": "Katalog",
+    "plan": "Plan",
+    "desk": "Desk"
+  },
   "home": {
     "title": "Køb native-indhold i nordiske aviser og magasiner",
     "subtitle": "Se alle titler der tilbyder native, med gennemsigtige priser. Giv os en brief — vi skriver det og booker det, også hvor programmatisk ikke er muligt.",
@@ -31,6 +36,74 @@
     },
     "indicativeNote": "Priserne er vejledende. En fast pris bekræftes af vores indkøbsteam baseret på tilgængelighed, sæson og volumen.",
     "noResults": "Ingen titler matcher disse filtre."
+  },
+  "titleDetail": {
+    "back": "Tilbage til kataloget",
+    "publishedBy": "Udgives af",
+    "reach": "Månedlig rækkevidde",
+    "leadTime": "Leveringstid",
+    "days": "dage",
+    "from": "Fra",
+    "spec": "Indholdsspecifikation",
+    "words": "Ord",
+    "images": "Billeder (min.)",
+    "disclosure": "Mærkning",
+    "addToPlan": "Tilføj til plan",
+    "indicativeNote": "Vejledende pris. Den faste pris bekræftes af vores indkøbsteam."
+  },
+  "plan": {
+    "title": "Din plan",
+    "empty": "Din plan er tom.",
+    "browse": "Se kataloget",
+    "remove": "Fjern",
+    "qty": "Antal",
+    "estTotal": "Anslået vejledende total",
+    "rfqTitle": "Anmod om et fast tilbud",
+    "error": "Tilføj mindst én placering og udfyld virksomhed, e-mail og marked."
+  },
+  "rfq": {
+    "org": "Virksomhed",
+    "contactName": "Kontaktperson",
+    "contactEmail": "Kontakt-e-mail",
+    "market": "Faktureringsmarked",
+    "budget": "Budget (valgfrit)",
+    "audience": "Målgruppe (valgfrit)",
+    "goal": "Kampagnemål (valgfrit)",
+    "brief": "Indholdsbrief (valgfrit)",
+    "submit": "Send anmodning"
+  },
+  "requests": {
+    "title": "Anmodning",
+    "status": "Status",
+    "items": "Valgte placeringer",
+    "quote": "Dit tilbud",
+    "subtotal": "Subtotal",
+    "vat": "Moms",
+    "total": "Total",
+    "validUntil": "Gyldig til",
+    "accept": "Accepter tilbud",
+    "pending": "Din anmodning er sendt. Vores indkøbsteam forbereder et fast tilbud.",
+    "accepted": "Tilbud accepteret — ordre bekræftet.",
+    "order": "Ordre",
+    "orderStatus": "Ordrestatus"
+  },
+  "desk": {
+    "title": "Desk-konsol",
+    "subtitle": "Internt — indkommende anmodninger, tilbud og ordrer.",
+    "noRequests": "Ingen anmodninger endnu.",
+    "org": "Virksomhed",
+    "status": "Status",
+    "items": "Linjer",
+    "open": "Åbn",
+    "request": "Anmodning",
+    "brief": "Brief",
+    "generate": "Lav tilbud",
+    "quote": "Tilbud",
+    "subtotal": "Subtotal",
+    "vat": "Moms",
+    "total": "Total",
+    "awaiting": "Afventer kundens accept.",
+    "acceptedOrder": "Accepteret — ordre oprettet."
   },
   "productType": {
     "NATIVE_ARTICLE": "Native-artikel",

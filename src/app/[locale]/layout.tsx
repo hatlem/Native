@@ -41,6 +41,8 @@ export default async function LocaleLayout({
               <nav className="nav">
                 <Link href="/">{t("home")}</Link>
                 <Link href="/catalog">{t("catalog")}</Link>
+                <Link href="/plan">{t("plan")}</Link>
+                <Link href="/desk">{t("desk")}</Link>
               </nav>
             </div>
           </header>

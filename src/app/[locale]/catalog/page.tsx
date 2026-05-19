@@ -1,6 +1,7 @@
 import { getTranslations } from "next-intl/server";
 import { MarketCode, ProductType, Prisma } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
+import { Link } from "@/i18n/navigation";
 import { indicativePrice, formatMoney } from "@/lib/money";
 
 export const dynamic = "force-dynamic";
@@ -122,7 +123,9 @@ export default async function CatalogPage({
 
             return (
               <article className="card" key={title.id}>
-                <h3>{title.name}</h3>
+                <h3>
+                  <Link href={`/catalog/${title.slug}`}>{title.name}</Link>
+                </h3>
                 <div className="muted">
                   {title.publisher.name} · {tMarket(title.market.code)}
                 </div>
