@@ -4,7 +4,8 @@
     "home": "Home",
     "catalog": "Catalog",
     "plan": "Plan",
-    "desk": "Desk"
+    "desk": "Desk",
+    "publisher": "Publisher"
   },
   "home": {
     "title": "Buy native content in Nordic newspapers and magazines",
@@ -158,6 +159,22 @@
     "planTitle": "Confirm your order",
     "planNote": "All items are firm-priced — submitting confirms your order instantly, no buying-desk wait.",
     "planSubmit": "Confirm order"
+  },
+  "publisher": {
+    "title": "Publisher portal",
+    "orders": "Incoming bookings",
+    "ordersTitle": "Incoming bookings",
+    "noOrders": "No bookings yet.",
+    "basePrice": "Base price",
+    "visibility": "Pricing",
+    "leadTime": "Lead time (days)",
+    "save": "Save",
+    "firm": "Firm (instant book)",
+    "indicative": "Indicative (RFQ)",
+    "status": "Order status",
+    "booking": "Booking status",
+    "liveUrl": "Live URL",
+    "noBooking": "No booking record."
   },
   "productType": {
     "NATIVE_ARTICLE": "Native article",

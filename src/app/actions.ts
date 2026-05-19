@@ -198,6 +198,9 @@ export async function submitRequest(formData: FormData) {
           audience: audience || null,
         })),
       });
+      await tx.publisherBooking.createMany({
+        data: order.lines.map((l) => ({ orderLineId: l.id })),
+      });
     }
 
     return req;
@@ -327,6 +330,9 @@ export async function acceptQuote(formData: FormData) {
         message: plan.goal,
         audience: plan.audienceNote,
       })),
+    });
+    await tx.publisherBooking.createMany({
+      data: order.lines.map((line) => ({ orderLineId: line.id })),
     });
 
     await tx.quote.update({

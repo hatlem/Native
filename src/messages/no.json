@@ -4,7 +4,8 @@
     "home": "Hjem",
     "catalog": "Katalog",
     "plan": "Plan",
-    "desk": "Desk"
+    "desk": "Desk",
+    "publisher": "Utgiver"
   },
   "home": {
     "title": "Kjøp native-innhold i nordiske aviser og magasiner",
@@ -158,6 +159,22 @@
     "planTitle": "Bekreft bestillingen",
     "planNote": "Alle elementer har fast pris — innsending bekrefter bestillingen umiddelbart, uten venting på kjøpsteamet.",
     "planSubmit": "Bekreft bestilling"
+  },
+  "publisher": {
+    "title": "Utgiverportal",
+    "orders": "Innkommende bookinger",
+    "ordersTitle": "Innkommende bookinger",
+    "noOrders": "Ingen bookinger ennå.",
+    "basePrice": "Grunnpris",
+    "visibility": "Prising",
+    "leadTime": "Ledetid (dager)",
+    "save": "Lagre",
+    "firm": "Fast (bestill direkte)",
+    "indicative": "Veiledende (forespørsel)",
+    "status": "Bestillingsstatus",
+    "booking": "Bookingstatus",
+    "liveUrl": "Live-URL",
+    "noBooking": "Ingen booking registrert."
   },
   "productType": {
     "NATIVE_ARTICLE": "Native-artikkel",

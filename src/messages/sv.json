@@ -4,7 +4,8 @@
     "home": "Hem",
     "catalog": "Katalog",
     "plan": "Plan",
-    "desk": "Desk"
+    "desk": "Desk",
+    "publisher": "Utgivare"
   },
   "home": {
     "title": "Köp native-innehåll i nordiska tidningar och magasin",
@@ -158,6 +159,22 @@
     "planTitle": "Bekräfta din order",
     "planNote": "Alla poster har fast pris — att skicka in bekräftar din order direkt, ingen väntan på inköpsteamet.",
     "planSubmit": "Bekräfta order"
+  },
+  "publisher": {
+    "title": "Utgivarportal",
+    "orders": "Inkommande bokningar",
+    "ordersTitle": "Inkommande bokningar",
+    "noOrders": "Inga bokningar än.",
+    "basePrice": "Grundpris",
+    "visibility": "Prissättning",
+    "leadTime": "Ledtid (dagar)",
+    "save": "Spara",
+    "firm": "Fast (boka direkt)",
+    "indicative": "Vägledande (förfrågan)",
+    "status": "Orderstatus",
+    "booking": "Bokningsstatus",
+    "liveUrl": "Live-URL",
+    "noBooking": "Ingen bokning registrerad."
   },
   "productType": {
     "NATIVE_ARTICLE": "Native-artikel",

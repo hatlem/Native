@@ -30,9 +30,15 @@ pnpm dev                      # http://localhost:3000  -> redirects to /en
 ```
 
 The internal desk console (`/[locale]/desk`) requires a `DESK` /
-`SUPERADMIN` login. The seed creates a demo account:
-`desk@benative.example` / `benative-desk` (override via
-`DESK_ADMIN_EMAIL` / `DESK_ADMIN_PASSWORD`).
+`SUPERADMIN` login; the publisher portal (`/[locale]/publisher`)
+requires a `PUBLISHER` login. The seed creates demo accounts:
+
+- Desk: `desk@benative.example` / `benative-desk`
+- Publisher: `publisher@benative.example` / `benative-pub` (mapped to
+  the "Schibsted" publisher)
+
+Override via `DESK_ADMIN_EMAIL` / `DESK_ADMIN_PASSWORD` and
+`PUBLISHER_EMAIL` / `PUBLISHER_PASSWORD`.
 
 Catalog: `/en/catalog` (also `/no`, `/sv`, `/da`). Filter by market, format and
 free-text search.

@@ -47,6 +47,7 @@ export default async function LocaleLayout({
                 <Link href="/catalog">{t("catalog")}</Link>
                 <Link href="/plan">{t("plan")}</Link>
                 <Link href="/desk">{t("desk")}</Link>
+                <Link href="/publisher">{t("publisher")}</Link>
                 {session?.user ? (
                   <form
                     action={logout}
