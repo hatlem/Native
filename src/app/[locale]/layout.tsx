@@ -46,6 +46,9 @@ export default async function LocaleLayout({
                 <Link href="/">{t("home")}</Link>
                 <Link href="/catalog">{t("catalog")}</Link>
                 <Link href="/plan">{t("plan")}</Link>
+                {session?.user?.role === "BUYER" ? (
+                  <Link href="/requests">{t("requests")}</Link>
+                ) : null}
                 <Link href="/desk">{t("desk")}</Link>
                 <Link href="/publisher">{t("publisher")}</Link>
                 {session?.user ? (
@@ -58,7 +61,10 @@ export default async function LocaleLayout({
                     <button type="submit">{ta("signout")}</button>
                   </form>
                 ) : (
-                  <Link href="/signin">{ta("signin")}</Link>
+                  <>
+                    <Link href="/signin">{ta("signin")}</Link>
+                    <Link href="/signup">{ta("signup")}</Link>
+                  </>
                 )}
               </nav>
             </div>

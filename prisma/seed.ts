@@ -16,6 +16,11 @@ const PUB_EMAIL = (
   process.env.PUBLISHER_EMAIL || "publisher@benative.example"
 ).toLowerCase();
 const PUB_PASSWORD = process.env.PUBLISHER_PASSWORD || "benative-pub";
+const BUYER_EMAIL = (
+  process.env.BUYER_EMAIL || "buyer@benative.example"
+).toLowerCase();
+const BUYER_PASSWORD = process.env.BUYER_PASSWORD || "benative-buyer";
+const BUYER_ORG = "Demo Advertiser AS";
 
 type SeedMarket = {
   code: MarketCode;
@@ -282,10 +287,33 @@ async function main() {
     });
   }
 
+  let buyerOrg = await prisma.organization.findFirst({
+    where: { name: BUYER_ORG },
+  });
+  buyerOrg ??= await prisma.organization.create({
+    data: { name: BUYER_ORG, type: "ADVERTISER", marketCode: MarketCode.NO },
+  });
+  const buyerHash = await bcrypt.hash(BUYER_PASSWORD, 10);
+  await prisma.user.upsert({
+    where: { email: BUYER_EMAIL },
+    update: {
+      passwordHash: buyerHash,
+      role: "BUYER",
+      organizationId: buyerOrg.id,
+    },
+    create: {
+      email: BUYER_EMAIL,
+      name: "Demo Buyer",
+      role: "BUYER",
+      passwordHash: buyerHash,
+      organizationId: buyerOrg.id,
+    },
+  });
+
   const titleCount = await prisma.title.count();
   const productCount = await prisma.product.count();
   console.log(
-    `Seeded ${MARKETS.length} markets, ${titleCount} titles, ${productCount} products, desk user ${DESK_EMAIL}, publisher user ${PUB_EMAIL}.`,
+    `Seeded ${MARKETS.length} markets, ${titleCount} titles, ${productCount} products, desk user ${DESK_EMAIL}, publisher user ${PUB_EMAIL}, buyer user ${BUYER_EMAIL}.`,
   );
 }
 

@@ -3,7 +3,7 @@
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
-import { MarketCode } from "@prisma/client";
+import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
 import {
   PLAN_COOKIE,
@@ -13,7 +13,6 @@ import {
 } from "@/lib/basket";
 import { firmLineTotal, withVat } from "@/lib/money";
 
-const MARKET_CODES = Object.values(MarketCode) as string[];
 const COOKIE_OPTS = {
   httpOnly: true,
   sameSite: "lax" as const,
@@ -54,28 +53,32 @@ export async function removeFromPlan(formData: FormData) {
 
 export async function submitRequest(formData: FormData) {
   const locale = str(formData, "locale") || "en";
-  const orgName = str(formData, "orgName");
-  const contactName = str(formData, "contactName");
-  const contactEmail = str(formData, "contactEmail").toLowerCase();
-  const marketCode = str(formData, "market");
   const budgetRaw = str(formData, "budget");
   const goal = str(formData, "goal");
   const audience = str(formData, "audience");
   const brief = str(formData, "brief");
 
-  const basket = await readBasket();
+  // RFQ/checkout is account-bound: the request is owned by the buyer's
+  // organization, so only they (and the desk) can later view or accept it.
+  const session = await auth();
+  const me = session?.user?.id
+    ? await prisma.user.findUnique({
+        where: { id: session.user.id },
+        include: { organization: true },
+      })
+    : null;
+  if (!me?.organization) {
+    redirect(`/${locale}/signin`);
+  }
+  const org = me.organization;
 
-  if (
-    basket.length === 0 ||
-    !orgName ||
-    !contactEmail ||
-    !MARKET_CODES.includes(marketCode)
-  ) {
+  const basket = await readBasket();
+  if (basket.length === 0) {
     redirect(`/${locale}/plan?error=1`);
   }
 
   const market = await prisma.market.findUnique({
-    where: { code: marketCode as MarketCode },
+    where: { code: org.marketCode },
   });
   const currency = market?.currency ?? "EUR";
 
@@ -99,31 +102,10 @@ export async function submitRequest(formData: FormData) {
   );
 
   const request = await prisma.$transaction(async (tx) => {
-    const org = await tx.organization.create({
-      data: {
-        name: orgName,
-        type: "ADVERTISER",
-        marketCode: marketCode as MarketCode,
-      },
-    });
-
-    if (contactEmail) {
-      await tx.user.upsert({
-        where: { email: contactEmail },
-        update: { name: contactName || undefined, organizationId: org.id },
-        create: {
-          email: contactEmail,
-          name: contactName || null,
-          role: "BUYER",
-          organizationId: org.id,
-        },
-      });
-    }
-
     const plan = await tx.plan.create({
       data: {
         organizationId: org.id,
-        name: `${orgName} — campaign`,
+        name: `${org.name} — campaign`,
         budget: budgetRaw ? Number(budgetRaw) || null : null,
         currency,
         goal: goal || null,
@@ -305,6 +287,25 @@ export async function acceptQuote(formData: FormData) {
     },
   });
   if (!quote) redirect(`/${locale}/catalog`);
+
+  // Only the owning organization (or the desk) may accept a quote.
+  const session = await auth();
+  const role = session?.user?.role;
+  const isDesk = role === "DESK" || role === "SUPERADMIN";
+  if (!isDesk) {
+    const buyer = session?.user?.id
+      ? await prisma.user.findUnique({
+          where: { id: session.user.id },
+          select: { organizationId: true },
+        })
+      : null;
+    if (
+      !buyer?.organizationId ||
+      buyer.organizationId !== quote.request.organizationId
+    ) {
+      redirect(`/${locale}/signin`);
+    }
+  }
   if (quote.order) {
     redirect(`/${locale}/requests/${quote.requestId}`);
   }

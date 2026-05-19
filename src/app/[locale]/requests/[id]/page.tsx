@@ -1,5 +1,6 @@
 import { getTranslations } from "next-intl/server";
 import { notFound } from "next/navigation";
+import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
 import { Link } from "@/i18n/navigation";
 import { formatMoney } from "@/lib/money";
@@ -47,6 +48,26 @@ export default async function RequestPage({
     },
   });
   if (!request) notFound();
+
+  // Org-scoped: the desk sees any request; a buyer sees only their
+  // organization's. Anyone else gets a 404 (don't leak existence).
+  const session = await auth();
+  const role = session?.user?.role;
+  const isDesk = role === "DESK" || role === "SUPERADMIN";
+  if (!isDesk) {
+    const me = session?.user?.id
+      ? await prisma.user.findUnique({
+          where: { id: session.user.id },
+          select: { organizationId: true },
+        })
+      : null;
+    if (
+      !me?.organizationId ||
+      me.organizationId !== request.organizationId
+    ) {
+      notFound();
+    }
+  }
 
   const products = await prisma.product.findMany({
     where: { id: { in: request.plan.items.map((i) => i.productId) } },

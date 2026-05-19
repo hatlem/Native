@@ -5,7 +5,8 @@
     "catalog": "Katalog",
     "plan": "Plan",
     "desk": "Desk",
-    "publisher": "Udgiver"
+    "publisher": "Udgiver",
+    "requests": "Mine anmodninger"
   },
   "home": {
     "title": "Køb native-indhold i nordiske aviser og magasiner",
@@ -72,7 +73,9 @@
     "audience": "Målgruppe (valgfrit)",
     "goal": "Kampagnemål (valgfrit)",
     "brief": "Indholdsbrief (valgfrit)",
-    "submit": "Send anmodning"
+    "submit": "Send anmodning",
+    "requestingAs": "Bestiller som",
+    "loginRequired": "Log ind eller opret en konto for at anmode om tilbud:"
   },
   "requests": {
     "title": "Anmodning",
@@ -87,7 +90,11 @@
     "pending": "Din anmodning er sendt. Vores indkøbsteam forbereder et fast tilbud.",
     "accepted": "Tilbud accepteret — ordre bekræftet.",
     "order": "Ordre",
-    "orderStatus": "Ordrestatus"
+    "orderStatus": "Ordrestatus",
+    "listTitle": "Mine anmodninger",
+    "none": "Du har ingen anmodninger endnu.",
+    "view": "Vis",
+    "created": "Oprettet"
   },
   "desk": {
     "title": "Desk-konsol",
@@ -113,9 +120,20 @@
     "password": "Adgangskode",
     "submit": "Log ind",
     "failed": "Ugyldig e-mail eller adgangskode.",
-    "hint": "Demo desk-login: desk@benative.example / benative-desk",
+    "hint": "Demo-logins — desk: desk@benative.example / benative-desk · køber: buyer@benative.example / benative-buyer",
     "signin": "Log ind",
-    "signout": "Log ud"
+    "signout": "Log ud",
+    "signup": "Tilmeld dig",
+    "signupTitle": "Opret din konto",
+    "name": "Dit navn",
+    "org": "Virksomhedsnavn",
+    "market": "Faktureringsmarked",
+    "createAccount": "Opret konto",
+    "pwHint": "Adgangskoden skal være mindst 8 tegn.",
+    "noAccount": "Ingen konto?",
+    "haveAccount": "Har du allerede en konto?",
+    "regFailed": "Udfyld alle påkrævede felter (adgangskode min. 8 tegn).",
+    "regExists": "Der findes allerede en konto med den e-mail."
   },
   "order": {
     "title": "Ordre",

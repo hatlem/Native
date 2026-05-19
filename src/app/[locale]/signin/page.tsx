@@ -1,6 +1,8 @@
 import { getTranslations } from "next-intl/server";
 import { redirect } from "next/navigation";
 import { auth } from "@/auth";
+import { Link } from "@/i18n/navigation";
+import { landingForRole } from "@/lib/roles";
 import { authenticate } from "@/app/auth-actions";
 
 export const dynamic = "force-dynamic";
@@ -15,7 +17,7 @@ export default async function SignInPage({
   const { locale } = await params;
   const sp = await searchParams;
   const session = await auth();
-  if (session?.user) redirect(`/${locale}/desk`);
+  if (session?.user) redirect(landingForRole(session.user.role, locale));
 
   const t = await getTranslations({ locale, namespace: "auth" });
 
@@ -36,6 +38,9 @@ export default async function SignInPage({
         <button type="submit">{t("submit")}</button>
       </form>
       <p className="note">{t("hint")}</p>
+      <p className="note">
+        {t("noAccount")} <Link href="/signup">{t("signup")}</Link>
+      </p>
     </section>
   );
 }

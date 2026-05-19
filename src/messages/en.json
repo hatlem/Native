@@ -5,7 +5,8 @@
     "catalog": "Catalog",
     "plan": "Plan",
     "desk": "Desk",
-    "publisher": "Publisher"
+    "publisher": "Publisher",
+    "requests": "My requests"
   },
   "home": {
     "title": "Buy native content in Nordic newspapers and magazines",
@@ -72,7 +73,9 @@
     "audience": "Target audience (optional)",
     "goal": "Campaign goal (optional)",
     "brief": "Content brief (optional)",
-    "submit": "Submit request"
+    "submit": "Submit request",
+    "requestingAs": "Requesting as",
+    "loginRequired": "Sign in or create an account to request a quote:"
   },
   "requests": {
     "title": "Request",
@@ -87,7 +90,11 @@
     "pending": "Your request was submitted. Our buying desk will prepare a firm quote.",
     "accepted": "Quote accepted — order confirmed.",
     "order": "Order",
-    "orderStatus": "Order status"
+    "orderStatus": "Order status",
+    "listTitle": "My requests",
+    "none": "You have no requests yet.",
+    "view": "View",
+    "created": "Created"
   },
   "desk": {
     "title": "Desk console",
@@ -113,9 +120,20 @@
     "password": "Password",
     "submit": "Sign in",
     "failed": "Invalid email or password.",
-    "hint": "Demo desk login: desk@benative.example / benative-desk",
+    "hint": "Demo logins — desk: desk@benative.example / benative-desk · buyer: buyer@benative.example / benative-buyer",
     "signin": "Sign in",
-    "signout": "Sign out"
+    "signout": "Sign out",
+    "signup": "Sign up",
+    "signupTitle": "Create your account",
+    "name": "Your name",
+    "org": "Company name",
+    "market": "Billing market",
+    "createAccount": "Create account",
+    "pwHint": "Password must be at least 8 characters.",
+    "noAccount": "No account?",
+    "haveAccount": "Already have an account?",
+    "regFailed": "Please fill in all required fields (password min. 8 characters).",
+    "regExists": "An account with that email already exists."
   },
   "order": {
     "title": "Order",

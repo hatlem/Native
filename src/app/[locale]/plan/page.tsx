@@ -1,5 +1,5 @@
 import { getTranslations } from "next-intl/server";
-import { MarketCode } from "@prisma/client";
+import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
 import { Link } from "@/i18n/navigation";
 import { readBasket } from "@/lib/basket";
@@ -7,8 +7,6 @@ import { indicativePrice, formatMoney } from "@/lib/money";
 import { removeFromPlan, submitRequest } from "@/app/actions";
 
 export const dynamic = "force-dynamic";
-
-const MARKET_CODES = Object.values(MarketCode);
 
 export default async function PlanPage({
   params,
@@ -23,7 +21,16 @@ export default async function PlanPage({
   const tf = await getTranslations({ locale, namespace: "firm" });
   const tr = await getTranslations({ locale, namespace: "rfq" });
   const tType = await getTranslations({ locale, namespace: "productType" });
-  const tMarket = await getTranslations({ locale, namespace: "market" });
+  const ta = await getTranslations({ locale, namespace: "auth" });
+
+  const session = await auth();
+  const me = session?.user?.id
+    ? await prisma.user.findUnique({
+        where: { id: session.user.id },
+        include: { organization: true },
+      })
+    : null;
+  const buyerOrg = me?.organization ?? null;
 
   const basket = await readBasket();
   const products = basket.length
@@ -106,58 +113,42 @@ export default async function PlanPage({
             {allFirm ? tf("planTitle") : t("rfqTitle")}
           </h2>
           {allFirm ? <p className="note">{tf("planNote")}</p> : null}
-          <form action={submitRequest} className="filters">
-            <input type="hidden" name="locale" value={locale} />
-            <div>
-              <label htmlFor="orgName">{tr("org")}</label>
-              <input id="orgName" name="orgName" required />
-            </div>
-            <div>
-              <label htmlFor="contactName">{tr("contactName")}</label>
-              <input id="contactName" name="contactName" />
-            </div>
-            <div>
-              <label htmlFor="contactEmail">{tr("contactEmail")}</label>
-              <input
-                id="contactEmail"
-                name="contactEmail"
-                type="email"
-                required
-              />
-            </div>
-            <div>
-              <label htmlFor="market">{tr("market")}</label>
-              <select id="market" name="market" defaultValue="">
-                <option value="" disabled>
-                  —
-                </option>
-                {MARKET_CODES.map((m) => (
-                  <option key={m} value={m}>
-                    {tMarket(m)}
-                  </option>
-                ))}
-              </select>
-            </div>
-            <div>
-              <label htmlFor="budget">{tr("budget")}</label>
-              <input id="budget" name="budget" type="number" min="0" />
-            </div>
-            <div>
-              <label htmlFor="audience">{tr("audience")}</label>
-              <input id="audience" name="audience" />
-            </div>
-            <div>
-              <label htmlFor="goal">{tr("goal")}</label>
-              <input id="goal" name="goal" />
-            </div>
-            <div>
-              <label htmlFor="brief">{tr("brief")}</label>
-              <input id="brief" name="brief" />
-            </div>
-            <button type="submit">
-              {allFirm ? tf("planSubmit") : tr("submit")}
-            </button>
-          </form>
+          {buyerOrg ? (
+            <>
+              <p className="muted">
+                {tr("requestingAs")}: {buyerOrg.name}
+              </p>
+              <form action={submitRequest} className="filters">
+                <input type="hidden" name="locale" value={locale} />
+                <div>
+                  <label htmlFor="budget">{tr("budget")}</label>
+                  <input id="budget" name="budget" type="number" min="0" />
+                </div>
+                <div>
+                  <label htmlFor="audience">{tr("audience")}</label>
+                  <input id="audience" name="audience" />
+                </div>
+                <div>
+                  <label htmlFor="goal">{tr("goal")}</label>
+                  <input id="goal" name="goal" />
+                </div>
+                <div>
+                  <label htmlFor="brief">{tr("brief")}</label>
+                  <input id="brief" name="brief" />
+                </div>
+                <button type="submit">
+                  {allFirm ? tf("planSubmit") : tr("submit")}
+                </button>
+              </form>
+            </>
+          ) : (
+            <p className="note">
+              {tr("loginRequired")}{" "}
+              <Link href="/signin">{ta("signin")}</Link>
+              {" · "}
+              <Link href="/signup">{ta("signup")}</Link>
+            </p>
+          )}
         </>
       )}
     </section>
