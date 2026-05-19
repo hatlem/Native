@@ -1,0 +1,42 @@
+{
+  "common": { "appName": "BeNative" },
+  "nav": { "home": "Home", "catalog": "Catalog" },
+  "home": {
+    "title": "Buy native content in Nordic newspapers and magazines",
+    "subtitle": "See every title that offers native, with transparent pricing. Brief us once — we write it, we book it, even where programmatic isn't possible.",
+    "cta": "Browse the catalog",
+    "vp1Title": "One transparent catalog",
+    "vp1Body": "Every newspaper and magazine that offers native content and native ads, with specs and indicative pricing.",
+    "vp2Title": "We buy it for you",
+    "vp2Body": "Most titles don't sell programmatically. Our managed desk negotiates and books on your behalf.",
+    "vp3Title": "We make the content",
+    "vp3Body": "In-house production tuned to each title's specs — a better result and a better deal."
+  },
+  "catalog": {
+    "title": "Catalog",
+    "subtitle": "Native content and native advertising across Nordic newspapers and magazines.",
+    "filters": {
+      "market": "Market",
+      "type": "Format",
+      "all": "All",
+      "search": "Search",
+      "searchPlaceholder": "Title or category…",
+      "apply": "Apply"
+    },
+    "card": {
+      "from": "From",
+      "reach": "Monthly reach",
+      "leadTime": "Lead time",
+      "days": "days"
+    },
+    "indicativeNote": "Prices are indicative. A firm price is confirmed by our buying desk based on availability, season and volume.",
+    "noResults": "No titles match these filters."
+  },
+  "productType": {
+    "NATIVE_ARTICLE": "Native article",
+    "ADVERTORIAL": "Advertorial",
+    "NATIVE_DISPLAY": "Native display",
+    "PACKAGE": "Package"
+  },
+  "market": { "NO": "Norway", "SE": "Sweden", "DK": "Denmark" }
+}

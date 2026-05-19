@@ -1,0 +1,42 @@
+{
+  "common": { "appName": "BeNative" },
+  "nav": { "home": "Hem", "catalog": "Katalog" },
+  "home": {
+    "title": "Köp native-innehåll i nordiska tidningar och magasin",
+    "subtitle": "Se alla titlar som erbjuder native, med transparenta priser. Ge oss en brief — vi skriver det och bokar det, även där programmatiskt inte är möjligt.",
+    "cta": "Se katalogen",
+    "vp1Title": "En transparent katalog",
+    "vp1Body": "Alla tidningar och magasin som erbjuder native-innehåll och native-annonser, med specifikationer och vägledande priser.",
+    "vp2Title": "Vi köper det åt dig",
+    "vp2Body": "De flesta titlar säljer inte programmatiskt. Vårt inköpsteam förhandlar och bokar åt dig.",
+    "vp3Title": "Vi skapar innehållet",
+    "vp3Body": "Egen produktion anpassad efter varje titels specifikationer — bättre resultat och bättre pris."
+  },
+  "catalog": {
+    "title": "Katalog",
+    "subtitle": "Native-innehåll och native-annonsering i nordiska tidningar och magasin.",
+    "filters": {
+      "market": "Marknad",
+      "type": "Format",
+      "all": "Alla",
+      "search": "Sök",
+      "searchPlaceholder": "Titel eller kategori…",
+      "apply": "Använd"
+    },
+    "card": {
+      "from": "Från",
+      "reach": "Månatlig räckvidd",
+      "leadTime": "Ledtid",
+      "days": "dagar"
+    },
+    "indicativeNote": "Priserna är vägledande. Ett fast pris bekräftas av vårt inköpsteam baserat på tillgänglighet, säsong och volym.",
+    "noResults": "Inga titlar matchar dessa filter."
+  },
+  "productType": {
+    "NATIVE_ARTICLE": "Native-artikel",
+    "ADVERTORIAL": "Advertorial",
+    "NATIVE_DISPLAY": "Native display",
+    "PACKAGE": "Paket"
+  },
+  "market": { "NO": "Norge", "SE": "Sverige", "DK": "Danmark" }
+}

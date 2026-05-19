@@ -1,0 +1,60 @@
+# BeNative
+
+Nordic marketplace for buying **native content** and **native advertising** in
+newspapers and magazines — transparent catalog + pricing, a managed buying desk,
+and in-house content production.
+
+See [`PLAN.md`](./PLAN.md) for the full product, architecture and roadmap plan.
+This is the **Phase 0** scaffold: the catalog data model plus a runnable,
+multilingual public catalog.
+
+## Stack
+
+- Next.js (App Router) + TypeScript
+- PostgreSQL via Prisma
+- next-intl (en / no / sv / da), multi-currency (NOK / SEK / DKK)
+
+## Prerequisites
+
+- Node 22+, pnpm 10+
+- PostgreSQL 16 (use `docker compose up -d db` for a local instance)
+
+## Setup
+
+```bash
+cp .env.example .env          # adjust DATABASE_URL if needed
+pnpm install
+pnpm prisma migrate deploy    # or: pnpm prisma:migrate (dev)
+pnpm db:seed                  # seed Nordic markets, publishers, titles
+pnpm dev                      # http://localhost:3000  -> redirects to /en
+```
+
+Catalog: `/en/catalog` (also `/no`, `/sv`, `/da`). Filter by market, format and
+free-text search.
+
+## Scripts
+
+| Script | Purpose |
+|---|---|
+| `pnpm dev` | Run the dev server |
+| `pnpm build` | `prisma generate` + `next build` |
+| `pnpm start` | Run the production build |
+| `pnpm lint` | ESLint (next) |
+| `pnpm typecheck` | `tsc --noEmit` |
+| `pnpm prisma:migrate` | Create/apply a dev migration |
+| `pnpm prisma:deploy` | Apply migrations (CI/prod) |
+| `pnpm db:seed` | Seed catalog data |
+
+## What's implemented in Phase 0
+
+- Full data model (`prisma/schema.prisma`) — catalog + commerce/content entities
+  (catalog is the focus; the rest gates later phases).
+- Seeded Nordic catalog: NO/SE/DK markets, publishers, titles, products,
+  per-product price rules and content specs.
+- Multilingual public catalog page with market/format/search filters and
+  **indicative** "from" pricing (firm pricing is a desk Quote — Phase 1).
+
+## Next (Phase 1 — see PLAN.md)
+
+Public title detail, compare/plan basket, RFQ submission, and the internal
+desk console to turn requests into quotes and orders.
