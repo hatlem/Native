@@ -7,7 +7,8 @@
     "desk": "Desk",
     "publisher": "Publisher",
     "requests": "My requests",
-    "reports": "Reports"
+    "reports": "Reports",
+    "agency": "Agency"
   },
   "reports": {
     "title": "Reports",
@@ -24,6 +25,23 @@
     "none": "No data yet.",
     "mySpend": "My spend",
     "mySubtitle": "Your organization's orders and spend."
+  },
+  "agency": {
+    "title": "Agency workspace",
+    "subtitle": "Manage your client advertisers and act on their behalf.",
+    "error": "Please provide a client name and market.",
+    "active": "Active client",
+    "none": "None selected",
+    "clients": "Clients",
+    "noClients": "No clients yet — add your first below.",
+    "orders": "Orders",
+    "spend": "Spend",
+    "switch": "Act as this client",
+    "activeBadge": "Active",
+    "addClient": "Add a client",
+    "clientName": "Client name",
+    "market": "Billing market",
+    "create": "Create client"
   },
   "home": {
     "title": "Buy native content in Nordic newspapers and magazines",
@@ -92,7 +110,8 @@
     "brief": "Content brief (optional)",
     "submit": "Submit request",
     "requestingAs": "Requesting as",
-    "loginRequired": "Sign in or create an account to request a quote:"
+    "loginRequired": "Sign in or create an account to request a quote:",
+    "selectClient": "Select a client to act for in the"
   },
   "requests": {
     "title": "Request",

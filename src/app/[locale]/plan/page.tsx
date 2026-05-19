@@ -1,6 +1,7 @@
 import { getTranslations } from "next-intl/server";
 import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
+import { getWorkspace } from "@/lib/workspace";
 import { Link } from "@/i18n/navigation";
 import { readBasket } from "@/lib/basket";
 import { indicativeFromRules, toRateRules, formatMoney } from "@/lib/money";
@@ -22,15 +23,17 @@ export default async function PlanPage({
   const tr = await getTranslations({ locale, namespace: "rfq" });
   const tType = await getTranslations({ locale, namespace: "productType" });
   const ta = await getTranslations({ locale, namespace: "auth" });
+  const tNav = await getTranslations({ locale, namespace: "nav" });
 
   const session = await auth();
-  const me = session?.user?.id
-    ? await prisma.user.findUnique({
-        where: { id: session.user.id },
-        include: { organization: true },
+  const ws = await getWorkspace(session?.user?.id);
+  const activeOrg = ws?.activeOrgId
+    ? await prisma.organization.findUnique({
+        where: { id: ws.activeOrgId },
+        select: { name: true },
       })
     : null;
-  const buyerOrg = me?.organization ?? null;
+  const needsClient = !!ws?.isAgency && !ws.activeOrgId;
 
   const basket = await readBasket();
   const products = basket.length
@@ -112,10 +115,15 @@ export default async function PlanPage({
             {allFirm ? tf("planTitle") : t("rfqTitle")}
           </h2>
           {allFirm ? <p className="note">{tf("planNote")}</p> : null}
-          {buyerOrg ? (
+          {needsClient ? (
+            <p className="note">
+              {tr("selectClient")}{" "}
+              <Link href="/agency">{tNav("agency")}</Link>
+            </p>
+          ) : activeOrg ? (
             <>
               <p className="muted">
-                {tr("requestingAs")}: {buyerOrg.name}
+                {tr("requestingAs")}: {activeOrg.name}
               </p>
               <form action={submitRequest} className="filters">
                 <input type="hidden" name="locale" value={locale} />

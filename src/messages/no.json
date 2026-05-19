@@ -7,7 +7,8 @@
     "desk": "Desk",
     "publisher": "Utgiver",
     "requests": "Mine forespørsler",
-    "reports": "Rapporter"
+    "reports": "Rapporter",
+    "agency": "Byrå"
   },
   "reports": {
     "title": "Rapporter",
@@ -24,6 +25,23 @@
     "none": "Ingen data ennå.",
     "mySpend": "Mitt forbruk",
     "mySubtitle": "Organisasjonens bestillinger og forbruk."
+  },
+  "agency": {
+    "title": "Byråarbeidsflate",
+    "subtitle": "Administrer kundene dine og handle på deres vegne.",
+    "error": "Oppgi kundenavn og marked.",
+    "active": "Aktiv kunde",
+    "none": "Ingen valgt",
+    "clients": "Kunder",
+    "noClients": "Ingen kunder ennå — legg til den første nedenfor.",
+    "orders": "Bestillinger",
+    "spend": "Forbruk",
+    "switch": "Handle som denne kunden",
+    "activeBadge": "Aktiv",
+    "addClient": "Legg til kunde",
+    "clientName": "Kundenavn",
+    "market": "Faktureringsmarked",
+    "create": "Opprett kunde"
   },
   "home": {
     "title": "Kjøp native-innhold i nordiske aviser og magasiner",
@@ -92,7 +110,8 @@
     "brief": "Innholdsbrief (valgfritt)",
     "submit": "Send forespørsel",
     "requestingAs": "Bestiller som",
-    "loginRequired": "Logg inn eller opprett en konto for å be om tilbud:"
+    "loginRequired": "Logg inn eller opprett en konto for å be om tilbud:",
+    "selectClient": "Velg en kunde å handle for i"
   },
   "requests": {
     "title": "Forespørsel",

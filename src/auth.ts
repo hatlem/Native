@@ -19,7 +19,10 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         const password = String(credentials?.password ?? "");
         if (!email || !password) return null;
 
-        const user = await prisma.user.findUnique({ where: { email } });
+        const user = await prisma.user.findUnique({
+          where: { email },
+          include: { organization: { select: { id: true, type: true } } },
+        });
         if (!user?.passwordHash) return null;
 
         const ok = await bcrypt.compare(password, user.passwordHash);
@@ -30,6 +33,8 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
           email: user.email,
           name: user.name ?? undefined,
           role: user.role,
+          orgId: user.organization?.id ?? null,
+          orgType: user.organization?.type ?? null,
         };
       },
     }),
@@ -37,8 +42,16 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
   callbacks: {
     jwt({ token, user }) {
       if (user) {
-        token.uid = user.id;
-        token.role = (user as { role?: string }).role;
+        const u = user as {
+          id: string;
+          role?: string;
+          orgId?: string | null;
+          orgType?: string | null;
+        };
+        token.uid = u.id;
+        token.role = u.role;
+        token.orgId = u.orgId ?? null;
+        token.orgType = u.orgType ?? null;
       }
       return token;
     },
@@ -46,6 +59,8 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
       if (session.user) {
         session.user.id = (token.uid as string) ?? "";
         session.user.role = (token.role as string) ?? "BUYER";
+        session.user.orgId = (token.orgId as string | null) ?? null;
+        session.user.orgType = (token.orgType as string | null) ?? null;
       }
       return session;
     },

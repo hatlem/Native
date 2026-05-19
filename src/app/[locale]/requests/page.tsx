@@ -2,6 +2,7 @@ import { getTranslations } from "next-intl/server";
 import { redirect } from "next/navigation";
 import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
+import { getWorkspace } from "@/lib/workspace";
 import { Link } from "@/i18n/navigation";
 
 export const dynamic = "force-dynamic";
@@ -16,18 +17,13 @@ export default async function RequestsPage({
   const tNav = await getTranslations({ locale, namespace: "nav" });
 
   const session = await auth();
-  const me = session?.user?.id
-    ? await prisma.user.findUnique({
-        where: { id: session.user.id },
-        select: { organizationId: true },
-      })
-    : null;
-  if (!me?.organizationId) {
+  const ws = await getWorkspace(session?.user?.id);
+  if (!ws) {
     redirect(`/${locale}/signin`);
   }
 
   const requests = await prisma.request.findMany({
-    where: { organizationId: me.organizationId },
+    where: { organizationId: { in: ws.scopeOrgIds } },
     orderBy: { createdAt: "desc" },
     include: {
       plan: { select: { name: true, items: true } },

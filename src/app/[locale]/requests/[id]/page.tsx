@@ -2,6 +2,7 @@ import { getTranslations } from "next-intl/server";
 import { notFound } from "next/navigation";
 import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
+import { getWorkspace } from "@/lib/workspace";
 import { Link } from "@/i18n/navigation";
 import { formatMoney } from "@/lib/money";
 import { acceptQuote } from "@/app/actions";
@@ -49,22 +50,15 @@ export default async function RequestPage({
   });
   if (!request) notFound();
 
-  // Org-scoped: the desk sees any request; a buyer sees only their
-  // organization's. Anyone else gets a 404 (don't leak existence).
+  // Org-scoped: the desk sees any request; an advertiser sees only its
+  // own, an agency any of its clients'. Anyone else gets a 404 (don't
+  // leak existence).
   const session = await auth();
   const role = session?.user?.role;
   const isDesk = role === "DESK" || role === "SUPERADMIN";
   if (!isDesk) {
-    const me = session?.user?.id
-      ? await prisma.user.findUnique({
-          where: { id: session.user.id },
-          select: { organizationId: true },
-        })
-      : null;
-    if (
-      !me?.organizationId ||
-      me.organizationId !== request.organizationId
-    ) {
+    const ws = await getWorkspace(session?.user?.id);
+    if (!ws?.scopeOrgIds.includes(request.organizationId)) {
       notFound();
     }
   }

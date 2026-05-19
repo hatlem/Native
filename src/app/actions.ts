@@ -5,6 +5,7 @@ import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
 import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
+import { getWorkspace } from "@/lib/workspace";
 import {
   PLAN_COOKIE,
   readBasket,
@@ -87,19 +88,20 @@ export async function submitRequest(formData: FormData) {
   const audience = str(formData, "audience");
   const brief = str(formData, "brief");
 
-  // RFQ/checkout is account-bound: the request is owned by the buyer's
-  // organization, so only they (and the desk) can later view or accept it.
+  // RFQ/checkout is account-bound: the request is owned by the acting
+  // organization (an advertiser's own org, or the agency's selected
+  // client) so only they, their agency, and the desk can view/accept it.
   const session = await auth();
-  const me = session?.user?.id
-    ? await prisma.user.findUnique({
-        where: { id: session.user.id },
-        include: { organization: true },
-      })
-    : null;
-  if (!me?.organization) {
+  const ws = await getWorkspace(session?.user?.id);
+  if (!ws?.activeOrgId) {
+    redirect(ws?.isAgency ? `/${locale}/agency` : `/${locale}/signin`);
+  }
+  const org = await prisma.organization.findUnique({
+    where: { id: ws.activeOrgId },
+  });
+  if (!org) {
     redirect(`/${locale}/signin`);
   }
-  const org = me.organization;
 
   const basket = await readBasket();
   if (basket.length === 0) {
@@ -287,21 +289,13 @@ export async function acceptQuote(formData: FormData) {
   });
   if (!quote) redirect(`/${locale}/catalog`);
 
-  // Only the owning organization (or the desk) may accept a quote.
+  // Only the owning organization, its agency, or the desk may accept.
   const session = await auth();
   const role = session?.user?.role;
   const isDesk = role === "DESK" || role === "SUPERADMIN";
   if (!isDesk) {
-    const buyer = session?.user?.id
-      ? await prisma.user.findUnique({
-          where: { id: session.user.id },
-          select: { organizationId: true },
-        })
-      : null;
-    if (
-      !buyer?.organizationId ||
-      buyer.organizationId !== quote.request.organizationId
-    ) {
+    const ws = await getWorkspace(session?.user?.id);
+    if (!ws?.scopeOrgIds.includes(quote.request.organizationId)) {
       redirect(`/${locale}/signin`);
     }
   }

@@ -21,6 +21,11 @@ const BUYER_EMAIL = (
 ).toLowerCase();
 const BUYER_PASSWORD = process.env.BUYER_PASSWORD || "benative-buyer";
 const BUYER_ORG = "Demo Advertiser AS";
+const AGENCY_EMAIL = (
+  process.env.AGENCY_EMAIL || "agency@benative.example"
+).toLowerCase();
+const AGENCY_PASSWORD = process.env.AGENCY_PASSWORD || "benative-agency";
+const AGENCY_ORG = "Demo Media Agency";
 
 type SeedMarket = {
   code: MarketCode;
@@ -338,10 +343,53 @@ async function main() {
     },
   });
 
+  // Agency workspace: an AGENCY org managing two advertiser clients.
+  let agencyOrg = await prisma.organization.findFirst({
+    where: { name: AGENCY_ORG },
+  });
+  agencyOrg ??= await prisma.organization.create({
+    data: { name: AGENCY_ORG, type: "AGENCY", marketCode: MarketCode.NO },
+  });
+  const agencyHash = await bcrypt.hash(AGENCY_PASSWORD, 10);
+  await prisma.user.upsert({
+    where: { email: AGENCY_EMAIL },
+    update: {
+      passwordHash: agencyHash,
+      role: "ORG_ADMIN",
+      organizationId: agencyOrg.id,
+    },
+    create: {
+      email: AGENCY_EMAIL,
+      name: "Agency Admin",
+      role: "ORG_ADMIN",
+      passwordHash: agencyHash,
+      organizationId: agencyOrg.id,
+    },
+  });
+  const agencyClients: [string, MarketCode][] = [
+    ["Client One AS", MarketCode.NO],
+    ["Client Two AB", MarketCode.SE],
+  ];
+  for (const [cname, mc] of agencyClients) {
+    const exists = await prisma.organization.findFirst({
+      where: { name: cname, parentOrgId: agencyOrg.id },
+    });
+    if (!exists) {
+      await prisma.organization.create({
+        data: {
+          name: cname,
+          type: "ADVERTISER",
+          marketCode: mc,
+          parentOrgId: agencyOrg.id,
+        },
+      });
+    }
+  }
+
   const titleCount = await prisma.title.count();
   const productCount = await prisma.product.count();
   console.log(
-    `Seeded ${MARKETS.length} markets, ${titleCount} titles, ${productCount} products, desk user ${DESK_EMAIL}, publisher user ${PUB_EMAIL}, buyer user ${BUYER_EMAIL}.`,
+    `Seeded ${MARKETS.length} markets, ${titleCount} titles, ${productCount} products, desk user ${DESK_EMAIL}, publisher user ${PUB_EMAIL}, buyer user ${BUYER_EMAIL}, agency user ${AGENCY_EMAIL}.`,
   );
 }
 

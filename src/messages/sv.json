@@ -7,7 +7,8 @@
     "desk": "Desk",
     "publisher": "Utgivare",
     "requests": "Mina förfrågningar",
-    "reports": "Rapporter"
+    "reports": "Rapporter",
+    "agency": "Byrå"
   },
   "reports": {
     "title": "Rapporter",
@@ -24,6 +25,23 @@
     "none": "Ingen data ännu.",
     "mySpend": "Mina utgifter",
     "mySubtitle": "Organisationens order och utgifter."
+  },
+  "agency": {
+    "title": "Byråarbetsyta",
+    "subtitle": "Hantera dina kunder och agera å deras vägnar.",
+    "error": "Ange kundnamn och marknad.",
+    "active": "Aktiv kund",
+    "none": "Ingen vald",
+    "clients": "Kunder",
+    "noClients": "Inga kunder ännu — lägg till din första nedan.",
+    "orders": "Order",
+    "spend": "Utgifter",
+    "switch": "Agera som denna kund",
+    "activeBadge": "Aktiv",
+    "addClient": "Lägg till kund",
+    "clientName": "Kundnamn",
+    "market": "Faktureringsmarknad",
+    "create": "Skapa kund"
   },
   "home": {
     "title": "Köp native-innehåll i nordiska tidningar och magasin",
@@ -92,7 +110,8 @@
     "brief": "Innehållsbrief (valfritt)",
     "submit": "Skicka förfrågan",
     "requestingAs": "Beställer som",
-    "loginRequired": "Logga in eller skapa ett konto för att begära offert:"
+    "loginRequired": "Logga in eller skapa ett konto för att begära offert:",
+    "selectClient": "Välj en kund att agera för i"
   },
   "requests": {
     "title": "Förfrågan",
