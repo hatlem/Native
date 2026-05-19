@@ -3,6 +3,7 @@
   "nav": {
     "home": "Hjem",
     "catalog": "Katalog",
+    "recommend": "Anbefaling",
     "plan": "Plan",
     "desk": "Desk",
     "publisher": "Utgiver",
@@ -42,6 +43,22 @@
     "clientName": "Kundenavn",
     "market": "Faktureringsmarked",
     "create": "Opprett kunde"
+  },
+  "recommend": {
+    "title": "Plananbefaling",
+    "subtitle": "Få et forslag til tittelmiks for markedet og budsjettet ditt.",
+    "market": "Marked",
+    "budget": "Budsjett",
+    "category": "Kategori",
+    "anyCategory": "Alle kategorier",
+    "suggest": "Foreslå en miks",
+    "reach": "Rekkevidde",
+    "cost": "Kostnad",
+    "remaining": "Budsjett igjen",
+    "none": "Ingen miks passer det budsjettet — prøv høyere budsjett eller et annet marked.",
+    "addAll": "Legg alle i planen",
+    "hint": "Velg marked og budsjett for å se et forslag, eller",
+    "browse": "bla i katalogen"
   },
   "home": {
     "title": "Kjøp native-innhold i nordiske aviser og magasiner",

@@ -3,6 +3,7 @@
   "nav": {
     "home": "Hem",
     "catalog": "Katalog",
+    "recommend": "Rekommendation",
     "plan": "Plan",
     "desk": "Desk",
     "publisher": "Utgivare",
@@ -42,6 +43,22 @@
     "clientName": "Kundnamn",
     "market": "Faktureringsmarknad",
     "create": "Skapa kund"
+  },
+  "recommend": {
+    "title": "Planrekommendation",
+    "subtitle": "Få ett förslag på titelmix för din marknad och budget.",
+    "market": "Marknad",
+    "budget": "Budget",
+    "category": "Kategori",
+    "anyCategory": "Alla kategorier",
+    "suggest": "Föreslå en mix",
+    "reach": "Räckvidd",
+    "cost": "Kostnad",
+    "remaining": "Budget kvar",
+    "none": "Ingen mix får plats i den budgeten — prova högre budget eller en annan marknad.",
+    "addAll": "Lägg alla i planen",
+    "hint": "Välj marknad och budget för att se ett förslag, eller",
+    "browse": "bläddra i katalogen"
   },
   "home": {
     "title": "Köp native-innehåll i nordiska tidningar och magasin",

@@ -3,6 +3,7 @@
   "nav": {
     "home": "Home",
     "catalog": "Catalog",
+    "recommend": "Recommender",
     "plan": "Plan",
     "desk": "Desk",
     "publisher": "Publisher",
@@ -42,6 +43,22 @@
     "clientName": "Client name",
     "market": "Billing market",
     "create": "Create client"
+  },
+  "recommend": {
+    "title": "Plan recommender",
+    "subtitle": "Get a suggested title mix for your market and budget.",
+    "market": "Market",
+    "budget": "Budget",
+    "category": "Category",
+    "anyCategory": "Any category",
+    "suggest": "Suggest a mix",
+    "reach": "Reach",
+    "cost": "Cost",
+    "remaining": "Budget left",
+    "none": "No mix fits that budget — try a higher budget or another market.",
+    "addAll": "Add all to plan",
+    "hint": "Choose a market and budget to see a suggested mix, or",
+    "browse": "browse the catalog"
   },
   "home": {
     "title": "Buy native content in Nordic newspapers and magazines",

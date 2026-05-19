@@ -73,6 +73,30 @@ export async function addToPlan(formData: FormData) {
   redirect(`/${locale}/plan`);
 }
 
+export async function addRecommendedPlan(formData: FormData) {
+  const locale = str(formData, "locale") || "en";
+  const ids = str(formData, "productIds")
+    .split(",")
+    .map((s) => s.trim())
+    .filter(Boolean);
+  if (ids.length > 0) {
+    const valid = await prisma.product.findMany({
+      where: { id: { in: ids }, active: true, bookable: true },
+      select: { id: true },
+    });
+    const validIds = new Set(valid.map((p) => p.id));
+    const items = await readBasket();
+    for (const id of ids) {
+      if (!validIds.has(id)) continue;
+      const existing = items.find((i) => i.productId === id);
+      if (existing) existing.quantity += 1;
+      else items.push({ productId: id, quantity: 1 });
+    }
+    await writeBasket(items);
+  }
+  redirect(`/${locale}/plan`);
+}
+
 export async function removeFromPlan(formData: FormData) {
   const locale = str(formData, "locale") || "en";
   const productId = str(formData, "productId");
