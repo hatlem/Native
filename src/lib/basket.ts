@@ -4,9 +4,8 @@ export const PLAN_COOKIE = "benative_plan";
 
 export type BasketItem = { productId: string; quantity: number };
 
-export async function readBasket(): Promise<BasketItem[]> {
-  const store = await cookies();
-  const raw = store.get(PLAN_COOKIE)?.value;
+// Pure: tolerate any untrusted cookie payload and normalise to a safe basket.
+export function parseBasket(raw: string | undefined | null): BasketItem[] {
   if (!raw) return [];
   try {
     const parsed: unknown = JSON.parse(raw);
@@ -23,6 +22,11 @@ export async function readBasket(): Promise<BasketItem[]> {
   } catch {
     return [];
   }
+}
+
+export async function readBasket(): Promise<BasketItem[]> {
+  const store = await cookies();
+  return parseBasket(store.get(PLAN_COOKIE)?.value);
 }
 
 export function serializeBasket(items: BasketItem[]): string {
