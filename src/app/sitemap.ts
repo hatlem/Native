@@ -18,6 +18,14 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     select: { slug: true, updatedAt: true },
   });
 
+  const MARKETING = [
+    "for-advertisers",
+    "for-agencies",
+    "for-publishers",
+    "how-it-works",
+    "about",
+  ] as const;
+
   const out: MetadataRoute.Sitemap = [];
   for (const locale of routing.locales) {
     out.push({ url: `${base}/${locale}`, changeFrequency: "weekly", priority: 0.7 });
@@ -26,6 +34,13 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       changeFrequency: "daily",
       priority: 0.9,
     });
+    for (const path of MARKETING) {
+      out.push({
+        url: `${base}/${locale}/${path}`,
+        changeFrequency: "monthly",
+        priority: 0.5,
+      });
+    }
     for (const t of titles) {
       out.push({
         url: `${base}/${locale}/catalog/${t.slug}`,

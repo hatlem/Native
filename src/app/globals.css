@@ -658,6 +658,32 @@ footer .container {
   padding-bottom: 22px;
 }
 
+footer .container.footer-grid {
+  display: grid;
+  grid-template-columns: 2fr 1fr 1fr 1fr;
+  gap: 32px;
+  align-items: start;
+  padding-top: 36px;
+  padding-bottom: 36px;
+}
+
+footer .footer-grid ul {
+  list-style: none;
+  padding: 0;
+  margin: 8px 0;
+}
+
+footer .footer-grid li {
+  margin: 6px 0;
+  font-size: 0.9rem;
+}
+
+@media (max-width: 760px) {
+  footer .container.footer-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
 footer a {
   color: var(--muted);
 }
