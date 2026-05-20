@@ -104,6 +104,23 @@ enum InvoiceStatus {
   VOID
 }
 
+enum NotificationKind {
+  RFQ_SUBMITTED
+  QUOTE_READY
+  QUOTE_ACCEPTED
+  BOOKING_NEW
+  BOOKING_CONFIRMED
+  ASSET_REVIEW
+  INVOICE_ISSUED
+}
+
+enum JobStatus {
+  PENDING
+  RUNNING
+  DONE
+  FAILED
+}
+
 // ---------- Catalog ----------
 
 model Market {
@@ -113,6 +130,11 @@ model Market {
   currency     String // ISO 4217, e.g. NOK / SEK / DKK
   defaultLocale String    @default("en")
   vatRatePct   Decimal    @db.Decimal(5, 2)
+  // Per-PLAN §13: native/sponsored disclosure label required for the
+  // market (NO: "Annonsørinnhold", SE: "Annons", DK: "Annonce"). Used by
+  // the spec-check as a market-wide minimum even when a Title hasn't
+  // configured its own.
+  disclosureLabel String?
   createdAt    DateTime   @default(now())
   updatedAt    DateTime   @updatedAt
 
@@ -174,8 +196,28 @@ model Product {
   createdAt    DateTime        @default(now())
   updatedAt    DateTime        @updatedAt
 
-  priceRules PriceRule[]
-  spec       Spec?
+  priceRules    PriceRule[]
+  spec          Spec?
+  availability  Availability[]
+}
+
+// Phase-3 availability calendar — a product is bookable for a given
+// (year, month) unless a row exists with `blocked = true`. Sold-out /
+// editorial-closed windows surface to buyers in the catalog and stop
+// `submitRequest` for FIRM-priced items.
+model Availability {
+  id        String   @id @default(cuid())
+  productId String
+  product   Product  @relation(fields: [productId], references: [id])
+  year      Int
+  month     Int // 1-12
+  blocked   Boolean  @default(true)
+  note      String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([productId, year, month])
+  @@index([productId])
 }
 
 model PriceRule {
@@ -238,6 +280,44 @@ model User {
   publisher      Publisher?   @relation(fields: [publisherId], references: [id])
   createdAt      DateTime     @default(now())
   updatedAt      DateTime     @updatedAt
+
+  notifications Notification[]
+}
+
+// In-DB notification inbox. The email adapter (src/lib/notify.ts) also
+// fires on create, but this row is the source of truth — UI reads it,
+// and a real email provider just needs to swap the adapter.
+model Notification {
+  id        String           @id @default(cuid())
+  userId    String
+  user      User             @relation(fields: [userId], references: [id])
+  kind      NotificationKind
+  title     String
+  body      String?
+  link      String?
+  readAt    DateTime?
+  createdAt DateTime         @default(now())
+
+  @@index([userId, readAt])
+}
+
+// Async job queue. Phase 0 ships an in-process runner (src/lib/jobs.ts);
+// swapping to BullMQ later only needs a new runner — the writers don't
+// change. Rows are kept for observability/audit.
+model Job {
+  id        String    @id @default(cuid())
+  kind      String
+  payload   String // JSON
+  status    JobStatus @default(PENDING)
+  attempts  Int       @default(0)
+  lastError String?
+  runAt     DateTime  @default(now())
+  startedAt DateTime?
+  finishedAt DateTime?
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+
+  @@index([status, runAt])
 }
 
 // ---------- Plan -> Request -> Quote -> Order ----------

@@ -8,8 +8,39 @@
     "desk": "Desk",
     "publisher": "Publisher",
     "requests": "My requests",
+    "orders": "Orders",
     "reports": "Reports",
-    "agency": "Agency"
+    "agency": "Agency",
+    "notifications": "Inbox"
+  },
+  "orders": {
+    "title": "Your orders",
+    "subtitle": "Status, deliverables and invoices for every order on your account.",
+    "status": "Status",
+    "lines": "Items",
+    "none": "You have no orders yet.",
+    "view": "View",
+    "invoice": "Invoice",
+    "booking": "Booking",
+    "livePlacement": "View live placement"
+  },
+  "notifications": {
+    "title": "Notifications",
+    "none": "Nothing in your inbox.",
+    "markAll": "Mark all as read",
+    "open": "Open"
+  },
+  "compare": {
+    "title": "Compare titles",
+    "subtitle": "Side-by-side specs and indicative pricing.",
+    "empty": "Pick at least one title from the catalog to compare.",
+    "view": "Open title"
+  },
+  "availability": {
+    "title": "Availability",
+    "subtitle": "Block months you can't deliver in — the catalog hides firm-priced products for blocked months and instant-book checkout refuses them.",
+    "blocked": "Blocked",
+    "save": "Save"
   },
   "reports": {
     "title": "Reports",
@@ -90,7 +121,8 @@
     },
     "indicativeNote": "Prices are indicative. A firm price is confirmed by our buying desk based on availability, season and volume.",
     "noResults": "No titles match these filters.",
-    "clearFilters": "Clear filters"
+    "clearFilters": "Clear filters",
+    "compareTop": "Compare these results"
   },
   "titleDetail": {
     "back": "Back to catalog",
@@ -256,7 +288,8 @@
     "disclosure": "Disclosure label",
     "fileFormats": "File formats",
     "requirements": "Requirements",
-    "saveSpec": "Save spec"
+    "saveSpec": "Save spec",
+    "availability": "Availability"
   },
   "productType": {
     "NATIVE_ARTICLE": "Native article",

@@ -99,20 +99,24 @@ export default async function LocaleLayout({
                       <Link href="/agency">{t("agency")}</Link>
                     ) : null}
                     <Link href="/requests">{t("requests")}</Link>
+                    <Link href="/orders">{t("orders")}</Link>
                     <Link href="/reports">{t("reports")}</Link>
                   </>
                 ) : null}
                 <Link href="/desk">{t("desk")}</Link>
                 <Link href="/publisher">{t("publisher")}</Link>
                 {session?.user ? (
-                  <form
-                    action={logout}
-                    style={{ display: "inline", marginLeft: 18 }}
-                  >
-                    <input type="hidden" name="locale" value={locale} />
-                    <span className="muted">{session.user.email}</span>{" "}
-                    <button type="submit">{ta("signout")}</button>
-                  </form>
+                  <>
+                    <Link href="/notifications">{t("notifications")}</Link>
+                    <form
+                      action={logout}
+                      style={{ display: "inline", marginLeft: 18 }}
+                    >
+                      <input type="hidden" name="locale" value={locale} />
+                      <span className="muted">{session.user.email}</span>{" "}
+                      <button type="submit">{ta("signout")}</button>
+                    </form>
+                  </>
                 ) : (
                   <>
                     <Link href="/signin">{ta("signin")}</Link>
