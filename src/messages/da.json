@@ -1,5 +1,7 @@
 {
-  "common": { "appName": "BeNative" },
+  "common": {
+    "appName": "BeNative"
+  },
   "nav": {
     "home": "Hjem",
     "catalog": "Katalog",
@@ -9,7 +11,9 @@
     "publisher": "Udgiver",
     "requests": "Mine anmodninger",
     "reports": "Rapporter",
-    "agency": "Bureau"
+    "agency": "Bureau",
+    "orders": "Ordrer",
+    "notifications": "Indbakke"
   },
   "reports": {
     "title": "Rapporter",
@@ -90,7 +94,8 @@
     },
     "indicativeNote": "Priserne er vejledende. En fast pris bekræftes af vores indkøbsteam baseret på tilgængelighed, sæson og volumen.",
     "noResults": "Ingen titler matcher disse filtre.",
-    "clearFilters": "Ryd filtre"
+    "clearFilters": "Ryd filtre",
+    "compareTop": "Sammenlign disse resultater"
   },
   "titleDetail": {
     "back": "Tilbage til kataloget",
@@ -256,7 +261,8 @@
     "disclosure": "Mærkning",
     "fileFormats": "Filformater",
     "requirements": "Krav",
-    "saveSpec": "Gem specifikation"
+    "saveSpec": "Gem specifikation",
+    "availability": "Tilgængelighed"
   },
   "productType": {
     "NATIVE_ARTICLE": "Native-artikel",
@@ -264,5 +270,38 @@
     "NATIVE_DISPLAY": "Native display",
     "PACKAGE": "Pakke"
   },
-  "market": { "NO": "Norge", "SE": "Sverige", "DK": "Danmark" }
+  "market": {
+    "NO": "Norge",
+    "SE": "Sverige",
+    "DK": "Danmark"
+  },
+  "orders": {
+    "title": "Dine ordrer",
+    "subtitle": "Status, leverancer og fakturaer for alle ordrer på din konto.",
+    "status": "Status",
+    "lines": "Linjer",
+    "none": "Du har endnu ingen ordrer.",
+    "view": "Åbn",
+    "invoice": "Faktura",
+    "booking": "Booking",
+    "livePlacement": "Se live-placering"
+  },
+  "notifications": {
+    "title": "Notifikationer",
+    "none": "Din indbakke er tom.",
+    "markAll": "Markér alle som læst",
+    "open": "Åbn"
+  },
+  "compare": {
+    "title": "Sammenlign titler",
+    "subtitle": "Specifikationer og vejledende priser side om side.",
+    "empty": "Vælg mindst én titel fra kataloget for at sammenligne.",
+    "view": "Åbn titel"
+  },
+  "availability": {
+    "title": "Tilgængelighed",
+    "subtitle": "Bloker måneder du ikke kan levere — kataloget skjuler fast­pris­produkter for blokerede måneder, og selv­betjeningskassen afviser dem.",
+    "blocked": "Blokeret",
+    "save": "Gem"
+  }
 }

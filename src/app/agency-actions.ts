@@ -7,6 +7,7 @@ import { MarketCode } from "@prisma/client";
 import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
 import { CLIENT_COOKIE, getWorkspace } from "@/lib/workspace";
+import { recordAudit } from "@/lib/audit";
 
 const MARKET_CODES = Object.values(MarketCode) as string[];
 
@@ -29,13 +30,18 @@ export async function createClient(formData: FormData) {
     redirect(`/${locale}/agency?error=1`);
   }
 
-  await prisma.organization.create({
+  const created = await prisma.organization.create({
     data: {
       name,
       type: "ADVERTISER",
       marketCode: marketCode as MarketCode,
       parentOrgId: ws.agencyOrgId,
     },
+  });
+  await recordAudit(session?.user?.id ?? null, "client.create", `Organization:${created.id}`, {
+    agencyOrgId: ws.agencyOrgId,
+    name,
+    market: marketCode,
   });
   revalidatePath(`/${locale}/agency`);
   redirect(`/${locale}/agency`);

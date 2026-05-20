@@ -1,5 +1,7 @@
 {
-  "common": { "appName": "BeNative" },
+  "common": {
+    "appName": "BeNative"
+  },
   "nav": {
     "home": "Hjem",
     "catalog": "Katalog",
@@ -9,7 +11,9 @@
     "publisher": "Utgiver",
     "requests": "Mine forespørsler",
     "reports": "Rapporter",
-    "agency": "Byrå"
+    "agency": "Byrå",
+    "orders": "Bestillinger",
+    "notifications": "Innboks"
   },
   "reports": {
     "title": "Rapporter",
@@ -90,7 +94,8 @@
     },
     "indicativeNote": "Prisene er veiledende. Endelig pris bekreftes av kjøpsteamet basert på tilgjengelighet, sesong og volum.",
     "noResults": "Ingen titler matcher disse filtrene.",
-    "clearFilters": "Nullstill filtre"
+    "clearFilters": "Nullstill filtre",
+    "compareTop": "Sammenlign disse resultatene"
   },
   "titleDetail": {
     "back": "Tilbake til katalogen",
@@ -256,7 +261,8 @@
     "disclosure": "Merking",
     "fileFormats": "Filformater",
     "requirements": "Krav",
-    "saveSpec": "Lagre spesifikasjon"
+    "saveSpec": "Lagre spesifikasjon",
+    "availability": "Tilgjengelighet"
   },
   "productType": {
     "NATIVE_ARTICLE": "Native-artikkel",
@@ -264,5 +270,38 @@
     "NATIVE_DISPLAY": "Native display",
     "PACKAGE": "Pakke"
   },
-  "market": { "NO": "Norge", "SE": "Sverige", "DK": "Danmark" }
+  "market": {
+    "NO": "Norge",
+    "SE": "Sverige",
+    "DK": "Danmark"
+  },
+  "orders": {
+    "title": "Dine bestillinger",
+    "subtitle": "Status, leveranser og fakturaer for alle bestillinger på kontoen din.",
+    "status": "Status",
+    "lines": "Linjer",
+    "none": "Du har ingen bestillinger ennå.",
+    "view": "Åpne",
+    "invoice": "Faktura",
+    "booking": "Booking",
+    "livePlacement": "Se live-plassering"
+  },
+  "notifications": {
+    "title": "Varsler",
+    "none": "Innboksen er tom.",
+    "markAll": "Marker alle som lest",
+    "open": "Åpne"
+  },
+  "compare": {
+    "title": "Sammenlign titler",
+    "subtitle": "Spesifikasjoner og veiledende priser side om side.",
+    "empty": "Velg minst én tittel fra katalogen for å sammenligne.",
+    "view": "Åpne tittel"
+  },
+  "availability": {
+    "title": "Tilgjengelighet",
+    "subtitle": "Blokker måneder du ikke kan levere — katalogen skjuler firmpris­produkter for blokkerte måneder og selv­betjent kassen avviser dem.",
+    "blocked": "Blokkert",
+    "save": "Lagre"
+  }
 }

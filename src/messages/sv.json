@@ -1,5 +1,7 @@
 {
-  "common": { "appName": "BeNative" },
+  "common": {
+    "appName": "BeNative"
+  },
   "nav": {
     "home": "Hem",
     "catalog": "Katalog",
@@ -9,7 +11,9 @@
     "publisher": "Utgivare",
     "requests": "Mina förfrågningar",
     "reports": "Rapporter",
-    "agency": "Byrå"
+    "agency": "Byrå",
+    "orders": "Beställningar",
+    "notifications": "Inkorg"
   },
   "reports": {
     "title": "Rapporter",
@@ -90,7 +94,8 @@
     },
     "indicativeNote": "Priserna är vägledande. Ett fast pris bekräftas av vårt inköpsteam baserat på tillgänglighet, säsong och volym.",
     "noResults": "Inga titlar matchar dessa filter.",
-    "clearFilters": "Rensa filter"
+    "clearFilters": "Rensa filter",
+    "compareTop": "Jämför dessa resultat"
   },
   "titleDetail": {
     "back": "Tillbaka till katalogen",
@@ -256,7 +261,8 @@
     "disclosure": "Märkning",
     "fileFormats": "Filformat",
     "requirements": "Krav",
-    "saveSpec": "Spara specifikation"
+    "saveSpec": "Spara specifikation",
+    "availability": "Tillgänglighet"
   },
   "productType": {
     "NATIVE_ARTICLE": "Native-artikel",
@@ -264,5 +270,38 @@
     "NATIVE_DISPLAY": "Native display",
     "PACKAGE": "Paket"
   },
-  "market": { "NO": "Norge", "SE": "Sverige", "DK": "Danmark" }
+  "market": {
+    "NO": "Norge",
+    "SE": "Sverige",
+    "DK": "Danmark"
+  },
+  "orders": {
+    "title": "Dina beställningar",
+    "subtitle": "Status, leveranser och fakturor för alla beställningar på ditt konto.",
+    "status": "Status",
+    "lines": "Rader",
+    "none": "Du har inga beställningar än.",
+    "view": "Öppna",
+    "invoice": "Faktura",
+    "booking": "Bokning",
+    "livePlacement": "Se live-placering"
+  },
+  "notifications": {
+    "title": "Aviseringar",
+    "none": "Inkorgen är tom.",
+    "markAll": "Markera alla som lästa",
+    "open": "Öppna"
+  },
+  "compare": {
+    "title": "Jämför titlar",
+    "subtitle": "Specifikationer och vägledande priser sida vid sida.",
+    "empty": "Välj minst en titel från katalogen för att jämföra.",
+    "view": "Öppna titel"
+  },
+  "availability": {
+    "title": "Tillgänglighet",
+    "subtitle": "Blockera månader du inte kan leverera — katalogen döljer fastpris­produkter för blockerade månader och självservice­kassan vägrar dem.",
+    "blocked": "Blockerad",
+    "save": "Spara"
+  }
 }

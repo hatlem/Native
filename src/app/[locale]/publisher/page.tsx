@@ -45,6 +45,8 @@ export default async function PublisherDashboard({
       <p className="muted">{publisher.name}</p>
       <p>
         <Link href="/publisher/orders">{t("orders")} →</Link>
+        {"  ·  "}
+        <Link href="/publisher/availability">{t("availability")} →</Link>
       </p>
 
       {publisher.titles.map((title) => (
