@@ -173,6 +173,36 @@
     "awaiting": "Väntar på kundens godkännande.",
     "acceptedOrder": "Accepterad — order skapad."
   },
+  "deskTitles": {
+    "title": "Titlar och magasin",
+    "subtitle": "Super-admin granskar varje titel i katalogen. Kontrollera om utgivaren erbjuder native och slå på det.",
+    "counts": {
+      "active": "Live i katalogen",
+      "inactive": "Inte i katalogen",
+      "unverified": "Ej kontrollerade än"
+    },
+    "filters": {
+      "market": "Marknad",
+      "status": "Status",
+      "all": "Alla",
+      "apply": "Använd"
+    },
+    "status": {
+      "all": "Alla",
+      "unverified": "Ej kontrollerade än",
+      "active": "Erbjuder native",
+      "no-native": "Erbjuder inte native"
+    },
+    "reach": "Räckvidd per månad",
+    "products": "Produkter",
+    "checkSite": "Kontrollera utgivarens webbplats",
+    "actions": {
+      "markNative": "Markera: erbjuder native",
+      "markNoNative": "Markera: ingen native",
+      "deactivate": "Inaktivera"
+    },
+    "none": "Inga titlar matchar filtren."
+  },
   "auth": {
     "title": "Logga in",
     "email": "E-post",

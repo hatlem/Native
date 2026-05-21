@@ -1,4 +1,5 @@
 import { getTranslations } from "next-intl/server";
+import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
 import { Link } from "@/i18n/navigation";
 import { StatusBadge } from "@/app/status-badge";
@@ -15,6 +16,10 @@ export default async function DeskListPage({
   const t = await getTranslations({ locale, namespace: "desk" });
   const to = await getTranslations({ locale, namespace: "order" });
   const tr = await getTranslations({ locale, namespace: "reports" });
+  const tt = await getTranslations({ locale, namespace: "deskTitles" });
+
+  const session = await auth();
+  const isSuperadmin = session?.user?.role === "SUPERADMIN";
 
   const requests = await prisma.request.findMany({
     orderBy: { createdAt: "desc" },
@@ -33,6 +38,12 @@ export default async function DeskListPage({
         <Link href="/desk/orders">{to("orders")} →</Link>
         {"  ·  "}
         <Link href="/desk/reports">{tr("title")} →</Link>
+        {isSuperadmin ? (
+          <>
+            {"  ·  "}
+            <Link href="/desk/titles">{tt("title")} →</Link>
+          </>
+        ) : null}
       </p>
 
       {requests.length === 0 ? (
