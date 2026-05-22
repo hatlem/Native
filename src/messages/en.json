@@ -202,6 +202,36 @@
     "awaiting": "Awaiting customer acceptance.",
     "acceptedOrder": "Accepted — order created."
   },
+  "deskTitles": {
+    "title": "Titles & magazines",
+    "subtitle": "Super-admin review of every catalog title. Check whether each publisher offers native and turn it on.",
+    "counts": {
+      "active": "Live in catalog",
+      "inactive": "Not in catalog",
+      "unverified": "Not yet checked"
+    },
+    "filters": {
+      "market": "Market",
+      "status": "Status",
+      "all": "All",
+      "apply": "Apply"
+    },
+    "status": {
+      "all": "All",
+      "unverified": "Not yet checked",
+      "active": "Native available",
+      "no-native": "No native offered"
+    },
+    "reach": "Monthly reach",
+    "products": "Products",
+    "checkSite": "Check publisher site",
+    "actions": {
+      "markNative": "Mark: offers native",
+      "markNoNative": "Mark: no native",
+      "deactivate": "Deactivate"
+    },
+    "none": "No titles match these filters."
+  },
   "auth": {
     "title": "Sign in",
     "email": "Email",

@@ -173,6 +173,36 @@
     "awaiting": "Venter på at kunden godtar.",
     "acceptedOrder": "Godtatt — bestilling opprettet."
   },
+  "deskTitles": {
+    "title": "Titler og magasiner",
+    "subtitle": "Super-admin-gjennomgang av alle titler i katalogen. Sjekk om utgiveren tilbyr native og slå det på.",
+    "counts": {
+      "active": "Live i katalogen",
+      "inactive": "Ikke i katalogen",
+      "unverified": "Ikke sjekket ennå"
+    },
+    "filters": {
+      "market": "Marked",
+      "status": "Status",
+      "all": "Alle",
+      "apply": "Bruk"
+    },
+    "status": {
+      "all": "Alle",
+      "unverified": "Ikke sjekket ennå",
+      "active": "Tilbyr native",
+      "no-native": "Tilbyr ikke native"
+    },
+    "reach": "Månedlig rekkevidde",
+    "products": "Produkter",
+    "checkSite": "Sjekk utgiverens nettsted",
+    "actions": {
+      "markNative": "Merk: tilbyr native",
+      "markNoNative": "Merk: ingen native",
+      "deactivate": "Deaktiver"
+    },
+    "none": "Ingen titler matcher filtrene."
+  },
   "auth": {
     "title": "Logg inn",
     "email": "E-post",
