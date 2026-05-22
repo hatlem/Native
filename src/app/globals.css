@@ -2227,6 +2227,93 @@ select:disabled {
   color: var(--accent-hover);
 }
 
+/* ---------- Marketing: prose section + step list ---------- */
+
+.prose-section {
+  max-width: 760px;
+}
+
+.prose {
+  color: var(--muted-strong);
+  font-size: 1.05rem;
+  line-height: 1.65;
+  max-width: 70ch;
+  margin: 0 0 var(--s-4);
+}
+
+.step-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--s-4);
+}
+
+.step-item {
+  display: grid;
+  grid-template-columns: 80px 1fr;
+  gap: var(--s-4);
+  align-items: flex-start;
+  margin: 0;
+  padding: var(--s-4);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--r-md);
+}
+
+.step-item h3 {
+  margin: 0 0 4px;
+}
+
+.step-item .muted {
+  margin: 0;
+}
+
+.step-num {
+  font-family: var(--font-display);
+  font-size: 2rem;
+  font-weight: 660;
+  letter-spacing: -0.03em;
+  color: var(--accent);
+  line-height: 1;
+}
+
+@media (max-width: 520px) {
+  .step-item { grid-template-columns: 1fr; }
+  .step-num { font-size: 1.4rem; }
+}
+
+/* ---------- Client cards ---------- */
+
+.client-card {
+  gap: var(--s-2);
+}
+
+.client-card.is-active {
+  border-color: var(--accent);
+}
+
+.client-cta {
+  margin-top: var(--s-3);
+}
+
+.add-client-form .grid-2 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--s-3);
+}
+
+@media (max-width: 520px) {
+  .add-client-form .grid-2 { grid-template-columns: 1fr; }
+}
+
+.add-client-form .actions {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: var(--s-3);
+}
+
 /* ---------- Invoice page ---------- */
 
 .invoice-shell {

@@ -43,7 +43,10 @@ export default async function AgencyPage({
     },
   });
 
-  const rollup = new Map<string, { count: number; spend: number; currency: string }>();
+  const rollup = new Map<
+    string,
+    { count: number; spend: number; currency: string }
+  >();
   for (const o of orders) {
     const cur = rollup.get(o.organizationId) ?? {
       count: 0,
@@ -56,76 +59,131 @@ export default async function AgencyPage({
     rollup.set(o.organizationId, cur);
   }
 
+  const activeName = ws.activeOrgId
+    ? (clients.find((c) => c.id === ws.activeOrgId)?.name ?? null)
+    : null;
+
   return (
-    <section>
-      <h1>{t("title")}</h1>
-      <p className="muted">{t("subtitle")}</p>
-      {sp.error ? <p className="note">{t("error")}</p> : null}
+    <>
+      <header className="page-header">
+        <span className="eyebrow accent">{t("eyebrow")}</span>
+        <h1>{t("title")}</h1>
+        <p className="lead">{t("subtitle")}</p>
+      </header>
 
-      <p className="note">
-        {t("active")}:{" "}
-        <strong>
-          {ws.activeOrgId
-            ? (clients.find((c) => c.id === ws.activeOrgId)?.name ??
-              t("none"))
-            : t("none")}
-        </strong>
-      </p>
+      {sp.error ? (
+        <div className="banner-error" role="alert">
+          <span>{t("error")}</span>
+        </div>
+      ) : null}
 
-      <h2 style={{ marginTop: 24 }}>{t("clients")}</h2>
-      {clients.length === 0 ? (
-        <p className="note">{t("noClients")}</p>
-      ) : (
-        <div className="grid">
-          {clients.map((c) => {
-            const r = rollup.get(c.id);
-            const isActive = c.id === ws.activeOrgId;
-            return (
-              <article className="card" key={c.id}>
-                <h3>{c.name}</h3>
-                <div className="muted">{tMarket(c.marketCode)}</div>
-                <div className="muted">
-                  {t("orders")}: {r?.count ?? 0}
-                </div>
-                <div className="muted">
-                  {t("spend")}:{" "}
-                  {r ? formatMoney(r.spend, r.currency, locale) : "—"}
-                </div>
-                <form action={selectClient} style={{ marginTop: 10 }}>
-                  <input type="hidden" name="locale" value={locale} />
-                  <input type="hidden" name="clientId" value={c.id} />
-                  <button type="submit" disabled={isActive}>
-                    {isActive ? t("activeBadge") : t("switch")}
-                  </button>
-                </form>
-              </article>
-            );
-          })}
+      <div className="kpi-grid">
+        <div className="kpi">
+          <div className="label">{t("active")}</div>
+          <div className="value" style={{ fontSize: "1.4rem" }}>
+            {activeName ?? t("none")}
+          </div>
+          {activeName ? (
+            <div className="delta">{t("activeSub")}</div>
+          ) : (
+            <div className="delta">{t("activePrompt")}</div>
+          )}
         </div>
-      )}
+        <div className="kpi">
+          <div className="label">{t("clients")}</div>
+          <div className="value">{clients.length}</div>
+        </div>
+      </div>
 
-      <h2 style={{ marginTop: 24 }}>{t("addClient")}</h2>
-      <form action={createClient} className="filters">
-        <input type="hidden" name="locale" value={locale} />
-        <div>
-          <label htmlFor="name">{t("clientName")}</label>
-          <input id="name" name="name" required />
+      <section className="section">
+        <div className="section-head">
+          <div>
+            <span className="eyebrow">{t("clientsEyebrow")}</span>
+            <h2>{t("clients")}</h2>
+          </div>
         </div>
-        <div>
-          <label htmlFor="market">{t("market")}</label>
-          <select id="market" name="market" defaultValue="">
-            <option value="" disabled>
-              —
-            </option>
-            {MARKET_CODES.map((m) => (
-              <option key={m} value={m}>
-                {tMarket(m)}
-              </option>
-            ))}
-          </select>
+        {clients.length === 0 ? (
+          <p className="muted">{t("noClients")}</p>
+        ) : (
+          <div className="grid">
+            {clients.map((c) => {
+              const r = rollup.get(c.id);
+              const isActive = c.id === ws.activeOrgId;
+              return (
+                <article
+                  className={`card client-card ${isActive ? "is-active" : ""}`}
+                  key={c.id}
+                >
+                  <div className="cluster between">
+                    <h3>{c.name}</h3>
+                    {isActive ? (
+                      <span className="badge badge-info dotless">
+                        {t("activeBadge")}
+                      </span>
+                    ) : null}
+                  </div>
+                  <p className="muted small">{tMarket(c.marketCode)}</p>
+                  <dl className="spec-grid">
+                    <dt>{t("orders")}</dt>
+                    <dd>{r?.count ?? 0}</dd>
+                    <dt>{t("spend")}</dt>
+                    <dd>
+                      {r ? formatMoney(r.spend, r.currency, locale) : "—"}
+                    </dd>
+                  </dl>
+                  <form action={selectClient} className="client-cta">
+                    <input type="hidden" name="locale" value={locale} />
+                    <input type="hidden" name="clientId" value={c.id} />
+                    <button
+                      type="submit"
+                      className="btn small block"
+                      disabled={isActive}
+                    >
+                      {isActive ? t("activeBadge") : t("switch")}
+                    </button>
+                  </form>
+                </article>
+              );
+            })}
+          </div>
+        )}
+      </section>
+
+      <section className="section">
+        <div className="section-head">
+          <div>
+            <span className="eyebrow">{t("addClientEyebrow")}</span>
+            <h2>{t("addClient")}</h2>
+          </div>
         </div>
-        <button type="submit">{t("create")}</button>
-      </form>
-    </section>
+        <form action={createClient} className="card add-client-form">
+          <input type="hidden" name="locale" value={locale} />
+          <div className="grid-2">
+            <div className="field">
+              <label htmlFor="name">{t("clientName")}</label>
+              <input id="name" name="name" required />
+            </div>
+            <div className="field">
+              <label htmlFor="market">{t("market")}</label>
+              <select id="market" name="market" defaultValue="" required>
+                <option value="" disabled>
+                  {t("marketPlaceholder")}
+                </option>
+                {MARKET_CODES.map((m) => (
+                  <option key={m} value={m}>
+                    {tMarket(m)}
+                  </option>
+                ))}
+              </select>
+            </div>
+          </div>
+          <div className="actions">
+            <button type="submit" className="btn">
+              {t("create")}
+            </button>
+          </div>
+        </form>
+      </section>
+    </>
   );
 }

@@ -128,8 +128,14 @@
     "orderCount": "{count, plural, =0 {0 orders} =1 {1 order} other {# orders}}"
   },
   "agency": {
+    "eyebrow": "Agency",
     "title": "Agency workspace",
     "subtitle": "Manage your client advertisers and act on their behalf.",
+    "activeSub": "All actions scoped to this client",
+    "activePrompt": "Pick a client to act on their behalf",
+    "clientsEyebrow": "Clients",
+    "addClientEyebrow": "New",
+    "marketPlaceholder": "Choose billing market",
     "error": "Please provide a client name and market.",
     "active": "Active client",
     "none": "None selected",
@@ -571,6 +577,9 @@
     "footerContact": "Contact"
   },
   "advertisers": {
+    "eyebrow": "For advertisers",
+    "problemsEyebrow": "Problems",
+    "solutionsEyebrow": "Solutions",
     "metaTitle": "For advertisers",
     "title": "Buy native content across every Nordic title",
     "lead": "Discovery, comparable pricing and content production in one place. Most premium editorial inventory isn't sold programmatically — we make it bookable anyway.",
@@ -592,6 +601,8 @@
     "contentBody": "Content is half the cost and most of the performance of a native campaign. Bundling it means we can ship spec-compliant, disclosure-correct articles in the lead time the publisher actually quotes — and the total bundle beats DIY."
   },
   "agencies": {
+    "eyebrow": "For agencies",
+    "featuresEyebrow": "Built for agencies",
     "metaTitle": "For agencies",
     "title": "A managed desk your team can lean on",
     "lead": "Plan across every Nordic title in one workspace, switch between clients in a click, and let our desk handle publisher negotiations.",
@@ -610,6 +621,9 @@
     "ctaBody": "Open an agency workspace and add your clients. We'll set you up for a pilot RFQ within a working day."
   },
   "publishersMkt": {
+    "eyebrow": "For publishers",
+    "benefitsEyebrow": "Why it works",
+    "howEyebrow": "How partnerships work",
     "metaTitle": "For publishers",
     "title": "Incremental demand without building self-serve",
     "lead": "We bring buyers who already understand native, hand you ready-to-publish content that meets your specs, and consolidate billing through one relationship.",
@@ -638,6 +652,7 @@
     "contactCta": "Talk to partnerships"
   },
   "how": {
+    "eyebrow": "How it works",
     "metaTitle": "How it works",
     "title": "From brief to live placement",
     "lead": "Five steps from \"I have a campaign idea\" to a published, spec-compliant native article — most of them done by us.",
@@ -661,6 +676,7 @@
     "contentBody": "Per-title playbooks cover tone, length, imagery, disclosure rules (Annonsørinnhold / Annons / Annonce), and brand-safety review. An automatic spec check has to pass before an asset can be marked final — so what reaches the publisher is always publishable."
   },
   "about": {
+    "eyebrow": "About",
     "metaTitle": "About BeNative",
     "title": "Native is operationally painful. We fix that.",
     "lead": "BeNative is a Nordic marketplace for buying native content and native advertising across newspapers and magazines — including the many that don't sell programmatically.",

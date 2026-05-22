@@ -59,12 +59,18 @@
     "orderCount": "{count, plural, =0 {0 ordrer} =1 {1 ordre} other {# ordrer}}"
   },
   "agency": {
+    "eyebrow": "Bureau",
     "title": "Bureauarbejdsområde",
     "subtitle": "Administrer dine kunder og handl på deres vegne.",
     "error": "Angiv kundenavn og marked.",
     "active": "Aktiv kunde",
+    "activeSub": "Alle handlinger gælder denne kunde",
+    "activePrompt": "Vælg en kunde at handle for",
     "none": "Ingen valgt",
     "clients": "Kunder",
+    "clientsEyebrow": "Kunder",
+    "addClientEyebrow": "Ny",
+    "marketPlaceholder": "Vælg faktureringsmarked",
     "noClients": "Ingen kunder endnu — tilføj din første nedenfor.",
     "orders": "Ordrer",
     "spend": "Forbrug",
@@ -572,6 +578,9 @@
     "footerContact": "Kontakt"
   },
   "advertisers": {
+    "eyebrow": "For annoncører",
+    "problemsEyebrow": "Problemer",
+    "solutionsEyebrow": "Løsninger",
     "metaTitle": "For annoncører",
     "title": "Køb native indhold på tværs af alle nordiske titler",
     "lead": "Opdagelse, sammenlignelige priser og indholdsproduktion ét sted. Det meste premium-redaktionelle sælges ikke programmatisk — vi gør det bookbart alligevel.",
@@ -593,6 +602,8 @@
     "contentBody": "Indhold er halvdelen af omkostningen og det meste af præstationen i en native-kampagne. Når vi pakker det, kan vi levere spec-rigtige, mærkningsrigtige artikler inden for udgiverens reelle leveringstid — og pakken slår at gøre det selv."
   },
   "agencies": {
+    "eyebrow": "For bureauer",
+    "featuresEyebrow": "Bygget til bureauer",
     "metaTitle": "For bureauer",
     "title": "En indkøbsdesk teamet kan læne sig op ad",
     "lead": "Planlæg på tværs af alle nordiske titler i ét arbejdsområde, skift mellem kunder med ét klik, og lad vores desk håndtere udgiverforhandlingerne.",
@@ -611,6 +622,9 @@
     "ctaBody": "Opret et bureauarbejdsområde og tilføj kunderne. Vi sætter jer op til en pilot-RFQ inden for én arbejdsdag."
   },
   "publishersMkt": {
+    "eyebrow": "For udgivere",
+    "benefitsEyebrow": "Hvorfor det virker",
+    "howEyebrow": "Sådan fungerer partnerskaber",
     "metaTitle": "For udgivere",
     "title": "Inkrementel efterspørgsel uden at bygge selvbetjening",
     "lead": "Vi tager købere med, der allerede forstår native, leverer publiceringsklart indhold der matcher jeres spec, og samler fakturering i ét forhold.",
@@ -639,6 +653,7 @@
     "contactCta": "Tal med partnerteamet"
   },
   "how": {
+    "eyebrow": "Sådan fungerer det",
     "metaTitle": "Sådan virker det",
     "title": "Fra brief til live placering",
     "lead": "Fem trin fra »jeg har en kampagneidé« til en publiceret, spec-rigtig native-artikel — de fleste gjort af os.",
@@ -662,6 +677,7 @@
     "contentBody": "Per-titel playbooks dækker tone, længde, billeder, mærkningsregler (Annonsørindhold / Annons / Annonce) og brand-sikkerhed. Et automatisk spec-tjek skal bestå før et asset kan markeres som færdigt — så det udgiveren modtager altid kan publiceres."
   },
   "about": {
+    "eyebrow": "Om os",
     "metaTitle": "Om BeNative",
     "title": "Native er operationelt hårdt. Det fikser vi.",
     "lead": "BeNative er en nordisk markedsplads til at købe native indhold og native annoncering i aviser og magasiner — også de mange der ikke sælger programmatisk.",

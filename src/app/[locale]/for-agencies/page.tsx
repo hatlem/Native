@@ -28,21 +28,27 @@ export default async function ForAgenciesPage({
 
   return (
     <>
-      <section className="hero">
+      <header className="page-header">
+        <span className="eyebrow accent">{t("eyebrow")}</span>
         <h1>{t("title")}</h1>
         <p className="lead">{t("lead")}</p>
         <div className="hero-actions">
-          <Link href="/signup" className="btn">
+          <Link href="/signup" className="btn large">
             {tm("createAgencyAccount")}
           </Link>
-          <Link href="/catalog" className="btn secondary">
+          <Link href="/catalog" className="btn secondary large">
             {tm("browseCatalog")}
           </Link>
         </div>
-      </section>
+      </header>
 
-      <section style={{ marginTop: 32 }}>
-        <h2>{t("featuresTitle")}</h2>
+      <section className="section">
+        <div className="section-head">
+          <div>
+            <span className="eyebrow">{t("featuresEyebrow")}</span>
+            <h2>{t("featuresTitle")}</h2>
+          </div>
+        </div>
         <div className="grid">
           {features.map((f) => (
             <article className="card" key={f.title}>
@@ -53,23 +59,21 @@ export default async function ForAgenciesPage({
         </div>
       </section>
 
-      <section style={{ marginTop: 32 }}>
+      <section className="section prose-section">
         <h2>{t("workflowTitle")}</h2>
-        <p className="muted" style={{ maxWidth: "60ch" }}>
-          {t("workflowBody")}
-        </p>
-        <p className="note">
-          <Link href="/how-it-works">{tm("seeWorkflow")} →</Link>
+        <p className="prose">{t("workflowBody")}</p>
+        <p>
+          <Link href="/how-it-works" className="link">
+            {tm("seeWorkflow")} →
+          </Link>
         </p>
       </section>
 
-      <section style={{ marginTop: 40, textAlign: "center" }}>
+      <section className="section cta-block">
         <h2>{t("ctaTitle")}</h2>
-        <p className="muted" style={{ maxWidth: "52ch", margin: "0 auto" }}>
-          {t("ctaBody")}
-        </p>
-        <div className="hero-actions" style={{ justifyContent: "center" }}>
-          <Link href="/signup" className="btn">
+        <p className="muted">{t("ctaBody")}</p>
+        <div className="hero-actions">
+          <Link href="/signup" className="btn large">
             {tm("createAgencyAccount")}
           </Link>
         </div>

@@ -28,48 +28,38 @@ export default async function HowItWorksPage({
 
   return (
     <>
-      <section className="hero">
+      <header className="page-header">
+        <span className="eyebrow accent">{t("eyebrow")}</span>
         <h1>{t("title")}</h1>
         <p className="lead">{t("lead")}</p>
-      </section>
+      </header>
 
-      <section style={{ marginTop: 32 }}>
-        <div className="grid">
+      <section className="section">
+        <ol className="step-list">
           {steps.map((s, idx) => (
-            <article className="card" key={s.title}>
-              <div
-                aria-hidden="true"
-                style={{
-                  width: 36,
-                  height: 36,
-                  borderRadius: 999,
-                  background: "var(--primary-soft)",
-                  color: "var(--primary-hover)",
-                  display: "grid",
-                  placeItems: "center",
-                  fontWeight: 700,
-                  marginBottom: 8,
-                }}
-              >
-                {idx + 1}
+            <li className="step-item" key={s.title}>
+              <div className="step-num" aria-hidden>
+                {String(idx + 1).padStart(2, "0")}
               </div>
-              <h3>{s.title}</h3>
-              <p className="muted">{s.body}</p>
-            </article>
+              <div>
+                <h3>{s.title}</h3>
+                <p className="muted">{s.body}</p>
+              </div>
+            </li>
           ))}
-        </div>
+        </ol>
       </section>
 
-      <section style={{ marginTop: 32 }}>
-        <h2>{t("modesTitle")}</h2>
-        <div className="grid">
+      <section className="section">
+        <div className="section-head">
+          <h2>{t("modesTitle")}</h2>
+        </div>
+        <div className="grid two">
           <article className="card">
-            <h3>
-              <span className="tag" style={{ marginRight: 8 }}>
-                ⚡ {t("modeFirmTag")}
-              </span>
-              {t("modeFirmTitle")}
-            </h3>
+            <span className="badge badge-info dotless">
+              ⚡ {t("modeFirmTag")}
+            </span>
+            <h3>{t("modeFirmTitle")}</h3>
             <p className="muted">{t("modeFirmBody")}</p>
           </article>
           <article className="card">
@@ -79,20 +69,19 @@ export default async function HowItWorksPage({
         </div>
       </section>
 
-      <section style={{ marginTop: 32 }}>
+      <section className="section prose-section">
         <h2>{t("contentTitle")}</h2>
-        <p className="muted" style={{ maxWidth: "60ch" }}>
-          {t("contentBody")}
-        </p>
+        <p className="prose">{t("contentBody")}</p>
       </section>
 
-      <section style={{ marginTop: 40, textAlign: "center" }}>
+      <section className="section cta-block">
         <h2>{tm("ctaBlockTitle")}</h2>
-        <div className="hero-actions" style={{ justifyContent: "center" }}>
-          <Link href="/catalog" className="btn">
+        <p className="muted">{tm("ctaBlockBody")}</p>
+        <div className="hero-actions">
+          <Link href="/catalog" className="btn large">
             {tm("browseCatalog")}
           </Link>
-          <Link href="/signup" className="btn secondary">
+          <Link href="/signup" className="btn secondary large">
             {tm("createAccount")}
           </Link>
         </div>

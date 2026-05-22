@@ -32,21 +32,27 @@ export default async function ForAdvertisersPage({
 
   return (
     <>
-      <section className="hero">
+      <header className="page-header">
+        <span className="eyebrow accent">{t("eyebrow")}</span>
         <h1>{t("title")}</h1>
         <p className="lead">{t("lead")}</p>
         <div className="hero-actions">
-          <Link href="/catalog" className="btn">
+          <Link href="/catalog" className="btn large">
             {tm("browseCatalog")}
           </Link>
-          <Link href="/signup" className="btn secondary">
+          <Link href="/signup" className="btn secondary large">
             {tm("createAccount")}
           </Link>
         </div>
-      </section>
+      </header>
 
-      <section style={{ marginTop: 32 }}>
-        <h2>{t("problemsTitle")}</h2>
+      <section className="section">
+        <div className="section-head">
+          <div>
+            <span className="eyebrow">{t("problemsEyebrow")}</span>
+            <h2>{t("problemsTitle")}</h2>
+          </div>
+        </div>
         <div className="grid">
           {problems.map((p) => (
             <article className="card" key={p.title}>
@@ -57,8 +63,13 @@ export default async function ForAdvertisersPage({
         </div>
       </section>
 
-      <section style={{ marginTop: 32 }}>
-        <h2>{t("solutionsTitle")}</h2>
+      <section className="section">
+        <div className="section-head">
+          <div>
+            <span className="eyebrow accent">{t("solutionsEyebrow")}</span>
+            <h2>{t("solutionsTitle")}</h2>
+          </div>
+        </div>
         <div className="grid">
           {solutions.map((s) => (
             <article className="card" key={s.title}>
@@ -69,20 +80,19 @@ export default async function ForAdvertisersPage({
         </div>
       </section>
 
-      <section style={{ marginTop: 32 }}>
+      <section className="section prose-section">
         <h2>{t("contentTitle")}</h2>
-        <p className="muted" style={{ maxWidth: "60ch" }}>
-          {t("contentBody")}
-        </p>
+        <p className="prose">{t("contentBody")}</p>
       </section>
 
-      <section style={{ marginTop: 40, textAlign: "center" }}>
+      <section className="section cta-block">
         <h2>{tm("ctaBlockTitle")}</h2>
-        <div className="hero-actions" style={{ justifyContent: "center" }}>
-          <Link href="/catalog" className="btn">
+        <p className="muted">{tm("ctaBlockBody")}</p>
+        <div className="hero-actions">
+          <Link href="/catalog" className="btn large">
             {tm("browseCatalog")}
           </Link>
-          <Link href="/recommend" className="btn secondary">
+          <Link href="/recommend" className="btn secondary large">
             {tm("tryRecommender")}
           </Link>
         </div>
