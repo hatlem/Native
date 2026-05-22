@@ -210,7 +210,11 @@
     "listHeading": "Alla förfrågningar",
     "newRequestCta": "Ny förfrågan",
     "itemsAndAge": "{items} rader · {age}",
-    "hasQuote": "Offert klar"
+    "hasQuote": "Offert klar",
+    "itemsEyebrow": "Brief",
+    "quoteEyebrow": "Firm pris",
+    "orderEyebrow": "Beställning",
+    "pendingTitle": "Din brief ligger hos desk"
   },
   "desk": {
     "eyebrow": "Internt desk",

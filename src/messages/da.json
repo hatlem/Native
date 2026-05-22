@@ -210,7 +210,11 @@
     "listHeading": "Alle anmodninger",
     "newRequestCta": "Ny anmodning",
     "itemsAndAge": "{items} linjer · {age}",
-    "hasQuote": "Tilbud klar"
+    "hasQuote": "Tilbud klar",
+    "itemsEyebrow": "Brief",
+    "quoteEyebrow": "Firm pris",
+    "orderEyebrow": "Ordre",
+    "pendingTitle": "Din brief er hos desk"
   },
   "desk": {
     "eyebrow": "Internt desk",
