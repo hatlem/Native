@@ -1150,6 +1150,47 @@ form:not(.filters):not(.cmdk-form) button[type="submit"]:not(.btn):hover {
   max-width: 38ch;
 }
 
+.signup-bullets {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 var(--s-4);
+  display: flex;
+  flex-direction: column;
+  gap: var(--s-2);
+  max-width: 38ch;
+}
+
+.signup-bullets li {
+  position: relative;
+  padding-left: 22px;
+  color: var(--text);
+  font-size: 0.95rem;
+  margin: 0;
+}
+
+.signup-bullets li::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 7px;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: var(--accent);
+  opacity: 0.18;
+}
+
+.signup-bullets li::after {
+  content: "";
+  position: absolute;
+  left: 3px;
+  top: 12px;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--accent);
+}
+
 .auth-shell .marketing .pull strong {
   color: var(--heading);
   display: block;
