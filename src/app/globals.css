@@ -1717,6 +1717,21 @@ select:disabled {
   white-space: nowrap;
 }
 
+.table .actions-col {
+  text-align: right;
+  white-space: nowrap;
+}
+
+.actions-col .link {
+  color: var(--accent);
+  font-size: 0.85rem;
+  font-weight: 540;
+}
+
+.actions-col .link + .link {
+  margin-left: 12px;
+}
+
 /* ---------- Text helpers ---------- */
 
 .muted {

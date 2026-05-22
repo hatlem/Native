@@ -37,15 +37,30 @@
     "roleGuest": "Guest"
   },
   "orders": {
+    "eyebrow": "Orders",
     "title": "Your orders",
     "subtitle": "Status, deliverables and invoices for every order on your account.",
     "status": "Status",
+    "organization": "Organization",
     "lines": "Items",
+    "total": "Total",
+    "created": "Created",
     "none": "You have no orders yet.",
     "view": "View",
     "invoice": "Invoice",
     "booking": "Booking",
-    "livePlacement": "View live placement"
+    "livePlacement": "Live placement",
+    "kpiInProgress": "In progress",
+    "kpiInProgressSub": "Confirmed, in production, scheduled",
+    "kpiLive": "Live now",
+    "kpiLiveSub": "Currently published",
+    "kpiCompleted": "Completed",
+    "kpiCompletedSub": "Wrapped & invoiced",
+    "kpiSpend": "Total spend",
+    "kpiSpendSub": "Across all orders",
+    "listEyebrow": "All orders",
+    "listHeading": "Order history",
+    "newOrderCta": "New order"
   },
   "notifications": {
     "title": "Notifications",

@@ -419,15 +419,30 @@
     "DK": "Danmark"
   },
   "orders": {
+    "eyebrow": "Beställningar",
     "title": "Dina beställningar",
     "subtitle": "Status, leveranser och fakturor för alla beställningar på ditt konto.",
     "status": "Status",
+    "organization": "Organisation",
     "lines": "Rader",
+    "total": "Totalt",
+    "created": "Skapad",
     "none": "Du har inga beställningar än.",
     "view": "Öppna",
     "invoice": "Faktura",
     "booking": "Bokning",
-    "livePlacement": "Se live-placering"
+    "livePlacement": "Live-placering",
+    "kpiInProgress": "Pågående",
+    "kpiInProgressSub": "Bekräftade, i produktion, schemalagda",
+    "kpiLive": "Live nu",
+    "kpiLiveSub": "Publicerade just nu",
+    "kpiCompleted": "Avslutade",
+    "kpiCompletedSub": "Wrappade och fakturerade",
+    "kpiSpend": "Total utgift",
+    "kpiSpendSub": "Över alla beställningar",
+    "listEyebrow": "Alla beställningar",
+    "listHeading": "Beställningshistorik",
+    "newOrderCta": "Ny beställning"
   },
   "notifications": {
     "title": "Aviseringar",
