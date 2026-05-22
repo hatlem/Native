@@ -86,9 +86,18 @@
     "browse": "gennemse kataloget"
   },
   "home": {
+    "eyebrow": "BeNative — det nordiske native-marked",
     "title": "Køb native-indhold i nordiske aviser og magasiner",
     "subtitle": "Se alle titler der tilbyder native, med gennemsigtige priser. Giv os en brief — vi skriver det og booker det, også hvor programmatisk ikke er muligt.",
     "cta": "Se kataloget",
+    "statsTitles": "Titler i kataloget",
+    "statsProducts": "Native-produkter",
+    "statsMarkets": "Nordiske markeder",
+    "featuredEyebrow": "Udvalgt",
+    "featuredTitle": "I kataloget lige nu",
+    "featuredCta": "Se alle titler",
+    "priceFrom": "Fra",
+    "whyEyebrow": "Hvorfor BeNative",
     "vp1Title": "Ét gennemsigtigt katalog",
     "vp1Body": "Alle aviser og magasiner der tilbyder native-indhold og native-annoncer, med specifikationer og vejledende priser.",
     "vp2Title": "Vi køber det for dig",

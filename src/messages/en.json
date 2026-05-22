@@ -115,9 +115,18 @@
     "browse": "browse the catalog"
   },
   "home": {
+    "eyebrow": "BeNative — Nordic native marketplace",
     "title": "Buy native content in Nordic newspapers and magazines",
     "subtitle": "See every title that offers native, with transparent pricing. Brief us once — we write it, we book it, even where programmatic isn't possible.",
     "cta": "Browse the catalog",
+    "statsTitles": "Titles in catalog",
+    "statsProducts": "Native products",
+    "statsMarkets": "Nordic markets",
+    "featuredEyebrow": "Featured",
+    "featuredTitle": "Live in the catalog right now",
+    "featuredCta": "See all titles",
+    "priceFrom": "From",
+    "whyEyebrow": "Why BeNative",
     "vp1Title": "One transparent catalog",
     "vp1Body": "Every newspaper and magazine that offers native content and native ads, with specs and indicative pricing.",
     "vp2Title": "We buy it for you",

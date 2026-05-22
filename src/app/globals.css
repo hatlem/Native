@@ -1100,6 +1100,113 @@ form:not(.filters):not(.cmdk-form) button[type="submit"]:not(.btn):hover {
   margin-right: 4px;
 }
 
+/* ---------- Home / marketing ---------- */
+
+.section-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  gap: var(--s-4);
+  margin-bottom: var(--s-4);
+  flex-wrap: wrap;
+}
+
+.section-head h2 {
+  margin: 0;
+}
+
+.section-head .link {
+  color: var(--accent);
+  font-weight: 540;
+  font-size: 0.95rem;
+}
+
+.section-head .link:hover {
+  color: var(--accent-hover);
+  text-decoration: underline;
+}
+
+.hero-stats {
+  display: grid;
+  grid-template-columns: repeat(3, auto);
+  gap: var(--s-6);
+  margin-top: var(--s-6);
+  padding: var(--s-5) 0 0;
+  border-top: 1px solid var(--border);
+  align-items: end;
+  justify-content: flex-start;
+}
+
+.hero-stat .value {
+  font-family: var(--font-display);
+  font-size: clamp(2.2rem, 1.6rem + 1.8vw, 3rem);
+  font-weight: 660;
+  letter-spacing: -0.03em;
+  color: var(--heading);
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+}
+
+.hero-stat .label {
+  font-size: 0.85rem;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  font-weight: 600;
+  margin-top: 6px;
+}
+
+.title-card {
+  text-decoration: none;
+  color: inherit;
+}
+
+.title-card .tag {
+  margin: 0 0 var(--s-3);
+  align-self: flex-start;
+}
+
+.title-card h3 {
+  margin-bottom: 4px;
+}
+
+.title-card .small {
+  font-size: 0.82rem;
+  margin-top: 4px;
+}
+
+.card-link {
+  margin-top: auto;
+  margin-bottom: 0;
+}
+
+.cta-block {
+  text-align: center;
+  padding: var(--s-7) var(--s-5);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--r-lg);
+}
+
+.cta-block h2 {
+  margin: 0 0 var(--s-3);
+}
+
+.cta-block p {
+  max-width: 52ch;
+  margin: 0 auto var(--s-5);
+}
+
+.cta-block .hero-actions {
+  justify-content: center;
+  margin: 0;
+}
+
+@media (max-width: 760px) {
+  .hero-stats { grid-template-columns: 1fr 1fr; gap: var(--s-4); }
+  .cta-block { padding: var(--s-5) var(--s-3); }
+}
+
 /* ---------- Auth shell ---------- */
 
 .auth-shell {
