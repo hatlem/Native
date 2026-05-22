@@ -190,7 +190,22 @@
     "listTitle": "Mine anmodninger",
     "none": "Du har ingen anmodninger endnu.",
     "view": "Vis",
-    "created": "Oprettet"
+    "created": "Oprettet",
+    "eyebrow": "Anmodninger",
+    "listLead": "Briefer du har sendt til desk og tilbuddene der er kommet tilbage.",
+    "kpiTotal": "Anmodninger i alt",
+    "kpiTotalSub": "Alle briefer du har sendt",
+    "kpiQuoted": "Tilbud klar",
+    "kpiQuotedSub": "Klar til gennemgang",
+    "kpiDraft": "Kladder",
+    "kpiDraftSub": "Endnu ikke sendt",
+    "kpiClosed": "Lukkede",
+    "kpiClosedSub": "Accepteret eller afvist",
+    "listEyebrow": "Indbakke",
+    "listHeading": "Alle anmodninger",
+    "newRequestCta": "Ny anmodning",
+    "itemsAndAge": "{items} linjer · {age}",
+    "hasQuote": "Tilbud klar"
   },
   "desk": {
     "eyebrow": "Internt desk",

@@ -219,7 +219,22 @@
     "listTitle": "My requests",
     "none": "You have no requests yet.",
     "view": "View",
-    "created": "Created"
+    "created": "Created",
+    "eyebrow": "Requests",
+    "listLead": "Briefs you've submitted to the desk and the quotes that came back.",
+    "kpiTotal": "Total requests",
+    "kpiTotalSub": "Every brief you've sent",
+    "kpiQuoted": "Quoted",
+    "kpiQuotedSub": "Ready to review",
+    "kpiDraft": "Drafts",
+    "kpiDraftSub": "Not yet submitted",
+    "kpiClosed": "Closed",
+    "kpiClosedSub": "Accepted or declined",
+    "listEyebrow": "Inbox",
+    "listHeading": "All requests",
+    "newRequestCta": "New request",
+    "itemsAndAge": "{items} items · {age}",
+    "hasQuote": "Quote ready"
   },
   "desk": {
     "eyebrow": "Internal desk",

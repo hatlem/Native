@@ -190,7 +190,22 @@
     "listTitle": "Mine forespørsler",
     "none": "Du har ingen forespørsler ennå.",
     "view": "Vis",
-    "created": "Opprettet"
+    "created": "Opprettet",
+    "eyebrow": "Forespørsler",
+    "listLead": "Briefer du har sendt til desk og tilbudene som har kommet tilbake.",
+    "kpiTotal": "Totalt antall forespørsler",
+    "kpiTotalSub": "Alle briefer du har sendt",
+    "kpiQuoted": "Tilbud klart",
+    "kpiQuotedSub": "Klar for gjennomgang",
+    "kpiDraft": "Utkast",
+    "kpiDraftSub": "Ikke sendt ennå",
+    "kpiClosed": "Lukket",
+    "kpiClosedSub": "Godtatt eller avvist",
+    "listEyebrow": "Innboks",
+    "listHeading": "Alle forespørsler",
+    "newRequestCta": "Ny forespørsel",
+    "itemsAndAge": "{items} linjer · {age}",
+    "hasQuote": "Tilbud klart"
   },
   "desk": {
     "eyebrow": "Internt desk",

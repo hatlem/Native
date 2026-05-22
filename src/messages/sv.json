@@ -190,7 +190,22 @@
     "listTitle": "Mina förfrågningar",
     "none": "Du har inga förfrågningar ännu.",
     "view": "Visa",
-    "created": "Skapad"
+    "created": "Skapad",
+    "eyebrow": "Förfrågningar",
+    "listLead": "Briefer du skickat till desk och offerterna som kommit tillbaka.",
+    "kpiTotal": "Totalt antal förfrågningar",
+    "kpiTotalSub": "Alla briefer du skickat",
+    "kpiQuoted": "Offert klar",
+    "kpiQuotedSub": "Redo för granskning",
+    "kpiDraft": "Utkast",
+    "kpiDraftSub": "Inte skickade än",
+    "kpiClosed": "Stängda",
+    "kpiClosedSub": "Accepterade eller avvisade",
+    "listEyebrow": "Inkorg",
+    "listHeading": "Alla förfrågningar",
+    "newRequestCta": "Ny förfrågan",
+    "itemsAndAge": "{items} rader · {age}",
+    "hasQuote": "Offert klar"
   },
   "desk": {
     "eyebrow": "Internt desk",
