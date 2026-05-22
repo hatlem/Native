@@ -406,6 +406,15 @@
     "specMissing": "Ej satt",
     "orders": "Inkommande bokningar",
     "ordersTitle": "Inkommande bokningar",
+    "ordersLead": "Varje rad nedan är en köpares bokning mot dina titlar — uppdatera produktionsstatus och live-URL när den publiceras.",
+    "kpiInProduction": "I produktion",
+    "kpiInProductionSub": "Innehåll skrivs",
+    "kpiScheduled": "Schemalagd",
+    "kpiScheduledSub": "Redo att publicera",
+    "kpiLive": "Live",
+    "kpiLiveSub": "Publicerad nu",
+    "orderLinesEyebrow": "Bokningar",
+    "orderLinesHeading": "Rader du behöver hantera",
     "noOrders": "Inga bokningar än.",
     "basePrice": "Grundpris",
     "visibility": "Prissättning",
@@ -466,16 +475,25 @@
     "newOrderCta": "Ny beställning"
   },
   "notifications": {
+    "eyebrow": "Inkorg",
     "title": "Aviseringar",
+    "lead": "Offertsvar, orderuppdateringar och plattformsaviseringar på ett ställe.",
     "none": "Inkorgen är tom.",
     "markAll": "Markera alla som lästa",
-    "open": "Öppna"
+    "open": "Öppna",
+    "unreadCount": "{count, plural, =0 {0 olästa} =1 {1 oläst} other {# olästa}}",
+    "totalCount": "{count, plural, =0 {0 totalt} =1 {1 totalt} other {# totalt}}"
   },
   "compare": {
+    "eyebrow": "Jämför",
     "title": "Jämför titlar",
     "subtitle": "Specifikationer och vägledande priser sida vid sida.",
     "empty": "Välj minst en titel från katalogen för att jämföra.",
-    "view": "Öppna titel"
+    "view": "Öppna titel",
+    "rowAttribute": "Attribut",
+    "rowMarket": "Marknad",
+    "rowCategory": "Kategori",
+    "rowFormats": "Tillgängliga format"
   },
   "availability": {
     "title": "Tillgänglighet",

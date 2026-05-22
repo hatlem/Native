@@ -406,6 +406,15 @@
     "specMissing": "Ikke sat",
     "orders": "Indkommende bookinger",
     "ordersTitle": "Indkommende bookinger",
+    "ordersLead": "Hver linje nedenfor er en købers booking mod dine titler — opdater produktionsstatus og live-URL når den publiceres.",
+    "kpiInProduction": "I produktion",
+    "kpiInProductionSub": "Indhold skrives",
+    "kpiScheduled": "Planlagt",
+    "kpiScheduledSub": "Klar til publicering",
+    "kpiLive": "Live",
+    "kpiLiveSub": "Publiceret nu",
+    "orderLinesEyebrow": "Bookinger",
+    "orderLinesHeading": "Linjer du skal håndtere",
     "noOrders": "Ingen bookinger endnu.",
     "basePrice": "Grundpris",
     "visibility": "Prissætning",
@@ -466,16 +475,25 @@
     "newOrderCta": "Ny ordre"
   },
   "notifications": {
+    "eyebrow": "Indbakke",
     "title": "Notifikationer",
+    "lead": "Tilbudssvar, ordreopdateringer og platformsnotifikationer ét sted.",
     "none": "Din indbakke er tom.",
     "markAll": "Markér alle som læst",
-    "open": "Åbn"
+    "open": "Åbn",
+    "unreadCount": "{count, plural, =0 {0 ulæste} =1 {1 ulæst} other {# ulæste}}",
+    "totalCount": "{count, plural, =0 {0 i alt} =1 {1 i alt} other {# i alt}}"
   },
   "compare": {
+    "eyebrow": "Sammenlign",
     "title": "Sammenlign titler",
     "subtitle": "Specifikationer og vejledende priser side om side.",
     "empty": "Vælg mindst én titel fra kataloget for at sammenligne.",
-    "view": "Åbn titel"
+    "view": "Åbn titel",
+    "rowAttribute": "Egenskab",
+    "rowMarket": "Marked",
+    "rowCategory": "Kategori",
+    "rowFormats": "Tilgængelige formater"
   },
   "availability": {
     "title": "Tilgængelighed",

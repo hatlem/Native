@@ -8,6 +8,18 @@ import { markAllRead } from "@/app/notification-actions";
 
 export const dynamic = "force-dynamic";
 
+function timeAgo(date: Date, locale: string): string {
+  const diff = Date.now() - date.getTime();
+  const minutes = Math.floor(diff / 60_000);
+  const hours = Math.floor(minutes / 60);
+  const days = Math.floor(hours / 24);
+  const rtf = new Intl.RelativeTimeFormat(locale, { numeric: "auto" });
+  if (days >= 1) return rtf.format(-days, "day");
+  if (hours >= 1) return rtf.format(-hours, "hour");
+  if (minutes >= 1) return rtf.format(-minutes, "minute");
+  return rtf.format(0, "minute");
+}
+
 export default async function NotificationsPage({
   params,
 }: {
@@ -26,39 +38,83 @@ export default async function NotificationsPage({
     take: 100,
   });
 
+  const unread = rows.filter((n) => !n.readAt).length;
+
   return (
-    <section>
-      <h1>{t("title")}</h1>
-      {rows.length === 0 ? (
-        <EmptyState title={t("none")} primaryHref="/catalog" primaryLabel={tNav("catalog")} />
-      ) : (
-        <>
-          <form action={markAllRead} style={{ marginBottom: 16 }}>
+    <>
+      <header className="page-header">
+        <span className="eyebrow accent">{t("eyebrow")}</span>
+        <h1>{t("title")}</h1>
+        <p className="lead">{t("lead")}</p>
+      </header>
+
+      <div className="result-bar">
+        <div className="result-bar-summary">
+          <strong>
+            {t("unreadCount", { count: unread })}
+          </strong>
+          <span className="muted small">
+            {t("totalCount", { count: rows.length })}
+          </span>
+        </div>
+        {unread > 0 ? (
+          <form action={markAllRead} className="result-bar-action">
             <input type="hidden" name="locale" value={locale} />
-            <button type="submit">{t("markAll")}</button>
+            <button type="submit" className="btn small secondary">
+              {t("markAll")}
+            </button>
           </form>
-          <div className="grid">
-            {rows.map((n) => (
-              <article
-                className="card"
-                key={n.id}
-                style={n.readAt ? { opacity: 0.7 } : undefined}
-              >
-                <h3>{n.title}</h3>
-                {n.body ? <div className="muted">{n.body}</div> : null}
-                <div className="muted" style={{ fontSize: "0.8rem" }}>
-                  {n.createdAt.toISOString().slice(0, 16).replace("T", " ")}
+        ) : null}
+      </div>
+
+      {rows.length === 0 ? (
+        <EmptyState
+          title={t("none")}
+          primaryHref="/catalog"
+          primaryLabel={tNav("catalog")}
+        />
+      ) : (
+        <div className="action-list">
+          {rows.map((n) => {
+            const inner = (
+              <>
+                <span
+                  className={`unread-dot ${n.readAt ? "is-read" : ""}`}
+                  aria-hidden
+                />
+                <div>
+                  <div className="title">{n.title}</div>
+                  {n.body ? <div className="sub">{n.body}</div> : null}
+                  <div className="muted small mt-1">
+                    {timeAgo(n.createdAt, locale)}
+                  </div>
                 </div>
                 {n.link ? (
-                  <p className="note">
-                    <Link href={n.link}>{t("open")} →</Link>
-                  </p>
+                  <span className="chev" aria-hidden>
+                    →
+                  </span>
                 ) : null}
-              </article>
-            ))}
-          </div>
-        </>
+              </>
+            );
+            return n.link ? (
+              <Link
+                key={n.id}
+                href={n.link}
+                className={`item ${n.readAt ? "item-read" : ""}`}
+              >
+                {inner}
+              </Link>
+            ) : (
+              <div
+                key={n.id}
+                className={`item ${n.readAt ? "item-read" : ""}`}
+              >
+                {inner}
+              </div>
+            );
+          })}
+        </div>
       )}
-    </section>
+    </>
   );
 }

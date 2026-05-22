@@ -406,6 +406,15 @@
     "specMissing": "Ikke satt",
     "orders": "Innkommende bookinger",
     "ordersTitle": "Innkommende bookinger",
+    "ordersLead": "Hver linje under er en kjøpers booking mot dine titler — oppdater produksjonsstatus og live-URL når den publiseres.",
+    "kpiInProduction": "I produksjon",
+    "kpiInProductionSub": "Innhold skrives",
+    "kpiScheduled": "Planlagt",
+    "kpiScheduledSub": "Klar til publisering",
+    "kpiLive": "Live",
+    "kpiLiveSub": "Publisert nå",
+    "orderLinesEyebrow": "Bookinger",
+    "orderLinesHeading": "Linjer du må håndtere",
     "noOrders": "Ingen bookinger ennå.",
     "basePrice": "Grunnpris",
     "visibility": "Prising",
@@ -466,16 +475,25 @@
     "newOrderCta": "Ny bestilling"
   },
   "notifications": {
+    "eyebrow": "Innboks",
     "title": "Varsler",
+    "lead": "Tilbud, bestillingsoppdateringer og plattformvarsler på ett sted.",
     "none": "Innboksen er tom.",
     "markAll": "Marker alle som lest",
-    "open": "Åpne"
+    "open": "Åpne",
+    "unreadCount": "{count, plural, =0 {0 uleste} =1 {1 ulest} other {# uleste}}",
+    "totalCount": "{count, plural, =0 {0 totalt} =1 {1 totalt} other {# totalt}}"
   },
   "compare": {
+    "eyebrow": "Sammenlign",
     "title": "Sammenlign titler",
     "subtitle": "Spesifikasjoner og veiledende priser side om side.",
     "empty": "Velg minst én tittel fra katalogen for å sammenligne.",
-    "view": "Åpne tittel"
+    "view": "Åpne tittel",
+    "rowAttribute": "Egenskap",
+    "rowMarket": "Marked",
+    "rowCategory": "Kategori",
+    "rowFormats": "Tilgjengelige formater"
   },
   "availability": {
     "title": "Tilgjengelighet",

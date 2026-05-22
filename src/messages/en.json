@@ -63,16 +63,25 @@
     "newOrderCta": "New order"
   },
   "notifications": {
+    "eyebrow": "Inbox",
     "title": "Notifications",
+    "lead": "Quote responses, order updates and platform alerts in one place.",
     "none": "Nothing in your inbox.",
     "markAll": "Mark all as read",
-    "open": "Open"
+    "open": "Open",
+    "unreadCount": "{count, plural, =0 {0 unread} =1 {1 unread} other {# unread}}",
+    "totalCount": "{count, plural, =0 {0 total} =1 {1 total} other {# total}}"
   },
   "compare": {
+    "eyebrow": "Compare",
     "title": "Compare titles",
     "subtitle": "Side-by-side specs and indicative pricing.",
     "empty": "Pick at least one title from the catalog to compare.",
-    "view": "Open title"
+    "view": "Open title",
+    "rowAttribute": "Attribute",
+    "rowMarket": "Market",
+    "rowCategory": "Category",
+    "rowFormats": "Available formats"
   },
   "availability": {
     "title": "Availability",
@@ -449,6 +458,15 @@
     "specHas": "Configured",
     "specMissing": "Not set",
     "ordersTitle": "Incoming bookings",
+    "ordersLead": "Each line below is a buyer booking against your titles — update production status and the live URL once it ships.",
+    "kpiInProduction": "In production",
+    "kpiInProductionSub": "Content being written",
+    "kpiScheduled": "Scheduled",
+    "kpiScheduledSub": "Ready to publish",
+    "kpiLive": "Live",
+    "kpiLiveSub": "Currently published",
+    "orderLinesEyebrow": "Bookings",
+    "orderLinesHeading": "Lines you need to act on",
     "noOrders": "No bookings yet.",
     "basePrice": "Base price",
     "visibility": "Pricing",
