@@ -255,7 +255,12 @@
     "vat": "Moms",
     "total": "Total",
     "awaiting": "Afventer kundens accept.",
-    "acceptedOrder": "Accepteret — ordre oprettet."
+    "acceptedOrder": "Accepteret — ordre oprettet.",
+    "briefEyebrow": "Brief",
+    "quoteEyebrow": "Tilbud",
+    "readyToQuoteTitle": "Klar til at lave tilbud?",
+    "readyToQuoteBody": "Generer et udkast fra briefen ovenfor — du kan justere marginer og linjer på næste skærm.",
+    "openOrder": "Åbn ordre"
   },
   "deskTitles": {
     "eyebrow": "Superadmin · titler",
@@ -340,6 +345,8 @@
     "back": "Tilbage til desk",
     "issueInvoice": "Udsted faktura",
     "viewInvoice": "Se faktura",
+    "deskDetailLead": "Flyt ordren gennem produktionen, håndter udkast, og send fakturaen når den er færdig.",
+    "productionEyebrow": "Produktion",
     "deskLead": "Alle ordrer på tværs af alle kunder — produktion, planlægning og live-publicering.",
     "customer": "Kunde",
     "total": "Total",
@@ -365,7 +372,10 @@
     "finalize": "Færdiggør",
     "requestChanges": "Anmod om ændringer",
     "draftLabel": "Ny udkastversion",
-    "saveDraft": "Gem udkast"
+    "saveDraft": "Gem udkast",
+    "history": "Versionshistorik",
+    "composeNew": "Skriv en ny version",
+    "draftPlaceholder": "Indsæt eller skriv det nye udkast her…"
   },
   "invoice": {
     "title": "Faktura",
@@ -476,7 +486,9 @@
     "kpiSpendSub": "På tværs af alle ordrer",
     "listEyebrow": "Alle ordrer",
     "listHeading": "Ordrehistorik",
-    "newOrderCta": "Ny ordre"
+    "newOrderCta": "Ny ordre",
+    "orderDetailLead": "Produktionsstatus, leverancer og live-placeringer for hver linje i denne ordre.",
+    "linesEyebrow": "Ordrelinjer"
   },
   "notifications": {
     "eyebrow": "Indbakke",

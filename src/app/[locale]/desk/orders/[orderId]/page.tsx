@@ -25,6 +25,7 @@ export default async function DeskOrderPage({
   const t = await getTranslations({ locale, namespace: "order" });
   const tp = await getTranslations({ locale, namespace: "production" });
   const tType = await getTranslations({ locale, namespace: "productType" });
+  const td = await getTranslations({ locale, namespace: "desk" });
 
   const order = await prisma.order.findUnique({
     where: { id: orderId },
@@ -49,151 +50,217 @@ export default async function DeskOrderPage({
   const invoice = order.invoices[0];
 
   return (
-    <section>
-      <p>
-        <Link href="/desk/orders">← {t("orders")}</Link>
-      </p>
-      <h1>
-        {t("title")} · {order.organization.name}
-      </h1>
-      <p className="muted">
-        {t("status")}: <StatusBadge value={order.status} />
-      </p>
+    <>
+      <nav className="breadcrumb">
+        <Link href="/desk/orders" className="small-link">
+          ← {t("orders")}
+        </Link>
+      </nav>
 
-      <div style={{ display: "flex", gap: 12, flexWrap: "wrap" }}>
-        {!NON_ADVANCEABLE.includes(order.status) ? (
-          <form action={advanceOrder}>
-            <input type="hidden" name="locale" value={locale} />
-            <input type="hidden" name="orderId" value={order.id} />
-            <button type="submit" className="btn" style={{ marginTop: 0 }}>
-              {t("advance")}
-            </button>
-          </form>
-        ) : null}
-        {order.status === "COMPLETED" && !invoice ? (
-          <form action={issueInvoice}>
-            <input type="hidden" name="locale" value={locale} />
-            <input type="hidden" name="orderId" value={order.id} />
-            <button type="submit" className="btn" style={{ marginTop: 0 }}>
-              {t("issueInvoice")}
-            </button>
-          </form>
-        ) : null}
-        {invoice ? (
-          <Link className="btn" href={`/invoices/${invoice.id}`}>
-            {t("viewInvoice")}
-          </Link>
-        ) : null}
-      </div>
-
-      <h2 style={{ marginTop: 24 }}>{t("lines")}</h2>
-      {order.lines.map((line) => {
-        const p = byId.get(line.productId);
-        const assets = line.brief?.assets ?? [];
-        const latest = assets[0];
-        return (
-          <div className="card" key={line.id} style={{ marginBottom: 16 }}>
-            <h3>{p?.title.name ?? line.productId}</h3>
-            <div className="muted">{p ? tType(p.type) : ""}</div>
-            {line.brief?.audience ? (
-              <div className="muted">
-                {tp("audience")}: {line.brief.audience}
-              </div>
+      <header className="detail-head">
+        <div>
+          <span className="eyebrow accent">{td("eyebrow")}</span>
+          <h1>
+            {t("title")} · {order.organization.name}
+          </h1>
+          <p className="lead">{t("deskDetailLead")}</p>
+        </div>
+        <aside className="detail-meta">
+          <div className="meta-row">
+            <span className="muted small">{t("status")}</span>
+            <span className="value">
+              <StatusBadge value={order.status} />
+            </span>
+          </div>
+          <div className="meta-row">
+            <span className="muted small">{t("total")}</span>
+            <span className="value">
+              {formatMoney(
+                Number(order.quote.total),
+                order.quote.currency,
+                locale,
+              )}
+            </span>
+          </div>
+          <div className="detail-actions">
+            {!NON_ADVANCEABLE.includes(order.status) ? (
+              <form action={advanceOrder}>
+                <input type="hidden" name="locale" value={locale} />
+                <input type="hidden" name="orderId" value={order.id} />
+                <button type="submit" className="btn block">
+                  {t("advance")}
+                </button>
+              </form>
             ) : null}
-            {line.brief?.message ? (
-              <div className="muted">
-                {tp("brief")}: {line.brief.message}
-              </div>
+            {order.status === "COMPLETED" && !invoice ? (
+              <form action={issueInvoice}>
+                <input type="hidden" name="locale" value={locale} />
+                <input type="hidden" name="orderId" value={order.id} />
+                <button type="submit" className="btn block">
+                  {t("issueInvoice")}
+                </button>
+              </form>
             ) : null}
-
-            {assets.length === 0 ? (
-              <p className="note">{tp("noAssets")}</p>
-            ) : (
-              assets.map((a) => (
-                <div
-                  key={a.id}
-                  className="muted"
-                  style={{ borderTop: "1px solid var(--border)", marginTop: 8, paddingTop: 8 }}
-                >
-                  {tp("version")} {a.version} — {tp("status")}:{" "}
-                  <StatusBadge value={a.status} />
-                  {a.specPassed === true ? ` · ✅ ${tp("specPass")}` : null}
-                  {a.specPassed === false ? ` · ⚠ ${tp("specFail")}` : null}
-                  {a.reviewNotes ? <div>{a.reviewNotes}</div> : null}
-                  {a.body ? (
-                    <div style={{ marginTop: 4, whiteSpace: "pre-wrap" }}>
-                      {a.body.slice(0, 240)}
-                      {a.body.length > 240 ? "…" : ""}
-                    </div>
-                  ) : null}
-                </div>
-              ))
-            )}
-
-            {latest ? (
-              <div
-                style={{ display: "flex", gap: 8, flexWrap: "wrap", marginTop: 10 }}
+            {invoice ? (
+              <Link
+                className="btn secondary block"
+                href={`/invoices/${invoice.id}`}
               >
-                {(
-                  [
-                    ["runSpecCheck", runSpecCheck, tp("specCheck"), undefined],
-                    ["IN_REVIEW", setAssetStatus, tp("submitReview"), "IN_REVIEW"],
-                    ["APPROVED", setAssetStatus, tp("approve"), "APPROVED"],
-                    ["FINAL", setAssetStatus, tp("finalize"), "FINAL"],
-                    [
-                      "CHANGES_REQUESTED",
-                      setAssetStatus,
-                      tp("requestChanges"),
-                      "CHANGES_REQUESTED",
-                    ],
-                  ] as const
-                ).map(([key, action, label, target]) => (
-                  <form action={action} key={key}>
+                {t("viewInvoice")}
+              </Link>
+            ) : null}
+          </div>
+        </aside>
+      </header>
+
+      <section className="section">
+        <div className="section-head">
+          <div>
+            <span className="eyebrow">{t("productionEyebrow")}</span>
+            <h2>{t("lines")}</h2>
+          </div>
+        </div>
+
+        <div className="stack-4">
+          {order.lines.map((line) => {
+            const p = byId.get(line.productId);
+            const assets = line.brief?.assets ?? [];
+            const latest = assets[0];
+            return (
+              <article className="card desk-line-card" key={line.id}>
+                <div className="line-head">
+                  <div>
+                    <h3>{p?.title.name ?? line.productId}</h3>
+                    <p className="muted small">{p ? tType(p.type) : ""}</p>
+                  </div>
+                  <div className="price" style={{ marginTop: 0 }}>
+                    {formatMoney(
+                      Number(line.lineTotal),
+                      order.quote.currency,
+                      locale,
+                    )}
+                  </div>
+                </div>
+
+                {line.brief?.audience || line.brief?.message ? (
+                  <dl className="spec-grid">
+                    {line.brief.audience ? (
+                      <>
+                        <dt>{tp("audience")}</dt>
+                        <dd>{line.brief.audience}</dd>
+                      </>
+                    ) : null}
+                    {line.brief.message ? (
+                      <>
+                        <dt>{tp("brief")}</dt>
+                        <dd>{line.brief.message}</dd>
+                      </>
+                    ) : null}
+                  </dl>
+                ) : null}
+
+                <div className="asset-timeline">
+                  <h4>{tp("history")}</h4>
+                  {assets.length === 0 ? (
+                    <p className="muted small">{tp("noAssets")}</p>
+                  ) : (
+                    <ul className="timeline-list">
+                      {assets.map((a) => (
+                        <li key={a.id} className="timeline-item">
+                          <div className="timeline-head">
+                            <span className="timeline-label">
+                              {tp("version")} {a.version}
+                            </span>
+                            <StatusBadge value={a.status} />
+                            {a.specPassed === true ? (
+                              <span className="badge badge-success dotless">
+                                ✓ {tp("specPass")}
+                              </span>
+                            ) : null}
+                            {a.specPassed === false ? (
+                              <span className="badge badge-warning dotless">
+                                ⚠ {tp("specFail")}
+                              </span>
+                            ) : null}
+                          </div>
+                          {a.reviewNotes ? (
+                            <p className="muted small">{a.reviewNotes}</p>
+                          ) : null}
+                          {a.body ? (
+                            <pre className="asset-body">
+                              {a.body.slice(0, 240)}
+                              {a.body.length > 240 ? "…" : ""}
+                            </pre>
+                          ) : null}
+                        </li>
+                      ))}
+                    </ul>
+                  )}
+                </div>
+
+                {latest ? (
+                  <div className="asset-actions">
+                    <form action={runSpecCheck}>
+                      <input type="hidden" name="locale" value={locale} />
+                      <input type="hidden" name="orderId" value={order.id} />
+                      <input type="hidden" name="assetId" value={latest.id} />
+                      <button type="submit" className="btn small secondary">
+                        {tp("specCheck")}
+                      </button>
+                    </form>
+                    {(
+                      [
+                        ["IN_REVIEW", tp("submitReview")],
+                        ["APPROVED", tp("approve")],
+                        ["FINAL", tp("finalize")],
+                        ["CHANGES_REQUESTED", tp("requestChanges")],
+                      ] as const
+                    ).map(([target, label]) => (
+                      <form action={setAssetStatus} key={target}>
+                        <input type="hidden" name="locale" value={locale} />
+                        <input type="hidden" name="orderId" value={order.id} />
+                        <input type="hidden" name="assetId" value={latest.id} />
+                        <input type="hidden" name="target" value={target} />
+                        <button type="submit" className="btn small ghost">
+                          {label}
+                        </button>
+                      </form>
+                    ))}
+                  </div>
+                ) : null}
+
+                <details className="spec-details">
+                  <summary>
+                    {tp("draftLabel")}
+                    <span className="muted small">{tp("composeNew")}</span>
+                  </summary>
+                  <form action={saveDraft} className="product-form">
                     <input type="hidden" name="locale" value={locale} />
                     <input type="hidden" name="orderId" value={order.id} />
-                    <input type="hidden" name="assetId" value={latest.id} />
-                    {target ? (
-                      <input type="hidden" name="target" value={target} />
-                    ) : null}
-                    <button type="submit">{label}</button>
+                    <input type="hidden" name="orderLineId" value={line.id} />
+                    <div className="field">
+                      <label htmlFor={`body-${line.id}`}>
+                        {tp("draftLabel")}
+                      </label>
+                      <textarea
+                        id={`body-${line.id}`}
+                        name="body"
+                        rows={6}
+                        placeholder={tp("draftPlaceholder")}
+                      />
+                    </div>
+                    <div className="actions">
+                      <button type="submit" className="btn small">
+                        {tp("saveDraft")}
+                      </button>
+                    </div>
                   </form>
-                ))}
-              </div>
-            ) : null}
-
-            <form action={saveDraft} style={{ marginTop: 12 }}>
-              <input type="hidden" name="locale" value={locale} />
-              <input type="hidden" name="orderId" value={order.id} />
-              <input type="hidden" name="orderLineId" value={line.id} />
-              <label className="muted" htmlFor={`body-${line.id}`}>
-                {tp("draftLabel")}
-              </label>
-              <textarea
-                id={`body-${line.id}`}
-                name="body"
-                rows={4}
-                style={{
-                  display: "block",
-                  width: "100%",
-                  marginTop: 4,
-                  background: "var(--bg)",
-                  color: "var(--text)",
-                  border: "1px solid var(--border)",
-                  borderRadius: 8,
-                  padding: 8,
-                }}
-              />
-              <button type="submit" style={{ marginTop: 8 }}>
-                {tp("saveDraft")}
-              </button>
-            </form>
-
-            <div className="muted" style={{ marginTop: 8 }}>
-              {formatMoney(Number(line.lineTotal), order.quote.currency, locale)}
-            </div>
-          </div>
-        );
-      })}
-    </section>
+                </details>
+              </article>
+            );
+          })}
+        </div>
+      </section>
+    </>
   );
 }

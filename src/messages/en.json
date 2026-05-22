@@ -60,7 +60,9 @@
     "kpiSpendSub": "Across all orders",
     "listEyebrow": "All orders",
     "listHeading": "Order history",
-    "newOrderCta": "New order"
+    "newOrderCta": "New order",
+    "orderDetailLead": "Production status, deliverables and live placements for every line in this order.",
+    "linesEyebrow": "Order lines"
   },
   "notifications": {
     "eyebrow": "Inbox",
@@ -317,7 +319,12 @@
     "vat": "VAT",
     "total": "Total",
     "awaiting": "Awaiting customer acceptance.",
-    "acceptedOrder": "Accepted — order created."
+    "acceptedOrder": "Accepted — order created.",
+    "briefEyebrow": "Brief",
+    "quoteEyebrow": "Quote",
+    "readyToQuoteTitle": "Ready to quote?",
+    "readyToQuoteBody": "Generate a draft quote from the brief above — you can edit margins and lines on the next screen.",
+    "openOrder": "Open order"
   },
   "deskTitles": {
     "eyebrow": "Super-admin · titles",
@@ -402,6 +409,8 @@
     "back": "Back to desk",
     "issueInvoice": "Issue invoice",
     "viewInvoice": "View invoice",
+    "deskDetailLead": "Move the order through production, manage drafts, and surface the invoice when it's done.",
+    "productionEyebrow": "Production",
     "deskLead": "Every order across all customers — production, scheduling and live placement.",
     "customer": "Customer",
     "total": "Total",
@@ -427,7 +436,10 @@
     "finalize": "Finalize",
     "requestChanges": "Request changes",
     "draftLabel": "New draft version",
-    "saveDraft": "Save draft"
+    "saveDraft": "Save draft",
+    "history": "Version history",
+    "composeNew": "Compose a new version",
+    "draftPlaceholder": "Paste or write the new draft here…"
   },
   "invoice": {
     "title": "Invoice",

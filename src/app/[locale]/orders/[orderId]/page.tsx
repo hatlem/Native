@@ -8,8 +8,6 @@ import { StatusBadge } from "@/app/status-badge";
 
 export const dynamic = "force-dynamic";
 
-// Per-order buyer view: status timeline, per-line content + booking
-// progress, links to invoice. Org-scoped via canActOnOrg.
 export default async function MyOrderPage({
   params,
 }: {
@@ -29,7 +27,9 @@ export default async function MyOrderPage({
       invoices: { select: { id: true, status: true } },
       lines: {
         include: {
-          brief: { include: { assets: { orderBy: { version: "desc" }, take: 1 } } },
+          brief: {
+            include: { assets: { orderBy: { version: "desc" }, take: 1 } },
+          },
           booking: true,
         },
       },
@@ -45,74 +45,124 @@ export default async function MyOrderPage({
     include: { title: true },
   });
   const byId = new Map(products.map((p) => [p.id, p]));
+  const invoice = order.invoices[0];
 
   return (
-    <section>
-      <p>
-        <Link href="/orders">← {t("title")}</Link>
-      </p>
-      <h1>
-        {to("title")} #{order.id.slice(-8).toUpperCase()}
-      </h1>
-      <p className="muted">
-        {to("status")}: <StatusBadge value={order.status} />
-      </p>
-      <p className="price">
-        {formatMoney(Number(order.quote.total), order.quote.currency, locale)}
-      </p>
+    <>
+      <nav className="breadcrumb">
+        <Link href="/orders" className="small-link">
+          ← {t("title")}
+        </Link>
+      </nav>
 
-      <h2 style={{ marginTop: 16 }}>{to("lines")}</h2>
-      <div className="grid">
-        {order.lines.map((line) => {
-          const p = byId.get(line.productId);
-          const latest = line.brief?.assets[0];
-          return (
-            <article className="card" key={line.id}>
-              <h3>{p?.title.name ?? line.productId}</h3>
-              <div className="muted">{p ? tType(p.type) : ""}</div>
-              <div className="muted">
-                {tp("status")}:{" "}
-                {latest ? (
-                  <StatusBadge value={latest.status} />
-                ) : (
-                  tp("noAssets")
-                )}
-                {latest?.specPassed === true ? " · ✅" : null}
-              </div>
-              {line.booking ? (
-                <div className="muted">
-                  {t("booking")}: <StatusBadge value={line.booking.status} />
-                  {line.booking.liveUrl ? (
+      <header className="detail-head">
+        <div>
+          <span className="eyebrow accent">{t("eyebrow")}</span>
+          <h1>
+            {to("title")} #{order.id.slice(-8).toUpperCase()}
+          </h1>
+          <p className="lead">{t("orderDetailLead")}</p>
+        </div>
+        <aside className="detail-meta">
+          <div className="meta-row">
+            <span className="muted small">{to("status")}</span>
+            <span className="value">
+              <StatusBadge value={order.status} />
+            </span>
+          </div>
+          <div className="meta-row">
+            <span className="muted small">{t("lines")}</span>
+            <span className="value">{order.lines.length}</span>
+          </div>
+          <div className="meta-row">
+            <span className="muted small">{t("total")}</span>
+            <span className="value">
+              {formatMoney(
+                Number(order.quote.total),
+                order.quote.currency,
+                locale,
+              )}
+            </span>
+          </div>
+          {invoice ? (
+            <Link
+              href={`/invoices/${invoice.id}`}
+              className="btn small secondary"
+            >
+              {ti("title")} →
+            </Link>
+          ) : null}
+        </aside>
+      </header>
+
+      <section className="section">
+        <div className="section-head">
+          <div>
+            <span className="eyebrow">{t("linesEyebrow")}</span>
+            <h2>{to("lines")}</h2>
+          </div>
+        </div>
+        <div className="grid two">
+          {order.lines.map((line) => {
+            const p = byId.get(line.productId);
+            const latest = line.brief?.assets[0];
+            return (
+              <article className="card line-card" key={line.id}>
+                <div className="line-head">
+                  <div>
+                    <h3>{p?.title.name ?? line.productId}</h3>
+                    <p className="muted small">{p ? tType(p.type) : ""}</p>
+                  </div>
+                  <div className="price" style={{ marginTop: 0 }}>
+                    {formatMoney(
+                      Number(line.lineTotal),
+                      order.quote.currency,
+                      locale,
+                    )}
+                  </div>
+                </div>
+
+                <dl className="spec-grid">
+                  <dt>{tp("status")}</dt>
+                  <dd>
+                    {latest ? (
+                      <span className="cluster tight">
+                        <StatusBadge value={latest.status} />
+                        {latest.specPassed === true ? (
+                          <span className="badge badge-success dotless">
+                            ✓
+                          </span>
+                        ) : null}
+                      </span>
+                    ) : (
+                      <span className="muted small">{tp("noAssets")}</span>
+                    )}
+                  </dd>
+                  {line.booking ? (
                     <>
-                      {" · "}
-                      <a
-                        href={line.booking.liveUrl}
-                        target="_blank"
-                        rel="noreferrer noopener"
-                      >
-                        {t("livePlacement")} →
-                      </a>
+                      <dt>{t("booking")}</dt>
+                      <dd>
+                        <StatusBadge value={line.booking.status} />
+                      </dd>
                     </>
                   ) : null}
-                </div>
-              ) : null}
-              <div className="muted" style={{ marginTop: 6 }}>
-                {formatMoney(
-                  Number(line.lineTotal),
-                  order.quote.currency,
-                  locale,
-                )}
-              </div>
-            </article>
-          );
-        })}
-      </div>
+                </dl>
 
-      {order.invoices[0] ? (
-        <p className="note" style={{ marginTop: 20 }}>
-          <Link href={`/invoices/${order.invoices[0].id}`}>{ti("title")} →</Link>
-        </p>
-      ) : null}
-    </section>
+                {line.booking?.liveUrl ? (
+                  <a
+                    href={line.booking.liveUrl}
+                    target="_blank"
+                    rel="noreferrer noopener"
+                    className="btn small secondary block"
+                  >
+                    {t("livePlacement")} ↗
+                  </a>
+                ) : null}
+              </article>
+            );
+          })}
+        </div>
+      </section>
+    </>
   );
 }

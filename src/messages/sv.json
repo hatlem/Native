@@ -255,7 +255,12 @@
     "vat": "Moms",
     "total": "Totalt",
     "awaiting": "Väntar på kundens godkännande.",
-    "acceptedOrder": "Accepterad — order skapad."
+    "acceptedOrder": "Accepterad — order skapad.",
+    "briefEyebrow": "Brief",
+    "quoteEyebrow": "Offert",
+    "readyToQuoteTitle": "Redo att offerera?",
+    "readyToQuoteBody": "Generera ett utkast från briefen ovan — du kan justera marginaler och rader på nästa skärm.",
+    "openOrder": "Öppna order"
   },
   "deskTitles": {
     "eyebrow": "Superadmin · titlar",
@@ -340,6 +345,8 @@
     "back": "Tillbaka till desk",
     "issueInvoice": "Skapa faktura",
     "viewInvoice": "Visa faktura",
+    "deskDetailLead": "Flytta beställningen genom produktionen, hantera utkast och skicka fakturan när den är klar.",
+    "productionEyebrow": "Produktion",
     "deskLead": "Alla ordrar för alla kunder — produktion, schemaläggning och live-publicering.",
     "customer": "Kund",
     "total": "Totalt",
@@ -365,7 +372,10 @@
     "finalize": "Slutför",
     "requestChanges": "Begär ändringar",
     "draftLabel": "Ny utkastversion",
-    "saveDraft": "Spara utkast"
+    "saveDraft": "Spara utkast",
+    "history": "Versionshistorik",
+    "composeNew": "Skriv en ny version",
+    "draftPlaceholder": "Klistra in eller skriv det nya utkastet här…"
   },
   "invoice": {
     "title": "Faktura",
@@ -476,7 +486,9 @@
     "kpiSpendSub": "Över alla beställningar",
     "listEyebrow": "Alla beställningar",
     "listHeading": "Beställningshistorik",
-    "newOrderCta": "Ny beställning"
+    "newOrderCta": "Ny beställning",
+    "orderDetailLead": "Produktionsstatus, leveranser och live-placeringar för varje rad i denna beställning.",
+    "linesEyebrow": "Orderrader"
   },
   "notifications": {
     "eyebrow": "Inkorg",
