@@ -1,5 +1,7 @@
 {
-  "common": { "appName": "BeNative" },
+  "common": {
+    "appName": "BeNative"
+  },
   "nav": {
     "home": "Hjem",
     "catalog": "Katalog",
@@ -9,7 +11,9 @@
     "publisher": "Utgiver",
     "requests": "Mine forespørsler",
     "reports": "Rapporter",
-    "agency": "Byrå"
+    "agency": "Byrå",
+    "orders": "Bestillinger",
+    "notifications": "Innboks"
   },
   "reports": {
     "title": "Rapporter",
@@ -90,7 +94,8 @@
     },
     "indicativeNote": "Prisene er veiledende. Endelig pris bekreftes av kjøpsteamet basert på tilgjengelighet, sesong og volum.",
     "noResults": "Ingen titler matcher disse filtrene.",
-    "clearFilters": "Nullstill filtre"
+    "clearFilters": "Nullstill filtre",
+    "compareTop": "Sammenlign disse resultatene"
   },
   "titleDetail": {
     "back": "Tilbake til katalogen",
@@ -256,7 +261,8 @@
     "disclosure": "Merking",
     "fileFormats": "Filformater",
     "requirements": "Krav",
-    "saveSpec": "Lagre spesifikasjon"
+    "saveSpec": "Lagre spesifikasjon",
+    "availability": "Tilgjengelighet"
   },
   "productType": {
     "NATIVE_ARTICLE": "Native-artikkel",
@@ -264,5 +270,174 @@
     "NATIVE_DISPLAY": "Native display",
     "PACKAGE": "Pakke"
   },
-  "market": { "NO": "Norge", "SE": "Sverige", "DK": "Danmark" }
+  "market": {
+    "NO": "Norge",
+    "SE": "Sverige",
+    "DK": "Danmark"
+  },
+  "orders": {
+    "title": "Dine bestillinger",
+    "subtitle": "Status, leveranser og fakturaer for alle bestillinger på kontoen din.",
+    "status": "Status",
+    "lines": "Linjer",
+    "none": "Du har ingen bestillinger ennå.",
+    "view": "Åpne",
+    "invoice": "Faktura",
+    "booking": "Booking",
+    "livePlacement": "Se live-plassering"
+  },
+  "notifications": {
+    "title": "Varsler",
+    "none": "Innboksen er tom.",
+    "markAll": "Marker alle som lest",
+    "open": "Åpne"
+  },
+  "compare": {
+    "title": "Sammenlign titler",
+    "subtitle": "Spesifikasjoner og veiledende priser side om side.",
+    "empty": "Velg minst én tittel fra katalogen for å sammenligne.",
+    "view": "Åpne tittel"
+  },
+  "availability": {
+    "title": "Tilgjengelighet",
+    "subtitle": "Blokker måneder du ikke kan levere — katalogen skjuler firmpris­produkter for blokkerte måneder og selv­betjent kassen avviser dem.",
+    "blocked": "Blokkert",
+    "save": "Lagre"
+  },
+  "marketing": {
+    "howCta": "Slik fungerer det",
+    "audiencesTitle": "Bygget for hele native-økosystemet",
+    "audAdvertiserTitle": "For annonsører",
+    "audAdvertiserBody": "Én katalog over alle nordiske titler som tilbyr native. Brief oss; vi skriver og bestiller.",
+    "audAgencyTitle": "For byråer",
+    "audAgencyBody": "En innkjøpsdesk dere kan støtte dere på, med arbeidsflater for flere kunder.",
+    "audPublisherTitle": "For utgivere",
+    "audPublisherBody": "Inkrementell, kvalifisert etterspørsel og publiseringsklart innhold — uten å bygge selvbetjening.",
+    "learnMore": "Les mer",
+    "ctaBlockTitle": "Begynn i katalogen",
+    "ctaBlockBody": "Bla gjennom alle nordiske titler som tilbyr native — filtrer på marked, format og målgruppe, og se veiledende priser før du tar kontakt.",
+    "browseCatalog": "Åpne katalogen",
+    "createAccount": "Opprett konto",
+    "createAgencyAccount": "Opprett byråkonto",
+    "tryRecommender": "Prøv anbefaleren",
+    "seeWorkflow": "Se hele arbeidsflyten",
+    "footerTagline": "Native innhold og native annonsering på tvers av nordiske titler — transparent, administrert, produktifisert.",
+    "footerProduct": "Produkt",
+    "footerSolutions": "Løsninger",
+    "footerCompany": "Selskap",
+    "footerAbout": "Om oss",
+    "footerContact": "Kontakt"
+  },
+  "advertisers": {
+    "metaTitle": "For annonsører",
+    "title": "Kjøp native innhold på tvers av alle nordiske titler",
+    "lead": "Oppdagelse, sammenlignbare priser og innholdsproduksjon på ett sted. De fleste premium-redaksjonene selges ikke programmatisk — vi gjør dem bookbare likevel.",
+    "problemsTitle": "Slik føles native vanligvis",
+    "problem1Title": "Fragmentert",
+    "problem1Body": "Hundrevis av titler i Norge, Sverige og Danmark, hver med egen selger, prisliste og spec.",
+    "problem2Title": "Uoversiktlig",
+    "problem2Body": "Priser ligger i PDF-er og e-poster. Å sammenligne tar uker med fram og tilbake.",
+    "problem3Title": "Operasjonelt tungt",
+    "problem3Body": "God native er redaksjonelt håndverk tilpasset hver utgiver. Å produsere det internt med høy kvalitet er krevende.",
+    "solutionsTitle": "Det BeNative gir deg",
+    "solution1Title": "Én transparent katalog",
+    "solution1Body": "Hver avis og magasin som tilbyr native, med veiledende priser, spec og rekkevidde — uten salgssamtale.",
+    "solution2Title": "Administrert innkjøpsdesk",
+    "solution2Body": "Send inn en kjøpsforespørsel og vi gjør den om til et fastpris-tilbud sammen med utgiveren. Du ser prisen, godtar, vi bestiller.",
+    "solution3Title": "Innholdsproduksjon",
+    "solution3Body": "Artikkelnivå-innhold inkludert, tilpasset hver titels spec og markedets merkereglar. Én leverandør, bedre resultat.",
+    "contentTitle": "Hvorfor pakke innhold med plassering",
+    "contentBody": "Innhold er halve kostnaden og det meste av ytelsen i en native-kampanje. Når vi pakker det inn, kan vi levere spec-riktige, merke-riktige artikler innen utgiverens reelle leveringstid — og pakken slår å gjøre det selv."
+  },
+  "agencies": {
+    "metaTitle": "For byråer",
+    "title": "En innkjøpsdesk teamet kan støtte seg på",
+    "lead": "Planlegg på tvers av alle nordiske titler i ett arbeidsområde, bytt mellom kunder med ett klikk, og la desken vår håndtere utgiverforhandlingene.",
+    "featuresTitle": "Laget for hvordan byrå faktisk jobber",
+    "feature1Title": "Arbeidsområder for flere kunder",
+    "feature1Body": "Én byråkonto holder alle kundeorganisasjoner. Bytt med ett klikk; forespørsler, tilbud og ordrer holdes til riktig kunde.",
+    "feature2Title": "Sammenlign på tvers av titler",
+    "feature2Body": "Spec, veiledende priser og rekkevidde side om side — laget for planleggere, ikke for innkjøpere som sliter i regneark.",
+    "feature3Title": "Fastpris-selvbetjening",
+    "feature3Body": "Titler med offentlig fastpris kan bookes direkte fra planen. Resten går via desken, fortsatt med full transparens.",
+    "feature4Title": "Hvitmerking (kommer)",
+    "feature4Body": "Vis BeNative i deres egne kundeportaler. Samme katalog, deres merke. Ta kontakt for tidlig tilgang.",
+    "workflowTitle": "Samme arbeidsflyt som teamet allerede kjører",
+    "workflowBody": "Brief → plan → forespørsel → fastpris-tilbud → ordre → live-plassering → rapportering. Vi går inn i stegene som gjør vondt — sourcing, tilbud, innhold — uten å endre måten dere brifer eller rapporterer.",
+    "ctaTitle": "Kjør en kampanje med oss",
+    "ctaBody": "Opprett et byråarbeidsområde og legg til kundene. Vi setter dere opp til et pilot-RFQ innen én arbeidsdag."
+  },
+  "publishersMkt": {
+    "metaTitle": "For utgivere",
+    "title": "Inkrementell etterspørsel uten å bygge selvbetjening",
+    "lead": "Vi tar med oss kjøpere som allerede forstår native, leverer publiseringsklart innhold som matcher spec, og samler faktureringen i ett forhold.",
+    "benefitsTitle": "Hva du får",
+    "benefit1Title": "Kvalifisert etterspørsel",
+    "benefit1Body": "Briefer som kjenner format og leveringstid på forhånd. Ingen vedlegg av mediekit, ingen tidstyver.",
+    "benefit2Title": "Publiseringsklart innhold",
+    "benefit2Body": "Artikler produsert til deres spec — ordtelling, bildeantall, merkereglar, filformat. Spec-sjekket før det når dere.",
+    "benefit3Title": "Deres prisliste, deres spec",
+    "benefit3Body": "Dere eier pris og inventar. Vi selger aldri under deres oppgitte rater; vår margin ligger på kjøpersiden.",
+    "benefit4Title": "Ett faktureringsforhold",
+    "benefit4Body": "Én faktura per syklus fra BeNative på tvers av alle annonsører og byråer, med betalingsbetingelser dere setter.",
+    "howTitle": "Slik fungerer partnerskapet",
+    "step1Title": "Onboard prislisten deres",
+    "step1Body": "Vi importerer mediekit-et og oversetter det til BeNative-katalogens format. Dere verifiserer; det går live.",
+    "step2Title": "Vi tar med kjøpere",
+    "step2Body": "Annonsører og byråer finner titlene deres, bygger en plan og sender forespørsel.",
+    "step3Title": "Tilbud + innhold",
+    "step3Body": "Desken vår lager et fastpris-tilbud; innholdsteamet vårt skriver artikkelen til spec. Dere ser begge før det bookes.",
+    "step4Title": "Dere publiserer",
+    "step4Body": "Vi overleverer asseten og bekrefter plassering. Dere publiserer, markerer som bekreftet, og vi følger det helt til faktura.",
+    "controlTitle": "Dere har kontrollen",
+    "controlBody": "Blokker måneder dere ikke kan levere. Slå produkter av og på mellom fastpris og RFQ. Oppdater spec og leveringstider når redaksjonen endrer dem. Alt fra utgiverportalen deres.",
+    "ctaTitle": "Bli partner",
+    "ctaBody": "Vi onboarder titler i NO/SE/DK. Fortell oss om inventaret deres, så svarer vi innen én arbeidsdag.",
+    "contactCta": "Snakk med partnere"
+  },
+  "how": {
+    "metaTitle": "Slik fungerer det",
+    "title": "Fra brief til live plassering",
+    "lead": "Fem steg fra «jeg har en kampanjeidé» til en publisert, spec-riktig native-artikkel — de fleste gjort av oss.",
+    "step1Title": "Bla i katalogen",
+    "step1Body": "Filtrer hver nordiske tittel på marked, format, kategori og målgruppe. Se veiledende pris og rekkevidde med en gang.",
+    "step2Title": "Bygg en plan",
+    "step2Body": "Legg titler i en plan med budsjett, datoer og målgruppe-notater. Sammenlign side om side før du forplikter deg.",
+    "step3Title": "Få et fastpris-tilbud",
+    "step3Body": "Send planen som forespørsel. Desken sjekker tilgjengelighet med utgiver og lager et fastpris-tilbud, vanligvis innen én arbeidsdag.",
+    "step4Title": "Vi lager innholdet",
+    "step4Body": "Redaksjonen vår skriver artikkelen til hver titels spec — lengde, bilder, merkereglar, format — og kjører en spec-sjekk før det forlater huset.",
+    "step5Title": "Gå live og rapporter",
+    "step5Body": "Utgiver bestiller og publiserer. Dere får live-URL, sporing og en faktura med riktig MVA for markedet deres.",
+    "modesTitle": "To bestillingsmoduser",
+    "modeFirmTag": "Direkte",
+    "modeFirmTitle": "Fastpris — selvbetjening",
+    "modeFirmBody": "Produkter med offentlig fastpris kan bestilles direkte fra planen. Ingen desk-overlevering, ingen ventetid.",
+    "modeRfqTitle": "Forespørsel om pris — administrert",
+    "modeRfqBody": "Veiledende-prisede produkter går via desken. Vi forhandler tilgjengelighet og sesong, deretter får dere en fastpris å godta.",
+    "contentTitle": "Om innholdet",
+    "contentBody": "Per-titel playbooks dekker tone, lengde, bilder, merkereglar (Annonsørinnhold / Annons / Annonce) og merkevare-sikkerhet. En automatisk spec-sjekk må passere før en asset kan markeres som ferdig — slik at det som når utgiveren alltid kan publiseres."
+  },
+  "about": {
+    "metaTitle": "Om BeNative",
+    "title": "Native er operasjonelt vondt. Vi fikser det.",
+    "lead": "BeNative er et nordisk marked for kjøp av native innhold og native annonsering i aviser og magasiner — inkludert de mange som ikke selger programmatisk.",
+    "missionTitle": "Misjon",
+    "missionBody1": "Gjør nordisk native-inventar like enkelt å finne, sammenligne og kjøpe som programmatisk display — uten å miste den redaksjonelle kvaliteten som gjør native bra i utgangspunktet.",
+    "missionBody2": "Vi er kjøper-først: transparent katalog, transparent pris, administrert kjøp bak, innholdsproduksjon tilpasset hver tittel. Det forsvarlige ligger i datasettet og relasjonene, ikke i én enkelt funksjon.",
+    "nordicTitle": "Hvorfor Norden, hvorfor nå",
+    "nordicBody": "Native betaler bedre enn display i Norden, men kjøpsopplevelsen er to tiår bak. De fleste premium-titlene selges fortsatt ikke programmatisk. Både kjøpere og utgivere vil ha en nøytral aggregator — vi bygger den for NO, SE og DK først, flerspråklig og fler-valuta fra dag én.",
+    "beliefsTitle": "Det vi tror på",
+    "belief1Title": "Katalogen er produktet",
+    "belief1Body": "Katalog-datasettet og utgiverrelasjonene er vollgrava. Alt annet er formet for å gjøre det mer komplett, mer nøyaktig, mer sammenlignbart.",
+    "belief2Title": "Innholdskvalitet er ikke forhandlingsbart",
+    "belief2Body": "Dårlig native skader utgiver, merke og leser. Spec-sjekker er ikke valgfrie og merkereglar er kodet per marked.",
+    "belief3Title": "Drift må gjøre seg fortjent",
+    "belief3Body": "En administrert desk gir bare mening hvis hver kampanje reduserer desk-timer for den neste. Vi måler det.",
+    "teamTitle": "Team",
+    "teamBody": "Et lite produkt-/teknologiteam i Norden, som jobber sammen med en innkjøpsdesk og et redaksjonelt team for innholdsproduksjon. Vi jobber åpent — plattformplanen, datamodellen og katalogen er alle synlige på siden.",
+    "contactTitle": "Ta kontakt",
+    "contactBody": "Enten du vil planlegge en kampanje, bli partner som utgiver, eller bare sammenligne notater om native — vi hører gjerne fra deg.",
+    "contactCta": "Send oss e-post"
+  }
 }

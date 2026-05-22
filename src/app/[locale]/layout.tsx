@@ -75,6 +75,7 @@ export default async function LocaleLayout({
   const t = await getTranslations({ locale, namespace: "nav" });
   const tc = await getTranslations({ locale, namespace: "common" });
   const ta = await getTranslations({ locale, namespace: "auth" });
+  const tm = await getTranslations({ locale, namespace: "marketing" });
   const session = await auth();
 
   return (
@@ -99,20 +100,24 @@ export default async function LocaleLayout({
                       <Link href="/agency">{t("agency")}</Link>
                     ) : null}
                     <Link href="/requests">{t("requests")}</Link>
+                    <Link href="/orders">{t("orders")}</Link>
                     <Link href="/reports">{t("reports")}</Link>
                   </>
                 ) : null}
                 <Link href="/desk">{t("desk")}</Link>
                 <Link href="/publisher">{t("publisher")}</Link>
                 {session?.user ? (
-                  <form
-                    action={logout}
-                    style={{ display: "inline", marginLeft: 18 }}
-                  >
-                    <input type="hidden" name="locale" value={locale} />
-                    <span className="muted">{session.user.email}</span>{" "}
-                    <button type="submit">{ta("signout")}</button>
-                  </form>
+                  <>
+                    <Link href="/notifications">{t("notifications")}</Link>
+                    <form
+                      action={logout}
+                      style={{ display: "inline", marginLeft: 18 }}
+                    >
+                      <input type="hidden" name="locale" value={locale} />
+                      <span className="muted">{session.user.email}</span>{" "}
+                      <button type="submit">{ta("signout")}</button>
+                    </form>
+                  </>
                 ) : (
                   <>
                     <Link href="/signin">{ta("signin")}</Link>
@@ -124,15 +129,47 @@ export default async function LocaleLayout({
           </header>
           <main className="container">{children}</main>
           <footer>
-            <div className="container">
-              <span>
-                © {new Date().getFullYear()} {tc("appName")}
-              </span>
-              <span>
-                <Link href="/catalog">{t("catalog")}</Link>
-                {" · "}
-                <Link href="/recommend">{t("recommend")}</Link>
-              </span>
+            <div className="container footer-grid">
+              <div>
+                <strong style={{ color: "var(--heading)" }}>{tc("appName")}</strong>
+                <p className="muted" style={{ fontSize: "0.85rem", maxWidth: "32ch" }}>
+                  {tm("footerTagline")}
+                </p>
+                <p className="muted" style={{ fontSize: "0.8rem" }}>
+                  © {new Date().getFullYear()} {tc("appName")}
+                </p>
+              </div>
+              <div>
+                <p style={{ fontWeight: 700, margin: 0, color: "var(--heading)" }}>
+                  {tm("footerProduct")}
+                </p>
+                <ul style={{ listStyle: "none", padding: 0, margin: "8px 0" }}>
+                  <li><Link href="/catalog">{t("catalog")}</Link></li>
+                  <li><Link href="/recommend">{t("recommend")}</Link></li>
+                  <li><Link href="/how-it-works">{tm("howCta")}</Link></li>
+                </ul>
+              </div>
+              <div>
+                <p style={{ fontWeight: 700, margin: 0, color: "var(--heading)" }}>
+                  {tm("footerSolutions")}
+                </p>
+                <ul style={{ listStyle: "none", padding: 0, margin: "8px 0" }}>
+                  <li><Link href="/for-advertisers">{tm("audAdvertiserTitle")}</Link></li>
+                  <li><Link href="/for-agencies">{tm("audAgencyTitle")}</Link></li>
+                  <li><Link href="/for-publishers">{tm("audPublisherTitle")}</Link></li>
+                </ul>
+              </div>
+              <div>
+                <p style={{ fontWeight: 700, margin: 0, color: "var(--heading)" }}>
+                  {tm("footerCompany")}
+                </p>
+                <ul style={{ listStyle: "none", padding: 0, margin: "8px 0" }}>
+                  <li><Link href="/about">{tm("footerAbout")}</Link></li>
+                  <li>
+                    <a href="mailto:hello@benative.example">{tm("footerContact")}</a>
+                  </li>
+                </ul>
+              </div>
             </div>
           </footer>
         </NextIntlClientProvider>

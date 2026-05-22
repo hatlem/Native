@@ -1,5 +1,7 @@
 {
-  "common": { "appName": "BeNative" },
+  "common": {
+    "appName": "BeNative"
+  },
   "nav": {
     "home": "Home",
     "catalog": "Catalog",
@@ -8,8 +10,39 @@
     "desk": "Desk",
     "publisher": "Publisher",
     "requests": "My requests",
+    "orders": "Orders",
     "reports": "Reports",
-    "agency": "Agency"
+    "agency": "Agency",
+    "notifications": "Inbox"
+  },
+  "orders": {
+    "title": "Your orders",
+    "subtitle": "Status, deliverables and invoices for every order on your account.",
+    "status": "Status",
+    "lines": "Items",
+    "none": "You have no orders yet.",
+    "view": "View",
+    "invoice": "Invoice",
+    "booking": "Booking",
+    "livePlacement": "View live placement"
+  },
+  "notifications": {
+    "title": "Notifications",
+    "none": "Nothing in your inbox.",
+    "markAll": "Mark all as read",
+    "open": "Open"
+  },
+  "compare": {
+    "title": "Compare titles",
+    "subtitle": "Side-by-side specs and indicative pricing.",
+    "empty": "Pick at least one title from the catalog to compare.",
+    "view": "Open title"
+  },
+  "availability": {
+    "title": "Availability",
+    "subtitle": "Block months you can't deliver in — the catalog hides firm-priced products for blocked months and instant-book checkout refuses them.",
+    "blocked": "Blocked",
+    "save": "Save"
   },
   "reports": {
     "title": "Reports",
@@ -90,7 +123,8 @@
     },
     "indicativeNote": "Prices are indicative. A firm price is confirmed by our buying desk based on availability, season and volume.",
     "noResults": "No titles match these filters.",
-    "clearFilters": "Clear filters"
+    "clearFilters": "Clear filters",
+    "compareTop": "Compare these results"
   },
   "titleDetail": {
     "back": "Back to catalog",
@@ -256,7 +290,8 @@
     "disclosure": "Disclosure label",
     "fileFormats": "File formats",
     "requirements": "Requirements",
-    "saveSpec": "Save spec"
+    "saveSpec": "Save spec",
+    "availability": "Availability"
   },
   "productType": {
     "NATIVE_ARTICLE": "Native article",
@@ -264,5 +299,145 @@
     "NATIVE_DISPLAY": "Native display",
     "PACKAGE": "Package"
   },
-  "market": { "NO": "Norway", "SE": "Sweden", "DK": "Denmark" }
+  "market": {
+    "NO": "Norway",
+    "SE": "Sweden",
+    "DK": "Denmark"
+  },
+  "marketing": {
+    "howCta": "How it works",
+    "audiencesTitle": "Built for every side of native",
+    "audAdvertiserTitle": "For advertisers",
+    "audAdvertiserBody": "One catalog of every Nordic title that offers native. Brief us; we write it and book it.",
+    "audAgencyTitle": "For agencies",
+    "audAgencyBody": "A managed desk you can lean on, with multi-client workspaces.",
+    "audPublisherTitle": "For publishers",
+    "audPublisherBody": "Incremental qualified demand and ready-to-publish content — without building self-serve.",
+    "learnMore": "Learn more",
+    "ctaBlockTitle": "Start with the catalog",
+    "ctaBlockBody": "Browse every Nordic title that offers native — filter by market, format and audience, and see indicative pricing before you talk to anyone.",
+    "browseCatalog": "Browse the catalog",
+    "createAccount": "Create an account",
+    "createAgencyAccount": "Open an agency workspace",
+    "tryRecommender": "Try the recommender",
+    "seeWorkflow": "See the full workflow",
+    "footerTagline": "Native content and native advertising across every Nordic title — transparent, managed, productised.",
+    "footerProduct": "Product",
+    "footerSolutions": "Solutions",
+    "footerCompany": "Company",
+    "footerAbout": "About",
+    "footerContact": "Contact"
+  },
+  "advertisers": {
+    "metaTitle": "For advertisers",
+    "title": "Buy native content across every Nordic title",
+    "lead": "Discovery, comparable pricing and content production in one place. Most premium editorial inventory isn't sold programmatically — we make it bookable anyway.",
+    "problemsTitle": "What native usually feels like",
+    "problem1Title": "Fragmented",
+    "problem1Body": "Hundreds of titles across Norway, Sweden and Denmark, each with its own sales rep, rate card and spec sheet.",
+    "problem2Title": "Opaque",
+    "problem2Body": "Pricing lives in PDFs and emails. Comparing value across titles takes weeks of back-and-forth.",
+    "problem3Title": "Operationally heavy",
+    "problem3Body": "Good native is editorial-grade writing tuned per publisher. Producing it in-house at quality is hard.",
+    "solutionsTitle": "What BeNative gives you",
+    "solution1Title": "One transparent catalog",
+    "solution1Body": "Every newspaper and magazine that offers native, with indicative pricing, format specs and reach data — no sales call required.",
+    "solution2Title": "Managed buying desk",
+    "solution2Body": "Submit a request to buy and our team turns it into a firm quote with the publisher. You see the price, you accept, we book.",
+    "solution3Title": "Content production",
+    "solution3Body": "Bundled article-grade content, tuned to each title's spec and the market's disclosure rules. One supplier, better outcome.",
+    "contentTitle": "Why bundle content with placement",
+    "contentBody": "Content is half the cost and most of the performance of a native campaign. Bundling it means we can ship spec-compliant, disclosure-correct articles in the lead time the publisher actually quotes — and the total bundle beats DIY."
+  },
+  "agencies": {
+    "metaTitle": "For agencies",
+    "title": "A managed desk your team can lean on",
+    "lead": "Plan across every Nordic title in one workspace, switch between clients in a click, and let our desk handle publisher negotiations.",
+    "featuresTitle": "Built for agency reality",
+    "feature1Title": "Multi-client workspaces",
+    "feature1Body": "One agency account holds every client org. Switch with one click; requests, quotes and orders stay scoped to the active client.",
+    "feature2Title": "Compare across titles",
+    "feature2Body": "Side-by-side specs, indicative pricing and reach — built for planners, not buyers stuck in spreadsheets.",
+    "feature3Title": "Firm-price self-serve",
+    "feature3Body": "Where titles publish firm pricing, your planners can book instantly. Everything else routes through the desk with full transparency.",
+    "feature4Title": "White-label (coming)",
+    "feature4Body": "Surface BeNative inside your own client portals. Same catalog, your brand. Talk to us if you'd like early access.",
+    "workflowTitle": "Same workflow your team already runs",
+    "workflowBody": "Brief → plan → request → firm quote → order → live placement → reporting. We slot into the steps that hurt most — sourcing, quoting, content — without changing how you brief or report.",
+    "ctaTitle": "Run a campaign with us",
+    "ctaBody": "Open an agency workspace and add your clients. We'll set you up for a pilot RFQ within a working day."
+  },
+  "publishersMkt": {
+    "metaTitle": "For publishers",
+    "title": "Incremental demand without building self-serve",
+    "lead": "We bring buyers who already understand native, hand you ready-to-publish content that meets your specs, and consolidate billing through one relationship.",
+    "benefitsTitle": "What you get",
+    "benefit1Title": "Qualified demand",
+    "benefit1Body": "Briefs that already know your format and lead time. No tire-kickers, no media-kit attachments.",
+    "benefit2Title": "Ready-to-publish content",
+    "benefit2Body": "Articles produced to your spec — word count, image counts, disclosure label, file formats. Spec-checked before it reaches you.",
+    "benefit3Title": "Your rate card, your specs",
+    "benefit3Body": "You own pricing and inventory. We never resell at a discount to your published rates; our margin is on the buyer side.",
+    "benefit4Title": "Single billing relationship",
+    "benefit4Body": "One invoice per cycle from BeNative across all advertisers and agencies, with payment terms you set.",
+    "howTitle": "How partnership works",
+    "step1Title": "Onboard your rate card",
+    "step1Body": "We import your media kit and translate it into the BeNative catalog format. You verify; it goes live.",
+    "step2Title": "We bring buyers",
+    "step2Body": "Advertisers and agencies find your titles, build a plan, and submit a request.",
+    "step3Title": "Quote + content",
+    "step3Body": "Our desk produces a firm quote; our content team writes the article to your spec. You see both before it's booked.",
+    "step4Title": "You publish",
+    "step4Body": "We hand over the asset and confirm placement. You publish, mark it confirmed, and we track it through to invoicing.",
+    "controlTitle": "You stay in control",
+    "controlBody": "Block months you can't deliver in. Toggle products between firm-priced self-serve and managed RFQ. Update specs and lead times when your editorial team changes them. All from your publisher portal.",
+    "ctaTitle": "Become a partner",
+    "ctaBody": "We're onboarding titles across NO/SE/DK. Tell us about your inventory and we'll get back within a working day.",
+    "contactCta": "Talk to partnerships"
+  },
+  "how": {
+    "metaTitle": "How it works",
+    "title": "From brief to live placement",
+    "lead": "Five steps from \"I have a campaign idea\" to a published, spec-compliant native article — most of them done by us.",
+    "step1Title": "Browse the catalog",
+    "step1Body": "Filter every Nordic title by market, format, category and audience. See indicative pricing and reach up front.",
+    "step2Title": "Build a plan",
+    "step2Body": "Add titles to a plan with budget, dates and audience notes. Compare side-by-side before you commit.",
+    "step3Title": "Get a firm quote",
+    "step3Body": "Submit the plan as a request. Our desk checks availability with the publisher and produces a firm quote, usually inside a working day.",
+    "step4Title": "We make the content",
+    "step4Body": "Our editorial team writes the article to each title's spec — length, images, disclosure label, format — and runs a spec check before it leaves the building.",
+    "step5Title": "Go live and report",
+    "step5Body": "The publisher books and publishes. You get the live URL, tracking and an invoice with the right VAT for your market.",
+    "modesTitle": "Two booking modes",
+    "modeFirmTag": "Instant",
+    "modeFirmTitle": "Firm price — self-serve",
+    "modeFirmBody": "Products with firm public pricing can be booked instantly from your plan. No desk hand-off, no quote wait.",
+    "modeRfqTitle": "Request for quote — managed",
+    "modeRfqBody": "Indicative-priced products go through the desk. We negotiate availability and season, then give you a firm price to accept.",
+    "contentTitle": "About the content",
+    "contentBody": "Per-title playbooks cover tone, length, imagery, disclosure rules (Annonsørinnhold / Annons / Annonce), and brand-safety review. An automatic spec check has to pass before an asset can be marked final — so what reaches the publisher is always publishable."
+  },
+  "about": {
+    "metaTitle": "About BeNative",
+    "title": "Native is operationally painful. We fix that.",
+    "lead": "BeNative is a Nordic marketplace for buying native content and native advertising across newspapers and magazines — including the many that don't sell programmatically.",
+    "missionTitle": "Mission",
+    "missionBody1": "Make Nordic native inventory as easy to find, compare and buy as programmatic display — without losing the editorial quality that makes native work in the first place.",
+    "missionBody2": "We're buyer-first: transparent catalog, transparent pricing, managed buying behind it, content production tuned to each title. Defensibility is in the dataset and the relationships, not in any single feature.",
+    "nordicTitle": "Why Nordic, why now",
+    "nordicBody": "Native pays better than display in the Nordics, but the buying experience is two decades behind. Most premium titles still don't sell programmatically. Buyers and publishers both want a neutral aggregator — we're building it for NO, SE and DK first, multilingual and multi-currency from day one.",
+    "beliefsTitle": "What we believe",
+    "belief1Title": "Catalog is the product",
+    "belief1Body": "The catalog dataset and publisher relationships are the moat. Everything else is shaped around making it more complete, more accurate, more comparable.",
+    "belief2Title": "Content quality is non-negotiable",
+    "belief2Body": "Bad native hurts the publisher, the brand and the reader. Spec checks aren't optional and disclosure rules are encoded per market.",
+    "belief3Title": "Operations earn their keep",
+    "belief3Body": "A managed desk only makes sense if every campaign reduces desk-hours for the next one. We instrument it so it does.",
+    "teamTitle": "Team",
+    "teamBody": "A small product/engineering team in the Nordics, working alongside a buying desk and an editorial team for content production. We work in public — the platform plan, the data model and the catalog are all visible on the site.",
+    "contactTitle": "Get in touch",
+    "contactBody": "Whether you want to plan a campaign, partner as a publisher, or just compare notes on native — we'd love to hear from you.",
+    "contactCta": "Email us"
+  }
 }

@@ -4,6 +4,7 @@ import { prisma } from "@/lib/prisma";
 import { Link } from "@/i18n/navigation";
 import { indicativeFromRules, toRateRules, formatMoney } from "@/lib/money";
 import { EmptyState } from "@/app/empty-state";
+import { searchTitleIds } from "@/lib/catalog-search";
 
 export const dynamic = "force-dynamic";
 
@@ -40,18 +41,24 @@ export default async function CatalogPage({
   );
   const q = typeof sp.q === "string" ? sp.q.trim() : "";
 
+  // FTS-first: ask Postgres for Title ids matching the query, then
+  // intersect with the rest of the filter. Falls back to ILIKE if FTS
+  // can't form a valid query (e.g. only punctuation).
+  const matchedIds = await searchTitleIds(q);
   const where: Prisma.TitleWhereInput = {
     active: true,
     ...(market ? { market: { code: market } } : {}),
     ...(type ? { products: { some: { type, active: true } } } : {}),
-    ...(q
-      ? {
-          OR: [
-            { name: { contains: q, mode: "insensitive" } },
-            { category: { contains: q, mode: "insensitive" } },
-          ],
-        }
-      : {}),
+    ...(matchedIds
+      ? { id: { in: matchedIds } }
+      : q
+        ? {
+            OR: [
+              { name: { contains: q, mode: "insensitive" } },
+              { category: { contains: q, mode: "insensitive" } },
+            ],
+          }
+        : {}),
   };
 
   const titles = await prisma.title.findMany({
@@ -114,6 +121,19 @@ export default async function CatalogPage({
           primaryLabel={t("clearFilters")}
         />
       ) : (
+        <>
+          {titles.length >= 2 ? (
+            <p className="note" style={{ marginTop: 10 }}>
+              <Link
+                href={`/catalog/compare?ids=${titles
+                  .slice(0, 6)
+                  .map((t) => t.id)
+                  .join(",")}`}
+              >
+                {t("compareTop")} →
+              </Link>
+            </p>
+          ) : null}
         <div className="grid">
           {titles.map((title) => {
             const prices = title.products.map((p) =>
@@ -156,6 +176,7 @@ export default async function CatalogPage({
             );
           })}
         </div>
+        </>
       )}
 
       <p className="note">{t("indicativeNote")}</p>

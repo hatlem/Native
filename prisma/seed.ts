@@ -201,6 +201,7 @@ const PRODUCT_BLUEPRINT: {
 
 async function main() {
   // Clean catalog tables for an idempotent reseed (no commerce data yet).
+  await prisma.availability.deleteMany();
   await prisma.priceRule.deleteMany();
   await prisma.spec.deleteMany();
   await prisma.product.deleteMany();
@@ -216,6 +217,7 @@ async function main() {
         currency: m.currency,
         defaultLocale: m.defaultLocale,
         vatRatePct: 25,
+        disclosureLabel: m.disclosure,
       },
     });
 
