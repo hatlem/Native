@@ -3,12 +3,26 @@ import type { Metadata, Viewport } from "next";
 import { NextIntlClientProvider } from "next-intl";
 import { getMessages, getTranslations } from "next-intl/server";
 import { notFound } from "next/navigation";
+import { Inter } from "next/font/google";
 import { routing } from "@/i18n/routing";
 import { Link } from "@/i18n/navigation";
 import { auth } from "@/auth";
 import { logout } from "@/app/auth-actions";
 import { GtmScripts, GtmNoscript } from "@/app/gtm";
+import { NavShell } from "@/app/nav-shell";
+import {
+  audienceFor,
+  navItemsFor,
+  paletteItemsFor,
+  userMenuItemsFor,
+} from "@/lib/nav";
 import "../globals.css";
+
+const inter = Inter({
+  subsets: ["latin"],
+  display: "swap",
+  variable: "--font-inter",
+});
 
 export async function generateMetadata({
   params,
@@ -54,9 +68,30 @@ export async function generateMetadata({
 export const viewport: Viewport = {
   width: "device-width",
   initialScale: 1,
-  colorScheme: "light",
-  themeColor: "#f6f7f9",
+  colorScheme: "light dark",
+  themeColor: [
+    { media: "(prefers-color-scheme: light)", color: "#f6f6f4" },
+    { media: "(prefers-color-scheme: dark)", color: "#0c0d10" },
+  ],
 };
+
+function initialsFromEmail(email: string | null | undefined): string {
+  if (!email) return "·";
+  const local = email.split("@")[0] ?? "";
+  const parts = local.split(/[._-]+/).filter(Boolean);
+  if (parts.length === 0) return email[0]?.toUpperCase() ?? "·";
+  if (parts.length === 1) return parts[0].slice(0, 2).toUpperCase();
+  return (parts[0][0] + parts[1][0]).toUpperCase();
+}
+
+function roleLabel(audience: ReturnType<typeof audienceFor>, role: string | undefined, t: (k: string) => string): string {
+  if (role === "SUPERADMIN") return t("roleSuperAdmin");
+  if (role === "DESK" || role === "CONTENT") return t("roleDesk");
+  if (role === "PUBLISHER") return t("rolePublisher");
+  if (audience === "agency") return t("roleAgency");
+  if (audience === "advertiser") return t("roleAdvertiser");
+  return t("roleGuest");
+}
 
 export default async function LocaleLayout({
   children,
@@ -78,95 +113,98 @@ export default async function LocaleLayout({
   const tm = await getTranslations({ locale, namespace: "marketing" });
   const session = await auth();
 
+  const audience = audienceFor(session);
+  const nav = navItemsFor(audience, t);
+  const palette = paletteItemsFor(audience, t);
+  const userMenu = userMenuItemsFor(audience, t);
+
+  const appName = tc("appName");
+  const signedIn = Boolean(session?.user);
+
   return (
-    <html lang={locale}>
+    <html lang={locale} className={inter.variable}>
       <body>
         <GtmNoscript />
         <GtmScripts />
         <NextIntlClientProvider messages={messages}>
-          <header className="site-header">
-            <div className="container">
-              <Link href="/" className="brand">
-                {tc("appName")}
-              </Link>
-              <nav className="nav">
-                <Link href="/">{t("home")}</Link>
-                <Link href="/catalog">{t("catalog")}</Link>
-                <Link href="/recommend">{t("recommend")}</Link>
-                <Link href="/plan">{t("plan")}</Link>
-                {session?.user?.orgId ? (
-                  <>
-                    {session.user.orgType === "AGENCY" ? (
-                      <Link href="/agency">{t("agency")}</Link>
-                    ) : null}
-                    <Link href="/requests">{t("requests")}</Link>
-                    <Link href="/orders">{t("orders")}</Link>
-                    <Link href="/reports">{t("reports")}</Link>
-                  </>
-                ) : null}
-                <Link href="/desk">{t("desk")}</Link>
-                <Link href="/publisher">{t("publisher")}</Link>
-                {session?.user ? (
-                  <>
-                    <Link href="/notifications">{t("notifications")}</Link>
-                    <form
-                      action={logout}
-                      style={{ display: "inline", marginLeft: 18 }}
-                    >
-                      <input type="hidden" name="locale" value={locale} />
-                      <span className="muted">{session.user.email}</span>{" "}
-                      <button type="submit">{ta("signout")}</button>
-                    </form>
-                  </>
-                ) : (
-                  <>
-                    <Link href="/signin">{ta("signin")}</Link>
-                    <Link href="/signup">{ta("signup")}</Link>
-                  </>
-                )}
-              </nav>
-            </div>
-          </header>
-          <main className="container">{children}</main>
+          <NavShell
+            brand={appName}
+            nav={nav}
+            palette={palette}
+            menuItems={userMenu}
+            signedIn={signedIn}
+            user={
+              signedIn && session?.user?.email
+                ? {
+                    email: session.user.email,
+                    initials: initialsFromEmail(session.user.email),
+                    roleLabel: roleLabel(audience, session.user.role, t),
+                  }
+                : undefined
+            }
+            signOutAction={
+              signedIn ? (
+                <form action={logout}>
+                  <input type="hidden" name="locale" value={locale} />
+                  <button type="submit">{ta("signout")}</button>
+                </form>
+              ) : undefined
+            }
+            authActions={
+              !signedIn
+                ? { signIn: ta("signin"), signUp: ta("signup") }
+                : undefined
+            }
+            labels={{
+              skip: t("skipToContent"),
+              menu: t("menu"),
+              close: t("close"),
+              search: t("search"),
+              searchPlaceholder: t("searchPlaceholder"),
+              noResults: t("noResults"),
+            }}
+          />
+
+          <main id="main" className="container">
+            {children}
+          </main>
+
           <footer>
             <div className="container footer-grid">
-              <div>
-                <strong style={{ color: "var(--heading)" }}>{tc("appName")}</strong>
-                <p className="muted" style={{ fontSize: "0.85rem", maxWidth: "32ch" }}>
-                  {tm("footerTagline")}
-                </p>
-                <p className="muted" style={{ fontSize: "0.8rem" }}>
-                  © {new Date().getFullYear()} {tc("appName")}
+              <div className="brand-block">
+                <Link href="/" className="brand" aria-label={appName}>
+                  <span className="brand-mark" aria-hidden="true">BN</span>
+                  <span>{appName}</span>
+                </Link>
+                <p>{tm("footerTagline")}</p>
+                <p className="copyright">
+                  © {new Date().getFullYear()} {appName}
                 </p>
               </div>
-              <div>
-                <p style={{ fontWeight: 700, margin: 0, color: "var(--heading)" }}>
-                  {tm("footerProduct")}
-                </p>
-                <ul style={{ listStyle: "none", padding: 0, margin: "8px 0" }}>
+              <div className="col">
+                <h5>{tm("footerProduct")}</h5>
+                <ul>
                   <li><Link href="/catalog">{t("catalog")}</Link></li>
                   <li><Link href="/recommend">{t("recommend")}</Link></li>
                   <li><Link href="/how-it-works">{tm("howCta")}</Link></li>
                 </ul>
               </div>
-              <div>
-                <p style={{ fontWeight: 700, margin: 0, color: "var(--heading)" }}>
-                  {tm("footerSolutions")}
-                </p>
-                <ul style={{ listStyle: "none", padding: 0, margin: "8px 0" }}>
+              <div className="col">
+                <h5>{tm("footerSolutions")}</h5>
+                <ul>
                   <li><Link href="/for-advertisers">{tm("audAdvertiserTitle")}</Link></li>
                   <li><Link href="/for-agencies">{tm("audAgencyTitle")}</Link></li>
                   <li><Link href="/for-publishers">{tm("audPublisherTitle")}</Link></li>
                 </ul>
               </div>
-              <div>
-                <p style={{ fontWeight: 700, margin: 0, color: "var(--heading)" }}>
-                  {tm("footerCompany")}
-                </p>
-                <ul style={{ listStyle: "none", padding: 0, margin: "8px 0" }}>
+              <div className="col">
+                <h5>{tm("footerCompany")}</h5>
+                <ul>
                   <li><Link href="/about">{tm("footerAbout")}</Link></li>
                   <li>
-                    <a href="mailto:hello@benative.example">{tm("footerContact")}</a>
+                    <a href="mailto:hello@benative.example">
+                      {tm("footerContact")}
+                    </a>
                   </li>
                 </ul>
               </div>
