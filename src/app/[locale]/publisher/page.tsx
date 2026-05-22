@@ -17,6 +17,7 @@ export default async function PublisherDashboard({
 }) {
   const { locale } = await params;
   const t = await getTranslations({ locale, namespace: "publisher" });
+  const tn = await getTranslations({ locale, namespace: "nav" });
   const tType = await getTranslations({ locale, namespace: "productType" });
 
   const session = await auth();
@@ -39,151 +40,295 @@ export default async function PublisherDashboard({
   });
   if (!publisher) redirect(`/${locale}/signin`);
 
+  const titleIds = publisher.titles.map((title) => title.id);
+  const productIds = publisher.titles.flatMap((title) =>
+    title.products.map((p) => p.id),
+  );
+  const [activeProducts, bookableProducts, ordersCount, blockedCount] =
+    await Promise.all([
+      prisma.product.count({
+        where: { titleId: { in: titleIds }, active: true },
+      }),
+      prisma.product.count({
+        where: { titleId: { in: titleIds }, bookable: true, active: true },
+      }),
+      prisma.orderLine.count({
+        where: {
+          productId: { in: productIds },
+          order: {
+            status: { in: ["CONFIRMED", "IN_PRODUCTION", "SCHEDULED", "LIVE"] },
+          },
+        },
+      }),
+      prisma.availability.count({
+        where: { productId: { in: productIds } },
+      }),
+    ]);
+
+  const activeTitleCount = publisher.titles.filter((titie) => titie.active).length;
+
   return (
-    <section>
-      <h1>{t("title")}</h1>
-      <p className="muted">{publisher.name}</p>
-      <p>
-        <Link href="/publisher/orders">{t("orders")} →</Link>
-        {"  ·  "}
-        <Link href="/publisher/availability">{t("availability")} →</Link>
-      </p>
+    <>
+      <header className="page-header">
+        <span className="eyebrow accent">{t("eyebrow")}</span>
+        <h1>{t("dashboardTitle")}</h1>
+        <p className="lead">
+          {t("dashboardLead", { publisher: publisher.name })}
+        </p>
+      </header>
 
-      {publisher.titles.map((title) => (
-        <div key={title.id} style={{ marginTop: 20 }}>
-          <h2>{title.name}</h2>
-          <div className="grid">
-            {title.products.map((p) => (
-              <article className="card" key={p.id}>
-                <h3>{tType(p.type)}</h3>
-                <form action={updateProduct}>
-                  <input type="hidden" name="locale" value={locale} />
-                  <input type="hidden" name="productId" value={p.id} />
-                  <label className="muted" htmlFor={`bp-${p.id}`}>
-                    {t("basePrice")} ({p.currency})
-                  </label>
-                  <input
-                    id={`bp-${p.id}`}
-                    name="basePrice"
-                    type="number"
-                    min="0"
-                    defaultValue={Number(p.basePrice)}
-                  />
-                  <label className="muted" htmlFor={`vis-${p.id}`}>
-                    {t("visibility")}
-                  </label>
-                  <select
-                    id={`vis-${p.id}`}
-                    name="visibility"
-                    defaultValue={p.visibility}
+      <div className="kpi-grid">
+        <div className="kpi">
+          <div className="label">{t("kpiActiveTitles")}</div>
+          <div className="value">{activeTitleCount}</div>
+          <div className="delta">{t("kpiActiveTitlesSub")}</div>
+        </div>
+        <div className="kpi">
+          <div className="label">{t("kpiActiveProducts")}</div>
+          <div className="value">{activeProducts}</div>
+          <div className="delta">
+            {t("kpiBookable", { count: bookableProducts })}
+          </div>
+        </div>
+        <div className="kpi">
+          <div className="label">{t("kpiIncomingOrders")}</div>
+          <div className="value">{ordersCount}</div>
+          {ordersCount > 0 ? (
+            <Link href="/publisher/orders" className="cta">
+              {t("openOrders")} →
+            </Link>
+          ) : (
+            <div className="delta">{t("kpiNoOrders")}</div>
+          )}
+        </div>
+        <div className="kpi">
+          <div className="label">{t("kpiBlockedMonths")}</div>
+          <div className="value">{blockedCount}</div>
+          <Link href="/publisher/availability" className="cta">
+            {t("manageAvailability")} →
+          </Link>
+        </div>
+      </div>
+
+      <section className="section">
+        <div className="grid two">
+          <Link href="/publisher/orders" className="card hoverable quick-link">
+            <h3>{t("orders")}</h3>
+            <p className="muted">{t("ordersBlurb")}</p>
+            <span className="link">{tn("orders")} →</span>
+          </Link>
+          <Link
+            href="/publisher/availability"
+            className="card hoverable quick-link"
+          >
+            <h3>{t("availability")}</h3>
+            <p className="muted">{t("availabilityBlurb")}</p>
+            <span className="link">{t("manageAvailability")} →</span>
+          </Link>
+        </div>
+      </section>
+
+      <section className="section">
+        <div className="section-head">
+          <div>
+            <span className="eyebrow">{t("titlesEyebrow")}</span>
+            <h2>{t("titlesHeading")}</h2>
+          </div>
+          <span className="muted">
+            {t("titlesCount", { count: publisher.titles.length })}
+          </span>
+        </div>
+
+        {publisher.titles.length === 0 ? (
+          <p className="muted">{t("noTitles")}</p>
+        ) : (
+          <div className="stack-5">
+            {publisher.titles.map((title) => (
+              <article key={title.id} className="title-block">
+                <header className="title-block-head">
+                  <div>
+                    <h3>{title.name}</h3>
+                    {title.category ? (
+                      <p className="muted small">{title.category}</p>
+                    ) : null}
+                  </div>
+                  <span
+                    className={`badge ${
+                      title.active ? "badge-success" : "badge-neutral"
+                    }`}
                   >
-                    {VISIBILITIES.map((v) => (
-                      <option key={v} value={v}>
-                        {t(v === "FIRM" ? "firm" : "indicative")}
-                      </option>
+                    {title.active ? t("statusActive") : t("statusInactive")}
+                  </span>
+                </header>
+                {title.products.length === 0 ? (
+                  <p className="muted">{t("noProducts")}</p>
+                ) : (
+                  <div className="grid two tight">
+                    {title.products.map((p) => (
+                      <article key={p.id} className="card product-card">
+                        <header className="product-head">
+                          <div>
+                            <h4>{tType(p.type)}</h4>
+                            <p className="muted small">
+                              {p.visibility === "FIRM" ? t("firm") : t("indicative")}
+                              {p.bookable ? ` · ${t("bookable")}` : ""}
+                            </p>
+                          </div>
+                          <span
+                            className={`badge ${
+                              p.active ? "badge-success" : "badge-neutral"
+                            } dotless`}
+                          >
+                            {p.currency}
+                          </span>
+                        </header>
+
+                        <form action={updateProduct} className="product-form">
+                          <input type="hidden" name="locale" value={locale} />
+                          <input type="hidden" name="productId" value={p.id} />
+                          <div className="grid-2">
+                            <div className="field">
+                              <label htmlFor={`bp-${p.id}`}>
+                                {t("basePrice")}
+                              </label>
+                              <input
+                                id={`bp-${p.id}`}
+                                name="basePrice"
+                                type="number"
+                                min="0"
+                                defaultValue={Number(p.basePrice)}
+                              />
+                            </div>
+                            <div className="field">
+                              <label htmlFor={`lt-${p.id}`}>
+                                {t("leadTime")}
+                              </label>
+                              <input
+                                id={`lt-${p.id}`}
+                                name="leadTimeDays"
+                                type="number"
+                                min="1"
+                                defaultValue={p.leadTimeDays}
+                              />
+                            </div>
+                          </div>
+                          <div className="field">
+                            <label htmlFor={`vis-${p.id}`}>
+                              {t("visibility")}
+                            </label>
+                            <select
+                              id={`vis-${p.id}`}
+                              name="visibility"
+                              defaultValue={p.visibility}
+                            >
+                              {VISIBILITIES.map((v) => (
+                                <option key={v} value={v}>
+                                  {v === "FIRM" ? t("firm") : t("indicative")}
+                                </option>
+                              ))}
+                            </select>
+                          </div>
+                          <label className="checkbox-row">
+                            <input
+                              name="bookable"
+                              type="checkbox"
+                              defaultChecked={p.bookable}
+                            />
+                            <span>{t("bookable")}</span>
+                          </label>
+                          <div className="actions">
+                            <button type="submit" className="btn small">
+                              {t("save")}
+                            </button>
+                          </div>
+                        </form>
+
+                        <details className="spec-details">
+                          <summary>
+                            {t("specTitle")}
+                            <span className="muted small">
+                              {p.spec
+                                ? t("specHas")
+                                : t("specMissing")}
+                            </span>
+                          </summary>
+                          <form action={updateSpec} className="product-form">
+                            <input type="hidden" name="locale" value={locale} />
+                            <input type="hidden" name="productId" value={p.id} />
+                            <div className="grid-2">
+                              <div className="field">
+                                <label htmlFor={`wn-${p.id}`}>{t("wordMin")}</label>
+                                <input
+                                  id={`wn-${p.id}`}
+                                  name="wordCountMin"
+                                  type="number"
+                                  min="0"
+                                  defaultValue={p.spec?.wordCountMin ?? ""}
+                                />
+                              </div>
+                              <div className="field">
+                                <label htmlFor={`wx-${p.id}`}>{t("wordMax")}</label>
+                                <input
+                                  id={`wx-${p.id}`}
+                                  name="wordCountMax"
+                                  type="number"
+                                  min="0"
+                                  defaultValue={p.spec?.wordCountMax ?? ""}
+                                />
+                              </div>
+                              <div className="field">
+                                <label htmlFor={`im-${p.id}`}>{t("imagesMin")}</label>
+                                <input
+                                  id={`im-${p.id}`}
+                                  name="imagesMin"
+                                  type="number"
+                                  min="0"
+                                  defaultValue={p.spec?.imagesMin ?? ""}
+                                />
+                              </div>
+                              <div className="field">
+                                <label htmlFor={`dl-${p.id}`}>
+                                  {t("disclosure")}
+                                </label>
+                                <input
+                                  id={`dl-${p.id}`}
+                                  name="disclosureLabel"
+                                  defaultValue={p.spec?.disclosureLabel ?? ""}
+                                />
+                              </div>
+                            </div>
+                            <div className="field">
+                              <label htmlFor={`ff-${p.id}`}>{t("fileFormats")}</label>
+                              <input
+                                id={`ff-${p.id}`}
+                                name="fileFormats"
+                                defaultValue={p.spec?.fileFormats ?? ""}
+                              />
+                            </div>
+                            <div className="field">
+                              <label htmlFor={`rq-${p.id}`}>{t("requirements")}</label>
+                              <input
+                                id={`rq-${p.id}`}
+                                name="requirements"
+                                defaultValue={p.spec?.requirements ?? ""}
+                              />
+                            </div>
+                            <div className="actions">
+                              <button type="submit" className="btn small">
+                                {t("saveSpec")}
+                              </button>
+                            </div>
+                          </form>
+                        </details>
+                      </article>
                     ))}
-                  </select>
-                  <label className="muted" htmlFor={`lt-${p.id}`}>
-                    {t("leadTime")}
-                  </label>
-                  <input
-                    id={`lt-${p.id}`}
-                    name="leadTimeDays"
-                    type="number"
-                    min="1"
-                    defaultValue={p.leadTimeDays}
-                  />
-                  <label
-                    className="muted"
-                    htmlFor={`bk-${p.id}`}
-                    style={{ display: "block", marginTop: 8 }}
-                  >
-                    <input
-                      id={`bk-${p.id}`}
-                      name="bookable"
-                      type="checkbox"
-                      defaultChecked={p.bookable}
-                    />{" "}
-                    {t("bookable")}
-                  </label>
-                  <button
-                    type="submit"
-                    style={{ marginTop: 10, display: "block" }}
-                  >
-                    {t("save")}
-                  </button>
-                </form>
-
-                <form action={updateSpec} style={{ marginTop: 12 }}>
-                  <input type="hidden" name="locale" value={locale} />
-                  <input type="hidden" name="productId" value={p.id} />
-                  <strong className="muted">{t("specTitle")}</strong>
-                  <label className="muted" htmlFor={`wn-${p.id}`}>
-                    {t("wordMin")}
-                  </label>
-                  <input
-                    id={`wn-${p.id}`}
-                    name="wordCountMin"
-                    type="number"
-                    min="0"
-                    defaultValue={p.spec?.wordCountMin ?? ""}
-                  />
-                  <label className="muted" htmlFor={`wx-${p.id}`}>
-                    {t("wordMax")}
-                  </label>
-                  <input
-                    id={`wx-${p.id}`}
-                    name="wordCountMax"
-                    type="number"
-                    min="0"
-                    defaultValue={p.spec?.wordCountMax ?? ""}
-                  />
-                  <label className="muted" htmlFor={`im-${p.id}`}>
-                    {t("imagesMin")}
-                  </label>
-                  <input
-                    id={`im-${p.id}`}
-                    name="imagesMin"
-                    type="number"
-                    min="0"
-                    defaultValue={p.spec?.imagesMin ?? ""}
-                  />
-                  <label className="muted" htmlFor={`dl-${p.id}`}>
-                    {t("disclosure")}
-                  </label>
-                  <input
-                    id={`dl-${p.id}`}
-                    name="disclosureLabel"
-                    defaultValue={p.spec?.disclosureLabel ?? ""}
-                  />
-                  <label className="muted" htmlFor={`ff-${p.id}`}>
-                    {t("fileFormats")}
-                  </label>
-                  <input
-                    id={`ff-${p.id}`}
-                    name="fileFormats"
-                    defaultValue={p.spec?.fileFormats ?? ""}
-                  />
-                  <label className="muted" htmlFor={`rq-${p.id}`}>
-                    {t("requirements")}
-                  </label>
-                  <input
-                    id={`rq-${p.id}`}
-                    name="requirements"
-                    defaultValue={p.spec?.requirements ?? ""}
-                  />
-                  <button
-                    type="submit"
-                    style={{ marginTop: 10, display: "block" }}
-                  >
-                    {t("saveSpec")}
-                  </button>
-                </form>
+                  </div>
+                )}
               </article>
             ))}
           </div>
-        </div>
-      ))}
-    </section>
+        )}
+      </section>
+    </>
   );
 }

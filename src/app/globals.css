@@ -1755,6 +1755,135 @@ select:disabled {
   color: var(--accent-hover);
 }
 
+/* ---------- Publisher dashboard ---------- */
+
+.title-block {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--r-lg);
+  padding: var(--s-5);
+}
+
+.title-block-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: var(--s-3);
+  margin-bottom: var(--s-4);
+}
+
+.title-block-head h3 {
+  margin: 0 0 4px;
+}
+
+.product-card {
+  padding: var(--s-4);
+  background: var(--surface-2);
+  border-radius: var(--r-md);
+  border: 1px solid var(--border);
+}
+
+.product-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: var(--s-3);
+  margin-bottom: var(--s-4);
+}
+
+.product-head h4 {
+  margin: 0 0 4px;
+  font-size: 1rem;
+}
+
+.product-head .small,
+.title-block-head .small {
+  font-size: 0.78rem;
+  margin: 0;
+}
+
+.product-form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--s-3);
+}
+
+.product-form .grid-2 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--s-3);
+}
+
+@media (max-width: 520px) {
+  .product-form .grid-2 { grid-template-columns: 1fr; }
+}
+
+.checkbox-row {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.92rem;
+  color: var(--text);
+  cursor: pointer;
+}
+
+.checkbox-row input[type="checkbox"] {
+  width: 16px;
+  height: 16px;
+  min-height: auto;
+  min-width: auto;
+  margin: 0;
+  accent-color: var(--accent);
+}
+
+.product-form .actions {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: var(--s-1);
+}
+
+.spec-details {
+  margin-top: var(--s-3);
+  border-top: 1px solid var(--border);
+  padding-top: var(--s-3);
+}
+
+.spec-details summary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  cursor: pointer;
+  font-weight: 540;
+  color: var(--heading);
+  font-size: 0.92rem;
+  list-style: none;
+  padding: 4px 0;
+}
+
+.spec-details summary::-webkit-details-marker {
+  display: none;
+}
+
+.spec-details summary::after {
+  content: "+";
+  color: var(--muted);
+  font-size: 1.2rem;
+  line-height: 1;
+  margin-left: 12px;
+}
+
+.spec-details[open] summary::after {
+  content: "−";
+}
+
+.spec-details[open] {
+  padding-bottom: var(--s-2);
+}
+
+.spec-details .product-form {
+  margin-top: var(--s-3);
+}
+
 /* ---------- Footer ---------- */
 
 footer {
