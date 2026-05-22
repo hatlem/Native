@@ -17,6 +17,18 @@ function asEnum<T extends string>(value: string | undefined, allowed: T[]) {
     : undefined;
 }
 
+function buildQueryString(
+  current: { market?: string; type?: string; q?: string },
+  remove?: "market" | "type" | "q",
+): string {
+  const params = new URLSearchParams();
+  if (current.market && remove !== "market") params.set("market", current.market);
+  if (current.type && remove !== "type") params.set("type", current.type);
+  if (current.q && remove !== "q") params.set("q", current.q);
+  const s = params.toString();
+  return s ? `?${s}` : "";
+}
+
 export default async function CatalogPage({
   params,
   searchParams,
@@ -41,9 +53,6 @@ export default async function CatalogPage({
   );
   const q = typeof sp.q === "string" ? sp.q.trim() : "";
 
-  // FTS-first: ask Postgres for Title ids matching the query, then
-  // intersect with the rest of the filter. Falls back to ILIKE if FTS
-  // can't form a valid query (e.g. only punctuation).
   const matchedIds = await searchTitleIds(q);
   const where: Prisma.TitleWhereInput = {
     active: true,
@@ -74,12 +83,21 @@ export default async function CatalogPage({
     orderBy: { name: "asc" },
   });
 
-  return (
-    <section>
-      <h1>{t("title")}</h1>
-      <p className="muted">{t("subtitle")}</p>
+  const hasFilter = Boolean(market || type || q);
+  const filterChips: { label: string; remove: "market" | "type" | "q" }[] = [];
+  if (market) filterChips.push({ label: tMarket(market), remove: "market" });
+  if (type) filterChips.push({ label: tType(type), remove: "type" });
+  if (q) filterChips.push({ label: `"${q}"`, remove: "q" });
 
-      <form className="filters" method="get">
+  return (
+    <>
+      <header className="page-header">
+        <span className="eyebrow accent">{t("eyebrow")}</span>
+        <h1>{t("title")}</h1>
+        <p className="lead">{t("subtitle")}</p>
+      </header>
+
+      <form className="filters" method="get" role="search">
         <div>
           <label htmlFor="market">{t("filters.market")}</label>
           <select id="market" name="market" defaultValue={market ?? ""}>
@@ -102,7 +120,7 @@ export default async function CatalogPage({
             ))}
           </select>
         </div>
-        <div>
+        <div style={{ flex: 1, minWidth: 220 }}>
           <label htmlFor="q">{t("filters.search")}</label>
           <input
             id="q"
@@ -114,6 +132,47 @@ export default async function CatalogPage({
         <button type="submit">{t("filters.apply")}</button>
       </form>
 
+      <div className="result-bar">
+        <div className="result-bar-summary">
+          <strong>
+            {t("resultCount", { count: titles.length })}
+          </strong>
+          {hasFilter ? (
+            <Link href="/catalog" className="muted small-link">
+              {t("clearFilters")}
+            </Link>
+          ) : null}
+        </div>
+        {filterChips.length > 0 ? (
+          <div className="filter-chips">
+            {filterChips.map((c) => (
+              <Link
+                key={c.remove}
+                href={`/catalog${buildQueryString({ market, type, q }, c.remove)}`}
+                className="filter-chip"
+                aria-label={`${t("removeFilter")}: ${c.label}`}
+              >
+                <span>{c.label}</span>
+                <span className="x" aria-hidden>
+                  ×
+                </span>
+              </Link>
+            ))}
+          </div>
+        ) : null}
+        {titles.length >= 2 ? (
+          <Link
+            href={`/catalog/compare?ids=${titles
+              .slice(0, 6)
+              .map((t) => t.id)
+              .join(",")}`}
+            className="btn small secondary"
+          >
+            {t("compareTop")}
+          </Link>
+        ) : null}
+      </div>
+
       {titles.length === 0 ? (
         <EmptyState
           title={t("noResults")}
@@ -121,65 +180,66 @@ export default async function CatalogPage({
           primaryLabel={t("clearFilters")}
         />
       ) : (
-        <>
-          {titles.length >= 2 ? (
-            <p className="note" style={{ marginTop: 10 }}>
-              <Link
-                href={`/catalog/compare?ids=${titles
-                  .slice(0, 6)
-                  .map((t) => t.id)
-                  .join(",")}`}
-              >
-                {t("compareTop")} →
-              </Link>
-            </p>
-          ) : null}
         <div className="grid">
           {titles.map((title) => {
             const prices = title.products.map((p) =>
-              indicativeFromRules(Number(p.basePrice), toRateRules(p.priceRules)),
+              indicativeFromRules(
+                Number(p.basePrice),
+                toRateRules(p.priceRules),
+              ),
             );
             const from = prices.length ? Math.min(...prices) : null;
-            const currency = title.products[0]?.currency ?? title.market.currency;
+            const currency =
+              title.products[0]?.currency ?? title.market.currency;
+            const hasFirm = title.products.some((p) => p.visibility === "FIRM");
 
             return (
-              <article className="card" key={title.id}>
-                <h3>
-                  <Link href={`/catalog/${title.slug}`}>{title.name}</Link>
-                </h3>
-                <div className="muted">
-                  {title.publisher.name} · {tMarket(title.market.code)}
+              <Link
+                href={`/catalog/${title.slug}`}
+                key={title.id}
+                className="card hoverable title-card"
+              >
+                <div className="title-card-head">
+                  <span className="tag">{tMarket(title.market.code)}</span>
+                  {hasFirm ? (
+                    <span className="badge badge-info dotless">
+                      ⚡ {tf("badge")}
+                    </span>
+                  ) : null}
                 </div>
-                <div>
-                  <span className="tag">{title.category}</span>
-                  {title.products.map((p) => (
+                <h3>{title.name}</h3>
+                <p className="muted">{title.publisher.name}</p>
+                {title.category ? (
+                  <p className="muted small">{title.category}</p>
+                ) : null}
+                <div className="tag-row">
+                  {title.products.slice(0, 4).map((p) => (
                     <span className="tag" key={p.id}>
                       {tType(p.type)}
                     </span>
                   ))}
-                  {title.products.some((p) => p.visibility === "FIRM") ? (
-                    <span className="tag">⚡ {tf("badge")}</span>
+                </div>
+                <div className="card-foot">
+                  {title.monthlyReach ? (
+                    <span className="muted small">
+                      {t("card.reach")}:{" "}
+                      {new Intl.NumberFormat(locale).format(title.monthlyReach)}
+                    </span>
+                  ) : null}
+                  {from !== null ? (
+                    <div className="price">
+                      <span className="currency">{t("card.from")}</span>
+                      {formatMoney(from, currency, locale)}
+                    </div>
                   ) : null}
                 </div>
-                {title.monthlyReach ? (
-                  <div className="muted" style={{ marginTop: 10 }}>
-                    {t("card.reach")}:{" "}
-                    {new Intl.NumberFormat().format(title.monthlyReach)}
-                  </div>
-                ) : null}
-                {from !== null ? (
-                  <div className="price">
-                    {t("card.from")} {formatMoney(from, currency, locale)}
-                  </div>
-                ) : null}
-              </article>
+              </Link>
             );
           })}
         </div>
-        </>
       )}
 
       <p className="note">{t("indicativeNote")}</p>
-    </section>
+    </>
   );
 }

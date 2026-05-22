@@ -106,8 +106,11 @@
     "vp3Body": "Egen produktion anpassad efter varje titels specifikationer — bättre resultat och bättre pris."
   },
   "catalog": {
-    "title": "Katalog",
-    "subtitle": "Native-innehåll och native-annonsering i nordiska tidningar och magasin.",
+    "eyebrow": "Utforska",
+    "title": "Varje nordisk titel som kör native",
+    "subtitle": "Filtrera på marknad, format och publik. Vägledande priser på varje produkt — firm pris på begäran via desk.",
+    "resultCount": "{count, plural, =0 {0 titlar} =1 {1 titel} other {# titlar}}",
+    "removeFilter": "Ta bort filter",
     "filters": {
       "market": "Marknad",
       "type": "Format",

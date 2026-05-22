@@ -135,8 +135,11 @@
     "vp3Body": "In-house production tuned to each title's specs — a better result and a better deal."
   },
   "catalog": {
-    "title": "Catalog",
-    "subtitle": "Native content and native advertising across Nordic newspapers and magazines.",
+    "eyebrow": "Browse",
+    "title": "Every Nordic title that runs native",
+    "subtitle": "Filter by market, format and audience. Indicative pricing on every product — firm pricing on request via the desk.",
+    "resultCount": "{count, plural, =0 {0 titles} =1 {1 title} other {# titles}}",
+    "removeFilter": "Remove filter",
     "filters": {
       "market": "Market",
       "type": "Format",
