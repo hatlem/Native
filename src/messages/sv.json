@@ -488,6 +488,15 @@
     "unreadCount": "{count, plural, =0 {0 olästa} =1 {1 oläst} other {# olästa}}",
     "totalCount": "{count, plural, =0 {0 totalt} =1 {1 totalt} other {# totalt}}"
   },
+  "errors": {
+    "notFoundTitle": "Vi hittar inte den sidan",
+    "notFoundBody": "Den kan ha flyttats, döpts om eller aldrig funnits. Gå tillbaka hem eller utforska katalogen.",
+    "errorTitle": "Något gick precis sönder",
+    "errorBody": "Vi stötte på ett oväntat fel. Försök igen, eller gå hem. Om det fortsätter, dela referensen nedan med vårt team.",
+    "errorRef": "Referens",
+    "tryAgain": "Försök igen",
+    "backHome": "Tillbaka hem"
+  },
   "compare": {
     "eyebrow": "Jämför",
     "title": "Jämför titlar",

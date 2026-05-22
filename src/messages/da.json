@@ -488,6 +488,15 @@
     "unreadCount": "{count, plural, =0 {0 ulæste} =1 {1 ulæst} other {# ulæste}}",
     "totalCount": "{count, plural, =0 {0 i alt} =1 {1 i alt} other {# i alt}}"
   },
+  "errors": {
+    "notFoundTitle": "Vi kan ikke finde den side",
+    "notFoundBody": "Den kan være flyttet, omdøbt eller aldrig have eksisteret. Gå tilbage til forsiden eller udforsk kataloget.",
+    "errorTitle": "Noget gik lige galt",
+    "errorBody": "Vi stødte på en uventet fejl. Prøv igen, eller gå hjem. Hvis det fortsætter, så del referencen nedenfor med vores team.",
+    "errorRef": "Reference",
+    "tryAgain": "Prøv igen",
+    "backHome": "Tilbage til forsiden"
+  },
   "compare": {
     "eyebrow": "Sammenlign",
     "title": "Sammenlign titler",

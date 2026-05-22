@@ -72,6 +72,15 @@
     "unreadCount": "{count, plural, =0 {0 unread} =1 {1 unread} other {# unread}}",
     "totalCount": "{count, plural, =0 {0 total} =1 {1 total} other {# total}}"
   },
+  "errors": {
+    "notFoundTitle": "We can't find that page",
+    "notFoundBody": "It may have moved, been renamed, or never existed. Head back home or browse the catalog.",
+    "errorTitle": "Something just broke",
+    "errorBody": "We hit an unexpected error. Try again, or head home. If it keeps happening, share the reference below with our team.",
+    "errorRef": "Reference",
+    "tryAgain": "Try again",
+    "backHome": "Back to home"
+  },
   "compare": {
     "eyebrow": "Compare",
     "title": "Compare titles",
