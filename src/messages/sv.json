@@ -134,6 +134,7 @@
     "back": "Tillbaka till katalogen",
     "publishedBy": "Ges ut av",
     "reach": "Månatlig räckvidd",
+    "formats": "Native-format",
     "leadTime": "Ledtid",
     "days": "dagar",
     "from": "Från",
@@ -143,7 +144,10 @@
     "disclosure": "Märkning",
     "addToPlan": "Lägg till i plan",
     "indicativeNote": "Vägledande pris. Det fasta priset bekräftas av vårt inköpsteam.",
-    "unavailable": "För närvarande inte tillgänglig för bokning."
+    "unavailable": "För närvarande inte tillgänglig för bokning.",
+    "formatsEyebrow": "Tillgängliga format",
+    "formatsHeading": "Välj ett format och lägg det till din plan",
+    "bookableSummary": "{count, plural, =0 {Ingen direktbokning} =1 {1 kan bokas direkt} other {# kan bokas direkt}}"
   },
   "plan": {
     "title": "Din plan",

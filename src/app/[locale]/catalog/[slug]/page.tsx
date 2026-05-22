@@ -50,88 +50,150 @@ export default async function TitleDetailPage({
     category: title.category,
     brand: { "@type": "Brand", name: title.publisher.name },
     url: `${siteBase}/${locale}/catalog/${title.slug}`,
-    offers: { "@type": "AggregateOffer", priceCurrency: title.market.currency, offers: ldOffers },
+    offers: {
+      "@type": "AggregateOffer",
+      priceCurrency: title.market.currency,
+      offers: ldOffers,
+    },
   };
 
+  const productCount = title.products.length;
+  const bookableCount = title.products.filter((p) => p.bookable).length;
+  const allPrices = title.products.map((p) =>
+    indicativeFromRules(Number(p.basePrice), toRateRules(p.priceRules)),
+  );
+  const fromPrice = allPrices.length ? Math.min(...allPrices) : null;
+  const currency =
+    title.products[0]?.currency ?? title.market.currency;
+
   return (
-    <section>
+    <>
       <script
         type="application/ld+json"
-        // schema.org JSON-LD: PLAN §14 "structured data for discovery".
         dangerouslySetInnerHTML={{ __html: JSON.stringify(ld) }}
       />
-      <p>
-        <Link href="/catalog">← {t("back")}</Link>
-      </p>
-      <h1>{title.name}</h1>
-      <p className="muted">
-        {t("publishedBy")} {title.publisher.name} · {tMarket(title.market.code)}{" "}
-        · {title.category}
-      </p>
-      {title.monthlyReach ? (
-        <p className="muted">
-          {t("reach")}: {new Intl.NumberFormat().format(title.monthlyReach)}
-        </p>
-      ) : null}
+      <nav className="breadcrumb" aria-label="Breadcrumb">
+        <Link href="/catalog" className="small-link">
+          ← {t("back")}
+        </Link>
+      </nav>
 
-      <div className="grid">
-        {title.products.map((p) => {
-          const price = indicativeFromRules(
-            Number(p.basePrice),
-            toRateRules(p.priceRules),
-          );
-          return (
-            <article className="card" key={p.id}>
-              <h3>{tType(p.type)}</h3>
-              <div className="price">
-                {t("from")} {formatMoney(price, p.currency, locale)}
-              </div>
-              {p.visibility === "FIRM" ? (
-                <span className="tag">⚡ {tf("badge")}</span>
-              ) : null}
-              <div className="muted" style={{ marginTop: 6 }}>
-                {t("leadTime")}: {p.leadTimeDays} {t("days")}
-              </div>
-              {p.spec ? (
-                <div className="muted" style={{ marginTop: 10 }}>
-                  <strong>{t("spec")}</strong>
-                  <br />
-                  {p.spec.wordCountMin && p.spec.wordCountMax ? (
-                    <>
-                      {t("words")}: {p.spec.wordCountMin}–{p.spec.wordCountMax}
-                      <br />
-                    </>
-                  ) : null}
-                  {t("images")}: {p.spec.imagesMin ?? 0}
-                  <br />
-                  {p.spec.disclosureLabel ? (
-                    <>
-                      {t("disclosure")}: {p.spec.disclosureLabel}
-                    </>
+      <header className="detail-head">
+        <div>
+          <div className="cluster tight" style={{ marginBottom: 10 }}>
+            <span className="tag">{tMarket(title.market.code)}</span>
+            {title.category ? <span className="tag">{title.category}</span> : null}
+            {title.products.some((p) => p.visibility === "FIRM") ? (
+              <span className="badge badge-info dotless">
+                ⚡ {tf("badge")}
+              </span>
+            ) : null}
+          </div>
+          <h1>{title.name}</h1>
+          <p className="lead">
+            {t("publishedBy")} {title.publisher.name}
+          </p>
+        </div>
+        <aside className="detail-meta">
+          {title.monthlyReach ? (
+            <div className="meta-row">
+              <span className="muted small">{t("reach")}</span>
+              <span className="value">
+                {new Intl.NumberFormat(locale).format(title.monthlyReach)}
+              </span>
+            </div>
+          ) : null}
+          <div className="meta-row">
+            <span className="muted small">{t("formats")}</span>
+            <span className="value">{productCount}</span>
+          </div>
+          {fromPrice !== null ? (
+            <div className="meta-row">
+              <span className="muted small">{t("from")}</span>
+              <span className="value">
+                {formatMoney(fromPrice, currency, locale)}
+              </span>
+            </div>
+          ) : null}
+        </aside>
+      </header>
+
+      <section className="section">
+        <div className="section-head">
+          <div>
+            <span className="eyebrow">{t("formatsEyebrow")}</span>
+            <h2>{t("formatsHeading")}</h2>
+          </div>
+          {bookableCount > 0 ? (
+            <span className="muted small">
+              {t("bookableSummary", { count: bookableCount })}
+            </span>
+          ) : null}
+        </div>
+
+        <div className="grid">
+          {title.products.map((p) => {
+            const price = indicativeFromRules(
+              Number(p.basePrice),
+              toRateRules(p.priceRules),
+            );
+            return (
+              <article className="card product-detail-card" key={p.id}>
+                <div className="cluster tight" style={{ marginBottom: 8 }}>
+                  <h3 style={{ margin: 0 }}>{tType(p.type)}</h3>
+                  {p.visibility === "FIRM" ? (
+                    <span className="badge badge-info dotless">
+                      ⚡ {tf("badge")}
+                    </span>
                   ) : null}
                 </div>
-              ) : null}
-              {p.bookable ? (
-                <form action={addToPlan} style={{ marginTop: 12 }}>
-                  <input type="hidden" name="locale" value={locale} />
-                  <input type="hidden" name="productId" value={p.id} />
-                  <button
-                    type="submit"
-                    className="btn"
-                    style={{ marginTop: 0 }}
-                  >
-                    {t("addToPlan")}
-                  </button>
-                </form>
-              ) : (
-                <p className="note">{t("unavailable")}</p>
-              )}
-            </article>
-          );
-        })}
-      </div>
+                <div className="price">
+                  <span className="currency">{t("from")}</span>
+                  {formatMoney(price, p.currency, locale)}
+                </div>
+                <div className="cluster tight" style={{ marginTop: 10 }}>
+                  <span className="tag">
+                    {t("leadTime")}: {p.leadTimeDays} {t("days")}
+                  </span>
+                </div>
+                {p.spec ? (
+                  <dl className="spec-grid">
+                    {p.spec.wordCountMin && p.spec.wordCountMax ? (
+                      <>
+                        <dt>{t("words")}</dt>
+                        <dd>
+                          {p.spec.wordCountMin}–{p.spec.wordCountMax}
+                        </dd>
+                      </>
+                    ) : null}
+                    <dt>{t("images")}</dt>
+                    <dd>{p.spec.imagesMin ?? 0}</dd>
+                    {p.spec.disclosureLabel ? (
+                      <>
+                        <dt>{t("disclosure")}</dt>
+                        <dd>{p.spec.disclosureLabel}</dd>
+                      </>
+                    ) : null}
+                  </dl>
+                ) : null}
+                {p.bookable ? (
+                  <form action={addToPlan} className="product-cta">
+                    <input type="hidden" name="locale" value={locale} />
+                    <input type="hidden" name="productId" value={p.id} />
+                    <button type="submit" className="btn block">
+                      {t("addToPlan")}
+                    </button>
+                  </form>
+                ) : (
+                  <p className="muted small product-cta">{t("unavailable")}</p>
+                )}
+              </article>
+            );
+          })}
+        </div>
+      </section>
 
       <p className="note">{t("indicativeNote")}</p>
-    </section>
+    </>
   );
 }

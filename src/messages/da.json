@@ -134,6 +134,7 @@
     "back": "Tilbage til kataloget",
     "publishedBy": "Udgives af",
     "reach": "Månedlig rækkevidde",
+    "formats": "Native-formater",
     "leadTime": "Leveringstid",
     "days": "dage",
     "from": "Fra",
@@ -143,7 +144,10 @@
     "disclosure": "Mærkning",
     "addToPlan": "Tilføj til plan",
     "indicativeNote": "Vejledende pris. Den faste pris bekræftes af vores indkøbsteam.",
-    "unavailable": "I øjeblikket ikke tilgængelig til booking."
+    "unavailable": "I øjeblikket ikke tilgængelig til booking.",
+    "formatsEyebrow": "Tilgængelige formater",
+    "formatsHeading": "Vælg et format og tilføj det til din plan",
+    "bookableSummary": "{count, plural, =0 {Ingen direkte booking} =1 {1 kan bookes direkte} other {# kan bookes direkte}}"
   },
   "plan": {
     "title": "Din plan",

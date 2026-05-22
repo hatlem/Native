@@ -1863,6 +1863,93 @@ select:disabled {
   color: var(--accent-hover);
 }
 
+/* ---------- Detail header ---------- */
+
+.breadcrumb {
+  margin: 0 0 var(--s-3);
+  font-size: 0.85rem;
+}
+
+.detail-head {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 280px;
+  gap: var(--s-6);
+  align-items: start;
+  margin-bottom: var(--s-6);
+}
+
+@media (max-width: 760px) {
+  .detail-head { grid-template-columns: 1fr; gap: var(--s-4); }
+}
+
+.detail-head h1 {
+  margin: 0 0 var(--s-2);
+}
+
+.detail-head .lead {
+  color: var(--muted-strong);
+  font-size: 1.05rem;
+  margin: 0;
+}
+
+.detail-meta {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--r-md);
+  padding: var(--s-4);
+  display: flex;
+  flex-direction: column;
+  gap: var(--s-3);
+}
+
+.meta-row {
+  display: flex;
+  flex-direction: column;
+}
+
+.meta-row .value {
+  font-family: var(--font-display);
+  font-size: 1.15rem;
+  font-weight: 660;
+  color: var(--heading);
+  letter-spacing: -0.018em;
+  font-variant-numeric: tabular-nums;
+  margin-top: 2px;
+}
+
+.small {
+  font-size: 0.82rem;
+}
+
+/* Product detail cards */
+.product-detail-card .price {
+  margin-top: var(--s-2);
+}
+
+.spec-grid {
+  display: grid;
+  grid-template-columns: max-content 1fr;
+  gap: 4px 12px;
+  margin: var(--s-3) 0 0;
+  font-size: 0.88rem;
+}
+
+.spec-grid dt {
+  color: var(--muted);
+  font-weight: 500;
+}
+
+.spec-grid dd {
+  margin: 0;
+  color: var(--text);
+  font-weight: 500;
+}
+
+.product-cta {
+  margin-top: auto;
+  padding-top: var(--s-4);
+}
+
 /* ---------- Publisher dashboard ---------- */
 
 .title-block {
