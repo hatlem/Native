@@ -1691,7 +1691,7 @@ select:disabled {
   background: var(--surface);
   border: 1px solid var(--border);
   border-radius: var(--r-md);
-  margin-top: var(--s-5);
+  margin-top: var(--s-4);
   overflow: hidden;
 }
 
@@ -1703,12 +1703,57 @@ select:disabled {
   padding: 14px 18px;
   border-bottom: 1px solid var(--border);
   transition: background var(--t-fast);
+  color: inherit;
+  text-decoration: none;
 }
 
 .action-list .item:last-child { border-bottom: 0; }
 .action-list .item:hover { background: var(--surface-2); }
 .action-list .item .title { font-weight: 540; color: var(--heading); }
-.action-list .item .sub { font-size: 0.85rem; color: var(--muted); }
+.action-list .item .sub {
+  font-size: 0.85rem;
+  color: var(--muted);
+  margin-top: 2px;
+}
+.action-list .item .chev {
+  color: var(--muted);
+  font-size: 1rem;
+  opacity: 0.6;
+  transition: transform var(--t-fast), opacity var(--t-fast);
+}
+.action-list .item:hover .chev {
+  opacity: 1;
+  transform: translateX(2px);
+  color: var(--heading);
+}
+
+.kpi.kpi-warn {
+  border-color: color-mix(in srgb, var(--warning) 40%, var(--border));
+  background: color-mix(in srgb, var(--warning-soft) 60%, var(--surface));
+}
+
+.kpi.kpi-warn .value { color: var(--warning); }
+.kpi.kpi-warn .label { color: var(--warning); }
+
+.quick-link {
+  text-decoration: none;
+  color: inherit;
+}
+
+.quick-link h3 {
+  margin-bottom: 6px;
+}
+
+.quick-link .link {
+  margin-top: auto;
+  color: var(--accent);
+  font-weight: 540;
+  font-size: 0.92rem;
+}
+
+.quick-link:hover .link {
+  color: var(--accent-hover);
+}
 
 /* ---------- Footer ---------- */
 
