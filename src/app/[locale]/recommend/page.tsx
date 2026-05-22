@@ -73,16 +73,19 @@ export default async function RecommendPage({
       : null;
 
   return (
-    <section>
-      <h1>{t("title")}</h1>
-      <p className="muted">{t("subtitle")}</p>
+    <>
+      <header className="page-header">
+        <span className="eyebrow accent">{t("eyebrow")}</span>
+        <h1>{t("title")}</h1>
+        <p className="lead">{t("subtitle")}</p>
+      </header>
 
       <form method="get" className="filters">
         <div>
           <label htmlFor="market">{t("market")}</label>
           <select id="market" name="market" defaultValue={marketCode ?? ""}>
             <option value="" disabled>
-              —
+              {t("marketPlaceholder")}
             </option>
             {MARKET_CODES.map((m) => (
               <option key={m} value={m}>
@@ -98,6 +101,7 @@ export default async function RecommendPage({
             name="budget"
             type="number"
             min="0"
+            placeholder="100000"
             defaultValue={budget || ""}
           />
         </div>
@@ -128,46 +132,78 @@ export default async function RecommendPage({
           />
         ) : (
           <>
-            <p className="note">
-              {t("reach")}: {result.totalReach.toLocaleString(locale)} ·{" "}
-              {t("cost")}: {formatMoney(result.totalCost, currency, locale)}{" "}
-              · {t("remaining")}:{" "}
-              {formatMoney(result.remaining, currency, locale)}
-            </p>
-            <div className="grid">
-              {result.picks.map((p) => (
-                <article className="card" key={p.productId}>
-                  <h3>{p.titleName}</h3>
-                  <div className="muted">{tType(p.type)}</div>
-                  <div className="muted">
-                    {t("reach")}: {p.reach.toLocaleString(locale)}
-                  </div>
-                  <div className="price">
-                    {formatMoney(p.unitPrice, currency, locale)}
-                  </div>
-                </article>
-              ))}
+            <div className="kpi-grid">
+              <div className="kpi">
+                <div className="label">{t("reach")}</div>
+                <div className="value">
+                  {result.totalReach.toLocaleString(locale)}
+                </div>
+                <div className="delta">{t("reachSub")}</div>
+              </div>
+              <div className="kpi">
+                <div className="label">{t("cost")}</div>
+                <div className="value">
+                  {formatMoney(result.totalCost, currency, locale)}
+                </div>
+                <div className="delta">
+                  {t("ofBudget", {
+                    budget: formatMoney(budget, currency, locale),
+                  })}
+                </div>
+              </div>
+              <div className="kpi">
+                <div className="label">{t("remaining")}</div>
+                <div className="value">
+                  {formatMoney(result.remaining, currency, locale)}
+                </div>
+                <div className="delta">{t("remainingSub")}</div>
+              </div>
             </div>
-            <form action={addRecommendedPlan} style={{ marginTop: 16 }}>
-              <input type="hidden" name="locale" value={locale} />
-              <input
-                type="hidden"
-                name="productIds"
-                value={result.picks.map((p) => p.productId).join(",")}
-              />
-              <button type="submit" className="btn">
-                {t("addAll")}
-              </button>
-            </form>
+
+            <section className="section">
+              <div className="section-head">
+                <div>
+                  <span className="eyebrow">{t("mixEyebrow")}</span>
+                  <h2>{t("mixHeading")}</h2>
+                </div>
+                <form action={addRecommendedPlan}>
+                  <input type="hidden" name="locale" value={locale} />
+                  <input
+                    type="hidden"
+                    name="productIds"
+                    value={result.picks.map((p) => p.productId).join(",")}
+                  />
+                  <button type="submit" className="btn">
+                    {t("addAll")}
+                  </button>
+                </form>
+              </div>
+
+              <div className="grid">
+                {result.picks.map((p) => (
+                  <article className="card" key={p.productId}>
+                    <span className="tag">{tType(p.type)}</span>
+                    <h3>{p.titleName}</h3>
+                    <p className="muted small">{p.category}</p>
+                    <p className="muted small">
+                      {t("reach")}: {p.reach.toLocaleString(locale)}
+                    </p>
+                    <div className="price">
+                      {formatMoney(p.unitPrice, currency, locale)}
+                    </div>
+                  </article>
+                ))}
+              </div>
+            </section>
           </>
         )
       ) : (
-        <EmptyState
-          title={t("hint")}
-          primaryHref="/catalog"
-          primaryLabel={t("browse")}
-        />
+        <div className="empty">
+          <div className="empty-icon">✦</div>
+          <h3 className="empty-title">{t("hintTitle")}</h3>
+          <p>{t("hint")}</p>
+        </div>
       )}
-    </section>
+    </>
   );
 }

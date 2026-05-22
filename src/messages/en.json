@@ -98,7 +98,12 @@
     "title": "Availability",
     "subtitle": "Block months you can't deliver in — the catalog hides firm-priced products for blocked months and instant-book checkout refuses them.",
     "blocked": "Blocked",
-    "save": "Save"
+    "save": "Save",
+    "kpiBlocked": "Blocked months",
+    "kpiBlockedSub": "Across all products",
+    "kpiHorizon": "Months ahead",
+    "kpiHorizonSub": "Editable horizon",
+    "titleEyebrow": "Title"
   },
   "reports": {
     "title": "Reports",
@@ -115,6 +120,7 @@
     "none": "No data yet.",
     "mySpend": "My spend",
     "mySubtitle": "Your organization's orders and spend.",
+    "eyebrowOrg": "Spend",
     "reportsHeadline": "Demand, conversion and revenue at a glance",
     "conversionSub": "Briefs that became orders",
     "gmvEyebrow": "Gross merchandise value",
@@ -151,8 +157,16 @@
     "remaining": "Budget left",
     "none": "No mix fits that budget — try a higher budget or another market.",
     "addAll": "Add all to plan",
-    "hint": "Choose a market and budget to see a suggested mix, or",
-    "browse": "browse the catalog"
+    "hint": "Choose a market and budget above to see a suggested mix.",
+    "browse": "Browse the catalog",
+    "eyebrow": "Recommender",
+    "hintTitle": "Tell us your market and budget",
+    "marketPlaceholder": "Choose a market",
+    "reachSub": "Combined monthly reach",
+    "ofBudget": "of {budget} budget",
+    "remainingSub": "Headroom for more lines",
+    "mixEyebrow": "Suggested mix",
+    "mixHeading": "Titles that fit your brief"
   },
   "home": {
     "eyebrow": "BeNative — Nordic native marketplace",
@@ -219,14 +233,19 @@
     "bookableSummary": "{count, plural, =0 {None bookable instantly} =1 {1 bookable instantly} other {# bookable instantly}}"
   },
   "plan": {
+    "eyebrow": "Plan",
     "title": "Your plan",
+    "lead": "Review your selected placements, then send the brief to our desk for a firm quote — or buy on instant-book if every line supports it.",
     "empty": "Your plan is empty.",
     "browse": "Browse the catalog",
     "remove": "Remove",
     "qty": "Qty",
     "estTotal": "Estimated indicative total",
     "rfqTitle": "Request a firm quote",
-    "error": "Add at least one placement and fill in company, email and market."
+    "error": "Add at least one placement and fill in company, email and market.",
+    "linesEyebrow": "Selected",
+    "linesHeading": "Your placements",
+    "itemCount": "{count, plural, =0 {0 items} =1 {1 item} other {# items}}"
   },
   "rfq": {
     "org": "Company",
@@ -443,10 +462,12 @@
   },
   "invoice": {
     "title": "Invoice",
+    "eyebrow": "Invoice",
     "status": "Status",
     "billTo": "Bill to",
     "issued": "Issued",
     "due": "Due",
+    "currency": "Currency",
     "subtotal": "Subtotal",
     "vat": "VAT",
     "total": "Total"

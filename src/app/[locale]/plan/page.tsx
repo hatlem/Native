@@ -54,7 +54,11 @@ export default async function PlanPage({
         toRateRules(p.priceRules),
         b.quantity,
       );
-      return { product: p, quantity: b.quantity, lineTotal: unit * b.quantity };
+      return {
+        product: p,
+        quantity: b.quantity,
+        lineTotal: unit * b.quantity,
+      };
     })
     .filter((l): l is NonNullable<typeof l> => l !== null);
 
@@ -70,10 +74,18 @@ export default async function PlanPage({
     lines.length > 0 && lines.every((l) => l.product.visibility === "FIRM");
 
   return (
-    <section>
-      <h1>{t("title")}</h1>
+    <>
+      <header className="page-header">
+        <span className="eyebrow accent">{t("eyebrow")}</span>
+        <h1>{t("title")}</h1>
+        <p className="lead">{t("lead")}</p>
+      </header>
 
-      {sp.error ? <p className="note">{t("error")}</p> : null}
+      {sp.error ? (
+        <div className="banner-error" role="alert">
+          <span>{t("error")}</span>
+        </div>
+      ) : null}
 
       {lines.length === 0 ? (
         <EmptyState
@@ -84,85 +96,117 @@ export default async function PlanPage({
           secondaryLabel={tNav("recommend")}
         />
       ) : (
-        <>
-          <div className="grid">
-            {lines.map((l) => (
-              <article className="card" key={l.product.id}>
-                <h3>{l.product.title.name}</h3>
-                <div className="muted">{tType(l.product.type)}</div>
-                <div className="muted">
-                  {t("qty")}: {l.quantity}
+        <div className="split">
+          <div>
+            <div className="section-head">
+              <div>
+                <span className="eyebrow">{t("linesEyebrow")}</span>
+                <h2>{t("linesHeading")}</h2>
+              </div>
+              <span className="muted small">
+                {t("itemCount", { count: lines.length })}
+              </span>
+            </div>
+            <div className="action-list">
+              {lines.map((l) => (
+                <div className="item plan-item" key={l.product.id}>
+                  <span className="tag">{tType(l.product.type)}</span>
+                  <div>
+                    <div className="title">{l.product.title.name}</div>
+                    <div className="sub">
+                      {t("qty")}: {l.quantity}
+                    </div>
+                  </div>
+                  <div className="cluster tight">
+                    <span className="price plan-line-price">
+                      {formatMoney(l.lineTotal, l.product.currency, locale)}
+                    </span>
+                    <form action={removeFromPlan}>
+                      <input type="hidden" name="locale" value={locale} />
+                      <input
+                        type="hidden"
+                        name="productId"
+                        value={l.product.id}
+                      />
+                      <button type="submit" className="btn small ghost">
+                        {t("remove")}
+                      </button>
+                    </form>
+                  </div>
                 </div>
-                <div className="price">
-                  {formatMoney(l.lineTotal, l.product.currency, locale)}
-                </div>
-                <form action={removeFromPlan} style={{ marginTop: 10 }}>
-                  <input type="hidden" name="locale" value={locale} />
-                  <input
-                    type="hidden"
-                    name="productId"
-                    value={l.product.id}
-                  />
-                  <button type="submit">{t("remove")}</button>
-                </form>
-              </article>
-            ))}
+              ))}
+            </div>
           </div>
 
-          <p className="note">
-            {t("estTotal")}:{" "}
-            {[...totals.entries()]
-              .map(([cur, amt]) => formatMoney(amt, cur, locale))
-              .join(" · ")}
-          </p>
+          <aside className="plan-summary">
+            <div className="plan-summary-head">
+              <span className="muted small">{t("estTotal")}</span>
+              <div className="plan-summary-total">
+                {[...totals.entries()].map(([cur, amt]) => (
+                  <div className="price" key={cur}>
+                    {formatMoney(amt, cur, locale)}
+                  </div>
+                ))}
+              </div>
+              {allFirm ? (
+                <span className="badge badge-info dotless">
+                  ⚡ {tf("badge")}
+                </span>
+              ) : null}
+            </div>
 
-          <h2 style={{ marginTop: 32 }}>
-            {allFirm ? tf("planTitle") : t("rfqTitle")}
-          </h2>
-          {allFirm ? <p className="note">{tf("planNote")}</p> : null}
-          {needsClient ? (
-            <p className="note">
-              {tr("selectClient")}{" "}
-              <Link href="/agency">{tNav("agency")}</Link>
-            </p>
-          ) : activeOrg ? (
-            <>
-              <p className="muted">
-                {tr("requestingAs")}: {activeOrg.name}
+            <h3>{allFirm ? tf("planTitle") : t("rfqTitle")}</h3>
+            {allFirm ? <p className="muted small">{tf("planNote")}</p> : null}
+
+            {needsClient ? (
+              <p className="muted small">
+                {tr("selectClient")}{" "}
+                <Link href="/agency" className="link">
+                  {tNav("agency")}
+                </Link>
               </p>
-              <form action={submitRequest} className="filters">
+            ) : activeOrg ? (
+              <form action={submitRequest} className="product-form">
                 <input type="hidden" name="locale" value={locale} />
-                <div>
+                <p className="muted small">
+                  {tr("requestingAs")}: <strong>{activeOrg.name}</strong>
+                </p>
+                <div className="field">
                   <label htmlFor="budget">{tr("budget")}</label>
                   <input id="budget" name="budget" type="number" min="0" />
                 </div>
-                <div>
+                <div className="field">
                   <label htmlFor="audience">{tr("audience")}</label>
                   <input id="audience" name="audience" />
                 </div>
-                <div>
+                <div className="field">
                   <label htmlFor="goal">{tr("goal")}</label>
                   <input id="goal" name="goal" />
                 </div>
-                <div>
+                <div className="field">
                   <label htmlFor="brief">{tr("brief")}</label>
-                  <input id="brief" name="brief" />
+                  <textarea id="brief" name="brief" rows={3} />
                 </div>
-                <button type="submit">
+                <button type="submit" className="btn block">
                   {allFirm ? tf("planSubmit") : tr("submit")}
                 </button>
               </form>
-            </>
-          ) : (
-            <p className="note">
-              {tr("loginRequired")}{" "}
-              <Link href="/signin">{ta("signin")}</Link>
-              {" · "}
-              <Link href="/signup">{ta("signup")}</Link>
-            </p>
-          )}
-        </>
+            ) : (
+              <div className="auth-fallback">
+                <p className="muted small">{tr("loginRequired")}</p>
+                <div className="cluster">
+                  <Link href="/signin" className="btn small secondary">
+                    {ta("signin")}
+                  </Link>
+                  <Link href="/signup" className="btn small">
+                    {ta("signup")}
+                  </Link>
+                </div>
+              </div>
+            )}
+          </aside>
+        </div>
       )}
-    </section>
+    </>
   );
 }

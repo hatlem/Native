@@ -7,10 +7,11 @@ import { setAvailability } from "@/app/publisher-actions";
 
 export const dynamic = "force-dynamic";
 
-// Phase-3 availability calendar (PLAN §6/§11). Publishers block months
-// they can't serve so the catalog hides them on FIRM-priced products
-// and `submitRequest` refuses self-serve checkouts for the current
-// month. Past months are not editable.
+const MONTH_NAMES_INTL = (locale: string, year: number, month: number) =>
+  new Intl.DateTimeFormat(locale, { month: "short", year: "2-digit" }).format(
+    new Date(Date.UTC(year, month - 1, 1)),
+  );
+
 export default async function PublisherAvailabilityPage({
   params,
 }: {
@@ -32,7 +33,9 @@ export default async function PublisherAvailabilityPage({
     include: {
       products: {
         where: { active: true },
-        include: { availability: { orderBy: [{ year: "asc" }, { month: "asc" }] } },
+        include: {
+          availability: { orderBy: [{ year: "asc" }, { month: "asc" }] },
+        },
       },
     },
   });
@@ -44,61 +47,99 @@ export default async function PublisherAvailabilityPage({
     months.push({
       year: d.getUTCFullYear(),
       month: d.getUTCMonth() + 1,
-      label: `${d.getUTCFullYear()}-${String(d.getUTCMonth() + 1).padStart(2, "0")}`,
+      label: MONTH_NAMES_INTL(locale, d.getUTCFullYear(), d.getUTCMonth() + 1),
     });
   }
 
+  const blockedTotal = titles.reduce(
+    (sum, title) =>
+      sum +
+      title.products.reduce(
+        (s, p) => s + p.availability.filter((a) => a.blocked).length,
+        0,
+      ),
+    0,
+  );
+
   return (
-    <section>
-      <p>
-        <Link href="/publisher">← {t("title")}</Link>
-      </p>
-      <h1>{ta("title")}</h1>
-      <p className="muted">{ta("subtitle")}</p>
+    <>
+      <nav className="breadcrumb">
+        <Link href="/publisher" className="small-link">
+          ← {t("title")}
+        </Link>
+      </nav>
+
+      <header className="page-header">
+        <span className="eyebrow accent">{t("eyebrow")}</span>
+        <h1>{ta("title")}</h1>
+        <p className="lead">{ta("subtitle")}</p>
+      </header>
+
+      <div className="kpi-grid">
+        <div className={`kpi ${blockedTotal > 0 ? "kpi-warn" : ""}`}>
+          <div className="label">{ta("kpiBlocked")}</div>
+          <div className="value">{blockedTotal}</div>
+          <div className="delta">{ta("kpiBlockedSub")}</div>
+        </div>
+        <div className="kpi">
+          <div className="label">{ta("kpiHorizon")}</div>
+          <div className="value">{months.length}</div>
+          <div className="delta">{ta("kpiHorizonSub")}</div>
+        </div>
+      </div>
 
       {titles.map((title) => (
-        <div key={title.id} style={{ marginTop: 20 }}>
-          <h2>{title.name}</h2>
-          <div className="grid">
+        <section className="section" key={title.id}>
+          <div className="section-head">
+            <div>
+              <span className="eyebrow">{ta("titleEyebrow")}</span>
+              <h2>{title.name}</h2>
+            </div>
+          </div>
+          <div className="grid two">
             {title.products.map((p) => {
               const blockedKeys = new Set(
-                p.availability.filter((a) => a.blocked).map((a) => `${a.year}-${a.month}`),
+                p.availability
+                  .filter((a) => a.blocked)
+                  .map((a) => `${a.year}-${a.month}`),
               );
               return (
-                <article className="card" key={p.id}>
+                <article className="card availability-card" key={p.id}>
                   <h3>{p.name}</h3>
-                  {months.map((m) => {
-                    const key = `${m.year}-${m.month}`;
-                    const isBlocked = blockedKeys.has(key);
-                    return (
-                      <form
-                        action={setAvailability}
-                        key={key}
-                        style={{ display: "flex", gap: 8, alignItems: "center", marginTop: 6 }}
-                      >
-                        <input type="hidden" name="locale" value={locale} />
-                        <input type="hidden" name="productId" value={p.id} />
-                        <input type="hidden" name="year" value={m.year} />
-                        <input type="hidden" name="month" value={m.month} />
-                        <span style={{ minWidth: 80 }}>{m.label}</span>
-                        <label className="muted">
-                          <input
-                            type="checkbox"
-                            name="blocked"
-                            defaultChecked={isBlocked}
-                          />{" "}
-                          {ta("blocked")}
-                        </label>
-                        <button type="submit">{ta("save")}</button>
-                      </form>
-                    );
-                  })}
+                  <ul className="month-grid">
+                    {months.map((m) => {
+                      const key = `${m.year}-${m.month}`;
+                      const isBlocked = blockedKeys.has(key);
+                      return (
+                        <li key={key} className={`month-cell ${isBlocked ? "is-blocked" : ""}`}>
+                          <form action={setAvailability}>
+                            <input type="hidden" name="locale" value={locale} />
+                            <input type="hidden" name="productId" value={p.id} />
+                            <input type="hidden" name="year" value={m.year} />
+                            <input type="hidden" name="month" value={m.month} />
+                            <span className="month-label">{m.label}</span>
+                            <label className="month-toggle">
+                              <input
+                                type="checkbox"
+                                name="blocked"
+                                defaultChecked={isBlocked}
+                              />
+                              <span>{ta("blocked")}</span>
+                            </label>
+                            <button type="submit" className="btn small ghost">
+                              {ta("save")}
+                            </button>
+                          </form>
+                        </li>
+                      );
+                    })}
+                  </ul>
                 </article>
               );
             })}
           </div>
-        </div>
+        </section>
       ))}
-    </section>
+    </>
   );
 }

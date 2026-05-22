@@ -6,6 +6,7 @@ import { getWorkspace } from "@/lib/workspace";
 import { Link } from "@/i18n/navigation";
 import { formatMoney } from "@/lib/money";
 import { tally, averageOrderValue } from "@/lib/reporting";
+import { EmptyState } from "@/app/empty-state";
 
 export const dynamic = "force-dynamic";
 
@@ -20,9 +21,7 @@ export default async function MyReportsPage({
 
   const session = await auth();
   const ws = await getWorkspace(session?.user?.id);
-  if (!ws) {
-    redirect(`/${locale}/signin`);
-  }
+  if (!ws) redirect(`/${locale}/signin`);
 
   const orders = await prisma.order.findMany({
     where: { organizationId: { in: ws.scopeOrgIds } },
@@ -33,18 +32,18 @@ export default async function MyReportsPage({
     },
   });
 
-  const byCurrency = [
-    ...new Set(orders.map((o) => o.quote.currency)),
-  ].map((cur) => {
-    const inCur = orders.filter((o) => o.quote.currency === cur);
-    const spend = inCur.reduce((s, o) => s + Number(o.quote.total), 0);
-    return {
-      currency: cur,
-      count: inCur.length,
-      spend,
-      aov: averageOrderValue(spend, inCur.length),
-    };
-  });
+  const byCurrency = [...new Set(orders.map((o) => o.quote.currency))].map(
+    (cur) => {
+      const inCur = orders.filter((o) => o.quote.currency === cur);
+      const spend = inCur.reduce((s, o) => s + Number(o.quote.total), 0);
+      return {
+        currency: cur,
+        count: inCur.length,
+        spend,
+        aov: averageOrderValue(spend, inCur.length),
+      };
+    },
+  );
 
   const statusRows = tally(orders.map((o) => o.status));
 
@@ -63,52 +62,83 @@ export default async function MyReportsPage({
   );
 
   return (
-    <section>
-      <h1>{t("mySpend")}</h1>
-      <p className="muted">{t("mySubtitle")}</p>
+    <>
+      <header className="page-header">
+        <span className="eyebrow accent">{t("eyebrowOrg")}</span>
+        <h1>{t("mySpend")}</h1>
+        <p className="lead">{t("mySubtitle")}</p>
+      </header>
 
       {orders.length === 0 ? (
-        <p>
-          {t("none")} <Link href="/catalog">{tNav("catalog")}</Link>
-        </p>
+        <EmptyState
+          title={t("none")}
+          primaryHref="/catalog"
+          primaryLabel={tNav("catalog")}
+        />
       ) : (
         <>
-          <div className="grid">
+          <div className="kpi-grid">
             {byCurrency.map((c) => (
-              <article className="card" key={c.currency}>
-                <h3>{c.currency}</h3>
-                <div className="muted">
-                  {t("orders")}: {c.count}
+              <div className="kpi" key={c.currency}>
+                <div className="label">
+                  {t("gmv")} · {c.currency}
                 </div>
-                <div className="muted">
-                  {t("gmv")}: {formatMoney(c.spend, c.currency, locale)}
+                <div className="value">
+                  {formatMoney(c.spend, c.currency, locale)}
                 </div>
-                <div className="muted">
-                  {t("aov")}: {formatMoney(c.aov, c.currency, locale)}
+                <div className="delta">
+                  {c.count} {t("orders").toLowerCase()} · {t("aov")}:{" "}
+                  {formatMoney(c.aov, c.currency, locale)}
                 </div>
-              </article>
-            ))}
-          </div>
-
-          <h2 style={{ marginTop: 24 }}>{t("byStatus")}</h2>
-          <div className="card">
-            {statusRows.map((r) => (
-              <div key={r.key} className="muted">
-                {r.key}: {r.count}
               </div>
             ))}
           </div>
 
-          <h2 style={{ marginTop: 24 }}>{t("byCategory")}</h2>
-          <div className="card">
-            {categoryRows.map((r) => (
-              <div key={r.key} className="muted">
-                {r.key}: {r.count}
+          <div className="grid two">
+            <section>
+              <div className="section-head">
+                <h2>{t("byStatus")}</h2>
               </div>
-            ))}
+              <BreakdownList rows={statusRows} t={t} />
+            </section>
+            <section>
+              <div className="section-head">
+                <h2>{t("byCategory")}</h2>
+              </div>
+              <BreakdownList rows={categoryRows} t={t} />
+            </section>
           </div>
         </>
       )}
-    </section>
+    </>
+  );
+}
+
+function BreakdownList({
+  rows,
+  t,
+}: {
+  rows: { key: string; count: number }[];
+  t: (k: string) => string;
+}) {
+  if (rows.length === 0) return <p className="muted">{t("none")}</p>;
+  const total = rows.reduce((s, r) => s + r.count, 0) || 1;
+  return (
+    <div className="breakdown">
+      {rows.map((r) => {
+        const pct = Math.round((r.count / total) * 100);
+        return (
+          <div className="breakdown-row" key={r.key}>
+            <div className="breakdown-label">
+              <span>{r.key}</span>
+              <span className="muted small">{r.count}</span>
+            </div>
+            <div className="breakdown-bar" aria-hidden>
+              <span style={{ width: `${pct}%` }} />
+            </div>
+          </div>
+        );
+      })}
+    </div>
   );
 }

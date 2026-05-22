@@ -51,6 +51,7 @@
     "none": "Ingen data endnu.",
     "mySpend": "Mit forbrug",
     "mySubtitle": "Organisationens ordrer og forbrug.",
+    "eyebrowOrg": "Forbrug",
     "reportsHeadline": "Efterspørgsel, konvertering og omsætning i ét blik",
     "conversionSub": "Briefer der blev til ordrer",
     "gmvEyebrow": "Bruttoværdi",
@@ -87,8 +88,16 @@
     "remaining": "Budget tilbage",
     "none": "Ingen miks passer til det budget — prøv et højere budget eller et andet marked.",
     "addAll": "Føj alle til planen",
-    "hint": "Vælg marked og budget for at se et forslag, eller",
-    "browse": "gennemse kataloget"
+    "hint": "Vælg marked og budget ovenfor for at se et forslag.",
+    "browse": "Se kataloget",
+    "eyebrow": "Anbefaling",
+    "hintTitle": "Fortæl os marked og budget",
+    "marketPlaceholder": "Vælg et marked",
+    "reachSub": "Samlet månedlig rækkevidde",
+    "ofBudget": "af {budget} budget",
+    "remainingSub": "Plads til flere linjer",
+    "mixEyebrow": "Foreslået miks",
+    "mixHeading": "Titler der passer til briefen"
   },
   "home": {
     "eyebrow": "BeNative — det nordiske native-marked",
@@ -155,14 +164,19 @@
     "bookableSummary": "{count, plural, =0 {Ingen direkte booking} =1 {1 kan bookes direkte} other {# kan bookes direkte}}"
   },
   "plan": {
+    "eyebrow": "Plan",
     "title": "Din plan",
+    "lead": "Gennemgå dine placeringer og send briefen til desk for et fast tilbud — eller køb direkte hvis alle linjer understøtter det.",
     "empty": "Din plan er tom.",
     "browse": "Se kataloget",
     "remove": "Fjern",
     "qty": "Antal",
     "estTotal": "Anslået vejledende total",
     "rfqTitle": "Anmod om et fast tilbud",
-    "error": "Tilføj mindst én placering og udfyld virksomhed, e-mail og marked."
+    "error": "Tilføj mindst én placering og udfyld virksomhed, e-mail og marked.",
+    "linesEyebrow": "Valgt",
+    "linesHeading": "Dine placeringer",
+    "itemCount": "{count, plural, =0 {0 linjer} =1 {1 linje} other {# linjer}}"
   },
   "rfq": {
     "org": "Virksomhed",
@@ -379,10 +393,12 @@
   },
   "invoice": {
     "title": "Faktura",
+    "eyebrow": "Faktura",
     "status": "Status",
     "billTo": "Faktureres til",
     "issued": "Udstedt",
     "due": "Forfalder",
+    "currency": "Valuta",
     "subtotal": "Subtotal",
     "vat": "Moms",
     "total": "Total"
@@ -524,7 +540,12 @@
     "title": "Tilgængelighed",
     "subtitle": "Bloker måneder du ikke kan levere — kataloget skjuler fast­pris­produkter for blokerede måneder, og selv­betjeningskassen afviser dem.",
     "blocked": "Blokeret",
-    "save": "Gem"
+    "save": "Gem",
+    "kpiBlocked": "Blokerede måneder",
+    "kpiBlockedSub": "På tværs af produkter",
+    "kpiHorizon": "Måneder frem",
+    "kpiHorizonSub": "Redigerbar horisont",
+    "titleEyebrow": "Titel"
   },
   "marketing": {
     "howCta": "Sådan virker det",

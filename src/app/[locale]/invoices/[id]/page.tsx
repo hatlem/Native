@@ -21,46 +21,81 @@ export default async function InvoicePage({
   if (!invoice) notFound();
 
   return (
-    <section>
-      <h1>
-        {t("title")} #{invoice.id.slice(-8).toUpperCase()}
-      </h1>
-      <p className="muted">
-        {t("status")}: <StatusBadge value={invoice.status} />
-      </p>
-      <p className="muted">
-        {t("billTo")}: {invoice.organization.name}
-      </p>
-      {invoice.issuedAt ? (
-        <p className="muted">
-          {t("issued")}: {invoice.issuedAt.toISOString().slice(0, 10)}
-        </p>
-      ) : null}
-      {invoice.dueAt ? (
-        <p className="muted">
-          {t("due")}: {invoice.dueAt.toISOString().slice(0, 10)}
-        </p>
-      ) : null}
-
-      <div className="card" style={{ marginTop: 16 }}>
-        {invoice.lines.map((l) => (
-          <div key={l.id} className="muted">
-            {l.description} × {l.quantity} —{" "}
-            {formatMoney(Number(l.lineTotal), invoice.currency, locale)}
-          </div>
-        ))}
-        <div style={{ marginTop: 12 }}>
-          {t("subtotal")}:{" "}
-          {formatMoney(Number(invoice.subtotal), invoice.currency, locale)}
-          <br />
-          {t("vat")} ({Number(invoice.vatPct)}%)
-          <br />
-          <span className="price">
-            {t("total")}:{" "}
-            {formatMoney(Number(invoice.total), invoice.currency, locale)}
-          </span>
+    <div className="invoice-shell">
+      <header className="invoice-head">
+        <div>
+          <span className="eyebrow accent">{t("eyebrow")}</span>
+          <h1>
+            {t("title")} #{invoice.id.slice(-8).toUpperCase()}
+          </h1>
         </div>
-      </div>
-    </section>
+        <StatusBadge value={invoice.status} />
+      </header>
+
+      <dl className="invoice-meta">
+        <div>
+          <dt>{t("billTo")}</dt>
+          <dd>{invoice.organization.name}</dd>
+        </div>
+        {invoice.issuedAt ? (
+          <div>
+            <dt>{t("issued")}</dt>
+            <dd>{invoice.issuedAt.toISOString().slice(0, 10)}</dd>
+          </div>
+        ) : null}
+        {invoice.dueAt ? (
+          <div>
+            <dt>{t("due")}</dt>
+            <dd>{invoice.dueAt.toISOString().slice(0, 10)}</dd>
+          </div>
+        ) : null}
+        <div>
+          <dt>{t("currency")}</dt>
+          <dd>{invoice.currency}</dd>
+        </div>
+      </dl>
+
+      <article className="quote-card">
+        <div className="quote-lines">
+          {invoice.lines.map((l) => (
+            <div key={l.id} className="quote-line">
+              <span>
+                {l.description}{" "}
+                <span className="muted">× {l.quantity}</span>
+              </span>
+              <span className="num">
+                {formatMoney(Number(l.lineTotal), invoice.currency, locale)}
+              </span>
+            </div>
+          ))}
+        </div>
+        <div className="quote-totals">
+          <div className="quote-row">
+            <span className="muted">{t("subtotal")}</span>
+            <span className="num">
+              {formatMoney(Number(invoice.subtotal), invoice.currency, locale)}
+            </span>
+          </div>
+          <div className="quote-row">
+            <span className="muted">
+              {t("vat")} ({Number(invoice.vatPct)}%)
+            </span>
+            <span className="num">
+              {formatMoney(
+                Number(invoice.total) - Number(invoice.subtotal),
+                invoice.currency,
+                locale,
+              )}
+            </span>
+          </div>
+          <div className="quote-row total">
+            <span>{t("total")}</span>
+            <span className="num">
+              {formatMoney(Number(invoice.total), invoice.currency, locale)}
+            </span>
+          </div>
+        </div>
+      </article>
+    </div>
   );
 }
