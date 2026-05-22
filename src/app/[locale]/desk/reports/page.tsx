@@ -19,6 +19,7 @@ export default async function DeskReportsPage({
   const { locale } = await params;
   const t = await getTranslations({ locale, namespace: "reports" });
   const to = await getTranslations({ locale, namespace: "order" });
+  const td = await getTranslations({ locale, namespace: "desk" });
 
   const [requestCount, orders, orderLines, markets, invoices] =
     await Promise.all([
@@ -34,7 +35,6 @@ export default async function DeskReportsPage({
       prisma.invoice.findMany({ select: { status: true } }),
     ]);
 
-  // KPIs grouped by currency so NOK/SEK/DKK never sum together.
   const currencies = [...new Set(markets.map((m) => m.currency))];
   const kpis = currencies
     .map((cur) => {
@@ -50,15 +50,6 @@ export default async function DeskReportsPage({
     .filter((k) => k.count > 0);
 
   const statusRows = tally(orders.map((o) => o.status));
-
-  const spendByCurrency = currencies
-    .map((cur) => ({
-      currency: cur,
-      total: orders
-        .filter((o) => o.quote.currency === cur)
-        .reduce((s, o) => s + Number(o.quote.total), 0),
-    }))
-    .filter((r) => r.total > 0);
 
   const products = orderLines.length
     ? await prisma.product.findMany({
@@ -78,100 +69,122 @@ export default async function DeskReportsPage({
   );
 
   return (
-    <section>
-      <p>
-        <Link href="/desk">← {to("back")}</Link>
-      </p>
-      <h1>{t("title")}</h1>
-      <p className="muted">{t("subtitle")}</p>
+    <>
+      <nav className="breadcrumb">
+        <Link href="/desk" className="small-link">
+          ← {td("title")}
+        </Link>
+      </nav>
 
-      <div className="grid">
-        <article className="card">
-          <h3>{t("requests")}</h3>
-          <div className="price">{requestCount}</div>
-        </article>
-        <article className="card">
-          <h3>{to("orders")}</h3>
-          <div className="price">{orders.length}</div>
-        </article>
-        <article className="card">
-          <h3>{t("conversion")}</h3>
-          <div className="price">
-            {conversionPct(requestCount, orders.length)}%
-          </div>
-        </article>
-      </div>
+      <header className="page-header">
+        <span className="eyebrow accent">{td("eyebrow")} · {t("title")}</span>
+        <h1>{t("reportsHeadline")}</h1>
+        <p className="lead">{t("subtitle")}</p>
+      </header>
 
-      <h2 style={{ marginTop: 24 }}>{t("gmv")}</h2>
-      {kpis.length === 0 ? (
-        <p className="note">{t("none")}</p>
-      ) : (
-        <div className="grid">
-          {kpis.map((k) => (
-            <article className="card" key={k.currency}>
-              <h3>{k.currency}</h3>
-              <div className="muted">
-                {t("gmv")}: {formatMoney(k.gmv, k.currency, locale)}
-              </div>
-              <div className="muted">
-                {t("aov")}: {formatMoney(k.aov, k.currency, locale)}
-              </div>
-            </article>
-          ))}
+      <div className="kpi-grid">
+        <div className="kpi">
+          <div className="label">{t("requests")}</div>
+          <div className="value">{requestCount}</div>
         </div>
-      )}
-
-      <h2 style={{ marginTop: 24 }}>{t("byStatus")}</h2>
-      <div className="card">
-        {statusRows.length === 0 ? (
-          <span className="muted">{t("none")}</span>
-        ) : (
-          statusRows.map((r) => (
-            <div key={r.key} className="muted">
-              {r.key}: {r.count}
-            </div>
-          ))
-        )}
+        <div className="kpi">
+          <div className="label">{to("orders")}</div>
+          <div className="value">{orders.length}</div>
+        </div>
+        <div className="kpi">
+          <div className="label">{t("conversion")}</div>
+          <div className="value">{conversionPct(requestCount, orders.length)}%</div>
+          <div className="delta">{t("conversionSub")}</div>
+        </div>
       </div>
 
-      <h2 style={{ marginTop: 24 }}>{t("byMarket")}</h2>
-      <div className="card">
-        {spendByCurrency.length === 0 ? (
-          <span className="muted">{t("none")}</span>
+      <section className="section">
+        <div className="section-head">
+          <div>
+            <span className="eyebrow">{t("gmvEyebrow")}</span>
+            <h2>{t("gmv")}</h2>
+          </div>
+          {kpis.length > 0 ? (
+            <span className="muted small">{t("gmvNote")}</span>
+          ) : null}
+        </div>
+        {kpis.length === 0 ? (
+          <p className="muted">{t("none")}</p>
         ) : (
-          spendByCurrency.map((r) => (
-            <div key={r.currency} className="muted">
-              {r.currency}: {formatMoney(r.total, r.currency, locale)}
-            </div>
-          ))
+          <div className="grid">
+            {kpis.map((k) => (
+              <article className="card" key={k.currency}>
+                <span className="tag">{k.currency}</span>
+                <h3>{formatMoney(k.gmv, k.currency, locale)}</h3>
+                <p className="muted small">
+                  {t("orderCount", { count: k.count })}
+                </p>
+                <p className="muted small">
+                  {t("aov")}: {formatMoney(k.aov, k.currency, locale)}
+                </p>
+              </article>
+            ))}
+          </div>
         )}
-      </div>
+      </section>
 
-      <h2 style={{ marginTop: 24 }}>{t("byCategory")}</h2>
-      <div className="card">
-        {categoryRows.length === 0 ? (
-          <span className="muted">{t("none")}</span>
-        ) : (
-          categoryRows.map((r) => (
-            <div key={r.key} className="muted">
-              {r.key}: {r.count}
-            </div>
-          ))
-        )}
-      </div>
+      <div className="grid two">
+        <section>
+          <div className="section-head">
+            <h2>{t("byStatus")}</h2>
+          </div>
+          <BreakdownList rows={statusRows} t={t} kind="count" />
+        </section>
 
-      <h2 style={{ marginTop: 24 }}>{t("invoices")}</h2>
-      <div className="card">
-        {invoiceRows.length === 0 ? (
-          <span className="muted">{t("none")}</span>
-        ) : (
-          invoiceRows.map((r) => (
-            <div key={r.group} className="muted">
-              {r.group}: {r.amount}
-            </div>
-          ))
-        )}
+        <section>
+          <div className="section-head">
+            <h2>{t("byCategory")}</h2>
+          </div>
+          <BreakdownList rows={categoryRows} t={t} kind="count" />
+        </section>
+
+        <section>
+          <div className="section-head">
+            <h2>{t("invoices")}</h2>
+          </div>
+          <BreakdownList
+            rows={invoiceRows.map((r) => ({ key: r.group, count: r.amount }))}
+            t={t}
+            kind="count"
+          />
+        </section>
       </div>
-    </section>
+    </>
+  );
+}
+
+function BreakdownList({
+  rows,
+  t,
+  kind,
+}: {
+  rows: { key: string; count: number }[];
+  t: (k: string) => string;
+  kind: "count";
+}) {
+  if (rows.length === 0) return <p className="muted">{t("none")}</p>;
+  const total = rows.reduce((s, r) => s + r.count, 0) || 1;
+  return (
+    <div className="breakdown">
+      {rows.map((r) => {
+        const pct = Math.round((r.count / total) * 100);
+        return (
+          <div className="breakdown-row" key={r.key}>
+            <div className="breakdown-label">
+              <span>{r.key}</span>
+              <span className="muted small">{kind === "count" ? r.count : r.count}</span>
+            </div>
+            <div className="breakdown-bar" aria-hidden>
+              <span style={{ width: `${pct}%` }} />
+            </div>
+          </div>
+        );
+      })}
+    </div>
   );
 }

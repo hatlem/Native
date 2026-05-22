@@ -50,7 +50,12 @@
     "invoices": "Fakturaer efter status",
     "none": "Ingen data endnu.",
     "mySpend": "Mit forbrug",
-    "mySubtitle": "Organisationens ordrer og forbrug."
+    "mySubtitle": "Organisationens ordrer og forbrug.",
+    "reportsHeadline": "Efterspørgsel, konvertering og omsætning i ét blik",
+    "conversionSub": "Briefer der blev til ordrer",
+    "gmvEyebrow": "Bruttoværdi",
+    "gmvNote": "Per valuta — aldrig summeret på tværs af NOK/SEK/DKK",
+    "orderCount": "{count, plural, =0 {0 ordrer} =1 {1 ordre} other {# ordrer}}"
   },
   "agency": {
     "title": "Bureauarbejdsområde",
@@ -249,6 +254,12 @@
     "acceptedOrder": "Accepteret — ordre oprettet."
   },
   "deskTitles": {
+    "eyebrow": "Superadmin · titler",
+    "activeSub": "Vises i /catalog",
+    "inactiveSub": "Skjult fra /catalog",
+    "unverifiedSub": "Skal have udgiver-site-tjek",
+    "marketEyebrow": "Marked",
+    "titleCount": "{count, plural, =0 {0 titler} =1 {1 titel} other {# titler}}",
     "title": "Titler og magasiner",
     "subtitle": "Super-admin gennemgang af alle titler i kataloget. Tjek om udgiveren tilbyder native, og slå det til.",
     "counts": {
@@ -324,7 +335,17 @@
     "open": "Åbn",
     "back": "Tilbage til desk",
     "issueInvoice": "Udsted faktura",
-    "viewInvoice": "Se faktura"
+    "viewInvoice": "Se faktura",
+    "deskLead": "Alle ordrer på tværs af alle kunder — produktion, planlægning og live-publicering.",
+    "customer": "Kunde",
+    "total": "Total",
+    "created": "Oprettet",
+    "kpiInProgress": "I gang",
+    "kpiLive": "Live",
+    "kpiCompleted": "Afsluttet",
+    "listEyebrow": "Alle ordrer",
+    "listHeading": "Ordrepipeline",
+    "totalCount": "{count, plural, =0 {0 ordrer} =1 {1 ordre} other {# ordrer}}"
   },
   "production": {
     "brief": "Brief",

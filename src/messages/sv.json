@@ -50,7 +50,12 @@
     "invoices": "Fakturor efter status",
     "none": "Ingen data ännu.",
     "mySpend": "Mina utgifter",
-    "mySubtitle": "Organisationens order och utgifter."
+    "mySubtitle": "Organisationens order och utgifter.",
+    "reportsHeadline": "Efterfrågan, konvertering och intäkter i ett ögonkast",
+    "conversionSub": "Briefer som blev beställningar",
+    "gmvEyebrow": "Bruttovärde",
+    "gmvNote": "Per valuta — aldrig summerat över NOK/SEK/DKK",
+    "orderCount": "{count, plural, =0 {0 ordrar} =1 {1 order} other {# ordrar}}"
   },
   "agency": {
     "title": "Byråarbetsyta",
@@ -249,6 +254,12 @@
     "acceptedOrder": "Accepterad — order skapad."
   },
   "deskTitles": {
+    "eyebrow": "Superadmin · titlar",
+    "activeSub": "Visas i /catalog",
+    "inactiveSub": "Dolda från /catalog",
+    "unverifiedSub": "Behöver utgivar-sajt-koll",
+    "marketEyebrow": "Marknad",
+    "titleCount": "{count, plural, =0 {0 titlar} =1 {1 titel} other {# titlar}}",
     "title": "Titlar och magasin",
     "subtitle": "Super-admin granskar varje titel i katalogen. Kontrollera om utgivaren erbjuder native och slå på det.",
     "counts": {
@@ -324,7 +335,17 @@
     "open": "Öppna",
     "back": "Tillbaka till desk",
     "issueInvoice": "Skapa faktura",
-    "viewInvoice": "Visa faktura"
+    "viewInvoice": "Visa faktura",
+    "deskLead": "Alla ordrar för alla kunder — produktion, schemaläggning och live-publicering.",
+    "customer": "Kund",
+    "total": "Totalt",
+    "created": "Skapad",
+    "kpiInProgress": "Pågående",
+    "kpiLive": "Live",
+    "kpiCompleted": "Avslutad",
+    "listEyebrow": "Alla ordrar",
+    "listHeading": "Orderpipeline",
+    "totalCount": "{count, plural, =0 {0 ordrar} =1 {1 order} other {# ordrar}}"
   },
   "production": {
     "brief": "Brief",

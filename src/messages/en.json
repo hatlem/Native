@@ -94,7 +94,12 @@
     "invoices": "Invoices by status",
     "none": "No data yet.",
     "mySpend": "My spend",
-    "mySubtitle": "Your organization's orders and spend."
+    "mySubtitle": "Your organization's orders and spend.",
+    "reportsHeadline": "Demand, conversion and revenue at a glance",
+    "conversionSub": "Briefs that became orders",
+    "gmvEyebrow": "Gross merchandise value",
+    "gmvNote": "Per currency — never summed across NOK/SEK/DKK",
+    "orderCount": "{count, plural, =0 {0 orders} =1 {1 order} other {# orders}}"
   },
   "agency": {
     "title": "Agency workspace",
@@ -293,8 +298,14 @@
     "acceptedOrder": "Accepted — order created."
   },
   "deskTitles": {
+    "eyebrow": "Super-admin · titles",
     "title": "Titles & magazines",
     "subtitle": "Super-admin review of every catalog title. Check whether each publisher offers native and turn it on.",
+    "activeSub": "Showing in /catalog",
+    "inactiveSub": "Hidden from /catalog",
+    "unverifiedSub": "Need a publisher-site check",
+    "marketEyebrow": "Market",
+    "titleCount": "{count, plural, =0 {0 titles} =1 {1 title} other {# titles}}",
     "counts": {
       "active": "Live in catalog",
       "inactive": "Not in catalog",
@@ -368,7 +379,17 @@
     "open": "Open",
     "back": "Back to desk",
     "issueInvoice": "Issue invoice",
-    "viewInvoice": "View invoice"
+    "viewInvoice": "View invoice",
+    "deskLead": "Every order across all customers — production, scheduling and live placement.",
+    "customer": "Customer",
+    "total": "Total",
+    "created": "Created",
+    "kpiInProgress": "In progress",
+    "kpiLive": "Live",
+    "kpiCompleted": "Completed",
+    "listEyebrow": "All orders",
+    "listHeading": "Order pipeline",
+    "totalCount": "{count, plural, =0 {0 orders} =1 {1 order} other {# orders}}"
   },
   "production": {
     "brief": "Brief",
