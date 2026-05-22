@@ -1100,6 +1100,168 @@ form:not(.filters):not(.cmdk-form) button[type="submit"]:not(.btn):hover {
   margin-right: 4px;
 }
 
+/* ---------- Auth shell ---------- */
+
+.auth-shell {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 480px);
+  gap: var(--s-7);
+  align-items: stretch;
+  margin: 0 auto;
+  max-width: 1080px;
+  padding: var(--s-6) 0 var(--s-8);
+}
+
+@media (max-width: 880px) {
+  .auth-shell {
+    grid-template-columns: 1fr;
+    gap: var(--s-5);
+    padding: var(--s-3) 0 var(--s-6);
+  }
+}
+
+.auth-shell .marketing {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding-right: var(--s-4);
+}
+
+.auth-shell .marketing h1 {
+  font-size: clamp(2.2rem, 1.5rem + 3vw, 3.4rem);
+  letter-spacing: -0.032em;
+  margin: 0 0 var(--s-4);
+  max-width: 14ch;
+}
+
+.auth-shell .marketing .lead {
+  color: var(--muted-strong);
+  font-size: 1.05rem;
+  max-width: 36ch;
+  margin: 0 0 var(--s-5);
+}
+
+.auth-shell .marketing .pull {
+  margin-top: auto;
+  padding-top: var(--s-5);
+  border-top: 1px solid var(--border);
+  color: var(--muted);
+  font-size: 0.92rem;
+  max-width: 38ch;
+}
+
+.auth-shell .marketing .pull strong {
+  color: var(--heading);
+  display: block;
+  font-weight: 600;
+  margin-bottom: 4px;
+}
+
+.auth-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--r-lg);
+  padding: var(--s-6);
+  display: flex;
+  flex-direction: column;
+  gap: var(--s-4);
+}
+
+@media (max-width: 480px) {
+  .auth-card { padding: var(--s-5) var(--s-4); }
+}
+
+.auth-card .head h2 {
+  font-size: 1.45rem;
+  margin: 0 0 4px;
+  letter-spacing: -0.018em;
+}
+
+.auth-card .head p {
+  margin: 0;
+  color: var(--muted);
+  font-size: 0.92rem;
+}
+
+.auth-card form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--s-3);
+}
+
+.auth-card form .actions {
+  margin-top: var(--s-2);
+}
+
+.auth-card .alt {
+  text-align: center;
+  font-size: 0.9rem;
+  color: var(--muted);
+  margin-top: var(--s-2);
+}
+
+.auth-card .alt a { color: var(--accent); font-weight: 540; }
+.auth-card .alt a:hover { color: var(--accent-hover); text-decoration: underline; }
+
+.demo-block {
+  border-top: 1px solid var(--border);
+  padding-top: var(--s-4);
+  margin-top: var(--s-2);
+}
+
+.demo-block .label {
+  font-size: 0.78rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  color: var(--muted);
+  margin-bottom: var(--s-2);
+}
+
+.demo-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.demo-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: var(--surface-2);
+  color: var(--text);
+  border: 1px solid var(--border);
+  border-radius: var(--r-pill);
+  padding: 6px 12px;
+  font-size: 0.82rem;
+  font-weight: 540;
+  cursor: pointer;
+  transition: background var(--t-fast), border-color var(--t-fast);
+}
+
+.demo-chip:hover {
+  background: var(--surface);
+  border-color: var(--muted-strong);
+}
+
+.demo-chip[data-active="true"] {
+  background: var(--ink);
+  color: var(--primary-contrast);
+  border-color: var(--ink);
+}
+
+.banner-error {
+  background: var(--danger-soft);
+  color: var(--danger);
+  border: 1px solid color-mix(in srgb, var(--danger) 30%, transparent);
+  border-radius: var(--r-sm);
+  padding: 10px 14px;
+  font-size: 0.9rem;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
 /* ---------- Forms (filters + global field styling) ---------- */
 
 label {
