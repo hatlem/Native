@@ -14,10 +14,10 @@ const inter = Inter({
 });
 
 const DESK_MAILTO =
-  "mailto:desk@benative.example?subject=Talk%20to%20the%20BeNative%20desk";
+  "mailto:desk@atnative.com?subject=Talk%20to%20the%20ATNative%20desk";
 
 export const metadata = {
-  title: "BeNative — One brief. 240+ Nordic titles. Firm quote in 24 hours.",
+  title: "ATNative — One brief. 3,000+ titles across 9 European markets. Firm quote in 24 hours.",
 };
 
 export const dynamic = "force-dynamic";
@@ -50,43 +50,48 @@ export default async function HomePage({
   const { locale } = await params;
   const t = await getTranslations({ locale, namespace: "landing" });
 
-  // All titles have a Market FK now (NOT NULL across all 9 catalog
-  // countries — NO, SE, DK, FI, DE, AT, CH, UK, IE).
-  const [sampleTitles, publishersRaw, totalActiveTitles, totalPublishers] =
-    await Promise.all([
-      prisma.title.findMany({
-        where: {
-          active: true,
-          products: { some: { active: true, visibility: "INDICATIVE" } },
+  // Catalog reach: report the full catalogued size (3,000+ titles across
+  // all 9 markets — NO, SE, DK, FI, DE, AT, CH, UK, IE), not only the
+  // small subset already verified for instant booking. The sample table
+  // still pulls from active titles with indicative pricing.
+  const [
+    sampleTitles,
+    publishersRaw,
+    totalActiveTitles,
+    totalTitles,
+    totalPublishers,
+  ] = await Promise.all([
+    prisma.title.findMany({
+      where: {
+        active: true,
+        products: { some: { active: true, visibility: "INDICATIVE" } },
+      },
+      orderBy: [{ monthlyReach: "desc" }, { name: "asc" }],
+      take: 8,
+      include: {
+        publisher: { select: { name: true } },
+        market: { select: { code: true, currency: true } },
+        products: {
+          where: { active: true, visibility: "INDICATIVE" },
+          orderBy: { basePrice: "asc" },
+          include: { priceRules: true },
+          take: 1,
         },
-        orderBy: [{ monthlyReach: "desc" }, { name: "asc" }],
-        take: 8,
-        include: {
-          publisher: { select: { name: true } },
-          market: { select: { code: true, currency: true } },
-          products: {
-            where: { active: true, visibility: "INDICATIVE" },
-            orderBy: { basePrice: "asc" },
-            include: { priceRules: true },
-            take: 1,
-          },
+      },
+    }),
+    prisma.publisher.findMany({
+      where: { titles: { some: {} } },
+      include: {
+        market: { select: { code: true } },
+        titles: {
+          select: { market: { select: { code: true } } },
         },
-      }),
-      prisma.publisher.findMany({
-        where: { titles: { some: { active: true } } },
-        include: {
-          market: { select: { code: true } },
-          titles: {
-            where: { active: true },
-            select: { market: { select: { code: true } } },
-          },
-        },
-      }),
-      prisma.title.count({ where: { active: true } }),
-      prisma.publisher.count({
-        where: { titles: { some: { active: true } } },
-      }),
-    ]);
+      },
+    }),
+    prisma.title.count({ where: { active: true } }),
+    prisma.title.count(),
+    prisma.publisher.count(),
+  ]);
 
   const featuredId = sampleTitles[2]?.id;
 
@@ -123,6 +128,7 @@ export default async function HomePage({
             <span className="row">{t("hero.h1Line1")}</span>
             <span className="row">{t("hero.h1Line2")}</span>
             <span className="row ink-mute">{t("hero.h1Line3")}</span>
+            <span className="row ink-mute">{t("hero.h1Line4")}</span>
           </h1>
 
           <div className="hero-cluster">
@@ -246,7 +252,8 @@ export default async function HomePage({
             <div className="meta">
               {t("pubs.meta", {
                 publishers: totalPublishers,
-                titles: totalActiveTitles,
+                titles: totalTitles,
+                active: totalActiveTitles,
               })}
             </div>
           </div>
@@ -267,8 +274,6 @@ export default async function HomePage({
                       {i < arr.length - 1 ? " · " : ""}
                     </span>
                   ))}
-                  {" — "}
-                  {p.count} {t("pubs.titlesSuffix")}
                 </div>
               </div>
             ))}
@@ -368,17 +373,12 @@ export default async function HomePage({
       {/* STATS */}
       <section className="stats" aria-label={t("hero.sideAria")}>
         <div className="cell">
-          <div className="v">
-            240
-            <span style={{ fontSize: "0.5em", color: "var(--ink-mute)", fontWeight: 500 }}>
-              +
-            </span>
-          </div>
+          <div className="v">{totalTitles.toLocaleString(locale)}</div>
           <div className="l">{t("stats.v240Label")}</div>
           <div className="sub">{t("stats.v240Sub")}</div>
         </div>
         <div className="cell">
-          <div className="v">12</div>
+          <div className="v">{totalPublishers.toLocaleString(locale)}</div>
           <div className="l">{t("stats.v12Label")}</div>
           <div className="sub">{t("stats.v12Sub")}</div>
         </div>
@@ -394,7 +394,7 @@ export default async function HomePage({
           <div className="sub">{t("stats.v24Sub")}</div>
         </div>
         <div className="cell">
-          <div className="v">3</div>
+          <div className="v">9</div>
           <div className="l">{t("stats.v3Label")}</div>
           <div className="sub">{t("stats.v3Sub")}</div>
         </div>
@@ -470,7 +470,7 @@ export default async function HomePage({
       <footer className="page-foot">
         <div className="wrap">
           <div className="left">
-            <div className="brand-foot">BeNative</div>
+            <div className="brand-foot">ATNative</div>
             <div className="copy">{t("foot.tagline")}</div>
             <div className="copy" style={{ marginTop: 8 }}>
               © <span className="roman">MMXXVI</span> · {t("foot.copy")}
@@ -484,15 +484,14 @@ export default async function HomePage({
             <a href={DESK_MAILTO}>{t("foot.navContact")}</a>
           </nav>
           <div className="markets">
-            <span>
-              <span className="flag no"></span>NO
-            </span>
-            <span>
-              <span className="flag se"></span>SE
-            </span>
-            <span>
-              <span className="flag dk"></span>DK
-            </span>
+            {(["no", "se", "dk", "fi", "de", "at", "ch", "uk", "ie"] as const).map(
+              (m) => (
+                <span key={m}>
+                  <span className={`flag ${m}`}></span>
+                  {m.toUpperCase()}
+                </span>
+              ),
+            )}
           </div>
         </div>
       </footer>
@@ -541,6 +540,12 @@ body:has(.bn) header.site-header .nav button:hover { background: #3A3528 !import
   --NO: #BA0C2F;
   --SE: #006AA7;
   --DK: #C8102E;
+  --FI: #003580;
+  --DE: #1a1a1a;
+  --AT: #ED2939;
+  --CH: #DA291C;
+  --UK: #012169;
+  --IE: #009A44;
   --max: 1280px;
   --pad: clamp(20px, 4vw, 56px);
 
@@ -667,6 +672,12 @@ body:has(.bn) header.site-header .nav button:hover { background: #3A3528 !import
 .bn .flag.no { background: var(--NO); }
 .bn .flag.se { background: var(--SE); }
 .bn .flag.dk { background: var(--DK); }
+.bn .flag.fi { background: var(--FI); }
+.bn .flag.de { background: var(--DE); }
+.bn .flag.at { background: var(--AT); }
+.bn .flag.ch { background: var(--CH); }
+.bn .flag.uk { background: var(--UK); }
+.bn .flag.ie { background: var(--IE); }
 
 .bn .pubs-foot {
   margin-top: 22px;
