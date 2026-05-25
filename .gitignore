@@ -29,3 +29,6 @@ next-env.d.ts
 .playwright-mcp/
 sec-review.md
 sec-review-*.md
+
+# scenario fixtures (large binaries — kept out of git)
+test-fixtures/
