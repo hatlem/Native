@@ -1,6 +1,6 @@
 import { getTranslations } from "next-intl/server";
 import { redirect } from "next/navigation";
-import { MarketCode } from "@prisma/client";
+import { MarketCode, Prisma } from "@prisma/client";
 import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
 import { Link } from "@/i18n/navigation";
@@ -16,6 +16,14 @@ const MARKET_CODES = Object.values(MarketCode);
 const STATUS_VALUES = ["all", "unverified", "active", "no-native"] as const;
 type StatusFilter = (typeof STATUS_VALUES)[number];
 
+// Small fixed-domain CSV columns — perfect for dropdowns.
+const NATIVE_FIT_VALUES = ["High", "Medium", "Low"] as const;
+const FORMAT_VALUES = ["Print + Digital", "Digital", "Print"] as const;
+const B2B_B2C_VALUES = ["B2B", "B2C"] as const;
+const REACH_VALUES = ["National", "Regional", "Local", "International"] as const;
+
+const PAGE_SIZE = 60;
+
 function asMarket(value: string | undefined): MarketCode | undefined {
   return value && (MARKET_CODES as string[]).includes(value)
     ? (value as MarketCode)
@@ -26,6 +34,20 @@ function asStatus(value: string | undefined): StatusFilter {
   return value && (STATUS_VALUES as readonly string[]).includes(value)
     ? (value as StatusFilter)
     : "all";
+}
+
+function asEnumValue<T extends string>(
+  value: string | undefined,
+  allowed: readonly T[],
+): T | undefined {
+  return value && (allowed as readonly string[]).includes(value)
+    ? (value as T)
+    : undefined;
+}
+
+function str(sp: Record<string, string | string[] | undefined>, key: string) {
+  const v = sp[key];
+  return typeof v === "string" ? v.trim() : "";
 }
 
 export default async function DeskTitlesPage({
@@ -46,25 +68,64 @@ export default async function DeskTitlesPage({
   const tMarket = await getTranslations({ locale, namespace: "market" });
   const td = await getTranslations({ locale, namespace: "desk" });
 
-  const market = asMarket(typeof sp.market === "string" ? sp.market : undefined);
-  const status = asStatus(typeof sp.status === "string" ? sp.status : undefined);
+  const market = asMarket(str(sp, "market") || undefined);
+  const status = asStatus(str(sp, "status") || undefined);
+  const nativeFit = asEnumValue(str(sp, "nativeFit") || undefined, NATIVE_FIT_VALUES);
+  const format = asEnumValue(str(sp, "format") || undefined, FORMAT_VALUES);
+  const b2bB2c = asEnumValue(str(sp, "b2bB2c") || undefined, B2B_B2C_VALUES);
+  const reach = asEnumValue(str(sp, "reach") || undefined, REACH_VALUES);
+  const vertical = str(sp, "vertical");
+  const ownerGroup = str(sp, "ownerGroup");
+  const q = str(sp, "q");
+  const pageParam = parseInt(str(sp, "page") || "1", 10);
+  const page = Number.isFinite(pageParam) && pageParam >= 1 ? pageParam : 1;
 
-  const titles = await prisma.title.findMany({
-    where: {
-      ...(market ? { market: { code: market } } : {}),
-      ...(status === "unverified" ? { lastVerifiedAt: null } : {}),
-      ...(status === "active" ? { active: true } : {}),
-      ...(status === "no-native"
-        ? { active: false, lastVerifiedAt: { not: null } }
-        : {}),
-    },
-    include: {
-      publisher: true,
-      market: true,
-      _count: { select: { products: true } },
-    },
-    orderBy: [{ market: { code: "asc" } }, { publisher: { name: "asc" } }, { name: "asc" }],
-  });
+  const where: Prisma.TitleWhereInput = {
+    ...(market ? { market: { code: market } } : {}),
+    ...(status === "unverified" ? { lastVerifiedAt: null } : {}),
+    ...(status === "active" ? { active: true } : {}),
+    ...(status === "no-native"
+      ? { active: false, lastVerifiedAt: { not: null } }
+      : {}),
+    ...(nativeFit ? { nativeFit } : {}),
+    ...(format ? { format } : {}),
+    ...(b2bB2c ? { b2bB2c } : {}),
+    ...(reach ? { reach } : {}),
+    ...(vertical
+      ? { vertical: { contains: vertical, mode: "insensitive" } }
+      : {}),
+    ...(ownerGroup
+      ? { ownerGroup: { contains: ownerGroup, mode: "insensitive" } }
+      : {}),
+    ...(q
+      ? {
+          OR: [
+            { name: { contains: q, mode: "insensitive" } },
+            { publisherName: { contains: q, mode: "insensitive" } },
+            { tags: { contains: q, mode: "insensitive" } },
+          ],
+        }
+      : {}),
+  };
+
+  const [filteredCount, titles] = await Promise.all([
+    prisma.title.count({ where }),
+    prisma.title.findMany({
+      where,
+      include: {
+        publisher: true,
+        market: true,
+        _count: { select: { products: true } },
+      },
+      orderBy: [
+        { market: { code: "asc" } },
+        { publisher: { name: "asc" } },
+        { name: "asc" },
+      ],
+      take: PAGE_SIZE,
+      skip: (page - 1) * PAGE_SIZE,
+    }),
+  ]);
 
   const counts = await prisma.title.groupBy({
     by: ["active"],
@@ -76,13 +137,29 @@ export default async function DeskTitlesPage({
     where: { lastVerifiedAt: null },
   });
 
-  // Group by market for display.
   const byMarket = new Map<MarketCode, typeof titles>();
   for (const tt of titles) {
     const arr = byMarket.get(tt.market.code) ?? [];
     arr.push(tt);
     byMarket.set(tt.market.code, arr);
   }
+
+  const totalPages = Math.max(1, Math.ceil(filteredCount / PAGE_SIZE));
+  const pageQuery = (p: number) => {
+    const params = new URLSearchParams();
+    if (market) params.set("market", market);
+    if (status !== "all") params.set("status", status);
+    if (nativeFit) params.set("nativeFit", nativeFit);
+    if (format) params.set("format", format);
+    if (b2bB2c) params.set("b2bB2c", b2bB2c);
+    if (reach) params.set("reach", reach);
+    if (vertical) params.set("vertical", vertical);
+    if (ownerGroup) params.set("ownerGroup", ownerGroup);
+    if (q) params.set("q", q);
+    if (p > 1) params.set("page", String(p));
+    const s = params.toString();
+    return s ? `?${s}` : "";
+  };
 
   return (
     <section>
@@ -129,8 +206,83 @@ export default async function DeskTitlesPage({
             ))}
           </select>
         </div>
+        <div>
+          <label htmlFor="nativeFit">{t("filters.nativeFit")}</label>
+          <select id="nativeFit" name="nativeFit" defaultValue={nativeFit ?? ""}>
+            <option value="">{t("filters.all")}</option>
+            {NATIVE_FIT_VALUES.map((v) => (
+              <option key={v} value={v}>
+                {v}
+              </option>
+            ))}
+          </select>
+        </div>
+        <div>
+          <label htmlFor="format">{t("filters.format")}</label>
+          <select id="format" name="format" defaultValue={format ?? ""}>
+            <option value="">{t("filters.all")}</option>
+            {FORMAT_VALUES.map((v) => (
+              <option key={v} value={v}>
+                {v}
+              </option>
+            ))}
+          </select>
+        </div>
+        <div>
+          <label htmlFor="b2bB2c">{t("filters.b2bB2c")}</label>
+          <select id="b2bB2c" name="b2bB2c" defaultValue={b2bB2c ?? ""}>
+            <option value="">{t("filters.all")}</option>
+            {B2B_B2C_VALUES.map((v) => (
+              <option key={v} value={v}>
+                {v}
+              </option>
+            ))}
+          </select>
+        </div>
+        <div>
+          <label htmlFor="reach">{t("filters.reach")}</label>
+          <select id="reach" name="reach" defaultValue={reach ?? ""}>
+            <option value="">{t("filters.all")}</option>
+            {REACH_VALUES.map((v) => (
+              <option key={v} value={v}>
+                {v}
+              </option>
+            ))}
+          </select>
+        </div>
+        <div>
+          <label htmlFor="vertical">{t("filters.vertical")}</label>
+          <input
+            id="vertical"
+            name="vertical"
+            defaultValue={vertical}
+            placeholder={t("filters.verticalPlaceholder")}
+          />
+        </div>
+        <div>
+          <label htmlFor="ownerGroup">{t("filters.ownerGroup")}</label>
+          <input
+            id="ownerGroup"
+            name="ownerGroup"
+            defaultValue={ownerGroup}
+            placeholder={t("filters.ownerGroupPlaceholder")}
+          />
+        </div>
+        <div>
+          <label htmlFor="q">{t("filters.search")}</label>
+          <input
+            id="q"
+            name="q"
+            defaultValue={q}
+            placeholder={t("filters.searchPlaceholder")}
+          />
+        </div>
         <button type="submit">{t("filters.apply")}</button>
       </form>
+
+      <p className="muted" style={{ marginTop: 12 }}>
+        {t("resultCount", { count: filteredCount })}
+      </p>
 
       {titles.length === 0 ? (
         <p className="note" style={{ marginTop: 20 }}>
@@ -155,8 +307,63 @@ export default async function DeskTitlesPage({
                   <article className="card" key={title.id}>
                     <h3>{title.name}</h3>
                     <div className="muted">
-                      {title.publisher.name} · {title.category}
+                      {title.publisher.name}
+                      {title.ownerGroup &&
+                      title.ownerGroup !== title.publisher.name
+                        ? ` (${title.ownerGroup})`
+                        : ""}{" "}
+                      · {title.category}
                     </div>
+                    {title.type ||
+                    title.frequency ||
+                    title.b2bB2c ||
+                    title.format ||
+                    title.nativeFit ||
+                    title.reach ? (
+                      <div
+                        style={{
+                          marginTop: 8,
+                          display: "flex",
+                          gap: 6,
+                          flexWrap: "wrap",
+                        }}
+                      >
+                        {title.type ? (
+                          <span className="tag">{title.type}</span>
+                        ) : null}
+                        {title.frequency ? (
+                          <span className="tag">{title.frequency}</span>
+                        ) : null}
+                        {title.b2bB2c ? (
+                          <span className="tag">{title.b2bB2c}</span>
+                        ) : null}
+                        {title.format ? (
+                          <span className="tag">{title.format}</span>
+                        ) : null}
+                        {title.nativeFit ? (
+                          <span className="tag">
+                            {t("nativeFitTag", { value: title.nativeFit })}
+                          </span>
+                        ) : null}
+                        {title.reach ? (
+                          <span className="tag">{title.reach}</span>
+                        ) : null}
+                      </div>
+                    ) : null}
+                    {title.vertical ? (
+                      <div className="muted" style={{ marginTop: 6 }}>
+                        {title.vertical}
+                      </div>
+                    ) : null}
+                    {title.audience ? (
+                      <div className="muted">{title.audience}</div>
+                    ) : null}
+                    {title.circulation ? (
+                      <div className="muted">
+                        {t("circulation")}:{" "}
+                        {new Intl.NumberFormat().format(title.circulation)}
+                      </div>
+                    ) : null}
                     {title.monthlyReach ? (
                       <div className="muted">
                         {t("reach")}:{" "}
@@ -215,6 +422,32 @@ export default async function DeskTitlesPage({
           </div>
         ))
       )}
+
+      {totalPages > 1 ? (
+        <nav
+          className="pagination"
+          style={{
+            marginTop: 24,
+            display: "flex",
+            gap: 12,
+            alignItems: "center",
+          }}
+        >
+          {page > 1 ? (
+            <a href={pageQuery(page - 1) || "?"}>← {t("pagination.prev")}</a>
+          ) : (
+            <span className="muted">← {t("pagination.prev")}</span>
+          )}
+          <span className="muted">
+            {t("pagination.page", { page, total: totalPages })}
+          </span>
+          {page < totalPages ? (
+            <a href={pageQuery(page + 1)}>{t("pagination.next")} →</a>
+          ) : (
+            <span className="muted">{t("pagination.next")} →</span>
+          )}
+        </nav>
+      ) : null}
     </section>
   );
 }

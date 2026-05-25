@@ -184,6 +184,16 @@
     "filters": {
       "market": "Marked",
       "status": "Status",
+      "nativeFit": "Native-tilpasning",
+      "format": "Format",
+      "b2bB2c": "B2B/B2C",
+      "reach": "Geografisk rækkevidde",
+      "vertical": "Vertikal",
+      "verticalPlaceholder": "F.eks. News, B2B – Energy …",
+      "ownerGroup": "Ejer (koncern)",
+      "ownerGroupPlaceholder": "F.eks. Schibsted, Polaris …",
+      "search": "Søg",
+      "searchPlaceholder": "Titel, udgiver eller tag …",
       "all": "Alle",
       "apply": "Anvend"
     },
@@ -194,8 +204,16 @@
       "no-native": "Tilbyder ikke native"
     },
     "reach": "Månedlig rækkevidde",
+    "circulation": "Oplag",
     "products": "Produkter",
     "checkSite": "Tjek udgiverens website",
+    "nativeFitTag": "Native: {value}",
+    "resultCount": "{count, plural, =0 {Ingen resultater} =1 {1 titel} other {# titler}}",
+    "pagination": {
+      "prev": "Forrige",
+      "next": "Næste",
+      "page": "Side {page} af {total}"
+    },
     "actions": {
       "markNative": "Markér: tilbyder native",
       "markNoNative": "Markér: ingen native",

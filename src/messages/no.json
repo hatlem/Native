@@ -184,6 +184,16 @@
     "filters": {
       "market": "Marked",
       "status": "Status",
+      "nativeFit": "Native-tilpasning",
+      "format": "Format",
+      "b2bB2c": "B2B/B2C",
+      "reach": "Geografisk dekning",
+      "vertical": "Vertikal",
+      "verticalPlaceholder": "F.eks. News, B2B – Energy …",
+      "ownerGroup": "Eier (konsern)",
+      "ownerGroupPlaceholder": "F.eks. Schibsted, Polaris …",
+      "search": "Søk",
+      "searchPlaceholder": "Tittel, utgiver eller tagg …",
       "all": "Alle",
       "apply": "Bruk"
     },
@@ -194,8 +204,16 @@
       "no-native": "Tilbyr ikke native"
     },
     "reach": "Månedlig rekkevidde",
+    "circulation": "Opplag",
     "products": "Produkter",
     "checkSite": "Sjekk utgiverens nettsted",
+    "nativeFitTag": "Native: {value}",
+    "resultCount": "{count, plural, =0 {Ingen treff} =1 {1 tittel} other {# titler}}",
+    "pagination": {
+      "prev": "Forrige",
+      "next": "Neste",
+      "page": "Side {page} av {total}"
+    },
     "actions": {
       "markNative": "Merk: tilbyr native",
       "markNoNative": "Merk: ingen native",
