@@ -1,12 +1,17 @@
 "use server";
 
 import { redirect } from "next/navigation";
-import { PriceVisibility, BookingStatus } from "@prisma/client";
+import {
+  PriceVisibility,
+  BookingStatus,
+  ContentAssetStatus,
+} from "@prisma/client";
 import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
 import { recordAudit } from "@/lib/audit";
 import { notifyDesk, notifyOrg } from "@/lib/notify";
 import { safeExternalUrl } from "@/lib/security";
+import { canRetractAsset, normaliseReason } from "@/lib/cancellation";
 
 function field(formData: FormData, key: string): string {
   const v = formData.get(key);
@@ -174,6 +179,104 @@ export async function updateBooking(formData: FormData) {
       }
     }
   }
+  redirect(`/${locale}/publisher/orders`);
+}
+
+// Publisher invokes the editorial veto on a draft. Distinct from the
+// soft "request changes" workflow (which goes via `setAssetStatus`
+// CHANGES_REQUESTED on the desk side) — this is the hard rejection
+// the FagPresse/DK Finans scenario surfaced as missing.
+//
+// Authorisation: the asset's brief must hang off an OrderLine whose
+// product belongs to a Title this publisher owns. Anything else and we
+// silently redirect — no leaking of asset metadata across publishers.
+//
+// Side-effects:
+//   - asset status → RETRACTED + retraction metadata persisted
+//   - desk + buyer org receive EDITORIAL_VETO notification with the
+//     publisher's stated reason (audit chain demands it)
+//   - audit row records publisher actor + reason
+//
+// We deliberately don't cancel the order here. The publisher killed the
+// content; the desk decides whether to find a substitute placement,
+// renegotiate, or escalate to cancelOrder. Coupling those two would be
+// presumptuous — the desk owns the commercial relationship.
+export async function rejectAsset(formData: FormData) {
+  const locale = field(formData, "locale") || "en";
+  const { publisherId, userId } = await requirePublisher(locale);
+  const assetId = field(formData, "assetId");
+  const reason = normaliseReason(field(formData, "reason"));
+
+  if (!reason) {
+    redirect(`/${locale}/publisher/orders?veto=reason-required`);
+  }
+
+  const asset = await prisma.contentAsset.findUnique({
+    where: { id: assetId },
+    include: {
+      brief: {
+        select: {
+          orderLine: {
+            select: {
+              productId: true,
+              order: {
+                select: { id: true, organizationId: true },
+              },
+            },
+          },
+        },
+      },
+    },
+  });
+
+  if (!asset) {
+    redirect(`/${locale}/publisher/orders?veto=not-found`);
+  }
+
+  const product = await prisma.product.findUnique({
+    where: { id: asset.brief.orderLine.productId },
+    select: { title: { select: { publisherId: true } } },
+  });
+  if (product?.title.publisherId !== publisherId) {
+    redirect(`/${locale}/publisher/orders`);
+  }
+
+  if (!canRetractAsset(asset.status)) {
+    redirect(`/${locale}/publisher/orders?veto=already-retracted`);
+  }
+
+  await prisma.contentAsset.update({
+    where: { id: asset.id },
+    data: {
+      status: ContentAssetStatus.RETRACTED,
+      retractedAt: new Date(),
+      retractedBy: userId,
+      retractionNote: reason,
+    },
+  });
+
+  await recordAudit(userId, "asset.retract", `ContentAsset:${asset.id}`, {
+    from: asset.status,
+    reason,
+    publisherId,
+  });
+
+  const orderId = asset.brief.orderLine.order.id;
+  const orgId = asset.brief.orderLine.order.organizationId;
+
+  await notifyDesk({
+    kind: "EDITORIAL_VETO",
+    title: "Publisher invoked editorial veto",
+    body: reason,
+    link: `/${locale}/desk/orders/${orderId}`,
+  });
+  await notifyOrg(orgId, {
+    kind: "EDITORIAL_VETO",
+    title: "Publisher cannot run this draft",
+    body: reason,
+    link: `/${locale}/orders/${orderId}`,
+  });
+
   redirect(`/${locale}/publisher/orders`);
 }
 

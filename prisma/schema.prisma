@@ -92,6 +92,10 @@ enum ContentAssetStatus {
   CHANGES_REQUESTED
   APPROVED
   FINAL
+  // Publisher invoked editorial veto — the draft is hard-rejected, not
+  // a soft "please tweak". Asset row stays for audit; status flag keeps
+  // it out of any "current asset" picker.
+  RETRACTED
 }
 
 enum BookingStatus {
@@ -118,6 +122,14 @@ enum NotificationKind {
   BOOKING_CONFIRMED
   ASSET_REVIEW
   INVOICE_ISSUED
+  // Publisher editorial firewall fired — distinct from ASSET_REVIEW so
+  // the buyer's dashboard can surface it as a hard event, not another
+  // "please tweak" nudge.
+  EDITORIAL_VETO
+  // Order moved to CANCELLED state (any cause: editorial veto, buyer
+  // pull-out, desk decision). Buyer + publisher get this so they're not
+  // surprised by the missing booking.
+  ORDER_CANCELLED
 }
 
 enum JobStatus {
@@ -446,6 +458,12 @@ model Order {
   quoteId        String       @unique
   quote          Quote        @relation(fields: [quoteId], references: [id])
   status         OrderStatus  @default(QUOTED)
+  // Set when the order moves to CANCELLED. Free-text reason and the
+  // role that invoked the cancellation (DESK | PUBLISHER | BUYER) so
+  // we can defend the decision against any later customer dispute.
+  cancelledAt    DateTime?
+  cancelReason   String?
+  cancelledBy    String?
   createdAt      DateTime     @default(now())
   updatedAt      DateTime     @updatedAt
 
@@ -490,6 +508,12 @@ model ContentAsset {
   bodyUrl     String? // pointer into object storage
   specPassed  Boolean?
   reviewNotes String?
+  // Publisher-side editorial veto stamp. Separate from `reviewNotes`
+  // because the audit chain needs to distinguish a soft "request
+  // changes" comment from a hard "this will not run" decision.
+  retractedAt     DateTime?
+  retractedBy     String?
+  retractionNote  String?
   createdAt   DateTime           @default(now())
   updatedAt   DateTime           @updatedAt
 }
