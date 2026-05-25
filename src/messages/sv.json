@@ -1,6 +1,6 @@
 {
   "common": {
-    "appName": "BeNative"
+    "appName": "ATNative"
   },
   "nav": {
     "home": "Hem",
@@ -107,18 +107,18 @@
     "mixHeading": "Titlar som passar din brief"
   },
   "home": {
-    "eyebrow": "BeNative — den nordiska native-marknaden",
-    "title": "Köp native-innehåll i nordiska tidningar och magasin",
+    "eyebrow": "ATNative — den europeiska native-marknaden",
+    "title": "Köp native-innehåll i europeiska tidningar och magasin",
     "subtitle": "Se alla titlar som erbjuder native, med transparenta priser. Ge oss en brief — vi skriver det och bokar det, även där programmatiskt inte är möjligt.",
     "cta": "Se katalogen",
     "statsTitles": "Titlar i katalogen",
     "statsProducts": "Native-produkter",
-    "statsMarkets": "Nordiska marknader",
+    "statsMarkets": "Europeiska marknader",
     "featuredEyebrow": "Utvalt",
     "featuredTitle": "I katalogen just nu",
     "featuredCta": "Se alla titlar",
     "priceFrom": "Från",
-    "whyEyebrow": "Varför BeNative",
+    "whyEyebrow": "Varför ATNative",
     "vp1Title": "En transparent katalog",
     "vp1Body": "Alla tidningar och magasin som erbjuder native-innehåll och native-annonser, med specifikationer och vägledande priser.",
     "vp2Title": "Vi köper det åt dig",
@@ -128,7 +128,7 @@
   },
   "catalog": {
     "eyebrow": "Utforska",
-    "title": "Varje nordisk titel som kör native",
+    "title": "Varje europeisk titel som kör native",
     "subtitle": "Filtrera på marknad, format och publik. Vägledande priser på varje produkt — firm pris på begäran via desk.",
     "resultCount": "{count, plural, =0 {Inga träffar} =1 {1 titel} other {# titlar}}",
     "removeFilter": "Ta bort filter",
@@ -163,13 +163,13 @@
     "compareTop": "Jämför dessa resultat",
     "gate": {
       "eyebrow": "Katalogen",
-      "title": "{count, plural, =1 {1 nordisk titel.} other {# nordiska titlar.}} En desk.",
+      "title": "{count, plural, =1 {1 europeisk titel.} other {# europeiska titlar.}} En desk.",
       "lead": "Hela katalogen — format, målgrupp, vägledande priser — är för verifierade annonsörer och byråer. Begär åtkomst så skickar vi en briefmall samma dag.",
       "ctaPrimary": "Begär åtkomst",
       "ctaSecondary": "Logga in",
       "statsTitles": "Titlar i katalogen",
       "statsProducts": "Native-produkter",
-      "statsMarkets": "Nordiska marknader",
+      "statsMarkets": "Europeiska marknader",
       "teaserEyebrow": "Utvalt",
       "teaserTitle": "En försmak av vad som finns",
       "teaserCta": "Se hela katalogen",
@@ -299,7 +299,7 @@
     "openLink": "Öppna",
     "ordersBlurb": "Ordrar som bekräftats, är i produktion eller live.",
     "reportsBlurb": "Plattforms-KPI:er — efterfrågan, konvertering och intäkter.",
-    "titlesBlurb": "Granska och aktivera nordiska magasintitlar.",
+    "titlesBlurb": "Granska och aktivera europeiska magasintitlar.",
     "org": "Företag",
     "status": "Status",
     "items": "Rader",
@@ -389,22 +389,22 @@
     "password": "Lösenord",
     "submit": "Logga in",
     "failed": "Ogiltig e-post eller lösenord — försök igen.",
-    "hint": "Demo-inloggningar — desk: desk@benative.example / benative-desk · köpare: buyer@benative.example / benative-buyer",
+    "hint": "Demo-inloggningar — desk: desk@atnative.com / atnative-desk · köpare: buyer@atnative.com / atnative-buyer",
     "signin": "Logga in",
     "signout": "Logga ut",
     "signup": "Registrera dig",
     "signupTitle": "Skapa ditt konto",
     "signupSubtitle": "Berätta vem du är, så sätter vi upp dig.",
     "signupHeadline": "Börja köpa native på 30 sekunder.",
-    "signupLead": "Gratis att skapa konto, se priser för varje nordisk titel och skicka in en brief när du är redo.",
-    "bulletCatalog": "Se varje nordisk titel med transparenta specs och priser",
+    "signupLead": "Gratis att skapa konto, se priser för varje europeisk titel och skicka in en brief när du är redo.",
+    "bulletCatalog": "Se varje europeisk titel med transparenta specs och priser",
     "bulletDesk": "Briefa oss en gång — vi skriver och bokar åt dig",
     "bulletReports": "Följ förfrågningar, beställningar och utgifter på ett ställe",
     "haveAccountTitle": "Redan registrerad?",
     "haveAccountBody": "Välkommen tillbaka —",
     "marketPlaceholder": "Välj faktureringsmarknad",
     "signinSubtitle": "Välkommen tillbaka. Logga in för att fortsätta.",
-    "welcomeHeadline": "Den nordiska native-marknaden.",
+    "welcomeHeadline": "Den europeiska native-marknaden.",
     "welcomeLead": "En transparent katalog över varje tidning och tidskrift som erbjuder native — med en managed desk som briefar, skriver och bokar åt dig.",
     "pullTitle": "Inte kund än?",
     "pullBody": "Bläddra i katalogen utan att logga in, och skicka en brief när du är redo.",
@@ -506,7 +506,6 @@
     "specHas": "Konfigurerad",
     "specMissing": "Ej satt",
     "orders": "Inkommande bokningar",
-    "orders": "Inkommande bokningar",
     "ordersTitle": "Inkommande bokningar",
     "ordersLead": "Varje rad nedan är en köpares bokning mot dina titlar — uppdatera produktionsstatus och live-URL när den publiceras.",
     "kpiInProduction": "I produktion",
@@ -540,10 +539,10 @@
     "availability": "Tillgänglighet"
   },
   "formats": {
-    "metaTitle": "Native-format — BeNative",
+    "metaTitle": "Native-format — ATNative",
     "eyebrow": "Format",
     "title": "Fyra sätt att köra native — välj det som passar.",
-    "lead": "Varje nordisk titel i vår katalog stödjer ett eller flera av dessa fyra format. Skillnaden är vems röst du betalar för och hur framträdande varumärket är.",
+    "lead": "Varje europeisk titel i vår katalog stödjer ett eller flera av dessa fyra format. Skillnaden är vems röst du betalar för och hur framträdande varumärket är.",
     "voice": "Vems röst",
     "brandPresence": "Varumärkets närvaro",
     "readsLike": "Läses som",
@@ -590,7 +589,7 @@
       "rule": "Köper du redan en native-artikel är paketet nästan alltid billigare än att köpa display separat."
     },
     "disclosureTitle": "Alla fyra är tydligt märkta som betalt",
-    "disclosureBody": "Nordiska medieregulatorer kräver att varje betald placering är otvetydigt märkt. Vi använder som standard utgivarens egen märkning (t.ex. 'Annonsörinnehåll', 'Annons', 'Annonce') och verifierar den vid varje spec-koll innan ordern går live.",
+    "disclosureBody": "Europeiska medieregulatorer kräver att varje betald placering är otvetydigt märkt. Vi använder som standard utgivarens egen märkning (t.ex. 'Annonsörinnehåll', 'Annons', 'Annonce') och verifierar den vid varje spec-koll innan ordern går live.",
     "ctaTitle": "Osäker på vilket som passar?",
     "ctaBody": "Skicka oss en brief så rekommenderar desken en formatmix för mål, publik och budget — samma dag.",
     "ctaContact": "Prata med desken",
@@ -690,20 +689,20 @@
     "howCta": "Så funkar det",
     "audiencesTitle": "Byggt för hela native-ekosystemet",
     "audAdvertiserTitle": "För annonsörer",
-    "audAdvertiserBody": "En katalog över alla nordiska titlar som erbjuder native. Briefa oss; vi skriver och bokar.",
+    "audAdvertiserBody": "En katalog över alla europeiska titlar som erbjuder native. Briefa oss; vi skriver och bokar.",
     "audAgencyTitle": "För byråer",
     "audAgencyBody": "En inköpsdesk ni kan luta er mot, med arbetsytor för flera kunder.",
     "audPublisherTitle": "För utgivare",
     "audPublisherBody": "Inkrementell, kvalificerad efterfrågan och publiceringsklart innehåll — utan att bygga självservice.",
     "learnMore": "Läs mer",
     "ctaBlockTitle": "Börja i katalogen",
-    "ctaBlockBody": "Bläddra bland alla nordiska titlar som erbjuder native — filtrera på marknad, format och målgrupp, och se vägledande priser innan du tar kontakt.",
+    "ctaBlockBody": "Bläddra bland alla europeiska titlar som erbjuder native — filtrera på marknad, format och målgrupp, och se vägledande priser innan du tar kontakt.",
     "browseCatalog": "Öppna katalogen",
     "createAccount": "Skapa konto",
     "createAgencyAccount": "Öppna byråkonto",
     "tryRecommender": "Prova rekommenderaren",
     "seeWorkflow": "Se hela arbetsflödet",
-    "footerTagline": "Native-innehåll och native-annonsering över alla nordiska titlar — transparent, hanterat, paketerat.",
+    "footerTagline": "Native-innehåll och native-annonsering över alla europeiska titlar — transparent, hanterat, paketerat.",
     "footerProduct": "Produkt",
     "footerSolutions": "Lösningar",
     "footerCompany": "Företag",
@@ -715,7 +714,7 @@
     "problemsEyebrow": "Problem",
     "solutionsEyebrow": "Lösningar",
     "metaTitle": "För annonsörer",
-    "title": "Köp native-innehåll i alla nordiska titlar",
+    "title": "Köp native-innehåll i alla europeiska titlar",
     "lead": "Upptäckt, jämförbara priser och innehållsproduktion på ett ställe. Det mesta premium-redaktionella säljs inte programmatiskt — vi gör det bokningsbart ändå.",
     "problemsTitle": "Så känns native vanligtvis",
     "problem1Title": "Fragmenterat",
@@ -724,7 +723,7 @@
     "problem2Body": "Priser ligger i PDF:er och mejl. Att jämföra värde tar veckor av fram-och-tillbaka.",
     "problem3Title": "Operativt tungt",
     "problem3Body": "Bra native är redaktionellt hantverk anpassat per utgivare. Att producera det internt med kvalitet är svårt.",
-    "solutionsTitle": "Det BeNative ger er",
+    "solutionsTitle": "Det ATNative ger er",
     "solution1Title": "En transparent katalog",
     "solution1Body": "Varje tidning och tidskrift som erbjuder native, med vägledande priser, spec och räckvidd — utan säljsamtal.",
     "solution2Title": "Hanterad inköpsdesk",
@@ -742,7 +741,7 @@
     "featuresEyebrow": "Byggt för byråer",
     "metaTitle": "För byråer",
     "title": "En inköpsdesk teamet kan luta sig mot",
-    "lead": "Planera över alla nordiska titlar i en arbetsyta, växla mellan kunder med ett klick, och låt vår desk sköta utgivarförhandlingarna.",
+    "lead": "Planera över alla europeiska titlar i en arbetsyta, växla mellan kunder med ett klick, och låt vår desk sköta utgivarförhandlingarna.",
     "featuresTitle": "Byggt för hur byråer faktiskt jobbar",
     "feature1Title": "Arbetsytor för flera kunder",
     "feature1Body": "Ett byråkonto rymmer alla kundorganisationer. Växla med ett klick; förfrågningar, offerter och ordrar håller sig till rätt kund.",
@@ -751,7 +750,7 @@
     "feature3Title": "Fastpris-självservice",
     "feature3Body": "Titlar med publikt fastpris kan bokas direkt från planen. Övriga går via desken, fortfarande med full transparens.",
     "feature4Title": "White-label (kommer)",
-    "feature4Body": "Visa BeNative i era egna kundportaler. Samma katalog, ert varumärke. Hör av er för tidig tillgång.",
+    "feature4Body": "Visa ATNative i era egna kundportaler. Samma katalog, ert varumärke. Hör av er för tidig tillgång.",
     "workflowTitle": "Samma arbetsflöde teamet redan kör",
     "workflowBody": "Brief → plan → förfrågan → fastprisoffert → order → live-placering → rapportering. Vi går in i stegen som gör ont — sourcing, offert, innehåll — utan att ändra hur ni briefar eller rapporterar.",
     "ctaTitle": "Kör en kampanj med oss",
@@ -772,10 +771,10 @@
     "benefit3Title": "Er prislista, er spec",
     "benefit3Body": "Ni äger pris och inventering. Vi säljer aldrig under era publicerade priser; vår marginal ligger på köparsidan.",
     "benefit4Title": "En faktureringsrelation",
-    "benefit4Body": "En faktura per cykel från BeNative över alla annonsörer och byråer, med era betalningsvillkor.",
+    "benefit4Body": "En faktura per cykel från ATNative över alla annonsörer och byråer, med era betalningsvillkor.",
     "howTitle": "Så fungerar partnerskapet",
     "step1Title": "Onboarda er prislista",
-    "step1Body": "Vi importerar ert mediekit och översätter till BeNative-katalogens format. Ni verifierar; det går live.",
+    "step1Body": "Vi importerar ert mediekit och översätter till ATNative-katalogens format. Ni verifierar; det går live.",
     "step2Title": "Vi tar med köpare",
     "step2Body": "Annonsörer och byråer hittar era titlar, bygger en plan och skickar förfrågan.",
     "step3Title": "Offert + innehåll",
@@ -794,7 +793,7 @@
     "title": "Från brief till live-placering",
     "lead": "Fem steg från »jag har en kampanjidé« till en publicerad, spec-riktig native-artikel — de flesta gjorda av oss.",
     "step1Title": "Bläddra i katalogen",
-    "step1Body": "Filtrera varje nordisk titel på marknad, format, kategori och målgrupp. Se vägledande pris och räckvidd direkt.",
+    "step1Body": "Filtrera varje europeisk titel på marknad, format, kategori och målgrupp. Se vägledande pris och räckvidd direkt.",
     "step2Title": "Bygg en plan",
     "step2Body": "Lägg titlar i en plan med budget, datum och målgruppsnotering. Jämför sida vid sida innan ni låser.",
     "step3Title": "Få en fastprisoffert",
@@ -814,14 +813,14 @@
   },
   "about": {
     "eyebrow": "Om oss",
-    "metaTitle": "Om BeNative",
+    "metaTitle": "Om ATNative",
     "title": "Native är operativt jobbigt. Vi fixar det.",
-    "lead": "BeNative är en nordisk marknadsplats för att köpa native-innehåll och native-annonsering i tidningar och tidskrifter — inklusive de många som inte säljer programmatiskt.",
+    "lead": "ATNative är en europeisk marknadsplats för att köpa native-innehåll och native-annonsering i tidningar och tidskrifter — inklusive de många som inte säljer programmatiskt.",
     "missionTitle": "Mission",
-    "missionBody1": "Gör nordisk native-inventering lika enkel att hitta, jämföra och köpa som programmatisk display — utan att tappa den redaktionella kvalitet som gör native bra från början.",
+    "missionBody1": "Gör europeisk native-inventering lika enkel att hitta, jämföra och köpa som programmatisk display — utan att tappa den redaktionella kvalitet som gör native bra från början.",
     "missionBody2": "Vi är köpare-först: transparent katalog, transparent pris, hanterat köp bakom, innehållsproduktion anpassad per titel. Det försvarbara ligger i datasetet och relationerna, inte i en enskild funktion.",
-    "nordicTitle": "Varför Norden, varför nu",
-    "nordicBody": "Native betalar bättre än display i Norden, men köpupplevelsen ligger två decennier efter. De flesta premium-titlarna säljs fortfarande inte programmatiskt. Både köpare och utgivare vill ha en neutral aggregator — vi bygger den för NO, SE och DK först, flerspråkig och multi-valuta från dag ett.",
+    "nordicTitle": "Varför Europa, varför nu",
+    "nordicBody": "Native betalar bättre än display i Europa, men köpupplevelsen ligger två decennier efter. De flesta premium-titlarna säljs fortfarande inte programmatiskt. Både köpare och utgivare vill ha en neutral aggregator — vi bygger den för nio europeiska marknader (NO, SE, DK, FI, DE, AT, CH, UK, IE), flerspråkig och multi-valuta från dag ett.",
     "beliefsTitle": "Det vi tror på",
     "belief1Title": "Katalogen är produkten",
     "belief1Body": "Katalog-datasetet och utgivarrelationerna är vallgraven. Allt annat är format för att göra det mer komplett, mer korrekt, mer jämförbart.",
@@ -830,7 +829,7 @@
     "belief3Title": "Driften måste förtjäna sin plats",
     "belief3Body": "En hanterad desk är vettig bara om varje kampanj minskar desk-timmar för nästa. Vi mäter det.",
     "teamTitle": "Team",
-    "teamBody": "Ett litet produkt-/teknikteam i Norden, som jobbar tillsammans med en inköpsdesk och en redaktion för innehållsproduktion. Vi jobbar öppet — plattformplanen, datamodellen och katalogen syns på sidan.",
+    "teamBody": "Ett litet produkt-/teknikteam i Europa, som jobbar tillsammans med en inköpsdesk och en redaktion för innehållsproduktion. Vi jobbar öppet — plattformplanen, datamodellen och katalogen syns på sidan.",
     "contactTitle": "Hör av er",
     "contactBody": "Oavsett om ni vill planera en kampanj, bli partner som utgivare eller bara jämföra anteckningar om native — vi vill gärna höra från er.",
     "contactCta": "Mejla oss"
@@ -841,7 +840,7 @@
       "items": {
         "catalog": {
           "title": "Katalog",
-          "description": "Varje nordisk titel som erbjuder native — filtrera på marknad, format och målgrupp."
+          "description": "Varje europeisk titel som erbjuder native — filtrera på marknad, format och målgrupp."
         },
         "recommend": {
           "title": "Rekommendation",
@@ -862,7 +861,7 @@
       "items": {
         "advertisers": {
           "title": "För annonsörer",
-          "description": "En katalog över alla nordiska titlar som erbjuder native."
+          "description": "En katalog över alla europeiska titlar som erbjuder native."
         },
         "agencies": {
           "title": "För byråer",
@@ -899,7 +898,7 @@
       },
       "featured": {
         "title": "Bli partner",
-        "description": "Få in din titel på BeNative."
+        "description": "Få in din titel på ATNative."
       }
     },
     "company": {
@@ -944,7 +943,7 @@
         "tagline": "För annonsörer som vill boka fastpris-native direkt.",
         "price": "Gratis att använda",
         "priceNote": "Du betalar endast utgivarens pris i kassan.",
-        "feature1": "Bläddra i hela den nordiska katalogen",
+        "feature1": "Bläddra i hela den europeiska katalogen",
         "feature2": "Bygg planer och jämför titlar",
         "feature3": "Boka fastpris-placeringar direkt",
         "feature4": "Faktura i marknadens valuta",
@@ -996,14 +995,14 @@
     "faq4Q": "Kan vi använda eget innehåll?",
     "faq4A": "Ja. Skicka in ert utkast så spec-kollar vi det; eller låt desken producera från start till mål.",
     "ctaTitle": "Redo att jämföra titlar?",
-    "ctaBody": "Katalogen visar indikativt pris för varje nordisk titel — inget säljsamtal krävs.",
+    "ctaBody": "Katalogen visar indikativt pris för varje europeisk titel — inget säljsamtal krävs.",
     "ctaContact": "Prata med oss",
     "feesEyebrow": "Avgifter",
     "faqEyebrow": "FAQ",
     "faqTitle": "Vanliga frågor"
   },
   "contact": {
-    "metaTitle": "Kontakta BeNative",
+    "metaTitle": "Kontakta ATNative",
     "eyebrow": "Kontakt",
     "title": "Hör av er",
     "lead": "Välj rätt kanal nedan, eller använd formuläret. Vi svarar på alla meddelanden inom en arbetsdag.",
@@ -1024,10 +1023,10 @@
     "formTitle": "Berätta vad ni behöver",
     "formLead": "Ett kort meddelande räcker. Vi dirigerar till rätt person och följer upp via e-post.",
     "bullet1": "Svar inom en arbetsdag",
-    "bullet2": "Nordiska tidszoner (CET/CEST)",
+    "bullet2": "Europeisk arbetstid (CET/CEST)",
     "bullet3": "Inga drip-kampanjer — lovat",
     "pullTitle": "Föredrar e-post? ",
-    "pullBody": "Skicka en rad till hello@benative.example så tar vi det därifrån.",
+    "pullBody": "Skicka en rad till hello@atnative.com så tar vi det därifrån.",
     "formCardTitle": "Skicka ett meddelande",
     "formCardLead": "Vi hör av oss inom en arbetsdag.",
     "name": "Namn",
@@ -1041,7 +1040,7 @@
     "message": "Meddelande",
     "messagePlaceholder": "Vad försöker ni göra, och när?",
     "submit": "Skicka meddelande",
-    "altPrefix": "Nyfiken på vilka som står bakom BeNative?",
+    "altPrefix": "Nyfiken på vilka som står bakom ATNative?",
     "altLink": "Läs om oss →"
   },
   "security": {
@@ -1090,11 +1089,11 @@
     "metaTitle": "Integritet",
     "eyebrow": "Integritet",
     "title": "Integritetspolicy",
-    "lead": "Så samlar, använder och skyddar BeNative personuppgifter — på enkel svenska.",
+    "lead": "Så samlar, använder och skyddar ATNative personuppgifter — på enkel svenska.",
     "lastUpdated": "Senast uppdaterad: 22 maj 2026",
     "controller": {
       "title": "Vem är personuppgiftsansvarig",
-      "body": "BeNative AS är personuppgiftsansvarig för personuppgifter som behandlas via marknadsplatsen. Vi har bas i Norge och behandlar all data inom EU/EES."
+      "body": "ATNative AS är personuppgiftsansvarig för personuppgifter som behandlas via marknadsplatsen. Vi har bas i Norge och behandlar all data inom EU/EES."
     },
     "data": {
       "title": "Vilka uppgifter vi samlar",
@@ -1122,7 +1121,7 @@
     },
     "rights": {
       "title": "Era rättigheter",
-      "body": "Ni kan begära åtkomst, rättelse, radering eller export av era personuppgifter, och invända mot behandling som bygger på berättigat intresse. Kontakta privacy@benative.example för att utöva dessa rättigheter."
+      "body": "Ni kan begära åtkomst, rättelse, radering eller export av era personuppgifter, och invända mot behandling som bygger på berättigat intresse. Kontakta privacy@atnative.com för att utöva dessa rättigheter."
     },
     "cookies": {
       "title": "Cookies",
@@ -1139,11 +1138,11 @@
     "metaTitle": "Användarvillkor",
     "eyebrow": "Villkor",
     "title": "Marknadsplatsens användarvillkor",
-    "lead": "Dessa villkor reglerar er användning av BeNative som annonsör, byrå eller utgivare.",
+    "lead": "Dessa villkor reglerar er användning av ATNative som annonsör, byrå eller utgivare.",
     "lastUpdated": "Senast uppdaterad: 22 maj 2026",
     "scope": {
       "title": "Omfattning",
-      "body": "BeNative är en marknadsplats som kopplar annonsörer och byråer med tidnings- och magasin-utgivare som erbjuder native-innehåll och native-annonsering. Dessa villkor gäller för alla användare."
+      "body": "ATNative är en marknadsplats som kopplar annonsörer och byråer med tidnings- och magasin-utgivare som erbjuder native-innehåll och native-annonsering. Dessa villkor gäller för alla användare."
     },
     "accounts": {
       "title": "Konton",
@@ -1159,7 +1158,7 @@
     },
     "content": {
       "title": "Innehåll",
-      "body": "Innehåll producerat via BeNative licensieras till annonsören för den bokade placeringen. Utgivare kan avvisa innehåll som inte uppfyller deras redaktionella standard, med skriftlig motivering."
+      "body": "Innehåll producerat via ATNative licensieras till annonsören för den bokade placeringen. Utgivare kan avvisa innehåll som inte uppfyller deras redaktionella standard, med skriftlig motivering."
     },
     "fees": {
       "title": "Avgifter och betalning",
@@ -1167,7 +1166,7 @@
     },
     "liability": {
       "title": "Ansvar",
-      "body": "BeNative underlättar transaktionen men är inte utgivare av placerade artiklar. Varje part ansvarar för efterlevnad av annonser-, märknings- och konsumentskyddslag. Ansvar begränsas till avgifter betalda de senaste 12 månaderna."
+      "body": "ATNative underlättar transaktionen men är inte utgivare av placerade artiklar. Varje part ansvarar för efterlevnad av annonser-, märknings- och konsumentskyddslag. Ansvar begränsas till avgifter betalda de senaste 12 månaderna."
     },
     "termination": {
       "title": "Uppsägning",
@@ -1183,5 +1182,147 @@
     },
     "contactTitle": "Juridisk kontakt",
     "contactBody": "Frågor om dessa villkor — skriv till"
+  },
+  "landing": {
+    "hero": {
+      "labelText": "ATNative · Native-marknadsplats",
+      "pain": "Det mesta av premium-native säljs inte programmatiskt. Det säljs över telefon, med en PDF-prislista och fyra veckors fram-och-tillbaka. <strong>Vi ersätter det med en brief och fast offert inom 24 timmar.</strong>",
+      "h1Line1": "En brief.",
+      "h1Line2": "3 000+ titlar.",
+      "h1Line3": "Fast offert inom 24 timmar.",
+      "ctaPrimary": "Skicka en brief",
+      "ctaSecondary": "Så funkar det",
+      "ctaMeta": "Inget samtal krävs. Vi svarar skriftligt, på dokument.",
+      "sideAria": "Varför native",
+      "sideBody": "Sponsrade artiklar slår display konsekvent på uppmärksamhet och varumärkeslyft. Du betalar för det som publiceras, inte för det som blockeras."
+    },
+    "why": {
+      "labelText": "Varför native",
+      "h2": "Native gör jobbet display inte kan.",
+      "lead": "Display köper visningar i marginalen. Native köper redaktionell tid inuti artikeln. Annan yta, annat läsarbeteende, annat resultat.",
+      "colAIx": "I.",
+      "colAH3": "Uppmärksamhet du inte kan ad-blocka",
+      "colABody": "En sponsrad artikel lever där läsaren redan är koncentrerad. <strong>Ingen bannerblindhet, ingen skip-knapp</strong> — enheten är innehållet.",
+      "colAPull": "<strong>3–5×</strong> dwell-tid jämfört med display",
+      "colBIx": "II.",
+      "colBH3": "Förtroende överfört från titeln",
+      "colBBody": "När en läsare ser er historia under en titel de litar på, överförs en del av det förtroendet. <strong>Märkningen är tydlig</strong> — trovärdigheten kommer från den redaktionella ramen.",
+      "colBPull": "<strong>+18 procentenheter</strong> varumärkeslyft (branschsnitt)",
+      "colCIx": "III.",
+      "colCH3": "Lever vidare efter kampanjen",
+      "colCBody": "En publicerad artikel fortsätter generera visningar och sökträffar långt efter kampanjslut. <strong>Display försvinner i samma stund ni slutar betala.</strong>",
+      "colCPull": "Ligger på utgivarens domän. Indexerad. Permanent."
+    },
+    "vs": {
+      "labelText": "Native vs display",
+      "h2": "Samma budget. Helt olika utfall.",
+      "thNative": "Native (sponsrad artikel)",
+      "thDisplay": "Display-banner",
+      "primaryJobSpec": "Primärt jobb",
+      "primaryJobNative": "Berätta en historia läsaren valde att läsa",
+      "primaryJobDisplay": "Avbryta och leda till er sajt",
+      "readerBehaviourSpec": "Läsarbeteende",
+      "readerBehaviourNative": "Läser. Scrollar. Stannar kvar.",
+      "readerBehaviourDisplay": "Scrollar förbi. Ad-blockar. Glömmer.",
+      "realEstateSpec": "Yta",
+      "realEstateNative": "Inuti det redaktionella flödet",
+      "realEstateDisplay": "Marginal, header, mellan stycken",
+      "trustTransferSpec": "Förtroendeöverföring",
+      "trustTransferNative": "Lånad från titeln",
+      "trustTransferDisplay": "Ingen — läsare vet att det är annons",
+      "longevitySpec": "Livslängd",
+      "longevityNative": "Indexerad, sökbar, permanent",
+      "longevityDisplay": "Försvinner vid kampanjslut",
+      "bestFitSpec": "Bäst för",
+      "bestFitNative": "Övervägda köp, B2B, varumärkesbyggande",
+      "bestFitDisplay": "Performance-retargeting, enkla erbjudanden"
+    },
+    "rule": {
+      "labelIx": "Den gyllene regeln",
+      "h2": "Är det inte användbart för läsaren är det inte native — det är ett pressmeddelande i förklädnad.",
+      "body": "Varje artikel vi levererar måste förtjäna läsarens tid på egen hand. <strong>Redaktionella standarder, titelns specifikation, marknadens märkning</strong> — inget kompromissande. Det är så förtroendeöverföringen faktiskt fungerar.",
+      "sig": "— ATNative-desken"
+    },
+    "pubs": {
+      "labelText": "Utgivare",
+      "meta": "{publishers, number}+ utgivare · {titles, number}+ titlar katalogiserade · {active, number} verifierade för direktbokning",
+      "foot": "Det ni ser här är bara en bråkdel av katalogen.",
+      "footMore": "Berätta vad ni letar efter"
+    },
+    "catalog": {
+      "labelText": "Ett smakprov ur katalogen",
+      "h2": "Live-titlar, indikativ prissättning.",
+      "ask": "Be om hela listan",
+      "thTitle": "Titel",
+      "thPublisher": "Kategori",
+      "thMarket": "Marknad",
+      "thFormat": "Format",
+      "thAudience": "Räckvidd",
+      "thFrom": "Från",
+      "fmtNativeArticle": "Native-artikel",
+      "fmtSponsoredArticle": "Sponsrad artikel",
+      "fmtSponsoredContent": "Sponsrat innehåll",
+      "fmtSponsoredArticleAds": "Artikel + förstärkning",
+      "readersSuffix": "läsare/mån",
+      "footBody": "Indikativa priser. Desken bekräftar fast pris baserat på tillgänglighet, säsong och volym.",
+      "footInd": "Indikativ · exkl. moms"
+    },
+    "stats": {
+      "v240Label": "Titlar i katalog",
+      "v240Sub": "NO · SE · DK · FI · DE · AT · CH · UK · IE",
+      "v12Label": "Utgivare i nätverket",
+      "v12Sub": "Dagstidningar, magasin, nischtitlar",
+      "v24Unit": "h",
+      "v24Label": "Fast offert",
+      "v24Sub": "Genomsnittlig svarstid från desken",
+      "v3Label": "Marknader täckta",
+      "v3Sub": "9 europeiska marknader"
+    },
+    "how": {
+      "labelText": "Så funkar det",
+      "h2": "Tre steg. Det mesta av jobbet är på vår sida.",
+      "s1Num": "01",
+      "s1H3": "Skicka en brief",
+      "s1Body": "Marknad, budget, målgrupp, en mening om målet. Det räcker för desken att skopa. Ingen deck krävs.",
+      "s1Time": "5 minuter",
+      "s2Num": "02",
+      "s2H3": "Fast offert inom 24h",
+      "s2Body": "Vi kommer tillbaka med en titelshortlist, fast pris per utgivare, scope för innehållsproduktion och go-live-datum. Skriftligt, inte över samtal.",
+      "s2Time": "Inom en arbetsdag",
+      "s3Num": "03",
+      "s3H3": "Vi publicerar, ni godkänner",
+      "s3Body": "Vi skriver artikeln till titelns spec, kör spec-kollen, ger er utkastet för godkännande, sedan publicerar utgivaren. Ni får live-URL och faktura.",
+      "s3Time": "10–25 dagar beroende på titel"
+    },
+    "obj": {
+      "h2": "Det folk frågar innan de skickar en brief.",
+      "q1": "Varför inte bara köpa display? Det är billigare.",
+      "a1": "Per visning, ja. Per <strong>uppmärksamhetssekund</strong> vinner native med bred marginal. Bygger ni övervägande är inte enhetspriset det viktiga.",
+      "q2": "Native känns långsamt. Vi behöver detta på marknaden nästa vecka.",
+      "a2": "De flesta titlar publicerar inom 10–25 dagar efter brief. Vissa samma vecka. Den fasta offerten på 24 timmar berättar exakt när, per titel, innan ni binder er.",
+      "q3": "Vi har inte operativ kapacitet för native.",
+      "a3": "<strong>Det är hela poängen med desken.</strong> Brief in, färdig artikel och live placering ut. Vårt team sköter förhandling med utgivare, innehållsproduktion, spec-koll och fakturering.",
+      "q4": "Hur mäter vi det?",
+      "a4": "Standard spårning på live-URL:en — sidvisningar, tid på sidan, scrolldjup, klick vidare till er sajt. Varumärkeslyft på begäran via panelstudie.",
+      "q5": "Vad gäller brand safety och märkning?",
+      "a5": "Märkning är kodad per marknad (<strong>Annonsörsinnehåll / Annons / Annonce</strong>) och appliceras automatiskt. Spec-kollen måste passera innan något når utgivaren."
+    },
+    "endCta": {
+      "h2": "Skicka oss en brief.",
+      "body": "Ett stycke räcker. Vi kommer tillbaka skriftligt, med fast offert, inom 24 timmar.",
+      "ctaPrimary": "Mejla desken",
+      "ctaSecondary": "Skapa konto",
+      "qualPrefix": "Eller ni är utgivare och vill listas —",
+      "qualLink": "tala med oss"
+    },
+    "foot": {
+      "tagline": "Native-innehåll och native-annonsering över alla europeiska titlar — och en växande europeisk katalog.",
+      "copy": "ATNative AS · Oslo",
+      "navAdv": "För annonsörer",
+      "navAgy": "För byråer",
+      "navPub": "För utgivare",
+      "navAbout": "Om oss",
+      "navContact": "Kontakt"
+    }
   }
 }

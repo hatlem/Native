@@ -1,6 +1,6 @@
 {
   "common": {
-    "appName": "BeNative"
+    "appName": "ATNative"
   },
   "nav": {
     "home": "Home",
@@ -176,18 +176,18 @@
     "mixHeading": "Titles that fit your brief"
   },
   "home": {
-    "eyebrow": "BeNative — Nordic native marketplace",
-    "title": "Buy native content in Nordic newspapers and magazines",
+    "eyebrow": "ATNative — European native marketplace",
+    "title": "Buy native content in European newspapers and magazines",
     "subtitle": "See every title that offers native, with transparent pricing. Brief us once — we write it, we book it, even where programmatic isn't possible.",
     "cta": "Browse the catalog",
     "statsTitles": "Titles in catalog",
     "statsProducts": "Native products",
-    "statsMarkets": "Nordic markets",
+    "statsMarkets": "European markets",
     "featuredEyebrow": "Featured",
     "featuredTitle": "Live in the catalog right now",
     "featuredCta": "See all titles",
     "priceFrom": "From",
-    "whyEyebrow": "Why BeNative",
+    "whyEyebrow": "Why ATNative",
     "vp1Title": "One transparent catalog",
     "vp1Body": "Every newspaper and magazine that offers native content and native ads, with specs and indicative pricing.",
     "vp2Title": "We buy it for you",
@@ -197,7 +197,7 @@
   },
   "catalog": {
     "eyebrow": "Browse",
-    "title": "Every Nordic title that runs native",
+    "title": "Every European title that runs native",
     "subtitle": "Filter by market, format and audience. Indicative pricing on every product — firm pricing on request via the desk.",
     "resultCount": "{count, plural, =0 {No matches} =1 {1 title} other {# titles}}",
     "removeFilter": "Remove filter",
@@ -232,13 +232,13 @@
     "compareTop": "Compare these results",
     "gate": {
       "eyebrow": "The catalog",
-      "title": "{count, plural, =1 {1 Nordic title.} other {# Nordic titles.}} One desk.",
+      "title": "{count, plural, =1 {1 European title.} other {# European titles.}} One desk.",
       "lead": "The full catalog — formats, audience, indicative pricing — is for verified advertisers and agencies. Get access and we'll send a brief template the same day.",
       "ctaPrimary": "Get access",
       "ctaSecondary": "Sign in",
       "statsTitles": "Titles in catalog",
       "statsProducts": "Native products",
-      "statsMarkets": "Nordic markets",
+      "statsMarkets": "European markets",
       "teaserEyebrow": "Featured",
       "teaserTitle": "A taste of what's inside",
       "teaserCta": "See full catalog",
@@ -368,7 +368,7 @@
     "openLink": "Open",
     "ordersBlurb": "Orders that have been confirmed, are in production, or have gone live.",
     "reportsBlurb": "Platform KPIs — demand, conversion and revenue.",
-    "titlesBlurb": "Review and activate Nordic magazine titles.",
+    "titlesBlurb": "Review and activate European magazine titles.",
     "org": "Company",
     "status": "Status",
     "items": "Items",
@@ -458,22 +458,22 @@
     "password": "Password",
     "submit": "Sign in",
     "failed": "Invalid email or password — please try again.",
-    "hint": "Demo logins — desk: desk@benative.example / benative-desk · buyer: buyer@benative.example / benative-buyer",
+    "hint": "Demo logins — desk: desk@atnative.com / atnative-desk · buyer: buyer@atnative.com / atnative-buyer",
     "signin": "Sign in",
     "signout": "Sign out",
     "signup": "Sign up",
     "signupTitle": "Create your account",
     "signupSubtitle": "Tell us who you are and we'll get you set up.",
     "signupHeadline": "Start buying native in 30 seconds.",
-    "signupLead": "Free to create an account, browse pricing across every Nordic title, and submit a brief whenever you're ready.",
-    "bulletCatalog": "Browse every Nordic title with transparent specs and pricing",
+    "signupLead": "Free to create an account, browse pricing across every European title, and submit a brief whenever you're ready.",
+    "bulletCatalog": "Browse every European title with transparent specs and pricing",
     "bulletDesk": "Brief us once — we write and book on your behalf",
     "bulletReports": "Track requests, orders and spend in one place",
     "haveAccountTitle": "Already signed up?",
     "haveAccountBody": "Welcome back —",
     "marketPlaceholder": "Choose your billing market",
     "signinSubtitle": "Welcome back. Sign in to continue.",
-    "welcomeHeadline": "The Nordic native marketplace.",
+    "welcomeHeadline": "The European native marketplace.",
     "welcomeLead": "One transparent catalog of every newspaper and magazine that offers native — with a managed desk that briefs, writes and books on your behalf.",
     "pullTitle": "Not a customer yet?",
     "pullBody": "Browse the catalog without signing in, then submit a brief when you're ready.",
@@ -608,10 +608,10 @@
     "availability": "Availability"
   },
   "formats": {
-    "metaTitle": "Native formats — BeNative",
+    "metaTitle": "Native formats — ATNative",
     "eyebrow": "Formats",
     "title": "Four ways to run native — pick the one that fits.",
-    "lead": "Every Nordic title in our catalog supports one or more of these four formats. The difference is whose voice you're paying for and how prominent the brand is.",
+    "lead": "Every European title in our catalog supports one or more of these four formats. The difference is whose voice you're paying for and how prominent the brand is.",
     "voice": "Whose voice",
     "brandPresence": "Brand presence",
     "readsLike": "Reads like",
@@ -658,7 +658,7 @@
       "rule": "If you're already buying a native article, the package is almost always cheaper than buying display separately."
     },
     "disclosureTitle": "All four are clearly labelled as paid",
-    "disclosureBody": "Nordic media regulators require every paid placement to be unambiguously disclosed. We default to the publisher's own disclosure label (e.g. 'Annonsørinnhold', 'Annons', 'Annonce') and verify it on every spec check before the order goes live.",
+    "disclosureBody": "EU media regulators require every paid placement to be unambiguously disclosed. We default to the publisher's own disclosure label (e.g. 'Annonsørinnhold', 'Annons', 'Annonce') and verify it on every spec check before the order goes live.",
     "ctaTitle": "Not sure which fits?",
     "ctaBody": "Send us a brief and the desk recommends a format mix for your goal, audience and budget — same day.",
     "ctaContact": "Talk to the desk",
@@ -689,20 +689,20 @@
     "howCta": "How it works",
     "audiencesTitle": "Built for every side of native",
     "audAdvertiserTitle": "For advertisers",
-    "audAdvertiserBody": "One catalog of every Nordic title that offers native. Brief us; we write it and book it.",
+    "audAdvertiserBody": "One catalog of every European title that offers native. Brief us; we write it and book it.",
     "audAgencyTitle": "For agencies",
     "audAgencyBody": "A managed desk you can lean on, with multi-client workspaces.",
     "audPublisherTitle": "For publishers",
     "audPublisherBody": "Incremental qualified demand and ready-to-publish content — without building self-serve.",
     "learnMore": "Learn more",
     "ctaBlockTitle": "Start with the catalog",
-    "ctaBlockBody": "Browse every Nordic title that offers native — filter by market, format and audience, and see indicative pricing before you talk to anyone.",
+    "ctaBlockBody": "Browse every European title that offers native — filter by market, format and audience, and see indicative pricing before you talk to anyone.",
     "browseCatalog": "Browse the catalog",
     "createAccount": "Create an account",
     "createAgencyAccount": "Open an agency workspace",
     "tryRecommender": "Try the recommender",
     "seeWorkflow": "See the full workflow",
-    "footerTagline": "Native content and native advertising across every Nordic title — transparent, managed, productised.",
+    "footerTagline": "Native content and native advertising across every European title — transparent, managed, productised.",
     "footerProduct": "Product",
     "footerSolutions": "Solutions",
     "footerCompany": "Company",
@@ -714,7 +714,7 @@
     "problemsEyebrow": "Problems",
     "solutionsEyebrow": "Solutions",
     "metaTitle": "For advertisers",
-    "title": "Buy native content across every Nordic title",
+    "title": "Buy native content across every European title",
     "lead": "Discovery, comparable pricing and content production in one place. Most premium editorial inventory isn't sold programmatically — we make it bookable anyway.",
     "problemsTitle": "What native usually feels like",
     "problem1Title": "Fragmented",
@@ -723,7 +723,7 @@
     "problem2Body": "Pricing lives in PDFs and emails. Comparing value across titles takes weeks of back-and-forth.",
     "problem3Title": "Operationally heavy",
     "problem3Body": "Good native is editorial-grade writing tuned per publisher. Producing it in-house at quality is hard.",
-    "solutionsTitle": "What BeNative gives you",
+    "solutionsTitle": "What ATNative gives you",
     "solution1Title": "One transparent catalog",
     "solution1Body": "Every newspaper and magazine that offers native, with indicative pricing, format specs and reach data — no sales call required.",
     "solution2Title": "Managed buying desk",
@@ -741,7 +741,7 @@
     "featuresEyebrow": "Built for agencies",
     "metaTitle": "For agencies",
     "title": "A managed desk your team can lean on",
-    "lead": "Plan across every Nordic title in one workspace, switch between clients in a click, and let our desk handle publisher negotiations.",
+    "lead": "Plan across every European title in one workspace, switch between clients in a click, and let our desk handle publisher negotiations.",
     "featuresTitle": "Built for agency reality",
     "feature1Title": "Multi-client workspaces",
     "feature1Body": "One agency account holds every client org. Switch with one click; requests, quotes and orders stay scoped to the active client.",
@@ -750,7 +750,7 @@
     "feature3Title": "Firm-price self-serve",
     "feature3Body": "Where titles publish firm pricing, your planners can book instantly. Everything else routes through the desk with full transparency.",
     "feature4Title": "White-label (coming)",
-    "feature4Body": "Surface BeNative inside your own client portals. Same catalog, your brand. Talk to us if you'd like early access.",
+    "feature4Body": "Surface ATNative inside your own client portals. Same catalog, your brand. Talk to us if you'd like early access.",
     "workflowTitle": "Same workflow your team already runs",
     "workflowBody": "Brief → plan → request → firm quote → order → live placement → reporting. We slot into the steps that hurt most — sourcing, quoting, content — without changing how you brief or report.",
     "ctaTitle": "Run a campaign with us",
@@ -771,10 +771,10 @@
     "benefit3Title": "Your rate card, your specs",
     "benefit3Body": "You own pricing and inventory. We never resell at a discount to your published rates; our margin is on the buyer side.",
     "benefit4Title": "Single billing relationship",
-    "benefit4Body": "One invoice per cycle from BeNative across all advertisers and agencies, with payment terms you set.",
+    "benefit4Body": "One invoice per cycle from ATNative across all advertisers and agencies, with payment terms you set.",
     "howTitle": "How partnership works",
     "step1Title": "Onboard your rate card",
-    "step1Body": "We import your media kit and translate it into the BeNative catalog format. You verify; it goes live.",
+    "step1Body": "We import your media kit and translate it into the ATNative catalog format. You verify; it goes live.",
     "step2Title": "We bring buyers",
     "step2Body": "Advertisers and agencies find your titles, build a plan, and submit a request.",
     "step3Title": "Quote + content",
@@ -793,7 +793,7 @@
     "title": "From brief to live placement",
     "lead": "Five steps from \"I have a campaign idea\" to a published, spec-compliant native article — most of them done by us.",
     "step1Title": "Browse the catalog",
-    "step1Body": "Filter every Nordic title by market, format, category and audience. See indicative pricing and reach up front.",
+    "step1Body": "Filter every European title by market, format, category and audience. See indicative pricing and reach up front.",
     "step2Title": "Build a plan",
     "step2Body": "Add titles to a plan with budget, dates and audience notes. Compare side-by-side before you commit.",
     "step3Title": "Get a firm quote",
@@ -813,14 +813,14 @@
   },
   "about": {
     "eyebrow": "About",
-    "metaTitle": "About BeNative",
+    "metaTitle": "About ATNative",
     "title": "Native is operationally painful. We fix that.",
-    "lead": "BeNative is a Nordic marketplace for buying native content and native advertising across newspapers and magazines — including the many that don't sell programmatically.",
+    "lead": "ATNative is a European marketplace for buying native content and native advertising across newspapers and magazines — including the many that don't sell programmatically.",
     "missionTitle": "Mission",
-    "missionBody1": "Make Nordic native inventory as easy to find, compare and buy as programmatic display — without losing the editorial quality that makes native work in the first place.",
+    "missionBody1": "Make European native inventory as easy to find, compare and buy as programmatic display — without losing the editorial quality that makes native work in the first place.",
     "missionBody2": "We're buyer-first: transparent catalog, transparent pricing, managed buying behind it, content production tuned to each title. Defensibility is in the dataset and the relationships, not in any single feature.",
-    "nordicTitle": "Why Nordic, why now",
-    "nordicBody": "Native pays better than display in the Nordics, but the buying experience is two decades behind. Most premium titles still don't sell programmatically. Buyers and publishers both want a neutral aggregator — we're building it for NO, SE and DK first, multilingual and multi-currency from day one.",
+    "nordicTitle": "Why European, why now",
+    "nordicBody": "Native pays better than display in Europe, but the buying experience is two decades behind. Most premium titles still don't sell programmatically. Buyers and publishers both want a neutral aggregator — we're building it across nine European markets (NO, SE, DK, FI, DE, AT, CH, UK, IE), multilingual and multi-currency from day one.",
     "beliefsTitle": "What we believe",
     "belief1Title": "Catalog is the product",
     "belief1Body": "The catalog dataset and publisher relationships are the moat. Everything else is shaped around making it more complete, more accurate, more comparable.",
@@ -829,7 +829,7 @@
     "belief3Title": "Operations earn their keep",
     "belief3Body": "A managed desk only makes sense if every campaign reduces desk-hours for the next one. We instrument it so it does.",
     "teamTitle": "Team",
-    "teamBody": "A small product/engineering team in the Nordics, working alongside a buying desk and an editorial team for content production. We work in public — the platform plan, the data model and the catalog are all visible on the site.",
+    "teamBody": "A small product/engineering team in Europe, working alongside a buying desk and an editorial team for content production. We work in public — the platform plan, the data model and the catalog are all visible on the site.",
     "contactTitle": "Get in touch",
     "contactBody": "Whether you want to plan a campaign, partner as a publisher, or just compare notes on native — we'd love to hear from you.",
     "contactCta": "Email us"
@@ -840,7 +840,7 @@
       "items": {
         "catalog": {
           "title": "Catalog",
-          "description": "Every Nordic title that offers native — filter by market, format and audience."
+          "description": "Every European title that offers native — filter by market, format and audience."
         },
         "recommend": {
           "title": "Recommendation",
@@ -861,7 +861,7 @@
       "items": {
         "advertisers": {
           "title": "For advertisers",
-          "description": "One catalog of every Nordic title that offers native."
+          "description": "One catalog of every European title that offers native."
         },
         "agencies": {
           "title": "For agencies",
@@ -898,7 +898,7 @@
       },
       "featured": {
         "title": "Become a partner",
-        "description": "Onboard your title onto BeNative."
+        "description": "Onboard your title onto ATNative."
       }
     },
     "company": {
@@ -943,7 +943,7 @@
         "tagline": "For advertisers who want to book firm-price native instantly.",
         "price": "Free to use",
         "priceNote": "Pay only the publisher rate at checkout.",
-        "feature1": "Browse the full Nordic catalog",
+        "feature1": "Browse the full European catalog",
         "feature2": "Build plans and compare titles",
         "feature3": "Book firm-priced placements instantly",
         "feature4": "Invoice in your market's currency",
@@ -995,14 +995,14 @@
     "faq4Q": "Can we bring our own content?",
     "faq4A": "Yes. Bring your own draft and we'll spec-check it; or have the desk produce it end-to-end.",
     "ctaTitle": "Ready to compare titles?",
-    "ctaBody": "The catalog shows indicative pricing for every Nordic title — no sales call required.",
+    "ctaBody": "The catalog shows indicative pricing for every European title — no sales call required.",
     "ctaContact": "Talk to us",
     "feesEyebrow": "Fees",
     "faqEyebrow": "FAQ",
     "faqTitle": "Frequently asked questions"
   },
   "contact": {
-    "metaTitle": "Contact BeNative",
+    "metaTitle": "Contact ATNative",
     "eyebrow": "Contact",
     "title": "Get in touch",
     "lead": "Pick the right channel below, or use the form. We answer every message within a working day.",
@@ -1023,10 +1023,10 @@
     "formTitle": "Tell us what you need",
     "formLead": "A short message is enough. We'll route you to the right person and follow up by email.",
     "bullet1": "Reply within one working day",
-    "bullet2": "Nordic time zones (CET/CEST)",
+    "bullet2": "European time zones (CET/CEST)",
     "bullet3": "No drip campaigns — promise",
     "pullTitle": "Prefer email? ",
-    "pullBody": "Drop a line to hello@benative.example and we'll triage from there.",
+    "pullBody": "Drop a line to hello@atnative.com and we'll triage from there.",
     "formCardTitle": "Send us a message",
     "formCardLead": "We'll get back within a working day.",
     "name": "Your name",
@@ -1040,7 +1040,7 @@
     "message": "Message",
     "messagePlaceholder": "What are you trying to do, and when?",
     "submit": "Send message",
-    "altPrefix": "Curious who's behind BeNative?",
+    "altPrefix": "Curious who's behind ATNative?",
     "altLink": "Read about us →"
   },
   "security": {
@@ -1089,11 +1089,11 @@
     "metaTitle": "Privacy",
     "eyebrow": "Privacy",
     "title": "Privacy policy",
-    "lead": "How BeNative collects, uses and protects personal data — in plain language.",
+    "lead": "How ATNative collects, uses and protects personal data — in plain language.",
     "lastUpdated": "Last updated: 22 May 2026",
     "controller": {
       "title": "Who is the data controller",
-      "body": "BeNative AS is the data controller for personal data processed via this marketplace. We are based in Norway and process all data inside the EU/EEA."
+      "body": "ATNative AS is the data controller for personal data processed via this marketplace. We are based in Norway and process all data inside the EU/EEA."
     },
     "data": {
       "title": "What data we collect",
@@ -1121,7 +1121,7 @@
     },
     "rights": {
       "title": "Your rights",
-      "body": "You can request access, correction, deletion or export of your personal data, and you can object to processing based on legitimate interest. Contact privacy@benative.example to exercise these rights."
+      "body": "You can request access, correction, deletion or export of your personal data, and you can object to processing based on legitimate interest. Contact privacy@atnative.com to exercise these rights."
     },
     "cookies": {
       "title": "Cookies",
@@ -1138,11 +1138,11 @@
     "metaTitle": "Terms of service",
     "eyebrow": "Terms",
     "title": "Marketplace terms of service",
-    "lead": "These terms govern your use of BeNative as an advertiser, agency or publisher.",
+    "lead": "These terms govern your use of ATNative as an advertiser, agency or publisher.",
     "lastUpdated": "Last updated: 22 May 2026",
     "scope": {
       "title": "Scope",
-      "body": "BeNative is a marketplace connecting advertisers and agencies with newspaper and magazine publishers offering native content and native advertising. These terms apply to all users of the marketplace."
+      "body": "ATNative is a marketplace connecting advertisers and agencies with newspaper and magazine publishers offering native content and native advertising. These terms apply to all users of the marketplace."
     },
     "accounts": {
       "title": "Accounts",
@@ -1158,7 +1158,7 @@
     },
     "content": {
       "title": "Content",
-      "body": "Content produced through BeNative is licensed to the advertiser for the placement booked. Publishers may decline content that does not meet their editorial standards, with a written reason."
+      "body": "Content produced through ATNative is licensed to the advertiser for the placement booked. Publishers may decline content that does not meet their editorial standards, with a written reason."
     },
     "fees": {
       "title": "Fees and payment",
@@ -1166,7 +1166,7 @@
     },
     "liability": {
       "title": "Liability",
-      "body": "BeNative facilitates the transaction but is not the publisher of placed articles. Each party is responsible for compliance with applicable advertising, disclosure and consumer-protection law. Liability is limited to the fees paid in the prior 12 months."
+      "body": "ATNative facilitates the transaction but is not the publisher of placed articles. Each party is responsible for compliance with applicable advertising, disclosure and consumer-protection law. Liability is limited to the fees paid in the prior 12 months."
     },
     "termination": {
       "title": "Termination",
@@ -1182,5 +1182,147 @@
     },
     "contactTitle": "Legal contact",
     "contactBody": "Questions about these terms — write to"
+  },
+  "landing": {
+    "hero": {
+      "labelText": "ATNative · Native marketplace",
+      "pain": "Most premium native isn't sold programmatically. It's sold by a phone call, a PDF rate-card, and a four-week back-and-forth. <strong>We replace that with one brief and a 24-hour firm quote.</strong>",
+      "h1Line1": "One brief.",
+      "h1Line2": "3,000+ titles.",
+      "h1Line3": "Firm quote in 24 hours.",
+      "ctaPrimary": "Send a brief",
+      "ctaSecondary": "How it works",
+      "ctaMeta": "No call required. We reply in writing, on the record.",
+      "sideAria": "Why native",
+      "sideBody": "Sponsored articles consistently out-perform display on attention and brand lift. Pay for what you publish, not for what's blocked."
+    },
+    "why": {
+      "labelText": "Why native",
+      "h2": "Native does the job display can't.",
+      "lead": "Display buys impressions in the gutter. Native buys editorial time inside the article itself. Different real-estate, different reader behaviour, different result.",
+      "colAIx": "I.",
+      "colAH3": "Attention you can't ad-block",
+      "colABody": "A sponsored article lives where the reader is already paying attention. <strong>No banner blindness, no skip button</strong> — the unit is the content.",
+      "colAPull": "<strong>3–5×</strong> dwell time vs comparable display",
+      "colBIx": "II.",
+      "colBH3": "Trust transferred from the title",
+      "colBBody": "When a reader sees your story under a title they trust, some of that trust transfers. <strong>Disclosure stays clear</strong> — credibility comes from the editorial frame.",
+      "colBPull": "<strong>+18pp</strong> brand consideration lift (industry avg.)",
+      "colCIx": "III.",
+      "colCH3": "Longevity past the campaign",
+      "colCBody": "A published article keeps earning impressions and search referrals after the campaign ends. <strong>Display disappears the moment you stop paying.</strong>",
+      "colCPull": "Lives on the publisher's domain. Indexed. Permanent."
+    },
+    "vs": {
+      "labelText": "Native vs display",
+      "h2": "Same budget. Very different outcome.",
+      "thNative": "Native (sponsored article)",
+      "thDisplay": "Display banner",
+      "primaryJobSpec": "Primary job",
+      "primaryJobNative": "Tell a story the reader chose to read",
+      "primaryJobDisplay": "Interrupt and redirect to your site",
+      "readerBehaviourSpec": "Reader behaviour",
+      "readerBehaviourNative": "Reads. Scrolls. Lingers.",
+      "readerBehaviourDisplay": "Scrolls past. Ad-blocks. Forgets.",
+      "realEstateSpec": "Real estate",
+      "realEstateNative": "Inside the editorial flow",
+      "realEstateDisplay": "Gutter, header, between paragraphs",
+      "trustTransferSpec": "Trust transfer",
+      "trustTransferNative": "Borrowed from the title",
+      "trustTransferDisplay": "None — readers know it's an ad",
+      "longevitySpec": "Longevity",
+      "longevityNative": "Indexed, searchable, permanent",
+      "longevityDisplay": "Disappears at campaign end",
+      "bestFitSpec": "Best fit",
+      "bestFitNative": "Considered purchase, B2B, brand build",
+      "bestFitDisplay": "Performance retargeting, simple offers"
+    },
+    "rule": {
+      "labelIx": "The golden rule",
+      "h2": "If it isn't useful to the reader, it isn't native — it's a press release in disguise.",
+      "body": "Every article we ship has to earn the reader's time on its own. <strong>Editorial standards, the publisher's spec, the market's disclosure label</strong> — non-negotiable. That's how the trust transfer actually works.",
+      "sig": "— The ATNative desk"
+    },
+    "pubs": {
+      "labelText": "Publishers",
+      "meta": "{publishers, number}+ publishers · {titles, number}+ titles catalogued · {active, number} verified for instant booking",
+      "foot": "What you see here is a sliver of the catalog.",
+      "footMore": "Tell us what you're after"
+    },
+    "catalog": {
+      "labelText": "A taste of the catalog",
+      "h2": "Live titles, indicative pricing.",
+      "ask": "Ask for the full list",
+      "thTitle": "Title",
+      "thPublisher": "Category",
+      "thMarket": "Market",
+      "thFormat": "Format",
+      "thAudience": "Reach",
+      "thFrom": "From",
+      "fmtNativeArticle": "Native article",
+      "fmtSponsoredArticle": "Sponsored article",
+      "fmtSponsoredContent": "Sponsored content",
+      "fmtSponsoredArticleAds": "Article + amplification",
+      "readersSuffix": "readers/mo",
+      "footBody": "Indicative prices. The desk confirms firm pricing based on availability, season and volume.",
+      "footInd": "Indicative · ex. VAT"
+    },
+    "stats": {
+      "v240Label": "Titles catalogued",
+      "v240Sub": "NO · SE · DK · FI · DE · AT · CH · UK · IE",
+      "v12Label": "Publishers in network",
+      "v12Sub": "Daily papers, magazines, niche titles",
+      "v24Unit": "h",
+      "v24Label": "Firm quote",
+      "v24Sub": "Average desk turnaround",
+      "v3Label": "Markets covered",
+      "v3Sub": "9 European markets"
+    },
+    "how": {
+      "labelText": "How it works",
+      "h2": "Three steps. Most of the work is on our side.",
+      "s1Num": "01",
+      "s1H3": "Send a brief",
+      "s1Body": "Target market, budget, audience, a sentence about the goal. That's enough for the desk to scope. No deck required.",
+      "s1Time": "5 minutes",
+      "s2Num": "02",
+      "s2H3": "Firm quote in 24h",
+      "s2Body": "We come back with a title shortlist, firm pricing per publisher, content production scope, and a go-live date. Written, not on a call.",
+      "s2Time": "Within one working day",
+      "s3Num": "03",
+      "s3H3": "We publish, you review",
+      "s3Body": "We write the article to the title's spec, run the spec-check, hand you the draft for approval, then the publisher publishes. You get the live URL and an invoice.",
+      "s3Time": "10–25 days, depending on title"
+    },
+    "obj": {
+      "h2": "What people ask before they brief us.",
+      "q1": "Why not just buy display? It's cheaper.",
+      "a1": "Per impression, yes. Per <strong>attention-second</strong>, native wins by a wide margin. If you're building consideration, the unit price isn't what matters.",
+      "q2": "Native feels slow. We need this in market next week.",
+      "a2": "Most titles publish within 10–25 days of brief. Some same-week. The 24-hour firm quote tells you exactly when, per title, before you commit.",
+      "q3": "We don't have the operational capacity for native.",
+      "a3": "<strong>That's the entire point of the desk.</strong> Brief in, finished article and live placement out. Our team handles publisher negotiation, content production, spec-checking, and invoicing.",
+      "q4": "How do we measure it?",
+      "a4": "Standard tracking on the live URL — page views, time on page, scroll depth, click-through to your site. Brand lift on request via panel study.",
+      "q5": "What about brand safety and disclosure?",
+      "a5": "Disclosure is encoded per market (<strong>Annonsørinnhold / Annons / Annonce</strong>) and applied automatically. Spec-check has to pass before anything reaches the publisher."
+    },
+    "endCta": {
+      "h2": "Send us a brief.",
+      "body": "One paragraph is enough. We come back in writing, with a firm quote, within 24 hours.",
+      "ctaPrimary": "Email the desk",
+      "ctaSecondary": "Create an account",
+      "qualPrefix": "Or you're a publisher and want to be listed —",
+      "qualLink": "talk to us"
+    },
+    "foot": {
+      "tagline": "Native content and native advertising across every European title — and a growing European catalog.",
+      "copy": "ATNative AS · Oslo",
+      "navAdv": "For advertisers",
+      "navAgy": "For agencies",
+      "navPub": "For publishers",
+      "navAbout": "About",
+      "navContact": "Contact"
+    }
   }
 }
