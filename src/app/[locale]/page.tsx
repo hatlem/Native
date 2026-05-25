@@ -579,11 +579,15 @@ body:has(.bn) header.site-header .nav button:hover { background: #3A3528 !import
 
 .bn .wrap { max-width: var(--max); margin: 0 auto; padding-left: var(--pad); padding-right: var(--pad); }
 
-/* — Hero — */
-.bn .hero { padding: clamp(64px, 9vw, 140px) 0 clamp(48px, 6vw, 96px); border-bottom: 2px solid var(--rule); }
+/* — Hero — tuned so the headline + CTAs + 3-5× side stat all sit
+   above the fold on a 1366×768 laptop. */
+.bn .hero {
+  padding: clamp(28px, 3.6vw, 56px) 0 clamp(28px, 3.6vw, 56px);
+  border-bottom: 2px solid var(--rule);
+}
 .bn .pain-row {
   display: flex; align-items: baseline; gap: 18px; flex-wrap: wrap;
-  margin-bottom: clamp(44px, 5vw, 72px);
+  margin-bottom: clamp(20px, 2.4vw, 36px);
 }
 .bn .label {
   font-size: 11px; text-transform: uppercase; letter-spacing: 0.18em; font-weight: 600;
@@ -594,19 +598,20 @@ body:has(.bn) header.site-header .nav button:hover { background: #3A3528 !import
   content: ""; display: inline-block; width: 56px; height: 1px; background: var(--ink); margin-left: 16px; transform: translateY(-4px);
 }
 .bn .pain-line {
-  font-size: clamp(15px, 1.3vw, 18px);
+  font-size: clamp(14px, 1.1vw, 16px);
   color: var(--ink-soft);
-  max-width: 56ch;
+  max-width: 64ch;
   line-height: 1.5;
+  margin: 0;
 }
 .bn .pain-line strong { font-weight: 600; color: var(--ink); }
 
 .bn h1.headline {
   font-weight: 600;
-  font-size: clamp(48px, 8.4vw, 112px);
+  font-size: clamp(40px, min(6.4vw, 8.4vh), 88px);
   line-height: 0.95;
   letter-spacing: -0.045em;
-  margin: 0 0 clamp(40px, 4vw, 60px) 0;
+  margin: 0 0 clamp(24px, 2.6vw, 40px) 0;
   text-wrap: balance;
 }
 .bn h1.headline .row { display: block; }
@@ -621,7 +626,7 @@ body:has(.bn) header.site-header .nav button:hover { background: #3A3528 !import
 .bn .ctas { display: flex; gap: 16px; flex-wrap: wrap; align-items: center; }
 .bn .btn {
   display: inline-flex; align-items: center; gap: 12px;
-  padding: 16px 22px; border-radius: 2px;
+  padding: 13px 20px; border-radius: 2px;
   font-size: 13px; text-transform: uppercase; letter-spacing: 0.14em; font-weight: 600;
   border: 2px solid var(--ink); background: transparent; color: var(--ink);
   cursor: pointer; transition: transform .15s ease;
