@@ -6,6 +6,7 @@ import { formatMoney } from "@/lib/money";
 import { loadScope, canActOnOrg } from "@/lib/scope";
 import { safeExternalUrl } from "@/lib/security";
 import { StatusBadge } from "@/app/status-badge";
+import { duplicatePlan } from "@/app/actions";
 
 export const dynamic = "force-dynamic";
 
@@ -93,6 +94,17 @@ export default async function MyOrderPage({
               {ti("title")} →
             </Link>
           ) : null}
+          {/* Returning-customer affordance (Maja R2): rebuild the
+              in-flight basket from this order's original plan. The
+              user lands on /plan to edit titles, dates, and budget
+              before re-submitting the RFQ. */}
+          <form action={duplicatePlan}>
+            <input type="hidden" name="locale" value={locale} />
+            <input type="hidden" name="orderId" value={order.id} />
+            <button type="submit" className="btn small secondary block">
+              {t("useAsTemplate")}
+            </button>
+          </form>
         </aside>
       </header>
 

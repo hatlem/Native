@@ -87,6 +87,28 @@ export default async function PlanPage({
         </div>
       ) : null}
 
+      {/* Surfaced by duplicatePlan (Maja R2 / "use as template") so the
+          buyer knows how many items survived the rehydration. */}
+      {typeof sp.duplicate === "string" ? (
+        sp.duplicate === "ok" ? (
+          <div className="banner-info" role="status">
+            <span>{t("duplicateOk")}</span>
+          </div>
+        ) : sp.duplicate.startsWith("partial-") ? (
+          <div className="banner-info" role="status">
+            <span>
+              {t("duplicatePartial", {
+                dropped: sp.duplicate.slice("partial-".length),
+              })}
+            </span>
+          </div>
+        ) : sp.duplicate === "all-inactive" ? (
+          <div className="banner-error" role="alert">
+            <span>{t("duplicateAllInactive")}</span>
+          </div>
+        ) : null
+      ) : null}
+
       {lines.length === 0 ? (
         <EmptyState
           title={t("empty")}

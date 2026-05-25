@@ -5,6 +5,13 @@ import { ProductType, PriceVisibility } from "@prisma/client";
 import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
 import { recordAudit } from "@/lib/audit";
+import { emailAdapter } from "@/lib/notify";
+import {
+  newInviteToken,
+  expiryFromNow,
+  claimLink,
+  inviteEmail,
+} from "@/lib/publisher-invite";
 
 function field(formData: FormData, key: string): string {
   const v = formData.get(key);
@@ -152,6 +159,70 @@ export async function markTitleNoNative(formData: FormData) {
     name: title.name,
   });
   redirect(`/${locale}/desk/titles`);
+}
+
+// Closes Ingrid's "manual email drafting" gap: emit a tokenised invite
+// link to the publisher's commercial contact so they can claim a
+// portal account that's pre-bound to the Publisher row we activated.
+//
+// The action is super-admin-only (it's a partnership-shaping decision,
+// not a desk-ops one) and audited. Token is single-use + time-limited
+// (default 14 days, configurable via PublisherInvite.expiresAt).
+export async function sendPublisherInvite(formData: FormData) {
+  const locale = field(formData, "locale") || "en";
+  const publisherId = field(formData, "publisherId");
+  const rawEmail = field(formData, "email").toLowerCase();
+  const userId = await requireSuperadmin(locale);
+
+  // Light email validation — we'd rather refuse a typo here than send
+  // an invite to nowhere and have it look like spam if it lands later.
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(rawEmail)) {
+    redirect(`/${locale}/desk/titles?invite=invalid-email`);
+  }
+
+  const publisher = await prisma.publisher.findUnique({
+    where: { id: publisherId },
+    select: { id: true, name: true },
+  });
+  if (!publisher) {
+    redirect(`/${locale}/desk/titles?invite=not-found`);
+  }
+
+  const session = await auth();
+  const inviterName = session?.user?.name ?? null;
+
+  const token = newInviteToken();
+  const expiresAt = expiryFromNow();
+
+  await prisma.publisherInvite.create({
+    data: {
+      publisherId: publisher.id,
+      email: rawEmail,
+      token,
+      expiresAt,
+      createdBy: userId,
+    },
+  });
+  await recordAudit(userId, "publisher.invite", `Publisher:${publisher.id}`, {
+    email: rawEmail,
+    expiresAt: expiresAt.toISOString(),
+  });
+
+  const link = claimLink(token, locale);
+  const { subject, text } = inviteEmail({
+    publisherName: publisher.name,
+    inviterName,
+    link,
+  });
+  try {
+    await emailAdapter({ to: rawEmail, subject, text });
+  } catch (err) {
+    // Adapter failure shouldn't block the invite — it's recorded in DB
+    // and the super-admin can resend.
+    console.error("publisher.invite_email_failed", { publisherId, err });
+  }
+
+  redirect(`/${locale}/desk/titles?invite=sent`);
 }
 
 // Deactivate an already-live title (super-admin only). Doesn't touch

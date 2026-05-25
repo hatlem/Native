@@ -175,8 +175,9 @@ model Publisher {
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
 
-  titles Title[]
-  users  User[]
+  titles  Title[]
+  users   User[]
+  invites PublisherInvite[]
 
   @@unique([marketId, name])
   @@index([countryCode])
@@ -338,6 +339,29 @@ model User {
   updatedAt      DateTime     @updatedAt
 
   notifications Notification[]
+}
+
+// Super-admin emits these when activating a new publishing house in
+// the catalog. The publisher commercial-lead clicks the tokenised link
+// and lands on a signup page that binds the new User to the
+// pre-existing Publisher record. Token is single-use and time-limited.
+//
+// Closes Ingrid's scenario gap (super-admin had no
+// sendPublisherInvite action and was manually drafting partner emails).
+model PublisherInvite {
+  id              String    @id @default(cuid())
+  publisherId     String
+  publisher       Publisher @relation(fields: [publisherId], references: [id])
+  email           String
+  token           String    @unique
+  expiresAt       DateTime
+  claimedAt       DateTime?
+  claimedByUserId String?
+  createdBy       String
+  createdAt       DateTime  @default(now())
+
+  @@index([publisherId])
+  @@index([email])
 }
 
 // In-DB notification inbox. The email adapter (src/lib/notify.ts) also

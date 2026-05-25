@@ -1911,6 +1911,22 @@ form:not(.filters):not(.cmdk-form) button[type="submit"]:not(.btn):hover {
   gap: 8px;
 }
 
+/* Soft success/info banner — used by post-action toasts that survive a
+   redirect (e.g. ?duplicate=ok on /plan after a "Use as template" click). */
+.banner-info {
+  background: var(--surface);
+  color: var(--ink);
+  border: 1px solid var(--border);
+  border-left: 3px solid var(--accent);
+  border-radius: var(--r-sm);
+  padding: 10px 14px;
+  font-size: 0.9rem;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
 /* ---------- Forms (filters + global field styling) ---------- */
 
 label {

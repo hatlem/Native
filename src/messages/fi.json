@@ -63,7 +63,8 @@
     "listHeading": "Tilaushistoria",
     "newOrderCta": "Uusi tilaus",
     "orderDetailLead": "Tuotantotila, toimitukset ja live-sijoittelut jokaiselle riville tässä tilauksessa.",
-    "linesEyebrow": "Tilausrivit"
+    "linesEyebrow": "Tilausrivit",
+    "useAsTemplate": "Use as template"
   },
   "notifications": {
     "eyebrow": "Saapuneet",
@@ -288,7 +289,10 @@
     "error": "Lisää vähintään yksi sijoittelu ja täytä yritys, sähköposti ja markkina.",
     "linesEyebrow": "Valittu",
     "linesHeading": "Sijoittelusi",
-    "itemCount": "{count, plural, =0 {0 riviä} =1 {1 rivi} other {# riviä}}"
+    "itemCount": "{count, plural, =0 {0 riviä} =1 {1 rivi} other {# riviä}}",
+    "duplicateOk": "Plan restored from your previous order. Edit and re-submit when ready.",
+    "duplicatePartial": "Plan restored. {dropped} item(s) were dropped because the titles are no longer active — browse the catalog for substitutes.",
+    "duplicateAllInactive": "All titles from that order are inactive now. Browse the catalog to build a fresh plan."
   },
   "rfq": {
     "org": "Yritys",
@@ -486,7 +490,21 @@
     "noAccount": "Ei tiliä?",
     "haveAccount": "Onko sinulla jo tili?",
     "regFailed": "Täytä kaikki pakolliset kentät (salasana vähintään 8 merkkiä).",
-    "regExists": "Tili tällä sähköpostilla on jo olemassa."
+    "regExists": "Tili tällä sähköpostilla on jo olemassa.",
+    "inviteInvalidTitle": "This invite is no longer valid",
+    "inviteExpiredBody": "The link has expired. Ask the ATNative team for a fresh invitation.",
+    "inviteClaimedBody": "This invite has already been claimed. Sign in instead.",
+    "inviteUnknownBody": "We could not find this invite. The link may be mistyped.",
+    "claimHeadline": "Claim the {publisher} publisher portal",
+    "claimLead": "Set a password and the portal is yours — your inventory, your rate card, your specs.",
+    "claimBullet1": "Maintain rate cards, specs and lead times for the titles in your portfolio.",
+    "claimBullet2": "Receive ATNative buyers qualified demand without building self-serve tooling.",
+    "claimBullet3": "Single billing relationship — one invoice per cycle from ATNative.",
+    "claimTitle": "Set your password",
+    "claimSubtitle": "You will be signed in as the {publisher} portal owner.",
+    "claimEmailLockedHint": "Email is locked to the invitation — ask ATNative to issue a new invite if it needs to change.",
+    "claimSubmit": "Claim portal account",
+    "claimError": "We could not complete the claim. The link may have just expired."
   },
   "order": {
     "title": "Tilaus",
