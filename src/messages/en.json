@@ -110,16 +110,28 @@
     "filters": {
       "market": "Market",
       "type": "Format",
+      "nativeFit": "Native fit",
+      "b2bB2c": "B2B/B2C",
+      "onlyPriced": "Priced titles only",
       "all": "All",
       "search": "Search",
-      "searchPlaceholder": "Title or category…",
+      "searchPlaceholder": "Title, vertical or tag …",
       "apply": "Apply"
     },
     "card": {
       "from": "From",
       "reach": "Monthly reach",
+      "circulation": "Circulation",
       "leadTime": "Lead time",
-      "days": "days"
+      "days": "days",
+      "requestQuote": "Request a quote",
+      "nativeFit": "Native: {value}"
+    },
+    "resultCount": "{count, plural, =0 {No matches} =1 {1 title} other {# titles}}",
+    "pagination": {
+      "prev": "Previous",
+      "next": "Next",
+      "page": "Page {page} of {total}"
     },
     "indicativeNote": "Prices are indicative. A firm price is confirmed by our buying desk based on availability, season and volume.",
     "noResults": "No titles match these filters.",
@@ -130,6 +142,7 @@
     "back": "Back to catalog",
     "publishedBy": "Published by",
     "reach": "Monthly reach",
+    "circulation": "Circulation",
     "leadTime": "Lead time",
     "days": "days",
     "from": "From",
@@ -138,6 +151,12 @@
     "images": "Images (min)",
     "disclosure": "Disclosure label",
     "addToPlan": "Add to plan",
+    "nativeFitTag": "Native: {value}",
+    "requestQuote": {
+      "title": "Request a quote",
+      "body": "This title is in our catalog but doesn't yet have published list pricing. Send a brief and the desk will pull pricing and availability for you.",
+      "cta": "Start a plan"
+    },
     "indicativeNote": "Indicative price. The firm price is confirmed by our buying desk.",
     "unavailable": "Currently unavailable for booking."
   },

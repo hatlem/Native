@@ -45,7 +45,10 @@ export default async function ComparePage({
   }
 
   const titles = await prisma.title.findMany({
-    where: { id: { in: ids }, active: true },
+    where: {
+      id: { in: ids },
+      OR: [{ active: true }, { lastVerifiedAt: null }],
+    },
     include: {
       publisher: true,
       market: true,

@@ -30,7 +30,10 @@ export default async function TitleDetailPage({
     },
   });
 
-  if (!title || !title.active) notFound();
+  if (!title) notFound();
+  // Verified-no-native titles stay hidden; everything else (commerce-active
+  // and unverified research-catalog rows) renders.
+  if (!title.active && title.lastVerifiedAt) notFound();
 
   const siteBase =
     process.env.NEXT_PUBLIC_SITE_URL?.replace(/\/$/, "") || "";
@@ -52,6 +55,7 @@ export default async function TitleDetailPage({
     url: `${siteBase}/${locale}/catalog/${title.slug}`,
     offers: { "@type": "AggregateOffer", priceCurrency: title.market.currency, offers: ldOffers },
   };
+  const needsQuote = title.products.length === 0;
 
   return (
     <section>
@@ -73,8 +77,61 @@ export default async function TitleDetailPage({
           {t("reach")}: {new Intl.NumberFormat().format(title.monthlyReach)}
         </p>
       ) : null}
+      {/* Surface the rest of the CSV-imported research metadata so buyers
+          can size up a research-catalog title even before requesting a quote. */}
+      {title.type ||
+      title.frequency ||
+      title.b2bB2c ||
+      title.format ||
+      title.nativeFit ||
+      title.reach ? (
+        <div
+          style={{
+            marginTop: 8,
+            display: "flex",
+            gap: 6,
+            flexWrap: "wrap",
+          }}
+        >
+          {title.type ? <span className="tag">{title.type}</span> : null}
+          {title.frequency ? (
+            <span className="tag">{title.frequency}</span>
+          ) : null}
+          {title.b2bB2c ? <span className="tag">{title.b2bB2c}</span> : null}
+          {title.format ? <span className="tag">{title.format}</span> : null}
+          {title.nativeFit ? (
+            <span className="tag">
+              {t("nativeFitTag", { value: title.nativeFit })}
+            </span>
+          ) : null}
+          {title.reach ? <span className="tag">{title.reach}</span> : null}
+        </div>
+      ) : null}
+      {title.vertical ? (
+        <p className="muted" style={{ marginTop: 8 }}>
+          {title.vertical}
+        </p>
+      ) : null}
+      {title.audience ? (
+        <p className="muted">{title.audience}</p>
+      ) : null}
+      {title.circulation ? (
+        <p className="muted">
+          {t("circulation")}:{" "}
+          {new Intl.NumberFormat().format(title.circulation)}
+        </p>
+      ) : null}
 
-      <div className="grid">
+      {needsQuote ? (
+        <article className="card" style={{ marginTop: 16 }}>
+          <h3>{t("requestQuote.title")}</h3>
+          <p className="muted">{t("requestQuote.body")}</p>
+          <Link href="/plan" className="btn" style={{ marginTop: 8 }}>
+            {t("requestQuote.cta")}
+          </Link>
+        </article>
+      ) : (
+        <div className="grid">
         {title.products.map((p) => {
           const price = indicativeFromRules(
             Number(p.basePrice),
@@ -129,7 +186,8 @@ export default async function TitleDetailPage({
             </article>
           );
         })}
-      </div>
+        </div>
+      )}
 
       <p className="note">{t("indicativeNote")}</p>
     </section>

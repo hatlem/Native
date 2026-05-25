@@ -81,16 +81,28 @@
     "filters": {
       "market": "Marked",
       "type": "Format",
+      "nativeFit": "Native-tilpasning",
+      "b2bB2c": "B2B/B2C",
+      "onlyPriced": "Kun titler med pris",
       "all": "Alle",
       "search": "Søk",
-      "searchPlaceholder": "Tittel eller kategori…",
+      "searchPlaceholder": "Tittel, vertikal eller tagg …",
       "apply": "Bruk"
     },
     "card": {
       "from": "Fra",
       "reach": "Månedlig rekkevidde",
+      "circulation": "Opplag",
       "leadTime": "Ledetid",
-      "days": "dager"
+      "days": "dager",
+      "requestQuote": "Be om tilbud",
+      "nativeFit": "Native: {value}"
+    },
+    "resultCount": "{count, plural, =0 {Ingen treff} =1 {1 tittel} other {# titler}}",
+    "pagination": {
+      "prev": "Forrige",
+      "next": "Neste",
+      "page": "Side {page} av {total}"
     },
     "indicativeNote": "Prisene er veiledende. Endelig pris bekreftes av kjøpsteamet basert på tilgjengelighet, sesong og volum.",
     "noResults": "Ingen titler matcher disse filtrene.",
@@ -101,6 +113,7 @@
     "back": "Tilbake til katalogen",
     "publishedBy": "Utgis av",
     "reach": "Månedlig rekkevidde",
+    "circulation": "Opplag",
     "leadTime": "Ledetid",
     "days": "dager",
     "from": "Fra",
@@ -109,6 +122,12 @@
     "images": "Bilder (min.)",
     "disclosure": "Merking",
     "addToPlan": "Legg til i plan",
+    "nativeFitTag": "Native: {value}",
+    "requestQuote": {
+      "title": "Be om tilbud",
+      "body": "Denne tittelen er i vår oversikt, men har ikke en publisert listepris ennå. Send en brief, så henter desk-teamet inn priser og tilgjengelighet for deg.",
+      "cta": "Start en plan"
+    },
     "indicativeNote": "Veiledende pris. Endelig pris bekreftes av kjøpsteamet.",
     "unavailable": "For øyeblikket ikke tilgjengelig for bestilling."
   },

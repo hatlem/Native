@@ -10,9 +10,15 @@ export const dynamic = "force-dynamic";
 
 const MARKET_CODES = Object.values(MarketCode);
 const PRODUCT_TYPES = Object.values(ProductType);
+const NATIVE_FIT_VALUES = ["High", "Medium", "Low"] as const;
+const B2B_B2C_VALUES = ["B2B", "B2C"] as const;
+const PAGE_SIZE = 60;
 
-function asEnum<T extends string>(value: string | undefined, allowed: T[]) {
-  return value && (allowed as string[]).includes(value)
+function asEnum<T extends string>(
+  value: string | undefined,
+  allowed: readonly T[],
+) {
+  return value && (allowed as readonly string[]).includes(value)
     ? (value as T)
     : undefined;
 }
@@ -39,16 +45,33 @@ export default async function CatalogPage({
     typeof sp.type === "string" ? sp.type : undefined,
     PRODUCT_TYPES,
   );
+  const nativeFit = asEnum(
+    typeof sp.nativeFit === "string" ? sp.nativeFit : undefined,
+    NATIVE_FIT_VALUES,
+  );
+  const b2bB2c = asEnum(
+    typeof sp.b2bB2c === "string" ? sp.b2bB2c : undefined,
+    B2B_B2C_VALUES,
+  );
+  const onlyPriced =
+    typeof sp.onlyPriced === "string" && sp.onlyPriced === "1";
   const q = typeof sp.q === "string" ? sp.q.trim() : "";
+  const pageRaw = typeof sp.page === "string" ? parseInt(sp.page, 10) : 1;
+  const page = Number.isFinite(pageRaw) && pageRaw >= 1 ? pageRaw : 1;
 
   // FTS-first: ask Postgres for Title ids matching the query, then
   // intersect with the rest of the filter. Falls back to ILIKE if FTS
   // can't form a valid query (e.g. only punctuation).
   const matchedIds = await searchTitleIds(q);
   const where: Prisma.TitleWhereInput = {
-    active: true,
+    // Show commerce-active titles AND unverified research-catalog rows;
+    // hide titles the desk has verified as not offering native.
+    OR: [{ active: true }, { lastVerifiedAt: null }],
     ...(market ? { market: { code: market } } : {}),
     ...(type ? { products: { some: { type, active: true } } } : {}),
+    ...(onlyPriced ? { active: true } : {}),
+    ...(nativeFit ? { nativeFit } : {}),
+    ...(b2bB2c ? { b2bB2c } : {}),
     ...(matchedIds
       ? { id: { in: matchedIds } }
       : q
@@ -56,23 +79,45 @@ export default async function CatalogPage({
             OR: [
               { name: { contains: q, mode: "insensitive" } },
               { category: { contains: q, mode: "insensitive" } },
+              { vertical: { contains: q, mode: "insensitive" } },
+              { tags: { contains: q, mode: "insensitive" } },
             ],
           }
         : {}),
   };
 
-  const titles = await prisma.title.findMany({
-    where,
-    include: {
-      publisher: true,
-      market: true,
-      products: {
-        where: { active: true },
-        include: { priceRules: true },
+  const [totalCount, titles] = await Promise.all([
+    prisma.title.count({ where }),
+    prisma.title.findMany({
+      where,
+      include: {
+        publisher: true,
+        market: true,
+        products: {
+          where: { active: true },
+          include: { priceRules: true },
+        },
       },
-    },
-    orderBy: { name: "asc" },
-  });
+      // Commerce-active titles surface first, then research catalog by name.
+      orderBy: [{ active: "desc" }, { name: "asc" }],
+      take: PAGE_SIZE,
+      skip: (page - 1) * PAGE_SIZE,
+    }),
+  ]);
+  const totalPages = Math.max(1, Math.ceil(totalCount / PAGE_SIZE));
+
+  const pageQuery = (p: number) => {
+    const params = new URLSearchParams();
+    if (market) params.set("market", market);
+    if (type) params.set("type", type);
+    if (nativeFit) params.set("nativeFit", nativeFit);
+    if (b2bB2c) params.set("b2bB2c", b2bB2c);
+    if (onlyPriced) params.set("onlyPriced", "1");
+    if (q) params.set("q", q);
+    if (p > 1) params.set("page", String(p));
+    const s = params.toString();
+    return s ? `?${s}` : "";
+  };
 
   return (
     <section>
@@ -103,6 +148,28 @@ export default async function CatalogPage({
           </select>
         </div>
         <div>
+          <label htmlFor="nativeFit">{t("filters.nativeFit")}</label>
+          <select id="nativeFit" name="nativeFit" defaultValue={nativeFit ?? ""}>
+            <option value="">{t("filters.all")}</option>
+            {NATIVE_FIT_VALUES.map((v) => (
+              <option key={v} value={v}>
+                {v}
+              </option>
+            ))}
+          </select>
+        </div>
+        <div>
+          <label htmlFor="b2bB2c">{t("filters.b2bB2c")}</label>
+          <select id="b2bB2c" name="b2bB2c" defaultValue={b2bB2c ?? ""}>
+            <option value="">{t("filters.all")}</option>
+            {B2B_B2C_VALUES.map((v) => (
+              <option key={v} value={v}>
+                {v}
+              </option>
+            ))}
+          </select>
+        </div>
+        <div>
           <label htmlFor="q">{t("filters.search")}</label>
           <input
             id="q"
@@ -111,8 +178,28 @@ export default async function CatalogPage({
             placeholder={t("filters.searchPlaceholder")}
           />
         </div>
+        <label
+          style={{
+            display: "flex",
+            alignItems: "center",
+            gap: 6,
+            whiteSpace: "nowrap",
+          }}
+        >
+          <input
+            type="checkbox"
+            name="onlyPriced"
+            value="1"
+            defaultChecked={onlyPriced}
+          />
+          {t("filters.onlyPriced")}
+        </label>
         <button type="submit">{t("filters.apply")}</button>
       </form>
+
+      <p className="muted" style={{ marginTop: 12 }}>
+        {t("resultCount", { count: totalCount })}
+      </p>
 
       {titles.length === 0 ? (
         <EmptyState
@@ -141,6 +228,7 @@ export default async function CatalogPage({
             );
             const from = prices.length ? Math.min(...prices) : null;
             const currency = title.products[0]?.currency ?? title.market.currency;
+            const needsQuote = title.products.length === 0;
 
             return (
               <article className="card" key={title.id}>
@@ -160,11 +248,32 @@ export default async function CatalogPage({
                   {title.products.some((p) => p.visibility === "FIRM") ? (
                     <span className="tag">⚡ {tf("badge")}</span>
                   ) : null}
+                  {needsQuote ? (
+                    <span className="tag">{t("card.requestQuote")}</span>
+                  ) : null}
+                  {title.nativeFit ? (
+                    <span className="tag">
+                      {t("card.nativeFit", { value: title.nativeFit })}
+                    </span>
+                  ) : null}
+                  {title.b2bB2c ? (
+                    <span className="tag">{title.b2bB2c}</span>
+                  ) : null}
                 </div>
+                {title.vertical ? (
+                  <div className="muted" style={{ marginTop: 8 }}>
+                    {title.vertical}
+                  </div>
+                ) : null}
                 {title.monthlyReach ? (
                   <div className="muted" style={{ marginTop: 10 }}>
                     {t("card.reach")}:{" "}
                     {new Intl.NumberFormat().format(title.monthlyReach)}
+                  </div>
+                ) : title.circulation ? (
+                  <div className="muted" style={{ marginTop: 10 }}>
+                    {t("card.circulation")}:{" "}
+                    {new Intl.NumberFormat().format(title.circulation)}
                   </div>
                 ) : null}
                 {from !== null ? (
@@ -178,6 +287,32 @@ export default async function CatalogPage({
         </div>
         </>
       )}
+
+      {totalPages > 1 ? (
+        <nav
+          className="pagination"
+          style={{
+            marginTop: 24,
+            display: "flex",
+            gap: 12,
+            alignItems: "center",
+          }}
+        >
+          {page > 1 ? (
+            <a href={pageQuery(page - 1) || "?"}>← {t("pagination.prev")}</a>
+          ) : (
+            <span className="muted">← {t("pagination.prev")}</span>
+          )}
+          <span className="muted">
+            {t("pagination.page", { page, total: totalPages })}
+          </span>
+          {page < totalPages ? (
+            <a href={pageQuery(page + 1)}>{t("pagination.next")} →</a>
+          ) : (
+            <span className="muted">{t("pagination.next")} →</span>
+          )}
+        </nav>
+      ) : null}
 
       <p className="note">{t("indicativeNote")}</p>
     </section>

@@ -81,16 +81,28 @@
     "filters": {
       "market": "Marked",
       "type": "Format",
+      "nativeFit": "Native-tilpasning",
+      "b2bB2c": "B2B/B2C",
+      "onlyPriced": "Kun titler med pris",
       "all": "Alle",
       "search": "Søg",
-      "searchPlaceholder": "Titel eller kategori…",
+      "searchPlaceholder": "Titel, vertikal eller tag …",
       "apply": "Anvend"
     },
     "card": {
       "from": "Fra",
       "reach": "Månedlig rækkevidde",
+      "circulation": "Oplag",
       "leadTime": "Leveringstid",
-      "days": "dage"
+      "days": "dage",
+      "requestQuote": "Anmod om tilbud",
+      "nativeFit": "Native: {value}"
+    },
+    "resultCount": "{count, plural, =0 {Ingen resultater} =1 {1 titel} other {# titler}}",
+    "pagination": {
+      "prev": "Forrige",
+      "next": "Næste",
+      "page": "Side {page} af {total}"
     },
     "indicativeNote": "Priserne er vejledende. En fast pris bekræftes af vores indkøbsteam baseret på tilgængelighed, sæson og volumen.",
     "noResults": "Ingen titler matcher disse filtre.",
@@ -101,6 +113,7 @@
     "back": "Tilbage til kataloget",
     "publishedBy": "Udgives af",
     "reach": "Månedlig rækkevidde",
+    "circulation": "Oplag",
     "leadTime": "Leveringstid",
     "days": "dage",
     "from": "Fra",
@@ -109,6 +122,12 @@
     "images": "Billeder (min.)",
     "disclosure": "Mærkning",
     "addToPlan": "Tilføj til plan",
+    "nativeFitTag": "Native: {value}",
+    "requestQuote": {
+      "title": "Anmod om tilbud",
+      "body": "Denne titel er i vores katalog, men har endnu ingen offentliggjort listepris. Send en brief, så finder vores indkøbsteam priser og tilgængelighed til dig.",
+      "cta": "Start en plan"
+    },
     "indicativeNote": "Vejledende pris. Den faste pris bekræftes af vores indkøbsteam.",
     "unavailable": "I øjeblikket ikke tilgængelig til booking."
   },
