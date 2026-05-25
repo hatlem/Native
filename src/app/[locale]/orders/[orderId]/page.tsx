@@ -4,6 +4,7 @@ import { prisma } from "@/lib/prisma";
 import { Link } from "@/i18n/navigation";
 import { formatMoney } from "@/lib/money";
 import { loadScope, canActOnOrg } from "@/lib/scope";
+import { safeExternalUrl } from "@/lib/security";
 import { StatusBadge } from "@/app/status-badge";
 
 export const dynamic = "force-dynamic";
@@ -148,16 +149,19 @@ export default async function MyOrderPage({
                   ) : null}
                 </dl>
 
-                {line.booking?.liveUrl ? (
-                  <a
-                    href={line.booking.liveUrl}
-                    target="_blank"
-                    rel="noreferrer noopener"
-                    className="btn small secondary block"
-                  >
-                    {t("livePlacement")} ↗
-                  </a>
-                ) : null}
+                {(() => {
+                  const safe = safeExternalUrl(line.booking?.liveUrl);
+                  return safe ? (
+                    <a
+                      href={safe}
+                      target="_blank"
+                      rel="noreferrer noopener"
+                      className="btn small secondary block"
+                    >
+                      {t("livePlacement")} ↗
+                    </a>
+                  ) : null;
+                })()}
               </article>
             );
           })}

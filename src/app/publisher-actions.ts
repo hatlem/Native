@@ -6,6 +6,7 @@ import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
 import { recordAudit } from "@/lib/audit";
 import { notifyDesk, notifyOrg } from "@/lib/notify";
+import { safeExternalUrl } from "@/lib/security";
 
 function field(formData: FormData, key: string): string {
   const v = formData.get(key);
@@ -117,6 +118,11 @@ export async function updateBooking(formData: FormData) {
   const status = field(formData, "status") as BookingStatus;
   const liveUrl = field(formData, "liveUrl");
 
+  // Whitelist scheme on the publisher-supplied URL — it ends up in
+  // <a href> on the buyer's order page and as the notification link, so a
+  // `javascript:` payload would otherwise XSS the buyer's session.
+  const safeLiveUrl = safeExternalUrl(liveUrl);
+
   const booking = await prisma.publisherBooking.findUnique({
     where: { id: bookingId },
     include: {
@@ -139,14 +145,14 @@ export async function updateBooking(formData: FormData) {
         where: { id: booking.id },
         data: {
           status,
-          liveUrl: liveUrl || null,
+          liveUrl: safeLiveUrl,
           confirmedAt: status === "CONFIRMED" ? new Date() : null,
         },
       });
       await recordAudit(userId, "booking.update", `PublisherBooking:${booking.id}`, {
         from: booking.status,
         to: status,
-        liveUrl: liveUrl || null,
+        liveUrl: safeLiveUrl,
       });
       if (status === "CONFIRMED" || status === "PUBLISHED") {
         await notifyDesk({
@@ -163,7 +169,7 @@ export async function updateBooking(formData: FormData) {
             status === "PUBLISHED"
               ? "Your placement is live"
               : "Publisher confirmed your booking",
-          link: liveUrl || `/${locale}/orders/${booking.orderLine.order.id}`,
+          link: safeLiveUrl ?? `/${locale}/orders/${booking.orderLine.order.id}`,
         });
       }
     }

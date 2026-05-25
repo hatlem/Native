@@ -3,6 +3,7 @@ import { redirect } from "next/navigation";
 import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
 import { Link } from "@/i18n/navigation";
+import { safeExternalUrl } from "@/lib/security";
 import { EmptyState } from "@/app/empty-state";
 import { markAllRead } from "@/app/notification-actions";
 
@@ -76,6 +77,10 @@ export default async function NotificationsPage({
       ) : (
         <div className="action-list">
           {rows.map((n) => {
+            // Defence-in-depth: any pre-existing publisher-controlled URLs
+            // (e.g. liveUrl) saved before the write-side sanitiser would
+            // otherwise reach the buyer's <a href>.
+            const safeLink = safeExternalUrl(n.link);
             const inner = (
               <>
                 <span
@@ -89,17 +94,17 @@ export default async function NotificationsPage({
                     {timeAgo(n.createdAt, locale)}
                   </div>
                 </div>
-                {n.link ? (
+                {safeLink ? (
                   <span className="chev" aria-hidden>
                     →
                   </span>
                 ) : null}
               </>
             );
-            return n.link ? (
+            return safeLink ? (
               <Link
                 key={n.id}
-                href={n.link}
+                href={safeLink}
                 className={`item ${n.readAt ? "item-read" : ""}`}
               >
                 {inner}

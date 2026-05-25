@@ -89,7 +89,12 @@ export default async function SignInPage({
           </div>
         </form>
 
-        <DemoChips label={t("demoLabel")} accounts={DEMO_ACCOUNTS} />
+        {/* Demo accounts are seeded with known-weak passwords; only expose
+            the chip helper outside production so credential-stuffing the
+            seeded accounts isn't documented on the production login page. */}
+        {process.env.NODE_ENV !== "production" ? (
+          <DemoChips label={t("demoLabel")} accounts={DEMO_ACCOUNTS} />
+        ) : null}
 
         <div className="alt">
           {t("noAccount")} <Link href="/signup">{t("signup")}</Link>

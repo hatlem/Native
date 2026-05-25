@@ -10,6 +10,7 @@ import { auth } from "@/auth";
 import { logout } from "@/app/auth-actions";
 import { GtmScripts, GtmNoscript } from "@/app/gtm";
 import { NavShell } from "@/app/nav-shell";
+import { PublicHeader } from "@/app/public-header";
 import {
   audienceFor,
   navItemsFor,
@@ -127,43 +128,43 @@ export default async function LocaleLayout({
         <GtmNoscript />
         <GtmScripts />
         <NextIntlClientProvider messages={messages}>
-          <NavShell
-            brand={appName}
-            nav={nav}
-            palette={palette}
-            menuItems={userMenu}
-            signedIn={signedIn}
-            user={
-              signedIn && session?.user?.email
-                ? {
-                    email: session.user.email,
-                    initials: initialsFromEmail(session.user.email),
-                    roleLabel: roleLabel(audience, session.user.role, t),
-                  }
-                : undefined
-            }
-            signOutAction={
-              signedIn ? (
+          {signedIn ? (
+            <NavShell
+              brand={appName}
+              nav={nav}
+              palette={palette}
+              menuItems={userMenu}
+              signedIn={signedIn}
+              user={
+                session?.user?.email
+                  ? {
+                      email: session.user.email,
+                      initials: initialsFromEmail(session.user.email),
+                      roleLabel: roleLabel(audience, session.user.role, t),
+                    }
+                  : undefined
+              }
+              signOutAction={
                 <form action={logout}>
                   <input type="hidden" name="locale" value={locale} />
                   <button type="submit">{ta("signout")}</button>
                 </form>
-              ) : undefined
-            }
-            authActions={
-              !signedIn
-                ? { signIn: ta("signin"), signUp: ta("signup") }
-                : undefined
-            }
-            labels={{
-              skip: t("skipToContent"),
-              menu: t("menu"),
-              close: t("close"),
-              search: t("search"),
-              searchPlaceholder: t("searchPlaceholder"),
-              noResults: t("noResults"),
-            }}
-          />
+              }
+              labels={{
+                skip: t("skipToContent"),
+                menu: t("menu"),
+                close: t("close"),
+                search: t("search"),
+                searchPlaceholder: t("searchPlaceholder"),
+                noResults: t("noResults"),
+              }}
+            />
+          ) : (
+            <PublicHeader
+              brand={appName}
+              authActions={{ signIn: ta("signin"), signUp: ta("signup") }}
+            />
+          )}
 
           <main id="main" className="container">
             {children}

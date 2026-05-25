@@ -2,6 +2,7 @@ import { getTranslations } from "next-intl/server";
 import { notFound } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import { formatMoney } from "@/lib/money";
+import { loadScope, canActOnOrg } from "@/lib/scope";
 import { StatusBadge } from "@/app/status-badge";
 
 export const dynamic = "force-dynamic";
@@ -19,6 +20,12 @@ export default async function InvoicePage({
     include: { organization: true, lines: true },
   });
   if (!invoice) notFound();
+
+  // Multi-tenant guard: only the billed organization, its agency, or the
+  // desk may view an invoice. Anonymous callers always 404 (same response
+  // as a non-existent invoice — don't leak existence).
+  const scope = await loadScope();
+  if (!canActOnOrg(scope, invoice.organizationId)) notFound();
 
   return (
     <div className="invoice-shell">

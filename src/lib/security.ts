@@ -17,3 +17,25 @@ export function assertSecret(env: NodeJS.ProcessEnv = process.env): void {
     );
   }
 }
+
+// Allow-list URL sanitiser. Publisher-supplied URLs (e.g. PublisherBooking
+// `liveUrl`) flow into <a href> in buyer-visible pages and into the
+// notification inbox; without a scheme check a malicious publisher could
+// set `javascript:alert(...)` and trigger XSS on a buyer's session.
+// Returns the trimmed URL when it parses cleanly to http/https/mailto,
+// else null.
+const SAFE_SCHEMES = new Set(["http:", "https:", "mailto:"]);
+export function safeExternalUrl(raw: string | null | undefined): string | null {
+  const trimmed = (raw ?? "").trim();
+  if (!trimmed) return null;
+  // Bare paths (publisher could paste a relative URL) are safe to render.
+  if (trimmed.startsWith("/") && !trimmed.startsWith("//")) return trimmed;
+  let url: URL;
+  try {
+    url = new URL(trimmed);
+  } catch {
+    return null;
+  }
+  if (!SAFE_SCHEMES.has(url.protocol)) return null;
+  return url.toString();
+}

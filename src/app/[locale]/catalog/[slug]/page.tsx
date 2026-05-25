@@ -70,7 +70,13 @@ export default async function TitleDetailPage({
     <>
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(ld) }}
+        dangerouslySetInnerHTML={{
+          // JSON.stringify doesn't escape `</script>` inside string fields,
+          // so a stored payload in title/publisher names could break out of
+          // the <script> block. Defense-in-depth — currently only admins
+          // can set those fields.
+          __html: JSON.stringify(ld).replace(/</g, "\\u003c"),
+        }}
       />
       <nav className="breadcrumb" aria-label="Breadcrumb">
         <Link href="/catalog" className="small-link">

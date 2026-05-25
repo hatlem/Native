@@ -27,3 +27,5 @@ next-env.d.ts
 # audit artifacts
 .audit/
 .playwright-mcp/
+sec-review.md
+sec-review-*.md

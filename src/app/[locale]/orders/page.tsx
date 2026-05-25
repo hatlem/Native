@@ -4,6 +4,7 @@ import { prisma } from "@/lib/prisma";
 import { Link } from "@/i18n/navigation";
 import { formatMoney } from "@/lib/money";
 import { loadScope } from "@/lib/scope";
+import { safeExternalUrl } from "@/lib/security";
 import { EmptyState } from "@/app/empty-state";
 import { StatusBadge } from "@/app/status-badge";
 
@@ -125,8 +126,9 @@ export default async function MyOrdersPage({
               </thead>
               <tbody>
                 {orders.map((o) => {
-                  const live = o.lines.find((l) => l.booking?.liveUrl)?.booking
-                    ?.liveUrl;
+                  const live = safeExternalUrl(
+                    o.lines.find((l) => l.booking?.liveUrl)?.booking?.liveUrl,
+                  );
                   const invoice = o.invoices[0];
                   return (
                     <tr key={o.id}>

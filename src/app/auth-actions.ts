@@ -105,7 +105,11 @@ export async function register(formData: FormData) {
     // Unique-email violation (or any create failure) — surface as a
     // friendly "already registered" rather than a 500.
   }
-  if (!createdUserId) redirect(`/${locale}/signup?error=exists`);
+  // Don't leak whether the email already exists — same outcome as a
+  // generic validation failure. The legitimate owner sees a sign-in
+  // prompt via the standard ?error=1 banner; an attacker enumerating
+  // emails learns nothing.
+  if (!createdUserId) redirect(`/${locale}/signup?error=1`);
   await recordAudit(createdUserId, "user.register", `User:${email}`, { ip, orgName });
 
   try {

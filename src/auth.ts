@@ -1,10 +1,26 @@
 import NextAuth from "next-auth";
 import Credentials from "next-auth/providers/credentials";
+import { headers } from "next/headers";
 import bcrypt from "bcryptjs";
 import { prisma } from "@/lib/prisma";
 import { assertSecret } from "@/lib/security";
+import { authLimiter } from "@/lib/rate-limit";
 
 assertSecret();
+
+async function authClientIp(): Promise<string> {
+  // headers() throws outside a request scope (e.g. in tests). Best-effort.
+  try {
+    const h = await headers();
+    return (
+      h.get("x-forwarded-for")?.split(",")[0]?.trim() ||
+      h.get("x-real-ip") ||
+      "unknown"
+    );
+  } catch {
+    return "unknown";
+  }
+}
 
 export const { handlers, auth, signIn, signOut } = NextAuth({
   trustHost: true,
@@ -21,6 +37,17 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
           .trim();
         const password = String(credentials?.password ?? "");
         if (!email || !password) return null;
+
+        // Rate-limit at the provider so direct POSTs to
+        // /api/auth/callback/credentials can't bypass the limiter that
+        // sits in the `authenticate()` server action.
+        const ip = await authClientIp();
+        if (
+          !authLimiter.check(`signin:ip:${ip}`).ok ||
+          !authLimiter.check(`signin:email:${email}`).ok
+        ) {
+          return null;
+        }
 
         const user = await prisma.user.findUnique({
           where: { email },
