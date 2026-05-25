@@ -2227,6 +2227,78 @@ select:disabled {
   color: var(--accent-hover);
 }
 
+/* ---------- Legal doc (privacy / terms) ---------- */
+
+.legal-doc {
+  max-width: 760px;
+}
+
+.legal-doc .last-updated {
+  margin-top: var(--s-2);
+}
+
+.legal-section {
+  margin-top: var(--s-5);
+}
+
+.legal-section h2 {
+  margin: 0 0 var(--s-3);
+  font-size: clamp(1.1rem, 1rem + 0.5vw, 1.4rem);
+  letter-spacing: -0.022em;
+}
+
+.legal-section .prose {
+  margin: 0;
+  font-size: 1rem;
+  line-height: 1.7;
+}
+
+/* ---------- Pricing plan cards ---------- */
+
+.plan-card {
+  display: flex;
+  flex-direction: column;
+  gap: var(--s-2);
+  position: relative;
+}
+
+.plan-card.is-featured {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 1px var(--accent);
+}
+
+.plan-badge {
+  align-self: flex-start;
+  margin-bottom: var(--s-2);
+}
+
+.plan-features {
+  margin-top: var(--s-3);
+}
+
+.plan-cta {
+  margin-top: auto;
+  padding-top: var(--s-4);
+}
+
+/* ---------- Contact channels ---------- */
+
+.contact-channel {
+  gap: var(--s-2);
+}
+
+.contact-channel .channel-email {
+  margin-top: auto;
+  padding-top: var(--s-2);
+  font-weight: 540;
+  word-break: break-all;
+}
+
+.contact-shell {
+  max-width: none;
+  padding-top: 0;
+}
+
 /* ---------- Marketing: prose section + step list ---------- */
 
 .prose-section {

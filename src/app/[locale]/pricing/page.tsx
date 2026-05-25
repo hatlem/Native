@@ -29,41 +29,34 @@ export default async function PricingPage({
 
   return (
     <>
-      <section className="hero">
+      <header className="page-header">
         <span className="eyebrow accent">{t("eyebrow")}</span>
         <h1>{t("title")}</h1>
         <p className="lead">{t("lead")}</p>
-      </section>
+      </header>
 
       <section className="section">
         <div className="grid">
           {plans.map((p) => (
             <article
               key={p.id}
-              className="card"
-              style={
-                p.featured
-                  ? { borderColor: "var(--accent)", borderWidth: 2 }
-                  : undefined
-              }
+              className={`card plan-card ${p.featured ? "is-featured" : ""}`}
             >
               {p.featured ? (
-                <span className="badge badge-info dotless" style={{ alignSelf: "flex-start", marginBottom: 8 }}>
+                <span className="badge badge-info dotless plan-badge">
                   {t("recommended")}
                 </span>
               ) : null}
               <h3>{t(`plans.${p.id}.name`)}</h3>
               <p className="muted">{t(`plans.${p.id}.tagline`)}</p>
-              <div className="price">
-                {t(`plans.${p.id}.price`)}
-              </div>
+              <div className="price">{t(`plans.${p.id}.price`)}</div>
               <p className="small muted">{t(`plans.${p.id}.priceNote`)}</p>
-              <ul className="signup-bullets" style={{ marginTop: 16 }}>
+              <ul className="signup-bullets plan-features">
                 {[1, 2, 3, 4].map((i) => (
                   <li key={i}>{t(`plans.${p.id}.feature${i}`)}</li>
                 ))}
               </ul>
-              <div className="card-foot" style={{ marginTop: "auto" }}>
+              <div className="plan-cta">
                 <Link
                   href={p.id === "agency" ? "/for-agencies" : "/signup"}
                   className={p.featured ? "btn block" : "btn secondary block"}
@@ -77,7 +70,12 @@ export default async function PricingPage({
       </section>
 
       <section className="section">
-        <h2>{t("feesTitle")}</h2>
+        <div className="section-head">
+          <div>
+            <span className="eyebrow">{t("feesEyebrow")}</span>
+            <h2>{t("feesTitle")}</h2>
+          </div>
+        </div>
         <p className="muted">{t("feesLead")}</p>
         <div className="table-wrap">
           <table className="table">
@@ -110,7 +108,12 @@ export default async function PricingPage({
       </section>
 
       <section className="section">
-        <h2>{t("faqTitle")}</h2>
+        <div className="section-head">
+          <div>
+            <span className="eyebrow">{t("faqEyebrow")}</span>
+            <h2>{t("faqTitle")}</h2>
+          </div>
+        </div>
         <div className="grid two">
           {[1, 2, 3, 4].map((i) => (
             <article className="card" key={i}>
@@ -121,18 +124,16 @@ export default async function PricingPage({
         </div>
       </section>
 
-      <section className="section">
-        <div className="cta-block">
-          <h2>{t("ctaTitle")}</h2>
-          <p>{t("ctaBody")}</p>
-          <div className="hero-actions">
-            <Link href="/catalog" className="btn large">
-              {tm("browseCatalog")}
-            </Link>
-            <Link href="/contact" className="btn secondary large">
-              {t("ctaContact")}
-            </Link>
-          </div>
+      <section className="section cta-block">
+        <h2>{t("ctaTitle")}</h2>
+        <p>{t("ctaBody")}</p>
+        <div className="hero-actions">
+          <Link href="/catalog" className="btn large">
+            {tm("browseCatalog")}
+          </Link>
+          <Link href="/contact" className="btn secondary large">
+            {t("ctaContact")}
+          </Link>
         </div>
       </section>
     </>

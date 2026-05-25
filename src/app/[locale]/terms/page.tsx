@@ -33,32 +33,30 @@ export default async function TermsPage({
   ] as const;
 
   return (
-    <>
-      <section className="hero">
+    <article className="legal-doc">
+      <header className="page-header">
         <span className="eyebrow accent">{t("eyebrow")}</span>
         <h1>{t("title")}</h1>
         <p className="lead">{t("lead")}</p>
-        <p className="muted small">{t("lastUpdated")}</p>
-      </section>
+        <p className="muted small last-updated">{t("lastUpdated")}</p>
+      </header>
 
-      <article className="section" style={{ maxWidth: 720 }}>
-        {sections.map((s) => (
-          <section key={s} className="section">
-            <h2>{t(`${s}.title`)}</h2>
-            <p>{t(`${s}.body`)}</p>
-          </section>
-        ))}
-
-        <section className="section">
-          <h2>{t("contactTitle")}</h2>
-          <p>
-            {t("contactBody")}{" "}
-            <a className="link" href="mailto:legal@benative.example">
-              legal@benative.example
-            </a>
-          </p>
+      {sections.map((s) => (
+        <section className="legal-section" key={s}>
+          <h2>{t(`${s}.title`)}</h2>
+          <p className="prose">{t(`${s}.body`)}</p>
         </section>
-      </article>
-    </>
+      ))}
+
+      <section className="legal-section">
+        <h2>{t("contactTitle")}</h2>
+        <p className="prose">
+          {t("contactBody")}{" "}
+          <a className="link" href="mailto:legal@benative.example">
+            legal@benative.example
+          </a>
+        </p>
+      </section>
+    </article>
   );
 }

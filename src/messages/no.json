@@ -129,7 +129,7 @@
     "eyebrow": "Utforsk",
     "title": "Alle nordiske titler som tilbyr native",
     "subtitle": "Filtrer på marked, format og publikum. Veiledende priser på alle produkter — firm pris på forespørsel via desk.",
-    "resultCount": "{count, plural, =0 {0 titler} =1 {1 tittel} other {# titler}}",
+    "resultCount": "{count, plural, =0 {Ingen treff} =1 {1 tittel} other {# titler}}",
     "removeFilter": "Fjern filter",
     "filters": {
       "market": "Marked",
@@ -151,7 +151,6 @@
       "requestQuote": "Be om tilbud",
       "nativeFit": "Native: {value}"
     },
-    "resultCount": "{count, plural, =0 {Ingen treff} =1 {1 tittel} other {# titler}}",
     "pagination": {
       "prev": "Forrige",
       "next": "Neste",
@@ -756,42 +755,98 @@
     "product": {
       "label": "Produkt",
       "items": {
-        "catalog": { "title": "Katalog", "description": "Alle nordiske titler som tilbyr native — filtrer på marked, format og målgruppe." },
-        "recommend": { "title": "Anbefaling", "description": "Si oss budsjettet — vi foreslår en tittelmiks." },
-        "howItWorks": { "title": "Slik fungerer det", "description": "Fra brief til publisert artikkel i fem trinn." }
+        "catalog": {
+          "title": "Katalog",
+          "description": "Alle nordiske titler som tilbyr native — filtrer på marked, format og målgruppe."
+        },
+        "recommend": {
+          "title": "Anbefaling",
+          "description": "Si oss budsjettet — vi foreslår en tittelmiks."
+        },
+        "howItWorks": {
+          "title": "Slik fungerer det",
+          "description": "Fra brief til publisert artikkel i fem trinn."
+        }
       },
-      "featured": { "title": "Utforsk katalogen", "description": "Veiledende pris og rekkevidde — uten salgssamtale." }
+      "featured": {
+        "title": "Utforsk katalogen",
+        "description": "Veiledende pris og rekkevidde — uten salgssamtale."
+      }
     },
     "solutions": {
       "label": "Løsninger",
       "items": {
-        "advertisers": { "title": "For annonsører", "description": "Én katalog over alle nordiske titler som tilbyr native." },
-        "agencies": { "title": "For byråer", "description": "Multi-kunde-arbeidsflate og en desk å lene seg på." },
-        "publishers": { "title": "For utgivere", "description": "Kvalifisert etterspørsel og publiseringsklart innhold." }
+        "advertisers": {
+          "title": "For annonsører",
+          "description": "Én katalog over alle nordiske titler som tilbyr native."
+        },
+        "agencies": {
+          "title": "For byråer",
+          "description": "Multi-kunde-arbeidsflate og en desk å lene seg på."
+        },
+        "publishers": {
+          "title": "For utgivere",
+          "description": "Kvalifisert etterspørsel og publiseringsklart innhold."
+        }
       },
-      "featured": { "title": "Sammenlign titler side om side", "description": "Spesifikasjoner, pris og rekkevidde på ett sted." }
+      "featured": {
+        "title": "Sammenlign titler side om side",
+        "description": "Spesifikasjoner, pris og rekkevidde på ett sted."
+      }
     },
-    "pricing": { "label": "Priser" },
+    "pricing": {
+      "label": "Priser"
+    },
     "resources": {
       "label": "Ressurser",
       "items": {
-        "howItWorks": { "title": "Slik fungerer det", "description": "Gjennomgang av brief, plan, tilbud, innhold og publisering." },
-        "security": { "title": "Sikkerhet", "description": "Slik beskytter vi kampanje- og kundedata." },
-        "contact": { "title": "Kontakt", "description": "Snakk med salg, partnerskap eller support." }
+        "howItWorks": {
+          "title": "Slik fungerer det",
+          "description": "Gjennomgang av brief, plan, tilbud, innhold og publisering."
+        },
+        "security": {
+          "title": "Sikkerhet",
+          "description": "Slik beskytter vi kampanje- og kundedata."
+        },
+        "contact": {
+          "title": "Kontakt",
+          "description": "Snakk med salg, partnerskap eller support."
+        }
       },
-      "featured": { "title": "Bli partner", "description": "Få tittelen din inn på BeNative." }
+      "featured": {
+        "title": "Bli partner",
+        "description": "Få tittelen din inn på BeNative."
+      }
     },
     "company": {
       "label": "Selskap",
       "items": {
-        "about": { "title": "Om oss", "description": "Hvorfor vi finnes og hvem vi tjener." },
-        "contact": { "title": "Kontakt", "description": "Nå riktig team." },
-        "privacy": { "title": "Personvern", "description": "Slik håndterer vi personopplysninger." },
-        "terms": { "title": "Vilkår", "description": "Markedsplassens brukervilkår." }
+        "about": {
+          "title": "Om oss",
+          "description": "Hvorfor vi finnes og hvem vi tjener."
+        },
+        "contact": {
+          "title": "Kontakt",
+          "description": "Nå riktig team."
+        },
+        "privacy": {
+          "title": "Personvern",
+          "description": "Slik håndterer vi personopplysninger."
+        },
+        "terms": {
+          "title": "Vilkår",
+          "description": "Markedsplassens brukervilkår."
+        }
       },
-      "featured": { "title": "Bli partner", "description": "Distribuer native-etterspørsel til dine titler." }
+      "featured": {
+        "title": "Bli partner",
+        "description": "Distribuer native-etterspørsel til dine titler."
+      }
     },
-    "actions": { "back": "Tilbake", "openSubmenu": "Åpne {label}-undermeny" }
+    "actions": {
+      "back": "Tilbake",
+      "openSubmenu": "Åpne {label}-undermeny"
+    }
   },
   "pricing": {
     "metaTitle": "Priser",
@@ -858,7 +913,10 @@
     "faq4A": "Ja. Send oss et utkast så spec-sjekker vi det; eller la desken produsere det fra start til slutt.",
     "ctaTitle": "Klar til å sammenligne titler?",
     "ctaBody": "Katalogen viser veiledende pris for hver nordisk tittel — ingen salgssamtale nødvendig.",
-    "ctaContact": "Snakk med oss"
+    "ctaContact": "Snakk med oss",
+    "feesEyebrow": "Avgifter",
+    "faqEyebrow": "FAQ",
+    "faqTitle": "Ofte stilte spørsmål"
   },
   "contact": {
     "metaTitle": "Kontakt BeNative",
@@ -866,9 +924,18 @@
     "title": "Ta kontakt",
     "lead": "Velg riktig kanal under, eller bruk skjemaet. Vi svarer på alle henvendelser innen én virkedag.",
     "channels": {
-      "sales": { "title": "Salg og kampanjer", "body": "Planlegg en kampanje eller få fast pris fra desken." },
-      "publishers": { "title": "Utgivere og partnerskap", "body": "Få inn en tittel, oppdater rate card, diskuter partnerskap." },
-      "support": { "title": "Support", "body": "Hjelp med kontoen din, en aktiv bestilling, eller faktura." }
+      "sales": {
+        "title": "Salg og kampanjer",
+        "body": "Planlegg en kampanje eller få fast pris fra desken."
+      },
+      "publishers": {
+        "title": "Utgivere og partnerskap",
+        "body": "Få inn en tittel, oppdater rate card, diskuter partnerskap."
+      },
+      "support": {
+        "title": "Support",
+        "body": "Hjelp med kontoen din, en aktiv bestilling, eller faktura."
+      }
     },
     "formTitle": "Fortell oss hva du trenger",
     "formLead": "En kort melding er nok. Vi ruter til riktig person og følger opp på e-post.",
@@ -931,7 +998,9 @@
     "disclosureMail": "Rapporter til",
     "ctaTitle": "Snakk med sikkerhet",
     "ctaBody": "Vi tar gjerne en gjennomgang av spesifikke kontroller, deler DPA, eller diskuterer anskaffelseskrav.",
-    "ctaContact": "Kontakt oss"
+    "ctaContact": "Kontakt oss",
+    "pillarsEyebrow": "Prinsipper",
+    "complianceEyebrow": "Compliance"
   },
   "privacy": {
     "metaTitle": "Personvern",
@@ -939,16 +1008,46 @@
     "title": "Personvernerklæring",
     "lead": "Slik samler, bruker og beskytter BeNative personopplysninger — på vanlig norsk.",
     "lastUpdated": "Sist oppdatert: 22. mai 2026",
-    "controller": { "title": "Hvem er behandlingsansvarlig", "body": "BeNative AS er behandlingsansvarlig for personopplysninger som behandles via denne markedsplassen. Vi har base i Norge og behandler alle data innenfor EU/EØS." },
-    "data": { "title": "Hvilke data vi samler", "body": "Kontodata (navn, jobb-e-post, rolle, organisasjon), markedsplass-aktivitet (forespørsler, bestillinger, planer), og minimal telemetri som trengs for å drive tjenesten (innloggingshendelser, feilrapporter). Vi kjører ingen tredjeparts annonse- eller atferdssporingspiksler på markedsføringssidene våre." },
-    "purpose": { "title": "Hvordan vi bruker dem", "body": "Til å drive markedsplassen, rute forespørsler mellom annonsører og utgivere, produsere fakturaer, forhindre svindel og forbedre produktet. Vi selger ikke personopplysninger." },
-    "legal": { "title": "Rettslig grunnlag", "body": "Avtaleoppfyllelse (kontoinnehavere), berettiget interesse (sikkerhet, svindelforebygging, produktforbedring) og samtykke (valgfritt nyhetsbrev)." },
-    "retention": { "title": "Hvor lenge vi lagrer", "body": "Kontodata så lenge kontoen eksisterer; transaksjonsdata i syv år (regnskapsloven); telemetri aggregert etter 90 dager." },
-    "sharing": { "title": "Hvem vi deler data med", "body": "Utgivere ser kjøperens organisasjon og ordredetaljer for bestillinger plassert hos dem. Underleverandører (hosting, e-post, betaling) er listet i DPA, alle EU-basert eller med tilstrekkelige garantier." },
-    "transfers": { "title": "Internasjonale overføringer", "body": "Kundedata er lagret i EU. Enhver tilfeldig overføring utenfor EU/EØS bruker Standard Contractual Clauses og en adekvansvurdering." },
-    "rights": { "title": "Dine rettigheter", "body": "Du kan be om innsyn, retting, sletting eller eksport av personopplysningene dine, og du kan motsette deg behandling basert på berettiget interesse. Kontakt privacy@benative.example for å utøve disse rettighetene." },
-    "cookies": { "title": "Informasjonskapsler", "body": "Vi bruker strengt nødvendige cookies (sesjon, CSRF) og, med samtykke, anonymisert produktanalyse. Ingen annonse- eller kryss-sporings-cookies." },
-    "changes": { "title": "Endringer i denne erklæringen", "body": "Vesentlige endringer publiseres her, og kontoinnehavere varsles på e-post. Sist oppdatert-datoen over reflekterer alltid gjeldende versjon." },
+    "controller": {
+      "title": "Hvem er behandlingsansvarlig",
+      "body": "BeNative AS er behandlingsansvarlig for personopplysninger som behandles via denne markedsplassen. Vi har base i Norge og behandler alle data innenfor EU/EØS."
+    },
+    "data": {
+      "title": "Hvilke data vi samler",
+      "body": "Kontodata (navn, jobb-e-post, rolle, organisasjon), markedsplass-aktivitet (forespørsler, bestillinger, planer), og minimal telemetri som trengs for å drive tjenesten (innloggingshendelser, feilrapporter). Vi kjører ingen tredjeparts annonse- eller atferdssporingspiksler på markedsføringssidene våre."
+    },
+    "purpose": {
+      "title": "Hvordan vi bruker dem",
+      "body": "Til å drive markedsplassen, rute forespørsler mellom annonsører og utgivere, produsere fakturaer, forhindre svindel og forbedre produktet. Vi selger ikke personopplysninger."
+    },
+    "legal": {
+      "title": "Rettslig grunnlag",
+      "body": "Avtaleoppfyllelse (kontoinnehavere), berettiget interesse (sikkerhet, svindelforebygging, produktforbedring) og samtykke (valgfritt nyhetsbrev)."
+    },
+    "retention": {
+      "title": "Hvor lenge vi lagrer",
+      "body": "Kontodata så lenge kontoen eksisterer; transaksjonsdata i syv år (regnskapsloven); telemetri aggregert etter 90 dager."
+    },
+    "sharing": {
+      "title": "Hvem vi deler data med",
+      "body": "Utgivere ser kjøperens organisasjon og ordredetaljer for bestillinger plassert hos dem. Underleverandører (hosting, e-post, betaling) er listet i DPA, alle EU-basert eller med tilstrekkelige garantier."
+    },
+    "transfers": {
+      "title": "Internasjonale overføringer",
+      "body": "Kundedata er lagret i EU. Enhver tilfeldig overføring utenfor EU/EØS bruker Standard Contractual Clauses og en adekvansvurdering."
+    },
+    "rights": {
+      "title": "Dine rettigheter",
+      "body": "Du kan be om innsyn, retting, sletting eller eksport av personopplysningene dine, og du kan motsette deg behandling basert på berettiget interesse. Kontakt privacy@benative.example for å utøve disse rettighetene."
+    },
+    "cookies": {
+      "title": "Informasjonskapsler",
+      "body": "Vi bruker strengt nødvendige cookies (sesjon, CSRF) og, med samtykke, anonymisert produktanalyse. Ingen annonse- eller kryss-sporings-cookies."
+    },
+    "changes": {
+      "title": "Endringer i denne erklæringen",
+      "body": "Vesentlige endringer publiseres her, og kontoinnehavere varsles på e-post. Sist oppdatert-datoen over reflekterer alltid gjeldende versjon."
+    },
     "contactTitle": "Kontakt for personvern",
     "contactBody": "Spørsmål, forespørsler eller klager — skriv til"
   },
@@ -958,16 +1057,46 @@
     "title": "Brukervilkår for markedsplassen",
     "lead": "Disse vilkårene regulerer bruk av BeNative som annonsør, byrå eller utgiver.",
     "lastUpdated": "Sist oppdatert: 22. mai 2026",
-    "scope": { "title": "Omfang", "body": "BeNative er en markedsplass som kobler annonsører og byråer med aviser og magasiner som tilbyr native-innhold og native-annonsering. Disse vilkårene gjelder for alle brukere." },
-    "accounts": { "title": "Kontoer", "body": "Du må oppgi korrekt registreringsinformasjon, holde påloggingsdetaljer konfidensielle og varsle oss om uautorisert tilgang. Kontoer er knyttet til én organisasjon; deling på tvers krever byrå-arbeidsområdet." },
-    "roles": { "title": "Roller og tilgang", "body": "Hver konto har en rolle — annonsør, byrå, utgiver, desk eller admin — som bestemmer hvilke data og handlinger som er tilgjengelige. Roller tildeles av en admin i organisasjonen din." },
-    "orders": { "title": "Bestillinger", "body": "Innsending av en plan oppretter en forespørsel. En forespørsel blir bindende bestilling først når et fast tilbud er akseptert av kjøper og bekreftet av utgiver. Avbestillinger følger hver utgivers ledetid." },
-    "content": { "title": "Innhold", "body": "Innhold produsert via BeNative er lisensiert til annonsøren for plasseringen som er booket. Utgivere kan avvise innhold som ikke møter deres redaksjonelle standard, med skriftlig begrunnelse." },
-    "fees": { "title": "Avgifter og betaling", "body": "Pris følger gjeldende avgiftsplan (se /pricing). Fakturaer utstedes i kjøperens markedsvaluta med mva. per lokal lov. Betalingsbetingelser er netto 30 dager om ikke annet er avtalt." },
-    "liability": { "title": "Ansvar", "body": "BeNative tilrettelegger transaksjonen, men er ikke utgiver av plasserte artikler. Hver part er ansvarlig for etterlevelse av annonse-, merknads- og forbrukervernlovgivning. Ansvar er begrenset til avgifter betalt de siste 12 månedene." },
-    "termination": { "title": "Opphør", "body": "Hver part kan si opp kontoen med 30 dagers varsel. Vi kan suspendere eller avslutte kontoer som bryter vilkårene, misbruker markedsplassen eller ikke betaler fakturaer." },
-    "law": { "title": "Lovvalg", "body": "Disse vilkårene reguleres av norsk rett. Tvister behandles av Oslo tingrett, med mindre tvingende forbrukervernregler i din jurisdiksjon krever annet." },
-    "changes": { "title": "Endringer i vilkårene", "body": "Vesentlige endringer publiseres her, og kontoinnehavere varsles på e-post minst 30 dager før de trer i kraft." },
+    "scope": {
+      "title": "Omfang",
+      "body": "BeNative er en markedsplass som kobler annonsører og byråer med aviser og magasiner som tilbyr native-innhold og native-annonsering. Disse vilkårene gjelder for alle brukere."
+    },
+    "accounts": {
+      "title": "Kontoer",
+      "body": "Du må oppgi korrekt registreringsinformasjon, holde påloggingsdetaljer konfidensielle og varsle oss om uautorisert tilgang. Kontoer er knyttet til én organisasjon; deling på tvers krever byrå-arbeidsområdet."
+    },
+    "roles": {
+      "title": "Roller og tilgang",
+      "body": "Hver konto har en rolle — annonsør, byrå, utgiver, desk eller admin — som bestemmer hvilke data og handlinger som er tilgjengelige. Roller tildeles av en admin i organisasjonen din."
+    },
+    "orders": {
+      "title": "Bestillinger",
+      "body": "Innsending av en plan oppretter en forespørsel. En forespørsel blir bindende bestilling først når et fast tilbud er akseptert av kjøper og bekreftet av utgiver. Avbestillinger følger hver utgivers ledetid."
+    },
+    "content": {
+      "title": "Innhold",
+      "body": "Innhold produsert via BeNative er lisensiert til annonsøren for plasseringen som er booket. Utgivere kan avvise innhold som ikke møter deres redaksjonelle standard, med skriftlig begrunnelse."
+    },
+    "fees": {
+      "title": "Avgifter og betaling",
+      "body": "Pris følger gjeldende avgiftsplan (se /pricing). Fakturaer utstedes i kjøperens markedsvaluta med mva. per lokal lov. Betalingsbetingelser er netto 30 dager om ikke annet er avtalt."
+    },
+    "liability": {
+      "title": "Ansvar",
+      "body": "BeNative tilrettelegger transaksjonen, men er ikke utgiver av plasserte artikler. Hver part er ansvarlig for etterlevelse av annonse-, merknads- og forbrukervernlovgivning. Ansvar er begrenset til avgifter betalt de siste 12 månedene."
+    },
+    "termination": {
+      "title": "Opphør",
+      "body": "Hver part kan si opp kontoen med 30 dagers varsel. Vi kan suspendere eller avslutte kontoer som bryter vilkårene, misbruker markedsplassen eller ikke betaler fakturaer."
+    },
+    "law": {
+      "title": "Lovvalg",
+      "body": "Disse vilkårene reguleres av norsk rett. Tvister behandles av Oslo tingrett, med mindre tvingende forbrukervernregler i din jurisdiksjon krever annet."
+    },
+    "changes": {
+      "title": "Endringer i vilkårene",
+      "body": "Vesentlige endringer publiseres her, og kontoinnehavere varsles på e-post minst 30 dager før de trer i kraft."
+    },
     "contactTitle": "Juridisk kontakt",
     "contactBody": "Spørsmål om disse vilkårene — skriv til"
   }

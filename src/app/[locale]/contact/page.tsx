@@ -37,23 +37,19 @@ export default async function ContactPage({
 
   return (
     <>
-      <section className="hero">
+      <header className="page-header">
         <span className="eyebrow accent">{t("eyebrow")}</span>
         <h1>{t("title")}</h1>
         <p className="lead">{t("lead")}</p>
-      </section>
+      </header>
 
       <section className="section">
         <div className="grid">
           {channels.map((c) => (
-            <article className="card" key={c.id}>
+            <article className="card contact-channel" key={c.id}>
               <h3>{t(`channels.${c.id}.title`)}</h3>
               <p className="muted">{t(`channels.${c.id}.body`)}</p>
-              <a
-                className="link"
-                href={`mailto:${c.email}`}
-                style={{ marginTop: "auto" }}
-              >
+              <a className="link channel-email" href={`mailto:${c.email}`}>
                 {c.email}
               </a>
             </article>
@@ -62,9 +58,9 @@ export default async function ContactPage({
       </section>
 
       <section className="section">
-        <div className="auth-shell">
+        <div className="auth-shell contact-shell">
           <div className="marketing">
-            <h2 style={{ marginTop: 0 }}>{t("formTitle")}</h2>
+            <h2>{t("formTitle")}</h2>
             <p className="lead">{t("formLead")}</p>
             <ul className="signup-bullets">
               <li>{t("bullet1")}</li>

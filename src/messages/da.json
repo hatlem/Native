@@ -129,7 +129,7 @@
     "eyebrow": "Udforsk",
     "title": "Hver nordisk titel der kører native",
     "subtitle": "Filtrer på marked, format og publikum. Vejledende priser på hvert produkt — firm pris på anmodning via desk.",
-    "resultCount": "{count, plural, =0 {0 titler} =1 {1 titel} other {# titler}}",
+    "resultCount": "{count, plural, =0 {Ingen resultater} =1 {1 titel} other {# titler}}",
     "removeFilter": "Fjern filter",
     "filters": {
       "market": "Marked",
@@ -151,7 +151,6 @@
       "requestQuote": "Anmod om tilbud",
       "nativeFit": "Native: {value}"
     },
-    "resultCount": "{count, plural, =0 {Ingen resultater} =1 {1 titel} other {# titler}}",
     "pagination": {
       "prev": "Forrige",
       "next": "Næste",
@@ -915,7 +914,10 @@
     "faq4A": "Ja. Send os et udkast så spec-tjekker vi det; eller lad desken producere det fra start til slut.",
     "ctaTitle": "Klar til at sammenligne titler?",
     "ctaBody": "Kataloget viser indikativ pris for hver nordisk titel — ingen salgssamtale nødvendig.",
-    "ctaContact": "Tal med os"
+    "ctaContact": "Tal med os",
+    "feesEyebrow": "Gebyrer",
+    "faqEyebrow": "FAQ",
+    "faqTitle": "Ofte stillede spørgsmål"
   },
   "contact": {
     "metaTitle": "Kontakt BeNative",
@@ -997,7 +999,9 @@
     "disclosureMail": "Rapportér til",
     "ctaTitle": "Tal med sikkerhed",
     "ctaBody": "Vi tager gerne en gennemgang af specifikke kontroller, deler DPA eller diskuterer indkøbskrav.",
-    "ctaContact": "Kontakt os"
+    "ctaContact": "Kontakt os",
+    "pillarsEyebrow": "Principper",
+    "complianceEyebrow": "Compliance"
   },
   "privacy": {
     "metaTitle": "Privatliv",

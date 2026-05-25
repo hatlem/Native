@@ -198,7 +198,7 @@
     "eyebrow": "Browse",
     "title": "Every Nordic title that runs native",
     "subtitle": "Filter by market, format and audience. Indicative pricing on every product — firm pricing on request via the desk.",
-    "resultCount": "{count, plural, =0 {0 titles} =1 {1 title} other {# titles}}",
+    "resultCount": "{count, plural, =0 {No matches} =1 {1 title} other {# titles}}",
     "removeFilter": "Remove filter",
     "filters": {
       "market": "Market",
@@ -220,7 +220,6 @@
       "requestQuote": "Request a quote",
       "nativeFit": "Native: {value}"
     },
-    "resultCount": "{count, plural, =0 {No matches} =1 {1 title} other {# titles}}",
     "pagination": {
       "prev": "Previous",
       "next": "Next",
@@ -755,42 +754,98 @@
     "product": {
       "label": "Product",
       "items": {
-        "catalog": { "title": "Catalog", "description": "Every Nordic title that offers native — filter by market, format and audience." },
-        "recommend": { "title": "Recommendation", "description": "Tell us your budget; we'll suggest a title mix." },
-        "howItWorks": { "title": "How it works", "description": "From brief to live placement in five steps." }
+        "catalog": {
+          "title": "Catalog",
+          "description": "Every Nordic title that offers native — filter by market, format and audience."
+        },
+        "recommend": {
+          "title": "Recommendation",
+          "description": "Tell us your budget; we'll suggest a title mix."
+        },
+        "howItWorks": {
+          "title": "How it works",
+          "description": "From brief to live placement in five steps."
+        }
       },
-      "featured": { "title": "Browse the catalog", "description": "Indicative pricing and reach — no sales call required." }
+      "featured": {
+        "title": "Browse the catalog",
+        "description": "Indicative pricing and reach — no sales call required."
+      }
     },
     "solutions": {
       "label": "Solutions",
       "items": {
-        "advertisers": { "title": "For advertisers", "description": "One catalog of every Nordic title that offers native." },
-        "agencies": { "title": "For agencies", "description": "Multi-client workspaces and a managed desk." },
-        "publishers": { "title": "For publishers", "description": "Qualified demand and ready-to-publish content." }
+        "advertisers": {
+          "title": "For advertisers",
+          "description": "One catalog of every Nordic title that offers native."
+        },
+        "agencies": {
+          "title": "For agencies",
+          "description": "Multi-client workspaces and a managed desk."
+        },
+        "publishers": {
+          "title": "For publishers",
+          "description": "Qualified demand and ready-to-publish content."
+        }
       },
-      "featured": { "title": "Compare titles side-by-side", "description": "Specs, pricing and reach in one place." }
+      "featured": {
+        "title": "Compare titles side-by-side",
+        "description": "Specs, pricing and reach in one place."
+      }
     },
-    "pricing": { "label": "Pricing" },
+    "pricing": {
+      "label": "Pricing"
+    },
     "resources": {
       "label": "Resources",
       "items": {
-        "howItWorks": { "title": "How it works", "description": "Walk through brief, plan, quote, content and go-live." },
-        "security": { "title": "Security", "description": "How we protect campaign and customer data." },
-        "contact": { "title": "Contact", "description": "Talk to sales, partnerships or support." }
+        "howItWorks": {
+          "title": "How it works",
+          "description": "Walk through brief, plan, quote, content and go-live."
+        },
+        "security": {
+          "title": "Security",
+          "description": "How we protect campaign and customer data."
+        },
+        "contact": {
+          "title": "Contact",
+          "description": "Talk to sales, partnerships or support."
+        }
       },
-      "featured": { "title": "Become a partner", "description": "Onboard your title onto BeNative." }
+      "featured": {
+        "title": "Become a partner",
+        "description": "Onboard your title onto BeNative."
+      }
     },
     "company": {
       "label": "Company",
       "items": {
-        "about": { "title": "About", "description": "Why we exist and who we serve." },
-        "contact": { "title": "Contact", "description": "Reach the right team." },
-        "privacy": { "title": "Privacy", "description": "How we handle personal data." },
-        "terms": { "title": "Terms", "description": "Marketplace terms of service." }
+        "about": {
+          "title": "About",
+          "description": "Why we exist and who we serve."
+        },
+        "contact": {
+          "title": "Contact",
+          "description": "Reach the right team."
+        },
+        "privacy": {
+          "title": "Privacy",
+          "description": "How we handle personal data."
+        },
+        "terms": {
+          "title": "Terms",
+          "description": "Marketplace terms of service."
+        }
       },
-      "featured": { "title": "Partner with us", "description": "Distribute native demand to your titles." }
+      "featured": {
+        "title": "Partner with us",
+        "description": "Distribute native demand to your titles."
+      }
     },
-    "actions": { "back": "Back", "openSubmenu": "Open {label} submenu" }
+    "actions": {
+      "back": "Back",
+      "openSubmenu": "Open {label} submenu"
+    }
   },
   "pricing": {
     "metaTitle": "Pricing",
@@ -857,7 +912,10 @@
     "faq4A": "Yes. Bring your own draft and we'll spec-check it; or have the desk produce it end-to-end.",
     "ctaTitle": "Ready to compare titles?",
     "ctaBody": "The catalog shows indicative pricing for every Nordic title — no sales call required.",
-    "ctaContact": "Talk to us"
+    "ctaContact": "Talk to us",
+    "feesEyebrow": "Fees",
+    "faqEyebrow": "FAQ",
+    "faqTitle": "Frequently asked questions"
   },
   "contact": {
     "metaTitle": "Contact BeNative",
@@ -865,9 +923,18 @@
     "title": "Get in touch",
     "lead": "Pick the right channel below, or use the form. We answer every message within a working day.",
     "channels": {
-      "sales": { "title": "Sales & campaigns", "body": "Plan a campaign or get a firm quote from the desk." },
-      "publishers": { "title": "Publishers & partnerships", "body": "Onboard a title, update your rate card, discuss partnership." },
-      "support": { "title": "Support", "body": "Help with your account, a live order, or a billing question." }
+      "sales": {
+        "title": "Sales & campaigns",
+        "body": "Plan a campaign or get a firm quote from the desk."
+      },
+      "publishers": {
+        "title": "Publishers & partnerships",
+        "body": "Onboard a title, update your rate card, discuss partnership."
+      },
+      "support": {
+        "title": "Support",
+        "body": "Help with your account, a live order, or a billing question."
+      }
     },
     "formTitle": "Tell us what you need",
     "formLead": "A short message is enough. We'll route you to the right person and follow up by email.",
@@ -930,7 +997,9 @@
     "disclosureMail": "Report to",
     "ctaTitle": "Talk to security",
     "ctaBody": "We're happy to walk through specific controls, share our DPA, or discuss procurement requirements.",
-    "ctaContact": "Contact us"
+    "ctaContact": "Contact us",
+    "pillarsEyebrow": "Principles",
+    "complianceEyebrow": "Compliance"
   },
   "privacy": {
     "metaTitle": "Privacy",
@@ -938,16 +1007,46 @@
     "title": "Privacy policy",
     "lead": "How BeNative collects, uses and protects personal data — in plain language.",
     "lastUpdated": "Last updated: 22 May 2026",
-    "controller": { "title": "Who is the data controller", "body": "BeNative AS is the data controller for personal data processed via this marketplace. We are based in Norway and process all data inside the EU/EEA." },
-    "data": { "title": "What data we collect", "body": "Account data (name, work email, role, organisation), marketplace activity (requests, orders, plans), and minimal telemetry needed to operate the service (login events, error reports). We do not run third-party advertising or behavioural tracking pixels on our marketing pages." },
-    "purpose": { "title": "How we use it", "body": "To operate the marketplace, route requests between advertisers and publishers, produce invoices, prevent fraud, and improve the product. We do not sell personal data." },
-    "legal": { "title": "Legal basis", "body": "Performance of contract (account holders), legitimate interest (security, fraud prevention, product improvement), and consent (optional newsletter)." },
-    "retention": { "title": "How long we keep data", "body": "Account data for as long as the account exists; transactional data for seven years (accounting law); telemetry rolled up to aggregates after 90 days." },
-    "sharing": { "title": "Who we share data with", "body": "Publishers see the buyer organisation and order details for orders placed with them. Subprocessors (hosting, email, payments) are listed in our DPA, all EU-based or with adequate safeguards." },
-    "transfers": { "title": "International transfers", "body": "Customer data is hosted in the EU. Any incidental transfer outside the EU/EEA uses Standard Contractual Clauses and an adequacy assessment." },
-    "rights": { "title": "Your rights", "body": "You can request access, correction, deletion or export of your personal data, and you can object to processing based on legitimate interest. Contact privacy@benative.example to exercise these rights." },
-    "cookies": { "title": "Cookies", "body": "We use strictly necessary cookies (session, CSRF) and, with consent, anonymised product analytics. No advertising or cross-site tracking cookies." },
-    "changes": { "title": "Changes to this policy", "body": "We'll post material changes here and notify account holders by email. The last-updated date above always reflects the current version." },
+    "controller": {
+      "title": "Who is the data controller",
+      "body": "BeNative AS is the data controller for personal data processed via this marketplace. We are based in Norway and process all data inside the EU/EEA."
+    },
+    "data": {
+      "title": "What data we collect",
+      "body": "Account data (name, work email, role, organisation), marketplace activity (requests, orders, plans), and minimal telemetry needed to operate the service (login events, error reports). We do not run third-party advertising or behavioural tracking pixels on our marketing pages."
+    },
+    "purpose": {
+      "title": "How we use it",
+      "body": "To operate the marketplace, route requests between advertisers and publishers, produce invoices, prevent fraud, and improve the product. We do not sell personal data."
+    },
+    "legal": {
+      "title": "Legal basis",
+      "body": "Performance of contract (account holders), legitimate interest (security, fraud prevention, product improvement), and consent (optional newsletter)."
+    },
+    "retention": {
+      "title": "How long we keep data",
+      "body": "Account data for as long as the account exists; transactional data for seven years (accounting law); telemetry rolled up to aggregates after 90 days."
+    },
+    "sharing": {
+      "title": "Who we share data with",
+      "body": "Publishers see the buyer organisation and order details for orders placed with them. Subprocessors (hosting, email, payments) are listed in our DPA, all EU-based or with adequate safeguards."
+    },
+    "transfers": {
+      "title": "International transfers",
+      "body": "Customer data is hosted in the EU. Any incidental transfer outside the EU/EEA uses Standard Contractual Clauses and an adequacy assessment."
+    },
+    "rights": {
+      "title": "Your rights",
+      "body": "You can request access, correction, deletion or export of your personal data, and you can object to processing based on legitimate interest. Contact privacy@benative.example to exercise these rights."
+    },
+    "cookies": {
+      "title": "Cookies",
+      "body": "We use strictly necessary cookies (session, CSRF) and, with consent, anonymised product analytics. No advertising or cross-site tracking cookies."
+    },
+    "changes": {
+      "title": "Changes to this policy",
+      "body": "We'll post material changes here and notify account holders by email. The last-updated date above always reflects the current version."
+    },
     "contactTitle": "Data protection contact",
     "contactBody": "Questions, requests or complaints — write to"
   },
@@ -957,16 +1056,46 @@
     "title": "Marketplace terms of service",
     "lead": "These terms govern your use of BeNative as an advertiser, agency or publisher.",
     "lastUpdated": "Last updated: 22 May 2026",
-    "scope": { "title": "Scope", "body": "BeNative is a marketplace connecting advertisers and agencies with newspaper and magazine publishers offering native content and native advertising. These terms apply to all users of the marketplace." },
-    "accounts": { "title": "Accounts", "body": "You must provide accurate registration information, keep credentials confidential, and notify us of any unauthorised access. Accounts are tied to a single organisation; sharing across organisations requires the agency workspace." },
-    "roles": { "title": "Roles and access", "body": "Each account has a role — advertiser, agency, publisher, desk or admin — that determines what data and actions are available. Roles are assigned by an admin in your organisation." },
-    "orders": { "title": "Orders", "body": "Submitting a plan creates a request. A request becomes a binding order only when a firm quote is accepted by the buyer and confirmed by the publisher. Cancellations follow each publisher's lead time." },
-    "content": { "title": "Content", "body": "Content produced through BeNative is licensed to the advertiser for the placement booked. Publishers may decline content that does not meet their editorial standards, with a written reason." },
-    "fees": { "title": "Fees and payment", "body": "Pricing follows the active fee schedule (see /pricing). Invoices are issued in the buyer's market currency, with VAT applied per local law. Payment terms default to net 30 days unless otherwise agreed." },
-    "liability": { "title": "Liability", "body": "BeNative facilitates the transaction but is not the publisher of placed articles. Each party is responsible for compliance with applicable advertising, disclosure and consumer-protection law. Liability is limited to the fees paid in the prior 12 months." },
-    "termination": { "title": "Termination", "body": "Either party may terminate the account with 30 days' notice. We may suspend or terminate accounts that breach these terms, abuse the marketplace, or fail to pay invoices." },
-    "law": { "title": "Governing law", "body": "These terms are governed by Norwegian law. Disputes are submitted to the courts of Oslo, unless mandatory consumer-protection rules in your jurisdiction require otherwise." },
-    "changes": { "title": "Changes to these terms", "body": "We'll post material changes here and notify account holders by email at least 30 days before they take effect." },
+    "scope": {
+      "title": "Scope",
+      "body": "BeNative is a marketplace connecting advertisers and agencies with newspaper and magazine publishers offering native content and native advertising. These terms apply to all users of the marketplace."
+    },
+    "accounts": {
+      "title": "Accounts",
+      "body": "You must provide accurate registration information, keep credentials confidential, and notify us of any unauthorised access. Accounts are tied to a single organisation; sharing across organisations requires the agency workspace."
+    },
+    "roles": {
+      "title": "Roles and access",
+      "body": "Each account has a role — advertiser, agency, publisher, desk or admin — that determines what data and actions are available. Roles are assigned by an admin in your organisation."
+    },
+    "orders": {
+      "title": "Orders",
+      "body": "Submitting a plan creates a request. A request becomes a binding order only when a firm quote is accepted by the buyer and confirmed by the publisher. Cancellations follow each publisher's lead time."
+    },
+    "content": {
+      "title": "Content",
+      "body": "Content produced through BeNative is licensed to the advertiser for the placement booked. Publishers may decline content that does not meet their editorial standards, with a written reason."
+    },
+    "fees": {
+      "title": "Fees and payment",
+      "body": "Pricing follows the active fee schedule (see /pricing). Invoices are issued in the buyer's market currency, with VAT applied per local law. Payment terms default to net 30 days unless otherwise agreed."
+    },
+    "liability": {
+      "title": "Liability",
+      "body": "BeNative facilitates the transaction but is not the publisher of placed articles. Each party is responsible for compliance with applicable advertising, disclosure and consumer-protection law. Liability is limited to the fees paid in the prior 12 months."
+    },
+    "termination": {
+      "title": "Termination",
+      "body": "Either party may terminate the account with 30 days' notice. We may suspend or terminate accounts that breach these terms, abuse the marketplace, or fail to pay invoices."
+    },
+    "law": {
+      "title": "Governing law",
+      "body": "These terms are governed by Norwegian law. Disputes are submitted to the courts of Oslo, unless mandatory consumer-protection rules in your jurisdiction require otherwise."
+    },
+    "changes": {
+      "title": "Changes to these terms",
+      "body": "We'll post material changes here and notify account holders by email at least 30 days before they take effect."
+    },
     "contactTitle": "Legal contact",
     "contactBody": "Questions about these terms — write to"
   }

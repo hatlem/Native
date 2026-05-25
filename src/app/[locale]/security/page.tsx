@@ -27,26 +27,36 @@ export default async function SecurityPage({
 
   return (
     <>
-      <section className="hero">
+      <header className="page-header">
         <span className="eyebrow accent">{t("eyebrow")}</span>
         <h1>{t("title")}</h1>
         <p className="lead">{t("lead")}</p>
-      </section>
+      </header>
 
       <section className="section">
-        <h2>{t("pillarsTitle")}</h2>
+        <div className="section-head">
+          <div>
+            <span className="eyebrow">{t("pillarsEyebrow")}</span>
+            <h2>{t("pillarsTitle")}</h2>
+          </div>
+        </div>
         <div className="grid">
           {pillars.map((p) => (
             <article className="card" key={p.title}>
               <h3>{p.title}</h3>
-              <p>{p.body}</p>
+              <p className="muted">{p.body}</p>
             </article>
           ))}
         </div>
       </section>
 
       <section className="section">
-        <h2>{t("complianceTitle")}</h2>
+        <div className="section-head">
+          <div>
+            <span className="eyebrow">{t("complianceEyebrow")}</span>
+            <h2>{t("complianceTitle")}</h2>
+          </div>
+        </div>
         <p className="muted">{t("complianceLead")}</p>
         <div className="table-wrap">
           <table className="table">
@@ -98,10 +108,10 @@ export default async function SecurityPage({
         </div>
       </section>
 
-      <section className="section">
+      <section className="section prose-section">
         <h2>{t("disclosureTitle")}</h2>
-        <p>{t("disclosureBody")}</p>
-        <p>
+        <p className="prose">{t("disclosureBody")}</p>
+        <p className="prose">
           {t("disclosureMail")}{" "}
           <a className="link" href="mailto:security@benative.example">
             security@benative.example
@@ -109,15 +119,13 @@ export default async function SecurityPage({
         </p>
       </section>
 
-      <section className="section">
-        <div className="cta-block">
-          <h2>{t("ctaTitle")}</h2>
-          <p>{t("ctaBody")}</p>
-          <div className="hero-actions">
-            <Link href="/contact" className="btn large">
-              {t("ctaContact")}
-            </Link>
-          </div>
+      <section className="section cta-block">
+        <h2>{t("ctaTitle")}</h2>
+        <p className="muted">{t("ctaBody")}</p>
+        <div className="hero-actions">
+          <Link href="/contact" className="btn large">
+            {t("ctaContact")}
+          </Link>
         </div>
       </section>
     </>
