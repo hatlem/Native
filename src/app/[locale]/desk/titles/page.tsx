@@ -21,6 +21,7 @@ const NATIVE_FIT_VALUES = ["High", "Medium", "Low"] as const;
 const FORMAT_VALUES = ["Print + Digital", "Digital", "Print"] as const;
 const B2B_B2C_VALUES = ["B2B", "B2C"] as const;
 const REACH_VALUES = ["National", "Regional", "Local", "International"] as const;
+const URL_STATUS_VALUES = ["VERIFIED", "LIKELY_OK", "UNVERIFIED"] as const;
 
 const PAGE_SIZE = 60;
 
@@ -74,8 +75,20 @@ export default async function DeskTitlesPage({
   const format = asEnumValue(str(sp, "format") || undefined, FORMAT_VALUES);
   const b2bB2c = asEnumValue(str(sp, "b2bB2c") || undefined, B2B_B2C_VALUES);
   const reach = asEnumValue(str(sp, "reach") || undefined, REACH_VALUES);
+  const urlStatus = asEnumValue(
+    str(sp, "urlStatus") || undefined,
+    URL_STATUS_VALUES,
+  );
   const vertical = str(sp, "vertical");
   const ownerGroup = str(sp, "ownerGroup");
+  const titleType = str(sp, "type");
+  const frequency = str(sp, "frequency");
+  const category = str(sp, "category");
+  const circulationMinRaw = str(sp, "circulationMin");
+  const circulationMin =
+    circulationMinRaw && /^\d+$/.test(circulationMinRaw)
+      ? parseInt(circulationMinRaw, 10)
+      : undefined;
   const q = str(sp, "q");
   const pageParam = parseInt(str(sp, "page") || "1", 10);
   const page = Number.isFinite(pageParam) && pageParam >= 1 ? pageParam : 1;
@@ -91,11 +104,24 @@ export default async function DeskTitlesPage({
     ...(format ? { format } : {}),
     ...(b2bB2c ? { b2bB2c } : {}),
     ...(reach ? { reach } : {}),
+    ...(urlStatus ? { urlStatus } : {}),
     ...(vertical
       ? { vertical: { contains: vertical, mode: "insensitive" } }
       : {}),
     ...(ownerGroup
       ? { ownerGroup: { contains: ownerGroup, mode: "insensitive" } }
+      : {}),
+    ...(titleType
+      ? { type: { contains: titleType, mode: "insensitive" } }
+      : {}),
+    ...(frequency
+      ? { frequency: { contains: frequency, mode: "insensitive" } }
+      : {}),
+    ...(category
+      ? { category: { contains: category, mode: "insensitive" } }
+      : {}),
+    ...(circulationMin !== undefined
+      ? { circulation: { gte: circulationMin } }
       : {}),
     ...(q
       ? {
@@ -153,8 +179,14 @@ export default async function DeskTitlesPage({
     if (format) params.set("format", format);
     if (b2bB2c) params.set("b2bB2c", b2bB2c);
     if (reach) params.set("reach", reach);
+    if (urlStatus) params.set("urlStatus", urlStatus);
     if (vertical) params.set("vertical", vertical);
     if (ownerGroup) params.set("ownerGroup", ownerGroup);
+    if (titleType) params.set("type", titleType);
+    if (frequency) params.set("frequency", frequency);
+    if (category) params.set("category", category);
+    if (circulationMin !== undefined)
+      params.set("circulationMin", String(circulationMin));
     if (q) params.set("q", q);
     if (p > 1) params.set("page", String(p));
     const s = params.toString();
@@ -251,6 +283,17 @@ export default async function DeskTitlesPage({
           </select>
         </div>
         <div>
+          <label htmlFor="urlStatus">{t("filters.urlStatus")}</label>
+          <select id="urlStatus" name="urlStatus" defaultValue={urlStatus ?? ""}>
+            <option value="">{t("filters.all")}</option>
+            {URL_STATUS_VALUES.map((v) => (
+              <option key={v} value={v}>
+                {v}
+              </option>
+            ))}
+          </select>
+        </div>
+        <div>
           <label htmlFor="vertical">{t("filters.vertical")}</label>
           <input
             id="vertical"
@@ -266,6 +309,44 @@ export default async function DeskTitlesPage({
             name="ownerGroup"
             defaultValue={ownerGroup}
             placeholder={t("filters.ownerGroupPlaceholder")}
+          />
+        </div>
+        <div>
+          <label htmlFor="type">{t("filters.type")}</label>
+          <input
+            id="type"
+            name="type"
+            defaultValue={titleType}
+            placeholder={t("filters.typePlaceholder")}
+          />
+        </div>
+        <div>
+          <label htmlFor="frequency">{t("filters.frequency")}</label>
+          <input
+            id="frequency"
+            name="frequency"
+            defaultValue={frequency}
+            placeholder={t("filters.frequencyPlaceholder")}
+          />
+        </div>
+        <div>
+          <label htmlFor="category">{t("filters.category")}</label>
+          <input
+            id="category"
+            name="category"
+            defaultValue={category}
+            placeholder={t("filters.categoryPlaceholder")}
+          />
+        </div>
+        <div>
+          <label htmlFor="circulationMin">{t("filters.circulationMin")}</label>
+          <input
+            id="circulationMin"
+            name="circulationMin"
+            type="number"
+            min="0"
+            defaultValue={circulationMin ?? ""}
+            placeholder={t("filters.circulationMinPlaceholder")}
           />
         </div>
         <div>
@@ -358,6 +439,14 @@ export default async function DeskTitlesPage({
                     {title.audience ? (
                       <div className="muted">{title.audience}</div>
                     ) : null}
+                    {title.locationNote ? (
+                      <div className="muted">📍 {title.locationNote}</div>
+                    ) : null}
+                    {title.adSales ? (
+                      <div className="muted">
+                        {t("adSales")}: {title.adSales}
+                      </div>
+                    ) : null}
                     {title.circulation ? (
                       <div className="muted">
                         {t("circulation")}:{" "}
@@ -373,8 +462,42 @@ export default async function DeskTitlesPage({
                     <div className="muted">
                       {t("products")}: {title._count.products}
                     </div>
-                    <div style={{ marginTop: 8 }}>
+                    {title.tags ? (
+                      <div
+                        style={{
+                          marginTop: 6,
+                          display: "flex",
+                          gap: 4,
+                          flexWrap: "wrap",
+                        }}
+                      >
+                        {title.tags
+                          .split(",")
+                          .map((s) => s.trim())
+                          .filter(Boolean)
+                          .map((tag, i) => (
+                            <span
+                              key={i}
+                              className="tag"
+                              style={{ fontSize: "0.8em", opacity: 0.85 }}
+                            >
+                              #{tag}
+                            </span>
+                          ))}
+                      </div>
+                    ) : null}
+                    <div
+                      style={{
+                        marginTop: 8,
+                        display: "flex",
+                        gap: 6,
+                        flexWrap: "wrap",
+                      }}
+                    >
                       <span className="tag">{statusLabel}</span>
+                      {title.urlStatus ? (
+                        <span className="tag">{title.urlStatus}</span>
+                      ) : null}
                     </div>
                     {title.websiteUrl ? (
                       <div className="muted" style={{ marginTop: 8 }}>
