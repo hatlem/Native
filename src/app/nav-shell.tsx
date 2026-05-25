@@ -165,17 +165,6 @@ export function NavShell({
           </nav>
 
           <div className="nav-actions">
-            <button
-              type="button"
-              className="cmdk-trigger"
-              aria-label={labels.search}
-              onClick={openPalette}
-            >
-              <SearchIcon />
-              <span className="cmdk-placeholder">{labels.searchPlaceholder}</span>
-              <kbd>⌘K</kbd>
-            </button>
-
             {signedIn && user ? (
               <details
                 ref={userMenuRef}
@@ -244,17 +233,6 @@ export function NavShell({
               <CloseIcon />
             </button>
           </div>
-          <button
-            type="button"
-            className="cmdk-trigger"
-            onClick={() => {
-              closeDrawer();
-              openPalette();
-            }}
-          >
-            <SearchIcon />
-            <span className="cmdk-placeholder">{labels.searchPlaceholder}</span>
-          </button>
           <nav aria-label="Mobile">
             {nav.map((item) => (
               <Link

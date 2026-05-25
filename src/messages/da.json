@@ -487,6 +487,7 @@
     "specHas": "Konfigureret",
     "specMissing": "Ikke sat",
     "orders": "Indkommende bookinger",
+    "orders": "Indkommende bookinger",
     "ordersTitle": "Indkommende bookinger",
     "ordersLead": "Hver linje nedenfor er en købers booking mod dine titler — opdater produktionsstatus og live-URL når den publiceres.",
     "kpiInProduction": "I produktion",

@@ -487,6 +487,7 @@
     "specHas": "Konfigurerad",
     "specMissing": "Ej satt",
     "orders": "Inkommande bokningar",
+    "orders": "Inkommande bokningar",
     "ordersTitle": "Inkommande bokningar",
     "ordersLead": "Varje rad nedan är en köpares bokning mot dina titlar — uppdatera produktionsstatus och live-URL när den publiceras.",
     "kpiInProduction": "I produktion",

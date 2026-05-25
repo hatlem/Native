@@ -555,6 +555,7 @@
     "statusInactive": "Pending review",
     "specHas": "Configured",
     "specMissing": "Not set",
+    "orders": "Incoming bookings",
     "ordersTitle": "Incoming bookings",
     "ordersLead": "Each line below is a buyer booking against your titles — update production status and the live URL once it ships.",
     "kpiInProduction": "In production",

@@ -87,8 +87,13 @@
     ui-monospace, "SF Mono", "Cascadia Code", Menlo, Consolas, monospace;
 }
 
+/* Dark tokens — applied when the user prefers dark OR when html has
+   data-theme="dark" (the latter lets us preview / test dark mode
+   without changing the OS setting). The data-theme="light" exception
+   on the @media query lets users force light even on a dark OS. */
+
 @media (prefers-color-scheme: dark) {
-  :root {
+  :root:not([data-theme="light"]) {
     --bg: #0c0d10;
     --surface: #15171b;
     --surface-2: #1a1c21;
@@ -124,6 +129,44 @@
     --shadow-md: 0 12px 32px rgba(0, 0, 0, 0.5);
     --shadow-lg: 0 32px 80px rgba(0, 0, 0, 0.6);
   }
+}
+
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --bg: #0c0d10;
+  --surface: #15171b;
+  --surface-2: #1a1c21;
+  --surface-3: #20232a;
+  --border: #2a2d34;
+  --border-strong: #3a3e48;
+
+  --text: #e6e7ec;
+  --heading: #f7f8fb;
+  --muted: #9ea3b0;
+  --muted-strong: #c2c6d1;
+
+  --ink: #f6f7f9;
+  --ink-hover: #ffffff;
+  --primary: var(--ink);
+  --primary-hover: var(--ink-hover);
+  --primary-contrast: #0a0b0d;
+
+  --accent: #8c80ff;
+  --accent-hover: #a89fff;
+  --accent-soft: #1d1b3e;
+  --ring: rgba(140, 128, 255, 0.4);
+
+  --success: #34d39c;
+  --success-soft: #0f2a22;
+  --warning: #e0a85d;
+  --warning-soft: #2c2014;
+  --danger: #f06e7a;
+  --danger-soft: #2e1418;
+
+  --shadow-xs: 0 1px 0 rgba(0, 0, 0, 0.35);
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.4);
+  --shadow-md: 0 12px 32px rgba(0, 0, 0, 0.5);
+  --shadow-lg: 0 32px 80px rgba(0, 0, 0, 0.6);
 }
 
 /* ---------- Reset ---------- */
