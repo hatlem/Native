@@ -1,4 +1,6 @@
 import { getTranslations } from "next-intl/server";
+import { redirect } from "next/navigation";
+import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
 import { Link } from "@/i18n/navigation";
 import { indicativeFromRules, toRateRules, formatMoney } from "@/lib/money";
@@ -17,6 +19,10 @@ export default async function ComparePage({
   searchParams: Promise<Record<string, string | string[] | undefined>>;
 }) {
   const { locale } = await params;
+  const session = await auth();
+  if (!session?.user) {
+    redirect(`/${locale}/signin?next=/${locale}/catalog/compare`);
+  }
   const sp = await searchParams;
   const t = await getTranslations({ locale, namespace: "compare" });
   const tc = await getTranslations({ locale, namespace: "catalog" });

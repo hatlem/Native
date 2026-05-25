@@ -12,28 +12,28 @@ import bcrypt from "bcryptjs";
 const prisma = new PrismaClient();
 
 const DESK_EMAIL = (
-  process.env.DESK_ADMIN_EMAIL || "desk@benative.example"
+  process.env.DESK_ADMIN_EMAIL || "desk@atnative.com"
 ).toLowerCase();
-const DESK_PASSWORD = process.env.DESK_ADMIN_PASSWORD || "benative-desk";
+const DESK_PASSWORD = process.env.DESK_ADMIN_PASSWORD || "atnative-desk";
 const PUB_EMAIL = (
-  process.env.PUBLISHER_EMAIL || "publisher@benative.example"
+  process.env.PUBLISHER_EMAIL || "publisher@atnative.com"
 ).toLowerCase();
-const PUB_PASSWORD = process.env.PUBLISHER_PASSWORD || "benative-pub";
+const PUB_PASSWORD = process.env.PUBLISHER_PASSWORD || "atnative-pub";
 const BUYER_EMAIL = (
-  process.env.BUYER_EMAIL || "buyer@benative.example"
+  process.env.BUYER_EMAIL || "buyer@atnative.com"
 ).toLowerCase();
-const BUYER_PASSWORD = process.env.BUYER_PASSWORD || "benative-buyer";
+const BUYER_PASSWORD = process.env.BUYER_PASSWORD || "atnative-buyer";
 const BUYER_ORG = "Demo Advertiser AS";
 const AGENCY_EMAIL = (
-  process.env.AGENCY_EMAIL || "agency@benative.example"
+  process.env.AGENCY_EMAIL || "agency@atnative.com"
 ).toLowerCase();
-const AGENCY_PASSWORD = process.env.AGENCY_PASSWORD || "benative-agency";
+const AGENCY_PASSWORD = process.env.AGENCY_PASSWORD || "atnative-agency";
 const AGENCY_ORG = "Demo Media Agency";
 const SUPERADMIN_EMAIL = (
-  process.env.SUPERADMIN_EMAIL || "superadmin@benative.example"
+  process.env.SUPERADMIN_EMAIL || "superadmin@atnative.com"
 ).toLowerCase();
 const SUPERADMIN_PASSWORD =
-  process.env.SUPERADMIN_PASSWORD || "benative-superadmin";
+  process.env.SUPERADMIN_PASSWORD || "atnative-superadmin";
 
 type SeedMarket = {
   code: MarketCode;
@@ -535,7 +535,35 @@ async function activateCommerceTitles(
   return activated;
 }
 
+// Refuse to seed the documented demo passwords against a production
+// database — every account here lands with a deterministic password from
+// the README, and the SUPERADMIN role grants full tenant access. Allow it
+// when the operator has supplied their own value via the *_PASSWORD env
+// vars (those values won't equal the literal default), or when they set
+// SEED_ALLOW_PRODUCTION=1 to acknowledge they really want demo accounts.
+function assertSeedCredentials() {
+  if (process.env.NODE_ENV !== "production") return;
+  if (process.env.SEED_ALLOW_PRODUCTION === "1") return;
+  const defaults: Array<[string, string]> = [
+    [DESK_PASSWORD, "atnative-desk"],
+    [PUB_PASSWORD, "atnative-pub"],
+    [BUYER_PASSWORD, "atnative-buyer"],
+    [AGENCY_PASSWORD, "atnative-agency"],
+    [SUPERADMIN_PASSWORD, "atnative-superadmin"],
+  ];
+  const stillDefault = defaults
+    .filter(([v, def]) => v === def)
+    .map(([, def]) => def);
+  if (stillDefault.length === 0) return;
+  throw new Error(
+    `Refusing to seed demo users in production with the documented default passwords: ${stillDefault.join(", ")}. ` +
+      `Set DESK_ADMIN_PASSWORD / PUBLISHER_PASSWORD / BUYER_PASSWORD / AGENCY_PASSWORD / SUPERADMIN_PASSWORD before running seed, ` +
+      `or set SEED_ALLOW_PRODUCTION=1 to override (not recommended).`,
+  );
+}
+
 async function main() {
+  assertSeedCredentials();
   // Clean catalog tables for an idempotent reseed (no commerce data yet).
   await prisma.availability.deleteMany();
   await prisma.priceRule.deleteMany();

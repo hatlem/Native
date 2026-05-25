@@ -134,7 +134,7 @@ export async function submitRequest(formData: FormData) {
     redirect(ws?.isAgency ? `/${locale}/agency` : `/${locale}/signin`);
   }
 
-  if (!rfqLimiter.check(`rfq:${ws.activeOrgId}`).ok) {
+  if (!(await rfqLimiter.check(`rfq:${ws.activeOrgId}`)).ok) {
     redirect(`/${locale}/plan?error=rate`);
   }
 

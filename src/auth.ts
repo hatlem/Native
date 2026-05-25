@@ -23,6 +23,12 @@ async function authClientIp(): Promise<string> {
 }
 
 export const { handlers, auth, signIn, signOut } = NextAuth({
+  // `trustHost: true` makes Auth.js accept the Host / X-Forwarded-Host
+  // headers as authoritative when building callback URLs. This is safe
+  // only when a trusted reverse proxy (Vercel/Railway/Cloudflare in front
+  // of the app) normalises Host before the request reaches Node — they
+  // strip attacker-supplied values. If you ever expose the Node process
+  // directly to the public internet, set this to false and pin AUTH_URL.
   trustHost: true,
   session: { strategy: "jwt" },
   providers: [
@@ -42,12 +48,11 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         // /api/auth/callback/credentials can't bypass the limiter that
         // sits in the `authenticate()` server action.
         const ip = await authClientIp();
-        if (
-          !authLimiter.check(`signin:ip:${ip}`).ok ||
-          !authLimiter.check(`signin:email:${email}`).ok
-        ) {
-          return null;
-        }
+        const [ipCheck, emailCheck] = await Promise.all([
+          authLimiter.check(`signin:ip:${ip}`),
+          authLimiter.check(`signin:email:${email}`),
+        ]);
+        if (!ipCheck.ok || !emailCheck.ok) return null;
 
         const user = await prisma.user.findUnique({
           where: { email },

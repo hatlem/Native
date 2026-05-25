@@ -32,7 +32,11 @@ export async function authenticate(formData: FormData) {
   // Rate-limit on the email AND the source IP — the attacker controls both
   // independently so we want either to slow them down.
   const ip = await clientKey();
-  if (!authLimiter.check(`signin:ip:${ip}`).ok || !authLimiter.check(`signin:email:${email}`).ok) {
+  const [ipCheck, emailCheck] = await Promise.all([
+    authLimiter.check(`signin:ip:${ip}`),
+    authLimiter.check(`signin:email:${email}`),
+  ]);
+  if (!ipCheck.ok || !emailCheck.ok) {
     redirect(`/${locale}/signin?error=rate`);
   }
 
@@ -66,7 +70,7 @@ export async function register(formData: FormData) {
   const marketCode = String(formData.get("market") || "").trim();
 
   const ip = await clientKey();
-  if (!authLimiter.check(`signup:ip:${ip}`).ok) {
+  if (!(await authLimiter.check(`signup:ip:${ip}`)).ok) {
     redirect(`/${locale}/signup?error=rate`);
   }
 

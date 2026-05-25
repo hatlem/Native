@@ -1,4 +1,5 @@
 import { getTranslations } from "next-intl/server";
+import { headers } from "next/headers";
 import { notFound, redirect } from "next/navigation";
 import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
@@ -18,6 +19,8 @@ export default async function TitleDetailPage({
   if (!session?.user) {
     redirect(`/${locale}/signin?next=/${locale}/catalog/${slug}`);
   }
+  // CSP nonce from middleware — required for the inline ld+json <script> below.
+  const nonce = (await headers()).get("x-nonce") ?? undefined;
   const t = await getTranslations({ locale, namespace: "titleDetail" });
   const tf = await getTranslations({ locale, namespace: "firm" });
   const tType = await getTranslations({ locale, namespace: "productType" });
@@ -67,6 +70,7 @@ export default async function TitleDetailPage({
     <section>
       <script
         type="application/ld+json"
+        nonce={nonce}
         // schema.org JSON-LD: PLAN §14 "structured data for discovery".
         dangerouslySetInnerHTML={{ __html: JSON.stringify(ld) }}
       />

@@ -8,6 +8,7 @@ import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
 import { getWorkspace } from "@/lib/workspace";
 import { recordAudit } from "@/lib/audit";
+import { exportLimiter } from "@/lib/rate-limit";
 
 export const dynamic = "force-dynamic";
 
@@ -15,6 +16,20 @@ export async function GET(req: NextRequest) {
   const session = await auth();
   if (!session?.user?.id) {
     return NextResponse.json({ error: "auth required" }, { status: 401 });
+  }
+
+  // Heavy multi-table read — cap per user so a bad actor (or buggy
+  // client) can't burn DB time or egress hammering the endpoint. Desk
+  // calls hit the same limit; the audit log already records who ran what.
+  const limit = await exportLimiter.check(`export:${session.user.id}`);
+  if (!limit.ok) {
+    return NextResponse.json(
+      { error: "rate limit", retryAfterMs: limit.retryAfterMs },
+      {
+        status: 429,
+        headers: { "Retry-After": String(Math.ceil(limit.retryAfterMs / 1000)) },
+      },
+    );
   }
 
   const role = session.user.role;
@@ -78,7 +93,7 @@ export async function GET(req: NextRequest) {
     },
     {
       headers: {
-        "Content-Disposition": `attachment; filename="benative-export-${Date.now()}.json"`,
+        "Content-Disposition": `attachment; filename="atnative-export-${Date.now()}.json"`,
       },
     },
   );
