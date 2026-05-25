@@ -303,7 +303,13 @@
   "market": {
     "NO": "Norge",
     "SE": "Sverige",
-    "DK": "Danmark"
+    "DK": "Danmark",
+    "FI": "Finland",
+    "DE": "Tyskland",
+    "AT": "Østrig",
+    "CH": "Schweiz",
+    "UK": "Storbritannien",
+    "IE": "Irland"
   },
   "orders": {
     "title": "Dine ordrer",

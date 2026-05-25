@@ -140,7 +140,8 @@ export default async function CatalogPage({
               indicativeFromRules(Number(p.basePrice), toRateRules(p.priceRules)),
             );
             const from = prices.length ? Math.min(...prices) : null;
-            const currency = title.products[0]?.currency ?? title.market.currency;
+            const currency =
+              title.products[0]?.currency ?? title.market?.currency ?? "";
 
             return (
               <article className="card" key={title.id}>
@@ -148,7 +149,7 @@ export default async function CatalogPage({
                   <Link href={`/catalog/${title.slug}`}>{title.name}</Link>
                 </h3>
                 <div className="muted">
-                  {title.publisher.name} · {tMarket(title.market.code)}
+                  {title.publisher.name} · {tMarket(title.countryCode)}
                 </div>
                 <div>
                   <span className="tag">{title.category}</span>

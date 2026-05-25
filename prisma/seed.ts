@@ -3,7 +3,10 @@ import {
   MarketCode,
   ProductType,
   PriceVisibility,
+  Prisma,
 } from "@prisma/client";
+import { readFileSync } from "node:fs";
+import { join } from "node:path";
 import bcrypt from "bcryptjs";
 
 const prisma = new PrismaClient();
@@ -64,241 +67,242 @@ const MARKETS: SeedMarket[] = [
   },
 ];
 
-type SeedTitle = {
-  name: string;
-  category: string;
-  monthlyReach: number;
-};
-
-const PUBLISHERS: {
-  market: MarketCode;
-  name: string;
-  paymentTerms: string;
-  titles: SeedTitle[];
-}[] = [
-  {
-    market: MarketCode.NO,
-    name: "Schibsted",
-    paymentTerms: "net 30",
-    titles: [
-      { name: "Aftenposten", category: "general-news", monthlyReach: 1_200_000 },
-      { name: "VG", category: "general-news", monthlyReach: 2_000_000 },
-      { name: "E24", category: "business", monthlyReach: 600_000 },
-    ],
-  },
-  {
-    market: MarketCode.NO,
-    name: "Amedia",
-    paymentTerms: "net 30",
-    titles: [
-      { name: "Nettavisen", category: "general-news", monthlyReach: 900_000 },
-    ],
-  },
-  {
-    market: MarketCode.SE,
-    name: "Bonnier News",
-    paymentTerms: "net 30",
-    titles: [
-      {
-        name: "Dagens Nyheter",
-        category: "general-news",
-        monthlyReach: 1_500_000,
-      },
-      {
-        name: "Dagens industri",
-        category: "business",
-        monthlyReach: 700_000,
-      },
-    ],
-  },
-  {
-    market: MarketCode.SE,
-    name: "Schibsted Sverige",
-    paymentTerms: "net 30",
-    titles: [
-      { name: "Aftonbladet", category: "general-news", monthlyReach: 2_500_000 },
-    ],
-  },
-  {
-    market: MarketCode.DK,
-    name: "JP/Politikens Hus",
-    paymentTerms: "net 30",
-    titles: [
-      { name: "Politiken", category: "general-news", monthlyReach: 800_000 },
-      {
-        name: "Jyllands-Posten",
-        category: "general-news",
-        monthlyReach: 700_000,
-      },
-    ],
-  },
-  {
-    market: MarketCode.DK,
-    name: "Berlingske Media",
-    paymentTerms: "net 30",
-    titles: [
-      { name: "Berlingske", category: "business", monthlyReach: 500_000 },
-    ],
-  },
-];
-
-// Nordic magazines. Seeded as `active = false` with no products: the
-// super-admin desk page reviews each one, checks whether the publisher
-// offers native, and either activates it (auto-creating default
-// products from the blueprint) or marks it as verified-but-no-native.
-type SeedMagazine = {
-  name: string;
-  category: string;
-  monthlyReach: number;
-  websiteUrl?: string;
-};
-
-const MAGAZINE_PUBLISHERS: {
-  market: MarketCode;
-  name: string;
-  paymentTerms: string;
-  magazines: SeedMagazine[];
-}[] = [
-  // ----- Norway -----
-  {
-    market: MarketCode.NO,
-    name: "Egmont Publishing Norge",
-    paymentTerms: "net 30",
-    magazines: [
-      { name: "Hjemmet", category: "women-lifestyle", monthlyReach: 320_000 },
-      { name: "Familien", category: "family", monthlyReach: 180_000 },
-      { name: "Vi Menn", category: "men-lifestyle", monthlyReach: 240_000 },
-      { name: "Det Nye", category: "women-fashion", monthlyReach: 95_000 },
-      { name: "Norsk Ukeblad", category: "women-lifestyle", monthlyReach: 210_000 },
-      { name: "Hytte & Hjem", category: "home", monthlyReach: 140_000 },
-      { name: "Tara", category: "women-lifestyle", monthlyReach: 110_000 },
-      { name: "Topp Idrett", category: "sports", monthlyReach: 80_000 },
-    ],
-  },
-  {
-    market: MarketCode.NO,
-    name: "Aller Media",
-    paymentTerms: "net 30",
-    magazines: [
-      { name: "Se og Hør", category: "celebrity", monthlyReach: 600_000 },
-      { name: "KK", category: "women-lifestyle", monthlyReach: 320_000 },
-      { name: "Henne", category: "women-fashion", monthlyReach: 140_000 },
-      { name: "Foreldre & Barn", category: "family", monthlyReach: 95_000 },
-      { name: "Vakre Hjem & Interiør", category: "home", monthlyReach: 120_000 },
-    ],
-  },
-  {
-    market: MarketCode.NO,
-    name: "Bonnier Publications Norge",
-    paymentTerms: "net 30",
-    magazines: [
-      { name: "Illustrert Vitenskap", category: "science", monthlyReach: 230_000 },
-      { name: "Historie", category: "history", monthlyReach: 150_000 },
-      { name: "Bo Bedre", category: "home", monthlyReach: 180_000 },
-      { name: "Gjør Det Selv", category: "diy", monthlyReach: 110_000 },
-    ],
-  },
-  {
-    market: MarketCode.NO,
-    name: "Kapital Forlag",
-    paymentTerms: "net 30",
-    magazines: [
-      { name: "Kapital", category: "business", monthlyReach: 95_000 },
-    ],
-  },
-
-  // ----- Sweden -----
-  {
-    market: MarketCode.SE,
-    name: "Bonnier Magazines & Brands",
-    paymentTerms: "net 30",
-    magazines: [
-      { name: "Damernas Värld", category: "women-fashion", monthlyReach: 220_000 },
-      { name: "Sköna Hem", category: "home", monthlyReach: 280_000 },
-      { name: "Allt om Mat", category: "food", monthlyReach: 260_000 },
-      { name: "M-magasin", category: "women-lifestyle", monthlyReach: 180_000 },
-      { name: "Allas", category: "women-lifestyle", monthlyReach: 320_000 },
-      { name: "ICA-Kuriren", category: "food", monthlyReach: 410_000 },
-      { name: "Året Runt", category: "women-lifestyle", monthlyReach: 240_000 },
-    ],
-  },
-  {
-    market: MarketCode.SE,
-    name: "Aller Media AB",
-    paymentTerms: "net 30",
-    magazines: [
-      { name: "Allers", category: "women-lifestyle", monthlyReach: 360_000 },
-      { name: "Hänt", category: "celebrity", monthlyReach: 290_000 },
-      { name: "Hänt Extra", category: "celebrity", monthlyReach: 230_000 },
-      { name: "Se & Hör", category: "celebrity", monthlyReach: 280_000 },
-      { name: "Femina", category: "women-fashion", monthlyReach: 210_000 },
-    ],
-  },
-  {
-    market: MarketCode.SE,
-    name: "Egmont Publishing AB",
-    paymentTerms: "net 30",
-    magazines: [
-      { name: "Hus & Hem", category: "home", monthlyReach: 240_000 },
-      { name: "Tara", category: "women-lifestyle", monthlyReach: 150_000 },
-      { name: "Vagabond", category: "travel", monthlyReach: 170_000 },
-      { name: "Privata Affärer", category: "business", monthlyReach: 130_000 },
-    ],
-  },
-  {
-    market: MarketCode.SE,
-    name: "Forma Publishing Group",
-    paymentTerms: "net 30",
-    magazines: [
-      { name: "Lantliv", category: "home", monthlyReach: 130_000 },
-    ],
-  },
-
-  // ----- Denmark -----
-  {
-    market: MarketCode.DK,
-    name: "Aller Media A/S",
-    paymentTerms: "net 30",
-    magazines: [
-      { name: "Se og Hør", category: "celebrity", monthlyReach: 350_000 },
-      { name: "Familie Journal", category: "family", monthlyReach: 410_000 },
-      { name: "Helse", category: "health", monthlyReach: 180_000 },
-      { name: "Søndag", category: "women-lifestyle", monthlyReach: 240_000 },
-      { name: "Femina", category: "women-fashion", monthlyReach: 190_000 },
-      { name: "BilledBladet", category: "celebrity", monthlyReach: 270_000 },
-    ],
-  },
-  {
-    market: MarketCode.DK,
-    name: "Egmont Publishing A/S",
-    paymentTerms: "net 30",
-    magazines: [
-      { name: "Eurowoman", category: "women-fashion", monthlyReach: 140_000 },
-      { name: "Costume", category: "women-fashion", monthlyReach: 130_000 },
-      { name: "Bilen", category: "automotive", monthlyReach: 110_000 },
-      { name: "Vores Børn", category: "family", monthlyReach: 90_000 },
-      { name: "Bo Bedre", category: "home", monthlyReach: 200_000 },
-    ],
-  },
-  {
-    market: MarketCode.DK,
-    name: "Bonnier Publications A/S",
-    paymentTerms: "net 30",
-    magazines: [
-      { name: "Gør Det Selv", category: "diy", monthlyReach: 130_000 },
-      { name: "Illustreret Videnskab", category: "science", monthlyReach: 260_000 },
-      { name: "Historie", category: "history", monthlyReach: 160_000 },
-      { name: "Aktiv Træning", category: "fitness", monthlyReach: 100_000 },
-    ],
-  },
-];
-
 function slugify(value: string) {
   return value
     .toLowerCase()
     .normalize("NFKD")
     .replace(/[^a-z0-9]+/g, "-")
     .replace(/(^-|-$)/g, "");
+}
+
+// Minimal RFC 4180 CSV parser. Keep inline to avoid a runtime dep.
+function parseCsv(text: string): string[][] {
+  const rows: string[][] = [];
+  let row: string[] = [];
+  let field = "";
+  let inQuotes = false;
+  for (let i = 0; i < text.length; i++) {
+    const c = text[i];
+    if (inQuotes) {
+      if (c === '"') {
+        if (text[i + 1] === '"') {
+          field += '"';
+          i++;
+        } else {
+          inQuotes = false;
+        }
+      } else {
+        field += c;
+      }
+    } else {
+      if (c === '"') {
+        inQuotes = true;
+      } else if (c === ",") {
+        row.push(field);
+        field = "";
+      } else if (c === "\n") {
+        row.push(field);
+        rows.push(row);
+        row = [];
+        field = "";
+      } else if (c === "\r") {
+        // ignore
+      } else {
+        field += c;
+      }
+    }
+  }
+  if (field.length > 0 || row.length > 0) {
+    row.push(field);
+    rows.push(row);
+  }
+  return rows;
+}
+
+function nonEmpty(value: string | undefined): string | null {
+  if (value == null) return null;
+  const trimmed = value.trim();
+  return trimmed.length === 0 ? null : trimmed;
+}
+
+function toInt(value: string | undefined): number | null {
+  const v = nonEmpty(value);
+  if (v == null) return null;
+  const n = Number(v);
+  return Number.isFinite(n) && Number.isInteger(n) ? n : null;
+}
+
+type CsvRow = {
+  country: string;
+  title: string;
+  type: string | null;
+  category: string;
+  frequency: string | null;
+  ownerGroup: string | null;
+  publisher: string;
+  adSales: string | null;
+  locationNote: string | null;
+  circulation: number | null;
+  vertical: string | null;
+  audience: string | null;
+  b2bB2c: string | null;
+  reach: string | null;
+  format: string | null;
+  nativeFit: string | null;
+  tags: string | null;
+  url: string | null;
+  urlStatus: string | null;
+};
+
+function readMediaCsv(): CsvRow[] {
+  const path = join(process.cwd(), "prisma", "data", "medier_alle.csv");
+  const text = readFileSync(path, "utf8");
+  const rows = parseCsv(text);
+  if (rows.length < 2) return [];
+  const out: CsvRow[] = [];
+  // The CSV has 20 columns; columns 1 and 11 are both labelled "Country"
+  // (a duplicate in the source export). We use index 0.
+  for (let i = 1; i < rows.length; i++) {
+    const r = rows[i];
+    if (r.length < 2) continue;
+    const country = (r[0] ?? "").trim();
+    const title = (r[1] ?? "").trim();
+    const publisher = (r[6] ?? "").trim();
+    const category = (r[3] ?? "").trim();
+    if (!country || !title || !publisher || !category) continue;
+    out.push({
+      country,
+      title,
+      type: nonEmpty(r[2]),
+      category,
+      frequency: nonEmpty(r[4]),
+      ownerGroup: nonEmpty(r[5]),
+      publisher,
+      adSales: nonEmpty(r[7]),
+      locationNote: nonEmpty(r[8]),
+      circulation: toInt(r[9]),
+      vertical: nonEmpty(r[11]),
+      audience: nonEmpty(r[12]),
+      b2bB2c: nonEmpty(r[13]),
+      reach: nonEmpty(r[14]),
+      format: nonEmpty(r[15]),
+      nativeFit: nonEmpty(r[16]),
+      tags: nonEmpty(r[17]),
+      url: nonEmpty(r[18]),
+      urlStatus: nonEmpty(r[19]),
+    });
+  }
+  return out;
+}
+
+// Apply NO/SE/DK markets so every Title in a Nordic country gets a
+// Market FK; outlets from UK/DE/FI/IE/AT/CH live in the catalog without
+// a Market (they're research-only until we open those countries).
+async function seedMarkets(): Promise<Map<string, string>> {
+  const codeToId = new Map<string, string>();
+  for (const m of MARKETS) {
+    const market = await prisma.market.create({
+      data: {
+        code: m.code,
+        name: m.name,
+        currency: m.currency,
+        defaultLocale: m.defaultLocale,
+        vatRatePct: 25,
+        disclosureLabel: m.disclosure,
+      },
+    });
+    codeToId.set(m.code, market.id);
+  }
+  return codeToId;
+}
+
+// Bulk-imports every CSV row into Publisher + Title. Returns a slug→id
+// map so the commerce blueprint below can promote a small curated set
+// to active products.
+async function seedFromCsv(
+  marketIds: Map<string, string>,
+): Promise<Map<string, string>> {
+  const rows = readMediaCsv();
+
+  // Dedupe publishers up-front. The CSV's "Publisher" column is the
+  // legal entity (e.g. "Aftenposten AS"); we get ~1,900 unique
+  // (country, publisher) pairs. Bulk-insert with createMany, then look
+  // up ids in one query.
+  const pubKey = (country: string, name: string) => `${country}|${name}`;
+  const publisherSeen = new Map<string, { countryCode: string; name: string }>();
+  for (const r of rows) {
+    const k = pubKey(r.country, r.publisher);
+    if (!publisherSeen.has(k)) {
+      publisherSeen.set(k, { countryCode: r.country, name: r.publisher });
+    }
+  }
+  await prisma.publisher.createMany({
+    data: Array.from(publisherSeen.values()).map((p) => ({
+      name: p.name,
+      countryCode: p.countryCode,
+      marketId: marketIds.get(p.countryCode) ?? null,
+      paymentTerms: "net 30",
+    })),
+    skipDuplicates: true,
+  });
+
+  const publisherRows = await prisma.publisher.findMany({
+    select: { id: true, countryCode: true, name: true },
+  });
+  const publisherIdByKey = new Map<string, string>();
+  for (const p of publisherRows) {
+    publisherIdByKey.set(pubKey(p.countryCode, p.name), p.id);
+  }
+
+  // Dedupe titles by slug (a few CSV rows are exact duplicates — 4
+  // pairs as of the May 2026 export).
+  const titleSeen = new Map<string, CsvRow>();
+  for (const r of rows) {
+    const slug = slugify(`${r.title}-${r.country}`);
+    if (!titleSeen.has(slug)) titleSeen.set(slug, r);
+  }
+
+  // createMany is dramatically faster than per-row create (3k vs ~6s)
+  // and we never need the returned ids for non-commerce titles.
+  const titleData: Prisma.TitleCreateManyInput[] = [];
+  for (const [slug, r] of titleSeen) {
+    const publisherId = publisherIdByKey.get(pubKey(r.country, r.publisher));
+    if (!publisherId) continue;
+    titleData.push({
+      name: r.title,
+      slug,
+      publisherId,
+      countryCode: r.country,
+      marketId: marketIds.get(r.country) ?? null,
+      category: r.category,
+      websiteUrl: r.url,
+      active: false,
+      lastVerifiedAt: null,
+      type: r.type,
+      frequency: r.frequency,
+      ownerGroup: r.ownerGroup,
+      publisherName: r.publisher,
+      adSales: r.adSales,
+      locationNote: r.locationNote,
+      circulation: r.circulation,
+      vertical: r.vertical,
+      audience: r.audience,
+      b2bB2c: r.b2bB2c,
+      reach: r.reach,
+      format: r.format,
+      nativeFit: r.nativeFit,
+      tags: r.tags,
+      urlStatus: r.urlStatus,
+    });
+  }
+  await prisma.title.createMany({ data: titleData, skipDuplicates: true });
+
+  const titleRows = await prisma.title.findMany({
+    select: { id: true, slug: true },
+  });
+  const titleIdBySlug = new Map<string, string>();
+  for (const t of titleRows) titleIdBySlug.set(t.slug, t.id);
+  return titleIdBySlug;
 }
 
 type RateCardTier = {
@@ -322,7 +326,6 @@ const PRODUCT_BLUEPRINT: {
     visibility: PriceVisibility.INDICATIVE,
     rateCard: [
       { label: "standard", minVolume: 1, marginPct: 22, seasonalMultiplier: 1 },
-      // Editorial series — volume discount from 3 placements.
       { label: "series", minVolume: 3, marginPct: 18, seasonalMultiplier: 1 },
     ],
   },
@@ -336,8 +339,6 @@ const PRODUCT_BLUEPRINT: {
       { label: "series", minVolume: 3, marginPct: 15, seasonalMultiplier: 1 },
     ],
   },
-  // Standardised display inventory is firm-priced -> self-serve instant book.
-  // Carries a high-season premium; bulk buyers get a better margin.
   {
     type: ProductType.NATIVE_DISPLAY,
     perThousandReach: 12,
@@ -355,6 +356,100 @@ const PRODUCT_BLUEPRINT: {
   },
 ];
 
+// Curated commerce subset — these are the Phase-0 titles that ship with
+// products + price rules + specs. Slugs are computed from the CSV
+// titles' (name, country); look them up via the slug map returned by
+// `seedFromCsv`. monthlyReach is hand-curated (estimated monthly
+// readers; differs from print circulation captured in `Title.circulation`).
+type CommerceTitle = {
+  slug: string;
+  monthlyReach: number;
+};
+
+const COMMERCE_TITLES: CommerceTitle[] = [
+  { slug: slugify("Aftenposten-NO"), monthlyReach: 1_200_000 },
+  { slug: slugify("Verdens Gang (VG)-NO"), monthlyReach: 2_000_000 },
+  { slug: slugify("E24-NO"), monthlyReach: 600_000 },
+  { slug: slugify("Nettavisen-NO"), monthlyReach: 900_000 },
+  { slug: slugify("Dagens Nyheter-SE"), monthlyReach: 1_500_000 },
+  { slug: slugify("Dagens Industri-SE"), monthlyReach: 700_000 },
+  { slug: slugify("Aftonbladet-SE"), monthlyReach: 2_500_000 },
+  { slug: slugify("Politiken-DK"), monthlyReach: 800_000 },
+  { slug: slugify("Morgenavisen Jyllands-Posten-DK"), monthlyReach: 700_000 },
+  { slug: slugify("Berlingske-DK"), monthlyReach: 500_000 },
+];
+
+async function activateCommerceTitles(
+  marketIds: Map<string, string>,
+  titleIdBySlug: Map<string, string>,
+): Promise<number> {
+  let activated = 0;
+  for (const c of COMMERCE_TITLES) {
+    const titleId = titleIdBySlug.get(c.slug);
+    if (!titleId) continue;
+    const title = await prisma.title.findUnique({
+      where: { id: titleId },
+      select: {
+        id: true,
+        name: true,
+        countryCode: true,
+        marketId: true,
+      },
+    });
+    if (!title || !title.marketId) continue;
+    const market = MARKETS.find((m) => m.code === title.countryCode);
+    if (!market) continue;
+
+    await prisma.title.update({
+      where: { id: title.id },
+      data: {
+        active: true,
+        monthlyReach: c.monthlyReach,
+        lastVerifiedAt: new Date(),
+      },
+    });
+
+    for (const bp of PRODUCT_BLUEPRINT) {
+      const basePrice = Math.round((c.monthlyReach / 1000) * bp.perThousandReach);
+      await prisma.product.create({
+        data: {
+          titleId: title.id,
+          type: bp.type,
+          name: `${title.name} — ${bp.type}`,
+          currency: market.currency,
+          basePrice,
+          visibility: bp.visibility,
+          leadTimeDays: bp.leadTimeDays,
+          priceRules: {
+            create: bp.rateCard.map((rc) => ({
+              label: rc.label,
+              minVolume: rc.minVolume,
+              marginPct: rc.marginPct,
+              seasonalMultiplier: rc.seasonalMultiplier,
+            })),
+          },
+          spec: {
+            create: {
+              wordCountMin:
+                bp.type === ProductType.NATIVE_DISPLAY ? null : 500,
+              wordCountMax:
+                bp.type === ProductType.NATIVE_DISPLAY ? null : 900,
+              imagesMin: 2,
+              disclosureLabel: market.disclosure,
+              fileFormats: "JPG, PNG",
+              requirements:
+                "Clearly marked as paid; editorial-quality copy aligned to the title's house style.",
+            },
+          },
+        },
+      });
+    }
+    activated++;
+  }
+  void marketIds;
+  return activated;
+}
+
 async function main() {
   // Clean catalog tables for an idempotent reseed (no commerce data yet).
   await prisma.availability.deleteMany();
@@ -365,126 +460,9 @@ async function main() {
   await prisma.publisher.deleteMany();
   await prisma.market.deleteMany();
 
-  for (const m of MARKETS) {
-    const market = await prisma.market.create({
-      data: {
-        code: m.code,
-        name: m.name,
-        currency: m.currency,
-        defaultLocale: m.defaultLocale,
-        vatRatePct: 25,
-        disclosureLabel: m.disclosure,
-      },
-    });
-
-    const publishers = PUBLISHERS.filter((p) => p.market === m.code);
-    for (const p of publishers) {
-      const publisher = await prisma.publisher.create({
-        data: {
-          name: p.name,
-          marketId: market.id,
-          paymentTerms: p.paymentTerms,
-          contactEmail: `sales@${slugify(p.name)}.example`,
-        },
-      });
-
-      for (const titleSeed of p.titles) {
-        const title = await prisma.title.create({
-          data: {
-            name: titleSeed.name,
-            slug: slugify(`${titleSeed.name}-${m.code}`),
-            publisherId: publisher.id,
-            marketId: market.id,
-            category: titleSeed.category,
-            monthlyReach: titleSeed.monthlyReach,
-            websiteUrl: `https://www.${slugify(titleSeed.name)}.example`,
-            lastVerifiedAt: new Date(),
-          },
-        });
-
-        for (const bp of PRODUCT_BLUEPRINT) {
-          const basePrice = Math.round(
-            (titleSeed.monthlyReach / 1000) * bp.perThousandReach,
-          );
-          const product = await prisma.product.create({
-            data: {
-              titleId: title.id,
-              type: bp.type,
-              name: `${titleSeed.name} — ${bp.type}`,
-              currency: m.currency,
-              basePrice,
-              visibility: bp.visibility,
-              leadTimeDays: bp.leadTimeDays,
-              priceRules: {
-                create: bp.rateCard.map((rc) => ({
-                  label: rc.label,
-                  minVolume: rc.minVolume,
-                  marginPct: rc.marginPct,
-                  seasonalMultiplier: rc.seasonalMultiplier,
-                })),
-              },
-              spec: {
-                create: {
-                  wordCountMin:
-                    bp.type === ProductType.NATIVE_DISPLAY ? null : 500,
-                  wordCountMax:
-                    bp.type === ProductType.NATIVE_DISPLAY ? null : 900,
-                  imagesMin: 2,
-                  disclosureLabel: m.disclosure,
-                  fileFormats: "JPG, PNG",
-                  requirements:
-                    "Clearly marked as paid; editorial-quality copy aligned to the title's house style.",
-                },
-              },
-            },
-          });
-          void product;
-        }
-      }
-    }
-  }
-
-  // Magazines: seed inactive with no products. Super-admins use the
-  // /desk/titles page to verify whether each one offers native and
-  // activate the ones that do.
-  let magazineCount = 0;
-  for (const pubSeed of MAGAZINE_PUBLISHERS) {
-    const market = await prisma.market.findUnique({
-      where: { code: pubSeed.market },
-    });
-    if (!market) continue;
-
-    let publisher = await prisma.publisher.findFirst({
-      where: { marketId: market.id, name: pubSeed.name },
-    });
-    publisher ??= await prisma.publisher.create({
-      data: {
-        name: pubSeed.name,
-        marketId: market.id,
-        paymentTerms: pubSeed.paymentTerms,
-        contactEmail: `sales@${slugify(pubSeed.name)}.example`,
-      },
-    });
-
-    for (const mag of pubSeed.magazines) {
-      const slug = slugify(`${mag.name}-${pubSeed.market}`);
-      await prisma.title.create({
-        data: {
-          name: mag.name,
-          slug,
-          publisherId: publisher.id,
-          marketId: market.id,
-          category: mag.category,
-          monthlyReach: mag.monthlyReach,
-          websiteUrl:
-            mag.websiteUrl ?? `https://www.${slugify(mag.name)}.example`,
-          active: false,
-          lastVerifiedAt: null,
-        },
-      });
-      magazineCount++;
-    }
-  }
+  const marketIds = await seedMarkets();
+  const titleIdBySlug = await seedFromCsv(marketIds);
+  const activeCount = await activateCommerceTitles(marketIds, titleIdBySlug);
 
   const passwordHash = await bcrypt.hash(DESK_PASSWORD, 10);
   await prisma.user.upsert({
@@ -510,24 +488,28 @@ async function main() {
     },
   });
 
-  const pubPublisher = await prisma.publisher.findFirst({
-    where: { name: "Schibsted" },
+  // Publisher user is linked to whichever Publisher owns the
+  // "aftenposten-no" title — that anchors the demo publisher to a real
+  // commerce-active title without hard-coding a name.
+  const aftenposten = await prisma.title.findUnique({
+    where: { slug: slugify("Aftenposten-NO") },
+    select: { publisherId: true },
   });
-  if (pubPublisher) {
+  if (aftenposten) {
     const pubHash = await bcrypt.hash(PUB_PASSWORD, 10);
     await prisma.user.upsert({
       where: { email: PUB_EMAIL },
       update: {
         passwordHash: pubHash,
         role: "PUBLISHER",
-        publisherId: pubPublisher.id,
+        publisherId: aftenposten.publisherId,
       },
       create: {
         email: PUB_EMAIL,
         name: "Publisher Admin",
         role: "PUBLISHER",
         passwordHash: pubHash,
-        publisherId: pubPublisher.id,
+        publisherId: aftenposten.publisherId,
       },
     });
   }
@@ -599,9 +581,10 @@ async function main() {
   }
 
   const titleCount = await prisma.title.count();
+  const publisherCount = await prisma.publisher.count();
   const productCount = await prisma.product.count();
   console.log(
-    `Seeded ${MARKETS.length} markets, ${titleCount} titles (${magazineCount} magazines pending super-admin review), ${productCount} products, superadmin ${SUPERADMIN_EMAIL}, desk ${DESK_EMAIL}, publisher ${PUB_EMAIL}, buyer ${BUYER_EMAIL}, agency ${AGENCY_EMAIL}.`,
+    `Seeded ${MARKETS.length} markets, ${publisherCount} publishers, ${titleCount} titles (${activeCount} active commerce), ${productCount} products, superadmin ${SUPERADMIN_EMAIL}, desk ${DESK_EMAIL}, publisher ${PUB_EMAIL}, buyer ${BUYER_EMAIL}, agency ${AGENCY_EMAIL}.`,
   );
 }
 
