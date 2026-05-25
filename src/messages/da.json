@@ -134,16 +134,28 @@
     "filters": {
       "market": "Marked",
       "type": "Format",
+      "nativeFit": "Native-tilpasning",
+      "b2bB2c": "B2B/B2C",
+      "onlyPriced": "Kun titler med pris",
       "all": "Alle",
       "search": "Søg",
-      "searchPlaceholder": "Titel eller kategori…",
+      "searchPlaceholder": "Titel, vertikal eller tag …",
       "apply": "Anvend"
     },
     "card": {
       "from": "Fra",
       "reach": "Månedlig rækkevidde",
+      "circulation": "Oplag",
       "leadTime": "Leveringstid",
-      "days": "dage"
+      "days": "dage",
+      "requestQuote": "Anmod om tilbud",
+      "nativeFit": "Native: {value}"
+    },
+    "resultCount": "{count, plural, =0 {Ingen resultater} =1 {1 titel} other {# titler}}",
+    "pagination": {
+      "prev": "Forrige",
+      "next": "Næste",
+      "page": "Side {page} af {total}"
     },
     "indicativeNote": "Priserne er vejledende. En fast pris bekræftes af vores indkøbsteam baseret på tilgængelighed, sæson og volumen.",
     "noResults": "Ingen titler matcher disse filtre.",
@@ -155,6 +167,7 @@
     "publishedBy": "Udgives af",
     "reach": "Månedlig rækkevidde",
     "formats": "Native-formater",
+    "circulation": "Oplag",
     "leadTime": "Leveringstid",
     "days": "dage",
     "from": "Fra",
@@ -163,6 +176,12 @@
     "images": "Billeder (min.)",
     "disclosure": "Mærkning",
     "addToPlan": "Tilføj til plan",
+    "nativeFitTag": "Native: {value}",
+    "requestQuote": {
+      "title": "Anmod om tilbud",
+      "body": "Denne titel er i vores katalog, men har endnu ingen offentliggjort listepris. Send en brief, så finder vores indkøbsteam priser og tilgængelighed til dig.",
+      "cta": "Start en plan"
+    },
     "indicativeNote": "Vejledende pris. Den faste pris bekræftes af vores indkøbsteam.",
     "unavailable": "I øjeblikket ikke tilgængelig til booking.",
     "formatsEyebrow": "Tilgængelige formater",
@@ -299,6 +318,25 @@
     "filters": {
       "market": "Marked",
       "status": "Status",
+      "nativeFit": "Native-tilpasning",
+      "format": "Format",
+      "b2bB2c": "B2B/B2C",
+      "reach": "Geografisk rækkevidde",
+      "urlStatus": "URL-status",
+      "vertical": "Vertikal",
+      "verticalPlaceholder": "F.eks. News, B2B – Energy …",
+      "ownerGroup": "Ejer (koncern)",
+      "ownerGroupPlaceholder": "F.eks. Schibsted, Polaris …",
+      "type": "Type",
+      "typePlaceholder": "F.eks. Avis, Monthly mag …",
+      "frequency": "Frekvens",
+      "frequencyPlaceholder": "F.eks. Dagligt, Ugentligt …",
+      "category": "Kategori",
+      "categoryPlaceholder": "F.eks. Regional, Religion …",
+      "circulationMin": "Min oplag",
+      "circulationMinPlaceholder": "F.eks. 50000",
+      "search": "Søg",
+      "searchPlaceholder": "Titel, udgiver eller tag …",
       "all": "Alle",
       "apply": "Anvend"
     },
@@ -309,8 +347,17 @@
       "no-native": "Tilbyder ikke native"
     },
     "reach": "Månedlig rækkevidde",
+    "circulation": "Oplag",
+    "adSales": "Annoncesalg",
     "products": "Produkter",
     "checkSite": "Tjek udgiverens website",
+    "nativeFitTag": "Native: {value}",
+    "resultCount": "{count, plural, =0 {Ingen resultater} =1 {1 titel} other {# titler}}",
+    "pagination": {
+      "prev": "Forrige",
+      "next": "Næste",
+      "page": "Side {page} af {total}"
+    },
     "actions": {
       "markNative": "Markér: tilbyder native",
       "markNoNative": "Markér: ingen native",

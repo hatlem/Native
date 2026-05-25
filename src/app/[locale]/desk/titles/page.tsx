@@ -1,6 +1,6 @@
 import { getTranslations } from "next-intl/server";
 import { redirect } from "next/navigation";
-import type { MarketCode } from "@prisma/client";
+import { MarketCode, Prisma } from "@prisma/client";
 import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
 import { Link } from "@/i18n/navigation";
@@ -12,26 +12,22 @@ import {
 
 export const dynamic = "force-dynamic";
 
-// All catalog countries — the NO/SE/DK Markets we sell into plus the
-// research-catalog imports from prisma/data/medier_alle.csv.
-const COUNTRY_CODES = [
-  "NO",
-  "SE",
-  "DK",
-  "FI",
-  "DE",
-  "AT",
-  "CH",
-  "UK",
-  "IE",
-] as const;
-type CountryCode = (typeof COUNTRY_CODES)[number];
+const MARKET_CODES = Object.values(MarketCode);
 const STATUS_VALUES = ["all", "unverified", "active", "no-native"] as const;
 type StatusFilter = (typeof STATUS_VALUES)[number];
 
-function asCountry(value: string | undefined): CountryCode | undefined {
-  return value && (COUNTRY_CODES as readonly string[]).includes(value)
-    ? (value as CountryCode)
+// Small fixed-domain CSV columns — perfect for dropdowns.
+const NATIVE_FIT_VALUES = ["High", "Medium", "Low"] as const;
+const FORMAT_VALUES = ["Print + Digital", "Digital", "Print"] as const;
+const B2B_B2C_VALUES = ["B2B", "B2C"] as const;
+const REACH_VALUES = ["National", "Regional", "Local", "International"] as const;
+const URL_STATUS_VALUES = ["VERIFIED", "LIKELY_OK", "UNVERIFIED"] as const;
+
+const PAGE_SIZE = 60;
+
+function asMarket(value: string | undefined): MarketCode | undefined {
+  return value && (MARKET_CODES as string[]).includes(value)
+    ? (value as MarketCode)
     : undefined;
 }
 
@@ -39,6 +35,20 @@ function asStatus(value: string | undefined): StatusFilter {
   return value && (STATUS_VALUES as readonly string[]).includes(value)
     ? (value as StatusFilter)
     : "all";
+}
+
+function asEnumValue<T extends string>(
+  value: string | undefined,
+  allowed: readonly T[],
+): T | undefined {
+  return value && (allowed as readonly string[]).includes(value)
+    ? (value as T)
+    : undefined;
+}
+
+function str(sp: Record<string, string | string[] | undefined>, key: string) {
+  const v = sp[key];
+  return typeof v === "string" ? v.trim() : "";
 }
 
 export default async function DeskTitlesPage({
@@ -59,31 +69,89 @@ export default async function DeskTitlesPage({
   const tMarket = await getTranslations({ locale, namespace: "market" });
   const td = await getTranslations({ locale, namespace: "desk" });
 
-  const country = asCountry(
-    typeof sp.market === "string" ? sp.market : undefined,
+  const market = asMarket(str(sp, "market") || undefined);
+  const status = asStatus(str(sp, "status") || undefined);
+  const nativeFit = asEnumValue(str(sp, "nativeFit") || undefined, NATIVE_FIT_VALUES);
+  const format = asEnumValue(str(sp, "format") || undefined, FORMAT_VALUES);
+  const b2bB2c = asEnumValue(str(sp, "b2bB2c") || undefined, B2B_B2C_VALUES);
+  const reach = asEnumValue(str(sp, "reach") || undefined, REACH_VALUES);
+  const urlStatus = asEnumValue(
+    str(sp, "urlStatus") || undefined,
+    URL_STATUS_VALUES,
   );
-  const status = asStatus(typeof sp.status === "string" ? sp.status : undefined);
+  const vertical = str(sp, "vertical");
+  const ownerGroup = str(sp, "ownerGroup");
+  const titleType = str(sp, "type");
+  const frequency = str(sp, "frequency");
+  const category = str(sp, "category");
+  const circulationMinRaw = str(sp, "circulationMin");
+  const circulationMin =
+    circulationMinRaw && /^\d+$/.test(circulationMinRaw)
+      ? parseInt(circulationMinRaw, 10)
+      : undefined;
+  const q = str(sp, "q");
+  const pageParam = parseInt(str(sp, "page") || "1", 10);
+  const page = Number.isFinite(pageParam) && pageParam >= 1 ? pageParam : 1;
 
-  const titles = await prisma.title.findMany({
-    where: {
-      ...(country ? { countryCode: country } : {}),
-      ...(status === "unverified" ? { lastVerifiedAt: null } : {}),
-      ...(status === "active" ? { active: true } : {}),
-      ...(status === "no-native"
-        ? { active: false, lastVerifiedAt: { not: null } }
-        : {}),
-    },
-    include: {
-      publisher: true,
-      market: true,
-      _count: { select: { products: true } },
-    },
-    orderBy: [
-      { countryCode: "asc" },
-      { publisher: { name: "asc" } },
-      { name: "asc" },
-    ],
-  });
+  const where: Prisma.TitleWhereInput = {
+    ...(market ? { market: { code: market } } : {}),
+    ...(status === "unverified" ? { lastVerifiedAt: null } : {}),
+    ...(status === "active" ? { active: true } : {}),
+    ...(status === "no-native"
+      ? { active: false, lastVerifiedAt: { not: null } }
+      : {}),
+    ...(nativeFit ? { nativeFit } : {}),
+    ...(format ? { format } : {}),
+    ...(b2bB2c ? { b2bB2c } : {}),
+    ...(reach ? { reach } : {}),
+    ...(urlStatus ? { urlStatus } : {}),
+    ...(vertical
+      ? { vertical: { contains: vertical, mode: "insensitive" } }
+      : {}),
+    ...(ownerGroup
+      ? { ownerGroup: { contains: ownerGroup, mode: "insensitive" } }
+      : {}),
+    ...(titleType
+      ? { type: { contains: titleType, mode: "insensitive" } }
+      : {}),
+    ...(frequency
+      ? { frequency: { contains: frequency, mode: "insensitive" } }
+      : {}),
+    ...(category
+      ? { category: { contains: category, mode: "insensitive" } }
+      : {}),
+    ...(circulationMin !== undefined
+      ? { circulation: { gte: circulationMin } }
+      : {}),
+    ...(q
+      ? {
+          OR: [
+            { name: { contains: q, mode: "insensitive" } },
+            { publisherName: { contains: q, mode: "insensitive" } },
+            { tags: { contains: q, mode: "insensitive" } },
+          ],
+        }
+      : {}),
+  };
+
+  const [filteredCount, titles] = await Promise.all([
+    prisma.title.count({ where }),
+    prisma.title.findMany({
+      where,
+      include: {
+        publisher: true,
+        market: true,
+        _count: { select: { products: true } },
+      },
+      orderBy: [
+        { market: { code: "asc" } },
+        { publisher: { name: "asc" } },
+        { name: "asc" },
+      ],
+      take: PAGE_SIZE,
+      skip: (page - 1) * PAGE_SIZE,
+    }),
+  ]);
 
   const counts = await prisma.title.groupBy({
     by: ["active"],
@@ -95,53 +163,65 @@ export default async function DeskTitlesPage({
     where: { lastVerifiedAt: null },
   });
 
-  // Group by country for display. Uses countryCode (always set) rather
-  // than the optional Market FK so research-catalog titles render too.
-  const byCountry = new Map<string, typeof titles>();
+  const byMarket = new Map<MarketCode, typeof titles>();
   for (const tt of titles) {
-    const arr = byCountry.get(tt.countryCode) ?? [];
+    const arr = byMarket.get(tt.market.code) ?? [];
     arr.push(tt);
-    byCountry.set(tt.countryCode, arr);
+    byMarket.set(tt.market.code, arr);
   }
 
+  const totalPages = Math.max(1, Math.ceil(filteredCount / PAGE_SIZE));
+  const pageQuery = (p: number) => {
+    const params = new URLSearchParams();
+    if (market) params.set("market", market);
+    if (status !== "all") params.set("status", status);
+    if (nativeFit) params.set("nativeFit", nativeFit);
+    if (format) params.set("format", format);
+    if (b2bB2c) params.set("b2bB2c", b2bB2c);
+    if (reach) params.set("reach", reach);
+    if (urlStatus) params.set("urlStatus", urlStatus);
+    if (vertical) params.set("vertical", vertical);
+    if (ownerGroup) params.set("ownerGroup", ownerGroup);
+    if (titleType) params.set("type", titleType);
+    if (frequency) params.set("frequency", frequency);
+    if (category) params.set("category", category);
+    if (circulationMin !== undefined)
+      params.set("circulationMin", String(circulationMin));
+    if (q) params.set("q", q);
+    if (p > 1) params.set("page", String(p));
+    const s = params.toString();
+    return s ? `?${s}` : "";
+  };
+
   return (
-    <>
-      <nav className="breadcrumb">
-        <Link href="/desk" className="small-link">
-          ← {td("title")}
-        </Link>
-      </nav>
+    <section>
+      <p>
+        <Link href="/desk">← {td("title")}</Link>
+      </p>
+      <h1>{t("title")}</h1>
+      <p className="muted">{t("subtitle")}</p>
 
-      <header className="page-header">
-        <span className="eyebrow accent">{t("eyebrow")}</span>
-        <h1>{t("title")}</h1>
-        <p className="lead">{t("subtitle")}</p>
-      </header>
-
-      <div className="kpi-grid">
-        <div className="kpi">
-          <div className="label">{t("counts.active")}</div>
-          <div className="value">{totalActive}</div>
-          <div className="delta">{t("activeSub")}</div>
-        </div>
-        <div className="kpi">
-          <div className="label">{t("counts.inactive")}</div>
-          <div className="value">{totalInactive}</div>
-          <div className="delta">{t("inactiveSub")}</div>
-        </div>
-        <div className={`kpi ${unverifiedCount > 0 ? "kpi-warn" : ""}`}>
-          <div className="label">{t("counts.unverified")}</div>
-          <div className="value">{unverifiedCount}</div>
-          <div className="delta">{t("unverifiedSub")}</div>
-        </div>
+      <div className="grid">
+        <article className="card">
+          <h3>{t("counts.active")}</h3>
+          <div className="price">{totalActive}</div>
+        </article>
+        <article className="card">
+          <h3>{t("counts.inactive")}</h3>
+          <div className="price">{totalInactive}</div>
+        </article>
+        <article className="card">
+          <h3>{t("counts.unverified")}</h3>
+          <div className="price">{unverifiedCount}</div>
+        </article>
       </div>
 
-      <form className="filters" method="get">
+      <form className="filters" method="get" style={{ marginTop: 16 }}>
         <div>
           <label htmlFor="market">{t("filters.market")}</label>
-          <select id="market" name="market" defaultValue={country ?? ""}>
+          <select id="market" name="market" defaultValue={market ?? ""}>
             <option value="">{t("filters.all")}</option>
-            {COUNTRY_CODES.map((m) => (
+            {MARKET_CODES.map((m) => (
               <option key={m} value={m}>
                 {tMarket(m)}
               </option>
@@ -158,23 +238,141 @@ export default async function DeskTitlesPage({
             ))}
           </select>
         </div>
+        <div>
+          <label htmlFor="nativeFit">{t("filters.nativeFit")}</label>
+          <select id="nativeFit" name="nativeFit" defaultValue={nativeFit ?? ""}>
+            <option value="">{t("filters.all")}</option>
+            {NATIVE_FIT_VALUES.map((v) => (
+              <option key={v} value={v}>
+                {v}
+              </option>
+            ))}
+          </select>
+        </div>
+        <div>
+          <label htmlFor="format">{t("filters.format")}</label>
+          <select id="format" name="format" defaultValue={format ?? ""}>
+            <option value="">{t("filters.all")}</option>
+            {FORMAT_VALUES.map((v) => (
+              <option key={v} value={v}>
+                {v}
+              </option>
+            ))}
+          </select>
+        </div>
+        <div>
+          <label htmlFor="b2bB2c">{t("filters.b2bB2c")}</label>
+          <select id="b2bB2c" name="b2bB2c" defaultValue={b2bB2c ?? ""}>
+            <option value="">{t("filters.all")}</option>
+            {B2B_B2C_VALUES.map((v) => (
+              <option key={v} value={v}>
+                {v}
+              </option>
+            ))}
+          </select>
+        </div>
+        <div>
+          <label htmlFor="reach">{t("filters.reach")}</label>
+          <select id="reach" name="reach" defaultValue={reach ?? ""}>
+            <option value="">{t("filters.all")}</option>
+            {REACH_VALUES.map((v) => (
+              <option key={v} value={v}>
+                {v}
+              </option>
+            ))}
+          </select>
+        </div>
+        <div>
+          <label htmlFor="urlStatus">{t("filters.urlStatus")}</label>
+          <select id="urlStatus" name="urlStatus" defaultValue={urlStatus ?? ""}>
+            <option value="">{t("filters.all")}</option>
+            {URL_STATUS_VALUES.map((v) => (
+              <option key={v} value={v}>
+                {v}
+              </option>
+            ))}
+          </select>
+        </div>
+        <div>
+          <label htmlFor="vertical">{t("filters.vertical")}</label>
+          <input
+            id="vertical"
+            name="vertical"
+            defaultValue={vertical}
+            placeholder={t("filters.verticalPlaceholder")}
+          />
+        </div>
+        <div>
+          <label htmlFor="ownerGroup">{t("filters.ownerGroup")}</label>
+          <input
+            id="ownerGroup"
+            name="ownerGroup"
+            defaultValue={ownerGroup}
+            placeholder={t("filters.ownerGroupPlaceholder")}
+          />
+        </div>
+        <div>
+          <label htmlFor="type">{t("filters.type")}</label>
+          <input
+            id="type"
+            name="type"
+            defaultValue={titleType}
+            placeholder={t("filters.typePlaceholder")}
+          />
+        </div>
+        <div>
+          <label htmlFor="frequency">{t("filters.frequency")}</label>
+          <input
+            id="frequency"
+            name="frequency"
+            defaultValue={frequency}
+            placeholder={t("filters.frequencyPlaceholder")}
+          />
+        </div>
+        <div>
+          <label htmlFor="category">{t("filters.category")}</label>
+          <input
+            id="category"
+            name="category"
+            defaultValue={category}
+            placeholder={t("filters.categoryPlaceholder")}
+          />
+        </div>
+        <div>
+          <label htmlFor="circulationMin">{t("filters.circulationMin")}</label>
+          <input
+            id="circulationMin"
+            name="circulationMin"
+            type="number"
+            min="0"
+            defaultValue={circulationMin ?? ""}
+            placeholder={t("filters.circulationMinPlaceholder")}
+          />
+        </div>
+        <div>
+          <label htmlFor="q">{t("filters.search")}</label>
+          <input
+            id="q"
+            name="q"
+            defaultValue={q}
+            placeholder={t("filters.searchPlaceholder")}
+          />
+        </div>
         <button type="submit">{t("filters.apply")}</button>
       </form>
 
+      <p className="muted" style={{ marginTop: 12 }}>
+        {t("resultCount", { count: filteredCount })}
+      </p>
+
       {titles.length === 0 ? (
-        <p className="note">{t("none")}</p>
+        <p className="note" style={{ marginTop: 20 }}>
+          {t("none")}
+        </p>
       ) : (
-        Array.from(byCountry.entries()).map(([mc, mTitles]) => (
-          <section className="section" key={mc}>
-            <div className="section-head">
-              <div>
-                <span className="eyebrow">{t("marketEyebrow")}</span>
-                <h2>{tMarket(mc as MarketCode)}</h2>
-              </div>
-              <span className="muted small">
-                {t("titleCount", { count: mTitles.length })}
-              </span>
-            </div>
+        Array.from(byMarket.entries()).map(([mc, mTitles]) => (
+          <div key={mc} style={{ marginTop: 24 }}>
+            <h2>{tMarket(mc)}</h2>
             <div className="grid">
               {mTitles.map((title) => {
                 const verified = title.lastVerifiedAt !== null;
@@ -185,64 +383,147 @@ export default async function DeskTitlesPage({
                   : hasNative
                     ? t("status.active")
                     : t("status.no-native");
-                const tone = !verified
-                  ? "badge-warning"
-                  : hasNative
-                    ? "badge-success"
-                    : "badge-neutral";
 
                 return (
-                  <article className="card title-review-card" key={title.id}>
-                    <div className="title-review-head">
-                      <div>
-                        <h3>{title.name}</h3>
-                        <p className="muted small">{title.publisher.name}</p>
-                      </div>
-                      <span className={`badge ${tone} dotless`}>
-                        {statusLabel}
-                      </span>
+                  <article className="card" key={title.id}>
+                    <h3>{title.name}</h3>
+                    <div className="muted">
+                      {title.publisher.name}
+                      {title.ownerGroup &&
+                      title.ownerGroup !== title.publisher.name
+                        ? ` (${title.ownerGroup})`
+                        : ""}{" "}
+                      · {title.category}
                     </div>
-                    {title.category ? (
-                      <p className="muted small">{title.category}</p>
+                    {title.type ||
+                    title.frequency ||
+                    title.b2bB2c ||
+                    title.format ||
+                    title.nativeFit ||
+                    title.reach ? (
+                      <div
+                        style={{
+                          marginTop: 8,
+                          display: "flex",
+                          gap: 6,
+                          flexWrap: "wrap",
+                        }}
+                      >
+                        {title.type ? (
+                          <span className="tag">{title.type}</span>
+                        ) : null}
+                        {title.frequency ? (
+                          <span className="tag">{title.frequency}</span>
+                        ) : null}
+                        {title.b2bB2c ? (
+                          <span className="tag">{title.b2bB2c}</span>
+                        ) : null}
+                        {title.format ? (
+                          <span className="tag">{title.format}</span>
+                        ) : null}
+                        {title.nativeFit ? (
+                          <span className="tag">
+                            {t("nativeFitTag", { value: title.nativeFit })}
+                          </span>
+                        ) : null}
+                        {title.reach ? (
+                          <span className="tag">{title.reach}</span>
+                        ) : null}
+                      </div>
+                    ) : null}
+                    {title.vertical ? (
+                      <div className="muted" style={{ marginTop: 6 }}>
+                        {title.vertical}
+                      </div>
+                    ) : null}
+                    {title.audience ? (
+                      <div className="muted">{title.audience}</div>
+                    ) : null}
+                    {title.locationNote ? (
+                      <div className="muted">📍 {title.locationNote}</div>
+                    ) : null}
+                    {title.adSales ? (
+                      <div className="muted">
+                        {t("adSales")}: {title.adSales}
+                      </div>
+                    ) : null}
+                    {title.circulation ? (
+                      <div className="muted">
+                        {t("circulation")}:{" "}
+                        {new Intl.NumberFormat().format(title.circulation)}
+                      </div>
                     ) : null}
                     {title.monthlyReach ? (
-                      <p className="muted small">
+                      <div className="muted">
                         {t("reach")}:{" "}
-                        {new Intl.NumberFormat(locale).format(
-                          title.monthlyReach,
-                        )}
-                      </p>
+                        {new Intl.NumberFormat().format(title.monthlyReach)}
+                      </div>
                     ) : null}
-                    <p className="muted small">
+                    <div className="muted">
                       {t("products")}: {title._count.products}
-                    </p>
+                    </div>
+                    {title.tags ? (
+                      <div
+                        style={{
+                          marginTop: 6,
+                          display: "flex",
+                          gap: 4,
+                          flexWrap: "wrap",
+                        }}
+                      >
+                        {title.tags
+                          .split(",")
+                          .map((s) => s.trim())
+                          .filter(Boolean)
+                          .map((tag, i) => (
+                            <span
+                              key={i}
+                              className="tag"
+                              style={{ fontSize: "0.8em", opacity: 0.85 }}
+                            >
+                              #{tag}
+                            </span>
+                          ))}
+                      </div>
+                    ) : null}
+                    <div
+                      style={{
+                        marginTop: 8,
+                        display: "flex",
+                        gap: 6,
+                        flexWrap: "wrap",
+                      }}
+                    >
+                      <span className="tag">{statusLabel}</span>
+                      {title.urlStatus ? (
+                        <span className="tag">{title.urlStatus}</span>
+                      ) : null}
+                    </div>
                     {title.websiteUrl ? (
-                      <p>
+                      <div className="muted" style={{ marginTop: 8 }}>
                         <a
                           href={title.websiteUrl}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="link"
                         >
                           {t("checkSite")} ↗
                         </a>
-                      </p>
+                      </div>
                     ) : null}
-                    <div className="title-actions">
+
+                    <div style={{ marginTop: 12, display: "flex", gap: 8, flexWrap: "wrap" }}>
                       {!hasNative ? (
                         <form action={markTitleNative}>
                           <input type="hidden" name="locale" value={locale} />
                           <input type="hidden" name="titleId" value={title.id} />
-                          <button type="submit" className="btn small">
-                            {t("actions.markNative")}
-                          </button>
+                          <button type="submit">{t("actions.markNative")}</button>
                         </form>
                       ) : null}
                       {!declined && !hasNative ? (
                         <form action={markTitleNoNative}>
                           <input type="hidden" name="locale" value={locale} />
                           <input type="hidden" name="titleId" value={title.id} />
-                          <button type="submit" className="btn small secondary">
+                          <button type="submit">
                             {t("actions.markNoNative")}
                           </button>
                         </form>
@@ -251,7 +532,7 @@ export default async function DeskTitlesPage({
                         <form action={deactivateTitle}>
                           <input type="hidden" name="locale" value={locale} />
                           <input type="hidden" name="titleId" value={title.id} />
-                          <button type="submit" className="btn small ghost">
+                          <button type="submit">
                             {t("actions.deactivate")}
                           </button>
                         </form>
@@ -261,9 +542,35 @@ export default async function DeskTitlesPage({
                 );
               })}
             </div>
-          </section>
+          </div>
         ))
       )}
-    </>
+
+      {totalPages > 1 ? (
+        <nav
+          className="pagination"
+          style={{
+            marginTop: 24,
+            display: "flex",
+            gap: 12,
+            alignItems: "center",
+          }}
+        >
+          {page > 1 ? (
+            <a href={pageQuery(page - 1) || "?"}>← {t("pagination.prev")}</a>
+          ) : (
+            <span className="muted">← {t("pagination.prev")}</span>
+          )}
+          <span className="muted">
+            {t("pagination.page", { page, total: totalPages })}
+          </span>
+          {page < totalPages ? (
+            <a href={pageQuery(page + 1)}>{t("pagination.next")} →</a>
+          ) : (
+            <span className="muted">{t("pagination.next")} →</span>
+          )}
+        </nav>
+      ) : null}
+    </section>
   );
 }

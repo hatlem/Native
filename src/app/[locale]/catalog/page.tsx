@@ -10,23 +10,17 @@ export const dynamic = "force-dynamic";
 
 const MARKET_CODES = Object.values(MarketCode);
 const PRODUCT_TYPES = Object.values(ProductType);
+const NATIVE_FIT_VALUES = ["High", "Medium", "Low"] as const;
+const B2B_B2C_VALUES = ["B2B", "B2C"] as const;
+const PAGE_SIZE = 60;
 
-function asEnum<T extends string>(value: string | undefined, allowed: T[]) {
-  return value && (allowed as string[]).includes(value)
+function asEnum<T extends string>(
+  value: string | undefined,
+  allowed: readonly T[],
+) {
+  return value && (allowed as readonly string[]).includes(value)
     ? (value as T)
     : undefined;
-}
-
-function buildQueryString(
-  current: { market?: string; type?: string; q?: string },
-  remove?: "market" | "type" | "q",
-): string {
-  const params = new URLSearchParams();
-  if (current.market && remove !== "market") params.set("market", current.market);
-  if (current.type && remove !== "type") params.set("type", current.type);
-  if (current.q && remove !== "q") params.set("q", current.q);
-  const s = params.toString();
-  return s ? `?${s}` : "";
 }
 
 export default async function CatalogPage({
@@ -51,13 +45,33 @@ export default async function CatalogPage({
     typeof sp.type === "string" ? sp.type : undefined,
     PRODUCT_TYPES,
   );
+  const nativeFit = asEnum(
+    typeof sp.nativeFit === "string" ? sp.nativeFit : undefined,
+    NATIVE_FIT_VALUES,
+  );
+  const b2bB2c = asEnum(
+    typeof sp.b2bB2c === "string" ? sp.b2bB2c : undefined,
+    B2B_B2C_VALUES,
+  );
+  const onlyPriced =
+    typeof sp.onlyPriced === "string" && sp.onlyPriced === "1";
   const q = typeof sp.q === "string" ? sp.q.trim() : "";
+  const pageRaw = typeof sp.page === "string" ? parseInt(sp.page, 10) : 1;
+  const page = Number.isFinite(pageRaw) && pageRaw >= 1 ? pageRaw : 1;
 
+  // FTS-first: ask Postgres for Title ids matching the query, then
+  // intersect with the rest of the filter. Falls back to ILIKE if FTS
+  // can't form a valid query (e.g. only punctuation).
   const matchedIds = await searchTitleIds(q);
   const where: Prisma.TitleWhereInput = {
-    active: true,
+    // Show commerce-active titles AND unverified research-catalog rows;
+    // hide titles the desk has verified as not offering native.
+    OR: [{ active: true }, { lastVerifiedAt: null }],
     ...(market ? { market: { code: market } } : {}),
     ...(type ? { products: { some: { type, active: true } } } : {}),
+    ...(onlyPriced ? { active: true } : {}),
+    ...(nativeFit ? { nativeFit } : {}),
+    ...(b2bB2c ? { b2bB2c } : {}),
     ...(matchedIds
       ? { id: { in: matchedIds } }
       : q
@@ -65,39 +79,52 @@ export default async function CatalogPage({
             OR: [
               { name: { contains: q, mode: "insensitive" } },
               { category: { contains: q, mode: "insensitive" } },
+              { vertical: { contains: q, mode: "insensitive" } },
+              { tags: { contains: q, mode: "insensitive" } },
             ],
           }
         : {}),
   };
 
-  const titles = await prisma.title.findMany({
-    where,
-    include: {
-      publisher: true,
-      market: true,
-      products: {
-        where: { active: true },
-        include: { priceRules: true },
+  const [totalCount, titles] = await Promise.all([
+    prisma.title.count({ where }),
+    prisma.title.findMany({
+      where,
+      include: {
+        publisher: true,
+        market: true,
+        products: {
+          where: { active: true },
+          include: { priceRules: true },
+        },
       },
-    },
-    orderBy: { name: "asc" },
-  });
+      // Commerce-active titles surface first, then research catalog by name.
+      orderBy: [{ active: "desc" }, { name: "asc" }],
+      take: PAGE_SIZE,
+      skip: (page - 1) * PAGE_SIZE,
+    }),
+  ]);
+  const totalPages = Math.max(1, Math.ceil(totalCount / PAGE_SIZE));
 
-  const hasFilter = Boolean(market || type || q);
-  const filterChips: { label: string; remove: "market" | "type" | "q" }[] = [];
-  if (market) filterChips.push({ label: tMarket(market), remove: "market" });
-  if (type) filterChips.push({ label: tType(type), remove: "type" });
-  if (q) filterChips.push({ label: `"${q}"`, remove: "q" });
+  const pageQuery = (p: number) => {
+    const params = new URLSearchParams();
+    if (market) params.set("market", market);
+    if (type) params.set("type", type);
+    if (nativeFit) params.set("nativeFit", nativeFit);
+    if (b2bB2c) params.set("b2bB2c", b2bB2c);
+    if (onlyPriced) params.set("onlyPriced", "1");
+    if (q) params.set("q", q);
+    if (p > 1) params.set("page", String(p));
+    const s = params.toString();
+    return s ? `?${s}` : "";
+  };
 
   return (
-    <>
-      <header className="page-header">
-        <span className="eyebrow accent">{t("eyebrow")}</span>
-        <h1>{t("title")}</h1>
-        <p className="lead">{t("subtitle")}</p>
-      </header>
+    <section>
+      <h1>{t("title")}</h1>
+      <p className="muted">{t("subtitle")}</p>
 
-      <form className="filters" method="get" role="search">
+      <form className="filters" method="get">
         <div>
           <label htmlFor="market">{t("filters.market")}</label>
           <select id="market" name="market" defaultValue={market ?? ""}>
@@ -120,7 +147,29 @@ export default async function CatalogPage({
             ))}
           </select>
         </div>
-        <div style={{ flex: 1, minWidth: 220 }}>
+        <div>
+          <label htmlFor="nativeFit">{t("filters.nativeFit")}</label>
+          <select id="nativeFit" name="nativeFit" defaultValue={nativeFit ?? ""}>
+            <option value="">{t("filters.all")}</option>
+            {NATIVE_FIT_VALUES.map((v) => (
+              <option key={v} value={v}>
+                {v}
+              </option>
+            ))}
+          </select>
+        </div>
+        <div>
+          <label htmlFor="b2bB2c">{t("filters.b2bB2c")}</label>
+          <select id="b2bB2c" name="b2bB2c" defaultValue={b2bB2c ?? ""}>
+            <option value="">{t("filters.all")}</option>
+            {B2B_B2C_VALUES.map((v) => (
+              <option key={v} value={v}>
+                {v}
+              </option>
+            ))}
+          </select>
+        </div>
+        <div>
           <label htmlFor="q">{t("filters.search")}</label>
           <input
             id="q"
@@ -129,49 +178,28 @@ export default async function CatalogPage({
             placeholder={t("filters.searchPlaceholder")}
           />
         </div>
+        <label
+          style={{
+            display: "flex",
+            alignItems: "center",
+            gap: 6,
+            whiteSpace: "nowrap",
+          }}
+        >
+          <input
+            type="checkbox"
+            name="onlyPriced"
+            value="1"
+            defaultChecked={onlyPriced}
+          />
+          {t("filters.onlyPriced")}
+        </label>
         <button type="submit">{t("filters.apply")}</button>
       </form>
 
-      <div className="result-bar">
-        <div className="result-bar-summary">
-          <strong>
-            {t("resultCount", { count: titles.length })}
-          </strong>
-          {hasFilter ? (
-            <Link href="/catalog" className="muted small-link">
-              {t("clearFilters")}
-            </Link>
-          ) : null}
-        </div>
-        {filterChips.length > 0 ? (
-          <div className="filter-chips">
-            {filterChips.map((c) => (
-              <Link
-                key={c.remove}
-                href={`/catalog${buildQueryString({ market, type, q }, c.remove)}`}
-                className="filter-chip"
-                aria-label={`${t("removeFilter")}: ${c.label}`}
-              >
-                <span>{c.label}</span>
-                <span className="x" aria-hidden>
-                  ×
-                </span>
-              </Link>
-            ))}
-          </div>
-        ) : null}
-        {titles.length >= 2 ? (
-          <Link
-            href={`/catalog/compare?ids=${titles
-              .slice(0, 6)
-              .map((t) => t.id)
-              .join(",")}`}
-            className="btn small secondary"
-          >
-            {t("compareTop")}
-          </Link>
-        ) : null}
-      </div>
+      <p className="muted" style={{ marginTop: 12 }}>
+        {t("resultCount", { count: totalCount })}
+      </p>
 
       {titles.length === 0 ? (
         <EmptyState
@@ -180,67 +208,113 @@ export default async function CatalogPage({
           primaryLabel={t("clearFilters")}
         />
       ) : (
+        <>
+          {titles.length >= 2 ? (
+            <p className="note" style={{ marginTop: 10 }}>
+              <Link
+                href={`/catalog/compare?ids=${titles
+                  .slice(0, 6)
+                  .map((t) => t.id)
+                  .join(",")}`}
+              >
+                {t("compareTop")} →
+              </Link>
+            </p>
+          ) : null}
         <div className="grid">
           {titles.map((title) => {
             const prices = title.products.map((p) =>
-              indicativeFromRules(
-                Number(p.basePrice),
-                toRateRules(p.priceRules),
-              ),
+              indicativeFromRules(Number(p.basePrice), toRateRules(p.priceRules)),
             );
             const from = prices.length ? Math.min(...prices) : null;
-            const currency =
-              title.products[0]?.currency ?? title.market?.currency ?? "";
-            const hasFirm = title.products.some((p) => p.visibility === "FIRM");
-            const marketCode = (title.market?.code ?? title.countryCode) as MarketCode;
+            const currency = title.products[0]?.currency ?? title.market.currency;
+            const needsQuote = title.products.length === 0;
 
             return (
-              <Link
-                href={`/catalog/${title.slug}`}
-                key={title.id}
-                className="card hoverable title-card"
-              >
-                <div className="title-card-head">
-                  <span className="tag">{tMarket(marketCode)}</span>
-                  {hasFirm ? (
-                    <span className="badge badge-info dotless">
-                      ⚡ {tf("badge")}
-                    </span>
-                  ) : null}
+              <article className="card" key={title.id}>
+                <h3>
+                  <Link href={`/catalog/${title.slug}`}>{title.name}</Link>
+                </h3>
+                <div className="muted">
+                  {title.publisher.name} · {tMarket(title.market.code)}
                 </div>
-                <h3>{title.name}</h3>
-                <p className="muted">{title.publisher.name}</p>
-                {title.category ? (
-                  <p className="muted small">{title.category}</p>
-                ) : null}
-                <div className="tag-row">
-                  {title.products.slice(0, 4).map((p) => (
+                <div>
+                  <span className="tag">{title.category}</span>
+                  {title.products.map((p) => (
                     <span className="tag" key={p.id}>
                       {tType(p.type)}
                     </span>
                   ))}
-                </div>
-                <div className="card-foot">
-                  {title.monthlyReach ? (
-                    <span className="muted small">
-                      {t("card.reach")}:{" "}
-                      {new Intl.NumberFormat(locale).format(title.monthlyReach)}
+                  {title.products.some((p) => p.visibility === "FIRM") ? (
+                    <span className="tag">⚡ {tf("badge")}</span>
+                  ) : null}
+                  {needsQuote ? (
+                    <span className="tag">{t("card.requestQuote")}</span>
+                  ) : null}
+                  {title.nativeFit ? (
+                    <span className="tag">
+                      {t("card.nativeFit", { value: title.nativeFit })}
                     </span>
                   ) : null}
-                  {from !== null ? (
-                    <div className="price">
-                      <span className="currency">{t("card.from")}</span>
-                      {formatMoney(from, currency, locale)}
-                    </div>
+                  {title.b2bB2c ? (
+                    <span className="tag">{title.b2bB2c}</span>
                   ) : null}
                 </div>
-              </Link>
+                {title.vertical ? (
+                  <div className="muted" style={{ marginTop: 8 }}>
+                    {title.vertical}
+                  </div>
+                ) : null}
+                {title.monthlyReach ? (
+                  <div className="muted" style={{ marginTop: 10 }}>
+                    {t("card.reach")}:{" "}
+                    {new Intl.NumberFormat().format(title.monthlyReach)}
+                  </div>
+                ) : title.circulation ? (
+                  <div className="muted" style={{ marginTop: 10 }}>
+                    {t("card.circulation")}:{" "}
+                    {new Intl.NumberFormat().format(title.circulation)}
+                  </div>
+                ) : null}
+                {from !== null ? (
+                  <div className="price">
+                    {t("card.from")} {formatMoney(from, currency, locale)}
+                  </div>
+                ) : null}
+              </article>
             );
           })}
         </div>
+        </>
       )}
 
+      {totalPages > 1 ? (
+        <nav
+          className="pagination"
+          style={{
+            marginTop: 24,
+            display: "flex",
+            gap: 12,
+            alignItems: "center",
+          }}
+        >
+          {page > 1 ? (
+            <a href={pageQuery(page - 1) || "?"}>← {t("pagination.prev")}</a>
+          ) : (
+            <span className="muted">← {t("pagination.prev")}</span>
+          )}
+          <span className="muted">
+            {t("pagination.page", { page, total: totalPages })}
+          </span>
+          {page < totalPages ? (
+            <a href={pageQuery(page + 1)}>{t("pagination.next")} →</a>
+          ) : (
+            <span className="muted">{t("pagination.next")} →</span>
+          )}
+        </nav>
+      ) : null}
+
       <p className="note">{t("indicativeNote")}</p>
-    </>
+    </section>
   );
 }

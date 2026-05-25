@@ -1,6 +1,5 @@
 import { getTranslations } from "next-intl/server";
 import { notFound } from "next/navigation";
-import type { MarketCode } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
 import { Link } from "@/i18n/navigation";
 import { indicativeFromRules, toRateRules, formatMoney } from "@/lib/money";
@@ -31,7 +30,10 @@ export default async function TitleDetailPage({
     },
   });
 
-  if (!title || !title.active) notFound();
+  if (!title) notFound();
+  // Verified-no-native titles stay hidden; everything else (commerce-active
+  // and unverified research-catalog rows) renders.
+  if (!title.active && title.lastVerifiedAt) notFound();
 
   const siteBase =
     process.env.NEXT_PUBLIC_SITE_URL?.replace(/\/$/, "") || "";
@@ -51,157 +53,143 @@ export default async function TitleDetailPage({
     category: title.category,
     brand: { "@type": "Brand", name: title.publisher.name },
     url: `${siteBase}/${locale}/catalog/${title.slug}`,
-    offers: {
-      "@type": "AggregateOffer",
-      priceCurrency: title.market?.currency ?? title.products[0]?.currency ?? "",
-      offers: ldOffers,
-    },
+    offers: { "@type": "AggregateOffer", priceCurrency: title.market.currency, offers: ldOffers },
   };
-
-  const productCount = title.products.length;
-  const bookableCount = title.products.filter((p) => p.bookable).length;
-  const allPrices = title.products.map((p) =>
-    indicativeFromRules(Number(p.basePrice), toRateRules(p.priceRules)),
-  );
-  const fromPrice = allPrices.length ? Math.min(...allPrices) : null;
-  const currency =
-    title.products[0]?.currency ?? title.market?.currency ?? "";
-  const marketCode = (title.market?.code ?? title.countryCode) as MarketCode;
+  const needsQuote = title.products.length === 0;
 
   return (
-    <>
+    <section>
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{
-          // JSON.stringify doesn't escape `</script>` inside string fields,
-          // so a stored payload in title/publisher names could break out of
-          // the <script> block. Defense-in-depth — currently only admins
-          // can set those fields.
-          __html: JSON.stringify(ld).replace(/</g, "\\u003c"),
-        }}
+        // schema.org JSON-LD: PLAN §14 "structured data for discovery".
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(ld) }}
       />
-      <nav className="breadcrumb" aria-label="Breadcrumb">
-        <Link href="/catalog" className="small-link">
-          ← {t("back")}
-        </Link>
-      </nav>
-
-      <header className="detail-head">
-        <div>
-          <div className="cluster tight" style={{ marginBottom: 10 }}>
-            <span className="tag">{tMarket(marketCode)}</span>
-            {title.category ? <span className="tag">{title.category}</span> : null}
-            {title.products.some((p) => p.visibility === "FIRM") ? (
-              <span className="badge badge-info dotless">
-                ⚡ {tf("badge")}
-              </span>
-            ) : null}
-          </div>
-          <h1>{title.name}</h1>
-          <p className="lead">
-            {t("publishedBy")} {title.publisher.name}
-          </p>
-        </div>
-        <aside className="detail-meta">
-          {title.monthlyReach ? (
-            <div className="meta-row">
-              <span className="muted small">{t("reach")}</span>
-              <span className="value">
-                {new Intl.NumberFormat(locale).format(title.monthlyReach)}
-              </span>
-            </div>
+      <p>
+        <Link href="/catalog">← {t("back")}</Link>
+      </p>
+      <h1>{title.name}</h1>
+      <p className="muted">
+        {t("publishedBy")} {title.publisher.name} · {tMarket(title.market.code)}{" "}
+        · {title.category}
+      </p>
+      {title.monthlyReach ? (
+        <p className="muted">
+          {t("reach")}: {new Intl.NumberFormat().format(title.monthlyReach)}
+        </p>
+      ) : null}
+      {/* Surface the rest of the CSV-imported research metadata so buyers
+          can size up a research-catalog title even before requesting a quote. */}
+      {title.type ||
+      title.frequency ||
+      title.b2bB2c ||
+      title.format ||
+      title.nativeFit ||
+      title.reach ? (
+        <div
+          style={{
+            marginTop: 8,
+            display: "flex",
+            gap: 6,
+            flexWrap: "wrap",
+          }}
+        >
+          {title.type ? <span className="tag">{title.type}</span> : null}
+          {title.frequency ? (
+            <span className="tag">{title.frequency}</span>
           ) : null}
-          <div className="meta-row">
-            <span className="muted small">{t("formats")}</span>
-            <span className="value">{productCount}</span>
-          </div>
-          {fromPrice !== null ? (
-            <div className="meta-row">
-              <span className="muted small">{t("from")}</span>
-              <span className="value">
-                {formatMoney(fromPrice, currency, locale)}
-              </span>
-            </div>
-          ) : null}
-        </aside>
-      </header>
-
-      <section className="section">
-        <div className="section-head">
-          <div>
-            <span className="eyebrow">{t("formatsEyebrow")}</span>
-            <h2>{t("formatsHeading")}</h2>
-          </div>
-          {bookableCount > 0 ? (
-            <span className="muted small">
-              {t("bookableSummary", { count: bookableCount })}
+          {title.b2bB2c ? <span className="tag">{title.b2bB2c}</span> : null}
+          {title.format ? <span className="tag">{title.format}</span> : null}
+          {title.nativeFit ? (
+            <span className="tag">
+              {t("nativeFitTag", { value: title.nativeFit })}
             </span>
           ) : null}
+          {title.reach ? <span className="tag">{title.reach}</span> : null}
         </div>
+      ) : null}
+      {title.vertical ? (
+        <p className="muted" style={{ marginTop: 8 }}>
+          {title.vertical}
+        </p>
+      ) : null}
+      {title.audience ? (
+        <p className="muted">{title.audience}</p>
+      ) : null}
+      {title.circulation ? (
+        <p className="muted">
+          {t("circulation")}:{" "}
+          {new Intl.NumberFormat().format(title.circulation)}
+        </p>
+      ) : null}
 
+      {needsQuote ? (
+        <article className="card" style={{ marginTop: 16 }}>
+          <h3>{t("requestQuote.title")}</h3>
+          <p className="muted">{t("requestQuote.body")}</p>
+          <Link href="/plan" className="btn" style={{ marginTop: 8 }}>
+            {t("requestQuote.cta")}
+          </Link>
+        </article>
+      ) : (
         <div className="grid">
-          {title.products.map((p) => {
-            const price = indicativeFromRules(
-              Number(p.basePrice),
-              toRateRules(p.priceRules),
-            );
-            return (
-              <article className="card product-detail-card" key={p.id}>
-                <div className="cluster tight" style={{ marginBottom: 8 }}>
-                  <h3 style={{ margin: 0 }}>{tType(p.type)}</h3>
-                  {p.visibility === "FIRM" ? (
-                    <span className="badge badge-info dotless">
-                      ⚡ {tf("badge")}
-                    </span>
+        {title.products.map((p) => {
+          const price = indicativeFromRules(
+            Number(p.basePrice),
+            toRateRules(p.priceRules),
+          );
+          return (
+            <article className="card" key={p.id}>
+              <h3>{tType(p.type)}</h3>
+              <div className="price">
+                {t("from")} {formatMoney(price, p.currency, locale)}
+              </div>
+              {p.visibility === "FIRM" ? (
+                <span className="tag">⚡ {tf("badge")}</span>
+              ) : null}
+              <div className="muted" style={{ marginTop: 6 }}>
+                {t("leadTime")}: {p.leadTimeDays} {t("days")}
+              </div>
+              {p.spec ? (
+                <div className="muted" style={{ marginTop: 10 }}>
+                  <strong>{t("spec")}</strong>
+                  <br />
+                  {p.spec.wordCountMin && p.spec.wordCountMax ? (
+                    <>
+                      {t("words")}: {p.spec.wordCountMin}–{p.spec.wordCountMax}
+                      <br />
+                    </>
+                  ) : null}
+                  {t("images")}: {p.spec.imagesMin ?? 0}
+                  <br />
+                  {p.spec.disclosureLabel ? (
+                    <>
+                      {t("disclosure")}: {p.spec.disclosureLabel}
+                    </>
                   ) : null}
                 </div>
-                <div className="price">
-                  <span className="currency">{t("from")}</span>
-                  {formatMoney(price, p.currency, locale)}
-                </div>
-                <div className="cluster tight" style={{ marginTop: 10 }}>
-                  <span className="tag">
-                    {t("leadTime")}: {p.leadTimeDays} {t("days")}
-                  </span>
-                </div>
-                {p.spec ? (
-                  <dl className="spec-grid">
-                    {p.spec.wordCountMin && p.spec.wordCountMax ? (
-                      <>
-                        <dt>{t("words")}</dt>
-                        <dd>
-                          {p.spec.wordCountMin}–{p.spec.wordCountMax}
-                        </dd>
-                      </>
-                    ) : null}
-                    <dt>{t("images")}</dt>
-                    <dd>{p.spec.imagesMin ?? 0}</dd>
-                    {p.spec.disclosureLabel ? (
-                      <>
-                        <dt>{t("disclosure")}</dt>
-                        <dd>{p.spec.disclosureLabel}</dd>
-                      </>
-                    ) : null}
-                  </dl>
-                ) : null}
-                {p.bookable ? (
-                  <form action={addToPlan} className="product-cta">
-                    <input type="hidden" name="locale" value={locale} />
-                    <input type="hidden" name="productId" value={p.id} />
-                    <button type="submit" className="btn block">
-                      {t("addToPlan")}
-                    </button>
-                  </form>
-                ) : (
-                  <p className="muted small product-cta">{t("unavailable")}</p>
-                )}
-              </article>
-            );
-          })}
+              ) : null}
+              {p.bookable ? (
+                <form action={addToPlan} style={{ marginTop: 12 }}>
+                  <input type="hidden" name="locale" value={locale} />
+                  <input type="hidden" name="productId" value={p.id} />
+                  <button
+                    type="submit"
+                    className="btn"
+                    style={{ marginTop: 0 }}
+                  >
+                    {t("addToPlan")}
+                  </button>
+                </form>
+              ) : (
+                <p className="note">{t("unavailable")}</p>
+              )}
+            </article>
+          );
+        })}
         </div>
-      </section>
+      )}
 
       <p className="note">{t("indicativeNote")}</p>
-    </>
+    </section>
   );
 }

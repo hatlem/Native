@@ -50,15 +50,13 @@ export default async function HomePage({
   const { locale } = await params;
   const t = await getTranslations({ locale, namespace: "landing" });
 
-  // The public marketing landing only features Nordic commerce inventory
-  // (titles with marketId set). Research-catalog rows from the CSV import
-  // (marketId = null) are excluded.
+  // All titles have a Market FK now (NOT NULL across all 9 catalog
+  // countries — NO, SE, DK, FI, DE, AT, CH, UK, IE).
   const [sampleTitles, publishersRaw, totalActiveTitles, totalPublishers] =
     await Promise.all([
       prisma.title.findMany({
         where: {
           active: true,
-          marketId: { not: null },
           products: { some: { active: true, visibility: "INDICATIVE" } },
         },
         orderBy: [{ monthlyReach: "desc" }, { name: "asc" }],
@@ -75,26 +73,18 @@ export default async function HomePage({
         },
       }),
       prisma.publisher.findMany({
-        where: {
-          marketId: { not: null },
-          titles: { some: { active: true, marketId: { not: null } } },
-        },
+        where: { titles: { some: { active: true } } },
         include: {
           market: { select: { code: true } },
           titles: {
-            where: { active: true, marketId: { not: null } },
+            where: { active: true },
             select: { market: { select: { code: true } } },
           },
         },
       }),
-      prisma.title.count({
-        where: { active: true, marketId: { not: null } },
-      }),
+      prisma.title.count({ where: { active: true } }),
       prisma.publisher.count({
-        where: {
-          marketId: { not: null },
-          titles: { some: { active: true, marketId: { not: null } } },
-        },
+        where: { titles: { some: { active: true } } },
       }),
     ]);
 
@@ -103,11 +93,7 @@ export default async function HomePage({
   const topPublishers = publishersRaw
     .map((p) => {
       const markets = Array.from(
-        new Set(
-          p.titles
-            .map((t) => t.market?.code.toLowerCase())
-            .filter((c): c is string => !!c),
-        ),
+        new Set(p.titles.map((t) => t.market.code.toLowerCase())),
       ).sort();
       return {
         id: p.id,
@@ -350,11 +336,9 @@ export default async function HomePage({
                 const formatKey = product
                   ? PRODUCT_TYPE_TO_FORMAT_KEY[product.type]
                   : "fmtNativeArticle";
-                const marketCodeUpper =
-                  title.market?.code ?? title.countryCode;
+                const marketCodeUpper = title.market.code;
                 const marketCode = marketCodeUpper.toLowerCase();
-                const currency =
-                  title.market?.currency ?? product?.currency ?? "";
+                const currency = title.market.currency;
                 return (
                   <tr
                     key={title.id}

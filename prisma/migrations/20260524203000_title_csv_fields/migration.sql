@@ -1,35 +1,22 @@
--- Loosen Title/Publisher market FKs and enrich Title with the CSV
--- research-catalog fields (see prisma/data/medier_alle.csv). Lets us
--- store all 3155 Nordic + European media outlets in one Title table.
+-- Add the CSV research-catalog columns to Title (see
+-- prisma/data/medier_alle.csv) so all 3,150+ Nordic + European media
+-- outlets are filterable from a single table. Also denormalises the
+-- country code onto Title/Publisher so catalog filtering can hit an
+-- index without joining Market.
 
--- ---------- Publisher: nullable marketId + countryCode ----------
+-- ---------- Publisher.countryCode (denormalized) ----------
 
 ALTER TABLE "Publisher" ADD COLUMN "countryCode" TEXT;
 
--- Backfill countryCode from the linked Market for existing rows.
 UPDATE "Publisher" p
   SET "countryCode" = m."code"::text
   FROM "Market" m
   WHERE p."marketId" = m."id";
 
 ALTER TABLE "Publisher" ALTER COLUMN "countryCode" SET NOT NULL;
+CREATE INDEX "Publisher_countryCode_idx" ON "Publisher"("countryCode");
 
--- Drop the old (marketId, name) unique index and the FK NOT NULL so we
--- can recreate the FK as nullable. (Prisma 6 represents @@unique as an
--- index, not a table constraint.)
-DROP INDEX "Publisher_marketId_name_key";
-ALTER TABLE "Publisher" DROP CONSTRAINT "Publisher_marketId_fkey";
-ALTER TABLE "Publisher" ALTER COLUMN "marketId" DROP NOT NULL;
-ALTER TABLE "Publisher"
-  ADD CONSTRAINT "Publisher_marketId_fkey"
-  FOREIGN KEY ("marketId") REFERENCES "Market"("id")
-  ON DELETE SET NULL ON UPDATE CASCADE;
-
-CREATE UNIQUE INDEX "Publisher_countryCode_name_key"
-  ON "Publisher"("countryCode", "name");
-CREATE INDEX "Publisher_marketId_idx" ON "Publisher"("marketId");
-
--- ---------- Title: nullable marketId + CSV fields ----------
+-- ---------- Title.countryCode + CSV columns ----------
 
 ALTER TABLE "Title" ADD COLUMN "countryCode" TEXT;
 
@@ -40,15 +27,8 @@ UPDATE "Title" t
 
 ALTER TABLE "Title" ALTER COLUMN "countryCode" SET NOT NULL;
 
-ALTER TABLE "Title" DROP CONSTRAINT "Title_marketId_fkey";
-ALTER TABLE "Title" ALTER COLUMN "marketId" DROP NOT NULL;
-ALTER TABLE "Title"
-  ADD CONSTRAINT "Title_marketId_fkey"
-  FOREIGN KEY ("marketId") REFERENCES "Market"("id")
-  ON DELETE SET NULL ON UPDATE CASCADE;
-
 -- Research-catalog metadata columns. All nullable — they describe the
--- title for filtering/search and are not required by any commerce flow.
+-- title for filtering / search and are not required by any commerce flow.
 ALTER TABLE "Title" ADD COLUMN "type" TEXT;
 ALTER TABLE "Title" ADD COLUMN "frequency" TEXT;
 ALTER TABLE "Title" ADD COLUMN "ownerGroup" TEXT;
@@ -65,7 +45,6 @@ ALTER TABLE "Title" ADD COLUMN "nativeFit" TEXT;
 ALTER TABLE "Title" ADD COLUMN "tags" TEXT;
 ALTER TABLE "Title" ADD COLUMN "urlStatus" TEXT;
 
--- Indexes on the columns the catalog UI filters by.
 CREATE INDEX "Title_countryCode_idx" ON "Title"("countryCode");
 CREATE INDEX "Title_type_idx" ON "Title"("type");
 CREATE INDEX "Title_category_idx" ON "Title"("category");

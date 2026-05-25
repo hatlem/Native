@@ -134,16 +134,28 @@
     "filters": {
       "market": "Marknad",
       "type": "Format",
+      "nativeFit": "Native-passform",
+      "b2bB2c": "B2B/B2C",
+      "onlyPriced": "Endast titlar med pris",
       "all": "Alla",
       "search": "Sök",
-      "searchPlaceholder": "Titel eller kategori…",
+      "searchPlaceholder": "Titel, vertikal eller tagg …",
       "apply": "Använd"
     },
     "card": {
       "from": "Från",
       "reach": "Månatlig räckvidd",
+      "circulation": "Upplaga",
       "leadTime": "Ledtid",
-      "days": "dagar"
+      "days": "dagar",
+      "requestQuote": "Begär offert",
+      "nativeFit": "Native: {value}"
+    },
+    "resultCount": "{count, plural, =0 {Inga träffar} =1 {1 titel} other {# titlar}}",
+    "pagination": {
+      "prev": "Föregående",
+      "next": "Nästa",
+      "page": "Sida {page} av {total}"
     },
     "indicativeNote": "Priserna är vägledande. Ett fast pris bekräftas av vårt inköpsteam baserat på tillgänglighet, säsong och volym.",
     "noResults": "Inga titlar matchar dessa filter.",
@@ -155,6 +167,7 @@
     "publishedBy": "Ges ut av",
     "reach": "Månatlig räckvidd",
     "formats": "Native-format",
+    "circulation": "Upplaga",
     "leadTime": "Ledtid",
     "days": "dagar",
     "from": "Från",
@@ -163,6 +176,12 @@
     "images": "Bilder (min.)",
     "disclosure": "Märkning",
     "addToPlan": "Lägg till i plan",
+    "nativeFitTag": "Native: {value}",
+    "requestQuote": {
+      "title": "Begär offert",
+      "body": "Den här titeln finns i katalogen men har ingen publicerad listprisning ännu. Skicka en brief så hämtar våra inköpare priser och tillgänglighet åt dig.",
+      "cta": "Starta en plan"
+    },
     "indicativeNote": "Vägledande pris. Det fasta priset bekräftas av vårt inköpsteam.",
     "unavailable": "För närvarande inte tillgänglig för bokning.",
     "formatsEyebrow": "Tillgängliga format",
@@ -299,6 +318,25 @@
     "filters": {
       "market": "Marknad",
       "status": "Status",
+      "nativeFit": "Native-passform",
+      "format": "Format",
+      "b2bB2c": "B2B/B2C",
+      "reach": "Geografisk räckvidd",
+      "urlStatus": "URL-status",
+      "vertical": "Vertikal",
+      "verticalPlaceholder": "T.ex. News, B2B – Energy …",
+      "ownerGroup": "Ägare (koncern)",
+      "ownerGroupPlaceholder": "T.ex. Schibsted, Polaris …",
+      "type": "Typ",
+      "typePlaceholder": "T.ex. Dagstidning, Monthly mag …",
+      "frequency": "Frekvens",
+      "frequencyPlaceholder": "T.ex. Daglig, Veckovis …",
+      "category": "Kategori",
+      "categoryPlaceholder": "T.ex. Regional, Religion …",
+      "circulationMin": "Min upplaga",
+      "circulationMinPlaceholder": "T.ex. 50000",
+      "search": "Sök",
+      "searchPlaceholder": "Titel, utgivare eller tagg …",
       "all": "Alla",
       "apply": "Använd"
     },
@@ -309,8 +347,17 @@
       "no-native": "Erbjuder inte native"
     },
     "reach": "Räckvidd per månad",
+    "circulation": "Upplaga",
+    "adSales": "Annonsförsäljning",
     "products": "Produkter",
     "checkSite": "Kontrollera utgivarens webbplats",
+    "nativeFitTag": "Native: {value}",
+    "resultCount": "{count, plural, =0 {Inga träffar} =1 {1 titel} other {# titlar}}",
+    "pagination": {
+      "prev": "Föregående",
+      "next": "Nästa",
+      "page": "Sida {page} av {total}"
+    },
     "actions": {
       "markNative": "Markera: erbjuder native",
       "markNoNative": "Markera: ingen native",
