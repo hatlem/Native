@@ -71,8 +71,7 @@ export default async function ComparePage({
             indicativeFromRules(Number(p.basePrice), toRateRules(p.priceRules)),
           );
           const from = prices.length ? Math.min(...prices) : null;
-          const cur =
-            title.products[0]?.currency ?? title.market?.currency ?? "";
+          const cur = title.products[0]?.currency ?? title.market.currency;
           const leadMin = title.products.length
             ? Math.min(...title.products.map((p) => p.leadTimeDays))
             : null;
@@ -82,7 +81,7 @@ export default async function ComparePage({
                 <Link href={`/catalog/${title.slug}`}>{title.name}</Link>
               </h3>
               <div className="muted">
-                {title.publisher.name} · {tMarket(title.countryCode)}
+                {title.publisher.name} · {tMarket(title.market.code)}
               </div>
               <div className="muted">{title.category}</div>
               {title.monthlyReach ? (

@@ -43,13 +43,19 @@ type SeedMarket = {
   disclosure: string;
 };
 
-const MARKETS: SeedMarket[] = [
+type SeedMarketSpec = SeedMarket & { vatRatePct: number };
+
+// VAT rates and disclosure labels are common-knowledge defaults
+// (Eurostat / national tax authorities); tune in the desk admin once we
+// open commerce in each non-Nordic market.
+const MARKETS: SeedMarketSpec[] = [
   {
     code: MarketCode.NO,
     name: "Norway",
     currency: "NOK",
     defaultLocale: "no",
     disclosure: "Annonsørinnhold",
+    vatRatePct: 25,
   },
   {
     code: MarketCode.SE,
@@ -57,6 +63,7 @@ const MARKETS: SeedMarket[] = [
     currency: "SEK",
     defaultLocale: "sv",
     disclosure: "Annons",
+    vatRatePct: 25,
   },
   {
     code: MarketCode.DK,
@@ -64,6 +71,55 @@ const MARKETS: SeedMarket[] = [
     currency: "DKK",
     defaultLocale: "da",
     disclosure: "Annonce / Sponsoreret indhold",
+    vatRatePct: 25,
+  },
+  {
+    code: MarketCode.FI,
+    name: "Finland",
+    currency: "EUR",
+    defaultLocale: "en",
+    disclosure: "Kaupallinen yhteistyö",
+    vatRatePct: 25.5,
+  },
+  {
+    code: MarketCode.DE,
+    name: "Germany",
+    currency: "EUR",
+    defaultLocale: "en",
+    disclosure: "Anzeige",
+    vatRatePct: 19,
+  },
+  {
+    code: MarketCode.AT,
+    name: "Austria",
+    currency: "EUR",
+    defaultLocale: "en",
+    disclosure: "Anzeige",
+    vatRatePct: 20,
+  },
+  {
+    code: MarketCode.CH,
+    name: "Switzerland",
+    currency: "CHF",
+    defaultLocale: "en",
+    disclosure: "Bezahlte Anzeige",
+    vatRatePct: 8.1,
+  },
+  {
+    code: MarketCode.UK,
+    name: "United Kingdom",
+    currency: "GBP",
+    defaultLocale: "en",
+    disclosure: "Sponsored",
+    vatRatePct: 20,
+  },
+  {
+    code: MarketCode.IE,
+    name: "Ireland",
+    currency: "EUR",
+    defaultLocale: "en",
+    disclosure: "Sponsored",
+    vatRatePct: 23,
   },
 ];
 
@@ -195,9 +251,8 @@ function readMediaCsv(): CsvRow[] {
   return out;
 }
 
-// Apply NO/SE/DK markets so every Title in a Nordic country gets a
-// Market FK; outlets from UK/DE/FI/IE/AT/CH live in the catalog without
-// a Market (they're research-only until we open those countries).
+// Create a Market for every country in the CSV (NO/SE/DK/FI/DE/AT/CH/UK/IE)
+// so every Title and Publisher has a non-null Market FK.
 async function seedMarkets(): Promise<Map<string, string>> {
   const codeToId = new Map<string, string>();
   for (const m of MARKETS) {
@@ -207,7 +262,7 @@ async function seedMarkets(): Promise<Map<string, string>> {
         name: m.name,
         currency: m.currency,
         defaultLocale: m.defaultLocale,
-        vatRatePct: 25,
+        vatRatePct: m.vatRatePct,
         disclosureLabel: m.disclosure,
       },
     });
@@ -237,12 +292,18 @@ async function seedFromCsv(
     }
   }
   await prisma.publisher.createMany({
-    data: Array.from(publisherSeen.values()).map((p) => ({
-      name: p.name,
-      countryCode: p.countryCode,
-      marketId: marketIds.get(p.countryCode) ?? null,
-      paymentTerms: "net 30",
-    })),
+    data: Array.from(publisherSeen.values())
+      .map((p) => {
+        const marketId = marketIds.get(p.countryCode);
+        if (!marketId) return null;
+        return {
+          name: p.name,
+          countryCode: p.countryCode,
+          marketId,
+          paymentTerms: "net 30",
+        };
+      })
+      .filter((x): x is NonNullable<typeof x> => x !== null),
     skipDuplicates: true,
   });
 
@@ -267,13 +328,14 @@ async function seedFromCsv(
   const titleData: Prisma.TitleCreateManyInput[] = [];
   for (const [slug, r] of titleSeen) {
     const publisherId = publisherIdByKey.get(pubKey(r.country, r.publisher));
-    if (!publisherId) continue;
+    const marketId = marketIds.get(r.country);
+    if (!publisherId || !marketId) continue;
     titleData.push({
       name: r.title,
       slug,
       publisherId,
       countryCode: r.country,
-      marketId: marketIds.get(r.country) ?? null,
+      marketId,
       category: r.category,
       websiteUrl: r.url,
       active: false,

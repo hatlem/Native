@@ -17,6 +17,12 @@ enum MarketCode {
   NO
   SE
   DK
+  FI
+  DE
+  AT
+  CH
+  UK
+  IE
 }
 
 enum ProductType {
@@ -145,12 +151,12 @@ model Market {
 model Publisher {
   id            String   @id @default(cuid())
   name          String
-  // Free-form ISO 3166-1 alpha-2 country code. Populated for every
-  // publisher (incl. those outside the NO/SE/DK Market scope — e.g.
-  // UK/DE/FI/IE/AT/CH research-catalog rows from the CSV import).
+  // Denormalized ISO country code mirroring `market.code`. Kept as a
+  // first-class column so catalog filtering can hit an index without
+  // joining Market.
   countryCode   String
-  marketId      String?
-  market        Market?  @relation(fields: [marketId], references: [id])
+  marketId      String
+  market        Market   @relation(fields: [marketId], references: [id])
   contactEmail  String?
   paymentTerms  String? // e.g. "net 30"
   contractNotes String?
@@ -160,8 +166,8 @@ model Publisher {
   titles Title[]
   users  User[]
 
-  @@unique([countryCode, name])
-  @@index([marketId])
+  @@unique([marketId, name])
+  @@index([countryCode])
 }
 
 model Title {
@@ -170,12 +176,11 @@ model Title {
   slug          String    @unique
   publisherId   String
   publisher     Publisher @relation(fields: [publisherId], references: [id])
-  // ISO 3166-1 alpha-2 country code, always set. The Market FK is only
-  // populated for NO/SE/DK (where we sell); other countries come from
-  // the research-catalog CSV import and have marketId = null.
+  // Denormalized ISO country code mirroring `market.code`. Kept so
+  // catalog filtering by country hits an index without joining Market.
   countryCode   String
-  marketId      String?
-  market        Market?   @relation(fields: [marketId], references: [id])
+  marketId      String
+  market        Market    @relation(fields: [marketId], references: [id])
   category      String // e.g. "general-news", "business", "lifestyle"
   audienceNote  String?
   monthlyReach  Int? // estimated readers / month

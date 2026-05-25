@@ -50,11 +50,7 @@ export default async function TitleDetailPage({
     category: title.category,
     brand: { "@type": "Brand", name: title.publisher.name },
     url: `${siteBase}/${locale}/catalog/${title.slug}`,
-    offers: {
-      "@type": "AggregateOffer",
-      priceCurrency: title.market?.currency ?? title.products[0]?.currency ?? "",
-      offers: ldOffers,
-    },
+    offers: { "@type": "AggregateOffer", priceCurrency: title.market.currency, offers: ldOffers },
   };
 
   return (
@@ -69,7 +65,7 @@ export default async function TitleDetailPage({
       </p>
       <h1>{title.name}</h1>
       <p className="muted">
-        {t("publishedBy")} {title.publisher.name} · {tMarket(title.countryCode)}{" "}
+        {t("publishedBy")} {title.publisher.name} · {tMarket(title.market.code)}{" "}
         · {title.category}
       </p>
       {title.monthlyReach ? (
