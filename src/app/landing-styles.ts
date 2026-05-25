@@ -766,6 +766,9 @@ body:has(.bn) header.site-header .nav button:hover { background: #3A3528 !import
   outline: 3px solid var(--ink); outline-offset: -2px;
 }
 .bn .auth-card .field textarea { resize: vertical; min-height: 96px; }
+.bn .auth-card .field .hint {
+  font-size: 12px; color: var(--ink-mute); margin-top: 2px;
+}
 .bn .auth-card .actions { margin-top: 4px; }
 .bn .auth-card .alt {
   font-size: 13px; color: var(--ink-soft); text-align: center;
@@ -796,6 +799,24 @@ body:has(.bn) header.site-header .nav button:hover { background: #3A3528 !import
 /* Contact shell uses auth-shell layout */
 .bn .contact-shell { min-height: 0; }
 
+/* — Skeleton lines (marketing loading) — */
+.bn .skel {
+  display: block;
+  background: linear-gradient(90deg, rgba(20,17,12,.08) 0%, rgba(20,17,12,.16) 50%, rgba(20,17,12,.08) 100%);
+  background-size: 200% 100%;
+  border-radius: 2px;
+  animation: bn-skel-shimmer 1.4s ease-in-out infinite;
+}
+.bn .skel-eyebrow { width: 120px; height: 12px; margin-bottom: 18px; }
+.bn .skel-h1 { width: 60%; max-width: 520px; height: clamp(36px, 4vw, 56px); margin-bottom: 18px; }
+.bn .skel-lead { width: 80%; max-width: 640px; height: 18px; }
+.bn .skel-line { height: 14px; margin-bottom: 10px; width: 100%; }
+.bn .skel-line.short { width: 60%; }
+@keyframes bn-skel-shimmer {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
 /* — Utility page (404) — */
 .bn .utility-page {
   min-height: calc(100vh - 200px);
@@ -818,6 +839,123 @@ body:has(.bn) header.site-header .nav button:hover { background: #3A3528 !import
 .bn .utility-page .cluster {
   display: flex; gap: 16px; flex-wrap: wrap; margin-top: 16px;
 }
+
+/* — Pricing plan cards — */
+.bn .grid .card.plan-card {
+  position: relative;
+  gap: 16px;
+}
+.bn .grid .card.plan-card.is-featured {
+  background: var(--ink);
+  color: var(--paper);
+  border-right-color: var(--ink);
+  border-bottom-color: var(--ink);
+}
+.bn .grid .card.plan-card.is-featured h3,
+.bn .grid .card.plan-card.is-featured .price,
+.bn .grid .card.plan-card.is-featured p,
+.bn .grid .card.plan-card.is-featured li { color: var(--paper); }
+.bn .grid .card.plan-card.is-featured .muted { color: rgba(237,232,219,.7); }
+.bn .grid .card.plan-card.is-featured .plan-badge {
+  background: var(--paper); color: var(--ink); border-color: var(--paper);
+}
+.bn .grid .card.plan-card .plan-badge {
+  align-self: flex-start;
+}
+.bn .grid .card.plan-card .price {
+  font-size: clamp(36px, 4vw, 56px); font-weight: 600; letter-spacing: -0.04em; line-height: 1;
+  margin-top: 4px;
+}
+.bn .grid .card.plan-card .plan-features {
+  list-style: none; padding: 0; margin: 8px 0 0 0; display: grid; gap: 10px;
+}
+.bn .grid .card.plan-card .plan-features li {
+  font-size: 13.5px; line-height: 1.5; color: var(--ink-soft); padding-left: 20px; position: relative;
+}
+.bn .grid .card.plan-card.is-featured .plan-features li { color: rgba(237,232,219,.85); }
+.bn .grid .card.plan-card .plan-features li::before {
+  content: ""; position: absolute; left: 0; top: 9px; width: 10px; height: 1px; background: var(--ink);
+}
+.bn .grid .card.plan-card.is-featured .plan-features li::before { background: var(--paper); }
+.bn .grid .card.plan-card .plan-cta { margin-top: auto; padding-top: 8px; }
+.bn .grid .card.plan-card.is-featured .plan-cta .btn {
+  background: var(--paper); color: var(--ink); border-color: var(--paper); box-shadow: 6px 6px 0 0 rgba(237,232,219,.35);
+}
+
+/* — Filters bar (recommend page) — */
+.bn .filters {
+  display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)) auto;
+  gap: 16px; align-items: end;
+  padding: 24px;
+  background: var(--paper-2);
+  border: 2px solid var(--ink); border-radius: 2px;
+  margin-bottom: clamp(32px, 4vw, 48px);
+}
+.bn .filters > div { display: grid; gap: 6px; }
+.bn .filters label {
+  font-size: 11px; text-transform: uppercase; letter-spacing: 0.14em; font-weight: 600; color: var(--ink);
+}
+.bn .filters input,
+.bn .filters select {
+  padding: 11px 14px; border: 2px solid var(--ink); border-radius: 2px;
+  background: var(--paper); color: var(--ink);
+  font-family: inherit; font-size: 14px;
+}
+.bn .filters input:focus,
+.bn .filters select:focus { outline: 3px solid var(--ink); outline-offset: -2px; }
+.bn .filters button[type="submit"] {
+  padding: 13px 20px; border: 2px solid var(--ink); background: var(--ink); color: var(--paper);
+  font-size: 13px; text-transform: uppercase; letter-spacing: 0.14em; font-weight: 600;
+  cursor: pointer; border-radius: 2px;
+  box-shadow: 6px 6px 0 0 var(--ink-mute);
+  transition: transform .15s ease;
+}
+.bn .filters button[type="submit"]:hover { transform: translateY(-1px); box-shadow: 8px 8px 0 0 var(--ink-mute); }
+
+/* — KPI band (recommend results) — */
+.bn .kpi-grid {
+  display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  border-top: 2px solid var(--rule); border-left: 1px solid var(--hair);
+  margin-bottom: clamp(32px, 4vw, 48px);
+}
+.bn .kpi-grid .kpi {
+  padding: 28px clamp(20px, 2.2vw, 32px);
+  border-right: 1px solid var(--hair); border-bottom: 1px solid var(--hair);
+  display: flex; flex-direction: column; gap: 6px;
+}
+.bn .kpi-grid .kpi .label {
+  font-size: 11px; text-transform: uppercase; letter-spacing: 0.18em; font-weight: 600; color: var(--ink-mute);
+}
+.bn .kpi-grid .kpi .value {
+  font-size: clamp(28px, 3vw, 40px); font-weight: 600; letter-spacing: -0.03em; line-height: 1;
+}
+.bn .kpi-grid .kpi .delta {
+  font-size: 12px; color: var(--ink-soft); line-height: 1.4;
+}
+
+/* Recommend result cards inherit .grid .card */
+.bn .grid .card .tag {
+  display: inline-flex; align-self: flex-start;
+  padding: 4px 8px; font-size: 10.5px; text-transform: uppercase; letter-spacing: 0.14em; font-weight: 600;
+  border: 1px solid var(--ink); border-radius: 2px;
+}
+.bn .grid .card .price {
+  font-size: clamp(22px, 2vw, 28px); font-weight: 600; letter-spacing: -0.02em; margin-top: 6px;
+}
+
+/* Empty state */
+.bn .empty {
+  padding: clamp(48px, 6vw, 96px) var(--pad);
+  text-align: center;
+  border-top: 2px solid var(--rule); border-bottom: 2px solid var(--rule);
+}
+.bn .empty .empty-icon {
+  font-size: 36px; color: var(--ink-mute); margin-bottom: 14px;
+}
+.bn .empty .empty-title {
+  margin: 0 0 8px 0; font-weight: 600; font-size: clamp(20px, 2vw, 28px); letter-spacing: -0.015em;
+}
+.bn .empty p { margin: 0; font-size: 14px; color: var(--ink-soft); }
 
 /* — Formats page — */
 .bn .format-list {
