@@ -429,6 +429,8 @@ type CommerceTitle = {
 };
 
 const COMMERCE_TITLES: CommerceTitle[] = [
+  // ---------- NO/SE/DK ---------- hand-curated, with monthly-reach
+  // estimates that reflect print + digital audience.
   { slug: slugify("Aftenposten-NO"), monthlyReach: 1_200_000 },
   { slug: slugify("Verdens Gang (VG)-NO"), monthlyReach: 2_000_000 },
   { slug: slugify("E24-NO"), monthlyReach: 600_000 },
@@ -439,6 +441,27 @@ const COMMERCE_TITLES: CommerceTitle[] = [
   { slug: slugify("Politiken-DK"), monthlyReach: 800_000 },
   { slug: slugify("Morgenavisen Jyllands-Posten-DK"), monthlyReach: 700_000 },
   { slug: slugify("Berlingske-DK"), monthlyReach: 500_000 },
+  // ---------- FI/DE/AT/CH/UK/IE ---------- top three by circulation in
+  // each market (queried from prisma/data/medier_alle.csv). reach is
+  // the CSV circulation; refine once we get publisher rate cards.
+  { slug: slugify("Pirkka-FI"), monthlyReach: 2_200_000 },
+  { slug: slugify("Yhteishyvä-FI"), monthlyReach: 1_800_000 },
+  { slug: slugify("7 päivää-FI"), monthlyReach: 280_000 },
+  { slug: slugify("ADAC Motorwelt-DE"), monthlyReach: 11_500_000 },
+  { slug: slugify("Apotheken Umschau-DE"), monthlyReach: 9_000_000 },
+  { slug: slugify("rtv-DE"), monthlyReach: 5_000_000 },
+  { slug: slugify("ÖAMTC AutoTouring-AT"), monthlyReach: 2_100_000 },
+  { slug: slugify("Kronen Zeitung-AT"), monthlyReach: 600_000 },
+  { slug: slugify("ÖAV Bergauf-AT"), monthlyReach: 600_000 },
+  { slug: slugify("Coopzeitung-CH"), monthlyReach: 2_400_000 },
+  { slug: slugify("Migros Magazin-CH"), monthlyReach: 1_500_000 },
+  { slug: slugify("Touring (TCS)-CH"), monthlyReach: 1_300_000 },
+  { slug: slugify("The Economist-UK"), monthlyReach: 1_500_000 },
+  { slug: slugify("The Sun-UK"), monthlyReach: 1_200_000 },
+  { slug: slugify("The Sun on Sunday-UK"), monthlyReach: 1_100_000 },
+  { slug: slugify("Sunday Independent-IE"), monthlyReach: 130_000 },
+  { slug: slugify("Sunday World-IE"), monthlyReach: 110_000 },
+  { slug: slugify("Irish Farmers Journal-IE"), monthlyReach: 70_000 },
 ];
 
 async function activateCommerceTitles(
