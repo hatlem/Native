@@ -10,6 +10,7 @@ import {
   runSpecCheck,
   setAssetStatus,
   issueInvoice,
+  issueCreditNote,
 } from "@/app/desk-actions";
 import { StatusBadge } from "@/app/status-badge";
 import { canCancelOrder, cancelBlockReason } from "@/lib/cancellation";
@@ -39,6 +40,7 @@ export default async function DeskOrderPage({
       organization: true,
       quote: true,
       invoices: true,
+      creditNotes: true,
       lines: {
         include: {
           brief: { include: { assets: { orderBy: { version: "desc" } } } },
@@ -180,6 +182,59 @@ export default async function DeskOrderPage({
               </>
             ) : null}
           </dl>
+
+          {/* Credit-note affordance — only renders once invoice exists,
+              order is CANCELLED, and no credit note has been issued. */}
+          {invoice &&
+          ["ISSUED", "PAID", "OVERDUE"].includes(invoice.status) &&
+          order.creditNotes.length === 0 ? (
+            <details className="spec-details">
+              <summary>
+                <span className="btn secondary">{t("creditNoteButton")}</span>
+              </summary>
+              <form action={issueCreditNote} className="product-form">
+                <input type="hidden" name="locale" value={locale} />
+                <input type="hidden" name="orderId" value={order.id} />
+                <h4 style={{ margin: "12px 0 4px" }}>{t("creditNoteTitle")}</h4>
+                <p className="muted small">
+                  {t("creditNoteHint", {
+                    amount: formatMoney(
+                      Number(invoice.total),
+                      invoice.currency,
+                      locale,
+                    ),
+                  })}
+                </p>
+                <div className="field">
+                  <label htmlFor={`credit-reason-${order.id}`}>
+                    {t("creditNoteReasonLabel")}
+                  </label>
+                  <textarea
+                    id={`credit-reason-${order.id}`}
+                    name="reason"
+                    rows={3}
+                    required
+                    placeholder={t("creditNoteReasonPlaceholder")}
+                  />
+                </div>
+                <div className="actions">
+                  <button type="submit" className="btn">
+                    {t("creditNoteSubmit")}
+                  </button>
+                </div>
+              </form>
+            </details>
+          ) : order.creditNotes.length > 0 ? (
+            <p className="muted small">
+              <strong>{t("creditNoteIssuedLabel")}:</strong>{" "}
+              {formatMoney(
+                Number(order.creditNotes[0].amount),
+                order.creditNotes[0].currency,
+                locale,
+              )}{" "}
+              · {order.creditNotes[0].reason}
+            </p>
+          ) : null}
         </section>
       ) : null}
 

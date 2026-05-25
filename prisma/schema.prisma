@@ -112,6 +112,7 @@ enum InvoiceStatus {
   PAID
   OVERDUE
   VOID
+  CREDITED
 }
 
 enum NotificationKind {
@@ -323,6 +324,7 @@ model Organization {
   requests Request[]
   orders   Order[]
   invoices Invoice[]
+  apiKeys  ApiKey[]
 }
 
 model User {
@@ -379,6 +381,38 @@ model Notification {
   createdAt DateTime         @default(now())
 
   @@index([userId, readAt])
+}
+
+// API key for the public catalog read API (/api/v1/catalog/*).
+// Each key is owned by an Organization (agency or advertiser) — see
+// Tobias's GroupM scenario for the canonical use case. The stored
+// `tokenHash` is the SHA-256 of the raw token; the raw value is only
+// shown to the creator at issuance.
+//
+// Scopes are kept as a comma-separated string for v1 — a JSON array
+// column would be cleaner but the only scope today is "catalog:read"
+// and a future migration can normalise once we add more.
+model ApiKey {
+  id             String        @id @default(cuid())
+  organizationId String?
+  organization   Organization? @relation(fields: [organizationId], references: [id])
+  // Human label so super-admin can rotate per integration partner.
+  name           String
+  // SHA-256 of the raw token (hex). Never store the raw value.
+  tokenHash      String        @unique
+  // Comma-separated scopes; "catalog:read" is the only v1 value.
+  scopes         String        @default("catalog:read")
+  createdBy      String
+  createdAt      DateTime      @default(now())
+  lastUsedAt     DateTime?
+  // Nullable: explicit no-expiry for trusted partner agencies; the
+  // super-admin UI surfaces lastUsedAt + a "rotate" affordance instead
+  // of forcing a TTL.
+  expiresAt      DateTime?
+  revokedAt      DateTime?
+
+  @@index([organizationId])
+  @@index([revokedAt])
 }
 
 // Async job queue. Phase 0 ships an in-process runner (src/lib/jobs.ts);
@@ -491,8 +525,9 @@ model Order {
   createdAt      DateTime     @default(now())
   updatedAt      DateTime     @updatedAt
 
-  lines    OrderLine[]
-  invoices Invoice[]
+  lines       OrderLine[]
+  invoices    Invoice[]
+  creditNotes CreditNote[]
 }
 
 model OrderLine {
@@ -538,8 +573,20 @@ model ContentAsset {
   retractedAt     DateTime?
   retractedBy     String?
   retractionNote  String?
+  // Lineage pointer for cross-market content reuse (Maja R2's gap).
+  // When a writer adapts an existing article for a new market — e.g.
+  // the Danish "Sådan slipper du HR-konsulenten" piece becomes the
+  // Swedish version — this points at the source asset so:
+  //   - the desk can charge adaptation-rate instead of greenfield
+  //   - the audit chain shows where reused quotes originated
+  //   - "asset library" listings group adaptations under their root
+  sourceAssetId   String?
+  sourceAsset     ContentAsset?  @relation("AssetLineage", fields: [sourceAssetId], references: [id])
+  adaptations     ContentAsset[] @relation("AssetLineage")
   createdAt   DateTime           @default(now())
   updatedAt   DateTime           @updatedAt
+
+  @@index([sourceAssetId])
 }
 
 model PublisherBooking {
@@ -570,7 +617,8 @@ model Invoice {
   createdAt      DateTime      @default(now())
   updatedAt      DateTime      @updatedAt
 
-  lines InvoiceLine[]
+  lines       InvoiceLine[]
+  creditNotes CreditNote[]
 }
 
 model InvoiceLine {
@@ -581,6 +629,33 @@ model InvoiceLine {
   quantity    Int     @default(1)
   unitAmount  Decimal @db.Decimal(12, 2)
   lineTotal   Decimal @db.Decimal(12, 2)
+}
+
+// Refund issued against an Invoice. Lives separately from the
+// original invoice so the audit chain stays append-only: the invoice
+// row records what was BILLED; the credit-note row records what was
+// REFUNDED, with a stated reason. PLAN §13 / §14 (audit + per-market
+// VAT) requires both halves of the story for any later tax filing.
+//
+// Closes the Kirsten R2 follow-on: once an order is CANCELLED *after*
+// the invoice was issued, the only correct accounting move is a
+// credit note — not silently voiding the invoice (which loses the
+// "what was billed" record).
+model CreditNote {
+  id         String   @id @default(cuid())
+  invoiceId  String
+  invoice    Invoice  @relation(fields: [invoiceId], references: [id])
+  orderId    String
+  order      Order    @relation(fields: [orderId], references: [id])
+  currency   String
+  amount     Decimal  @db.Decimal(12, 2)
+  reason     String
+  issuedAt   DateTime @default(now())
+  issuedBy   String
+  createdAt  DateTime @default(now())
+
+  @@index([invoiceId])
+  @@index([orderId])
 }
 
 model AuditLog {

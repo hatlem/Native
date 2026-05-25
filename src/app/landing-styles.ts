@@ -15,26 +15,94 @@ body:has(.bn) main.container {
   margin: 0 !important;
 }
 
-/* Reconcile the kept mega menu with the bone landing palette */
+/* Reconcile the public mega header with the bone landing palette.
+   The header is rendered by PublicHeader (.nav-mega-link / .nav-mega-trigger /
+   .btn / .icon-btn) outside the .bn wrapper, so the .bn token overrides
+   don't reach it — we restate the cream palette explicitly. */
 body:has(.bn) header.site-header {
-  background: rgba(237, 232, 219, 0.88) !important;
+  background: rgba(237, 232, 219, 0.92) !important;
   border-bottom: 2px solid #14110C !important;
+  color-scheme: light;
 }
-body:has(.bn) header.site-header .brand { color: #14110C !important; }
-body:has(.bn) header.site-header .nav a { color: #6B6452 !important; }
-body:has(.bn) header.site-header .nav a:hover { color: #14110C !important; background: transparent !important; }
-body:has(.bn) header.site-header .nav .muted { color: #6B6452 !important; }
-body:has(.bn) header.site-header .nav form { border-left-color: rgba(20,17,12,0.2) !important; }
-body:has(.bn) header.site-header .nav button {
+body:has(.bn) header.site-header .brand,
+body:has(.bn) header.site-header .brand:hover { color: #14110C !important; }
+body:has(.bn) header.site-header .brand-mark {
   background: #14110C !important;
   color: #EDE8DB !important;
-  border-color: #14110C !important;
+}
+body:has(.bn) header.site-header .nav-mega-link,
+body:has(.bn) header.site-header .nav-mega-trigger {
+  color: #3A3528 !important;
+  background: transparent !important;
+}
+body:has(.bn) header.site-header .nav-mega-link:hover,
+body:has(.bn) header.site-header .nav-mega-trigger:hover,
+body:has(.bn) header.site-header .nav-mega-trigger[aria-expanded="true"],
+body:has(.bn) header.site-header .nav-mega-link[aria-current="page"] {
+  color: #14110C !important;
+  background: rgba(20,17,12,0.06) !important;
+}
+/* Mega dropdown panel — cream surface, ink content */
+body:has(.bn) .mega-panel {
+  background: #EDE8DB !important;
+  border: 1px solid rgba(20,17,12,0.18) !important;
+  box-shadow: 6px 6px 0 0 rgba(20,17,12,0.18) !important;
+}
+body:has(.bn) .mega-item { color: #14110C !important; }
+body:has(.bn) .mega-item:hover { background: rgba(20,17,12,0.06) !important; }
+body:has(.bn) .mega-item-icon { color: #6B6452 !important; }
+body:has(.bn) .mega-item-title { color: #14110C !important; }
+body:has(.bn) .mega-item-desc { color: #6B6452 !important; }
+body:has(.bn) .mega-featured {
+  background: rgba(20,17,12,0.04) !important;
+  border-top: 1px solid rgba(20,17,12,0.12) !important;
+}
+body:has(.bn) .mega-featured-icon { color: #14110C !important; }
+body:has(.bn) .mega-featured-title { color: #14110C !important; }
+body:has(.bn) .mega-featured-desc { color: #6B6452 !important; }
+/* Header action buttons — Sign in (ghost) + Sign up (filled) */
+body:has(.bn) header.site-header .nav-actions .btn {
+  border: 2px solid #14110C !important;
   border-radius: 2px !important;
   text-transform: uppercase;
-  letter-spacing: 0.14em;
-  font-size: 12px;
+  letter-spacing: 0.12em;
+  font-weight: 600;
 }
-body:has(.bn) header.site-header .nav button:hover { background: #3A3528 !important; }
+body:has(.bn) header.site-header .nav-actions .btn.ghost {
+  background: transparent !important;
+  color: #14110C !important;
+}
+body:has(.bn) header.site-header .nav-actions .btn.ghost:hover {
+  background: rgba(20,17,12,0.06) !important;
+}
+body:has(.bn) header.site-header .nav-actions .btn:not(.ghost) {
+  background: #14110C !important;
+  color: #EDE8DB !important;
+}
+body:has(.bn) header.site-header .nav-actions .btn:not(.ghost):hover {
+  background: #3A3528 !important;
+  border-color: #3A3528 !important;
+}
+body:has(.bn) header.site-header .icon-btn {
+  color: #14110C !important;
+  background: transparent !important;
+  border: 1px solid rgba(20,17,12,0.32) !important;
+}
+body:has(.bn) header.site-header .icon-btn:hover {
+  background: rgba(20,17,12,0.06) !important;
+}
+/* Mobile drawer — cream sheet */
+body:has(.bn) .drawer .sheet {
+  background: #EDE8DB !important;
+  color: #14110C !important;
+  color-scheme: light;
+}
+body:has(.bn) .drawer .scrim { background: rgba(20,17,12,0.4) !important; }
+body:has(.bn) .drawer-link {
+  color: #14110C !important;
+  border-bottom-color: rgba(20,17,12,0.12) !important;
+}
+body:has(.bn) .drawer-link:hover { background: rgba(20,17,12,0.06) !important; }
 
 .bn {
   /* Lock the editorial cream palette regardless of OS prefers-color-scheme.

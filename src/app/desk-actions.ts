@@ -108,6 +108,11 @@ export async function saveDraft(formData: FormData) {
   const orderLineId = field(formData, "orderLineId");
   const orderId = field(formData, "orderId");
   const body = field(formData, "body");
+  // Optional: writer flags this as an adaptation of a previously
+  // shipped asset. Persisted on ContentAsset.sourceAssetId so the
+  // desk can charge adaptation-rate instead of greenfield and the
+  // audit chain shows quote-reuse lineage (Maja R2's deeper gap).
+  const sourceAssetId = field(formData, "sourceAssetId") || null;
   const { userId } = await requireDeskOrContent(locale);
 
   const brief = await prisma.contentBrief.findUnique({
@@ -122,10 +127,12 @@ export async function saveDraft(formData: FormData) {
         version: nextVersion,
         status: "DRAFT",
         body,
+        sourceAssetId: sourceAssetId || null,
       },
     });
     await recordAudit(userId, "asset.draft", `ContentAsset:${asset.id}`, {
       version: nextVersion,
+      sourceAssetId: sourceAssetId || null,
     });
     // Queue spec check rather than block the form submission.
     await enqueue("spec.check", { assetId: asset.id });
@@ -295,6 +302,89 @@ export async function cancelOrder(formData: FormData) {
       }),
     ),
   );
+
+  redirect(`/${locale}/desk/orders/${order.id}`);
+}
+
+// Issue a credit note against the order's invoice. The supported v1
+// shape is full-credit: we refund the invoice total, mark the invoice
+// CREDITED, and record the reason. Partial credits are a real need
+// (e.g. publisher refunds line A but the customer still pays for line
+// B) but they introduce per-line accounting that wants its own design
+// pass; v1 keeps the surface tight.
+//
+// Required preconditions:
+//   - Order has a CANCELLED status (the typical credit-note trigger)
+//   - Order has exactly one issued (or paid) invoice with status
+//     ISSUED / PAID / OVERDUE — not DRAFT, not already CREDITED/VOID.
+//
+// Side effects:
+//   - CreditNote row written
+//   - Invoice.status → CREDITED
+//   - Audit row records actor + reason + amount
+//   - Buyer org notified
+export async function issueCreditNote(formData: FormData) {
+  const locale = field(formData, "locale") || "en";
+  const orderId = field(formData, "orderId");
+  const reason = normaliseReason(field(formData, "reason"));
+  const userId = await requireDesk(locale);
+
+  if (!reason) {
+    redirect(`/${locale}/desk/orders/${orderId}?credit=reason-required`);
+  }
+
+  const order = await prisma.order.findUnique({
+    where: { id: orderId },
+    include: { invoices: true, creditNotes: true },
+  });
+  if (!order) {
+    redirect(`/${locale}/desk/orders/${orderId}?credit=not-found`);
+  }
+  if (order.status !== OrderStatus.CANCELLED) {
+    redirect(
+      `/${locale}/desk/orders/${orderId}?credit=only-cancelled-orders`,
+    );
+  }
+  if (order.creditNotes.length > 0) {
+    redirect(`/${locale}/desk/orders/${orderId}?credit=already-issued`);
+  }
+  const invoice = order.invoices.find((i) =>
+    ["ISSUED", "PAID", "OVERDUE"].includes(i.status),
+  );
+  if (!invoice) {
+    redirect(`/${locale}/desk/orders/${orderId}?credit=no-eligible-invoice`);
+  }
+
+  await prisma.$transaction([
+    prisma.creditNote.create({
+      data: {
+        invoiceId: invoice.id,
+        orderId: order.id,
+        currency: invoice.currency,
+        amount: invoice.total,
+        reason,
+        issuedBy: userId,
+      },
+    }),
+    prisma.invoice.update({
+      where: { id: invoice.id },
+      data: { status: "CREDITED" },
+    }),
+  ]);
+
+  await recordAudit(userId, "credit_note.issue", `Invoice:${invoice.id}`, {
+    orderId: order.id,
+    amount: Number(invoice.total),
+    currency: invoice.currency,
+    reason,
+  });
+
+  await notifyOrg(order.organizationId, {
+    kind: "INVOICE_ISSUED",
+    title: "Credit note issued",
+    body: `${Number(invoice.total)} ${invoice.currency} credited — ${reason}`,
+    link: `/${locale}/invoices/${invoice.id}`,
+  });
 
   redirect(`/${locale}/desk/orders/${order.id}`);
 }
