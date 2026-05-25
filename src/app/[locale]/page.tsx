@@ -114,10 +114,7 @@ export default async function HomePage({
         <div className="wrap">
           <div className="pain-row">
             <div>
-              <span className="label">
-                <span className="num">{t("hero.labelNum")}</span>{" "}
-                {t("hero.labelText")}
-              </span>
+              <span className="label">{t("hero.labelText")}</span>
             </div>
             <p className="pain-line">{t.rich("hero.pain", richTags)}</p>
           </div>
@@ -158,10 +155,7 @@ export default async function HomePage({
         <div className="wrap">
           <div className="why-head">
             <div>
-              <div className="label">
-                <span className="num">{t("why.labelNum")}</span>{" "}
-                {t("why.labelText")}
-              </div>
+              <div className="label">{t("why.labelText")}</div>
               <h2>{t("why.h2")}</h2>
             </div>
             <p className="lead">{t("why.lead")}</p>
@@ -194,10 +188,7 @@ export default async function HomePage({
       <section className="vs">
         <div className="wrap">
           <div className="vs-head">
-            <div className="label">
-              <span className="num">{t("vs.labelNum")}</span>{" "}
-              {t("vs.labelText")}
-            </div>
+            <div className="label">{t("vs.labelText")}</div>
             <h2>{t("vs.h2")}</h2>
           </div>
 
@@ -250,12 +241,7 @@ export default async function HomePage({
         <div className="wrap">
           <div className="pubs-head">
             <div>
-              <div className="label-lg">
-                <span style={{ color: "var(--ink-mute)" }}>
-                  {t("pubs.labelNum")}
-                </span>{" "}
-                {t("pubs.labelText")}
-              </div>
+              <div className="label-lg">{t("pubs.labelText")}</div>
             </div>
             <div className="meta">
               {t("pubs.meta", {
@@ -302,10 +288,7 @@ export default async function HomePage({
         <div className="wrap">
           <div className="cat-head">
             <div>
-              <div className="label">
-                <span className="num">{t("catalog.labelNum")}</span>{" "}
-                {t("catalog.labelText")}
-              </div>
+              <div className="label">{t("catalog.labelText")}</div>
               <h2>{t("catalog.h2")}</h2>
             </div>
             <a href="#request" className="ask">
@@ -421,10 +404,7 @@ export default async function HomePage({
       <section className="how" id="how">
         <div className="wrap">
           <div className="how-head">
-            <div className="label">
-              <span className="num">{t("how.labelNum")}</span>{" "}
-              {t("how.labelText")}
-            </div>
+            <div className="label">{t("how.labelText")}</div>
             <h2>{t("how.h2")}</h2>
           </div>
 
@@ -593,7 +573,6 @@ body:has(.bn) header.site-header .nav button:hover { background: #3A3528 !import
   font-size: 11px; text-transform: uppercase; letter-spacing: 0.18em; font-weight: 600;
   color: var(--ink);
 }
-.bn .label .num { color: var(--ink-mute); font-weight: 500; margin-right: 8px; }
 .bn .pain-row .label::after {
   content: ""; display: inline-block; width: 56px; height: 1px; background: var(--ink); margin-left: 16px; transform: translateY(-4px);
 }
