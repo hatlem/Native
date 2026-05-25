@@ -12,6 +12,7 @@ import {
   claimLink,
   inviteEmail,
 } from "@/lib/publisher-invite";
+import { blueprintFor, basePriceFor } from "@/lib/activation-blueprint";
 
 function field(formData: FormData, key: string): string {
   const v = formData.get(key);
@@ -26,41 +27,9 @@ async function requireSuperadmin(locale: string): Promise<string> {
   return session.user.id;
 }
 
-// Same shape as prisma/seed.ts — kept inline so activation doesn't have
-// to import seed-time data.
-const ACTIVATION_BLUEPRINT: {
-  type: ProductType;
-  perThousandReach: number;
-  leadTimeDays: number;
-  visibility: PriceVisibility;
-  marginPct: number;
-  seasonalMultiplier: number;
-}[] = [
-  {
-    type: ProductType.NATIVE_ARTICLE,
-    perThousandReach: 25,
-    leadTimeDays: 12,
-    visibility: PriceVisibility.INDICATIVE,
-    marginPct: 22,
-    seasonalMultiplier: 1,
-  },
-  {
-    type: ProductType.ADVERTORIAL,
-    perThousandReach: 18,
-    leadTimeDays: 10,
-    visibility: PriceVisibility.INDICATIVE,
-    marginPct: 18,
-    seasonalMultiplier: 1,
-  },
-  {
-    type: ProductType.NATIVE_DISPLAY,
-    perThousandReach: 12,
-    leadTimeDays: 7,
-    visibility: PriceVisibility.FIRM,
-    marginPct: 12,
-    seasonalMultiplier: 1.1,
-  },
-];
+// Blueprint structure lives in src/lib/activation-blueprint.ts so it
+// can be unit-tested and so the per-market overrides (Ingrid's gap)
+// have a single home.
 
 // Verified that the title offers native. Creates default products from
 // the blueprint (only if none exist yet) and activates the title.
@@ -72,7 +41,9 @@ export async function markTitleNative(formData: FormData) {
   const title = await prisma.title.findUnique({
     where: { id: titleId },
     include: {
-      market: { select: { currency: true, disclosureLabel: true } },
+      market: {
+        select: { code: true, currency: true, disclosureLabel: true },
+      },
       _count: { select: { products: true } },
     },
   });
@@ -80,8 +51,9 @@ export async function markTitleNative(formData: FormData) {
 
   if (title._count.products === 0) {
     const reach = title.monthlyReach ?? 100_000;
-    for (const bp of ACTIVATION_BLUEPRINT) {
-      const basePrice = Math.round((reach / 1000) * bp.perThousandReach);
+    const blueprint = blueprintFor(title.market.code);
+    for (const bp of blueprint) {
+      const basePrice = basePriceFor(reach, bp, title.market.code);
       await prisma.product.create({
         data: {
           titleId: title.id,
@@ -158,6 +130,46 @@ export async function markTitleNoNative(formData: FormData) {
   await recordAudit(userId, "title.mark_no_native", `Title:${title.id}`, {
     name: title.name,
   });
+  redirect(`/${locale}/desk/titles`);
+}
+
+// Re-verify pricing for an already-active title without flipping any
+// inactive products back on (that's what markTitleNative does). Bumps
+// lastVerifiedAt and records the actor, so the catalog's "verified"
+// claim is more than a timestamp from initial activation — it's a
+// repeated decision Ingrid made on a defined cadence.
+//
+// Deliberately does NOT regenerate basePrice from the blueprint:
+// publishers may have set their own rate via updateProduct since
+// activation, and the catalog freshness audit shouldn't overwrite
+// their work. Surface a separate "regenerate pricing from blueprint"
+// affordance only if/when the desk asks for it.
+export async function verifyTitlePricing(formData: FormData) {
+  const locale = field(formData, "locale") || "en";
+  const titleId = field(formData, "titleId");
+  const userId = await requireSuperadmin(locale);
+
+  const title = await prisma.title.findUnique({
+    where: { id: titleId },
+    select: {
+      id: true,
+      name: true,
+      lastVerifiedAt: true,
+      products: { select: { id: true, basePrice: true } },
+    },
+  });
+  if (!title) redirect(`/${locale}/desk/titles`);
+
+  await prisma.title.update({
+    where: { id: title.id },
+    data: { lastVerifiedAt: new Date() },
+  });
+  await recordAudit(userId, "title.verify_pricing", `Title:${title.id}`, {
+    name: title.name,
+    productCount: title.products.length,
+    previousVerifiedAt: title.lastVerifiedAt?.toISOString() ?? null,
+  });
+
   redirect(`/${locale}/desk/titles`);
 }
 

@@ -37,6 +37,10 @@ body:has(.bn) header.site-header .nav button {
 body:has(.bn) header.site-header .nav button:hover { background: #3A3528 !important; }
 
 .bn {
+  /* Lock the editorial cream palette regardless of OS prefers-color-scheme.
+     globals.css flips --heading/--text/--muted to near-white in dark mode,
+     which would render unreadable on the cream paper background. */
+  color-scheme: light;
   --paper: #EDE8DB;
   --paper-2: #E4DECB;
   --ink: #14110C;
@@ -45,6 +49,18 @@ body:has(.bn) header.site-header .nav button:hover { background: #3A3528 !import
   --rule: #14110C;
   --hair: rgba(20,17,12,.18);
   --accent: #14110C;
+  /* Override the globals.css dark-mode tokens so any element that still
+     reads --heading/--text/--muted (h1/h2/h3, .lead, .muted) stays dark
+     ink on cream. */
+  --heading: #14110C;
+  --text: #14110C;
+  --muted: #6B6452;
+  --muted-strong: #3A3528;
+  --bg: #EDE8DB;
+  --surface: #EDE8DB;
+  --surface-2: #E4DECB;
+  --border: rgba(20,17,12,.18);
+  --border-strong: rgba(20,17,12,.32);
   --ok: #1F6F3E;
   --info: #3A3528;
   --warn: #8B5A00;
