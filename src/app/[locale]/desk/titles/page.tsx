@@ -1,6 +1,5 @@
 import { getTranslations } from "next-intl/server";
 import { redirect } from "next/navigation";
-import { MarketCode } from "@prisma/client";
 import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
 import { Link } from "@/i18n/navigation";
@@ -12,13 +11,26 @@ import {
 
 export const dynamic = "force-dynamic";
 
-const MARKET_CODES = Object.values(MarketCode);
+// All catalog countries — the NO/SE/DK Markets we sell into plus the
+// research-catalog imports from prisma/data/medier_alle.csv.
+const COUNTRY_CODES = [
+  "NO",
+  "SE",
+  "DK",
+  "FI",
+  "DE",
+  "AT",
+  "CH",
+  "UK",
+  "IE",
+] as const;
+type CountryCode = (typeof COUNTRY_CODES)[number];
 const STATUS_VALUES = ["all", "unverified", "active", "no-native"] as const;
 type StatusFilter = (typeof STATUS_VALUES)[number];
 
-function asMarket(value: string | undefined): MarketCode | undefined {
-  return value && (MARKET_CODES as string[]).includes(value)
-    ? (value as MarketCode)
+function asCountry(value: string | undefined): CountryCode | undefined {
+  return value && (COUNTRY_CODES as readonly string[]).includes(value)
+    ? (value as CountryCode)
     : undefined;
 }
 
@@ -46,12 +58,14 @@ export default async function DeskTitlesPage({
   const tMarket = await getTranslations({ locale, namespace: "market" });
   const td = await getTranslations({ locale, namespace: "desk" });
 
-  const market = asMarket(typeof sp.market === "string" ? sp.market : undefined);
+  const country = asCountry(
+    typeof sp.market === "string" ? sp.market : undefined,
+  );
   const status = asStatus(typeof sp.status === "string" ? sp.status : undefined);
 
   const titles = await prisma.title.findMany({
     where: {
-      ...(market ? { market: { code: market } } : {}),
+      ...(country ? { countryCode: country } : {}),
       ...(status === "unverified" ? { lastVerifiedAt: null } : {}),
       ...(status === "active" ? { active: true } : {}),
       ...(status === "no-native"
@@ -63,7 +77,11 @@ export default async function DeskTitlesPage({
       market: true,
       _count: { select: { products: true } },
     },
-    orderBy: [{ market: { code: "asc" } }, { publisher: { name: "asc" } }, { name: "asc" }],
+    orderBy: [
+      { countryCode: "asc" },
+      { publisher: { name: "asc" } },
+      { name: "asc" },
+    ],
   });
 
   const counts = await prisma.title.groupBy({
@@ -76,12 +94,13 @@ export default async function DeskTitlesPage({
     where: { lastVerifiedAt: null },
   });
 
-  // Group by market for display.
-  const byMarket = new Map<MarketCode, typeof titles>();
+  // Group by country for display. Uses countryCode (always set) rather
+  // than the optional Market FK so research-catalog titles render too.
+  const byCountry = new Map<string, typeof titles>();
   for (const tt of titles) {
-    const arr = byMarket.get(tt.market.code) ?? [];
+    const arr = byCountry.get(tt.countryCode) ?? [];
     arr.push(tt);
-    byMarket.set(tt.market.code, arr);
+    byCountry.set(tt.countryCode, arr);
   }
 
   return (
@@ -110,9 +129,9 @@ export default async function DeskTitlesPage({
       <form className="filters" method="get" style={{ marginTop: 16 }}>
         <div>
           <label htmlFor="market">{t("filters.market")}</label>
-          <select id="market" name="market" defaultValue={market ?? ""}>
+          <select id="market" name="market" defaultValue={country ?? ""}>
             <option value="">{t("filters.all")}</option>
-            {MARKET_CODES.map((m) => (
+            {COUNTRY_CODES.map((m) => (
               <option key={m} value={m}>
                 {tMarket(m)}
               </option>
@@ -137,7 +156,7 @@ export default async function DeskTitlesPage({
           {t("none")}
         </p>
       ) : (
-        Array.from(byMarket.entries()).map(([mc, mTitles]) => (
+        Array.from(byCountry.entries()).map(([mc, mTitles]) => (
           <div key={mc} style={{ marginTop: 24 }}>
             <h2>{tMarket(mc)}</h2>
             <div className="grid">

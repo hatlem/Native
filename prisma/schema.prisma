@@ -145,8 +145,12 @@ model Market {
 model Publisher {
   id            String   @id @default(cuid())
   name          String
-  marketId      String
-  market        Market   @relation(fields: [marketId], references: [id])
+  // Free-form ISO 3166-1 alpha-2 country code. Populated for every
+  // publisher (incl. those outside the NO/SE/DK Market scope — e.g.
+  // UK/DE/FI/IE/AT/CH research-catalog rows from the CSV import).
+  countryCode   String
+  marketId      String?
+  market        Market?  @relation(fields: [marketId], references: [id])
   contactEmail  String?
   paymentTerms  String? // e.g. "net 30"
   contractNotes String?
@@ -156,7 +160,8 @@ model Publisher {
   titles Title[]
   users  User[]
 
-  @@unique([marketId, name])
+  @@unique([countryCode, name])
+  @@index([marketId])
 }
 
 model Title {
@@ -165,18 +170,52 @@ model Title {
   slug          String    @unique
   publisherId   String
   publisher     Publisher @relation(fields: [publisherId], references: [id])
-  marketId      String
-  market        Market    @relation(fields: [marketId], references: [id])
+  // ISO 3166-1 alpha-2 country code, always set. The Market FK is only
+  // populated for NO/SE/DK (where we sell); other countries come from
+  // the research-catalog CSV import and have marketId = null.
+  countryCode   String
+  marketId      String?
+  market        Market?   @relation(fields: [marketId], references: [id])
   category      String // e.g. "general-news", "business", "lifestyle"
   audienceNote  String?
   monthlyReach  Int? // estimated readers / month
   websiteUrl    String?
   active        Boolean   @default(true)
   lastVerifiedAt DateTime?
+  // ---------- CSV import fields (research catalog) ----------
+  // Populated from prisma/data/medier_alle.csv. These are descriptive
+  // metadata used to power filtering/search in the catalog UI; they do
+  // not gate the commerce model (which still flows via Product/Spec).
+  type          String? // CSV "Type" — Avis, Magazine, Monthly mag, Digital, ...
+  frequency     String? // CSV "Frequency" — Daglig, Ukentlig, Monthly, ...
+  ownerGroup    String? // CSV "Owner (group)" — Polaris Media, Schibsted, ...
+  publisherName String? // CSV "Publisher" — raw publisher string (the FK Publisher is for commerce)
+  adSales       String? // CSV "Ad Sales" — who handles ad sales
+  locationNote  String? // CSV "Location / Note" — city or short note
+  circulation   Int?    // CSV "Circulation"
+  vertical      String? // CSV "Vertical" — News (National), B2B – Energy, ...
+  audience      String? // CSV "Audience" — General consumer, Regional consumer, ...
+  b2bB2c        String? // CSV "B2B/B2C"
+  reach         String? // CSV "Reach" — National / Regional / Local / Niche
+  format        String? // CSV "Format" — Print + Digital / Print / Digital
+  nativeFit     String? // CSV "Native fit" — High / Medium / Low
+  tags          String? // CSV "Tags" — comma-separated tag list
+  urlStatus     String? // CSV "URL_status" — VERIFIED / LIKELY_OK / UNVERIFIED
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
 
   products Product[]
+
+  @@index([countryCode])
+  @@index([type])
+  @@index([category])
+  @@index([vertical])
+  @@index([b2bB2c])
+  @@index([nativeFit])
+  @@index([format])
+  @@index([reach])
+  @@index([frequency])
+  @@index([ownerGroup])
 }
 
 model Product {
