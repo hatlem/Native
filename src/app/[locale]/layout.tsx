@@ -183,7 +183,7 @@ export default async function LocaleLayout({
                 </p>
               </div>
               <div className="col">
-                <h5>{tm("footerProduct")}</h5>
+                <h2 className="footer-col-head">{tm("footerProduct")}</h2>
                 <ul>
                   <li><Link href="/catalog">{t("catalog")}</Link></li>
                   <li><Link href="/recommend">{t("recommend")}</Link></li>
@@ -191,7 +191,7 @@ export default async function LocaleLayout({
                 </ul>
               </div>
               <div className="col">
-                <h5>{tm("footerSolutions")}</h5>
+                <h2 className="footer-col-head">{tm("footerSolutions")}</h2>
                 <ul>
                   <li><Link href="/for-advertisers">{tm("audAdvertiserTitle")}</Link></li>
                   <li><Link href="/for-agencies">{tm("audAgencyTitle")}</Link></li>
@@ -199,7 +199,7 @@ export default async function LocaleLayout({
                 </ul>
               </div>
               <div className="col">
-                <h5>{tm("footerCompany")}</h5>
+                <h2 className="footer-col-head">{tm("footerCompany")}</h2>
                 <ul>
                   <li><Link href="/about">{tm("footerAbout")}</Link></li>
                   <li>

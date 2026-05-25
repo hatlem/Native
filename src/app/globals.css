@@ -3267,7 +3267,8 @@ footer .container.footer-grid {
   padding-bottom: var(--s-6);
 }
 
-footer h5 {
+footer h5,
+footer .footer-col-head {
   font-family: var(--font-display);
   font-size: 0.78rem;
   font-weight: 700;
@@ -3275,6 +3276,7 @@ footer h5 {
   letter-spacing: 0.1em;
   color: var(--heading);
   margin: 0 0 var(--s-3);
+  line-height: 1.2;
 }
 
 footer .brand-block p {
