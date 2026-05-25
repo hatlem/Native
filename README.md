@@ -1,4 +1,4 @@
-# BeNative
+# ATNative
 
 Nordic marketplace for buying **native content** and **native advertising** in
 newspapers and magazines — transparent catalog + pricing, a managed buying desk,
@@ -33,13 +33,13 @@ The internal desk console (`/[locale]/desk`) requires a `DESK` /
 `SUPERADMIN` login; the publisher portal (`/[locale]/publisher`)
 requires a `PUBLISHER` login. The seed creates demo accounts:
 
-- Super admin: `superadmin@benative.example` / `benative-superadmin`
+- Super admin: `superadmin@atnative.com` / `atnative-superadmin`
   (gets the extra **Titles & magazines** review page at
   `/[locale]/desk/titles` — every Nordic magazine is seeded inactive so
   the super admin can check whether the publisher offers native and
   turn the ones that do into live catalog titles)
-- Desk: `desk@benative.example` / `benative-desk`
-- Publisher: `publisher@benative.example` / `benative-pub` (mapped to
+- Desk: `desk@atnative.com` / `atnative-desk`
+- Publisher: `publisher@atnative.com` / `atnative-pub` (mapped to
   the "Schibsted" publisher)
 
 Override via `SUPERADMIN_EMAIL` / `SUPERADMIN_PASSWORD`,

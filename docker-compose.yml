@@ -3,13 +3,13 @@ services:
     image: postgres:16
     restart: unless-stopped
     environment:
-      POSTGRES_USER: benative
-      POSTGRES_PASSWORD: benative
-      POSTGRES_DB: benative
+      POSTGRES_USER: atnative
+      POSTGRES_PASSWORD: atnative
+      POSTGRES_DB: atnative
     ports:
       - "5432:5432"
     volumes:
-      - benative_pgdata:/var/lib/postgresql/data
+      - atnative_pgdata:/var/lib/postgresql/data
 
 volumes:
-  benative_pgdata:
+  atnative_pgdata:

@@ -13,19 +13,19 @@ jobs:
       postgres:
         image: postgres:16
         env:
-          POSTGRES_USER: benative
-          POSTGRES_PASSWORD: benative
-          POSTGRES_DB: benative
+          POSTGRES_USER: atnative
+          POSTGRES_PASSWORD: atnative
+          POSTGRES_DB: atnative
         ports:
           - 5432:5432
         options: >-
-          --health-cmd "pg_isready -U benative"
+          --health-cmd "pg_isready -U atnative"
           --health-interval 10s
           --health-timeout 5s
           --health-retries 5
 
     env:
-      DATABASE_URL: "postgresql://benative:benative@127.0.0.1:5432/benative?schema=public"
+      DATABASE_URL: "postgresql://atnative:atnative@127.0.0.1:5432/atnative?schema=public"
       AUTH_SECRET: "ci-test-secret"
 
     steps:

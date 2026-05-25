@@ -1,11 +1,11 @@
-# BeNative — Platform Plan
+# ATNative — Platform Plan
 
 > A Nordic marketplace for buying **native content** and **native advertising** in
 > newspapers and magazines — with transparent pricing, a managed buying desk, and
 > an in-house content production service.
 >
 > Reference / inspiration: [SUNT](https://www.suntcontent.com/) (true native
-> distribution network). BeNative differs by being **buyer-first**: a discovery +
+> distribution network). ATNative differs by being **buyer-first**: a discovery +
 > price-transparency + managed-buying layer on top of publishers, including the
 > many that do **not** sell programmatically.
 
@@ -13,11 +13,11 @@
 
 ## 1. Executive Summary
 
-**What it is.** BeNative is a two-sided platform that makes it easy to discover,
+**What it is.** ATNative is a two-sided platform that makes it easy to discover,
 price, and buy native content placements and native ads across Nordic newspapers
-and magazines. Many publishers do not offer programmatic buying — BeNative
+and magazines. Many publishers do not offer programmatic buying — ATNative
 aggregates their offerings, shows comparable pricing and specs, and acts as a
-**managed buying desk** that purchases on the customer's behalf. BeNative also
+**managed buying desk** that purchases on the customer's behalf. ATNative also
 produces the content, so the advertiser gets a better, cheaper, higher-converting
 result.
 
@@ -82,12 +82,12 @@ build. We bring ready-to-publish, spec-compliant content and a single billing
 relationship."
 
 ### Positioning vs. alternatives
-| Alternative | Gap BeNative fills |
+| Alternative | Gap ATNative fills |
 |---|---|
-| SUNT / native distribution networks | They optimize *distribution* of native across a network. BeNative is *buyer-first discovery + price transparency + managed buying* across titles **including non-networked ones**, plus content production. |
-| Programmatic native (Outbrain/Taboola style) | Those are recommendation-widget/feed buys. BeNative targets **editorial in-title native content** that isn't programmatically buyable. |
-| Media agencies | Agencies negotiate per client. BeNative is a productized, transparent, repeatable layer; can be white-labeled to agencies. |
-| Direct to publisher | One title at a time, no comparability. BeNative is the aggregated, comparable view. |
+| SUNT / native distribution networks | They optimize *distribution* of native across a network. ATNative is *buyer-first discovery + price transparency + managed buying* across titles **including non-networked ones**, plus content production. |
+| Programmatic native (Outbrain/Taboola style) | Those are recommendation-widget/feed buys. ATNative targets **editorial in-title native content** that isn't programmatically buyable. |
+| Media agencies | Agencies negotiate per client. ATNative is a productized, transparent, repeatable layer; can be white-labeled to agencies. |
+| Direct to publisher | One title at a time, no comparability. ATNative is the aggregated, comparable view. |
 
 **Moat over time:** proprietary catalog + normalized pricing data, publisher
 contracts and rate access, content production playbooks per title, and
@@ -103,11 +103,11 @@ performance benchmarks.
    speed, reporting, possibly white-label. High volume.
 3. **Publisher ad/commercial team** — supplies inventory, rate cards, specs,
    availability; wants qualified demand and clean delivery.
-4. **BeNative buying desk (ops)** — internal; turns RFQs into bookings, manages
+4. **ATNative buying desk (ops)** — internal; turns RFQs into bookings, manages
    publisher comms, availability, and billing.
-5. **BeNative content team** — internal/freelance; produces articles, native ad
+5. **ATNative content team** — internal/freelance; produces articles, native ad
    creative; ensures per-publisher spec compliance.
-6. **BeNative admin** — manages catalog data, pricing rules, users, finance.
+6. **ATNative admin** — manages catalog data, pricing rules, users, finance.
 
 ---
 
@@ -222,7 +222,7 @@ Core entities (Prisma/Postgres):
   lead time, base/indicative price, currency, pricing model
   (`flat | cpm | cpc | package`), placement details.
 - **PriceRule** — modifiers: seasonality, volume tiers, market, negotiated
-  publisher rate, BeNative margin %.
+  publisher rate, ATNative margin %.
 - **Spec** — per-Product content/creative requirements (length, images,
   disclosure label, formatting, file specs) used for validation.
 - **Organization** — advertiser or agency; type, market, VAT id; agency may have
@@ -341,7 +341,7 @@ The catalog is the core asset and the hardest input — most pricing is not publ
 
 ## 12. Content Production Service (operational design)
 
-This is what lets BeNative deliver a "better deal" (better outcome + bundled
+This is what lets ATNative deliver a "better deal" (better outcome + bundled
 cost) and earns content margin.
 
 - **Capacity model:** small in-house editorial core + vetted freelancer pool;
