@@ -71,6 +71,11 @@ export async function markTitleNative(formData: FormData) {
   });
   if (!title) redirect(`/${locale}/desk/titles`);
 
+  // Activation creates products with currency + disclosure label inherited
+  // from the title's Market. Research-catalog titles (UK/DE/FI/IE/AT/CH)
+  // have no Market FK and can't be activated until they're assigned one.
+  if (!title.market) redirect(`/${locale}/desk/titles`);
+
   if (title._count.products === 0) {
     const reach = title.monthlyReach ?? 100_000;
     for (const bp of ACTIVATION_BLUEPRINT) {
@@ -125,7 +130,7 @@ export async function markTitleNative(formData: FormData) {
   });
   await recordAudit(userId, "title.mark_native", `Title:${title.id}`, {
     name: title.name,
-    market: title.marketId,
+    market: title.marketId ?? title.countryCode,
   });
   redirect(`/${locale}/desk/titles`);
 }

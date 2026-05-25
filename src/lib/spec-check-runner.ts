@@ -27,7 +27,7 @@ export async function runSpecCheckForAsset(assetId: string): Promise<void> {
     wordCountMin: product?.spec?.wordCountMin ?? null,
     wordCountMax: product?.spec?.wordCountMax ?? null,
     titleDisclosure: product?.spec?.disclosureLabel ?? null,
-    marketDisclosure: product?.title.market.disclosureLabel ?? null,
+    marketDisclosure: product?.title.market?.disclosureLabel ?? null,
   });
 
   await prisma.contentAsset.update({

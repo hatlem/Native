@@ -550,7 +550,13 @@
   "market": {
     "NO": "Norway",
     "SE": "Sweden",
-    "DK": "Denmark"
+    "DK": "Denmark",
+    "FI": "Finland",
+    "DE": "Germany",
+    "AT": "Austria",
+    "CH": "Switzerland",
+    "UK": "United Kingdom",
+    "IE": "Ireland"
   },
   "marketing": {
     "howCta": "How it works",

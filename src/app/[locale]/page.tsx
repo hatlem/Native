@@ -50,11 +50,15 @@ export default async function HomePage({
   const { locale } = await params;
   const t = await getTranslations({ locale, namespace: "landing" });
 
+  // The public marketing landing only features Nordic commerce inventory
+  // (titles with marketId set). Research-catalog rows from the CSV import
+  // (marketId = null) are excluded.
   const [sampleTitles, publishersRaw, totalActiveTitles, totalPublishers] =
     await Promise.all([
       prisma.title.findMany({
         where: {
           active: true,
+          marketId: { not: null },
           products: { some: { active: true, visibility: "INDICATIVE" } },
         },
         orderBy: [{ monthlyReach: "desc" }, { name: "asc" }],
@@ -71,18 +75,26 @@ export default async function HomePage({
         },
       }),
       prisma.publisher.findMany({
-        where: { titles: { some: { active: true } } },
+        where: {
+          marketId: { not: null },
+          titles: { some: { active: true, marketId: { not: null } } },
+        },
         include: {
           market: { select: { code: true } },
           titles: {
-            where: { active: true },
+            where: { active: true, marketId: { not: null } },
             select: { market: { select: { code: true } } },
           },
         },
       }),
-      prisma.title.count({ where: { active: true } }),
+      prisma.title.count({
+        where: { active: true, marketId: { not: null } },
+      }),
       prisma.publisher.count({
-        where: { titles: { some: { active: true } } },
+        where: {
+          marketId: { not: null },
+          titles: { some: { active: true, marketId: { not: null } } },
+        },
       }),
     ]);
 
@@ -91,7 +103,11 @@ export default async function HomePage({
   const topPublishers = publishersRaw
     .map((p) => {
       const markets = Array.from(
-        new Set(p.titles.map((t) => t.market.code.toLowerCase())),
+        new Set(
+          p.titles
+            .map((t) => t.market?.code.toLowerCase())
+            .filter((c): c is string => !!c),
+        ),
       ).sort();
       return {
         id: p.id,
@@ -334,7 +350,11 @@ export default async function HomePage({
                 const formatKey = product
                   ? PRODUCT_TYPE_TO_FORMAT_KEY[product.type]
                   : "fmtNativeArticle";
-                const marketCode = title.market.code.toLowerCase();
+                const marketCodeUpper =
+                  title.market?.code ?? title.countryCode;
+                const marketCode = marketCodeUpper.toLowerCase();
+                const currency =
+                  title.market?.currency ?? product?.currency ?? "";
                 return (
                   <tr
                     key={title.id}
@@ -351,7 +371,7 @@ export default async function HomePage({
                     </td>
                     <td>
                       <span className={`flag ${marketCode}`}></span>
-                      {title.market.code}
+                      {marketCodeUpper}
                     </td>
                     <td className="hide-md">
                       <span className="cat-tag">{t(`catalog.${formatKey}`)}</span>
@@ -362,7 +382,7 @@ export default async function HomePage({
                     </td>
                     <td className="num">
                       {indicative !== null
-                        ? formatMoney(indicative, title.market.currency, locale)
+                        ? formatMoney(indicative, currency, locale)
                         : "—"}
                     </td>
                   </tr>

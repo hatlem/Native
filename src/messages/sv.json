@@ -482,7 +482,13 @@
   "market": {
     "NO": "Norge",
     "SE": "Sverige",
-    "DK": "Danmark"
+    "DK": "Danmark",
+    "FI": "Finland",
+    "DE": "Tyskland",
+    "AT": "Österrike",
+    "CH": "Schweiz",
+    "UK": "Storbritannien",
+    "IE": "Irland"
   },
   "orders": {
     "eyebrow": "Beställningar",
@@ -698,5 +704,349 @@
     "contactTitle": "Hör av er",
     "contactBody": "Oavsett om ni vill planera en kampanj, bli partner som utgivare eller bara jämföra anteckningar om native — vi vill gärna höra från er.",
     "contactCta": "Mejla oss"
+  },
+  "publicNav": {
+    "product": {
+      "label": "Produkt",
+      "items": {
+        "catalog": {
+          "title": "Katalog",
+          "description": "Varje nordisk titel som erbjuder native — filtrera på marknad, format och målgrupp."
+        },
+        "recommend": {
+          "title": "Rekommendation",
+          "description": "Berätta budgeten — vi föreslår en titelmix."
+        },
+        "howItWorks": {
+          "title": "Så funkar det",
+          "description": "Från brief till publicerad artikel i fem steg."
+        }
+      },
+      "featured": {
+        "title": "Utforska katalogen",
+        "description": "Indikativt pris och räckvidd — utan säljsamtal."
+      }
+    },
+    "solutions": {
+      "label": "Lösningar",
+      "items": {
+        "advertisers": {
+          "title": "För annonsörer",
+          "description": "En katalog över alla nordiska titlar som erbjuder native."
+        },
+        "agencies": {
+          "title": "För byråer",
+          "description": "Flerkundsarbetsyta och en desk att luta sig mot."
+        },
+        "publishers": {
+          "title": "För utgivare",
+          "description": "Kvalificerad efterfrågan och färdigt innehåll."
+        }
+      },
+      "featured": {
+        "title": "Jämför titlar sida vid sida",
+        "description": "Specifikationer, pris och räckvidd på ett ställe."
+      }
+    },
+    "pricing": {
+      "label": "Priser"
+    },
+    "resources": {
+      "label": "Resurser",
+      "items": {
+        "howItWorks": {
+          "title": "Så funkar det",
+          "description": "Genomgång av brief, plan, offert, innehåll och go-live."
+        },
+        "security": {
+          "title": "Säkerhet",
+          "description": "Så skyddar vi kampanj- och kunddata."
+        },
+        "contact": {
+          "title": "Kontakt",
+          "description": "Prata med sälj, partnerskap eller support."
+        }
+      },
+      "featured": {
+        "title": "Bli partner",
+        "description": "Få in din titel på BeNative."
+      }
+    },
+    "company": {
+      "label": "Företag",
+      "items": {
+        "about": {
+          "title": "Om oss",
+          "description": "Varför vi finns och vilka vi tjänar."
+        },
+        "contact": {
+          "title": "Kontakt",
+          "description": "Nå rätt team."
+        },
+        "privacy": {
+          "title": "Integritet",
+          "description": "Så hanterar vi personuppgifter."
+        },
+        "terms": {
+          "title": "Villkor",
+          "description": "Marknadsplatsens användarvillkor."
+        }
+      },
+      "featured": {
+        "title": "Bli partner",
+        "description": "Distribuera native-efterfrågan till dina titlar."
+      }
+    },
+    "actions": {
+      "back": "Tillbaka",
+      "openSubmenu": "Öppna {label}-undermeny"
+    }
+  },
+  "pricing": {
+    "metaTitle": "Priser",
+    "eyebrow": "Priser",
+    "title": "Transparent prissättning för båda sidor av marknadsplatsen",
+    "lead": "Inga plattformsavgifter, inga minimum. Du betalar för placeringar och (valfritt) innehåll — till priser utgivarna sätter, med vår marginal synlig.",
+    "recommended": "Mest populär",
+    "plans": {
+      "selfServe": {
+        "name": "Självservice",
+        "tagline": "För annonsörer som vill boka fastpris-native direkt.",
+        "price": "Gratis att använda",
+        "priceNote": "Du betalar endast utgivarens pris i kassan.",
+        "feature1": "Bläddra i hela den nordiska katalogen",
+        "feature2": "Bygg planer och jämför titlar",
+        "feature3": "Boka fastpris-placeringar direkt",
+        "feature4": "Faktura i marknadens valuta",
+        "cta": "Skapa konto"
+      },
+      "managed": {
+        "name": "Hanterad desk",
+        "tagline": "För kampanjer som behöver RFQ, innehållsproduktion och en projektägare.",
+        "price": "10 % av media",
+        "priceNote": "Plus utgivarens pris. Innehåll prissätts per artikel.",
+        "feature1": "Allt i Självservice",
+        "feature2": "Desk hanterar RFQ och förhandling med utgivare",
+        "feature3": "Buntad innehållsproduktion till titel-specifikation",
+        "feature4": "En sammanslagen faktura över utgivare",
+        "cta": "Prata med desken"
+      },
+      "agency": {
+        "name": "Byrå",
+        "tagline": "För mediebyråer som hanterar kampanjer för flera kunder.",
+        "price": "Volymprissättning",
+        "priceNote": "Reducerad desk-avgift från första bokade planen.",
+        "feature1": "Flerkundsarbetsyta",
+        "feature2": "Byt mellan kunder med ett klick",
+        "feature3": "Per kund förfrågningar, offerter och fakturering",
+        "feature4": "Valfri white-label (tidig åtkomst)",
+        "cta": "Öppna en byråarbetsyta"
+      }
+    },
+    "feesTitle": "Så fungerar avgifterna",
+    "feesLead": "Vi visar vad vi tjänar på varje transaktion. Utgivarens priser är deras; marknadsplatsavgiften är vår.",
+    "feesColRole": "Roll",
+    "feesColFee": "Avgift",
+    "feesColNote": "Anmärkning",
+    "feesAdvRole": "Annonsör / Byrå",
+    "feesAdvFee": "10 % av mediaköp",
+    "feesAdvNote": "Slopas på fastpris-självservice-bokningar.",
+    "feesPubRole": "Utgivare",
+    "feesPubFee": "0 %",
+    "feesPubNote": "Du behåller 100 % av ditt rate-card-pris.",
+    "feesContentRole": "Innehållsproduktion",
+    "feesContentFee": "Per artikel",
+    "feesContentNote": "Offereras i förväg baserat på titel-specifikation och ordmängd.",
+    "faq1Q": "Finns det en lägsta nivå?",
+    "faq1A": "Nej. Du kan börja med en enda fastpris-placering och skala därifrån.",
+    "faq2Q": "Ser utgivarna er marginal?",
+    "faq2A": "Ja — prissättningen är helt transparent på båda sidor av marknadsplatsen.",
+    "faq3Q": "Vilka valutor fakturerar ni i?",
+    "faq3A": "NOK för Norge, SEK för Sverige, DKK för Danmark, med moms per marknad.",
+    "faq4Q": "Kan vi använda eget innehåll?",
+    "faq4A": "Ja. Skicka in ert utkast så spec-kollar vi det; eller låt desken producera från start till mål.",
+    "ctaTitle": "Redo att jämföra titlar?",
+    "ctaBody": "Katalogen visar indikativt pris för varje nordisk titel — inget säljsamtal krävs.",
+    "ctaContact": "Prata med oss"
+  },
+  "contact": {
+    "metaTitle": "Kontakta BeNative",
+    "eyebrow": "Kontakt",
+    "title": "Hör av er",
+    "lead": "Välj rätt kanal nedan, eller använd formuläret. Vi svarar på alla meddelanden inom en arbetsdag.",
+    "channels": {
+      "sales": {
+        "title": "Sälj och kampanjer",
+        "body": "Planera en kampanj eller få fast pris från desken."
+      },
+      "publishers": {
+        "title": "Utgivare och partnerskap",
+        "body": "Få in en titel, uppdatera rate card, diskutera partnerskap."
+      },
+      "support": {
+        "title": "Support",
+        "body": "Hjälp med kontot, en aktiv beställning eller faktura."
+      }
+    },
+    "formTitle": "Berätta vad ni behöver",
+    "formLead": "Ett kort meddelande räcker. Vi dirigerar till rätt person och följer upp via e-post.",
+    "bullet1": "Svar inom en arbetsdag",
+    "bullet2": "Nordiska tidszoner (CET/CEST)",
+    "bullet3": "Inga drip-kampanjer — lovat",
+    "pullTitle": "Föredrar e-post? ",
+    "pullBody": "Skicka en rad till hello@benative.example så tar vi det därifrån.",
+    "formCardTitle": "Skicka ett meddelande",
+    "formCardLead": "Vi hör av oss inom en arbetsdag.",
+    "name": "Namn",
+    "email": "Jobbmejl",
+    "org": "Företag (valfritt)",
+    "role": "Jag är",
+    "roleAdvertiser": "Annonsör",
+    "roleAgency": "Byrå",
+    "rolePublisher": "Utgivare",
+    "roleOther": "Något annat",
+    "message": "Meddelande",
+    "messagePlaceholder": "Vad försöker ni göra, och när?",
+    "submit": "Skicka meddelande",
+    "altPrefix": "Nyfiken på vilka som står bakom BeNative?",
+    "altLink": "Läs om oss →"
+  },
+  "security": {
+    "metaTitle": "Säkerhet",
+    "eyebrow": "Säkerhet",
+    "title": "Byggt för seriösa mediaköpare",
+    "lead": "Kampanjbudgetar och utgivares rate cards är känsliga. Vi behandlar dem därefter.",
+    "pillarsTitle": "Våra fyra pelare",
+    "pillar1Title": "Minsta privilegium som standard",
+    "pillar1Body": "Rollbaserad åtkomst avgränsar varje sida och varje databasfråga. Byråer ser bara sina kunder; utgivare ser bara sina titlar.",
+    "pillar2Title": "Dataminimering",
+    "pillar2Body": "Vi lagrar det vi behöver för att driva marknadsplatsen — och inget mer. Inga spårningspixlar, inga skuggprofiler, ingen berikning.",
+    "pillar3Title": "Kryptering i transit och i vila",
+    "pillar3Body": "TLS 1.2+ överallt. Databasskivor och backup krypterade i vila. Hemligheter ligger i en hanterad vault, inte i koden.",
+    "pillar4Title": "Spårbar i designen",
+    "pillar4Body": "Varje beställning, offert och innehållstillgång har en oföränderlig logg. Vi kan svara på vem som gjorde vad, när — och det kan ni också.",
+    "complianceTitle": "Compliance och hållning",
+    "complianceLead": "Vi är ett ungt företag. Vi är ärliga om vad som är live och vad som är på roadmappen.",
+    "colArea": "Område",
+    "colStatus": "Status",
+    "colNote": "Anmärkning",
+    "statusYes": "Live",
+    "statusEu": "Endast EU",
+    "statusRoadmap": "Roadmap",
+    "statusPlan": "Planerat",
+    "gdprArea": "GDPR",
+    "gdprNote": "DPA tillgängligt på begäran; vi är personuppgiftsansvariga för marknadsplatsdata.",
+    "dataResArea": "Dataresiliens",
+    "dataResNote": "All kunddata lagras i EU (Stockholm-regionen).",
+    "encryptionArea": "Kryptering",
+    "encryptionNote": "TLS 1.2+ i transit, AES-256 i vila, hanterad nyckelvault.",
+    "ssoArea": "SSO (SAML / OIDC)",
+    "ssoNote": "Tillgängligt på Hanterad och Byrå-planerna på begäran.",
+    "auditArea": "SOC 2 Type I",
+    "auditNote": "Målsatt sent 2026.",
+    "disclosureTitle": "Ansvarsfull rapportering",
+    "disclosureBody": "Hittade ni en sårbarhet? Vi förbinder oss att bekräfta inom 48 timmar, dela en åtgärdsplan inom fem arbetsdagar, och aldrig förfölja forskare som handlar i god tro.",
+    "disclosureMail": "Rapportera till",
+    "ctaTitle": "Prata med säkerhet",
+    "ctaBody": "Vi går gärna igenom specifika kontroller, delar DPA eller diskuterar upphandlingskrav.",
+    "ctaContact": "Kontakta oss"
+  },
+  "privacy": {
+    "metaTitle": "Integritet",
+    "eyebrow": "Integritet",
+    "title": "Integritetspolicy",
+    "lead": "Så samlar, använder och skyddar BeNative personuppgifter — på enkel svenska.",
+    "lastUpdated": "Senast uppdaterad: 22 maj 2026",
+    "controller": {
+      "title": "Vem är personuppgiftsansvarig",
+      "body": "BeNative AS är personuppgiftsansvarig för personuppgifter som behandlas via marknadsplatsen. Vi har bas i Norge och behandlar all data inom EU/EES."
+    },
+    "data": {
+      "title": "Vilka uppgifter vi samlar",
+      "body": "Kontodata (namn, jobbmejl, roll, organisation), marknadsplatsaktivitet (förfrågningar, beställningar, planer), och minimal telemetri som krävs för att driva tjänsten (inloggningar, felrapporter). Vi kör inga tredjeparts annons- eller beteendespårpixlar på våra marknadsföringssidor."
+    },
+    "purpose": {
+      "title": "Hur vi använder dem",
+      "body": "För att driva marknadsplatsen, dirigera förfrågningar mellan annonsörer och utgivare, producera fakturor, förhindra bedrägeri och förbättra produkten. Vi säljer inte personuppgifter."
+    },
+    "legal": {
+      "title": "Rättslig grund",
+      "body": "Avtalsuppfyllelse (kontoinnehavare), berättigat intresse (säkerhet, bedrägeriförebyggande, produktförbättring) och samtycke (valfritt nyhetsbrev)."
+    },
+    "retention": {
+      "title": "Hur länge vi sparar",
+      "body": "Kontodata så länge kontot finns; transaktionsdata i sju år (bokföringslag); telemetri aggregerat efter 90 dagar."
+    },
+    "sharing": {
+      "title": "Vem vi delar data med",
+      "body": "Utgivare ser köparorganisationen och orderdetaljer för beställningar placerade hos dem. Underbiträden (hosting, e-post, betalning) listas i vår DPA, alla EU-baserade eller med tillräckliga skyddsåtgärder."
+    },
+    "transfers": {
+      "title": "Internationella överföringar",
+      "body": "Kunddata lagras i EU. Alla tillfälliga överföringar utanför EU/EES använder Standard Contractual Clauses och en adekvansbedömning."
+    },
+    "rights": {
+      "title": "Era rättigheter",
+      "body": "Ni kan begära åtkomst, rättelse, radering eller export av era personuppgifter, och invända mot behandling som bygger på berättigat intresse. Kontakta privacy@benative.example för att utöva dessa rättigheter."
+    },
+    "cookies": {
+      "title": "Cookies",
+      "body": "Vi använder strikt nödvändiga cookies (session, CSRF) och, med samtycke, anonymiserad produktanalys. Inga annons- eller korsspårningscookies."
+    },
+    "changes": {
+      "title": "Ändringar av policyn",
+      "body": "Vi publicerar väsentliga ändringar här och meddelar kontoinnehavare via e-post. Senast uppdaterad-datumet ovan speglar alltid aktuell version."
+    },
+    "contactTitle": "Dataskyddskontakt",
+    "contactBody": "Frågor, förfrågningar eller klagomål — skriv till"
+  },
+  "terms": {
+    "metaTitle": "Användarvillkor",
+    "eyebrow": "Villkor",
+    "title": "Marknadsplatsens användarvillkor",
+    "lead": "Dessa villkor reglerar er användning av BeNative som annonsör, byrå eller utgivare.",
+    "lastUpdated": "Senast uppdaterad: 22 maj 2026",
+    "scope": {
+      "title": "Omfattning",
+      "body": "BeNative är en marknadsplats som kopplar annonsörer och byråer med tidnings- och magasin-utgivare som erbjuder native-innehåll och native-annonsering. Dessa villkor gäller för alla användare."
+    },
+    "accounts": {
+      "title": "Konton",
+      "body": "Ni måste ange korrekt registreringsinformation, hålla inloggningsuppgifter konfidentiella och meddela oss om obehörig åtkomst. Konton är knutna till en organisation; delning över organisationer kräver byråarbetsytan."
+    },
+    "roles": {
+      "title": "Roller och åtkomst",
+      "body": "Varje konto har en roll — annonsör, byrå, utgivare, desk eller admin — som bestämmer vilka data och åtgärder som är tillgängliga. Roller tilldelas av en admin i er organisation."
+    },
+    "orders": {
+      "title": "Beställningar",
+      "body": "Inlämning av en plan skapar en förfrågan. En förfrågan blir en bindande beställning först när en fast offert accepteras av köparen och bekräftas av utgivaren. Avbokningar följer varje utgivares ledtid."
+    },
+    "content": {
+      "title": "Innehåll",
+      "body": "Innehåll producerat via BeNative licensieras till annonsören för den bokade placeringen. Utgivare kan avvisa innehåll som inte uppfyller deras redaktionella standard, med skriftlig motivering."
+    },
+    "fees": {
+      "title": "Avgifter och betalning",
+      "body": "Prissättning enligt aktuell avgiftsplan (se /pricing). Fakturor utfärdas i köparens marknadsvaluta med moms per lokal lag. Betalningsvillkor är netto 30 dagar om inget annat avtalas."
+    },
+    "liability": {
+      "title": "Ansvar",
+      "body": "BeNative underlättar transaktionen men är inte utgivare av placerade artiklar. Varje part ansvarar för efterlevnad av annonser-, märknings- och konsumentskyddslag. Ansvar begränsas till avgifter betalda de senaste 12 månaderna."
+    },
+    "termination": {
+      "title": "Uppsägning",
+      "body": "Endera parten kan säga upp kontot med 30 dagars varsel. Vi kan stänga av eller avsluta konton som bryter mot villkoren, missbrukar marknadsplatsen eller inte betalar fakturor."
+    },
+    "law": {
+      "title": "Tillämplig lag",
+      "body": "Dessa villkor regleras av norsk lag. Tvister handläggs av Oslo tingsrätt, om inte tvingande konsumentskyddsregler i er jurisdiktion kräver annat."
+    },
+    "changes": {
+      "title": "Ändringar av villkoren",
+      "body": "Vi publicerar väsentliga ändringar här och meddelar kontoinnehavare via e-post minst 30 dagar innan de träder i kraft."
+    },
+    "contactTitle": "Juridisk kontakt",
+    "contactBody": "Frågor om dessa villkor — skriv till"
   }
 }

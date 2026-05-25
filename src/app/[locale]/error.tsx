@@ -2,6 +2,7 @@
 
 import { useEffect } from "react";
 import { useTranslations } from "next-intl";
+import { Link } from "@/i18n/navigation";
 
 export default function ErrorBoundary({
   error,
@@ -32,9 +33,9 @@ export default function ErrorBoundary({
         <button type="button" className="btn" onClick={reset}>
           {t("tryAgain")}
         </button>
-        <a href="/" className="btn secondary">
+        <Link href="/" className="btn secondary">
           {t("backHome")}
-        </a>
+        </Link>
       </div>
     </div>
   );

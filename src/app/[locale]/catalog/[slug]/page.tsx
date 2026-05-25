@@ -1,5 +1,6 @@
 import { getTranslations } from "next-intl/server";
 import { notFound } from "next/navigation";
+import type { MarketCode } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
 import { Link } from "@/i18n/navigation";
 import { indicativeFromRules, toRateRules, formatMoney } from "@/lib/money";
@@ -52,7 +53,7 @@ export default async function TitleDetailPage({
     url: `${siteBase}/${locale}/catalog/${title.slug}`,
     offers: {
       "@type": "AggregateOffer",
-      priceCurrency: title.market.currency,
+      priceCurrency: title.market?.currency ?? title.products[0]?.currency ?? "",
       offers: ldOffers,
     },
   };
@@ -64,7 +65,8 @@ export default async function TitleDetailPage({
   );
   const fromPrice = allPrices.length ? Math.min(...allPrices) : null;
   const currency =
-    title.products[0]?.currency ?? title.market.currency;
+    title.products[0]?.currency ?? title.market?.currency ?? "";
+  const marketCode = (title.market?.code ?? title.countryCode) as MarketCode;
 
   return (
     <>
@@ -87,7 +89,7 @@ export default async function TitleDetailPage({
       <header className="detail-head">
         <div>
           <div className="cluster tight" style={{ marginBottom: 10 }}>
-            <span className="tag">{tMarket(title.market.code)}</span>
+            <span className="tag">{tMarket(marketCode)}</span>
             {title.category ? <span className="tag">{title.category}</span> : null}
             {title.products.some((p) => p.visibility === "FIRM") ? (
               <span className="badge badge-info dotless">

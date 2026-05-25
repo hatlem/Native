@@ -190,8 +190,9 @@ export default async function CatalogPage({
             );
             const from = prices.length ? Math.min(...prices) : null;
             const currency =
-              title.products[0]?.currency ?? title.market.currency;
+              title.products[0]?.currency ?? title.market?.currency ?? "";
             const hasFirm = title.products.some((p) => p.visibility === "FIRM");
+            const marketCode = (title.market?.code ?? title.countryCode) as MarketCode;
 
             return (
               <Link
@@ -200,7 +201,7 @@ export default async function CatalogPage({
                 className="card hoverable title-card"
               >
                 <div className="title-card-head">
-                  <span className="tag">{tMarket(title.market.code)}</span>
+                  <span className="tag">{tMarket(marketCode)}</span>
                   {hasFirm ? (
                     <span className="badge badge-info dotless">
                       ⚡ {tf("badge")}

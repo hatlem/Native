@@ -1,4 +1,5 @@
 import { getTranslations } from "next-intl/server";
+import type { MarketCode } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
 import { Link } from "@/i18n/navigation";
 import { indicativeFromRules, toRateRules, formatMoney } from "@/lib/money";
@@ -88,7 +89,7 @@ export default async function ComparePage({
         <CompareRow label={t("rowMarket")}>
           {ordered.map((title) => (
             <span key={title.id} className="tag">
-              {tMarket(title.market.code)}
+              {tMarket((title.market?.code ?? title.countryCode) as MarketCode)}
             </span>
           ))}
         </CompareRow>
@@ -145,7 +146,7 @@ export default async function ComparePage({
               ),
             );
             const from = prices.length ? Math.min(...prices) : null;
-            const cur = title.products[0]?.currency ?? title.market.currency;
+            const cur = title.products[0]?.currency ?? title.market?.currency ?? "";
             return (
               <span key={title.id} className="price">
                 {from !== null ? formatMoney(from, cur, locale) : "—"}
