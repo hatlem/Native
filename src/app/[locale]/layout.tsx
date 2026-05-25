@@ -2,6 +2,7 @@ import type { ReactNode } from "react";
 import type { Metadata, Viewport } from "next";
 import { NextIntlClientProvider } from "next-intl";
 import { getMessages, getTranslations } from "next-intl/server";
+import { headers } from "next/headers";
 import { notFound } from "next/navigation";
 import { Inter } from "next/font/google";
 import { routing } from "@/i18n/routing";
@@ -113,6 +114,9 @@ export default async function LocaleLayout({
   const ta = await getTranslations({ locale, namespace: "auth" });
   const tm = await getTranslations({ locale, namespace: "marketing" });
   const session = await auth();
+  // Per-request CSP nonce minted by middleware.ts. Threaded into any
+  // inline <script>/<style> that the strict policy would otherwise block.
+  const nonce = (await headers()).get("x-nonce") ?? undefined;
 
   const audience = audienceFor(session);
   const nav = navItemsFor(audience, t);
@@ -126,7 +130,7 @@ export default async function LocaleLayout({
     <html lang={locale} className={inter.variable}>
       <body>
         <GtmNoscript />
-        <GtmScripts />
+        <GtmScripts nonce={nonce} />
         <NextIntlClientProvider messages={messages}>
           {signedIn ? (
             <NavShell
@@ -174,7 +178,7 @@ export default async function LocaleLayout({
             <div className="container footer-grid">
               <div className="brand-block">
                 <Link href="/" className="brand" aria-label={appName}>
-                  <span className="brand-mark" aria-hidden="true">BN</span>
+                  <span className="brand-mark" aria-hidden="true">AT</span>
                   <span>{appName}</span>
                 </Link>
                 <p>{tm("footerTagline")}</p>
@@ -204,7 +208,7 @@ export default async function LocaleLayout({
                 <ul>
                   <li><Link href="/about">{tm("footerAbout")}</Link></li>
                   <li>
-                    <a href="mailto:hello@benative.example">
+                    <a href="mailto:hello@atnative.com">
                       {tm("footerContact")}
                     </a>
                   </li>

@@ -1,7 +1,7 @@
 import { cookies } from "next/headers";
 import { prisma } from "@/lib/prisma";
 
-export const CLIENT_COOKIE = "benative_client";
+export const CLIENT_COOKIE = "atnative_client";
 
 export type Workspace = {
   userId: string;

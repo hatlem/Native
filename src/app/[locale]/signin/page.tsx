@@ -4,16 +4,17 @@ import { auth } from "@/auth";
 import { Link } from "@/i18n/navigation";
 import { landingForRole } from "@/lib/roles";
 import { authenticate } from "@/app/auth-actions";
+import { LandingShell } from "@/app/landing-shell";
 import { DemoChips, type DemoAccount } from "./demo-chips";
 
 export const dynamic = "force-dynamic";
 
 const DEMO_ACCOUNTS: DemoAccount[] = [
-  { key: "buyer", label: "Buyer", email: "buyer@benative.example", password: "benative-buyer" },
-  { key: "agency", label: "Agency", email: "agency@benative.example", password: "benative-agency" },
-  { key: "publisher", label: "Publisher", email: "publisher@benative.example", password: "benative-pub" },
-  { key: "desk", label: "Desk", email: "desk@benative.example", password: "benative-desk" },
-  { key: "superadmin", label: "Super admin", email: "superadmin@benative.example", password: "benative-superadmin" },
+  { key: "buyer", label: "Buyer", email: "buyer@atnative.com", password: "atnative-buyer" },
+  { key: "agency", label: "Agency", email: "agency@atnative.com", password: "atnative-agency" },
+  { key: "publisher", label: "Publisher", email: "publisher@atnative.com", password: "atnative-pub" },
+  { key: "desk", label: "Desk", email: "desk@atnative.com", password: "atnative-desk" },
+  { key: "superadmin", label: "Super admin", email: "superadmin@atnative.com", password: "atnative-superadmin" },
 ];
 
 export default async function SignInPage({
@@ -35,72 +36,74 @@ export default async function SignInPage({
   const showError = Boolean(sp.error);
 
   return (
-    <section className="auth-shell">
-      <div className="marketing">
-        <span className="eyebrow accent">{appName}</span>
-        <h1>{t("welcomeHeadline")}</h1>
-        <p className="lead">{t("welcomeLead")}</p>
-        <div className="pull">
-          <strong>{t("pullTitle")}</strong>
-          {t("pullBody")}
-        </div>
-      </div>
-
-      <div className="auth-card">
-        <div className="head">
-          <h2>{t("title")}</h2>
-          <p>{t("signinSubtitle")}</p>
+    <LandingShell locale={locale} screenLabel="Sign in">
+      <section className="auth-shell">
+        <div className="marketing">
+          <span className="eyebrow accent">{appName}</span>
+          <h1>{t("welcomeHeadline")}</h1>
+          <p className="lead">{t("welcomeLead")}</p>
+          <div className="pull">
+            <strong>{t("pullTitle")}</strong>
+            {t("pullBody")}
+          </div>
         </div>
 
-        {showError ? (
-          <div className="banner-error" role="alert">
-            <ErrorIcon />
-            <span>{t("failed")}</span>
+        <div className="auth-card">
+          <div className="head">
+            <h2>{t("title")}</h2>
+            <p>{t("signinSubtitle")}</p>
           </div>
-        ) : null}
 
-        <form action={authenticate} noValidate>
-          <input type="hidden" name="locale" value={locale} />
-          <div className="field">
-            <label htmlFor="email">{t("email")}</label>
-            <input
-              id="email"
-              name="email"
-              type="email"
-              autoComplete="email"
-              autoFocus
-              required
-            />
-          </div>
-          <div className="field">
-            <label htmlFor="password">{t("password")}</label>
-            <input
-              id="password"
-              name="password"
-              type="password"
-              autoComplete="current-password"
-              required
-            />
-          </div>
-          <div className="actions">
-            <button type="submit" className="btn block">
-              {t("submit")}
-            </button>
-          </div>
-        </form>
+          {showError ? (
+            <div className="banner-error" role="alert">
+              <ErrorIcon />
+              <span>{t("failed")}</span>
+            </div>
+          ) : null}
 
-        {/* Demo accounts are seeded with known-weak passwords; only expose
-            the chip helper outside production so credential-stuffing the
-            seeded accounts isn't documented on the production login page. */}
-        {process.env.NODE_ENV !== "production" ? (
-          <DemoChips label={t("demoLabel")} accounts={DEMO_ACCOUNTS} />
-        ) : null}
+          <form action={authenticate} noValidate>
+            <input type="hidden" name="locale" value={locale} />
+            <div className="field">
+              <label htmlFor="email">{t("email")}</label>
+              <input
+                id="email"
+                name="email"
+                type="email"
+                autoComplete="email"
+                autoFocus
+                required
+              />
+            </div>
+            <div className="field">
+              <label htmlFor="password">{t("password")}</label>
+              <input
+                id="password"
+                name="password"
+                type="password"
+                autoComplete="current-password"
+                required
+              />
+            </div>
+            <div className="actions">
+              <button type="submit" className="btn primary block">
+                {t("submit")}
+              </button>
+            </div>
+          </form>
 
-        <div className="alt">
-          {t("noAccount")} <Link href="/signup">{t("signup")}</Link>
+          {/* Demo accounts are seeded with known-weak passwords; only expose
+              the chip helper outside production so credential-stuffing the
+              seeded accounts isn't documented on the production login page. */}
+          {process.env.NODE_ENV !== "production" ? (
+            <DemoChips label={t("demoLabel")} accounts={DEMO_ACCOUNTS} />
+          ) : null}
+
+          <div className="alt">
+            {t("noAccount")} <Link href="/signup">{t("signup")}</Link>
+          </div>
         </div>
-      </div>
-    </section>
+      </section>
+    </LandingShell>
   );
 }
 

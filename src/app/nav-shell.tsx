@@ -148,7 +148,7 @@ export function NavShell({
       <header className="site-header">
         <div className="container">
           <Link href="/" className="brand" aria-label={brand}>
-            <span className="brand-mark" aria-hidden="true">BN</span>
+            <span className="brand-mark" aria-hidden="true">AT</span>
             <span>{brand}</span>
           </Link>
 
@@ -221,7 +221,7 @@ export function NavShell({
         <aside className="sheet" aria-label="Menu">
           <div className="head">
             <Link href="/" className="brand" onClick={closeDrawer}>
-              <span className="brand-mark" aria-hidden="true">BN</span>
+              <span className="brand-mark" aria-hidden="true">AT</span>
               <span>{brand}</span>
             </Link>
             <button

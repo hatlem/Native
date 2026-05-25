@@ -1,6 +1,6 @@
 import { cookies } from "next/headers";
 
-export const PLAN_COOKIE = "benative_plan";
+export const PLAN_COOKIE = "atnative_plan";
 
 export type BasketItem = { productId: string; quantity: number };
 

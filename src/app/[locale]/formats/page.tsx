@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { getTranslations } from "next-intl/server";
 import { ProductType } from "@prisma/client";
 import { Link } from "@/i18n/navigation";
-import { PageHeader, SectionHead } from "@/components";
+import { LandingShell } from "@/app/landing-shell";
 
 export async function generateMetadata({
   params,
@@ -34,106 +34,114 @@ export default async function FormatsPage({
   const tm = await getTranslations({ locale, namespace: "marketing" });
 
   return (
-    <>
-      <PageHeader
-        eyebrow={t("eyebrow")}
-        title={t("title")}
-        lead={t("lead")}
-      />
+    <LandingShell locale={locale} screenLabel="Formats">
+      <header className="page-hero">
+        <div className="wrap">
+          <span className="eyebrow accent">{t("eyebrow")}</span>
+          <h1>{t("title")}</h1>
+          <p className="lead">{t("lead")}</p>
+        </div>
+      </header>
 
       <section className="section">
-        <div className="format-list">
-          {FORMATS.map((f) => (
-            <article
-              key={f.slug}
-              id={f.slug}
-              className="format-card"
-            >
-              <header className="format-card-head">
-                <span className="eyebrow">{tType(f.key)}</span>
-                <h2>{t(`${f.slug}.title`)}</h2>
-                <p className="lead">{tType(`desc${f.key}`)}</p>
-              </header>
+        <div className="wrap">
+          <div className="format-list">
+            {FORMATS.map((f) => (
+              <article
+                key={f.slug}
+                id={f.slug}
+                className="format-card"
+              >
+                <header className="format-card-head">
+                  <span className="eyebrow">{tType(f.key)}</span>
+                  <h2>{t(`${f.slug}.title`)}</h2>
+                  <p className="lead">{tType(`desc${f.key}`)}</p>
+                </header>
 
-              <dl className="format-grid">
-                <div>
-                  <dt>{t("voice")}</dt>
-                  <dd>{t(`${f.slug}.voice`)}</dd>
-                </div>
-                <div>
-                  <dt>{t("brandPresence")}</dt>
-                  <dd>{t(`${f.slug}.brand`)}</dd>
-                </div>
-                <div>
-                  <dt>{t("readsLike")}</dt>
-                  <dd>{t(`${f.slug}.reads`)}</dd>
-                </div>
-                <div>
-                  <dt>{t("bestFor")}</dt>
-                  <dd>{t(`${f.slug}.bestFor`)}</dd>
-                </div>
-              </dl>
+                <dl className="format-grid">
+                  <div>
+                    <dt>{t("voice")}</dt>
+                    <dd>{t(`${f.slug}.voice`)}</dd>
+                  </div>
+                  <div>
+                    <dt>{t("brandPresence")}</dt>
+                    <dd>{t(`${f.slug}.brand`)}</dd>
+                  </div>
+                  <div>
+                    <dt>{t("readsLike")}</dt>
+                    <dd>{t(`${f.slug}.reads`)}</dd>
+                  </div>
+                  <div>
+                    <dt>{t("bestFor")}</dt>
+                    <dd>{t(`${f.slug}.bestFor`)}</dd>
+                  </div>
+                </dl>
 
-              <p className="format-rule">{t(`${f.slug}.rule`)}</p>
-            </article>
-          ))}
+                <p className="format-rule">{t(`${f.slug}.rule`)}</p>
+              </article>
+            ))}
+          </div>
         </div>
       </section>
 
       <section className="section">
-        <SectionHead
-          eyebrow={t("comparisonEyebrow")}
-          title={t("comparisonTitle")}
-        />
-        <div className="table-wrap responsive">
-          <table className="table compare-formats-table">
-            <thead>
-              <tr>
-                <th>{t("th.attribute")}</th>
-                {FORMATS.map((f) => (
-                  <th key={f.slug}>{tType(f.key)}</th>
-                ))}
-              </tr>
-            </thead>
-            <tbody>
-              {(["voice", "brand", "reads", "bestFor"] as const).map((row) => (
-                <tr key={row}>
-                  <td data-label={t("th.attribute")}>
-                    <strong>{t(`th.${row}`)}</strong>
-                  </td>
+        <div className="wrap">
+          <div className="section-head">
+            <div>
+              <span className="eyebrow">{t("comparisonEyebrow")}</span>
+              <h2>{t("comparisonTitle")}</h2>
+            </div>
+          </div>
+          <div className="table-wrap">
+            <table className="table compare-formats-table">
+              <thead>
+                <tr>
+                  <th>{t("th.attribute")}</th>
                   {FORMATS.map((f) => (
-                    <td
-                      key={f.slug}
-                      data-label={tType(f.key)}
-                      className="muted"
-                    >
-                      {t(`${f.slug}.${row}`)}
-                    </td>
+                    <th key={f.slug}>{tType(f.key)}</th>
                   ))}
                 </tr>
-              ))}
-            </tbody>
-          </table>
+              </thead>
+              <tbody>
+                {(["voice", "brand", "reads", "bestFor"] as const).map((row) => (
+                  <tr key={row}>
+                    <td>
+                      <strong>{t(`th.${row}`)}</strong>
+                    </td>
+                    {FORMATS.map((f) => (
+                      <td key={f.slug} className="muted">
+                        {t(`${f.slug}.${row}`)}
+                      </td>
+                    ))}
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
         </div>
       </section>
 
       <section className="section prose-section">
-        <h2>{t("disclosureTitle")}</h2>
-        <p className="prose">{t("disclosureBody")}</p>
-      </section>
-
-      <section className="section cta-block">
-        <h2>{t("ctaTitle")}</h2>
-        <p className="muted">{t("ctaBody")}</p>
-        <div className="hero-actions">
-          <Link href="/catalog" className="btn large">
-            {tm("browseCatalog")}
-          </Link>
-          <Link href="/contact" className="btn secondary large">
-            {t("ctaContact")}
-          </Link>
+        <div className="wrap">
+          <h2>{t("disclosureTitle")}</h2>
+          <p className="prose">{t("disclosureBody")}</p>
         </div>
       </section>
-    </>
+
+      <section className="cta-block">
+        <div className="wrap">
+          <h2>{t("ctaTitle")}</h2>
+          <p>{t("ctaBody")}</p>
+          <div className="hero-actions">
+            <Link href="/catalog" className="btn primary">
+              {tm("browseCatalog")} <span className="arrow">→</span>
+            </Link>
+            <Link href="/contact" className="btn secondary">
+              {t("ctaContact")}
+            </Link>
+          </div>
+        </div>
+      </section>
+    </LandingShell>
   );
 }

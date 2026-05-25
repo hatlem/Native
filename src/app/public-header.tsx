@@ -91,7 +91,7 @@ export function PublicHeader({ brand, authActions }: Props) {
       <header className="site-header public-header">
         <div className="container">
           <Link href="/" className="brand" aria-label={brand}>
-            <span className="brand-mark" aria-hidden="true">BN</span>
+            <span className="brand-mark" aria-hidden="true">AT</span>
             <span>{brand}</span>
           </Link>
 
@@ -174,7 +174,7 @@ export function PublicHeader({ brand, authActions }: Props) {
               </button>
             ) : (
               <Link href="/" className="brand" onClick={closeDrawer}>
-                <span className="brand-mark" aria-hidden="true">BN</span>
+                <span className="brand-mark" aria-hidden="true">AT</span>
                 <span>{brand}</span>
               </Link>
             )}
