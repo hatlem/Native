@@ -1,0 +1,11 @@
+// Shared design-system components — typed wrappers over the CSS classes
+// in globals.css. Prefer these over inlining the class names so we can
+// evolve the markup in one place.
+
+export { PageHeader } from "./page-header";
+export { Breadcrumb } from "./breadcrumb";
+export { SectionHead } from "./section-head";
+export { Kpi, KpiGrid } from "./kpi";
+export { ActionList, ActionListItem } from "./action-list";
+export { DetailHead, MetaRow } from "./detail-head";
+export { QuoteCard } from "./quote-card";

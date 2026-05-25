@@ -4,6 +4,14 @@ import { prisma } from "@/lib/prisma";
 import { Link } from "@/i18n/navigation";
 import { StatusBadge } from "@/app/status-badge";
 import { EmptyState } from "@/app/empty-state";
+import {
+  PageHeader,
+  SectionHead,
+  Kpi,
+  KpiGrid,
+  ActionList,
+  ActionListItem,
+} from "@/components";
 
 export const dynamic = "force-dynamic";
 
@@ -78,13 +86,13 @@ export default async function DeskListPage({
 
   return (
     <>
-      <header className="page-header">
-        <span className="eyebrow accent">{t("eyebrow")}</span>
-        <h1>{t("title")}</h1>
-        <p className="lead">{t("subtitle")}</p>
-      </header>
+      <PageHeader
+        eyebrow={t("eyebrow")}
+        title={t("title")}
+        lead={t("subtitle")}
+      />
 
-      <div className="kpi-grid">
+      <KpiGrid>
         <Kpi
           label={t("kpiAttention")}
           value={needsAttention}
@@ -97,13 +105,11 @@ export default async function DeskListPage({
           label={t("kpiQuotesOut")}
           value={quotedCount}
           delta={t("kpiQuotesOutSub")}
-          tone="neutral"
         />
         <Kpi
           label={t("kpiActiveOrders")}
           value={activeOrderCount}
           delta={t("kpiActiveOrdersSub")}
-          tone="neutral"
           ctaHref={activeOrderCount > 0 ? "/desk/orders" : undefined}
           ctaLabel={activeOrderCount > 0 ? to("orders") : undefined}
         />
@@ -117,20 +123,20 @@ export default async function DeskListPage({
             ctaLabel={pendingTitleCount > 0 ? tt("title") : undefined}
           />
         ) : null}
-      </div>
+      </KpiGrid>
 
       <section className="section" id="new-briefs">
-        <div className="section-head">
-          <div>
-            <span className="eyebrow">{t("sectionInbox")}</span>
-            <h2>{t("newBriefsTitle")}</h2>
-          </div>
-          {newBriefs.length > 0 ? (
-            <span className="muted">
-              {t("newBriefsCount", { count: submittedCount })}
-            </span>
-          ) : null}
-        </div>
+        <SectionHead
+          eyebrow={t("sectionInbox")}
+          title={t("newBriefsTitle")}
+          trailing={
+            newBriefs.length > 0 ? (
+              <span className="muted">
+                {t("newBriefsCount", { count: submittedCount })}
+              </span>
+            ) : null
+          }
+        />
         {newBriefs.length === 0 ? (
           <EmptyState
             title={t("noBriefs")}
@@ -140,63 +146,53 @@ export default async function DeskListPage({
             secondaryLabel={tr("title")}
           />
         ) : (
-          <div className="action-list">
+          <ActionList>
             {newBriefs.map((r) => (
-              <Link
+              <ActionListItem
                 key={r.id}
                 href={`/desk/${r.id}`}
-                className="item item-link"
-              >
-                <StatusBadge value={r.status} />
-                <div>
-                  <div className="title">{r.organization.name}</div>
-                  <div className="sub">
+                badge={<StatusBadge value={r.status} />}
+                title={r.organization.name}
+                sub={
+                  <>
                     {t("itemsAndAge", {
                       items: r.plan._count.items,
                       age: timeAgo(r.createdAt, locale),
                     })}
-                    {r.briefSummary ? ` · ${r.briefSummary.slice(0, 80)}${r.briefSummary.length > 80 ? "…" : ""}` : ""}
-                  </div>
-                </div>
-                <span className="chev" aria-hidden>→</span>
-              </Link>
+                    {r.briefSummary
+                      ? ` · ${r.briefSummary.slice(0, 80)}${r.briefSummary.length > 80 ? "…" : ""}`
+                      : ""}
+                  </>
+                }
+              />
             ))}
-          </div>
+          </ActionList>
         )}
       </section>
 
       <section className="section">
-        <div className="section-head">
-          <div>
-            <span className="eyebrow">{t("sectionWorking")}</span>
-            <h2>{t("workingOnTitle")}</h2>
-          </div>
-        </div>
+        <SectionHead
+          eyebrow={t("sectionWorking")}
+          title={t("workingOnTitle")}
+        />
         {activeRequests.length === 0 ? (
           <p className="muted">{t("nothingActive")}</p>
         ) : (
-          <div className="action-list">
+          <ActionList>
             {activeRequests.map((r) => (
-              <Link
+              <ActionListItem
                 key={r.id}
                 href={`/desk/${r.id}`}
-                className="item item-link"
-              >
-                <StatusBadge value={r.status} />
-                <div>
-                  <div className="title">{r.organization.name}</div>
-                  <div className="sub">
-                    {t("itemsQuotesAge", {
-                      items: r.plan._count.items,
-                      quotes: r._count.quotes,
-                      age: timeAgo(r.updatedAt, locale),
-                    })}
-                  </div>
-                </div>
-                <span className="chev" aria-hidden>→</span>
-              </Link>
+                badge={<StatusBadge value={r.status} />}
+                title={r.organization.name}
+                sub={t("itemsQuotesAge", {
+                  items: r.plan._count.items,
+                  quotes: r._count.quotes,
+                  age: timeAgo(r.updatedAt, locale),
+                })}
+              />
             ))}
-          </div>
+          </ActionList>
         )}
       </section>
 
@@ -222,34 +218,5 @@ export default async function DeskListPage({
         </div>
       </section>
     </>
-  );
-}
-
-function Kpi({
-  label,
-  value,
-  delta,
-  tone,
-  ctaHref,
-  ctaLabel,
-}: {
-  label: string;
-  value: number;
-  delta?: string;
-  tone?: "warn" | "neutral";
-  ctaHref?: string;
-  ctaLabel?: string;
-}) {
-  return (
-    <div className={`kpi ${tone === "warn" ? "kpi-warn" : ""}`}>
-      <div className="label">{label}</div>
-      <div className="value">{value}</div>
-      {delta ? <div className="delta">{delta}</div> : null}
-      {ctaHref && ctaLabel ? (
-        <Link href={ctaHref} className="cta">
-          {ctaLabel} →
-        </Link>
-      ) : null}
-    </div>
   );
 }

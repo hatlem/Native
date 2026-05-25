@@ -8,6 +8,13 @@ import { Link } from "@/i18n/navigation";
 import { formatMoney } from "@/lib/money";
 import { acceptQuote } from "@/app/actions";
 import { StatusBadge } from "@/app/status-badge";
+import {
+  Breadcrumb,
+  DetailHead,
+  MetaRow,
+  SectionHead,
+  QuoteCard,
+} from "@/components";
 
 export const dynamic = "force-dynamic";
 
@@ -19,7 +26,6 @@ export default async function RequestPage({
   const { locale, id } = await params;
   const t = await getTranslations({ locale, namespace: "requests" });
   const tType = await getTranslations({ locale, namespace: "productType" });
-  const tNav = await getTranslations({ locale, namespace: "nav" });
   const tp = await getTranslations({ locale, namespace: "production" });
   const ti = await getTranslations({ locale, namespace: "invoice" });
 
@@ -73,11 +79,7 @@ export default async function RequestPage({
 
   return (
     <>
-      <nav className="breadcrumb">
-        <Link href="/requests" className="small-link">
-          ← {t("listTitle")}
-        </Link>
-      </nav>
+      <Breadcrumb href="/requests">{t("listTitle")}</Breadcrumb>
 
       <DataLayerEvent event="rfq_submitted" id={request.id} />
       {order ? (
@@ -89,41 +91,27 @@ export default async function RequestPage({
         />
       ) : null}
 
-      <header className="detail-head">
-        <div>
-          <span className="eyebrow accent">{t("eyebrow")}</span>
-          <h1>{t("title")} · {request.organization.name}</h1>
-          <p className="lead">{request.plan.name}</p>
-        </div>
-        <aside className="detail-meta">
-          <div className="meta-row">
-            <span className="muted small">{t("status")}</span>
-            <span className="value">
+      <DetailHead
+        eyebrow={t("eyebrow")}
+        title={`${t("title")} · ${request.organization.name}`}
+        lead={request.plan.name}
+        meta={
+          <>
+            <MetaRow label={t("status")}>
               <StatusBadge value={request.status} />
-            </span>
-          </div>
-          <div className="meta-row">
-            <span className="muted small">{t("items")}</span>
-            <span className="value">{request.plan.items.length}</span>
-          </div>
-          {quote ? (
-            <div className="meta-row">
-              <span className="muted small">{t("total")}</span>
-              <span className="value">
+            </MetaRow>
+            <MetaRow label={t("items")}>{request.plan.items.length}</MetaRow>
+            {quote ? (
+              <MetaRow label={t("total")}>
                 {formatMoney(Number(quote.total), quote.currency, locale)}
-              </span>
-            </div>
-          ) : null}
-        </aside>
-      </header>
+              </MetaRow>
+            ) : null}
+          </>
+        }
+      />
 
       <section className="section">
-        <div className="section-head">
-          <div>
-            <span className="eyebrow">{t("itemsEyebrow")}</span>
-            <h2>{t("items")}</h2>
-          </div>
-        </div>
+        <SectionHead eyebrow={t("itemsEyebrow")} title={t("items")} />
         <div className="grid">
           {request.plan.items.map((item) => {
             const p = byId.get(item.productId);
@@ -148,92 +136,95 @@ export default async function RequestPage({
         </section>
       ) : (
         <section className="section">
-          <div className="section-head">
-            <div>
-              <span className="eyebrow">{t("quoteEyebrow")}</span>
-              <h2>{t("quote")}</h2>
-            </div>
-            {quote.validUntil ? (
-              <span className="muted small">
-                {t("validUntil")}: {quote.validUntil.toISOString().slice(0, 10)}
-              </span>
-            ) : null}
-          </div>
-          <article className="card quote-card">
-            <div className="quote-lines">
-              {quote.lines.map((l) => (
-                <div key={l.id} className="quote-line">
-                  <span>
-                    {l.description} <span className="muted">× {l.quantity}</span>
-                  </span>
-                  <span className="num">
-                    {formatMoney(Number(l.lineTotal), quote.currency, locale)}
-                  </span>
+          <SectionHead
+            eyebrow={t("quoteEyebrow")}
+            title={t("quote")}
+            trailing={
+              quote.validUntil ? (
+                <span className="muted small">
+                  {t("validUntil")}:{" "}
+                  {quote.validUntil.toISOString().slice(0, 10)}
+                </span>
+              ) : null
+            }
+          />
+          <QuoteCard
+            lines={quote.lines.map((l) => ({
+              description: l.description,
+              meta: `× ${l.quantity}`,
+              amount: formatMoney(
+                Number(l.lineTotal),
+                quote.currency,
+                locale,
+              ),
+            }))}
+            rows={[
+              {
+                label: t("subtotal"),
+                amount: formatMoney(
+                  Number(quote.subtotal),
+                  quote.currency,
+                  locale,
+                ),
+              },
+              {
+                label: `${t("vat")} (${Number(quote.vatPct)}%)`,
+                amount: formatMoney(
+                  Number(quote.total) - Number(quote.subtotal),
+                  quote.currency,
+                  locale,
+                ),
+              },
+              {
+                label: t("total"),
+                amount: formatMoney(
+                  Number(quote.total),
+                  quote.currency,
+                  locale,
+                ),
+                isTotal: true,
+              },
+            ]}
+            footer={
+              order ? (
+                <div className="banner-success" role="status">
+                  ✓ {t("accepted")} — {t("orderStatus")}:{" "}
+                  <StatusBadge value={order.status} />
                 </div>
-              ))}
-            </div>
-            <div className="quote-totals">
-              <div className="quote-row">
-                <span className="muted">{t("subtotal")}</span>
-                <span className="num">
-                  {formatMoney(Number(quote.subtotal), quote.currency, locale)}
-                </span>
-              </div>
-              <div className="quote-row">
-                <span className="muted">
-                  {t("vat")} ({Number(quote.vatPct)}%)
-                </span>
-                <span className="num">
-                  {formatMoney(
-                    Number(quote.total) - Number(quote.subtotal),
-                    quote.currency,
-                    locale,
-                  )}
-                </span>
-              </div>
-              <div className="quote-row total">
-                <span>{t("total")}</span>
-                <span className="num">
-                  {formatMoney(Number(quote.total), quote.currency, locale)}
-                </span>
-              </div>
-            </div>
-            {order ? (
-              <div className="banner-success" role="status">
-                ✓ {t("accepted")} — {t("orderStatus")}:{" "}
-                <StatusBadge value={order.status} />
-              </div>
-            ) : (
-              <form action={acceptQuote} className="quote-cta">
-                <input type="hidden" name="locale" value={locale} />
-                <input type="hidden" name="quoteId" value={quote.id} />
-                <button type="submit" className="btn large">
-                  {t("accept")}
-                </button>
-              </form>
-            )}
-          </article>
+              ) : (
+                <form action={acceptQuote} className="quote-cta">
+                  <input type="hidden" name="locale" value={locale} />
+                  <input type="hidden" name="quoteId" value={quote.id} />
+                  <button type="submit" className="btn large">
+                    {t("accept")}
+                  </button>
+                </form>
+              )
+            }
+          />
         </section>
       )}
 
       {order ? (
         <section className="section">
-          <div className="section-head">
-            <div>
-              <span className="eyebrow">{t("orderEyebrow")}</span>
-              <h2>
+          <SectionHead
+            eyebrow={t("orderEyebrow")}
+            title={
+              <>
                 {t("order")} <StatusBadge value={order.status} />
-              </h2>
-            </div>
-            {orderInvoice ? (
-              <Link
-                href={`/invoices/${orderInvoice.id}`}
-                className="btn small secondary"
-              >
-                {ti("title")} →
-              </Link>
-            ) : null}
-          </div>
+              </>
+            }
+            trailing={
+              orderInvoice ? (
+                <Link
+                  href={`/invoices/${orderInvoice.id}`}
+                  className="btn small secondary"
+                >
+                  {ti("title")} →
+                </Link>
+              ) : null
+            }
+          />
           <div className="grid">
             {order.lines.map((line) => {
               const p = byId.get(line.productId);
