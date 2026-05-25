@@ -5,6 +5,9 @@ import { landingForRole } from "./roles";
 test("landingForRole routes desk roles to the console", () => {
   assert.equal(landingForRole("DESK", "en"), "/en/desk");
   assert.equal(landingForRole("SUPERADMIN", "no"), "/no/desk");
+  // CONTENT (freelance writers) also lands on the desk console —
+  // they need the asset queue + saveDraft + spec-check that lives there.
+  assert.equal(landingForRole("CONTENT", "sv"), "/sv/desk");
 });
 
 test("landingForRole routes publishers to the portal", () => {

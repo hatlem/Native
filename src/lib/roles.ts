@@ -10,6 +10,9 @@ export function landingForRole(
       return `/${locale}/publisher`;
     case "DESK":
     case "SUPERADMIN":
+    case "CONTENT":
+      // Writers land on the desk console — same surface, narrower
+      // action gating (see desk-actions.requireDeskOrContent).
       return `/${locale}/desk`;
     default:
       return `/${locale}/catalog`;

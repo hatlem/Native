@@ -5,12 +5,14 @@ import { Link } from "@/i18n/navigation";
 import { formatMoney } from "@/lib/money";
 import {
   advanceOrder,
+  cancelOrder,
   saveDraft,
   runSpecCheck,
   setAssetStatus,
   issueInvoice,
 } from "@/app/desk-actions";
 import { StatusBadge } from "@/app/status-badge";
+import { canCancelOrder, cancelBlockReason } from "@/lib/cancellation";
 
 export const dynamic = "force-dynamic";
 
@@ -18,10 +20,14 @@ const NON_ADVANCEABLE = ["COMPLETED", "INVOICED", "CANCELLED"];
 
 export default async function DeskOrderPage({
   params,
+  searchParams,
 }: {
   params: Promise<{ locale: string; orderId: string }>;
+  searchParams: Promise<Record<string, string | string[] | undefined>>;
 }) {
   const { locale, orderId } = await params;
+  const sp = await searchParams;
+  const cancelError = typeof sp.cancel === "string" ? sp.cancel : undefined;
   const t = await getTranslations({ locale, namespace: "order" });
   const tp = await getTranslations({ locale, namespace: "production" });
   const tType = await getTranslations({ locale, namespace: "productType" });
@@ -109,9 +115,73 @@ export default async function DeskOrderPage({
                 {t("viewInvoice")}
               </Link>
             ) : null}
+            {canCancelOrder(order.status) ? (
+              <details className="spec-details">
+                <summary>
+                  <span className="btn secondary block">
+                    {t("cancelButton")}
+                  </span>
+                </summary>
+                <form action={cancelOrder} className="product-form">
+                  <input type="hidden" name="locale" value={locale} />
+                  <input type="hidden" name="orderId" value={order.id} />
+                  <h4 style={{ margin: "12px 0 4px" }}>{t("cancelTitle")}</h4>
+                  <p className="muted small">{t("cancelHint")}</p>
+                  <div className="field">
+                    <label htmlFor={`cancel-reason-${order.id}`}>
+                      {t("cancelReasonLabel")}
+                    </label>
+                    <textarea
+                      id={`cancel-reason-${order.id}`}
+                      name="reason"
+                      rows={4}
+                      required
+                      placeholder={t("cancelReasonPlaceholder")}
+                    />
+                  </div>
+                  <div className="actions">
+                    <button type="submit" className="btn block">
+                      {t("cancelSubmit")}
+                    </button>
+                  </div>
+                </form>
+              </details>
+            ) : order.status !== "CANCELLED" ? (
+              <p className="muted small">
+                {t("cancelBlocked")} {cancelBlockReason(order.status)}
+              </p>
+            ) : null}
           </div>
         </aside>
       </header>
+
+      {cancelError ? (
+        <div className="banner-error" role="alert">
+          <strong>{t("cancelError")}:</strong> {cancelError}
+        </div>
+      ) : null}
+
+      {order.status === "CANCELLED" && order.cancelledAt ? (
+        <section className="cancelled-summary">
+          <h2>{t("cancelledAtLabel")}</h2>
+          <dl className="spec-grid">
+            <dt>{t("cancelledAtLabel")}</dt>
+            <dd>{order.cancelledAt.toISOString().slice(0, 16).replace("T", " ")}</dd>
+            {order.cancelledBy ? (
+              <>
+                <dt>{t("cancelledByLabel")}</dt>
+                <dd>{order.cancelledBy}</dd>
+              </>
+            ) : null}
+            {order.cancelReason ? (
+              <>
+                <dt>{t("cancelledReasonLabel")}</dt>
+                <dd>{order.cancelReason}</dd>
+              </>
+            ) : null}
+          </dl>
+        </section>
+      ) : null}
 
       <section className="section">
         <div className="section-head">

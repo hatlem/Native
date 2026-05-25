@@ -46,6 +46,35 @@ async function requireDesk(locale: string): Promise<string> {
   return session.user.id;
 }
 
+// Looser gate for the content-production touchpoints (saveDraft,
+// runSpecCheck, setAssetStatus → IN_REVIEW). Lets writers contracted
+// under the CONTENT role do their job without elevating them to the
+// full desk surface. Commercial decisions (advanceOrder, issueInvoice,
+// cancelOrder) still require requireDesk.
+async function requireDeskOrContent(
+  locale: string,
+): Promise<{ userId: string; role: "DESK" | "CONTENT" | "SUPERADMIN" }> {
+  const session = await auth();
+  const role = session?.user?.role;
+  if (
+    !session?.user ||
+    (role !== "DESK" && role !== "CONTENT" && role !== "SUPERADMIN")
+  ) {
+    redirect(`/${locale}/signin`);
+  }
+  return {
+    userId: session.user.id,
+    role: role as "DESK" | "CONTENT" | "SUPERADMIN",
+  };
+}
+
+// What status transitions the CONTENT role is allowed to invoke from
+// setAssetStatus. CONTENT hands a draft to the desk for review; it
+// never approves or finalises (those gates belong to the buyer + desk).
+const CONTENT_ASSET_TARGETS: ReadonlySet<ContentAssetStatus> = new Set([
+  ContentAssetStatus.IN_REVIEW,
+]);
+
 export async function advanceOrder(formData: FormData) {
   const locale = field(formData, "locale") || "en";
   const orderId = field(formData, "orderId");
@@ -79,7 +108,7 @@ export async function saveDraft(formData: FormData) {
   const orderLineId = field(formData, "orderLineId");
   const orderId = field(formData, "orderId");
   const body = field(formData, "body");
-  const userId = await requireDesk(locale);
+  const { userId } = await requireDeskOrContent(locale);
 
   const brief = await prisma.contentBrief.findUnique({
     where: { orderLineId },
@@ -108,7 +137,7 @@ export async function runSpecCheck(formData: FormData) {
   const locale = field(formData, "locale") || "en";
   const assetId = field(formData, "assetId");
   const orderId = field(formData, "orderId");
-  const userId = await requireDesk(locale);
+  const { userId } = await requireDeskOrContent(locale);
 
   await runSpecCheckForAsset(assetId);
   await recordAudit(userId, "asset.spec_check", `ContentAsset:${assetId}`);
@@ -121,7 +150,13 @@ export async function setAssetStatus(formData: FormData) {
   const assetId = field(formData, "assetId");
   const orderId = field(formData, "orderId");
   const target = field(formData, "target") as ContentAssetStatus;
-  const userId = await requireDesk(locale);
+  const { userId, role } = await requireDeskOrContent(locale);
+
+  // Writers can only hand a draft off for review. APPROVED / FINAL /
+  // CHANGES_REQUESTED stay with the desk + buyer.
+  if (role === "CONTENT" && !CONTENT_ASSET_TARGETS.has(target)) {
+    redirect(`/${locale}/desk/orders/${orderId}`);
+  }
 
   if (ASSET_TARGETS.includes(target)) {
     const asset = await prisma.contentAsset.findUnique({

@@ -441,7 +441,18 @@
     "kpiCompleted": "Avslutad",
     "listEyebrow": "Alla ordrar",
     "listHeading": "Orderpipeline",
-    "totalCount": "{count, plural, =0 {0 ordrar} =1 {1 order} other {# ordrar}}"
+    "totalCount": "{count, plural, =0 {0 ordrar} =1 {1 order} other {# ordrar}}",
+    "cancelButton": "Cancel order",
+    "cancelTitle": "Cancel this order",
+    "cancelHint": "Add a clear reason — it is recorded in the audit log and shown to the buyer and publisher.",
+    "cancelReasonLabel": "Reason",
+    "cancelReasonPlaceholder": "e.g. Buyer pulled out; or publisher editorial veto on the scheduled draft.",
+    "cancelSubmit": "Confirm cancellation",
+    "cancelBlocked": "This order can no longer be cancelled.",
+    "cancelError": "Cancellation refused",
+    "cancelledAtLabel": "Cancelled",
+    "cancelledByLabel": "By",
+    "cancelledReasonLabel": "Reason"
   },
   "production": {
     "brief": "Brief",
@@ -460,7 +471,15 @@
     "saveDraft": "Spara utkast",
     "history": "Versionshistorik",
     "composeNew": "Skriv en ny version",
-    "draftPlaceholder": "Klistra in eller skriv det nya utkastet här…"
+    "draftPlaceholder": "Klistra in eller skriv det nya utkastet här…",
+    "vetoButton": "Editorial veto",
+    "vetoTitle": "Reject this draft",
+    "vetoHint": "Use only for hard editorial rejection. For tweaks, the desk has the soft \"Request changes\" path.",
+    "vetoReasonLabel": "Reason",
+    "vetoReasonPlaceholder": "e.g. Case studies read as sponsor pitch — violates our editorial standard for annoncørbetalt content.",
+    "vetoSubmit": "Confirm rejection",
+    "vetoError": "Rejection refused",
+    "retractedLabel": "Retracted"
   },
   "invoice": {
     "title": "Faktura",

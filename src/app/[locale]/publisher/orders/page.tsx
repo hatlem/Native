@@ -4,9 +4,10 @@ import { BookingStatus } from "@prisma/client";
 import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
 import { Link } from "@/i18n/navigation";
-import { updateBooking } from "@/app/publisher-actions";
+import { updateBooking, rejectAsset } from "@/app/publisher-actions";
 import { StatusBadge } from "@/app/status-badge";
 import { EmptyState } from "@/app/empty-state";
+import { canRetractAsset } from "@/lib/cancellation";
 
 export const dynamic = "force-dynamic";
 
@@ -14,12 +15,17 @@ const BOOKING_STATUSES = Object.values(BookingStatus);
 
 export default async function PublisherOrdersPage({
   params,
+  searchParams,
 }: {
   params: Promise<{ locale: string }>;
+  searchParams: Promise<Record<string, string | string[] | undefined>>;
 }) {
   const { locale } = await params;
+  const sp = await searchParams;
+  const vetoError = typeof sp.veto === "string" ? sp.veto : undefined;
   const t = await getTranslations({ locale, namespace: "publisher" });
   const tType = await getTranslations({ locale, namespace: "productType" });
+  const tp = await getTranslations({ locale, namespace: "production" });
 
   const session = await auth();
   const me = await prisma.user.findUnique({
@@ -46,7 +52,15 @@ export default async function PublisherOrdersPage({
     ? await prisma.orderLine.findMany({
         where: { productId: { in: productIds } },
         orderBy: { id: "desc" },
-        include: { order: true, booking: true },
+        include: {
+          order: true,
+          booking: true,
+          brief: {
+            include: {
+              assets: { orderBy: { version: "desc" }, take: 1 },
+            },
+          },
+        },
       })
     : [];
 
@@ -87,6 +101,12 @@ export default async function PublisherOrdersPage({
             <div className="value">{liveCount}</div>
             <div className="delta">{t("kpiLiveSub")}</div>
           </div>
+        </div>
+      ) : null}
+
+      {vetoError ? (
+        <div className="banner-error" role="alert">
+          <strong>{tp("vetoError")}:</strong> {vetoError}
         </div>
       ) : null}
 
@@ -160,6 +180,56 @@ export default async function PublisherOrdersPage({
                   ) : (
                     <p className="muted">{t("noBooking")}</p>
                   )}
+
+                  {/* Editorial-veto control — only renders if a draft
+                      exists and is in a state the publisher is still
+                      allowed to retract. Distinct from the desk-side
+                      "request changes" soft path: this is a hard
+                      rejection that flips ContentAsset → RETRACTED. */}
+                  {line.brief?.assets[0] &&
+                  canRetractAsset(line.brief.assets[0].status) ? (
+                    <details className="spec-details veto-block">
+                      <summary>
+                        <span className="btn small ghost">
+                          {tp("vetoButton")}
+                        </span>
+                      </summary>
+                      <form action={rejectAsset} className="product-form">
+                        <input type="hidden" name="locale" value={locale} />
+                        <input
+                          type="hidden"
+                          name="assetId"
+                          value={line.brief.assets[0].id}
+                        />
+                        <h4 style={{ margin: "12px 0 4px" }}>
+                          {tp("vetoTitle")}
+                        </h4>
+                        <p className="muted small">{tp("vetoHint")}</p>
+                        <div className="field">
+                          <label htmlFor={`veto-${line.id}`}>
+                            {tp("vetoReasonLabel")}
+                          </label>
+                          <textarea
+                            id={`veto-${line.id}`}
+                            name="reason"
+                            rows={4}
+                            required
+                            placeholder={tp("vetoReasonPlaceholder")}
+                          />
+                        </div>
+                        <div className="actions">
+                          <button type="submit" className="btn small">
+                            {tp("vetoSubmit")}
+                          </button>
+                        </div>
+                      </form>
+                    </details>
+                  ) : line.brief?.assets[0]?.status === "RETRACTED" ? (
+                    <p className="muted small">
+                      <strong>{tp("retractedLabel")}:</strong>{" "}
+                      {line.brief.assets[0].retractionNote ?? ""}
+                    </p>
+                  ) : null}
                 </article>
               );
             })}
