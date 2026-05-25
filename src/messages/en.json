@@ -17,6 +17,7 @@
     "availability": "Availability",
     "titles": "Titles",
     "howItWorks": "How it works",
+    "formats": "Formats",
     "forAdvertisers": "Advertisers",
     "forAgencies": "Agencies",
     "forPublishers": "Publishers",
@@ -228,7 +229,25 @@
     "indicativeNote": "Prices are indicative. A firm price is confirmed by our buying desk based on availability, season and volume.",
     "noResults": "No titles match these filters.",
     "clearFilters": "Clear filters",
-    "compareTop": "Compare these results"
+    "compareTop": "Compare these results",
+    "gate": {
+      "eyebrow": "The catalog",
+      "title": "{count, plural, =1 {1 Nordic title.} other {# Nordic titles.}} One desk.",
+      "lead": "The full catalog — formats, audience, indicative pricing — is for verified advertisers and agencies. Get access and we'll send a brief template the same day.",
+      "ctaPrimary": "Get access",
+      "ctaSecondary": "Sign in",
+      "statsTitles": "Titles in catalog",
+      "statsProducts": "Native products",
+      "statsMarkets": "Nordic markets",
+      "teaserEyebrow": "Featured",
+      "teaserTitle": "A taste of what's inside",
+      "teaserCta": "See full catalog",
+      "cardLocked": "Pricing on sign-in",
+      "teaserFoot": "Showing 6 of {total}.",
+      "teaserLink": "Sign in to see every title and indicative pricing",
+      "ctaBlockTitle": "Ready to brief us?",
+      "ctaBlockBody": "Create an account, tell us what you're selling and to whom — we'll come back within 24 hours with the titles and formats that fit."
+    }
   },
   "titleDetail": {
     "back": "Back to catalog",
@@ -588,11 +607,72 @@
     "saveSpec": "Save spec",
     "availability": "Availability"
   },
+  "formats": {
+    "metaTitle": "Native formats — BeNative",
+    "eyebrow": "Formats",
+    "title": "Four ways to run native — pick the one that fits.",
+    "lead": "Every Nordic title in our catalog supports one or more of these four formats. The difference is whose voice you're paying for and how prominent the brand is.",
+    "voice": "Whose voice",
+    "brandPresence": "Brand presence",
+    "readsLike": "Reads like",
+    "bestFor": "Best for",
+    "comparisonEyebrow": "Side by side",
+    "comparisonTitle": "How they stack up",
+    "th": {
+      "attribute": "Attribute",
+      "voice": "Voice",
+      "brand": "Brand presence",
+      "reads": "Reads like",
+      "bestFor": "Best for"
+    },
+    "native-article": {
+      "title": "The format you pay top dollar for.",
+      "voice": "The title's editorial voice",
+      "brand": "Subtle — usually a 'Sponsored by X' tag and one product mention",
+      "reads": "A magazine feature",
+      "bestFor": "Brand authority, complex sells, B2B, considered purchases",
+      "rule": "If a journalist could plausibly have written this without your input, it's a native article."
+    },
+    "advertorial": {
+      "title": "Your story, told inside the magazine.",
+      "voice": "The brand's, framed editorially",
+      "brand": "Up front — brand named in dek, byline, throughout",
+      "reads": "A long-form ad with editorial styling",
+      "bestFor": "Direct response, product launches, simpler propositions",
+      "rule": "If the brand needs to be in the headline, it's an advertorial."
+    },
+    "native-display": {
+      "title": "The publisher's typography, in-feed.",
+      "voice": "Mostly visual — your headline, the title's layout",
+      "brand": "Logo + tag in the unit; click-through to your destination",
+      "reads": "An editorial card that turns out to be sponsored",
+      "bestFor": "Reach, retargeting, awareness against a curated audience",
+      "rule": "If you want the title's frame around a click, not its words, run native display."
+    },
+    "package": {
+      "title": "Article + display, one budget.",
+      "voice": "Both — the article persuades, the display amplifies",
+      "brand": "Subtle in the article, more visible in the display units",
+      "reads": "A feature with its own promotion across the title",
+      "bestFor": "Campaigns where reach inside the same title matters",
+      "rule": "If you're already buying a native article, the package is almost always cheaper than buying display separately."
+    },
+    "disclosureTitle": "All four are clearly labelled as paid",
+    "disclosureBody": "Nordic media regulators require every paid placement to be unambiguously disclosed. We default to the publisher's own disclosure label (e.g. 'Annonsørinnhold', 'Annons', 'Annonce') and verify it on every spec check before the order goes live.",
+    "ctaTitle": "Not sure which fits?",
+    "ctaBody": "Send us a brief and the desk recommends a format mix for your goal, audience and budget — same day.",
+    "ctaContact": "Talk to the desk",
+    "learnMore": "How this format works"
+  },
   "productType": {
     "NATIVE_ARTICLE": "Native article",
     "ADVERTORIAL": "Advertorial",
     "NATIVE_DISPLAY": "Native display",
-    "PACKAGE": "Package"
+    "PACKAGE": "Package",
+    "descNATIVE_ARTICLE": "Editorial-grade article paid for by a brand, written and designed in the title's voice. Readers finish it the way they finish any other story.",
+    "descADVERTORIAL": "Sponsored article clearly labelled as paid content. Brand presence is up front; the surrounding design stays editorial.",
+    "descNATIVE_DISPLAY": "Display unit that inherits the publisher's typography and runs in-feed, not in banner slots. The trust transfer is most of the value.",
+    "descPACKAGE": "Bundled native article plus native display amplification in the same title — the article does the persuasion, the display does the reach."
   },
   "market": {
     "NO": "Norway",
@@ -651,7 +731,10 @@
     "solution3Title": "Content production",
     "solution3Body": "Bundled article-grade content, tuned to each title's spec and the market's disclosure rules. One supplier, better outcome.",
     "contentTitle": "Why bundle content with placement",
-    "contentBody": "Content is half the cost and most of the performance of a native campaign. Bundling it means we can ship spec-compliant, disclosure-correct articles in the lead time the publisher actually quotes — and the total bundle beats DIY."
+    "contentBody": "Content is half the cost and most of the performance of a native campaign. Bundling it means we can ship spec-compliant, disclosure-correct articles in the lead time the publisher actually quotes — and the total bundle beats DIY.",
+    "formatsEyebrow": "Formats",
+    "formatsTitle": "What's on offer",
+    "formatsLead": "Every title in the catalog publishes some mix of these. The desk picks the one that fits the brief — and the disclosure rules of that market."
   },
   "agencies": {
     "eyebrow": "For agencies",

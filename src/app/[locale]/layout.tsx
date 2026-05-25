@@ -186,6 +186,7 @@ export default async function LocaleLayout({
                 <h2 className="footer-col-head">{tm("footerProduct")}</h2>
                 <ul>
                   <li><Link href="/catalog">{t("catalog")}</Link></li>
+                  <li><Link href="/formats">{t("formats")}</Link></li>
                   <li><Link href="/recommend">{t("recommend")}</Link></li>
                   <li><Link href="/how-it-works">{tm("howCta")}</Link></li>
                 </ul>

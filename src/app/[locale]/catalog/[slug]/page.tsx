@@ -1,5 +1,6 @@
 import { getTranslations } from "next-intl/server";
-import { notFound } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
+import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
 import { Link } from "@/i18n/navigation";
 import { indicativeFromRules, toRateRules, formatMoney } from "@/lib/money";
@@ -13,10 +14,15 @@ export default async function TitleDetailPage({
   params: Promise<{ locale: string; slug: string }>;
 }) {
   const { locale, slug } = await params;
+  const session = await auth();
+  if (!session?.user) {
+    redirect(`/${locale}/signin?next=/${locale}/catalog/${slug}`);
+  }
   const t = await getTranslations({ locale, namespace: "titleDetail" });
   const tf = await getTranslations({ locale, namespace: "firm" });
   const tType = await getTranslations({ locale, namespace: "productType" });
   const tMarket = await getTranslations({ locale, namespace: "market" });
+  const tFormats = await getTranslations({ locale, namespace: "formats" });
 
   const title = await prisma.title.findUnique({
     where: { slug },
@@ -137,9 +143,16 @@ export default async function TitleDetailPage({
             Number(p.basePrice),
             toRateRules(p.priceRules),
           );
+          const formatSlug = p.type.toLowerCase().replace(/_/g, "-");
           return (
             <article className="card" key={p.id}>
               <h3>{tType(p.type)}</h3>
+              <Link
+                href={`/formats#${formatSlug}`}
+                className="format-learn"
+              >
+                {tFormats("learnMore")} →
+              </Link>
               <div className="price">
                 {t("from")} {formatMoney(price, p.currency, locale)}
               </div>

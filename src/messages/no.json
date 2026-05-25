@@ -17,6 +17,7 @@
     "availability": "Tilgjengelighet",
     "titles": "Titler",
     "howItWorks": "Slik fungerer det",
+    "formats": "Formater",
     "forAdvertisers": "Annonsører",
     "forAgencies": "Byråer",
     "forPublishers": "Utgivere",
@@ -159,7 +160,25 @@
     "indicativeNote": "Prisene er veiledende. Endelig pris bekreftes av kjøpsteamet basert på tilgjengelighet, sesong og volum.",
     "noResults": "Ingen titler matcher disse filtrene.",
     "clearFilters": "Nullstill filtre",
-    "compareTop": "Sammenlign disse resultatene"
+    "compareTop": "Sammenlign disse resultatene",
+    "gate": {
+      "eyebrow": "Katalogen",
+      "title": "{count, plural, =1 {1 nordisk tittel.} other {# nordiske titler.}} Ett desk.",
+      "lead": "Hele katalogen — formater, målgrupper, veiledende priser — er for verifiserte annonsører og byråer. Be om tilgang så sender vi en brief-mal samme dag.",
+      "ctaPrimary": "Be om tilgang",
+      "ctaSecondary": "Logg inn",
+      "statsTitles": "Titler i katalogen",
+      "statsProducts": "Native-produkter",
+      "statsMarkets": "Nordiske markeder",
+      "teaserEyebrow": "Utvalgt",
+      "teaserTitle": "En smakebit av det som ligger inne",
+      "teaserCta": "Se hele katalogen",
+      "cardLocked": "Pris ved innlogging",
+      "teaserFoot": "Viser 6 av {total}.",
+      "teaserLink": "Logg inn for å se alle titler og veiledende priser",
+      "ctaBlockTitle": "Klar til å gi oss en brief?",
+      "ctaBlockBody": "Opprett konto, fortell oss hva du selger og til hvem — vi kommer tilbake innen 24 timer med titlene og formatene som passer."
+    }
   },
   "titleDetail": {
     "back": "Tilbake til katalogen",
@@ -520,11 +539,72 @@
     "saveSpec": "Lagre spesifikasjon",
     "availability": "Tilgjengelighet"
   },
+  "formats": {
+    "metaTitle": "Native-formater — BeNative",
+    "eyebrow": "Formater",
+    "title": "Fire måter å kjøre native — velg den som passer.",
+    "lead": "Hver nordisk tittel i katalogen vår støtter ett eller flere av disse fire formatene. Forskjellen er hvem sin stemme du betaler for og hvor synlig merket er.",
+    "voice": "Hvem sin stemme",
+    "brandPresence": "Merkets tilstedeværelse",
+    "readsLike": "Leses som",
+    "bestFor": "Best for",
+    "comparisonEyebrow": "Side om side",
+    "comparisonTitle": "Slik står de mot hverandre",
+    "th": {
+      "attribute": "Egenskap",
+      "voice": "Stemme",
+      "brand": "Merkets tilstedeværelse",
+      "reads": "Leses som",
+      "bestFor": "Best for"
+    },
+    "native-article": {
+      "title": "Formatet du betaler full pris for.",
+      "voice": "Titlens redaksjonelle stemme",
+      "brand": "Diskret — som regel en «Annonsørinnhold fra X»-tag og én produktomtale",
+      "reads": "En magasinartikkel",
+      "bestFor": "Merkeautoritet, komplekse salg, B2B, vurderte kjøp",
+      "rule": "Hvis en journalist kunne ha skrevet det uten din input, er det en native-artikkel."
+    },
+    "advertorial": {
+      "title": "Din historie, fortalt inni magasinet.",
+      "voice": "Merkets, innrammet redaksjonelt",
+      "brand": "Fremst — merket nevnt i ingress, byline og gjennomgående",
+      "reads": "En lengre annonse med redaksjonell styling",
+      "bestFor": "Direkterespons, produktlanseringer, enklere budskap",
+      "rule": "Hvis merket må stå i overskriften, er det en advertorial."
+    },
+    "native-display": {
+      "title": "Utgiverens typografi, i feeden.",
+      "voice": "Mest visuelt — din tittel, utgiverens layout",
+      "brand": "Logo + tag i enheten; klikk videre til ditt landingssted",
+      "reads": "Et redaksjonelt kort som viser seg å være sponset",
+      "bestFor": "Rekkevidde, retargeting, kjennskap mot et kuratert publikum",
+      "rule": "Hvis du vil ha titlens ramme rundt et klikk, ikke rundt ordene dine — kjør native display."
+    },
+    "package": {
+      "title": "Artikkel + display, ett budsjett.",
+      "voice": "Begge — artikkelen overbeviser, display'en forsterker",
+      "brand": "Diskret i artikkelen, mer synlig i display-enhetene",
+      "reads": "En sak med egen kampanje på tvers av titelen",
+      "bestFor": "Kampanjer der rekkevidde inni samme tittel betyr noe",
+      "rule": "Hvis du allerede kjøper en native-artikkel, er pakken nesten alltid billigere enn å kjøpe display separat."
+    },
+    "disclosureTitle": "Alle fire er tydelig merket som betalt",
+    "disclosureBody": "Nordiske medieregulatorer krever at hver betalt plassering er utvetydig merket. Vi bruker som standard utgiverens egen merking (f.eks. «Annonsørinnhold», «Annons», «Annonce») og verifiserer den på hver spesifikasjonssjekk før bestillingen går live.",
+    "ctaTitle": "Usikker på hva som passer?",
+    "ctaBody": "Send oss en brief, så anbefaler desken en formatmiks for mål, publikum og budsjett — samme dag.",
+    "ctaContact": "Snakk med desken",
+    "learnMore": "Slik fungerer dette formatet"
+  },
   "productType": {
     "NATIVE_ARTICLE": "Native-artikkel",
     "ADVERTORIAL": "Advertorial",
     "NATIVE_DISPLAY": "Native display",
-    "PACKAGE": "Pakke"
+    "PACKAGE": "Pakke",
+    "descNATIVE_ARTICLE": "Redaksjonell artikkel betalt av et merke, skrevet og designet i titlens stemme. Leserne leser den ferdig slik de leser enhver annen sak.",
+    "descADVERTORIAL": "Sponset artikkel tydelig merket som betalt innhold. Merket står fremst; designet rundt holdes redaksjonelt.",
+    "descNATIVE_DISPLAY": "Displayenhet som arver utgiverens typografi og kjører i feeden, ikke i bannerslots. Tillitsoverføringen er det meste av verdien.",
+    "descPACKAGE": "Native-artikkel og native display i samme tittel — artikkelen overbeviser, displayet gir rekkevidden."
   },
   "market": {
     "NO": "Norge",
@@ -652,7 +732,10 @@
     "solution3Title": "Innholdsproduksjon",
     "solution3Body": "Artikkelnivå-innhold inkludert, tilpasset hver titels spec og markedets merkereglar. Én leverandør, bedre resultat.",
     "contentTitle": "Hvorfor pakke innhold med plassering",
-    "contentBody": "Innhold er halve kostnaden og det meste av ytelsen i en native-kampanje. Når vi pakker det inn, kan vi levere spec-riktige, merke-riktige artikler innen utgiverens reelle leveringstid — og pakken slår å gjøre det selv."
+    "contentBody": "Innhold er halve kostnaden og det meste av ytelsen i en native-kampanje. Når vi pakker det inn, kan vi levere spec-riktige, merke-riktige artikler innen utgiverens reelle leveringstid — og pakken slår å gjøre det selv.",
+    "formatsEyebrow": "Formater",
+    "formatsTitle": "Dette er på tilbud",
+    "formatsLead": "Hver tittel i katalogen publiserer en miks av disse. Desken velger den som passer briefen — og merkereglene i det markedet."
   },
   "agencies": {
     "eyebrow": "For byråer",
