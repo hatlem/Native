@@ -1523,5 +1523,21 @@
     "save": "Spara ändringar",
     "saved": "Sparat",
     "cancel": "Avbryt"
+  },
+  "salesContacts": {
+    "title": "Säljkontakter",
+    "empty": "Inga säljkontakter kopplade till denna titel.",
+    "primary": "Primär",
+    "makePrimary": "Gör primär",
+    "detach": "Koppla bort",
+    "attachExisting": "Koppla en befintlig kontakt",
+    "attach": "Koppla",
+    "addNew": "Lägg till ny kontakt",
+    "name": "Namn",
+    "email": "E-post",
+    "phone": "Telefon",
+    "role": "Roll",
+    "notes": "Anteckningar",
+    "create": "Skapa kontakt"
   }
 }

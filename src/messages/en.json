@@ -1523,5 +1523,21 @@
     "save": "Save changes",
     "saved": "Saved",
     "cancel": "Cancel"
+  },
+  "salesContacts": {
+    "title": "Sales contacts",
+    "empty": "No sales contacts attached to this title.",
+    "primary": "Primary",
+    "makePrimary": "Make primary",
+    "detach": "Detach",
+    "attachExisting": "Attach an existing contact",
+    "attach": "Attach",
+    "addNew": "Add new contact",
+    "name": "Name",
+    "email": "Email",
+    "phone": "Phone",
+    "role": "Role",
+    "notes": "Notes",
+    "create": "Create contact"
   }
 }

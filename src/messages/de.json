@@ -1381,5 +1381,21 @@
     "save": "Änderungen speichern",
     "saved": "Gespeichert",
     "cancel": "Abbrechen"
+  },
+  "salesContacts": {
+    "title": "Vertriebskontakte",
+    "empty": "Keine Vertriebskontakte mit diesem Titel verknüpft.",
+    "primary": "Primär",
+    "makePrimary": "Als primär festlegen",
+    "detach": "Trennen",
+    "attachExisting": "Bestehenden Kontakt verknüpfen",
+    "attach": "Verknüpfen",
+    "addNew": "Neuen Kontakt hinzufügen",
+    "name": "Name",
+    "email": "E-Mail",
+    "phone": "Telefon",
+    "role": "Rolle",
+    "notes": "Notizen",
+    "create": "Kontakt erstellen"
   }
 }

@@ -1523,5 +1523,21 @@
     "save": "Lagre endringer",
     "saved": "Lagret",
     "cancel": "Avbryt"
+  },
+  "salesContacts": {
+    "title": "Salgskontakter",
+    "empty": "Ingen salgskontakter knyttet til denne tittelen.",
+    "primary": "Primær",
+    "makePrimary": "Gjør primær",
+    "detach": "Koble fra",
+    "attachExisting": "Koble til eksisterende kontakt",
+    "attach": "Koble til",
+    "addNew": "Legg til ny kontakt",
+    "name": "Navn",
+    "email": "E-post",
+    "phone": "Telefon",
+    "role": "Rolle",
+    "notes": "Notater",
+    "create": "Opprett kontakt"
   }
 }

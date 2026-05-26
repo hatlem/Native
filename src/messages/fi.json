@@ -1523,5 +1523,21 @@
     "save": "Tallenna muutokset",
     "saved": "Tallennettu",
     "cancel": "Peruuta"
+  },
+  "salesContacts": {
+    "title": "Myyntiyhteystiedot",
+    "empty": "Tähän otsikkoon ei ole liitetty myyntiyhteyshenkilöitä.",
+    "primary": "Ensisijainen",
+    "makePrimary": "Aseta ensisijaiseksi",
+    "detach": "Irrota",
+    "attachExisting": "Liitä olemassa oleva yhteystieto",
+    "attach": "Liitä",
+    "addNew": "Lisää uusi yhteystieto",
+    "name": "Nimi",
+    "email": "Sähköposti",
+    "phone": "Puhelin",
+    "role": "Rooli",
+    "notes": "Muistiinpanot",
+    "create": "Luo yhteystieto"
   }
 }

@@ -7,6 +7,7 @@ import {
   updateTitlePricing,
   setPublisherPricesPublic,
 } from "@/app/title-actions";
+import { SalesContactsPanel } from "./_components/SalesContactsPanel";
 
 export const dynamic = "force-dynamic";
 
@@ -178,6 +179,12 @@ export default async function DeskTitleEditPage({
           </button>
         </form>
       </article>
+
+      <SalesContactsPanel
+        locale={locale}
+        titleId={title.id}
+        publisherId={title.publisher.id}
+      />
     </section>
   );
 }
