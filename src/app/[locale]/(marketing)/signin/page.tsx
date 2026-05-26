@@ -3,7 +3,7 @@ import { redirect } from "next/navigation";
 import { auth } from "@/auth";
 import { Link } from "@/i18n/navigation";
 import { landingForRole } from "@/lib/roles";
-import { authenticate } from "@/app/auth-actions";
+import { authenticate, requestMagicLink } from "@/app/auth-actions";
 import { LandingShell } from "@/app/landing-shell";
 import { SubmitButton } from "@/components";
 import { DemoChips, type DemoAccount } from "./demo-chips";
@@ -95,6 +95,32 @@ export default async function SignInPage({
             </div>
             <div className="actions">
               <SubmitButton label={t("submit")} pendingLabel={t("signingIn")} />
+            </div>
+          </form>
+
+          <div className="alt" style={{ marginTop: 8 }}>
+            <Link href="/forgot-password">{t("forgotLink")}</Link>
+          </div>
+
+          <div className="divider" role="separator" aria-hidden="true" style={{ margin: "20px 0", textAlign: "center", color: "#9ca3af", fontSize: 13 }}>
+            {t("magicLinkDivider")}
+          </div>
+
+          <div className="head" style={{ marginBottom: 12 }}>
+            <h2 style={{ fontSize: 18 }}>{t("magicLinkTitle")}</h2>
+            <p>{t("magicLinkLead")}</p>
+          </div>
+
+          <form action={requestMagicLink} noValidate>
+            <input type="hidden" name="locale" value={locale} />
+            <div className="field">
+              <label htmlFor="magic-email">{t("email")}</label>
+              <input id="magic-email" name="email" type="email" autoComplete="email" required />
+            </div>
+            <div className="actions">
+              <button type="submit" className="btn primary block">
+                {t("magicLinkButton")}
+              </button>
             </div>
           </form>
 
