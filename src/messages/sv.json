@@ -237,6 +237,7 @@
     "goal": "Kampanjmål (valfritt)",
     "brief": "Innehållsbrief (valfritt)",
     "submit": "Skicka förfrågan",
+    "submitting": "Skickar brief…",
     "requestingAs": "Beställer som",
     "loginRequired": "Logga in eller skapa ett konto för att begära offert:",
     "selectClient": "Välj en kund att agera för i"
@@ -563,7 +564,8 @@
     "badge": "Boka direkt",
     "planTitle": "Bekräfta din order",
     "planNote": "Alla poster har fast pris — att skicka in bekräftar din order direkt, ingen väntan på inköpsteamet.",
-    "planSubmit": "Bekräfta order"
+    "planSubmit": "Bekräfta order",
+    "planSubmitting": "Lägger order…"
   },
   "publisher": {
     "title": "Utgivarportal",

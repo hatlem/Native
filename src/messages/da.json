@@ -237,6 +237,7 @@
     "goal": "Kampagnemål (valgfrit)",
     "brief": "Indholdsbrief (valgfrit)",
     "submit": "Send anmodning",
+    "submitting": "Sender brief…",
     "requestingAs": "Bestiller som",
     "loginRequired": "Log ind eller opret en konto for at anmode om tilbud:",
     "selectClient": "Vælg en kunde at handle for i"
@@ -563,7 +564,8 @@
     "badge": "Bestil direkte",
     "planTitle": "Bekræft din ordre",
     "planNote": "Alle poster har fast pris — at indsende bekræfter din ordre med det samme, ingen ventetid på indkøbsteamet.",
-    "planSubmit": "Bekræft ordre"
+    "planSubmit": "Bekræft ordre",
+    "planSubmitting": "Afgiver ordre…"
   },
   "publisher": {
     "title": "Udgiverportal",

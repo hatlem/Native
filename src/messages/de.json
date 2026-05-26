@@ -308,6 +308,7 @@
     "goal": "Campaign goal (optional)",
     "brief": "Content brief (optional)",
     "submit": "Submit request",
+    "submitting": "Brief wird gesendet…",
     "requestingAs": "Requesting as",
     "loginRequired": "Sign in or create an account to request a quote:",
     "selectClient": "Select a client to act for in the"
@@ -634,7 +635,8 @@
     "badge": "Sofortbuchung",
     "planTitle": "Bestellung bestätigen",
     "planNote": "Alle Positionen sind festpreisig — mit dem Absenden wird Ihre Bestellung sofort bestätigt, keine Wartezeit beim Einkaufs-Desk.",
-    "planSubmit": "Bestellung bestätigen"
+    "planSubmit": "Bestellung bestätigen",
+    "planSubmitting": "Bestellung wird aufgegeben…"
   },
   "publisher": {
     "title": "Publisher portal",

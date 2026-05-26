@@ -8,6 +8,7 @@ import { indicativeFromRules, toRateRules, formatMoney } from "@/lib/money";
 import { isProductPriceShown } from "@/lib/pricing-visibility";
 import { removeFromPlan, submitRequest } from "@/app/actions";
 import { EmptyState } from "@/app/empty-state";
+import { SubmitButton } from "@/components";
 
 export const dynamic = "force-dynamic";
 
@@ -239,9 +240,13 @@ export default async function PlanPage({
                   <label htmlFor="brief">{tr("brief")}</label>
                   <textarea id="brief" name="brief" rows={3} />
                 </div>
-                <button type="submit" className="btn block">
-                  {allFirm ? tf("planSubmit") : tr("submit")}
-                </button>
+                <SubmitButton
+                  label={allFirm ? tf("planSubmit") : tr("submit")}
+                  pendingLabel={
+                    allFirm ? tf("planSubmitting") : tr("submitting")
+                  }
+                  className="btn block"
+                />
               </form>
             ) : (
               <div className="auth-fallback">

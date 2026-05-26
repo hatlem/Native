@@ -308,6 +308,7 @@
     "goal": "Kampanjan tavoite (valinnainen)",
     "brief": "Sisältöbrief (valinnainen)",
     "submit": "Lähetä pyyntö",
+    "submitting": "Brief lähetetään…",
     "requestingAs": "Pyytäjä",
     "loginRequired": "Kirjaudu sisään tai luo tili pyytääksesi tarjouksen:",
     "selectClient": "Valitse asiakas, jonka puolesta toimit"
@@ -634,7 +635,8 @@
     "badge": "Pikatilaus",
     "planTitle": "Vahvista tilauksesi",
     "planNote": "Kaikilla riveillä on kiinteä hinta — lähettäminen vahvistaa tilauksesi heti, ei deskin odotusta.",
-    "planSubmit": "Vahvista tilaus"
+    "planSubmit": "Vahvista tilaus",
+    "planSubmitting": "Tilaus tehdään…"
   },
   "publisher": {
     "title": "Kustantajaportaali",

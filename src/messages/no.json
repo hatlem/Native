@@ -237,6 +237,7 @@
     "goal": "Kampanjemål (valgfritt)",
     "brief": "Innholdsbrief (valgfritt)",
     "submit": "Send forespørsel",
+    "submitting": "Sender brief…",
     "requestingAs": "Bestiller som",
     "loginRequired": "Logg inn eller opprett en konto for å be om tilbud:",
     "selectClient": "Velg en kunde å handle for i"
@@ -563,7 +564,8 @@
     "badge": "Bestill direkte",
     "planTitle": "Bekreft bestillingen",
     "planNote": "Alle elementer har fast pris — innsending bekrefter bestillingen umiddelbart, uten venting på kjøpsteamet.",
-    "planSubmit": "Bekreft bestilling"
+    "planSubmit": "Bekreft bestilling",
+    "planSubmitting": "Legger inn bestilling…"
   },
   "publisher": {
     "title": "Utgiverportal",

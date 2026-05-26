@@ -308,6 +308,7 @@
     "goal": "Campaign goal (optional)",
     "brief": "Content brief (optional)",
     "submit": "Submit request",
+    "submitting": "Sending brief…",
     "requestingAs": "Requesting as",
     "loginRequired": "Sign in or create an account to request a quote:",
     "selectClient": "Select a client to act for in the"
@@ -634,7 +635,8 @@
     "badge": "Instant book",
     "planTitle": "Confirm your order",
     "planNote": "All items are firm-priced — submitting confirms your order instantly, no buying-desk wait.",
-    "planSubmit": "Confirm order"
+    "planSubmit": "Confirm order",
+    "planSubmitting": "Placing order…"
   },
   "publisher": {
     "title": "Publisher portal",
