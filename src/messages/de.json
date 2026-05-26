@@ -171,6 +171,7 @@
     "remaining": "Budget left",
     "none": "No mix fits that budget — try a higher budget or another market.",
     "addAll": "Add all to plan",
+    "addingAll": "Wird hinzugefügt…",
     "hint": "Choose a market and budget above to see a suggested mix.",
     "browse": "Browse the catalog",
     "eyebrow": "Recommender",

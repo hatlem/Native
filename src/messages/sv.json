@@ -97,6 +97,7 @@
     "remaining": "Budget kvar",
     "none": "Ingen mix får plats i den budgeten — prova högre budget eller en annan marknad.",
     "addAll": "Lägg alla i planen",
+    "addingAll": "Lägger till…",
     "hint": "Välj marknad och budget ovan för att se ett förslag.",
     "browse": "Se katalogen",
     "eyebrow": "Rekommendation",

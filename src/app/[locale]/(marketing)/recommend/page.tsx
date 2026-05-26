@@ -7,6 +7,7 @@ import { EmptyState } from "@/app/empty-state";
 import { recommendMix, type Candidate } from "@/lib/recommend";
 import { addRecommendedPlan } from "@/app/actions";
 import { LandingShell } from "@/app/landing-shell";
+import { SubmitButton } from "@/components";
 
 export const dynamic = "force-dynamic";
 
@@ -184,9 +185,11 @@ export default async function RecommendPage({
                       name="productIds"
                       value={result.picks.map((p) => p.productId).join(",")}
                     />
-                    <button type="submit" className="btn primary">
-                      {t("addAll")} <span className="arrow">→</span>
-                    </button>
+                    <SubmitButton
+                      label={`${t("addAll")} →`}
+                      pendingLabel={t("addingAll")}
+                      className="btn primary"
+                    />
                   </form>
                 </div>
 
