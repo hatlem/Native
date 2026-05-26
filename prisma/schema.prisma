@@ -245,7 +245,10 @@ model Title {
   frequency     String? // CSV "Frequency" — Daglig, Ukentlig, Monthly, ...
   ownerGroup    String? // CSV "Owner (group)" — Polaris Media, Schibsted, ...
   publisherName String? // CSV "Publisher" — raw publisher string (the FK Publisher is for commerce)
-  adSales       String? // CSV "Ad Sales" — who handles ad sales
+  // DEPRECATED — superseded by the SalesContact join (see SalesContactTitle).
+  // Kept to preserve CSV import lineage. Will be dropped once admin has
+  // finished curating SalesContact rows for every active title.
+  adSales       String?
   locationNote  String? // CSV "Location / Note" — city or short note
   circulation   Int?    // CSV "Circulation"
   vertical      String? // CSV "Vertical" — News (National), B2B – Energy, ...
