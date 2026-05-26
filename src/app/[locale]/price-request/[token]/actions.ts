@@ -73,7 +73,7 @@ export async function submitPriceRequestAction(formData: FormData) {
     hasNative,
     responseNote: str(formData, "responseNote") || undefined,
     quotes,
-    recordedById: req.salesContactId,
+    recordedById: `salescontact:${req.salesContactId}`,
   });
 
   redirect(`/${locale}/price-request/${token}/thanks`);

@@ -4,7 +4,6 @@ import {
   arePricesVisible,
   allPricesVisible,
   anyHiddenPrices,
-  redactProductPricing,
 } from "./pricing-visibility";
 
 test("arePricesVisible defaults to true when fields are missing", () => {
@@ -81,25 +80,3 @@ test("anyHiddenPrices is the inverse of allPricesVisible for non-empty inputs", 
   assert.equal(allPricesVisible(titles), false);
 });
 
-test("redactProductPricing strips price when hidden, preserves when visible", () => {
-  const visible = redactProductPricing(
-    { basePrice: "1000", currency: "EUR", visibility: "FIRM", name: "X", active: true, confirmedAt: new Date() },
-    { pricesPublic: true, publisher: { pricesPublic: true } },
-  );
-  assert.equal(visible.basePrice, "1000");
-  assert.equal(visible.visibility, "FIRM");
-  assert.equal(visible.priceVisible, true);
-  assert.equal((visible as { name: string }).name, "X");
-
-  const hidden = redactProductPricing(
-    { basePrice: "1000", currency: "EUR", visibility: "FIRM", name: "X", active: true, confirmedAt: new Date() },
-    { pricesPublic: false, publisher: { pricesPublic: true } },
-  );
-  assert.equal(hidden.basePrice, null);
-  // Demoted to INDICATIVE so consumers never think they can checkout
-  // against a price they can't see.
-  assert.equal(hidden.visibility, "INDICATIVE");
-  assert.equal(hidden.priceVisible, false);
-  // Currency stays — useful as a hint for the "Request price (EUR)" UI.
-  assert.equal(hidden.currency, "EUR");
-});

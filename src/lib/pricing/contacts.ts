@@ -44,27 +44,31 @@ export async function attachContactToTitle(args: {
   isPrimary?: boolean;
   actorId: string;
 }) {
-  // If making primary, demote any existing primary first so the
-  // partial unique index doesn't reject the insert.
-  if (args.isPrimary) {
-    await prisma.salesContactTitle.updateMany({
-      where: { titleId: args.titleId, isPrimary: true },
-      data: { isPrimary: false },
-    });
-  }
-  const link = await prisma.salesContactTitle.upsert({
-    where: {
-      salesContactId_titleId: {
+  // Demote-then-upsert must be atomic — otherwise a concurrent caller
+  // could see the title in a zero-primary state between the two
+  // statements, or the partial unique index could reject the upsert
+  // mid-flow leaving the previous primary demoted with no replacement.
+  const link = await prisma.$transaction(async (tx) => {
+    if (args.isPrimary) {
+      await tx.salesContactTitle.updateMany({
+        where: { titleId: args.titleId, isPrimary: true },
+        data: { isPrimary: false },
+      });
+    }
+    return tx.salesContactTitle.upsert({
+      where: {
+        salesContactId_titleId: {
+          salesContactId: args.salesContactId,
+          titleId: args.titleId,
+        },
+      },
+      create: {
         salesContactId: args.salesContactId,
         titleId: args.titleId,
+        isPrimary: args.isPrimary ?? false,
       },
-    },
-    create: {
-      salesContactId: args.salesContactId,
-      titleId: args.titleId,
-      isPrimary: args.isPrimary ?? false,
-    },
-    update: { isPrimary: args.isPrimary ?? false },
+      update: { isPrimary: args.isPrimary ?? false },
+    });
   });
   await recordAudit(args.actorId, "sales_contact.attach", `Title:${args.titleId}`, {
     salesContactId: args.salesContactId,

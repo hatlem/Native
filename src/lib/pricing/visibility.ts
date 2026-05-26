@@ -40,24 +40,3 @@ export function isProductPriceShown(
   return arePricesVisible(title);
 }
 
-export function redactProductPricing<
-  T extends {
-    basePrice?: unknown;
-    currency?: string;
-    visibility?: string;
-    active?: boolean;
-    confirmedAt?: Date | null;
-  },
->(product: T, title: TitleWithVisibility): T & { priceVisible: boolean } {
-  const shown = isProductPriceShown(
-    { active: product.active ?? true, confirmedAt: product.confirmedAt ?? null },
-    title,
-  );
-  if (shown) return { ...product, priceVisible: true };
-  return {
-    ...product,
-    basePrice: null,
-    visibility: "INDICATIVE",
-    priceVisible: false,
-  };
-}

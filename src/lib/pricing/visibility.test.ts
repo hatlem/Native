@@ -1,9 +1,6 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import {
-  isProductPriceShown,
-  redactProductPricing,
-} from "./visibility";
+import { isProductPriceShown } from "./visibility";
 
 const visibleTitle = { pricesPublic: true, publisher: { pricesPublic: true } };
 const hiddenTitle = { pricesPublic: false, publisher: { pricesPublic: true } };
@@ -34,32 +31,4 @@ test("isProductPriceShown returns true when all three gates pass", () => {
     isProductPriceShown({ active: true, confirmedAt: new Date() }, visibleTitle),
     true,
   );
-});
-
-test("redactProductPricing redacts when confirmedAt is null", () => {
-  const product = {
-    basePrice: "1000",
-    currency: "EUR",
-    visibility: "FIRM",
-    active: true,
-    confirmedAt: null,
-  };
-  const out = redactProductPricing(product, visibleTitle);
-  assert.equal(out.basePrice, null);
-  assert.equal(out.visibility, "INDICATIVE");
-  assert.equal(out.priceVisible, false);
-  assert.equal(out.currency, "EUR");
-});
-
-test("redactProductPricing keeps price when confirmed + visible", () => {
-  const product = {
-    basePrice: "1000",
-    currency: "EUR",
-    visibility: "FIRM",
-    active: true,
-    confirmedAt: new Date(),
-  };
-  const out = redactProductPricing(product, visibleTitle);
-  assert.equal(out.basePrice, "1000");
-  assert.equal(out.priceVisible, true);
 });

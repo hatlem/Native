@@ -5,7 +5,6 @@ export {
   arePricesVisible,
   allPricesVisible,
   anyHiddenPrices,
-  redactProductPricing,
   isProductPriceShown,
   type TitleWithVisibility,
   type ProductWithConfirmation,
