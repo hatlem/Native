@@ -154,6 +154,13 @@ model Market {
   // the spec-check as a market-wide minimum even when a Title hasn't
   // configured its own.
   disclosureLabel String?
+  // EUR conversion rate for cross-market campaign size display. Stored
+  // as "1 unit of local currency = X EUR" so the math is a single
+  // multiply at render time. NULL means the market is already EUR
+  // (DE / AT / IE / FI). Buyer-facing only — local currency stays
+  // canonical at the quote/invoice layer. Desk edits the rate weekly
+  // until we wire to an ECB feed.
+  fxToEUR         Decimal? @db.Decimal(12, 6)
   createdAt    DateTime   @default(now())
   updatedAt    DateTime   @updatedAt
 
@@ -173,6 +180,12 @@ model Publisher {
   contactEmail  String?
   paymentTerms  String? // e.g. "net 30"
   contractNotes String?
+  // Master switch for buyer-facing price visibility. When false,
+  // every title under this publisher renders as "Request price" in
+  // the catalog / recommender / public API — the desk still sees
+  // and quotes from internal prices as normal. Used when a publisher
+  // is onboarded under NDA or wants RFQ-only positioning.
+  pricesPublic  Boolean  @default(true)
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
 
@@ -201,6 +214,19 @@ model Title {
   websiteUrl    String?
   active        Boolean   @default(true)
   lastVerifiedAt DateTime?
+  // Public rate-card price for a standard sponsored placement on
+  // this title — the number the publisher publishes on their media
+  // kit. Used as the *anchor* on customer-facing quotes
+  // ("Rate card €X → your price €Y"). Editorial input only; the
+  // commerce price still flows via Product.basePrice + PriceRule.
+  publishedRateCard     Decimal? @db.Decimal(12, 2)
+  publishedRateCurrency String?  // ISO 4217; falls back to market currency at render time
+  // Per-title price-visibility switch. AND-ed with publisher.pricesPublic
+  // at render time. False → catalog / recommender / public API hide
+  // every euro figure for this title and surface "Request price"
+  // instead. Self-serve FIRM checkout is also blocked for hidden
+  // titles so the buyer never sees a price they shouldn't.
+  pricesPublic          Boolean  @default(true)
   // ---------- CSV import fields (research catalog) ----------
   // Populated from prisma/data/medier_alle.csv. These are descriptive
   // metadata used to power filtering/search in the catalog UI; they do

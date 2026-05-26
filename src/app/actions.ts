@@ -18,6 +18,8 @@ import {
   toRateRules,
   type QuotableItem,
 } from "@/lib/money";
+import { arePricesVisible } from "@/lib/pricing-visibility";
+import { groupItemsByMarket } from "@/lib/quote-grouping";
 import { recordAudit } from "@/lib/audit";
 import { notifyDesk, notifyOrg, notifyPublisher } from "@/lib/notify";
 import { rfqLimiter } from "@/lib/rate-limit";
@@ -150,29 +152,43 @@ export async function submitRequest(formData: FormData) {
     redirect(`/${locale}/plan?error=1`);
   }
 
-  const market = await prisma.market.findUnique({
-    where: { code: org.marketCode },
-  });
-  const currency = market?.currency ?? "EUR";
-
-  const vatPct = market ? Number(market.vatRatePct) : 25;
   const products = await prisma.product.findMany({
     where: {
       id: { in: basket.map((b) => b.productId) },
       active: true,
       bookable: true,
     },
-    include: { priceRules: true },
+    include: {
+      priceRules: true,
+      title: { include: { publisher: true, market: true } },
+    },
   });
   const byId = new Map(products.map((p) => [p.id, p]));
   const items = basket.filter((b) => byId.has(b.productId));
   if (items.length === 0) redirect(`/${locale}/plan?error=1`);
 
+  // Multi-currency split: one Quote per placement market. A cross-
+  // border basket (e.g. NO + SE + DE) becomes one Request with three
+  // Quotes, each in its market's currency and VAT. Grouping by market
+  // (not currency) keeps the four EUR markets — DE/AT/IE/FI — apart
+  // since they all share EUR but have different VAT rates.
+  const groups = groupItemsByMarket(items, byId);
+  // For the legacy Plan.currency field: a single-market basket keeps
+  // the single currency; multi-market basket leaves it null, signalling
+  // that the per-Quote currencies are the source of truth.
+  const planCurrency = groups.length === 1 ? groups[0].currency : null;
+
   // Self-serve: an all-firm-priced basket needs no desk — auto-quote,
-  // auto-accept and confirm the order immediately.
-  const allFirm = items.every(
-    (i) => byId.get(i.productId)?.visibility === "FIRM",
-  );
+  // auto-accept and confirm the order immediately. Server-side gate
+  // mirrors the plan page UI: any line whose title has hidden prices
+  // forces the basket onto the RFQ path so we never auto-charge a
+  // buyer against a price they couldn't see in the catalog.
+  const allFirm = items.every((i) => {
+    const product = byId.get(i.productId);
+    if (!product) return false;
+    if (product.visibility !== "FIRM") return false;
+    return arePricesVisible(product.title);
+  });
 
   // Honour Phase-3 availability for FIRM (self-serve) baskets: block
   // the current month if any selected product is unavailable now. RFQ
@@ -197,7 +213,7 @@ export async function submitRequest(formData: FormData) {
         organizationId: org.id,
         name: `${org.name} — campaign`,
         budget: budgetRaw ? Number(budgetRaw) || null : null,
-        currency,
+        currency: planCurrency,
         goal: goal || null,
         audienceNote: audience || null,
         items: {
@@ -219,48 +235,52 @@ export async function submitRequest(formData: FormData) {
     });
 
     if (allFirm) {
-      const lines = computeQuoteLines(
-        items.map((i) => toQuotable(byId.get(i.productId)!, i.quantity)),
-      );
-      const { subtotal, total } = quoteTotals(lines, vatPct);
+      for (const group of groups) {
+        const lines = computeQuoteLines(
+          group.items.map((i) =>
+            toQuotable(byId.get(i.productId)!, i.quantity),
+          ),
+        );
+        const { subtotal, total } = quoteTotals(lines, group.vatPct);
 
-      const quote = await tx.quote.create({
-        data: {
-          requestId: req.id,
-          status: "ACCEPTED",
-          currency,
-          subtotal,
-          vatPct,
-          total,
-          validUntil: new Date(Date.now() + 14 * 24 * 60 * 60 * 1000),
-          lines: { create: lines },
-        },
-      });
-      const order = await tx.order.create({
-        data: {
-          organizationId: org.id,
-          quoteId: quote.id,
-          status: "CONFIRMED",
-          lines: {
-            create: lines.map((l) => ({
-              productId: l.productId,
-              quantity: l.quantity,
-              lineTotal: l.lineTotal,
-            })),
+        const quote = await tx.quote.create({
+          data: {
+            requestId: req.id,
+            status: "ACCEPTED",
+            currency: group.currency,
+            subtotal,
+            vatPct: group.vatPct,
+            total,
+            validUntil: new Date(Date.now() + 14 * 24 * 60 * 60 * 1000),
+            lines: { create: lines },
           },
-        },
-        include: { lines: true },
-      });
-      await tx.contentBrief.createMany({
-        data: order.lines.map((l) => ({
-          orderLineId: l.id,
-          message: goal || null,
-          audience: audience || null,
-        })),
-      });
-      await tx.publisherBooking.createMany({
-        data: order.lines.map((l) => ({ orderLineId: l.id })),
-      });
+        });
+        const order = await tx.order.create({
+          data: {
+            organizationId: org.id,
+            quoteId: quote.id,
+            status: "CONFIRMED",
+            lines: {
+              create: lines.map((l) => ({
+                productId: l.productId,
+                quantity: l.quantity,
+                lineTotal: l.lineTotal,
+              })),
+            },
+          },
+          include: { lines: true },
+        });
+        await tx.contentBrief.createMany({
+          data: order.lines.map((l) => ({
+            orderLineId: l.id,
+            message: goal || null,
+            audience: audience || null,
+          })),
+        });
+        await tx.publisherBooking.createMany({
+          data: order.lines.map((l) => ({ orderLineId: l.id })),
+        });
+      }
     }
 
     return req;
@@ -335,58 +355,78 @@ export async function generateQuote(formData: FormData) {
     redirect(`/${locale}/desk/${requestId}`);
   }
 
-  const market = await prisma.market.findUnique({
-    where: { code: request.organization.marketCode },
-  });
-  const vatPct = market ? Number(market.vatRatePct) : 25;
-  const currency = market?.currency ?? request.plan.currency ?? "EUR";
-
   const products = await prisma.product.findMany({
     where: { id: { in: request.plan.items.map((i) => i.productId) } },
-    include: { priceRules: true },
+    include: {
+      priceRules: true,
+      title: { include: { market: true } },
+    },
   });
   const byId = new Map(products.map((p) => [p.id, p]));
 
-  const lines = computeQuoteLines(
-    request.plan.items
-      .map((item) => {
-        const product = byId.get(item.productId);
-        return product ? toQuotable(product, item.quantity) : null;
-      })
-      .filter((q): q is QuotableItem => q !== null),
-  );
+  // One quote per placement market — same grouping rule submitRequest
+  // uses, so a buyer who briefed across NO + SE + DE gets three quotes
+  // each in its local currency and VAT.
+  const groups = groupItemsByMarket(request.plan.items, byId);
+  if (groups.length === 0) redirect(`/${locale}/desk`);
 
-  const { subtotal, total } = quoteTotals(lines, vatPct);
   const validUntil = new Date(Date.now() + 14 * 24 * 60 * 60 * 1000);
 
-  const [quote] = await prisma.$transaction([
-    prisma.quote.create({
-      data: {
-        requestId: request.id,
-        status: "SENT",
-        currency,
-        subtotal,
-        vatPct,
-        total,
-        validUntil,
-        lines: { create: lines },
-      },
-    }),
-    prisma.request.update({
+  const created = await prisma.$transaction(async (tx) => {
+    const quotes: { id: string; currency: string; total: number }[] = [];
+    for (const group of groups) {
+      const lines = computeQuoteLines(
+        group.items
+          .map((item) => {
+            const product = byId.get(item.productId);
+            return product ? toQuotable(product, item.quantity) : null;
+          })
+          .filter((q): q is QuotableItem => q !== null),
+      );
+      const { subtotal, total } = quoteTotals(lines, group.vatPct);
+      const quote = await tx.quote.create({
+        data: {
+          requestId: request.id,
+          status: "SENT",
+          currency: group.currency,
+          subtotal,
+          vatPct: group.vatPct,
+          total,
+          validUntil,
+          lines: { create: lines },
+        },
+      });
+      quotes.push({ id: quote.id, currency: group.currency, total });
+    }
+    await tx.request.update({
       where: { id: request.id },
       data: { status: "QUOTED" },
-    }),
-  ]);
-
-  await recordAudit(scope.userId, "quote.create", `Quote:${quote.id}`, {
-    requestId,
-    total,
-    currency,
+    });
+    return quotes;
   });
+
+  for (const q of created) {
+    await recordAudit(scope.userId, "quote.create", `Quote:${q.id}`, {
+      requestId,
+      total: q.total,
+      currency: q.currency,
+    });
+  }
+  // One QUOTE_READY notification per request — body summarises totals
+  // across the currencies so the buyer sees a single inbox entry even
+  // for a multi-market campaign.
+  const totalsBody = created
+    .map((q) => `${q.total} ${q.currency}`)
+    .join(" + ");
   await notifyOrg(request.organizationId, {
     kind: "QUOTE_READY",
-    title: "Your quote is ready",
-    body: `Total ${total} ${currency}, valid until ${validUntil.toISOString().slice(0, 10)}.`,
+    title:
+      created.length === 1
+        ? "Your quote is ready"
+        : `Your ${created.length} quotes are ready`,
+    body: `Total ${totalsBody}, valid until ${validUntil
+      .toISOString()
+      .slice(0, 10)}.`,
     link: `/${locale}/requests/${request.id}`,
   });
 
@@ -575,4 +615,108 @@ export async function acceptQuote(formData: FormData) {
   );
 
   redirect(`/${locale}/requests/${quote.requestId}`);
+}
+
+// Accept every still-open Quote on a Request in a single transaction.
+// Used when the Request was split into multiple Quotes (one per
+// placement market). A single buyer click maps the entire campaign
+// from "quotes ready" to "orders confirmed" — partial failures roll
+// the whole thing back so the buyer never gets half a campaign live.
+// Existing acceptQuote stays for desk-side single-quote operations.
+export async function acceptAllQuotesForRequest(formData: FormData) {
+  const locale = str(formData, "locale") || "en";
+  const requestId = str(formData, "requestId");
+
+  const request = await prisma.request.findUnique({
+    where: { id: requestId },
+    include: {
+      plan: true,
+      quotes: { include: { lines: true, order: true } },
+    },
+  });
+  if (!request) redirect(`/${locale}/catalog`);
+
+  const scope = await loadScope();
+  if (!canActOnOrg(scope, request.organizationId)) {
+    redirect(`/${locale}/signin`);
+  }
+
+  const openQuotes = request.quotes.filter((q) => !q.order);
+  if (openQuotes.length === 0) {
+    redirect(`/${locale}/requests/${request.id}`);
+  }
+
+  const plan = request.plan;
+  const createdOrders = await prisma.$transaction(async (tx) => {
+    const orders: { id: string; productIds: string[] }[] = [];
+    for (const quote of openQuotes) {
+      const order = await tx.order.create({
+        data: {
+          organizationId: request.organizationId,
+          quoteId: quote.id,
+          status: "CONFIRMED",
+          lines: {
+            create: quote.lines.map((l) => ({
+              productId: l.productId,
+              quantity: l.quantity,
+              lineTotal: l.lineTotal,
+            })),
+          },
+        },
+        include: { lines: true },
+      });
+      await tx.contentBrief.createMany({
+        data: order.lines.map((line) => ({
+          orderLineId: line.id,
+          message: plan.goal,
+          audience: plan.audienceNote,
+        })),
+      });
+      await tx.publisherBooking.createMany({
+        data: order.lines.map((line) => ({ orderLineId: line.id })),
+      });
+      await tx.quote.update({
+        where: { id: quote.id },
+        data: { status: "ACCEPTED" },
+      });
+      orders.push({
+        id: order.id,
+        productIds: quote.lines.map((l) => l.productId),
+      });
+    }
+    await tx.request.update({
+      where: { id: request.id },
+      data: { status: "CLOSED" },
+    });
+    return orders;
+  });
+
+  for (const o of createdOrders) {
+    await recordAudit(scope.userId, "quote.accept", `Order:${o.id}`, {
+      requestId: request.id,
+    });
+  }
+  await notifyDesk({
+    kind: "QUOTE_ACCEPTED",
+    title:
+      createdOrders.length === 1
+        ? "Quote accepted"
+        : `${createdOrders.length} quotes accepted`,
+    body: "A buyer accepted a multi-market campaign — orders confirmed.",
+    link: `/${locale}/desk/orders`,
+  });
+  const allProductIds = createdOrders.flatMap((o) => o.productIds);
+  const pubIds = await uniquePublisherIdsForProducts(allProductIds);
+  await Promise.all(
+    pubIds.map((pid) =>
+      notifyPublisher(pid, {
+        kind: "BOOKING_NEW",
+        title: "New booking",
+        body: "A confirmed order requires booking on your end.",
+        link: `/${locale}/publisher/orders`,
+      }),
+    ),
+  );
+
+  redirect(`/${locale}/requests/${request.id}`);
 }

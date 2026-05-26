@@ -188,6 +188,38 @@ function toInt(value: string | undefined): number | null {
   return Number.isFinite(n) && Number.isInteger(n) ? n : null;
 }
 
+function toDecimal(value: string | undefined): number | null {
+  const v = nonEmpty(value);
+  if (v == null) return null;
+  const n = Number(v);
+  return Number.isFinite(n) && n >= 0 ? n : null;
+}
+
+// Truthy-ish flags from CSV cells. Accepts "1", "true", "yes", "y",
+// "on" (case-insensitive) as true; "0", "false", "no", "n", "off",
+// blank as false. Returns null when the cell is missing entirely so
+// the caller can fall back to the schema default.
+function toFlag(value: string | undefined): boolean | null {
+  const v = nonEmpty(value);
+  if (v == null) return null;
+  const lo = v.toLowerCase();
+  if (["1", "true", "yes", "y", "on"].includes(lo)) return true;
+  if (["0", "false", "no", "n", "off"].includes(lo)) return false;
+  return null;
+}
+
+// Find the first column whose header matches `name` (case-insensitive,
+// trimmed). Returns null when the column isn't present. Used for the
+// optional RateCard / RateCardCurrency / PricesPublic columns so the
+// existing CSV (which doesn't have them) keeps importing unchanged.
+function findColumnIndex(header: string[], name: string): number | null {
+  const lower = name.toLowerCase();
+  for (let i = 0; i < header.length; i++) {
+    if ((header[i] ?? "").trim().toLowerCase() === lower) return i;
+  }
+  return null;
+}
+
 type CsvRow = {
   country: string;
   title: string;
@@ -208,6 +240,12 @@ type CsvRow = {
   tags: string | null;
   url: string | null;
   urlStatus: string | null;
+  // Optional columns added for the buyer-facing pricing levers — these
+  // only populate when the CSV actually includes the named columns;
+  // existing 20-column exports continue to import unchanged.
+  publishedRateCard: number | null;
+  publishedRateCurrency: string | null;
+  pricesPublic: boolean | null;
 };
 
 function readMediaCsv(): CsvRow[] {
@@ -215,9 +253,18 @@ function readMediaCsv(): CsvRow[] {
   const text = readFileSync(path, "utf8");
   const rows = parseCsv(text);
   if (rows.length < 2) return [];
+  const headerRow = rows[0] ?? [];
+  // Existing 20-column layout is still index-based (columns 1 and 11
+  // are both labelled "Country" — a duplicate in the source export,
+  // so we can't use the header name for those). The buyer-facing
+  // pricing columns are read by NAME so they can be added anywhere
+  // in the file (including future columns inserted in the middle)
+  // without breaking the import. Missing columns ⇒ field stays null.
+  const rateCardIdx = findColumnIndex(headerRow, "RateCard");
+  const rateCardCurrencyIdx = findColumnIndex(headerRow, "RateCardCurrency");
+  const pricesPublicIdx = findColumnIndex(headerRow, "PricesPublic");
+
   const out: CsvRow[] = [];
-  // The CSV has 20 columns; columns 1 and 11 are both labelled "Country"
-  // (a duplicate in the source export). We use index 0.
   for (let i = 1; i < rows.length; i++) {
     const r = rows[i];
     if (r.length < 2) continue;
@@ -226,6 +273,10 @@ function readMediaCsv(): CsvRow[] {
     const publisher = (r[6] ?? "").trim();
     const category = (r[3] ?? "").trim();
     if (!country || !title || !publisher || !category) continue;
+    const rateCard =
+      rateCardIdx !== null ? toDecimal(r[rateCardIdx]) : null;
+    const rateCardCurrencyRaw =
+      rateCardCurrencyIdx !== null ? nonEmpty(r[rateCardCurrencyIdx]) : null;
     out.push({
       country,
       title,
@@ -246,6 +297,13 @@ function readMediaCsv(): CsvRow[] {
       tags: nonEmpty(r[17]),
       url: nonEmpty(r[18]),
       urlStatus: nonEmpty(r[19]),
+      publishedRateCard: rateCard,
+      publishedRateCurrency:
+        rateCard != null && rateCardCurrencyRaw
+          ? rateCardCurrencyRaw.toUpperCase()
+          : null,
+      pricesPublic:
+        pricesPublicIdx !== null ? toFlag(r[pricesPublicIdx]) : null,
     });
   }
   return out;
@@ -355,6 +413,13 @@ async function seedFromCsv(
       nativeFit: r.nativeFit,
       tags: r.tags,
       urlStatus: r.urlStatus,
+      ...(r.publishedRateCard != null
+        ? {
+            publishedRateCard: r.publishedRateCard,
+            publishedRateCurrency: r.publishedRateCurrency,
+          }
+        : {}),
+      ...(r.pricesPublic !== null ? { pricesPublic: r.pricesPublic } : {}),
     });
   }
   await prisma.title.createMany({ data: titleData, skipDuplicates: true });

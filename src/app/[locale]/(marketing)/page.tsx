@@ -3,7 +3,6 @@ import { getTranslations } from "next-intl/server";
 import { ProductType } from "@prisma/client";
 import { Link } from "@/i18n/navigation";
 import { prisma } from "@/lib/prisma";
-import { indicativeFromRules, toRateRules, formatMoney } from "@/lib/money";
 import { LandingShell } from "@/app/landing-shell";
 
 const DESK_MAILTO =
@@ -67,7 +66,6 @@ export default async function HomePage({
         products: {
           where: { active: true, visibility: "INDICATIVE" },
           orderBy: { basePrice: "asc" },
-          include: { priceRules: true },
           take: 1,
         },
       },
@@ -300,24 +298,16 @@ export default async function HomePage({
                 <th>{t("catalog.thMarket")}</th>
                 <th className="hide-md">{t("catalog.thFormat")}</th>
                 <th className="hide-md">{t("catalog.thAudience")}</th>
-                <th className="num">{t("catalog.thFrom")}</th>
               </tr>
             </thead>
             <tbody>
               {sampleTitles.map((title) => {
                 const product = title.products[0];
-                const indicative = product
-                  ? indicativeFromRules(
-                      Number(product.basePrice),
-                      toRateRules(product.priceRules),
-                    )
-                  : null;
                 const formatKey = product
                   ? PRODUCT_TYPE_TO_FORMAT_KEY[product.type]
                   : "fmtNativeArticle";
                 const marketCodeUpper = title.market.code;
                 const marketCode = marketCodeUpper.toLowerCase();
-                const currency = title.market.currency;
                 return (
                   <tr
                     key={title.id}
@@ -343,11 +333,6 @@ export default async function HomePage({
                       {formatReach(title.monthlyReach)}{" "}
                       {t("catalog.readersSuffix")}
                     </td>
-                    <td className="num">
-                      {indicative !== null
-                        ? formatMoney(indicative, currency, locale)
-                        : "—"}
-                    </td>
                   </tr>
                 );
               })}
@@ -356,7 +341,6 @@ export default async function HomePage({
 
           <div className="cat-foot">
             <div>{t("catalog.footBody")}</div>
-            <div className="ind">{t("catalog.footInd")}</div>
           </div>
         </div>
       </section>

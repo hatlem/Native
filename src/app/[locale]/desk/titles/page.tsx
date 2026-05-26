@@ -512,6 +512,12 @@ export default async function DeskTitlesPage({
                     ) : null}
 
                     <div style={{ marginTop: 12, display: "flex", gap: 8, flexWrap: "wrap" }}>
+                      <Link
+                        href={`/desk/titles/${title.id}`}
+                        className="btn small secondary"
+                      >
+                        {t("actions.edit")}
+                      </Link>
                       {!hasNative ? (
                         <form action={markTitleNative}>
                           <input type="hidden" name="locale" value={locale} />

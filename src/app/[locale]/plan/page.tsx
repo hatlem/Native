@@ -5,6 +5,7 @@ import { getWorkspace } from "@/lib/workspace";
 import { Link } from "@/i18n/navigation";
 import { readBasket } from "@/lib/basket";
 import { indicativeFromRules, toRateRules, formatMoney } from "@/lib/money";
+import { arePricesVisible } from "@/lib/pricing-visibility";
 import { removeFromPlan, submitRequest } from "@/app/actions";
 import { EmptyState } from "@/app/empty-state";
 
@@ -25,6 +26,10 @@ export default async function PlanPage({
   const tType = await getTranslations({ locale, namespace: "productType" });
   const ta = await getTranslations({ locale, namespace: "auth" });
   const tNav = await getTranslations({ locale, namespace: "nav" });
+  const tv = await getTranslations({
+    locale,
+    namespace: "priceVisibility",
+  });
 
   const session = await auth();
   const ws = await getWorkspace(session?.user?.id);
@@ -40,7 +45,10 @@ export default async function PlanPage({
   const products = basket.length
     ? await prisma.product.findMany({
         where: { id: { in: basket.map((b) => b.productId) } },
-        include: { title: true, priceRules: true },
+        include: {
+          title: { include: { publisher: true } },
+          priceRules: true,
+        },
       })
     : [];
   const byId = new Map(products.map((p) => [p.id, p]));
@@ -49,29 +57,40 @@ export default async function PlanPage({
     .map((b) => {
       const p = byId.get(b.productId);
       if (!p) return null;
-      const unit = indicativeFromRules(
-        Number(p.basePrice),
-        toRateRules(p.priceRules),
-        b.quantity,
-      );
+      const priceVisible = arePricesVisible(p.title);
+      const unit = priceVisible
+        ? indicativeFromRules(
+            Number(p.basePrice),
+            toRateRules(p.priceRules),
+            b.quantity,
+          )
+        : 0;
       return {
         product: p,
         quantity: b.quantity,
+        priceVisible,
         lineTotal: unit * b.quantity,
       };
     })
     .filter((l): l is NonNullable<typeof l> => l !== null);
 
+  const hasHiddenPrice = lines.some((l) => !l.priceVisible);
+
   const totals = new Map<string, number>();
   for (const l of lines) {
+    if (!l.priceVisible) continue;
     totals.set(
       l.product.currency,
       (totals.get(l.product.currency) ?? 0) + l.lineTotal,
     );
   }
 
+  // A hidden-price line forces the whole basket onto the RFQ path —
+  // we can't checkout firm against a price the buyer hasn't seen.
   const allFirm =
-    lines.length > 0 && lines.every((l) => l.product.visibility === "FIRM");
+    lines.length > 0 &&
+    !hasHiddenPrice &&
+    lines.every((l) => l.product.visibility === "FIRM");
 
   return (
     <>
@@ -129,6 +148,11 @@ export default async function PlanPage({
                 {t("itemCount", { count: lines.length })}
               </span>
             </div>
+            {hasHiddenPrice ? (
+              <div className="banner-info" role="status">
+                <span>{tv("planRfqOnly")}</span>
+              </div>
+            ) : null}
             <div className="action-list">
               {lines.map((l) => (
                 <div className="item plan-item" key={l.product.id}>
@@ -140,9 +164,15 @@ export default async function PlanPage({
                     </div>
                   </div>
                   <div className="cluster tight">
-                    <span className="price plan-line-price">
-                      {formatMoney(l.lineTotal, l.product.currency, locale)}
-                    </span>
+                    {l.priceVisible ? (
+                      <span className="price plan-line-price">
+                        {formatMoney(l.lineTotal, l.product.currency, locale)}
+                      </span>
+                    ) : (
+                      <span className="muted small plan-line-price">
+                        {tv("requestPrice")}
+                      </span>
+                    )}
                     <form action={removeFromPlan}>
                       <input type="hidden" name="locale" value={locale} />
                       <input

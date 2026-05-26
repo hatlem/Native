@@ -382,7 +382,8 @@
     "actions": {
       "markNative": "Markera: erbjuder native",
       "markNoNative": "Markera: ingen native",
-      "deactivate": "Inaktivera"
+      "deactivate": "Inaktivera",
+      "edit": "Redigera"
     },
     "none": "Inga titlar matchar filtren."
   },
@@ -1429,5 +1430,67 @@
     "status_revoked": "Revoked",
     "revoke": "Revoke",
     "docsHintPrefix": "Public docs available at"
+  },
+  "quoteNarrative": {
+    "sectionCampaign": "Din kampanj",
+    "sectionWhatYouGet": "Det du får",
+    "sectionInvestment": "Investering",
+    "sectionWhyThisPrice": "Varför detta pris",
+    "sectionTerms": "Villkor",
+    "outcomeSummary": "{itemCount, plural, =1 {En redaktionell native-placering för {orgName} på en ledande europeisk titel} other {# redaktionella native-placeringar för {orgName} på ledande europeiska titlar}} — skriven, förhandlad och rapporterad som ett paket.",
+    "anchorLabel": "Listpris",
+    "anchorSavings": "−{pct}% mot listpris",
+    "anchorNote": "Utgivarens offentliga listpris för placeringen. Ditt totalpris inkluderar innehållsproduktion, placering, revideringar och rapportering.",
+    "whyThisPrice": "ATNative har direkta redaktionella relationer med alla titlar i offerten. Vi förhandlar placeringen, anlitar en branschspecialiserad skribent, hanterar redaktionell granskning med utgivaren och rapporterar på resultatet. Du får en ansvarig partner och ett totalpris — inte en mediafaktura, en skribentfaktura och ett byråarvode.",
+    "termsPayment": "50 % vid godkännande, 50 % vid publicering.",
+    "termsCancellation": "Full återbetalning innan artikelbriefen är godkänd; 50 % återbetalning innan första utkastet; ingen återbetalning efter att utgivarens slot är bekräftad.",
+    "termsValidity": "Offerten gäller i 14 dagar. Tillgänglighet hos utgivaren bekräftas vid godkännande.",
+    "bullets": {
+      "NATIVE_ARTICLE": [
+        "Förhandlad placering på {titleName}, skriven i titelns redaktionella röst",
+        "Artikel (1 200–1 500 ord) skriven av en branschspecialiserad journalist",
+        "Två revideringsomgångar och ditt godkännande innan publicering",
+        "Distribution i {titleName}s native-flöde och nyhetsbrev",
+        "Resultatrapport efter 30, 90 och 365 dagar"
+      ],
+      "ADVERTORIAL": [
+        "Förhandlad placering på {titleName}, tydligt märkt som betalt innehåll",
+        "Varumärkesledd artikel (800–1 200 ord) skriven enligt utgivarens redaktionella standard",
+        "En revideringsomgång och ditt godkännande innan publicering",
+        "Distribution i {titleName}s innehållsflöde",
+        "Resultatrapport efter 30 och 90 dagar"
+      ],
+      "NATIVE_DISPLAY": [
+        "In-feed-displayenhet på {titleName}, formgiven i utgivarens typografi",
+        "Kreativt material producerat enligt titelns spec",
+        "Riktat efter sektion och målgruppssegment",
+        "Resultatrapport efter 30 och 90 dagar (visningar, klickfrekvens, synlighet)"
+      ],
+      "PACKAGE": [
+        "Redaktionell artikel på {titleName} (1 200–1 500 ord)",
+        "Native-displayförstärkning i samma titel",
+        "Gemensam redaktionell granskning och gemensam publiceringsdag",
+        "Resultatrapport efter 30, 90 och 365 dagar"
+      ]
+    }
+  },
+  "priceVisibility": {
+    "requestPrice": "Begär pris",
+    "requestPriceHelp": "Pris sätts efter en brief — vi återkommer med tillgänglighet och fast pris.",
+    "planRfqOnly": "En eller flera titlar i din plan kräver offert — direktköp är inaktiverat tills priset är bekräftat."
+  },
+  "titleAdmin": {
+    "title": "Redigera titel",
+    "publishedRateCard": "Listpris",
+    "publishedRateCardHelp": "Utgivarens officiella listpris för en standardplacering. Visas som överstruket ankare på offerter till annonsör.",
+    "publishedRateCurrency": "Valuta",
+    "pricesPublic": "Visa priser för annonsör",
+    "pricesPublicHelp": "Av = katalogen visar 'Begär pris' istället för siffror. Direktköp är också inaktiverat.",
+    "publisherPricesPublic": "Synlighet för hela utgivaren",
+    "publisherPricesPublicOn": "Utgivarens priser är offentliga",
+    "publisherPricesPublicOff": "Utgivarens priser är dolda — åsidosätter alla titlar",
+    "save": "Spara ändringar",
+    "saved": "Sparat",
+    "cancel": "Avbryt"
   }
 }

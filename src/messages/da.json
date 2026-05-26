@@ -382,7 +382,8 @@
     "actions": {
       "markNative": "Markér: tilbyder native",
       "markNoNative": "Markér: ingen native",
-      "deactivate": "Deaktivér"
+      "deactivate": "Deaktivér",
+      "edit": "Rediger"
     },
     "none": "Ingen titler matcher filtrene."
   },
@@ -1430,5 +1431,67 @@
     "status_revoked": "Revoked",
     "revoke": "Revoke",
     "docsHintPrefix": "Public docs available at"
+  },
+  "quoteNarrative": {
+    "sectionCampaign": "Din kampagne",
+    "sectionWhatYouGet": "Det du får",
+    "sectionInvestment": "Investering",
+    "sectionWhyThisPrice": "Hvorfor denne pris",
+    "sectionTerms": "Vilkår",
+    "outcomeSummary": "{itemCount, plural, =1 {Én redaktionel native-placering for {orgName} på en førende europæisk titel} other {# redaktionelle native-placeringer for {orgName} på førende europæiske titler}} — skrevet, forhandlet og rapporteret som én pakke.",
+    "anchorLabel": "Listepris",
+    "anchorSavings": "−{pct}% mod listepris",
+    "anchorNote": "Udgiverens offentlige listepris for placeringen. Din samlede pris inkluderer indholdsproduktion, placering, revisioner og rapportering.",
+    "whyThisPrice": "ATNative har direkte redaktionelle relationer med alle titler i tilbuddet. Vi forhandler placeringen, hyrer en brancheekspert som skribent, varetager redaktionel gennemgang med udgiveren og rapporterer på resultatet. Du får én ansvarlig partner og én samlet pris — ikke en mediefaktura, en skribentfaktura og et bureauhonorar.",
+    "termsPayment": "50 % ved accept, 50 % ved udgivelse.",
+    "termsCancellation": "Fuld refusion før artikelbriefen er godkendt; 50 % refusion før første udkast; ingen refusion efter at udgiverens slot er bekræftet.",
+    "termsValidity": "Tilbuddet er gyldigt i 14 dage. Tilgængelighed hos udgiveren bekræftes ved accept.",
+    "bullets": {
+      "NATIVE_ARTICLE": [
+        "Forhandlet placering på {titleName}, skrevet i titlens redaktionelle stemme",
+        "Artikel (1.200–1.500 ord) skrevet af en brancheekspert",
+        "To revisionsrunder og din godkendelse før udgivelse",
+        "Distribution i {titleName}s native-feed og nyhedsbrev",
+        "Resultatrapport efter 30, 90 og 365 dage"
+      ],
+      "ADVERTORIAL": [
+        "Forhandlet placering på {titleName}, tydeligt mærket som betalt indhold",
+        "Brandledet artikel (800–1.200 ord) skrevet efter udgiverens redaktionelle standard",
+        "Én revisionsrunde og din godkendelse før udgivelse",
+        "Distribution i {titleName}s indholds-feed",
+        "Resultatrapport efter 30 og 90 dage"
+      ],
+      "NATIVE_DISPLAY": [
+        "In-feed-displayenhed på {titleName}, designet i udgiverens typografi",
+        "Kreativ produceret efter titlens specs",
+        "Målrettet efter sektion og målgruppesegment",
+        "Resultatrapport efter 30 og 90 dage (visninger, klikrate, synlighed)"
+      ],
+      "PACKAGE": [
+        "Redaktionel artikel på {titleName} (1.200–1.500 ord)",
+        "Native-displayforstærkning i samme titel",
+        "Fælles redaktionel gennemgang og fælles udgivelsesdato",
+        "Resultatrapport efter 30, 90 og 365 dage"
+      ]
+    }
+  },
+  "priceVisibility": {
+    "requestPrice": "Bed om pris",
+    "requestPriceHelp": "Prisen fastsættes efter en brief — vi vender tilbage med tilgængelighed og en fast pris.",
+    "planRfqOnly": "En eller flere titler i din plan kræver et tilbud — instant køb er deaktiveret indtil prisen er bekræftet."
+  },
+  "titleAdmin": {
+    "title": "Rediger titel",
+    "publishedRateCard": "Listepris",
+    "publishedRateCardHelp": "Udgiverens officielle listepris for en standardplacering. Vises som overstreget anker på tilbud til annoncør.",
+    "publishedRateCurrency": "Valuta",
+    "pricesPublic": "Vis priser til annoncør",
+    "pricesPublicHelp": "Fra = kataloget viser 'Bed om pris' i stedet for tal. Instant køb er også deaktiveret.",
+    "publisherPricesPublic": "Synlighed for hele udgiveren",
+    "publisherPricesPublicOn": "Udgiverens priser er offentlige",
+    "publisherPricesPublicOff": "Udgiverens priser er skjult — tilsidesætter alle titler",
+    "save": "Gem ændringer",
+    "saved": "Gemt",
+    "cancel": "Annullér"
   }
 }

@@ -4,7 +4,9 @@ import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
 import { Link } from "@/i18n/navigation";
 import { indicativeFromRules, toRateRules, formatMoney } from "@/lib/money";
+import { arePricesVisible } from "@/lib/pricing-visibility";
 import { EmptyState } from "@/app/empty-state";
+import { LandingShell } from "@/app/landing-shell";
 import { searchTitleIds } from "@/lib/catalog-search";
 
 export const dynamic = "force-dynamic";
@@ -47,6 +49,10 @@ export default async function CatalogPage({
   const tf = await getTranslations({ locale, namespace: "firm" });
   const tType = await getTranslations({ locale, namespace: "productType" });
   const tMarket = await getTranslations({ locale, namespace: "market" });
+  const tv = await getTranslations({
+    locale,
+    namespace: "priceVisibility",
+  });
 
   const market = asEnum(
     typeof sp.market === "string" ? sp.market : undefined,
@@ -234,9 +240,15 @@ export default async function CatalogPage({
           ) : null}
         <div className="grid">
           {titles.map((title) => {
-            const prices = title.products.map((p) =>
-              indicativeFromRules(Number(p.basePrice), toRateRules(p.priceRules)),
-            );
+            const priceVisible = arePricesVisible(title);
+            const prices = priceVisible
+              ? title.products.map((p) =>
+                  indicativeFromRules(
+                    Number(p.basePrice),
+                    toRateRules(p.priceRules),
+                  ),
+                )
+              : [];
             const from = prices.length ? Math.min(...prices) : null;
             const currency = title.products[0]?.currency ?? title.market.currency;
             const needsQuote = title.products.length === 0;
@@ -256,11 +268,15 @@ export default async function CatalogPage({
                       {tType(p.type)}
                     </span>
                   ))}
-                  {title.products.some((p) => p.visibility === "FIRM") ? (
+                  {priceVisible &&
+                  title.products.some((p) => p.visibility === "FIRM") ? (
                     <span className="tag">⚡ {tf("badge")}</span>
                   ) : null}
                   {needsQuote ? (
                     <span className="tag">{t("card.requestQuote")}</span>
+                  ) : null}
+                  {!priceVisible ? (
+                    <span className="tag">{tv("requestPrice")}</span>
                   ) : null}
                   {title.nativeFit ? (
                     <span className="tag">
@@ -287,10 +303,12 @@ export default async function CatalogPage({
                     {new Intl.NumberFormat().format(title.circulation)}
                   </div>
                 ) : null}
-                {from !== null ? (
+                {priceVisible && from !== null ? (
                   <div className="price">
                     {t("card.from")} {formatMoney(from, currency, locale)}
                   </div>
+                ) : !priceVisible ? (
+                  <div className="price muted">{tv("requestPrice")}</div>
                 ) : null}
               </article>
             );
@@ -359,100 +377,108 @@ async function CatalogMarketing({ locale }: { locale: string }) {
     ]);
 
   return (
-    <>
+    <LandingShell locale={locale} screenLabel="Catalog gate" withFooter={true}>
       <section className="hero">
-        <span className="eyebrow accent">{t("gate.eyebrow")}</span>
-        <h1>{t("gate.title", { count: titleCount })}</h1>
-        <p className="lead">{t("gate.lead")}</p>
-        <div className="hero-actions">
-          <Link href="/signup" className="btn large">
-            {t("gate.ctaPrimary")}
-          </Link>
-          <Link href="/signin" className="btn secondary large">
-            {t("gate.ctaSecondary")}
-          </Link>
-        </div>
-        <div className="hero-stats">
-          <div className="hero-stat">
-            <div className="value">{titleCount}</div>
-            <div className="label">{t("gate.statsTitles")}</div>
+        <div className="wrap">
+          <span className="eyebrow accent">{t("gate.eyebrow")}</span>
+          <h1>{t("gate.title", { count: titleCount })}</h1>
+          <p className="lead">{t("gate.lead")}</p>
+          <div className="hero-actions">
+            <Link href="/signup" className="btn large">
+              {t("gate.ctaPrimary")}
+            </Link>
+            <Link href="/signin" className="btn secondary large">
+              {t("gate.ctaSecondary")}
+            </Link>
           </div>
-          <div className="hero-stat">
-            <div className="value">{productCount}</div>
-            <div className="label">{t("gate.statsProducts")}</div>
-          </div>
-          <div className="hero-stat">
-            <div className="value">{distinctMarkets}</div>
-            <div className="label">{t("gate.statsMarkets")}</div>
+          <div className="hero-stats">
+            <div className="hero-stat">
+              <div className="value">{titleCount.toLocaleString(locale)}</div>
+              <div className="label">{t("gate.statsTitles")}</div>
+            </div>
+            <div className="hero-stat">
+              <div className="value">{productCount.toLocaleString(locale)}</div>
+              <div className="label">{t("gate.statsProducts")}</div>
+            </div>
+            <div className="hero-stat">
+              <div className="value">{distinctMarkets}</div>
+              <div className="label">{t("gate.statsMarkets")}</div>
+            </div>
           </div>
         </div>
       </section>
 
       <section className="section">
-        <div className="section-head">
-          <div>
-            <span className="eyebrow accent">{ta("formatsEyebrow")}</span>
-            <h2>{ta("formatsTitle")}</h2>
+        <div className="wrap">
+          <div className="section-head">
+            <div>
+              <span className="eyebrow accent">{ta("formatsEyebrow")}</span>
+              <h2>{ta("formatsTitle")}</h2>
+            </div>
+            <p className="lead" style={{ margin: 0, maxWidth: "44ch" }}>
+              {ta("formatsLead")}
+            </p>
           </div>
-          <p className="lead" style={{ margin: 0, maxWidth: "44ch" }}>
-            {ta("formatsLead")}
+          <div className="grid">
+            {FORMAT_KEYS.map((k) => (
+              <article className="card" key={k}>
+                <h3>{tType(k)}</h3>
+                <p className="muted">{tType(`desc${k}`)}</p>
+              </article>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      <section className="section">
+        <div className="wrap">
+          <div className="section-head">
+            <div>
+              <span className="eyebrow">{t("gate.teaserEyebrow")}</span>
+              <h2>{t("gate.teaserTitle")}</h2>
+            </div>
+            <Link href="/signup" className="link">
+              {t("gate.teaserCta")} →
+            </Link>
+          </div>
+          <div className="grid">
+            {featured.map((title) => (
+              <article className="card title-card" key={title.id}>
+                <span className="tag">{tMarket(title.market.code)}</span>
+                <h3>{title.name}</h3>
+                <p className="muted">{title.publisher.name}</p>
+                {title.category ? (
+                  <p className="muted small">{title.category}</p>
+                ) : null}
+                <p className="muted small" style={{ marginTop: 12 }}>
+                  🔒 {t("gate.cardLocked")}
+                </p>
+              </article>
+            ))}
+          </div>
+          <p className="note" style={{ marginTop: 24 }}>
+            {t("gate.teaserFoot", { total: titleCount })}{" "}
+            <Link href="/signup" className="link">
+              {t("gate.teaserLink")} →
+            </Link>
           </p>
         </div>
-        <div className="grid">
-          {FORMAT_KEYS.map((k) => (
-            <article className="card" key={k}>
-              <h3>{tType(k)}</h3>
-              <p className="muted">{tType(`desc${k}`)}</p>
-            </article>
-          ))}
-        </div>
-      </section>
-
-      <section className="section">
-        <div className="section-head">
-          <div>
-            <span className="eyebrow">{t("gate.teaserEyebrow")}</span>
-            <h2>{t("gate.teaserTitle")}</h2>
-          </div>
-          <Link href="/signup" className="link">
-            {t("gate.teaserCta")} →
-          </Link>
-        </div>
-        <div className="grid">
-          {featured.map((title) => (
-            <article className="card title-card" key={title.id}>
-              <span className="tag">{tMarket(title.market.code)}</span>
-              <h3>{title.name}</h3>
-              <p className="muted">{title.publisher.name}</p>
-              {title.category ? (
-                <p className="muted small">{title.category}</p>
-              ) : null}
-              <p className="muted small" style={{ marginTop: 12 }}>
-                🔒 {t("gate.cardLocked")}
-              </p>
-            </article>
-          ))}
-        </div>
-        <p className="note" style={{ marginTop: 24 }}>
-          {t("gate.teaserFoot", { total: titleCount })}{" "}
-          <Link href="/signup" className="link">
-            {t("gate.teaserLink")} →
-          </Link>
-        </p>
       </section>
 
       <section className="section cta-block">
-        <h2>{t("gate.ctaBlockTitle")}</h2>
-        <p className="muted">{t("gate.ctaBlockBody")}</p>
-        <div className="hero-actions">
-          <Link href="/signup" className="btn large">
-            {t("gate.ctaPrimary")}
-          </Link>
-          <Link href="/signin" className="btn secondary large">
-            {t("gate.ctaSecondary")}
-          </Link>
+        <div className="wrap">
+          <h2>{t("gate.ctaBlockTitle")}</h2>
+          <p className="muted">{t("gate.ctaBlockBody")}</p>
+          <div className="hero-actions">
+            <Link href="/signup" className="btn large">
+              {t("gate.ctaPrimary")}
+            </Link>
+            <Link href="/signin" className="btn secondary large">
+              {t("gate.ctaSecondary")}
+            </Link>
+          </div>
         </div>
       </section>
-    </>
+    </LandingShell>
   );
 }
