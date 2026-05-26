@@ -376,6 +376,12 @@ export async function requestPasswordReset(formData: FormData) {
       console.error("auth.password_reset_email_failed", { userId: user.id, err });
     }
     await recordAudit(user.id, "auth.password_reset_requested", `User:${email}`, { ip });
+  } else if (user) {
+    // User exists but has no password (passwordless-future or OAuth-only account):
+    // there's nothing to reset. Keep the user-facing response identical to the
+    // other branches (still /check-email) but emit a distinct audit kind so
+    // ops can spot the case in the log.
+    await recordAudit(user.id, "auth.password_reset_requested_no_password", `User:${email}`, { ip });
   } else {
     await recordAudit(email, "auth.password_reset_requested_unknown", `User:${email}`, { ip });
   }
@@ -462,8 +468,7 @@ export async function resetPassword(formData: FormData) {
     throw error;
   }
 
-  // Use the recordSignIn helper from auth-events to record IP + fire alert if needed.
-  const { recordSignIn } = await import("@/lib/auth-events");
+  // Use the recordSignIn helper to record IP + fire alert if needed.
   await recordSignIn({
     userId: outcome.userId,
     userEmail: outcome.email,
