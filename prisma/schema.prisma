@@ -365,8 +365,13 @@ model User {
   publisher      Publisher?   @relation(fields: [publisherId], references: [id])
   createdAt      DateTime     @default(now())
   updatedAt      DateTime     @updatedAt
+  emailVerifiedAt DateTime?
+  lastSignInIp    String?
+  lastSignInAt    DateTime?
 
-  notifications Notification[]
+  notifications       Notification[]
+  magicLinkTokens     MagicLinkToken[]
+  passwordResetTokens PasswordResetToken[]
 }
 
 // Super-admin emits these when activating a new publishing house in
@@ -694,4 +699,39 @@ model AuditLog {
 
   @@index([entity])
   @@index([createdAt])
+}
+
+// Single-use magic-link sign-in token. Hashed at rest (SHA-256); the raw
+// token only ever lives in the email URL. Mirrors the PublisherInvite
+// pattern (single-use, time-limited).
+model MagicLinkToken {
+  id          String    @id @default(cuid())
+  userId      String
+  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  tokenHash   String    @unique
+  expiresAt   DateTime
+  consumedAt  DateTime?
+  requestedIp String?
+  createdAt   DateTime  @default(now())
+
+  @@index([userId])
+  @@index([expiresAt])
+}
+
+// Single-use password-reset token. Same shape as MagicLinkToken — the two
+// are kept as separate tables so we can prune / rate-limit / audit them
+// independently and so a request for one doesn't shorten the window of
+// the other.
+model PasswordResetToken {
+  id          String    @id @default(cuid())
+  userId      String
+  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  tokenHash   String    @unique
+  expiresAt   DateTime
+  consumedAt  DateTime?
+  requestedIp String?
+  createdAt   DateTime  @default(now())
+
+  @@index([userId])
+  @@index([expiresAt])
 }
