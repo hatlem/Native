@@ -8,6 +8,7 @@ import {
   setPublisherPricesPublic,
 } from "@/app/title-actions";
 import { SalesContactsPanel } from "./_components/SalesContactsPanel";
+import { PriceRequestsPanel } from "./_components/PriceRequestsPanel";
 
 export const dynamic = "force-dynamic";
 
@@ -185,6 +186,8 @@ export default async function DeskTitleEditPage({
         titleId={title.id}
         publisherId={title.publisher.id}
       />
+
+      <PriceRequestsPanel locale={locale} titleId={title.id} />
     </section>
   );
 }

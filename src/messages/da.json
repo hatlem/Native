@@ -1540,5 +1540,33 @@
     "role": "Rolle",
     "notes": "Noter",
     "create": "Opret kontakt"
+  },
+  "priceRequests": {
+    "title": "Prisforespørgsler",
+    "sendNew": "Send ny forespørgsel",
+    "noContactsHint": "Tilføj en salgskontakt ovenfor, inden du sender en forespørgsel.",
+    "noRequests": "Ingen forespørgsler for denne titel endnu.",
+    "send": "Send forespørgsel",
+    "resend": "Send igen",
+    "cancel": "Annullér",
+    "logManual": "Registrer svar manuelt",
+    "primary": "primær",
+    "col": { "contact": "Kontakt", "created": "Oprettet", "status": "Status", "actions": "Handlinger" },
+    "status": {
+      "draft": "Kladde",
+      "sent": "Sendt",
+      "opened": "Åbnet",
+      "responded": "Besvaret",
+      "cancelled": "Annulleret",
+      "expired": "Udløbet"
+    },
+    "manual": {
+      "product": "Produkt",
+      "price": "Pris",
+      "currency": "Valuta",
+      "included": "Hvad der er inkluderet",
+      "excluded": "Hvad der IKKE er inkluderet",
+      "submit": "Registrer dette tilbud"
+    }
   }
 }

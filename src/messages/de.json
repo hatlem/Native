@@ -1397,5 +1397,33 @@
     "role": "Rolle",
     "notes": "Notizen",
     "create": "Kontakt erstellen"
+  },
+  "priceRequests": {
+    "title": "Preisanfragen",
+    "sendNew": "Neue Anfrage senden",
+    "noContactsHint": "Fügen Sie oben einen Vertriebskontakt hinzu, bevor Sie eine Anfrage senden.",
+    "noRequests": "Noch keine Anfragen für diesen Titel.",
+    "send": "Anfrage senden",
+    "resend": "Erneut senden",
+    "cancel": "Abbrechen",
+    "logManual": "Antwort manuell erfassen",
+    "primary": "primär",
+    "col": { "contact": "Kontakt", "created": "Erstellt", "status": "Status", "actions": "Aktionen" },
+    "status": {
+      "draft": "Entwurf",
+      "sent": "Gesendet",
+      "opened": "Geöffnet",
+      "responded": "Beantwortet",
+      "cancelled": "Storniert",
+      "expired": "Abgelaufen"
+    },
+    "manual": {
+      "product": "Produkt",
+      "price": "Preis",
+      "currency": "Währung",
+      "included": "Was inbegriffen ist",
+      "excluded": "Was NICHT inbegriffen ist",
+      "submit": "Dieses Angebot erfassen"
+    }
   }
 }

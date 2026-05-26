@@ -1539,5 +1539,33 @@
     "role": "Rooli",
     "notes": "Muistiinpanot",
     "create": "Luo yhteystieto"
+  },
+  "priceRequests": {
+    "title": "Hintapyynnöt",
+    "sendNew": "Lähetä uusi pyyntö",
+    "noContactsHint": "Lisää myyntiyhteyshenkilö yllä ennen pyynnön lähettämistä.",
+    "noRequests": "Ei vielä pyyntöjä tälle nimikkeelle.",
+    "send": "Lähetä pyyntö",
+    "resend": "Lähetä uudelleen",
+    "cancel": "Peruuta",
+    "logManual": "Kirjaa vastaus manuaalisesti",
+    "primary": "ensisijainen",
+    "col": { "contact": "Yhteystieto", "created": "Luotu", "status": "Tila", "actions": "Toiminnot" },
+    "status": {
+      "draft": "Luonnos",
+      "sent": "Lähetetty",
+      "opened": "Avattu",
+      "responded": "Vastattu",
+      "cancelled": "Peruutettu",
+      "expired": "Vanhentunut"
+    },
+    "manual": {
+      "product": "Tuote",
+      "price": "Hinta",
+      "currency": "Valuutta",
+      "included": "Mitä sisältyy",
+      "excluded": "Mitä EI sisälly",
+      "submit": "Kirjaa tämä tarjous"
+    }
   }
 }

@@ -1539,5 +1539,33 @@
     "role": "Rolle",
     "notes": "Notater",
     "create": "Opprett kontakt"
+  },
+  "priceRequests": {
+    "title": "Prisforespørsler",
+    "sendNew": "Send ny forespørsel",
+    "noContactsHint": "Legg til en salgskontakt ovenfor før du sender en forespørsel.",
+    "noRequests": "Ingen forespørsler for denne tittelen ennå.",
+    "send": "Send forespørsel",
+    "resend": "Send på nytt",
+    "cancel": "Avbryt",
+    "logManual": "Registrer svar manuelt",
+    "primary": "primær",
+    "col": { "contact": "Kontakt", "created": "Opprettet", "status": "Status", "actions": "Handlinger" },
+    "status": {
+      "draft": "Utkast",
+      "sent": "Sendt",
+      "opened": "Åpnet",
+      "responded": "Besvart",
+      "cancelled": "Avbrutt",
+      "expired": "Utløpt"
+    },
+    "manual": {
+      "product": "Produkt",
+      "price": "Pris",
+      "currency": "Valuta",
+      "included": "Hva som er inkludert",
+      "excluded": "Hva som IKKE er inkludert",
+      "submit": "Registrer dette tilbudet"
+    }
   }
 }

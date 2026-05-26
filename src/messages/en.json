@@ -1539,5 +1539,33 @@
     "role": "Role",
     "notes": "Notes",
     "create": "Create contact"
+  },
+  "priceRequests": {
+    "title": "Price requests",
+    "sendNew": "Send a new request",
+    "noContactsHint": "Add a sales contact above before sending a request.",
+    "noRequests": "No requests yet for this title.",
+    "send": "Send request",
+    "resend": "Resend",
+    "cancel": "Cancel",
+    "logManual": "Log response manually",
+    "primary": "primary",
+    "col": { "contact": "Contact", "created": "Created", "status": "Status", "actions": "Actions" },
+    "status": {
+      "draft": "Draft",
+      "sent": "Sent",
+      "opened": "Opened",
+      "responded": "Responded",
+      "cancelled": "Cancelled",
+      "expired": "Expired"
+    },
+    "manual": {
+      "product": "Product",
+      "price": "Price",
+      "currency": "Currency",
+      "included": "What's included",
+      "excluded": "What's NOT included",
+      "submit": "Log this quote"
+    }
   }
 }

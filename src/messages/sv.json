@@ -1539,5 +1539,33 @@
     "role": "Roll",
     "notes": "Anteckningar",
     "create": "Skapa kontakt"
+  },
+  "priceRequests": {
+    "title": "Prisförfrågningar",
+    "sendNew": "Skicka ny förfrågan",
+    "noContactsHint": "Lägg till en säljkontakt ovan innan du skickar en förfrågan.",
+    "noRequests": "Inga förfrågningar för denna titel ännu.",
+    "send": "Skicka förfrågan",
+    "resend": "Skicka igen",
+    "cancel": "Avbryt",
+    "logManual": "Registrera svar manuellt",
+    "primary": "primär",
+    "col": { "contact": "Kontakt", "created": "Skapad", "status": "Status", "actions": "Åtgärder" },
+    "status": {
+      "draft": "Utkast",
+      "sent": "Skickad",
+      "opened": "Öppnad",
+      "responded": "Besvarad",
+      "cancelled": "Avbruten",
+      "expired": "Utgången"
+    },
+    "manual": {
+      "product": "Produkt",
+      "price": "Pris",
+      "currency": "Valuta",
+      "included": "Vad som ingår",
+      "excluded": "Vad som INTE ingår",
+      "submit": "Registrera detta offert"
+    }
   }
 }
