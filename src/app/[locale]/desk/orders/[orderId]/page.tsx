@@ -14,6 +14,7 @@ import {
 } from "@/app/desk-actions";
 import { StatusBadge } from "@/app/status-badge";
 import { canCancelOrder, cancelBlockReason } from "@/lib/cancellation";
+import { SubmitButton } from "@/components";
 
 export const dynamic = "force-dynamic";
 
@@ -95,18 +96,22 @@ export default async function DeskOrderPage({
               <form action={advanceOrder}>
                 <input type="hidden" name="locale" value={locale} />
                 <input type="hidden" name="orderId" value={order.id} />
-                <button type="submit" className="btn block">
-                  {t("advance")}
-                </button>
+                <SubmitButton
+                  label={t("advance")}
+                  pendingLabel={t("advancing")}
+                  className="btn block"
+                />
               </form>
             ) : null}
             {order.status === "COMPLETED" && !invoice ? (
               <form action={issueInvoice}>
                 <input type="hidden" name="locale" value={locale} />
                 <input type="hidden" name="orderId" value={order.id} />
-                <button type="submit" className="btn block">
-                  {t("issueInvoice")}
-                </button>
+                <SubmitButton
+                  label={t("issueInvoice")}
+                  pendingLabel={t("issuingInvoice")}
+                  className="btn block"
+                />
               </form>
             ) : null}
             {invoice ? (
@@ -142,9 +147,11 @@ export default async function DeskOrderPage({
                     />
                   </div>
                   <div className="actions">
-                    <button type="submit" className="btn block">
-                      {t("cancelSubmit")}
-                    </button>
+                    <SubmitButton
+                      label={t("cancelSubmit")}
+                      pendingLabel={t("cancelling")}
+                      className="btn block"
+                    />
                   </div>
                 </form>
               </details>
@@ -218,9 +225,11 @@ export default async function DeskOrderPage({
                   />
                 </div>
                 <div className="actions">
-                  <button type="submit" className="btn">
-                    {t("creditNoteSubmit")}
-                  </button>
+                  <SubmitButton
+                    label={t("creditNoteSubmit")}
+                    pendingLabel={t("issuingCreditNote")}
+                    className="btn"
+                  />
                 </div>
               </form>
             </details>

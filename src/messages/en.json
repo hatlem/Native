@@ -558,12 +558,14 @@
     "title": "Order",
     "status": "Status",
     "advance": "Advance status",
+    "advancing": "Advancing…",
     "lines": "Lines",
     "orders": "Orders",
     "noOrders": "No orders yet.",
     "open": "Open",
     "back": "Back to desk",
     "issueInvoice": "Issue invoice",
+    "issuingInvoice": "Issuing…",
     "viewInvoice": "View invoice",
     "deskDetailLead": "Move the order through production, manage drafts, and surface the invoice when it's done.",
     "productionEyebrow": "Production",
@@ -583,6 +585,7 @@
     "cancelReasonLabel": "Reason",
     "cancelReasonPlaceholder": "e.g. Buyer pulled out; or publisher editorial veto on the scheduled draft.",
     "cancelSubmit": "Confirm cancellation",
+    "cancelling": "Cancelling…",
     "cancelBlocked": "This order can no longer be cancelled.",
     "cancelError": "Cancellation refused",
     "cancelledAtLabel": "Cancelled",
@@ -594,6 +597,7 @@
     "creditNoteReasonLabel": "Reason",
     "creditNoteReasonPlaceholder": "e.g. Order cancelled after invoice issued; publisher editorial veto.",
     "creditNoteSubmit": "Issue credit note",
+    "issuingCreditNote": "Issuing…",
     "creditNoteIssuedLabel": "Credit note issued"
   },
   "production": {
@@ -1563,7 +1567,12 @@
     "cancel": "Cancel",
     "logManual": "Log response manually",
     "primary": "primary",
-    "col": { "contact": "Contact", "created": "Created", "status": "Status", "actions": "Actions" },
+    "col": {
+      "contact": "Contact",
+      "created": "Created",
+      "status": "Status",
+      "actions": "Actions"
+    },
     "status": {
       "draft": "Draft",
       "sent": "Sent",
@@ -1644,10 +1653,22 @@
     "note": "Anything else we should know?",
     "submit": "Send pricing",
     "closed": {
-      "expired": { "title": "Link expired", "body": "Please reach out to your contact at NativeSpin to issue a new link." },
-      "responded": { "title": "Already received", "body": "Thanks — we already have your response on file." },
-      "cancelled": { "title": "Link cancelled", "body": "Please reach out to your contact at NativeSpin." },
-      "unknown": { "title": "Link not available", "body": "Please reach out to your contact at NativeSpin." }
+      "expired": {
+        "title": "Link expired",
+        "body": "Please reach out to your contact at NativeSpin to issue a new link."
+      },
+      "responded": {
+        "title": "Already received",
+        "body": "Thanks — we already have your response on file."
+      },
+      "cancelled": {
+        "title": "Link cancelled",
+        "body": "Please reach out to your contact at NativeSpin."
+      },
+      "unknown": {
+        "title": "Link not available",
+        "body": "Please reach out to your contact at NativeSpin."
+      }
     },
     "thanks": {
       "title": "Thanks!",
