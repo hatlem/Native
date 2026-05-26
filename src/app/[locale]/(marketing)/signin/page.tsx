@@ -38,9 +38,11 @@ export default async function SignInPage({
   const errorMessage =
     errorCode === "rate"
       ? t("rateLimited")
-      : errorCode
-        ? t("failed")
-        : null;
+      : errorCode === "magic_expired"
+        ? t("magicLinkExpired")
+        : errorCode
+          ? t("failed")
+          : null;
   const initialEmail = typeof sp.email === "string" ? sp.email : "";
 
   return (
