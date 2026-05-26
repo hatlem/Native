@@ -392,6 +392,8 @@
     "password": "Lösenord",
     "submit": "Logga in",
     "failed": "Ogiltig e-post eller lösenord — försök igen.",
+    "rateLimited": "För många försök — vänta en minut och försök igen.",
+    "signingIn": "Loggar in…",
     "hint": "Demo-inloggningar — desk: desk@atnative.com / atnative-desk · köpare: buyer@atnative.com / atnative-buyer",
     "signin": "Logga in",
     "signout": "Logga ut",

@@ -392,6 +392,8 @@
     "password": "Adgangskode",
     "submit": "Log ind",
     "failed": "Ugyldig e-mail eller adgangskode — prøv igen.",
+    "rateLimited": "For mange forsøg — vent et minut og prøv igen.",
+    "signingIn": "Logger ind…",
     "hint": "Demo-logins — desk: desk@atnative.com / atnative-desk · køber: buyer@atnative.com / atnative-buyer",
     "signin": "Log ind",
     "signout": "Log ud",

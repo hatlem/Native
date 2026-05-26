@@ -462,6 +462,8 @@
     "password": "Password",
     "submit": "Sign in",
     "failed": "Invalid email or password — please try again.",
+    "rateLimited": "Too many sign-in attempts — wait a minute and try again.",
+    "signingIn": "Signing in…",
     "hint": "Demo logins — desk: desk@atnative.com / atnative-desk · buyer: buyer@atnative.com / atnative-buyer",
     "signin": "Sign in",
     "signout": "Sign out",

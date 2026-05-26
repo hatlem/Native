@@ -462,6 +462,8 @@
     "password": "Salasana",
     "submit": "Kirjaudu sisään",
     "failed": "Virheellinen sähköposti tai salasana — yritä uudelleen.",
+    "rateLimited": "Liian monta yritystä — odota hetki ja yritä uudelleen.",
+    "signingIn": "Kirjaudutaan…",
     "hint": "Demo-tunnukset — desk: desk@atnative.com / atnative-desk · ostaja: buyer@atnative.com / atnative-buyer",
     "signin": "Kirjaudu sisään",
     "signout": "Kirjaudu ulos",

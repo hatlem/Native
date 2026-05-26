@@ -36,8 +36,9 @@ export async function authenticate(formData: FormData) {
     authLimiter.check(`signin:ip:${ip}`),
     authLimiter.check(`signin:email:${email}`),
   ]);
+  const emailParam = email ? `&email=${encodeURIComponent(email)}` : "";
   if (!ipCheck.ok || !emailCheck.ok) {
-    redirect(`/${locale}/signin?error=rate`);
+    redirect(`/${locale}/signin?error=rate${emailParam}`);
   }
 
   try {
@@ -45,7 +46,7 @@ export async function authenticate(formData: FormData) {
   } catch (error) {
     if (error instanceof AuthError) {
       await recordAudit(email || "anonymous", "auth.signin_failed", `User:${email}`, { ip });
-      redirect(`/${locale}/signin?error=1`);
+      redirect(`/${locale}/signin?error=1${emailParam}`);
     }
     throw error;
   }

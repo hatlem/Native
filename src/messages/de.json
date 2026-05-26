@@ -462,6 +462,8 @@
     "password": "Passwort",
     "submit": "Anmelden",
     "failed": "E-Mail oder Passwort ungültig — bitte erneut versuchen.",
+    "rateLimited": "Zu viele Versuche — bitte eine Minute warten und erneut versuchen.",
+    "signingIn": "Wird angemeldet…",
     "hint": "Demo-Zugänge — Desk: desk@atnative.com / atnative-desk · Käufer: buyer@atnative.com / atnative-buyer",
     "signin": "Anmelden",
     "signout": "Abmelden",

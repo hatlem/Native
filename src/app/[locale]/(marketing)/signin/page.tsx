@@ -6,6 +6,7 @@ import { landingForRole } from "@/lib/roles";
 import { authenticate } from "@/app/auth-actions";
 import { LandingShell } from "@/app/landing-shell";
 import { DemoChips, type DemoAccount } from "./demo-chips";
+import { SubmitButton } from "./submit-button";
 
 export const dynamic = "force-dynamic";
 
@@ -33,7 +34,14 @@ export default async function SignInPage({
   const tc = await getTranslations({ locale, namespace: "common" });
 
   const appName = tc("appName");
-  const showError = Boolean(sp.error);
+  const errorCode = typeof sp.error === "string" ? sp.error : undefined;
+  const errorMessage =
+    errorCode === "rate"
+      ? t("rateLimited")
+      : errorCode
+        ? t("failed")
+        : null;
+  const initialEmail = typeof sp.email === "string" ? sp.email : "";
 
   return (
     <LandingShell locale={locale} screenLabel="Sign in">
@@ -54,10 +62,10 @@ export default async function SignInPage({
             <p>{t("signinSubtitle")}</p>
           </div>
 
-          {showError ? (
+          {errorMessage ? (
             <div className="banner-error" role="alert">
               <ErrorIcon />
-              <span>{t("failed")}</span>
+              <span>{errorMessage}</span>
             </div>
           ) : null}
 
@@ -72,6 +80,7 @@ export default async function SignInPage({
                 autoComplete="email"
                 autoFocus
                 required
+                defaultValue={initialEmail}
               />
             </div>
             <div className="field">
@@ -85,9 +94,7 @@ export default async function SignInPage({
               />
             </div>
             <div className="actions">
-              <button type="submit" className="btn primary block">
-                {t("submit")}
-              </button>
+              <SubmitButton label={t("submit")} pendingLabel={t("signingIn")} />
             </div>
           </form>
 
