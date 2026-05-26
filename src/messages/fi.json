@@ -541,6 +541,7 @@
     "claimSubtitle": "You will be signed in as the {publisher} portal owner.",
     "claimEmailLockedHint": "Email is locked to the invitation — ask NativeSpin to issue a new invite if it needs to change.",
     "claimSubmit": "Claim portal account",
+    "claimSubmitting": "Lunastetaan…",
     "claimError": "We could not complete the claim. The link may have just expired.",
     "forgotLink": "Unohditko salasanan?",
     "magicLinkDivider": "tai",

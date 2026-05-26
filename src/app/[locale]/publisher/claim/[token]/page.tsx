@@ -6,6 +6,7 @@ import { Link } from "@/i18n/navigation";
 import { claimPublisherInvite } from "@/app/auth-actions";
 import { checkInvite } from "@/lib/publisher-invite";
 import { LandingShell } from "@/app/landing-shell";
+import { SubmitButton } from "@/components";
 
 export const dynamic = "force-dynamic";
 
@@ -134,9 +135,10 @@ export default async function ClaimPublisherInvitePage({
               <span className="hint">{t("pwHint")}</span>
             </div>
             <div className="actions">
-              <button type="submit" className="btn primary block">
-                {t("claimSubmit")}
-              </button>
+              <SubmitButton
+                label={t("claimSubmit")}
+                pendingLabel={t("claimSubmitting")}
+              />
             </div>
           </form>
 
