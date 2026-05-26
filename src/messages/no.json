@@ -315,6 +315,7 @@
     "request": "Forespørsel",
     "brief": "Brief",
     "generate": "Lag tilbud",
+    "generating": "Lager…",
     "quote": "Tilbud",
     "subtotal": "Delsum",
     "vat": "MVA",

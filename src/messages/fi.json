@@ -388,6 +388,7 @@
     "request": "Pyyntö",
     "brief": "Brief",
     "generate": "Luo tarjous",
+    "generating": "Luodaan…",
     "quote": "Tarjous",
     "subtotal": "Välisumma",
     "vat": "ALV",

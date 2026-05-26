@@ -388,6 +388,7 @@
     "request": "Request",
     "brief": "Brief",
     "generate": "Generate quote",
+    "generating": "Wird erstellt…",
     "quote": "Quote",
     "subtotal": "Subtotal",
     "vat": "VAT",

@@ -5,6 +5,7 @@ import { Link } from "@/i18n/navigation";
 import { formatMoney } from "@/lib/money";
 import { generateQuote } from "@/app/actions";
 import { StatusBadge } from "@/app/status-badge";
+import { SubmitButton } from "@/components";
 
 export const dynamic = "force-dynamic";
 
@@ -106,9 +107,11 @@ export default async function DeskRequestPage({
             <form action={generateQuote}>
               <input type="hidden" name="locale" value={locale} />
               <input type="hidden" name="requestId" value={request.id} />
-              <button type="submit" className="btn large">
-                {t("generate")}
-              </button>
+              <SubmitButton
+                label={t("generate")}
+                pendingLabel={t("generating")}
+                className="btn large"
+              />
             </form>
           </div>
         </section>
