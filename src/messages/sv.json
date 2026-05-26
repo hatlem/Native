@@ -1468,6 +1468,7 @@
     "ttlPlaceholder": "No expiry",
     "ttlHint": "Leave blank for no expiry; max 1825 days (5 years).",
     "issueSubmit": "Generate key",
+    "issuing": "Genererar…",
     "listEyebrow": "Existing",
     "listTitle": "All keys",
     "colName": "Name",
@@ -1480,6 +1481,7 @@
     "status_expired": "Expired",
     "status_revoked": "Revoked",
     "revoke": "Revoke",
+    "revoking": "Återkallar…",
     "docsHintPrefix": "Public docs available at"
   },
   "quoteNarrative": {

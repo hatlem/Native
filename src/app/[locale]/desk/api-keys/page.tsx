@@ -4,6 +4,7 @@ import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
 import { Link } from "@/i18n/navigation";
 import { createApiKey, revokeApiKey } from "@/app/admin-actions";
+import { SubmitButton } from "@/components";
 
 export const dynamic = "force-dynamic";
 
@@ -120,9 +121,11 @@ export default async function ApiKeysPage({
             <span className="hint">{t("ttlHint")}</span>
           </div>
           <div className="actions">
-            <button type="submit" className="btn">
-              {t("issueSubmit")}
-            </button>
+            <SubmitButton
+              label={t("issueSubmit")}
+              pendingLabel={t("issuing")}
+              className="btn"
+            />
           </div>
         </form>
       </section>
@@ -188,9 +191,11 @@ export default async function ApiKeysPage({
                         <form action={revokeApiKey}>
                           <input type="hidden" name="locale" value={locale} />
                           <input type="hidden" name="keyId" value={k.id} />
-                          <button type="submit" className="btn small ghost">
-                            {t("revoke")}
-                          </button>
+                          <SubmitButton
+                            label={t("revoke")}
+                            pendingLabel={t("revoking")}
+                            className="btn small ghost"
+                          />
                         </form>
                       ) : null}
                     </td>
