@@ -83,8 +83,8 @@ test("anyHiddenPrices is the inverse of allPricesVisible for non-empty inputs", 
 
 test("redactProductPricing strips price when hidden, preserves when visible", () => {
   const visible = redactProductPricing(
-    { basePrice: "1000", currency: "EUR", visibility: "FIRM", name: "X" },
-    true,
+    { basePrice: "1000", currency: "EUR", visibility: "FIRM", name: "X", active: true, confirmedAt: new Date() },
+    { pricesPublic: true, publisher: { pricesPublic: true } },
   );
   assert.equal(visible.basePrice, "1000");
   assert.equal(visible.visibility, "FIRM");
@@ -92,8 +92,8 @@ test("redactProductPricing strips price when hidden, preserves when visible", ()
   assert.equal((visible as { name: string }).name, "X");
 
   const hidden = redactProductPricing(
-    { basePrice: "1000", currency: "EUR", visibility: "FIRM", name: "X" },
-    false,
+    { basePrice: "1000", currency: "EUR", visibility: "FIRM", name: "X", active: true, confirmedAt: new Date() },
+    { pricesPublic: false, publisher: { pricesPublic: true } },
   );
   assert.equal(hidden.basePrice, null);
   // Demoted to INDICATIVE so consumers never think they can checkout
