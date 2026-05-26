@@ -9,12 +9,26 @@ import {
   markTitleNoNative,
   deactivateTitle,
 } from "@/app/title-actions";
+import {
+  latestConfirmedAtAcrossProducts,
+  freshnessBucket,
+  ageInDays,
+  type FreshnessBucket,
+} from "@/lib/pricing/freshness";
 
 export const dynamic = "force-dynamic";
 
 const MARKET_CODES = Object.values(MarketCode);
 const STATUS_VALUES = ["all", "unverified", "active", "no-native"] as const;
 type StatusFilter = (typeof STATUS_VALUES)[number];
+
+const FRESHNESS_VALUES = ["never", "stale", "aging", "fresh"] as const;
+
+function asFreshness(value: string | undefined): FreshnessBucket | undefined {
+  return value && (FRESHNESS_VALUES as readonly string[]).includes(value)
+    ? (value as FreshnessBucket)
+    : undefined;
+}
 
 // Small fixed-domain CSV columns — perfect for dropdowns.
 const NATIVE_FIT_VALUES = ["High", "Medium", "Low"] as const;
@@ -90,6 +104,7 @@ export default async function DeskTitlesPage({
       ? parseInt(circulationMinRaw, 10)
       : undefined;
   const q = str(sp, "q");
+  const freshnessFilter = asFreshness(str(sp, "freshness") || undefined);
   const pageParam = parseInt(str(sp, "page") || "1", 10);
   const page = Number.isFinite(pageParam) && pageParam >= 1 ? pageParam : 1;
 
@@ -142,6 +157,7 @@ export default async function DeskTitlesPage({
         publisher: true,
         market: true,
         _count: { select: { products: true } },
+        products: { select: { confirmedAt: true } },
       },
       orderBy: [
         { market: { code: "asc" } },
@@ -163,15 +179,35 @@ export default async function DeskTitlesPage({
     where: { lastVerifiedAt: null },
   });
 
-  const byMarket = new Map<MarketCode, typeof titles>();
-  for (const tt of titles) {
+  // Compute freshness for every title, then optionally filter in-memory.
+  type TitleWithFreshness = (typeof titles)[number] & {
+    freshness: FreshnessBucket;
+    freshnessAgeDays: number | null;
+  };
+
+  const titlesWithFreshness: TitleWithFreshness[] = titles.map((title) => {
+    const latest = latestConfirmedAtAcrossProducts(title.products);
+    return {
+      ...title,
+      freshness: freshnessBucket(latest),
+      freshnessAgeDays: ageInDays(latest),
+    };
+  });
+
+  const filteredTitles = freshnessFilter
+    ? titlesWithFreshness.filter((t) => t.freshness === freshnessFilter)
+    : titlesWithFreshness;
+
+  const byMarket = new Map<MarketCode, TitleWithFreshness[]>();
+  for (const tt of filteredTitles) {
     const arr = byMarket.get(tt.market.code) ?? [];
     arr.push(tt);
     byMarket.set(tt.market.code, arr);
   }
 
   const totalPages = Math.max(1, Math.ceil(filteredCount / PAGE_SIZE));
-  const pageQuery = (p: number) => {
+
+  const baseParams = () => {
     const params = new URLSearchParams();
     if (market) params.set("market", market);
     if (status !== "all") params.set("status", status);
@@ -188,7 +224,20 @@ export default async function DeskTitlesPage({
     if (circulationMin !== undefined)
       params.set("circulationMin", String(circulationMin));
     if (q) params.set("q", q);
+    return params;
+  };
+
+  const pageQuery = (p: number) => {
+    const params = baseParams();
+    if (freshnessFilter) params.set("freshness", freshnessFilter);
     if (p > 1) params.set("page", String(p));
+    const s = params.toString();
+    return s ? `?${s}` : "";
+  };
+
+  const freshnessQuery = (bucket: FreshnessBucket | undefined) => {
+    const params = baseParams();
+    if (bucket) params.set("freshness", bucket);
     const s = params.toString();
     return s ? `?${s}` : "";
   };
@@ -365,7 +414,28 @@ export default async function DeskTitlesPage({
         {t("resultCount", { count: filteredCount })}
       </p>
 
-      {titles.length === 0 ? (
+      {/* Price freshness filter chips */}
+      <div style={{ marginTop: 12, display: "flex", gap: 8, flexWrap: "wrap" }}>
+        <Link
+          href={`/desk/titles${freshnessQuery(undefined)}`}
+          className={`tag${!freshnessFilter ? " active" : ""}`}
+          style={!freshnessFilter ? { fontWeight: 700, opacity: 1 } : { opacity: 0.65 }}
+        >
+          {t("freshness.filterAll")}
+        </Link>
+        {FRESHNESS_VALUES.map((bucket) => (
+          <Link
+            key={bucket}
+            href={`/desk/titles${freshnessFilter === bucket ? freshnessQuery(undefined) : freshnessQuery(bucket)}`}
+            className={`tag${freshnessFilter === bucket ? " active" : ""}`}
+            style={freshnessFilter === bucket ? { fontWeight: 700, opacity: 1 } : { opacity: 0.65 }}
+          >
+            {t(`freshness.filter${bucket.charAt(0).toUpperCase()}${bucket.slice(1)}` as `freshness.filterNever` | `freshness.filterStale` | `freshness.filterAging` | `freshness.filterFresh`)}
+          </Link>
+        ))}
+      </div>
+
+      {filteredTitles.length === 0 ? (
         <p className="note" style={{ marginTop: 20 }}>
           {t("none")}
         </p>
@@ -498,6 +568,31 @@ export default async function DeskTitlesPage({
                       {title.urlStatus ? (
                         <span className="tag">{title.urlStatus}</span>
                       ) : null}
+                      <span
+                        className="tag"
+                        style={{
+                          backgroundColor:
+                            title.freshness === "fresh"
+                              ? "#dcfce7"
+                              : title.freshness === "aging"
+                                ? "#fef9c3"
+                                : "#fee2e2",
+                          color:
+                            title.freshness === "fresh"
+                              ? "#166534"
+                              : title.freshness === "aging"
+                                ? "#854d0e"
+                                : "#991b1b",
+                        }}
+                      >
+                        {title.freshness === "never"
+                          ? t("freshness.never")
+                          : title.freshness === "stale"
+                            ? t("freshness.stale", { days: title.freshnessAgeDays ?? 0 })
+                            : title.freshness === "aging"
+                              ? t("freshness.aging", { days: title.freshnessAgeDays ?? 0 })
+                              : t("freshness.fresh", { days: title.freshnessAgeDays ?? 0 })}
+                      </span>
                     </div>
                     {title.websiteUrl ? (
                       <div className="muted" style={{ marginTop: 8 }}>

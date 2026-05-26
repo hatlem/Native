@@ -455,6 +455,18 @@
       "deactivate": "Poista käytöstä",
       "edit": "Muokkaa"
     },
+    "freshness": {
+      "column": "Hintojen tuoreus",
+      "never": "Ei vahvistettu",
+      "stale": "Vanhentunut ({days}d)",
+      "aging": "Vanhenee ({days}d)",
+      "fresh": "Tuore ({days}d)",
+      "filterAll": "Kaikki",
+      "filterNever": "Ei koskaan",
+      "filterStale": "Vanhentunut (>90d)",
+      "filterAging": "Vanhenee (31–90d)",
+      "filterFresh": "Tuore (≤30d)"
+    },
     "none": "Ei julkaisuja vastaa näitä suodattimia."
   },
   "auth": {

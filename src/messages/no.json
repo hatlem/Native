@@ -385,6 +385,18 @@
       "deactivate": "Deaktiver",
       "edit": "Rediger"
     },
+    "freshness": {
+      "column": "Prisferskhet",
+      "never": "Ikke bekreftet",
+      "stale": "Foreldet ({days}d)",
+      "aging": "Aldrende ({days}d)",
+      "fresh": "Fersk ({days}d)",
+      "filterAll": "Alle",
+      "filterNever": "Aldri",
+      "filterStale": "Foreldet (>90d)",
+      "filterAging": "Aldrende (31–90d)",
+      "filterFresh": "Fersk (≤30d)"
+    },
     "none": "Ingen titler matcher filtrene."
   },
   "auth": {

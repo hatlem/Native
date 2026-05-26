@@ -455,6 +455,18 @@
       "deactivate": "Deactivate",
       "edit": "Edit"
     },
+    "freshness": {
+      "column": "Price freshness",
+      "never": "Never confirmed",
+      "stale": "Stale ({days}d)",
+      "aging": "Aging ({days}d)",
+      "fresh": "Fresh ({days}d)",
+      "filterAll": "All",
+      "filterNever": "Never",
+      "filterStale": "Stale (>90d)",
+      "filterAging": "Aging (31–90d)",
+      "filterFresh": "Fresh (≤30d)"
+    },
     "none": "No titles match these filters."
   },
   "auth": {

@@ -455,6 +455,18 @@
       "deactivate": "Deactivate",
       "edit": "Bearbeiten"
     },
+    "freshness": {
+      "column": "Preisaktualität",
+      "never": "Nicht bestätigt",
+      "stale": "Veraltet ({days}d)",
+      "aging": "Alternd ({days}d)",
+      "fresh": "Frisch ({days}d)",
+      "filterAll": "Alle",
+      "filterNever": "Nie",
+      "filterStale": "Veraltet (>90d)",
+      "filterAging": "Alternd (31–90d)",
+      "filterFresh": "Frisch (≤30d)"
+    },
     "none": "No titles match these filters."
   },
   "auth": {

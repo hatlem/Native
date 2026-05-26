@@ -385,6 +385,18 @@
       "deactivate": "Inaktivera",
       "edit": "Redigera"
     },
+    "freshness": {
+      "column": "Prisfärskhet",
+      "never": "Inte bekräftat",
+      "stale": "Gammal ({days}d)",
+      "aging": "Åldras ({days}d)",
+      "fresh": "Färsk ({days}d)",
+      "filterAll": "Alla",
+      "filterNever": "Aldrig",
+      "filterStale": "Gammal (>90d)",
+      "filterAging": "Åldras (31–90d)",
+      "filterFresh": "Färsk (≤30d)"
+    },
     "none": "Inga titlar matchar filtren."
   },
   "auth": {
