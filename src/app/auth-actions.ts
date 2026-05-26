@@ -16,6 +16,7 @@ import { magicLinkEmail } from "@/lib/mail/templates/magic-link";
 import { passwordResetEmail } from "@/lib/mail/templates/password-reset";
 import { passwordChangedEmail } from "@/lib/mail/templates/password-changed";
 import { recordSignIn } from "@/lib/auth-events";
+import { welcomeEmail } from "@/lib/mail/templates/welcome";
 
 const MARKET_CODES = Object.values(MarketCode) as string[];
 
@@ -141,6 +142,14 @@ export async function register(formData: FormData) {
   // emails learns nothing.
   if (!createdUserId) redirect(`/${locale}/signup?error=1${tail}`);
   await recordAudit(createdUserId, "user.register", `User:${email}`, { ip, orgName });
+
+  const catalogUrl = `${appUrl()}/${locale}/catalog`;
+  const welcome = welcomeEmail({ catalogUrl, locale, appName: appName() });
+  try {
+    await emailAdapter({ to: email, subject: welcome.subject, text: welcome.text, html: welcome.html });
+  } catch (err) {
+    console.error("auth.welcome_email_failed", { userId: createdUserId, err });
+  }
 
   try {
     await signIn("credentials", { email, password, redirect: false });
