@@ -1,63 +1,50 @@
-// NativeSpin wordmark + favicon mark.
+// NativeSpin wordmark + favicon mark. Both are vector traces of the
+// source design (Downloads/nativespin.png) via the project-standard
+// potrace pipeline (see /Users/andreashatlem/Desktop/attorly/
+// convert-v3.sh). Themed via currentColor so they inherit color from
+// the container.
 //
-// This is a TEXT-BASED PLACEHOLDER until finished NativeSpin artwork is
-// available. When that artwork arrives (e.g. ~/Downloads/nativespin-ferdig.png),
-// regenerate via the project-standard potrace pipeline — see
-// /Users/andreashatlem/Desktop/attorly/convert-v3.sh for the exact recipe:
+// Wordmark: 1353:254 (~5.33:1).
+// N mark: 178:198 (~0.9:1, suitable for the favicon tile).
 //
-//   magick nativespin-ferdig.png -fuzz 15% -flatten \
-//          -background white -colorspace gray -threshold 60% /tmp/x.pbm
-//   potrace /tmp/x.pbm --svg --flat --turdsize 4 --alphamax 1.0 \
-//          --opttolerance 0.2 -o /tmp/x.svg
-//
-// Then paste the resulting <path d> into a WORDMARK_PATH constant below
-// and switch BrandWordmark to render that path inside a <g transform>
-// (the previous ATNative trace in git history shows the exact shape).
-//
-// Until then the wordmark renders as SVG <text> with a Futura-like font
-// stack. It inherits color via currentColor so it themes correctly in
-// the nav and any other surface.
+// Static copies mirrored at:
+//   public/brand/nativespin-wordmark.svg
+//   public/brand/nativespin-n.svg
 
 import type { SVGProps } from "react";
 
 type WordmarkProps = SVGProps<SVGSVGElement> & { title?: string };
 
-const WORDMARK_FONT_STACK =
-  "Futura, 'Avenir Next', Avenir, 'Century Gothic', 'Trebuchet MS', 'Helvetica Neue', Arial, sans-serif";
+const WORDMARK_PATH =
+  "M8922 2519 c-78 -13 -199 -56 -262 -92 -73 -41 -168 -139 -203 -209 -42 -82 -57 -152 -57 -260 0 -153 39 -251 142 -349 94 -90 240 -143 533 -194 229 -40 334 -64 400 -94 125 -57 180 -135 179 -256 0 -92 -30 -159 -95 -220 -96 -90 -248 -132 -444 -122 -181 9 -318 59 -408 149 -51 51 -101 145 -112 209 l-7 39 -118 0 -119 0 6 -38 c29 -207 149 -373 335 -465 153 -76 236 -92 473 -91 228 1 293 13 432 81 228 111 338 355 273 608 -23 91 -64 159 -128 215 -98 87 -210 130 -448 175 -335 62 -401 77 -470 106 -141 59 -202 150 -192 289 11 154 111 258 293 305 70 18 241 20 317 4 173 -37 308 -154 339 -294 l12 -55 114 0 c129 0 121 -8 98 101 -35 167 -144 303 -307 382 -51 25 -122 53 -158 62 -77 20 -338 29 -418 14z M10 1690 l0 -820 120 0 120 0 -2 655 c-2 360 -1 655 2 655 3 -1 51 -60 107 -133 56 -73 247 -319 425 -548 178 -228 416 -537 531 -685 l207 -270 123 3 122 2 3 981 2 980 -110 0 -110 0 0 -815 c0 -448 -3 -815 -7 -814 -5 0 -26 24 -48 52 -127 167 -690 896 -934 1210 l-285 367 -133 0 -133 0 0 -820z M4854 2496 c-107 -47 -120 -216 -21 -276 67 -41 171 -18 214 46 26 40 24 134 -3 171 -50 67 -121 89 -190 59z M11810 2488 c-49 -34 -72 -71 -77 -125 -8 -93 57 -163 151 -163 69 0 118 33 141 94 52 136 -100 272 -215 194z M3880 2145 l0 -215 -150 0 -150 0 0 -85 0 -85 149 0 150 0 3 -467 c4 -410 6 -474 21 -520 36 -107 129 -189 246 -215 31 -7 126 -12 216 -13 l160 0 3 91 3 92 -138 4 c-170 4 -217 22 -261 96 l-27 47 -3 441 c-2 356 0 442 10 441 7 0 104 1 216 1 l202 2 0 85 0 85 -215 0 -215 0 0 215 0 215 -110 0 -110 0 0 -215z M2670 1964 c-288 -26 -473 -164 -505 -377 l-7 -47 110 0 110 0 7 33 c19 87 69 142 162 178 46 18 85 23 190 27 116 4 141 2 205 -18 129 -39 198 -135 198 -276 0 -42 -4 -55 -19 -64 -50 -26 -159 -41 -371 -50 -258 -11 -351 -29 -462 -87 -120 -63 -188 -158 -209 -293 -27 -177 53 -341 204 -414 160 -79 452 -75 615 8 67 34 157 118 204 190 l38 59 0 -140 0 -141 31 -4 c17 -3 64 -3 105 0 l74 5 0 502 c0 297 -4 524 -10 556 -33 172 -157 288 -355 332 -74 16 -240 27 -315 21z m460 -844 c-15 -87 -69 -196 -130 -263 -111 -122 -316 -181 -496 -144 -89 19 -144 55 -178 117 -26 47 -28 59 -24 122 7 87 40 140 113 180 70 38 155 55 345 68 164 11 287 30 345 54 l30 13 3 -41 c2 -22 -2 -70 -8 -106z M7334 1960 c-202 -28 -372 -133 -463 -285 -86 -142 -123 -332 -103 -520 38 -349 239 -574 555 -625 110 -18 302 -8 392 20 154 48 257 135 324 272 22 46 43 98 46 116 l7 32 -110 0 -109 0 -32 -65 c-55 -111 -151 -175 -296 -196 -156 -23 -317 24 -414 121 -76 76 -141 229 -141 332 l0 38 556 0 557 0 -6 118 c-6 139 -23 209 -78 321 -76 155 -209 261 -383 306 -75 19 -222 26 -302 15z m311 -210 c40 -15 76 -40 111 -75 74 -73 107 -144 128 -272 l6 -33 -451 0 -451 0 7 43 c28 164 133 292 284 344 58 21 81 23 186 20 96 -3 132 -8 180 -27z M10752 1960 c-82 -12 -122 -25 -205 -68 -71 -37 -153 -116 -186 -180 l-18 -35 -6 84 c-4 46 -7 103 -7 127 l0 42 -105 0 -105 0 0 -960 0 -961 108 3 107 3 0 388 0 389 25 -34 c87 -119 203 -195 343 -225 101 -21 287 -13 382 17 197 62 335 205 407 419 31 93 32 102 33 266 0 193 -9 241 -78 385 -75 160 -230 283 -407 324 -86 20 -210 27 -288 16z m197 -195 c177 -42 302 -171 346 -357 19 -81 19 -245 0 -326 -55 -234 -230 -372 -470 -372 -195 0 -349 89 -428 246 -49 98 -62 161 -62 294 1 131 17 200 70 296 100 180 325 270 544 219z M12900 1961 c-119 -16 -214 -62 -290 -140 -30 -31 -64 -76 -75 -99 -11 -23 -22 -42 -25 -42 -3 0 -3 28 -2 62 2 34 1 90 -3 125 l-7 63 -104 0 -104 0 0 -690 0 -690 110 0 110 0 0 404 c0 439 6 499 55 598 95 190 312 274 520 202 71 -25 155 -111 184 -187 35 -96 41 -173 41 -604 l0 -413 105 0 105 0 0 465 c0 385 -3 479 -16 542 -42 204 -170 341 -361 387 -77 19 -175 26 -243 17z M4810 1240 l0 -690 104 0 104 0 3 28 c2 15 3 325 1 690 l-2 662 -105 0 -105 0 0 -690z M5260 1922 c0 -5 56 -136 124 -293 68 -156 199 -462 292 -679 92 -217 173 -399 178 -403 11 -8 242 -4 250 4 2 2 58 137 124 299 66 162 159 390 207 505 151 363 235 568 235 571 0 2 -51 4 -113 4 l-113 0 -86 -212 c-250 -623 -383 -948 -388 -948 -3 1 -40 87 -82 193 -42 106 -148 365 -236 577 l-159 385 -117 3 c-64 1 -116 -1 -116 -6z M11770 1240 l0 -690 110 0 110 0 0 690 0 690 -110 0 -110 0 0 -690z M10 640 l0 -90 110 0 c61 0 113 -1 118 -2 4 -2 8 39 10 90 l3 92 -121 0 -120 0 0 -90z";
 
 export function BrandWordmark({ title = "NativeSpin", ...rest }: WordmarkProps) {
   return (
     <svg
-      viewBox="0 0 360 60"
+      viewBox="0 0 1353 254"
       xmlns="http://www.w3.org/2000/svg"
       role="img"
       aria-label={title}
-      preserveAspectRatio="xMinYMid meet"
+      preserveAspectRatio="xMidYMid meet"
       {...rest}
     >
-      <text
-        x="0"
-        y="44"
-        fontFamily={WORDMARK_FONT_STACK}
-        fontSize="44"
-        fontWeight="500"
-        letterSpacing="-0.5"
-        fill="currentColor"
-      >
-        NativeSpin
-      </text>
+      <g transform="translate(0,254) scale(0.1,-0.1)" fill="currentColor">
+        <path d={WORDMARK_PATH} />
+      </g>
     </svg>
   );
 }
 
 type MarkProps = SVGProps<SVGSVGElement> & { title?: string };
 
-// Square favicon — black rounded tile with a geometric "N" glyph in
-// white. Used as the favicon at src/app/icon.svg.
-//
-// Built from straight rectangles plus one polygon for the diagonal.
-// The diagonal is drawn as a parallelogram so its ends meet the
-// verticals cleanly at any size.
+const N_PATH =
+  "M10 1150 l0 -820 120 0 120 0 -2 655 c-2 360 -1 655 2 655 3 -1 51 -60 107 -133 56 -73 247 -319 425 -548 178 -228 416 -537 531 -685 l207 -270 123 3 122 2 3 981 2 980 -110 0 -110 0 0 -815 c0 -448 -3 -815 -7 -814 -5 0 -26 24 -48 52 -127 167 -690 896 -934 1210 l-285 367 -133 0 -133 0 0 -820z M10 100 l0 -90 110 0 c61 0 113 -1 118 -2 4 -2 8 39 10 90 l3 92 -121 0 -120 0 0 -90z";
+
+// Square favicon — black rounded tile with the NativeSpin 'N' glyph
+// (vector-traced from the source) in white. The N's source bbox is
+// 178×198. Transform maps potrace coords (10× Y-flipped) onto the
+// 64×64 tile: scale 0.02222 (height-limited fit), centered horizontally
+// at x=12.25 with ~10px top/bottom padding.
 export function BrandMark({ title = "NativeSpin", ...rest }: MarkProps) {
   return (
     <svg
@@ -68,13 +55,8 @@ export function BrandMark({ title = "NativeSpin", ...rest }: MarkProps) {
       {...rest}
     >
       <rect width="64" height="64" rx="12" fill="currentColor" />
-      <g fill="#fff">
-        {/* Left vertical */}
-        <rect x="14" y="14" width="6" height="36" />
-        {/* Right vertical */}
-        <rect x="44" y="14" width="6" height="36" />
-        {/* Diagonal beam from top-left of left bar to bottom-right of right bar */}
-        <polygon points="20,14 28,14 50,50 42,50" />
+      <g transform="translate(12.25, 54) scale(0.02222, -0.02222)" fill="#fff">
+        <path d={N_PATH} />
       </g>
     </svg>
   );
