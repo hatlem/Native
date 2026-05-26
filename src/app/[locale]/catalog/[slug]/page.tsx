@@ -5,7 +5,7 @@ import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
 import { Link } from "@/i18n/navigation";
 import { indicativeFromRules, toRateRules, formatMoney } from "@/lib/money";
-import { arePricesVisible } from "@/lib/pricing-visibility";
+import { isProductPriceShown, arePricesVisible } from "@/lib/pricing-visibility";
 import { addToPlan } from "@/app/actions";
 
 export const dynamic = "force-dynamic";
@@ -49,33 +49,40 @@ export default async function TitleDetailPage({
   // and unverified research-catalog rows) renders.
   if (!title.active && title.lastVerifiedAt) notFound();
 
-  const priceVisible = arePricesVisible(title);
+  // Title-level visibility gate (pricesPublic flags only) — used for
+  // schema.org AggregateOffer wrapper and the bottom note.
+  const titlePriceVisible = arePricesVisible(title);
   const siteBase =
     process.env.NEXT_PUBLIC_SITE_URL?.replace(/\/$/, "") || "";
-  // schema.org Offer/price is only emitted when the buyer is allowed to
-  // see the price; otherwise we omit price fields so search engines
-  // don't index numbers we deliberately hide on the page.
-  const ldOffers = priceVisible
-    ? title.products.map((p) => ({
-        "@type": "Offer",
-        name: p.name,
-        priceCurrency: p.currency,
-        price: indicativeFromRules(
-          Number(p.basePrice),
-          toRateRules(p.priceRules),
-        ),
-        availability: p.bookable
-          ? "https://schema.org/InStock"
-          : "https://schema.org/OutOfStock",
-      }))
-    : title.products.map((p) => ({
-        "@type": "Offer",
-        name: p.name,
-        priceCurrency: p.currency,
-        availability: p.bookable
-          ? "https://schema.org/InStock"
-          : "https://schema.org/OutOfStock",
-      }));
+  // schema.org Offer/price is only emitted per-product when active +
+  // confirmedAt + pricesPublic are all satisfied.
+  const ldOffers = title.products.map((p) => {
+    const shown = isProductPriceShown(p, title);
+    return shown
+      ? {
+          "@type": "Offer",
+          name: p.name,
+          priceCurrency: p.currency,
+          price: indicativeFromRules(
+            Number(p.basePrice),
+            toRateRules(p.priceRules),
+          ),
+          availability: p.bookable
+            ? "https://schema.org/InStock"
+            : "https://schema.org/OutOfStock",
+        }
+      : {
+          "@type": "Offer",
+          name: p.name,
+          priceCurrency: p.currency,
+          availability: p.bookable
+            ? "https://schema.org/InStock"
+            : "https://schema.org/OutOfStock",
+        };
+  });
+  const anyPriceVisible = title.products.some((p) =>
+    isProductPriceShown(p, title),
+  );
   const ld = {
     "@context": "https://schema.org",
     "@type": "Product",
@@ -83,7 +90,7 @@ export default async function TitleDetailPage({
     category: title.category,
     brand: { "@type": "Brand", name: title.publisher.name },
     url: `${siteBase}/${locale}/catalog/${title.slug}`,
-    offers: priceVisible
+    offers: anyPriceVisible
       ? {
           "@type": "AggregateOffer",
           priceCurrency: title.market.currency,
@@ -170,6 +177,7 @@ export default async function TitleDetailPage({
       ) : (
         <div className="grid">
         {title.products.map((p) => {
+          const priceShown = isProductPriceShown(p, title);
           const price = indicativeFromRules(
             Number(p.basePrice),
             toRateRules(p.priceRules),
@@ -184,14 +192,14 @@ export default async function TitleDetailPage({
               >
                 {tFormats("learnMore")} →
               </Link>
-              {priceVisible ? (
+              {priceShown ? (
                 <div className="price">
                   {t("from")} {formatMoney(price, p.currency, locale)}
                 </div>
               ) : (
                 <div className="price muted">{tv("requestPrice")}</div>
               )}
-              {priceVisible && p.visibility === "FIRM" ? (
+              {priceShown && p.visibility === "FIRM" ? (
                 <span className="tag">⚡ {tf("badge")}</span>
               ) : null}
               <div className="muted" style={{ marginTop: 6 }}>
@@ -237,11 +245,11 @@ export default async function TitleDetailPage({
         </div>
       )}
 
-      {priceVisible ? (
+      {anyPriceVisible ? (
         <p className="note">{t("indicativeNote")}</p>
-      ) : (
+      ) : !titlePriceVisible ? (
         <p className="note">{tv("requestPriceHelp")}</p>
-      )}
+      ) : null}
     </section>
   );
 }

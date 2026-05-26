@@ -390,7 +390,9 @@
     "quoteEyebrow": "Quote",
     "readyToQuoteTitle": "Ready to quote?",
     "readyToQuoteBody": "Generate a draft quote from the brief above — you can edit margins and lines on the next screen.",
-    "openOrder": "Open order"
+    "openOrder": "Open order",
+    "bannerUnconfirmed": "{count, plural, one {1 product needs price confirmation} other {# products need price confirmation}}",
+    "bannerReview": "Review them →"
   },
   "deskTitles": {
     "eyebrow": "Super-admin · titles",
@@ -455,7 +457,23 @@
       "deactivate": "Deactivate",
       "edit": "Edit"
     },
-    "none": "No titles match these filters."
+    "freshness": {
+      "column": "Price freshness",
+      "never": "Never confirmed",
+      "stale": "Stale ({days}d)",
+      "aging": "Aging ({days}d)",
+      "fresh": "Fresh ({days}d)",
+      "filterAll": "All",
+      "filterNever": "Never",
+      "filterStale": "Stale (>90d)",
+      "filterAging": "Aging (31–90d)",
+      "filterFresh": "Fresh (≤30d)"
+    },
+    "none": "No titles match these filters.",
+    "bulk": {
+      "sendPriceRequest": "Send price request to selected",
+      "hint": "Skips titles with no primary sales contact"
+    }
   },
   "auth": {
     "title": "Sign in",
@@ -1490,7 +1508,7 @@
     }
   },
   "priceVisibility": {
-    "requestPrice": "Request price",
+    "requestPrice": "Contact for price",
     "requestPriceHelp": "Pricing on this title is set after a brief — we'll come back with availability and a firm number.",
     "planRfqOnly": "One or more titles in your plan require a quote — instant checkout is disabled until we confirm pricing."
   },
@@ -1500,12 +1518,129 @@
     "publishedRateCardHelp": "The publisher's official list-price for a standard placement, shown to advertisers as a strikethrough anchor on quotes.",
     "publishedRateCurrency": "Currency",
     "pricesPublic": "Show prices to advertisers",
-    "pricesPublicHelp": "Off = catalog shows 'Request price' instead of any € figure. Self-serve checkout is also disabled.",
+    "pricesPublicHelp": "Off = catalog shows 'Contact for price' instead of any € figure. Self-serve checkout is also disabled.",
     "publisherPricesPublic": "Publisher-wide visibility",
     "publisherPricesPublicOn": "Publisher prices are public",
     "publisherPricesPublicOff": "Publisher prices are hidden — overrides every title",
     "save": "Save changes",
     "saved": "Saved",
     "cancel": "Cancel"
+  },
+  "salesContacts": {
+    "title": "Sales contacts",
+    "empty": "No sales contacts attached to this title.",
+    "primary": "Primary",
+    "makePrimary": "Make primary",
+    "detach": "Detach",
+    "attachExisting": "Attach an existing contact",
+    "attach": "Attach",
+    "addNew": "Add new contact",
+    "name": "Name",
+    "email": "Email",
+    "phone": "Phone",
+    "role": "Role",
+    "notes": "Notes",
+    "create": "Create contact"
+  },
+  "priceRequests": {
+    "title": "Price requests",
+    "sendNew": "Send a new request",
+    "noContactsHint": "Add a sales contact above before sending a request.",
+    "noRequests": "No requests yet for this title.",
+    "send": "Send request",
+    "resend": "Resend",
+    "cancel": "Cancel",
+    "logManual": "Log response manually",
+    "primary": "primary",
+    "col": { "contact": "Contact", "created": "Created", "status": "Status", "actions": "Actions" },
+    "status": {
+      "draft": "Draft",
+      "sent": "Sent",
+      "opened": "Opened",
+      "responded": "Responded",
+      "cancelled": "Cancelled",
+      "expired": "Expired"
+    },
+    "manual": {
+      "product": "Product",
+      "price": "Price",
+      "currency": "Currency",
+      "included": "What's included",
+      "excluded": "What's NOT included",
+      "submit": "Log this quote"
+    }
+  },
+  "pendingQuotes": {
+    "title": "Pending quotes",
+    "empty": "No quotes awaiting your review for this title.",
+    "queueTitle": "Pending quotes — all titles",
+    "queueEmpty": "Nothing pending. Inbox zero.",
+    "backToDesk": "Back to desk",
+    "currentLive": "Current live price",
+    "incomingQuote": "Incoming quote",
+    "confirmedAt": "Confirmed {date}",
+    "neverConfirmed": "Never confirmed",
+    "draftProduct": "New format (no live product yet)",
+    "receivedAt": "Received {date}",
+    "included": "Included",
+    "excluded": "Excluded",
+    "newFormat": "New format",
+    "apply": "Apply",
+    "reject": "Reject",
+    "rejectReason": "Reason (optional)",
+    "editBefore": "Edit before applying",
+    "price": "Price",
+    "currency": "Currency",
+    "saveEdit": "Save",
+    "col": {
+      "title": "Title",
+      "received": "Received",
+      "price": "Price",
+      "actions": "Actions"
+    }
+  },
+  "priceRequestForm": {
+    "hi": "Hi {name},",
+    "intro": "We list {title} ({publisher}) in our ATNative catalog and want to confirm current pricing.",
+    "hasNative": {
+      "question": "Does this title still offer native content?",
+      "yes": "Yes",
+      "no": "No",
+      "unknown": "Not sure"
+    },
+    "products": {
+      "legend": "Pricing per format",
+      "none": "We don't have any products listed yet for this title.",
+      "skip": "Skip — don't quote this one",
+      "price": "Price",
+      "currency": "Currency",
+      "included": "What's included",
+      "includedPlaceholder": "e.g. 1 sponsored article, 2-week homepage promotion, social distribution",
+      "excluded": "What's NOT included",
+      "excludedPlaceholder": "e.g. print, programmatic display, video production",
+      "validUntil": "Valid until"
+    },
+    "draft": {
+      "legend": "Other formats you'd like to add",
+      "hint": "Add up to three more formats you'd like us to list.",
+      "addFormat": "Add format {n}",
+      "type": "Format type",
+      "name": "Format name",
+      "desc": "Short description",
+      "price": "Price",
+      "currency": "Currency"
+    },
+    "note": "Anything else we should know?",
+    "submit": "Send pricing",
+    "closed": {
+      "expired": { "title": "Link expired", "body": "Please reach out to your contact at ATNative to issue a new link." },
+      "responded": { "title": "Already received", "body": "Thanks — we already have your response on file." },
+      "cancelled": { "title": "Link cancelled", "body": "Please reach out to your contact at ATNative." },
+      "unknown": { "title": "Link not available", "body": "Please reach out to your contact at ATNative." }
+    },
+    "thanks": {
+      "title": "Thanks!",
+      "body": "We've logged your pricing. The ATNative desk will review and apply it shortly."
+    }
   }
 }

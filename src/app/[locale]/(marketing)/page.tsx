@@ -19,6 +19,8 @@ const PRODUCT_TYPE_TO_FORMAT_KEY: Record<ProductType, string> = {
   [ProductType.ADVERTORIAL]: "fmtSponsoredArticle",
   [ProductType.NATIVE_DISPLAY]: "fmtSponsoredContent",
   [ProductType.PACKAGE]: "fmtSponsoredArticleAds",
+  [ProductType.CONTEXTUAL]: "fmtSponsoredContent",
+  [ProductType.OTHER]: "fmtSponsoredContent",
 };
 
 function formatReach(n: number | null | undefined): string {

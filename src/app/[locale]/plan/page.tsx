@@ -5,7 +5,7 @@ import { getWorkspace } from "@/lib/workspace";
 import { Link } from "@/i18n/navigation";
 import { readBasket } from "@/lib/basket";
 import { indicativeFromRules, toRateRules, formatMoney } from "@/lib/money";
-import { arePricesVisible } from "@/lib/pricing-visibility";
+import { isProductPriceShown } from "@/lib/pricing-visibility";
 import { removeFromPlan, submitRequest } from "@/app/actions";
 import { EmptyState } from "@/app/empty-state";
 
@@ -57,7 +57,7 @@ export default async function PlanPage({
     .map((b) => {
       const p = byId.get(b.productId);
       if (!p) return null;
-      const priceVisible = arePricesVisible(p.title);
+      const priceVisible = isProductPriceShown(p, p.title);
       const unit = priceVisible
         ? indicativeFromRules(
             Number(p.basePrice),

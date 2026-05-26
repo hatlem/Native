@@ -320,7 +320,9 @@
     "quoteEyebrow": "Tilbud",
     "readyToQuoteTitle": "Klar til at lave tilbud?",
     "readyToQuoteBody": "Generer et udkast fra briefen ovenfor — du kan justere marginer og linjer på næste skærm.",
-    "openOrder": "Åbn ordre"
+    "openOrder": "Åbn ordre",
+    "bannerUnconfirmed": "{count, plural, one {1 produkt mangler prisbekræftelse} other {# produkter mangler prisbekræftelse}}",
+    "bannerReview": "Gennemgå →"
   },
   "deskTitles": {
     "eyebrow": "Superadmin · titler",
@@ -385,7 +387,23 @@
       "deactivate": "Deaktivér",
       "edit": "Rediger"
     },
-    "none": "Ingen titler matcher filtrene."
+    "freshness": {
+      "column": "Prisfriskhed",
+      "never": "Ikke bekræftet",
+      "stale": "Forældet ({days}d)",
+      "aging": "Ældes ({days}d)",
+      "fresh": "Frisk ({days}d)",
+      "filterAll": "Alle",
+      "filterNever": "Aldrig",
+      "filterStale": "Forældet (>90d)",
+      "filterAging": "Ældes (31–90d)",
+      "filterFresh": "Frisk (≤30d)"
+    },
+    "none": "Ingen titler matcher filtrene.",
+    "bulk": {
+      "sendPriceRequest": "Send prisforespørgsel til valgte",
+      "hint": "Springer titler uden primær salgskontakt over"
+    }
   },
   "auth": {
     "title": "Log ind",
@@ -1491,7 +1509,7 @@
     }
   },
   "priceVisibility": {
-    "requestPrice": "Bed om pris",
+    "requestPrice": "Kontakt for pris",
     "requestPriceHelp": "Prisen fastsættes efter en brief — vi vender tilbage med tilgængelighed og en fast pris.",
     "planRfqOnly": "En eller flere titler i din plan kræver et tilbud — instant køb er deaktiveret indtil prisen er bekræftet."
   },
@@ -1501,12 +1519,129 @@
     "publishedRateCardHelp": "Udgiverens officielle listepris for en standardplacering. Vises som overstreget anker på tilbud til annoncør.",
     "publishedRateCurrency": "Valuta",
     "pricesPublic": "Vis priser til annoncør",
-    "pricesPublicHelp": "Fra = kataloget viser 'Bed om pris' i stedet for tal. Instant køb er også deaktiveret.",
+    "pricesPublicHelp": "Fra = kataloget viser 'Kontakt for pris' i stedet for tal. Instant køb er også deaktiveret.",
     "publisherPricesPublic": "Synlighed for hele udgiveren",
     "publisherPricesPublicOn": "Udgiverens priser er offentlige",
     "publisherPricesPublicOff": "Udgiverens priser er skjult — tilsidesætter alle titler",
     "save": "Gem ændringer",
     "saved": "Gemt",
     "cancel": "Annullér"
+  },
+  "salesContacts": {
+    "title": "Salgskontakter",
+    "empty": "Ingen salgskontakter knyttet til denne titel.",
+    "primary": "Primær",
+    "makePrimary": "Gør primær",
+    "detach": "Frakobl",
+    "attachExisting": "Tilknyt en eksisterende kontakt",
+    "attach": "Tilknyt",
+    "addNew": "Tilføj ny kontakt",
+    "name": "Navn",
+    "email": "E-mail",
+    "phone": "Telefon",
+    "role": "Rolle",
+    "notes": "Noter",
+    "create": "Opret kontakt"
+  },
+  "priceRequests": {
+    "title": "Prisforespørgsler",
+    "sendNew": "Send ny forespørgsel",
+    "noContactsHint": "Tilføj en salgskontakt ovenfor, inden du sender en forespørgsel.",
+    "noRequests": "Ingen forespørgsler for denne titel endnu.",
+    "send": "Send forespørgsel",
+    "resend": "Send igen",
+    "cancel": "Annullér",
+    "logManual": "Registrer svar manuelt",
+    "primary": "primær",
+    "col": { "contact": "Kontakt", "created": "Oprettet", "status": "Status", "actions": "Handlinger" },
+    "status": {
+      "draft": "Kladde",
+      "sent": "Sendt",
+      "opened": "Åbnet",
+      "responded": "Besvaret",
+      "cancelled": "Annulleret",
+      "expired": "Udløbet"
+    },
+    "manual": {
+      "product": "Produkt",
+      "price": "Pris",
+      "currency": "Valuta",
+      "included": "Hvad der er inkluderet",
+      "excluded": "Hvad der IKKE er inkluderet",
+      "submit": "Registrer dette tilbud"
+    }
+  },
+  "pendingQuotes": {
+    "title": "Afventende pristilbud",
+    "empty": "Ingen tilbud afventer gennemgang for denne titel.",
+    "queueTitle": "Afventende pristilbud — alle titler",
+    "queueEmpty": "Intet afventer. Indbakke nul.",
+    "backToDesk": "Tilbage til desk",
+    "currentLive": "Aktuel live-pris",
+    "incomingQuote": "Indkommende tilbud",
+    "confirmedAt": "Bekræftet {date}",
+    "neverConfirmed": "Aldrig bekræftet",
+    "draftProduct": "Nyt format (intet live-produkt endnu)",
+    "receivedAt": "Modtaget {date}",
+    "included": "Inkluderet",
+    "excluded": "Ekskluderet",
+    "newFormat": "Nyt format",
+    "apply": "Anvend",
+    "reject": "Afvis",
+    "rejectReason": "Årsag (valgfrit)",
+    "editBefore": "Rediger inden anvendelse",
+    "price": "Pris",
+    "currency": "Valuta",
+    "saveEdit": "Gem",
+    "col": {
+      "title": "Titel",
+      "received": "Modtaget",
+      "price": "Pris",
+      "actions": "Handlinger"
+    }
+  },
+  "priceRequestForm": {
+    "hi": "Hej {name},",
+    "intro": "Vi lister {title} ({publisher}) i ATNative-kataloget og ønsker at bekræfte de aktuelle priser.",
+    "hasNative": {
+      "question": "Tilbyder denne titel stadig nativt indhold?",
+      "yes": "Ja",
+      "no": "Nej",
+      "unknown": "Usikker"
+    },
+    "products": {
+      "legend": "Priser pr. format",
+      "none": "Vi har endnu ingen produkter listet for denne titel.",
+      "skip": "Spring over — giv ikke pris på denne",
+      "price": "Pris",
+      "currency": "Valuta",
+      "included": "Hvad er inkluderet",
+      "includedPlaceholder": "f.eks. 1 sponsoreret artikel, 2-ugers forside, sociale medier",
+      "excluded": "Hvad er IKKE inkluderet",
+      "excludedPlaceholder": "f.eks. print, programmatisk display, videoproduktion",
+      "validUntil": "Gyldig til"
+    },
+    "draft": {
+      "legend": "Andre formater du vil tilføje",
+      "hint": "Tilføj op til tre formater, du ønsker vi lister.",
+      "addFormat": "Tilføj format {n}",
+      "type": "Formattype",
+      "name": "Formatnavn",
+      "desc": "Kort beskrivelse",
+      "price": "Pris",
+      "currency": "Valuta"
+    },
+    "note": "Er der andet vi bør vide?",
+    "submit": "Send priser",
+    "closed": {
+      "expired": { "title": "Linket er udløbet", "body": "Kontakt din ATNative-repræsentant for at få et nyt link." },
+      "responded": { "title": "Allerede modtaget", "body": "Tak — vi har allerede dit svar registreret." },
+      "cancelled": { "title": "Linket er annulleret", "body": "Kontakt din ATNative-repræsentant." },
+      "unknown": { "title": "Linket er ikke tilgængeligt", "body": "Kontakt din ATNative-repræsentant." }
+    },
+    "thanks": {
+      "title": "Tak!",
+      "body": "Vi har registreret dine priser. ATNative-teamet vil gennemgå og anvende dem snart."
+    }
   }
 }

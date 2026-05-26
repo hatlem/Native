@@ -390,7 +390,9 @@
     "quoteEyebrow": "Quote",
     "readyToQuoteTitle": "Ready to quote?",
     "readyToQuoteBody": "Generate a draft quote from the brief above — you can edit margins and lines on the next screen.",
-    "openOrder": "Open order"
+    "openOrder": "Open order",
+    "bannerUnconfirmed": "{count, plural, one {1 Produkt benötigt Preisbestätigung} other {# Produkte benötigen Preisbestätigung}}",
+    "bannerReview": "Überprüfen →"
   },
   "deskTitles": {
     "eyebrow": "Super-admin · titles",
@@ -455,7 +457,23 @@
       "deactivate": "Deactivate",
       "edit": "Bearbeiten"
     },
-    "none": "No titles match these filters."
+    "freshness": {
+      "column": "Preisaktualität",
+      "never": "Nicht bestätigt",
+      "stale": "Veraltet ({days}d)",
+      "aging": "Alternd ({days}d)",
+      "fresh": "Frisch ({days}d)",
+      "filterAll": "Alle",
+      "filterNever": "Nie",
+      "filterStale": "Veraltet (>90d)",
+      "filterAging": "Alternd (31–90d)",
+      "filterFresh": "Frisch (≤30d)"
+    },
+    "none": "No titles match these filters.",
+    "bulk": {
+      "sendPriceRequest": "Preisanfrage an Auswahl senden",
+      "hint": "Überspringt Titel ohne primären Vertriebskontakt"
+    }
   },
   "auth": {
     "title": "Anmelden",
@@ -1348,7 +1366,7 @@
     }
   },
   "priceVisibility": {
-    "requestPrice": "Preis anfragen",
+    "requestPrice": "Preis auf Anfrage",
     "requestPriceHelp": "Der Preis wird nach Briefing festgelegt — wir melden uns mit Verfügbarkeit und einem Festpreis.",
     "planRfqOnly": "Mindestens ein Titel im Plan erfordert ein Angebot — Sofort-Buchung ist deaktiviert, bis der Preis bestätigt ist."
   },
@@ -1358,12 +1376,129 @@
     "publishedRateCardHelp": "Der offizielle Listenpreis des Verlags für eine Standardplatzierung. Erscheint als durchgestrichener Ankerpreis im Angebot an den Werbekunden.",
     "publishedRateCurrency": "Währung",
     "pricesPublic": "Preise für Werbekunden anzeigen",
-    "pricesPublicHelp": "Aus = Katalog zeigt 'Preis anfragen' statt Zahlen. Sofort-Buchung ist ebenfalls deaktiviert.",
+    "pricesPublicHelp": "Aus = Katalog zeigt 'Preis auf Anfrage' statt Zahlen. Sofort-Buchung ist ebenfalls deaktiviert.",
     "publisherPricesPublic": "Sichtbarkeit für den gesamten Verlag",
     "publisherPricesPublicOn": "Preise des Verlags sind öffentlich",
     "publisherPricesPublicOff": "Preise des Verlags sind verborgen — überschreibt alle Titel",
     "save": "Änderungen speichern",
     "saved": "Gespeichert",
     "cancel": "Abbrechen"
+  },
+  "salesContacts": {
+    "title": "Vertriebskontakte",
+    "empty": "Keine Vertriebskontakte mit diesem Titel verknüpft.",
+    "primary": "Primär",
+    "makePrimary": "Als primär festlegen",
+    "detach": "Trennen",
+    "attachExisting": "Bestehenden Kontakt verknüpfen",
+    "attach": "Verknüpfen",
+    "addNew": "Neuen Kontakt hinzufügen",
+    "name": "Name",
+    "email": "E-Mail",
+    "phone": "Telefon",
+    "role": "Rolle",
+    "notes": "Notizen",
+    "create": "Kontakt erstellen"
+  },
+  "priceRequests": {
+    "title": "Preisanfragen",
+    "sendNew": "Neue Anfrage senden",
+    "noContactsHint": "Fügen Sie oben einen Vertriebskontakt hinzu, bevor Sie eine Anfrage senden.",
+    "noRequests": "Noch keine Anfragen für diesen Titel.",
+    "send": "Anfrage senden",
+    "resend": "Erneut senden",
+    "cancel": "Abbrechen",
+    "logManual": "Antwort manuell erfassen",
+    "primary": "primär",
+    "col": { "contact": "Kontakt", "created": "Erstellt", "status": "Status", "actions": "Aktionen" },
+    "status": {
+      "draft": "Entwurf",
+      "sent": "Gesendet",
+      "opened": "Geöffnet",
+      "responded": "Beantwortet",
+      "cancelled": "Storniert",
+      "expired": "Abgelaufen"
+    },
+    "manual": {
+      "product": "Produkt",
+      "price": "Preis",
+      "currency": "Währung",
+      "included": "Was inbegriffen ist",
+      "excluded": "Was NICHT inbegriffen ist",
+      "submit": "Dieses Angebot erfassen"
+    }
+  },
+  "pendingQuotes": {
+    "title": "Ausstehende Preisangebote",
+    "empty": "Keine Angebote warten auf Prüfung für diesen Titel.",
+    "queueTitle": "Ausstehende Preisangebote — alle Titel",
+    "queueEmpty": "Nichts ausstehend. Posteingang leer.",
+    "backToDesk": "Zurück zum Desk",
+    "currentLive": "Aktueller Live-Preis",
+    "incomingQuote": "Eingehendes Angebot",
+    "confirmedAt": "Bestätigt {date}",
+    "neverConfirmed": "Nie bestätigt",
+    "draftProduct": "Neues Format (noch kein Live-Produkt)",
+    "receivedAt": "Erhalten {date}",
+    "included": "Enthalten",
+    "excluded": "Ausgeschlossen",
+    "newFormat": "Neues Format",
+    "apply": "Anwenden",
+    "reject": "Ablehnen",
+    "rejectReason": "Grund (optional)",
+    "editBefore": "Vor Anwendung bearbeiten",
+    "price": "Preis",
+    "currency": "Währung",
+    "saveEdit": "Speichern",
+    "col": {
+      "title": "Titel",
+      "received": "Erhalten",
+      "price": "Preis",
+      "actions": "Aktionen"
+    }
+  },
+  "priceRequestForm": {
+    "hi": "Hallo {name},",
+    "intro": "Wir listen {title} ({publisher}) im ATNative-Katalog und möchten die aktuellen Preise bestätigen.",
+    "hasNative": {
+      "question": "Bietet dieser Titel noch Native-Content an?",
+      "yes": "Ja",
+      "no": "Nein",
+      "unknown": "Unsicher"
+    },
+    "products": {
+      "legend": "Preise pro Format",
+      "none": "Wir haben noch keine Produkte für diesen Titel hinterlegt.",
+      "skip": "Überspringen — kein Angebot für dieses",
+      "price": "Preis",
+      "currency": "Währung",
+      "included": "Was ist enthalten",
+      "includedPlaceholder": "z.B. 1 gesponserter Artikel, 2-wöchige Startseiten-Platzierung, Social Media",
+      "excluded": "Was ist NICHT enthalten",
+      "excludedPlaceholder": "z.B. Print, programmatisches Display, Videoproduktion",
+      "validUntil": "Gültig bis"
+    },
+    "draft": {
+      "legend": "Weitere Formate, die Sie hinzufügen möchten",
+      "hint": "Fügen Sie bis zu drei weitere Formate hinzu, die wir listen sollen.",
+      "addFormat": "Format {n} hinzufügen",
+      "type": "Formattyp",
+      "name": "Formatname",
+      "desc": "Kurzbeschreibung",
+      "price": "Preis",
+      "currency": "Währung"
+    },
+    "note": "Gibt es noch etwas, das wir wissen sollten?",
+    "submit": "Preise senden",
+    "closed": {
+      "expired": { "title": "Link abgelaufen", "body": "Bitte wenden Sie sich an Ihren ATNative-Ansprechpartner, um einen neuen Link zu erhalten." },
+      "responded": { "title": "Bereits erhalten", "body": "Danke — wir haben Ihre Antwort bereits gespeichert." },
+      "cancelled": { "title": "Link storniert", "body": "Bitte wenden Sie sich an Ihren ATNative-Ansprechpartner." },
+      "unknown": { "title": "Link nicht verfügbar", "body": "Bitte wenden Sie sich an Ihren ATNative-Ansprechpartner." }
+    },
+    "thanks": {
+      "title": "Danke!",
+      "body": "Wir haben Ihre Preise erfasst. Das ATNative-Team wird diese in Kürze prüfen und eintragen."
+    }
   }
 }

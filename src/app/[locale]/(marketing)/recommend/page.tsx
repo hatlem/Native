@@ -2,6 +2,7 @@ import { getTranslations } from "next-intl/server";
 import { MarketCode } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
 import { indicativeFromRules, toRateRules, formatMoney } from "@/lib/money";
+import { arePricesVisible } from "@/lib/pricing/visibility";
 import { EmptyState } from "@/app/empty-state";
 import { recommendMix, type Candidate } from "@/lib/recommend";
 import { addRecommendedPlan } from "@/app/actions";
@@ -48,23 +49,29 @@ export default async function RecommendPage({
       where: {
         active: true,
         bookable: true,
+        confirmedAt: { not: null },
         title: { active: true, market: { code: marketCode } },
       },
-      include: { title: true, priceRules: true },
+      include: {
+        title: { include: { publisher: { select: { pricesPublic: true } } } },
+        priceRules: true,
+      },
     });
 
-    candidates = products.map((p) => ({
-      productId: p.id,
-      titleId: p.titleId,
-      titleName: p.title.name,
-      category: p.title.category,
-      type: p.type,
-      reach: p.title.monthlyReach ?? 0,
-      unitPrice: indicativeFromRules(
-        Number(p.basePrice),
-        toRateRules(p.priceRules),
-      ),
-    }));
+    candidates = products
+      .filter((p) => arePricesVisible(p.title))
+      .map((p) => ({
+        productId: p.id,
+        titleId: p.titleId,
+        titleName: p.title.name,
+        category: p.title.category,
+        type: p.type,
+        reach: p.title.monthlyReach ?? 0,
+        unitPrice: indicativeFromRules(
+          Number(p.basePrice),
+          toRateRules(p.priceRules),
+        ),
+      }));
     categories = [...new Set(candidates.map((c) => c.category))].sort();
   }
 

@@ -390,7 +390,9 @@
     "quoteEyebrow": "Tarjous",
     "readyToQuoteTitle": "Valmis tarjoamaan?",
     "readyToQuoteBody": "Luo tarjousluonnos ylläolevasta briefistä — voit muokata katteita ja rivejä seuraavalla näytöllä.",
-    "openOrder": "Avaa tilaus"
+    "openOrder": "Avaa tilaus",
+    "bannerUnconfirmed": "{count, plural, one {1 tuote tarvitsee hintavahvistuksen} other {# tuotetta tarvitsee hintavahvistuksen}}",
+    "bannerReview": "Tarkista →"
   },
   "deskTitles": {
     "eyebrow": "Pääkäyttäjä · julkaisut",
@@ -455,7 +457,23 @@
       "deactivate": "Poista käytöstä",
       "edit": "Muokkaa"
     },
-    "none": "Ei julkaisuja vastaa näitä suodattimia."
+    "freshness": {
+      "column": "Hintojen tuoreus",
+      "never": "Ei vahvistettu",
+      "stale": "Vanhentunut ({days}d)",
+      "aging": "Vanhenee ({days}d)",
+      "fresh": "Tuore ({days}d)",
+      "filterAll": "Kaikki",
+      "filterNever": "Ei koskaan",
+      "filterStale": "Vanhentunut (>90d)",
+      "filterAging": "Vanhenee (31–90d)",
+      "filterFresh": "Tuore (≤30d)"
+    },
+    "none": "Ei julkaisuja vastaa näitä suodattimia.",
+    "bulk": {
+      "sendPriceRequest": "Lähetä hintapyyntö valituille",
+      "hint": "Ohittaa otsikot ilman ensisijaista myyntiyhteyshenkilöä"
+    }
   },
   "auth": {
     "title": "Kirjaudu sisään",
@@ -1490,7 +1508,7 @@
     }
   },
   "priceVisibility": {
-    "requestPrice": "Pyydä hinta",
+    "requestPrice": "Kysy hintaa",
     "requestPriceHelp": "Hinta vahvistetaan briefin jälkeen — palaamme asiaan saatavuuden ja kiinteän hinnan kanssa.",
     "planRfqOnly": "Yksi tai useampi suunnitelmasi nimike vaatii tarjouksen — pikaosto on poistettu käytöstä kunnes hinta on vahvistettu."
   },
@@ -1500,12 +1518,129 @@
     "publishedRateCardHelp": "Julkaisijan virallinen listahinta tavanomaisesta julkaisusta. Näkyy tarjouksessa yliviivattuna ankkurihintana.",
     "publishedRateCurrency": "Valuutta",
     "pricesPublic": "Näytä hinnat mainostajalle",
-    "pricesPublicHelp": "Pois = luettelo näyttää 'Pyydä hinta' lukujen sijaan. Pikaosto on myös pois käytöstä.",
+    "pricesPublicHelp": "Pois = luettelo näyttää 'Kysy hintaa' lukujen sijaan. Pikaosto on myös pois käytöstä.",
     "publisherPricesPublic": "Koko julkaisijan näkyvyys",
     "publisherPricesPublicOn": "Julkaisijan hinnat ovat julkisia",
     "publisherPricesPublicOff": "Julkaisijan hinnat on piilotettu — ohittaa kaikki nimikkeet",
     "save": "Tallenna muutokset",
     "saved": "Tallennettu",
     "cancel": "Peruuta"
+  },
+  "salesContacts": {
+    "title": "Myyntiyhteystiedot",
+    "empty": "Tähän otsikkoon ei ole liitetty myyntiyhteyshenkilöitä.",
+    "primary": "Ensisijainen",
+    "makePrimary": "Aseta ensisijaiseksi",
+    "detach": "Irrota",
+    "attachExisting": "Liitä olemassa oleva yhteystieto",
+    "attach": "Liitä",
+    "addNew": "Lisää uusi yhteystieto",
+    "name": "Nimi",
+    "email": "Sähköposti",
+    "phone": "Puhelin",
+    "role": "Rooli",
+    "notes": "Muistiinpanot",
+    "create": "Luo yhteystieto"
+  },
+  "priceRequests": {
+    "title": "Hintapyynnöt",
+    "sendNew": "Lähetä uusi pyyntö",
+    "noContactsHint": "Lisää myyntiyhteyshenkilö yllä ennen pyynnön lähettämistä.",
+    "noRequests": "Ei vielä pyyntöjä tälle nimikkeelle.",
+    "send": "Lähetä pyyntö",
+    "resend": "Lähetä uudelleen",
+    "cancel": "Peruuta",
+    "logManual": "Kirjaa vastaus manuaalisesti",
+    "primary": "ensisijainen",
+    "col": { "contact": "Yhteystieto", "created": "Luotu", "status": "Tila", "actions": "Toiminnot" },
+    "status": {
+      "draft": "Luonnos",
+      "sent": "Lähetetty",
+      "opened": "Avattu",
+      "responded": "Vastattu",
+      "cancelled": "Peruutettu",
+      "expired": "Vanhentunut"
+    },
+    "manual": {
+      "product": "Tuote",
+      "price": "Hinta",
+      "currency": "Valuutta",
+      "included": "Mitä sisältyy",
+      "excluded": "Mitä EI sisälly",
+      "submit": "Kirjaa tämä tarjous"
+    }
+  },
+  "pendingQuotes": {
+    "title": "Odottavat tarjoukset",
+    "empty": "Ei tarjouksia odottamassa tarkistusta tälle nimikkeelle.",
+    "queueTitle": "Odottavat tarjoukset — kaikki nimikkeet",
+    "queueEmpty": "Ei odottavia. Postilaatikko tyhjä.",
+    "backToDesk": "Takaisin deskiin",
+    "currentLive": "Nykyinen live-hinta",
+    "incomingQuote": "Saapuva tarjous",
+    "confirmedAt": "Vahvistettu {date}",
+    "neverConfirmed": "Ei koskaan vahvistettu",
+    "draftProduct": "Uusi formaatti (ei live-tuotetta vielä)",
+    "receivedAt": "Vastaanotettu {date}",
+    "included": "Sisältyy",
+    "excluded": "Ei sisälly",
+    "newFormat": "Uusi formaatti",
+    "apply": "Sovella",
+    "reject": "Hylkää",
+    "rejectReason": "Syy (valinnainen)",
+    "editBefore": "Muokkaa ennen soveltamista",
+    "price": "Hinta",
+    "currency": "Valuutta",
+    "saveEdit": "Tallenna",
+    "col": {
+      "title": "Nimike",
+      "received": "Vastaanotettu",
+      "price": "Hinta",
+      "actions": "Toiminnot"
+    }
+  },
+  "priceRequestForm": {
+    "hi": "Hei {name},",
+    "intro": "Listaamme {title} ({publisher}) ATNative-katalogissa ja haluamme vahvistaa nykyiset hinnat.",
+    "hasNative": {
+      "question": "Tarjoaako tämä julkaisu edelleen natiivisisältöä?",
+      "yes": "Kyllä",
+      "no": "Ei",
+      "unknown": "En tiedä"
+    },
+    "products": {
+      "legend": "Hinnat formaateittain",
+      "none": "Meillä ei ole vielä tuotteita listattuna tälle julkaisulle.",
+      "skip": "Ohita — älä tarjoa hintaa tälle",
+      "price": "Hinta",
+      "currency": "Valuutta",
+      "included": "Mitä sisältyy",
+      "includedPlaceholder": "esim. 1 sponsoroitu artikkeli, 2 viikon etusivupaikka, sosiaalinen media",
+      "excluded": "Mitä EI sisälly",
+      "excludedPlaceholder": "esim. printti, ohjelmallinen display, videtuotanto",
+      "validUntil": "Voimassa asti"
+    },
+    "draft": {
+      "legend": "Muita formaatteja, joita haluat lisätä",
+      "hint": "Lisää enintään kolme formaattia, joita haluaisit meidän listaavan.",
+      "addFormat": "Lisää formaatti {n}",
+      "type": "Formaattityyppi",
+      "name": "Formaatin nimi",
+      "desc": "Lyhyt kuvaus",
+      "price": "Hinta",
+      "currency": "Valuutta"
+    },
+    "note": "Onko muuta mitä meidän pitäisi tietää?",
+    "submit": "Lähetä hinnat",
+    "closed": {
+      "expired": { "title": "Linkki on vanhentunut", "body": "Ota yhteyttä ATNative-yhteyshenkilöösi uuden linkin saamiseksi." },
+      "responded": { "title": "Jo vastaanotettu", "body": "Kiitos — vastauksesi on jo tallennettu." },
+      "cancelled": { "title": "Linkki peruutettu", "body": "Ota yhteyttä ATNative-yhteyshenkilöösi." },
+      "unknown": { "title": "Linkki ei ole käytettävissä", "body": "Ota yhteyttä ATNative-yhteyshenkilöösi." }
+    },
+    "thanks": {
+      "title": "Kiitos!",
+      "body": "Olemme kirjanneet hintasi. ATNative-tiimi tarkistaa ja ottaa ne käyttöön pian."
+    }
   }
 }

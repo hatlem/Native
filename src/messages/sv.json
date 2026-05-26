@@ -320,7 +320,9 @@
     "quoteEyebrow": "Offert",
     "readyToQuoteTitle": "Redo att offerera?",
     "readyToQuoteBody": "Generera ett utkast från briefen ovan — du kan justera marginaler och rader på nästa skärm.",
-    "openOrder": "Öppna order"
+    "openOrder": "Öppna order",
+    "bannerUnconfirmed": "{count, plural, one {1 produkt saknar prisbekräftelse} other {# produkter saknar prisbekräftelse}}",
+    "bannerReview": "Granska dem →"
   },
   "deskTitles": {
     "eyebrow": "Superadmin · titlar",
@@ -385,7 +387,23 @@
       "deactivate": "Inaktivera",
       "edit": "Redigera"
     },
-    "none": "Inga titlar matchar filtren."
+    "freshness": {
+      "column": "Prisfärskhet",
+      "never": "Inte bekräftat",
+      "stale": "Gammal ({days}d)",
+      "aging": "Åldras ({days}d)",
+      "fresh": "Färsk ({days}d)",
+      "filterAll": "Alla",
+      "filterNever": "Aldrig",
+      "filterStale": "Gammal (>90d)",
+      "filterAging": "Åldras (31–90d)",
+      "filterFresh": "Färsk (≤30d)"
+    },
+    "none": "Inga titlar matchar filtren.",
+    "bulk": {
+      "sendPriceRequest": "Skicka prisförfrågan till valda",
+      "hint": "Hoppar över titlar utan primär säljkontakt"
+    }
   },
   "auth": {
     "title": "Logga in",
@@ -1490,7 +1508,7 @@
     }
   },
   "priceVisibility": {
-    "requestPrice": "Begär pris",
+    "requestPrice": "Kontakta för pris",
     "requestPriceHelp": "Pris sätts efter en brief — vi återkommer med tillgänglighet och fast pris.",
     "planRfqOnly": "En eller flera titlar i din plan kräver offert — direktköp är inaktiverat tills priset är bekräftat."
   },
@@ -1500,12 +1518,129 @@
     "publishedRateCardHelp": "Utgivarens officiella listpris för en standardplacering. Visas som överstruket ankare på offerter till annonsör.",
     "publishedRateCurrency": "Valuta",
     "pricesPublic": "Visa priser för annonsör",
-    "pricesPublicHelp": "Av = katalogen visar 'Begär pris' istället för siffror. Direktköp är också inaktiverat.",
+    "pricesPublicHelp": "Av = katalogen visar 'Kontakta för pris' istället för siffror. Direktköp är också inaktiverat.",
     "publisherPricesPublic": "Synlighet för hela utgivaren",
     "publisherPricesPublicOn": "Utgivarens priser är offentliga",
     "publisherPricesPublicOff": "Utgivarens priser är dolda — åsidosätter alla titlar",
     "save": "Spara ändringar",
     "saved": "Sparat",
     "cancel": "Avbryt"
+  },
+  "salesContacts": {
+    "title": "Säljkontakter",
+    "empty": "Inga säljkontakter kopplade till denna titel.",
+    "primary": "Primär",
+    "makePrimary": "Gör primär",
+    "detach": "Koppla bort",
+    "attachExisting": "Koppla en befintlig kontakt",
+    "attach": "Koppla",
+    "addNew": "Lägg till ny kontakt",
+    "name": "Namn",
+    "email": "E-post",
+    "phone": "Telefon",
+    "role": "Roll",
+    "notes": "Anteckningar",
+    "create": "Skapa kontakt"
+  },
+  "priceRequests": {
+    "title": "Prisförfrågningar",
+    "sendNew": "Skicka ny förfrågan",
+    "noContactsHint": "Lägg till en säljkontakt ovan innan du skickar en förfrågan.",
+    "noRequests": "Inga förfrågningar för denna titel ännu.",
+    "send": "Skicka förfrågan",
+    "resend": "Skicka igen",
+    "cancel": "Avbryt",
+    "logManual": "Registrera svar manuellt",
+    "primary": "primär",
+    "col": { "contact": "Kontakt", "created": "Skapad", "status": "Status", "actions": "Åtgärder" },
+    "status": {
+      "draft": "Utkast",
+      "sent": "Skickad",
+      "opened": "Öppnad",
+      "responded": "Besvarad",
+      "cancelled": "Avbruten",
+      "expired": "Utgången"
+    },
+    "manual": {
+      "product": "Produkt",
+      "price": "Pris",
+      "currency": "Valuta",
+      "included": "Vad som ingår",
+      "excluded": "Vad som INTE ingår",
+      "submit": "Registrera detta offert"
+    }
+  },
+  "pendingQuotes": {
+    "title": "Väntande prisförslag",
+    "empty": "Inga förslag väntar på granskning för den här titeln.",
+    "queueTitle": "Väntande prisförslag — alla titlar",
+    "queueEmpty": "Inget väntar. Inkorg noll.",
+    "backToDesk": "Tillbaka till desk",
+    "currentLive": "Aktuellt live-pris",
+    "incomingQuote": "Inkommande förslag",
+    "confirmedAt": "Bekräftad {date}",
+    "neverConfirmed": "Aldrig bekräftad",
+    "draftProduct": "Nytt format (inget live-produkt ännu)",
+    "receivedAt": "Mottagen {date}",
+    "included": "Inkluderat",
+    "excluded": "Exkluderat",
+    "newFormat": "Nytt format",
+    "apply": "Tillämpa",
+    "reject": "Avvisa",
+    "rejectReason": "Anledning (valfritt)",
+    "editBefore": "Redigera innan tillämpning",
+    "price": "Pris",
+    "currency": "Valuta",
+    "saveEdit": "Spara",
+    "col": {
+      "title": "Titel",
+      "received": "Mottagen",
+      "price": "Pris",
+      "actions": "Åtgärder"
+    }
+  },
+  "priceRequestForm": {
+    "hi": "Hej {name},",
+    "intro": "Vi listar {title} ({publisher}) i ATNative-katalogen och vill bekräfta aktuella priser.",
+    "hasNative": {
+      "question": "Erbjuder den här titeln fortfarande nativt innehåll?",
+      "yes": "Ja",
+      "no": "Nej",
+      "unknown": "Osäker"
+    },
+    "products": {
+      "legend": "Priser per format",
+      "none": "Vi har inga produkter listade för den här titeln ännu.",
+      "skip": "Hoppa över — ge inget pris på den här",
+      "price": "Pris",
+      "currency": "Valuta",
+      "included": "Vad som ingår",
+      "includedPlaceholder": "t.ex. 1 sponsrad artikel, 2 veckors startsideplacering, sociala medier",
+      "excluded": "Vad som INTE ingår",
+      "excludedPlaceholder": "t.ex. print, programmatisk display, videoproduktion",
+      "validUntil": "Giltigt till"
+    },
+    "draft": {
+      "legend": "Andra format du vill lägga till",
+      "hint": "Lägg till upp till tre format som du vill att vi ska lista.",
+      "addFormat": "Lägg till format {n}",
+      "type": "Formattyp",
+      "name": "Formatnamn",
+      "desc": "Kort beskrivning",
+      "price": "Pris",
+      "currency": "Valuta"
+    },
+    "note": "Något annat vi bör veta?",
+    "submit": "Skicka priser",
+    "closed": {
+      "expired": { "title": "Länken har gått ut", "body": "Kontakta din ATNative-representant för att få en ny länk." },
+      "responded": { "title": "Redan mottaget", "body": "Tack — vi har redan ditt svar på fil." },
+      "cancelled": { "title": "Länken är avbruten", "body": "Kontakta din ATNative-representant." },
+      "unknown": { "title": "Länken är inte tillgänglig", "body": "Kontakta din ATNative-representant." }
+    },
+    "thanks": {
+      "title": "Tack!",
+      "body": "Vi har loggat dina priser. ATNative-teamet kommer att granska och tillämpa dem snart."
+    }
   }
 }

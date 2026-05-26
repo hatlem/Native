@@ -18,7 +18,7 @@ import {
   toRateRules,
   type QuotableItem,
 } from "@/lib/money";
-import { arePricesVisible } from "@/lib/pricing-visibility";
+import { isProductPriceShown } from "@/lib/pricing-visibility";
 import { groupItemsByMarket } from "@/lib/quote-grouping";
 import { recordAudit } from "@/lib/audit";
 import { notifyDesk, notifyOrg, notifyPublisher } from "@/lib/notify";
@@ -181,13 +181,14 @@ export async function submitRequest(formData: FormData) {
   // Self-serve: an all-firm-priced basket needs no desk — auto-quote,
   // auto-accept and confirm the order immediately. Server-side gate
   // mirrors the plan page UI: any line whose title has hidden prices
-  // forces the basket onto the RFQ path so we never auto-charge a
-  // buyer against a price they couldn't see in the catalog.
+  // OR whose price hasn't been confirmed yet forces the basket onto
+  // the RFQ path so we never auto-charge a buyer against a price
+  // they couldn't see in the catalog.
   const allFirm = items.every((i) => {
     const product = byId.get(i.productId);
     if (!product) return false;
     if (product.visibility !== "FIRM") return false;
-    return arePricesVisible(product.title);
+    return isProductPriceShown(product, product.title);
   });
 
   // Honour Phase-3 availability for FIRM (self-serve) baskets: block
