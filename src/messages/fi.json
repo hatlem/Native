@@ -1541,6 +1541,7 @@
     "publisherPricesPublicOn": "Julkaisijan hinnat ovat julkisia",
     "publisherPricesPublicOff": "Julkaisijan hinnat on piilotettu — ohittaa kaikki nimikkeet",
     "save": "Tallenna muutokset",
+    "saving": "Tallennetaan…",
     "saved": "Tallennettu",
     "cancel": "Peruuta"
   },

@@ -10,6 +10,7 @@ import {
 import { SalesContactsPanel } from "./_components/SalesContactsPanel";
 import { PriceRequestsPanel } from "./_components/PriceRequestsPanel";
 import { PendingQuotesPanel } from "./_components/PendingQuotesPanel";
+import { SubmitButton } from "@/components";
 
 export const dynamic = "force-dynamic";
 
@@ -141,9 +142,11 @@ export default async function DeskTitleEditPage({
             <p className="muted small">{t("pricesPublicHelp")}</p>
           </div>
 
-          <button type="submit" className="btn">
-            {t("save")}
-          </button>
+          <SubmitButton
+            label={t("save")}
+            pendingLabel={t("saving")}
+            className="btn"
+          />
         </form>
       </article>
 
@@ -176,9 +179,13 @@ export default async function DeskTitleEditPage({
             />
             {t("pricesPublic")} ({title.publisher.name})
           </label>
-          <button type="submit" className="btn small" style={{ marginTop: 12 }}>
-            {t("save")}
-          </button>
+          <div style={{ marginTop: 12 }}>
+            <SubmitButton
+              label={t("save")}
+              pendingLabel={t("saving")}
+              className="btn small"
+            />
+          </div>
         </form>
       </article>
 

@@ -1542,6 +1542,7 @@
     "publisherPricesPublicOn": "Udgiverens priser er offentlige",
     "publisherPricesPublicOff": "Udgiverens priser er skjult — tilsidesætter alle titler",
     "save": "Gem ændringer",
+    "saving": "Gemmer…",
     "saved": "Gemt",
     "cancel": "Annullér"
   },

@@ -1541,6 +1541,7 @@
     "publisherPricesPublicOn": "Publisher prices are public",
     "publisherPricesPublicOff": "Publisher prices are hidden — overrides every title",
     "save": "Save changes",
+    "saving": "Saving…",
     "saved": "Saved",
     "cancel": "Cancel"
   },

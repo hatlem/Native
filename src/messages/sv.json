@@ -1541,6 +1541,7 @@
     "publisherPricesPublicOn": "Utgivarens priser är offentliga",
     "publisherPricesPublicOff": "Utgivarens priser är dolda — åsidosätter alla titlar",
     "save": "Spara ändringar",
+    "saving": "Sparar…",
     "saved": "Sparat",
     "cancel": "Avbryt"
   },

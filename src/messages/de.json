@@ -1399,6 +1399,7 @@
     "publisherPricesPublicOn": "Preise des Verlags sind öffentlich",
     "publisherPricesPublicOff": "Preise des Verlags sind verborgen — überschreibt alle Titel",
     "save": "Änderungen speichern",
+    "saving": "Wird gespeichert…",
     "saved": "Gespeichert",
     "cancel": "Abbrechen"
   },
