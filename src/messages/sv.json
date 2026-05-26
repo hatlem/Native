@@ -774,9 +774,14 @@
     "view": "Öppna titel",
     "back": "Tillbaka till katalogen",
     "rowAttribute": "Attribut",
+    "rowPublisher": "Utgivare",
     "rowMarket": "Marknad",
     "rowCategory": "Kategori",
-    "rowFormats": "Tillgängliga format"
+    "rowReach": "Månadsräckvidd",
+    "rowLeadTime": "Ledtid",
+    "rowFormats": "Tillgängliga format",
+    "rowFromPrice": "Från pris",
+    "rowAction": "Åtgärd"
   },
   "availability": {
     "title": "Tillgänglighet",

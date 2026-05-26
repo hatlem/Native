@@ -95,9 +95,14 @@
     "view": "Avaa julkaisu",
     "back": "Takaisin katalogiin",
     "rowAttribute": "Ominaisuus",
+    "rowPublisher": "Kustantaja",
     "rowMarket": "Markkina",
     "rowCategory": "Kategoria",
-    "rowFormats": "Saatavilla olevat formaatit"
+    "rowReach": "Kuukausittainen tavoittavuus",
+    "rowLeadTime": "Toimitusaika",
+    "rowFormats": "Saatavilla olevat formaatit",
+    "rowFromPrice": "Alkaen",
+    "rowAction": "Toiminto"
   },
   "availability": {
     "title": "Saatavuus",

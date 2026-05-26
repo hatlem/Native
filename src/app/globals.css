@@ -2386,9 +2386,20 @@ select:disabled {
 }
 
 .compare-formats-table th:first-child,
-.compare-formats-table td:first-child {
+.compare-formats-table td:first-child,
+.compare-titles-table th:first-child,
+.compare-titles-table td:first-child {
   width: 140px;
   white-space: nowrap;
+}
+
+/* Title-compare table: header column has the title name as a link. */
+.compare-titles-table thead th {
+  vertical-align: bottom;
+  min-width: 160px;
+}
+.compare-titles-table thead th a {
+  font-weight: 600;
 }
 
 .format-learn {

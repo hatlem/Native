@@ -95,9 +95,14 @@
     "view": "Titel öffnen",
     "back": "Zurück zum Katalog",
     "rowAttribute": "Merkmal",
+    "rowPublisher": "Verlag",
     "rowMarket": "Markt",
     "rowCategory": "Kategorie",
-    "rowFormats": "Verfügbare Formate"
+    "rowReach": "Monatliche Reichweite",
+    "rowLeadTime": "Vorlaufzeit",
+    "rowFormats": "Verfügbare Formate",
+    "rowFromPrice": "Ab Preis",
+    "rowAction": "Aktion"
   },
   "availability": {
     "title": "Availability",

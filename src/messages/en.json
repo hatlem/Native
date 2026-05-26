@@ -95,9 +95,14 @@
     "view": "Open title",
     "back": "Back to catalog",
     "rowAttribute": "Attribute",
+    "rowPublisher": "Publisher",
     "rowMarket": "Market",
     "rowCategory": "Category",
-    "rowFormats": "Available formats"
+    "rowReach": "Monthly reach",
+    "rowLeadTime": "Lead time",
+    "rowFormats": "Available formats",
+    "rowFromPrice": "From price",
+    "rowAction": "Action"
   },
   "availability": {
     "title": "Availability",

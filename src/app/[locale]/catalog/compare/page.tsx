@@ -79,8 +79,10 @@ export default async function ComparePage({
         <Link href="/catalog">← {t("back")}</Link>
       </p>
 
-      <div className="grid">
-        {ordered.map((title) => {
+      {/* Precompute per-title row values so the table body is just a
+          map over a row spec. Avoids inline ternaries per cell. */}
+      {(() => {
+        const rows = ordered.map((title) => {
           const visibleProducts = title.products.filter((p) =>
             isProductPriceShown(p, title),
           );
@@ -98,46 +100,131 @@ export default async function ComparePage({
           const leadMin = title.products.length
             ? Math.min(...title.products.map((p) => p.leadTimeDays))
             : null;
-          return (
-            <article className="card" key={title.id}>
-              <h3>
-                <Link href={`/catalog/${title.slug}`}>{title.name}</Link>
-              </h3>
-              <div className="muted">
-                {title.publisher.name} · {tMarket(title.market.code)}
-              </div>
-              <div className="muted">{title.category}</div>
-              {title.monthlyReach ? (
-                <div className="muted">
-                  {tc("card.reach")}: {new Intl.NumberFormat().format(title.monthlyReach)}
-                </div>
-              ) : null}
-              {leadMin !== null ? (
-                <div className="muted">
-                  {tc("card.leadTime")}: {leadMin} {tc("card.days")}
-                </div>
-              ) : null}
-              <div>
-                {title.products.map((p) => (
-                  <span className="tag" key={p.id}>
-                    {tType(p.type)}
-                  </span>
-                ))}
-              </div>
-              {from !== null ? (
-                <div className="price">
-                  {tc("card.from")} {formatMoney(from, cur, locale)}
-                </div>
-              ) : anyHidden ? (
-                <div className="price muted">{tv("requestPrice")}</div>
-              ) : null}
-              <p className="note" style={{ marginTop: 8 }}>
-                <Link href={`/catalog/${title.slug}`}>{t("view")} →</Link>
-              </p>
-            </article>
-          );
-        })}
-      </div>
+          return { title, anyHidden, from, cur, leadMin };
+        });
+
+        return (
+          <div className="table-wrap responsive">
+            <table className="table compare-titles-table">
+              <thead>
+                <tr>
+                  <th>{t("rowAttribute")}</th>
+                  {rows.map(({ title }) => (
+                    <th key={title.id}>
+                      <Link href={`/catalog/${title.slug}`}>{title.name}</Link>
+                    </th>
+                  ))}
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>
+                    <strong>{t("rowPublisher")}</strong>
+                  </td>
+                  {rows.map(({ title }) => (
+                    <td key={title.id}>{title.publisher.name}</td>
+                  ))}
+                </tr>
+                <tr>
+                  <td>
+                    <strong>{t("rowMarket")}</strong>
+                  </td>
+                  {rows.map(({ title }) => (
+                    <td key={title.id}>{tMarket(title.market.code)}</td>
+                  ))}
+                </tr>
+                <tr>
+                  <td>
+                    <strong>{t("rowCategory")}</strong>
+                  </td>
+                  {rows.map(({ title }) => (
+                    <td key={title.id} className="muted">
+                      {title.category}
+                    </td>
+                  ))}
+                </tr>
+                <tr>
+                  <td>
+                    <strong>{t("rowReach")}</strong>
+                  </td>
+                  {rows.map(({ title }) => (
+                    <td key={title.id} className="num">
+                      {title.monthlyReach
+                        ? new Intl.NumberFormat().format(title.monthlyReach)
+                        : "—"}
+                    </td>
+                  ))}
+                </tr>
+                <tr>
+                  <td>
+                    <strong>{t("rowLeadTime")}</strong>
+                  </td>
+                  {rows.map(({ title, leadMin }) => (
+                    <td key={title.id} className="num">
+                      {leadMin !== null
+                        ? `${leadMin} ${tc("card.days")}`
+                        : "—"}
+                    </td>
+                  ))}
+                </tr>
+                <tr>
+                  <td>
+                    <strong>{t("rowFormats")}</strong>
+                  </td>
+                  {rows.map(({ title }) => (
+                    <td key={title.id}>
+                      {title.products.length === 0 ? (
+                        <span className="muted">—</span>
+                      ) : (
+                        <span className="cluster tight">
+                          {title.products.map((p) => (
+                            <span className="tag" key={p.id}>
+                              {tType(p.type)}
+                            </span>
+                          ))}
+                        </span>
+                      )}
+                    </td>
+                  ))}
+                </tr>
+                <tr>
+                  <td>
+                    <strong>{t("rowFromPrice")}</strong>
+                  </td>
+                  {rows.map(({ title, from, cur, anyHidden }) => (
+                    <td key={title.id} className="num">
+                      {from !== null ? (
+                        <span className="price">
+                          {formatMoney(from, cur, locale)}
+                        </span>
+                      ) : anyHidden ? (
+                        <span className="muted">{tv("requestPrice")}</span>
+                      ) : (
+                        <span className="muted">—</span>
+                      )}
+                    </td>
+                  ))}
+                </tr>
+                <tr>
+                  <td>
+                    <strong>{t("rowAction")}</strong>
+                  </td>
+                  {rows.map(({ title }) => (
+                    <td key={title.id}>
+                      <Link
+                        href={`/catalog/${title.slug}`}
+                        className="link"
+                      >
+                        {t("view")} →
+                      </Link>
+                    </td>
+                  ))}
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        );
+      })()}
 
       <p className="note">{tc("indicativeNote")}</p>
     </section>

@@ -774,9 +774,14 @@
     "view": "Åbn titel",
     "back": "Tilbage til kataloget",
     "rowAttribute": "Egenskab",
+    "rowPublisher": "Udgiver",
     "rowMarket": "Marked",
     "rowCategory": "Kategori",
-    "rowFormats": "Tilgængelige formater"
+    "rowReach": "Månedlig rækkevidde",
+    "rowLeadTime": "Leveringstid",
+    "rowFormats": "Tilgængelige formater",
+    "rowFromPrice": "Fra pris",
+    "rowAction": "Handling"
   },
   "availability": {
     "title": "Tilgængelighed",
