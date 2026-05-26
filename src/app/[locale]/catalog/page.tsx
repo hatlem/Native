@@ -4,7 +4,7 @@ import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
 import { Link } from "@/i18n/navigation";
 import { indicativeFromRules, toRateRules, formatMoney } from "@/lib/money";
-import { arePricesVisible } from "@/lib/pricing-visibility";
+import { isProductPriceShown } from "@/lib/pricing-visibility";
 import { EmptyState } from "@/app/empty-state";
 import { LandingShell } from "@/app/landing-shell";
 import { searchTitleIds } from "@/lib/catalog-search";
@@ -240,15 +240,19 @@ export default async function CatalogPage({
           ) : null}
         <div className="grid">
           {titles.map((title) => {
-            const priceVisible = arePricesVisible(title);
-            const prices = priceVisible
-              ? title.products.map((p) =>
-                  indicativeFromRules(
-                    Number(p.basePrice),
-                    toRateRules(p.priceRules),
-                  ),
-                )
-              : [];
+            // Per-product visibility: active + confirmedAt + pricesPublic flags
+            const visibleProducts = title.products.filter((p) =>
+              isProductPriceShown(p, title),
+            );
+            const anyHidden = title.products.some(
+              (p) => !isProductPriceShown(p, title),
+            );
+            const prices = visibleProducts.map((p) =>
+              indicativeFromRules(
+                Number(p.basePrice),
+                toRateRules(p.priceRules),
+              ),
+            );
             const from = prices.length ? Math.min(...prices) : null;
             const currency = title.products[0]?.currency ?? title.market.currency;
             const needsQuote = title.products.length === 0;
@@ -268,14 +272,13 @@ export default async function CatalogPage({
                       {tType(p.type)}
                     </span>
                   ))}
-                  {priceVisible &&
-                  title.products.some((p) => p.visibility === "FIRM") ? (
+                  {visibleProducts.some((p) => p.visibility === "FIRM") ? (
                     <span className="tag">⚡ {tf("badge")}</span>
                   ) : null}
                   {needsQuote ? (
                     <span className="tag">{t("card.requestQuote")}</span>
                   ) : null}
-                  {!priceVisible ? (
+                  {anyHidden ? (
                     <span className="tag">{tv("requestPrice")}</span>
                   ) : null}
                   {title.nativeFit ? (
@@ -303,11 +306,11 @@ export default async function CatalogPage({
                     {new Intl.NumberFormat().format(title.circulation)}
                   </div>
                 ) : null}
-                {priceVisible && from !== null ? (
+                {from !== null ? (
                   <div className="price">
                     {t("card.from")} {formatMoney(from, currency, locale)}
                   </div>
-                ) : !priceVisible ? (
+                ) : anyHidden ? (
                   <div className="price muted">{tv("requestPrice")}</div>
                 ) : null}
               </article>

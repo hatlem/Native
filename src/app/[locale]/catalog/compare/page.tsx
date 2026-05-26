@@ -4,7 +4,7 @@ import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
 import { Link } from "@/i18n/navigation";
 import { indicativeFromRules, toRateRules, formatMoney } from "@/lib/money";
-import { arePricesVisible } from "@/lib/pricing-visibility";
+import { isProductPriceShown } from "@/lib/pricing-visibility";
 import { EmptyState } from "@/app/empty-state";
 
 export const dynamic = "force-dynamic";
@@ -81,15 +81,18 @@ export default async function ComparePage({
 
       <div className="grid">
         {ordered.map((title) => {
-          const priceVisible = arePricesVisible(title);
-          const prices = priceVisible
-            ? title.products.map((p) =>
-                indicativeFromRules(
-                  Number(p.basePrice),
-                  toRateRules(p.priceRules),
-                ),
-              )
-            : [];
+          const visibleProducts = title.products.filter((p) =>
+            isProductPriceShown(p, title),
+          );
+          const anyHidden = title.products.some(
+            (p) => !isProductPriceShown(p, title),
+          );
+          const prices = visibleProducts.map((p) =>
+            indicativeFromRules(
+              Number(p.basePrice),
+              toRateRules(p.priceRules),
+            ),
+          );
           const from = prices.length ? Math.min(...prices) : null;
           const cur = title.products[0]?.currency ?? title.market.currency;
           const leadMin = title.products.length
@@ -121,11 +124,11 @@ export default async function ComparePage({
                   </span>
                 ))}
               </div>
-              {priceVisible && from !== null ? (
+              {from !== null ? (
                 <div className="price">
                   {tc("card.from")} {formatMoney(from, cur, locale)}
                 </div>
-              ) : !priceVisible ? (
+              ) : anyHidden ? (
                 <div className="price muted">{tv("requestPrice")}</div>
               ) : null}
               <p className="note" style={{ marginTop: 8 }}>

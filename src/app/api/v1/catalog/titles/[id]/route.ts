@@ -4,7 +4,7 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { authenticateRequest } from "@/lib/api-auth";
-import { arePricesVisible } from "@/lib/pricing-visibility";
+import { isProductPriceShown } from "@/lib/pricing-visibility";
 import { rfqLimiter } from "@/lib/rate-limit";
 
 export const dynamic = "force-dynamic";
@@ -68,12 +68,15 @@ export async function GET(
     return errJson(404, "NOT_FOUND", "Title not found or inactive.");
   }
 
-  // When the publisher or title hides prices, redact every numeric
-  // pricing field — basePriceIndicative, visibility, and the full
-  // priceRules array (which encodes margin tiers we never want to
-  // leak to integration partners). The shape stays stable; clients
-  // gate on pricesVisible.
-  const priceVisible = arePricesVisible(title);
+  // Visibility is evaluated per product: active + confirmedAt +
+  // publisher.pricesPublic + title.pricesPublic. Redact numeric fields
+  // and demote visibility to INDICATIVE when a product's price is
+  // hidden so integration partners can't construct firm checkout flows
+  // against numbers the buyer never agreed to see. The shape stays
+  // stable; clients gate on pricesVisible / per-product visibility.
+  const anyPriceVisible = title.products.some((p) =>
+    isProductPriceShown(p, title),
+  );
 
   return NextResponse.json({
     data: {
@@ -92,33 +95,36 @@ export async function GET(
         ...title.market,
         vatRatePct: Number(title.market.vatRatePct),
       },
-      pricesVisible: priceVisible,
-      products: title.products.map((p) => ({
-        id: p.id,
-        type: p.type,
-        basePriceIndicative: priceVisible ? Number(p.basePrice) : null,
-        currency: p.currency,
-        visibility: priceVisible ? p.visibility : "INDICATIVE",
-        leadTimeDays: p.leadTimeDays,
-        spec: p.spec
-          ? {
-              wordCountMin: p.spec.wordCountMin,
-              wordCountMax: p.spec.wordCountMax,
-              imagesMin: p.spec.imagesMin,
-              disclosureLabel: p.spec.disclosureLabel,
-              fileFormats: p.spec.fileFormats,
-              requirements: p.spec.requirements,
-            }
-          : null,
-        priceRules: priceVisible
-          ? p.priceRules.map((r) => ({
-              label: r.label,
-              minVolume: r.minVolume,
-              marginPct: Number(r.marginPct),
-              seasonalMultiplier: Number(r.seasonalMultiplier),
-            }))
-          : [],
-      })),
+      pricesVisible: anyPriceVisible,
+      products: title.products.map((p) => {
+        const shown = isProductPriceShown(p, title);
+        return {
+          id: p.id,
+          type: p.type,
+          basePriceIndicative: shown ? Number(p.basePrice) : null,
+          currency: p.currency,
+          visibility: shown ? p.visibility : "INDICATIVE",
+          leadTimeDays: p.leadTimeDays,
+          spec: p.spec
+            ? {
+                wordCountMin: p.spec.wordCountMin,
+                wordCountMax: p.spec.wordCountMax,
+                imagesMin: p.spec.imagesMin,
+                disclosureLabel: p.spec.disclosureLabel,
+                fileFormats: p.spec.fileFormats,
+                requirements: p.spec.requirements,
+              }
+            : null,
+          priceRules: shown
+            ? p.priceRules.map((r) => ({
+                label: r.label,
+                minVolume: r.minVolume,
+                marginPct: Number(r.marginPct),
+                seasonalMultiplier: Number(r.seasonalMultiplier),
+              }))
+            : [],
+        };
+      }),
     },
   });
 }

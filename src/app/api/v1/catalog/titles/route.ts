@@ -21,7 +21,7 @@ import { NextResponse, type NextRequest } from "next/server";
 import { MarketCode, ProductType } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
 import { authenticateRequest } from "@/lib/api-auth";
-import { arePricesVisible } from "@/lib/pricing-visibility";
+import { isProductPriceShown } from "@/lib/pricing-visibility";
 import { rfqLimiter } from "@/lib/rate-limit";
 
 export const dynamic = "force-dynamic";
@@ -104,6 +104,8 @@ export async function GET(req: NextRequest) {
           currency: true,
           visibility: true,
           leadTimeDays: true,
+          active: true,
+          confirmedAt: true,
         },
       },
     },
@@ -115,11 +117,14 @@ export async function GET(req: NextRequest) {
 
   return NextResponse.json({
     data: page.map((t) => {
-      // Visibility cascade: publisher.pricesPublic AND title.pricesPublic.
-      // When hidden, redact the price and demote visibility to INDICATIVE
-      // so integration partners don't construct firm checkout flows
-      // against a price the buyer never agreed to see.
-      const priceVisible = arePricesVisible(t);
+      // Visibility cascade per product: active + confirmedAt +
+      // publisher.pricesPublic + title.pricesPublic. When hidden, redact
+      // the price and demote visibility to INDICATIVE so integration
+      // partners don't construct firm checkout flows against a price the
+      // buyer never agreed to see.
+      const anyPriceVisible = t.products.some((p) =>
+        isProductPriceShown(p, t),
+      );
       return {
         id: t.id,
         slug: t.slug,
@@ -129,15 +134,18 @@ export async function GET(req: NextRequest) {
         lastVerifiedAt: t.lastVerifiedAt,
         publisher: { id: t.publisher.id, name: t.publisher.name },
         market: t.market,
-        pricesVisible: priceVisible,
-        products: t.products.map((p) => ({
-          id: p.id,
-          type: p.type,
-          basePriceIndicative: priceVisible ? Number(p.basePrice) : null,
-          currency: p.currency,
-          visibility: priceVisible ? p.visibility : "INDICATIVE",
-          leadTimeDays: p.leadTimeDays,
-        })),
+        pricesVisible: anyPriceVisible,
+        products: t.products.map((p) => {
+          const shown = isProductPriceShown(p, t);
+          return {
+            id: p.id,
+            type: p.type,
+            basePriceIndicative: shown ? Number(p.basePrice) : null,
+            currency: p.currency,
+            visibility: shown ? p.visibility : "INDICATIVE",
+            leadTimeDays: p.leadTimeDays,
+          };
+        }),
       };
     }),
     page: {
