@@ -9,7 +9,7 @@ const DESK_MAILTO =
   "mailto:desk@atnative.com?subject=Talk%20to%20the%20ATNative%20desk";
 
 export const metadata = {
-  title: "ATNative — One brief. 3,000+ titles across 9 European markets. Firm quote in 24 hours.",
+  title: "ATNative — One brief. 3,000+ titles across 9 markets. Firm quote in 24 hours.",
 };
 
 export const dynamic = "force-dynamic";

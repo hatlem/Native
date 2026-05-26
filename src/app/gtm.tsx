@@ -2,7 +2,7 @@ import Script from "next/script";
 
 export const GTM_ID = process.env.NEXT_PUBLIC_GTM_ID;
 
-// Consent Mode v2 defaults to *denied* — required for EU/Nordic (GDPR).
+// Consent Mode v2 defaults to *denied* — required for EU/EEA (GDPR).
 // A consent management platform deployed via GTM can later call
 // gtag('consent','update',...) to grant storage. GTM only loads when a
 // container id is configured, so non-configured environments ship no

@@ -83,7 +83,7 @@ export default async function ApiKeysPage({
               id="key-name"
               name="name"
               required
-              placeholder="e.g. GroupM Nordic Atlas"
+              placeholder="e.g. GroupM Atlas"
             />
           </div>
           <div className="field">

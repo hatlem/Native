@@ -47,8 +47,8 @@ export default async function AboutPage({
 
       <section className="section prose-section">
         <div className="wrap">
-          <h2>{t("nordicTitle")}</h2>
-          <p className="prose">{t("nordicBody")}</p>
+          <h2>{t("whyNowTitle")}</h2>
+          <p className="prose">{t("whyNowBody")}</p>
         </div>
       </section>
 
