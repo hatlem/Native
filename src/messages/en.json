@@ -1567,5 +1567,34 @@
       "excluded": "What's NOT included",
       "submit": "Log this quote"
     }
+  },
+  "pendingQuotes": {
+    "title": "Pending quotes",
+    "empty": "No quotes awaiting your review for this title.",
+    "queueTitle": "Pending quotes — all titles",
+    "queueEmpty": "Nothing pending. Inbox zero.",
+    "backToDesk": "Back to desk",
+    "currentLive": "Current live price",
+    "incomingQuote": "Incoming quote",
+    "confirmedAt": "Confirmed {date}",
+    "neverConfirmed": "Never confirmed",
+    "draftProduct": "New format (no live product yet)",
+    "receivedAt": "Received {date}",
+    "included": "Included",
+    "excluded": "Excluded",
+    "newFormat": "New format",
+    "apply": "Apply",
+    "reject": "Reject",
+    "rejectReason": "Reason (optional)",
+    "editBefore": "Edit before applying",
+    "price": "Price",
+    "currency": "Currency",
+    "saveEdit": "Save",
+    "col": {
+      "title": "Title",
+      "received": "Received",
+      "price": "Price",
+      "actions": "Actions"
+    }
   }
 }

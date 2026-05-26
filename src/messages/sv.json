@@ -1567,5 +1567,34 @@
       "excluded": "Vad som INTE ingår",
       "submit": "Registrera detta offert"
     }
+  },
+  "pendingQuotes": {
+    "title": "Väntande prisförslag",
+    "empty": "Inga förslag väntar på granskning för den här titeln.",
+    "queueTitle": "Väntande prisförslag — alla titlar",
+    "queueEmpty": "Inget väntar. Inkorg noll.",
+    "backToDesk": "Tillbaka till desk",
+    "currentLive": "Aktuellt live-pris",
+    "incomingQuote": "Inkommande förslag",
+    "confirmedAt": "Bekräftad {date}",
+    "neverConfirmed": "Aldrig bekräftad",
+    "draftProduct": "Nytt format (inget live-produkt ännu)",
+    "receivedAt": "Mottagen {date}",
+    "included": "Inkluderat",
+    "excluded": "Exkluderat",
+    "newFormat": "Nytt format",
+    "apply": "Tillämpa",
+    "reject": "Avvisa",
+    "rejectReason": "Anledning (valfritt)",
+    "editBefore": "Redigera innan tillämpning",
+    "price": "Pris",
+    "currency": "Valuta",
+    "saveEdit": "Spara",
+    "col": {
+      "title": "Titel",
+      "received": "Mottagen",
+      "price": "Pris",
+      "actions": "Åtgärder"
+    }
   }
 }

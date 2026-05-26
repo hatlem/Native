@@ -1568,5 +1568,34 @@
       "excluded": "Hvad der IKKE er inkluderet",
       "submit": "Registrer dette tilbud"
     }
+  },
+  "pendingQuotes": {
+    "title": "Afventende pristilbud",
+    "empty": "Ingen tilbud afventer gennemgang for denne titel.",
+    "queueTitle": "Afventende pristilbud — alle titler",
+    "queueEmpty": "Intet afventer. Indbakke nul.",
+    "backToDesk": "Tilbage til desk",
+    "currentLive": "Aktuel live-pris",
+    "incomingQuote": "Indkommende tilbud",
+    "confirmedAt": "Bekræftet {date}",
+    "neverConfirmed": "Aldrig bekræftet",
+    "draftProduct": "Nyt format (intet live-produkt endnu)",
+    "receivedAt": "Modtaget {date}",
+    "included": "Inkluderet",
+    "excluded": "Ekskluderet",
+    "newFormat": "Nyt format",
+    "apply": "Anvend",
+    "reject": "Afvis",
+    "rejectReason": "Årsag (valgfrit)",
+    "editBefore": "Rediger inden anvendelse",
+    "price": "Pris",
+    "currency": "Valuta",
+    "saveEdit": "Gem",
+    "col": {
+      "title": "Titel",
+      "received": "Modtaget",
+      "price": "Pris",
+      "actions": "Handlinger"
+    }
   }
 }

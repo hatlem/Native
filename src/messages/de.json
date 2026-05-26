@@ -1425,5 +1425,34 @@
       "excluded": "Was NICHT inbegriffen ist",
       "submit": "Dieses Angebot erfassen"
     }
+  },
+  "pendingQuotes": {
+    "title": "Ausstehende Preisangebote",
+    "empty": "Keine Angebote warten auf Prüfung für diesen Titel.",
+    "queueTitle": "Ausstehende Preisangebote — alle Titel",
+    "queueEmpty": "Nichts ausstehend. Posteingang leer.",
+    "backToDesk": "Zurück zum Desk",
+    "currentLive": "Aktueller Live-Preis",
+    "incomingQuote": "Eingehendes Angebot",
+    "confirmedAt": "Bestätigt {date}",
+    "neverConfirmed": "Nie bestätigt",
+    "draftProduct": "Neues Format (noch kein Live-Produkt)",
+    "receivedAt": "Erhalten {date}",
+    "included": "Enthalten",
+    "excluded": "Ausgeschlossen",
+    "newFormat": "Neues Format",
+    "apply": "Anwenden",
+    "reject": "Ablehnen",
+    "rejectReason": "Grund (optional)",
+    "editBefore": "Vor Anwendung bearbeiten",
+    "price": "Preis",
+    "currency": "Währung",
+    "saveEdit": "Speichern",
+    "col": {
+      "title": "Titel",
+      "received": "Erhalten",
+      "price": "Preis",
+      "actions": "Aktionen"
+    }
   }
 }

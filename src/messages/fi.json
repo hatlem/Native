@@ -1567,5 +1567,34 @@
       "excluded": "Mitä EI sisälly",
       "submit": "Kirjaa tämä tarjous"
     }
+  },
+  "pendingQuotes": {
+    "title": "Odottavat tarjoukset",
+    "empty": "Ei tarjouksia odottamassa tarkistusta tälle nimikkeelle.",
+    "queueTitle": "Odottavat tarjoukset — kaikki nimikkeet",
+    "queueEmpty": "Ei odottavia. Postilaatikko tyhjä.",
+    "backToDesk": "Takaisin deskiin",
+    "currentLive": "Nykyinen live-hinta",
+    "incomingQuote": "Saapuva tarjous",
+    "confirmedAt": "Vahvistettu {date}",
+    "neverConfirmed": "Ei koskaan vahvistettu",
+    "draftProduct": "Uusi formaatti (ei live-tuotetta vielä)",
+    "receivedAt": "Vastaanotettu {date}",
+    "included": "Sisältyy",
+    "excluded": "Ei sisälly",
+    "newFormat": "Uusi formaatti",
+    "apply": "Sovella",
+    "reject": "Hylkää",
+    "rejectReason": "Syy (valinnainen)",
+    "editBefore": "Muokkaa ennen soveltamista",
+    "price": "Hinta",
+    "currency": "Valuutta",
+    "saveEdit": "Tallenna",
+    "col": {
+      "title": "Nimike",
+      "received": "Vastaanotettu",
+      "price": "Hinta",
+      "actions": "Toiminnot"
+    }
   }
 }

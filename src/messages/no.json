@@ -1567,5 +1567,34 @@
       "excluded": "Hva som IKKE er inkludert",
       "submit": "Registrer dette tilbudet"
     }
+  },
+  "pendingQuotes": {
+    "title": "Avventer pristilbud",
+    "empty": "Ingen tilbud venter på gjennomgang for denne tittelen.",
+    "queueTitle": "Avventer pristilbud — alle titler",
+    "queueEmpty": "Ingenting venter. Innboks tom.",
+    "backToDesk": "Tilbake til desk",
+    "currentLive": "Gjeldende live-pris",
+    "incomingQuote": "Innkommende tilbud",
+    "confirmedAt": "Bekreftet {date}",
+    "neverConfirmed": "Aldri bekreftet",
+    "draftProduct": "Nytt format (ingen live-produkt ennå)",
+    "receivedAt": "Mottatt {date}",
+    "included": "Inkludert",
+    "excluded": "Ekskludert",
+    "newFormat": "Nytt format",
+    "apply": "Bruk",
+    "reject": "Avvis",
+    "rejectReason": "Årsak (valgfritt)",
+    "editBefore": "Rediger før bruk",
+    "price": "Pris",
+    "currency": "Valuta",
+    "saveEdit": "Lagre",
+    "col": {
+      "title": "Tittel",
+      "received": "Mottatt",
+      "price": "Pris",
+      "actions": "Handlinger"
+    }
   }
 }
