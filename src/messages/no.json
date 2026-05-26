@@ -397,7 +397,11 @@
       "filterAging": "Aldrende (31–90d)",
       "filterFresh": "Fersk (≤30d)"
     },
-    "none": "Ingen titler matcher filtrene."
+    "none": "Ingen titler matcher filtrene.",
+    "bulk": {
+      "sendPriceRequest": "Send prisforespørsel til valgte",
+      "hint": "Hopper over titler uten primær salgskontakt"
+    }
   },
   "auth": {
     "title": "Logg inn",

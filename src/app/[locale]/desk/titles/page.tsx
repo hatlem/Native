@@ -9,6 +9,7 @@ import {
   markTitleNoNative,
   deactivateTitle,
 } from "@/app/title-actions";
+import { createPriceRequestsBulkAction } from "@/app/price-actions";
 import {
   latestConfirmedAtAcrossProducts,
   freshnessBucket,
@@ -440,7 +441,13 @@ export default async function DeskTitlesPage({
           {t("none")}
         </p>
       ) : (
-        Array.from(byMarket.entries()).map(([mc, mTitles]) => (
+        <form action={createPriceRequestsBulkAction}>
+          <input type="hidden" name="locale" value={locale} />
+          <div style={{ marginTop: 16, display: "flex", gap: 12, alignItems: "center", flexWrap: "wrap" }}>
+            <button type="submit">{t("bulk.sendPriceRequest")}</button>
+            <span className="muted" style={{ fontSize: "0.9em" }}>{t("bulk.hint")}</span>
+          </div>
+          {Array.from(byMarket.entries()).map(([mc, mTitles]) => (
           <div key={mc} style={{ marginTop: 24 }}>
             <h2>{tMarket(mc)}</h2>
             <div className="grid">
@@ -455,8 +462,16 @@ export default async function DeskTitlesPage({
                     : t("status.no-native");
 
                 return (
-                  <article className="card" key={title.id}>
-                    <h3>{title.name}</h3>
+                  <article className="card" key={title.id} style={{ position: "relative" }}>
+                    <div style={{ display: "flex", alignItems: "flex-start", gap: 8 }}>
+                      <input
+                        type="checkbox"
+                        name="titleIds"
+                        value={title.id}
+                        style={{ marginTop: 4, flexShrink: 0 }}
+                      />
+                      <h3 style={{ margin: 0 }}>{title.name}</h3>
+                    </div>
                     <div className="muted">
                       {title.publisher.name}
                       {title.ownerGroup &&
@@ -644,7 +659,8 @@ export default async function DeskTitlesPage({
               })}
             </div>
           </div>
-        ))
+        ))}
+        </form>
       )}
 
       {totalPages > 1 ? (

@@ -397,7 +397,11 @@
       "filterAging": "Ældes (31–90d)",
       "filterFresh": "Frisk (≤30d)"
     },
-    "none": "Ingen titler matcher filtrene."
+    "none": "Ingen titler matcher filtrene.",
+    "bulk": {
+      "sendPriceRequest": "Send prisforespørgsel til valgte",
+      "hint": "Springer titler uden primær salgskontakt over"
+    }
   },
   "auth": {
     "title": "Log ind",

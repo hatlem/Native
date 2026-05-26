@@ -467,7 +467,11 @@
       "filterAging": "Vanhenee (31–90d)",
       "filterFresh": "Tuore (≤30d)"
     },
-    "none": "Ei julkaisuja vastaa näitä suodattimia."
+    "none": "Ei julkaisuja vastaa näitä suodattimia.",
+    "bulk": {
+      "sendPriceRequest": "Lähetä hintapyyntö valituille",
+      "hint": "Ohittaa otsikot ilman ensisijaista myyntiyhteyshenkilöä"
+    }
   },
   "auth": {
     "title": "Kirjaudu sisään",

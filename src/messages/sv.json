@@ -397,7 +397,11 @@
       "filterAging": "Åldras (31–90d)",
       "filterFresh": "Färsk (≤30d)"
     },
-    "none": "Inga titlar matchar filtren."
+    "none": "Inga titlar matchar filtren.",
+    "bulk": {
+      "sendPriceRequest": "Skicka prisförfrågan till valda",
+      "hint": "Hoppar över titlar utan primär säljkontakt"
+    }
   },
   "auth": {
     "title": "Logga in",

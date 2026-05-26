@@ -467,7 +467,11 @@
       "filterAging": "Alternd (31–90d)",
       "filterFresh": "Frisch (≤30d)"
     },
-    "none": "No titles match these filters."
+    "none": "No titles match these filters.",
+    "bulk": {
+      "sendPriceRequest": "Preisanfrage an Auswahl senden",
+      "hint": "Überspringt Titel ohne primären Vertriebskontakt"
+    }
   },
   "auth": {
     "title": "Anmelden",
