@@ -3,6 +3,7 @@
 import { AuthError } from "next-auth";
 import { redirect } from "next/navigation";
 import { headers } from "next/headers";
+import { after } from "next/server";
 import bcrypt from "bcryptjs";
 import { MarketCode } from "@prisma/client";
 import { signIn, signOut } from "@/auth";
@@ -309,6 +310,8 @@ export async function requestMagicLink(formData: FormData) {
   });
 
   if (user) {
+    // Token row MUST exist before the email leaves — otherwise a fast
+    // recipient could click the link before the row is committed.
     const raw = generateToken();
     await prisma.magicLinkToken.create({
       data: {
@@ -318,16 +321,29 @@ export async function requestMagicLink(formData: FormData) {
         requestedIp: ip,
       },
     });
+    // Hand the email send + audit write to `next/server`'s `after()` so
+    // they run AFTER the response is committed. This closes most of the
+    // timing-attack window between the user-exists branch (SMTP latency,
+    // ~10²ms) and the unknown-email branch (audit only, ~10ms). Both
+    // branches return the same /check-email redirect on the same code
+    // path — the post-response work is invisible to the attacker.
     const url = `${appUrl()}/${locale}/magic-link/${raw}`;
     const msg = magicLinkEmail({ url, locale, appName: appName() });
-    try {
-      await emailAdapter({ to: user.email, subject: msg.subject, text: msg.text, html: msg.html });
-    } catch (err) {
-      console.error("auth.magic_link_email_failed", { userId: user.id, err });
-    }
-    await recordAudit(user.id, "auth.magic_link_requested", `User:${email}`, { ip });
+    const userId = user.id;
+    const userEmail = user.email;
+    after(async () => {
+      try {
+        await emailAdapter({ to: userEmail, subject: msg.subject, text: msg.text, html: msg.html });
+      } catch (err) {
+        console.error("auth.magic_link_email_failed", { userId, err });
+      }
+      await recordAudit(userId, "auth.magic_link_requested", `User:${userEmail}`, { ip });
+    });
   } else {
-    await recordAudit(email, "auth.magic_link_requested_unknown", `User:${email}`, { ip });
+    // Same shape: audit also deferred so timing parity holds.
+    after(async () => {
+      await recordAudit(email, "auth.magic_link_requested_unknown", `User:${email}`, { ip });
+    });
   }
 
   redirect(`/${locale}/check-email`);
@@ -359,6 +375,8 @@ export async function requestPasswordReset(formData: FormData) {
   });
 
   if (user?.passwordHash) {
+    // Token row MUST exist before the email leaves — otherwise a fast
+    // recipient could click the reset link before the row is committed.
     const raw = generateToken();
     await prisma.passwordResetToken.create({
       data: {
@@ -368,22 +386,35 @@ export async function requestPasswordReset(formData: FormData) {
         requestedIp: ip,
       },
     });
+    // Defer the SMTP latency + audit write to after() so the three
+    // request-side branches (has-password / no-password / unknown email)
+    // all return on roughly the same wall-clock — closing the
+    // enumeration timing channel.
     const url = `${appUrl()}/${locale}/reset-password/${raw}`;
     const msg = passwordResetEmail({ url, locale, appName: appName() });
-    try {
-      await emailAdapter({ to: user.email, subject: msg.subject, text: msg.text, html: msg.html });
-    } catch (err) {
-      console.error("auth.password_reset_email_failed", { userId: user.id, err });
-    }
-    await recordAudit(user.id, "auth.password_reset_requested", `User:${email}`, { ip });
+    const userId = user.id;
+    const userEmail = user.email;
+    after(async () => {
+      try {
+        await emailAdapter({ to: userEmail, subject: msg.subject, text: msg.text, html: msg.html });
+      } catch (err) {
+        console.error("auth.password_reset_email_failed", { userId, err });
+      }
+      await recordAudit(userId, "auth.password_reset_requested", `User:${userEmail}`, { ip });
+    });
   } else if (user) {
     // User exists but has no password (passwordless-future or OAuth-only account):
     // there's nothing to reset. Keep the user-facing response identical to the
     // other branches (still /check-email) but emit a distinct audit kind so
     // ops can spot the case in the log.
-    await recordAudit(user.id, "auth.password_reset_requested_no_password", `User:${email}`, { ip });
+    const userId = user.id;
+    after(async () => {
+      await recordAudit(userId, "auth.password_reset_requested_no_password", `User:${email}`, { ip });
+    });
   } else {
-    await recordAudit(email, "auth.password_reset_requested_unknown", `User:${email}`, { ip });
+    after(async () => {
+      await recordAudit(email, "auth.password_reset_requested_unknown", `User:${email}`, { ip });
+    });
   }
 
   redirect(`/${locale}/check-email`);
