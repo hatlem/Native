@@ -1,73 +1,44 @@
-// ATNative wordmark + favicon mark, drawn as primitives so the SVG is
-// font-independent and crisp at any size. Stroke-based geometric sans
-// inspired by the Futura/Avenir feel of the brand artwork. Color follows
-// `currentColor` so the mark inherits text color from its container —
-// dark on the marketing chrome, white on a dark-mode panel, etc.
+// ATNative wordmark + favicon mark. The wordmark is a vector trace of
+// the source design (Downloads/atnative-ferdig.png) via the project-
+// standard potrace pipeline (see /Users/andreashatlem/Desktop/attorly/
+// convert-v3.sh). Single-path, ~3 KB, themed via currentColor so the
+// mark inherits color from its container.
 //
-// The signature element is the small ladder of three dashes hanging
-// below the T's baseline (publication "layers"). It's part of the
-// wordmark for the nav; the favicon uses just the T+ladder mark.
+// The traced path lives in potrace's coordinate space (10× scaled,
+// y-flipped); the <g transform> below maps it into the 0..1327 × 0..224
+// viewBox. Source aspect ratio: 1327:224 (~5.92:1).
+//
+// A static file copy is mirrored at public/brand/atnative-wordmark.svg
+// for callers that want a plain <img src>.
 
 import type { SVGProps } from "react";
 
 type WordmarkProps = SVGProps<SVGSVGElement> & { title?: string };
 
+const WORDMARK_PATH =
+  "M943 1972 c-122 -256 -783 -1615 -881 -1809 -29 -57 -52 -107 -52 -113 0 -6 52 -10 140 -10 134 0 140 1 154 22 8 13 101 210 206 438 106 228 270 579 364 780 95 201 199 422 231 492 62 138 77 158 103 142 9 -6 60 -107 114 -225 55 -118 123 -266 152 -329 139 -299 405 -878 499 -1085 l104 -230 142 -3 c83 -1 141 1 141 7 0 9 -111 247 -250 536 -158 329 -449 945 -572 1210 -71 154 -145 315 -165 358 l-36 77 -136 0 -136 0 -122 -258z M2060 2120 l0 -110 425 0 425 0 0 -990 0 -991 118 3 117 3 3 988 2 987 425 0 425 0 0 110 0 110 -970 0 -970 0 0 -110z M4450 1420 l0 -810 120 0 120 0 -2 620 c-2 341 0 620 3 620 11 0 397 -492 854 -1090 61 -80 201 -262 311 -405 110 -143 210 -275 223 -292 l22 -33 128 0 128 0 6 123 c3 67 4 561 2 1097 l-4 975 -115 3 -116 3 0 -911 c0 -500 -4 -910 -8 -910 -4 0 -33 33 -63 73 -244 319 -721 938 -1006 1305 l-344 442 -130 0 -129 0 0 -810z M9731 2198 c-73 -50 -98 -116 -76 -201 40 -155 250 -169 320 -22 32 70 6 171 -56 216 -50 35 -142 39 -188 7z M8730 1765 l0 -185 -160 0 -160 0 0 -95 0 -95 159 0 160 0 3 -517 c4 -492 5 -521 24 -579 66 -193 205 -263 527 -264 l117 0 0 100 0 100 -87 0 c-185 0 -280 37 -324 126 l-24 49 -3 493 -3 492 220 0 221 0 0 95 0 95 -217 2 -218 3 -3 183 -2 182 -115 0 -115 0 0 -185z M7357 1610 c-209 -33 -374 -142 -447 -294 -28 -59 -53 -160 -42 -171 3 -3 56 -5 118 -5 l112 0 7 33 c13 56 53 124 96 161 109 93 341 121 517 63 72 -23 152 -87 182 -146 22 -44 40 -136 40 -206 l0 -51 -53 -17 c-88 -28 -153 -37 -377 -52 -345 -24 -489 -66 -605 -176 -66 -62 -100 -129 -116 -227 -29 -176 54 -356 200 -436 209 -113 525 -109 727 9 65 38 147 123 187 193 l32 57 3 -157 3 -158 110 0 110 0 -3 592 c-4 585 -4 594 -26 652 -63 169 -177 266 -371 318 -87 23 -309 33 -404 18z m583 -847 c-1 -152 -69 -331 -159 -421 -95 -95 -229 -144 -396 -145 -114 0 -189 18 -253 60 -157 106 -143 332 27 417 70 35 167 54 376 71 178 14 322 36 370 55 33 14 35 12 35 -37z M12410 1614 c-299 -58 -489 -219 -579 -489 -111 -336 -26 -736 200 -939 216 -194 589 -239 877 -106 152 71 279 224 316 382 l6 28 -113 0 -114 0 -17 -42 c-60 -155 -220 -250 -422 -250 -154 -1 -286 45 -378 130 -79 74 -146 226 -161 364 l-7 68 619 2 618 3 3 45 c4 59 -14 220 -33 295 -8 33 -36 102 -61 154 -83 169 -229 286 -419 337 -59 16 -284 28 -335 18z m228 -194 c201 -33 334 -162 377 -368 8 -37 15 -77 15 -89 l0 -23 -504 0 -505 0 5 38 c44 311 296 493 612 442z M9692 808 l3 -773 113 -3 112 -3 0 776 0 775 -115 0 -115 0 2 -772z M10170 1570 c0 -6 69 -179 154 -383 192 -463 461 -1116 469 -1140 6 -16 20 -17 138 -15 l131 3 75 180 c76 184 160 382 422 1005 l150 355 -116 3 c-64 1 -120 -1 -124 -5 -4 -4 -67 -154 -139 -333 -73 -179 -176 -428 -227 -555 -52 -126 -111 -271 -130 -322 -20 -51 -39 -90 -43 -88 -4 2 -15 26 -25 52 -10 26 -110 280 -222 563 -112 283 -219 553 -238 600 l-33 85 -121 3 c-83 2 -121 -1 -121 -8z M766 530 c-25 -55 -46 -105 -46 -110 0 -12 896 -14 903 -2 2 4 -16 53 -42 110 l-46 102 -361 0 -361 0 -47 -100z M4420 470 l0 -51 148 3 147 3 3 48 3 47 -150 0 -151 0 0 -50z M4420 265 l0 -55 150 0 150 0 0 55 0 55 -150 0 -150 0 0 -55z M4420 75 l0 -45 151 0 150 0 -3 43 -3 42 -147 3 -148 3 0 -46z";
+
 export function BrandWordmark({ title = "ATNative", ...rest }: WordmarkProps) {
   return (
     <svg
-      viewBox="0 0 460 110"
+      viewBox="0 0 1327 224"
       xmlns="http://www.w3.org/2000/svg"
       role="img"
       aria-label={title}
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="6"
-      strokeLinecap="square"
-      strokeLinejoin="miter"
+      preserveAspectRatio="xMidYMid meet"
       {...rest}
     >
-      {/* A: triangle outline + crossbar (cap-height 70, y=15..85) */}
-      <path d="M5 85 L40 15 L75 85 M22 60 L58 60" />
-
-      {/* T: top bar + stem */}
-      <path d="M85 15 L145 15 M115 18 L115 85" />
-
-      {/* T-ladder: three dashes below the T, centered on the stem at x=115 */}
-      <g stroke="none" fill="currentColor">
-        <rect x="103" y="92" width="24" height="3.5" />
-        <rect x="103" y="99.5" width="24" height="3.5" />
-        <rect x="103" y="107" width="24" height="3.5" />
+      <g transform="translate(0,224) scale(0.1,-0.1)" fill="currentColor">
+        <path d={WORDMARK_PATH} />
       </g>
-
-      {/* N: two verticals + diagonal */}
-      <path d="M158 85 L158 15 L210 85 L210 15" />
-
-      {/* a — single-story: open bowl + tail. Drawn as one continuous path
-         that traces the right stem down, around the bottom, and closes the
-         bowl with a clockwise arc back to the top of the stem. */}
-      <path d="M260 49 a18 18 0 1 0 0 26 L260 85 M260 49 L260 85" />
-
-      {/* t: stem + crossbar (ascender, stem y=27..85) */}
-      <path d="M283 32 L283 85 M272 48 L297 48" />
-
-      {/* i: dot + stem */}
-      <circle cx="313" cy="35" r="3.2" stroke="none" fill="currentColor" />
-      <path d="M313 50 L313 85" />
-
-      {/* v: two diagonals meeting at baseline */}
-      <path d="M327 50 L350 85 L373 50" />
-
-      {/* e: bowl with crossbar and open bottom-right. Drawn as a
-         crossbar plus an arc that starts at the bottom-right opening,
-         sweeps up and around back to the crossbar's right end. */}
-      <path d="M386 67 L420 67 M420 67 a17 17 0 1 0 -7 16" />
     </svg>
   );
 }
 
 type MarkProps = SVGProps<SVGSVGElement> & { title?: string };
 
-// Square favicon — black rounded tile with the T+ladder mark in white.
+// Square favicon — keeps the T+ladder element from the wordmark on a
+// black rounded tile. Used as the favicon at src/app/icon.svg.
 export function BrandMark({ title = "ATNative", ...rest }: MarkProps) {
   return (
     <svg
@@ -79,11 +50,8 @@ export function BrandMark({ title = "ATNative", ...rest }: MarkProps) {
     >
       <rect width="64" height="64" rx="12" fill="currentColor" />
       <g fill="#fff">
-        {/* T top bar */}
         <rect x="14" y="18" width="36" height="4.5" />
-        {/* T stem */}
         <rect x="29.75" y="22.5" width="4.5" height="22" />
-        {/* Ladder */}
         <rect x="24" y="48" width="16" height="3" />
         <rect x="24" y="52.5" width="16" height="3" />
         <rect x="24" y="57" width="16" height="3" />
