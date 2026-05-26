@@ -451,6 +451,16 @@ main.container {
   font-family: var(--font-display);
 }
 
+/* New SVG wordmark used as the inline brand. Inherits color via
+   currentColor (set on the parent .brand). Height tuned to match the
+   header line; width is the SVG's natural aspect ratio (460:110). */
+.brand-wordmark {
+  height: 28px;
+  width: auto;
+  display: block;
+  color: var(--heading);
+}
+
 .brand:hover {
   color: var(--heading);
 }

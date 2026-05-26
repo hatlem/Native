@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Link, usePathname } from "@/i18n/navigation";
+import { BrandWordmark } from "@/app/brand";
 import type { NavItem } from "@/lib/nav";
 
 type PaletteSection = { section: string; items: NavItem[] };
@@ -148,8 +149,7 @@ export function NavShell({
       <header className="site-header">
         <div className="container">
           <Link href="/" className="brand" aria-label={brand}>
-            <span className="brand-mark" aria-hidden="true">AT</span>
-            <span>{brand}</span>
+            <BrandWordmark className="brand-wordmark" aria-label={brand} />
           </Link>
 
           <nav className="nav-primary" aria-label="Primary">
@@ -221,8 +221,7 @@ export function NavShell({
         <aside className="sheet" aria-label="Menu">
           <div className="head">
             <Link href="/" className="brand" onClick={closeDrawer}>
-              <span className="brand-mark" aria-hidden="true">AT</span>
-              <span>{brand}</span>
+              <BrandWordmark className="brand-wordmark" aria-label={brand} />
             </Link>
             <button
               type="button"

@@ -35,3 +35,6 @@ test-fixtures/
 
 # local DB snapshots (pg_dump safety nets taken before destructive migrations)
 scripts/dev-backups/
+
+# claude code session state
+.claude/

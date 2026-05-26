@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useTranslations } from "next-intl";
 import { Link, usePathname } from "@/i18n/navigation";
+import { BrandWordmark } from "@/app/brand";
 import { PUBLIC_NAV_ITEMS, type PublicIcon, type PublicNavMega } from "@/lib/public-nav";
 
 type Props = {
@@ -91,8 +92,7 @@ export function PublicHeader({ brand, authActions }: Props) {
       <header className="site-header public-header">
         <div className="container">
           <Link href="/" className="brand" aria-label={brand}>
-            <span className="brand-mark" aria-hidden="true">AT</span>
-            <span>{brand}</span>
+            <BrandWordmark className="brand-wordmark" aria-label={brand} />
           </Link>
 
           <nav
@@ -174,8 +174,7 @@ export function PublicHeader({ brand, authActions }: Props) {
               </button>
             ) : (
               <Link href="/" className="brand" onClick={closeDrawer}>
-                <span className="brand-mark" aria-hidden="true">AT</span>
-                <span>{brand}</span>
+                <BrandWordmark className="brand-wordmark" aria-label={brand} />
               </Link>
             )}
             <button
