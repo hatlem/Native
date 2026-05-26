@@ -223,9 +223,9 @@
     "linesEyebrow": "Valgt",
     "linesHeading": "Dine placeringer",
     "itemCount": "{count, plural, =0 {0 linjer} =1 {1 linje} other {# linjer}}",
-    "duplicateOk": "Plan restored from your previous order. Edit and re-submit when ready.",
-    "duplicatePartial": "Plan restored. {dropped} item(s) were dropped because the titles are no longer active — browse the catalog for substitutes.",
-    "duplicateAllInactive": "All titles from that order are inactive now. Browse the catalog to build a fresh plan."
+    "duplicateOk": "Plan gendannet fra din forrige ordre. Rediger og send igen, når du er klar.",
+    "duplicatePartial": "Plan gendannet. {dropped} element(er) blev udeladt, fordi titlerne ikke længere er aktive — gennemse kataloget for erstatninger.",
+    "duplicateAllInactive": "Alle titler fra den ordre er inaktive nu. Gennemse kataloget for at bygge en ny plan."
   },
   "rfq": {
     "org": "Virksomhed",
@@ -503,24 +503,24 @@
     "listEyebrow": "Alle ordrer",
     "listHeading": "Ordrepipeline",
     "totalCount": "{count, plural, =0 {0 ordrer} =1 {1 ordre} other {# ordrer}}",
-    "cancelButton": "Cancel order",
-    "cancelTitle": "Cancel this order",
-    "cancelHint": "Add a clear reason — it is recorded in the audit log and shown to the buyer and publisher.",
-    "cancelReasonLabel": "Reason",
-    "cancelReasonPlaceholder": "e.g. Buyer pulled out; or publisher editorial veto on the scheduled draft.",
-    "cancelSubmit": "Confirm cancellation",
-    "cancelBlocked": "This order can no longer be cancelled.",
-    "cancelError": "Cancellation refused",
-    "cancelledAtLabel": "Cancelled",
+    "cancelButton": "Annullér ordre",
+    "cancelTitle": "Annullér denne ordre",
+    "cancelHint": "Tilføj en klar årsag — den registreres i revisionsloggen og vises til køberen og udgiveren.",
+    "cancelReasonLabel": "Årsag",
+    "cancelReasonPlaceholder": "f.eks. Køberen trak sig; eller udgiverens redaktionelle veto mod det planlagte udkast.",
+    "cancelSubmit": "Bekræft annullering",
+    "cancelBlocked": "Denne ordre kan ikke længere annulleres.",
+    "cancelError": "Annullering afvist",
+    "cancelledAtLabel": "Annulleret",
     "cancelledByLabel": "By",
-    "cancelledReasonLabel": "Reason",
-    "creditNoteButton": "Issue credit note",
-    "creditNoteTitle": "Refund the invoice",
-    "creditNoteHint": "Refund {amount} against the issued invoice. The reason is logged on the credit note and shown to the buyer.",
-    "creditNoteReasonLabel": "Reason",
-    "creditNoteReasonPlaceholder": "e.g. Order cancelled after invoice issued; publisher editorial veto.",
-    "creditNoteSubmit": "Issue credit note",
-    "creditNoteIssuedLabel": "Credit note issued"
+    "cancelledReasonLabel": "Årsag",
+    "creditNoteButton": "Udsted kreditnota",
+    "creditNoteTitle": "Refunder fakturaen",
+    "creditNoteHint": "Refunder {amount} mod den udstedte faktura. Årsagen logges på kreditnotaen og vises til køberen.",
+    "creditNoteReasonLabel": "Årsag",
+    "creditNoteReasonPlaceholder": "f.eks. Ordre annulleret efter fakturaudstedelse; redaktionelt veto fra udgiver.",
+    "creditNoteSubmit": "Udsted kreditnota",
+    "creditNoteIssuedLabel": "Kreditnota udstedt"
   },
   "production": {
     "brief": "Brief",
@@ -540,14 +540,14 @@
     "history": "Versionshistorik",
     "composeNew": "Skriv en ny version",
     "draftPlaceholder": "Indsæt eller skriv det nye udkast her…",
-    "vetoButton": "Editorial veto",
-    "vetoTitle": "Reject this draft",
-    "vetoHint": "Use only for hard editorial rejection. For tweaks, the desk has the soft \"Request changes\" path.",
-    "vetoReasonLabel": "Reason",
-    "vetoReasonPlaceholder": "e.g. Case studies read as sponsor pitch — violates our editorial standard for annoncørbetalt content.",
-    "vetoSubmit": "Confirm rejection",
-    "vetoError": "Rejection refused",
-    "retractedLabel": "Retracted"
+    "vetoButton": "Redaktionelt veto",
+    "vetoTitle": "Afvis dette udkast",
+    "vetoHint": "Brug kun til hård redaktionel afvisning. Til småjusteringer har desken den blødere \"Anmod om ændringer\"-vej.",
+    "vetoReasonLabel": "Årsag",
+    "vetoReasonPlaceholder": "f.eks. Case-studierne læses som sponsor-pitch — bryder vores redaktionelle standard for annoncørbetalt indhold.",
+    "vetoSubmit": "Bekræft afvisning",
+    "vetoError": "Afvisning afvist",
+    "retractedLabel": "Tilbagekaldt"
   },
   "invoice": {
     "title": "Faktura",
@@ -1563,7 +1563,12 @@
     "cancel": "Annullér",
     "logManual": "Registrer svar manuelt",
     "primary": "primær",
-    "col": { "contact": "Kontakt", "created": "Oprettet", "status": "Status", "actions": "Handlinger" },
+    "col": {
+      "contact": "Kontakt",
+      "created": "Oprettet",
+      "status": "Status",
+      "actions": "Handlinger"
+    },
     "status": {
       "draft": "Kladde",
       "sent": "Sendt",
@@ -1644,10 +1649,22 @@
     "note": "Er der andet vi bør vide?",
     "submit": "Send priser",
     "closed": {
-      "expired": { "title": "Linket er udløbet", "body": "Kontakt din NativeSpin-repræsentant for at få et nyt link." },
-      "responded": { "title": "Allerede modtaget", "body": "Tak — vi har allerede dit svar registreret." },
-      "cancelled": { "title": "Linket er annulleret", "body": "Kontakt din NativeSpin-repræsentant." },
-      "unknown": { "title": "Linket er ikke tilgængeligt", "body": "Kontakt din NativeSpin-repræsentant." }
+      "expired": {
+        "title": "Linket er udløbet",
+        "body": "Kontakt din NativeSpin-repræsentant for at få et nyt link."
+      },
+      "responded": {
+        "title": "Allerede modtaget",
+        "body": "Tak — vi har allerede dit svar registreret."
+      },
+      "cancelled": {
+        "title": "Linket er annulleret",
+        "body": "Kontakt din NativeSpin-repræsentant."
+      },
+      "unknown": {
+        "title": "Linket er ikke tilgængeligt",
+        "body": "Kontakt din NativeSpin-repræsentant."
+      }
     },
     "thanks": {
       "title": "Tak!",

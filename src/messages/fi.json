@@ -296,9 +296,9 @@
     "linesEyebrow": "Valittu",
     "linesHeading": "Sijoittelusi",
     "itemCount": "{count, plural, =0 {0 riviä} =1 {1 rivi} other {# riviä}}",
-    "duplicateOk": "Plan restored from your previous order. Edit and re-submit when ready.",
-    "duplicatePartial": "Plan restored. {dropped} item(s) were dropped because the titles are no longer active — browse the catalog for substitutes.",
-    "duplicateAllInactive": "All titles from that order are inactive now. Browse the catalog to build a fresh plan."
+    "duplicateOk": "Suunnitelma palautettu edellisestä tilauksestasi. Muokkaa ja lähetä uudelleen, kun olet valmis.",
+    "duplicatePartial": "Suunnitelma palautettu. {dropped} kohde(tta) jätettiin pois, koska julkaisut eivät ole enää aktiivisia — selaa katalogia korvaajia varten.",
+    "duplicateAllInactive": "Kaikki kyseisen tilauksen julkaisut ovat nyt inaktiivisia. Selaa katalogia luodaksesi uusi suunnitelma."
   },
   "rfq": {
     "org": "Yritys",
@@ -576,24 +576,24 @@
     "listEyebrow": "Kaikki tilaukset",
     "listHeading": "Tilausputki",
     "totalCount": "{count, plural, =0 {0 tilausta} =1 {1 tilaus} other {# tilausta}}",
-    "cancelButton": "Cancel order",
-    "cancelTitle": "Cancel this order",
-    "cancelHint": "Add a clear reason — it is recorded in the audit log and shown to the buyer and publisher.",
-    "cancelReasonLabel": "Reason",
-    "cancelReasonPlaceholder": "e.g. Buyer pulled out; or publisher editorial veto on the scheduled draft.",
-    "cancelSubmit": "Confirm cancellation",
-    "cancelBlocked": "This order can no longer be cancelled.",
-    "cancelError": "Cancellation refused",
-    "cancelledAtLabel": "Cancelled",
+    "cancelButton": "Peruuta tilaus",
+    "cancelTitle": "Peruuta tämä tilaus",
+    "cancelHint": "Anna selkeä syy — se kirjataan tarkastuslokiin ja näytetään ostajalle ja kustantajalle.",
+    "cancelReasonLabel": "Syy",
+    "cancelReasonPlaceholder": "esim. Ostaja perui; tai kustantajan toimituksellinen veto suunnitellulle luonnokselle.",
+    "cancelSubmit": "Vahvista peruutus",
+    "cancelBlocked": "Tätä tilausta ei voi enää peruuttaa.",
+    "cancelError": "Peruutus hylätty",
+    "cancelledAtLabel": "Peruutettu",
     "cancelledByLabel": "By",
-    "cancelledReasonLabel": "Reason",
-    "creditNoteButton": "Issue credit note",
-    "creditNoteTitle": "Refund the invoice",
-    "creditNoteHint": "Refund {amount} against the issued invoice. The reason is logged on the credit note and shown to the buyer.",
-    "creditNoteReasonLabel": "Reason",
-    "creditNoteReasonPlaceholder": "e.g. Order cancelled after invoice issued; publisher editorial veto.",
-    "creditNoteSubmit": "Issue credit note",
-    "creditNoteIssuedLabel": "Credit note issued"
+    "cancelledReasonLabel": "Syy",
+    "creditNoteButton": "Anna hyvityslasku",
+    "creditNoteTitle": "Palauta lasku",
+    "creditNoteHint": "Palauta {amount} annettua laskua vastaan. Syy kirjataan hyvityslaskulle ja näytetään ostajalle.",
+    "creditNoteReasonLabel": "Syy",
+    "creditNoteReasonPlaceholder": "esim. Tilaus peruutettu laskutuksen jälkeen; kustantajan toimituksellinen veto.",
+    "creditNoteSubmit": "Anna hyvityslasku",
+    "creditNoteIssuedLabel": "Hyvityslasku annettu"
   },
   "production": {
     "brief": "Brief",
@@ -613,14 +613,14 @@
     "history": "Versiohistoria",
     "composeNew": "Kirjoita uusi versio",
     "draftPlaceholder": "Liitä tai kirjoita uusi luonnos tähän…",
-    "vetoButton": "Editorial veto",
-    "vetoTitle": "Reject this draft",
-    "vetoHint": "Use only for hard editorial rejection. For tweaks, the desk has the soft \"Request changes\" path.",
-    "vetoReasonLabel": "Reason",
-    "vetoReasonPlaceholder": "e.g. Case studies read as sponsor pitch — violates our editorial standard for annoncørbetalt content.",
-    "vetoSubmit": "Confirm rejection",
-    "vetoError": "Rejection refused",
-    "retractedLabel": "Retracted"
+    "vetoButton": "Toimituksellinen veto",
+    "vetoTitle": "Hylkää tämä luonnos",
+    "vetoHint": "Käytä vain ankaraan toimitukselliseen hylkäykseen. Pieniin muutoksiin deskillä on lievempi \"Pyydä muutoksia\"-polku.",
+    "vetoReasonLabel": "Syy",
+    "vetoReasonPlaceholder": "esim. Tapaustutkimukset lukeutuvat sponsoripitchinä — rikkoo toimituksellista standardiamme mainostajan maksamalle sisällölle.",
+    "vetoSubmit": "Vahvista hylkäys",
+    "vetoError": "Hylkäys evätty",
+    "retractedLabel": "Peruutettu"
   },
   "invoice": {
     "title": "Lasku",
@@ -1562,7 +1562,12 @@
     "cancel": "Peruuta",
     "logManual": "Kirjaa vastaus manuaalisesti",
     "primary": "ensisijainen",
-    "col": { "contact": "Yhteystieto", "created": "Luotu", "status": "Tila", "actions": "Toiminnot" },
+    "col": {
+      "contact": "Yhteystieto",
+      "created": "Luotu",
+      "status": "Tila",
+      "actions": "Toiminnot"
+    },
     "status": {
       "draft": "Luonnos",
       "sent": "Lähetetty",
@@ -1643,10 +1648,22 @@
     "note": "Onko muuta mitä meidän pitäisi tietää?",
     "submit": "Lähetä hinnat",
     "closed": {
-      "expired": { "title": "Linkki on vanhentunut", "body": "Ota yhteyttä NativeSpin-yhteyshenkilöösi uuden linkin saamiseksi." },
-      "responded": { "title": "Jo vastaanotettu", "body": "Kiitos — vastauksesi on jo tallennettu." },
-      "cancelled": { "title": "Linkki peruutettu", "body": "Ota yhteyttä NativeSpin-yhteyshenkilöösi." },
-      "unknown": { "title": "Linkki ei ole käytettävissä", "body": "Ota yhteyttä NativeSpin-yhteyshenkilöösi." }
+      "expired": {
+        "title": "Linkki on vanhentunut",
+        "body": "Ota yhteyttä NativeSpin-yhteyshenkilöösi uuden linkin saamiseksi."
+      },
+      "responded": {
+        "title": "Jo vastaanotettu",
+        "body": "Kiitos — vastauksesi on jo tallennettu."
+      },
+      "cancelled": {
+        "title": "Linkki peruutettu",
+        "body": "Ota yhteyttä NativeSpin-yhteyshenkilöösi."
+      },
+      "unknown": {
+        "title": "Linkki ei ole käytettävissä",
+        "body": "Ota yhteyttä NativeSpin-yhteyshenkilöösi."
+      }
     },
     "thanks": {
       "title": "Kiitos!",

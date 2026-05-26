@@ -223,9 +223,9 @@
     "linesEyebrow": "Valgt",
     "linesHeading": "Plasseringene dine",
     "itemCount": "{count, plural, =0 {0 linjer} =1 {1 linje} other {# linjer}}",
-    "duplicateOk": "Plan restored from your previous order. Edit and re-submit when ready.",
-    "duplicatePartial": "Plan restored. {dropped} item(s) were dropped because the titles are no longer active — browse the catalog for substitutes.",
-    "duplicateAllInactive": "All titles from that order are inactive now. Browse the catalog to build a fresh plan."
+    "duplicateOk": "Plan gjenopprettet fra din forrige bestilling. Rediger og send på nytt når du er klar.",
+    "duplicatePartial": "Plan gjenopprettet. {dropped} element(er) ble droppet fordi titlene ikke lenger er aktive — bla i katalogen for erstatninger.",
+    "duplicateAllInactive": "Alle titler fra den bestillingen er inaktive nå. Bla i katalogen for å bygge en ny plan."
   },
   "rfq": {
     "org": "Selskap",
@@ -503,24 +503,24 @@
     "listEyebrow": "Alle bestillinger",
     "listHeading": "Bestillingspipeline",
     "totalCount": "{count, plural, =0 {0 bestillinger} =1 {1 bestilling} other {# bestillinger}}",
-    "cancelButton": "Cancel order",
-    "cancelTitle": "Cancel this order",
-    "cancelHint": "Add a clear reason — it is recorded in the audit log and shown to the buyer and publisher.",
-    "cancelReasonLabel": "Reason",
-    "cancelReasonPlaceholder": "e.g. Buyer pulled out; or publisher editorial veto on the scheduled draft.",
-    "cancelSubmit": "Confirm cancellation",
-    "cancelBlocked": "This order can no longer be cancelled.",
-    "cancelError": "Cancellation refused",
-    "cancelledAtLabel": "Cancelled",
+    "cancelButton": "Kanseller bestilling",
+    "cancelTitle": "Kanseller denne bestillingen",
+    "cancelHint": "Legg til en tydelig årsak — den lagres i revisjonsloggen og vises til kjøper og utgiver.",
+    "cancelReasonLabel": "Årsak",
+    "cancelReasonPlaceholder": "f.eks. Kjøper trakk seg; eller redaksjonelt veto fra utgiver mot planlagt utkast.",
+    "cancelSubmit": "Bekreft kansellering",
+    "cancelBlocked": "Denne bestillingen kan ikke lenger kanselleres.",
+    "cancelError": "Kansellering avvist",
+    "cancelledAtLabel": "Kansellert",
     "cancelledByLabel": "By",
-    "cancelledReasonLabel": "Reason",
-    "creditNoteButton": "Issue credit note",
-    "creditNoteTitle": "Refund the invoice",
-    "creditNoteHint": "Refund {amount} against the issued invoice. The reason is logged on the credit note and shown to the buyer.",
-    "creditNoteReasonLabel": "Reason",
-    "creditNoteReasonPlaceholder": "e.g. Order cancelled after invoice issued; publisher editorial veto.",
-    "creditNoteSubmit": "Issue credit note",
-    "creditNoteIssuedLabel": "Credit note issued"
+    "cancelledReasonLabel": "Årsak",
+    "creditNoteButton": "Utsted kreditnota",
+    "creditNoteTitle": "Refunder fakturaen",
+    "creditNoteHint": "Refunder {amount} mot den utstedte fakturaen. Årsaken logges på kreditnotaen og vises til kjøperen.",
+    "creditNoteReasonLabel": "Årsak",
+    "creditNoteReasonPlaceholder": "f.eks. Bestilling kansellert etter fakturering; redaksjonelt veto fra utgiver.",
+    "creditNoteSubmit": "Utsted kreditnota",
+    "creditNoteIssuedLabel": "Kreditnota utstedt"
   },
   "production": {
     "brief": "Brief",
@@ -540,14 +540,14 @@
     "history": "Versjonshistorikk",
     "composeNew": "Skriv en ny versjon",
     "draftPlaceholder": "Lim inn eller skriv det nye utkastet her…",
-    "vetoButton": "Editorial veto",
-    "vetoTitle": "Reject this draft",
-    "vetoHint": "Use only for hard editorial rejection. For tweaks, the desk has the soft \"Request changes\" path.",
-    "vetoReasonLabel": "Reason",
-    "vetoReasonPlaceholder": "e.g. Case studies read as sponsor pitch — violates our editorial standard for annoncørbetalt content.",
-    "vetoSubmit": "Confirm rejection",
-    "vetoError": "Rejection refused",
-    "retractedLabel": "Retracted"
+    "vetoButton": "Redaksjonelt veto",
+    "vetoTitle": "Avvis dette utkastet",
+    "vetoHint": "Bruk kun for hard redaksjonell avvisning. For småjusteringer har desken den mykere «Be om endringer»-veien.",
+    "vetoReasonLabel": "Årsak",
+    "vetoReasonPlaceholder": "f.eks. Case-studiene leses som sponsor-pitch — bryter vår redaksjonelle standard for annonsørbetalt innhold.",
+    "vetoSubmit": "Bekreft avvisning",
+    "vetoError": "Avvisning ble nektet",
+    "retractedLabel": "Tilbakekalt"
   },
   "invoice": {
     "title": "Faktura",
@@ -1562,7 +1562,12 @@
     "cancel": "Avbryt",
     "logManual": "Registrer svar manuelt",
     "primary": "primær",
-    "col": { "contact": "Kontakt", "created": "Opprettet", "status": "Status", "actions": "Handlinger" },
+    "col": {
+      "contact": "Kontakt",
+      "created": "Opprettet",
+      "status": "Status",
+      "actions": "Handlinger"
+    },
     "status": {
       "draft": "Utkast",
       "sent": "Sendt",
@@ -1643,10 +1648,22 @@
     "note": "Noe annet vi bør vite?",
     "submit": "Send priser",
     "closed": {
-      "expired": { "title": "Lenken er utløpt", "body": "Ta kontakt med din NativeSpin-representant for å få en ny lenke." },
-      "responded": { "title": "Allerede mottatt", "body": "Takk — vi har allerede registrert svaret ditt." },
-      "cancelled": { "title": "Lenken er avbrutt", "body": "Ta kontakt med din NativeSpin-representant." },
-      "unknown": { "title": "Lenken er ikke tilgjengelig", "body": "Ta kontakt med din NativeSpin-representant." }
+      "expired": {
+        "title": "Lenken er utløpt",
+        "body": "Ta kontakt med din NativeSpin-representant for å få en ny lenke."
+      },
+      "responded": {
+        "title": "Allerede mottatt",
+        "body": "Takk — vi har allerede registrert svaret ditt."
+      },
+      "cancelled": {
+        "title": "Lenken er avbrutt",
+        "body": "Ta kontakt med din NativeSpin-representant."
+      },
+      "unknown": {
+        "title": "Lenken er ikke tilgjengelig",
+        "body": "Ta kontakt med din NativeSpin-representant."
+      }
     },
     "thanks": {
       "title": "Takk!",
