@@ -15,23 +15,71 @@ function timeAgo(date: Date, locale: string): string {
   return rtf.format(0, "day");
 }
 
+type SortField = "status" | "customer" | "lines" | "total" | "created";
+type SortDir = "asc" | "desc";
+const SORT_FIELDS: SortField[] = [
+  "status",
+  "customer",
+  "lines",
+  "total",
+  "created",
+];
+
+function buildOrderBy(field: SortField, dir: SortDir) {
+  switch (field) {
+    case "status":
+      return { status: dir } as const;
+    case "customer":
+      return { organization: { name: dir } } as const;
+    case "lines":
+      return { lines: { _count: dir } } as const;
+    case "total":
+      return { quote: { total: dir } } as const;
+    case "created":
+      return { createdAt: dir } as const;
+  }
+}
+
 export default async function DeskOrdersPage({
   params,
+  searchParams,
 }: {
   params: Promise<{ locale: string }>;
+  searchParams: Promise<Record<string, string | string[] | undefined>>;
 }) {
   const { locale } = await params;
+  const sp = await searchParams;
   const t = await getTranslations({ locale, namespace: "order" });
   const td = await getTranslations({ locale, namespace: "desk" });
 
+  const sortRaw = typeof sp.sort === "string" ? sp.sort : "";
+  const dirRaw = typeof sp.dir === "string" ? sp.dir : "";
+  const sort: SortField = (SORT_FIELDS as readonly string[]).includes(sortRaw)
+    ? (sortRaw as SortField)
+    : "created";
+  const dir: SortDir = dirRaw === "asc" ? "asc" : "desc";
+
   const orders = await prisma.order.findMany({
-    orderBy: { createdAt: "desc" },
+    orderBy: buildOrderBy(sort, dir),
     include: {
       organization: true,
       quote: { select: { currency: true, total: true } },
       _count: { select: { lines: true } },
     },
   });
+
+  const sortHref = (field: SortField) => {
+    const nextDir: SortDir = field === sort && dir === "desc" ? "asc" : "desc";
+    return `/desk/orders?sort=${field}&dir=${nextDir}`;
+  };
+  const arrow = (field: SortField) =>
+    field === sort ? (dir === "asc" ? " ↑" : " ↓") : "";
+  const ariaSort = (field: SortField): "ascending" | "descending" | "none" =>
+    field === sort
+      ? dir === "asc"
+        ? "ascending"
+        : "descending"
+      : "none";
 
   const inProgress = orders.filter((o) =>
     ["CONFIRMED", "IN_PRODUCTION", "SCHEDULED"].includes(o.status),
@@ -90,11 +138,36 @@ export default async function DeskOrdersPage({
             <table className="table">
               <thead>
                 <tr>
-                  <th>{t("status")}</th>
-                  <th>{t("customer")}</th>
-                  <th className="num">{t("lines")}</th>
-                  <th className="num">{t("total")}</th>
-                  <th>{t("created")}</th>
+                  <th aria-sort={ariaSort("status")}>
+                    <Link href={sortHref("status")} className="th-sort">
+                      {t("status")}
+                      {arrow("status")}
+                    </Link>
+                  </th>
+                  <th aria-sort={ariaSort("customer")}>
+                    <Link href={sortHref("customer")} className="th-sort">
+                      {t("customer")}
+                      {arrow("customer")}
+                    </Link>
+                  </th>
+                  <th aria-sort={ariaSort("lines")} className="num">
+                    <Link href={sortHref("lines")} className="th-sort">
+                      {t("lines")}
+                      {arrow("lines")}
+                    </Link>
+                  </th>
+                  <th aria-sort={ariaSort("total")} className="num">
+                    <Link href={sortHref("total")} className="th-sort">
+                      {t("total")}
+                      {arrow("total")}
+                    </Link>
+                  </th>
+                  <th aria-sort={ariaSort("created")}>
+                    <Link href={sortHref("created")} className="th-sort">
+                      {t("created")}
+                      {arrow("created")}
+                    </Link>
+                  </th>
                   <th></th>
                 </tr>
               </thead>

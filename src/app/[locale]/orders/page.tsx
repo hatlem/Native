@@ -18,21 +18,56 @@ function timeAgo(date: Date, locale: string): string {
   return rtf.format(0, "day");
 }
 
+type SortField = "status" | "organization" | "lines" | "total" | "created";
+type SortDir = "asc" | "desc";
+const SORT_FIELDS: SortField[] = [
+  "status",
+  "organization",
+  "lines",
+  "total",
+  "created",
+];
+
+function buildOrderBy(field: SortField, dir: SortDir) {
+  switch (field) {
+    case "status":
+      return { status: dir } as const;
+    case "organization":
+      return { organization: { name: dir } } as const;
+    case "lines":
+      return { lines: { _count: dir } } as const;
+    case "total":
+      return { quote: { total: dir } } as const;
+    case "created":
+      return { createdAt: dir } as const;
+  }
+}
+
 export default async function MyOrdersPage({
   params,
+  searchParams,
 }: {
   params: Promise<{ locale: string }>;
+  searchParams: Promise<Record<string, string | string[] | undefined>>;
 }) {
   const { locale } = await params;
+  const sp = await searchParams;
   const t = await getTranslations({ locale, namespace: "orders" });
   const tNav = await getTranslations({ locale, namespace: "nav" });
 
   const scope = await loadScope();
   if (!scope.workspace) redirect(`/${locale}/signin`);
 
+  const sortRaw = typeof sp.sort === "string" ? sp.sort : "";
+  const dirRaw = typeof sp.dir === "string" ? sp.dir : "";
+  const sort: SortField = (SORT_FIELDS as readonly string[]).includes(sortRaw)
+    ? (sortRaw as SortField)
+    : "created";
+  const dir: SortDir = dirRaw === "asc" ? "asc" : "desc";
+
   const orders = await prisma.order.findMany({
     where: { organizationId: { in: scope.workspace.scopeOrgIds } },
-    orderBy: { createdAt: "desc" },
+    orderBy: buildOrderBy(sort, dir),
     include: {
       organization: { select: { name: true } },
       quote: { select: { currency: true, total: true } },
@@ -40,6 +75,20 @@ export default async function MyOrdersPage({
       lines: { include: { booking: true } },
     },
   });
+
+  // Toggle direction on the active column, default to desc on a new column.
+  const sortHref = (field: SortField) => {
+    const nextDir: SortDir = field === sort && dir === "desc" ? "asc" : "desc";
+    return `/orders?sort=${field}&dir=${nextDir}`;
+  };
+  const arrow = (field: SortField) =>
+    field === sort ? (dir === "asc" ? " ↑" : " ↓") : "";
+  const ariaSort = (field: SortField): "ascending" | "descending" | "none" =>
+    field === sort
+      ? dir === "asc"
+        ? "ascending"
+        : "descending"
+      : "none";
 
   const activeCount = orders.filter((o) =>
     ["CONFIRMED", "IN_PRODUCTION", "SCHEDULED"].includes(o.status),
@@ -116,11 +165,36 @@ export default async function MyOrdersPage({
             <table className="table">
               <thead>
                 <tr>
-                  <th>{t("status")}</th>
-                  <th>{t("organization")}</th>
-                  <th className="num">{t("lines")}</th>
-                  <th className="num">{t("total")}</th>
-                  <th>{t("created")}</th>
+                  <th aria-sort={ariaSort("status")}>
+                    <Link href={sortHref("status")} className="th-sort">
+                      {t("status")}
+                      {arrow("status")}
+                    </Link>
+                  </th>
+                  <th aria-sort={ariaSort("organization")}>
+                    <Link href={sortHref("organization")} className="th-sort">
+                      {t("organization")}
+                      {arrow("organization")}
+                    </Link>
+                  </th>
+                  <th aria-sort={ariaSort("lines")} className="num">
+                    <Link href={sortHref("lines")} className="th-sort">
+                      {t("lines")}
+                      {arrow("lines")}
+                    </Link>
+                  </th>
+                  <th aria-sort={ariaSort("total")} className="num">
+                    <Link href={sortHref("total")} className="th-sort">
+                      {t("total")}
+                      {arrow("total")}
+                    </Link>
+                  </th>
+                  <th aria-sort={ariaSort("created")}>
+                    <Link href={sortHref("created")} className="th-sort">
+                      {t("created")}
+                      {arrow("created")}
+                    </Link>
+                  </th>
                   <th></th>
                 </tr>
               </thead>
