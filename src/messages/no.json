@@ -1491,6 +1491,8 @@
     "status_revoked": "Revoked",
     "revoke": "Revoke",
     "revoking": "Tilbakekaller…",
+    "revokeConfirm": "Dette kan ikke angres. Eksisterende integrasjoner som bruker denne nøkkelen slutter å fungere umiddelbart.",
+    "revokeConfirmCta": "Ja, tilbakekall nøkkelen",
     "docsHintPrefix": "Public docs available at"
   },
   "quoteNarrative": {

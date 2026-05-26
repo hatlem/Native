@@ -188,15 +188,47 @@ export default async function ApiKeysPage({
                     </td>
                     <td>
                       {status === "active" ? (
-                        <form action={revokeApiKey}>
-                          <input type="hidden" name="locale" value={locale} />
-                          <input type="hidden" name="keyId" value={k.id} />
-                          <SubmitButton
-                            label={t("revoke")}
-                            pendingLabel={t("revoking")}
-                            className="btn small ghost"
-                          />
-                        </form>
+                        // §17 — Revoke is irreversible. Hide the actual
+                        // submit behind a <details> disclosure so the
+                        // first click expands a confirmation block; the
+                        // second click is the real revoke. No reason
+                        // field (the audit log already captures
+                        // actor + timestamp on the action).
+                        <details className="spec-details">
+                          <summary>
+                            <span className="btn small ghost">
+                              {t("revoke")}
+                            </span>
+                          </summary>
+                          <form
+                            action={revokeApiKey}
+                            className="product-form"
+                          >
+                            <input
+                              type="hidden"
+                              name="locale"
+                              value={locale}
+                            />
+                            <input
+                              type="hidden"
+                              name="keyId"
+                              value={k.id}
+                            />
+                            <p
+                              className="muted small"
+                              style={{ margin: "8px 0" }}
+                            >
+                              {t("revokeConfirm")}
+                            </p>
+                            <div className="actions">
+                              <SubmitButton
+                                label={t("revokeConfirmCta")}
+                                pendingLabel={t("revoking")}
+                                className="btn small ghost"
+                              />
+                            </div>
+                          </form>
+                        </details>
                       ) : null}
                     </td>
                   </tr>

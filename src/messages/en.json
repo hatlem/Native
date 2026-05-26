@@ -1491,6 +1491,8 @@
     "status_revoked": "Revoked",
     "revoke": "Revoke",
     "revoking": "Revoking…",
+    "revokeConfirm": "This cannot be undone. Existing integrations using this key will stop working immediately.",
+    "revokeConfirmCta": "Yes, revoke key",
     "docsHintPrefix": "Public docs available at"
   },
   "quoteNarrative": {

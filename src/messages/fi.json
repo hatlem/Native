@@ -1491,6 +1491,8 @@
     "status_revoked": "Revoked",
     "revoke": "Revoke",
     "revoking": "Peruutetaan…",
+    "revokeConfirm": "Tätä ei voi peruuttaa. Tätä avainta käyttävät olemassa olevat integraatiot lakkaavat toimimasta välittömästi.",
+    "revokeConfirmCta": "Kyllä, peruuta avain",
     "docsHintPrefix": "Public docs available at"
   },
   "quoteNarrative": {

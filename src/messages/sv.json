@@ -1491,6 +1491,8 @@
     "status_revoked": "Revoked",
     "revoke": "Revoke",
     "revoking": "Återkallar…",
+    "revokeConfirm": "Detta kan inte ångras. Befintliga integrationer som använder den här nyckeln slutar att fungera direkt.",
+    "revokeConfirmCta": "Ja, återkalla nyckeln",
     "docsHintPrefix": "Public docs available at"
   },
   "quoteNarrative": {

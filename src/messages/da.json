@@ -1492,6 +1492,8 @@
     "status_revoked": "Revoked",
     "revoke": "Revoke",
     "revoking": "Tilbagekalder…",
+    "revokeConfirm": "Dette kan ikke fortrydes. Eksisterende integrationer der bruger denne nøgle holder op med at virke med det samme.",
+    "revokeConfirmCta": "Ja, tilbagekald nøglen",
     "docsHintPrefix": "Public docs available at"
   },
   "quoteNarrative": {

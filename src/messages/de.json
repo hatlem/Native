@@ -1349,6 +1349,8 @@
     "status_revoked": "Revoked",
     "revoke": "Revoke",
     "revoking": "Wird zurückgezogen…",
+    "revokeConfirm": "Dies kann nicht rückgängig gemacht werden. Bestehende Integrationen, die diesen Schlüssel verwenden, funktionieren sofort nicht mehr.",
+    "revokeConfirmCta": "Ja, Schlüssel zurückziehen",
     "docsHintPrefix": "Public docs available at"
   },
   "quoteNarrative": {
