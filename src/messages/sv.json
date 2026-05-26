@@ -320,7 +320,9 @@
     "quoteEyebrow": "Offert",
     "readyToQuoteTitle": "Redo att offerera?",
     "readyToQuoteBody": "Generera ett utkast från briefen ovan — du kan justera marginaler och rader på nästa skärm.",
-    "openOrder": "Öppna order"
+    "openOrder": "Öppna order",
+    "bannerUnconfirmed": "{count, plural, one {1 produkt saknar prisbekräftelse} other {# produkter saknar prisbekräftelse}}",
+    "bannerReview": "Granska dem →"
   },
   "deskTitles": {
     "eyebrow": "Superadmin · titlar",

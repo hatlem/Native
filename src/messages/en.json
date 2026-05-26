@@ -390,7 +390,9 @@
     "quoteEyebrow": "Quote",
     "readyToQuoteTitle": "Ready to quote?",
     "readyToQuoteBody": "Generate a draft quote from the brief above — you can edit margins and lines on the next screen.",
-    "openOrder": "Open order"
+    "openOrder": "Open order",
+    "bannerUnconfirmed": "{count, plural, one {1 product needs price confirmation} other {# products need price confirmation}}",
+    "bannerReview": "Review them →"
   },
   "deskTitles": {
     "eyebrow": "Super-admin · titles",

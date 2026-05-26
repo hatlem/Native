@@ -49,6 +49,7 @@ export default async function DeskListPage({
     quotedCount,
     activeOrderCount,
     pendingTitleCount,
+    unconfirmedCount,
   ] = await Promise.all([
     prisma.request.findMany({
       where: { status: "SUBMITTED" },
@@ -80,6 +81,9 @@ export default async function DeskListPage({
     isSuperadmin
       ? prisma.title.count({ where: { active: false } })
       : Promise.resolve(0),
+    isSuperadmin
+      ? prisma.product.count({ where: { active: true, confirmedAt: null } })
+      : Promise.resolve(0),
   ]);
 
   const needsAttention = submittedCount + inReviewCount;
@@ -91,6 +95,20 @@ export default async function DeskListPage({
         title={t("title")}
         lead={t("subtitle")}
       />
+
+      {unconfirmedCount > 0 && (
+        <aside className="flex items-center gap-3 rounded-lg border border-amber-300 bg-amber-50 px-4 py-3 text-sm text-amber-900 dark:border-amber-700 dark:bg-amber-950 dark:text-amber-200">
+          <span className="flex-1">
+            {t("bannerUnconfirmed", { count: unconfirmedCount })}
+          </span>
+          <Link
+            href="/desk/titles?freshness=never"
+            className="whitespace-nowrap font-medium underline underline-offset-2 hover:no-underline"
+          >
+            {t("bannerReview")}
+          </Link>
+        </aside>
+      )}
 
       <KpiGrid>
         <Kpi

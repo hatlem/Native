@@ -390,7 +390,9 @@
     "quoteEyebrow": "Tarjous",
     "readyToQuoteTitle": "Valmis tarjoamaan?",
     "readyToQuoteBody": "Luo tarjousluonnos ylläolevasta briefistä — voit muokata katteita ja rivejä seuraavalla näytöllä.",
-    "openOrder": "Avaa tilaus"
+    "openOrder": "Avaa tilaus",
+    "bannerUnconfirmed": "{count, plural, one {1 tuote tarvitsee hintavahvistuksen} other {# tuotetta tarvitsee hintavahvistuksen}}",
+    "bannerReview": "Tarkista →"
   },
   "deskTitles": {
     "eyebrow": "Pääkäyttäjä · julkaisut",

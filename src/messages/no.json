@@ -320,7 +320,9 @@
     "quoteEyebrow": "Tilbud",
     "readyToQuoteTitle": "Klar til å lage tilbud?",
     "readyToQuoteBody": "Generer et utkast fra briefen over — du kan justere marginer og linjer på neste skjerm.",
-    "openOrder": "Åpne bestilling"
+    "openOrder": "Åpne bestilling",
+    "bannerUnconfirmed": "{count, plural, one {1 produkt mangler prisbekreftelse} other {# produkter mangler prisbekreftelse}}",
+    "bannerReview": "Se gjennom →"
   },
   "deskTitles": {
     "eyebrow": "Superadmin · titler",
