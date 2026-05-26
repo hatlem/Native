@@ -675,6 +675,7 @@
     "visibility": "Pricing",
     "leadTime": "Lead time (days)",
     "save": "Save",
+    "saving": "Wird gespeichert…",
     "firm": "Firm (instant book)",
     "indicative": "Indicative (RFQ)",
     "status": "Order status",

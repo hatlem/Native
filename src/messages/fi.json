@@ -675,6 +675,7 @@
     "visibility": "Hinnoittelu",
     "leadTime": "Toimitusaika (päivää)",
     "save": "Tallenna",
+    "saving": "Tallennetaan…",
     "firm": "Kiinteä (pikatilaus)",
     "indicative": "Suuntaa-antava (tarjouspyyntö)",
     "status": "Tilauksen tila",

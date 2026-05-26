@@ -604,6 +604,7 @@
     "visibility": "Prising",
     "leadTime": "Ledetid (dager)",
     "save": "Lagre",
+    "saving": "Lagrer…",
     "firm": "Fast (bestill direkte)",
     "indicative": "Veiledende (forespørsel)",
     "status": "Bestillingsstatus",

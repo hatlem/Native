@@ -5,6 +5,7 @@ import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
 import { Link } from "@/i18n/navigation";
 import { updateProduct, updateSpec } from "@/app/publisher-actions";
+import { SubmitButton } from "@/components";
 
 export const dynamic = "force-dynamic";
 
@@ -237,9 +238,11 @@ export default async function PublisherDashboard({
                             <span>{t("bookable")}</span>
                           </label>
                           <div className="actions">
-                            <button type="submit" className="btn small">
-                              {t("save")}
-                            </button>
+                            <SubmitButton
+                              label={t("save")}
+                              pendingLabel={t("saving")}
+                              className="btn small"
+                            />
                           </div>
                         </form>
 
@@ -314,9 +317,11 @@ export default async function PublisherDashboard({
                               />
                             </div>
                             <div className="actions">
-                              <button type="submit" className="btn small">
-                                {t("saveSpec")}
-                              </button>
+                              <SubmitButton
+                                label={t("saveSpec")}
+                                pendingLabel={t("saving")}
+                                className="btn small"
+                              />
                             </div>
                           </form>
                         </details>
