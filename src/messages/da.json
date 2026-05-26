@@ -1,6 +1,6 @@
 {
   "common": {
-    "appName": "ATNative"
+    "appName": "NativeSpin"
   },
   "nav": {
     "home": "Hjem",
@@ -109,7 +109,7 @@
     "mixHeading": "Titler der passer til briefen"
   },
   "home": {
-    "eyebrow": "ATNative — native i Norden, DACH, Storbritannien og Irland",
+    "eyebrow": "NativeSpin — native i Norden, DACH, Storbritannien og Irland",
     "title": "Køb native-indhold i premium aviser og magasiner",
     "subtitle": "Se alle titler der tilbyder native, med gennemsigtige priser — i NO, SE, DK, FI, DE, AT, CH, UK og IE. Giv os en brief — vi skriver det og booker det, også hvor programmatisk ikke er muligt.",
     "cta": "Se kataloget",
@@ -120,7 +120,7 @@
     "featuredTitle": "I kataloget lige nu",
     "featuredCta": "Se alle titler",
     "priceFrom": "Fra",
-    "whyEyebrow": "Hvorfor ATNative",
+    "whyEyebrow": "Hvorfor NativeSpin",
     "vp1Title": "Ét gennemsigtigt katalog",
     "vp1Body": "Alle aviser og magasiner der tilbyder native-indhold og native-annoncer, med specifikationer og vejledende priser.",
     "vp2Title": "Vi køber det for dig",
@@ -418,7 +418,7 @@
     "failed": "Ugyldig e-mail eller adgangskode — prøv igen.",
     "rateLimited": "For mange forsøg — vent et minut og prøv igen.",
     "signingIn": "Logger ind…",
-    "hint": "Demo-logins — desk: desk@atnative.com / atnative-desk · køber: buyer@atnative.com / atnative-buyer",
+    "hint": "Demo-logins — desk: desk@nativespin.com / nativespin-desk · køber: buyer@nativespin.com / nativespin-buyer",
     "signin": "Log ind",
     "signout": "Log ud",
     "signup": "Tilmeld dig",
@@ -451,17 +451,17 @@
     "regRateLimited": "For mange registreringsforsøg — vent et minut og prøv igen.",
     "regExists": "Der findes allerede en konto med den e-mail.",
     "inviteInvalidTitle": "This invite is no longer valid",
-    "inviteExpiredBody": "The link has expired. Ask the ATNative team for a fresh invitation.",
+    "inviteExpiredBody": "The link has expired. Ask the NativeSpin team for a fresh invitation.",
     "inviteClaimedBody": "This invite has already been claimed. Sign in instead.",
     "inviteUnknownBody": "We could not find this invite. The link may be mistyped.",
     "claimHeadline": "Claim the {publisher} publisher portal",
     "claimLead": "Set a password and the portal is yours — your inventory, your rate card, your specs.",
     "claimBullet1": "Maintain rate cards, specs and lead times for the titles in your portfolio.",
-    "claimBullet2": "Receive ATNative buyers qualified demand without building self-serve tooling.",
-    "claimBullet3": "Single billing relationship — one invoice per cycle from ATNative.",
+    "claimBullet2": "Receive NativeSpin buyers qualified demand without building self-serve tooling.",
+    "claimBullet3": "Single billing relationship — one invoice per cycle from NativeSpin.",
     "claimTitle": "Set your password",
     "claimSubtitle": "You will be signed in as the {publisher} portal owner.",
-    "claimEmailLockedHint": "Email is locked to the invitation — ask ATNative to issue a new invite if it needs to change.",
+    "claimEmailLockedHint": "Email is locked to the invitation — ask NativeSpin to issue a new invite if it needs to change.",
     "claimSubmit": "Claim portal account",
     "claimError": "We could not complete the claim. The link may have just expired.",
     "forgotLink": "Glemt adgangskode?",
@@ -628,7 +628,7 @@
     "availability": "Tilgængelighed"
   },
   "formats": {
-    "metaTitle": "Native-formater — ATNative",
+    "metaTitle": "Native-formater — NativeSpin",
     "eyebrow": "Formater",
     "title": "Fire måder at køre native — vælg den der passer.",
     "lead": "Hver titel i vores katalog understøtter ét eller flere af disse fire formater. Forskellen er hvis stemme du betaler for og hvor synlig brandet er.",
@@ -816,7 +816,7 @@
     "problem2Body": "Priser ligger i PDF'er og mails. At sammenligne værdi tager uger af tovtrækkeri.",
     "problem3Title": "Operationelt tungt",
     "problem3Body": "God native er redaktionelt håndværk tilpasset hver udgiver. At producere det internt med kvalitet er svært.",
-    "solutionsTitle": "Det ATNative giver jer",
+    "solutionsTitle": "Det NativeSpin giver jer",
     "solution1Title": "Ét transparent katalog",
     "solution1Body": "Hver avis og hvert magasin der tilbyder native, med vejledende priser, spec og rækkevidde — uden salgssamtale.",
     "solution2Title": "Håndteret indkøbsdesk",
@@ -843,7 +843,7 @@
     "feature3Title": "Fastpris-selvbetjening",
     "feature3Body": "Titler med offentlig fastpris kan bookes direkte fra planen. Resten går via desken, stadig med fuld transparens.",
     "feature4Title": "Hvidmærkning (på vej)",
-    "feature4Body": "Vis ATNative i jeres egne kundeportaler. Samme katalog, jeres brand. Tag kontakt for tidlig adgang.",
+    "feature4Body": "Vis NativeSpin i jeres egne kundeportaler. Samme katalog, jeres brand. Tag kontakt for tidlig adgang.",
     "workflowTitle": "Samme arbejdsgang teamet allerede kører",
     "workflowBody": "Brief → plan → anmodning → fastprisoffert → ordre → live-placering → rapportering. Vi træder ind i de trin der gør ondt — sourcing, offert, indhold — uden at ændre hvordan I briefer eller rapporterer.",
     "ctaTitle": "Kør en kampagne med os",
@@ -864,10 +864,10 @@
     "benefit3Title": "Jeres prisliste, jeres spec",
     "benefit3Body": "I ejer pris og inventar. Vi sælger aldrig under jeres offentliggjorte priser; vores margin ligger på køberssiden.",
     "benefit4Title": "Ét faktureringsforhold",
-    "benefit4Body": "Én faktura per cyklus fra ATNative på tværs af alle annoncører og bureauer, med jeres betalingsbetingelser.",
+    "benefit4Body": "Én faktura per cyklus fra NativeSpin på tværs af alle annoncører og bureauer, med jeres betalingsbetingelser.",
     "howTitle": "Sådan fungerer partnerskabet",
     "step1Title": "Onboard prislisten",
-    "step1Body": "Vi importerer mediekittet og oversætter det til ATNative-katalogets format. I verificerer; det går live.",
+    "step1Body": "Vi importerer mediekittet og oversætter det til NativeSpin-katalogets format. I verificerer; det går live.",
     "step2Title": "Vi tager købere med",
     "step2Body": "Annoncører og bureauer finder jeres titler, bygger en plan og sender anmodning.",
     "step3Title": "Offert + indhold",
@@ -906,9 +906,9 @@
   },
   "about": {
     "eyebrow": "Om os",
-    "metaTitle": "Om ATNative",
+    "metaTitle": "Om NativeSpin",
     "title": "Native er operationelt hårdt. Det fikser vi.",
-    "lead": "ATNative er en markedsplads til at købe native indhold og native annoncering i aviser og magasiner — også de mange der ikke sælger programmatisk.",
+    "lead": "NativeSpin er en markedsplads til at købe native indhold og native annoncering i aviser og magasiner — også de mange der ikke sælger programmatisk.",
     "missionTitle": "Mission",
     "missionBody1": "Gør native-inventar lige så nemt at finde, sammenligne og købe som programmatisk display — uden at miste den redaktionelle kvalitet, der gør native godt fra starten.",
     "missionBody2": "Vi er køber-først: transparent katalog, transparent pris, håndteret køb bagved, indholdsproduktion tilpasset hver titel. Det forsvarbare ligger i datasættet og relationerne, ikke i én enkelt funktion.",
@@ -992,7 +992,7 @@
       },
       "featured": {
         "title": "Bliv partner",
-        "description": "Få din titel ind på ATNative."
+        "description": "Få din titel ind på NativeSpin."
       }
     },
     "company": {
@@ -1096,7 +1096,7 @@
     "faqTitle": "Ofte stillede spørgsmål"
   },
   "contact": {
-    "metaTitle": "Kontakt ATNative",
+    "metaTitle": "Kontakt NativeSpin",
     "eyebrow": "Kontakt",
     "title": "Tag fat i os",
     "lead": "Vælg den rette kanal nedenfor, eller brug formularen. Vi svarer på alle henvendelser inden for én arbejdsdag.",
@@ -1120,7 +1120,7 @@
     "bullet2": "Arbejdstid CET/CEST",
     "bullet3": "Ingen drip-kampagner — lovet",
     "pullTitle": "Foretrækker du e-mail? ",
-    "pullBody": "Skriv til hello@atnative.com så tager vi det derfra.",
+    "pullBody": "Skriv til hello@nativespin.com så tager vi det derfra.",
     "formCardTitle": "Send os en besked",
     "formCardLead": "Vi vender tilbage inden for én arbejdsdag.",
     "name": "Navn",
@@ -1134,7 +1134,7 @@
     "message": "Besked",
     "messagePlaceholder": "Hvad prøver I at opnå, og hvornår?",
     "submit": "Send besked",
-    "altPrefix": "Nysgerrig efter, hvem der står bag ATNative?",
+    "altPrefix": "Nysgerrig efter, hvem der står bag NativeSpin?",
     "altLink": "Læs om os →"
   },
   "security": {
@@ -1183,11 +1183,11 @@
     "metaTitle": "Privatliv",
     "eyebrow": "Privatliv",
     "title": "Privatlivspolitik",
-    "lead": "Sådan indsamler, bruger og beskytter ATNative persondata — på almindelig dansk.",
+    "lead": "Sådan indsamler, bruger og beskytter NativeSpin persondata — på almindelig dansk.",
     "lastUpdated": "Sidst opdateret: 22. maj 2026",
     "controller": {
       "title": "Hvem er dataansvarlig",
-      "body": "ATNative AS er dataansvarlig for persondata, der behandles via denne markedsplads. Vi har base i Norge og behandler alle data inden for EU/EØS."
+      "body": "NativeSpin AS er dataansvarlig for persondata, der behandles via denne markedsplads. Vi har base i Norge og behandler alle data inden for EU/EØS."
     },
     "data": {
       "title": "Hvilke data vi indsamler",
@@ -1215,7 +1215,7 @@
     },
     "rights": {
       "title": "Jeres rettigheder",
-      "body": "I kan anmode om indsigt, berigtigelse, sletning eller eksport af jeres persondata, og I kan gøre indsigelse mod behandling baseret på berettiget interesse. Kontakt privacy@atnative.com for at udøve disse rettigheder."
+      "body": "I kan anmode om indsigt, berigtigelse, sletning eller eksport af jeres persondata, og I kan gøre indsigelse mod behandling baseret på berettiget interesse. Kontakt privacy@nativespin.com for at udøve disse rettigheder."
     },
     "cookies": {
       "title": "Cookies",
@@ -1232,11 +1232,11 @@
     "metaTitle": "Brugervilkår",
     "eyebrow": "Vilkår",
     "title": "Markedspladsens brugervilkår",
-    "lead": "Disse vilkår regulerer jeres brug af ATNative som annoncør, bureau eller udgiver.",
+    "lead": "Disse vilkår regulerer jeres brug af NativeSpin som annoncør, bureau eller udgiver.",
     "lastUpdated": "Sidst opdateret: 22. maj 2026",
     "scope": {
       "title": "Omfang",
-      "body": "ATNative er en markedsplads, der forbinder annoncører og bureauer med avis- og magasin-udgivere, der tilbyder native-indhold og native-annoncering. Disse vilkår gælder for alle brugere."
+      "body": "NativeSpin er en markedsplads, der forbinder annoncører og bureauer med avis- og magasin-udgivere, der tilbyder native-indhold og native-annoncering. Disse vilkår gælder for alle brugere."
     },
     "accounts": {
       "title": "Konti",
@@ -1252,7 +1252,7 @@
     },
     "content": {
       "title": "Indhold",
-      "body": "Indhold produceret via ATNative er licenseret til annoncøren for den bookede placering. Udgivere kan afvise indhold, der ikke opfylder deres redaktionelle standard, med skriftlig begrundelse."
+      "body": "Indhold produceret via NativeSpin er licenseret til annoncøren for den bookede placering. Udgivere kan afvise indhold, der ikke opfylder deres redaktionelle standard, med skriftlig begrundelse."
     },
     "fees": {
       "title": "Gebyrer og betaling",
@@ -1260,7 +1260,7 @@
     },
     "liability": {
       "title": "Ansvar",
-      "body": "ATNative letter transaktionen, men er ikke udgiver af placerede artikler. Hver part er ansvarlig for overholdelse af annonce-, mærknings- og forbrugerbeskyttelseslovgivning. Ansvar er begrænset til gebyrer betalt de seneste 12 måneder."
+      "body": "NativeSpin letter transaktionen, men er ikke udgiver af placerede artikler. Hver part er ansvarlig for overholdelse af annonce-, mærknings- og forbrugerbeskyttelseslovgivning. Ansvar er begrænset til gebyrer betalt de seneste 12 måneder."
     },
     "termination": {
       "title": "Ophør",
@@ -1279,7 +1279,7 @@
   },
   "landing": {
     "hero": {
-      "labelText": "ATNative · Native-markedsplads",
+      "labelText": "NativeSpin · Native-markedsplads",
       "pain": "Det meste af premium native sælges ikke programmatisk. Det sælges over telefon, med en PDF-prisliste og fire ugers tovtrækkeri. <strong>Vi erstatter det med én brief og fast tilbud inden for 24 timer.</strong>",
       "h1Line1": "Én brief.",
       "h1Line2": "3.000+ titler.",
@@ -1335,7 +1335,7 @@
       "labelIx": "Den gyldne regel",
       "h2": "Er det ikke nyttigt for læseren, er det ikke native — det er en pressemeddelelse i forklædning.",
       "body": "Hver artikel, vi leverer, skal fortjene læserens tid på egen hånd. <strong>Redaktionelle standarder, titlens specifikation, markedets mærkning</strong> — ikke til forhandling. Det er sådan, tillidsoverførslen faktisk virker.",
-      "sig": "— ATNative-desken"
+      "sig": "— NativeSpin-desken"
     },
     "pubs": {
       "labelText": "Udgivere",
@@ -1411,7 +1411,7 @@
     },
     "foot": {
       "tagline": "Native-indhold og native-annoncering på tværs af hver titel vi dækker i NO, SE, DK, FI, DE, AT, CH, UK og IE — og et voksende katalog.",
-      "copy": "ATNative AS · Oslo",
+      "copy": "NativeSpin AS · Oslo",
       "navAdv": "For annoncører",
       "navAgy": "For bureauer",
       "navPub": "For udgivere",
@@ -1420,13 +1420,13 @@
     }
   },
   "apiDocs": {
-    "metaTitle": "ATNative API",
+    "metaTitle": "NativeSpin API",
     "eyebrow": "Developers",
-    "title": "ATNative public catalog API",
-    "lead": "A read API over the ATNative title catalog — designed for agency planning tools (Atlas-style) and adtech partners that need normalised supply data for editorial native across our 9 markets — Norway, Sweden, Denmark, Finland, Germany, Austria, Switzerland, the UK and Ireland.",
+    "title": "NativeSpin public catalog API",
+    "lead": "A read API over the NativeSpin title catalog — designed for agency planning tools (Atlas-style) and adtech partners that need normalised supply data for editorial native across our 9 markets — Norway, Sweden, Denmark, Finland, Germany, Austria, Switzerland, the UK and Ireland.",
     "authTitle": "Authentication",
-    "authBody": "Every request carries a Bearer API key in the Authorization header. Keys are issued per integration partner by the ATNative team and scoped to catalog:read.",
-    "authRequest": "Send a structured request to partners@atnative.com — tell us the integration shape and the markets you care about, and we will issue you a key.",
+    "authBody": "Every request carries a Bearer API key in the Authorization header. Keys are issued per integration partner by the NativeSpin team and scoped to catalog:read.",
+    "authRequest": "Send a structured request to partners@nativespin.com — tell us the integration shape and the markets you care about, and we will issue you a key.",
     "endpointsEyebrow": "v1 endpoints",
     "endpointsTitle": "What is available today",
     "listBody": "Paginated catalog listing of every active title with at least one active product. Filter by market (NO/SE/DK/FI/DE/AT/CH/UK/IE) and format (NATIVE_ARTICLE/ADVERTORIAL/NATIVE_DISPLAY/PACKAGE).",
@@ -1454,7 +1454,7 @@
     "issueTitle": "Issue a new key",
     "nameLabel": "Name / partner",
     "orgLabel": "Owning organisation (optional)",
-    "orgPlatform": "ATNative platform key (no org)",
+    "orgPlatform": "NativeSpin platform key (no org)",
     "scopesLabel": "Scopes",
     "scopesHint": "Comma-separated. Current options: catalog:read.",
     "ttlLabel": "Expires in (days)",
@@ -1485,7 +1485,7 @@
     "anchorLabel": "Listepris",
     "anchorSavings": "−{pct}% mod listepris",
     "anchorNote": "Udgiverens offentlige listepris for placeringen. Din samlede pris inkluderer indholdsproduktion, placering, revisioner og rapportering.",
-    "whyThisPrice": "ATNative har direkte redaktionelle relationer med alle titler i tilbuddet. Vi forhandler placeringen, hyrer en brancheekspert som skribent, varetager redaktionel gennemgang med udgiveren og rapporterer på resultatet. Du får én ansvarlig partner og én samlet pris — ikke en mediefaktura, en skribentfaktura og et bureauhonorar.",
+    "whyThisPrice": "NativeSpin har direkte redaktionelle relationer med alle titler i tilbuddet. Vi forhandler placeringen, hyrer en brancheekspert som skribent, varetager redaktionel gennemgang med udgiveren og rapporterer på resultatet. Du får én ansvarlig partner og én samlet pris — ikke en mediefaktura, en skribentfaktura og et bureauhonorar.",
     "termsPayment": "50 % ved accept, 50 % ved udgivelse.",
     "termsCancellation": "Fuld refusion før artikelbriefen er godkendt; 50 % refusion før første udkast; ingen refusion efter at udgiverens slot er bekræftet.",
     "termsValidity": "Tilbuddet er gyldigt i 14 dage. Tilgængelighed hos udgiveren bekræftes ved accept.",
@@ -1612,7 +1612,7 @@
   },
   "priceRequestForm": {
     "hi": "Hej {name},",
-    "intro": "Vi lister {title} ({publisher}) i ATNative-kataloget og ønsker at bekræfte de aktuelle priser.",
+    "intro": "Vi lister {title} ({publisher}) i NativeSpin-kataloget og ønsker at bekræfte de aktuelle priser.",
     "hasNative": {
       "question": "Tilbyder denne titel stadig nativt indhold?",
       "yes": "Ja",
@@ -1644,14 +1644,14 @@
     "note": "Er der andet vi bør vide?",
     "submit": "Send priser",
     "closed": {
-      "expired": { "title": "Linket er udløbet", "body": "Kontakt din ATNative-repræsentant for at få et nyt link." },
+      "expired": { "title": "Linket er udløbet", "body": "Kontakt din NativeSpin-repræsentant for at få et nyt link." },
       "responded": { "title": "Allerede modtaget", "body": "Tak — vi har allerede dit svar registreret." },
-      "cancelled": { "title": "Linket er annulleret", "body": "Kontakt din ATNative-repræsentant." },
-      "unknown": { "title": "Linket er ikke tilgængeligt", "body": "Kontakt din ATNative-repræsentant." }
+      "cancelled": { "title": "Linket er annulleret", "body": "Kontakt din NativeSpin-repræsentant." },
+      "unknown": { "title": "Linket er ikke tilgængeligt", "body": "Kontakt din NativeSpin-repræsentant." }
     },
     "thanks": {
       "title": "Tak!",
-      "body": "Vi har registreret dine priser. ATNative-teamet vil gennemgå og anvende dem snart."
+      "body": "Vi har registreret dine priser. NativeSpin-teamet vil gennemgå og anvende dem snart."
     }
   }
 }

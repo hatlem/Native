@@ -14,7 +14,7 @@ export async function generateMetadata({
 }
 
 // Public API reference. Lives in (marketing) so partners can read it
-// without an account — the keys themselves are issued by ATNative
+// without an account — the keys themselves are issued by NativeSpin
 // super-admins per integration partner.
 export default async function ApiDocsPage({
   params,

@@ -60,8 +60,8 @@ export default async function TermsPage({
           <h2>{t("contactTitle")}</h2>
           <p className="prose">
             {t("contactBody")}{" "}
-            <a className="link" href="mailto:legal@atnative.com">
-              legal@atnative.com
+            <a className="link" href="mailto:legal@nativespin.com">
+              legal@nativespin.com
             </a>
           </p>
         </section>

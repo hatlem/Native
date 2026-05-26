@@ -12,28 +12,28 @@ import bcrypt from "bcryptjs";
 const prisma = new PrismaClient();
 
 const DESK_EMAIL = (
-  process.env.DESK_ADMIN_EMAIL || "desk@atnative.com"
+  process.env.DESK_ADMIN_EMAIL || "desk@nativespin.com"
 ).toLowerCase();
-const DESK_PASSWORD = process.env.DESK_ADMIN_PASSWORD || "atnative-desk";
+const DESK_PASSWORD = process.env.DESK_ADMIN_PASSWORD || "nativespin-desk";
 const PUB_EMAIL = (
-  process.env.PUBLISHER_EMAIL || "publisher@atnative.com"
+  process.env.PUBLISHER_EMAIL || "publisher@nativespin.com"
 ).toLowerCase();
-const PUB_PASSWORD = process.env.PUBLISHER_PASSWORD || "atnative-pub";
+const PUB_PASSWORD = process.env.PUBLISHER_PASSWORD || "nativespin-pub";
 const BUYER_EMAIL = (
-  process.env.BUYER_EMAIL || "buyer@atnative.com"
+  process.env.BUYER_EMAIL || "buyer@nativespin.com"
 ).toLowerCase();
-const BUYER_PASSWORD = process.env.BUYER_PASSWORD || "atnative-buyer";
+const BUYER_PASSWORD = process.env.BUYER_PASSWORD || "nativespin-buyer";
 const BUYER_ORG = "Demo Advertiser AS";
 const AGENCY_EMAIL = (
-  process.env.AGENCY_EMAIL || "agency@atnative.com"
+  process.env.AGENCY_EMAIL || "agency@nativespin.com"
 ).toLowerCase();
-const AGENCY_PASSWORD = process.env.AGENCY_PASSWORD || "atnative-agency";
+const AGENCY_PASSWORD = process.env.AGENCY_PASSWORD || "nativespin-agency";
 const AGENCY_ORG = "Demo Media Agency";
 const SUPERADMIN_EMAIL = (
-  process.env.SUPERADMIN_EMAIL || "superadmin@atnative.com"
+  process.env.SUPERADMIN_EMAIL || "superadmin@nativespin.com"
 ).toLowerCase();
 const SUPERADMIN_PASSWORD =
-  process.env.SUPERADMIN_PASSWORD || "atnative-superadmin";
+  process.env.SUPERADMIN_PASSWORD || "nativespin-superadmin";
 
 type SeedMarket = {
   code: MarketCode;
@@ -610,11 +610,11 @@ function assertSeedCredentials() {
   if (process.env.NODE_ENV !== "production") return;
   if (process.env.SEED_ALLOW_PRODUCTION === "1") return;
   const defaults: Array<[string, string]> = [
-    [DESK_PASSWORD, "atnative-desk"],
-    [PUB_PASSWORD, "atnative-pub"],
-    [BUYER_PASSWORD, "atnative-buyer"],
-    [AGENCY_PASSWORD, "atnative-agency"],
-    [SUPERADMIN_PASSWORD, "atnative-superadmin"],
+    [DESK_PASSWORD, "nativespin-desk"],
+    [PUB_PASSWORD, "nativespin-pub"],
+    [BUYER_PASSWORD, "nativespin-buyer"],
+    [AGENCY_PASSWORD, "nativespin-agency"],
+    [SUPERADMIN_PASSWORD, "nativespin-superadmin"],
   ];
   const stillDefault = defaults
     .filter(([v, def]) => v === def)

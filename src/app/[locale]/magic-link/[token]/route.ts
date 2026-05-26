@@ -41,7 +41,7 @@ function appUrl(): string {
 }
 
 function appName(): string {
-  return process.env.AUTH_APP_NAME ?? "ATNative";
+  return process.env.AUTH_APP_NAME ?? "NativeSpin";
 }
 
 export async function GET(

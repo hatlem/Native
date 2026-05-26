@@ -92,7 +92,7 @@ test("inviteEmail falls back to a generic inviter when none is supplied", () => 
     inviterName: null,
     link: "https://example.test/en/publisher/claim/xyz",
   });
-  assert.match(text, /ATNative team/i);
+  assert.match(text, /NativeSpin team/i);
 });
 
 test("claimLink encodes the token + honours the locale", () => {

@@ -198,7 +198,7 @@ export function makeResendAdapter(): EmailAdapter | null {
   const key = process.env.RESEND_API_KEY;
   if (!key) return null;
   const client = new Resend(key);
-  const from = process.env.AUTH_EMAIL_FROM ?? "ATNative <noreply@atnative.com>";
+  const from = process.env.AUTH_EMAIL_FROM ?? "NativeSpin <noreply@nativespin.com>";
   const replyTo = process.env.AUTH_EMAIL_REPLY_TO;
   return async (msg) => {
     await client.emails.send({
@@ -242,7 +242,7 @@ No template engine. Plain TS strings + `layout()` helper. Inline styles only —
 
 ```
 RESEND_API_KEY=
-AUTH_EMAIL_FROM="ATNative <noreply@atnative.com>"
+AUTH_EMAIL_FROM="NativeSpin <noreply@nativespin.com>"
 AUTH_EMAIL_REPLY_TO=
 ```
 

@@ -11,11 +11,11 @@ import { DemoChips, type DemoAccount } from "./demo-chips";
 export const dynamic = "force-dynamic";
 
 const DEMO_ACCOUNTS: DemoAccount[] = [
-  { key: "buyer", label: "Buyer", email: "buyer@atnative.com", password: "atnative-buyer" },
-  { key: "agency", label: "Agency", email: "agency@atnative.com", password: "atnative-agency" },
-  { key: "publisher", label: "Publisher", email: "publisher@atnative.com", password: "atnative-pub" },
-  { key: "desk", label: "Desk", email: "desk@atnative.com", password: "atnative-desk" },
-  { key: "superadmin", label: "Super admin", email: "superadmin@atnative.com", password: "atnative-superadmin" },
+  { key: "buyer", label: "Buyer", email: "buyer@nativespin.com", password: "nativespin-buyer" },
+  { key: "agency", label: "Agency", email: "agency@nativespin.com", password: "nativespin-agency" },
+  { key: "publisher", label: "Publisher", email: "publisher@nativespin.com", password: "nativespin-pub" },
+  { key: "desk", label: "Desk", email: "desk@nativespin.com", password: "nativespin-desk" },
+  { key: "superadmin", label: "Super admin", email: "superadmin@nativespin.com", password: "nativespin-superadmin" },
 ];
 
 export default async function SignInPage({

@@ -108,7 +108,7 @@ export async function sendPriceRequest(args: {
     titleName: req.title.name,
     publisherName: req.title.publisher.name,
     link,
-    inviterName: req.requestedBy.name ?? "The ATNative team",
+    inviterName: req.requestedBy.name ?? "The NativeSpin team",
   });
 
   await prisma.priceRequest.update({

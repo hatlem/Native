@@ -1,6 +1,6 @@
 {
   "common": {
-    "appName": "ATNative"
+    "appName": "NativeSpin"
   },
   "nav": {
     "home": "Etusivu",
@@ -182,7 +182,7 @@
     "mixHeading": "Julkaisut, jotka sopivat briifiisi"
   },
   "home": {
-    "eyebrow": "ATNative — natiivi Pohjoismaissa, DACH-alueella, Britanniassa ja Irlannissa",
+    "eyebrow": "NativeSpin — natiivi Pohjoismaissa, DACH-alueella, Britanniassa ja Irlannissa",
     "title": "Osta natiivisisältöä premium-sanoma- ja aikakauslehdistä",
     "subtitle": "Näe jokainen julkaisu, joka tarjoaa natiivia, läpinäkyvällä hinnoittelulla — markkinoilla NO, SE, DK, FI, DE, AT, CH, UK ja IE. Brif meille kerran — kirjoitamme sen, varaamme sen, myös sinne missä programmaattinen ei toimi.",
     "cta": "Selaa katalogia",
@@ -193,7 +193,7 @@
     "featuredTitle": "Katalogissa juuri nyt",
     "featuredCta": "Näytä kaikki julkaisut",
     "priceFrom": "Alkaen",
-    "whyEyebrow": "Miksi ATNative",
+    "whyEyebrow": "Miksi NativeSpin",
     "vp1Title": "Yksi läpinäkyvä katalogi",
     "vp1Body": "Jokainen sanoma- ja aikakauslehti, joka tarjoaa natiivisisältöä ja natiivimainoksia, spesifikaatioilla ja suuntaa-antavalla hinnoittelulla.",
     "vp2Title": "Me ostamme sen puolestasi",
@@ -491,7 +491,7 @@
     "failed": "Virheellinen sähköposti tai salasana — yritä uudelleen.",
     "rateLimited": "Liian monta yritystä — odota hetki ja yritä uudelleen.",
     "signingIn": "Kirjaudutaan…",
-    "hint": "Demo-tunnukset — desk: desk@atnative.com / atnative-desk · ostaja: buyer@atnative.com / atnative-buyer",
+    "hint": "Demo-tunnukset — desk: desk@nativespin.com / nativespin-desk · ostaja: buyer@nativespin.com / nativespin-buyer",
     "signin": "Kirjaudu sisään",
     "signout": "Kirjaudu ulos",
     "signup": "Luo tili",
@@ -524,17 +524,17 @@
     "regRateLimited": "Liian monta rekisteröitymisyritystä — odota hetki ja yritä uudelleen.",
     "regExists": "Tili tällä sähköpostilla on jo olemassa.",
     "inviteInvalidTitle": "This invite is no longer valid",
-    "inviteExpiredBody": "The link has expired. Ask the ATNative team for a fresh invitation.",
+    "inviteExpiredBody": "The link has expired. Ask the NativeSpin team for a fresh invitation.",
     "inviteClaimedBody": "This invite has already been claimed. Sign in instead.",
     "inviteUnknownBody": "We could not find this invite. The link may be mistyped.",
     "claimHeadline": "Claim the {publisher} publisher portal",
     "claimLead": "Set a password and the portal is yours — your inventory, your rate card, your specs.",
     "claimBullet1": "Maintain rate cards, specs and lead times for the titles in your portfolio.",
-    "claimBullet2": "Receive ATNative buyers qualified demand without building self-serve tooling.",
-    "claimBullet3": "Single billing relationship — one invoice per cycle from ATNative.",
+    "claimBullet2": "Receive NativeSpin buyers qualified demand without building self-serve tooling.",
+    "claimBullet3": "Single billing relationship — one invoice per cycle from NativeSpin.",
     "claimTitle": "Set your password",
     "claimSubtitle": "You will be signed in as the {publisher} portal owner.",
-    "claimEmailLockedHint": "Email is locked to the invitation — ask ATNative to issue a new invite if it needs to change.",
+    "claimEmailLockedHint": "Email is locked to the invitation — ask NativeSpin to issue a new invite if it needs to change.",
     "claimSubmit": "Claim portal account",
     "claimError": "We could not complete the claim. The link may have just expired.",
     "forgotLink": "Unohditko salasanan?",
@@ -701,7 +701,7 @@
     "availability": "Saatavuus"
   },
   "formats": {
-    "metaTitle": "Natiiviformaatit — ATNative",
+    "metaTitle": "Natiiviformaatit — NativeSpin",
     "eyebrow": "Formaatit",
     "title": "Neljä tapaa tehdä natiivia — valitse sopiva.",
     "lead": "Jokainen julkaisu katalogissamme tukee yhtä tai useampaa näistä neljästä formaatista. Ero on siinä, kenen ääntä maksat ja kuinka näkyvä brändi on.",
@@ -816,7 +816,7 @@
     "problem2Body": "Hinnoittelu asuu PDF-tiedostoissa ja sähköposteissa. Arvon vertailu julkaisujen välillä vie viikkoja edestakaista viestittelyä.",
     "problem3Title": "Operatiivisesti raskas",
     "problem3Body": "Hyvä natiivi on toimituksellisen tason kirjoittamista viritettynä per kustantaja. Sen tuottaminen talon sisällä laadukkaasti on vaikeaa.",
-    "solutionsTitle": "Mitä ATNative tarjoaa",
+    "solutionsTitle": "Mitä NativeSpin tarjoaa",
     "solution1Title": "Yksi läpinäkyvä katalogi",
     "solution1Body": "Jokainen sanoma- ja aikakauslehti, joka tarjoaa natiivia, suuntaa-antavalla hinnoittelulla, formaattispekseillä ja tavoittavuusdatalla — ei myyntipuhelua vaadita.",
     "solution2Title": "Hallinnoitu ostodeski",
@@ -843,7 +843,7 @@
     "feature3Title": "Kiinteähintainen itsepalvelu",
     "feature3Body": "Kun julkaisut julkaisevat kiinteät hinnat, suunnittelijasi voivat varata heti. Kaikki muu kulkee deskin kautta täydellä läpinäkyvyydellä.",
     "feature4Title": "Whitelabel (tulossa)",
-    "feature4Body": "Tuo ATNative omiin asiakasportaaleihisi. Sama katalogi, sinun brändisi. Ota meihin yhteyttä, jos haluat varhaista pääsyä.",
+    "feature4Body": "Tuo NativeSpin omiin asiakasportaaleihisi. Sama katalogi, sinun brändisi. Ota meihin yhteyttä, jos haluat varhaista pääsyä.",
     "workflowTitle": "Sama työnkulku, jota tiimisi jo ajaa",
     "workflowBody": "Brief → suunnitelma → pyyntö → kiinteä tarjous → tilaus → live-sijoittelu → raportointi. Solahdamme niihin vaiheisiin, jotka tekevät eniten kipeää — hankinta, tarjous, sisältö — muuttamatta sitä, miten briiffaat tai raportoit.",
     "ctaTitle": "Aja kampanja kanssamme",
@@ -864,10 +864,10 @@
     "benefit3Title": "Sinun hinnastosi, sinun spesifikaatiosi",
     "benefit3Body": "Omistat hinnoittelun ja varaston. Emme koskaan myy alennuksella julkaistuja hintojasi vasten; katteemme on ostajan puolella.",
     "benefit4Title": "Yksi laskutussuhde",
-    "benefit4Body": "Yksi lasku per sykli ATNativelta kaikilta mainostajilta ja toimistoilta, sinun asettamillasi maksuehdoilla.",
+    "benefit4Body": "Yksi lasku per sykli NativeSpinlta kaikilta mainostajilta ja toimistoilta, sinun asettamillasi maksuehdoilla.",
     "howTitle": "Näin kumppanuus toimii",
     "step1Title": "Tuo hinnastosi käyttöön",
-    "step1Body": "Tuomme mediakorttisi ja käännämme sen ATNative-katalogin formaattiin. Sinä vahvistat; se menee liveksi.",
+    "step1Body": "Tuomme mediakorttisi ja käännämme sen NativeSpin-katalogin formaattiin. Sinä vahvistat; se menee liveksi.",
     "step2Title": "Me tuomme ostajat",
     "step2Body": "Mainostajat ja toimistot löytävät julkaisusi, rakentavat suunnitelman ja lähettävät pyynnön.",
     "step3Title": "Tarjous + sisältö",
@@ -906,9 +906,9 @@
   },
   "about": {
     "eyebrow": "Tietoa",
-    "metaTitle": "Tietoa ATNativesta",
+    "metaTitle": "Tietoa NativeSpinsta",
     "title": "Natiivi on operatiivisesti tuskallista. Me korjaamme sen.",
-    "lead": "ATNative on markkinapaikka natiivisisällön ja natiivimainonnan ostamiseen sanoma- ja aikakauslehdistä — mukaan lukien ne monet, jotka eivät myy programmaattisesti.",
+    "lead": "NativeSpin on markkinapaikka natiivisisällön ja natiivimainonnan ostamiseen sanoma- ja aikakauslehdistä — mukaan lukien ne monet, jotka eivät myy programmaattisesti.",
     "missionTitle": "Missio",
     "missionBody1": "Tee natiivivarastosta yhtä helppoa löytää, vertailla ja ostaa kuin programmaattisesta displaysta — menettämättä sitä toimituksellista laatua, joka tekee natiivista toimivan ensinnäkin.",
     "missionBody2": "Olemme ostajalähtöisiä: läpinäkyvä katalogi, läpinäkyvä hinnoittelu, hallinnoitu osto sen takana, sisällöntuotanto viritetty jokaiselle julkaisulle. Puolustettavuus on tietoaineistossa ja suhteissa, ei missään yksittäisessä ominaisuudessa.",
@@ -991,7 +991,7 @@
       },
       "featured": {
         "title": "Ryhdy kumppaniksi",
-        "description": "Ota julkaisusi käyttöön ATNativessa."
+        "description": "Ota julkaisusi käyttöön NativeSpinssa."
       }
     },
     "company": {
@@ -1095,7 +1095,7 @@
     "faqTitle": "Usein kysytyt kysymykset"
   },
   "contact": {
-    "metaTitle": "Yhteys ATNativeen",
+    "metaTitle": "Yhteys NativeSpinen",
     "eyebrow": "Yhteystiedot",
     "title": "Ota yhteyttä",
     "lead": "Valitse oikea kanava alta tai käytä lomaketta. Vastaamme jokaiseen viestiin arkipäivän kuluessa.",
@@ -1119,7 +1119,7 @@
     "bullet2": "Aikavyöhykkeet CET/CEST",
     "bullet3": "Ei tippamarkkinointia — lupaus",
     "pullTitle": "Suositko sähköpostia? ",
-    "pullBody": "Lähetä viesti osoitteeseen hello@atnative.com ja jatkamme siitä.",
+    "pullBody": "Lähetä viesti osoitteeseen hello@nativespin.com ja jatkamme siitä.",
     "formCardTitle": "Lähetä meille viesti",
     "formCardLead": "Palaamme arkipäivän kuluessa.",
     "name": "Nimesi",
@@ -1133,7 +1133,7 @@
     "message": "Viesti",
     "messagePlaceholder": "Mitä yrität tehdä ja milloin?",
     "submit": "Lähetä viesti",
-    "altPrefix": "Kiinnostaa kuka on ATNativen takana?",
+    "altPrefix": "Kiinnostaa kuka on NativeSpinn takana?",
     "altLink": "Lue meistä →"
   },
   "security": {
@@ -1182,11 +1182,11 @@
     "metaTitle": "Tietosuoja",
     "eyebrow": "Tietosuoja",
     "title": "Tietosuojakäytäntö",
-    "lead": "Näin ATNative kerää, käyttää ja suojaa henkilötietoja — selkokielellä.",
+    "lead": "Näin NativeSpin kerää, käyttää ja suojaa henkilötietoja — selkokielellä.",
     "lastUpdated": "Päivitetty viimeksi: 22. toukokuuta 2026",
     "controller": {
       "title": "Kuka on rekisterinpitäjä",
-      "body": "ATNative AS on rekisterinpitäjä tämän markkinapaikan kautta käsiteltäville henkilötiedoille. Sijaitsemme Norjassa ja käsittelemme kaikki tiedot EU:n/ETA:n sisällä."
+      "body": "NativeSpin AS on rekisterinpitäjä tämän markkinapaikan kautta käsiteltäville henkilötiedoille. Sijaitsemme Norjassa ja käsittelemme kaikki tiedot EU:n/ETA:n sisällä."
     },
     "data": {
       "title": "Mitä tietoja keräämme",
@@ -1214,7 +1214,7 @@
     },
     "rights": {
       "title": "Oikeutesi",
-      "body": "Voit pyytää henkilötietojesi käyttöä, korjausta, poistoa tai vientiä, ja voit vastustaa oikeutettuun etuun perustuvaa käsittelyä. Ota yhteyttä osoitteeseen privacy@atnative.com käyttääksesi näitä oikeuksia."
+      "body": "Voit pyytää henkilötietojesi käyttöä, korjausta, poistoa tai vientiä, ja voit vastustaa oikeutettuun etuun perustuvaa käsittelyä. Ota yhteyttä osoitteeseen privacy@nativespin.com käyttääksesi näitä oikeuksia."
     },
     "cookies": {
       "title": "Evästeet",
@@ -1231,11 +1231,11 @@
     "metaTitle": "Käyttöehdot",
     "eyebrow": "Ehdot",
     "title": "Markkinapaikan käyttöehdot",
-    "lead": "Nämä ehdot säätelevät ATNativen käyttöäsi mainostajana, toimistona tai kustantajana.",
+    "lead": "Nämä ehdot säätelevät NativeSpinn käyttöäsi mainostajana, toimistona tai kustantajana.",
     "lastUpdated": "Päivitetty viimeksi: 22. toukokuuta 2026",
     "scope": {
       "title": "Soveltamisala",
-      "body": "ATNative on markkinapaikka, joka yhdistää mainostajat ja toimistot sanomalehti- ja aikakauslehtikustantajiin, jotka tarjoavat natiivisisältöä ja natiivimainontaa. Nämä ehdot koskevat kaikkia markkinapaikan käyttäjiä."
+      "body": "NativeSpin on markkinapaikka, joka yhdistää mainostajat ja toimistot sanomalehti- ja aikakauslehtikustantajiin, jotka tarjoavat natiivisisältöä ja natiivimainontaa. Nämä ehdot koskevat kaikkia markkinapaikan käyttäjiä."
     },
     "accounts": {
       "title": "Tilit",
@@ -1251,7 +1251,7 @@
     },
     "content": {
       "title": "Sisältö",
-      "body": "ATNativen kautta tuotettu sisältö lisensoidaan mainostajalle varattuun sijoitteluun. Kustantajat voivat hylätä sisällön, joka ei täytä heidän toimituksellisia standardejaan, kirjallisella perusteella."
+      "body": "NativeSpinn kautta tuotettu sisältö lisensoidaan mainostajalle varattuun sijoitteluun. Kustantajat voivat hylätä sisällön, joka ei täytä heidän toimituksellisia standardejaan, kirjallisella perusteella."
     },
     "fees": {
       "title": "Maksut ja maksaminen",
@@ -1259,7 +1259,7 @@
     },
     "liability": {
       "title": "Vastuu",
-      "body": "ATNative välittää transaktion, mutta ei ole sijoitettujen artikkeleiden julkaisija. Kukin osapuoli vastaa siitä, että noudattaa sovellettavaa mainonta-, ilmoitus- ja kuluttajansuojalainsäädäntöä. Vastuu rajoittuu edellisten 12 kuukauden aikana maksettuihin maksuihin."
+      "body": "NativeSpin välittää transaktion, mutta ei ole sijoitettujen artikkeleiden julkaisija. Kukin osapuoli vastaa siitä, että noudattaa sovellettavaa mainonta-, ilmoitus- ja kuluttajansuojalainsäädäntöä. Vastuu rajoittuu edellisten 12 kuukauden aikana maksettuihin maksuihin."
     },
     "termination": {
       "title": "Irtisanominen",
@@ -1278,7 +1278,7 @@
   },
   "landing": {
     "hero": {
-      "labelText": "ATNative · Natiivimarkkinapaikka",
+      "labelText": "NativeSpin · Natiivimarkkinapaikka",
       "pain": "Suurinta osaa premium-natiivista ei myydä ohjelmallisesti. Sitä myydään puhelimessa, PDF-hinnastolla ja neljän viikon edestakaisin viestittelyllä. <strong>Korvaamme sen yhdellä briefillä ja 24 tunnin kiinteällä tarjouksella.</strong>",
       "h1Line1": "Yksi brief.",
       "h1Line2": "3 000+ julkaisua.",
@@ -1334,7 +1334,7 @@
       "labelIx": "Kultainen sääntö",
       "h2": "Jos se ei ole lukijalle hyödyllistä, se ei ole natiivia — se on tiedote naamioituna.",
       "body": "Jokaisen toimittamamme artikkelin pitää ansaita lukijan aika itse. <strong>Toimitukselliset standardit, kustantajan spesifikaatio, markkinan ilmoitusmerkintä</strong> — ei neuvoteltavissa. Näin luottamuksen siirto todella toimii.",
-      "sig": "— ATNative-desk"
+      "sig": "— NativeSpin-desk"
     },
     "pubs": {
       "labelText": "Kustantajat",
@@ -1410,7 +1410,7 @@
     },
     "foot": {
       "tagline": "Natiivisisältöä ja natiivimainontaa jokaisesta julkaisusta, jonka katamme markkinoilla NO, SE, DK, FI, DE, AT, CH, UK ja IE — ja kasvava katalogi.",
-      "copy": "ATNative AS · Oslo",
+      "copy": "NativeSpin AS · Oslo",
       "navAdv": "Mainostajille",
       "navAgy": "Toimistoille",
       "navPub": "Kustantajille",
@@ -1419,13 +1419,13 @@
     }
   },
   "apiDocs": {
-    "metaTitle": "ATNative API",
+    "metaTitle": "NativeSpin API",
     "eyebrow": "Developers",
-    "title": "ATNative public catalog API",
-    "lead": "A read API over the ATNative title catalog — designed for agency planning tools (Atlas-style) and adtech partners that need normalised supply data for editorial native across our 9 markets — Norway, Sweden, Denmark, Finland, Germany, Austria, Switzerland, the UK and Ireland.",
+    "title": "NativeSpin public catalog API",
+    "lead": "A read API over the NativeSpin title catalog — designed for agency planning tools (Atlas-style) and adtech partners that need normalised supply data for editorial native across our 9 markets — Norway, Sweden, Denmark, Finland, Germany, Austria, Switzerland, the UK and Ireland.",
     "authTitle": "Authentication",
-    "authBody": "Every request carries a Bearer API key in the Authorization header. Keys are issued per integration partner by the ATNative team and scoped to catalog:read.",
-    "authRequest": "Send a structured request to partners@atnative.com — tell us the integration shape and the markets you care about, and we will issue you a key.",
+    "authBody": "Every request carries a Bearer API key in the Authorization header. Keys are issued per integration partner by the NativeSpin team and scoped to catalog:read.",
+    "authRequest": "Send a structured request to partners@nativespin.com — tell us the integration shape and the markets you care about, and we will issue you a key.",
     "endpointsEyebrow": "v1 endpoints",
     "endpointsTitle": "What is available today",
     "listBody": "Paginated catalog listing of every active title with at least one active product. Filter by market (NO/SE/DK/FI/DE/AT/CH/UK/IE) and format (NATIVE_ARTICLE/ADVERTORIAL/NATIVE_DISPLAY/PACKAGE).",
@@ -1453,7 +1453,7 @@
     "issueTitle": "Issue a new key",
     "nameLabel": "Name / partner",
     "orgLabel": "Owning organisation (optional)",
-    "orgPlatform": "ATNative platform key (no org)",
+    "orgPlatform": "NativeSpin platform key (no org)",
     "scopesLabel": "Scopes",
     "scopesHint": "Comma-separated. Current options: catalog:read.",
     "ttlLabel": "Expires in (days)",
@@ -1484,7 +1484,7 @@
     "anchorLabel": "Listahinta",
     "anchorSavings": "−{pct}% listahintaan verrattuna",
     "anchorNote": "Julkaisijan virallinen listahinta tälle julkaisulle. Kokonaishintaasi sisältyy sisällöntuotanto, julkaisu, korjaukset ja raportointi.",
-    "whyThisPrice": "ATNativellä on suorat toimitukselliset suhteet kaikkiin tarjouksen medioihin. Neuvottelemme julkaisun, palkkaamme toimialaa tuntevan toimittajan, hoidamme toimituksellisen tarkistuksen julkaisijan kanssa ja toimitamme raportoinnin. Saat yhden vastuullisen kumppanin ja yhden kokonaishinnan — emme erikseen medialaskua, kirjoittajalaskua ja toimistopalkkiota.",
+    "whyThisPrice": "NativeSpinllä on suorat toimitukselliset suhteet kaikkiin tarjouksen medioihin. Neuvottelemme julkaisun, palkkaamme toimialaa tuntevan toimittajan, hoidamme toimituksellisen tarkistuksen julkaisijan kanssa ja toimitamme raportoinnin. Saat yhden vastuullisen kumppanin ja yhden kokonaishinnan — emme erikseen medialaskua, kirjoittajalaskua ja toimistopalkkiota.",
     "termsPayment": "50 % hyväksynnän yhteydessä, 50 % julkaisun yhteydessä.",
     "termsCancellation": "Täysi palautus ennen artikkelibrieffin hyväksyntää; 50 % palautus ennen ensimmäistä luonnosta; ei palautusta enää julkaisijan paikan vahvistuksen jälkeen.",
     "termsValidity": "Tarjous voimassa 14 päivää. Julkaisijan saatavuus vahvistetaan hyväksynnän yhteydessä.",
@@ -1611,7 +1611,7 @@
   },
   "priceRequestForm": {
     "hi": "Hei {name},",
-    "intro": "Listaamme {title} ({publisher}) ATNative-katalogissa ja haluamme vahvistaa nykyiset hinnat.",
+    "intro": "Listaamme {title} ({publisher}) NativeSpin-katalogissa ja haluamme vahvistaa nykyiset hinnat.",
     "hasNative": {
       "question": "Tarjoaako tämä julkaisu edelleen natiivisisältöä?",
       "yes": "Kyllä",
@@ -1643,14 +1643,14 @@
     "note": "Onko muuta mitä meidän pitäisi tietää?",
     "submit": "Lähetä hinnat",
     "closed": {
-      "expired": { "title": "Linkki on vanhentunut", "body": "Ota yhteyttä ATNative-yhteyshenkilöösi uuden linkin saamiseksi." },
+      "expired": { "title": "Linkki on vanhentunut", "body": "Ota yhteyttä NativeSpin-yhteyshenkilöösi uuden linkin saamiseksi." },
       "responded": { "title": "Jo vastaanotettu", "body": "Kiitos — vastauksesi on jo tallennettu." },
-      "cancelled": { "title": "Linkki peruutettu", "body": "Ota yhteyttä ATNative-yhteyshenkilöösi." },
-      "unknown": { "title": "Linkki ei ole käytettävissä", "body": "Ota yhteyttä ATNative-yhteyshenkilöösi." }
+      "cancelled": { "title": "Linkki peruutettu", "body": "Ota yhteyttä NativeSpin-yhteyshenkilöösi." },
+      "unknown": { "title": "Linkki ei ole käytettävissä", "body": "Ota yhteyttä NativeSpin-yhteyshenkilöösi." }
     },
     "thanks": {
       "title": "Kiitos!",
-      "body": "Olemme kirjanneet hintasi. ATNative-tiimi tarkistaa ja ottaa ne käyttöön pian."
+      "body": "Olemme kirjanneet hintasi. NativeSpin-tiimi tarkistaa ja ottaa ne käyttöön pian."
     }
   }
 }

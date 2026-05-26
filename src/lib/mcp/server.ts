@@ -17,7 +17,7 @@ export async function buildMcpServerForToken(
   if (!canRead) return null;
 
   const server = new McpServer({
-    name: "atnative-pricing",
+    name: "nativespin-pricing",
     version: "1.0.0",
   });
 

@@ -11,7 +11,7 @@
 // with the actual sponsor name (Liv's gap from the scenario coverage
 // matrix: the spec-check used to reject any byline that didn't match
 // the template verbatim, including legitimate variants like
-// "Producerat för Hud & Glöd av ATNative redaktion" where the
+// "Producerat för Hud & Glöd av NativeSpin redaktion" where the
 // producer-credit suffix is per playbook).
 
 export type SpecInput = {

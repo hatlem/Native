@@ -279,7 +279,7 @@ function appUrl(): string {
 }
 
 function appName(): string {
-  return process.env.AUTH_APP_NAME ?? "ATNative";
+  return process.env.AUTH_APP_NAME ?? "NativeSpin";
 }
 
 // Magic-link sign-in: user submits email, we email them a one-tap link.

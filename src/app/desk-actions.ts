@@ -296,7 +296,7 @@ export async function cancelOrder(formData: FormData) {
     publisherIds.map((pid) =>
       notifyPublisher(pid, {
         kind: "ORDER_CANCELLED",
-        title: "Order cancelled by ATNative desk",
+        title: "Order cancelled by NativeSpin desk",
         body: reason,
         link: `/${locale}/publisher/orders`,
       }),

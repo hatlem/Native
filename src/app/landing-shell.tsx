@@ -13,7 +13,7 @@ const inter = Inter({
 });
 
 const DESK_MAILTO =
-  "mailto:desk@atnative.com?subject=Talk%20to%20the%20ATNative%20desk";
+  "mailto:desk@nativespin.com?subject=Talk%20to%20the%20NativeSpin%20desk";
 
 const MARKETS = ["no", "se", "dk", "fi", "de", "at", "ch", "uk", "ie"] as const;
 
@@ -52,7 +52,7 @@ export async function LandingShell({
         <footer className="page-foot">
           <div className="wrap">
             <div className="left">
-              <div className="brand-foot">ATNative</div>
+              <div className="brand-foot">NativeSpin</div>
               <div className="copy">{t("foot.tagline")}</div>
               <div className="copy" style={{ marginTop: 8 }}>
                 © <span className="roman">MMXXVI</span> · {t("foot.copy")}

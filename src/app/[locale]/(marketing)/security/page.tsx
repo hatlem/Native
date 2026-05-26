@@ -121,8 +121,8 @@ export default async function SecurityPage({
           <p className="prose">{t("disclosureBody")}</p>
           <p className="prose">
             {t("disclosureMail")}{" "}
-            <a className="link" href="mailto:security@atnative.com">
-              security@atnative.com
+            <a className="link" href="mailto:security@nativespin.com">
+              security@nativespin.com
             </a>
           </p>
         </div>

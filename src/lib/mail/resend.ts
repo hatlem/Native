@@ -11,7 +11,7 @@ export function makeResendAdapter(
   const key = env.RESEND_API_KEY;
   if (!key) return null;
   const client = new Resend(key);
-  const from = env.AUTH_EMAIL_FROM ?? "ATNative <noreply@atnative.com>";
+  const from = env.AUTH_EMAIL_FROM ?? "NativeSpin <noreply@nativespin.com>";
   const replyTo = env.AUTH_EMAIL_REPLY_TO;
   return async (msg) => {
     await client.emails.send({

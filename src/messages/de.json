@@ -1,6 +1,6 @@
 {
   "common": {
-    "appName": "ATNative"
+    "appName": "NativeSpin"
   },
   "nav": {
     "home": "Start",
@@ -182,7 +182,7 @@
     "mixHeading": "Titles that fit your brief"
   },
   "home": {
-    "eyebrow": "ATNative — Native in den nordischen Ländern, DACH, UK und Irland",
+    "eyebrow": "NativeSpin — Native in den nordischen Ländern, DACH, UK und Irland",
     "title": "Native-Inhalte in Premium-Zeitungen und Magazinen kaufen",
     "subtitle": "Jeden Titel sehen, der Native anbietet — mit transparenten Preisen, in NO, SE, DK, FI, DE, AT, CH, UK und IE. Einmal briefen — wir schreiben, wir buchen, auch dort, wo Programmatic nicht funktioniert.",
     "cta": "Katalog durchsuchen",
@@ -193,7 +193,7 @@
     "featuredTitle": "Gerade live im Katalog",
     "featuredCta": "Alle Titel ansehen",
     "priceFrom": "Ab",
-    "whyEyebrow": "Warum ATNative",
+    "whyEyebrow": "Warum NativeSpin",
     "vp1Title": "Ein transparenter Katalog",
     "vp1Body": "Jede Zeitung und jedes Magazin, das Native-Inhalte und Native-Anzeigen anbietet — mit Specs und Richtpreisen.",
     "vp2Title": "Wir kaufen für Sie ein",
@@ -491,7 +491,7 @@
     "failed": "E-Mail oder Passwort ungültig — bitte erneut versuchen.",
     "rateLimited": "Zu viele Versuche — bitte eine Minute warten und erneut versuchen.",
     "signingIn": "Wird angemeldet…",
-    "hint": "Demo-Zugänge — Desk: desk@atnative.com / atnative-desk · Käufer: buyer@atnative.com / atnative-buyer",
+    "hint": "Demo-Zugänge — Desk: desk@nativespin.com / nativespin-desk · Käufer: buyer@nativespin.com / nativespin-buyer",
     "signin": "Anmelden",
     "signout": "Abmelden",
     "signup": "Registrieren",
@@ -524,17 +524,17 @@
     "regRateLimited": "Zu viele Registrierungsversuche — bitte eine Minute warten und erneut versuchen.",
     "regExists": "Ein Konto mit dieser E-Mail existiert bereits.",
     "inviteInvalidTitle": "This invite is no longer valid",
-    "inviteExpiredBody": "The link has expired. Ask the ATNative team for a fresh invitation.",
+    "inviteExpiredBody": "The link has expired. Ask the NativeSpin team for a fresh invitation.",
     "inviteClaimedBody": "This invite has already been claimed. Sign in instead.",
     "inviteUnknownBody": "We could not find this invite. The link may be mistyped.",
     "claimHeadline": "Claim the {publisher} publisher portal",
     "claimLead": "Set a password and the portal is yours — your inventory, your rate card, your specs.",
     "claimBullet1": "Maintain rate cards, specs and lead times for the titles in your portfolio.",
-    "claimBullet2": "Receive ATNative buyers qualified demand without building self-serve tooling.",
-    "claimBullet3": "Single billing relationship — one invoice per cycle from ATNative.",
+    "claimBullet2": "Receive NativeSpin buyers qualified demand without building self-serve tooling.",
+    "claimBullet3": "Single billing relationship — one invoice per cycle from NativeSpin.",
     "claimTitle": "Set your password",
     "claimSubtitle": "You will be signed in as the {publisher} portal owner.",
-    "claimEmailLockedHint": "Email is locked to the invitation — ask ATNative to issue a new invite if it needs to change.",
+    "claimEmailLockedHint": "Email is locked to the invitation — ask NativeSpin to issue a new invite if it needs to change.",
     "claimSubmit": "Claim portal account",
     "claimError": "We could not complete the claim. The link may have just expired.",
     "forgotLink": "Passwort vergessen?",
@@ -701,7 +701,7 @@
     "availability": "Availability"
   },
   "formats": {
-    "metaTitle": "Native-Formate — ATNative",
+    "metaTitle": "Native-Formate — NativeSpin",
     "eyebrow": "Formate",
     "title": "Vier Wege, Native zu fahren — wählen Sie den passenden.",
     "lead": "Jeder Titel in unserem Katalog unterstützt eines oder mehrere dieser vier Formate. Der Unterschied liegt darin, wessen Stimme Sie bezahlen — und wie prominent die Marke auftritt.",
@@ -816,7 +816,7 @@
     "problem2Body": "Preise leben in PDFs und E-Mails. Werte über Titel hinweg zu vergleichen dauert Wochen.",
     "problem3Title": "Operativ aufwendig",
     "problem3Body": "Gutes Native ist redaktionelles Schreiben, abgestimmt auf jeden Verlag. Inhouse auf Qualitätsniveau zu produzieren ist schwer.",
-    "solutionsTitle": "Was ATNative Ihnen bietet",
+    "solutionsTitle": "Was NativeSpin Ihnen bietet",
     "solution1Title": "Ein transparenter Katalog",
     "solution1Body": "Jede Zeitung und jedes Magazin, das Native anbietet — mit Richtpreisen, Format-Specs und Reichweitendaten. Kein Verkaufsgespräch erforderlich.",
     "solution2Title": "Managed Buying Desk",
@@ -843,7 +843,7 @@
     "feature3Title": "Self-Serve zu festen Preisen",
     "feature3Body": "Wo Titel feste Preise veröffentlichen, können Ihre Planer:innen sofort buchen. Alles andere läuft transparent über das Desk.",
     "feature4Title": "White-Label (in Vorbereitung)",
-    "feature4Body": "ATNative in Ihren eigenen Kundenportalen anzeigen. Gleicher Katalog, Ihre Marke. Sprechen Sie uns für Early Access an.",
+    "feature4Body": "NativeSpin in Ihren eigenen Kundenportalen anzeigen. Gleicher Katalog, Ihre Marke. Sprechen Sie uns für Early Access an.",
     "workflowTitle": "Der gleiche Workflow, den Ihr Team schon nutzt",
     "workflowBody": "Brief → Plan → Anfrage → festes Angebot → Bestellung → Live-Platzierung → Reporting. Wir setzen genau dort an, wo es am meisten weh tut — Sourcing, Pricing, Content — ohne zu ändern, wie Sie briefen oder reporten.",
     "ctaTitle": "Eine Kampagne mit uns fahren",
@@ -864,10 +864,10 @@
     "benefit3Title": "Ihre Preisliste, Ihre Specs",
     "benefit3Body": "Preise und Inventar bleiben bei Ihnen. Wir verkaufen niemals unter Ihren veröffentlichten Konditionen weiter; unsere Marge liegt auf der Käuferseite.",
     "benefit4Title": "Eine einzige Abrechnung",
-    "benefit4Body": "Eine Rechnung pro Zyklus von ATNative über alle Werbetreibenden und Agenturen — zu Zahlungsbedingungen, die Sie festlegen.",
+    "benefit4Body": "Eine Rechnung pro Zyklus von NativeSpin über alle Werbetreibenden und Agenturen — zu Zahlungsbedingungen, die Sie festlegen.",
     "howTitle": "So funktioniert die Partnerschaft",
     "step1Title": "Preisliste onboarden",
-    "step1Body": "Wir importieren Ihr Media-Kit und übersetzen es in das ATNative-Katalogformat. Sie verifizieren; es geht live.",
+    "step1Body": "Wir importieren Ihr Media-Kit und übersetzen es in das NativeSpin-Katalogformat. Sie verifizieren; es geht live.",
     "step2Title": "Wir bringen Käufer",
     "step2Body": "Werbetreibende und Agenturen finden Ihre Titel, bauen einen Plan und stellen eine Anfrage.",
     "step3Title": "Angebot + Inhalt",
@@ -906,9 +906,9 @@
   },
   "about": {
     "eyebrow": "Über uns",
-    "metaTitle": "Über ATNative",
+    "metaTitle": "Über NativeSpin",
     "title": "Native ist operativ schmerzhaft. Wir lösen das.",
-    "lead": "ATNative ist ein Marktplatz für den Einkauf von Native Content und Native Advertising in Zeitungen und Magazinen — auch in den vielen, die nicht programmatisch verkaufen.",
+    "lead": "NativeSpin ist ein Marktplatz für den Einkauf von Native Content und Native Advertising in Zeitungen und Magazinen — auch in den vielen, die nicht programmatisch verkaufen.",
     "missionTitle": "Mission",
     "missionBody1": "Native-Inventar so leicht zu finden, zu vergleichen und zu kaufen machen wie Programmatic Display — ohne die redaktionelle Qualität zu verlieren, die Native überhaupt erst funktionieren lässt.",
     "missionBody2": "Wir denken vom Käufer aus: transparenter Katalog, transparente Preise, Managed Buying im Hintergrund, Content-Produktion abgestimmt auf jeden Titel. Die Verteidigung liegt im Datensatz und in den Beziehungen, nicht in einem einzelnen Feature.",
@@ -991,7 +991,7 @@
       },
       "featured": {
         "title": "Partner werden",
-        "description": "Ihre Titel bei ATNative onboarden."
+        "description": "Ihre Titel bei NativeSpin onboarden."
       }
     },
     "company": {
@@ -1095,7 +1095,7 @@
     "faqTitle": "Häufige Fragen"
   },
   "contact": {
-    "metaTitle": "ATNative kontaktieren",
+    "metaTitle": "NativeSpin kontaktieren",
     "eyebrow": "Kontakt",
     "title": "Kontakt aufnehmen",
     "lead": "Wählen Sie unten den passenden Kanal oder nutzen Sie das Formular. Wir antworten innerhalb eines Werktags auf jede Nachricht.",
@@ -1119,7 +1119,7 @@
     "bullet2": "Arbeitszeiten MEZ/MESZ",
     "bullet3": "Keine Drip-Kampagnen — versprochen",
     "pullTitle": "Lieber per E-Mail? ",
-    "pullBody": "Schreiben Sie an hello@atnative.com und wir kümmern uns intern.",
+    "pullBody": "Schreiben Sie an hello@nativespin.com und wir kümmern uns intern.",
     "formCardTitle": "Nachricht senden",
     "formCardLead": "Wir melden uns innerhalb eines Werktags.",
     "name": "Ihr Name",
@@ -1133,7 +1133,7 @@
     "message": "Nachricht",
     "messagePlaceholder": "Was wollen Sie erreichen und bis wann?",
     "submit": "Nachricht senden",
-    "altPrefix": "Neugierig, wer hinter ATNative steht?",
+    "altPrefix": "Neugierig, wer hinter NativeSpin steht?",
     "altLink": "Über uns lesen →"
   },
   "security": {
@@ -1182,11 +1182,11 @@
     "metaTitle": "Datenschutz",
     "eyebrow": "Datenschutz",
     "title": "Datenschutzerklärung",
-    "lead": "Wie ATNative personenbezogene Daten erhebt, nutzt und schützt — in verständlicher Sprache.",
+    "lead": "Wie NativeSpin personenbezogene Daten erhebt, nutzt und schützt — in verständlicher Sprache.",
     "lastUpdated": "Stand: 22. Mai 2026",
     "controller": {
       "title": "Wer ist Verantwortlicher",
-      "body": "ATNative AS ist Verantwortliche:r für personenbezogene Daten, die über diesen Marktplatz verarbeitet werden. Wir sitzen in Norwegen und verarbeiten alle Daten innerhalb der EU/des EWR."
+      "body": "NativeSpin AS ist Verantwortliche:r für personenbezogene Daten, die über diesen Marktplatz verarbeitet werden. Wir sitzen in Norwegen und verarbeiten alle Daten innerhalb der EU/des EWR."
     },
     "data": {
       "title": "Welche Daten wir erheben",
@@ -1214,7 +1214,7 @@
     },
     "rights": {
       "title": "Ihre Rechte",
-      "body": "Sie können Auskunft, Berichtigung, Löschung oder Export Ihrer personenbezogenen Daten verlangen und Widerspruch gegen Verarbeitungen auf Grundlage berechtigter Interessen einlegen. Wenden Sie sich dafür an privacy@atnative.com."
+      "body": "Sie können Auskunft, Berichtigung, Löschung oder Export Ihrer personenbezogenen Daten verlangen und Widerspruch gegen Verarbeitungen auf Grundlage berechtigter Interessen einlegen. Wenden Sie sich dafür an privacy@nativespin.com."
     },
     "cookies": {
       "title": "Cookies",
@@ -1231,11 +1231,11 @@
     "metaTitle": "Nutzungsbedingungen",
     "eyebrow": "AGB",
     "title": "Marktplatz-Nutzungsbedingungen",
-    "lead": "Diese Bedingungen regeln Ihre Nutzung von ATNative als Werbetreibend, Agentur oder Verlag.",
+    "lead": "Diese Bedingungen regeln Ihre Nutzung von NativeSpin als Werbetreibend, Agentur oder Verlag.",
     "lastUpdated": "Stand: 22. Mai 2026",
     "scope": {
       "title": "Geltungsbereich",
-      "body": "ATNative ist ein Marktplatz, der Werbetreibende und Agenturen mit Zeitungs- und Magazinverlagen verbindet, die Native Content und Native Advertising anbieten. Diese Bedingungen gelten für alle Nutzer:innen des Marktplatzes."
+      "body": "NativeSpin ist ein Marktplatz, der Werbetreibende und Agenturen mit Zeitungs- und Magazinverlagen verbindet, die Native Content und Native Advertising anbieten. Diese Bedingungen gelten für alle Nutzer:innen des Marktplatzes."
     },
     "accounts": {
       "title": "Konten",
@@ -1251,7 +1251,7 @@
     },
     "content": {
       "title": "Inhalt",
-      "body": "Über ATNative produzierte Inhalte werden dem Werbetreibenden für die gebuchte Platzierung lizenziert. Verlage können Inhalte mit schriftlicher Begründung ablehnen, wenn sie nicht den redaktionellen Standards entsprechen."
+      "body": "Über NativeSpin produzierte Inhalte werden dem Werbetreibenden für die gebuchte Platzierung lizenziert. Verlage können Inhalte mit schriftlicher Begründung ablehnen, wenn sie nicht den redaktionellen Standards entsprechen."
     },
     "fees": {
       "title": "Gebühren und Zahlung",
@@ -1259,7 +1259,7 @@
     },
     "liability": {
       "title": "Haftung",
-      "body": "ATNative vermittelt die Transaktion, ist aber nicht Verleger der platzierten Artikel. Jede Partei ist für die Einhaltung des geltenden Werbe-, Kennzeichnungs- und Verbraucherschutzrechts verantwortlich. Die Haftung ist auf die in den vorangegangenen 12 Monaten gezahlten Gebühren begrenzt."
+      "body": "NativeSpin vermittelt die Transaktion, ist aber nicht Verleger der platzierten Artikel. Jede Partei ist für die Einhaltung des geltenden Werbe-, Kennzeichnungs- und Verbraucherschutzrechts verantwortlich. Die Haftung ist auf die in den vorangegangenen 12 Monaten gezahlten Gebühren begrenzt."
     },
     "termination": {
       "title": "Kündigung",
@@ -1277,13 +1277,13 @@
     "contactBody": "Fragen zu diesen Bedingungen — schreiben Sie an"
   },
   "apiDocs": {
-    "metaTitle": "ATNative API",
+    "metaTitle": "NativeSpin API",
     "eyebrow": "Developers",
-    "title": "ATNative public catalog API",
-    "lead": "A read API over the ATNative title catalog — designed for agency planning tools (Atlas-style) and adtech partners that need normalised supply data for editorial native across our 9 markets — Norway, Sweden, Denmark, Finland, Germany, Austria, Switzerland, the UK and Ireland.",
+    "title": "NativeSpin public catalog API",
+    "lead": "A read API over the NativeSpin title catalog — designed for agency planning tools (Atlas-style) and adtech partners that need normalised supply data for editorial native across our 9 markets — Norway, Sweden, Denmark, Finland, Germany, Austria, Switzerland, the UK and Ireland.",
     "authTitle": "Authentication",
-    "authBody": "Every request carries a Bearer API key in the Authorization header. Keys are issued per integration partner by the ATNative team and scoped to catalog:read.",
-    "authRequest": "Send a structured request to partners@atnative.com — tell us the integration shape and the markets you care about, and we will issue you a key.",
+    "authBody": "Every request carries a Bearer API key in the Authorization header. Keys are issued per integration partner by the NativeSpin team and scoped to catalog:read.",
+    "authRequest": "Send a structured request to partners@nativespin.com — tell us the integration shape and the markets you care about, and we will issue you a key.",
     "endpointsEyebrow": "v1 endpoints",
     "endpointsTitle": "What is available today",
     "listBody": "Paginated catalog listing of every active title with at least one active product. Filter by market (NO/SE/DK/FI/DE/AT/CH/UK/IE) and format (NATIVE_ARTICLE/ADVERTORIAL/NATIVE_DISPLAY/PACKAGE).",
@@ -1311,7 +1311,7 @@
     "issueTitle": "Issue a new key",
     "nameLabel": "Name / partner",
     "orgLabel": "Owning organisation (optional)",
-    "orgPlatform": "ATNative platform key (no org)",
+    "orgPlatform": "NativeSpin platform key (no org)",
     "scopesLabel": "Scopes",
     "scopesHint": "Comma-separated. Current options: catalog:read.",
     "ttlLabel": "Expires in (days)",
@@ -1342,7 +1342,7 @@
     "anchorLabel": "Listenpreis",
     "anchorSavings": "−{pct}% gegenüber Listenpreis",
     "anchorNote": "Der öffentliche Listenpreis des Verlags für diese Platzierung. Ihr Komplettpreis enthält Inhaltsproduktion, Platzierung, Revisionen und Reporting.",
-    "whyThisPrice": "ATNative pflegt direkte redaktionelle Beziehungen zu allen Titeln in Ihrem Angebot. Wir verhandeln die Platzierung, beauftragen eine fachkundige Autorin oder einen fachkundigen Autor, koordinieren die redaktionelle Abnahme mit dem Verlag und liefern das Reporting. Sie haben einen verantwortlichen Partner und einen Komplettpreis — keine getrennte Medienrechnung, Autorenrechnung und Agenturpauschale.",
+    "whyThisPrice": "NativeSpin pflegt direkte redaktionelle Beziehungen zu allen Titeln in Ihrem Angebot. Wir verhandeln die Platzierung, beauftragen eine fachkundige Autorin oder einen fachkundigen Autor, koordinieren die redaktionelle Abnahme mit dem Verlag und liefern das Reporting. Sie haben einen verantwortlichen Partner und einen Komplettpreis — keine getrennte Medienrechnung, Autorenrechnung und Agenturpauschale.",
     "termsPayment": "50 % bei Annahme, 50 % bei Veröffentlichung.",
     "termsCancellation": "Volle Rückerstattung vor Freigabe des Briefings; 50 % Rückerstattung vor dem ersten Entwurf; nach Bestätigung des Slots beim Verlag nicht erstattungsfähig.",
     "termsValidity": "Angebot gilt 14 Tage. Verfügbarkeit beim Verlag wird bei Annahme bestätigt.",
@@ -1469,7 +1469,7 @@
   },
   "priceRequestForm": {
     "hi": "Hallo {name},",
-    "intro": "Wir listen {title} ({publisher}) im ATNative-Katalog und möchten die aktuellen Preise bestätigen.",
+    "intro": "Wir listen {title} ({publisher}) im NativeSpin-Katalog und möchten die aktuellen Preise bestätigen.",
     "hasNative": {
       "question": "Bietet dieser Titel noch Native-Content an?",
       "yes": "Ja",
@@ -1501,14 +1501,14 @@
     "note": "Gibt es noch etwas, das wir wissen sollten?",
     "submit": "Preise senden",
     "closed": {
-      "expired": { "title": "Link abgelaufen", "body": "Bitte wenden Sie sich an Ihren ATNative-Ansprechpartner, um einen neuen Link zu erhalten." },
+      "expired": { "title": "Link abgelaufen", "body": "Bitte wenden Sie sich an Ihren NativeSpin-Ansprechpartner, um einen neuen Link zu erhalten." },
       "responded": { "title": "Bereits erhalten", "body": "Danke — wir haben Ihre Antwort bereits gespeichert." },
-      "cancelled": { "title": "Link storniert", "body": "Bitte wenden Sie sich an Ihren ATNative-Ansprechpartner." },
-      "unknown": { "title": "Link nicht verfügbar", "body": "Bitte wenden Sie sich an Ihren ATNative-Ansprechpartner." }
+      "cancelled": { "title": "Link storniert", "body": "Bitte wenden Sie sich an Ihren NativeSpin-Ansprechpartner." },
+      "unknown": { "title": "Link nicht verfügbar", "body": "Bitte wenden Sie sich an Ihren NativeSpin-Ansprechpartner." }
     },
     "thanks": {
       "title": "Danke!",
-      "body": "Wir haben Ihre Preise erfasst. Das ATNative-Team wird diese in Kürze prüfen und eintragen."
+      "body": "Wir haben Ihre Preise erfasst. Das NativeSpin-Team wird diese in Kürze prüfen und eintragen."
     }
   }
 }

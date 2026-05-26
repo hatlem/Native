@@ -27,8 +27,8 @@ test("non-English locales are actually translated (not stubbed to en)", () => {
 
 test("subject functions interpolate the app name in every locale", () => {
   for (const loc of LOCALES) {
-    const subj = strings(loc).magicLink.subject("ATNative");
-    assert.ok(subj.includes("ATNative"), `${loc}: subject didn't include app name`);
+    const subj = strings(loc).magicLink.subject("NativeSpin");
+    assert.ok(subj.includes("NativeSpin"), `${loc}: subject didn't include app name`);
   }
 });
 

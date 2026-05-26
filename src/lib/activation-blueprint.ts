@@ -4,7 +4,7 @@
 // History: the original blueprint was market-blind (NOK 25 per 1000
 // reach for native articles). That makes sense in NO; it produces
 // EUR 120 for a German B2B trade with 4,800 IVW circulation — well
-// below ATNative's content-production cost. Ingrid's scenario
+// below NativeSpin's content-production cost. Ingrid's scenario
 // (Frankfurter Stilhaus expansion) surfaced this as a real launch
 // blocker — without per-market overrides the catalog would either
 // publish nonsense indicative prices or require manual overrides on

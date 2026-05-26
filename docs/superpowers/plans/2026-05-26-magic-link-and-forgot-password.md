@@ -397,7 +397,7 @@ export function makeResendAdapter(
   const key = env.RESEND_API_KEY;
   if (!key) return null;
   const client = new Resend(key);
-  const from = env.AUTH_EMAIL_FROM ?? "ATNative <noreply@atnative.com>";
+  const from = env.AUTH_EMAIL_FROM ?? "NativeSpin <noreply@nativespin.com>";
   const replyTo = env.AUTH_EMAIL_REPLY_TO;
   return async (msg) => {
     await client.emails.send({
@@ -689,23 +689,23 @@ import { test } from "node:test";
 import assert from "node:assert/strict";
 import { magicLinkEmail } from "./magic-link";
 
-const URL = "https://atnative.com/en/magic-link/abc123";
+const URL = "https://nativespin.com/en/magic-link/abc123";
 
 test("magicLinkEmail returns subject, text, html with the URL embedded", () => {
-  const m = magicLinkEmail({ url: URL, locale: "en", appName: "ATNative" });
-  assert.ok(m.subject.includes("ATNative"));
+  const m = magicLinkEmail({ url: URL, locale: "en", appName: "NativeSpin" });
+  assert.ok(m.subject.includes("NativeSpin"));
   assert.ok(m.text.includes(URL));
   assert.ok(m.html!.includes(URL));
 });
 
 test("magicLinkEmail falls back to en for unknown locale", () => {
-  const m = magicLinkEmail({ url: URL, locale: "klingon", appName: "ATNative" });
-  assert.ok(m.subject.includes("ATNative"));
+  const m = magicLinkEmail({ url: URL, locale: "klingon", appName: "NativeSpin" });
+  assert.ok(m.subject.includes("NativeSpin"));
   assert.ok(m.text.includes(URL));
 });
 
 test("magicLinkEmail text body is plain (no HTML tags)", () => {
-  const m = magicLinkEmail({ url: URL, locale: "en", appName: "ATNative" });
+  const m = magicLinkEmail({ url: URL, locale: "en", appName: "NativeSpin" });
   assert.equal(m.text.includes("<"), false);
   assert.equal(m.text.includes(">"), false);
 });
@@ -780,17 +780,17 @@ import { test } from "node:test";
 import assert from "node:assert/strict";
 import { passwordResetEmail } from "./password-reset";
 
-const URL = "https://atnative.com/en/reset-password/abc123";
+const URL = "https://nativespin.com/en/reset-password/abc123";
 
 test("passwordResetEmail returns subject, text, html with the URL embedded", () => {
-  const m = passwordResetEmail({ url: URL, locale: "en", appName: "ATNative" });
+  const m = passwordResetEmail({ url: URL, locale: "en", appName: "NativeSpin" });
   assert.ok(m.subject.toLowerCase().includes("password"));
   assert.ok(m.text.includes(URL));
   assert.ok(m.html!.includes(URL));
 });
 
 test("passwordResetEmail footer says password won't change unprompted", () => {
-  const m = passwordResetEmail({ url: URL, locale: "en", appName: "ATNative" });
+  const m = passwordResetEmail({ url: URL, locale: "en", appName: "NativeSpin" });
   assert.match(m.text, /password won't change|password will not change/i);
 });
 ```
@@ -865,18 +865,18 @@ import assert from "node:assert/strict";
 import { welcomeEmail } from "./welcome";
 
 test("welcomeEmail subject includes the app name", () => {
-  const m = welcomeEmail({ catalogUrl: "https://atnative.com/en/catalog", locale: "en", appName: "ATNative" });
-  assert.ok(m.subject.includes("ATNative"));
+  const m = welcomeEmail({ catalogUrl: "https://nativespin.com/en/catalog", locale: "en", appName: "NativeSpin" });
+  assert.ok(m.subject.includes("NativeSpin"));
 });
 
 test("welcomeEmail body references the app name", () => {
-  const m = welcomeEmail({ catalogUrl: "https://atnative.com/en/catalog", locale: "en", appName: "ATNative" });
-  assert.ok(m.text.includes("ATNative"));
+  const m = welcomeEmail({ catalogUrl: "https://nativespin.com/en/catalog", locale: "en", appName: "NativeSpin" });
+  assert.ok(m.text.includes("NativeSpin"));
 });
 
 test("welcomeEmail CTA points to the catalog url", () => {
-  const url = "https://atnative.com/en/catalog";
-  const m = welcomeEmail({ catalogUrl: url, locale: "en", appName: "ATNative" });
+  const url = "https://nativespin.com/en/catalog";
+  const m = welcomeEmail({ catalogUrl: url, locale: "en", appName: "NativeSpin" });
   assert.ok(m.html!.includes(url));
 });
 ```
@@ -956,7 +956,7 @@ test("passwordChangedEmail body includes IP and timestamp", () => {
     ip: "203.0.113.4",
     at: "2026-05-26 14:00 UTC",
     locale: "en",
-    appName: "ATNative",
+    appName: "NativeSpin",
   });
   assert.ok(m.text.includes("203.0.113.4"));
   assert.ok(m.text.includes("2026-05-26 14:00 UTC"));
@@ -968,7 +968,7 @@ test("passwordChangedEmail has no CTA (informational only)", () => {
     ip: "x",
     at: "y",
     locale: "en",
-    appName: "ATNative",
+    appName: "NativeSpin",
   });
   // No href button — only the body text and footer.
   assert.equal(m.html!.match(/<a [^>]*href=/g)?.length ?? 0, 0);
@@ -1049,21 +1049,21 @@ test("newSigninAlertEmail body includes the new IP", () => {
   const m = newSigninAlertEmail({
     ip: "198.51.100.7",
     at: "2026-05-26 14:00 UTC",
-    resetUrl: "https://atnative.com/en/forgot-password",
+    resetUrl: "https://nativespin.com/en/forgot-password",
     locale: "en",
-    appName: "ATNative",
+    appName: "NativeSpin",
   });
   assert.ok(m.text.includes("198.51.100.7"));
 });
 
 test("newSigninAlertEmail CTA links to the reset URL", () => {
-  const url = "https://atnative.com/en/forgot-password";
+  const url = "https://nativespin.com/en/forgot-password";
   const m = newSigninAlertEmail({
     ip: "x",
     at: "y",
     resetUrl: url,
     locale: "en",
-    appName: "ATNative",
+    appName: "NativeSpin",
   });
   assert.ok(m.html!.includes(url));
 });
@@ -1378,7 +1378,7 @@ function appUrl(): string {
 }
 
 function appName(): string {
-  return process.env.AUTH_APP_NAME ?? "ATNative";
+  return process.env.AUTH_APP_NAME ?? "NativeSpin";
 }
 ```
 
@@ -2121,7 +2121,7 @@ function appUrl(): string {
 }
 
 function appName(): string {
-  return process.env.AUTH_APP_NAME ?? "ATNative";
+  return process.env.AUTH_APP_NAME ?? "NativeSpin";
 }
 
 export default async function MagicLinkPage({
@@ -2306,9 +2306,9 @@ If it exists, append:
 # --- Auth emails (Resend) ---
 # Optional in dev — when unset, emails are logged to the console only.
 RESEND_API_KEY=
-AUTH_EMAIL_FROM="ATNative <noreply@atnative.com>"
+AUTH_EMAIL_FROM="NativeSpin <noreply@nativespin.com>"
 AUTH_EMAIL_REPLY_TO=
-AUTH_APP_NAME="ATNative"
+AUTH_APP_NAME="NativeSpin"
 ```
 
 If it does NOT exist, create it with at least the four lines above (this is fine — Next.js will simply ignore an unrecognised file outside `.env.local`).
@@ -2396,14 +2396,14 @@ Run this checklist before shipping a release that touches auth.
 
 1. Set `RESEND_API_KEY` to a real Resend test key (or use a Resend dashboard with "test mode" enabled).
 2. Set `AUTH_EMAIL_FROM` to an address Resend will accept for your verified domain.
-3. Have a seeded test user — e.g. `buyer@atnative.com`.
+3. Have a seeded test user — e.g. `buyer@nativespin.com`.
 
 ## Magic link sign-in
 
 - [ ] Visit `/en/signin`, scroll to the magic-link form
-- [ ] Enter `buyer@atnative.com`, click "Send sign-in link"
+- [ ] Enter `buyer@nativespin.com`, click "Send sign-in link"
 - [ ] Redirected to `/en/check-email`
-- [ ] Check the Resend dashboard — one delivery to `buyer@atnative.com`
+- [ ] Check the Resend dashboard — one delivery to `buyer@nativespin.com`
 - [ ] Click the link in the email → land on `/en/catalog` (or the seeded user's landing page)
 - [ ] Reload the same link → "this sign-in link has expired" page renders
 - [ ] Repeat with an UNKNOWN email — still redirects to `/en/check-email`, NO email is sent
@@ -2411,7 +2411,7 @@ Run this checklist before shipping a release that touches auth.
 ## Password reset
 
 - [ ] Visit `/en/signin`, click "Forgot password?"
-- [ ] Enter `buyer@atnative.com`, submit
+- [ ] Enter `buyer@nativespin.com`, submit
 - [ ] Redirected to `/en/check-email`
 - [ ] Click reset link in the email → "set a new password" form renders
 - [ ] Submit a new password (≥8 chars) → signed in + redirected to `/en/catalog`

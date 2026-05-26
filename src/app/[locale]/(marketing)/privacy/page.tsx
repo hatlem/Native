@@ -60,8 +60,8 @@ export default async function PrivacyPage({
           <h2>{t("contactTitle")}</h2>
           <p className="prose">
             {t("contactBody")}{" "}
-            <a className="link" href="mailto:privacy@atnative.com">
-              privacy@atnative.com
+            <a className="link" href="mailto:privacy@nativespin.com">
+              privacy@nativespin.com
             </a>
           </p>
         </section>

@@ -6,14 +6,14 @@ Run this checklist before shipping a release that touches auth.
 
 1. Set `RESEND_API_KEY` to a real Resend test key (or use a Resend dashboard with "test mode" enabled).
 2. Set `AUTH_EMAIL_FROM` to an address Resend will accept for your verified domain.
-3. Have a seeded test user — e.g. `buyer@atnative.com`.
+3. Have a seeded test user — e.g. `buyer@nativespin.com`.
 
 ## Magic link sign-in
 
 - [ ] Visit `/en/signin`, scroll to the magic-link form
-- [ ] Enter `buyer@atnative.com`, click "Send sign-in link"
+- [ ] Enter `buyer@nativespin.com`, click "Send sign-in link"
 - [ ] Redirected to `/en/check-email`
-- [ ] Check the Resend dashboard — one delivery to `buyer@atnative.com`
+- [ ] Check the Resend dashboard — one delivery to `buyer@nativespin.com`
 - [ ] Click the link in the email → land on `/en/catalog` (or the seeded user's landing page)
 - [ ] Reload the same link → "this sign-in link has expired" page renders
 - [ ] Repeat with an UNKNOWN email — still redirects to `/en/check-email`, NO email is sent
@@ -21,7 +21,7 @@ Run this checklist before shipping a release that touches auth.
 ## Password reset
 
 - [ ] Visit `/en/signin`, click "Forgot password?"
-- [ ] Enter `buyer@atnative.com`, submit
+- [ ] Enter `buyer@nativespin.com`, submit
 - [ ] Redirected to `/en/check-email`
 - [ ] Click reset link in the email → "set a new password" form renders
 - [ ] Submit a new password (≥8 chars) → signed in + redirected to `/en/catalog`

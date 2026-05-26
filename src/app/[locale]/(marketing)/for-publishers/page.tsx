@@ -39,7 +39,7 @@ export default async function ForPublishersPage({
           <h1>{t("title")}</h1>
           <p className="lead">{t("lead")}</p>
           <div className="hero-actions">
-            <a href="mailto:partners@atnative.com" className="btn primary">
+            <a href="mailto:partners@nativespin.com" className="btn primary">
               {t("contactCta")} <span className="arrow">→</span>
             </a>
             <Link href="/how-it-works" className="btn secondary">
@@ -104,7 +104,7 @@ export default async function ForPublishersPage({
           <h2>{t("ctaTitle")}</h2>
           <p>{t("ctaBody")}</p>
           <div className="hero-actions">
-            <a href="mailto:partners@atnative.com" className="btn primary">
+            <a href="mailto:partners@nativespin.com" className="btn primary">
               {t("contactCta")} <span className="arrow">→</span>
             </a>
           </div>

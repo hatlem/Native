@@ -83,7 +83,7 @@ export default async function AboutPage({
           <h2>{t("contactTitle")}</h2>
           <p>{t("contactBody")}</p>
           <div className="hero-actions">
-            <a href="mailto:hello@atnative.com" className="btn primary">
+            <a href="mailto:hello@nativespin.com" className="btn primary">
               {t("contactCta")} <span className="arrow">→</span>
             </a>
             <Link href="/catalog" className="btn secondary">

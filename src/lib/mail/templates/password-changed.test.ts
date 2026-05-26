@@ -7,7 +7,7 @@ test("passwordChangedEmail body includes IP and timestamp", () => {
     ip: "203.0.113.4",
     at: "2026-05-26 14:00 UTC",
     locale: "en",
-    appName: "ATNative",
+    appName: "NativeSpin",
   });
   assert.ok(m.text.includes("203.0.113.4"));
   assert.ok(m.text.includes("2026-05-26 14:00 UTC"));
@@ -19,7 +19,7 @@ test("passwordChangedEmail has no CTA (informational only)", () => {
     ip: "x",
     at: "y",
     locale: "en",
-    appName: "ATNative",
+    appName: "NativeSpin",
   });
   assert.equal(m.html!.match(/<a [^>]*href=/g)?.length ?? 0, 0);
 });

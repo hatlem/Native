@@ -22,9 +22,9 @@ export default async function ContactPage({
   const t = await getTranslations({ locale, namespace: "contact" });
 
   const channels = [
-    { id: "sales", email: "sales@atnative.com" },
-    { id: "publishers", email: "partners@atnative.com" },
-    { id: "support", email: "support@atnative.com" },
+    { id: "sales", email: "sales@nativespin.com" },
+    { id: "publishers", email: "partners@nativespin.com" },
+    { id: "support", email: "support@nativespin.com" },
   ] as const;
 
   return (
@@ -70,7 +70,7 @@ export default async function ContactPage({
 
         <form
           className="auth-card"
-          action="mailto:hello@atnative.com"
+          action="mailto:hello@nativespin.com"
           method="post"
           encType="text/plain"
         >

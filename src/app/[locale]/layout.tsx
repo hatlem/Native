@@ -208,7 +208,7 @@ export default async function LocaleLayout({
                 <ul>
                   <li><Link href="/about">{tm("footerAbout")}</Link></li>
                   <li>
-                    <a href="mailto:hello@atnative.com">
+                    <a href="mailto:hello@nativespin.com">
                       {tm("footerContact")}
                     </a>
                   </li>

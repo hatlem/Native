@@ -75,20 +75,20 @@ export function inviteEmail(args: {
   inviterName?: string | null;
   link: string;
 }): { subject: string; text: string } {
-  const subject = `ATNative — partnership invitation for ${args.publisherName}`;
+  const subject = `NativeSpin — partnership invitation for ${args.publisherName}`;
   const lines = [
     `Hi,`,
     ``,
-    `${args.inviterName ?? "The ATNative team"} has added ${args.publisherName} to the ATNative catalog and invited you to claim a publisher portal account.`,
+    `${args.inviterName ?? "The NativeSpin team"} has added ${args.publisherName} to the NativeSpin catalog and invited you to claim a publisher portal account.`,
     ``,
-    `The portal lets you maintain rate cards, specs, availability, and bookings for the titles ATNative buyers can book through us.`,
+    `The portal lets you maintain rate cards, specs, availability, and bookings for the titles NativeSpin buyers can book through us.`,
     ``,
     `Claim the account here (link expires in ${DEFAULT_INVITE_TTL_DAYS} days):`,
     args.link,
     ``,
     `If you weren't expecting this, you can ignore the message — the link is single-use.`,
     ``,
-    `— ATNative`,
+    `— NativeSpin`,
   ];
   return { subject, text: lines.join("\n") };
 }

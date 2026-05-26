@@ -82,7 +82,7 @@ test("byline placeholder [SPONSOR] accepts any sponsor name (Liv's gap)", () => 
   // placeholder is a wildcard so the producer-credit suffix is fine.
   const r = specCheck({
     body:
-      "Annonsörbetalt innehåll · Producerat för Hud & Glöd av ATNative redaktion. " +
+      "Annonsörbetalt innehåll · Producerat för Hud & Glöd av NativeSpin redaktion. " +
       "Words words words words words.",
     wordCountMin: 5,
     titleDisclosure: "Producerat för [SPONSOR]",

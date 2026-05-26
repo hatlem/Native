@@ -93,7 +93,7 @@ export async function GET(req: NextRequest) {
     },
     {
       headers: {
-        "Content-Disposition": `attachment; filename="atnative-export-${Date.now()}.json"`,
+        "Content-Disposition": `attachment; filename="nativespin-export-${Date.now()}.json"`,
       },
     },
   );

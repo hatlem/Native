@@ -41,7 +41,7 @@ function en(a: EmailArgs): Built {
     text: [
       `Hi ${a.contactName},`,
       ``,
-      `${a.inviterName} at ATNative is keeping our catalog pricing for ${a.titleName} (${a.publisherName}) up to date.`,
+      `${a.inviterName} at NativeSpin is keeping our catalog pricing for ${a.titleName} (${a.publisherName}) up to date.`,
       ``,
       `Could you confirm your current native rates? It takes ~2 minutes:`,
       a.link,
@@ -51,7 +51,7 @@ function en(a: EmailArgs): Built {
       `Link is good for ${a.ttlDays ?? 30} days.`,
       ``,
       `Thanks,`,
-      `${a.inviterName} / ATNative`,
+      `${a.inviterName} / NativeSpin`,
     ].join("\n"),
   };
 }
@@ -62,7 +62,7 @@ function no(a: EmailArgs): Built {
     text: [
       `Hei ${a.contactName},`,
       ``,
-      `${a.inviterName} fra ATNative holder katalogprisene for ${a.titleName} (${a.publisherName}) oppdatert.`,
+      `${a.inviterName} fra NativeSpin holder katalogprisene for ${a.titleName} (${a.publisherName}) oppdatert.`,
       ``,
       `Kan du bekrefte gjeldende native-priser? Tar omtrent 2 minutter:`,
       a.link,
@@ -72,7 +72,7 @@ function no(a: EmailArgs): Built {
       `Lenken er gyldig i ${a.ttlDays ?? 30} dager.`,
       ``,
       `Takk,`,
-      `${a.inviterName} / ATNative`,
+      `${a.inviterName} / NativeSpin`,
     ].join("\n"),
   };
 }
@@ -83,7 +83,7 @@ function sv(a: EmailArgs): Built {
     text: [
       `Hej ${a.contactName},`,
       ``,
-      `${a.inviterName} på ATNative håller katalogpriserna för ${a.titleName} (${a.publisherName}) aktuella.`,
+      `${a.inviterName} på NativeSpin håller katalogpriserna för ${a.titleName} (${a.publisherName}) aktuella.`,
       ``,
       `Kan du bekräfta era nuvarande native-priser? Tar ungefär 2 minuter:`,
       a.link,
@@ -93,7 +93,7 @@ function sv(a: EmailArgs): Built {
       `Länken är giltig i ${a.ttlDays ?? 30} dagar.`,
       ``,
       `Tack,`,
-      `${a.inviterName} / ATNative`,
+      `${a.inviterName} / NativeSpin`,
     ].join("\n"),
   };
 }
@@ -104,7 +104,7 @@ function da(a: EmailArgs): Built {
     text: [
       `Hej ${a.contactName},`,
       ``,
-      `${a.inviterName} fra ATNative holder katalogpriserne for ${a.titleName} (${a.publisherName}) opdaterede.`,
+      `${a.inviterName} fra NativeSpin holder katalogpriserne for ${a.titleName} (${a.publisherName}) opdaterede.`,
       ``,
       `Kan du bekræfte jeres aktuelle native-priser? Det tager ca. 2 minutter:`,
       a.link,
@@ -114,7 +114,7 @@ function da(a: EmailArgs): Built {
       `Linket gælder i ${a.ttlDays ?? 30} dage.`,
       ``,
       `Tak,`,
-      `${a.inviterName} / ATNative`,
+      `${a.inviterName} / NativeSpin`,
     ].join("\n"),
   };
 }
@@ -125,7 +125,7 @@ function fi(a: EmailArgs): Built {
     text: [
       `Hei ${a.contactName},`,
       ``,
-      `${a.inviterName} ATNativelta pitää luettelohinnat ajan tasalla julkaisulle ${a.titleName} (${a.publisherName}).`,
+      `${a.inviterName} NativeSpinlta pitää luettelohinnat ajan tasalla julkaisulle ${a.titleName} (${a.publisherName}).`,
       ``,
       `Voitko vahvistaa nykyiset natiivimainonnan hinnat? Vie noin 2 minuuttia:`,
       a.link,
@@ -135,7 +135,7 @@ function fi(a: EmailArgs): Built {
       `Linkki on voimassa ${a.ttlDays ?? 30} päivää.`,
       ``,
       `Kiitos,`,
-      `${a.inviterName} / ATNative`,
+      `${a.inviterName} / NativeSpin`,
     ].join("\n"),
   };
 }
@@ -146,7 +146,7 @@ function de(a: EmailArgs): Built {
     text: [
       `Hallo ${a.contactName},`,
       ``,
-      `${a.inviterName} bei ATNative hält die Katalogpreise für ${a.titleName} (${a.publisherName}) aktuell.`,
+      `${a.inviterName} bei NativeSpin hält die Katalogpreise für ${a.titleName} (${a.publisherName}) aktuell.`,
       ``,
       `Können Sie Ihre aktuellen Native-Preise bestätigen? Dauert etwa 2 Minuten:`,
       a.link,
@@ -156,7 +156,7 @@ function de(a: EmailArgs): Built {
       `Der Link ist ${a.ttlDays ?? 30} Tage gültig.`,
       ``,
       `Danke,`,
-      `${a.inviterName} / ATNative`,
+      `${a.inviterName} / NativeSpin`,
     ].join("\n"),
   };
 }

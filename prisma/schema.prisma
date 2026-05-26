@@ -1,4 +1,4 @@
-// ATNative data model — see PLAN.md §8.
+// NativeSpin data model — see PLAN.md §8.
 // Phase 0 focuses on the catalog (Market/Publisher/Title/Product/PriceRule/Spec);
 // the commerce/content entities are modeled now because they gate later phases.
 

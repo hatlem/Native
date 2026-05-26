@@ -1,8 +1,8 @@
 {
-  "name": "atnative",
+  "name": "nativespin",
   "version": "0.0.0",
   "private": true,
-  "description": "ATNative — Nordic marketplace for buying native content and native advertising in newspapers and magazines.",
+  "description": "NativeSpin — Nordic marketplace for buying native content and native advertising in newspapers and magazines.",
   "scripts": {
     "dev": "next dev",
     "build": "prisma generate && next build",
