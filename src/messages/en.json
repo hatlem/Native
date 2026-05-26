@@ -210,7 +210,7 @@
   },
   "catalog": {
     "eyebrow": "Browse",
-    "title": "Every title that runs native across our 9 markets",
+    "title": "Every title that runs native",
     "subtitle": "Filter by market, format and audience. Indicative pricing on every product — firm pricing on request via the desk.",
     "resultCount": "{count, plural, =0 {No matches} =1 {1 title} other {# titles}}",
     "removeFilter": "Remove filter",
@@ -222,12 +222,23 @@
       "onlyPriced": "Priced titles only",
       "all": "All",
       "search": "Search",
-      "searchPlaceholder": "Title, vertical or tag …",
-      "apply": "Apply"
+      "searchPlaceholder": "Search titles, verticals or tags…",
+      "apply": "Apply",
+      "advanced": "Advanced options",
+      "formatCount": "{count, plural, =0 {All formats} =1 {1 format} other {# formats}}",
+      "compareMode": "Compare picker",
+      "compareModeHint": "Tick titles to compare side-by-side",
+      "loading": "Updating…"
+    },
+    "compareBar": {
+      "label": "{count, plural, =1 {1 title selected} other {# titles selected}}",
+      "open": "Compare →",
+      "clear": "Clear"
     },
     "card": {
       "from": "From",
-      "reach": "Monthly reach",
+      "reach": "Monthly readers (combined)",
+      "digitalReach": "Monthly online readers",
       "circulation": "Circulation",
       "leadTime": "Lead time",
       "days": "days",
@@ -265,7 +276,8 @@
   "titleDetail": {
     "back": "Back to catalog",
     "publishedBy": "Published by",
-    "reach": "Monthly reach",
+    "reach": "Monthly readers (combined)",
+    "digitalReach": "Monthly online readers",
     "formats": "Native formats",
     "circulation": "Circulation",
     "leadTime": "Lead time",
@@ -779,10 +791,19 @@
     "ADVERTORIAL": "Advertorial",
     "NATIVE_DISPLAY": "Native display",
     "PACKAGE": "Package",
+    "CONTEXTUAL": "Contextual",
+    "OTHER": "Other",
     "descNATIVE_ARTICLE": "Editorial-grade article paid for by a brand, written and designed in the title's voice. Readers finish it the way they finish any other story.",
     "descADVERTORIAL": "Sponsored article clearly labelled as paid content. Brand presence is up front; the surrounding design stays editorial.",
     "descNATIVE_DISPLAY": "Display unit that inherits the publisher's typography and runs in-feed, not in banner slots. The trust transfer is most of the value.",
-    "descPACKAGE": "Bundled native article plus native display amplification in the same title — the article does the persuasion, the display does the reach."
+    "descPACKAGE": "Bundled native article plus native display amplification in the same title — the article does the persuasion, the display does the reach.",
+    "descCONTEXTUAL": "Placement targeted by page topic and surrounding editorial context rather than user data — the relevance comes from where the ad runs.",
+    "descOTHER": "Custom or one-off format that doesn't fit the standard categories — typically negotiated case by case."
+  },
+  "nativeFit": {
+    "High": "High",
+    "Medium": "Medium",
+    "Low": "Low"
   },
   "market": {
     "NO": "Norway",
@@ -1563,16 +1584,20 @@
     "empty": "No sales contacts attached to this title.",
     "primary": "Primary",
     "makePrimary": "Make primary",
+    "settingPrimary": "Setting primary…",
     "detach": "Detach",
+    "detaching": "Detaching…",
     "attachExisting": "Attach an existing contact",
     "attach": "Attach",
+    "attaching": "Attaching…",
     "addNew": "Add new contact",
     "name": "Name",
     "email": "Email",
     "phone": "Phone",
     "role": "Role",
     "notes": "Notes",
-    "create": "Create contact"
+    "create": "Create contact",
+    "creating": "Creating…"
   },
   "priceRequests": {
     "title": "Price requests",
@@ -1580,8 +1605,11 @@
     "noContactsHint": "Add a sales contact above before sending a request.",
     "noRequests": "No requests yet for this title.",
     "send": "Send request",
+    "sending": "Sending…",
     "resend": "Resend",
+    "resending": "Resending…",
     "cancel": "Cancel",
+    "cancelling": "Cancelling…",
     "logManual": "Log response manually",
     "primary": "primary",
     "col": {
@@ -1604,7 +1632,8 @@
       "currency": "Currency",
       "included": "What's included",
       "excluded": "What's NOT included",
-      "submit": "Log this quote"
+      "submit": "Log this quote",
+      "submitting": "Logging…"
     }
   },
   "pendingQuotes": {
@@ -1623,12 +1652,15 @@
     "excluded": "Excluded",
     "newFormat": "New format",
     "apply": "Apply",
+    "applying": "Applying…",
     "reject": "Reject",
+    "rejecting": "Rejecting…",
     "rejectReason": "Reason (optional)",
     "editBefore": "Edit before applying",
     "price": "Price",
     "currency": "Currency",
     "saveEdit": "Save",
+    "savingEdit": "Saving…",
     "col": {
       "title": "Title",
       "received": "Received",

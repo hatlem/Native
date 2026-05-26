@@ -8,6 +8,7 @@ import {
   logManualResponseAction,
 } from "@/app/price-actions";
 import { listContactsForTitle } from "@/lib/pricing/contacts";
+import { SubmitButton } from "@/components";
 
 export async function PriceRequestsPanel({
   locale,
@@ -57,9 +58,11 @@ export async function PriceRequestsPanel({
                 ))}
               </select>
             </div>
-            <button type="submit" className="btn small">
-              {t("send")}
-            </button>
+            <SubmitButton
+              label={t("send")}
+              pendingLabel={t("sending")}
+              className="btn small"
+            />
           </form>
         )}
       </details>
@@ -120,9 +123,11 @@ export async function PriceRequestsPanel({
                                 name="priceRequestId"
                                 value={r.id}
                               />
-                              <button type="submit" className="btn small">
-                                {t("resend")}
-                              </button>
+                              <SubmitButton
+                                label={t("resend")}
+                                pendingLabel={t("resending")}
+                                className="btn small"
+                              />
                             </form>
                             <form action={cancelPriceRequestAction}>
                               <input type="hidden" name="locale" value={locale} />
@@ -132,9 +137,11 @@ export async function PriceRequestsPanel({
                                 name="priceRequestId"
                                 value={r.id}
                               />
-                              <button type="submit" className="btn small">
-                                {t("cancel")}
-                              </button>
+                              <SubmitButton
+                                label={t("cancel")}
+                                pendingLabel={t("cancelling")}
+                                className="btn small"
+                              />
                             </form>
                           </>
                         )}
@@ -243,9 +250,11 @@ async function ManualLogForm({
         </label>
         <textarea id={`mlf-excluded-${priceRequestId}`} name="excludedText" />
       </div>
-      <button type="submit" className="btn small">
-        {t("manual.submit")}
-      </button>
+      <SubmitButton
+        label={t("manual.submit")}
+        pendingLabel={t("manual.submitting")}
+        className="btn small"
+      />
     </form>
   );
 }

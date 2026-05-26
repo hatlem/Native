@@ -222,12 +222,22 @@
       "onlyPriced": "Nur Titel mit Preis",
       "all": "Alle",
       "search": "Suche",
-      "searchPlaceholder": "Titel, Vertikale oder Tag …",
-      "apply": "Anwenden"
+      "searchPlaceholder": "Titel, Vertikale oder Tag suchen…",
+      "apply": "Anwenden",
+      "advanced": "Erweiterte Optionen",
+      "formatCount": "{count, plural, =0 {Alle Formate} =1 {1 Format} other {# Formate}}",
+      "compareMode": "Vergleichsauswahl",
+      "compareModeHint": "Titel auswählen, um sie nebeneinander zu vergleichen",
+      "loading": "Wird aktualisiert…"
+    },
+    "compareBar": {
+      "label": "{count, plural, =1 {1 Titel ausgewählt} other {# Titel ausgewählt}}",
+      "open": "Vergleichen →",
+      "clear": "Zurücksetzen"
     },
     "card": {
       "from": "Ab",
-      "reach": "Monatliche Reichweite",
+      "reach": "Monatliche Leser",
       "circulation": "Auflage",
       "leadTime": "Vorlaufzeit",
       "days": "Tage",
@@ -265,7 +275,7 @@
   "titleDetail": {
     "back": "Zurück zum Katalog",
     "publishedBy": "Verlegt von",
-    "reach": "Monatliche Reichweite",
+    "reach": "Monatliche Leser",
     "formats": "Native-Formate",
     "circulation": "Auflage",
     "leadTime": "Vorlaufzeit",
@@ -1430,16 +1440,20 @@
     "empty": "Keine Vertriebskontakte mit diesem Titel verknüpft.",
     "primary": "Primär",
     "makePrimary": "Als primär festlegen",
+    "settingPrimary": "Wird gesetzt…",
     "detach": "Trennen",
+    "detaching": "Wird getrennt…",
     "attachExisting": "Bestehenden Kontakt verknüpfen",
     "attach": "Verknüpfen",
+    "attaching": "Wird verknüpft…",
     "addNew": "Neuen Kontakt hinzufügen",
     "name": "Name",
     "email": "E-Mail",
     "phone": "Telefon",
     "role": "Rolle",
     "notes": "Notizen",
-    "create": "Kontakt erstellen"
+    "create": "Kontakt erstellen",
+    "creating": "Wird erstellt…"
   },
   "priceRequests": {
     "title": "Preisanfragen",
@@ -1447,8 +1461,11 @@
     "noContactsHint": "Fügen Sie oben einen Vertriebskontakt hinzu, bevor Sie eine Anfrage senden.",
     "noRequests": "Noch keine Anfragen für diesen Titel.",
     "send": "Anfrage senden",
+    "sending": "Wird gesendet…",
     "resend": "Erneut senden",
+    "resending": "Wird erneut gesendet…",
     "cancel": "Abbrechen",
+    "cancelling": "Wird abgebrochen…",
     "logManual": "Antwort manuell erfassen",
     "primary": "primär",
     "col": {
@@ -1471,7 +1488,8 @@
       "currency": "Währung",
       "included": "Was inbegriffen ist",
       "excluded": "Was NICHT inbegriffen ist",
-      "submit": "Dieses Angebot erfassen"
+      "submit": "Dieses Angebot erfassen",
+      "submitting": "Wird protokolliert…"
     }
   },
   "pendingQuotes": {
@@ -1490,12 +1508,15 @@
     "excluded": "Ausgeschlossen",
     "newFormat": "Neues Format",
     "apply": "Anwenden",
+    "applying": "Wird angewendet…",
     "reject": "Ablehnen",
+    "rejecting": "Wird abgelehnt…",
     "rejectReason": "Grund (optional)",
     "editBefore": "Vor Anwendung bearbeiten",
     "price": "Preis",
     "currency": "Währung",
     "saveEdit": "Speichern",
+    "savingEdit": "Wird gespeichert…",
     "col": {
       "title": "Titel",
       "received": "Erhalten",

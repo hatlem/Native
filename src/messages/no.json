@@ -143,12 +143,23 @@
       "onlyPriced": "Kun titler med pris",
       "all": "Alle",
       "search": "Søk",
-      "searchPlaceholder": "Tittel, vertikal eller tagg …",
-      "apply": "Bruk"
+      "searchPlaceholder": "Søk i titler, vertikaler eller tagger…",
+      "apply": "Bruk",
+      "advanced": "Avanserte valg",
+      "formatCount": "{count, plural, =0 {Alle formater} =1 {1 format} other {# formater}}",
+      "compareMode": "Sammenligningsvelger",
+      "compareModeHint": "Velg titler du vil sammenligne side om side",
+      "loading": "Oppdaterer…"
+    },
+    "compareBar": {
+      "label": "{count, plural, =1 {1 tittel valgt} other {# titler valgt}}",
+      "open": "Sammenlign →",
+      "clear": "Fjern"
     },
     "card": {
       "from": "Fra",
-      "reach": "Månedlige nettlesere",
+      "reach": "Månedlige lesere (totalt)",
+      "digitalReach": "Månedlige nettlesere",
       "circulation": "Opplag",
       "leadTime": "Ledetid",
       "days": "dager",
@@ -186,7 +197,8 @@
   "titleDetail": {
     "back": "Tilbake til katalogen",
     "publishedBy": "Utgis av",
-    "reach": "Månedlige nettlesere",
+    "reach": "Månedlige lesere (totalt)",
+    "digitalReach": "Månedlige nettlesere",
     "formats": "Native-formater",
     "circulation": "Opplag",
     "leadTime": "Ledetid",
@@ -1572,16 +1584,20 @@
     "empty": "Ingen salgskontakter knyttet til denne tittelen.",
     "primary": "Primær",
     "makePrimary": "Gjør primær",
+    "settingPrimary": "Setter primær…",
     "detach": "Koble fra",
+    "detaching": "Kobler fra…",
     "attachExisting": "Koble til eksisterende kontakt",
     "attach": "Koble til",
+    "attaching": "Knytter til…",
     "addNew": "Legg til ny kontakt",
     "name": "Navn",
     "email": "E-post",
     "phone": "Telefon",
     "role": "Rolle",
     "notes": "Notater",
-    "create": "Opprett kontakt"
+    "create": "Opprett kontakt",
+    "creating": "Oppretter…"
   },
   "priceRequests": {
     "title": "Prisforespørsler",
@@ -1589,8 +1605,11 @@
     "noContactsHint": "Legg til en salgskontakt ovenfor før du sender en forespørsel.",
     "noRequests": "Ingen forespørsler for denne tittelen ennå.",
     "send": "Send forespørsel",
+    "sending": "Sender…",
     "resend": "Send på nytt",
+    "resending": "Sender på nytt…",
     "cancel": "Avbryt",
+    "cancelling": "Kansellerer…",
     "logManual": "Registrer svar manuelt",
     "primary": "primær",
     "col": {
@@ -1613,7 +1632,8 @@
       "currency": "Valuta",
       "included": "Hva som er inkludert",
       "excluded": "Hva som IKKE er inkludert",
-      "submit": "Registrer dette tilbudet"
+      "submit": "Registrer dette tilbudet",
+      "submitting": "Logger…"
     }
   },
   "pendingQuotes": {
@@ -1632,12 +1652,15 @@
     "excluded": "Ekskludert",
     "newFormat": "Nytt format",
     "apply": "Bruk",
+    "applying": "Anvender…",
     "reject": "Avvis",
+    "rejecting": "Avviser…",
     "rejectReason": "Årsak (valgfritt)",
     "editBefore": "Rediger før bruk",
     "price": "Pris",
     "currency": "Valuta",
     "saveEdit": "Lagre",
+    "savingEdit": "Lagrer…",
     "col": {
       "title": "Tittel",
       "received": "Mottatt",

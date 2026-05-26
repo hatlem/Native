@@ -5,6 +5,7 @@ import {
   rejectQuoteAction,
   editPendingQuoteAction,
 } from "@/app/price-actions";
+import { SubmitButton } from "@/components";
 
 export async function PendingQuotesPanel({
   locale,
@@ -126,9 +127,11 @@ export async function PendingQuotesPanel({
                 <input type="hidden" name="locale" value={locale} />
                 <input type="hidden" name="titleId" value={titleId} />
                 <input type="hidden" name="quoteId" value={q.id} />
-                <button type="submit" className="btn small">
-                  {t("apply")}
-                </button>
+                <SubmitButton
+                  label={t("apply")}
+                  pendingLabel={t("applying")}
+                  className="btn small"
+                />
               </form>
 
               <form action={rejectQuoteAction} style={{ display: "flex", gap: 6 }}>
@@ -140,9 +143,11 @@ export async function PendingQuotesPanel({
                   placeholder={t("rejectReason")}
                   style={{ fontSize: "0.875rem", padding: "4px 8px" }}
                 />
-                <button type="submit" className="btn small">
-                  {t("reject")}
-                </button>
+                <SubmitButton
+                  label={t("reject")}
+                  pendingLabel={t("rejecting")}
+                  className="btn small"
+                />
               </form>
 
               <details>
@@ -178,9 +183,11 @@ export async function PendingQuotesPanel({
                       />
                     </label>
                   </div>
-                  <button type="submit" className="btn small">
-                    {t("saveEdit")}
-                  </button>
+                  <SubmitButton
+                    label={t("saveEdit")}
+                    pendingLabel={t("savingEdit")}
+                    className="btn small"
+                  />
                 </form>
               </details>
             </div>

@@ -6,6 +6,7 @@ import {
   setPrimaryContactAction,
   detachContactAction,
 } from "@/app/price-actions";
+import { SubmitButton } from "@/components";
 
 export async function SalesContactsPanel({
   locale,
@@ -62,18 +63,22 @@ export async function SalesContactsPanel({
                     <input type="hidden" name="locale" value={locale} />
                     <input type="hidden" name="titleId" value={titleId} />
                     <input type="hidden" name="salesContactId" value={c.id} />
-                    <button type="submit" className="btn small">
-                      {t("makePrimary")}
-                    </button>
+                    <SubmitButton
+                      label={t("makePrimary")}
+                      pendingLabel={t("settingPrimary")}
+                      className="btn small"
+                    />
                   </form>
                 )}
                 <form action={detachContactAction}>
                   <input type="hidden" name="locale" value={locale} />
                   <input type="hidden" name="titleId" value={titleId} />
                   <input type="hidden" name="salesContactId" value={c.id} />
-                  <button type="submit" className="btn small">
-                    {t("detach")}
-                  </button>
+                  <SubmitButton
+                    label={t("detach")}
+                    pendingLabel={t("detaching")}
+                    className="btn small"
+                  />
                 </form>
               </div>
             </li>
@@ -104,9 +109,11 @@ export async function SalesContactsPanel({
                 {t("makePrimary")}
               </label>
             </div>
-            <button type="submit" className="btn small">
-              {t("attach")}
-            </button>
+            <SubmitButton
+              label={t("attach")}
+              pendingLabel={t("attaching")}
+              className="btn small"
+            />
           </form>
         </details>
       )}
@@ -145,9 +152,11 @@ export async function SalesContactsPanel({
               {t("makePrimary")}
             </label>
           </div>
-          <button type="submit" className="btn small">
-            {t("create")}
-          </button>
+          <SubmitButton
+            label={t("create")}
+            pendingLabel={t("creating")}
+            className="btn small"
+          />
         </form>
       </details>
     </article>

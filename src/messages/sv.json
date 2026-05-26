@@ -143,12 +143,23 @@
       "onlyPriced": "Endast titlar med pris",
       "all": "Alla",
       "search": "Sök",
-      "searchPlaceholder": "Titel, vertikal eller tagg …",
-      "apply": "Använd"
+      "searchPlaceholder": "Sök bland titlar, vertikaler eller taggar…",
+      "apply": "Använd",
+      "advanced": "Avancerade alternativ",
+      "formatCount": "{count, plural, =0 {Alla format} =1 {1 format} other {# format}}",
+      "compareMode": "Jämförelsväljare",
+      "compareModeHint": "Markera titlar du vill jämföra sida vid sida",
+      "loading": "Uppdaterar…"
+    },
+    "compareBar": {
+      "label": "{count, plural, =1 {1 titel vald} other {# titlar valda}}",
+      "open": "Jämför →",
+      "clear": "Rensa"
     },
     "card": {
       "from": "Från",
-      "reach": "Månatliga onlineläsare",
+      "reach": "Månatliga läsare (totalt)",
+      "digitalReach": "Månatliga onlineläsare",
       "circulation": "Upplaga",
       "leadTime": "Ledtid",
       "days": "dagar",
@@ -186,7 +197,7 @@
   "titleDetail": {
     "back": "Tillbaka till katalogen",
     "publishedBy": "Ges ut av",
-    "reach": "Månatliga onlineläsare",
+    "reach": "Månatliga läsare",
     "formats": "Native-format",
     "circulation": "Upplaga",
     "leadTime": "Ledtid",
@@ -1572,16 +1583,20 @@
     "empty": "Inga säljkontakter kopplade till denna titel.",
     "primary": "Primär",
     "makePrimary": "Gör primär",
+    "settingPrimary": "Sätter primär…",
     "detach": "Koppla bort",
+    "detaching": "Kopplar bort…",
     "attachExisting": "Koppla en befintlig kontakt",
     "attach": "Koppla",
+    "attaching": "Kopplar till…",
     "addNew": "Lägg till ny kontakt",
     "name": "Namn",
     "email": "E-post",
     "phone": "Telefon",
     "role": "Roll",
     "notes": "Anteckningar",
-    "create": "Skapa kontakt"
+    "create": "Skapa kontakt",
+    "creating": "Skapar…"
   },
   "priceRequests": {
     "title": "Prisförfrågningar",
@@ -1589,8 +1604,11 @@
     "noContactsHint": "Lägg till en säljkontakt ovan innan du skickar en förfrågan.",
     "noRequests": "Inga förfrågningar för denna titel ännu.",
     "send": "Skicka förfrågan",
+    "sending": "Skickar…",
     "resend": "Skicka igen",
+    "resending": "Skickar igen…",
     "cancel": "Avbryt",
+    "cancelling": "Avbryter…",
     "logManual": "Registrera svar manuellt",
     "primary": "primär",
     "col": {
@@ -1613,7 +1631,8 @@
       "currency": "Valuta",
       "included": "Vad som ingår",
       "excluded": "Vad som INTE ingår",
-      "submit": "Registrera detta offert"
+      "submit": "Registrera detta offert",
+      "submitting": "Loggar…"
     }
   },
   "pendingQuotes": {
@@ -1632,12 +1651,15 @@
     "excluded": "Exkluderat",
     "newFormat": "Nytt format",
     "apply": "Tillämpa",
+    "applying": "Tillämpar…",
     "reject": "Avvisa",
+    "rejecting": "Avvisar…",
     "rejectReason": "Anledning (valfritt)",
     "editBefore": "Redigera innan tillämpning",
     "price": "Pris",
     "currency": "Valuta",
     "saveEdit": "Spara",
+    "savingEdit": "Sparar…",
     "col": {
       "title": "Titel",
       "received": "Mottagen",

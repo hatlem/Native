@@ -143,12 +143,22 @@
       "onlyPriced": "Kun titler med pris",
       "all": "Alle",
       "search": "Søg",
-      "searchPlaceholder": "Titel, vertikal eller tag …",
-      "apply": "Anvend"
+      "searchPlaceholder": "Søg i titler, vertikaler eller tags…",
+      "apply": "Anvend",
+      "advanced": "Avancerede muligheder",
+      "formatCount": "{count, plural, =0 {Alle formater} =1 {1 format} other {# formater}}",
+      "compareMode": "Sammenligningsvælger",
+      "compareModeHint": "Vælg titler du vil sammenligne side om side",
+      "loading": "Opdaterer…"
+    },
+    "compareBar": {
+      "label": "{count, plural, =1 {1 titel valgt} other {# titler valgt}}",
+      "open": "Sammenlign →",
+      "clear": "Ryd"
     },
     "card": {
       "from": "Fra",
-      "reach": "Månedlig rækkevidde",
+      "reach": "Månedlige læsere",
       "circulation": "Oplag",
       "leadTime": "Leveringstid",
       "days": "dage",
@@ -186,7 +196,7 @@
   "titleDetail": {
     "back": "Tilbage til kataloget",
     "publishedBy": "Udgives af",
-    "reach": "Månedlig rækkevidde",
+    "reach": "Månedlige læsere",
     "formats": "Native-formater",
     "circulation": "Oplag",
     "leadTime": "Leveringstid",
@@ -1573,16 +1583,20 @@
     "empty": "Ingen salgskontakter knyttet til denne titel.",
     "primary": "Primær",
     "makePrimary": "Gør primær",
+    "settingPrimary": "Sætter primær…",
     "detach": "Frakobl",
+    "detaching": "Frakobler…",
     "attachExisting": "Tilknyt en eksisterende kontakt",
     "attach": "Tilknyt",
+    "attaching": "Tilknytter…",
     "addNew": "Tilføj ny kontakt",
     "name": "Navn",
     "email": "E-mail",
     "phone": "Telefon",
     "role": "Rolle",
     "notes": "Noter",
-    "create": "Opret kontakt"
+    "create": "Opret kontakt",
+    "creating": "Opretter…"
   },
   "priceRequests": {
     "title": "Prisforespørgsler",
@@ -1590,8 +1604,11 @@
     "noContactsHint": "Tilføj en salgskontakt ovenfor, inden du sender en forespørgsel.",
     "noRequests": "Ingen forespørgsler for denne titel endnu.",
     "send": "Send forespørgsel",
+    "sending": "Sender…",
     "resend": "Send igen",
+    "resending": "Sender igen…",
     "cancel": "Annullér",
+    "cancelling": "Annullerer…",
     "logManual": "Registrer svar manuelt",
     "primary": "primær",
     "col": {
@@ -1614,7 +1631,8 @@
       "currency": "Valuta",
       "included": "Hvad der er inkluderet",
       "excluded": "Hvad der IKKE er inkluderet",
-      "submit": "Registrer dette tilbud"
+      "submit": "Registrer dette tilbud",
+      "submitting": "Logger…"
     }
   },
   "pendingQuotes": {
@@ -1633,12 +1651,15 @@
     "excluded": "Ekskluderet",
     "newFormat": "Nyt format",
     "apply": "Anvend",
+    "applying": "Anvender…",
     "reject": "Afvis",
+    "rejecting": "Afviser…",
     "rejectReason": "Årsag (valgfrit)",
     "editBefore": "Rediger inden anvendelse",
     "price": "Pris",
     "currency": "Valuta",
     "saveEdit": "Gem",
+    "savingEdit": "Gemmer…",
     "col": {
       "title": "Titel",
       "received": "Modtaget",

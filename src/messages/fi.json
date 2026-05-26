@@ -222,12 +222,22 @@
       "onlyPriced": "Vain hinnoitellut julkaisut",
       "all": "Kaikki",
       "search": "Haku",
-      "searchPlaceholder": "Julkaisu, vertikaali tai tagi …",
-      "apply": "Käytä"
+      "searchPlaceholder": "Hae julkaisuja, vertikaaleja tai tageja…",
+      "apply": "Käytä",
+      "advanced": "Lisäasetukset",
+      "formatCount": "{count, plural, =0 {Kaikki formaatit} =1 {1 formaatti} other {# formaattia}}",
+      "compareMode": "Vertailutyökalu",
+      "compareModeHint": "Valitse julkaisut, joita haluat vertailla rinnakkain",
+      "loading": "Päivitetään…"
+    },
+    "compareBar": {
+      "label": "{count, plural, =1 {1 julkaisu valittu} other {# julkaisua valittu}}",
+      "open": "Vertaile →",
+      "clear": "Tyhjennä"
     },
     "card": {
       "from": "Alkaen",
-      "reach": "Kuukausittainen tavoittavuus",
+      "reach": "Kuukausittaiset lukijat",
       "circulation": "Levikki",
       "leadTime": "Toimitusaika",
       "days": "päivää",
@@ -265,7 +275,7 @@
   "titleDetail": {
     "back": "Takaisin katalogiin",
     "publishedBy": "Julkaisija",
-    "reach": "Kuukausittainen tavoittavuus",
+    "reach": "Kuukausittaiset lukijat",
     "formats": "Natiiviformaatit",
     "circulation": "Levikki",
     "leadTime": "Toimitusaika",
@@ -1572,16 +1582,20 @@
     "empty": "Tähän otsikkoon ei ole liitetty myyntiyhteyshenkilöitä.",
     "primary": "Ensisijainen",
     "makePrimary": "Aseta ensisijaiseksi",
+    "settingPrimary": "Asetetaan ensisijaiseksi…",
     "detach": "Irrota",
+    "detaching": "Irrotetaan…",
     "attachExisting": "Liitä olemassa oleva yhteystieto",
     "attach": "Liitä",
+    "attaching": "Liitetään…",
     "addNew": "Lisää uusi yhteystieto",
     "name": "Nimi",
     "email": "Sähköposti",
     "phone": "Puhelin",
     "role": "Rooli",
     "notes": "Muistiinpanot",
-    "create": "Luo yhteystieto"
+    "create": "Luo yhteystieto",
+    "creating": "Luodaan…"
   },
   "priceRequests": {
     "title": "Hintapyynnöt",
@@ -1589,8 +1603,11 @@
     "noContactsHint": "Lisää myyntiyhteyshenkilö yllä ennen pyynnön lähettämistä.",
     "noRequests": "Ei vielä pyyntöjä tälle nimikkeelle.",
     "send": "Lähetä pyyntö",
+    "sending": "Lähetetään…",
     "resend": "Lähetä uudelleen",
+    "resending": "Lähetetään uudelleen…",
     "cancel": "Peruuta",
+    "cancelling": "Peruutetaan…",
     "logManual": "Kirjaa vastaus manuaalisesti",
     "primary": "ensisijainen",
     "col": {
@@ -1613,7 +1630,8 @@
       "currency": "Valuutta",
       "included": "Mitä sisältyy",
       "excluded": "Mitä EI sisälly",
-      "submit": "Kirjaa tämä tarjous"
+      "submit": "Kirjaa tämä tarjous",
+      "submitting": "Kirjataan…"
     }
   },
   "pendingQuotes": {
@@ -1632,12 +1650,15 @@
     "excluded": "Ei sisälly",
     "newFormat": "Uusi formaatti",
     "apply": "Sovella",
+    "applying": "Käytetään…",
     "reject": "Hylkää",
+    "rejecting": "Hylätään…",
     "rejectReason": "Syy (valinnainen)",
     "editBefore": "Muokkaa ennen soveltamista",
     "price": "Hinta",
     "currency": "Valuutta",
     "saveEdit": "Tallenna",
+    "savingEdit": "Tallennetaan…",
     "col": {
       "title": "Nimike",
       "received": "Vastaanotettu",
