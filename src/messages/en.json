@@ -1506,7 +1506,7 @@
     }
   },
   "priceVisibility": {
-    "requestPrice": "Request price",
+    "requestPrice": "Contact for price",
     "requestPriceHelp": "Pricing on this title is set after a brief — we'll come back with availability and a firm number.",
     "planRfqOnly": "One or more titles in your plan require a quote — instant checkout is disabled until we confirm pricing."
   },
@@ -1516,7 +1516,7 @@
     "publishedRateCardHelp": "The publisher's official list-price for a standard placement, shown to advertisers as a strikethrough anchor on quotes.",
     "publishedRateCurrency": "Currency",
     "pricesPublic": "Show prices to advertisers",
-    "pricesPublicHelp": "Off = catalog shows 'Request price' instead of any € figure. Self-serve checkout is also disabled.",
+    "pricesPublicHelp": "Off = catalog shows 'Contact for price' instead of any € figure. Self-serve checkout is also disabled.",
     "publisherPricesPublic": "Publisher-wide visibility",
     "publisherPricesPublicOn": "Publisher prices are public",
     "publisherPricesPublicOff": "Publisher prices are hidden — overrides every title",

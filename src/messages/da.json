@@ -1507,7 +1507,7 @@
     }
   },
   "priceVisibility": {
-    "requestPrice": "Bed om pris",
+    "requestPrice": "Kontakt for pris",
     "requestPriceHelp": "Prisen fastsættes efter en brief — vi vender tilbage med tilgængelighed og en fast pris.",
     "planRfqOnly": "En eller flere titler i din plan kræver et tilbud — instant køb er deaktiveret indtil prisen er bekræftet."
   },
@@ -1517,7 +1517,7 @@
     "publishedRateCardHelp": "Udgiverens officielle listepris for en standardplacering. Vises som overstreget anker på tilbud til annoncør.",
     "publishedRateCurrency": "Valuta",
     "pricesPublic": "Vis priser til annoncør",
-    "pricesPublicHelp": "Fra = kataloget viser 'Bed om pris' i stedet for tal. Instant køb er også deaktiveret.",
+    "pricesPublicHelp": "Fra = kataloget viser 'Kontakt for pris' i stedet for tal. Instant køb er også deaktiveret.",
     "publisherPricesPublic": "Synlighed for hele udgiveren",
     "publisherPricesPublicOn": "Udgiverens priser er offentlige",
     "publisherPricesPublicOff": "Udgiverens priser er skjult — tilsidesætter alle titler",

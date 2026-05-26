@@ -1506,7 +1506,7 @@
     }
   },
   "priceVisibility": {
-    "requestPrice": "Pyydä hinta",
+    "requestPrice": "Kysy hintaa",
     "requestPriceHelp": "Hinta vahvistetaan briefin jälkeen — palaamme asiaan saatavuuden ja kiinteän hinnan kanssa.",
     "planRfqOnly": "Yksi tai useampi suunnitelmasi nimike vaatii tarjouksen — pikaosto on poistettu käytöstä kunnes hinta on vahvistettu."
   },
@@ -1516,7 +1516,7 @@
     "publishedRateCardHelp": "Julkaisijan virallinen listahinta tavanomaisesta julkaisusta. Näkyy tarjouksessa yliviivattuna ankkurihintana.",
     "publishedRateCurrency": "Valuutta",
     "pricesPublic": "Näytä hinnat mainostajalle",
-    "pricesPublicHelp": "Pois = luettelo näyttää 'Pyydä hinta' lukujen sijaan. Pikaosto on myös pois käytöstä.",
+    "pricesPublicHelp": "Pois = luettelo näyttää 'Kysy hintaa' lukujen sijaan. Pikaosto on myös pois käytöstä.",
     "publisherPricesPublic": "Koko julkaisijan näkyvyys",
     "publisherPricesPublicOn": "Julkaisijan hinnat ovat julkisia",
     "publisherPricesPublicOff": "Julkaisijan hinnat on piilotettu — ohittaa kaikki nimikkeet",

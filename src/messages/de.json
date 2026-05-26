@@ -1364,7 +1364,7 @@
     }
   },
   "priceVisibility": {
-    "requestPrice": "Preis anfragen",
+    "requestPrice": "Preis auf Anfrage",
     "requestPriceHelp": "Der Preis wird nach Briefing festgelegt — wir melden uns mit Verfügbarkeit und einem Festpreis.",
     "planRfqOnly": "Mindestens ein Titel im Plan erfordert ein Angebot — Sofort-Buchung ist deaktiviert, bis der Preis bestätigt ist."
   },
@@ -1374,7 +1374,7 @@
     "publishedRateCardHelp": "Der offizielle Listenpreis des Verlags für eine Standardplatzierung. Erscheint als durchgestrichener Ankerpreis im Angebot an den Werbekunden.",
     "publishedRateCurrency": "Währung",
     "pricesPublic": "Preise für Werbekunden anzeigen",
-    "pricesPublicHelp": "Aus = Katalog zeigt 'Preis anfragen' statt Zahlen. Sofort-Buchung ist ebenfalls deaktiviert.",
+    "pricesPublicHelp": "Aus = Katalog zeigt 'Preis auf Anfrage' statt Zahlen. Sofort-Buchung ist ebenfalls deaktiviert.",
     "publisherPricesPublic": "Sichtbarkeit für den gesamten Verlag",
     "publisherPricesPublicOn": "Preise des Verlags sind öffentlich",
     "publisherPricesPublicOff": "Preise des Verlags sind verborgen — überschreibt alle Titel",
