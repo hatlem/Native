@@ -264,6 +264,7 @@
     "images": "Images (min)",
     "disclosure": "Disclosure label",
     "addToPlan": "Add to plan",
+    "addingToPlan": "Adding…",
     "nativeFitTag": "Native: {value}",
     "requestQuote": {
       "title": "Request a quote",

@@ -194,6 +194,7 @@
     "images": "Billeder (min.)",
     "disclosure": "Mærkning",
     "addToPlan": "Tilføj til plan",
+    "addingToPlan": "Tilføjer…",
     "nativeFitTag": "Native: {value}",
     "requestQuote": {
       "title": "Anmod om tilbud",

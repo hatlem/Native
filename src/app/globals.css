@@ -2153,6 +2153,22 @@ select:disabled {
   margin-top: var(--s-4);
 }
 
+.spec-list {
+  display: grid;
+  grid-template-columns: max-content 1fr;
+  column-gap: 12px;
+  row-gap: 2px;
+  margin: 6px 0 0 0;
+  font-size: 0.875rem;
+}
+.spec-list dt {
+  color: var(--muted);
+}
+.spec-list dd {
+  margin: 0;
+  color: var(--text);
+}
+
 .split {
   display: grid;
   gap: var(--s-6);

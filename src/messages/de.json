@@ -264,6 +264,7 @@
     "images": "Bilder (min.)",
     "disclosure": "Kennzeichnungslabel",
     "addToPlan": "Zum Plan hinzufügen",
+    "addingToPlan": "Wird hinzugefügt…",
     "nativeFitTag": "Native: {value}",
     "requestQuote": {
       "title": "Angebot anfragen",

@@ -7,6 +7,7 @@ import { Link } from "@/i18n/navigation";
 import { indicativeFromRules, toRateRules, formatMoney } from "@/lib/money";
 import { isProductPriceShown, arePricesVisible } from "@/lib/pricing-visibility";
 import { addToPlan } from "@/app/actions";
+import { SubmitButton } from "@/components";
 
 export const dynamic = "force-dynamic";
 
@@ -208,33 +209,34 @@ export default async function TitleDetailPage({
               {p.spec ? (
                 <div className="muted" style={{ marginTop: 10 }}>
                   <strong>{t("spec")}</strong>
-                  <br />
-                  {p.spec.wordCountMin && p.spec.wordCountMax ? (
-                    <>
-                      {t("words")}: {p.spec.wordCountMin}–{p.spec.wordCountMax}
-                      <br />
-                    </>
-                  ) : null}
-                  {t("images")}: {p.spec.imagesMin ?? 0}
-                  <br />
-                  {p.spec.disclosureLabel ? (
-                    <>
-                      {t("disclosure")}: {p.spec.disclosureLabel}
-                    </>
-                  ) : null}
+                  <dl className="spec-list">
+                    {p.spec.wordCountMin && p.spec.wordCountMax ? (
+                      <>
+                        <dt>{t("words")}</dt>
+                        <dd>
+                          {p.spec.wordCountMin}–{p.spec.wordCountMax}
+                        </dd>
+                      </>
+                    ) : null}
+                    <dt>{t("images")}</dt>
+                    <dd>{p.spec.imagesMin ?? 0}</dd>
+                    {p.spec.disclosureLabel ? (
+                      <>
+                        <dt>{t("disclosure")}</dt>
+                        <dd>{p.spec.disclosureLabel}</dd>
+                      </>
+                    ) : null}
+                  </dl>
                 </div>
               ) : null}
               {p.bookable ? (
                 <form action={addToPlan} style={{ marginTop: 12 }}>
                   <input type="hidden" name="locale" value={locale} />
                   <input type="hidden" name="productId" value={p.id} />
-                  <button
-                    type="submit"
-                    className="btn"
-                    style={{ marginTop: 0 }}
-                  >
-                    {t("addToPlan")}
-                  </button>
+                  <SubmitButton
+                    label={t("addToPlan")}
+                    pendingLabel={t("addingToPlan")}
+                  />
                 </form>
               ) : (
                 <p className="note">{t("unavailable")}</p>

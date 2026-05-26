@@ -264,6 +264,7 @@
     "images": "Kuvia (min.)",
     "disclosure": "Mainosmerkintä",
     "addToPlan": "Lisää suunnitelmaan",
+    "addingToPlan": "Lisätään…",
     "nativeFitTag": "Natiivi: {value}",
     "requestQuote": {
       "title": "Pyydä tarjous",

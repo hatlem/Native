@@ -194,6 +194,7 @@
     "images": "Bilder (min.)",
     "disclosure": "Märkning",
     "addToPlan": "Lägg till i plan",
+    "addingToPlan": "Lägger till…",
     "nativeFitTag": "Native: {value}",
     "requestQuote": {
       "title": "Begär offert",
