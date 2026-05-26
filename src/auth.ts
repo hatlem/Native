@@ -6,6 +6,7 @@ import { prisma } from "@/lib/prisma";
 import { assertSecret } from "@/lib/security";
 import { authLimiter } from "@/lib/rate-limit";
 import "@/lib/mail";
+import { hashToken } from "@/lib/tokens";
 
 assertSecret();
 
@@ -71,6 +72,59 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
           role: user.role,
           orgId: user.organization?.id ?? null,
           orgType: user.organization?.type ?? null,
+        };
+      },
+    }),
+    Credentials({
+      id: "magic-link",
+      credentials: {
+        token: { label: "Token", type: "text" },
+      },
+      authorize: async (credentials) => {
+        const raw = String(credentials?.token ?? "");
+        if (!raw) return null;
+
+        // Rate-limit consume by IP — defends the
+        // /api/auth/callback/magic-link endpoint against brute-force.
+        const ip = await authClientIp();
+        const consume = await authLimiter.check(`magic-consume:ip:${ip}`);
+        if (!consume.ok) return null;
+
+        const hash = hashToken(raw);
+
+        // updateMany with the guard clause atomically marks the token
+        // consumed if and only if it's still unused + unexpired. Wins
+        // double-click races: only one caller sees count === 1.
+        const updated = await prisma.magicLinkToken.updateMany({
+          where: { tokenHash: hash, consumedAt: null, expiresAt: { gt: new Date() } },
+          data: { consumedAt: new Date() },
+        });
+        if (updated.count !== 1) return null;
+
+        const row = await prisma.magicLinkToken.findUnique({
+          where: { tokenHash: hash },
+          include: {
+            user: {
+              include: { organization: { select: { id: true, type: true } } },
+            },
+          },
+        });
+        if (!row) return null;
+
+        if (!row.user.emailVerifiedAt) {
+          await prisma.user.update({
+            where: { id: row.userId },
+            data: { emailVerifiedAt: new Date() },
+          });
+        }
+
+        return {
+          id: row.user.id,
+          email: row.user.email,
+          name: row.user.name ?? undefined,
+          role: row.user.role,
+          orgId: row.user.organization?.id ?? null,
+          orgType: row.user.organization?.type ?? null,
         };
       },
     }),
