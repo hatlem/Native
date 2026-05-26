@@ -5,6 +5,7 @@ import bcrypt from "bcryptjs";
 import { prisma } from "@/lib/prisma";
 import { assertSecret } from "@/lib/security";
 import { authLimiter } from "@/lib/rate-limit";
+import "@/lib/mail";
 
 assertSecret();
 
