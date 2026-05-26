@@ -13,6 +13,13 @@ datasource db {
 
 // ---------- Enums ----------
 
+enum PriceResponseSource {
+  LINK_FORM
+  MANUAL_EMAIL
+  MANUAL_PHONE
+  MANUAL_OTHER
+}
+
 enum MarketCode {
   NO
   SE
@@ -254,6 +261,7 @@ model Title {
 
   products          Product[]
   salesContactLinks SalesContactTitle[]
+  priceRequests     PriceRequest[]
 
   @@index([countryCode])
   @@index([type])
@@ -375,9 +383,10 @@ model User {
   lastSignInIp    String?
   lastSignInAt    DateTime?
 
-  notifications       Notification[]
-  magicLinkTokens     MagicLinkToken[]
-  passwordResetTokens PasswordResetToken[]
+  notifications          Notification[]
+  magicLinkTokens        MagicLinkToken[]
+  passwordResetTokens    PasswordResetToken[]
+  priceRequestsRequested PriceRequest[] @relation("PriceRequestRequester")
 }
 
 // Super-admin emits these when activating a new publishing house in
@@ -754,7 +763,8 @@ model SalesContact {
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt
 
-  titles SalesContactTitle[]
+  titles   SalesContactTitle[]
+  requests PriceRequest[]
 
   @@unique([publisherId, email])
   @@index([publisherId])
@@ -770,4 +780,29 @@ model SalesContactTitle {
 
   @@id([salesContactId, titleId])
   @@index([titleId])
+}
+
+model PriceRequest {
+  id              String   @id @default(cuid())
+  titleId         String
+  title           Title    @relation(fields: [titleId], references: [id])
+  salesContactId  String
+  salesContact    SalesContact @relation(fields: [salesContactId], references: [id])
+  token           String   @unique
+  expiresAt       DateTime
+  sentAt          DateTime?
+  openedAt        DateTime?
+  respondedAt     DateTime?
+  cancelledAt     DateTime?
+  responseSource  PriceResponseSource?
+  responseNote    String?
+  hasNative       Boolean?
+  requestedById   String
+  requestedBy     User     @relation("PriceRequestRequester", fields: [requestedById], references: [id])
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  @@index([titleId])
+  @@index([salesContactId])
+  @@index([respondedAt])
 }
