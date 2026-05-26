@@ -753,6 +753,7 @@
     "subtitle": "Specifikationer och vägledande priser sida vid sida.",
     "empty": "Välj minst en titel från katalogen för att jämföra.",
     "view": "Öppna titel",
+    "back": "Tillbaka till katalogen",
     "rowAttribute": "Attribut",
     "rowMarket": "Marknad",
     "rowCategory": "Kategori",

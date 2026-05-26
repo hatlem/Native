@@ -753,6 +753,7 @@
     "subtitle": "Specifikationer og vejledende priser side om side.",
     "empty": "Vælg mindst én titel fra kataloget for at sammenligne.",
     "view": "Åbn titel",
+    "back": "Tilbage til kataloget",
     "rowAttribute": "Egenskab",
     "rowMarket": "Marked",
     "rowCategory": "Kategori",

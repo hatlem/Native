@@ -91,6 +91,7 @@
     "subtitle": "Spesifikaatiot ja suuntaa-antavat hinnat rinnakkain.",
     "empty": "Valitse vähintään yksi julkaisu katalogista verrataksesi.",
     "view": "Avaa julkaisu",
+    "back": "Takaisin katalogiin",
     "rowAttribute": "Ominaisuus",
     "rowMarket": "Markkina",
     "rowCategory": "Kategoria",

@@ -91,6 +91,7 @@
     "subtitle": "Side-by-side specs and indicative pricing.",
     "empty": "Pick at least one title from the catalog to compare.",
     "view": "Open title",
+    "back": "Back to catalog",
     "rowAttribute": "Attribute",
     "rowMarket": "Market",
     "rowCategory": "Category",

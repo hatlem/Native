@@ -76,7 +76,7 @@ export default async function ComparePage({
       <h1>{t("title")}</h1>
       <p className="muted">{t("subtitle")}</p>
       <p>
-        <Link href="/catalog">← {tc("title")}</Link>
+        <Link href="/catalog">← {t("back")}</Link>
       </p>
 
       <div className="grid">
