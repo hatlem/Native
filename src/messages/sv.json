@@ -76,11 +76,13 @@
     "orders": "Order",
     "spend": "Utgifter",
     "switch": "Agera som denna kund",
+    "switching": "Växlar…",
     "activeBadge": "Aktiv",
     "addClient": "Lägg till kund",
     "clientName": "Kundnamn",
     "market": "Faktureringsmarknad",
-    "create": "Skapa kund"
+    "create": "Skapa kund",
+    "creating": "Skapar…"
   },
   "recommend": {
     "title": "Planrekommendation",

@@ -76,11 +76,13 @@
     "orders": "Ordrer",
     "spend": "Forbrug",
     "switch": "Handl som denne kunde",
+    "switching": "Skifter…",
     "activeBadge": "Aktiv",
     "addClient": "Tilføj kunde",
     "clientName": "Kundenavn",
     "market": "Faktureringsmarked",
-    "create": "Opret kunde"
+    "create": "Opret kunde",
+    "creating": "Opretter…"
   },
   "recommend": {
     "title": "Plananbefaling",

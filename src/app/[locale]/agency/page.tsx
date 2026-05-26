@@ -6,6 +6,7 @@ import { prisma } from "@/lib/prisma";
 import { formatMoney } from "@/lib/money";
 import { getWorkspace } from "@/lib/workspace";
 import { createClient, selectClient } from "@/app/agency-actions";
+import { SubmitButton } from "@/components";
 
 export const dynamic = "force-dynamic";
 
@@ -131,17 +132,26 @@ export default async function AgencyPage({
                       {r ? formatMoney(r.spend, r.currency, locale) : "—"}
                     </dd>
                   </dl>
-                  <form action={selectClient} className="client-cta">
-                    <input type="hidden" name="locale" value={locale} />
-                    <input type="hidden" name="clientId" value={c.id} />
+                  {isActive ? (
                     <button
-                      type="submit"
+                      type="button"
                       className="btn small block"
-                      disabled={isActive}
+                      disabled
+                      aria-label={t("activeBadge")}
                     >
-                      {isActive ? t("activeBadge") : t("switch")}
+                      {t("activeBadge")}
                     </button>
-                  </form>
+                  ) : (
+                    <form action={selectClient} className="client-cta">
+                      <input type="hidden" name="locale" value={locale} />
+                      <input type="hidden" name="clientId" value={c.id} />
+                      <SubmitButton
+                        label={t("switch")}
+                        pendingLabel={t("switching")}
+                        className="btn small block"
+                      />
+                    </form>
+                  )}
                 </article>
               );
             })}
@@ -178,9 +188,11 @@ export default async function AgencyPage({
             </div>
           </div>
           <div className="actions">
-            <button type="submit" className="btn">
-              {t("create")}
-            </button>
+            <SubmitButton
+              label={t("create")}
+              pendingLabel={t("creating")}
+              className="btn"
+            />
           </div>
         </form>
       </section>

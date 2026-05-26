@@ -147,11 +147,13 @@
     "orders": "Orders",
     "spend": "Spend",
     "switch": "Act as this client",
+    "switching": "Wird gewechselt…",
     "activeBadge": "Active",
     "addClient": "Add a client",
     "clientName": "Client name",
     "market": "Billing market",
-    "create": "Create client"
+    "create": "Create client",
+    "creating": "Wird erstellt…"
   },
   "recommend": {
     "title": "Plan recommender",

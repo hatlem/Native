@@ -147,11 +147,13 @@
     "orders": "Tilaukset",
     "spend": "Kulutus",
     "switch": "Toimi tämän asiakkaan puolesta",
+    "switching": "Vaihdetaan…",
     "activeBadge": "Aktiivinen",
     "addClient": "Lisää asiakas",
     "clientName": "Asiakkaan nimi",
     "market": "Laskutusmarkkina",
-    "create": "Luo asiakas"
+    "create": "Luo asiakas",
+    "creating": "Luodaan…"
   },
   "recommend": {
     "title": "Suunnitelman suosittelija",
