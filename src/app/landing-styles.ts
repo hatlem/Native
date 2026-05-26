@@ -853,6 +853,9 @@ body:has(.bn) .drawer-link:hover { background: rgba(20,17,12,0.06) !important; }
 .bn .auth-card .field .hint {
   font-size: 12px; color: var(--ink-mute); margin-top: 2px;
 }
+.bn .auth-card .field label .optional {
+  text-transform: none; letter-spacing: 0; font-weight: 400; color: var(--ink-mute);
+}
 .bn .auth-card .actions { margin-top: 4px; }
 .bn .auth-card .alt {
   font-size: 13px; color: var(--ink-soft); text-align: center;

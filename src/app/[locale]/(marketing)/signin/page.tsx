@@ -5,8 +5,8 @@ import { Link } from "@/i18n/navigation";
 import { landingForRole } from "@/lib/roles";
 import { authenticate } from "@/app/auth-actions";
 import { LandingShell } from "@/app/landing-shell";
+import { SubmitButton } from "@/components";
 import { DemoChips, type DemoAccount } from "./demo-chips";
-import { SubmitButton } from "./submit-button";
 
 export const dynamic = "force-dynamic";
 

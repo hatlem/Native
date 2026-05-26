@@ -9,3 +9,4 @@ export { Kpi, KpiGrid } from "./kpi";
 export { ActionList, ActionListItem } from "./action-list";
 export { DetailHead, MetaRow } from "./detail-head";
 export { QuoteCard } from "./quote-card";
+export { SubmitButton } from "./submit-button";

@@ -71,8 +71,17 @@ export async function register(formData: FormData) {
   const marketCode = String(formData.get("market") || "").trim();
 
   const ip = await clientKey();
+  // Don't echo password back through the URL — everything else is recoverable.
+  const preservedParams = new URLSearchParams();
+  if (name) preservedParams.set("name", name);
+  if (orgName) preservedParams.set("orgName", orgName);
+  if (marketCode) preservedParams.set("market", marketCode);
+  if (email) preservedParams.set("email", email);
+  const preservedQs = preservedParams.toString();
+  const tail = preservedQs ? `&${preservedQs}` : "";
+
   if (!(await authLimiter.check(`signup:ip:${ip}`)).ok) {
-    redirect(`/${locale}/signup?error=rate`);
+    redirect(`/${locale}/signup?error=rate${tail}`);
   }
 
   if (
@@ -81,7 +90,7 @@ export async function register(formData: FormData) {
     !orgName ||
     !MARKET_CODES.includes(marketCode)
   ) {
-    redirect(`/${locale}/signup?error=1`);
+    redirect(`/${locale}/signup?error=1${tail}`);
   }
 
   const passwordHash = await bcrypt.hash(password, 10);
@@ -114,7 +123,7 @@ export async function register(formData: FormData) {
   // generic validation failure. The legitimate owner sees a sign-in
   // prompt via the standard ?error=1 banner; an attacker enumerating
   // emails learns nothing.
-  if (!createdUserId) redirect(`/${locale}/signup?error=1`);
+  if (!createdUserId) redirect(`/${locale}/signup?error=1${tail}`);
   await recordAudit(createdUserId, "user.register", `User:${email}`, { ip, orgName });
 
   try {

@@ -5,6 +5,7 @@ import { auth } from "@/auth";
 import { Link } from "@/i18n/navigation";
 import { register } from "@/app/auth-actions";
 import { LandingShell } from "@/app/landing-shell";
+import { SubmitButton } from "@/components";
 
 export const dynamic = "force-dynamic";
 
@@ -27,8 +28,19 @@ export default async function SignUpPage({
   const tMarket = await getTranslations({ locale, namespace: "market" });
 
   const appName = tc("appName");
-  const errorKey =
-    sp.error === "exists" ? "regExists" : sp.error ? "regFailed" : null;
+  const errorCode = typeof sp.error === "string" ? sp.error : undefined;
+  const errorMessage =
+    errorCode === "rate"
+      ? t("regRateLimited")
+      : errorCode
+        ? t("regFailed")
+        : null;
+  const sParam = (key: string) =>
+    typeof sp[key] === "string" ? (sp[key] as string) : "";
+  const initialName = sParam("name");
+  const initialOrgName = sParam("orgName");
+  const initialMarket = sParam("market");
+  const initialEmail = sParam("email");
 
   return (
     <LandingShell locale={locale} screenLabel="Sign up">
@@ -57,18 +69,27 @@ export default async function SignUpPage({
             <p>{t("signupSubtitle")}</p>
           </div>
 
-          {errorKey ? (
+          {errorMessage ? (
             <div className="banner-error" role="alert">
               <ErrorIcon />
-              <span>{t(errorKey)}</span>
+              <span>{errorMessage}</span>
             </div>
           ) : null}
 
           <form action={register} noValidate>
             <input type="hidden" name="locale" value={locale} />
             <div className="field">
-              <label htmlFor="name">{t("name")}</label>
-              <input id="name" name="name" autoComplete="name" autoFocus />
+              <label htmlFor="name">
+                {t("name")}{" "}
+                <span className="optional">({t("optional")})</span>
+              </label>
+              <input
+                id="name"
+                name="name"
+                autoComplete="name"
+                autoFocus
+                defaultValue={initialName}
+              />
             </div>
             <div className="field">
               <label htmlFor="orgName">{t("org")}</label>
@@ -77,11 +98,17 @@ export default async function SignUpPage({
                 name="orgName"
                 autoComplete="organization"
                 required
+                defaultValue={initialOrgName}
               />
             </div>
             <div className="field">
               <label htmlFor="market">{t("market")}</label>
-              <select id="market" name="market" defaultValue="" required>
+              <select
+                id="market"
+                name="market"
+                defaultValue={initialMarket}
+                required
+              >
                 <option value="" disabled>
                   {t("marketPlaceholder")}
                 </option>
@@ -100,6 +127,7 @@ export default async function SignUpPage({
                 type="email"
                 autoComplete="email"
                 required
+                defaultValue={initialEmail}
               />
             </div>
             <div className="field">
@@ -115,9 +143,10 @@ export default async function SignUpPage({
               <span className="hint">{t("pwHint")}</span>
             </div>
             <div className="actions">
-              <button type="submit" className="btn primary block">
-                {t("createAccount")}
-              </button>
+              <SubmitButton
+                label={t("createAccount")}
+                pendingLabel={t("creatingAccount")}
+              />
             </div>
           </form>
 
