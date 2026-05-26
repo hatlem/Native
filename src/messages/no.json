@@ -739,6 +739,7 @@
     "lead": "Tilbud, bestillingsoppdateringer og plattformvarsler på ett sted.",
     "none": "Innboksen er tom.",
     "markAll": "Marker alle som lest",
+    "markingAll": "Markerer…",
     "open": "Åpne",
     "unreadCount": "{count, plural, =0 {0 uleste} =1 {1 ulest} other {# uleste}}",
     "totalCount": "{count, plural, =0 {0 totalt} =1 {1 totalt} other {# totalt}}"

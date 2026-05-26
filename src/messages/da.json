@@ -739,6 +739,7 @@
     "lead": "Tilbudssvar, ordreopdateringer og platformsnotifikationer ét sted.",
     "none": "Din indbakke er tom.",
     "markAll": "Markér alle som læst",
+    "markingAll": "Markerer…",
     "open": "Åbn",
     "unreadCount": "{count, plural, =0 {0 ulæste} =1 {1 ulæst} other {# ulæste}}",
     "totalCount": "{count, plural, =0 {0 i alt} =1 {1 i alt} other {# i alt}}"

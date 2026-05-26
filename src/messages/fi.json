@@ -72,6 +72,7 @@
     "lead": "Tarjousvastaukset, tilausten päivitykset ja alustahälytykset yhdessä paikassa.",
     "none": "Saapuneissa ei ole mitään.",
     "markAll": "Merkitse kaikki luetuiksi",
+    "markingAll": "Merkitään…",
     "open": "Avaa",
     "unreadCount": "{count, plural, =0 {0 lukematonta} =1 {1 lukematon} other {# lukematonta}}",
     "totalCount": "{count, plural, =0 {0 yhteensä} =1 {1 yhteensä} other {# yhteensä}}"

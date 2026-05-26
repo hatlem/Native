@@ -739,6 +739,7 @@
     "lead": "Offertsvar, orderuppdateringar och plattformsaviseringar på ett ställe.",
     "none": "Inkorgen är tom.",
     "markAll": "Markera alla som lästa",
+    "markingAll": "Markerar…",
     "open": "Öppna",
     "unreadCount": "{count, plural, =0 {0 olästa} =1 {1 oläst} other {# olästa}}",
     "totalCount": "{count, plural, =0 {0 totalt} =1 {1 totalt} other {# totalt}}"

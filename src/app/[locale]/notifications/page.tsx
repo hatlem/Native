@@ -6,6 +6,7 @@ import { Link } from "@/i18n/navigation";
 import { safeExternalUrl } from "@/lib/security";
 import { EmptyState } from "@/app/empty-state";
 import { markAllRead } from "@/app/notification-actions";
+import { SubmitButton } from "@/components";
 
 export const dynamic = "force-dynamic";
 
@@ -61,9 +62,11 @@ export default async function NotificationsPage({
         {unread > 0 ? (
           <form action={markAllRead} className="result-bar-action">
             <input type="hidden" name="locale" value={locale} />
-            <button type="submit" className="btn small secondary">
-              {t("markAll")}
-            </button>
+            <SubmitButton
+              label={t("markAll")}
+              pendingLabel={t("markingAll")}
+              className="btn small secondary"
+            />
           </form>
         ) : null}
       </div>
