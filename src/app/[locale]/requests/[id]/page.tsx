@@ -17,6 +17,7 @@ import {
   DetailHead,
   MetaRow,
   SectionHead,
+  SubmitButton,
 } from "@/components";
 
 export const dynamic = "force-dynamic";
@@ -385,9 +386,11 @@ export default async function RequestPage({
                       name="requestId"
                       value={request.id}
                     />
-                    <button type="submit" className="btn large">
-                      {t("accept")}
-                    </button>
+                    <SubmitButton
+                      label={t("accept")}
+                      pendingLabel={t("accepting")}
+                      className="btn large"
+                    />
                   </form>
                 )}
               </article>
