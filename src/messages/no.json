@@ -382,7 +382,8 @@
     "actions": {
       "markNative": "Merk: tilbyr native",
       "markNoNative": "Merk: ingen native",
-      "deactivate": "Deaktiver"
+      "deactivate": "Deaktiver",
+      "edit": "Rediger"
     },
     "none": "Ingen titler matcher filtrene."
   },
@@ -439,7 +440,22 @@
     "claimSubtitle": "You will be signed in as the {publisher} portal owner.",
     "claimEmailLockedHint": "Email is locked to the invitation — ask ATNative to issue a new invite if it needs to change.",
     "claimSubmit": "Claim portal account",
-    "claimError": "We could not complete the claim. The link may have just expired."
+    "claimError": "We could not complete the claim. The link may have just expired.",
+    "forgotLink": "Forgot password?",
+    "magicLinkDivider": "or",
+    "magicLinkTitle": "Sign in with a link",
+    "magicLinkLead": "We'll email you a one-tap sign-in link.",
+    "magicLinkButton": "Send sign-in link",
+    "checkTitle": "Check your inbox",
+    "checkLead": "If that email is registered, we just sent a link. It expires in 15 minutes.",
+    "forgotTitle": "Reset your password",
+    "forgotLead": "Enter your email and we'll send you a link to set a new password.",
+    "forgotButton": "Send reset link",
+    "resetTitle": "Set a new password",
+    "resetButton": "Update password",
+    "resetExpired": "This link has expired or was already used. Request a new one.",
+    "magicLinkExpired": "This sign-in link has expired or was already used.",
+    "backToSignin": "Back to sign in"
   },
   "order": {
     "title": "Bestilling",
@@ -1429,5 +1445,67 @@
     "status_revoked": "Revoked",
     "revoke": "Revoke",
     "docsHintPrefix": "Public docs available at"
+  },
+  "quoteNarrative": {
+    "sectionCampaign": "Din kampanje",
+    "sectionWhatYouGet": "Det du får",
+    "sectionInvestment": "Investering",
+    "sectionWhyThisPrice": "Hvorfor denne prisen",
+    "sectionTerms": "Vilkår",
+    "outcomeSummary": "{itemCount, plural, =1 {Én redaksjonell native-plassering for {orgName} på en ledende europeisk tittel} other {# redaksjonelle native-plasseringer for {orgName} på ledende europeiske titler}} — skrevet, forhandlet og rapportert som én pakke.",
+    "anchorLabel": "Listepris",
+    "anchorSavings": "−{pct}% mot listepris",
+    "anchorNote": "Utgivers offentlige listepris for plasseringen. Totalprisen din inkluderer innholdsproduksjon, plassering, revisjoner og rapportering.",
+    "whyThisPrice": "ATNative har direkte redaksjonelle relasjoner med alle titlene i tilbudet. Vi forhandler plasseringen, engasjerer en bransjekjent journalist, håndterer redaksjonell gjennomgang med utgiver, og rapporterer på resultatet. Du får én ansvarlig partner og én total pris — ikke en mediafaktura, en skribentfaktura og et byrå-honorar.",
+    "termsPayment": "50 % ved aksept, 50 % ved publisering.",
+    "termsCancellation": "Full refusjon før artikkelbriefen er godkjent; 50 % refusjon før første utkast; ingen refusjon etter at utgivers slot er bekreftet.",
+    "termsValidity": "Tilbudet er gyldig i 14 dager. Tilgjengelighet hos utgiver bekreftes ved aksept.",
+    "bullets": {
+      "NATIVE_ARTICLE": [
+        "Forhandlet plassering på {titleName}, skrevet i titlens redaksjonelle stemme",
+        "Artikkel (1 200–1 500 ord) skrevet av en bransjekjent journalist",
+        "To revisjonsrunder og din godkjenning før publisering",
+        "Distribusjon i {titleName}s native-feed og nyhetsbrev",
+        "Resultatrapport etter 30, 90 og 365 dager"
+      ],
+      "ADVERTORIAL": [
+        "Forhandlet plassering på {titleName}, tydelig merket som betalt innhold",
+        "Merkevareledet artikkel (800–1 200 ord) skrevet etter utgivers redaksjonelle standard",
+        "Én revisjonsrunde og din godkjenning før publisering",
+        "Distribusjon i {titleName}s innholds-feed",
+        "Resultatrapport etter 30 og 90 dager"
+      ],
+      "NATIVE_DISPLAY": [
+        "In-feed-displayenhet på {titleName}, stilet i utgivers typografi",
+        "Kreativt produsert etter titlens spesifikasjoner",
+        "Målrettet etter seksjon og målgruppesegment",
+        "Resultatrapport etter 30 og 90 dager (visninger, klikkrate, synlighet)"
+      ],
+      "PACKAGE": [
+        "Redaksjonell artikkel på {titleName} (1 200–1 500 ord)",
+        "Native-displayforsterkning i samme tittel",
+        "Felles redaksjonell gjennomgang og felles publiseringsdato",
+        "Resultatrapport etter 30, 90 og 365 dager"
+      ]
+    }
+  },
+  "priceVisibility": {
+    "requestPrice": "Be om pris",
+    "requestPriceHelp": "Pris settes etter en brief — vi kommer tilbake med tilgjengelighet og fast pris.",
+    "planRfqOnly": "En eller flere titler i planen krever et tilbud — direktekjøp er deaktivert til prisen er bekreftet."
+  },
+  "titleAdmin": {
+    "title": "Rediger tittel",
+    "publishedRateCard": "Listepris",
+    "publishedRateCardHelp": "Utgivers offisielle listepris for en standardplassering. Vises som overstreket forankring på tilbud til annonsør.",
+    "publishedRateCurrency": "Valuta",
+    "pricesPublic": "Vis priser til annonsør",
+    "pricesPublicHelp": "Av = katalogen viser «Be om pris» i stedet for tall. Direktekjøp er også deaktivert.",
+    "publisherPricesPublic": "Synlighet for hele utgiver",
+    "publisherPricesPublicOn": "Utgivers priser er offentlige",
+    "publisherPricesPublicOff": "Utgivers priser er skjult — overstyrer alle titler",
+    "save": "Lagre endringer",
+    "saved": "Lagret",
+    "cancel": "Avbryt"
   }
 }

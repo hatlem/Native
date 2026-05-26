@@ -452,7 +452,8 @@
     "actions": {
       "markNative": "Mark: offers native",
       "markNoNative": "Mark: no native",
-      "deactivate": "Deactivate"
+      "deactivate": "Deactivate",
+      "edit": "Edit"
     },
     "none": "No titles match these filters."
   },
@@ -509,7 +510,22 @@
     "claimSubtitle": "You will be signed in as the {publisher} portal owner.",
     "claimEmailLockedHint": "Email is locked to the invitation — ask ATNative to issue a new invite if it needs to change.",
     "claimSubmit": "Claim portal account",
-    "claimError": "We could not complete the claim. The link may have just expired."
+    "claimError": "We could not complete the claim. The link may have just expired.",
+    "forgotLink": "Forgot password?",
+    "magicLinkDivider": "or",
+    "magicLinkTitle": "Sign in with a link",
+    "magicLinkLead": "We'll email you a one-tap sign-in link.",
+    "magicLinkButton": "Send sign-in link",
+    "checkTitle": "Check your inbox",
+    "checkLead": "If that email is registered, we just sent a link. It expires in 15 minutes.",
+    "forgotTitle": "Reset your password",
+    "forgotLead": "Enter your email and we'll send you a link to set a new password.",
+    "forgotButton": "Send reset link",
+    "resetTitle": "Set a new password",
+    "resetButton": "Update password",
+    "resetExpired": "This link has expired or was already used. Request a new one.",
+    "magicLinkExpired": "This sign-in link has expired or was already used.",
+    "backToSignin": "Back to sign in"
   },
   "order": {
     "title": "Order",
@@ -1429,5 +1445,67 @@
     "status_revoked": "Revoked",
     "revoke": "Revoke",
     "docsHintPrefix": "Public docs available at"
+  },
+  "quoteNarrative": {
+    "sectionCampaign": "Your campaign",
+    "sectionWhatYouGet": "What you get",
+    "sectionInvestment": "Investment",
+    "sectionWhyThisPrice": "Why this price",
+    "sectionTerms": "Terms",
+    "outcomeSummary": "{itemCount, plural, =1 {A single editorial-grade native placement for {orgName} on a premium European title} other {# editorial-grade native placements for {orgName} across premium European titles}} — written, negotiated and reported on as one package.",
+    "anchorLabel": "Rate card",
+    "anchorSavings": "−{pct}% vs rate card",
+    "anchorNote": "The publisher's public rate card for this placement. Your all-in price includes editorial production, placement, revisions and reporting.",
+    "whyThisPrice": "ATNative maintains direct editorial relationships with every title in your quote. We negotiate placement, commission a vertical-specialist writer, manage editorial review with the publisher, and report on performance. You get one accountable partner and one all-in price — not a media invoice, a writer invoice and an agency retainer.",
+    "termsPayment": "50% on acceptance, 50% on publish.",
+    "termsCancellation": "Full refund before the article brief is approved; 50% refund before first draft; non-refundable once the publisher slot is confirmed.",
+    "termsValidity": "Quote valid for 14 days. Publisher availability confirmed at acceptance.",
+    "bullets": {
+      "NATIVE_ARTICLE": [
+        "Negotiated placement on {titleName}, written in the title's editorial voice",
+        "Article (1,200–1,500 words) written by a vertical-specialist journalist",
+        "Two rounds of revisions and your sign-off before publish",
+        "Distribution across {titleName}'s native feed and newsletter",
+        "Performance report at 30, 90 and 365 days"
+      ],
+      "ADVERTORIAL": [
+        "Negotiated placement on {titleName}, clearly labelled as paid content",
+        "Brand-led article (800–1,200 words) written to the publisher's editorial standard",
+        "One round of revisions and your sign-off before publish",
+        "Distribution in {titleName}'s content feed",
+        "Performance report at 30 and 90 days"
+      ],
+      "NATIVE_DISPLAY": [
+        "In-feed display unit on {titleName}, styled in the publisher's typography",
+        "Creative produced to the title's specs",
+        "Targeted by section and audience segment",
+        "Performance report at 30 and 90 days (impressions, click-through, viewability)"
+      ],
+      "PACKAGE": [
+        "Editorial article on {titleName} (1,200–1,500 words)",
+        "Native display amplification across the same title",
+        "Single editorial review and single publication date",
+        "Performance report at 30, 90 and 365 days"
+      ]
+    }
+  },
+  "priceVisibility": {
+    "requestPrice": "Request price",
+    "requestPriceHelp": "Pricing on this title is set after a brief — we'll come back with availability and a firm number.",
+    "planRfqOnly": "One or more titles in your plan require a quote — instant checkout is disabled until we confirm pricing."
+  },
+  "titleAdmin": {
+    "title": "Edit title",
+    "publishedRateCard": "Published rate card",
+    "publishedRateCardHelp": "The publisher's official list-price for a standard placement, shown to advertisers as a strikethrough anchor on quotes.",
+    "publishedRateCurrency": "Currency",
+    "pricesPublic": "Show prices to advertisers",
+    "pricesPublicHelp": "Off = catalog shows 'Request price' instead of any € figure. Self-serve checkout is also disabled.",
+    "publisherPricesPublic": "Publisher-wide visibility",
+    "publisherPricesPublicOn": "Publisher prices are public",
+    "publisherPricesPublicOff": "Publisher prices are hidden — overrides every title",
+    "save": "Save changes",
+    "saved": "Saved",
+    "cancel": "Cancel"
   }
 }

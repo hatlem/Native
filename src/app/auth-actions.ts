@@ -10,6 +10,13 @@ import { prisma } from "@/lib/prisma";
 import { landingForRole } from "@/lib/roles";
 import { authLimiter } from "@/lib/rate-limit";
 import { recordAudit } from "@/lib/audit";
+import { generateToken, hashToken, tokenExpiry } from "@/lib/tokens";
+import { emailAdapter } from "@/lib/notify";
+import { magicLinkEmail } from "@/lib/mail/templates/magic-link";
+import { passwordResetEmail } from "@/lib/mail/templates/password-reset";
+import { passwordChangedEmail } from "@/lib/mail/templates/password-changed";
+import { recordSignIn } from "@/lib/auth-events";
+import { welcomeEmail } from "@/lib/mail/templates/welcome";
 
 const MARKET_CODES = Object.values(MarketCode) as string[];
 
@@ -56,6 +63,16 @@ export async function authenticate(formData: FormData) {
     select: { id: true, role: true },
   });
   await recordAudit(user?.id ?? email, "auth.signin", `User:${email}`, { ip });
+  if (user?.id) {
+    await recordSignIn({
+      userId: user.id,
+      userEmail: email,
+      ip,
+      locale,
+      appName: appName(),
+      resetUrl: `${appUrl()}/${locale}/forgot-password`,
+    });
+  }
   // Outside the try: redirect() throws NEXT_REDIRECT, which must not be caught.
   redirect(landingForRole(user?.role, locale));
 }
@@ -125,6 +142,14 @@ export async function register(formData: FormData) {
   // emails learns nothing.
   if (!createdUserId) redirect(`/${locale}/signup?error=1${tail}`);
   await recordAudit(createdUserId, "user.register", `User:${email}`, { ip, orgName });
+
+  const catalogUrl = `${appUrl()}/${locale}/catalog`;
+  const welcome = welcomeEmail({ catalogUrl, locale, appName: appName() });
+  try {
+    await emailAdapter({ to: email, subject: welcome.subject, text: welcome.text, html: welcome.html });
+  } catch (err) {
+    console.error("auth.welcome_email_failed", { userId: createdUserId, err });
+  }
 
   try {
     await signIn("credentials", { email, password, redirect: false });
@@ -241,4 +266,221 @@ export async function claimPublisherInvite(formData: FormData) {
 export async function logout(formData: FormData) {
   const locale = String(formData.get("locale") || "en");
   await signOut({ redirectTo: `/${locale}` });
+}
+
+function appUrl(): string {
+  return (
+    process.env.AUTH_URL ??
+    process.env.NEXTAUTH_URL ??
+    process.env.NEXT_PUBLIC_SITE_URL ??
+    "http://localhost:3000"
+  );
+}
+
+function appName(): string {
+  return process.env.AUTH_APP_NAME ?? "ATNative";
+}
+
+// Magic-link sign-in: user submits email, we email them a one-tap link.
+// We always redirect to /check-email, regardless of whether the email
+// matched a real account, to avoid account enumeration.
+export async function requestMagicLink(formData: FormData) {
+  const locale = String(formData.get("locale") || "en");
+  const email = String(formData.get("email") || "")
+    .toLowerCase()
+    .trim();
+
+  const ip = await clientKey();
+  const [ipCheck, emailCheck] = await Promise.all([
+    authLimiter.check(`magic-link:ip:${ip}`),
+    authLimiter.check(`magic-link:email:${email}`),
+  ]);
+  if (!ipCheck.ok || !emailCheck.ok) {
+    redirect(`/${locale}/signin?error=rate`);
+  }
+
+  if (!email) {
+    redirect(`/${locale}/check-email`);
+  }
+
+  const user = await prisma.user.findUnique({
+    where: { email },
+    select: { id: true, email: true },
+  });
+
+  if (user) {
+    const raw = generateToken();
+    await prisma.magicLinkToken.create({
+      data: {
+        userId: user.id,
+        tokenHash: hashToken(raw),
+        expiresAt: tokenExpiry(),
+        requestedIp: ip,
+      },
+    });
+    const url = `${appUrl()}/${locale}/magic-link/${raw}`;
+    const msg = magicLinkEmail({ url, locale, appName: appName() });
+    try {
+      await emailAdapter({ to: user.email, subject: msg.subject, text: msg.text, html: msg.html });
+    } catch (err) {
+      console.error("auth.magic_link_email_failed", { userId: user.id, err });
+    }
+    await recordAudit(user.id, "auth.magic_link_requested", `User:${email}`, { ip });
+  } else {
+    await recordAudit(email, "auth.magic_link_requested_unknown", `User:${email}`, { ip });
+  }
+
+  redirect(`/${locale}/check-email`);
+}
+
+// Password reset request: same anti-enumeration as requestMagicLink.
+export async function requestPasswordReset(formData: FormData) {
+  const locale = String(formData.get("locale") || "en");
+  const email = String(formData.get("email") || "")
+    .toLowerCase()
+    .trim();
+
+  const ip = await clientKey();
+  const [ipCheck, emailCheck] = await Promise.all([
+    authLimiter.check(`reset:ip:${ip}`),
+    authLimiter.check(`reset:email:${email}`),
+  ]);
+  if (!ipCheck.ok || !emailCheck.ok) {
+    redirect(`/${locale}/forgot-password?error=rate`);
+  }
+
+  if (!email) {
+    redirect(`/${locale}/check-email`);
+  }
+
+  const user = await prisma.user.findUnique({
+    where: { email },
+    select: { id: true, email: true, passwordHash: true },
+  });
+
+  if (user?.passwordHash) {
+    const raw = generateToken();
+    await prisma.passwordResetToken.create({
+      data: {
+        userId: user.id,
+        tokenHash: hashToken(raw),
+        expiresAt: tokenExpiry(),
+        requestedIp: ip,
+      },
+    });
+    const url = `${appUrl()}/${locale}/reset-password/${raw}`;
+    const msg = passwordResetEmail({ url, locale, appName: appName() });
+    try {
+      await emailAdapter({ to: user.email, subject: msg.subject, text: msg.text, html: msg.html });
+    } catch (err) {
+      console.error("auth.password_reset_email_failed", { userId: user.id, err });
+    }
+    await recordAudit(user.id, "auth.password_reset_requested", `User:${email}`, { ip });
+  } else if (user) {
+    // User exists but has no password (passwordless-future or OAuth-only account):
+    // there's nothing to reset. Keep the user-facing response identical to the
+    // other branches (still /check-email) but emit a distinct audit kind so
+    // ops can spot the case in the log.
+    await recordAudit(user.id, "auth.password_reset_requested_no_password", `User:${email}`, { ip });
+  } else {
+    await recordAudit(email, "auth.password_reset_requested_unknown", `User:${email}`, { ip });
+  }
+
+  redirect(`/${locale}/check-email`);
+}
+
+// Consume a password-reset token: validate, update password, invalidate
+// all other open reset tokens for the same user, fire the
+// password-changed email, and sign the user in.
+export async function resetPassword(formData: FormData) {
+  const locale = String(formData.get("locale") || "en");
+  const token = String(formData.get("token") || "").trim();
+  const newPassword = String(formData.get("password") || "");
+
+  const ip = await clientKey();
+  if (!(await authLimiter.check(`reset-consume:ip:${ip}`)).ok) {
+    redirect(`/${locale}/reset-password/${token}?error=rate`);
+  }
+
+  if (!token || newPassword.length < 8) {
+    redirect(`/${locale}/reset-password/${token}?error=1`);
+  }
+
+  const hash = hashToken(token);
+  const passwordHash = await bcrypt.hash(newPassword, 10);
+  const now = new Date();
+
+  type Outcome =
+    | { ok: true; userId: string; email: string }
+    | { ok: false };
+
+  const outcome = await prisma.$transaction<Outcome>(async (tx) => {
+    const updated = await tx.passwordResetToken.updateMany({
+      where: { tokenHash: hash, consumedAt: null, expiresAt: { gt: now } },
+      data: { consumedAt: now },
+    });
+    if (updated.count !== 1) return { ok: false };
+
+    const row = await tx.passwordResetToken.findUnique({
+      where: { tokenHash: hash },
+      select: { userId: true, user: { select: { email: true } } },
+    });
+    if (!row) return { ok: false };
+
+    await tx.user.update({
+      where: { id: row.userId },
+      data: { passwordHash },
+    });
+
+    await tx.passwordResetToken.updateMany({
+      where: { userId: row.userId, consumedAt: null, NOT: { tokenHash: hash } },
+      data: { consumedAt: now },
+    });
+
+    return { ok: true, userId: row.userId, email: row.user.email };
+  });
+
+  if (!outcome.ok) {
+    await recordAudit(token ? `token:${token.slice(0, 8)}…` : "anonymous", "auth.password_reset_invalid", `Token`, { ip });
+    redirect(`/${locale}/reset-password/${token}?error=expired`);
+  }
+
+  await recordAudit(outcome.userId, "auth.password_reset_consumed", `User:${outcome.email}`, { ip });
+
+  const msg = passwordChangedEmail({
+    ip,
+    at: now.toISOString().replace("T", " ").slice(0, 16) + " UTC",
+    locale,
+    appName: appName(),
+  });
+  try {
+    await emailAdapter({ to: outcome.email, subject: msg.subject, text: msg.text, html: msg.html });
+  } catch (err) {
+    console.error("auth.password_changed_email_failed", { userId: outcome.userId, err });
+  }
+
+  try {
+    await signIn("credentials", { email: outcome.email, password: newPassword, redirect: false });
+  } catch (error) {
+    if (error instanceof AuthError) {
+      redirect(`/${locale}/signin`);
+    }
+    throw error;
+  }
+
+  // Use the recordSignIn helper to record IP + fire alert if needed.
+  await recordSignIn({
+    userId: outcome.userId,
+    userEmail: outcome.email,
+    ip,
+    locale,
+    appName: appName(),
+    resetUrl: `${appUrl()}/${locale}/forgot-password`,
+  });
+
+  const fresh = await prisma.user.findUnique({
+    where: { id: outcome.userId },
+    select: { role: true },
+  });
+  redirect(landingForRole(fresh?.role, locale));
 }

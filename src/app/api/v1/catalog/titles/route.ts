@@ -21,6 +21,7 @@ import { NextResponse, type NextRequest } from "next/server";
 import { MarketCode, ProductType } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
 import { authenticateRequest } from "@/lib/api-auth";
+import { arePricesVisible } from "@/lib/pricing-visibility";
 import { rfqLimiter } from "@/lib/rate-limit";
 
 export const dynamic = "force-dynamic";
@@ -90,7 +91,9 @@ export async function GET(req: NextRequest) {
     take: limit + 1, // peek one extra to know if there's a next page
     ...(cursor ? { cursor: { id: cursor }, skip: 1 } : {}),
     include: {
-      publisher: { select: { id: true, name: true } },
+      publisher: {
+        select: { id: true, name: true, pricesPublic: true },
+      },
       market: { select: { code: true, currency: true, disclosureLabel: true } },
       products: {
         where: { active: true },
@@ -111,24 +114,32 @@ export async function GET(req: NextRequest) {
   const nextCursor = hasMore ? page[page.length - 1]?.id : null;
 
   return NextResponse.json({
-    data: page.map((t) => ({
-      id: t.id,
-      slug: t.slug,
-      name: t.name,
-      category: t.category,
-      monthlyReach: t.monthlyReach,
-      lastVerifiedAt: t.lastVerifiedAt,
-      publisher: t.publisher,
-      market: t.market,
-      products: t.products.map((p) => ({
-        id: p.id,
-        type: p.type,
-        basePriceIndicative: Number(p.basePrice),
-        currency: p.currency,
-        visibility: p.visibility,
-        leadTimeDays: p.leadTimeDays,
-      })),
-    })),
+    data: page.map((t) => {
+      // Visibility cascade: publisher.pricesPublic AND title.pricesPublic.
+      // When hidden, redact the price and demote visibility to INDICATIVE
+      // so integration partners don't construct firm checkout flows
+      // against a price the buyer never agreed to see.
+      const priceVisible = arePricesVisible(t);
+      return {
+        id: t.id,
+        slug: t.slug,
+        name: t.name,
+        category: t.category,
+        monthlyReach: t.monthlyReach,
+        lastVerifiedAt: t.lastVerifiedAt,
+        publisher: { id: t.publisher.id, name: t.publisher.name },
+        market: t.market,
+        pricesVisible: priceVisible,
+        products: t.products.map((p) => ({
+          id: p.id,
+          type: p.type,
+          basePriceIndicative: priceVisible ? Number(p.basePrice) : null,
+          currency: p.currency,
+          visibility: priceVisible ? p.visibility : "INDICATIVE",
+          leadTimeDays: p.leadTimeDays,
+        })),
+      };
+    }),
     page: {
       limit,
       hasMore,

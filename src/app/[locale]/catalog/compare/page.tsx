@@ -4,6 +4,7 @@ import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
 import { Link } from "@/i18n/navigation";
 import { indicativeFromRules, toRateRules, formatMoney } from "@/lib/money";
+import { arePricesVisible } from "@/lib/pricing-visibility";
 import { EmptyState } from "@/app/empty-state";
 
 export const dynamic = "force-dynamic";
@@ -28,6 +29,10 @@ export default async function ComparePage({
   const tc = await getTranslations({ locale, namespace: "catalog" });
   const tMarket = await getTranslations({ locale, namespace: "market" });
   const tType = await getTranslations({ locale, namespace: "productType" });
+  const tv = await getTranslations({
+    locale,
+    namespace: "priceVisibility",
+  });
 
   const idsRaw = typeof sp.ids === "string" ? sp.ids : "";
   const ids = idsRaw
@@ -76,9 +81,15 @@ export default async function ComparePage({
 
       <div className="grid">
         {ordered.map((title) => {
-          const prices = title.products.map((p) =>
-            indicativeFromRules(Number(p.basePrice), toRateRules(p.priceRules)),
-          );
+          const priceVisible = arePricesVisible(title);
+          const prices = priceVisible
+            ? title.products.map((p) =>
+                indicativeFromRules(
+                  Number(p.basePrice),
+                  toRateRules(p.priceRules),
+                ),
+              )
+            : [];
           const from = prices.length ? Math.min(...prices) : null;
           const cur = title.products[0]?.currency ?? title.market.currency;
           const leadMin = title.products.length
@@ -110,10 +121,12 @@ export default async function ComparePage({
                   </span>
                 ))}
               </div>
-              {from !== null ? (
+              {priceVisible && from !== null ? (
                 <div className="price">
                   {tc("card.from")} {formatMoney(from, cur, locale)}
                 </div>
+              ) : !priceVisible ? (
+                <div className="price muted">{tv("requestPrice")}</div>
               ) : null}
               <p className="note" style={{ marginTop: 8 }}>
                 <Link href={`/catalog/${title.slug}`}>{t("view")} →</Link>

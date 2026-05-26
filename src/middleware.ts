@@ -23,6 +23,10 @@ function buildCsp(nonce: string): string {
     ? " https://www.googletagmanager.com https://*.google-analytics.com https://*.analytics.google.com"
     : "";
   const gtmFrame = hasGtm ? " https://www.googletagmanager.com" : "";
+  // Next.js dev wraps every module in eval() (eval-source-map), so without
+  // 'unsafe-eval' the React bootstrap silently fails and the page never
+  // hydrates. Production uses static chunks and doesn't need this.
+  const devEval = process.env.NODE_ENV === "development" ? " 'unsafe-eval'" : "";
 
   return [
     `default-src 'self'`,
@@ -30,7 +34,7 @@ function buildCsp(nonce: string): string {
     // graph without each chunk needing its own nonce. Drop modern
     // browsers ignore the host allow-list once strict-dynamic is in
     // effect — that's fine, the GTM bootstrap is what loads gtm.js.
-    `script-src 'self' 'nonce-${nonce}' 'strict-dynamic'${gtmScript}`,
+    `script-src 'self' 'nonce-${nonce}' 'strict-dynamic'${gtmScript}${devEval}`,
     // Tailwind + React inline `style=` attributes are pervasive; a
     // hash/nonce policy isn't feasible without a wholesale refactor.
     `style-src 'self' 'unsafe-inline'`,

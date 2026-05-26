@@ -5,6 +5,7 @@ import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
 import { Link } from "@/i18n/navigation";
 import { indicativeFromRules, toRateRules, formatMoney } from "@/lib/money";
+import { arePricesVisible } from "@/lib/pricing-visibility";
 import { addToPlan } from "@/app/actions";
 
 export const dynamic = "force-dynamic";
@@ -26,6 +27,10 @@ export default async function TitleDetailPage({
   const tType = await getTranslations({ locale, namespace: "productType" });
   const tMarket = await getTranslations({ locale, namespace: "market" });
   const tFormats = await getTranslations({ locale, namespace: "formats" });
+  const tv = await getTranslations({
+    locale,
+    namespace: "priceVisibility",
+  });
 
   const title = await prisma.title.findUnique({
     where: { slug },
@@ -44,17 +49,33 @@ export default async function TitleDetailPage({
   // and unverified research-catalog rows) renders.
   if (!title.active && title.lastVerifiedAt) notFound();
 
+  const priceVisible = arePricesVisible(title);
   const siteBase =
     process.env.NEXT_PUBLIC_SITE_URL?.replace(/\/$/, "") || "";
-  const ldOffers = title.products.map((p) => ({
-    "@type": "Offer",
-    name: p.name,
-    priceCurrency: p.currency,
-    price: indicativeFromRules(Number(p.basePrice), toRateRules(p.priceRules)),
-    availability: p.bookable
-      ? "https://schema.org/InStock"
-      : "https://schema.org/OutOfStock",
-  }));
+  // schema.org Offer/price is only emitted when the buyer is allowed to
+  // see the price; otherwise we omit price fields so search engines
+  // don't index numbers we deliberately hide on the page.
+  const ldOffers = priceVisible
+    ? title.products.map((p) => ({
+        "@type": "Offer",
+        name: p.name,
+        priceCurrency: p.currency,
+        price: indicativeFromRules(
+          Number(p.basePrice),
+          toRateRules(p.priceRules),
+        ),
+        availability: p.bookable
+          ? "https://schema.org/InStock"
+          : "https://schema.org/OutOfStock",
+      }))
+    : title.products.map((p) => ({
+        "@type": "Offer",
+        name: p.name,
+        priceCurrency: p.currency,
+        availability: p.bookable
+          ? "https://schema.org/InStock"
+          : "https://schema.org/OutOfStock",
+      }));
   const ld = {
     "@context": "https://schema.org",
     "@type": "Product",
@@ -62,7 +83,13 @@ export default async function TitleDetailPage({
     category: title.category,
     brand: { "@type": "Brand", name: title.publisher.name },
     url: `${siteBase}/${locale}/catalog/${title.slug}`,
-    offers: { "@type": "AggregateOffer", priceCurrency: title.market.currency, offers: ldOffers },
+    offers: priceVisible
+      ? {
+          "@type": "AggregateOffer",
+          priceCurrency: title.market.currency,
+          offers: ldOffers,
+        }
+      : { "@type": "AggregateOffer", offers: ldOffers },
   };
   const needsQuote = title.products.length === 0;
 
@@ -157,10 +184,14 @@ export default async function TitleDetailPage({
               >
                 {tFormats("learnMore")} →
               </Link>
-              <div className="price">
-                {t("from")} {formatMoney(price, p.currency, locale)}
-              </div>
-              {p.visibility === "FIRM" ? (
+              {priceVisible ? (
+                <div className="price">
+                  {t("from")} {formatMoney(price, p.currency, locale)}
+                </div>
+              ) : (
+                <div className="price muted">{tv("requestPrice")}</div>
+              )}
+              {priceVisible && p.visibility === "FIRM" ? (
                 <span className="tag">⚡ {tf("badge")}</span>
               ) : null}
               <div className="muted" style={{ marginTop: 6 }}>
@@ -206,7 +237,11 @@ export default async function TitleDetailPage({
         </div>
       )}
 
-      <p className="note">{t("indicativeNote")}</p>
+      {priceVisible ? (
+        <p className="note">{t("indicativeNote")}</p>
+      ) : (
+        <p className="note">{tv("requestPriceHelp")}</p>
+      )}
     </section>
   );
 }

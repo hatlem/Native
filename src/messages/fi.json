@@ -452,7 +452,8 @@
     "actions": {
       "markNative": "Merkitse: tarjoaa natiivia",
       "markNoNative": "Merkitse: ei natiivia",
-      "deactivate": "Poista käytöstä"
+      "deactivate": "Poista käytöstä",
+      "edit": "Muokkaa"
     },
     "none": "Ei julkaisuja vastaa näitä suodattimia."
   },
@@ -509,7 +510,22 @@
     "claimSubtitle": "You will be signed in as the {publisher} portal owner.",
     "claimEmailLockedHint": "Email is locked to the invitation — ask ATNative to issue a new invite if it needs to change.",
     "claimSubmit": "Claim portal account",
-    "claimError": "We could not complete the claim. The link may have just expired."
+    "claimError": "We could not complete the claim. The link may have just expired.",
+    "forgotLink": "Forgot password?",
+    "magicLinkDivider": "or",
+    "magicLinkTitle": "Sign in with a link",
+    "magicLinkLead": "We'll email you a one-tap sign-in link.",
+    "magicLinkButton": "Send sign-in link",
+    "checkTitle": "Check your inbox",
+    "checkLead": "If that email is registered, we just sent a link. It expires in 15 minutes.",
+    "forgotTitle": "Reset your password",
+    "forgotLead": "Enter your email and we'll send you a link to set a new password.",
+    "forgotButton": "Send reset link",
+    "resetTitle": "Set a new password",
+    "resetButton": "Update password",
+    "resetExpired": "This link has expired or was already used. Request a new one.",
+    "magicLinkExpired": "This sign-in link has expired or was already used.",
+    "backToSignin": "Back to sign in"
   },
   "order": {
     "title": "Tilaus",
@@ -1429,5 +1445,67 @@
     "status_revoked": "Revoked",
     "revoke": "Revoke",
     "docsHintPrefix": "Public docs available at"
+  },
+  "quoteNarrative": {
+    "sectionCampaign": "Kampanjasi",
+    "sectionWhatYouGet": "Mitä saat",
+    "sectionInvestment": "Investointi",
+    "sectionWhyThisPrice": "Miksi tämä hinta",
+    "sectionTerms": "Ehdot",
+    "outcomeSummary": "{itemCount, plural, =1 {Yksi toimituksellinen native-julkaisu {orgName}-yritykselle eurooppalaisessa kärkimediassa} other {# toimituksellista native-julkaisua {orgName}-yritykselle eurooppalaisissa kärkimedioissa}} — kirjoitettuna, neuvoteltuna ja raportoituna yhtenä pakettina.",
+    "anchorLabel": "Listahinta",
+    "anchorSavings": "−{pct}% listahintaan verrattuna",
+    "anchorNote": "Julkaisijan virallinen listahinta tälle julkaisulle. Kokonaishintaasi sisältyy sisällöntuotanto, julkaisu, korjaukset ja raportointi.",
+    "whyThisPrice": "ATNativellä on suorat toimitukselliset suhteet kaikkiin tarjouksen medioihin. Neuvottelemme julkaisun, palkkaamme toimialaa tuntevan toimittajan, hoidamme toimituksellisen tarkistuksen julkaisijan kanssa ja toimitamme raportoinnin. Saat yhden vastuullisen kumppanin ja yhden kokonaishinnan — emme erikseen medialaskua, kirjoittajalaskua ja toimistopalkkiota.",
+    "termsPayment": "50 % hyväksynnän yhteydessä, 50 % julkaisun yhteydessä.",
+    "termsCancellation": "Täysi palautus ennen artikkelibrieffin hyväksyntää; 50 % palautus ennen ensimmäistä luonnosta; ei palautusta enää julkaisijan paikan vahvistuksen jälkeen.",
+    "termsValidity": "Tarjous voimassa 14 päivää. Julkaisijan saatavuus vahvistetaan hyväksynnän yhteydessä.",
+    "bullets": {
+      "NATIVE_ARTICLE": [
+        "Neuvoteltu julkaisu mediassa {titleName}, kirjoitettu median toimituksellisella äänellä",
+        "Artikkeli (1 200–1 500 sanaa) toimialaa tuntevan toimittajan kirjoittama",
+        "Kaksi korjauskierrosta ja hyväksyntäsi ennen julkaisua",
+        "Levitys {titleName}-median native-syötteessä ja uutiskirjeessä",
+        "Tulosraportti 30, 90 ja 365 päivän kohdalla"
+      ],
+      "ADVERTORIAL": [
+        "Neuvoteltu julkaisu mediassa {titleName}, selkeästi merkittynä maksetuksi sisällöksi",
+        "Brändijohtoinen artikkeli (800–1 200 sanaa) julkaisijan toimituksellisten standardien mukaan",
+        "Yksi korjauskierros ja hyväksyntäsi ennen julkaisua",
+        "Levitys {titleName}-median sisältösyötteessä",
+        "Tulosraportti 30 ja 90 päivän kohdalla"
+      ],
+      "NATIVE_DISPLAY": [
+        "In-feed-display-yksikkö mediassa {titleName}, julkaisijan typografian mukaisesti",
+        "Kreatiivi tuotettu median spesifikaatioiden mukaan",
+        "Kohdennettu osion ja yleisösegmentin mukaan",
+        "Tulosraportti 30 ja 90 päivän kohdalla (näytöt, klikkausprosentti, näkyvyys)"
+      ],
+      "PACKAGE": [
+        "Toimituksellinen artikkeli mediassa {titleName} (1 200–1 500 sanaa)",
+        "Native-display-vahvistus samassa mediassa",
+        "Yhteinen toimituksellinen tarkistus ja yhteinen julkaisupäivä",
+        "Tulosraportti 30, 90 ja 365 päivän kohdalla"
+      ]
+    }
+  },
+  "priceVisibility": {
+    "requestPrice": "Pyydä hinta",
+    "requestPriceHelp": "Hinta vahvistetaan briefin jälkeen — palaamme asiaan saatavuuden ja kiinteän hinnan kanssa.",
+    "planRfqOnly": "Yksi tai useampi suunnitelmasi nimike vaatii tarjouksen — pikaosto on poistettu käytöstä kunnes hinta on vahvistettu."
+  },
+  "titleAdmin": {
+    "title": "Muokkaa nimikettä",
+    "publishedRateCard": "Listahinta",
+    "publishedRateCardHelp": "Julkaisijan virallinen listahinta tavanomaisesta julkaisusta. Näkyy tarjouksessa yliviivattuna ankkurihintana.",
+    "publishedRateCurrency": "Valuutta",
+    "pricesPublic": "Näytä hinnat mainostajalle",
+    "pricesPublicHelp": "Pois = luettelo näyttää 'Pyydä hinta' lukujen sijaan. Pikaosto on myös pois käytöstä.",
+    "publisherPricesPublic": "Koko julkaisijan näkyvyys",
+    "publisherPricesPublicOn": "Julkaisijan hinnat ovat julkisia",
+    "publisherPricesPublicOff": "Julkaisijan hinnat on piilotettu — ohittaa kaikki nimikkeet",
+    "save": "Tallenna muutokset",
+    "saved": "Tallennettu",
+    "cancel": "Peruuta"
   }
 }

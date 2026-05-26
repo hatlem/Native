@@ -4,6 +4,7 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { authenticateRequest } from "@/lib/api-auth";
+import { arePricesVisible } from "@/lib/pricing-visibility";
 import { rfqLimiter } from "@/lib/rate-limit";
 
 export const dynamic = "force-dynamic";
@@ -41,7 +42,12 @@ export async function GET(
     where: { id },
     include: {
       publisher: {
-        select: { id: true, name: true, countryCode: true },
+        select: {
+          id: true,
+          name: true,
+          countryCode: true,
+          pricesPublic: true,
+        },
       },
       market: {
         select: {
@@ -62,6 +68,13 @@ export async function GET(
     return errJson(404, "NOT_FOUND", "Title not found or inactive.");
   }
 
+  // When the publisher or title hides prices, redact every numeric
+  // pricing field — basePriceIndicative, visibility, and the full
+  // priceRules array (which encodes margin tiers we never want to
+  // leak to integration partners). The shape stays stable; clients
+  // gate on pricesVisible.
+  const priceVisible = arePricesVisible(title);
+
   return NextResponse.json({
     data: {
       id: title.id,
@@ -70,17 +83,22 @@ export async function GET(
       category: title.category,
       monthlyReach: title.monthlyReach,
       lastVerifiedAt: title.lastVerifiedAt,
-      publisher: title.publisher,
+      publisher: {
+        id: title.publisher.id,
+        name: title.publisher.name,
+        countryCode: title.publisher.countryCode,
+      },
       market: {
         ...title.market,
         vatRatePct: Number(title.market.vatRatePct),
       },
+      pricesVisible: priceVisible,
       products: title.products.map((p) => ({
         id: p.id,
         type: p.type,
-        basePriceIndicative: Number(p.basePrice),
+        basePriceIndicative: priceVisible ? Number(p.basePrice) : null,
         currency: p.currency,
-        visibility: p.visibility,
+        visibility: priceVisible ? p.visibility : "INDICATIVE",
         leadTimeDays: p.leadTimeDays,
         spec: p.spec
           ? {
@@ -92,12 +110,14 @@ export async function GET(
               requirements: p.spec.requirements,
             }
           : null,
-        priceRules: p.priceRules.map((r) => ({
-          label: r.label,
-          minVolume: r.minVolume,
-          marginPct: Number(r.marginPct),
-          seasonalMultiplier: Number(r.seasonalMultiplier),
-        })),
+        priceRules: priceVisible
+          ? p.priceRules.map((r) => ({
+              label: r.label,
+              minVolume: r.minVolume,
+              marginPct: Number(r.marginPct),
+              seasonalMultiplier: Number(r.seasonalMultiplier),
+            }))
+          : [],
       })),
     },
   });

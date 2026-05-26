@@ -452,7 +452,8 @@
     "actions": {
       "markNative": "Mark: offers native",
       "markNoNative": "Mark: no native",
-      "deactivate": "Deactivate"
+      "deactivate": "Deactivate",
+      "edit": "Bearbeiten"
     },
     "none": "No titles match these filters."
   },
@@ -509,7 +510,22 @@
     "claimSubtitle": "You will be signed in as the {publisher} portal owner.",
     "claimEmailLockedHint": "Email is locked to the invitation — ask ATNative to issue a new invite if it needs to change.",
     "claimSubmit": "Claim portal account",
-    "claimError": "We could not complete the claim. The link may have just expired."
+    "claimError": "We could not complete the claim. The link may have just expired.",
+    "forgotLink": "Forgot password?",
+    "magicLinkDivider": "or",
+    "magicLinkTitle": "Sign in with a link",
+    "magicLinkLead": "We'll email you a one-tap sign-in link.",
+    "magicLinkButton": "Send sign-in link",
+    "checkTitle": "Check your inbox",
+    "checkLead": "If that email is registered, we just sent a link. It expires in 15 minutes.",
+    "forgotTitle": "Reset your password",
+    "forgotLead": "Enter your email and we'll send you a link to set a new password.",
+    "forgotButton": "Send reset link",
+    "resetTitle": "Set a new password",
+    "resetButton": "Update password",
+    "resetExpired": "This link has expired or was already used. Request a new one.",
+    "magicLinkExpired": "This sign-in link has expired or was already used.",
+    "backToSignin": "Back to sign in"
   },
   "order": {
     "title": "Order",
@@ -1287,5 +1303,67 @@
     "status_revoked": "Revoked",
     "revoke": "Revoke",
     "docsHintPrefix": "Public docs available at"
+  },
+  "quoteNarrative": {
+    "sectionCampaign": "Ihre Kampagne",
+    "sectionWhatYouGet": "Ihre Leistungen",
+    "sectionInvestment": "Investition",
+    "sectionWhyThisPrice": "Warum dieser Preis",
+    "sectionTerms": "Konditionen",
+    "outcomeSummary": "{itemCount, plural, =1 {Eine redaktionell hochwertige Native-Platzierung für {orgName} in einem führenden europäischen Titel} other {# redaktionell hochwertige Native-Platzierungen für {orgName} in führenden europäischen Titeln}} — geschrieben, verhandelt und ausgewertet als ein Paket.",
+    "anchorLabel": "Listenpreis",
+    "anchorSavings": "−{pct}% gegenüber Listenpreis",
+    "anchorNote": "Der öffentliche Listenpreis des Verlags für diese Platzierung. Ihr Komplettpreis enthält Inhaltsproduktion, Platzierung, Revisionen und Reporting.",
+    "whyThisPrice": "ATNative pflegt direkte redaktionelle Beziehungen zu allen Titeln in Ihrem Angebot. Wir verhandeln die Platzierung, beauftragen eine fachkundige Autorin oder einen fachkundigen Autor, koordinieren die redaktionelle Abnahme mit dem Verlag und liefern das Reporting. Sie haben einen verantwortlichen Partner und einen Komplettpreis — keine getrennte Medienrechnung, Autorenrechnung und Agenturpauschale.",
+    "termsPayment": "50 % bei Annahme, 50 % bei Veröffentlichung.",
+    "termsCancellation": "Volle Rückerstattung vor Freigabe des Briefings; 50 % Rückerstattung vor dem ersten Entwurf; nach Bestätigung des Slots beim Verlag nicht erstattungsfähig.",
+    "termsValidity": "Angebot gilt 14 Tage. Verfügbarkeit beim Verlag wird bei Annahme bestätigt.",
+    "bullets": {
+      "NATIVE_ARTICLE": [
+        "Verhandelte Platzierung in {titleName}, geschrieben in der redaktionellen Stimme des Titels",
+        "Artikel (1.200–1.500 Wörter) verfasst von einer fachkundigen Journalistin oder einem fachkundigen Journalisten",
+        "Zwei Korrekturrunden und Ihre Freigabe vor Veröffentlichung",
+        "Distribution im Native-Feed und Newsletter von {titleName}",
+        "Reporting nach 30, 90 und 365 Tagen"
+      ],
+      "ADVERTORIAL": [
+        "Verhandelte Platzierung in {titleName}, klar als bezahlter Inhalt gekennzeichnet",
+        "Markenführender Artikel (800–1.200 Wörter) nach den redaktionellen Standards des Verlags",
+        "Eine Korrekturrunde und Ihre Freigabe vor Veröffentlichung",
+        "Distribution im Content-Feed von {titleName}",
+        "Reporting nach 30 und 90 Tagen"
+      ],
+      "NATIVE_DISPLAY": [
+        "In-Feed-Displayeinheit in {titleName}, gestaltet in der Typografie des Verlags",
+        "Kreation produziert nach den Spezifikationen des Titels",
+        "Targeting nach Ressort und Zielgruppensegment",
+        "Reporting nach 30 und 90 Tagen (Impressionen, Klickrate, Sichtbarkeit)"
+      ],
+      "PACKAGE": [
+        "Redaktioneller Artikel in {titleName} (1.200–1.500 Wörter)",
+        "Native-Display-Verstärkung im selben Titel",
+        "Gemeinsame redaktionelle Abnahme und gemeinsamer Veröffentlichungstermin",
+        "Reporting nach 30, 90 und 365 Tagen"
+      ]
+    }
+  },
+  "priceVisibility": {
+    "requestPrice": "Preis anfragen",
+    "requestPriceHelp": "Der Preis wird nach Briefing festgelegt — wir melden uns mit Verfügbarkeit und einem Festpreis.",
+    "planRfqOnly": "Mindestens ein Titel im Plan erfordert ein Angebot — Sofort-Buchung ist deaktiviert, bis der Preis bestätigt ist."
+  },
+  "titleAdmin": {
+    "title": "Titel bearbeiten",
+    "publishedRateCard": "Listenpreis",
+    "publishedRateCardHelp": "Der offizielle Listenpreis des Verlags für eine Standardplatzierung. Erscheint als durchgestrichener Ankerpreis im Angebot an den Werbekunden.",
+    "publishedRateCurrency": "Währung",
+    "pricesPublic": "Preise für Werbekunden anzeigen",
+    "pricesPublicHelp": "Aus = Katalog zeigt 'Preis anfragen' statt Zahlen. Sofort-Buchung ist ebenfalls deaktiviert.",
+    "publisherPricesPublic": "Sichtbarkeit für den gesamten Verlag",
+    "publisherPricesPublicOn": "Preise des Verlags sind öffentlich",
+    "publisherPricesPublicOff": "Preise des Verlags sind verborgen — überschreibt alle Titel",
+    "save": "Änderungen speichern",
+    "saved": "Gespeichert",
+    "cancel": "Abbrechen"
   }
 }

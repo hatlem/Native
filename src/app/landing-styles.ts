@@ -129,6 +129,9 @@ body:has(.bn) .drawer-link:hover { background: rgba(20,17,12,0.06) !important; }
   --surface-2: #E4DECB;
   --border: rgba(20,17,12,.18);
   --border-strong: rgba(20,17,12,.32);
+  --primary: #14110C;
+  --primary-hover: #3A3528;
+  --primary-contrast: #EDE8DB;
   --ok: #1F6F3E;
   --info: #3A3528;
   --warn: #8B5A00;

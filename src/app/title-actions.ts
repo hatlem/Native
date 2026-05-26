@@ -237,6 +237,104 @@ export async function sendPublisherInvite(formData: FormData) {
   redirect(`/${locale}/desk/titles?invite=sent`);
 }
 
+// Update the buyer-facing pricing fields on a Title: publishedRateCard
+// (the publisher's official list-price, used as the strikethrough anchor
+// on quotes — wields the "deal feels won" lever) and pricesPublic (the
+// per-title visibility toggle that AND's with publisher.pricesPublic).
+// Empty rate-card input clears the field — useful when a publisher
+// pulls their public rate card or moves to NDA pricing.
+export async function updateTitlePricing(formData: FormData) {
+  const locale = field(formData, "locale") || "en";
+  const titleId = field(formData, "titleId");
+  const userId = await requireSuperadmin(locale);
+
+  const title = await prisma.title.findUnique({
+    where: { id: titleId },
+    select: {
+      id: true,
+      name: true,
+      market: { select: { currency: true } },
+    },
+  });
+  if (!title) redirect(`/${locale}/desk/titles`);
+
+  const rateCardRaw = field(formData, "publishedRateCard");
+  const currencyRaw = field(formData, "publishedRateCurrency").toUpperCase();
+  // Checkbox semantics: unchecked checkboxes don't appear in FormData
+  // at all, so we read existence rather than the value string.
+  const pricesPublic = formData.get("pricesPublic") !== null;
+
+  let publishedRateCard: number | null = null;
+  if (rateCardRaw) {
+    const parsed = Number(rateCardRaw);
+    if (!Number.isFinite(parsed) || parsed < 0) {
+      redirect(`/${locale}/desk/titles/${titleId}?error=invalid-rate`);
+    }
+    publishedRateCard = Math.round(parsed * 100) / 100;
+  }
+
+  // Currency must be 3 letters when present; fall back to the title's
+  // market currency when the desk leaves it blank.
+  const fallbackCurrency = title.market.currency;
+  const publishedRateCurrency =
+    publishedRateCard != null
+      ? /^[A-Z]{3}$/.test(currencyRaw)
+        ? currencyRaw
+        : fallbackCurrency
+      : null;
+
+  await prisma.title.update({
+    where: { id: title.id },
+    data: {
+      publishedRateCard,
+      publishedRateCurrency,
+      pricesPublic,
+    },
+  });
+  await recordAudit(userId, "title.update_pricing", `Title:${title.id}`, {
+    name: title.name,
+    publishedRateCard,
+    publishedRateCurrency,
+    pricesPublic,
+  });
+  redirect(`/${locale}/desk/titles/${titleId}?saved=1`);
+}
+
+// Toggle the publisher-wide price visibility cascade. Off → every
+// title under this publisher renders as "Request price" no matter
+// what the per-title toggle says (publisher AND title both have to
+// be true for prices to be visible). Used when a whole publisher
+// is onboarded under NDA or asks for RFQ-only positioning.
+export async function setPublisherPricesPublic(formData: FormData) {
+  const locale = field(formData, "locale") || "en";
+  const publisherId = field(formData, "publisherId");
+  const titleIdReturn = field(formData, "titleId"); // page to redirect back to
+  const userId = await requireSuperadmin(locale);
+
+  const publisher = await prisma.publisher.findUnique({
+    where: { id: publisherId },
+    select: { id: true, name: true },
+  });
+  if (!publisher) redirect(`/${locale}/desk/titles`);
+
+  const pricesPublic = formData.get("pricesPublic") !== null;
+
+  await prisma.publisher.update({
+    where: { id: publisher.id },
+    data: { pricesPublic },
+  });
+  await recordAudit(
+    userId,
+    "publisher.update_prices_public",
+    `Publisher:${publisher.id}`,
+    { name: publisher.name, pricesPublic },
+  );
+  if (titleIdReturn) {
+    redirect(`/${locale}/desk/titles/${titleIdReturn}?saved=publisher`);
+  }
+  redirect(`/${locale}/desk/titles`);
+}
+
 // Deactivate an already-live title (super-admin only). Doesn't touch
 // the verification timestamp — only the visibility flag.
 export async function deactivateTitle(formData: FormData) {
