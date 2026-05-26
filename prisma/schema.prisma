@@ -191,9 +191,10 @@ model Publisher {
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
 
-  titles  Title[]
-  users   User[]
-  invites PublisherInvite[]
+  titles        Title[]
+  users         User[]
+  invites       PublisherInvite[]
+  salesContacts SalesContact[]
 
   @@unique([marketId, name])
   @@index([countryCode])
@@ -251,7 +252,8 @@ model Title {
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
 
-  products Product[]
+  products          Product[]
+  salesContactLinks SalesContactTitle[]
 
   @@index([countryCode])
   @@index([type])
@@ -738,4 +740,34 @@ model PasswordResetToken {
 
   @@index([userId])
   @@index([expiresAt])
+}
+
+model SalesContact {
+  id          String    @id @default(cuid())
+  publisherId String
+  publisher   Publisher @relation(fields: [publisherId], references: [id], onDelete: Cascade)
+  name        String
+  email       String
+  phone       String?
+  role        String?
+  notes       String?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  titles SalesContactTitle[]
+
+  @@unique([publisherId, email])
+  @@index([publisherId])
+}
+
+model SalesContactTitle {
+  salesContactId String
+  salesContact   SalesContact @relation(fields: [salesContactId], references: [id], onDelete: Cascade)
+  titleId        String
+  title          Title        @relation(fields: [titleId], references: [id], onDelete: Cascade)
+  isPrimary      Boolean      @default(false)
+  createdAt      DateTime     @default(now())
+
+  @@id([salesContactId, titleId])
+  @@index([titleId])
 }
