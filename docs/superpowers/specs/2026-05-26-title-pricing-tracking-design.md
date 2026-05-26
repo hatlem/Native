@@ -393,7 +393,7 @@ Embedded HTTP streamable transport route inside Native's Next.js app. Authentica
 - `native_log_quote({ priceRequestId?, productId, price, currency, includedText?, excludedText?, validUntil? })`
 - `native_log_quote_draft({ priceRequestId?, draftProductType, draftProductName, draftProductDesc?, price, currency, ... })`
 - `native_apply_quote({ quoteId })`
-- `native_mark_title_no_native({ titleId })`
+- `native_cancel_price_request({ priceRequestId })`
 
 ### Implementation rule
 
