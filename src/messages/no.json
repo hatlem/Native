@@ -1596,5 +1596,49 @@
       "price": "Pris",
       "actions": "Handlinger"
     }
+  },
+  "priceRequestForm": {
+    "hi": "Hei {name},",
+    "intro": "Vi lister {title} ({publisher}) i ATNative-katalogen og ønsker å bekrefte gjeldende priser.",
+    "hasNative": {
+      "question": "Tilbyr denne tittelen fortsatt nativt innhold?",
+      "yes": "Ja",
+      "no": "Nei",
+      "unknown": "Usikker"
+    },
+    "products": {
+      "legend": "Priser per format",
+      "none": "Vi har ingen produkter listet for denne tittelen ennå.",
+      "skip": "Hopp over — gi ikke pris på dette",
+      "price": "Pris",
+      "currency": "Valuta",
+      "included": "Hva er inkludert",
+      "includedPlaceholder": "f.eks. 1 sponset artikkel, 2-ukers forsideplass, sosiale medier",
+      "excluded": "Hva er IKKE inkludert",
+      "excludedPlaceholder": "f.eks. print, programmatisk display, videoproduksjon",
+      "validUntil": "Gyldig til"
+    },
+    "draft": {
+      "legend": "Andre formater du vil legge til",
+      "hint": "Legg til opptil tre formater du ønsker vi skal liste.",
+      "addFormat": "Legg til format {n}",
+      "type": "Formattype",
+      "name": "Formatnavn",
+      "desc": "Kort beskrivelse",
+      "price": "Pris",
+      "currency": "Valuta"
+    },
+    "note": "Noe annet vi bør vite?",
+    "submit": "Send priser",
+    "closed": {
+      "expired": { "title": "Lenken er utløpt", "body": "Ta kontakt med din ATNative-representant for å få en ny lenke." },
+      "responded": { "title": "Allerede mottatt", "body": "Takk — vi har allerede registrert svaret ditt." },
+      "cancelled": { "title": "Lenken er avbrutt", "body": "Ta kontakt med din ATNative-representant." },
+      "unknown": { "title": "Lenken er ikke tilgjengelig", "body": "Ta kontakt med din ATNative-representant." }
+    },
+    "thanks": {
+      "title": "Takk!",
+      "body": "Vi har registrert prisene dine. ATNative-teamet vil gjennomgå og legge dem inn snart."
+    }
   }
 }

@@ -1596,5 +1596,49 @@
       "price": "Price",
       "actions": "Actions"
     }
+  },
+  "priceRequestForm": {
+    "hi": "Hi {name},",
+    "intro": "We list {title} ({publisher}) in our ATNative catalog and want to confirm current pricing.",
+    "hasNative": {
+      "question": "Does this title still offer native content?",
+      "yes": "Yes",
+      "no": "No",
+      "unknown": "Not sure"
+    },
+    "products": {
+      "legend": "Pricing per format",
+      "none": "We don't have any products listed yet for this title.",
+      "skip": "Skip — don't quote this one",
+      "price": "Price",
+      "currency": "Currency",
+      "included": "What's included",
+      "includedPlaceholder": "e.g. 1 sponsored article, 2-week homepage promotion, social distribution",
+      "excluded": "What's NOT included",
+      "excludedPlaceholder": "e.g. print, programmatic display, video production",
+      "validUntil": "Valid until"
+    },
+    "draft": {
+      "legend": "Other formats you'd like to add",
+      "hint": "Add up to three more formats you'd like us to list.",
+      "addFormat": "Add format {n}",
+      "type": "Format type",
+      "name": "Format name",
+      "desc": "Short description",
+      "price": "Price",
+      "currency": "Currency"
+    },
+    "note": "Anything else we should know?",
+    "submit": "Send pricing",
+    "closed": {
+      "expired": { "title": "Link expired", "body": "Please reach out to your contact at ATNative to issue a new link." },
+      "responded": { "title": "Already received", "body": "Thanks — we already have your response on file." },
+      "cancelled": { "title": "Link cancelled", "body": "Please reach out to your contact at ATNative." },
+      "unknown": { "title": "Link not available", "body": "Please reach out to your contact at ATNative." }
+    },
+    "thanks": {
+      "title": "Thanks!",
+      "body": "We've logged your pricing. The ATNative desk will review and apply it shortly."
+    }
   }
 }

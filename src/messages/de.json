@@ -1454,5 +1454,49 @@
       "price": "Preis",
       "actions": "Aktionen"
     }
+  },
+  "priceRequestForm": {
+    "hi": "Hallo {name},",
+    "intro": "Wir listen {title} ({publisher}) im ATNative-Katalog und möchten die aktuellen Preise bestätigen.",
+    "hasNative": {
+      "question": "Bietet dieser Titel noch Native-Content an?",
+      "yes": "Ja",
+      "no": "Nein",
+      "unknown": "Unsicher"
+    },
+    "products": {
+      "legend": "Preise pro Format",
+      "none": "Wir haben noch keine Produkte für diesen Titel hinterlegt.",
+      "skip": "Überspringen — kein Angebot für dieses",
+      "price": "Preis",
+      "currency": "Währung",
+      "included": "Was ist enthalten",
+      "includedPlaceholder": "z.B. 1 gesponserter Artikel, 2-wöchige Startseiten-Platzierung, Social Media",
+      "excluded": "Was ist NICHT enthalten",
+      "excludedPlaceholder": "z.B. Print, programmatisches Display, Videoproduktion",
+      "validUntil": "Gültig bis"
+    },
+    "draft": {
+      "legend": "Weitere Formate, die Sie hinzufügen möchten",
+      "hint": "Fügen Sie bis zu drei weitere Formate hinzu, die wir listen sollen.",
+      "addFormat": "Format {n} hinzufügen",
+      "type": "Formattyp",
+      "name": "Formatname",
+      "desc": "Kurzbeschreibung",
+      "price": "Preis",
+      "currency": "Währung"
+    },
+    "note": "Gibt es noch etwas, das wir wissen sollten?",
+    "submit": "Preise senden",
+    "closed": {
+      "expired": { "title": "Link abgelaufen", "body": "Bitte wenden Sie sich an Ihren ATNative-Ansprechpartner, um einen neuen Link zu erhalten." },
+      "responded": { "title": "Bereits erhalten", "body": "Danke — wir haben Ihre Antwort bereits gespeichert." },
+      "cancelled": { "title": "Link storniert", "body": "Bitte wenden Sie sich an Ihren ATNative-Ansprechpartner." },
+      "unknown": { "title": "Link nicht verfügbar", "body": "Bitte wenden Sie sich an Ihren ATNative-Ansprechpartner." }
+    },
+    "thanks": {
+      "title": "Danke!",
+      "body": "Wir haben Ihre Preise erfasst. Das ATNative-Team wird diese in Kürze prüfen und eintragen."
+    }
   }
 }

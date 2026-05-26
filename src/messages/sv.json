@@ -1596,5 +1596,49 @@
       "price": "Pris",
       "actions": "Åtgärder"
     }
+  },
+  "priceRequestForm": {
+    "hi": "Hej {name},",
+    "intro": "Vi listar {title} ({publisher}) i ATNative-katalogen och vill bekräfta aktuella priser.",
+    "hasNative": {
+      "question": "Erbjuder den här titeln fortfarande nativt innehåll?",
+      "yes": "Ja",
+      "no": "Nej",
+      "unknown": "Osäker"
+    },
+    "products": {
+      "legend": "Priser per format",
+      "none": "Vi har inga produkter listade för den här titeln ännu.",
+      "skip": "Hoppa över — ge inget pris på den här",
+      "price": "Pris",
+      "currency": "Valuta",
+      "included": "Vad som ingår",
+      "includedPlaceholder": "t.ex. 1 sponsrad artikel, 2 veckors startsideplacering, sociala medier",
+      "excluded": "Vad som INTE ingår",
+      "excludedPlaceholder": "t.ex. print, programmatisk display, videoproduktion",
+      "validUntil": "Giltigt till"
+    },
+    "draft": {
+      "legend": "Andra format du vill lägga till",
+      "hint": "Lägg till upp till tre format som du vill att vi ska lista.",
+      "addFormat": "Lägg till format {n}",
+      "type": "Formattyp",
+      "name": "Formatnamn",
+      "desc": "Kort beskrivning",
+      "price": "Pris",
+      "currency": "Valuta"
+    },
+    "note": "Något annat vi bör veta?",
+    "submit": "Skicka priser",
+    "closed": {
+      "expired": { "title": "Länken har gått ut", "body": "Kontakta din ATNative-representant för att få en ny länk." },
+      "responded": { "title": "Redan mottaget", "body": "Tack — vi har redan ditt svar på fil." },
+      "cancelled": { "title": "Länken är avbruten", "body": "Kontakta din ATNative-representant." },
+      "unknown": { "title": "Länken är inte tillgänglig", "body": "Kontakta din ATNative-representant." }
+    },
+    "thanks": {
+      "title": "Tack!",
+      "body": "Vi har loggat dina priser. ATNative-teamet kommer att granska och tillämpa dem snart."
+    }
   }
 }

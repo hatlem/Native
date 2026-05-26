@@ -1596,5 +1596,49 @@
       "price": "Hinta",
       "actions": "Toiminnot"
     }
+  },
+  "priceRequestForm": {
+    "hi": "Hei {name},",
+    "intro": "Listaamme {title} ({publisher}) ATNative-katalogissa ja haluamme vahvistaa nykyiset hinnat.",
+    "hasNative": {
+      "question": "Tarjoaako tämä julkaisu edelleen natiivisisältöä?",
+      "yes": "Kyllä",
+      "no": "Ei",
+      "unknown": "En tiedä"
+    },
+    "products": {
+      "legend": "Hinnat formaateittain",
+      "none": "Meillä ei ole vielä tuotteita listattuna tälle julkaisulle.",
+      "skip": "Ohita — älä tarjoa hintaa tälle",
+      "price": "Hinta",
+      "currency": "Valuutta",
+      "included": "Mitä sisältyy",
+      "includedPlaceholder": "esim. 1 sponsoroitu artikkeli, 2 viikon etusivupaikka, sosiaalinen media",
+      "excluded": "Mitä EI sisälly",
+      "excludedPlaceholder": "esim. printti, ohjelmallinen display, videtuotanto",
+      "validUntil": "Voimassa asti"
+    },
+    "draft": {
+      "legend": "Muita formaatteja, joita haluat lisätä",
+      "hint": "Lisää enintään kolme formaattia, joita haluaisit meidän listaavan.",
+      "addFormat": "Lisää formaatti {n}",
+      "type": "Formaattityyppi",
+      "name": "Formaatin nimi",
+      "desc": "Lyhyt kuvaus",
+      "price": "Hinta",
+      "currency": "Valuutta"
+    },
+    "note": "Onko muuta mitä meidän pitäisi tietää?",
+    "submit": "Lähetä hinnat",
+    "closed": {
+      "expired": { "title": "Linkki on vanhentunut", "body": "Ota yhteyttä ATNative-yhteyshenkilöösi uuden linkin saamiseksi." },
+      "responded": { "title": "Jo vastaanotettu", "body": "Kiitos — vastauksesi on jo tallennettu." },
+      "cancelled": { "title": "Linkki peruutettu", "body": "Ota yhteyttä ATNative-yhteyshenkilöösi." },
+      "unknown": { "title": "Linkki ei ole käytettävissä", "body": "Ota yhteyttä ATNative-yhteyshenkilöösi." }
+    },
+    "thanks": {
+      "title": "Kiitos!",
+      "body": "Olemme kirjanneet hintasi. ATNative-tiimi tarkistaa ja ottaa ne käyttöön pian."
+    }
   }
 }
