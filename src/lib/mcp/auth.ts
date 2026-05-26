@@ -20,10 +20,11 @@ function hashToken(token: string): string {
 
 export async function authenticateApiKey(
   rawToken: string,
-): Promise<{ id: string; scopes: string } | null> {
+): Promise<{ id: string; scopes: string; createdBy: string } | null> {
   if (!rawToken) return null;
   const key = await prisma.apiKey.findUnique({
     where: { tokenHash: hashToken(rawToken) },
+    select: { id: true, scopes: true, createdBy: true, revokedAt: true, expiresAt: true },
   });
   if (!key) return null;
   if (key.revokedAt) return null;
@@ -32,9 +33,5 @@ export async function authenticateApiKey(
   prisma.apiKey
     .update({ where: { id: key.id }, data: { lastUsedAt: new Date() } })
     .catch(() => {});
-  return { id: key.id, scopes: key.scopes };
-}
-
-export function actorForApiKey(keyId: string): string {
-  return `apikey:${keyId}`;
+  return { id: key.id, scopes: key.scopes, createdBy: key.createdBy };
 }

@@ -1,5 +1,6 @@
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
-import { authenticateApiKey, hasScope, actorForApiKey } from "./auth";
+import { authenticateApiKey, hasScope } from "./auth";
+import { recordAudit } from "@/lib/audit";
 import { readToolDefinitions } from "./tools-read";
 import { mutateToolDefinitions } from "./tools-mutate";
 
@@ -41,7 +42,7 @@ export async function buildMcpServerForToken(
 
   // Mutation tools — only for pricing:admin
   if (canMutate) {
-    const mutators = mutateToolDefinitions(actorForApiKey(key.id));
+    const mutators = mutateToolDefinitions(key.createdBy);
     for (const [name, def] of Object.entries(mutators)) {
       const shape = def.parameters.shape;
       server.tool(
@@ -49,6 +50,8 @@ export async function buildMcpServerForToken(
         def.description,
         shape,
         async (args: Record<string, unknown>) => {
+          // Record audit row linking the invocation to the API key for traceability
+          await recordAudit(key.createdBy, "mcp.tool_invoked", `Tool:${name}`, { apiKeyId: key.id });
           // eslint-disable-next-line @typescript-eslint/no-explicit-any
           const parsed = def.parameters.parse(args) as any;
           // eslint-disable-next-line @typescript-eslint/no-explicit-any

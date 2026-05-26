@@ -185,6 +185,7 @@ export async function sendPriceRequestEmail(
   const built = buildPriceRequestEmail(args);
   await emailAdapter({
     to: args.to,
+    ...(args.replyTo ? { replyTo: args.replyTo } : {}),
     subject: built.subject,
     text: built.text,
   });

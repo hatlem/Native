@@ -82,7 +82,7 @@ export async function logFormSubmission(args: {
     if (!v.ok) throw new Error(v.reason);
   }
 
-  return prisma.$transaction(async (tx) => {
+  await prisma.$transaction(async (tx) => {
     for (const q of args.quotes) {
       await tx.priceQuote.create({
         data: {
@@ -109,6 +109,11 @@ export async function logFormSubmission(args: {
         hasNative: args.hasNative,
       },
     });
+  });
+
+  await recordAudit(args.recordedById, "price_quote.form_submit", `PriceRequest:${args.priceRequestId}`, {
+    quoteCount: args.quotes.length,
+    hasNative: args.hasNative,
   });
 }
 

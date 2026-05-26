@@ -19,3 +19,8 @@ test("parseScopes drops empties", () => {
   assert.deepEqual(parseScopes(""), []);
   assert.deepEqual(parseScopes(" , catalog:read , "), ["catalog:read"]);
 });
+
+test("hasScope rejects unknown scopes", () => {
+  // @ts-expect-error — runtime test of a known-invalid scope
+  assert.equal(hasScope("catalog:read", "not:a:scope"), false);
+});
