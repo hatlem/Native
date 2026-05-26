@@ -10,6 +10,9 @@ import { prisma } from "@/lib/prisma";
 import { landingForRole } from "@/lib/roles";
 import { authLimiter } from "@/lib/rate-limit";
 import { recordAudit } from "@/lib/audit";
+import { generateToken, hashToken, tokenExpiry } from "@/lib/tokens";
+import { emailAdapter } from "@/lib/notify";
+import { magicLinkEmail } from "@/lib/mail/templates/magic-link";
 
 const MARKET_CODES = Object.values(MarketCode) as string[];
 
@@ -241,4 +244,69 @@ export async function claimPublisherInvite(formData: FormData) {
 export async function logout(formData: FormData) {
   const locale = String(formData.get("locale") || "en");
   await signOut({ redirectTo: `/${locale}` });
+}
+
+function appUrl(): string {
+  return (
+    process.env.AUTH_URL ??
+    process.env.NEXTAUTH_URL ??
+    process.env.NEXT_PUBLIC_SITE_URL ??
+    "http://localhost:3000"
+  );
+}
+
+function appName(): string {
+  return process.env.AUTH_APP_NAME ?? "ATNative";
+}
+
+// Magic-link sign-in: user submits email, we email them a one-tap link.
+// We always redirect to /check-email, regardless of whether the email
+// matched a real account, to avoid account enumeration.
+export async function requestMagicLink(formData: FormData) {
+  const locale = String(formData.get("locale") || "en");
+  const email = String(formData.get("email") || "")
+    .toLowerCase()
+    .trim();
+
+  const ip = await clientKey();
+  const [ipCheck, emailCheck] = await Promise.all([
+    authLimiter.check(`magic-link:ip:${ip}`),
+    authLimiter.check(`magic-link:email:${email}`),
+  ]);
+  if (!ipCheck.ok || !emailCheck.ok) {
+    redirect(`/${locale}/signin?error=rate`);
+  }
+
+  if (!email) {
+    redirect(`/${locale}/check-email`);
+  }
+
+  const user = await prisma.user.findUnique({
+    where: { email },
+    select: { id: true, email: true },
+  });
+
+  if (user) {
+    const raw = generateToken();
+    await prisma.magicLinkToken.create({
+      data: {
+        userId: user.id,
+        tokenHash: hashToken(raw),
+        expiresAt: tokenExpiry(),
+        requestedIp: ip,
+      },
+    });
+    const url = `${appUrl()}/${locale}/magic-link/${raw}`;
+    const msg = magicLinkEmail({ url, locale, appName: appName() });
+    try {
+      await emailAdapter({ to: user.email, subject: msg.subject, text: msg.text, html: msg.html });
+    } catch (err) {
+      console.error("auth.magic_link_email_failed", { userId: user.id, err });
+    }
+    await recordAudit(user.id, "auth.magic_link_requested", `User:${email}`, { ip });
+  } else {
+    await recordAudit(email, "auth.magic_link_requested_unknown", `User:${email}`, { ip });
+  }
+
+  redirect(`/${locale}/check-email`);
 }
