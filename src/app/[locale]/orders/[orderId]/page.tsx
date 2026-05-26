@@ -7,6 +7,7 @@ import { loadScope, canActOnOrg } from "@/lib/scope";
 import { safeExternalUrl } from "@/lib/security";
 import { StatusBadge } from "@/app/status-badge";
 import { duplicatePlan } from "@/app/actions";
+import { SubmitButton } from "@/components";
 
 export const dynamic = "force-dynamic";
 
@@ -101,9 +102,11 @@ export default async function MyOrderPage({
           <form action={duplicatePlan}>
             <input type="hidden" name="locale" value={locale} />
             <input type="hidden" name="orderId" value={order.id} />
-            <button type="submit" className="btn small secondary block">
-              {t("useAsTemplate")}
-            </button>
+            <SubmitButton
+              label={t("useAsTemplate")}
+              pendingLabel={t("duplicating")}
+              className="btn small secondary block"
+            />
           </form>
         </aside>
       </header>

@@ -64,7 +64,8 @@
     "newOrderCta": "New order",
     "orderDetailLead": "Production status, deliverables and live placements for every line in this order.",
     "linesEyebrow": "Order lines",
-    "useAsTemplate": "Use as template"
+    "useAsTemplate": "Use as template",
+    "duplicating": "Duplicating…"
   },
   "notifications": {
     "eyebrow": "Inbox",

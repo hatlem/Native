@@ -732,7 +732,8 @@
     "newOrderCta": "Ny bestilling",
     "orderDetailLead": "Produksjonsstatus, leveranser og live-plasseringer for hver linje i denne bestillingen.",
     "linesEyebrow": "Bestillingslinjer",
-    "useAsTemplate": "Use as template"
+    "useAsTemplate": "Use as template",
+    "duplicating": "Dupliserer…"
   },
   "notifications": {
     "eyebrow": "Innboks",

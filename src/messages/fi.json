@@ -64,7 +64,8 @@
     "newOrderCta": "Uusi tilaus",
     "orderDetailLead": "Tuotantotila, toimitukset ja live-sijoittelut jokaiselle riville tässä tilauksessa.",
     "linesEyebrow": "Tilausrivit",
-    "useAsTemplate": "Use as template"
+    "useAsTemplate": "Use as template",
+    "duplicating": "Monistetaan…"
   },
   "notifications": {
     "eyebrow": "Saapuneet",
