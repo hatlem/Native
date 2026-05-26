@@ -627,6 +627,7 @@
     "vetoReasonLabel": "Syy",
     "vetoReasonPlaceholder": "esim. Tapaustutkimukset lukeutuvat sponsoripitchinä — rikkoo toimituksellista standardiamme mainostajan maksamalle sisällölle.",
     "vetoSubmit": "Vahvista hylkäys",
+    "vetoSubmitting": "Vahvistetaan…",
     "vetoError": "Hylkäys evätty",
     "retractedLabel": "Peruutettu"
   },

@@ -627,6 +627,7 @@
     "vetoReasonLabel": "Reason",
     "vetoReasonPlaceholder": "e.g. Case studies read as sponsor pitch — violates our editorial standard for annoncørbetalt content.",
     "vetoSubmit": "Confirm rejection",
+    "vetoSubmitting": "Confirming…",
     "vetoError": "Rejection refused",
     "retractedLabel": "Retracted"
   },

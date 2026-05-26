@@ -8,6 +8,7 @@ import { updateBooking, rejectAsset } from "@/app/publisher-actions";
 import { StatusBadge } from "@/app/status-badge";
 import { EmptyState } from "@/app/empty-state";
 import { canRetractAsset } from "@/lib/cancellation";
+import { SubmitButton } from "@/components";
 
 export const dynamic = "force-dynamic";
 
@@ -172,9 +173,11 @@ export default async function PublisherOrdersPage({
                         />
                       </div>
                       <div className="actions">
-                        <button type="submit" className="btn small">
-                          {t("save")}
-                        </button>
+                        <SubmitButton
+                          label={t("save")}
+                          pendingLabel={t("saving")}
+                          className="btn small"
+                        />
                       </div>
                     </form>
                   ) : (
@@ -218,9 +221,11 @@ export default async function PublisherOrdersPage({
                           />
                         </div>
                         <div className="actions">
-                          <button type="submit" className="btn small">
-                            {tp("vetoSubmit")}
-                          </button>
+                          <SubmitButton
+                            label={tp("vetoSubmit")}
+                            pendingLabel={tp("vetoSubmitting")}
+                            className="btn small"
+                          />
                         </div>
                       </form>
                     </details>

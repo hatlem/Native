@@ -554,6 +554,7 @@
     "vetoReasonLabel": "Årsag",
     "vetoReasonPlaceholder": "f.eks. Case-studierne læses som sponsor-pitch — bryder vores redaktionelle standard for annoncørbetalt indhold.",
     "vetoSubmit": "Bekræft afvisning",
+    "vetoSubmitting": "Bekræfter…",
     "vetoError": "Afvisning afvist",
     "retractedLabel": "Tilbagekaldt"
   },

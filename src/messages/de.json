@@ -627,6 +627,7 @@
     "vetoReasonLabel": "Grund",
     "vetoReasonPlaceholder": "z.B. Fallstudien lesen sich als Sponsor-Pitch — verstößt gegen unseren redaktionellen Standard für werbefinanzierte Inhalte.",
     "vetoSubmit": "Ablehnung bestätigen",
+    "vetoSubmitting": "Wird bestätigt…",
     "vetoError": "Ablehnung verweigert",
     "retractedLabel": "Zurückgezogen"
   },
