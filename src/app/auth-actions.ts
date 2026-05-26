@@ -13,6 +13,7 @@ import { recordAudit } from "@/lib/audit";
 import { generateToken, hashToken, tokenExpiry } from "@/lib/tokens";
 import { emailAdapter } from "@/lib/notify";
 import { magicLinkEmail } from "@/lib/mail/templates/magic-link";
+import { passwordResetEmail } from "@/lib/mail/templates/password-reset";
 
 const MARKET_CODES = Object.values(MarketCode) as string[];
 
@@ -306,6 +307,56 @@ export async function requestMagicLink(formData: FormData) {
     await recordAudit(user.id, "auth.magic_link_requested", `User:${email}`, { ip });
   } else {
     await recordAudit(email, "auth.magic_link_requested_unknown", `User:${email}`, { ip });
+  }
+
+  redirect(`/${locale}/check-email`);
+}
+
+// Password reset request: same anti-enumeration as requestMagicLink.
+export async function requestPasswordReset(formData: FormData) {
+  const locale = String(formData.get("locale") || "en");
+  const email = String(formData.get("email") || "")
+    .toLowerCase()
+    .trim();
+
+  const ip = await clientKey();
+  const [ipCheck, emailCheck] = await Promise.all([
+    authLimiter.check(`reset:ip:${ip}`),
+    authLimiter.check(`reset:email:${email}`),
+  ]);
+  if (!ipCheck.ok || !emailCheck.ok) {
+    redirect(`/${locale}/forgot-password?error=rate`);
+  }
+
+  if (!email) {
+    redirect(`/${locale}/check-email`);
+  }
+
+  const user = await prisma.user.findUnique({
+    where: { email },
+    select: { id: true, email: true, passwordHash: true },
+  });
+
+  if (user?.passwordHash) {
+    const raw = generateToken();
+    await prisma.passwordResetToken.create({
+      data: {
+        userId: user.id,
+        tokenHash: hashToken(raw),
+        expiresAt: tokenExpiry(),
+        requestedIp: ip,
+      },
+    });
+    const url = `${appUrl()}/${locale}/reset-password/${raw}`;
+    const msg = passwordResetEmail({ url, locale, appName: appName() });
+    try {
+      await emailAdapter({ to: user.email, subject: msg.subject, text: msg.text, html: msg.html });
+    } catch (err) {
+      console.error("auth.password_reset_email_failed", { userId: user.id, err });
+    }
+    await recordAudit(user.id, "auth.password_reset_requested", `User:${email}`, { ip });
+  } else {
+    await recordAudit(email, "auth.password_reset_requested_unknown", `User:${email}`, { ip });
   }
 
   redirect(`/${locale}/check-email`);
