@@ -781,6 +781,7 @@
     "subtitle": "Blockera månader du inte kan leverera — katalogen döljer fastpris­produkter för blockerade månader och självservice­kassan vägrar dem.",
     "blocked": "Blockerad",
     "save": "Spara",
+    "saving": "Sparar…",
     "kpiBlocked": "Blockerade månader",
     "kpiBlockedSub": "Alla produkter",
     "kpiHorizon": "Månader framåt",

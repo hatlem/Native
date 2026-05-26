@@ -4,6 +4,7 @@ import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
 import { Link } from "@/i18n/navigation";
 import { setAvailability } from "@/app/publisher-actions";
+import { SubmitButton } from "@/components";
 
 export const dynamic = "force-dynamic";
 
@@ -126,9 +127,11 @@ export default async function PublisherAvailabilityPage({
                               />
                               <span>{ta("blocked")}</span>
                             </label>
-                            <button type="submit" className="btn small ghost">
-                              {ta("save")}
-                            </button>
+                            <SubmitButton
+                              label={ta("save")}
+                              pendingLabel={ta("saving")}
+                              className="btn small ghost"
+                            />
                           </form>
                         </li>
                       );

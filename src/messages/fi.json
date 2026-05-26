@@ -104,6 +104,7 @@
     "subtitle": "Estä kuukaudet, joina et voi toimittaa — katalogi piilottaa kiinteähintaiset tuotteet estetyiltä kuukausilta ja pikatilauskassa estää ne.",
     "blocked": "Estetty",
     "save": "Tallenna",
+    "saving": "Tallennetaan…",
     "kpiBlocked": "Estettyjä kuukausia",
     "kpiBlockedSub": "Kaikkien tuotteiden osalta",
     "kpiHorizon": "Kuukautta eteenpäin",

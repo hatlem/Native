@@ -781,6 +781,7 @@
     "subtitle": "Bloker måneder du ikke kan levere — kataloget skjuler fast­pris­produkter for blokerede måneder, og selv­betjeningskassen afviser dem.",
     "blocked": "Blokeret",
     "save": "Gem",
+    "saving": "Gemmer…",
     "kpiBlocked": "Blokerede måneder",
     "kpiBlockedSub": "På tværs af produkter",
     "kpiHorizon": "Måneder frem",

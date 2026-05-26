@@ -781,6 +781,7 @@
     "subtitle": "Blokker måneder du ikke kan levere — katalogen skjuler firmpris­produkter for blokkerte måneder og selv­betjent kassen avviser dem.",
     "blocked": "Blokkert",
     "save": "Lagre",
+    "saving": "Lagrer…",
     "kpiBlocked": "Blokkerte måneder",
     "kpiBlockedSub": "Alle produkter",
     "kpiHorizon": "Måneder fremover",

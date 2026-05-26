@@ -104,6 +104,7 @@
     "subtitle": "Block months you can't deliver in — the catalog hides firm-priced products for blocked months and instant-book checkout refuses them.",
     "blocked": "Blocked",
     "save": "Save",
+    "saving": "Wird gespeichert…",
     "kpiBlocked": "Blocked months",
     "kpiBlockedSub": "Across all products",
     "kpiHorizon": "Months ahead",
