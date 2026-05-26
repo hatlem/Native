@@ -32,3 +32,6 @@ sec-review-*.md
 
 # scenario fixtures (large binaries — kept out of git)
 test-fixtures/
+
+# local DB snapshots (pg_dump safety nets taken before destructive migrations)
+scripts/dev-backups/
