@@ -123,6 +123,8 @@ export default async function DeskListPage({
           label={t("kpiQuotesOut")}
           value={quotedCount}
           delta={t("kpiQuotesOutSub")}
+          ctaHref={quotedCount > 0 ? "#in-motion" : undefined}
+          ctaLabel={quotedCount > 0 ? t("ctaReview") : undefined}
         />
         <Kpi
           label={t("kpiActiveOrders")}
@@ -188,7 +190,7 @@ export default async function DeskListPage({
         )}
       </section>
 
-      <section className="section">
+      <section className="section" id="in-motion">
         <SectionHead
           eyebrow={t("sectionWorking")}
           title={t("workingOnTitle")}
