@@ -15,6 +15,7 @@ import { emailAdapter } from "@/lib/notify";
 import { magicLinkEmail } from "@/lib/mail/templates/magic-link";
 import { passwordResetEmail } from "@/lib/mail/templates/password-reset";
 import { passwordChangedEmail } from "@/lib/mail/templates/password-changed";
+import { recordSignIn } from "@/lib/auth-events";
 
 const MARKET_CODES = Object.values(MarketCode) as string[];
 
@@ -61,6 +62,16 @@ export async function authenticate(formData: FormData) {
     select: { id: true, role: true },
   });
   await recordAudit(user?.id ?? email, "auth.signin", `User:${email}`, { ip });
+  if (user?.id) {
+    await recordSignIn({
+      userId: user.id,
+      userEmail: email,
+      ip,
+      locale,
+      appName: appName(),
+      resetUrl: `${appUrl()}/${locale}/forgot-password`,
+    });
+  }
   // Outside the try: redirect() throws NEXT_REDIRECT, which must not be caught.
   redirect(landingForRole(user?.role, locale));
 }
