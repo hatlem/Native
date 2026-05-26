@@ -197,7 +197,8 @@
   "titleDetail": {
     "back": "Tillbaka till katalogen",
     "publishedBy": "Ges ut av",
-    "reach": "Månatliga läsare",
+    "reach": "Månatliga läsare (totalt)",
+    "digitalReach": "Månatliga onlineläsare",
     "formats": "Native-format",
     "circulation": "Upplaga",
     "leadTime": "Ledtid",

@@ -117,7 +117,12 @@ export default async function TitleDetailPage({
         {t("publishedBy")} {title.publisher.name} · {tMarket(title.market.code)}{" "}
         · {title.category}
       </p>
-      {title.monthlyReach ? (
+      {title.digitalReach ? (
+        <p className="muted">
+          {t("digitalReach")}:{" "}
+          {new Intl.NumberFormat().format(title.digitalReach)}
+        </p>
+      ) : title.monthlyReach ? (
         <p className="muted">
           {t("reach")}: {new Intl.NumberFormat().format(title.monthlyReach)}
         </p>
@@ -159,12 +164,6 @@ export default async function TitleDetailPage({
       ) : null}
       {title.audience ? (
         <p className="muted">{title.audience}</p>
-      ) : null}
-      {title.circulation ? (
-        <p className="muted">
-          {t("circulation")}:{" "}
-          {new Intl.NumberFormat().format(title.circulation)}
-        </p>
       ) : null}
 
       {needsQuote ? (

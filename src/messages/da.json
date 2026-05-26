@@ -158,7 +158,8 @@
     },
     "card": {
       "from": "Fra",
-      "reach": "Månedlige læsere",
+      "reach": "Månedlige læsere (samlet)",
+      "digitalReach": "Månedlige onlinelæsere",
       "circulation": "Oplag",
       "leadTime": "Leveringstid",
       "days": "dage",
@@ -196,7 +197,8 @@
   "titleDetail": {
     "back": "Tilbage til kataloget",
     "publishedBy": "Udgives af",
-    "reach": "Månedlige læsere",
+    "reach": "Månedlige læsere (samlet)",
+    "digitalReach": "Månedlige onlinelæsere",
     "formats": "Native-formater",
     "circulation": "Oplag",
     "leadTime": "Leveringstid",

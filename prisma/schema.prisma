@@ -220,7 +220,15 @@ model Title {
   market        Market    @relation(fields: [marketId], references: [id])
   category      String // e.g. "general-news", "business", "lifestyle"
   audienceNote  String?
-  monthlyReach  Int? // estimated readers / month
+  // Combined print + digital monthly readers (legacy seed estimate).
+  // Kept for desk/internal use; the customer-facing catalog should
+  // prefer `digitalReach` once it's populated.
+  monthlyReach  Int?
+  // Pure digital monthly visitors / unique readers on the title's
+  // website. This is what marketing/agency prospects actually care
+  // about because the marketplace doesn't sell print. Populated from
+  // SimilarWeb / publisher analytics; null until seeded.
+  digitalReach  Int?
   websiteUrl    String?
   active        Boolean   @default(true)
   lastVerifiedAt DateTime?

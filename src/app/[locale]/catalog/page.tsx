@@ -8,11 +8,18 @@ import { isProductPriceShown } from "@/lib/pricing-visibility";
 import { EmptyState } from "@/app/empty-state";
 import { LandingShell } from "@/app/landing-shell";
 import { searchTitleIds } from "@/lib/catalog-search";
+import { CatalogFilters } from "./_components/CatalogFilters";
+import {
+  CompareSelectionProvider,
+  TitleSelector,
+} from "./_components/CompareSelection";
 
 export const dynamic = "force-dynamic";
 
 const MARKET_CODES = Object.values(MarketCode);
 const PRODUCT_TYPES = Object.values(ProductType);
+// Marketing surface highlights the canonical four — research-only enum
+// members (CONTEXTUAL, OTHER) intentionally don't show in the format gallery.
 const FORMAT_KEYS: ProductType[] = [
   ProductType.NATIVE_ARTICLE,
   ProductType.ADVERTORIAL,
@@ -49,6 +56,7 @@ export default async function CatalogPage({
   const tf = await getTranslations({ locale, namespace: "firm" });
   const tType = await getTranslations({ locale, namespace: "productType" });
   const tMarket = await getTranslations({ locale, namespace: "market" });
+  const tFit = await getTranslations({ locale, namespace: "nativeFit" });
   const tv = await getTranslations({
     locale,
     namespace: "priceVisibility",
@@ -58,10 +66,20 @@ export default async function CatalogPage({
     typeof sp.market === "string" ? sp.market : undefined,
     MARKET_CODES,
   );
-  const type = asEnum(
-    typeof sp.type === "string" ? sp.type : undefined,
-    PRODUCT_TYPES,
-  );
+  // `types` is the new multi-select param (CSV). Fall back to the legacy
+  // single `type` param so older shared links keep working.
+  const typesRaw =
+    typeof sp.types === "string"
+      ? sp.types
+      : typeof sp.type === "string"
+        ? sp.type
+        : "";
+  const types: ProductType[] = typesRaw
+    .split(",")
+    .map((s) => s.trim())
+    .filter((s): s is ProductType =>
+      (PRODUCT_TYPES as readonly string[]).includes(s),
+    );
   const nativeFit = asEnum(
     typeof sp.nativeFit === "string" ? sp.nativeFit : undefined,
     NATIVE_FIT_VALUES,
@@ -72,6 +90,11 @@ export default async function CatalogPage({
   );
   const onlyPriced =
     typeof sp.onlyPriced === "string" && sp.onlyPriced === "1";
+  const compareMode =
+    typeof sp.compareMode === "string" && sp.compareMode === "1";
+  // Advanced section auto-opens when an advanced filter is active so the
+  // user can see *why* their result set is filtered, not just that it is.
+  const advancedOpen = compareMode || !!b2bB2c;
   const q = typeof sp.q === "string" ? sp.q.trim() : "";
   const pageRaw = typeof sp.page === "string" ? parseInt(sp.page, 10) : 1;
   const page = Number.isFinite(pageRaw) && pageRaw >= 1 ? pageRaw : 1;
@@ -85,7 +108,9 @@ export default async function CatalogPage({
     // hide titles the desk has verified as not offering native.
     OR: [{ active: true }, { lastVerifiedAt: null }],
     ...(market ? { market: { code: market } } : {}),
-    ...(type ? { products: { some: { type, active: true } } } : {}),
+    ...(types.length
+      ? { products: { some: { type: { in: types }, active: true } } }
+      : {}),
     ...(onlyPriced ? { active: true } : {}),
     ...(nativeFit ? { nativeFit } : {}),
     ...(b2bB2c ? { b2bB2c } : {}),
@@ -126,10 +151,11 @@ export default async function CatalogPage({
   const pageQuery = (p: number) => {
     const params = new URLSearchParams();
     if (market) params.set("market", market);
-    if (type) params.set("type", type);
+    if (types.length) params.set("types", types.join(","));
     if (nativeFit) params.set("nativeFit", nativeFit);
     if (b2bB2c) params.set("b2bB2c", b2bB2c);
     if (onlyPriced) params.set("onlyPriced", "1");
+    if (compareMode) params.set("compareMode", "1");
     if (q) params.set("q", q);
     if (p > 1) params.set("page", String(p));
     const s = params.toString();
@@ -142,24 +168,33 @@ export default async function CatalogPage({
   // changes.
   type FilterKey =
     | "market"
-    | "type"
+    | "types"
     | "nativeFit"
     | "b2bB2c"
     | "onlyPriced"
     | "q";
-  const filterHref = (except: FilterKey) => {
+  const filterHref = (
+    except: FilterKey,
+    extra?: { dropType?: ProductType },
+  ) => {
     const params = new URLSearchParams();
     if (market && except !== "market") params.set("market", market);
-    if (type && except !== "type") params.set("type", type);
+    if (except !== "types") {
+      const keep = extra?.dropType
+        ? types.filter((t) => t !== extra.dropType)
+        : types;
+      if (keep.length) params.set("types", keep.join(","));
+    }
     if (nativeFit && except !== "nativeFit") params.set("nativeFit", nativeFit);
     if (b2bB2c && except !== "b2bB2c") params.set("b2bB2c", b2bB2c);
     if (onlyPriced && except !== "onlyPriced") params.set("onlyPriced", "1");
+    if (compareMode) params.set("compareMode", "1");
     if (q && except !== "q") params.set("q", q);
     const s = params.toString();
     return s ? `/catalog?${s}` : "/catalog";
   };
 
-  const activeFilters: Array<{ key: FilterKey; label: string; href: string }> =
+  const activeFilters: Array<{ key: string; label: string; href: string }> =
     [];
   if (market)
     activeFilters.push({
@@ -167,16 +202,17 @@ export default async function CatalogPage({
       label: `${t("filters.market")}: ${tMarket(market)}`,
       href: filterHref("market"),
     });
-  if (type)
+  for (const tp of types) {
     activeFilters.push({
-      key: "type",
-      label: `${t("filters.type")}: ${tType(type)}`,
-      href: filterHref("type"),
+      key: `type-${tp}`,
+      label: `${t("filters.type")}: ${tType(tp)}`,
+      href: filterHref("types", { dropType: tp }),
     });
+  }
   if (nativeFit)
     activeFilters.push({
       key: "nativeFit",
-      label: `${t("filters.nativeFit")}: ${nativeFit}`,
+      label: `${t("filters.nativeFit")}: ${tFit(nativeFit)}`,
       href: filterHref("nativeFit"),
     });
   if (b2bB2c)
@@ -203,100 +239,22 @@ export default async function CatalogPage({
       <h1>{t("title")}</h1>
       <p className="muted">{t("subtitle")}</p>
 
-      <form className="filters" method="get">
-        <div>
-          <label htmlFor="market">{t("filters.market")}</label>
-          <select
-            key={`market-${market ?? "all"}`}
-            id="market"
-            name="market"
-            defaultValue={market ?? ""}
-          >
-            <option value="">{t("filters.all")}</option>
-            {MARKET_CODES.map((m) => (
-              <option key={m} value={m}>
-                {tMarket(m)}
-              </option>
-            ))}
-          </select>
-        </div>
-        <div>
-          <label htmlFor="type">{t("filters.type")}</label>
-          <select
-            key={`type-${type ?? "all"}`}
-            id="type"
-            name="type"
-            defaultValue={type ?? ""}
-          >
-            <option value="">{t("filters.all")}</option>
-            {PRODUCT_TYPES.map((pt) => (
-              <option key={pt} value={pt}>
-                {tType(pt)}
-              </option>
-            ))}
-          </select>
-        </div>
-        <div>
-          <label htmlFor="nativeFit">{t("filters.nativeFit")}</label>
-          <select
-            key={`nativeFit-${nativeFit ?? "all"}`}
-            id="nativeFit"
-            name="nativeFit"
-            defaultValue={nativeFit ?? ""}
-          >
-            <option value="">{t("filters.all")}</option>
-            {NATIVE_FIT_VALUES.map((v) => (
-              <option key={v} value={v}>
-                {v}
-              </option>
-            ))}
-          </select>
-        </div>
-        <div>
-          <label htmlFor="b2bB2c">{t("filters.b2bB2c")}</label>
-          <select
-            key={`b2bB2c-${b2bB2c ?? "all"}`}
-            id="b2bB2c"
-            name="b2bB2c"
-            defaultValue={b2bB2c ?? ""}
-          >
-            <option value="">{t("filters.all")}</option>
-            {B2B_B2C_VALUES.map((v) => (
-              <option key={v} value={v}>
-                {v}
-              </option>
-            ))}
-          </select>
-        </div>
-        <div>
-          <label htmlFor="q">{t("filters.search")}</label>
-          <input
-            key={`q-${q || "empty"}`}
-            id="q"
-            name="q"
-            defaultValue={q}
-            placeholder={t("filters.searchPlaceholder")}
-          />
-        </div>
-        <label
-          style={{
-            display: "flex",
-            alignItems: "center",
-            gap: 6,
-            whiteSpace: "nowrap",
-          }}
-        >
-          <input
-            key={`onlyPriced-${onlyPriced ? "1" : "0"}`}
-            type="checkbox"
-            name="onlyPriced"
-            value="1"
-            defaultChecked={onlyPriced}
-          />
-          {t("filters.onlyPriced")}
-        </label>
-        <button type="submit">{t("filters.apply")}</button>
-      </form>
+      <CatalogFilters
+        markets={MARKET_CODES.map((m) => ({ value: m, label: tMarket(m) }))}
+        formats={PRODUCT_TYPES.map((pt) => ({ value: pt, label: tType(pt) }))}
+        nativeFits={NATIVE_FIT_VALUES.map((v) => ({ value: v, label: tFit(v) }))}
+        b2bB2cs={B2B_B2C_VALUES.map((v) => ({ value: v, label: v }))}
+        initial={{
+          q,
+          market: market ?? "",
+          types,
+          nativeFit: nativeFit ?? "",
+          b2bB2c: b2bB2c ?? "",
+          onlyPriced,
+          advancedOpen,
+          compareMode,
+        }}
+      />
 
       {activeFilters.length > 0 ? (
         <div className="filter-chips" style={{ marginTop: 12 }}>
@@ -327,19 +285,7 @@ export default async function CatalogPage({
           primaryLabel={t("clearFilters")}
         />
       ) : (
-        <>
-          {titles.length >= 2 ? (
-            <p className="note" style={{ marginTop: 10 }}>
-              <Link
-                href={`/catalog/compare?ids=${titles
-                  .slice(0, 6)
-                  .map((t) => t.id)
-                  .join(",")}`}
-              >
-                {t("compareTop")} →
-              </Link>
-            </p>
-          ) : null}
+        <CompareSelectionProvider enabled={compareMode}>
         <div className="grid">
           {titles.map((title) => {
             // Per-product visibility: active + confirmedAt + pricesPublic flags
@@ -360,7 +306,8 @@ export default async function CatalogPage({
             const needsQuote = title.products.length === 0;
 
             return (
-              <article className="card" key={title.id}>
+              <article className="card catalog-card" key={title.id}>
+                <TitleSelector id={title.id} />
                 <h3>
                   <Link href={`/catalog/${title.slug}`}>{title.name}</Link>
                 </h3>
@@ -385,7 +332,7 @@ export default async function CatalogPage({
                   ) : null}
                   {title.nativeFit ? (
                     <span className="tag">
-                      {t("card.nativeFit", { value: title.nativeFit })}
+                      {t("card.nativeFit", { value: tFit(title.nativeFit as "High" | "Medium" | "Low") })}
                     </span>
                   ) : null}
                   {title.b2bB2c ? (
@@ -397,15 +344,15 @@ export default async function CatalogPage({
                     {title.vertical}
                   </div>
                 ) : null}
-                {title.monthlyReach ? (
+                {title.digitalReach ? (
+                  <div className="muted" style={{ marginTop: 10 }}>
+                    {t("card.digitalReach")}:{" "}
+                    {new Intl.NumberFormat().format(title.digitalReach)}
+                  </div>
+                ) : title.monthlyReach ? (
                   <div className="muted" style={{ marginTop: 10 }}>
                     {t("card.reach")}:{" "}
                     {new Intl.NumberFormat().format(title.monthlyReach)}
-                  </div>
-                ) : title.circulation ? (
-                  <div className="muted" style={{ marginTop: 10 }}>
-                    {t("card.circulation")}:{" "}
-                    {new Intl.NumberFormat().format(title.circulation)}
                   </div>
                 ) : null}
                 {from !== null ? (
@@ -419,7 +366,7 @@ export default async function CatalogPage({
             );
           })}
         </div>
-        </>
+        </CompareSelectionProvider>
       )}
 
       {totalPages > 1 ? (

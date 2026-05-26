@@ -26,10 +26,7 @@ body:has(.bn) header.site-header {
 }
 body:has(.bn) header.site-header .brand,
 body:has(.bn) header.site-header .brand:hover { color: #14110C !important; }
-body:has(.bn) header.site-header .brand-mark {
-  background: #14110C !important;
-  color: #EDE8DB !important;
-}
+/* The brand SVG wordmark uses currentColor, so it inherits from .brand above. */
 body:has(.bn) header.site-header .nav-mega-link,
 body:has(.bn) header.site-header .nav-mega-trigger {
   color: #3A3528 !important;
@@ -762,27 +759,32 @@ body:has(.bn) .drawer-link:hover { background: rgba(20,17,12,0.06) !important; }
 }
 
 /* — Legal docs (privacy / terms) — */
-.bn .legal-doc { padding-bottom: 0; }
-.bn .legal-doc .page-hero .last-updated {
+/* globals.css has an unscoped .legal-doc { max-width: 760px } that was
+   originally meant for inline article content; here it's the .bn root
+   class, so we restore full-width and let .legal-body handle the column
+   constraint instead. */
+.bn.legal-doc { max-width: none; padding-bottom: 0; }
+.bn.legal-doc { padding-bottom: 0; }
+.bn.legal-doc .page-hero .last-updated {
   font-size: 12px; text-transform: uppercase; letter-spacing: 0.14em; color: var(--ink-mute); margin: 0;
 }
-.bn .legal-doc .legal-body {
+.bn.legal-doc .legal-body {
   max-width: 760px;
   margin: 0 auto;
   padding: clamp(48px, 5vw, 80px) var(--pad) clamp(64px, 7vw, 96px);
   border-bottom: 2px solid var(--rule);
 }
-.bn .legal-doc .legal-section {
+.bn.legal-doc .legal-section {
   padding: 28px 0;
   border-bottom: 1px solid var(--hair);
 }
-.bn .legal-doc .legal-section:first-child { padding-top: 0; }
-.bn .legal-doc .legal-section:last-child { border-bottom: none; padding-bottom: 0; }
-.bn .legal-doc .legal-section h2 {
+.bn.legal-doc .legal-section:first-child { padding-top: 0; }
+.bn.legal-doc .legal-section:last-child { border-bottom: none; padding-bottom: 0; }
+.bn.legal-doc .legal-section h2 {
   margin: 0 0 12px 0; font-weight: 600;
   font-size: clamp(20px, 1.8vw, 26px); letter-spacing: -0.015em; line-height: 1.2;
 }
-.bn .legal-doc .legal-section .prose { max-width: none; }
+.bn.legal-doc .legal-section .prose { max-width: none; }
 
 /* — Auth shell (signin) — */
 .bn .auth-shell {

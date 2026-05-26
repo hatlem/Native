@@ -29,10 +29,9 @@ export async function buildMcpServerForToken(
       def.description,
       shape,
       async (args: Record<string, unknown>) => {
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        const parsed = def.parameters.parse(args) as any;
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        const result = await (def.handler as (a: any) => Promise<unknown>)(parsed);
+        const parsed = def.parameters.parse(args) as unknown;
+        const handler = def.handler as (a: unknown) => Promise<unknown>;
+        const result = await handler(parsed);
         return {
           content: [{ type: "text" as const, text: JSON.stringify(result, null, 2) }],
         };
@@ -52,10 +51,9 @@ export async function buildMcpServerForToken(
         async (args: Record<string, unknown>) => {
           // Record audit row linking the invocation to the API key for traceability
           await recordAudit(key.createdBy, "mcp.tool_invoked", `Tool:${name}`, { apiKeyId: key.id });
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          const parsed = def.parameters.parse(args) as any;
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          const result = await (def.handler as (a: any) => Promise<unknown>)(parsed);
+          const parsed = def.parameters.parse(args) as unknown;
+          const handler = def.handler as (a: unknown) => Promise<unknown>;
+          const result = await handler(parsed);
           return {
             content: [{ type: "text" as const, text: JSON.stringify(result, null, 2) }],
           };

@@ -237,7 +237,8 @@
     },
     "card": {
       "from": "Ab",
-      "reach": "Monatliche Leser",
+      "reach": "Monatliche Leser (gesamt)",
+      "digitalReach": "Monatliche Online-Leser",
       "circulation": "Auflage",
       "leadTime": "Vorlaufzeit",
       "days": "Tage",
@@ -275,7 +276,8 @@
   "titleDetail": {
     "back": "Zurück zum Katalog",
     "publishedBy": "Verlegt von",
-    "reach": "Monatliche Leser",
+    "reach": "Monatliche Leser (gesamt)",
+    "digitalReach": "Monatliche Online-Leser",
     "formats": "Native-Formate",
     "circulation": "Auflage",
     "leadTime": "Vorlaufzeit",

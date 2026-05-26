@@ -237,7 +237,8 @@
     },
     "card": {
       "from": "Alkaen",
-      "reach": "Kuukausittaiset lukijat",
+      "reach": "Kuukausittaiset lukijat (yhteensä)",
+      "digitalReach": "Kuukausittaiset verkkolukijat",
       "circulation": "Levikki",
       "leadTime": "Toimitusaika",
       "days": "päivää",
@@ -275,7 +276,8 @@
   "titleDetail": {
     "back": "Takaisin katalogiin",
     "publishedBy": "Julkaisija",
-    "reach": "Kuukausittaiset lukijat",
+    "reach": "Kuukausittaiset lukijat (yhteensä)",
+    "digitalReach": "Kuukausittaiset verkkolukijat",
     "formats": "Natiiviformaatit",
     "circulation": "Levikki",
     "leadTime": "Toimitusaika",
