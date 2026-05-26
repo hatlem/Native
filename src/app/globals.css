@@ -2251,6 +2251,26 @@ select:disabled {
   padding: var(--s-4);
 }
 
+/* §5 bento — the primary KPI on a dashboard spans two columns and
+   upsizes the value. Leads the eye on what needs attention first. */
+.kpi.kpi-primary {
+  grid-column: span 2;
+}
+.kpi.kpi-primary .value {
+  font-size: 2.4rem;
+}
+@media (max-width: 720px) {
+  /* On narrow viewports the grid collapses to one column anyway —
+     dropping the span keeps the primary tile from forcing an awkward
+     two-column-wide single tile in a single-column layout. */
+  .kpi.kpi-primary {
+    grid-column: auto;
+  }
+  .kpi.kpi-primary .value {
+    font-size: 1.85rem;
+  }
+}
+
 .kpi .label {
   font-size: 0.78rem;
   color: var(--muted);

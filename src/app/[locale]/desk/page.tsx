@@ -112,6 +112,7 @@ export default async function DeskListPage({
 
       <KpiGrid>
         <Kpi
+          primary
           label={t("kpiAttention")}
           value={needsAttention}
           delta={t("kpiAttentionSub")}
