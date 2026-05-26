@@ -30,6 +30,8 @@ enum ProductType {
   ADVERTORIAL
   NATIVE_DISPLAY
   PACKAGE
+  CONTEXTUAL
+  OTHER
 }
 
 enum PricingModel {
@@ -277,6 +279,8 @@ model Product {
   leadTimeDays Int             @default(10)
   active       Boolean         @default(true)
   bookable     Boolean         @default(true)
+  confirmedAt     DateTime?
+  confirmedSource String?   // e.g. "PriceQuote:abc123", "manual", "blueprint-legacy"
   createdAt    DateTime        @default(now())
   updatedAt    DateTime        @updatedAt
 
