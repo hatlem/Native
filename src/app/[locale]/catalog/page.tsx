@@ -136,6 +136,68 @@ export default async function CatalogPage({
     return s ? `?${s}` : "";
   };
 
+  // Build "remove this one filter" hrefs. When the user clicks an active-
+  // filter chip we want to keep every other filter intact and just drop
+  // the one they clicked — page is reset to 1 because the result set
+  // changes.
+  type FilterKey =
+    | "market"
+    | "type"
+    | "nativeFit"
+    | "b2bB2c"
+    | "onlyPriced"
+    | "q";
+  const filterHref = (except: FilterKey) => {
+    const params = new URLSearchParams();
+    if (market && except !== "market") params.set("market", market);
+    if (type && except !== "type") params.set("type", type);
+    if (nativeFit && except !== "nativeFit") params.set("nativeFit", nativeFit);
+    if (b2bB2c && except !== "b2bB2c") params.set("b2bB2c", b2bB2c);
+    if (onlyPriced && except !== "onlyPriced") params.set("onlyPriced", "1");
+    if (q && except !== "q") params.set("q", q);
+    const s = params.toString();
+    return s ? `/catalog?${s}` : "/catalog";
+  };
+
+  const activeFilters: Array<{ key: FilterKey; label: string; href: string }> =
+    [];
+  if (market)
+    activeFilters.push({
+      key: "market",
+      label: `${t("filters.market")}: ${tMarket(market)}`,
+      href: filterHref("market"),
+    });
+  if (type)
+    activeFilters.push({
+      key: "type",
+      label: `${t("filters.type")}: ${tType(type)}`,
+      href: filterHref("type"),
+    });
+  if (nativeFit)
+    activeFilters.push({
+      key: "nativeFit",
+      label: `${t("filters.nativeFit")}: ${nativeFit}`,
+      href: filterHref("nativeFit"),
+    });
+  if (b2bB2c)
+    activeFilters.push({
+      key: "b2bB2c",
+      label: `${t("filters.b2bB2c")}: ${b2bB2c}`,
+      href: filterHref("b2bB2c"),
+    });
+  if (onlyPriced)
+    activeFilters.push({
+      key: "onlyPriced",
+      label: t("filters.onlyPriced"),
+      href: filterHref("onlyPriced"),
+    });
+  if (q)
+    activeFilters.push({
+      key: "q",
+      label: `${t("filters.search")}: ${q}`,
+      href: filterHref("q"),
+    });
+
   return (
     <section>
       <h1>{t("title")}</h1>
@@ -144,7 +206,12 @@ export default async function CatalogPage({
       <form className="filters" method="get">
         <div>
           <label htmlFor="market">{t("filters.market")}</label>
-          <select id="market" name="market" defaultValue={market ?? ""}>
+          <select
+            key={`market-${market ?? "all"}`}
+            id="market"
+            name="market"
+            defaultValue={market ?? ""}
+          >
             <option value="">{t("filters.all")}</option>
             {MARKET_CODES.map((m) => (
               <option key={m} value={m}>
@@ -155,7 +222,12 @@ export default async function CatalogPage({
         </div>
         <div>
           <label htmlFor="type">{t("filters.type")}</label>
-          <select id="type" name="type" defaultValue={type ?? ""}>
+          <select
+            key={`type-${type ?? "all"}`}
+            id="type"
+            name="type"
+            defaultValue={type ?? ""}
+          >
             <option value="">{t("filters.all")}</option>
             {PRODUCT_TYPES.map((pt) => (
               <option key={pt} value={pt}>
@@ -166,7 +238,12 @@ export default async function CatalogPage({
         </div>
         <div>
           <label htmlFor="nativeFit">{t("filters.nativeFit")}</label>
-          <select id="nativeFit" name="nativeFit" defaultValue={nativeFit ?? ""}>
+          <select
+            key={`nativeFit-${nativeFit ?? "all"}`}
+            id="nativeFit"
+            name="nativeFit"
+            defaultValue={nativeFit ?? ""}
+          >
             <option value="">{t("filters.all")}</option>
             {NATIVE_FIT_VALUES.map((v) => (
               <option key={v} value={v}>
@@ -177,7 +254,12 @@ export default async function CatalogPage({
         </div>
         <div>
           <label htmlFor="b2bB2c">{t("filters.b2bB2c")}</label>
-          <select id="b2bB2c" name="b2bB2c" defaultValue={b2bB2c ?? ""}>
+          <select
+            key={`b2bB2c-${b2bB2c ?? "all"}`}
+            id="b2bB2c"
+            name="b2bB2c"
+            defaultValue={b2bB2c ?? ""}
+          >
             <option value="">{t("filters.all")}</option>
             {B2B_B2C_VALUES.map((v) => (
               <option key={v} value={v}>
@@ -189,6 +271,7 @@ export default async function CatalogPage({
         <div>
           <label htmlFor="q">{t("filters.search")}</label>
           <input
+            key={`q-${q || "empty"}`}
             id="q"
             name="q"
             defaultValue={q}
@@ -204,6 +287,7 @@ export default async function CatalogPage({
           }}
         >
           <input
+            key={`onlyPriced-${onlyPriced ? "1" : "0"}`}
             type="checkbox"
             name="onlyPriced"
             value="1"
@@ -213,6 +297,24 @@ export default async function CatalogPage({
         </label>
         <button type="submit">{t("filters.apply")}</button>
       </form>
+
+      {activeFilters.length > 0 ? (
+        <div className="filter-chips" style={{ marginTop: 12 }}>
+          {activeFilters.map((f) => (
+            <Link key={f.key} href={f.href} className="filter-chip">
+              {f.label}
+              <span className="x" aria-label={t("removeFilter")}>
+                ×
+              </span>
+            </Link>
+          ))}
+          {activeFilters.length >= 2 ? (
+            <Link href="/catalog" className="filter-chip">
+              {t("clearFilters")}
+            </Link>
+          ) : null}
+        </div>
+      ) : null}
 
       <p className="muted" style={{ marginTop: 12 }}>
         {t("resultCount", { count: totalCount })}
