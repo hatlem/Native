@@ -391,7 +391,9 @@
       "markNative": "Markér: tilbyder native",
       "markNoNative": "Markér: ingen native",
       "deactivate": "Deaktivér",
-      "edit": "Rediger"
+      "edit": "Rediger",
+      "marking": "Markerer…",
+      "deactivating": "Deaktiverer…"
     },
     "freshness": {
       "column": "Prisfriskhed",
@@ -408,7 +410,8 @@
     "none": "Ingen titler matcher filtrene.",
     "bulk": {
       "sendPriceRequest": "Send prisforespørgsel til valgte",
-      "hint": "Springer titler uden primær salgskontakt over"
+      "hint": "Springer titler uden primær salgskontakt over",
+      "sending": "Sender…"
     }
   },
   "auth": {

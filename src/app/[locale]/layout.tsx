@@ -12,6 +12,7 @@ import { logout } from "@/app/auth-actions";
 import { GtmScripts, GtmNoscript } from "@/app/gtm";
 import { NavShell } from "@/app/nav-shell";
 import { PublicHeader } from "@/app/public-header";
+import { BrandWordmark } from "@/app/brand";
 import {
   audienceFor,
   navItemsFor,
@@ -178,8 +179,7 @@ export default async function LocaleLayout({
             <div className="container footer-grid">
               <div className="brand-block">
                 <Link href="/" className="brand" aria-label={appName}>
-                  <span className="brand-mark" aria-hidden="true">AT</span>
-                  <span>{appName}</span>
+                  <BrandWordmark className="brand-wordmark" aria-label={appName} />
                 </Link>
                 <p>{tm("footerTagline")}</p>
                 <p className="copyright">

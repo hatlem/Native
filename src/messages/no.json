@@ -391,7 +391,9 @@
       "markNative": "Merk: tilbyr native",
       "markNoNative": "Merk: ingen native",
       "deactivate": "Deaktiver",
-      "edit": "Rediger"
+      "edit": "Rediger",
+      "marking": "Markerer…",
+      "deactivating": "Deaktiverer…"
     },
     "freshness": {
       "column": "Prisferskhet",
@@ -408,7 +410,8 @@
     "none": "Ingen titler matcher filtrene.",
     "bulk": {
       "sendPriceRequest": "Send prisforespørsel til valgte",
-      "hint": "Hopper over titler uten primær salgskontakt"
+      "hint": "Hopper over titler uten primær salgskontakt",
+      "sending": "Sender…"
     }
   },
   "auth": {

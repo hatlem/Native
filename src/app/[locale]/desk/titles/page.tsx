@@ -10,6 +10,7 @@ import {
   deactivateTitle,
 } from "@/app/title-actions";
 import { createPriceRequestsBulkAction } from "@/app/price-actions";
+import { SubmitButton } from "@/components";
 import {
   latestConfirmedAtAcrossProducts,
   freshnessBucket,
@@ -444,7 +445,10 @@ export default async function DeskTitlesPage({
         <form action={createPriceRequestsBulkAction}>
           <input type="hidden" name="locale" value={locale} />
           <div style={{ marginTop: 16, display: "flex", gap: 12, alignItems: "center", flexWrap: "wrap" }}>
-            <button type="submit">{t("bulk.sendPriceRequest")}</button>
+            <SubmitButton
+              label={t("bulk.sendPriceRequest")}
+              pendingLabel={t("bulk.sending")}
+            />
             <span className="muted" style={{ fontSize: "0.9em" }}>{t("bulk.hint")}</span>
           </div>
           {Array.from(byMarket.entries()).map(([mc, mTitles]) => (
@@ -632,25 +636,30 @@ export default async function DeskTitlesPage({
                         <form action={markTitleNative}>
                           <input type="hidden" name="locale" value={locale} />
                           <input type="hidden" name="titleId" value={title.id} />
-                          <button type="submit">{t("actions.markNative")}</button>
+                          <SubmitButton
+                            label={t("actions.markNative")}
+                            pendingLabel={t("actions.marking")}
+                          />
                         </form>
                       ) : null}
                       {!declined && !hasNative ? (
                         <form action={markTitleNoNative}>
                           <input type="hidden" name="locale" value={locale} />
                           <input type="hidden" name="titleId" value={title.id} />
-                          <button type="submit">
-                            {t("actions.markNoNative")}
-                          </button>
+                          <SubmitButton
+                            label={t("actions.markNoNative")}
+                            pendingLabel={t("actions.marking")}
+                          />
                         </form>
                       ) : null}
                       {hasNative ? (
                         <form action={deactivateTitle}>
                           <input type="hidden" name="locale" value={locale} />
                           <input type="hidden" name="titleId" value={title.id} />
-                          <button type="submit">
-                            {t("actions.deactivate")}
-                          </button>
+                          <SubmitButton
+                            label={t("actions.deactivate")}
+                            pendingLabel={t("actions.deactivating")}
+                          />
                         </form>
                       ) : null}
                     </div>

@@ -464,7 +464,9 @@
       "markNative": "Mark: offers native",
       "markNoNative": "Mark: no native",
       "deactivate": "Deactivate",
-      "edit": "Bearbeiten"
+      "edit": "Bearbeiten",
+      "marking": "Wird markiert…",
+      "deactivating": "Wird deaktiviert…"
     },
     "freshness": {
       "column": "Preisaktualität",
@@ -481,7 +483,8 @@
     "none": "No titles match these filters.",
     "bulk": {
       "sendPriceRequest": "Preisanfrage an Auswahl senden",
-      "hint": "Überspringt Titel ohne primären Vertriebskontakt"
+      "hint": "Überspringt Titel ohne primären Vertriebskontakt",
+      "sending": "Wird gesendet…"
     }
   },
   "auth": {

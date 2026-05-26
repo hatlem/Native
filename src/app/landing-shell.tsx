@@ -3,6 +3,7 @@ import { Inter } from "next/font/google";
 import { headers } from "next/headers";
 import { getTranslations } from "next-intl/server";
 import { Link } from "@/i18n/navigation";
+import { BrandWordmark } from "@/app/brand";
 import { STYLES } from "./landing-styles";
 
 const inter = Inter({
@@ -52,7 +53,7 @@ export async function LandingShell({
         <footer className="page-foot">
           <div className="wrap">
             <div className="left">
-              <div className="brand-foot">NativeSpin</div>
+              <BrandWordmark className="brand-foot-mark" aria-label="NativeSpin" />
               <div className="copy">{t("foot.tagline")}</div>
               <div className="copy" style={{ marginTop: 8 }}>
                 © <span className="roman">MMXXVI</span> · {t("foot.copy")}

@@ -464,7 +464,9 @@
       "markNative": "Merkitse: tarjoaa natiivia",
       "markNoNative": "Merkitse: ei natiivia",
       "deactivate": "Poista käytöstä",
-      "edit": "Muokkaa"
+      "edit": "Muokkaa",
+      "marking": "Merkitään…",
+      "deactivating": "Inaktivoidaan…"
     },
     "freshness": {
       "column": "Hintojen tuoreus",
@@ -481,7 +483,8 @@
     "none": "Ei julkaisuja vastaa näitä suodattimia.",
     "bulk": {
       "sendPriceRequest": "Lähetä hintapyyntö valituille",
-      "hint": "Ohittaa otsikot ilman ensisijaista myyntiyhteyshenkilöä"
+      "hint": "Ohittaa otsikot ilman ensisijaista myyntiyhteyshenkilöä",
+      "sending": "Lähetetään…"
     }
   },
   "auth": {

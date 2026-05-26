@@ -464,7 +464,9 @@
       "markNative": "Mark: offers native",
       "markNoNative": "Mark: no native",
       "deactivate": "Deactivate",
-      "edit": "Edit"
+      "edit": "Edit",
+      "marking": "Marking…",
+      "deactivating": "Deactivating…"
     },
     "freshness": {
       "column": "Price freshness",
@@ -481,7 +483,8 @@
     "none": "No titles match these filters.",
     "bulk": {
       "sendPriceRequest": "Send price request to selected",
-      "hint": "Skips titles with no primary sales contact"
+      "hint": "Skips titles with no primary sales contact",
+      "sending": "Sending…"
     }
   },
   "auth": {

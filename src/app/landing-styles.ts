@@ -658,6 +658,7 @@ body:has(.bn) .drawer-link:hover { background: rgba(20,17,12,0.06) !important; }
 .bn .page-foot .wrap { display: flex; justify-content: space-between; align-items: end; gap: 32px; flex-wrap: wrap; }
 .bn .page-foot .left { display: flex; flex-direction: column; gap: 6px; }
 .bn .page-foot .brand-foot { font-weight: 600; letter-spacing: -0.02em; font-size: 17px; }
+.bn .page-foot .brand-foot-mark { height: 22px; width: auto; display: block; color: var(--ink); }
 .bn .page-foot .copy { font-size: 11.5px; color: var(--ink-mute); letter-spacing: 0.14em; text-transform: uppercase; }
 .bn .page-foot .copy .roman { font-variant-numeric: oldstyle-nums; }
 .bn .page-foot nav { display: flex; gap: 28px; flex-wrap: wrap; }

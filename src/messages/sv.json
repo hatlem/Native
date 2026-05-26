@@ -391,7 +391,9 @@
       "markNative": "Markera: erbjuder native",
       "markNoNative": "Markera: ingen native",
       "deactivate": "Inaktivera",
-      "edit": "Redigera"
+      "edit": "Redigera",
+      "marking": "Markerar…",
+      "deactivating": "Inaktiverar…"
     },
     "freshness": {
       "column": "Prisfärskhet",
@@ -408,7 +410,8 @@
     "none": "Inga titlar matchar filtren.",
     "bulk": {
       "sendPriceRequest": "Skicka prisförfrågan till valda",
-      "hint": "Hoppar över titlar utan primär säljkontakt"
+      "hint": "Hoppar över titlar utan primär säljkontakt",
+      "sending": "Skickar…"
     }
   },
   "auth": {
