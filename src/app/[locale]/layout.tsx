@@ -121,6 +121,9 @@ export default async function LocaleLayout({
   // Per-request CSP nonce minted by middleware.ts. Threaded into any
   // inline <script>/<style> that the strict policy would otherwise block.
   const nonce = reqHeaders.get("x-nonce") ?? undefined;
+  // TEMPORARY: surface pathname value to a body data-attr so we can
+  // verify the onboarding-gate's pathname read is working in prod.
+  const __debugPath = reqHeaders.get("x-pathname") ?? "(missing)";
 
   // Onboarding gate. Authenticated buyers whose Organization has no
   // marketCode yet, OR who have no phone number, must complete
@@ -170,7 +173,7 @@ export default async function LocaleLayout({
 
   return (
     <html lang={locale} className={inter.variable}>
-      <body>
+      <body data-debug-path={__debugPath}>
         <GtmNoscript />
         <GtmScripts nonce={nonce} />
         <NextIntlClientProvider messages={messages}>
