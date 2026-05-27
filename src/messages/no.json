@@ -115,24 +115,8 @@
     "mixHeading": "Titler som passer briefen"
   },
   "home": {
-    "eyebrow": "NativeSpin — native i Norden, DACH, Storbritannia og Irland",
     "title": "Kjøp native-innhold i premium aviser og magasiner",
-    "subtitle": "En transparent katalog over hver tittel som tilbyr native på tvers av 9 markeder. Gi oss en brief — vi skriver det og bestiller det, også der programmatisk ikke er mulig.",
-    "cta": "Se katalogen",
-    "statsTitles": "Titler i katalogen",
-    "statsProducts": "Native-produkter",
-    "statsMarkets": "Markeder dekket",
-    "featuredEyebrow": "Utvalgt",
-    "featuredTitle": "I katalogen akkurat nå",
-    "featuredCta": "Se alle titler",
-    "priceFrom": "Fra",
-    "whyEyebrow": "Hvorfor NativeSpin",
-    "vp1Title": "Én åpen katalog",
-    "vp1Body": "Alle aviser og magasiner som tilbyr native-innhold og native-annonser, med spesifikasjoner og veiledende priser.",
-    "vp2Title": "Vi kjøper det for deg",
-    "vp2Body": "De fleste titler selger ikke programmatisk. Vårt kjøpsteam forhandler og bestiller på dine vegne.",
-    "vp3Title": "Vi lager innholdet",
-    "vp3Body": "Egen produksjon tilpasset hver tittels spesifikasjoner — bedre resultat og bedre pris."
+    "subtitle": "En transparent katalog over hver tittel som tilbyr native på tvers av 9 markeder. Gi oss en brief — vi skriver det og bestiller det, også der programmatisk ikke er mulig."
   },
   "catalog": {
     "eyebrow": "Utforsk",

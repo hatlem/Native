@@ -194,24 +194,8 @@
     "mixHeading": "Julkaisut, jotka sopivat briifiisi"
   },
   "home": {
-    "eyebrow": "NativeSpin — natiivi Pohjoismaissa, DACH-alueella, Britanniassa ja Irlannissa",
     "title": "Osta natiivisisältöä premium-sanoma- ja aikakauslehdistä",
-    "subtitle": "Läpinäkyvä katalogi jokaisesta tittelistä, joka tarjoaa natiivia 9 markkinalla. Lähetä brief — kirjoitamme sen ja varaamme sen, myös sinne missä programmaattinen ei toimi.",
-    "cta": "Selaa katalogia",
-    "statsTitles": "Julkaisua katalogissa",
-    "statsProducts": "Natiivituotetta",
-    "statsMarkets": "Katetut markkinat",
-    "featuredEyebrow": "Esillä",
-    "featuredTitle": "Katalogissa juuri nyt",
-    "featuredCta": "Näytä kaikki julkaisut",
-    "priceFrom": "Alkaen",
-    "whyEyebrow": "Miksi NativeSpin",
-    "vp1Title": "Yksi läpinäkyvä katalogi",
-    "vp1Body": "Jokainen sanoma- ja aikakauslehti, joka tarjoaa natiivisisältöä ja natiivimainoksia, spesifikaatioilla ja suuntaa-antavalla hinnoittelulla.",
-    "vp2Title": "Me ostamme sen puolestasi",
-    "vp2Body": "Useimmat julkaisut eivät myy programmaattisesti. Hallinnoitu deskimme neuvottelee ja varaa puolestasi.",
-    "vp3Title": "Me teemme sisällön",
-    "vp3Body": "Talon sisäinen tuotanto viritetty kunkin julkaisun spesifikaatioihin — parempi lopputulos ja parempi diili."
+    "subtitle": "Läpinäkyvä katalogi jokaisesta tittelistä, joka tarjoaa natiivia 9 markkinalla. Lähetä brief — kirjoitamme sen ja varaamme sen, myös sinne missä programmaattinen ei toimi."
   },
   "catalog": {
     "eyebrow": "Selaa",

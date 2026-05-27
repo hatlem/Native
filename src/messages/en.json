@@ -194,24 +194,8 @@
     "mixHeading": "Titles that fit your brief"
   },
   "home": {
-    "eyebrow": "NativeSpin — native across the Nordics, DACH, UK and Ireland",
     "title": "Buy native content in premium newspapers and magazines",
-    "subtitle": "A transparent catalog of every title that offers native across 9 markets. Brief us once — we write it, we book it, even where programmatic isn't possible.",
-    "cta": "Browse the catalog",
-    "statsTitles": "Titles in catalog",
-    "statsProducts": "Native products",
-    "statsMarkets": "Markets covered",
-    "featuredEyebrow": "Featured",
-    "featuredTitle": "Live in the catalog right now",
-    "featuredCta": "See all titles",
-    "priceFrom": "From",
-    "whyEyebrow": "Why NativeSpin",
-    "vp1Title": "One transparent catalog",
-    "vp1Body": "Every newspaper and magazine that offers native content and native ads, with specs and indicative pricing.",
-    "vp2Title": "We buy it for you",
-    "vp2Body": "Most titles don't sell programmatically. Our managed desk negotiates and books on your behalf.",
-    "vp3Title": "We make the content",
-    "vp3Body": "In-house production tuned to each title's specs — a better result and a better deal."
+    "subtitle": "A transparent catalog of every title that offers native across 9 markets. Brief us once — we write it, we book it, even where programmatic isn't possible."
   },
   "catalog": {
     "eyebrow": "Browse",
