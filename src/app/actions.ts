@@ -5,11 +5,15 @@ import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
 import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
+import { requireOnboardingBeforeBuy } from "@/lib/onboarding-gate";
 import { getWorkspace } from "@/lib/workspace";
 import {
   PLAN_COOKIE,
+  PLAN_BRIEF_COOKIE,
+  planBriefHasContent,
   readBasket,
   serializeBasket,
+  serializePlanBrief,
   type BasketItem,
 } from "@/lib/basket";
 import {
@@ -135,6 +139,28 @@ export async function submitRequest(formData: FormData) {
   if (!ws?.activeOrgId) {
     redirect(ws?.isAgency ? `/${locale}/agency` : `/${locale}/signin`);
   }
+
+  // Stash the brief draft before the onboarding gate may detour the
+  // user away — /plan rehydrates the form from this cookie on return
+  // so the buyer doesn't have to re-type budget/audience/goal/brief.
+  // Cleared at the end of this action on success.
+  const briefDraft = {
+    budget: budgetRaw,
+    audience,
+    goal,
+    brief,
+  };
+  if (planBriefHasContent(briefDraft)) {
+    const store = await cookies();
+    store.set(PLAN_BRIEF_COOKIE, serializePlanBrief(briefDraft), COOKIE_OPTS);
+  }
+
+  // Buyer onboarding is deferred to the moment of buying intent: the
+  // desk needs a reachable phone number, and the billing market drives
+  // VAT + invoice currency on the Quote we're about to mint. Bounces
+  // to /onboarding?next=/plan so the user lands back on the basket
+  // with brief intact (cookie-backed) after filling in the two fields.
+  await requireOnboardingBeforeBuy(session, locale, `/${locale}/plan`);
 
   if (!(await rfqLimiter.check(`rfq:${ws.activeOrgId}`)).ok) {
     redirect(`/${locale}/plan?error=rate`);
@@ -323,6 +349,7 @@ export async function submitRequest(formData: FormData) {
 
   const store = await cookies();
   store.delete(PLAN_COOKIE);
+  store.delete(PLAN_BRIEF_COOKIE);
   redirect(`/${locale}/requests/${request.id}`);
 }
 

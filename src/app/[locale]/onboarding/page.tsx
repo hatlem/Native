@@ -3,6 +3,7 @@ import { redirect } from "next/navigation";
 import { MarketCode } from "@prisma/client";
 import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
+import { safeNext } from "@/lib/onboarding-gate";
 import { saveOnboarding } from "@/app/onboarding-actions";
 import { LandingShell } from "@/app/landing-shell";
 import { SubmitButton } from "@/components";
@@ -32,6 +33,15 @@ export default async function OnboardingPage({
   const t = await getTranslations({ locale, namespace: "onboarding" });
   const tMarket = await getTranslations({ locale, namespace: "market" });
 
+  // Where to send the user after onboarding completes. Defaults to
+  // /catalog when arrived at directly; the buy-gate threads /plan so a
+  // user who hit "Send request" lands back on the basket with brief
+  // intact. safeNext blocks open-redirect attempts via ?next=//evil.
+  const next = safeNext(
+    typeof sp.next === "string" ? sp.next : undefined,
+    `/${locale}/catalog`,
+  );
+
   // If the user's org already has marketCode set AND they have a phone,
   // they're done — no point sitting on this page.
   const user = await prisma.user.findUnique({
@@ -43,7 +53,7 @@ export default async function OnboardingPage({
     },
   });
   if (user?.organization?.marketCode && user.phone) {
-    redirect(`/${locale}/catalog`);
+    redirect(next);
   }
 
   const errorCode = typeof sp.error === "string" ? sp.error : undefined;
@@ -76,6 +86,7 @@ export default async function OnboardingPage({
 
           <form action={saveOnboarding} noValidate>
             <input type="hidden" name="locale" value={locale} />
+            <input type="hidden" name="next" value={next} />
             <div className="field">
               <label htmlFor="market">{t("marketLabel")}</label>
               <select

@@ -1,10 +1,9 @@
 import { getTranslations } from "next-intl/server";
 import { auth } from "@/auth";
-import { requireOnboardingComplete } from "@/lib/onboarding-gate";
 import { prisma } from "@/lib/prisma";
 import { getWorkspace } from "@/lib/workspace";
 import { Link } from "@/i18n/navigation";
-import { readBasket } from "@/lib/basket";
+import { readBasket, readPlanBrief } from "@/lib/basket";
 import { indicativeFromRules, toRateRules, formatMoney } from "@/lib/money";
 import { isProductPriceShown } from "@/lib/pricing-visibility";
 import { removeFromPlan, submitRequest } from "@/app/actions";
@@ -35,7 +34,6 @@ export default async function PlanPage({
 
   const session = await auth();
 
-  await requireOnboardingComplete(session, locale);
   const ws = await getWorkspace(session?.user?.id);
   const activeOrg = ws?.activeOrgId
     ? await prisma.organization.findUnique({
@@ -46,6 +44,10 @@ export default async function PlanPage({
   const needsClient = !!ws?.isAgency && !ws.activeOrgId;
 
   const basket = await readBasket();
+  // Rehydrate the brief from the cookie submitRequest stashed before
+  // the onboarding gate detour. Empty strings on the fresh path —
+  // React leaves the input blank when defaultValue is "".
+  const briefDraft = await readPlanBrief();
   const products = basket.length
     ? await prisma.product.findMany({
         where: { id: { in: basket.map((b) => b.productId) } },
@@ -263,19 +265,38 @@ export default async function PlanPage({
                 </p>
                 <div className="field">
                   <label htmlFor="budget">{tr("budget")}</label>
-                  <input id="budget" name="budget" type="number" min="0" />
+                  <input
+                    id="budget"
+                    name="budget"
+                    type="number"
+                    min="0"
+                    defaultValue={briefDraft.budget}
+                  />
                 </div>
                 <div className="field">
                   <label htmlFor="audience">{tr("audience")}</label>
-                  <input id="audience" name="audience" />
+                  <input
+                    id="audience"
+                    name="audience"
+                    defaultValue={briefDraft.audience}
+                  />
                 </div>
                 <div className="field">
                   <label htmlFor="goal">{tr("goal")}</label>
-                  <input id="goal" name="goal" />
+                  <input
+                    id="goal"
+                    name="goal"
+                    defaultValue={briefDraft.goal}
+                  />
                 </div>
                 <div className="field">
                   <label htmlFor="brief">{tr("brief")}</label>
-                  <textarea id="brief" name="brief" rows={3} />
+                  <textarea
+                    id="brief"
+                    name="brief"
+                    rows={3}
+                    defaultValue={briefDraft.brief}
+                  />
                 </div>
                 <SubmitButton
                   label={allFirm ? tf("planSubmit") : tr("submit")}

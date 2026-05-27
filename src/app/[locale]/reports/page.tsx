@@ -1,7 +1,6 @@
 import { getTranslations } from "next-intl/server";
 import { redirect } from "next/navigation";
 import { auth } from "@/auth";
-import { requireOnboardingComplete } from "@/lib/onboarding-gate";
 import { prisma } from "@/lib/prisma";
 import { getWorkspace } from "@/lib/workspace";
 import { Link } from "@/i18n/navigation";
@@ -22,7 +21,6 @@ export default async function MyReportsPage({
 
   const session = await auth();
 
-  await requireOnboardingComplete(session, locale);
   const ws = await getWorkspace(session?.user?.id);
   if (!ws) redirect(`/${locale}/signin`);
 

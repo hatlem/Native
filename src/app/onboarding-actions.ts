@@ -4,6 +4,7 @@ import { redirect } from "next/navigation";
 import { MarketCode } from "@prisma/client";
 import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
+import { safeNext } from "@/lib/onboarding-gate";
 import { recordAudit } from "@/lib/audit";
 
 const MARKET_CODES = Object.values(MarketCode) as string[];
@@ -25,11 +26,16 @@ function isValidPhone(raw: string): boolean {
 }
 
 // Save onboarding (post-signup) details: Faktureringsmarked on the
-// user's org + phone on the user. Both are required before the user
-// reaches the catalog — the layout-level redirect enforces this so a
-// stale-browser-tab user can't skip ahead.
+// user's org + phone on the user. Onboarding is deferred — a user
+// only lands here when they trigger a buy/RFQ without these fields,
+// so on success we redirect back to wherever the gate fired from
+// (defaults to /catalog when arrived at directly).
 export async function saveOnboarding(formData: FormData) {
   const locale = String(formData.get("locale") || "en");
+  const next = safeNext(
+    String(formData.get("next") || ""),
+    `/${locale}/catalog`,
+  );
   const session = await auth();
   if (!session?.user?.id) redirect(`/${locale}/signin`);
 
@@ -38,7 +44,9 @@ export async function saveOnboarding(formData: FormData) {
   const phone = normalisePhone(phoneRaw);
 
   if (!MARKET_CODES.includes(market) || !isValidPhone(phone)) {
-    redirect(`/${locale}/onboarding?error=1`);
+    redirect(
+      `/${locale}/onboarding?error=1&next=${encodeURIComponent(next)}`,
+    );
   }
 
   const user = await prisma.user.findUnique({
@@ -67,5 +75,5 @@ export async function saveOnboarding(formData: FormData) {
     hasPhone: true,
   });
 
-  redirect(`/${locale}/catalog`);
+  redirect(next);
 }

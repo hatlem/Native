@@ -2,7 +2,6 @@ import { getTranslations } from "next-intl/server";
 import { intlLocale } from "@/lib/money";
 import { redirect } from "next/navigation";
 import { auth } from "@/auth";
-import { requireOnboardingComplete } from "@/lib/onboarding-gate";
 import { prisma } from "@/lib/prisma";
 import { Link } from "@/i18n/navigation";
 import { safeExternalUrl } from "@/lib/security";
@@ -35,7 +34,6 @@ export default async function NotificationsPage({
 
   const session = await auth();
 
-  await requireOnboardingComplete(session, locale);
   if (!session?.user?.id) redirect(`/${locale}/signin`);
 
   const rows = await prisma.notification.findMany({

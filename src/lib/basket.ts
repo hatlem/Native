@@ -1,8 +1,55 @@
 import { cookies } from "next/headers";
 
 export const PLAN_COOKIE = "nativespin_plan";
+// Brief draft persisted alongside the basket so the buyer doesn't
+// lose their budget/audience/goal/brief text when the buy-gate
+// detours them to /onboarding. Cleared on successful submit.
+export const PLAN_BRIEF_COOKIE = "nativespin_brief";
 
 export type BasketItem = { productId: string; quantity: number };
+
+export type PlanBrief = {
+  budget: string;
+  audience: string;
+  goal: string;
+  brief: string;
+};
+
+const EMPTY_BRIEF: PlanBrief = { budget: "", audience: "", goal: "", brief: "" };
+
+// Pure: tolerate any untrusted cookie payload and normalise. Caps each
+// field length so a hostile cookie can't blow up the page render.
+export function parsePlanBrief(raw: string | undefined | null): PlanBrief {
+  if (!raw) return EMPTY_BRIEF;
+  try {
+    const parsed: unknown = JSON.parse(raw);
+    if (!parsed || typeof parsed !== "object") return EMPTY_BRIEF;
+    const o = parsed as Record<string, unknown>;
+    const str = (v: unknown, max: number) =>
+      typeof v === "string" ? v.slice(0, max) : "";
+    return {
+      budget: str(o.budget, 32),
+      audience: str(o.audience, 200),
+      goal: str(o.goal, 200),
+      brief: str(o.brief, 4000),
+    };
+  } catch {
+    return EMPTY_BRIEF;
+  }
+}
+
+export async function readPlanBrief(): Promise<PlanBrief> {
+  const store = await cookies();
+  return parsePlanBrief(store.get(PLAN_BRIEF_COOKIE)?.value);
+}
+
+export function serializePlanBrief(brief: PlanBrief): string {
+  return JSON.stringify(brief);
+}
+
+export function planBriefHasContent(brief: PlanBrief): boolean {
+  return !!(brief.budget || brief.audience || brief.goal || brief.brief);
+}
 
 // Pure: tolerate any untrusted cookie payload and normalise to a safe basket.
 export function parseBasket(raw: string | undefined | null): BasketItem[] {

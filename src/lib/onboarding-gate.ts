@@ -2,21 +2,26 @@ import { redirect } from "next/navigation";
 import type { Session } from "next-auth";
 import { prisma } from "@/lib/prisma";
 
-// Call this at the top of any authenticated buyer-facing page that
-// requires a completed onboarding (marketCode + phone). The previous
-// approach gated at the [locale]/layout.tsx level via an x-pathname
-// header threaded through middleware — but the request-header init
-// from next-intl's wrapped middleware response doesn't reliably reach
-// the layout in Next.js 15 (custom headers come back as missing while
-// x-nonce, which is set in the same code path, does propagate;
-// possibly a next-intl + NextResponse.rewrite interaction). Per-page
-// guarding is the boring-but-reliable answer.
+// Same-origin path check. Prevents ?next=https://evil.com or //evil.com
+// open redirects when bouncing the user back after onboarding.
+export function safeNext(raw: string | null | undefined, fallback: string): string {
+  if (!raw) return fallback;
+  if (!raw.startsWith("/") || raw.startsWith("//")) return fallback;
+  return raw;
+}
+
+// Buyer onboarding (Faktureringsmarked + phone) is deferred — users
+// can browse the catalog, build a plan, and explore the app without
+// completing it. The gate fires at the moment of transactional intent
+// (RFQ / firm-priced submit) so the desk has phone reachability and
+// the billing market is known before any quote can run.
 //
-// Skips the gate for non-BUYER roles — desk/superadmin/publisher
-// don't have an onboarding to complete and shouldn't be looped.
-export async function requireOnboardingComplete(
+// Skips for non-BUYER roles — desk/superadmin/publisher don't have a
+// buyer onboarding to complete.
+export async function requireOnboardingBeforeBuy(
   session: Session | null,
   locale: string,
+  returnTo: string,
 ): Promise<void> {
   if (!session?.user?.id) return;
   if (session.user.role && session.user.role !== "BUYER") return;
@@ -27,9 +32,9 @@ export async function requireOnboardingComplete(
       organization: { select: { marketCode: true } },
     },
   });
-  const onboardingComplete =
-    !!user?.phone && !!user?.organization?.marketCode;
-  if (!onboardingComplete) {
-    redirect(`/${locale}/onboarding`);
+  const complete = !!user?.phone && !!user?.organization?.marketCode;
+  if (!complete) {
+    const next = encodeURIComponent(returnTo);
+    redirect(`/${locale}/onboarding?next=${next}`);
   }
 }

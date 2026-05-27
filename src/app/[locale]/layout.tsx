@@ -120,10 +120,6 @@ export default async function LocaleLayout({
   // Per-request CSP nonce minted by middleware.ts. Threaded into any
   // inline <script>/<style> that the strict policy would otherwise block.
   const nonce = (await headers()).get("x-nonce") ?? undefined;
-  // Onboarding gate lives at the page level — see lib/onboarding-gate.ts.
-  // The layout previously gated via an x-pathname header from middleware
-  // but custom headers don't reliably propagate through next-intl's
-  // wrapped middleware response in Next.js 15.
 
   const audience = audienceFor(session);
   const nav = navItemsFor(audience, t);

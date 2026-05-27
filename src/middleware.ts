@@ -67,13 +67,12 @@ export default function middleware(req: NextRequest) {
   }
 
   // Both the passthrough case and the next-intl internal-rewrite case
-  // need the same request-header init: x-nonce for CSP-nonced inline
-  // tags, x-pathname so the onboarding-gate in [locale]/layout.tsx can
-  // see the current URL. Rebuilding the response is the only way to
-  // surface request headers to downstream RSCs in Next.js 15.
+  // need the request-header init for x-nonce so RSCs can attach it to
+  // any inline <script>/<style> the strict CSP would otherwise block.
+  // Rebuilding the response is the only way to surface request headers
+  // to downstream RSCs in Next.js 15.
   const reqHeaders = new Headers(req.headers);
   reqHeaders.set("x-nonce", nonce);
-  reqHeaders.set("x-pathname", req.nextUrl.pathname);
   // Preserve next-intl's internal rewrite directive if it set one.
   const rewriteUrl = intlRes.headers.get("x-middleware-rewrite");
   const res = rewriteUrl
