@@ -161,7 +161,11 @@
     "clientName": "Client name",
     "market": "Billing market",
     "create": "Create client",
-    "creating": "Creating…"
+    "creating": "Creating…",
+    "gatedTitle": "Agency workspace",
+    "gatedLead": "The multi-client workspace is available to agency partners.",
+    "gatedBody": "If your agency wants to run NativeSpin on behalf of clients — separate client orgs, switch with one click, billing rolled up at the agency level — send us a quick note and we'll set it up.",
+    "gatedCta": "Request agency access"
   },
   "recommend": {
     "title": "Plan recommender",
@@ -836,6 +840,7 @@
     "browseCatalog": "Browse the catalog",
     "createAccount": "Create an account",
     "createAgencyAccount": "Open an agency workspace",
+    "requestAgencyAccess": "Request agency access",
     "tryRecommender": "Try the recommender",
     "seeWorkflow": "See the full workflow",
     "footerTagline": "Native content and native advertising across every title we cover in NO, SE, DK, FI, DE, AT, CH, UK and IE — transparent, managed, productised.",

@@ -161,7 +161,11 @@
     "clientName": "Asiakkaan nimi",
     "market": "Laskutusmarkkina",
     "create": "Luo asiakas",
-    "creating": "Luodaan…"
+    "creating": "Luodaan…",
+    "gatedTitle": "Toimisto-työtila",
+    "gatedLead": "Monitilatyötila on saatavilla toimistokumppaneille.",
+    "gatedBody": "Jos toimistosi haluaa käyttää NativeSpiniä asiakkaiden puolesta — erilliset asiakasorganisaatiot, vaihda yhdellä klikkauksella, laskutus koottu toimistotasolla — lähetä meille viesti, niin järjestämme sen.",
+    "gatedCta": "Pyydä toimistokäyttö"
   },
   "recommend": {
     "title": "Suunnitelman suosittelija",
@@ -836,6 +840,7 @@
     "browseCatalog": "Selaa katalogia",
     "createAccount": "Luo tili",
     "createAgencyAccount": "Avaa toimiston työtila",
+    "requestAgencyAccess": "Pyydä toimistokäyttö",
     "tryRecommender": "Kokeile suosittelijaa",
     "seeWorkflow": "Näe koko työnkulku",
     "footerTagline": "Natiivisisältöä ja natiivimainontaa jokaisesta julkaisusta, jonka katamme markkinoilla NO, SE, DK, FI, DE, AT, CH, UK ja IE — läpinäkyvästi, hallinnoidusti, tuotteistettuna.",

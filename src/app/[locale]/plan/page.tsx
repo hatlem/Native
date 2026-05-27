@@ -77,14 +77,34 @@ export default async function PlanPage({
 
   const hasHiddenPrice = lines.some((l) => !l.priceVisible);
 
-  const totals = new Map<string, number>();
+  // Per-currency rollup. Visible-price lines accumulate; locked-price
+  // lines still register their currency so a tri-Nordic basket shows
+  // NOK + SEK + DKK rows up front — even when only one of them has a
+  // visible total today. Hiding the locked currencies entirely was the
+  // Erlend bug: the CFO defense relies on seeing all three lines.
+  type Rollup = { amount: number; hasVisible: boolean; hasHidden: boolean };
+  const totalsByCurrency = new Map<string, Rollup>();
   for (const l of lines) {
-    if (!l.priceVisible) continue;
-    totals.set(
-      l.product.currency,
-      (totals.get(l.product.currency) ?? 0) + l.lineTotal,
-    );
+    const cur = l.product.currency;
+    const r = totalsByCurrency.get(cur) ?? {
+      amount: 0,
+      hasVisible: false,
+      hasHidden: false,
+    };
+    if (l.priceVisible) {
+      r.amount += l.lineTotal;
+      r.hasVisible = true;
+    } else {
+      r.hasHidden = true;
+    }
+    totalsByCurrency.set(cur, r);
   }
+  // Render order: visible-only first, then mixed, then hidden-only —
+  // so the "real number" lines lead and "from desk" lines follow.
+  const totals = [...totalsByCurrency.entries()].sort(([, a], [, b]) => {
+    const score = (r: Rollup) => (r.hasVisible ? 0 : 1);
+    return score(a) - score(b);
+  });
 
   // A hidden-price line forces the whole basket onto the RFQ path —
   // we can't checkout firm against a price the buyer hasn't seen.
@@ -195,9 +215,23 @@ export default async function PlanPage({
             <div className="plan-summary-head">
               <span className="muted small">{t("estTotal")}</span>
               <div className="plan-summary-total">
-                {[...totals.entries()].map(([cur, amt]) => (
+                {totals.map(([cur, r]) => (
                   <div className="price" key={cur}>
-                    {formatMoney(amt, cur, locale)}
+                    {r.hasVisible ? (
+                      <>
+                        {formatMoney(r.amount, cur, locale)}
+                        {r.hasHidden ? (
+                          <span className="muted small">
+                            {" "}
+                            + {tv("requestPrice")}
+                          </span>
+                        ) : null}
+                      </>
+                    ) : (
+                      <span className="muted">
+                        {cur} · {tv("requestPrice")}
+                      </span>
+                    )}
                   </div>
                 ))}
               </div>

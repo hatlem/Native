@@ -161,7 +161,11 @@
     "clientName": "Client name",
     "market": "Billing market",
     "create": "Create client",
-    "creating": "Wird erstellt…"
+    "creating": "Wird erstellt…",
+    "gatedTitle": "Agentur-Arbeitsbereich",
+    "gatedLead": "Der Multi-Client-Arbeitsbereich ist für Agenturpartner verfügbar.",
+    "gatedBody": "Wenn Ihre Agentur NativeSpin für Kunden betreiben möchte — separate Kundenorganisationen, ein Klick zum Wechseln, Abrechnung auf Agenturebene gebündelt — schicken Sie uns eine kurze Nachricht, wir richten es ein.",
+    "gatedCta": "Agentur-Zugang anfordern"
   },
   "recommend": {
     "title": "Plan recommender",
@@ -836,6 +840,7 @@
     "browseCatalog": "Katalog durchsuchen",
     "createAccount": "Konto anlegen",
     "createAgencyAccount": "Agentur-Workspace eröffnen",
+    "requestAgencyAccess": "Agentur-Zugang anfordern",
     "tryRecommender": "Empfehlung ausprobieren",
     "seeWorkflow": "Vollständigen Workflow ansehen",
     "footerTagline": "Native Content und Native Advertising in jedem Titel, den wir abdecken — in NO, SE, DK, FI, DE, AT, CH, UK und IE — transparent, gemanagt, produktisiert.",

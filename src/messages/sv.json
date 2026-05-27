@@ -82,7 +82,11 @@
     "clientName": "Kundnamn",
     "market": "Faktureringsmarknad",
     "create": "Skapa kund",
-    "creating": "Skapar…"
+    "creating": "Skapar…",
+    "gatedTitle": "Byråarbetsyta",
+    "gatedLead": "Multiklientarbetsytan är tillgänglig för byråpartner.",
+    "gatedBody": "Om din byrå vill driva NativeSpin för kunder — separata kundorganisationer, växla med ett klick, fakturering samlad på byrånivå — skicka oss ett meddelande så sätter vi upp det.",
+    "gatedCta": "Begär byråtillgång"
   },
   "recommend": {
     "title": "Planrekommendation",
@@ -836,6 +840,7 @@
     "browseCatalog": "Öppna katalogen",
     "createAccount": "Skapa konto",
     "createAgencyAccount": "Öppna byråkonto",
+    "requestAgencyAccess": "Begär byråtillgång",
     "tryRecommender": "Prova rekommenderaren",
     "seeWorkflow": "Se hela arbetsflödet",
     "footerTagline": "Native-innehåll och native-annonsering över varje titel vi täcker i NO, SE, DK, FI, DE, AT, CH, UK och IE — transparent, hanterat, paketerat.",

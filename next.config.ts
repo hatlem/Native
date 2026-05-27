@@ -25,6 +25,21 @@ const nextConfig: NextConfig = {
   async headers() {
     return [{ source: "/:path*", headers: securityHeaders }];
   },
+  // /developers and /docs are conventional landing spots tech evaluators
+  // try first (Tobias scenario). Send them to the real API docs at /api
+  // rather than 307-ing them silently to the home page.
+  async redirects() {
+    return [
+      { source: "/developers", destination: "/api", permanent: false },
+      { source: "/docs", destination: "/api", permanent: false },
+      {
+        source: "/:locale/developers",
+        destination: "/:locale/api",
+        permanent: false,
+      },
+      { source: "/:locale/docs", destination: "/:locale/api", permanent: false },
+    ];
+  },
 };
 
 export default withNextIntl(nextConfig);

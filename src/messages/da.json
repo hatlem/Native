@@ -82,7 +82,11 @@
     "clientName": "Kundenavn",
     "market": "Faktureringsmarked",
     "create": "Opret kunde",
-    "creating": "Opretter…"
+    "creating": "Opretter…",
+    "gatedTitle": "Bureau-arbejdsområde",
+    "gatedLead": "Flerklient-arbejdsområdet er tilgængeligt for bureau-partnere.",
+    "gatedBody": "Hvis dit bureau vil drive NativeSpin på vegne af kunder — separate kundeorganisationer, skift med ét klik, fakturering samlet på bureau-niveau — send os en kort besked, så sætter vi det op.",
+    "gatedCta": "Anmod om bureau-adgang"
   },
   "recommend": {
     "title": "Plananbefaling",
@@ -836,6 +840,7 @@
     "browseCatalog": "Åbn kataloget",
     "createAccount": "Opret konto",
     "createAgencyAccount": "Opret bureaukonto",
+    "requestAgencyAccess": "Anmod om bureau-adgang",
     "tryRecommender": "Prøv anbefaleren",
     "seeWorkflow": "Se hele arbejdsgangen",
     "footerTagline": "Native-indhold og native-annoncering på tværs af hver titel vi dækker i NO, SE, DK, FI, DE, AT, CH, UK og IE — transparent, håndteret, produktificeret.",

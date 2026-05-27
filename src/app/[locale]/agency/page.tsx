@@ -6,7 +6,7 @@ import { prisma } from "@/lib/prisma";
 import { formatMoney } from "@/lib/money";
 import { getWorkspace } from "@/lib/workspace";
 import { createClient, selectClient } from "@/app/agency-actions";
-import { SubmitButton } from "@/components";
+import { MailLink, SubmitButton } from "@/components";
 
 export const dynamic = "force-dynamic";
 
@@ -25,9 +25,37 @@ export default async function AgencyPage({
   const tMarket = await getTranslations({ locale, namespace: "market" });
 
   const session = await auth();
-  const ws = await getWorkspace(session?.user?.id);
-  if (!ws?.isAgency || !ws.agencyOrgId) {
+  if (!session?.user) {
     redirect(`/${locale}/signin`);
+  }
+  const ws = await getWorkspace(session.user.id);
+  if (!ws?.isAgency || !ws.agencyOrgId) {
+    // Signed-in but not an agency org. Previously this fell through to
+    // a /signin redirect that bounced back to /catalog — a silent loop
+    // from the buyer's POV (Camilla scenario, Bug #9). Show an honest
+    // "request agency access" page instead so they know the surface
+    // exists but is gated.
+    return (
+      <section className="section">
+        <header className="page-header">
+          <span className="eyebrow accent">{t("eyebrow")}</span>
+          <h1>{t("gatedTitle")}</h1>
+          <p className="lead">{t("gatedLead")}</p>
+        </header>
+        <div className="card">
+          <p>{t("gatedBody")}</p>
+          <p className="cluster" style={{ marginTop: 16 }}>
+            <MailLink
+              to="partners@nativespin.com"
+              subject="Agency access — NativeSpin"
+              className="btn primary"
+            >
+              {t("gatedCta")}
+            </MailLink>
+          </p>
+        </div>
+      </section>
+    );
   }
 
   const clients = await prisma.organization.findMany({
