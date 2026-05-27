@@ -3,6 +3,7 @@ import { getTranslations } from "next-intl/server";
 import { ProductType } from "@prisma/client";
 import { Link } from "@/i18n/navigation";
 import { prisma } from "@/lib/prisma";
+import { intlLocale } from "@/lib/money";
 import { LandingShell } from "@/app/landing-shell";
 import { MailLink } from "@/components";
 
@@ -355,12 +356,12 @@ export default async function HomePage({
       {/* STATS */}
       <section className="stats" aria-label={t("hero.sideAria")}>
         <div className="cell">
-          <div className="v">{totalTitles.toLocaleString(locale)}</div>
+          <div className="v">{totalTitles.toLocaleString(intlLocale(locale))}</div>
           <div className="l">{t("stats.v240Label")}</div>
           <div className="sub">{t("stats.v240Sub")}</div>
         </div>
         <div className="cell">
-          <div className="v">{totalPublishers.toLocaleString(locale)}</div>
+          <div className="v">{totalPublishers.toLocaleString(intlLocale(locale))}</div>
           <div className="l">{t("stats.v12Label")}</div>
           <div className="sub">{t("stats.v12Sub")}</div>
         </div>

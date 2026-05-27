@@ -5,7 +5,7 @@ import { prisma } from "@/lib/prisma";
 import { getWorkspace } from "@/lib/workspace";
 import { DataLayerEvent } from "@/app/data-layer-event";
 import { Link } from "@/i18n/navigation";
-import { formatMoney } from "@/lib/money";
+import { formatMoney, intlLocale } from "@/lib/money";
 import {
   buildQuoteNarrative,
   anchorDiscountPct,
@@ -195,7 +195,7 @@ export default async function RequestPage({
                 <dt>{t("pendingSlaLabel")}</dt>
                 <dd>
                   <time dateTime={slaTarget.toISOString()}>
-                    {slaTarget.toLocaleString(locale, {
+                    {slaTarget.toLocaleString(intlLocale(locale), {
                       dateStyle: "medium",
                       timeStyle: "short",
                     })}

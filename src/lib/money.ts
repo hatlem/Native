@@ -3,12 +3,29 @@
 // Publicly we only ever show an *indicative* "from" price; the firm price is
 // produced by the desk via a Quote.
 
+// next-intl URL slug → BCP 47 language tag. The URL-locale slugs `at`,
+// `ch`, `uk`, `ie` are country codes that Intl.NumberFormat /
+// Date.toLocaleString reject with RangeError if passed directly. Map
+// them to the language variant we want to show in each market.
 const LOCALE_TO_INTL: Record<string, string> = {
   en: "en-GB",
   no: "nb-NO",
   sv: "sv-SE",
   da: "da-DK",
+  fi: "fi-FI",
+  de: "de-DE",
+  at: "de-AT",
+  ch: "de-CH",
+  uk: "en-GB",
+  ie: "en-IE",
 };
+
+// Shared adapter for any Intl API call that takes a locale tag. Avoid
+// passing the bare URL slug directly to `Number.toLocaleString` etc.
+// because the country-coded slugs throw RangeError on stock V8.
+export function intlLocale(locale: string): string {
+  return LOCALE_TO_INTL[locale] ?? "en-GB";
+}
 
 export function indicativePrice(
   basePrice: number,

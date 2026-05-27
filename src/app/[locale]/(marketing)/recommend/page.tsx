@@ -1,7 +1,7 @@
 import { getTranslations } from "next-intl/server";
 import { MarketCode } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
-import { indicativeFromRules, toRateRules, formatMoney } from "@/lib/money";
+import { indicativeFromRules, toRateRules, formatMoney, intlLocale } from "@/lib/money";
 import { arePricesVisible } from "@/lib/pricing/visibility";
 import { EmptyState } from "@/app/empty-state";
 import { recommendMix, type Candidate } from "@/lib/recommend";
@@ -149,7 +149,7 @@ export default async function RecommendPage({
                   <div className="kpi">
                     <div className="label">{t("reach")}</div>
                     <div className="value">
-                      {result.totalReach.toLocaleString(locale)}
+                      {result.totalReach.toLocaleString(intlLocale(locale))}
                     </div>
                     <div className="delta">{t("reachSub")}</div>
                   </div>
@@ -200,7 +200,7 @@ export default async function RecommendPage({
                       <h3>{p.titleName}</h3>
                       <p className="muted small">{p.category}</p>
                       <p className="muted small">
-                        {t("reach")}: {p.reach.toLocaleString(locale)}
+                        {t("reach")}: {p.reach.toLocaleString(intlLocale(locale))}
                       </p>
                       <div className="price">
                         {formatMoney(p.unitPrice, currency, locale)}

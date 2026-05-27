@@ -3,7 +3,7 @@ import { MarketCode, ProductType, Prisma } from "@prisma/client";
 import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
 import { Link } from "@/i18n/navigation";
-import { indicativeFromRules, toRateRules, formatMoney } from "@/lib/money";
+import { indicativeFromRules, toRateRules, formatMoney, intlLocale } from "@/lib/money";
 import { isProductPriceShown } from "@/lib/pricing-visibility";
 import { EmptyState } from "@/app/empty-state";
 import { LandingShell } from "@/app/landing-shell";
@@ -465,11 +465,11 @@ async function CatalogMarketing({ locale }: { locale: string }) {
           </div>
           <div className="hero-stats">
             <div className="hero-stat">
-              <div className="value">{titleCount.toLocaleString(locale)}</div>
+              <div className="value">{titleCount.toLocaleString(intlLocale(locale))}</div>
               <div className="label">{t("gate.statsTitles")}</div>
             </div>
             <div className="hero-stat">
-              <div className="value">{productCount.toLocaleString(locale)}</div>
+              <div className="value">{productCount.toLocaleString(intlLocale(locale))}</div>
               <div className="label">{t("gate.statsProducts")}</div>
             </div>
             <div className="hero-stat">
