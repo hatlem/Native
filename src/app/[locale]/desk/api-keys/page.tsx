@@ -62,8 +62,14 @@ export default async function ApiKeysPage({
     );
   }
 
-  // Read the one-time flash cookie set by createApiKey, then clear it
-  // so a refresh of this page shows nothing.
+  // Read the one-time flash cookie set by createApiKey. We deliberately
+  // do NOT clear it here — `cookies().set()` throws in Next.js 15 server
+  // components. The cookie has a 120-second `maxAge` set by the action
+  // and is path-scoped to this page only, which gives the admin time to
+  // copy the token and is gone before any cache/log retention matters.
+  // A refresh within those 120s re-shows the same banner to the same
+  // authenticated SUPERADMIN — acceptable since the token was already
+  // displayed to that exact session.
   const cookieStore = await cookies();
   const raw = cookieStore.get(ISSUED_KEY_COOKIE)?.value;
   let tokenOnce: string | null = null;
@@ -78,10 +84,6 @@ export default async function ApiKeysPage({
     } catch {
       // Ignore — corrupted cookie is treated as "no recent issuance".
     }
-    cookieStore.set(ISSUED_KEY_COOKIE, "", {
-      path: `/${locale}/desk/api-keys`,
-      maxAge: 0,
-    });
   }
   const errCode = typeof sp.error === "string" ? sp.error : null;
 
