@@ -51,6 +51,41 @@ export async function authenticate(formData: FormData) {
     await signIn("credentials", { email, password, redirect: false });
   } catch (error) {
     if (error instanceof AuthError) {
+      // Disambiguate the "valid password, just unverified" case from
+      // truly-wrong credentials. Telling that user "Invalid email or
+      // password" sends them to forgot-password when the real fix is
+      // to click a link in their inbox. Gated on a successful bcrypt
+      // compare so we don't leak existence to anyone with a guess.
+      const u = await prisma.user.findUnique({
+        where: { email },
+        select: { id: true, passwordHash: true, emailVerifiedAt: true },
+      });
+      if (u?.passwordHash && !u.emailVerifiedAt) {
+        const ok = await bcrypt.compare(password, u.passwordHash);
+        if (ok) {
+          const raw = generateToken();
+          await prisma.magicLinkToken.create({
+            data: {
+              userId: u.id,
+              tokenHash: hashToken(raw),
+              expiresAt: tokenExpiry(),
+              requestedIp: ip,
+            },
+          });
+          const url = `${appUrl()}/${locale}/magic-link/${raw}`;
+          const msg = magicLinkEmail({ url, locale, appName: appName() });
+          const unverifiedUserId = u.id;
+          after(async () => {
+            try {
+              await emailAdapter({ to: email, subject: msg.subject, text: msg.text, html: msg.html });
+            } catch (err) {
+              console.error("auth.verify_email_resend_failed", { userId: unverifiedUserId, err });
+            }
+            await recordAudit(unverifiedUserId, "auth.verify_email_resent", `User:${email}`, { ip });
+          });
+          redirect(`/${locale}/check-email?verify=1`);
+        }
+      }
       await recordAudit(email || "anonymous", "auth.signin_failed", `User:${email}`, { ip });
       redirect(`/${locale}/signin?error=1${emailParam}`);
     }

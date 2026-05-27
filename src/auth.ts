@@ -65,6 +65,14 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         const ok = await bcrypt.compare(password, user.passwordHash);
         if (!ok) return null;
 
+        // Verification gate: a user who signed up with a password but
+        // never clicked the magic-link in their inbox hasn't proven
+        // ownership of the address — refuse credentials sign-in until
+        // they do. Legacy accounts are backfilled in migration
+        // 20260527120000_backfill_email_verified so this only blocks
+        // genuinely-unverified accounts.
+        if (!user.emailVerifiedAt) return null;
+
         return {
           id: user.id,
           email: user.email,

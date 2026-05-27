@@ -13,6 +13,7 @@ import {
   inviteEmail,
 } from "@/lib/publisher-invite";
 import { blueprintFor, basePriceFor } from "@/lib/activation-blueprint";
+import { checkBusinessEmailWithMx } from "@/lib/email-policy";
 
 function field(formData: FormData, key: string): string {
   const v = formData.get(key);
@@ -190,6 +191,14 @@ export async function sendPublisherInvite(formData: FormData) {
   // an invite to nowhere and have it look like spam if it lands later.
   if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(rawEmail)) {
     redirect(`/${locale}/desk/titles?invite=invalid-email`);
+  }
+
+  // Same company-email gate as buyer signup — gating here, not at
+  // claim time, because the claim form locks the email to whatever
+  // the invite was issued to. Catches it before the row is created.
+  const policy = await checkBusinessEmailWithMx(rawEmail);
+  if (!policy.ok) {
+    redirect(`/${locale}/desk/titles?invite=email-business`);
   }
 
   const publisher = await prisma.publisher.findUnique({

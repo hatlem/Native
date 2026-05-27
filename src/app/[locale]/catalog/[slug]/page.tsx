@@ -107,7 +107,13 @@ export default async function TitleDetailPage({
         type="application/ld+json"
         nonce={nonce}
         // schema.org JSON-LD: PLAN §14 "structured data for discovery".
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(ld) }}
+        // Escape "<" to < so a stored "</script>" payload in
+        // Title.name / Publisher.name / Product.name (admin-controlled
+        // today, but could become editable later) can't break out of
+        // this <script> block.
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify(ld).replace(/</g, "\\u003C"),
+        }}
       />
       <p>
         <Link href="/catalog">← {t("back")}</Link>
