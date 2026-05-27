@@ -3996,6 +3996,18 @@ footer a:hover {
     width: 100%;
   }
 
+  /* iOS zooms into form fields when the font-size is < 16px on focus.
+     Bump all text-entry fields to 16px on small screens — keeps the
+     desktop 0.95rem density without the mobile zoom trap. */
+  .filters input:not([type="checkbox"]):not([type="radio"]),
+  .filters select,
+  .filters textarea,
+  input:not([type="checkbox"]):not([type="radio"]),
+  select,
+  textarea {
+    font-size: 16px;
+  }
+
   .filters button,
   .hero-actions .btn {
     width: 100%;

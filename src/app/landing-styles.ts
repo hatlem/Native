@@ -347,9 +347,11 @@ body:has(.bn) .drawer-link:hover { background: rgba(20,17,12,0.06) !important; }
 .bn .grid .card h3 {
   margin: 0; font-size: clamp(20px, 1.8vw, 26px); font-weight: 600;
   letter-spacing: -0.02em; line-height: 1.15; max-width: 16ch;
+  overflow-wrap: anywhere;
 }
 .bn .grid .card p {
   margin: 0; font-size: 14px; line-height: 1.6; color: var(--ink-soft); max-width: 36ch;
+  overflow-wrap: anywhere;
 }
 .bn .grid .card .muted { color: var(--ink-mute); }
 .bn .grid .card.contact-channel {
@@ -1010,7 +1012,8 @@ body:has(.bn) .drawer-link:hover { background: rgba(20,17,12,0.06) !important; }
 .bn .filters select {
   padding: 11px 14px; border: 2px solid var(--ink); border-radius: 2px;
   background: var(--paper); color: var(--ink);
-  font-family: inherit; font-size: 14px;
+  font-family: inherit; font-size: 16px;
+  min-height: 44px;
 }
 .bn .filters input:focus,
 .bn .filters select:focus { outline: 3px solid var(--ink); outline-offset: -2px; }
