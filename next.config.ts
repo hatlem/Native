@@ -26,12 +26,14 @@ const nextConfig: NextConfig = {
     return [{ source: "/:path*", headers: securityHeaders }];
   },
   // /developers and /docs are conventional landing spots tech evaluators
-  // try first (Tobias scenario). Send them to the real API docs at /api
-  // rather than 307-ing them silently to the home page.
+  // try first (Tobias scenario). Send them to the real API docs at /api.
+  // Only the locale-prefixed forms are listed — next-intl's middleware
+  // first redirects bare `/developers` → `/<defaultLocale>/developers`,
+  // which then hits the rule below. Adding a bare `/developers → /api`
+  // here would short-circuit ahead of next-intl and land on `/api`
+  // with no locale prefix (which 404s — `/api` lives under [locale]).
   async redirects() {
     return [
-      { source: "/developers", destination: "/api", permanent: false },
-      { source: "/docs", destination: "/api", permanent: false },
       {
         source: "/:locale/developers",
         destination: "/:locale/api",
