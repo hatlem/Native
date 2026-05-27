@@ -1,6 +1,6 @@
 {
   "name": "nativespin",
-  "version": "0.0.0",
+  "version": "0.0.1",
   "private": true,
   "description": "NativeSpin — Nordic marketplace for buying native content and native advertising in newspapers and magazines.",
   "scripts": {
