@@ -132,7 +132,7 @@
   "catalog": {
     "eyebrow": "Utforsk",
     "title": "Hver tittel som tilbyr native",
-    "subtitle": "Filtrer på marked, format og publikum. Veiledende priser på alle produkter — firm pris på forespørsel via desk.",
+    "subtitle": "Filtrer på marked, format og publikum. Veiledende priser der utgiveren har delt dem — firm pris på forespørsel via desk.",
     "resultCount": "{count, plural, =0 {Ingen treff} =1 {1 tittel} other {# titler}}",
     "removeFilter": "Fjern filter",
     "filters": {
@@ -147,6 +147,7 @@
       "apply": "Bruk",
       "advanced": "Avanserte valg",
       "formatCount": "{count, plural, =0 {Alle formater} =1 {1 format} other {# formater}}",
+      "marketCount": "{count, plural, =0 {Alle markeder} =1 {1 marked} other {# markeder}}",
       "compareMode": "Sammenligningsvelger",
       "compareModeHint": "Velg titler du vil sammenligne side om side",
       "loading": "Oppdaterer…"
@@ -292,7 +293,11 @@
     "itemsEyebrow": "Brief",
     "quoteEyebrow": "Firm pris",
     "orderEyebrow": "Bestilling",
-    "pendingTitle": "Briefen er hos desk"
+    "pendingTitle": "Briefen er hos desk",
+    "pendingBuyerLabel": "Innkjøper",
+    "pendingBuyerUnassigned": "Under tildeling",
+    "pendingSlaLabel": "Fast tilbud forventet innen",
+    "pendingBriefLabel": "Din brief"
   },
   "desk": {
     "eyebrow": "Internt desk",

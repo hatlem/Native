@@ -4,6 +4,7 @@ import { headers } from "next/headers";
 import { getTranslations } from "next-intl/server";
 import { Link } from "@/i18n/navigation";
 import { BrandWordmark } from "@/app/brand";
+import { MailLink } from "@/components";
 import { STYLES } from "./landing-styles";
 
 const inter = Inter({
@@ -13,8 +14,7 @@ const inter = Inter({
   weight: ["400", "500", "600"],
 });
 
-const DESK_MAILTO =
-  "mailto:desk@nativespin.com?subject=Talk%20to%20the%20NativeSpin%20desk";
+const DESK_SUBJECT = "Talk to the NativeSpin desk";
 
 const MARKETS = ["no", "se", "dk", "fi", "de", "at", "ch", "uk", "ie"] as const;
 
@@ -64,7 +64,9 @@ export async function LandingShell({
               <Link href="/for-agencies">{t("foot.navAgy")}</Link>
               <Link href="/for-publishers">{t("foot.navPub")}</Link>
               <Link href="/about">{t("foot.navAbout")}</Link>
-              <a href={DESK_MAILTO}>{t("foot.navContact")}</a>
+              <MailLink to="desk@nativespin.com" subject={DESK_SUBJECT}>
+                {t("foot.navContact")}
+              </MailLink>
             </nav>
             <div className="markets">
               {MARKETS.map((m) => (

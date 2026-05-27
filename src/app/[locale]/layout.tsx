@@ -13,6 +13,7 @@ import { GtmScripts, GtmNoscript } from "@/app/gtm";
 import { NavShell } from "@/app/nav-shell";
 import { PublicHeader } from "@/app/public-header";
 import { BrandWordmark } from "@/app/brand";
+import { MailLink } from "@/components";
 import {
   audienceFor,
   navItemsFor,
@@ -208,9 +209,9 @@ export default async function LocaleLayout({
                 <ul>
                   <li><Link href="/about">{tm("footerAbout")}</Link></li>
                   <li>
-                    <a href="mailto:hello@nativespin.com">
+                    <MailLink to="hello@nativespin.com">
                       {tm("footerContact")}
-                    </a>
+                    </MailLink>
                   </li>
                 </ul>
               </div>

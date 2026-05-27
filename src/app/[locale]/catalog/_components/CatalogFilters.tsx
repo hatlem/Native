@@ -14,7 +14,7 @@ type Props = {
   b2bB2cs: Option[];
   initial: {
     q: string;
-    market: string;
+    markets: string[];
     types: string[];
     nativeFit: string;
     b2bB2c: string;
@@ -35,8 +35,10 @@ export function CatalogFilters({ markets, formats, nativeFits, b2bB2cs, initial 
   const [isPending, startTransition] = useTransition();
   const [q, setQ] = useState(initial.q);
   const [formatOpen, setFormatOpen] = useState(false);
+  const [marketOpen, setMarketOpen] = useState(false);
   const [advancedOpen, setAdvancedOpen] = useState(initial.advancedOpen);
   const formatRef = useRef<HTMLDivElement>(null);
+  const marketRef = useRef<HTMLDivElement>(null);
 
   // Debounced URL update for the search input. Other filter changes
   // commit instantly — only the text field waits for the typist to pause.
@@ -66,6 +68,18 @@ export function CatalogFilters({ markets, formats, nativeFits, b2bB2cs, initial 
     document.addEventListener("mousedown", onDown);
     return () => document.removeEventListener("mousedown", onDown);
   }, [formatOpen]);
+
+  // Same outside-click handling for the market popover.
+  useEffect(() => {
+    if (!marketOpen) return;
+    function onDown(e: MouseEvent) {
+      if (marketRef.current && !marketRef.current.contains(e.target as Node)) {
+        setMarketOpen(false);
+      }
+    }
+    document.addEventListener("mousedown", onDown);
+    return () => document.removeEventListener("mousedown", onDown);
+  }, [marketOpen]);
 
   function commit(updater: (params: URLSearchParams) => void) {
     const next = new URLSearchParams(sp.toString());
@@ -99,6 +113,22 @@ export function CatalogFilters({ markets, formats, nativeFits, b2bB2cs, initial 
     commit((p) => p.delete("types"));
   }
 
+  function toggleMarket(value: string) {
+    const current = sp.get("market")?.split(",").filter(Boolean) ?? [];
+    const has = current.includes(value);
+    const nextValues = has
+      ? current.filter((v) => v !== value)
+      : [...current, value];
+    commit((p) => {
+      if (nextValues.length) p.set("market", nextValues.join(","));
+      else p.delete("market");
+    });
+  }
+
+  function clearMarkets() {
+    commit((p) => p.delete("market"));
+  }
+
   function toggleOnlyPriced(checked: boolean) {
     commit((p) => {
       if (checked) p.set("onlyPriced", "1");
@@ -115,6 +145,16 @@ export function CatalogFilters({ markets, formats, nativeFits, b2bB2cs, initial 
 
   const selectedTypes = new Set(initial.types);
   const formatLabel = t("formatCount", { count: selectedTypes.size });
+  const selectedMarkets = new Set(initial.markets);
+  // Show the actual single-market label when only one is chosen so the
+  // common case stays as readable as a single-select dropdown — fall back
+  // to a count for multi-select state.
+  const marketLabel =
+    selectedMarkets.size === 0
+      ? t("all")
+      : selectedMarkets.size === 1
+        ? (markets.find((m) => m.value === initial.markets[0])?.label ?? initial.markets[0])
+        : t("marketCount", { count: selectedMarkets.size });
 
   return (
     <div className="catalog-filters">
@@ -138,19 +178,44 @@ export function CatalogFilters({ markets, formats, nativeFits, b2bB2cs, initial 
 
       <div className="catalog-filters__row">
         <div className="catalog-filters__field">
-          <label htmlFor="market">{t("market")}</label>
-          <select
-            id="market"
-            value={initial.market}
-            onChange={(e) => setSingle("market", e.target.value)}
-          >
-            <option value="">{t("all")}</option>
-            {markets.map((m) => (
-              <option key={m.value} value={m.value}>
-                {m.label}
-              </option>
-            ))}
-          </select>
+          <label>{t("market")}</label>
+          <div className="catalog-filters__multi" ref={marketRef}>
+            <button
+              type="button"
+              className="catalog-filters__multi-trigger"
+              onClick={() => setMarketOpen((o) => !o)}
+              aria-haspopup="true"
+              aria-expanded={marketOpen}
+            >
+              <span>{marketLabel}</span>
+              <span aria-hidden="true" className="catalog-filters__chev">
+                ⌄
+              </span>
+            </button>
+            {marketOpen ? (
+              <div className="catalog-filters__popover" role="dialog">
+                {markets.map((m) => (
+                  <label key={m.value} className="catalog-filters__popover-row">
+                    <input
+                      type="checkbox"
+                      checked={selectedMarkets.has(m.value)}
+                      onChange={() => toggleMarket(m.value)}
+                    />
+                    <span>{m.label}</span>
+                  </label>
+                ))}
+                {selectedMarkets.size > 0 ? (
+                  <button
+                    type="button"
+                    className="catalog-filters__popover-clear"
+                    onClick={clearMarkets}
+                  >
+                    {t("all")}
+                  </button>
+                ) : null}
+              </div>
+            ) : null}
+          </div>
         </div>
 
         <div className="catalog-filters__field">

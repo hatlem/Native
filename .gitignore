@@ -38,3 +38,4 @@ scripts/dev-backups/
 
 # claude code session state
 .claude/
+scenario-runs/

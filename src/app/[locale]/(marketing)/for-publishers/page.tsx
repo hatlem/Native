@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { getTranslations } from "next-intl/server";
 import { Link } from "@/i18n/navigation";
 import { LandingShell } from "@/app/landing-shell";
+import { MailLink } from "@/components";
 
 export async function generateMetadata({
   params,
@@ -39,9 +40,9 @@ export default async function ForPublishersPage({
           <h1>{t("title")}</h1>
           <p className="lead">{t("lead")}</p>
           <div className="hero-actions">
-            <a href="mailto:partners@nativespin.com" className="btn primary">
+            <MailLink to="partners@nativespin.com" className="btn primary">
               {t("contactCta")} <span className="arrow">→</span>
-            </a>
+            </MailLink>
             <Link href="/how-it-works" className="btn secondary">
               {tm("howCta")}
             </Link>
@@ -104,9 +105,9 @@ export default async function ForPublishersPage({
           <h2>{t("ctaTitle")}</h2>
           <p>{t("ctaBody")}</p>
           <div className="hero-actions">
-            <a href="mailto:partners@nativespin.com" className="btn primary">
+            <MailLink to="partners@nativespin.com" className="btn primary">
               {t("contactCta")} <span className="arrow">→</span>
-            </a>
+            </MailLink>
           </div>
         </div>
       </section>

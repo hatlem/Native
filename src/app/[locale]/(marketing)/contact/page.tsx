@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { getTranslations } from "next-intl/server";
 import { Link } from "@/i18n/navigation";
 import { LandingShell } from "@/app/landing-shell";
+import { MailLink } from "@/components";
 
 export async function generateMetadata({
   params,
@@ -44,9 +45,9 @@ export default async function ContactPage({
               <article className="card contact-channel" key={c.id}>
                 <h3>{t(`channels.${c.id}.title`)}</h3>
                 <p className="muted">{t(`channels.${c.id}.body`)}</p>
-                <a className="channel-email" href={`mailto:${c.email}`}>
+                <MailLink className="channel-email" to={c.email}>
                   {c.email}
-                </a>
+                </MailLink>
               </article>
             ))}
           </div>

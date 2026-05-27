@@ -211,7 +211,7 @@
   "catalog": {
     "eyebrow": "Durchstöbern",
     "title": "Jeder Titel, der Native anbietet",
-    "subtitle": "Nach Markt, Format und Zielgruppe filtern. Richtpreis bei jedem Produkt — verbindliche Preise auf Anfrage über das Desk.",
+    "subtitle": "Nach Markt, Format und Zielgruppe filtern. Richtpreis dort, wo der Verlag ihn geteilt hat — verbindliche Preise auf Anfrage über das Desk.",
     "resultCount": "{count, plural, =0 {Keine Treffer} =1 {1 Titel} other {# Titel}}",
     "removeFilter": "Filter entfernen",
     "filters": {
@@ -226,6 +226,7 @@
       "apply": "Anwenden",
       "advanced": "Erweiterte Optionen",
       "formatCount": "{count, plural, =0 {Alle Formate} =1 {1 Format} other {# Formate}}",
+      "marketCount": "{count, plural, =0 {Alle Märkte} =1 {1 Markt} other {# Märkte}}",
       "compareMode": "Vergleichsauswahl",
       "compareModeHint": "Titel auswählen, um sie nebeneinander zu vergleichen",
       "loading": "Wird aktualisiert…"
@@ -371,7 +372,11 @@
     "itemsEyebrow": "Brief",
     "quoteEyebrow": "Firm pricing",
     "orderEyebrow": "Order",
-    "pendingTitle": "Your brief is with the desk"
+    "pendingTitle": "Your brief is with the desk",
+    "pendingBuyerLabel": "Einkäufer",
+    "pendingBuyerUnassigned": "Wird zugewiesen",
+    "pendingSlaLabel": "Verbindliches Angebot erwartet bis",
+    "pendingBriefLabel": "Ihr Brief"
   },
   "desk": {
     "eyebrow": "Internal desk",

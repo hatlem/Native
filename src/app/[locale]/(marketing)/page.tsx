@@ -4,9 +4,9 @@ import { ProductType } from "@prisma/client";
 import { Link } from "@/i18n/navigation";
 import { prisma } from "@/lib/prisma";
 import { LandingShell } from "@/app/landing-shell";
+import { MailLink } from "@/components";
 
-const DESK_MAILTO =
-  "mailto:desk@nativespin.com?subject=Talk%20to%20the%20NativeSpin%20desk";
+const DESK_SUBJECT = "Talk to the NativeSpin desk";
 
 export const metadata = {
   title: "NativeSpin — One brief. 3,000+ titles across 9 markets. Firm quote in 24 hours.",
@@ -54,6 +54,7 @@ export default async function HomePage({
     totalActiveTitles,
     totalTitles,
     totalPublishers,
+    nordicTitles,
   ] = await Promise.all([
     prisma.title.findMany({
       where: {
@@ -84,6 +85,10 @@ export default async function HomePage({
     prisma.title.count({ where: { active: true } }),
     prisma.title.count(),
     prisma.publisher.count(),
+    // The "240+" in the why-section pull-quote is specifically about the
+    // NO·SE·DK premium core, not the full 9-market footprint. Source it
+    // live so the number can't drift past the marketing copy again.
+    prisma.title.count({ where: { market: { code: { in: ["NO", "SE", "DK"] } } } }),
   ]);
 
   const featuredId = sampleTitles[2]?.id;
@@ -118,7 +123,7 @@ export default async function HomePage({
           <h1 className="headline">
             <span className="row">{t("hero.h1Line1")}</span>
             <span className="row">{t("hero.h1Line2")}</span>
-            <span className="row ink-mute">{t("hero.h1Line3")}</span>
+            <span className="row ink-mute">{t("hero.h1Line3", { totalCount: totalTitles })}</span>
             <span className="row ink-mute">{t("hero.h1Line4")}</span>
           </h1>
 
@@ -175,7 +180,7 @@ export default async function HomePage({
               <div className="ix">{t("why.colCIx")}</div>
               <h3>{t("why.colCH3")}</h3>
               <p>{t.rich("why.colCBody", richTags)}</p>
-              <div className="pull">{t("why.colCPull")}</div>
+              <div className="pull">{t("why.colCPull", { nordicCount: nordicTitles })}</div>
             </div>
           </div>
         </div>
@@ -342,7 +347,7 @@ export default async function HomePage({
           </table>
 
           <div className="cat-foot">
-            <div>{t("catalog.footBody")}</div>
+            <div>{t("catalog.footBody", { nordicCount: nordicTitles })}</div>
           </div>
         </div>
       </section>
@@ -421,9 +426,9 @@ export default async function HomePage({
           <h2>{t("endCta.h2")}</h2>
           <p>{t("endCta.body")}</p>
           <div className="row">
-            <a href={DESK_MAILTO} className="btn primary">
+            <MailLink to="desk@nativespin.com" subject={DESK_SUBJECT} className="btn primary">
               {t("endCta.ctaPrimary")} <span className="arrow">→</span>
-            </a>
+            </MailLink>
             <Link href="/signup" className="btn">
               {t("endCta.ctaSecondary")}
             </Link>

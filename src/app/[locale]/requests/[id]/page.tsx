@@ -80,6 +80,31 @@ export default async function RequestPage({
   });
   const byId = new Map(products.map((p) => [p.id, p]));
 
+  // Resolve the assigned desk buyer's name so the buyer-facing page can
+  // surface accountability ("Hentet av Astrid"). Schema has the FK column
+  // but no relation — fetch by ID.
+  const assignedBuyer = request.assignedDeskUserId
+    ? await prisma.user.findUnique({
+        where: { id: request.assignedDeskUserId },
+        select: { name: true, email: true },
+      })
+    : null;
+
+  // Marketing promise: a firm quote in ≤24 working hours. Surface the
+  // derived target so the buyer can see what they're waiting on instead
+  // of staring at a generic ⏳. Naive working-hour math is fine here —
+  // weekends roll forward by 48 / 72 hours.
+  const slaTarget = (() => {
+    const t = new Date(request.createdAt);
+    let hoursAdded = 0;
+    while (hoursAdded < 24) {
+      t.setHours(t.getHours() + 1);
+      const day = t.getDay(); // 0 = Sun, 6 = Sat
+      if (day !== 0 && day !== 6) hoursAdded += 1;
+    }
+    return t;
+  })();
+
   // Multi-currency requests carry one Quote per placement market.
   // Sort by currency so the buyer reads them in a stable order across
   // page loads (alphabetical by ISO code).
@@ -157,6 +182,33 @@ export default async function RequestPage({
             <div className="empty-icon">⏳</div>
             <h3 className="empty-title">{t("pendingTitle")}</h3>
             <p>{t("pending")}</p>
+            <dl className="pending-meta">
+              <div>
+                <dt>{t("pendingBuyerLabel")}</dt>
+                <dd>
+                  {assignedBuyer?.name ??
+                    assignedBuyer?.email ??
+                    t("pendingBuyerUnassigned")}
+                </dd>
+              </div>
+              <div>
+                <dt>{t("pendingSlaLabel")}</dt>
+                <dd>
+                  <time dateTime={slaTarget.toISOString()}>
+                    {slaTarget.toLocaleString(locale, {
+                      dateStyle: "medium",
+                      timeStyle: "short",
+                    })}
+                  </time>
+                </dd>
+              </div>
+            </dl>
+            {request.briefSummary ? (
+              <details className="pending-brief">
+                <summary>{t("pendingBriefLabel")}</summary>
+                <p>{request.briefSummary}</p>
+              </details>
+            ) : null}
           </div>
         </section>
       ) : (

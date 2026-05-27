@@ -62,10 +62,20 @@ export default async function CatalogPage({
     namespace: "priceVisibility",
   });
 
-  const market = asEnum(
-    typeof sp.market === "string" ? sp.market : undefined,
-    MARKET_CODES,
-  );
+  // `market` is multi-select (CSV). A single value still works — same param
+  // shape as `types`. This lets tri-Nordic buyers run one query across NO·SE·DK
+  // instead of three.
+  const marketsRaw =
+    typeof sp.market === "string" ? sp.market : "";
+  const markets: MarketCode[] = marketsRaw
+    .split(",")
+    .map((s) => s.trim())
+    .filter((s): s is MarketCode =>
+      (MARKET_CODES as readonly string[]).includes(s),
+    );
+  // Legacy single-`market` consumers downstream — keep the first as a
+  // convenience for things that only need one (e.g. SEO / breadcrumb).
+  const market = markets[0];
   // `types` is the new multi-select param (CSV). Fall back to the legacy
   // single `type` param so older shared links keep working.
   const typesRaw =
@@ -107,7 +117,11 @@ export default async function CatalogPage({
     // Show commerce-active titles AND unverified research-catalog rows;
     // hide titles the desk has verified as not offering native.
     OR: [{ active: true }, { lastVerifiedAt: null }],
-    ...(market ? { market: { code: market } } : {}),
+    ...(markets.length
+      ? markets.length === 1
+        ? { market: { code: markets[0] } }
+        : { market: { code: { in: markets } } }
+      : {}),
     ...(types.length
       ? { products: { some: { type: { in: types }, active: true } } }
       : {}),
@@ -150,7 +164,7 @@ export default async function CatalogPage({
 
   const pageQuery = (p: number) => {
     const params = new URLSearchParams();
-    if (market) params.set("market", market);
+    if (markets.length) params.set("market", markets.join(","));
     if (types.length) params.set("types", types.join(","));
     if (nativeFit) params.set("nativeFit", nativeFit);
     if (b2bB2c) params.set("b2bB2c", b2bB2c);
@@ -175,10 +189,15 @@ export default async function CatalogPage({
     | "q";
   const filterHref = (
     except: FilterKey,
-    extra?: { dropType?: ProductType },
+    extra?: { dropType?: ProductType; dropMarket?: MarketCode },
   ) => {
     const params = new URLSearchParams();
-    if (market && except !== "market") params.set("market", market);
+    if (except !== "market") {
+      const keep = extra?.dropMarket
+        ? markets.filter((m) => m !== extra.dropMarket)
+        : markets;
+      if (keep.length) params.set("market", keep.join(","));
+    }
     if (except !== "types") {
       const keep = extra?.dropType
         ? types.filter((t) => t !== extra.dropType)
@@ -196,12 +215,13 @@ export default async function CatalogPage({
 
   const activeFilters: Array<{ key: string; label: string; href: string }> =
     [];
-  if (market)
+  for (const m of markets) {
     activeFilters.push({
-      key: "market",
-      label: `${t("filters.market")}: ${tMarket(market)}`,
-      href: filterHref("market"),
+      key: `market-${m}`,
+      label: `${t("filters.market")}: ${tMarket(m)}`,
+      href: filterHref("market", { dropMarket: m }),
     });
+  }
   for (const tp of types) {
     activeFilters.push({
       key: `type-${tp}`,
@@ -246,7 +266,7 @@ export default async function CatalogPage({
         b2bB2cs={B2B_B2C_VALUES.map((v) => ({ value: v, label: v }))}
         initial={{
           q,
-          market: market ?? "",
+          markets,
           types,
           nativeFit: nativeFit ?? "",
           b2bB2c: b2bB2c ?? "",

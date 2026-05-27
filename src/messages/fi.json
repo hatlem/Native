@@ -211,7 +211,7 @@
   "catalog": {
     "eyebrow": "Selaa",
     "title": "Jokainen julkaisu, joka ajaa natiivia",
-    "subtitle": "Suodata markkinan, formaatin ja yleisön mukaan. Suuntaa-antava hinta jokaisesta tuotteesta — kiinteä hinta pyynnöstä deskin kautta.",
+    "subtitle": "Suodata markkinan, formaatin ja yleisön mukaan. Suuntaa-antava hinta siellä missä julkaisija on jakanut sen — kiinteä hinta pyynnöstä deskin kautta.",
     "resultCount": "{count, plural, =0 {Ei osumia} =1 {1 julkaisu} other {# julkaisua}}",
     "removeFilter": "Poista suodatin",
     "filters": {
@@ -226,6 +226,7 @@
       "apply": "Käytä",
       "advanced": "Lisäasetukset",
       "formatCount": "{count, plural, =0 {Kaikki formaatit} =1 {1 formaatti} other {# formaattia}}",
+      "marketCount": "{count, plural, =0 {Kaikki markkinat} =1 {1 markkina} other {# markkinaa}}",
       "compareMode": "Vertailutyökalu",
       "compareModeHint": "Valitse julkaisut, joita haluat vertailla rinnakkain",
       "loading": "Päivitetään…"
@@ -371,7 +372,11 @@
     "itemsEyebrow": "Brief",
     "quoteEyebrow": "Kiinteä hinnoittelu",
     "orderEyebrow": "Tilaus",
-    "pendingTitle": "Briefisi on deskillä"
+    "pendingTitle": "Briefisi on deskillä",
+    "pendingBuyerLabel": "Ostaja",
+    "pendingBuyerUnassigned": "Osoitetaan",
+    "pendingSlaLabel": "Kiinteä hinta odotetaan viimeistään",
+    "pendingBriefLabel": "Briefisi"
   },
   "desk": {
     "eyebrow": "Sisäinen desk",

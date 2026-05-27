@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { getTranslations } from "next-intl/server";
 import { Link } from "@/i18n/navigation";
 import { LandingShell } from "@/app/landing-shell";
+import { MailLink } from "@/components";
 
 export async function generateMetadata({
   params,
@@ -121,9 +122,7 @@ export default async function SecurityPage({
           <p className="prose">{t("disclosureBody")}</p>
           <p className="prose">
             {t("disclosureMail")}{" "}
-            <a className="link" href="mailto:security@nativespin.com">
-              security@nativespin.com
-            </a>
+            <MailLink className="link" to="security@nativespin.com" />
           </p>
         </div>
       </section>

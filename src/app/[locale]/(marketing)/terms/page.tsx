@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { getTranslations } from "next-intl/server";
 import { LandingShell } from "@/app/landing-shell";
+import { MailLink } from "@/components";
 
 export async function generateMetadata({
   params,
@@ -60,9 +61,7 @@ export default async function TermsPage({
           <h2>{t("contactTitle")}</h2>
           <p className="prose">
             {t("contactBody")}{" "}
-            <a className="link" href="mailto:legal@nativespin.com">
-              legal@nativespin.com
-            </a>
+            <MailLink className="link" to="legal@nativespin.com" />
           </p>
         </section>
       </article>

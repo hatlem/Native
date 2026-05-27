@@ -3,7 +3,7 @@
   "pain": "<strong>Natiivimainonta</strong> – artikkeli, jonka brändi maksaa ja joka kirjoitetaan ja taitetaan sen lehden tai aikakauslehden äänellä, joka sen julkaisee. Lukijat <strong>lukevat sen loppuun</strong> kuten minkä tahansa muun jutun. Display-mainokset ohitetaan; natiivi ansaitsee paikkansa.",
   "h1Line1": "Mainos, jonka ihmiset lukevat loppuun.",
   "h1Line2": "Sivu, johon ihmiset luottavat.",
-  "h1Line3": "3 000+ julkaisua.",
+  "h1Line3": "{totalCount}+ julkaisua.",
   "h1Line4": "Yksi desk.",
   "ctaPrimary": "Pyydä pääsyä",
   "ctaSecondary": "Katso miten se toimii",
