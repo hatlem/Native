@@ -847,7 +847,8 @@ body:has(.bn) .drawer-link:hover { background: rgba(20,17,12,0.06) !important; }
 .bn .auth-card .field textarea {
   padding: 12px 14px; border: 2px solid var(--ink); border-radius: 2px;
   background: var(--paper); color: var(--ink);
-  font-family: inherit; font-size: 14px; line-height: 1.4;
+  font-family: inherit; font-size: 16px; line-height: 1.4;
+  min-height: 44px;
   transition: outline .15s ease;
 }
 .bn .auth-card .field input:focus,
@@ -862,6 +863,23 @@ body:has(.bn) .drawer-link:hover { background: rgba(20,17,12,0.06) !important; }
 .bn .auth-card .field label .optional {
   text-transform: none; letter-spacing: 0; font-weight: 400; color: var(--ink-mute);
 }
+.bn .auth-card .signup-password-disclosure summary {
+  list-style: none;
+  cursor: pointer;
+  padding: 12px 0;
+  min-height: 44px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--ink-soft);
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+.bn .auth-card .signup-password-disclosure summary::-webkit-details-marker { display: none; }
+.bn .auth-card .signup-password-disclosure summary::before {
+  content: "+"; font-size: 16px; line-height: 1; color: var(--ink-mute);
+}
+.bn .auth-card .signup-password-disclosure[open] summary::before { content: "−"; }
 .bn .auth-card .actions { margin-top: 4px; }
 .bn .auth-card .alt {
   font-size: 13px; color: var(--ink-soft); text-align: center;
