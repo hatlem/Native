@@ -1,4 +1,5 @@
 import { getTranslations } from "next-intl/server";
+import { intlLocale } from "@/lib/money";
 import { redirect } from "next/navigation";
 import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
@@ -9,7 +10,7 @@ import { SubmitButton } from "@/components";
 export const dynamic = "force-dynamic";
 
 const MONTH_NAMES_INTL = (locale: string, year: number, month: number) =>
-  new Intl.DateTimeFormat(locale, { month: "short", year: "2-digit" }).format(
+  new Intl.DateTimeFormat(intlLocale(locale), { month: "short", year: "2-digit" }).format(
     new Date(Date.UTC(year, month - 1, 1)),
   );
 

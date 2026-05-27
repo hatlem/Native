@@ -1,4 +1,5 @@
 import { getTranslations } from "next-intl/server";
+import { intlLocale } from "@/lib/money";
 import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
 import { Link } from "@/i18n/navigation";
@@ -20,7 +21,7 @@ function timeAgo(date: Date, locale: string): string {
   const minutes = Math.floor(diff / 60_000);
   const hours = Math.floor(minutes / 60);
   const days = Math.floor(hours / 24);
-  const rtf = new Intl.RelativeTimeFormat(locale, { numeric: "auto" });
+  const rtf = new Intl.RelativeTimeFormat(intlLocale(locale), { numeric: "auto" });
   if (days >= 1) return rtf.format(-days, "day");
   if (hours >= 1) return rtf.format(-hours, "hour");
   if (minutes >= 1) return rtf.format(-minutes, "minute");

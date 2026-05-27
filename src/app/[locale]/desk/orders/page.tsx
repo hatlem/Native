@@ -1,7 +1,7 @@
 import { getTranslations } from "next-intl/server";
 import { prisma } from "@/lib/prisma";
 import { Link } from "@/i18n/navigation";
-import { formatMoney } from "@/lib/money";
+import { formatMoney, intlLocale } from "@/lib/money";
 import { StatusBadge } from "@/app/status-badge";
 import { EmptyState } from "@/app/empty-state";
 
@@ -10,7 +10,7 @@ export const dynamic = "force-dynamic";
 function timeAgo(date: Date, locale: string): string {
   const diff = Date.now() - date.getTime();
   const days = Math.floor(diff / (1000 * 60 * 60 * 24));
-  const rtf = new Intl.RelativeTimeFormat(locale, { numeric: "auto" });
+  const rtf = new Intl.RelativeTimeFormat(intlLocale(locale), { numeric: "auto" });
   if (days >= 1) return rtf.format(-days, "day");
   return rtf.format(0, "day");
 }
