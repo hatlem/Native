@@ -1,6 +1,7 @@
 import { getTranslations } from "next-intl/server";
 import { MarketCode, ProductType, Prisma } from "@prisma/client";
 import { auth } from "@/auth";
+import { requireOnboardingComplete } from "@/lib/onboarding-gate";
 import { prisma } from "@/lib/prisma";
 import { Link } from "@/i18n/navigation";
 import { indicativeFromRules, toRateRules, formatMoney, intlLocale } from "@/lib/money";
@@ -51,6 +52,7 @@ export default async function CatalogPage({
   if (!session?.user) {
     return <CatalogMarketing locale={locale} />;
   }
+  await requireOnboardingComplete(session, locale);
   const sp = await searchParams;
   const t = await getTranslations({ locale, namespace: "catalog" });
   const tf = await getTranslations({ locale, namespace: "firm" });

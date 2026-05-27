@@ -1,5 +1,6 @@
 import { getTranslations } from "next-intl/server";
 import { auth } from "@/auth";
+import { requireOnboardingComplete } from "@/lib/onboarding-gate";
 import { prisma } from "@/lib/prisma";
 import { getWorkspace } from "@/lib/workspace";
 import { Link } from "@/i18n/navigation";
@@ -33,6 +34,8 @@ export default async function PlanPage({
   });
 
   const session = await auth();
+
+  await requireOnboardingComplete(session, locale);
   const ws = await getWorkspace(session?.user?.id);
   const activeOrg = ws?.activeOrgId
     ? await prisma.organization.findUnique({

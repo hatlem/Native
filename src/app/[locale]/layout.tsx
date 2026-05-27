@@ -117,51 +117,13 @@ export default async function LocaleLayout({
   const ta = await getTranslations({ locale, namespace: "auth" });
   const tm = await getTranslations({ locale, namespace: "marketing" });
   const session = await auth();
-  const reqHeaders = await headers();
   // Per-request CSP nonce minted by middleware.ts. Threaded into any
   // inline <script>/<style> that the strict policy would otherwise block.
-  const nonce = reqHeaders.get("x-nonce") ?? undefined;
-  // TEMPORARY: surface pathname value to a body data-attr so we can
-  // verify the onboarding-gate's pathname read is working in prod.
-  const __debugPath = reqHeaders.get("x-pathname") ?? "(missing)";
-
-  // Onboarding gate. Authenticated buyers whose Organization has no
-  // marketCode yet, OR who have no phone number, must complete
-  // onboarding before they can browse the catalog. Allow-list the
-  // routes that need to remain reachable WITHOUT a completed
-  // onboarding — auth flows, the onboarding page itself, and the
-  // marketing/landing pages (which are open to logged-out users
-  // anyway). Path is what middleware threaded in via x-pathname.
-  if (session?.user?.id && session.user.role === "BUYER") {
-    const pathname = reqHeaders.get("x-pathname") ?? "";
-    const stripped = pathname.replace(/^\/[a-z]{2}(?=\/|$)/, "");
-    const onboardingExempt =
-      stripped === "" ||
-      stripped.startsWith("/onboarding") ||
-      stripped.startsWith("/signin") ||
-      stripped.startsWith("/signup") ||
-      stripped.startsWith("/signout") ||
-      stripped.startsWith("/magic-link") ||
-      stripped.startsWith("/forgot-password") ||
-      stripped.startsWith("/reset-password") ||
-      stripped.startsWith("/check-email") ||
-      stripped.startsWith("/account") ||
-      stripped.startsWith("/api/");
-    if (!onboardingExempt) {
-      const user = await prisma.user.findUnique({
-        where: { id: session.user.id },
-        select: {
-          phone: true,
-          organization: { select: { marketCode: true } },
-        },
-      });
-      const onboardingComplete =
-        !!user?.phone && !!user?.organization?.marketCode;
-      if (!onboardingComplete) {
-        redirect(`/${locale}/onboarding`);
-      }
-    }
-  }
+  const nonce = (await headers()).get("x-nonce") ?? undefined;
+  // Onboarding gate lives at the page level — see lib/onboarding-gate.ts.
+  // The layout previously gated via an x-pathname header from middleware
+  // but custom headers don't reliably propagate through next-intl's
+  // wrapped middleware response in Next.js 15.
 
   const audience = audienceFor(session);
   const nav = navItemsFor(audience, t);
@@ -173,7 +135,7 @@ export default async function LocaleLayout({
 
   return (
     <html lang={locale} className={inter.variable}>
-      <body data-debug-path={__debugPath}>
+      <body>
         <GtmNoscript />
         <GtmScripts nonce={nonce} />
         <NextIntlClientProvider messages={messages}>
