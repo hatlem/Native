@@ -1524,7 +1524,12 @@
     "revoking": "Återkallar…",
     "revokeConfirm": "Detta kan inte ångras. Befintliga integrationer som använder den här nyckeln slutar att fungera direkt.",
     "revokeConfirmCta": "Ja, återkalla nyckeln",
-    "docsHintPrefix": "Offentlig dokumentation finns på"
+    "docsHintPrefix": "Offentlig dokumentation finns på",
+    "deniedTitle": "API-nycklar (endast SUPERADMIN)",
+    "deniedLead": "Denna sida är för NativeSpins plattforms-administratörer.",
+    "deniedBody": "Offentliga katalog-API-nycklar utfärdas av NativeSpin-superadmins. Om din roll legitimt behöver nyckel-utfärdande — eller du är partner som behöver en nyckel — kontakta desken så ordnar vi det.",
+    "deniedCta": "Mejla desken",
+    "deniedBack": "Tillbaka till /desk"
   },
   "quoteNarrative": {
     "sectionCampaign": "Din kampanj",

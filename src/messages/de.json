@@ -1382,7 +1382,12 @@
     "revoking": "Wird zurückgezogen…",
     "revokeConfirm": "Dies kann nicht rückgängig gemacht werden. Bestehende Integrationen, die diesen Schlüssel verwenden, funktionieren sofort nicht mehr.",
     "revokeConfirmCta": "Ja, Schlüssel zurückziehen",
-    "docsHintPrefix": "Öffentliche Dokumentation verfügbar unter"
+    "docsHintPrefix": "Öffentliche Dokumentation verfügbar unter",
+    "deniedTitle": "API-Schlüssel (nur SUPERADMIN)",
+    "deniedLead": "Diese Seite ist für NativeSpin-Plattform-Admins.",
+    "deniedBody": "Öffentliche Katalog-API-Schlüssel werden von NativeSpin-Superadmins ausgestellt. Wenn Ihre Rolle die Schlüssel-Ausstellung legitim benötigt — oder Sie ein Partner sind, der einen Schlüssel benötigt — kontaktieren Sie das Desk, wir richten es ein.",
+    "deniedCta": "An das Desk schreiben",
+    "deniedBack": "Zurück zu /desk"
   },
   "quoteNarrative": {
     "sectionCampaign": "Ihre Kampagne",

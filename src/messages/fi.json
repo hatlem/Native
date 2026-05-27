@@ -1524,7 +1524,12 @@
     "revoking": "Peruutetaan…",
     "revokeConfirm": "Tätä ei voi peruuttaa. Tätä avainta käyttävät olemassa olevat integraatiot lakkaavat toimimasta välittömästi.",
     "revokeConfirmCta": "Kyllä, peruuta avain",
-    "docsHintPrefix": "Julkinen dokumentaatio saatavilla osoitteessa"
+    "docsHintPrefix": "Julkinen dokumentaatio saatavilla osoitteessa",
+    "deniedTitle": "API-avaimet (vain SUPERADMIN)",
+    "deniedLead": "Tämä sivu on NativeSpinin alusta-järjestelmänvalvojille.",
+    "deniedBody": "Julkisen luettelon API-avaimet myöntää NativeSpin-superadmin. Jos roolisi tarvitsee laillisesti avaimen myöntämistä — tai olet kumppani joka tarvitsee avaimen — ota yhteyttä deskiin niin järjestämme sen.",
+    "deniedCta": "Lähetä deskille sähköposti",
+    "deniedBack": "Takaisin /desk"
   },
   "quoteNarrative": {
     "sectionCampaign": "Kampanjasi",

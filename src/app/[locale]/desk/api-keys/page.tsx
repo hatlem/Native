@@ -1,17 +1,21 @@
+import { cookies } from "next/headers";
 import { getTranslations } from "next-intl/server";
 import { redirect } from "next/navigation";
 import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
 import { Link } from "@/i18n/navigation";
 import { createApiKey, revokeApiKey } from "@/app/admin-actions";
-import { SubmitButton } from "@/components";
+import { MailLink, SubmitButton } from "@/components";
 
 export const dynamic = "force-dynamic";
 
+const ISSUED_KEY_COOKIE = "ns_issued_key";
+
 // Super-admin issuance page for the public catalog API. The raw
-// token is surfaced exactly once via the ?token search param the
-// createApiKey action sets — copy it now, after the next navigation
-// only the SHA-256 hash remains in the DB.
+// token is surfaced exactly once via an httpOnly flash cookie set
+// by the createApiKey action — read it here, render it inline, then
+// clear the cookie so a refresh shows nothing and the URL stays
+// token-free.
 export default async function ApiKeysPage({
   params,
   searchParams,
@@ -22,14 +26,63 @@ export default async function ApiKeysPage({
   const { locale } = await params;
   const sp = await searchParams;
   const session = await auth();
-  if (session?.user?.role !== "SUPERADMIN") {
+  // Unauthenticated → bounce to signin so the next-auth callback URL
+  // lands them back here. Authenticated but wrong role → render an
+  // explicit permission-denied state below so DESK users don't get
+  // silently looped through /signin → /desk and conclude "this link
+  // is broken".
+  if (!session?.user) {
     redirect(`/${locale}/signin`);
   }
-
   const t = await getTranslations({ locale, namespace: "apiKeys" });
+  if (session.user.role !== "SUPERADMIN") {
+    return (
+      <section className="section">
+        <header className="page-header">
+          <span className="eyebrow accent">{t("eyebrow")}</span>
+          <h1>{t("deniedTitle")}</h1>
+          <p className="lead">{t("deniedLead")}</p>
+        </header>
+        <div className="card">
+          <p>{t("deniedBody")}</p>
+          <p className="cluster" style={{ marginTop: 16 }}>
+            <MailLink
+              to="desk@nativespin.com"
+              subject="API key access — NativeSpin"
+              className="btn small secondary"
+            >
+              {t("deniedCta")}
+            </MailLink>
+            <Link href="/desk" className="btn small ghost">
+              {t("deniedBack")}
+            </Link>
+          </p>
+        </div>
+      </section>
+    );
+  }
 
-  const created = typeof sp.created === "string" ? sp.created : null;
-  const tokenOnce = typeof sp.token === "string" ? sp.token : null;
+  // Read the one-time flash cookie set by createApiKey, then clear it
+  // so a refresh of this page shows nothing.
+  const cookieStore = await cookies();
+  const raw = cookieStore.get(ISSUED_KEY_COOKIE)?.value;
+  let tokenOnce: string | null = null;
+  let created: string | null = null;
+  if (raw) {
+    try {
+      const parsed = JSON.parse(raw) as { id?: string; token?: string };
+      if (parsed.id && parsed.token) {
+        created = parsed.id;
+        tokenOnce = parsed.token;
+      }
+    } catch {
+      // Ignore — corrupted cookie is treated as "no recent issuance".
+    }
+    cookieStore.set(ISSUED_KEY_COOKIE, "", {
+      path: `/${locale}/desk/api-keys`,
+      maxAge: 0,
+    });
+  }
   const errCode = typeof sp.error === "string" ? sp.error : null;
 
   const keys = await prisma.apiKey.findMany({

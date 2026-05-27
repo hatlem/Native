@@ -1,5 +1,6 @@
 "use server";
 
+import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
@@ -9,6 +10,15 @@ import {
   hashApiToken,
   parseScopes,
 } from "@/lib/api-key";
+
+// One-time flash cookie for surfacing a freshly issued API token.
+// Previously we redirected to `/desk/api-keys?token=atn_…`, but the
+// raw bearer in the URL leaks to browser history, server access logs,
+// and any Referer header fired before the user closes the page. The
+// flash cookie is httpOnly + path-scoped + short-lived so the page can
+// read it server-side exactly once and then clear it.
+const ISSUED_KEY_COOKIE = "ns_issued_key";
+const ISSUED_KEY_TTL_SECONDS = 120;
 
 function field(formData: FormData, key: string): string {
   const v = formData.get(key);
@@ -23,11 +33,30 @@ async function requireSuperadmin(locale: string): Promise<string> {
   return session.user.id;
 }
 
-// Issue a new public-catalog API key. Returns by redirecting to
-// /desk/api-keys with the raw token in the search params — that's the
-// only time the value is shown, and the page reads it from the URL
-// once before the user navigates away. (We deliberately don't email
-// the raw token; partner ops gets it copy-pasted in-session.)
+// Server-side allowlist of API-key scopes. Anything not in this set is
+// rejected at issuance — that's how we keep a typo'd "catlog:read" or a
+// hand-rolled "admin:*" from silently landing in the DB.
+//
+// `pricing:admin` is internal-only — it grants global mutation across
+// every publisher's pricing graph via the MCP server (no per-publisher
+// scoping in the v1 schema). The createApiKey action refuses to mint a
+// pricing:admin key for any organization other than the NativeSpin
+// platform itself (organizationId === null) so a misclicked "issue key
+// for Acme Corp" can't accidentally hand a partner ring-0 pricing
+// powers.
+const VALID_SCOPES: ReadonlySet<string> = new Set([
+  "catalog:read",
+  "catalog:*",
+  "pricing:admin",
+]);
+const INTERNAL_ONLY_SCOPES: ReadonlySet<string> = new Set(["pricing:admin"]);
+
+// Issue a new public-catalog API key. The raw token is surfaced
+// exactly once via an httpOnly flash cookie — NOT a URL query string,
+// which would leak the bearer into browser history, server access
+// logs, and outbound Referer headers. The page reads the cookie on
+// first render, displays the value, and clears the cookie so a refresh
+// shows nothing.
 //
 // Closes Tobias's "no API key auth" gap. Scopes are kept minimal in
 // v1: "catalog:read" is the only documented value; the form accepts
@@ -46,6 +75,24 @@ export async function createApiKey(formData: FormData) {
   const scopeSet = parseScopes(scopesRaw);
   if (scopeSet.size === 0) {
     redirect(`/${locale}/desk/api-keys?error=scopes`);
+  }
+  // Reject any scope not in the allowlist. Keeps "admin:*"-shaped typos
+  // and undocumented wildcards out of the DB.
+  for (const s of scopeSet) {
+    if (!VALID_SCOPES.has(s)) {
+      redirect(`/${locale}/desk/api-keys?error=scopes`);
+    }
+  }
+  // Internal-only scopes (pricing:admin) MUST be platform keys — the
+  // MCP mutation surface has no per-publisher scoping, so handing a
+  // pricing:admin key to a customer org would give them mutation
+  // power across every publisher in the catalog.
+  if (organizationId !== null) {
+    for (const s of scopeSet) {
+      if (INTERNAL_ONLY_SCOPES.has(s)) {
+        redirect(`/${locale}/desk/api-keys?error=internal_only_scope`);
+      }
+    }
   }
 
   let expiresAt: Date | null = null;
@@ -78,15 +125,17 @@ export async function createApiKey(formData: FormData) {
     expiresAt: expiresAt?.toISOString() ?? null,
   });
 
-  // Raw token surfaced once via search param so the admin can copy
-  // it. The hash is what's persisted; the raw value lives in the URL
-  // for ~one navigation and then is gone.
-  redirect(
-    `/${locale}/desk/api-keys?created=` +
-      encodeURIComponent(created.id) +
-      `&token=` +
-      encodeURIComponent(token),
-  );
+  // Raw token surfaced once via httpOnly flash cookie — see the
+  // ISSUED_KEY_COOKIE comment at the top of this file for the rationale.
+  const cookieStore = await cookies();
+  cookieStore.set(ISSUED_KEY_COOKIE, JSON.stringify({ id: created.id, token }), {
+    httpOnly: true,
+    sameSite: "lax",
+    secure: process.env.NODE_ENV === "production",
+    path: `/${locale}/desk/api-keys`,
+    maxAge: ISSUED_KEY_TTL_SECONDS,
+  });
+  redirect(`/${locale}/desk/api-keys`);
 }
 
 export async function revokeApiKey(formData: FormData) {

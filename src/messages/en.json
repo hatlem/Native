@@ -1524,7 +1524,12 @@
     "revoking": "Revoking…",
     "revokeConfirm": "This cannot be undone. Existing integrations using this key will stop working immediately.",
     "revokeConfirmCta": "Yes, revoke key",
-    "docsHintPrefix": "Public docs available at"
+    "docsHintPrefix": "Public docs available at",
+    "deniedTitle": "API keys (SUPERADMIN only)",
+    "deniedLead": "This page is for NativeSpin platform admins.",
+    "deniedBody": "Public-catalog API keys are issued by NativeSpin superadmins. If your role legitimately needs API-key issuance — or you're a partner trying to get a key — reach out to the desk and we'll wire you up.",
+    "deniedCta": "Email the desk",
+    "deniedBack": "Back to /desk"
   },
   "quoteNarrative": {
     "sectionCampaign": "Your campaign",
