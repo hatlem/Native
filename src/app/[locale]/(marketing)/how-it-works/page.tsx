@@ -89,11 +89,11 @@ export default async function HowItWorksPage({
           <h2>{tm("ctaBlockTitle")}</h2>
           <p>{tm("ctaBlockBody")}</p>
           <div className="hero-actions">
-            <Link href="/catalog" className="btn primary">
-              {tm("browseCatalog")} <span className="arrow">→</span>
+            <Link href="/signup" className="btn primary">
+              {tm("createAccount")} <span className="arrow">→</span>
             </Link>
-            <Link href="/signup" className="btn secondary">
-              {tm("createAccount")}
+            <Link href="/catalog" className="btn secondary">
+              {tm("browseCatalog")}
             </Link>
           </div>
         </div>

@@ -43,8 +43,8 @@ export default async function ForAgenciesPage({
             >
               {tm("requestAgencyAccess")} <span className="arrow">→</span>
             </MailLink>
-            <Link href="/catalog" className="btn secondary">
-              {tm("browseCatalog")}
+            <Link href="/how-it-works" className="btn secondary">
+              {tm("howCta")}
             </Link>
           </div>
         </div>

@@ -25,6 +25,7 @@ export default async function RecommendPage({
   const t = await getTranslations({ locale, namespace: "recommend" });
   const tType = await getTranslations({ locale, namespace: "productType" });
   const tMarket = await getTranslations({ locale, namespace: "market" });
+  const tm = await getTranslations({ locale, namespace: "marketing" });
 
   const marketCode =
     typeof sp.market === "string" &&
@@ -140,8 +141,8 @@ export default async function RecommendPage({
             result.picks.length === 0 ? (
               <EmptyState
                 title={t("none")}
-                primaryHref="/catalog"
-                primaryLabel={t("browse")}
+                primaryHref="/signup"
+                primaryLabel={tm("createAccount")}
               />
             ) : (
               <>

@@ -87,8 +87,8 @@ export default async function AboutPage({
             <MailLink to="hello@nativespin.com" className="btn primary">
               {t("contactCta")} <span className="arrow">→</span>
             </MailLink>
-            <Link href="/catalog" className="btn secondary">
-              {tm("browseCatalog")}
+            <Link href="/signup" className="btn secondary">
+              {tm("createAccount")}
             </Link>
           </div>
         </div>

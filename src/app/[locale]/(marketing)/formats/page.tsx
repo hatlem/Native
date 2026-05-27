@@ -133,8 +133,8 @@ export default async function FormatsPage({
           <h2>{t("ctaTitle")}</h2>
           <p>{t("ctaBody")}</p>
           <div className="hero-actions">
-            <Link href="/catalog" className="btn primary">
-              {tm("browseCatalog")} <span className="arrow">→</span>
+            <Link href="/signup" className="btn primary">
+              {tm("createAccount")} <span className="arrow">→</span>
             </Link>
             <Link href="/contact" className="btn secondary">
               {t("ctaContact")}

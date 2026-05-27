@@ -48,11 +48,11 @@ export default async function ForAdvertisersPage({
           <h1>{t("title")}</h1>
           <p className="lead">{t("lead")}</p>
           <div className="hero-actions">
-            <Link href="/catalog" className="btn primary">
-              {tm("browseCatalog")} <span className="arrow">→</span>
+            <Link href="/signup" className="btn primary">
+              {tm("createAccount")} <span className="arrow">→</span>
             </Link>
-            <Link href="/signup" className="btn secondary">
-              {tm("createAccount")}
+            <Link href="/catalog" className="btn secondary">
+              {tm("browseCatalog")}
             </Link>
           </div>
         </div>
@@ -128,8 +128,8 @@ export default async function ForAdvertisersPage({
           <h2>{tm("ctaBlockTitle")}</h2>
           <p>{tm("ctaBlockBody")}</p>
           <div className="hero-actions">
-            <Link href="/catalog" className="btn primary">
-              {tm("browseCatalog")} <span className="arrow">→</span>
+            <Link href="/signup" className="btn primary">
+              {tm("createAccount")} <span className="arrow">→</span>
             </Link>
             <Link href="/recommend" className="btn secondary">
               {tm("tryRecommender")}
