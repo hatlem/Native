@@ -410,7 +410,7 @@ export default async function HomePage({
           <div className="obj-grid">
             <h2>{t("obj.h2")}</h2>
             <div className="qas">
-              {([1, 2, 3, 4, 5] as const).map((n) => (
+              {([1, 2, 3, 4, 5, 6] as const).map((n) => (
                 <div className="qa" key={n}>
                   <div className="q">{t(`obj.q${n}`)}</div>
                   <div className="a">{t.rich(`obj.a${n}`, richTags)}</div>
