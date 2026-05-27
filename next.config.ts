@@ -22,6 +22,11 @@ const securityHeaders = [
 ];
 
 const nextConfig: NextConfig = {
+  // The floating Next.js "N" dev indicator overlaps form content at
+  // mobile widths and ends up in every screenshot we take for design
+  // review. Disable it — it's a dev-only overlay and we still get
+  // build errors, type errors, and HMR feedback through the CLI.
+  devIndicators: false,
   async headers() {
     return [{ source: "/:path*", headers: securityHeaders }];
   },
