@@ -3,7 +3,8 @@ import type { Metadata, Viewport } from "next";
 import { NextIntlClientProvider } from "next-intl";
 import { getMessages, getTranslations } from "next-intl/server";
 import { headers } from "next/headers";
-import { notFound } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
+import { prisma } from "@/lib/prisma";
 import { Inter } from "next/font/google";
 import { routing } from "@/i18n/routing";
 import { Link } from "@/i18n/navigation";
@@ -116,9 +117,48 @@ export default async function LocaleLayout({
   const ta = await getTranslations({ locale, namespace: "auth" });
   const tm = await getTranslations({ locale, namespace: "marketing" });
   const session = await auth();
+  const reqHeaders = await headers();
   // Per-request CSP nonce minted by middleware.ts. Threaded into any
   // inline <script>/<style> that the strict policy would otherwise block.
-  const nonce = (await headers()).get("x-nonce") ?? undefined;
+  const nonce = reqHeaders.get("x-nonce") ?? undefined;
+
+  // Onboarding gate. Authenticated buyers whose Organization has no
+  // marketCode yet, OR who have no phone number, must complete
+  // onboarding before they can browse the catalog. Allow-list the
+  // routes that need to remain reachable WITHOUT a completed
+  // onboarding — auth flows, the onboarding page itself, and the
+  // marketing/landing pages (which are open to logged-out users
+  // anyway). Path is what middleware threaded in via x-pathname.
+  if (session?.user?.id && session.user.role === "BUYER") {
+    const pathname = reqHeaders.get("x-pathname") ?? "";
+    const stripped = pathname.replace(/^\/[a-z]{2}(?=\/|$)/, "");
+    const onboardingExempt =
+      stripped === "" ||
+      stripped.startsWith("/onboarding") ||
+      stripped.startsWith("/signin") ||
+      stripped.startsWith("/signup") ||
+      stripped.startsWith("/signout") ||
+      stripped.startsWith("/magic-link") ||
+      stripped.startsWith("/forgot-password") ||
+      stripped.startsWith("/reset-password") ||
+      stripped.startsWith("/check-email") ||
+      stripped.startsWith("/account") ||
+      stripped.startsWith("/api/");
+    if (!onboardingExempt) {
+      const user = await prisma.user.findUnique({
+        where: { id: session.user.id },
+        select: {
+          phone: true,
+          organization: { select: { marketCode: true } },
+        },
+      });
+      const onboardingComplete =
+        !!user?.phone && !!user?.organization?.marketCode;
+      if (!onboardingComplete) {
+        redirect(`/${locale}/onboarding`);
+      }
+    }
+  }
 
   const audience = audienceFor(session);
   const nav = navItemsFor(audience, t);

@@ -5,7 +5,6 @@ import { redirect } from "next/navigation";
 import { headers } from "next/headers";
 import { after } from "next/server";
 import bcrypt from "bcryptjs";
-import { MarketCode } from "@prisma/client";
 import { signIn, signOut } from "@/auth";
 import { prisma } from "@/lib/prisma";
 import { landingForRole } from "@/lib/roles";
@@ -18,8 +17,7 @@ import { passwordResetEmail } from "@/lib/mail/templates/password-reset";
 import { passwordChangedEmail } from "@/lib/mail/templates/password-changed";
 import { recordSignIn } from "@/lib/auth-events";
 import { welcomeEmail } from "@/lib/mail/templates/welcome";
-
-const MARKET_CODES = Object.values(MarketCode) as string[];
+import { checkBusinessEmailWithMx } from "@/lib/email-policy";
 
 async function clientKey(): Promise<string> {
   const h = await headers();
@@ -86,14 +84,14 @@ export async function register(formData: FormData) {
   const password = String(formData.get("password") || "");
   const name = String(formData.get("name") || "").trim();
   const orgName = String(formData.get("orgName") || "").trim();
-  const marketCode = String(formData.get("market") || "").trim();
 
   const ip = await clientKey();
-  // Don't echo password back through the URL — everything else is recoverable.
+  // Preserve form input on validation error. Password is deliberately
+  // never echoed back; market + phone now live in onboarding so they
+  // don't appear here anymore.
   const preservedParams = new URLSearchParams();
   if (name) preservedParams.set("name", name);
   if (orgName) preservedParams.set("orgName", orgName);
-  if (marketCode) preservedParams.set("market", marketCode);
   if (email) preservedParams.set("email", email);
   const preservedQs = preservedParams.toString();
   const tail = preservedQs ? `&${preservedQs}` : "";
@@ -102,16 +100,34 @@ export async function register(formData: FormData) {
     redirect(`/${locale}/signup?error=rate${tail}`);
   }
 
-  if (
-    !email ||
-    password.length < 8 ||
-    !orgName ||
-    !MARKET_CODES.includes(marketCode)
-  ) {
+  // Signup gate is now: email + orgName + (password OR consent to use
+  // magic-link). Faktureringsmarked / VAT-marked moves to onboarding —
+  // it's a legal-entity attribute, not a moment-of-creation requirement.
+  // Password is optional; an empty password commits the user to a
+  // magic-link-only signin path and triggers a magic-link email.
+  const passwordlessSignup = password.length === 0;
+  if (!email || !orgName) {
     redirect(`/${locale}/signup?error=1${tail}`);
   }
+  if (!passwordlessSignup && password.length < 8) {
+    redirect(`/${locale}/signup?error=password_length${tail}`);
+  }
 
-  const passwordHash = await bcrypt.hash(password, 10);
+  // Company-email gate: reject free providers (gmail, yahoo, …),
+  // disposable services (mailinator, 10minutemail, …) and domains
+  // with no MX records (typos like "gnail.com", parked domains).
+  const policy = await checkBusinessEmailWithMx(email);
+  if (!policy.ok) {
+    await recordAudit(email, "auth.signup_email_rejected", `User:${email}`, {
+      ip,
+      reason: policy.reason,
+    });
+    redirect(`/${locale}/signup?error=email_business${tail}`);
+  }
+
+  const passwordHash = passwordlessSignup
+    ? null
+    : await bcrypt.hash(password, 10);
   let createdUserId: string | null = null;
   try {
     createdUserId = await prisma.$transaction(async (tx) => {
@@ -119,7 +135,8 @@ export async function register(formData: FormData) {
         data: {
           name: orgName,
           type: "ADVERTISER",
-          marketCode: marketCode as MarketCode,
+          // marketCode is set during onboarding (next stop after signup).
+          marketCode: null,
         },
       });
       const user = await tx.user.create({
@@ -142,9 +159,13 @@ export async function register(formData: FormData) {
   // prompt via the standard ?error=1 banner; an attacker enumerating
   // emails learns nothing.
   if (!createdUserId) redirect(`/${locale}/signup?error=1${tail}`);
-  await recordAudit(createdUserId, "user.register", `User:${email}`, { ip, orgName });
+  await recordAudit(createdUserId, "user.register", `User:${email}`, {
+    ip,
+    orgName,
+    passwordless: passwordlessSignup,
+  });
 
-  const catalogUrl = `${appUrl()}/${locale}/catalog`;
+  const catalogUrl = `${appUrl()}/${locale}/onboarding`;
   const welcome = welcomeEmail({ catalogUrl, locale, appName: appName() });
   try {
     await emailAdapter({ to: email, subject: welcome.subject, text: welcome.text, html: welcome.html });
@@ -152,15 +173,40 @@ export async function register(formData: FormData) {
     console.error("auth.welcome_email_failed", { userId: createdUserId, err });
   }
 
-  try {
-    await signIn("credentials", { email, password, redirect: false });
-  } catch (error) {
-    if (error instanceof AuthError) {
-      redirect(`/${locale}/signin`);
+  // Both signup paths (password + passwordless) deliver a magic-link
+  // and land the user on /check-email. The link consume in
+  // src/app/[locale]/magic-link/[token]/route.ts performs the
+  // single-use + emailVerifiedAt update atomically, then signs the
+  // user in — so the first session is always gated behind inbox
+  // ownership. Password users can sign in normally via credentials
+  // AFTER verification (the credentials provider rejects accounts
+  // with emailVerifiedAt === null).
+  const raw = generateToken();
+  await prisma.magicLinkToken.create({
+    data: {
+      userId: createdUserId,
+      tokenHash: hashToken(raw),
+      expiresAt: tokenExpiry(),
+      requestedIp: ip,
+    },
+  });
+  const url = `${appUrl()}/${locale}/magic-link/${raw}`;
+  const msg = magicLinkEmail({ url, locale, appName: appName() });
+  const newUserId = createdUserId;
+  after(async () => {
+    try {
+      await emailAdapter({ to: email, subject: msg.subject, text: msg.text, html: msg.html });
+    } catch (err) {
+      console.error("auth.magic_link_email_failed_on_signup", { userId: newUserId, err });
     }
-    throw error;
-  }
-  redirect(`/${locale}/catalog`);
+    await recordAudit(
+      newUserId,
+      passwordlessSignup ? "auth.magic_link_signup_sent" : "auth.verify_email_sent",
+      `User:${email}`,
+      { ip },
+    );
+  });
+  redirect(`/${locale}/check-email`);
 }
 
 // Claim a publisher-invite token: validate it (single-use, time-limited),
@@ -226,6 +272,10 @@ export async function claimPublisherInvite(formData: FormData) {
           role: "PUBLISHER",
           passwordHash,
           publisherId: invite.publisherId,
+          // Reaching this point requires clicking the invite link in
+          // the invited mailbox — that's proof of ownership, so the
+          // account starts verified and bypasses the credentials gate.
+          emailVerifiedAt: new Date(),
         },
       });
       await tx.publisherInvite.update({

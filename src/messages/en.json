@@ -35,7 +35,8 @@
     "rolePublisher": "Publisher",
     "roleAgency": "Agency",
     "roleAdvertiser": "Advertiser",
-    "roleGuest": "Guest"
+    "roleGuest": "Guest",
+    "account": "Account"
   },
   "orders": {
     "eyebrow": "Orders",
@@ -584,7 +585,12 @@
     "resetButton": "Update password",
     "resetExpired": "This link has expired or was already used. Request a new one.",
     "magicLinkExpired": "This sign-in link has expired or was already used.",
-    "backToSignin": "Back to sign in"
+    "backToSignin": "Back to sign in",
+    "signupSubtitleShort": "Three fields. We'll ask the rest once you're in.",
+    "setPasswordSummary": "Set a password (optional)",
+    "pwHintOptional": "At least 8 characters. Leave blank to sign in via magic-link only.",
+    "magicLinkSignupNote": "Skip the password and we'll send you a magic-link to sign in.",
+    "regPasswordTooShort": "Password must be at least 8 characters."
   },
   "order": {
     "title": "Order",
@@ -1738,5 +1744,62 @@
       "title": "Thanks!",
       "body": "We've logged your pricing. The NativeSpin desk will review and apply it shortly."
     }
+  },
+  "onboarding": {
+    "eyebrow": "Set up your account",
+    "title": "Two quick questions",
+    "lead": "We need a billing market for VAT + invoicing, and a phone number so the desk can reach you fast on time-sensitive RFQs.",
+    "bullet1": "Catalog access unlocks right after this step",
+    "bullet2": "You can change both later from /account",
+    "bullet3": "Phone is desk-only — not surfaced to publishers",
+    "formTitle": "Almost done",
+    "formLead": "These two settings drive your invoices and let the desk reach you fast.",
+    "marketLabel": "Billing market",
+    "marketPlaceholder": "Pick your legal entity's home market",
+    "marketHint": "Where your invoicing entity is registered (VAT). Buying inventory works across all 9 markets.",
+    "phoneLabel": "Phone",
+    "phonePlaceholder": "+47 ...",
+    "phoneHint": "Direct line for the desk. Not used for marketing.",
+    "submit": "Complete setup",
+    "submitting": "Saving…",
+    "error": "Both fields are required."
+  },
+  "account": {
+    "eyebrow": "Account",
+    "title": "Account settings",
+    "lead": "Update your contact details, company info, and password.",
+    "profileEyebrow": "You",
+    "profileTitle": "Profile",
+    "emailLabel": "Email",
+    "emailHint": "Email can't be changed here. Contact the desk if you need a new email.",
+    "nameLabel": "Name",
+    "phoneLabel": "Phone",
+    "phoneHint": "Direct line for the desk; never shared with publishers.",
+    "saveProfile": "Save profile",
+    "saving": "Saving…",
+    "companyEyebrow": "Company",
+    "companyTitle": "Company info",
+    "orgLabel": "Company name",
+    "marketLabel": "Billing market",
+    "marketPlaceholder": "Pick your legal entity's home market",
+    "marketHint": "Where your invoicing entity is registered (VAT). Buying inventory works across all 9 markets.",
+    "saveCompany": "Save company info",
+    "passwordEyebrow": "Sign-in",
+    "passwordTitleSet": "Set a password",
+    "passwordTitleChange": "Change password",
+    "currentPasswordLabel": "Current password",
+    "newPasswordLabel": "New password",
+    "pwHint": "At least 8 characters.",
+    "passwordlessNote": "You currently sign in via magic-link only. Set a password if you want both options.",
+    "savePasswordSet": "Set password",
+    "savePasswordChange": "Change password",
+    "optional": "optional",
+    "okProfile": "Profile updated.",
+    "okCompany": "Company info updated.",
+    "okPassword": "Password updated.",
+    "errPhone": "Phone number doesn't look right. Use at least 6 digits.",
+    "errCompany": "Company name and billing market are required.",
+    "errPasswordLength": "New password must be at least 8 characters.",
+    "errCurrentPassword": "Current password is incorrect."
   }
 }

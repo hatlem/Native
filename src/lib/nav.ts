@@ -97,6 +97,7 @@ export function userMenuItemsFor(
   if (audience === "public") return [];
   return [
     { key: "notifications", label: t("notifications"), href: "/notifications" },
+    { key: "account", label: t("account"), href: "/account" },
   ];
 }
 

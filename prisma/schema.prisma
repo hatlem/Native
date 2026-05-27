@@ -363,7 +363,11 @@ model Organization {
   id            String   @id @default(cuid())
   name          String
   type          OrgType
-  marketCode    MarketCode
+  // Nullable so signup can defer this to onboarding — the legal-entity
+  // home market drives VAT / invoice locale / default currency but it's
+  // not needed at moment-of-account-creation. Onboarding makes this
+  // required before the user can submit an RFQ.
+  marketCode    MarketCode?
   vatId         String?
   parentOrgId   String?
   parentOrg     Organization?  @relation("AgencyClients", fields: [parentOrgId], references: [id])
@@ -383,6 +387,7 @@ model User {
   id             String       @id @default(cuid())
   email          String       @unique
   name           String?
+  phone          String?
   passwordHash   String?
   role           UserRole     @default(BUYER)
   organizationId String?

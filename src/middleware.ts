@@ -72,10 +72,14 @@ export default function middleware(req: NextRequest) {
 
   // Passthrough: inject the nonce as a request header so the layout can
   // read it via `headers()` and thread it into <Script nonce> / <style nonce>.
-  // We have to rebuild the NextResponse because next-intl's `.next()` call
-  // doesn't expose its request-header init.
+  // Also surface the current pathname so the layout can decide whether
+  // to enforce the onboarding gate without each authenticated page
+  // re-implementing the check. We have to rebuild the NextResponse
+  // because next-intl's `.next()` call doesn't expose its request-header
+  // init.
   const reqHeaders = new Headers(req.headers);
   reqHeaders.set("x-nonce", nonce);
+  reqHeaders.set("x-pathname", req.nextUrl.pathname);
   const res = NextResponse.next({ request: { headers: reqHeaders } });
   intlRes.headers.forEach((v, k) => res.headers.set(k, v));
   res.headers.set("Content-Security-Policy", csp);

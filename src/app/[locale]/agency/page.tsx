@@ -151,7 +151,9 @@ export default async function AgencyPage({
                       </span>
                     ) : null}
                   </div>
-                  <p className="muted small">{tMarket(c.marketCode)}</p>
+                  <p className="muted small">
+                    {c.marketCode ? tMarket(c.marketCode) : "—"}
+                  </p>
                   <dl className="spec-grid">
                     <dt>{t("orders")}</dt>
                     <dd>{r?.count ?? 0}</dd>

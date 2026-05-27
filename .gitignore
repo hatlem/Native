@@ -39,3 +39,5 @@ scripts/dev-backups/
 # claude code session state
 .claude/
 scenario-runs/
+testit.md
+testit-*.md

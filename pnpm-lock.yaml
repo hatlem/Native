@@ -20,6 +20,12 @@ importers:
       bcryptjs:
         specifier: ^3.0.3
         version: 3.0.3
+      disposable-email-domains:
+        specifier: ^1.0.62
+        version: 1.0.62
+      free-email-domains:
+        specifier: ^1.9.17
+        version: 1.9.17
       next:
         specifier: ^15.1.6
         version: 15.5.18(react-dom@19.2.6(react@19.2.6))(react@19.2.6)
@@ -1236,6 +1242,9 @@ packages:
     resolution: {integrity: sha512-Btj2BOOO83o3WyH59e8MgXsxEQVcarkUOpEYrubB0urwnN10yQ364rsiByU11nZlqWYZm05i/of7io4mzihBtQ==}
     engines: {node: '>=8'}
 
+  disposable-email-domains@1.0.62:
+    resolution: {integrity: sha512-LBQvhRw7mznQTPoyZbsmYeNOZt1pN5aCsx4BAU/3siVFuiM9f2oyKzUaB8v1jbxFjE3aYqYiMo63kAL4pHgfWQ==}
+
   doctrine@2.1.0:
     resolution: {integrity: sha512-35mSku4ZXK0vfCuHEDAwt55dg2jNajHZ1odvF+8SSr82EsZY4QmXfuWso8oEd8zRhVObSN18aM0CjSdoBX7zIw==}
     engines: {node: '>=0.10.0'}
@@ -1515,6 +1524,10 @@ packages:
   forwarded@0.2.0:
     resolution: {integrity: sha512-buRG0fpBtRHSTCOASe6hD258tEubFoRLb4ZNA6NxMVHNw2gOcwHo9wyablzMzOA5z9xA9L1KNjk/Nt6MT9aYow==}
     engines: {node: '>= 0.6'}
+
+  free-email-domains@1.9.17:
+    resolution: {integrity: sha512-IeJxWSaU7wv90fPp1qgpoN5uIvmCri2ck3mtJyp1MEsZAztgWxF1iNh1S/05/ZwNSIEVIaFMLATMy2FpfRwwsQ==}
+    engines: {node: '>= 18'}
 
   fresh@2.0.0:
     resolution: {integrity: sha512-Rx/WycZ60HOaqLKAi6cHRKKI7zxWbJ31MhntmtwMoaTeF7XFH9hhBp8vITaMidfljRQ6eYWCKkaTK+ykVJHP2A==}
@@ -3469,6 +3482,8 @@ snapshots:
 
   detect-libc@2.1.2: {}
 
+  disposable-email-domains@1.0.62: {}
+
   doctrine@2.1.0:
     dependencies:
       esutils: 2.0.3
@@ -3945,6 +3960,8 @@ snapshots:
       is-callable: 1.2.7
 
   forwarded@0.2.0: {}
+
+  free-email-domains@1.9.17: {}
 
   fresh@2.0.0: {}
 

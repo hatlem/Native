@@ -1,6 +1,5 @@
 import { getTranslations } from "next-intl/server";
 import { redirect } from "next/navigation";
-import { MarketCode } from "@prisma/client";
 import { auth } from "@/auth";
 import { Link } from "@/i18n/navigation";
 import { register } from "@/app/auth-actions";
@@ -8,8 +7,6 @@ import { LandingShell } from "@/app/landing-shell";
 import { SubmitButton } from "@/components";
 
 export const dynamic = "force-dynamic";
-
-const MARKET_CODES = Object.values(MarketCode);
 
 export default async function SignUpPage({
   params,
@@ -25,21 +22,23 @@ export default async function SignUpPage({
 
   const t = await getTranslations({ locale, namespace: "auth" });
   const tc = await getTranslations({ locale, namespace: "common" });
-  const tMarket = await getTranslations({ locale, namespace: "market" });
 
   const appName = tc("appName");
   const errorCode = typeof sp.error === "string" ? sp.error : undefined;
   const errorMessage =
     errorCode === "rate"
       ? t("regRateLimited")
-      : errorCode
-        ? t("regFailed")
-        : null;
+      : errorCode === "email_business"
+        ? t("regEmailBusiness")
+        : errorCode === "password_length"
+          ? t("regPasswordTooShort")
+          : errorCode
+            ? t("regFailed")
+            : null;
   const sParam = (key: string) =>
     typeof sp[key] === "string" ? (sp[key] as string) : "";
   const initialName = sParam("name");
   const initialOrgName = sParam("orgName");
-  const initialMarket = sParam("market");
   const initialEmail = sParam("email");
 
   return (
@@ -66,7 +65,7 @@ export default async function SignUpPage({
         <div className="auth-card">
           <div className="head">
             <h2>{t("signupTitle")}</h2>
-            <p>{t("signupSubtitle")}</p>
+            <p>{t("signupSubtitleShort")}</p>
           </div>
 
           {errorMessage ? (
@@ -102,24 +101,6 @@ export default async function SignUpPage({
               />
             </div>
             <div className="field">
-              <label htmlFor="market">{t("market")}</label>
-              <select
-                id="market"
-                name="market"
-                defaultValue={initialMarket}
-                required
-              >
-                <option value="" disabled>
-                  {t("marketPlaceholder")}
-                </option>
-                {MARKET_CODES.map((m) => (
-                  <option key={m} value={m}>
-                    {tMarket(m)}
-                  </option>
-                ))}
-              </select>
-            </div>
-            <div className="field">
               <label htmlFor="email">{t("email")}</label>
               <input
                 id="email"
@@ -130,18 +111,34 @@ export default async function SignUpPage({
                 defaultValue={initialEmail}
               />
             </div>
-            <div className="field">
-              <label htmlFor="password">{t("password")}</label>
-              <input
-                id="password"
-                name="password"
-                type="password"
-                autoComplete="new-password"
-                minLength={8}
-                required
-              />
-              <span className="hint">{t("pwHint")}</span>
-            </div>
+
+            {/* Password is now optional. The disclosure default-closed
+                keeps the form at three fields for the first-time visitor
+                Maja's scenario flagged; opening it shows the same
+                password input + hint as before. An empty password
+                routes signup through magic-link delivery. */}
+            <details className="signup-password-disclosure">
+              <summary>{t("setPasswordSummary")}</summary>
+              <div className="field" style={{ marginTop: 12 }}>
+                <label htmlFor="password">
+                  {t("password")}{" "}
+                  <span className="optional">({t("optional")})</span>
+                </label>
+                <input
+                  id="password"
+                  name="password"
+                  type="password"
+                  autoComplete="new-password"
+                  minLength={8}
+                />
+                <span className="hint">{t("pwHintOptional")}</span>
+              </div>
+            </details>
+
+            <p className="muted small" style={{ marginTop: 8 }}>
+              {t("magicLinkSignupNote")}
+            </p>
+
             <div className="actions">
               <SubmitButton
                 label={t("createAccount")}
