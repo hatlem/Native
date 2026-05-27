@@ -193,7 +193,7 @@ export default async function ApiKeysPage({
           </div>
         </div>
 
-        <div className="table-wrap">
+        <div className="table-wrap responsive">
           <table className="table">
             <thead>
               <tr>
@@ -215,20 +215,20 @@ export default async function ApiKeysPage({
                     : "active";
                 return (
                   <tr key={k.id}>
-                    <td>{k.name}</td>
-                    <td className="muted">
+                    <td data-label={t("colName")}>{k.name}</td>
+                    <td className="muted" data-label={t("colOrg")}>
                       {k.organization?.name ?? "— platform —"}
                     </td>
-                    <td className="muted small">{k.scopes}</td>
-                    <td className="muted small">
+                    <td className="muted small" data-label={t("colScopes")}>{k.scopes}</td>
+                    <td className="muted small" data-label={t("colCreated")}>
                       {k.createdAt.toISOString().slice(0, 10)}
                     </td>
-                    <td className="muted small">
+                    <td className="muted small" data-label={t("colLastUsed")}>
                       {k.lastUsedAt
                         ? k.lastUsedAt.toISOString().slice(0, 10)
                         : "—"}
                     </td>
-                    <td>
+                    <td data-label={t("colStatus")}>
                       <span
                         className={
                           status === "revoked"
@@ -241,7 +241,7 @@ export default async function ApiKeysPage({
                         {t(`status_${status}`)}
                       </span>
                     </td>
-                    <td>
+                    <td data-label="">
                       {status === "active" ? (
                         // §17 — Revoke is irreversible. Hide the actual
                         // submit behind a <details> disclosure so the

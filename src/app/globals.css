@@ -1330,7 +1330,7 @@ form:not(.filters):not(.cmdk-form) button[type="submit"]:not(.btn):hover {
   margin-top: var(--s-5);
 }
 
-.grid.two { grid-template-columns: repeat(auto-fill, minmax(360px, 1fr)); }
+.grid.two { grid-template-columns: repeat(auto-fill, minmax(min(360px, 100%), 1fr)); }
 .grid.tight { gap: var(--s-3); }
 
 .card {
