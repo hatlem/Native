@@ -50,38 +50,41 @@ function buildCsp(nonce: string): string {
   ].join("; ");
 }
 
-function isPassthrough(res: NextResponse): boolean {
-  return (
-    !res.headers.get("Location") && !res.headers.get("x-middleware-rewrite")
-  );
-}
-
 export default function middleware(req: NextRequest) {
   const nonce = generateNonce();
   const csp = buildCsp(nonce);
 
-  // Let next-intl resolve the locale (may redirect for "/" → "/en", etc.).
+  // Let next-intl resolve the locale (may redirect for "/" → "/en", etc.,
+  // and internally rewrite locale-prefixed paths so [locale] segments
+  // resolve correctly).
   const intlRes = intlMiddleware(req);
 
-  // For redirects/rewrites the layout will run on the *next* request with
-  // a fresh nonce, so we only need to set the response header here.
-  if (!isPassthrough(intlRes)) {
+  // For redirects the response IS the final answer — the next request
+  // will get a fresh middleware pass with its own nonce/headers.
+  if (intlRes.headers.get("Location")) {
     intlRes.headers.set("Content-Security-Policy", csp);
     return intlRes;
   }
 
-  // Passthrough: inject the nonce as a request header so the layout can
-  // read it via `headers()` and thread it into <Script nonce> / <style nonce>.
-  // Also surface the current pathname so the layout can decide whether
-  // to enforce the onboarding gate without each authenticated page
-  // re-implementing the check. We have to rebuild the NextResponse
-  // because next-intl's `.next()` call doesn't expose its request-header
-  // init.
+  // Both the passthrough case and the next-intl internal-rewrite case
+  // need the same request-header init: x-nonce for CSP-nonced inline
+  // tags, x-pathname so the onboarding-gate in [locale]/layout.tsx can
+  // see the current URL. Rebuilding the response is the only way to
+  // surface request headers to downstream RSCs in Next.js 15.
   const reqHeaders = new Headers(req.headers);
   reqHeaders.set("x-nonce", nonce);
   reqHeaders.set("x-pathname", req.nextUrl.pathname);
-  const res = NextResponse.next({ request: { headers: reqHeaders } });
-  intlRes.headers.forEach((v, k) => res.headers.set(k, v));
+  // Preserve next-intl's internal rewrite directive if it set one.
+  const rewriteUrl = intlRes.headers.get("x-middleware-rewrite");
+  const res = rewriteUrl
+    ? NextResponse.rewrite(rewriteUrl, { request: { headers: reqHeaders } })
+    : NextResponse.next({ request: { headers: reqHeaders } });
+  intlRes.headers.forEach((v, k) => {
+    // Don't double-set the rewrite directive — NextResponse.rewrite()
+    // emits its own.
+    if (k.toLowerCase() === "x-middleware-rewrite") return;
+    res.headers.set(k, v);
+  });
   res.headers.set("Content-Security-Policy", csp);
   return res;
 }
