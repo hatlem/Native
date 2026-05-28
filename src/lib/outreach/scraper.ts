@@ -55,7 +55,7 @@ export async function scrapePublisher(args: {
   fetcher: Fetcher;
 }): Promise<ScrapeResult> {
   const root = args.rootUrl.replace(/\/+$/, "");
-  const publisherDomain = new URL(root).hostname.replace(/^www\./, "");
+  const publisherDomain = new URL(root).hostname.replace(/^(www\.)+/, "");
   const seen = new Map<string, ScrapedCandidate>();
   const errors: ScrapeResult["errors"] = [];
 
