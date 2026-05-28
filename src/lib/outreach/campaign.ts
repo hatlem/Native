@@ -1,9 +1,12 @@
 import { prisma } from "@/lib/prisma";
 import { recordAudit } from "@/lib/audit";
-import { newRateCardToken, rateCardExpiryFromNow } from "./tokens";
+import { newRateCardToken, rateCardExpiryFromNow, rateCardLink, unsubscribeLink } from "./tokens";
 import { groupSalesContactsByEmail } from "./dedup";
-import { suppressedEmailSet } from "./suppression";
-import { localeForMarketCode, type Locale } from "./email";
+import { suppressedEmailSet, isSuppressed } from "./suppression";
+import { localeForMarketCode, type Locale, buildOutreachEmail } from "./email";
+import { emailAdapter } from "@/lib/notify";
+import { stepKindForCount, nextStepDate, MAX_STEPS } from "./sequence";
+import { outreachLimiter } from "@/lib/rate-limit";
 
 export async function buildRateCardCampaign(args: {
   createdById: string;
@@ -90,4 +93,122 @@ export async function buildRateCardCampaign(args: {
   }
 
   return { requests_created: created, requests_skipped: skipped, titles_covered: titlesCovered };
+}
+
+export async function sendRateCardStep(args: {
+  requestId: string;
+  actorId: string;
+}): Promise<
+  | { sent: "initial" | "bump1" | "bump2" }
+  | { skipped: "responded" | "cancelled" | "expired" | "suppressed" | "rate_limited" | "max_steps" | "no_titles" }
+> {
+  const req = await prisma.rateCardRequest.findUnique({
+    where: { id: args.requestId },
+    include: {
+      titles: { include: { title: { include: { market: { select: { code: true } } } } } },
+    },
+  });
+  if (!req) throw new Error("rate_card_request.not_found");
+  if (req.respondedAt) return { skipped: "responded" };
+  if (req.cancelledAt) return { skipped: "cancelled" };
+  if (req.expiresAt <= new Date()) return { skipped: "expired" };
+  if (req.sentCount >= MAX_STEPS) return { skipped: "max_steps" };
+
+  if (req.titles.length === 0) {
+    await recordAudit(args.actorId, "outreach.skipped_no_titles", `RateCardRequest:${req.id}`, {
+      to: req.recipientEmail,
+    });
+    return { skipped: "no_titles" };
+  }
+
+  if (await isSuppressed(req.recipientEmail)) {
+    await recordAudit(args.actorId, "outreach.skipped_suppressed", `RateCardRequest:${req.id}`, {
+      to: req.recipientEmail,
+    });
+    return { skipped: "suppressed" };
+  }
+
+  const limited = await outreachLimiter.check("outreach-send");
+  if (!limited.ok) return { skipped: "rate_limited" };
+
+  const step = stepKindForCount(req.sentCount);
+  const link = rateCardLink(req.token, req.locale);
+  const unsubLink = unsubscribeLink(req.token, req.locale);
+  const built = buildOutreachEmail({
+    step,
+    locale: req.locale as Locale,
+    recipientName: req.recipientName,
+    titles: req.titles.map((t) => ({ name: t.title.name, marketCode: t.title.market.code })),
+    link,
+    unsubscribeLink: unsubLink,
+  });
+
+  await emailAdapter({
+    to: req.recipientEmail,
+    subject: built.subject,
+    text: built.text,
+    replyTo: process.env.OUTREACH_REPLY_TO,
+    headers: {
+      "List-Unsubscribe": `<${unsubLink}>`,
+      "List-Unsubscribe-Post": "List-Unsubscribe=One-Click",
+    },
+  });
+
+  const now = new Date();
+  const next = nextStepDate(step, now);
+  await prisma.rateCardRequest.update({
+    where: { id: req.id },
+    data: {
+      sentCount: req.sentCount + 1,
+      lastStepAt: now,
+      nextStepAt: next,
+      sentAt: req.sentAt ?? now,
+    },
+  });
+
+  await recordAudit(args.actorId, `rate_card_request.send.${step}`, `RateCardRequest:${req.id}`, {
+    to: req.recipientEmail,
+  });
+  return { sent: step };
+}
+
+export async function selectBatchForSend(args: { limit: number; minConfidence?: number }) {
+  const now = new Date();
+  return prisma.rateCardRequest.findMany({
+    where: {
+      respondedAt: null,
+      cancelledAt: null,
+      expiresAt: { gt: now },
+      sentCount: { lt: MAX_STEPS },
+      OR: [
+        { sentCount: 0 },
+        { nextStepAt: { lte: now } },
+      ],
+    },
+    orderBy: [{ nextStepAt: { sort: "asc", nulls: "first" } }, { createdAt: "asc" }],
+    take: args.limit,
+  });
+}
+
+export async function markRateCardOpened(token: string): Promise<void> {
+  const req = await prisma.rateCardRequest.findUnique({
+    where: { token },
+    select: { id: true, openedAt: true },
+  });
+  if (!req || req.openedAt) return;
+  await prisma.rateCardRequest.update({ where: { id: req.id }, data: { openedAt: new Date() } });
+}
+
+export async function findRateCardRequestByToken(token: string) {
+  return prisma.rateCardRequest.findUnique({
+    where: { token },
+    include: {
+      titles: { include: { title: { include: { publisher: true, market: true } } } },
+    },
+  });
+}
+
+export async function cancelRateCardRequest(args: { requestId: string; actorId: string }): Promise<void> {
+  await prisma.rateCardRequest.update({ where: { id: args.requestId }, data: { cancelledAt: new Date() } });
+  await recordAudit(args.actorId, "rate_card_request.cancel", `RateCardRequest:${args.requestId}`);
 }

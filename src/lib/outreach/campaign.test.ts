@@ -1,7 +1,8 @@
 import { test, before, after } from "node:test";
 import assert from "node:assert/strict";
 import { prisma } from "@/lib/prisma";
-import { buildRateCardCampaign } from "./campaign";
+import { buildRateCardCampaign, sendRateCardStep, selectBatchForSend } from "./campaign";
+import { setEmailAdapter } from "@/lib/notify";
 
 let userId: string;
 let publisherIds: string[] = [];
@@ -73,6 +74,54 @@ test("buildRateCardCampaign groups 2 contacts sharing email -> 1 request with bo
 test("buildRateCardCampaign is idempotent — second run creates 0 new requests", async () => {
   const result = await buildRateCardCampaign({ createdById: userId, scopeContactIds: salesContactIds });
   assert.equal(result.requests_created, 0);
+});
+
+test("sendRateCardStep happy path sends initial, bumps sentCount, sets nextStepAt", async () => {
+  const captured: Array<{ to: string; subject: string; text: string; headers?: Record<string, string> }> = [];
+  setEmailAdapter(async (m) => { captured.push(m as any); });
+
+  const req = await prisma.rateCardRequest.findFirstOrThrow({ where: { recipientEmail: "shared@saleshouse-test.example" } });
+  const result = await sendRateCardStep({ requestId: req.id, actorId: userId });
+  assert.deepEqual(result, { sent: "initial" });
+  assert.equal(captured.length, 1);
+  assert.equal(captured[0].to, "shared@saleshouse-test.example");
+  assert.ok(captured[0].headers?.["List-Unsubscribe"]);
+
+  const after = await prisma.rateCardRequest.findUniqueOrThrow({ where: { id: req.id } });
+  assert.equal(after.sentCount, 1);
+  assert.ok(after.nextStepAt);
+  assert.ok(after.sentAt);
+});
+
+test("sendRateCardStep skips when respondedAt is set", async () => {
+  const req = await prisma.rateCardRequest.findFirstOrThrow({ where: { recipientEmail: "shared@saleshouse-test.example" } });
+  await prisma.rateCardRequest.update({ where: { id: req.id }, data: { respondedAt: new Date() } });
+  const result = await sendRateCardStep({ requestId: req.id, actorId: userId });
+  assert.deepEqual(result, { skipped: "responded" });
+  await prisma.rateCardRequest.update({ where: { id: req.id }, data: { respondedAt: null } });
+});
+
+test("sendRateCardStep skips when recipient is suppressed", async () => {
+  await prisma.outreachSuppression.upsert({
+    where: { email: "shared@saleshouse-test.example" },
+    update: {},
+    create: { email: "shared@saleshouse-test.example", reason: "manual" },
+  });
+  const req = await prisma.rateCardRequest.findFirstOrThrow({ where: { recipientEmail: "shared@saleshouse-test.example" } });
+  const result = await sendRateCardStep({ requestId: req.id, actorId: userId });
+  assert.deepEqual(result, { skipped: "suppressed" });
+  await prisma.outreachSuppression.delete({ where: { email: "shared@saleshouse-test.example" } });
+});
+
+test("selectBatchForSend returns requests due (nextStepAt <= now) and never-sent ones", async () => {
+  const list = await selectBatchForSend({ limit: 100 });
+  for (const r of list) {
+    assert.ok(r.id);
+    assert.equal(r.respondedAt, null);
+    assert.equal(r.cancelledAt, null);
+    assert.ok(r.expiresAt > new Date());
+    assert.ok(r.sentCount < 3);
+  }
 });
 
 test("buildRateCardCampaign skips suppressed emails", async () => {

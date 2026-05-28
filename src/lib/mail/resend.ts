@@ -21,6 +21,7 @@ export function makeResendAdapter(
       text: msg.text,
       html: msg.html,
       replyTo,
+      ...(msg.headers ? { headers: msg.headers } : {}),
     });
   };
 }

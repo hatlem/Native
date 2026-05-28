@@ -18,6 +18,7 @@ export type EmailMessage = {
   text: string;
   html?: string;
   replyTo?: string;
+  headers?: Record<string, string>;
 };
 
 export type EmailAdapter = (msg: EmailMessage) => Promise<void>;
