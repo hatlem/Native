@@ -104,32 +104,35 @@ etc.) with `respondedAt` set. The desk reads them and transcribes to quotable pr
   so outreach mail is separate from transactional auth mail (`AUTH_EMAIL_FROM`).
 - **Throttle:** `outreachLimiter` (8/hour) + `OUTREACH_DAILY_CAP` (20) + `OUTREACH_HOURLY_CAP` (8).
 
-## Receiving replies — REQUIRED SETUP (not yet wired)
+## Receiving replies — wired via GetMailer
 
-> **Reply-first only works once inbound mail for `elias@nativespin.com` is delivered to a
-> readable inbox.** As of this writing, `nativespin.com` has **no MX records** and
-> Cloudflare Email Routing is unconfigured — replies would be dropped. This must be set
-> up before the first real batch.
+Replies (and any mail to `@nativespin.com`) are received by **GetMailer** (the team's own
+ESP) and read through GetMailer's inbox API / MCP. Current setup:
 
-Pick one path:
+- `nativespin.com` is added + **verified** in GetMailer (account key in
+  `~/.claude/settings.json` → `GETMAILER_API_KEY`). Inbound is enabled; `elias@nativespin.com`
+  is a registered inbound address.
+- DNS: `nativespin.com MX 10 mail.getmailer.co` (Cloudflare). This is GetMailer's MTA — the
+  same MX `getmailer.co` and other GetMailer domains use.
+- **Resend sending is untouched** — it lives on the `send.nativespin.com` subdomain
+  (`feedback-smtp...amazonses.com` + `resend._domainkey`), independent of the apex MX.
+- Cloudflare Email Routing is **disabled** (an earlier Gmail-forwarding attempt was removed)
+  — the apex MX points only at GetMailer.
 
-**Option 1 — GetMailer (the team's own product):**
-1. Log in / create the account at https://getmailer.co/dashboard (must be done by a human).
-2. Add `nativespin.com` as an inbound domain; note the MX records GetMailer specifies.
-3. Add those MX records to `nativespin.com` DNS in Cloudflare.
-4. Verify `elias@nativespin.com` (or a catch-all) is routed to a readable inbox there.
-5. The `getmailer` MCP (configured in `~/.claude/settings.json`) can then read the inbox
-   — but it loads only on Claude Code restart; it is not available mid-session.
+**Reading replies:**
+- The `getmailer` MCP (configured in `~/.claude/settings.json`) reads the inbox, but loads
+  only on Claude Code **restart** — not mid-session.
+- Or call the API directly: `GET https://getmailer.co/api/inbox` with
+  `Authorization: Bearer $GETMAILER_API_KEY`.
 
-**Option 2 — Cloudflare Email Routing → Gmail (simpler):**
-1. Cloudflare dashboard → `nativespin.com` → Email → enable Email Routing (adds MX
-   records automatically since Cloudflare manages the DNS).
-2. Add a routing rule: `elias@nativespin.com` → forward to a real inbox
-   (e.g. a monitored Gmail). Confirm the verification email Cloudflare sends.
-3. Replies then land in that inbox; the Gmail MCP can search/read them.
-
-Either way: when a reply arrives, the desk marks the `RateCardRequest` responded
+When a reply arrives, the desk marks the matching `RateCardRequest` responded
 (`responseSource: "EMAIL"`) and records the prices.
+
+> Note: GetMailer's spam filter quarantines by default (threshold 5). If a legitimate reply
+> doesn't show in the main inbox, check `?status=QUARANTINED`.
+
+**To re-point replies elsewhere** (e.g. a Google Workspace mailbox), change the apex MX in
+Cloudflare. Only one MX target can be active at a time.
 
 ## Environment variables (Railway)
 
