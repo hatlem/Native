@@ -81,14 +81,14 @@ test("buildRateCardCampaign skips suppressed emails", async () => {
     update: {},
     create: { email: "solo@publisher-test.example", reason: "unsubscribe" },
   });
-  await prisma.rateCardRequest.deleteMany({ where: { recipientEmail: "solo@publisher-test.example" } });
-
-  const result = await buildRateCardCampaign({ createdById: userId, scopeContactIds: salesContactIds });
-  // shared@ already exists; solo@ is suppressed
-  assert.equal(result.requests_created, 0);
-  const solo = await prisma.rateCardRequest.findFirst({ where: { recipientEmail: "solo@publisher-test.example" } });
-  assert.equal(solo, null);
-
-  // Cleanup
-  await prisma.outreachSuppression.delete({ where: { email: "solo@publisher-test.example" } });
+  try {
+    await prisma.rateCardRequest.deleteMany({ where: { recipientEmail: "solo@publisher-test.example" } });
+    const result = await buildRateCardCampaign({ createdById: userId, scopeContactIds: salesContactIds });
+    // shared@ already exists; solo@ is suppressed
+    assert.equal(result.requests_created, 0);
+    const solo = await prisma.rateCardRequest.findFirst({ where: { recipientEmail: "solo@publisher-test.example" } });
+    assert.equal(solo, null);
+  } finally {
+    await prisma.outreachSuppression.delete({ where: { email: "solo@publisher-test.example" } });
+  }
 });

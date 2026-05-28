@@ -1,7 +1,7 @@
 import { prisma } from "@/lib/prisma";
 import { recordAudit } from "@/lib/audit";
 import { newRateCardToken, rateCardExpiryFromNow } from "./tokens";
-import { groupSalesContactsByEmail, normaliseEmail } from "./dedup";
+import { groupSalesContactsByEmail } from "./dedup";
 import { suppressedEmailSet } from "./suppression";
 import { localeForMarketCode, type Locale } from "./email";
 
@@ -31,15 +31,29 @@ export async function buildRateCardCampaign(args: {
   let titlesCovered = 0;
 
   for (const g of groups) {
-    // Skip if an active (non-cancelled, non-expired) request already exists for this email.
+    // Skip if a responded request exists (never re-engage a responder) or an
+    // active in-flight request exists (non-cancelled, non-responded, non-expired).
     const existing = await prisma.rateCardRequest.findFirst({
       where: {
         recipientEmail: g.recipientEmail,
-        cancelledAt: null,
-        expiresAt: { gt: new Date() },
+        OR: [
+          { respondedAt: { not: null } },
+          {
+            cancelledAt: null,
+            respondedAt: null,
+            expiresAt: { gt: new Date() },
+          },
+        ],
       },
     });
     if (existing) {
+      skipped++;
+      continue;
+    }
+
+    // Skip if this group has no titles — creating an empty request would produce
+    // broken outreach with nothing to list in the email.
+    if (g.titleIds.length === 0) {
       skipped++;
       continue;
     }
