@@ -11,16 +11,17 @@ export function makeResendAdapter(
   const key = env.RESEND_API_KEY;
   if (!key) return null;
   const client = new Resend(key);
-  const from = env.AUTH_EMAIL_FROM ?? "NativeSpin <noreply@nativespin.com>";
-  const replyTo = env.AUTH_EMAIL_REPLY_TO;
+  const defaultFrom = env.AUTH_EMAIL_FROM ?? "NativeSpin <noreply@nativespin.com>";
+  const defaultReplyTo = env.AUTH_EMAIL_REPLY_TO;
   return async (msg) => {
+    const replyTo = msg.replyTo ?? defaultReplyTo;
     await client.emails.send({
-      from,
+      from: msg.from ?? defaultFrom,
       to: msg.to,
       subject: msg.subject,
       text: msg.text,
       html: msg.html,
-      replyTo,
+      ...(replyTo ? { replyTo } : {}),
       ...(msg.headers ? { headers: msg.headers } : {}),
     });
   };

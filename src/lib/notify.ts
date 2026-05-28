@@ -17,6 +17,11 @@ export type EmailMessage = {
   subject: string;
   text: string;
   html?: string;
+  // Per-message overrides. When unset, the adapter falls back to its
+  // configured defaults (AUTH_EMAIL_FROM / AUTH_EMAIL_REPLY_TO). Outreach
+  // sets these so partnership mail comes from (and replies route to)
+  // partnerships@, separate from transactional auth mail.
+  from?: string;
   replyTo?: string;
   headers?: Record<string, string>;
 };
