@@ -290,7 +290,7 @@
       "body": "This title is in our catalog but doesn't yet have published list pricing. Send a brief and the desk will pull pricing and availability for you.",
       "cta": "Start a plan"
     },
-    "indicativeNote": "Indicative price. The firm price is confirmed by our buying desk.",
+    "indicativeNote": "Prices shown are indicative examples. The final offer is always negotiated on volume — impressions, campaign length, number of articles and content production. NativeSpin handles that for you.",
     "unavailable": "Currently unavailable for booking.",
     "formatsEyebrow": "Available formats",
     "formatsHeading": "Choose a format and add it to your plan",
@@ -1811,8 +1811,7 @@
     "contentProductionLabel": "Who writes the content?",
     "content_advertiser": "The advertiser can deliver their own articles",
     "content_publisher": "Articles must be written by your department",
-    "content_both": "Both are possible",
-    "ratesExampleNote": "The prices you enter are indicative examples. The final offer is always negotiated based on volume — impressions, campaign length, number of articles and content production. NativeSpin handles that negotiation."
+    "content_both": "Both are possible"
   },
   "account": {
     "eyebrow": "Account",

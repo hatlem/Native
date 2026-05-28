@@ -211,7 +211,7 @@
       "body": "Den här titeln finns i katalogen men har ingen publicerad listprisning ännu. Skicka en brief så hämtar våra inköpare priser och tillgänglighet åt dig.",
       "cta": "Starta en plan"
     },
-    "indicativeNote": "Vägledande pris. Det fasta priset bekräftas av vårt inköpsteam.",
+    "indicativeNote": "Priserna är vägledande exempel. Det slutliga erbjudandet förhandlas alltid utifrån volym — antal visningar, kampanjlängd, antal artiklar och innehållsproduktion. NativeSpin ordnar det åt dig.",
     "unavailable": "För närvarande inte tillgänglig för bokning.",
     "formatsEyebrow": "Tillgängliga format",
     "formatsHeading": "Välj ett format och lägg det till din plan",
@@ -1850,7 +1850,6 @@
     "contentProductionLabel": "Vem skriver innehållet?",
     "content_advertiser": "Annonsören kan leverera egna artiklar",
     "content_publisher": "Artiklarna måste skrivas av er avdelning",
-    "content_both": "Båda är möjliga",
-    "ratesExampleNote": "Priserna du anger är vägledande exempel. Det slutliga erbjudandet förhandlas alltid utifrån volym — antal visningar, kampanjlängd, antal artiklar och innehållsproduktion. NativeSpin sköter den förhandlingen."
+    "content_both": "Båda är möjliga"
   }
 }

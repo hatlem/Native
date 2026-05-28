@@ -290,7 +290,7 @@
       "body": "Dieser Titel ist in unserem Katalog, hat aber noch keine veröffentlichten Listenpreise. Senden Sie einen Brief und das Desk holt Preis und Verfügbarkeit für Sie ein.",
       "cta": "Plan starten"
     },
-    "indicativeNote": "Richtpreis. Der verbindliche Preis wird von unserem Einkaufs-Desk bestätigt.",
+    "indicativeNote": "Die angezeigten Preise sind unverbindliche Beispiele. Das endgültige Angebot wird immer nach Volumen verhandelt — Impressions, Kampagnenlänge, Anzahl der Artikel und Content-Produktion. NativeSpin übernimmt das für Sie.",
     "unavailable": "Aktuell nicht buchbar.",
     "formatsEyebrow": "Verfügbare Formate",
     "formatsHeading": "Format wählen und zum Plan hinzufügen",
@@ -1708,7 +1708,6 @@
     "contentProductionLabel": "Wer schreibt die Inhalte?",
     "content_advertiser": "Der Werbetreibende kann eigene Artikel liefern",
     "content_publisher": "Artikel müssen von Ihrer Abteilung verfasst werden",
-    "content_both": "Beides ist möglich",
-    "ratesExampleNote": "Die von Ihnen angegebenen Preise sind unverbindliche Beispiele. Das endgültige Angebot wird immer nach Volumen verhandelt — Impressions, Kampagnenlänge, Anzahl der Artikel und Content-Produktion. NativeSpin übernimmt die Verhandlung."
+    "content_both": "Beides ist möglich"
   }
 }

@@ -290,7 +290,7 @@
       "body": "Tämä julkaisu on katalogissamme, mutta sillä ei vielä ole julkaistuja listahintoja. Lähetä brief, niin desk hakee hinnoittelun ja saatavuuden puolestasi.",
       "cta": "Aloita suunnitelma"
     },
-    "indicativeNote": "Suuntaa-antava hinta. Kiinteän hinnan vahvistaa ostodeskimme.",
+    "indicativeNote": "Hinnat ovat suuntaa-antavia esimerkkejä. Lopullinen tarjous neuvotellaan aina volyymin mukaan — näyttökerrat, kampanjan kesto, artikkelien määrä ja sisällöntuotanto. NativeSpin hoitaa sen puolestasi.",
     "unavailable": "Ei tällä hetkellä varattavissa.",
     "formatsEyebrow": "Saatavilla olevat formaatit",
     "formatsHeading": "Valitse formaatti ja lisää se suunnitelmaasi",
@@ -1850,7 +1850,6 @@
     "contentProductionLabel": "Kuka kirjoittaa sisällön?",
     "content_advertiser": "Mainostaja voi toimittaa omat artikkelinsa",
     "content_publisher": "Artikkelit on kirjoitettava osastonne toimesta",
-    "content_both": "Molemmat ovat mahdollisia",
-    "ratesExampleNote": "Antamasi hinnat ovat suuntaa-antavia esimerkkejä. Lopullinen tarjous neuvotellaan aina volyymin mukaan — näyttökerrat, kampanjan kesto, artikkelien määrä ja sisällöntuotanto. NativeSpin hoitaa neuvottelun."
+    "content_both": "Molemmat ovat mahdollisia"
   }
 }

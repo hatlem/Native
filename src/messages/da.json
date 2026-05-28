@@ -211,7 +211,7 @@
       "body": "Denne titel er i vores katalog, men har endnu ingen offentliggjort listepris. Send en brief, så finder vores indkøbsteam priser og tilgængelighed til dig.",
       "cta": "Start en plan"
     },
-    "indicativeNote": "Vejledende pris. Den faste pris bekræftes af vores indkøbsteam.",
+    "indicativeNote": "Priserne er vejledende eksempler. Det endelige tilbud forhandles altid ud fra volumen — antal visninger, kampagnelængde, antal artikler og indholdsproduktion. Det ordner vi i NativeSpin.",
     "unavailable": "I øjeblikket ikke tilgængelig til booking.",
     "formatsEyebrow": "Tilgængelige formater",
     "formatsHeading": "Vælg et format og tilføj det til din plan",
@@ -1851,7 +1851,6 @@
     "contentProductionLabel": "Hvem skriver indholdet?",
     "content_advertiser": "Annoncøren kan levere egne artikler",
     "content_publisher": "Artiklerne skal skrives af jeres afdeling",
-    "content_both": "Begge dele er mulige",
-    "ratesExampleNote": "Priserne, du indtaster, er vejledende eksempler. Det endelige tilbud forhandles altid ud fra volumen — antal visninger, kampagnelængde, antal artikler og indholdsproduktion. Det ordner vi i NativeSpin."
+    "content_both": "Begge dele er mulige"
   }
 }

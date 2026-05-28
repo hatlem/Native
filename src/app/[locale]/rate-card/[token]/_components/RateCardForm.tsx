@@ -111,7 +111,6 @@ export default function RateCardForm({
 
         <details className="rc-details">
           <summary>{t("ratesLabel")}</summary>
-          <p className="rc-example-note">{t("ratesExampleNote")}</p>
           <div className="rc-rates">
             {titles.map((titleItem, i) => (
               <fieldset className="rc-rate-card" key={titleItem.titleId}>

@@ -4154,15 +4154,6 @@ footer a:hover {
   color: var(--accent);
   padding: var(--s-2) 0;
 }
-.rc-example-note {
-  font-size: 0.82rem;
-  line-height: 1.5;
-  color: var(--muted-strong);
-  background: var(--surface-3);
-  border-radius: var(--r-sm);
-  padding: var(--s-3);
-  margin: var(--s-3) 0 0;
-}
 .rc-rates {
   display: flex;
   flex-direction: column;
