@@ -190,7 +190,7 @@ function da_bump1(a: BuildArgs): Built {
   const greeting = a.recipientName ? `Hej ${a.recipientName},` : `Hej,`;
   return {
     subject: `Re: Native-rate cards for ${a.titles.length} titler`,
-    text: [greeting, ``, `Lille reminder — vi venter stadig på rate cards for ${a.titles.length} titler:`, ``, a.link, ``, `— NativeSpin`, ``, `Afmeld: ${a.unsubscribeLink}`].join("\n"),
+    text: [greeting, ``, `Lille påmindelse — vi venter stadig på rate cards for ${a.titles.length} titler:`, ``, a.link, ``, `— NativeSpin`, ``, `Afmeld: ${a.unsubscribeLink}`].join("\n"),
   };
 }
 function da_bump2(a: BuildArgs): Built {
@@ -323,7 +323,7 @@ function en_bump2(a: BuildArgs): Built {
   const greeting = a.recipientName ? `Hi ${a.recipientName},` : `Hi,`;
   return {
     subject: `Right contact for rate cards?`,
-    text: [greeting, ``, `We've been trying to reach the right contact for rate cards on ${a.titles.length} titles in the NativeSpin catalog. If it's not you, can you point us to who is?`, ``, a.link, ``, `Not interested? Unsubscribe here: ${a.unsubscribeLink}.`, ``, `— NativeSpin`].join("\n"),
+    text: [greeting, ``, `We've been trying to reach the right contact for rate cards on ${a.titles.length} titles in the NativeSpin catalogue. If it's not you, can you point us to who is?`, ``, a.link, ``, `Not interested? Unsubscribe here: ${a.unsubscribeLink}.`, ``, `— NativeSpin`].join("\n"),
   };
 }
 
