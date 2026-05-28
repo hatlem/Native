@@ -1800,7 +1800,19 @@
     "unsubscribedBody": "You will not receive further outreach from NativeSpin. Reach out at any time if that changes.",
     "uploadButton": "Choose file",
     "uploadNoFile": "No file selected",
-    "orSeparator": "or"
+    "orSeparator": "or",
+    "rateProduction": "Production (one-time)",
+    "rateDistribution": "Distribution",
+    "rateUnit": "Unit",
+    "unit_cpm": "CPM",
+    "unit_flat": "Flat campaign",
+    "unit_cpc": "Per click",
+    "unit_guaranteed": "Guaranteed reach",
+    "contentProductionLabel": "Who writes the content?",
+    "content_advertiser": "The advertiser can deliver their own articles",
+    "content_publisher": "Articles must be written by your department",
+    "content_both": "Both are possible",
+    "ratesExampleNote": "The prices you enter are indicative examples. The final offer is always negotiated based on volume — impressions, campaign length, number of articles and content production. NativeSpin handles that negotiation."
   },
   "account": {
     "eyebrow": "Account",

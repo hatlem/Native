@@ -50,6 +50,11 @@ export default async function RateCardPage({
 
   await markRateCardOpened(token);
 
+  const currencyByLocale: Record<string, string> = {
+    no: "NOK", sv: "SEK", da: "DKK", fi: "EUR", de: "EUR", en: "GBP",
+  };
+  const defaultCurrency = currencyByLocale[locale] ?? "EUR";
+
   return (
     <main className="p-8 max-w-3xl mx-auto">
       <h1 className="text-2xl font-semibold">{t("pageTitle")}</h1>
@@ -82,6 +87,7 @@ export default async function RateCardPage({
         }))}
         defaultName={req.recipientName ?? ""}
         defaultEmail={req.recipientEmail}
+        defaultCurrency={defaultCurrency}
         submitAction={submitRateCardAction}
       />
     </main>

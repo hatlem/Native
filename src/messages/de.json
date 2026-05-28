@@ -1697,6 +1697,18 @@
     "unsubscribedBody": "Sie erhalten keine weiteren E-Mails von NativeSpin. Melden Sie sich gern, falls sich das ändert.",
     "uploadButton": "Datei wählen",
     "uploadNoFile": "Keine Datei ausgewählt",
-    "orSeparator": "oder"
+    "orSeparator": "oder",
+    "rateProduction": "Produktion (einmalig)",
+    "rateDistribution": "Distribution",
+    "rateUnit": "Einheit",
+    "unit_cpm": "CPM",
+    "unit_flat": "Festpreis-Kampagne",
+    "unit_cpc": "Pro Klick",
+    "unit_guaranteed": "Garantierte Reichweite",
+    "contentProductionLabel": "Wer schreibt die Inhalte?",
+    "content_advertiser": "Der Werbetreibende kann eigene Artikel liefern",
+    "content_publisher": "Artikel müssen von Ihrer Abteilung verfasst werden",
+    "content_both": "Beides ist möglich",
+    "ratesExampleNote": "Die von Ihnen angegebenen Preise sind unverbindliche Beispiele. Das endgültige Angebot wird immer nach Volumen verhandelt — Impressions, Kampagnenlänge, Anzahl der Artikel und Content-Produktion. NativeSpin übernimmt die Verhandlung."
   }
 }

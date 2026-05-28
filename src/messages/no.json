@@ -1801,7 +1801,19 @@
     "unsubscribedBody": "Du vil ikke motta flere e-poster fra NativeSpin. Ta gjerne kontakt om det endrer seg.",
     "uploadButton": "Velg fil",
     "uploadNoFile": "Ingen fil valgt",
-    "orSeparator": "eller"
+    "orSeparator": "eller",
+    "rateProduction": "Produksjon (engangs)",
+    "rateDistribution": "Distribusjon",
+    "rateUnit": "Enhet",
+    "unit_cpm": "CPM",
+    "unit_flat": "Fast kampanje",
+    "unit_cpc": "Per klikk",
+    "unit_guaranteed": "Garantert rekkevidde",
+    "contentProductionLabel": "Hvem skriver innholdet?",
+    "content_advertiser": "Annonsøren kan levere egne artikler",
+    "content_publisher": "Artiklene må skrives av deres avdeling",
+    "content_both": "Begge deler er mulig",
+    "ratesExampleNote": "Prisene du legger inn er veiledende eksempelpriser. Det endelige tilbudet forhandles alltid ut fra volum — antall visninger, kampanjelengde, antall artikler og produksjon av innhold. Det ordner vi i NativeSpin."
   },
   "account": {
     "eyebrow": "Konto",

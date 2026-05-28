@@ -67,26 +67,45 @@ export async function submitRateCardAction(formData: FormData) {
   const contactEmail = f(formData, "contactEmail") || null;
   const contactRole = f(formData, "contactRole") || null;
   const formatsOffered = (formData.getAll("formatsOffered") as string[]).filter(Boolean);
+  const contentProductionRaw = f(formData, "contentProduction");
+  const contentProduction = ["advertiser", "publisher", "both"].includes(contentProductionRaw)
+    ? contentProductionRaw
+    : null;
 
-  type RateRow = { titleId: string; price: number; currency: string; unit: string };
-  const responseData: RateRow[] = [];
+  // Native/advertorial pricing is two-part: production (one-time) + distribution
+  // (CPM / flat campaign / per-click / guaranteed reach). Capture both per title.
+  type RateRow = {
+    titleId: string;
+    production: number | null;
+    distribution: number | null;
+    distributionUnit: string;
+    currency: string;
+  };
+  const rates: RateRow[] = [];
   for (let i = 0; i < req.titles.length; i++) {
     const titleId = f(formData, `rates[${i}].titleId`);
     const skip = formData.get(`rates[${i}].skip`) === "on";
-    const priceRaw = f(formData, `rates[${i}].price`);
-    if (skip || !priceRaw || !titleId) continue;
-    const price = Number(priceRaw);
-    if (!Number.isFinite(price) || price <= 0) continue;
-    responseData.push({
+    if (skip || !titleId) continue;
+    const prodRaw = Number(f(formData, `rates[${i}].production`));
+    const distRaw = Number(f(formData, `rates[${i}].distribution`));
+    const production = Number.isFinite(prodRaw) && prodRaw > 0 ? prodRaw : null;
+    const distribution = Number.isFinite(distRaw) && distRaw > 0 ? distRaw : null;
+    if (production === null && distribution === null) continue;
+    rates.push({
       titleId,
-      price,
+      production,
+      distribution,
+      distributionUnit: f(formData, `rates[${i}].distributionUnit`) || "cpm",
       currency: f(formData, `rates[${i}].currency`).toUpperCase() || "EUR",
-      unit: f(formData, `rates[${i}].unit`) || "CPM",
     });
   }
 
+  const hasPrices = rates.length > 0;
+  const responseData =
+    hasPrices || contentProduction ? { contentProduction, rates } : null;
+
   const hasSomething =
-    !!mediaKitUrl || !!mediaKitObjectKey || responseData.length > 0 || !!responseNote;
+    !!mediaKitUrl || !!mediaKitObjectKey || hasPrices || !!responseNote || !!contentProduction;
   if (!hasSomething) redirect(`/${locale}/rate-card/${token}?error=empty`);
 
   await prisma.rateCardRequest.update({
@@ -95,7 +114,7 @@ export async function submitRateCardAction(formData: FormData) {
       mediaKitUrl,
       mediaKitObjectKey,
       responseNote,
-      responseData: responseData.length > 0 ? (responseData as never) : undefined,
+      responseData: responseData ? (responseData as never) : undefined,
       formatsOffered,
       contactName,
       contactEmail,
@@ -109,7 +128,8 @@ export async function submitRateCardAction(formData: FormData) {
     source: "FORM",
     hasFile: !!mediaKitObjectKey,
     hasUrl: !!mediaKitUrl,
-    hasPrices: responseData.length,
+    hasPrices: rates.length,
+    contentProduction,
     hasNote: !!responseNote,
   });
 

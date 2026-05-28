@@ -4154,23 +4154,49 @@ footer a:hover {
   color: var(--accent);
   padding: var(--s-2) 0;
 }
+.rc-example-note {
+  font-size: 0.82rem;
+  line-height: 1.5;
+  color: var(--muted-strong);
+  background: var(--surface-3);
+  border-radius: var(--r-sm);
+  padding: var(--s-3);
+  margin: var(--s-3) 0 0;
+}
 .rc-rates {
   display: flex;
   flex-direction: column;
   gap: var(--s-3);
   margin-top: var(--s-3);
 }
-.rc-rate-row {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) 96px 88px 88px auto;
-  align-items: center;
-  gap: var(--s-2);
+.rc-rate-card {
+  border: 1px solid var(--border);
+  border-radius: var(--r-sm);
+  padding: var(--s-3) var(--s-4) var(--s-4);
+  margin: 0;
 }
 .rc-rate-title {
-  font-size: 0.9rem;
-  min-width: 0;
-  overflow: hidden;
-  text-overflow: ellipsis;
+  font-size: 0.92rem;
+  font-weight: 580;
+  color: var(--heading);
+  padding: 0 var(--s-2);
+}
+.rc-rate-fields {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr 0.7fr;
+  gap: var(--s-3);
+  margin-bottom: var(--s-3);
+}
+.rc-radios {
+  display: flex;
+  flex-direction: column;
+  gap: var(--s-2);
+}
+.rc-radio {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--s-2);
+  font-size: 0.92rem;
 }
 .rc-skip {
   display: inline-flex;
@@ -4204,7 +4230,14 @@ footer a:hover {
   justify-content: flex-start;
 }
 @media (max-width: 720px) {
-  .rc-rate-row,
+  .rc-rate-fields,
+  .rc-formats,
+  .rc-contact-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+@media (max-width: 520px) {
+  .rc-rate-fields,
   .rc-formats,
   .rc-contact-grid {
     grid-template-columns: 1fr;

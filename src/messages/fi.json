@@ -1839,6 +1839,18 @@
     "unsubscribedBody": "Et saa enää viestejä NativeSpiniltä. Otathan yhteyttä, jos tilanne muuttuu.",
     "uploadButton": "Valitse tiedosto",
     "uploadNoFile": "Ei tiedostoa valittu",
-    "orSeparator": "tai"
+    "orSeparator": "tai",
+    "rateProduction": "Tuotanto (kertaluonteinen)",
+    "rateDistribution": "Jakelu",
+    "rateUnit": "Yksikkö",
+    "unit_cpm": "CPM",
+    "unit_flat": "Kiinteä kampanja",
+    "unit_cpc": "Per klikkaus",
+    "unit_guaranteed": "Taattu tavoittavuus",
+    "contentProductionLabel": "Kuka kirjoittaa sisällön?",
+    "content_advertiser": "Mainostaja voi toimittaa omat artikkelinsa",
+    "content_publisher": "Artikkelit on kirjoitettava osastonne toimesta",
+    "content_both": "Molemmat ovat mahdollisia",
+    "ratesExampleNote": "Antamasi hinnat ovat suuntaa-antavia esimerkkejä. Lopullinen tarjous neuvotellaan aina volyymin mukaan — näyttökerrat, kampanjan kesto, artikkelien määrä ja sisällöntuotanto. NativeSpin hoitaa neuvottelun."
   }
 }
