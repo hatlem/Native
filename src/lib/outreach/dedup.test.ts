@@ -39,3 +39,13 @@ test("excludes suppressed emails", () => {
   assert.equal(groups.length, 1);
   assert.equal(groups[0].recipientEmail, "good@a.no");
 });
+
+test("suppressed Set with mixed-case entries still filters correctly", () => {
+  const contacts = [
+    { id: "a", publisherId: "p1", email: "ok@x.no", name: null, titleIds: ["t1"] },
+    { id: "b", publisherId: "p2", email: "bad@y.no", name: null, titleIds: ["t2"] },
+  ];
+  const groups = groupSalesContactsByEmail(contacts, new Set(["BAD@Y.no", "  EXTRA@z.no  "]));
+  assert.equal(groups.length, 1);
+  assert.equal(groups[0].recipientEmail, "ok@x.no");
+});

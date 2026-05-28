@@ -1,6 +1,5 @@
-export function normaliseEmail(s: string): string {
-  return s.trim().toLowerCase();
-}
+import { normaliseEmail } from "@/lib/pricing/contacts";
+export { normaliseEmail };
 
 export type ContactInput = {
   id: string;
@@ -21,10 +20,12 @@ export function groupSalesContactsByEmail(
   contacts: ContactInput[],
   suppressed: Set<string> = new Set(),
 ): RecipientGroup[] {
+  // Defense in depth: normalise the suppression Set so callers don't have to.
+  const suppressedNorm = suppressed.size === 0 ? suppressed : new Set(Array.from(suppressed, normaliseEmail));
   const byEmail = new Map<string, RecipientGroup>();
   for (const c of contacts) {
     const email = normaliseEmail(c.email);
-    if (suppressed.has(email)) continue;
+    if (suppressedNorm.has(email)) continue;
     let group = byEmail.get(email);
     if (!group) {
       group = {
