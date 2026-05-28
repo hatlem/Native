@@ -29,8 +29,10 @@ test("initial NO email contains hook + title list + link + unsubscribe", () => {
     link: "https://nativespin.com/no/rate-card/abc",
     unsubscribeLink: "https://nativespin.com/no/rate-card/abc/unsubscribe",
   });
-  assert.match(built.subject, /native|rate card/i);
-  assert.match(built.text, /annonsører som leter/);
+  assert.match(built.subject, /native|rate card|prisforespørsel/i);
+  assert.match(built.text, /annonsør vi ønsker/);
+  assert.match(built.text, /Svar gjerne direkte på denne e-posten/);
+  assert.match(built.text, /Elias Getia, NativeSpin/);
   assert.match(built.text, /Aftenposten/);
   assert.match(built.text, /Bergens Tidende/);
   assert.match(built.text, /https:\/\/nativespin\.com\/no\/rate-card\/abc/);
