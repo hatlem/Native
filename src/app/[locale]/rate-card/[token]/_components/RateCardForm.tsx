@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useTransition } from "react";
+import { useTranslations } from "next-intl";
 import { presignRateCardUpload } from "../actions";
 
 type Title = { titleId: string; name: string; marketCode: string };
@@ -22,6 +23,7 @@ export default function RateCardForm({
   unsubscribeHref: string;
   submitAction: (formData: FormData) => Promise<void>;
 }) {
+  const t = useTranslations("rateCard");
   const [objectKey, setObjectKey] = useState<string | null>(null);
   const [uploadError, setUploadError] = useState<string | null>(null);
   const [uploading, setUploading] = useState(false);
@@ -54,6 +56,15 @@ export default function RateCardForm({
     }
   }
 
+  const formats: Array<[string, string]> = [
+    ["native_article", t("format_native_article")],
+    ["sponsored_content", t("format_sponsored_content")],
+    ["brand_stories", t("format_brand_stories")],
+    ["video_native", t("format_video_native")],
+    ["native_display", t("format_native_display")],
+    ["other", t("format_other")],
+  ];
+
   return (
     <form
       action={(fd) => startTransition(() => submitAction(fd))}
@@ -65,47 +76,54 @@ export default function RateCardForm({
       <input type="hidden" name="mediaKitObjectKey" value={objectKey ?? ""} />
 
       <fieldset className="border rounded p-4">
-        <legend className="px-2 text-sm font-medium">Send your rate card</legend>
+        <legend className="px-2 text-sm font-medium">{t("sendHeading")}</legend>
 
         <label className="block mb-3">
-          <span className="text-sm">Upload a file (PDF / PPTX / image, max 25 MB)</span>
+          <span className="text-sm">{t("uploadLabel")} ({t("uploadHint")})</span>
           <input
             type="file"
             accept=".pdf,.pptx,.ppt,.png,.jpg,.jpeg"
             onChange={onFileChange}
             className="block mt-1"
           />
-          {uploading && <span className="text-xs text-slate-500">Uploading…</span>}
-          {objectKey && <span className="text-xs text-emerald-700">File uploaded.</span>}
-          {uploadError && <span className="text-xs text-red-700">Upload failed: {uploadError}</span>}
+          {uploading && <span className="text-xs text-slate-500">{t("uploading")}</span>}
+          {objectKey && <span className="text-xs text-emerald-700">{t("uploadDone")}</span>}
+          {uploadError && (
+            <span className="text-xs text-red-700">{t("uploadFailed", { error: uploadError })}</span>
+          )}
         </label>
 
         <label className="block mb-3">
-          <span className="text-sm">Or paste a URL to your rate card / media kit</span>
-          <input name="mediaKitUrl" type="url" placeholder="https://…" className="block w-full border rounded px-2 py-1 mt-1" />
+          <span className="text-sm">{t("urlLabel")}</span>
+          <input
+            name="mediaKitUrl"
+            type="url"
+            placeholder={t("urlPlaceholder")}
+            className="block w-full border rounded px-2 py-1 mt-1"
+          />
         </label>
 
         <details className="mt-2">
-          <summary className="cursor-pointer text-sm">Or enter rates per title</summary>
+          <summary className="cursor-pointer text-sm">{t("ratesLabel")}</summary>
           <table className="w-full text-sm mt-3">
             <thead>
               <tr className="text-left text-slate-500">
-                <th>Title</th>
-                <th>Price</th>
-                <th>Currency</th>
-                <th>Unit</th>
-                <th>Skip</th>
+                <th>{t("tableTitle")}</th>
+                <th>{t("tablePrice")}</th>
+                <th>{t("tableCurrency")}</th>
+                <th>{t("tableUnit")}</th>
+                <th>{t("tableSkip")}</th>
               </tr>
             </thead>
             <tbody>
-              {titles.map((t, i) => (
-                <tr key={t.titleId}>
+              {titles.map((titleItem, i) => (
+                <tr key={titleItem.titleId}>
                   <td>
-                    {t.name}{" "}
-                    <span className="text-slate-500 text-xs">({t.marketCode})</span>
+                    {titleItem.name}{" "}
+                    <span className="text-slate-500 text-xs">({titleItem.marketCode})</span>
                   </td>
                   <td>
-                    <input name={`rates[${i}].titleId`} type="hidden" value={t.titleId} />
+                    <input name={`rates[${i}].titleId`} type="hidden" value={titleItem.titleId} />
                     <input
                       name={`rates[${i}].price`}
                       type="number"
@@ -142,16 +160,9 @@ export default function RateCardForm({
       </fieldset>
 
       <fieldset className="border rounded p-4">
-        <legend className="px-2 text-sm font-medium">Native formats you offer</legend>
+        <legend className="px-2 text-sm font-medium">{t("formatsLabel")}</legend>
         <div className="grid grid-cols-2 gap-2 text-sm">
-          {[
-            ["native_article", "Native article / advertorial"],
-            ["sponsored_content", "Sponsored content"],
-            ["brand_stories", "Brand stories"],
-            ["video_native", "Native video"],
-            ["native_display", "Native display"],
-            ["other", "Other"],
-          ].map(([value, label]) => (
+          {formats.map(([value, label]) => (
             <label key={value} className="flex items-center gap-2">
               <input type="checkbox" name="formatsOffered" value={value} /> {label}
             </label>
@@ -160,10 +171,10 @@ export default function RateCardForm({
       </fieldset>
 
       <fieldset className="border rounded p-4">
-        <legend className="px-2 text-sm font-medium">Contact for follow-up</legend>
+        <legend className="px-2 text-sm font-medium">{t("contactLabel")}</legend>
         <div className="grid grid-cols-3 gap-3 text-sm">
           <label>
-            Name
+            {t("contactName")}
             <input
               name="contactName"
               defaultValue={defaultName}
@@ -171,7 +182,7 @@ export default function RateCardForm({
             />
           </label>
           <label>
-            Email
+            {t("contactEmail")}
             <input
               name="contactEmail"
               type="email"
@@ -180,14 +191,14 @@ export default function RateCardForm({
             />
           </label>
           <label>
-            Role
+            {t("contactRole")}
             <input name="contactRole" className="w-full border rounded px-2 py-1" />
           </label>
         </div>
       </fieldset>
 
       <label className="block">
-        <span className="text-sm">Short message (optional)</span>
+        <span className="text-sm">{t("noteLabel")}</span>
         <textarea name="responseNote" rows={3} className="w-full border rounded px-2 py-1 mt-1" />
       </label>
 
@@ -197,10 +208,10 @@ export default function RateCardForm({
           disabled={pending || uploading}
           className="px-4 py-2 bg-slate-900 text-white rounded"
         >
-          {pending ? "Sending…" : "Send response"}
+          {pending ? t("sending") : t("submitButton")}
         </button>
         <a href={unsubscribeHref} className="text-sm text-slate-500 underline">
-          Unsubscribe
+          {t("unsubscribeLink")}
         </a>
       </div>
     </form>

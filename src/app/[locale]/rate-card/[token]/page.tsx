@@ -1,3 +1,4 @@
+import { getTranslations } from "next-intl/server";
 import { findRateCardRequestByToken, markRateCardOpened } from "@/lib/outreach/campaign";
 import { checkRateCardRequest } from "@/lib/outreach/tokens";
 import { submitRateCardAction } from "./actions";
@@ -14,13 +15,14 @@ export default async function RateCardPage({
 }) {
   const { locale, token } = await params;
   const sp = await searchParams;
+  const t = await getTranslations({ locale, namespace: "rateCard" });
   const req = await findRateCardRequestByToken(token);
 
   if (!req) {
     return (
       <main className="p-8 max-w-prose mx-auto">
-        <h1 className="text-xl font-semibold">Link not found</h1>
-        <p className="mt-2">This rate-card link is invalid.</p>
+        <h1 className="text-xl font-semibold">{t("pageTitle")}</h1>
+        <p className="mt-2">{t("statusNotFound")}</p>
       </main>
     );
   }
@@ -33,15 +35,15 @@ export default async function RateCardPage({
 
   if (!verdict || !verdict.ok) {
     const reason = verdict && !verdict.ok ? verdict.reason : "expired";
-    const messageMap: Record<string, string> = {
-      expired: "This link has expired.",
-      responded: "Thanks — we've already received your response.",
-      cancelled: "This request has been cancelled.",
-    };
+    const statusKey = reason === "responded"
+      ? "statusResponded"
+      : reason === "cancelled"
+        ? "statusCancelled"
+        : "statusExpired";
     return (
       <main className="p-8 max-w-prose mx-auto">
-        <h1 className="text-xl font-semibold">Rate card request</h1>
-        <p className="mt-2">{messageMap[reason]}</p>
+        <h1 className="text-xl font-semibold">{t("pageTitle")}</h1>
+        <p className="mt-2">{t(statusKey as "statusExpired" | "statusResponded" | "statusCancelled")}</p>
       </main>
     );
   }
@@ -50,25 +52,22 @@ export default async function RateCardPage({
 
   return (
     <main className="p-8 max-w-3xl mx-auto">
-      <h1 className="text-2xl font-semibold">Rate card request</h1>
+      <h1 className="text-2xl font-semibold">{t("pageTitle")}</h1>
       <p className="mt-2 text-slate-700">
-        Send us current native rate cards for the {req.titles.length}{" "}
-        {req.titles.length === 1 ? "title" : "titles"} below. Link valid until{" "}
-        {req.expiresAt.toISOString().slice(0, 10)}.
+        {t("intro", { count: req.titles.length })}{" "}
+        {t("linkValidUntil", { date: req.expiresAt.toISOString().slice(0, 10) })}
       </p>
       {sp.error === "empty" && (
-        <p className="mt-2 text-red-700">
-          Please fill in at least one of: file, link, prices, or a note.
-        </p>
+        <p className="mt-2 text-red-700">{t("errorEmpty")}</p>
       )}
       {sp.error === "rate" && (
-        <p className="mt-2 text-red-700">Too many submissions — please wait a moment.</p>
+        <p className="mt-2 text-red-700">{t("errorRate")}</p>
       )}
       <ul className="mt-3 text-sm text-slate-700 list-disc pl-5">
-        {req.titles.map((t) => (
-          <li key={t.titleId}>
-            {t.title.name}{" "}
-            <span className="text-slate-500">({t.title.market.code})</span>
+        {req.titles.map((titleEntry) => (
+          <li key={titleEntry.titleId}>
+            {titleEntry.title.name}{" "}
+            <span className="text-slate-500">({titleEntry.title.market.code})</span>
           </li>
         ))}
       </ul>
@@ -76,10 +75,10 @@ export default async function RateCardPage({
       <RateCardForm
         token={token}
         locale={locale}
-        titles={req.titles.map((t) => ({
-          titleId: t.titleId,
-          name: t.title.name,
-          marketCode: t.title.market.code,
+        titles={req.titles.map((titleEntry) => ({
+          titleId: titleEntry.titleId,
+          name: titleEntry.title.name,
+          marketCode: titleEntry.title.market.code,
         }))}
         defaultName={req.recipientName ?? ""}
         defaultEmail={req.recipientEmail}
