@@ -12,6 +12,24 @@ import {
 
 export const dynamic = "force-dynamic";
 
+type ChannelTitle = { salesChannel: "DIRECT" | "IN_HOUSE" | "REP" | null; adSales: string | null };
+
+// Collapse a publisher's titles into a single "direct or not" badge.
+function channelBadge(titles: ChannelTitle[]) {
+  const channels = new Set(titles.map((t) => t.salesChannel).filter(Boolean));
+  if (channels.size === 0) return { label: "—", cls: "bg-slate-100 text-slate-500", house: "" };
+  if (channels.size > 1) return { label: "Mixed", cls: "bg-amber-100 text-amber-800", house: "" };
+
+  const ch = [...channels][0];
+  // For non-direct titles, surface which house sells their ads.
+  const houses = [...new Set(titles.map((t) => t.adSales).filter(Boolean))];
+  const house = ch === "DIRECT" ? "" : houses.slice(0, 1).join("");
+
+  if (ch === "DIRECT") return { label: "Direct", cls: "bg-emerald-100 text-emerald-800", house };
+  if (ch === "IN_HOUSE") return { label: "In-house arm", cls: "bg-sky-100 text-sky-800", house };
+  return { label: "Rep house", cls: "bg-rose-100 text-rose-800", house };
+}
+
 export default async function PublisherContactsPage({
   params,
   searchParams,
@@ -169,7 +187,7 @@ export default async function PublisherContactsPage({
         select: {
           name: true,
           countryCode: true,
-          titles: { select: { id: true } },
+          titles: { select: { id: true, salesChannel: true, adSales: true } },
         },
       },
     },
@@ -179,6 +197,16 @@ export default async function PublisherContactsPage({
     by: ["status"],
     _count: { _all: true },
   });
+
+  const channelCounts = await prisma.title.groupBy({
+    by: ["salesChannel"],
+    _count: { _all: true },
+  });
+  const channelLabels: Record<string, string> = {
+    DIRECT: "Direct",
+    IN_HOUSE: "In-house arm",
+    REP: "Rep house",
+  };
 
   return (
     <div className="p-6 space-y-6">
@@ -200,6 +228,18 @@ export default async function PublisherContactsPage({
             <strong>{c._count._all}</strong>
           </div>
         ))}
+      </section>
+
+      <section className="text-sm text-slate-600">
+        <span className="text-slate-500 mr-2">Titles by channel:</span>
+        {channelCounts
+          .filter((c) => c.salesChannel)
+          .map((c) => (
+            <span key={c.salesChannel} className="mr-3">
+              {channelLabels[c.salesChannel as string] ?? c.salesChannel}{" "}
+              <strong>{c._count._all}</strong>
+            </span>
+          ))}
       </section>
 
       <section>
@@ -225,6 +265,7 @@ export default async function PublisherContactsPage({
           <tr className="text-left text-slate-500 border-b">
             <th className="pb-2 pr-4">Publisher</th>
             <th className="pb-2 pr-4">Market</th>
+            <th className="pb-2 pr-4">Channel</th>
             <th className="pb-2 pr-4">Titles</th>
             <th className="pb-2 pr-4">Candidate</th>
             <th className="pb-2 pr-4">Conf.</th>
@@ -233,10 +274,20 @@ export default async function PublisherContactsPage({
           </tr>
         </thead>
         <tbody>
-          {candidates.map((c) => (
+          {candidates.map((c) => {
+            const badge = channelBadge(c.publisher.titles);
+            return (
             <tr key={c.id} className="border-t align-top">
               <td className="py-2 pr-4">{c.publisher.name}</td>
               <td className="py-2 pr-4">{c.publisher.countryCode}</td>
+              <td className="py-2 pr-4">
+                <span className={`inline-block rounded px-2 py-0.5 text-xs font-medium ${badge.cls}`}>
+                  {badge.label}
+                </span>
+                {badge.house && (
+                  <div className="text-slate-500 text-xs mt-1">{badge.house}</div>
+                )}
+              </td>
               <td className="py-2 pr-4">{c.publisher.titles.length}</td>
               <td className="py-2 pr-4">
                 <div>{c.name ?? "—"}</div>
@@ -267,7 +318,8 @@ export default async function PublisherContactsPage({
                 </form>
               </td>
             </tr>
-          ))}
+            );
+          })}
         </tbody>
       </table>
     </div>

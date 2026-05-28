@@ -258,6 +258,9 @@ model Title {
   // Kept to preserve CSV import lineage. Will be dropped once admin has
   // finished curating SalesContact rows for every active title.
   adSales       String?
+  // Clean, queryable classification of `adSales` — drives outreach routing
+  // and the desk "direct or not" badge. Backfilled from `adSales`.
+  salesChannel  SalesChannel?
   locationNote  String? // CSV "Location / Note" — city or short note
   circulation   Int?    // CSV "Circulation"
   vertical      String? // CSV "Vertical" — News (National), B2B – Energy, ...
@@ -286,6 +289,7 @@ model Title {
   @@index([reach])
   @@index([frequency])
   @@index([ownerGroup])
+  @@index([salesChannel])
 }
 
 model Product {
@@ -459,6 +463,21 @@ enum CandidateStatus {
   PENDING
   APPROVED
   REJECTED
+}
+
+// How a title's advertising is sold — the "direct or not" axis for outreach.
+// Derived from the CSV `adSales` string; see prisma/migrations backfill.
+//   DIRECT   — the publisher sells its own ads; contact the title directly.
+//   IN_HOUSE — the publisher *group's* own ad department (Bonnier News
+//              Brands, Amedia Salg, Schibsted SMS, …). Not a third party —
+//              the most direct route that exists for those titles.
+//   REP      — an independent third-party rep house representing unrelated
+//              titles (HS Media, A2 Media, Salgsfabrikken, Iconic). True
+//              middleman.
+enum SalesChannel {
+  DIRECT
+  IN_HOUSE
+  REP
 }
 
 // In-DB notification inbox. The email adapter (src/lib/notify.ts) also
