@@ -186,6 +186,11 @@
   },
   "titleDetail": {
     "back": "Tilbage til kataloget",
+    "disclosureLabel": {
+      "heading": "Påkrævet mærkning",
+      "body": "vises på hver sponsoreret artikel i dette marked i henhold til lokal markedsføringslovgivning.",
+      "aria": "Påkrævet mærkning for dette marked"
+    },
     "publishedBy": "Udgives af",
     "reach": "Månedlige læsere (samlet)",
     "digitalReach": "Månedlige onlinelæsere",

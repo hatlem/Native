@@ -265,6 +265,11 @@
   },
   "titleDetail": {
     "back": "Zurück zum Katalog",
+    "disclosureLabel": {
+      "heading": "Pflichtkennzeichnung",
+      "body": "wird auf jedem Sponsored Article in diesem Markt gemäß UWG / lokalem Werberecht angezeigt.",
+      "aria": "Pflichtkennzeichnung für diesen Markt"
+    },
     "publishedBy": "Verlegt von",
     "reach": "Monatliche Leser (gesamt)",
     "digitalReach": "Monatliche Online-Leser",

@@ -186,6 +186,11 @@
   },
   "titleDetail": {
     "back": "Tilbake til katalogen",
+    "disclosureLabel": {
+      "heading": "Påkrevd merking",
+      "body": "vises på hver sponset artikkel i dette markedet i henhold til lokal markedsføringslov.",
+      "aria": "Påkrevd merking for dette markedet"
+    },
     "publishedBy": "Utgis av",
     "reach": "Månedlige lesere (totalt)",
     "digitalReach": "Månedlige nettlesere",

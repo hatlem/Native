@@ -2,7 +2,7 @@
 
 import { AuthError } from "next-auth";
 import { redirect } from "next/navigation";
-import { headers } from "next/headers";
+import { cookies, headers } from "next/headers";
 import { after } from "next/server";
 import bcrypt from "bcryptjs";
 import { signIn, signOut } from "@/auth";
@@ -18,6 +18,8 @@ import { passwordChangedEmail } from "@/lib/mail/templates/password-changed";
 import { recordSignIn } from "@/lib/auth-events";
 import { welcomeEmail } from "@/lib/mail/templates/welcome";
 import { checkBusinessEmailWithMx } from "@/lib/email-policy";
+import { PLAN_COOKIE, PLAN_BRIEF_COOKIE } from "@/lib/basket";
+import { CLIENT_COOKIE } from "@/lib/workspace";
 
 async function clientKey(): Promise<string> {
   const h = await headers();
@@ -351,6 +353,18 @@ export async function claimPublisherInvite(formData: FormData) {
 
 export async function logout(formData: FormData) {
   const locale = String(formData.get("locale") || "en");
+  // Clear the basket/brief cookies so the next user on this browser
+  // doesn't inherit the previous session's plan basket. The cookies
+  // are not user-scoped (they predate auth), so we treat sign-out as
+  // the natural "abandon plan" boundary. Found via scenario testing:
+  // a fresh-signup buyer landed on /plan with the prior user's lines
+  // already selected.
+  const store = await cookies();
+  store.delete(PLAN_COOKIE);
+  store.delete(PLAN_BRIEF_COOKIE);
+  // Also drop the agency client-switch cookie so a logout doesn't
+  // leave the next user with someone else's client context.
+  store.delete(CLIENT_COOKIE);
   await signOut({ redirectTo: `/${locale}` });
 }
 

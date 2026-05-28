@@ -8,6 +8,8 @@ import { indicativeFromRules, toRateRules, formatMoney } from "@/lib/money";
 import { isProductPriceShown, arePricesVisible } from "@/lib/pricing-visibility";
 import { addToPlan } from "@/app/actions";
 import { SubmitButton } from "@/components";
+import { localizeTaxonomy, localizeVertical } from "@/lib/taxonomy-i18n";
+import type { AppLocale } from "@/i18n/routing";
 
 export const dynamic = "force-dynamic";
 
@@ -149,12 +151,12 @@ export default async function TitleDetailPage({
             flexWrap: "wrap",
           }}
         >
-          {title.type ? <span className="tag">{title.type}</span> : null}
+          {title.type ? <span className="tag">{localizeTaxonomy(title.type, locale as AppLocale)}</span> : null}
           {title.frequency ? (
-            <span className="tag">{title.frequency}</span>
+            <span className="tag">{localizeTaxonomy(title.frequency, locale as AppLocale)}</span>
           ) : null}
-          {title.b2bB2c ? <span className="tag">{title.b2bB2c}</span> : null}
-          {title.format ? <span className="tag">{title.format}</span> : null}
+          {title.b2bB2c ? <span className="tag">{localizeTaxonomy(title.b2bB2c, locale as AppLocale)}</span> : null}
+          {title.format ? <span className="tag">{localizeTaxonomy(title.format, locale as AppLocale)}</span> : null}
           {title.nativeFit ? (
             <span className="tag">
               {t("nativeFitTag", { value: title.nativeFit })}
@@ -165,11 +167,32 @@ export default async function TitleDetailPage({
       ) : null}
       {title.vertical ? (
         <p className="muted" style={{ marginTop: 8 }}>
-          {title.vertical}
+          {localizeVertical(title.vertical, locale as AppLocale)}
         </p>
       ) : null}
       {title.audience ? (
-        <p className="muted">{title.audience}</p>
+        <p className="muted">{localizeVertical(title.audience, locale as AppLocale)}</p>
+      ) : null}
+
+      {/* Market-level disclosure label — surfaced BEFORE the quote so
+          regulated buyers (UWG-DE/AT, KSML-FI, CAP-UK, ASAI-IE) can
+          confirm what label the platform will require on published
+          native content. Closes the Linnea scenario finding that the
+          per-market regulatory floor was invisible until quote stage. */}
+      {title.market.disclosureLabel ? (
+        <p
+          className="muted"
+          style={{ marginTop: 8, fontSize: "0.85em" }}
+          aria-label={t("disclosureLabel.aria")}
+        >
+          <strong>{t("disclosureLabel.heading")}:</strong>{" "}
+          <span className="tag" style={{ marginLeft: 4 }}>
+            “{title.market.disclosureLabel}”
+          </span>{" "}
+          <span style={{ marginLeft: 4 }}>
+            {t("disclosureLabel.body")}
+          </span>
+        </p>
       ) : null}
 
       {needsQuote ? (

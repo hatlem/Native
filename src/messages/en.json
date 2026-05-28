@@ -265,6 +265,11 @@
   },
   "titleDetail": {
     "back": "Back to catalog",
+    "disclosureLabel": {
+      "heading": "Required disclosure label",
+      "body": "shown on every sponsored article in this market per local advertising regulation.",
+      "aria": "Required disclosure label for this market"
+    },
     "publishedBy": "Published by",
     "reach": "Monthly readers (combined)",
     "digitalReach": "Monthly online readers",

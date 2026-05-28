@@ -475,8 +475,43 @@ model ApiKey {
   expiresAt      DateTime?
   revokedAt      DateTime?
 
+  webhooks PartnerWebhook[]
+
   @@index([organizationId])
   @@index([revokedAt])
+}
+
+// Partner-program webhook subscription (v0). Lets an API-key holder
+// subscribe to catalog-state events (title activated / deactivated /
+// price changed) so they don't need to poll. v0 ships a single in-
+// process delivery attempt with HMAC-SHA256 signing of the body; if
+// the receiver returns non-2xx we record `lastErrorAt` + `lastErrorBody`
+// and leave it to the partner to inspect via the desk console. No
+// automatic retry queue + no replay endpoint yet — both are tracked
+// as follow-up. The model is shaped so adding a retry job later is a
+// schema-stable change (deliveryAttempts + queueRetryAt fields).
+model PartnerWebhook {
+  id             String   @id @default(cuid())
+  apiKeyId       String
+  apiKey         ApiKey   @relation(fields: [apiKeyId], references: [id])
+  // Comma-separated event types. v0 known kinds: "title.activated",
+  // "title.deactivated", "title.price_changed". Receivers MUST tolerate
+  // unknown future event kinds rather than 4xx them.
+  events         String   @default("title.activated,title.deactivated")
+  targetUrl      String
+  // 32 bytes hex — used for HMAC-SHA256 of the JSON body. Issued at
+  // create time, surfaced once via the same flash-cookie pattern as
+  // raw API tokens. Rotation = create new webhook, delete old.
+  secretHash     String
+  createdBy      String
+  createdAt      DateTime @default(now())
+  lastDeliveryAt DateTime?
+  lastErrorAt    DateTime?
+  lastErrorBody  String?
+  disabledAt     DateTime?
+
+  @@index([apiKeyId])
+  @@index([disabledAt])
 }
 
 // Async job queue. Phase 0 ships an in-process runner (src/lib/jobs.ts);

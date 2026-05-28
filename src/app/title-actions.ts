@@ -14,6 +14,7 @@ import {
 } from "@/lib/publisher-invite";
 import { blueprintFor, basePriceFor } from "@/lib/activation-blueprint";
 import { checkBusinessEmailWithMx } from "@/lib/email-policy";
+import { fireWebhook } from "@/lib/webhooks";
 
 function field(formData: FormData, key: string): string {
   const v = formData.get(key);
@@ -106,6 +107,15 @@ export async function markTitleNative(formData: FormData) {
   await recordAudit(userId, "title.mark_native", `Title:${title.id}`, {
     name: title.name,
     market: title.marketId,
+  });
+  // Fire partner webhook (v0) — receivers subscribed to title.activated
+  // get a signed POST so they can refresh their catalog cache without
+  // polling. Failure is silent + visible via PartnerWebhook.lastErrorAt.
+  fireWebhook("title.activated", {
+    title_id: title.id,
+    slug: title.slug,
+    name: title.name,
+    market_id: title.marketId,
   });
   redirect(`/${locale}/desk/titles`);
 }
@@ -364,6 +374,12 @@ export async function deactivateTitle(formData: FormData) {
   });
   await recordAudit(userId, "title.deactivate", `Title:${title.id}`, {
     name: title.name,
+  });
+  fireWebhook("title.deactivated", {
+    title_id: title.id,
+    slug: title.slug,
+    name: title.name,
+    market_id: title.marketId,
   });
   redirect(`/${locale}/desk/titles`);
 }

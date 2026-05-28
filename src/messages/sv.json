@@ -186,6 +186,11 @@
   },
   "titleDetail": {
     "back": "Tillbaka till katalogen",
+    "disclosureLabel": {
+      "heading": "Obligatorisk märkning",
+      "body": "visas på varje sponsrad artikel i denna marknad enligt lokal marknadsföringslag.",
+      "aria": "Obligatorisk märkning för denna marknad"
+    },
     "publishedBy": "Ges ut av",
     "reach": "Månatliga läsare (totalt)",
     "digitalReach": "Månatliga onlineläsare",

@@ -265,6 +265,11 @@
   },
   "titleDetail": {
     "back": "Takaisin katalogiin",
+    "disclosureLabel": {
+      "heading": "Pakollinen merkintä",
+      "body": "näkyy jokaisessa sponsoroidussa artikkelissa tällä markkinalla paikallisen markkinointilain mukaisesti.",
+      "aria": "Pakollinen merkintä tällä markkinalla"
+    },
     "publishedBy": "Julkaisija",
     "reach": "Kuukausittaiset lukijat (yhteensä)",
     "digitalReach": "Kuukausittaiset verkkolukijat",
