@@ -113,3 +113,8 @@ export const rfqLimiter = new RateLimiter(20, 20 / 60); // 20 per minute
 // GDPR data export — heavy DB read, capped per user. Refill is so slow
 // that hitting the floor effectively blocks until the next hour.
 export const exportLimiter = new RateLimiter(5, 5 / 3600); // 5 per hour
+// Outreach campaign sending. Bucket per-process — the CLI batch
+// honours the same limiter as the desk-UI "Send" button so concurrent
+// runs can't exceed our daily/hourly caps. Defaults to ~8/hour which
+// is the Gmail/Yahoo "casual sender" sweet spot during domain warmup.
+export const outreachLimiter = new RateLimiter(8, 8 / 3600);
