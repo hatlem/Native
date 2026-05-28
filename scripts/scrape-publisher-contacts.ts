@@ -78,7 +78,14 @@ async function main() {
       console.log(`[${i + 1}/${publishers.length}] ${pub.name} — no URL`);
       continue;
     }
-    const root = url.replace(/\/+[^/]*$/, "").replace(/^(https?:\/\/[^/]+).*$/, "$1");
+    let root: string;
+    try {
+      root = new URL(url).origin;
+    } catch {
+      errors++;
+      console.error(`[${i + 1}/${publishers.length}] ${pub.name} — ERROR invalid URL ${JSON.stringify(url)}`);
+      continue;
+    }
     try {
       const result = await scrapePublisher({
         publisherId: pub.id,
