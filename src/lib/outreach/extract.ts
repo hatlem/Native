@@ -1,4 +1,5 @@
 import * as cheerio from "cheerio";
+import type { AnyNode } from "domhandler";
 import { SALES_VOCAB_RE, type CandidateHints } from "./scoring";
 
 export type ExtractedCandidate = {
@@ -84,7 +85,7 @@ export function extractCandidates(args: ExtractArgs): ExtractedCandidate[] {
 
 function inferNameAndRole(
   $: cheerio.CheerioAPI,
-  el: cheerio.AnyNode,
+  el: AnyNode,
 ): { name: string | null; role: string | null } {
   const $el = $(el);
 
@@ -120,7 +121,7 @@ function splitRoleAndName(s: string): { name: string | null; role: string | null
   return { name: s, role: null };
 }
 
-function extractNearbyPhone($: cheerio.CheerioAPI, el: cheerio.AnyNode): string | null {
+function extractNearbyPhone($: cheerio.CheerioAPI, el: AnyNode): string | null {
   const txt = $(el).closest("dd, li, p, tr, address").text();
   const m = txt.match(PHONE_RE);
   return m ? m[0].trim() : null;

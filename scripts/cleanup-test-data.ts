@@ -19,7 +19,7 @@ async function main() {
   for (const c of sc) console.log(" sales-contact:", c.id, c.email, c.name);
 
   const prs = await p.priceRequest.findMany({ where: { salesContact: { email: { in: TEST_EMAILS } } } });
-  for (const pr of prs) console.log(" price-req:", pr.id, "status:", pr.status);
+  for (const pr of prs) console.log(" price-req:", pr.id);
 
   console.log("\n== DELETING ==");
   // Order matters: child rows first.
