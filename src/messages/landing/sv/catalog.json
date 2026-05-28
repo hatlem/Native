@@ -9,7 +9,7 @@
   "thFormat": "Format",
   "thAudience": "Läsare / mån",
   "readersSuffix": "läsare",
-  "footBody": "Katalogen är åtkomststyrd – konkurrensstrategisk, av design. När du är verifierad ser du alla {nordicCount}+ titlar, fullständiga specifikationer, ledtider och live tillgänglighet.",
+  "footBody": "Katalogen är åtkomststyrd – konkurrensstrategisk, av design. När du är verifierad ser du alla {totalCount}+ titlar, fullständiga specifikationer, ledtider och live tillgänglighet.",
   "fmtSponsoredArticleAds": "Sponsrad artikel + annonser",
   "fmtNewsPremiumWeekly": "Nyhet · Premium veckovis",
   "fmtBusinessDaily": "Näringsliv dagligt",

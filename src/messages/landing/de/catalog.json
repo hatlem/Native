@@ -9,7 +9,7 @@
   "thFormat": "Format",
   "thAudience": "Reichweite / Mo.",
   "readersSuffix": "Leser",
-  "footBody": "Der Katalog ist zugangsgeschützt — wettbewerbsbewusst, mit Absicht. Nach Verifizierung sehen Sie alle 3.000+ Titel, vollständige Specs, Vorlaufzeiten und Live-Verfügbarkeit.",
+  "footBody": "Der Katalog ist zugangsgeschützt — wettbewerbsbewusst, mit Absicht. Nach Verifizierung sehen Sie alle {totalCount}+ Titel, vollständige Specs, Vorlaufzeiten und Live-Verfügbarkeit.",
   "fmtSponsoredArticleAds": "Sponsored Article + Ads",
   "fmtNewsPremiumWeekly": "News · Premium-Wochenzeitung",
   "fmtBusinessDaily": "Wirtschaftstageszeitung",

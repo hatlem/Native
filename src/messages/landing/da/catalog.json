@@ -9,7 +9,7 @@
   "thFormat": "Format",
   "thAudience": "Læsere / md",
   "readersSuffix": "læsere",
-  "footBody": "Kataloget er adgangsstyret – konkurrencestrategisk, ved design. Når du er verificeret, ser du alle {nordicCount}+ titler, fulde specifikationer, leveringstider og live tilgængelighed.",
+  "footBody": "Kataloget er adgangsstyret – konkurrencestrategisk, ved design. Når du er verificeret, ser du alle {totalCount}+ titler, fulde specifikationer, leveringstider og live tilgængelighed.",
   "fmtSponsoredArticleAds": "Annoncørartikel + annoncer",
   "fmtNewsPremiumWeekly": "Nyhed · Premium ugentligt",
   "fmtBusinessDaily": "Erhverv dagligt",

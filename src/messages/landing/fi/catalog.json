@@ -8,7 +8,7 @@
   "thFormat": "Formaatti",
   "thAudience": "Yleisö / kk",
   "readersSuffix": "lukijaa",
-  "footBody": "Katalogi on käyttöoikeuden takana — kilpailusyistä. Vahvistuksen jälkeen näet kaikki 3 000+ julkaisua, täydet spesifikaatiot, toimitusajat ja live-saatavuuden.",
+  "footBody": "Katalogi on käyttöoikeuden takana — kilpailusyistä. Vahvistuksen jälkeen näet kaikki {totalCount}+ julkaisua, täydet spesifikaatiot, toimitusajat ja live-saatavuuden.",
   "fmtSponsoredArticleAds": "Sponsoroitu artikkeli + mainokset",
   "fmtNewsPremiumWeekly": "Uutiset · Premium-viikkolehti",
   "fmtBusinessDaily": "Talouspäivälehti",

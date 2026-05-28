@@ -9,7 +9,7 @@
   "thFormat": "Format",
   "thAudience": "Audience / mo",
   "readersSuffix": "readers",
-  "footBody": "The catalog is access-gated — competitive, by design. Once verified, you see all {nordicCount}+ titles, full specs, lead times and live availability.",
+  "footBody": "The catalog is access-gated — competitive, by design. Once verified, you see all {totalCount}+ titles, full specs, lead times and live availability.",
   "fmtSponsoredArticleAds": "Sponsored article + ads",
   "fmtNewsPremiumWeekly": "News · Premium weekly",
   "fmtBusinessDaily": "Business daily",
