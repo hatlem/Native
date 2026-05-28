@@ -198,10 +198,11 @@ model Publisher {
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
 
-  titles        Title[]
-  users         User[]
-  invites       PublisherInvite[]
-  salesContacts SalesContact[]
+  titles             Title[]
+  users              User[]
+  invites            PublisherInvite[]
+  salesContacts      SalesContact[]
+  contactCandidates  ContactCandidate[]
 
   @@unique([marketId, name])
   @@index([countryCode])
@@ -273,6 +274,7 @@ model Title {
   products          Product[]
   salesContactLinks SalesContactTitle[]
   priceRequests     PriceRequest[]
+  rateCardRequests  RateCardRequestTitle[]
 
   @@index([countryCode])
   @@index([type])
@@ -403,8 +405,9 @@ model User {
   notifications          Notification[]
   magicLinkTokens        MagicLinkToken[]
   passwordResetTokens    PasswordResetToken[]
-  priceRequestsRequested PriceRequest[] @relation("PriceRequestRequester")
-  priceQuotesApplied     PriceQuote[]   @relation("PriceQuoteApplier")
+  priceRequestsRequested PriceRequest[]     @relation("PriceRequestRequester")
+  priceQuotesApplied     PriceQuote[]       @relation("PriceQuoteApplier")
+  rateCardRequests       RateCardRequest[]  @relation("RateCardRequestCreator")
 }
 
 // Super-admin emits these when activating a new publishing house in
@@ -428,6 +431,34 @@ model PublisherInvite {
 
   @@index([publisherId])
   @@index([email])
+}
+
+// Scraper output queued for admin review. Approved candidates become SalesContact rows.
+model ContactCandidate {
+  id             String          @id @default(cuid())
+  publisherId    String
+  publisher      Publisher       @relation(fields: [publisherId], references: [id], onDelete: Cascade)
+  email          String
+  name           String?
+  role           String?
+  phone          String?
+  sourceUrl      String
+  confidence     Int
+  status         CandidateStatus @default(PENDING)
+  reviewedById   String?
+  reviewedAt     DateTime?
+  salesContactId String?
+  createdAt      DateTime        @default(now())
+  updatedAt      DateTime        @updatedAt
+
+  @@unique([publisherId, email])
+  @@index([status])
+}
+
+enum CandidateStatus {
+  PENDING
+  APPROVED
+  REJECTED
 }
 
 // In-DB notification inbox. The email adapter (src/lib/notify.ts) also
@@ -898,4 +929,62 @@ model PriceQuote {
   @@index([productId])
   @@index([priceRequestId])
   @@index([appliedAt])
+}
+
+// One row = one recipient = one campaign thread = one token.
+// Spans potentially many titles across many publishers (sales-house case).
+model RateCardRequest {
+  id                String                  @id @default(cuid())
+  recipientEmail    String
+  recipientName     String?
+  locale            String
+  token             String                  @unique
+  sentCount         Int                     @default(0)
+  lastStepAt        DateTime?
+  nextStepAt        DateTime?
+  sentAt            DateTime?
+  openedAt          DateTime?
+  respondedAt       DateTime?
+  cancelledAt       DateTime?
+  expiresAt         DateTime
+  mediaKitUrl       String?
+  mediaKitObjectKey String?
+  responseNote      String?
+  formatsOffered    String[]
+  contactName       String?
+  contactEmail      String?
+  contactRole       String?
+  responseData      Json?
+  responseSource    RateCardResponseSource?
+  createdById       String
+  createdBy         User                    @relation("RateCardRequestCreator", fields: [createdById], references: [id])
+  createdAt         DateTime                @default(now())
+  updatedAt         DateTime                @updatedAt
+  titles            RateCardRequestTitle[]
+
+  @@index([recipientEmail])
+  @@index([nextStepAt, respondedAt, cancelledAt])
+  @@index([respondedAt])
+}
+
+enum RateCardResponseSource {
+  FORM
+  EMAIL
+}
+
+model RateCardRequestTitle {
+  rateCardRequestId String
+  rateCardRequest   RateCardRequest @relation(fields: [rateCardRequestId], references: [id], onDelete: Cascade)
+  titleId           String
+  title             Title           @relation(fields: [titleId], references: [id], onDelete: Cascade)
+
+  @@id([rateCardRequestId, titleId])
+  @@index([titleId])
+}
+
+// Email suppression list — recipients who unsubscribed, bounced, or were manually excluded.
+model OutreachSuppression {
+  email     String   @id
+  reason    String
+  createdAt DateTime @default(now())
 }
