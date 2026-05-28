@@ -1798,7 +1798,10 @@
     "thanksTitle": "Takk!",
     "thanksBody": "Vi har mottatt svaret ditt. Vi tar kontakt når en relevant henvendelse kommer.",
     "unsubscribedTitle": "Avregistrert",
-    "unsubscribedBody": "Du vil ikke motta flere e-poster fra NativeSpin. Ta gjerne kontakt om det endrer seg."
+    "unsubscribedBody": "Du vil ikke motta flere e-poster fra NativeSpin. Ta gjerne kontakt om det endrer seg.",
+    "uploadButton": "Velg fil",
+    "uploadNoFile": "Ingen fil valgt",
+    "orSeparator": "eller"
   },
   "account": {
     "eyebrow": "Konto",

@@ -1694,6 +1694,9 @@
     "thanksTitle": "Vielen Dank!",
     "thanksBody": "Ihre Antwort ist eingegangen. Wir melden uns, wenn ein passendes Briefing vorliegt.",
     "unsubscribedTitle": "Abgemeldet",
-    "unsubscribedBody": "Sie erhalten keine weiteren E-Mails von NativeSpin. Melden Sie sich gern, falls sich das ändert."
+    "unsubscribedBody": "Sie erhalten keine weiteren E-Mails von NativeSpin. Melden Sie sich gern, falls sich das ändert.",
+    "uploadButton": "Datei wählen",
+    "uploadNoFile": "Keine Datei ausgewählt",
+    "orSeparator": "oder"
   }
 }

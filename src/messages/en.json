@@ -1797,7 +1797,10 @@
     "thanksTitle": "Thanks!",
     "thanksBody": "Your response is in. We'll be in touch when a relevant brief lands.",
     "unsubscribedTitle": "Unsubscribed",
-    "unsubscribedBody": "You will not receive further outreach from NativeSpin. Reach out at any time if that changes."
+    "unsubscribedBody": "You will not receive further outreach from NativeSpin. Reach out at any time if that changes.",
+    "uploadButton": "Choose file",
+    "uploadNoFile": "No file selected",
+    "orSeparator": "or"
   },
   "account": {
     "eyebrow": "Account",

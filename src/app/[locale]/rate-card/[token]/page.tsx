@@ -82,7 +82,6 @@ export default async function RateCardPage({
         }))}
         defaultName={req.recipientName ?? ""}
         defaultEmail={req.recipientEmail}
-        unsubscribeHref={`/${locale}/rate-card/${token}/unsubscribe`}
         submitAction={submitRateCardAction}
       />
     </main>

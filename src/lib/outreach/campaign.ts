@@ -143,16 +143,25 @@ export async function sendRateCardStep(args: {
     unsubscribeLink: unsubLink,
   });
 
+  // Only the final breakaway email (bump2) carries an opt-out. The initial
+  // inquiry and first nudge are pure business asks — surfacing unsubscribe
+  // there would let publishers opt out before we ever get prices, which
+  // costs them sales to our advertisers too. (At 20/day we're far below the
+  // bulk-sender threshold that would mandate List-Unsubscribe everywhere.)
   await emailAdapter({
     to: req.recipientEmail,
     subject: built.subject,
     text: built.text,
     from: process.env.OUTREACH_FROM,
     replyTo: process.env.OUTREACH_REPLY_TO,
-    headers: {
-      "List-Unsubscribe": `<${unsubLink}>`,
-      "List-Unsubscribe-Post": "List-Unsubscribe=One-Click",
-    },
+    ...(step === "bump2"
+      ? {
+          headers: {
+            "List-Unsubscribe": `<${unsubLink}>`,
+            "List-Unsubscribe-Post": "List-Unsubscribe=One-Click",
+          },
+        }
+      : {}),
   });
 
   const now = new Date();

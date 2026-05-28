@@ -1836,6 +1836,9 @@
     "thanksTitle": "Kiitos!",
     "thanksBody": "Olemme saaneet vastauksesi. Otamme yhteyttä, kun olennainen kysely tulee.",
     "unsubscribedTitle": "Tilaus peruutettu",
-    "unsubscribedBody": "Et saa enää viestejä NativeSpiniltä. Otathan yhteyttä, jos tilanne muuttuu."
+    "unsubscribedBody": "Et saa enää viestejä NativeSpiniltä. Otathan yhteyttä, jos tilanne muuttuu.",
+    "uploadButton": "Valitse tiedosto",
+    "uploadNoFile": "Ei tiedostoa valittu",
+    "orSeparator": "tai"
   }
 }

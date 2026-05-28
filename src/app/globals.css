@@ -4095,3 +4095,118 @@ footer a:hover {
     animation-duration: 0.01ms !important;
   }
 }
+
+/* ---------- Rate-card response form ---------- */
+.rc-form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--s-5);
+  margin-top: var(--s-6);
+}
+.rc-card {
+  gap: var(--s-4);
+}
+.rc-card-title {
+  font-family: var(--font-display);
+  font-size: 1.05rem;
+  font-weight: 600;
+  color: var(--heading);
+  margin: 0;
+}
+.rc-file {
+  display: flex;
+  align-items: center;
+  gap: var(--s-3);
+  cursor: pointer;
+}
+.rc-file-name {
+  font-size: 0.9rem;
+  color: var(--muted);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.rc-ok {
+  font-size: 0.82rem;
+  color: var(--success);
+  font-weight: 540;
+}
+.rc-or {
+  display: flex;
+  align-items: center;
+  gap: var(--s-3);
+  font-size: 0.8rem;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+.rc-or::before,
+.rc-or::after {
+  content: "";
+  flex: 1;
+  height: 1px;
+  background: var(--border);
+}
+.rc-details > summary {
+  cursor: pointer;
+  font-size: 0.9rem;
+  font-weight: 540;
+  color: var(--accent);
+  padding: var(--s-2) 0;
+}
+.rc-rates {
+  display: flex;
+  flex-direction: column;
+  gap: var(--s-3);
+  margin-top: var(--s-3);
+}
+.rc-rate-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 96px 88px 88px auto;
+  align-items: center;
+  gap: var(--s-2);
+}
+.rc-rate-title {
+  font-size: 0.9rem;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.rc-skip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.82rem;
+  color: var(--muted);
+  white-space: nowrap;
+}
+.rc-formats {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--s-3);
+}
+.rc-check {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--s-2);
+  font-size: 0.92rem;
+}
+.rc-contact-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: var(--s-4);
+}
+.rc-note {
+  margin-top: var(--s-4);
+}
+.rc-actions {
+  display: flex;
+  justify-content: flex-start;
+}
+@media (max-width: 720px) {
+  .rc-rate-row,
+  .rc-formats,
+  .rc-contact-grid {
+    grid-template-columns: 1fr;
+  }
+}

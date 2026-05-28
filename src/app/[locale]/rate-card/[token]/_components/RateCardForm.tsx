@@ -12,7 +12,6 @@ export default function RateCardForm({
   titles,
   defaultName,
   defaultEmail,
-  unsubscribeHref,
   submitAction,
 }: {
   token: string;
@@ -20,11 +19,11 @@ export default function RateCardForm({
   titles: Title[];
   defaultName: string;
   defaultEmail: string;
-  unsubscribeHref: string;
   submitAction: (formData: FormData) => Promise<void>;
 }) {
   const t = useTranslations("rateCard");
   const [objectKey, setObjectKey] = useState<string | null>(null);
+  const [fileName, setFileName] = useState<string | null>(null);
   const [uploadError, setUploadError] = useState<string | null>(null);
   const [uploading, setUploading] = useState(false);
   const [pending, startTransition] = useTransition();
@@ -34,6 +33,7 @@ export default function RateCardForm({
     if (!file) return;
     setUploadError(null);
     setObjectKey(null);
+    setFileName(file.name);
     setUploading(true);
     try {
       const { url, key } = await presignRateCardUpload({
@@ -68,151 +68,122 @@ export default function RateCardForm({
   return (
     <form
       action={(fd) => startTransition(() => submitAction(fd))}
-      className="mt-6 space-y-6"
+      className="rc-form"
       encType="multipart/form-data"
     >
       <input type="hidden" name="token" value={token} />
       <input type="hidden" name="locale" value={locale} />
       <input type="hidden" name="mediaKitObjectKey" value={objectKey ?? ""} />
 
-      <fieldset className="border rounded p-4">
-        <legend className="px-2 text-sm font-medium">{t("sendHeading")}</legend>
+      {/* Send rate card */}
+      <section className="card rc-card">
+        <h2 className="rc-card-title">{t("sendHeading")}</h2>
 
-        <label className="block mb-3">
-          <span className="text-sm">{t("uploadLabel")} ({t("uploadHint")})</span>
-          <input
-            type="file"
-            accept=".pdf,.pptx,.ppt,.png,.jpg,.jpeg"
-            onChange={onFileChange}
-            className="block mt-1"
-          />
-          {uploading && <span className="text-xs text-slate-500">{t("uploading")}</span>}
-          {objectKey && <span className="text-xs text-emerald-700">{t("uploadDone")}</span>}
-          {uploadError && (
-            <span className="text-xs text-red-700">{t("uploadFailed", { error: uploadError })}</span>
-          )}
-        </label>
+        <div className="field">
+          <label htmlFor="rc-file">{t("uploadLabel")}</label>
+          <label className="rc-file" htmlFor="rc-file">
+            <span className="btn secondary small">{t("uploadButton")}</span>
+            <span className="rc-file-name">{fileName ?? t("uploadNoFile")}</span>
+            <input
+              id="rc-file"
+              type="file"
+              accept=".pdf,.pptx,.ppt,.png,.jpg,.jpeg"
+              onChange={onFileChange}
+              hidden
+            />
+          </label>
+          <span className="hint">{t("uploadHint")}</span>
+          {uploading && <span className="hint">{t("uploading")}</span>}
+          {objectKey && <span className="rc-ok">{t("uploadDone")}</span>}
+          {uploadError && <span className="err">{t("uploadFailed", { error: uploadError })}</span>}
+        </div>
 
-        <label className="block mb-3">
-          <span className="text-sm">{t("urlLabel")}</span>
-          <input
-            name="mediaKitUrl"
-            type="url"
-            placeholder={t("urlPlaceholder")}
-            className="block w-full border rounded px-2 py-1 mt-1"
-          />
-        </label>
+        <div className="rc-or">{t("orSeparator")}</div>
 
-        <details className="mt-2">
-          <summary className="cursor-pointer text-sm">{t("ratesLabel")}</summary>
-          <table className="w-full text-sm mt-3">
-            <thead>
-              <tr className="text-left text-slate-500">
-                <th>{t("tableTitle")}</th>
-                <th>{t("tablePrice")}</th>
-                <th>{t("tableCurrency")}</th>
-                <th>{t("tableUnit")}</th>
-                <th>{t("tableSkip")}</th>
-              </tr>
-            </thead>
-            <tbody>
-              {titles.map((titleItem, i) => (
-                <tr key={titleItem.titleId}>
-                  <td>
-                    {titleItem.name}{" "}
-                    <span className="text-slate-500 text-xs">({titleItem.marketCode})</span>
-                  </td>
-                  <td>
-                    <input name={`rates[${i}].titleId`} type="hidden" value={titleItem.titleId} />
-                    <input
-                      name={`rates[${i}].price`}
-                      type="number"
-                      min="0"
-                      step="0.01"
-                      className="w-24 border rounded px-2 py-1"
-                    />
-                  </td>
-                  <td>
-                    <select name={`rates[${i}].currency`} className="border rounded px-2 py-1">
-                      <option>EUR</option>
-                      <option>NOK</option>
-                      <option>SEK</option>
-                      <option>DKK</option>
-                      <option>GBP</option>
-                      <option>CHF</option>
-                    </select>
-                  </td>
-                  <td>
-                    <select name={`rates[${i}].unit`} className="border rounded px-2 py-1">
-                      <option>CPM</option>
-                      <option>CPC</option>
-                      <option>flat</option>
-                    </select>
-                  </td>
-                  <td>
-                    <input name={`rates[${i}].skip`} type="checkbox" />
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+        <div className="field">
+          <label htmlFor="rc-url">{t("urlLabel")}</label>
+          <input id="rc-url" name="mediaKitUrl" type="url" placeholder={t("urlPlaceholder")} />
+        </div>
+
+        <details className="rc-details">
+          <summary>{t("ratesLabel")}</summary>
+          <div className="rc-rates">
+            {titles.map((titleItem, i) => (
+              <div className="rc-rate-row" key={titleItem.titleId}>
+                <div className="rc-rate-title">
+                  {titleItem.name} <span className="muted">({titleItem.marketCode})</span>
+                </div>
+                <input name={`rates[${i}].titleId`} type="hidden" value={titleItem.titleId} />
+                <input
+                  name={`rates[${i}].price`}
+                  type="number"
+                  min="0"
+                  step="0.01"
+                  placeholder={t("tablePrice")}
+                  className="rc-price"
+                  aria-label={`${titleItem.name} ${t("tablePrice")}`}
+                />
+                <select name={`rates[${i}].currency`} aria-label={t("tableCurrency")}>
+                  <option>EUR</option>
+                  <option>NOK</option>
+                  <option>SEK</option>
+                  <option>DKK</option>
+                  <option>GBP</option>
+                  <option>CHF</option>
+                </select>
+                <select name={`rates[${i}].unit`} aria-label={t("tableUnit")}>
+                  <option>CPM</option>
+                  <option>CPC</option>
+                  <option>flat</option>
+                </select>
+                <label className="rc-skip">
+                  <input name={`rates[${i}].skip`} type="checkbox" /> {t("tableSkip")}
+                </label>
+              </div>
+            ))}
+          </div>
         </details>
-      </fieldset>
+      </section>
 
-      <fieldset className="border rounded p-4">
-        <legend className="px-2 text-sm font-medium">{t("formatsLabel")}</legend>
-        <div className="grid grid-cols-2 gap-2 text-sm">
+      {/* Formats */}
+      <section className="card rc-card">
+        <h2 className="rc-card-title">{t("formatsLabel")}</h2>
+        <div className="rc-formats">
           {formats.map(([value, label]) => (
-            <label key={value} className="flex items-center gap-2">
+            <label key={value} className="rc-check">
               <input type="checkbox" name="formatsOffered" value={value} /> {label}
             </label>
           ))}
         </div>
-      </fieldset>
+      </section>
 
-      <fieldset className="border rounded p-4">
-        <legend className="px-2 text-sm font-medium">{t("contactLabel")}</legend>
-        <div className="grid grid-cols-3 gap-3 text-sm">
-          <label>
-            {t("contactName")}
-            <input
-              name="contactName"
-              defaultValue={defaultName}
-              className="w-full border rounded px-2 py-1"
-            />
-          </label>
-          <label>
-            {t("contactEmail")}
-            <input
-              name="contactEmail"
-              type="email"
-              defaultValue={defaultEmail}
-              className="w-full border rounded px-2 py-1"
-            />
-          </label>
-          <label>
-            {t("contactRole")}
-            <input name="contactRole" className="w-full border rounded px-2 py-1" />
-          </label>
+      {/* Contact */}
+      <section className="card rc-card">
+        <h2 className="rc-card-title">{t("contactLabel")}</h2>
+        <div className="rc-contact-grid">
+          <div className="field">
+            <label htmlFor="rc-name">{t("contactName")}</label>
+            <input id="rc-name" name="contactName" defaultValue={defaultName} />
+          </div>
+          <div className="field">
+            <label htmlFor="rc-email">{t("contactEmail")}</label>
+            <input id="rc-email" name="contactEmail" type="email" defaultValue={defaultEmail} />
+          </div>
+          <div className="field">
+            <label htmlFor="rc-role">{t("contactRole")}</label>
+            <input id="rc-role" name="contactRole" />
+          </div>
         </div>
-      </fieldset>
+        <div className="field rc-note">
+          <label htmlFor="rc-msg">{t("noteLabel")}</label>
+          <textarea id="rc-msg" name="responseNote" rows={3} />
+        </div>
+      </section>
 
-      <label className="block">
-        <span className="text-sm">{t("noteLabel")}</span>
-        <textarea name="responseNote" rows={3} className="w-full border rounded px-2 py-1 mt-1" />
-      </label>
-
-      <div className="flex items-center justify-between">
-        <button
-          type="submit"
-          disabled={pending || uploading}
-          className="px-4 py-2 bg-slate-900 text-white rounded"
-        >
+      <div className="rc-actions">
+        <button type="submit" disabled={pending || uploading} className="btn large">
           {pending ? t("sending") : t("submitButton")}
         </button>
-        <a href={unsubscribeHref} className="text-sm text-slate-500 underline">
-          {t("unsubscribeLink")}
-        </a>
       </div>
     </form>
   );

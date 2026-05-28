@@ -9,7 +9,18 @@ let publisherIds: string[] = [];
 let titleIds: string[] = [];
 let salesContactIds: string[] = [];
 
+const TEST_EMAILS = ["shared@saleshouse-test.example", "solo@publisher-test.example"];
+
 before(async () => {
+  // Defensive: clear any leftover state from an interrupted prior run so the
+  // build-idempotency assertions start from a clean slate.
+  const stale = await prisma.rateCardRequest.findMany({ where: { recipientEmail: { in: TEST_EMAILS } }, select: { id: true } });
+  if (stale.length) {
+    await prisma.rateCardRequestTitle.deleteMany({ where: { rateCardRequestId: { in: stale.map((r) => r.id) } } });
+    await prisma.rateCardRequest.deleteMany({ where: { id: { in: stale.map((r) => r.id) } } });
+  }
+  await prisma.outreachSuppression.deleteMany({ where: { email: { in: TEST_EMAILS } } });
+
   const market = await prisma.market.findFirstOrThrow();
   const user = await prisma.user.findFirstOrThrow({ where: { role: { in: ["DESK", "SUPERADMIN"] } } });
   userId = user.id;
@@ -85,12 +96,30 @@ test("sendRateCardStep happy path sends initial, bumps sentCount, sets nextStepA
   assert.deepEqual(result, { sent: "initial" });
   assert.equal(captured.length, 1);
   assert.equal(captured[0].to, "shared@saleshouse-test.example");
-  assert.ok(captured[0].headers?.["List-Unsubscribe"]);
+  // The initial inquiry carries NO opt-out — List-Unsubscribe is reserved
+  // for the final bump2 breakaway email only.
+  assert.equal(captured[0].headers?.["List-Unsubscribe"], undefined);
 
   const after = await prisma.rateCardRequest.findUniqueOrThrow({ where: { id: req.id } });
   assert.equal(after.sentCount, 1);
   assert.ok(after.nextStepAt);
   assert.ok(after.sentAt);
+});
+
+test("sendRateCardStep adds List-Unsubscribe only on the bump2 breakaway", async () => {
+  const captured: Array<{ headers?: Record<string, string> }> = [];
+  setEmailAdapter(async (m) => { captured.push(m as any); });
+
+  const req = await prisma.rateCardRequest.findFirstOrThrow({ where: { recipientEmail: "shared@saleshouse-test.example" } });
+  // Fast-forward to bump2 (sentCount 2 -> step "bump2")
+  await prisma.rateCardRequest.update({ where: { id: req.id }, data: { sentCount: 2, nextStepAt: new Date(0) } });
+  const result = await sendRateCardStep({ requestId: req.id, actorId: userId });
+  assert.deepEqual(result, { sent: "bump2" });
+  assert.ok(captured[0].headers?.["List-Unsubscribe"]);
+  assert.equal(captured[0].headers?.["List-Unsubscribe-Post"], "List-Unsubscribe=One-Click");
+  // Restore sendable state so downstream tests (which reuse shared@) aren't
+  // tripped by the now-terminal sentCount.
+  await prisma.rateCardRequest.update({ where: { id: req.id }, data: { sentCount: 1, nextStepAt: null } });
 });
 
 test("sendRateCardStep skips when respondedAt is set", async () => {

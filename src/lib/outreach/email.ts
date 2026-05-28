@@ -25,6 +25,9 @@ export type BuildArgs = {
   recipientName: string | null;
   titles: TitleRef[];
   link: string;
+  // Only used by the final (bump2) breakaway email — initial + bump1 are
+  // pure business inquiries with no opt-out, since unsubscribing here means
+  // we never get prices and the publisher never gets sold to our advertisers.
   unsubscribeLink: string;
 };
 
@@ -68,8 +71,6 @@ function no_initial(a: BuildArgs): Built {
       `Om du ikke er riktig person til å svare på dette, videresend gjerne internt, svar på denne e-posten, eller gi oss beskjed via lenken.`,
       ``,
       SIGNATURE,
-      ``,
-      `Avregistrer fra videre kommunikasjon: ${a.unsubscribeLink}`,
     ].join("\n"),
   };
 }
@@ -85,8 +86,6 @@ function no_bump1(a: BuildArgs): Built {
       `Du kan også legge dem inn her: ${a.link}`,
       ``,
       SIGNATURE,
-      ``,
-      `Avregistrer: ${a.unsubscribeLink}`,
     ].join("\n"),
   };
 }
@@ -135,8 +134,6 @@ function sv_initial(a: BuildArgs): Built {
       `Om du inte är rätt person att svara på detta, vidarebefordra gärna internt, svara på det här mejlet, eller hör av dig via länken.`,
       ``,
       SIGNATURE,
-      ``,
-      `Avregistrera dig från vidare kommunikation: ${a.unsubscribeLink}`,
     ].join("\n"),
   };
 }
@@ -152,8 +149,6 @@ function sv_bump1(a: BuildArgs): Built {
       `Du kan också lägga in dem här: ${a.link}`,
       ``,
       SIGNATURE,
-      ``,
-      `Avregistrera: ${a.unsubscribeLink}`,
     ].join("\n"),
   };
 }
@@ -202,8 +197,6 @@ function da_initial(a: BuildArgs): Built {
       `Hvis du ikke er rette person til at svare på dette, så videresend gerne internt, svar på denne mail, eller giv os besked via linket.`,
       ``,
       SIGNATURE,
-      ``,
-      `Afmeld dig yderligere kommunikation: ${a.unsubscribeLink}`,
     ].join("\n"),
   };
 }
@@ -219,8 +212,6 @@ function da_bump1(a: BuildArgs): Built {
       `I kan også lægge dem ind her: ${a.link}`,
       ``,
       SIGNATURE,
-      ``,
-      `Afmeld: ${a.unsubscribeLink}`,
     ].join("\n"),
   };
 }
@@ -269,8 +260,6 @@ function fi_initial(a: BuildArgs): Built {
       `Jos et ole oikea henkilö vastaamaan tähän, välitä mielellään sisäisesti, vastaa tähän sähköpostiin tai kerro meille linkin kautta.`,
       ``,
       SIGNATURE,
-      ``,
-      `Peruuta jatkoviestintä: ${a.unsubscribeLink}`,
     ].join("\n"),
   };
 }
@@ -286,8 +275,6 @@ function fi_bump1(a: BuildArgs): Built {
       `Voitte myös syöttää ne tähän: ${a.link}`,
       ``,
       SIGNATURE,
-      ``,
-      `Peruuta: ${a.unsubscribeLink}`,
     ].join("\n"),
   };
 }
@@ -336,8 +323,6 @@ function de_initial(a: BuildArgs): Built {
       `Falls Sie nicht die richtige Ansprechperson sind, leiten Sie diese E-Mail gern intern weiter, antworten Sie darauf oder geben Sie uns über den Link Bescheid.`,
       ``,
       SIGNATURE,
-      ``,
-      `Von weiterer Kommunikation abmelden: ${a.unsubscribeLink}`,
     ].join("\n"),
   };
 }
@@ -353,8 +338,6 @@ function de_bump1(a: BuildArgs): Built {
       `Sie können sie auch hier eintragen: ${a.link}`,
       ``,
       SIGNATURE,
-      ``,
-      `Abmelden: ${a.unsubscribeLink}`,
     ].join("\n"),
   };
 }
@@ -403,8 +386,6 @@ function en_initial(a: BuildArgs): Built {
       `If you're not the right person to answer this, please forward it internally, reply to this email, or let us know via the link.`,
       ``,
       SIGNATURE,
-      ``,
-      `Unsubscribe from further communication: ${a.unsubscribeLink}`,
     ].join("\n"),
   };
 }
@@ -420,8 +401,6 @@ function en_bump1(a: BuildArgs): Built {
       `You can also enter them here: ${a.link}`,
       ``,
       SIGNATURE,
-      ``,
-      `Unsubscribe: ${a.unsubscribeLink}`,
     ].join("\n"),
   };
 }

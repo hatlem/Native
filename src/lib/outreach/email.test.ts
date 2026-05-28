@@ -36,7 +36,8 @@ test("initial NO email contains hook + title list + link + unsubscribe", () => {
   assert.match(built.text, /Aftenposten/);
   assert.match(built.text, /Bergens Tidende/);
   assert.match(built.text, /https:\/\/nativespin\.com\/no\/rate-card\/abc/);
-  assert.match(built.text, /Avregistrer/);
+  // Initial inquiry must NOT offer an opt-out — only the bump2 breakaway does.
+  assert.doesNotMatch(built.text, /Avregistrer/);
 });
 
 test("bump1 is short, references the previous mail, contains link", () => {

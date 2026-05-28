@@ -1836,6 +1836,9 @@
     "thanksTitle": "Tack!",
     "thanksBody": "Vi har fått ditt svar. Vi hör av oss när en relevant förfrågan kommer.",
     "unsubscribedTitle": "Avregistrerad",
-    "unsubscribedBody": "Du kommer inte att få fler mejl från NativeSpin. Hör gärna av dig om det ändras."
+    "unsubscribedBody": "Du kommer inte att få fler mejl från NativeSpin. Hör gärna av dig om det ändras.",
+    "uploadButton": "Välj fil",
+    "uploadNoFile": "Ingen fil vald",
+    "orSeparator": "eller"
   }
 }
