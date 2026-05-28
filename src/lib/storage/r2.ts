@@ -27,6 +27,7 @@ export function buildObjectKey(args: { prefix: string; filename: string }): stri
     .replace(/[^a-z0-9._-]+/g, "-")
     .replace(/\.+/g, ".")          // collapse multiple dots (drops .. traversal)
     .replace(/^[-.]+|[-.]+$/g, "");  // trim leading/trailing -.
+  if (!safe) throw new Error(`filename_sanitises_to_empty:${args.filename}`);
   return `${args.prefix}/${date}/${uuid}-${safe}`;
 }
 
@@ -34,14 +35,15 @@ let _client: S3Client | null = null;
 function client(): S3Client {
   if (_client) return _client;
   const accountId = process.env.R2_ACCOUNT_ID;
+  const accessKeyId = process.env.R2_ACCESS_KEY_ID;
+  const secretAccessKey = process.env.R2_SECRET_ACCESS_KEY;
   if (!accountId) throw new Error("R2_ACCOUNT_ID not set");
+  if (!accessKeyId) throw new Error("R2_ACCESS_KEY_ID not set");
+  if (!secretAccessKey) throw new Error("R2_SECRET_ACCESS_KEY not set");
   _client = new S3Client({
     region: "auto",
     endpoint: `https://${accountId}.r2.cloudflarestorage.com`,
-    credentials: {
-      accessKeyId: process.env.R2_ACCESS_KEY_ID!,
-      secretAccessKey: process.env.R2_SECRET_ACCESS_KEY!,
-    },
+    credentials: { accessKeyId, secretAccessKey },
   });
   return _client;
 }
@@ -56,16 +58,21 @@ export async function presignUpload(args: {
   prefix: string;
   filename: string;
   contentType: string;
+  bytes: number;
   ttlSec?: number;
 }): Promise<{ url: string; key: string }> {
   if (!validateContentType(args.contentType)) {
     throw new Error(`content_type_not_allowed:${args.contentType}`);
+  }
+  if (!isAllowedSize(args.bytes)) {
+    throw new Error(`file_size_not_allowed:${args.bytes}`);
   }
   const key = buildObjectKey({ prefix: args.prefix, filename: args.filename });
   const cmd = new PutObjectCommand({
     Bucket: bucket(),
     Key: key,
     ContentType: args.contentType,
+    ContentLength: args.bytes,
   });
   const url = await getSignedUrl(client(), cmd, { expiresIn: args.ttlSec ?? 300 });
   return { url, key };

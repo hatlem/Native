@@ -1,6 +1,6 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { buildObjectKey, validateContentType, isAllowedSize } from "./r2";
+import { buildObjectKey, validateContentType, isAllowedSize, presignUpload } from "./r2";
 
 test("buildObjectKey composes prefix/timestamp-uuid-filename", () => {
   const key = buildObjectKey({ prefix: "rate-cards", filename: "Bonnier RateCard 2026.pdf" });
@@ -31,4 +31,20 @@ test("isAllowedSize enforces 25 MB cap", () => {
   assert.ok(isAllowedSize(25 * 1024 * 1024));
   assert.ok(!isAllowedSize(25 * 1024 * 1024 + 1));
   assert.ok(!isAllowedSize(0));
+});
+
+test("presignUpload throws on disallowed bytes before any network or key work", async () => {
+  await assert.rejects(
+    () => presignUpload({ prefix: "p", filename: "x.pdf", contentType: "application/pdf", bytes: 0 }),
+    /file_size_not_allowed/,
+  );
+  await assert.rejects(
+    () => presignUpload({ prefix: "p", filename: "x.pdf", contentType: "application/pdf", bytes: 26 * 1024 * 1024 }),
+    /file_size_not_allowed/,
+  );
+});
+
+test("buildObjectKey throws when filename sanitises to empty", () => {
+  assert.throws(() => buildObjectKey({ prefix: "p", filename: "..." }), /filename_sanitises_to_empty/);
+  assert.throws(() => buildObjectKey({ prefix: "p", filename: "@@@" }), /filename_sanitises_to_empty/);
 });
