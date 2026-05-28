@@ -1,6 +1,7 @@
 "use server";
 
 import { redirect } from "next/navigation";
+import { revalidatePath } from "next/cache";
 import { OrderStatus, ContentAssetStatus, BookingStatus } from "@prisma/client";
 import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
@@ -216,6 +217,37 @@ export async function setAssetStatus(formData: FormData) {
 //     notification with the reason, so neither learns about it from
 //     calendar absence
 //   - audit row records actor + reason for any later dispute
+// Update the post-order follow-up commitment note on the order. Lets
+// the desk capture forward-looking commercial advisory text ("Q1-2027
+// Berlingske Weekend contingent on Q3 KPI" — Petter scenario) without
+// rotting it in the desk associate's head when they change role.
+// Empty input clears the note.
+export async function updateNextEngagementNote(formData: FormData) {
+  const locale = field(formData, "locale") || "en";
+  const orderId = field(formData, "orderId");
+  const note = field(formData, "note").slice(0, 2000);
+  const userId = await requireDesk(locale);
+
+  const order = await prisma.order.findUnique({
+    where: { id: orderId },
+    select: { id: true },
+  });
+  if (!order) {
+    redirect(`/${locale}/desk/orders/${orderId}?neng=not-found`);
+  }
+
+  await prisma.order.update({
+    where: { id: orderId },
+    data: { nextEngagementNote: note.length ? note : null },
+  });
+  await recordAudit(userId, "order.next_engagement_note_updated", `Order:${orderId}`, {
+    length: note.length,
+  });
+  revalidatePath(`/${locale}/desk/orders/${orderId}`);
+  revalidatePath(`/${locale}/orders/${orderId}`);
+  redirect(`/${locale}/desk/orders/${orderId}?neng=ok`);
+}
+
 export async function cancelOrder(formData: FormData) {
   const locale = field(formData, "locale") || "en";
   const orderId = field(formData, "orderId");

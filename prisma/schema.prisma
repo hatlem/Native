@@ -586,8 +586,14 @@ model Order {
   cancelledAt    DateTime?
   cancelReason   String?
   cancelledBy    String?
-  createdAt      DateTime     @default(now())
-  updatedAt      DateTime     @updatedAt
+  // Free-text desk note on the post-order follow-up commitment to the
+  // buyer ("Q1-2027 Berlingske Weekend contingent on Q3 KPI" — Petter's
+  // scenario). Lives on the order so the relationship history travels
+  // with the customer file rather than rotting in the desk associate's
+  // head when they change role. Buyer-visible.
+  nextEngagementNote String?
+  createdAt    DateTime     @default(now())
+  updatedAt    DateTime     @updatedAt
 
   lines       OrderLine[]
   invoices    Invoice[]

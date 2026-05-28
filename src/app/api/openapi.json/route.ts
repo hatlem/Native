@@ -1,0 +1,239 @@
+// Public OpenAPI 3.1 spec for the NativeSpin partner-program API.
+// Hand-written rather than auto-generated so the contract is auditable
+// and stable across runtime changes — partners depend on this shape.
+// Tobias scenario follow-up (the lowest-effort highest-impact gap his
+// evaluation flagged: even an auto-generated spec lets engineering
+// scope an integration ahead of the partnership contract).
+//
+// Lives at /api/openapi.json AND mirrored from /.well-known/openapi.json
+// via a rewrite in next.config so generic API discovery tools find it.
+
+import { NextResponse } from "next/server";
+import { MarketCode, ProductType } from "@prisma/client";
+
+export const dynamic = "force-static";
+export const revalidate = 3600; // re-render hourly; spec is rarely-changing.
+
+const SPEC = {
+  openapi: "3.1.0",
+  info: {
+    title: "NativeSpin Catalog API",
+    version: "1.0.0",
+    description:
+      "Read API over the NativeSpin title catalog — designed for agency planning tools and adtech partners that need normalised supply data for editorial native across our 9 markets (NO, SE, DK, FI, DE, AT, CH, UK, IE). Bearer-auth gated; keys are issued by NativeSpin to integration partners via partners@nativespin.com.",
+    contact: {
+      name: "NativeSpin partners",
+      email: "partners@nativespin.com",
+      url: "https://nativespin.com/api",
+    },
+    license: {
+      name: "Partner program terms (see partnership contract)",
+    },
+  },
+  servers: [{ url: "https://nativespin.com", description: "Production" }],
+  components: {
+    securitySchemes: {
+      bearerAuth: {
+        type: "http",
+        scheme: "bearer",
+        description:
+          'Bearer API key with the `catalog:read` scope. Issued by NativeSpin per integration partner. Send as `Authorization: Bearer <key>`.',
+      },
+    },
+    schemas: {
+      Title: {
+        type: "object",
+        required: ["id", "slug", "name", "publisher", "market", "products"],
+        properties: {
+          id: { type: "string" },
+          slug: { type: "string" },
+          name: { type: "string" },
+          category: { type: "string", nullable: true },
+          monthlyReach: { type: "integer", nullable: true },
+          lastVerifiedAt: { type: "string", format: "date-time", nullable: true },
+          publisher: {
+            type: "object",
+            properties: {
+              id: { type: "string" },
+              name: { type: "string" },
+            },
+          },
+          market: {
+            type: "object",
+            properties: {
+              code: { type: "string", enum: Object.values(MarketCode) },
+              currency: { type: "string" },
+              disclosureLabel: { type: "string", nullable: true },
+            },
+          },
+          pricesVisible: { type: "boolean" },
+          products: {
+            type: "array",
+            items: { $ref: "#/components/schemas/Product" },
+          },
+        },
+      },
+      Product: {
+        type: "object",
+        required: ["id", "type", "visibility"],
+        properties: {
+          id: { type: "string" },
+          type: { type: "string", enum: Object.values(ProductType) },
+          basePrice: {
+            type: "string",
+            nullable: true,
+            description:
+              "Decimal as string. Null when the title's pricing is hidden (pricesVisible=false).",
+          },
+          currency: { type: "string", nullable: true },
+          visibility: { type: "string", enum: ["INDICATIVE", "FIRM"] },
+          leadTimeDays: { type: "integer", nullable: true },
+        },
+      },
+      Error: {
+        type: "object",
+        properties: {
+          error: {
+            type: "object",
+            properties: {
+              code: {
+                type: "string",
+                enum: [
+                  "MISSING",
+                  "INVALID",
+                  "REVOKED",
+                  "EXPIRED",
+                  "SCOPE",
+                  "RATE_LIMITED",
+                  "NOT_FOUND",
+                ],
+              },
+              message: { type: "string" },
+            },
+            required: ["code", "message"],
+          },
+        },
+      },
+    },
+  },
+  security: [{ bearerAuth: [] }],
+  paths: {
+    "/api/v1/catalog/titles": {
+      get: {
+        summary: "List titles in the public catalog",
+        description:
+          "Cursor-paginated. Stable sort by name + id ascending so a full sync doesn't miss rows when a new title is activated mid-sync. Rate-limited per API key.",
+        parameters: [
+          {
+            name: "market",
+            in: "query",
+            schema: { type: "string", enum: Object.values(MarketCode) },
+            description: "Filter by market.",
+          },
+          {
+            name: "format",
+            in: "query",
+            schema: { type: "string", enum: Object.values(ProductType) },
+            description:
+              "Only return titles with at least one active product of this type.",
+          },
+          {
+            name: "limit",
+            in: "query",
+            schema: { type: "integer", minimum: 1, maximum: 100, default: 50 },
+          },
+          {
+            name: "cursor",
+            in: "query",
+            schema: { type: "string" },
+            description:
+              "Opaque pagination token returned in the previous response.",
+          },
+        ],
+        responses: {
+          "200": {
+            description: "Page of titles + nextCursor.",
+            content: {
+              "application/json": {
+                schema: {
+                  type: "object",
+                  properties: {
+                    data: {
+                      type: "array",
+                      items: { $ref: "#/components/schemas/Title" },
+                    },
+                    nextCursor: { type: "string", nullable: true },
+                  },
+                },
+              },
+            },
+          },
+          "401": {
+            description: "Missing / invalid / revoked / expired bearer.",
+            content: {
+              "application/json": {
+                schema: { $ref: "#/components/schemas/Error" },
+              },
+            },
+          },
+          "403": {
+            description: "Key lacks catalog:read scope.",
+            content: {
+              "application/json": {
+                schema: { $ref: "#/components/schemas/Error" },
+              },
+            },
+          },
+          "429": {
+            description: "Rate-limited — back off + retry.",
+            content: {
+              "application/json": {
+                schema: { $ref: "#/components/schemas/Error" },
+              },
+            },
+          },
+        },
+      },
+    },
+    "/api/v1/catalog/titles/{id}": {
+      get: {
+        summary: "Get one title by id.",
+        parameters: [
+          {
+            name: "id",
+            in: "path",
+            required: true,
+            schema: { type: "string" },
+          },
+        ],
+        responses: {
+          "200": {
+            description: "The title.",
+            content: {
+              "application/json": {
+                schema: { $ref: "#/components/schemas/Title" },
+              },
+            },
+          },
+          "404": {
+            description: "Not found.",
+            content: {
+              "application/json": {
+                schema: { $ref: "#/components/schemas/Error" },
+              },
+            },
+          },
+        },
+      },
+    },
+  },
+} as const;
+
+export async function GET() {
+  return NextResponse.json(SPEC, {
+    headers: {
+      // Spec is public — let CDNs cache it.
+      "Cache-Control": "public, max-age=3600, s-maxage=3600",
+    },
+  });
+}

@@ -47,6 +47,18 @@ const nextConfig: NextConfig = {
       { source: "/:locale/docs", destination: "/:locale/api", permanent: false },
     ];
   },
+  // /.well-known/openapi.json is the conventional discovery URL for
+  // generic API tooling (Postman, openapi-generator, Apidog, etc.).
+  // Mirror it to the real handler at /api/openapi.json so partners
+  // don't have to know our route convention to find the spec.
+  async rewrites() {
+    return [
+      {
+        source: "/.well-known/openapi.json",
+        destination: "/api/openapi.json",
+      },
+    ];
+  },
 };
 
 export default withNextIntl(nextConfig);
