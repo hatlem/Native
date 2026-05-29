@@ -1709,5 +1709,19 @@
     "content_advertiser": "Der Werbetreibende kann eigene Artikel liefern",
     "content_publisher": "Artikel müssen von Ihrer Abteilung verfasst werden",
     "content_both": "Beides ist möglich"
+  },
+  "invite": {
+    "title": "Treten Sie {org} bei",
+    "invitationFor": "Einladung für {email}",
+    "accept": "Einladung annehmen",
+    "createAndJoin": "Konto erstellen und beitreten",
+    "namePlaceholder": "Ihr Name",
+    "passwordPlaceholder": "Passwort wählen (min. 8 Zeichen)",
+    "unavailableTitle": "Einladung nicht verfügbar",
+    "unavailableBody": "Diese Einladung ist nicht mehr gültig. Bitten Sie den Administrator, eine neue zu senden.",
+    "wrongAccountTitle": "Falsches Konto",
+    "wrongAccountBody": "Diese Einladung gilt für {inviteEmail}. Sie sind als {authedEmail} angemeldet.",
+    "signOut": "Abmelden",
+    "genericError": "Etwas ist schiefgelaufen. Überprüfen Sie Ihre Angaben und versuchen Sie es erneut."
   }
 }

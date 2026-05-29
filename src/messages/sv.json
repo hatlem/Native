@@ -1851,5 +1851,19 @@
     "content_advertiser": "Annonsören kan leverera egna artiklar",
     "content_publisher": "Artiklarna måste skrivas av er avdelning",
     "content_both": "Båda är möjliga"
+  },
+  "invite": {
+    "title": "Gå med i {org}",
+    "invitationFor": "Inbjudan till {email}",
+    "accept": "Acceptera inbjudan",
+    "createAndJoin": "Skapa konto och gå med",
+    "namePlaceholder": "Ditt namn",
+    "passwordPlaceholder": "Välj lösenord (minst 8 tecken)",
+    "unavailableTitle": "Inbjudan ej tillgänglig",
+    "unavailableBody": "Den här inbjudan är inte längre giltig. Be administratören skicka en ny.",
+    "wrongAccountTitle": "Fel konto",
+    "wrongAccountBody": "Inbjudan gäller {inviteEmail}. Du är inloggad som {authedEmail}.",
+    "signOut": "Logga ut",
+    "genericError": "Något gick fel. Kontrollera uppgifterna och försök igen."
   }
 }

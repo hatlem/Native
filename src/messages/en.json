@@ -1850,5 +1850,19 @@
     "errCompany": "Company name and billing market are required.",
     "errPasswordLength": "New password must be at least 8 characters.",
     "errCurrentPassword": "Current password is incorrect."
+  },
+  "invite": {
+    "title": "Join {org}",
+    "invitationFor": "Invitation for {email}",
+    "accept": "Accept invitation",
+    "createAndJoin": "Create account & join",
+    "namePlaceholder": "Your name",
+    "passwordPlaceholder": "Choose a password (min 8)",
+    "unavailableTitle": "Invitation unavailable",
+    "unavailableBody": "This invite is no longer valid. Ask the admin to send a new one.",
+    "wrongAccountTitle": "Wrong account",
+    "wrongAccountBody": "This invite is for {inviteEmail}. You're signed in as {authedEmail}.",
+    "signOut": "Sign out",
+    "genericError": "Something went wrong. Check your details and try again."
   }
 }

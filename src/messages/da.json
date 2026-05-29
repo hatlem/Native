@@ -1852,5 +1852,19 @@
     "content_advertiser": "Annoncøren kan levere egne artikler",
     "content_publisher": "Artiklerne skal skrives af jeres afdeling",
     "content_both": "Begge dele er mulige"
+  },
+  "invite": {
+    "title": "Tilmeld dig {org}",
+    "invitationFor": "Invitation til {email}",
+    "accept": "Acceptér invitation",
+    "createAndJoin": "Opret konto og tilmeld dig",
+    "namePlaceholder": "Dit navn",
+    "passwordPlaceholder": "Vælg adgangskode (mindst 8 tegn)",
+    "unavailableTitle": "Invitation ikke tilgængelig",
+    "unavailableBody": "Denne invitation er ikke længere gyldig. Bed administratoren om at sende en ny.",
+    "wrongAccountTitle": "Forkert konto",
+    "wrongAccountBody": "Invitationen gælder {inviteEmail}. Du er logget ind som {authedEmail}.",
+    "signOut": "Log ud",
+    "genericError": "Noget gik galt. Tjek dine oplysninger og prøv igen."
   }
 }
