@@ -185,6 +185,18 @@ export async function register(formData: FormData) {
           organizationId: org.id,
         },
       });
+      // The org creator is its first, permanent ADMIN. Membership is the
+      // source of truth for role + commit authority, so without this row a
+      // brand-new advertiser would resolve activeRole=null / canCommit=false
+      // and be locked out of checkout, accept-quote, and team invites.
+      await tx.membership.create({
+        data: {
+          userId: user.id,
+          organizationId: org.id,
+          role: "ADMIN",
+          canCommit: true,
+        },
+      });
       return user.id;
     });
   } catch {
