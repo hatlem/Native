@@ -74,7 +74,7 @@ export async function GET(
       reason: !row ? "not_found" : row.consumedAt ? "consumed" : "expired",
     });
     return NextResponse.redirect(
-      new URL(`/${locale}/signin?error=magic_expired`, req.url),
+      new URL(`/${locale}/signin?error=magic_expired`, appUrl()),
     );
   }
 
@@ -106,10 +106,10 @@ export async function GET(
     // Anything else = real failure (rate-limited consume, race lost, etc).
     await recordAudit("anonymous", "auth.magic_link_invalid", "Token", { ip, reason: "signin_failed" });
     return NextResponse.redirect(
-      new URL(`/${locale}/signin?error=magic_expired`, req.url),
+      new URL(`/${locale}/signin?error=magic_expired`, appUrl()),
     );
   }
 
   // Unreachable: signIn always throws (NEXT_REDIRECT on success).
-  return NextResponse.redirect(new URL(landing, req.url));
+  return NextResponse.redirect(new URL(landing, appUrl()));
 }
