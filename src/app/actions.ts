@@ -27,7 +27,7 @@ import { groupItemsByMarket } from "@/lib/quote-grouping";
 import { recordAudit } from "@/lib/audit";
 import { notifyDesk, notifyOrg, notifyPublisher } from "@/lib/notify";
 import { rfqLimiter } from "@/lib/rate-limit";
-import { loadScope, canActOnOrg } from "@/lib/scope";
+import { loadScope, canActOnOrg, canCommitOnOrg } from "@/lib/scope";
 
 const COOKIE_OPTS = {
   httpOnly: true,
@@ -575,6 +575,9 @@ export async function acceptQuote(formData: FormData) {
   if (!canActOnOrg(scope, quote.request.organizationId)) {
     redirect(`/${locale}/signin`);
   }
+  if (!canCommitOnOrg(scope, quote.request.organizationId)) {
+    redirect(`/${locale}/signin`);
+  }
   if (quote.order) {
     redirect(`/${locale}/requests/${quote.requestId}`);
   }
@@ -666,6 +669,9 @@ export async function acceptAllQuotesForRequest(formData: FormData) {
 
   const scope = await loadScope();
   if (!canActOnOrg(scope, request.organizationId)) {
+    redirect(`/${locale}/signin`);
+  }
+  if (!canCommitOnOrg(scope, request.organizationId)) {
     redirect(`/${locale}/signin`);
   }
 

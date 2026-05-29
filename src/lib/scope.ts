@@ -40,3 +40,14 @@ export function canActOnOrg(scope: Scope, organizationId: string): boolean {
   if (scope.isDesk) return true;
   return !!scope.workspace?.scopeOrgIds.includes(organizationId);
 }
+
+/**
+ * May this user *commit* the org — accept a quote / place an order — on `organizationId`?
+ * Commit authority is per-ACTIVE-org and never inferred from the (possibly stale) JWT role.
+ */
+export function canCommitOnOrg(scope: Scope, organizationId: string): boolean {
+  if (scope.isDesk) return true;
+  const ws = scope.workspace;
+  if (!ws) return false;
+  return ws.activeOrgId === organizationId && ws.activeCanCommit === true;
+}
