@@ -4,6 +4,16 @@ import { prisma } from "@/lib/prisma";
 import { buildRateCardCampaign, sendRateCardStep, selectBatchForSend } from "./campaign";
 import { setEmailAdapter } from "@/lib/notify";
 
+// DB-mutating integration tests — skipped unless RUN_DB_IT=1 is set, and only
+// to be run against a DISPOSABLE test database, never production. See
+// candidates.test.ts for why (a prod run with an undefined cleanup filter
+// mass-deleted rows).
+const RUN_DB_IT = process.env.RUN_DB_IT === "1";
+
+if (!RUN_DB_IT) {
+  test("campaign integration tests (skipped — set RUN_DB_IT=1 with a disposable DB)", { skip: true }, () => {});
+} else {
+
 let userId: string;
 let publisherIds: string[] = [];
 let titleIds: string[] = [];
@@ -170,3 +180,5 @@ test("buildRateCardCampaign skips suppressed emails", async () => {
     await prisma.outreachSuppression.delete({ where: { email: "solo@publisher-test.example" } });
   }
 });
+
+}
