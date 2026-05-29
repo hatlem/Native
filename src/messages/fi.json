@@ -1785,6 +1785,7 @@
     "passwordlessNote": "Kirjaudut nyt vain magic-linkillä. Aseta salasana jos haluat molemmat vaihtoehdot.",
     "savePasswordSet": "Aseta salasana",
     "savePasswordChange": "Vaihda salasana",
+    "saveMember": "Tallenna",
     "optional": "valinnainen",
     "okProfile": "Profiili päivitetty.",
     "okCompany": "Yritystiedot päivitetty.",

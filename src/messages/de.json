@@ -1643,6 +1643,7 @@
     "passwordlessNote": "Sie melden sich derzeit nur per Magic-Link an. Setzen Sie ein Passwort, wenn Sie beide Optionen wünschen.",
     "savePasswordSet": "Passwort setzen",
     "savePasswordChange": "Passwort ändern",
+    "saveMember": "Speichern",
     "optional": "optional",
     "okProfile": "Profil aktualisiert.",
     "okCompany": "Firmendaten aktualisiert.",

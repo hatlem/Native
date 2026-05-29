@@ -1843,6 +1843,7 @@
     "passwordlessNote": "Du logger nå inn med kun magic-link. Sett et passord hvis du vil ha begge muligheter.",
     "savePasswordSet": "Sett passord",
     "savePasswordChange": "Endre passord",
+    "saveMember": "Lagre",
     "optional": "valgfritt",
     "okProfile": "Profil oppdatert.",
     "okCompany": "Firmainfo oppdatert.",

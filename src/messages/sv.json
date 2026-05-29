@@ -1785,6 +1785,7 @@
     "passwordlessNote": "Du loggar nu in med endast magic-link. Sätt ett lösenord om du vill ha båda möjligheterna.",
     "savePasswordSet": "Sätt lösenord",
     "savePasswordChange": "Ändra lösenord",
+    "saveMember": "Spara",
     "optional": "valfritt",
     "okProfile": "Profil uppdaterad.",
     "okCompany": "Företagsinfo uppdaterad.",

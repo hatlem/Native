@@ -1842,6 +1842,7 @@
     "passwordlessNote": "You currently sign in via magic-link only. Set a password if you want both options.",
     "savePasswordSet": "Set password",
     "savePasswordChange": "Change password",
+    "saveMember": "Save",
     "optional": "optional",
     "okProfile": "Profile updated.",
     "okCompany": "Company info updated.",

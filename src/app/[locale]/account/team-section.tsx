@@ -5,6 +5,7 @@ import { SubmitButton } from "@/components";
 import {
   inviteToOrg,
   revokeMembership,
+  updateMembership,
   revokeInvite,
 } from "@/app/org-invite-actions";
 
@@ -108,14 +109,65 @@ export async function TeamSection({ locale, orgId, isAdmin }: Props) {
                   <td>{expires ?? "—"}</td>
                   {isAdmin && (
                     <td>
-                      <form action={revokeMembership}>
-                        <input type="hidden" name="locale" value={locale} />
-                        <input type="hidden" name="userId" value={m.userId} />
-                        <SubmitButton
-                          label={t("revoke")}
-                          pendingLabel={t("saving")}
-                        />
-                      </form>
+                      <div
+                        style={{
+                          display: "flex",
+                          alignItems: "center",
+                          gap: "0.5rem",
+                          flexWrap: "wrap",
+                        }}
+                      >
+                        <form
+                          action={updateMembership}
+                          style={{
+                            display: "flex",
+                            alignItems: "center",
+                            gap: "0.5rem",
+                            flexWrap: "wrap",
+                          }}
+                        >
+                          <input type="hidden" name="locale" value={locale} />
+                          <input
+                            type="hidden"
+                            name="userId"
+                            value={m.userId}
+                          />
+                          <select name="role" defaultValue={m.role}>
+                            <option value="ADMIN">{t("roleAdmin")}</option>
+                            <option value="MEMBER">{t("roleMember")}</option>
+                            <option value="RESTRICTED">
+                              {t("roleRestricted")}
+                            </option>
+                          </select>
+                          <label
+                            className="checkbox-label"
+                            title={t("canCommitLabel")}
+                          >
+                            <input
+                              type="checkbox"
+                              name="canCommit"
+                              defaultChecked={m.canCommit}
+                            />
+                            {t("colCommit")}
+                          </label>
+                          <SubmitButton
+                            label={t("saveMember")}
+                            pendingLabel={t("saving")}
+                          />
+                        </form>
+                        <form action={revokeMembership}>
+                          <input type="hidden" name="locale" value={locale} />
+                          <input
+                            type="hidden"
+                            name="userId"
+                            value={m.userId}
+                          />
+                          <SubmitButton
+                            label={t("revoke")}
+                            pendingLabel={t("saving")}
+                          />
+                        </form>
+                      </div>
                     </td>
                   )}
                 </tr>

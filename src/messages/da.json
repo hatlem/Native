@@ -1786,6 +1786,7 @@
     "passwordlessNote": "Du logger nu kun ind med magic-link. Sæt et kodeord hvis du vil have begge muligheder.",
     "savePasswordSet": "Sæt kodeord",
     "savePasswordChange": "Skift kodeord",
+    "saveMember": "Gem",
     "optional": "valgfrit",
     "okProfile": "Profil opdateret.",
     "okCompany": "Virksomhedsinfo opdateret.",
