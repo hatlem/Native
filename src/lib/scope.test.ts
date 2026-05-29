@@ -34,3 +34,21 @@ test("cannot commit on an org that is not the active org", () => {
 test("no workspace → cannot commit", () => {
   assert.equal(canCommitOnOrg(base({ workspace: null }), "o1"), false);
 });
+test("agency may commit on a client org in scope (no membership required)", () => {
+  assert.equal(
+    canCommitOnOrg(
+      base({ workspace: ws({ isAgency: true, agencyOrgId: "ag1", activeOrgId: "client1", scopeOrgIds: ["ag1", "client1"], activeRole: null, activeCanCommit: false }) }),
+      "client1",
+    ),
+    true,
+  );
+});
+test("agency may NOT commit on an org outside its scope", () => {
+  assert.equal(
+    canCommitOnOrg(
+      base({ workspace: ws({ isAgency: true, agencyOrgId: "ag1", activeOrgId: "client1", scopeOrgIds: ["ag1", "client1"], activeRole: null, activeCanCommit: false }) }),
+      "other",
+    ),
+    false,
+  );
+});
