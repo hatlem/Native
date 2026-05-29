@@ -58,6 +58,26 @@ export async function getWorkspace(
   const now = new Date();
   const membershipOrgIds = activeScopeOrgIds(memberships, now);
 
+  // Opportunistic, on-action reconciliation (no cron/worker): once a membership
+  // crosses its expiry, flip its stored status so audit/reporting stays accurate.
+  // This is bookkeeping only — access is already denied lazily by
+  // activeScopeOrgIds/resolveOrgMembership (which test expiresAt), and the Team UI
+  // derives "Expired" from isMembershipActive. Fire-and-forget; scoped to this user.
+  const hasNewlyExpired = memberships.some(
+    (m) =>
+      m.status === "ACTIVE" &&
+      m.expiresAt !== null &&
+      m.expiresAt.getTime() <= now.getTime(),
+  );
+  if (hasNewlyExpired) {
+    void prisma.membership
+      .updateMany({
+        where: { userId, status: "ACTIVE", expiresAt: { not: null, lte: now } },
+        data: { status: "EXPIRED" },
+      })
+      .catch((err) => console.error("membership.reconcile_failed", { userId, err }));
+  }
+
   const org = user?.organization;
 
   if (!org) {
