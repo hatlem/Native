@@ -6,6 +6,7 @@ import { MarketCode } from "@prisma/client";
 import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
 import { recordAudit } from "@/lib/audit";
+import { resolveOrgMembership } from "@/lib/membership";
 
 const MARKET_CODES = Object.values(MarketCode) as string[];
 
@@ -64,9 +65,22 @@ export async function updateCompany(formData: FormData) {
   if (!user?.organizationId) {
     redirect(`/${locale}/account?error=no_org#company`);
   }
-  // Only org admins + the user's own org can edit company info. v1
-  // keeps this loose: any BUYER role on the org can edit (single-seat
-  // is the common case). Tighten when multi-seat lands.
+  // Only an ADMIN of the org may edit company info. Multi-seat has landed,
+  // so a MEMBER/RESTRICTED seat must not rename the org or change its market.
+  const memberships = await prisma.membership.findMany({
+    where: { userId: session.user.id, organizationId: user.organizationId },
+    select: {
+      userId: true,
+      organizationId: true,
+      role: true,
+      canCommit: true,
+      expiresAt: true,
+      status: true,
+    },
+  });
+  if (resolveOrgMembership(memberships, user.organizationId, new Date())?.role !== "ADMIN") {
+    redirect(`/${locale}/account?error=forbidden#company`);
+  }
   await prisma.organization.update({
     where: { id: user.organizationId },
     data: {

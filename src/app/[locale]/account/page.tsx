@@ -39,6 +39,9 @@ export default async function AccountPage({
 
   const scope = await loadScope();
   const ws = scope.workspace;
+  // Company info is admin-only to edit (server-enforced in updateCompany);
+  // non-admin seats see it read-only.
+  const isOrgAdmin = ws?.activeRole === "ADMIN";
 
   const user = await prisma.user.findUnique({
     where: { id: session.user.id },
@@ -175,6 +178,7 @@ export default async function AccountPage({
               name="orgName"
               autoComplete="organization"
               required
+              disabled={!isOrgAdmin}
               defaultValue={user.organization?.name ?? ""}
             />
           </div>
@@ -185,6 +189,7 @@ export default async function AccountPage({
               name="market"
               defaultValue={user.organization?.marketCode ?? ""}
               required
+              disabled={!isOrgAdmin}
             >
               <option value="" disabled>
                 {t("marketPlaceholder")}
@@ -197,12 +202,14 @@ export default async function AccountPage({
             </select>
             <span className="hint">{t("marketHint")}</span>
           </div>
-          <div className="actions">
-            <SubmitButton
-              label={t("saveCompany")}
-              pendingLabel={t("saving")}
-            />
-          </div>
+          {isOrgAdmin && (
+            <div className="actions">
+              <SubmitButton
+                label={t("saveCompany")}
+                pendingLabel={t("saving")}
+              />
+            </div>
+          )}
         </form>
       </section>
 
