@@ -393,12 +393,12 @@ model Organization {
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
 
-  users    User[]
-  plans    Plan[]
-  requests Request[]
-  orders   Order[]
-  invoices Invoice[]
-  apiKeys  ApiKey[]
+  users       User[]
+  plans       Plan[]
+  requests    Request[]
+  orders      Order[]
+  invoices    Invoice[]
+  apiKeys     ApiKey[]
   memberships Membership[]
   invites     OrgInvite[]
 }
@@ -464,7 +464,7 @@ model Membership {
   expiresAt      DateTime?
   status         MembershipStatus @default(ACTIVE)
   invitedById    String?
-  invitedBy      User?            @relation("MembershipInviter", fields: [invitedById], references: [id])
+  invitedBy      User?            @relation("MembershipInviter", fields: [invitedById], references: [id], onDelete: SetNull)
   createdAt      DateTime         @default(now())
   updatedAt      DateTime         @updatedAt
 
