@@ -125,7 +125,19 @@ export default async function CatalogPage({
     ...(types.length
       ? { products: { some: { type: { in: types }, active: true } } }
       : {}),
-    ...(onlyPriced ? { active: true } : {}),
+    // "Priced titles only" = a buyer can actually see a € figure. Mirror
+    // isProductPriceShown (src/lib/pricing/visibility.ts): an active,
+    // sales-confirmed product AND both title + publisher prices public.
+    // AND-wrapped so it composes with the type filter's own products.some.
+    ...(onlyPriced
+      ? {
+          AND: [
+            { products: { some: { active: true, confirmedAt: { not: null } } } },
+            { pricesPublic: true },
+            { publisher: { is: { pricesPublic: true } } },
+          ],
+        }
+      : {}),
     ...(nativeFit ? { nativeFit } : {}),
     ...(b2bB2c ? { b2bB2c } : {}),
     ...(matchedIds
