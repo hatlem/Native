@@ -3,12 +3,14 @@ import { redirect } from "next/navigation";
 import { MarketCode } from "@prisma/client";
 import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
+import { loadScope } from "@/lib/scope";
 import {
   updateCompany,
   updateProfile,
   setPassword,
 } from "@/app/account-actions";
 import { SubmitButton } from "@/components";
+import { TeamSection } from "./team-section";
 
 export const dynamic = "force-dynamic";
 
@@ -35,6 +37,9 @@ export default async function AccountPage({
   const session = await auth();
   if (!session?.user?.id) redirect(`/${locale}/signin`);
 
+  const scope = await loadScope();
+  const ws = scope.workspace;
+
   const user = await prisma.user.findUnique({
     where: { id: session.user.id },
     select: {
@@ -59,7 +64,17 @@ export default async function AccountPage({
       ? t("okCompany")
       : okCode === "password"
         ? t("okPassword")
-        : null;
+        : okCode === "invited"
+          ? t("okInvited")
+          : okCode === "revoked"
+            ? t("okRevoked")
+            : okCode === "updated"
+              ? t("okUpdated")
+              : okCode === "invite_revoked"
+                ? t("okInviteRevoked")
+                : okCode === "joined"
+                  ? t("okJoined")
+                  : null;
   const errMessage = errCode === "phone"
     ? t("errPhone")
     : errCode === "company"
@@ -68,7 +83,15 @@ export default async function AccountPage({
         ? t("errPasswordLength")
         : errCode === "current_password"
           ? t("errCurrentPassword")
-          : null;
+          : errCode === "forbidden"
+            ? t("errForbidden")
+            : errCode === "last_admin"
+              ? t("errLastAdmin")
+              : errCode === "already_member"
+                ? t("errAlreadyMember")
+                : errCode === "admin_delegation"
+                  ? t("errAdminDelegation")
+                  : null;
 
   return (
     <>
@@ -228,6 +251,14 @@ export default async function AccountPage({
           </div>
         </form>
       </section>
+
+      {ws?.activeOrgId && (
+        <TeamSection
+          locale={locale}
+          orgId={ws.activeOrgId}
+          isAdmin={ws.activeRole === "ADMIN"}
+        />
+      )}
     </>
   );
 }

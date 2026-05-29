@@ -1,7 +1,7 @@
 # Multi-User Org-Invite & Time-Limited Delegation — Design
 
 **Date:** 2026-05-29
-**Status:** Approved (design); pending implementation plan
+**Status:** Implemented (pending staging verification)
 **Scope:** v1 covers permanent multi-seat invites **and** time-bounded delegation (all four flagged scenarios A–D).
 
 ## Problem

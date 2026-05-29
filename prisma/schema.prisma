@@ -68,6 +68,18 @@ enum UserRole {
   SUPERADMIN
 }
 
+enum MembershipRole {
+  ADMIN
+  MEMBER
+  RESTRICTED
+}
+
+enum MembershipStatus {
+  ACTIVE
+  EXPIRED
+  REVOKED
+}
+
 enum RequestStatus {
   DRAFT
   SUBMITTED
@@ -381,12 +393,14 @@ model Organization {
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
 
-  users    User[]
-  plans    Plan[]
-  requests Request[]
-  orders   Order[]
-  invoices Invoice[]
-  apiKeys  ApiKey[]
+  users       User[]
+  plans       Plan[]
+  requests    Request[]
+  orders      Order[]
+  invoices    Invoice[]
+  apiKeys     ApiKey[]
+  memberships Membership[]
+  invites     OrgInvite[]
 }
 
 model User {
@@ -412,6 +426,8 @@ model User {
   priceRequestsRequested PriceRequest[]     @relation("PriceRequestRequester")
   priceQuotesApplied     PriceQuote[]       @relation("PriceQuoteApplier")
   rateCardRequests       RateCardRequest[]  @relation("RateCardRequestCreator")
+  memberships            Membership[]       @relation("UserMemberships")
+  invitedMembers         Membership[]       @relation("MembershipInviter")
 }
 
 // Super-admin emits these when activating a new publishing house in
@@ -434,6 +450,46 @@ model PublisherInvite {
   createdAt       DateTime  @default(now())
 
   @@index([publisherId])
+  @@index([email])
+}
+
+model Membership {
+  id             String           @id @default(cuid())
+  userId         String
+  user           User             @relation("UserMemberships", fields: [userId], references: [id], onDelete: Cascade)
+  organizationId String
+  organization   Organization     @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  role           MembershipRole   @default(MEMBER)
+  canCommit      Boolean          @default(false)
+  expiresAt      DateTime?
+  status         MembershipStatus @default(ACTIVE)
+  invitedById    String?
+  invitedBy      User?            @relation("MembershipInviter", fields: [invitedById], references: [id], onDelete: SetNull)
+  createdAt      DateTime         @default(now())
+  updatedAt      DateTime         @updatedAt
+
+  @@unique([userId, organizationId])
+  @@index([organizationId])
+  @@index([userId])
+  @@index([expiresAt])
+}
+
+model OrgInvite {
+  id                  String         @id @default(cuid())
+  organizationId      String
+  organization        Organization   @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  email               String
+  role                MembershipRole  @default(MEMBER)
+  canCommit           Boolean         @default(false)
+  delegationExpiresAt DateTime?
+  token               String          @unique
+  expiresAt           DateTime
+  claimedAt           DateTime?
+  claimedByUserId     String?
+  createdById         String
+  createdAt           DateTime        @default(now())
+
+  @@index([organizationId])
   @@index([email])
 }
 
@@ -543,7 +599,7 @@ model ApiKey {
 model PartnerWebhook {
   id             String   @id @default(cuid())
   apiKeyId       String
-  apiKey         ApiKey   @relation(fields: [apiKeyId], references: [id])
+  apiKey         ApiKey   @relation(fields: [apiKeyId], references: [id], onDelete: Cascade)
   // Comma-separated event types. v0 known kinds: "title.activated",
   // "title.deactivated", "title.price_changed". Receivers MUST tolerate
   // unknown future event kinds rather than 4xx them.

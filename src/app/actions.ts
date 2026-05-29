@@ -27,7 +27,7 @@ import { groupItemsByMarket } from "@/lib/quote-grouping";
 import { recordAudit } from "@/lib/audit";
 import { notifyDesk, notifyOrg, notifyPublisher } from "@/lib/notify";
 import { rfqLimiter } from "@/lib/rate-limit";
-import { loadScope, canActOnOrg } from "@/lib/scope";
+import { loadScope, canActOnOrg, canCommitOnOrg } from "@/lib/scope";
 
 const COOKIE_OPTS = {
   httpOnly: true,
@@ -216,6 +216,18 @@ export async function submitRequest(formData: FormData) {
     if (product.visibility !== "FIRM") return false;
     return isProductPriceShown(product, product.title);
   });
+
+  // Commit gate: the all-firm path creates a CONFIRMED order immediately —
+  // the same commitment as acceptQuote/acceptAllQuotesForRequest. Only
+  // members (or agencies) with canCommit authority may proceed. The RFQ
+  // path (allFirm === false) is NOT a commit and must stay ungated so any
+  // member can request a quote from the desk.
+  if (allFirm) {
+    const scope = await loadScope();
+    if (!canCommitOnOrg(scope, org.id)) {
+      redirect(`/${locale}/plan?error=forbidden`);
+    }
+  }
 
   // Honour Phase-3 availability for FIRM (self-serve) baskets: block
   // the current month if any selected product is unavailable now. RFQ
@@ -575,6 +587,9 @@ export async function acceptQuote(formData: FormData) {
   if (!canActOnOrg(scope, quote.request.organizationId)) {
     redirect(`/${locale}/signin`);
   }
+  if (!canCommitOnOrg(scope, quote.request.organizationId)) {
+    redirect(`/${locale}/signin`);
+  }
   if (quote.order) {
     redirect(`/${locale}/requests/${quote.requestId}`);
   }
@@ -666,6 +681,9 @@ export async function acceptAllQuotesForRequest(formData: FormData) {
 
   const scope = await loadScope();
   if (!canActOnOrg(scope, request.organizationId)) {
+    redirect(`/${locale}/signin`);
+  }
+  if (!canCommitOnOrg(scope, request.organizationId)) {
     redirect(`/${locale}/signin`);
   }
 
