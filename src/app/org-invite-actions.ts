@@ -11,7 +11,7 @@ import { recordAudit } from "@/lib/audit";
 import { emailAdapter } from "@/lib/notify";
 import { loadScope } from "@/lib/scope";
 import { authLimiter } from "@/lib/rate-limit";
-import { resolveOrgMembership, type MembershipRole } from "@/lib/membership";
+import { resolveOrgMembership, wouldRemoveLastAdmin, type MembershipRole } from "@/lib/membership";
 import {
   newInviteToken,
   expiryFromNow,
@@ -124,6 +124,101 @@ export async function inviteToOrg(formData: FormData) {
   });
   redirect(`/${locale}/account?ok=invited#team`);
 }
+
+// ─── Admin gate + shared helpers ─────────────────────────────────────────────
+
+async function requireActiveAdmin(locale: Locale) {
+  const session = await auth();
+  if (!session?.user?.id) redirect(`/${locale}/signin`);
+  const scope = await loadScope();
+  const ws = scope.workspace;
+  if (!ws?.activeOrgId || ws.activeRole !== "ADMIN") {
+    redirect(`/${locale}/account?error=forbidden#team`);
+  }
+  return { session, orgId: ws.activeOrgId };
+}
+
+async function loadOrgMembershipsForGuard(orgId: string) {
+  return prisma.membership.findMany({
+    where: { organizationId: orgId },
+    select: {
+      userId: true,
+      organizationId: true,
+      role: true,
+      canCommit: true,
+      expiresAt: true,
+      status: true,
+    },
+  });
+}
+
+// ─── New management actions ───────────────────────────────────────────────────
+
+export async function revokeMembership(formData: FormData) {
+  const locale = asLocale(String(formData.get("locale") || "en"));
+  const { session, orgId } = await requireActiveAdmin(locale);
+  const targetUserId = String(formData.get("userId") || "");
+  if (!targetUserId) redirect(`/${locale}/account?error=1#team`);
+
+  const rows = await loadOrgMembershipsForGuard(orgId);
+  if (wouldRemoveLastAdmin(rows, targetUserId, new Date())) {
+    redirect(`/${locale}/account?error=last_admin#team`);
+  }
+  await prisma.membership.updateMany({
+    where: { organizationId: orgId, userId: targetUserId },
+    data: { status: "REVOKED" },
+  });
+  await recordAudit(session.user!.id, "org.membership_revoked", `Organization:${orgId}`, {
+    targetUserId,
+  });
+  redirect(`/${locale}/account?ok=revoked#team`);
+}
+
+export async function updateMembership(formData: FormData) {
+  const locale = asLocale(String(formData.get("locale") || "en"));
+  const { session, orgId } = await requireActiveAdmin(locale);
+  const targetUserId = String(formData.get("userId") || "");
+  const role = String(formData.get("role") || "MEMBER") as MembershipRole;
+  const canCommit = formData.get("canCommit") === "on";
+  if (!targetUserId) redirect(`/${locale}/account?error=1#team`);
+  if (!["ADMIN", "MEMBER", "RESTRICTED"].includes(role)) {
+    redirect(`/${locale}/account?error=role#team`);
+  }
+
+  // Demoting the last admin away from ADMIN is forbidden.
+  if (role !== "ADMIN") {
+    const rows = await loadOrgMembershipsForGuard(orgId);
+    if (wouldRemoveLastAdmin(rows, targetUserId, new Date())) {
+      redirect(`/${locale}/account?error=last_admin#team`);
+    }
+  }
+  await prisma.membership.updateMany({
+    where: { organizationId: orgId, userId: targetUserId },
+    data: { role, canCommit },
+  });
+  await recordAudit(session.user!.id, "org.membership_updated", `Organization:${orgId}`, {
+    targetUserId,
+    role,
+    canCommit,
+  });
+  redirect(`/${locale}/account?ok=updated#team`);
+}
+
+export async function revokeInvite(formData: FormData) {
+  const locale = asLocale(String(formData.get("locale") || "en"));
+  const { session, orgId } = await requireActiveAdmin(locale);
+  const inviteId = String(formData.get("inviteId") || "");
+  if (!inviteId) redirect(`/${locale}/account?error=1#team`);
+  await prisma.orgInvite.deleteMany({
+    where: { id: inviteId, organizationId: orgId, claimedAt: null },
+  });
+  await recordAudit(session.user!.id, "org.invite_revoked", `Organization:${orgId}`, {
+    inviteId,
+  });
+  redirect(`/${locale}/account?ok=invite_revoked#team`);
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
 
 export async function claimOrgInvite(formData: FormData) {
   const locale = asLocale(String(formData.get("locale") || "en"));
