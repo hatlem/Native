@@ -59,6 +59,21 @@ export function validateDelegationDate(delegationExpiresAt: Date | null, now: Da
   return delegationExpiresAt.getTime() > now.getTime();
 }
 
+// ---- Role label lookup (locale × role → natural noun phrase) ----
+
+const ROLE_LABELS: Record<Locale, Record<MembershipRole, string>> = {
+  en: { ADMIN: "an admin", MEMBER: "a member", RESTRICTED: "a restricted user" },
+  no: { ADMIN: "administrator", MEMBER: "medlem", RESTRICTED: "bruker med begrenset tilgang" },
+  sv: { ADMIN: "administratör", MEMBER: "medlem", RESTRICTED: "användare med begränsad åtkomst" },
+  da: { ADMIN: "administrator", MEMBER: "medlem", RESTRICTED: "bruger med begrænset adgang" },
+  fi: { ADMIN: "ylläpitäjä", MEMBER: "jäsen", RESTRICTED: "käyttäjä, jolla on rajoitettu käyttöoikeus" },
+  de: { ADMIN: "Administrator", MEMBER: "Mitglied", RESTRICTED: "eingeschränkter Benutzer" },
+};
+
+function roleLabel(role: MembershipRole, locale: Locale): string {
+  return ROLE_LABELS[locale][role];
+}
+
 // ---- Invite email (multilingual; mirrors src/lib/pricing/email.ts) ----
 
 export type OrgInviteEmailArgs = {
@@ -85,7 +100,7 @@ function en(a: OrgInviteEmailArgs): Built {
     text: [
       `Hi,`,
       ``,
-      `${a.inviterName} invited you to join ${a.orgName} on NativeSpin as ${a.role.toLowerCase()}.${until}`,
+      `${a.inviterName} invited you to join ${a.orgName} on NativeSpin as ${roleLabel(a.role, "en")}.${until}`,
       ``,
       `Accept your invite:`,
       a.link,
@@ -106,7 +121,7 @@ function no(a: OrgInviteEmailArgs): Built {
     text: [
       `Hei,`,
       ``,
-      `${a.inviterName} har invitert deg til ${a.orgName} på NativeSpin som ${a.role.toLowerCase()}.${until}`,
+      `${a.inviterName} har invitert deg til ${a.orgName} på NativeSpin som ${roleLabel(a.role, "no")}.${until}`,
       ``,
       `Godta invitasjonen:`,
       a.link,
@@ -127,7 +142,7 @@ function sv(a: OrgInviteEmailArgs): Built {
     text: [
       `Hej,`,
       ``,
-      `${a.inviterName} har bjudit in dig till ${a.orgName} på NativeSpin som ${a.role.toLowerCase()}.${until}`,
+      `${a.inviterName} har bjudit in dig till ${a.orgName} på NativeSpin som ${roleLabel(a.role, "sv")}.${until}`,
       ``,
       `Acceptera inbjudan:`,
       a.link,
@@ -148,7 +163,7 @@ function da(a: OrgInviteEmailArgs): Built {
     text: [
       `Hej,`,
       ``,
-      `${a.inviterName} har inviteret dig til ${a.orgName} på NativeSpin som ${a.role.toLowerCase()}.${until}`,
+      `${a.inviterName} har inviteret dig til ${a.orgName} på NativeSpin som ${roleLabel(a.role, "da")}.${until}`,
       ``,
       `Accepter invitationen:`,
       a.link,
@@ -169,7 +184,7 @@ function fi(a: OrgInviteEmailArgs): Built {
     text: [
       `Hei,`,
       ``,
-      `${a.inviterName} kutsui sinut organisaatioon ${a.orgName} NativeSpinissä roolilla ${a.role.toLowerCase()}.${until}`,
+      `${a.inviterName} kutsui sinut organisaatioon ${a.orgName} NativeSpinissä roolilla ${roleLabel(a.role, "fi")}.${until}`,
       ``,
       `Hyväksy kutsu:`,
       a.link,
@@ -190,7 +205,7 @@ function de(a: OrgInviteEmailArgs): Built {
     text: [
       `Hallo,`,
       ``,
-      `${a.inviterName} hat Sie als ${a.role.toLowerCase()} zu ${a.orgName} auf NativeSpin eingeladen.${until}`,
+      `${a.inviterName} hat Sie als ${roleLabel(a.role, "de")} zu ${a.orgName} auf NativeSpin eingeladen.${until}`,
       ``,
       `Einladung annehmen:`,
       a.link,

@@ -135,3 +135,10 @@ test("buildOrgInviteEmail covers all six locales with distinct subjects from en 
   // all defined, non-empty
   subs.forEach((s) => assert.ok(s && s.length > 0));
 });
+
+test("localized invite emails translate the role word (no raw enum)", () => {
+  for (const locale of ["no","sv","da","fi","de"] as const) {
+    const built = buildOrgInviteEmail({ locale, orgName: "Org", inviterName: "I", link: "L", role: "RESTRICTED", delegationExpiresAt: null });
+    assert.ok(!/\brestricted\b/i.test(built.text), `${locale} leaked raw role word: ${built.text}`);
+  }
+});
