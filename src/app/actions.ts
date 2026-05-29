@@ -217,6 +217,18 @@ export async function submitRequest(formData: FormData) {
     return isProductPriceShown(product, product.title);
   });
 
+  // Commit gate: the all-firm path creates a CONFIRMED order immediately —
+  // the same commitment as acceptQuote/acceptAllQuotesForRequest. Only
+  // members (or agencies) with canCommit authority may proceed. The RFQ
+  // path (allFirm === false) is NOT a commit and must stay ungated so any
+  // member can request a quote from the desk.
+  if (allFirm) {
+    const scope = await loadScope();
+    if (!canCommitOnOrg(scope, org.id)) {
+      redirect(`/${locale}/plan?error=forbidden`);
+    }
+  }
+
   // Honour Phase-3 availability for FIRM (self-serve) baskets: block
   // the current month if any selected product is unavailable now. RFQ
   // baskets still go through the desk, which can negotiate around it.
