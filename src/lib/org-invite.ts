@@ -59,6 +59,11 @@ export function validateDelegationDate(delegationExpiresAt: Date | null, now: Da
   return delegationExpiresAt.getTime() > now.getTime();
 }
 
+/** Admins must be permanent: an ADMIN role combined with an expiry is forbidden. */
+export function isDelegatedAdminForbidden(role: MembershipRole, delegationExpiresAt: Date | null): boolean {
+  return role === "ADMIN" && delegationExpiresAt !== null;
+}
+
 // ---- Role label lookup (locale × role → natural noun phrase) ----
 
 const ROLE_LABELS: Record<Locale, Record<MembershipRole, string>> = {

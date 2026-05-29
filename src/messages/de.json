@@ -1660,6 +1660,7 @@
     "errForbidden": "Sie benötigen Administratorrechte für diese Aktion.",
     "errLastAdmin": "Der letzte Administrator kann nicht aus der Organisation entfernt werden.",
     "errAlreadyMember": "Diese Person ist bereits ein aktives Mitglied.",
+    "errAdminDelegation": "Administratoren können keine Zeitbegrenzung haben — laden Sie sie als dauerhaftes Mitglied ein oder verwenden Sie Mitglied/Eingeschränkt für zeitlich begrenzten Zugang.",
     "teamEyebrow": "Team",
     "teamTitle": "Teammitglieder",
     "colName": "Name",

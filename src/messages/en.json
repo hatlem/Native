@@ -1859,6 +1859,7 @@
     "errForbidden": "You need admin access to do that.",
     "errLastAdmin": "Cannot remove the last admin from the organisation.",
     "errAlreadyMember": "That person is already an active member.",
+    "errAdminDelegation": "Admins can't have a time limit — invite them as a permanent member, or use Member/Restricted for time-limited access.",
     "teamEyebrow": "Team",
     "teamTitle": "Team members",
     "colName": "Name",

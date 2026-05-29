@@ -1802,6 +1802,7 @@
     "errForbidden": "Tarvitset järjestelmänvalvojan oikeudet tähän toimintoon.",
     "errLastAdmin": "Viimeistä järjestelmänvalvojaa ei voi poistaa organisaatiosta.",
     "errAlreadyMember": "Kyseinen henkilö on jo aktiivinen jäsen.",
+    "errAdminDelegation": "Järjestelmänvalvojilla ei voi olla aikarajoitusta — kutsu heidät pysyvänä jäsenenä tai käytä Jäsen/Rajoitettu-roolia määräaikaiseen käyttöoikeuteen.",
     "teamEyebrow": "Tiimi",
     "teamTitle": "Tiimin jäsenet",
     "colName": "Nimi",

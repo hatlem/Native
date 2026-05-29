@@ -89,7 +89,9 @@ export default async function AccountPage({
               ? t("errLastAdmin")
               : errCode === "already_member"
                 ? t("errAlreadyMember")
-                : null;
+                : errCode === "admin_delegation"
+                  ? t("errAdminDelegation")
+                  : null;
 
   return (
     <>

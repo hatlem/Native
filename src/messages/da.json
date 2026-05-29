@@ -1803,6 +1803,7 @@
     "errForbidden": "Du skal have administratoradgang for at gøre dette.",
     "errLastAdmin": "Kan ikke fjerne den sidste administrator fra organisationen.",
     "errAlreadyMember": "Den pågældende er allerede et aktivt medlem.",
+    "errAdminDelegation": "Administratorer kan ikke have en tidsbegrænsning — inviter dem som et permanent medlem, eller brug Medlem/Begrænset for tidsbegrænset adgang.",
     "teamEyebrow": "Team",
     "teamTitle": "Teammedlemmer",
     "colName": "Navn",

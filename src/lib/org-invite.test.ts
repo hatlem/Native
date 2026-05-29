@@ -6,6 +6,7 @@ import {
   checkOrgInvite,
   validateOrgClaim,
   validateDelegationDate,
+  isDelegatedAdminForbidden,
   buildOrgInviteEmail,
   ORG_INVITE_TTL_DAYS,
 } from "./org-invite";
@@ -110,6 +111,13 @@ test("validateDelegationDate: null ok, future ok, past rejected", () => {
   assert.equal(validateDelegationDate(null, NOW), true);
   assert.equal(validateDelegationDate(new Date("2026-10-05"), NOW), true);
   assert.equal(validateDelegationDate(new Date("2026-01-01"), NOW), false);
+});
+
+test("isDelegatedAdminForbidden: ADMIN + date forbidden; others allowed", () => {
+  assert.equal(isDelegatedAdminForbidden("ADMIN", new Date("2026-10-05")), true);
+  assert.equal(isDelegatedAdminForbidden("ADMIN", null), false);
+  assert.equal(isDelegatedAdminForbidden("MEMBER", new Date("2026-10-05")), false);
+  assert.equal(isDelegatedAdminForbidden("RESTRICTED", new Date("2026-10-05")), false);
 });
 
 test("buildOrgInviteEmail returns localized subject+text containing the link", () => {

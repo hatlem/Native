@@ -16,6 +16,7 @@ import {
   newInviteToken,
   expiryFromNow,
   validateDelegationDate,
+  isDelegatedAdminForbidden,
   buildOrgInviteEmail,
   orgInviteLink,
   validateOrgClaim,
@@ -68,6 +69,9 @@ export async function inviteToOrg(formData: FormData) {
   }
   if (!validateDelegationDate(delegationExpiresAt, new Date())) {
     redirect(`/${locale}/account?error=delegation_past#team`);
+  }
+  if (isDelegatedAdminForbidden(role, delegationExpiresAt)) {
+    redirect(`/${locale}/account?error=admin_delegation#team`);
   }
 
   // Reject inviting someone who is already an active member.
@@ -192,9 +196,12 @@ export async function updateMembership(formData: FormData) {
       redirect(`/${locale}/account?error=last_admin#team`);
     }
   }
+  // Admins are always permanent: clear any expiry when promoting to ADMIN
+  // so the membership can never silently expire and leave the org with
+  // zero active admins.
   await prisma.membership.updateMany({
     where: { organizationId: orgId, userId: targetUserId },
-    data: { role, canCommit },
+    data: role === "ADMIN" ? { role, canCommit, expiresAt: null } : { role, canCommit },
   });
   await recordAudit(session.user!.id, "org.membership_updated", `Organization:${orgId}`, {
     targetUserId,
