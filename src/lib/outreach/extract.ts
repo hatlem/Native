@@ -1,6 +1,6 @@
 import * as cheerio from "cheerio";
 import type { AnyNode } from "domhandler";
-import { SALES_VOCAB_RE, type CandidateHints } from "./scoring";
+import { SALES_VOCAB_RE, classifyLocalPart, type CandidateHints } from "./scoring";
 
 export type ExtractedCandidate = {
   email: string;
@@ -38,6 +38,7 @@ export function extractCandidates(args: ExtractArgs): ExtractedCandidate[] {
       contextHasSalesVocab: SALES_VOCAB_RE.test(surroundingText),
       hasName: !!name,
       emailDomainMatchesPublisher: email.endsWith("@" + args.publisherDomain),
+      localPartKind: classifyLocalPart(email),
     };
     found.set(email, {
       email,
@@ -69,6 +70,7 @@ export function extractCandidates(args: ExtractArgs): ExtractedCandidate[] {
         contextHasSalesVocab: true,
         hasName: !!name,
         emailDomainMatchesPublisher: email.endsWith("@" + args.publisherDomain),
+        localPartKind: classifyLocalPart(email),
       };
       found.set(email, {
         email,
@@ -79,6 +81,33 @@ export function extractCandidates(args: ExtractArgs): ExtractedCandidate[] {
       });
     }
   });
+
+  // Pass 3: body-wide sweep for advertising inboxes (annonse@, salg@, …).
+  // These are a strong signal on their own, and are often printed in a footer
+  // or banner with no surrounding sales vocabulary — so the vocab-gated Pass 2
+  // misses them. Restricting to advertising local parts keeps this from
+  // pulling in arbitrary editorial/system addresses.
+  const bodyText = $("body").text();
+  const bodyMatches = bodyText.match(EMAIL_RE) ?? [];
+  for (const raw of bodyMatches) {
+    const email = raw.toLowerCase();
+    if (found.has(email)) continue;
+    if (classifyLocalPart(email) !== "advertising") continue;
+    found.set(email, {
+      email,
+      name: null,
+      role: null,
+      phone: null,
+      hints: {
+        isMailto: false,
+        pathKind: args.pathKind,
+        contextHasSalesVocab: false,
+        hasName: false,
+        emailDomainMatchesPublisher: email.endsWith("@" + args.publisherDomain),
+        localPartKind: "advertising",
+      },
+    });
+  }
 
   return Array.from(found.values());
 }

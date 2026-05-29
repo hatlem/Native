@@ -1,6 +1,6 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { scoreCandidate, type CandidateHints } from "./scoring";
+import { scoreCandidate, classifyLocalPart, type CandidateHints } from "./scoring";
 
 function hints(overrides: Partial<CandidateHints>): CandidateHints {
   return {
@@ -9,6 +9,7 @@ function hints(overrides: Partial<CandidateHints>): CandidateHints {
     contextHasSalesVocab: false,
     hasName: false,
     emailDomainMatchesPublisher: false,
+    localPartKind: "neutral",
     ...overrides,
   };
 }
@@ -17,7 +18,7 @@ test("baseline (no signals) is 0", () => {
   assert.equal(scoreCandidate(hints({})), 0);
 });
 
-test("strong: mailto + sales page + sales vocab + name + matching domain = 100 (capped)", () => {
+test("strong: mailto + sales page + vocab + name + matching domain = 100 (capped)", () => {
   assert.equal(
     scoreCandidate(
       hints({
@@ -28,22 +29,79 @@ test("strong: mailto + sales page + sales vocab + name + matching domain = 100 (
         emailDomainMatchesPublisher: true,
       }),
     ),
-    100, // 50+30+20+20+10 = 130, clamped to 100
+    100, // 40+25+15+15+10 = 105, clamped to 100
   );
 });
 
-test("medium: scraped-text email on /kontakt with name = 20", () => {
-  assert.equal(scoreCandidate(hints({ pathKind: "contact", hasName: true })), 20);
+test("mailto alone is 40", () => {
+  assert.equal(scoreCandidate(hints({ isMailto: true })), 40);
 });
 
-test("mailto alone is 50", () => {
-  assert.equal(scoreCandidate(hints({ isMailto: true })), 50);
+test("sales-vocab without mailto or sales path is 15", () => {
+  assert.equal(scoreCandidate(hints({ contextHasSalesVocab: true })), 15);
 });
 
-test("sales-vocab without mailto or sales path is 20", () => {
-  assert.equal(scoreCandidate(hints({ contextHasSalesVocab: true })), 20);
+test("advertising local part adds 40 — a plain mailto annonse@ reaches review", () => {
+  // 40 (mailto) + 40 (advertising) = 80
+  assert.equal(
+    scoreCandidate(hints({ isMailto: true, localPartKind: "advertising" })),
+    80,
+  );
 });
 
-test("score never below 0", () => {
-  assert.equal(scoreCandidate(hints({})), 0);
+test("editorial local part is demoted below the bulk-approve threshold", () => {
+  // Even on the ad page with a name + matching domain: 105 - 60 = 45 < 80
+  const score = scoreCandidate(
+    hints({
+      isMailto: true,
+      pathKind: "sales",
+      contextHasSalesVocab: true,
+      hasName: true,
+      emailDomainMatchesPublisher: true,
+      localPartKind: "editorial",
+    }),
+  );
+  assert.equal(score, 45);
+  assert.ok(score < 80);
+});
+
+test("score never below 0 (editorial with no positive signal)", () => {
+  assert.equal(scoreCandidate(hints({ localPartKind: "editorial" })), 0);
+});
+
+test("classifyLocalPart: advertising inboxes", () => {
+  for (const e of [
+    "annonse@avis.no",
+    "annonsering@x.se",
+    "salg@y.no",
+    "sales@z.co.uk",
+    "marketing@a.com",
+    "anzeigen@b.de",
+    "mainos@c.fi",
+    "annonsavdelningen@d.se",
+  ]) {
+    assert.equal(classifyLocalPart(e), "advertising", e);
+  }
+});
+
+test("classifyLocalPart: editorial / system inboxes", () => {
+  for (const e of [
+    "tips@avis.no",
+    "redaksjon@x.no",
+    "redaktion@y.de",
+    "abonnement@z.no",
+    "kundeservice@a.no",
+    "support@b.com",
+    "faktura@c.no",
+    "jobb@d.no",
+    "noreply@e.com",
+  ]) {
+    assert.equal(classifyLocalPart(e), "editorial", e);
+  }
+});
+
+test("classifyLocalPart: neutral inboxes (generic + named people)", () => {
+  for (const e of ["info@x.no", "post@y.no", "kontakt@z.no", "ola.nordmann@avis.no"]) {
+    assert.equal(classifyLocalPart(e), "neutral", e);
+  }
 });

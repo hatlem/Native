@@ -26,15 +26,15 @@ export type ScrapeResult = {
 };
 
 const PATHS_BY_COUNTRY: Record<string, string[]> = {
-  NO: ["/", "/annonsere", "/annonsorer", "/annonsering", "/kontakt", "/om-oss"],
-  SE: ["/", "/annonsera", "/annonsorer", "/annonsering", "/kontakt", "/om-oss"],
-  DK: ["/", "/annoncere", "/annoncorer", "/kontakt", "/om-os"],
-  FI: ["/", "/mainosta", "/mainonta", "/yhteystiedot", "/yhteys"],
-  DE: ["/", "/werben", "/anzeigen", "/kontakt", "/impressum"],
-  AT: ["/", "/werben", "/kontakt", "/impressum"],
-  CH: ["/", "/werben", "/kontakt", "/impressum"],
-  UK: ["/", "/advertise", "/advertising", "/contact", "/contact-us"],
-  IE: ["/", "/advertise", "/advertising", "/contact", "/contact-us"],
+  NO: ["/", "/annonsere", "/annonsorer", "/annonsering", "/for-annonsorer", "/mediekit", "/kontakt", "/om-oss"],
+  SE: ["/", "/annonsera", "/annonsorer", "/annonsering", "/for-annonsorer", "/mediekit", "/kontakt", "/om-oss"],
+  DK: ["/", "/annoncere", "/annoncorer", "/for-annoncorer", "/mediekit", "/kontakt", "/om-os"],
+  FI: ["/", "/mainosta", "/mainonta", "/mediakortti", "/yhteystiedot", "/yhteys"],
+  DE: ["/", "/werben", "/anzeigen", "/mediadaten", "/kontakt", "/impressum"],
+  AT: ["/", "/werben", "/mediadaten", "/kontakt", "/impressum"],
+  CH: ["/", "/werben", "/mediadaten", "/kontakt", "/impressum"],
+  UK: ["/", "/advertise", "/advertising", "/advertise-with-us", "/media-pack", "/contact", "/contact-us"],
+  IE: ["/", "/advertise", "/advertising", "/advertise-with-us", "/media-pack", "/contact", "/contact-us"],
 };
 
 export function pathsForCountry(country: string): string[] {
@@ -43,8 +43,8 @@ export function pathsForCountry(country: string): string[] {
 
 function pathKindFor(path: string): CandidateHints["pathKind"] {
   if (path === "/") return "homepage";
-  if (/annons|advert|werben|anzeigen|mainos/i.test(path)) return "sales";
-  if (/kontakt|contact|impressum|yhteys/i.test(path)) return "contact";
+  if (/annons|annonc|advert|werben|anzeigen|mainos|mediekit|mediadaten|mediakort|media-pack/i.test(path)) return "sales";
+  if (/kontakt|contact|impressum|yhteys|om-oss|om-os/i.test(path)) return "contact";
   return "other";
 }
 

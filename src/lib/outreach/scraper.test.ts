@@ -29,10 +29,16 @@ test("scrapePublisher aggregates candidates across probed paths and scores them"
     countryCode: "NO",
     fetcher,
   });
-  assert.ok(result.candidates.length >= 1);
-  const top = result.candidates[0];
-  assert.equal(top.email, "ola.nordmann@avis.no");
-  assert.ok(top.confidence >= 90);
+  assert.ok(result.candidates.length >= 2);
+  // Both strong contacts surface high: the dedicated advertising inbox
+  // (advertising local part) and the named Salgssjef.
+  const byEmail = Object.fromEntries(result.candidates.map((c) => [c.email, c]));
+  assert.ok(byEmail["annonse@avis.no"], "advertising inbox found");
+  assert.equal(byEmail["annonse@avis.no"].confidence, 100);
+  assert.ok(byEmail["ola.nordmann@avis.no"], "named seller found");
+  assert.ok(byEmail["ola.nordmann@avis.no"].confidence >= 90);
+  // Sorted by confidence descending.
+  assert.ok(result.candidates[0].confidence >= result.candidates[1].confidence);
   assert.equal(result.errors.length, 0);
 });
 

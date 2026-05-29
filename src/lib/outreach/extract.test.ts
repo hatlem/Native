@@ -25,8 +25,29 @@ test("extracts mailto + role + name from a Norwegian ad-sales page", () => {
   assert.equal(got[0].hints.hasName, true);
   assert.equal(got[0].hints.emailDomainMatchesPublisher, true);
   assert.equal(got[0].name, "Salgssjef Ola Nordmann");
-  // secondary: annonse@avis.no — generic role inbox
+  // secondary: annonse@avis.no — generic role inbox, flagged advertising
   assert.equal(got[1].email, "annonse@avis.no");
+  assert.equal(got[1].hints.localPartKind, "advertising");
+});
+
+test("Pass 3 sweeps a plain-text advertising inbox from a footer (no vocab nearby)", () => {
+  const html = `<!doctype html><html><body>
+    <h1>Forsiden</h1><p>Velkommen til nyhetene.</p>
+    <footer>Kontakt redaksjonen på <span>tips@avis.no</span>.
+    For annonser: <span>salg@avis.no</span></footer>
+  </body></html>`;
+  const got = extractCandidates({
+    html,
+    sourceUrl: "https://www.avis.no/",
+    pathKind: "homepage",
+    publisherDomain: "avis.no",
+  });
+  const byEmail = Object.fromEntries(got.map((c) => [c.email, c]));
+  // The advertising inbox is captured even with no surrounding sales vocab…
+  assert.ok(byEmail["salg@avis.no"]);
+  assert.equal(byEmail["salg@avis.no"].hints.localPartKind, "advertising");
+  // …while the editorial tip line is NOT swept in by Pass 3.
+  assert.equal(byEmail["tips@avis.no"], undefined);
 });
 
 test("extracts emails from a /kontakt page with table layout", () => {
