@@ -599,7 +599,7 @@ model ApiKey {
 model PartnerWebhook {
   id             String   @id @default(cuid())
   apiKeyId       String
-  apiKey         ApiKey   @relation(fields: [apiKeyId], references: [id])
+  apiKey         ApiKey   @relation(fields: [apiKeyId], references: [id], onDelete: Cascade)
   // Comma-separated event types. v0 known kinds: "title.activated",
   // "title.deactivated", "title.price_changed". Receivers MUST tolerate
   // unknown future event kinds rather than 4xx them.
