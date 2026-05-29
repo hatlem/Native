@@ -97,8 +97,8 @@ Backfill one `Membership { role: ADMIN, canCommit: true, expiresAt: null, status
 
 ## 3. Expiry enforcement
 
-- **Lazy (correctness):** handled by §2 — an expired delegation grants nothing the instant the timestamp passes; no job required for security.
-- **Daily sweep (hygiene only):** a secret-protected `/api/cron/expire-memberships` route flips `ACTIVE → EXPIRED` for rows past `expiresAt`, and emails the org admin + delegate a heads-up. Idempotent. Triggered by a Railway cron (mirror any existing cron pattern; otherwise add this route + scheduler). Never the security boundary.
+- **Lazy (correctness):** handled by §2 — an expired delegation grants nothing the instant the timestamp passes; no job required for security. The Team UI likewise derives "Expired" from `isMembershipActive`, so display is correct without any stored-status change.
+- **On-action reconciliation (bookkeeping only):** no cron/worker. When `getWorkspace` loads a user's memberships and observes a row that has crossed its `expiresAt` while still `status = ACTIVE`, it flips that user's stale rows to `EXPIRED` (fire-and-forget, scoped to the user). This keeps the stored `status`/audit accurate without a scheduler. (Decision: the codebase has no cron and only an in-process job queue in `src/lib/jobs.ts`; a dedicated cron route was rejected as out-of-pattern and redundant with the lazy check. A proactive "your access ended" email is intentionally out of scope for v1 — it can be added later via `enqueue()` if wanted.)
 
 ## 4. Invite & claim flow
 
