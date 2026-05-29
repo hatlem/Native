@@ -16,26 +16,40 @@ body:has(.bn) main.container {
 }
 
 /* Reconcile the public mega header with the bone landing palette.
-   The header is rendered by PublicHeader (.nav-mega-link / .nav-mega-trigger /
-   .btn / .icon-btn) outside the .bn wrapper, so the .bn token overrides
-   don't reach it — we restate the cream palette explicitly. */
+   The header (PublicHeader for anon, NavShell for signed-in users) renders
+   outside the .bn wrapper, so the .bn token overrides don't reach it. The
+   header is ALWAYS cream here, so restate the ink palette tokens on it —
+   this fixes every token consumer at once: the SVG .brand-wordmark (reads
+   --heading) and the signed-in .nav-primary links (read --muted), which
+   otherwise inherit the global dark-mode tokens and render near-white on
+   the cream bar for visitors whose OS is in dark mode. */
 body:has(.bn) header.site-header {
   background: rgba(237, 232, 219, 0.92) !important;
   border-bottom: 2px solid #14110C !important;
   color-scheme: light;
+  --heading: #14110C;
+  --text: #14110C;
+  --muted: #3A3528;
+  --muted-strong: #3A3528;
+  --ink: #14110C;
 }
 body:has(.bn) header.site-header .brand,
 body:has(.bn) header.site-header .brand:hover { color: #14110C !important; }
-/* The brand SVG wordmark uses currentColor, so it inherits from .brand above. */
+/* Belt-and-suspenders for the SVG wordmark (its own color rule reads
+   --heading, now restated above) and both header link flavours. */
+body:has(.bn) header.site-header .brand-wordmark { color: #14110C !important; }
 body:has(.bn) header.site-header .nav-mega-link,
-body:has(.bn) header.site-header .nav-mega-trigger {
+body:has(.bn) header.site-header .nav-mega-trigger,
+body:has(.bn) header.site-header .nav-primary a {
   color: #3A3528 !important;
   background: transparent !important;
 }
 body:has(.bn) header.site-header .nav-mega-link:hover,
 body:has(.bn) header.site-header .nav-mega-trigger:hover,
 body:has(.bn) header.site-header .nav-mega-trigger[aria-expanded="true"],
-body:has(.bn) header.site-header .nav-mega-link[aria-current="page"] {
+body:has(.bn) header.site-header .nav-mega-link[aria-current="page"],
+body:has(.bn) header.site-header .nav-primary a:hover,
+body:has(.bn) header.site-header .nav-primary a[aria-current="page"] {
   color: #14110C !important;
   background: rgba(20,17,12,0.06) !important;
 }
