@@ -34,21 +34,44 @@ rather than guessed.**
 | Jysk Fynske Medier | 19 | DK | `kundeservice@jfm.dk` | medium | jfm.dk/kontakt |
 | Immediate Commercial | 23 | UK | `enquiries@immediate.co.uk` | low | media.info directory (own site blocked) |
 
-### Gaps — no email published; route is a web form / named sellers
+### Named sellers (second research pass) — the 8 no-inbox groups
 
-These big groups don't expose a generic ad inbox; ad sales go through Ocast
-forms or named individual sellers. Needs a decision (use form, or find a named
-seller) before sending:
+These groups publish no generic ad inbox, so outreach routes to a named
+ad-sales / branded-content person. `high` = email seen verbatim on a live page;
+`medium` = named person verified on a live page, email constructed from the
+group's domain pattern (pattern corroborated by a real address on that domain).
+Verify `medium` before sending.
 
-| Sales house | ~Titles | Market | Notes |
-|---|---|---|---|
-| Bonnier News Brands | 91 | SE | DN, Expressen. Ocast contact forms + named sellers; no inbox. |
-| Schibsted Marketing Services | 36 | NO/SE | Aftenposten, Aftonbladet. annonseweb pages blocked; `sales@schibsted.no` seen only in snippets (unverified). |
-| Reach Commercial | 53 | UK | Daily Express, Mirror. Contact form only; `solutions@reachplc.com` unverified. |
-| Newsquest Commercial | 43 | UK | Site refused fetch; only `first.last@newsquest.co.uk` pattern (unverified). |
-| Egmont Publishing (NO) | 34 | NO | Now Story House Egmont; reachable contact page had no email. |
-| Aller Media (NO) | 22 | NO | annonse.aller.no lists ~80 individual `first.last@aller.no`, no generic inbox. |
-| Bauer Advertising KG (DE) | 24 | DE | Now BAUER ADVANCE; JS-rendered, `onlinevermarktung@baueradvance.com` unverified. |
+| Sales house | ~Titles | Mkt | Named contact (role) | Email | Conf. |
+|---|---|---|---|---|---|
+| Schibsted Partnerstudio | 36 | NO/SE | Ellen Cabrinetti Meum (Head, native studio) | `ellen.cabrinetti@schibsted.com` | high |
+| Schibsted Partnerstudio | | | Caroline Birkeland (Business Dev, branded content) | `caroline.birkeland@schibsted.com` | high |
+| Schibsted SMS | | | Martine Hansen (Salgsdirektør, SMS Norge) | `martine.hansen@schibsted.com` | medium |
+| Aller Media (NO) | 22 | NO | Chris Tallerås Steen (Salgsdirektør) | `chris.talleras.steen@aller.com` | high |
+| Aller Media (NO) | | | Asbjørn Halvorsen (Head of Content Mktg / native) | `asbjorn.halvorsen@aller.com` | high |
+| Bonnier News Brands | 91 | SE | Mats Dicklén (Head of Brand Studio, native) | `mats.dicklen@bonniernews.se` | medium |
+| Bonnier News Brands | | | Paul Brandenfeldt (Försäljningsdirektör) | `paul.brandenfeldt@bonniernews.se` | medium |
+| Reach Commercial | 53 | UK | Mark Field (Director, Reach Studio — branded content) | `mark.field@reachplc.com` | medium |
+| Reach Commercial | | | Emma Callaghan (CRO, advertising) | `emma.callaghan@reachplc.com` | medium |
+| Newsquest Commercial | 43 | UK | Sean Duffy (Commercial Dir, Scotland/NI — Herald/National) | `sean.duffy@newsquest.co.uk` | medium |
+| Egmont (NO) | 34 | NO | Jill Iren Molland (Commercial Director) | `jill.molland@egmont.com` | medium |
+| Egmont (NO) | | | Ann-Elise Ertesvåg (press/commercial) | `ann-elise.ertesvag@egmont.com` | high |
+| Bauer Advance (DE) | 24 | DE | Frank Fröhling (CSO / MD) | `frank.froehling@baueradvance.com` | medium |
+| Iconic Media (IE) | 23 | IE | Garry Mernagh (Regional Sales Director) | `garry.mernagh@iconicnews.ie` | medium |
+
+Notes:
+- Schibsted's `advertising.schibsted.com` only offers a phone + "book a
+  meeting" flow; the high-confidence route is **Partnerstudio** (their native
+  studio, emails printed in plain text at partnerstudio.no/ansatte).
+- Aller NO domain is **@aller.com** (not @aller.no); emails decoded from the
+  Cloudflare obfuscation on annonse.aller.no/kontakt.
+- Bonnier sellers each have an Ocast contact page (per-seller email is JS-loaded);
+  pattern `first.last@bonniernews.se` anchored by a seen `johan.petersen@bonniernews.se`.
+- Reach `first.last@reachplc.com` (~98% pattern); Newsquest `first.last@newsquest.co.uk` (~86%).
+- Bauer DE: since Jan 2025 German print is marketed largely via **Ad Alliance** —
+  Frank Fröhling's Bauer Advance remit may have narrowed; consider routing those
+  titles to Ad Alliance instead.
+- Iconic staff domain is `@iconicnews.ie` (RocketReach-sourced names + pattern).
 
 ## Independent rep houses (true middlemen — `REP`)
 
