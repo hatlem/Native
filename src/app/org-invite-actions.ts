@@ -82,14 +82,18 @@ export async function inviteToOrg(formData: FormData) {
     }),
   ]);
 
-  const org = await prisma.organization.findUnique({
-    where: { id: orgId },
-    select: { name: true },
-  });
+  const [org, inviter] = await Promise.all([
+    prisma.organization.findUnique({ where: { id: orgId }, select: { name: true } }),
+    prisma.user.findUnique({ where: { id: session.user.id }, select: { name: true, email: true } }),
+  ]);
+  const inviterName =
+    inviter?.name?.trim() ||
+    inviter?.email?.split("@")[0] ||
+    "An admin";
   const built = buildOrgInviteEmail({
     locale,
     orgName: org?.name ?? "your organization",
-    inviterName: session.user.name ?? "An admin",
+    inviterName,
     link: orgInviteLink(locale, token),
     role,
     delegationExpiresAt,
