@@ -315,7 +315,16 @@
     "duplicateOk": "Plan aus Ihrer vorherigen Bestellung wiederhergestellt. Bearbeiten und erneut absenden, wenn Sie bereit sind.",
     "duplicatePartial": "Plan wiederhergestellt. {dropped} Element(e) wurden entfernt, da die Titel nicht mehr aktiv sind — durchsuchen Sie den Katalog nach Alternativen.",
     "duplicateAllInactive": "Alle Titel aus dieser Bestellung sind jetzt inaktiv. Durchsuchen Sie den Katalog, um einen neuen Plan zu erstellen.",
-    "pricingOnRequest": "Preis auf Anfrage — verbindliches Angebot in 24 Std."
+    "pricingOnRequest": "Preis auf Anfrage — verbindliches Angebot in 24 Std.",
+    "startTitle": "Starten Sie Ihre Kampagne",
+    "startLead": "Teilen Sie uns Ihren Markt und Ihr Budget mit — wir schlagen Titel vor, auf die Sie Ihr Brief aufbauen können.",
+    "recommend": "Titel empfehlen",
+    "recommending": "Titel werden gesucht…",
+    "recForBudget": "Empfohlen für Ihr Budget",
+    "recAlsoConsider": "Ebenfalls einen Blick wert",
+    "reach": "monatliche Reichweite",
+    "add": "Zum Plan hinzufügen",
+    "recNone": "Noch keine Titel in diesem Markt — durchsuchen Sie den gesamten Katalog."
   },
   "rfq": {
     "org": "Firma",

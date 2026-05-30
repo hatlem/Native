@@ -315,7 +315,16 @@
     "duplicateOk": "Plan restored from your previous order. Edit and re-submit when ready.",
     "duplicatePartial": "Plan restored. {dropped} item(s) were dropped because the titles are no longer active — browse the catalog for substitutes.",
     "duplicateAllInactive": "All titles from that order are inactive now. Browse the catalog to build a fresh plan.",
-    "pricingOnRequest": "Pricing on request — firm quote in 24 h"
+    "pricingOnRequest": "Pricing on request — firm quote in 24 h",
+    "startTitle": "Start your campaign",
+    "startLead": "Tell us your market and budget — we'll suggest titles to build your brief around.",
+    "recommend": "Recommend titles",
+    "recommending": "Finding titles…",
+    "recForBudget": "Recommended for your budget",
+    "recAlsoConsider": "Also worth considering",
+    "reach": "monthly reach",
+    "add": "Add to plan",
+    "recNone": "No titles in that market yet — browse the full catalog."
   },
   "rfq": {
     "org": "Company",

@@ -315,7 +315,16 @@
     "duplicateOk": "Suunnitelma palautettu edellisestä tilauksestasi. Muokkaa ja lähetä uudelleen, kun olet valmis.",
     "duplicatePartial": "Suunnitelma palautettu. {dropped} kohde(tta) jätettiin pois, koska julkaisut eivät ole enää aktiivisia — selaa katalogia korvaajia varten.",
     "duplicateAllInactive": "Kaikki kyseisen tilauksen julkaisut ovat nyt inaktiivisia. Selaa katalogia luodaksesi uusi suunnitelma.",
-    "pricingOnRequest": "Hinta pyynnöstä — sitova tarjous 24 t kuluessa"
+    "pricingOnRequest": "Hinta pyynnöstä — sitova tarjous 24 t kuluessa",
+    "startTitle": "Aloita kampanjasi",
+    "startLead": "Kerro meille markkinasi ja budjettisi — ehdotamme julkaisuja, joiden ympärille rakentaa briefisi.",
+    "recommend": "Ehdota julkaisuja",
+    "recommending": "Etsitään julkaisuja…",
+    "recForBudget": "Suositeltu budjetillesi",
+    "recAlsoConsider": "Myös harkitsemisen arvoista",
+    "reach": "kuukausittainen tavoittavuus",
+    "add": "Lisää suunnitelmaan",
+    "recNone": "Ei vielä julkaisuja tässä markkinassa — selaa koko katalogi."
   },
   "rfq": {
     "org": "Yritys",

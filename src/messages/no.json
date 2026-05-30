@@ -236,7 +236,16 @@
     "duplicateOk": "Plan gjenopprettet fra din forrige bestilling. Rediger og send på nytt når du er klar.",
     "duplicatePartial": "Plan gjenopprettet. {dropped} element(er) ble droppet fordi titlene ikke lenger er aktive — bla i katalogen for erstatninger.",
     "duplicateAllInactive": "Alle titler fra den bestillingen er inaktive nå. Bla i katalogen for å bygge en ny plan.",
-    "pricingOnRequest": "Pris på forespørsel — fast tilbud innen 24 t"
+    "pricingOnRequest": "Pris på forespørsel — fast tilbud innen 24 t",
+    "startTitle": "Start kampanjen din",
+    "startLead": "Fortell oss marked og budsjett — vi foreslår titler du kan bygge briefen rundt.",
+    "recommend": "Foreslå titler",
+    "recommending": "Finner titler…",
+    "recForBudget": "Anbefalt for budsjettet ditt",
+    "recAlsoConsider": "Verdt å vurdere også",
+    "reach": "månedlig rekkevidde",
+    "add": "Legg til i planen",
+    "recNone": "Ingen titler i dette markedet ennå — utforsk hele katalogen."
   },
   "rfq": {
     "org": "Selskap",

@@ -236,7 +236,16 @@
     "duplicateOk": "Plan återställd från din föregående order. Redigera och skicka in igen när du är redo.",
     "duplicatePartial": "Plan återställd. {dropped} objekt togs bort eftersom titlarna inte längre är aktiva — bläddra i katalogen för ersättare.",
     "duplicateAllInactive": "Alla titlar från den ordern är inaktiva nu. Bläddra i katalogen för att bygga en ny plan.",
-    "pricingOnRequest": "Pris på begäran — fast offert inom 24 h"
+    "pricingOnRequest": "Pris på begäran — fast offert inom 24 h",
+    "startTitle": "Starta din kampanj",
+    "startLead": "Berätta vilket marknad och budget du har — vi föreslår titlar att bygga din brief kring.",
+    "recommend": "Föreslå titlar",
+    "recommending": "Hittar titlar…",
+    "recForBudget": "Rekommenderat för din budget",
+    "recAlsoConsider": "Värt att överväga också",
+    "reach": "månedlig räckvidd",
+    "add": "Lägg till i planen",
+    "recNone": "Inga titlar i den marknaden ännu — bläddra i hela katalogen."
   },
   "rfq": {
     "org": "Företag",
