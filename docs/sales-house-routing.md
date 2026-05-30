@@ -10,6 +10,14 @@ Every title is now classified by `Title.salesChannel`:
 
 The badge is visible per publisher on `/desk/publisher-contacts`.
 
+**Loaded into the DB** by `scripts/load-sales-house-contacts.ts` (machine-readable
+form of the tables below). As of the last run it created SalesContacts covering
+**850 of the 1,975 non-direct titles** (the 23 researched houses); the remaining
+~1,125 titles run through ~470 smaller houses with no verified email yet and are
+**left unmapped on purpose** — fill those in here, then rerun the loader.
+DIRECT titles are handled separately by `scripts/approve-direct-candidates.ts`
+(promotes the best scraped candidate per publisher, ≥80 confidence).
+
 `IN_HOUSE` and `REP` titles should be routed to the sales house's advertising
 inbox, **not** the per-title editorial address the scraper found. Below is the
 research result — verify before bulk-sending. **Rule applied during research:
