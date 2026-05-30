@@ -1,0 +1,18 @@
+{
+  "heading": "Ikke klar for en prat ennå?",
+  "lead": "Få korte, konkrete notater om native-annonsering i de ni markedene våre — nye titler, formatideer og hva som faktisk virker. Meld deg av når som helst.",
+  "placeholder": "deg@selskap.no",
+  "button": "Hold meg oppdatert",
+  "sending": "Sender …",
+  "success": "Nesten i mål — sjekk innboksen for å bekrefte.",
+  "error": "Den e-posten ser ikke helt riktig ut. Kan du sjekke den?",
+  "footerHeading": "Hold deg oppdatert",
+  "statusEyebrow": "Nyhetsbrev",
+  "status_confirmed_title": "Du er med.",
+  "status_confirmed_body": "Abonnementet er bekreftet. Vi tar kontakt når vi har noe som er verdt tiden din.",
+  "status_unsubscribed_title": "Du er avmeldt.",
+  "status_unsubscribed_body": "Du får ikke flere nyhetsbrev fra oss. Du kan melde deg på igjen når som helst.",
+  "status_invalid_title": "Lenken virket ikke.",
+  "status_invalid_body": "Lenken kan ha utløpt eller allerede vært brukt. Prøv å melde deg på igjen fra en hvilken som helst side.",
+  "statusHome": "Tilbake til forsiden"
+}

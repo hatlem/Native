@@ -1,0 +1,18 @@
+{
+  "heading": "Ikke klar til en snak endnu?",
+  "lead": "Få korte, konkrete noter om native-annoncering på vores ni markeder — nye titler, formatidéer og hvad der rent faktisk virker. Afmeld når som helst.",
+  "placeholder": "dig@virksomhed.dk",
+  "button": "Hold mig opdateret",
+  "sending": "Sender …",
+  "success": "Næsten i mål — tjek din indbakke for at bekræfte.",
+  "error": "Den mail ser ikke helt rigtig ud. Vil du tjekke den?",
+  "footerHeading": "Hold dig opdateret",
+  "statusEyebrow": "Nyhedsbrev",
+  "status_confirmed_title": "Du er med.",
+  "status_confirmed_body": "Dit abonnement er bekræftet. Vi vender tilbage, når vi har noget, der er din tid værd.",
+  "status_unsubscribed_title": "Du er afmeldt.",
+  "status_unsubscribed_body": "Du modtager ikke flere nyhedsbreve fra os. Du kan tilmelde dig igen når som helst.",
+  "status_invalid_title": "Linket virkede ikke.",
+  "status_invalid_body": "Linket er måske udløbet eller allerede blevet brugt. Prøv at tilmelde dig igen fra en vilkårlig side.",
+  "statusHome": "Tilbage til forsiden"
+}

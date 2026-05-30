@@ -1,0 +1,18 @@
+{
+  "heading": "Not ready to talk yet?",
+  "lead": "Get occasional, no-fluff notes on native advertising across our nine markets — new titles, format ideas, and what's working. Unsubscribe anytime.",
+  "placeholder": "you@company.com",
+  "button": "Keep me posted",
+  "sending": "Sending…",
+  "success": "Almost there — check your inbox to confirm.",
+  "error": "That email doesn't look right. Mind checking it?",
+  "footerHeading": "Stay in the loop",
+  "statusEyebrow": "Newsletter",
+  "status_confirmed_title": "You're in.",
+  "status_confirmed_body": "Your subscription is confirmed. We'll be in touch when there's something worth your time.",
+  "status_unsubscribed_title": "You're unsubscribed.",
+  "status_unsubscribed_body": "You won't receive newsletter emails from us. No hard feelings — you can resubscribe anytime.",
+  "status_invalid_title": "That link didn't work.",
+  "status_invalid_body": "The link may have expired or already been used. Try subscribing again from any page.",
+  "statusHome": "Back to home"
+}
