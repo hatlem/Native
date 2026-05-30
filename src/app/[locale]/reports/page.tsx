@@ -48,7 +48,11 @@ export default async function MyReportsPage({
 
   const statusRows = tally(orders.map((o) => o.status));
 
-  const productIds = orders.flatMap((o) => o.lines.map((l) => l.productId));
+  // Category aggregation is over placement (inventory) lines only —
+  // content-fee lines carry no product/category.
+  const productIds = orders
+    .flatMap((o) => o.lines.map((l) => l.productId))
+    .filter((id): id is string => !!id);
   const products = productIds.length
     ? await prisma.product.findMany({
         where: { id: { in: productIds } },

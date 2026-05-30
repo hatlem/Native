@@ -52,7 +52,13 @@ export default async function DeskOrderPage({
   if (!order) notFound();
 
   const products = await prisma.product.findMany({
-    where: { id: { in: order.lines.map((l) => l.productId) } },
+    where: {
+      id: {
+        in: order.lines
+          .map((l) => l.productId)
+          .filter((id): id is string => !!id),
+      },
+    },
     include: { title: true },
   });
   const byId = new Map(products.map((p) => [p.id, p]));
@@ -257,14 +263,18 @@ export default async function DeskOrderPage({
 
         <div className="stack-4">
           {order.lines.map((line) => {
-            const p = byId.get(line.productId);
+            const p = line.productId ? byId.get(line.productId) : undefined;
+            const isContentFee = line.kind === "CONTENT_FEE";
             const assets = line.brief?.assets ?? [];
             const latest = assets[0];
             return (
               <article className="card desk-line-card" key={line.id}>
                 <div className="line-head">
                   <div>
-                    <h3>{p?.title.name ?? line.productId}</h3>
+                    <h3>
+                      {p?.title.name ??
+                        (isContentFee ? tType("CONTENT_FEE") : "—")}
+                    </h3>
                     <p className="muted small">{p ? tType(p.type) : ""}</p>
                   </div>
                   <div className="price" style={{ marginTop: 0 }}>

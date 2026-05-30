@@ -36,7 +36,8 @@
     "roleAgency": "Toimisto",
     "roleAdvertiser": "Mainostaja",
     "roleGuest": "Vieras",
-    "account": "Tili"
+    "account": "Tili",
+    "contentFees": "Sisältömaksut"
   },
   "orders": {
     "eyebrow": "Tilaukset",
@@ -137,7 +138,13 @@
     "conversionSub": "Briefit, joista tuli tilauksia",
     "gmvEyebrow": "Tavaravirran bruttoarvo",
     "gmvNote": "Per valuutta — ei koskaan summata NOK/SEK/DKK välillä",
-    "orderCount": "{count, plural, =0 {0 tilausta} =1 {1 tilaus} other {# tilausta}}"
+    "orderCount": "{count, plural, =0 {0 tilausta} =1 {1 tilaus} other {# tilausta}}",
+    "revenueSplitEyebrow": "Tuotot",
+    "revenueSplit": "Tuottojen jakauma",
+    "revenueSplitNote": "Ostokate vs. sisältömaksutuotot",
+    "marginRevenue": "Kate",
+    "contentFeeRevenue": "Sisältömaksut",
+    "contentFeeShare": "Sisältömaksujen osuus"
   },
   "agency": {
     "eyebrow": "Toimisto",
@@ -326,7 +333,9 @@
     "recAlsoConsider": "Myös harkitsemisen arvoista",
     "reach": "kuukausittainen tavoittavuus",
     "add": "Lisää suunnitelmaan",
-    "recNone": "Ei vielä julkaisuja tässä markkinassa — selaa koko katalogi."
+    "recNone": "Ei vielä julkaisuja tässä markkinassa — selaa koko katalogi.",
+    "contentProduction": "Sisällöntuotanto",
+    "contentProductionHint": "Anna NativeSpinin kirjoittaa natiiviartikkeli tähän sijoitteluun (lisää tuotantomaksun)."
   },
   "rfq": {
     "org": "Yritys",
@@ -819,7 +828,8 @@
     "descNATIVE_DISPLAY": "Display-yksikkö, joka perii kustantajan typografian ja toimii feedissä, ei banneripaikoilla. Luottamuksen siirto on suurin osa arvosta.",
     "descPACKAGE": "Pakettina natiiviartikkeli ja natiivi display -vahvistus samassa julkaisussa — artikkeli vakuuttaa, display tuo tavoittavuuden.",
     "descCONTEXTUAL": "Sijoittelu kohdistetaan sivun aiheen ja toimituksellisen kontekstin perusteella käyttäjädatan sijaan — relevanssi tulee siitä, missä mainos näkyy.",
-    "descOTHER": "Mukautettu formaatti, joka ei sovi vakiokategorioihin — neuvotellaan tyypillisesti tapauskohtaisesti."
+    "descOTHER": "Mukautettu formaatti, joka ei sovi vakiokategorioihin — neuvotellaan tyypillisesti tapauskohtaisesti.",
+    "CONTENT_FEE": "Sisällöntuotanto"
   },
   "nativeFit": {
     "High": "Korkea",
@@ -1912,5 +1922,29 @@
     "wrongAccountBody": "Kutsu on osoitettu käyttäjälle {inviteEmail}. Olet kirjautunut sisään käyttäjänä {authedEmail}.",
     "signOut": "Kirjaudu ulos",
     "genericError": "Jokin meni pieleen. Tarkista tiedot ja yritä uudelleen."
+  },
+  "contentFees": {
+    "eyebrow": "Desk",
+    "title": "Sisältömaksut",
+    "lead": "Määritä, mitä NativeSpin veloittaa natiivisisällön tuotannosta. Tarkin aktiivinen sääntö (markkina + tyyppi) ratkaisee, kun ostaja pyytää meitä kirjoittamaan sijoittelun.",
+    "errorInvalid": "Anna kelvollinen maksu ja kolmikirjaiminen valuutta.",
+    "newHeading": "Uusi sääntö",
+    "market": "Markkina",
+    "anyMarket": "Kaikki markkinat",
+    "productType": "Tuotetyyppi",
+    "anyType": "Kaikki tyypit",
+    "currency": "Valuutta",
+    "greenfieldFee": "Maksu (uusi)",
+    "adaptationFee": "Maksu (mukautus)",
+    "note": "Huomautus",
+    "create": "Lisää sääntö",
+    "creating": "Lisätään…",
+    "rulesHeading": "Maksusäännöt",
+    "empty": "Ei sääntöjä vielä – lisää yllä.",
+    "status": "Tila",
+    "active": "Aktiivinen",
+    "inactive": "Ei käytössä",
+    "activate": "Aktivoi",
+    "deactivate": "Poista käytöstä"
   }
 }

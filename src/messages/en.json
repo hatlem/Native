@@ -36,7 +36,8 @@
     "roleAgency": "Agency",
     "roleAdvertiser": "Advertiser",
     "roleGuest": "Guest",
-    "account": "Account"
+    "account": "Account",
+    "contentFees": "Content fees"
   },
   "orders": {
     "eyebrow": "Orders",
@@ -137,7 +138,13 @@
     "conversionSub": "Briefs that became orders",
     "gmvEyebrow": "Gross merchandise value",
     "gmvNote": "Per currency — never summed across NOK/SEK/DKK",
-    "orderCount": "{count, plural, =0 {0 orders} =1 {1 order} other {# orders}}"
+    "orderCount": "{count, plural, =0 {0 orders} =1 {1 order} other {# orders}}",
+    "revenueSplitEyebrow": "Monetization",
+    "revenueSplit": "Revenue split",
+    "revenueSplitNote": "Buying margin vs content-fee revenue",
+    "marginRevenue": "Margin",
+    "contentFeeRevenue": "Content fees",
+    "contentFeeShare": "Content-fee share"
   },
   "agency": {
     "eyebrow": "Agency",
@@ -326,7 +333,9 @@
     "recAlsoConsider": "Also worth considering",
     "reach": "monthly reach",
     "add": "Add to plan",
-    "recNone": "No titles in that market yet — browse the full catalog."
+    "recNone": "No titles in that market yet — browse the full catalog.",
+    "contentProduction": "Content production",
+    "contentProductionHint": "Have NativeSpin write the native article for this placement (adds a production fee)."
   },
   "rfq": {
     "org": "Company",
@@ -818,7 +827,8 @@
     "descNATIVE_DISPLAY": "Display unit that inherits the publisher's typography and runs in-feed, not in banner slots. The trust transfer is most of the value.",
     "descPACKAGE": "Bundled native article plus native display amplification in the same title — the article does the persuasion, the display does the reach.",
     "descCONTEXTUAL": "Placement targeted by page topic and surrounding editorial context rather than user data — the relevance comes from where the ad runs.",
-    "descOTHER": "Custom or one-off format that doesn't fit the standard categories — typically negotiated case by case."
+    "descOTHER": "Custom or one-off format that doesn't fit the standard categories — typically negotiated case by case.",
+    "CONTENT_FEE": "Content production"
   },
   "nativeFit": {
     "High": "High",
@@ -1911,5 +1921,29 @@
     "wrongAccountBody": "This invite is for {inviteEmail}. You're signed in as {authedEmail}.",
     "signOut": "Sign out",
     "genericError": "Something went wrong. Check your details and try again."
+  },
+  "contentFees": {
+    "eyebrow": "Desk",
+    "title": "Content fees",
+    "lead": "Set what NativeSpin charges to produce native content. The most specific active rule (market + type) wins when a buyer asks us to write a placement.",
+    "errorInvalid": "Enter a valid fee and a 3-letter currency.",
+    "newHeading": "New rule",
+    "market": "Market",
+    "anyMarket": "Any market",
+    "productType": "Product type",
+    "anyType": "Any type",
+    "currency": "Currency",
+    "greenfieldFee": "Greenfield fee",
+    "adaptationFee": "Adaptation fee",
+    "note": "Note",
+    "create": "Add rule",
+    "creating": "Adding…",
+    "rulesHeading": "Fee rules",
+    "empty": "No rules yet — add one above.",
+    "status": "Status",
+    "active": "Active",
+    "inactive": "Inactive",
+    "activate": "Activate",
+    "deactivate": "Deactivate"
   }
 }

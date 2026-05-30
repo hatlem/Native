@@ -16,7 +16,8 @@
     "db:seed": "tsx prisma/seed.ts",
     "scrape-contacts": "tsx scripts/scrape-publisher-contacts.ts",
     "build-rate-card-campaign": "tsx scripts/build-rate-card-campaign.ts",
-    "send-rate-card-batch": "tsx scripts/send-rate-card-batch.ts"
+    "send-rate-card-batch": "tsx scripts/send-rate-card-batch.ts",
+    "seed-content-fees": "tsx scripts/seed-content-fees.ts"
   },
   "prisma": {
     "seed": "tsx prisma/seed.ts"

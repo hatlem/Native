@@ -36,7 +36,8 @@
     "roleAgency": "Byrå",
     "roleAdvertiser": "Annonsör",
     "roleGuest": "Gäst",
-    "account": "Konto"
+    "account": "Konto",
+    "contentFees": "Innehållsavgifter"
   },
   "reports": {
     "title": "Rapporter",
@@ -58,7 +59,13 @@
     "conversionSub": "Briefer som blev beställningar",
     "gmvEyebrow": "Bruttovärde",
     "gmvNote": "Per valuta — aldrig summerat över NOK/SEK/DKK",
-    "orderCount": "{count, plural, =0 {0 ordrar} =1 {1 order} other {# ordrar}}"
+    "orderCount": "{count, plural, =0 {0 ordrar} =1 {1 order} other {# ordrar}}",
+    "revenueSplitEyebrow": "Intäkter",
+    "revenueSplit": "Intäktsfördelning",
+    "revenueSplitNote": "Inköpsmarginal vs. intäkt från innehållsavgifter",
+    "marginRevenue": "Marginal",
+    "contentFeeRevenue": "Innehållsavgifter",
+    "contentFeeShare": "Andel innehållsavgifter"
   },
   "agency": {
     "eyebrow": "Byrå",
@@ -247,7 +254,9 @@
     "recAlsoConsider": "Värt att överväga också",
     "reach": "månatlig räckvidd",
     "add": "Lägg till i planen",
-    "recNone": "Inga titlar i den marknaden ännu — bläddra i hela katalogen."
+    "recNone": "Inga titlar i den marknaden ännu — bläddra i hela katalogen.",
+    "contentProduction": "Innehållsproduktion",
+    "contentProductionHint": "Låt NativeSpin skriva nativeartikeln för den här placeringen (lägger till en produktionsavgift)."
   },
   "rfq": {
     "org": "Företag",
@@ -740,7 +749,8 @@
     "descNATIVE_DISPLAY": "Displayenhet som ärver utgivarens typografi och körs i feeden, inte i bannerplatser. Förtroendeöverföringen är det mesta av värdet.",
     "descPACKAGE": "Native-artikel plus native display i samma titel — artikeln övertygar, displayen ger räckvidden.",
     "descCONTEXTUAL": "Placering som riktas efter sidans ämne och redaktionellt sammanhang istället för användardata — relevansen kommer från var annonsen visas.",
-    "descOTHER": "Anpassat format som inte passar standardkategorierna — förhandlas vanligtvis från fall till fall."
+    "descOTHER": "Anpassat format som inte passar standardkategorierna — förhandlas vanligtvis från fall till fall.",
+    "CONTENT_FEE": "Innehållsproduktion"
   },
   "nativeFit": {
     "High": "Hög",
@@ -1912,5 +1922,29 @@
     "wrongAccountBody": "Inbjudan gäller {inviteEmail}. Du är inloggad som {authedEmail}.",
     "signOut": "Logga ut",
     "genericError": "Något gick fel. Kontrollera uppgifterna och försök igen."
+  },
+  "contentFees": {
+    "eyebrow": "Desk",
+    "title": "Innehållsavgifter",
+    "lead": "Ange vad NativeSpin tar betalt för att producera nativeinnehåll. Den mest specifika aktiva regeln (marknad + typ) gäller när en köpare ber oss skriva en placering.",
+    "errorInvalid": "Ange en giltig avgift och en valuta med tre bokstäver.",
+    "newHeading": "Ny regel",
+    "market": "Marknad",
+    "anyMarket": "Alla marknader",
+    "productType": "Produkttyp",
+    "anyType": "Alla typer",
+    "currency": "Valuta",
+    "greenfieldFee": "Avgift (nyskriven)",
+    "adaptationFee": "Avgift (anpassning)",
+    "note": "Notering",
+    "create": "Lägg till regel",
+    "creating": "Lägger till…",
+    "rulesHeading": "Avgiftsregler",
+    "empty": "Inga regler ännu – lägg till en ovan.",
+    "status": "Status",
+    "active": "Aktiv",
+    "inactive": "Inaktiv",
+    "activate": "Aktivera",
+    "deactivate": "Inaktivera"
   }
 }

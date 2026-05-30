@@ -24,6 +24,7 @@ import {
   type QuotableItem,
 } from "@/lib/money";
 import { isProductPriceShown } from "@/lib/pricing-visibility";
+import { loadContentFeeRules, contentFeeLinesForGroup } from "@/lib/content-fee";
 import { groupItemsByMarket } from "@/lib/quote-grouping";
 import { recordAudit } from "@/lib/audit";
 import { notifyDesk, notifyOrg, notifyPublisher } from "@/lib/notify";
@@ -129,6 +130,24 @@ export async function setQuantity(formData: FormData) {
     const existing = items.find((i) => i.productId === productId);
     if (existing) {
       existing.quantity = qty;
+      await writeBasket(items);
+    }
+  }
+  redirect(`/${locale}/plan`);
+}
+
+// Toggle whether NativeSpin produces the content for one plan line.
+// Drives a CONTENT_FEE quote line at submit time. withContent="1" turns
+// it on, anything else off.
+export async function setContentProduction(formData: FormData) {
+  const locale = str(formData, "locale") || "en";
+  const productId = str(formData, "productId");
+  const on = str(formData, "withContent") === "1";
+  if (productId) {
+    const items = await readBasket();
+    const existing = items.find((i) => i.productId === productId);
+    if (existing) {
+      existing.withContent = on;
       await writeBasket(items);
     }
   }
@@ -266,6 +285,10 @@ export async function submitRequest(formData: FormData) {
     if (blocked) redirect(`/${locale}/plan?error=availability`);
   }
 
+  // Content-production fees only matter on the self-serve (allFirm) path,
+  // which mints quotes here; the RFQ path defers pricing to the desk.
+  const feeRules = allFirm ? await loadContentFeeRules() : [];
+
   const request = await prisma.$transaction(async (tx) => {
     const plan = await tx.plan.create({
       data: {
@@ -279,6 +302,7 @@ export async function submitRequest(formData: FormData) {
           create: items.map((i) => ({
             productId: i.productId,
             quantity: i.quantity,
+            withContent: i.withContent ?? false,
           })),
         },
       },
@@ -295,11 +319,19 @@ export async function submitRequest(formData: FormData) {
 
     if (allFirm) {
       for (const group of groups) {
-        const lines = computeQuoteLines(
-          group.items.map((i) =>
-            toQuotable(byId.get(i.productId)!, i.quantity),
+        const lines = [
+          ...computeQuoteLines(
+            group.items.map((i) =>
+              toQuotable(byId.get(i.productId)!, i.quantity),
+            ),
           ),
-        );
+          ...contentFeeLinesForGroup(
+            group.items,
+            byId,
+            group.marketCode,
+            feeRules,
+          ),
+        ];
         const { subtotal, total } = quoteTotals(lines, group.vatPct);
 
         const quote = await tx.quote.create({
@@ -321,6 +353,7 @@ export async function submitRequest(formData: FormData) {
             status: "CONFIRMED",
             lines: {
               create: lines.map((l) => ({
+                kind: l.kind,
                 productId: l.productId,
                 quantity: l.quantity,
                 lineTotal: l.lineTotal,
@@ -329,15 +362,19 @@ export async function submitRequest(formData: FormData) {
           },
           include: { lines: true },
         });
+        // Briefs and publisher bookings attach only to inventory lines —
+        // a CONTENT_FEE line is a billing line for production work that
+        // is briefed/fulfilled against the placement line itself.
+        const placementLines = order.lines.filter((l) => l.kind === "INVENTORY");
         await tx.contentBrief.createMany({
-          data: order.lines.map((l) => ({
+          data: placementLines.map((l) => ({
             orderLineId: l.id,
             message: goal || null,
             audience: audience || null,
           })),
         });
         await tx.publisherBooking.createMany({
-          data: order.lines.map((l) => ({ orderLineId: l.id })),
+          data: placementLines.map((l) => ({ orderLineId: l.id })),
         });
       }
     }
@@ -430,19 +467,28 @@ export async function generateQuote(formData: FormData) {
   const groups = groupItemsByMarket(request.plan.items, byId);
   if (groups.length === 0) redirect(`/${locale}/desk`);
 
+  const feeRules = await loadContentFeeRules();
   const validUntil = new Date(Date.now() + 14 * 24 * 60 * 60 * 1000);
 
   const created = await prisma.$transaction(async (tx) => {
     const quotes: { id: string; currency: string; total: number }[] = [];
     for (const group of groups) {
-      const lines = computeQuoteLines(
-        group.items
-          .map((item) => {
-            const product = byId.get(item.productId);
-            return product ? toQuotable(product, item.quantity) : null;
-          })
-          .filter((q): q is QuotableItem => q !== null),
-      );
+      const lines = [
+        ...computeQuoteLines(
+          group.items
+            .map((item) => {
+              const product = byId.get(item.productId);
+              return product ? toQuotable(product, item.quantity) : null;
+            })
+            .filter((q): q is QuotableItem => q !== null),
+        ),
+        ...contentFeeLinesForGroup(
+          group.items,
+          byId,
+          group.marketCode,
+          feeRules,
+        ),
+      ];
       const { subtotal, total } = quoteTotals(lines, group.vatPct);
       const quote = await tx.quote.create({
         data: {
@@ -624,6 +670,7 @@ export async function acceptQuote(formData: FormData) {
         status: "CONFIRMED",
         lines: {
           create: quote.lines.map((l) => ({
+            kind: l.kind,
             productId: l.productId,
             quantity: l.quantity,
             lineTotal: l.lineTotal,
@@ -633,15 +680,18 @@ export async function acceptQuote(formData: FormData) {
       include: { lines: true },
     });
 
+    // Briefs and bookings attach to placement lines only — CONTENT_FEE
+    // lines are billing-only.
+    const placementLines = order.lines.filter((l) => l.kind === "INVENTORY");
     await tx.contentBrief.createMany({
-      data: order.lines.map((line) => ({
+      data: placementLines.map((line) => ({
         orderLineId: line.id,
         message: plan.goal,
         audience: plan.audienceNote,
       })),
     });
     await tx.publisherBooking.createMany({
-      data: order.lines.map((line) => ({ orderLineId: line.id })),
+      data: placementLines.map((line) => ({ orderLineId: line.id })),
     });
 
     await tx.quote.update({
@@ -665,7 +715,9 @@ export async function acceptQuote(formData: FormData) {
     body: "A buyer accepted a quote — order is now confirmed.",
     link: `/${locale}/desk/orders/${order.id}`,
   });
-  const pubIds = await uniquePublisherIdsForProducts(quote.lines.map((l) => l.productId));
+  const pubIds = await uniquePublisherIdsForProducts(
+    quote.lines.map((l) => l.productId).filter((id): id is string => !!id),
+  );
   await Promise.all(
     pubIds.map((pid) =>
       notifyPublisher(pid, {
@@ -723,6 +775,7 @@ export async function acceptAllQuotesForRequest(formData: FormData) {
           status: "CONFIRMED",
           lines: {
             create: quote.lines.map((l) => ({
+              kind: l.kind,
               productId: l.productId,
               quantity: l.quantity,
               lineTotal: l.lineTotal,
@@ -731,15 +784,16 @@ export async function acceptAllQuotesForRequest(formData: FormData) {
         },
         include: { lines: true },
       });
+      const placementLines = order.lines.filter((l) => l.kind === "INVENTORY");
       await tx.contentBrief.createMany({
-        data: order.lines.map((line) => ({
+        data: placementLines.map((line) => ({
           orderLineId: line.id,
           message: plan.goal,
           audience: plan.audienceNote,
         })),
       });
       await tx.publisherBooking.createMany({
-        data: order.lines.map((line) => ({ orderLineId: line.id })),
+        data: placementLines.map((line) => ({ orderLineId: line.id })),
       });
       await tx.quote.update({
         where: { id: quote.id },
@@ -747,7 +801,9 @@ export async function acceptAllQuotesForRequest(formData: FormData) {
       });
       orders.push({
         id: order.id,
-        productIds: quote.lines.map((l) => l.productId),
+        productIds: quote.lines
+          .map((l) => l.productId)
+          .filter((id): id is string => !!id),
       });
     }
     await tx.request.update({

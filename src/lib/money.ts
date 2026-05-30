@@ -99,7 +99,9 @@ export type QuotableItem = {
 };
 
 export type QuoteLineComputation = {
-  productId: string;
+  kind: "INVENTORY" | "CONTENT_FEE";
+  // Null for CONTENT_FEE lines — they bill our production service.
+  productId: string | null;
   description: string;
   quantity: number;
   unitCost: number;
@@ -115,6 +117,7 @@ export function computeQuoteLines(
     const marginPct = rule ? rule.marginPct : DEFAULT_MARGIN_PCT;
     const seasonal = rule ? rule.seasonalMultiplier : DEFAULT_SEASONAL;
     return {
+      kind: "INVENTORY" as const,
       productId: i.productId,
       description: i.name,
       quantity: i.quantity,
@@ -125,6 +128,83 @@ export function computeQuoteLines(
       ),
     };
   });
+}
+
+// ---------- Content-fee pricing ----------
+// Our own production-service revenue, billed when a buyer asks NativeSpin
+// to produce the native content for a placement. Priced from a
+// ContentFeeRule (desk-owned), not the publisher rate card. One fee per
+// placement: the article is written once regardless of insertion count.
+
+export type ContentFeeRuleSpec = {
+  marketCode: string | null;
+  productType: string | null;
+  currency: string;
+  greenfieldFee: number;
+  adaptationFee: number | null;
+  active: boolean;
+};
+
+// Most-specific active match wins. Scoring: a matched productType is
+// worth more than a matched market (type drives effort far more than
+// geography); a wildcard (null) dimension scores 0. A rule whose non-null
+// dimension contradicts the request is ineligible.
+export function pickContentFeeRule(
+  rules: ContentFeeRuleSpec[],
+  productType: string,
+  marketCode: string,
+): ContentFeeRuleSpec | null {
+  const eligible = rules.filter(
+    (r) =>
+      r.active &&
+      (r.productType === null || r.productType === productType) &&
+      (r.marketCode === null || r.marketCode === marketCode),
+  );
+  if (eligible.length === 0) return null;
+  const score = (r: ContentFeeRuleSpec) =>
+    (r.productType === productType ? 2 : 0) +
+    (r.marketCode === marketCode ? 1 : 0);
+  return [...eligible].sort((a, b) => score(b) - score(a))[0];
+}
+
+export function contentFeeAmount(
+  rule: ContentFeeRuleSpec,
+  isAdaptation = false,
+): number {
+  if (isAdaptation && rule.adaptationFee != null) return rule.adaptationFee;
+  return rule.greenfieldFee;
+}
+
+export type ContentFeeItem = {
+  name: string;
+  productType: string;
+  isAdaptation?: boolean;
+};
+
+// Produce CONTENT_FEE quote lines for placements the buyer wants us to
+// write. Items with no matching active rule are skipped (no silent
+// zero-priced line — the desk sees the gap and sets a rule).
+export function computeContentFeeLines(
+  items: ContentFeeItem[],
+  rules: ContentFeeRuleSpec[],
+  marketCode: string,
+): QuoteLineComputation[] {
+  const lines: QuoteLineComputation[] = [];
+  for (const item of items) {
+    const rule = pickContentFeeRule(rules, item.productType, marketCode);
+    if (!rule) continue;
+    const fee = Math.round(contentFeeAmount(rule, item.isAdaptation));
+    lines.push({
+      kind: "CONTENT_FEE",
+      productId: null,
+      description: `Content production — ${item.name}`,
+      quantity: 1,
+      unitCost: 0,
+      marginPct: 0,
+      lineTotal: fee,
+    });
+  }
+  return lines;
 }
 
 export function quoteTotals(

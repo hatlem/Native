@@ -8,7 +8,7 @@ import { readBasket, readPlanBrief } from "@/lib/basket";
 import { indicativeFromRules, toRateRules, formatMoney } from "@/lib/money";
 import { isProductPriceShown } from "@/lib/pricing-visibility";
 import { recommendTiered, type Candidate, type SupplementaryTitle } from "@/lib/recommend";
-import { removeFromPlan, submitRequest, setQuantity, addToPlan } from "@/app/actions";
+import { removeFromPlan, submitRequest, setQuantity, addToPlan, setContentProduction } from "@/app/actions";
 import { SubmitButton } from "@/components";
 
 const MARKET_CODES = Object.values(MarketCode);
@@ -79,6 +79,7 @@ export default async function PlanPage({
         product: p,
         quantity: b.quantity,
         priceVisible,
+        withContent: b.withContent ?? false,
         lineTotal: unit * b.quantity,
       };
     })
@@ -330,6 +331,19 @@ export default async function PlanPage({
                         <button type="submit" className="btn small ghost" aria-label={t("increment")}>+</button>
                       </form>
                     </div>
+                    <form action={setContentProduction} className="plan-content-toggle">
+                      <input type="hidden" name="locale" value={locale} />
+                      <input type="hidden" name="productId" value={l.product.id} />
+                      <input type="hidden" name="withContent" value={l.withContent ? "0" : "1"} />
+                      <button
+                        type="submit"
+                        className={`btn small ${l.withContent ? "" : "ghost"}`}
+                        aria-pressed={l.withContent}
+                        title={t("contentProductionHint")}
+                      >
+                        {l.withContent ? `✓ ${t("contentProduction")}` : `+ ${t("contentProduction")}`}
+                      </button>
+                    </form>
                   </div>
                   <div className="cluster tight">
                     {l.priceVisible ? (

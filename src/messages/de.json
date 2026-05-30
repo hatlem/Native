@@ -36,7 +36,8 @@
     "roleAgency": "Agentur",
     "roleAdvertiser": "Werbetreibend",
     "roleGuest": "Gast",
-    "account": "Konto"
+    "account": "Konto",
+    "contentFees": "Content-Gebühren"
   },
   "orders": {
     "eyebrow": "Bestellungen",
@@ -137,7 +138,13 @@
     "conversionSub": "Briefs, die zu Bestellungen wurden",
     "gmvEyebrow": "Bruttowarenwert",
     "gmvNote": "Pro Währung — nie über NOK/SEK/DKK summiert",
-    "orderCount": "{count, plural, =0 {0 Bestellungen} =1 {1 Bestellung} other {# Bestellungen}}"
+    "orderCount": "{count, plural, =0 {0 Bestellungen} =1 {1 Bestellung} other {# Bestellungen}}",
+    "revenueSplitEyebrow": "Monetarisierung",
+    "revenueSplit": "Umsatzaufteilung",
+    "revenueSplitNote": "Einkaufsmarge vs. Umsatz aus Content-Gebühren",
+    "marginRevenue": "Marge",
+    "contentFeeRevenue": "Content-Gebühren",
+    "contentFeeShare": "Anteil Content-Gebühren"
   },
   "agency": {
     "eyebrow": "Agentur",
@@ -326,7 +333,9 @@
     "recAlsoConsider": "Ebenfalls einen Blick wert",
     "reach": "monatliche Reichweite",
     "add": "Zum Plan hinzufügen",
-    "recNone": "Noch keine Titel in diesem Markt — durchsuchen Sie den gesamten Katalog."
+    "recNone": "Noch keine Titel in diesem Markt — durchsuchen Sie den gesamten Katalog.",
+    "contentProduction": "Content-Produktion",
+    "contentProductionHint": "NativeSpin schreibt den Native-Artikel für diese Platzierung (zzgl. Produktionsgebühr)."
   },
   "rfq": {
     "org": "Firma",
@@ -819,7 +828,8 @@
     "descNATIVE_DISPLAY": "Display-Einheit, die die Typografie des Verlags übernimmt und im Feed läuft, nicht in Banner-Slots. Die Vertrauensübertragung macht den größten Teil des Werts aus.",
     "descPACKAGE": "Gebündelter Native-Artikel plus Native-Display-Verstärkung im selben Titel — der Artikel überzeugt, das Display sorgt für Reichweite.",
     "descCONTEXTUAL": "Platzierung, die nach Seitenthema und redaktionellem Umfeld statt nach Nutzerdaten ausgerichtet wird — die Relevanz ergibt sich aus dem Umfeld der Anzeige.",
-    "descOTHER": "Individuelles Format, das nicht in die Standardkategorien passt — wird in der Regel von Fall zu Fall verhandelt."
+    "descOTHER": "Individuelles Format, das nicht in die Standardkategorien passt — wird in der Regel von Fall zu Fall verhandelt.",
+    "CONTENT_FEE": "Content-Produktion"
   },
   "nativeFit": {
     "High": "Hoch",
@@ -1770,5 +1780,29 @@
     "wrongAccountBody": "Diese Einladung gilt für {inviteEmail}. Sie sind als {authedEmail} angemeldet.",
     "signOut": "Abmelden",
     "genericError": "Etwas ist schiefgelaufen. Überprüfen Sie Ihre Angaben und versuchen Sie es erneut."
+  },
+  "contentFees": {
+    "eyebrow": "Desk",
+    "title": "Content-Gebühren",
+    "lead": "Legen Sie fest, was NativeSpin für die Produktion von Native-Content berechnet. Die spezifischste aktive Regel (Markt + Typ) greift, wenn ein Käufer uns mit einer Platzierung beauftragt.",
+    "errorInvalid": "Geben Sie eine gültige Gebühr und eine dreistellige Währung ein.",
+    "newHeading": "Neue Regel",
+    "market": "Markt",
+    "anyMarket": "Alle Märkte",
+    "productType": "Produkttyp",
+    "anyType": "Alle Typen",
+    "currency": "Währung",
+    "greenfieldFee": "Gebühr (Neu)",
+    "adaptationFee": "Gebühr (Anpassung)",
+    "note": "Notiz",
+    "create": "Regel hinzufügen",
+    "creating": "Wird hinzugefügt…",
+    "rulesHeading": "Gebührenregeln",
+    "empty": "Noch keine Regeln – fügen Sie oben eine hinzu.",
+    "status": "Status",
+    "active": "Aktiv",
+    "inactive": "Inaktiv",
+    "activate": "Aktivieren",
+    "deactivate": "Deaktivieren"
   }
 }

@@ -10,7 +10,11 @@ import {
   quoteTotals,
   toRateRules,
   indicativeFromRules,
+  pickContentFeeRule,
+  contentFeeAmount,
+  computeContentFeeLines,
   type RateRule,
+  type ContentFeeRuleSpec,
 } from "./money";
 
 test("indicativePrice applies margin then seasonal multiplier", () => {
@@ -119,4 +123,71 @@ test("indicativeFromRules uses the tier for the given quantity", () => {
   assert.equal(indicativeFromRules(1000, TIERS, 3), 1180);
   // no rules -> default 15%: 1000 * 1.15 = 1150
   assert.equal(indicativeFromRules(1000, [], 1), 1150);
+});
+
+// ---------- Content-fee pricing ----------
+
+const FEE_RULES: ContentFeeRuleSpec[] = [
+  { marketCode: null, productType: null, currency: "NOK", greenfieldFee: 8000, adaptationFee: 4000, active: true },
+  { marketCode: null, productType: "NATIVE_ARTICLE", currency: "NOK", greenfieldFee: 12000, adaptationFee: 6000, active: true },
+  { marketCode: "NO", productType: "NATIVE_ARTICLE", currency: "NOK", greenfieldFee: 15000, adaptationFee: 7000, active: true },
+  { marketCode: "SE", productType: "NATIVE_ARTICLE", currency: "SEK", greenfieldFee: 14000, adaptationFee: 7000, active: false },
+];
+
+test("pickContentFeeRule prefers the most specific active match", () => {
+  // NO + NATIVE_ARTICLE -> the market+type rule
+  assert.equal(pickContentFeeRule(FEE_RULES, "NATIVE_ARTICLE", "NO")?.greenfieldFee, 15000);
+  // DK + NATIVE_ARTICLE -> falls back to the type-only rule (no DK rule)
+  assert.equal(pickContentFeeRule(FEE_RULES, "NATIVE_ARTICLE", "DK")?.greenfieldFee, 12000);
+  // NO + ADVERTORIAL -> falls back to the global rule
+  assert.equal(pickContentFeeRule(FEE_RULES, "ADVERTORIAL", "NO")?.greenfieldFee, 8000);
+});
+
+test("pickContentFeeRule ignores inactive rules", () => {
+  // SE + NATIVE_ARTICLE rule is inactive -> falls back to type-only
+  assert.equal(pickContentFeeRule(FEE_RULES, "NATIVE_ARTICLE", "SE")?.greenfieldFee, 12000);
+});
+
+test("pickContentFeeRule returns null when nothing matches", () => {
+  const onlyType: ContentFeeRuleSpec[] = [
+    { marketCode: null, productType: "ADVERTORIAL", currency: "NOK", greenfieldFee: 5000, adaptationFee: null, active: true },
+  ];
+  assert.equal(pickContentFeeRule(onlyType, "NATIVE_ARTICLE", "NO"), null);
+});
+
+test("contentFeeAmount picks greenfield or adaptation", () => {
+  const rule = FEE_RULES[2];
+  assert.equal(contentFeeAmount(rule), 15000);
+  assert.equal(contentFeeAmount(rule, true), 7000);
+  // adaptation falls back to greenfield when no adaptation fee set
+  const noAdapt: ContentFeeRuleSpec = { ...rule, adaptationFee: null };
+  assert.equal(contentFeeAmount(noAdapt, true), 15000);
+});
+
+test("computeContentFeeLines builds one CONTENT_FEE line per matched item", () => {
+  const lines = computeContentFeeLines(
+    [
+      { name: "Aftenposten native", productType: "NATIVE_ARTICLE" },
+      { name: "VG display", productType: "NATIVE_DISPLAY" },
+    ],
+    FEE_RULES,
+    "NO",
+  );
+  assert.equal(lines.length, 2);
+  assert.equal(lines[0].kind, "CONTENT_FEE");
+  assert.equal(lines[0].productId, null);
+  assert.equal(lines[0].lineTotal, 15000); // NO + NATIVE_ARTICLE
+  assert.equal(lines[1].lineTotal, 8000); // global fallback
+  assert.equal(lines[0].description, "Content production — Aftenposten native");
+});
+
+test("computeContentFeeLines skips items with no matching rule", () => {
+  const lines = computeContentFeeLines(
+    [{ name: "X", productType: "NATIVE_ARTICLE" }],
+    [
+      { marketCode: null, productType: "ADVERTORIAL", currency: "NOK", greenfieldFee: 5000, adaptationFee: null, active: true },
+    ],
+    "NO",
+  );
+  assert.equal(lines.length, 0);
 });

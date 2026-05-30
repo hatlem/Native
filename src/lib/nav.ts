@@ -75,6 +75,7 @@ export function navItemsFor(
       return [
         { key: "desk", label: t("desk"), href: "/desk" },
         { key: "deskOrders", label: t("orders"), href: "/desk/orders" },
+        { key: "deskContentFees", label: t("contentFees"), href: "/desk/content-fees" },
         { key: "deskReports", label: t("reports"), href: "/desk/reports" },
       ];
     case "superadmin":
@@ -82,6 +83,7 @@ export function navItemsFor(
         { key: "desk", label: t("desk"), href: "/desk" },
         { key: "deskOrders", label: t("orders"), href: "/desk/orders" },
         { key: "deskTitles", label: t("titles"), href: "/desk/titles" },
+        { key: "deskContentFees", label: t("contentFees"), href: "/desk/content-fees" },
         { key: "deskReports", label: t("reports"), href: "/desk/reports" },
       ];
   }
@@ -135,6 +137,7 @@ export function paletteItemsFor(
         return [
           { key: "desk", label: t("desk"), href: "/desk" },
           { key: "deskOrders", label: t("orders"), href: "/desk/orders" },
+          { key: "deskContentFees", label: t("contentFees"), href: "/desk/content-fees" },
           { key: "deskReports", label: t("reports"), href: "/desk/reports" },
           ...(audience === "superadmin"
             ? [{ key: "deskTitles", label: t("titles"), href: "/desk/titles" }]

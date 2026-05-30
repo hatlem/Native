@@ -280,7 +280,13 @@ export async function cancelOrder(formData: FormData) {
   // OrderLine has no direct `product` relation in the schema, so we
   // pull the publisher chain in a separate query rather than include.
   const lineProducts = await prisma.product.findMany({
-    where: { id: { in: order.lines.map((l) => l.productId) } },
+    where: {
+      id: {
+        in: order.lines
+          .map((l) => l.productId)
+          .filter((id): id is string => !!id),
+      },
+    },
     select: { title: { select: { publisherId: true } } },
   });
   const publisherIds = Array.from(

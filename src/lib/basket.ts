@@ -15,7 +15,14 @@ export function clampQuantity(n: number): number {
   return Math.min(t, MAX_QTY);
 }
 
-export type BasketItem = { productId: string; quantity: number };
+export type BasketItem = {
+  productId: string;
+  quantity: number;
+  // When true the buyer wants NativeSpin to produce the native content
+  // for this placement — drives a CONTENT_FEE quote line. Optional in the
+  // cookie payload; absent/false means bring-your-own-content.
+  withContent?: boolean;
+};
 
 export type PlanBrief = {
   budget: string;
@@ -68,12 +75,13 @@ export function parseBasket(raw: string | undefined | null): BasketItem[] {
     if (!Array.isArray(parsed)) return [];
     return parsed
       .filter(
-        (x): x is { productId: string; quantity?: unknown } =>
+        (x): x is { productId: string; quantity?: unknown; withContent?: unknown } =>
           !!x && typeof (x as { productId?: unknown }).productId === "string",
       )
       .map((x) => ({
         productId: x.productId,
         quantity: Math.max(1, Math.trunc(Number(x.quantity)) || 1),
+        withContent: x.withContent === true,
       }));
   } catch {
     return [];

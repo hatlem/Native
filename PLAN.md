@@ -31,16 +31,20 @@ incremental demand without building self-serve tech.
 desk. Progressively automate ordering toward self-serve and, where publishers
 allow, programmatic.
 
-**Market (decided).** **Nordic from the start** — Norway, Sweden, Denmark.
-Multi-language UI (NO/SE/DK/EN), multi-currency (NOK/SEK/DKK/EUR), per-market VAT.
+**Market (decided).** Launched **Nordic-first** — Norway, Sweden, Denmark — with
+the data model spanning 9 European markets (NO/SE/DK/FI/DE/AT/CH/UK/IE).
+Multi-language UI (en/no/sv/da/de/fi), multi-currency (NOK/SEK/DKK), per-market VAT.
 
 **Stack (decided).** Single TypeScript codebase: **Next.js (App Router) +
-PostgreSQL via Prisma**, deployable on Vercel/Fly. Optimized for a small team and
+PostgreSQL via Prisma**, deployed on **Railway**. Optimized for a small team and
 speed to market.
 
-**This document is plan-only.** No code is created yet. It defines product scope,
-architecture, data model, workflows, operations, roadmap, and risks so
-implementation can start with shared understanding.
+**Status.** This document is the product plan-of-record. The platform is built
+and deployed: the catalog, RFQ→quote→order commerce flow, content-production
+workflow, invoicing, publisher portal, public API + MCP, and the
+publisher-outreach engine are all implemented (see [`README.md`](./README.md)).
+The phased scope, workflows, and roadmap below remain the reference; sections
+describing future automation/self-serve are still forward-looking.
 
 ---
 
@@ -397,16 +401,16 @@ cost) and earns content margin.
 
 | Concern | Choice |
 |---|---|
-| App | Next.js (App Router) + TypeScript |
-| DB | PostgreSQL + Prisma |
-| Auth | Auth.js / Clerk (org + roles) |
-| Jobs | Redis-backed queue (BullMQ or hosted) |
-| Search | Postgres FTS first; dedicated search later if needed |
-| Storage | S3-compatible object storage |
+| App | Next.js 15 (App Router) + React 19 + TypeScript |
+| DB | PostgreSQL + Prisma 6 |
+| Auth | Auth.js (NextAuth v5) — credentials + email magic links, org + roles |
+| Jobs | In-process runner persisting to the `Job` table (swappable to BullMQ/SQS later) |
+| Search | Postgres-backed catalog search (`src/lib/catalog-search.ts`) |
+| Storage | Cloudflare R2 (S3-compatible) |
 | i18n | next-intl; per-Market locale/currency |
-| Email | Transactional email provider |
-| Hosting | Vercel/Fly + managed Postgres |
-| CI/CD | GitHub Actions; dev/staging/prod; feature flags |
+| Email | Resend (transactional + outreach; inbound webhook) |
+| Hosting | Railway + managed Postgres |
+| CI/CD | GitHub Actions; `main` auto-deploys to prod |
 
 ---
 
@@ -480,23 +484,39 @@ patterns are stable enough to automate).
 Next.js + TypeScript + Postgres/Prisma · Market = Nordic (NO/SE/DK) from start,
 multilingual + multi-currency.
 
-**Open — resolve before/early in Phase 0–1:**
-- Auth: Auth.js vs. Clerk (agency SSO needs?).
+**Resolved:**
+- Auth: **Auth.js (NextAuth v5)** — credentials + email magic links.
+- Hosting: **Railway** + managed Postgres.
+- Launch pricing: **indicative** everywhere; firm pricing on a desk-issued quote.
+
+**Still open:**
 - Primary revenue emphasis for MVP: buying margin vs. content fee weighting.
-- How public should pricing be at launch (indicative everywhere vs. firm for a
-  curated subset)?
 - Accounting/invoicing system to integrate (per-market VAT compliance).
-- Initial title target list per market and partnership approach.
-- Hosting choice (Vercel vs. Fly) and managed Postgres provider.
 - Tracking/attribution approach acceptable to publishers (UTM only vs. pixels).
 
 ---
 
-### Immediate Next Steps (when implementation is approved)
-1. Confirm the open questions above (auth, hosting, initial title list,
-   accounting integration).
-2. Phase 0: scaffold Next.js + Prisma + i18n + auth + CI; implement the
-   **catalog data model** and internal catalog admin first (it gates
-   everything).
-3. Seed an initial NO/SE/DK title set and stand up the public catalog +
-   RFQ for the Phase-1 MVP.
+### Done (Phase 0–2, parts of 3–4)
+1. Scaffolded Next.js + Prisma + i18n + auth + CI; built the **catalog data
+   model** and internal catalog admin (it gates everything).
+2. Seeded a NO/SE/DK title set and shipped the public catalog + RFQ →
+   quote → order flow (the Phase-1 MVP), plus the content-production
+   workflow, invoicing, publisher portal, public API + MCP, and the
+   publisher-outreach engine.
+
+Phase 3–4 automation already shipped: **self-serve instant-book** for all-firm
+baskets (commit-gated + availability-checked), **publisher self-managed** prices/
+visibility/specs/availability, budget-based **recommendations**, currency-grouped
+**reporting** (AOV, RFQ→order conversion), and catalog-state **partner webhooks**.
+
+### Next (genuinely not built)
+- **External accounting integration** (e.g. Fiken/Tripletex) — today invoices/
+  credit notes are modeled with per-market VAT and exported as CSV only.
+- **Campaign attribution** acceptable to publishers — UTM-per-placement / pixels
+  and delivery/engagement/conversion benchmarks. Today: site-side GTM + UTM
+  capture on outreach forms only.
+- **Phase 4 optimization loop** — content playbooks + pricing intelligence +
+  benchmarks by title/category.
+- **Publisher-side programmatic ingestion** of inventory (vs. the read-only
+  public API + the manual publisher portal).
+- Resolve the remaining business decision: revenue emphasis (margin vs. content fee).

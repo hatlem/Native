@@ -7,6 +7,7 @@ import {
   sumByGroup,
   averageOrderValue,
   conversionPct,
+  revenueSplit,
 } from "@/lib/reporting";
 
 export const dynamic = "force-dynamic";
@@ -27,7 +28,21 @@ export default async function DeskReportsPage({
       prisma.order.findMany({
         select: {
           status: true,
-          quote: { select: { currency: true, total: true, subtotal: true } },
+          quote: {
+            select: {
+              currency: true,
+              total: true,
+              subtotal: true,
+              lines: {
+                select: {
+                  kind: true,
+                  unitCost: true,
+                  quantity: true,
+                  lineTotal: true,
+                },
+              },
+            },
+          },
         },
       }),
       prisma.orderLine.findMany({ select: { productId: true } }),
@@ -51,16 +66,40 @@ export default async function DeskReportsPage({
 
   const statusRows = tally(orders.map((o) => o.status));
 
+  // Revenue split (margin vs content fee) per currency — the "emphasis"
+  // view. Computed from realized order quote lines.
+  const revenueByCurrency = currencies
+    .map((cur) => {
+      const lines = orders
+        .filter((o) => o.quote.currency === cur)
+        .flatMap((o) =>
+          o.quote.lines.map((l) => ({
+            kind: l.kind,
+            unitCost: Number(l.unitCost),
+            quantity: l.quantity,
+            lineTotal: Number(l.lineTotal),
+          })),
+        );
+      return { currency: cur, split: revenueSplit(lines) };
+    })
+    .filter((r) => r.split.totalRevenue !== 0);
+
   const products = orderLines.length
     ? await prisma.product.findMany({
-        where: { id: { in: orderLines.map((l) => l.productId) } },
+        where: {
+          id: {
+            in: orderLines
+              .map((l) => l.productId)
+              .filter((id): id is string => !!id),
+          },
+        },
         select: { id: true, title: { select: { category: true } } },
       })
     : [];
   const catById = new Map(products.map((p) => [p.id, p.title.category]));
   const categoryRows = tally(
     orderLines
-      .map((l) => catById.get(l.productId))
+      .map((l) => (l.productId ? catById.get(l.productId) : undefined))
       .filter((c): c is string => !!c),
   );
 
@@ -121,6 +160,39 @@ export default async function DeskReportsPage({
                 </p>
                 <p className="muted small">
                   {t("aov")}: {formatMoney(k.aov, k.currency, locale)}
+                </p>
+              </article>
+            ))}
+          </div>
+        )}
+      </section>
+
+      <section className="section">
+        <div className="section-head">
+          <div>
+            <span className="eyebrow">{t("revenueSplitEyebrow")}</span>
+            <h2>{t("revenueSplit")}</h2>
+          </div>
+          <span className="muted small">{t("revenueSplitNote")}</span>
+        </div>
+        {revenueByCurrency.length === 0 ? (
+          <p className="muted">{t("none")}</p>
+        ) : (
+          <div className="grid">
+            {revenueByCurrency.map(({ currency, split }) => (
+              <article className="card" key={currency}>
+                <span className="tag">{currency}</span>
+                <h3>{formatMoney(split.totalRevenue, currency, locale)}</h3>
+                <p className="muted small">
+                  {t("marginRevenue")}:{" "}
+                  {formatMoney(split.marginRevenue, currency, locale)}
+                </p>
+                <p className="muted small">
+                  {t("contentFeeRevenue")}:{" "}
+                  {formatMoney(split.contentFeeRevenue, currency, locale)}
+                </p>
+                <p className="muted small">
+                  {t("contentFeeShare")}: {split.contentFeeRatioPct}%
                 </p>
               </article>
             ))}

@@ -1,6 +1,8 @@
 // NativeSpin data model — see PLAN.md §8.
-// Phase 0 focuses on the catalog (Market/Publisher/Title/Product/PriceRule/Spec);
-// the commerce/content entities are modeled now because they gate later phases.
+// Covers the full lifecycle: catalog (Market/Publisher/Title/Product/PriceRule/
+// Spec), commerce (Plan/Request/Quote/Order/Invoice/CreditNote), content
+// production (ContentBrief/ContentAsset), multi-tenant orgs, the public API,
+// and the publisher-outreach engine (SalesContact/RateCardRequest/PriceRequest).
 
 generator client {
   provider = "prisma-client-js"
@@ -46,6 +48,16 @@ enum PricingModel {
   CPM
   CPC
   PACKAGE
+}
+
+// A quote/order line is either inventory (a publisher placement, priced
+// from the rate card with a margin) or a content-production fee (our
+// service revenue, priced from a ContentFeeRule). Splitting the two lets
+// reporting separate buying margin from content-fee revenue — the
+// "margin vs content fee" emphasis the business steers on.
+enum LineKind {
+  INVENTORY
+  CONTENT_FEE
 }
 
 enum PriceVisibility {
@@ -375,6 +387,32 @@ model Spec {
   updatedAt    DateTime @updatedAt
 }
 
+// Desk-owned price list for NativeSpin's own content-production service.
+// This is *our* revenue, not the publisher's — kept off Product (which
+// publishers edit). When a quote line is produced for a placement the
+// buyer wants us to write, we look up the most-specific active rule:
+//   (productType + marketCode) > productType > marketCode > global
+// and bill `greenfieldFee` (or `adaptationFee` when the asset reuses an
+// existing one via ContentAsset.sourceAssetId).
+model ContentFeeRule {
+  id            String       @id @default(cuid())
+  // Both nullable — null = "applies to any". A rule with both null is
+  // the global fallback. Most-specific active match wins.
+  marketCode    MarketCode?
+  productType   ProductType?
+  currency      String // ISO 4217
+  greenfieldFee Decimal      @db.Decimal(12, 2)
+  // Charged instead of greenfieldFee when adapting an existing asset for
+  // a new market. Null → fall back to greenfieldFee.
+  adaptationFee Decimal?     @db.Decimal(12, 2)
+  active        Boolean      @default(true)
+  note          String?
+  createdAt     DateTime     @default(now())
+  updatedAt     DateTime     @updatedAt
+
+  @@index([active, productType, marketCode])
+}
+
 // ---------- Accounts ----------
 
 model Organization {
@@ -665,6 +703,11 @@ model PlanItem {
   plan      Plan    @relation(fields: [planId], references: [id])
   productId String
   quantity  Int     @default(1)
+  // When true, the buyer wants NativeSpin to produce the native content
+  // for this placement — adds a CONTENT_FEE line to the quote priced
+  // from the matching ContentFeeRule. Per-placement: some buyers bring
+  // their own copy.
+  withContent Boolean @default(false)
   notes     String?
 }
 
@@ -702,15 +745,21 @@ model Quote {
 }
 
 model QuoteLine {
-  id            String  @id @default(cuid())
+  id            String   @id @default(cuid())
   quoteId       String
-  quote         Quote   @relation(fields: [quoteId], references: [id])
-  productId     String
+  quote         Quote    @relation(fields: [quoteId], references: [id])
+  kind          LineKind @default(INVENTORY)
+  // Null for CONTENT_FEE lines — those bill our production service, not
+  // a publisher placement.
+  productId     String?
   description   String
-  quantity      Int     @default(1)
-  unitCost      Decimal @db.Decimal(12, 2)
-  marginPct     Decimal @db.Decimal(5, 2)
-  lineTotal     Decimal @db.Decimal(12, 2)
+  quantity      Int      @default(1)
+  // For INVENTORY: the publisher's rate-card cost. For CONTENT_FEE: our
+  // cost basis (0 unless we want to track writer cost), so margin
+  // reporting treats the whole fee as revenue.
+  unitCost      Decimal  @db.Decimal(12, 2)
+  marginPct     Decimal  @db.Decimal(5, 2)
+  lineTotal     Decimal  @db.Decimal(12, 2)
   availability  String?
 }
 
@@ -742,12 +791,14 @@ model Order {
 }
 
 model OrderLine {
-  id        String  @id @default(cuid())
+  id        String   @id @default(cuid())
   orderId   String
-  order     Order   @relation(fields: [orderId], references: [id])
-  productId String
-  quantity  Int     @default(1)
-  lineTotal Decimal @db.Decimal(12, 2)
+  order     Order    @relation(fields: [orderId], references: [id])
+  kind      LineKind @default(INVENTORY)
+  // Null for CONTENT_FEE lines (no publisher placement to fulfil).
+  productId String?
+  quantity  Int      @default(1)
+  lineTotal Decimal  @db.Decimal(12, 2)
 
   brief   ContentBrief?
   booking PublisherBooking?

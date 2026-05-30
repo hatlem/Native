@@ -20,7 +20,9 @@ test("parseBasket drops entries without a string productId", () => {
     { productId: 5, quantity: 1 },
     { productId: "p1", quantity: 3 },
   ]);
-  assert.deepEqual(parseBasket(raw), [{ productId: "p1", quantity: 3 }]);
+  assert.deepEqual(parseBasket(raw), [
+    { productId: "p1", quantity: 3, withContent: false },
+  ]);
 });
 
 test("parseBasket clamps quantity to a positive integer", () => {
@@ -32,18 +34,31 @@ test("parseBasket clamps quantity to a positive integer", () => {
     { productId: "e", quantity: "7" },
   ]);
   assert.deepEqual(parseBasket(raw), [
-    { productId: "a", quantity: 1 },
-    { productId: "b", quantity: 1 },
-    { productId: "c", quantity: 2 },
-    { productId: "d", quantity: 1 },
-    { productId: "e", quantity: 7 },
+    { productId: "a", quantity: 1, withContent: false },
+    { productId: "b", quantity: 1, withContent: false },
+    { productId: "c", quantity: 2, withContent: false },
+    { productId: "d", quantity: 1, withContent: false },
+    { productId: "e", quantity: 7, withContent: false },
+  ]);
+});
+
+test("parseBasket carries the withContent flag (only literal true)", () => {
+  const raw = JSON.stringify([
+    { productId: "a", quantity: 1, withContent: true },
+    { productId: "b", quantity: 1, withContent: "yes" },
+    { productId: "c", quantity: 1 },
+  ]);
+  assert.deepEqual(parseBasket(raw), [
+    { productId: "a", quantity: 1, withContent: true },
+    { productId: "b", quantity: 1, withContent: false },
+    { productId: "c", quantity: 1, withContent: false },
   ]);
 });
 
 test("serializeBasket round-trips through parseBasket", () => {
   const items = [
-    { productId: "p1", quantity: 1 },
-    { productId: "p2", quantity: 4 },
+    { productId: "p1", quantity: 1, withContent: false },
+    { productId: "p2", quantity: 4, withContent: true },
   ];
   assert.deepEqual(parseBasket(serializeBasket(items)), items);
 });
