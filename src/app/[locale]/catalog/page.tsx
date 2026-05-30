@@ -90,6 +90,8 @@ export default async function CatalogPage({
     .filter((s): s is ProductType =>
       (PRODUCT_TYPES as readonly string[]).includes(s),
     );
+  const verticalsRaw = typeof sp.vertical === "string" ? sp.vertical : "";
+  const verticals = verticalsRaw.split(",").map((s) => s.trim()).filter(Boolean);
   const nativeFit = asEnum(
     typeof sp.nativeFit === "string" ? sp.nativeFit : undefined,
     NATIVE_FIT_VALUES,
@@ -125,6 +127,7 @@ export default async function CatalogPage({
     ...(types.length
       ? { products: { some: { type: { in: types }, active: true } } }
       : {}),
+    ...(verticals.length ? { vertical: { in: verticals } } : {}),
     // "Priced titles only" = a buyer can actually see a € figure. Mirror
     // isProductPriceShown (src/lib/pricing/visibility.ts): an active,
     // sales-confirmed product AND both title + publisher prices public.
@@ -154,6 +157,16 @@ export default async function CatalogPage({
         : {}),
   };
 
+  const verticalRows = await prisma.title.findMany({
+    where: { active: true, vertical: { not: null } },
+    select: { vertical: true },
+    distinct: ["vertical"],
+    orderBy: { vertical: "asc" },
+  });
+  const verticalOptions = verticalRows
+    .map((r) => r.vertical!)
+    .filter((v) => v.trim().length > 0);
+
   const [totalCount, titles] = await Promise.all([
     prisma.title.count({ where }),
     prisma.title.findMany({
@@ -178,6 +191,7 @@ export default async function CatalogPage({
     const params = new URLSearchParams();
     if (markets.length) params.set("market", markets.join(","));
     if (types.length) params.set("types", types.join(","));
+    if (verticals.length) params.set("vertical", verticals.join(","));
     if (nativeFit) params.set("nativeFit", nativeFit);
     if (b2bB2c) params.set("b2bB2c", b2bB2c);
     if (onlyPriced) params.set("onlyPriced", "1");
@@ -195,13 +209,14 @@ export default async function CatalogPage({
   type FilterKey =
     | "market"
     | "types"
+    | "vertical"
     | "nativeFit"
     | "b2bB2c"
     | "onlyPriced"
     | "q";
   const filterHref = (
     except: FilterKey,
-    extra?: { dropType?: ProductType; dropMarket?: MarketCode },
+    extra?: { dropType?: ProductType; dropMarket?: MarketCode; dropVertical?: string },
   ) => {
     const params = new URLSearchParams();
     if (except !== "market") {
@@ -215,6 +230,12 @@ export default async function CatalogPage({
         ? types.filter((t) => t !== extra.dropType)
         : types;
       if (keep.length) params.set("types", keep.join(","));
+    }
+    if (except !== "vertical") {
+      const keep = extra?.dropVertical
+        ? verticals.filter((v) => v !== extra.dropVertical)
+        : verticals;
+      if (keep.length) params.set("vertical", keep.join(","));
     }
     if (nativeFit && except !== "nativeFit") params.set("nativeFit", nativeFit);
     if (b2bB2c && except !== "b2bB2c") params.set("b2bB2c", b2bB2c);
@@ -239,6 +260,13 @@ export default async function CatalogPage({
       key: `type-${tp}`,
       label: `${t("filters.type")}: ${tType(tp)}`,
       href: filterHref("types", { dropType: tp }),
+    });
+  }
+  for (const v of verticals) {
+    activeFilters.push({
+      key: `vertical-${v}`,
+      label: `${t("filters.category")}: ${v}`,
+      href: filterHref("vertical", { dropVertical: v }),
     });
   }
   if (nativeFit)
@@ -276,10 +304,12 @@ export default async function CatalogPage({
         formats={PRODUCT_TYPES.map((pt) => ({ value: pt, label: tType(pt) }))}
         nativeFits={NATIVE_FIT_VALUES.map((v) => ({ value: v, label: tFit(v) }))}
         b2bB2cs={B2B_B2C_VALUES.map((v) => ({ value: v, label: v }))}
+        categories={verticalOptions.map((v) => ({ value: v, label: v }))}
         initial={{
           q,
           markets,
           types,
+          verticals,
           nativeFit: nativeFit ?? "",
           b2bB2c: b2bB2c ?? "",
           onlyPriced,

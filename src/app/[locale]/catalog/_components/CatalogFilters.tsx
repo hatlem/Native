@@ -12,10 +12,12 @@ type Props = {
   formats: Option[];
   nativeFits: Option[];
   b2bB2cs: Option[];
+  categories: Option[];
   initial: {
     q: string;
     markets: string[];
     types: string[];
+    verticals: string[];
     nativeFit: string;
     b2bB2c: string;
     onlyPriced: boolean;
@@ -26,7 +28,7 @@ type Props = {
 
 const SEARCH_DEBOUNCE_MS = 300;
 
-export function CatalogFilters({ markets, formats, nativeFits, b2bB2cs, initial }: Props) {
+export function CatalogFilters({ markets, formats, nativeFits, b2bB2cs, categories, initial }: Props) {
   const router = useRouter();
   const pathname = usePathname();
   const sp = useSearchParams();
@@ -36,9 +38,11 @@ export function CatalogFilters({ markets, formats, nativeFits, b2bB2cs, initial 
   const [q, setQ] = useState(initial.q);
   const [formatOpen, setFormatOpen] = useState(false);
   const [marketOpen, setMarketOpen] = useState(false);
+  const [categoryOpen, setCategoryOpen] = useState(false);
   const [advancedOpen, setAdvancedOpen] = useState(initial.advancedOpen);
   const formatRef = useRef<HTMLDivElement>(null);
   const marketRef = useRef<HTMLDivElement>(null);
+  const categoryRef = useRef<HTMLDivElement>(null);
 
   // Debounced URL update for the search input. Other filter changes
   // commit instantly — only the text field waits for the typist to pause.
@@ -80,6 +84,18 @@ export function CatalogFilters({ markets, formats, nativeFits, b2bB2cs, initial 
     document.addEventListener("mousedown", onDown);
     return () => document.removeEventListener("mousedown", onDown);
   }, [marketOpen]);
+
+  // Same outside-click handling for the category popover.
+  useEffect(() => {
+    if (!categoryOpen) return;
+    function onDown(e: MouseEvent) {
+      if (categoryRef.current && !categoryRef.current.contains(e.target as Node)) {
+        setCategoryOpen(false);
+      }
+    }
+    document.addEventListener("mousedown", onDown);
+    return () => document.removeEventListener("mousedown", onDown);
+  }, [categoryOpen]);
 
   function commit(updater: (params: URLSearchParams) => void) {
     const next = new URLSearchParams(sp.toString());
@@ -129,6 +145,22 @@ export function CatalogFilters({ markets, formats, nativeFits, b2bB2cs, initial 
     commit((p) => p.delete("market"));
   }
 
+  function toggleCategory(value: string) {
+    const current = sp.get("vertical")?.split(",").filter(Boolean) ?? [];
+    const has = current.includes(value);
+    const nextValues = has
+      ? current.filter((v) => v !== value)
+      : [...current, value];
+    commit((p) => {
+      if (nextValues.length) p.set("vertical", nextValues.join(","));
+      else p.delete("vertical");
+    });
+  }
+
+  function clearCategories() {
+    commit((p) => p.delete("vertical"));
+  }
+
   function toggleOnlyPriced(checked: boolean) {
     commit((p) => {
       if (checked) p.set("onlyPriced", "1");
@@ -155,6 +187,8 @@ export function CatalogFilters({ markets, formats, nativeFits, b2bB2cs, initial 
       : selectedMarkets.size === 1
         ? (markets.find((m) => m.value === initial.markets[0])?.label ?? initial.markets[0])
         : t("marketCount", { count: selectedMarkets.size });
+  const selectedCategories = new Set(initial.verticals);
+  const categoryLabel = t("categoryCount", { count: selectedCategories.size });
 
   return (
     <div className="catalog-filters">
@@ -209,6 +243,47 @@ export function CatalogFilters({ markets, formats, nativeFits, b2bB2cs, initial 
                     type="button"
                     className="catalog-filters__popover-clear"
                     onClick={clearMarkets}
+                  >
+                    {t("all")}
+                  </button>
+                ) : null}
+              </div>
+            ) : null}
+          </div>
+        </div>
+
+        <div className="catalog-filters__field">
+          <label>{t("category")}</label>
+          <div className="catalog-filters__multi" ref={categoryRef}>
+            <button
+              type="button"
+              className="catalog-filters__multi-trigger"
+              onClick={() => setCategoryOpen((o) => !o)}
+              aria-haspopup="true"
+              aria-expanded={categoryOpen}
+            >
+              <span>{categoryLabel}</span>
+              <span aria-hidden="true" className="catalog-filters__chev">
+                ⌄
+              </span>
+            </button>
+            {categoryOpen ? (
+              <div className="catalog-filters__popover" role="dialog">
+                {categories.map((c) => (
+                  <label key={c.value} className="catalog-filters__popover-row">
+                    <input
+                      type="checkbox"
+                      checked={selectedCategories.has(c.value)}
+                      onChange={() => toggleCategory(c.value)}
+                    />
+                    <span>{c.label}</span>
+                  </label>
+                ))}
+                {selectedCategories.size > 0 ? (
+                  <button
+                    type="button"
+                    className="catalog-filters__popover-clear"
+                    onClick={clearCategories}
                   >
                     {t("all")}
                   </button>
@@ -275,6 +350,22 @@ export function CatalogFilters({ markets, formats, nativeFits, b2bB2cs, initial 
           </select>
         </div>
 
+        <div className="catalog-filters__field">
+          <label htmlFor="b2bB2c">{t("b2bB2c")}</label>
+          <select
+            id="b2bB2c"
+            value={initial.b2bB2c}
+            onChange={(e) => setSingle("b2bB2c", e.target.value)}
+          >
+            <option value="">{t("all")}</option>
+            {b2bB2cs.map((v) => (
+              <option key={v.value} value={v.value}>
+                {v.label}
+              </option>
+            ))}
+          </select>
+        </div>
+
         <label className="filter-checkbox">
           <input
             type="checkbox"
@@ -297,22 +388,6 @@ export function CatalogFilters({ markets, formats, nativeFits, b2bB2cs, initial 
 
       {advancedOpen ? (
         <div className="catalog-filters__advanced">
-          <div className="catalog-filters__field">
-            <label htmlFor="b2bB2c">{t("b2bB2c")}</label>
-            <select
-              id="b2bB2c"
-              value={initial.b2bB2c}
-              onChange={(e) => setSingle("b2bB2c", e.target.value)}
-            >
-              <option value="">{t("all")}</option>
-              {b2bB2cs.map((v) => (
-                <option key={v.value} value={v.value}>
-                  {v.label}
-                </option>
-              ))}
-            </select>
-          </div>
-
           <label className="filter-checkbox catalog-filters__compare-toggle">
             <input
               type="checkbox"

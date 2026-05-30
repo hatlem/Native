@@ -214,6 +214,8 @@
       "searchPlaceholder": "Hae julkaisuja, vertikaaleja tai tageja…",
       "apply": "Käytä",
       "advanced": "Lisäasetukset",
+      "category": "Kategoria",
+      "categoryCount": "{count, plural, =0 {Kaikki kategoriat} =1 {1 kategoria} other {# kategoriaa}}",
       "formatCount": "{count, plural, =0 {Kaikki formaatit} =1 {1 formaatti} other {# formaattia}}",
       "marketCount": "{count, plural, =0 {Kaikki markkinat} =1 {1 markkina} other {# markkinaa}}",
       "compareMode": "Vertailutyökalu",

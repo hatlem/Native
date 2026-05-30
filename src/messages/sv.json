@@ -135,6 +135,8 @@
       "searchPlaceholder": "Sök bland titlar, vertikaler eller taggar…",
       "apply": "Använd",
       "advanced": "Avancerade alternativ",
+      "category": "Kategori",
+      "categoryCount": "{count, plural, =0 {Alla kategorier} =1 {1 kategori} other {# kategorier}}",
       "formatCount": "{count, plural, =0 {Alla format} =1 {1 format} other {# format}}",
       "marketCount": "{count, plural, =0 {Alla marknader} =1 {1 marknad} other {# marknader}}",
       "compareMode": "Jämförelsväljare",
