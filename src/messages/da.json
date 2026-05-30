@@ -37,7 +37,8 @@
     "roleAdvertiser": "Annoncør",
     "roleGuest": "Gæst",
     "account": "Konto",
-    "contentFees": "Indholdsgebyrer"
+    "contentFees": "Indholdsgebyrer",
+    "playbooks": "Spillebøger"
   },
   "reports": {
     "title": "Rapporter",
@@ -65,7 +66,18 @@
     "revenueSplitNote": "Indkøbsmargin vs. indtægt fra indholdsgebyrer",
     "marginRevenue": "Margin",
     "contentFeeRevenue": "Indholdsgebyrer",
-    "contentFeeShare": "Andel indholdsgebyrer"
+    "contentFeeShare": "Andel indholdsgebyrer",
+    "pricingIntelEyebrow": "Prisindsigt",
+    "pricingIntel": "Foreslået margin pr. kategori",
+    "pricingIntelNote": "Højeste margin der stadig vandt aftaler – vejledende, aldrig automatisk",
+    "pricingIntelEmpty": "Ikke nok afgjorte tilbud endnu til benchmark.",
+    "benchSamples": "Tilbud",
+    "benchWinRate": "Vinderrate",
+    "benchAvgMargin": "Gns. margin",
+    "suggestedMargin": "Foreslået",
+    "basis_win-rate": "fra vinderrate",
+    "basis_category-median": "kategorimedian",
+    "basis_default": "standard"
   },
   "agency": {
     "eyebrow": "Bureau",
@@ -1947,5 +1959,32 @@
     "inactive": "Inaktiv",
     "activate": "Aktivér",
     "deactivate": "Deaktivér"
+  },
+  "playbooks": {
+    "eyebrow": "Desk",
+    "title": "Indholdsspillebøger",
+    "lead": "Genbrugelig vejledning til, hvad der giver god native pr. format, kategori og marked. Den mest specifikke aktive spillebog vises for skribenten på hver brief.",
+    "errorInvalid": "En titel er påkrævet.",
+    "newHeading": "Ny spillebog",
+    "playbookTitle": "Titel",
+    "productType": "Produkttype",
+    "anyType": "Alle typer",
+    "category": "Kategori",
+    "anyCategory": "Alle kategorier",
+    "market": "Marked",
+    "anyMarket": "Alle markeder",
+    "angle": "Vinkel",
+    "structure": "Struktur",
+    "doList": "Gør",
+    "dontList": "Lad være",
+    "exampleHeadlines": "Eksempeloverskrifter",
+    "listHint": "Én pr. linje",
+    "create": "Tilføj spillebog",
+    "creating": "Tilføjer…",
+    "listHeading": "Spillebøger",
+    "empty": "Ingen spillebøger endnu – tilføj en ovenfor.",
+    "activate": "Aktivér",
+    "deactivate": "Deaktivér",
+    "matchedEyebrow": "Spillebog"
   }
 }

@@ -37,7 +37,8 @@
     "roleAdvertiser": "Annonsør",
     "roleGuest": "Gjest",
     "account": "Konto",
-    "contentFees": "Innholdshonorar"
+    "contentFees": "Innholdshonorar",
+    "playbooks": "Spillebøker"
   },
   "reports": {
     "title": "Rapporter",
@@ -65,7 +66,18 @@
     "revenueSplitNote": "Innkjøpsmargin vs. inntekt fra innholdshonorar",
     "marginRevenue": "Margin",
     "contentFeeRevenue": "Innholdshonorar",
-    "contentFeeShare": "Andel innholdshonorar"
+    "contentFeeShare": "Andel innholdshonorar",
+    "pricingIntelEyebrow": "Prisinnsikt",
+    "pricingIntel": "Foreslått margin per kategori",
+    "pricingIntelNote": "Høyeste margin som fortsatt vant avtaler – veiledende, aldri automatisk",
+    "pricingIntelEmpty": "Ikke nok avgjorte tilbud ennå til å lage referanse.",
+    "benchSamples": "Tilbud",
+    "benchWinRate": "Vinnerrate",
+    "benchAvgMargin": "Snittmargin",
+    "suggestedMargin": "Foreslått",
+    "basis_win-rate": "fra vinnerrate",
+    "basis_category-median": "kategorimedian",
+    "basis_default": "standard"
   },
   "agency": {
     "eyebrow": "Byrå",
@@ -1946,5 +1958,32 @@
     "inactive": "Inaktiv",
     "activate": "Aktiver",
     "deactivate": "Deaktiver"
+  },
+  "playbooks": {
+    "eyebrow": "Desk",
+    "title": "Innholdsspillebøker",
+    "lead": "Gjenbrukbar veiledning for hva som gir god native per format, kategori og marked. Den mest spesifikke aktive spilleboken vises for skribenten på hver brief.",
+    "errorInvalid": "Tittel er påkrevd.",
+    "newHeading": "Ny spillebok",
+    "playbookTitle": "Tittel",
+    "productType": "Produkttype",
+    "anyType": "Alle typer",
+    "category": "Kategori",
+    "anyCategory": "Alle kategorier",
+    "market": "Marked",
+    "anyMarket": "Alle marked",
+    "angle": "Vinkling",
+    "structure": "Struktur",
+    "doList": "Gjør",
+    "dontList": "Ikke gjør",
+    "exampleHeadlines": "Eksempeltitler",
+    "listHint": "Én per linje",
+    "create": "Legg til spillebok",
+    "creating": "Legger til…",
+    "listHeading": "Spillebøker",
+    "empty": "Ingen spillebøker ennå – legg til en over.",
+    "activate": "Aktiver",
+    "deactivate": "Deaktiver",
+    "matchedEyebrow": "Spillebok"
   }
 }

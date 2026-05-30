@@ -14,6 +14,7 @@ import {
 } from "@/app/desk-actions";
 import { StatusBadge } from "@/app/status-badge";
 import { canCancelOrder, cancelBlockReason } from "@/lib/cancellation";
+import { pickPlaybook } from "@/lib/playbook";
 import { SubmitButton } from "@/components";
 
 export const dynamic = "force-dynamic";
@@ -63,6 +64,16 @@ export default async function DeskOrderPage({
   });
   const byId = new Map(products.map((p) => [p.id, p]));
   const invoice = order.invoices[0];
+
+  // Phase-4 playbooks: load active playbooks once and match per placement
+  // line so the writer sees the relevant guidance inline.
+  const playbooks = await prisma.playbook.findMany({ where: { active: true } });
+  const matchablePlaybooks = playbooks.map((p) => ({
+    ...p,
+    productType: p.productType as string | null,
+    marketCode: p.marketCode as string | null,
+  }));
+  const tpb = await getTranslations({ locale, namespace: "playbooks" });
 
   return (
     <>
@@ -267,6 +278,14 @@ export default async function DeskOrderPage({
             const isContentFee = line.kind === "CONTENT_FEE";
             const assets = line.brief?.assets ?? [];
             const latest = assets[0];
+            const pb = p
+              ? pickPlaybook(
+                  matchablePlaybooks,
+                  p.type,
+                  p.title.category,
+                  p.title.countryCode,
+                )
+              : null;
             return (
               <article className="card desk-line-card" key={line.id}>
                 <div className="line-head">
@@ -285,6 +304,64 @@ export default async function DeskOrderPage({
                     )}
                   </div>
                 </div>
+
+                {pb ? (
+                  <div className="card playbook-card" style={{ marginTop: 0 }}>
+                    <span className="eyebrow accent">{tpb("matchedEyebrow")}</span>
+                    <h4 style={{ margin: "0.25rem 0" }}>{pb.title}</h4>
+                    {pb.angle ? (
+                      <p className="small">
+                        <strong>{tpb("angle")}:</strong> {pb.angle}
+                      </p>
+                    ) : null}
+                    {pb.structure ? (
+                      <p className="small">
+                        <strong>{tpb("structure")}:</strong> {pb.structure}
+                      </p>
+                    ) : null}
+                    <div className="grid two">
+                      {pb.doList ? (
+                        <div>
+                          <p className="small muted">{tpb("doList")}</p>
+                          <ul className="small">
+                            {pb.doList
+                              .split("\n")
+                              .filter((s) => s.trim())
+                              .map((s, i) => (
+                                <li key={i}>{s.trim()}</li>
+                              ))}
+                          </ul>
+                        </div>
+                      ) : null}
+                      {pb.dontList ? (
+                        <div>
+                          <p className="small muted">{tpb("dontList")}</p>
+                          <ul className="small">
+                            {pb.dontList
+                              .split("\n")
+                              .filter((s) => s.trim())
+                              .map((s, i) => (
+                                <li key={i}>{s.trim()}</li>
+                              ))}
+                          </ul>
+                        </div>
+                      ) : null}
+                    </div>
+                    {pb.exampleHeadlines ? (
+                      <details>
+                        <summary className="small">{tpb("exampleHeadlines")}</summary>
+                        <ul className="small">
+                          {pb.exampleHeadlines
+                            .split("\n")
+                            .filter((s) => s.trim())
+                            .map((s, i) => (
+                              <li key={i}>{s.trim()}</li>
+                            ))}
+                        </ul>
+                      </details>
+                    ) : null}
+                  </div>
+                ) : null}
 
                 {line.brief?.audience || line.brief?.message ? (
                   <dl className="spec-grid">

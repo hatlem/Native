@@ -37,7 +37,8 @@
     "roleAdvertiser": "Mainostaja",
     "roleGuest": "Vieras",
     "account": "Tili",
-    "contentFees": "Sisältömaksut"
+    "contentFees": "Sisältömaksut",
+    "playbooks": "Pelikirjat"
   },
   "orders": {
     "eyebrow": "Tilaukset",
@@ -144,7 +145,18 @@
     "revenueSplitNote": "Ostokate vs. sisältömaksutuotot",
     "marginRevenue": "Kate",
     "contentFeeRevenue": "Sisältömaksut",
-    "contentFeeShare": "Sisältömaksujen osuus"
+    "contentFeeShare": "Sisältömaksujen osuus",
+    "pricingIntelEyebrow": "Hinnoittelutieto",
+    "pricingIntel": "Ehdotettu kate kategorioittain",
+    "pricingIntelNote": "Korkein kate, jolla kaupat vielä voitettiin – ohjeellinen, ei automaattinen",
+    "pricingIntelEmpty": "Ei vielä tarpeeksi ratkaistuja tarjouksia vertailuun.",
+    "benchSamples": "Tarjoukset",
+    "benchWinRate": "Voittoprosentti",
+    "benchAvgMargin": "Keskikate",
+    "suggestedMargin": "Ehdotettu",
+    "basis_win-rate": "voittoprosentista",
+    "basis_category-median": "kategorian mediaani",
+    "basis_default": "oletus"
   },
   "agency": {
     "eyebrow": "Toimisto",
@@ -1946,5 +1958,32 @@
     "inactive": "Ei käytössä",
     "activate": "Aktivoi",
     "deactivate": "Poista käytöstä"
+  },
+  "playbooks": {
+    "eyebrow": "Desk",
+    "title": "Sisältöpelikirjat",
+    "lead": "Uudelleenkäytettävä ohjeistus hyvästä natiivisisällöstä formaatin, kategorian ja markkinan mukaan. Tarkin aktiivinen pelikirja näkyy kirjoittajalle jokaisessa briefissä.",
+    "errorInvalid": "Otsikko vaaditaan.",
+    "newHeading": "Uusi pelikirja",
+    "playbookTitle": "Otsikko",
+    "productType": "Tuotetyyppi",
+    "anyType": "Kaikki tyypit",
+    "category": "Kategoria",
+    "anyCategory": "Kaikki kategoriat",
+    "market": "Markkina",
+    "anyMarket": "Kaikki markkinat",
+    "angle": "Näkökulma",
+    "structure": "Rakenne",
+    "doList": "Tee",
+    "dontList": "Älä tee",
+    "exampleHeadlines": "Esimerkkiotsikot",
+    "listHint": "Yksi riviä kohden",
+    "create": "Lisää pelikirja",
+    "creating": "Lisätään…",
+    "listHeading": "Pelikirjat",
+    "empty": "Ei pelikirjoja vielä – lisää yllä.",
+    "activate": "Aktivoi",
+    "deactivate": "Poista käytöstä",
+    "matchedEyebrow": "Pelikirja"
   }
 }

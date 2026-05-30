@@ -37,7 +37,8 @@
     "roleAdvertiser": "Advertiser",
     "roleGuest": "Guest",
     "account": "Account",
-    "contentFees": "Content fees"
+    "contentFees": "Content fees",
+    "playbooks": "Playbooks"
   },
   "orders": {
     "eyebrow": "Orders",
@@ -144,7 +145,18 @@
     "revenueSplitNote": "Buying margin vs content-fee revenue",
     "marginRevenue": "Margin",
     "contentFeeRevenue": "Content fees",
-    "contentFeeShare": "Content-fee share"
+    "contentFeeShare": "Content-fee share",
+    "pricingIntelEyebrow": "Pricing intelligence",
+    "pricingIntel": "Suggested margin by category",
+    "pricingIntelNote": "Highest margin that still won deals — advisory, never auto-applied",
+    "pricingIntelEmpty": "Not enough decided quotes yet to benchmark.",
+    "benchSamples": "Quotes",
+    "benchWinRate": "Win rate",
+    "benchAvgMargin": "Avg margin",
+    "suggestedMargin": "Suggested",
+    "basis_win-rate": "from win rate",
+    "basis_category-median": "category median",
+    "basis_default": "default"
   },
   "agency": {
     "eyebrow": "Agency",
@@ -1945,5 +1957,32 @@
     "inactive": "Inactive",
     "activate": "Activate",
     "deactivate": "Deactivate"
+  },
+  "playbooks": {
+    "eyebrow": "Desk",
+    "title": "Content playbooks",
+    "lead": "Reusable guidance for what makes good native per format, category and market. The most specific active playbook surfaces to the writer on every brief.",
+    "errorInvalid": "A title is required.",
+    "newHeading": "New playbook",
+    "playbookTitle": "Title",
+    "productType": "Product type",
+    "anyType": "Any type",
+    "category": "Category",
+    "anyCategory": "Any category",
+    "market": "Market",
+    "anyMarket": "Any market",
+    "angle": "Angle",
+    "structure": "Structure",
+    "doList": "Do",
+    "dontList": "Don't",
+    "exampleHeadlines": "Example headlines",
+    "listHint": "One per line",
+    "create": "Add playbook",
+    "creating": "Adding…",
+    "listHeading": "Playbooks",
+    "empty": "No playbooks yet — add one above.",
+    "activate": "Activate",
+    "deactivate": "Deactivate",
+    "matchedEyebrow": "Playbook"
   }
 }

@@ -9,8 +9,16 @@ import {
   conversionPct,
   revenueSplit,
 } from "@/lib/reporting";
+import {
+  benchmarkBy,
+  suggestMargin,
+  median,
+  type BenchmarkRow,
+} from "@/lib/pricing-intelligence";
 
 export const dynamic = "force-dynamic";
+
+const DECIDED = ["ACCEPTED", "DECLINED", "EXPIRED"] as const;
 
 export default async function DeskReportsPage({
   params,
@@ -49,6 +57,63 @@ export default async function DeskReportsPage({
       prisma.market.findMany({ select: { currency: true } }),
       prisma.invoice.findMany({ select: { status: true } }),
     ]);
+
+  // Pricing intelligence: benchmark + suggested margin per category, from
+  // decided (won/lost) quote inventory lines.
+  const decidedQuotes = await prisma.quote.findMany({
+    where: { status: { in: [...DECIDED] } },
+    select: {
+      status: true,
+      lines: {
+        where: { kind: "INVENTORY" },
+        select: { productId: true, marginPct: true, lineTotal: true },
+      },
+    },
+  });
+  const benchProductIds = [
+    ...new Set(
+      decidedQuotes.flatMap((q) =>
+        q.lines.map((l) => l.productId).filter((id): id is string => !!id),
+      ),
+    ),
+  ];
+  const benchProducts = benchProductIds.length
+    ? await prisma.product.findMany({
+        where: { id: { in: benchProductIds } },
+        select: { id: true, title: { select: { category: true } } },
+      })
+    : [];
+  const catByProduct = new Map(
+    benchProducts.map((p) => [p.id, p.title.category]),
+  );
+  const benchRows: BenchmarkRow[] = decidedQuotes.flatMap((q) =>
+    q.lines.flatMap((l) => {
+      const cat = l.productId ? catByProduct.get(l.productId) : undefined;
+      if (!cat) return [];
+      return [
+        {
+          key: cat,
+          marginPct: Number(l.marginPct),
+          lineTotal: Number(l.lineTotal),
+          won: q.status === "ACCEPTED",
+        },
+      ];
+    }),
+  );
+  const benchmarks = benchmarkBy(benchRows);
+  const overallMedianMargin = median(benchRows.map((r) => r.marginPct));
+  const pricingIntel = benchmarks.map((b) => {
+    const obs = benchRows
+      .filter((r) => r.key === b.key)
+      .map((r) => ({ marginPct: r.marginPct, won: r.won }));
+    const catMedian = median(
+      benchRows.filter((r) => r.key === b.key).map((r) => r.marginPct),
+    );
+    return {
+      benchmark: b,
+      suggestion: suggestMargin(obs, catMedian ?? overallMedianMargin),
+    };
+  });
 
   const currencies = [...new Set(markets.map((m) => m.currency))];
   const kpis = currencies
@@ -196,6 +261,47 @@ export default async function DeskReportsPage({
                 </p>
               </article>
             ))}
+          </div>
+        )}
+      </section>
+
+      <section className="section">
+        <div className="section-head">
+          <div>
+            <span className="eyebrow">{t("pricingIntelEyebrow")}</span>
+            <h2>{t("pricingIntel")}</h2>
+          </div>
+          <span className="muted small">{t("pricingIntelNote")}</span>
+        </div>
+        {pricingIntel.length === 0 ? (
+          <p className="muted">{t("pricingIntelEmpty")}</p>
+        ) : (
+          <div className="table-wrap">
+            <table className="table">
+              <thead>
+                <tr>
+                  <th>{t("byCategory")}</th>
+                  <th>{t("benchSamples")}</th>
+                  <th>{t("benchWinRate")}</th>
+                  <th>{t("benchAvgMargin")}</th>
+                  <th>{t("suggestedMargin")}</th>
+                </tr>
+              </thead>
+              <tbody>
+                {pricingIntel.map(({ benchmark: b, suggestion: s }) => (
+                  <tr key={b.key}>
+                    <td>{b.key}</td>
+                    <td>{b.samples}</td>
+                    <td>{b.winRatePct}%</td>
+                    <td>{b.avgMarginPct}%</td>
+                    <td>
+                      <strong>{s.marginPct}%</strong>{" "}
+                      <span className="muted small">({t(`basis_${s.basis}`)})</span>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
           </div>
         )}
       </section>

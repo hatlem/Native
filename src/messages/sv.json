@@ -37,7 +37,8 @@
     "roleAdvertiser": "Annonsör",
     "roleGuest": "Gäst",
     "account": "Konto",
-    "contentFees": "Innehållsavgifter"
+    "contentFees": "Innehållsavgifter",
+    "playbooks": "Spelböcker"
   },
   "reports": {
     "title": "Rapporter",
@@ -65,7 +66,18 @@
     "revenueSplitNote": "Inköpsmarginal vs. intäkt från innehållsavgifter",
     "marginRevenue": "Marginal",
     "contentFeeRevenue": "Innehållsavgifter",
-    "contentFeeShare": "Andel innehållsavgifter"
+    "contentFeeShare": "Andel innehållsavgifter",
+    "pricingIntelEyebrow": "Prisinsikt",
+    "pricingIntel": "Föreslagen marginal per kategori",
+    "pricingIntelNote": "Högsta marginal som fortfarande vann affärer – vägledande, aldrig automatisk",
+    "pricingIntelEmpty": "Inte tillräckligt med avgjorda offerter ännu för riktmärke.",
+    "benchSamples": "Offerter",
+    "benchWinRate": "Vinstandel",
+    "benchAvgMargin": "Snittmarginal",
+    "suggestedMargin": "Föreslagen",
+    "basis_win-rate": "från vinstandel",
+    "basis_category-median": "kategorimedian",
+    "basis_default": "standard"
   },
   "agency": {
     "eyebrow": "Byrå",
@@ -1946,5 +1958,32 @@
     "inactive": "Inaktiv",
     "activate": "Aktivera",
     "deactivate": "Inaktivera"
+  },
+  "playbooks": {
+    "eyebrow": "Desk",
+    "title": "Innehållsspelböcker",
+    "lead": "Återanvändbar vägledning för vad som ger bra native per format, kategori och marknad. Den mest specifika aktiva spelboken visas för skribenten i varje brief.",
+    "errorInvalid": "En titel krävs.",
+    "newHeading": "Ny spelbok",
+    "playbookTitle": "Titel",
+    "productType": "Produkttyp",
+    "anyType": "Alla typer",
+    "category": "Kategori",
+    "anyCategory": "Alla kategorier",
+    "market": "Marknad",
+    "anyMarket": "Alla marknader",
+    "angle": "Vinkel",
+    "structure": "Struktur",
+    "doList": "Gör",
+    "dontList": "Gör inte",
+    "exampleHeadlines": "Exempelrubriker",
+    "listHint": "En per rad",
+    "create": "Lägg till spelbok",
+    "creating": "Lägger till…",
+    "listHeading": "Spelböcker",
+    "empty": "Inga spelböcker ännu – lägg till en ovan.",
+    "activate": "Aktivera",
+    "deactivate": "Inaktivera",
+    "matchedEyebrow": "Spelbok"
   }
 }

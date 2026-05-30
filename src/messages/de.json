@@ -37,7 +37,8 @@
     "roleAdvertiser": "Werbetreibend",
     "roleGuest": "Gast",
     "account": "Konto",
-    "contentFees": "Content-Gebühren"
+    "contentFees": "Content-Gebühren",
+    "playbooks": "Playbooks"
   },
   "orders": {
     "eyebrow": "Bestellungen",
@@ -144,7 +145,18 @@
     "revenueSplitNote": "Einkaufsmarge vs. Umsatz aus Content-Gebühren",
     "marginRevenue": "Marge",
     "contentFeeRevenue": "Content-Gebühren",
-    "contentFeeShare": "Anteil Content-Gebühren"
+    "contentFeeShare": "Anteil Content-Gebühren",
+    "pricingIntelEyebrow": "Preis-Insights",
+    "pricingIntel": "Empfohlene Marge je Kategorie",
+    "pricingIntelNote": "Höchste Marge, die noch Abschlüsse gewann – beratend, nie automatisch",
+    "pricingIntelEmpty": "Noch nicht genug entschiedene Angebote für einen Benchmark.",
+    "benchSamples": "Angebote",
+    "benchWinRate": "Gewinnrate",
+    "benchAvgMargin": "Ø Marge",
+    "suggestedMargin": "Empfohlen",
+    "basis_win-rate": "aus Gewinnrate",
+    "basis_category-median": "Kategorie-Median",
+    "basis_default": "Standard"
   },
   "agency": {
     "eyebrow": "Agentur",
@@ -1804,5 +1816,32 @@
     "inactive": "Inaktiv",
     "activate": "Aktivieren",
     "deactivate": "Deaktivieren"
+  },
+  "playbooks": {
+    "eyebrow": "Desk",
+    "title": "Content-Playbooks",
+    "lead": "Wiederverwendbare Leitlinien für guten Native-Content je Format, Kategorie und Markt. Das spezifischste aktive Playbook erscheint für die Autorin bei jedem Brief.",
+    "errorInvalid": "Ein Titel ist erforderlich.",
+    "newHeading": "Neues Playbook",
+    "playbookTitle": "Titel",
+    "productType": "Produkttyp",
+    "anyType": "Alle Typen",
+    "category": "Kategorie",
+    "anyCategory": "Alle Kategorien",
+    "market": "Markt",
+    "anyMarket": "Alle Märkte",
+    "angle": "Ansatz",
+    "structure": "Struktur",
+    "doList": "Do's",
+    "dontList": "Don'ts",
+    "exampleHeadlines": "Beispiel-Headlines",
+    "listHint": "Eine pro Zeile",
+    "create": "Playbook hinzufügen",
+    "creating": "Wird hinzugefügt…",
+    "listHeading": "Playbooks",
+    "empty": "Noch keine Playbooks – fügen Sie oben eines hinzu.",
+    "activate": "Aktivieren",
+    "deactivate": "Deaktivieren",
+    "matchedEyebrow": "Playbook"
   }
 }

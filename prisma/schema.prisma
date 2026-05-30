@@ -424,6 +424,31 @@ model ContentFeeRule {
   @@index([active, productType, marketCode])
 }
 
+// Phase 4 — content playbooks. Desk-owned, reusable guidance for what
+// makes good native for a given format / category / market. The most
+// specific active match surfaces to the writer when a ContentBrief is
+// created, closing the optimization loop: benchmarks & pricing inform
+// price; playbooks codify the content that wins.
+model Playbook {
+  id               String       @id @default(cuid())
+  // All three nullable — null = "applies to any". Most-specific active
+  // match wins (productType weighted highest, then category, then market).
+  productType      ProductType?
+  category         String?
+  marketCode       MarketCode?
+  title            String
+  angle            String?      // the persuasion angle that works here
+  structure        String?      // recommended article structure
+  doList           String?      // newline-separated do's
+  dontList         String?      // newline-separated don'ts
+  exampleHeadlines String?      // newline-separated example headlines
+  active           Boolean      @default(true)
+  createdAt        DateTime     @default(now())
+  updatedAt        DateTime     @updatedAt
+
+  @@index([active, productType, category, marketCode])
+}
+
 // ---------- Accounts ----------
 
 model Organization {
