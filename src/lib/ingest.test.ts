@@ -64,10 +64,23 @@ test("parseIngestPayload rejects unknown fields (strict)", () => {
   assert.equal(r.ok, false);
 });
 
-test("parseIngestPayload rejects an empty or oversized batch", () => {
+test("parseIngestPayload enforces the batch bounds (1..100)", () => {
   assert.equal(parseIngestPayload({ products: [] }).ok, false);
-  const big = { products: Array.from({ length: 201 }, () => validProduct) };
-  assert.equal(parseIngestPayload(big).ok, false);
+  assert.equal(
+    parseIngestPayload({ products: Array.from({ length: 100 }, () => validProduct) }).ok,
+    true,
+  );
+  assert.equal(
+    parseIngestPayload({ products: Array.from({ length: 101 }, () => validProduct) }).ok,
+    false,
+  );
+});
+
+test("parseIngestPayload caps availability rows at 24", () => {
+  const av = (n: number) =>
+    Array.from({ length: n }, (_, i) => ({ year: 2026, month: (i % 12) + 1, blocked: false }));
+  assert.equal(parseIngestPayload({ products: [{ ...validProduct, availability: av(24) }] }).ok, true);
+  assert.equal(parseIngestPayload({ products: [{ ...validProduct, availability: av(25) }] }).ok, false);
 });
 
 test("parseIngestPayload rejects a non-object body", () => {
