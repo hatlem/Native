@@ -67,10 +67,48 @@ export function verifySvixSignature(args: {
 export type ResendEvent = {
   type: string;
   data?: {
+    from?: string;
     to?: string | string[];
     bounce?: { type?: string; subType?: string } | null;
   };
 };
+
+// Pull the bare domain out of a From header, which may be either
+// "elias@nativespin.com" or "Elias Getia <elias@nativespin.com>".
+export function senderDomain(from: string | undefined): string | null {
+  if (!from) return null;
+  const angle = from.match(/<([^>]+)>/);
+  const addr = (angle ? angle[1] : from).trim();
+  const at = addr.lastIndexOf("@");
+  if (at === -1) return null;
+  return addr.slice(at + 1).toLowerCase().trim() || null;
+}
+
+/**
+ * Resend webhooks are ACCOUNT-WIDE — one account hosts many domains
+ * (getmailer, getintent, …), so this endpoint receives their bounces too.
+ * Only events sent FROM one of our domains may write to NativeSpin's
+ * suppression list. The allowlist defaults to the OUTREACH_FROM domain.
+ */
+export function isAllowedSender(event: ResendEvent, allowedDomains: Set<string>): boolean {
+  if (allowedDomains.size === 0) return true; // no allowlist configured → don't filter
+  const dom = senderDomain(event.data?.from);
+  return dom !== null && allowedDomains.has(dom);
+}
+
+export function allowedDomainsFromEnv(env: NodeJS.ProcessEnv = process.env): Set<string> {
+  // Comma-separated override, else the domain of OUTREACH_FROM / AUTH_EMAIL_FROM.
+  const explicit = env.RESEND_WEBHOOK_DOMAINS;
+  if (explicit) {
+    return new Set(explicit.split(",").map((d) => d.trim().toLowerCase()).filter(Boolean));
+  }
+  const out = new Set<string>();
+  for (const v of [env.OUTREACH_FROM, env.AUTH_EMAIL_FROM]) {
+    const d = senderDomain(v);
+    if (d) out.add(d);
+  }
+  return out;
+}
 
 /**
  * Which recipients should be suppressed for this event, and why.
@@ -113,8 +151,9 @@ export async function handleResendWebhook(args: {
   rawBody: string;
   headers: Headers;
   secret: string | undefined;
+  allowedDomains?: Set<string>;
   nowMs?: number;
-}): Promise<{ ok: true; suppressed: number; type: string } > {
+}): Promise<{ ok: true; suppressed: number; type: string; ignored?: "foreign_domain" }> {
   if (!args.secret) throw new WebhookError("missing_secret", 500);
 
   const svix = extractSvixHeaders(args.headers);
@@ -127,6 +166,13 @@ export async function handleResendWebhook(args: {
     event = JSON.parse(args.rawBody);
   } catch {
     throw new WebhookError("invalid_json", 400);
+  }
+
+  // Account-wide webhook: ignore other platforms' domains. Still a 200 — the
+  // event is valid, just not ours, and we don't want Resend to retry it.
+  const allowed = args.allowedDomains ?? allowedDomainsFromEnv();
+  if (!isAllowedSender(event, allowed)) {
+    return { ok: true, suppressed: 0, type: event.type ?? "unknown", ignored: "foreign_domain" };
   }
 
   const suppressions = suppressionsFromEvent(event);

@@ -1,7 +1,14 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import crypto from "node:crypto";
-import { verifySvixSignature, suppressionsFromEvent, type SvixHeaders } from "./resend-webhook";
+import {
+  verifySvixSignature,
+  suppressionsFromEvent,
+  senderDomain,
+  isAllowedSender,
+  allowedDomainsFromEnv,
+  type SvixHeaders,
+} from "./resend-webhook";
 
 const SECRET = "whsec_" + Buffer.from("super-secret-signing-key").toString("base64");
 
@@ -74,4 +81,33 @@ test("suppressionsFromEvent: permanent bounce suppresses; transient does not", (
 test("suppressionsFromEvent: delivered/opened yield nothing", () => {
   assert.deepEqual(suppressionsFromEvent({ type: "email.delivered", data: { to: "a@x.com" } }), []);
   assert.deepEqual(suppressionsFromEvent({ type: "email.opened", data: { to: "a@x.com" } }), []);
+});
+
+test("senderDomain parses bare and display-name From headers", () => {
+  assert.equal(senderDomain("elias@nativespin.com"), "nativespin.com");
+  assert.equal(senderDomain("Elias Getia <elias@nativespin.com>"), "nativespin.com");
+  assert.equal(senderDomain("ELIAS <Elias@NativeSpin.com>"), "nativespin.com");
+  assert.equal(senderDomain(undefined), null);
+  assert.equal(senderDomain("not-an-email"), null);
+});
+
+test("isAllowedSender filters foreign domains, allows ours", () => {
+  const allowed = new Set(["nativespin.com"]);
+  assert.equal(isAllowedSender({ type: "email.bounced", data: { from: "elias@nativespin.com" } }, allowed), true);
+  assert.equal(isAllowedSender({ type: "email.bounced", data: { from: "x@getintent.com" } }, allowed), false);
+  // No from at all → not ours.
+  assert.equal(isAllowedSender({ type: "email.bounced", data: {} }, allowed), false);
+  // Empty allowlist → don't filter (fail-open, but env always provides one).
+  assert.equal(isAllowedSender({ type: "email.bounced", data: { from: "x@getintent.com" } }, new Set()), true);
+});
+
+test("allowedDomainsFromEnv: explicit override and OUTREACH_FROM fallback", () => {
+  assert.deepEqual(
+    [...allowedDomainsFromEnv({ RESEND_WEBHOOK_DOMAINS: "a.com, B.COM " } as unknown as NodeJS.ProcessEnv)].sort(),
+    ["a.com", "b.com"],
+  );
+  assert.deepEqual(
+    [...allowedDomainsFromEnv({ OUTREACH_FROM: "Elias <elias@nativespin.com>" } as unknown as NodeJS.ProcessEnv)],
+    ["nativespin.com"],
+  );
 });
