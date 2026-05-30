@@ -842,7 +842,8 @@
     "ctaTitle": "Unsicher, was passt?",
     "ctaBody": "Senden Sie uns einen Brief — das Desk empfiehlt einen Formatmix für Ihr Ziel, Ihre Zielgruppe und Ihr Budget. Noch am selben Tag.",
     "ctaContact": "Mit dem Desk sprechen",
-    "learnMore": "So funktioniert dieses Format"
+    "learnMore": "So funktioniert dieses Format",
+    "creativeSpecsLink": "So bereiten Sie Ihre Inhalte vor →"
   },
   "productType": {
     "NATIVE_ARTICLE": "Native-Artikel",
@@ -1866,5 +1867,28 @@
     "matchedEyebrow": "Playbook",
     "save": "Speichern",
     "edit": "Bearbeiten"
+  },
+  "creativeSpecs": {
+    "metaTitle": "Materialvorgaben — so bereiten Sie Ihre Inhalte vor",
+    "eyebrow": "Materialvorgaben",
+    "title": "So bereiten Sie Ihre Inhalte vor",
+    "lead": "Das brauchen wir, um eine Platzierung live zu bringen – nach Format. Liegt das bereit, geht es schnell.",
+    "article": {
+      "heading": "Artikel (Native-Artikel, Advertorial, Native Plus)",
+      "body": "500–800 Wörter (kürzer ist mit starken Bildern in Ordnung). Bilder mindestens 1200×628 px, idealerweise unter 300 KB. Überschrift bis 70 Zeichen, Teaser bis 200. Zwei bis drei externe Links. Planen Sie 3 Werktage für eigenes Material ein, 10, wenn wir es schreiben."
+    },
+    "nativePlus": {
+      "heading": "Native Plus — shoppbare Extras",
+      "body": "Bis zu 3 Produktlinks oder -karten im Artikel. Jeder braucht Produktname, Bild, Preis und Ziel-URL. Halten Sie die Kauf-Buttons kurz und ehrlich (z. B. „Jetzt kaufen“, „Produkt ansehen“). Produkte werden klar als Werbung gekennzeichnet."
+    },
+    "video": {
+      "heading": "Content-Video",
+      "body": "Bis zu 60 Sekunden funktionieren am besten. Schicken Sie einen YouTube- oder Vimeo-Link oder eine MP4 bis etwa 200 MB. Fügen Sie ein Vorschaubild und einen einzeiligen Teaser bei. Untertitel dringend empfohlen – die meisten Wiedergaben starten stumm."
+    },
+    "disclosureHeading": "Kennzeichnung",
+    "disclosureBody": "Jede Platzierung wird klar als bezahlt im vom Markt vorgeschriebenen Wortlaut gekennzeichnet. Die Kennzeichnung wird nie versteckt, verkleinert oder entfernt.",
+    "ctaTitle": "Bereit für Ihr Briefing?",
+    "ctaBody": "Schicken Sie, was Sie haben – wir sagen Ihnen, was fehlt.",
+    "ctaContact": "Mit dem Team sprechen"
   }
 }

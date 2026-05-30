@@ -763,7 +763,8 @@
     "ctaTitle": "Osäker på vilket som passar?",
     "ctaBody": "Skicka oss en brief så rekommenderar desken en formatmix för mål, publik och budget — samma dag.",
     "ctaContact": "Prata med desken",
-    "learnMore": "Så fungerar detta format"
+    "learnMore": "Så fungerar detta format",
+    "creativeSpecsLink": "Så förbereder du innehållet →"
   },
   "productType": {
     "NATIVE_ARTICLE": "Native-artikel",
@@ -2008,5 +2009,28 @@
     "matchedEyebrow": "Spelbok",
     "save": "Spara",
     "edit": "Redigera"
+  },
+  "creativeSpecs": {
+    "metaTitle": "Materialspecar — så förbereder du innehållet",
+    "eyebrow": "Materialspecar",
+    "title": "Så förbereder du innehållet",
+    "lead": "Det här behöver vi för att få en placering live, per format. Har du det redo går det snabbt.",
+    "article": {
+      "heading": "Artiklar (native-artikel, advertorial, Native Plus)",
+      "body": "500–800 ord (kortare går bra med starka bilder). Bilder på minst 1200×628 px, helst under 300 KB. Rubrik upp till 70 tecken, ingress upp till 200. Två till tre externa länkar. Räkna med 3 arbetsdagar för eget material, 10 om vi skriver det."
+    },
+    "nativePlus": {
+      "heading": "Native Plus — köpbara tillägg",
+      "body": "Upp till 3 produktlänkar eller -kort i artikeln. Varje behöver produktnamn, bild, pris och länk. Håll köpknapparna korta och ärliga (t.ex. ”Köp nu”, ”Se produkten”). Produkter märks tydligt som annons."
+    },
+    "video": {
+      "heading": "Innehållsvideo",
+      "body": "Upp till 60 sekunder fungerar bäst. Skicka en YouTube- eller Vimeo-länk, eller en MP4 på runt 200 MB. Bifoga en miniatyrbild och en kort ingress. Textning rekommenderas starkt – de flesta uppspelningar börjar utan ljud."
+    },
+    "disclosureHeading": "Märkning",
+    "disclosureBody": "Varje placering märks tydligt som betald med marknadens obligatoriska ordalydelse. Märkningen döljs, förminskas eller tas aldrig bort.",
+    "ctaTitle": "Redo att briefa oss?",
+    "ctaBody": "Skicka det du har – vi säger till om något saknas.",
+    "ctaContact": "Prata med teamet"
   }
 }

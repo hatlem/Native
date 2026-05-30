@@ -763,7 +763,8 @@
     "ctaTitle": "Usikker på hva som passer?",
     "ctaBody": "Send oss en brief, så anbefaler desken en formatmiks for mål, publikum og budsjett — samme dag.",
     "ctaContact": "Snakk med desken",
-    "learnMore": "Slik fungerer dette formatet"
+    "learnMore": "Slik fungerer dette formatet",
+    "creativeSpecsLink": "Slik forbereder du innholdet →"
   },
   "productType": {
     "NATIVE_ARTICLE": "Native-artikkel",
@@ -2008,5 +2009,28 @@
     "matchedEyebrow": "Spillebok",
     "save": "Lagre",
     "edit": "Rediger"
+  },
+  "creativeSpecs": {
+    "metaTitle": "Materiellkrav — slik forbereder du innholdet",
+    "eyebrow": "Materiellkrav",
+    "title": "Slik forbereder du innholdet",
+    "lead": "Dette trenger vi for å få en plassering på lufta, etter format. Har du dette klart, går det fort.",
+    "article": {
+      "heading": "Artikler (native-artikkel, advertorial, Native Plus)",
+      "body": "500–800 ord (kortere er greit med sterke bilder). Bilder på minst 1200×628 px, helst under 300 KB. Tittel inntil 70 tegn, ingress inntil 200. To til tre eksterne lenker. Beregn 3 virkedager for ditt eget materiell, 10 hvis vi skriver det."
+    },
+    "nativePlus": {
+      "heading": "Native Plus — kjøpbare tillegg",
+      "body": "Inntil 3 produktlenker eller -kort i artikkelen. Hvert trenger produktnavn, bilde, pris og lenke. Hold kjøpsknappene korte og ærlige (f.eks. «Kjøp nå», «Se produktet»). Produkter merkes tydelig som annonse."
+    },
+    "video": {
+      "heading": "Innholdsvideo",
+      "body": "Inntil 60 sekunder fungerer best. Send en YouTube- eller Vimeo-lenke, eller en MP4 på rundt 200 MB. Legg ved et miniatyrbilde og en kort ingress. Teksting anbefales sterkt – de fleste avspillinger starter uten lyd."
+    },
+    "disclosureHeading": "Merking",
+    "disclosureBody": "Hver plassering merkes tydelig som betalt med markedets påkrevde ordlyd. Merkingen skjules, forminskes eller fjernes aldri.",
+    "ctaTitle": "Klar til å briefe oss?",
+    "ctaBody": "Send det du har – så sier vi fra om noe mangler.",
+    "ctaContact": "Snakk med teamet"
   }
 }

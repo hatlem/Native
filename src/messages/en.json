@@ -841,7 +841,8 @@
     "ctaTitle": "Not sure which fits?",
     "ctaBody": "Send us a brief and the desk recommends a format mix for your goal, audience and budget — same day.",
     "ctaContact": "Talk to the desk",
-    "learnMore": "How this format works"
+    "learnMore": "How this format works",
+    "creativeSpecsLink": "How to prepare your content →"
   },
   "productType": {
     "NATIVE_ARTICLE": "Native article",
@@ -2007,5 +2008,28 @@
     "matchedEyebrow": "Playbook",
     "save": "Save",
     "edit": "Edit"
+  },
+  "creativeSpecs": {
+    "metaTitle": "Creative specs — how to prepare your content",
+    "eyebrow": "Creative specs",
+    "title": "How to prepare your content",
+    "lead": "What we need from you to get a placement live, by format. Bring these and the desk can move fast.",
+    "article": {
+      "heading": "Articles (Native Article, Advertorial, Native Plus)",
+      "body": "500–800 words (shorter is fine with strong visuals). Images at least 1200×628 px, ideally under 300 KB. Headline up to 70 characters, teaser up to 200. Two to three external links. Allow 3 working days for your material, 10 if we write it."
+    },
+    "nativePlus": {
+      "heading": "Native Plus — shoppable extras",
+      "body": "Up to 3 in-article product links or cards. Each needs a product name, image, price, and destination URL. Keep buy-button wording short and honest (e.g. \"Shop now\", \"See the product\"). Products are clearly marked as advertising."
+    },
+    "video": {
+      "heading": "Content video",
+      "body": "Up to 60 seconds works best. Supply a YouTube or Vimeo link, or an MP4 up to roughly 200 MB. Include a thumbnail and a one-line teaser. Captions strongly recommended — most plays start muted."
+    },
+    "disclosureHeading": "Disclosure",
+    "disclosureBody": "Every placement is clearly marked as paid in the market's required wording. The label is never hidden, shrunk, or removed.",
+    "ctaTitle": "Ready to brief us?",
+    "ctaBody": "Send what you have — we'll tell you what's missing.",
+    "ctaContact": "Talk to the desk"
   }
 }

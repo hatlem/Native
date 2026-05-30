@@ -133,6 +133,9 @@ export default async function FormatsPage({
         <div className="wrap">
           <h2>{t("disclosureTitle")}</h2>
           <p className="prose">{t("disclosureBody")}</p>
+          <p className="prose">
+            <Link href="/resources/creative-specs">{t("creativeSpecsLink")}</Link>
+          </p>
         </div>
       </section>
 

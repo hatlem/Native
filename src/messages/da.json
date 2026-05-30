@@ -763,7 +763,8 @@
     "ctaTitle": "Usikker på hvad der passer?",
     "ctaBody": "Send os en brief, så anbefaler desken en formatmix for mål, publikum og budget — samme dag.",
     "ctaContact": "Tal med desken",
-    "learnMore": "Sådan virker dette format"
+    "learnMore": "Sådan virker dette format",
+    "creativeSpecsLink": "Sådan forbereder du indholdet →"
   },
   "productType": {
     "NATIVE_ARTICLE": "Native-artikel",
@@ -2009,5 +2010,28 @@
     "matchedEyebrow": "Spillebog",
     "save": "Gem",
     "edit": "Rediger"
+  },
+  "creativeSpecs": {
+    "metaTitle": "Materialekrav — sådan forbereder du indholdet",
+    "eyebrow": "Materialekrav",
+    "title": "Sådan forbereder du indholdet",
+    "lead": "Det her skal vi bruge for at få en placering i luften, efter format. Har du det klar, går det hurtigt.",
+    "article": {
+      "heading": "Artikler (native-artikel, advertorial, Native Plus)",
+      "body": "500–800 ord (kortere er fint med stærke billeder). Billeder på mindst 1200×628 px, helst under 300 KB. Overskrift op til 70 tegn, manchet op til 200. To til tre eksterne links. Regn med 3 arbejdsdage for dit eget materiale, 10 hvis vi skriver det."
+    },
+    "nativePlus": {
+      "heading": "Native Plus — købbare tillæg",
+      "body": "Op til 3 produktlinks eller -kort i artiklen. Hvert kræver produktnavn, billede, pris og link. Hold købsknapperne korte og ærlige (f.eks. »Køb nu«, »Se produktet«). Produkter markeres tydeligt som annonce."
+    },
+    "video": {
+      "heading": "Indholdsvideo",
+      "body": "Op til 60 sekunder fungerer bedst. Send et YouTube- eller Vimeo-link, eller en MP4 på cirka 200 MB. Vedlæg et miniaturebillede og en kort manchet. Undertekster anbefales kraftigt – de fleste afspilninger starter uden lyd."
+    },
+    "disclosureHeading": "Mærkning",
+    "disclosureBody": "Hver placering markeres tydeligt som betalt med markedets påkrævede ordlyd. Mærkningen skjules, formindskes eller fjernes aldrig.",
+    "ctaTitle": "Klar til at briefe os?",
+    "ctaBody": "Send det, du har – så siger vi til, hvis noget mangler.",
+    "ctaContact": "Tal med teamet"
   }
 }

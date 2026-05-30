@@ -69,6 +69,7 @@ export async function LandingShell({
               <Link href="/for-agencies">{t("foot.navAgy")}</Link>
               <Link href="/for-publishers">{t("foot.navPub")}</Link>
               <Link href="/about">{t("foot.navAbout")}</Link>
+              <Link href="/resources/creative-specs">{t("foot.navCreativeSpecs")}</Link>
               <MailLink to="desk@nativespin.com" subject={DESK_SUBJECT}>
                 {t("foot.navContact")}
               </MailLink>
