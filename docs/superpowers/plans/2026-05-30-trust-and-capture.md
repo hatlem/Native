@@ -11,7 +11,7 @@
 **Conventions verified in this repo (do not deviate):**
 - **Tests:** `node:test` + `node:assert/strict`, run with `pnpm test` (`tsx --test "src/**/*.test.ts"`). **No Vitest, no prisma mocking.** Mirror `src/lib/pricing/quotes.test.ts`.
 - **Tokens:** `generateToken()` + `hashToken()` from `@/lib/tokens` (raw base64url; SHA-256 hex hash).
-- **Absolute URLs:** a **synchronous** `appUrl()` (reads `NEXTAUTH_URL ?? NEXT_PUBLIC_SITE_URL ?? http://localhost:3100`, strips trailing slash) is currently **copy-pasted** in `src/app/auth-actions.ts:383` and `src/app/[locale]/magic-link/[token]/route.ts:34`. Task 0 extracts it to a shared `@/lib/url`; new code imports from there. Build links as `` `${appUrl()}/path` `` (no `await`).
+- **Absolute URLs:** a **synchronous** `appUrl()` (reads `AUTH_URL ?? NEXTAUTH_URL ?? NEXT_PUBLIC_SITE_URL ?? http://localhost:3000`) is currently **copy-pasted** in `src/app/auth-actions.ts:383` and `src/app/[locale]/magic-link/[token]/route.ts:34`. Task 0 extracts it verbatim to a shared `@/lib/url`; new code imports from there. Build links as `` `${appUrl()}/path` `` (no `await`).
 - **No `date-fns`** in the repo — compute expiries with plain `Date` math.
 - **Email normalisation:** `normaliseEmail(email)` from `@/lib/outreach/dedup`.
 
@@ -31,17 +31,21 @@
 - [ ] **Step 1: Create the shared helper** (exact copy of the existing implementation):
 
 ```ts
-// Origin for building absolute links in emails / redirects. Mirrors the
-// NextAuth base resolution so confirmation links point at the right host
-// in every environment. Synchronous and dependency-free.
+// Origin for building absolute links in emails / redirects. Verbatim move
+// of the helper currently duplicated in auth-actions.ts and the magic-link
+// route — same env precedence, same fallback, no behavior change.
+// Synchronous and dependency-free.
 export function appUrl(): string {
-  const envUrl =
+  return (
+    process.env.AUTH_URL ??
     process.env.NEXTAUTH_URL ??
     process.env.NEXT_PUBLIC_SITE_URL ??
-    "http://localhost:3100";
-  return envUrl.replace(/\/$/, "");
+    "http://localhost:3000"
+  );
 }
 ```
+
+> The env values used in this repo carry no trailing slash (existing callers already build `` `${appUrl()}/${locale}/…` ``), so the newsletter links concatenate cleanly. Keep this an exact copy — do not "improve" it here.
 
 - [ ] **Step 2: Verify it typechecks**
 
