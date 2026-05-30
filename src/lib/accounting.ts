@@ -105,31 +105,29 @@ export const noopProvider: AccountingProvider = {
 };
 
 // Fiken adapter (Norwegian accounting SaaS — sensible default for a
-// Nordic-first business). Skeleton only: the live HTTP client is gated on
-// FIKEN_API_TOKEN + FIKEN_COMPANY_SLUG and is intentionally not called
-// here until those credentials exist and the mapping to Fiken's sales-
-// invoice schema is verified against a sandbox company. Until then it
-// reports a clear, non-silent "not configured" result.
+// Nordic-first business). The live client lives in fiken.ts. Gated on
+// FIKEN_API_TOKEN + FIKEN_COMPANY_SLUG; when unset it reports a clear,
+// non-silent "not configured" result. NOTE: the Fiken field mapping must
+// be confirmed against a Fiken sandbox company before enabling in prod
+// (see fiken.ts) — keep ACCOUNTING_PROVIDER unset until then.
 export function fikenProvider(): AccountingProvider {
   const token = process.env.FIKEN_API_TOKEN;
-  const company = process.env.FIKEN_COMPANY_SLUG;
+  const companySlug = process.env.FIKEN_COMPANY_SLUG;
+  const bankAccountCode = process.env.FIKEN_BANK_ACCOUNT_CODE;
   return {
     name: "fiken",
     async pushInvoice(doc) {
-      if (!token || !company) {
+      if (!token || !companySlug) {
         return {
           ok: false,
           provider: "fiken",
           error: "Fiken not configured (set FIKEN_API_TOKEN + FIKEN_COMPANY_SLUG).",
         };
       }
-      // TODO(live): POST doc to https://api.fiken.no/api/v2/companies/{company}/invoices
-      // once credentials + a sandbox-verified field mapping are in place.
-      return {
-        ok: false,
-        provider: "fiken",
-        error: `Fiken push not yet implemented for invoice ${doc.invoiceId}.`,
-      };
+      // Lazy import so the live client (and its fetch usage) only loads
+      // when Fiken is actually selected.
+      const { fikenPushInvoice } = await import("@/lib/fiken");
+      return fikenPushInvoice(doc, { token, companySlug, bankAccountCode });
     },
   };
 }
