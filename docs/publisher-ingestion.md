@@ -37,8 +37,10 @@ values are your own identifiers; keep them stable.
 
 ### `PUT /api/v1/publisher/products`
 
-Batch upsert (1–200 products). Validated with Zod; unknown fields are
-rejected (422 with `error.details`).
+Batch upsert (1–100 products; up to 24 availability rows each). Validated
+with Zod; unknown fields are rejected (422 with `error.details`). A
+product whose `currency` doesn't match its market's currency is skipped and
+reported back under `skipped` rather than written.
 
 ```bash
 curl -X PUT https://nativespin.com/api/v1/publisher/products \
