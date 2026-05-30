@@ -304,6 +304,8 @@
     "browse": "Selaa katalogia",
     "remove": "Poista",
     "qty": "Määrä",
+    "decrement": "Vähennä määrää",
+    "increment": "Lisää määrää",
     "estTotal": "Arvioitu suuntaa-antava yhteissumma",
     "rfqTitle": "Pyydä kiinteä tarjous",
     "error": "Lisää vähintään yksi sijoittelu ja täytä yritys, sähköposti ja markkina.",

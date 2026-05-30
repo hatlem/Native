@@ -304,6 +304,8 @@
     "browse": "Katalog durchsuchen",
     "remove": "Entfernen",
     "qty": "Menge",
+    "decrement": "Menge verringern",
+    "increment": "Menge erhöhen",
     "estTotal": "Geschätzter Richtwert",
     "rfqTitle": "Festes Angebot anfordern",
     "error": "Mindestens eine Platzierung hinzufügen und Firma, E-Mail und Markt ausfüllen.",

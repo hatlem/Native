@@ -225,6 +225,8 @@
     "browse": "Se katalogen",
     "remove": "Fjern",
     "qty": "Antall",
+    "decrement": "Reduser antall",
+    "increment": "Øk antall",
     "estTotal": "Estimert veiledende total",
     "rfqTitle": "Be om et fast tilbud",
     "error": "Legg til minst én plassering og fyll inn selskap, e-post og marked.",

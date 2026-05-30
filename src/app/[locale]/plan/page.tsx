@@ -6,7 +6,7 @@ import { Link } from "@/i18n/navigation";
 import { readBasket, readPlanBrief } from "@/lib/basket";
 import { indicativeFromRules, toRateRules, formatMoney } from "@/lib/money";
 import { isProductPriceShown } from "@/lib/pricing-visibility";
-import { removeFromPlan, submitRequest } from "@/app/actions";
+import { removeFromPlan, submitRequest, setQuantity } from "@/app/actions";
 import { EmptyState } from "@/app/empty-state";
 import { SubmitButton } from "@/components";
 
@@ -185,8 +185,20 @@ export default async function PlanPage({
                   <span className="tag">{tType(l.product.type)}</span>
                   <div>
                     <div className="title">{l.product.title.name}</div>
-                    <div className="sub">
-                      {t("qty")}: {l.quantity}
+                    <div className="sub plan-qty">
+                      <form action={setQuantity} className="plan-qty-step">
+                        <input type="hidden" name="locale" value={locale} />
+                        <input type="hidden" name="productId" value={l.product.id} />
+                        <input type="hidden" name="quantity" value={l.quantity - 1} />
+                        <button type="submit" className="btn small ghost" aria-label={t("decrement")} disabled={l.quantity <= 1}>−</button>
+                      </form>
+                      <span aria-live="polite">{t("qty")}: {l.quantity}</span>
+                      <form action={setQuantity} className="plan-qty-step">
+                        <input type="hidden" name="locale" value={locale} />
+                        <input type="hidden" name="productId" value={l.product.id} />
+                        <input type="hidden" name="quantity" value={l.quantity + 1} />
+                        <button type="submit" className="btn small ghost" aria-label={t("increment")}>+</button>
+                      </form>
                     </div>
                   </div>
                   <div className="cluster tight">
@@ -201,11 +213,7 @@ export default async function PlanPage({
                     )}
                     <form action={removeFromPlan}>
                       <input type="hidden" name="locale" value={locale} />
-                      <input
-                        type="hidden"
-                        name="productId"
-                        value={l.product.id}
-                      />
+                      <input type="hidden" name="productId" value={l.product.id} />
                       <button type="submit" className="btn small ghost">
                         {t("remove")}
                       </button>

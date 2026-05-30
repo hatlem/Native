@@ -225,6 +225,8 @@
     "browse": "Se katalogen",
     "remove": "Ta bort",
     "qty": "Antal",
+    "decrement": "Minska antal",
+    "increment": "Öka antal",
     "estTotal": "Uppskattad vägledande summa",
     "rfqTitle": "Begär en fast offert",
     "error": "Lägg till minst en placering och fyll i företag, e-post och marknad.",

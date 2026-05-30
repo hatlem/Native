@@ -304,6 +304,8 @@
     "browse": "Browse the catalog",
     "remove": "Remove",
     "qty": "Qty",
+    "decrement": "Decrease quantity",
+    "increment": "Increase quantity",
     "estTotal": "Estimated indicative total",
     "rfqTitle": "Request a firm quote",
     "error": "Add at least one placement and fill in company, email and market.",
