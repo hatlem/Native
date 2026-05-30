@@ -36,7 +36,9 @@
     "roleAgency": "Byrå",
     "roleAdvertiser": "Annonsør",
     "roleGuest": "Gjest",
-    "account": "Konto"
+    "account": "Konto",
+    "contentFees": "Innholdshonorar",
+    "playbooks": "Spillebøker"
   },
   "reports": {
     "title": "Rapporter",
@@ -58,7 +60,24 @@
     "conversionSub": "Briefer som ble til bestillinger",
     "gmvEyebrow": "Bruttoverdi",
     "gmvNote": "Per valuta — aldri summert på tvers av NOK/SEK/DKK",
-    "orderCount": "{count, plural, =0 {0 bestillinger} =1 {1 bestilling} other {# bestillinger}}"
+    "orderCount": "{count, plural, =0 {0 bestillinger} =1 {1 bestilling} other {# bestillinger}}",
+    "revenueSplitEyebrow": "Inntekt",
+    "revenueSplit": "Inntektsfordeling",
+    "revenueSplitNote": "Innkjøpsmargin vs. inntekt fra innholdshonorar",
+    "marginRevenue": "Margin",
+    "contentFeeRevenue": "Innholdshonorar",
+    "contentFeeShare": "Andel innholdshonorar",
+    "pricingIntelEyebrow": "Prisinnsikt",
+    "pricingIntel": "Foreslått margin per kategori",
+    "pricingIntelNote": "Høyeste margin som fortsatt vant avtaler – veiledende, aldri automatisk",
+    "pricingIntelEmpty": "Ikke nok avgjorte tilbud ennå til å lage referanse.",
+    "benchSamples": "Tilbud",
+    "benchWinRate": "Vinnerrate",
+    "benchAvgMargin": "Snittmargin",
+    "suggestedMargin": "Foreslått",
+    "basis_win-rate": "fra vinnerrate",
+    "basis_category-median": "kategorimedian",
+    "basis_default": "standard"
   },
   "agency": {
     "eyebrow": "Byrå",
@@ -247,7 +266,9 @@
     "recAlsoConsider": "Verdt å vurdere også",
     "reach": "månedlig rekkevidde",
     "add": "Legg til i planen",
-    "recNone": "Ingen titler i dette markedet ennå — utforsk hele katalogen."
+    "recNone": "Ingen titler i dette markedet ennå — utforsk hele katalogen.",
+    "contentProduction": "Innholdsproduksjon",
+    "contentProductionHint": "La NativeSpin skrive den native artikkelen for denne plasseringen (legger til et produksjonshonorar)."
   },
   "rfq": {
     "org": "Selskap",
@@ -740,7 +761,8 @@
     "descNATIVE_DISPLAY": "Displayenhet som arver utgiverens typografi og kjører i feeden, ikke i bannerslots. Tillitsoverføringen er det meste av verdien.",
     "descPACKAGE": "Native-artikkel og native display i samme tittel — artikkelen overbeviser, displayet gir rekkevidden.",
     "descCONTEXTUAL": "Plassering målrettet etter sidens tema og redaksjonell kontekst, ikke brukerdata — relevansen kommer fra hvor annonsen vises.",
-    "descOTHER": "Tilpasset format som ikke passer i standardkategoriene — typisk forhandlet sak for sak."
+    "descOTHER": "Tilpasset format som ikke passer i standardkategoriene — typisk forhandlet sak for sak.",
+    "CONTENT_FEE": "Innholdsproduksjon"
   },
   "nativeFit": {
     "High": "Høy",
@@ -1912,5 +1934,56 @@
     "wrongAccountBody": "Invitasjonen gjelder {inviteEmail}. Du er logget inn som {authedEmail}.",
     "signOut": "Logg ut",
     "genericError": "Noe gikk galt. Sjekk opplysningene og prøv igjen."
+  },
+  "contentFees": {
+    "eyebrow": "Desk",
+    "title": "Innholdshonorar",
+    "lead": "Angi hva NativeSpin tar betalt for å produsere native innhold. Den mest spesifikke aktive regelen (marked + type) gjelder når en kjøper ber oss skrive en plassering.",
+    "errorInvalid": "Angi et gyldig honorar og en valuta på tre bokstaver.",
+    "newHeading": "Ny regel",
+    "market": "Marked",
+    "anyMarket": "Alle marked",
+    "productType": "Produkttype",
+    "anyType": "Alle typer",
+    "currency": "Valuta",
+    "greenfieldFee": "Honorar (nyskrevet)",
+    "adaptationFee": "Honorar (tilpasning)",
+    "note": "Notat",
+    "create": "Legg til regel",
+    "creating": "Legger til…",
+    "rulesHeading": "Honorarregler",
+    "empty": "Ingen regler ennå – legg til en over.",
+    "status": "Status",
+    "active": "Aktiv",
+    "inactive": "Inaktiv",
+    "activate": "Aktiver",
+    "deactivate": "Deaktiver"
+  },
+  "playbooks": {
+    "eyebrow": "Desk",
+    "title": "Innholdsspillebøker",
+    "lead": "Gjenbrukbar veiledning for hva som gir god native per format, kategori og marked. Den mest spesifikke aktive spilleboken vises for skribenten på hver brief.",
+    "errorInvalid": "Tittel er påkrevd.",
+    "newHeading": "Ny spillebok",
+    "playbookTitle": "Tittel",
+    "productType": "Produkttype",
+    "anyType": "Alle typer",
+    "category": "Kategori",
+    "anyCategory": "Alle kategorier",
+    "market": "Marked",
+    "anyMarket": "Alle marked",
+    "angle": "Vinkling",
+    "structure": "Struktur",
+    "doList": "Gjør",
+    "dontList": "Ikke gjør",
+    "exampleHeadlines": "Eksempeltitler",
+    "listHint": "Én per linje",
+    "create": "Legg til spillebok",
+    "creating": "Legger til…",
+    "listHeading": "Spillebøker",
+    "empty": "Ingen spillebøker ennå – legg til en over.",
+    "activate": "Aktiver",
+    "deactivate": "Deaktiver",
+    "matchedEyebrow": "Spillebok"
   }
 }

@@ -1,6 +1,8 @@
 // NativeSpin data model — see PLAN.md §8.
-// Phase 0 focuses on the catalog (Market/Publisher/Title/Product/PriceRule/Spec);
-// the commerce/content entities are modeled now because they gate later phases.
+// Covers the full lifecycle: catalog (Market/Publisher/Title/Product/PriceRule/
+// Spec), commerce (Plan/Request/Quote/Order/Invoice/CreditNote), content
+// production (ContentBrief/ContentAsset), multi-tenant orgs, the public API,
+// and the publisher-outreach engine (SalesContact/RateCardRequest/PriceRequest).
 
 generator client {
   provider = "prisma-client-js"
@@ -46,6 +48,16 @@ enum PricingModel {
   CPM
   CPC
   PACKAGE
+}
+
+// A quote/order line is either inventory (a publisher placement, priced
+// from the rate card with a margin) or a content-production fee (our
+// service revenue, priced from a ContentFeeRule). Splitting the two lets
+// reporting separate buying margin from content-fee revenue — the
+// "margin vs content fee" emphasis the business steers on.
+enum LineKind {
+  INVENTORY
+  CONTENT_FEE
 }
 
 enum PriceVisibility {
@@ -215,6 +227,7 @@ model Publisher {
   invites            PublisherInvite[]
   salesContacts      SalesContact[]
   contactCandidates  ContactCandidate[]
+  apiKeys            ApiKey[]
 
   @@unique([marketId, name])
   @@index([countryCode])
@@ -226,6 +239,10 @@ model Title {
   slug          String    @unique
   publisherId   String
   publisher     Publisher @relation(fields: [publisherId], references: [id])
+  // Publisher's own identifier for this title, used by the programmatic
+  // ingestion API to upsert idempotently. Unique per publisher; null for
+  // titles created via the CSV import or the manual desk flow.
+  externalRef   String?
   // Denormalized ISO country code mirroring `market.code`. Kept so
   // catalog filtering by country hits an index without joining Market.
   countryCode   String
@@ -302,6 +319,7 @@ model Title {
   @@index([frequency])
   @@index([ownerGroup])
   @@index([salesChannel])
+  @@unique([publisherId, externalRef])
 }
 
 model Product {
@@ -311,6 +329,9 @@ model Product {
   type         ProductType
   name         String
   description  String?
+  // Publisher's own SKU for this product, for idempotent ingestion.
+  // Unique within a title; null for non-ingested products.
+  externalRef  String?
   pricingModel PricingModel    @default(FLAT)
   basePrice    Decimal         @db.Decimal(12, 2)
   currency     String // ISO 4217, normally inherited from Market
@@ -327,6 +348,8 @@ model Product {
   spec          Spec?
   availability  Availability[]
   priceQuotes   PriceQuote[]
+
+  @@unique([titleId, externalRef])
 }
 
 // Phase-3 availability calendar — a product is bookable for a given
@@ -373,6 +396,57 @@ model Spec {
   requirements String? // free-form additional requirements
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
+}
+
+// Desk-owned price list for NativeSpin's own content-production service.
+// This is *our* revenue, not the publisher's — kept off Product (which
+// publishers edit). When a quote line is produced for a placement the
+// buyer wants us to write, we look up the most-specific active rule:
+//   (productType + marketCode) > productType > marketCode > global
+// and bill `greenfieldFee` (or `adaptationFee` when the asset reuses an
+// existing one via ContentAsset.sourceAssetId).
+model ContentFeeRule {
+  id            String       @id @default(cuid())
+  // Both nullable — null = "applies to any". A rule with both null is
+  // the global fallback. Most-specific active match wins.
+  marketCode    MarketCode?
+  productType   ProductType?
+  currency      String // ISO 4217
+  greenfieldFee Decimal      @db.Decimal(12, 2)
+  // Charged instead of greenfieldFee when adapting an existing asset for
+  // a new market. Null → fall back to greenfieldFee.
+  adaptationFee Decimal?     @db.Decimal(12, 2)
+  active        Boolean      @default(true)
+  note          String?
+  createdAt     DateTime     @default(now())
+  updatedAt     DateTime     @updatedAt
+
+  @@index([active, productType, marketCode])
+}
+
+// Phase 4 — content playbooks. Desk-owned, reusable guidance for what
+// makes good native for a given format / category / market. The most
+// specific active match surfaces to the writer when a ContentBrief is
+// created, closing the optimization loop: benchmarks & pricing inform
+// price; playbooks codify the content that wins.
+model Playbook {
+  id               String       @id @default(cuid())
+  // All three nullable — null = "applies to any". Most-specific active
+  // match wins (productType weighted highest, then category, then market).
+  productType      ProductType?
+  category         String?
+  marketCode       MarketCode?
+  title            String
+  angle            String?      // the persuasion angle that works here
+  structure        String?      // recommended article structure
+  doList           String?      // newline-separated do's
+  dontList         String?      // newline-separated don'ts
+  exampleHeadlines String?      // newline-separated example headlines
+  active           Boolean      @default(true)
+  createdAt        DateTime     @default(now())
+  updatedAt        DateTime     @updatedAt
+
+  @@index([active, productType, category, marketCode])
 }
 
 // ---------- Accounts ----------
@@ -566,11 +640,17 @@ model ApiKey {
   id             String        @id @default(cuid())
   organizationId String?
   organization   Organization? @relation(fields: [organizationId], references: [id])
+  // Set for publisher ingestion keys: the key may only read/write this
+  // publisher's inventory (hard multi-tenant boundary). Null for the
+  // existing buyer/partner catalog:read keys.
+  publisherId    String?
+  publisher      Publisher?    @relation(fields: [publisherId], references: [id])
   // Human label so super-admin can rotate per integration partner.
   name           String
   // SHA-256 of the raw token (hex). Never store the raw value.
   tokenHash      String        @unique
-  // Comma-separated scopes; "catalog:read" is the only v1 value.
+  // Comma-separated scopes; "catalog:read" (buyer/partner reads) and
+  // "catalog:write" (publisher ingestion) are the v1 values.
   scopes         String        @default("catalog:read")
   createdBy      String
   createdAt      DateTime      @default(now())
@@ -584,6 +664,7 @@ model ApiKey {
   webhooks PartnerWebhook[]
 
   @@index([organizationId])
+  @@index([publisherId])
   @@index([revokedAt])
 }
 
@@ -665,6 +746,11 @@ model PlanItem {
   plan      Plan    @relation(fields: [planId], references: [id])
   productId String
   quantity  Int     @default(1)
+  // When true, the buyer wants NativeSpin to produce the native content
+  // for this placement — adds a CONTENT_FEE line to the quote priced
+  // from the matching ContentFeeRule. Per-placement: some buyers bring
+  // their own copy.
+  withContent Boolean @default(false)
   notes     String?
 }
 
@@ -702,15 +788,21 @@ model Quote {
 }
 
 model QuoteLine {
-  id            String  @id @default(cuid())
+  id            String   @id @default(cuid())
   quoteId       String
-  quote         Quote   @relation(fields: [quoteId], references: [id])
-  productId     String
+  quote         Quote    @relation(fields: [quoteId], references: [id])
+  kind          LineKind @default(INVENTORY)
+  // Null for CONTENT_FEE lines — those bill our production service, not
+  // a publisher placement.
+  productId     String?
   description   String
-  quantity      Int     @default(1)
-  unitCost      Decimal @db.Decimal(12, 2)
-  marginPct     Decimal @db.Decimal(5, 2)
-  lineTotal     Decimal @db.Decimal(12, 2)
+  quantity      Int      @default(1)
+  // For INVENTORY: the publisher's rate-card cost. For CONTENT_FEE: our
+  // cost basis (0 unless we want to track writer cost), so margin
+  // reporting treats the whole fee as revenue.
+  unitCost      Decimal  @db.Decimal(12, 2)
+  marginPct     Decimal  @db.Decimal(5, 2)
+  lineTotal     Decimal  @db.Decimal(12, 2)
   availability  String?
 }
 
@@ -742,12 +834,14 @@ model Order {
 }
 
 model OrderLine {
-  id        String  @id @default(cuid())
+  id        String   @id @default(cuid())
   orderId   String
-  order     Order   @relation(fields: [orderId], references: [id])
-  productId String
-  quantity  Int     @default(1)
-  lineTotal Decimal @db.Decimal(12, 2)
+  order     Order    @relation(fields: [orderId], references: [id])
+  kind      LineKind @default(INVENTORY)
+  // Null for CONTENT_FEE lines (no publisher placement to fulfil).
+  productId String?
+  quantity  Int      @default(1)
+  lineTotal Decimal  @db.Decimal(12, 2)
 
   brief   ContentBrief?
   booking PublisherBooking?

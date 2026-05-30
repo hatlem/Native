@@ -7,9 +7,18 @@ import {
   sumByGroup,
   averageOrderValue,
   conversionPct,
+  revenueSplit,
 } from "@/lib/reporting";
+import {
+  benchmarkBy,
+  suggestMargin,
+  median,
+  type BenchmarkRow,
+} from "@/lib/pricing-intelligence";
 
 export const dynamic = "force-dynamic";
+
+const DECIDED = ["ACCEPTED", "DECLINED", "EXPIRED"] as const;
 
 export default async function DeskReportsPage({
   params,
@@ -27,13 +36,84 @@ export default async function DeskReportsPage({
       prisma.order.findMany({
         select: {
           status: true,
-          quote: { select: { currency: true, total: true, subtotal: true } },
+          quote: {
+            select: {
+              currency: true,
+              total: true,
+              subtotal: true,
+              lines: {
+                select: {
+                  kind: true,
+                  unitCost: true,
+                  quantity: true,
+                  lineTotal: true,
+                },
+              },
+            },
+          },
         },
       }),
       prisma.orderLine.findMany({ select: { productId: true } }),
       prisma.market.findMany({ select: { currency: true } }),
       prisma.invoice.findMany({ select: { status: true } }),
     ]);
+
+  // Pricing intelligence: benchmark + suggested margin per category, from
+  // decided (won/lost) quote inventory lines.
+  const decidedQuotes = await prisma.quote.findMany({
+    where: { status: { in: [...DECIDED] } },
+    select: {
+      status: true,
+      lines: {
+        where: { kind: "INVENTORY" },
+        select: { productId: true, marginPct: true, lineTotal: true },
+      },
+    },
+  });
+  const benchProductIds = [
+    ...new Set(
+      decidedQuotes.flatMap((q) =>
+        q.lines.map((l) => l.productId).filter((id): id is string => !!id),
+      ),
+    ),
+  ];
+  const benchProducts = benchProductIds.length
+    ? await prisma.product.findMany({
+        where: { id: { in: benchProductIds } },
+        select: { id: true, title: { select: { category: true } } },
+      })
+    : [];
+  const catByProduct = new Map(
+    benchProducts.map((p) => [p.id, p.title.category]),
+  );
+  const benchRows: BenchmarkRow[] = decidedQuotes.flatMap((q) =>
+    q.lines.flatMap((l) => {
+      const cat = l.productId ? catByProduct.get(l.productId) : undefined;
+      if (!cat) return [];
+      return [
+        {
+          key: cat,
+          marginPct: Number(l.marginPct),
+          lineTotal: Number(l.lineTotal),
+          won: q.status === "ACCEPTED",
+        },
+      ];
+    }),
+  );
+  const benchmarks = benchmarkBy(benchRows);
+  const overallMedianMargin = median(benchRows.map((r) => r.marginPct));
+  const pricingIntel = benchmarks.map((b) => {
+    const obs = benchRows
+      .filter((r) => r.key === b.key)
+      .map((r) => ({ marginPct: r.marginPct, won: r.won }));
+    const catMedian = median(
+      benchRows.filter((r) => r.key === b.key).map((r) => r.marginPct),
+    );
+    return {
+      benchmark: b,
+      suggestion: suggestMargin(obs, catMedian ?? overallMedianMargin),
+    };
+  });
 
   const currencies = [...new Set(markets.map((m) => m.currency))];
   const kpis = currencies
@@ -51,16 +131,40 @@ export default async function DeskReportsPage({
 
   const statusRows = tally(orders.map((o) => o.status));
 
+  // Revenue split (margin vs content fee) per currency — the "emphasis"
+  // view. Computed from realized order quote lines.
+  const revenueByCurrency = currencies
+    .map((cur) => {
+      const lines = orders
+        .filter((o) => o.quote.currency === cur)
+        .flatMap((o) =>
+          o.quote.lines.map((l) => ({
+            kind: l.kind,
+            unitCost: Number(l.unitCost),
+            quantity: l.quantity,
+            lineTotal: Number(l.lineTotal),
+          })),
+        );
+      return { currency: cur, split: revenueSplit(lines) };
+    })
+    .filter((r) => r.split.totalRevenue !== 0);
+
   const products = orderLines.length
     ? await prisma.product.findMany({
-        where: { id: { in: orderLines.map((l) => l.productId) } },
+        where: {
+          id: {
+            in: orderLines
+              .map((l) => l.productId)
+              .filter((id): id is string => !!id),
+          },
+        },
         select: { id: true, title: { select: { category: true } } },
       })
     : [];
   const catById = new Map(products.map((p) => [p.id, p.title.category]));
   const categoryRows = tally(
     orderLines
-      .map((l) => catById.get(l.productId))
+      .map((l) => (l.productId ? catById.get(l.productId) : undefined))
       .filter((c): c is string => !!c),
   );
 
@@ -124,6 +228,80 @@ export default async function DeskReportsPage({
                 </p>
               </article>
             ))}
+          </div>
+        )}
+      </section>
+
+      <section className="section">
+        <div className="section-head">
+          <div>
+            <span className="eyebrow">{t("revenueSplitEyebrow")}</span>
+            <h2>{t("revenueSplit")}</h2>
+          </div>
+          <span className="muted small">{t("revenueSplitNote")}</span>
+        </div>
+        {revenueByCurrency.length === 0 ? (
+          <p className="muted">{t("none")}</p>
+        ) : (
+          <div className="grid">
+            {revenueByCurrency.map(({ currency, split }) => (
+              <article className="card" key={currency}>
+                <span className="tag">{currency}</span>
+                <h3>{formatMoney(split.totalRevenue, currency, locale)}</h3>
+                <p className="muted small">
+                  {t("marginRevenue")}:{" "}
+                  {formatMoney(split.marginRevenue, currency, locale)}
+                </p>
+                <p className="muted small">
+                  {t("contentFeeRevenue")}:{" "}
+                  {formatMoney(split.contentFeeRevenue, currency, locale)}
+                </p>
+                <p className="muted small">
+                  {t("contentFeeShare")}: {split.contentFeeRatioPct}%
+                </p>
+              </article>
+            ))}
+          </div>
+        )}
+      </section>
+
+      <section className="section">
+        <div className="section-head">
+          <div>
+            <span className="eyebrow">{t("pricingIntelEyebrow")}</span>
+            <h2>{t("pricingIntel")}</h2>
+          </div>
+          <span className="muted small">{t("pricingIntelNote")}</span>
+        </div>
+        {pricingIntel.length === 0 ? (
+          <p className="muted">{t("pricingIntelEmpty")}</p>
+        ) : (
+          <div className="table-wrap">
+            <table className="table">
+              <thead>
+                <tr>
+                  <th>{t("byCategory")}</th>
+                  <th>{t("benchSamples")}</th>
+                  <th>{t("benchWinRate")}</th>
+                  <th>{t("benchAvgMargin")}</th>
+                  <th>{t("suggestedMargin")}</th>
+                </tr>
+              </thead>
+              <tbody>
+                {pricingIntel.map(({ benchmark: b, suggestion: s }) => (
+                  <tr key={b.key}>
+                    <td>{b.key}</td>
+                    <td>{b.samples}</td>
+                    <td>{b.winRatePct}%</td>
+                    <td>{b.avgMarginPct}%</td>
+                    <td>
+                      <strong>{s.marginPct}%</strong>{" "}
+                      <span className="muted small">({t(`basis_${s.basis}`)})</span>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
           </div>
         )}
       </section>

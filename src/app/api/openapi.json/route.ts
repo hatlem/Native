@@ -37,7 +37,7 @@ const SPEC = {
         type: "http",
         scheme: "bearer",
         description:
-          'Bearer API key with the `catalog:read` scope. Issued by NativeSpin per integration partner. Send as `Authorization: Bearer <key>`.',
+          'Bearer API key. `catalog:read` for the public catalog endpoints; `catalog:write` (bound to one publisher) for the ingestion endpoints. Send as `Authorization: Bearer <key>`.',
       },
     },
     schemas: {
@@ -88,6 +88,72 @@ const SPEC = {
           currency: { type: "string", nullable: true },
           visibility: { type: "string", enum: ["INDICATIVE", "FIRM"] },
           leadTimeDays: { type: "integer", nullable: true },
+        },
+      },
+      IngestPayload: {
+        type: "object",
+        required: ["products"],
+        properties: {
+          products: {
+            type: "array",
+            minItems: 1,
+            maxItems: 200,
+            items: {
+              type: "object",
+              required: ["externalRef", "type", "name", "basePrice", "currency", "title"],
+              properties: {
+                externalRef: { type: "string", description: "Your SKU; unique within the title." },
+                type: { type: "string", enum: Object.values(ProductType) },
+                name: { type: "string" },
+                description: { type: "string", nullable: true },
+                basePrice: { type: "number", description: "Publisher rate-card cost." },
+                currency: { type: "string", description: "ISO 4217, 3 letters." },
+                leadTimeDays: { type: "integer", nullable: true },
+                visibility: {
+                  type: "string",
+                  enum: ["INDICATIVE", "FIRM"],
+                  description: "Defaults to INDICATIVE on create.",
+                },
+                bookable: { type: "boolean" },
+                title: {
+                  type: "object",
+                  required: ["externalRef", "name", "marketCode", "category"],
+                  properties: {
+                    externalRef: { type: "string", description: "Your title id; unique per publisher." },
+                    name: { type: "string" },
+                    marketCode: { type: "string", enum: Object.values(MarketCode) },
+                    category: { type: "string" },
+                    websiteUrl: { type: "string", nullable: true },
+                    audienceNote: { type: "string", nullable: true },
+                  },
+                },
+                spec: {
+                  type: "object",
+                  nullable: true,
+                  properties: {
+                    wordCountMin: { type: "integer", nullable: true },
+                    wordCountMax: { type: "integer", nullable: true },
+                    imagesMin: { type: "integer", nullable: true },
+                    disclosureLabel: { type: "string", nullable: true },
+                    fileFormats: { type: "string", nullable: true },
+                    requirements: { type: "string", nullable: true },
+                  },
+                },
+                availability: {
+                  type: "array",
+                  items: {
+                    type: "object",
+                    required: ["year", "month"],
+                    properties: {
+                      year: { type: "integer" },
+                      month: { type: "integer", minimum: 1, maximum: 12 },
+                      blocked: { type: "boolean" },
+                    },
+                  },
+                },
+              },
+            },
+          },
         },
       },
       Error: {
@@ -222,6 +288,51 @@ const SPEC = {
                 schema: { $ref: "#/components/schemas/Error" },
               },
             },
+          },
+        },
+      },
+    },
+    "/api/v1/publisher/products": {
+      put: {
+        summary:
+          "Upsert the calling publisher's inventory (titles/products/prices/specs/availability). Idempotent on externalRef. Requires a catalog:write key bound to a publisher. New titles land inactive until NativeSpin activates them.",
+        security: [{ bearerAuth: [] }],
+        requestBody: {
+          required: true,
+          content: {
+            "application/json": {
+              schema: { $ref: "#/components/schemas/IngestPayload" },
+            },
+          },
+        },
+        responses: {
+          "200": { description: "Upsert summary with per-item ids." },
+          "401": {
+            description: "Auth failed.",
+            content: { "application/json": { schema: { $ref: "#/components/schemas/Error" } } },
+          },
+          "403": {
+            description: "Key lacks catalog:write or is not bound to a publisher.",
+            content: { "application/json": { schema: { $ref: "#/components/schemas/Error" } } },
+          },
+          "422": {
+            description: "Payload failed validation (see error.details).",
+            content: { "application/json": { schema: { $ref: "#/components/schemas/Error" } } },
+          },
+        },
+      },
+      get: {
+        summary: "Read back the calling publisher's ingested inventory.",
+        security: [{ bearerAuth: [] }],
+        responses: {
+          "200": { description: "The publisher's ingested titles and products." },
+          "401": {
+            description: "Auth failed.",
+            content: { "application/json": { schema: { $ref: "#/components/schemas/Error" } } },
+          },
+          "403": {
+            description: "Key lacks catalog:write or is not bound to a publisher.",
+            content: { "application/json": { schema: { $ref: "#/components/schemas/Error" } } },
           },
         },
       },

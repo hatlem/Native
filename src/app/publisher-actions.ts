@@ -142,7 +142,9 @@ export async function updateBooking(formData: FormData) {
 
   if (booking && Object.values(BookingStatus).includes(status)) {
     const product = await prisma.product.findUnique({
-      where: { id: booking.orderLine.productId },
+      // Bookings only exist on inventory lines, so productId is present;
+      // the ?? "" satisfies the type and yields no product otherwise.
+      where: { id: booking.orderLine.productId ?? "" },
       include: { title: { select: { publisherId: true } } },
     });
     if (product?.title.publisherId === publisherId) {
@@ -234,7 +236,8 @@ export async function rejectAsset(formData: FormData) {
   }
 
   const product = await prisma.product.findUnique({
-    where: { id: asset.brief.orderLine.productId },
+    // Briefs only attach to inventory lines, so productId is present.
+    where: { id: asset.brief.orderLine.productId ?? "" },
     select: { title: { select: { publisherId: true } } },
   });
   if (product?.title.publisherId !== publisherId) {

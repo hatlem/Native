@@ -22,6 +22,7 @@ export type QuoteAnchor = {
 
 export type QuoteNarrativeLine = {
   lineId: string;
+  kind: "INVENTORY" | "CONTENT_FEE";
   titleName: string;
   productType: string;
   quantity: number;
@@ -37,7 +38,9 @@ export type QuoteNarrativeData = {
 
 type NarrativeQuoteLine = {
   id: string;
-  productId: string;
+  kind?: "INVENTORY" | "CONTENT_FEE";
+  // Null for CONTENT_FEE lines (production service, no placement).
+  productId: string | null;
   lineTotal: unknown;
   quantity: number;
 };
@@ -70,19 +73,25 @@ export function buildQuoteNarrative(
   const { quote, organization, productsById } = input;
 
   const lines: QuoteNarrativeLine[] = quote.lines.map((line) => {
-    const product = productsById.get(line.productId);
+    const kind = line.kind ?? "INVENTORY";
+    const product = line.productId ? productsById.get(line.productId) : undefined;
     const title = product?.title;
     const rateCardPerUnit =
       title?.publishedRateCard != null ? Number(title.publishedRateCard) : null;
 
+    // Content-fee lines carry no product or rate-card anchor — the page
+    // labels them from productType ("CONTENT_FEE"). titleName stays empty
+    // so we never render a raw id.
     return {
       lineId: line.id,
-      titleName: title?.name ?? line.productId,
-      productType: product?.type ?? "NATIVE_ARTICLE",
+      kind,
+      titleName: title?.name ?? (kind === "CONTENT_FEE" ? "" : (line.productId ?? "")),
+      productType:
+        product?.type ?? (kind === "CONTENT_FEE" ? "CONTENT_FEE" : "NATIVE_ARTICLE"),
       quantity: line.quantity,
       lineTotal: Number(line.lineTotal),
       anchor:
-        rateCardPerUnit != null && rateCardPerUnit > 0
+        kind === "INVENTORY" && rateCardPerUnit != null && rateCardPerUnit > 0
           ? {
               rateCard: rateCardPerUnit * line.quantity,
               currency: title?.publishedRateCurrency ?? quote.currency,

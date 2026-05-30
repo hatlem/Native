@@ -627,6 +627,41 @@ function assertSeedCredentials() {
   );
 }
 
+// Seed placeholder content-production fees so the CONTENT_FEE quote line
+// is live out of the box. Per market: one global rule (any product type)
+// plus a richer NATIVE_ARTICLE override. Amounts are PLACEHOLDERS — the
+// desk tunes them in /desk/content-fees once real production costs are
+// known. Major-currency markets use a smaller nominal than the Nordic
+// krone markets so the figures stay sane across NOK/SEK/DKK vs EUR/GBP/CHF.
+async function seedContentFeeRules() {
+  const rows = MARKETS.flatMap((m) => {
+    const krone = m.currency === "NOK" || m.currency === "SEK" || m.currency === "DKK";
+    const globalGreen = krone ? 8000 : 800;
+    const globalAdapt = krone ? 4000 : 400;
+    const articleGreen = krone ? 12000 : 1200;
+    const articleAdapt = krone ? 6000 : 600;
+    return [
+      {
+        marketCode: m.code,
+        productType: null,
+        currency: m.currency,
+        greenfieldFee: globalGreen,
+        adaptationFee: globalAdapt,
+        note: "Seed placeholder — set real production cost in /desk/content-fees.",
+      },
+      {
+        marketCode: m.code,
+        productType: ProductType.NATIVE_ARTICLE,
+        currency: m.currency,
+        greenfieldFee: articleGreen,
+        adaptationFee: articleAdapt,
+        note: "Seed placeholder — editorial native article.",
+      },
+    ];
+  });
+  await prisma.contentFeeRule.createMany({ data: rows });
+}
+
 async function main() {
   assertSeedCredentials();
   // Clean catalog tables for an idempotent reseed (no commerce data yet).
@@ -637,10 +672,12 @@ async function main() {
   await prisma.title.deleteMany();
   await prisma.publisher.deleteMany();
   await prisma.market.deleteMany();
+  await prisma.contentFeeRule.deleteMany();
 
   const marketIds = await seedMarkets();
   const titleIdBySlug = await seedFromCsv(marketIds);
   const activeCount = await activateCommerceTitles(marketIds, titleIdBySlug);
+  await seedContentFeeRules();
 
   const passwordHash = await bcrypt.hash(DESK_PASSWORD, 10);
   await prisma.user.upsert({

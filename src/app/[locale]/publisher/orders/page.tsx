@@ -128,7 +128,9 @@ export default async function PublisherOrdersPage({
         ) : (
           <div className="grid two">
             {lines.map((line) => {
-              const meta = productMap.get(line.productId);
+              const meta = line.productId
+                ? productMap.get(line.productId)
+                : undefined;
               return (
                 <article className="card booking-card" key={line.id}>
                   <div className="booking-head">

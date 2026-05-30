@@ -234,6 +234,7 @@ export default async function RequestPage({
                 currency: q.currency,
                 lines: q.lines.map((l) => ({
                   id: l.id,
+                  kind: l.kind,
                   productId: l.productId,
                   lineTotal: l.lineTotal,
                   quantity: l.quantity,
@@ -242,10 +243,13 @@ export default async function RequestPage({
               organization: { name: request.organization.name },
               productsById: productsForNarrative,
             });
-            // Derive the market code from any line's product so we can
-            // label the per-currency block ("Norway · NOK").
-            const firstProduct =
-              q.lines[0] && byId.get(q.lines[0].productId);
+            // Derive the market code from a placement line's product so we
+            // can label the per-currency block ("Norway · NOK"). Content-
+            // fee lines have no product, so skip them.
+            const firstProductId = q.lines.find((l) => l.productId)?.productId;
+            const firstProduct = firstProductId
+              ? byId.get(firstProductId)
+              : undefined;
             const marketCode = firstProduct?.title.market.code ?? "";
             return { quote: q, narrative, marketCode };
           });
@@ -474,8 +478,10 @@ export default async function RequestPage({
           />
           <div className="grid">
             {orders.flatMap((o) =>
-              o.lines.map((line) => {
-                const p = byId.get(line.productId);
+              o.lines
+                .filter((line) => line.kind === "INVENTORY" && line.productId)
+                .map((line) => {
+                const p = line.productId ? byId.get(line.productId) : undefined;
                 const asset = line.brief?.assets[0];
                 return (
                   <article className="card" key={line.id}>

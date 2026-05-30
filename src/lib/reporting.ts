@@ -39,3 +39,48 @@ export function conversionPct(requests: number, orders: number): number {
   if (requests <= 0) return 0;
   return Math.round((orders / requests) * 1000) / 10;
 }
+
+// ---------- Revenue split: buying margin vs content-fee ----------
+// The "margin vs content fee" emphasis, measured from realized quote
+// lines. Margin revenue is the markup we keep on inventory (lineTotal
+// minus the publisher's cost); content-fee revenue is our production
+// service. Caller passes lines from a single currency.
+
+export type RevenueLine = {
+  kind: "INVENTORY" | "CONTENT_FEE";
+  unitCost: number;
+  quantity: number;
+  lineTotal: number;
+};
+
+export type RevenueSplit = {
+  marginRevenue: number; // markup kept on inventory
+  contentFeeRevenue: number; // production-service revenue
+  totalRevenue: number;
+  // Content fee as a share of total revenue, 0..100 with one decimal.
+  // 0 when there is no revenue.
+  contentFeeRatioPct: number;
+};
+
+export function revenueSplit(lines: RevenueLine[]): RevenueSplit {
+  let marginRevenue = 0;
+  let contentFeeRevenue = 0;
+  for (const l of lines) {
+    if (l.kind === "CONTENT_FEE") {
+      contentFeeRevenue += l.lineTotal;
+    } else {
+      marginRevenue += l.lineTotal - l.unitCost * l.quantity;
+    }
+  }
+  const totalRevenue = marginRevenue + contentFeeRevenue;
+  const contentFeeRatioPct =
+    totalRevenue > 0
+      ? Math.round((contentFeeRevenue / totalRevenue) * 1000) / 10
+      : 0;
+  return {
+    marginRevenue: Math.round(marginRevenue),
+    contentFeeRevenue: Math.round(contentFeeRevenue),
+    totalRevenue: Math.round(totalRevenue),
+    contentFeeRatioPct,
+  };
+}

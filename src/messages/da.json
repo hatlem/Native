@@ -36,7 +36,9 @@
     "roleAgency": "Bureau",
     "roleAdvertiser": "Annoncør",
     "roleGuest": "Gæst",
-    "account": "Konto"
+    "account": "Konto",
+    "contentFees": "Indholdsgebyrer",
+    "playbooks": "Spillebøger"
   },
   "reports": {
     "title": "Rapporter",
@@ -58,7 +60,24 @@
     "conversionSub": "Briefer der blev til ordrer",
     "gmvEyebrow": "Bruttoværdi",
     "gmvNote": "Per valuta — aldrig summeret på tværs af NOK/SEK/DKK",
-    "orderCount": "{count, plural, =0 {0 ordrer} =1 {1 ordre} other {# ordrer}}"
+    "orderCount": "{count, plural, =0 {0 ordrer} =1 {1 ordre} other {# ordrer}}",
+    "revenueSplitEyebrow": "Indtægt",
+    "revenueSplit": "Indtægtsfordeling",
+    "revenueSplitNote": "Indkøbsmargin vs. indtægt fra indholdsgebyrer",
+    "marginRevenue": "Margin",
+    "contentFeeRevenue": "Indholdsgebyrer",
+    "contentFeeShare": "Andel indholdsgebyrer",
+    "pricingIntelEyebrow": "Prisindsigt",
+    "pricingIntel": "Foreslået margin pr. kategori",
+    "pricingIntelNote": "Højeste margin der stadig vandt aftaler – vejledende, aldrig automatisk",
+    "pricingIntelEmpty": "Ikke nok afgjorte tilbud endnu til benchmark.",
+    "benchSamples": "Tilbud",
+    "benchWinRate": "Vinderrate",
+    "benchAvgMargin": "Gns. margin",
+    "suggestedMargin": "Foreslået",
+    "basis_win-rate": "fra vinderrate",
+    "basis_category-median": "kategorimedian",
+    "basis_default": "standard"
   },
   "agency": {
     "eyebrow": "Bureau",
@@ -247,7 +266,9 @@
     "recAlsoConsider": "Også værd at overveje",
     "reach": "månedlig rækkevidde",
     "add": "Tilføj til planen",
-    "recNone": "Ingen titler i dette marked endnu — gennemse hele kataloget."
+    "recNone": "Ingen titler i dette marked endnu — gennemse hele kataloget.",
+    "contentProduction": "Indholdsproduktion",
+    "contentProductionHint": "Lad NativeSpin skrive den native artikel til denne placering (tilføjer et produktionsgebyr)."
   },
   "rfq": {
     "org": "Virksomhed",
@@ -740,7 +761,8 @@
     "descNATIVE_DISPLAY": "Displayenhed der arver udgiverens typografi og kører i feedet, ikke i bannerslots. Tillidsoverførslen er det meste af værdien.",
     "descPACKAGE": "Native-artikel plus native display i samme titel — artiklen overbeviser, displayet giver rækkevidden.",
     "descCONTEXTUAL": "Placering målrettet efter sidens emne og redaktionel kontekst i stedet for brugerdata — relevansen kommer fra hvor annoncen vises.",
-    "descOTHER": "Tilpasset format der ikke passer i standardkategorierne — typisk forhandlet fra sag til sag."
+    "descOTHER": "Tilpasset format der ikke passer i standardkategorierne — typisk forhandlet fra sag til sag.",
+    "CONTENT_FEE": "Indholdsproduktion"
   },
   "nativeFit": {
     "High": "Høj",
@@ -1913,5 +1935,56 @@
     "wrongAccountBody": "Invitationen gælder {inviteEmail}. Du er logget ind som {authedEmail}.",
     "signOut": "Log ud",
     "genericError": "Noget gik galt. Tjek dine oplysninger og prøv igen."
+  },
+  "contentFees": {
+    "eyebrow": "Desk",
+    "title": "Indholdsgebyrer",
+    "lead": "Angiv, hvad NativeSpin tager for at producere native indhold. Den mest specifikke aktive regel (marked + type) gælder, når en køber beder os skrive en placering.",
+    "errorInvalid": "Angiv et gyldigt gebyr og en valuta på tre bogstaver.",
+    "newHeading": "Ny regel",
+    "market": "Marked",
+    "anyMarket": "Alle markeder",
+    "productType": "Produkttype",
+    "anyType": "Alle typer",
+    "currency": "Valuta",
+    "greenfieldFee": "Gebyr (nyskrevet)",
+    "adaptationFee": "Gebyr (tilpasning)",
+    "note": "Note",
+    "create": "Tilføj regel",
+    "creating": "Tilføjer…",
+    "rulesHeading": "Gebyrregler",
+    "empty": "Ingen regler endnu – tilføj en ovenfor.",
+    "status": "Status",
+    "active": "Aktiv",
+    "inactive": "Inaktiv",
+    "activate": "Aktivér",
+    "deactivate": "Deaktivér"
+  },
+  "playbooks": {
+    "eyebrow": "Desk",
+    "title": "Indholdsspillebøger",
+    "lead": "Genbrugelig vejledning til, hvad der giver god native pr. format, kategori og marked. Den mest specifikke aktive spillebog vises for skribenten på hver brief.",
+    "errorInvalid": "En titel er påkrævet.",
+    "newHeading": "Ny spillebog",
+    "playbookTitle": "Titel",
+    "productType": "Produkttype",
+    "anyType": "Alle typer",
+    "category": "Kategori",
+    "anyCategory": "Alle kategorier",
+    "market": "Marked",
+    "anyMarket": "Alle markeder",
+    "angle": "Vinkel",
+    "structure": "Struktur",
+    "doList": "Gør",
+    "dontList": "Lad være",
+    "exampleHeadlines": "Eksempeloverskrifter",
+    "listHint": "Én pr. linje",
+    "create": "Tilføj spillebog",
+    "creating": "Tilføjer…",
+    "listHeading": "Spillebøger",
+    "empty": "Ingen spillebøger endnu – tilføj en ovenfor.",
+    "activate": "Aktivér",
+    "deactivate": "Deaktivér",
+    "matchedEyebrow": "Spillebog"
   }
 }

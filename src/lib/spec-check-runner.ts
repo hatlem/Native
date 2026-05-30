@@ -15,8 +15,14 @@ export async function runSpecCheckForAsset(assetId: string): Promise<void> {
   });
   if (!asset) return;
 
+  // Briefs only attach to inventory (placement) order lines, so productId
+  // is present in practice; bail defensively if a content-fee line ever
+  // reaches here.
+  const productId = asset.brief.orderLine.productId;
+  if (!productId) return;
+
   const product = await prisma.product.findUnique({
-    where: { id: asset.brief.orderLine.productId },
+    where: { id: productId },
     include: {
       spec: true,
       title: { include: { market: { select: { disclosureLabel: true } } } },
