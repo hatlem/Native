@@ -41,6 +41,10 @@ enum ProductType {
   PACKAGE
   CONTEXTUAL
   OTHER
+  // Shoppable native article — in-article product links / buy buttons.
+  NATIVE_PLUS
+  // Video-led sponsored placement in the publisher's player/feed.
+  CONTENT_VIDEO
 }
 
 enum PricingModel {
@@ -398,6 +402,12 @@ model Spec {
   disclosureLabel String? // required sponsored/native marking text
   fileFormats  String? // e.g. "JPG, PNG"
   requirements String? // free-form additional requirements
+  // Content Video specs (null for non-video formats).
+  videoMaxSeconds Int?    // max length in seconds, e.g. 60
+  videoHosting    String? // accepted hosting/format, e.g. "YouTube, Vimeo, or MP4 ≤ 200 MB"
+  // Native Plus (shoppable) specs (null for non-shoppable formats).
+  shoppableMaxProducts Int?    // max in-article product links/cards, e.g. 3
+  ctaGuidance          String? // allowed/required buy-button CTA wording
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
 }
