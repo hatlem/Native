@@ -10,6 +10,7 @@ import { getWorkspace } from "@/lib/workspace";
 import {
   PLAN_COOKIE,
   PLAN_BRIEF_COOKIE,
+  clampQuantity,
   planBriefHasContent,
   readBasket,
   serializeBasket,
@@ -113,6 +114,25 @@ export async function removeFromPlan(formData: FormData) {
   const items = (await readBasket()).filter((i) => i.productId !== productId);
   await writeBasket(items);
   revalidatePath(`/${locale}/plan`);
+}
+
+// Set the quantity for one plan line directly (the plan-page stepper).
+// addToPlan keeps incrementing on catalog re-add; this lets the buyer
+// set an exact value. Clamped to [1, MAX_QTY]; never removes a line
+// (Remove is its own action).
+export async function setQuantity(formData: FormData) {
+  const locale = str(formData, "locale") || "en";
+  const productId = str(formData, "productId");
+  const qty = clampQuantity(Number(str(formData, "quantity")));
+  if (productId) {
+    const items = await readBasket();
+    const existing = items.find((i) => i.productId === productId);
+    if (existing) {
+      existing.quantity = qty;
+      await writeBasket(items);
+    }
+  }
+  redirect(`/${locale}/plan`);
 }
 
 async function clientKey(): Promise<string> {
