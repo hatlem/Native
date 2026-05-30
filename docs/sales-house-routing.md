@@ -12,8 +12,9 @@ The badge is visible per publisher on `/desk/publisher-contacts`.
 
 **Loaded into the DB** by `scripts/load-sales-house-contacts.ts` (machine-readable
 form of the tables below). As of the last run it created SalesContacts covering
-**850 of the 1,975 non-direct titles** (the 23 researched houses); the remaining
-~1,125 titles run through ~470 smaller houses with no verified email yet and are
+**1,216 of the 1,975 non-direct titles** (23 originally-researched houses + 46
+long-tail houses from the Sonnet swarm, see bottom); the remaining ~759 titles
+run through smaller houses with no verified email yet and are
 **left unmapped on purpose** — fill those in here, then rerun the loader.
 DIRECT titles are handled separately by `scripts/approve-direct-candidates.ts`
 (promotes the best scraped candidate per publisher, ≥80 confidence).
@@ -92,3 +93,33 @@ Notes:
 
 > Research date: 2026-05-29. Re-verify medium/low entries and fill the gaps
 > before the first real batch to those titles.
+
+
+## Long-tail research (Sonnet swarm, 2026-05-30)
+
+Researched 68 long-tail sales houses (≥4 titles each) under the strict
+no-guessing rule. **46 high-confidence emails were MX-verified and loaded**
+into the ROUTES table in `scripts/load-sales-house-contacts.ts` (coverage of
+non-direct titles went 850 → 1,216). `Burda Direct` was excluded — its only
+public inbox is *Vertrieb* (distribution), not advertising.
+
+### Medium-confidence — verify before sending (NOT yet loaded)
+
+| House | Email | Contact | Note |
+|---|---|---|---|
+| EMAP Commercial | frazer.stokes@emap.com | Frazer Stokes | No generic advertising inbox found. frazer.stokes@emap.com was seen verbatim on architects |
+| KSF Media Mainosmyynti | annons@ksfmedia.fi | — | The email annons@ksfmedia.fi is consistently cited in Google search snippets as the advert |
+| DC Thomson Media | cfrench@dctmedia.co.uk | C French | Named advertising contact seen verbatim on fairsubmissions.co.uk: "Advertising – cfrench@d |
+| Berlingske Media Annonce | annoncering@berlingskemedia.dk | — | Email seen verbatim on the LeadIQ company page, reproduced from Berlingske Media's own adv |
+| Mediaprint | vertrieb@mediaprint.at | — | vertrieb@mediaprint.at was seen verbatim on the presseangebot.at Mediaprint page as the co |
+| DLV Anzeigen | sandra.holleber@dlv.de | Sandra Holleber | No generic advertising inbox (anzeigen@, werbung@, mediasales@) found on any live page. Sa |
+
+(`Mediaprint → vertrieb@` is a distribution inbox — likely wrong door; verify.)
+
+### No verified email found — need manual research (15)
+
+`Hearst UK Commercial`, `Keskisuomalainen Oyj Mainosmyynti`, `Goldbach`, `Condé Nast UK Commercial`, `NHST Media Salg`, `MA Commercial`, `IDG Sales`, `Ippen Anzeigen`, `Incisive Commercial`, `Centaur Commercial`, `Celtic Media Advertising`, `Mail Metro Media`, `oe24 Anzeigen`, `Condé Nast Germany Advertising`, `Styria Media Sales`
+
+These are mostly big groups that gate ad sales behind web forms / Ocast
+(Hearst UK, Condé Nast UK & DE, Goldbach, Mail Metro Media, Styria, oe24,
+Keskisuomalainen, NHST, Centaur, Incisive, IDG, MA Commercial, Ippen, Celtic).
