@@ -235,7 +235,8 @@
     "itemCount": "{count, plural, =0 {0 linjer} =1 {1 linje} other {# linjer}}",
     "duplicateOk": "Plan gjenopprettet fra din forrige bestilling. Rediger og send på nytt når du er klar.",
     "duplicatePartial": "Plan gjenopprettet. {dropped} element(er) ble droppet fordi titlene ikke lenger er aktive — bla i katalogen for erstatninger.",
-    "duplicateAllInactive": "Alle titler fra den bestillingen er inaktive nå. Bla i katalogen for å bygge en ny plan."
+    "duplicateAllInactive": "Alle titler fra den bestillingen er inaktive nå. Bla i katalogen for å bygge en ny plan.",
+    "pricingOnRequest": "Pris på forespørsel — fast tilbud innen 24 t"
   },
   "rfq": {
     "org": "Selskap",

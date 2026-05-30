@@ -314,7 +314,8 @@
     "itemCount": "{count, plural, =0 {0 Positionen} =1 {1 Position} other {# Positionen}}",
     "duplicateOk": "Plan aus Ihrer vorherigen Bestellung wiederhergestellt. Bearbeiten und erneut absenden, wenn Sie bereit sind.",
     "duplicatePartial": "Plan wiederhergestellt. {dropped} Element(e) wurden entfernt, da die Titel nicht mehr aktiv sind — durchsuchen Sie den Katalog nach Alternativen.",
-    "duplicateAllInactive": "Alle Titel aus dieser Bestellung sind jetzt inaktiv. Durchsuchen Sie den Katalog, um einen neuen Plan zu erstellen."
+    "duplicateAllInactive": "Alle Titel aus dieser Bestellung sind jetzt inaktiv. Durchsuchen Sie den Katalog, um einen neuen Plan zu erstellen.",
+    "pricingOnRequest": "Preis auf Anfrage — verbindliches Angebot in 24 Std."
   },
   "rfq": {
     "org": "Firma",

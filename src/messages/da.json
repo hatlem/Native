@@ -235,7 +235,8 @@
     "itemCount": "{count, plural, =0 {0 linjer} =1 {1 linje} other {# linjer}}",
     "duplicateOk": "Plan gendannet fra din forrige ordre. Rediger og send igen, når du er klar.",
     "duplicatePartial": "Plan gendannet. {dropped} element(er) blev udeladt, fordi titlerne ikke længere er aktive — gennemse kataloget for erstatninger.",
-    "duplicateAllInactive": "Alle titler fra den ordre er inaktive nu. Gennemse kataloget for at bygge en ny plan."
+    "duplicateAllInactive": "Alle titler fra den ordre er inaktive nu. Gennemse kataloget for at bygge en ny plan.",
+    "pricingOnRequest": "Pris på forespørgsel — fast tilbud inden 24 t"
   },
   "rfq": {
     "org": "Virksomhed",

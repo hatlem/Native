@@ -314,7 +314,8 @@
     "itemCount": "{count, plural, =0 {0 riviä} =1 {1 rivi} other {# riviä}}",
     "duplicateOk": "Suunnitelma palautettu edellisestä tilauksestasi. Muokkaa ja lähetä uudelleen, kun olet valmis.",
     "duplicatePartial": "Suunnitelma palautettu. {dropped} kohde(tta) jätettiin pois, koska julkaisut eivät ole enää aktiivisia — selaa katalogia korvaajia varten.",
-    "duplicateAllInactive": "Kaikki kyseisen tilauksen julkaisut ovat nyt inaktiivisia. Selaa katalogia luodaksesi uusi suunnitelma."
+    "duplicateAllInactive": "Kaikki kyseisen tilauksen julkaisut ovat nyt inaktiivisia. Selaa katalogia luodaksesi uusi suunnitelma.",
+    "pricingOnRequest": "Hinta pyynnöstä — sitova tarjous 24 t kuluessa"
   },
   "rfq": {
     "org": "Yritys",

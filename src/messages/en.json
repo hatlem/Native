@@ -314,7 +314,8 @@
     "itemCount": "{count, plural, =0 {0 items} =1 {1 item} other {# items}}",
     "duplicateOk": "Plan restored from your previous order. Edit and re-submit when ready.",
     "duplicatePartial": "Plan restored. {dropped} item(s) were dropped because the titles are no longer active — browse the catalog for substitutes.",
-    "duplicateAllInactive": "All titles from that order are inactive now. Browse the catalog to build a fresh plan."
+    "duplicateAllInactive": "All titles from that order are inactive now. Browse the catalog to build a fresh plan.",
+    "pricingOnRequest": "Pricing on request — firm quote in 24 h"
   },
   "rfq": {
     "org": "Company",

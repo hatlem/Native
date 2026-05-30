@@ -235,7 +235,8 @@
     "itemCount": "{count, plural, =0 {0 rader} =1 {1 rad} other {# rader}}",
     "duplicateOk": "Plan återställd från din föregående order. Redigera och skicka in igen när du är redo.",
     "duplicatePartial": "Plan återställd. {dropped} objekt togs bort eftersom titlarna inte längre är aktiva — bläddra i katalogen för ersättare.",
-    "duplicateAllInactive": "Alla titlar från den ordern är inaktiva nu. Bläddra i katalogen för att bygga en ny plan."
+    "duplicateAllInactive": "Alla titlar från den ordern är inaktiva nu. Bläddra i katalogen för att bygga en ny plan.",
+    "pricingOnRequest": "Pris på begäran — fast offert inom 24 h"
   },
   "rfq": {
     "org": "Företag",

@@ -228,25 +228,19 @@ export default async function PlanPage({
             <div className="plan-summary-head">
               <span className="muted small">{t("estTotal")}</span>
               <div className="plan-summary-total">
-                {totals.map(([cur, r]) => (
-                  <div className="price" key={cur}>
-                    {r.hasVisible ? (
-                      <>
-                        {formatMoney(r.amount, cur, locale)}
-                        {r.hasHidden ? (
-                          <span className="muted small">
-                            {" "}
-                            + {tv("requestPrice")}
-                          </span>
-                        ) : null}
-                      </>
-                    ) : (
-                      <span className="muted">
-                        {cur} · {tv("requestPrice")}
-                      </span>
-                    )}
-                  </div>
-                ))}
+                {totals
+                  .filter(([, r]) => r.hasVisible)
+                  .map(([cur, r]) => (
+                    <div className="price" key={cur}>
+                      {formatMoney(r.amount, cur, locale)}
+                      {r.hasHidden ? (
+                        <span className="muted small"> + {tv("requestPrice")}</span>
+                      ) : null}
+                    </div>
+                  ))}
+                {hasHiddenPrice && !totals.some(([, r]) => r.hasVisible) ? (
+                  <div className="muted small">{t("pricingOnRequest")}</div>
+                ) : null}
               </div>
               {allFirm ? (
                 <span className="badge badge-info dotless">
