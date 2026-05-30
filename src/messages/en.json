@@ -1962,7 +1962,12 @@
     "inactive": "Inactive",
     "activate": "Activate",
     "deactivate": "Deactivate",
-    "save": "Save"
+    "save": "Save",
+    "bulkEyebrow": "Quick edit",
+    "bulkHeading": "Set all fees",
+    "bulkHint": "Edit every fee in the grid, then save once.",
+    "saveAll": "Save all",
+    "saving": "Saving…"
   },
   "playbooks": {
     "eyebrow": "Desk",

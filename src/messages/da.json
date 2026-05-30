@@ -1964,7 +1964,12 @@
     "inactive": "Inaktiv",
     "activate": "Aktivér",
     "deactivate": "Deaktivér",
-    "save": "Gem"
+    "save": "Gem",
+    "bulkEyebrow": "Hurtigredigering",
+    "bulkHeading": "Angiv alle gebyrer",
+    "bulkHint": "Rediger alle gebyrer i tabellen, og gem én gang.",
+    "saveAll": "Gem alle",
+    "saving": "Gemmer…"
   },
   "playbooks": {
     "eyebrow": "Desk",
