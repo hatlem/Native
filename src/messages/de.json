@@ -1815,7 +1815,8 @@
     "active": "Aktiv",
     "inactive": "Inaktiv",
     "activate": "Aktivieren",
-    "deactivate": "Deaktivieren"
+    "deactivate": "Deaktivieren",
+    "save": "Speichern"
   },
   "playbooks": {
     "eyebrow": "Desk",
@@ -1842,6 +1843,8 @@
     "empty": "Noch keine Playbooks – fügen Sie oben eines hinzu.",
     "activate": "Aktivieren",
     "deactivate": "Deaktivieren",
-    "matchedEyebrow": "Playbook"
+    "matchedEyebrow": "Playbook",
+    "save": "Speichern",
+    "edit": "Bearbeiten"
   }
 }

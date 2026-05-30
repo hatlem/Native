@@ -1957,7 +1957,8 @@
     "active": "Aktiivinen",
     "inactive": "Ei käytössä",
     "activate": "Aktivoi",
-    "deactivate": "Poista käytöstä"
+    "deactivate": "Poista käytöstä",
+    "save": "Tallenna"
   },
   "playbooks": {
     "eyebrow": "Desk",
@@ -1984,6 +1985,8 @@
     "empty": "Ei pelikirjoja vielä – lisää yllä.",
     "activate": "Aktivoi",
     "deactivate": "Poista käytöstä",
-    "matchedEyebrow": "Pelikirja"
+    "matchedEyebrow": "Pelikirja",
+    "save": "Tallenna",
+    "edit": "Muokkaa"
   }
 }

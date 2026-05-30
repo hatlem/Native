@@ -1957,7 +1957,8 @@
     "active": "Aktiv",
     "inactive": "Inaktiv",
     "activate": "Aktivera",
-    "deactivate": "Inaktivera"
+    "deactivate": "Inaktivera",
+    "save": "Spara"
   },
   "playbooks": {
     "eyebrow": "Desk",
@@ -1984,6 +1985,8 @@
     "empty": "Inga spelböcker ännu – lägg till en ovan.",
     "activate": "Aktivera",
     "deactivate": "Inaktivera",
-    "matchedEyebrow": "Spelbok"
+    "matchedEyebrow": "Spelbok",
+    "save": "Spara",
+    "edit": "Redigera"
   }
 }

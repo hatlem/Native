@@ -62,6 +62,33 @@ export async function createPlaybook(formData: FormData) {
   redirect(`/${locale}/desk/playbooks`);
 }
 
+export async function updatePlaybook(formData: FormData) {
+  const locale = field(formData, "locale") || "en";
+  const userId = await requireDesk(locale);
+  const id = field(formData, "id");
+
+  const title = field(formData, "title");
+  if (!title) redirect(`/${locale}/desk/playbooks?error=invalid`);
+
+  const pb = await prisma.playbook.findUnique({ where: { id } });
+  if (pb) {
+    await prisma.playbook.update({
+      where: { id },
+      data: {
+        title,
+        angle: field(formData, "angle") || null,
+        structure: field(formData, "structure") || null,
+        doList: field(formData, "doList") || null,
+        dontList: field(formData, "dontList") || null,
+        exampleHeadlines: field(formData, "exampleHeadlines") || null,
+      },
+    });
+    await recordAudit(userId, "playbook.update", `Playbook:${id}`, { title });
+  }
+  revalidatePath(`/${locale}/desk/playbooks`);
+  redirect(`/${locale}/desk/playbooks`);
+}
+
 export async function togglePlaybook(formData: FormData) {
   const locale = field(formData, "locale") || "en";
   const userId = await requireDesk(locale);

@@ -1956,7 +1956,8 @@
     "active": "Active",
     "inactive": "Inactive",
     "activate": "Activate",
-    "deactivate": "Deactivate"
+    "deactivate": "Deactivate",
+    "save": "Save"
   },
   "playbooks": {
     "eyebrow": "Desk",
@@ -1983,6 +1984,8 @@
     "empty": "No playbooks yet — add one above.",
     "activate": "Activate",
     "deactivate": "Deactivate",
-    "matchedEyebrow": "Playbook"
+    "matchedEyebrow": "Playbook",
+    "save": "Save",
+    "edit": "Edit"
   }
 }

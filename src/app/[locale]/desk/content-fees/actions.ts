@@ -71,6 +71,36 @@ export async function createContentFeeRule(formData: FormData) {
   redirect(`/${locale}/desk/content-fees`);
 }
 
+// Edit a rule's economics in place (amounts + note). Market/type/currency
+// identity is immutable — to change those, deactivate and create a new
+// rule, so historical quotes stay traceable to the rule that priced them.
+export async function updateContentFeeRule(formData: FormData) {
+  const locale = field(formData, "locale") || "en";
+  const userId = await requireDesk(locale);
+  const id = field(formData, "id");
+
+  const greenfieldFee = parseFee(field(formData, "greenfieldFee"));
+  if (greenfieldFee === null) {
+    redirect(`/${locale}/desk/content-fees?error=invalid`);
+  }
+  const adaptationRaw = field(formData, "adaptationFee");
+  const adaptationFee = adaptationRaw ? parseFee(adaptationRaw) : null;
+
+  const rule = await prisma.contentFeeRule.findUnique({ where: { id } });
+  if (rule) {
+    await prisma.contentFeeRule.update({
+      where: { id },
+      data: { greenfieldFee, adaptationFee, note: field(formData, "note") || null },
+    });
+    await recordAudit(userId, "contentFeeRule.update", `ContentFeeRule:${id}`, {
+      greenfieldFee,
+      adaptationFee,
+    });
+  }
+  revalidatePath(`/${locale}/desk/content-fees`);
+  redirect(`/${locale}/desk/content-fees`);
+}
+
 // Flip active on/off so a rule can be retired without losing its history
 // (and any audit trail of past quotes that used it).
 export async function toggleContentFeeRule(formData: FormData) {

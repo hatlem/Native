@@ -135,6 +135,7 @@ All app routes are locale-prefixed (`/en`, `/no`, `/sv`, `/da`, `/de`, `/fi`).
 | `pnpm build-rate-card-campaign` | Assemble a rate-card outreach campaign |
 | `pnpm send-rate-card-batch` | Send the next capped batch of outreach email |
 | `pnpm seed-content-fees` | Insert default content-fee rules (idempotent; safe in prod) |
+| `pnpm seed-playbooks` | Insert starter content playbooks (idempotent; safe in prod) |
 | `pnpm issue-publisher-key <publisher>` | Issue a `catalog:write` ingestion key bound to a publisher |
 
 Additional one-off operational scripts live in [`scripts/`](./scripts/)
@@ -163,5 +164,7 @@ The catalog, RFQ/quote/order commerce flow, content-production workflow,
 invoicing, publisher portal, public API + MCP, the publisher-outreach engine, the
 content-fee revenue stream + margin/fee reporting, Phase-4 pricing intelligence /
 benchmarks / content playbooks, and the publisher programmatic-ingestion API are
-all implemented. The main remaining item is external accounting integration
-(invoices export as CSV today). Roadmap is tracked in [`PLAN.md`](./PLAN.md).
+all implemented. Accounting export is provider-neutral (`src/lib/accounting.ts` +
+structured JSON at `/api/export/invoices/accounting.json`); a **live** push to an
+accounting SaaS (Fiken adapter scaffolded) is the one remaining step and needs
+provider credentials. Roadmap is tracked in [`PLAN.md`](./PLAN.md).

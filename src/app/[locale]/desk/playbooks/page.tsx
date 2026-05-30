@@ -2,7 +2,7 @@ import { getTranslations } from "next-intl/server";
 import { MarketCode, ProductType } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
 import { SubmitButton } from "@/components";
-import { createPlaybook, togglePlaybook } from "./actions";
+import { createPlaybook, togglePlaybook, updatePlaybook } from "./actions";
 
 export const dynamic = "force-dynamic";
 
@@ -133,6 +133,40 @@ export default async function DeskPlaybooksPage({
                     <strong>{t("angle")}:</strong> {p.angle}
                   </p>
                 ) : null}
+                <details>
+                  <summary className="small">{t("edit")}</summary>
+                  <form action={updatePlaybook} className="stack-4" style={{ marginTop: "0.75rem" }}>
+                    <input type="hidden" name="locale" value={locale} />
+                    <input type="hidden" name="id" value={p.id} />
+                    <label className="field">
+                      <span>{t("playbookTitle")}</span>
+                      <input name="title" maxLength={200} defaultValue={p.title} required />
+                    </label>
+                    <label className="field">
+                      <span>{t("angle")}</span>
+                      <input name="angle" maxLength={300} defaultValue={p.angle ?? ""} />
+                    </label>
+                    <label className="field">
+                      <span>{t("structure")}</span>
+                      <textarea name="structure" rows={2} maxLength={1000} defaultValue={p.structure ?? ""} />
+                    </label>
+                    <div className="grid two">
+                      <label className="field">
+                        <span>{t("doList")}</span>
+                        <textarea name="doList" rows={3} maxLength={1000} defaultValue={p.doList ?? ""} />
+                      </label>
+                      <label className="field">
+                        <span>{t("dontList")}</span>
+                        <textarea name="dontList" rows={3} maxLength={1000} defaultValue={p.dontList ?? ""} />
+                      </label>
+                    </div>
+                    <label className="field">
+                      <span>{t("exampleHeadlines")}</span>
+                      <textarea name="exampleHeadlines" rows={3} maxLength={1000} defaultValue={p.exampleHeadlines ?? ""} />
+                    </label>
+                    <SubmitButton className="btn small" label={t("save")} pendingLabel="…" />
+                  </form>
+                </details>
               </article>
             ))}
           </div>
