@@ -1,6 +1,6 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { parseBasket, serializeBasket } from "./basket";
+import { parseBasket, serializeBasket, clampQuantity, MAX_QTY } from "./basket";
 
 test("parseBasket returns empty for missing or blank input", () => {
   assert.deepEqual(parseBasket(undefined), []);
@@ -46,4 +46,20 @@ test("serializeBasket round-trips through parseBasket", () => {
     { productId: "p2", quantity: 4 },
   ];
   assert.deepEqual(parseBasket(serializeBasket(items)), items);
+});
+
+test("clampQuantity floors at 1", () => {
+  assert.equal(clampQuantity(0), 1);
+  assert.equal(clampQuantity(-3), 1);
+  assert.equal(clampQuantity(NaN), 1);
+});
+test("clampQuantity caps at MAX_QTY", () => {
+  assert.equal(MAX_QTY, 20);
+  assert.equal(clampQuantity(21), 20);
+  assert.equal(clampQuantity(999), 20);
+});
+test("clampQuantity passes valid values through, truncating", () => {
+  assert.equal(clampQuantity(1), 1);
+  assert.equal(clampQuantity(5), 5);
+  assert.equal(clampQuantity(3.7), 3);
 });

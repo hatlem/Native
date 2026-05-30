@@ -6,6 +6,15 @@ export const PLAN_COOKIE = "nativespin_plan";
 // detours them to /onboarding. Cleared on successful submit.
 export const PLAN_BRIEF_COOKIE = "nativespin_brief";
 
+export const MAX_QTY = 20;
+
+// Clamp an untrusted quantity into [1, MAX_QTY]; non-finite → 1.
+export function clampQuantity(n: number): number {
+  const t = Math.trunc(Number(n));
+  if (!Number.isFinite(t) || t < 1) return 1;
+  return Math.min(t, MAX_QTY);
+}
+
 export type BasketItem = { productId: string; quantity: number };
 
 export type PlanBrief = {
