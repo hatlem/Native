@@ -7,7 +7,6 @@ import { Link } from "@/i18n/navigation";
 import { readBasket, readPlanBrief } from "@/lib/basket";
 import { indicativeFromRules, toRateRules, formatMoney } from "@/lib/money";
 import { isProductPriceShown } from "@/lib/pricing-visibility";
-import { arePricesVisible } from "@/lib/pricing/visibility";
 import { recommendTiered, type Candidate, type SupplementaryTitle } from "@/lib/recommend";
 import { removeFromPlan, submitRequest, setQuantity, addToPlan } from "@/app/actions";
 import { SubmitButton } from "@/components";
@@ -157,7 +156,11 @@ export default async function PlanPage({
     for (const p of recProducts) {
       const reach = p.title.digitalReach ?? p.title.monthlyReach ?? 0;
       const currency = p.currency ?? p.title.market?.currency ?? "EUR";
-      if (arePricesVisible(p.title)) {
+      // Tier 1 only when the buyer would actually see a € figure — active,
+      // sales-confirmed, prices public (same gate as the catalog + /recommend).
+      // Unconfirmed-but-public-price products fall through to Tier 2 "Request
+      // price", never a fabricated indicative figure.
+      if (isProductPriceShown(p, p.title)) {
         priced.push({
           productId: p.id,
           titleId: p.titleId,
