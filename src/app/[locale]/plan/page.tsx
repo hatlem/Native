@@ -43,7 +43,7 @@ export default async function PlanPage({
   const activeOrg = ws?.activeOrgId
     ? await prisma.organization.findUnique({
         where: { id: ws.activeOrgId },
-        select: { name: true },
+        select: { name: true, marketCode: true },
       })
     : null;
   const needsClient = !!ws?.isAgency && !ws.activeOrgId;
@@ -130,13 +130,7 @@ export default async function PlanPage({
     ? recMarketRaw
     : "";
   const recBudget = Number(recBudgetRaw) > 0 ? Number(recBudgetRaw) : 0;
-  const homeMarket =
-    ws?.activeOrgId
-      ? (await prisma.organization.findUnique({
-          where: { id: ws.activeOrgId },
-          select: { marketCode: true },
-        }))?.marketCode ?? null
-      : null;
+  const homeMarket = activeOrg?.marketCode ?? null;
 
   let rec: { picks: Candidate[]; supplementary: SupplementaryTitle[] } | null = null;
   let recCurrency = "EUR";
