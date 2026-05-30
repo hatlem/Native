@@ -4234,3 +4234,11 @@ footer a:hover {
     grid-template-columns: 1fr;
   }
 }
+
+.plan-qty { display: inline-flex; align-items: center; gap: 6px; }
+.plan-qty-step { display: inline; }
+.plan-qty-step .btn.small { min-width: 28px; padding: 2px 8px; }
+
+.plan-start { max-width: 560px; }
+.plan-start-form { display: grid; gap: 12px; }
+.plan-start-results { margin-top: 20px; display: grid; gap: 16px; }

@@ -1,4 +1,5 @@
 import { getTranslations } from "next-intl/server";
+import { MarketCode } from "@prisma/client";
 import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
 import { getWorkspace } from "@/lib/workspace";
@@ -6,9 +7,11 @@ import { Link } from "@/i18n/navigation";
 import { readBasket, readPlanBrief } from "@/lib/basket";
 import { indicativeFromRules, toRateRules, formatMoney } from "@/lib/money";
 import { isProductPriceShown } from "@/lib/pricing-visibility";
-import { removeFromPlan, submitRequest } from "@/app/actions";
-import { EmptyState } from "@/app/empty-state";
+import { recommendTiered, type Candidate, type SupplementaryTitle } from "@/lib/recommend";
+import { removeFromPlan, submitRequest, setQuantity, addToPlan } from "@/app/actions";
 import { SubmitButton } from "@/components";
+
+const MARKET_CODES = Object.values(MarketCode);
 
 export const dynamic = "force-dynamic";
 
@@ -31,6 +34,7 @@ export default async function PlanPage({
     locale,
     namespace: "priceVisibility",
   });
+  const tMarket = await getTranslations({ locale, namespace: "market" });
 
   const session = await auth();
 
@@ -38,7 +42,7 @@ export default async function PlanPage({
   const activeOrg = ws?.activeOrgId
     ? await prisma.organization.findUnique({
         where: { id: ws.activeOrgId },
-        select: { name: true },
+        select: { name: true, marketCode: true },
       })
     : null;
   const needsClient = !!ws?.isAgency && !ws.activeOrgId;
@@ -118,6 +122,71 @@ export default async function PlanPage({
     !hasHiddenPrice &&
     lines.every((l) => l.product.visibility === "FIRM");
 
+  // Empty-state recommendation: budget + market → tiered title suggestions.
+  const recMarketRaw = typeof sp.recMarket === "string" ? sp.recMarket : "";
+  const recBudgetRaw = typeof sp.recBudget === "string" ? sp.recBudget : "";
+  const recMarket = (MARKET_CODES as readonly string[]).includes(recMarketRaw)
+    ? recMarketRaw
+    : "";
+  const recBudget = Number(recBudgetRaw) > 0 ? Number(recBudgetRaw) : 0;
+  const homeMarket = activeOrg?.marketCode ?? null;
+
+  let rec: { picks: Candidate[]; supplementary: SupplementaryTitle[] } | null = null;
+  let recCurrency = "EUR";
+  if (basket.length === 0 && recMarket) {
+    const recProducts = await prisma.product.findMany({
+      where: {
+        active: true,
+        bookable: true,
+        title: { active: true, market: { code: recMarket as MarketCode } },
+      },
+      include: {
+        title: {
+          include: {
+            publisher: { select: { pricesPublic: true } },
+            market: { select: { currency: true } },
+          },
+        },
+        priceRules: true,
+      },
+    });
+    recCurrency = recProducts[0]?.currency ?? "EUR";
+    const priced: Candidate[] = [];
+    const unpricedByTitle = new Map<string, SupplementaryTitle>();
+    for (const p of recProducts) {
+      const reach = p.title.digitalReach ?? p.title.monthlyReach ?? 0;
+      const currency = p.currency ?? p.title.market?.currency ?? "EUR";
+      // Tier 1 only when the buyer would actually see a € figure — active,
+      // sales-confirmed, prices public (same gate as the catalog + /recommend).
+      // Unconfirmed-but-public-price products fall through to Tier 2 "Request
+      // price", never a fabricated indicative figure.
+      if (isProductPriceShown(p, p.title)) {
+        priced.push({
+          productId: p.id,
+          titleId: p.titleId,
+          titleName: p.title.name,
+          category: p.title.category,
+          type: p.type,
+          reach,
+          unitPrice: indicativeFromRules(Number(p.basePrice), toRateRules(p.priceRules)),
+        });
+      } else if (!unpricedByTitle.has(p.titleId)) {
+        unpricedByTitle.set(p.titleId, {
+          titleId: p.titleId,
+          titleName: p.title.name,
+          productId: p.id,
+          reach,
+          currency,
+        });
+      }
+    }
+    rec = recommendTiered(
+      priced,
+      [...unpricedByTitle.values()],
+      recBudget > 0 ? recBudget : Number.MAX_SAFE_INTEGER,
+    );
+  }
+
   return (
     <>
       <header className="page-header">
@@ -155,13 +224,74 @@ export default async function PlanPage({
       ) : null}
 
       {lines.length === 0 ? (
-        <EmptyState
-          title={t("empty")}
-          primaryHref="/catalog"
-          primaryLabel={t("browse")}
-          secondaryHref="/recommend"
-          secondaryLabel={tNav("recommend")}
-        />
+        <div className="plan-start">
+          <form className="plan-start-form" method="get">
+            <h2>{t("startTitle")}</h2>
+            <p className="muted small">{t("startLead")}</p>
+            <div className="field">
+              <label htmlFor="recMarket">{tr("market")}</label>
+              <select id="recMarket" name="recMarket" defaultValue={recMarket || homeMarket || ""}>
+                {MARKET_CODES.map((m) => (
+                  <option key={m} value={m}>{tMarket(m)}</option>
+                ))}
+              </select>
+            </div>
+            <div className="field">
+              <label htmlFor="recBudget">{tr("budget")}</label>
+              <input id="recBudget" name="recBudget" type="number" min="0" defaultValue={recBudgetRaw} />
+            </div>
+            <SubmitButton label={t("recommend")} pendingLabel={t("recommending")} />
+            <Link href="/catalog" className="link small">{t("browse")}</Link>
+          </form>
+
+          {rec ? (
+            <div className="plan-start-results">
+              {rec.picks.length > 0 ? (
+                <>
+                  <h3>{t("recForBudget")}</h3>
+                  <div className="action-list">
+                    {rec.picks.map((p) => (
+                      <div className="item" key={p.productId}>
+                        <div>
+                          <div className="title">{p.titleName}</div>
+                          <div className="sub muted small">{formatMoney(p.unitPrice, recCurrency, locale)} · {p.reach.toLocaleString(locale)} {t("reach")}</div>
+                        </div>
+                        <form action={addToPlan}>
+                          <input type="hidden" name="locale" value={locale} />
+                          <input type="hidden" name="productId" value={p.productId} />
+                          <button type="submit" className="btn small">{t("add")}</button>
+                        </form>
+                      </div>
+                    ))}
+                  </div>
+                </>
+              ) : null}
+              {rec.supplementary.length > 0 ? (
+                <>
+                  <h3>{t("recAlsoConsider")}</h3>
+                  <div className="action-list">
+                    {rec.supplementary.map((s) => (
+                      <div className="item" key={s.productId}>
+                        <div>
+                          <div className="title">{s.titleName}</div>
+                          <div className="sub muted small">{tv("requestPrice")} · {s.reach.toLocaleString(locale)} {t("reach")}</div>
+                        </div>
+                        <form action={addToPlan}>
+                          <input type="hidden" name="locale" value={locale} />
+                          <input type="hidden" name="productId" value={s.productId} />
+                          <button type="submit" className="btn small ghost">{t("add")}</button>
+                        </form>
+                      </div>
+                    ))}
+                  </div>
+                </>
+              ) : null}
+              {rec.picks.length === 0 && rec.supplementary.length === 0 ? (
+                <p className="muted small">{t("recNone")}</p>
+              ) : null}
+            </div>
+          ) : null}
+        </div>
       ) : (
         <div className="split">
           <div>
@@ -185,8 +315,20 @@ export default async function PlanPage({
                   <span className="tag">{tType(l.product.type)}</span>
                   <div>
                     <div className="title">{l.product.title.name}</div>
-                    <div className="sub">
-                      {t("qty")}: {l.quantity}
+                    <div className="sub plan-qty">
+                      <form action={setQuantity} className="plan-qty-step">
+                        <input type="hidden" name="locale" value={locale} />
+                        <input type="hidden" name="productId" value={l.product.id} />
+                        <input type="hidden" name="quantity" value={l.quantity - 1} />
+                        <button type="submit" className="btn small ghost" aria-label={t("decrement")} disabled={l.quantity <= 1}>−</button>
+                      </form>
+                      <span aria-live="polite">{t("qty")}: {l.quantity}</span>
+                      <form action={setQuantity} className="plan-qty-step">
+                        <input type="hidden" name="locale" value={locale} />
+                        <input type="hidden" name="productId" value={l.product.id} />
+                        <input type="hidden" name="quantity" value={l.quantity + 1} />
+                        <button type="submit" className="btn small ghost" aria-label={t("increment")}>+</button>
+                      </form>
                     </div>
                   </div>
                   <div className="cluster tight">
@@ -201,11 +343,7 @@ export default async function PlanPage({
                     )}
                     <form action={removeFromPlan}>
                       <input type="hidden" name="locale" value={locale} />
-                      <input
-                        type="hidden"
-                        name="productId"
-                        value={l.product.id}
-                      />
+                      <input type="hidden" name="productId" value={l.product.id} />
                       <button type="submit" className="btn small ghost">
                         {t("remove")}
                       </button>
@@ -220,25 +358,19 @@ export default async function PlanPage({
             <div className="plan-summary-head">
               <span className="muted small">{t("estTotal")}</span>
               <div className="plan-summary-total">
-                {totals.map(([cur, r]) => (
-                  <div className="price" key={cur}>
-                    {r.hasVisible ? (
-                      <>
-                        {formatMoney(r.amount, cur, locale)}
-                        {r.hasHidden ? (
-                          <span className="muted small">
-                            {" "}
-                            + {tv("requestPrice")}
-                          </span>
-                        ) : null}
-                      </>
-                    ) : (
-                      <span className="muted">
-                        {cur} · {tv("requestPrice")}
-                      </span>
-                    )}
-                  </div>
-                ))}
+                {totals
+                  .filter(([, r]) => r.hasVisible)
+                  .map(([cur, r]) => (
+                    <div className="price" key={cur}>
+                      {formatMoney(r.amount, cur, locale)}
+                      {r.hasHidden ? (
+                        <span className="muted small"> + {tv("requestPrice")}</span>
+                      ) : null}
+                    </div>
+                  ))}
+                {hasHiddenPrice && !totals.some(([, r]) => r.hasVisible) ? (
+                  <div className="muted small">{t("pricingOnRequest")}</div>
+                ) : null}
               </div>
               {allFirm ? (
                 <span className="badge badge-info dotless">

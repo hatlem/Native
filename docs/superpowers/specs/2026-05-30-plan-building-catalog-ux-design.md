@@ -1,7 +1,7 @@
 # Plan-building & Catalog UX — Design
 
 **Date:** 2026-05-30
-**Status:** Approved (design); pending implementation plan
+**Status:** Implemented (pending staging verification)
 **Goal:** Make it easy and best-in-class for a buyer to go from "empty plan" to a real brief/RFQ — by guiding discovery (brief → recommended titles), fixing the catalog's missing filters, and cleaning up two plan-page defects (static quantity, oversized request-price totals).
 
 ## Problem

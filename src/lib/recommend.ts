@@ -63,3 +63,43 @@ export function recommendMix(
     remaining: budget - totalCost,
   };
 }
+
+export type SupplementaryTitle = {
+  titleId: string;
+  titleName: string;
+  productId: string;
+  reach: number;
+  currency: string;
+};
+
+export type TieredRecommendation = {
+  picks: Candidate[];
+  supplementary: SupplementaryTitle[];
+  totalCost: number;
+  totalReach: number;
+};
+
+// Tier 1: budget-optimized priced picks (reach-per-€) via recommendMix.
+// Tier 2: top-reach unpriced titles (excluding titles already picked),
+// capped. Pass Number.MAX_SAFE_INTEGER as budget when the buyer gave no
+// budget — recommendMix then returns all priced titles, one per title.
+export function recommendTiered(
+  priced: Candidate[],
+  unpriced: SupplementaryTitle[],
+  budget: number,
+  opts?: { supplementaryCap?: number },
+): TieredRecommendation {
+  const cap = opts?.supplementaryCap ?? 6;
+  const base = recommendMix(priced, budget);
+  const pickedTitleIds = new Set(base.picks.map((p) => p.titleId));
+  const supplementary = [...unpriced]
+    .filter((s) => !pickedTitleIds.has(s.titleId))
+    .sort((a, b) => b.reach - a.reach || a.titleName.localeCompare(b.titleName))
+    .slice(0, cap);
+  return {
+    picks: base.picks,
+    supplementary,
+    totalCost: base.totalCost,
+    totalReach: base.totalReach,
+  };
+}
