@@ -338,7 +338,7 @@
     "duplicateAllInactive": "Alle Titel aus dieser Bestellung sind jetzt inaktiv. Durchsuchen Sie den Katalog, um einen neuen Plan zu erstellen.",
     "pricingOnRequest": "Preis auf Anfrage — verbindliches Angebot in 24 Std.",
     "startTitle": "Starten Sie Ihre Kampagne",
-    "startLead": "Teilen Sie uns Ihren Markt und Ihr Budget mit — wir schlagen Titel vor, auf die Sie Ihren Brief aufbauen können.",
+    "startLead": "Beschreiben Sie Zielgruppe und Markt – wir schlagen passende Titel vor.",
     "recommend": "Titel empfehlen",
     "recommending": "Titel werden gesucht…",
     "recForBudget": "Empfohlen für Ihr Budget",
@@ -347,7 +347,11 @@
     "add": "Zum Plan hinzufügen",
     "recNone": "Noch keine Titel in diesem Markt — durchsuchen Sie den gesamten Katalog.",
     "contentProduction": "Content-Produktion",
-    "contentProductionHint": "NativeSpin schreibt den Native-Artikel für diese Platzierung (zzgl. Produktionsgebühr)."
+    "contentProductionHint": "NativeSpin schreibt den Native-Artikel für diese Platzierung (zzgl. Produktionsgebühr).",
+    "briefLabel": "Wen möchten Sie erreichen?",
+    "briefPlaceholder": "z. B. Wir verkaufen Software an Finanz- und Rechtsteams in Oslo",
+    "briefHint": "Wir matchen Titel nach Zielgruppe, Branche und Region. Markt erforderlich; Budget optional.",
+    "recForBrief": "Auf Ihr Briefing abgestimmt"
   },
   "rfq": {
     "org": "Firma",

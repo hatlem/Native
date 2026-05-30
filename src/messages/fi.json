@@ -338,7 +338,7 @@
     "duplicateAllInactive": "Kaikki kyseisen tilauksen julkaisut ovat nyt inaktiivisia. Selaa katalogia luodaksesi uusi suunnitelma.",
     "pricingOnRequest": "Hinta pyynnöstä — sitova tarjous 24 t kuluessa",
     "startTitle": "Aloita kampanjasi",
-    "startLead": "Kerro meille markkinasi ja budjettisi — ehdotamme julkaisuja, joiden ympärille rakentaa briefisi.",
+    "startLead": "Kuvaile yleisösi ja markkinasi – ehdotamme julkaisuja briefin pohjaksi.",
     "recommend": "Ehdota julkaisuja",
     "recommending": "Etsitään julkaisuja…",
     "recForBudget": "Suositeltu budjetillesi",
@@ -347,7 +347,11 @@
     "add": "Lisää suunnitelmaan",
     "recNone": "Ei vielä julkaisuja tässä markkinassa — selaa koko katalogi.",
     "contentProduction": "Sisällöntuotanto",
-    "contentProductionHint": "Anna NativeSpinin kirjoittaa natiiviartikkeli tähän sijoitteluun (lisää tuotantomaksun)."
+    "contentProductionHint": "Anna NativeSpinin kirjoittaa natiiviartikkeli tähän sijoitteluun (lisää tuotantomaksun).",
+    "briefLabel": "Kenet haluat tavoittaa?",
+    "briefPlaceholder": "esim. Myymme ohjelmistoja talous- ja lakitiimeille Oslossa",
+    "briefHint": "Sovitamme julkaisut yleisön, toimialan ja alueen mukaan. Markkina vaaditaan; budjetti valinnainen.",
+    "recForBrief": "Sovitettu briefiisi"
   },
   "rfq": {
     "org": "Yritys",

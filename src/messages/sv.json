@@ -259,7 +259,7 @@
     "duplicateAllInactive": "Alla titlar från den ordern är inaktiva nu. Bläddra i katalogen för att bygga en ny plan.",
     "pricingOnRequest": "Pris på begäran — fast offert inom 24 h",
     "startTitle": "Starta din kampanj",
-    "startLead": "Berätta vilket marknad och budget du har — vi föreslår titlar att bygga din brief kring.",
+    "startLead": "Beskriv din målgrupp och marknad – vi föreslår titlar att bygga briefen kring.",
     "recommend": "Föreslå titlar",
     "recommending": "Hittar titlar…",
     "recForBudget": "Rekommenderat för din budget",
@@ -268,7 +268,11 @@
     "add": "Lägg till i planen",
     "recNone": "Inga titlar i den marknaden ännu — bläddra i hela katalogen.",
     "contentProduction": "Innehållsproduktion",
-    "contentProductionHint": "Låt NativeSpin skriva nativeartikeln för den här placeringen (lägger till en produktionsavgift)."
+    "contentProductionHint": "Låt NativeSpin skriva nativeartikeln för den här placeringen (lägger till en produktionsavgift).",
+    "briefLabel": "Vilka vill du nå?",
+    "briefPlaceholder": "t.ex. Vi säljer programvara till finans- och juristteam i Oslo",
+    "briefHint": "Vi matchar titlar efter målgrupp, bransch och region. Marknad krävs; budget är valfri.",
+    "recForBrief": "Matchat mot din brief"
   },
   "rfq": {
     "org": "Företag",

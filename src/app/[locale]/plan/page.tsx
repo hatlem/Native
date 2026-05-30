@@ -8,6 +8,14 @@ import { readBasket, readPlanBrief } from "@/lib/basket";
 import { indicativeFromRules, toRateRules, formatMoney } from "@/lib/money";
 import { isProductPriceShown } from "@/lib/pricing-visibility";
 import { recommendTiered, type Candidate, type SupplementaryTitle } from "@/lib/recommend";
+import {
+  extractFacets,
+  mergeFacets,
+  matchTitles,
+  facetsAreEmpty,
+  type MatchableTitle,
+} from "@/lib/brief-match";
+import { enrichBriefWithLLM, llmEnrichmentAvailable } from "@/lib/brief-match-llm";
 import { removeFromPlan, submitRequest, setQuantity, addToPlan, setContentProduction } from "@/app/actions";
 import { SubmitButton } from "@/components";
 
@@ -130,10 +138,14 @@ export default async function PlanPage({
     ? recMarketRaw
     : "";
   const recBudget = Number(recBudgetRaw) > 0 ? Number(recBudgetRaw) : 0;
+  const recBriefRaw = typeof sp.recBrief === "string" ? sp.recBrief.slice(0, 2000) : "";
   const homeMarket = activeOrg?.marketCode ?? null;
 
   let rec: { picks: Candidate[]; supplementary: SupplementaryTitle[] } | null = null;
   let recCurrency = "EUR";
+  // True when the results were ranked by the brief (drives the heading +
+  // reason chips); false = plain budget recommender.
+  let briefMatched = false;
   if (basket.length === 0 && recMarket) {
     const recProducts = await prisma.product.findMany({
       where: {
@@ -181,11 +193,71 @@ export default async function PlanPage({
         });
       }
     }
-    rec = recommendTiered(
-      priced,
-      [...unpricedByTitle.values()],
-      recBudget > 0 ? recBudget : Number.MAX_SAFE_INTEGER,
-    );
+    // Brief-driven matching: rank/filter the same candidates by how well
+    // each title fits the buyer's free-text brief (hybrid: deterministic
+    // taxonomy + optional LLM enrichment). Falls back to the budget
+    // recommender when the brief yields no usable signal.
+    let facets = recBriefRaw ? extractFacets(recBriefRaw) : null;
+    if (facets && llmEnrichmentAvailable()) {
+      facets = mergeFacets(facets, await enrichBriefWithLLM(recBriefRaw));
+    }
+
+    if (facets && !facetsAreEmpty(facets)) {
+      const matchables = new Map<string, MatchableTitle>();
+      for (const p of recProducts) {
+        if (matchables.has(p.titleId)) continue;
+        matchables.set(p.titleId, {
+          id: p.titleId,
+          name: p.title.name,
+          b2bB2c: p.title.b2bB2c,
+          vertical: p.title.vertical,
+          audience: p.title.audience,
+          category: p.title.category,
+          reach: p.title.reach,
+          nativeFit: p.title.nativeFit,
+          tags: p.title.tags,
+          locationNote: p.title.locationNote,
+          digitalReach: p.title.digitalReach,
+          monthlyReach: p.title.monthlyReach,
+        });
+      }
+      const matches = matchTitles([...matchables.values()], facets);
+      const rank = new Map(matches.map((m, i) => [m.title.id, i]));
+      const reasonsByTitle = new Map(matches.map((m) => [m.title.id, m.reasons]));
+
+      const matchedPriced = priced
+        .filter((c) => rank.has(c.titleId))
+        .sort((a, b) => (rank.get(a.titleId)! - rank.get(b.titleId)!))
+        .map((c) => ({ ...c, reasons: reasonsByTitle.get(c.titleId) ?? [] }));
+
+      // Greedy budget cap (one product per title already); no budget = all.
+      // Cap the list to the strongest matches so a broad brief doesn't dump
+      // hundreds of rows.
+      const MAX_PICKS = 12;
+      const cap = recBudget > 0 ? recBudget : Number.MAX_SAFE_INTEGER;
+      const picks: Candidate[] = [];
+      let spend = 0;
+      for (const c of matchedPriced) {
+        if (picks.length >= MAX_PICKS) break;
+        if (spend + c.unitPrice > cap) continue;
+        picks.push(c);
+        spend += c.unitPrice;
+      }
+
+      const supplementary = [...unpricedByTitle.values()]
+        .filter((s) => rank.has(s.titleId))
+        .sort((a, b) => (rank.get(a.titleId)! - rank.get(b.titleId)!))
+        .slice(0, 6);
+
+      rec = { picks, supplementary };
+      briefMatched = true;
+    } else {
+      rec = recommendTiered(
+        priced,
+        [...unpricedByTitle.values()],
+        recBudget > 0 ? recBudget : Number.MAX_SAFE_INTEGER,
+      );
+    }
   }
 
   return (
@@ -230,6 +302,18 @@ export default async function PlanPage({
             <h2>{t("startTitle")}</h2>
             <p className="muted small">{t("startLead")}</p>
             <div className="field">
+              <label htmlFor="recBrief">{t("briefLabel")}</label>
+              <textarea
+                id="recBrief"
+                name="recBrief"
+                rows={3}
+                maxLength={2000}
+                placeholder={t("briefPlaceholder")}
+                defaultValue={recBriefRaw}
+              />
+              <span className="hint">{t("briefHint")}</span>
+            </div>
+            <div className="field">
               <label htmlFor="recMarket">{tr("market")}</label>
               <select id="recMarket" name="recMarket" defaultValue={recMarket || homeMarket || ""}>
                 {MARKET_CODES.map((m) => (
@@ -249,13 +333,20 @@ export default async function PlanPage({
             <div className="plan-start-results">
               {rec.picks.length > 0 ? (
                 <>
-                  <h3>{t("recForBudget")}</h3>
+                  <h3>{briefMatched ? t("recForBrief") : t("recForBudget")}</h3>
                   <div className="action-list">
                     {rec.picks.map((p) => (
                       <div className="item" key={p.productId}>
                         <div>
                           <div className="title">{p.titleName}</div>
                           <div className="sub muted small">{tType(p.type)} · {tr("fromPrice", { price: formatMoney(p.unitPrice, recCurrency, locale) })} · {p.reach.toLocaleString(locale)} {t("reach")}</div>
+                          {p.reasons && p.reasons.length > 0 ? (
+                            <div className="cluster tight" style={{ marginTop: "0.35rem" }}>
+                              {p.reasons.slice(0, 4).map((r) => (
+                                <span className="tag" key={r}>{r}</span>
+                              ))}
+                            </div>
+                          ) : null}
                         </div>
                         <form action={addToPlan}>
                           <input type="hidden" name="locale" value={locale} />

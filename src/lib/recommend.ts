@@ -13,6 +13,9 @@ export type Candidate = {
   type: string;
   reach: number;
   unitPrice: number;
+  // Why this title matched the brief (facet chips), when brief matching is
+  // used. Absent for the plain budget recommender.
+  reasons?: string[];
 };
 
 export type Recommendation = {
