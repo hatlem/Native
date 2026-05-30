@@ -13,6 +13,11 @@ import { upsertPendingSubscriber } from "./store";
 
 export type SubscribeState = { status: "idle" | "ok" | "error"; message?: string };
 
+// Supported marketing locales. Captured locale is stored on the subscriber
+// and used to build the post-confirm redirect, so we never persist an
+// arbitrary client-supplied value — fall back to "en".
+const LOCALES = new Set(["en", "no", "da", "sv", "fi", "de"]);
+
 const NEWSLETTER_FROM =
   process.env.AUTH_EMAIL_FROM ?? "NativeSpin <noreply@nativespin.com>";
 
@@ -33,7 +38,8 @@ export async function subscribeNewsletter(
   _prev: SubscribeState,
   formData: FormData,
 ): Promise<SubscribeState> {
-  const locale = String(formData.get("locale") ?? "en");
+  const rawLocale = String(formData.get("locale") ?? "en");
+  const locale = LOCALES.has(rawLocale) ? rawLocale : "en";
   const parsed = parseSubscribeInput({
     email: String(formData.get("email") ?? ""),
     source: String(formData.get("source") ?? ""),
