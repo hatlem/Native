@@ -509,14 +509,25 @@ baskets (commit-gated + availability-checked), **publisher self-managed** prices
 visibility/specs/availability, budget-based **recommendations**, currency-grouped
 **reporting** (AOV, RFQ→order conversion), and catalog-state **partner webhooks**.
 
+Also shipped (2026-05-30):
+- **Content-fee revenue stream** — content production is a first-class
+  CONTENT_FEE quote/order line (desk-owned `ContentFeeRule` price list,
+  per-placement opt-in), with a margin-vs-content-fee **revenue-split**
+  report. This operationalizes the revenue-emphasis decision: the business
+  tunes the mix from real data instead of guessing.
+- **Phase 4 optimization loop** — win-rate-aware **pricing intelligence**
+  (`suggestMargin`) + **benchmarks** by category on the desk reports, and
+  **content playbooks** (`Playbook`) matched per placement on the order
+  detail. Advisory only — nothing auto-applies a price.
+- **Publisher programmatic ingestion** — authenticated `catalog:write` API
+  (`PUT/GET /api/v1/publisher/products`) bound to one publisher, idempotent
+  on `externalRef`, new titles inactive until curation. See
+  [`docs/publisher-ingestion.md`](./docs/publisher-ingestion.md).
+
 ### Next (genuinely not built)
 - **External accounting integration** (e.g. Fiken/Tripletex) — today invoices/
   credit notes are modeled with per-market VAT and exported as CSV only.
 - **Campaign attribution** acceptable to publishers — UTM-per-placement / pixels
   and delivery/engagement/conversion benchmarks. Today: site-side GTM + UTM
-  capture on outreach forms only.
-- **Phase 4 optimization loop** — content playbooks + pricing intelligence +
-  benchmarks by title/category.
-- **Publisher-side programmatic ingestion** of inventory (vs. the read-only
-  public API + the manual publisher portal).
-- Resolve the remaining business decision: revenue emphasis (margin vs. content fee).
+  capture on outreach forms only. (Pricing intelligence currently benchmarks
+  on win rate + margin; richer delivery/engagement signals need this.)

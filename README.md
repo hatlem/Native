@@ -89,6 +89,19 @@ All app routes are locale-prefixed (`/en`, `/no`, `/sv`, `/da`, `/de`, `/fi`).
   production (`ContentBrief → ContentAsset` with per-publisher spec checks and a
   publisher editorial veto). Pricing is `INDICATIVE` in the catalog and becomes
   `FIRM` only on a desk-issued quote.
+- **Two revenue streams.** Inventory buying margin (`PriceRule.marginPct`) and
+  content-production fees (`ContentFeeRule` → `CONTENT_FEE` quote/order lines,
+  opt-in per placement). The desk reports show the realized **margin-vs-content-fee
+  split**, so the monetization mix is tuned from data.
+- **Pricing intelligence & playbooks (Phase 4).** `suggestMargin` recommends the
+  highest margin that historically still won the deal (advisory, never
+  auto-applied); category **benchmarks** and **content playbooks** (matched per
+  placement) close the optimization loop. See `src/lib/pricing-intelligence.ts`,
+  `src/lib/playbook.ts`.
+- **Publisher ingestion.** `catalog:write` API keys bound to a single publisher
+  push inventory via `PUT /api/v1/publisher/products` (idempotent on
+  `externalRef`; new titles stay inactive until curation). See
+  [`docs/publisher-ingestion.md`](./docs/publisher-ingestion.md).
 - **Multi-tenant orgs & roles.** Organizations (advertiser/agency) with
   memberships, org invites, and scoped roles (`BUYER`, `APPROVER`, `ORG_ADMIN`,
   `DESK`, `CONTENT`, `PUBLISHER`, `SUPERADMIN`). Access is enforced server-side
@@ -121,6 +134,8 @@ All app routes are locale-prefixed (`/en`, `/no`, `/sv`, `/da`, `/de`, `/fi`).
 | `pnpm scrape-contacts` | Scrape publisher/sales-house contacts |
 | `pnpm build-rate-card-campaign` | Assemble a rate-card outreach campaign |
 | `pnpm send-rate-card-batch` | Send the next capped batch of outreach email |
+| `pnpm seed-content-fees` | Insert default content-fee rules (idempotent; safe in prod) |
+| `pnpm issue-publisher-key <publisher>` | Issue a `catalog:write` ingestion key bound to a publisher |
 
 Additional one-off operational scripts live in [`scripts/`](./scripts/)
 (contact loading, MCP key issuance, digital-reach enrichment, data cleanup,
@@ -145,6 +160,8 @@ a follow-up).
 ## Status
 
 The catalog, RFQ/quote/order commerce flow, content-production workflow,
-invoicing, publisher portal, public API + MCP, and the publisher-outreach engine
-are all implemented. Roadmap and remaining automation/self-serve work are tracked
-in [`PLAN.md`](./PLAN.md).
+invoicing, publisher portal, public API + MCP, the publisher-outreach engine, the
+content-fee revenue stream + margin/fee reporting, Phase-4 pricing intelligence /
+benchmarks / content playbooks, and the publisher programmatic-ingestion API are
+all implemented. The main remaining item is external accounting integration
+(invoices export as CSV today). Roadmap is tracked in [`PLAN.md`](./PLAN.md).
