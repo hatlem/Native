@@ -18,13 +18,15 @@ export const dynamic = "force-dynamic";
 
 const MARKET_CODES = Object.values(MarketCode);
 const PRODUCT_TYPES = Object.values(ProductType);
-// Marketing surface highlights the canonical four — research-only enum
-// members (CONTEXTUAL, OTHER) intentionally don't show in the format gallery.
+// Catalog format filter highlights the buyable formats — research-only enum
+// members (CONTEXTUAL, OTHER) intentionally don't show in the filter.
 const FORMAT_KEYS: ProductType[] = [
   ProductType.NATIVE_ARTICLE,
   ProductType.ADVERTORIAL,
   ProductType.NATIVE_DISPLAY,
   ProductType.PACKAGE,
+  ProductType.NATIVE_PLUS,
+  ProductType.CONTENT_VIDEO,
 ];
 const NATIVE_FIT_VALUES = ["High", "Medium", "Low"] as const;
 const B2B_B2C_VALUES = ["B2B", "B2C"] as const;

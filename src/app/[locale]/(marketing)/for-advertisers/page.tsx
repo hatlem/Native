@@ -10,6 +10,8 @@ const FORMAT_KEYS: ProductType[] = [
   ProductType.ADVERTORIAL,
   ProductType.NATIVE_DISPLAY,
   ProductType.PACKAGE,
+  ProductType.NATIVE_PLUS,
+  ProductType.CONTENT_VIDEO,
 ];
 
 export async function generateMetadata({

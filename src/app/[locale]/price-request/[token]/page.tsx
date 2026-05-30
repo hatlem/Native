@@ -87,6 +87,8 @@ export default async function PriceRequestFormPage({
                     <option value="NATIVE_DISPLAY">Native display</option>
                     <option value="CONTEXTUAL">Contextual</option>
                     <option value="PACKAGE">Package</option>
+                    <option value="NATIVE_PLUS">Native Plus</option>
+                    <option value="CONTENT_VIDEO">Content video</option>
                     <option value="OTHER">Other</option>
                   </select>
                 </label>
