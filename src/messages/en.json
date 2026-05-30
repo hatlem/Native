@@ -820,6 +820,22 @@
       "bestFor": "Campaigns where reach inside the same title matters",
       "rule": "If you're already buying a native article, the package is almost always cheaper than buying display separately."
     },
+    "native-plus": {
+      "title": "Inspiration you can act on.",
+      "voice": "The title's editorial voice, with shoppable moments built in",
+      "brand": "Named advertiser; products clearly marked as buyable",
+      "reads": "A feature you can act on — tap a product, not a banner",
+      "bestFor": "Considered products where inspiration and purchase belong together",
+      "rule": "Commerce is additive, never the disguise — the story still earns the read."
+    },
+    "content-video": {
+      "title": "Video that earns the play.",
+      "voice": "Video in the title's register, not a TV spot",
+      "brand": "Named advertiser; disclosed as paid in the player",
+      "reads": "The publisher's own video, in-feed and in-player",
+      "bestFor": "Stories better shown than told — demos, places, people",
+      "rule": "Earns the view on its own merit; the disclosure is always visible."
+    },
     "disclosureTitle": "All four are clearly labelled as paid",
     "disclosureBody": "EU media regulators require every paid placement to be unambiguously disclosed. We default to the publisher's own disclosure label (e.g. 'Annonsørinnhold', 'Annons', 'Annonce') and verify it on every spec check before the order goes live.",
     "ctaTitle": "Not sure which fits?",
@@ -834,12 +850,16 @@
     "PACKAGE": "Package",
     "CONTEXTUAL": "Contextual",
     "OTHER": "Other",
+    "NATIVE_PLUS": "Native Plus",
+    "CONTENT_VIDEO": "Content video",
     "descNATIVE_ARTICLE": "Editorial-grade article paid for by a brand, written and designed in the title's voice. Readers finish it the way they finish any other story.",
     "descADVERTORIAL": "Sponsored article clearly labelled as paid content. Brand presence is up front; the surrounding design stays editorial.",
     "descNATIVE_DISPLAY": "Display unit that inherits the publisher's typography and runs in-feed, not in banner slots. The trust transfer is most of the value.",
     "descPACKAGE": "Bundled native article plus native display amplification in the same title — the article does the persuasion, the display does the reach.",
     "descCONTEXTUAL": "Placement targeted by page topic and surrounding editorial context rather than user data — the relevance comes from where the ad runs.",
     "descOTHER": "Custom or one-off format that doesn't fit the standard categories — typically negotiated case by case.",
+    "descNATIVE_PLUS": "Shoppable native article — editorial-grade copy with in-article product links and buy buttons, so readers can act without leaving the page.",
+    "descCONTENT_VIDEO": "Video-led sponsored placement that runs in the publisher's player and feed, built for attention rather than a banner slot.",
     "CONTENT_FEE": "Content production"
   },
   "nativeFit": {
@@ -1956,7 +1976,8 @@
     "active": "Active",
     "inactive": "Inactive",
     "activate": "Activate",
-    "deactivate": "Deactivate"
+    "deactivate": "Deactivate",
+    "save": "Save"
   },
   "playbooks": {
     "eyebrow": "Desk",
@@ -1983,6 +2004,8 @@
     "empty": "No playbooks yet — add one above.",
     "activate": "Activate",
     "deactivate": "Deactivate",
-    "matchedEyebrow": "Playbook"
+    "matchedEyebrow": "Playbook",
+    "save": "Save",
+    "edit": "Edit"
   }
 }

@@ -821,6 +821,22 @@
       "bestFor": "Kampanjat, joissa tavoittavuus saman julkaisun sisällä merkitsee",
       "rule": "Jos ostat jo natiiviartikkelin, paketti on lähes aina halvempi kuin display erikseen."
     },
+    "native-plus": {
+      "title": "Inspiraatiota, johon voi tarttua.",
+      "voice": "Julkaisun toimituksellinen ääni, ostettavat hetket sisäänrakennettuna",
+      "brand": "Nimetty mainostaja; tuotteet selkeästi merkitty ostettaviksi",
+      "reads": "Juttu, johon voi tarttua – napauta tuotetta, ei banneria",
+      "bestFor": "Harkitut ostokset, joissa inspiraatio ja ostaminen kuuluvat yhteen",
+      "rule": "Kauppa on lisä, ei valeasu – jutun on silti ansaittava lukeminen."
+    },
+    "content-video": {
+      "title": "Video, joka ansaitsee katselun.",
+      "voice": "Video julkaisun sävyssä, ei tv-mainos",
+      "brand": "Nimetty mainostaja; merkitty maksetuksi soittimessa",
+      "reads": "Julkaisijan oma video, syötteessä ja soittimessa",
+      "bestFor": "Tarinat, jotka on parempi näyttää kuin kertoa – demot, paikat, ihmiset",
+      "rule": "Ansaitsee katselun omilla ansioillaan; merkintä on aina näkyvissä."
+    },
     "disclosureTitle": "Kaikki neljä on selkeästi merkitty maksetuksi",
     "disclosureBody": "EU:n medianvalvojat edellyttävät jokaisen maksetun sijoittelun tunnistettavissa olevaa merkintää. Käytämme oletuksena kustantajan omaa merkintää (esim. 'Annonsørinnhold', 'Annons', 'Annonce', 'Anzeige', 'Mainos') ja vahvistamme sen jokaisessa spesifikaation tarkistuksessa ennen kuin tilaus menee liveksi.",
     "ctaTitle": "Et tiedä mikä sopii?",
@@ -835,12 +851,16 @@
     "PACKAGE": "Paketti",
     "CONTEXTUAL": "Kontekstuaalinen",
     "OTHER": "Muu",
+    "NATIVE_PLUS": "Native Plus",
+    "CONTENT_VIDEO": "Sisältövideo",
     "descNATIVE_ARTICLE": "Toimituksellisen tason artikkeli, jonka brändi maksaa, kirjoitettuna ja taitettuna julkaisun äänellä. Lukijat lukevat sen loppuun kuten minkä tahansa muun jutun.",
     "descADVERTORIAL": "Sponsoroitu artikkeli, joka on selkeästi merkitty maksetuksi sisällöksi. Brändi näkyy edessä; ympäröivä design pysyy toimituksellisena.",
     "descNATIVE_DISPLAY": "Display-yksikkö, joka perii kustantajan typografian ja toimii feedissä, ei banneripaikoilla. Luottamuksen siirto on suurin osa arvosta.",
     "descPACKAGE": "Pakettina natiiviartikkeli ja natiivi display -vahvistus samassa julkaisussa — artikkeli vakuuttaa, display tuo tavoittavuuden.",
     "descCONTEXTUAL": "Sijoittelu kohdistetaan sivun aiheen ja toimituksellisen kontekstin perusteella käyttäjädatan sijaan — relevanssi tulee siitä, missä mainos näkyy.",
     "descOTHER": "Mukautettu formaatti, joka ei sovi vakiokategorioihin — neuvotellaan tyypillisesti tapauskohtaisesti.",
+    "descNATIVE_PLUS": "Ostettava natiiviartikkeli — toimituksellisen tasoinen sisältö, jossa on tuotelinkit ja ostopainikkeet itse artikkelissa, joten lukija voi toimia poistumatta sivulta.",
+    "descCONTENT_VIDEO": "Videovetoinen kaupallinen sisältö, joka toistetaan julkaisijan omassa soittimessa ja syötteessä – tehty huomiolle, ei banneripaikaksi.",
     "CONTENT_FEE": "Sisällöntuotanto"
   },
   "nativeFit": {
@@ -1957,7 +1977,8 @@
     "active": "Aktiivinen",
     "inactive": "Ei käytössä",
     "activate": "Aktivoi",
-    "deactivate": "Poista käytöstä"
+    "deactivate": "Poista käytöstä",
+    "save": "Tallenna"
   },
   "playbooks": {
     "eyebrow": "Desk",
@@ -1984,6 +2005,8 @@
     "empty": "Ei pelikirjoja vielä – lisää yllä.",
     "activate": "Aktivoi",
     "deactivate": "Poista käytöstä",
-    "matchedEyebrow": "Pelikirja"
+    "matchedEyebrow": "Pelikirja",
+    "save": "Tallenna",
+    "edit": "Muokkaa"
   }
 }

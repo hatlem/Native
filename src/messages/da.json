@@ -742,6 +742,22 @@
       "bestFor": "Kampagner hvor rækkevidde inde i samme titel betyder noget",
       "rule": "Køber du allerede en native-artikel, er pakken næsten altid billigere end at købe display separat."
     },
+    "native-plus": {
+      "title": "Inspiration, du kan handle på.",
+      "voice": "Titlens redaktionelle stemme, med købbare øjeblikke indbygget",
+      "brand": "Navngivet annoncør; produkter tydeligt markeret som købbare",
+      "reads": "En reportage, du kan handle på – tryk på et produkt, ikke et banner",
+      "bestFor": "Gennemtænkte køb, hvor inspiration og handel hører sammen",
+      "rule": "Handlen er en tilføjelse, aldrig en forklædning – historien skal stadig fortjene læsningen."
+    },
+    "content-video": {
+      "title": "Video, der fortjener afspilningen.",
+      "voice": "Video i titlens toneleje, ikke en tv-reklame",
+      "brand": "Navngivet annoncør; markeret som betalt i afspilleren",
+      "reads": "Udgiverens egen video, i feed og afspiller",
+      "bestFor": "Historier, der vises bedre, end de fortælles – demoer, steder, mennesker",
+      "rule": "Fortjener visningen på egne præmisser; markeringen er altid synlig."
+    },
     "disclosureTitle": "Alle fire er tydeligt mærket som betalt",
     "disclosureBody": "EU-medieregulatorer kræver at hver betalt placering er utvetydigt mærket. Vi bruger som standard udgiverens egen mærkning (f.eks. 'Annonsørinnhold', 'Annons', 'Annonce') og verificerer den ved hvert spec-tjek før ordren går live.",
     "ctaTitle": "Usikker på hvad der passer?",
@@ -756,12 +772,16 @@
     "PACKAGE": "Pakke",
     "CONTEXTUAL": "Kontekstuel",
     "OTHER": "Andet",
+    "NATIVE_PLUS": "Native Plus",
+    "CONTENT_VIDEO": "Indholdsvideo",
     "descNATIVE_ARTICLE": "Redaktionel artikel betalt af et brand, skrevet og designet i titlens stemme. Læserne læser den færdig, som de læser enhver anden historie.",
     "descADVERTORIAL": "Sponsoreret artikel tydeligt mærket som betalt indhold. Brandet står forrest; det omkringliggende design holdes redaktionelt.",
     "descNATIVE_DISPLAY": "Displayenhed der arver udgiverens typografi og kører i feedet, ikke i bannerslots. Tillidsoverførslen er det meste af værdien.",
     "descPACKAGE": "Native-artikel plus native display i samme titel — artiklen overbeviser, displayet giver rækkevidden.",
     "descCONTEXTUAL": "Placering målrettet efter sidens emne og redaktionel kontekst i stedet for brugerdata — relevansen kommer fra hvor annoncen vises.",
     "descOTHER": "Tilpasset format der ikke passer i standardkategorierne — typisk forhandlet fra sag til sag.",
+    "descNATIVE_PLUS": "Købbar native-artikel — redaktionelt indhold med produktlinks og købsknapper i selve artiklen, så læseren kan handle uden at forlade siden.",
+    "descCONTENT_VIDEO": "Videodrevet annonceindhold, der afspilles i udgiverens egen afspiller og feed, bygget til opmærksomhed – ikke en bannerplads.",
     "CONTENT_FEE": "Indholdsproduktion"
   },
   "nativeFit": {
@@ -1958,7 +1978,8 @@
     "active": "Aktiv",
     "inactive": "Inaktiv",
     "activate": "Aktivér",
-    "deactivate": "Deaktivér"
+    "deactivate": "Deaktivér",
+    "save": "Gem"
   },
   "playbooks": {
     "eyebrow": "Desk",
@@ -1985,6 +2006,8 @@
     "empty": "Ingen spillebøger endnu – tilføj en ovenfor.",
     "activate": "Aktivér",
     "deactivate": "Deaktivér",
-    "matchedEyebrow": "Spillebog"
+    "matchedEyebrow": "Spillebog",
+    "save": "Gem",
+    "edit": "Rediger"
   }
 }

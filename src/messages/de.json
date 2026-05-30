@@ -821,6 +821,22 @@
       "bestFor": "Kampagnen, bei denen Reichweite im selben Titel zählt",
       "rule": "Wenn Sie ohnehin einen Native-Artikel kaufen, ist das Paket fast immer günstiger als Display separat zu buchen."
     },
+    "native-plus": {
+      "title": "Inspiration, die zum Handeln einlädt.",
+      "voice": "Die redaktionelle Stimme des Titels, mit eingebauten Shopping-Momenten",
+      "brand": "Genannter Werbetreibender; Produkte klar als kaufbar gekennzeichnet",
+      "reads": "Ein Beitrag zum Handeln – auf ein Produkt tippen, nicht auf ein Banner",
+      "bestFor": "Erklärungsbedürftige Käufe, bei denen Inspiration und Kauf zusammengehören",
+      "rule": "Der Handel kommt hinzu, nie als Tarnung – die Geschichte muss den Lesefluss weiter verdienen."
+    },
+    "content-video": {
+      "title": "Video, das den Play verdient.",
+      "voice": "Video im Tonfall des Titels, kein TV-Spot",
+      "brand": "Genannter Werbetreibender; im Player als bezahlt gekennzeichnet",
+      "reads": "Das eigene Video des Publishers, im Feed und im Player",
+      "bestFor": "Geschichten, die man besser zeigt als erzählt – Demos, Orte, Menschen",
+      "rule": "Verdient die Wiedergabe aus eigener Kraft; die Kennzeichnung ist immer sichtbar."
+    },
     "disclosureTitle": "Alle vier sind klar als bezahlt gekennzeichnet",
     "disclosureBody": "Medienregulatoren verlangen, dass jede bezahlte Platzierung unmissverständlich gekennzeichnet ist. Wir verwenden standardmäßig die Kennzeichnung des Verlags (z. B. „Anzeige“, „Sponsored“, „Werbung“) und prüfen sie bei jeder Spec-Kontrolle, bevor die Bestellung live geht.",
     "ctaTitle": "Unsicher, was passt?",
@@ -835,12 +851,16 @@
     "PACKAGE": "Paket",
     "CONTEXTUAL": "Kontextuell",
     "OTHER": "Sonstiges",
+    "NATIVE_PLUS": "Native Plus",
+    "CONTENT_VIDEO": "Content-Video",
     "descNATIVE_ARTICLE": "Redaktioneller Artikel, von einer Marke bezahlt, geschrieben und gestaltet im Tonfall des Titels. Leser lesen ihn zu Ende, so wie sie jede andere Geschichte zu Ende lesen.",
     "descADVERTORIAL": "Gesponserter Artikel, klar als bezahlter Inhalt gekennzeichnet. Die Marke steht vorn; das umgebende Design bleibt redaktionell.",
     "descNATIVE_DISPLAY": "Display-Einheit, die die Typografie des Verlags übernimmt und im Feed läuft, nicht in Banner-Slots. Die Vertrauensübertragung macht den größten Teil des Werts aus.",
     "descPACKAGE": "Gebündelter Native-Artikel plus Native-Display-Verstärkung im selben Titel — der Artikel überzeugt, das Display sorgt für Reichweite.",
     "descCONTEXTUAL": "Platzierung, die nach Seitenthema und redaktionellem Umfeld statt nach Nutzerdaten ausgerichtet wird — die Relevanz ergibt sich aus dem Umfeld der Anzeige.",
     "descOTHER": "Individuelles Format, das nicht in die Standardkategorien passt — wird in der Regel von Fall zu Fall verhandelt.",
+    "descNATIVE_PLUS": "Shoppbarer Native-Artikel — redaktioneller Inhalt mit Produktlinks und Kauf-Buttons direkt im Artikel, sodass Leser handeln können, ohne die Seite zu verlassen.",
+    "descCONTENT_VIDEO": "Videobasierte Werbeinhalte, die im Player und Feed des Publishers laufen – für Aufmerksamkeit gemacht, nicht als Banner-Platz.",
     "CONTENT_FEE": "Content-Produktion"
   },
   "nativeFit": {
@@ -1815,7 +1835,8 @@
     "active": "Aktiv",
     "inactive": "Inaktiv",
     "activate": "Aktivieren",
-    "deactivate": "Deaktivieren"
+    "deactivate": "Deaktivieren",
+    "save": "Speichern"
   },
   "playbooks": {
     "eyebrow": "Desk",
@@ -1842,6 +1863,8 @@
     "empty": "Noch keine Playbooks – fügen Sie oben eines hinzu.",
     "activate": "Aktivieren",
     "deactivate": "Deaktivieren",
-    "matchedEyebrow": "Playbook"
+    "matchedEyebrow": "Playbook",
+    "save": "Speichern",
+    "edit": "Bearbeiten"
   }
 }
