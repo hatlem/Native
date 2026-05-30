@@ -338,7 +338,7 @@
     "duplicateAllInactive": "All titles from that order are inactive now. Browse the catalog to build a fresh plan.",
     "pricingOnRequest": "Pricing on request — firm quote in 24 h",
     "startTitle": "Start your campaign",
-    "startLead": "Tell us your market and budget — we'll suggest titles to build your brief around.",
+    "startLead": "Describe your audience and market — we will suggest titles to build your brief around.",
     "recommend": "Recommend titles",
     "recommending": "Finding titles…",
     "recForBudget": "Recommended for your budget",
@@ -347,7 +347,11 @@
     "add": "Add to plan",
     "recNone": "No titles in that market yet — browse the full catalog.",
     "contentProduction": "Content production",
-    "contentProductionHint": "Have NativeSpin write the native article for this placement (adds a production fee)."
+    "contentProductionHint": "Have NativeSpin write the native article for this placement (adds a production fee).",
+    "briefLabel": "Who are you trying to reach?",
+    "briefPlaceholder": "e.g. We sell software to finance and legal teams in Oslo",
+    "briefHint": "We match titles by audience, industry and region. Market is required; budget is optional.",
+    "recForBrief": "Matched to your brief"
   },
   "rfq": {
     "org": "Company",

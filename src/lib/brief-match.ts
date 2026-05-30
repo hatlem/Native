@@ -240,7 +240,10 @@ export function scoreTitle(title: MatchableTitle, facets: BriefFacets): { score:
     }
   }
 
-  if (title.nativeFit && title.nativeFit.toLowerCase() === "high") {
+  // nativeFit is a quality tiebreaker, not a match on its own — only nudge
+  // titles that already matched something, so "High fit" can't make an
+  // otherwise-irrelevant title appear as a brief match.
+  if (score > 0 && title.nativeFit && title.nativeFit.toLowerCase() === "high") {
     score += W.nativeFitHigh;
   }
 
