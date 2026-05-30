@@ -1821,7 +1821,12 @@
     "inactive": "Inaktiv",
     "activate": "Aktivieren",
     "deactivate": "Deaktivieren",
-    "save": "Speichern"
+    "save": "Speichern",
+    "bulkEyebrow": "Schnellbearbeitung",
+    "bulkHeading": "Alle Gebühren festlegen",
+    "bulkHint": "Alle Gebühren im Raster bearbeiten und einmal speichern.",
+    "saveAll": "Alle speichern",
+    "saving": "Speichern…"
   },
   "playbooks": {
     "eyebrow": "Desk",

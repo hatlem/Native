@@ -6,6 +6,7 @@ import {
   createContentFeeRule,
   toggleContentFeeRule,
   updateContentFeeRule,
+  bulkUpdateContentFeeRules,
 } from "./actions";
 
 export const dynamic = "force-dynamic";
@@ -102,6 +103,69 @@ export default async function DeskContentFeesPage({
           />
         </form>
       </section>
+
+      {rules.length > 0 ? (
+        <section className="section">
+          <div className="section-head">
+            <div>
+              <span className="eyebrow accent">{t("bulkEyebrow")}</span>
+              <h2>{t("bulkHeading")}</h2>
+            </div>
+            <span className="muted small">{t("bulkHint")}</span>
+          </div>
+          <form action={bulkUpdateContentFeeRules} className="card">
+            <input type="hidden" name="locale" value={locale} />
+            <input type="hidden" name="ids" value={rules.map((r) => r.id).join(",")} />
+            <div className="table-wrap">
+              <table className="table">
+                <thead>
+                  <tr>
+                    <th>{t("market")}</th>
+                    <th>{t("productType")}</th>
+                    <th>{t("greenfieldFee")}</th>
+                    <th>{t("adaptationFee")}</th>
+                    <th>{t("currency")}</th>
+                    <th>{t("status")}</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {rules.map((r) => (
+                    <tr key={r.id} className={r.active ? "" : "muted"}>
+                      <td>{r.marketCode ?? t("anyMarket")}</td>
+                      <td>{r.productType ? tType(r.productType) : t("anyType")}</td>
+                      <td>
+                        <input
+                          name={`g_${r.id}`}
+                          type="number"
+                          min="0"
+                          step="1"
+                          defaultValue={Number(r.greenfieldFee)}
+                          style={{ width: "10ch" }}
+                          aria-label={`${t("greenfieldFee")} ${r.marketCode ?? ""} ${r.productType ?? ""}`}
+                        />
+                      </td>
+                      <td>
+                        <input
+                          name={`a_${r.id}`}
+                          type="number"
+                          min="0"
+                          step="1"
+                          defaultValue={r.adaptationFee != null ? Number(r.adaptationFee) : ""}
+                          style={{ width: "10ch" }}
+                          aria-label={`${t("adaptationFee")} ${r.marketCode ?? ""} ${r.productType ?? ""}`}
+                        />
+                      </td>
+                      <td className="small muted">{r.currency}</td>
+                      <td className="small muted">{r.active ? t("active") : t("inactive")}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+            <SubmitButton className="btn primary" label={t("saveAll")} pendingLabel={t("saving")} />
+          </form>
+        </section>
+      ) : null}
 
       <section className="section">
         <div className="section-head">

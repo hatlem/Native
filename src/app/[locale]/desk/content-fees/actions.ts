@@ -39,6 +39,43 @@ function parseType(raw: string): ProductType | null {
     : null;
 }
 
+// Bulk save: update every rule's greenfield/adaptation fee from one grid in
+// a single transaction. Inputs are named g_<id> / a_<id>; `ids` is the
+// comma-joined list of rule ids to process. Rows with an invalid greenfield
+// value are skipped (the others still save); empty adaptation clears it.
+export async function bulkUpdateContentFeeRules(formData: FormData) {
+  const locale = field(formData, "locale") || "en";
+  const userId = await requireDesk(locale);
+
+  const ids = field(formData, "ids").split(",").map((s) => s.trim()).filter(Boolean);
+  if (ids.length === 0) redirect(`/${locale}/desk/content-fees`);
+
+  const updates: { id: string; greenfieldFee: number; adaptationFee: number | null }[] = [];
+  for (const id of ids) {
+    const greenfieldFee = parseFee(field(formData, `g_${id}`));
+    if (greenfieldFee === null) continue; // skip invalid, keep the rest
+    const adaptRaw = field(formData, `a_${id}`);
+    const adaptationFee = adaptRaw ? parseFee(adaptRaw) : null;
+    updates.push({ id, greenfieldFee, adaptationFee });
+  }
+
+  if (updates.length > 0) {
+    await prisma.$transaction(
+      updates.map((u) =>
+        prisma.contentFeeRule.update({
+          where: { id: u.id },
+          data: { greenfieldFee: u.greenfieldFee, adaptationFee: u.adaptationFee },
+        }),
+      ),
+    );
+    await recordAudit(userId, "contentFeeRule.bulkUpdate", "ContentFeeRule:*", {
+      count: updates.length,
+    });
+  }
+  revalidatePath(`/${locale}/desk/content-fees`);
+  redirect(`/${locale}/desk/content-fees`);
+}
+
 export async function createContentFeeRule(formData: FormData) {
   const locale = field(formData, "locale") || "en";
   const userId = await requireDesk(locale);

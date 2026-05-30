@@ -1963,7 +1963,12 @@
     "inactive": "Inaktiv",
     "activate": "Aktiver",
     "deactivate": "Deaktiver",
-    "save": "Lagre"
+    "save": "Lagre",
+    "bulkEyebrow": "Hurtigredigering",
+    "bulkHeading": "Sett alle honorar",
+    "bulkHint": "Rediger alle honorar i tabellen, og lagre én gang.",
+    "saveAll": "Lagre alle",
+    "saving": "Lagrer…"
   },
   "playbooks": {
     "eyebrow": "Desk",
