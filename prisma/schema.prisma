@@ -43,6 +43,12 @@ enum ProductType {
   OTHER
 }
 
+enum SubscriberStatus {
+  PENDING
+  CONFIRMED
+  UNSUBSCRIBED
+}
+
 enum PricingModel {
   FLAT
   CPM
@@ -219,6 +225,10 @@ model Publisher {
   // and quotes from internal prices as normal. Used when a publisher
   // is onboarded under NDA or wants RFQ-only positioning.
   pricesPublic  Boolean  @default(true)
+  // Optional brand logo for the marketing proof strip. Null → the strip
+  // renders a styled text chip of the publisher name instead, so the
+  // component is truthful with zero assets and logos drop in later.
+  logoUrl       String?
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
 
@@ -1156,4 +1166,24 @@ model OutreachSuppression {
   email     String   @id
   reason    String
   createdAt DateTime @default(now())
+}
+
+// Marketing newsletter subscriber. Double opt-in: a row is PENDING until
+// the recipient clicks the tokenised confirm link, then CONFIRMED. The
+// raw tokens live only in email URLs; we store SHA-256 hashes (same
+// pattern as MagicLinkToken). The unsub token is long-lived so links in
+// old emails keep working; the confirm token is single-use + expires.
+model Subscriber {
+  email            String           @id
+  locale           String
+  status           SubscriberStatus @default(PENDING)
+  source           String // where the signup came from: "footer", "home", ...
+  confirmTokenHash String?          @unique
+  confirmExpiresAt DateTime?
+  unsubTokenHash   String           @unique
+  createdAt        DateTime         @default(now())
+  confirmedAt      DateTime?
+  unsubscribedAt   DateTime?
+
+  @@index([status])
 }
