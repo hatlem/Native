@@ -283,7 +283,8 @@
     "submitting": "Sender brief…",
     "requestingAs": "Bestiller som",
     "loginRequired": "Logg inn eller opprett en konto for å be om tilbud:",
-    "selectClient": "Velg en kunde å handle for i"
+    "selectClient": "Velg en kunde å handle for i",
+    "fromPrice": "fra {price}"
   },
   "requests": {
     "title": "Forespørsel",

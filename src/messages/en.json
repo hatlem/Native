@@ -362,7 +362,8 @@
     "submitting": "Sending brief…",
     "requestingAs": "Requesting as",
     "loginRequired": "Sign in or create an account to request a quote:",
-    "selectClient": "Select a client to act for in the"
+    "selectClient": "Select a client to act for in the",
+    "fromPrice": "from {price}"
   },
   "requests": {
     "title": "Request",
