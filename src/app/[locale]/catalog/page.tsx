@@ -104,9 +104,9 @@ export default async function CatalogPage({
     typeof sp.onlyPriced === "string" && sp.onlyPriced === "1";
   const compareMode =
     typeof sp.compareMode === "string" && sp.compareMode === "1";
-  // Advanced section auto-opens when an advanced filter is active so the
-  // user can see *why* their result set is filtered, not just that it is.
-  const advancedOpen = compareMode || !!b2bB2c;
+  // Advanced section auto-opens only for the compare picker now — B2B/B2C
+  // moved to the main filter row, so it no longer drives this.
+  const advancedOpen = compareMode;
   const q = typeof sp.q === "string" ? sp.q.trim() : "";
   const pageRaw = typeof sp.page === "string" ? parseInt(sp.page, 10) : 1;
   const page = Number.isFinite(pageRaw) && pageRaw >= 1 ? pageRaw : 1;
