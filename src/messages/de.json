@@ -362,7 +362,8 @@
     "submitting": "Brief wird gesendet…",
     "requestingAs": "Anfrage als",
     "loginRequired": "Melden Sie sich an oder erstellen Sie ein Konto, um ein Angebot anzufordern:",
-    "selectClient": "Wählen Sie einen Kunden, in dessen Namen Sie handeln, im"
+    "selectClient": "Wählen Sie einen Kunden, in dessen Namen Sie handeln, im",
+    "fromPrice": "ab {price}"
   },
   "requests": {
     "title": "Anfrage",

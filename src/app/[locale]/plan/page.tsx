@@ -255,7 +255,7 @@ export default async function PlanPage({
                       <div className="item" key={p.productId}>
                         <div>
                           <div className="title">{p.titleName}</div>
-                          <div className="sub muted small">{formatMoney(p.unitPrice, recCurrency, locale)} · {p.reach.toLocaleString(locale)} {t("reach")}</div>
+                          <div className="sub muted small">{tType(p.type)} · {tr("fromPrice", { price: formatMoney(p.unitPrice, recCurrency, locale) })} · {p.reach.toLocaleString(locale)} {t("reach")}</div>
                         </div>
                         <form action={addToPlan}>
                           <input type="hidden" name="locale" value={locale} />

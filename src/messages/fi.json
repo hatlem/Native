@@ -362,7 +362,8 @@
     "submitting": "Brief lähetetään…",
     "requestingAs": "Pyytäjä",
     "loginRequired": "Kirjaudu sisään tai luo tili pyytääksesi tarjouksen:",
-    "selectClient": "Valitse asiakas, jonka puolesta toimit"
+    "selectClient": "Valitse asiakas, jonka puolesta toimit",
+    "fromPrice": "alkaen {price}"
   },
   "requests": {
     "title": "Pyyntö",

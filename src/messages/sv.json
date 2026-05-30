@@ -283,7 +283,8 @@
     "submitting": "Skickar brief…",
     "requestingAs": "Beställer som",
     "loginRequired": "Logga in eller skapa ett konto för att begära offert:",
-    "selectClient": "Välj en kund att agera för i"
+    "selectClient": "Välj en kund att agera för i",
+    "fromPrice": "från {price}"
   },
   "requests": {
     "title": "Förfrågan",
