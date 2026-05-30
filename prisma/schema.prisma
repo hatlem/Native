@@ -1157,3 +1157,29 @@ model OutreachSuppression {
   reason    String
   createdAt DateTime @default(now())
 }
+
+enum SubscriberStatus {
+  PENDING
+  CONFIRMED
+  UNSUBSCRIBED
+}
+
+// Marketing newsletter subscriber. Double opt-in: a row is PENDING until
+// the recipient clicks the tokenised confirm link, then CONFIRMED. The
+// raw tokens live only in email URLs; we store SHA-256 hashes (same
+// pattern as MagicLinkToken). The unsub token is long-lived so links in
+// old emails keep working; the confirm token is single-use + expires.
+model Subscriber {
+  email            String           @id
+  locale           String
+  status           SubscriberStatus @default(PENDING)
+  source           String // where the signup came from: "footer", "home", ...
+  confirmTokenHash String?          @unique
+  confirmExpiresAt DateTime?
+  unsubTokenHash   String           @unique
+  createdAt        DateTime         @default(now())
+  confirmedAt      DateTime?
+  unsubscribedAt   DateTime?
+
+  @@index([status])
+}
