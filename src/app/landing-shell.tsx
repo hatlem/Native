@@ -5,6 +5,7 @@ import { getTranslations } from "next-intl/server";
 import { Link } from "@/i18n/navigation";
 import { BrandWordmark } from "@/app/brand";
 import { MailLink } from "@/components";
+import { NewsletterSignup } from "@/app/[locale]/(marketing)/_components/NewsletterSignup";
 import { STYLES } from "./landing-styles";
 
 const inter = Inter({
@@ -52,6 +53,10 @@ export async function LandingShell({
       {withFooter ? (
         <footer className="page-foot">
           <div className="wrap">
+            <div className="foot-newsletter">
+              <div className="copy">{t("newsletter.footerHeading")}</div>
+              <NewsletterSignup variant="compact" source="footer" />
+            </div>
             <div className="left">
               <BrandWordmark className="brand-foot-mark" aria-label="NativeSpin" />
               <div className="copy">{t("foot.tagline")}</div>

@@ -219,6 +219,10 @@ model Publisher {
   // and quotes from internal prices as normal. Used when a publisher
   // is onboarded under NDA or wants RFQ-only positioning.
   pricesPublic  Boolean  @default(true)
+  // Optional brand logo for the marketing proof strip. Null → the strip
+  // renders a styled text chip of the publisher name instead, so the
+  // component is truthful with zero assets and logos drop in later.
+  logoUrl       String?
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
 

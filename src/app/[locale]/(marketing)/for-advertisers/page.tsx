@@ -3,6 +3,7 @@ import { getTranslations } from "next-intl/server";
 import { ProductType } from "@prisma/client";
 import { Link } from "@/i18n/navigation";
 import { LandingShell } from "@/app/landing-shell";
+import { PublisherStrip } from "../_components/PublisherStrip";
 
 const FORMAT_KEYS: ProductType[] = [
   ProductType.NATIVE_ARTICLE,
@@ -57,6 +58,8 @@ export default async function ForAdvertisersPage({
           </div>
         </div>
       </header>
+
+      <PublisherStrip locale={locale} />
 
       <section className="section">
         <div className="wrap">

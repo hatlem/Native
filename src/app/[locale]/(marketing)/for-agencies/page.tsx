@@ -3,6 +3,7 @@ import { getTranslations } from "next-intl/server";
 import { Link } from "@/i18n/navigation";
 import { LandingShell } from "@/app/landing-shell";
 import { MailLink } from "@/components";
+import { PublisherStrip } from "../_components/PublisherStrip";
 
 export async function generateMetadata({
   params,

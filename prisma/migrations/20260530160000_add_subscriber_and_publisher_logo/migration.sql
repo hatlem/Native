@@ -1,11 +1,8 @@
 -- CreateEnum
 CREATE TYPE "SubscriberStatus" AS ENUM ('PENDING', 'CONFIRMED', 'UNSUBSCRIBED');
 
--- DropIndex
-DROP INDEX IF EXISTS "Title_searchTsv_idx";
-
 -- AlterTable
-ALTER TABLE "Title" DROP COLUMN IF EXISTS "searchTsv";
+ALTER TABLE "Publisher" ADD COLUMN "logoUrl" TEXT;
 
 -- CreateTable
 CREATE TABLE "Subscriber" (
@@ -24,10 +21,10 @@ CREATE TABLE "Subscriber" (
 );
 
 -- CreateIndex
+CREATE UNIQUE INDEX "Subscriber_confirmTokenHash_key" ON "Subscriber"("confirmTokenHash");
+
+-- CreateIndex
 CREATE UNIQUE INDEX "Subscriber_unsubTokenHash_key" ON "Subscriber"("unsubTokenHash");
 
 -- CreateIndex
 CREATE INDEX "Subscriber_status_idx" ON "Subscriber"("status");
-
--- CreateIndex
-CREATE INDEX "Subscriber_confirmTokenHash_idx" ON "Subscriber"("confirmTokenHash");
