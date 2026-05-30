@@ -15,6 +15,9 @@ export type AuthOk = {
   ok: true;
   keyId: string;
   organizationId: string | null;
+  // Set for publisher ingestion keys — the publisher this key may
+  // read/write. Null for buyer/partner catalog:read keys.
+  publisherId: string | null;
   scopes: Set<string>;
 };
 export type AuthErr = {
@@ -43,6 +46,7 @@ export async function authenticateRequest(
     select: {
       id: true,
       organizationId: true,
+      publisherId: true,
       scopes: true,
       expiresAt: true,
       revokedAt: true,
@@ -74,6 +78,7 @@ export async function authenticateRequest(
     ok: true,
     keyId: key.id,
     organizationId: key.organizationId,
+    publisherId: key.publisherId,
     scopes,
   };
 }
