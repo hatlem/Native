@@ -104,6 +104,7 @@ export async function PUT(req: NextRequest) {
     titlesUpdated: summary.titlesUpdated,
     productsCreated: summary.productsCreated,
     productsUpdated: summary.productsUpdated,
+    skipped: summary.skipped.length,
   });
 
   return NextResponse.json(
@@ -112,6 +113,10 @@ export async function PUT(req: NextRequest) {
       titles_updated: summary.titlesUpdated,
       products_created: summary.productsCreated,
       products_updated: summary.productsUpdated,
+      skipped: summary.skipped.map((s) => ({
+        external_ref: s.externalRef,
+        reason: s.reason,
+      })),
       results: summary.results.map((r) => ({
         external_ref: r.externalRef,
         title_id: r.titleId,

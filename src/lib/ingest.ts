@@ -74,13 +74,17 @@ export const IngestProductSchema = z
     bookable: z.boolean().optional(),
     title: IngestTitleSchema,
     spec: IngestSpecSchema.nullish(),
-    availability: z.array(IngestAvailabilitySchema).max(36).optional(),
+    // Capped so a single request can't fan out into thousands of upserts
+    // (24 months of availability is two years ahead — more than enough).
+    availability: z.array(IngestAvailabilitySchema).max(24).optional(),
   })
   .strict();
 
 export const IngestPayloadSchema = z
   .object({
-    products: z.array(IngestProductSchema).min(1).max(200),
+    // Batch cap bounds per-request DB work; large catalogs page through
+    // multiple calls (the endpoint is idempotent on externalRef).
+    products: z.array(IngestProductSchema).min(1).max(100),
   })
   .strict();
 

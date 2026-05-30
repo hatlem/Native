@@ -97,7 +97,7 @@ const SPEC = {
           products: {
             type: "array",
             minItems: 1,
-            maxItems: 200,
+            maxItems: 100,
             items: {
               type: "object",
               required: ["externalRef", "type", "name", "basePrice", "currency", "title"],

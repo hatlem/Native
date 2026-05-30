@@ -1,9 +1,12 @@
 import { getTranslations } from "next-intl/server";
 import { MarketCode, ProductType } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
-import { formatMoney } from "@/lib/money";
 import { SubmitButton } from "@/components";
-import { createContentFeeRule, toggleContentFeeRule } from "./actions";
+import {
+  createContentFeeRule,
+  toggleContentFeeRule,
+  updateContentFeeRule,
+} from "./actions";
 
 export const dynamic = "force-dynamic";
 
@@ -124,11 +127,38 @@ export default async function DeskContentFeesPage({
                   <tr key={r.id} className={r.active ? "" : "muted"}>
                     <td>{r.marketCode ?? t("anyMarket")}</td>
                     <td>{r.productType ? tType(r.productType) : t("anyType")}</td>
-                    <td>{formatMoney(Number(r.greenfieldFee), r.currency, locale)}</td>
-                    <td>
-                      {r.adaptationFee != null
-                        ? formatMoney(Number(r.adaptationFee), r.currency, locale)
-                        : "—"}
+                    <td colSpan={2}>
+                      {/* Inline edit of the economics (amounts + note). */}
+                      <form action={updateContentFeeRule} className="cluster tight">
+                        <input type="hidden" name="locale" value={locale} />
+                        <input type="hidden" name="id" value={r.id} />
+                        <label className="small muted">
+                          {t("greenfieldFee")}
+                          <input
+                            name="greenfieldFee"
+                            type="number"
+                            min="0"
+                            step="1"
+                            defaultValue={Number(r.greenfieldFee)}
+                            style={{ width: "8ch" }}
+                            required
+                          />
+                        </label>
+                        <label className="small muted">
+                          {t("adaptationFee")}
+                          <input
+                            name="adaptationFee"
+                            type="number"
+                            min="0"
+                            step="1"
+                            defaultValue={r.adaptationFee != null ? Number(r.adaptationFee) : ""}
+                            style={{ width: "8ch" }}
+                          />
+                        </label>
+                        <input type="hidden" name="note" value={r.note ?? ""} />
+                        <span className="small muted">{r.currency}</span>
+                        <SubmitButton className="btn small ghost" label={t("save")} pendingLabel="…" />
+                      </form>
                     </td>
                     <td>{r.active ? t("active") : t("inactive")}</td>
                     <td>

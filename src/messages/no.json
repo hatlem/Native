@@ -1957,7 +1957,8 @@
     "active": "Aktiv",
     "inactive": "Inaktiv",
     "activate": "Aktiver",
-    "deactivate": "Deaktiver"
+    "deactivate": "Deaktiver",
+    "save": "Lagre"
   },
   "playbooks": {
     "eyebrow": "Desk",
@@ -1984,6 +1985,8 @@
     "empty": "Ingen spillebøker ennå – legg til en over.",
     "activate": "Aktiver",
     "deactivate": "Deaktiver",
-    "matchedEyebrow": "Spillebok"
+    "matchedEyebrow": "Spillebok",
+    "save": "Lagre",
+    "edit": "Rediger"
   }
 }
