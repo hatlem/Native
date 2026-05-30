@@ -1176,4 +1176,11 @@ body:has(.bn) .drawer-link:hover { background: rgba(20,17,12,0.06) !important; }
   .bn .page-foot nav { gap: 16px 22px; }
   .bn .page-foot .markets { gap: 10px; flex-wrap: wrap; }
 }
+.newsletter-form{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.newsletter-form.compact{max-width:420px}
+.newsletter-form input[type=email]{flex:1;min-width:200px;padding:10px 12px;border:1px solid var(--ink-soft);border-radius:8px;font:inherit}
+.newsletter-hp{position:absolute!important;left:-9999px;width:1px;height:1px;overflow:hidden}
+.newsletter-ok{color:var(--accent);font-weight:500}
+.newsletter-err{color:#c0392b;flex-basis:100%;font-size:13px;margin:4px 0 0}
+.sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);border:0}
 `;
