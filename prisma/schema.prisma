@@ -143,6 +143,11 @@ enum BookingStatus {
   CANCELLED
 }
 
+enum MetricsSource {
+  PUBLISHER
+  DESK
+}
+
 enum InvoiceStatus {
   DRAFT
   ISSUED
@@ -929,6 +934,8 @@ model PublisherBooking {
   confirmedAt DateTime?
   createdAt   DateTime      @default(now())
   updatedAt   DateTime      @updatedAt
+
+  metrics     BookingMetrics?
 }
 
 model Invoice {
@@ -1181,6 +1188,38 @@ model OutreachSuppression {
   email     String   @id
   reason    String
   createdAt DateTime @default(now())
+}
+
+// First-party tracked link embedded in a produced article. NativeSpin
+// writes the content, so it owns the outbound links — each becomes a
+// /go/<token> that counts clicks before redirecting to the advertiser.
+model TrackedLink {
+  id          String    @id @default(cuid())
+  orderLineId String
+  orderLine   OrderLine @relation(fields: [orderLineId], references: [id], onDelete: Cascade)
+  token       String    @unique
+  targetUrl   String
+  label       String?
+  clickCount  Int       @default(0)
+  createdAt   DateTime  @default(now())
+
+  @@index([orderLineId])
+}
+
+// Optional publisher/desk-reported reach for a live booking. Clicks come
+// from TrackedLink (first-party); impressions are the one number only the
+// publisher can supply, so they stay optional.
+model BookingMetrics {
+  id          String           @id @default(cuid())
+  bookingId   String           @unique
+  booking     PublisherBooking @relation(fields: [bookingId], references: [id], onDelete: Cascade)
+  impressions Int?
+  source      MetricsSource    @default(PUBLISHER)
+  note        String?
+  reportedAt  DateTime?
+  reportedBy  String?
+  createdAt   DateTime         @default(now())
+  updatedAt   DateTime         @updatedAt
 }
 
 enum SubscriberStatus {
