@@ -28,6 +28,7 @@ import { loadContentFeeRules, contentFeeLinesForGroup } from "@/lib/content-fee"
 import { groupItemsByMarket } from "@/lib/quote-grouping";
 import { recordAudit } from "@/lib/audit";
 import { notifyDesk, notifyOrg, notifyPublisher } from "@/lib/notify";
+import { isAudienceSegment } from "@/lib/targeting/segments";
 import { rfqLimiter } from "@/lib/rate-limit";
 import { loadScope, canActOnOrg, canCommitOnOrg } from "@/lib/scope";
 
