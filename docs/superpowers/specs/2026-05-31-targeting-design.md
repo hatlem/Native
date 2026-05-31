@@ -68,7 +68,32 @@ mangles output — audited via a Node line-scan instead):
   "Tech decision-makers". These are publisher editorial-audience labels, not
   user traits.
 
+## 0. Reach-tier catalog filter (zero-risk geo win)
+
+**Data reality (verified against the dev DB):** `Title.locationNote` is a
+free-text catch-all populated on 2,320 / 3,152 titles, but only a fraction are
+actual places — the rest are topics ("Diabetes", "Fotball"), circulation
+figures ("137k (2025)", "10 000 opplag"), or editorial descriptors
+("Konservativ", "Investigative non-profit"). So a confident-only city/region
+backfill correctly leaves the majority null.
+
+Meanwhile `Title.reach` (National / Regional / Local / Niche) is already clean,
+fully populated, and indexed — but is NOT yet a catalog filter. Adding it is the
+cheapest, safest geo win and ships independently of the city/region work.
+
+- Add a **reach-tier** filter to the catalog (single- or multi-select over the
+  four `Title.reach` values), parsed from `searchParams` and added to the
+  prisma `where` exactly like the existing `nativeFit` filter.
+- This is its own slice (no schema change, no data risk).
+
 ## 1. Geo enrichment (schema + backfill)
+
+> Scope per user decision (merge of "reach-tier filter" + "full region+city all
+> 9 markets"): build both. §0 is the safe filter; this section is the ambitious
+> city/region enrichment across all nine markets, confident-only. The region
+> backfill is the riskiest slice (hand-curated geographic knowledge per market);
+> it is structured as a separable slice so partial coverage / leaving a market's
+> table empty is fine and never blocks the rest.
 
 Add to `Title` (both nullable, both indexed):
 
@@ -103,6 +128,16 @@ The script prints a summary: N titles updated, M left null, per market.
 
 > No fuzzy/LLM matching — deterministic table only. A title with null geo
 > simply doesn't appear in the region filter. Honest over complete.
+
+**Coverage strategy (all 9 markets, confident-only):** curate per-market
+city→region tables, prioritising where real place-names are densest (NO has 705
+distinct locationNote values, many recognisable Norwegian places; UK/DE/IE
+likewise have clear city names). Lists are seeded from the distinct
+locationNote values per market (captured during planning). Anything not in a
+table stays null. The backfill summary must report, per market, how many titles
+got city/region vs left null, so coverage is measurable and over-reach is
+visible. Region is only assigned via a city→region mapping (never guessed from a
+non-city note), so a wrong region is structurally hard to produce.
 
 ## 2. Catalog region filter (live)
 
@@ -182,11 +217,12 @@ together. `Plan` columns don't reference the geo columns, so combining is safe.)
 
 ## Slices (separately committable)
 
-1. Schema + migration (Title.region/city + Plan.target*) + `parseGeo` + tests.
-2. Backfill script + run + summary.
-3. Catalog region filter (+ city in search).
-4. Plan targeting brief (selectors + persistence + desk summary) + segments.ts.
-5. Marketing targeting section + i18n (all six locales).
+1. **Reach-tier catalog filter** (§0) — no schema change, zero data risk.
+2. Schema + migration (Title.region/city + Plan.target*) + `parseGeo` + tests.
+3. Backfill script + run + per-market coverage summary.
+4. Catalog region filter (+ city in search).
+5. Plan targeting brief (selectors + persistence + desk summary) + segments.ts.
+6. Marketing targeting section + i18n + retargeting-copy fix (all six locales).
 
 ## Out of scope
 
