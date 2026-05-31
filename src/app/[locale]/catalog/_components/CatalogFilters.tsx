@@ -14,11 +14,13 @@ type Props = {
   b2bB2cs: Option[];
   reaches: Option[];
   categories: Option[];
+  regions: Option[];
   initial: {
     q: string;
     markets: string[];
     types: string[];
     verticals: string[];
+    regions: string[];
     nativeFit: string;
     b2bB2c: string;
     reach: string;
@@ -210,6 +212,7 @@ export function CatalogFilters({ markets, formats, nativeFits, b2bB2cs, reaches,
   const selectedCategories = new Set(initial.verticals);
   const selectedRegions = new Set(initial.regions);
   const categoryLabel = t("categoryCount", { count: selectedCategories.size });
+  const regionLabel = t("regionCount", { count: selectedRegions.size });
 
   return (
     <div className="catalog-filters">

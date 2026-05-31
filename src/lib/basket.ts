@@ -29,9 +29,20 @@ export type PlanBrief = {
   audience: string;
   goal: string;
   brief: string;
+  targetGeo: string;
+  targetAudience: string;
+  targetContext: string;
 };
 
-const EMPTY_BRIEF: PlanBrief = { budget: "", audience: "", goal: "", brief: "" };
+const EMPTY_BRIEF: PlanBrief = {
+  budget: "",
+  audience: "",
+  goal: "",
+  brief: "",
+  targetGeo: "",
+  targetAudience: "",
+  targetContext: "",
+};
 
 // Pure: tolerate any untrusted cookie payload and normalise. Caps each
 // field length so a hostile cookie can't blow up the page render.
@@ -48,6 +59,9 @@ export function parsePlanBrief(raw: string | undefined | null): PlanBrief {
       audience: str(o.audience, 200),
       goal: str(o.goal, 200),
       brief: str(o.brief, 4000),
+      targetGeo: str(o.targetGeo, 200),
+      targetAudience: str(o.targetAudience, 400),
+      targetContext: str(o.targetContext, 200),
     };
   } catch {
     return EMPTY_BRIEF;
