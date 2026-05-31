@@ -25,11 +25,24 @@ Decisions locked during brainstorming:
 - **Geo:** add structured `region` + `city` columns; backfill confident-only
   from `locationNote`, leave the rest null.
 
-**Verified, not assumed:** there are currently **zero** targeting / retargeting
-/ demographic claims in the i18n copy (`grep -rin retarget src/` → none; the
-`NATIVE_DISPLAY` description is clean). So there is nothing false to retrofit —
-the original plan to "fix the retargeting word" is dropped; that copy never
-existed.
+**Verified i18n claim audit** (the repo's `grep` is aliased to `ugrep` and
+mangles output — audited via a Node line-scan instead):
+
+- **One genuine false claim to fix:** `formats.native-display.bestFor` =
+  "Reach, **retargeting**, awareness against a curated audience" — this lists
+  retargeting as a strength of NativeSpin's OWN native-display format. Under the
+  claim boundary that's false (no user-level data). Fix in all six locales:
+  drop "retargeting", e.g. EN → "Reach and awareness against a curated
+  audience." (no/sv/da/de/fi equivalently).
+- **Leave alone (honest competitor contrast):** the `bestFitDisplay` strings in
+  the native-vs-display comparison (root `landing.vs` / `vs` namespace and
+  `src/messages/landing/<loc>/vs.json`) describe **display / programmatic —
+  the competitor** NativeSpin contrasts itself against ("Performance
+  retargeting, simple offers", "ecommerce retargeting, broad reach at low
+  CPM"). These are accurate positioning, not NativeSpin claims.
+- **Also fine, no change:** `quoteNarrative.bullets.NATIVE_DISPLAY` =
+  "Targeted by section and audience segment" — contextual + title-audience
+  segment is exactly within the allowed boundary.
 
 ## Grounding (current state, verified)
 
@@ -142,6 +155,8 @@ together. `Plan` columns don't reference the geo columns, so combining is safe.)
 - New `targeting` i18n namespace (or a block in the `advertisers` namespace)
   for this copy. No new standalone page (keep it on the page buyers already
   read).
+- **Fix the one false claim** in `formats.native-display.bestFor` (drop
+  "retargeting") across all six locales, as detailed in the claim audit above.
 
 ## 5. i18n (all six locales: en, no, sv, da, fi, de)
 
@@ -149,6 +164,7 @@ together. `Plan` columns don't reference the geo columns, so combining is safe.)
 - Plan form: targeting selector labels (geo / audience / context) + the
   segment option labels.
 - `/for-advertisers` targeting section copy.
+- `formats.native-display.bestFor`: remove "retargeting" (all six locales).
 - English first; natural native translations (no calques); parity-checked.
 
 ## 6. Testing & verification
