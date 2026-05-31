@@ -37,7 +37,7 @@ const SPEC = {
         type: "http",
         scheme: "bearer",
         description:
-          'Bearer API key. `catalog:read` for the public catalog endpoints; `catalog:write` (bound to one publisher) for the ingestion endpoints. Send as `Authorization: Bearer <key>`.',
+          'Bearer API key. `catalog:read` for the public catalog endpoints; `orders:write` (bound to one organization) for self-serve order placement; `catalog:write` (bound to one publisher) for the ingestion endpoints. Send as `Authorization: Bearer <key>`.',
       },
     },
     schemas: {
@@ -156,6 +156,38 @@ const SPEC = {
           },
         },
       },
+      OrderRequest: {
+        type: "object",
+        required: ["items"],
+        properties: {
+          items: {
+            type: "array",
+            minItems: 1,
+            items: {
+              type: "object",
+              required: ["productId", "quantity"],
+              properties: {
+                productId: { type: "string" },
+                quantity: { type: "integer", minimum: 1 },
+              },
+            },
+          },
+          reference: {
+            type: "string",
+            maxLength: 200,
+            description:
+              "Optional buyer reference, stored on the order's brief.",
+          },
+        },
+      },
+      OrderResponse: {
+        type: "object",
+        required: ["requestId", "orderIds"],
+        properties: {
+          requestId: { type: "string" },
+          orderIds: { type: "array", items: { type: "string" } },
+        },
+      },
       Error: {
         type: "object",
         properties: {
@@ -172,6 +204,15 @@ const SPEC = {
                   "SCOPE",
                   "RATE_LIMITED",
                   "NOT_FOUND",
+                  "NO_ORG",
+                  "BAD_JSON",
+                  "BAD_BODY",
+                  "NO_ITEMS",
+                  "BAD_ITEM",
+                  "BAD_QUANTITY",
+                  "UNKNOWN_PRODUCT",
+                  "RFQ_ONLY",
+                  "METHOD_NOT_ALLOWED",
                 ],
               },
               message: { type: "string" },
@@ -332,6 +373,54 @@ const SPEC = {
           },
           "403": {
             description: "Key lacks catalog:write or is not bound to a publisher.",
+            content: { "application/json": { schema: { $ref: "#/components/schemas/Error" } } },
+          },
+        },
+      },
+    },
+    "/api/v1/orders": {
+      post: {
+        summary: "Place a firm-priced, self-serve order",
+        description:
+          "Books firm-priced placements on named premium titles in one call. RFQ-only inventory is rejected (422 RFQ_ONLY) — those titles stay desk-mediated. Requires the orders:write scope and a key bound to a buying organization.",
+        operationId: "createOrder",
+        security: [{ bearerAuth: [] }],
+        requestBody: {
+          required: true,
+          content: {
+            "application/json": {
+              schema: { $ref: "#/components/schemas/OrderRequest" },
+            },
+          },
+        },
+        responses: {
+          "201": {
+            description: "Order(s) created and confirmed.",
+            content: {
+              "application/json": {
+                schema: { $ref: "#/components/schemas/OrderResponse" },
+              },
+            },
+          },
+          "400": {
+            description: "Body is not valid JSON.",
+            content: { "application/json": { schema: { $ref: "#/components/schemas/Error" } } },
+          },
+          "401": {
+            description: "Missing / invalid bearer.",
+            content: { "application/json": { schema: { $ref: "#/components/schemas/Error" } } },
+          },
+          "403": {
+            description: "Key lacks orders:write, or is not bound to an organization.",
+            content: { "application/json": { schema: { $ref: "#/components/schemas/Error" } } },
+          },
+          "422": {
+            description:
+              "Invalid order, unknown product, or RFQ-only product (RFQ_ONLY) — submit those via the desk.",
+            content: { "application/json": { schema: { $ref: "#/components/schemas/Error" } } },
+          },
+          "429": {
+            description: "Rate-limited — back off + retry.",
             content: { "application/json": { schema: { $ref: "#/components/schemas/Error" } } },
           },
         },
