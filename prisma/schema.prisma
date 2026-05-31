@@ -299,6 +299,10 @@ model Title {
   // and the desk "direct or not" badge. Backfilled from `adSales`.
   salesChannel  SalesChannel?
   locationNote  String? // CSV "Location / Note" — city or short note
+  // Structured geo derived from locationNote where confident (Title geo
+  // enrichment). Null when national/unknown; locationNote stays the raw note.
+  city          String?
+  region        String?
   circulation   Int?    // CSV "Circulation"
   vertical      String? // CSV "Vertical" — News (National), B2B – Energy, ...
   audience      String? // CSV "Audience" — General consumer, Regional consumer, ...
@@ -327,6 +331,8 @@ model Title {
   @@index([frequency])
   @@index([ownerGroup])
   @@index([salesChannel])
+  @@index([city])
+  @@index([region])
   @@unique([publisherId, externalRef])
 }
 
@@ -747,6 +753,11 @@ model Plan {
   endDate        DateTime?
   audienceNote   String?
   goal           String?
+  // Structured campaign targeting intent — what the buyer wants to reach.
+  // Descriptive (used by the desk to pick titles); NOT an ad-server audience.
+  targetGeo      String? // markets/regions chosen, comma-separated
+  targetAudience String? // audience-segment labels, comma-separated
+  targetContext  String? // categories/verticals, comma-separated
   createdAt      DateTime     @default(now())
   updatedAt      DateTime     @updatedAt
 
