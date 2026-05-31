@@ -6,6 +6,8 @@ import { prisma } from "@/lib/prisma";
 import { intlLocale } from "@/lib/money";
 import { LandingShell } from "@/app/landing-shell";
 import { MailLink } from "@/components";
+import { NewsletterSignup } from "./_components/NewsletterSignup";
+import { PublisherStrip } from "./_components/PublisherStrip";
 
 const DESK_SUBJECT = "Talk to the NativeSpin desk";
 
@@ -22,6 +24,8 @@ const PRODUCT_TYPE_TO_FORMAT_KEY: Record<ProductType, string> = {
   [ProductType.PACKAGE]: "fmtSponsoredArticleAds",
   [ProductType.CONTEXTUAL]: "fmtSponsoredContent",
   [ProductType.OTHER]: "fmtSponsoredContent",
+  [ProductType.NATIVE_PLUS]: "fmtNativePlus",
+  [ProductType.CONTENT_VIDEO]: "fmtContentVideo",
 };
 
 function formatReach(n: number | null | undefined): string {
@@ -181,6 +185,9 @@ export default async function HomePage({
           </div>
         </div>
       </section>
+
+      {/* PUBLISHER STRIP */}
+      <PublisherStrip locale={locale} />
 
       {/* VS DISPLAY */}
       <section className="vs">
@@ -415,6 +422,15 @@ export default async function HomePage({
           </div>
         </div>
       </section>
+
+        {/* NEWSLETTER */}
+        <section className="section newsletter-block">
+          <div className="wrap">
+            <h2>{t("newsletter.heading")}</h2>
+            <p className="lead">{t("newsletter.lead")}</p>
+            <NewsletterSignup variant="full" source="home" />
+          </div>
+        </section>
 
       {/* END CTA */}
       <section className="end-cta" id="request">

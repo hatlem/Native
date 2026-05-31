@@ -239,7 +239,12 @@
       "marketCount": "{count, plural, =0 {Alle Märkte} =1 {1 Markt} other {# Märkte}}",
       "compareMode": "Vergleichsauswahl",
       "compareModeHint": "Titel auswählen, um sie nebeneinander zu vergleichen",
-      "loading": "Wird aktualisiert…"
+      "loading": "Wird aktualisiert…",
+      "reach": "Reichweite",
+      "anyReach": "Alle Reichweiten",
+      "region": "Region",
+      "allRegions": "Alle Regionen",
+      "regionCount": "{count, plural, =0 {Alle Regionen} one {# Region} other {# Regionen}}"
     },
     "compareBar": {
       "label": "{count, plural, =1 {1 Titel ausgewählt} other {# Titel ausgewählt}}",
@@ -338,7 +343,7 @@
     "duplicateAllInactive": "Alle Titel aus dieser Bestellung sind jetzt inaktiv. Durchsuchen Sie den Katalog, um einen neuen Plan zu erstellen.",
     "pricingOnRequest": "Preis auf Anfrage — verbindliches Angebot in 24 Std.",
     "startTitle": "Starten Sie Ihre Kampagne",
-    "startLead": "Beschreiben Sie Zielgruppe und Markt – wir schlagen passende Titel vor.",
+    "startLead": "Teilen Sie uns Ihren Markt und Ihr Budget mit — wir schlagen Titel vor, auf die Sie Ihren Brief aufbauen können.",
     "recommend": "Titel empfehlen",
     "recommending": "Titel werden gesucht…",
     "recForBudget": "Empfohlen für Ihr Budget",
@@ -367,7 +372,12 @@
     "requestingAs": "Anfrage als",
     "loginRequired": "Melden Sie sich an oder erstellen Sie ein Konto, um ein Angebot anzufordern:",
     "selectClient": "Wählen Sie einen Kunden, in dessen Namen Sie handeln, im",
-    "fromPrice": "ab {price}"
+    "fromPrice": "ab {price}",
+    "targetAudienceLabel": "Zielgruppensegmente (optional)",
+    "targetGeoLabel": "Geografischer Fokus (optional)",
+    "targetGeoPlaceholder": "z. B. NO, SE — oder Bayern, München",
+    "targetContextLabel": "Redaktioneller Kontext (optional)",
+    "targetContextPlaceholder": "z. B. Wirtschaft, Lifestyle, Sport"
   },
   "requests": {
     "title": "Anfrage",
@@ -815,7 +825,7 @@
       "voice": "Vor allem visuell — Ihre Headline, das Layout des Titels",
       "brand": "Logo + Hinweis in der Einheit; Klick führt zu Ihrem Ziel",
       "reads": "Eine redaktionelle Karte, die sich als gesponsert erweist",
-      "bestFor": "Reichweite, Retargeting, Awareness vor einer kuratierten Zielgruppe",
+      "bestFor": "Reichweite und Awareness vor einer kuratierten Zielgruppe",
       "rule": "Wenn Sie den Rahmen des Titels um einen Klick wollen, nicht dessen Worte, dann Native Display."
     },
     "package": {
@@ -831,7 +841,24 @@
     "ctaTitle": "Unsicher, was passt?",
     "ctaBody": "Senden Sie uns einen Brief — das Desk empfiehlt einen Formatmix für Ihr Ziel, Ihre Zielgruppe und Ihr Budget. Noch am selben Tag.",
     "ctaContact": "Mit dem Desk sprechen",
-    "learnMore": "So funktioniert dieses Format"
+    "learnMore": "So funktioniert dieses Format",
+    "native-plus": {
+      "title": "Inspiration, die zum Handeln einlädt.",
+      "voice": "Die redaktionelle Stimme des Titels, mit eingebauten Shopping-Momenten",
+      "brand": "Genannter Werbetreibender; Produkte klar als kaufbar gekennzeichnet",
+      "reads": "Ein Beitrag zum Handeln – auf ein Produkt tippen, nicht auf ein Banner",
+      "bestFor": "Erklärungsbedürftige Käufe, bei denen Inspiration und Kauf zusammengehören",
+      "rule": "Der Handel kommt hinzu, nie als Tarnung – die Geschichte muss den Lesefluss weiter verdienen."
+    },
+    "content-video": {
+      "title": "Video, das den Play verdient.",
+      "voice": "Video im Tonfall des Titels, kein TV-Spot",
+      "brand": "Genannter Werbetreibender; im Player als bezahlt gekennzeichnet",
+      "reads": "Das eigene Video des Publishers, im Feed und im Player",
+      "bestFor": "Geschichten, die man besser zeigt als erzählt – Demos, Orte, Menschen",
+      "rule": "Verdient die Wiedergabe aus eigener Kraft; die Kennzeichnung ist immer sichtbar."
+    },
+    "creativeSpecsLink": "So bereiten Sie Ihre Inhalte vor →"
   },
   "productType": {
     "NATIVE_ARTICLE": "Native-Artikel",
@@ -846,7 +873,11 @@
     "descPACKAGE": "Gebündelter Native-Artikel plus Native-Display-Verstärkung im selben Titel — der Artikel überzeugt, das Display sorgt für Reichweite.",
     "descCONTEXTUAL": "Platzierung, die nach Seitenthema und redaktionellem Umfeld statt nach Nutzerdaten ausgerichtet wird — die Relevanz ergibt sich aus dem Umfeld der Anzeige.",
     "descOTHER": "Individuelles Format, das nicht in die Standardkategorien passt — wird in der Regel von Fall zu Fall verhandelt.",
-    "CONTENT_FEE": "Content-Produktion"
+    "CONTENT_FEE": "Content-Produktion",
+    "NATIVE_PLUS": "Native Plus",
+    "CONTENT_VIDEO": "Content-Video",
+    "descNATIVE_PLUS": "Shoppbarer Native-Artikel — redaktioneller Inhalt mit Produktlinks und Kauf-Buttons direkt im Artikel, sodass Leser handeln können, ohne die Seite zu verlassen.",
+    "descCONTENT_VIDEO": "Videobasierte Werbeinhalte, die im Player und Feed des Publishers laufen – für Aufmerksamkeit gemacht, nicht als Banner-Platz."
   },
   "nativeFit": {
     "High": "Hoch",
@@ -914,7 +945,18 @@
     "contentBody": "Inhalt ist die Hälfte der Kosten und der Großteil der Wirkung einer Native-Kampagne. Wenn wir bündeln, können wir spec-konforme, kennzeichnungsrichtige Artikel in der vom Verlag tatsächlich genannten Vorlaufzeit liefern — und das Gesamtpaket schlägt DIY.",
     "formatsEyebrow": "Formate",
     "formatsTitle": "Das ist im Angebot",
-    "formatsLead": "Jeder Titel im Katalog veröffentlicht eine Mischung aus diesen Formaten. Das Desk wählt das passende — und passt sich den Kennzeichnungsregeln des jeweiligen Marktes an."
+    "formatsLead": "Jeder Titel im Katalog veröffentlicht eine Mischung aus diesen Formaten. Das Desk wählt das passende — und passt sich den Kennzeichnungsregeln des jeweiligen Marktes an.",
+    "targetingEyebrow": "Targeting",
+    "targetingTitle": "Erreichen Sie die richtigen Leser nach Wo, Was und Wer.",
+    "targetingLead": "Targeting bei NativeSpin heißt, die richtigen Titel zu wählen — nicht, Menschen durchs Web zu verfolgen.",
+    "targetingContextTitle": "Kontextuell",
+    "targetingContextBody": "Wählen Sie Titel nach Kategorie, Branche und redaktionellem Thema, damit Ihre Geschichte dort steht, wo sie hingehört.",
+    "targetingGeoTitle": "Geografisch",
+    "targetingGeoBody": "Filtern Sie nach Markt, Region, Stadt und Reichweite — nationaler Markenaufbau oder eine einzelne Stadt.",
+    "targetingAudienceTitle": "Zielgruppensegment",
+    "targetingAudienceBody": "Jeder Titel hat eine definierte redaktionelle Zielgruppe — von regionalen Verbrauchern bis zu B2B-Entscheidern.",
+    "targetingHonestyTitle": "Was wir nicht tun",
+    "targetingHonestyBody": "Kein verhaltensbasiertes Retargeting, keine Interessensgraphen, keine Daten auf Nutzerebene. Die Relevanz kommt vom Titel, nicht vom Tracking des Lesers."
   },
   "agencies": {
     "eyebrow": "Für Agenturen",
@@ -1856,5 +1898,50 @@
     "matchedEyebrow": "Playbook",
     "save": "Speichern",
     "edit": "Bearbeiten"
+  },
+  "creativeSpecs": {
+    "metaTitle": "Materialvorgaben — so bereiten Sie Ihre Inhalte vor",
+    "eyebrow": "Materialvorgaben",
+    "title": "So bereiten Sie Ihre Inhalte vor",
+    "lead": "Das brauchen wir, um eine Platzierung live zu bringen – nach Format. Liegt das bereit, geht es schnell.",
+    "article": {
+      "heading": "Artikel (Native-Artikel, Advertorial, Native Plus)",
+      "body": "500–800 Wörter (kürzer ist mit starken Bildern in Ordnung). Bilder mindestens 1200×628 px, idealerweise unter 300 KB. Überschrift bis 70 Zeichen, Teaser bis 200. Zwei bis drei externe Links. Planen Sie 3 Werktage für eigenes Material ein, 10, wenn wir es schreiben."
+    },
+    "nativePlus": {
+      "heading": "Native Plus — shoppbare Extras",
+      "body": "Bis zu 3 Produktlinks oder -karten im Artikel. Jeder braucht Produktname, Bild, Preis und Ziel-URL. Halten Sie die Kauf-Buttons kurz und ehrlich (z. B. „Jetzt kaufen“, „Produkt ansehen“). Produkte werden klar als Werbung gekennzeichnet."
+    },
+    "video": {
+      "heading": "Content-Video",
+      "body": "Bis zu 60 Sekunden funktionieren am besten. Schicken Sie einen YouTube- oder Vimeo-Link oder eine MP4 bis etwa 200 MB. Fügen Sie ein Vorschaubild und einen einzeiligen Teaser bei. Untertitel dringend empfohlen – die meisten Wiedergaben starten stumm."
+    },
+    "disclosureHeading": "Kennzeichnung",
+    "disclosureBody": "Jede Platzierung wird klar als bezahlt im vom Markt vorgeschriebenen Wortlaut gekennzeichnet. Die Kennzeichnung wird nie versteckt, verkleinert oder entfernt.",
+    "ctaTitle": "Bereit für Ihr Briefing?",
+    "ctaBody": "Schicken Sie, was Sie haben – wir sagen Ihnen, was fehlt.",
+    "ctaContact": "Mit dem Team sprechen"
+  },
+  "reachTier": {
+    "reach": "Reichweite",
+    "National": "National",
+    "Regional": "Regional",
+    "Local": "Lokal",
+    "Niche": "Nische"
+  },
+  "targetSegment": {
+    "general-consumer": "Allgemeine Verbraucher",
+    "regional-local": "Regionale / lokale Leser",
+    "affluent": "Wohlhabend / Luxus",
+    "families-parents": "Familien & Eltern",
+    "seniors-50plus": "Senioren (50+)",
+    "b2b-decision-makers": "B2B-Entscheider",
+    "healthcare-pros": "Gesundheitsfachkräfte",
+    "legal-finance-pros": "Jura- & Finanzprofis",
+    "tech-it-pros": "Tech- & IT-Profis",
+    "construction-property-pros": "Bau & Immobilien",
+    "farming-rural": "Landwirtschaft & ländlicher Raum",
+    "lifestyle-hobby": "Lifestyle & Hobby",
+    "culture-media": "Kultur & Medien"
   }
 }

@@ -12,14 +12,18 @@ type Props = {
   formats: Option[];
   nativeFits: Option[];
   b2bB2cs: Option[];
+  reaches: Option[];
   categories: Option[];
+  regions: Option[];
   initial: {
     q: string;
     markets: string[];
     types: string[];
     verticals: string[];
+    regions: string[];
     nativeFit: string;
     b2bB2c: string;
+    reach: string;
     onlyPriced: boolean;
     advancedOpen: boolean;
     compareMode: boolean;
@@ -28,7 +32,7 @@ type Props = {
 
 const SEARCH_DEBOUNCE_MS = 300;
 
-export function CatalogFilters({ markets, formats, nativeFits, b2bB2cs, categories, initial }: Props) {
+export function CatalogFilters({ markets, formats, nativeFits, b2bB2cs, reaches, categories, regions, initial }: Props) {
   const router = useRouter();
   const pathname = usePathname();
   const sp = useSearchParams();
@@ -39,10 +43,12 @@ export function CatalogFilters({ markets, formats, nativeFits, b2bB2cs, categori
   const [formatOpen, setFormatOpen] = useState(false);
   const [marketOpen, setMarketOpen] = useState(false);
   const [categoryOpen, setCategoryOpen] = useState(false);
+  const [regionOpen, setRegionOpen] = useState(false);
   const [advancedOpen, setAdvancedOpen] = useState(initial.advancedOpen);
   const formatRef = useRef<HTMLDivElement>(null);
   const marketRef = useRef<HTMLDivElement>(null);
   const categoryRef = useRef<HTMLDivElement>(null);
+  const regionRef = useRef<HTMLDivElement>(null);
 
   // Debounced URL update for the search input. Other filter changes
   // commit instantly — only the text field waits for the typist to pause.
@@ -161,6 +167,22 @@ export function CatalogFilters({ markets, formats, nativeFits, b2bB2cs, categori
     commit((p) => p.delete("vertical"));
   }
 
+  function toggleRegion(value: string) {
+    const current = sp.get("region")?.split(",").filter(Boolean) ?? [];
+    const has = current.includes(value);
+    const nextValues = has
+      ? current.filter((v) => v !== value)
+      : [...current, value];
+    commit((p) => {
+      if (nextValues.length) p.set("region", nextValues.join(","));
+      else p.delete("region");
+    });
+  }
+
+  function clearRegions() {
+    commit((p) => p.delete("region"));
+  }
+
   function toggleOnlyPriced(checked: boolean) {
     commit((p) => {
       if (checked) p.set("onlyPriced", "1");
@@ -188,7 +210,9 @@ export function CatalogFilters({ markets, formats, nativeFits, b2bB2cs, categori
         ? (markets.find((m) => m.value === initial.markets[0])?.label ?? initial.markets[0])
         : t("marketCount", { count: selectedMarkets.size });
   const selectedCategories = new Set(initial.verticals);
+  const selectedRegions = new Set(initial.regions);
   const categoryLabel = t("categoryCount", { count: selectedCategories.size });
+  const regionLabel = t("regionCount", { count: selectedRegions.size });
 
   return (
     <div className="catalog-filters">
@@ -333,6 +357,46 @@ export function CatalogFilters({ markets, formats, nativeFits, b2bB2cs, categori
             ) : null}
           </div>
         </div>
+
+        {regions.length > 0 ? (
+          <div className="catalog-filters__field">
+            <label>{t("region")}</label>
+            <div className="catalog-filters__multi" ref={regionRef}>
+              <button
+                type="button"
+                className="catalog-filters__multi-toggle"
+                onClick={() => setRegionOpen((o) => !o)}
+                aria-expanded={regionOpen}
+              >
+                <span>{regionLabel}</span>
+                <span aria-hidden="true">▾</span>
+              </button>
+              {regionOpen ? (
+                <div className="catalog-filters__multi-menu" role="listbox">
+                  {regions.map((r) => (
+                    <label key={r.value} className="catalog-filters__multi-option">
+                      <input
+                        type="checkbox"
+                        checked={selectedRegions.has(r.value)}
+                        onChange={() => toggleRegion(r.value)}
+                      />
+                      <span>{r.label}</span>
+                    </label>
+                  ))}
+                  {selectedRegions.size > 0 ? (
+                    <button
+                      type="button"
+                      className="catalog-filters__multi-clear"
+                      onClick={clearRegions}
+                    >
+                      {t("all")}
+                    </button>
+                  ) : null}
+                </div>
+              ) : null}
+            </div>
+          </div>
+        ) : null}
 
         <div className="catalog-filters__field">
           <label htmlFor="nativeFit">{t("nativeFit")}</label>

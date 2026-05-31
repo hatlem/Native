@@ -1,0 +1,18 @@
+{
+  "heading": "Inte redo att prata än?",
+  "lead": "Få korta, konkreta notiser om native-annonsering på våra nio marknader — nya titlar, formatidéer och vad som faktiskt fungerar. Avsluta när du vill.",
+  "placeholder": "du@foretag.se",
+  "button": "Håll mig uppdaterad",
+  "sending": "Skickar …",
+  "success": "Nästan klart — kolla inkorgen för att bekräfta.",
+  "error": "Den där adressen ser inte riktig ut. Kan du kolla den?",
+  "footerHeading": "Håll dig uppdaterad",
+  "statusEyebrow": "Nyhetsbrev",
+  "status_confirmed_title": "Du är med.",
+  "status_confirmed_body": "Din prenumeration är bekräftad. Vi hör av oss när vi har något som är värt din tid.",
+  "status_unsubscribed_title": "Du är avregistrerad.",
+  "status_unsubscribed_body": "Du får inga fler nyhetsbrev från oss. Du kan prenumerera igen när du vill.",
+  "status_invalid_title": "Länken fungerade inte.",
+  "status_invalid_body": "Länken kan ha gått ut eller redan ha använts. Försök prenumerera igen från valfri sida.",
+  "statusHome": "Tillbaka till startsidan"
+}

@@ -41,6 +41,10 @@ enum ProductType {
   PACKAGE
   CONTEXTUAL
   OTHER
+  // Shoppable native article — in-article product links / buy buttons.
+  NATIVE_PLUS
+  // Video-led sponsored placement in the publisher's player/feed.
+  CONTENT_VIDEO
 }
 
 enum PricingModel {
@@ -219,6 +223,10 @@ model Publisher {
   // and quotes from internal prices as normal. Used when a publisher
   // is onboarded under NDA or wants RFQ-only positioning.
   pricesPublic  Boolean  @default(true)
+  // Optional brand logo for the marketing proof strip. Null → the strip
+  // renders a styled text chip of the publisher name instead, so the
+  // component is truthful with zero assets and logos drop in later.
+  logoUrl       String?
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
 
@@ -291,6 +299,10 @@ model Title {
   // and the desk "direct or not" badge. Backfilled from `adSales`.
   salesChannel  SalesChannel?
   locationNote  String? // CSV "Location / Note" — city or short note
+  // Structured geo derived from locationNote where confident (Title geo
+  // enrichment). Null when national/unknown; locationNote stays the raw note.
+  city          String?
+  region        String?
   circulation   Int?    // CSV "Circulation"
   vertical      String? // CSV "Vertical" — News (National), B2B – Energy, ...
   audience      String? // CSV "Audience" — General consumer, Regional consumer, ...
@@ -319,6 +331,8 @@ model Title {
   @@index([frequency])
   @@index([ownerGroup])
   @@index([salesChannel])
+  @@index([city])
+  @@index([region])
   @@unique([publisherId, externalRef])
 }
 
@@ -394,6 +408,12 @@ model Spec {
   disclosureLabel String? // required sponsored/native marking text
   fileFormats  String? // e.g. "JPG, PNG"
   requirements String? // free-form additional requirements
+  // Content Video specs (null for non-video formats).
+  videoMaxSeconds Int?    // max length in seconds, e.g. 60
+  videoHosting    String? // accepted hosting/format, e.g. "YouTube, Vimeo, or MP4 ≤ 200 MB"
+  // Native Plus (shoppable) specs (null for non-shoppable formats).
+  shoppableMaxProducts Int?    // max in-article product links/cards, e.g. 3
+  ctaGuidance          String? // allowed/required buy-button CTA wording
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
 }
@@ -733,6 +753,11 @@ model Plan {
   endDate        DateTime?
   audienceNote   String?
   goal           String?
+  // Structured campaign targeting intent — what the buyer wants to reach.
+  // Descriptive (used by the desk to pick titles); NOT an ad-server audience.
+  targetGeo      String? // markets/regions chosen, comma-separated
+  targetAudience String? // audience-segment labels, comma-separated
+  targetContext  String? // categories/verticals, comma-separated
   createdAt      DateTime     @default(now())
   updatedAt      DateTime     @updatedAt
 
@@ -1156,4 +1181,30 @@ model OutreachSuppression {
   email     String   @id
   reason    String
   createdAt DateTime @default(now())
+}
+
+enum SubscriberStatus {
+  PENDING
+  CONFIRMED
+  UNSUBSCRIBED
+}
+
+// Marketing newsletter subscriber. Double opt-in: a row is PENDING until
+// the recipient clicks the tokenised confirm link, then CONFIRMED. The
+// raw tokens live only in email URLs; we store SHA-256 hashes (same
+// pattern as MagicLinkToken). The unsub token is long-lived so links in
+// old emails keep working; the confirm token is single-use + expires.
+model Subscriber {
+  email            String           @id
+  locale           String
+  status           SubscriberStatus @default(PENDING)
+  source           String // where the signup came from: "footer", "home", ...
+  confirmTokenHash String?          @unique
+  confirmExpiresAt DateTime?
+  unsubTokenHash   String           @unique
+  createdAt        DateTime         @default(now())
+  confirmedAt      DateTime?
+  unsubscribedAt   DateTime?
+
+  @@index([status])
 }

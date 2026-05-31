@@ -28,6 +28,7 @@ import { loadContentFeeRules, contentFeeLinesForGroup } from "@/lib/content-fee"
 import { groupItemsByMarket } from "@/lib/quote-grouping";
 import { recordAudit } from "@/lib/audit";
 import { notifyDesk, notifyOrg, notifyPublisher } from "@/lib/notify";
+import { isAudienceSegment } from "@/lib/targeting/segments";
 import { rfqLimiter } from "@/lib/rate-limit";
 import { loadScope, canActOnOrg, canCommitOnOrg } from "@/lib/scope";
 
@@ -169,6 +170,15 @@ export async function submitRequest(formData: FormData) {
   const goal = str(formData, "goal");
   const audience = str(formData, "audience");
   const brief = str(formData, "brief");
+  const targetGeo = str(formData, "targetGeo");
+  const targetContext = str(formData, "targetContext");
+  // Audience segments are a checkbox group → collect all checked values,
+  // keep only known segment keys (defends against tampered form posts).
+  const targetAudience = formData
+    .getAll("targetAudience")
+    .map((v) => String(v))
+    .filter(isAudienceSegment)
+    .join(",");
 
   // RFQ/checkout is account-bound: the request is owned by the acting
   // organization (an advertiser's own org, or the agency's selected
@@ -188,6 +198,9 @@ export async function submitRequest(formData: FormData) {
     audience,
     goal,
     brief,
+    targetGeo,
+    targetAudience,
+    targetContext,
   };
   if (planBriefHasContent(briefDraft)) {
     const store = await cookies();
@@ -298,6 +311,9 @@ export async function submitRequest(formData: FormData) {
         currency: planCurrency,
         goal: goal || null,
         audienceNote: audience || null,
+        targetGeo: targetGeo || null,
+        targetAudience: targetAudience || null,
+        targetContext: targetContext || null,
         items: {
           create: items.map((i) => ({
             productId: i.productId,
@@ -308,12 +324,22 @@ export async function submitRequest(formData: FormData) {
       },
     });
 
+    // Fold structured targeting intent into the desk-facing brief so the
+    // desk sees it as readable lines, not just buried Plan columns.
+    const targetingLines = [
+      targetGeo && `Geo: ${targetGeo}`,
+      targetAudience && `Audience: ${targetAudience}`,
+      targetContext && `Context: ${targetContext}`,
+    ].filter(Boolean);
+    const briefSummary =
+      [brief, ...targetingLines].filter(Boolean).join("\n") || null;
+
     const req = await tx.request.create({
       data: {
         organizationId: org.id,
         planId: plan.id,
         status: allFirm ? "CLOSED" : "SUBMITTED",
-        briefSummary: brief || null,
+        briefSummary,
       },
     });
 

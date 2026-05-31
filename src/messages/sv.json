@@ -160,7 +160,12 @@
       "marketCount": "{count, plural, =0 {Alla marknader} =1 {1 marknad} other {# marknader}}",
       "compareMode": "Jämförelsväljare",
       "compareModeHint": "Markera titlar du vill jämföra sida vid sida",
-      "loading": "Uppdaterar…"
+      "loading": "Uppdaterar…",
+      "reach": "Räckvidd",
+      "anyReach": "All räckvidd",
+      "region": "Region",
+      "allRegions": "Alla regioner",
+      "regionCount": "{count, plural, =0 {Alla regioner} one {# region} other {# regioner}}"
     },
     "compareBar": {
       "label": "{count, plural, =1 {1 titel vald} other {# titlar valda}}",
@@ -259,7 +264,7 @@
     "duplicateAllInactive": "Alla titlar från den ordern är inaktiva nu. Bläddra i katalogen för att bygga en ny plan.",
     "pricingOnRequest": "Pris på begäran — fast offert inom 24 h",
     "startTitle": "Starta din kampanj",
-    "startLead": "Beskriv din målgrupp och marknad – vi föreslår titlar att bygga briefen kring.",
+    "startLead": "Berätta vilket marknad och budget du har — vi föreslår titlar att bygga din brief kring.",
     "recommend": "Föreslå titlar",
     "recommending": "Hittar titlar…",
     "recForBudget": "Rekommenderat för din budget",
@@ -288,7 +293,12 @@
     "requestingAs": "Beställer som",
     "loginRequired": "Logga in eller skapa ett konto för att begära offert:",
     "selectClient": "Välj en kund att agera för i",
-    "fromPrice": "från {price}"
+    "fromPrice": "från {price}",
+    "targetAudienceLabel": "Målgruppssegment (valfritt)",
+    "targetGeoLabel": "Geografiskt fokus (valfritt)",
+    "targetGeoPlaceholder": "t.ex. NO, SE — eller Götaland, Stockholm",
+    "targetContextLabel": "Redaktionellt sammanhang (valfritt)",
+    "targetContextPlaceholder": "t.ex. näringsliv, livsstil, sport"
   },
   "requests": {
     "title": "Förfrågan",
@@ -736,7 +746,7 @@
       "voice": "Mest visuellt — din rubrik, titelns layout",
       "brand": "Logo + tag i enheten; klick vidare till din destination",
       "reads": "Ett redaktionellt kort som visar sig vara sponsrat",
-      "bestFor": "Räckvidd, retargeting, kännedom mot en kurerad publik",
+      "bestFor": "Räckvidd och kännedom mot en kurerad publik",
       "rule": "Vill du ha titelns ram runt ett klick, inte runt orden — kör native display."
     },
     "package": {
@@ -752,7 +762,24 @@
     "ctaTitle": "Osäker på vilket som passar?",
     "ctaBody": "Skicka oss en brief så rekommenderar desken en formatmix för mål, publik och budget — samma dag.",
     "ctaContact": "Prata med desken",
-    "learnMore": "Så fungerar detta format"
+    "learnMore": "Så fungerar detta format",
+    "native-plus": {
+      "title": "Inspiration du kan agera på.",
+      "voice": "Titelns redaktionella röst, med köpbara ögonblick inbyggda",
+      "brand": "Namngiven annonsör; produkter tydligt märkta som köpbara",
+      "reads": "Ett reportage du kan agera på – tryck på en produkt, inte en banner",
+      "bestFor": "Genomtänkta köp där inspiration och handel hör ihop",
+      "rule": "Handeln är ett tillägg, aldrig en förklädnad – berättelsen måste fortfarande förtjäna läsningen."
+    },
+    "content-video": {
+      "title": "Video som förtjänar uppspelningen.",
+      "voice": "Video i titelns tonläge, inte en tv-reklam",
+      "brand": "Namngiven annonsör; märkt som betald i spelaren",
+      "reads": "Utgivarens egen video, i flöde och spelare",
+      "bestFor": "Berättelser som visas bättre än de berättas – demos, platser, människor",
+      "rule": "Förtjänar visningen på egna meriter; märkningen är alltid synlig."
+    },
+    "creativeSpecsLink": "Så förbereder du innehållet →"
   },
   "productType": {
     "NATIVE_ARTICLE": "Native-artikel",
@@ -767,7 +794,11 @@
     "descPACKAGE": "Native-artikel plus native display i samma titel — artikeln övertygar, displayen ger räckvidden.",
     "descCONTEXTUAL": "Placering som riktas efter sidans ämne och redaktionellt sammanhang istället för användardata — relevansen kommer från var annonsen visas.",
     "descOTHER": "Anpassat format som inte passar standardkategorierna — förhandlas vanligtvis från fall till fall.",
-    "CONTENT_FEE": "Innehållsproduktion"
+    "CONTENT_FEE": "Innehållsproduktion",
+    "NATIVE_PLUS": "Native Plus",
+    "CONTENT_VIDEO": "Innehållsvideo",
+    "descNATIVE_PLUS": "Köpbar native-artikel — redaktionellt innehåll med produktlänkar och köpknappar i själva artikeln, så att läsaren kan handla utan att lämna sidan.",
+    "descCONTENT_VIDEO": "Videodrivet sponsrat innehåll som spelas i utgivarens egen spelare och flöde, byggt för uppmärksamhet – inte en bannerplats."
   },
   "nativeFit": {
     "High": "Hög",
@@ -914,7 +945,18 @@
     "contentBody": "Innehållet är halva kostnaden och det mesta av prestandan i en native-kampanj. När vi paketerar det kan vi leverera spec-riktiga, märkningsriktiga artiklar inom utgivarens faktiska ledtid — och paketet slår att göra det själv.",
     "formatsEyebrow": "Format",
     "formatsTitle": "Det här erbjuds",
-    "formatsLead": "Varje titel i katalogen publicerar någon mix av dessa. Desken väljer den som passar briefen — och märkningsreglerna i det marknaden."
+    "formatsLead": "Varje titel i katalogen publicerar någon mix av dessa. Desken väljer den som passar briefen — och märkningsreglerna i det marknaden.",
+    "targetingEyebrow": "Målgruppsstyrning",
+    "targetingTitle": "Nå rätt läsare utifrån var, vad och vem.",
+    "targetingLead": "Målgruppsstyrning hos NativeSpin handlar om att välja rätt titlar — inte att jaga människor runt på webben.",
+    "targetingContextTitle": "Kontextuell",
+    "targetingContextBody": "Välj titlar efter kategori, vertikal och redaktionellt ämne, så att din story hamnar där den hör hemma.",
+    "targetingGeoTitle": "Geografisk",
+    "targetingGeoBody": "Filtrera på marknad, region, stad och räckvidd — nationellt varumärkesbygge eller en enda stad.",
+    "targetingAudienceTitle": "Målgruppssegment",
+    "targetingAudienceBody": "Varje titel har en definierad redaktionell publik — från regionala konsumenter till B2B-beslutsfattare.",
+    "targetingHonestyTitle": "Det vi inte gör",
+    "targetingHonestyBody": "Ingen beteendebaserad retargeting, inga intressegrafer, ingen data på användarnivå. Relevansen kommer från titeln, inte från att spåra läsaren."
   },
   "agencies": {
     "eyebrow": "För byråer",
@@ -1998,5 +2040,50 @@
     "matchedEyebrow": "Spelbok",
     "save": "Spara",
     "edit": "Redigera"
+  },
+  "creativeSpecs": {
+    "metaTitle": "Materialspecar — så förbereder du innehållet",
+    "eyebrow": "Materialspecar",
+    "title": "Så förbereder du innehållet",
+    "lead": "Det här behöver vi för att få en placering live, per format. Har du det redo går det snabbt.",
+    "article": {
+      "heading": "Artiklar (native-artikel, advertorial, Native Plus)",
+      "body": "500–800 ord (kortare går bra med starka bilder). Bilder på minst 1200×628 px, helst under 300 KB. Rubrik upp till 70 tecken, ingress upp till 200. Två till tre externa länkar. Räkna med 3 arbetsdagar för eget material, 10 om vi skriver det."
+    },
+    "nativePlus": {
+      "heading": "Native Plus — köpbara tillägg",
+      "body": "Upp till 3 produktlänkar eller -kort i artikeln. Varje behöver produktnamn, bild, pris och länk. Håll köpknapparna korta och ärliga (t.ex. ”Köp nu”, ”Se produkten”). Produkter märks tydligt som annons."
+    },
+    "video": {
+      "heading": "Innehållsvideo",
+      "body": "Upp till 60 sekunder fungerar bäst. Skicka en YouTube- eller Vimeo-länk, eller en MP4 på runt 200 MB. Bifoga en miniatyrbild och en kort ingress. Textning rekommenderas starkt – de flesta uppspelningar börjar utan ljud."
+    },
+    "disclosureHeading": "Märkning",
+    "disclosureBody": "Varje placering märks tydligt som betald med marknadens obligatoriska ordalydelse. Märkningen döljs, förminskas eller tas aldrig bort.",
+    "ctaTitle": "Redo att briefa oss?",
+    "ctaBody": "Skicka det du har – vi säger till om något saknas.",
+    "ctaContact": "Prata med teamet"
+  },
+  "reachTier": {
+    "reach": "Räckvidd",
+    "National": "Nationell",
+    "Regional": "Regional",
+    "Local": "Lokal",
+    "Niche": "Nisch"
+  },
+  "targetSegment": {
+    "general-consumer": "Allmänna konsumenter",
+    "regional-local": "Regionala / lokala läsare",
+    "affluent": "Välbärgade / lyx",
+    "families-parents": "Familjer och föräldrar",
+    "seniors-50plus": "Seniorer (50+)",
+    "b2b-decision-makers": "B2B-beslutsfattare",
+    "healthcare-pros": "Vårdpersonal",
+    "legal-finance-pros": "Juridik- och finansfolk",
+    "tech-it-pros": "Tech- och IT-folk",
+    "construction-property-pros": "Bygg och fastighet",
+    "farming-rural": "Lantbruk och landsbygd",
+    "lifestyle-hobby": "Livsstil och hobby",
+    "culture-media": "Kultur och medier"
   }
 }

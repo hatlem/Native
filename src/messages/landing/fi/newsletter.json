@@ -1,0 +1,18 @@
+{
+  "heading": "Etkö ole vielä valmis juttelemaan?",
+  "lead": "Saat silloin tällöin lyhyitä, asiapitoisia havaintoja natiivimainonnasta yhdeksällä markkina-alueellamme — uusia julkaisuja, formaatti-ideoita ja sitä, mikä oikeasti toimii. Voit perua tilauksen milloin tahansa.",
+  "placeholder": "sina@yritys.fi",
+  "button": "Pidä minut ajan tasalla",
+  "sending": "Lähetetään …",
+  "success": "Melkein valmista — vahvista tilaus sähköpostistasi.",
+  "error": "Tuo osoite ei näytä aivan oikealta. Tarkistaisitko sen?",
+  "footerHeading": "Pysy ajan tasalla",
+  "statusEyebrow": "Uutiskirje",
+  "status_confirmed_title": "Olet mukana.",
+  "status_confirmed_body": "Tilauksesi on vahvistettu. Otamme yhteyttä, kun meillä on jotain aikasi arvoista.",
+  "status_unsubscribed_title": "Tilauksesi on peruttu.",
+  "status_unsubscribed_body": "Et saa meiltä enää uutiskirjeitä. Voit tilata sen uudelleen milloin tahansa.",
+  "status_invalid_title": "Linkki ei toiminut.",
+  "status_invalid_body": "Linkki on saattanut vanhentua tai se on jo käytetty. Yritä tilata uudelleen miltä tahansa sivulta.",
+  "statusHome": "Takaisin etusivulle"
+}

@@ -13,6 +13,8 @@ const LANDING_SECTIONS = [
   "obj",
   "endCta",
   "foot",
+  "newsletter",
+  "team",
 ] as const;
 
 export default getRequestConfig(async ({ requestLocale }) => {

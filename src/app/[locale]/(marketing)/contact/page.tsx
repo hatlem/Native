@@ -3,6 +3,7 @@ import { getTranslations } from "next-intl/server";
 import { Link } from "@/i18n/navigation";
 import { LandingShell } from "@/app/landing-shell";
 import { MailLink } from "@/components";
+import { TeamRow } from "./_components/TeamRow";
 
 export async function generateMetadata({
   params,
@@ -37,6 +38,8 @@ export default async function ContactPage({
           <p className="lead">{t("lead")}</p>
         </div>
       </header>
+
+      <TeamRow locale={locale} />
 
       <section className="section">
         <div className="wrap">

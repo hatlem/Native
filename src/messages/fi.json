@@ -239,7 +239,12 @@
       "marketCount": "{count, plural, =0 {Kaikki markkinat} =1 {1 markkina} other {# markkinaa}}",
       "compareMode": "Vertailutyökalu",
       "compareModeHint": "Valitse julkaisut, joita haluat vertailla rinnakkain",
-      "loading": "Päivitetään…"
+      "loading": "Päivitetään…",
+      "reach": "Tavoittavuus",
+      "anyReach": "Mikä tahansa",
+      "region": "Alue",
+      "allRegions": "Kaikki alueet",
+      "regionCount": "{count, plural, =0 {Kaikki alueet} one {# alue} other {# aluetta}}"
     },
     "compareBar": {
       "label": "{count, plural, =1 {1 julkaisu valittu} other {# julkaisua valittu}}",
@@ -338,7 +343,7 @@
     "duplicateAllInactive": "Kaikki kyseisen tilauksen julkaisut ovat nyt inaktiivisia. Selaa katalogia luodaksesi uusi suunnitelma.",
     "pricingOnRequest": "Hinta pyynnöstä — sitova tarjous 24 t kuluessa",
     "startTitle": "Aloita kampanjasi",
-    "startLead": "Kuvaile yleisösi ja markkinasi – ehdotamme julkaisuja briefin pohjaksi.",
+    "startLead": "Kerro meille markkinasi ja budjettisi — ehdotamme julkaisuja, joiden ympärille rakentaa briefisi.",
     "recommend": "Ehdota julkaisuja",
     "recommending": "Etsitään julkaisuja…",
     "recForBudget": "Suositeltu budjetillesi",
@@ -367,7 +372,12 @@
     "requestingAs": "Pyytäjä",
     "loginRequired": "Kirjaudu sisään tai luo tili pyytääksesi tarjouksen:",
     "selectClient": "Valitse asiakas, jonka puolesta toimit",
-    "fromPrice": "alkaen {price}"
+    "fromPrice": "alkaen {price}",
+    "targetAudienceLabel": "Yleisösegmentit (valinnainen)",
+    "targetGeoLabel": "Maantieteellinen painopiste (valinnainen)",
+    "targetGeoPlaceholder": "esim. NO, SE — tai Uusimaa, Helsinki",
+    "targetContextLabel": "Toimituksellinen konteksti (valinnainen)",
+    "targetContextPlaceholder": "esim. talous, elämäntapa, urheilu"
   },
   "requests": {
     "title": "Pyyntö",
@@ -815,7 +825,7 @@
       "voice": "Lähinnä visuaalinen — sinun otsikkosi, julkaisun layout",
       "brand": "Logo + tagi yksikössä; klikkaus omaan kohteeseen",
       "reads": "Toimituksellinen kortti, joka osoittautuu sponsoroiduksi",
-      "bestFor": "Tavoittavuus, uudelleenmarkkinointi, tunnettuus kuratoidulle yleisölle",
+      "bestFor": "Tavoittavuus ja tunnettuus kuratoidulle yleisölle",
       "rule": "Jos haluat julkaisun kehyksen klikkauksen ympärille, et sen sanojen, valitse natiivi display."
     },
     "package": {
@@ -831,7 +841,24 @@
     "ctaTitle": "Et tiedä mikä sopii?",
     "ctaBody": "Lähetä meille brief, niin desk suosittelee formaattimiksin tavoitteellesi, yleisöllesi ja budjetillesi — samana päivänä.",
     "ctaContact": "Keskustele deskin kanssa",
-    "learnMore": "Näin tämä formaatti toimii"
+    "learnMore": "Näin tämä formaatti toimii",
+    "native-plus": {
+      "title": "Inspiraatiota, johon voi tarttua.",
+      "voice": "Julkaisun toimituksellinen ääni, ostettavat hetket sisäänrakennettuna",
+      "brand": "Nimetty mainostaja; tuotteet selkeästi merkitty ostettaviksi",
+      "reads": "Juttu, johon voi tarttua – napauta tuotetta, ei banneria",
+      "bestFor": "Harkitut ostokset, joissa inspiraatio ja ostaminen kuuluvat yhteen",
+      "rule": "Kauppa on lisä, ei valeasu – jutun on silti ansaittava lukeminen."
+    },
+    "content-video": {
+      "title": "Video, joka ansaitsee katselun.",
+      "voice": "Video julkaisun sävyssä, ei tv-mainos",
+      "brand": "Nimetty mainostaja; merkitty maksetuksi soittimessa",
+      "reads": "Julkaisijan oma video, syötteessä ja soittimessa",
+      "bestFor": "Tarinat, jotka on parempi näyttää kuin kertoa – demot, paikat, ihmiset",
+      "rule": "Ansaitsee katselun omilla ansioillaan; merkintä on aina näkyvissä."
+    },
+    "creativeSpecsLink": "Näin valmistelet sisällön →"
   },
   "productType": {
     "NATIVE_ARTICLE": "Natiiviartikkeli",
@@ -846,7 +873,11 @@
     "descPACKAGE": "Pakettina natiiviartikkeli ja natiivi display -vahvistus samassa julkaisussa — artikkeli vakuuttaa, display tuo tavoittavuuden.",
     "descCONTEXTUAL": "Sijoittelu kohdistetaan sivun aiheen ja toimituksellisen kontekstin perusteella käyttäjädatan sijaan — relevanssi tulee siitä, missä mainos näkyy.",
     "descOTHER": "Mukautettu formaatti, joka ei sovi vakiokategorioihin — neuvotellaan tyypillisesti tapauskohtaisesti.",
-    "CONTENT_FEE": "Sisällöntuotanto"
+    "CONTENT_FEE": "Sisällöntuotanto",
+    "NATIVE_PLUS": "Native Plus",
+    "CONTENT_VIDEO": "Sisältövideo",
+    "descNATIVE_PLUS": "Ostettava natiiviartikkeli — toimituksellisen tasoinen sisältö, jossa on tuotelinkit ja ostopainikkeet itse artikkelissa, joten lukija voi toimia poistumatta sivulta.",
+    "descCONTENT_VIDEO": "Videovetoinen kaupallinen sisältö, joka toistetaan julkaisijan omassa soittimessa ja syötteessä – tehty huomiolle, ei banneripaikaksi."
   },
   "nativeFit": {
     "High": "Korkea",
@@ -914,7 +945,18 @@
     "contentBody": "Sisältö on puolet kustannuksesta ja suurin osa natiivikampanjan suorituskyvystä. Paketointi tarkoittaa, että voimme toimittaa spesifikaatioiden mukaisia, merkinnältään oikein olevia artikkeleita kustantajan oikeasti tarjoamassa toimitusajassa — ja paketti voittaa itsetekemisen.",
     "formatsEyebrow": "Formaatit",
     "formatsTitle": "Mitä on tarjolla",
-    "formatsLead": "Jokainen katalogin julkaisu julkaisee jonkin yhdistelmän näistä. Desk valitsee briifiin sopivan — ja sen markkinan merkintäsääntöihin sopivan."
+    "formatsLead": "Jokainen katalogin julkaisu julkaisee jonkin yhdistelmän näistä. Desk valitsee briifiin sopivan — ja sen markkinan merkintäsääntöihin sopivan.",
+    "targetingEyebrow": "Kohdennus",
+    "targetingTitle": "Tavoita oikeat lukijat sen mukaan, missä, mitä ja kuka.",
+    "targetingLead": "Kohdennus NativeSpinissä tarkoittaa oikeiden julkaisujen valitsemista — ei ihmisten jahtaamista ympäri verkkoa.",
+    "targetingContextTitle": "Kontekstuaalinen",
+    "targetingContextBody": "Valitse julkaisut kategorian, toimialan ja toimituksellisen aiheen mukaan, jotta juttusi on siellä, minne se kuuluu.",
+    "targetingGeoTitle": "Maantieteellinen",
+    "targetingGeoBody": "Suodata markkinan, alueen, kaupungin ja tavoittavuuden mukaan — valtakunnallista brändinrakennusta tai yksi kaupunki.",
+    "targetingAudienceTitle": "Yleisösegmentti",
+    "targetingAudienceBody": "Jokaisella julkaisulla on määritelty toimituksellinen yleisö — alueellisista kuluttajista B2B-päättäjiin.",
+    "targetingHonestyTitle": "Mitä emme tee",
+    "targetingHonestyBody": "Ei käyttäytymiseen perustuvaa uudelleenmarkkinointia, ei kiinnostusprofiileja, ei käyttäjätason dataa. Relevanssi tulee julkaisusta, ei lukijan seuraamisesta."
   },
   "agencies": {
     "eyebrow": "Toimistoille",
@@ -1998,5 +2040,50 @@
     "matchedEyebrow": "Pelikirja",
     "save": "Tallenna",
     "edit": "Muokkaa"
+  },
+  "creativeSpecs": {
+    "metaTitle": "Materiaalivaatimukset — näin valmistelet sisällön",
+    "eyebrow": "Materiaalivaatimukset",
+    "title": "Näin valmistelet sisällön",
+    "lead": "Tämän tarvitsemme saadaksemme julkaisun ilmoille, formaateittain. Kun nämä ovat valmiina, homma etenee nopeasti.",
+    "article": {
+      "heading": "Artikkelit (natiiviartikkeli, advertoriaali, Native Plus)",
+      "body": "500–800 sanaa (lyhyempi käy vahvoilla kuvilla). Kuvat vähintään 1200×628 px, mielellään alle 300 kt. Otsikko enintään 70 merkkiä, ingressi enintään 200. Kaksi tai kolme ulkoista linkkiä. Varaa 3 työpäivää omalle materiaalille, 10 jos kirjoitamme sen."
+    },
+    "nativePlus": {
+      "heading": "Native Plus — ostettavat lisät",
+      "body": "Enintään 3 tuotelinkkiä tai -korttia artikkelissa. Kukin tarvitsee tuotenimen, kuvan, hinnan ja linkin. Pidä ostopainikkeet lyhyinä ja rehellisinä (esim. ”Osta nyt”, ”Katso tuote”). Tuotteet merkitään selkeästi mainokseksi."
+    },
+    "video": {
+      "heading": "Sisältövideo",
+      "body": "Enintään 60 sekuntia toimii parhaiten. Lähetä YouTube- tai Vimeo-linkki tai MP4 noin 200 Mt asti. Liitä mukaan pienoiskuva ja lyhyt ingressi. Tekstitystä suositellaan vahvasti – useimmat katselut alkavat ilman ääntä."
+    },
+    "disclosureHeading": "Merkintä",
+    "disclosureBody": "Jokainen julkaisu merkitään selkeästi maksetuksi markkinan vaatimalla sanamuodolla. Merkintää ei koskaan piiloteta, pienennetä tai poisteta.",
+    "ctaTitle": "Valmis briiffaamaan meidät?",
+    "ctaBody": "Lähetä mitä sinulla on – kerromme, mitä puuttuu.",
+    "ctaContact": "Keskustele tiimin kanssa"
+  },
+  "reachTier": {
+    "reach": "Tavoittavuus",
+    "National": "Valtakunnallinen",
+    "Regional": "Alueellinen",
+    "Local": "Paikallinen",
+    "Niche": "Nichemedia"
+  },
+  "targetSegment": {
+    "general-consumer": "Yleiskuluttajat",
+    "regional-local": "Alueelliset / paikalliset lukijat",
+    "affluent": "Varakkaat / luksus",
+    "families-parents": "Perheet ja vanhemmat",
+    "seniors-50plus": "Seniorit (50+)",
+    "b2b-decision-makers": "B2B-päättäjät",
+    "healthcare-pros": "Terveydenhuollon ammattilaiset",
+    "legal-finance-pros": "Laki- ja finanssialan ammattilaiset",
+    "tech-it-pros": "Tech- ja IT-ammattilaiset",
+    "construction-property-pros": "Rakentaminen ja kiinteistöt",
+    "farming-rural": "Maatalous ja maaseutu",
+    "lifestyle-hobby": "Elämäntapa ja harrastukset",
+    "culture-media": "Kulttuuri ja media"
   }
 }

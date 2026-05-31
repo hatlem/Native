@@ -14,13 +14,21 @@ export async function generateMetadata({
   return { title: t("metaTitle"), description: t("lead") };
 }
 
-type Slug = "native-article" | "advertorial" | "native-display" | "package";
+type Slug =
+  | "native-article"
+  | "advertorial"
+  | "native-display"
+  | "package"
+  | "native-plus"
+  | "content-video";
 
 const FORMATS: { slug: Slug; type: ProductType; key: string }[] = [
   { slug: "native-article", type: ProductType.NATIVE_ARTICLE, key: "NATIVE_ARTICLE" },
   { slug: "advertorial", type: ProductType.ADVERTORIAL, key: "ADVERTORIAL" },
   { slug: "native-display", type: ProductType.NATIVE_DISPLAY, key: "NATIVE_DISPLAY" },
   { slug: "package", type: ProductType.PACKAGE, key: "PACKAGE" },
+  { slug: "native-plus", type: ProductType.NATIVE_PLUS, key: "NATIVE_PLUS" },
+  { slug: "content-video", type: ProductType.CONTENT_VIDEO, key: "CONTENT_VIDEO" },
 ];
 
 export default async function FormatsPage({
@@ -125,6 +133,9 @@ export default async function FormatsPage({
         <div className="wrap">
           <h2>{t("disclosureTitle")}</h2>
           <p className="prose">{t("disclosureBody")}</p>
+          <p className="prose">
+            <Link href="/resources/creative-specs">{t("creativeSpecsLink")}</Link>
+          </p>
         </div>
       </section>
 

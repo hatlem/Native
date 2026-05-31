@@ -239,7 +239,12 @@
       "marketCount": "{count, plural, =0 {All markets} =1 {1 market} other {# markets}}",
       "compareMode": "Compare picker",
       "compareModeHint": "Tick titles to compare side-by-side",
-      "loading": "Updating…"
+      "loading": "Updating…",
+      "reach": "Reach",
+      "anyReach": "Any reach",
+      "region": "Region",
+      "allRegions": "All regions",
+      "regionCount": "{count, plural, =0 {All regions} one {# region} other {# regions}}"
     },
     "compareBar": {
       "label": "{count, plural, =1 {1 title selected} other {# titles selected}}",
@@ -338,7 +343,7 @@
     "duplicateAllInactive": "All titles from that order are inactive now. Browse the catalog to build a fresh plan.",
     "pricingOnRequest": "Pricing on request — firm quote in 24 h",
     "startTitle": "Start your campaign",
-    "startLead": "Describe your audience and market — we will suggest titles to build your brief around.",
+    "startLead": "Tell us your market and budget — we'll suggest titles to build your brief around.",
     "recommend": "Recommend titles",
     "recommending": "Finding titles…",
     "recForBudget": "Recommended for your budget",
@@ -367,7 +372,12 @@
     "requestingAs": "Requesting as",
     "loginRequired": "Sign in or create an account to request a quote:",
     "selectClient": "Select a client to act for in the",
-    "fromPrice": "from {price}"
+    "fromPrice": "from {price}",
+    "targetAudienceLabel": "Audience segments (optional)",
+    "targetGeoLabel": "Geographic focus (optional)",
+    "targetGeoPlaceholder": "e.g. NO, SE — or Vestlandet, Oslo",
+    "targetContextLabel": "Editorial context (optional)",
+    "targetContextPlaceholder": "e.g. business, lifestyle, sport"
   },
   "requests": {
     "title": "Request",
@@ -814,7 +824,7 @@
       "voice": "Mostly visual — your headline, the title's layout",
       "brand": "Logo + tag in the unit; click-through to your destination",
       "reads": "An editorial card that turns out to be sponsored",
-      "bestFor": "Reach, retargeting, awareness against a curated audience",
+      "bestFor": "Reach and awareness against a curated audience",
       "rule": "If you want the title's frame around a click, not its words, run native display."
     },
     "package": {
@@ -830,7 +840,24 @@
     "ctaTitle": "Not sure which fits?",
     "ctaBody": "Send us a brief and the desk recommends a format mix for your goal, audience and budget — same day.",
     "ctaContact": "Talk to the desk",
-    "learnMore": "How this format works"
+    "learnMore": "How this format works",
+    "native-plus": {
+      "title": "Inspiration you can act on.",
+      "voice": "The title's editorial voice, with shoppable moments built in",
+      "brand": "Named advertiser; products clearly marked as buyable",
+      "reads": "A feature you can act on — tap a product, not a banner",
+      "bestFor": "Considered products where inspiration and purchase belong together",
+      "rule": "Commerce is additive, never the disguise — the story still earns the read."
+    },
+    "content-video": {
+      "title": "Video that earns the play.",
+      "voice": "Video in the title's register, not a TV spot",
+      "brand": "Named advertiser; disclosed as paid in the player",
+      "reads": "The publisher's own video, in-feed and in-player",
+      "bestFor": "Stories better shown than told — demos, places, people",
+      "rule": "Earns the view on its own merit; the disclosure is always visible."
+    },
+    "creativeSpecsLink": "How to prepare your content →"
   },
   "productType": {
     "NATIVE_ARTICLE": "Native article",
@@ -845,7 +872,11 @@
     "descPACKAGE": "Bundled native article plus native display amplification in the same title — the article does the persuasion, the display does the reach.",
     "descCONTEXTUAL": "Placement targeted by page topic and surrounding editorial context rather than user data — the relevance comes from where the ad runs.",
     "descOTHER": "Custom or one-off format that doesn't fit the standard categories — typically negotiated case by case.",
-    "CONTENT_FEE": "Content production"
+    "CONTENT_FEE": "Content production",
+    "NATIVE_PLUS": "Native Plus",
+    "CONTENT_VIDEO": "Content video",
+    "descNATIVE_PLUS": "Shoppable native article — editorial-grade copy with in-article product links and buy buttons, so readers can act without leaving the page.",
+    "descCONTENT_VIDEO": "Video-led sponsored placement that runs in the publisher's player and feed, built for attention rather than a banner slot."
   },
   "nativeFit": {
     "High": "High",
@@ -913,7 +944,18 @@
     "contentBody": "Content is half the cost and most of the performance of a native campaign. Bundling it means we can ship spec-compliant, disclosure-correct articles in the lead time the publisher actually quotes — and the total bundle beats DIY.",
     "formatsEyebrow": "Formats",
     "formatsTitle": "What's on offer",
-    "formatsLead": "Every title in the catalog publishes some mix of these. The desk picks the one that fits the brief — and the disclosure rules of that market."
+    "formatsLead": "Every title in the catalog publishes some mix of these. The desk picks the one that fits the brief — and the disclosure rules of that market.",
+    "targetingEyebrow": "Targeting",
+    "targetingTitle": "Reach the right readers by where, what, and who.",
+    "targetingLead": "Targeting on NativeSpin means choosing the right titles — not chasing people around the web.",
+    "targetingContextTitle": "Contextual",
+    "targetingContextBody": "Pick titles by category, vertical, and editorial topic, so your story runs where it belongs.",
+    "targetingGeoTitle": "Geographic",
+    "targetingGeoBody": "Filter by market, region, city, and reach tier — national brand build or a single city.",
+    "targetingAudienceTitle": "Audience segment",
+    "targetingAudienceBody": "Each title carries a defined editorial audience — from regional consumers to B2B decision-makers.",
+    "targetingHonestyTitle": "What we don't do",
+    "targetingHonestyBody": "No behavioural retargeting, no interest graphs, no user-level data. The relevance comes from the title, not from tracking the reader."
   },
   "agencies": {
     "eyebrow": "For agencies",
@@ -1997,5 +2039,50 @@
     "matchedEyebrow": "Playbook",
     "save": "Save",
     "edit": "Edit"
+  },
+  "creativeSpecs": {
+    "metaTitle": "Creative specs — how to prepare your content",
+    "eyebrow": "Creative specs",
+    "title": "How to prepare your content",
+    "lead": "What we need from you to get a placement live, by format. Bring these and the desk can move fast.",
+    "article": {
+      "heading": "Articles (Native Article, Advertorial, Native Plus)",
+      "body": "500–800 words (shorter is fine with strong visuals). Images at least 1200×628 px, ideally under 300 KB. Headline up to 70 characters, teaser up to 200. Two to three external links. Allow 3 working days for your material, 10 if we write it."
+    },
+    "nativePlus": {
+      "heading": "Native Plus — shoppable extras",
+      "body": "Up to 3 in-article product links or cards. Each needs a product name, image, price, and destination URL. Keep buy-button wording short and honest (e.g. \"Shop now\", \"See the product\"). Products are clearly marked as advertising."
+    },
+    "video": {
+      "heading": "Content video",
+      "body": "Up to 60 seconds works best. Supply a YouTube or Vimeo link, or an MP4 up to roughly 200 MB. Include a thumbnail and a one-line teaser. Captions strongly recommended — most plays start muted."
+    },
+    "disclosureHeading": "Disclosure",
+    "disclosureBody": "Every placement is clearly marked as paid in the market's required wording. The label is never hidden, shrunk, or removed.",
+    "ctaTitle": "Ready to brief us?",
+    "ctaBody": "Send what you have — we'll tell you what's missing.",
+    "ctaContact": "Talk to the desk"
+  },
+  "reachTier": {
+    "reach": "Reach",
+    "National": "National",
+    "Regional": "Regional",
+    "Local": "Local",
+    "Niche": "Niche"
+  },
+  "targetSegment": {
+    "general-consumer": "General consumers",
+    "regional-local": "Regional / local audiences",
+    "affluent": "Affluent / luxury",
+    "families-parents": "Families & parents",
+    "seniors-50plus": "Seniors (50+)",
+    "b2b-decision-makers": "B2B decision-makers",
+    "healthcare-pros": "Healthcare professionals",
+    "legal-finance-pros": "Legal & finance professionals",
+    "tech-it-pros": "Tech & IT professionals",
+    "construction-property-pros": "Construction & property pros",
+    "farming-rural": "Farming & rural",
+    "lifestyle-hobby": "Lifestyle & hobby",
+    "culture-media": "Culture & media"
   }
 }

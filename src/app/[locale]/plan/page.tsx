@@ -17,6 +17,7 @@ import {
 } from "@/lib/brief-match";
 import { enrichBriefWithLLM, llmEnrichmentAvailable } from "@/lib/brief-match-llm";
 import { removeFromPlan, submitRequest, setQuantity, addToPlan, setContentProduction } from "@/app/actions";
+import { AUDIENCE_SEGMENTS } from "@/lib/targeting/segments";
 import { SubmitButton } from "@/components";
 
 const MARKET_CODES = Object.values(MarketCode);
@@ -35,6 +36,7 @@ export default async function PlanPage({
   const t = await getTranslations({ locale, namespace: "plan" });
   const tf = await getTranslations({ locale, namespace: "firm" });
   const tr = await getTranslations({ locale, namespace: "rfq" });
+  const tSeg = await getTranslations({ locale, namespace: "targetSegment" });
   const tType = await getTranslations({ locale, namespace: "productType" });
   const ta = await getTranslations({ locale, namespace: "auth" });
   const tNav = await getTranslations({ locale, namespace: "nav" });
@@ -524,6 +526,42 @@ export default async function PlanPage({
                     id="goal"
                     name="goal"
                     defaultValue={briefDraft.goal}
+                  />
+                </div>
+                <div className="field">
+                  <label>{tr("targetAudienceLabel")}</label>
+                  <div className="checkbox-grid">
+                    {AUDIENCE_SEGMENTS.map((s) => (
+                      <label key={s} className="checkbox">
+                        <input
+                          type="checkbox"
+                          name="targetAudience"
+                          value={s}
+                          defaultChecked={briefDraft.targetAudience
+                            .split(",")
+                            .includes(s)}
+                        />
+                        {tSeg(s)}
+                      </label>
+                    ))}
+                  </div>
+                </div>
+                <div className="field">
+                  <label htmlFor="targetGeo">{tr("targetGeoLabel")}</label>
+                  <input
+                    id="targetGeo"
+                    name="targetGeo"
+                    defaultValue={briefDraft.targetGeo}
+                    placeholder={tr("targetGeoPlaceholder")}
+                  />
+                </div>
+                <div className="field">
+                  <label htmlFor="targetContext">{tr("targetContextLabel")}</label>
+                  <input
+                    id="targetContext"
+                    name="targetContext"
+                    defaultValue={briefDraft.targetContext}
+                    placeholder={tr("targetContextPlaceholder")}
                   />
                 </div>
                 <div className="field">

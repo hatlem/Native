@@ -3,12 +3,15 @@ import { getTranslations } from "next-intl/server";
 import { ProductType } from "@prisma/client";
 import { Link } from "@/i18n/navigation";
 import { LandingShell } from "@/app/landing-shell";
+import { PublisherStrip } from "../_components/PublisherStrip";
 
 const FORMAT_KEYS: ProductType[] = [
   ProductType.NATIVE_ARTICLE,
   ProductType.ADVERTORIAL,
   ProductType.NATIVE_DISPLAY,
   ProductType.PACKAGE,
+  ProductType.NATIVE_PLUS,
+  ProductType.CONTENT_VIDEO,
 ];
 
 export async function generateMetadata({
@@ -57,6 +60,8 @@ export default async function ForAdvertisersPage({
           </div>
         </div>
       </header>
+
+      <PublisherStrip locale={locale} />
 
       <section className="section">
         <div className="wrap">
@@ -120,6 +125,36 @@ export default async function ForAdvertisersPage({
         <div className="wrap">
           <h2>{t("contentTitle")}</h2>
           <p className="prose">{t("contentBody")}</p>
+        </div>
+      </section>
+
+      <section className="section">
+        <div className="wrap">
+          <div className="section-head">
+            <div>
+              <span className="eyebrow accent">{t("targetingEyebrow")}</span>
+              <h2>{t("targetingTitle")}</h2>
+            </div>
+            <p className="lead">{t("targetingLead")}</p>
+          </div>
+          <div className="grid">
+            <article className="card">
+              <h3>{t("targetingContextTitle")}</h3>
+              <p className="muted">{t("targetingContextBody")}</p>
+            </article>
+            <article className="card">
+              <h3>{t("targetingGeoTitle")}</h3>
+              <p className="muted">{t("targetingGeoBody")}</p>
+            </article>
+            <article className="card">
+              <h3>{t("targetingAudienceTitle")}</h3>
+              <p className="muted">{t("targetingAudienceBody")}</p>
+            </article>
+          </div>
+          <p className="prose" style={{ marginTop: 20 }}>
+            <strong>{t("targetingHonestyTitle")}: </strong>
+            {t("targetingHonestyBody")}
+          </p>
         </div>
       </section>
 

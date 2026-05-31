@@ -18,16 +18,19 @@ export const dynamic = "force-dynamic";
 
 const MARKET_CODES = Object.values(MarketCode);
 const PRODUCT_TYPES = Object.values(ProductType);
-// Marketing surface highlights the canonical four — research-only enum
-// members (CONTEXTUAL, OTHER) intentionally don't show in the format gallery.
+// Catalog format filter highlights the buyable formats — research-only enum
+// members (CONTEXTUAL, OTHER) intentionally don't show in the filter.
 const FORMAT_KEYS: ProductType[] = [
   ProductType.NATIVE_ARTICLE,
   ProductType.ADVERTORIAL,
   ProductType.NATIVE_DISPLAY,
   ProductType.PACKAGE,
+  ProductType.NATIVE_PLUS,
+  ProductType.CONTENT_VIDEO,
 ];
 const NATIVE_FIT_VALUES = ["High", "Medium", "Low"] as const;
 const B2B_B2C_VALUES = ["B2B", "B2C"] as const;
+const REACH_VALUES = ["National", "Regional", "Local", "Niche"] as const;
 const PAGE_SIZE = 60;
 
 function asEnum<T extends string>(
@@ -57,6 +60,7 @@ export default async function CatalogPage({
   const tType = await getTranslations({ locale, namespace: "productType" });
   const tMarket = await getTranslations({ locale, namespace: "market" });
   const tFit = await getTranslations({ locale, namespace: "nativeFit" });
+  const tReach = await getTranslations({ locale, namespace: "reachTier" });
   const tv = await getTranslations({
     locale,
     namespace: "priceVisibility",
@@ -92,6 +96,8 @@ export default async function CatalogPage({
     );
   const verticalsRaw = typeof sp.vertical === "string" ? sp.vertical : "";
   const verticals = verticalsRaw.split(",").map((s) => s.trim()).filter(Boolean);
+  const regionsRaw = typeof sp.region === "string" ? sp.region : "";
+  const regions = regionsRaw.split(",").map((s) => s.trim()).filter(Boolean);
   const nativeFit = asEnum(
     typeof sp.nativeFit === "string" ? sp.nativeFit : undefined,
     NATIVE_FIT_VALUES,
@@ -99,6 +105,10 @@ export default async function CatalogPage({
   const b2bB2c = asEnum(
     typeof sp.b2bB2c === "string" ? sp.b2bB2c : undefined,
     B2B_B2C_VALUES,
+  );
+  const reach = asEnum(
+    typeof sp.reach === "string" ? sp.reach : undefined,
+    REACH_VALUES,
   );
   const onlyPriced =
     typeof sp.onlyPriced === "string" && sp.onlyPriced === "1";
@@ -128,6 +138,7 @@ export default async function CatalogPage({
       ? { products: { some: { type: { in: types }, active: true } } }
       : {}),
     ...(verticals.length ? { vertical: { in: verticals } } : {}),
+    ...(regions.length ? { region: { in: regions } } : {}),
     // "Priced titles only" = a buyer can actually see a € figure. Mirror
     // isProductPriceShown (src/lib/pricing/visibility.ts): an active,
     // sales-confirmed product AND both title + publisher prices public.
@@ -143,6 +154,7 @@ export default async function CatalogPage({
       : {}),
     ...(nativeFit ? { nativeFit } : {}),
     ...(b2bB2c ? { b2bB2c } : {}),
+    ...(reach ? { reach } : {}),
     ...(matchedIds
       ? { id: { in: matchedIds } }
       : q
@@ -152,6 +164,7 @@ export default async function CatalogPage({
               { category: { contains: q, mode: "insensitive" } },
               { vertical: { contains: q, mode: "insensitive" } },
               { tags: { contains: q, mode: "insensitive" } },
+              { city: { contains: q, mode: "insensitive" } },
             ],
           }
         : {}),
@@ -165,6 +178,18 @@ export default async function CatalogPage({
   });
   const verticalOptions = verticalRows
     .map((r) => r.vertical!)
+    .filter((v) => v.trim().length > 0);
+
+  // Distinct regions present from the geo backfill — drives the region
+  // multiselect. Null regions (national/unknown titles) don't appear.
+  const regionRows = await prisma.title.findMany({
+    where: { region: { not: null } },
+    select: { region: true },
+    distinct: ["region"],
+    orderBy: { region: "asc" },
+  });
+  const regionOptions = regionRows
+    .map((r) => r.region!)
     .filter((v) => v.trim().length > 0);
 
   const [totalCount, titles] = await Promise.all([
@@ -304,14 +329,18 @@ export default async function CatalogPage({
         formats={PRODUCT_TYPES.map((pt) => ({ value: pt, label: tType(pt) }))}
         nativeFits={NATIVE_FIT_VALUES.map((v) => ({ value: v, label: tFit(v) }))}
         b2bB2cs={B2B_B2C_VALUES.map((v) => ({ value: v, label: v }))}
+        reaches={REACH_VALUES.map((v) => ({ value: v, label: tReach(v) }))}
         categories={verticalOptions.map((v) => ({ value: v, label: v }))}
+        regions={regionOptions.map((v) => ({ value: v, label: v }))}
         initial={{
           q,
           markets,
           types,
           verticals,
+          regions,
           nativeFit: nativeFit ?? "",
           b2bB2c: b2bB2c ?? "",
+          reach: reach ?? "",
           onlyPriced,
           advancedOpen,
           compareMode,
