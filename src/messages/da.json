@@ -288,7 +288,12 @@
     "submitting": "Sender brief…",
     "requestingAs": "Bestiller som",
     "loginRequired": "Log ind eller opret en konto for at anmode om tilbud:",
-    "selectClient": "Vælg en kunde at handle for i"
+    "selectClient": "Vælg en kunde at handle for i",
+    "targetAudienceLabel": "Målgruppesegmenter (valgfrit)",
+    "targetGeoLabel": "Geografisk fokus (valgfrit)",
+    "targetGeoPlaceholder": "f.eks. NO, SE — eller Midtjylland, København",
+    "targetContextLabel": "Redaktionel kontekst (valgfrit)",
+    "targetContextPlaceholder": "f.eks. erhverv, livsstil, sport"
   },
   "requests": {
     "title": "Anmodning",
@@ -2045,5 +2050,20 @@
     "Regional": "Regional",
     "Local": "Lokal",
     "Niche": "Niche"
+  },
+  "targetSegment": {
+    "general-consumer": "Almindelige forbrugere",
+    "regional-local": "Regionale / lokale læsere",
+    "affluent": "Velhavende / luksus",
+    "families-parents": "Familier og forældre",
+    "seniors-50plus": "Seniorer (50+)",
+    "b2b-decision-makers": "B2B-beslutningstagere",
+    "healthcare-pros": "Sundhedsprofessionelle",
+    "legal-finance-pros": "Jura- og finansfolk",
+    "tech-it-pros": "Tech- og it-folk",
+    "construction-property-pros": "Byggeri og ejendom",
+    "farming-rural": "Landbrug og land",
+    "lifestyle-hobby": "Livsstil og hobby",
+    "culture-media": "Kultur og medier"
   }
 }

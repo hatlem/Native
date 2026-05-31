@@ -367,7 +367,12 @@
     "submitting": "Sending brief…",
     "requestingAs": "Requesting as",
     "loginRequired": "Sign in or create an account to request a quote:",
-    "selectClient": "Select a client to act for in the"
+    "selectClient": "Select a client to act for in the",
+    "targetAudienceLabel": "Audience segments (optional)",
+    "targetGeoLabel": "Geographic focus (optional)",
+    "targetGeoPlaceholder": "e.g. NO, SE — or Vestlandet, Oslo",
+    "targetContextLabel": "Editorial context (optional)",
+    "targetContextPlaceholder": "e.g. business, lifestyle, sport"
   },
   "requests": {
     "title": "Request",
@@ -2043,5 +2048,20 @@
     "Regional": "Regional",
     "Local": "Local",
     "Niche": "Niche"
+  },
+  "targetSegment": {
+    "general-consumer": "General consumers",
+    "regional-local": "Regional / local audiences",
+    "affluent": "Affluent / luxury",
+    "families-parents": "Families & parents",
+    "seniors-50plus": "Seniors (50+)",
+    "b2b-decision-makers": "B2B decision-makers",
+    "healthcare-pros": "Healthcare professionals",
+    "legal-finance-pros": "Legal & finance professionals",
+    "tech-it-pros": "Tech & IT professionals",
+    "construction-property-pros": "Construction & property pros",
+    "farming-rural": "Farming & rural",
+    "lifestyle-hobby": "Lifestyle & hobby",
+    "culture-media": "Culture & media"
   }
 }

@@ -367,7 +367,12 @@
     "submitting": "Brief lähetetään…",
     "requestingAs": "Pyytäjä",
     "loginRequired": "Kirjaudu sisään tai luo tili pyytääksesi tarjouksen:",
-    "selectClient": "Valitse asiakas, jonka puolesta toimit"
+    "selectClient": "Valitse asiakas, jonka puolesta toimit",
+    "targetAudienceLabel": "Yleisösegmentit (valinnainen)",
+    "targetGeoLabel": "Maantieteellinen painopiste (valinnainen)",
+    "targetGeoPlaceholder": "esim. NO, SE — tai Uusimaa, Helsinki",
+    "targetContextLabel": "Toimituksellinen konteksti (valinnainen)",
+    "targetContextPlaceholder": "esim. talous, elämäntapa, urheilu"
   },
   "requests": {
     "title": "Pyyntö",
@@ -2044,5 +2049,20 @@
     "Regional": "Alueellinen",
     "Local": "Paikallinen",
     "Niche": "Nichemedia"
+  },
+  "targetSegment": {
+    "general-consumer": "Yleiskuluttajat",
+    "regional-local": "Alueelliset / paikalliset lukijat",
+    "affluent": "Varakkaat / luksus",
+    "families-parents": "Perheet ja vanhemmat",
+    "seniors-50plus": "Seniorit (50+)",
+    "b2b-decision-makers": "B2B-päättäjät",
+    "healthcare-pros": "Terveydenhuollon ammattilaiset",
+    "legal-finance-pros": "Laki- ja finanssialan ammattilaiset",
+    "tech-it-pros": "Tech- ja IT-ammattilaiset",
+    "construction-property-pros": "Rakentaminen ja kiinteistöt",
+    "farming-rural": "Maatalous ja maaseutu",
+    "lifestyle-hobby": "Elämäntapa ja harrastukset",
+    "culture-media": "Kulttuuri ja media"
   }
 }

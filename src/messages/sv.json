@@ -288,7 +288,12 @@
     "submitting": "Skickar brief…",
     "requestingAs": "Beställer som",
     "loginRequired": "Logga in eller skapa ett konto för att begära offert:",
-    "selectClient": "Välj en kund att agera för i"
+    "selectClient": "Välj en kund att agera för i",
+    "targetAudienceLabel": "Målgruppssegment (valfritt)",
+    "targetGeoLabel": "Geografiskt fokus (valfritt)",
+    "targetGeoPlaceholder": "t.ex. NO, SE — eller Götaland, Stockholm",
+    "targetContextLabel": "Redaktionellt sammanhang (valfritt)",
+    "targetContextPlaceholder": "t.ex. näringsliv, livsstil, sport"
   },
   "requests": {
     "title": "Förfrågan",
@@ -2044,5 +2049,20 @@
     "Regional": "Regional",
     "Local": "Lokal",
     "Niche": "Nisch"
+  },
+  "targetSegment": {
+    "general-consumer": "Allmänna konsumenter",
+    "regional-local": "Regionala / lokala läsare",
+    "affluent": "Välbärgade / lyx",
+    "families-parents": "Familjer och föräldrar",
+    "seniors-50plus": "Seniorer (50+)",
+    "b2b-decision-makers": "B2B-beslutsfattare",
+    "healthcare-pros": "Vårdpersonal",
+    "legal-finance-pros": "Juridik- och finansfolk",
+    "tech-it-pros": "Tech- och IT-folk",
+    "construction-property-pros": "Bygg och fastighet",
+    "farming-rural": "Lantbruk och landsbygd",
+    "lifestyle-hobby": "Livsstil och hobby",
+    "culture-media": "Kultur och medier"
   }
 }

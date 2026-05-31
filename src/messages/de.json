@@ -367,7 +367,12 @@
     "submitting": "Brief wird gesendet…",
     "requestingAs": "Anfrage als",
     "loginRequired": "Melden Sie sich an oder erstellen Sie ein Konto, um ein Angebot anzufordern:",
-    "selectClient": "Wählen Sie einen Kunden, in dessen Namen Sie handeln, im"
+    "selectClient": "Wählen Sie einen Kunden, in dessen Namen Sie handeln, im",
+    "targetAudienceLabel": "Zielgruppensegmente (optional)",
+    "targetGeoLabel": "Geografischer Fokus (optional)",
+    "targetGeoPlaceholder": "z. B. NO, SE — oder Bayern, München",
+    "targetContextLabel": "Redaktioneller Kontext (optional)",
+    "targetContextPlaceholder": "z. B. Wirtschaft, Lifestyle, Sport"
   },
   "requests": {
     "title": "Anfrage",
@@ -1902,5 +1907,20 @@
     "Regional": "Regional",
     "Local": "Lokal",
     "Niche": "Nische"
+  },
+  "targetSegment": {
+    "general-consumer": "Allgemeine Verbraucher",
+    "regional-local": "Regionale / lokale Leser",
+    "affluent": "Wohlhabend / Luxus",
+    "families-parents": "Familien & Eltern",
+    "seniors-50plus": "Senioren (50+)",
+    "b2b-decision-makers": "B2B-Entscheider",
+    "healthcare-pros": "Gesundheitsfachkräfte",
+    "legal-finance-pros": "Jura- & Finanzprofis",
+    "tech-it-pros": "Tech- & IT-Profis",
+    "construction-property-pros": "Bau & Immobilien",
+    "farming-rural": "Landwirtschaft & ländlicher Raum",
+    "lifestyle-hobby": "Lifestyle & Hobby",
+    "culture-media": "Kultur & Medien"
   }
 }

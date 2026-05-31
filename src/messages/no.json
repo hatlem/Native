@@ -288,7 +288,12 @@
     "submitting": "Sender brief…",
     "requestingAs": "Bestiller som",
     "loginRequired": "Logg inn eller opprett en konto for å be om tilbud:",
-    "selectClient": "Velg en kunde å handle for i"
+    "selectClient": "Velg en kunde å handle for i",
+    "targetAudienceLabel": "Målgruppesegmenter (valgfritt)",
+    "targetGeoLabel": "Geografisk fokus (valgfritt)",
+    "targetGeoPlaceholder": "f.eks. NO, SE — eller Vestlandet, Oslo",
+    "targetContextLabel": "Redaksjonell kontekst (valgfritt)",
+    "targetContextPlaceholder": "f.eks. næringsliv, livsstil, sport"
   },
   "requests": {
     "title": "Forespørsel",
@@ -2044,5 +2049,20 @@
     "Regional": "Regional",
     "Local": "Lokal",
     "Niche": "Nisje"
+  },
+  "targetSegment": {
+    "general-consumer": "Allmenne forbrukere",
+    "regional-local": "Regionale / lokale lesere",
+    "affluent": "Velstående / luksus",
+    "families-parents": "Familier og foreldre",
+    "seniors-50plus": "Seniorer (50+)",
+    "b2b-decision-makers": "B2B-beslutningstakere",
+    "healthcare-pros": "Helsepersonell",
+    "legal-finance-pros": "Jus- og finansfolk",
+    "tech-it-pros": "Tech- og IT-folk",
+    "construction-property-pros": "Bygg og eiendom",
+    "farming-rural": "Landbruk og distrikt",
+    "lifestyle-hobby": "Livsstil og hobby",
+    "culture-media": "Kultur og medier"
   }
 }
