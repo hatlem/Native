@@ -20,11 +20,11 @@ import {
 import {
   computeQuoteLines,
   quoteTotals,
-  toRateRules,
   type QuotableItem,
 } from "@/lib/money";
 import { isProductPriceShown } from "@/lib/pricing-visibility";
 import { loadContentFeeRules, contentFeeLinesForGroup } from "@/lib/content-fee";
+import { createFirmOrder, toQuotable } from "@/lib/commerce/firm-order";
 import { groupItemsByMarket } from "@/lib/quote-grouping";
 import { recordAudit } from "@/lib/audit";
 import { notifyDesk, notifyOrg, notifyPublisher } from "@/lib/notify";
@@ -47,30 +47,6 @@ async function writeBasket(items: BasketItem[]) {
 function str(formData: FormData, key: string): string {
   const v = formData.get(key);
   return typeof v === "string" ? v.trim() : "";
-}
-
-type ProductWithRules = {
-  id: string;
-  name: string;
-  basePrice: unknown;
-  priceRules: {
-    marginPct: unknown;
-    seasonalMultiplier: unknown;
-    minVolume: number;
-  }[];
-};
-
-function toQuotable(
-  p: ProductWithRules,
-  quantity: number,
-): QuotableItem {
-  return {
-    productId: p.id,
-    name: p.name,
-    quantity,
-    basePrice: Number(p.basePrice),
-    rules: toRateRules(p.priceRules),
-  };
 }
 
 export async function addToPlan(formData: FormData) {
@@ -298,115 +274,75 @@ export async function submitRequest(formData: FormData) {
     if (blocked) redirect(`/${locale}/plan?error=availability`);
   }
 
-  // Content-production fees only matter on the self-serve (allFirm) path,
-  // which mints quotes here; the RFQ path defers pricing to the desk.
-  const feeRules = allFirm ? await loadContentFeeRules() : [];
-
-  const request = await prisma.$transaction(async (tx) => {
-    const plan = await tx.plan.create({
-      data: {
-        organizationId: org.id,
-        name: `${org.name} — campaign`,
+  let request: { id: string };
+  if (allFirm) {
+    // Self-serve: hand the cleared FIRM basket to the shared order factory
+    // — the single source of truth the POST /api/v1/orders endpoint also
+    // uses. It mints the plan, an auto-accepted quote per market, and a
+    // CONFIRMED order with briefs + publisher bookings.
+    const result = await createFirmOrder({
+      organizationId: org.id,
+      orgName: org.name,
+      items,
+      byId,
+      brief: {
+        briefText: brief,
+        goal: goal || null,
+        audience: audience || null,
         budget: budgetRaw ? Number(budgetRaw) || null : null,
         currency: planCurrency,
-        goal: goal || null,
-        audienceNote: audience || null,
         targetGeo: targetGeo || null,
         targetAudience: targetAudience || null,
         targetContext: targetContext || null,
-        items: {
-          create: items.map((i) => ({
-            productId: i.productId,
-            quantity: i.quantity,
-            withContent: i.withContent ?? false,
-          })),
+      },
+    });
+    request = { id: result.requestId };
+  } else {
+    // RFQ: create the plan + request for the desk to price later. No
+    // quotes here — pricing is deferred to generateQuote.
+    request = await prisma.$transaction(async (tx) => {
+      const plan = await tx.plan.create({
+        data: {
+          organizationId: org.id,
+          name: `${org.name} — campaign`,
+          budget: budgetRaw ? Number(budgetRaw) || null : null,
+          currency: planCurrency,
+          goal: goal || null,
+          audienceNote: audience || null,
+          targetGeo: targetGeo || null,
+          targetAudience: targetAudience || null,
+          targetContext: targetContext || null,
+          items: {
+            create: items.map((i) => ({
+              productId: i.productId,
+              quantity: i.quantity,
+              withContent: i.withContent ?? false,
+            })),
+          },
         },
-      },
+      });
+
+      // Fold structured targeting intent into the desk-facing brief so the
+      // desk sees it as readable lines, not just buried Plan columns.
+      const targetingLines = [
+        targetGeo && `Geo: ${targetGeo}`,
+        targetAudience && `Audience: ${targetAudience}`,
+        targetContext && `Context: ${targetContext}`,
+      ].filter(Boolean);
+      const briefSummary =
+        [brief, ...targetingLines].filter(Boolean).join("\n") || null;
+
+      const req = await tx.request.create({
+        data: {
+          organizationId: org.id,
+          planId: plan.id,
+          status: "SUBMITTED",
+          briefSummary,
+        },
+      });
+      return { id: req.id };
     });
-
-    // Fold structured targeting intent into the desk-facing brief so the
-    // desk sees it as readable lines, not just buried Plan columns.
-    const targetingLines = [
-      targetGeo && `Geo: ${targetGeo}`,
-      targetAudience && `Audience: ${targetAudience}`,
-      targetContext && `Context: ${targetContext}`,
-    ].filter(Boolean);
-    const briefSummary =
-      [brief, ...targetingLines].filter(Boolean).join("\n") || null;
-
-    const req = await tx.request.create({
-      data: {
-        organizationId: org.id,
-        planId: plan.id,
-        status: allFirm ? "CLOSED" : "SUBMITTED",
-        briefSummary,
-      },
-    });
-
-    if (allFirm) {
-      for (const group of groups) {
-        const lines = [
-          ...computeQuoteLines(
-            group.items.map((i) =>
-              toQuotable(byId.get(i.productId)!, i.quantity),
-            ),
-          ),
-          ...contentFeeLinesForGroup(
-            group.items,
-            byId,
-            group.marketCode,
-            feeRules,
-          ),
-        ];
-        const { subtotal, total } = quoteTotals(lines, group.vatPct);
-
-        const quote = await tx.quote.create({
-          data: {
-            requestId: req.id,
-            status: "ACCEPTED",
-            currency: group.currency,
-            subtotal,
-            vatPct: group.vatPct,
-            total,
-            validUntil: new Date(Date.now() + 14 * 24 * 60 * 60 * 1000),
-            lines: { create: lines },
-          },
-        });
-        const order = await tx.order.create({
-          data: {
-            organizationId: org.id,
-            quoteId: quote.id,
-            status: "CONFIRMED",
-            lines: {
-              create: lines.map((l) => ({
-                kind: l.kind,
-                productId: l.productId,
-                quantity: l.quantity,
-                lineTotal: l.lineTotal,
-              })),
-            },
-          },
-          include: { lines: true },
-        });
-        // Briefs and publisher bookings attach only to inventory lines —
-        // a CONTENT_FEE line is a billing line for production work that
-        // is briefed/fulfilled against the placement line itself.
-        const placementLines = order.lines.filter((l) => l.kind === "INVENTORY");
-        await tx.contentBrief.createMany({
-          data: placementLines.map((l) => ({
-            orderLineId: l.id,
-            message: goal || null,
-            audience: audience || null,
-          })),
-        });
-        await tx.publisherBooking.createMany({
-          data: placementLines.map((l) => ({ orderLineId: l.id })),
-        });
-      }
-    }
-
-    return req;
-  });
+  }
 
   await recordAudit(session?.user?.id ?? null, "request.submit", `Request:${request.id}`, {
     orgId: org.id,
