@@ -9,6 +9,8 @@ import { recordAudit } from "@/lib/audit";
 import { notifyOrg, notifyPublisher } from "@/lib/notify";
 import { enqueue } from "@/lib/jobs";
 import { runSpecCheckForAsset, registerSpecCheckJob } from "@/lib/spec-check-runner";
+import { ensureTrackedLinks } from "@/lib/metrics/store";
+import { rewriteBodyLinks } from "@/lib/metrics/links";
 import {
   canCancelOrder,
   cancelBlockReason,

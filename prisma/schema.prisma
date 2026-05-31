@@ -873,8 +873,9 @@ model OrderLine {
   quantity  Int      @default(1)
   lineTotal Decimal  @db.Decimal(12, 2)
 
-  brief   ContentBrief?
-  booking PublisherBooking?
+  brief        ContentBrief?
+  booking      PublisherBooking?
+  trackedLinks TrackedLink[]
 }
 
 model ContentBrief {
