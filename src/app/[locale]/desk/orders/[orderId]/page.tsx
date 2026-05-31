@@ -11,7 +11,9 @@ import {
   setAssetStatus,
   issueInvoice,
   issueCreditNote,
+  confirmTrackedLinks,
 } from "@/app/desk-actions";
+import { extractLinks } from "@/lib/metrics/links";
 import { StatusBadge } from "@/app/status-badge";
 import { canCancelOrder, cancelBlockReason } from "@/lib/cancellation";
 import { pickPlaybook } from "@/lib/playbook";
@@ -35,6 +37,7 @@ export default async function DeskOrderPage({
   const tp = await getTranslations({ locale, namespace: "production" });
   const tType = await getTranslations({ locale, namespace: "productType" });
   const td = await getTranslations({ locale, namespace: "desk" });
+  const tt = await getTranslations({ locale, namespace: "performance" });
 
   const order = await prisma.order.findUnique({
     where: { id: orderId },
@@ -46,6 +49,7 @@ export default async function DeskOrderPage({
       lines: {
         include: {
           brief: { include: { assets: { orderBy: { version: "desc" } } } },
+          trackedLinks: true,
         },
       },
     },

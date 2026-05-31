@@ -2084,5 +2084,16 @@
     "farming-rural": "Farming & rural",
     "lifestyle-hobby": "Lifestyle & hobby",
     "culture-media": "Culture & media"
+  },
+  "performance": {
+    "trackLinksLabel": "Track outbound links in this article:",
+    "trackLinksSave": "Save tracked links",
+    "trackedClicks": "{n} clicks",
+    "panelTitle": "Performance",
+    "clicks": "Clicks",
+    "impressions": "Impressions",
+    "pending": "Reporting at the agreed checkpoint.",
+    "impressionsLabel": "Impressions (from your analytics)",
+    "impressionsSave": "Save"
   }
 }
