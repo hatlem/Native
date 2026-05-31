@@ -243,7 +243,8 @@
       "reach": "Reach",
       "anyReach": "Any reach",
       "region": "Region",
-      "allRegions": "All regions"
+      "allRegions": "All regions",
+      "regionCount": "{count, plural, =0 {All regions} one {# region} other {# regions}}"
     },
     "compareBar": {
       "label": "{count, plural, =1 {1 title selected} other {# titles selected}}",

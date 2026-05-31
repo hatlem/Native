@@ -30,7 +30,7 @@ type Props = {
 
 const SEARCH_DEBOUNCE_MS = 300;
 
-export function CatalogFilters({ markets, formats, nativeFits, b2bB2cs, reaches, categories, initial }: Props) {
+export function CatalogFilters({ markets, formats, nativeFits, b2bB2cs, reaches, categories, regions, initial }: Props) {
   const router = useRouter();
   const pathname = usePathname();
   const sp = useSearchParams();
@@ -163,6 +163,22 @@ export function CatalogFilters({ markets, formats, nativeFits, b2bB2cs, reaches,
 
   function clearCategories() {
     commit((p) => p.delete("vertical"));
+  }
+
+  function toggleRegion(value: string) {
+    const current = sp.get("region")?.split(",").filter(Boolean) ?? [];
+    const has = current.includes(value);
+    const nextValues = has
+      ? current.filter((v) => v !== value)
+      : [...current, value];
+    commit((p) => {
+      if (nextValues.length) p.set("region", nextValues.join(","));
+      else p.delete("region");
+    });
+  }
+
+  function clearRegions() {
+    commit((p) => p.delete("region"));
   }
 
   function toggleOnlyPriced(checked: boolean) {
@@ -338,6 +354,46 @@ export function CatalogFilters({ markets, formats, nativeFits, b2bB2cs, reaches,
             ) : null}
           </div>
         </div>
+
+        {regions.length > 0 ? (
+          <div className="catalog-filters__field">
+            <label>{t("region")}</label>
+            <div className="catalog-filters__multi" ref={regionRef}>
+              <button
+                type="button"
+                className="catalog-filters__multi-toggle"
+                onClick={() => setRegionOpen((o) => !o)}
+                aria-expanded={regionOpen}
+              >
+                <span>{regionLabel}</span>
+                <span aria-hidden="true">▾</span>
+              </button>
+              {regionOpen ? (
+                <div className="catalog-filters__multi-menu" role="listbox">
+                  {regions.map((r) => (
+                    <label key={r.value} className="catalog-filters__multi-option">
+                      <input
+                        type="checkbox"
+                        checked={selectedRegions.has(r.value)}
+                        onChange={() => toggleRegion(r.value)}
+                      />
+                      <span>{r.label}</span>
+                    </label>
+                  ))}
+                  {selectedRegions.size > 0 ? (
+                    <button
+                      type="button"
+                      className="catalog-filters__multi-clear"
+                      onClick={clearRegions}
+                    >
+                      {t("all")}
+                    </button>
+                  ) : null}
+                </div>
+              ) : null}
+            </div>
+          </div>
+        ) : null}
 
         <div className="catalog-filters__field">
           <label htmlFor="nativeFit">{t("nativeFit")}</label>

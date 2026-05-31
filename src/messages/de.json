@@ -243,7 +243,8 @@
       "reach": "Reichweite",
       "anyReach": "Alle Reichweiten",
       "region": "Region",
-      "allRegions": "Alle Regionen"
+      "allRegions": "Alle Regionen",
+      "regionCount": "{count, plural, =0 {Alle Regionen} one {# Region} other {# Regionen}}"
     },
     "compareBar": {
       "label": "{count, plural, =1 {1 Titel ausgewählt} other {# Titel ausgewählt}}",

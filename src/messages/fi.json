@@ -243,7 +243,8 @@
       "reach": "Tavoittavuus",
       "anyReach": "Mikä tahansa",
       "region": "Alue",
-      "allRegions": "Kaikki alueet"
+      "allRegions": "Kaikki alueet",
+      "regionCount": "{count, plural, =0 {Kaikki alueet} one {# alue} other {# aluetta}}"
     },
     "compareBar": {
       "label": "{count, plural, =1 {1 julkaisu valittu} other {# julkaisua valittu}}",

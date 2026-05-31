@@ -180,6 +180,18 @@ export default async function CatalogPage({
     .map((r) => r.vertical!)
     .filter((v) => v.trim().length > 0);
 
+  // Distinct regions present from the geo backfill — drives the region
+  // multiselect. Null regions (national/unknown titles) don't appear.
+  const regionRows = await prisma.title.findMany({
+    where: { region: { not: null } },
+    select: { region: true },
+    distinct: ["region"],
+    orderBy: { region: "asc" },
+  });
+  const regionOptions = regionRows
+    .map((r) => r.region!)
+    .filter((v) => v.trim().length > 0);
+
   const [totalCount, titles] = await Promise.all([
     prisma.title.count({ where }),
     prisma.title.findMany({
