@@ -38,6 +38,41 @@ function field(formData: FormData, key: string): string {
   return typeof v === "string" ? v.trim() : "";
 }
 
+// Desk confirms which auto-detected outbound links in a produced article
+// to track. Each chosen URL becomes a TrackedLink (idempotent) and the
+// asset body is rewritten so the published article uses /go/<token>.
+export async function confirmTrackedLinks(formData: FormData) {
+  const locale = field(formData, "locale") || "en";
+  const orderId = field(formData, "orderId");
+  const orderLineId = field(formData, "orderLineId");
+  const assetId = field(formData, "assetId");
+  const { userId } = await requireDeskOrContent(locale);
+
+  const chosen = formData
+    .getAll("trackUrl")
+    .map((v) => String(v))
+    .filter((url) => /^https?:\/\//.test(url))
+    .map((url) => ({ url, label: null }));
+
+  if (chosen.length) {
+    const map = await ensureTrackedLinks(orderLineId, chosen);
+    const asset = await prisma.contentAsset.findUnique({
+      where: { id: assetId },
+      select: { id: true, body: true },
+    });
+    if (asset?.body) {
+      await prisma.contentAsset.update({
+        where: { id: asset.id },
+        data: { body: rewriteBodyLinks(asset.body, map) },
+      });
+    }
+    await recordAudit(userId, "asset.track_links", `ContentAsset:${assetId}`, {
+      count: chosen.length,
+    });
+  }
+  redirect(`/${locale}/desk/orders/${orderId}`);
+}
+
 async function requireDesk(locale: string): Promise<string> {
   const session = await auth();
   const role = session?.user?.role;
