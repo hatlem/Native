@@ -12,6 +12,7 @@ import { recordAudit } from "@/lib/audit";
 import { notifyDesk, notifyOrg } from "@/lib/notify";
 import { safeExternalUrl } from "@/lib/security";
 import { canRetractAsset, normaliseReason } from "@/lib/cancellation";
+import { parseImpressions } from "@/lib/metrics/validate";
 
 function field(formData: FormData, key: string): string {
   const v = formData.get(key);
