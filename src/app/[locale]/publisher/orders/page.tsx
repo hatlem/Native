@@ -4,7 +4,7 @@ import { BookingStatus } from "@prisma/client";
 import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
 import { Link } from "@/i18n/navigation";
-import { updateBooking, rejectAsset } from "@/app/publisher-actions";
+import { updateBooking, rejectAsset, submitBookingImpressions } from "@/app/publisher-actions";
 import { StatusBadge } from "@/app/status-badge";
 import { EmptyState } from "@/app/empty-state";
 import { canRetractAsset } from "@/lib/cancellation";
@@ -27,6 +27,7 @@ export default async function PublisherOrdersPage({
   const t = await getTranslations({ locale, namespace: "publisher" });
   const tType = await getTranslations({ locale, namespace: "productType" });
   const tp = await getTranslations({ locale, namespace: "production" });
+  const tt = await getTranslations({ locale, namespace: "performance" });
 
   const session = await auth();
   const me = await prisma.user.findUnique({
@@ -55,7 +56,7 @@ export default async function PublisherOrdersPage({
         orderBy: { id: "desc" },
         include: {
           order: true,
-          booking: true,
+          booking: { include: { metrics: true } },
           brief: {
             include: {
               assets: { orderBy: { version: "desc" }, take: 1 },
@@ -185,6 +186,30 @@ export default async function PublisherOrdersPage({
                   ) : (
                     <p className="muted">{t("noBooking")}</p>
                   )}
+
+                  {line.booking ? (
+                    <form action={submitBookingImpressions} className="product-form">
+                      <input type="hidden" name="locale" value={locale} />
+                      <input type="hidden" name="bookingId" value={line.booking.id} />
+                      <div className="field">
+                        <label htmlFor={`imp-${line.id}`}>{tt("impressionsLabel")}</label>
+                        <input
+                          id={`imp-${line.id}`}
+                          name="impressions"
+                          type="number"
+                          min="0"
+                          defaultValue={line.booking.metrics?.impressions ?? ""}
+                        />
+                      </div>
+                      <div className="actions">
+                        <SubmitButton
+                          label={tt("impressionsSave")}
+                          pendingLabel={t("saving")}
+                          className="btn small ghost"
+                        />
+                      </div>
+                    </form>
+                  ) : null}
 
                   {/* Editorial-veto control — only renders if a draft
                       exists and is in a state the publisher is still

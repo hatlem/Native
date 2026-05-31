@@ -1490,26 +1490,26 @@
         "Artikel (1.200–1.500 Wörter) verfasst von einer fachkundigen Journalistin oder einem fachkundigen Journalisten",
         "Zwei Korrekturrunden und Ihre Freigabe vor Veröffentlichung",
         "Distribution im Native-Feed und Newsletter von {titleName}",
-        "Reporting nach 30, 90 und 365 Tagen"
+        "Klick-Tracking auf jedem von uns gesetzten Link, berichtet zu vereinbarten Zeitpunkten"
       ],
       "ADVERTORIAL": [
         "Verhandelte Platzierung in {titleName}, klar als bezahlter Inhalt gekennzeichnet",
         "Markenführender Artikel (800–1.200 Wörter) nach den redaktionellen Standards des Verlags",
         "Eine Korrekturrunde und Ihre Freigabe vor Veröffentlichung",
         "Distribution im Content-Feed von {titleName}",
-        "Reporting nach 30 und 90 Tagen"
+        "Klick-Tracking auf jedem von uns gesetzten Link, berichtet zu vereinbarten Zeitpunkten"
       ],
       "NATIVE_DISPLAY": [
         "In-Feed-Displayeinheit in {titleName}, gestaltet in der Typografie des Verlags",
         "Kreation produziert nach den Spezifikationen des Titels",
         "Targeting nach Ressort und Zielgruppensegment",
-        "Reporting nach 30 und 90 Tagen (Impressionen, Klickrate, Sichtbarkeit)"
+        "Klick-Tracking auf jedem von uns gesetzten Link, plus berichtete Impressionen, zu vereinbarten Zeitpunkten"
       ],
       "PACKAGE": [
         "Redaktioneller Artikel in {titleName} (1.200–1.500 Wörter)",
         "Native-Display-Verstärkung im selben Titel",
         "Gemeinsame redaktionelle Abnahme und gemeinsamer Veröffentlichungstermin",
-        "Reporting nach 30, 90 und 365 Tagen"
+        "Klick-Tracking auf jedem von uns gesetzten Link, berichtet zu vereinbarten Zeitpunkten"
       ]
     }
   },
@@ -1943,5 +1943,16 @@
     "farming-rural": "Landwirtschaft & ländlicher Raum",
     "lifestyle-hobby": "Lifestyle & Hobby",
     "culture-media": "Kultur & Medien"
+  },
+  "performance": {
+    "trackLinksLabel": "Ausgehende Links in diesem Artikel tracken:",
+    "trackLinksSave": "Getrackte Links speichern",
+    "trackedClicks": "{n} Klicks",
+    "panelTitle": "Performance",
+    "clicks": "Klicks",
+    "impressions": "Impressionen",
+    "pending": "Bericht zum vereinbarten Zeitpunkt.",
+    "impressionsLabel": "Impressionen (aus Ihrer Analyse)",
+    "impressionsSave": "Speichern"
   }
 }

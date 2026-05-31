@@ -1525,7 +1525,7 @@
       "q3": "Meillä ei ole operatiivista kapasiteettia natiiviin.",
       "a3": "<strong>Juuri sitä varten desk on olemassa.</strong> Brief sisään, valmis artikkeli ja live-sijoittelu ulos. Tiimimme hoitaa kustantajaneuvottelut, sisällöntuotannon, spesifikaatiotarkistuksen ja laskutuksen.",
       "q4": "Miten mittaamme sitä?",
-      "a4": "Tavallinen seuranta live-URL:llä — sivunäytöt, viipymäaika, vieritysyvyys, klikkaukset sivustollesi. Bränditarjouksen nousu pyynnöstä paneelitutkimuksena.",
+      "a4": "Seuraamme klikkauksia jokaisesta artikkelisi linkistä — ensimmäisen osapuolen mittauksena. Tavoittavuuden (näytöt) raportoi julkaisija silloin kun se on saatavilla. Emme lupaa viewabilitya tai paneeliin perustuvaa brand liftiä, jota emme voi mitata.",
       "q5": "Entä brändin turvallisuus ja ilmoittaminen?",
       "a5": "Ilmoitus on koodattu per markkina (<strong>Annonsørinnhold / Annons / Annonce / Mainos / Werbung</strong>) ja sovelletaan automaattisesti. Spesifikaatiotarkistus on läpäistävä ennen kuin mikään päätyy kustantajalle."
     },
@@ -1632,26 +1632,26 @@
         "Artikkeli (1 200–1 500 sanaa) toimialaa tuntevan toimittajan kirjoittama",
         "Kaksi korjauskierrosta ja hyväksyntäsi ennen julkaisua",
         "Levitys {titleName}-median native-syötteessä ja uutiskirjeessä",
-        "Tulosraportti 30, 90 ja 365 päivän kohdalla"
+        "Klikkiseuranta jokaiselle lisäämällemme linkille, raportoituna sovittuina ajankohtina"
       ],
       "ADVERTORIAL": [
         "Neuvoteltu julkaisu mediassa {titleName}, selkeästi merkittynä maksetuksi sisällöksi",
         "Brändijohtoinen artikkeli (800–1 200 sanaa) julkaisijan toimituksellisten standardien mukaan",
         "Yksi korjauskierros ja hyväksyntäsi ennen julkaisua",
         "Levitys {titleName}-median sisältösyötteessä",
-        "Tulosraportti 30 ja 90 päivän kohdalla"
+        "Klikkiseuranta jokaiselle lisäämällemme linkille, raportoituna sovittuina ajankohtina"
       ],
       "NATIVE_DISPLAY": [
         "In-feed-display-yksikkö mediassa {titleName}, julkaisijan typografian mukaisesti",
         "Kreatiivi tuotettu median spesifikaatioiden mukaan",
         "Kohdennettu osion ja yleisösegmentin mukaan",
-        "Tulosraportti 30 ja 90 päivän kohdalla (näytöt, klikkausprosentti, näkyvyys)"
+        "Klikkiseuranta jokaiselle lisäämällemme linkille sekä raportoidut näytöt, sovittuina ajankohtina"
       ],
       "PACKAGE": [
         "Toimituksellinen artikkeli mediassa {titleName} (1 200–1 500 sanaa)",
         "Native-display-vahvistus samassa mediassa",
         "Yhteinen toimituksellinen tarkistus ja yhteinen julkaisupäivä",
-        "Tulosraportti 30, 90 ja 365 päivän kohdalla"
+        "Klikkiseuranta jokaiselle lisäämällemme linkille, raportoituna sovittuina ajankohtina"
       ]
     }
   },
@@ -2085,5 +2085,16 @@
     "farming-rural": "Maatalous ja maaseutu",
     "lifestyle-hobby": "Elämäntapa ja harrastukset",
     "culture-media": "Kulttuuri ja media"
+  },
+  "performance": {
+    "trackLinksLabel": "Seuraa tämän artikkelin ulkoisia linkkejä:",
+    "trackLinksSave": "Tallenna seuratut linkit",
+    "trackedClicks": "{n} klikkausta",
+    "panelTitle": "Tulokset",
+    "clicks": "Klikkaukset",
+    "impressions": "Näytöt",
+    "pending": "Raportoidaan sovittuna ajankohtana.",
+    "impressionsLabel": "Näytöt (analytiikastasi)",
+    "impressionsSave": "Tallenna"
   }
 }

@@ -43,6 +43,9 @@ export default async function MyOrderPage({
   const scope = await loadScope();
   if (!canActOnOrg(scope, order.organizationId)) notFound();
 
+  const tperf = await getTranslations({ locale, namespace: "performance" });
+  const clickTotals = await clicksByOrderLine(order.lines.map((l) => l.id));
+
   const products = await prisma.product.findMany({
     where: {
       id: {
@@ -189,6 +192,24 @@ export default async function MyOrderPage({
                     </a>
                   ) : null;
                 })()}
+
+                {!isContentFee ? (
+                  <dl className="spec-grid perf-panel">
+                    <dt>{tperf("clicks")}</dt>
+                    <dd>{clickTotals[line.id] ?? 0}</dd>
+                    {line.booking?.metrics?.impressions != null ? (
+                      <>
+                        <dt>{tperf("impressions")}</dt>
+                        <dd>{line.booking.metrics.impressions.toLocaleString()}</dd>
+                      </>
+                    ) : (
+                      <>
+                        <dt>{tperf("panelTitle")}</dt>
+                        <dd className="muted small">{tperf("pending")}</dd>
+                      </>
+                    )}
+                  </dl>
+                ) : null}
               </article>
             );
           })}

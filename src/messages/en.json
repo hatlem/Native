@@ -1524,7 +1524,7 @@
       "q3": "We don't have the operational capacity for native.",
       "a3": "<strong>That's the entire point of the desk.</strong> Brief in, finished article and live placement out. Our team handles publisher negotiation, content production, spec-checking, and invoicing.",
       "q4": "How do we measure it?",
-      "a4": "Standard tracking on the live URL — page views, time on page, scroll depth, click-through to your site. Brand lift on request via panel study.",
+      "a4": "We track click-throughs on every link inside your article — counted first-party. Reach (impressions) is reported by the publisher where available. We don't claim viewability or panel-based brand-lift we can't measure.",
       "q5": "What about brand safety and disclosure?",
       "a5": "Disclosure is encoded per market (<strong>Annonsørinnhold / Annons / Annonce</strong>) and applied automatically. Spec-check has to pass before anything reaches the publisher."
     },
@@ -1631,26 +1631,26 @@
         "Article (1,200–1,500 words) written by a vertical-specialist journalist",
         "Two rounds of revisions and your sign-off before publish",
         "Distribution across {titleName}'s native feed and newsletter",
-        "Performance report at 30, 90 and 365 days"
+        "Click-through tracking on every link we place, reported at agreed checkpoints"
       ],
       "ADVERTORIAL": [
         "Negotiated placement on {titleName}, clearly labelled as paid content",
         "Brand-led article (800–1,200 words) written to the publisher's editorial standard",
         "One round of revisions and your sign-off before publish",
         "Distribution in {titleName}'s content feed",
-        "Performance report at 30 and 90 days"
+        "Click-through tracking on every link we place, reported at agreed checkpoints"
       ],
       "NATIVE_DISPLAY": [
         "In-feed display unit on {titleName}, styled in the publisher's typography",
         "Creative produced to the title's specs",
         "Targeted by section and audience segment",
-        "Performance report at 30 and 90 days (impressions, click-through, viewability)"
+        "Click-through tracking on every link we place, plus reported impressions, at agreed checkpoints"
       ],
       "PACKAGE": [
         "Editorial article on {titleName} (1,200–1,500 words)",
         "Native display amplification across the same title",
         "Single editorial review and single publication date",
-        "Performance report at 30, 90 and 365 days"
+        "Click-through tracking on every link we place, reported at agreed checkpoints"
       ]
     }
   },

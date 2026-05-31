@@ -1525,7 +1525,7 @@
       "q3": "Vi har ikke operasjonell kapasitet for native.",
       "a3": "<strong>Det er hele poenget med desken.</strong> Brief inn, ferdig artikkel og live plassering ut. Teamet vårt håndterer forhandlinger med utgiver, innholdsproduksjon, spec-sjekk og fakturering.",
       "q4": "Hvordan måler vi det?",
-      "a4": "Standard sporing på live-URL — sidevisninger, tid på siden, scrolldybde, klikk videre til ditt nettsted. Merkevareløft på forespørsel via panelundersøkelse.",
+      "a4": "Vi sporer klikk på hver lenke inne i artikkelen din — målt førsteparts. Rekkevidde (visninger) rapporteres av utgiveren der det er tilgjengelig. Vi lover ikke viewability eller panelbasert brand lift vi ikke kan måle.",
       "q5": "Hva med brand safety og merking?",
       "a5": "Merking er kodet per marked (<strong>Annonsørinnhold / Annons / Annonce</strong>) og påføres automatisk. Spec-sjekken må bestå før noe når utgiveren."
     },
@@ -1632,26 +1632,26 @@
         "Artikkel (1 200–1 500 ord) skrevet av en bransjekjent journalist",
         "To revisjonsrunder og din godkjenning før publisering",
         "Distribusjon i {titleName}s native-feed og nyhetsbrev",
-        "Resultatrapport etter 30, 90 og 365 dager"
+        "Klikksporing på hver lenke vi legger inn, rapportert ved avtalte tidspunkter"
       ],
       "ADVERTORIAL": [
         "Forhandlet plassering på {titleName}, tydelig merket som betalt innhold",
         "Merkevareledet artikkel (800–1 200 ord) skrevet etter utgivers redaksjonelle standard",
         "Én revisjonsrunde og din godkjenning før publisering",
         "Distribusjon i {titleName}s innholds-feed",
-        "Resultatrapport etter 30 og 90 dager"
+        "Klikksporing på hver lenke vi legger inn, rapportert ved avtalte tidspunkter"
       ],
       "NATIVE_DISPLAY": [
         "In-feed-displayenhet på {titleName}, stilet i utgivers typografi",
         "Kreativt produsert etter titlens spesifikasjoner",
         "Målrettet etter seksjon og målgruppesegment",
-        "Resultatrapport etter 30 og 90 dager (visninger, klikkrate, synlighet)"
+        "Klikksporing på hver lenke vi legger inn, pluss rapporterte visninger, ved avtalte tidspunkter"
       ],
       "PACKAGE": [
         "Redaksjonell artikkel på {titleName} (1 200–1 500 ord)",
         "Native-displayforsterkning i samme tittel",
         "Felles redaksjonell gjennomgang og felles publiseringsdato",
-        "Resultatrapport etter 30, 90 og 365 dager"
+        "Klikksporing på hver lenke vi legger inn, rapportert ved avtalte tidspunkter"
       ]
     }
   },
@@ -2085,5 +2085,16 @@
     "farming-rural": "Landbruk og distrikt",
     "lifestyle-hobby": "Livsstil og hobby",
     "culture-media": "Kultur og medier"
+  },
+  "performance": {
+    "trackLinksLabel": "Spor utgående lenker i denne artikkelen:",
+    "trackLinksSave": "Lagre sporede lenker",
+    "trackedClicks": "{n} klikk",
+    "panelTitle": "Resultater",
+    "clicks": "Klikk",
+    "impressions": "Visninger",
+    "pending": "Rapporteres ved avtalt tidspunkt.",
+    "impressionsLabel": "Visninger (fra din analyse)",
+    "impressionsSave": "Lagre"
   }
 }
