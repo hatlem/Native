@@ -239,7 +239,9 @@
       "marketCount": "{count, plural, =0 {All markets} =1 {1 market} other {# markets}}",
       "compareMode": "Compare picker",
       "compareModeHint": "Tick titles to compare side-by-side",
-      "loading": "Updating…"
+      "loading": "Updating…",
+      "reach": "Reach",
+      "anyReach": "Any reach"
     },
     "compareBar": {
       "label": "{count, plural, =1 {1 title selected} other {# titles selected}}",
@@ -2031,5 +2033,12 @@
     "ctaTitle": "Ready to brief us?",
     "ctaBody": "Send what you have — we'll tell you what's missing.",
     "ctaContact": "Talk to the desk"
+  },
+  "reachTier": {
+    "reach": "Reach",
+    "National": "National",
+    "Regional": "Regional",
+    "Local": "Local",
+    "Niche": "Niche"
   }
 }

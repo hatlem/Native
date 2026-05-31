@@ -30,6 +30,7 @@ const FORMAT_KEYS: ProductType[] = [
 ];
 const NATIVE_FIT_VALUES = ["High", "Medium", "Low"] as const;
 const B2B_B2C_VALUES = ["B2B", "B2C"] as const;
+const REACH_VALUES = ["National", "Regional", "Local", "Niche"] as const;
 const PAGE_SIZE = 60;
 
 function asEnum<T extends string>(
@@ -59,6 +60,7 @@ export default async function CatalogPage({
   const tType = await getTranslations({ locale, namespace: "productType" });
   const tMarket = await getTranslations({ locale, namespace: "market" });
   const tFit = await getTranslations({ locale, namespace: "nativeFit" });
+  const tReach = await getTranslations({ locale, namespace: "reachTier" });
   const tv = await getTranslations({
     locale,
     namespace: "priceVisibility",
@@ -101,6 +103,10 @@ export default async function CatalogPage({
   const b2bB2c = asEnum(
     typeof sp.b2bB2c === "string" ? sp.b2bB2c : undefined,
     B2B_B2C_VALUES,
+  );
+  const reach = asEnum(
+    typeof sp.reach === "string" ? sp.reach : undefined,
+    REACH_VALUES,
   );
   const onlyPriced =
     typeof sp.onlyPriced === "string" && sp.onlyPriced === "1";
@@ -145,6 +151,7 @@ export default async function CatalogPage({
       : {}),
     ...(nativeFit ? { nativeFit } : {}),
     ...(b2bB2c ? { b2bB2c } : {}),
+    ...(reach ? { reach } : {}),
     ...(matchedIds
       ? { id: { in: matchedIds } }
       : q
@@ -306,6 +313,7 @@ export default async function CatalogPage({
         formats={PRODUCT_TYPES.map((pt) => ({ value: pt, label: tType(pt) }))}
         nativeFits={NATIVE_FIT_VALUES.map((v) => ({ value: v, label: tFit(v) }))}
         b2bB2cs={B2B_B2C_VALUES.map((v) => ({ value: v, label: v }))}
+        reaches={REACH_VALUES.map((v) => ({ value: v, label: tReach(v) }))}
         categories={verticalOptions.map((v) => ({ value: v, label: v }))}
         initial={{
           q,
@@ -314,6 +322,7 @@ export default async function CatalogPage({
           verticals,
           nativeFit: nativeFit ?? "",
           b2bB2c: b2bB2c ?? "",
+          reach: reach ?? "",
           onlyPriced,
           advancedOpen,
           compareMode,

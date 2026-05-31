@@ -160,7 +160,9 @@
       "marketCount": "{count, plural, =0 {Alla marknader} =1 {1 marknad} other {# marknader}}",
       "compareMode": "Jämförelsväljare",
       "compareModeHint": "Markera titlar du vill jämföra sida vid sida",
-      "loading": "Uppdaterar…"
+      "loading": "Uppdaterar…",
+      "reach": "Räckvidd",
+      "anyReach": "All räckvidd"
     },
     "compareBar": {
       "label": "{count, plural, =1 {1 titel vald} other {# titlar valda}}",
@@ -2032,5 +2034,12 @@
     "ctaTitle": "Redo att briefa oss?",
     "ctaBody": "Skicka det du har – vi säger till om något saknas.",
     "ctaContact": "Prata med teamet"
+  },
+  "reachTier": {
+    "reach": "Räckvidd",
+    "National": "Nationell",
+    "Regional": "Regional",
+    "Local": "Lokal",
+    "Niche": "Nisch"
   }
 }

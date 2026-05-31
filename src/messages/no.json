@@ -160,7 +160,9 @@
       "marketCount": "{count, plural, =0 {Alle markeder} =1 {1 marked} other {# markeder}}",
       "compareMode": "Sammenligningsvelger",
       "compareModeHint": "Velg titler du vil sammenligne side om side",
-      "loading": "Oppdaterer…"
+      "loading": "Oppdaterer…",
+      "reach": "Rekkevidde",
+      "anyReach": "All rekkevidde"
     },
     "compareBar": {
       "label": "{count, plural, =1 {1 tittel valgt} other {# titler valgt}}",
@@ -2032,5 +2034,12 @@
     "ctaTitle": "Klar til å briefe oss?",
     "ctaBody": "Send det du har – så sier vi fra om noe mangler.",
     "ctaContact": "Snakk med teamet"
+  },
+  "reachTier": {
+    "reach": "Rekkevidde",
+    "National": "Nasjonal",
+    "Regional": "Regional",
+    "Local": "Lokal",
+    "Niche": "Nisje"
   }
 }

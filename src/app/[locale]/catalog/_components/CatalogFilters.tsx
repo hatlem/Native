@@ -12,6 +12,7 @@ type Props = {
   formats: Option[];
   nativeFits: Option[];
   b2bB2cs: Option[];
+  reaches: Option[];
   categories: Option[];
   initial: {
     q: string;
@@ -20,6 +21,7 @@ type Props = {
     verticals: string[];
     nativeFit: string;
     b2bB2c: string;
+    reach: string;
     onlyPriced: boolean;
     advancedOpen: boolean;
     compareMode: boolean;
@@ -28,7 +30,7 @@ type Props = {
 
 const SEARCH_DEBOUNCE_MS = 300;
 
-export function CatalogFilters({ markets, formats, nativeFits, b2bB2cs, categories, initial }: Props) {
+export function CatalogFilters({ markets, formats, nativeFits, b2bB2cs, reaches, categories, initial }: Props) {
   const router = useRouter();
   const pathname = usePathname();
   const sp = useSearchParams();

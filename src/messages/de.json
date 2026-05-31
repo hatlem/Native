@@ -239,7 +239,9 @@
       "marketCount": "{count, plural, =0 {Alle Märkte} =1 {1 Markt} other {# Märkte}}",
       "compareMode": "Vergleichsauswahl",
       "compareModeHint": "Titel auswählen, um sie nebeneinander zu vergleichen",
-      "loading": "Wird aktualisiert…"
+      "loading": "Wird aktualisiert…",
+      "reach": "Reichweite",
+      "anyReach": "Alle Reichweiten"
     },
     "compareBar": {
       "label": "{count, plural, =1 {1 Titel ausgewählt} other {# Titel ausgewählt}}",
@@ -1890,5 +1892,12 @@
     "ctaTitle": "Bereit für Ihr Briefing?",
     "ctaBody": "Schicken Sie, was Sie haben – wir sagen Ihnen, was fehlt.",
     "ctaContact": "Mit dem Team sprechen"
+  },
+  "reachTier": {
+    "reach": "Reichweite",
+    "National": "National",
+    "Regional": "Regional",
+    "Local": "Lokal",
+    "Niche": "Nische"
   }
 }

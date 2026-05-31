@@ -239,7 +239,9 @@
       "marketCount": "{count, plural, =0 {Kaikki markkinat} =1 {1 markkina} other {# markkinaa}}",
       "compareMode": "Vertailutyökalu",
       "compareModeHint": "Valitse julkaisut, joita haluat vertailla rinnakkain",
-      "loading": "Päivitetään…"
+      "loading": "Päivitetään…",
+      "reach": "Tavoittavuus",
+      "anyReach": "Mikä tahansa"
     },
     "compareBar": {
       "label": "{count, plural, =1 {1 julkaisu valittu} other {# julkaisua valittu}}",
@@ -2032,5 +2034,12 @@
     "ctaTitle": "Valmis briiffaamaan meidät?",
     "ctaBody": "Lähetä mitä sinulla on – kerromme, mitä puuttuu.",
     "ctaContact": "Keskustele tiimin kanssa"
+  },
+  "reachTier": {
+    "reach": "Tavoittavuus",
+    "National": "Valtakunnallinen",
+    "Regional": "Alueellinen",
+    "Local": "Paikallinen",
+    "Niche": "Nichemedia"
   }
 }
