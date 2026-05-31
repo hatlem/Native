@@ -185,6 +185,58 @@ export async function updateBooking(formData: FormData) {
   redirect(`/${locale}/publisher/orders`);
 }
 
+// Publisher reports impressions (reach) for a booking from their own
+// analytics. Clicks are tracked first-party via /go links, so this is the
+// one number only the publisher can supply. Optional — empty clears it.
+export async function submitBookingImpressions(formData: FormData) {
+  const locale = field(formData, "locale") || "en";
+  const { publisherId, userId } = await requirePublisher(locale);
+  const bookingId = field(formData, "bookingId");
+
+  const parsed = parseImpressions(field(formData, "impressions"));
+  if (!parsed.ok) redirect(`/${locale}/publisher/orders?error=metrics`);
+  const value = parsed.ok ? parsed.value : null;
+
+  // Ownership mirrors updateBooking: booking → orderLine.productId →
+  // product.title.publisherId must match the acting publisher.
+  const booking = await prisma.publisherBooking.findUnique({
+    where: { id: bookingId },
+    include: { orderLine: { select: { productId: true } } },
+  });
+  if (!booking) redirect(`/${locale}/publisher/orders`);
+  const product = await prisma.product.findUnique({
+    where: { id: booking!.orderLine.productId ?? "" },
+    include: { title: { select: { publisherId: true } } },
+  });
+  if (product?.title.publisherId !== publisherId) {
+    redirect(`/${locale}/publisher/orders`);
+  }
+
+  await prisma.bookingMetrics.upsert({
+    where: { bookingId },
+    create: {
+      bookingId,
+      impressions: value,
+      source: "PUBLISHER",
+      reportedAt: new Date(),
+      reportedBy: userId,
+    },
+    update: {
+      impressions: value,
+      source: "PUBLISHER",
+      reportedAt: new Date(),
+      reportedBy: userId,
+    },
+  });
+  await recordAudit(
+    userId,
+    "booking.impressions",
+    `PublisherBooking:${bookingId}`,
+    { impressions: value },
+  );
+  redirect(`/${locale}/publisher/orders`);
+}
+
 // Publisher invokes the editorial veto on a draft. Distinct from the
 // soft "request changes" workflow (which goes via `setAssetStatus`
 // CHANGES_REQUESTED on the desk side) — this is the hard rejection
