@@ -21,12 +21,53 @@ no publisher intake, no tracking link. This is a live false claim.
 This sub-project turns the promise into something **true** and removes what we
 can't honor. Decisions locked during brainstorming:
 
-- **Metrics source:** publishers enter impressions/clicks per live booking
-  (they hold the data); desk can override; buyer sees a read-only view.
-- **Tracked click link:** a NativeSpin-owned `/go/<token>` redirect that counts
-  first-party clicks, minted only for bookings with an outbound CTA.
+- **PRIMARY: in-article tracked links (REVISED — supersedes booking-level
+  clickToken below).** NativeSpin produces the article content (`ContentAsset`),
+  so it owns every outbound link in the article. When generating/finalizing an
+  article the desk/writer **chooses which destination URL(s) to track**; the
+  system mints a `/go/<token>` link, embeds it in the article body in place of
+  the raw URL, and counts first-party clicks per link. Works for ALL formats
+  (native article included), not just display CTAs — clicks become real and
+  ours, no publisher self-reporting needed. Many `TrackedLink`s per order line.
+- **Impressions:** kept as an OPTIONAL publisher/desk-entered number for
+  reach-delivered context. Clicks (from tracked links) are the primary, always-
+  shown metric; impressions show when provided.
+- **Dashboard:** buyer (and desk) see per-article click counts (sum of its
+  tracked links), per-link breakdown, optional impressions, reported date.
 - **Copy:** reword to what we deliver; drop viewability / scroll-depth /
   brand-lift-panel claims entirely.
+
+### REVISED data model (replaces §1 booking-level clickToken)
+
+```prisma
+model TrackedLink {
+  id          String   @id @default(cuid())
+  orderLineId String                       // the placement this link belongs to
+  orderLine   OrderLine @relation(fields: [orderLineId], references: [id], onDelete: Cascade)
+  token       String   @unique             // unguessable base64url; the /go/<token> slug
+  targetUrl   String                       // advertiser destination
+  label       String?                      // e.g. "CTA", "product link"
+  clickCount  Int      @default(0)
+  createdAt   DateTime @default(now())
+  @@index([orderLineId])
+}
+```
+
+`BookingMetrics` is kept but slimmed to `impressions Int?` + report metadata
+(no `clicks`/`linkClicks` — clicks now come from `TrackedLink`). The
+`PublisherBooking.clickToken`/`clickTargetUrl` fields from the original §1 are
+**dropped** in favour of `TrackedLink`.
+
+Flow: in the content-production UI (where the desk/writer finalizes a
+`ContentAsset` for an order line), a "tracked links" panel lets them add
+destination URLs + labels → each becomes a `TrackedLink` and shows its
+`/go/<token>` to paste into the article body. `GET /go/<token>` increments
+`clickCount` and 302-redirects to `targetUrl` (bad token → safe fallback, no
+500, no PII). Buyer/desk dashboard aggregates clicks per order line.
+
+> NOTE: the §1 below (PublisherBooking.clickToken, CTA-only minting) is the
+> earlier approach and is SUPERSEDED by this section — implement the
+> TrackedLink model above instead.
 - **A/B testing: explicitly OUT OF SCOPE** (deferred) — splitting delivery is
   premature before we can even measure one variant; revisit once real metrics
   exist.
