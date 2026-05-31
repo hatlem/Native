@@ -91,5 +91,5 @@ export default function middleware(req: NextRequest) {
 export const config = {
   // Skip Next internals and static assets — they don't need a per-request
   // nonce or a locale match.
-  matcher: ["/((?!api|_next|_vercel|.*\\..*).*)"],
+  matcher: ["/((?!api|go|_next|_vercel|.*\\..*).*)"],
 };
