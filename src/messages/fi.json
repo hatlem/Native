@@ -241,7 +241,9 @@
       "compareModeHint": "Valitse julkaisut, joita haluat vertailla rinnakkain",
       "loading": "Päivitetään…",
       "reach": "Tavoittavuus",
-      "anyReach": "Mikä tahansa"
+      "anyReach": "Mikä tahansa",
+      "region": "Alue",
+      "allRegions": "Kaikki alueet"
     },
     "compareBar": {
       "label": "{count, plural, =1 {1 julkaisu valittu} other {# julkaisua valittu}}",

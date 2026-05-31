@@ -162,7 +162,9 @@
       "compareModeHint": "Vælg titler du vil sammenligne side om side",
       "loading": "Opdaterer…",
       "reach": "Rækkevidde",
-      "anyReach": "Al rækkevidde"
+      "anyReach": "Al rækkevidde",
+      "region": "Region",
+      "allRegions": "Alle regioner"
     },
     "compareBar": {
       "label": "{count, plural, =1 {1 titel valgt} other {# titler valgt}}",

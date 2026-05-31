@@ -96,6 +96,8 @@ export default async function CatalogPage({
     );
   const verticalsRaw = typeof sp.vertical === "string" ? sp.vertical : "";
   const verticals = verticalsRaw.split(",").map((s) => s.trim()).filter(Boolean);
+  const regionsRaw = typeof sp.region === "string" ? sp.region : "";
+  const regions = regionsRaw.split(",").map((s) => s.trim()).filter(Boolean);
   const nativeFit = asEnum(
     typeof sp.nativeFit === "string" ? sp.nativeFit : undefined,
     NATIVE_FIT_VALUES,
@@ -136,6 +138,7 @@ export default async function CatalogPage({
       ? { products: { some: { type: { in: types }, active: true } } }
       : {}),
     ...(verticals.length ? { vertical: { in: verticals } } : {}),
+    ...(regions.length ? { region: { in: regions } } : {}),
     // "Priced titles only" = a buyer can actually see a € figure. Mirror
     // isProductPriceShown (src/lib/pricing/visibility.ts): an active,
     // sales-confirmed product AND both title + publisher prices public.
@@ -161,6 +164,7 @@ export default async function CatalogPage({
               { category: { contains: q, mode: "insensitive" } },
               { vertical: { contains: q, mode: "insensitive" } },
               { tags: { contains: q, mode: "insensitive" } },
+              { city: { contains: q, mode: "insensitive" } },
             ],
           }
         : {}),
@@ -315,11 +319,13 @@ export default async function CatalogPage({
         b2bB2cs={B2B_B2C_VALUES.map((v) => ({ value: v, label: v }))}
         reaches={REACH_VALUES.map((v) => ({ value: v, label: tReach(v) }))}
         categories={verticalOptions.map((v) => ({ value: v, label: v }))}
+        regions={regionOptions.map((v) => ({ value: v, label: v }))}
         initial={{
           q,
           markets,
           types,
           verticals,
+          regions,
           nativeFit: nativeFit ?? "",
           b2bB2c: b2bB2c ?? "",
           reach: reach ?? "",

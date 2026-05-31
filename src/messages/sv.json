@@ -162,7 +162,9 @@
       "compareModeHint": "Markera titlar du vill jämföra sida vid sida",
       "loading": "Uppdaterar…",
       "reach": "Räckvidd",
-      "anyReach": "All räckvidd"
+      "anyReach": "All räckvidd",
+      "region": "Region",
+      "allRegions": "Alla regioner"
     },
     "compareBar": {
       "label": "{count, plural, =1 {1 titel vald} other {# titlar valda}}",

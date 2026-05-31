@@ -241,7 +241,9 @@
       "compareModeHint": "Tick titles to compare side-by-side",
       "loading": "Updating…",
       "reach": "Reach",
-      "anyReach": "Any reach"
+      "anyReach": "Any reach",
+      "region": "Region",
+      "allRegions": "All regions"
     },
     "compareBar": {
       "label": "{count, plural, =1 {1 title selected} other {# titles selected}}",

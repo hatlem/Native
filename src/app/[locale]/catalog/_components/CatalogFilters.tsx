@@ -41,10 +41,12 @@ export function CatalogFilters({ markets, formats, nativeFits, b2bB2cs, reaches,
   const [formatOpen, setFormatOpen] = useState(false);
   const [marketOpen, setMarketOpen] = useState(false);
   const [categoryOpen, setCategoryOpen] = useState(false);
+  const [regionOpen, setRegionOpen] = useState(false);
   const [advancedOpen, setAdvancedOpen] = useState(initial.advancedOpen);
   const formatRef = useRef<HTMLDivElement>(null);
   const marketRef = useRef<HTMLDivElement>(null);
   const categoryRef = useRef<HTMLDivElement>(null);
+  const regionRef = useRef<HTMLDivElement>(null);
 
   // Debounced URL update for the search input. Other filter changes
   // commit instantly — only the text field waits for the typist to pause.
@@ -190,6 +192,7 @@ export function CatalogFilters({ markets, formats, nativeFits, b2bB2cs, reaches,
         ? (markets.find((m) => m.value === initial.markets[0])?.label ?? initial.markets[0])
         : t("marketCount", { count: selectedMarkets.size });
   const selectedCategories = new Set(initial.verticals);
+  const selectedRegions = new Set(initial.regions);
   const categoryLabel = t("categoryCount", { count: selectedCategories.size });
 
   return (

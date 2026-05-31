@@ -241,7 +241,9 @@
       "compareModeHint": "Titel auswählen, um sie nebeneinander zu vergleichen",
       "loading": "Wird aktualisiert…",
       "reach": "Reichweite",
-      "anyReach": "Alle Reichweiten"
+      "anyReach": "Alle Reichweiten",
+      "region": "Region",
+      "allRegions": "Alle Regionen"
     },
     "compareBar": {
       "label": "{count, plural, =1 {1 Titel ausgewählt} other {# Titel ausgewählt}}",
