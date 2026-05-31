@@ -1427,7 +1427,12 @@
     "errorsBody": "Fehler kommen als JSON mit einem stabilen Code und einer menschenlesbaren Nachricht zurück. Codes heute: MISSING, INVALID, EXPIRED, REVOKED, SCOPE, RATE_LIMITED, NOT_FOUND.",
     "ctaTitle": "Brauchen Sie einen Schlüssel?",
     "ctaBody": "Wir stellen die API nicht automatisch bereit — Partnerintegrationen haben kommerzielle Implikationen, die wir zuerst besprechen möchten. Melden Sie sich, und wir geben Ihnen innerhalb eines Arbeitstags einen funktionierenden Schlüssel.",
-    "ctaContact": "Mit Partnerships sprechen"
+    "ctaContact": "Mit Partnerships sprechen",
+    "selfServeEyebrow": "Self-Serve",
+    "selfServeTitle": "Kaufen wie programmatisch — auf benannten Premium-Titeln",
+    "selfServeBody": "Entdecke Inventar über die Katalog-API und buche festpreisige Platzierungen in einem Aufruf — per API oder in der App. Keine Auktion, kein verstecktes Inventar: jeder Titel ist benannt, jeder Preis ist der des Publishers. RFQ-Titel bleiben bewusst desk-vermittelt — die API bucht ausschließlich festpreisiges Self-Serve-Inventar.",
+    "ordersBody": "Gib eine festpreisige Self-Serve-Bestellung auf. Sende festpreisige Produkte und erhalte in einem Aufruf eine bestätigte Bestellung zurück. Erfordert den orders:write-Scope und einen an deine Organisation gebundenen Schlüssel; RFQ-Produkte liefern 422 RFQ_ONLY.",
+    "ordersRequest": "curl -X POST https://nativespin.com/api/v1/orders \\\n  -H \"Authorization: Bearer DEIN_KEY\" \\\n  -H \"Content-Type: application/json\" \\\n  -d '{\"items\":[{\"productId\":\"PRODUKT_ID\",\"quantity\":1}]}'"
   },
   "apiKeys": {
     "eyebrow": "Super-Admin",

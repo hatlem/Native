@@ -1568,7 +1568,12 @@
     "errorsBody": "Errors come back as JSON with a stable code and a human message. Codes today: MISSING, INVALID, EXPIRED, REVOKED, SCOPE, RATE_LIMITED, NOT_FOUND.",
     "ctaTitle": "Need a key?",
     "ctaBody": "We will not auto-provision the API — partner integrations carry commercial implications we want to talk through first. Reach out and we will get you a working key within a working day.",
-    "ctaContact": "Talk to partnerships"
+    "ctaContact": "Talk to partnerships",
+    "selfServeEyebrow": "Self-serve",
+    "selfServeTitle": "Buy like programmatic — on named premium titles",
+    "selfServeBody": "Discover inventory through the catalog API, then book firm-priced placements in one call — by API or in the app. No auction, no mystery supply: every title is named, every price is the publisher's. RFQ titles stay desk-mediated by design — the API places firm, self-serve inventory only.",
+    "ordersBody": "Place a firm-priced, self-serve order. Send firm products and get a confirmed order back in one call. Requires the orders:write scope and a key bound to your organization; RFQ-only products return 422 RFQ_ONLY.",
+    "ordersRequest": "curl -X POST https://nativespin.com/api/v1/orders \\\n  -H \"Authorization: Bearer YOUR_KEY\" \\\n  -H \"Content-Type: application/json\" \\\n  -d '{\"items\":[{\"productId\":\"PRODUCT_ID\",\"quantity\":1}]}'"
   },
   "apiKeys": {
     "eyebrow": "Super admin",

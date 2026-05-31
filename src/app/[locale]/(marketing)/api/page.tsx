@@ -36,6 +36,21 @@ export default async function ApiDocsPage({
 
       <section className="section prose-section">
         <div className="wrap">
+          <span className="eyebrow accent">{t("selfServeEyebrow")}</span>
+          <h2>{t("selfServeTitle")}</h2>
+          <p className="prose">{t("selfServeBody")}</p>
+          <pre className="prose" style={{ whiteSpace: "pre-wrap" }}>
+{`POST /api/v1/orders
+Authorization: Bearer atn_<your-token>
+Content-Type: application/json
+
+{ "items": [ { "productId": "<firm-product-id>", "quantity": 1 } ] }`}
+          </pre>
+        </div>
+      </section>
+
+      <section className="section prose-section">
+        <div className="wrap">
           <h2>{t("authTitle")}</h2>
           <p className="prose">{t("authBody")}</p>
           <pre className="prose" style={{ whiteSpace: "pre-wrap" }}>
@@ -69,6 +84,11 @@ Authorization: Bearer atn_<your-token>`}
               <h3>GET /api/v1/catalog/titles/{`{id}`}</h3>
               <p className="muted">{t("detailBody")}</p>
               <p className="muted small">{t("detailIncludes")}</p>
+            </article>
+
+            <article className="card">
+              <h3>POST /api/v1/orders</h3>
+              <p className="muted">{t("ordersBody")}</p>
             </article>
           </div>
         </div>

@@ -1569,7 +1569,12 @@
     "errorsBody": "Fel returneras som JSON med en stabil kod och ett mänskligt meddelande. Koder idag: MISSING, INVALID, EXPIRED, REVOKED, SCOPE, RATE_LIMITED, NOT_FOUND.",
     "ctaTitle": "Behöver du en nyckel?",
     "ctaBody": "Vi tillhandahåller inte API:t automatiskt — partnerintegrationer har kommersiella implikationer som vi vill prata igenom först. Hör av dig, så får du en fungerande nyckel inom en arbetsdag.",
-    "ctaContact": "Prata med partnerskapsteamet"
+    "ctaContact": "Prata med partnerskapsteamet",
+    "selfServeEyebrow": "Självbetjäning",
+    "selfServeTitle": "Köp som programmatiskt — på namngivna premiumtitlar",
+    "selfServeBody": "Hitta lager via katalog-API:t och boka fastprissatta placeringar i ett anrop — via API eller i appen. Ingen auktion, inget dolt lager: varje titel är namngiven, varje pris är utgivarens eget. RFQ-titlar förblir desk-styrda med avsikt — API:t bokar endast fastprissatt självbetjäningslager.",
+    "ordersBody": "Lägg en fastprissatt självbetjäningsorder. Skicka fastprissatta produkter och få en bekräftad order tillbaka i ett anrop. Kräver orders:write-behörighet och en nyckel kopplad till din organisation; RFQ-produkter ger 422 RFQ_ONLY.",
+    "ordersRequest": "curl -X POST https://nativespin.com/api/v1/orders \\\n  -H \"Authorization: Bearer DIN_NYCKEL\" \\\n  -H \"Content-Type: application/json\" \\\n  -d '{\"items\":[{\"productId\":\"PRODUKT_ID\",\"quantity\":1}]}'"
   },
   "apiKeys": {
     "eyebrow": "Superadmin",

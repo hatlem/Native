@@ -1569,7 +1569,12 @@
     "errorsBody": "Virheet palautetaan JSON-muodossa pysyvällä koodilla ja luettavalla viestillä. Koodit tällä hetkellä: MISSING, INVALID, EXPIRED, REVOKED, SCOPE, RATE_LIMITED, NOT_FOUND.",
     "ctaTitle": "Tarvitsetko avaimen?",
     "ctaBody": "Emme automaattisesti myönnä API-pääsyä — kumppani-integraatioilla on kaupallisia vaikutuksia, jotka haluamme keskustella ensin. Ota yhteyttä, niin saat toimivan avaimen yhden työpäivän kuluessa.",
-    "ctaContact": "Keskustele kumppanuustiimin kanssa"
+    "ctaContact": "Keskustele kumppanuustiimin kanssa",
+    "selfServeEyebrow": "Itsepalvelu",
+    "selfServeTitle": "Osta kuin ohjelmallisesti — nimetyistä premium-julkaisuista",
+    "selfServeBody": "Löydä tarjonta luettelo-API:n kautta ja varaa kiinteähintaiset sijoittelut yhdellä kutsulla — API:n kautta tai sovelluksessa. Ei huutokauppaa, ei piilotettua tarjontaa: jokainen julkaisu on nimetty, jokainen hinta on julkaisijan oma. RFQ-julkaisut pysyvät tarkoituksella deskin välittäminä — API varaa vain kiinteähintaista itsepalvelutarjontaa.",
+    "ordersBody": "Tee kiinteähintainen itsepalvelutilaus. Lähetä kiinteähintaiset tuotteet ja saat vahvistetun tilauksen takaisin yhdellä kutsulla. Vaatii orders:write-oikeuden ja organisaatioosi sidotun avaimen; RFQ-tuotteet palauttavat 422 RFQ_ONLY.",
+    "ordersRequest": "curl -X POST https://nativespin.com/api/v1/orders \\\n  -H \"Authorization: Bearer AVAIMESI\" \\\n  -H \"Content-Type: application/json\" \\\n  -d '{\"items\":[{\"productId\":\"TUOTE_ID\",\"quantity\":1}]}'"
   },
   "apiKeys": {
     "eyebrow": "Superadmin",

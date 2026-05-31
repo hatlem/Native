@@ -1570,7 +1570,12 @@
     "errorsBody": "Fejl returneres som JSON med en stabil kode og en menneskelig læsbar besked. Koder i dag: MISSING, INVALID, EXPIRED, REVOKED, SCOPE, RATE_LIMITED, NOT_FOUND.",
     "ctaTitle": "Brug for en nøgle?",
     "ctaBody": "Vi auto-tildeler ikke API'et — partnerintegrationer har kommercielle implikationer, som vi gerne vil tale igennem først. Ræk ud, så får du en fungerende nøgle inden for en arbejdsdag.",
-    "ctaContact": "Tal med partnerskabsteamet"
+    "ctaContact": "Tal med partnerskabsteamet",
+    "selfServeEyebrow": "Selvbetjening",
+    "selfServeTitle": "Køb som programmatisk — på navngivne premiumtitler",
+    "selfServeBody": "Find lager via katalog-API'et, og book fastprissatte placeringer i ét kald — via API eller i appen. Ingen auktion, intet skjult lager: hver titel er navngivet, hver pris er udgiverens egen. RFQ-titler forbliver desk-styrede med vilje — API'et booker kun fastprissat selvbetjeningslager.",
+    "ordersBody": "Afgiv en fastprissat selvbetjeningsordre. Send fastprissatte produkter og få en bekræftet ordre tilbage i ét kald. Kræver orders:write-adgang og en nøgle bundet til din organisation; RFQ-produkter giver 422 RFQ_ONLY.",
+    "ordersRequest": "curl -X POST https://nativespin.com/api/v1/orders \\\n  -H \"Authorization: Bearer DIN_NØGLE\" \\\n  -H \"Content-Type: application/json\" \\\n  -d '{\"items\":[{\"productId\":\"PRODUKT_ID\",\"quantity\":1}]}'"
   },
   "apiKeys": {
     "eyebrow": "Superadmin",
