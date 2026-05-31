@@ -7,6 +7,7 @@ import { loadScope, canActOnOrg } from "@/lib/scope";
 import { safeExternalUrl } from "@/lib/security";
 import { StatusBadge } from "@/app/status-badge";
 import { duplicatePlan } from "@/app/actions";
+import { clicksByOrderLine } from "@/lib/metrics/store";
 import { SubmitButton } from "@/components";
 
 export const dynamic = "force-dynamic";
@@ -33,7 +34,7 @@ export default async function MyOrderPage({
           brief: {
             include: { assets: { orderBy: { version: "desc" }, take: 1 } },
           },
-          booking: true,
+          booking: { include: { metrics: true } },
         },
       },
     },
