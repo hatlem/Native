@@ -820,7 +820,7 @@
       "voice": "Lähinnä visuaalinen — sinun otsikkosi, julkaisun layout",
       "brand": "Logo + tagi yksikössä; klikkaus omaan kohteeseen",
       "reads": "Toimituksellinen kortti, joka osoittautuu sponsoroiduksi",
-      "bestFor": "Tavoittavuus, uudelleenmarkkinointi, tunnettuus kuratoidulle yleisölle",
+      "bestFor": "Tavoittavuus ja tunnettuus kuratoidulle yleisölle",
       "rule": "Jos haluat julkaisun kehyksen klikkauksen ympärille, et sen sanojen, valitse natiivi display."
     },
     "package": {
@@ -940,7 +940,18 @@
     "contentBody": "Sisältö on puolet kustannuksesta ja suurin osa natiivikampanjan suorituskyvystä. Paketointi tarkoittaa, että voimme toimittaa spesifikaatioiden mukaisia, merkinnältään oikein olevia artikkeleita kustantajan oikeasti tarjoamassa toimitusajassa — ja paketti voittaa itsetekemisen.",
     "formatsEyebrow": "Formaatit",
     "formatsTitle": "Mitä on tarjolla",
-    "formatsLead": "Jokainen katalogin julkaisu julkaisee jonkin yhdistelmän näistä. Desk valitsee briifiin sopivan — ja sen markkinan merkintäsääntöihin sopivan."
+    "formatsLead": "Jokainen katalogin julkaisu julkaisee jonkin yhdistelmän näistä. Desk valitsee briifiin sopivan — ja sen markkinan merkintäsääntöihin sopivan.",
+    "targetingEyebrow": "Kohdennus",
+    "targetingTitle": "Tavoita oikeat lukijat sen mukaan, missä, mitä ja kuka.",
+    "targetingLead": "Kohdennus NativeSpinissä tarkoittaa oikeiden julkaisujen valitsemista — ei ihmisten jahtaamista ympäri verkkoa.",
+    "targetingContextTitle": "Kontekstuaalinen",
+    "targetingContextBody": "Valitse julkaisut kategorian, toimialan ja toimituksellisen aiheen mukaan, jotta juttusi on siellä, minne se kuuluu.",
+    "targetingGeoTitle": "Maantieteellinen",
+    "targetingGeoBody": "Suodata markkinan, alueen, kaupungin ja tavoittavuuden mukaan — valtakunnallista brändinrakennusta tai yksi kaupunki.",
+    "targetingAudienceTitle": "Yleisösegmentti",
+    "targetingAudienceBody": "Jokaisella julkaisulla on määritelty toimituksellinen yleisö — alueellisista kuluttajista B2B-päättäjiin.",
+    "targetingHonestyTitle": "Mitä emme tee",
+    "targetingHonestyBody": "Ei käyttäytymiseen perustuvaa uudelleenmarkkinointia, ei kiinnostusprofiileja, ei käyttäjätason dataa. Relevanssi tulee julkaisusta, ei lukijan seuraamisesta."
   },
   "agencies": {
     "eyebrow": "Toimistoille",

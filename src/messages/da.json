@@ -741,7 +741,7 @@
       "voice": "Mest visuelt — din overskrift, titlens layout",
       "brand": "Logo + tag i enheden; klik videre til din destination",
       "reads": "Et redaktionelt kort der viser sig at være sponsoreret",
-      "bestFor": "Rækkevidde, retargeting, kendskab mod et kurateret publikum",
+      "bestFor": "Rækkevidde og kendskab mod et kurateret publikum",
       "rule": "Vil du have titlens ramme om et klik, ikke om ordene — så kør native display."
     },
     "package": {
@@ -940,7 +940,18 @@
     "contentBody": "Indhold er halvdelen af omkostningen og det meste af præstationen i en native-kampagne. Når vi pakker det, kan vi levere spec-rigtige, mærkningsrigtige artikler inden for udgiverens reelle leveringstid — og pakken slår at gøre det selv.",
     "formatsEyebrow": "Formater",
     "formatsTitle": "Det her er på tilbud",
-    "formatsLead": "Hver titel i kataloget udgiver en blanding af disse. Desken vælger den, der passer briefen — og mærkningsreglerne i det marked."
+    "formatsLead": "Hver titel i kataloget udgiver en blanding af disse. Desken vælger den, der passer briefen — og mærkningsreglerne i det marked.",
+    "targetingEyebrow": "Målretning",
+    "targetingTitle": "Nå de rette læsere ud fra hvor, hvad og hvem.",
+    "targetingLead": "Målretning hos NativeSpin betyder at vælge de rette titler — ikke at jagte folk rundt på nettet.",
+    "targetingContextTitle": "Kontekstuel",
+    "targetingContextBody": "Vælg titler efter kategori, vertikal og redaktionelt emne, så din historie står, hvor den hører hjemme.",
+    "targetingGeoTitle": "Geografisk",
+    "targetingGeoBody": "Filtrér på marked, region, by og rækkevidde — national brandopbygning eller en enkelt by.",
+    "targetingAudienceTitle": "Målgruppesegment",
+    "targetingAudienceBody": "Hver titel har en defineret redaktionel målgruppe — fra regionale forbrugere til B2B-beslutningstagere.",
+    "targetingHonestyTitle": "Det vi ikke gør",
+    "targetingHonestyBody": "Ingen adfærdsbaseret retargeting, ingen interessegrafer, ingen data på brugerniveau. Relevansen kommer fra titlen, ikke fra at spore læseren."
   },
   "agencies": {
     "eyebrow": "For bureauer",

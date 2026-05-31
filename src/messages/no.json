@@ -741,7 +741,7 @@
       "voice": "Mest visuelt — din tittel, utgiverens layout",
       "brand": "Logo + tag i enheten; klikk videre til ditt landingssted",
       "reads": "Et redaksjonelt kort som viser seg å være sponset",
-      "bestFor": "Rekkevidde, retargeting, kjennskap mot et kuratert publikum",
+      "bestFor": "Rekkevidde og kjennskap mot et kuratert publikum",
       "rule": "Hvis du vil ha titlens ramme rundt et klikk, ikke rundt ordene dine — kjør native display."
     },
     "package": {
@@ -940,7 +940,18 @@
     "contentBody": "Innhold er halve kostnaden og det meste av ytelsen i en native-kampanje. Når vi pakker det inn, kan vi levere spec-riktige, merke-riktige artikler innen utgiverens reelle leveringstid — og pakken slår å gjøre det selv.",
     "formatsEyebrow": "Formater",
     "formatsTitle": "Dette er på tilbud",
-    "formatsLead": "Hver tittel i katalogen publiserer en miks av disse. Desken velger den som passer briefen — og merkereglene i det markedet."
+    "formatsLead": "Hver tittel i katalogen publiserer en miks av disse. Desken velger den som passer briefen — og merkereglene i det markedet.",
+    "targetingEyebrow": "Målretting",
+    "targetingTitle": "Nå de rette leserne ut fra hvor, hva og hvem.",
+    "targetingLead": "Målretting hos NativeSpin betyr å velge de rette titlene — ikke å jage folk rundt på nettet.",
+    "targetingContextTitle": "Kontekstuell",
+    "targetingContextBody": "Velg titler etter kategori, vertikal og redaksjonelt tema, så saken din står der den hører hjemme.",
+    "targetingGeoTitle": "Geografisk",
+    "targetingGeoBody": "Filtrer på marked, region, by og rekkevidde — nasjonal merkevarebygging eller én enkelt by.",
+    "targetingAudienceTitle": "Målgruppesegment",
+    "targetingAudienceBody": "Hver tittel har en definert redaksjonell målgruppe — fra regionale forbrukere til B2B-beslutningstakere.",
+    "targetingHonestyTitle": "Det vi ikke gjør",
+    "targetingHonestyBody": "Ingen atferdsbasert retargeting, ingen interessegrafer, ingen data på brukernivå. Relevansen kommer fra tittelen, ikke fra å spore leseren."
   },
   "agencies": {
     "eyebrow": "For byråer",

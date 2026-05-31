@@ -741,7 +741,7 @@
       "voice": "Mest visuellt — din rubrik, titelns layout",
       "brand": "Logo + tag i enheten; klick vidare till din destination",
       "reads": "Ett redaktionellt kort som visar sig vara sponsrat",
-      "bestFor": "Räckvidd, retargeting, kännedom mot en kurerad publik",
+      "bestFor": "Räckvidd och kännedom mot en kurerad publik",
       "rule": "Vill du ha titelns ram runt ett klick, inte runt orden — kör native display."
     },
     "package": {
@@ -940,7 +940,18 @@
     "contentBody": "Innehållet är halva kostnaden och det mesta av prestandan i en native-kampanj. När vi paketerar det kan vi leverera spec-riktiga, märkningsriktiga artiklar inom utgivarens faktiska ledtid — och paketet slår att göra det själv.",
     "formatsEyebrow": "Format",
     "formatsTitle": "Det här erbjuds",
-    "formatsLead": "Varje titel i katalogen publicerar någon mix av dessa. Desken väljer den som passar briefen — och märkningsreglerna i det marknaden."
+    "formatsLead": "Varje titel i katalogen publicerar någon mix av dessa. Desken väljer den som passar briefen — och märkningsreglerna i det marknaden.",
+    "targetingEyebrow": "Målgruppsstyrning",
+    "targetingTitle": "Nå rätt läsare utifrån var, vad och vem.",
+    "targetingLead": "Målgruppsstyrning hos NativeSpin handlar om att välja rätt titlar — inte att jaga människor runt på webben.",
+    "targetingContextTitle": "Kontextuell",
+    "targetingContextBody": "Välj titlar efter kategori, vertikal och redaktionellt ämne, så att din story hamnar där den hör hemma.",
+    "targetingGeoTitle": "Geografisk",
+    "targetingGeoBody": "Filtrera på marknad, region, stad och räckvidd — nationellt varumärkesbygge eller en enda stad.",
+    "targetingAudienceTitle": "Målgruppssegment",
+    "targetingAudienceBody": "Varje titel har en definierad redaktionell publik — från regionala konsumenter till B2B-beslutsfattare.",
+    "targetingHonestyTitle": "Det vi inte gör",
+    "targetingHonestyBody": "Ingen beteendebaserad retargeting, inga intressegrafer, ingen data på användarnivå. Relevansen kommer från titeln, inte från att spåra läsaren."
   },
   "agencies": {
     "eyebrow": "För byråer",

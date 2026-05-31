@@ -128,6 +128,36 @@ export default async function ForAdvertisersPage({
         </div>
       </section>
 
+      <section className="section">
+        <div className="wrap">
+          <div className="section-head">
+            <div>
+              <span className="eyebrow accent">{t("targetingEyebrow")}</span>
+              <h2>{t("targetingTitle")}</h2>
+            </div>
+            <p className="lead">{t("targetingLead")}</p>
+          </div>
+          <div className="grid">
+            <article className="card">
+              <h3>{t("targetingContextTitle")}</h3>
+              <p className="muted">{t("targetingContextBody")}</p>
+            </article>
+            <article className="card">
+              <h3>{t("targetingGeoTitle")}</h3>
+              <p className="muted">{t("targetingGeoBody")}</p>
+            </article>
+            <article className="card">
+              <h3>{t("targetingAudienceTitle")}</h3>
+              <p className="muted">{t("targetingAudienceBody")}</p>
+            </article>
+          </div>
+          <p className="prose" style={{ marginTop: 20 }}>
+            <strong>{t("targetingHonestyTitle")}: </strong>
+            {t("targetingHonestyBody")}
+          </p>
+        </div>
+      </section>
+
       <section className="cta-block">
         <div className="wrap">
           <h2>{tm("ctaBlockTitle")}</h2>

@@ -820,7 +820,7 @@
       "voice": "Vor allem visuell — Ihre Headline, das Layout des Titels",
       "brand": "Logo + Hinweis in der Einheit; Klick führt zu Ihrem Ziel",
       "reads": "Eine redaktionelle Karte, die sich als gesponsert erweist",
-      "bestFor": "Reichweite, Retargeting, Awareness vor einer kuratierten Zielgruppe",
+      "bestFor": "Reichweite und Awareness vor einer kuratierten Zielgruppe",
       "rule": "Wenn Sie den Rahmen des Titels um einen Klick wollen, nicht dessen Worte, dann Native Display."
     },
     "package": {
@@ -940,7 +940,18 @@
     "contentBody": "Inhalt ist die Hälfte der Kosten und der Großteil der Wirkung einer Native-Kampagne. Wenn wir bündeln, können wir spec-konforme, kennzeichnungsrichtige Artikel in der vom Verlag tatsächlich genannten Vorlaufzeit liefern — und das Gesamtpaket schlägt DIY.",
     "formatsEyebrow": "Formate",
     "formatsTitle": "Das ist im Angebot",
-    "formatsLead": "Jeder Titel im Katalog veröffentlicht eine Mischung aus diesen Formaten. Das Desk wählt das passende — und passt sich den Kennzeichnungsregeln des jeweiligen Marktes an."
+    "formatsLead": "Jeder Titel im Katalog veröffentlicht eine Mischung aus diesen Formaten. Das Desk wählt das passende — und passt sich den Kennzeichnungsregeln des jeweiligen Marktes an.",
+    "targetingEyebrow": "Targeting",
+    "targetingTitle": "Erreichen Sie die richtigen Leser nach Wo, Was und Wer.",
+    "targetingLead": "Targeting bei NativeSpin heißt, die richtigen Titel zu wählen — nicht, Menschen durchs Web zu verfolgen.",
+    "targetingContextTitle": "Kontextuell",
+    "targetingContextBody": "Wählen Sie Titel nach Kategorie, Branche und redaktionellem Thema, damit Ihre Geschichte dort steht, wo sie hingehört.",
+    "targetingGeoTitle": "Geografisch",
+    "targetingGeoBody": "Filtern Sie nach Markt, Region, Stadt und Reichweite — nationaler Markenaufbau oder eine einzelne Stadt.",
+    "targetingAudienceTitle": "Zielgruppensegment",
+    "targetingAudienceBody": "Jeder Titel hat eine definierte redaktionelle Zielgruppe — von regionalen Verbrauchern bis zu B2B-Entscheidern.",
+    "targetingHonestyTitle": "Was wir nicht tun",
+    "targetingHonestyBody": "Kein verhaltensbasiertes Retargeting, keine Interessensgraphen, keine Daten auf Nutzerebene. Die Relevanz kommt vom Titel, nicht vom Tracking des Lesers."
   },
   "agencies": {
     "eyebrow": "Für Agenturen",

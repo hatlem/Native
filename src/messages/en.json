@@ -819,7 +819,7 @@
       "voice": "Mostly visual — your headline, the title's layout",
       "brand": "Logo + tag in the unit; click-through to your destination",
       "reads": "An editorial card that turns out to be sponsored",
-      "bestFor": "Reach, retargeting, awareness against a curated audience",
+      "bestFor": "Reach and awareness against a curated audience",
       "rule": "If you want the title's frame around a click, not its words, run native display."
     },
     "package": {
@@ -939,7 +939,18 @@
     "contentBody": "Content is half the cost and most of the performance of a native campaign. Bundling it means we can ship spec-compliant, disclosure-correct articles in the lead time the publisher actually quotes — and the total bundle beats DIY.",
     "formatsEyebrow": "Formats",
     "formatsTitle": "What's on offer",
-    "formatsLead": "Every title in the catalog publishes some mix of these. The desk picks the one that fits the brief — and the disclosure rules of that market."
+    "formatsLead": "Every title in the catalog publishes some mix of these. The desk picks the one that fits the brief — and the disclosure rules of that market.",
+    "targetingEyebrow": "Targeting",
+    "targetingTitle": "Reach the right readers by where, what, and who.",
+    "targetingLead": "Targeting on NativeSpin means choosing the right titles — not chasing people around the web.",
+    "targetingContextTitle": "Contextual",
+    "targetingContextBody": "Pick titles by category, vertical, and editorial topic, so your story runs where it belongs.",
+    "targetingGeoTitle": "Geographic",
+    "targetingGeoBody": "Filter by market, region, city, and reach tier — national brand build or a single city.",
+    "targetingAudienceTitle": "Audience segment",
+    "targetingAudienceBody": "Each title carries a defined editorial audience — from regional consumers to B2B decision-makers.",
+    "targetingHonestyTitle": "What we don't do",
+    "targetingHonestyBody": "No behavioural retargeting, no interest graphs, no user-level data. The relevance comes from the title, not from tracking the reader."
   },
   "agencies": {
     "eyebrow": "For agencies",
