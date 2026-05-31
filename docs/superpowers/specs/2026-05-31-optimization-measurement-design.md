@@ -58,12 +58,16 @@ model TrackedLink {
 `PublisherBooking.clickToken`/`clickTargetUrl` fields from the original §1 are
 **dropped** in favour of `TrackedLink`.
 
-Flow: in the content-production UI (where the desk/writer finalizes a
-`ContentAsset` for an order line), a "tracked links" panel lets them add
-destination URLs + labels → each becomes a `TrackedLink` and shows its
-`/go/<token>` to paste into the article body. `GET /go/<token>` increments
-`clickCount` and 302-redirects to `targetUrl` (bad token → safe fallback, no
-500, no PII). Buyer/desk dashboard aggregates clicks per order line.
+Flow (HYBRID auto-detect + desk-confirm, per user decision): in the
+content-production UI for an order line's `ContentAsset`, a pure
+`extractLinks(body)` helper scans the asset body for external `http(s)` hrefs
+and lists them as candidates. The desk ticks which candidates to track (with an
+optional label); each ticked one becomes a `TrackedLink` and the asset body is
+rewritten so that href → `/go/<token>`. Untracked links stay as-is. Re-running
+extraction is idempotent (already-tracked URLs show as tracked, not duplicated).
+`GET /go/<token>` increments `clickCount` and 302-redirects to `targetUrl` (bad
+token → safe fallback, no 500, no PII). Buyer/desk dashboard aggregates clicks
+per order line. `extractLinks` and the body-rewrite are pure + unit-tested.
 
 > NOTE: the §1 below (PublisherBooking.clickToken, CTA-only minting) is the
 > earlier approach and is SUPERSEDED by this section — implement the
