@@ -19,6 +19,7 @@
     "send-rate-card-batch": "tsx scripts/send-rate-card-batch.ts",
     "seed-content-fees": "tsx scripts/seed-content-fees.ts",
     "issue-publisher-key": "tsx scripts/issue-publisher-key.ts",
+    "issue-pricing-admin-key": "tsx scripts/issue-pricing-admin-key.ts",
     "seed-playbooks": "tsx scripts/seed-playbooks.ts"
   },
   "prisma": {
