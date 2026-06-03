@@ -40,6 +40,7 @@ if (!RUN_DB_IT) {
         publisherId: pub.id,
         countryCode: market.code,
         marketId: market.id,
+        category: "business",
       },
     });
     titleId = title.id;
