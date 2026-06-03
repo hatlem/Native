@@ -10,7 +10,8 @@ import {
   cancelPriceRequest,
 } from "@/lib/pricing/requests";
 import { applyQuote, logQuote } from "@/lib/pricing/quotes";
-import type { ProductType } from "@prisma/client";
+import { createContactLog } from "@/lib/pricing/contact-log";
+import type { ProductType, ContactChannel, ContactDirection } from "@prisma/client";
 
 const productTypeSchema = z.enum([
   "NATIVE_ARTICLE",
@@ -20,6 +21,9 @@ const productTypeSchema = z.enum([
   "CONTEXTUAL",
   "OTHER",
 ]);
+
+const contactChannelSchema = z.enum(["EMAIL", "PHONE", "WEB_FORM", "LINKEDIN", "OTHER"]);
+const contactDirectionSchema = z.enum(["OUTBOUND", "INBOUND"]);
 
 export const mutateToolDefinitions = (actorId: string) => ({
   native_create_sales_contact: {
@@ -98,7 +102,7 @@ export const mutateToolDefinitions = (actorId: string) => ({
 
   native_log_quote: {
     description:
-      "Log a PriceQuote against an existing Product. Use for transcribing email/phone responses.",
+      "Log a PriceQuote against an existing Product. Use for transcribing email/phone responses. Pass contactLogId to attribute the offer to a logged contact event.",
     parameters: z.object({
       priceRequestId: z.string().optional(),
       productId: z.string(),
@@ -107,6 +111,7 @@ export const mutateToolDefinitions = (actorId: string) => ({
       includedText: z.string().optional(),
       excludedText: z.string().optional(),
       validUntil: z.string().datetime().optional(),
+      contactLogId: z.string().optional(),
     }),
     handler: async (a: {
       priceRequestId?: string;
@@ -116,6 +121,7 @@ export const mutateToolDefinitions = (actorId: string) => ({
       includedText?: string;
       excludedText?: string;
       validUntil?: string;
+      contactLogId?: string;
     }) =>
       logQuote({
         priceRequestId: a.priceRequestId,
@@ -125,13 +131,14 @@ export const mutateToolDefinitions = (actorId: string) => ({
         includedText: a.includedText,
         excludedText: a.excludedText,
         validUntil: a.validUntil ? new Date(a.validUntil) : undefined,
+        contactLogId: a.contactLogId,
         recordedById: actorId,
       }),
   },
 
   native_log_quote_draft: {
     description:
-      "Log a PriceQuote for a new format that doesn't have an existing Product yet. When applied, will create a new (inactive) Product.",
+      "Log a PriceQuote for a new format that doesn't have an existing Product yet. When applied, will create a new (inactive) Product. Pass contactLogId to attribute the offer to a logged contact event.",
     parameters: z.object({
       priceRequestId: z.string().optional(),
       draftProductType: productTypeSchema,
@@ -141,6 +148,7 @@ export const mutateToolDefinitions = (actorId: string) => ({
       currency: z.string().length(3),
       includedText: z.string().optional(),
       excludedText: z.string().optional(),
+      contactLogId: z.string().optional(),
     }),
     handler: async (a: {
       priceRequestId?: string;
@@ -151,6 +159,7 @@ export const mutateToolDefinitions = (actorId: string) => ({
       currency: string;
       includedText?: string;
       excludedText?: string;
+      contactLogId?: string;
     }) =>
       logQuote({
         priceRequestId: a.priceRequestId,
@@ -161,7 +170,38 @@ export const mutateToolDefinitions = (actorId: string) => ({
         currency: a.currency,
         includedText: a.includedText,
         excludedText: a.excludedText,
+        contactLogId: a.contactLogId,
         recordedById: actorId,
+      }),
+  },
+
+  native_log_contact: {
+    description:
+      "Log a contact event against a title — how we reached out to a medium to gather prices (channel, direction, optional sales contact + note). Use after sending an outreach email or recording a reply.",
+    parameters: z.object({
+      titleId: z.string(),
+      channel: contactChannelSchema,
+      direction: contactDirectionSchema.optional(),
+      salesContactId: z.string().optional(),
+      contactedAt: z.string().datetime().optional(),
+      note: z.string().optional(),
+    }),
+    handler: async (a: {
+      titleId: string;
+      channel: ContactChannel;
+      direction?: ContactDirection;
+      salesContactId?: string;
+      contactedAt?: string;
+      note?: string;
+    }) =>
+      createContactLog({
+        titleId: a.titleId,
+        channel: a.channel,
+        direction: a.direction,
+        salesContactId: a.salesContactId,
+        contactedAt: a.contactedAt ? new Date(a.contactedAt) : undefined,
+        note: a.note,
+        actorId,
       }),
   },
 

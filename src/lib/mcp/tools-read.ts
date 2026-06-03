@@ -7,6 +7,7 @@ import {
 } from "@/lib/pricing/contacts";
 import { listPendingQuotes, getPriceHistory } from "@/lib/pricing/quotes";
 import { requestStatus } from "@/lib/pricing/requests";
+import { listForTitle as listContactLogsForTitle } from "@/lib/pricing/contact-log";
 import type { MarketCode } from "@prisma/client";
 
 export const readToolDefinitions = {
@@ -132,5 +133,12 @@ export const readToolDefinitions = {
     description: "Full PriceQuote history for a given product, newest first.",
     parameters: z.object({ productId: z.string() }),
     handler: async (args: { productId: string }) => getPriceHistory(args.productId),
+  },
+
+  native_list_contact_logs: {
+    description:
+      "List the contact-log history for a title (how we've reached out to gather prices), newest first, including the sales contact and any attributed offers (PriceQuotes).",
+    parameters: z.object({ titleId: z.string() }),
+    handler: async (args: { titleId: string }) => listContactLogsForTitle(args.titleId),
   },
 } as const;
