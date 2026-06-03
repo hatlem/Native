@@ -227,7 +227,7 @@ export async function addContactLogAction(formData: FormData) {
     titleId,
     salesContactId: optionalField(formData, "salesContactId"),
     channel: field(formData, "channel") as ContactChannel,
-    direction: (optionalField(formData, "direction") as ContactDirection) ?? "OUTBOUND",
+    direction: optionalField(formData, "direction") as ContactDirection | undefined,
     contactedAt: dateStr ? new Date(dateStr) : undefined,
     note: optionalField(formData, "note"),
     actorId: userId,
