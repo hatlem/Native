@@ -181,7 +181,7 @@ export const mutateToolDefinitions = (actorId: string) => ({
     parameters: z.object({
       titleId: z.string(),
       channel: contactChannelSchema,
-      direction: contactDirectionSchema.optional(),
+      direction: contactDirectionSchema.optional().describe("OUTBOUND (we contacted them) or INBOUND (they replied); defaults to OUTBOUND"),
       salesContactId: z.string().optional(),
       contactedAt: z.string().datetime().optional(),
       note: z.string().optional(),
