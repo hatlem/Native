@@ -10,6 +10,7 @@ import {
 import { SalesContactsPanel } from "./_components/SalesContactsPanel";
 import { PriceRequestsPanel } from "./_components/PriceRequestsPanel";
 import { PendingQuotesPanel } from "./_components/PendingQuotesPanel";
+import { ContactHistoryPanel } from "./_components/ContactHistoryPanel";
 import { SubmitButton } from "@/components";
 
 export const dynamic = "force-dynamic";
@@ -198,6 +199,8 @@ export default async function DeskTitleEditPage({
       <PriceRequestsPanel locale={locale} titleId={title.id} />
 
       <PendingQuotesPanel locale={locale} titleId={title.id} />
+
+      <ContactHistoryPanel locale={locale} titleId={title.id} />
     </section>
   );
 }

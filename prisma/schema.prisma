@@ -324,6 +324,7 @@ model Title {
   salesContactLinks SalesContactTitle[]
   priceRequests     PriceRequest[]
   rateCardRequests  RateCardRequestTitle[]
+  contactLogs       ContactLog[]
 
   @@index([countryCode])
   @@index([type])
@@ -527,6 +528,7 @@ model User {
   rateCardRequests       RateCardRequest[]  @relation("RateCardRequestCreator")
   memberships            Membership[]       @relation("UserMemberships")
   invitedMembers         Membership[]       @relation("MembershipInviter")
+  contactLogs            ContactLog[]       @relation("ContactLogAuthor")
 }
 
 // Super-admin emits these when activating a new publishing house in
@@ -1055,8 +1057,9 @@ model SalesContact {
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt
 
-  titles   SalesContactTitle[]
-  requests PriceRequest[]
+  titles      SalesContactTitle[]
+  requests    PriceRequest[]
+  contactLogs ContactLog[]
 
   @@unique([publisherId, email])
   @@index([publisherId])
@@ -1127,10 +1130,48 @@ model PriceQuote {
 
   recordedAt       DateTime @default(now())
   recordedById     String
+  contactLogId     String?
+  contactLog       ContactLog? @relation(fields: [contactLogId], references: [id], onDelete: SetNull)
 
   @@index([productId])
   @@index([priceRequestId])
   @@index([appliedAt])
+  @@index([contactLogId])
+}
+
+enum ContactChannel {
+  EMAIL
+  PHONE
+  WEB_FORM
+  LINKEDIN
+  OTHER
+}
+
+enum ContactDirection {
+  OUTBOUND
+  INBOUND
+}
+
+model ContactLog {
+  id             String           @id @default(cuid())
+  titleId        String
+  title          Title            @relation(fields: [titleId], references: [id])
+  salesContactId String?
+  salesContact   SalesContact?    @relation(fields: [salesContactId], references: [id], onDelete: SetNull)
+  channel        ContactChannel
+  direction      ContactDirection @default(OUTBOUND)
+  contactedAt    DateTime         @default(now())
+  contactedById  String
+  contactedBy    User             @relation("ContactLogAuthor", fields: [contactedById], references: [id])
+  note           String?
+  createdAt      DateTime         @default(now())
+  updatedAt      DateTime         @updatedAt
+
+  quotes PriceQuote[]
+
+  @@index([titleId])
+  @@index([contactedAt])
+  @@index([salesContactId])
 }
 
 // One row = one recipient = one campaign thread = one token.

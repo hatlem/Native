@@ -22,6 +22,12 @@ import {
   editPendingQuote,
   logQuote,
 } from "@/lib/pricing/quotes";
+import {
+  createContactLog,
+  editContactLog,
+  deleteContactLog,
+} from "@/lib/pricing/contact-log";
+import type { ContactChannel, ContactDirection } from "@prisma/client";
 
 function field(formData: FormData, key: string): string {
   const v = formData.get(key);
@@ -208,4 +214,66 @@ export async function editPendingQuoteAction(formData: FormData) {
     actorUserId: userId,
   });
   revalidatePath(`/${locale}/desk/titles/${field(formData, "titleId")}`);
+}
+
+// ---- Contact log (kontakthistorikk) ----
+
+export async function addContactLogAction(formData: FormData) {
+  const locale = field(formData, "locale") || "en";
+  const userId = await requireSuperadmin(locale);
+  const titleId = field(formData, "titleId");
+  const dateStr = optionalField(formData, "contactedAt");
+  await createContactLog({
+    titleId,
+    salesContactId: optionalField(formData, "salesContactId"),
+    channel: field(formData, "channel") as ContactChannel,
+    direction: optionalField(formData, "direction") as ContactDirection | undefined,
+    contactedAt: dateStr ? new Date(dateStr) : undefined,
+    note: optionalField(formData, "note"),
+    actorId: userId,
+  });
+  revalidatePath(`/${locale}/desk/titles/${titleId}`);
+}
+
+export async function editContactLogAction(formData: FormData) {
+  const locale = field(formData, "locale") || "en";
+  const userId = await requireSuperadmin(locale);
+  const titleId = field(formData, "titleId");
+  const dateStr = optionalField(formData, "contactedAt");
+  await editContactLog({
+    id: field(formData, "id"),
+    channel: field(formData, "channel") as ContactChannel,
+    direction: field(formData, "direction") as ContactDirection,
+    contactedAt: dateStr ? new Date(dateStr) : undefined,
+    note: optionalField(formData, "note") ?? null,
+    salesContactId: optionalField(formData, "salesContactId") ?? null,
+    actorId: userId,
+  });
+  revalidatePath(`/${locale}/desk/titles/${titleId}`);
+}
+
+export async function deleteContactLogAction(formData: FormData) {
+  const locale = field(formData, "locale") || "en";
+  const userId = await requireSuperadmin(locale);
+  const titleId = field(formData, "titleId");
+  await deleteContactLog({ id: field(formData, "id"), actorId: userId });
+  revalidatePath(`/${locale}/desk/titles/${titleId}`);
+}
+
+export async function recordOfferFromContactAction(formData: FormData) {
+  const locale = field(formData, "locale") || "en";
+  const userId = await requireSuperadmin(locale);
+  const titleId = field(formData, "titleId");
+  const validUntilStr = optionalField(formData, "validUntil");
+  await logQuote({
+    contactLogId: field(formData, "contactLogId"),
+    productId: optionalField(formData, "productId"),
+    price: Number(field(formData, "price")),
+    currency: field(formData, "currency"),
+    includedText: optionalField(formData, "includedText"),
+    excludedText: optionalField(formData, "excludedText"),
+    validUntil: validUntilStr ? new Date(validUntilStr) : undefined,
+    recordedById: userId,
+  });
+  revalidatePath(`/${locale}/desk/titles/${titleId}`);
 }

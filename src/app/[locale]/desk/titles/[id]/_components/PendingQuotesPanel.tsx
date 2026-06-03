@@ -23,11 +23,13 @@ export async function PendingQuotesPanel({
       OR: [
         { product: { titleId } },
         { priceRequest: { titleId } },
+        { contactLog: { titleId } },
       ],
     },
     include: {
       product: true,
       priceRequest: { include: { salesContact: true } },
+      contactLog: { include: { salesContact: true } },
     },
     orderBy: { recordedAt: "desc" },
   });
@@ -98,8 +100,8 @@ export async function PendingQuotesPanel({
                   {t("receivedAt", {
                     date: q.recordedAt.toISOString().slice(0, 10),
                   })}
-                  {q.priceRequest?.salesContact && (
-                    <> · {q.priceRequest.salesContact.name}</>
+                  {(q.priceRequest?.salesContact ?? q.contactLog?.salesContact) && (
+                    <> · {(q.priceRequest?.salesContact ?? q.contactLog?.salesContact)!.name}</>
                   )}
                 </div>
                 {q.includedText && (
