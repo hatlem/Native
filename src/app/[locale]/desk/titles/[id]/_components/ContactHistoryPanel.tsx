@@ -19,7 +19,7 @@ export async function ContactHistoryPanel({
   titleId: string;
 }) {
   const t = await getTranslations({ locale, namespace: "contactLog" });
-  const [entries, contacts, products] = await Promise.all([
+  const [entries, contacts, products, titleRow] = await Promise.all([
     listForTitle(titleId),
     listContactsForTitle(titleId),
     prisma.product.findMany({
@@ -27,7 +27,13 @@ export async function ContactHistoryPanel({
       select: { id: true, name: true, currency: true },
       orderBy: { name: "asc" },
     }),
+    prisma.title.findUnique({
+      where: { id: titleId },
+      select: { market: { select: { currency: true } } },
+    }),
   ]);
+
+  const fallbackCurrency = products[0]?.currency ?? titleRow?.market?.currency ?? "";
 
   return (
     <article className="card" style={{ marginTop: 16 }}>
@@ -89,33 +95,45 @@ export async function ContactHistoryPanel({
                   <input type="hidden" name="titleId" value={titleId} />
                   <input type="hidden" name="contactLogId" value={e.id} />
                   <div className="field">
-                    <label>{t("product")}</label>
-                    <select name="productId">
-                      <option value="">{t("draftHint")}</option>
-                      {products.map((p) => (
-                        <option key={p.id} value={p.id}>{p.name}</option>
-                      ))}
-                    </select>
+                    <label>
+                      {t("product")}
+                      <select name="productId">
+                        <option value="">{t("draftHint")}</option>
+                        {products.map((p) => (
+                          <option key={p.id} value={p.id}>{p.name}</option>
+                        ))}
+                      </select>
+                    </label>
                   </div>
                   <div className="field">
-                    <label>{t("price")}</label>
-                    <input name="price" type="number" step="0.01" required />
+                    <label>
+                      {t("price")}
+                      <input name="price" type="number" step="0.01" required />
+                    </label>
                   </div>
                   <div className="field">
-                    <label>{t("currency")}</label>
-                    <input name="currency" defaultValue={products[0]?.currency ?? "NOK"} required />
+                    <label>
+                      {t("currency")}
+                      <input name="currency" defaultValue={fallbackCurrency} required />
+                    </label>
                   </div>
                   <div className="field">
-                    <label>{t("included")}</label>
-                    <textarea name="includedText" />
+                    <label>
+                      {t("included")}
+                      <textarea name="includedText" />
+                    </label>
                   </div>
                   <div className="field">
-                    <label>{t("excluded")}</label>
-                    <textarea name="excludedText" />
+                    <label>
+                      {t("excluded")}
+                      <textarea name="excludedText" />
+                    </label>
                   </div>
                   <div className="field">
-                    <label>{t("validUntil")}</label>
-                    <input name="validUntil" type="date" />
+                    <label>
+                      {t("validUntil")}
+                      <input name="validUntil" type="date" />
+                    </label>
                   </div>
                   <SubmitButton label={t("save")} pendingLabel={t("saving")} className="btn small" />
                 </form>
