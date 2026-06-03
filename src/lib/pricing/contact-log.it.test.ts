@@ -1,7 +1,7 @@
 import { test, before, after } from "node:test";
 import assert from "node:assert/strict";
 import { prisma } from "@/lib/prisma";
-import { logQuote } from "@/lib/pricing/quotes";
+import { logQuote, applyQuote } from "@/lib/pricing/quotes";
 import {
   createContactLog,
   listForTitle,
@@ -47,8 +47,9 @@ if (!RUN_DB_IT) {
   });
 
   after(async () => {
-    await prisma.priceQuote.deleteMany({ where: { contactLog: { titleId } } });
+    await prisma.priceQuote.deleteMany({ where: { recordedById: userId } });
     await prisma.contactLog.deleteMany({ where: { titleId } });
+    await prisma.product.deleteMany({ where: { titleId } });
     await prisma.title.deleteMany({ where: { id: titleId } });
     await prisma.publisher.deleteMany({ where: { id: publisherId } });
     await prisma.user.deleteMany({ where: { id: userId } });
@@ -86,6 +87,31 @@ if (!RUN_DB_IT) {
     assert.equal(list[1].id, first.id);
     assert.equal(list[0].quotes.length, 1);
     assert.equal(list[0].quotes[0].includedText, "inkl. produksjon");
+  });
+
+  test("a draft offer attributed to a contact can be applied to the catalog", async () => {
+    const entry = await createContactLog({
+      titleId,
+      channel: "EMAIL",
+      direction: "INBOUND",
+      actorId: userId,
+    });
+    const quote = await logQuote({
+      contactLogId: entry.id,
+      draftProductType: "NATIVE_ARTICLE",
+      draftProductName: "Apply-me",
+      price: 12345,
+      currency: "NOK",
+      recordedById: userId,
+    });
+
+    await applyQuote({ quoteId: quote.id, actorUserId: userId });
+
+    const applied = await prisma.priceQuote.findUnique({ where: { id: quote.id } });
+    assert.ok(applied?.appliedAt, "quote is marked applied");
+    assert.ok(applied?.productId, "a product was created and linked");
+    const product = await prisma.product.findUnique({ where: { id: applied!.productId! } });
+    assert.equal(product?.titleId, titleId, "product created on the contact's title");
   });
 
   test("delete nulls the quote link but keeps the quote", async () => {

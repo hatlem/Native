@@ -125,7 +125,7 @@ export async function applyQuote(args: {
 }) {
   const quote = await prisma.priceQuote.findUnique({
     where: { id: args.quoteId },
-    include: { priceRequest: { include: { title: true } } },
+    include: { priceRequest: { include: { title: true } }, contactLog: true },
   });
   if (!quote) throw new Error("quote.not_found");
   if (quote.appliedAt) throw new Error("quote.already_applied");
@@ -138,10 +138,10 @@ export async function applyQuote(args: {
       if (!quote.draftProductType || !quote.draftProductName) {
         throw new Error("quote.draft_missing_fields");
       }
-      if (!quote.priceRequest) {
+      const titleId = quote.priceRequest?.titleId ?? quote.contactLog?.titleId;
+      if (!titleId) {
         throw new Error("quote.draft_requires_request");
       }
-      const titleId = quote.priceRequest.titleId;
       const newProduct = await tx.product.create({
         data: {
           titleId,
