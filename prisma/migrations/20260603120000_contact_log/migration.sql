@@ -35,16 +35,29 @@ CREATE INDEX IF NOT EXISTS "ContactLog_salesContactId_idx" ON "ContactLog"("sale
 ALTER TABLE "PriceQuote" ADD COLUMN IF NOT EXISTS "contactLogId" TEXT;
 CREATE INDEX IF NOT EXISTS "PriceQuote_contactLogId_idx" ON "PriceQuote"("contactLogId");
 
+-- Enums and FKs are guarded for idempotency; older migrations use bare CREATE TYPE/ADD CONSTRAINT.
+
 -- Foreign keys
-ALTER TABLE "ContactLog"
-  ADD CONSTRAINT "ContactLog_titleId_fkey" FOREIGN KEY ("titleId")
-  REFERENCES "Title"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
-ALTER TABLE "ContactLog"
-  ADD CONSTRAINT "ContactLog_salesContactId_fkey" FOREIGN KEY ("salesContactId")
-  REFERENCES "SalesContact"("id") ON DELETE SET NULL ON UPDATE CASCADE;
-ALTER TABLE "ContactLog"
-  ADD CONSTRAINT "ContactLog_contactedById_fkey" FOREIGN KEY ("contactedById")
-  REFERENCES "User"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
-ALTER TABLE "PriceQuote"
-  ADD CONSTRAINT "PriceQuote_contactLogId_fkey" FOREIGN KEY ("contactLogId")
-  REFERENCES "ContactLog"("id") ON DELETE SET NULL ON UPDATE CASCADE;
+DO $$ BEGIN
+  ALTER TABLE "ContactLog"
+    ADD CONSTRAINT "ContactLog_titleId_fkey" FOREIGN KEY ("titleId")
+    REFERENCES "Title"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+EXCEPTION WHEN duplicate_object THEN null; END $$;
+
+DO $$ BEGIN
+  ALTER TABLE "ContactLog"
+    ADD CONSTRAINT "ContactLog_salesContactId_fkey" FOREIGN KEY ("salesContactId")
+    REFERENCES "SalesContact"("id") ON DELETE SET NULL ON UPDATE CASCADE;
+EXCEPTION WHEN duplicate_object THEN null; END $$;
+
+DO $$ BEGIN
+  ALTER TABLE "ContactLog"
+    ADD CONSTRAINT "ContactLog_contactedById_fkey" FOREIGN KEY ("contactedById")
+    REFERENCES "User"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+EXCEPTION WHEN duplicate_object THEN null; END $$;
+
+DO $$ BEGIN
+  ALTER TABLE "PriceQuote"
+    ADD CONSTRAINT "PriceQuote_contactLogId_fkey" FOREIGN KEY ("contactLogId")
+    REFERENCES "ContactLog"("id") ON DELETE SET NULL ON UPDATE CASCADE;
+EXCEPTION WHEN duplicate_object THEN null; END $$;
