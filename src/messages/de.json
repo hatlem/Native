@@ -1562,6 +1562,7 @@
     "title": "Kontaktverlauf",
     "empty": "Noch kein Kontakt protokolliert.",
     "addNew": "Kontakt protokollieren",
+    "edit": "Bearbeiten",
     "channel": "Kanal",
     "direction": "Richtung",
     "outbound": "Wir haben Kontakt aufgenommen",

@@ -5,6 +5,7 @@ import { listContactsForTitle } from "@/lib/pricing/contacts";
 import {
   addContactLogAction,
   deleteContactLogAction,
+  editContactLogAction,
   recordOfferFromContactAction,
 } from "@/app/price-actions";
 import { SubmitButton } from "@/components";
@@ -133,6 +134,64 @@ export async function ContactHistoryPanel({
                     <label>
                       {t("validUntil")}
                       <input name="validUntil" type="date" />
+                    </label>
+                  </div>
+                  <SubmitButton label={t("save")} pendingLabel={t("saving")} className="btn small" />
+                </form>
+              </details>
+
+              <details style={{ marginTop: 8 }}>
+                <summary className="muted small" style={{ cursor: "pointer" }}>
+                  {t("edit")}
+                </summary>
+                <form action={editContactLogAction} className="product-form" style={{ marginTop: 8 }}>
+                  <input type="hidden" name="locale" value={locale} />
+                  <input type="hidden" name="titleId" value={titleId} />
+                  <input type="hidden" name="id" value={e.id} />
+                  <div className="field">
+                    <label>
+                      {t("channel")}
+                      <select name="channel" defaultValue={e.channel} required>
+                        {CHANNELS.map((c) => (
+                          <option key={c} value={c}>{t(`channel${c}`)}</option>
+                        ))}
+                      </select>
+                    </label>
+                  </div>
+                  <div className="field">
+                    <label>
+                      {t("direction")}
+                      <select name="direction" defaultValue={e.direction}>
+                        <option value="OUTBOUND">{t("outbound")}</option>
+                        <option value="INBOUND">{t("inbound")}</option>
+                      </select>
+                    </label>
+                  </div>
+                  <div className="field">
+                    <label>
+                      {t("date")}
+                      <input
+                        name="contactedAt"
+                        type="date"
+                        defaultValue={e.contactedAt.toISOString().slice(0, 10)}
+                      />
+                    </label>
+                  </div>
+                  <div className="field">
+                    <label>
+                      {t("contact")}
+                      <select name="salesContactId" defaultValue={e.salesContactId ?? ""}>
+                        <option value="">{t("noContact")}</option>
+                        {contacts.map((c) => (
+                          <option key={c.id} value={c.id}>{c.name} — {c.email}</option>
+                        ))}
+                      </select>
+                    </label>
+                  </div>
+                  <div className="field">
+                    <label>
+                      {t("note")}
+                      <textarea name="note" defaultValue={e.note ?? ""} />
                     </label>
                   </div>
                   <SubmitButton label={t("save")} pendingLabel={t("saving")} className="btn small" />

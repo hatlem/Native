@@ -1705,6 +1705,7 @@
     "title": "Kontakthistorik",
     "empty": "Ingen kontakter er logget endnu.",
     "addNew": "Log en kontakt",
+    "edit": "Rediger",
     "channel": "Kanal",
     "direction": "Retning",
     "outbound": "Vi tog kontakt",

@@ -1703,6 +1703,7 @@
     "title": "Contact history",
     "empty": "No contact logged yet.",
     "addNew": "Log a contact",
+    "edit": "Edit",
     "channel": "Channel",
     "direction": "Direction",
     "outbound": "We contacted them",

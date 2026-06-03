@@ -1704,6 +1704,7 @@
     "title": "Yhteydenottohistoria",
     "empty": "Yhteydenottoja ei ole vielä kirjattu.",
     "addNew": "Kirjaa yhteydenotto",
+    "edit": "Muokkaa",
     "channel": "Kanava",
     "direction": "Suunta",
     "outbound": "Otimme yhteyttä",
