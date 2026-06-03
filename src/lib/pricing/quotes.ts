@@ -42,6 +42,7 @@ export function validateQuoteInput(q: QuoteInput): ValidationResult {
 
 export async function logQuote(args: QuoteInput & {
   priceRequestId?: string;
+  contactLogId?: string;
   recordedById: string;
 }) {
   const v = validateQuoteInput(args);
@@ -50,6 +51,7 @@ export async function logQuote(args: QuoteInput & {
   const quote = await prisma.priceQuote.create({
     data: {
       priceRequestId: args.priceRequestId ?? null,
+      contactLogId: args.contactLogId ?? null,
       productId: args.productId ?? null,
       draftProductType: args.draftProductType ?? null,
       draftProductName: args.draftProductName ?? null,
