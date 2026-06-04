@@ -336,6 +336,12 @@ model Title {
   // column yet, so nothing from a media kit is ever lost. Recurring
   // keys get promoted to real columns over time.
   commercialExtra   Json?
+  // Structured list of commercial info we still need from this title —
+  // e.g. ["display CPM", "nyhetsbrev ukespris"]. A publisher may *offer*
+  // a format without giving us the number; we record that gap here
+  // (queryable) instead of burying it in commercialExtra freetext, and it
+  // drives the gap follow-up emails. Empty = nothing outstanding.
+  outstandingInfo   String[]
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
 
