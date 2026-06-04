@@ -109,10 +109,10 @@ Når et svar avdekker datafeil, ryddes det med en gang (alt reversibelt via `act
 ### Sendt hittil — IKKE send på nytt
 **Dag 1 (2026-06-03), 16:** salg@batmagasinet.no · robert@friflyt.no · arnt.erik@smallstep.no · oliver.brenden@hegnar.no · nryf@rytter.no · neteland@pinsebevegelsen.no · arild.ostvold@medierogledelse.no · al@hsmedia.no · tidende@tannlegeforeningen.no · red@byavisatonsberg.no · annonse@dn.no · salgbergen@amedia.no · salg@tumedia.no · marked@filmweb.no · kontor@genealogi.no · annonser@lmd.no
 
-**Dag 2 (2026-06-05), 8 levert:** marked@amedia.no · ann-elise.ertesvag@egmont.com · annonser@bladet.no · elin.ellingsen@schibsted.no · knut@a2media.no · markus@salgsfabrikken.no · annonse@vl.no · christian.lind@tunmedia.no
+**Dag 2 (2026-06-05), 15 levert:** marked@amedia.no · ann-elise.ertesvag@egmont.com · annonser@bladet.no · elin.ellingsen@schibsted.no · knut@a2media.no · markus@salgsfabrikken.no · annonse@vl.no · christian.lind@tunmedia.no · cecilie.konterud@bonnier.no · argument@argumentnett.no · sissel@eddapresse.no · snorre.fjeldstad@vagant.no · rolf@askmedia.no · nina.tenvik@kampanje.com · tg@maritimt.com
 
 **Bounce (ugyldig adresse — IKKE bruk igjen, finn riktig kontakt):** annonse@aller.no («user not found») — logget med BOUNCE-notat på 23 Aller-titler.
-**Hoppet over (feilruting):** andrine.wefring@lomedia.no (admin, ikke salg).
+**Hoppet over:** andrine.wefring@lomedia.no (admin-feilruting); bl@medierogledelse.no (samme utgiver alt kontaktet via arild@ + Bjarte; titlene merget/nedlagt).
 
 Skip-kilde i prod: titler med `ContactLog` OUTBOUND. Send-script: `scripts/log-outreach-batch.ts` (matcher gruppens titler på eksakt navn → logger OUTBOUND; bounce-flagg på avviste).
 
