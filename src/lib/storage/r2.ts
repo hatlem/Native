@@ -82,3 +82,32 @@ export async function presignDownload(args: { key: string; ttlSec?: number }): P
   const cmd = new GetObjectCommand({ Bucket: bucket(), Key: args.key });
   return getSignedUrl(client(), cmd, { expiresIn: args.ttlSec ?? 3600 });
 }
+
+// Server-side direct upload. Used when the bytes already live on the
+// server (e.g. a PDF pulled from an email reply / forwarded inbox)
+// rather than coming from a browser via a presigned PUT. Same client,
+// bucket and content-type/size validation as the presigned path.
+export async function putObject(args: {
+  prefix: string;
+  filename: string;
+  contentType: string;
+  body: Buffer;
+}): Promise<{ key: string; sizeBytes: number }> {
+  if (!validateContentType(args.contentType)) {
+    throw new Error(`content_type_not_allowed:${args.contentType}`);
+  }
+  if (!isAllowedSize(args.body.byteLength)) {
+    throw new Error(`file_size_not_allowed:${args.body.byteLength}`);
+  }
+  const key = buildObjectKey({ prefix: args.prefix, filename: args.filename });
+  await client().send(
+    new PutObjectCommand({
+      Bucket: bucket(),
+      Key: key,
+      Body: args.body,
+      ContentType: args.contentType,
+      ContentLength: args.body.byteLength,
+    }),
+  );
+  return { key, sizeBytes: args.body.byteLength };
+}

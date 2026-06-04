@@ -44,3 +44,7 @@ local-data-*.sql
 scenario-runs/
 testit.md
 testit-*.md
+
+# tesseract.js OCR language data (downloaded at runtime)
+*.traineddata
+*.traineddata.gz
