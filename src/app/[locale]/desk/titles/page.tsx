@@ -3,6 +3,7 @@ import { redirect } from "next/navigation";
 import { MarketCode, Prisma } from "@prisma/client";
 import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
+import { intlLocale } from "@/lib/money";
 import { Link } from "@/i18n/navigation";
 import {
   markTitleNative,
@@ -539,13 +540,13 @@ export default async function DeskTitlesPage({
                     {title.circulation ? (
                       <div className="muted">
                         {t("circulation")}:{" "}
-                        {new Intl.NumberFormat().format(title.circulation)}
+                        {new Intl.NumberFormat(intlLocale(locale)).format(title.circulation)}
                       </div>
                     ) : null}
                     {title.monthlyReach ? (
                       <div className="muted">
                         {t("reach")}:{" "}
-                        {new Intl.NumberFormat().format(title.monthlyReach)}
+                        {new Intl.NumberFormat(intlLocale(locale)).format(title.monthlyReach)}
                       </div>
                     ) : null}
                     <div className="muted">

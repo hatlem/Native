@@ -450,12 +450,12 @@ export default async function CatalogPage({
                 {title.digitalReach ? (
                   <div className="muted" style={{ marginTop: 10 }}>
                     {t("card.digitalReach")}:{" "}
-                    {new Intl.NumberFormat().format(title.digitalReach)}
+                    {new Intl.NumberFormat(intlLocale(locale)).format(title.digitalReach)}
                   </div>
                 ) : title.monthlyReach ? (
                   <div className="muted" style={{ marginTop: 10 }}>
                     {t("card.reach")}:{" "}
-                    {new Intl.NumberFormat().format(title.monthlyReach)}
+                    {new Intl.NumberFormat(intlLocale(locale)).format(title.monthlyReach)}
                   </div>
                 ) : null}
                 {from !== null ? (

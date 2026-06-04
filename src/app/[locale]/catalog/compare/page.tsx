@@ -3,7 +3,7 @@ import { redirect } from "next/navigation";
 import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
 import { Link } from "@/i18n/navigation";
-import { indicativeFromRules, toRateRules, formatMoney } from "@/lib/money";
+import { indicativeFromRules, toRateRules, formatMoney, intlLocale } from "@/lib/money";
 import { isProductPriceShown } from "@/lib/pricing-visibility";
 import { EmptyState } from "@/app/empty-state";
 
@@ -151,7 +151,7 @@ export default async function ComparePage({
                   {rows.map(({ title }) => (
                     <td key={title.id} className="num">
                       {title.monthlyReach
-                        ? new Intl.NumberFormat().format(title.monthlyReach)
+                        ? new Intl.NumberFormat(intlLocale(locale)).format(title.monthlyReach)
                         : "—"}
                     </td>
                   ))}

@@ -4,7 +4,7 @@ import { notFound, redirect } from "next/navigation";
 import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
 import { Link } from "@/i18n/navigation";
-import { indicativeFromRules, toRateRules, formatMoney } from "@/lib/money";
+import { indicativeFromRules, toRateRules, formatMoney, intlLocale } from "@/lib/money";
 import { isProductPriceShown, arePricesVisible } from "@/lib/pricing-visibility";
 import { addToPlan } from "@/app/actions";
 import { SubmitButton } from "@/components";
@@ -138,11 +138,11 @@ export default async function TitleDetailPage({
       {title.digitalReach ? (
         <p className="muted">
           {t("digitalReach")}:{" "}
-          {new Intl.NumberFormat().format(title.digitalReach)}
+          {new Intl.NumberFormat(intlLocale(locale)).format(title.digitalReach)}
         </p>
       ) : title.monthlyReach ? (
         <p className="muted">
-          {t("reach")}: {new Intl.NumberFormat().format(title.monthlyReach)}
+          {t("reach")}: {new Intl.NumberFormat(intlLocale(locale)).format(title.monthlyReach)}
         </p>
       ) : null}
       {/* Surface the rest of the CSV-imported research metadata so buyers
