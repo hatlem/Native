@@ -410,6 +410,9 @@ export default async function CatalogPage({
                 </div>
                 <div>
                   <span className="tag">{title.category}</span>
+                  {title.offersNativeContent ? (
+                    <span className="tag">{t("card.offersNative")}</span>
+                  ) : null}
                   {title.products.map((p) => (
                     <span className="tag" key={p.id}>
                       {tType(p.type)}
@@ -433,7 +436,13 @@ export default async function CatalogPage({
                     <span className="tag">{title.b2bB2c}</span>
                   ) : null}
                 </div>
-                {title.vertical ? (
+                {title.description ? (
+                  <div className="muted" style={{ marginTop: 8 }}>
+                    {title.description.length > 140
+                      ? `${title.description.slice(0, 140)}…`
+                      : title.description}
+                  </div>
+                ) : title.vertical ? (
                   <div className="muted" style={{ marginTop: 8 }}>
                     {title.vertical}
                   </div>

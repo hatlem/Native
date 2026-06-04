@@ -259,7 +259,8 @@
       "leadTime": "Vorlaufzeit",
       "days": "Tage",
       "requestQuote": "Angebot anfragen",
-      "nativeFit": "Native: {value}"
+      "nativeFit": "Native: {value}",
+      "offersNative": "✓ Werblicher Content"
     },
     "pagination": {
       "prev": "Zurück",
@@ -320,7 +321,9 @@
     "unavailable": "Aktuell nicht buchbar.",
     "formatsEyebrow": "Verfügbare Formate",
     "formatsHeading": "Format wählen und zum Plan hinzufügen",
-    "bookableSummary": "{count, plural, =0 {Nichts sofort buchbar} =1 {1 sofort buchbar} other {# sofort buchbar}}"
+    "bookableSummary": "{count, plural, =0 {Nichts sofort buchbar} =1 {1 sofort buchbar} other {# sofort buchbar}}",
+    "offersNative": "✓ Werblicher Content",
+    "keywordsHeading": "Schlagwörter"
   },
   "plan": {
     "eyebrow": "Plan",

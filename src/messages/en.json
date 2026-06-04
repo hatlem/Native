@@ -259,7 +259,8 @@
       "leadTime": "Lead time",
       "days": "days",
       "requestQuote": "Request a quote",
-      "nativeFit": "Native: {value}"
+      "nativeFit": "Native: {value}",
+      "offersNative": "✓ Advertiser content"
     },
     "pagination": {
       "prev": "Previous",
@@ -320,7 +321,9 @@
     "unavailable": "Currently unavailable for booking.",
     "formatsEyebrow": "Available formats",
     "formatsHeading": "Choose a format and add it to your plan",
-    "bookableSummary": "{count, plural, =0 {None bookable instantly} =1 {1 bookable instantly} other {# bookable instantly}}"
+    "bookableSummary": "{count, plural, =0 {None bookable instantly} =1 {1 bookable instantly} other {# bookable instantly}}",
+    "offersNative": "✓ Advertiser content",
+    "keywordsHeading": "Keywords"
   },
   "plan": {
     "eyebrow": "Plan",

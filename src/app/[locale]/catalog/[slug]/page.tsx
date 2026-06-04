@@ -127,6 +127,14 @@ export default async function TitleDetailPage({
         {t("publishedBy")} {title.publisher.name} · {tMarket(title.market.code)}{" "}
         · {title.category}
       </p>
+      {title.offersNativeContent ? (
+        <p style={{ marginTop: 8 }}>
+          <span className="tag">{t("offersNative")}</span>
+        </p>
+      ) : null}
+      {title.description ? (
+        <p style={{ marginTop: 8 }}>{title.description}</p>
+      ) : null}
       {title.digitalReach ? (
         <p className="muted">
           {t("digitalReach")}:{" "}
@@ -174,6 +182,18 @@ export default async function TitleDetailPage({
       ) : null}
       {title.audience ? (
         <p className="muted">{localizeVertical(title.audience, locale as AppLocale)}</p>
+      ) : null}
+      {title.keywords.length ? (
+        <div style={{ marginTop: 8 }}>
+          <span className="muted small">{t("keywordsHeading")}: </span>
+          <span style={{ display: "inline-flex", gap: 6, flexWrap: "wrap" }}>
+            {title.keywords.map((k) => (
+              <span className="tag" key={k}>
+                {k}
+              </span>
+            ))}
+          </span>
+        </div>
       ) : null}
 
       {/* Market-level disclosure label — surfaced BEFORE the quote so

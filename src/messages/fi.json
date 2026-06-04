@@ -259,7 +259,8 @@
       "leadTime": "Toimitusaika",
       "days": "päivää",
       "requestQuote": "Pyydä tarjous",
-      "nativeFit": "Natiivi: {value}"
+      "nativeFit": "Natiivi: {value}",
+      "offersNative": "✓ Kaupallinen sisältö"
     },
     "pagination": {
       "prev": "Edellinen",
@@ -320,7 +321,9 @@
     "unavailable": "Ei tällä hetkellä varattavissa.",
     "formatsEyebrow": "Saatavilla olevat formaatit",
     "formatsHeading": "Valitse formaatti ja lisää se suunnitelmaasi",
-    "bookableSummary": "{count, plural, =0 {Ei välittömästi varattavia} =1 {1 välittömästi varattava} other {# välittömästi varattavaa}}"
+    "bookableSummary": "{count, plural, =0 {Ei välittömästi varattavia} =1 {1 välittömästi varattava} other {# välittömästi varattavaa}}",
+    "offersNative": "✓ Kaupallinen sisältö",
+    "keywordsHeading": "Avainsanat"
   },
   "plan": {
     "eyebrow": "Suunnitelma",

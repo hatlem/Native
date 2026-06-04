@@ -1,7 +1,9 @@
 // Wraps Postgres FTS for the catalog: query against the `searchTsv`
-// column (added in the 20260520120000 migration), fall back to plain
-// ILIKE when the query is missing. Returns matching Title ids so the
-// caller can keep using Prisma includes for the rest.
+// generated column (name + aliases weight A, category + keywords weight B,
+// audienceNote + description weight C — see migration
+// 20260604170000_fts_keywords_description), fall back to plain ILIKE when
+// the query is missing. Returns matching Title ids so the caller can keep
+// using Prisma includes for the rest.
 
 import { Prisma } from "@prisma/client";
 import { prisma } from "@/lib/prisma";

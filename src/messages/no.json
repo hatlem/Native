@@ -180,7 +180,8 @@
       "leadTime": "Ledetid",
       "days": "dager",
       "requestQuote": "Be om tilbud",
-      "nativeFit": "Native: {value}"
+      "nativeFit": "Native: {value}",
+      "offersNative": "✓ Annonsørinnhold"
     },
     "pagination": {
       "prev": "Forrige",
@@ -241,7 +242,9 @@
     "unavailable": "For øyeblikket ikke tilgjengelig for bestilling.",
     "formatsEyebrow": "Tilgjengelige formater",
     "formatsHeading": "Velg et format og legg det til i planen",
-    "bookableSummary": "{count, plural, =0 {Ingen direkte bestilling} =1 {1 kan bestilles direkte} other {# kan bestilles direkte}}"
+    "bookableSummary": "{count, plural, =0 {Ingen direkte bestilling} =1 {1 kan bestilles direkte} other {# kan bestilles direkte}}",
+    "offersNative": "✓ Annonsørinnhold",
+    "keywordsHeading": "Nøkkelord"
   },
   "plan": {
     "eyebrow": "Plan",
