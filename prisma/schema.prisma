@@ -276,6 +276,13 @@ model Title {
   websiteUrl    String?
   active        Boolean   @default(true)
   lastVerifiedAt DateTime?
+  // Set when a publisher confirms a title is defunct (no longer exists /
+  // merged into another title). We also set active=false, but these two
+  // fields preserve *that* and *why* it was discontinued for the future —
+  // distinct from a temporary deactivation. discontinuedNote records what
+  // replaced it (e.g. "merged into lørdagsavisen") and the source.
+  discontinuedAt   DateTime?
+  discontinuedNote String?
   // Public rate-card price for a standard sponsored placement on
   // this title — the number the publisher publishes on their media
   // kit. Used as the *anchor* on customer-facing quotes
