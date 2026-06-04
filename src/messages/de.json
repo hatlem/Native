@@ -1995,5 +1995,17 @@
     "pending": "Bericht zum vereinbarten Zeitpunkt.",
     "impressionsLabel": "Impressionen (aus Ihrer Analyse)",
     "impressionsSave": "Speichern"
+  },
+  "landing": {
+    "foot": {
+      "tagline": "Native-Content und Native-Werbung über jeden Titel, den wir in NO, SE, DK, FI, DE, AT, CH, UK und IE abdecken — und ein wachsender Katalog.",
+      "copy": "NativeSpin AS · Oslo",
+      "navAdv": "Für Werbetreibende",
+      "navAgy": "Für Agenturen",
+      "navPub": "Für Publisher",
+      "navAbout": "Über uns",
+      "navContact": "Kontakt",
+      "navCreativeSpecs": "Anzeigenspezifikationen"
+    }
   }
 }

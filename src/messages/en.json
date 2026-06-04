@@ -1546,7 +1546,8 @@
       "navAgy": "For agencies",
       "navPub": "For publishers",
       "navAbout": "About",
-      "navContact": "Contact"
+      "navContact": "Contact",
+      "navCreativeSpecs": "Creative specs"
     }
   },
   "apiDocs": {

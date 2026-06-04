@@ -1548,7 +1548,8 @@
       "navAgy": "For bureauer",
       "navPub": "For udgivere",
       "navAbout": "Om os",
-      "navContact": "Kontakt"
+      "navContact": "Kontakt",
+      "navCreativeSpecs": "Annoncespecifikationer"
     }
   },
   "apiDocs": {

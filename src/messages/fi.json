@@ -1547,7 +1547,8 @@
       "navAgy": "Toimistoille",
       "navPub": "Kustantajille",
       "navAbout": "Tietoa",
-      "navContact": "Yhteystiedot"
+      "navContact": "Yhteystiedot",
+      "navCreativeSpecs": "Mainosmääritykset"
     }
   },
   "apiDocs": {
