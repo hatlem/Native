@@ -1732,6 +1732,22 @@
     "channelLINKEDIN": "LinkedIn",
     "channelOTHER": "Other"
   },
+  "rateCards": {
+    "title": "Rate cards / media kits",
+    "empty": "No rate-card documents stored yet for this title.",
+    "complete": "Commercial profile complete",
+    "incomplete": "Missing",
+    "missing_advertiser_content_price": "advertiser-content price",
+    "missing_included_text": "what's included",
+    "missing_own_content_allowed": "own-article policy",
+    "included": "Included",
+    "excluded": "Not included",
+    "applied": "Applied to catalog",
+    "pending": "Pending",
+    "ocr_PENDING": "OCR pending",
+    "ocr_DONE": "OCR done",
+    "ocr_FAILED": "OCR failed"
+  },
   "priceRequests": {
     "title": "Price requests",
     "sendNew": "Send a new request",
