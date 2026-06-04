@@ -1,6 +1,6 @@
 import { prisma } from "@/lib/prisma";
 import { recordAudit } from "@/lib/audit";
-import type { ProductType, PriceResponseSource } from "@prisma/client";
+import type { ProductType, PriceResponseSource, PriceUnit } from "@prisma/client";
 
 // ---------- Pure validation ----------
 
@@ -43,6 +43,8 @@ export function validateQuoteInput(q: QuoteInput): ValidationResult {
 export async function logQuote(args: QuoteInput & {
   priceRequestId?: string;
   contactLogId?: string;
+  priceUnit?: PriceUnit;
+  rateCardDocumentId?: string;
   recordedById: string;
 }) {
   const v = validateQuoteInput(args);
@@ -52,11 +54,13 @@ export async function logQuote(args: QuoteInput & {
     data: {
       priceRequestId: args.priceRequestId ?? null,
       contactLogId: args.contactLogId ?? null,
+      rateCardDocumentId: args.rateCardDocumentId ?? null,
       productId: args.productId ?? null,
       draftProductType: args.draftProductType ?? null,
       draftProductName: args.draftProductName ?? null,
       draftProductDesc: args.draftProductDesc ?? null,
       price: args.price.toString(),
+      priceUnit: args.priceUnit ?? "FLAT",
       currency: args.currency,
       includedText: args.includedText ?? null,
       excludedText: args.excludedText ?? null,
@@ -67,7 +71,9 @@ export async function logQuote(args: QuoteInput & {
   await recordAudit(args.recordedById, "price_quote.log", `PriceQuote:${quote.id}`, {
     productId: args.productId,
     price: args.price,
+    priceUnit: args.priceUnit ?? "FLAT",
     currency: args.currency,
+    rateCardDocumentId: args.rateCardDocumentId,
   });
   return quote;
 }
