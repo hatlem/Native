@@ -355,6 +355,17 @@ model Title {
   instagramFollowers  Int?
   // Agency commission (byråprovisjon) as a percentage, e.g. 3.50.
   agencyCommissionPct Decimal? @db.Decimal(5, 2)
+  // Alternative names / spellings / brand names this title is known by
+  // (e.g. TU.no ← "Teknisk Ukeblad"; Tidende ← "NTFs Tidende",
+  // "Tannlegetidende"). Checked during ingest/import so we match an
+  // existing title instead of creating a duplicate.
+  aliases       String[]
+  // Curated, queryable search tags (the legacy `tags` string is CSV-import
+  // lineage; prefer this structured array going forward).
+  keywords      String[]
+  // Human-written description of the title — who it reaches and what it's
+  // about — enriched as we learn more from publisher replies/media kits.
+  description   String?
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
 
