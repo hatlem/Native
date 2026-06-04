@@ -106,8 +106,15 @@ Når et svar avdekker datafeil, ryddes det med en gang (alt reversibelt via `act
   `railway run --service Postgres sh -c 'DATABASE_URL="$DATABASE_PUBLIC_URL" pnpm tsx <script>'` som kaller `createContactLog({ titleId, salesContactId?, channel:"EMAIL", direction:"OUTBOUND", note, actorId })` (prod-DB er kun internt tilgjengelig).
 - Neste mottakere hentes fra `outreach_send_list.json` (filtrer bort allerede sendte).
 
-### Sendt hittil — IKKE send på nytt (16)
-salg@batmagasinet.no · robert@friflyt.no · arnt.erik@smallstep.no · oliver.brenden@hegnar.no · nryf@rytter.no · neteland@pinsebevegelsen.no · arild.ostvold@medierogledelse.no · al@hsmedia.no · tidende@tannlegeforeningen.no · red@byavisatonsberg.no · annonse@dn.no · salgbergen@amedia.no · salg@tumedia.no · marked@filmweb.no · kontor@genealogi.no · annonser@lmd.no
+### Sendt hittil — IKKE send på nytt
+**Dag 1 (2026-06-03), 16:** salg@batmagasinet.no · robert@friflyt.no · arnt.erik@smallstep.no · oliver.brenden@hegnar.no · nryf@rytter.no · neteland@pinsebevegelsen.no · arild.ostvold@medierogledelse.no · al@hsmedia.no · tidende@tannlegeforeningen.no · red@byavisatonsberg.no · annonse@dn.no · salgbergen@amedia.no · salg@tumedia.no · marked@filmweb.no · kontor@genealogi.no · annonser@lmd.no
+
+**Dag 2 (2026-06-05), 8 levert:** marked@amedia.no · ann-elise.ertesvag@egmont.com · annonser@bladet.no · elin.ellingsen@schibsted.no · knut@a2media.no · markus@salgsfabrikken.no · annonse@vl.no · christian.lind@tunmedia.no
+
+**Bounce (ugyldig adresse — IKKE bruk igjen, finn riktig kontakt):** annonse@aller.no («user not found») — logget med BOUNCE-notat på 23 Aller-titler.
+**Hoppet over (feilruting):** andrine.wefring@lomedia.no (admin, ikke salg).
+
+Skip-kilde i prod: titler med `ContactLog` OUTBOUND. Send-script: `scripts/log-outreach-batch.ts` (matcher gruppens titler på eksakt navn → logger OUTBOUND; bounce-flagg på avviste).
 
 ---
 
