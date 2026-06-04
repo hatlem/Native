@@ -342,6 +342,19 @@ model Title {
   // (queryable) instead of burying it in commercialExtra freetext, and it
   // drives the gap follow-up emails. Empty = nothing outstanding.
   outstandingInfo   String[]
+  // Whether this title offers advertiser content (annonsørinnhold / native
+  // article / sponsored content) at all. null = unknown (not yet
+  // confirmed), true = offered, false = explicitly does NOT offer it (e.g.
+  // display banners only). Confirmed from publisher replies. Surfaced so we
+  // never re-ask a title that has told us they don't do native.
+  offersNativeContent Boolean?
+  // Recurring commercial metrics that show up across many media kits —
+  // structured (not buried in commercialExtra) so they're queryable and
+  // comparable across publishers. Null = not provided.
+  facebookFollowers   Int?
+  instagramFollowers  Int?
+  // Agency commission (byråprovisjon) as a percentage, e.g. 3.50.
+  agencyCommissionPct Decimal? @db.Decimal(5, 2)
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
 
