@@ -667,17 +667,20 @@ body:has(.bn) .drawer-link:hover { background: rgba(20,17,12,0.06) !important; }
 }
 
 /* — Shared page footer — */
-.bn .page-foot { padding: 36px 0 56px; }
-.bn .page-foot .wrap { display: flex; justify-content: space-between; align-items: end; gap: 32px; flex-wrap: wrap; }
-.bn .page-foot .left { display: flex; flex-direction: column; gap: 6px; }
-.bn .page-foot .brand-foot { font-weight: 600; letter-spacing: -0.02em; font-size: 17px; }
-.bn .page-foot .brand-foot-mark { height: 22px; width: auto; display: block; color: var(--ink); }
+.bn .page-foot { padding: 56px 0; }
+.bn .page-foot .wrap { display: flex; flex-direction: column; gap: clamp(40px, 5vw, 64px); }
+.bn .page-foot .foot-top { display: flex; justify-content: space-between; align-items: flex-start; gap: clamp(40px, 6vw, 96px); flex-wrap: wrap; }
+.bn .page-foot .foot-newsletter { display: flex; flex-direction: column; gap: 14px; flex: 1 1 320px; max-width: 30rem; }
 .bn .page-foot .copy { font-size: 11.5px; color: var(--ink-mute); letter-spacing: 0.14em; text-transform: uppercase; }
 .bn .page-foot .copy .roman { font-variant-numeric: oldstyle-nums; }
-.bn .page-foot nav { display: flex; gap: 28px; flex-wrap: wrap; }
+.bn .page-foot nav { display: flex; gap: clamp(40px, 5vw, 72px); flex-wrap: wrap; }
+.bn .page-foot .foot-nav-col { display: flex; flex-direction: column; gap: 14px; }
 .bn .page-foot nav a { font-size: 11.5px; text-transform: uppercase; letter-spacing: 0.14em; color: var(--ink-soft); font-weight: 500; }
 .bn .page-foot nav a:hover { color: var(--ink); }
-.bn .page-foot .markets { display: flex; gap: 14px; font-size: 11px; text-transform: uppercase; letter-spacing: 0.16em; color: var(--ink-mute); font-weight: 500; }
+.bn .page-foot .brand-foot-block { display: flex; flex-direction: column; align-items: flex-start; gap: 8px; }
+.bn .page-foot .brand-foot-mark { height: 22px; width: auto; display: block; color: var(--ink); }
+.bn .page-foot .foot-legal { display: flex; justify-content: space-between; align-items: center; gap: 24px; flex-wrap: wrap; border-top: 1px solid var(--hair); padding-top: 24px; }
+.bn .page-foot .markets { font-size: 11px; text-transform: uppercase; letter-spacing: 0.16em; color: var(--ink-mute); font-weight: 500; }
 
 /* — Why native works — */
 .bn .why { padding: clamp(64px, 7vw, 104px) 0; border-bottom: 2px solid var(--rule); }

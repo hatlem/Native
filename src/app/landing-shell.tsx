@@ -53,34 +53,37 @@ export async function LandingShell({
       {withFooter ? (
         <footer className="page-foot">
           <div className="wrap">
-            <div className="foot-newsletter">
-              <div className="copy">{t("newsletter.footerHeading")}</div>
-              <NewsletterSignup variant="compact" source="footer" />
+            <div className="foot-top">
+              <div className="foot-newsletter">
+                <div className="copy">{t("newsletter.footerHeading")}</div>
+                <NewsletterSignup variant="compact" source="footer" />
+              </div>
+              <nav aria-label="Footer">
+                <div className="foot-nav-col">
+                  <Link href="/for-advertisers">{t("foot.navAdv")}</Link>
+                  <Link href="/for-agencies">{t("foot.navAgy")}</Link>
+                  <Link href="/about">{t("foot.navAbout")}</Link>
+                </div>
+                <div className="foot-nav-col">
+                  <Link href="/for-publishers">{t("foot.navPub")}</Link>
+                  <Link href="/resources/creative-specs">{t("foot.navCreativeSpecs")}</Link>
+                  <MailLink to="desk@nativespin.com" subject={DESK_SUBJECT}>
+                    {t("foot.navContact")}
+                  </MailLink>
+                </div>
+              </nav>
             </div>
-            <div className="left">
+            <div className="brand-foot-block">
               <BrandWordmark className="brand-foot-mark" aria-label="NativeSpin" />
               <div className="copy">{t("foot.tagline")}</div>
-              <div className="copy" style={{ marginTop: 8 }}>
+            </div>
+            <div className="foot-legal">
+              <div className="copy">
                 © <span className="roman">MMXXVI</span> · {t("foot.copy")}
               </div>
-            </div>
-            <nav aria-label="Footer">
-              <Link href="/for-advertisers">{t("foot.navAdv")}</Link>
-              <Link href="/for-agencies">{t("foot.navAgy")}</Link>
-              <Link href="/for-publishers">{t("foot.navPub")}</Link>
-              <Link href="/about">{t("foot.navAbout")}</Link>
-              <Link href="/resources/creative-specs">{t("foot.navCreativeSpecs")}</Link>
-              <MailLink to="desk@nativespin.com" subject={DESK_SUBJECT}>
-                {t("foot.navContact")}
-              </MailLink>
-            </nav>
-            <div className="markets">
-              {MARKETS.map((m) => (
-                <span key={m}>
-                  <span className={`flag ${m}`}></span>
-                  {m.toUpperCase()}
-                </span>
-              ))}
+              <div className="markets">
+                {MARKETS.map((m) => m.toUpperCase()).join(" · ")}
+              </div>
             </div>
           </div>
         </footer>
