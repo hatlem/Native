@@ -48,8 +48,10 @@ export default async function TitleDetailPage({
   });
 
   if (!title) notFound();
-  // Verified-no-native titles stay hidden; everything else (commerce-active
-  // and unverified research-catalog rows) renders.
+  // Discontinued (nedlagt/duplikat) titles never render. Verified-no-native
+  // titles stay hidden; everything else (commerce-active and unverified
+  // research-catalog rows) renders.
+  if (title.discontinuedAt) notFound();
   if (!title.active && title.lastVerifiedAt) notFound();
 
   // Title-level visibility gate (pricesPublic flags only) — used for

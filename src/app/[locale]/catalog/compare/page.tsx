@@ -59,6 +59,7 @@ export default async function ComparePage({
     where: {
       id: { in: ids },
       OR: [{ active: true }, { lastVerifiedAt: null }],
+      discontinuedAt: null,
     },
     include: {
       publisher: true,

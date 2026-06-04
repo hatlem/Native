@@ -16,6 +16,101 @@ import { SubmitButton } from "@/components";
 
 export const dynamic = "force-dynamic";
 
+// Read-only display of the structured commercial/editorial profile we
+// capture from publisher replies (offersNativeContent is the core
+// dimension). Everything is on the title row already; this surfaces it so
+// admins can see all captured data in one place. Consumer surfaces never
+// render these fields — see catalog price gating + the `discontinuedAt`
+// hide-filter.
+function CommercialProfileCard({
+  title,
+}: {
+  title: Awaited<ReturnType<typeof prisma.title.findUnique>> & object;
+}) {
+  const t = title as Record<string, unknown>;
+  const yesNo = (v: unknown) =>
+    v === true ? "Ja" : v === false ? "Nei" : "Ukjent";
+  const arr = (v: unknown) => (Array.isArray(v) && v.length ? v.join(", ") : "—");
+  const val = (v: unknown) => (v == null || v === "" ? "—" : String(v));
+  const offers = t.offersNativeContent;
+  const discontinuedAt = t.discontinuedAt as Date | null;
+  const extra = t.commercialExtra;
+
+  const rows: [string, string][] = [
+    ["Tilbyr annonsørinnhold", yesNo(offers)],
+    ["Egne artikler (ownContent)", val(t.ownContentAllowed)],
+    ["Innholdspolicy", val(t.contentPolicy)],
+    ["Beskrivelse", val(t.description)],
+    ["Nøkkelord", arr(t.keywords)],
+    ["Alias", arr(t.aliases)],
+    ["Mangler (outstanding)", arr(t.outstandingInfo)],
+    ["Digital rekkevidde", val(t.digitalReach)],
+    ["Månedlig rekkevidde", val(t.monthlyReach)],
+    ["Opplag", val(t.circulation)],
+    ["Facebook-følgere", val(t.facebookFollowers)],
+    ["Instagram-følgere", val(t.instagramFollowers)],
+    [
+      "Byråprovisjon",
+      t.agencyCommissionPct != null ? `${Number(t.agencyCommissionPct)} %` : "—",
+    ],
+  ];
+
+  return (
+    <article className="card" style={{ marginTop: 16 }}>
+      <h2>Publikasjonsdata</h2>
+      <p className="muted small">
+        Strukturert kommersiell/redaksjonell profil fanget fra svar. Vises kun
+        på desk – aldri for forbruker.
+      </p>
+      {!t.active ? (
+        <div className="banner-error" role="status" style={{ marginBottom: 12 }}>
+          <span>
+            Deaktivert
+            {discontinuedAt
+              ? ` · nedlagt ${new Date(discontinuedAt).toISOString().slice(0, 10)}`
+              : ""}
+            {t.discontinuedNote ? ` — ${String(t.discontinuedNote)}` : ""}
+          </span>
+        </div>
+      ) : null}
+      <dl
+        style={{
+          display: "grid",
+          gridTemplateColumns: "minmax(180px, 240px) 1fr",
+          gap: "6px 16px",
+          margin: 0,
+        }}
+      >
+        {rows.map(([k, v]) => (
+          <div key={k} style={{ display: "contents" }}>
+            <dt className="muted small">{k}</dt>
+            <dd style={{ margin: 0 }}>{v}</dd>
+          </div>
+        ))}
+      </dl>
+      {extra != null && Object.keys(extra as object).length > 0 ? (
+        <details style={{ marginTop: 12 }}>
+          <summary className="muted small">
+            Øvrig (commercialExtra — ustrukturert)
+          </summary>
+          <pre
+            style={{
+              whiteSpace: "pre-wrap",
+              fontSize: 12,
+              background: "var(--surface-2, #f6f6f6)",
+              padding: 12,
+              borderRadius: 6,
+              marginTop: 8,
+            }}
+          >
+            {JSON.stringify(extra, null, 2)}
+          </pre>
+        </details>
+      ) : null}
+    </article>
+  );
+}
+
 // Desk-side editor for the two buyer-facing pricing levers we added
 // alongside the quote-narrative template:
 //
@@ -190,6 +285,8 @@ export default async function DeskTitleEditPage({
           </div>
         </form>
       </article>
+
+      <CommercialProfileCard title={title} />
 
       <SalesContactsPanel
         locale={locale}

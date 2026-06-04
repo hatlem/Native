@@ -129,6 +129,9 @@ export default async function CatalogPage({
     // Show commerce-active titles AND unverified research-catalog rows;
     // hide titles the desk has verified as not offering native.
     OR: [{ active: true }, { lastVerifiedAt: null }],
+    // Never surface titles marked discontinued (nedlagt/duplikat), even if
+    // they're still unverified research rows.
+    discontinuedAt: null,
     ...(markets.length
       ? markets.length === 1
         ? { market: { code: markets[0] } }
