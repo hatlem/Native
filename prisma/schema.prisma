@@ -366,6 +366,12 @@ model Title {
   // Human-written description of the title — who it reaches and what it's
   // about — enriched as we learn more from publisher replies/media kits.
   description   String?
+  // Internal (desk-only): the date the current pricing/commercial data on
+  // this title is from — typically the publisher reply / rate-card received
+  // date. Lets the desk judge at a glance whether prices are current or
+  // stale. Distinct from `lastVerifiedAt` (which also drives catalog
+  // visibility). Never shown to consumers.
+  pricingAsOf   DateTime?
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
 

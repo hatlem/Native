@@ -34,9 +34,14 @@ function CommercialProfileCard({
   const val = (v: unknown) => (v == null || v === "" ? "—" : String(v));
   const offers = t.offersNativeContent;
   const discontinuedAt = t.discontinuedAt as Date | null;
+  const pricingAsOf = t.pricingAsOf as Date | null;
   const extra = t.commercialExtra;
+  const dateOnly = (d: Date | null) =>
+    d ? new Date(d).toISOString().slice(0, 10) : "—";
 
   const rows: [string, string][] = [
+    ["Prisdata fra (dato)", dateOnly(pricingAsOf)],
+    ["Sist verifisert", dateOnly(t.lastVerifiedAt as Date | null)],
     ["Tilbyr annonsørinnhold", yesNo(offers)],
     ["Egne artikler (ownContent)", val(t.ownContentAllowed)],
     ["Innholdspolicy", val(t.contentPolicy)],
