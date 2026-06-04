@@ -47,9 +47,15 @@ async function requireSuperadmin(locale: string): Promise<string> {
 const VALID_SCOPES: ReadonlySet<string> = new Set([
   "catalog:read",
   "catalog:*",
+  "orders:write",
   "pricing:admin",
 ]);
 const INTERNAL_ONLY_SCOPES: ReadonlySet<string> = new Set(["pricing:admin"]);
+// `orders:write` is the inverse of an internal-only scope: it places
+// firm orders against the issuing organization, so POST /api/v1/orders
+// returns NO_ORG for a platform (org-less) key. Requiring an org at
+// issuance turns that runtime dead-end into a clear up-front error.
+const ORG_REQUIRED_SCOPES: ReadonlySet<string> = new Set(["orders:write"]);
 
 // Issue a new public-catalog API key. The raw token is surfaced
 // exactly once via an httpOnly flash cookie — NOT a URL query string,
@@ -91,6 +97,15 @@ export async function createApiKey(formData: FormData) {
     for (const s of scopeSet) {
       if (INTERNAL_ONLY_SCOPES.has(s)) {
         redirect(`/${locale}/desk/api-keys?error=internal_only_scope`);
+      }
+    }
+  }
+  // Org-required scopes (orders:write) MUST be bound to an organization —
+  // a platform key would only ever get NO_ORG from the orders endpoint.
+  if (organizationId === null) {
+    for (const s of scopeSet) {
+      if (ORG_REQUIRED_SCOPES.has(s)) {
+        redirect(`/${locale}/desk/api-keys?error=org_required_scope`);
       }
     }
   }

@@ -120,7 +120,13 @@ export default async function ApiKeysPage({
 
       {errCode ? (
         <div className="banner-error" role="alert">
-          <span>{t("errorScopes")}</span>
+          <span>
+            {errCode === "internal_only_scope"
+              ? t("errorInternalOnly")
+              : errCode === "org_required_scope"
+                ? t("errorOrgRequired")
+                : t("errorScopes")}
+          </span>
         </div>
       ) : null}
 
