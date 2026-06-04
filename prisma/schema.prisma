@@ -241,6 +241,7 @@ model Publisher {
   salesContacts      SalesContact[]
   contactCandidates  ContactCandidate[]
   apiKeys            ApiKey[]
+  rateCardDocuments  RateCardDocument[]
 
   @@unique([marketId, name])
   @@index([countryCode])
@@ -317,6 +318,17 @@ model Title {
   nativeFit     String? // CSV "Native fit" — High / Medium / Low
   tags          String? // CSV "Tags" — comma-separated tag list
   urlStatus     String? // CSV "URL_status" — VERIFIED / LIKELY_OK / UNVERIFIED
+  // ---------- Commercial profile (rate-card ingestion) ----------
+  // Can the advertiser deliver its own article content for this
+  // publication? UNKNOWN until captured from a rate card / reply.
+  ownContentAllowed OwnContent @default(UNKNOWN)
+  // Free-text description of the publication's content policy (e.g.
+  // labelling rules, editorial approval, off-limits topics).
+  contentPolicy     String?
+  // Catch-all for any captured commercial info that has no structured
+  // column yet, so nothing from a media kit is ever lost. Recurring
+  // keys get promoted to real columns over time.
+  commercialExtra   Json?
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
 
@@ -325,6 +337,7 @@ model Title {
   priceRequests     PriceRequest[]
   rateCardRequests  RateCardRequestTitle[]
   contactLogs       ContactLog[]
+  rateCardDocuments RateCardDocument[]
 
   @@index([countryCode])
   @@index([type])
@@ -1116,10 +1129,20 @@ model PriceQuote {
   draftProductDesc String?
 
   price            Decimal  @db.Decimal(12, 2)
+  // Semantics of `price`: a flat per-placement fee (FLAT), or a
+  // per-click (CPC) / per-thousand-impressions (CPM) rate. Lets us
+  // capture performance-priced offers without a separate column.
+  priceUnit        PriceUnit @default(FLAT)
   currency         String
   includedText     String?
   excludedText     String?
   validUntil       DateTime?
+
+  // Source media-kit / rate-card PDF this quote was extracted from, if
+  // any. Nullable + ON DELETE SET NULL so applied prices survive a
+  // document deletion.
+  rateCardDocumentId String?
+  rateCardDocument   RateCardDocument? @relation(fields: [rateCardDocumentId], references: [id], onDelete: SetNull)
 
   appliedAt        DateTime?
   appliedById      String?
@@ -1136,6 +1159,54 @@ model PriceQuote {
   @@index([productId])
   @@index([priceRequestId])
   @@index([appliedAt])
+  @@index([contactLogId])
+  @@index([rateCardDocumentId])
+}
+
+// Semantics for PriceQuote.price — flat per-placement fee, or a
+// performance rate (per click / per mille impressions).
+enum PriceUnit {
+  FLAT
+  CPC
+  CPM
+}
+
+// Whether a publication will run the advertiser's own (delivered)
+// editorial/article content, as opposed to publisher-produced native.
+enum OwnContent {
+  YES
+  NO
+  WITH_APPROVAL
+  UNKNOWN
+}
+
+// Raw storage + history for every received rate-card / media-kit PDF.
+// The original file lives in R2 (objectKey); ocrText holds the full
+// extracted text (digital + image OCR) so prices stored as images are
+// still searchable. Extracted images are never stored.
+model RateCardDocument {
+  id           String      @id @default(cuid())
+  titleId      String?
+  title        Title?      @relation(fields: [titleId], references: [id], onDelete: SetNull)
+  publisherId  String?
+  publisher    Publisher?  @relation(fields: [publisherId], references: [id], onDelete: SetNull)
+  contactLogId String?
+  contactLog   ContactLog? @relation(fields: [contactLogId], references: [id], onDelete: SetNull)
+  fileName     String
+  objectKey    String // R2 key
+  contentType  String      @default("application/pdf")
+  sizeBytes    Int?
+  ocrText      String? // full extracted text (digital + image OCR)
+  ocrStatus    String      @default("PENDING") // PENDING | DONE | FAILED
+  source       String? // e.g. "email:andreas@admirate.no"
+  receivedAt   DateTime    @default(now())
+  createdById  String
+  createdAt    DateTime    @default(now())
+
+  quotes PriceQuote[]
+
+  @@index([titleId])
+  @@index([publisherId])
   @@index([contactLogId])
 }
 
@@ -1167,7 +1238,8 @@ model ContactLog {
   createdAt      DateTime         @default(now())
   updatedAt      DateTime         @updatedAt
 
-  quotes PriceQuote[]
+  quotes            PriceQuote[]
+  rateCardDocuments RateCardDocument[]
 
   @@index([titleId])
   @@index([contactedAt])
