@@ -111,7 +111,7 @@ Når et svar avdekker datafeil, ryddes det med en gang (alt reversibelt via `act
 
 **Dag 2 (2026-06-05), 15 levert:** marked@amedia.no · ann-elise.ertesvag@egmont.com · annonser@bladet.no · elin.ellingsen@schibsted.no · knut@a2media.no · markus@salgsfabrikken.no · annonse@vl.no · christian.lind@tunmedia.no · cecilie.konterud@bonnier.no · argument@argumentnett.no · sissel@eddapresse.no · snorre.fjeldstad@vagant.no · rolf@askmedia.no · nina.tenvik@kampanje.com · tg@maritimt.com
 
-**Dag 2 (2026-06-05), 10 levert SE (svensk mal):** filippa.wijkstrom@bonniernews.se · bokaannons@ntmmedia.se · erik.hamberg@aller.com · mediepartner@ernamedia.se · kontakt@rabaldermedia.se · annons@mitti.se · lrfannons@adelivery.se · foretag@stampen.com · annonsera@pharma-industry.se · saljavdelningen@egmont.se
+**Dag 2 (2026-06-05), 16 levert SE (svensk mal, varierte emner):** filippa.wijkstrom@bonniernews.se · bokaannons@ntmmedia.se · erik.hamberg@aller.com · mediepartner@ernamedia.se · kontakt@rabaldermedia.se · annons@mitti.se · lrfannons@adelivery.se · foretag@stampen.com · annonsera@pharma-industry.se · saljavdelningen@egmont.se · veronica@rabaldermedia.se · henrik@batmedia.se · annelie@sb-media.se · gabrielle.hagman@mediakraft.se · john@adsales.se · lotta@hippson.se
 
 **Bounce (ugyldig adresse — IKKE bruk igjen, finn riktig kontakt):** annonse@aller.no («user not found») — logget med BOUNCE-notat på 23 Aller-titler.
 **Hoppet over:** andrine.wefring@lomedia.no (admin-feilruting); bl@medierogledelse.no (samme utgiver alt kontaktet via arild@ + Bjarte; titlene merget/nedlagt); elin.ellingsen@schibsted.no (SE-gruppen — samme kontakt alt kontaktet via NO-gruppen samme dag).
