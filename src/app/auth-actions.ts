@@ -363,6 +363,92 @@ export async function claimPublisherInvite(formData: FormData) {
   redirect(`/${locale}/publisher`);
 }
 
+// Claim a writer-invite token: validate it (single-use, time-limited),
+// create a User in CONTENT role, bind an empty WriterProfile, mark the
+// invite claimed, and sign the user in.
+//
+// Mirrors claimPublisherInvite exactly — same email-lock, same rate
+// limiter, same duplicate-email handling.
+export async function claimWriterInviteSignup(formData: FormData) {
+  const locale = String(formData.get("locale") || "en");
+  const token = String(formData.get("token") || "").trim();
+  const name = String(formData.get("name") || "").trim();
+  const password = String(formData.get("password") || "");
+  const submittedEmail = String(formData.get("email") || "")
+    .toLowerCase()
+    .trim();
+
+  const ip = await clientKey();
+  if (!(await authLimiter.check(`invite:ip:${ip}`)).ok) {
+    redirect(`/${locale}/writer/claim/${token}?error=rate`);
+  }
+
+  if (!token || !name || password.length < 8) {
+    redirect(`/${locale}/writer/claim/${token}?error=1`);
+  }
+
+  const invite = await prisma.writerInvite.findUnique({
+    where: { token },
+    select: { id: true, email: true, expiresAt: true, claimedAt: true },
+  });
+  if (!invite || invite.claimedAt || invite.expiresAt.getTime() <= Date.now()) {
+    redirect(`/${locale}/writer/claim/${token}`);
+  }
+  if (submittedEmail && submittedEmail !== invite.email) {
+    redirect(`/${locale}/writer/claim/${token}?error=1`);
+  }
+
+  const passwordHash = await bcrypt.hash(password, 10);
+
+  let createdUserId: string | null = null;
+  try {
+    createdUserId = await prisma.$transaction(async (tx) => {
+      const user = await tx.user.create({
+        data: {
+          email: invite.email,
+          name: name || null,
+          role: "CONTENT",
+          passwordHash,
+          // Clicking the invite link proves mailbox ownership — account
+          // starts verified and bypasses the email-confirmation gate.
+          emailVerifiedAt: new Date(),
+        },
+      });
+      await tx.writerProfile.create({ data: { userId: user.id } });
+      await tx.writerInvite.update({
+        where: { id: invite.id },
+        data: { claimedAt: new Date(), claimedByUserId: user.id },
+      });
+      return user.id;
+    });
+  } catch {
+    // Unique-email violation — send to sign-in.
+    redirect(`/${locale}/signin`);
+  }
+
+  if (!createdUserId) redirect(`/${locale}/writer/claim/${token}?error=1`);
+  await recordAudit(
+    createdUserId,
+    "writer.invite_claimed",
+    `WriterInvite:${invite.id}`,
+    { ip },
+  );
+
+  try {
+    await signIn("credentials", {
+      email: invite.email,
+      password,
+      redirect: false,
+    });
+  } catch (error) {
+    if (error instanceof AuthError) {
+      redirect(`/${locale}/signin`);
+    }
+    throw error;
+  }
+  redirect(`/${locale}/writer`);
+}
+
 export async function logout(formData: FormData) {
   const locale = String(formData.get("locale") || "en");
   // Clear the basket/brief cookies so the next user on this browser
