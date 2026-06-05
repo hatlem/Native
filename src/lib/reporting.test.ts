@@ -6,6 +6,7 @@ import {
   averageOrderValue,
   conversionPct,
   revenueSplit,
+  ctrPct,
   type RevenueLine,
 } from "./reporting";
 
@@ -72,4 +73,12 @@ test("revenueSplit is zero-safe with no lines", () => {
     totalRevenue: 0,
     contentFeeRatioPct: 0,
   });
+});
+
+test("ctrPct: clicks/impressions to one decimal; guards zero/null denominator", () => {
+  assert.equal(ctrPct(50, 1000), 5);
+  assert.equal(ctrPct(1, 3), 33.3);
+  assert.equal(ctrPct(10, 0), null);   // undefined CTR, not 0
+  assert.equal(ctrPct(10, null), null);
+  assert.equal(ctrPct(0, 1000), 0);
 });

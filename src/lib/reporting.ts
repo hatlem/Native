@@ -84,3 +84,11 @@ export function revenueSplit(lines: RevenueLine[]): RevenueSplit {
     contentFeeRatioPct,
   };
 }
+
+// Click-through rate as a percentage with one decimal. Returns null (not 0)
+// when impressions are missing/zero so the caller can show "—" instead of a
+// misleading 0%. Compute per publisher over bookings with reported impressions.
+export function ctrPct(clicks: number, impressions: number | null): number | null {
+  if (impressions === null || impressions <= 0) return null;
+  return Math.round((clicks / impressions) * 1000) / 10;
+}
