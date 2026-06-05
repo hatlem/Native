@@ -13,6 +13,8 @@ import {
   issueCreditNote,
   confirmTrackedLinks,
 } from "@/app/desk-actions";
+import { assignWriterToLine } from "@/app/writer-pool-actions";
+import { WritersPanel } from "./writers-panel";
 import { extractLinks } from "@/lib/metrics/links";
 import { StatusBadge } from "@/app/status-badge";
 import { canCancelOrder, cancelBlockReason } from "@/lib/cancellation";
@@ -52,6 +54,14 @@ export default async function DeskOrderPage({
           trackedLinks: true,
         },
       },
+      writerPool: {
+        select: {
+          writerId: true,
+          writer: {
+            select: { user: { select: { name: true, email: true } } },
+          },
+        },
+      },
     },
   });
   if (!order) notFound();
@@ -68,6 +78,16 @@ export default async function DeskOrderPage({
   });
   const byId = new Map(products.map((p) => [p.id, p]));
   const invoice = order.invoices[0];
+
+  // Derive criteria from the first line that has a product/title.
+  const firstProductLine = order.lines.find(
+    (l) => l.productId != null && byId.has(l.productId),
+  );
+  const firstProduct = firstProductLine?.productId
+    ? byId.get(firstProductLine.productId)
+    : undefined;
+  const firstLineCountry = firstProduct?.title.countryCode ?? "";
+  const firstLineCategory = firstProduct?.title.category ?? "";
 
   // Phase-4 playbooks: load active playbooks once and match per placement
   // line so the writer sees the relevant guidance inline.
@@ -268,6 +288,14 @@ export default async function DeskOrderPage({
         </section>
       ) : null}
 
+      <WritersPanel
+        locale={locale}
+        orderId={order.id}
+        poolWriterIds={order.writerPool.map((p) => p.writerId)}
+        criteriaCountry={firstLineCountry}
+        criteriaCategory={firstLineCategory}
+      />
+
       <section className="section">
         <div className="section-head">
           <div>
@@ -308,6 +336,29 @@ export default async function DeskOrderPage({
                     )}
                   </div>
                 </div>
+
+                {order.writerPool.length > 0 ? (
+                  <form action={assignWriterToLine} className="flex items-center gap-2">
+                    <input type="hidden" name="locale" value={locale} />
+                    <input type="hidden" name="orderId" value={order.id} />
+                    <input type="hidden" name="orderLineId" value={line.id} />
+                    <select
+                      name="writerId"
+                      defaultValue={line.assignedWriterId ?? ""}
+                      className="text-xs border rounded px-1 py-0.5"
+                    >
+                      <option value="">— Unassigned —</option>
+                      {order.writerPool.map((pool) => (
+                        <option key={pool.writerId} value={pool.writerId}>
+                          {pool.writer.user.name ?? pool.writer.user.email}
+                        </option>
+                      ))}
+                    </select>
+                    <button type="submit" className="ml-2 text-xs underline">
+                      Assign
+                    </button>
+                  </form>
+                ) : null}
 
                 {pb ? (
                   <div className="card playbook-card" style={{ marginTop: 0 }}>
