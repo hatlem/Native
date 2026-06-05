@@ -22,6 +22,8 @@ UPDATE "Order" o SET "flightStartDate" = p."startDate", "flightEndDate" = p."end
 FROM "Quote" q JOIN "Request" r ON r.id = q."requestId" JOIN "Plan" p ON p.id = r."planId"
 WHERE q.id = o."quoteId" AND o."flightEndDate" IS NULL;
 
+CREATE INDEX IF NOT EXISTS "Order_flightEndDate_idx" ON "Order"("flightEndDate");
+
 -- PublisherBooking ----------------------------------------------------------
 ALTER TABLE "PublisherBooking" ADD COLUMN IF NOT EXISTS "publisherId" TEXT;
 ALTER TABLE "PublisherBooking" ADD COLUMN IF NOT EXISTS "titleId" TEXT;
@@ -57,7 +59,6 @@ ALTER TABLE "BookingMetrics" ADD COLUMN IF NOT EXISTS "windowEnd" TIMESTAMP(3);
 ALTER TABLE "BookingMetrics" ADD COLUMN IF NOT EXISTS "frozenAt" TIMESTAMP(3);
 ALTER TABLE "BookingMetrics" ADD COLUMN IF NOT EXISTS "impressionsAtClose" INTEGER;
 ALTER TABLE "BookingMetrics" ADD COLUMN IF NOT EXISTS "clicksFirstPartyAtClose" INTEGER;
-UPDATE "BookingMetrics" SET "source" = 'PUBLISHER_FORM' WHERE "source" = 'PUBLISHER';
 
 -- MetricsRequest + join -----------------------------------------------------
 CREATE TABLE IF NOT EXISTS "MetricsRequest" (
