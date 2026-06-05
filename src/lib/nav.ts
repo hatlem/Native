@@ -15,6 +15,7 @@ export type Audience =
   | "advertiser"
   | "agency"
   | "publisher"
+  | "writer"
   | "desk"
   | "superadmin";
 
@@ -30,7 +31,8 @@ export function audienceFor(session: SessionShape | null | undefined): Audience 
   const role = session?.user?.role;
   if (!role) return "public";
   if (role === "PUBLISHER") return "publisher";
-  if (role === "DESK" || role === "CONTENT") return "desk";
+  if (role === "CONTENT") return "writer";
+  if (role === "DESK") return "desk";
   if (role === "SUPERADMIN") return "superadmin";
   if (session?.user?.orgType === "AGENCY") return "agency";
   return "advertiser";
@@ -70,6 +72,11 @@ export function navItemsFor(
         { key: "publisher", label: t("publisher"), href: "/publisher" },
         { key: "publisherOrders", label: t("orders"), href: "/publisher/orders" },
         { key: "availability", label: t("availability"), href: "/publisher/availability" },
+      ];
+    case "writer":
+      return [
+        { key: "writerAssignments", label: t("orders"), href: "/writer" },
+        { key: "writerProfile", label: t("account"), href: "/writer/profile" },
       ];
     case "desk":
       return [
@@ -132,6 +139,12 @@ export function paletteItemsFor(
           { key: "publisher", label: t("publisher"), href: "/publisher" },
           { key: "publisherOrders", label: t("orders"), href: "/publisher/orders" },
           { key: "availability", label: t("availability"), href: "/publisher/availability" },
+          { key: "notifications", label: t("notifications"), href: "/notifications" },
+        ];
+      case "writer":
+        return [
+          { key: "writerAssignments", label: t("orders"), href: "/writer" },
+          { key: "writerProfile", label: t("account"), href: "/writer/profile" },
           { key: "notifications", label: t("notifications"), href: "/notifications" },
         ];
       case "desk":
