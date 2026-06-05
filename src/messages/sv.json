@@ -38,7 +38,8 @@
     "roleGuest": "Gäst",
     "account": "Konto",
     "contentFees": "Innehållsavgifter",
-    "playbooks": "Spelböcker"
+    "playbooks": "Spelböcker",
+    "writers": "Skribenter"
   },
   "reports": {
     "title": "Rapporter",
@@ -478,6 +479,25 @@
       "hint": "Hoppar över titlar utan primär säljkontakt",
       "sending": "Skickar…"
     }
+  },
+  "deskWriters": {
+    "eyebrow": "Desk · skribenter",
+    "title": "Skribenter",
+    "lead": "Hantera skribentpoolen – bjud in nya skribenter och se aktuell lista.",
+    "inviteHeading": "Bjud in en skribent",
+    "emailLabel": "E-postadress",
+    "inviteButton": "Skicka inbjudan",
+    "inviting": "Skickar…",
+    "pendingHeading": "Väntande inbjudningar",
+    "noPending": "Inga väntande inbjudningar.",
+    "expires": "Går ut",
+    "claimLink": "Länk",
+    "rosterHeading": "Skribenter",
+    "noWriters": "Inga skribenter ännu – bjud in en ovan.",
+    "active": "Aktiv",
+    "inactive": "Inaktiv",
+    "assignments": "{active} aktiva",
+    "assignmentsOf": "{active} / {max} aktiva"
   },
   "auth": {
     "title": "Logga in",

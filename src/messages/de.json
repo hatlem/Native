@@ -38,7 +38,8 @@
     "roleGuest": "Gast",
     "account": "Konto",
     "contentFees": "Content-Gebühren",
-    "playbooks": "Playbooks"
+    "playbooks": "Playbooks",
+    "writers": "Autoren"
   },
   "orders": {
     "eyebrow": "Bestellungen",
@@ -557,6 +558,25 @@
       "hint": "Überspringt Titel ohne primären Vertriebskontakt",
       "sending": "Wird gesendet…"
     }
+  },
+  "deskWriters": {
+    "eyebrow": "Desk · Autoren",
+    "title": "Autoren",
+    "lead": "Autorenpool verwalten – neue Autoren einladen und aktuelle Liste überprüfen.",
+    "inviteHeading": "Autor einladen",
+    "emailLabel": "E-Mail-Adresse",
+    "inviteButton": "Einladung senden",
+    "inviting": "Wird gesendet…",
+    "pendingHeading": "Ausstehende Einladungen",
+    "noPending": "Keine ausstehenden Einladungen.",
+    "expires": "Läuft ab",
+    "claimLink": "Link",
+    "rosterHeading": "Autoren",
+    "noWriters": "Noch keine Autoren – oben einen einladen.",
+    "active": "Aktiv",
+    "inactive": "Inaktiv",
+    "assignments": "{active} aktiv",
+    "assignmentsOf": "{active} / {max} aktiv"
   },
   "auth": {
     "title": "Anmelden",

@@ -38,7 +38,8 @@
     "roleGuest": "Vieras",
     "account": "Tili",
     "contentFees": "Sisältömaksut",
-    "playbooks": "Pelikirjat"
+    "playbooks": "Pelikirjat",
+    "writers": "Kirjoittajat"
   },
   "orders": {
     "eyebrow": "Tilaukset",
@@ -557,6 +558,25 @@
       "hint": "Ohittaa otsikot ilman ensisijaista myyntiyhteyshenkilöä",
       "sending": "Lähetetään…"
     }
+  },
+  "deskWriters": {
+    "eyebrow": "Desk · kirjoittajat",
+    "title": "Kirjoittajat",
+    "lead": "Hallinnoi kirjoittajapoolia – kutsu uusia kirjoittajia ja tarkista nykyinen lista.",
+    "inviteHeading": "Kutsu kirjoittaja",
+    "emailLabel": "Sähköpostiosoite",
+    "inviteButton": "Lähetä kutsu",
+    "inviting": "Lähetetään…",
+    "pendingHeading": "Odottavat kutsut",
+    "noPending": "Ei odottavia kutsuja.",
+    "expires": "Vanhenee",
+    "claimLink": "Linkki",
+    "rosterHeading": "Kirjoittajat",
+    "noWriters": "Ei kirjoittajia vielä – kutsu yksi yllä.",
+    "active": "Aktiivinen",
+    "inactive": "Ei aktiivinen",
+    "assignments": "{active} aktiivinen",
+    "assignmentsOf": "{active} / {max} aktiivinen"
   },
   "auth": {
     "title": "Kirjaudu sisään",

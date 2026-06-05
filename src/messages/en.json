@@ -38,7 +38,8 @@
     "roleGuest": "Guest",
     "account": "Account",
     "contentFees": "Content fees",
-    "playbooks": "Playbooks"
+    "playbooks": "Playbooks",
+    "writers": "Writers"
   },
   "orders": {
     "eyebrow": "Orders",
@@ -557,6 +558,25 @@
       "hint": "Skips titles with no primary sales contact",
       "sending": "Sending…"
     }
+  },
+  "deskWriters": {
+    "eyebrow": "Desk · writers",
+    "title": "Writers",
+    "lead": "Manage the writer pool — invite new writers and review the current roster.",
+    "inviteHeading": "Invite a writer",
+    "emailLabel": "Email address",
+    "inviteButton": "Send invite",
+    "inviting": "Inviting…",
+    "pendingHeading": "Pending invites",
+    "noPending": "No pending invites.",
+    "expires": "Expires",
+    "claimLink": "Claim link",
+    "rosterHeading": "Writers",
+    "noWriters": "No writers yet — invite one above.",
+    "active": "Active",
+    "inactive": "Inactive",
+    "assignments": "{active} active",
+    "assignmentsOf": "{active} / {max} active"
   },
   "auth": {
     "title": "Sign in",

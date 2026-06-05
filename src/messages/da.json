@@ -38,7 +38,8 @@
     "roleGuest": "Gæst",
     "account": "Konto",
     "contentFees": "Indholdsgebyrer",
-    "playbooks": "Spillebøger"
+    "playbooks": "Spillebøger",
+    "writers": "Skribenter"
   },
   "reports": {
     "title": "Rapporter",
@@ -478,6 +479,25 @@
       "hint": "Springer titler uden primær salgskontakt over",
       "sending": "Sender…"
     }
+  },
+  "deskWriters": {
+    "eyebrow": "Desk · skribenter",
+    "title": "Skribenter",
+    "lead": "Administrer skriventpoolen – inviter nye skribenter og se den aktuelle liste.",
+    "inviteHeading": "Inviter en skribent",
+    "emailLabel": "E-mailadresse",
+    "inviteButton": "Send invitation",
+    "inviting": "Sender…",
+    "pendingHeading": "Afventende invitationer",
+    "noPending": "Ingen afventende invitationer.",
+    "expires": "Udløber",
+    "claimLink": "Link",
+    "rosterHeading": "Skribenter",
+    "noWriters": "Ingen skribenter endnu – inviter én ovenfor.",
+    "active": "Aktiv",
+    "inactive": "Inaktiv",
+    "assignments": "{active} aktive",
+    "assignmentsOf": "{active} / {max} aktive"
   },
   "auth": {
     "title": "Log ind",
