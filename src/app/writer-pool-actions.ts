@@ -42,13 +42,16 @@ export async function removeWriterFromPool(formData: FormData) {
   const writerId = field(formData, "writerId");
   const userId = await requireDeskUser(locale);
 
-  // Clear any line assignments to this writer on this order first, so we
-  // never leave a line assigned to a non-pool writer.
-  await prisma.orderLine.updateMany({
-    where: { orderId, assignedWriterId: writerId },
-    data: { assignedWriterId: null, assignedAt: null, assignedById: null },
-  });
-  await prisma.orderWriterPool.deleteMany({ where: { orderId, writerId } });
+  // Clear any line assignments to this writer on this order, then drop the
+  // pool row — atomically, so we never leave a line assigned to a writer
+  // who is no longer in the pool.
+  await prisma.$transaction([
+    prisma.orderLine.updateMany({
+      where: { orderId, assignedWriterId: writerId },
+      data: { assignedWriterId: null, assignedAt: null, assignedById: null },
+    }),
+    prisma.orderWriterPool.deleteMany({ where: { orderId, writerId } }),
+  ]);
   await recordAudit(userId, "writer.pool_remove", `Order:${orderId}`, { writerId });
 
   redirect(`/${locale}/desk/orders/${orderId}`);
