@@ -16,6 +16,12 @@ test("canOverwrite: same source overwrites (latest reading wins)", () => {
 test("canOverwrite: any source writes a fresh (null existing) row", () => {
   assert.equal(canOverwrite("PUBLISHER_EMAIL", null), true);
 });
+test("canOverwrite: PUBLISHER_EMAIL overwrites SYSTEM (freeze sentinel is lowest rank)", () => {
+  assert.equal(canOverwrite("PUBLISHER_EMAIL", "SYSTEM"), true);
+});
+test("canOverwrite: SYSTEM cannot overwrite DESK", () => {
+  assert.equal(canOverwrite("SYSTEM", "DESK"), false);
+});
 
 test("buildFreezeSnapshot copies current impressions + first-party clicks, stamps frozenAt", () => {
   const now = new Date("2026-06-12T00:00:00Z");

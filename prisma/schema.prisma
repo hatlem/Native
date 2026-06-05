@@ -158,6 +158,7 @@ enum BookingStatus {
 }
 
 enum MetricsSource {
+  SYSTEM          // snapshot-only writes (freeze); ranked lowest so a later real reading always overwrites the live fields
   PUBLISHER       // legacy (pre-campaign-reporting rows); migrated to PUBLISHER_FORM. Kept so the Prisma enum matches the DB type (Postgres can't drop an enum value).
   PUBLISHER_FORM  // tokenized self-serve form (publisher typed it)
   PUBLISHER_EMAIL // AI-transcribed from a publisher email reply (authoritative; raw snippet in note)

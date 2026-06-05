@@ -8,10 +8,13 @@ DO $$ BEGIN
 EXCEPTION WHEN duplicate_object THEN null; END $$;
 
 -- MetricsSource: add the new members, migrate old PUBLISHER -> PUBLISHER_FORM.
+ALTER TYPE "MetricsSource" ADD VALUE IF NOT EXISTS 'SYSTEM';
 ALTER TYPE "MetricsSource" ADD VALUE IF NOT EXISTS 'PUBLISHER_FORM';
 ALTER TYPE "MetricsSource" ADD VALUE IF NOT EXISTS 'PUBLISHER_EMAIL';
 -- (DESK already exists; PUBLISHER stays as a now-unused legacy value — Postgres
 --  cannot drop an enum value. Existing rows are migrated below.)
+-- (SYSTEM is only used at runtime for freeze snapshots; ranked lowest so a
+--  later real publisher write always overwrites it.)
 
 -- Order ---------------------------------------------------------------------
 ALTER TABLE "Order" ADD COLUMN IF NOT EXISTS "flightStartDate" TIMESTAMP(3);

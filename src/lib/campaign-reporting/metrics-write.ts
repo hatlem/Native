@@ -4,7 +4,9 @@ import type { MetricsSource } from "@prisma/client";
 // incoming source rank >= the existing source rank. A desk override therefore
 // never gets clobbered by a later form/email write; an AI email never clobbers
 // a form value; same-source writes take the latest reading.
+// SYSTEM is ranked 0 (lowest) so any real publisher write always overwrites a freeze snapshot.
 const RANK: Record<MetricsSource, number> = {
+  SYSTEM: 0,
   PUBLISHER_EMAIL: 1,
   PUBLISHER: 2,       // legacy = same trust as a form submission
   PUBLISHER_FORM: 2,

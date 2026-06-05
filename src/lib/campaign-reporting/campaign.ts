@@ -14,9 +14,25 @@ import { stepKindForCount, nextStepDate, MAX_STEPS } from "@/lib/outreach/sequen
 import { outreachLimiter } from "@/lib/rate-limit";
 import { clicksByOrderLine } from "@/lib/metrics/store";
 import { canOverwrite, buildFreezeSnapshot } from "./metrics-write";
-import type { MetricsSource } from "@prisma/client";
+import { normaliseEmail } from "@/lib/outreach/dedup";
+import type { MetricsSource, Prisma } from "@prisma/client";
 
 const GRACE_DAYS = 1;
+
+// ---------- Helpers ----------
+
+/**
+ * Inject `+token` into the local part of an email address, tolerating
+ * display-name forms (`"Name" <local@domain>`) and unset/malformed input.
+ * Returns undefined if `base` is falsy or unparseable.
+ */
+function metricsReplyTo(base: string | undefined, token: string): string | undefined {
+  if (!base) return undefined;
+  const m = base.trim().match(/^(.*<)?([^<>@\s]+)@([^<>@\s]+)(>.*)?$/);
+  if (!m) return undefined;
+  const [, pre = "", local, domain, post = ""] = m;
+  return `${pre}${local}+${token}@${domain}${post}`;
+}
 
 // ---------- Build ----------
 
@@ -26,7 +42,7 @@ export async function buildMetricsCampaign(args: {
 }): Promise<{ requests_created: number; needs_contact: number; orders_scanned: number }> {
   const now = args.now ?? new Date();
   const orders = await prisma.order.findMany({
-    where: { flightEndDate: { not: null }, status: { notIn: ["QUOTED", "CANCELLED"] } },
+    where: { flightEndDate: { lt: now, not: null }, status: { notIn: ["QUOTED", "CANCELLED"] } },
     select: {
       id: true, status: true, flightEndDate: true,
       lines: {
@@ -132,7 +148,7 @@ export async function sendMetricsRequestStep(args: { requestId: string; actorId:
 
   // Suppression: block hard bounces (dead address), but allow a marketing
   // unsubscribe through — this is a transactional follow-up on a fulfilled order.
-  const supp = await prisma.outreachSuppression.findUnique({ where: { email: req.recipientEmail } });
+  const supp = await prisma.outreachSuppression.findUnique({ where: { email: normaliseEmail(req.recipientEmail) } });
   if (supp && supp.reason !== "unsubscribe") {
     await recordAudit(args.actorId, "metrics.skipped_suppressed", `MetricsRequest:${req.id}`, { to: req.recipientEmail, reason: supp.reason });
     return { skipped: "suppressed" };
@@ -150,12 +166,11 @@ export async function sendMetricsRequestStep(args: { requestId: string; actorId:
 
   // Per-request reply-to plus-addressing so an inbound AI-parsed reply maps to
   // this exact request (Task 13). Falls back to OUTREACH_REPLY_TO if no base set.
-  const replyBase = process.env.METRICS_REPLY_TO ?? process.env.OUTREACH_REPLY_TO ?? "";
-  const replyTo = replyBase.includes("@") ? replyBase.replace("@", `+${req.token}@`) : replyBase;
+  const replyTo = metricsReplyTo(process.env.METRICS_REPLY_TO ?? process.env.OUTREACH_REPLY_TO, req.token);
 
   await emailAdapter({
     to: req.recipientEmail, subject: built.subject, text: built.text,
-    from: process.env.OUTREACH_FROM, replyTo: replyTo || undefined,
+    from: process.env.OUTREACH_FROM, replyTo,
   });
 
   const now = new Date();
@@ -202,16 +217,19 @@ export type MetricFields = {
   windowEnd?: Date | null;
 };
 
-export async function writeBookingMetric(args: {
-  bookingId: string;
-  source: MetricsSource;
-  reportedBy: string;
-  note?: string | null;
-  fields: MetricFields;
-  now?: Date;
-}): Promise<{ written: boolean }> {
+export async function writeBookingMetric(
+  args: {
+    bookingId: string;
+    source: MetricsSource;
+    reportedBy: string;
+    note?: string | null;
+    fields: MetricFields;
+    now?: Date;
+  },
+  db: Prisma.TransactionClient | typeof prisma = prisma,
+): Promise<{ written: boolean }> {
   const now = args.now ?? new Date();
-  const existing = await prisma.bookingMetrics.findUnique({ where: { bookingId: args.bookingId }, select: { source: true, frozenAt: true } });
+  const existing = await db.bookingMetrics.findUnique({ where: { bookingId: args.bookingId }, select: { source: true, frozenAt: true } });
   if (existing && !canOverwrite(args.source, existing.source)) return { written: false };
 
   const data = {
@@ -222,7 +240,7 @@ export async function writeBookingMetric(args: {
     note: args.note ?? undefined,
     reportedAt: now,
   };
-  await prisma.bookingMetrics.upsert({
+  await db.bookingMetrics.upsert({
     where: { bookingId: args.bookingId },
     create: { bookingId: args.bookingId, ...data },
     update: data,
@@ -251,28 +269,55 @@ export async function recomputeRequestStatus(metricsRequestId: string): Promise<
 export async function freezeDueCampaigns(args: { now?: Date }): Promise<{ frozen: number }> {
   const now = args.now ?? new Date();
   const requests = await prisma.metricsRequest.findMany({
-    where: { order: { flightEndDate: { not: null }, status: { notIn: ["QUOTED", "CANCELLED"] } } },
+    where: {
+      order: {
+        flightEndDate: { lt: now, not: null },
+        status: { notIn: ["QUOTED", "CANCELLED"] },
+      },
+    },
     select: {
       order: { select: { flightEndDate: true, status: true } },
       bookings: { select: { booking: { select: { id: true, orderLineId: true, metrics: { select: { impressions: true, frozenAt: true } } } } } },
     },
   });
-  let frozen = 0;
+
+  // Collect all eligible bookings across all requests first, then batch-fetch clicks.
+  const eligibleBookings: Array<{
+    id: string;
+    orderLineId: string;
+    impressions: number | null;
+  }> = [];
   for (const req of requests) {
     if (!isOrderEligibleForScan(req.order, now, GRACE_DAYS)) continue;
     for (const rb of req.bookings) {
       const b = rb.booking;
       if (b.metrics?.frozenAt) continue;
-      const clicks = (await clicksByOrderLine([b.orderLineId]))[b.orderLineId] ?? 0;
-      const snap = buildFreezeSnapshot({ impressions: b.metrics?.impressions ?? null }, clicks, now);
-      await prisma.bookingMetrics.upsert({
-        where: { bookingId: b.id },
-        create: { bookingId: b.id, source: "DESK", reportedBy: "system:freeze", ...snap },
-        update: snap,
-      });
-      frozen++;
+      eligibleBookings.push({ id: b.id, orderLineId: b.orderLineId, impressions: b.metrics?.impressions ?? null });
     }
   }
+
+  if (eligibleBookings.length === 0) return { frozen: 0 };
+
+  // One batch click lookup for all eligible order lines.
+  const allOrderLineIds = eligibleBookings.map((b) => b.orderLineId);
+  const clicksMap = await clicksByOrderLine(allOrderLineIds);
+
+  let frozen = 0;
+  for (const b of eligibleBookings) {
+    const clicks = clicksMap[b.orderLineId] ?? 0;
+    const snap = buildFreezeSnapshot({ impressions: b.impressions }, clicks, now);
+    await prisma.bookingMetrics.upsert({
+      where: { bookingId: b.id },
+      create: { bookingId: b.id, source: "SYSTEM", reportedBy: "system:freeze", ...snap },
+      update: snap,
+    });
+    frozen++;
+  }
+
+  if (frozen > 0) {
+    await recordAudit("system:freeze", "metrics.freeze", "system", { frozen, asOf: now.toISOString() });
+  }
+
   return { frozen };
 }
 
@@ -300,6 +345,10 @@ export async function ingestMetricsReply(args: {
   if (!req) return { status: "unmatched" };
 
   const reportedBy = `email:${args.msgid}`;
+
+  // Any unattributed reply (regardless of placement count) → flag for desk.
+  if (args.byBooking.length === 0) return { status: "ambiguous" };
+
   // Idempotency: if any metric for these bookings already records this msgid, stop.
   const dup = await prisma.bookingMetrics.findFirst({
     where: { bookingId: { in: req.bookings.map((b) => b.bookingId) }, reportedBy },
@@ -307,15 +356,14 @@ export async function ingestMetricsReply(args: {
   });
   if (dup) return { status: "duplicate" };
 
-  // Multi-placement + unattributed reply → flag for desk rather than guess.
-  if (req.bookings.length > 1 && args.byBooking.length === 0) return { status: "ambiguous" };
-
-  for (const entry of args.byBooking) {
-    await writeBookingMetric({
-      bookingId: entry.bookingId, source: "PUBLISHER_EMAIL", reportedBy,
-      note: entry.rawQuote, fields: entry.fields,
-    });
-  }
+  await prisma.$transaction(async (tx) => {
+    for (const entry of args.byBooking) {
+      await writeBookingMetric(
+        { bookingId: entry.bookingId, source: "PUBLISHER_EMAIL", reportedBy, note: entry.rawQuote, fields: entry.fields },
+        tx,
+      );
+    }
+  });
   await recomputeRequestStatus(req.id);
   return { status: "written" };
 }

@@ -472,6 +472,36 @@ if (!RUN_DB_IT) {
   });
 
   // -----------------------------------------------------------------------
+  // Test: freeze uses SYSTEM source → subsequent PUBLISHER_EMAIL write lands
+  // -----------------------------------------------------------------------
+  test("freeze uses SYSTEM source — subsequent PUBLISHER_EMAIL write is not blocked", async () => {
+    // Ensure booking3 has no metrics yet
+    await prisma.bookingMetrics.deleteMany({ where: { bookingId: booking3Id } });
+
+    // Freeze: should create a SYSTEM-sourced row for booking3
+    const freezeResult = await freezeDueCampaigns({ now: new Date() });
+    assert.ok(freezeResult.frozen >= 0, "freeze should succeed");
+
+    const frozenBm = await prisma.bookingMetrics.findUnique({ where: { bookingId: booking3Id } });
+    if (frozenBm) {
+      assert.equal(frozenBm.source, "SYSTEM", "freeze snapshot should use SYSTEM source");
+
+      // A real publisher write must overwrite the SYSTEM sentinel
+      const writeResult = await writeBookingMetric({
+        bookingId: booking3Id,
+        source: "PUBLISHER_EMAIL",
+        reportedBy: "email:test-freeze-regression",
+        fields: { impressions: 42000 },
+      });
+      assert.equal(writeResult.written, true, "PUBLISHER_EMAIL should overwrite SYSTEM freeze snapshot");
+
+      const afterBm = await prisma.bookingMetrics.findUnique({ where: { bookingId: booking3Id } });
+      assert.equal(afterBm?.impressions, 42000, "impressions should reflect publisher write, not freeze sentinel");
+      assert.equal(afterBm?.source, "PUBLISHER_EMAIL");
+    }
+  });
+
+  // -----------------------------------------------------------------------
   // Test: ingestMetricsReply writes once, duplicate on second call
   // -----------------------------------------------------------------------
   test("ingestMetricsReply writes metrics once; same msgid returns duplicate", async () => {
