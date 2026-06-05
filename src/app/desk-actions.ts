@@ -49,7 +49,7 @@ export async function confirmTrackedLinks(formData: FormData) {
   const orderId = field(formData, "orderId");
   const orderLineId = field(formData, "orderLineId");
   const assetId = field(formData, "assetId");
-  const { userId } = await requireDeskOrContent(locale);
+  const { userId } = await requireLineWriter(orderLineId, locale);
 
   const chosen = formData
     .getAll("trackUrl")
@@ -83,28 +83,6 @@ async function requireDesk(locale: string): Promise<string> {
     redirect(`/${locale}/signin`);
   }
   return session.user.id;
-}
-
-// Looser gate for the content-production touchpoints (saveDraft,
-// runSpecCheck, setAssetStatus → IN_REVIEW). Lets writers contracted
-// under the CONTENT role do their job without elevating them to the
-// full desk surface. Commercial decisions (advanceOrder, issueInvoice,
-// cancelOrder) still require requireDesk.
-async function requireDeskOrContent(
-  locale: string,
-): Promise<{ userId: string; role: "DESK" | "CONTENT" | "SUPERADMIN" }> {
-  const session = await auth();
-  const role = session?.user?.role;
-  if (
-    !session?.user ||
-    (role !== "DESK" && role !== "CONTENT" && role !== "SUPERADMIN")
-  ) {
-    redirect(`/${locale}/signin`);
-  }
-  return {
-    userId: session.user.id,
-    role: role as "DESK" | "CONTENT" | "SUPERADMIN",
-  };
 }
 
 // What status transitions the CONTENT role is allowed to invoke from

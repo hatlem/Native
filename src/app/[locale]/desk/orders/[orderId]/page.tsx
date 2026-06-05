@@ -288,13 +288,15 @@ export default async function DeskOrderPage({
         </section>
       ) : null}
 
-      <WritersPanel
-        locale={locale}
-        orderId={order.id}
-        poolWriterIds={order.writerPool.map((p) => p.writerId)}
-        criteriaCountry={firstLineCountry}
-        criteriaCategory={firstLineCategory}
-      />
+      {["CONFIRMED", "IN_PRODUCTION", "SCHEDULED", "LIVE", "COMPLETED"].includes(order.status) ? (
+        <WritersPanel
+          locale={locale}
+          orderId={order.id}
+          poolWriterIds={order.writerPool.map((p) => p.writerId)}
+          criteriaCountry={firstLineCountry}
+          criteriaCategory={firstLineCategory}
+        />
+      ) : null}
 
       <section className="section">
         <div className="section-head">

@@ -969,6 +969,8 @@ model OrderLine {
   assignedWriterId String?
   assignedWriter   WriterProfile? @relation("LineAssignedWriter", fields: [assignedWriterId], references: [id])
   assignedAt       DateTime?
+  // Desk user who made the assignment. Bare id (no relation), same
+  // convention as Order.cancelledBy.
   assignedById     String?
 
   brief        ContentBrief?

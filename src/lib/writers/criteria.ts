@@ -28,6 +28,7 @@ const CATEGORY_TOPIC: Record<string, ContentTopic> = {
   business: "FINANCE",
   finance: "FINANCE",
   economy: "FINANCE",
+  b2b: "B2B",
   health: "HEALTH",
   tech: "TECH",
   technology: "TECH",

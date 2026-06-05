@@ -11,7 +11,11 @@ export default async function WriterProfilePage({
 }) {
   const { locale } = await params;
   const session = await auth();
-  if (!session?.user || session.user.role !== "CONTENT") {
+  const role = session?.user?.role;
+  if (
+    !session?.user ||
+    (role !== "CONTENT" && role !== "DESK" && role !== "SUPERADMIN")
+  ) {
     redirect(`/${locale}/signin`);
   }
 
@@ -19,7 +23,16 @@ export default async function WriterProfilePage({
     where: { userId: session.user.id },
     include: { languages: true, specialties: true },
   });
-  if (!profile) redirect(`/${locale}/signin`);
+  if (!profile) {
+    return (
+      <main className="mx-auto max-w-2xl p-6">
+        <h1 className="text-lg font-semibold">My profile</h1>
+        <p className="mt-4 text-sm text-neutral-500">
+          This account has no writer profile.
+        </p>
+      </main>
+    );
+  }
 
   const myLangs = new Set(profile.languages.map((l) => l.language));
   const myTopics = new Set(profile.specialties.map((s) => s.topic));
