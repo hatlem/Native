@@ -158,8 +158,19 @@ enum BookingStatus {
 }
 
 enum MetricsSource {
-  PUBLISHER
-  DESK
+  PUBLISHER       // legacy (pre-campaign-reporting rows); migrated to PUBLISHER_FORM. Kept so the Prisma enum matches the DB type (Postgres can't drop an enum value).
+  PUBLISHER_FORM  // tokenized self-serve form (publisher typed it)
+  PUBLISHER_EMAIL // AI-transcribed from a publisher email reply (authoritative; raw snippet in note)
+  DESK            // manual entry / override (wins on a mis-parse)
+}
+
+enum MetricsRequestStatus {
+  NEEDS_CONTACT // no resolvable contact — surfaced to desk, not sent
+  PENDING
+  PARTIAL
+  COMPLETE
+  EXPIRED
+  CANCELLED
 }
 
 enum InvoiceStatus {
@@ -290,6 +301,8 @@ model Publisher {
   contactCandidates  ContactCandidate[]
   apiKeys            ApiKey[]
   rateCardDocuments  RateCardDocument[]
+  bookings           PublisherBooking[]
+  metricsRequests    MetricsRequest[]
 
   @@unique([marketId, name])
   @@index([countryCode])
@@ -437,6 +450,7 @@ model Title {
   rateCardRequests  RateCardRequestTitle[]
   contactLogs       ContactLog[]
   rateCardDocuments RateCardDocument[]
+  bookings          PublisherBooking[]
 
   @@index([countryCode])
   @@index([type])
@@ -642,6 +656,7 @@ model User {
   invitedMembers         Membership[]       @relation("MembershipInviter")
   contactLogs            ContactLog[]       @relation("ContactLogAuthor")
   writerProfile          WriterProfile?
+  metricsRequests        MetricsRequest[]   @relation("MetricsRequestCreator")
 }
 
 // Super-admin emits these when activating a new publishing house in
@@ -975,13 +990,19 @@ model Order {
   // with the customer file rather than rotting in the desk associate's
   // head when they change role. Buyer-visible.
   nextEngagementNote String?
+  // Actual paid-media flight window (defaulted from the Plan on creation).
+  // Drives the advertiser report window and the end-of-campaign scan.
+  // Publisher article run (PublisherBooking.liveEndDate) may extend past this.
+  flightStartDate    DateTime?
+  flightEndDate      DateTime?
   createdAt    DateTime     @default(now())
   updatedAt    DateTime     @updatedAt
 
-  lines       OrderLine[]
-  invoices    Invoice[]
-  creditNotes CreditNote[]
-  writerPool  OrderWriterPool[]
+  lines           OrderLine[]
+  invoices        Invoice[]
+  creditNotes     CreditNote[]
+  writerPool      OrderWriterPool[]
+  metricsRequests MetricsRequest[]
 }
 
 model OrderLine {
@@ -1065,14 +1086,30 @@ model PublisherBooking {
   id          String        @id @default(cuid())
   orderLineId String        @unique
   orderLine   OrderLine     @relation(fields: [orderLineId], references: [id])
+  // Denormalized at booking creation (backfilled in migration via the
+  // product chain) so the campaign report + MetricsRequest group by
+  // publisher without a nullable Product join. Mirrors Title.countryCode.
+  publisherId String?
+  publisher   Publisher?    @relation(fields: [publisherId], references: [id])
+  titleId     String?
+  title       Title?        @relation(fields: [titleId], references: [id])
   status      BookingStatus @default(PENDING)
   placementDate DateTime?
+  // Actual article run (may extend past Order.flightEndDate).
+  liveStartDate DateTime?
+  liveEndDate   DateTime?
   liveUrl     String?
+  // Publisher's own tracking link, when they provide one.
+  publisherTrackingUrl String?
   confirmedAt DateTime?
   createdAt   DateTime      @default(now())
   updatedAt   DateTime      @updatedAt
 
-  metrics     BookingMetrics?
+  metrics            BookingMetrics?
+  metricsRequestRefs MetricsRequestBooking[]
+
+  @@index([publisherId])
+  @@index([titleId])
 }
 
 model Invoice {
@@ -1430,6 +1467,50 @@ model RateCardRequestTitle {
   @@index([titleId])
 }
 
+// One row = one (order, publisher) = one campaign-report thread = one token.
+// Collects end-of-campaign numbers for that publisher's bookings in the order.
+model MetricsRequest {
+  id             String               @id @default(cuid())
+  orderId        String
+  order          Order                @relation(fields: [orderId], references: [id])
+  publisherId    String
+  publisher      Publisher            @relation(fields: [publisherId], references: [id])
+  recipientEmail String?              // frozen at creation; null while NEEDS_CONTACT
+  recipientName  String?
+  locale         String               @default("en")
+  token          String               @unique
+  status         MetricsRequestStatus @default(PENDING)
+  sentCount      Int                  @default(0)
+  lastStepAt     DateTime?
+  nextStepAt     DateTime?
+  sentAt         DateTime?
+  openedAt       DateTime?
+  respondedAt    DateTime?
+  cancelledAt    DateTime?
+  expiresAt      DateTime
+  createdById    String
+  createdBy      User                 @relation("MetricsRequestCreator", fields: [createdById], references: [id])
+  createdAt      DateTime             @default(now())
+  updatedAt      DateTime             @updatedAt
+
+  bookings MetricsRequestBooking[]
+
+  @@unique([orderId, publisherId])
+  @@index([orderId])
+  @@index([nextStepAt, respondedAt, cancelledAt])
+  @@index([status])
+}
+
+model MetricsRequestBooking {
+  metricsRequestId String
+  metricsRequest   MetricsRequest   @relation(fields: [metricsRequestId], references: [id], onDelete: Cascade)
+  bookingId        String
+  booking          PublisherBooking @relation(fields: [bookingId], references: [id], onDelete: Cascade)
+
+  @@id([metricsRequestId, bookingId])
+  @@index([bookingId])
+}
+
 // Email suppression list — recipients who unsubscribed, bounced, or were manually excluded.
 model OutreachSuppression {
   email     String   @id
@@ -1460,9 +1541,21 @@ model BookingMetrics {
   id          String           @id @default(cuid())
   bookingId   String           @unique
   booking     PublisherBooking @relation(fields: [bookingId], references: [id], onDelete: Cascade)
+  // Latest reported values ("live-to-date").
   impressions Int?
-  source      MetricsSource    @default(PUBLISHER)
-  note        String?
+  pageViews   Int?
+  publisherReportedClicks Int? // publisher's own click count; distinct from first-party TrackedLink clicks
+  avgTimeSec  Int?
+  scrollDepthPct Int?
+  extra       Json?            // only not-yet-promoted extras; never anything the report renders
+  windowStart DateTime?
+  windowEnd   DateTime?
+  // Frozen campaign snapshot (the advertiser deliverable). Set at close; immutable after.
+  frozenAt    DateTime?
+  impressionsAtClose      Int?
+  clicksFirstPartyAtClose Int?
+  source      MetricsSource    @default(PUBLISHER_FORM)
+  note        String?          // for the email path: the raw quoted snippet the number came from
   reportedAt  DateTime?
   reportedBy  String?
   createdAt   DateTime         @default(now())
