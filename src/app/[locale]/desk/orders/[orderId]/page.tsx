@@ -21,6 +21,8 @@ import { StatusBadge } from "@/app/status-badge";
 import { canCancelOrder, cancelBlockReason } from "@/lib/cancellation";
 import { pickPlaybook } from "@/lib/playbook";
 import { SubmitButton } from "@/components";
+import { clicksByOrderLine } from "@/lib/metrics/store";
+import { CampaignSection } from "./campaign-section";
 
 export const dynamic = "force-dynamic";
 
@@ -53,6 +55,13 @@ export default async function DeskOrderPage({
         include: {
           brief: { include: { assets: { orderBy: { version: "desc" } } } },
           trackedLinks: true,
+          booking: {
+            include: {
+              metrics: true,
+              publisher: { select: { name: true } },
+              title: { select: { name: true } },
+            },
+          },
         },
       },
       writerPool: {
@@ -66,6 +75,19 @@ export default async function DeskOrderPage({
     },
   });
   if (!order) notFound();
+
+  const metricsRequests = await prisma.metricsRequest.findMany({
+    where: { orderId: order.id },
+    select: {
+      id: true,
+      publisherId: true,
+      status: true,
+      recipientEmail: true,
+      sentCount: true,
+      token: true,
+    },
+  });
+  const clicks = await clicksByOrderLine(order.lines.map((l) => l.id));
 
   const products = await prisma.product.findMany({
     where: {
@@ -540,6 +562,13 @@ export default async function DeskOrderPage({
           })}
         </div>
       </section>
+
+      <CampaignSection
+        locale={locale}
+        order={order}
+        metricsRequests={metricsRequests}
+        clicks={clicks}
+      />
     </>
   );
 }
