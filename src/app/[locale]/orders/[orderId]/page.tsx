@@ -2,12 +2,13 @@ import { getTranslations } from "next-intl/server";
 import { notFound } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import { Link } from "@/i18n/navigation";
-import { formatMoney } from "@/lib/money";
+import { formatMoney, intlLocale } from "@/lib/money";
 import { loadScope, canActOnOrg } from "@/lib/scope";
 import { safeExternalUrl } from "@/lib/security";
 import { StatusBadge } from "@/app/status-badge";
 import { duplicatePlan } from "@/app/actions";
 import { clicksByOrderLine } from "@/lib/metrics/store";
+import { ctrPct } from "@/lib/reporting";
 import { SubmitButton } from "@/components";
 
 export const dynamic = "force-dynamic";
@@ -34,7 +35,13 @@ export default async function MyOrderPage({
           brief: {
             include: { assets: { orderBy: { version: "desc" }, take: 1 } },
           },
-          booking: { include: { metrics: true } },
+          booking: {
+              include: {
+                metrics: true,
+                publisher: { select: { name: true } },
+                title: { select: { name: true } },
+              },
+            },
         },
       },
     },
@@ -45,7 +52,34 @@ export default async function MyOrderPage({
   if (!canActOnOrg(scope, order.organizationId)) notFound();
 
   const tperf = await getTranslations({ locale, namespace: "performance" });
+  const tcr = await getTranslations({ locale, namespace: "campaignReport" });
   const clickTotals = await clicksByOrderLine(order.lines.map((l) => l.id));
+
+  // Campaign report rows — frozen numbers first, live-to-date fallback.
+  // Never exposes unitCost, marginPct, or any internal margin field.
+  const campaignRows = order.lines.flatMap((l) => {
+    const b = l.booking;
+    if (!b) return [];
+    const firstParty = b.metrics?.clicksFirstPartyAtClose ?? clickTotals[l.id] ?? 0;
+    const impressions = b.metrics?.impressionsAtClose ?? b.metrics?.impressions ?? null;
+    return [{
+      publisher: b.publisher?.name ?? "—",
+      title: b.title?.name ?? "—",
+      liveStart: b.liveStartDate,
+      liveEnd: b.liveEndDate,
+      impressions,
+      firstPartyClicks: firstParty,
+      pageViews: b.metrics?.pageViews ?? null,
+      ctr: ctrPct(firstParty, impressions),
+      frozen: !!b.metrics?.frozenAt,
+    }];
+  });
+  const reportedCount = campaignRows.filter((r) => r.impressions !== null).length;
+
+  const fmtDate = (d: Date | null) =>
+    d ? d.toLocaleDateString(intlLocale(locale), { day: "numeric", month: "short", year: "numeric" }) : "—";
+  const fmtNum = (n: number | null) =>
+    n === null ? null : n.toLocaleString(intlLocale(locale));
 
   const products = await prisma.product.findMany({
     where: {
@@ -216,6 +250,146 @@ export default async function MyOrderPage({
           })}
         </div>
       </section>
+
+      {campaignRows.length > 0 && (
+        <section className="section">
+          <div className="section-head">
+            <div>
+              <span className="eyebrow">{tcr("eyebrow")}</span>
+              <h2>{tcr("heading")}</h2>
+              <p className="muted small">{tcr("lead")}</p>
+            </div>
+            <a
+              href={`/api/export/campaign-report/${order.id}.csv`}
+              className="btn small secondary"
+              download
+            >
+              {tcr("downloadCsv")}
+            </a>
+          </div>
+
+          {(order.flightStartDate || order.flightEndDate) && (
+            <p className="muted small" style={{ marginBottom: "1rem" }}>
+              {tcr("flightWindow")}:{" "}
+              <strong>
+                {fmtDate(order.flightStartDate)} – {fmtDate(order.flightEndDate)}
+              </strong>
+            </p>
+          )}
+
+          <div className="table-wrap" style={{ overflowX: "auto" }}>
+            <table className="data-table">
+              <thead>
+                <tr>
+                  <th>{tcr("colPublisher")}</th>
+                  <th>{tcr("colTitle")}</th>
+                  <th>{tcr("colLiveWindow")}</th>
+                  <th className="num">{tcr("colImpressions")}</th>
+                  <th className="num">{tcr("colClicks")}</th>
+                  <th className="num">{tcr("colPageViews")}</th>
+                  <th className="num">{tcr("colCtr")}</th>
+                </tr>
+              </thead>
+              <tbody>
+                {campaignRows.map((row, i) => (
+                  <tr key={i}>
+                    <td>{row.publisher}</td>
+                    <td>{row.title}</td>
+                    <td className="small muted">
+                      {row.liveStart || row.liveEnd
+                        ? `${fmtDate(row.liveStart)} – ${fmtDate(row.liveEnd)}`
+                        : "—"}
+                    </td>
+                    <td className="num">
+                      {row.impressions !== null ? (
+                        <span>
+                          {fmtNum(row.impressions)}{" "}
+                          <span
+                            className="badge badge-muted dotless small"
+                            title={row.frozen ? tcr("frozen") : tcr("liveToDated")}
+                          >
+                            {row.frozen ? "✓" : "~"}
+                          </span>
+                        </span>
+                      ) : (
+                        <span className="muted small">{tcr("pending")}</span>
+                      )}
+                    </td>
+                    <td className="num">{fmtNum(row.firstPartyClicks) ?? "0"}</td>
+                    <td className="num">{fmtNum(row.pageViews) ?? "—"}</td>
+                    <td className="num">
+                      {row.ctr !== null ? `${row.ctr}%` : "—"}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+              {campaignRows.length > 1 && (
+                <tfoot>
+                  <tr className="total-row">
+                    <td colSpan={3}>
+                      <strong>{tcr("totalRow")}</strong>
+                    </td>
+                    <td className="num">
+                      <strong>
+                        {(() => {
+                          const total = campaignRows.reduce(
+                            (s, r) => (r.impressions !== null ? s + r.impressions : s),
+                            0,
+                          );
+                          return reportedCount > 0 ? fmtNum(total) : "—";
+                        })()}
+                      </strong>
+                    </td>
+                    <td className="num">
+                      <strong>
+                        {fmtNum(
+                          campaignRows.reduce((s, r) => s + r.firstPartyClicks, 0),
+                        )}
+                      </strong>
+                    </td>
+                    <td className="num">
+                      <strong>
+                        {(() => {
+                          const total = campaignRows.reduce(
+                            (s, r) => (r.pageViews !== null ? s + r.pageViews : s),
+                            0,
+                          );
+                          const anyPv = campaignRows.some((r) => r.pageViews !== null);
+                          return anyPv ? fmtNum(total) : "—";
+                        })()}
+                      </strong>
+                    </td>
+                    <td className="num">
+                      {(() => {
+                        const totalImpressions = campaignRows.reduce(
+                          (s, r) => (r.impressions !== null ? s + r.impressions : s),
+                          0,
+                        );
+                        const totalClicks = campaignRows.reduce(
+                          (s, r) => s + r.firstPartyClicks,
+                          0,
+                        );
+                        const totalCtr = ctrPct(totalClicks, totalImpressions > 0 ? totalImpressions : null);
+                        return totalCtr !== null ? <strong>{totalCtr}%</strong> : "—";
+                      })()}
+                    </td>
+                  </tr>
+                </tfoot>
+              )}
+            </table>
+          </div>
+
+          {reportedCount < campaignRows.length && (
+            <p className="muted small" style={{ marginTop: "0.75rem" }}>
+              {tcr("coverageCaveat", { n: reportedCount, m: campaignRows.length })}
+            </p>
+          )}
+
+          <p className="muted small" style={{ marginTop: "0.5rem" }}>
+            {tcr("reachDisclaimer")}
+          </p>
+        </section>
+      )}
     </>
   );
 }

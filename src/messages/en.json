@@ -2181,5 +2181,26 @@
     "pending": "Reporting at the agreed checkpoint.",
     "impressionsLabel": "Impressions (from your analytics)",
     "impressionsSave": "Save"
+  },
+  "campaignReport": {
+    "eyebrow": "Campaign report",
+    "heading": "Campaign report",
+    "lead": "Confirmed delivery numbers for this campaign.",
+    "flightWindow": "Flight window",
+    "colPublisher": "Publisher",
+    "colTitle": "Title",
+    "colLiveWindow": "Live window",
+    "colImpressions": "Impressions",
+    "colClicks": "1st-party clicks",
+    "colPageViews": "Page views",
+    "colCtr": "CTR",
+    "totalRow": "Campaign total",
+    "frozen": "Final (campaign close)",
+    "liveToDated": "Live-to-date",
+    "noData": "—",
+    "pending": "Pending reporting",
+    "coverageCaveat": "{n} of {m} placements have reported impressions. Others update when the publisher submits numbers.",
+    "downloadCsv": "Download CSV",
+    "reachDisclaimer": "Impressions are publisher-reported. First-party clicks are tracked via our link."
   }
 }
