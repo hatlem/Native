@@ -48,8 +48,11 @@ export async function updateWriterProfile(formData: FormData) {
     .getAll("specialties")
     .filter((v): v is string => typeof v === "string")
     .filter((v) => v in ContentTopic) as ContentTopic[];
-  const proficiency =
-    (field(formData, "proficiency") as LanguageProficiency) || "FLUENT";
+  const proficiencyRaw = field(formData, "proficiency");
+  const proficiency: LanguageProficiency =
+    proficiencyRaw in LanguageProficiency
+      ? (proficiencyRaw as LanguageProficiency)
+      : "FLUENT";
 
   await prisma.$transaction([
     prisma.writerProfile.update({
