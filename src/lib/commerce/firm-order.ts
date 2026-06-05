@@ -212,8 +212,20 @@ export async function createFirmOrder(args: {
           audience,
         })),
       });
+      // Resolve title/publisher for placement lines so each booking is anchored to
+      // its publisher at creation (the campaign report groups by it).
+      const placementProductIds = placementLines.map((l) => l.productId).filter((id): id is string => !!id);
+      const placementProducts = await tx.product.findMany({
+        where: { id: { in: placementProductIds } },
+        select: { id: true, titleId: true, title: { select: { publisherId: true } } },
+      });
+      const titleByProduct = new Map(placementProducts.map((p) => [p.id, { titleId: p.titleId, publisherId: p.title.publisherId }]));
+
       await tx.publisherBooking.createMany({
-        data: placementLines.map((l) => ({ orderLineId: l.id })),
+        data: placementLines.map((l) => {
+          const ref = l.productId ? titleByProduct.get(l.productId) : undefined;
+          return { orderLineId: l.id, titleId: ref?.titleId ?? null, publisherId: ref?.publisherId ?? null };
+        }),
       });
     }
 
