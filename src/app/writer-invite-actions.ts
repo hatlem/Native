@@ -1,10 +1,10 @@
 "use server";
 
 import { redirect } from "next/navigation";
-import { randomBytes } from "node:crypto";
 import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
 import { recordAudit } from "@/lib/audit";
+import { newInviteToken, expiryFromNow } from "@/lib/publisher-invite";
 
 function field(formData: FormData, key: string): string {
   const v = formData.get(key);
@@ -22,8 +22,8 @@ export async function createWriterInvite(formData: FormData) {
   }
   if (!email) redirect(`/${locale}/desk/writers`);
 
-  const token = randomBytes(24).toString("hex");
-  const expiresAt = new Date(Date.now() + 14 * 24 * 60 * 60 * 1000);
+  const token = newInviteToken();
+  const expiresAt = expiryFromNow();
   await prisma.writerInvite.create({
     data: { email, token, expiresAt, createdBy: session.user.id },
   });
@@ -32,35 +32,4 @@ export async function createWriterInvite(formData: FormData) {
   });
 
   redirect(`/${locale}/desk/writers`);
-}
-
-// Binds a new CONTENT user + empty WriterProfile when the invite is claimed.
-// Call from the claim/signup route handler after the User row is created;
-// pass the freshly created userId. Returns false if the token is invalid,
-// already claimed, or expired.
-export async function claimWriterInvite(
-  token: string,
-  newUserId: string,
-): Promise<boolean> {
-  const invite = await prisma.writerInvite.findUnique({ where: { token } });
-  if (!invite || invite.claimedAt || invite.expiresAt < new Date()) {
-    return false;
-  }
-  await prisma.$transaction([
-    prisma.user.update({
-      where: { id: newUserId },
-      data: { role: "CONTENT", emailVerifiedAt: new Date() },
-    }),
-    prisma.writerProfile.create({ data: { userId: newUserId } }),
-    prisma.writerInvite.update({
-      where: { token },
-      data: { claimedAt: new Date(), claimedByUserId: newUserId },
-    }),
-  ]);
-  await recordAudit(
-    newUserId,
-    "writer.invite_claim",
-    `WriterInvite:${invite.id}`,
-  );
-  return true;
 }
