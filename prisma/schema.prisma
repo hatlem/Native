@@ -974,6 +974,8 @@ model OrderLine {
   brief        ContentBrief?
   booking      PublisherBooking?
   trackedLinks TrackedLink[]
+
+  @@index([assignedWriterId])
 }
 
 model ContentBrief {
@@ -1023,6 +1025,7 @@ model ContentAsset {
   updatedAt   DateTime           @updatedAt
 
   @@index([sourceAssetId])
+  @@index([authorWriterId])
 }
 
 model PublisherBooking {

@@ -107,6 +107,13 @@ ALTER TABLE "OrderLine" ADD COLUMN IF NOT EXISTS "assignedById"     TEXT;
 -- AlterTable: ContentAsset — author attribution
 ALTER TABLE "ContentAsset" ADD COLUMN IF NOT EXISTS "authorWriterId" TEXT;
 
+-- Indexes for writer console queries
+CREATE INDEX IF NOT EXISTS "OrderLine_assignedWriterId_idx"
+  ON "OrderLine"("assignedWriterId");
+
+CREATE INDEX IF NOT EXISTS "ContentAsset_authorWriterId_idx"
+  ON "ContentAsset"("authorWriterId");
+
 -- Foreign keys (guarded for idempotency)
 
 DO $$ BEGIN
