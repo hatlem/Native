@@ -25,6 +25,11 @@ import {
 import { isProductPriceShown } from "@/lib/pricing-visibility";
 import { loadContentFeeRules, contentFeeLinesForGroup } from "@/lib/content-fee";
 import { createFirmOrder, toQuotable } from "@/lib/commerce/firm-order";
+import {
+  authorshipFromWithContent,
+  authorshipForOrderLine,
+  type AuthorshipMode,
+} from "@/lib/authorship";
 import { groupItemsByMarket } from "@/lib/quote-grouping";
 import { recordAudit } from "@/lib/audit";
 import { notifyDesk, notifyOrg, notifyPublisher } from "@/lib/notify";
@@ -317,6 +322,7 @@ export async function submitRequest(formData: FormData) {
               productId: i.productId,
               quantity: i.quantity,
               withContent: i.withContent ?? false,
+              authorshipMode: authorshipFromWithContent(i.withContent),
             })),
           },
         },
@@ -605,7 +611,7 @@ export async function acceptQuote(formData: FormData) {
     include: {
       lines: true,
       order: true,
-      request: { include: { plan: true } },
+      request: { include: { plan: { include: { items: true } } } },
     },
   });
   if (!quote) redirect(`/${locale}/catalog`);
@@ -623,6 +629,11 @@ export async function acceptQuote(formData: FormData) {
   }
 
   const plan = quote.request.plan;
+  // Carry the buyer's per-product authorship intent (captured on the plan)
+  // onto the order lines, so the confirmed order records who writes each piece.
+  const authorshipByProduct = new Map<string, AuthorshipMode>(
+    plan.items.map((i) => [i.productId, i.authorshipMode]),
+  );
 
   const order = await prisma.$transaction(async (tx) => {
     const order = await tx.order.create({
@@ -633,6 +644,7 @@ export async function acceptQuote(formData: FormData) {
         lines: {
           create: quote.lines.map((l) => ({
             kind: l.kind,
+            authorshipMode: authorshipForOrderLine(l, authorshipByProduct),
             productId: l.productId,
             quantity: l.quantity,
             lineTotal: l.lineTotal,
@@ -707,7 +719,7 @@ export async function acceptAllQuotesForRequest(formData: FormData) {
   const request = await prisma.request.findUnique({
     where: { id: requestId },
     include: {
-      plan: true,
+      plan: { include: { items: true } },
       quotes: { include: { lines: true, order: true } },
     },
   });
@@ -727,6 +739,9 @@ export async function acceptAllQuotesForRequest(formData: FormData) {
   }
 
   const plan = request.plan;
+  const authorshipByProduct = new Map<string, AuthorshipMode>(
+    plan.items.map((i) => [i.productId, i.authorshipMode]),
+  );
   const createdOrders = await prisma.$transaction(async (tx) => {
     const orders: { id: string; productIds: string[] }[] = [];
     for (const quote of openQuotes) {
@@ -738,6 +753,7 @@ export async function acceptAllQuotesForRequest(formData: FormData) {
           lines: {
             create: quote.lines.map((l) => ({
               kind: l.kind,
+              authorshipMode: authorshipForOrderLine(l, authorshipByProduct),
               productId: l.productId,
               quantity: l.quantity,
               lineTotal: l.lineTotal,

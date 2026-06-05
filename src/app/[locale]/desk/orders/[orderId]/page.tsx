@@ -14,6 +14,7 @@ import {
   confirmTrackedLinks,
 } from "@/app/desk-actions";
 import { assignWriterToLine } from "@/app/writer-pool-actions";
+import { writerStaffableLine } from "@/lib/authorship";
 import { WritersPanel } from "./writers-panel";
 import { extractLinks } from "@/lib/metrics/links";
 import { StatusBadge } from "@/app/status-badge";
@@ -339,7 +340,7 @@ export default async function DeskOrderPage({
                   </div>
                 </div>
 
-                {order.writerPool.length > 0 ? (
+                {order.writerPool.length > 0 && writerStaffableLine(line) ? (
                   <form action={assignWriterToLine} className="flex items-center gap-2">
                     <input type="hidden" name="locale" value={locale} />
                     <input type="hidden" name="orderId" value={order.id} />

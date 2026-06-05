@@ -17,6 +17,11 @@ import {
 } from "@/lib/money";
 import { groupItemsByMarket } from "@/lib/quote-grouping";
 import { loadContentFeeRules, contentFeeLinesForGroup } from "@/lib/content-fee";
+import {
+  authorshipFromWithContent,
+  authorshipForOrderLine,
+  type AuthorshipMode,
+} from "@/lib/authorship";
 
 // Minimal product shape the quote engine needs. Both the self-serve basket
 // query and the desk quote query hydrate at least these fields.
@@ -101,6 +106,12 @@ export async function createFirmOrder(args: {
   const planCurrency = groups.length === 1 ? groups[0].currency : null;
   const feeRules = await loadContentFeeRules();
 
+  // Per-product authorship intent (projected from the buyer's withContent
+  // toggle), used to stamp both the PlanItem and the eventual OrderLine.
+  const authorshipByProduct = new Map<string, AuthorshipMode>(
+    items.map((i) => [i.productId, authorshipFromWithContent(i.withContent)]),
+  );
+
   return prisma.$transaction(async (tx) => {
     const plan = await tx.plan.create({
       data: {
@@ -118,6 +129,7 @@ export async function createFirmOrder(args: {
             productId: i.productId,
             quantity: i.quantity,
             withContent: i.withContent ?? false,
+            authorshipMode: authorshipByProduct.get(i.productId)!,
           })),
         },
       },
@@ -179,6 +191,7 @@ export async function createFirmOrder(args: {
           lines: {
             create: lines.map((l) => ({
               kind: l.kind,
+              authorshipMode: authorshipForOrderLine(l, authorshipByProduct),
               productId: l.productId,
               quantity: l.quantity,
               lineTotal: l.lineTotal,

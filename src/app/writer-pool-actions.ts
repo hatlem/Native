@@ -5,6 +5,7 @@ import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
 import { recordAudit } from "@/lib/audit";
 import { canAssignWriter } from "@/lib/writers/access";
+import { writerStaffableLine } from "@/lib/authorship";
 
 function field(formData: FormData, key: string): string {
   const v = formData.get(key);
@@ -79,6 +80,18 @@ export async function assignWriterToLine(formData: FormData) {
   });
   if (!canAssignWriter(pool.map((p) => p.writerId), writerId)) {
     // Reject out-of-pool assignment silently — UI only offers pool members.
+    redirect(`/${locale}/desk/orders/${orderId}`);
+  }
+
+  // Only an INVENTORY placement NativeSpin produces may be staffed. A
+  // buyer-/publisher-produced placement is written elsewhere, and a
+  // CONTENT_FEE line is billing-only (no brief/booking) — assigning a writer
+  // to either is a category error, so reject it even on a tampered form.
+  const line = await prisma.orderLine.findUnique({
+    where: { id: orderLineId },
+    select: { kind: true, authorshipMode: true },
+  });
+  if (!line || !writerStaffableLine(line)) {
     redirect(`/${locale}/desk/orders/${orderId}`);
   }
 

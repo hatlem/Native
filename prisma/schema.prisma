@@ -64,6 +64,20 @@ enum LineKind {
   CONTENT_FEE
 }
 
+// Who writes the article for a placement — a separate axis from LineKind
+// (which is billing: a publisher placement vs our content-production fee).
+// Carried Plan→Order so a confirmed order records production intent instead
+// of leaving "buyer brought their own copy" and "publisher produces it" as
+// indistinguishable rows. BUYER_SUPPLIED is the historical withContent=false
+// default; NATIVESPIN_PRODUCED maps to withContent=true (drives the
+// CONTENT_FEE line + writer staffing); PUBLISHER_PRODUCED has no buyer toggle
+// yet but is modelled now so the record can represent it without a later split.
+enum AuthorshipMode {
+  BUYER_SUPPLIED
+  NATIVESPIN_PRODUCED
+  PUBLISHER_PRODUCED
+}
+
 enum PriceVisibility {
   INDICATIVE
   FIRM
@@ -310,6 +324,14 @@ model Title {
   websiteUrl    String?
   active        Boolean   @default(true)
   lastVerifiedAt DateTime?
+  // Positive verification of whether the publication is *still in production*.
+  // `active`/`discontinuedAt` only record deactivation; this records the
+  // opposite too — that we actively CONFIRMED a title is live (not merely that
+  // nobody has flagged it). UNVERIFIED is the honest default: do not trust a
+  // title until it is positively confirmed. verificationSource holds the URL /
+  // reply backing the status; lastVerifiedAt holds when it was checked.
+  verificationStatus VerificationStatus @default(UNVERIFIED)
+  verificationSource String?
   // Set when a publisher confirms a title is defunct (no longer exists /
   // merged into another title). We also set active=false, but these two
   // fields preserve *that* and *why* it was discontinued for the future —
@@ -872,8 +894,13 @@ model PlanItem {
   // When true, the buyer wants NativeSpin to produce the native content
   // for this placement — adds a CONTENT_FEE line to the quote priced
   // from the matching ContentFeeRule. Per-placement: some buyers bring
-  // their own copy.
+  // their own copy. The v1 input for `authorshipMode` (kept as a shim
+  // until the UI exposes the full mode selector).
   withContent Boolean @default(false)
+  // Canonical authorship intent for this placement, projected from
+  // withContent today. Persisted (not just derived) so it can be carried
+  // onto the OrderLine at confirmation.
+  authorshipMode AuthorshipMode @default(BUYER_SUPPLIED)
   notes     String?
 }
 
@@ -962,6 +989,10 @@ model OrderLine {
   orderId   String
   order     Order    @relation(fields: [orderId], references: [id])
   kind      LineKind @default(INVENTORY)
+  // Who writes the article. Carried from the PlanItem at order creation so
+  // the confirmed order records production intent. Gates writer staffing —
+  // only NATIVESPIN_PRODUCED lines may be assigned a writer.
+  authorshipMode AuthorshipMode @default(BUYER_SUPPLIED)
   // Null for CONTENT_FEE lines (no publisher placement to fulfil).
   productId String?
   quantity  Int      @default(1)
@@ -1268,6 +1299,18 @@ enum OwnContent {
   NO
   WITH_APPROVAL
   UNKNOWN
+}
+
+// Whether a title has been positively confirmed as still in production.
+// UNVERIFIED is the default — a title is not trusted until checked against its
+// own site / a reliable source. LIVE = confirmed currently published.
+// DISCONTINUED = confirmed closed/merged/renamed (pairs with discontinuedAt).
+// UNCERTAIN = checked but could not be confirmed either way.
+enum VerificationStatus {
+  UNVERIFIED
+  LIVE
+  DISCONTINUED
+  UNCERTAIN
 }
 
 // Raw storage + history for every received rate-card / media-kit PDF.
