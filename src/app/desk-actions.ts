@@ -224,7 +224,7 @@ export async function setAssetStatus(formData: FormData) {
   // Writers can only hand a draft off for review. APPROVED / FINAL /
   // CHANGES_REQUESTED stay with the desk + buyer.
   if (role === "CONTENT" && !CONTENT_ASSET_TARGETS.has(target)) {
-    redirect(`/${locale}/desk/orders/${orderId}`);
+    redirect(`/${locale}/writer/lines/${orderLineId}`);
   }
 
   if (ASSET_TARGETS.includes(target)) {
