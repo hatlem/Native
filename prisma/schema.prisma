@@ -182,6 +182,40 @@ enum JobStatus {
   FAILED
 }
 
+// Languages writers produce content in — matches the src/messages locale
+// set (no, sv, da, fi, de, en). Distinct from MarketCode because several
+// markets share a language (DE/AT/CH → DE, UK/IE → EN).
+enum ContentLanguage {
+  NO
+  SV
+  DA
+  FI
+  DE
+  EN
+}
+
+enum LanguageProficiency {
+  NATIVE
+  FLUENT
+  WORKING
+}
+
+// Editorial specialty taxonomy for writer matching. Enum for v1 (simple,
+// filterable); promote to a Topic table only if the desk needs to add
+// categories itself.
+enum ContentTopic {
+  FINANCE
+  HEALTH
+  TECH
+  LIFESTYLE
+  B2B
+  TRAVEL
+  FOOD
+  CULTURE
+  SUSTAINABILITY
+  OTHER
+}
+
 // ---------- Catalog ----------
 
 model Market {
@@ -585,6 +619,7 @@ model User {
   memberships            Membership[]       @relation("UserMemberships")
   invitedMembers         Membership[]       @relation("MembershipInviter")
   contactLogs            ContactLog[]       @relation("ContactLogAuthor")
+  writerProfile          WriterProfile?
 }
 
 // Super-admin emits these when activating a new publishing house in
@@ -919,6 +954,7 @@ model Order {
   lines       OrderLine[]
   invoices    Invoice[]
   creditNotes CreditNote[]
+  writerPool  OrderWriterPool[]
 }
 
 model OrderLine {
@@ -930,6 +966,10 @@ model OrderLine {
   productId String?
   quantity  Int      @default(1)
   lineTotal Decimal  @db.Decimal(12, 2)
+  assignedWriterId String?
+  assignedWriter   WriterProfile? @relation("LineAssignedWriter", fields: [assignedWriterId], references: [id])
+  assignedAt       DateTime?
+  assignedById     String?
 
   brief        ContentBrief?
   booking      PublisherBooking?
@@ -958,6 +998,8 @@ model ContentAsset {
   version     Int                @default(1)
   status      ContentAssetStatus @default(DRAFT)
   body        String?
+  authorWriterId String?
+  authorWriter   WriterProfile? @relation("AssetAuthor", fields: [authorWriterId], references: [id])
   bodyUrl     String? // pointer into object storage
   specPassed  Boolean?
   reviewNotes String?
@@ -1403,4 +1445,79 @@ model Subscriber {
   unsubscribedAt   DateTime?
 
   @@index([status])
+}
+
+// ---------- Writer Pool ----------
+
+// Freelance writer profile. 1:1 with a User whose role is CONTENT. Carries
+// the matching signals the desk uses to staff an order: languages,
+// specialties, rate, and capacity.
+model WriterProfile {
+  id                   String   @id @default(cuid())
+  userId               String   @unique
+  user                 User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  bio                  String?
+  ratePerArticle       Decimal? @db.Decimal(12, 2)
+  ratePerWord          Decimal? @db.Decimal(12, 4)
+  currency             String? // ISO 4217; default from home market
+  maxActiveAssignments Int? // capacity guidance; over-cap warns, never blocks
+  active               Boolean  @default(true) // left / on pause
+  portfolioUrl         String?
+  createdAt            DateTime @default(now())
+  updatedAt            DateTime @updatedAt
+
+  languages       WriterLanguage[]
+  specialties     WriterSpecialty[]
+  poolMemberships OrderWriterPool[]
+  assignedLines   OrderLine[]       @relation("LineAssignedWriter")
+  authoredAssets  ContentAsset[]    @relation("AssetAuthor")
+}
+
+model WriterLanguage {
+  id          String              @id @default(cuid())
+  writerId    String
+  writer      WriterProfile       @relation(fields: [writerId], references: [id], onDelete: Cascade)
+  language    ContentLanguage
+  proficiency LanguageProficiency @default(FLUENT)
+
+  @@unique([writerId, language])
+}
+
+model WriterSpecialty {
+  id       String        @id @default(cuid())
+  writerId String
+  writer   WriterProfile @relation(fields: [writerId], references: [id], onDelete: Cascade)
+  topic    ContentTopic
+
+  @@unique([writerId, topic])
+}
+
+// Candidate writers attached to an order. The desk builds this pool;
+// per-line assignment (OrderLine.assignedWriter) must be a pool member.
+model OrderWriterPool {
+  id        String        @id @default(cuid())
+  orderId   String
+  order     Order         @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  writerId  String
+  writer    WriterProfile @relation(fields: [writerId], references: [id])
+  addedById String // desk user who added them
+  addedAt   DateTime      @default(now())
+
+  @@unique([orderId, writerId])
+  @@index([writerId])
+}
+
+// Single-use, time-limited invite that binds a new User{role: CONTENT}
+// and an empty WriterProfile on claim. Mirrors PublisherInvite.
+model WriterInvite {
+  id              String    @id @default(cuid())
+  email           String
+  token           String    @unique
+  expiresAt       DateTime
+  claimedAt       DateTime?
+  claimedByUserId String?
+  createdBy       String
+  createdAt       DateTime  @default(now())
+
+  @@index([email])
 }
