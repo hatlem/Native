@@ -48,7 +48,7 @@ export async function loadRoster(): Promise<RosterWriter[]> {
       active: w.active,
       maxActiveAssignments: w.maxActiveAssignments,
       activeAssignments,
-      ratePerArticle: w.ratePerArticle ? Number(w.ratePerArticle) : null,
+      ratePerArticle: w.ratePerArticle != null ? Number(w.ratePerArticle) : null,
       currency: w.currency,
       languages: w.languages,
       specialties: w.specialties,
