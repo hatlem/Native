@@ -17,6 +17,7 @@ import {
   normaliseReason,
   type CancelActor,
 } from "@/lib/cancellation";
+import { requireLineWriter } from "@/lib/writers/guard";
 
 registerSpecCheckJob();
 
@@ -151,7 +152,10 @@ export async function saveDraft(formData: FormData) {
   // desk can charge adaptation-rate instead of greenfield and the
   // audit chain shows quote-reuse lineage (Maja R2's deeper gap).
   const sourceAssetId = field(formData, "sourceAssetId") || null;
-  const { userId } = await requireDeskOrContent(locale);
+  const { userId, writerProfileId, role } = await requireLineWriter(
+    orderLineId,
+    locale,
+  );
 
   const brief = await prisma.contentBrief.findUnique({
     where: { orderLineId },
@@ -166,6 +170,7 @@ export async function saveDraft(formData: FormData) {
         status: "DRAFT",
         body,
         sourceAssetId: sourceAssetId || null,
+        authorWriterId: writerProfileId,
       },
     });
     await recordAudit(userId, "asset.draft", `ContentAsset:${asset.id}`, {
@@ -175,19 +180,33 @@ export async function saveDraft(formData: FormData) {
     // Queue spec check rather than block the form submission.
     await enqueue("spec.check", { assetId: asset.id });
   }
-  redirect(`/${locale}/desk/orders/${orderId}`);
+  // CONTENT writers return to their console; desk stays on the order page.
+  redirect(
+    role === "CONTENT"
+      ? `/${locale}/writer/lines/${orderLineId}`
+      : `/${locale}/desk/orders/${orderId}`,
+  );
 }
 
 export async function runSpecCheck(formData: FormData) {
   const locale = field(formData, "locale") || "en";
   const assetId = field(formData, "assetId");
   const orderId = field(formData, "orderId");
-  const { userId } = await requireDeskOrContent(locale);
+  const asset = await prisma.contentAsset.findUnique({
+    where: { id: assetId },
+    select: { brief: { select: { orderLineId: true } } },
+  });
+  const orderLineId = asset?.brief.orderLineId ?? "";
+  const { userId, role } = await requireLineWriter(orderLineId, locale);
 
   await runSpecCheckForAsset(assetId);
   await recordAudit(userId, "asset.spec_check", `ContentAsset:${assetId}`);
 
-  redirect(`/${locale}/desk/orders/${orderId}`);
+  redirect(
+    role === "CONTENT"
+      ? `/${locale}/writer/lines/${orderLineId}`
+      : `/${locale}/desk/orders/${orderId}`,
+  );
 }
 
 export async function setAssetStatus(formData: FormData) {
@@ -195,7 +214,12 @@ export async function setAssetStatus(formData: FormData) {
   const assetId = field(formData, "assetId");
   const orderId = field(formData, "orderId");
   const target = field(formData, "target") as ContentAssetStatus;
-  const { userId, role } = await requireDeskOrContent(locale);
+  const assetForLine = await prisma.contentAsset.findUnique({
+    where: { id: assetId },
+    select: { brief: { select: { orderLineId: true } } },
+  });
+  const orderLineId = assetForLine?.brief.orderLineId ?? "";
+  const { userId, role } = await requireLineWriter(orderLineId, locale);
 
   // Writers can only hand a draft off for review. APPROVED / FINAL /
   // CHANGES_REQUESTED stay with the desk + buyer.
@@ -234,7 +258,11 @@ export async function setAssetStatus(formData: FormData) {
       }
     }
   }
-  redirect(`/${locale}/desk/orders/${orderId}`);
+  redirect(
+    role === "CONTENT"
+      ? `/${locale}/writer/lines/${orderLineId}`
+      : `/${locale}/desk/orders/${orderId}`,
+  );
 }
 
 // Cancel an order. Surfaced from both the desk console (operations
