@@ -85,6 +85,7 @@ export function navItemsFor(
         { key: "deskContentFees", label: t("contentFees"), href: "/desk/content-fees" },
         { key: "deskPlaybooks", label: t("playbooks"), href: "/desk/playbooks" },
         { key: "deskWriters", label: t("writers"), href: "/desk/writers" },
+        { key: "deskMetricsNeedsContact", label: t("metricsNeedsContact"), href: "/desk/metrics-needs-contact" },
         { key: "deskReports", label: t("reports"), href: "/desk/reports" },
       ];
     case "superadmin":
@@ -95,6 +96,7 @@ export function navItemsFor(
         { key: "deskContentFees", label: t("contentFees"), href: "/desk/content-fees" },
         { key: "deskPlaybooks", label: t("playbooks"), href: "/desk/playbooks" },
         { key: "deskWriters", label: t("writers"), href: "/desk/writers" },
+        { key: "deskMetricsNeedsContact", label: t("metricsNeedsContact"), href: "/desk/metrics-needs-contact" },
         { key: "deskReports", label: t("reports"), href: "/desk/reports" },
       ];
   }
