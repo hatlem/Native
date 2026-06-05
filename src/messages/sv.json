@@ -1046,6 +1046,9 @@
     "missionBody2": "Vi är köpare-först: transparent katalog, transparent pris, hanterat köp bakom, innehållsproduktion anpassad per titel. Det försvarbara ligger i datasetet och relationerna, inte i en enskild funktion.",
     "whyNowTitle": "Varför nu",
     "whyNowBody": "Native betalar bättre än display, men köpupplevelsen ligger två decennier efter. De flesta premium-titlarna säljs fortfarande inte programmatiskt. Både köpare och utgivare vill ha en neutral aggregator — vi bygger den en titel i taget i NO, SE, DK, FI, DE, AT, CH, UK och IE.",
+    "originTitle": "Varifrån vi kommer",
+    "originBody1": "Några av oss har sålt native sedan 2006 — först för en tidning riktad till studenter, med banners, betalda artiklar och hel- och halvsidesannonser, och senare för Norway Exports, en exporttidning som helt bestod av native-artiklar. Native var ingen kategori ännu, och annonsörerna blev ofta lite förvånade över att det ens var ett alternativ.",
+    "originBody2": "Tjugo år senare har bilden vänt: i dag är det vanligare att en titel har native än att den inte har det — och formatet lever sina bästa dagar. NativeSpin är verktyget vi önskar att vi haft då — ett ställe att hitta native, jämföra och köpa.",
     "beliefsTitle": "Det vi tror på",
     "belief1Title": "Katalogen är produkten",
     "belief1Body": "Katalog-datasetet och utgivarrelationerna är vallgraven. Allt annat är format för att göra det mer komplett, mer korrekt, mer jämförbart.",
@@ -1318,7 +1321,7 @@
     "lastUpdated": "Senast uppdaterad: 22 maj 2026",
     "controller": {
       "title": "Vem är personuppgiftsansvarig",
-      "body": "NativeSpin AS är personuppgiftsansvarig för personuppgifter som behandlas via marknadsplatsen. Vi har bas i Norge och behandlar all data inom EU/EES."
+      "body": "Getia AS är personuppgiftsansvarig för personuppgifter som behandlas via marknadsplatsen. Vi har bas i Norge och behandlar all data inom EU/EES."
     },
     "data": {
       "title": "Vilka uppgifter vi samlar",
@@ -1542,7 +1545,7 @@
     },
     "foot": {
       "tagline": "Native-innehåll och native-annonsering över varje titel vi täcker i NO, SE, DK, FI, DE, AT, CH, UK och IE — och en växande katalog.",
-      "copy": "NativeSpin AS · Oslo",
+      "copy": "Getia AS · Oslo",
       "navAdv": "För annonsörer",
       "navAgy": "För byråer",
       "navPub": "För utgivare",

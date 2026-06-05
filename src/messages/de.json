@@ -1046,6 +1046,9 @@
     "missionBody2": "Wir denken vom Käufer aus: transparenter Katalog, transparente Preise, Managed Buying im Hintergrund, Content-Produktion abgestimmt auf jeden Titel. Die Verteidigung liegt im Datensatz und in den Beziehungen, nicht in einem einzelnen Feature.",
     "whyNowTitle": "Warum jetzt",
     "whyNowBody": "Native verdient mehr als Display, aber das Einkaufserlebnis ist zwei Jahrzehnte hinterher. Die meisten Premium-Titel verkaufen nicht programmatisch. Käufer und Verlage wollen einen neutralen Aggregator — wir bauen ihn Titel für Titel in NO, SE, DK, FI, DE, AT, CH, UK und IE.",
+    "originTitle": "Woher wir kommen",
+    "originBody1": "Einige von uns verkaufen Native schon seit 2006 — zuerst für ein Magazin für Schulabgänger, mit Bannern, bezahlten Artikeln sowie ganz- und halbseitigen Anzeigen, und später für Norway Exports, ein Exportmagazin, das ausschließlich aus Native-Artikeln bestand. Native war noch keine eigene Kategorie, und Werbetreibende waren oft etwas überrascht, dass es das überhaupt gab.",
+    "originBody2": "Zwanzig Jahre später hat sich das Bild gedreht: Heute ist es üblicher, dass ein Titel Native anbietet, als dass er es nicht tut — und das Format erlebt seine besten Tage. NativeSpin ist das Werkzeug, das wir uns damals gewünscht hätten — ein Ort, um Native zu finden, zu vergleichen und zu kaufen.",
     "beliefsTitle": "Wovon wir überzeugt sind",
     "belief1Title": "Der Katalog ist das Produkt",
     "belief1Body": "Der Katalogdatensatz und die Verlagsbeziehungen sind der Burggraben. Alles andere ist darauf ausgerichtet, ihn vollständiger, genauer und vergleichbarer zu machen.",
@@ -1318,7 +1321,7 @@
     "lastUpdated": "Stand: 22. Mai 2026",
     "controller": {
       "title": "Wer ist Verantwortlicher",
-      "body": "NativeSpin AS ist Verantwortliche:r für personenbezogene Daten, die über diesen Marktplatz verarbeitet werden. Wir sitzen in Norwegen und verarbeiten alle Daten innerhalb der EU/des EWR."
+      "body": "Getia AS ist Verantwortliche:r für personenbezogene Daten, die über diesen Marktplatz verarbeitet werden. Wir sitzen in Norwegen und verarbeiten alle Daten innerhalb der EU/des EWR."
     },
     "data": {
       "title": "Welche Daten wir erheben",
@@ -2001,7 +2004,7 @@
   "landing": {
     "foot": {
       "tagline": "Native-Content und Native-Werbung über jeden Titel, den wir in NO, SE, DK, FI, DE, AT, CH, UK und IE abdecken — und ein wachsender Katalog.",
-      "copy": "NativeSpin AS · Oslo",
+      "copy": "Getia AS · Oslo",
       "navAdv": "Für Werbetreibende",
       "navAgy": "Für Agenturen",
       "navPub": "Für Publisher",

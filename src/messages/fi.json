@@ -1046,6 +1046,9 @@
     "missionBody2": "Olemme ostajalähtöisiä: läpinäkyvä katalogi, läpinäkyvä hinnoittelu, hallinnoitu osto sen takana, sisällöntuotanto viritetty jokaiselle julkaisulle. Puolustettavuus on tietoaineistossa ja suhteissa, ei missään yksittäisessä ominaisuudessa.",
     "whyNowTitle": "Miksi nyt",
     "whyNowBody": "Natiivi maksaa paremmin kuin display, mutta ostokokemus on kaksi vuosikymmentä jäljessä. Useimmat premium-julkaisut eivät edelleenkään myy programmaattisesti. Sekä ostajat että kustantajat haluavat neutraalin koostajan — me rakennamme sitä yksi julkaisu kerrallaan markkinoilla NO, SE, DK, FI, DE, AT, CH, UK ja IE.",
+    "originTitle": "Mistä tulemme",
+    "originBody1": "Osa meistä on myynyt natiivia vuodesta 2006 — ensin abiturienteille suunnatussa lehdessä, jossa myytiin bannereita, maksettuja artikkeleita sekä koko- ja puolen sivun ilmoituksia, ja myöhemmin Norway Exports -vientilehdessä, joka koostui pelkästään natiiviartikkeleista. Natiivi ei ollut vielä oma kategoriansa, ja mainostajat olivat usein hieman yllättyneitä siitä, että se ylipäätään oli vaihtoehto.",
+    "originBody2": "Kaksikymmentä vuotta myöhemmin tilanne on kääntynyt: nykyään on tavallisempaa, että julkaisulla on natiivia kuin ettei ole — ja formaatti elää parhaita päiviään. NativeSpin on työkalu, jonka olisimme toivoneet olleen olemassa silloin — yksi paikka löytää natiivi, vertailla ja ostaa.",
     "beliefsTitle": "Mihin uskomme",
     "belief1Title": "Katalogi on tuote",
     "belief1Body": "Katalogitietoaineisto ja kustantajasuhteet ovat vallihauta. Kaikki muu on muotoiltu tekemään siitä täydellisempi, tarkempi ja vertailukelpoisempi.",
@@ -1318,7 +1321,7 @@
     "lastUpdated": "Päivitetty viimeksi: 22. toukokuuta 2026",
     "controller": {
       "title": "Kuka on rekisterinpitäjä",
-      "body": "NativeSpin AS on rekisterinpitäjä tämän markkinapaikan kautta käsiteltäville henkilötiedoille. Sijaitsemme Norjassa ja käsittelemme kaikki tiedot EU:n/ETA:n sisällä."
+      "body": "Getia AS on rekisterinpitäjä tämän markkinapaikan kautta käsiteltäville henkilötiedoille. Sijaitsemme Norjassa ja käsittelemme kaikki tiedot EU:n/ETA:n sisällä."
     },
     "data": {
       "title": "Mitä tietoja keräämme",
@@ -1542,7 +1545,7 @@
     },
     "foot": {
       "tagline": "Natiivisisältöä ja natiivimainontaa jokaisesta julkaisusta, jonka katamme markkinoilla NO, SE, DK, FI, DE, AT, CH, UK ja IE — ja kasvava katalogi.",
-      "copy": "NativeSpin AS · Oslo",
+      "copy": "Getia AS · Oslo",
       "navAdv": "Mainostajille",
       "navAgy": "Toimistoille",
       "navPub": "Kustantajille",
