@@ -71,6 +71,7 @@ Replace `enum MetricsSource`:
 
 ```prisma
 enum MetricsSource {
+  PUBLISHER       // legacy (pre-campaign-reporting rows); migrated to PUBLISHER_FORM. Kept so the Prisma enum matches the DB type (Postgres can't drop an enum value).
   PUBLISHER_FORM  // tokenized self-serve form (publisher typed it)
   PUBLISHER_EMAIL // AI-transcribed from a publisher email reply (authoritative; raw snippet in note)
   DESK            // manual entry / override (wins on a mis-parse)
@@ -628,6 +629,7 @@ import type { MetricsSource } from "@prisma/client";
 // a form value; same-source writes take the latest reading.
 const RANK: Record<MetricsSource, number> = {
   PUBLISHER_EMAIL: 1,
+  PUBLISHER: 2,       // legacy = same trust as a form submission
   PUBLISHER_FORM: 2,
   DESK: 3,
 };
