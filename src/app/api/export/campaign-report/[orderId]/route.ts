@@ -82,7 +82,20 @@ export async function GET(
     { count: rows.length },
   );
 
-  return new NextResponse(csv(rows), {
+  const CSV_HEADERS = [
+    "publisher",
+    "title",
+    "live_start",
+    "live_end",
+    "impressions",
+    "first_party_clicks",
+    "page_views",
+    "avg_time_sec",
+    "scroll_depth_pct",
+    "ctr_pct",
+  ];
+
+  return new NextResponse(csv(rows, CSV_HEADERS), {
     headers: {
       "Content-Type": "text/csv; charset=utf-8",
       "Content-Disposition": `attachment; filename="campaign-${orderId.slice(0, 8)}-${new Date().toISOString().slice(0, 10)}.csv"`,

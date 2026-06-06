@@ -188,6 +188,8 @@ export async function createFirmOrder(args: {
           organizationId,
           quoteId: quote.id,
           status: "CONFIRMED",
+          flightStartDate: plan.startDate ?? null,
+          flightEndDate: plan.endDate ?? null,
           lines: {
             create: lines.map((l) => ({
               kind: l.kind,

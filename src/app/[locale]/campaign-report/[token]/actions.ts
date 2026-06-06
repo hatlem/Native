@@ -11,6 +11,7 @@ import {
 import { checkMetricsRequest } from "@/lib/campaign-reporting/tokens";
 import { recordAudit } from "@/lib/audit";
 import { rfqLimiter } from "@/lib/rate-limit";
+import { safeExternalUrl } from "@/lib/security";
 
 function num(fd: FormData, k: string): number | null {
   const v = fd.get(k);
@@ -63,14 +64,15 @@ export async function submitCampaignReportAction(formData: FormData) {
       scrollDepthPct: num(formData, `m[${id}].scrollDepthPct`),
     };
     const tracking = str(formData, `m[${id}].publisherTrackingUrl`);
-    if (tracking) {
+    const safeTracking = safeExternalUrl(tracking);
+    if (safeTracking) {
       await prisma.publisherBooking.update({
         where: { id },
-        data: { publisherTrackingUrl: tracking },
+        data: { publisherTrackingUrl: safeTracking },
       });
     }
     const hasAny = Object.values(fields).some((v) => v !== null);
-    if (!hasAny && !tracking) continue;
+    if (!hasAny && !safeTracking) continue;
     if (hasAny) {
       await writeBookingMetric({
         bookingId: id,

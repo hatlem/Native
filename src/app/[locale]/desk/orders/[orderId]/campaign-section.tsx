@@ -6,6 +6,7 @@ import {
   resendMetricsRequest,
 } from "@/app/desk-actions";
 import { SubmitButton } from "@/components";
+import { safeExternalUrl } from "@/lib/security";
 
 // ---------------------------------------------------------------------------
 // Prop types — mirrors the extended query added in page.tsx.
@@ -270,34 +271,40 @@ export async function CampaignSection({ locale, order, metricsRequests, clicks }
 
                         <dt>{t("liveUrl")}</dt>
                         <dd>
-                          {booking.liveUrl ? (
-                            <a
-                              href={booking.liveUrl}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              className="small-link"
-                            >
-                              {booking.liveUrl}
-                            </a>
-                          ) : (
-                            "—"
-                          )}
+                          {(() => {
+                            const safeLiveUrl = safeExternalUrl(booking.liveUrl);
+                            return safeLiveUrl ? (
+                              <a
+                                href={safeLiveUrl}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="small-link"
+                              >
+                                {booking.liveUrl}
+                              </a>
+                            ) : (
+                              "—"
+                            );
+                          })()}
                         </dd>
 
                         <dt>{t("publisherTrackingUrl")}</dt>
                         <dd>
-                          {booking.publisherTrackingUrl ? (
-                            <a
-                              href={booking.publisherTrackingUrl}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              className="small-link"
-                            >
-                              {booking.publisherTrackingUrl}
-                            </a>
-                          ) : (
-                            "—"
-                          )}
+                          {(() => {
+                            const safeTracking = safeExternalUrl(booking.publisherTrackingUrl);
+                            return safeTracking ? (
+                              <a
+                                href={safeTracking}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="small-link"
+                              >
+                                {booking.publisherTrackingUrl}
+                              </a>
+                            ) : (
+                              "—"
+                            );
+                          })()}
                         </dd>
 
                         <dt>{t("ourClicks")}</dt>

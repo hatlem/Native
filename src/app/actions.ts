@@ -641,6 +641,8 @@ export async function acceptQuote(formData: FormData) {
         organizationId: quote.request.organizationId,
         quoteId: quote.id,
         status: "CONFIRMED",
+        flightStartDate: plan.startDate ?? null,
+        flightEndDate: plan.endDate ?? null,
         lines: {
           create: quote.lines.map((l) => ({
             kind: l.kind,
@@ -750,6 +752,8 @@ export async function acceptAllQuotesForRequest(formData: FormData) {
           organizationId: request.organizationId,
           quoteId: quote.id,
           status: "CONFIRMED",
+          flightStartDate: plan.startDate ?? null,
+          flightEndDate: plan.endDate ?? null,
           lines: {
             create: quote.lines.map((l) => ({
               kind: l.kind,
