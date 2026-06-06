@@ -260,7 +260,7 @@ export default async function MyOrderPage({
               <p className="muted small">{tcr("lead")}</p>
             </div>
             <a
-              href={`/api/export/campaign-report/${order.id}.csv`}
+              href={`/api/export/campaign-report/${order.id}`}
               className="btn small secondary"
               download
             >
