@@ -53,6 +53,14 @@ export default async function AboutPage({
         </div>
       </section>
 
+      <section className="section prose-section">
+        <div className="wrap">
+          <h2>{t("originTitle")}</h2>
+          <p className="prose">{t("originBody1")}</p>
+          <p className="prose">{t("originBody2")}</p>
+        </div>
+      </section>
+
       <section className="section">
         <div className="wrap">
           <div className="section-head">
