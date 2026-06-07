@@ -7,16 +7,14 @@ import { prisma } from "@/lib/prisma";
 import { createContactLog } from "@/lib/pricing/contact-log";
 
 const ACTOR = "cmpmdiqtg048c0hu080m8kmok";
-const TODAY = "2026-06-05";
+const TODAY = "2026-06-04";
 
-// emails delivered today (cold outreach)
+// corrected re-sends after bounce diagnosis (right addresses verified on web)
 const DELIVERED = [
-  "marked@amedia.no", "ann-elise.ertesvag@egmont.com", "annonser@bladet.no",
-  "elin.ellingsen@schibsted.no", "knut@a2media.no", "markus@salgsfabrikken.no",
-  "annonse@vl.no", "christian.lind@tunmedia.no",
+  "annons@flamman.se", "bokaannons@ntmmedia.se",
 ];
-// bounced (invalid address) — register so we know not to reuse
-const BOUNCED = ["annonse@aller.no"];
+// bounced (undeliverable) — register so we know not to reuse
+const BOUNCED: string[] = [];
 
 async function logGroup(email: string, bounced: boolean) {
   const list: { email: string; market: string; titles: string[] }[] = JSON.parse(readFileSync("outreach_send_list.json", "utf8"));
@@ -30,7 +28,7 @@ async function logGroup(email: string, bounced: boolean) {
   const matchedNames = new Set(titles.map((t) => t.name.toLowerCase()));
   const unmatched = group.titles.filter((n) => !matchedNames.has(n.toLowerCase()));
   const note = bounced
-    ? `BOUNCE 2026-06-05: e-post til ${email} avvist (adressen finnes ikke – "user not found"). Trenger korrekt salgskontakt for denne utgiveren.`
+    ? `BOUNCE ${TODAY}: e-post til ${email} ikke levert (Undeliverable – adressen finnes ikke). Trenger korrekt salgskontakt for denne utgiveren.`
     : `Sendt prisforespørsel (annonsørinnhold) via Outlook til ${email} – Andreas/Admirate, ${TODAY}.`;
   for (const t of titles) {
     await createContactLog({ titleId: t.id, channel: "EMAIL", direction: "OUTBOUND", note, actorId: ACTOR });
