@@ -1169,8 +1169,9 @@ body:has(.bn) .drawer-link:hover { background: rgba(20,17,12,0.06) !important; }
   .bn .why-cols { grid-template-columns: 1fr; }
   .bn .why-cols .col { border-right: none; border-bottom: 1px solid var(--hair); padding: 28px 0 32px; }
   .bn .why-cols .col:last-child { border-bottom: none; }
-  .bn .vs-table { table-layout: auto; }
-  .bn .vs-table tbody td.spec { width: auto; }
+  .bn .vs-table thead th, .bn .vs-table tbody td { padding-right: 12px; overflow-wrap: anywhere; }
+  .bn .vs-table thead th.spec { width: 26%; }
+  .bn .vs-table tbody td.spec { font-size: 10px; letter-spacing: 0.04em; }
   .bn .section-head { grid-template-columns: 1fr; gap: 16px; }
   .bn .auth-shell { grid-template-columns: 1fr; }
   .bn .auth-shell .marketing { border-right: none; border-bottom: 2px solid var(--rule); }
