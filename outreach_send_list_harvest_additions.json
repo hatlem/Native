@@ -1,0 +1,551 @@
+[
+  {
+    "email": "annonse@ryfylke.net",
+    "market": "NO",
+    "titles": [
+      "Ryfylke"
+    ],
+    "source": "site-adpattern",
+    "wasPlaceholder": "discover@ryfylke.net"
+  },
+  {
+    "email": "annonse@boblad.no",
+    "market": "NO",
+    "titles": [
+      "Bø Blad"
+    ],
+    "source": "site-adpage",
+    "wasPlaceholder": "discover@boblad.no"
+  },
+  {
+    "email": "annonse@andoyposten.no",
+    "market": "NO",
+    "titles": [
+      "Andøyposten"
+    ],
+    "source": "site-adpattern",
+    "wasPlaceholder": "discover@andoyposten.no"
+  },
+  {
+    "email": "annonse@bomlo-nytt.no",
+    "market": "NO",
+    "titles": [
+      "Bømlo-Nytt"
+    ],
+    "source": "site-adpattern",
+    "wasPlaceholder": "discover@bomlo-nytt.no"
+  },
+  {
+    "email": "annonse@dagogtid.no",
+    "market": "NO",
+    "titles": [
+      "Dag og Tid"
+    ],
+    "source": "site-adpattern",
+    "wasPlaceholder": "discover@dagogtid.no"
+  },
+  {
+    "email": "marked@kanalen.no",
+    "market": "NO",
+    "titles": [
+      "Kanalen"
+    ],
+    "source": "site-adpattern",
+    "wasPlaceholder": "discover@kanalen.no"
+  },
+  {
+    "email": "annonse@klebuposten.no",
+    "market": "NO",
+    "titles": [
+      "Klæbuposten"
+    ],
+    "source": "site-adpattern",
+    "wasPlaceholder": "discover@klebuposten.no"
+  },
+  {
+    "email": "annonsar@marsteinen.no",
+    "market": "NO",
+    "titles": [
+      "Marsteinen"
+    ],
+    "source": "site-adpattern",
+    "wasPlaceholder": "discover@marsteinen.no"
+  },
+  {
+    "email": "annonser@samningen.no",
+    "market": "NO",
+    "titles": [
+      "Samningen"
+    ],
+    "source": "site-adpage",
+    "wasPlaceholder": "discover@samningen.no"
+  },
+  {
+    "email": "annonser@setesdolen.no",
+    "market": "NO",
+    "titles": [
+      "Setesdølen"
+    ],
+    "source": "site-adpattern",
+    "wasPlaceholder": "discover@setesdolen.no"
+  },
+  {
+    "email": "annonser@psykologisk.no",
+    "market": "NO",
+    "titles": [
+      "Psykologisk.no"
+    ],
+    "source": "site-adpage",
+    "wasPlaceholder": "discover@psykologisk.no"
+  },
+  {
+    "email": "annonsera@tandlakartidningen.se",
+    "market": "SE",
+    "titles": [
+      "Tandläkartidningen"
+    ],
+    "source": "site-adpage",
+    "wasPlaceholder": "discover@tandlakartidningen.se"
+  },
+  {
+    "email": "annons@husbyggaren.se",
+    "market": "SE",
+    "titles": [
+      "Husbyggaren"
+    ],
+    "source": "site-adpage",
+    "wasPlaceholder": "discover@husbyggaren.se"
+  },
+  {
+    "email": "annons@hemmetsvan.se",
+    "market": "SE",
+    "titles": [
+      "Hemmets Vän"
+    ],
+    "source": "site-adpage",
+    "wasPlaceholder": "discover@hemmetsvan.se"
+  },
+  {
+    "email": "annons@kyrkanstidning.se",
+    "market": "SE",
+    "titles": [
+      "Kyrkans Tidning"
+    ],
+    "source": "site-adpage",
+    "wasPlaceholder": "discover@kyrkanstidning.se"
+  },
+  {
+    "email": "annons@sandaren.se",
+    "market": "SE",
+    "titles": [
+      "Sändaren"
+    ],
+    "source": "site-adpage",
+    "wasPlaceholder": "discover@sandaren.se"
+  },
+  {
+    "email": "ilmoitusmyynti@kotimaa.fi",
+    "market": "FI",
+    "titles": [
+      "Kotimaa"
+    ],
+    "source": "site-adpage",
+    "wasPlaceholder": "discover@kotimaa.fi"
+  },
+  {
+    "email": "ilmoitukset@demokraatti.fi",
+    "market": "FI",
+    "titles": [
+      "Demokraatti"
+    ],
+    "source": "site-adpage",
+    "wasPlaceholder": "discover@demokraatti.fi"
+  },
+  {
+    "email": "annonse@grenda.no",
+    "market": "NO",
+    "titles": [
+      "Grenda"
+    ],
+    "source": "site-adpage",
+    "wasPlaceholder": "discover@grenda.no"
+  },
+  {
+    "email": "annonse@hallingdolen.no",
+    "market": "NO",
+    "titles": [
+      "Hallingdølen"
+    ],
+    "source": "site-adpattern",
+    "wasPlaceholder": "discover@hallingdolen.no"
+  },
+  {
+    "email": "annonse@klassekampen.no",
+    "market": "NO",
+    "titles": [
+      "Klassekampen"
+    ],
+    "source": "site-adpage",
+    "wasPlaceholder": "discover@klassekampen.no"
+  },
+  {
+    "email": "annonse@firdatidend.no",
+    "market": "NO",
+    "titles": [
+      "Firda Tidend"
+    ],
+    "source": "site-adpage",
+    "wasPlaceholder": "discover@firdatidend.no"
+  },
+  {
+    "email": "annonser@lp.no",
+    "market": "NO",
+    "titles": [
+      "Lillesands-Posten"
+    ],
+    "source": "site-adpattern",
+    "wasPlaceholder": "discover@lp.no"
+  },
+  {
+    "email": "annonse@suldalsposten.no",
+    "market": "NO",
+    "titles": [
+      "Suldalsposten"
+    ],
+    "source": "site-adpage",
+    "wasPlaceholder": "discover@suldalsposten.no"
+  },
+  {
+    "email": "annonse@stord24.no",
+    "market": "NO",
+    "titles": [
+      "Stord24"
+    ],
+    "source": "site-adpattern",
+    "wasPlaceholder": "discover@stord24.no"
+  },
+  {
+    "email": "annonse@subjekt.no",
+    "market": "NO",
+    "titles": [
+      "Subjekt"
+    ],
+    "source": "site-adpage",
+    "wasPlaceholder": "discover@subjekt.no"
+  },
+  {
+    "email": "annonser@sva.no",
+    "market": "NO",
+    "titles": [
+      "Sør-Varanger Avis"
+    ],
+    "source": "site-adpattern",
+    "wasPlaceholder": "discover@sva.no"
+  },
+  {
+    "email": "marked@vol.no",
+    "market": "NO",
+    "titles": [
+      "Vesteraalens Avis",
+      "Vesterålen Online"
+    ],
+    "source": "site-adpattern",
+    "wasPlaceholder": "discover@vol.no"
+  },
+  {
+    "email": "annonser@venneslatidende.no",
+    "market": "NO",
+    "titles": [
+      "Vennesla Tidende"
+    ],
+    "source": "site-adpattern",
+    "wasPlaceholder": "discover@venneslatidende.no"
+  },
+  {
+    "email": "annonse@vartoslo.no",
+    "market": "NO",
+    "titles": [
+      "VårtOslo"
+    ],
+    "source": "site-adpattern",
+    "wasPlaceholder": "discover@vartoslo.no"
+  },
+  {
+    "email": "annonser@forskerforum.no",
+    "market": "NO",
+    "titles": [
+      "Forskerforum Student",
+      "Forskerforum"
+    ],
+    "source": "site-adpage",
+    "wasPlaceholder": "discover@forskerforum.no"
+  },
+  {
+    "email": "annonser@resett.no",
+    "market": "NO",
+    "titles": [
+      "Resett"
+    ],
+    "source": "site-adpage",
+    "wasPlaceholder": "discover@resett.no"
+  },
+  {
+    "email": "salg@batmagasinet.no",
+    "market": "NO",
+    "titles": [
+      "Båtmagasinet"
+    ],
+    "source": "site-adpattern",
+    "wasPlaceholder": "discover@batmagasinet.no"
+  },
+  {
+    "email": "salg@at.no",
+    "market": "NO",
+    "titles": [
+      "Ren Mat",
+      "Anlegg & Transport",
+      "Ságat",
+      "Grimstad Adressetidende"
+    ],
+    "source": "site-adpattern",
+    "wasPlaceholder": "discover@at.no"
+  },
+  {
+    "email": "annonse@healthtalk.no",
+    "market": "NO",
+    "titles": [
+      "HealthTalk"
+    ],
+    "source": "site-adpattern",
+    "wasPlaceholder": "discover@healthtalk.no"
+  },
+  {
+    "email": "annonser@kystogfjord.no",
+    "market": "NO",
+    "titles": [
+      "Kyst og Fjord",
+      "Norsk Fiskerinæring"
+    ],
+    "source": "site-adpattern",
+    "wasPlaceholder": "discover@kystogfjord.no"
+  },
+  {
+    "email": "annons@varldenidag.se",
+    "market": "SE",
+    "titles": [
+      "Världen Idag"
+    ],
+    "source": "site-adpage",
+    "wasPlaceholder": "discover@varldenidag.se"
+  },
+  {
+    "email": "annons@haparandabladet.se",
+    "market": "SE",
+    "titles": [
+      "Haparandabladet"
+    ],
+    "source": "site-adpage",
+    "wasPlaceholder": "discover@haparandabladet.se"
+  },
+  {
+    "email": "annonssynpunkter@svd.se",
+    "market": "SE",
+    "titles": [
+      "Bil & Bostad",
+      "Svenska Dagbladet"
+    ],
+    "source": "site-adpage",
+    "wasPlaceholder": "discover@svd.se"
+  },
+  {
+    "email": "annons@lira.se",
+    "market": "SE",
+    "titles": [
+      "Lira Musikmagasin"
+    ],
+    "source": "site-adpattern",
+    "wasPlaceholder": "discover@lira.se"
+  },
+  {
+    "email": "annons@plazainterior.se",
+    "market": "SE",
+    "titles": [
+      "Plaza Interiör"
+    ],
+    "source": "site-adpage",
+    "wasPlaceholder": "discover@plazainterior.se"
+  },
+  {
+    "email": "annons@expo.se",
+    "market": "SE",
+    "titles": [
+      "Expo"
+    ],
+    "source": "site-adpage",
+    "wasPlaceholder": "discover@expo.se"
+  },
+  {
+    "email": "ilmoitukset@shl.fi",
+    "market": "FI",
+    "titles": [
+      "Sydän-Hämeen Lehti"
+    ],
+    "source": "site-adpage",
+    "wasPlaceholder": "discover@shl.fi"
+  },
+  {
+    "email": "mediamyynti@motouutiset.fi",
+    "market": "FI",
+    "titles": [
+      "MP Lehti"
+    ],
+    "source": "site-adpattern",
+    "wasPlaceholder": "discover@motouutiset.fi"
+  },
+  {
+    "email": "advertising@camdennewjournal.com",
+    "market": "UK",
+    "titles": [
+      "The Camden New Journal"
+    ],
+    "source": "site-adpattern",
+    "wasPlaceholder": "discover@camdennewjournal.com"
+  },
+  {
+    "email": "advertising@wsc.co.uk",
+    "market": "UK",
+    "titles": [
+      "When Saturday Comes"
+    ],
+    "source": "site-adpage",
+    "wasPlaceholder": "discover@wsc.co.uk"
+  },
+  {
+    "email": "sales@dublinpeople.com",
+    "market": "IE",
+    "titles": [
+      "Dublin People"
+    ],
+    "source": "site-adpattern",
+    "wasPlaceholder": "discover@dublinpeople.com"
+  },
+  {
+    "email": "sales@messenger.ie",
+    "market": "IE",
+    "titles": [
+      "Sacred Heart Messenger"
+    ],
+    "source": "site-adpattern",
+    "wasPlaceholder": "discover@messenger.ie"
+  },
+  {
+    "email": "annonser@energiteknikk.net",
+    "market": "NO",
+    "titles": [
+      "Energiteknikk"
+    ],
+    "source": "site-adpage",
+    "wasPlaceholder": "discover@energiteknikk.net"
+  },
+  {
+    "email": "annonser@tidsskriftet.no",
+    "market": "NO",
+    "titles": [
+      "Tidsskrift for Norsk Psykologforening",
+      "Tidsskrift for Den norske legeforening"
+    ],
+    "source": "site-adpage",
+    "wasPlaceholder": "discover@tidsskriftet.no"
+  },
+  {
+    "email": "advertising@sligoweekender.ie",
+    "market": "IE",
+    "titles": [
+      "Sligo Weekender"
+    ],
+    "source": "site-adpage",
+    "wasPlaceholder": "discover@sligoweekender.ie"
+  },
+  {
+    "email": "sales@kurier.at",
+    "market": "AT",
+    "titles": [
+      "Kurier",
+      "Kurier am Sonntag"
+    ],
+    "source": "site-adpage",
+    "wasPlaceholder": "discover@kurier.at"
+  },
+  {
+    "email": "sales@spex.net",
+    "market": "DE",
+    "titles": [
+      "Spex"
+    ],
+    "source": "site-adpattern",
+    "wasPlaceholder": "discover@spex.net"
+  },
+  {
+    "email": "annonsebestilling@dagsavisen.no",
+    "market": "NO",
+    "titles": [
+      "Dagsavisen"
+    ],
+    "source": "site-adpage",
+    "wasPlaceholder": "discover@dagsavisen.no"
+  },
+  {
+    "email": "advertise@upstreamonline.com",
+    "market": "NO",
+    "titles": [
+      "Upstream"
+    ],
+    "source": "site-adpage",
+    "wasPlaceholder": "discover@upstreamonline.com"
+  },
+  {
+    "email": "advertising@inews.co.uk",
+    "market": "UK",
+    "titles": [
+      "The i Paper"
+    ],
+    "source": "site-adpage",
+    "wasPlaceholder": "discover@inews.co.uk"
+  },
+  {
+    "email": "sales@continuitycentral.com",
+    "market": "UK",
+    "titles": [
+      "Risk Management"
+    ],
+    "source": "site-adpage",
+    "wasPlaceholder": "discover@continuitycentral.com"
+  },
+  {
+    "email": "advertising@connachttribune.ie",
+    "market": "IE",
+    "titles": [
+      "Connacht Tribune"
+    ],
+    "source": "site-adpage",
+    "wasPlaceholder": "discover@connachttribune.ie"
+  },
+  {
+    "email": "anzeigen@weser-kurier.de",
+    "market": "DE",
+    "titles": [
+      "Weser-Kurier"
+    ],
+    "source": "site-adpage",
+    "wasPlaceholder": "discover@weser-kurier.de"
+  },
+  {
+    "email": "sales@publish-industry.net",
+    "market": "DE",
+    "titles": [
+      "Energy 2.0"
+    ],
+    "source": "site-adpattern",
+    "wasPlaceholder": "discover@publish-industry.net"
+  }
+]

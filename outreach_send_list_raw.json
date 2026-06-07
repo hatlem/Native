@@ -1,0 +1,6963 @@
+[
+  {
+    "email": "marked@amedia.no",
+    "market": "NO",
+    "titles": [
+      "Bygdebladet",
+      "Drangedalsposten",
+      "Frostingen",
+      "Inderøyningen",
+      "Karmøynytt",
+      "Lokalavisa Trysil Engerdal",
+      "Lyngdals Avis",
+      "Meråkerposten",
+      "Nordre Aker Budstikke",
+      "Sagene Avis",
+      "SolungAvisa",
+      "Steinkjer-Avisa",
+      "Sydvesten",
+      "Nettavisen",
+      "Nettavisen Økonomi",
+      "Helgelendingen",
+      "Nye Troms",
+      "Vigga",
+      "Fjordenes Tidende",
+      "Hadeland",
+      "Finnmarken",
+      "Nordhordland",
+      "Norddalen",
+      "Rjukan Arbeiderblad",
+      "Akersposten (gratisavis)",
+      "Avisa Oslo",
+      "Drammens Tidende",
+      "Finnmarksposten",
+      "Glåmdalen",
+      "Gudbrandsdølen Dagningen",
+      "Hamar Arbeiderblad",
+      "Haugesunds Avis",
+      "Helgelands Blad",
+      "Hordaland Folkeblad",
+      "Lierposten",
+      "Moss Avis",
+      "Oppland Arbeiderblad",
+      "Os og Fusaposten",
+      "Rakkestad Avis",
+      "Raumnes",
+      "Ringerikes Blad",
+      "Sande Avis",
+      "Sarpsborg Arbeiderblad",
+      "Svelviksposten",
+      "Tidens Krav",
+      "Vestby Avis",
+      "Ytringen Avis",
+      "Akers Avis Groruddalen",
+      "Akershus Amtstidende",
+      "Aura Avis",
+      "Aust Agder Blad",
+      "Avisa Nordland",
+      "Bergensavisen (BA)",
+      "Brønnøysunds Avis",
+      "Bygdeposten",
+      "Eidsvoll Ullensaker Blad",
+      "Finnmark Dagblad",
+      "Firda",
+      "Firdaposten",
+      "Eikerbladet",
+      "Framtid i nord",
+      "Fredriksstad Blad",
+      "Fremover",
+      "Grimstad Adressetidende",
+      "Fjordingen",
+      "Hardanger Folkeblad",
+      "Indre Akershus Blad",
+      "Halden Arbeiderblad",
+      "Kragerø Blad Vestmar",
+      "Kvinnheringen",
+      "Laagendalsposten",
+      "Jarlsberg Avis",
+      "Lofotposten",
+      "Namdalsavisa",
+      "Nidaros",
+      "Lofot-Tidende",
+      "Nordlys",
+      "Nordstrands Blad",
+      "Porsgrunns Dagblad",
+      "Rana Blad",
+      "Ringsaker Blad",
+      "Romerikes Blad",
+      "Røyken og Hurums Avis",
+      "Saltenposten",
+      "Smaalenenes Avis",
+      "Sogn Avis",
+      "Telemarksavisa",
+      "Telen",
+      "Troms Folkeblad",
+      "Tvedestrandsposten",
+      "Tønsbergs Blad",
+      "Valdres",
+      "Vesterålen Online",
+      "Varingen",
+      "Vest-Telemark Blad",
+      "Østlandets Blad",
+      "Østlands-Posten",
+      "Østlendingen",
+      "Øyene",
+      "Side2",
+      "Ås Avis"
+    ]
+  },
+  {
+    "email": "filippa.wijkstrom@bonniernews.se",
+    "market": "SE",
+    "titles": [
+      "Allt om Trädgårdsdesign",
+      "Husdjur",
+      "Dagens Medicin",
+      "Chef",
+      "Ny Teknik",
+      "Privata Affärer",
+      "Auto Motor & Sport",
+      "Hockeysverige",
+      "Lag & Avtal",
+      "Tidningen Mama",
+      "Affärsvärlden",
+      "Expressen",
+      "GT",
+      "Göteborgs-Tidningen",
+      "Kvällsposten",
+      "Dagens Industri Weekend",
+      "Dagens Industri",
+      "Dagens Nyheter",
+      "Sydsvenskan",
+      "Helsingborgs Dagblad",
+      "Di Digital",
+      "Fokus",
+      "Aktiv Träning",
+      "Världens Historia",
+      "Illustrerad Vetenskap Historia",
+      "Digitalfoto för Alla",
+      "Gör Det Själv",
+      "I Form",
+      "Illustrerad Vetenskap",
+      "National Geographic Sverige",
+      "PC-Tidningen",
+      "Vi i Villa",
+      "Allt i Hemmet",
+      "Hembakat",
+      "Hem & Antik",
+      "Hälsoliv",
+      "Leva & Bo",
+      "Allt om Trädgård",
+      "Allt om Mat",
+      "Amelia",
+      "Damernas Värld",
+      "Lantliv",
+      "Teknikens Värld",
+      "Gods & Gårdar",
+      "Mama",
+      "Sköna Hem Mini",
+      "Gård & Torp",
+      "M-magasin",
+      "Styleby",
+      "Allt om Resor",
+      "Tara Hem",
+      "Sköna Hem",
+      "Tara",
+      "Annonsbladet Dalarna",
+      "Ljusdals-Posten",
+      "Ljusnan",
+      "Mora Tidning",
+      "Mariefreds Tidning",
+      "Nya Ludvika Tidning",
+      "Söderhamns-Kuriren",
+      "Tidningen Ångermanland",
+      "Örnsköldsviks Allehanda",
+      "Lokaltidningen Skåne",
+      "Bergslagsposten",
+      "Bärgslagsbladet",
+      "Skånska Dagbladet",
+      "Sundsvalls Tidning",
+      "Borlänge Tidning",
+      "Hudiksvalls Tidning",
+      "Arbetarbladet",
+      "Avesta Tidning",
+      "Dala-Demokraten",
+      "Gefle Dagblad",
+      "Länstidningen Östersund",
+      "Vestmanlands Läns Tidning",
+      "Östersunds-Posten",
+      "Falu Kuriren",
+      "Fagersta-Posten",
+      "Norrtelje Tidning",
+      "Nora Tidning",
+      "Nynäshamns Posten",
+      "Sala Allehanda",
+      "Bärgslagsbladet/Arboga Tidning",
+      "Karlskoga Tidning",
+      "Nerikes Allehanda",
+      "Hela Hälsingland",
+      "Breakit",
+      "Dagens Media",
+      "Resumé",
+      "BLM"
+    ]
+  },
+  {
+    "email": "musicradar@future-licensing.com",
+    "market": "UK",
+    "titles": [
+      "Bass Player",
+      "Country Life",
+      "Edge",
+      "Ideal Home",
+      "Retro Gamer",
+      "Classic Rock",
+      "Computer Music",
+      "Creative Bloq",
+      "Digital Camera",
+      "Guitar Techniques",
+      "Guitarist",
+      "ImagineFX",
+      "Metal Hammer",
+      "N-Photo",
+      "Photo Plus",
+      "Prog",
+      "SFX",
+      "Total Guitar",
+      "TV & Satellite Week",
+      "TV Times",
+      "Woman & Home",
+      "The Shooting Gazette",
+      "Cyclist",
+      "Cycling Weekly",
+      "Motor Boat & Yachting",
+      "Woman",
+      "Country Walking",
+      "Mountain Bike Rider",
+      "Practical Boat Owner",
+      "Rugby World",
+      "Trail",
+      "Woman's Own",
+      "Woman's Weekly",
+      "World Soccer",
+      "Trout & Salmon",
+      "MacFormat",
+      "Mac|Life",
+      "Country Homes & Interiors",
+      "FourFourTwo",
+      "Homes & Gardens",
+      "Livingetc",
+      "PC Gamer",
+      "PC Pro",
+      "Style at Home",
+      "T3",
+      "The Week",
+      "The Week Junior",
+      "Wallpaper*",
+      "Chat",
+      "Guitar World",
+      "Cyclingnews",
+      "Decanter",
+      "Horse & Hound",
+      "Auto Express",
+      "Yachting Monthly",
+      "Yachting World",
+      "Country Life Shooting Edition",
+      "Shooting Times",
+      "The Field",
+      "MoneyWeek",
+      "Channel Pro",
+      "Music Week",
+      "Audio Media",
+      "Rhythm",
+      "25 Beautiful Homes",
+      "Chat It's Fate",
+      "Practical Photography",
+      "Marie Claire UK",
+      "Linux Format"
+    ]
+  },
+  {
+    "email": "paul.bramley@athleticsweekly.com",
+    "market": "UK",
+    "titles": [
+      "Athletics Weekly",
+      "The Sunday National",
+      "Surrey Comet",
+      "Sutton & Croydon Guardian",
+      "Wimbledon Times",
+      "North-West Evening Mail",
+      "Strategic Risk",
+      "Glasgow Times",
+      "Greenock Telegraph",
+      "Bradford Telegraph & Argus",
+      "The Northern Echo",
+      "Bournemouth Echo",
+      "Isle of Wight County Press",
+      "Reading Chronicle",
+      "Southern Daily Echo",
+      "Swindon Advertiser",
+      "The Argus",
+      "Bromley Times",
+      "Greenwich Mercury",
+      "Hampstead & Highgate Express",
+      "Harrow Times",
+      "Hendon & Finchley Times",
+      "Ilford Recorder",
+      "Lancashire Telegraph",
+      "Romford Recorder",
+      "Stratford Express",
+      "The Westmorland Gazette",
+      "Dorset Echo",
+      "Somerset County Gazette",
+      "The Bury Times",
+      "Wiltshire Times",
+      "Worcester News",
+      "Boxing News",
+      "The Scottish Farmer",
+      "Bolton News",
+      "The National",
+      "StrategicRISK",
+      "Smallholder",
+      "Oxford Mail",
+      "Ealing Times",
+      "Hereford Times",
+      "The Herald",
+      "South Wales Argus"
+    ]
+  },
+  {
+    "email": "advertising@bauermedia.co.uk",
+    "market": "UK",
+    "titles": [
+      "All About Soap",
+      "Empire",
+      "Grazia",
+      "Take a Break Monthly",
+      "Bella",
+      "Modern Gardens",
+      "Soap Life",
+      "Total TV Guide",
+      "Take a Break",
+      "Yours",
+      "heat",
+      "that's life!",
+      "Gardens",
+      "Bike",
+      "Car",
+      "Inside Soap",
+      "MCN (Motorcycle News)",
+      "MOJO",
+      "Pick Me Up!",
+      "Practical Motorhome",
+      "Rail",
+      "TV Choice",
+      "Today's Golfer",
+      "What's on TV",
+      "Landscape",
+      "Real People",
+      "Love It!",
+      "Closer",
+      "Practical Caravan",
+      "Angling Times",
+      "Improve Your Coarse Fishing",
+      "Mini Magazine",
+      "Classic Cars",
+      "Land Rover Owner",
+      "Practical Classics",
+      "Trail Running"
+    ]
+  },
+  {
+    "email": "christian@ad-venture.no",
+    "market": "NO",
+    "titles": [
+      "Hus & Have",
+      "Bonytt Hytteliv",
+      "Autofil",
+      "Bonytt",
+      "Familien",
+      "Foreldre & Barn",
+      "Hageguiden",
+      "Hus & Hjem",
+      "Hytteliv",
+      "LevLandlig",
+      "Shape Up",
+      "Sykkelmagasinet",
+      "Vin",
+      "Aquavit",
+      "Bil",
+      "Costume Living",
+      "Donald Duck & Co",
+      "Kamille",
+      "M! magasinet",
+      "M Magazine",
+      "Pondus",
+      "Norsk Ukeblad",
+      "Spis Bedre",
+      "Tara Frisk",
+      "Tara Smak",
+      "Villmarksliv",
+      "Vi Menn Erotiske noveller",
+      "Vi Menn Historie",
+      "Bedre Helse",
+      "Klikk.no",
+      "ELLE Decoration Norge",
+      "Cosmopolitan Norge",
+      "ELLE Norge",
+      "Hjemmet",
+      "Bo Bygg og Bolig"
+    ],
+    "wasEmail": "ann-elise.ertesvag@egmont.com",
+    "verifiedBy": "reply"
+  },
+  {
+    "email": "annonser@bladet.no",
+    "market": "NO",
+    "titles": [
+      "Bladet (Malvik)",
+      "Sør-Trøndelag",
+      "Varden",
+      "Vestlandsnytt",
+      "iHarstad",
+      "iTromsø",
+      "MN24",
+      "Selbyggen",
+      "Sulaposten",
+      "Øyposten",
+      "Adresseavisen",
+      "Agderposten",
+      "Arbeidets Rett",
+      "Askøyværingen",
+      "Bygdanytt",
+      "Fosna-Folket",
+      "Fædrelandsvennen",
+      "Harstad Tidende",
+      "Hitra-Frøya",
+      "Innherred",
+      "iLevanger",
+      "Steinkjer24",
+      "Møre-Nytt",
+      "Randaberg24",
+      "Romsdals Budstikke",
+      "Strilen",
+      "Sunnhordland",
+      "Sunnmørsposten",
+      "Trønder-Avisa",
+      "Trønderbladet",
+      "Vestnytt",
+      "Vikebladet Vestposten"
+    ]
+  },
+  {
+    "email": "asiakaspalvelu@otavamedia.fi",
+    "market": "FI",
+    "titles": [
+      "Kotiliesi",
+      "Kotiliesi Käsityö",
+      "Seura",
+      "Suomen Kuvalehti",
+      "Tekniikan Maailma Klassikot",
+      "Moda",
+      "Alibi",
+      "Erä",
+      "Kanava",
+      "Kippari",
+      "Kotilääkäri",
+      "Metsästys ja Kalastus",
+      "Vauhdin Maailma",
+      "Viva",
+      "Golflehti",
+      "Hymy",
+      "Anna",
+      "Maalla",
+      "Suosikki",
+      "TM Rakennusmaailma",
+      "Tekniikan Maailma",
+      "Villivarsa",
+      "Parnasso",
+      "Kaksplus",
+      "Koululainen",
+      "Vene",
+      "Deko",
+      "Seura SuperRistikot",
+      "Suomen Kuvalehti Rakentajan Ekstra",
+      "TV-Maailma",
+      "Lemmikki"
+    ]
+  },
+  {
+    "email": "elin.ellingsen@schibsted.no",
+    "market": "NO",
+    "titles": [
+      "E24",
+      "VG Helg",
+      "Godt.no",
+      "Min Mote",
+      "TV-Guiden",
+      "Nice",
+      "Tek.no",
+      "Jærbladet",
+      "Aftenbladet Bryne",
+      "Lister (Farsunds Avis)",
+      "Lindesnes Avis Nord",
+      "Lindesnes",
+      "Stavanger Aftenblad",
+      "Aftenposten Junior",
+      "A-magasinet",
+      "Aftenposten Helg",
+      "Aftenposten Historie",
+      "Aftenposten Innsikt",
+      "Aftenposten K",
+      "Aftenposten Oppvekst",
+      "Aftenposten Vitenskap",
+      "Dalane Tidende",
+      "Aftenposten",
+      "Verdens Gang (VG)",
+      "Bergens Tidende",
+      "Solabladet",
+      "Sandefjords Blad",
+      "Sandefjords Blad (Amedia)",
+      "Sandnesposten",
+      "Svenska Dagbladet",
+      "Omni Ekonomi",
+      "Omni",
+      "TV.nu",
+      "Aftonbladet",
+      "Blocket",
+      "Klart.se"
+    ]
+  },
+  {
+    "email": "knut@a2media.no",
+    "market": "NO",
+    "titles": [
+      "Gartneryrket",
+      "Anleggsmaskinen",
+      "Fjell og Vidde",
+      "Fjell & Vidde",
+      "Norsk Farmaceutisk Tidsskrift",
+      "SFOnett",
+      "Byggmesteren",
+      "Glass & Fasade",
+      "AstmaAllergi",
+      "Kjøkkenskriveren",
+      "Kjøttbransjen",
+      "Park & Anlegg",
+      "Treindustrien",
+      "Yrkestrafikk",
+      "Gravplassen",
+      "Havnemagasinet",
+      "Kjøtt- og Eggprodusenten",
+      "Verktøykassa",
+      "Fiskeribladet",
+      "Barnehagefolk",
+      "Skog",
+      "Flynytt",
+      "Friluftsliv",
+      "Fuglehunden",
+      "HMS Magasinet",
+      "Folkevett"
+    ]
+  },
+  {
+    "email": "markus@salgsfabrikken.no",
+    "market": "NO",
+    "titles": [
+      "Fagbladet",
+      "Helsefagarbeideren",
+      "Hundesport",
+      "Revisor Informerer",
+      "Sykepleien",
+      "Vernepleieren",
+      "Advokatbladet",
+      "Bioingeniøren",
+      "Kretsløpet",
+      "Forsvarets Forum",
+      "Mester",
+      "Næring24",
+      "Skolelederen",
+      "Pensjonisten",
+      "Tara",
+      "Bobil og Caravan Magasinet",
+      "Buskap",
+      "Forskerforum",
+      "Natur & Miljø",
+      "Norsk Skogbruk",
+      "Politiforum",
+      "Tidsskrift for Jordmødre",
+      "Byggfakta Nyheter",
+      "Frimurerbladet",
+      "Utemiljø & Idrettsanlegg",
+      "Bobil & Caravan"
+    ]
+  },
+  {
+    "email": "annoncesalg@egmontmagasiner.dk",
+    "market": "DK",
+    "titles": [
+      "Smag",
+      "ALT for Damerne",
+      "ALT.dk",
+      "RUM",
+      "Vores Børn",
+      "Anders And Junior",
+      "Anders And Spar Sjov",
+      "Barbie",
+      "Basserne",
+      "Bibi & Tina",
+      "Disney Magasinet",
+      "Pixiline",
+      "Star Wars Magasinet",
+      "GRAVID",
+      "Eurowoman",
+      "Gastro",
+      "Euroman",
+      "Hendes Verden",
+      "fit living",
+      "HER&NU",
+      "LEGO Magasinet",
+      "Anders And & Co.",
+      "Eurowoman.dk",
+      "Mickey Mouse Magasinet",
+      "BoligLiv"
+    ]
+  },
+  {
+    "email": "annonce@jp.dk",
+    "market": "DK",
+    "titles": [
+      "Politiken",
+      "Morgenavisen Jyllands-Posten",
+      "Ekstra Bladet",
+      "Finans",
+      "Watch Medier (samlet)",
+      "AgriWatch",
+      "FinansWatch",
+      "MaritimeWatch",
+      "ShippingWatch",
+      "Fødevarewatch",
+      "EnergyWatch",
+      "FoodSupply",
+      "ITWatch",
+      "MediaWatch",
+      "KapWatch",
+      "Detailwatch",
+      "Ejendomswatch",
+      "HealthcareWatch",
+      "PolicyWatch",
+      "CleantechWatch",
+      "Travel Watch",
+      "EduWatch",
+      "BygTek",
+      "Jyllands-Posten Erhverv",
+      "Politiken Magasinet"
+    ]
+  },
+  {
+    "email": "frank.froehling@baueradvance.com",
+    "market": "DE",
+    "titles": [
+      "Bravo",
+      "Bravo Girl",
+      "7 Tage",
+      "Tina",
+      "Das Neue Blatt",
+      "Frau aktuell",
+      "InTouch",
+      "TV Hören und Sehen",
+      "Volksstimme",
+      "Frau im Spiegel",
+      "Closer",
+      "Cosmopolitan Deutschland",
+      "Jolie",
+      "Petra",
+      "Couch",
+      "Auto Zeitung",
+      "Auto Test",
+      "TV pur",
+      "TV 14",
+      "TV Movie",
+      "MEIN PFERD",
+      "Neue Post",
+      "Auf einen Blick",
+      "Mädchen"
+    ]
+  },
+  {
+    "email": "annonse@aller.no",
+    "market": "NO",
+    "titles": [
+      "Hjem Søte Hjem",
+      "Stella",
+      "Stella Living",
+      "Alt for damene",
+      "Det Nye",
+      "Reiselyst",
+      "Costume",
+      "Henne",
+      "Magasinet KK",
+      "Norsk Hagetidend (sponset)",
+      "Mat & Vin",
+      "Topp",
+      "KK",
+      "KK (Kvinner og Klær)",
+      "Lev (helse)",
+      "Se og Hør EXTRA",
+      "Se og Hør Kryss og Quiz",
+      "Se og Hør Tirsdag",
+      "Se og Hør",
+      "Dagbladet",
+      "Shifter",
+      "Dinside",
+      "Magasinet (Dagbladet)"
+    ]
+  },
+  {
+    "email": "enquiries@immediate.co.uk",
+    "market": "UK",
+    "titles": [
+      "220 Triathlon",
+      "BBC Gardeners' World",
+      "Radio Times",
+      "BBC Top Gear",
+      "BBC Wildlife",
+      "Discover Wildlife",
+      "HistoryExtra",
+      "Match of the Day Magazine",
+      "Easy Cook",
+      "BBC Good Food",
+      "BBC History",
+      "BBC Countryfile",
+      "BBC Music Magazine",
+      "BBC Science Focus",
+      "BBC Sky at Night",
+      "CBeebies Magazine",
+      "Gardens Illustrated",
+      "Mountain Biking UK",
+      "Olive",
+      "Cycling Plus",
+      "BBC History Revealed",
+      "National Geographic Kids UK",
+      "BBC Top Gear (different)"
+    ]
+  },
+  {
+    "email": "bokaannons@ntmmedia.se",
+    "market": "SE",
+    "titles": [
+      "Norran",
+      "Norrbottens-Kuriren",
+      "Norrländska Socialdemokraten",
+      "Gotlands Tidningar",
+      "Smålands Dagblad",
+      "Enköpings-Posten",
+      "Strengnäs Tidning",
+      "Eskilstuna-Kuriren",
+      "Folkbladet",
+      "Hultsfreds-Tidningen",
+      "Jönköpings-Posten",
+      "Motala Vadstena Tidning",
+      "Norrköpings Tidningar",
+      "Vimmerby Tidning",
+      "Västerviks-Tidningen",
+      "Östgöta Correspondenten",
+      "Folket",
+      "Katrineholms-Kuriren",
+      "Södermanlands Nyheter",
+      "Upsala Nya Tidning",
+      "Kuriren"
+    ]
+  },
+  {
+    "email": "business@jfm.dk",
+    "market": "DK",
+    "titles": [
+      "Ringkøbing-Skjern Dagblad",
+      "Fyens Stiftstidende",
+      "Fyns Amts Avis",
+      "Århus Stiftstidende",
+      "Frederiksborg Amts Avis",
+      "Helsingør Dagblad",
+      "Stiften",
+      "Avisen Danmark",
+      "JydskeVestkysten",
+      "Vejle Amts Folkeblad",
+      "Dagbladet Holstebro",
+      "Dagbladet Struer",
+      "Dagbladet Ringkøbing-Skjern",
+      "Horsens Folkeblad",
+      "Viborg Stifts Folkeblad",
+      "Fredericia Dagblad",
+      "Frederiksborg Amts Avis (lokal)",
+      "Folkebladet Lemvig",
+      "Randers Amtsavis",
+      "Lemvig Folkeblad"
+    ]
+  },
+  {
+    "email": "sales@apotheke-adhoc.de",
+    "market": "DE",
+    "titles": [
+      "Apotheke Adhoc",
+      "Living Magazine",
+      "Reise Aktuell",
+      "changeX",
+      "Kommunalpolitische Blätter",
+      "Junge Welt",
+      "Cicero",
+      "Bewusster Leben",
+      "Tennis Magazin",
+      "Wandermagazin",
+      "M! Games",
+      "Spielfilm Magazin",
+      "t3n",
+      "Steady Cam",
+      "Visions",
+      "Internet World Business",
+      "PR Report",
+      "Forstwelt",
+      "Gastrotel",
+      "Übermedien"
+    ]
+  },
+  {
+    "email": "verkaufsbuero.hamburg@ad-alliance.de",
+    "market": "DE",
+    "titles": [
+      "11 Freunde",
+      "Stern",
+      "Capital",
+      "Brigitte",
+      "Schöner-Wohnen Bunt",
+      "Gala",
+      "Schöner Wohnen",
+      "Beef!",
+      "Essen & Trinken",
+      "Living at Home",
+      "Häuser",
+      "Eltern",
+      "Chefkoch Magazin",
+      "Lecker",
+      "Geo",
+      "Geo Epoche",
+      "National Geographic Deutschland",
+      "Geo Saison",
+      "Eltern Family"
+    ]
+  },
+  {
+    "email": "erik.hamberg@aller.com",
+    "market": "SE",
+    "titles": [
+      "Allas",
+      "Hänt i Veckan",
+      "Matmagasinet",
+      "Motherhood",
+      "ELLE Mat & Vin",
+      "ELLE Sverige",
+      "Antik & Auktion",
+      "ELLE Decoration",
+      "Femina",
+      "Hemmets Veckotidning",
+      "MåBra",
+      "Residence",
+      "Svensk Damtidning",
+      "Året Runt",
+      "TV-Guiden",
+      "Veckans NU!",
+      "Hänt Extra",
+      "Allers"
+    ]
+  },
+  {
+    "email": "mediaplanning@hearst.co.uk",
+    "market": "UK",
+    "titles": [
+      "Good Housekeeping",
+      "Country Living",
+      "ELLE UK",
+      "Esquire",
+      "Harper's Bazaar",
+      "House Beautiful",
+      "Inside Out",
+      "Men's Health UK",
+      "Runner's World UK",
+      "Town & Country",
+      "Women's Health UK",
+      "Best",
+      "Cosmopolitan",
+      "Digital Spy",
+      "ELLE Decoration",
+      "Prima",
+      "Red"
+    ]
+  },
+  {
+    "email": "michaeln@idenyt.dk",
+    "market": "DK",
+    "titles": [
+      "Aktiv Træning",
+      "Aktiv Træning (DK)",
+      "Digital Foto",
+      "Gør Det Selv",
+      "Komputer for Alle",
+      "National Geographic Denmark",
+      "I Form (DK)",
+      "Bo Bedre (DK)",
+      "Historie",
+      "Hvorfor",
+      "Illustreret Videnskab Historie",
+      "Bolig Magasinet",
+      "Illustreret Videnskab",
+      "Bil Magasinet",
+      "Bobedre.dk",
+      "Arena",
+      "Bilrevyen"
+    ]
+  },
+  {
+    "email": "marketing@ringier.ch",
+    "market": "CH",
+    "titles": [
+      "Persönlich",
+      "Beobachter",
+      "Blick",
+      "SonntagsBlick",
+      "Bilanz Top 100 Anwälte",
+      "Bilanz",
+      "Cash",
+      "Handelszeitung",
+      "Schweizer Illustrierte",
+      "Schweizer LandLiebe",
+      "Le Temps",
+      "Bilan",
+      "Femina",
+      "L'Illustré",
+      "Le Temps Magazine",
+      "PME"
+    ]
+  },
+  {
+    "email": "jan.magatzki@klambt.de",
+    "market": "DE",
+    "titles": [
+      "Adel exklusiv",
+      "Marie Claire Germany",
+      "Grazia Deutschland",
+      "Diva",
+      "Madame",
+      "Joy Deutschland",
+      "Esquire Germany",
+      "P.M.",
+      "BIKE",
+      "Segeln",
+      "Tour",
+      "BOOTE",
+      "Klettern",
+      "Mountainbike",
+      "Outdoor",
+      "Yacht"
+    ]
+  },
+  {
+    "email": "anzeigen@20min.ch",
+    "market": "CH",
+    "titles": [
+      "20 Minuten",
+      "20 minutes (FR)",
+      "Annabelle",
+      "24 heures",
+      "Tele 7",
+      "Basler Zeitung (BaZ)",
+      "Berner Zeitung",
+      "Bund (Der Bund)",
+      "Le Matin Dimanche",
+      "Sonntagszeitung",
+      "Tribune de Genève",
+      "Schweizer Familie",
+      "Wir Eltern",
+      "Finanz und Wirtschaft"
+    ]
+  },
+  {
+    "email": "mediesalg@aller.dk",
+    "market": "DK",
+    "titles": [
+      "Allers DK",
+      "Se og Hør",
+      "Hus & Have",
+      "Spis Bedre",
+      "Billed-Bladet",
+      "Familie Journal",
+      "Anderledes",
+      "Costume DK",
+      "ELLE Denmark",
+      "Femina (DK)",
+      "Hjemmet (DK)",
+      "Q Magasinet",
+      "Ude og Hjemme",
+      "Costume Living"
+    ]
+  },
+  {
+    "email": "ann.jones@peoplenews.ie",
+    "market": "IE",
+    "titles": [
+      "Wexford People",
+      "Wicklow People",
+      "Corkman",
+      "Drogheda Independent",
+      "Sunday Independent",
+      "Argus (Dundalk)",
+      "Irish Independent",
+      "Sligo Champion",
+      "The Herald",
+      "Roscommon Herald",
+      "Kerryman",
+      "Sunday Independent Life Magazine",
+      "Irish Independent Farming",
+      "Sunday World"
+    ]
+  },
+  {
+    "email": "hello@mediaconcierge.co.uk",
+    "market": "UK",
+    "titles": [
+      "Belfast News Letter",
+      "Scotland on Sunday",
+      "The Scotsman",
+      "Edinburgh Evening News",
+      "Halifax Courier",
+      "Doncaster Free Press",
+      "Sheffield Star",
+      "The Yorkshire Post",
+      "Yorkshire Evening Post",
+      "Portsmouth News",
+      "Peterborough Telegraph",
+      "Sussex Express",
+      "Lancashire Evening Post",
+      "The Halifax Courier"
+    ]
+  },
+  {
+    "email": "andrine.wefring@lomedia.no",
+    "market": "NO",
+    "titles": [
+      "I Skolen",
+      "HK-Nytt",
+      "NTL-Magasinet",
+      "Aktuell",
+      "Magasinet for Fagorganiserte",
+      "Maritim Logg",
+      "Arbeidsmanden",
+      "FriFagbevegelse.no",
+      "LO-Aktuelt",
+      "NNN-Arbeideren",
+      "Posthornet",
+      "Sykepleien Forskning",
+      "Magasinet Aktuell"
+    ]
+  },
+  {
+    "email": "yritysasiakkaat@a-lehdet.fi",
+    "market": "FI",
+    "titles": [
+      "Avotakka",
+      "Meidän Talo",
+      "Meidän Mökki",
+      "Tuulilasi",
+      "Maku",
+      "Etiketti",
+      "Mondo",
+      "Apu Sport",
+      "Apu",
+      "Apu Terveys",
+      "Tarina",
+      "Image (A-lehdet)"
+    ]
+  },
+  {
+    "email": "mediamainonta@almamedia.fi",
+    "market": "FI",
+    "titles": [
+      "Veikkaaja",
+      "Markkinointi & Mainonta",
+      "Marmai",
+      "Arvopaperi",
+      "Mediuutiset",
+      "Talous & Tekniikka",
+      "Mikrobitti",
+      "Tivi",
+      "Talouselämä Digital",
+      "Kauppalehti",
+      "Talouselämä",
+      "Iltalehti"
+    ]
+  },
+  {
+    "email": "mediepartner@ernamedia.se",
+    "market": "SE",
+    "titles": [
+      "Arvika Nyheter",
+      "Karlstads-Tidningen",
+      "Nya Wermlands-Tidningen",
+      "Provinstidningen Dalsland",
+      "Säffle-Tidningen",
+      "Falköpings Tidning",
+      "Filipstads Tidning",
+      "Mariestads-Tidningen",
+      "Skaraborgs Allehanda",
+      "Värmlands Folkblad",
+      "Nya Lidköpings-Tidningen",
+      "Skaraborgs Läns Tidning"
+    ]
+  },
+  {
+    "email": "benedikt.faerber@axelspringer.com",
+    "market": "DE",
+    "titles": [
+      "Die Welt",
+      "Welt am Sonntag",
+      "B.Z.",
+      "Bild",
+      "Bild am Sonntag",
+      "Bild der Frau",
+      "Auto Bild",
+      "Sport Bild",
+      "Funkuhr",
+      "ComputerBild",
+      "Musikexpress",
+      "Rolling Stone Deutschland"
+    ]
+  },
+  {
+    "email": "sales@vogueuk.co.uk",
+    "market": "UK",
+    "titles": [
+      "Architectural Digest UK",
+      "GQ UK",
+      "Vogue (British Vogue)",
+      "Brides",
+      "Condé Nast Traveller",
+      "Glamour UK",
+      "House & Garden",
+      "Tatler",
+      "Vanity Fair UK",
+      "Wired UK",
+      "LOVE"
+    ]
+  },
+  {
+    "email": "yrityksille@kalevamedia.fi",
+    "market": "FI",
+    "titles": [
+      "Ilkka",
+      "Etelä-Pohjanmaa",
+      "Ilkka-Pohjalainen",
+      "Pyhäjokiseutu",
+      "Raahen Seutu",
+      "Suupohjan Sanomat",
+      "Viiskunta",
+      "Kaleva",
+      "Iijokiseutu",
+      "Komiat",
+      "Oulu-lehti"
+    ]
+  },
+  {
+    "email": "cecilie.konterud@bonnier.no",
+    "market": "NO",
+    "titles": [
+      "Illustrert Vitenskap Historie",
+      "Illustrert Vitenskap Junior",
+      "Auto Motor & Sport",
+      "National Geographic Junior",
+      "Aktiv Trening for Kvinner",
+      "Bygg din egen",
+      "Bo Bedre",
+      "Historie Norge",
+      "Mat & Drikke",
+      "Vitenskap Live",
+      "Komputer For Alle"
+    ]
+  },
+  {
+    "email": "ads.csc@haymarket.com",
+    "market": "UK",
+    "titles": [
+      "Classic & Sports Car",
+      "Campaign",
+      "Autocar",
+      "Brand Republic",
+      "Management Today",
+      "GP",
+      "PRWeek",
+      "People Management",
+      "Wind Power Monthly",
+      "Horticulture Week",
+      "Third Sector"
+    ]
+  },
+  {
+    "email": "sales-info@funkemedien.de",
+    "market": "DE",
+    "titles": [
+      "rtv",
+      "Berliner Morgenpost",
+      "Hamburger Abendblatt",
+      "Neue Ruhr/Rhein Zeitung (NRZ)",
+      "Westdeutsche Allgemeine Zeitung (WAZ)",
+      "Westfalenpost (WP)",
+      "Ostthüringer Zeitung",
+      "Thüringer Allgemeine",
+      "Thüringische Landeszeitung (TLZ)",
+      "Die Aktuelle",
+      "Hörzu"
+    ]
+  },
+  {
+    "email": "kontakt@rabaldermedia.se",
+    "market": "SE",
+    "titles": [
+      "Arbetet",
+      "Kommunalarbetaren",
+      "Skolvärlden",
+      "Sjukhusläkaren",
+      "Förvaltning & Service",
+      "Förskolan",
+      "Chef & Ledarskap",
+      "Specialpedagogik",
+      "Lärarnas Tidning",
+      "Pedagogiska Magasinet"
+    ]
+  },
+  {
+    "email": "ldeyhle@motorpresse.de",
+    "market": "DE",
+    "titles": [
+      "Auto Motor und Sport (ams)",
+      "Sport Auto",
+      "CAVALLO",
+      "Auto Straßenverkehr",
+      "PS - Das Sport-Motorrad",
+      "Golf Journal",
+      "Motor Klassik",
+      "Motorrad",
+      "Runners World Germany",
+      "Color Foto"
+    ]
+  },
+  {
+    "email": "richard.dye@emap.com",
+    "market": "UK",
+    "titles": [
+      "Architects' Journal",
+      "Drapers",
+      "Construction News",
+      "New Civil Engineer",
+      "Property Week",
+      "Architectural Review",
+      "Nursing Times",
+      "Retail Week",
+      "Local Government Chronicle"
+    ]
+  },
+  {
+    "email": "annons@mitti.se",
+    "market": "SE",
+    "titles": [
+      "Mitt i Bromma",
+      "Mitt i Nacka",
+      "Mitt i Norrort",
+      "Mitt i Solna",
+      "Mitt i Sundbyberg",
+      "Mitt i Söderort",
+      "Mitt i Tyresö",
+      "Mitt i Vasastan",
+      "Mitt i Östermalm"
+    ]
+  },
+  {
+    "email": "team@madsack-agentur.de",
+    "market": "DE",
+    "titles": [
+      "Hannoversche Allgemeine Zeitung (HAZ)",
+      "Göttinger Tageblatt",
+      "Kieler Nachrichten",
+      "Leipziger Volkszeitung (LVZ)",
+      "Lübecker Nachrichten",
+      "Märkische Allgemeine",
+      "Neue Presse (Hannover)",
+      "Ostsee-Zeitung",
+      "Dresdner Neueste Nachrichten"
+    ]
+  },
+  {
+    "email": "annonse@vl.no",
+    "market": "NO",
+    "titles": [
+      "Dagsavisen",
+      "Morgenbladet",
+      "Vårt Land"
+    ]
+  },
+  {
+    "email": "annons@bbl.fi",
+    "market": "FI",
+    "titles": [
+      "Borgåbladet",
+      "Hufvudstadsbladet",
+      "Vasabladet",
+      "Vasabladet & Co (yhteissuomennos)",
+      "Östnyland",
+      "Loviisan Sanomat",
+      "Västra Nyland",
+      "Österbottens Tidning"
+    ]
+  },
+  {
+    "email": "lrfannons@adelivery.se",
+    "market": "SE",
+    "titles": [
+      "ATL",
+      "Jordbruksaktuellt",
+      "Land Skogsbruk",
+      "Skogsaktuellt",
+      "Land",
+      "Land Lantbruk",
+      "Lantmannen",
+      "Populär Historia"
+    ]
+  },
+  {
+    "email": "christian.lind@tunmedia.no",
+    "market": "NO",
+    "titles": [
+      "Magasinet for Bondelaget",
+      "Min Energi",
+      "Vestlandsk Landbruk",
+      "Bondebladet",
+      "Bedre Gardsdrift",
+      "Norsk Landbruk",
+      "Nationen",
+      "Felleskjøpet Mølla"
+    ]
+  },
+  {
+    "email": "yourads@ajl.co.uk",
+    "market": "UK",
+    "titles": [
+      "Press and Journal",
+      "Evening Express",
+      "Evening Telegraph",
+      "The Courier",
+      "The Sunday Post",
+      "The Beano",
+      "Commando Comics"
+    ]
+  },
+  {
+    "email": "foretag@stampen.com",
+    "market": "SE",
+    "titles": [
+      "Lokaltidningen Stenungsund",
+      "Bohusläningen",
+      "Göteborgs-Posten",
+      "Hallands Nyheter",
+      "Hallandsposten",
+      "Strömstads Tidning",
+      "TTELA"
+    ]
+  },
+  {
+    "email": "storkunde.salg@sn.dk",
+    "market": "DK",
+    "titles": [
+      "Lolland-Falsters Folketidende",
+      "Nordvestnyt",
+      "Sjællandske",
+      "Dagbladet (Sjælland)",
+      "Lokalavisen Taastrup",
+      "Vestegnen",
+      "Det ny Odsherred"
+    ]
+  },
+  {
+    "email": "werbung@chmedia.ch",
+    "market": "CH",
+    "titles": [
+      "Luzerner Zeitung",
+      "Neue Luzerner Zeitung",
+      "Schweiz am Wochenende",
+      "Bz Basel",
+      "St. Galler Tagblatt",
+      "Aargauer Zeitung",
+      "Watson"
+    ]
+  },
+  {
+    "email": "argument@argumentnett.no",
+    "market": "NO",
+    "titles": [
+      "Argument",
+      "Argument (Oslo)",
+      "Bøygen",
+      "Uniforum",
+      "Fortid",
+      "Argument K"
+    ]
+  },
+  {
+    "email": "sissel@eddapresse.no",
+    "market": "NO",
+    "titles": [
+      "Fotografi",
+      "Folkemusikk",
+      "Hud & Helse",
+      "Museumsnytt",
+      "Jazznytt",
+      "Prosa"
+    ]
+  },
+  {
+    "email": "annoncering@berlingskemedia.dk",
+    "market": "DK",
+    "titles": [
+      "AOK",
+      "B.T.",
+      "Weekendavisen",
+      "Berlingske",
+      "Berlingske Business",
+      "Weekendavisen Ideer"
+    ]
+  },
+  {
+    "email": "sales@ippen-digital-media.de",
+    "market": "DE",
+    "titles": [
+      "Frankfurter Neue Presse",
+      "Frankfurter Rundschau",
+      "Hessische/Niedersächsische Allgemeine (HNA)",
+      "Münchner Merkur",
+      "tz",
+      "Westfälischer Anzeiger"
+    ]
+  },
+  {
+    "email": "adcopy@ft.com",
+    "market": "UK",
+    "titles": [
+      "FT Weekend",
+      "Financial Times",
+      "How to Spend It",
+      "Investment Adviser",
+      "Money Management",
+      "Investors' Chronicle"
+    ]
+  },
+  {
+    "email": "bm.anzeigen@konradin.de",
+    "market": "DE",
+    "titles": [
+      "Bild der Wissenschaft",
+      "Damals",
+      "db deutsche bauzeitung",
+      "md",
+      "Industrieanzeiger",
+      "Industrie 4.0 Magazin"
+    ]
+  },
+  {
+    "email": "annonsera@pharma-industry.se",
+    "market": "SE",
+    "titles": [
+      "Onkologi i Sverige",
+      "OrtopedisktMagasin",
+      "MedicalNews",
+      "Diabetes Magazine",
+      "NeurologiSverige",
+      "BestPractice"
+    ]
+  },
+  {
+    "email": "max.holland@thelawyer.com",
+    "market": "UK",
+    "titles": [
+      "The Lawyer",
+      "Creative Review",
+      "Design Week",
+      "Marketing Week",
+      "Money Marketing"
+    ]
+  },
+  {
+    "email": "imelda.duggan@anglocelt.ie",
+    "market": "IE",
+    "titles": [
+      "Anglo-Celt",
+      "Westmeath Topic",
+      "Athlone Topic",
+      "Connaught Telegraph",
+      "Meath Chronicle"
+    ]
+  },
+  {
+    "email": "horizont-anzeigen@dfv.de",
+    "market": "DE",
+    "titles": [
+      "Horizont",
+      "LEAD Digital",
+      "Der Handel",
+      "Lebensmittel Zeitung",
+      "TextilWirtschaft"
+    ]
+  },
+  {
+    "email": "sales@vogel.de",
+    "market": "DE",
+    "titles": [
+      "Konstruktionspraxis",
+      "MM Maschinenmarkt",
+      "Automobil Industrie",
+      "IT Business",
+      "KFZ-Betrieb"
+    ]
+  },
+  {
+    "email": "claudia.heynen@ast-fischer.ch",
+    "market": "CH",
+    "titles": [
+      "Schweizer Garten",
+      "Inside Paradeplatz",
+      "Berge",
+      "Auto Illustrierte",
+      "Petri-Heil"
+    ]
+  },
+  {
+    "email": "ci@news.co.uk",
+    "market": "UK",
+    "titles": [
+      "The Sun",
+      "The Sunday Times",
+      "The Times",
+      "The Sun on Sunday",
+      "Times Literary Supplement (TLS)"
+    ]
+  },
+  {
+    "email": "mediamyynti@aamuset.fi",
+    "market": "FI",
+    "titles": [
+      "Aamuset",
+      "Auranmaan Viikkolehti",
+      "Rannikkoseutu",
+      "Turun Sanomat",
+      "Turkulainen"
+    ]
+  },
+  {
+    "email": "saljavdelningen@egmont.se",
+    "market": "SE",
+    "titles": [
+      "Min Häst",
+      "Disneymagasinet",
+      "Hus & Hem",
+      "Kalle Anka & Co",
+      "Bamse"
+    ]
+  },
+  {
+    "email": "hofer-hoi.bastian@vgn.at",
+    "market": "AT",
+    "titles": [
+      "News Lust aufs Leben",
+      "News",
+      "Trend",
+      "Woman",
+      "autorevue"
+    ]
+  },
+  {
+    "email": "robert@friflyt.no",
+    "market": "NO",
+    "titles": [
+      "Fri Flyt",
+      "Terrengsykkel",
+      "UTE",
+      "Landevei"
+    ]
+  },
+  {
+    "email": "arnt.erik@smallstep.no",
+    "market": "NO",
+    "titles": [
+      "Avfallsbransjen.no",
+      "Biogassbransjen.no",
+      "Cnytt.no",
+      "Hydrogen24.no"
+    ]
+  },
+  {
+    "email": "annoncer@folkeskolen.dk",
+    "market": "DK",
+    "titles": [
+      "Akademikerbladet",
+      "Forskerforum (DK)",
+      "Magisterbladet",
+      "Akademikerbladet (AC)"
+    ]
+  },
+  {
+    "email": "recruitment.services@personneltoday.com",
+    "market": "UK",
+    "titles": [
+      "Personnel Today",
+      "Commercial Motor",
+      "Motor Transport",
+      "Railway Gazette"
+    ]
+  },
+  {
+    "email": "szmedia.regional@sz.de",
+    "market": "DE",
+    "titles": [
+      "Süddeutsche Zeitung",
+      "Stuttgarter Nachrichten",
+      "Stuttgarter Zeitung",
+      "Südwest Presse"
+    ]
+  },
+  {
+    "email": "info@dlv.de",
+    "market": "DE",
+    "titles": [
+      "agrarheute",
+      "dlz agrarmagazin",
+      "AgrarHeute Schwein",
+      "Bayerisches Landwirtschaftliches Wochenblatt"
+    ]
+  },
+  {
+    "email": "elisabeth.laimighofer@kurier.at",
+    "market": "AT",
+    "titles": [
+      "Kurier",
+      "Kurier am Sonntag",
+      "profil",
+      "Kurier.at"
+    ]
+  },
+  {
+    "email": "meinewerbung@kleinezeitung.at",
+    "market": "AT",
+    "titles": [
+      "kleinezeitung.at",
+      "Die Presse",
+      "Kleine Zeitung",
+      "Die Furche"
+    ]
+  },
+  {
+    "email": "adops@wrbm.com",
+    "market": "UK",
+    "titles": [
+      "Big Hospitality",
+      "Morning Advertiser",
+      "Restaurant",
+      "The Grocer"
+    ]
+  },
+  {
+    "email": "salesteam@newsireland.com",
+    "market": "IE",
+    "titles": [
+      "Irish Sun",
+      "Irish Sunday Times",
+      "Irish Sun on Sunday",
+      "Off the Ball"
+    ]
+  },
+  {
+    "email": "info@reachsolutionsireland.com",
+    "market": "IE",
+    "titles": [
+      "Irish Sunday Mirror",
+      "Irish Daily Mirror",
+      "Irish Daily Star",
+      "RSVP"
+    ]
+  },
+  {
+    "email": "sales-intelligence@iqm.de",
+    "market": "DE",
+    "titles": [
+      "Spiegel Online",
+      "Der Spiegel",
+      "manager magazin",
+      "Harvard Business Manager"
+    ]
+  },
+  {
+    "email": "b.schonauer@vfmz.de",
+    "market": "DE",
+    "titles": [
+      "Motorrad News",
+      "Roller-Magazin",
+      "Oldtimer Markt",
+      "Tourenfahrer"
+    ]
+  },
+  {
+    "email": "oliver.brenden@hegnar.no",
+    "market": "NO",
+    "titles": [
+      "Finansavisen",
+      "Finansavisen Bil",
+      "Kapital",
+      "Kapital IT"
+    ]
+  },
+  {
+    "email": "onlinevermarktung@lv.de",
+    "market": "DE",
+    "titles": [
+      "Landlust",
+      "Landwirtschaftliches Wochenblatt",
+      "top agrar",
+      "Reiter Revue International",
+      "Landfreund",
+      "Top Agrar Österreich"
+    ]
+  },
+  {
+    "email": "nryf@rytter.no",
+    "market": "NO",
+    "titles": [
+      "Hest og Hover",
+      "Hestesport",
+      "Norsk Ridesport"
+    ]
+  },
+  {
+    "email": "neteland@pinsebevegelsen.no",
+    "market": "NO",
+    "titles": [
+      "Lys i Hjemmet",
+      "Korsets Seier",
+      "Pinsebevegelsen.no"
+    ]
+  },
+  {
+    "email": "arild.ostvold@medierogledelse.no",
+    "market": "NO",
+    "titles": [
+      "Samtiden",
+      "Agora",
+      "Velferd.no"
+    ]
+  },
+  {
+    "email": "al@hsmedia.no",
+    "market": "NO",
+    "titles": [
+      "Byggekunst",
+      "Arkitektur N",
+      "Arkitektnytt"
+    ]
+  },
+  {
+    "email": "tidende@tannlegeforeningen.no",
+    "market": "NO",
+    "titles": [
+      "Tenner & Helse",
+      "Norsk Tannlegeforenings Tidende",
+      "Tannlegetidende"
+    ]
+  },
+  {
+    "email": "red@byavisatonsberg.no",
+    "market": "NO",
+    "titles": [
+      "Byavisa Tønsberg",
+      "Byavisa Sandefjord",
+      "Byavisa Drammen"
+    ]
+  },
+  {
+    "email": "veronica@rabaldermedia.se",
+    "market": "SE",
+    "titles": [
+      "Transportarbetaren",
+      "Vårdfokus",
+      "Hotell & Restaurang"
+    ]
+  },
+  {
+    "email": "annoncer@dnmh.dk",
+    "market": "DK",
+    "titles": [
+      "Nordjyske Stiftstidende",
+      "Vendsyssel Tidende",
+      "Thisted Dagblad"
+    ]
+  },
+  {
+    "email": "adops@bonniernews.se",
+    "market": "DK",
+    "titles": [
+      "Penge & Privatøkonomi",
+      "Dagens Medicin (DK)",
+      "Sport24",
+      "Smålänningen"
+    ]
+  },
+  {
+    "email": "jj@markedsforing.dk",
+    "market": "DK",
+    "titles": [
+      "Markedsføring",
+      "MEDIETUSEN",
+      "Mediatel"
+    ]
+  },
+  {
+    "email": "myynti@hillagroup.fi",
+    "market": "FI",
+    "titles": [
+      "Pietarsaaren Sanomat",
+      "Lestin-Reisjärvi",
+      "Inarilainen"
+    ]
+  },
+  {
+    "email": "niina.tuulaskoski@saarsalo.fi",
+    "market": "FI",
+    "titles": [
+      "Suomen Luonto",
+      "Suomen Lääkärilehti",
+      "Lakimiesuutiset"
+    ]
+  },
+  {
+    "email": "advertising@belfasttelegraph.co.uk",
+    "market": "UK",
+    "titles": [
+      "Sunday Life",
+      "Sunday World (NI edition)",
+      "Belfast Telegraph"
+    ]
+  },
+  {
+    "email": "webads@archant.co.uk",
+    "market": "UK",
+    "titles": [
+      "Eastern Daily Press",
+      "East Anglian Daily Times",
+      "Country Smallholding"
+    ]
+  },
+  {
+    "email": "murielle.gonzalez@totalpolitics.com",
+    "market": "UK",
+    "titles": [
+      "Civil Service World",
+      "PoliticsHome",
+      "The House Magazine"
+    ]
+  },
+  {
+    "email": "sales@joe.ie",
+    "market": "IE",
+    "titles": [
+      "JOE.ie",
+      "The42",
+      "TheJournal.ie"
+    ]
+  },
+  {
+    "email": "anzeigen@owl-mediasolutions.de",
+    "market": "DE",
+    "titles": [
+      "Neue Westfälische",
+      "Nordwest-Zeitung (NWZ)",
+      "Westfalen-Blatt"
+    ]
+  },
+  {
+    "email": "info@idg.de",
+    "market": "DE",
+    "titles": [
+      "CIO Germany",
+      "Computerwoche",
+      "PC Welt"
+    ]
+  },
+  {
+    "email": "juliane.becker@acquisa.de",
+    "market": "DE",
+    "titles": [
+      "Acquisa",
+      "Personalmagazin",
+      "Wirtschaft + Weiterbildung"
+    ]
+  },
+  {
+    "email": "pmaedchen@vdi-nachrichten.com",
+    "market": "DE",
+    "titles": [
+      "VDI Nachrichten",
+      "BWK Energie-Fachmagazin",
+      "Konstruktion"
+    ]
+  },
+  {
+    "email": "anzeigen@mittler-report.de",
+    "market": "DE",
+    "titles": [
+      "Marineforum",
+      "Europäische Sicherheit & Technik",
+      "Strategie & Technik"
+    ]
+  },
+  {
+    "email": "steinbrucker-murri@industriemedien.at",
+    "market": "AT",
+    "titles": [
+      "Industrie Magazin",
+      "Solid",
+      "Bau-Aktuell"
+    ]
+  },
+  {
+    "email": "info@admeira.ch",
+    "market": "CH",
+    "titles": [
+      "SRF.ch",
+      "rsi.ch",
+      "rts.ch"
+    ]
+  },
+  {
+    "email": "salg@batmagasinet.no",
+    "market": "NO",
+    "titles": [
+      "Båtmagasinet",
+      "Magasinet Båt",
+      "Båtliv"
+    ]
+  },
+  {
+    "email": "ilmoitukset@shl.fi",
+    "market": "FI",
+    "titles": [
+      "Sairaanhoitaja",
+      "Sydän-Hämeen Lehti",
+      "Hammaslääkärilehti"
+    ]
+  },
+  {
+    "email": "annonse@dn.no",
+    "market": "NO",
+    "titles": [
+      "Dagens Næringsliv",
+      "D2"
+    ]
+  },
+  {
+    "email": "salgbergen@amedia.no",
+    "market": "NO",
+    "titles": [
+      "Fanaposten",
+      "Åsane Tidende"
+    ]
+  },
+  {
+    "email": "salg@tumedia.no",
+    "market": "NO",
+    "titles": [
+      "Digi.no",
+      "Teknologi & Verkstedindustri"
+    ]
+  },
+  {
+    "email": "marked@filmweb.no",
+    "market": "NO",
+    "titles": [
+      "Film & Kino",
+      "Kinomagasinet"
+    ]
+  },
+  {
+    "email": "kontor@genealogi.no",
+    "market": "NO",
+    "titles": [
+      "Norsk Slektshistorisk Tidsskrift",
+      "Genealogen"
+    ]
+  },
+  {
+    "email": "annonser@lmd.no",
+    "market": "NO",
+    "titles": [
+      "Le Monde Diplomatique Norge",
+      "Le Monde Diplomatique"
+    ]
+  },
+  {
+    "email": "snorre.fjeldstad@vagant.no",
+    "market": "NO",
+    "titles": [
+      "Vagant",
+      "Vagant Music",
+      "Vagant DK"
+    ]
+  },
+  {
+    "email": "vidar@salgsfabrikken.no",
+    "market": "NO",
+    "titles": [
+      "Bobilverden.no",
+      "Norsk Politi"
+    ]
+  },
+  {
+    "email": "rolf@askmedia.no",
+    "market": "NO",
+    "titles": [
+      "Horeca",
+      "Tekstilforum"
+    ]
+  },
+  {
+    "email": "nina.tenvik@kampanje.com",
+    "market": "NO",
+    "titles": [
+      "Kampanje",
+      "Markedsføring"
+    ]
+  },
+  {
+    "email": "tg@maritimt.com",
+    "market": "NO",
+    "titles": [
+      "Maritimt Magasin",
+      "Sjøfartsbladet"
+    ]
+  },
+  {
+    "email": "bl@medierogledelse.no",
+    "market": "NO",
+    "titles": [
+      "Personal og ledelse",
+      "Ukeavisen Ledelse"
+    ]
+  },
+  {
+    "email": "annonse@dagen.no",
+    "market": "NO",
+    "titles": [
+      "Sambåndet",
+      "Dagen"
+    ]
+  },
+  {
+    "email": "fredrik@salgsfabrikken.no",
+    "market": "NO",
+    "titles": [
+      "VVS-aktuelt",
+      "VVSaktuelt"
+    ]
+  },
+  {
+    "email": "henrik@batmedia.se",
+    "market": "SE",
+    "titles": [
+      "På Kryss",
+      "Båtliv"
+    ]
+  },
+  {
+    "email": "annelie@sb-media.se",
+    "market": "SE",
+    "titles": [
+      "King",
+      "Hundsport"
+    ]
+  },
+  {
+    "email": "gabrielle.hagman@mediakraft.se",
+    "market": "SE",
+    "titles": [
+      "Hem & Hyra",
+      "Fysioterapi"
+    ]
+  },
+  {
+    "email": "john@adsales.se",
+    "market": "SE",
+    "titles": [
+      "Tidningen Akademikern",
+      "Socionomen"
+    ]
+  },
+  {
+    "email": "lotta@hippson.se",
+    "market": "SE",
+    "titles": [
+      "Hippson",
+      "Vi Med Häst",
+      "Hesten"
+    ]
+  },
+  {
+    "email": "annonce@altinget.dk",
+    "market": "DK",
+    "titles": [
+      "Altinget",
+      "Mandag Morgen"
+    ]
+  },
+  {
+    "email": "annoncer@sermitsiaq.gl",
+    "market": "DK",
+    "titles": [
+      "Sermitsiaq",
+      "Atuagagdliutit (AG)"
+    ]
+  },
+  {
+    "email": "hanne@media-partners.dk",
+    "market": "DK",
+    "titles": [
+      "Sygeplejersken",
+      "Bioanalytikeren"
+    ]
+  },
+  {
+    "email": "ke@ing.dk",
+    "market": "DK",
+    "titles": [
+      "Ingeniøren",
+      "Version2"
+    ]
+  },
+  {
+    "email": "ksv@hortiadvice.dk",
+    "market": "DK",
+    "titles": [
+      "Frugt & Grønt",
+      "Gartner Tidende"
+    ]
+  },
+  {
+    "email": "tobias@tipsbladet.dk",
+    "market": "DK",
+    "titles": [
+      "Fodboldmagasinet",
+      "Tipsbladet"
+    ]
+  },
+  {
+    "email": "steen.haa@dgmedia.dk",
+    "market": "DK",
+    "titles": [
+      "Arkitekten",
+      "Forbundet Arkitekters Tidsskrift"
+    ]
+  },
+  {
+    "email": "laskutus.keskisuomalainenmedia@media.fi",
+    "market": "FI",
+    "titles": [
+      "Etelä-Suomen Sanomat",
+      "Kymen Sanomat"
+    ]
+  },
+  {
+    "email": "juha.halminen@mediaosasto.fi",
+    "market": "FI",
+    "titles": [
+      "Defensor Legis",
+      "Apteekkari"
+    ]
+  },
+  {
+    "email": "toimisto@karjalanliitto.fi",
+    "market": "FI",
+    "titles": [
+      "Karjala-lehti",
+      "Kuntalehti"
+    ]
+  },
+  {
+    "email": "toimisto@pellervo.fi",
+    "market": "FI",
+    "titles": [
+      "Maatilan Pellervo",
+      "Pellervo"
+    ]
+  },
+  {
+    "email": "mediamyynti@metsalehti.fi",
+    "market": "FI",
+    "titles": [
+      "Metsälehti",
+      "Metsä"
+    ]
+  },
+  {
+    "email": "minna.alho@saarsalo.fi",
+    "market": "FI",
+    "titles": [
+      "Kirkko ja Kaupunki",
+      "Acatiimi"
+    ]
+  },
+  {
+    "email": "adops@telegraph.co.uk",
+    "market": "UK",
+    "titles": [
+      "The Sunday Telegraph",
+      "The Daily Telegraph"
+    ]
+  },
+  {
+    "email": "danny.brown@mailnewspapers.co.uk",
+    "market": "UK",
+    "titles": [
+      "Evening Standard",
+      "Evening Standard (weekly)"
+    ]
+  },
+  {
+    "email": "tim.deeks@canopymedia.co.uk",
+    "market": "UK",
+    "titles": [
+      "The Big Issue",
+      "The Big Issue London"
+    ]
+  },
+  {
+    "email": "advertising@shropshirestar.co.uk",
+    "market": "UK",
+    "titles": [
+      "Shropshire Star",
+      "Wolverhampton Express & Star"
+    ]
+  },
+  {
+    "email": "talktome@thekmgroup.co.uk",
+    "market": "UK",
+    "titles": [
+      "Kent Messenger",
+      "Kent Online (KM Group)"
+    ]
+  },
+  {
+    "email": "partnershiprequests@buzzfeed.com",
+    "market": "UK",
+    "titles": [
+      "HuffPost UK",
+      "BuzzFeed UK"
+    ]
+  },
+  {
+    "email": "vanessa.english@gunmart.net",
+    "market": "UK",
+    "titles": [
+      "Gun Mart",
+      "Sporting Rifle"
+    ]
+  },
+  {
+    "email": "john.woods@pensionsage.com",
+    "market": "UK",
+    "titles": [
+      "Pensions Age",
+      "Charity Times"
+    ]
+  },
+  {
+    "email": "advertising@solicitorsjournal.com",
+    "market": "UK",
+    "titles": [
+      "Solicitors Journal",
+      "Health Service Journal"
+    ]
+  },
+  {
+    "email": "advertisingsales@lexisnexis.co.uk",
+    "market": "UK",
+    "titles": [
+      "Family Law",
+      "Counsel Magazine"
+    ]
+  },
+  {
+    "email": "richard@teachprimary.com",
+    "market": "UK",
+    "titles": [
+      "Teach Primary",
+      "Teach Secondary"
+    ]
+  },
+  {
+    "email": "advertise@themanufacturer.com",
+    "market": "UK",
+    "titles": [
+      "Manufacturing Management",
+      "Process Engineering"
+    ]
+  },
+  {
+    "email": "sales@civilsociety.co.uk",
+    "market": "UK",
+    "titles": [
+      "Fundraising Magazine",
+      "Civil Society"
+    ]
+  },
+  {
+    "email": "steve.j@thepbgroup.com",
+    "market": "UK",
+    "titles": [
+      "Health & Beauty Salon",
+      "Professional Beauty"
+    ]
+  },
+  {
+    "email": "jberman@ttgmedia.com",
+    "market": "UK",
+    "titles": [
+      "Travel Trade Gazette (TTG)",
+      "Aspire"
+    ]
+  },
+  {
+    "email": "advertise@researchresearch.com",
+    "market": "UK",
+    "titles": [
+      "Research Fortnight",
+      "Research Professional"
+    ]
+  },
+  {
+    "email": "mediasolutions@irishtimes.com",
+    "market": "IE",
+    "titles": [
+      "Irish Times",
+      "The Irish Times Weekend"
+    ]
+  },
+  {
+    "email": "advertising@businesspost.ie",
+    "market": "IE",
+    "titles": [
+      "Sunday Business Post",
+      "Business Post"
+    ]
+  },
+  {
+    "email": "moshaughnessy@farmersjournal.ie",
+    "market": "IE",
+    "titles": [
+      "Irish Farmers Journal",
+      "Irish Country Living"
+    ]
+  },
+  {
+    "email": "joe@foundationmedia.ie",
+    "market": "IE",
+    "titles": [
+      "Irish Construction News",
+      "Construction Magazine"
+    ]
+  },
+  {
+    "email": "brendan.mcdermott@imt.ie",
+    "market": "IE",
+    "titles": [
+      "Irish Medical Times",
+      "Irish Medical News"
+    ]
+  },
+  {
+    "email": "ads@trinitynews.ie",
+    "market": "IE",
+    "titles": [
+      "Trinity News",
+      "University Times"
+    ]
+  },
+  {
+    "email": "i.mueller@faz.de",
+    "market": "DE",
+    "titles": [
+      "Frankfurter Allgemeine Sonntagszeitung",
+      "Frankfurter Allgemeine Zeitung"
+    ]
+  },
+  {
+    "email": "c.hoppe@nd-online.de",
+    "market": "DE",
+    "titles": [
+      "Neues Deutschland",
+      "Krautreporter"
+    ]
+  },
+  {
+    "email": "kundenservice@berlinerverlag.com",
+    "market": "DE",
+    "titles": [
+      "Berliner Kurier",
+      "Berliner Zeitung"
+    ]
+  },
+  {
+    "email": "anzeigen@pryntad.com",
+    "market": "DE",
+    "titles": [
+      "Lausitzer Rundschau",
+      "Möbel Kultur"
+    ]
+  },
+  {
+    "email": "vermarktung@weltderwunder.de",
+    "market": "DE",
+    "titles": [
+      "Welt der Wunder",
+      "Stereo"
+    ]
+  },
+  {
+    "email": "haller@herder.de",
+    "market": "DE",
+    "titles": [
+      "Christ in der Gegenwart",
+      "Herder Korrespondenz"
+    ]
+  },
+  {
+    "email": "kampagnenberatung@springernature.com",
+    "market": "DE",
+    "titles": [
+      "Pflegezeitschrift",
+      "MMW Fortschritte der Medizin"
+    ]
+  },
+  {
+    "email": "mediasales@beck.de",
+    "market": "DE",
+    "titles": [
+      "Juristische Schulung (JuS)",
+      "Neue Juristische Wochenschrift (NJW)"
+    ]
+  },
+  {
+    "email": "janosch.kleibrink@wolterskluwer.com",
+    "market": "DE",
+    "titles": [
+      "Legal Tribune Online (LTO)",
+      "Personalwirtschaft"
+    ]
+  },
+  {
+    "email": "sales@wuv.de",
+    "market": "DE",
+    "titles": [
+      "Werben & Verkaufen (W&V)",
+      "absatzwirtschaft"
+    ]
+  },
+  {
+    "email": "thilo.paulin@forum-zeitschriften.de",
+    "market": "DE",
+    "titles": [
+      "Hotelbau",
+      "Top Hotel"
+    ]
+  },
+  {
+    "email": "sales.munich@tecvia.com",
+    "market": "DE",
+    "titles": [
+      "Autohaus",
+      "VerkehrsRundschau"
+    ]
+  },
+  {
+    "email": "robert.horn@springernature.com",
+    "market": "DE",
+    "titles": [
+      "Versicherungsmagazin",
+      "Innovative Verwaltung"
+    ]
+  },
+  {
+    "email": "vertrieb@mediaprint.at",
+    "market": "AT",
+    "titles": [
+      "Krone Bunt",
+      "krone.at"
+    ]
+  },
+  {
+    "email": "marketing@neue.at",
+    "market": "AT",
+    "titles": [
+      "Neue Vorarlberger Tageszeitung (NEUE)",
+      "Vorarlberger Nachrichten"
+    ]
+  },
+  {
+    "email": "redaktion@wiener-online.at",
+    "market": "AT",
+    "titles": [
+      "Wiener",
+      "Wienerin"
+    ]
+  },
+  {
+    "email": "o.jonke@medianet.at",
+    "market": "AT",
+    "titles": [
+      "medianet",
+      "medianet medicine"
+    ]
+  },
+  {
+    "email": "bernd.mandl@architektur-aktuell.at",
+    "market": "AT",
+    "titles": [
+      "Architektur Aktuell",
+      "Stomatologie"
+    ]
+  },
+  {
+    "email": "stefan.dallinger@manz.at",
+    "market": "AT",
+    "titles": [
+      "Versicherungsrundschau Austria",
+      "Österreichische Juristen-Zeitung (ÖJZ)"
+    ]
+  },
+  {
+    "email": "alexander.palaschke@verlagholzhausen.at",
+    "market": "AT",
+    "titles": [
+      "Verkehr",
+      "monitor"
+    ]
+  },
+  {
+    "email": "contact@nzzone.ch",
+    "market": "CH",
+    "titles": [
+      "NZZ am Sonntag",
+      "Neue Zürcher Zeitung (NZZ)"
+    ]
+  },
+  {
+    "email": "florian.maas@impactmedias.ch",
+    "market": "CH",
+    "titles": [
+      "ArcInfo",
+      "L'Express / L'Impartial"
+    ]
+  },
+  {
+    "email": "info@mediati.ch",
+    "market": "CH",
+    "titles": [
+      "Corriere del Ticino",
+      "Il Caffè"
+    ]
+  },
+  {
+    "email": "annonser@kystogfjord.no",
+    "market": "NO",
+    "titles": [
+      "Kyst og Fjord",
+      "Norsk Fiskerinæring"
+    ]
+  },
+  {
+    "email": "marked@k7bulletin.no",
+    "market": "NO",
+    "titles": [
+      "Index",
+      "K7 Bulletin"
+    ]
+  },
+  {
+    "email": "salg@seilmagasinet.no",
+    "market": "NO",
+    "titles": [
+      "Seil Magasinet",
+      "Seilas"
+    ]
+  },
+  {
+    "email": "annonser@dagensmedisin.no",
+    "market": "NO",
+    "titles": [
+      "Dagens Medisin",
+      "Helserevyen"
+    ]
+  },
+  {
+    "email": "annonsesalg@frelsesarmeen.no",
+    "market": "NO",
+    "titles": [
+      "Litt om Mye",
+      "Veien Frem"
+    ]
+  },
+  {
+    "email": "annons@vvsforum.se",
+    "market": "SE",
+    "titles": [
+      "VVS-Forum",
+      "VVS-aktuellt"
+    ]
+  },
+  {
+    "email": "universitas.daglig.leder@gmail.com",
+    "market": "NO",
+    "titles": [
+      "Oslostudenten",
+      "Universitas"
+    ]
+  },
+  {
+    "email": "hans.simons@annonssaljarna.se",
+    "market": "SE",
+    "titles": [
+      "Kollega",
+      "Universitetsläraren"
+    ]
+  },
+  {
+    "email": "alex.armstrong@twsgroup.com",
+    "market": "UK",
+    "titles": [
+      "Shooting UK",
+      "Sporting Gun"
+    ]
+  },
+  {
+    "email": "dagligleder@studvest.no",
+    "market": "NO",
+    "titles": [
+      "Studentnytt",
+      "Studvest"
+    ]
+  },
+  {
+    "email": "jenny.elmqvist@bbm.bonnier.se",
+    "market": "SE",
+    "titles": [
+      "Aktuell Hållbarhet",
+      "Byggindustrin"
+    ]
+  },
+  {
+    "email": "red@flm.nu",
+    "market": "SE",
+    "titles": [
+      "FLM",
+      "Filmtidskriften FLM"
+    ]
+  },
+  {
+    "email": "info@vagabondreiselyst.no",
+    "market": "NO",
+    "titles": [
+      "Vagabond",
+      "Vagabond Travel"
+    ]
+  },
+  {
+    "email": "gl@bygg.no",
+    "market": "NO",
+    "titles": [
+      "Bygg.no",
+      "Byggeindustrien"
+    ]
+  },
+  {
+    "email": "jim.berg@etc.se",
+    "market": "SE",
+    "titles": [
+      "Dagens ETC",
+      "ETC Magasin"
+    ]
+  },
+  {
+    "email": "nils@offsidepress.se",
+    "market": "SE",
+    "titles": [
+      "Filter",
+      "Offside"
+    ]
+  },
+  {
+    "email": "wenche.eriksen@arendalstidende.no",
+    "market": "NO",
+    "titles": [
+      "Arendals Tidende"
+    ]
+  },
+  {
+    "email": "knut@avisahemnes.no",
+    "market": "NO",
+    "titles": [
+      "Avisa Hemnes"
+    ]
+  },
+  {
+    "email": "inger.bugjerde@amedia.no",
+    "market": "NO",
+    "titles": [
+      "Enebakk Avis"
+    ]
+  },
+  {
+    "email": "nyheter@filtermedia.no",
+    "market": "NO",
+    "titles": [
+      "Filter Nyheter"
+    ]
+  },
+  {
+    "email": "annonse@flatangernytt.no",
+    "market": "NO",
+    "titles": [
+      "FlatangerNytt"
+    ]
+  },
+  {
+    "email": "kristin.j@forskning.no",
+    "market": "NO",
+    "titles": [
+      "Forskning.no"
+    ]
+  },
+  {
+    "email": "annonse@geita.no",
+    "market": "NO",
+    "titles": [
+      "geita.no"
+    ]
+  },
+  {
+    "email": "annonse@gjesdalbuen.no",
+    "market": "NO",
+    "titles": [
+      "Gjesdalbuen"
+    ]
+  },
+  {
+    "email": "annonse@grannar.no",
+    "market": "NO",
+    "titles": [
+      "Grannar"
+    ]
+  },
+  {
+    "email": "post@kulingen.no",
+    "market": "NO",
+    "titles": [
+      "Kulingen"
+    ]
+  },
+  {
+    "email": "annonse@midsundingen.no",
+    "market": "NO",
+    "titles": [
+      "Midsundingen"
+    ]
+  },
+  {
+    "email": "annonse@mre.no",
+    "market": "NO",
+    "titles": [
+      "Møre"
+    ]
+  },
+  {
+    "email": "geir.myra@gmail.com",
+    "market": "NO",
+    "titles": [
+      "Norge IDAG"
+    ]
+  },
+  {
+    "email": "annonse@nyss.no",
+    "market": "NO",
+    "titles": [
+      "Nyss"
+    ]
+  },
+  {
+    "email": "yngve@ruijan-kaiku.no",
+    "market": "NO",
+    "titles": [
+      "Ruijan Kaiku"
+    ]
+  },
+  {
+    "email": "annonsenord@amedia.no",
+    "market": "NO",
+    "titles": [
+      "Snåsningen"
+    ]
+  },
+  {
+    "email": "annonse@s-n.no",
+    "market": "NO",
+    "titles": [
+      "Stjørdals-Nytt"
+    ]
+  },
+  {
+    "email": "annonse@storfjordnytt.no",
+    "market": "NO",
+    "titles": [
+      "Storfjordnytt"
+    ]
+  },
+  {
+    "email": "ronnaug@synste.no",
+    "market": "NO",
+    "titles": [
+      "Synste Møre"
+    ]
+  },
+  {
+    "email": "geir@sagat.no",
+    "market": "NO",
+    "titles": [
+      "Ságat"
+    ]
+  },
+  {
+    "email": "annonser@sovesten.no",
+    "market": "NO",
+    "titles": [
+      "Søvesten"
+    ]
+  },
+  {
+    "email": "annonse@totens-blad.no",
+    "market": "NO",
+    "titles": [
+      "Totens Blad"
+    ]
+  },
+  {
+    "email": "randi@tysnesbladet.no",
+    "market": "NO",
+    "titles": [
+      "Tysnes"
+    ]
+  },
+  {
+    "email": "henriette.kjernes@amedia.no",
+    "market": "NO",
+    "titles": [
+      "Ullern Avis / Akersposten"
+    ]
+  },
+  {
+    "email": "annonse@vestavind-sveio.no",
+    "market": "NO",
+    "titles": [
+      "Vestavind"
+    ]
+  },
+  {
+    "email": "annonse@vestnesavisa.no",
+    "market": "NO",
+    "titles": [
+      "Vestnesavisa"
+    ]
+  },
+  {
+    "email": "annonse@ytresogn.no",
+    "market": "NO",
+    "titles": [
+      "Ytre Sogn Avis"
+    ]
+  },
+  {
+    "email": "bjorg@avvir.no",
+    "market": "NO",
+    "titles": [
+      "Ávvir"
+    ]
+  },
+  {
+    "email": "post@osthavet.no",
+    "market": "NO",
+    "titles": [
+      "Østhavet"
+    ]
+  },
+  {
+    "email": "stina@oyblikk.no",
+    "market": "NO",
+    "titles": [
+      "Øy-Blikk"
+    ]
+  },
+  {
+    "email": "post@inspira-annonse.no",
+    "market": "NO",
+    "titles": [
+      "Inspira"
+    ]
+  },
+  {
+    "email": "bedriftskontakt@broderskabet.no",
+    "market": "NO",
+    "titles": [
+      "Tidsskriftet A"
+    ]
+  },
+  {
+    "email": "tuntreet@samfunnetiaas.no",
+    "market": "NO",
+    "titles": [
+      "Tuntreet"
+    ]
+  },
+  {
+    "email": "salgssjef@studentmediene.no",
+    "market": "NO",
+    "titles": [
+      "Under Dusken"
+    ]
+  },
+  {
+    "email": "desk@babyverden.no",
+    "market": "NO",
+    "titles": [
+      "Babyverden Mag"
+    ]
+  },
+  {
+    "email": "mcavisa-bike@info-sys.no",
+    "market": "NO",
+    "titles": [
+      "Bike"
+    ]
+  },
+  {
+    "email": "trine@eddapresse.no",
+    "market": "NO",
+    "titles": [
+      "Blikk"
+    ]
+  },
+  {
+    "email": "pernillea@benjamin.dk",
+    "market": "NO",
+    "titles": [
+      "Bolig Magasinet"
+    ]
+  },
+  {
+    "email": "annoncer@klikk.no",
+    "market": "NO",
+    "titles": [
+      "BoligDrøm"
+    ]
+  },
+  {
+    "email": "charlotte@vbmedia.no",
+    "market": "NO",
+    "titles": [
+      "Båtens Verden"
+    ]
+  },
+  {
+    "email": "cupido@cupido.no",
+    "market": "NO",
+    "titles": [
+      "Cupido"
+    ]
+  },
+  {
+    "email": "morten.reichel@gamereactor.com",
+    "market": "NO",
+    "titles": [
+      "Gamereactor Norge"
+    ]
+  },
+  {
+    "email": "post@ringerikehistorielag.org",
+    "market": "NO",
+    "titles": [
+      "Heftet Ringerike"
+    ]
+  },
+  {
+    "email": "birgitte@hotellmagasinet.no",
+    "market": "NO",
+    "titles": [
+      "Hotell Magasinet"
+    ]
+  },
+  {
+    "email": "reidar@rarmedia.no",
+    "market": "NO",
+    "titles": [
+      "Klassiske biler"
+    ]
+  },
+  {
+    "email": "knut@sistereuropa.no",
+    "market": "NO",
+    "titles": [
+      "Kulinarisk"
+    ]
+  },
+  {
+    "email": "marie@salgsfabrikken.no",
+    "market": "NO",
+    "titles": [
+      "Lek og Lyst"
+    ]
+  },
+  {
+    "email": "annonse@lydogbilde.no",
+    "market": "NO",
+    "titles": [
+      "Lyd og Bilde"
+    ]
+  },
+  {
+    "email": "kundeservice@minerva.no",
+    "market": "NO",
+    "titles": [
+      "Minerva"
+    ]
+  },
+  {
+    "email": "kontakt@norwegianwood.no",
+    "market": "NO",
+    "titles": [
+      "Norwegian Wood"
+    ]
+  },
+  {
+    "email": "rw@betterbusiness.no",
+    "market": "NO",
+    "titles": [
+      "Pegasus"
+    ]
+  },
+  {
+    "email": "admin@procycling.no",
+    "market": "NO",
+    "titles": [
+      "Procycling Norge"
+    ]
+  },
+  {
+    "email": "annonser@rushprint.no",
+    "market": "NO",
+    "titles": [
+      "Rushprint"
+    ]
+  },
+  {
+    "email": "scream@scream.no",
+    "market": "NO",
+    "titles": [
+      "Scream Magazine"
+    ]
+  },
+  {
+    "email": "redaksjon@sunnhetsbladet.no",
+    "market": "NO",
+    "titles": [
+      "SunnhetsBladet"
+    ]
+  },
+  {
+    "email": "annonse@utrop.no",
+    "market": "NO",
+    "titles": [
+      "Utrop"
+    ]
+  },
+  {
+    "email": "anne-lene.drillestad@bonnier.no",
+    "market": "NO",
+    "titles": [
+      "Vi i Villa"
+    ]
+  },
+  {
+    "email": "hakon@kommunikasjon.no",
+    "market": "NO",
+    "titles": [
+      "Aksess"
+    ]
+  },
+  {
+    "email": "annonse@altinget.no",
+    "market": "NO",
+    "titles": [
+      "Altinget.no"
+    ]
+  },
+  {
+    "email": "post@nfk.no",
+    "market": "NO",
+    "titles": [
+      "Arkiv i Nordland"
+    ]
+  },
+  {
+    "email": "post@bibel.no",
+    "market": "NO",
+    "titles": [
+      "Bibel.no Magasin"
+    ]
+  },
+  {
+    "email": "annonse@billedkunst.no",
+    "market": "NO",
+    "titles": [
+      "Billedkunst"
+    ]
+  },
+  {
+    "email": "marked@nbf.no",
+    "market": "NO",
+    "titles": [
+      "Bowling"
+    ]
+  },
+  {
+    "email": "andreas.halvorsen@hubexo.com",
+    "market": "NO",
+    "titles": [
+      "Byggefakta"
+    ]
+  },
+  {
+    "email": "annonse@salgsfabrikken.no",
+    "market": "NO",
+    "titles": [
+      "Caravanbladet"
+    ]
+  },
+  {
+    "email": "yngve@dagligvarehandelen.no",
+    "market": "NO",
+    "titles": [
+      "Dagligvarehandelen"
+    ]
+  },
+  {
+    "email": "post@dinbedrift.no",
+    "market": "NO",
+    "titles": [
+      "Dinbedrift.no"
+    ]
+  },
+  {
+    "email": "member@uasnorway.no",
+    "market": "NO",
+    "titles": [
+      "Dronemagasinet"
+    ]
+  },
+  {
+    "email": "anniken@dyreparken.no",
+    "market": "NO",
+    "titles": [
+      "Dyr og Folk"
+    ]
+  },
+  {
+    "email": "morten@elektronikkforlaget.no",
+    "market": "NO",
+    "titles": [
+      "Elektronikk"
+    ]
+  },
+  {
+    "email": "annonse@energiogklima.no",
+    "market": "NO",
+    "titles": [
+      "Energi og Klima"
+    ]
+  },
+  {
+    "email": "erik@addmedia.no",
+    "market": "NO",
+    "titles": [
+      "Ergoterapeuten"
+    ]
+  },
+  {
+    "email": "annonse@fiskeribladet.no",
+    "market": "NO",
+    "titles": [
+      "Fiskeriliv"
+    ]
+  },
+  {
+    "email": "fpol@nifu.no",
+    "market": "NO",
+    "titles": [
+      "Forskningspolitikk"
+    ]
+  },
+  {
+    "email": "randi@storybold.no",
+    "market": "NO",
+    "titles": [
+      "Fortidsvern"
+    ]
+  },
+  {
+    "email": "post@fotterapeutforbundet.no",
+    "market": "NO",
+    "titles": [
+      "Fotterapeuten"
+    ]
+  },
+  {
+    "email": "silje@frukt.no",
+    "market": "NO",
+    "titles": [
+      "FreshBliss"
+    ]
+  },
+  {
+    "email": "support@gamer.no",
+    "market": "NO",
+    "titles": [
+      "Gamer.no"
+    ]
+  },
+  {
+    "email": "marked@handball.no",
+    "market": "NO",
+    "titles": [
+      "Handball"
+    ]
+  },
+  {
+    "email": "andreas@transitmedia.no",
+    "market": "NO",
+    "titles": [
+      "Idrettspolitikk.no"
+    ]
+  },
+  {
+    "email": "post@entomologi.no",
+    "market": "NO",
+    "titles": [
+      "Insekt-Nytt"
+    ]
+  },
+  {
+    "email": "tina.karp@nlr.no",
+    "market": "NO",
+    "titles": [
+      "Inter Nos"
+    ]
+  },
+  {
+    "email": "eivind@kommunal-rapport.no",
+    "market": "NO",
+    "titles": [
+      "Kommunal Rapport"
+    ]
+  },
+  {
+    "email": "presse@kreftforeningen.no",
+    "market": "NO",
+    "titles": [
+      "Kreftforeningens magasin"
+    ]
+  },
+  {
+    "email": "post@lemmy.no",
+    "market": "NO",
+    "titles": [
+      "Lemmy"
+    ]
+  },
+  {
+    "email": "robin@hasleconsult.no",
+    "market": "NO",
+    "titles": [
+      "Maler-bladet"
+    ]
+  },
+  {
+    "email": "adm@matogmarked.no",
+    "market": "NO",
+    "titles": [
+      "Mat & Industri"
+    ]
+  },
+  {
+    "email": "marked@transitmedia.no",
+    "market": "NO",
+    "titles": [
+      "Naturpress.no"
+    ]
+  },
+  {
+    "email": "arvid.ervik@nhi.no",
+    "market": "NO",
+    "titles": [
+      "NHI.no"
+    ]
+  },
+  {
+    "email": "advert@sagepub.co.uk",
+    "market": "NO",
+    "titles": [
+      "Nordic Journal of Nursing Research"
+    ]
+  },
+  {
+    "email": "sten.bjertnes@bridge.no",
+    "market": "NO",
+    "titles": [
+      "Norsk Bridge"
+    ]
+  },
+  {
+    "email": "redaksjon@shakespearetidsskrift.no",
+    "market": "NO",
+    "titles": [
+      "Norsk Shakespeare- og Teatertidsskrift"
+    ]
+  },
+  {
+    "email": "post@bfo.no",
+    "market": "NO",
+    "titles": [
+      "Offisersbladet"
+    ]
+  },
+  {
+    "email": "annonse@pacem.no",
+    "market": "NO",
+    "titles": [
+      "PACEM"
+    ]
+  },
+  {
+    "email": "havard.bjerkeng@juridika.no",
+    "market": "NO",
+    "titles": [
+      "Plan"
+    ]
+  },
+  {
+    "email": "john.berge@mac.com",
+    "market": "NO",
+    "titles": [
+      "Pro AV Magasinet"
+    ]
+  },
+  {
+    "email": "sollien@nu.no",
+    "market": "NO",
+    "titles": [
+      "Putsj"
+    ]
+  },
+  {
+    "email": "elisabeth@askmedia.no",
+    "market": "NO",
+    "titles": [
+      "Renholdsnytt"
+    ]
+  },
+  {
+    "email": "huser@salgsfabrikken.no",
+    "market": "NO",
+    "titles": [
+      "Rørfag"
+    ]
+  },
+  {
+    "email": "annonse@skipsrevyen.no",
+    "market": "NO",
+    "titles": [
+      "Skipsrevyen"
+    ]
+  },
+  {
+    "email": "post@solenergi.no",
+    "market": "NO",
+    "titles": [
+      "Solenergi"
+    ]
+  },
+  {
+    "email": "tidsskrift@psykologtidsskriftet.no",
+    "market": "NO",
+    "titles": [
+      "Tidsskrift for Norsk Psykologforening"
+    ]
+  },
+  {
+    "email": "karianne.rutle@gmail.com",
+    "market": "NO",
+    "titles": [
+      "Utposten"
+    ]
+  },
+  {
+    "email": "bjornulf@a2media.no",
+    "market": "NO",
+    "titles": [
+      "Vi flyr"
+    ]
+  },
+  {
+    "email": "vidar@okonomi24.com",
+    "market": "NO",
+    "titles": [
+      "Økonomi24.com"
+    ]
+  },
+  {
+    "email": "sales@bpno.dk",
+    "market": "NO",
+    "titles": [
+      "Best Practice Nordic"
+    ]
+  },
+  {
+    "email": "terje@romeriksposten.no",
+    "market": "NO",
+    "titles": [
+      "Lokalavisen Skedsmo"
+    ]
+  },
+  {
+    "email": "ad@ad-venture.no",
+    "market": "NO",
+    "titles": [
+      "Maison Mat & Vin"
+    ]
+  },
+  {
+    "email": "david@travelnews.no",
+    "market": "NO",
+    "titles": [
+      "Travel News"
+    ]
+  },
+  {
+    "email": "phb@hsmedia.no",
+    "market": "NO",
+    "titles": [
+      "MotorMagasinet"
+    ]
+  },
+  {
+    "email": "britt.holstad@t-a.no",
+    "market": "NO",
+    "titles": [
+      "Inntrøndelagen"
+    ]
+  },
+  {
+    "email": "rune.antonsen@cw.no",
+    "market": "NO",
+    "titles": [
+      "Computerworld Norge"
+    ]
+  },
+  {
+    "email": "info@insidetelecom.com",
+    "market": "NO",
+    "titles": [
+      "Inside Telecom"
+    ]
+  },
+  {
+    "email": "annons@arbetaren.se",
+    "market": "SE",
+    "titles": [
+      "Arbetaren"
+    ]
+  },
+  {
+    "email": "annons@flamman.se",
+    "market": "SE",
+    "titles": [
+      "Flamman"
+    ]
+  },
+  {
+    "email": "salj@nyatider.se",
+    "market": "SE",
+    "titles": [
+      "Nya Tider"
+    ]
+  },
+  {
+    "email": "mats.jonsson@vkmedia.se",
+    "market": "SE",
+    "titles": [
+      "Västerbottens-Kuriren"
+    ]
+  },
+  {
+    "email": "annons@kristianstadsbladet.se",
+    "market": "SE",
+    "titles": [
+      "Norra Skåne"
+    ]
+  },
+  {
+    "email": "ola.tallbom@vkmedia.se",
+    "market": "SE",
+    "titles": [
+      "Västerbottningen"
+    ]
+  },
+  {
+    "email": "annons@hbl.fi",
+    "market": "SE",
+    "titles": [
+      "Hufvudstadsbladet"
+    ]
+  },
+  {
+    "email": "dellerbring@telia.com",
+    "market": "SE",
+    "titles": [
+      "Veteranen"
+    ]
+  },
+  {
+    "email": "mail@evagottfridsson.se",
+    "market": "SE",
+    "titles": [
+      "Modern Psykologi"
+    ]
+  },
+  {
+    "email": "redaktion@popularastronomi.se",
+    "market": "SE",
+    "titles": [
+      "Populär Astronomi"
+    ]
+  },
+  {
+    "email": "nils@res.se",
+    "market": "SE",
+    "titles": [
+      "RES"
+    ]
+  },
+  {
+    "email": "redaktion@cykelfrämjandet.se",
+    "market": "SE",
+    "titles": [
+      "Cykling"
+    ]
+  },
+  {
+    "email": "anders@sb-media.se",
+    "market": "SE",
+    "titles": [
+      "Camping & Husvagn"
+    ]
+  },
+  {
+    "email": "sofie@joforlaget.se",
+    "market": "SE",
+    "titles": [
+      "Allt om Jakt & Vapen"
+    ]
+  },
+  {
+    "email": "hej@slojdmagasinet.se",
+    "market": "SE",
+    "titles": [
+      "Slöjdmagasinet"
+    ]
+  },
+  {
+    "email": "ingar.brynnel@egmont.se",
+    "market": "SE",
+    "titles": [
+      "ICA-kuriren"
+    ]
+  },
+  {
+    "email": "reklam@sj.se",
+    "market": "SE",
+    "titles": [
+      "Kupé"
+    ]
+  },
+  {
+    "email": "bokning@ica.se",
+    "market": "SE",
+    "titles": [
+      "Buffé"
+    ]
+  },
+  {
+    "email": "commercial@paragraph.co.uk",
+    "market": "SE",
+    "titles": [
+      "Whisky"
+    ]
+  },
+  {
+    "email": "jesper.bengtsson@arenagruppen.se",
+    "market": "SE",
+    "titles": [
+      "Arena"
+    ]
+  },
+  {
+    "email": "alexander@20tal.se",
+    "market": "SE",
+    "titles": [
+      "10TAL"
+    ]
+  },
+  {
+    "email": "sofiao@ordfrontforlag.se",
+    "market": "SE",
+    "titles": [
+      "Galago"
+    ]
+  },
+  {
+    "email": "annons@sonicmagazine.com",
+    "market": "SE",
+    "titles": [
+      "Sonic"
+    ]
+  },
+  {
+    "email": "info@sb-media.se",
+    "market": "SE",
+    "titles": [
+      "Cafe"
+    ]
+  },
+  {
+    "email": "marknad@lakartidningen.se",
+    "market": "SE",
+    "titles": [
+      "Läkartidningen"
+    ]
+  },
+  {
+    "email": "annons@chef.se",
+    "market": "SE",
+    "titles": [
+      "Personal & Ledarskap"
+    ]
+  },
+  {
+    "email": "john.sjolund@bonniernews.se",
+    "market": "SE",
+    "titles": [
+      "Modern Industri"
+    ]
+  },
+  {
+    "email": "anders.persson@underhallsmessan.se",
+    "market": "SE",
+    "titles": [
+      "Underhåll"
+    ]
+  },
+  {
+    "email": "jon.ost@byggvarlden.se",
+    "market": "SE",
+    "titles": [
+      "Byggvärlden"
+    ]
+  },
+  {
+    "email": "annons@vagpress.se",
+    "market": "SE",
+    "titles": [
+      "Tidningen Proffs"
+    ]
+  },
+  {
+    "email": "binjamin.bektasevic@gothiakompetens.se",
+    "market": "SE",
+    "titles": [
+      "Tidskriften Äldreomsorg"
+    ]
+  },
+  {
+    "email": "ds@informa.se",
+    "market": "SE",
+    "titles": [
+      "Dagens Samhälle"
+    ]
+  },
+  {
+    "email": "marknad@rfsisu.se",
+    "market": "SE",
+    "titles": [
+      "Svensk Idrott"
+    ]
+  },
+  {
+    "email": "info@idrottensaffarer.se",
+    "market": "SE",
+    "titles": [
+      "Idrottens Affärer"
+    ]
+  },
+  {
+    "email": "erik.hamberg@aller.se",
+    "market": "SE",
+    "titles": [
+      "Allt om Sport"
+    ]
+  },
+  {
+    "email": "tony.gustavsson@squarepublishing.se",
+    "market": "SE",
+    "titles": [
+      "Kamera & Bild"
+    ]
+  },
+  {
+    "email": "silfonline@silf.se",
+    "market": "SE",
+    "titles": [
+      "Inköp & Logistik"
+    ]
+  },
+  {
+    "email": "johan.petersen@bbm.bonnier.se",
+    "market": "SE",
+    "titles": [
+      "Market"
+    ]
+  },
+  {
+    "email": "gregers@scandasia.com",
+    "market": "SE",
+    "titles": [
+      "ScandAsia"
+    ]
+  },
+  {
+    "email": "brix@partnermedier.dk",
+    "market": "DK",
+    "titles": [
+      "Børsen"
+    ]
+  },
+  {
+    "email": "information@frontmedia.dk",
+    "market": "DK",
+    "titles": [
+      "Information"
+    ]
+  },
+  {
+    "email": "salg@tidende.dk",
+    "market": "DK",
+    "titles": [
+      "Bornholms Tidende"
+    ]
+  },
+  {
+    "email": "annoncer@skivefolkeblad.dk",
+    "market": "DK",
+    "titles": [
+      "Skive Folkeblad"
+    ]
+  },
+  {
+    "email": "adops@sn.dk",
+    "market": "DK",
+    "titles": [
+      "KøgeAvisen"
+    ]
+  },
+  {
+    "email": "annoncer@udfordringen.dk",
+    "market": "DK",
+    "titles": [
+      "Udfordringen"
+    ]
+  },
+  {
+    "email": "kontakt@foljeton.dk",
+    "market": "DK",
+    "titles": [
+      "Føljeton"
+    ]
+  },
+  {
+    "email": "info@campingferie.dk",
+    "market": "DK",
+    "titles": [
+      "Camping og Friluftsliv"
+    ]
+  },
+  {
+    "email": "post@jaegerne.dk",
+    "market": "DK",
+    "titles": [
+      "Jæger"
+    ]
+  },
+  {
+    "email": "julie@sejlsport.dk",
+    "market": "DK",
+    "titles": [
+      "Sejlerbladet"
+    ]
+  },
+  {
+    "email": "abb@wiegaarden.dk",
+    "market": "DK",
+    "titles": [
+      "Ridehesten"
+    ]
+  },
+  {
+    "email": "contact@friktionmagasin.dk",
+    "market": "DK",
+    "titles": [
+      "Friktion"
+    ]
+  },
+  {
+    "email": "media@soundvenue.com",
+    "market": "DK",
+    "titles": [
+      "Soundvenue"
+    ]
+  },
+  {
+    "email": "annoncer@gaffa.dk",
+    "market": "DK",
+    "titles": [
+      "Gaffa"
+    ]
+  },
+  {
+    "email": "merete@ekkofilm.dk",
+    "market": "DK",
+    "titles": [
+      "EKKO"
+    ]
+  },
+  {
+    "email": "ufl@dmfnet.dk",
+    "market": "DK",
+    "titles": [
+      "Ugeskrift for Læger"
+    ]
+  },
+  {
+    "email": "pd@pharmadanmark.dk",
+    "market": "DK",
+    "titles": [
+      "Farmaceuten"
+    ]
+  },
+  {
+    "email": "annoncer@medicinsketidsskrifter.dk",
+    "market": "DK",
+    "titles": [
+      "Onkologisk Tidsskrift"
+    ]
+  },
+  {
+    "email": "ggb@gl.org",
+    "market": "DK",
+    "titles": [
+      "Gymnasieskolen"
+    ]
+  },
+  {
+    "email": "michael.j@dgmedia.dk",
+    "market": "DK",
+    "titles": [
+      "DJØFbladet"
+    ]
+  },
+  {
+    "email": "medlemskommunikation&markedsforing@hk.dk",
+    "market": "DK",
+    "titles": [
+      "Magasinet HK"
+    ]
+  },
+  {
+    "email": "dosc@stibo.com",
+    "market": "DK",
+    "titles": [
+      "Maskinmesteren"
+    ]
+  },
+  {
+    "email": "kf@kf.dk",
+    "market": "DK",
+    "titles": [
+      "Konstruktøren"
+    ]
+  },
+  {
+    "email": "cw@cw.dk",
+    "market": "DK",
+    "titles": [
+      "Computerworld DK"
+    ]
+  },
+  {
+    "email": "thomas@media-sales.dk",
+    "market": "DK",
+    "titles": [
+      "Børsens Magasin"
+    ]
+  },
+  {
+    "email": "pia@bureaubiz.dk",
+    "market": "DK",
+    "titles": [
+      "Bureaubiz"
+    ]
+  },
+  {
+    "email": "online@nordiskemedier.dk",
+    "market": "DK",
+    "titles": [
+      "Logistik & Transport"
+    ]
+  },
+  {
+    "email": "bka@nordiskemedier.dk",
+    "market": "DK",
+    "titles": [
+      "Transportmagasinet"
+    ]
+  },
+  {
+    "email": "post@horesta.dk",
+    "market": "DK",
+    "titles": [
+      "HORESTA Magasinet"
+    ]
+  },
+  {
+    "email": "jan.byskou@frontmedia.dk",
+    "market": "DK",
+    "titles": [
+      "Restauratøren"
+    ]
+  },
+  {
+    "email": "sa@huginmedia.dk",
+    "market": "DK",
+    "titles": [
+      "Byggeplads.dk"
+    ]
+  },
+  {
+    "email": "def@def.dk",
+    "market": "DK",
+    "titles": [
+      "Elektriker"
+    ]
+  },
+  {
+    "email": "sl@teknovation.dk",
+    "market": "DK",
+    "titles": [
+      "Grønt Miljø"
+    ]
+  },
+  {
+    "email": "jan@frontmedia.dk",
+    "market": "DK",
+    "titles": [
+      "Fiskeri Tidende"
+    ]
+  },
+  {
+    "email": "red@aktuelnaturvidenskab.dk",
+    "market": "DK",
+    "titles": [
+      "Aktuel Naturvidenskab"
+    ]
+  },
+  {
+    "email": "katariina.lankinen@suomenmaa.fi",
+    "market": "FI",
+    "titles": [
+      "Suomenmaa"
+    ]
+  },
+  {
+    "email": "myynti@almamedia.fi",
+    "market": "FI",
+    "titles": [
+      "Uusi Suomi"
+    ]
+  },
+  {
+    "email": "laskutus.keskisuomalainen@media.fi",
+    "market": "FI",
+    "titles": [
+      "Kouvolan Sanomat"
+    ]
+  },
+  {
+    "email": "annonser@bnf.fi",
+    "market": "FI",
+    "titles": [
+      "Syd-Österbotten"
+    ]
+  },
+  {
+    "email": "helsingin.ilmoitukset@media.fi",
+    "market": "FI",
+    "titles": [
+      "Etelä-Suomen Lehti"
+    ]
+  },
+  {
+    "email": "tiia.virtanen@loimaanlehti.fi",
+    "market": "FI",
+    "titles": [
+      "Loimaan Lehti"
+    ]
+  },
+  {
+    "email": "ilmoitukset@alueviesti.fi",
+    "market": "FI",
+    "titles": [
+      "Sastamalan Lehti"
+    ]
+  },
+  {
+    "email": "marjaana.vilponen@sanoma.com",
+    "market": "FI",
+    "titles": [
+      "Sydän-Satakunta"
+    ]
+  },
+  {
+    "email": "nona.ratia@otava.fi",
+    "market": "FI",
+    "titles": [
+      "Erikoislehti Riista"
+    ]
+  },
+  {
+    "email": "minna.hirsimaki@doublem.fi",
+    "market": "FI",
+    "titles": [
+      "Maailman Kuvalehti"
+    ]
+  },
+  {
+    "email": "reetta.salo@kruunumedia.fi",
+    "market": "FI",
+    "titles": [
+      "Lapsen Maailma"
+    ]
+  },
+  {
+    "email": "yrityspalvelu@sanoma.fi",
+    "market": "FI",
+    "titles": [
+      "Meidän Mummola",
+      "7 päivää",
+      "Aamulehti",
+      "Aku Ankan Juhlavuosi",
+      "Gloria",
+      "Glorian Ruoka & Viini",
+      "Image",
+      "LEGO Magasin Suomi",
+      "Marvel",
+      "Roope-setä",
+      "Lapin Liitto",
+      "Me Naiset",
+      "Helsingin Sanomat",
+      "Ilta-Sanomat",
+      "Riihimäen Sanomat",
+      "Aamuposti",
+      "Hämeen Sanomat",
+      "Iisalmen Sanomat",
+      "Kainuun Sanomat",
+      "Lapin Kansa",
+      "Pohjolan Sanomat",
+      "Salon Seudun Sanomat",
+      "Satakunnan Kansa",
+      "Janakkalan Sanomat",
+      "Helsingin Uutiset",
+      "Tamperelainen",
+      "Vantaan Sanomat",
+      "Aku Ankka",
+      "Itäväylä",
+      "Etelä-Helsingin Sanomat",
+      "ET-lehti",
+      "Hyvä Terveys",
+      "Kodin Kuvalehti",
+      "Kotivinkki",
+      "Tiede",
+      "Disney Junior",
+      "Trendi",
+      "Glorian Koti",
+      "Image (Sanoma)",
+      "Rakennuslehti",
+      "Frozen",
+      "Star Wars",
+      "Forssan Lehti",
+      "Länsiväylä",
+      "Aku Ankka Junior"
+    ]
+  },
+  {
+    "email": "roope.malmstrom@fokusmedia.fi",
+    "market": "FI",
+    "titles": [
+      "Auto Bild Suomi"
+    ]
+  },
+  {
+    "email": "aineistot.v8@fokusmedia.fi",
+    "market": "FI",
+    "titles": [
+      "V8 Magazine"
+    ]
+  },
+  {
+    "email": "toimitus@moottori.fi",
+    "market": "FI",
+    "titles": [
+      "Moottori"
+    ]
+  },
+  {
+    "email": "panu.kononen@suomenlatu.fi",
+    "market": "FI",
+    "titles": [
+      "Latu & Polku"
+    ]
+  },
+  {
+    "email": "info@retkilehti.fi",
+    "market": "FI",
+    "titles": [
+      "Retki"
+    ]
+  },
+  {
+    "email": "anja.moilanen@aromilehti.fi",
+    "market": "FI",
+    "titles": [
+      "Aromi"
+    ]
+  },
+  {
+    "email": "tuomas.rantanen@voima.fi",
+    "market": "FI",
+    "titles": [
+      "Voima"
+    ]
+  },
+  {
+    "email": "telma.peura@nvl.fi",
+    "market": "FI",
+    "titles": [
+      "Nuori Voima"
+    ]
+  },
+  {
+    "email": "oskari.anttonen@popmedia.fi",
+    "market": "FI",
+    "titles": [
+      "Inferno"
+    ]
+  },
+  {
+    "email": "kirsi.panula@hillagroup.fi",
+    "market": "FI",
+    "titles": [
+      "KP24"
+    ]
+  },
+  {
+    "email": "kirsi.tahjanjoki@otava.fi",
+    "market": "FI",
+    "titles": [
+      "Mauri Kunnaksen Maailma"
+    ]
+  },
+  {
+    "email": "anna.marjanen@duodecim.fi",
+    "market": "FI",
+    "titles": [
+      "Duodecim"
+    ]
+  },
+  {
+    "email": "heidi.andersson@tietotalli.fi",
+    "market": "FI",
+    "titles": [
+      "Fysioterapia"
+    ]
+  },
+  {
+    "email": "siiri.hiidenvuori@toimintaterapeuttiliitto.fi",
+    "market": "FI",
+    "titles": [
+      "Toimintaterapia"
+    ]
+  },
+  {
+    "email": "kaisa.yliruokanen@talentia.fi",
+    "market": "FI",
+    "titles": [
+      "Talentia"
+    ]
+  },
+  {
+    "email": "riku.suuriniemi@saarsalo.fi",
+    "market": "FI",
+    "titles": [
+      "Opettaja"
+    ]
+  },
+  {
+    "email": "info@saarsalo.fi",
+    "market": "FI",
+    "titles": [
+      "Yliopistolehti"
+    ]
+  },
+  {
+    "email": "merina.salminen@tek.fi",
+    "market": "FI",
+    "titles": [
+      "Tekniikan Akateemiset"
+    ]
+  },
+  {
+    "email": "lassi.uotila@terramedia.fi",
+    "market": "FI",
+    "titles": [
+      "Käytännön Maamies"
+    ]
+  },
+  {
+    "email": "jenni.mahanen@isannointiliitto.fi",
+    "market": "FI",
+    "titles": [
+      "Hyvä Yhtiö"
+    ]
+  },
+  {
+    "email": "marianne.kaartoaho@elisanet.fi",
+    "market": "FI",
+    "titles": [
+      "Tie & Liikenne"
+    ]
+  },
+  {
+    "email": "kimmo.ilmavirta@yrittajat.fi",
+    "market": "FI",
+    "titles": [
+      "Yrittäjä"
+    ]
+  },
+  {
+    "email": "anne.joukainen@asiakasmedia.fi",
+    "market": "FI",
+    "titles": [
+      "Kehittyvä Elintarvike"
+    ]
+  },
+  {
+    "email": "ollipekka.duk@gmail.com",
+    "market": "FI",
+    "titles": [
+      "Poliisi & Oikeus"
+    ]
+  },
+  {
+    "email": "minna.kamotskin@pelastustieto.fi",
+    "market": "FI",
+    "titles": [
+      "Pelastustieto"
+    ]
+  },
+  {
+    "email": "toimitus@kollega.fi",
+    "market": "FI",
+    "titles": [
+      "Kollegiaalisuus"
+    ]
+  },
+  {
+    "email": "sales@theguardian.com",
+    "market": "UK",
+    "titles": [
+      "The Guardian"
+    ]
+  },
+  {
+    "email": "opportunities@tortoisemedia.com",
+    "market": "UK",
+    "titles": [
+      "The Observer"
+    ]
+  },
+  {
+    "email": "ads@peoples-press.com",
+    "market": "UK",
+    "titles": [
+      "Morning Star"
+    ]
+  },
+  {
+    "email": "advertising@gvmediagroup.co.uk",
+    "market": "UK",
+    "titles": [
+      "The Voice"
+    ]
+  },
+  {
+    "email": "advertising@thejc.com",
+    "market": "UK",
+    "titles": [
+      "Jewish Chronicle"
+    ]
+  },
+  {
+    "email": "sales@jewishnews.co.uk",
+    "market": "UK",
+    "titles": [
+      "Jewish News"
+    ]
+  },
+  {
+    "email": "ads@methodistrecorder.co.uk",
+    "market": "UK",
+    "titles": [
+      "Methodist Recorder"
+    ]
+  },
+  {
+    "email": "uk.sales@timeout.com",
+    "market": "UK",
+    "titles": [
+      "Time Out London"
+    ]
+  },
+  {
+    "email": "advertising@cityam.com",
+    "market": "UK",
+    "titles": [
+      "City AM"
+    ]
+  },
+  {
+    "email": "reutersnewsagencysales@thomsonreuters.com",
+    "market": "UK",
+    "titles": [
+      "Reuters"
+    ]
+  },
+  {
+    "email": "enquiries@fnlondon.com",
+    "market": "UK",
+    "titles": [
+      "Financial News"
+    ]
+  },
+  {
+    "email": "gazette-advertising@lawsociety.org.uk",
+    "market": "UK",
+    "titles": [
+      "Law Society Gazette"
+    ]
+  },
+  {
+    "email": "sbernabe@politico.eu",
+    "market": "UK",
+    "titles": [
+      "Politico Europe"
+    ]
+  },
+  {
+    "email": "ads@totalpolitics.com",
+    "market": "UK",
+    "titles": [
+      "LabourList"
+    ]
+  },
+  {
+    "email": "jack.daly@madisonbell.com",
+    "market": "UK",
+    "titles": [
+      "Private Eye"
+    ]
+  },
+  {
+    "email": "advertising@spectator.co.uk",
+    "market": "UK",
+    "titles": [
+      "The Spectator"
+    ]
+  },
+  {
+    "email": "wendy.miller@prospectmagazine.co.uk",
+    "market": "UK",
+    "titles": [
+      "Prospect"
+    ]
+  },
+  {
+    "email": "sepi_arani@carwow.co.uk",
+    "market": "UK",
+    "titles": [
+      "Evo"
+    ]
+  },
+  {
+    "email": "motoringads@bauermedia.co.uk",
+    "market": "UK",
+    "titles": [
+      "Drive"
+    ]
+  },
+  {
+    "email": "advertising@swimming.org",
+    "market": "UK",
+    "titles": [
+      "Swim"
+    ]
+  },
+  {
+    "email": "info@aquila.co.uk",
+    "market": "UK",
+    "titles": [
+      "Aquila"
+    ]
+  },
+  {
+    "email": "advertising@firstnews.co.uk",
+    "market": "UK",
+    "titles": [
+      "First News"
+    ]
+  },
+  {
+    "email": "karen.biggs@twsgroup.com",
+    "market": "UK",
+    "titles": [
+      "Sporting Shooter"
+    ]
+  },
+  {
+    "email": "advertising@monocle.com",
+    "market": "UK",
+    "titles": [
+      "Monocle"
+    ]
+  },
+  {
+    "email": "advertising@threadneedlemedia.com",
+    "market": "UK",
+    "titles": [
+      "Square Mile"
+    ]
+  },
+  {
+    "email": "partnerships@tempusmagazine.co.uk",
+    "market": "UK",
+    "titles": [
+      "Tempus"
+    ]
+  },
+  {
+    "email": "debbie.field@hellomagazine.com",
+    "market": "UK",
+    "titles": [
+      "Hello!"
+    ]
+  },
+  {
+    "email": "ads@stylist.co.uk",
+    "market": "UK",
+    "titles": [
+      "Stylist"
+    ]
+  },
+  {
+    "email": "sponsorships@iod.com",
+    "market": "UK",
+    "titles": [
+      "Director"
+    ]
+  },
+  {
+    "email": "sales@realbusiness.co.uk",
+    "market": "UK",
+    "titles": [
+      "Real Business"
+    ]
+  },
+  {
+    "email": "csqueries@infopro-digital.com",
+    "market": "UK",
+    "titles": [
+      "Post Magazine"
+    ]
+  },
+  {
+    "email": "asutton@alm.com",
+    "market": "UK",
+    "titles": [
+      "Legal Week"
+    ]
+  },
+  {
+    "email": "andrew.bracey@assemblemediagroup.co.uk",
+    "market": "UK",
+    "titles": [
+      "Building"
+    ]
+  },
+  {
+    "email": "egenquiries@markallengroup.com",
+    "market": "UK",
+    "titles": [
+      "Estates Gazette"
+    ]
+  },
+  {
+    "email": "nick.emmons@ice.org.uk",
+    "market": "UK",
+    "titles": [
+      "Civil Engineering"
+    ]
+  },
+  {
+    "email": "jennifer@contentmediaservices.co.uk",
+    "market": "UK",
+    "titles": [
+      "RIBA Journal"
+    ]
+  },
+  {
+    "email": "rob.houghton@house-builder.co.uk",
+    "market": "UK",
+    "titles": [
+      "Housebuilder"
+    ]
+  },
+  {
+    "email": "e.walton@hgluk.com",
+    "market": "UK",
+    "titles": [
+      "Builders' Merchants News"
+    ]
+  },
+  {
+    "email": "digitalprint.sales@bmj.com",
+    "market": "UK",
+    "titles": [
+      "BMJ"
+    ]
+  },
+  {
+    "email": "journalmedia@elsevier.com",
+    "market": "UK",
+    "titles": [
+      "The Lancet"
+    ]
+  },
+  {
+    "email": "hello@cogora.com",
+    "market": "UK",
+    "titles": [
+      "Pulse"
+    ]
+  },
+  {
+    "email": "advertdept@rpharms.com",
+    "market": "UK",
+    "titles": [
+      "Pharmaceutical Journal"
+    ]
+  },
+  {
+    "email": "trevor.day@citeline.com",
+    "market": "UK",
+    "titles": [
+      "Chemist + Druggist"
+    ]
+  },
+  {
+    "email": "sales@rcni.com",
+    "market": "UK",
+    "titles": [
+      "Nursing Standard"
+    ]
+  },
+  {
+    "email": "steph.bryant@haymarket.com",
+    "market": "UK",
+    "titles": [
+      "Doctor"
+    ]
+  },
+  {
+    "email": "partnerships@tes.com",
+    "market": "UK",
+    "titles": [
+      "Times Educational Supplement (TES)"
+    ]
+  },
+  {
+    "email": "media@timeshighereducation.com",
+    "market": "UK",
+    "titles": [
+      "Times Higher Education"
+    ]
+  },
+  {
+    "email": "cheryl.townsend@thecaterer.com",
+    "market": "UK",
+    "titles": [
+      "Caterer (The Caterer)"
+    ]
+  },
+  {
+    "email": "advertising@mulberrymedia.co.uk",
+    "market": "UK",
+    "titles": [
+      "Hotel Owner"
+    ]
+  },
+  {
+    "email": "caroline.kelly@itp.com",
+    "market": "UK",
+    "titles": [
+      "Boutique Hotelier"
+    ]
+  },
+  {
+    "email": "ben.james@techtarget.com",
+    "market": "UK",
+    "titles": [
+      "Computer Weekly"
+    ]
+  },
+  {
+    "email": "aziz.rahman@techmonitor.ai",
+    "market": "UK",
+    "titles": [
+      "Computer Business Review"
+    ]
+  },
+  {
+    "email": "haydon.rainsford@purplems.com",
+    "market": "UK",
+    "titles": [
+      "Electrical Times"
+    ]
+  },
+  {
+    "email": "massimom@sjpbusinessmedia.com",
+    "market": "UK",
+    "titles": [
+      "Electrical Review"
+    ]
+  },
+  {
+    "email": "golda.burrows@plantandcivilengineer.com",
+    "market": "UK",
+    "titles": [
+      "Plant & Civil Engineer"
+    ]
+  },
+  {
+    "email": "advertising@memnews.co.uk",
+    "market": "UK",
+    "titles": [
+      "Manufacturing & Engineering Magazine"
+    ]
+  },
+  {
+    "email": "sales@busandcoachbuyer.com",
+    "market": "UK",
+    "titles": [
+      "Bus & Coach Buyer"
+    ]
+  },
+  {
+    "email": "customersuccess@lloydslistintelligence.com",
+    "market": "UK",
+    "titles": [
+      "Lloyd's List"
+    ]
+  },
+  {
+    "email": "sarahwood@fav-house.com",
+    "market": "UK",
+    "titles": [
+      "Utility Week"
+    ]
+  },
+  {
+    "email": "advertising@publicfinance.co.uk",
+    "market": "UK",
+    "titles": [
+      "Public Finance"
+    ]
+  },
+  {
+    "email": "khosi@alfol.co.uk",
+    "market": "UK",
+    "titles": [
+      "Creative HEAD"
+    ]
+  },
+  {
+    "email": "agarside@thebtngroup.com",
+    "market": "UK",
+    "titles": [
+      "Business Travel News Europe"
+    ]
+  },
+  {
+    "email": "communications@evangelical-times.org",
+    "market": "UK",
+    "titles": [
+      "Evangelical Times"
+    ]
+  },
+  {
+    "email": "ctads@christianitytoday.com",
+    "market": "UK",
+    "titles": [
+      "Christianity Today UK"
+    ]
+  },
+  {
+    "email": "gaby.pitts@thebookseller.com",
+    "market": "UK",
+    "titles": [
+      "The Bookseller"
+    ]
+  },
+  {
+    "email": "ali.cotter@thecurrency.news",
+    "market": "IE",
+    "titles": [
+      "The Currency"
+    ]
+  },
+  {
+    "email": "siobhan@businessplus.ie",
+    "market": "IE",
+    "titles": [
+      "Business Plus"
+    ]
+  },
+  {
+    "email": "wicklowads@localtimes.ie",
+    "market": "IE",
+    "titles": [
+      "Wicklow Times"
+    ]
+  },
+  {
+    "email": "sales@ctribune.ie",
+    "market": "IE",
+    "titles": [
+      "Connacht Tribune"
+    ]
+  },
+  {
+    "email": "sales@galwayadvertiser.ie",
+    "market": "IE",
+    "titles": [
+      "Galway Advertiser"
+    ]
+  },
+  {
+    "email": "maire@advertiser.ie",
+    "market": "IE",
+    "titles": [
+      "Mayo Advertiser"
+    ]
+  },
+  {
+    "email": "patcawley@mayonews.ie",
+    "market": "IE",
+    "titles": [
+      "Mayo News"
+    ]
+  },
+  {
+    "email": "advertising@southernstar.ie",
+    "market": "IE",
+    "titles": [
+      "Southern Star"
+    ]
+  },
+  {
+    "email": "advertising@clarechampion.ie",
+    "market": "IE",
+    "titles": [
+      "Clare Champion"
+    ]
+  },
+  {
+    "email": "sales@dublingazette.com",
+    "market": "IE",
+    "titles": [
+      "Dublin Gazette"
+    ]
+  },
+  {
+    "email": "info@wicklownews.net",
+    "market": "IE",
+    "titles": [
+      "Wicklow Voice"
+    ]
+  },
+  {
+    "email": "doireann.murray@image.ie",
+    "market": "IE",
+    "titles": [
+      "Image Magazine"
+    ]
+  },
+  {
+    "email": "hcarroll@businesspost.ie",
+    "market": "IE",
+    "titles": [
+      "Irish Tatler"
+    ]
+  },
+  {
+    "email": "patrick@stellar.ie",
+    "market": "IE",
+    "titles": [
+      "Stellar"
+    ]
+  },
+  {
+    "email": "sales@hotpress.com",
+    "market": "IE",
+    "titles": [
+      "Hot Press"
+    ]
+  },
+  {
+    "email": "info@harmonia.ie",
+    "market": "IE",
+    "titles": [
+      "Woman's Way"
+    ]
+  },
+  {
+    "email": "willie@slp.ie",
+    "market": "IE",
+    "titles": [
+      "Senior Times"
+    ]
+  },
+  {
+    "email": "irelands.own@peoplenews.ie",
+    "market": "IE",
+    "titles": [
+      "Ireland's Own"
+    ]
+  },
+  {
+    "email": "julie.boyde@pentonpublications.co.uk",
+    "market": "IE",
+    "titles": [
+      "Wedding Journal Ireland"
+    ]
+  },
+  {
+    "email": "partnerships@balls.ie",
+    "market": "IE",
+    "titles": [
+      "Balls.ie"
+    ]
+  },
+  {
+    "email": "advertising@agriland.ie",
+    "market": "IE",
+    "titles": [
+      "Agriland"
+    ]
+  },
+  {
+    "email": "colinwalsh@irishbuildingmagazine.ie",
+    "market": "IE",
+    "titles": [
+      "Irish Building Magazine"
+    ]
+  },
+  {
+    "email": "siobhan.depaor@inmo.ie",
+    "market": "IE",
+    "titles": [
+      "World of Irish Nursing"
+    ]
+  },
+  {
+    "email": "ianmulvaney@mediateam.ie",
+    "market": "IE",
+    "titles": [
+      "ShelfLife"
+    ]
+  },
+  {
+    "email": "ads@checkout.ie",
+    "market": "IE",
+    "titles": [
+      "Checkout"
+    ]
+  },
+  {
+    "email": "cullen@marketing.ie",
+    "market": "IE",
+    "titles": [
+      "Marketing.ie"
+    ]
+  },
+  {
+    "email": "alee@siliconrepublic.com",
+    "market": "IE",
+    "titles": [
+      "Silicon Republic"
+    ]
+  },
+  {
+    "email": "info@financedublin.com",
+    "market": "IE",
+    "titles": [
+      "Finance Magazine"
+    ]
+  },
+  {
+    "email": "sean@lawsociety.ie",
+    "market": "IE",
+    "titles": [
+      "Law Society Gazette Ireland"
+    ]
+  },
+  {
+    "email": "mary@fleet.ie",
+    "market": "IE",
+    "titles": [
+      "Fleet Transport"
+    ]
+  },
+  {
+    "email": "eamonnmaguire@mediateam.ie",
+    "market": "IE",
+    "titles": [
+      "Engineers Journal"
+    ]
+  },
+  {
+    "email": "advertising@irishcatholic.ie",
+    "market": "IE",
+    "titles": [
+      "Irish Catholic"
+    ]
+  },
+  {
+    "email": "carly.hempenstall@messenger.ie",
+    "market": "IE",
+    "titles": [
+      "Sacred Heart Messenger"
+    ]
+  },
+  {
+    "email": "advertising@houseandhome.ie",
+    "market": "IE",
+    "titles": [
+      "House and Home"
+    ]
+  },
+  {
+    "email": "anzeigen@taz.de",
+    "market": "DE",
+    "titles": [
+      "Tageszeitung (taz)"
+    ]
+  },
+  {
+    "email": "norbert_boddecker@brandeins.de",
+    "market": "DE",
+    "titles": [
+      "Brand Eins"
+    ]
+  },
+  {
+    "email": "verlag@jungle.world",
+    "market": "DE",
+    "titles": [
+      "Jungle World"
+    ]
+  },
+  {
+    "email": "anzeigen@compact-mail.de",
+    "market": "DE",
+    "titles": [
+      "Compact"
+    ]
+  },
+  {
+    "email": "beck@berliner-medienvertrieb.de",
+    "market": "DE",
+    "titles": [
+      "Junge Freiheit"
+    ]
+  },
+  {
+    "email": "e.kuss@haas-mediengruppe.de",
+    "market": "DE",
+    "titles": [
+      "Mannheimer Morgen"
+    ]
+  },
+  {
+    "email": "b.lazar@schwaebische.de",
+    "market": "DE",
+    "titles": [
+      "Schwäbische Zeitung"
+    ]
+  },
+  {
+    "email": "medienberater@vnp.de",
+    "market": "DE",
+    "titles": [
+      "Nürnberger Nachrichten"
+    ]
+  },
+  {
+    "email": "anzeigen@donaukurier.de",
+    "market": "DE",
+    "titles": [
+      "Donaukurier"
+    ]
+  },
+  {
+    "email": "marketing@pnp.de",
+    "market": "DE",
+    "titles": [
+      "Passauer Neue Presse"
+    ]
+  },
+  {
+    "email": "kundenservice@mittelbayerische.de",
+    "market": "DE",
+    "titles": [
+      "Mittelbayerische Zeitung"
+    ]
+  },
+  {
+    "email": "goepfert.manuela@ddv-mediengruppe.de",
+    "market": "DE",
+    "titles": [
+      "Sächsische Zeitung"
+    ]
+  },
+  {
+    "email": "anzeigen@freiepresse.de",
+    "market": "DE",
+    "titles": [
+      "Freie Presse"
+    ]
+  },
+  {
+    "email": "sz-service@sz-sb.de",
+    "market": "DE",
+    "titles": [
+      "Saarbrücker Zeitung"
+    ]
+  },
+  {
+    "email": "kontakt@rz-media.de",
+    "market": "DE",
+    "titles": [
+      "Rhein-Zeitung"
+    ]
+  },
+  {
+    "email": "online@tmvg.de",
+    "market": "DE",
+    "titles": [
+      "Trierischer Volksfreund"
+    ]
+  },
+  {
+    "email": "anzeigen@weser-kurier.de",
+    "market": "DE",
+    "titles": [
+      "Weser-Kurier"
+    ]
+  },
+  {
+    "email": "anzeigen@noz.de",
+    "market": "DE",
+    "titles": [
+      "Neue Osnabrücker Zeitung (NOZ)"
+    ]
+  },
+  {
+    "email": "wencke.vonderheydt@emotion.de",
+    "market": "DE",
+    "titles": [
+      "emotion"
+    ]
+  },
+  {
+    "email": "fanny.postl@redbull.com",
+    "market": "DE",
+    "titles": [
+      "Servus in Stadt & Land"
+    ]
+  },
+  {
+    "email": "nadine.sturmat@jalag.de",
+    "market": "DE",
+    "titles": [
+      "Der Feinschmecker"
+    ]
+  },
+  {
+    "email": "anzeigen@spektrum.de",
+    "market": "DE",
+    "titles": [
+      "Spektrum der Wissenschaft"
+    ]
+  },
+  {
+    "email": "medien@adac.de",
+    "market": "DE",
+    "titles": [
+      "ADAC Motorwelt"
+    ]
+  },
+  {
+    "email": "sales@kicker.de",
+    "market": "DE",
+    "titles": [
+      "Kicker"
+    ]
+  },
+  {
+    "email": "arne.zimmer@ad-alliance.de",
+    "market": "DE",
+    "titles": [
+      "DAV Panorama"
+    ]
+  },
+  {
+    "email": "sales@prisma-mediasolutions.de",
+    "market": "DE",
+    "titles": [
+      "prisma"
+    ]
+  },
+  {
+    "email": "marcus.wicker@eclipsed.de",
+    "market": "DE",
+    "titles": [
+      "Eclipsed"
+    ]
+  },
+  {
+    "email": "sales@mediahouse-berlin.de",
+    "market": "DE",
+    "titles": [
+      "Metal Hammer Germany"
+    ]
+  },
+  {
+    "email": "info@profifoto.de",
+    "market": "DE",
+    "titles": [
+      "ProfiFoto"
+    ]
+  },
+  {
+    "email": "info@verlagshaus.de",
+    "market": "DE",
+    "titles": [
+      "Modellbahnwelt"
+    ]
+  },
+  {
+    "email": "s.tesche@minervaverlag.de",
+    "market": "DE",
+    "titles": [
+      "Hunde"
+    ]
+  },
+  {
+    "email": "anzeigen@paulparey.de",
+    "market": "DE",
+    "titles": [
+      "Fisch & Fang"
+    ]
+  },
+  {
+    "email": "peternell@zeichensetzen.de",
+    "market": "DE",
+    "titles": [
+      "Idea Spektrum"
+    ]
+  },
+  {
+    "email": "anzeigen@publik-forum.de",
+    "market": "DE",
+    "titles": [
+      "Publik-Forum"
+    ]
+  },
+  {
+    "email": "anzeigen@kirche-und-leben.de",
+    "market": "DE",
+    "titles": [
+      "Kirche und Leben"
+    ]
+  },
+  {
+    "email": "anzeigen@juedische-allgemeine.de",
+    "market": "DE",
+    "titles": [
+      "Jüdische Allgemeine"
+    ]
+  },
+  {
+    "email": "vertrieb@islamische-zeitung.de",
+    "market": "DE",
+    "titles": [
+      "Islamische Zeitung"
+    ]
+  },
+  {
+    "email": "alexander.krauth@springernature.com",
+    "market": "DE",
+    "titles": [
+      "Ärzte Zeitung"
+    ]
+  },
+  {
+    "email": "hetmann@aerzteverlag.de",
+    "market": "DE",
+    "titles": [
+      "Deutsches Ärzteblatt"
+    ]
+  },
+  {
+    "email": "clauberg@aerzteverlag.de",
+    "market": "DE",
+    "titles": [
+      "Dental Magazin"
+    ]
+  },
+  {
+    "email": "zm-anzeigen@medtrix.group",
+    "market": "DE",
+    "titles": [
+      "Zahnärztliche Mitteilungen"
+    ]
+  },
+  {
+    "email": "heike.wolf@kohlhammer.de",
+    "market": "DE",
+    "titles": [
+      "Krankenhaus Umschau"
+    ]
+  },
+  {
+    "email": "media@doccheck.com",
+    "market": "DE",
+    "titles": [
+      "DocCheck News"
+    ]
+  },
+  {
+    "email": "tilman.gaebler@t-online.de",
+    "market": "DE",
+    "titles": [
+      "JuristenZeitung (JZ)"
+    ]
+  },
+  {
+    "email": "jn@anwaltsblatt-media.de",
+    "market": "DE",
+    "titles": [
+      "Anwaltsblatt"
+    ]
+  },
+  {
+    "email": "karin.gangl@faz-bm.de",
+    "market": "DE",
+    "titles": [
+      "AnwaltSpiegel"
+    ]
+  },
+  {
+    "email": "anzeigen@juve.de",
+    "market": "DE",
+    "titles": [
+      "Juve Rechtsmarkt"
+    ]
+  },
+  {
+    "email": "mirkovic@detail.de",
+    "market": "DE",
+    "titles": [
+      "Detail"
+    ]
+  },
+  {
+    "email": "oheinz@ait-online.de",
+    "market": "DE",
+    "titles": [
+      "AIT"
+    ]
+  },
+  {
+    "email": "anzeigen@iz.de",
+    "market": "DE",
+    "titles": [
+      "Immobilien Zeitung"
+    ]
+  },
+  {
+    "email": "ines.herrera@oberauer.com",
+    "market": "DE",
+    "titles": [
+      "Kress Pro"
+    ]
+  },
+  {
+    "email": "stefan.laratorres@ebnermedia.de",
+    "market": "DE",
+    "titles": [
+      "Page"
+    ]
+  },
+  {
+    "email": "norman.wittig@quadriga.eu",
+    "market": "DE",
+    "titles": [
+      "Human Resources Manager"
+    ]
+  },
+  {
+    "email": "anzeigen@degruyter.com",
+    "market": "DE",
+    "titles": [
+      "Automatisierungstechnik"
+    ]
+  },
+  {
+    "email": "kundenservice@ulmer.de",
+    "market": "DE",
+    "titles": [
+      "BWagrar"
+    ]
+  },
+  {
+    "email": "anzeigen@stamm.de",
+    "market": "DE",
+    "titles": [
+      "Erziehung und Wissenschaft"
+    ]
+  },
+  {
+    "email": "sales@publish-industry.net",
+    "market": "DE",
+    "titles": [
+      "Energy 2.0"
+    ]
+  },
+  {
+    "email": "olaf.schneider@vde-verlag.de",
+    "market": "DE",
+    "titles": [
+      "Sonne, Wind & Wärme"
+    ]
+  },
+  {
+    "email": "k.wiesner@emvg.de",
+    "market": "DE",
+    "titles": [
+      "E&M Energie & Management"
+    ]
+  },
+  {
+    "email": "behrens@dfv.de",
+    "market": "DE",
+    "titles": [
+      "AHGZ (Allgemeine Hotel- und Gastronomie-Zeitung)"
+    ]
+  },
+  {
+    "email": "info.hogapage@buhl-gruppe.de",
+    "market": "DE",
+    "titles": [
+      "Hogapage"
+    ]
+  },
+  {
+    "email": "franziska.harfy@crain.com",
+    "market": "DE",
+    "titles": [
+      "Automobilwoche"
+    ]
+  },
+  {
+    "email": "rolf.fritsche@maenken.com",
+    "market": "DE",
+    "titles": [
+      "kfz-anzeiger"
+    ]
+  },
+  {
+    "email": "torsten.wessel@chmielorz.de",
+    "market": "DE",
+    "titles": [
+      "Sport+Mode"
+    ]
+  },
+  {
+    "email": "ubeyer@weka-fachmedien.de",
+    "market": "DE",
+    "titles": [
+      "Funkschau"
+    ]
+  },
+  {
+    "email": "truchsess-jacobi@ctj-media.de",
+    "market": "DE",
+    "titles": [
+      "LANline"
+    ]
+  },
+  {
+    "email": "oliver.hammel@behoerdenspiegel.de",
+    "market": "DE",
+    "titles": [
+      "Behörden Spiegel"
+    ]
+  },
+  {
+    "email": "werbung@businessad.de",
+    "market": "DE",
+    "titles": [
+      "Versicherungswirtschaft"
+    ]
+  },
+  {
+    "email": "anzeigen@dasinvestment.com",
+    "market": "DE",
+    "titles": [
+      "DAS INVESTMENT"
+    ]
+  },
+  {
+    "email": "susanne.sinss@hansa-online.de",
+    "market": "DE",
+    "titles": [
+      "Hansa"
+    ]
+  },
+  {
+    "email": "gvolkert@motorpresse.de",
+    "market": "DE",
+    "titles": [
+      "Eurotransport"
+    ]
+  },
+  {
+    "email": "anzeigen@logistik-heute.de",
+    "market": "DE",
+    "titles": [
+      "Logistik Heute"
+    ]
+  },
+  {
+    "email": "wortanzeigen@kroneanzeigen.at",
+    "market": "AT",
+    "titles": [
+      "Kronen Zeitung"
+    ]
+  },
+  {
+    "email": "beate.oesterreicher@heute.at",
+    "market": "AT",
+    "titles": [
+      "Heute"
+    ]
+  },
+  {
+    "email": "mediaservice@sn.at",
+    "market": "AT",
+    "titles": [
+      "Salzburger Nachrichten"
+    ]
+  },
+  {
+    "email": "anzeigen@nachrichten.at",
+    "market": "AT",
+    "titles": [
+      "Oberösterreichische Nachrichten (OÖN)"
+    ]
+  },
+  {
+    "email": "verkauf@tt.com",
+    "market": "AT",
+    "titles": [
+      "Tiroler Tageszeitung"
+    ]
+  },
+  {
+    "email": "sales@falter.at",
+    "market": "AT",
+    "titles": [
+      "Falter"
+    ]
+  },
+  {
+    "email": "anzeigen@gewinn.com",
+    "market": "AT",
+    "titles": [
+      "Gewinn"
+    ]
+  },
+  {
+    "email": "carolin.daiker@datum.at",
+    "market": "AT",
+    "titles": [
+      "Datum"
+    ]
+  },
+  {
+    "email": "anzeigen@welt-der-frauen.at",
+    "market": "AT",
+    "titles": [
+      "Welt der Frau"
+    ]
+  },
+  {
+    "email": "anzeigen@falstaff.at",
+    "market": "AT",
+    "titles": [
+      "Falstaff Österreich"
+    ]
+  },
+  {
+    "email": "rene.gruber@oeamtc.at",
+    "market": "AT",
+    "titles": [
+      "ÖAMTC AutoTouring"
+    ]
+  },
+  {
+    "email": "m@arboe.at",
+    "market": "AT",
+    "titles": [
+      "ARBÖ Freie Fahrt"
+    ]
+  },
+  {
+    "email": "bergauf@agentur-ds.at",
+    "market": "AT",
+    "titles": [
+      "ÖAV Bergauf"
+    ]
+  },
+  {
+    "email": "matthias.seiringer@orf.at",
+    "market": "AT",
+    "titles": [
+      "ORF.at"
+    ]
+  },
+  {
+    "email": "anzeigen@aerztezeitung.at",
+    "market": "AT",
+    "titles": [
+      "Österreichische Ärztezeitung"
+    ]
+  },
+  {
+    "email": "a.valenta@manstein.at",
+    "market": "AT",
+    "titles": [
+      "Horizont Austria"
+    ]
+  },
+  {
+    "email": "vertrieb@oberauer.com",
+    "market": "AT",
+    "titles": [
+      "Der Österreichische Journalist"
+    ]
+  },
+  {
+    "email": "christof.hillbrand@bauernzeitung.at",
+    "market": "AT",
+    "titles": [
+      "Bauernzeitung"
+    ]
+  },
+  {
+    "email": "online-redaktion@blickinsland.at",
+    "market": "AT",
+    "titles": [
+      "Blick ins Land"
+    ]
+  },
+  {
+    "email": "marketing@regal.at",
+    "market": "AT",
+    "titles": [
+      "Regal"
+    ]
+  },
+  {
+    "email": "renate.jochinger@itwelt.at",
+    "market": "AT",
+    "titles": [
+      "Computerwelt"
+    ]
+  },
+  {
+    "email": "i.brand@edw.or.at",
+    "market": "AT",
+    "titles": [
+      "Sonntag (Kirche)"
+    ]
+  },
+  {
+    "email": "chur.promotion@somedia.ch",
+    "market": "CH",
+    "titles": [
+      "Südostschweiz"
+    ]
+  },
+  {
+    "email": "inserate@pomona.ch",
+    "market": "CH",
+    "titles": [
+      "Walliser Bote"
+    ]
+  },
+  {
+    "email": "inserate@vaterland.li",
+    "market": "CH",
+    "titles": [
+      "Liechtensteiner Vaterland"
+    ]
+  },
+  {
+    "email": "valais@impactmedias.ch",
+    "market": "CH",
+    "titles": [
+      "Le Nouvelliste"
+    ]
+  },
+  {
+    "email": "support@media-f.ch",
+    "market": "CH",
+    "titles": [
+      "La Liberté"
+    ]
+  },
+  {
+    "email": "pub@lecourrier.ch",
+    "market": "CH",
+    "titles": [
+      "Le Courrier"
+    ]
+  },
+  {
+    "email": "pub@regiopress.ch",
+    "market": "CH",
+    "titles": [
+      "La Regione"
+    ]
+  },
+  {
+    "email": "anzeigen@coop.ch",
+    "market": "CH",
+    "titles": [
+      "Coopzeitung"
+    ]
+  },
+  {
+    "email": "swegmann@datasport.com",
+    "market": "CH",
+    "titles": [
+      "FIT for LIFE"
+    ]
+  },
+  {
+    "email": "as@hrtoday.ch",
+    "market": "CH",
+    "titles": [
+      "HR Today"
+    ]
+  },
+  {
+    "email": "info@nau.ch",
+    "market": "CH",
+    "titles": [
+      "Nau.ch"
+    ]
+  },
+  {
+    "email": "philipp.lutzer@emh.ch",
+    "market": "CH",
+    "titles": [
+      "Schweizerische Ärztezeitung"
+    ]
+  },
+  {
+    "email": "pharmajournal@pharmasuisse.org",
+    "market": "CH",
+    "titles": [
+      "pharmaJournal"
+    ]
+  },
+  {
+    "email": "verlag@hochparterre.ch",
+    "market": "CH",
+    "titles": [
+      "Hochparterre"
+    ]
+  },
+  {
+    "email": "werbung@schweizerbauer.ch",
+    "market": "CH",
+    "titles": [
+      "Schweizer Bauer"
+    ]
+  },
+  {
+    "email": "sandra.wohlhauser@hotelleriesuisse.ch",
+    "market": "CH",
+    "titles": [
+      "Schweizer Hotelier"
+    ]
+  },
+  {
+    "email": "m-k@fachmedien.ch",
+    "market": "CH",
+    "titles": [
+      "Werbewoche"
+    ]
+  },
+  {
+    "email": "inserate@kimedia.ch",
+    "market": "CH",
+    "titles": [
+      "Plädoyer"
+    ]
+  },
+  {
+    "email": "media@svv.ch",
+    "market": "CH",
+    "titles": [
+      "Schweizer Versicherung"
+    ]
+  },
+  {
+    "email": "anzeigen@schweizerjaeger.ch",
+    "market": "CH",
+    "titles": [
+      "Schweizer Jäger"
+    ]
+  },
+  {
+    "email": "u.notz@kueba.ch",
+    "market": "CH",
+    "titles": [
+      "reformiert."
+    ]
+  },
+  {
+    "email": "urs.scharnowski@ideaschweiz.ch",
+    "market": "CH",
+    "titles": [
+      "Idea Schweiz"
+    ]
+  },
+  {
+    "email": "direction@cath-info.ch",
+    "market": "CH",
+    "titles": [
+      "Cath.ch"
+    ]
+  },
+  {
+    "email": "annonse@firdatidend.no",
+    "market": "NO",
+    "titles": [
+      "Firda Tidend"
+    ]
+  },
+  {
+    "email": "annonse@andoyposten.no",
+    "market": "NO",
+    "titles": [
+      "Andøyposten"
+    ]
+  },
+  {
+    "email": "annonse@boblad.no",
+    "market": "NO",
+    "titles": [
+      "Bø Blad"
+    ]
+  },
+  {
+    "email": "annonse@bomlo-nytt.no",
+    "market": "NO",
+    "titles": [
+      "Bømlo-Nytt"
+    ]
+  },
+  {
+    "email": "annonse@fjell-ljom.no",
+    "market": "NO",
+    "titles": [
+      "Fjell-Ljom"
+    ]
+  },
+  {
+    "email": "annonse@dagogtid.no",
+    "market": "NO",
+    "titles": [
+      "Dag og Tid"
+    ]
+  },
+  {
+    "email": "annonse@hallingdolen.no",
+    "market": "NO",
+    "titles": [
+      "Hallingdølen"
+    ]
+  },
+  {
+    "email": "annonse@haramsnytt.no",
+    "market": "NO",
+    "titles": [
+      "Haramsnytt"
+    ]
+  },
+  {
+    "email": "marked@kanalen.no",
+    "market": "NO",
+    "titles": [
+      "Kanalen"
+    ]
+  },
+  {
+    "email": "annonse@klassekampen.no",
+    "market": "NO",
+    "titles": [
+      "Klassekampen"
+    ]
+  },
+  {
+    "email": "annonse@klebuposten.no",
+    "market": "NO",
+    "titles": [
+      "Klæbuposten"
+    ]
+  },
+  {
+    "email": "annonser@lp.no",
+    "market": "NO",
+    "titles": [
+      "Lillesands-Posten"
+    ]
+  },
+  {
+    "email": "natasha.bolger@kildare-nationalist.ie",
+    "market": "IE",
+    "titles": [
+      "Liffey Champion"
+    ]
+  },
+  {
+    "email": "annonsar@marsteinen.no",
+    "market": "NO",
+    "titles": [
+      "Marsteinen"
+    ]
+  },
+  {
+    "email": "annonse@ryfylke.net",
+    "market": "NO",
+    "titles": [
+      "Ryfylke"
+    ]
+  },
+  {
+    "email": "annonser@setesdolen.no",
+    "market": "NO",
+    "titles": [
+      "Setesdølen"
+    ]
+  },
+  {
+    "email": "annonse@stord24.no",
+    "market": "NO",
+    "titles": [
+      "Stord24"
+    ]
+  },
+  {
+    "email": "annonse@subjekt.no",
+    "market": "NO",
+    "titles": [
+      "Subjekt"
+    ]
+  },
+  {
+    "email": "annonse@suldalsposten.no",
+    "market": "NO",
+    "titles": [
+      "Suldalsposten"
+    ]
+  },
+  {
+    "email": "marked@svalbardposten.no",
+    "market": "NO",
+    "titles": [
+      "Svalbardposten"
+    ]
+  },
+  {
+    "email": "annonser@sva.no",
+    "market": "NO",
+    "titles": [
+      "Sør-Varanger Avis"
+    ]
+  },
+  {
+    "email": "annonser@venneslatidende.no",
+    "market": "NO",
+    "titles": [
+      "Vennesla Tidende"
+    ]
+  },
+  {
+    "email": "marked@vol.no",
+    "market": "NO",
+    "titles": [
+      "Vesteraalens Avis"
+    ]
+  },
+  {
+    "email": "post@bondevennen.no",
+    "market": "NO",
+    "titles": [
+      "Bondevennen"
+    ]
+  },
+  {
+    "email": "annonse@healthtalk.no",
+    "market": "NO",
+    "titles": [
+      "HealthTalk"
+    ]
+  },
+  {
+    "email": "elisabeth.yri@norskfisk.no",
+    "market": "NO",
+    "titles": [
+      "Norsk Sjømat"
+    ]
+  },
+  {
+    "email": "annonser@psykologisk.no",
+    "market": "NO",
+    "titles": [
+      "Psykologisk.no"
+    ]
+  },
+  {
+    "email": "annons@varldenidag.se",
+    "market": "SE",
+    "titles": [
+      "Världen Idag"
+    ]
+  },
+  {
+    "email": "annons@haparandabladet.se",
+    "market": "SE",
+    "titles": [
+      "Haparandabladet"
+    ]
+  },
+  {
+    "email": "annonssynpunkter@svd.se",
+    "market": "SE",
+    "titles": [
+      "Bil & Bostad"
+    ]
+  },
+  {
+    "email": "annons@lira.se",
+    "market": "SE",
+    "titles": [
+      "Lira Musikmagasin"
+    ]
+  },
+  {
+    "email": "annons@husbyggaren.se",
+    "market": "SE",
+    "titles": [
+      "Husbyggaren"
+    ]
+  },
+  {
+    "email": "annons@sandaren.se",
+    "market": "SE",
+    "titles": [
+      "Sändaren"
+    ]
+  },
+  {
+    "email": "annons@kyrkanstidning.se",
+    "market": "SE",
+    "titles": [
+      "Kyrkans Tidning"
+    ]
+  },
+  {
+    "email": "annons@hemmetsvan.se",
+    "market": "SE",
+    "titles": [
+      "Hemmets Vän"
+    ]
+  },
+  {
+    "email": "annons@varakatter.se",
+    "market": "SE",
+    "titles": [
+      "Katten"
+    ]
+  },
+  {
+    "email": "myynti@kuljetuslehti.fi",
+    "market": "FI",
+    "titles": [
+      "Kuljetus"
+    ]
+  },
+  {
+    "email": "ilmo@sell.fi",
+    "market": "FI",
+    "titles": [
+      "Eläinlääkäriliiton lehti"
+    ]
+  },
+  {
+    "email": "myynti@skrolli.fi",
+    "market": "FI",
+    "titles": [
+      "Skrolli"
+    ]
+  },
+  {
+    "email": "ilmoitusmyynti@valio.fi",
+    "market": "FI",
+    "titles": [
+      "Maito ja Me"
+    ]
+  },
+  {
+    "email": "ilmoitus@mt.fi",
+    "market": "FI",
+    "titles": [
+      "Maatilan Tila"
+    ]
+  },
+  {
+    "email": "ilmoitusmyynti@kotimaa.fi",
+    "market": "FI",
+    "titles": [
+      "Kotimaa"
+    ]
+  },
+  {
+    "email": "andrea.ahslund@mediakraft.se",
+    "market": "SE",
+    "titles": [
+      "Tandläkartidningen"
+    ]
+  },
+  {
+    "email": "roger.johansson@informa.se",
+    "market": "SE",
+    "titles": [
+      "Energi & Miljö"
+    ]
+  },
+  {
+    "email": "salesuk@amg.biz",
+    "market": "UK",
+    "titles": [
+      "Eastern Eye"
+    ]
+  },
+  {
+    "email": "advertising@thecatholicherald.com",
+    "market": "UK",
+    "titles": [
+      "The Catholic Herald"
+    ]
+  },
+  {
+    "email": "advertising@irishnews.com",
+    "market": "UK",
+    "titles": [
+      "Irish News"
+    ]
+  },
+  {
+    "email": "advertising@camdennewjournal.com",
+    "market": "UK",
+    "titles": [
+      "The Camden New Journal"
+    ]
+  },
+  {
+    "email": "advertising@hackneycitizen.co.uk",
+    "market": "UK",
+    "titles": [
+      "Hackney Citizen"
+    ]
+  },
+  {
+    "email": "sales@bylinetimes.com",
+    "market": "UK",
+    "titles": [
+      "Byline Times"
+    ]
+  },
+  {
+    "email": "advertising@wsc.co.uk",
+    "market": "UK",
+    "titles": [
+      "When Saturday Comes"
+    ]
+  },
+  {
+    "email": "ads@lrb.co.uk",
+    "market": "UK",
+    "titles": [
+      "London Review of Books"
+    ]
+  },
+  {
+    "email": "sales@dublinpeople.com",
+    "market": "IE",
+    "titles": [
+      "Dublin People"
+    ]
+  },
+  {
+    "email": "sales@redcoms.org",
+    "market": "IE",
+    "titles": [
+      "Reality"
+    ]
+  },
+  {
+    "email": "anita@a2media.no",
+    "market": "NO",
+    "titles": [
+      "Ambulanseforum"
+    ]
+  },
+  {
+    "email": "annonser@creokultur.no",
+    "market": "NO",
+    "titles": [
+      "Kontekst"
+    ]
+  },
+  {
+    "email": "jonas@advertise.se",
+    "market": "SE",
+    "titles": [
+      "Vagabond"
+    ]
+  },
+  {
+    "email": "linda.l@pausermedia.se",
+    "market": "SE",
+    "titles": [
+      "Vd-tidningen"
+    ]
+  },
+  {
+    "email": "calle@advertise.se",
+    "market": "SE",
+    "titles": [
+      "Åka Skidor"
+    ]
+  },
+  {
+    "email": "annonce@k.dk",
+    "market": "DK",
+    "titles": [
+      "Kristeligt Dagblad"
+    ]
+  },
+  {
+    "email": "annons@aumedia.fi",
+    "market": "FI",
+    "titles": [
+      "Åbo Underrättelser"
+    ]
+  },
+  {
+    "email": "lisa@ottwaymediasolutions.com",
+    "market": "UK",
+    "titles": [
+      "The Tablet"
+    ]
+  },
+  {
+    "email": "customer.service@totalpolitics.com",
+    "market": "UK",
+    "titles": [
+      "Conservative Home"
+    ]
+  },
+  {
+    "email": "debbiegraham@ipn.ie",
+    "market": "IE",
+    "titles": [
+      "Irish Pharmacy News"
+    ]
+  },
+  {
+    "email": "advertising@imjmedia.ie",
+    "market": "IE",
+    "titles": [
+      "Adworld"
+    ]
+  },
+  {
+    "email": "vinduet@vinduet.no",
+    "market": "NO",
+    "titles": [
+      "Vinduet"
+    ]
+  },
+  {
+    "email": "salg@at.no",
+    "market": "NO",
+    "titles": [
+      "Anlegg & Transport"
+    ]
+  },
+  {
+    "email": "havard@josimar.no",
+    "market": "NO",
+    "titles": [
+      "Josimar"
+    ]
+  },
+  {
+    "email": "rebecca@musicbizworldwide.com",
+    "market": "UK",
+    "titles": [
+      "Music Business Worldwide"
+    ]
+  },
+  {
+    "email": "gb@intelligentlogistik.se",
+    "market": "SE",
+    "titles": [
+      "Logistikk i Norden"
+    ]
+  },
+  {
+    "email": "annoncer@fbg.dk",
+    "market": "DK",
+    "titles": [
+      "Maskinbladet"
+    ]
+  },
+  {
+    "email": "info@selectmedialtd.com",
+    "market": "IE",
+    "titles": [
+      "Irish Runner"
+    ]
+  },
+  {
+    "email": "ingerline@blv.no",
+    "market": "NO",
+    "titles": [
+      "Bladet Vesterålen"
+    ]
+  },
+  {
+    "email": "sture@ballade.no",
+    "market": "NO",
+    "titles": [
+      "Ballade"
+    ]
+  },
+  {
+    "email": "post@tennis.no",
+    "market": "NO",
+    "titles": [
+      "Tennis Norge"
+    ]
+  },
+  {
+    "email": "hans.petter.taraldsvik@telecomrevy.no",
+    "market": "NO",
+    "titles": [
+      "Telecom Revy"
+    ]
+  },
+  {
+    "email": "annons@dagen.se",
+    "market": "SE",
+    "titles": [
+      "Dagen"
+    ]
+  },
+  {
+    "email": "info@glanta.org",
+    "market": "SE",
+    "titles": [
+      "Glänta"
+    ]
+  },
+  {
+    "email": "info@tmf.se",
+    "market": "SE",
+    "titles": [
+      "Trä & Möbelforum"
+    ]
+  },
+  {
+    "email": "per@anlaggningsvarlden.se",
+    "market": "SE",
+    "titles": [
+      "Anläggningsvärlden"
+    ]
+  },
+  {
+    "email": "miriam.andersson@travelnews.se",
+    "market": "SE",
+    "titles": [
+      "Travel News"
+    ]
+  },
+  {
+    "email": "admin@basilisk.dk",
+    "market": "DK",
+    "titles": [
+      "Banana Split"
+    ]
+  },
+  {
+    "email": "jaana.raunola@sana.fi",
+    "market": "FI",
+    "titles": [
+      "Sana"
+    ]
+  },
+  {
+    "email": "aisha.roberts@insurancetimes.co.uk",
+    "market": "UK",
+    "titles": [
+      "Insurance Times"
+    ]
+  },
+  {
+    "email": "jross@irishcountrymagazine.ie",
+    "market": "IE",
+    "titles": [
+      "Irish Country Magazine"
+    ]
+  },
+  {
+    "email": "john@frolendingen.no",
+    "market": "NO",
+    "titles": [
+      "Frolendingen"
+    ]
+  },
+  {
+    "email": "es@mittkongsvinger.no",
+    "market": "NO",
+    "titles": [
+      "Mitt Kongsvinger"
+    ]
+  },
+  {
+    "email": "annonser@samningen.no",
+    "market": "NO",
+    "titles": [
+      "Samningen"
+    ]
+  },
+  {
+    "email": "post@vp.no",
+    "market": "NO",
+    "titles": [
+      "Vaksdalposten"
+    ]
+  },
+  {
+    "email": "hello@fruits.co",
+    "market": "NO",
+    "titles": [
+      "Demo (DUL)"
+    ]
+  },
+  {
+    "email": "trond.hansen@kondis.no",
+    "market": "NO",
+    "titles": [
+      "Kondis"
+    ]
+  },
+  {
+    "email": "post@bakeri.net",
+    "market": "NO",
+    "titles": [
+      "Bakeri.net"
+    ]
+  },
+  {
+    "email": "lars.oman@svenskjakt.se",
+    "market": "SE",
+    "titles": [
+      "Svensk Jakt"
+    ]
+  },
+  {
+    "email": "yuksel.u@pausermedia.se",
+    "market": "SE",
+    "titles": [
+      "Miljö & Utveckling"
+    ]
+  },
+  {
+    "email": "jo@dmfnet.dk",
+    "market": "DK",
+    "titles": [
+      "Journalisten"
+    ]
+  },
+  {
+    "email": "erkki.maki@motouutiset.fi",
+    "market": "FI",
+    "titles": [
+      "MP Lehti"
+    ]
+  },
+  {
+    "email": "jonathan.asfaw@pressgazette.co.uk",
+    "market": "UK",
+    "titles": [
+      "Press Gazette"
+    ]
+  },
+  {
+    "email": "sam.thompson@grocerygazette.co.uk",
+    "market": "UK",
+    "titles": [
+      "Grocery Gazette"
+    ]
+  },
+  {
+    "email": "ads@avondhupress.ie",
+    "market": "IE",
+    "titles": [
+      "Avondhu Press"
+    ]
+  },
+  {
+    "email": "s.mcintosh@gaeliclife.com",
+    "market": "IE",
+    "titles": [
+      "Gaelic Life"
+    ]
+  },
+  {
+    "email": "brian@retailnews.ie",
+    "market": "IE",
+    "titles": [
+      "Retail News"
+    ]
+  },
+  {
+    "email": "dagligleder@stoffmagasin.no",
+    "market": "NO",
+    "titles": [
+      "STOFF magasin"
+    ]
+  },
+  {
+    "email": "post@abm-media.no",
+    "market": "NO",
+    "titles": [
+      "Bok & Bibliotek"
+    ]
+  },
+  {
+    "email": "anne-lise@lkmedia.no",
+    "market": "NO",
+    "titles": [
+      "Hold Pusten"
+    ]
+  },
+  {
+    "email": "servicedesk@kirkepartner.no",
+    "market": "NO",
+    "titles": [
+      "Kirken.no Magasin"
+    ]
+  },
+  {
+    "email": "mk@hsmedia.no",
+    "market": "NO",
+    "titles": [
+      "Ledernytt"
+    ]
+  },
+  {
+    "email": "maria@lime.nu",
+    "market": "SE",
+    "titles": [
+      "Jaktjournalen"
+    ]
+  },
+  {
+    "email": "roger.nilsson@3fmediagroup.com",
+    "market": "SE",
+    "titles": [
+      "Fiskejournalen"
+    ]
+  },
+  {
+    "email": "vejde@adviser.se",
+    "market": "SE",
+    "titles": [
+      "Arkitektur"
+    ]
+  },
+  {
+    "email": "acke@sqfab.se",
+    "market": "SE",
+    "titles": [
+      "Byggnadsarbetaren"
+    ]
+  },
+  {
+    "email": "hrf@hansreitzel.dk",
+    "market": "DK",
+    "titles": [
+      "Hotel & Restaurant"
+    ]
+  },
+  {
+    "email": "dibyggeri@di.dk",
+    "market": "DK",
+    "titles": [
+      "Bygmesteren"
+    ]
+  },
+  {
+    "email": "arbetarbladet@gmail.com",
+    "market": "FI",
+    "titles": [
+      "Demokraatti"
+    ]
+  },
+  {
+    "email": "tuulikki.terhemaa@evl.fi",
+    "market": "FI",
+    "titles": [
+      "Kirkonkello"
+    ]
+  },
+  {
+    "email": "info@hargreaves-esq.com",
+    "market": "UK",
+    "titles": [
+      "Sports Insight"
+    ]
+  },
+  {
+    "email": "info@riai.ie",
+    "market": "IE",
+    "titles": [
+      "Architecture Ireland"
+    ]
+  },
+  {
+    "email": "agolovin1986@gmail.com",
+    "market": "NO",
+    "titles": [
+      "Fretta.no"
+    ]
+  },
+  {
+    "email": "post@handikapnytt.no",
+    "market": "NO",
+    "titles": [
+      "Handikapnytt"
+    ]
+  },
+  {
+    "email": "stina@optikerforbund.no",
+    "market": "NO",
+    "titles": [
+      "Optikeren"
+    ]
+  },
+  {
+    "email": "jari.nummikoski@saarsalo.fi",
+    "market": "FI",
+    "titles": [
+      "Rakennustaito"
+    ]
+  },
+  {
+    "email": "rebecca.nolan@markallengroup.com",
+    "market": "UK",
+    "titles": [
+      "HR Magazine"
+    ]
+  },
+  {
+    "email": "brendasmith@mediateam.ie",
+    "market": "IE",
+    "titles": [
+      "TechCentral.ie"
+    ]
+  },
+  {
+    "email": "irene.oerke@tysver-bygdeblad.no",
+    "market": "NO",
+    "titles": [
+      "Tysvær Bygdeblad"
+    ]
+  },
+  {
+    "email": "suek@churchtimes.co.uk",
+    "market": "UK",
+    "titles": [
+      "Church Times"
+    ]
+  },
+  {
+    "email": "sandra@adviser.se",
+    "market": "SE",
+    "titles": [
+      "Forskning & Framsteg"
+    ]
+  },
+  {
+    "email": "elisabeth@salgsfabrikken.no",
+    "market": "NO",
+    "titles": [
+      "Forsvarets Forum (F)"
+    ]
+  },
+  {
+    "email": "advertising@reachplc.com",
+    "market": "UK",
+    "titles": [
+      "Daily Record",
+      "Sunday Mail",
+      "Bath Chronicle",
+      "Birmingham Mail",
+      "BirminghamLive",
+      "Birmingham Post",
+      "Bristol Post",
+      "Cambridge News",
+      "Paisley Daily Express",
+      "Newcastle Chronicle",
+      "The Cornishman",
+      "Western Daily Press",
+      "ChronicleLive",
+      "Devon Live",
+      "WalesOnline",
+      "Star",
+      "Liverpool Echo",
+      "The Leader",
+      "Coventry Telegraph",
+      "Derby Telegraph",
+      "Huddersfield Daily Examiner",
+      "Hull Daily Mail",
+      "Lincolnshire Echo",
+      "Nottingham Post",
+      "The Journal",
+      "Cornish Guardian",
+      "Gloucestershire Echo",
+      "Essex Chronicle",
+      "Hertfordshire Mercury",
+      "Bristol Live",
+      "Burton Mail",
+      "LancsLive",
+      "MyLondon",
+      "Stoke Sentinel",
+      "Tamworth Herald",
+      "New!",
+      "OK!",
+      "Western Morning News",
+      "Leicester Mercury",
+      "Plymouth Herald",
+      "Daily Express",
+      "Daily Star",
+      "Daily Star Sunday",
+      "Sunday Express",
+      "Wales on Sunday",
+      "South Wales Echo",
+      "South Wales Evening Post",
+      "Western Mail",
+      "Daily Post",
+      "Sunday Mirror",
+      "Sunday People",
+      "Daily Mirror",
+      "Manchester Evening News"
+    ]
+  },
+  {
+    "email": "hsmedia@hsmedia.no",
+    "market": "NO",
+    "titles": [
+      "Illustrert Vitenskap",
+      "Iform",
+      "National Geographic Norge",
+      "Aktiv Trening",
+      "Vi Menn",
+      "Norsk Golf",
+      "Barnehage.no",
+      "Bedre Skole",
+      "Første Steg",
+      "Spesialpedagogikk",
+      "Utdanning",
+      "Utdanningsnytt",
+      "Yrke",
+      "OBOS-bladet",
+      "VG Endelig Fredag",
+      "VG Bilag",
+      "Vi Menn Bil",
+      "Vi Menn Bobil",
+      "Vi Menn Båt",
+      "Allers Julens Ideer",
+      "Se og Hør Ekstra",
+      "KK Jul",
+      "Bonde & Småbruker",
+      "Allers",
+      "Digital Foto",
+      "Jeger",
+      "Vi over 60",
+      "Energiteknikk",
+      "Norsk Veterinærtidsskrift",
+      "Lyskultur",
+      "Naturkanal1",
+      "Gjør det Selv",
+      "Dine Penger",
+      "Fysioterapeuten",
+      "Tidsskrift for Den norske legeforening",
+      "Bolig & Miljø",
+      "Hus & Bolig",
+      "IKEA Family Live",
+      "Camping i Norge",
+      "Motor",
+      "Vakre Hjem & Interiør",
+      "Coop Medlem",
+      "Kode24",
+      "NHO Magasinet",
+      "BAM (Bondelag)",
+      "Norsk Golf (digital)"
+    ]
+  },
+  {
+    "email": "advertising@donegallive.ie",
+    "market": "IE",
+    "titles": [
+      "Donegal Democrat",
+      "Limerick Leader",
+      "Donegal People's Press",
+      "Kilkenny People",
+      "Leitrim Observer",
+      "Longford Leader",
+      "Munster Express",
+      "Nationalist (Carlow)",
+      "Nenagh Guardian",
+      "Offaly Express",
+      "Waterford News & Star",
+      "Westmeath Examiner",
+      "Westmeath Independent",
+      "Sligo Weekender",
+      "Echo (Cork)",
+      "Western People",
+      "Limerick Chronicle",
+      "Dundalk Democrat",
+      "Leinster Express",
+      "Leinster Leader",
+      "Tipperary Star",
+      "Irish Examiner Farming",
+      "Irish Examiner"
+    ]
+  },
+  {
+    "email": "tony.sjosten@gotamedia.se",
+    "market": "SE",
+    "titles": [
+      "Barometern Oskarshamns-Tidningen",
+      "Östra Småland",
+      "Nybro Tidning",
+      "Smålands-Tidningen",
+      "Blekinge Läns Tidning",
+      "Borås Tidning",
+      "Kristianstadsbladet",
+      "Smålandsposten",
+      "Sydöstran",
+      "Tranås Tidning",
+      "Trelleborgs Allehanda",
+      "Vetlanda-Posten",
+      "Värnamo Nyheter",
+      "Ystads Allehanda"
+    ]
+  },
+  {
+    "email": "karl.byrne@dmgmedia.ie",
+    "market": "IE",
+    "titles": [
+      "Irish Daily Mail",
+      "Irish Mail on Sunday",
+      "VIP Magazine",
+      "U Magazine",
+      "EVOKE.ie",
+      "Extra.ie",
+      "Her.ie"
+    ]
+  },
+  {
+    "email": "vanessa.leppert@wbv.de",
+    "market": "DE",
+    "titles": [
+      "Baby und Familie",
+      "Apotheken Umschau",
+      "Diabetes Ratgeber",
+      "Senioren Ratgeber"
+    ]
+  },
+  {
+    "email": "opportunities@licensingworld.ie",
+    "market": "IE",
+    "titles": [
+      "Hotel & Catering Review",
+      "Hospitality Ireland",
+      "Licensing World"
+    ]
+  },
+  {
+    "email": "gerald.ulbricht.extern@dvvmedia.com",
+    "market": "DE",
+    "titles": [
+      "DVZ Deutsche Verkehrs-Zeitung",
+      "Schiff & Hafen",
+      "THB Täglicher Hafenbericht"
+    ]
+  },
+  {
+    "email": "aperitif@aperitif.no",
+    "market": "NO",
+    "titles": [
+      "Aperitif",
+      "Apéritif"
+    ]
+  },
+  {
+    "email": "annons@magasinetkonkret.se",
+    "market": "SE",
+    "titles": [
+      "Magasinet Konkret"
+    ]
+  },
+  {
+    "email": "suvi.kainulainen@hiihtoliitto.fi",
+    "market": "FI",
+    "titles": [
+      "Suomen Hiihtotapahtumat"
+    ]
+  },
+  {
+    "email": "anzeigen-auftragsbearbeitung@mainpost.de",
+    "market": "DE",
+    "titles": [
+      "Mainpost"
+    ]
+  },
+  {
+    "email": "inserate@tages-anzeiger.ch",
+    "market": "CH",
+    "titles": [
+      "Tages-Anzeiger"
+    ]
+  },
+  {
+    "email": "jan.erik@nemitek.no",
+    "market": "NO",
+    "titles": [
+      "Byggdrifteren"
+    ]
+  }
+]
