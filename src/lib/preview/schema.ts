@@ -20,10 +20,10 @@ export interface Article {
   body: string[];
 }
 
-// Strip ASCII control chars (keep normal whitespace), collapse, trim.
+// Strip ASCII control chars but keep tab/newline/CR (legitimate in a multi-line textarea), then trim.
 function clean(s: string): string {
   // eslint-disable-next-line no-control-regex
-  return s.replace(/[\u0000-\u001F\u007F]/g, "").trim();
+  return s.replace(/[\u0000-\u0008\u000B\u000C\u000E-\u001F\u007F]/g, "").trim();
 }
 
 const schema = z.object({

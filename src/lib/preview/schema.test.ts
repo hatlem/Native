@@ -29,6 +29,20 @@ test("parsePreviewInput strips control characters", () => {
   }
 });
 
+test("parsePreviewInput preserves newlines in a multi-line product", () => {
+  const r = parsePreviewInput({
+    brand: "Acme",
+    product: "Electric SUV.\nRange: 400 km\nFamily-friendly.",
+    market: "NO",
+    tone: "plain",
+  });
+  assert.equal(r.ok, true);
+  if (r.ok) {
+    assert.ok(r.value.product.includes("\n"), "newlines kept");
+    assert.ok(r.value.product.includes("Range: 400 km"), "words not merged");
+  }
+});
+
 test("marketLanguage maps all 9 markets to 6 languages", () => {
   assert.equal(marketLanguage("NO"), "no");
   assert.equal(marketLanguage("SE"), "sv");
