@@ -118,3 +118,7 @@ export const exportLimiter = new RateLimiter(5, 5 / 3600); // 5 per hour
 // runs can't exceed our daily/hourly caps. Defaults to ~8/hour which
 // is the Gmail/Yahoo "casual sender" sweet spot during domain warmup.
 export const outreachLimiter = new RateLimiter(8, 8 / 3600);
+// Public "preview your own native ad" tool. Gates only the expensive Claude
+// path per IP; over-limit callers still get a (free) template article, so
+// abuse can't run up model cost. ~15/hour.
+export const previewLimiter = new RateLimiter(15, 15 / 3600);
