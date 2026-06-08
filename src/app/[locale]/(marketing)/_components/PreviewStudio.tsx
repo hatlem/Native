@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useTranslations } from "next-intl";
 import type { Article, MarketCode, Tone } from "@/lib/preview/schema";
 import { PreviewControls, type MarketOption } from "./PreviewControls";
@@ -37,9 +37,17 @@ export function PreviewStudio({ markets, defaultDisclosure }: { markets: MarketM
 
   const disclosure = markets.find((m) => m.code === market)?.disclosureLabel || defaultDisclosure;
 
+  // Release the object URL when the uploaded image is replaced, swapped for a
+  // preset, or the studio unmounts — otherwise each upload leaks a blob.
+  useEffect(() => {
+    if (!photoUrl) return;
+    return () => URL.revokeObjectURL(photoUrl);
+  }, [photoUrl]);
+
   async function generate() {
     setLoading(true);
     setError(false);
+    setSource(null); // clear the prior badge so it can't mislabel this run
     try {
       const res = await fetch("/api/preview-ad", {
         method: "POST",
