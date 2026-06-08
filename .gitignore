@@ -30,7 +30,7 @@ next-env.d.ts
 sec-review.md
 sec-review-*.md
 
-# scenario fixtures (large binaries — kept out of git)
+# scenario fixtures (large binaries Ã¢ÂÂ kept out of git)
 test-fixtures/
 
 # local DB snapshots (pg_dump safety nets taken before destructive migrations)
@@ -48,3 +48,7 @@ testit-*.md
 # tesseract.js OCR language data (downloaded at runtime)
 *.traineddata
 *.traineddata.gz
+
+# Outreach mediekit/rate-card binaries — originals live in R2 (RateCardDocument table), not git
+docs/outreach-sources/**/*.pdf
+docs/outreach-sources/**/*.png

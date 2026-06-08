@@ -7,13 +7,16 @@ import { prisma } from "@/lib/prisma";
 import { createContactLog } from "@/lib/pricing/contact-log";
 
 const ACTOR = "cmpmdiqtg048c0hu080m8kmok";
-const TODAY = "2026-06-04";
+const TODAY = "2026-06-08";
 
-// corrected re-sends after bounce diagnosis (right addresses verified on web)
+// 2026-06-08 SE batch: tailored Swedish price requests sent via Outlook (Admirate)
 const DELIVERED = [
-  "annons@flamman.se", "bokaannons@ntmmedia.se",
+  "kundcenter@gotamedia.se", "ola.tallbom@vkmedia.se", "annons@hbl.fi",
+  "mail@evagottfridsson.se", "redaktion@popularastronomi.se", "nils@res.se",
+  "redaktion@cykelframjandet.se", "anders@sb-media.se", "sofie@joforlaget.se",
+  "hej@slojdmagasinet.se",
 ];
-// bounced (undeliverable) — register so we know not to reuse
+// bounced (undeliverable, 550) — register so we know not to reuse + need correct contact
 const BOUNCED: string[] = [];
 
 async function logGroup(email: string, bounced: boolean) {
