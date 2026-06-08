@@ -58,7 +58,7 @@ export async function NativeVsDisplay({ locale }: { locale: string }) {
           </div>
         </div>
       </div>
-      <p className="vsd-caption">{t("preview.vsCaption")}</p>
+      <p className="vsd-caption" aria-hidden="true">{t("preview.vsCaption")}</p>
     </>
   );
 }

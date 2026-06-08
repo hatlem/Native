@@ -8,7 +8,7 @@ export async function HeroArticleMock({ locale }: { locale: string }) {
         <span className="dot" />
         <span className="dot" />
         <span className="dot" />
-        <span className="url">{t("preview.mastheadName").toLowerCase()}.example/sponset</span>
+        <span className="url">{t("preview.mastheadName").toLowerCase()}.example/sponsored</span>
       </div>
       <div className="na-masthead">
         <span className="na-name">{t("preview.mastheadName")}</span>
