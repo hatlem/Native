@@ -751,11 +751,13 @@ body:has(.bn) .drawer-link:hover { background: rgba(20,17,12,0.06) !important; }
 .bn .vs-table tbody td.display { color: var(--ink-mute); }
 
 /* — Golden rule — */
-.bn .rule { background: var(--ink); color: var(--paper); padding: clamp(80px, 9vw, 140px) 0; border-bottom: 2px solid var(--rule); }
+.bn .rule { background: var(--ink); color: var(--paper); padding: clamp(80px, 9vw, 140px) 0; border-bottom: 2px solid var(--rule); position: relative; overflow: hidden; }
+.bn .rule::before { content: ""; position: absolute; inset: 0; background-image: var(--bn-grain); opacity: .06; pointer-events: none; }
 .bn .rule .wrap {
   display: grid; grid-template-columns: 1fr 1.7fr;
   gap: clamp(32px, 5vw, 80px);
   align-items: start;
+  position: relative; z-index: 1;
 }
 .bn .rule .label-ix {
   font-size: 11px; text-transform: uppercase; letter-spacing: 0.18em; font-weight: 600;
@@ -1249,10 +1251,7 @@ body:has(.bn) .drawer-link:hover { background: rgba(20,17,12,0.06) !important; }
 .bn .vsd .popup .pbtn { display:inline-block; font-size:9px; text-transform:uppercase; letter-spacing:.1em; font-weight:700; background:var(--NO); color:#fff; padding:6px 13px; border-radius:3px; }
 .bn .vsd-caption { font-size:11px; text-transform:uppercase; letter-spacing:.14em; color:var(--ink-mute); font-weight:600; margin:0 0 clamp(28px,3vw,40px); }
 
-/* golden rule grain + excerpt */
-.bn .rule { position:relative; overflow:hidden; }
-.bn .rule::before { content:""; position:absolute; inset:0; background-image:var(--bn-grain); opacity:.06; pointer-events:none; }
-.bn .rule .wrap { position:relative; z-index:1; }
+/* golden rule excerpt (grain + .wrap layering folded into the base .bn .rule rules above) */
 .bn .rule-excerpt { background:rgba(237,232,219,.06); border-left:2px solid var(--paper); padding:18px 22px; border-radius:0 3px 3px 0; margin-top:24px; }
 .bn .rule-excerpt .re-tag { font-size:8.5px; text-transform:uppercase; letter-spacing:.16em; color:rgba(237,232,219,.55); font-weight:700; margin-bottom:10px; }
 .bn .rule-excerpt p { margin:0; font-family:Georgia,serif; font-size:15px; line-height:1.6; color:rgba(237,232,219,.92); }
