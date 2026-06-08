@@ -14,6 +14,7 @@ const REQUIRED = [
   "productLabel", "productPlaceholder", "imageLabel", "uploadLabel", "generate",
   "generating", "badgeAi", "badgeTemplate", "editHint", "mastheadName", "navNews",
   "navBusiness", "navCulture", "ctaHeading", "ctaDesk", "ctaAccess", "errorGenerate",
+  "fallbackHeadline", "fallbackStandfirst", "fallbackByline", "fallbackBody1", "fallbackBody2",
 ];
 
 test("en studio.json has every required key", () => {
