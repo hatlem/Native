@@ -39,3 +39,20 @@ test("all locales have the same key set as en (stubs present)", () => {
     assert.deepEqual(keys, enKeys, `locale ${loc} key mismatch`);
   }
 });
+
+import { STYLES } from "../../app/landing-styles";
+
+test("STYLES contains the preview-visual selectors", () => {
+  for (const sel of [
+    ".bn .na-frame",
+    ".bn .na-photo",
+    ".bn .vsd",
+    ".bn .vsd .popup",
+    ".bn .rule-excerpt",
+    ".bn .bq-flow",
+    ".bn .bq-total",
+    "--bn-grain",
+  ]) {
+    assert.ok(STYLES.includes(sel), `STYLES missing: ${sel}`);
+  }
+});
