@@ -26,5 +26,10 @@
   "ctaHeading": "Like what you see? The desk does this for real.",
   "ctaDesk": "Talk to the desk",
   "ctaAccess": "Request access",
-  "errorGenerate": "Couldn't generate just now — please try again."
+  "errorGenerate": "Couldn't generate just now — please try again.",
+  "fallbackHeadline": "Your headline appears here",
+  "fallbackStandfirst": "Type your brand, pick a market, and generate a sample native article.",
+  "fallbackByline": "By the editorial desk · 8 min read",
+  "fallbackBody1": "This is placeholder text. Hit Generate and the desk's AI writes a sample native article in the publication's voice, using your brand and what you want to promote.",
+  "fallbackBody2": "Native advertising reads like the page it sits on — that's the whole point. The preview shows you exactly how a reader would meet it."
 }

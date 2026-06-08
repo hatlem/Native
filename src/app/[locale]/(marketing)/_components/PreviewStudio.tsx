@@ -10,27 +10,24 @@ interface MarketMeta extends MarketOption {
   disclosureLabel: string;
 }
 
-const FALLBACK: Article = {
-  headline: "Your headline appears here",
-  standfirst: "Type your brand, pick a market, and generate a sample native article.",
-  byline: "By the editorial desk · 8 min read",
-  body: [
-    "This is placeholder body text. Hit Generate and the desk's AI will write a sample native article in the publication's voice, using your brand and what you want to promote.",
-    "Native advertising reads like the page it sits on — that's the whole point. The preview shows you exactly how a reader would meet it.",
-  ],
-};
-
 export function PreviewStudio({ markets, defaultDisclosure }: { markets: MarketMeta[]; defaultDisclosure: string }) {
   const t = useTranslations("landing");
+  // Pre-generation placeholder article, localized. Lazy initializer so it's
+  // built once from the current locale's copy.
+  const [article, setArticle] = useState<Article>(() => ({
+    headline: t("studio.fallbackHeadline"),
+    standfirst: t("studio.fallbackStandfirst"),
+    byline: t("studio.fallbackByline"),
+    body: [t("studio.fallbackBody1"), t("studio.fallbackBody2")],
+  }));
   const [brand, setBrand] = useState("Volvo");
   const [market, setMarket] = useState<MarketCode>(markets[0]?.code ?? "NO");
   const [tone, setTone] = useState<Tone>("warm");
-  const [product, setProduct] = useState(
-    "A new fully-electric SUV built for Nordic winters — long range, quiet, family-friendly.",
-  );
+  // Seed the product with the localized placeholder text so the demo works on
+  // first click and reads natively, rather than an English default.
+  const [product, setProduct] = useState(() => t("studio.productPlaceholder"));
   const [preset, setPreset] = useState("pv-pa");
   const [photoUrl, setPhotoUrl] = useState<string | null>(null);
-  const [article, setArticle] = useState<Article>(FALLBACK);
   const [source, setSource] = useState<"ai" | "template" | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(false);
