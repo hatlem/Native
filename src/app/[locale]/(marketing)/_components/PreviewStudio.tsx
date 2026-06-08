@@ -34,6 +34,10 @@ export function PreviewStudio({ markets, defaultDisclosure }: { markets: MarketM
   const [source, setSource] = useState<"ai" | "template" | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(false);
+  // Bumped on each successful generation. Used as PreviewArticle's `key` so the
+  // contentEditable nodes remount with fresh content — React won't otherwise
+  // update DOM text the user has already edited (suppressContentEditableWarning).
+  const [articleKey, setArticleKey] = useState(0);
 
   const disclosure = markets.find((m) => m.code === market)?.disclosureLabel || defaultDisclosure;
 
@@ -58,6 +62,7 @@ export function PreviewStudio({ markets, defaultDisclosure }: { markets: MarketM
       const data = (await res.json()) as { source: "ai" | "template"; article: Article };
       setArticle(data.article);
       setSource(data.source);
+      setArticleKey((k) => k + 1);
     } catch {
       setError(true);
     } finally {
@@ -95,6 +100,7 @@ export function PreviewStudio({ markets, defaultDisclosure }: { markets: MarketM
       />
       <div>
         <PreviewArticle
+          key={articleKey}
           article={article}
           source={source}
           brand={brand}

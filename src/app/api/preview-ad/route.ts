@@ -41,5 +41,11 @@ export async function POST(req: NextRequest | Request) {
     runClaude: (input) => generatePreviewArticle(input),
   });
 
-  return NextResponse.json(result, { headers: { "Cache-Control": "no-store" } });
+  // Only expose what the client needs. `reason` (no_key/rate_limited/ai_error)
+  // stays server-side so the public endpoint doesn't reveal whether the Claude
+  // integration is wired up.
+  return NextResponse.json(
+    { source: result.source, article: result.article },
+    { headers: { "Cache-Control": "no-store" } },
+  );
 }

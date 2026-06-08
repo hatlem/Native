@@ -52,6 +52,8 @@ export function PreviewArticle({
         <h3
           contentEditable
           suppressContentEditableWarning
+          role="textbox"
+          aria-label={t("studio.editHint")}
           onBlur={(e) => onEditField("headline", e.currentTarget.textContent ?? "")}
         >
           {article.headline}
@@ -60,6 +62,9 @@ export function PreviewArticle({
           className="na-standfirst"
           contentEditable
           suppressContentEditableWarning
+          role="textbox"
+          aria-multiline="true"
+          aria-label={t("studio.editHint")}
           onBlur={(e) => onEditField("standfirst", e.currentTarget.textContent ?? "")}
         >
           {article.standfirst}
@@ -79,6 +84,9 @@ export function PreviewArticle({
               key={i}
               contentEditable
               suppressContentEditableWarning
+              role="textbox"
+              aria-multiline="true"
+              aria-label={t("studio.editHint")}
               onBlur={(e) => onEditBody(i, e.currentTarget.textContent ?? "")}
             >
               {para}
