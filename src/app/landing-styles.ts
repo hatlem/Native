@@ -1305,6 +1305,7 @@ body:has(.bn) .drawer-link:hover { background: rgba(20,17,12,0.06) !important; }
 .bn .pv-badge.tpl { background:transparent; color:var(--ink-mute); border:1px solid var(--hair); }
 .bn .pv-edithint { font-size:11px; color:var(--ink-mute); margin-top:10px; }
 .bn .pv-error { font-size:13px; color:var(--NO); margin-top:8px; }
+.bn .na-body { margin-top:18px; }
 .bn .na-art .na-body p { font-family:Georgia,serif; font-size:15px; line-height:1.62; color:#1d1a13; margin:0 0 12px; }
 .bn .na-art .na-body p:first-child::first-letter { font-size:42px; float:left; line-height:.8; margin:3px 8px 0 0; font-weight:700; }
 .bn [contenteditable]:focus { outline:2px dashed rgba(20,17,12,.4); outline-offset:3px; border-radius:2px; }
