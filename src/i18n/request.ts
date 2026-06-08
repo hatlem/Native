@@ -16,6 +16,7 @@ const LANDING_SECTIONS = [
   "newsletter",
   "team",
   "preview",
+  "studio",
 ] as const;
 
 export default getRequestConfig(async ({ requestLocale }) => {

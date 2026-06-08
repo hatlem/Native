@@ -140,6 +140,9 @@ export default async function HomePage({
                 <a href="#how" className="btn">
                   {t("hero.ctaSecondary")}
                 </a>
+                <Link href="/preview" className="btn">
+                  {t("hero.ctaTry")}
+                </Link>
               </div>
               <p className="btn-meta" style={{ marginTop: 18 }}>
                 {t("hero.ctaMeta")}
