@@ -66,10 +66,12 @@ export function PreviewArticle({
         </p>
         <div className="na-byline">{article.byline}</div>
         <div
-          className="na-photo"
-          {...(photoUrl
-            ? { style: { backgroundImage: `url(${JSON.stringify(photoUrl)})`, backgroundSize: "cover", backgroundPosition: "center" } }
-            : { className: `na-photo ${photoClass}` })}
+          className={photoUrl ? "na-photo" : `na-photo ${photoClass}`}
+          style={
+            photoUrl
+              ? { backgroundImage: `url(${JSON.stringify(photoUrl)})`, backgroundSize: "cover", backgroundPosition: "center" }
+              : undefined
+          }
         />
         <div className="na-body">
           {article.body.map((para, i) => (
