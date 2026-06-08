@@ -8,6 +8,10 @@ import { LandingShell } from "@/app/landing-shell";
 import { MailLink } from "@/components";
 import { NewsletterSignup } from "./_components/NewsletterSignup";
 import { PublisherStrip } from "./_components/PublisherStrip";
+import { HeroArticleMock } from "./_components/HeroArticleMock";
+import { NativeVsDisplay } from "./_components/NativeVsDisplay";
+import { GoldenRuleExcerpt } from "./_components/GoldenRuleExcerpt";
+import { BriefToQuote } from "./_components/BriefToQuote";
 
 const DESK_SUBJECT = "Talk to the NativeSpin desk";
 
@@ -149,6 +153,9 @@ export default async function HomePage({
               <p>{t("hero.sideBody")}</p>
             </aside>
           </div>
+          <div className="hero-showcase">
+            <HeroArticleMock locale={locale} />
+          </div>
         </div>
       </section>
 
@@ -197,6 +204,8 @@ export default async function HomePage({
             <h2>{t("vs.h2")}</h2>
           </div>
 
+          <NativeVsDisplay locale={locale} />
+
           <table className="vs-table" aria-label={t("vs.labelText")}>
             <thead>
               <tr>
@@ -237,6 +246,7 @@ export default async function HomePage({
           <div>
             <p className="body">{t.rich("rule.body", richTags)}</p>
             <div className="sig">{t("rule.sig")}</div>
+            <GoldenRuleExcerpt locale={locale} />
           </div>
         </div>
       </section>
@@ -403,6 +413,7 @@ export default async function HomePage({
               </div>
             ))}
           </div>
+          <BriefToQuote locale={locale} />
         </div>
       </section>
 
