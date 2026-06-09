@@ -52,3 +52,7 @@ testit-*.md
 # Outreach mediekit/rate-card binaries — originals live in R2 (RateCardDocument table), not git
 docs/outreach-sources/**/*.pdf
 docs/outreach-sources/**/*.png
+docs/outreach-sources/**/*.xlsx
+docs/outreach-sources/**/*.eml
+docs/outreach-sources/**/*.zip
+docs/outreach-sources/_dl-*/

@@ -58,23 +58,26 @@ async function main() {
   const next: Group[] = [];
   for (const m of order) for (const g of byMarketUncontacted[m] ?? []) next.push(g);
 
-  // Pull catalog profile for the next NO candidates so each email can be tailored.
-  const slice = next.filter((g) => g.market === "SE").slice(0, 30);
-  console.log(`\n=== Next ${slice.length} SE candidates with catalog profile (for tailoring) ===`);
-  for (const g of slice) {
-    const t = await prisma.title.findFirst({
-      where: { countryCode: g.market, name: { in: g.titles, mode: "insensitive" } },
-      select: { name: true, description: true, keywords: true, websiteUrl: true, city: true, region: true },
-    });
-    console.log(`\n• ${g.email}  → ${g.titles.join(", ")}`);
-    if (t) {
-      console.log(`   name: ${t.name}`);
-      if (t.city || t.region) console.log(`   place: ${[t.city, t.region].filter(Boolean).join(", ")}`);
-      if (t.websiteUrl) console.log(`   url: ${t.websiteUrl}`);
-      if (t.keywords?.length) console.log(`   keywords: ${t.keywords.join(", ")}`);
-      if (t.description) console.log(`   desc: ${t.description}`);
-    } else {
-      console.log(`   (no catalog match)`);
+  // Pull catalog profile for the next SE + DK candidates so each email can be tailored.
+  const PER_MARKET = Number(process.env.PER_MARKET ?? 15);
+  for (const m of ["SE", "DK"]) {
+    const slice = (byMarketUncontacted[m] ?? []).slice(0, PER_MARKET);
+    console.log(`\n========== Next ${slice.length} ${m} candidates with catalog profile ==========`);
+    for (const g of slice) {
+      const t = await prisma.title.findFirst({
+        where: { countryCode: g.market, name: { in: g.titles, mode: "insensitive" } },
+        select: { name: true, description: true, keywords: true, websiteUrl: true, city: true, region: true },
+      });
+      console.log(`\n• ${g.email}  → ${g.titles.join(", ")}`);
+      if (t) {
+        console.log(`   name: ${t.name}`);
+        if (t.city || t.region) console.log(`   place: ${[t.city, t.region].filter(Boolean).join(", ")}`);
+        if (t.websiteUrl) console.log(`   url: ${t.websiteUrl}`);
+        if (t.keywords?.length) console.log(`   keywords: ${t.keywords.join(", ")}`);
+        if (t.description) console.log(`   desc: ${t.description}`);
+      } else {
+        console.log(`   (no catalog match)`);
+      }
     }
   }
 }
