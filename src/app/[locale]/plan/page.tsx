@@ -3,9 +3,8 @@ import { MarketCode } from "@prisma/client";
 import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
 import { getWorkspace } from "@/lib/workspace";
-import { Link } from "@/i18n/navigation";
 import { readBasket, readPlanBrief } from "@/lib/basket";
-import { indicativeFromRules, toRateRules, formatMoney } from "@/lib/money";
+import { indicativeFromRules, toRateRules } from "@/lib/money";
 import { isProductPriceShown } from "@/lib/pricing-visibility";
 import { recommendTiered, type Candidate, type SupplementaryTitle } from "@/lib/recommend";
 import {
@@ -16,10 +15,10 @@ import {
   type MatchableTitle,
 } from "@/lib/brief-match";
 import { enrichBriefWithLLM, llmEnrichmentAvailable } from "@/lib/brief-match-llm";
-import { removeFromPlan, setQuantity, addToPlan, setContentProduction } from "@/app/plan-actions";
-import { submitRequest } from "@/app/checkout-actions";
-import { AUDIENCE_SEGMENTS } from "@/lib/targeting/segments";
-import { SubmitButton } from "@/components";
+import { PlanBanners } from "./_components/PlanBanners";
+import { PlanStart } from "./_components/PlanStart";
+import { PlanLines } from "./_components/PlanLines";
+import { PlanSummary, type Rollup } from "./_components/PlanSummary";
 
 const MARKET_CODES = Object.values(MarketCode);
 
@@ -35,17 +34,6 @@ export default async function PlanPage({
   const { locale } = await params;
   const sp = await searchParams;
   const t = await getTranslations({ locale, namespace: "plan" });
-  const tf = await getTranslations({ locale, namespace: "firm" });
-  const tr = await getTranslations({ locale, namespace: "rfq" });
-  const tSeg = await getTranslations({ locale, namespace: "targetSegment" });
-  const tType = await getTranslations({ locale, namespace: "productType" });
-  const ta = await getTranslations({ locale, namespace: "auth" });
-  const tNav = await getTranslations({ locale, namespace: "nav" });
-  const tv = await getTranslations({
-    locale,
-    namespace: "priceVisibility",
-  });
-  const tMarket = await getTranslations({ locale, namespace: "market" });
 
   const session = await auth();
 
@@ -103,7 +91,6 @@ export default async function PlanPage({
   // NOK + SEK + DKK rows up front — even when only one of them has a
   // visible total today. Hiding the locked currencies entirely was the
   // Erlend bug: the CFO defense relies on seeing all three lines.
-  type Rollup = { amount: number; hasVisible: boolean; hasHidden: boolean };
   const totalsByCurrency = new Map<string, Rollup>();
   for (const l of lines) {
     const cur = l.product.currency;
@@ -271,331 +258,31 @@ export default async function PlanPage({
         <p className="lead">{t("lead")}</p>
       </header>
 
-      {sp.error ? (
-        <div className="banner-error" role="alert">
-          <span>{t("error")}</span>
-        </div>
-      ) : null}
-
-      {/* Surfaced by duplicatePlan (Maja R2 / "use as template") so the
-          buyer knows how many items survived the rehydration. */}
-      {typeof sp.duplicate === "string" ? (
-        sp.duplicate === "ok" ? (
-          <div className="banner-info" role="status">
-            <span>{t("duplicateOk")}</span>
-          </div>
-        ) : sp.duplicate.startsWith("partial-") ? (
-          <div className="banner-info" role="status">
-            <span>
-              {t("duplicatePartial", {
-                dropped: sp.duplicate.slice("partial-".length),
-              })}
-            </span>
-          </div>
-        ) : sp.duplicate === "all-inactive" ? (
-          <div className="banner-error" role="alert">
-            <span>{t("duplicateAllInactive")}</span>
-          </div>
-        ) : null
-      ) : null}
+      <PlanBanners locale={locale} error={sp.error} duplicate={sp.duplicate} />
 
       {lines.length === 0 ? (
-        <div className="plan-start">
-          <form className="plan-start-form" method="get">
-            <h2>{t("startTitle")}</h2>
-            <p className="muted small">{t("startLead")}</p>
-            <div className="field">
-              <label htmlFor="recBrief">{t("briefLabel")}</label>
-              <textarea
-                id="recBrief"
-                name="recBrief"
-                rows={3}
-                maxLength={2000}
-                placeholder={t("briefPlaceholder")}
-                defaultValue={recBriefRaw}
-              />
-              <span className="hint">{t("briefHint")}</span>
-            </div>
-            <div className="field">
-              <label htmlFor="recMarket">{tr("market")}</label>
-              <select id="recMarket" name="recMarket" defaultValue={recMarket || homeMarket || ""}>
-                {MARKET_CODES.map((m) => (
-                  <option key={m} value={m}>{tMarket(m)}</option>
-                ))}
-              </select>
-            </div>
-            <div className="field">
-              <label htmlFor="recBudget">{tr("budget")}</label>
-              <input id="recBudget" name="recBudget" type="number" min="0" defaultValue={recBudgetRaw} />
-            </div>
-            <SubmitButton label={t("recommend")} pendingLabel={t("recommending")} />
-            <Link href="/catalog" className="link small">{t("browse")}</Link>
-          </form>
-
-          {rec ? (
-            <div className="plan-start-results">
-              {rec.picks.length > 0 ? (
-                <>
-                  <h3>{briefMatched ? t("recForBrief") : t("recForBudget")}</h3>
-                  <div className="action-list">
-                    {rec.picks.map((p) => (
-                      <div className="item" key={p.productId}>
-                        <div>
-                          <div className="title">{p.titleName}</div>
-                          <div className="sub muted small">{tType(p.type)} · {tr("fromPrice", { price: formatMoney(p.unitPrice, recCurrency, locale) })} · {p.reach.toLocaleString(locale)} {t("reach")}</div>
-                          {p.reasons && p.reasons.length > 0 ? (
-                            <div className="cluster tight" style={{ marginTop: "0.35rem" }}>
-                              {p.reasons.slice(0, 4).map((r) => (
-                                <span className="tag" key={r}>{r}</span>
-                              ))}
-                            </div>
-                          ) : null}
-                        </div>
-                        <form action={addToPlan}>
-                          <input type="hidden" name="locale" value={locale} />
-                          <input type="hidden" name="productId" value={p.productId} />
-                          <button type="submit" className="btn small">{t("add")}</button>
-                        </form>
-                      </div>
-                    ))}
-                  </div>
-                </>
-              ) : null}
-              {rec.supplementary.length > 0 ? (
-                <>
-                  <h3>{t("recAlsoConsider")}</h3>
-                  <div className="action-list">
-                    {rec.supplementary.map((s) => (
-                      <div className="item" key={s.productId}>
-                        <div>
-                          <div className="title">{s.titleName}</div>
-                          <div className="sub muted small">{tv("requestPrice")} · {s.reach.toLocaleString(locale)} {t("reach")}</div>
-                        </div>
-                        <form action={addToPlan}>
-                          <input type="hidden" name="locale" value={locale} />
-                          <input type="hidden" name="productId" value={s.productId} />
-                          <button type="submit" className="btn small ghost">{t("add")}</button>
-                        </form>
-                      </div>
-                    ))}
-                  </div>
-                </>
-              ) : null}
-              {rec.picks.length === 0 && rec.supplementary.length === 0 ? (
-                <p className="muted small">{t("recNone")}</p>
-              ) : null}
-            </div>
-          ) : null}
-        </div>
+        <PlanStart
+          locale={locale}
+          recBriefRaw={recBriefRaw}
+          recMarket={recMarket}
+          recBudgetRaw={recBudgetRaw}
+          homeMarket={homeMarket}
+          rec={rec}
+          recCurrency={recCurrency}
+          briefMatched={briefMatched}
+        />
       ) : (
         <div className="split">
-          <div>
-            <div className="section-head">
-              <div>
-                <span className="eyebrow">{t("linesEyebrow")}</span>
-                <h2>{t("linesHeading")}</h2>
-              </div>
-              <span className="muted small">
-                {t("itemCount", { count: lines.length })}
-              </span>
-            </div>
-            {hasHiddenPrice ? (
-              <div className="banner-info" role="status">
-                <span>{tv("planRfqOnly")}</span>
-              </div>
-            ) : null}
-            <div className="action-list">
-              {lines.map((l) => (
-                <div className="item plan-item" key={l.product.id}>
-                  <span className="tag">{tType(l.product.type)}</span>
-                  <div>
-                    <div className="title">{l.product.title.name}</div>
-                    <div className="sub plan-qty">
-                      <form action={setQuantity} className="plan-qty-step">
-                        <input type="hidden" name="locale" value={locale} />
-                        <input type="hidden" name="productId" value={l.product.id} />
-                        <input type="hidden" name="quantity" value={l.quantity - 1} />
-                        <button type="submit" className="btn small ghost" aria-label={t("decrement")} disabled={l.quantity <= 1}>−</button>
-                      </form>
-                      <span aria-live="polite">{t("qty")}: {l.quantity}</span>
-                      <form action={setQuantity} className="plan-qty-step">
-                        <input type="hidden" name="locale" value={locale} />
-                        <input type="hidden" name="productId" value={l.product.id} />
-                        <input type="hidden" name="quantity" value={l.quantity + 1} />
-                        <button type="submit" className="btn small ghost" aria-label={t("increment")}>+</button>
-                      </form>
-                    </div>
-                    <form action={setContentProduction} className="plan-content-toggle">
-                      <input type="hidden" name="locale" value={locale} />
-                      <input type="hidden" name="productId" value={l.product.id} />
-                      <input type="hidden" name="withContent" value={l.withContent ? "0" : "1"} />
-                      <button
-                        type="submit"
-                        className={`btn small ${l.withContent ? "" : "ghost"}`}
-                        aria-pressed={l.withContent}
-                        title={t("contentProductionHint")}
-                      >
-                        {l.withContent ? `✓ ${t("contentProduction")}` : `+ ${t("contentProduction")}`}
-                      </button>
-                    </form>
-                  </div>
-                  <div className="cluster tight">
-                    {l.priceVisible ? (
-                      <span className="price plan-line-price">
-                        {formatMoney(l.lineTotal, l.product.currency, locale)}
-                      </span>
-                    ) : (
-                      <span className="muted small plan-line-price">
-                        {tv("requestPrice")}
-                      </span>
-                    )}
-                    <form action={removeFromPlan}>
-                      <input type="hidden" name="locale" value={locale} />
-                      <input type="hidden" name="productId" value={l.product.id} />
-                      <button type="submit" className="btn small ghost">
-                        {t("remove")}
-                      </button>
-                    </form>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-
-          <aside className="plan-summary">
-            <div className="plan-summary-head">
-              <span className="muted small">{t("estTotal")}</span>
-              <div className="plan-summary-total">
-                {totals
-                  .filter(([, r]) => r.hasVisible)
-                  .map(([cur, r]) => (
-                    <div className="price" key={cur}>
-                      {formatMoney(r.amount, cur, locale)}
-                      {r.hasHidden ? (
-                        <span className="muted small"> + {tv("requestPrice")}</span>
-                      ) : null}
-                    </div>
-                  ))}
-                {hasHiddenPrice && !totals.some(([, r]) => r.hasVisible) ? (
-                  <div className="muted small">{t("pricingOnRequest")}</div>
-                ) : null}
-              </div>
-              {allFirm ? (
-                <span className="badge badge-info dotless">
-                  ⚡ {tf("badge")}
-                </span>
-              ) : null}
-            </div>
-
-            <h3>{allFirm ? tf("planTitle") : t("rfqTitle")}</h3>
-            {allFirm ? <p className="muted small">{tf("planNote")}</p> : null}
-
-            {needsClient ? (
-              <p className="muted small">
-                {tr("selectClient")}{" "}
-                <Link href="/agency" className="link">
-                  {tNav("agency")}
-                </Link>
-              </p>
-            ) : activeOrg ? (
-              <form action={submitRequest} className="product-form">
-                <input type="hidden" name="locale" value={locale} />
-                <p className="muted small">
-                  {tr("requestingAs")}: <strong>{activeOrg.name}</strong>
-                </p>
-                <div className="field">
-                  <label htmlFor="budget">{tr("budget")}</label>
-                  <input
-                    id="budget"
-                    name="budget"
-                    type="number"
-                    min="0"
-                    defaultValue={briefDraft.budget}
-                  />
-                </div>
-                <div className="field">
-                  <label htmlFor="audience">{tr("audience")}</label>
-                  <input
-                    id="audience"
-                    name="audience"
-                    defaultValue={briefDraft.audience}
-                  />
-                </div>
-                <div className="field">
-                  <label htmlFor="goal">{tr("goal")}</label>
-                  <input
-                    id="goal"
-                    name="goal"
-                    defaultValue={briefDraft.goal}
-                  />
-                </div>
-                <div className="field">
-                  <label>{tr("targetAudienceLabel")}</label>
-                  <div className="checkbox-grid">
-                    {AUDIENCE_SEGMENTS.map((s) => (
-                      <label key={s} className="checkbox">
-                        <input
-                          type="checkbox"
-                          name="targetAudience"
-                          value={s}
-                          defaultChecked={briefDraft.targetAudience
-                            .split(",")
-                            .includes(s)}
-                        />
-                        {tSeg(s)}
-                      </label>
-                    ))}
-                  </div>
-                </div>
-                <div className="field">
-                  <label htmlFor="targetGeo">{tr("targetGeoLabel")}</label>
-                  <input
-                    id="targetGeo"
-                    name="targetGeo"
-                    defaultValue={briefDraft.targetGeo}
-                    placeholder={tr("targetGeoPlaceholder")}
-                  />
-                </div>
-                <div className="field">
-                  <label htmlFor="targetContext">{tr("targetContextLabel")}</label>
-                  <input
-                    id="targetContext"
-                    name="targetContext"
-                    defaultValue={briefDraft.targetContext}
-                    placeholder={tr("targetContextPlaceholder")}
-                  />
-                </div>
-                <div className="field">
-                  <label htmlFor="brief">{tr("brief")}</label>
-                  <textarea
-                    id="brief"
-                    name="brief"
-                    rows={3}
-                    defaultValue={briefDraft.brief}
-                  />
-                </div>
-                <SubmitButton
-                  label={allFirm ? tf("planSubmit") : tr("submit")}
-                  pendingLabel={
-                    allFirm ? tf("planSubmitting") : tr("submitting")
-                  }
-                  className="btn block"
-                />
-              </form>
-            ) : (
-              <div className="auth-fallback">
-                <p className="muted small">{tr("loginRequired")}</p>
-                <div className="cluster">
-                  <Link href="/signin" className="btn small secondary">
-                    {ta("signin")}
-                  </Link>
-                  <Link href="/signup" className="btn small">
-                    {ta("signup")}
-                  </Link>
-                </div>
-              </div>
-            )}
-          </aside>
+          <PlanLines locale={locale} lines={lines} hasHiddenPrice={hasHiddenPrice} />
+          <PlanSummary
+            locale={locale}
+            totals={totals}
+            hasHiddenPrice={hasHiddenPrice}
+            allFirm={allFirm}
+            needsClient={needsClient}
+            activeOrg={activeOrg}
+            briefDraft={briefDraft}
+          />
         </div>
       )}
     </>
