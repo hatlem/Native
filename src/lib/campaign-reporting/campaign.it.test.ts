@@ -257,6 +257,14 @@ if (!RUN_DB_IT) {
         }
       }
     }
+    // Catch-all: the order-walk above misses plans/requests/quotes that
+    // never got a full order chain (or whose chain a failed run already
+    // half-deleted) — and any survivor blocks the org delete on its FK.
+    await prisma.quoteLine.deleteMany({ where: { quote: { request: { organizationId: orgId } } } });
+    await prisma.quote.deleteMany({ where: { request: { organizationId: orgId } } });
+    await prisma.request.deleteMany({ where: { organizationId: orgId } });
+    await prisma.planItem.deleteMany({ where: { plan: { organizationId: orgId } } });
+    await prisma.plan.deleteMany({ where: { organizationId: orgId } });
     await prisma.auditLog.deleteMany({ where: { actor: actorId } });
     await prisma.user.deleteMany({ where: { id: actorId } });
     await prisma.organization.deleteMany({ where: { id: orgId } });

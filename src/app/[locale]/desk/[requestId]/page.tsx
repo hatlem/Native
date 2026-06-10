@@ -3,7 +3,7 @@ import { notFound } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import { Link } from "@/i18n/navigation";
 import { formatMoney } from "@/lib/money";
-import { generateQuote } from "@/app/actions";
+import { generateQuote } from "@/app/quote-actions";
 import { StatusBadge } from "@/app/status-badge";
 import { SubmitButton } from "@/components";
 

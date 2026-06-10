@@ -8,7 +8,7 @@ const ACTOR = "cmpmdiqtg048c0hu080m8kmok";
 async function findNO(name: string) {
   return prisma.title.findFirst({ where: { countryCode: "NO", name: { equals: name, mode: "insensitive" } }, select: { id: true, name: true } });
 }
-async function getOrCreateLog(titleId, note) {
+async function getOrCreateLog(titleId: string, note: string) {
   const existing = await prisma.contactLog.findFirst({ where: { titleId, note: { contains: "NMF Mediakit 2026" } }, select: { id: true } });
   if (existing) return existing;
   return createContactLog({ titleId, channel: "EMAIL", direction: "INBOUND", note, actorId: ACTOR });

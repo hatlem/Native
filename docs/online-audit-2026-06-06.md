@@ -177,5 +177,5 @@ Per the catalog data standard: no live signal -> quarantined, never guessed aliv
 - FI: mediamyynti@motouutiset.fi — titles: MP Lehti
 - DK: hrf@hansreitzel.dk — titles: Hotel & Restaurant
 
-Full provenance (every verdict + evidence URL): `outreach_online_audit_0606.json`.
+Full provenance (every verdict + evidence URL): `data/outreach/outreach_online_audit_0606.json`.
 Re-apply with `node scripts/apply-online-audit-0606.cjs` (idempotent).

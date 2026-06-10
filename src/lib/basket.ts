@@ -110,3 +110,20 @@ export async function readBasket(): Promise<BasketItem[]> {
 export function serializeBasket(items: BasketItem[]): string {
   return JSON.stringify(items);
 }
+
+const COOKIE_OPTS = {
+  httpOnly: true,
+  sameSite: "lax" as const,
+  path: "/",
+  maxAge: 60 * 60 * 24 * 7,
+};
+
+export async function writeBasket(items: BasketItem[]): Promise<void> {
+  const store = await cookies();
+  store.set(PLAN_COOKIE, serializeBasket(items), COOKIE_OPTS);
+}
+
+export async function writePlanBrief(brief: PlanBrief): Promise<void> {
+  const store = await cookies();
+  store.set(PLAN_BRIEF_COOKIE, serializePlanBrief(brief), COOKIE_OPTS);
+}

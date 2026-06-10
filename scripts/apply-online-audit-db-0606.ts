@@ -1,4 +1,4 @@
-/** Sync the 2026-06-06 online audit (outreach_online_audit_0606.json) to the catalog.
+/** Sync the 2026-06-06 online audit (data/outreach/outreach_online_audit_0606.json) to the catalog.
  * - killed (dead/merged)       -> deactivate (discontinuedAt + sourced note, DISCONTINUED);
  *                                 merged: old name added to the survivor's aliases when it exists
  * - renamed                    -> rename title to current name, old name -> aliases, stamp LIVE;
@@ -21,7 +21,7 @@ const TAG = "online-audit 2026-06-06";
 type Killed = { market: string; group: string; title: string; status: string; becameTitle: string | null; note: string; evidence: string | null };
 type Renamed = { market: string; group: string; from: string; to: string; note: string; evidence: string | null };
 type TQuar = { market: string; group: string; title: string; status: string; note: string; evidence?: string | null };
-const audit = JSON.parse(readFileSync("outreach_online_audit_0606.json", "utf8"));
+const audit = JSON.parse(readFileSync("data/outreach/outreach_online_audit_0606.json", "utf8"));
 const killed: Killed[] = audit.killed;
 const renamed: Renamed[] = audit.renamed;
 const titleQuarantine: TQuar[] = audit.titleQuarantine;

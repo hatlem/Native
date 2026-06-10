@@ -20,7 +20,7 @@ const DELIVERED = [
 const BOUNCED: string[] = [];
 
 async function logGroup(email: string, bounced: boolean) {
-  const list: { email: string; market: string; titles: string[] }[] = JSON.parse(readFileSync("outreach_send_list.json", "utf8"));
+  const list: { email: string; market: string; titles: string[] }[] = JSON.parse(readFileSync("data/outreach/outreach_send_list.json", "utf8"));
   const group = list.find((g) => g.email.toLowerCase() === email.toLowerCase());
   if (!group) { console.log(`! ${email}: not in send list`); return; }
   // Match titles by exact name (case-insensitive) within the group's market.

@@ -1,6 +1,7 @@
 /** 2026-06-08 second reply wave (afternoon, 14:00–15:35). Dup-guarded via INBOUND
  * note tag. New native prices + commercial terms. Verified contact emails only. */
 import { prisma } from "@/lib/prisma";
+import type { ProductType } from "@prisma/client";
 import { createContactLog } from "@/lib/pricing/contact-log";
 import { createSalesContact, attachContactToTitle } from "@/lib/pricing/contacts";
 import { logQuote } from "@/lib/pricing/quotes";
@@ -18,7 +19,7 @@ async function ensureContact(publisherId: string, titleId: string, c: { name: st
   if (!sc) sc = await createSalesContact({ publisherId, name: c.name, email: c.email, phone: c.phone, role: c.role, notes: c.notes, actorId: ACTOR });
   await attachContactToTitle({ salesContactId: sc.id, titleId, isPrimary: c.primary ?? false, actorId: ACTOR });
 }
-type Q = { type: string; name: string; price: number; unit: "FLAT" | "CPC" | "CPM"; cur: string; desc: string };
+type Q = { type: ProductType; name: string; price: number; unit: "FLAT" | "CPC" | "CPM"; cur: string; desc: string };
 async function logQuotes(titleId: string, qs: Q[], note: string) {
   const log = await createContactLog({ titleId, channel: "EMAIL", direction: "INBOUND", note, actorId: ACTOR });
   for (const q of qs) await logQuote({ draftProductType: q.type, draftProductName: q.name, draftProductDesc: q.desc, contactLogId: log.id, price: q.price, currency: q.cur, priceUnit: q.unit, includedText: note.slice(0, 200), recordedById: ACTOR });

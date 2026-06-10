@@ -13,11 +13,11 @@ async function main(){
     if (titles.length){ mapped++; out.push({ email:x.best, market:titles[0].countryCode, titles:titles.map(t=>t.name), source:x.bestOnAdPage?"site-adpage":"site-adpattern", wasPlaceholder:x.email }); }
     else { unmapped++; out.push({ email:x.best, market:null, titles:[], source:x.bestOnAdPage?"site-adpage":"site-adpattern", wasPlaceholder:x.email, note:"no active catalog title matched domain" }); }
   }
-  writeFileSync("outreach_send_list_harvest_additions.json", JSON.stringify(out,null,2)+"\n");
+  writeFileSync("data/outreach/outreach_send_list_harvest_additions.json", JSON.stringify(out,null,2)+"\n");
   const by=r.reduce((a:any,x:any)=>{a[x.status]=(a[x.status]||0)+1;return a;},{});
   console.log("Harvest 1324 domains:", JSON.stringify(by));
   console.log(`Accepted (strict ad-sales): ${accept.length} | mapped to catalog title: ${mapped} | unmapped domain: ${unmapped}`);
-  console.log("Written: outreach_send_list_harvest_additions.json");
+  console.log("Written: data/outreach/outreach_send_list_harvest_additions.json");
   console.log("DROPPED (not silently): 259 CORRECTED rejected as billing/subscription/generic; 240 REVIEW (need manual look); 690 UNCONFIRMED; 75 ERROR.");
   await prisma.$disconnect();
 }

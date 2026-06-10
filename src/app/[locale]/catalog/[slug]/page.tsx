@@ -6,7 +6,7 @@ import { prisma } from "@/lib/prisma";
 import { Link } from "@/i18n/navigation";
 import { indicativeFromRules, toRateRules, formatMoney, intlLocale } from "@/lib/money";
 import { isProductPriceShown, arePricesVisible } from "@/lib/pricing-visibility";
-import { addToPlan } from "@/app/actions";
+import { addToPlan } from "@/app/plan-actions";
 import { SubmitButton } from "@/components";
 import { localizeTaxonomy, localizeVertical } from "@/lib/taxonomy-i18n";
 import type { AppLocale } from "@/i18n/routing";

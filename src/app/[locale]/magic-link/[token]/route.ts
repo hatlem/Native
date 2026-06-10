@@ -22,6 +22,7 @@ import { hashToken } from "@/lib/tokens";
 import { landingForRole } from "@/lib/roles";
 import { recordSignIn } from "@/lib/auth-events";
 import { recordAudit } from "@/lib/audit";
+import { appUrl, appName } from "@/lib/url";
 
 function clientIp(req: NextRequest): string {
   return (
@@ -29,19 +30,6 @@ function clientIp(req: NextRequest): string {
     req.headers.get("x-real-ip") ||
     "unknown"
   );
-}
-
-function appUrl(): string {
-  return (
-    process.env.AUTH_URL ??
-    process.env.NEXTAUTH_URL ??
-    process.env.NEXT_PUBLIC_SITE_URL ??
-    "http://localhost:3000"
-  );
-}
-
-function appName(): string {
-  return process.env.AUTH_APP_NAME ?? "NativeSpin";
 }
 
 export async function GET(

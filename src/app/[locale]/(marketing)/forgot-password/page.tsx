@@ -1,6 +1,6 @@
 import { getTranslations } from "next-intl/server";
 import { Link } from "@/i18n/navigation";
-import { requestPasswordReset } from "@/app/auth-actions";
+import { requestPasswordReset } from "@/app/password-actions";
 import { LandingShell } from "@/app/landing-shell";
 
 export const dynamic = "force-dynamic";

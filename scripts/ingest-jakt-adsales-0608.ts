@@ -6,6 +6,7 @@
  *     native + print prices, production fees. Courtesy close, no reply needed.
  * Idempotent: each title's quotes are skipped if its INBOUND ratecard log already exists. */
 import { prisma } from "@/lib/prisma";
+import type { ProductType } from "@prisma/client";
 import { createContactLog } from "@/lib/pricing/contact-log";
 import { createSalesContact, attachContactToTitle } from "@/lib/pricing/contacts";
 import { logQuote } from "@/lib/pricing/quotes";
@@ -27,7 +28,7 @@ async function alreadyIngested(titleId: string, tag: string) {
   return n > 0;
 }
 
-type Q = { type: string; name: string; price: number; unit: "FLAT" | "CPC" | "CPM"; desc: string };
+type Q = { type: ProductType; name: string; price: number; unit: "FLAT" | "CPC" | "CPM"; desc: string };
 
 // ---------------------------------------------------------------------------
 // A) Allt om Jakt & Vapen (JO Förlaget)

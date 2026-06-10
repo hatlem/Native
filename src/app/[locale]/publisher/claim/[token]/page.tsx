@@ -3,7 +3,7 @@ import { redirect } from "next/navigation";
 import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
 import { Link } from "@/i18n/navigation";
-import { claimPublisherInvite } from "@/app/auth-actions";
+import { claimPublisherInvite } from "@/app/claim-actions";
 import { checkInvite } from "@/lib/publisher-invite";
 import { LandingShell } from "@/app/landing-shell";
 import { SubmitButton } from "@/components";

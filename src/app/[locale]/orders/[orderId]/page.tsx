@@ -6,7 +6,7 @@ import { formatMoney, intlLocale } from "@/lib/money";
 import { loadScope, canActOnOrg } from "@/lib/scope";
 import { safeExternalUrl } from "@/lib/security";
 import { StatusBadge } from "@/app/status-badge";
-import { duplicatePlan } from "@/app/actions";
+import { duplicatePlan } from "@/app/plan-actions";
 import { clicksByOrderLine } from "@/lib/metrics/store";
 import { ctrPct } from "@/lib/reporting";
 import { SubmitButton } from "@/components";

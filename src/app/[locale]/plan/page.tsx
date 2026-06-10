@@ -16,7 +16,8 @@ import {
   type MatchableTitle,
 } from "@/lib/brief-match";
 import { enrichBriefWithLLM, llmEnrichmentAvailable } from "@/lib/brief-match-llm";
-import { removeFromPlan, submitRequest, setQuantity, addToPlan, setContentProduction } from "@/app/actions";
+import { removeFromPlan, setQuantity, addToPlan, setContentProduction } from "@/app/plan-actions";
+import { submitRequest } from "@/app/checkout-actions";
 import { AUDIENCE_SEGMENTS } from "@/lib/targeting/segments";
 import { SubmitButton } from "@/components";
 

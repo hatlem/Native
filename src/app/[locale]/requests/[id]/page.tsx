@@ -10,7 +10,7 @@ import {
   buildQuoteNarrative,
   anchorDiscountPct,
 } from "@/lib/quote-narrative";
-import { acceptAllQuotesForRequest } from "@/app/actions";
+import { acceptAllQuotesForRequest } from "@/app/quote-actions";
 import { StatusBadge } from "@/app/status-badge";
 import {
   Breadcrumb,

@@ -15,14 +15,14 @@
  * Contacted groups (verifiedBy delivered/reply) pass through untouched.
  * IDEMPOTENT: the uncontacted half is always rebuilt from the verdicts' inputs, and
  * prior audit-0606 quarantine entries are replaced, so re-running is safe.
- * Writes: outreach_send_list.json (rebuilt), outreach_send_list_quarantine.json,
- *         outreach_online_audit_0606.json (full provenance), /tmp/audit_summary.json
+ * Writes: data/outreach/outreach_send_list.json (rebuilt), data/outreach/outreach_send_list_quarantine.json,
+ *         data/outreach/outreach_online_audit_0606.json (full provenance), /tmp/audit_summary.json
  */
 const fs = require("fs");
 
-const sendList = JSON.parse(fs.readFileSync("outreach_send_list.json", "utf8"));
+const sendList = JSON.parse(fs.readFileSync("data/outreach/outreach_send_list.json", "utf8"));
 const verdicts = JSON.parse(fs.readFileSync("/tmp/verify_verdicts.json", "utf8"));
-const quarantineFile = JSON.parse(fs.readFileSync("outreach_send_list_quarantine.json", "utf8"))
+const quarantineFile = JSON.parse(fs.readFileSync("data/outreach/outreach_send_list_quarantine.json", "utf8"))
   .filter((q) => !/^audit-0606/.test(q.reason || "")); // drop prior runs of this audit
 
 const CONTACTED = new Set(["delivered", "reply"]);
@@ -112,11 +112,11 @@ for (const r of verdicts) {
   out.push(entry);
 }
 
-fs.writeFileSync("outreach_send_list.json", JSON.stringify(out, null, 2) + "\n");
-fs.writeFileSync("outreach_send_list_quarantine.json", JSON.stringify(
+fs.writeFileSync("data/outreach/outreach_send_list.json", JSON.stringify(out, null, 2) + "\n");
+fs.writeFileSync("data/outreach/outreach_send_list_quarantine.json", JSON.stringify(
   [...quarantineFile, ...newQuarantine, ...droppedGroups.map((d) => ({ email: d.email, market: d.market, titles: d.titles, reason: d.reason }))],
   null, 2) + "\n");
-fs.writeFileSync("outreach_online_audit_0606.json", JSON.stringify({
+fs.writeFileSync("data/outreach/outreach_online_audit_0606.json", JSON.stringify({
   auditedAt: "2026-06-06", workflowRun: "wf_1fdfa859-833",
   groupsAudited: verdicts.length,
   killed, renamed, titleQuarantine, emailCorrections,

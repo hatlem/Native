@@ -199,7 +199,7 @@ UNVERIFIED (1,257) catalog title checked online (workflow `wf_ae5c2906-90f`,
 
 ## Still uncertain (215 — flagged with fresh evidence notes, excluded from outreach)
 
-Full list with notes in `catalog_verification_0607.json`. Mostly suspected CSV
+Full list with notes in `data/catalog/catalog_verification_0607.json`. Mostly suspected CSV
 hallucinations (no such publication found) or brand/section confusions.
 
 Send-list impact: 3 titles in already-contacted groups removed (UTE closed,

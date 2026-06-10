@@ -164,9 +164,18 @@ export async function applyQuote(args: {
         },
       });
       productId = newProduct.id;
+      // The quote now references a catalog product, so the draft fields
+      // must clear — the PriceQuote_product_xor_draft DB constraint
+      // rejects a row that carries both. Their content lives on the
+      // product we just created.
       await tx.priceQuote.update({
         where: { id: quote.id },
-        data: { productId },
+        data: {
+          productId,
+          draftProductType: null,
+          draftProductName: null,
+          draftProductDesc: null,
+        },
       });
     } else {
       await tx.product.update({

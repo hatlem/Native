@@ -10,13 +10,13 @@
  *     single title's ad desk never hijacks a whole portfolio's sales contact.
  * Anything still unconfirmed -> QUARANTINE (never sent).
  * Discontinued titles are stripped; groups left with 0 active titles are dropped.
- * Writes outreach_send_list_verified.json + outreach_send_list_quarantine.json. */
+ * Writes data/outreach/outreach_send_list_verified.json + data/outreach/outreach_send_list_quarantine.json. */
 import { readFileSync, writeFileSync, existsSync } from "node:fs";
 import { prisma } from "@/lib/prisma";
 
 const PORTFOLIO_MIN = 8; // groups with >= this many titles: never override with a single-title adEmail
 type G = { email: string; market: string; titles: string[] };
-const groups: G[] = JSON.parse(readFileSync("outreach_send_list.json", "utf8"));
+const groups: G[] = JSON.parse(readFileSync("data/outreach/outreach_send_list.json", "utf8"));
 const harvest: { email: string; status: string; best: string | null }[] = JSON.parse(readFileSync("/tmp/email_verify.json", "utf8"));
 const ademails: { email: string; adEmail: string | null; source: string | null }[] =
   existsSync("/tmp/all_ademails.json") ? JSON.parse(readFileSync("/tmp/all_ademails.json", "utf8")) : [];
@@ -64,8 +64,8 @@ async function main() {
       quarantine.push({ email: g.email, market: g.market, titles, harvester: h && h.status || "UNKNOWN" });
     }
   }
-  writeFileSync("outreach_send_list_verified.json", JSON.stringify(sendable, null, 2) + "\n");
-  writeFileSync("outreach_send_list_quarantine.json", JSON.stringify(quarantine, null, 2) + "\n");
+  writeFileSync("data/outreach/outreach_send_list_verified.json", JSON.stringify(sendable, null, 2) + "\n");
+  writeFileSync("data/outreach/outreach_send_list_quarantine.json", JSON.stringify(quarantine, null, 2) + "\n");
   const summary = {
     inputGroups: groups.length, sendable: sendable.length, quarantined: quarantine.length,
     droppedEmptyGroups: groups.length - sendable.length - quarantine.length,
