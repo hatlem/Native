@@ -10,3 +10,8 @@ export function appUrl(): string {
     "http://localhost:3000"
   );
 }
+
+// Display name used in transactional email subjects/footers.
+export function appName(): string {
+  return process.env.AUTH_APP_NAME ?? "NativeSpin";
+}

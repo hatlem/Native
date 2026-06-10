@@ -1,6 +1,6 @@
 import { getTranslations } from "next-intl/server";
 import { Link } from "@/i18n/navigation";
-import { resetPassword } from "@/app/auth-actions";
+import { resetPassword } from "@/app/password-actions";
 import { LandingShell } from "@/app/landing-shell";
 import { prisma } from "@/lib/prisma";
 import { hashToken } from "@/lib/tokens";

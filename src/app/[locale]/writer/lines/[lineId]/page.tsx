@@ -1,6 +1,6 @@
 import { prisma } from "@/lib/prisma";
 import { requireLineWriter } from "@/lib/writers/guard";
-import { saveDraft, runSpecCheck, setAssetStatus } from "@/app/desk-actions";
+import { saveDraft, runSpecCheck, setAssetStatus } from "@/app/desk-content-actions";
 
 export default async function WriterLine({
   params,

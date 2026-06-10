@@ -4,7 +4,7 @@ import {
   saveFlightWindow,
   saveBookingMetricOverride,
   resendMetricsRequest,
-} from "@/app/desk-actions";
+} from "@/app/desk-reporting-actions";
 import { SubmitButton } from "@/components";
 import { safeExternalUrl } from "@/lib/security";
 

@@ -3,16 +3,14 @@ import { notFound } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import { Link } from "@/i18n/navigation";
 import { formatMoney } from "@/lib/money";
+import { advanceOrder, cancelOrder } from "@/app/desk-actions";
 import {
-  advanceOrder,
-  cancelOrder,
   saveDraft,
   runSpecCheck,
   setAssetStatus,
-  issueInvoice,
-  issueCreditNote,
   confirmTrackedLinks,
-} from "@/app/desk-actions";
+} from "@/app/desk-content-actions";
+import { issueInvoice, issueCreditNote } from "@/app/desk-billing-actions";
 import { assignWriterToLine } from "@/app/writer-pool-actions";
 import { writerStaffableLine } from "@/lib/authorship";
 import { WritersPanel } from "./writers-panel";

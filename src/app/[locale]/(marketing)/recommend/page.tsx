@@ -5,7 +5,7 @@ import { indicativeFromRules, toRateRules, formatMoney, intlLocale } from "@/lib
 import { arePricesVisible } from "@/lib/pricing/visibility";
 import { EmptyState } from "@/app/empty-state";
 import { recommendMix, type Candidate } from "@/lib/recommend";
-import { addRecommendedPlan } from "@/app/actions";
+import { addRecommendedPlan } from "@/app/plan-actions";
 import { LandingShell } from "@/app/landing-shell";
 import { SubmitButton } from "@/components";
 

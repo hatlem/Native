@@ -6,7 +6,7 @@ import { prisma } from "@/lib/prisma";
 import { assertSecret } from "@/lib/security";
 import { authLimiter } from "@/lib/rate-limit";
 import "@/lib/mail";
-import { hashToken } from "@/lib/tokens";
+import { consumeMagicLinkToken } from "@/lib/auth-tokens";
 
 assertSecret();
 
@@ -98,41 +98,18 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         const consume = await authLimiter.check(`magic-consume:ip:${ip}`);
         if (!consume.ok) return null;
 
-        const hash = hashToken(raw);
-
-        // updateMany with the guard clause atomically marks the token
-        // consumed if and only if it's still unused + unexpired. Wins
-        // double-click races: only one caller sees count === 1.
-        const updated = await prisma.magicLinkToken.updateMany({
-          where: { tokenHash: hash, consumedAt: null, expiresAt: { gt: new Date() } },
-          data: { consumedAt: new Date() },
-        });
-        if (updated.count !== 1) return null;
-
-        const row = await prisma.magicLinkToken.findUnique({
-          where: { tokenHash: hash },
-          include: {
-            user: {
-              include: { organization: { select: { id: true, type: true } } },
-            },
-          },
-        });
-        if (!row) return null;
-
-        if (!row.user.emailVerifiedAt) {
-          await prisma.user.update({
-            where: { id: row.userId },
-            data: { emailVerifiedAt: new Date() },
-          });
-        }
+        // Atomic single-use consume + emailVerifiedAt stamp — see
+        // @/lib/auth-tokens for the double-click race guarantee.
+        const user = await consumeMagicLinkToken(raw);
+        if (!user) return null;
 
         return {
-          id: row.user.id,
-          email: row.user.email,
-          name: row.user.name ?? undefined,
-          role: row.user.role,
-          orgId: row.user.organization?.id ?? null,
-          orgType: row.user.organization?.type ?? null,
+          id: user.id,
+          email: user.email,
+          name: user.name ?? undefined,
+          role: user.role,
+          orgId: user.orgId,
+          orgType: user.orgType,
         };
       },
     }),

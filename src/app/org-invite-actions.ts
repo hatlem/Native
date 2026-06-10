@@ -2,7 +2,6 @@
 
 import { AuthError } from "next-auth";
 import { redirect } from "next/navigation";
-import { headers } from "next/headers";
 import bcrypt from "bcryptjs";
 import { signIn } from "@/auth";
 import { prisma } from "@/lib/prisma";
@@ -11,6 +10,7 @@ import { recordAudit } from "@/lib/audit";
 import { emailAdapter } from "@/lib/notify";
 import { loadScope } from "@/lib/scope";
 import { authLimiter } from "@/lib/rate-limit";
+import { clientIp } from "@/lib/client-ip";
 import { resolveOrgMembership, wouldRemoveLastAdmin, type MembershipRole } from "@/lib/membership";
 import {
   newInviteToken,
@@ -21,15 +21,6 @@ import {
   orgInviteLink,
   validateOrgClaim,
 } from "@/lib/org-invite";
-
-async function clientKey(): Promise<string> {
-  const h = await headers();
-  return (
-    h.get("x-forwarded-for")?.split(",")[0]?.trim() ||
-    h.get("x-real-ip") ||
-    "unknown"
-  );
-}
 
 const LOCALES = ["en", "no", "sv", "da", "fi", "de"] as const;
 type Locale = (typeof LOCALES)[number];
@@ -238,7 +229,7 @@ export async function claimOrgInvite(formData: FormData) {
   if (!token) redirect(`/${locale}/invite/${token}?error=1`);
 
   // Rate-limit: same guard as claimPublisherInvite — creates accounts + signs in.
-  const ip = await clientKey();
+  const ip = await clientIp();
   if (!(await authLimiter.check(`invite:ip:${ip}`)).ok) {
     redirect(`/${locale}/invite/${token}?error=rate`);
   }

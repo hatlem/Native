@@ -2,7 +2,7 @@ import { getTranslations } from "next-intl/server";
 import { redirect } from "next/navigation";
 import { auth } from "@/auth";
 import { Link } from "@/i18n/navigation";
-import { register } from "@/app/auth-actions";
+import { register } from "@/app/signup-actions";
 import { LandingShell } from "@/app/landing-shell";
 import { SubmitButton } from "@/components";
 
