@@ -1,0 +1,405 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>NativeSpin — marketing image mockups</title>
+<style>
+  /* ── Bone palette (lifted from landing-styles.ts) ───────────────── */
+  :root{
+    --paper:#EDE8DB; --paper-2:#E4DECB; --ink:#14110C; --ink-soft:#3A3528;
+    --ink-mute:#6B6452; --rule:#14110C; --hair:rgba(20,17,12,.18);
+    --NO:#BA0C2F; --SE:#006AA7; --DK:#C8102E; --FI:#003580; --DE:#1a1a1a;
+    --max:1180px;
+    --grain:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.4'/%3E%3C/svg%3E");
+  }
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{
+    margin:0; background:var(--paper); color:var(--ink);
+    font-family:Inter,-apple-system,BlinkMacSystemFont,system-ui,sans-serif;
+    line-height:1.45; -webkit-font-smoothing:antialiased;
+  }
+  .wrap{max-width:var(--max); margin:0 auto; padding:0 clamp(20px,4vw,56px)}
+
+  /* doc header */
+  .doc-head{border-bottom:2px solid var(--rule); padding:48px 0 36px}
+  .doc-head .eyebrow{font-size:11px; text-transform:uppercase; letter-spacing:.18em; font-weight:700; color:var(--ink-mute)}
+  .doc-head h1{margin:14px 0 12px; font-size:clamp(30px,4.4vw,52px); letter-spacing:-.035em; line-height:1; font-weight:700}
+  .doc-head p{margin:0; max-width:62ch; font-size:15px; color:var(--ink-soft); line-height:1.6}
+  .toc{display:flex; flex-wrap:wrap; gap:8px; margin-top:24px}
+  .toc a{font-size:11px; text-transform:uppercase; letter-spacing:.12em; font-weight:600;
+    border:1px solid var(--ink); padding:6px 11px; border-radius:2px; color:var(--ink); text-decoration:none; transition:.15s}
+  .toc a:hover{background:var(--ink); color:var(--paper)}
+
+  /* spec block scaffolding */
+  .spec{border-bottom:1px solid var(--hair); padding:clamp(48px,6vw,84px) 0}
+  .spec:last-child{border-bottom:2px solid var(--rule)}
+  .spec-head{display:flex; gap:20px; align-items:baseline; margin-bottom:28px; flex-wrap:wrap}
+  .spec-num{font-size:clamp(34px,4vw,52px); font-weight:700; letter-spacing:-.04em; line-height:.9; color:var(--ink-mute)}
+  .spec-head .t h2{margin:0; font-size:clamp(22px,2.4vw,32px); letter-spacing:-.02em; font-weight:700; line-height:1.05}
+  .spec-head .t .loc{margin-top:7px; font-size:11px; text-transform:uppercase; letter-spacing:.14em; color:var(--ink-mute); font-weight:600}
+  .spec-note{max-width:64ch; font-size:14.5px; color:var(--ink-soft); line-height:1.6; margin:0 0 30px}
+  .spec-note strong{color:var(--ink); font-weight:600}
+  .stage{background:var(--paper-2); border:2px solid var(--ink); border-radius:3px; padding:clamp(20px,3vw,44px); box-shadow:8px 8px 0 0 rgba(20,17,12,.16)}
+  .caption{font-size:11px; text-transform:uppercase; letter-spacing:.14em; color:var(--ink-mute); font-weight:600; margin-top:16px}
+
+  /* generic browser chrome frame */
+  .browser{background:#fff; border:1.5px solid var(--ink); border-radius:6px; overflow:hidden; box-shadow:0 18px 40px -22px rgba(20,17,12,.6)}
+  .browser .bar{display:flex; align-items:center; gap:7px; padding:9px 12px; background:var(--paper-2); border-bottom:1px solid var(--hair)}
+  .browser .bar .dot{width:9px; height:9px; border-radius:50%; background:var(--ink-mute); opacity:.5}
+  .browser .bar .url{margin-left:10px; font-size:10.5px; color:var(--ink-mute); letter-spacing:.04em;
+    background:#fff; border:1px solid var(--hair); border-radius:20px; padding:3px 12px; flex:1; max-width:340px}
+
+  /* photo placeholder — warm editorial gradient + grain */
+  .photo{position:relative; overflow:hidden; background:
+      radial-gradient(120% 120% at 20% 10%, #c9b89a 0%, #a8906b 40%, #6d5a40 100%);}
+  .photo::after{content:""; position:absolute; inset:0; background-image:var(--grain); mix-blend-mode:overlay; opacity:.5}
+  .photo.cool{background:radial-gradient(120% 120% at 80% 0%, #9fb0bd 0%, #6c8090 45%, #38454f 100%)}
+  .photo.warm2{background:radial-gradient(110% 110% at 10% 90%, #d8b27a 0%, #b07d4e 50%, #5e3d24 100%)}
+
+  /* ── 1. native article mockup ─────────────────────────────────── */
+  .art-grid{display:grid; grid-template-columns:1.55fr .95fr; gap:28px; align-items:start}
+  .masthead{display:flex; justify-content:space-between; align-items:center; padding:14px 22px; border-bottom:2px solid #14110C}
+  .masthead .name{font-family:Georgia,'Times New Roman',serif; font-size:22px; font-weight:700; letter-spacing:.02em; color:#14110C}
+  .masthead .nav{font-size:9.5px; text-transform:uppercase; letter-spacing:.14em; color:#6B6452; display:flex; gap:14px}
+  .sponsored{display:inline-flex; align-items:center; gap:7px; font-size:9px; text-transform:uppercase; letter-spacing:.18em; font-weight:700;
+    color:#6B6452; border:1px solid rgba(20,17,12,.3); padding:4px 9px; border-radius:2px; background:#f4f0e6}
+  .art-body{padding:24px 30px 30px; color:#14110C}
+  .art-body h3{font-family:Georgia,serif; font-size:clamp(20px,2.4vw,30px); line-height:1.08; letter-spacing:-.01em; margin:14px 0 12px; font-weight:700; max-width:20ch}
+  .art-body .standfirst{font-family:Georgia,serif; font-size:15px; color:#3A3528; line-height:1.5; margin:0 0 16px; font-style:italic; max-width:44ch}
+  .art-body .byline{font-size:10px; text-transform:uppercase; letter-spacing:.13em; color:#6B6452; margin-bottom:18px}
+  .art-photo{height:200px; border-radius:3px}
+  .art-cols{column-count:2; column-gap:24px; margin-top:18px}
+  .art-cols .line{height:7px; border-radius:3px; background:rgba(20,17,12,.13); margin-bottom:9px}
+  .art-cols .line.s{width:62%}
+  .art-cols .line.first{width:40%; height:7px; background:rgba(20,17,12,.22)}
+  /* phone variant */
+  .phone{width:230px; margin:0 auto; background:#14110C; border-radius:30px; padding:9px; box-shadow:0 22px 44px -20px rgba(20,17,12,.7)}
+  .phone .screen{background:#fff; border-radius:22px; overflow:hidden}
+  .phone .notch{height:18px; display:flex; justify-content:center}
+  .phone .notch::after{content:""; width:74px; height:14px; background:#14110C; border-radius:0 0 12px 12px}
+  .phone .masthead{padding:9px 14px}
+  .phone .masthead .name{font-size:14px}
+  .phone .p-body{padding:12px 14px 18px}
+  .phone .p-body .sponsored{font-size:7.5px; padding:3px 6px; letter-spacing:.14em}
+  .phone .p-photo{height:108px; border-radius:2px; margin:10px 0}
+  .phone .p-body h4{font-family:Georgia,serif; font-size:15px; line-height:1.12; margin:8px 0 8px; font-weight:700}
+  .phone .p-body .line{height:5px; border-radius:3px; background:rgba(20,17,12,.13); margin-bottom:6px}
+  .phone .p-body .line.s{width:55%}
+
+  /* ── 2. native vs display ─────────────────────────────────────── */
+  .vs2{display:grid; grid-template-columns:1fr 1fr; gap:24px; align-items:start}
+  .vs2 .vlabel{font-size:11px; text-transform:uppercase; letter-spacing:.14em; font-weight:700; margin-bottom:12px; display:flex; align-items:center; gap:8px}
+  .vs2 .vlabel .tick{width:18px; height:18px; border-radius:50%; display:inline-flex; align-items:center; justify-content:center; color:#fff; font-size:11px}
+  .vs2 .good .tick{background:#1F6F3E}
+  .vs2 .bad .tick{background:var(--NO)}
+  /* clutter page */
+  .clutter{padding:0; color:#14110C}
+  .ad-banner{background:repeating-linear-gradient(45deg,#d8d2c2,#d8d2c2 10px,#cfc8b5 10px,#cfc8b5 20px); border:1px dashed #9a917a;
+    display:flex; align-items:center; justify-content:center; font-size:9px; text-transform:uppercase; letter-spacing:.16em; color:#6B6452; font-weight:700}
+  .ad-tag{position:absolute; top:5px; right:6px; font-size:7px; background:rgba(20,17,12,.6); color:#fff; padding:1px 5px; border-radius:2px; letter-spacing:.1em}
+  .clutter .c-head{padding:10px 14px; border-bottom:1px solid var(--hair); display:flex; justify-content:space-between; align-items:center}
+  .clutter .c-head .name{font-family:Georgia,serif; font-weight:700; font-size:15px}
+  .clutter .c-body{padding:12px 14px; position:relative}
+  .clutter .c-body h4{font-size:15px; margin:0 0 8px; line-height:1.15; font-weight:700; max-width:80%}
+  .clutter .c-body .line{height:6px; border-radius:3px; background:rgba(20,17,12,.13); margin-bottom:7px}
+  .clutter .popup{position:absolute; inset:auto 18px 16px 18px; background:#fff; border:1.5px solid var(--ink); border-radius:4px; padding:14px;
+    box-shadow:0 12px 30px -10px rgba(20,17,12,.5); text-align:center}
+  .clutter .popup .x{position:absolute; top:5px; right:8px; font-size:11px; color:var(--ink-mute)}
+  .clutter .popup strong{font-size:12px; display:block; margin-bottom:7px}
+  .clutter .popup .btn-fake{display:inline-block; font-size:9px; text-transform:uppercase; letter-spacing:.12em; font-weight:700; background:var(--NO); color:#fff; padding:6px 14px; border-radius:3px}
+
+  /* ── 3. magazine covers ───────────────────────────────────────── */
+  .covers{display:grid; grid-template-columns:repeat(6,1fr); gap:16px}
+  .cover{aspect-ratio:3/4; border-radius:3px; position:relative; overflow:hidden; box-shadow:0 10px 24px -14px rgba(20,17,12,.6);
+    padding:12px 11px; display:flex; flex-direction:column; color:#fff}
+  .cover::after{content:""; position:absolute; inset:0; background-image:var(--grain); mix-blend-mode:overlay; opacity:.35}
+  .cover .c-name{font-family:Georgia,serif; font-weight:700; font-size:15px; letter-spacing:.01em; line-height:1; position:relative; z-index:1}
+  .cover .c-coverline{margin-top:auto; position:relative; z-index:1}
+  .cover .c-coverline b{display:block; font-size:11px; line-height:1.1; font-weight:700; text-shadow:0 1px 3px rgba(0,0,0,.4)}
+  .cover .c-coverline span{font-size:8px; text-transform:uppercase; letter-spacing:.12em; opacity:.85}
+  .cover .flag{position:absolute; top:11px; right:11px; width:13px; height:9px; z-index:1; box-shadow:0 0 0 1px rgba(255,255,255,.4)}
+  .cv1{background:linear-gradient(160deg,#7a2230,#3a0f17)}
+  .cv2{background:linear-gradient(160deg,#1d3a52,#0c1d2c)}
+  .cv3{background:linear-gradient(160deg,#3f5a3a,#1c2c1a)}
+  .cv4{background:linear-gradient(160deg,#5a4a2f,#2c2113)}
+  .cv5{background:linear-gradient(160deg,#4a2f52,#22132c)}
+  .cv6{background:linear-gradient(160deg,#2f5250,#13302c)}
+
+  /* ── 4. publisher logos ───────────────────────────────────────── */
+  .logos{display:flex; flex-wrap:wrap; gap:18px 34px; align-items:center; padding:8px 0}
+  .logo{font-family:Georgia,serif; font-weight:700; font-size:20px; letter-spacing:.01em; color:var(--ink); opacity:.78}
+  .logo.alt{font-family:Inter,sans-serif; text-transform:uppercase; letter-spacing:.16em; font-size:14px; font-weight:800}
+  .logos .compare{display:block; width:100%; font-size:11px; color:var(--ink-mute); margin-top:10px; text-transform:uppercase; letter-spacing:.12em}
+
+  /* ── 5. golden rule dark ──────────────────────────────────────── */
+  .rule-stage{background:var(--ink); border-color:var(--ink); box-shadow:8px 8px 0 0 rgba(20,17,12,.3); position:relative; overflow:hidden}
+  .rule-stage::before{content:""; position:absolute; inset:0; background-image:var(--grain); opacity:.07}
+  .rule-stage .rgrid{display:grid; grid-template-columns:1fr 1.5fr; gap:36px; position:relative; z-index:1}
+  .rule-stage .rix{font-size:10px; text-transform:uppercase; letter-spacing:.18em; color:rgba(237,232,219,.5); font-weight:700}
+  .rule-stage h3{margin:12px 0 0; color:var(--paper); font-size:clamp(24px,3vw,38px); letter-spacing:-.03em; line-height:1; max-width:12ch; font-weight:700}
+  .excerpt{background:rgba(237,232,219,.06); border-left:2px solid var(--paper); padding:18px 22px; border-radius:0 3px 3px 0}
+  .excerpt .ex-tag{font-size:8.5px; text-transform:uppercase; letter-spacing:.16em; color:rgba(237,232,219,.55); font-weight:700; margin-bottom:10px}
+  .excerpt p{margin:0; font-family:Georgia,serif; font-size:15px; line-height:1.6; color:rgba(237,232,219,.92)}
+  .excerpt p .first{font-size:34px; float:left; line-height:.8; margin:4px 9px 0 0; font-weight:700; color:var(--paper)}
+
+  /* ── 6. brief → quote ─────────────────────────────────────────── */
+  .flow{display:grid; grid-template-columns:1fr auto 1fr; gap:22px; align-items:center}
+  .flow .arrow{font-size:26px; color:var(--ink-mute)}
+  .panel{background:#fff; border:1.5px solid var(--ink); border-radius:6px; padding:18px; box-shadow:0 14px 32px -20px rgba(20,17,12,.55)}
+  .panel .p-title{font-size:10px; text-transform:uppercase; letter-spacing:.14em; font-weight:700; color:var(--ink-mute); margin-bottom:14px}
+  .field{margin-bottom:11px}
+  .field label{display:block; font-size:8.5px; text-transform:uppercase; letter-spacing:.12em; color:var(--ink-mute); font-weight:700; margin-bottom:4px}
+  .field .inp{height:26px; border:1.5px solid rgba(20,17,12,.4); border-radius:3px; background:#faf8f1; display:flex; align-items:center; padding:0 9px; font-size:11px; color:var(--ink-soft)}
+  .field .inp.area{height:42px; align-items:flex-start; padding-top:6px}
+  .field-row{display:grid; grid-template-columns:1fr 1fr; gap:9px}
+  .quote-row{display:flex; justify-content:space-between; align-items:center; padding:9px 0; border-bottom:1px solid var(--hair); font-size:12px}
+  .quote-row:last-of-type{border-bottom:none}
+  .quote-row .qt{font-weight:600}
+  .quote-row .qp{font-variant-numeric:tabular-nums; font-weight:700}
+  .quote-row .qm{font-size:9px; text-transform:uppercase; letter-spacing:.1em; color:var(--ink-mute)}
+  .quote-total{display:flex; justify-content:space-between; margin-top:12px; padding-top:12px; border-top:2px solid var(--ink); font-weight:700; font-size:14px}
+  .badge-firm{display:inline-block; font-size:8px; text-transform:uppercase; letter-spacing:.14em; font-weight:700; background:#1F6F3E; color:#fff; padding:3px 8px; border-radius:2px; margin-bottom:12px}
+
+  .footer-note{padding:40px 0 64px; font-size:13px; color:var(--ink-mute); line-height:1.7; max-width:70ch}
+  .footer-note strong{color:var(--ink)}
+
+  @media(max-width:860px){
+    .art-grid,.vs2,.flow,.rule-stage .rgrid{grid-template-columns:1fr}
+    .flow .arrow{transform:rotate(90deg); justify-self:center}
+    .covers{grid-template-columns:repeat(3,1fr)}
+  }
+</style>
+</head>
+<body>
+
+<header class="doc-head">
+  <div class="wrap">
+    <div class="eyebrow">NativeSpin · marketing visuals — concept mockup</div>
+    <h1>Where images earn their place.</h1>
+    <p>Six visuals, all rendered to the Bone palette (cream paper, ink, editorial type). These are pure CSS mockups — placeholders for the real assets — so you can judge placement and tone before we commission photography or build the live components. The guiding rule: every visual <strong>shows the product</strong> or adds editorial credibility. Nothing decorative.</p>
+    <nav class="toc">
+      <a href="#m1">01 · Hero article</a>
+      <a href="#m2">02 · Native vs display</a>
+      <a href="#m3">03 · Magazine covers</a>
+      <a href="#m4">04 · Publisher logos</a>
+      <a href="#m5">05 · Golden rule</a>
+      <a href="#m6">06 · Brief → quote</a>
+    </nav>
+  </div>
+</header>
+
+<!-- 1 -->
+<section class="spec" id="m1">
+  <div class="wrap">
+    <div class="spec-head">
+      <div class="spec-num">01</div>
+      <div class="t"><h2>Hero — the native article itself</h2><div class="loc">Goes in: Hero, right column (replaces the 3–5× stat block, or sits beside it)</div></div>
+    </div>
+    <p class="spec-note">The single highest-leverage image. The headline says <em>"an ad people finish"</em> — this shows one. A believable native page: real masthead, a "Sponsored" tag, editorial photo and byline. Two device options below; pick one for the live build.</p>
+    <div class="stage">
+      <div class="art-grid">
+        <!-- desktop article -->
+        <div class="browser">
+          <div class="bar"><span class="dot"></span><span class="dot"></span><span class="dot"></span><span class="url">aftenbladet.no/sponset/det-stille-skiftet</span></div>
+          <div class="masthead">
+            <div class="name">Aftenbladet</div>
+            <div class="nav"><span>Nyheter</span><span>Økonomi</span><span>Kultur</span></div>
+          </div>
+          <div class="art-body">
+            <span class="sponsored">● Sponset innhold · i samarbeid med Volvo</span>
+            <h3>Det stille skiftet: hvordan en fjordby ble Nordens grønneste</h3>
+            <p class="standfirst">Ti år med tålmodig infrastruktur gjorde det utenkelige til hverdag. Vi reiste dit for å se hvordan.</p>
+            <div class="byline">Av Marit Solheim · Foto: Henrik Aas · 8 min lesetid</div>
+            <div class="art-photo photo"></div>
+            <div class="art-cols">
+              <div class="line first"></div><div class="line"></div><div class="line"></div><div class="line s"></div>
+              <div class="line"></div><div class="line"></div><div class="line s"></div><div class="line"></div>
+            </div>
+          </div>
+        </div>
+        <!-- phone article -->
+        <div>
+          <div class="phone">
+            <div class="screen">
+              <div class="notch"></div>
+              <div class="masthead"><div class="name">Aftenbladet</div></div>
+              <div class="p-body">
+                <span class="sponsored">● Sponset</span>
+                <div class="p-photo photo warm2"></div>
+                <h4>Det stille skiftet</h4>
+                <div class="line first" style="width:45%"></div><div class="line"></div><div class="line"></div><div class="line s"></div>
+              </div>
+            </div>
+          </div>
+          <div class="caption" style="text-align:center">Mobile variant — same article, reader's feed</div>
+        </div>
+      </div>
+      <div class="caption">Real version: 1 commissioned mock article shot, or a styled screenshot of a real placement (with permission).</div>
+    </div>
+  </div>
+</section>
+
+<!-- 2 -->
+<section class="spec" id="m2">
+  <div class="wrap">
+    <div class="spec-head">
+      <div class="spec-num">02</div>
+      <div class="t"><h2>Native vs. display — show the contrast</h2><div class="loc">Goes in: "Two formats, two different jobs" section, above the table</div></div>
+    </div>
+    <p class="spec-note">Your comparison is all words. One look at these two pages makes the argument before anyone reads a row: <strong>a page you'd stay on vs. a page you'd flee.</strong></p>
+    <div class="stage">
+      <div class="vs2">
+        <div class="good">
+          <div class="vlabel"><span class="tick">✓</span> Native — reads like the page</div>
+          <div class="browser">
+            <div class="bar"><span class="dot"></span><span class="dot"></span><span class="dot"></span><span class="url">magasin.no/reportasje</span></div>
+            <div class="masthead"><div class="name">Magasinet</div><div class="nav"><span>Reportasje</span><span>Reise</span></div></div>
+            <div class="art-body" style="padding:18px 22px">
+              <span class="sponsored">● Sponset innhold</span>
+              <div class="art-photo photo cool" style="height:120px; margin-top:12px"></div>
+              <h3 style="font-size:19px">En vanlig tirsdag, sett ovenfra</h3>
+              <div class="art-cols">
+                <div class="line first"></div><div class="line"></div><div class="line s"></div><div class="line"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="bad">
+          <div class="vlabel"><span class="tick">✕</span> Display — fighting for attention</div>
+          <div class="browser clutter">
+            <div class="bar"><span class="dot"></span><span class="dot"></span><span class="dot"></span><span class="url">news-site.com/article?utm=...</span></div>
+            <div class="ad-banner" style="height:42px; position:relative">LEADERBOARD AD 728×90<span class="ad-tag">AD</span></div>
+            <div class="c-head"><div class="name">DailyClicks</div></div>
+            <div class="c-body">
+              <div class="ad-banner" style="height:60px; float:right; width:120px; margin:0 0 8px 10px; position:relative">300×250<span class="ad-tag">AD</span></div>
+              <h4>Top headline you came for</h4>
+              <div class="line"></div><div class="line"></div><div class="line" style="width:70%"></div>
+              <div class="ad-banner" style="height:30px; margin:10px 0; position:relative">IN-CONTENT AD<span class="ad-tag">AD</span></div>
+              <div class="line"></div><div class="line" style="width:55%"></div>
+              <div class="popup">
+                <span class="x">✕</span>
+                <strong>Subscribe for 70% off!</strong>
+                <span class="btn-fake">Yes, sign me up</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="caption">Real version: 2 annotated screenshots — one clean native page, one ad-saturated page. Can be real sites (blurred branding).</div>
+    </div>
+  </div>
+</section>
+
+<!-- 3 -->
+<section class="spec" id="m3">
+  <div class="wrap">
+    <div class="spec-head">
+      <div class="spec-num">03</div>
+      <div class="t"><h2>Magazine & newspaper covers</h2><div class="loc">Goes in: Catalog sample table + Publishers catalog grid</div></div>
+    </div>
+    <p class="spec-note">The catalog is currently rows of text. Real <strong>covers</strong> make "240+ titles" tangible and add instant credibility — readers recognise the mastheads. Use as thumbnails beside each title row, or as a textured band behind the catalog header.</p>
+    <div class="stage">
+      <div class="covers">
+        <div class="cover cv1"><div class="c-name">Kapital</div><span class="flag" style="background:var(--NO)"></span><div class="c-coverline"><b>The 400 richest</b><span>Annual list · 2026</span></div></div>
+        <div class="cover cv2"><div class="c-name">Dagens<br>Næringsliv</div><span class="flag" style="background:var(--SE)"></span><div class="c-coverline"><b>Inside the deal</b><span>Business weekly</span></div></div>
+        <div class="cover cv3"><div class="c-name">Hytteliv</div><span class="flag" style="background:var(--NO)"></span><div class="c-coverline"><b>Cabins reimagined</b><span>Living · interiors</span></div></div>
+        <div class="cover cv4"><div class="c-name">Tara</div><span class="flag" style="background:var(--DK)"></span><div class="c-coverline"><b>Slow mornings</b><span>Lifestyle monthly</span></div></div>
+        <div class="cover cv5"><div class="c-name">Vi Menn</div><span class="flag" style="background:var(--FI)"></span><div class="c-coverline"><b>The long read</b><span>Features</span></div></div>
+        <div class="cover cv6"><div class="c-name">Teknisk<br>Ukeblad</div><span class="flag" style="background:var(--DE)"></span><div class="c-coverline"><b>Grid of the future</b><span>Tech · industry</span></div></div>
+      </div>
+      <div class="caption">Real version: actual cover thumbnails pulled from each publisher (rights usually granted to listed partners). Monochrome duotone option keeps it on-palette.</div>
+    </div>
+  </div>
+</section>
+
+<!-- 4 -->
+<section class="spec" id="m4">
+  <div class="wrap">
+    <div class="spec-head">
+      <div class="spec-num">04</div>
+      <div class="t"><h2>Publisher logos — monochrome strip</h2><div class="loc">Goes in: existing "Publishers in our network" strip</div></div>
+    </div>
+    <p class="spec-note">You already have this section — make sure it carries <strong>real wordmarks in a single ink colour</strong>, not plain text chips. Uniform ink keeps the cream calm while still reading as logos.</p>
+    <div class="stage">
+      <div class="logos">
+        <span class="logo">Aftenbladet</span>
+        <span class="logo alt">Kapital</span>
+        <span class="logo">Dagens&nbsp;Næringsliv</span>
+        <span class="logo alt">Hytteliv</span>
+        <span class="logo">Tara</span>
+        <span class="logo alt">Teknisk&nbsp;Ukeblad</span>
+        <span class="logo">Vi&nbsp;Menn</span>
+        <span class="compare">↑ all forced to one ink tone — vs. mixed-colour logos which would fight the cream</span>
+      </div>
+      <div class="caption">Real version: SVG wordmarks, recoloured to var(--ink) at ~78% opacity. Slight desaturate on the few that must stay coloured.</div>
+    </div>
+  </div>
+</section>
+
+<!-- 5 -->
+<section class="spec" id="m5">
+  <div class="wrap">
+    <div class="spec-head">
+      <div class="spec-num">05</div>
+      <div class="t"><h2>Golden Rule — print texture + real excerpt</h2><div class="loc">Goes in: the dark "If the writing is bad…" section</div></div>
+    </div>
+    <p class="spec-note">The dark section proves the quality claim best by <strong>showing quality writing</strong>. A pulled paragraph set like print — drop cap, serif — beside the headline. Subtle paper grain adds depth without clutter.</p>
+    <div class="stage rule-stage">
+      <div class="rgrid">
+        <div>
+          <div class="rix">The golden rule</div>
+          <h3>If the writing is bad, the trust is gone.</h3>
+        </div>
+        <div class="excerpt">
+          <div class="ex-tag">From a live placement · Magasinet</div>
+          <p><span class="first">T</span>he fjord doesn't announce itself. You round the last bend of the E39 and it's simply there — flat, grey, enormous — the way it has been for ten thousand years. What's new is the silence. No diesel idling at the quay, no two-stroke whine from the water. Just gulls, and the soft hum of something charging.</p>
+        </div>
+      </div>
+      <div class="caption" style="color:rgba(237,232,219,.55)">Real version: one genuine paragraph from a NativeSpin-written placement. Proof, not decoration.</div>
+    </div>
+  </div>
+</section>
+
+<!-- 6 -->
+<section class="spec" id="m6">
+  <div class="wrap">
+    <div class="spec-head">
+      <div class="spec-num">06</div>
+      <div class="t"><h2>Brief → quote — show the product</h2><div class="loc">Goes in: "How buying works" section</div></div>
+    </div>
+    <p class="spec-note">Three text columns explain the flow; a screenshot <strong>demonstrates</strong> it. One brief in, one firm quote out — the whole promise in a single glance.</p>
+    <div class="stage">
+      <div class="flow">
+        <div class="panel">
+          <div class="p-title">Step 01 · Your brief</div>
+          <div class="field"><label>Objective</label><div class="inp">Launch awareness — premium EV</div></div>
+          <div class="field-row">
+            <div class="field"><label>Markets</label><div class="inp">NO · SE · DK</div></div>
+            <div class="field"><label>Budget</label><div class="inp">€40–60k</div></div>
+          </div>
+          <div class="field"><label>Audience</label><div class="inp area">Affluent 35–55, urban, environmentally…</div></div>
+          <div class="field"><label>Dates</label><div class="inp">Sept–Oct 2026</div></div>
+        </div>
+        <div class="arrow">→</div>
+        <div class="panel">
+          <div class="p-title">Step 03 · Firm quote · 18 hrs later</div>
+          <span class="badge-firm">● Firm price · named desk buyer</span>
+          <div class="quote-row"><span><span class="qt">Aftenbladet</span><br><span class="qm">Native article · NO</span></span><span class="qp">€18,400</span></div>
+          <div class="quote-row"><span><span class="qt">Dagens Næringsliv</span><br><span class="qm">Sponsored feature · SE</span></span><span class="qp">€21,900</span></div>
+          <div class="quote-row"><span><span class="qt">Berlingske</span><br><span class="qm">Native + newsletter · DK</span></span><span class="qp">€12,300</span></div>
+          <div class="quote-total"><span>One contract</span><span>€52,600</span></div>
+        </div>
+      </div>
+      <div class="caption">Real version: actual UI screenshots of the brief form and a quote, lightly cropped. Numbers anonymised.</div>
+    </div>
+  </div>
+</section>
+
+<div class="wrap footer-note">
+  <p><strong>How to read this:</strong> these are CSS placeholders to lock placement and tone, not final art. Priority order for the live build: <strong>01 (hero) → 02 (vs display) → 03 (covers)</strong> carry the most weight; 04–06 are reinforcement. Tell me which to build first as a real component, and whether any need commissioned photography vs. a screenshot we can capture now.</p>
+</div>
+
+</body>
+</html>
