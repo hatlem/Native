@@ -1,4 +1,4 @@
-/** Sync the 2026-06-07 catalog verification (catalog_verification_0607.json) to the DB.
+/** Sync the 2026-06-07 catalog verification (data/catalog/catalog_verification_0607.json) to the DB.
  * Covers every title that was UNCERTAIN/UNVERIFIED — verdicts are matched by title ID
  * (echoed by the verification agents), never by name.
  * - alive    -> verificationStatus LIVE + evidence URL + lastVerifiedAt;
@@ -20,7 +20,7 @@ const NOW = new Date("2026-06-07T12:00:00.000Z");
 const TAG = "catalog-verification 2026-06-07";
 
 type Verdict = { id: string; name: string; market: string; status: string; currentName: string | null; evidenceUrl: string | null; websiteUrl: string | null; note: string };
-const { verdicts }: { verdicts: Verdict[] } = JSON.parse(readFileSync("catalog_verification_0607.json", "utf8"));
+const { verdicts }: { verdicts: Verdict[] } = JSON.parse(readFileSync("data/catalog/catalog_verification_0607.json", "utf8"));
 
 const src = (v: Verdict) => v.evidenceUrl || (v.note.match(/https?:\/\/[^\s)\]]+/) || [])[0] || v.note.slice(0, 240);
 const cleanName = (s: string) => s.replace(/\s*\(.*\)$/, "").trim();

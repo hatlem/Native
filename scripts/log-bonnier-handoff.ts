@@ -14,7 +14,7 @@ const NOTE =
 
 async function main() {
   const list: { email: string; market: string; titles: string[] }[] = JSON.parse(
-    readFileSync("outreach_send_list.json", "utf8"),
+    readFileSync("data/outreach/outreach_send_list.json", "utf8"),
   );
   const group = list.find((g) => g.email.toLowerCase() === GROUP_EMAIL.toLowerCase());
   if (!group) throw new Error(`group ${GROUP_EMAIL} not in send list`);

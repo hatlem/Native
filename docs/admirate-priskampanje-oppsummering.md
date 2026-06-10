@@ -30,7 +30,7 @@ Per-tittel **kontakthistorikk** på desk-tittelsiden: hvem vi har kontaktet, kan
 
 ### D. Dedupe, landtagging, sende-liste
 - Dedup **per adresse + land** → ~790 grupper / ~2 248 titler. Alle utgivernavn landtagget. Junk fjernet (`andreas.hatlem@gmail.com` = testartefakt).
-- Sende-liste: **`outreach_send_list.json`** (`{email, market, titles[]}`) — varig kopi.
+- Sende-liste: **`data/outreach/outreach_send_list.json`** (`{email, market, titles[]}`) — varig kopi.
 
 ### E. E-postutsending (Outlook / Admirate)
 - Fra `andreas@admirate.no` via Outlook web, manuelt drevet i Chrome. 30/dag.
@@ -104,7 +104,7 @@ Når et svar avdekker datafeil, ryddes det med en gang (alt reversibelt via `act
 - **Skriv hver e-post på nytt** (Ny e-post → Til → Emne → tekst → Send). Outlook-redigereren er skjør: ikke rediger midt i teksten; forkast via søppel-ikon → «OK»-dialog.
 - **Logg hver sending** som ContactLog OUTBOUND per tittel — script-mønster:
   `railway run --service Postgres sh -c 'DATABASE_URL="$DATABASE_PUBLIC_URL" pnpm tsx <script>'` som kaller `createContactLog({ titleId, salesContactId?, channel:"EMAIL", direction:"OUTBOUND", note, actorId })` (prod-DB er kun internt tilgjengelig).
-- Neste mottakere hentes fra `outreach_send_list.json` (filtrer bort allerede sendte).
+- Neste mottakere hentes fra `data/outreach/outreach_send_list.json` (filtrer bort allerede sendte).
 
 ### Sendt hittil — IKKE send på nytt
 **Dag 1 (2026-06-03), 16:** salg@batmagasinet.no · robert@friflyt.no · arnt.erik@smallstep.no · oliver.brenden@hegnar.no · nryf@rytter.no · neteland@pinsebevegelsen.no · arild.ostvold@medierogledelse.no · al@hsmedia.no · tidende@tannlegeforeningen.no · red@byavisatonsberg.no · annonse@dn.no · salgbergen@amedia.no · salg@tumedia.no · marked@filmweb.no · kontor@genealogi.no · annonser@lmd.no
@@ -133,12 +133,12 @@ Skip-kilde i prod: titler med `ContactLog` OUTBOUND. Send-script: `scripts/log-o
 
 ## 6. Status: varige vs flyktige artefakter
 
-- **Varig:** `outreach_send_list.json` (sende-liste), prosjektminne `outreach_admirate_campaign`, specs i `docs/superpowers/specs/`, all ContactLog/PriceQuote-data i prod-DB, lagrede PDF-er (når rate card-løsningen er live).
-- **Flyktig (forsvinner etter økten):** arbeidsfiler i `/tmp` (`final_map.json`, `discover.json`, `recheck.json`), og agent-workflow- enes rå-output. `final_map.json` er speilet til `outreach_send_list.json`, men de rå agent-resultatene (verifisering/oppdagelse) er ikke lagret varig utover korrigeringene som ble skrevet inn i lista.
+- **Varig:** `data/outreach/outreach_send_list.json` (sende-liste), prosjektminne `outreach_admirate_campaign`, specs i `docs/superpowers/specs/`, all ContactLog/PriceQuote-data i prod-DB, lagrede PDF-er (når rate card-løsningen er live).
+- **Flyktig (forsvinner etter økten):** arbeidsfiler i `/tmp` (`final_map.json`, `discover.json`, `recheck.json`), og agent-workflow- enes rå-output. `final_map.json` er speilet til `data/outreach/outreach_send_list.json`, men de rå agent-resultatene (verifisering/oppdagelse) er ikke lagret varig utover korrigeringene som ble skrevet inn i lista.
 
 ### Git/branch-status
 - `main` (pushet til prod, `7045928`): kontaktlogg-funksjon, MCP-utvidelse, `issue-pricing-admin-key`, rate card-spec, **og rate card-ingestion-funksjonen** (migrasjon `20260604120000_ratecard_ingestion` kjører på deploy).
-- Ikke committet: `outreach_send_list.json`, dette dokumentet.
+- Ikke committet: `data/outreach/outreach_send_list.json`, dette dokumentet.
 - `feat/ratecard-ingestion` merget og slettet; agent-worktree ryddet.
 
 ---
@@ -176,7 +176,7 @@ Skip-kilde i prod: titler med `ContactLog` OUTBOUND. Send-script: `scripts/log-o
 
 ## 10. Viktige filer og ressurser
 
-- Sende-liste: `outreach_send_list.json`
+- Sende-liste: `data/outreach/outreach_send_list.json`
 - Specs: `docs/superpowers/specs/2026-06-03-contact-log-design.md`, `…/2026-06-04-ratecard-ingestion-design.md`
 - Kode: `src/lib/pricing/contact-log.ts`, `src/lib/mcp/tools-*.ts`, `src/lib/storage/r2.ts`, `src/app/[locale]/desk/titles/[id]/_components/`
 - Scripts: `pnpm issue-pricing-admin-key`; per-svar ingest-scripts i `scripts/` (`ingest-*.ts`), `campaign-inspect.ts` (read-only oppslag av tittel-IDer/kontakter), `backfill-structure.ts`, `backfill-enrichment.ts`, `merge-tidende-dupes.ts`, `cleanup-flagged.ts`, `resolve-flagged.ts`. Kjøremønster: `railway run --service Native sh -c "export DATABASE_URL='<DATABASE_PUBLIC_URL fra Postgres-tjenesten>'; pnpm tsx scripts/<x>.ts"` (Native-tjenesten har R2-creds; offentlig DB-proxy fra Postgres-tjenestens `DATABASE_PUBLIC_URL`). SUPERADMIN-aktør: `superadmin@nativespin.com` (`cmpmdiqtg048c0hu080m8kmok`).

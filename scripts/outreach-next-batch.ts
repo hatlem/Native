@@ -1,4 +1,4 @@
-/** READ-ONLY. Cross-reference outreach_send_list.json against prod ContactLog
+/** READ-ONLY. Cross-reference data/outreach/outreach_send_list.json against prod ContactLog
  * OUTBOUND to report which groups are still uncontacted. Prints next batch
  * candidates, NO first. Does not write anything. */
 import { readFileSync } from "node:fs";
@@ -7,7 +7,7 @@ import { prisma } from "@/lib/prisma";
 type Group = { email: string; market: string; titles: string[]; wasEmail?: string };
 
 async function main() {
-  const list: Group[] = JSON.parse(readFileSync("outreach_send_list.json", "utf8"));
+  const list: Group[] = JSON.parse(readFileSync("data/outreach/outreach_send_list.json", "utf8"));
 
   const logs = await prisma.contactLog.findMany({
     where: { direction: "OUTBOUND" },
