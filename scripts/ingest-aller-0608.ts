@@ -3,6 +3,7 @@
  * docs/outreach-sources/aller/Aller Native 2026.pdf. All prices = NETTO, exkl. moms, SEK.
  * Dup-guarded via INBOUND note tag. */
 import { prisma } from "@/lib/prisma";
+import type { ProductType } from "@prisma/client";
 import { createContactLog } from "@/lib/pricing/contact-log";
 import { createSalesContact, attachContactToTitle } from "@/lib/pricing/contacts";
 import { logQuote } from "@/lib/pricing/quotes";
@@ -21,7 +22,7 @@ async function camilla(publisherId: string, titleId: string) {
   if (!sc) sc = await createSalesContact({ publisherId, name: "Camilla Hedström", email: "camilla.hedstrom@aller.com", phone: "+46708613270", role: "Client Manager, Aller Media (SE)", notes: "Sendte Aller SE native-mediekit (WeTransfer) 06-08.", actorId: ACTOR });
   await attachContactToTitle({ salesContactId: sc.id, titleId, isPrimary: true, actorId: ACTOR });
 }
-type Q = { type: string; name: string; price: number; cur?: string; unit?: "FLAT" | "CPC" | "CPM"; desc: string };
+type Q = { type: ProductType; name: string; price: number; cur?: string; unit?: "FLAT" | "CPC" | "CPM"; desc: string };
 async function logQuotes(titleId: string, qs: Q[], note: string) {
   const log = await createContactLog({ titleId, channel: "EMAIL", direction: "INBOUND", note, actorId: ACTOR });
   for (const q of qs) await logQuote({ draftProductType: q.type, draftProductName: q.name, draftProductDesc: q.desc, contactLogId: log.id, price: q.price, currency: q.cur ?? "SEK", priceUnit: q.unit ?? "FLAT", includedText: note.slice(0, 200), recordedById: ACTOR });
