@@ -2,7 +2,7 @@
 // marketing pages — signed-in users see the role-aware NavShell from
 // src/lib/nav.ts. One config drives both desktop dropdowns and mobile
 // accordion. Icons are inline SVG identifiers (rendered by
-// public-header.tsx) so we don't pull in lucide-react.
+// public-header-icons.tsx) so we don't pull in lucide-react.
 
 export type PublicIcon =
   | "grid"

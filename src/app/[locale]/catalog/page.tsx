@@ -2,45 +2,23 @@ import { getTranslations } from "next-intl/server";
 import { MarketCode, ProductType, Prisma } from "@prisma/client";
 import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
-import { Link } from "@/i18n/navigation";
-import { indicativeFromRules, toRateRules, formatMoney, intlLocale } from "@/lib/money";
-import { isProductPriceShown } from "@/lib/pricing-visibility";
-import { EmptyState } from "@/app/empty-state";
-import { LandingShell } from "@/app/landing-shell";
 import { searchTitleIds } from "@/lib/catalog-search";
 import { CatalogFilters } from "./_components/CatalogFilters";
+import { CatalogMarketing } from "./_components/CatalogMarketing";
+import { CatalogResults } from "./_components/CatalogResults";
+import { CatalogPagination } from "./_components/CatalogPagination";
+import { ActiveFilterChips } from "./_components/ActiveFilterChips";
 import {
-  CompareSelectionProvider,
-  TitleSelector,
-} from "./_components/CompareSelection";
+  MARKET_CODES,
+  PRODUCT_TYPES,
+  NATIVE_FIT_VALUES,
+  B2B_B2C_VALUES,
+  REACH_VALUES,
+  PAGE_SIZE,
+  parseCatalogParams,
+} from "./filters";
 
 export const dynamic = "force-dynamic";
-
-const MARKET_CODES = Object.values(MarketCode);
-const PRODUCT_TYPES = Object.values(ProductType);
-// Catalog format filter highlights the buyable formats — research-only enum
-// members (CONTEXTUAL, OTHER) intentionally don't show in the filter.
-const FORMAT_KEYS: ProductType[] = [
-  ProductType.NATIVE_ARTICLE,
-  ProductType.ADVERTORIAL,
-  ProductType.NATIVE_DISPLAY,
-  ProductType.PACKAGE,
-  ProductType.NATIVE_PLUS,
-  ProductType.CONTENT_VIDEO,
-];
-const NATIVE_FIT_VALUES = ["High", "Medium", "Low"] as const;
-const B2B_B2C_VALUES = ["B2B", "B2C"] as const;
-const REACH_VALUES = ["National", "Regional", "Local", "Niche"] as const;
-const PAGE_SIZE = 60;
-
-function asEnum<T extends string>(
-  value: string | undefined,
-  allowed: readonly T[],
-) {
-  return value && (allowed as readonly string[]).includes(value)
-    ? (value as T)
-    : undefined;
-}
 
 export default async function CatalogPage({
   params,
@@ -56,70 +34,25 @@ export default async function CatalogPage({
   }
   const sp = await searchParams;
   const t = await getTranslations({ locale, namespace: "catalog" });
-  const tf = await getTranslations({ locale, namespace: "firm" });
   const tType = await getTranslations({ locale, namespace: "productType" });
   const tMarket = await getTranslations({ locale, namespace: "market" });
   const tFit = await getTranslations({ locale, namespace: "nativeFit" });
   const tReach = await getTranslations({ locale, namespace: "reachTier" });
-  const tv = await getTranslations({
-    locale,
-    namespace: "priceVisibility",
-  });
 
-  // `market` is multi-select (CSV). A single value still works — same param
-  // shape as `types`. This lets tri-Nordic buyers run one query across NO·SE·DK
-  // instead of three.
-  const marketsRaw =
-    typeof sp.market === "string" ? sp.market : "";
-  const markets: MarketCode[] = marketsRaw
-    .split(",")
-    .map((s) => s.trim())
-    .filter((s): s is MarketCode =>
-      (MARKET_CODES as readonly string[]).includes(s),
-    );
-  // Legacy single-`market` consumers downstream — keep the first as a
-  // convenience for things that only need one (e.g. SEO / breadcrumb).
-  const market = markets[0];
-  // `types` is the new multi-select param (CSV). Fall back to the legacy
-  // single `type` param so older shared links keep working.
-  const typesRaw =
-    typeof sp.types === "string"
-      ? sp.types
-      : typeof sp.type === "string"
-        ? sp.type
-        : "";
-  const types: ProductType[] = typesRaw
-    .split(",")
-    .map((s) => s.trim())
-    .filter((s): s is ProductType =>
-      (PRODUCT_TYPES as readonly string[]).includes(s),
-    );
-  const verticalsRaw = typeof sp.vertical === "string" ? sp.vertical : "";
-  const verticals = verticalsRaw.split(",").map((s) => s.trim()).filter(Boolean);
-  const regionsRaw = typeof sp.region === "string" ? sp.region : "";
-  const regions = regionsRaw.split(",").map((s) => s.trim()).filter(Boolean);
-  const nativeFit = asEnum(
-    typeof sp.nativeFit === "string" ? sp.nativeFit : undefined,
-    NATIVE_FIT_VALUES,
-  );
-  const b2bB2c = asEnum(
-    typeof sp.b2bB2c === "string" ? sp.b2bB2c : undefined,
-    B2B_B2C_VALUES,
-  );
-  const reach = asEnum(
-    typeof sp.reach === "string" ? sp.reach : undefined,
-    REACH_VALUES,
-  );
-  const onlyPriced =
-    typeof sp.onlyPriced === "string" && sp.onlyPriced === "1";
-  const compareMode =
-    typeof sp.compareMode === "string" && sp.compareMode === "1";
-  // Advanced section auto-opens only for the compare picker now — B2B/B2C
-  // moved to the main filter row, so it no longer drives this.
-  const advancedOpen = compareMode;
-  const q = typeof sp.q === "string" ? sp.q.trim() : "";
-  const pageRaw = typeof sp.page === "string" ? parseInt(sp.page, 10) : 1;
-  const page = Number.isFinite(pageRaw) && pageRaw >= 1 ? pageRaw : 1;
+  const {
+    markets,
+    types,
+    verticals,
+    regions,
+    nativeFit,
+    b2bB2c,
+    reach,
+    onlyPriced,
+    compareMode,
+    advancedOpen,
+    q,
+    page,
+  } = parseCatalogParams(sp);
 
   // FTS-first: ask Postgres for Title ids matching the query, then
   // intersect with the rest of the filter. Falls back to ILIKE if FTS
@@ -350,290 +283,22 @@ export default async function CatalogPage({
         }}
       />
 
-      {activeFilters.length > 0 ? (
-        <div className="filter-chips" style={{ marginTop: 12 }}>
-          {activeFilters.map((f) => (
-            <Link key={f.key} href={f.href} className="filter-chip">
-              {f.label}
-              <span className="x" aria-label={t("removeFilter")}>
-                ×
-              </span>
-            </Link>
-          ))}
-          {activeFilters.length >= 2 ? (
-            <Link href="/catalog" className="filter-chip">
-              {t("clearFilters")}
-            </Link>
-          ) : null}
-        </div>
-      ) : null}
+      <ActiveFilterChips locale={locale} filters={activeFilters} />
 
       <p className="muted" style={{ marginTop: 12 }}>
         {t("resultCount", { count: totalCount })}
       </p>
 
-      {titles.length === 0 ? (
-        <EmptyState
-          title={t("noResults")}
-          primaryHref="/catalog"
-          primaryLabel={t("clearFilters")}
-        />
-      ) : (
-        <CompareSelectionProvider enabled={compareMode}>
-        <div className="grid">
-          {titles.map((title) => {
-            // Per-product visibility: active + confirmedAt + pricesPublic flags
-            const visibleProducts = title.products.filter((p) =>
-              isProductPriceShown(p, title),
-            );
-            const anyHidden = title.products.some(
-              (p) => !isProductPriceShown(p, title),
-            );
-            const prices = visibleProducts.map((p) =>
-              indicativeFromRules(
-                Number(p.basePrice),
-                toRateRules(p.priceRules),
-              ),
-            );
-            const from = prices.length ? Math.min(...prices) : null;
-            const currency = title.products[0]?.currency ?? title.market.currency;
-            const needsQuote = title.products.length === 0;
+      <CatalogResults locale={locale} titles={titles} compareMode={compareMode} />
 
-            return (
-              <article className="card catalog-card" key={title.id}>
-                <TitleSelector id={title.id} />
-                <h3>
-                  <Link href={`/catalog/${title.slug}`}>{title.name}</Link>
-                </h3>
-                <div className="muted">
-                  {title.publisher.name} · {tMarket(title.market.code)}
-                </div>
-                <div>
-                  <span className="tag">{title.category}</span>
-                  {title.offersNativeContent ? (
-                    <span className="tag">{t("card.offersNative")}</span>
-                  ) : null}
-                  {title.products.map((p) => (
-                    <span className="tag" key={p.id}>
-                      {tType(p.type)}
-                    </span>
-                  ))}
-                  {visibleProducts.some((p) => p.visibility === "FIRM") ? (
-                    <span className="tag">⚡ {tf("badge")}</span>
-                  ) : null}
-                  {needsQuote ? (
-                    <span className="tag">{t("card.requestQuote")}</span>
-                  ) : null}
-                  {anyHidden ? (
-                    <span className="tag">{tv("requestPrice")}</span>
-                  ) : null}
-                  {title.nativeFit ? (
-                    <span className="tag">
-                      {t("card.nativeFit", { value: tFit(title.nativeFit as "High" | "Medium" | "Low") })}
-                    </span>
-                  ) : null}
-                  {title.b2bB2c ? (
-                    <span className="tag">{title.b2bB2c}</span>
-                  ) : null}
-                </div>
-                {title.description ? (
-                  <div className="muted" style={{ marginTop: 8 }}>
-                    {title.description.length > 140
-                      ? `${title.description.slice(0, 140)}…`
-                      : title.description}
-                  </div>
-                ) : title.vertical ? (
-                  <div className="muted" style={{ marginTop: 8 }}>
-                    {title.vertical}
-                  </div>
-                ) : null}
-                {title.digitalReach ? (
-                  <div className="muted" style={{ marginTop: 10 }}>
-                    {t("card.digitalReach")}:{" "}
-                    {new Intl.NumberFormat(intlLocale(locale)).format(title.digitalReach)}
-                  </div>
-                ) : title.monthlyReach ? (
-                  <div className="muted" style={{ marginTop: 10 }}>
-                    {t("card.reach")}:{" "}
-                    {new Intl.NumberFormat(intlLocale(locale)).format(title.monthlyReach)}
-                  </div>
-                ) : null}
-                {from !== null ? (
-                  <div className="price">
-                    {t("card.from")} {formatMoney(from, currency, locale)}
-                  </div>
-                ) : anyHidden ? (
-                  <div className="price muted">{tv("requestPrice")}</div>
-                ) : null}
-              </article>
-            );
-          })}
-        </div>
-        </CompareSelectionProvider>
-      )}
-
-      {totalPages > 1 ? (
-        <nav
-          className="pagination"
-          style={{
-            marginTop: 24,
-            display: "flex",
-            gap: 12,
-            alignItems: "center",
-          }}
-        >
-          {page > 1 ? (
-            <a href={pageQuery(page - 1) || "?"}>← {t("pagination.prev")}</a>
-          ) : (
-            <span className="muted">← {t("pagination.prev")}</span>
-          )}
-          <span className="muted">
-            {t("pagination.page", { page, total: totalPages })}
-          </span>
-          {page < totalPages ? (
-            <a href={pageQuery(page + 1)}>{t("pagination.next")} →</a>
-          ) : (
-            <span className="muted">{t("pagination.next")} →</span>
-          )}
-        </nav>
-      ) : null}
+      <CatalogPagination
+        locale={locale}
+        page={page}
+        totalPages={totalPages}
+        pageQuery={pageQuery}
+      />
 
       <p className="note">{t("indicativeNote")}</p>
     </section>
-  );
-}
-
-async function CatalogMarketing({ locale }: { locale: string }) {
-  const t = await getTranslations({ locale, namespace: "catalog" });
-  const ta = await getTranslations({ locale, namespace: "advertisers" });
-  const tMarket = await getTranslations({ locale, namespace: "market" });
-  const tType = await getTranslations({ locale, namespace: "productType" });
-
-  const [titleCount, productCount, distinctMarkets, featured] =
-    await Promise.all([
-      prisma.title.count({ where: { active: true } }),
-      prisma.product.count({ where: { active: true } }),
-      prisma.title
-        .findMany({
-          where: { active: true },
-          select: { market: { select: { code: true } } },
-          distinct: ["marketId"],
-        })
-        .then((rows) => rows.length),
-      prisma.title.findMany({
-        where: { active: true },
-        orderBy: [{ monthlyReach: "desc" }, { name: "asc" }],
-        take: 6,
-        include: {
-          publisher: { select: { name: true } },
-          market: { select: { code: true } },
-        },
-      }),
-    ]);
-
-  return (
-    <LandingShell locale={locale} screenLabel="Catalog gate" withFooter={true}>
-      <section className="hero">
-        <div className="wrap">
-          <span className="eyebrow accent">{t("gate.eyebrow")}</span>
-          <h1>{t("gate.title", { count: titleCount })}</h1>
-          <p className="lead">{t("gate.lead")}</p>
-          <div className="hero-actions">
-            <Link href="/signup" className="btn large">
-              {t("gate.ctaPrimary")}
-            </Link>
-            <Link href="/signin" className="btn secondary large">
-              {t("gate.ctaSecondary")}
-            </Link>
-          </div>
-          <div className="hero-stats">
-            <div className="hero-stat">
-              <div className="value">{titleCount.toLocaleString(intlLocale(locale))}</div>
-              <div className="label">{t("gate.statsTitles")}</div>
-            </div>
-            <div className="hero-stat">
-              <div className="value">{productCount.toLocaleString(intlLocale(locale))}</div>
-              <div className="label">{t("gate.statsProducts")}</div>
-            </div>
-            <div className="hero-stat">
-              <div className="value">{distinctMarkets}</div>
-              <div className="label">{t("gate.statsMarkets")}</div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <section className="section">
-        <div className="wrap">
-          <div className="section-head">
-            <div>
-              <span className="eyebrow accent">{ta("formatsEyebrow")}</span>
-              <h2>{ta("formatsTitle")}</h2>
-            </div>
-            <p className="lead" style={{ margin: 0, maxWidth: "44ch" }}>
-              {ta("formatsLead")}
-            </p>
-          </div>
-          <div className="grid">
-            {FORMAT_KEYS.map((k) => (
-              <article className="card" key={k}>
-                <h3>{tType(k)}</h3>
-                <p className="muted">{tType(`desc${k}`)}</p>
-              </article>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      <section className="section">
-        <div className="wrap">
-          <div className="section-head">
-            <div>
-              <span className="eyebrow">{t("gate.teaserEyebrow")}</span>
-              <h2>{t("gate.teaserTitle")}</h2>
-            </div>
-            <Link href="/signup" className="link">
-              {t("gate.teaserCta")} →
-            </Link>
-          </div>
-          <div className="grid">
-            {featured.map((title) => (
-              <article className="card title-card" key={title.id}>
-                <span className="tag">{tMarket(title.market.code)}</span>
-                <h3>{title.name}</h3>
-                <p className="muted">{title.publisher.name}</p>
-                {title.category ? (
-                  <p className="muted small">{title.category}</p>
-                ) : null}
-                <p className="muted small" style={{ marginTop: 12 }}>
-                  🔒 {t("gate.cardLocked")}
-                </p>
-              </article>
-            ))}
-          </div>
-          <p className="note" style={{ marginTop: 24 }}>
-            {t("gate.teaserFoot", { total: titleCount })}{" "}
-            <Link href="/signup" className="link">
-              {t("gate.teaserLink")} →
-            </Link>
-          </p>
-        </div>
-      </section>
-
-      <section className="section cta-block">
-        <div className="wrap">
-          <h2>{t("gate.ctaBlockTitle")}</h2>
-          <p className="muted">{t("gate.ctaBlockBody")}</p>
-          <div className="hero-actions">
-            <Link href="/signup" className="btn large">
-              {t("gate.ctaPrimary")}
-            </Link>
-            <Link href="/signin" className="btn secondary large">
-              {t("gate.ctaSecondary")}
-            </Link>
-          </div>
-        </div>
-      </section>
-    </LandingShell>
   );
 }
