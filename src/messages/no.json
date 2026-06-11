@@ -1701,7 +1701,11 @@
   "priceVisibility": {
     "requestPrice": "Kontakt for pris",
     "requestPriceHelp": "Pris settes etter en brief — vi kommer tilbake med tilgjengelighet og fast pris.",
-    "planRfqOnly": "En eller flere titler i planen krever et tilbud — direktekjøp er deaktivert til prisen er bekreftet."
+    "planRfqOnly": "En eller flere titler i planen krever et tilbud — direktekjøp er deaktivert til prisen er bekreftet.",
+    "listIndicative": "Listepris (veiledende)",
+    "listIndicativeHelp": "Veiledende listepris — endelig pris bekreftes etter en kort brief.",
+    "productionIncluded": "Ferdig skrevet artikkel inkludert",
+    "firmTurnaround": "Fast pris normalt innen 2 virkedager"
   },
   "titleAdmin": {
     "title": "Rediger tittel",

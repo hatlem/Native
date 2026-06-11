@@ -1701,7 +1701,11 @@
   "priceVisibility": {
     "requestPrice": "Kontakta för pris",
     "requestPriceHelp": "Pris sätts efter en brief — vi återkommer med tillgänglighet och fast pris.",
-    "planRfqOnly": "En eller flera titlar i din plan kräver offert — direktköp är inaktiverat tills priset är bekräftat."
+    "planRfqOnly": "En eller flera titlar i din plan kräver offert — direktköp är inaktiverat tills priset är bekräftat.",
+    "listIndicative": "Listpris (indikativt)",
+    "listIndicativeHelp": "Indikativt listpris — det slutliga priset bekräftas efter en kort brief.",
+    "productionIncluded": "Färdigskriven artikel ingår",
+    "firmTurnaround": "Fast pris vanligtvis inom 2 arbetsdagar"
   },
   "titleAdmin": {
     "title": "Redigera titel",

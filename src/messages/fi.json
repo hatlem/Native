@@ -1701,7 +1701,11 @@
   "priceVisibility": {
     "requestPrice": "Kysy hintaa",
     "requestPriceHelp": "Hinta vahvistetaan briefin jälkeen — palaamme asiaan saatavuuden ja kiinteän hinnan kanssa.",
-    "planRfqOnly": "Yksi tai useampi suunnitelmasi nimike vaatii tarjouksen — pikaosto on poistettu käytöstä kunnes hinta on vahvistettu."
+    "planRfqOnly": "Yksi tai useampi suunnitelmasi nimike vaatii tarjouksen — pikaosto on poistettu käytöstä kunnes hinta on vahvistettu.",
+    "listIndicative": "Listahinta (suuntaa-antava)",
+    "listIndicativeHelp": "Suuntaa-antava listahinta — lopullinen hinta vahvistetaan lyhyen briiffin jälkeen.",
+    "productionIncluded": "Sisältää valmiiksi kirjoitetun artikkelin",
+    "firmTurnaround": "Kiinteä hinta yleensä 2 arkipäivän kuluessa"
   },
   "titleAdmin": {
     "title": "Muokkaa nimikettä",

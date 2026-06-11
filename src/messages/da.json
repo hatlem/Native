@@ -1702,7 +1702,11 @@
   "priceVisibility": {
     "requestPrice": "Kontakt for pris",
     "requestPriceHelp": "Prisen fastsættes efter en brief — vi vender tilbage med tilgængelighed og en fast pris.",
-    "planRfqOnly": "En eller flere titler i din plan kræver et tilbud — instant køb er deaktiveret indtil prisen er bekræftet."
+    "planRfqOnly": "En eller flere titler i din plan kræver et tilbud — instant køb er deaktiveret indtil prisen er bekræftet.",
+    "listIndicative": "Listepris (vejledende)",
+    "listIndicativeHelp": "Vejledende listepris — den endelige pris bekræftes efter en kort brief.",
+    "productionIncluded": "Færdigskrevet artikel inkluderet",
+    "firmTurnaround": "Fast pris typisk inden for 2 hverdage"
   },
   "titleAdmin": {
     "title": "Rediger titel",

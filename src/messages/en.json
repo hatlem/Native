@@ -1700,7 +1700,11 @@
   "priceVisibility": {
     "requestPrice": "Contact for price",
     "requestPriceHelp": "Pricing on this title is set after a brief — we'll come back with availability and a firm number.",
-    "planRfqOnly": "One or more titles in your plan require a quote — instant checkout is disabled until we confirm pricing."
+    "planRfqOnly": "One or more titles in your plan require a quote — instant checkout is disabled until we confirm pricing.",
+    "listIndicative": "List price (indicative)",
+    "listIndicativeHelp": "Indicative list rate — the final price is confirmed after a short brief.",
+    "productionIncluded": "Includes written article",
+    "firmTurnaround": "Firm price typically within 2 business days"
   },
   "titleAdmin": {
     "title": "Edit title",

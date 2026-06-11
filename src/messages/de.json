@@ -1558,7 +1558,11 @@
   "priceVisibility": {
     "requestPrice": "Preis auf Anfrage",
     "requestPriceHelp": "Der Preis wird nach Briefing festgelegt — wir melden uns mit Verfügbarkeit und einem Festpreis.",
-    "planRfqOnly": "Mindestens ein Titel im Plan erfordert ein Angebot — Sofort-Buchung ist deaktiviert, bis der Preis bestätigt ist."
+    "planRfqOnly": "Mindestens ein Titel im Plan erfordert ein Angebot — Sofort-Buchung ist deaktiviert, bis der Preis bestätigt ist.",
+    "listIndicative": "Listenpreis (indikativ)",
+    "listIndicativeHelp": "Indikativer Listenpreis — der endgültige Preis wird nach einem kurzen Briefing bestätigt.",
+    "productionIncluded": "Fertig geschriebener Artikel inklusive",
+    "firmTurnaround": "Festpreis in der Regel innerhalb von 2 Werktagen"
   },
   "titleAdmin": {
     "title": "Titel bearbeiten",
