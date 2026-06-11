@@ -203,6 +203,41 @@ export async function applyQuote(args: {
   });
 }
 
+// Quote-created products land inactive on purpose — the desk reviews
+// name/type/duplicates before a draft-quote product goes live in the
+// catalog. Once reviewed, this flips them on (active + bookable) so the
+// confirmed price surfaces as a catalog band. Scoped strictly to
+// products that came out of an applied PriceQuote and were never
+// activated; optional titleId narrows to one title.
+export async function activateQuoteProducts(args: {
+  actorUserId: string;
+  titleId?: string;
+}) {
+  const where = {
+    active: false,
+    confirmedAt: { not: null },
+    confirmedSource: { startsWith: "PriceQuote:" },
+    ...(args.titleId ? { titleId: args.titleId } : {}),
+  };
+  const products = await prisma.product.findMany({
+    where,
+    select: { id: true, titleId: true, name: true, type: true },
+  });
+  if (products.length === 0) return { activated: 0, products: [] };
+
+  await prisma.product.updateMany({
+    where,
+    data: { active: true, bookable: true },
+  });
+
+  await recordAudit(args.actorUserId, "product.activate_quote_batch", `count:${products.length}`, {
+    titleId: args.titleId ?? null,
+    productIds: products.map((p) => p.id),
+  });
+
+  return { activated: products.length, products };
+}
+
 export async function rejectQuote(args: {
   quoteId: string;
   reason?: string;

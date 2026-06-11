@@ -9,7 +9,7 @@ import {
   sendPriceRequest,
   cancelPriceRequest,
 } from "@/lib/pricing/requests";
-import { applyQuote, logQuote } from "@/lib/pricing/quotes";
+import { applyQuote, logQuote, activateQuoteProducts } from "@/lib/pricing/quotes";
 import { createContactLog } from "@/lib/pricing/contact-log";
 import type { ProductType, ContactChannel, ContactDirection } from "@prisma/client";
 
@@ -211,6 +211,14 @@ export const mutateToolDefinitions = (actorId: string) => ({
     parameters: z.object({ quoteId: z.string() }),
     handler: async (a: { quoteId: string }) =>
       applyQuote({ quoteId: a.quoteId, actorUserId: actorId }),
+  },
+
+  native_activate_quote_products: {
+    description:
+      "Activate quote-created Products (active=false, confirmedSource PriceQuote:*) after desk review so their confirmed prices show as catalog bands. Sets active+bookable. Optional titleId narrows to one title.",
+    parameters: z.object({ titleId: z.string().optional() }),
+    handler: async (a: { titleId?: string }) =>
+      activateQuoteProducts({ actorUserId: actorId, titleId: a.titleId }),
   },
 
   native_cancel_price_request: {
