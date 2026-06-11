@@ -13,8 +13,11 @@ import {
   pickContentFeeRule,
   contentFeeAmount,
   computeContentFeeLines,
+  pickMarginRule,
+  resolveDefaultMarginPct,
   type RateRule,
   type ContentFeeRuleSpec,
+  type MarginRuleSpec,
 } from "./money";
 
 test("indicativePrice applies margin then seasonal multiplier", () => {
@@ -190,4 +193,62 @@ test("computeContentFeeLines skips items with no matching rule", () => {
     "NO",
   );
   assert.equal(lines.length, 0);
+});
+
+// ---------- Default commission (MarginRule) ----------
+
+const MARGIN_RULES: MarginRuleSpec[] = [
+  { marketCode: null, marginPct: 20, active: true },
+  { marketCode: "NO", marginPct: 25, active: true },
+  { marketCode: "SE", marginPct: 30, active: false },
+];
+
+test("pickMarginRule prefers the market rule over the global one", () => {
+  assert.equal(pickMarginRule(MARGIN_RULES, "NO")?.marginPct, 25);
+  // No DK rule -> global fallback
+  assert.equal(pickMarginRule(MARGIN_RULES, "DK")?.marginPct, 20);
+});
+
+test("pickMarginRule ignores inactive rules", () => {
+  // The SE rule is inactive -> falls back to global
+  assert.equal(pickMarginRule(MARGIN_RULES, "SE")?.marginPct, 20);
+});
+
+test("pickMarginRule returns null when nothing matches", () => {
+  const onlyOtherMarket: MarginRuleSpec[] = [
+    { marketCode: "FI", marginPct: 18, active: true },
+  ];
+  assert.equal(pickMarginRule(onlyOtherMarket, "NO"), null);
+  assert.equal(pickMarginRule([], "NO"), null);
+});
+
+test("resolveDefaultMarginPct falls back to DEFAULT_MARGIN_PCT", () => {
+  assert.equal(resolveDefaultMarginPct(MARGIN_RULES, "NO"), 25);
+  assert.equal(resolveDefaultMarginPct(MARGIN_RULES, "DK"), 20);
+  // No match anywhere -> the hardcoded 15
+  assert.equal(resolveDefaultMarginPct([], "NO"), 15);
+});
+
+test("indicativeFromRules honors an explicit default margin", () => {
+  // No rules, 20% admin default: 10000 * 1.20 = 12000
+  assert.equal(indicativeFromRules(10000, [], 1, 20), 12000);
+  // Omitted -> today's behavior (15%)
+  assert.equal(indicativeFromRules(10000, [], 1), 11500);
+  // A matching tier still wins over the default
+  assert.equal(indicativeFromRules(1000, TIERS, 1, 20), 1220);
+});
+
+test("computeQuoteLines honors an explicit default margin", () => {
+  const [line] = computeQuoteLines(
+    [{ productId: "p4", name: "X", quantity: 1, basePrice: 1000, rules: [] }],
+    20,
+  );
+  assert.equal(line.marginPct, 20);
+  assert.equal(line.lineTotal, 1200);
+  // A matching tier still wins over the default
+  const [tiered] = computeQuoteLines(
+    [{ productId: "p5", name: "Y", quantity: 3, basePrice: 1000, rules: TIERS }],
+    20,
+  );
+  assert.equal(tiered.marginPct, 18);
 });

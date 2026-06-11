@@ -111,10 +111,11 @@ export type QuoteLineComputation = {
 
 export function computeQuoteLines(
   items: QuotableItem[],
+  defaultMarginPct: number = DEFAULT_MARGIN_PCT,
 ): QuoteLineComputation[] {
   return items.map((i) => {
     const rule = pickRule(i.rules, i.quantity);
-    const marginPct = rule ? rule.marginPct : DEFAULT_MARGIN_PCT;
+    const marginPct = rule ? rule.marginPct : defaultMarginPct;
     const seasonal = rule ? rule.seasonalMultiplier : DEFAULT_SEASONAL;
     return {
       kind: "INVENTORY" as const,
@@ -207,6 +208,40 @@ export function computeContentFeeLines(
   return lines;
 }
 
+// ---------- Default commission (MarginRule) ----------
+// Desk-owned default margin % used when a product carries no PriceRule.
+// Mirrors the ContentFeeRule most-specific-wins pattern, market dimension
+// only: an exact market match beats the global (null-market) fallback.
+
+export type MarginRuleSpec = {
+  marketCode: string | null;
+  marginPct: number;
+  active: boolean;
+};
+
+// Most-specific active match wins: a matched market scores above the
+// global wildcard (null). A rule whose non-null market contradicts the
+// request is ineligible. No match -> null (callers fall back to
+// DEFAULT_MARGIN_PCT).
+export function pickMarginRule(
+  rules: MarginRuleSpec[],
+  marketCode: string,
+): MarginRuleSpec | null {
+  const eligible = rules.filter(
+    (r) => r.active && (r.marketCode === null || r.marketCode === marketCode),
+  );
+  if (eligible.length === 0) return null;
+  const score = (r: MarginRuleSpec) => (r.marketCode === marketCode ? 1 : 0);
+  return [...eligible].sort((a, b) => score(b) - score(a))[0];
+}
+
+export function resolveDefaultMarginPct(
+  rules: MarginRuleSpec[],
+  marketCode: string,
+): number {
+  return pickMarginRule(rules, marketCode)?.marginPct ?? DEFAULT_MARGIN_PCT;
+}
+
 export function quoteTotals(
   lines: { lineTotal: number }[],
   vatPct: number,
@@ -232,11 +267,12 @@ export function indicativeFromRules(
   basePrice: number,
   rules: RateRule[],
   quantity = 1,
+  defaultMarginPct: number = DEFAULT_MARGIN_PCT,
 ): number {
   const rule = pickRule(rules, quantity);
   return indicativePrice(
     basePrice,
-    rule ? rule.marginPct : DEFAULT_MARGIN_PCT,
+    rule ? rule.marginPct : defaultMarginPct,
     rule ? rule.seasonalMultiplier : DEFAULT_SEASONAL,
   );
 }
