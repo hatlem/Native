@@ -1,6 +1,7 @@
 "use server";
 
 import { redirect } from "next/navigation";
+import { revalidatePath } from "next/cache";
 import { ProductType, PriceVisibility } from "@prisma/client";
 import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
@@ -352,6 +353,135 @@ export async function setPublisherPricesPublic(formData: FormData) {
     redirect(`/${locale}/desk/titles/${titleIdReturn}?saved=publisher`);
   }
   redirect(`/${locale}/desk/titles`);
+}
+
+// Title-level production-fee default — the middle layer of the fee
+// cascade (Product.productionFee → Title.productionFeeDefault →
+// ContentFeeRule). Blank input clears the override so the title
+// inherits the desk price list again; explicit 0 means the publisher
+// includes production for every product on this title.
+export async function updateTitleProductionFee(formData: FormData) {
+  const locale = field(formData, "locale") || "en";
+  const titleId = field(formData, "titleId");
+  const userId = await requireSuperadmin(locale);
+
+  const title = await prisma.title.findUnique({
+    where: { id: titleId },
+    select: { id: true, name: true },
+  });
+  if (!title) redirect(`/${locale}/desk/titles`);
+
+  const raw = field(formData, "productionFeeDefault");
+  let productionFeeDefault: number | null = null;
+  if (raw) {
+    const parsed = Number(raw);
+    if (!Number.isFinite(parsed) || parsed < 0) {
+      redirect(`/${locale}/desk/titles/${titleId}?error=invalid-fee`);
+    }
+    productionFeeDefault = Math.round(parsed * 100) / 100;
+  }
+
+  await prisma.title.update({
+    where: { id: title.id },
+    data: { productionFeeDefault },
+  });
+  await recordAudit(
+    userId,
+    "title.production_fee_default",
+    `Title:${title.id}`,
+    { name: title.name, productionFeeDefault },
+  );
+  revalidatePath(`/${locale}/desk/titles/${titleId}`);
+  redirect(`/${locale}/desk/titles/${titleId}?saved=1`);
+}
+
+// Per-product pricing overrides, the most-specific layer of both
+// cascades in one form:
+//
+//   - marginPct → the product's "default"-labeled PriceRule. Blank =
+//     inherit the admin MarginRule default (we DELETE the rule so the
+//     market default applies again); 0–95 upserts the rule (update the
+//     first existing default-labeled rule, else create with
+//     seasonalMultiplier 1 / minVolume 1).
+//   - productionFee → Product.productionFee. Blank = inherit (Title
+//     default → ContentFeeRule); explicit 0 = production included.
+export async function updateProductPricing(formData: FormData) {
+  const locale = field(formData, "locale") || "en";
+  const productId = field(formData, "productId");
+  const userId = await requireSuperadmin(locale);
+
+  const product = await prisma.product.findUnique({
+    where: { id: productId },
+    select: {
+      id: true,
+      name: true,
+      titleId: true,
+      priceRules: {
+        where: { label: "default" },
+        orderBy: { createdAt: "asc" },
+      },
+    },
+  });
+  if (!product) redirect(`/${locale}/desk/titles`);
+
+  const back = `/${locale}/desk/titles/${product.titleId}`;
+
+  // Commission % has a hard upper bound (same 95% cap as MarginRule):
+  // anything above would price the media share out of existence.
+  const marginRaw = field(formData, "marginPct");
+  let marginPct: number | null = null;
+  if (marginRaw) {
+    const parsed = Number(marginRaw);
+    if (!Number.isFinite(parsed) || parsed < 0 || parsed > 95) {
+      redirect(`${back}?error=invalid-pricing`);
+    }
+    marginPct = Math.round(parsed * 100) / 100;
+  }
+
+  const feeRaw = field(formData, "productionFee");
+  let productionFee: number | null = null;
+  if (feeRaw) {
+    const parsed = Number(feeRaw);
+    if (!Number.isFinite(parsed) || parsed < 0) {
+      redirect(`${back}?error=invalid-pricing`);
+    }
+    productionFee = Math.round(parsed * 100) / 100;
+  }
+
+  const defaultRule = product.priceRules[0] ?? null;
+  if (marginPct === null) {
+    if (defaultRule) {
+      await prisma.priceRule.delete({ where: { id: defaultRule.id } });
+    }
+  } else if (defaultRule) {
+    await prisma.priceRule.update({
+      where: { id: defaultRule.id },
+      data: { marginPct },
+    });
+  } else {
+    await prisma.priceRule.create({
+      data: {
+        productId: product.id,
+        label: "default",
+        marginPct,
+        seasonalMultiplier: 1,
+        minVolume: 1,
+      },
+    });
+  }
+
+  await prisma.product.update({
+    where: { id: product.id },
+    data: { productionFee },
+  });
+  await recordAudit(
+    userId,
+    "product.pricing_override",
+    `Product:${product.id}`,
+    { name: product.name, marginPct, productionFee },
+  );
+  revalidatePath(back);
+  redirect(`${back}?saved=1`);
 }
 
 // Deactivate an already-live title (super-admin only). Doesn't touch

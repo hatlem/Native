@@ -6,6 +6,8 @@ import { Link } from "@/i18n/navigation";
 import {
   updateTitlePricing,
   setPublisherPricesPublic,
+  updateTitleProductionFee,
+  updateProductPricing,
 } from "@/app/title-actions";
 import { SalesContactsPanel } from "./_components/SalesContactsPanel";
 import { PriceRequestsPanel } from "./_components/PriceRequestsPanel";
@@ -149,6 +151,12 @@ export default async function DeskTitleEditPage({
     include: {
       publisher: true,
       market: true,
+      // priceRules included so the per-product margin override renders
+      // its current "default"-labeled value (blank = inherit).
+      products: {
+        include: { priceRules: true },
+        orderBy: { createdAt: "asc" },
+      },
     },
   });
   if (!title) notFound();
@@ -186,6 +194,16 @@ export default async function DeskTitleEditPage({
       {error === "invalid-rate" ? (
         <div className="banner-error" role="alert">
           <span>{t("publishedRateCardHelp")}</span>
+        </div>
+      ) : error === "invalid-fee" ? (
+        <div className="banner-error" role="alert">
+          <span>{t("productionFeeDefaultHelp")}</span>
+        </div>
+      ) : error === "invalid-pricing" ? (
+        <div className="banner-error" role="alert">
+          <span>
+            {t("marginPctHelp")} {t("productionFeeHelp")}
+          </span>
         </div>
       ) : null}
 
@@ -290,6 +308,130 @@ export default async function DeskTitleEditPage({
           </div>
         </form>
       </article>
+
+      {/* Fee/margin override cascade, desk side. Title level sits in the
+          middle of the fee cascade (Product.productionFee →
+          Title.productionFeeDefault → ContentFeeRule); the per-product
+          rows below are the most-specific layer for both fee and
+          commission. Blank = inherit; explicit 0 = publisher includes
+          production. */}
+      <article className="card" style={{ marginTop: 16 }}>
+        <form action={updateTitleProductionFee} className="product-form">
+          <input type="hidden" name="locale" value={locale} />
+          <input type="hidden" name="titleId" value={title.id} />
+
+          <div className="field">
+            <label htmlFor="productionFeeDefault">
+              {t("productionFeeDefault")}
+            </label>
+            <input
+              id="productionFeeDefault"
+              name="productionFeeDefault"
+              type="number"
+              min="0"
+              step="100"
+              defaultValue={
+                title.productionFeeDefault != null
+                  ? Number(title.productionFeeDefault).toString()
+                  : ""
+              }
+            />
+            <p className="muted small">{t("productionFeeDefaultHelp")}</p>
+          </div>
+
+          <SubmitButton
+            label={t("savePricing")}
+            pendingLabel={t("savingPricing")}
+            className="btn"
+          />
+        </form>
+      </article>
+
+      {title.products.length > 0 ? (
+        <article className="card" style={{ marginTop: 16 }}>
+          <h2>{t("productPricing")}</h2>
+          <ul style={{ listStyle: "none", padding: 0, margin: "12px 0 0" }}>
+            {title.products.map((product) => {
+              const defaultRule = product.priceRules.find(
+                (r) => r.label === "default",
+              );
+              return (
+                <li
+                  key={product.id}
+                  style={{
+                    padding: "12px 0",
+                    borderBottom: "1px solid var(--border, #e5e7eb)",
+                  }}
+                >
+                  <strong>{product.name}</strong>{" "}
+                  <span className="muted small">
+                    {product.type} · {Number(product.basePrice)}{" "}
+                    {product.currency}
+                    {product.active ? "" : " · inactive"}
+                  </span>
+                  <form
+                    action={updateProductPricing}
+                    className="product-form"
+                    style={{ marginTop: 8 }}
+                  >
+                    <input type="hidden" name="locale" value={locale} />
+                    <input
+                      type="hidden"
+                      name="productId"
+                      value={product.id}
+                    />
+
+                    <div className="field">
+                      <label htmlFor={`marginPct-${product.id}`}>
+                        {t("marginPct")}
+                      </label>
+                      <input
+                        id={`marginPct-${product.id}`}
+                        name="marginPct"
+                        type="number"
+                        min="0"
+                        max="95"
+                        step="0.5"
+                        defaultValue={
+                          defaultRule != null
+                            ? Number(defaultRule.marginPct).toString()
+                            : ""
+                        }
+                      />
+                      <p className="muted small">{t("marginPctHelp")}</p>
+                    </div>
+
+                    <div className="field">
+                      <label htmlFor={`productionFee-${product.id}`}>
+                        {t("productionFee")}
+                      </label>
+                      <input
+                        id={`productionFee-${product.id}`}
+                        name="productionFee"
+                        type="number"
+                        min="0"
+                        step="100"
+                        defaultValue={
+                          product.productionFee != null
+                            ? Number(product.productionFee).toString()
+                            : ""
+                        }
+                      />
+                      <p className="muted small">{t("productionFeeHelp")}</p>
+                    </div>
+
+                    <SubmitButton
+                      label={t("savePricing")}
+                      pendingLabel={t("savingPricing")}
+                      className="btn small"
+                    />
+                  </form>
+                </li>
+              );
+            })}
+          </ul>
+        </article>
+      ) : null}
 
       <CommercialProfileCard title={title} />
 
