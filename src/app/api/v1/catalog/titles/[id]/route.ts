@@ -104,7 +104,6 @@ export async function GET(
       },
       pricesVisible: anyPriceVisible,
       products: title.products.map((p) => {
-        const shown = isProductPriceShown(p, title);
         // Band, never a figure — and NEVER the raw basePrice (net cost).
         const band = productBand(p, title, feeRules);
         return {
@@ -124,14 +123,6 @@ export async function GET(
                 requirements: p.spec.requirements,
               }
             : null,
-          priceRules: shown
-            ? p.priceRules.map((r) => ({
-                label: r.label,
-                minVolume: r.minVolume,
-                marginPct: Number(r.marginPct),
-                seasonalMultiplier: Number(r.seasonalMultiplier),
-              }))
-            : [],
         };
       }),
     },
