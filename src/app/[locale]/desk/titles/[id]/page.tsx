@@ -9,6 +9,8 @@ import {
   updateTitleProductionFee,
   updateProductPricing,
 } from "@/app/title-actions";
+import { pickContentFeeRule } from "@/lib/money";
+import { loadContentFeeRules } from "@/lib/content-fee";
 import { SalesContactsPanel } from "./_components/SalesContactsPanel";
 import { PriceRequestsPanel } from "./_components/PriceRequestsPanel";
 import { PendingQuotesPanel } from "./_components/PendingQuotesPanel";
@@ -166,6 +168,12 @@ export default async function DeskTitleEditPage({
     },
   });
   if (!title) notFound();
+
+  // Production responsibility per product: explicit 0 = the publisher
+  // includes production (we don't write); otherwise the fee cascade tells
+  // the desk what we charge — and therefore that WE must produce (and
+  // front the writer cost).
+  const feeRules = await loadContentFeeRules();
 
   const t = await getTranslations({ locale, namespace: "titleAdmin" });
   const tMarket = await getTranslations({ locale, namespace: "market" });
@@ -373,8 +381,64 @@ export default async function DeskTitleEditPage({
                   <span className="muted small">
                     {product.type} · {Number(product.basePrice)}{" "}
                     {product.currency}
+                    {product.pricingModel !== "FLAT"
+                      ? ` ${product.pricingModel}`
+                      : ""}
                     {product.active ? "" : " · inactive"}
                   </span>
+                  {/* Hvem produserer artikkelen — avgjør om vi må legge ut
+                      for skribent. Hardkodet norsk som resten av
+                      desk-profilkortet. */}
+                  {(() => {
+                    const explicit =
+                      product.productionFee != null
+                        ? Number(product.productionFee)
+                        : title.productionFeeDefault != null
+                          ? Number(title.productionFeeDefault)
+                          : null;
+                    if (explicit === 0) {
+                      return (
+                        <div className="muted small" style={{ marginTop: 4 }}>
+                          Produksjon: <strong>mediet inkluderer</strong> — vi
+                          skriver ikke
+                        </div>
+                      );
+                    }
+                    const fee =
+                      explicit ??
+                      pickContentFeeRule(
+                        feeRules,
+                        product.type,
+                        title.market.code,
+                      )?.greenfieldFee ??
+                      null;
+                    return (
+                      <div className="muted small" style={{ marginTop: 4 }}>
+                        Produksjon:{" "}
+                        {fee != null ? (
+                          <>
+                            <strong>vi produserer</strong> — gebyr {fee}{" "}
+                            {title.market.currency}
+                            {explicit != null ? "" : " (standard sats)"}
+                          </>
+                        ) : (
+                          <strong style={{ color: "#b45309" }}>
+                            ingen produksjonssats konfigurert
+                          </strong>
+                        )}
+                      </div>
+                    );
+                  })()}
+                  {product.includedText ? (
+                    <div className="muted small" style={{ marginTop: 4 }}>
+                      Mediet oppgir inkludert: {product.includedText}
+                    </div>
+                  ) : null}
+                  {product.leadTimeDays == null ? (
+                    <div className="muted small" style={{ marginTop: 4 }}>
+                      Ledetid: ikke oppgitt av mediet
+                    </div>
+                  ) : null}
                   <form
                     action={updateProductPricing}
                     className="product-form"

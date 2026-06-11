@@ -339,7 +339,8 @@
     },
     "includedHeading": "Sisältyy hintaan (median mukaan)",
     "notIncludedHeading": "Ei sisälly",
-    "rateProductionNote": "Artikkelin tuotanto veloitetaan erikseen — vahvistetaan kiinteässä tarjouksessa."
+    "rateProductionNote": "Artikkelin tuotanto veloitetaan erikseen — vahvistetaan kiinteässä tarjouksessa.",
+    "leadTimeEstimated": "arviolta {days} päivää"
   },
   "plan": {
     "eyebrow": "Suunnitelma",

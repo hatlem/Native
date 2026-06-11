@@ -348,12 +348,13 @@ export default async function TitleDetailPage({
                   <p style={{ margin: "2px 0 0" }}>{p.excludedText}</p>
                 </div>
               ) : null}
-              {/* Lead time only when the publisher actually stated one. */}
-              {p.leadTimeDays != null ? (
-                <div className="muted" style={{ marginTop: 6 }}>
-                  {t("leadTime")}: {p.leadTimeDays} {t("days")}
-                </div>
-              ) : null}
+              {/* Publisher-stated lead time when we have it; otherwise an
+                  honest platform estimate, labelled as such. */}
+              <div className="muted" style={{ marginTop: 6 }}>
+                {p.leadTimeDays != null
+                  ? `${t("leadTime")}: ${p.leadTimeDays} ${t("days")}`
+                  : `${t("leadTime")}: ${t("leadTimeEstimated", { days: 10 })}`}
+              </div>
               {p.spec ? (
                 <div className="muted" style={{ marginTop: 10 }}>
                   <strong>{t("spec")}</strong>

@@ -339,7 +339,8 @@
     },
     "includedHeading": "Included in the price (per the publisher)",
     "notIncludedHeading": "Not included",
-    "rateProductionNote": "Article production billed separately — confirmed in your firm quote."
+    "rateProductionNote": "Article production billed separately — confirmed in your firm quote.",
+    "leadTimeEstimated": "estimated {days} days"
   },
   "plan": {
     "eyebrow": "Plan",

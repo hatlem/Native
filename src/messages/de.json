@@ -339,7 +339,8 @@
     },
     "includedHeading": "Im Preis enthalten (laut Medium)",
     "notIncludedHeading": "Nicht enthalten",
-    "rateProductionNote": "Die Artikelproduktion wird separat berechnet — bestätigt im Festpreisangebot."
+    "rateProductionNote": "Die Artikelproduktion wird separat berechnet — bestätigt im Festpreisangebot.",
+    "leadTimeEstimated": "geschätzt {days} Tage"
   },
   "plan": {
     "eyebrow": "Plan",

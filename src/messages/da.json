@@ -260,7 +260,8 @@
     },
     "includedHeading": "Inkluderet i prisen (ifølge mediet)",
     "notIncludedHeading": "Ikke inkluderet",
-    "rateProductionNote": "Artikelproduktion kommer oveni — bekræftes i det faste tilbud."
+    "rateProductionNote": "Artikelproduktion kommer oveni — bekræftes i det faste tilbud.",
+    "leadTimeEstimated": "estimeret {days} dage"
   },
   "plan": {
     "eyebrow": "Plan",
