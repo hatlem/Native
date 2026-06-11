@@ -586,6 +586,23 @@ model ContentFeeRule {
   @@index([active, productType, marketCode])
 }
 
+// Desk-owned default commission (%) applied when a product carries no
+// PriceRule of its own. Null marketCode = global fallback; the
+// most-specific active match wins (market beats global). With no rows
+// the code falls back to the hardcoded 15 (DEFAULT_MARGIN_PCT), so an
+// empty table changes nothing.
+model MarginRule {
+  id         String      @id @default(cuid())
+  marketCode MarketCode?
+  marginPct  Decimal     @db.Decimal(5, 2)
+  active     Boolean     @default(true)
+  note       String?
+  createdAt  DateTime    @default(now())
+  updatedAt  DateTime    @updatedAt
+
+  @@index([active, marketCode])
+}
+
 // Phase 4 — content playbooks. Desk-owned, reusable guidance for what
 // makes good native for a given format / category / market. The most
 // specific active match surfaces to the writer when a ContentBrief is
