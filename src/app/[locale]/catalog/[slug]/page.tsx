@@ -4,8 +4,11 @@ import { notFound, redirect } from "next/navigation";
 import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
 import { Link } from "@/i18n/navigation";
-import { indicativeFromRules, toRateRules, formatMoney, intlLocale } from "@/lib/money";
-import { isProductPriceShown, arePricesVisible } from "@/lib/pricing-visibility";
+import { intlLocale } from "@/lib/money";
+import { isProductPriceShown, arePricesVisible } from "@/lib/pricing/visibility";
+import { bandLabel } from "@/lib/pricing/bands";
+import { productBand, titleBand } from "@/lib/pricing/display-price";
+import { loadContentFeeRules } from "@/lib/content-fee";
 import { addToPlan } from "@/app/plan-actions";
 import { SubmitButton } from "@/components";
 import { localizeTaxonomy, localizeVertical } from "@/lib/taxonomy-i18n";
@@ -54,40 +57,29 @@ export default async function TitleDetailPage({
   if (title.discontinuedAt) notFound();
   if (!title.active && title.lastVerifiedAt) notFound();
 
+  const feeRules = await loadContentFeeRules();
+
   // Title-level visibility gate (pricesPublic flags only) — used for
   // schema.org AggregateOffer wrapper and the bottom note.
   const titlePriceVisible = arePricesVisible(title);
   const siteBase =
     process.env.NEXT_PUBLIC_SITE_URL?.replace(/\/$/, "") || "";
-  // schema.org Offer/price is only emitted per-product when active +
-  // confirmedAt + pricesPublic are all satisfied.
-  const ldOffers = title.products.map((p) => {
-    const shown = isProductPriceShown(p, title);
-    return shown
-      ? {
-          "@type": "Offer",
-          name: p.name,
-          priceCurrency: p.currency,
-          price: indicativeFromRules(
-            Number(p.basePrice),
-            toRateRules(p.priceRules),
-          ),
-          availability: p.bookable
-            ? "https://schema.org/InStock"
-            : "https://schema.org/OutOfStock",
-        }
-      : {
-          "@type": "Offer",
-          name: p.name,
-          priceCurrency: p.currency,
-          availability: p.bookable
-            ? "https://schema.org/InStock"
-            : "https://schema.org/OutOfStock",
-        };
-  });
+  // JSON-LD must NEVER carry an exact figure — structured data is the
+  // easiest scrape target on the site. Per-product Offers carry no price;
+  // the AggregateOffer carries the band bounds (valid schema.org, keeps
+  // discovery value).
+  const ldOffers = title.products.map((p) => ({
+    "@type": "Offer",
+    name: p.name,
+    priceCurrency: p.currency,
+    availability: p.bookable
+      ? "https://schema.org/InStock"
+      : "https://schema.org/OutOfStock",
+  }));
   const anyPriceVisible = title.products.some((p) =>
     isProductPriceShown(p, title),
   );
+  const ldBand = titleBand(title.products, title, feeRules);
   const ld = {
     "@context": "https://schema.org",
     "@type": "Product",
@@ -95,10 +87,12 @@ export default async function TitleDetailPage({
     category: title.category,
     brand: { "@type": "Brand", name: title.publisher.name },
     url: `${siteBase}/${locale}/catalog/${title.slug}`,
-    offers: anyPriceVisible
+    offers: ldBand
       ? {
           "@type": "AggregateOffer",
-          priceCurrency: title.market.currency,
+          priceCurrency: ldBand.product.currency,
+          ...(ldBand.band.kind !== "under" ? { lowPrice: ldBand.band.low } : {}),
+          ...(ldBand.band.kind !== "over" ? { highPrice: ldBand.band.high } : {}),
           offers: ldOffers,
         }
       : { "@type": "AggregateOffer", offers: ldOffers },
@@ -228,11 +222,7 @@ export default async function TitleDetailPage({
       ) : (
         <div className="grid">
         {title.products.map((p) => {
-          const priceShown = isProductPriceShown(p, title);
-          const price = indicativeFromRules(
-            Number(p.basePrice),
-            toRateRules(p.priceRules),
-          );
+          const band = productBand(p, title, feeRules);
           const formatSlug = p.type.toLowerCase().replace(/_/g, "-");
           return (
             <article className="card" key={p.id}>
@@ -243,14 +233,20 @@ export default async function TitleDetailPage({
               >
                 {tFormats("learnMore")} →
               </Link>
-              {priceShown ? (
-                <div className="price">
-                  {t("from")} {formatMoney(price, p.currency, locale)}
-                </div>
+              {band ? (
+                <>
+                  <div className="price">
+                    ≈ {bandLabel(band, p.currency)}{" "}
+                    <span className="muted" title={tv("listIndicativeHelp")}>
+                      · {tv("listIndicative")}
+                    </span>
+                  </div>
+                  <div className="muted">✓ {tv("productionIncluded")}</div>
+                </>
               ) : (
                 <div className="price muted">{tv("requestPrice")}</div>
               )}
-              {priceShown && p.visibility === "FIRM" ? (
+              {band && p.visibility === "FIRM" ? (
                 <span className="tag">⚡ {tf("badge")}</span>
               ) : null}
               <div className="muted" style={{ marginTop: 6 }}>
@@ -280,14 +276,17 @@ export default async function TitleDetailPage({
                 </div>
               ) : null}
               {p.bookable ? (
-                <form action={addToPlan} style={{ marginTop: 12 }}>
-                  <input type="hidden" name="locale" value={locale} />
-                  <input type="hidden" name="productId" value={p.id} />
-                  <SubmitButton
-                    label={t("addToPlan")}
-                    pendingLabel={t("addingToPlan")}
-                  />
-                </form>
+                <>
+                  <form action={addToPlan} style={{ marginTop: 12 }}>
+                    <input type="hidden" name="locale" value={locale} />
+                    <input type="hidden" name="productId" value={p.id} />
+                    <SubmitButton
+                      label={t("addToPlan")}
+                      pendingLabel={t("addingToPlan")}
+                    />
+                  </form>
+                  {band ? <p className="note">{tv("firmTurnaround")}</p> : null}
+                </>
               ) : (
                 <p className="note">{t("unavailable")}</p>
               )}
