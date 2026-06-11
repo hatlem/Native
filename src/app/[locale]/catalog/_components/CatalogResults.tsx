@@ -1,8 +1,11 @@
 import { getTranslations } from "next-intl/server";
 import { Prisma } from "@prisma/client";
 import { Link } from "@/i18n/navigation";
-import { indicativeFromRules, toRateRules, formatMoney, intlLocale } from "@/lib/money";
-import { isProductPriceShown } from "@/lib/pricing-visibility";
+import { intlLocale } from "@/lib/money";
+import { isProductPriceShown } from "@/lib/pricing/visibility";
+import { bandLabel } from "@/lib/pricing/bands";
+import { titleBand } from "@/lib/pricing/display-price";
+import { loadContentFeeRules } from "@/lib/content-fee";
 import { EmptyState } from "@/app/empty-state";
 import { CompareSelectionProvider, TitleSelector } from "./CompareSelection";
 
@@ -36,6 +39,8 @@ export async function CatalogResults({
     namespace: "priceVisibility",
   });
 
+  const feeRules = await loadContentFeeRules();
+
   return titles.length === 0 ? (
     <EmptyState
       title={t("noResults")}
@@ -46,28 +51,25 @@ export async function CatalogResults({
     <CompareSelectionProvider enabled={compareMode}>
     <div className="grid">
       {titles.map((title) => {
-        // Per-product visibility: active + confirmedAt + pricesPublic flags
+        // Per-product visibility: active + confirmedAt + pricesPublic flags.
+        // The card shows a bucket BAND, never an exact figure — exact prices
+        // exist only in the quote flow (see display-price.ts).
         const visibleProducts = title.products.filter((p) =>
           isProductPriceShown(p, title),
         );
         const anyHidden = title.products.some(
           (p) => !isProductPriceShown(p, title),
         );
-        const prices = visibleProducts.map((p) =>
-          indicativeFromRules(
-            Number(p.basePrice),
-            toRateRules(p.priceRules),
-          ),
-        );
-        const from = prices.length ? Math.min(...prices) : null;
-        const currency = title.products[0]?.currency ?? title.market.currency;
+        const fromBand = titleBand(title.products, title, feeRules);
         const needsQuote = title.products.length === 0;
 
         return (
           <article className="card catalog-card" key={title.id}>
             <TitleSelector id={title.id} />
             <h3>
-              <Link href={`/catalog/${title.slug}`}>{title.name}</Link>
+              <Link className="card-link" href={`/catalog/${title.slug}`}>
+                {title.name}
+              </Link>
             </h3>
             <div className="muted">
               {title.publisher.name} · {tMarket(title.market.code)}
@@ -122,10 +124,16 @@ export async function CatalogResults({
                 {new Intl.NumberFormat(intlLocale(locale)).format(title.monthlyReach)}
               </div>
             ) : null}
-            {from !== null ? (
-              <div className="price">
-                {t("card.from")} {formatMoney(from, currency, locale)}
-              </div>
+            {fromBand ? (
+              <>
+                <div className="price">
+                  ≈ {bandLabel(fromBand.band, fromBand.product.currency)}{" "}
+                  <span className="muted" title={tv("listIndicativeHelp")}>
+                    · {tv("listIndicative")}
+                  </span>
+                </div>
+                <div className="muted">✓ {tv("productionIncluded")}</div>
+              </>
             ) : anyHidden ? (
               <div className="price muted">{tv("requestPrice")}</div>
             ) : null}

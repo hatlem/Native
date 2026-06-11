@@ -3514,6 +3514,19 @@ select:disabled {
 .catalog-card {
   position: relative;
 }
+
+/* Whole-card click target: the title link stretches over the card via
+   ::after; interactive children stay above it. */
+.catalog-card a.card-link::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+}
+.catalog-card :is(input, button, label, select, a:not(.card-link)) {
+  position: relative;
+  z-index: 2;
+}
 .title-selector {
   position: absolute;
   top: 12px;
