@@ -325,7 +325,21 @@
     "formatsHeading": "Format wählen und zum Plan hinzufügen",
     "bookableSummary": "{count, plural, =0 {Nichts sofort buchbar} =1 {1 sofort buchbar} other {# sofort buchbar}}",
     "offersNative": "✓ Werblicher Content",
-    "keywordsHeading": "Schlagwörter"
+    "keywordsHeading": "Schlagwörter",
+    "keyFacts": "Kennzahlen",
+    "factFrequency": "Frequenz",
+    "factType": "Typ",
+    "factFormat": "Format",
+    "factAudience": "Zielgruppe",
+    "factNativeFit": "Native-Eignung",
+    "factCategory": "Kategorie",
+    "marketRules": {
+      "heading": "Regeln in diesem Markt",
+      "labeling": "Die Kennzeichnung übernimmt das Medium — der Artikel wird gemäß dem Werberecht in {market} als '{label}' gekennzeichnet. Sie liefern nur den Inhalt."
+    },
+    "includedHeading": "Im Preis enthalten",
+    "includedPublication": "Veröffentlichung auf {name}",
+    "includedLabeling": "Gesetzlich vorgeschriebene Kennzeichnung"
   },
   "plan": {
     "eyebrow": "Plan",

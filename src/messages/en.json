@@ -325,7 +325,21 @@
     "formatsHeading": "Choose a format and add it to your plan",
     "bookableSummary": "{count, plural, =0 {None bookable instantly} =1 {1 bookable instantly} other {# bookable instantly}}",
     "offersNative": "✓ Advertiser content",
-    "keywordsHeading": "Keywords"
+    "keywordsHeading": "Keywords",
+    "keyFacts": "Key facts",
+    "factFrequency": "Frequency",
+    "factType": "Type",
+    "factFormat": "Format",
+    "factAudience": "Audience",
+    "factNativeFit": "Native fit",
+    "factCategory": "Category",
+    "marketRules": {
+      "heading": "Rules in this market",
+      "labeling": "Labeling is handled by the publisher — the article is labeled “{label}” as required by marketing law in {market}. You only supply the content."
+    },
+    "includedHeading": "Included in the price",
+    "includedPublication": "Publication on {name}",
+    "includedLabeling": "Required disclosure labeling"
   },
   "plan": {
     "eyebrow": "Plan",

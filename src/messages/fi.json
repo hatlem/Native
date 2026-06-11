@@ -325,7 +325,21 @@
     "formatsHeading": "Valitse formaatti ja lisää se suunnitelmaasi",
     "bookableSummary": "{count, plural, =0 {Ei välittömästi varattavia} =1 {1 välittömästi varattava} other {# välittömästi varattavaa}}",
     "offersNative": "✓ Kaupallinen sisältö",
-    "keywordsHeading": "Avainsanat"
+    "keywordsHeading": "Avainsanat",
+    "keyFacts": "Avainluvut",
+    "factFrequency": "Ilmestymistiheys",
+    "factType": "Tyyppi",
+    "factFormat": "Formaatti",
+    "factAudience": "Kohderyhmä",
+    "factNativeFit": "Native-sopivuus",
+    "factCategory": "Kategoria",
+    "marketRules": {
+      "heading": "Tämän markkinan säännöt",
+      "labeling": "Median vastuulla on merkintä — artikkeli merkitään '{label}' paikallisen markkinointilain mukaisesti ({market}). Sinä toimitat vain sisällön."
+    },
+    "includedHeading": "Sisältyy hintaan",
+    "includedPublication": "Julkaisu kohteessa {name}",
+    "includedLabeling": "Lakisääteinen merkintä"
   },
   "plan": {
     "eyebrow": "Suunnitelma",

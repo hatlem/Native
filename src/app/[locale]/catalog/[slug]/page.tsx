@@ -16,6 +16,16 @@ import type { AppLocale } from "@/i18n/routing";
 
 export const dynamic = "force-dynamic";
 
+// Some Title.category values are raw import slugs ("general-news") the
+// taxonomy map doesn't cover. When localization passes the value through
+// untouched and it still looks like a slug, render it human-readable
+// instead of leaking the slug into the facts card.
+function prettyCategory(value: string): string {
+  if (!/^[a-z0-9]+(-[a-z0-9]+)*$/.test(value)) return value;
+  const words = value.replace(/-/g, " ");
+  return words.charAt(0).toUpperCase() + words.slice(1);
+}
+
 export default async function TitleDetailPage({
   params,
 }: {
@@ -116,99 +126,112 @@ export default async function TitleDetailPage({
       <p>
         <Link href="/catalog">← {t("back")}</Link>
       </p>
-      <h1>{title.name}</h1>
-      <p className="muted">
-        {t("publishedBy")} {title.publisher.name} · {tMarket(title.market.code)}{" "}
-        · {title.category}
-      </p>
-      {title.offersNativeContent ? (
-        <p style={{ marginTop: 8 }}>
-          <span className="tag">{t("offersNative")}</span>
-        </p>
-      ) : null}
-      {title.description ? (
-        <p style={{ marginTop: 8 }}>{title.description}</p>
-      ) : null}
-      {title.digitalReach ? (
-        <p className="muted">
-          {t("digitalReach")}:{" "}
-          {new Intl.NumberFormat(intlLocale(locale)).format(title.digitalReach)}
-        </p>
-      ) : title.monthlyReach ? (
-        <p className="muted">
-          {t("reach")}: {new Intl.NumberFormat(intlLocale(locale)).format(title.monthlyReach)}
-        </p>
-      ) : null}
-      {/* Surface the rest of the CSV-imported research metadata so buyers
-          can size up a research-catalog title even before requesting a quote. */}
-      {title.type ||
-      title.frequency ||
-      title.b2bB2c ||
-      title.format ||
-      title.nativeFit ||
-      title.reach ? (
-        <div
-          style={{
-            marginTop: 8,
-            display: "flex",
-            gap: 6,
-            flexWrap: "wrap",
-          }}
-        >
-          {title.type ? <span className="tag">{localizeTaxonomy(title.type, locale as AppLocale)}</span> : null}
-          {title.frequency ? (
-            <span className="tag">{localizeTaxonomy(title.frequency, locale as AppLocale)}</span>
-          ) : null}
-          {title.b2bB2c ? <span className="tag">{localizeTaxonomy(title.b2bB2c, locale as AppLocale)}</span> : null}
-          {title.format ? <span className="tag">{localizeTaxonomy(title.format, locale as AppLocale)}</span> : null}
-          {title.nativeFit ? (
-            <span className="tag">
-              {t("nativeFitTag", { value: title.nativeFit })}
-            </span>
-          ) : null}
-          {title.reach ? <span className="tag">{title.reach}</span> : null}
-        </div>
-      ) : null}
-      {title.vertical ? (
-        <p className="muted" style={{ marginTop: 8 }}>
-          {localizeVertical(title.vertical, locale as AppLocale)}
-        </p>
-      ) : null}
-      {title.audience ? (
-        <p className="muted">{localizeVertical(title.audience, locale as AppLocale)}</p>
-      ) : null}
-      {title.keywords.length ? (
-        <div style={{ marginTop: 8 }}>
-          <span className="muted small">{t("keywordsHeading")}: </span>
-          <span style={{ display: "inline-flex", gap: 6, flexWrap: "wrap" }}>
-            {title.keywords.map((k) => (
-              <span className="tag" key={k}>
-                {k}
-              </span>
-            ))}
-          </span>
-        </div>
-      ) : null}
 
-      {/* Market-level disclosure label — surfaced BEFORE the quote so
-          regulated buyers (UWG-DE/AT, KSML-FI, CAP-UK, ASAI-IE) can
-          confirm what label the platform will require on published
-          native content. Closes the Linnea scenario finding that the
-          per-market regulatory floor was invisible until quote stage. */}
-      {title.market.disclosureLabel ? (
-        <p
-          className="muted"
-          style={{ marginTop: 8, fontSize: "0.85em" }}
-          aria-label={t("disclosureLabel.aria")}
-        >
-          <strong>{t("disclosureLabel.heading")}:</strong>{" "}
-          <span className="tag" style={{ marginLeft: 4 }}>
-            “{title.market.disclosureLabel}”
-          </span>{" "}
-          <span style={{ marginLeft: 4 }}>
-            {t("disclosureLabel.body")}
-          </span>
-        </p>
+      {/* Two-column header: identity/description left, labelled key
+          facts right. The facts card replaces the old loose stack of
+          unlabelled metadata lines (raw category slug, floating
+          type/audience text) — every datum now has a label, and only
+          rows with data render. */}
+      <div className="detail-head">
+        <div>
+          <h1>{title.name}</h1>
+          <p className="muted">
+            {t("publishedBy")} {title.publisher.name} ·{" "}
+            {tMarket(title.market.code)}
+          </p>
+          {title.description ? (
+            <p style={{ marginTop: 8 }}>{title.description}</p>
+          ) : null}
+          {title.vertical ? (
+            <p className="muted" style={{ marginTop: 8 }}>
+              {localizeVertical(title.vertical, locale as AppLocale)}
+            </p>
+          ) : null}
+          {title.audience ? (
+            <p className="muted">
+              {localizeVertical(title.audience, locale as AppLocale)}
+            </p>
+          ) : null}
+          {title.offersNativeContent || title.reach || title.keywords.length ? (
+            <div
+              style={{ marginTop: 10, display: "flex", gap: 6, flexWrap: "wrap" }}
+            >
+              {title.offersNativeContent ? (
+                <span className="tag">{t("offersNative")}</span>
+              ) : null}
+              {title.reach ? <span className="tag">{title.reach}</span> : null}
+              {title.keywords.map((k) => (
+                <span className="tag" key={k}>
+                  {k}
+                </span>
+              ))}
+            </div>
+          ) : null}
+        </div>
+
+        <aside className="card" aria-label={t("keyFacts")}>
+          <h3 style={{ marginTop: 0 }}>{t("keyFacts")}</h3>
+          <dl className="spec-list">
+            {title.digitalReach ? (
+              <>
+                <dt>{t("digitalReach")}</dt>
+                <dd>
+                  {new Intl.NumberFormat(intlLocale(locale)).format(
+                    title.digitalReach,
+                  )}
+                </dd>
+              </>
+            ) : null}
+            {title.monthlyReach ? (
+              <>
+                <dt>{t("reach")}</dt>
+                <dd>
+                  {new Intl.NumberFormat(intlLocale(locale)).format(
+                    title.monthlyReach,
+                  )}
+                </dd>
+              </>
+            ) : null}
+            {title.frequency ? (
+              <>
+                <dt>{t("factFrequency")}</dt>
+                <dd>{localizeTaxonomy(title.frequency, locale as AppLocale)}</dd>
+              </>
+            ) : null}
+            {title.type ? (
+              <>
+                <dt>{t("factType")}</dt>
+                <dd>{localizeTaxonomy(title.type, locale as AppLocale)}</dd>
+              </>
+            ) : null}
+            {title.format ? (
+              <>
+                <dt>{t("factFormat")}</dt>
+                <dd>{localizeTaxonomy(title.format, locale as AppLocale)}</dd>
+              </>
+            ) : null}
+            {title.b2bB2c ? (
+              <>
+                <dt>{t("factAudience")}</dt>
+                <dd>{localizeTaxonomy(title.b2bB2c, locale as AppLocale)}</dd>
+              </>
+            ) : null}
+            {title.nativeFit ? (
+              <>
+                <dt>{t("factNativeFit")}</dt>
+                <dd>{title.nativeFit}</dd>
+              </>
+            ) : null}
+            <dt>{t("factCategory")}</dt>
+            <dd>{prettyCategory(localizeTaxonomy(title.category, locale as AppLocale))}</dd>
+          </dl>
+        </aside>
+      </div>
+
+      {!needsQuote ? (
+        <div className="section-head">
+          <h2>{t("formatsHeading")}</h2>
+        </div>
       ) : null}
 
       {needsQuote ? (
@@ -221,18 +244,48 @@ export default async function TitleDetailPage({
         </article>
       ) : (
         <div className="grid">
-        {title.products.map((p) => {
-          const band = productBand(p, title, pricing);
+        {(() => {
+          // A confirmed, priced offer supersedes the seeded placeholder of
+          // the same format: when at least one product of a type carries a
+          // band, hide that type's band-less products. Otherwise a title
+          // that got real quotes shows a ghost "Contact for price" card
+          // next to four priced ones (Adresseavisen case).
+          const banded = title.products.map((p) => ({
+            p,
+            band: productBand(p, title, pricing),
+          }));
+          const pricedTypes = new Set(
+            banded.filter((x) => x.band).map((x) => x.p.type),
+          );
+          return banded.filter(
+            (x) => x.band || !pricedTypes.has(x.p.type),
+          );
+        })().map(({ p, band }) => {
           const formatSlug = p.type.toLowerCase().replace(/_/g, "-");
+          // Quote-created products carry a specific offer name ("Native
+          // 1 sak, 80k visn/mnd"); seeded ones repeat the type label or a
+          // machine name embedding the raw enum ("The Sun — NATIVE_ARTICLE").
+          // Heading shows the specific name, the type tag dedupes itself.
+          const typeLabel = tType(p.type);
+          const showName =
+            !!p.name && p.name !== typeLabel && !p.name.includes(p.type);
           return (
             <article className="card" key={p.id}>
-              <h3>{tType(p.type)}</h3>
-              <Link
-                href={`/formats#${formatSlug}`}
-                className="format-learn"
-              >
-                {tFormats("learnMore")} →
-              </Link>
+              <h3>{showName ? p.name : typeLabel}</h3>
+              <div style={{ display: "flex", gap: 6, alignItems: "center", flexWrap: "wrap" }}>
+                {showName ? <span className="tag">{typeLabel}</span> : null}
+                <Link
+                  href={`/formats#${formatSlug}`}
+                  className="format-learn"
+                >
+                  {tFormats("learnMore")} →
+                </Link>
+              </div>
+              {p.description ? (
+                <p className="muted small" style={{ marginTop: 6 }}>
+                  {p.description}
+                </p>
+              ) : null}
               {band ? (
                 <>
                   <div className="price">
@@ -241,7 +294,15 @@ export default async function TitleDetailPage({
                       · {tv("listIndicative")}
                     </span>
                   </div>
-                  <div className="muted">✓ {tv("productionIncluded")}</div>
+                  {/* What the price buys — the three things every
+                      NativeSpin order includes, so the buyer never has
+                      to guess whether production or labeling costs extra. */}
+                  <div className="muted small" style={{ marginTop: 6 }}>
+                    <strong>{t("includedHeading")}</strong>
+                    <div>✓ {tv("productionIncluded")}</div>
+                    <div>✓ {t("includedPublication", { name: title.name })}</div>
+                    <div>✓ {t("includedLabeling")}</div>
+                  </div>
                 </>
               ) : (
                 <div className="price muted">{tv("requestPrice")}</div>
@@ -300,6 +361,30 @@ export default async function TitleDetailPage({
         <p className="note">{t("indicativeNote")}</p>
       ) : !titlePriceVisible ? (
         <p className="note">{tv("requestPriceHelp")}</p>
+      ) : null}
+
+      {/* Market rules — reassurance, not a demand. The disclosure label
+          is handled by the publisher; foreign buyers (UWG-DE/AT, KSML-FI,
+          CAP-UK, ASAI-IE markets) see what local law requires without
+          having to know it. Category restrictions (e.g. gambling in NO)
+          slot in here once the per-market data field lands; enforcement
+          happens in the brief flow where the advertiser's category is
+          actually known. */}
+      {title.market.disclosureLabel ? (
+        <aside
+          className="card"
+          style={{ marginTop: 16 }}
+          aria-label={t("marketRules.heading")}
+        >
+          <h3 style={{ marginTop: 0 }}>{t("marketRules.heading")}</h3>
+          <p className="muted" style={{ margin: 0 }}>
+            ✓{" "}
+            {t("marketRules.labeling", {
+              label: title.market.disclosureLabel,
+              market: tMarket(title.market.code),
+            })}
+          </p>
+        </aside>
       ) : null}
     </section>
   );

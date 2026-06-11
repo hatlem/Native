@@ -246,7 +246,21 @@
     "formatsHeading": "Velg et format og legg det til i planen",
     "bookableSummary": "{count, plural, =0 {Ingen direkte bestilling} =1 {1 kan bestilles direkte} other {# kan bestilles direkte}}",
     "offersNative": "✓ Annonsørinnhold",
-    "keywordsHeading": "Nøkkelord"
+    "keywordsHeading": "Nøkkelord",
+    "keyFacts": "Nøkkeltall",
+    "factFrequency": "Frekvens",
+    "factType": "Type",
+    "factFormat": "Format",
+    "factAudience": "Målgruppe",
+    "factNativeFit": "Native-egnethet",
+    "factCategory": "Kategori",
+    "marketRules": {
+      "heading": "Regler i dette markedet",
+      "labeling": "Merking håndteres av mediet — artikkelen merkes «{label}» i henhold til markedsføringsloven i {market}. Du leverer kun innholdet."
+    },
+    "includedHeading": "Inkludert i prisen",
+    "includedPublication": "Publisering på {name}",
+    "includedLabeling": "Lovpålagt merking"
   },
   "plan": {
     "eyebrow": "Plan",
