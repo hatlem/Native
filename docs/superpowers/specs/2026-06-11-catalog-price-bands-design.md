@@ -1,6 +1,6 @@
 # Catalog price bands + production fee — design
 
-**Date:** 2026-06-11
+**Date:** 2026-06-11 (amended same day after codebase audit)
 **Status:** Approved design, pending implementation plan
 **Author:** Andreas + Claude
 
@@ -32,6 +32,41 @@ Investigation surfaced the real causes and a strategy question underneath them.
 - **The card is barely clickable.** Only the title text links to
   `/catalog/[slug]` (`CatalogResults.tsx`); the other ~95% of the card is dead.
 
+### Exact-price leak inventory (found during codebase audit)
+
+The strategy below only works if **no** browse surface exposes an exact
+figure. Audit found six surfaces; three currently leak worse than the UI:
+
+| Surface | Today | Severity |
+|---|---|---|
+| Catalog grid (`CatalogResults.tsx`) | exact marked-up "from" price | by design, to be banded |
+| Title detail (`catalog/[slug]/page.tsx`) | exact marked-up price per product | by design, to be banded |
+| Compare (`catalog/compare/page.tsx`) | exact marked-up "from" price | by design, to be banded |
+| JSON API (`api/v1/catalog/titles`) | **raw net `basePrice`** — our cost, un-marked-up | **cost-basis leak — bug** |
+| CSV export (`api/export/catalog.csv`) | **raw net `basePrice`**, one-click download for any signed-in user | **cost-basis leak + literally a downloadable price sheet — bug** |
+| JSON-LD (`catalog/[slug]` `<script type="application/ld+json">`) | exact marked-up price per product in machine-readable structured data | **easiest scrape target on the site** |
+
+### Existing infrastructure this design must reuse (not duplicate)
+
+The codebase already has a desk-owned content-production price list:
+
+- **`ContentFeeRule`** (schema): per `(productType?, marketCode?)` with
+  `greenfieldFee` / `adaptationFee`, most-specific active match wins
+  (productType+market > productType > market > global). Desk-editable at
+  `/desk/content-fees`. Seeded by `scripts/seed-content-fees.ts`
+  (placeholders: NATIVE_ARTICLE 12 000 kr / 1 200 EUR-scale greenfield).
+- **Pure math** in `src/lib/money.ts`: `pickContentFeeRule`,
+  `computeContentFeeLines`, `ContentFeeRuleSpec`.
+- **DB adapter** `src/lib/content-fee.ts`: `loadContentFeeRules()`.
+- **Quote composition** already adds `CONTENT_FEE` lines when the buyer
+  flags `withContent` / `authorshipMode` says NativeSpin produces.
+- **`src/lib/authorship.ts`**: `AuthorshipMode` + `nativeSpinProduces()` —
+  the "who writes the article" concept already exists.
+
+So "production fee" market defaults come from **ContentFeeRule**, not a new
+constants map; and the parked `producedBy` idea maps onto the existing
+`AuthorshipMode`.
+
 ### Strategy question
 
 For confirmed titles, what exactly do we reveal, and how do we frame it so a
@@ -47,10 +82,11 @@ roughly equally.
 | 2 | Estimate (unconfirmed) titles | Stay **"Contact for price"** — preserves the "confirmed, never guessed" standard |
 | 3 | Deal/negotiability framing | **Neutral, no promise** — label "list (indicative)"; negotiability is communicated by the mechanic ("firm price after a brief"), not a discount claim |
 | 4 | Production/writing cost | **Baked into the all-in band**, labeled **"Includes written article"** |
-| 5 | Production fee resolution | **Offer (Product) → publication (Title) → market default** (first set wins) |
-| 6 | Exact figure exposure | Never shown in browse (grid / detail / compare / **public API**); only inside an actual quote tied to a brief |
-| 7 | Card band selection | **Prefer the NATIVE_ARTICLE product's band** when one is shown; fall back to min across shown products. Prevents a cheap display product producing a "< 15k" band that feels like bait when the buyer wants the article |
-| 8 | Firm-price turnaround | CTA copy commits to "firm price, typically within 2 business days" — a single tunable string. The bands only work if the firm number arrives fast; this makes turnaround part of the product promise. **Ops must confirm the 2-day target before launch** |
+| 5 | Production fee resolution | **Offer (Product.productionFee) → publication (Title.productionFeeDefault) → desk price list (`ContentFeeRule.greenfieldFee`, most-specific match)** — first set value wins; `0` is a valid explicit value |
+| 6 | Exact figure exposure | Never in browse: grid, detail, compare, JSON API, CSV export, JSON-LD. Exact figures exist only inside an actual quote tied to a brief |
+| 7 | Card band selection | **Prefer the NATIVE_ARTICLE product's band** when one is shown; fall back to the cheapest shown product. Prevents a cheap display product producing a "< 15k" band that feels like bait when the buyer wants the article |
+| 8 | Firm-price turnaround | CTA copy commits to "firm price typically within 2 business days" — a single tunable i18n string. The bands only work if the firm number arrives fast. **Ops must confirm the 2-day target before launch** |
+| 9 | Band label format | Locale-neutral: `15–25k NOK`, `90k+ NOK`, `< 15k NOK`. "k" reads as thousand in every market; the ISO code avoids symbol ambiguity ("kr" is three currencies). No per-locale band i18n needed |
 
 Out of scope (YAGNI): metering / price credits, anonymized titles, quantified
 discount claims ("members pay X% less"). If scraping proves real later, the
@@ -64,18 +100,23 @@ existing API rate-limiter is the first lever, metering second.
   **Trigger:** if funnel data shows drop-off at the price step, A/B the soft
   qualitative line first. Implementation: a single i18n string behind a flag —
   no structural change needed.
-- **Bucket boundaries + production-fee defaults are placeholders outside
-  Scandinavia.** Calibrated from ~50 real SE/DK/NO quotes; the EUR/GBP/CHF
-  values are scale-guesses with no quote data behind them. **Trigger:**
-  recalibrate each market's buckets and fee default after its first ~10
-  applied quotes. Both live in one constants file so recalibration is a
-  data-only PR.
+- **Bucket boundaries are placeholders outside Scandinavia.** Calibrated from
+  ~50 real SE/DK/NO quotes; the EUR/GBP/CHF values are scale-guesses with no
+  quote data behind them. **Trigger:** recalibrate each market's buckets after
+  its first ~10 applied quotes. Buckets live in one constants block in
+  `bands.ts` so recalibration is a data-only PR.
+- **Production-fee amounts are desk data, not code.** The fee defaults come
+  from `ContentFeeRule` rows, editable at `/desk/content-fees`. Current rows
+  are seed placeholders (NATIVE_ARTICLE 12 000 kr greenfield); Andreas's
+  intended ~2 000 NOK is **set there by ops**, per market/product type — no
+  deploy needed.
 - **`producedBy` (who writes the article).** Some publishers mandate their own
   content studio (e.g. Dagens Medicin); elsewhere we produce. v1 shows the
   generic "Includes written article" — true in both cases — and does NOT claim
-  authorship. **Trigger:** if buyers ask "who writes it?", add a
-  `producedBy: PLATFORM | PUBLISHER_STUDIO` enum on Product and surface it in
-  the detail page's content spec, not the card.
+  authorship. The concept already exists as `AuthorshipMode` in
+  `src/lib/authorship.ts`. **Trigger:** if buyers ask "who writes it?",
+  surface the existing authorship mode in the detail page's content spec, not
+  the card.
 
 ## Pricing math
 
@@ -84,181 +125,157 @@ production fee** (the fee is *not* marked up — it is added after the margin),
 then snapped to a bucket:
 
 ```
-indicative     = basePrice × (1 + marginPct/100) × seasonalMultiplier   // existing
-customerPrice  = round(indicative) + productionFee
+indicative     = basePrice × (1 + marginPct/100) × seasonalMultiplier   // existing indicativeFromRules
+fee            = Product.productionFee ?? Title.productionFeeDefault
+                 ?? pickContentFeeRule(rules, productType, marketCode).greenfieldFee ?? 0
+customerPrice  = round(indicative) + fee
 band           = priceBand(customerPrice, currency)
 ```
 
-`indicative` is the existing computation (`indicativePrice` / `firmLineTotal`
-in `src/lib/money.ts`, and `indicativeFromRules` used by the card). The only
-additions are the `+ productionFee` term and the final `priceBand()` wrap.
+`??` semantics: `null`/unset falls through; an explicit `0` short-circuits —
+a publisher whose quote says "inkl. produktion" gets `productionFee = 0` and
+we still show "Includes written article" (the article is produced either way).
 
 ## Components
 
 ### 1. Band engine — `src/lib/pricing/bands.ts` (new)
 
-Single source of truth for turning a price into a bucket label.
+Single source of truth for turning a price into a bucket label. Used by all
+six surfaces.
 
 ```ts
-export type BandKind = "under" | "range" | "over";
-export type Band = { kind: BandKind; low: number | null; high: number | null };
+export type Band =
+  | { kind: "under"; high: number }
+  | { kind: "range"; low: number; high: number }
+  | { kind: "over"; low: number };
 
-// Per-currency bucket boundaries. Scandi kr and EUR/GBP/CHF differ ~10×.
-// Boundaries are tunable; starting values calibrated from real 06-09/06-10
-// quote data (native articles ~12–45k kr; packages to 150k; print to ~87k).
+// Per-currency bucket boundaries (ascending). Scandi kroner and the
+// EUR-scale currencies differ ~10×. NOK/SEK/DKK calibrated from the
+// 06-09/06-10 applied quotes; EUR/GBP/CHF are scale-guesses —
+// recalibrate after each market's first ~10 applied quotes.
 const BUCKETS: Record<string, number[]> = {
   NOK: [15_000, 25_000, 40_000, 60_000, 90_000],
   SEK: [15_000, 25_000, 40_000, 60_000, 90_000],
   DKK: [15_000, 25_000, 40_000, 60_000, 90_000],
-  EUR: [1_500, 2_500, 4_000, 6_000, 9_000],
+  EUR: [1_500, 2_500, 4_000, 6_000, 9_000],   // also NL/BE/FI/DE/AT/IE
   GBP: [1_500, 2_500, 4_000, 6_000, 9_000],
   CHF: [1_500, 2_500, 4_000, 6_000, 9_000],
 };
 
-export function priceBand(amount: number, currency: string): Band { /* … */ }
+export function priceBand(amount: number, currency: string): Band;
+export function bandLabel(band: Band, currency: string): string;
+// "15–25k NOK" | "90k+ NOK" | "< 15k NOK"
 ```
 
-- A price in `[boundary[i], boundary[i+1])` → `{ kind: "range", low, high }`.
-- Below first boundary → `{ kind: "under", high: boundary[0] }`.
-- At/above last boundary → `{ kind: "over", low: lastBoundary }`.
+- A price in `[boundary[i], boundary[i+1])` → range band; below the first →
+  under; at/above the last → over.
+- Unknown currency → EUR-scale fallback; never throw in a render path.
 - **Why it's scrape-proof:** many distinct prices collapse to the same label,
-  so neither the customer price nor the net `basePrice` is recoverable from the
-  band. (A `±%` envelope would leak the midpoint; rounding to 5k would be near-
-  exact — both rejected.)
-- A formatting helper renders a `Band` + currency + locale into a localized
-  string using the existing `intlLocale` / `Intl.NumberFormat` (e.g. "35–50k
-  NOK", "90k+ NOK", "< 15k NOK"). Compact "k" notation, `maximumFractionDigits: 0`.
+  so neither the customer price nor the net `basePrice` is recoverable. (A
+  `±%` envelope would leak the midpoint; 5k-rounding would be near-exact —
+  both rejected.)
 
 ### 2. Production fee resolution — `src/lib/pricing/production-fee.ts` (new)
 
-```ts
-// Per-market default fee, in the market's currency. Tunable.
-const MARKET_DEFAULT_FEE: Record<string, number> = {
-  NO: 2000, SE: 2500, DK: 1500, FI: 200, DE: 200,
-  AT: 200, CH: 200, UK: 180, IE: 200,
-};
+Thin cascade over the existing desk price list:
 
-// First set value wins. 0 is a valid explicit value (publisher already
-// includes production) and is NOT treated as "unset".
+```ts
+import { pickContentFeeRule, type ContentFeeRuleSpec } from "@/lib/money";
+
 export function resolveProductionFee(args: {
-  productFee: number | null;        // Product.productionFee  (this offer)
-  titleFee: number | null;          // Title.productionFeeDefault (this pub)
+  productFee: number | null;   // Product.productionFee   (this offer)
+  titleFee: number | null;     // Title.productionFeeDefault (this publication)
+  productType: string;
   marketCode: string;
-}): number { /* … */ }
+  rules: ContentFeeRuleSpec[]; // loadContentFeeRules() — desk-editable
+}): number;
 ```
 
-Note: `0` must short-circuit the cascade — a publisher whose quote says "inkl.
-produktion" gets `productionFee = 0`, and we still surface "Includes written
-article" (the article is produced either way; the fee is just internal cost
-recovery).
+First set value wins; `0` short-circuits; no matching rule → `0`.
 
 ### 3. Data model — `prisma/schema.prisma`
 
 ```prisma
 model Product {
   // …
-  productionFee Decimal? @db.Decimal(12, 2)   // null = inherit; 0 = included
+  productionFee Decimal? @db.Decimal(12, 2)   // null = inherit; 0 = publisher includes production
 }
 
 model Title {
   // …
-  productionFeeDefault Decimal? @db.Decimal(12, 2)  // null = inherit
+  productionFeeDefault Decimal? @db.Decimal(12, 2)  // null = inherit from ContentFeeRule
 }
 ```
 
-Migration: additive, both nullable, no backfill (null = inherit → market
-default). Name: `add_production_fee`.
+Migration: additive, both nullable, no backfill. Hand-authored SQL (repo
+convention — `migrate dev` is blocked; `migrate deploy` runs on deploy).
 
-### 4. Price visibility integration
+### 4. Display-price helper — `src/lib/pricing/display-price.ts` (new)
 
-`visibility.ts` gate is unchanged. A new shared helper computes the display
-band for a title so grid / detail / compare / API stay consistent:
-
-```ts
-// src/lib/pricing/visibility.ts (or a new display-price module)
-export function titlePriceBand(title): { band: Band; currency: string } | null
-```
-
-It mirrors the card's current logic — filter `isProductPriceShown`, compute
-`customerPrice` per shown product (indicative + resolved production fee) — but
-selects the representative product per decision #7:
-
-1. If a **NATIVE_ARTICLE** product is shown, band that one (it is the category
-   lead and what the buyer almost always came for).
-2. Otherwise band the **min** across shown products ("from" semantics).
-
-Returns `null` when nothing is shown (→ "Contact for price" if `anyHidden`,
-else nothing). The detail page is unaffected by #7 — it bands every product
-individually, so the full picture is one click away.
-
-### 5. UI surfaces
-
-- **Catalog grid** (`CatalogResults.tsx`): replace the
-  `{t("card.from")} {formatMoney(from, …)}` block with the band label +
-  `· list (indicative) ⓘ` + a `✓ Includes written article` line. Estimate
-  fallback (`anyHidden` → `requestPrice`) unchanged.
-- **Detail page** (`catalog/[slug]/page.tsx`): per-product exact `formatMoney`
-  → band. Keep the `FIRM` badge as a "firm rate" trust signal; the number is
-  still banded. CTA wording → "Add to plan — firm price typically within 2
-  business days" (decision #8; the turnaround figure is one i18n string).
-- **Compare page** (`catalog/compare/page.tsx`): same exact → band swap in the
-  price cells.
-
-### 6. Public API — `api/v1/catalog/titles/route.ts` (**bug fix + band**)
-
-Current code returns `basePriceIndicative: Number(p.basePrice)` — the **raw net
-publisher cost**, leaking the cost basis. Replace with a band:
+Pure functions shared by all six surfaces so they cannot drift:
 
 ```ts
-products: t.products.map((p) => {
-  const shown = isProductPriceShown(p, t);
-  return {
-    id: p.id,
-    type: p.type,
-    priceBand: shown ? bandLabelFor(p, t) : null,   // was basePriceIndicative (raw cost)
-    currency: p.currency,
-    visibility: shown ? p.visibility : "INDICATIVE",
-    leadTimeDays: p.leadTimeDays,
-  };
-});
+customerPrice(product, title, rules): number          // indicative + fee
+productBand(product, title, rules): Band | null       // null unless isProductPriceShown
+titleBand(products, title, rules):                    // decision #7:
+  { band: Band; product: P } | null                   //   NATIVE_ARTICLE if shown, else cheapest
 ```
 
-Drop `basePriceIndicative` entirely. Partners get the same band as the UI,
-never an exact figure, never the net cost.
+`visibility.ts` gate is unchanged. The detail page bands every product
+individually (full picture one click away); the card / compare / CSV use
+`titleBand`.
 
-### 7. Microcopy — `src/messages/en.json` (then translated to no/da/sv/fi/de)
+### 5. Surfaces (all six)
 
-Per the source-language-English-first standard, author in `en.json` first.
+- **Catalog grid** (`CatalogResults.tsx`): replace the exact
+  `from {formatMoney(...)}` with `≈ {bandLabel} · list (indicative) ⓘ` plus a
+  `✓ Includes written article` line. Estimate fallback ("Contact for price")
+  unchanged.
+- **Detail page** (`catalog/[slug]/page.tsx`): per-product exact → band. Keep
+  the `FIRM` badge as a trust signal; the number is still banded. Add the
+  decision-#8 note under Add-to-plan: "Firm price typically within 2 business
+  days."
+- **Compare page** (`catalog/compare/page.tsx`): exact → band in the
+  "from price" row.
+- **JSON API** (`api/v1/catalog/titles`): drop `basePriceIndicative` (raw cost
+  leak); add `priceBand: string | null` (the band label). Partners get the
+  same band as the UI.
+- **CSV export** (`api/export/catalog.csv`): drop `indicative_price` (raw cost
+  leak); add `price_band`. The one-click "download a price sheet" hole closes.
+- **JSON-LD** (`catalog/[slug]`): per-product `Offer` loses its exact `price`;
+  the title-level `AggregateOffer` carries the band bounds as
+  `lowPrice`/`highPrice` (valid schema.org, keeps SEO value, no exact figure).
+
+### 6. Microcopy — `src/messages/en.json` (then no/da/sv/fi/de)
+
+Band labels are locale-neutral (decision #9) — no band i18n keys. New keys:
 
 ```jsonc
 "priceVisibility": {
   "requestPrice": "Contact for price",          // unchanged (estimates)
-  "listIndicative": "list (indicative)",
-  "listIndicativeHelp": "Indicative list rate. Final price is confirmed after a short brief.",
+  "listIndicative": "List price (indicative)",
+  "listIndicativeHelp": "Indicative list rate — final price is confirmed after a short brief.",
   "productionIncluded": "Includes written article",
-  "firmTurnaround": "Firm price typically within 2 business days",
-  "band": {
-    "range": "{low}–{high}",
-    "over": "{value}+",
-    "under": "< {value}"
-  }
+  "firmTurnaround": "Firm price typically within 2 business days"
 }
 ```
 
-### 8. Whole-card clickable (quick win) — `CatalogResults.tsx`
+### 7. Whole-card clickable (quick win) — `CatalogResults.tsx` + `globals.css`
 
-Make `<article className="card catalog-card relative">` and give the title
-`<Link>` an `after:absolute after:inset-0` overlay so the entire card navigates
-to the detail page, while `TitleSelector` / Add-to-plan / compare controls sit
-above (`relative z-10`) and keep working. Single semantic link — accessible.
+Stretched-link pattern: `.catalog-card { position: relative }`, the title
+`Link` gets `className="card-link"` with an `::after` overlay covering the
+card; interactive children (compare checkbox, inner links) sit above via
+`z-index`. Single semantic link — accessible.
 
-## Parallel workstream (data ops, not code)
+## Parallel workstreams (ops, not code)
 
-**Apply the ~50 pending quotes.** This is what actually makes real prices
-appear (now as bands). Review each `PENDING` `PriceQuote` and `apply_quote`
-(via the `native_apply_quote` MCP tool / desk flow). Where a quote says the
-publisher already includes production, set that product's `productionFee = 0`.
-Tracked separately from the code changes.
+1. **Apply the ~50 pending quotes** (`native_apply_quote` / desk flow). This is
+   what actually makes real prices appear (as bands). Where a quote says the
+   publisher includes production, set that product's `productionFee = 0`.
+2. **Set real production fees** in `/desk/content-fees` (current rows are
+   12 000 kr seed placeholders; Andreas wants ~2 000 NOK for NO).
+3. **Confirm the 2-business-day firm-quote turnaround** (decision #8) — it's
+   in the buyer-facing copy.
 
 ## Data flow
 
@@ -266,54 +283,59 @@ Tracked separately from the code changes.
 Product.basePrice ─┐
 PriceRule (margin, ├─ indicativeFromRules ─→ indicative
  seasonal)        ─┘                            │
-Product/Title/market ─ resolveProductionFee ─→ + productionFee
+Product.productionFee → Title.productionFeeDefault
+  → ContentFeeRule (desk) ── resolveProductionFee ─→ + fee
                                                 │
                                           customerPrice
                                                 │
-                                          priceBand(·, currency)
+                                     priceBand(·, currency)
                                                 │
-                        ┌───────────────────────┼───────────────────────┐
-                     grid card              detail/compare           public API
-                  band + "incl. article"   band per product        priceBand field
+        ┌──────────┬───────────┬────────────────┼───────────────┬──────────────┐
+     grid card   detail     compare         JSON API         CSV export     JSON-LD
+   (titleBand) (productBand)(titleBand)   (productBand)     (titleBand)  (band bounds)
 ```
 
 ## Error / edge handling
 
 - **No products / no shown products** → existing "Contact for price" /
   request-quote paths, unchanged.
-- **Unknown currency** in `priceBand` → fall back to the EUR-scale buckets and
-  log; never throw in a render path.
+- **Unknown currency** in `priceBand` → EUR-scale fallback; never throw in a
+  render path.
 - **`productionFee = 0`** → valid; cascade stops; "Includes written article"
   still shown.
-- **Price below first / above last bucket** → `under` / `over` band labels.
-- **FIRM products** → banded in browse like everything else; firmness surfaces
-  via badge and in the quote.
+- **No matching ContentFeeRule** → fee `0` (band still renders).
+- **Price below first / above last bucket** → `under` / `over` labels.
+- **FIRM products** → banded in browse like everything else; firmness
+  surfaces via badge and in the quote.
 
-## Testing (node:test, per repo convention)
+## Testing (node:test via `pnpm test`, repo convention)
 
-- `bands.test.ts`: bucket boundaries (inclusive/exclusive edges), under/over,
-  per-currency scale, unknown-currency fallback, label formatting per locale.
-- `production-fee.test.ts`: cascade order, `0` short-circuit, market default
-  fallback, unknown market.
-- `visibility` band helper: NATIVE_ARTICLE preference (decision #7) when one
-  is shown, min-across-shown-products fallback, null when none shown, estimate
-  titles never produce a band, cheap-display-plus-expensive-article case bands
-  the article (regression guard against the "bait band").
-- API contract: `priceBand` present when shown, `null` when hidden,
-  `basePriceIndicative` absent (regression guard against the cost-leak).
+- `bands.test.ts`: bucket edges (inclusive low / exclusive high), under/over,
+  per-currency scale, unknown-currency fallback, label formatting incl.
+  fractional k ("1.5–2.5k EUR").
+- `production-fee.test.ts`: cascade order, `0` short-circuit at each level,
+  ContentFeeRule most-specific match passthrough, no-rule → 0.
+- `display-price.test.ts`: fee inclusion in customerPrice, NATIVE_ARTICLE
+  preference (decision #7), cheapest fallback, null when nothing shown,
+  estimate titles never produce a band, cheap-display-plus-expensive-article
+  bands the article (regression guard against the "bait band").
+- API/CSV: assert `priceBand` present when shown / null when hidden, and that
+  `basePriceIndicative` / `indicative_price` are gone (regression guard
+  against the cost leak).
 
 ## Files touched
 
 | File | Change |
 |------|--------|
-| `src/lib/pricing/bands.ts` | **new** — bucket engine + label formatter |
-| `src/lib/pricing/production-fee.ts` | **new** — fee cascade + market defaults |
-| `src/lib/pricing/visibility.ts` | add `titlePriceBand` display helper |
-| `prisma/schema.prisma` | `Product.productionFee`, `Title.productionFeeDefault` + migration |
+| `src/lib/pricing/bands.ts` | **new** — bucket engine + locale-neutral label |
+| `src/lib/pricing/production-fee.ts` | **new** — fee cascade over ContentFeeRule |
+| `src/lib/pricing/display-price.ts` | **new** — customerPrice / productBand / titleBand |
+| `prisma/schema.prisma` + migration | `Product.productionFee`, `Title.productionFeeDefault` |
 | `src/app/[locale]/catalog/_components/CatalogResults.tsx` | band display, "incl. article", whole-card click |
-| `src/app/[locale]/catalog/[slug]/page.tsx` | exact → band |
+| `src/app/[locale]/catalog/[slug]/page.tsx` | exact → band; JSON-LD band bounds; turnaround note |
 | `src/app/[locale]/catalog/compare/page.tsx` | exact → band |
-| `src/app/api/v1/catalog/titles/route.ts` | `basePriceIndicative` (raw cost) → `priceBand`; cost-leak fix |
-| `src/messages/en.json` (+ no/da/sv/fi/de) | new price-visibility strings |
-| tests | `bands.test.ts`, `production-fee.test.ts`, visibility + API tests |
-```
+| `src/app/api/v1/catalog/titles/route.ts` | raw-cost leak → `priceBand` |
+| `src/app/api/export/catalog.csv/route.ts` | raw-cost leak → `price_band` |
+| `src/app/globals.css` | stretched-link card CSS |
+| `src/messages/{en,no,da,sv,fi,de}.json` | new priceVisibility strings |
+| tests | `bands.test.ts`, `production-fee.test.ts`, `display-price.test.ts` |
