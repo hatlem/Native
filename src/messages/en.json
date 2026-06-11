@@ -1704,7 +1704,7 @@
     "listIndicative": "List price (indicative)",
     "listIndicativeHelp": "Indicative list rate — the final price is confirmed after a short brief.",
     "productionIncluded": "Includes written article",
-    "firmTurnaround": "Firm price typically within 2 business days"
+    "firmTurnaround": "Firm price typically within 24 hours"
   },
   "titleAdmin": {
     "title": "Edit title",

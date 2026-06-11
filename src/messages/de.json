@@ -1562,7 +1562,7 @@
     "listIndicative": "Listenpreis (indikativ)",
     "listIndicativeHelp": "Indikativer Listenpreis — der endgültige Preis wird nach einem kurzen Briefing bestätigt.",
     "productionIncluded": "Fertig geschriebener Artikel inklusive",
-    "firmTurnaround": "Festpreis in der Regel innerhalb von 2 Werktagen"
+    "firmTurnaround": "Festpreis in der Regel innerhalb von 24 Stunden"
   },
   "titleAdmin": {
     "title": "Titel bearbeiten",

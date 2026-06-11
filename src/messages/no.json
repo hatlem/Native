@@ -1705,7 +1705,7 @@
     "listIndicative": "Listepris (veiledende)",
     "listIndicativeHelp": "Veiledende listepris — endelig pris bekreftes etter en kort brief.",
     "productionIncluded": "Ferdig skrevet artikkel inkludert",
-    "firmTurnaround": "Fast pris normalt innen 2 virkedager"
+    "firmTurnaround": "Fast pris normalt innen 24 timer"
   },
   "titleAdmin": {
     "title": "Rediger tittel",

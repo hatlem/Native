@@ -1705,7 +1705,7 @@
     "listIndicative": "Listahinta (suuntaa-antava)",
     "listIndicativeHelp": "Suuntaa-antava listahinta — lopullinen hinta vahvistetaan lyhyen briiffin jälkeen.",
     "productionIncluded": "Sisältää valmiiksi kirjoitetun artikkelin",
-    "firmTurnaround": "Kiinteä hinta yleensä 2 arkipäivän kuluessa"
+    "firmTurnaround": "Kiinteä hinta yleensä 24 tunnin kuluessa"
   },
   "titleAdmin": {
     "title": "Muokkaa nimikettä",
