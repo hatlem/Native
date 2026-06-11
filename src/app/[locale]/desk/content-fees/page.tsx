@@ -7,6 +7,9 @@ import {
   toggleContentFeeRule,
   updateContentFeeRule,
   bulkUpdateContentFeeRules,
+  createMarginRule,
+  toggleMarginRule,
+  bulkUpdateMarginRules,
 } from "./actions";
 
 export const dynamic = "force-dynamic";
@@ -32,6 +35,10 @@ export default async function DeskContentFeesPage({
       { productType: "asc" },
       { marketCode: "asc" },
     ],
+  });
+
+  const marginRules = await prisma.marginRule.findMany({
+    orderBy: [{ active: "desc" }, { marketCode: "asc" }],
   });
 
   return (
@@ -247,6 +254,105 @@ export default async function DeskContentFeesPage({
             </table>
           </div>
         )}
+      </section>
+
+      <section className="section">
+        <div className="section-head">
+          <h2>{t("marginHeading")}</h2>
+        </div>
+        <p className="muted">{t("marginLead")}</p>
+
+        <form action={createMarginRule} className="card stack-4">
+          <input type="hidden" name="locale" value={locale} />
+          <div className="grid two">
+            <label className="field">
+              <span>{t("market")}</span>
+              <select name="marketCode" defaultValue="">
+                <option value="">{t("anyMarket")}</option>
+                {MARKET_CODES.map((m) => (
+                  <option key={m} value={m}>
+                    {m}
+                  </option>
+                ))}
+              </select>
+            </label>
+            <label className="field">
+              <span>{t("marginPct")}</span>
+              <input name="marginPct" type="number" min="0" max="95" step="0.5" required />
+            </label>
+            <label className="field">
+              <span>{t("note")}</span>
+              <input name="note" maxLength={200} />
+            </label>
+          </div>
+          <SubmitButton
+            className="btn primary"
+            label={t("marginCreate")}
+            pendingLabel={t("marginCreating")}
+          />
+        </form>
+
+        {marginRules.length > 0 ? (
+          <div className="card">
+            <div className="table-wrap">
+              <table className="table">
+                <thead>
+                  <tr>
+                    <th>{t("market")}</th>
+                    <th>{t("marginPct")}</th>
+                    <th>{t("note")}</th>
+                    <th>{t("status")}</th>
+                    <th />
+                  </tr>
+                </thead>
+                <tbody>
+                  {marginRules.map((r) => (
+                    <tr key={r.id} className={r.active ? "" : "muted"}>
+                      <td>{r.marketCode ?? t("anyMarket")}</td>
+                      <td>
+                        {/* Associated with the bulk form below via form="…"
+                            so the per-row toggle forms don't nest inside it. */}
+                        <input
+                          form="margin-bulk"
+                          name={`m_${r.id}`}
+                          type="number"
+                          min="0"
+                          max="95"
+                          step="0.5"
+                          defaultValue={Number(r.marginPct)}
+                          style={{ width: "10ch" }}
+                          aria-label={`${t("marginPct")} ${r.marketCode ?? t("anyMarket")}`}
+                        />
+                      </td>
+                      <td className="small muted">{r.note ?? ""}</td>
+                      <td className="small muted">{r.active ? t("active") : t("inactive")}</td>
+                      <td>
+                        <form action={toggleMarginRule}>
+                          <input type="hidden" name="locale" value={locale} />
+                          <input type="hidden" name="id" value={r.id} />
+                          <SubmitButton
+                            className="btn small ghost"
+                            label={r.active ? t("deactivate") : t("activate")}
+                            pendingLabel="…"
+                          />
+                        </form>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+            <form id="margin-bulk" action={bulkUpdateMarginRules}>
+              <input type="hidden" name="locale" value={locale} />
+              <input
+                type="hidden"
+                name="ids"
+                value={marginRules.map((r) => r.id).join(",")}
+              />
+              <SubmitButton className="btn primary" label={t("saveAll")} pendingLabel={t("saving")} />
+            </form>
+          </div>
+        ) : null}
       </section>
     </>
   );

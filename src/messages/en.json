@@ -2105,7 +2105,12 @@
     "bulkHeading": "Set all fees",
     "bulkHint": "Edit every fee in the grid, then save once.",
     "saveAll": "Save all",
-    "saving": "Saving…"
+    "saving": "Saving…",
+    "marginHeading": "Default commission",
+    "marginLead": "The commission % applied when a product has no price rule of its own — the any-market row is the global fallback, and with no rules the built-in 15% applies.",
+    "marginPct": "Commission %",
+    "marginCreate": "Add commission rule",
+    "marginCreating": "Adding…"
   },
   "playbooks": {
     "eyebrow": "Desk",

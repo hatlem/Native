@@ -138,6 +138,98 @@ export async function updateContentFeeRule(formData: FormData) {
   redirect(`/${locale}/desk/content-fees`);
 }
 
+// Default commission is a percentage, so unlike fees it has a hard upper
+// bound: anything above 95% would price the media share out of existence.
+function parseMarginPct(raw: string): number | null {
+  const n = Number(raw);
+  return Number.isFinite(n) && n >= 0 && n <= 95
+    ? Math.round(n * 100) / 100
+    : null;
+}
+
+// Default commission (%) applied when a product carries no price rule of
+// its own. Null market = global fallback; with no active rules the
+// built-in 15% applies.
+export async function createMarginRule(formData: FormData) {
+  const locale = field(formData, "locale") || "en";
+  const userId = await requireDesk(locale);
+
+  const marginPct = parseMarginPct(field(formData, "marginPct"));
+  if (marginPct === null) {
+    redirect(`/${locale}/desk/content-fees?error=invalid`);
+  }
+
+  const rule = await prisma.marginRule.create({
+    data: {
+      marketCode: parseMarket(field(formData, "marketCode")),
+      marginPct,
+      note: field(formData, "note") || null,
+    },
+  });
+  await recordAudit(userId, "margin_rule.create", `MarginRule:${rule.id}`, {
+    marketCode: rule.marketCode,
+    marginPct,
+  });
+  revalidatePath(`/${locale}/desk/content-fees`);
+  redirect(`/${locale}/desk/content-fees`);
+}
+
+// Bulk save: update every margin rule's percentage from one grid in a
+// single transaction. Inputs are named m_<id>; `ids` is the comma-joined
+// list of rule ids to process. Rows with an invalid percentage are
+// skipped (the others still save).
+export async function bulkUpdateMarginRules(formData: FormData) {
+  const locale = field(formData, "locale") || "en";
+  const userId = await requireDesk(locale);
+
+  const ids = field(formData, "ids").split(",").map((s) => s.trim()).filter(Boolean);
+  if (ids.length === 0) redirect(`/${locale}/desk/content-fees`);
+
+  const updates: { id: string; marginPct: number }[] = [];
+  for (const id of ids) {
+    const marginPct = parseMarginPct(field(formData, `m_${id}`));
+    if (marginPct === null) continue; // skip invalid, keep the rest
+    updates.push({ id, marginPct });
+  }
+
+  if (updates.length > 0) {
+    await prisma.$transaction(
+      updates.map((u) =>
+        prisma.marginRule.update({
+          where: { id: u.id },
+          data: { marginPct: u.marginPct },
+        }),
+      ),
+    );
+    await recordAudit(userId, "margin_rule.bulk_update", "MarginRule:*", {
+      count: updates.length,
+    });
+  }
+  revalidatePath(`/${locale}/desk/content-fees`);
+  redirect(`/${locale}/desk/content-fees`);
+}
+
+// Flip active on/off so a default-commission rule can be retired without
+// losing its history (quotes priced under it stay traceable).
+export async function toggleMarginRule(formData: FormData) {
+  const locale = field(formData, "locale") || "en";
+  const userId = await requireDesk(locale);
+  const id = field(formData, "id");
+
+  const rule = await prisma.marginRule.findUnique({ where: { id } });
+  if (rule) {
+    await prisma.marginRule.update({
+      where: { id },
+      data: { active: !rule.active },
+    });
+    await recordAudit(userId, "margin_rule.toggle", `MarginRule:${id}`, {
+      active: !rule.active,
+    });
+  }
+  revalidatePath(`/${locale}/desk/content-fees`);
+  redirect(`/${locale}/desk/content-fees`);
+}
+
 // Flip active on/off so a rule can be retired without losing its history
 // (and any audit trail of past quotes that used it).
 export async function toggleContentFeeRule(formData: FormData) {
