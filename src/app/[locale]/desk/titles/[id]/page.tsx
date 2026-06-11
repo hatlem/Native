@@ -152,9 +152,15 @@ export default async function DeskTitleEditPage({
       publisher: true,
       market: true,
       // priceRules included so the per-product margin override renders
-      // its current "default"-labeled value (blank = inherit).
+      // the rule updateProductPricing targets: the first by minVolume
+      // asc, createdAt asc — regardless of label (blank = inherit).
       products: {
-        include: { priceRules: true },
+        include: {
+          priceRules: {
+            orderBy: [{ minVolume: "asc" }, { createdAt: "asc" }],
+            take: 1,
+          },
+        },
         orderBy: { createdAt: "asc" },
       },
     },
@@ -352,9 +358,9 @@ export default async function DeskTitleEditPage({
           <h2>{t("productPricing")}</h2>
           <ul style={{ listStyle: "none", padding: 0, margin: "12px 0 0" }}>
             {title.products.map((product) => {
-              const defaultRule = product.priceRules.find(
-                (r) => r.label === "default",
-              );
+              // Same governing-rule pick as updateProductPricing: first
+              // PriceRule by minVolume asc, createdAt asc, any label.
+              const defaultRule = product.priceRules[0] ?? null;
               return (
                 <li
                   key={product.id}

@@ -398,11 +398,15 @@ export async function updateTitleProductionFee(formData: FormData) {
 // Per-product pricing overrides, the most-specific layer of both
 // cascades in one form:
 //
-//   - marginPct → the product's "default"-labeled PriceRule. Blank =
-//     inherit the admin MarginRule default (we DELETE the rule so the
-//     market default applies again); 0–95 upserts the rule (update the
-//     first existing default-labeled rule, else create with
-//     seasonalMultiplier 1 / minVolume 1).
+//   - marginPct → the product's FIRST PriceRule ordered by minVolume
+//     asc, then createdAt asc — regardless of label. Blueprint-created
+//     products already carry a "standard" minVolume-1 rule; targeting
+//     by label would leave two minVolume-1 rules whose pickRule winner
+//     is DB-order-dependent. 0–95 updates that rule's marginPct in
+//     place (its label/seasonal/minVolume are kept), else creates a
+//     "default" rule with seasonalMultiplier 1 / minVolume 1. Blank =
+//     inherit the admin MarginRule default (we DELETE that rule —
+//     whatever its label — so the market default truly applies again).
 //   - productionFee → Product.productionFee. Blank = inherit (Title
 //     default → ContentFeeRule); explicit 0 = production included.
 export async function updateProductPricing(formData: FormData) {
@@ -417,8 +421,8 @@ export async function updateProductPricing(formData: FormData) {
       name: true,
       titleId: true,
       priceRules: {
-        where: { label: "default" },
-        orderBy: { createdAt: "asc" },
+        orderBy: [{ minVolume: "asc" }, { createdAt: "asc" }],
+        take: 1,
       },
     },
   });
@@ -448,14 +452,16 @@ export async function updateProductPricing(formData: FormData) {
     productionFee = Math.round(parsed * 100) / 100;
   }
 
-  const defaultRule = product.priceRules[0] ?? null;
+  // The governing rule: first by minVolume asc, createdAt asc — the same
+  // ordering the desk title page uses to render the form's current value.
+  const targetRule = product.priceRules[0] ?? null;
   if (marginPct === null) {
-    if (defaultRule) {
-      await prisma.priceRule.delete({ where: { id: defaultRule.id } });
+    if (targetRule) {
+      await prisma.priceRule.delete({ where: { id: targetRule.id } });
     }
-  } else if (defaultRule) {
+  } else if (targetRule) {
     await prisma.priceRule.update({
-      where: { id: defaultRule.id },
+      where: { id: targetRule.id },
       data: { marginPct },
     });
   } else {

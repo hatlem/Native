@@ -5,9 +5,10 @@ import { prisma } from "@/lib/prisma";
 import {
   computeQuoteLines,
   quoteTotals,
+  resolveDefaultMarginPct,
   type QuotableItem,
 } from "@/lib/money";
-import { loadContentFeeRules, contentFeeLinesForGroup } from "@/lib/content-fee";
+import { loadPricingDefaults, contentFeeLinesForGroup } from "@/lib/content-fee";
 import { toQuotable } from "@/lib/commerce/firm-order";
 import { createOrderFromQuote } from "@/lib/commerce/accept-quote";
 import { uniquePublisherIdsForProducts } from "@/lib/commerce/publishers";
@@ -57,7 +58,9 @@ export async function generateQuote(formData: FormData) {
   const groups = groupItemsByMarket(request.plan.items, byId);
   if (groups.length === 0) redirect(`/${locale}/desk`);
 
-  const feeRules = await loadContentFeeRules();
+  // Fee rules and margin defaults come from the same load so the quote
+  // agrees with the catalog band the buyer saw (display-price.ts).
+  const defaults = await loadPricingDefaults();
   const validUntil = new Date(Date.now() + 14 * 24 * 60 * 60 * 1000);
 
   const created = await prisma.$transaction(async (tx) => {
@@ -71,12 +74,13 @@ export async function generateQuote(formData: FormData) {
               return product ? toQuotable(product, item.quantity) : null;
             })
             .filter((q): q is QuotableItem => q !== null),
+          resolveDefaultMarginPct(defaults.marginRules, group.marketCode),
         ),
         ...contentFeeLinesForGroup(
           group.items,
           byId,
           group.marketCode,
-          feeRules,
+          defaults.feeRules,
         ),
       ];
       const { subtotal, total } = quoteTotals(lines, group.vatPct);

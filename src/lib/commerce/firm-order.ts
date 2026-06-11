@@ -12,11 +12,12 @@ import { prisma } from "@/lib/prisma";
 import {
   computeQuoteLines,
   quoteTotals,
+  resolveDefaultMarginPct,
   toRateRules,
   type QuotableItem,
 } from "@/lib/money";
 import { groupItemsByMarket } from "@/lib/quote-grouping";
-import { loadContentFeeRules, contentFeeLinesForGroup } from "@/lib/content-fee";
+import { loadPricingDefaults, contentFeeLinesForGroup } from "@/lib/content-fee";
 import {
   authorshipFromWithContent,
   authorshipForOrderLine,
@@ -104,7 +105,9 @@ export async function createFirmOrder(args: {
   // Legacy Plan.currency: single-market basket keeps its one currency;
   // multi-market leaves it null (per-Quote currencies are the truth).
   const planCurrency = groups.length === 1 ? groups[0].currency : null;
-  const feeRules = await loadContentFeeRules();
+  // Fee rules and margin defaults come from the same load so the order
+  // agrees with the catalog band the buyer saw (display-price.ts).
+  const defaults = await loadPricingDefaults();
 
   // Per-product authorship intent (projected from the buyer's withContent
   // toggle), used to stamp both the PlanItem and the eventual OrderLine.
@@ -161,12 +164,13 @@ export async function createFirmOrder(args: {
           group.items.map((i) =>
             toQuotable(byId.get(i.productId)!, i.quantity),
           ),
+          resolveDefaultMarginPct(defaults.marginRules, group.marketCode),
         ),
         ...contentFeeLinesForGroup(
           group.items,
           byId,
           group.marketCode,
-          feeRules,
+          defaults.feeRules,
         ),
       ];
       const { subtotal, total } = quoteTotals(lines, group.vatPct);
