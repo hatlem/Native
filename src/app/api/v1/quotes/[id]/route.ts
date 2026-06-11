@@ -68,8 +68,6 @@ export async function GET(
         select: {
           id: true,
           quantity: true,
-          unitCost: true,
-          marginPct: true,
           lineTotal: true,
           productId: true,
           description: true,
@@ -104,8 +102,6 @@ export async function GET(
       product_id: l.productId,
       description: l.description,
       quantity: l.quantity,
-      unit_cost: String(l.unitCost),
-      margin_pct: String(l.marginPct),
       line_total: String(l.lineTotal),
     })),
     created_at: quote.createdAt.toISOString(),
