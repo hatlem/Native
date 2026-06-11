@@ -337,10 +337,25 @@
       "heading": "Rules in this market",
       "labeling": "Labeling is handled by the publisher — the article is labeled “{label}” as required by marketing law in {market}."
     },
-    "includedHeading": "Included in the price (per the publisher)",
+    "includedHeading": "Included in the price",
     "notIncludedHeading": "Not included",
     "rateProductionNote": "Article production billed separately — confirmed in your firm quote.",
-    "leadTimeEstimated": "estimated {days} days"
+    "leadTimeEstimated": "estimated {days} days",
+    "inc": {
+      "productionPlatform": "Finished article written for you",
+      "productionPublisher": "Article produced by the publisher's studio",
+      "viewsPerWeek": "Guaranteed {amount} views per week",
+      "viewsPerMonth": "Guaranteed {amount} views per month",
+      "viewsTotal": "Guaranteed {amount} views",
+      "readsTotal": "Guaranteed {amount} reads",
+      "frontpage": "Front-page promotion",
+      "newsletter": "Featured in the newsletter",
+      "social": "Social media distribution",
+      "print": "Print edition included",
+      "rights": "You own the content",
+      "searchable": "Searchable for {months} months",
+      "duration": "Live for {weeks} weeks"
+    }
   },
   "plan": {
     "eyebrow": "Plan",

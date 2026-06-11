@@ -258,10 +258,25 @@
       "heading": "Regler på dette marked",
       "labeling": "Mærkning håndteres af mediet — artiklen mærkes '{label}' i henhold til markedsføringsloven i {market}."
     },
-    "includedHeading": "Inkluderet i prisen (ifølge mediet)",
+    "includedHeading": "Inkluderet i prisen",
     "notIncludedHeading": "Ikke inkluderet",
     "rateProductionNote": "Artikelproduktion kommer oveni — bekræftes i det faste tilbud.",
-    "leadTimeEstimated": "estimeret {days} dage"
+    "leadTimeEstimated": "estimeret {days} dage",
+    "inc": {
+      "productionPlatform": "Færdigskrevet artikel",
+      "productionPublisher": "Artiklen produceres af mediets studio",
+      "viewsPerWeek": "Garanteret {amount} visninger pr. uge",
+      "viewsPerMonth": "Garanteret {amount} visninger pr. måned",
+      "viewsTotal": "Garanteret {amount} visninger",
+      "readsTotal": "Garanteret {amount} læsninger",
+      "frontpage": "Promovering på forsiden",
+      "newsletter": "Med i nyhedsbrevet",
+      "social": "Spredning på sociale medier",
+      "print": "Trykt udgave inkluderet",
+      "rights": "Du ejer indholdet",
+      "searchable": "Søgbar i {months} måneder",
+      "duration": "Ligger online i {weeks} uger"
+    }
   },
   "plan": {
     "eyebrow": "Plan",

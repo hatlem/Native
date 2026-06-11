@@ -337,10 +337,25 @@
       "heading": "Tämän markkinan säännöt",
       "labeling": "Median vastuulla on merkintä — artikkeli merkitään '{label}' paikallisen markkinointilain mukaisesti ({market})."
     },
-    "includedHeading": "Sisältyy hintaan (median mukaan)",
+    "includedHeading": "Sisältyy hintaan",
     "notIncludedHeading": "Ei sisälly",
     "rateProductionNote": "Artikkelin tuotanto veloitetaan erikseen — vahvistetaan kiinteässä tarjouksessa.",
-    "leadTimeEstimated": "arviolta {days} päivää"
+    "leadTimeEstimated": "arviolta {days} päivää",
+    "inc": {
+      "productionPlatform": "Valmiiksi kirjoitettu artikkeli",
+      "productionPublisher": "Artikkelin tuottaa median studio",
+      "viewsPerWeek": "Taattu {amount} näyttöä viikossa",
+      "viewsPerMonth": "Taattu {amount} näyttöä kuukaudessa",
+      "viewsTotal": "Taattu {amount} näyttöä",
+      "readsTotal": "Taattu {amount} lukukertaa",
+      "frontpage": "Nosto etusivulla",
+      "newsletter": "Mukana uutiskirjeessä",
+      "social": "Jakelu sosiaalisessa mediassa",
+      "print": "Printtiversio sisältyy",
+      "rights": "Omistat sisällön",
+      "searchable": "Haettavissa {months} kuukautta",
+      "duration": "Esillä {weeks} viikkoa"
+    }
   },
   "plan": {
     "eyebrow": "Suunnitelma",

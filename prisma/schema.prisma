@@ -500,6 +500,11 @@ model Product {
   // price covers (never a platform claim).
   includedText  String?
   excludedText  String?
+  // Semantic, buyer-exposable inclusions — the ONLY per-product facts a
+  // buyer sees beyond name/type/band. Structured ({ production, viewsPerWeek,
+  // frontpage, newsletter, ... }) and rendered via i18n templates, so one
+  // data entry serves every locale. Internal quote text stays desk-only.
+  inclusions Json?
   // Per-offer override of the content-production fee folded into the
   // displayed all-in band. Null = inherit (Title default → ContentFeeRule);
   // 0 = publisher includes production in basePrice.

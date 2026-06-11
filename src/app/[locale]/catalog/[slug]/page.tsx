@@ -27,6 +27,53 @@ function prettyCategory(value: string): string {
   return words.charAt(0).toUpperCase() + words.slice(1);
 }
 
+// Semantic, buyer-safe inclusions (Product.inclusions). Structured facts
+// curated by the desk/swarm from internal quote text — rendered through
+// i18n templates so one data entry serves every locale. Raw quote text
+// (contacts, discounts, net figures) must never reach this surface.
+export type ProductInclusions = {
+  production?: "PLATFORM" | "PUBLISHER";
+  viewsPerWeek?: number;
+  viewsPerMonth?: number;
+  viewsTotal?: number;
+  readsTotal?: number;
+  frontpage?: boolean;
+  newsletter?: boolean;
+  social?: boolean;
+  print?: boolean;
+  rights?: boolean;
+  searchableMonths?: number;
+  durationWeeks?: number;
+};
+
+function inclusionLines(
+  inc: ProductInclusions | null,
+  t: Awaited<ReturnType<typeof getTranslations>>,
+): string[] {
+  if (!inc) return [];
+  const lines: string[] = [];
+  if (inc.production === "PLATFORM") lines.push(t("inc.productionPlatform"));
+  if (inc.production === "PUBLISHER") lines.push(t("inc.productionPublisher"));
+  if (inc.viewsPerWeek)
+    lines.push(t("inc.viewsPerWeek", { amount: inc.viewsPerWeek }));
+  if (inc.viewsPerMonth)
+    lines.push(t("inc.viewsPerMonth", { amount: inc.viewsPerMonth }));
+  if (inc.viewsTotal)
+    lines.push(t("inc.viewsTotal", { amount: inc.viewsTotal }));
+  if (inc.readsTotal)
+    lines.push(t("inc.readsTotal", { amount: inc.readsTotal }));
+  if (inc.frontpage) lines.push(t("inc.frontpage"));
+  if (inc.newsletter) lines.push(t("inc.newsletter"));
+  if (inc.social) lines.push(t("inc.social"));
+  if (inc.print) lines.push(t("inc.print"));
+  if (inc.rights) lines.push(t("inc.rights"));
+  if (inc.searchableMonths)
+    lines.push(t("inc.searchable", { months: inc.searchableMonths }));
+  if (inc.durationWeeks)
+    lines.push(t("inc.duration", { weeks: inc.durationWeeks }));
+  return lines;
+}
+
 export default async function TitleDetailPage({
   params,
 }: {
@@ -283,11 +330,26 @@ export default async function TitleDetailPage({
                   {tFormats("learnMore")} →
                 </Link>
               </div>
-              {p.description ? (
-                <p className="muted small" style={{ marginTop: 6 }}>
-                  {p.description}
-                </p>
-              ) : null}
+              {/* SECURITY: description/includedText/excludedText are RAW
+                  QUOTE TEXT (publisher contacts, negotiated discounts,
+                  gross/net figures — the Akersposten leak). Desk-only.
+                  Buyers see ONLY buyerCopy: platform-written, per-locale,
+                  populated by the curation swarm. */}
+              {(() => {
+                const lines = inclusionLines(
+                  p.inclusions as ProductInclusions | null,
+                  t,
+                );
+                if (lines.length === 0) return null;
+                return (
+                  <div className="muted small" style={{ marginTop: 8 }}>
+                    <strong>{t("includedHeading")}</strong>
+                    {lines.map((line) => (
+                      <div key={line}>✓ {line}</div>
+                    ))}
+                  </div>
+                );
+              })()}
               {band ? (
                 <>
                   <div className="price">
@@ -297,10 +359,10 @@ export default async function TitleDetailPage({
                     </span>
                   </div>
                   {/* Only claim production is included when WE actually
-                      fold a production fee into this band. When the
-                      publisher includes production, their own
-                      includedText below says so — never both. */}
-                  {resolveProductionFee({
+                      fold a production fee into this band — and defer to
+                      the curated inclusions when they state who produces. */}
+                  {!(p.inclusions as ProductInclusions | null)?.production &&
+                  resolveProductionFee({
                     productFee:
                       p.productionFee == null ? null : Number(p.productionFee),
                     titleFee:
@@ -333,20 +395,6 @@ export default async function TitleDetailPage({
               )}
               {band && p.visibility === "FIRM" ? (
                 <span className="tag">⚡ {tf("badge")}</span>
-              ) : null}
-              {/* Publisher-stated scope, verbatim from the applied quote —
-                  the only honest source for "what does the price include". */}
-              {p.includedText ? (
-                <div className="muted small" style={{ marginTop: 8 }}>
-                  <strong>{t("includedHeading")}</strong>
-                  <p style={{ margin: "2px 0 0" }}>{p.includedText}</p>
-                </div>
-              ) : null}
-              {p.excludedText ? (
-                <div className="muted small" style={{ marginTop: 6 }}>
-                  <strong>{t("notIncludedHeading")}</strong>
-                  <p style={{ margin: "2px 0 0" }}>{p.excludedText}</p>
-                </div>
               ) : null}
               {/* Publisher-stated lead time when we have it; otherwise an
                   honest platform estimate, labelled as such. */}

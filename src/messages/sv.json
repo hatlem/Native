@@ -258,10 +258,25 @@
       "heading": "Regler på denna marknad",
       "labeling": "Märkningen hanteras av mediet — artikeln märks '{label}' enligt marknadsföringslagen i {market}."
     },
-    "includedHeading": "Ingår i priset (enligt mediet)",
+    "includedHeading": "Ingår i priset",
     "notIncludedHeading": "Ingår inte",
     "rateProductionNote": "Artikelproduktion tillkommer — bekräftas i fastpris-offerten.",
-    "leadTimeEstimated": "uppskattat {days} dagar"
+    "leadTimeEstimated": "uppskattat {days} dagar",
+    "inc": {
+      "productionPlatform": "Färdigskriven artikel",
+      "productionPublisher": "Artikeln produceras av mediets studio",
+      "viewsPerWeek": "Garanterat {amount} visningar per vecka",
+      "viewsPerMonth": "Garanterat {amount} visningar per månad",
+      "viewsTotal": "Garanterat {amount} visningar",
+      "readsTotal": "Garanterat {amount} läsningar",
+      "frontpage": "Puff på förstasidan",
+      "newsletter": "Med i nyhetsbrevet",
+      "social": "Spridning i sociala medier",
+      "print": "Tryckt utgåva ingår",
+      "rights": "Du äger innehållet",
+      "searchable": "Sökbar i {months} månader",
+      "duration": "Ligger ute i {weeks} veckor"
+    }
   },
   "plan": {
     "eyebrow": "Plan",

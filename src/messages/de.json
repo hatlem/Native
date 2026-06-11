@@ -337,10 +337,25 @@
       "heading": "Regeln in diesem Markt",
       "labeling": "Die Kennzeichnung übernimmt das Medium — der Artikel wird gemäß dem Werberecht in {market} als '{label}' gekennzeichnet."
     },
-    "includedHeading": "Im Preis enthalten (laut Medium)",
+    "includedHeading": "Im Preis enthalten",
     "notIncludedHeading": "Nicht enthalten",
     "rateProductionNote": "Die Artikelproduktion wird separat berechnet — bestätigt im Festpreisangebot.",
-    "leadTimeEstimated": "geschätzt {days} Tage"
+    "leadTimeEstimated": "geschätzt {days} Tage",
+    "inc": {
+      "productionPlatform": "Fertig geschriebener Artikel",
+      "productionPublisher": "Artikel wird vom Studio des Mediums produziert",
+      "viewsPerWeek": "Garantiert {amount} Aufrufe pro Woche",
+      "viewsPerMonth": "Garantiert {amount} Aufrufe pro Monat",
+      "viewsTotal": "Garantiert {amount} Aufrufe",
+      "readsTotal": "Garantiert {amount} Lesungen",
+      "frontpage": "Platzierung auf der Startseite",
+      "newsletter": "Im Newsletter enthalten",
+      "social": "Verbreitung in sozialen Medien",
+      "print": "Printausgabe inklusive",
+      "rights": "Sie besitzen den Inhalt",
+      "searchable": "{months} Monate auffindbar",
+      "duration": "{weeks} Wochen online"
+    }
   },
   "plan": {
     "eyebrow": "Plan",
