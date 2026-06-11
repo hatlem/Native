@@ -4,9 +4,9 @@
 // they can pipe into Notion / Airtable / their planning spreadsheet.
 //
 // Auth: any signed-in user. Same content visibility as the catalog
-// page itself (gated catalog is the visibility unit). Indicative
-// pricing follows the same per-title / per-publisher visibility logic
-// as the buyer-facing card.
+// page itself (gated catalog is the visibility unit). Price is shown
+// as a band label (e.g. "25–40k NOK") using the same helper as the
+// catalog card — never the net basePrice or exact customer figure.
 //
 // Query params:
 //   - market (NO/SE/DK/FI/DE/AT/CH/UK/IE): filter by market.
@@ -18,7 +18,9 @@ import { MarketCode } from "@prisma/client";
 import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
 import { csv } from "@/lib/csv";
-import { isProductPriceShown } from "@/lib/pricing-visibility";
+import { bandLabel } from "@/lib/pricing/bands";
+import { titleBand } from "@/lib/pricing/display-price";
+import { loadContentFeeRules } from "@/lib/content-fee";
 import { recordAudit } from "@/lib/audit";
 
 export const dynamic = "force-dynamic";
@@ -58,18 +60,23 @@ export async function GET(req: NextRequest) {
           leadTimeDays: true,
           active: true,
           confirmedAt: true,
+          productionFee: true,
+          priceRules: {
+            select: { marginPct: true, seasonalMultiplier: true, minVolume: true },
+          },
         },
       },
     },
   });
 
-  // One row per title; lowest-priced indicative product (mirrors the
-  // catalog-card price logic) for the headline price column.
+  const feeRules = await loadContentFeeRules();
+
+  // One row per title; price band mirrors the catalog card (NATIVE_ARTICLE
+  // preferred, else cheapest shown product). Never the exact figure.
   const rows = titles.map((t) => {
-    const shownProducts = t.products.filter((p) => isProductPriceShown(p, t));
-    const lowest = shownProducts
-      .filter((p) => p.basePrice != null)
-      .sort((a, b) => Number(a.basePrice) - Number(b.basePrice))[0];
+    // Same band selection as the catalog card (NATIVE_ARTICLE preferred,
+    // else cheapest). Never the exact figure — and never raw basePrice.
+    const fromBand = titleBand(t.products, t, feeRules);
     return {
       title_id: t.id,
       slug: t.slug,
@@ -84,10 +91,10 @@ export async function GET(req: NextRequest) {
         .map((p) => p.type)
         .filter((v, i, a) => a.indexOf(v) === i)
         .join("|"),
-      indicative_price: lowest?.basePrice != null ? String(lowest.basePrice) : "",
-      indicative_price_currency: lowest?.currency ?? "",
-      indicative_price_format: lowest?.type ?? "",
-      lead_time_days: lowest?.leadTimeDays ?? "",
+      price_band: fromBand ? bandLabel(fromBand.band, fromBand.product.currency) : "",
+      price_band_currency: fromBand?.product.currency ?? "",
+      price_band_format: fromBand?.product.type ?? "",
+      lead_time_days: fromBand?.product.leadTimeDays ?? "",
       disclosure_label: t.market.disclosureLabel ?? "",
       last_verified_at: t.lastVerifiedAt?.toISOString() ?? "",
     };
