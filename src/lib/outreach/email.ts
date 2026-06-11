@@ -13,7 +13,10 @@ export function localeForMarketCode(code: MarketCode): Locale {
     case "AT":
     case "CH": return "de";
     case "UK":
-    case "IE": return "en";
+    case "IE":
+    // NL/BE have no own locale yet — English is the outreach language there.
+    case "NL":
+    case "BE": return "en";
   }
 }
 

@@ -2,6 +2,7 @@
  * Body-price data only (attachment-only prices handled separately). Dup-guarded by
  * INBOUND note tag. Creates missing titles/publishers. Verified contact emails only. */
 import { prisma } from "@/lib/prisma";
+import type { ProductType, Prisma } from "@prisma/client";
 import { createContactLog } from "@/lib/pricing/contact-log";
 import { createSalesContact, attachContactToTitle } from "@/lib/pricing/contacts";
 import { logQuote } from "@/lib/pricing/quotes";
@@ -17,15 +18,15 @@ async function findT(name: string, cc: string) {
 }
 async function ensurePublisher(name: string, cc: string) {
   let p = await prisma.publisher.findFirst({ where: { name } });
-  if (!p) p = await prisma.publisher.create({ data: { name, countryCode: cc, marketId: MARKET[cc] } });
+  if (!p) p = await prisma.publisher.create({ data: { name, countryCode: cc, marketId: MARKET[cc]! } });
   return p;
 }
-async function ensureTitle(opts: { name: string; cc: string; slug: string; publisherName: string; websiteUrl?: string; category?: string; offersNative?: boolean; aliases?: string[]; keywords?: string[]; description?: string; digitalReach?: number }) {
+async function ensureTitle(opts: { name: string; cc: string; slug: string; publisherName: string; websiteUrl?: string; category: string; offersNative?: boolean; aliases?: string[]; keywords?: string[]; description?: string; digitalReach?: number }) {
   const existing = await prisma.title.findFirst({ where: { slug: opts.slug }, select: { id: true, name: true, publisherId: true, outstandingInfo: true } });
   if (existing) return existing;
   const pub = await ensurePublisher(opts.publisherName, opts.cc);
   const created = await prisma.title.create({ data: {
-    name: opts.name, slug: opts.slug, publisherId: pub.id, marketId: MARKET[opts.cc], countryCode: opts.cc,
+    name: opts.name, slug: opts.slug, publisherId: pub.id, marketId: MARKET[opts.cc]!, countryCode: opts.cc,
     category: opts.category, websiteUrl: opts.websiteUrl, offersNativeContent: opts.offersNative ?? true,
     aliases: opts.aliases ?? [], keywords: opts.keywords ?? [], description: opts.description,
     digitalReach: opts.digitalReach, active: true, lastVerifiedAt: new Date(),
@@ -41,14 +42,14 @@ async function ensureContact(publisherId: string, titleId: string, c: { name: st
   if (!sc) sc = await createSalesContact({ publisherId, name: c.name, email: c.email, phone: c.phone, role: c.role, notes: c.notes, actorId: ACTOR });
   await attachContactToTitle({ salesContactId: sc.id, titleId, isPrimary: c.primary ?? false, actorId: ACTOR });
 }
-type Q = { type: string; name: string; price: number; unit?: "FLAT" | "CPC" | "CPM"; cur?: string; desc: string };
+type Q = { type: ProductType; name: string; price: number; unit?: "FLAT" | "CPC" | "CPM"; cur?: string; desc: string };
 async function logQuotes(titleId: string, qs: Q[], note: string, cur = "SEK") {
   const log = await createContactLog({ titleId, channel: "EMAIL", direction: "INBOUND", note, actorId: ACTOR });
   for (const q of qs) await logQuote({ draftProductType: q.type, draftProductName: q.name, draftProductDesc: q.desc, contactLogId: log.id, price: q.price, currency: q.cur ?? cur, priceUnit: q.unit ?? "FLAT", includedText: note.slice(0, 200), recordedById: ACTOR });
   return log;
 }
 async function setExtra(titleId: string, extra: Record<string, unknown>, offersNative = true) {
-  await prisma.title.update({ where: { id: titleId }, data: { offersNativeContent: offersNative, commercialExtra: extra, lastVerifiedAt: new Date() } });
+  await prisma.title.update({ where: { id: titleId }, data: { offersNativeContent: offersNative, commercialExtra: extra as Prisma.InputJsonValue, lastVerifiedAt: new Date() } });
 }
 
 // 1) Chef (SE) — Patrik Mood (Chefakademin). Native digital 57 750/99 750/144 000 (1/2/3) + print 25 000/helsida.

@@ -19,6 +19,9 @@ export function localeForMarketCode(code: MarketCode): Locale {
       return "de";
     case "UK":
     case "IE":
+    // NL/BE have no own locale yet — English serves those markets.
+    case "NL":
+    case "BE":
       return "en";
   }
 }
