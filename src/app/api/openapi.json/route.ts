@@ -79,11 +79,11 @@ const SPEC = {
         properties: {
           id: { type: "string" },
           type: { type: "string", enum: Object.values(ProductType) },
-          basePrice: {
+          priceBand: {
             type: "string",
             nullable: true,
             description:
-              "Decimal as string. Null when the title's pricing is hidden (pricesVisible=false).",
+              'Indicative all-in price band label (e.g. "25–40k NOK"). Null when pricing is not public for this product.',
           },
           currency: { type: "string", nullable: true },
           visibility: { type: "string", enum: ["INDICATIVE", "FIRM"] },
