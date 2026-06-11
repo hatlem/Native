@@ -335,11 +335,8 @@
     "factCategory": "Kategorie",
     "marketRules": {
       "heading": "Regeln in diesem Markt",
-      "labeling": "Die Kennzeichnung übernimmt das Medium — der Artikel wird gemäß dem Werberecht in {market} als '{label}' gekennzeichnet. Sie liefern nur den Inhalt."
-    },
-    "includedHeading": "Im Preis enthalten",
-    "includedPublication": "Veröffentlichung auf {name}",
-    "includedLabeling": "Gesetzlich vorgeschriebene Kennzeichnung"
+      "labeling": "Die Kennzeichnung übernimmt das Medium — der Artikel wird gemäß dem Werberecht in {market} als '{label}' gekennzeichnet."
+    }
   },
   "plan": {
     "eyebrow": "Plan",

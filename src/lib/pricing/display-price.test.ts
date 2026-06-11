@@ -1,6 +1,6 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { customerPrice, productBand, titleBand } from "./display-price";
+import { customerPrice, productBand, titleBand, unitRate } from "./display-price";
 import type { PricingDefaults } from "@/lib/content-fee";
 import type { ContentFeeRuleSpec } from "../money";
 
@@ -128,4 +128,26 @@ test("titleBand is null when nothing is shown", () => {
     titleBand([product({ confirmedAt: null })], TITLE, DEFAULTS),
     null,
   );
+});
+
+test("CPM products never band; unitRate returns marked-up rounded rate", () => {
+  const cpm = product({ pricingModel: "CPM", basePrice: 345 });
+  assert.equal(productBand(cpm, TITLE, { feeRules: RULES, marginRules: [] }), null);
+  const got = unitRate(cpm, TITLE, { feeRules: RULES, marginRules: [] });
+  // 345 × 1.15 = 396.75 → nearest 5 = 395; no production fee folded in
+  assert.deepEqual(got, { rate: 395, unit: "CPM" });
+});
+
+test("titleBand ignores rate products when picking the card band", () => {
+  const cpm = product({ pricingModel: "CPM", basePrice: 100 });
+  const flat = product({ type: "ADVERTORIAL", basePrice: 30_000 });
+  const got = titleBand([cpm, flat], TITLE, { feeRules: RULES, marginRules: [] });
+  assert.ok(got);
+  assert.equal(got.product.type, "ADVERTORIAL");
+});
+
+test("unitRate is null for FLAT and for hidden rate products", () => {
+  assert.equal(unitRate(product(), TITLE, { feeRules: RULES, marginRules: [] }), null);
+  const hidden = product({ pricingModel: "CPM", confirmedAt: null });
+  assert.equal(unitRate(hidden, TITLE, { feeRules: RULES, marginRules: [] }), null);
 });

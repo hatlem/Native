@@ -256,11 +256,8 @@
     "factCategory": "Kategori",
     "marketRules": {
       "heading": "Regler på denna marknad",
-      "labeling": "Märkningen hanteras av mediet — artikeln märks '{label}' enligt marknadsföringslagen i {market}. Du levererar bara innehållet."
-    },
-    "includedHeading": "Ingår i priset",
-    "includedPublication": "Publicering på {name}",
-    "includedLabeling": "Lagstadgad märkning"
+      "labeling": "Märkningen hanteras av mediet — artikeln märks '{label}' enligt marknadsföringslagen i {market}."
+    }
   },
   "plan": {
     "eyebrow": "Plan",

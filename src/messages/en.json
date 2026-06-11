@@ -335,11 +335,8 @@
     "factCategory": "Category",
     "marketRules": {
       "heading": "Rules in this market",
-      "labeling": "Labeling is handled by the publisher — the article is labeled “{label}” as required by marketing law in {market}. You only supply the content."
-    },
-    "includedHeading": "Included in the price",
-    "includedPublication": "Publication on {name}",
-    "includedLabeling": "Required disclosure labeling"
+      "labeling": "Labeling is handled by the publisher — the article is labeled “{label}” as required by marketing law in {market}."
+    }
   },
   "plan": {
     "eyebrow": "Plan",

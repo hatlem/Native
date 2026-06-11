@@ -8,6 +8,10 @@
 // admin MarginRule for the title's market (then the 15% constant), so
 // bands and desk quotes share the same default-margin source.
 //
+// Bands apply to FLAT (per-placement) prices only. CPM/CPC rate cards
+// render via unitRate() — banding a 345 NOK CPM as if it were an
+// article price produced absurd "< 15k" cards (the Adresseavisen bug).
+//
 // Exact figures live ONLY in the quote flow. Spec:
 // docs/superpowers/specs/2026-06-11-catalog-price-bands-design.md
 
@@ -29,6 +33,9 @@ export type DisplayProduct = {
   type: string;
   basePrice: unknown;
   currency: string;
+  // Optional for back-compat with callers/tests that predate unit
+  // handling; missing means FLAT (the schema default).
+  pricingModel?: string;
   priceRules: { marginPct: unknown; seasonalMultiplier: unknown; minVolume: number }[];
   productionFee?: unknown;
 };
@@ -42,8 +49,13 @@ function toNumberOrNull(v: unknown): number | null {
   return v == null ? null : Number(v);
 }
 
+function isFlat(product: DisplayProduct): boolean {
+  return !product.pricingModel || product.pricingModel === "FLAT";
+}
+
 // All-in customer price: marked-up indicative + flat production fee
 // (the fee is NOT marked up — it is our cost-recovery, not inventory).
+// Only meaningful for FLAT products; rate products go through unitRate.
 export function customerPrice(
   product: DisplayProduct,
   title: DisplayTitle,
@@ -70,20 +82,48 @@ export function productBand(
   title: DisplayTitle,
   defaults: PricingDefaults,
 ): Band | null {
+  if (!isFlat(product)) return null;
   if (!isProductPriceShown(product, title)) return null;
   return priceBand(customerPrice(product, title, defaults), product.currency);
+}
+
+// Marked-up unit rate for CPM/CPC products, rounded to the nearest 5 so
+// the publisher's exact net rate is not recoverable. No production fee
+// folded in — the all-in cost of a rate product depends on volume, which
+// the quote flow resolves. Null for FLAT or hidden products.
+export function unitRate(
+  product: DisplayProduct,
+  title: DisplayTitle,
+  defaults: PricingDefaults,
+): { rate: number; unit: string } | null {
+  if (isFlat(product)) return null;
+  if (!isProductPriceShown(product, title)) return null;
+  const indicative = indicativeFromRules(
+    Number(product.basePrice),
+    toRateRules(product.priceRules),
+    1,
+    resolveDefaultMarginPct(defaults.marginRules, title.market.code),
+  );
+  return {
+    rate: Math.round(indicative / 5) * 5,
+    unit: product.pricingModel as string,
+  };
 }
 
 // Card-level band. Prefer the NATIVE_ARTICLE product when one is shown
 // (it is the category lead and what the buyer came for) — otherwise the
 // cheapest shown product. Prevents a cheap display product producing a
-// "< 15k" band that reads as bait next to a 35k article.
+// "< 15k" band that reads as bait next to a 35k article. Rate (CPM/CPC)
+// products never produce the card band — their numbers aren't comparable
+// to per-placement prices.
 export function titleBand<P extends DisplayProduct>(
   products: P[],
   title: DisplayTitle,
   defaults: PricingDefaults,
 ): { band: Band; product: P } | null {
-  const shown = products.filter((p) => isProductPriceShown(p, title));
+  const shown = products.filter(
+    (p) => isFlat(p) && isProductPriceShown(p, title),
+  );
   if (shown.length === 0) return null;
   const pick =
     shown.find((p) => p.type === "NATIVE_ARTICLE") ??

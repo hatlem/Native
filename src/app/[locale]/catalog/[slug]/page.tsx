@@ -7,7 +7,7 @@ import { Link } from "@/i18n/navigation";
 import { intlLocale } from "@/lib/money";
 import { isProductPriceShown, arePricesVisible } from "@/lib/pricing/visibility";
 import { bandLabel } from "@/lib/pricing/bands";
-import { productBand, titleBand } from "@/lib/pricing/display-price";
+import { productBand, titleBand, unitRate } from "@/lib/pricing/display-price";
 import { loadPricingDefaults } from "@/lib/content-fee";
 import { addToPlan } from "@/app/plan-actions";
 import { SubmitButton } from "@/components";
@@ -247,20 +247,21 @@ export default async function TitleDetailPage({
         {(() => {
           // A confirmed, priced offer supersedes the seeded placeholder of
           // the same format: when at least one product of a type carries a
-          // band, hide that type's band-less products. Otherwise a title
-          // that got real quotes shows a ghost "Contact for price" card
-          // next to four priced ones (Adresseavisen case).
+          // band or a unit rate, hide that type's unpriced products.
+          // Otherwise a title that got real quotes shows a ghost "Contact
+          // for price" card next to four priced ones (Adresseavisen case).
           const banded = title.products.map((p) => ({
             p,
             band: productBand(p, title, pricing),
+            rate: unitRate(p, title, pricing),
           }));
           const pricedTypes = new Set(
-            banded.filter((x) => x.band).map((x) => x.p.type),
+            banded.filter((x) => x.band || x.rate).map((x) => x.p.type),
           );
           return banded.filter(
-            (x) => x.band || !pricedTypes.has(x.p.type),
+            (x) => x.band || x.rate || !pricedTypes.has(x.p.type),
           );
-        })().map(({ p, band }) => {
+        })().map(({ p, band, rate }) => {
           const formatSlug = p.type.toLowerCase().replace(/_/g, "-");
           // Quote-created products carry a specific offer name ("Native
           // 1 sak, 80k visn/mnd"); seeded ones repeat the type label or a
@@ -294,16 +295,17 @@ export default async function TitleDetailPage({
                       · {tv("listIndicative")}
                     </span>
                   </div>
-                  {/* What the price buys — the three things every
-                      NativeSpin order includes, so the buyer never has
-                      to guess whether production or labeling costs extra. */}
-                  <div className="muted small" style={{ marginTop: 6 }}>
-                    <strong>{t("includedHeading")}</strong>
-                    <div>✓ {tv("productionIncluded")}</div>
-                    <div>✓ {t("includedPublication", { name: title.name })}</div>
-                    <div>✓ {t("includedLabeling")}</div>
-                  </div>
+                  <div className="muted">✓ {tv("productionIncluded")}</div>
                 </>
+              ) : rate ? (
+                // CPM/CPC rate card: marked-up unit rate, no band — the
+                // all-in cost depends on volume, settled in the quote.
+                <div className="price">
+                  ≈ {rate.rate} {p.currency} {rate.unit}{" "}
+                  <span className="muted" title={tv("listIndicativeHelp")}>
+                    · {tv("listIndicative")}
+                  </span>
+                </div>
               ) : (
                 <div className="price muted">{tv("requestPrice")}</div>
               )}
@@ -346,7 +348,7 @@ export default async function TitleDetailPage({
                       pendingLabel={t("addingToPlan")}
                     />
                   </form>
-                  {band ? <p className="note">{tv("firmTurnaround")}</p> : null}
+                  {band || rate ? <p className="note">{tv("firmTurnaround")}</p> : null}
                 </>
               ) : (
                 <p className="note">{t("unavailable")}</p>

@@ -156,6 +156,10 @@ export async function applyQuote(args: {
           description: quote.draftProductDesc ?? null,
           currency: quote.currency,
           basePrice: quote.price,
+          // Carry the quote's unit — a CPM/CPC rate must never become a
+          // FLAT product, or the band engine renders the rate as if it
+          // were a per-placement price (the Adresseavisen bug).
+          pricingModel: quote.priceUnit,
           visibility: "INDICATIVE",
           active: false,
           bookable: false,
@@ -183,6 +187,10 @@ export async function applyQuote(args: {
         data: {
           basePrice: quote.price,
           currency: quote.currency,
+          // Keep the unit in sync with the price being committed — a CPM
+          // quote applied onto a FLAT product would otherwise band the
+          // rate as a per-placement price.
+          pricingModel: quote.priceUnit,
           confirmedAt: new Date(),
           confirmedSource: `PriceQuote:${quote.id}`,
         },
