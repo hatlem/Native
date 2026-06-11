@@ -259,7 +259,8 @@
       "labeling": "Mærkning håndteres af mediet — artiklen mærkes '{label}' i henhold til markedsføringsloven i {market}."
     },
     "includedHeading": "Inkluderet i prisen (ifølge mediet)",
-    "notIncludedHeading": "Ikke inkluderet"
+    "notIncludedHeading": "Ikke inkluderet",
+    "rateProductionNote": "Artikelproduktion kommer oveni — bekræftes i det faste tilbud."
   },
   "plan": {
     "eyebrow": "Plan",

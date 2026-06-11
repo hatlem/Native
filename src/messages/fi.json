@@ -338,7 +338,8 @@
       "labeling": "Median vastuulla on merkintä — artikkeli merkitään '{label}' paikallisen markkinointilain mukaisesti ({market})."
     },
     "includedHeading": "Sisältyy hintaan (median mukaan)",
-    "notIncludedHeading": "Ei sisälly"
+    "notIncludedHeading": "Ei sisälly",
+    "rateProductionNote": "Artikkelin tuotanto veloitetaan erikseen — vahvistetaan kiinteässä tarjouksessa."
   },
   "plan": {
     "eyebrow": "Suunnitelma",

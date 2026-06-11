@@ -338,7 +338,8 @@
       "labeling": "Die Kennzeichnung übernimmt das Medium — der Artikel wird gemäß dem Werberecht in {market} als '{label}' gekennzeichnet."
     },
     "includedHeading": "Im Preis enthalten (laut Medium)",
-    "notIncludedHeading": "Nicht enthalten"
+    "notIncludedHeading": "Nicht enthalten",
+    "rateProductionNote": "Die Artikelproduktion wird separat berechnet — bestätigt im Festpreisangebot."
   },
   "plan": {
     "eyebrow": "Plan",

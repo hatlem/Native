@@ -317,12 +317,17 @@ export default async function TitleDetailPage({
               ) : rate ? (
                 // CPM/CPC rate card: marked-up unit rate, no band — the
                 // all-in cost depends on volume, settled in the quote.
-                <div className="price">
-                  ≈ {rate.rate} {p.currency} {rate.unit}{" "}
-                  <span className="muted" title={tv("listIndicativeHelp")}>
-                    · {tv("listIndicative")}
-                  </span>
-                </div>
+                // The rate buys DISTRIBUTION only; say so, or the buyer
+                // reads "395 NOK CPM" as the whole price of the article.
+                <>
+                  <div className="price">
+                    ≈ {rate.rate} {p.currency} {rate.unit}{" "}
+                    <span className="muted" title={tv("listIndicativeHelp")}>
+                      · {tv("listIndicative")}
+                    </span>
+                  </div>
+                  <div className="muted small">{t("rateProductionNote")}</div>
+                </>
               ) : (
                 <div className="price muted">{tv("requestPrice")}</div>
               )}
