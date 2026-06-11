@@ -121,6 +121,24 @@ const MARKETS: SeedMarketSpec[] = [
     disclosure: "Sponsored",
     vatRatePct: 23,
   },
+  {
+    code: MarketCode.NL,
+    name: "Netherlands",
+    currency: "EUR",
+    defaultLocale: "en",
+    disclosure: "Advertentie / Gesponsord",
+    vatRatePct: 21,
+  },
+  {
+    code: MarketCode.BE,
+    name: "Belgium",
+    currency: "EUR",
+    defaultLocale: "en",
+    // Bilingual market: Dutch (Flanders) "Advertentie" / French (Wallonia)
+    // "Publicité". Both surfaced so the spec-check is truthful either side.
+    disclosure: "Advertentie / Publicité",
+    vatRatePct: 21,
+  },
 ];
 
 function slugify(value: string) {

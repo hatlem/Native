@@ -21,6 +21,8 @@ const MARKET_CURRENCY: Record<MarketCode, string> = {
   CH: "CHF",
   UK: "GBP",
   IE: "EUR",
+  NL: "EUR",
+  BE: "EUR",
 };
 
 async function main() {

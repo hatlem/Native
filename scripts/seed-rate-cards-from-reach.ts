@@ -57,6 +57,8 @@ const MARKET_MULTIPLIER: Record<MarketCode, number> = {
   CH: 1.1,
   UK: 0.9,
   IE: 1,
+  NL: 1,
+  BE: 1,
 };
 
 function amountFromReach(reach: number | null): number {
