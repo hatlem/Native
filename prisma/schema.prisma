@@ -368,6 +368,9 @@ model Title {
   // instead. Self-serve FIRM checkout is also blocked for hidden
   // titles so the buyer never sees a price they shouldn't.
   pricesPublic          Boolean  @default(true)
+  // Publication-level default for the content-production fee. Null =
+  // inherit from the desk ContentFeeRule price list.
+  productionFeeDefault Decimal? @db.Decimal(12, 2)
   // ---------- CSV import fields (research catalog) ----------
   // Populated from prisma/data/medier_alle.csv. These are descriptive
   // metadata used to power filtering/search in the catalog UI; they do
@@ -490,6 +493,10 @@ model Product {
   bookable     Boolean         @default(true)
   confirmedAt     DateTime?
   confirmedSource String?   // e.g. "PriceQuote:abc123", "manual", "blueprint-legacy"
+  // Per-offer override of the content-production fee folded into the
+  // displayed all-in band. Null = inherit (Title default → ContentFeeRule);
+  // 0 = publisher includes production in basePrice.
+  productionFee Decimal? @db.Decimal(12, 2)
   createdAt    DateTime        @default(now())
   updatedAt    DateTime        @updatedAt
 
