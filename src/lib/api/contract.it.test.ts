@@ -275,7 +275,7 @@ if (!RUN_DB_IT) {
     let cursor: string | null = null;
     let found: {
       pricesVisible: boolean;
-      products: { id: string; basePriceIndicative: number | null; visibility: string }[];
+      products: { id: string; priceBand: string | null; visibility: string }[];
     } | null = null;
     for (let page = 0; page < 15 && !found; page++) {
       const qs = `?market=NO&limit=100${cursor ? `&cursor=${cursor}` : ""}`;
@@ -288,15 +288,18 @@ if (!RUN_DB_IT) {
     }
     assert.ok(found, "seeded title should appear in the NO catalog");
 
-    // Confirmed products expose their price; the unconfirmed one is
-    // redacted and demoted to INDICATIVE.
+    // Confirmed products expose a band label, never a figure — and never
+    // the raw net basePrice. The unconfirmed one has no band and is
+    // demoted to INDICATIVE.
     assert.equal(found.pricesVisible, true);
     const firm = found.products.find((p) => p.id === firmProductId);
     const hidden = found.products.find((p) => p.id === hiddenProductId);
     assert.ok(firm && hidden);
-    assert.equal(firm.basePriceIndicative, 12000);
+    assert.ok(!("basePriceIndicative" in firm), "raw net cost must not leak");
+    // Label shapes: "< 15k NOK" | "15–25k NOK" | "90k+ NOK".
+    assert.match(firm.priceBand ?? "", /^(?:< \d+k|\d+–\d+k|\d+k\+) NOK$/);
     assert.equal(firm.visibility, "FIRM");
-    assert.equal(hidden.basePriceIndicative, null);
+    assert.equal(hidden.priceBand, null);
     assert.equal(hidden.visibility, "INDICATIVE");
   });
 

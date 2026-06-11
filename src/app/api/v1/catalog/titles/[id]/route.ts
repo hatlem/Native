@@ -4,7 +4,10 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { authenticateRequest } from "@/lib/api-auth";
-import { isProductPriceShown } from "@/lib/pricing-visibility";
+import { isProductPriceShown } from "@/lib/pricing/visibility";
+import { bandLabel } from "@/lib/pricing/bands";
+import { productBand } from "@/lib/pricing/display-price";
+import { loadContentFeeRules } from "@/lib/content-fee";
 import { rfqLimiter } from "@/lib/rate-limit";
 
 export const dynamic = "force-dynamic";
@@ -36,6 +39,8 @@ export async function GET(
   if (!limited.ok) {
     return errJson(429, "RATE_LIMITED", "Slow down — retry after " + Math.ceil(limited.retryAfterMs / 1000) + "s.");
   }
+
+  const feeRules = await loadContentFeeRules();
 
   const { id } = await params;
   const title = await prisma.title.findUnique({
@@ -69,11 +74,13 @@ export async function GET(
   }
 
   // Visibility is evaluated per product: active + confirmedAt +
-  // publisher.pricesPublic + title.pricesPublic. Redact numeric fields
-  // and demote visibility to INDICATIVE when a product's price is
-  // hidden so integration partners can't construct firm checkout flows
-  // against numbers the buyer never agreed to see. The shape stays
-  // stable; clients gate on pricesVisible / per-product visibility.
+  // publisher.pricesPublic + title.pricesPublic. Visible prices are
+  // published as a band label (all-in customer price bucket), never a
+  // figure — and never the raw net basePrice. When a product's price is
+  // hidden the band is null and visibility is demoted to INDICATIVE so
+  // integration partners can't construct firm checkout flows against
+  // numbers the buyer never agreed to see. The shape stays stable;
+  // clients gate on pricesVisible / per-product visibility.
   const anyPriceVisible = title.products.some((p) =>
     isProductPriceShown(p, title),
   );
@@ -98,12 +105,14 @@ export async function GET(
       pricesVisible: anyPriceVisible,
       products: title.products.map((p) => {
         const shown = isProductPriceShown(p, title);
+        // Band, never a figure — and NEVER the raw basePrice (net cost).
+        const band = productBand(p, title, feeRules);
         return {
           id: p.id,
           type: p.type,
-          basePriceIndicative: shown ? Number(p.basePrice) : null,
+          priceBand: band ? bandLabel(band, p.currency) : null,
           currency: p.currency,
-          visibility: shown ? p.visibility : "INDICATIVE",
+          visibility: band ? p.visibility : "INDICATIVE",
           leadTimeDays: p.leadTimeDays,
           spec: p.spec
             ? {
