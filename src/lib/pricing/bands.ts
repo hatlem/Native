@@ -29,6 +29,11 @@ const FALLBACK_BUCKETS = BUCKETS.EUR;
 
 export function priceBand(amount: number, currency: string): Band {
   const buckets = BUCKETS[currency] ?? FALLBACK_BUCKETS;
+  // Bad numeric input (NaN from a failed Decimal/parse, negative from a
+  // data error) must never render "NaN–NaNk" — clamp to the lowest band.
+  if (!Number.isFinite(amount) || amount < 0) {
+    return { kind: "under", high: buckets[0] };
+  }
   const first = buckets[0];
   const last = buckets[buckets.length - 1];
   if (amount < first) return { kind: "under", high: first };

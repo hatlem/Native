@@ -64,3 +64,8 @@ test("bandLabel keeps fractional k for EUR-scale buckets", () => {
     "1.5–2.5k EUR",
   );
 });
+
+test("non-finite / negative amount → under sentinel", () => {
+  assert.deepEqual(priceBand(NaN, "NOK"), { kind: "under", high: 15_000 });
+  assert.deepEqual(priceBand(-500, "NOK"), { kind: "under", high: 15_000 });
+});
