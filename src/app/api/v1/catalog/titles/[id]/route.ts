@@ -7,7 +7,7 @@ import { authenticateRequest } from "@/lib/api-auth";
 import { isProductPriceShown } from "@/lib/pricing/visibility";
 import { bandLabel } from "@/lib/pricing/bands";
 import { productBand } from "@/lib/pricing/display-price";
-import { loadContentFeeRules } from "@/lib/content-fee";
+import { loadPricingDefaults } from "@/lib/content-fee";
 import { rfqLimiter } from "@/lib/rate-limit";
 
 export const dynamic = "force-dynamic";
@@ -40,7 +40,7 @@ export async function GET(
     return errJson(429, "RATE_LIMITED", "Slow down — retry after " + Math.ceil(limited.retryAfterMs / 1000) + "s.");
   }
 
-  const feeRules = await loadContentFeeRules();
+  const pricing = await loadPricingDefaults();
 
   const { id } = await params;
   const title = await prisma.title.findUnique({
@@ -105,7 +105,7 @@ export async function GET(
       pricesVisible: anyPriceVisible,
       products: title.products.map((p) => {
         // Band, never a figure — and NEVER the raw basePrice (net cost).
-        const band = productBand(p, title, feeRules);
+        const band = productBand(p, title, pricing);
         return {
           id: p.id,
           type: p.type,

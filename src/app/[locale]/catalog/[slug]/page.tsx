@@ -8,7 +8,7 @@ import { intlLocale } from "@/lib/money";
 import { isProductPriceShown, arePricesVisible } from "@/lib/pricing/visibility";
 import { bandLabel } from "@/lib/pricing/bands";
 import { productBand, titleBand } from "@/lib/pricing/display-price";
-import { loadContentFeeRules } from "@/lib/content-fee";
+import { loadPricingDefaults } from "@/lib/content-fee";
 import { addToPlan } from "@/app/plan-actions";
 import { SubmitButton } from "@/components";
 import { localizeTaxonomy, localizeVertical } from "@/lib/taxonomy-i18n";
@@ -57,7 +57,7 @@ export default async function TitleDetailPage({
   if (title.discontinuedAt) notFound();
   if (!title.active && title.lastVerifiedAt) notFound();
 
-  const feeRules = await loadContentFeeRules();
+  const pricing = await loadPricingDefaults();
 
   // Title-level visibility gate (pricesPublic flags only) — used for
   // schema.org AggregateOffer wrapper and the bottom note.
@@ -79,7 +79,7 @@ export default async function TitleDetailPage({
   const anyPriceVisible = title.products.some((p) =>
     isProductPriceShown(p, title),
   );
-  const ldBand = titleBand(title.products, title, feeRules);
+  const ldBand = titleBand(title.products, title, pricing);
   const ld = {
     "@context": "https://schema.org",
     "@type": "Product",
@@ -222,7 +222,7 @@ export default async function TitleDetailPage({
       ) : (
         <div className="grid">
         {title.products.map((p) => {
-          const band = productBand(p, title, feeRules);
+          const band = productBand(p, title, pricing);
           const formatSlug = p.type.toLowerCase().replace(/_/g, "-");
           return (
             <article className="card" key={p.id}>

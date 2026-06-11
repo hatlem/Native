@@ -20,7 +20,7 @@ import { prisma } from "@/lib/prisma";
 import { csv } from "@/lib/csv";
 import { bandLabel } from "@/lib/pricing/bands";
 import { titleBand } from "@/lib/pricing/display-price";
-import { loadContentFeeRules } from "@/lib/content-fee";
+import { loadPricingDefaults } from "@/lib/content-fee";
 import { recordAudit } from "@/lib/audit";
 
 export const dynamic = "force-dynamic";
@@ -69,14 +69,14 @@ export async function GET(req: NextRequest) {
     },
   });
 
-  const feeRules = await loadContentFeeRules();
+  const pricing = await loadPricingDefaults();
 
   // One row per title; price band mirrors the catalog card (NATIVE_ARTICLE
   // preferred, else cheapest shown product). Never the exact figure.
   const rows = titles.map((t) => {
     // Same band selection as the catalog card (NATIVE_ARTICLE preferred,
     // else cheapest). Never the exact figure — and never raw basePrice.
-    const fromBand = titleBand(t.products, t, feeRules);
+    const fromBand = titleBand(t.products, t, pricing);
     return {
       title_id: t.id,
       slug: t.slug,

@@ -92,6 +92,9 @@ export function suggestMargin(
           sampleSize: observations.length,
         }
       : {
+          // TODO(margin-rules): admin default not threaded here yet — display-only estimate
+          // (observations are grouped per category across markets, so no single
+          // market code is in scope to resolve a MarginRule against).
           marginPct: DEFAULT_MARGIN_PCT,
           basis: "default",
           sampleSize: observations.length,

@@ -5,7 +5,7 @@ import { intlLocale } from "@/lib/money";
 import { isProductPriceShown } from "@/lib/pricing/visibility";
 import { bandLabel } from "@/lib/pricing/bands";
 import { titleBand } from "@/lib/pricing/display-price";
-import { loadContentFeeRules } from "@/lib/content-fee";
+import { loadPricingDefaults } from "@/lib/content-fee";
 import { EmptyState } from "@/app/empty-state";
 import { CompareSelectionProvider, TitleSelector } from "./CompareSelection";
 
@@ -39,7 +39,7 @@ export async function CatalogResults({
     namespace: "priceVisibility",
   });
 
-  const feeRules = await loadContentFeeRules();
+  const pricing = await loadPricingDefaults();
 
   return titles.length === 0 ? (
     <EmptyState
@@ -60,7 +60,7 @@ export async function CatalogResults({
         const anyHidden = title.products.some(
           (p) => !isProductPriceShown(p, title),
         );
-        const fromBand = titleBand(title.products, title, feeRules);
+        const fromBand = titleBand(title.products, title, pricing);
         const needsQuote = title.products.length === 0;
 
         return (

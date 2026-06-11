@@ -3,14 +3,20 @@
 // JSON API, CSV export, JSON-LD) goes through these helpers so band
 // selection can never drift between surfaces.
 //
+// Margin and fee defaults arrive together as one PricingDefaults bundle
+// (loadPricingDefaults): products without a PriceRule fall back to the
+// admin MarginRule for the title's market (then the 15% constant), so
+// bands and desk quotes share the same default-margin source.
+//
 // Exact figures live ONLY in the quote flow. Spec:
 // docs/superpowers/specs/2026-06-11-catalog-price-bands-design.md
 
 import {
   indicativeFromRules,
+  resolveDefaultMarginPct,
   toRateRules,
-  type ContentFeeRuleSpec,
 } from "@/lib/money";
+import type { PricingDefaults } from "@/lib/content-fee";
 import { isProductPriceShown, type TitleWithVisibility } from "./visibility";
 import { priceBand, type Band } from "./bands";
 import { resolveProductionFee } from "./production-fee";
@@ -41,18 +47,20 @@ function toNumberOrNull(v: unknown): number | null {
 export function customerPrice(
   product: DisplayProduct,
   title: DisplayTitle,
-  rules: ContentFeeRuleSpec[],
+  defaults: PricingDefaults,
 ): number {
   const indicative = indicativeFromRules(
     Number(product.basePrice),
     toRateRules(product.priceRules),
+    1,
+    resolveDefaultMarginPct(defaults.marginRules, title.market.code),
   );
   const fee = resolveProductionFee({
     productFee: toNumberOrNull(product.productionFee),
     titleFee: toNumberOrNull(title.productionFeeDefault),
     productType: product.type,
     marketCode: title.market.code,
-    rules,
+    rules: defaults.feeRules,
   });
   return Math.round(indicative) + fee;
 }
@@ -60,10 +68,10 @@ export function customerPrice(
 export function productBand(
   product: DisplayProduct,
   title: DisplayTitle,
-  rules: ContentFeeRuleSpec[],
+  defaults: PricingDefaults,
 ): Band | null {
   if (!isProductPriceShown(product, title)) return null;
-  return priceBand(customerPrice(product, title, rules), product.currency);
+  return priceBand(customerPrice(product, title, defaults), product.currency);
 }
 
 // Card-level band. Prefer the NATIVE_ARTICLE product when one is shown
@@ -73,7 +81,7 @@ export function productBand(
 export function titleBand<P extends DisplayProduct>(
   products: P[],
   title: DisplayTitle,
-  rules: ContentFeeRuleSpec[],
+  defaults: PricingDefaults,
 ): { band: Band; product: P } | null {
   const shown = products.filter((p) => isProductPriceShown(p, title));
   if (shown.length === 0) return null;
@@ -81,10 +89,10 @@ export function titleBand<P extends DisplayProduct>(
     shown.find((p) => p.type === "NATIVE_ARTICLE") ??
     [...shown].sort(
       (a, b) =>
-        customerPrice(a, title, rules) - customerPrice(b, title, rules),
+        customerPrice(a, title, defaults) - customerPrice(b, title, defaults),
     )[0];
   return {
-    band: priceBand(customerPrice(pick, title, rules), pick.currency),
+    band: priceBand(customerPrice(pick, title, defaults), pick.currency),
     product: pick,
   };
 }

@@ -7,7 +7,7 @@ import { intlLocale } from "@/lib/money";
 import { isProductPriceShown } from "@/lib/pricing/visibility";
 import { bandLabel } from "@/lib/pricing/bands";
 import { titleBand } from "@/lib/pricing/display-price";
-import { loadContentFeeRules } from "@/lib/content-fee";
+import { loadPricingDefaults } from "@/lib/content-fee";
 import { EmptyState } from "@/app/empty-state";
 
 export const dynamic = "force-dynamic";
@@ -75,7 +75,7 @@ export default async function ComparePage({
     .map((id) => titles.find((t) => t.id === id))
     .filter((t): t is (typeof titles)[number] => !!t);
 
-  const feeRules = await loadContentFeeRules();
+  const pricing = await loadPricingDefaults();
 
   return (
     <section>
@@ -92,7 +92,7 @@ export default async function ComparePage({
           const anyHidden = title.products.some(
             (p) => !isProductPriceShown(p, title),
           );
-          const fromBand = titleBand(title.products, title, feeRules);
+          const fromBand = titleBand(title.products, title, pricing);
           const leadMin = title.products.length
             ? Math.min(...title.products.map((p) => p.leadTimeDays))
             : null;

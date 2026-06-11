@@ -8,6 +8,7 @@ import { prisma } from "@/lib/prisma";
 import {
   computeContentFeeLines,
   type ContentFeeRuleSpec,
+  type MarginRuleSpec,
   type QuoteLineComputation,
 } from "@/lib/money";
 import { nativeSpinProduces, type AuthorshipMode } from "@/lib/authorship";
@@ -24,6 +25,28 @@ export async function loadContentFeeRules(): Promise<ContentFeeRuleSpec[]> {
     adaptationFee: r.adaptationFee != null ? Number(r.adaptationFee) : null,
     active: r.active,
   }));
+}
+
+export type PricingDefaults = {
+  feeRules: ContentFeeRuleSpec[];
+  marginRules: MarginRuleSpec[];
+};
+
+// One bundle for every surface that renders a price band — fee rules and
+// margin defaults must come from the same load so bands and quotes agree.
+export async function loadPricingDefaults(): Promise<PricingDefaults> {
+  const [feeRules, marginRows] = await Promise.all([
+    loadContentFeeRules(),
+    prisma.marginRule.findMany({ where: { active: true } }),
+  ]);
+  return {
+    feeRules,
+    marginRules: marginRows.map((r) => ({
+      marketCode: r.marketCode,
+      marginPct: Number(r.marginPct),
+      active: r.active,
+    })),
+  };
 }
 
 type FeeProduct = { name: string; type: string };

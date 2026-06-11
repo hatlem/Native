@@ -24,7 +24,7 @@ import { authenticateRequest } from "@/lib/api-auth";
 import { isProductPriceShown } from "@/lib/pricing/visibility";
 import { bandLabel } from "@/lib/pricing/bands";
 import { productBand } from "@/lib/pricing/display-price";
-import { loadContentFeeRules } from "@/lib/content-fee";
+import { loadPricingDefaults } from "@/lib/content-fee";
 import { rfqLimiter } from "@/lib/rate-limit";
 
 export const dynamic = "force-dynamic";
@@ -62,7 +62,7 @@ export async function GET(req: NextRequest) {
     return errJson(429, "RATE_LIMITED", "Slow down — retry after " + Math.ceil(limited.retryAfterMs / 1000) + "s.");
   }
 
-  const feeRules = await loadContentFeeRules();
+  const pricing = await loadPricingDefaults();
 
   const url = new URL(req.url);
   const limit = Math.max(
@@ -148,7 +148,7 @@ export async function GET(req: NextRequest) {
         pricesVisible: anyPriceVisible,
         products: t.products.map((p) => {
           // Band, never a figure — and NEVER the raw basePrice (net cost).
-          const band = productBand(p, t, feeRules);
+          const band = productBand(p, t, pricing);
           return {
             id: p.id,
             type: p.type,
