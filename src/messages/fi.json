@@ -336,7 +336,9 @@
     "marketRules": {
       "heading": "Tämän markkinan säännöt",
       "labeling": "Median vastuulla on merkintä — artikkeli merkitään '{label}' paikallisen markkinointilain mukaisesti ({market})."
-    }
+    },
+    "includedHeading": "Sisältyy hintaan (median mukaan)",
+    "notIncludedHeading": "Ei sisälly"
   },
   "plan": {
     "eyebrow": "Suunnitelma",

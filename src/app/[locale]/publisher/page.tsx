@@ -209,7 +209,7 @@ export default async function PublisherDashboard({
                                 name="leadTimeDays"
                                 type="number"
                                 min="1"
-                                defaultValue={p.leadTimeDays}
+                                defaultValue={p.leadTimeDays ?? ""}
                               />
                             </div>
                           </div>

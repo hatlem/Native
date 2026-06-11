@@ -488,11 +488,18 @@ model Product {
   basePrice    Decimal         @db.Decimal(12, 2)
   currency     String // ISO 4217, normally inherited from Market
   visibility   PriceVisibility @default(INDICATIVE)
-  leadTimeDays Int             @default(10)
+  // Null = publisher has not stated a lead time. Never invent one — the
+  // card hides the row instead of showing a platform guess as fact.
+  leadTimeDays Int?
   active       Boolean         @default(true)
   bookable     Boolean         @default(true)
   confirmedAt     DateTime?
   confirmedSource String?   // e.g. "PriceQuote:abc123", "manual", "blueprint-legacy"
+  // Publisher-stated inclusions/exclusions, copied verbatim from the
+  // applied PriceQuote so the catalog can show what the MEDIA says the
+  // price covers (never a platform claim).
+  includedText  String?
+  excludedText  String?
   // Per-offer override of the content-production fee folded into the
   // displayed all-in band. Null = inherit (Title default → ContentFeeRule);
   // 0 = publisher includes production in basePrice.

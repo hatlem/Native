@@ -336,7 +336,9 @@
     "marketRules": {
       "heading": "Rules in this market",
       "labeling": "Labeling is handled by the publisher — the article is labeled “{label}” as required by marketing law in {market}."
-    }
+    },
+    "includedHeading": "Included in the price (per the publisher)",
+    "notIncludedHeading": "Not included"
   },
   "plan": {
     "eyebrow": "Plan",

@@ -336,7 +336,9 @@
     "marketRules": {
       "heading": "Regeln in diesem Markt",
       "labeling": "Die Kennzeichnung übernimmt das Medium — der Artikel wird gemäß dem Werberecht in {market} als '{label}' gekennzeichnet."
-    }
+    },
+    "includedHeading": "Im Preis enthalten (laut Medium)",
+    "notIncludedHeading": "Nicht enthalten"
   },
   "plan": {
     "eyebrow": "Plan",

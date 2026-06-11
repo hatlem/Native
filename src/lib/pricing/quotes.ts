@@ -160,6 +160,9 @@ export async function applyQuote(args: {
           // FLAT product, or the band engine renders the rate as if it
           // were a per-placement price (the Adresseavisen bug).
           pricingModel: quote.priceUnit,
+          // Publisher-stated scope travels with the price.
+          includedText: quote.includedText ?? null,
+          excludedText: quote.excludedText ?? null,
           visibility: "INDICATIVE",
           active: false,
           bookable: false,
@@ -191,6 +194,8 @@ export async function applyQuote(args: {
           // quote applied onto a FLAT product would otherwise band the
           // rate as a per-placement price.
           pricingModel: quote.priceUnit,
+          includedText: quote.includedText ?? null,
+          excludedText: quote.excludedText ?? null,
           confirmedAt: new Date(),
           confirmedSource: `PriceQuote:${quote.id}`,
         },

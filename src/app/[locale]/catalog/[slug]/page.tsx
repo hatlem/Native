@@ -8,6 +8,7 @@ import { intlLocale } from "@/lib/money";
 import { isProductPriceShown, arePricesVisible } from "@/lib/pricing/visibility";
 import { bandLabel } from "@/lib/pricing/bands";
 import { productBand, titleBand, unitRate } from "@/lib/pricing/display-price";
+import { resolveProductionFee } from "@/lib/pricing/production-fee";
 import { loadPricingDefaults } from "@/lib/content-fee";
 import { addToPlan } from "@/app/plan-actions";
 import { SubmitButton } from "@/components";
@@ -295,7 +296,23 @@ export default async function TitleDetailPage({
                       · {tv("listIndicative")}
                     </span>
                   </div>
-                  <div className="muted">✓ {tv("productionIncluded")}</div>
+                  {/* Only claim production is included when WE actually
+                      fold a production fee into this band. When the
+                      publisher includes production, their own
+                      includedText below says so — never both. */}
+                  {resolveProductionFee({
+                    productFee:
+                      p.productionFee == null ? null : Number(p.productionFee),
+                    titleFee:
+                      title.productionFeeDefault == null
+                        ? null
+                        : Number(title.productionFeeDefault),
+                    productType: p.type,
+                    marketCode: title.market.code,
+                    rules: pricing.feeRules,
+                  }) > 0 ? (
+                    <div className="muted">✓ {tv("productionIncluded")}</div>
+                  ) : null}
                 </>
               ) : rate ? (
                 // CPM/CPC rate card: marked-up unit rate, no band — the
@@ -312,9 +329,26 @@ export default async function TitleDetailPage({
               {band && p.visibility === "FIRM" ? (
                 <span className="tag">⚡ {tf("badge")}</span>
               ) : null}
-              <div className="muted" style={{ marginTop: 6 }}>
-                {t("leadTime")}: {p.leadTimeDays} {t("days")}
-              </div>
+              {/* Publisher-stated scope, verbatim from the applied quote —
+                  the only honest source for "what does the price include". */}
+              {p.includedText ? (
+                <div className="muted small" style={{ marginTop: 8 }}>
+                  <strong>{t("includedHeading")}</strong>
+                  <p style={{ margin: "2px 0 0" }}>{p.includedText}</p>
+                </div>
+              ) : null}
+              {p.excludedText ? (
+                <div className="muted small" style={{ marginTop: 6 }}>
+                  <strong>{t("notIncludedHeading")}</strong>
+                  <p style={{ margin: "2px 0 0" }}>{p.excludedText}</p>
+                </div>
+              ) : null}
+              {/* Lead time only when the publisher actually stated one. */}
+              {p.leadTimeDays != null ? (
+                <div className="muted" style={{ marginTop: 6 }}>
+                  {t("leadTime")}: {p.leadTimeDays} {t("days")}
+                </div>
+              ) : null}
               {p.spec ? (
                 <div className="muted" style={{ marginTop: 10 }}>
                   <strong>{t("spec")}</strong>

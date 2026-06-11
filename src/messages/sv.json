@@ -257,7 +257,9 @@
     "marketRules": {
       "heading": "Regler på denna marknad",
       "labeling": "Märkningen hanteras av mediet — artikeln märks '{label}' enligt marknadsföringslagen i {market}."
-    }
+    },
+    "includedHeading": "Ingår i priset (enligt mediet)",
+    "notIncludedHeading": "Ingår inte"
   },
   "plan": {
     "eyebrow": "Plan",

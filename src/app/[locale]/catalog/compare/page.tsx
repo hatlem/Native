@@ -93,9 +93,11 @@ export default async function ComparePage({
             (p) => !isProductPriceShown(p, title),
           );
           const fromBand = titleBand(title.products, title, pricing);
-          const leadMin = title.products.length
-            ? Math.min(...title.products.map((p) => p.leadTimeDays))
-            : null;
+          // Only publisher-stated lead times count; null = not stated.
+          const leadTimes = title.products
+            .map((p) => p.leadTimeDays)
+            .filter((d): d is number => d != null);
+          const leadMin = leadTimes.length ? Math.min(...leadTimes) : null;
           return { title, anyHidden, fromBand, leadMin };
         });
 

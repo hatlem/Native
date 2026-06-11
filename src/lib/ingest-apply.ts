@@ -145,7 +145,7 @@ export async function applyIngestion(
             description: p.description ?? null,
             basePrice: p.basePrice,
             currency: p.currency,
-            leadTimeDays: p.leadTimeDays ?? 10,
+            leadTimeDays: p.leadTimeDays ?? null,
             visibility: p.visibility ?? "INDICATIVE",
             bookable: p.bookable ?? true,
           },
