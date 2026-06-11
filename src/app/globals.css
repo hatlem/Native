@@ -3523,7 +3523,7 @@ select:disabled {
   inset: 0;
   z-index: 1;
 }
-.catalog-card :is(input, button, label, select, a:not(.card-link)) {
+.catalog-card :where(input, button, label, select, a:not(.card-link)) {
   position: relative;
   z-index: 2;
 }
