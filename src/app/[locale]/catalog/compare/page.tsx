@@ -3,8 +3,11 @@ import { redirect } from "next/navigation";
 import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
 import { Link } from "@/i18n/navigation";
-import { indicativeFromRules, toRateRules, formatMoney, intlLocale } from "@/lib/money";
-import { isProductPriceShown } from "@/lib/pricing-visibility";
+import { intlLocale } from "@/lib/money";
+import { isProductPriceShown } from "@/lib/pricing/visibility";
+import { bandLabel } from "@/lib/pricing/bands";
+import { titleBand } from "@/lib/pricing/display-price";
+import { loadContentFeeRules } from "@/lib/content-fee";
 import { EmptyState } from "@/app/empty-state";
 
 export const dynamic = "force-dynamic";
@@ -72,6 +75,8 @@ export default async function ComparePage({
     .map((id) => titles.find((t) => t.id === id))
     .filter((t): t is (typeof titles)[number] => !!t);
 
+  const feeRules = await loadContentFeeRules();
+
   return (
     <section>
       <h1>{t("title")}</h1>
@@ -84,24 +89,14 @@ export default async function ComparePage({
           map over a row spec. Avoids inline ternaries per cell. */}
       {(() => {
         const rows = ordered.map((title) => {
-          const visibleProducts = title.products.filter((p) =>
-            isProductPriceShown(p, title),
-          );
           const anyHidden = title.products.some(
             (p) => !isProductPriceShown(p, title),
           );
-          const prices = visibleProducts.map((p) =>
-            indicativeFromRules(
-              Number(p.basePrice),
-              toRateRules(p.priceRules),
-            ),
-          );
-          const from = prices.length ? Math.min(...prices) : null;
-          const cur = title.products[0]?.currency ?? title.market.currency;
+          const fromBand = titleBand(title.products, title, feeRules);
           const leadMin = title.products.length
             ? Math.min(...title.products.map((p) => p.leadTimeDays))
             : null;
-          return { title, anyHidden, from, cur, leadMin };
+          return { title, anyHidden, fromBand, leadMin };
         });
 
         return (
@@ -192,11 +187,11 @@ export default async function ComparePage({
                   <td>
                     <strong>{t("rowFromPrice")}</strong>
                   </td>
-                  {rows.map(({ title, from, cur, anyHidden }) => (
+                  {rows.map(({ title, fromBand, anyHidden }) => (
                     <td key={title.id} className="num">
-                      {from !== null ? (
+                      {fromBand ? (
                         <span className="price">
-                          {formatMoney(from, cur, locale)}
+                          ≈ {bandLabel(fromBand.band, fromBand.product.currency)}
                         </span>
                       ) : anyHidden ? (
                         <span className="muted">{tv("requestPrice")}</span>
