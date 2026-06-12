@@ -354,7 +354,14 @@
       "print": "Print edition included",
       "rights": "You own the content",
       "searchable": "Searchable for {months} months",
-      "duration": "Live for {weeks} weeks"
+      "duration": "Live for {weeks} weeks",
+      "articles": "{count} articles included",
+      "sov": "{pct}% share of voice during the period",
+      "socialChannels": "Distribution on {channels}",
+      "video": "Video included",
+      "report": "Results report after the campaign",
+      "photographer": "Photographer included",
+      "translation": "Translation included"
     }
   },
   "plan": {

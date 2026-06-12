@@ -275,7 +275,14 @@
       "print": "Papirutgave inkludert",
       "rights": "Du eier innholdet",
       "searchable": "Søkbar i {months} måneder",
-      "duration": "Ligger ute i {weeks} uker"
+      "duration": "Ligger ute i {weeks} uker",
+      "articles": "{count} artikler inkludert",
+      "sov": "{pct} % synlighet i perioden (share of voice)",
+      "socialChannels": "Spredning på {channels}",
+      "video": "Video inkludert",
+      "report": "Resultatrapport etter kampanjen",
+      "photographer": "Fotograf inkludert",
+      "translation": "Oversettelse inkludert"
     }
   },
   "plan": {

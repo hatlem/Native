@@ -275,7 +275,14 @@
       "print": "Tryckt utgåva ingår",
       "rights": "Du äger innehållet",
       "searchable": "Sökbar i {months} månader",
-      "duration": "Ligger ute i {weeks} veckor"
+      "duration": "Ligger ute i {weeks} veckor",
+      "articles": "{count} artiklar ingår",
+      "sov": "{pct} % share of voice under perioden",
+      "socialChannels": "Spridning på {channels}",
+      "video": "Video ingår",
+      "report": "Resultatrapport efter kampanjen",
+      "photographer": "Fotograf ingår",
+      "translation": "Översättning ingår"
     }
   },
   "plan": {

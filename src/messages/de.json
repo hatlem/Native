@@ -354,7 +354,14 @@
       "print": "Printausgabe inklusive",
       "rights": "Sie besitzen den Inhalt",
       "searchable": "{months} Monate auffindbar",
-      "duration": "{weeks} Wochen online"
+      "duration": "{weeks} Wochen online",
+      "articles": "{count} Artikel inklusive",
+      "sov": "{pct} % Share of Voice im Zeitraum",
+      "socialChannels": "Verbreitung auf {channels}",
+      "video": "Video inklusive",
+      "report": "Ergebnisbericht nach der Kampagne",
+      "photographer": "Fotograf inklusive",
+      "translation": "Übersetzung inklusive"
     }
   },
   "plan": {

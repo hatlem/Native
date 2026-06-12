@@ -275,7 +275,14 @@
       "print": "Trykt udgave inkluderet",
       "rights": "Du ejer indholdet",
       "searchable": "Søgbar i {months} måneder",
-      "duration": "Ligger online i {weeks} uger"
+      "duration": "Ligger online i {weeks} uger",
+      "articles": "{count} artikler inkluderet",
+      "sov": "{pct} % share of voice i perioden",
+      "socialChannels": "Spredning på {channels}",
+      "video": "Video inkluderet",
+      "report": "Resultatrapport efter kampagnen",
+      "photographer": "Fotograf inkluderet",
+      "translation": "Oversættelse inkluderet"
     }
   },
   "plan": {

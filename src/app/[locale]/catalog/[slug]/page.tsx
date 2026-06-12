@@ -40,10 +40,18 @@ export type ProductInclusions = {
   frontpage?: boolean;
   newsletter?: boolean;
   social?: boolean;
+  // Named channels beat the generic flag when the offer states them.
+  socialChannels?: string[];
   print?: boolean;
   rights?: boolean;
   searchableMonths?: number;
   durationWeeks?: number;
+  articles?: number;
+  sovPct?: number;
+  video?: boolean;
+  report?: boolean;
+  photographer?: boolean;
+  translation?: boolean;
 };
 
 function inclusionLines(
@@ -62,9 +70,18 @@ function inclusionLines(
     lines.push(t("inc.viewsTotal", { amount: inc.viewsTotal }));
   if (inc.readsTotal)
     lines.push(t("inc.readsTotal", { amount: inc.readsTotal }));
+  if (inc.articles && inc.articles > 1)
+    lines.push(t("inc.articles", { count: inc.articles }));
   if (inc.frontpage) lines.push(t("inc.frontpage"));
+  if (inc.sovPct) lines.push(t("inc.sov", { pct: inc.sovPct }));
   if (inc.newsletter) lines.push(t("inc.newsletter"));
-  if (inc.social) lines.push(t("inc.social"));
+  if (inc.socialChannels?.length)
+    lines.push(t("inc.socialChannels", { channels: inc.socialChannels.join(", ") }));
+  else if (inc.social) lines.push(t("inc.social"));
+  if (inc.video) lines.push(t("inc.video"));
+  if (inc.photographer) lines.push(t("inc.photographer"));
+  if (inc.translation) lines.push(t("inc.translation"));
+  if (inc.report) lines.push(t("inc.report"));
   if (inc.print) lines.push(t("inc.print"));
   if (inc.rights) lines.push(t("inc.rights"));
   if (inc.searchableMonths)
