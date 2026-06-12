@@ -2,14 +2,14 @@
   "name": "nativespin",
   "version": "0.0.1",
   "private": true,
-  "description": "NativeSpin — Nordic marketplace for buying native content and native advertising in newspapers and magazines.",
+  "description": "NativeSpin \u2014 Nordic marketplace for buying native content and native advertising in newspapers and magazines.",
   "scripts": {
     "dev": "next dev",
     "build": "prisma generate && next build",
     "start": "prisma migrate deploy && next start",
     "lint": "next lint",
     "typecheck": "tsc --noEmit",
-    "test": "tsx --test \"src/**/*.test.ts\"",
+    "test": "tsx --test $(find src -name '*.test.ts' ! -name '*.it.test.ts')",
     "prisma:generate": "prisma generate",
     "prisma:migrate": "prisma migrate dev",
     "prisma:deploy": "prisma migrate deploy",
@@ -23,7 +23,8 @@
     "seed-content-fees": "tsx scripts/seed-content-fees.ts",
     "issue-publisher-key": "tsx scripts/issue-publisher-key.ts",
     "issue-pricing-admin-key": "tsx scripts/issue-pricing-admin-key.ts",
-    "seed-playbooks": "tsx scripts/seed-playbooks.ts"
+    "seed-playbooks": "tsx scripts/seed-playbooks.ts",
+    "test:it": "ALLOW_LOCAL_DB=1 tsx --test \"src/**/*.it.test.ts\""
   },
   "prisma": {
     "seed": "tsx prisma/seed.ts"
