@@ -38,6 +38,7 @@ function inclusionLines(
   const lines: string[] = [];
   if (inc.production === "PLATFORM") lines.push(t("inc.productionPlatform"));
   if (inc.production === "PUBLISHER") lines.push(t("inc.productionPublisher"));
+  if (inc.production === "ADVERTISER") lines.push(t("inc.productionAdvertiser"));
   if (inc.viewsPerWeek)
     lines.push(t("inc.viewsPerWeek", { amount: inc.viewsPerWeek }));
   if (inc.viewsPerMonth)

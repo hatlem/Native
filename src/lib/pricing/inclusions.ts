@@ -5,7 +5,7 @@ import { z } from "zod";
 // templates so one data entry serves every locale. Raw quote text (contacts,
 // discounts, net figures) must never reach this shape.
 export type ProductInclusions = {
-  production?: "PLATFORM" | "PUBLISHER";
+  production?: "PLATFORM" | "PUBLISHER" | "ADVERTISER";
   viewsPerWeek?: number;
   viewsPerMonth?: number;
   viewsTotal?: number;
@@ -32,7 +32,7 @@ const positiveInt = z.number().int().positive();
 // Strict on purpose: an unknown key is a typo or a fact the renderer can't
 // express — reject it at the source instead of storing dead data.
 export const inclusionsSchema = z.strictObject({
-  production: z.enum(["PLATFORM", "PUBLISHER"]).optional(),
+  production: z.enum(["PLATFORM", "PUBLISHER", "ADVERTISER"]).optional(),
   viewsPerWeek: positiveInt.optional(),
   viewsPerMonth: positiveInt.optional(),
   viewsTotal: positiveInt.optional(),
