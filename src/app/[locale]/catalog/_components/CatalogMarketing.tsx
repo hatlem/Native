@@ -3,6 +3,8 @@ import { prisma } from "@/lib/prisma";
 import { Link } from "@/i18n/navigation";
 import { intlLocale } from "@/lib/money";
 import { LandingShell } from "@/app/landing-shell";
+import { localizeCategory } from "@/lib/taxonomy-i18n";
+import type { AppLocale } from "@/i18n/routing";
 import { FORMAT_KEYS } from "../filters";
 
 export async function CatalogMarketing({ locale }: { locale: string }) {
@@ -105,7 +107,9 @@ export async function CatalogMarketing({ locale }: { locale: string }) {
                 <h3>{title.name}</h3>
                 <p className="muted">{title.publisher.name}</p>
                 {title.category ? (
-                  <p className="muted small">{title.category}</p>
+                  <p className="muted small">
+                    {localizeCategory(title.category, locale as AppLocale)}
+                  </p>
                 ) : null}
                 <p className="muted small" style={{ marginTop: 12 }}>
                   🔒 {t("gate.cardLocked")}

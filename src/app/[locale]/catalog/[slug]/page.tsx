@@ -13,15 +13,16 @@ import type { ProductInclusions } from "@/lib/pricing/inclusions";
 import { loadPricingDefaults } from "@/lib/content-fee";
 import { addToPlan } from "@/app/plan-actions";
 import { SubmitButton } from "@/components";
-import { localizeTaxonomy, localizeVertical } from "@/lib/taxonomy-i18n";
+import { localizeCategory, localizeTaxonomy, localizeVertical } from "@/lib/taxonomy-i18n";
 import type { AppLocale } from "@/i18n/routing";
 
 export const dynamic = "force-dynamic";
 
-// Some Title.category values are raw import slugs ("general-news") the
-// taxonomy map doesn't cover. When localization passes the value through
-// untouched and it still looks like a slug, render it human-readable
-// instead of leaking the slug into the facts card.
+// Safety net: the 20260612080000 migration normalized known import slugs
+// ("general-news") into canonical English values, and localizeCategory
+// covers those. If a new import ever reintroduces a slug the category map
+// doesn't know, render it human-readable instead of leaking the slug
+// into the facts card.
 function prettyCategory(value: string): string {
   if (!/^[a-z0-9]+(-[a-z0-9]+)*$/.test(value)) return value;
   const words = value.replace(/-/g, " ");
@@ -262,7 +263,7 @@ export default async function TitleDetailPage({
               </>
             ) : null}
             <dt>{t("factCategory")}</dt>
-            <dd>{prettyCategory(localizeTaxonomy(title.category, locale as AppLocale))}</dd>
+            <dd>{prettyCategory(localizeCategory(title.category, locale as AppLocale))}</dd>
           </dl>
         </aside>
       </div>

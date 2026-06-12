@@ -7,6 +7,8 @@ import { bandLabel } from "@/lib/pricing/bands";
 import { titleBand } from "@/lib/pricing/display-price";
 import { loadPricingDefaults } from "@/lib/content-fee";
 import { EmptyState } from "@/app/empty-state";
+import { localizeCategory } from "@/lib/taxonomy-i18n";
+import type { AppLocale } from "@/i18n/routing";
 import { CompareSelectionProvider, TitleSelector } from "./CompareSelection";
 
 export type CatalogTitleRow = Prisma.TitleGetPayload<{
@@ -75,7 +77,9 @@ export async function CatalogResults({
               {title.publisher.name} · {tMarket(title.market.code)}
             </div>
             <div>
-              <span className="tag">{title.category}</span>
+              <span className="tag">
+                {localizeCategory(title.category, locale as AppLocale)}
+              </span>
               {title.offersNativeContent ? (
                 <span className="tag">{t("card.offersNative")}</span>
               ) : null}

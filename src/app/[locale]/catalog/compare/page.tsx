@@ -9,6 +9,8 @@ import { bandLabel } from "@/lib/pricing/bands";
 import { titleBand } from "@/lib/pricing/display-price";
 import { loadPricingDefaults } from "@/lib/content-fee";
 import { EmptyState } from "@/app/empty-state";
+import { localizeCategory } from "@/lib/taxonomy-i18n";
+import type { AppLocale } from "@/i18n/routing";
 
 export const dynamic = "force-dynamic";
 
@@ -137,7 +139,7 @@ export default async function ComparePage({
                   </td>
                   {rows.map(({ title }) => (
                     <td key={title.id} className="muted">
-                      {title.category}
+                      {localizeCategory(title.category, locale as AppLocale)}
                     </td>
                   ))}
                 </tr>
