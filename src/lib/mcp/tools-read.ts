@@ -129,6 +129,45 @@ export const readToolDefinitions = {
       listPendingQuotes(args),
   },
 
+  native_list_confirmed_products: {
+    description:
+      "All quote-confirmed products with their semantic inclusions status — the desk's curation worklist. Returns slug, product name/type/unit, whether inclusions are set, and the internal includedText to curate from.",
+    parameters: z.object({ market: z.string().optional() }),
+    handler: async (args: { market?: string }) => {
+      const products = await prisma.product.findMany({
+        where: {
+          confirmedSource: { startsWith: "PriceQuote:" },
+          ...(args.market
+            ? { title: { market: { code: args.market as MarketCode } } }
+            : {}),
+        },
+        select: {
+          name: true,
+          type: true,
+          pricingModel: true,
+          active: true,
+          inclusions: true,
+          includedText: true,
+          description: true,
+          title: { select: { slug: true, name: true } },
+        },
+        orderBy: [{ title: { slug: "asc" } }, { name: "asc" }],
+        take: 500,
+      });
+      return products.map((p) => ({
+        slug: p.title.slug,
+        title: p.title.name,
+        product: p.name,
+        type: p.type,
+        unit: p.pricingModel,
+        active: p.active,
+        inclusions: p.inclusions,
+        internalIncludedText: p.includedText,
+        internalDescription: p.description,
+      }));
+    },
+  },
+
   native_get_price_history: {
     description: "Full PriceQuote history for a given product, newest first.",
     parameters: z.object({ productId: z.string() }),
