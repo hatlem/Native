@@ -53,7 +53,7 @@ Tips fra Maria: Sandnesposten god match sammen med Gjesdalbuen (Sør-Rogaland).
 - Gun Mart: bounce fikset i send-listen (vanessa.english@gunmart.net)
 
 ## 4. Gjenstår å logge når MCP er oppe
-- [ ] Big Issue: contact (Tim Deeks/Canopy) + INBOUND + quote + apply + activate
-- [ ] Gjesdalbuen: contact (Maria Hagland) + INBOUND + pakke- og CPM-quotes + apply
-- [ ] KM: OUTBOUND-logg for svaret som ble sendt
-- [ ] Suomenmaa: markTitleNoNative (desk-UI)
+- [x] Big Issue: contact + INBOUND + quote 3000 GBP applied (cmqb3p3ft)
+- [x] Gjesdalbuen: contact + INBOUND + pakkequote 34580 NOK applied (cmqb3q4m3); CPM-ordinærpriser dokumentert i kontakt/logg — porteføljeutrulling avventer Andreas
+- [x] KM: OUTBOUND logget (cmqb3qlkn)
+- [~] Suomenmaa: desk-knappene var DØDE (nestet-form-bug, fikset i deploy) — deaktiveres når fixen er live
