@@ -1335,6 +1335,9 @@ model PriceQuote {
   currency         String
   includedText     String?
   excludedText     String?
+  // Structured buyer-safe deliverables (same shape as Product.inclusions),
+  // copied to the Product on apply.
+  inclusions       Json?
   validUntil       DateTime?
 
   // Source media-kit / rate-card PDF this quote was extracted from, if

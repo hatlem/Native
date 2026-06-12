@@ -1,6 +1,7 @@
 import { prisma } from "@/lib/prisma";
 import { recordAudit } from "@/lib/audit";
-import type { ProductType, PriceResponseSource, PriceUnit } from "@prisma/client";
+import { inclusionsSchema } from "@/lib/pricing/inclusions";
+import type { Prisma, ProductType, PriceResponseSource, PriceUnit } from "@prisma/client";
 
 // ---------- Pure validation ----------
 
@@ -13,6 +14,9 @@ export type QuoteInput = {
   currency: string;
   includedText?: string;
   excludedText?: string;
+  // Structured buyer-safe deliverables — validated against inclusionsSchema
+  // and copied onto the Product when the quote is applied.
+  inclusions?: unknown;
   validUntil?: Date;
 };
 
@@ -35,7 +39,18 @@ export function validateQuoteInput(q: QuoteInput): ValidationResult {
   if (!/^[A-Z]{3}$/.test(q.currency)) {
     return { ok: false, reason: "quote.invalid_currency" };
   }
+  if (q.inclusions != null && !inclusionsSchema.safeParse(q.inclusions).success) {
+    return { ok: false, reason: "quote.invalid_inclusions" };
+  }
   return { ok: true };
+}
+
+// Quote inclusions are validated unknown JSON; narrow them to Prisma's
+// JSON input type only when present so absent stays absent (column NULL).
+function inclusionsForWrite(
+  inclusions: unknown,
+): Prisma.InputJsonValue | undefined {
+  return inclusions != null ? (inclusions as Prisma.InputJsonValue) : undefined;
 }
 
 // ---------- DB-backed actions ----------
@@ -64,6 +79,7 @@ export async function logQuote(args: QuoteInput & {
       currency: args.currency,
       includedText: args.includedText ?? null,
       excludedText: args.excludedText ?? null,
+      inclusions: inclusionsForWrite(args.inclusions),
       validUntil: args.validUntil ?? null,
       recordedById: args.recordedById,
     },
@@ -103,6 +119,7 @@ export async function logFormSubmission(args: {
           currency: q.currency,
           includedText: q.includedText ?? null,
           excludedText: q.excludedText ?? null,
+          inclusions: inclusionsForWrite(q.inclusions),
           validUntil: q.validUntil ?? null,
           recordedById: args.recordedById,
         },
@@ -163,6 +180,9 @@ export async function applyQuote(args: {
           // Publisher-stated scope travels with the price.
           includedText: quote.includedText ?? null,
           excludedText: quote.excludedText ?? null,
+          // Structured deliverables travel too — undefined when the quote
+          // carries none, so the column stays NULL.
+          inclusions: inclusionsForWrite(quote.inclusions),
           visibility: "INDICATIVE",
           active: false,
           bookable: false,
@@ -196,6 +216,10 @@ export async function applyQuote(args: {
           pricingModel: quote.priceUnit,
           includedText: quote.includedText ?? null,
           excludedText: quote.excludedText ?? null,
+          // Only overwrite the product's curated inclusions when the quote
+          // actually carries structured deliverables — undefined leaves the
+          // existing value untouched.
+          inclusions: inclusionsForWrite(quote.inclusions),
           confirmedAt: new Date(),
           confirmedSource: `PriceQuote:${quote.id}`,
         },

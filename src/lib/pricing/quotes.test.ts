@@ -58,3 +58,42 @@ test("validateQuoteInput rejects bad currency code", () => {
   });
   assert.equal(v.ok, false);
 });
+
+test("validateQuoteInput accepts valid structured inclusions", () => {
+  const v = validateQuoteInput({
+    productId: "p1",
+    price: 1000,
+    currency: "EUR",
+    inclusions: {
+      production: "PUBLISHER",
+      viewsTotal: 25000,
+      frontpage: true,
+      socialChannels: ["Facebook", "Instagram"],
+      sovPct: 100,
+      durationWeeks: 2,
+    },
+  });
+  assert.equal(v.ok, true);
+});
+
+test("validateQuoteInput rejects inclusions with invalid production value", () => {
+  const v = validateQuoteInput({
+    productId: "p1",
+    price: 1000,
+    currency: "EUR",
+    inclusions: { production: "WRONG" },
+  });
+  assert.equal(v.ok, false);
+  if (!v.ok) assert.equal(v.reason, "quote.invalid_inclusions");
+});
+
+test("validateQuoteInput rejects inclusions with an unknown field (strict)", () => {
+  const v = validateQuoteInput({
+    productId: "p1",
+    price: 1000,
+    currency: "EUR",
+    inclusions: { frontpage: true, contactEmail: "sales@example.com" },
+  });
+  assert.equal(v.ok, false);
+  if (!v.ok) assert.equal(v.reason, "quote.invalid_inclusions");
+});

@@ -10,6 +10,7 @@ import {
   cancelPriceRequest,
 } from "@/lib/pricing/requests";
 import { applyQuote, logQuote, activateQuoteProducts } from "@/lib/pricing/quotes";
+import { inclusionsSchema, type ProductInclusions } from "@/lib/pricing/inclusions";
 import { createContactLog } from "@/lib/pricing/contact-log";
 import type { ProductType, ContactChannel, ContactDirection } from "@prisma/client";
 
@@ -102,7 +103,7 @@ export const mutateToolDefinitions = (actorId: string) => ({
 
   native_log_quote: {
     description:
-      "Log a PriceQuote against an existing Product. Use for transcribing email/phone responses. Pass contactLogId to attribute the offer to a logged contact event.",
+      "Log a PriceQuote against an existing Product. Use for transcribing email/phone responses. Pass contactLogId to attribute the offer to a logged contact event. Pass inclusions (structured buyer-safe deliverables: production, viewsPerWeek, frontpage, socialChannels, ...) so the catalog facts update automatically when the quote is applied.",
     parameters: z.object({
       priceRequestId: z.string().optional(),
       productId: z.string(),
@@ -110,6 +111,7 @@ export const mutateToolDefinitions = (actorId: string) => ({
       currency: z.string().length(3),
       includedText: z.string().optional(),
       excludedText: z.string().optional(),
+      inclusions: inclusionsSchema.optional(),
       validUntil: z.string().datetime().optional(),
       contactLogId: z.string().optional(),
     }),
@@ -120,6 +122,7 @@ export const mutateToolDefinitions = (actorId: string) => ({
       currency: string;
       includedText?: string;
       excludedText?: string;
+      inclusions?: ProductInclusions;
       validUntil?: string;
       contactLogId?: string;
     }) =>
@@ -130,6 +133,7 @@ export const mutateToolDefinitions = (actorId: string) => ({
         currency: a.currency,
         includedText: a.includedText,
         excludedText: a.excludedText,
+        inclusions: a.inclusions,
         validUntil: a.validUntil ? new Date(a.validUntil) : undefined,
         contactLogId: a.contactLogId,
         recordedById: actorId,
@@ -138,7 +142,7 @@ export const mutateToolDefinitions = (actorId: string) => ({
 
   native_log_quote_draft: {
     description:
-      "Log a PriceQuote for a new format that doesn't have an existing Product yet. When applied, will create a new (inactive) Product. Pass contactLogId to attribute the offer to a logged contact event.",
+      "Log a PriceQuote for a new format that doesn't have an existing Product yet. When applied, will create a new (inactive) Product. Pass contactLogId to attribute the offer to a logged contact event. Pass inclusions (structured buyer-safe deliverables: production, viewsPerWeek, frontpage, socialChannels, ...) so the created product carries catalog facts from day one.",
     parameters: z.object({
       priceRequestId: z.string().optional(),
       draftProductType: productTypeSchema,
@@ -148,6 +152,7 @@ export const mutateToolDefinitions = (actorId: string) => ({
       currency: z.string().length(3),
       includedText: z.string().optional(),
       excludedText: z.string().optional(),
+      inclusions: inclusionsSchema.optional(),
       contactLogId: z.string().optional(),
     }),
     handler: async (a: {
@@ -159,6 +164,7 @@ export const mutateToolDefinitions = (actorId: string) => ({
       currency: string;
       includedText?: string;
       excludedText?: string;
+      inclusions?: ProductInclusions;
       contactLogId?: string;
     }) =>
       logQuote({
@@ -170,6 +176,7 @@ export const mutateToolDefinitions = (actorId: string) => ({
         currency: a.currency,
         includedText: a.includedText,
         excludedText: a.excludedText,
+        inclusions: a.inclusions,
         contactLogId: a.contactLogId,
         recordedById: actorId,
       }),

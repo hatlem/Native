@@ -9,6 +9,7 @@ import { isProductPriceShown, arePricesVisible } from "@/lib/pricing/visibility"
 import { bandLabel } from "@/lib/pricing/bands";
 import { productBand, titleBand, unitRate } from "@/lib/pricing/display-price";
 import { resolveProductionFee } from "@/lib/pricing/production-fee";
+import type { ProductInclusions } from "@/lib/pricing/inclusions";
 import { loadPricingDefaults } from "@/lib/content-fee";
 import { addToPlan } from "@/app/plan-actions";
 import { SubmitButton } from "@/components";
@@ -26,33 +27,6 @@ function prettyCategory(value: string): string {
   const words = value.replace(/-/g, " ");
   return words.charAt(0).toUpperCase() + words.slice(1);
 }
-
-// Semantic, buyer-safe inclusions (Product.inclusions). Structured facts
-// curated by the desk/swarm from internal quote text — rendered through
-// i18n templates so one data entry serves every locale. Raw quote text
-// (contacts, discounts, net figures) must never reach this surface.
-export type ProductInclusions = {
-  production?: "PLATFORM" | "PUBLISHER";
-  viewsPerWeek?: number;
-  viewsPerMonth?: number;
-  viewsTotal?: number;
-  readsTotal?: number;
-  frontpage?: boolean;
-  newsletter?: boolean;
-  social?: boolean;
-  // Named channels beat the generic flag when the offer states them.
-  socialChannels?: string[];
-  print?: boolean;
-  rights?: boolean;
-  searchableMonths?: number;
-  durationWeeks?: number;
-  articles?: number;
-  sovPct?: number;
-  video?: boolean;
-  report?: boolean;
-  photographer?: boolean;
-  translation?: boolean;
-};
 
 function inclusionLines(
   inc: ProductInclusions | null,
