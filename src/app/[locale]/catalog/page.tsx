@@ -48,6 +48,10 @@ export default async function CatalogPage({
     b2bB2c,
     reach,
     onlyPriced,
+    producedForYou,
+    guaranteedReach,
+    newsletterIncluded,
+    videoIncluded,
     compareMode,
     advancedOpen,
     q,
@@ -58,6 +62,67 @@ export default async function CatalogPage({
   // intersect with the rest of the filter. Falls back to ILIKE if FTS
   // can't form a valid query (e.g. only punctuation).
   const matchedIds = await searchTitleIds(q);
+
+  // AND-composed conditions collected in one array so multiple filters that
+  // each need their own products.some (onlyPriced + the semantic
+  // deliverable filters) compose instead of overwriting each other's AND.
+  const andConditions: Prisma.TitleWhereInput[] = [];
+  if (onlyPriced) {
+    // "Priced titles only" = a buyer can actually see a € figure. Mirror
+    // isProductPriceShown (src/lib/pricing/visibility.ts): an active,
+    // sales-confirmed product AND both title + publisher prices public.
+    andConditions.push(
+      { products: { some: { active: true, confirmedAt: { not: null } } } },
+      { pricesPublic: true },
+      { publisher: { is: { pricesPublic: true } } },
+    );
+  }
+  // Semantic-deliverable filters read curated Product.inclusions (Json).
+  // Prisma JSON `path` filters on Postgres only match when the key exists
+  // and the value compares — verified against the local atnative DB.
+  if (producedForYou) {
+    // Publisher's editorial desk writes the content for the advertiser.
+    andConditions.push({
+      products: {
+        some: {
+          active: true,
+          inclusions: { path: ["production"], equals: "PUBLISHER" },
+        },
+      },
+    });
+  }
+  if (guaranteedReach) {
+    // Any committed reach number counts. `gt: 0` doubles as a key-existence
+    // check: a missing path never satisfies a numeric comparison.
+    andConditions.push({
+      products: {
+        some: {
+          active: true,
+          OR: [
+            { inclusions: { path: ["viewsPerWeek"], gt: 0 } },
+            { inclusions: { path: ["viewsPerMonth"], gt: 0 } },
+            { inclusions: { path: ["viewsTotal"], gt: 0 } },
+            { inclusions: { path: ["readsTotal"], gt: 0 } },
+          ],
+        },
+      },
+    });
+  }
+  if (newsletterIncluded) {
+    andConditions.push({
+      products: {
+        some: { active: true, inclusions: { path: ["newsletter"], equals: true } },
+      },
+    });
+  }
+  if (videoIncluded) {
+    andConditions.push({
+      products: {
+        some: { active: true, inclusions: { path: ["video"], equals: true } },
+      },
+    });
+  }
+
   const where: Prisma.TitleWhereInput = {
     // Show commerce-active titles AND unverified research-catalog rows;
     // hide titles the desk has verified as not offering native.
@@ -75,19 +140,9 @@ export default async function CatalogPage({
       : {}),
     ...(verticals.length ? { vertical: { in: verticals } } : {}),
     ...(regions.length ? { region: { in: regions } } : {}),
-    // "Priced titles only" = a buyer can actually see a € figure. Mirror
-    // isProductPriceShown (src/lib/pricing/visibility.ts): an active,
-    // sales-confirmed product AND both title + publisher prices public.
-    // AND-wrapped so it composes with the type filter's own products.some.
-    ...(onlyPriced
-      ? {
-          AND: [
-            { products: { some: { active: true, confirmedAt: { not: null } } } },
-            { pricesPublic: true },
-            { publisher: { is: { pricesPublic: true } } },
-          ],
-        }
-      : {}),
+    // AND-wrapped so each condition composes with the type filter's own
+    // products.some — see andConditions above for what goes in here.
+    ...(andConditions.length ? { AND: andConditions } : {}),
     ...(nativeFit ? { nativeFit } : {}),
     ...(b2bB2c ? { b2bB2c } : {}),
     ...(reach ? { reach } : {}),
@@ -156,6 +211,10 @@ export default async function CatalogPage({
     if (nativeFit) params.set("nativeFit", nativeFit);
     if (b2bB2c) params.set("b2bB2c", b2bB2c);
     if (onlyPriced) params.set("onlyPriced", "1");
+    if (producedForYou) params.set("producedForYou", "1");
+    if (guaranteedReach) params.set("guaranteedReach", "1");
+    if (newsletterIncluded) params.set("newsletterIncluded", "1");
+    if (videoIncluded) params.set("videoIncluded", "1");
     if (compareMode) params.set("compareMode", "1");
     if (q) params.set("q", q);
     if (p > 1) params.set("page", String(p));
@@ -174,6 +233,10 @@ export default async function CatalogPage({
     | "nativeFit"
     | "b2bB2c"
     | "onlyPriced"
+    | "producedForYou"
+    | "guaranteedReach"
+    | "newsletterIncluded"
+    | "videoIncluded"
     | "q";
   const filterHref = (
     except: FilterKey,
@@ -201,6 +264,14 @@ export default async function CatalogPage({
     if (nativeFit && except !== "nativeFit") params.set("nativeFit", nativeFit);
     if (b2bB2c && except !== "b2bB2c") params.set("b2bB2c", b2bB2c);
     if (onlyPriced && except !== "onlyPriced") params.set("onlyPriced", "1");
+    if (producedForYou && except !== "producedForYou")
+      params.set("producedForYou", "1");
+    if (guaranteedReach && except !== "guaranteedReach")
+      params.set("guaranteedReach", "1");
+    if (newsletterIncluded && except !== "newsletterIncluded")
+      params.set("newsletterIncluded", "1");
+    if (videoIncluded && except !== "videoIncluded")
+      params.set("videoIncluded", "1");
     if (compareMode) params.set("compareMode", "1");
     if (q && except !== "q") params.set("q", q);
     const s = params.toString();
@@ -248,6 +319,30 @@ export default async function CatalogPage({
       label: t("filters.onlyPriced"),
       href: filterHref("onlyPriced"),
     });
+  if (producedForYou)
+    activeFilters.push({
+      key: "producedForYou",
+      label: t("filters.producedForYou"),
+      href: filterHref("producedForYou"),
+    });
+  if (guaranteedReach)
+    activeFilters.push({
+      key: "guaranteedReach",
+      label: t("filters.guaranteedReach"),
+      href: filterHref("guaranteedReach"),
+    });
+  if (newsletterIncluded)
+    activeFilters.push({
+      key: "newsletterIncluded",
+      label: t("filters.newsletterIncluded"),
+      href: filterHref("newsletterIncluded"),
+    });
+  if (videoIncluded)
+    activeFilters.push({
+      key: "videoIncluded",
+      label: t("filters.videoIncluded"),
+      href: filterHref("videoIncluded"),
+    });
   if (q)
     activeFilters.push({
       key: "q",
@@ -278,6 +373,10 @@ export default async function CatalogPage({
           b2bB2c: b2bB2c ?? "",
           reach: reach ?? "",
           onlyPriced,
+          producedForYou,
+          guaranteedReach,
+          newsletterIncluded,
+          videoIncluded,
           advancedOpen,
           compareMode,
         }}

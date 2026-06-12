@@ -72,6 +72,16 @@ export function parseCatalogParams(
   );
   const onlyPriced =
     typeof sp.onlyPriced === "string" && sp.onlyPriced === "1";
+  // Semantic-deliverable filters — driven by curated Product.inclusions
+  // data, so buyers can filter by what they actually GET.
+  const producedForYou =
+    typeof sp.producedForYou === "string" && sp.producedForYou === "1";
+  const guaranteedReach =
+    typeof sp.guaranteedReach === "string" && sp.guaranteedReach === "1";
+  const newsletterIncluded =
+    typeof sp.newsletterIncluded === "string" && sp.newsletterIncluded === "1";
+  const videoIncluded =
+    typeof sp.videoIncluded === "string" && sp.videoIncluded === "1";
   const compareMode =
     typeof sp.compareMode === "string" && sp.compareMode === "1";
   // Advanced section auto-opens only for the compare picker now — B2B/B2C
@@ -90,6 +100,10 @@ export function parseCatalogParams(
     b2bB2c,
     reach,
     onlyPriced,
+    producedForYou,
+    guaranteedReach,
+    newsletterIncluded,
+    videoIncluded,
     compareMode,
     advancedOpen,
     q,

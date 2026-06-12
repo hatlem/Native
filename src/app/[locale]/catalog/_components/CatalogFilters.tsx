@@ -25,6 +25,10 @@ type Props = {
     b2bB2c: string;
     reach: string;
     onlyPriced: boolean;
+    producedForYou: boolean;
+    guaranteedReach: boolean;
+    newsletterIncluded: boolean;
+    videoIncluded: boolean;
     advancedOpen: boolean;
     compareMode: boolean;
   };
@@ -187,6 +191,15 @@ export function CatalogFilters({ markets, formats, nativeFits, b2bB2cs, reaches,
     commit((p) => {
       if (checked) p.set("onlyPriced", "1");
       else p.delete("onlyPriced");
+    });
+  }
+
+  // Shared toggle for the boolean "what you get" filters — same URL
+  // semantics as onlyPriced ("1" when on, absent when off).
+  function toggleFlag(key: string, checked: boolean) {
+    commit((p) => {
+      if (checked) p.set(key, "1");
+      else p.delete(key);
     });
   }
 
@@ -448,6 +461,43 @@ export function CatalogFilters({ markets, formats, nativeFits, b2bB2cs, reaches,
           {t("advanced")}{" "}
           <span aria-hidden="true">{advancedOpen ? "▴" : "▾"}</span>
         </button>
+      </div>
+
+      {/* Semantic deliverable filters — what the buyer actually GETS,
+          driven by curated product inclusions. */}
+      <div className="catalog-filters__row">
+        <label className="filter-checkbox">
+          <input
+            type="checkbox"
+            checked={initial.producedForYou}
+            onChange={(e) => toggleFlag("producedForYou", e.target.checked)}
+          />
+          <span>{t("producedForYou")}</span>
+        </label>
+        <label className="filter-checkbox">
+          <input
+            type="checkbox"
+            checked={initial.guaranteedReach}
+            onChange={(e) => toggleFlag("guaranteedReach", e.target.checked)}
+          />
+          <span>{t("guaranteedReach")}</span>
+        </label>
+        <label className="filter-checkbox">
+          <input
+            type="checkbox"
+            checked={initial.newsletterIncluded}
+            onChange={(e) => toggleFlag("newsletterIncluded", e.target.checked)}
+          />
+          <span>{t("newsletterIncluded")}</span>
+        </label>
+        <label className="filter-checkbox">
+          <input
+            type="checkbox"
+            checked={initial.videoIncluded}
+            onChange={(e) => toggleFlag("videoIncluded", e.target.checked)}
+          />
+          <span>{t("videoIncluded")}</span>
+        </label>
       </div>
 
       {advancedOpen ? (
