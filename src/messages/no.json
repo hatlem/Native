@@ -171,7 +171,8 @@
       "anyReach": "All rekkevidde",
       "region": "Region",
       "allRegions": "Alle regioner",
-      "regionCount": "{count, plural, =0 {Alle regioner} one {# region} other {# regioner}}"
+      "regionCount": "{count, plural, =0 {Alle regioner} one {# region} other {# regioner}}",
+      "publisher": "Utgiver"
     },
     "compareBar": {
       "label": "{count, plural, =1 {1 tittel valgt} other {# titler valgt}}",
@@ -305,7 +306,8 @@
       "photographer": "Fotograf inkludert",
       "translation": "Oversettelse inkludert",
       "productionAdvertiser": "Du leverer ferdig artikkel"
-    }
+    },
+    "publisherLinkHelp": "Se alle titler fra {name}"
   },
   "plan": {
     "eyebrow": "Plan",

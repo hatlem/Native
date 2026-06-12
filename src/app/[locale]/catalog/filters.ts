@@ -70,6 +70,9 @@ export function parseCatalogParams(
     typeof sp.reach === "string" ? sp.reach : undefined,
     REACH_VALUES,
   );
+  // Publisher/media-house filter — set by clicking the publisher name on
+  // a title card or detail page ("see everything from Amedia").
+  const publisher = typeof sp.publisher === "string" ? sp.publisher.trim() : "";
   const onlyPriced =
     typeof sp.onlyPriced === "string" && sp.onlyPriced === "1";
   // Semantic-deliverable filters — driven by curated Product.inclusions
@@ -100,6 +103,7 @@ export function parseCatalogParams(
     b2bB2c,
     reach,
     onlyPriced,
+    publisher,
     producedForYou,
     guaranteedReach,
     newsletterIncluded,

@@ -48,6 +48,7 @@ export default async function CatalogPage({
     b2bB2c,
     reach,
     onlyPriced,
+    publisher,
     producedForYou,
     guaranteedReach,
     newsletterIncluded,
@@ -140,6 +141,7 @@ export default async function CatalogPage({
       : {}),
     ...(verticals.length ? { vertical: { in: verticals } } : {}),
     ...(regions.length ? { region: { in: regions } } : {}),
+    ...(publisher ? { publisherId: publisher } : {}),
     // AND-wrapped so each condition composes with the type filter's own
     // products.some — see andConditions above for what goes in here.
     ...(andConditions.length ? { AND: andConditions } : {}),
@@ -183,6 +185,15 @@ export default async function CatalogPage({
     .map((r) => r.region!)
     .filter((v) => v.trim().length > 0);
 
+  // Resolve the publisher-filter chip label (name, not cuid). Invalid id
+  // simply matches nothing — no error path needed.
+  const publisherRow = publisher
+    ? await prisma.publisher.findUnique({
+        where: { id: publisher },
+        select: { name: true },
+      })
+    : null;
+
   const [totalCount, titles] = await Promise.all([
     prisma.title.count({ where }),
     prisma.title.findMany({
@@ -211,6 +222,7 @@ export default async function CatalogPage({
     if (nativeFit) params.set("nativeFit", nativeFit);
     if (b2bB2c) params.set("b2bB2c", b2bB2c);
     if (onlyPriced) params.set("onlyPriced", "1");
+    if (publisher) params.set("publisher", publisher);
     if (producedForYou) params.set("producedForYou", "1");
     if (guaranteedReach) params.set("guaranteedReach", "1");
     if (newsletterIncluded) params.set("newsletterIncluded", "1");
@@ -233,6 +245,7 @@ export default async function CatalogPage({
     | "nativeFit"
     | "b2bB2c"
     | "onlyPriced"
+    | "publisher"
     | "producedForYou"
     | "guaranteedReach"
     | "newsletterIncluded"
@@ -264,6 +277,7 @@ export default async function CatalogPage({
     if (nativeFit && except !== "nativeFit") params.set("nativeFit", nativeFit);
     if (b2bB2c && except !== "b2bB2c") params.set("b2bB2c", b2bB2c);
     if (onlyPriced && except !== "onlyPriced") params.set("onlyPriced", "1");
+    if (publisher && except !== "publisher") params.set("publisher", publisher);
     if (producedForYou && except !== "producedForYou")
       params.set("producedForYou", "1");
     if (guaranteedReach && except !== "guaranteedReach")
@@ -294,6 +308,12 @@ export default async function CatalogPage({
       href: filterHref("types", { dropType: tp }),
     });
   }
+  if (publisher)
+    activeFilters.push({
+      key: "publisher",
+      label: `${t("filters.publisher")}: ${publisherRow?.name ?? publisher}`,
+      href: filterHref("publisher"),
+    });
   for (const v of verticals) {
     activeFilters.push({
       key: `vertical-${v}`,

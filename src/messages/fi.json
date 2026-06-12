@@ -250,7 +250,8 @@
       "anyReach": "Mikä tahansa",
       "region": "Alue",
       "allRegions": "Kaikki alueet",
-      "regionCount": "{count, plural, =0 {Kaikki alueet} one {# alue} other {# aluetta}}"
+      "regionCount": "{count, plural, =0 {Kaikki alueet} one {# alue} other {# aluetta}}",
+      "publisher": "Julkaisija"
     },
     "compareBar": {
       "label": "{count, plural, =1 {1 julkaisu valittu} other {# julkaisua valittu}}",
@@ -384,7 +385,8 @@
       "photographer": "Valokuvaaja sisältyy",
       "translation": "Käännös sisältyy",
       "productionAdvertiser": "Toimitat valmiin artikkelin"
-    }
+    },
+    "publisherLinkHelp": "Katso kaikki nimikkeet julkaisijalta {name}"
   },
   "plan": {
     "eyebrow": "Suunnitelma",

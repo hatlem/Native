@@ -178,8 +178,16 @@ export default async function TitleDetailPage({
         <div>
           <h1>{title.name}</h1>
           <p className="muted">
-            {t("publishedBy")} {title.publisher.name} ·{" "}
-            {tMarket(title.market.code)}
+            {t("publishedBy")}{" "}
+            {/* Media-house drill-down: every title from the same publisher
+                (Amedia, Polaris, Aller, …) one click away. */}
+            <Link
+              href={`/catalog?publisher=${title.publisher.id}`}
+              title={t("publisherLinkHelp", { name: title.publisher.name })}
+            >
+              {title.publisher.name}
+            </Link>{" "}
+            · {tMarket(title.market.code)}
           </p>
           {title.description ? (
             <p style={{ marginTop: 8 }}>{title.description}</p>

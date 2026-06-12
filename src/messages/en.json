@@ -250,7 +250,8 @@
       "anyReach": "Any reach",
       "region": "Region",
       "allRegions": "All regions",
-      "regionCount": "{count, plural, =0 {All regions} one {# region} other {# regions}}"
+      "regionCount": "{count, plural, =0 {All regions} one {# region} other {# regions}}",
+      "publisher": "Publisher"
     },
     "compareBar": {
       "label": "{count, plural, =1 {1 title selected} other {# titles selected}}",
@@ -384,7 +385,8 @@
       "photographer": "Photographer included",
       "translation": "Translation included",
       "productionAdvertiser": "You supply the finished article"
-    }
+    },
+    "publisherLinkHelp": "See every title from {name}"
   },
   "plan": {
     "eyebrow": "Plan",

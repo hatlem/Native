@@ -74,7 +74,13 @@ export async function CatalogResults({
               </Link>
             </h3>
             <div className="muted">
-              {title.publisher.name} · {tMarket(title.market.code)}
+              {/* Publisher drill-down ("everything from Amedia"). Sits above
+                  the stretched card link via the a:not(.card-link) z-index
+                  rule, so it's clickable inside the clickable card. */}
+              <Link href={`/catalog?publisher=${title.publisher.id}`}>
+                {title.publisher.name}
+              </Link>{" "}
+              · {tMarket(title.market.code)}
             </div>
             <div>
               <span className="tag">

@@ -171,7 +171,8 @@
       "anyReach": "All räckvidd",
       "region": "Region",
       "allRegions": "Alla regioner",
-      "regionCount": "{count, plural, =0 {Alla regioner} one {# region} other {# regioner}}"
+      "regionCount": "{count, plural, =0 {Alla regioner} one {# region} other {# regioner}}",
+      "publisher": "Utgivare"
     },
     "compareBar": {
       "label": "{count, plural, =1 {1 titel vald} other {# titlar valda}}",
@@ -305,7 +306,8 @@
       "photographer": "Fotograf ingår",
       "translation": "Översättning ingår",
       "productionAdvertiser": "Du levererar färdig artikel"
-    }
+    },
+    "publisherLinkHelp": "Se alla titlar från {name}"
   },
   "plan": {
     "eyebrow": "Plan",
