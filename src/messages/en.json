@@ -335,7 +335,15 @@
     "factCategory": "Category",
     "marketRules": {
       "heading": "Rules in this market",
-      "labeling": "Labeling is handled by the publisher — the article is labeled “{label}” as required by marketing law in {market}."
+      "labeling": "Labeling is handled by the publisher — the article is labeled “{label}” as required by marketing law in {market}.",
+      "restricted": "Cannot be advertised in this market: {categories}"
+    },
+    "restrictedCategory": {
+      "GAMBLING": "Gambling & casino",
+      "ALCOHOL": "Alcohol",
+      "TOBACCO": "Tobacco & nicotine",
+      "PRESCRIPTION_DRUGS": "Prescription drugs",
+      "POLITICAL": "Political advertising"
     },
     "includedHeading": "Included in the price",
     "notIncludedHeading": "Not included",

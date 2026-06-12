@@ -335,7 +335,15 @@
     "factCategory": "Kategorie",
     "marketRules": {
       "heading": "Regeln in diesem Markt",
-      "labeling": "Die Kennzeichnung übernimmt das Medium — der Artikel wird gemäß dem Werberecht in {market} als '{label}' gekennzeichnet."
+      "labeling": "Die Kennzeichnung übernimmt das Medium — der Artikel wird gemäß dem Werberecht in {market} als '{label}' gekennzeichnet.",
+      "restricted": "Darf in diesem Markt nicht beworben werden: {categories}"
+    },
+    "restrictedCategory": {
+      "GAMBLING": "Glücksspiel & Casino",
+      "ALCOHOL": "Alkohol",
+      "TOBACCO": "Tabak & Nikotin",
+      "PRESCRIPTION_DRUGS": "Verschreibungspflichtige Medikamente",
+      "POLITICAL": "Politische Werbung"
     },
     "includedHeading": "Im Preis enthalten",
     "notIncludedHeading": "Nicht enthalten",

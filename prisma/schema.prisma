@@ -265,6 +265,11 @@ model Market {
   // canonical at the quote/invoice layer. Desk edits the rate weekly
   // until we wire to an ECB feed.
   fxToEUR         Decimal? @db.Decimal(12, 6)
+  // Ad categories restricted/banned by local marketing law. Values follow
+  // the RestrictedCategory convention: GAMBLING, ALCOHOL, TOBACCO,
+  // PRESCRIPTION_DRUGS, POLITICAL. Display-only today (title detail
+  // "Rules in this market" card) — enforced in the brief flow later.
+  restrictedCategories String[] @default([])
   createdAt    DateTime   @default(now())
   updatedAt    DateTime   @updatedAt
 

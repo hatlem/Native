@@ -448,23 +448,35 @@ export default async function TitleDetailPage({
           is handled by the publisher; foreign buyers (UWG-DE/AT, KSML-FI,
           CAP-UK, ASAI-IE markets) see what local law requires without
           having to know it. Category restrictions (e.g. gambling in NO)
-          slot in here once the per-market data field lands; enforcement
-          happens in the brief flow where the advertiser's category is
-          actually known. */}
-      {title.market.disclosureLabel ? (
+          are display-only here; enforcement happens in the brief flow
+          where the advertiser's category is actually known. */}
+      {title.market.disclosureLabel ||
+      title.market.restrictedCategories.length > 0 ? (
         <aside
           className="card"
           style={{ marginTop: 16 }}
           aria-label={t("marketRules.heading")}
         >
           <h3 style={{ marginTop: 0 }}>{t("marketRules.heading")}</h3>
-          <p className="muted" style={{ margin: 0 }}>
-            ✓{" "}
-            {t("marketRules.labeling", {
-              label: title.market.disclosureLabel,
-              market: tMarket(title.market.code),
-            })}
-          </p>
+          {title.market.disclosureLabel ? (
+            <p className="muted" style={{ margin: 0 }}>
+              ✓{" "}
+              {t("marketRules.labeling", {
+                label: title.market.disclosureLabel,
+                market: tMarket(title.market.code),
+              })}
+            </p>
+          ) : null}
+          {title.market.restrictedCategories.length > 0 ? (
+            <p className="muted" style={{ margin: 0 }}>
+              ✗{" "}
+              {t("marketRules.restricted", {
+                categories: title.market.restrictedCategories
+                  .map((c) => t(`restrictedCategory.${c}`))
+                  .join(", "),
+              })}
+            </p>
+          ) : null}
         </aside>
       ) : null}
     </section>

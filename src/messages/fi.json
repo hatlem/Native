@@ -335,7 +335,15 @@
     "factCategory": "Kategoria",
     "marketRules": {
       "heading": "Tämän markkinan säännöt",
-      "labeling": "Median vastuulla on merkintä — artikkeli merkitään '{label}' paikallisen markkinointilain mukaisesti ({market})."
+      "labeling": "Median vastuulla on merkintä — artikkeli merkitään '{label}' paikallisen markkinointilain mukaisesti ({market}).",
+      "restricted": "Ei voi mainostaa tällä markkinalla: {categories}"
+    },
+    "restrictedCategory": {
+      "GAMBLING": "Rahapelit ja kasinot",
+      "ALCOHOL": "Alkoholi",
+      "TOBACCO": "Tupakka ja nikotiini",
+      "PRESCRIPTION_DRUGS": "Reseptilääkkeet",
+      "POLITICAL": "Poliittinen mainonta"
     },
     "includedHeading": "Sisältyy hintaan",
     "notIncludedHeading": "Ei sisälly",

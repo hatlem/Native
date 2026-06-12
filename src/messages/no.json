@@ -256,7 +256,15 @@
     "factCategory": "Kategori",
     "marketRules": {
       "heading": "Regler i dette markedet",
-      "labeling": "Merking håndteres av mediet — artikkelen merkes «{label}» i henhold til markedsføringsloven i {market}."
+      "labeling": "Merking håndteres av mediet — artikkelen merkes «{label}» i henhold til markedsføringsloven i {market}.",
+      "restricted": "Kan ikke annonseres i dette markedet: {categories}"
+    },
+    "restrictedCategory": {
+      "GAMBLING": "Pengespill og kasino",
+      "ALCOHOL": "Alkohol",
+      "TOBACCO": "Tobakk og nikotin",
+      "PRESCRIPTION_DRUGS": "Reseptbelagte legemidler",
+      "POLITICAL": "Politisk reklame"
     },
     "includedHeading": "Inkludert i prisen",
     "notIncludedHeading": "Ikke inkludert",
