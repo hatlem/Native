@@ -349,6 +349,15 @@
     "notIncludedHeading": "Not included",
     "rateProductionNote": "Article production billed separately — confirmed in your firm quote.",
     "leadTimeEstimated": "estimated {days} days",
+    "nameQ": {
+      "articles": "{count, plural, one {# article} other {# articles}}",
+      "viewsPerWeek": "{amount} views/week",
+      "viewsPerMonth": "{amount} views/month",
+      "viewsTotal": "{amount} views",
+      "readsTotal": "{amount} reads",
+      "durationWeeks": "{weeks, plural, one {# week} other {# weeks}}",
+      "print": "print"
+    },
     "inc": {
       "productionPlatform": "Finished article written for you",
       "productionPublisher": "Article produced by the publisher's studio",

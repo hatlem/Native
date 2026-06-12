@@ -270,6 +270,15 @@
     "notIncludedHeading": "Ingår inte",
     "rateProductionNote": "Artikelproduktion tillkommer — bekräftas i fastpris-offerten.",
     "leadTimeEstimated": "uppskattat {days} dagar",
+    "nameQ": {
+      "articles": "{count, plural, one {# artikel} other {# artiklar}}",
+      "viewsPerWeek": "{amount} visn./vecka",
+      "viewsPerMonth": "{amount} visn./månad",
+      "viewsTotal": "{amount} visningar",
+      "readsTotal": "{amount} läsningar",
+      "durationWeeks": "{weeks, plural, one {# vecka} other {# veckor}}",
+      "print": "print"
+    },
     "inc": {
       "productionPlatform": "Färdigskriven artikel",
       "productionPublisher": "Artikeln produceras av mediets studio",

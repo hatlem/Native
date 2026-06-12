@@ -270,6 +270,15 @@
     "notIncludedHeading": "Ikke inkludert",
     "rateProductionNote": "Artikkelproduksjon kommer i tillegg — bekreftes i fasttilbudet.",
     "leadTimeEstimated": "estimert {days} dager",
+    "nameQ": {
+      "articles": "{count, plural, one {# artikkel} other {# artikler}}",
+      "viewsPerWeek": "{amount} visn./uke",
+      "viewsPerMonth": "{amount} visn./mnd",
+      "viewsTotal": "{amount} visninger",
+      "readsTotal": "{amount} lesinger",
+      "durationWeeks": "{weeks, plural, one {# uke} other {# uker}}",
+      "print": "print"
+    },
     "inc": {
       "productionPlatform": "Ferdig skrevet artikkel",
       "productionPublisher": "Artikkelen produseres av mediets studio",

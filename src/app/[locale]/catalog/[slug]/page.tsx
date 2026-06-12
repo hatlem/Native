@@ -10,6 +10,7 @@ import { bandLabel } from "@/lib/pricing/bands";
 import { productBand, titleBand, unitRate } from "@/lib/pricing/display-price";
 import { resolveProductionFee } from "@/lib/pricing/production-fee";
 import type { ProductInclusions } from "@/lib/pricing/inclusions";
+import { productDisplayNames } from "@/lib/pricing/display-name";
 import { loadPricingDefaults } from "@/lib/content-fee";
 import { addToPlan } from "@/app/plan-actions";
 import { SubmitButton } from "@/components";
@@ -298,23 +299,29 @@ export default async function TitleDetailPage({
           const pricedTypes = new Set(
             banded.filter((x) => x.band || x.rate).map((x) => x.p.type),
           );
-          return banded.filter(
+          const visible = banded.filter(
             (x) => x.band || x.rate || !pricedTypes.has(x.p.type),
           );
-        })().map(({ p, band, rate }) => {
+          // Headings are GENERATED from type + inclusions — never raw
+          // p.name, which is publisher-offer text in the publisher's
+          // language ("Native 1 sak (80k visn/mnd)") and desk-internal.
+          // Computed for the whole card list so identical siblings get
+          // disambiguated by their articles count.
+          const numberFormat = new Intl.NumberFormat(intlLocale(locale));
+          const displayNames = productDisplayNames(
+            visible.map(({ p }) => ({
+              typeLabel: tType(p.type),
+              inclusions: p.inclusions as ProductInclusions | null,
+            })),
+            (n) => numberFormat.format(n),
+            t,
+          );
+          return visible.map(({ p, band, rate }, cardIndex) => {
           const formatSlug = p.type.toLowerCase().replace(/_/g, "-");
-          // Quote-created products carry a specific offer name ("Native
-          // 1 sak, 80k visn/mnd"); seeded ones repeat the type label or a
-          // machine name embedding the raw enum ("The Sun — NATIVE_ARTICLE").
-          // Heading shows the specific name, the type tag dedupes itself.
-          const typeLabel = tType(p.type);
-          const showName =
-            !!p.name && p.name !== typeLabel && !p.name.includes(p.type);
           return (
             <article className="card" key={p.id}>
-              <h3>{showName ? p.name : typeLabel}</h3>
+              <h3>{displayNames[cardIndex]}</h3>
               <div style={{ display: "flex", gap: 6, alignItems: "center", flexWrap: "wrap" }}>
-                {showName ? <span className="tag">{typeLabel}</span> : null}
                 <Link
                   href={`/formats#${formatSlug}`}
                   className="format-learn"
@@ -435,7 +442,8 @@ export default async function TitleDetailPage({
               )}
             </article>
           );
-        })}
+          });
+        })()}
         </div>
       )}
 

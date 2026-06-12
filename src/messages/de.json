@@ -349,6 +349,15 @@
     "notIncludedHeading": "Nicht enthalten",
     "rateProductionNote": "Die Artikelproduktion wird separat berechnet — bestätigt im Festpreisangebot.",
     "leadTimeEstimated": "geschätzt {days} Tage",
+    "nameQ": {
+      "articles": "{count, plural, one {# Artikel} other {# Artikel}}",
+      "viewsPerWeek": "{amount} Aufrufe/Woche",
+      "viewsPerMonth": "{amount} Aufrufe/Monat",
+      "viewsTotal": "{amount} Aufrufe",
+      "readsTotal": "{amount} Lesungen",
+      "durationWeeks": "{weeks, plural, one {# Woche} other {# Wochen}}",
+      "print": "Print"
+    },
     "inc": {
       "productionPlatform": "Fertig geschriebener Artikel",
       "productionPublisher": "Artikel wird vom Studio des Mediums produziert",

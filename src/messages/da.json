@@ -270,6 +270,15 @@
     "notIncludedHeading": "Ikke inkluderet",
     "rateProductionNote": "Artikelproduktion kommer oveni — bekræftes i det faste tilbud.",
     "leadTimeEstimated": "estimeret {days} dage",
+    "nameQ": {
+      "articles": "{count, plural, one {# artikel} other {# artikler}}",
+      "viewsPerWeek": "{amount} visn./uge",
+      "viewsPerMonth": "{amount} visn./md.",
+      "viewsTotal": "{amount} visninger",
+      "readsTotal": "{amount} læsninger",
+      "durationWeeks": "{weeks, plural, one {# uge} other {# uger}}",
+      "print": "print"
+    },
     "inc": {
       "productionPlatform": "Færdigskrevet artikel",
       "productionPublisher": "Artiklen produceres af mediets studio",

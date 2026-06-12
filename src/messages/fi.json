@@ -349,6 +349,15 @@
     "notIncludedHeading": "Ei sisälly",
     "rateProductionNote": "Artikkelin tuotanto veloitetaan erikseen — vahvistetaan kiinteässä tarjouksessa.",
     "leadTimeEstimated": "arviolta {days} päivää",
+    "nameQ": {
+      "articles": "{count, plural, one {# artikkeli} other {# artikkelia}}",
+      "viewsPerWeek": "{amount} näyttöä/vk",
+      "viewsPerMonth": "{amount} näyttöä/kk",
+      "viewsTotal": "{amount} näyttöä",
+      "readsTotal": "{amount} lukukertaa",
+      "durationWeeks": "{weeks, plural, one {# viikko} other {# viikkoa}}",
+      "print": "printti"
+    },
     "inc": {
       "productionPlatform": "Valmiiksi kirjoitettu artikkeli",
       "productionPublisher": "Artikkelin tuottaa median studio",
