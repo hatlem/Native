@@ -225,35 +225,45 @@ export async function TitlesGrid({ locale, byMarket }: Props) {
                   >
                     {t("actions.edit")}
                   </Link>
+                  {/* Per-card actions live INSIDE the bulk <form> — nested
+                      <form> tags are invalid HTML, the parser drops them and
+                      the buttons ended up submitting the outer form to a
+                      broken action (desk couldn't deactivate anything,
+                      2026-06-12). React 19 formAction buttons share the
+                      outer form but route to their own server action, with
+                      name/value carrying the per-card titleId. */}
                   {!hasNative ? (
-                    <form action={markTitleNative}>
-                      <input type="hidden" name="locale" value={locale} />
-                      <input type="hidden" name="titleId" value={title.id} />
-                      <SubmitButton
-                        label={t("actions.markNative")}
-                        pendingLabel={t("actions.marking")}
-                      />
-                    </form>
+                    <button
+                      type="submit"
+                      className="btn small secondary"
+                      formAction={markTitleNative}
+                      name="titleId"
+                      value={title.id}
+                    >
+                      {t("actions.markNative")}
+                    </button>
                   ) : null}
                   {!declined && !hasNative ? (
-                    <form action={markTitleNoNative}>
-                      <input type="hidden" name="locale" value={locale} />
-                      <input type="hidden" name="titleId" value={title.id} />
-                      <SubmitButton
-                        label={t("actions.markNoNative")}
-                        pendingLabel={t("actions.marking")}
-                      />
-                    </form>
+                    <button
+                      type="submit"
+                      className="btn small ghost"
+                      formAction={markTitleNoNative}
+                      name="titleId"
+                      value={title.id}
+                    >
+                      {t("actions.markNoNative")}
+                    </button>
                   ) : null}
                   {hasNative ? (
-                    <form action={deactivateTitle}>
-                      <input type="hidden" name="locale" value={locale} />
-                      <input type="hidden" name="titleId" value={title.id} />
-                      <SubmitButton
-                        label={t("actions.deactivate")}
-                        pendingLabel={t("actions.deactivating")}
-                      />
-                    </form>
+                    <button
+                      type="submit"
+                      className="btn small ghost"
+                      formAction={deactivateTitle}
+                      name="titleId"
+                      value={title.id}
+                    >
+                      {t("actions.deactivate")}
+                    </button>
                   ) : null}
                 </div>
               </article>
