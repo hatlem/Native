@@ -377,7 +377,7 @@ export function CatalogFilters({ markets, formats, nativeFits, b2bB2cs, reaches,
             <div className="catalog-filters__multi" ref={regionRef}>
               <button
                 type="button"
-                className="catalog-filters__multi-toggle"
+                className="catalog-filters__multi-trigger"
                 onClick={() => setRegionOpen((o) => !o)}
                 aria-expanded={regionOpen}
               >
