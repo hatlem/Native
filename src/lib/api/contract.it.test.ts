@@ -6,6 +6,8 @@ import { prisma } from "@/lib/prisma";
 import { generateApiToken, hashApiToken } from "@/lib/api-key";
 import { POST as postOrder } from "@/app/api/v1/orders/route";
 import { GET as getTitles } from "@/app/api/v1/catalog/titles/route";
+import { GET as getTitle } from "@/app/api/v1/catalog/titles/[id]/route";
+import { buildMcpServerForToken } from "@/lib/mcp/server";
 
 // DB-mutating integration test — skipped unless RUN_DB_IT=1, and only
 // against a DISPOSABLE database. Exercises the public /api/v1 contract
@@ -47,6 +49,7 @@ if (!RUN_DB_IT) {
   let noOrgToken: string;
   let revokedToken: string;
   let catalogToken: string;
+  let pricingAdminToken: string;
 
   async function mintKey(opts: {
     scopes: string;
@@ -87,6 +90,14 @@ if (!RUN_DB_IT) {
         marketId: market.id,
         category: "business",
         active: true,
+        // Internal negotiation data — must NEVER appear in any buyer
+        // surface. The canary string below is asserted absent from the
+        // serialized /api/v1 responses.
+        commercialExtra: {
+          source: "API-IT-CANARY-CONTACT",
+          netPrice: 9999,
+          discountPct: 35,
+        },
       },
     });
     titleId = title.id;
@@ -143,6 +154,7 @@ if (!RUN_DB_IT) {
       revokedAt: new Date(),
     });
     catalogToken = await mintKey({ scopes: "catalog:read" });
+    pricingAdminToken = await mintKey({ scopes: "pricing:admin" });
   });
 
   after(async () => {
@@ -277,16 +289,30 @@ if (!RUN_DB_IT) {
       pricesVisible: boolean;
       products: { id: string; priceBand: string | null; visibility: string }[];
     } | null = null;
+    let foundPageJson = "";
     for (let page = 0; page < 15 && !found; page++) {
       const qs = `?market=NO&limit=100${cursor ? `&cursor=${cursor}` : ""}`;
       const res = await getTitles(titlesReq(catalogToken, qs));
       assert.equal(res.status, 200);
       const body = await res.json();
       found = body.data.find((t: { id: string }) => t.id === titleId) ?? null;
+      if (found) foundPageJson = JSON.stringify(body);
       cursor = body.nextCursor;
       if (!cursor) break;
     }
     assert.ok(found, "seeded title should appear in the NO catalog");
+
+    // Title.commercialExtra holds internal negotiation data (net prices,
+    // discount %, source contacts). The route fetches the full row via
+    // `include` — guard that the explicit response mapping keeps it out.
+    assert.ok(
+      !foundPageJson.includes("commercialExtra"),
+      "commercialExtra must never serialize into the public catalog list",
+    );
+    assert.ok(
+      !foundPageJson.includes("API-IT-CANARY-CONTACT"),
+      "commercialExtra contents must never serialize into the public catalog list",
+    );
 
     // Confirmed products expose a band label, never a figure — and never
     // the raw net basePrice. The unconfirmed one has no band and is
@@ -308,5 +334,46 @@ if (!RUN_DB_IT) {
     assert.equal(res.status, 200);
     const body = await res.json();
     assert.ok(body.data.length <= 1);
+  });
+
+  // ---- GET /api/v1/catalog/titles/[id] ----
+
+  test("catalog detail: commercialExtra never serializes", async () => {
+    const res = await getTitle(
+      new NextRequest(`http://localhost/api/v1/catalog/titles/${titleId}`, {
+        method: "GET",
+        headers: { authorization: `Bearer ${catalogToken}` },
+      }),
+      { params: Promise.resolve({ id: titleId }) },
+    );
+    assert.equal(res.status, 200);
+    const raw = JSON.stringify(await res.json());
+    assert.ok(
+      !raw.includes("commercialExtra"),
+      "commercialExtra must never serialize into the public title detail",
+    );
+    assert.ok(
+      !raw.includes("API-IT-CANARY-CONTACT"),
+      "commercialExtra contents must never serialize into the public title detail",
+    );
+    assert.ok(
+      !raw.includes("basePrice"),
+      "raw net basePrice must never serialize into the public title detail",
+    );
+  });
+
+  // ---- MCP server gate (src/lib/mcp/server.ts) ----
+
+  test("mcp: catalog:read key is rejected — read tools expose desk-internal data", async () => {
+    // native_get_title spreads the full Title row (commercialExtra, net
+    // basePrice, sales contacts). Partner keys must never open the MCP
+    // surface; they get the explicit-field /api/v1 contract instead.
+    const server = await buildMcpServerForToken(catalogToken);
+    assert.equal(server, null);
+  });
+
+  test("mcp: pricing:admin key opens the MCP server", async () => {
+    const server = await buildMcpServerForToken(pricingAdminToken);
+    assert.ok(server, "desk pricing:admin key should get an MCP server");
   });
 }

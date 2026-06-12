@@ -10,9 +10,12 @@ export async function buildMcpServerForToken(
   const key = await authenticateApiKey(rawToken);
   if (!key) return null;
 
-  const canRead =
-    hasScope(key.scopes, "catalog:read") ||
-    hasScope(key.scopes, "pricing:admin");
+  // The MCP surface is desk-internal tooling only — every read tool
+  // exposes negotiation data (Title.commercialExtra, raw net basePrice,
+  // sales contacts, quote history) that must never reach buyer/partner
+  // keys. catalog:read partners get the public catalog via
+  // /api/v1/catalog/*, which serializes an explicit field list.
+  const canRead = hasScope(key.scopes, "pricing:admin");
   const canMutate = hasScope(key.scopes, "pricing:admin");
   if (!canRead) return null;
 
@@ -21,7 +24,7 @@ export async function buildMcpServerForToken(
     version: "1.0.0",
   });
 
-  // Read tools — available to catalog:read and pricing:admin
+  // Read tools — pricing:admin only (desk-internal data; see gate above)
   for (const [name, def] of Object.entries(readToolDefinitions)) {
     const shape = def.parameters.shape;
     server.tool(
