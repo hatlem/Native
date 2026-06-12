@@ -136,3 +136,22 @@ export function titleBand<P extends DisplayProduct>(
     product: pick,
   };
 }
+
+// Card-level rate fallback for titles whose only confirmed pricing is
+// CPM/CPC (e.g. Adresseavisen). Without this the grid says "Contact for
+// price" while the detail page shows "≈ 395 NOK CPM" — a priced title
+// shouldn't look unpriced one click earlier. Cheapest shown rate wins.
+export function titleRate<P extends DisplayProduct>(
+  products: P[],
+  title: DisplayTitle,
+  defaults: PricingDefaults,
+): { rate: number; unit: string; product: P } | null {
+  const rated = products
+    .map((p) => {
+      const r = unitRate(p, title, defaults);
+      return r ? { ...r, product: p } : null;
+    })
+    .filter((r): r is { rate: number; unit: string; product: P } => r !== null);
+  if (rated.length === 0) return null;
+  return rated.sort((a, b) => a.rate - b.rate)[0];
+}

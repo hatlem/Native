@@ -26,5 +26,9 @@
     { "email": "vanessa.english@fieldsportspress.com", "titles": "Gun Mart", "status": "BOUNCED", "error": "550 5.1.1 no such user at fieldsportspress.com (Google) — address dead, needs a valid Gun Mart / Fieldsports Press contact" },
     { "email": "john.woods@pensionsage.com", "titles": "Pensions Age, Charity Times", "status": "sent" }
   ],
-  "catalog_note": "UK 4-10 niche titles (Telegraph, Big Issue, Shropshire Star, Kent Messenger, HuffPost/BuzzFeed UK, Gun Mart, Pensions Age) and the FI titles are NOT in the NativeSpin catalog, so no ContactLog/PriceQuote could be attached. UK 1-3 (Immediate, Media Concierge, DC Thomson) map to existing catalog titles. Capturing the Aamuset price requires first creating the FI title."
+  "catalog_note": "All FI and UK titles ARE in the catalog (just under <name>-<cc> slugs). All 12 delivered UK sends were logged as ContactLog OUTBOUND against their titles; Gun Mart logged twice (bounce attempt + corrected resend).",
+  "captured": {
+    "aamuset": "PriceQuote applied — Native article product confirmed at 900 EUR (net+VAT). SalesContact Susanna Lumikanta attached primary; INBOUND reply logged. 600 EUR subpage-only variant noted in includedText.",
+    "gun_mart_resend": "Original fieldsportspress.com address bounced (550 5.1.1). Correct address vanessa.english@gunmart.net found on gunmart.net/advertise; tailored email resent and delivered. SalesContact Vanessa English (Blaze Publishing) attached primary; corrected resend logged OUTBOUND."
+  }
 }

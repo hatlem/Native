@@ -1,6 +1,6 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { customerPrice, productBand, titleBand, unitRate } from "./display-price";
+import { customerPrice, productBand, titleBand, titleRate, unitRate } from "./display-price";
 import type { PricingDefaults } from "@/lib/content-fee";
 import type { ContentFeeRuleSpec } from "../money";
 
@@ -150,4 +150,18 @@ test("unitRate is null for FLAT and for hidden rate products", () => {
   assert.equal(unitRate(product(), TITLE, { feeRules: RULES, marginRules: [] }), null);
   const hidden = product({ pricingModel: "CPM", confirmedAt: null });
   assert.equal(unitRate(hidden, TITLE, { feeRules: RULES, marginRules: [] }), null);
+});
+
+test("titleRate falls back to the cheapest shown unit rate when no flat band exists", () => {
+  const cpmHigh = product({ pricingModel: "CPM", basePrice: 500, type: "NATIVE_DISPLAY" });
+  const cpmLow = product({ pricingModel: "CPM", basePrice: 343, type: "NATIVE_DISPLAY" });
+  const got = titleRate([cpmHigh, cpmLow], TITLE, DEFAULTS);
+  assert.ok(got);
+  // 343 × 1.15 = 394.45 → nearest 5 = 395
+  assert.equal(got.rate, 395);
+  assert.equal(got.unit, "CPM");
+});
+
+test("titleRate is null when only FLAT products exist (band owns the card)", () => {
+  assert.equal(titleRate([product()], TITLE, DEFAULTS), null);
 });

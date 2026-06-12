@@ -4,7 +4,7 @@ import { Link } from "@/i18n/navigation";
 import { intlLocale } from "@/lib/money";
 import { isProductPriceShown } from "@/lib/pricing/visibility";
 import { bandLabel } from "@/lib/pricing/bands";
-import { titleBand } from "@/lib/pricing/display-price";
+import { titleBand, titleRate } from "@/lib/pricing/display-price";
 import { loadPricingDefaults } from "@/lib/content-fee";
 import { EmptyState } from "@/app/empty-state";
 import { localizeCategory } from "@/lib/taxonomy-i18n";
@@ -63,6 +63,12 @@ export async function CatalogResults({
           (p) => !isProductPriceShown(p, title),
         );
         const fromBand = titleBand(title.products, title, pricing);
+        // CPM/CPC-only titles (Adresseavisen) have no flat band but DO
+        // have confirmed pricing — show the cheapest unit rate instead of
+        // a misleading "Contact for price".
+        const fromRate = fromBand
+          ? null
+          : titleRate(title.products, title, pricing);
         const needsQuote = title.products.length === 0;
 
         return (
@@ -146,6 +152,13 @@ export async function CatalogResults({
                 </div>
                 <div className="muted">✓ {tv("productionIncluded")}</div>
               </>
+            ) : fromRate ? (
+              <div className="price">
+                ≈ {fromRate.rate} {fromRate.product.currency} {fromRate.unit}{" "}
+                <span className="muted" title={tv("listIndicativeHelp")}>
+                  · {tv("listIndicative")}
+                </span>
+              </div>
             ) : anyHidden ? (
               <div className="price muted">{tv("requestPrice")}</div>
             ) : null}
