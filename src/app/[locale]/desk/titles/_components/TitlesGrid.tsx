@@ -35,7 +35,14 @@ export async function TitlesGrid({ locale, byMarket }: Props) {
   const tMarket = await getTranslations({ locale, namespace: "market" });
 
   return (
-    <form action={createPriceRequestsBulkAction}>
+    <>
+    {/* The bulk form is a SIBLING of the grid — card checkboxes join it via
+        the HTML form="" attribute. Nesting the whole grid inside it broke
+        every per-card action form (browsers drop nested <form>s), and React
+        formAction buttons don't carry their own name/value into server
+        actions, so the per-card real forms below are the only wiring that
+        actually delivers titleId. */}
+    <form id="bulk-titles-form" action={createPriceRequestsBulkAction}>
       <input type="hidden" name="locale" value={locale} />
       <div style={{ marginTop: 16, display: "flex", gap: 12, alignItems: "center", flexWrap: "wrap" }}>
         <SubmitButton
@@ -44,6 +51,7 @@ export async function TitlesGrid({ locale, byMarket }: Props) {
         />
         <span className="muted" style={{ fontSize: "0.9em" }}>{t("bulk.hint")}</span>
       </div>
+    </form>
       {Array.from(byMarket.entries()).map(([mc, mTitles]) => (
       <div key={mc} style={{ marginTop: 24 }}>
         <h2>{tMarket(mc)}</h2>
@@ -65,6 +73,7 @@ export async function TitlesGrid({ locale, byMarket }: Props) {
                     type="checkbox"
                     name="titleIds"
                     value={title.id}
+                    form="bulk-titles-form"
                     style={{ marginTop: 4, flexShrink: 0 }}
                   />
                   <h3 style={{ margin: 0 }}>{title.name}</h3>
@@ -225,45 +234,35 @@ export async function TitlesGrid({ locale, byMarket }: Props) {
                   >
                     {t("actions.edit")}
                   </Link>
-                  {/* Per-card actions live INSIDE the bulk <form> — nested
-                      <form> tags are invalid HTML, the parser drops them and
-                      the buttons ended up submitting the outer form to a
-                      broken action (desk couldn't deactivate anything,
-                      2026-06-12). React 19 formAction buttons share the
-                      outer form but route to their own server action, with
-                      name/value carrying the per-card titleId. */}
                   {!hasNative ? (
-                    <button
-                      type="submit"
-                      className="btn small secondary"
-                      formAction={markTitleNative}
-                      name="titleId"
-                      value={title.id}
-                    >
-                      {t("actions.markNative")}
-                    </button>
+                    <form action={markTitleNative}>
+                      <input type="hidden" name="locale" value={locale} />
+                      <input type="hidden" name="titleId" value={title.id} />
+                      <SubmitButton
+                        label={t("actions.markNative")}
+                        pendingLabel={t("actions.marking")}
+                      />
+                    </form>
                   ) : null}
                   {!declined && !hasNative ? (
-                    <button
-                      type="submit"
-                      className="btn small ghost"
-                      formAction={markTitleNoNative}
-                      name="titleId"
-                      value={title.id}
-                    >
-                      {t("actions.markNoNative")}
-                    </button>
+                    <form action={markTitleNoNative}>
+                      <input type="hidden" name="locale" value={locale} />
+                      <input type="hidden" name="titleId" value={title.id} />
+                      <SubmitButton
+                        label={t("actions.markNoNative")}
+                        pendingLabel={t("actions.marking")}
+                      />
+                    </form>
                   ) : null}
                   {hasNative ? (
-                    <button
-                      type="submit"
-                      className="btn small ghost"
-                      formAction={deactivateTitle}
-                      name="titleId"
-                      value={title.id}
-                    >
-                      {t("actions.deactivate")}
-                    </button>
+                    <form action={deactivateTitle}>
+                      <input type="hidden" name="locale" value={locale} />
+                      <input type="hidden" name="titleId" value={title.id} />
+                      <SubmitButton
+                        label={t("actions.deactivate")}
+                        pendingLabel={t("actions.deactivating")}
+                      />
+                    </form>
                   ) : null}
                 </div>
               </article>
@@ -272,6 +271,6 @@ export async function TitlesGrid({ locale, byMarket }: Props) {
         </div>
       </div>
     ))}
-    </form>
+    </>
   );
 }
