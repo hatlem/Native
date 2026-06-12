@@ -107,7 +107,7 @@ export async function RateCardsPanel({
                   </strong>{" "}
                   <span className="muted small">
                     {d.receivedAt.toISOString().slice(0, 10)}
-                    {d.source ? ` · ${d.source}` : ""}
+                    {d.source ? <>{" · "}{withSafeEmails(d.source)}</> : ""}
                     {" · "}
                     {ocrStatusLabel(t, d.ocrStatus)}
                   </span>
@@ -122,7 +122,7 @@ export async function RateCardsPanel({
                       {q.price.toString()} {q.currency}
                       {q.priceUnit !== "FLAT" ? ` (${q.priceUnit})` : ""}
                       {q.includedText ? <>{` · ${t("included")}: `}{withSafeEmails(q.includedText)}</> : ""}
-                      {q.excludedText ? ` · ${t("excluded")}: ${q.excludedText}` : ""}
+                      {q.excludedText ? <>{` · ${t("excluded")}: `}{withSafeEmails(q.excludedText)}</> : ""}
                       {" · "}
                       {q.appliedAt ? t("applied") : t("pending")}
                     </li>

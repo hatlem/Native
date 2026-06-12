@@ -9,7 +9,7 @@ import {
   recordOfferFromContactAction,
 } from "@/app/price-actions";
 import { SubmitButton } from "@/components";
-import { withSafeEmails } from "@/components/safe-email";
+import { SafeEmail, withSafeEmails } from "@/components/safe-email";
 
 const CHANNELS = ["EMAIL", "PHONE", "WEB_FORM", "LINKEDIN", "OTHER"] as const;
 
@@ -64,7 +64,7 @@ export async function ContactHistoryPanel({
                     {e.contactedAt.toISOString().slice(0, 10)}
                     {e.salesContact ? ` · ${e.salesContact.name}` : ""}
                   </span>
-                  {e.note && <div className="small" style={{ marginTop: 4 }}>{e.note}</div>}
+                  {e.note && <div className="small" style={{ marginTop: 4 }}>{withSafeEmails(e.note)}</div>}
                 </div>
                 <form action={deleteContactLogAction} style={{ flexShrink: 0 }}>
                   <input type="hidden" name="locale" value={locale} />
@@ -184,7 +184,7 @@ export async function ContactHistoryPanel({
                       <select name="salesContactId" defaultValue={e.salesContactId ?? ""}>
                         <option value="">{t("noContact")}</option>
                         {contacts.map((c) => (
-                          <option key={c.id} value={c.id}>{c.name} — {c.email}</option>
+                          <option key={c.id} value={c.id}>{c.name} — <SafeEmail address={c.email} /></option>
                         ))}
                       </select>
                     </label>
@@ -232,7 +232,7 @@ export async function ContactHistoryPanel({
             <select id="cl-contact" name="salesContactId">
               <option value="">{t("noContact")}</option>
               {contacts.map((c) => (
-                <option key={c.id} value={c.id}>{c.name} — {c.email}</option>
+                <option key={c.id} value={c.id}>{c.name} — <SafeEmail address={c.email} /></option>
               ))}
             </select>
           </div>
