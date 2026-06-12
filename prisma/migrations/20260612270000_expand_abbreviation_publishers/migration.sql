@@ -35,8 +35,28 @@ BEGIN
       AND ccu.table_name = 'Publisher' AND ccu.column_name = 'id'
       AND tc.table_schema = 'public'
   LOOP
-    EXECUTE format('UPDATE %I SET %I = $1 WHERE %I = $2', r.tbl, r.col, r.col)
-      USING dst_id, src_id;
+    -- Row by row with a unique_violation handler: when dst already has an
+    -- equivalent row (same contact email, same externalRef, ...) the src
+    -- row is a duplicate and is dropped instead of aborting the migration
+    -- (same pattern as the 06-11 publisher merges).
+    DECLARE row_id text;
+    BEGIN
+      FOR row_id IN EXECUTE format('SELECT id FROM %I WHERE %I = $1', r.tbl, r.col) USING src_id
+      LOOP
+        BEGIN
+          EXECUTE format('UPDATE %I SET %I = $1 WHERE id = $2', r.tbl, r.col)
+            USING dst_id, row_id;
+        EXCEPTION WHEN unique_violation THEN
+          EXECUTE format('DELETE FROM %I WHERE id = $1', r.tbl) USING row_id;
+        END;
+      END LOOP;
+    EXCEPTION WHEN undefined_column THEN
+      -- Join/link tables without an `id` column: bulk-update, duplicates
+      -- removed first.
+      EXECUTE format('DELETE FROM %I a WHERE a.%I = $1 AND EXISTS (SELECT 1 FROM %I b WHERE b.%I = $2 AND b = a)', r.tbl, r.col, r.tbl, r.col) USING src_id, dst_id;
+      EXECUTE format('UPDATE %I SET %I = $1 WHERE %I = $2', r.tbl, r.col, r.col)
+        USING dst_id, src_id;
+    END;
   END LOOP;
   DELETE FROM "Publisher" WHERE id = src_id;
 END $$ LANGUAGE plpgsql;
@@ -190,8 +210,34 @@ WHERE p.name = 'NBF (NO)' AND t.name = 'Blikkenslageren';
 SELECT _to_pub2(t.slug, 'Norsk brannvernforening (NO)')
 FROM "Title" t JOIN "Publisher" p ON p.id = t."publisherId"
 WHERE p.name = 'NBF (NO)' AND t.name = 'Brann og Sikkerhet';
-DELETE FROM "Publisher" p WHERE p.name = 'NBF (NO)'
-  AND NOT EXISTS (SELECT 1 FROM "Title" t WHERE t."publisherId" = p.id);
+-- Delete the emptied NBF row only when NOTHING references it (any FK,
+-- not just Title — a stray SalesContact would otherwise abort the whole
+-- migration with a restrict violation).
+DO $$
+DECLARE nbf_id text; refs int := 0; r record;
+BEGIN
+  SELECT id INTO nbf_id FROM "Publisher" WHERE name = 'NBF (NO)';
+  IF nbf_id IS NULL THEN RETURN; END IF;
+  FOR r IN
+    SELECT tc.table_name AS tbl, kcu.column_name AS col
+    FROM information_schema.table_constraints tc
+    JOIN information_schema.key_column_usage kcu
+      ON tc.constraint_name = kcu.constraint_name AND tc.table_schema = kcu.table_schema
+    JOIN information_schema.constraint_column_usage ccu
+      ON tc.constraint_name = ccu.constraint_name AND tc.table_schema = ccu.table_schema
+    WHERE tc.constraint_type = 'FOREIGN KEY'
+      AND ccu.table_name = 'Publisher' AND ccu.column_name = 'id'
+      AND tc.table_schema = 'public'
+  LOOP
+    EXECUTE format('SELECT count(*) FROM %I WHERE %I = $1', r.tbl, r.col)
+      INTO refs USING nbf_id;
+    IF refs > 0 THEN
+      RAISE NOTICE 'NBF (NO) still referenced by %.% — leaving row in place', r.tbl, r.col;
+      RETURN;
+    END IF;
+  END LOOP;
+  DELETE FROM "Publisher" WHERE id = nbf_id;
+END $$;
 
 -- ---------- Børn & Unge duplicate (PM row vs BUPL row) ----------
 UPDATE "Product" SET active = false, bookable = false, "updatedAt" = now()

@@ -44,9 +44,13 @@ function buildClient() {
 export const prisma: PrismaClient =
   globalForPrisma.prisma ??
   (new Proxy({} as PrismaClient, {
-    get(_target, prop, receiver) {
+    get(_target, prop) {
       const client = (globalForPrisma.prisma ??= buildClient());
-      const value = Reflect.get(client, prop, receiver);
+      // IMPORTANT: no `receiver` here. Passing the proxy as receiver made
+      // PrismaClient's internal lazy getters run with `this = proxy`, so
+      // every internal property access re-entered this trap — requests
+      // hung and prod returned 502s (2026-06-12).
+      const value = Reflect.get(client, prop);
       return typeof value === "function" ? value.bind(client) : value;
     },
   }) as PrismaClient);
