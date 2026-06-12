@@ -17,6 +17,7 @@ import { PendingQuotesPanel } from "./_components/PendingQuotesPanel";
 import { ContactHistoryPanel } from "./_components/ContactHistoryPanel";
 import { RateCardsPanel } from "./_components/RateCardsPanel";
 import { SubmitButton } from "@/components";
+import { withSafeEmails } from "@/components/safe-email";
 
 export const dynamic = "force-dynamic";
 
@@ -431,7 +432,7 @@ export default async function DeskTitleEditPage({
                   })()}
                   {product.includedText ? (
                     <div className="muted small" style={{ marginTop: 4 }}>
-                      Mediet oppgir inkludert: {product.includedText}
+                      Mediet oppgir inkludert: {withSafeEmails(product.includedText)}
                     </div>
                   ) : null}
                   {product.leadTimeDays == null ? (

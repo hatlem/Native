@@ -9,6 +9,7 @@ import {
   recordOfferFromContactAction,
 } from "@/app/price-actions";
 import { SubmitButton } from "@/components";
+import { withSafeEmails } from "@/components/safe-email";
 
 const CHANNELS = ["EMAIL", "PHONE", "WEB_FORM", "LINKEDIN", "OTHER"] as const;
 
@@ -78,7 +79,7 @@ export async function ContactHistoryPanel({
                   {e.quotes.map((q) => (
                     <li key={q.id} className="small muted">
                       └─ {q.product?.name ?? q.draftProductName ?? "—"}: {q.price.toString()} {q.currency}
-                      {q.includedText ? ` · ${t("included")}: ${q.includedText}` : ""}
+                      {q.includedText ? <>{` · ${t("included")}: `}{withSafeEmails(q.includedText)}</> : ""}
                       {q.excludedText ? ` · ${t("excluded")}: ${q.excludedText}` : ""}
                       {" · "}
                       {q.appliedAt ? t("applied") : t("pending")}

@@ -2,6 +2,7 @@ import { getTranslations } from "next-intl/server";
 import { prisma } from "@/lib/prisma";
 import { rateCardDownloadUrl } from "@/lib/ratecard/store";
 import { publicationCompleteness } from "@/lib/ratecard/extract";
+import { withSafeEmails } from "@/components/safe-email";
 
 type Translator = Awaited<ReturnType<typeof getTranslations>>;
 
@@ -120,7 +121,7 @@ export async function RateCardsPanel({
                       └─ {q.product?.name ?? q.draftProductName ?? "—"}:{" "}
                       {q.price.toString()} {q.currency}
                       {q.priceUnit !== "FLAT" ? ` (${q.priceUnit})` : ""}
-                      {q.includedText ? ` · ${t("included")}: ${q.includedText}` : ""}
+                      {q.includedText ? <>{` · ${t("included")}: `}{withSafeEmails(q.includedText)}</> : ""}
                       {q.excludedText ? ` · ${t("excluded")}: ${q.excludedText}` : ""}
                       {" · "}
                       {q.appliedAt ? t("applied") : t("pending")}

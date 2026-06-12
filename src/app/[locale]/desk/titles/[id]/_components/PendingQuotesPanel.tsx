@@ -6,6 +6,7 @@ import {
   editPendingQuoteAction,
 } from "@/app/price-actions";
 import { SubmitButton } from "@/components";
+import { withSafeEmails } from "@/components/safe-email";
 
 export async function PendingQuotesPanel({
   locale,
@@ -106,7 +107,7 @@ export async function PendingQuotesPanel({
                 </div>
                 {q.includedText && (
                   <div className="muted small" style={{ marginTop: 4 }}>
-                    <strong>{t("included")}:</strong> {q.includedText}
+                    <strong>{t("included")}:</strong> {withSafeEmails(q.includedText)}
                   </div>
                 )}
                 {q.excludedText && (
