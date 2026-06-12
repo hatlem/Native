@@ -1456,13 +1456,13 @@
   "auditedAt": "2026-06-06"
  },
  {
-  "email": "vanessa.english@fieldsportspress.com",
+  "email": "vanessa.english@gunmart.net",
   "market": "UK",
   "titles": [
    "Gun Mart"
   ],
-  "verifiedBy": "audit-0606:email-on-site",
-  "auditedAt": "2026-06-06"
+  "verifiedBy": "bounce-fix-0612:gunmart.net/advertise",
+  "auditedAt": "2026-06-12"
  },
  {
   "email": "john.woods@pensionsage.com",
