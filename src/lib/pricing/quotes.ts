@@ -250,10 +250,13 @@ export async function activateQuoteProducts(args: {
   actorUserId: string;
   titleId?: string;
 }) {
+  // Activate every confirmed-price product that is still inactive — whether the
+  // price came from a PriceQuote (publisher reply) or a script-seeded rate-card
+  // import (e.g. confirmedSource "EgmontPrisfil2026"). Policy: if we have a
+  // confirmed price, the product should be live so its band shows in the catalog.
   const where = {
     active: false,
     confirmedAt: { not: null },
-    confirmedSource: { startsWith: "PriceQuote:" },
     ...(args.titleId ? { titleId: args.titleId } : {}),
   };
   const products = await prisma.product.findMany({

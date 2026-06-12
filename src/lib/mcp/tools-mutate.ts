@@ -222,7 +222,7 @@ export const mutateToolDefinitions = (actorId: string) => ({
 
   native_activate_quote_products: {
     description:
-      "Activate quote-created Products (active=false, confirmedSource PriceQuote:*) after desk review so their confirmed prices show as catalog bands. Sets active+bookable. Optional titleId narrows to one title.",
+      "Activate inactive Products that have a confirmed price (confirmedAt set) — from a publisher PriceQuote OR a script-seeded rate-card import (e.g. Egmont) — so their confirmed prices show as catalog bands. Sets active+bookable. Optional titleId narrows to one title.",
     parameters: z.object({ titleId: z.string().optional() }),
     handler: async (a: { titleId?: string }) =>
       activateQuoteProducts({ actorUserId: actorId, titleId: a.titleId }),
