@@ -7,6 +7,7 @@ import { authenticate, requestMagicLink } from "@/app/auth-actions";
 import { LandingShell } from "@/app/landing-shell";
 import { SubmitButton } from "@/components";
 import { DemoChips, type DemoAccount } from "./demo-chips";
+import { withSafeEmails } from "@/components/safe-email";
 
 export const dynamic = "force-dynamic";
 
@@ -54,7 +55,7 @@ export default async function SignInPage({
           <p className="lead">{t("welcomeLead")}</p>
           <div className="pull">
             <strong>{t("pullTitle")}</strong>
-            {t("pullBody")}
+            {withSafeEmails(t("pullBody"))}
           </div>
         </div>
 

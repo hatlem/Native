@@ -1,0 +1,30 @@
+{
+  "batch": "FI/UK outreach 2026-06-12",
+  "from": "andreas@admirate.no",
+  "voice": "Admirate / Andreas Hatlem, per-title tailored, local language",
+  "FI_sent": [
+    { "email": "annons@bbl.fi", "lang": "sv", "titles": "HBL / KSF Media (Hufvudstadsbladet, Borgåbladet, Vasabladet m.fl.)", "status": "sent" },
+    { "email": "mediamyynti@aamuset.fi", "lang": "fi", "titles": "Turun Sanomat, Aamuset", "status": "sent", "reply": "PRICE — Aamuset native/advertorial 2026: 900 EUR net+VAT (1 wk news feed + permanent on advertorial subpage); 600 EUR net+VAT (advertorial subpage only); stays >=2yr; client supplies text+images; marked 'Mainos' + advertiser. From Susanna Lumikanta, Myyntijohtaja, susanna.lumikanta@aamuset.fi, 02 2693 016 / 050 4653 640. https://www.aamuset.fi/mainosartikkelit/" },
+    { "email": "ilmoitukset@shl.fi", "lang": "fi", "titles": "Sairaanhoitaja, Hammaslääkärilehti", "status": "sent", "reply": "auto-ack (kiitos viestistäsi)" },
+    { "email": "trafiikki@kaakonviestinta.fi", "lang": "fi", "titles": "Etelä-Suomen Sanomat, Kymen Sanomat", "status": "sent" },
+    { "email": "mediamyynti@apteekkariliitto.fi", "lang": "fi", "titles": "Apteekkari", "status": "sent" },
+    { "email": "marianne.kaartoaho@kuntalehti.fi", "lang": "fi", "titles": "Kuntalehti", "status": "sent" },
+    { "email": "sanna.makinen@saarsalo.fi", "lang": "fi", "titles": "Maatilan Pellervo", "status": "sent" },
+    { "email": "mediamyynti@metsalehti.fi", "lang": "fi", "titles": "Metsälehti", "status": "sent" },
+    { "email": "minna.alho@saarsalo.fi", "lang": "fi", "titles": "Kirkko ja Kaupunki, Acatiimi", "status": "sent" },
+    { "email": "katariina.lankinen@suomenmaa.fi", "lang": "fi", "titles": "Suomenmaa", "status": "sent" }
+  ],
+  "UK_sent": [
+    { "email": "advertising@immediate.co.uk", "titles": "Immediate Media (BBC Good Food, Radio Times, Science Focus, Top Gear, etc.)", "status": "sent" },
+    { "email": "hello@mediaconcierge.co.uk", "titles": "The Scotsman, Yorkshire Post, Sheffield Star, Belfast News Letter, etc.", "status": "sent" },
+    { "email": "newspapersales@dcthomson.co.uk", "titles": "The Courier, Press and Journal, The Sunday Post", "status": "sent", "reply": "auto-ack (monitored Mon-Fri)" },
+    { "email": "adops@telegraph.co.uk", "titles": "Daily Telegraph, Sunday Telegraph", "status": "sent" },
+    { "email": "tim.deeks@canopymedia.co.uk", "titles": "The Big Issue", "status": "sent" },
+    { "email": "marketing@mnamedia.co.uk", "titles": "Shropshire Star, Express & Star", "status": "sent", "reply": "auto-ack (unmonitored inbox)" },
+    { "email": "talktome@thekmgroup.co.uk", "titles": "Kent Messenger, KentOnline", "status": "sent", "reply": "auto-ack (thank you for contacting)" },
+    { "email": "partnershiprequests@buzzfeed.com", "titles": "HuffPost UK, BuzzFeed UK", "status": "sent" },
+    { "email": "vanessa.english@fieldsportspress.com", "titles": "Gun Mart", "status": "BOUNCED", "error": "550 5.1.1 no such user at fieldsportspress.com (Google) — address dead, needs a valid Gun Mart / Fieldsports Press contact" },
+    { "email": "john.woods@pensionsage.com", "titles": "Pensions Age, Charity Times", "status": "sent" }
+  ],
+  "catalog_note": "UK 4-10 niche titles (Telegraph, Big Issue, Shropshire Star, Kent Messenger, HuffPost/BuzzFeed UK, Gun Mart, Pensions Age) and the FI titles are NOT in the NativeSpin catalog, so no ContactLog/PriceQuote could be attached. UK 1-3 (Immediate, Media Concierge, DC Thomson) map to existing catalog titles. Capturing the Aamuset price requires first creating the FI title."
+}

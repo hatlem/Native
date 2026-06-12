@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { getTranslations } from "next-intl/server";
 import { Link } from "@/i18n/navigation";
 import { LandingShell } from "@/app/landing-shell";
+import { withSafeEmails } from "@/components/safe-email";
 
 export async function generateMetadata({
   params,
@@ -57,7 +58,7 @@ Content-Type: application/json
 {`GET /api/v1/catalog/titles
 Authorization: Bearer atn_<your-token>`}
           </pre>
-          <p className="prose">{t("authRequest")}</p>
+          <p className="prose">{withSafeEmails(t("authRequest"))}</p>
         </div>
       </section>
 

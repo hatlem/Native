@@ -11,3 +11,4 @@ export { DetailHead, MetaRow } from "./detail-head";
 export { QuoteCard } from "./quote-card";
 export { SubmitButton } from "./submit-button";
 export { MailLink } from "./mail-link";
+export { SafeEmail, withSafeEmails } from "./safe-email";

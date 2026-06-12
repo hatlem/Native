@@ -1,0 +1,954 @@
+{
+  "total": 117,
+  "exists": [
+    {
+      "id": "cmpmdiqal02mz0hu0evy08xlm",
+      "name": "Dansk",
+      "exists": true,
+      "confidence": "high",
+      "correctedName": "DANSK Magazine",
+      "evidence": "DANSK Magazine is a real, internationally distributed Danish fashion magazine founded in Copenhagen in 2002 by Uffe Buchard and Kim Grenaa, published bi-annually, distributed in ~20 countries (celebrated 20 years with a 2022 retrospective book; still sold via Newsstand.co.uk, Magazine Canteen, Readly). The catalog's URL (dansk.dk) is WRONG — that is a family clothing chain, not the magazine. The magazine's title is genuine and current, though I could not confirm a specific 2025/2026 issue (its own domain danskmagazine.com appears compromised). The publication itself is real. | RECHECK confirms: DANSK Magazine is a real, internationally distributed Danish fashion magazine founded in Copenhagen in 2002 by Uffe Buchard and Kim Grenaa. Published biannually in English, tag-lined 'the world's most independent fashion magazine', distributed across 20+ countries. Confirmed via its own website (danskmagazine.com), a Wikipedia 'List of magazines in Denmark' entry, Magpile, and active subscription retailers (Magazine Cafe Store, Papercut showing Issue 47 SS22).",
+      "sourceUrl": "https://www.newsstand.co.uk/550-Fashion-Magazines/18658-Subscribe-to-DANSK-Magazine-Subscription.aspx"
+    },
+    {
+      "id": "cmpmdiqam02p90hu0wgecpwsn",
+      "name": "Tjenestemandsbladet",
+      "exists": true,
+      "correctedName": "CS-Bladet (Centralforeningen for Stampersonel)",
+      "confidence": "high",
+      "evidence": "No publication titled 'Tjenestemandsbladet' found. The publisher CS (Centralforeningen for stampersonel, cs.dk) publishes 'CS-Bladet', listed by name in the Danske Medier media database (blad=65) and on cs.dk/fagforening/nyheder/cs-bladet/, currently published 3x/year. The catalog entry appears to be a wrong/generic name for the real, currently-published CS-Bladet. | RECHECK confirms: The name 'Tjenestemandsbladet' returns no results as a real Danish outlet. However, the claimed source URL (https://media.danskemedier.dk/default.asp?blad=65, blad=65) resolves to 'CS-Bladet', published by Centralforeningen for Stampersonel (Central Association for Military Personnel, the largest Danish defence trade union, ~9,000 members). This exactly matches the suggested correction. CS-Bladet is a real, currently-published trade magazine listed in Danske Medier's media database (released several times per year). The outlet at the cited source is real, so exists=true, but the correct name is CS-Bladet, not Tjenestemandsbladet.",
+      "sourceUrl": "https://media.danskemedier.dk/default.asp?blad=65"
+    },
+    {
+      "id": "cmpmdiqa301x60hu07mt81l7d",
+      "name": "Folkehøgskolen",
+      "exists": true,
+      "confidence": "high",
+      "evidence": "'Folkehøgskolen' is a real, currently published magazine issued by Folkehøgskoleforbundet (the frilynt branch). It is listed by name in the Norwegian trade-press directory Fagpressen (fagkilde.fagpressen.no/magasiner/0419/) as published 5 times per year, described as the organization's mouthpiece carrying current pedagogical, political and cultural material; an archive is maintained at frilyntfolkehogskole.no. The prior note conflated it with the school-finder portal folkehogskole.no and the Christian branch's separate journal 'Steg'; the title itself is genuine. | RECHECK confirms: Folkehøgskolen is a real, currently-published Norwegian magazine put out by Folkehøgskoleforbundet (Norwegian Association of Folk High Schools), published 5 issues per year from Oslo with editors Sonja Evang and Øyvind Krabberød. It is listed in the Fagpressen (Norwegian Specialised Press Association) catalog (catalog code 0419) and confirmed via independent search: the magazine archive is maintained at frilyntfolkehogskole.no with recent issues available in responsive/PDF format (issue 5/2022 onward).",
+      "sourceUrl": "https://fagkilde.fagpressen.no/magasiner/0419/"
+    },
+    {
+      "id": "cmpmdiqaf02eh0hu06w0f0b23",
+      "name": "Mersmak",
+      "exists": true,
+      "correctedName": "Mer Smak",
+      "confidence": "high",
+      "evidence": "The catalog url mersmak.se is an unrelated accounting firm, but a real publication exists under a slightly different name: 'Mer Smak' is Coop's member food magazine (originally named 'Mersmak', founded 1990 by Konsumentföreningen Stockholm; renamed 'Mer Smak' in 2013). It was discontinued Nov 2023 but resumed publication in May 2024 in collaboration with Coop Norrbotten, so it is currently published. The catalog entry's exact spelling 'Mersmak' matches the original/historic name. | RECHECK confirms: Independently confirmed via Swedish Wikipedia, Coop Sweden's own site (coop.se/medlem/mersmak), Vi Media, Mediakraft, and Readly. Mer Smak is Coop Sweden's member magazine, produced by Vi Media on behalf of Coop Sverige, published ~11 issues/year with over 1 million readers. Originally named 'Mersmak' (member publication for Konsumentforeningen Stockholm since 1990), it was renamed to 'Mer Smak' in 2013. Coop announced its closure in Nov 2023, but Konsumentforeningen Stockholm relaunched it in May 2024 in collaboration with Coop Norrbotten, distributed in Coop stores. It is a real, currently-published outlet.",
+      "sourceUrl": "https://sv.wikipedia.org/wiki/Mer_Smak"
+    }
+  ],
+  "deactivate": [
+    {
+      "id": "cmpmdiqbh03w60hu0ur2mlqfu",
+      "name": "Schweizer Hotelier",
+      "exists": false,
+      "confidence": "high",
+      "evidence": "Searched 'Schweizer Hotelier' + HotellerieSuisse. HotellerieSuisse's actual trade publications are 'htr hotelrevue' (monthly, since 1892) and 'Hotelière' (6x/year). No current title named 'Schweizer Hotelier' exists. Only a historical 'Schweizer Hotel-Revue' (1892-1949) appears on e-periodica.ch. The independent magazine 'Hotelier' (hotelier.ch) is a different publisher. No masthead, current issue, or media-kit listing 'Schweizer Hotelier'.",
+      "sourceUrl": "https://www.hotelleriesuisse.ch/de/verband-und-geschaeftsstelle/portraet/htr-hotelrevue"
+    },
+    {
+      "id": "cmpmdiqbh03we0hu0942wa3rm",
+      "name": "Schweizer Verkehrs Revue",
+      "exists": false,
+      "confidence": "high",
+      "evidence": "Searched 'Schweizer Verkehrs Revue' Switzerland. No publication by this name found. cargorail.ch (VAP) publishes no such magazine. Only similarly-named real titles exist: 'Schweizer Eisenbahn-Revue' (railway), 'Automobil Revue' (auto, since 1906), 'Verkehrshaus Magazin' (museum, quarterly). None match this exact name.",
+      "sourceUrl": "https://www.magazinecollector.net/magazines/trains/3772-schweizer-eisenbahn-revue/"
+    },
+    {
+      "id": "cmpmdiqbd03pb0hu0xu6np7y3",
+      "name": "Bauwirtschaft",
+      "exists": false,
+      "confidence": "high",
+      "evidence": "Searched 'Bauwirtschaft' Zeitschrift Bauverlag. Bauverlag (the catalog's URL) has 18 media brands and does NOT publish a title simply called 'Bauwirtschaft'; its construction-economics title is 'baumarkt+bauwirtschaft' (different name). The only journal titled 'Bauwirtschaft' is 'BauW - Zeitschrift Bauwirtschaft' published by Wolters Kluwer/Luchterhand (a construction-law journal), a different publisher entirely. So no Bauverlag publication by this name exists.",
+      "sourceUrl": "https://www.bauverlag.de/en/baumarkt_bauwirtschaft_1097979.html"
+    },
+    {
+      "id": "cmpmdiqbd03q80hu0608kov04",
+      "name": "klasse!",
+      "exists": false,
+      "confidence": "high",
+      "evidence": "Searched Klett 'Klasse!' magazine. Klett's 'KLASSE!' is a German-as-a-foreign-language coursebook/textbook series (Lehrwerk, levels A1-B1, Novice Low to Intermediate High), not a periodical magazine. No evidence of any ad-carrying magazine or recurring publication by this name from Klett. Mis-seeded catalog entry.",
+      "sourceUrl": "https://klettwl.com/store/klasse"
+    },
+    {
+      "id": "cmpmdiqan02r30hu0z81ii4vq",
+      "name": "Atom",
+      "exists": false,
+      "confidence": "high",
+      "evidence": "Searched DTU magazine 'Atom'. DTU's actual magazine is 'Dynamo' (alumni.dtu.dk). No DTU publication named 'Atom' found in searches, alumni pages, or publication lists. DTU has nuclear-energy research (a new 'DTU Nuclear Energy Technology' center) but no magazine titled 'Atom'. Hallucinated/mis-seeded.",
+      "sourceUrl": "https://www.alumni.dtu.dk/"
+    },
+    {
+      "id": "cmpmdiqal02n30hu0eiuaml7g",
+      "name": "Bilen",
+      "exists": false,
+      "confidence": "high",
+      "evidence": "Searched FDM member magazine 'Bilen'. FDM's member magazine is 'Motor' (founded 1906, Denmark's largest car magazine, printed 9x/year). No FDM publication called 'Bilen' exists. Misnamed/hallucinated catalog entry.",
+      "sourceUrl": "https://fdm.dk/magasinet-motor"
+    },
+    {
+      "id": "cmpmdiqam02pc0hu0z302eu4q",
+      "name": "DanskFire",
+      "exists": false,
+      "confidence": "high",
+      "evidence": "Searched 'DanskFire' + Beredskabsstyrelsen (brs.dk, Danish Emergency Management Agency). No publication named 'DanskFire' appears in their publications list or anywhere. brs.dk publishes guidance documents and statistics ('Redningsberedskabet i tal'), not a magazine by this name. Hallucinated.",
+      "sourceUrl": "https://www.brs.dk/da/nyheder-og-publikationer/publikationer2/alle-publikationer/"
+    },
+    {
+      "id": "cmpmdiqan02ql0hu0mtqj1u04",
+      "name": "DBU Magasin",
+      "exists": false,
+      "confidence": "high",
+      "evidence": "Searched DBU (Dansk Boldspil-Union) magazine. No current national publication titled 'DBU Magasin'. dbu.dk is the football federation site. Real DBU-related titles are regional and differently named: 'Magasinet Fodbold' (DBU Jylland, last issue autumn 2025) and 'Fodboldmagasinet København' (DBU København). Neither is named 'DBU Magasin', and the closest (Magasinet Fodbold) has ceased.",
+      "sourceUrl": "https://www.dbujylland.dk/klubben/magasinet-fodbold/"
+    },
+    {
+      "id": "cmpmdiqan02qp0hu0c1grw01u",
+      "name": "Faglig Senior",
+      "exists": false,
+      "confidence": "high",
+      "evidence": "Searched 'Faglig Senior' / 'Faglige Seniorer' publication. The organization Faglige Seniorer (fagligsenior.dk, Denmark's 2nd-largest senior org) exists but publishes only 'Seniorhåndbogen' (a reference handbook) and a newsletter. No publication titled 'Faglig Senior' exists. The catalog URL foa.dk/senior is about senior work-arrangement rights, not a magazine.",
+      "sourceUrl": "https://fagligsenior.dk/om-faglige-seniorer/"
+    },
+    {
+      "id": "cmpmdiqao02rb0hu0baugxkph",
+      "name": "FOTM (Frivilligt Folkelig Oplysning)",
+      "exists": false,
+      "confidence": "high",
+      "evidence": "Searched the exact acronym 'FOTM' and 'Frivilligt Folkeligt Oplysning' + Danmark. No organization or publication under this acronym exists. dfs.dk is Dansk Folkeoplysnings Samråd, an umbrella body that does not publish a title by this name. Related Danish folkeoplysning bodies found (FOF, FO) but none called FOTM. Appears garbled/hallucinated.",
+      "sourceUrl": "https://da.wikipedia.org/wiki/FOF"
+    },
+    {
+      "id": "cmpmdiqal02nj0hu097jzceqx",
+      "name": "Hesten",
+      "exists": false,
+      "confidence": "high",
+      "evidence": "Searched 'Hesten' magasin Danmark and hesten.dk. No Danish magazine simply titled 'Hesten' found in searches or the Danske Medier media database. Real Danish horse magazines are differently named: Magasinet Hest, Ridehesten (Magasinet Ridehesten), HesteMagasinet. hesten.dk is a generic horse-facts content page, not a publication.",
+      "sourceUrl": "https://media.danskemedier.dk/?blad=234"
+    },
+    {
+      "id": "cmpmdiqao02rc0hu0jguv2wie",
+      "name": "HR Magasinet",
+      "exists": false,
+      "confidence": "high",
+      "evidence": "Searched 'HR Magasinet' Danmark + Djøf. No Djøf publication by this name exists; Djøf publishes 'Djøfbladet' (4x/year, current). Real DK HR magazines are differently named: 'HR-chefen' (DANSK HR, since 1992, 6x/year), 'HR & Ledelse' (DANSK HR), 'HR JURA Magasinet'. No publication exactly titled 'HR Magasinet' from this publisher. Likely hallucinated.",
+      "sourceUrl": "https://www.djoefbladet.dk/indholdssider/magasin"
+    },
+    {
+      "id": "cmpmdiqal02nf0hu0i8vcgoqa",
+      "name": "Hund & Træning",
+      "exists": false,
+      "confidence": "high",
+      "evidence": "Searched 'Hund & Træning' magasin Dansk Kennel Klub. DKK's member magazine is 'HUNDEN' (published 10x/year, first issued Jan 1891), which covers training (træning) among other topics. No separate publication titled 'Hund & Træning' found at dkk.dk or elsewhere. The training term appears to have been confused into a fabricated title.",
+      "sourceUrl": "https://www.dkk.dk/medlemskab/medlemsfordele/medlemsbladet-hunden"
+    },
+    {
+      "id": "cmpmdiqal02ng0hu05d47kn57",
+      "name": "Kennel-Bladet",
+      "exists": false,
+      "confidence": "high",
+      "evidence": "Searched 'Kennel-Bladet' Dansk Kennel Klub. DKK's member magazine has been 'HUNDEN' since January 1891; it is listed in the Danske Medier database (blad 38). No evidence of any DKK title called 'Kennel-Bladet' currently or historically. Likely mis-seeded/hallucinated name.",
+      "sourceUrl": "https://media.danskemedier.dk/default.asp?blad=38"
+    },
+    {
+      "id": "cmpmdiqal02na0hu0oomz5vvb",
+      "name": "Lystfiskeri Magasinet",
+      "exists": false,
+      "confidence": "high",
+      "evidence": "Searched 'Lystfiskeri Magasinet' Danmark and lystfiskeren.dk. No magazine by this exact name found. lystfiskeren.dk is a fishing-gear retailer, not a publisher. Real DK fishing publications are differently named: Lystfiskermagasinet (one word), Magasinet Sportsfiskeren (Danmarks Sportsfiskerforbund), Lystfiskeri-Tidende (since 1889), Fisk & Fri. No exact match.",
+      "sourceUrl": "https://lystfiskermagasinet.dk/om-os/"
+    },
+    {
+      "id": "cmpmdiqal02o30hu0oytakvue",
+      "name": "Maden",
+      "exists": false,
+      "confidence": "high",
+      "evidence": "Searched 'Maden' magasin Danmark + madmagasin. No DK food magazine simply titled 'Maden' confirmed. maden.dk is a BBQ catering/food-delivery business, not a magazine. Real DK food magazines are differently named: Madmagasinet (madmagasinet.dk), MAD & venner, SPIS BEDRE. No exact match.",
+      "sourceUrl": "https://www.madmagasinet.dk/om-madmagasinet"
+    },
+    {
+      "id": "cmpmdiqan02pr0hu0do3egoac",
+      "name": "Madkærligheden",
+      "exists": false,
+      "confidence": "high",
+      "evidence": "Searched 'Madkærligheden' magasin/blad Danmark. The known URL madkærlighed.dk does not resolve. No magazine by this name found in searches or Danish magazine databases. Nearest items are unrelated food blogs/magazines (MAD & venner, recipe site 'Mad og Kærlighed'). Likely hallucinated.",
+      "sourceUrl": "https://madogvenner.dk/1827-2/"
+    },
+    {
+      "id": "cmpmdiqan02qu0hu0hs2q5bzh",
+      "name": "Mit liv",
+      "exists": false,
+      "confidence": "high",
+      "evidence": "Searched 'Mit liv' magasin/blad/medlemsblad Danmark. mitliv.dk is a diabetes/health webshop (ReaMed A/S), not a magazine. No advertising/editorial publication titled exactly 'Mit liv' found. Different real titles exist with 'Liv': 'Magasinet Liv' (lifestyle) and member magazine 'LIV' (Retten til Liv) — neither is 'Mit liv'. No exact match.",
+      "sourceUrl": "https://readmagasiner.dk/magasin-magasinet-liv/"
+    },
+    {
+      "id": "cmpmdiqan02py0hu0n8w6auyz",
+      "name": "Murermester",
+      "exists": false,
+      "confidence": "high",
+      "evidence": "Searched 'Murermester' fagblad/magasin/medlemsblad Danmark. No guild magazine titled 'Murermester' found; murermester.dk is a Copenhagen masonry contractor, not a publication. The bricklaying trade's member magazine is 'Mureren' (3F, Landsklubben for murer-, stenhugger- og stukkatørsvende). Murerlaug guilds exist but publish no title called 'Murermester'. Likely hallucinated.",
+      "sourceUrl": "https://www.3f.dk/kontakt/lands-og-landsbrancheklubber/byggegruppen/landsklubben-for-murer--stenhugger--og-stukkatoersvende/fagbladet-mureren"
+    },
+    {
+      "id": "cmpmdiqal02nx0hu0b8d9a6sh",
+      "name": "Strix Magazine",
+      "exists": false,
+      "confidence": "high",
+      "evidence": "Searched 'Strix Magazine Danmark blad magasin'. The only magazines named Strix are UK-based literary publications (Strix Leeds, a poetry/short-fiction magazine in England). strix.com / strix Group Plc is an Isle of Man kettle-control manufacturer (news-media.html is corporate PR, not a magazine). No Danish publication named 'Strix Magazine' appears in search or the Wikipedia list of Danish magazines. No DK ad-catalog publication exists.",
+      "sourceUrl": "https://www.strixleeds.com/"
+    },
+    {
+      "id": "cmpmdiqam02ok0hu0yzvdo13j",
+      "name": "Sundhed i Praksis",
+      "exists": false,
+      "confidence": "high",
+      "evidence": "Searched 'Sundhed i Praksis blad magasin Danmark'. No publication by this exact name found. Real Danish health magazines are Magasinet Sundhed (Danske Medier mediedatabase), Magasinet Helse, and Region Syddanmark's 'Sund i Syd' — none is 'Sundhed i Praksis'. laeger.dk is the Danish Medical Association and does not publish a title by this name. No evidence it exists.",
+      "sourceUrl": "https://media.danskemedier.dk/default.asp?blad=1273"
+    },
+    {
+      "id": "cmpmdiqal02nc0hu0vd2atys5",
+      "name": "Vand & Vind",
+      "exists": false,
+      "confidence": "high",
+      "evidence": "Searched 'Vand & Vind magasin blad Danmark'. No publication found. The closest real trade journal is 'Vand & Jord' (vand-og-jord.dk), a different title on water/soil topics. havnen.dk (the known URL) is unrelated. No magazine named 'Vand & Vind' exists.",
+      "sourceUrl": "https://vand-og-jord.dk/"
+    },
+    {
+      "id": "cmpmdiqal02o50hu05a1z6bhi",
+      "name": "Vin & Mad",
+      "exists": false,
+      "confidence": "high",
+      "evidence": "Searched 'Vin & Mad magasin blad Danmark tidsskrift'. No editorial magazine by this name found; vinogmad.dk is a wine/spirits webshop. Danish food/wine magazines that do exist are Gastro and Mad & Bolig — not a standalone 'Vin & Mad' title. No evidence of a currently-published publication.",
+      "sourceUrl": "https://www.bias.nu/her-er-de-bedste-magasiner-til-dig-der-holder-af-mad-og-vin/"
+    },
+    {
+      "id": "cmpmdiqak02mc0hu07i13f3ml",
+      "name": "Disney Magasinet",
+      "exists": false,
+      "confidence": "high",
+      "evidence": "Fetched Egmont/Story House Egmont's official magasiner page — it lists Eurowoman, Euroman, Gastro, King, Cafe, ALT for damerne, Vores Born, Kamille, Bamse, plus named Disney titles like Anders And & Co. and Disney Prinsesser. No title named exactly 'Disney Magasinet' exists; it is a generic name not used as a masthead. Likely AI-generated from Disney branding on the publisher site.",
+      "sourceUrl": "https://www.egmont.dk/magasiner"
+    },
+    {
+      "id": "cmpmdiqam02o90hu032g5lr18",
+      "name": "Smag",
+      "exists": false,
+      "confidence": "high",
+      "evidence": "Fetched Egmont's official magasiner page; no title named 'Smag' is listed. The publisher's food magazine is 'Gastro' (storyhouseegmont.dk/gastro). gastro.dk redirects to Euroman's Gastro section. No standalone, currently-published Danish magazine named 'Smag' found in search or the publisher catalog.",
+      "sourceUrl": "https://www.egmont.dk/magasiner"
+    },
+    {
+      "id": "cmpmdiqat02yf0hu0sgysuru2",
+      "name": "Autoala",
+      "exists": false,
+      "confidence": "high",
+      "evidence": "Searched 'Autoala lehti Suomi autoala.fi'. autoala.fi is an automotive-careers recruitment campaign site, not a magazine. The actual Finnish auto trade magazine is 'Suomen Autolehti' (suomenautolehti.fi, published by Autotieto Oy / SATL, since 1933, 5x/year). No publication named 'Autoala' exists.",
+      "sourceUrl": "https://www.suomenautolehti.fi/"
+    },
+    {
+      "id": "cmpmdiqat02ye0hu0ycggotdy",
+      "name": "Auto-Foorumi",
+      "exists": false,
+      "confidence": "high",
+      "evidence": "Searched 'Auto-Foorumi lehti Suomi AKL'. No publication by this name on AKL's site (akl.fi/uutishuone) or elsewhere. Results return only Suomen Autolehti and unrelated AKL events / web forums. AKL lists no member magazine called 'Auto-Foorumi'. No evidence it exists.",
+      "sourceUrl": "https://akl.fi/uutishuone/"
+    },
+    {
+      "id": "cmpmdiqau02z50hu0h9x5l58h",
+      "name": "Eläke",
+      "exists": false,
+      "confidence": "high",
+      "evidence": "Searched 'Eläke lehti Eläkeliitto'. No Finnish magazine named exactly 'Eläke' exists. Eläkeliitto's member magazine is 'EL-Sanomat' (elakeliitto.fi/elakeliitto/el-sanomat/, 5x/year). Other pensioner titles are 'Eläkkeensaaja' (EKL) and 'Eläkeläinen' — none simply 'Eläke'. Garbled/hallucinated entry.",
+      "sourceUrl": "https://elakeliitto.fi/elakeliitto/el-sanomat/"
+    },
+    {
+      "id": "cmpmdiqau02z20hu0zqulwgi4",
+      "name": "Helluntailehti",
+      "exists": false,
+      "confidence": "high",
+      "evidence": "Searched 'Helluntailehti lehti Suomi magazine'. No Finnish publication named 'Helluntailehti' appears anywhere; the cataloged URL helluntaikirkko.fi is the Finnish Pentecostal church organization, not a magazine. The actual Finnish Pentecostal magazine is Ristin Voitto (ristinvoitto.fi, published by Aikamedia), which covers Pentecostal congregations. 'Helluntailehti' is a generic descriptor (helluntai = Pentecost) likely invented from the church homepage.",
+      "sourceUrl": "https://www.ristinvoitto.fi/"
+    },
+    {
+      "id": "cmpmdiqar02vy0hu0me1xoni6",
+      "name": "Kiekkomaa",
+      "exists": false,
+      "confidence": "high",
+      "evidence": "Searched 'Kiekkomaa jääkiekko lehti Suomi'. No publication or media outlet named 'Kiekkomaa' surfaced. The cataloged URL jatkoaika.com brands itself as 'Jatkoaika', and other Finnish hockey media are SuomiKiekko, KiekkoUutiset, Pallomeri. No masthead, issue, or media-kit reference to 'Kiekkomaa' exists. Likely hallucinated/misattributed from jatkoaika.com.",
+      "sourceUrl": "https://www.jatkoaika.com/"
+    },
+    {
+      "id": "cmpmdiqau02za0hu00lcv5lh4",
+      "name": "Kunnallisuusvirka",
+      "exists": false,
+      "confidence": "high",
+      "evidence": "Searched 'Kunnallisuusvirka lehti KT Suomi'. KT (kt.fi, Kunta- ja hyvinvointialuetyönantajat) publishes 'KT-lehti' / 'Kuntatyönantaja-lehti' (ktlehti.fi), four times a year. No publication named 'Kunnallisuusvirka' exists anywhere; the term returns zero relevant hits. Hallucinated entry; the real title is KT-lehti.",
+      "sourceUrl": "https://www.ktlehti.fi/"
+    },
+    {
+      "id": "cmpmdiqas02wm0hu0i2h4de5s",
+      "name": "Lemmikkitaikuri",
+      "exists": false,
+      "confidence": "high",
+      "evidence": "Searched 'Lemmikkitaikuri lehti lemmikki magazine Suomi'. No publication named 'Lemmikkitaikuri' found. The cataloged URL taikuri.com is a parked/for-sale domain. The closest real Finnish pet magazine 'Lemmikki' (Otavamedia) ceased as a standalone title in December 2014; the current pet magazine is 'Pets' (Story House Egmont). Likely hallucinated.",
+      "sourceUrl": "https://fi.wikipedia.org/wiki/Lemmikki_(lehti)"
+    },
+    {
+      "id": "cmpmdiqau02z90hu0vb6tpf19",
+      "name": "Liike",
+      "exists": false,
+      "confidence": "medium",
+      "evidence": "Searched '\"Liike\" lehti liikunta magazine Suomi'. The cataloged URL liike.fi is Liikunnan Kehitysyhteistyö LiiKe ry, a sports-development NGO, not a magazine — no publication called 'Liike' is published there. A separate 'Liike Magazine' (liikemag, an independent fashion/beauty sustainability zine on Issuu/Instagram) exists but is unrelated to the cataloged liike.fi entry and is not a Finnish sports/liikunta publication. No magazine named 'Liike' is published by the cataloged publisher.",
+      "sourceUrl": "https://www.liike.fi/"
+    },
+    {
+      "id": "cmpmdiqas02wr0hu0tm4psjj4",
+      "name": "Luontoilta",
+      "exists": false,
+      "confidence": "high",
+      "evidence": "Searched 'Luontoilta lehti Luonto-Liitto magazine'. Luonto-Liitto (luontoliitto.fi) publishes the children's magazine 'Sieppo' and youth magazine 'Nuorten Luonto'; its own /lehdet page lists no title named 'Luontoilta'. The term returns no hits as a publication. Hallucinated.",
+      "sourceUrl": "https://luontoliitto.fi/lehdet/"
+    },
+    {
+      "id": "cmpmdiqat02y40hu0uhzij4vk",
+      "name": "LVI-Lehti",
+      "exists": false,
+      "confidence": "high",
+      "evidence": "Searched 'LVI-Lehti talotekniikka lehti Suomi'. No magazine named 'LVI-Lehti' exists. The cataloged publisher LVI-TU (lvi-tu.fi) publishes a newsletter, not a named magazine. The actual HVAC-sector magazine is the separately-published 'Talotekniikka-lehti' (talotekniikka-lehti.fi), a SuLVI member benefit. 'LVI-Lehti' is a generic descriptor, not a real masthead.",
+      "sourceUrl": "https://talotekniikka-lehti.fi/"
+    },
+    {
+      "id": "cmpmdiqat02xv0hu0wgkytocs",
+      "name": "Maatilan Tila",
+      "exists": false,
+      "confidence": "high",
+      "evidence": "Searched '\"Maatilan Tila\" lehti maatalous Suomi'. No publication named 'Maatilan Tila' found. The cataloged URL maaseuduntulevaisuus.fi is 'Maaseudun Tulevaisuus'; other real Finnish farm magazines are 'Maatilan Pellervo' and 'Käytännön Maamies'. 'Maatilan Tila' returns no masthead or media-kit hits; likely mislabeled/hallucinated.",
+      "sourceUrl": "https://www.maaseuduntulevaisuus.fi/"
+    },
+    {
+      "id": "cmpmdiqar02vq0hu0xdt2u2uw",
+      "name": "Mopo",
+      "exists": false,
+      "confidence": "high",
+      "evidence": "Searched '\"Mopo\" lehti nuoret magazine Suomi'. No youth magazine named 'Mopo' exists; 'mopo' means moped, and the cataloged URL mopo.fi redirects to moposport.fi, a moped retailer. Only a hobbyist 'Mopo Klassikot' enthusiast publication and an annual 'Mopo 2022' special exist, neither matching a standalone titled magazine 'Mopo'. Catalog entry appears mislabeled/hallucinated.",
+      "sourceUrl": "https://mopoilevatnuoret.fi/"
+    },
+    {
+      "id": "cmpmdiqap02t90hu0um7jxzfo",
+      "name": "Nuorten Sara",
+      "exists": false,
+      "confidence": "high",
+      "evidence": "Searched '\"Nuorten Sara\" lehti magazine Suomi'. No publication named 'Nuorten Sara' found. The cataloged URL nuortenelama.fi is a youth-guidance portal, unrelated. A historical magazine 'Sara' (Sanoma, women 40+, 2006–2012) is defunct and appears only in a media-museum archive. No current 'Nuorten Sara' title exists; hallucinated.",
+      "sourceUrl": "https://fi.wikipedia.org/wiki/Sara_(lehti)"
+    },
+    {
+      "id": "cmpmdiqau02z70hu0e3jdg2i3",
+      "name": "Pankki",
+      "exists": false,
+      "confidence": "high",
+      "evidence": "Searched 'Pankki lehti Finanssiala magazine Finland' and checked Finanssiala (Finance Finland) site. Finanssiala is an industry interest organization that publishes sector reports/statistics and news, not a magazine titled 'Pankki'. 'Pankki' is a generic Finnish word for 'bank'. Not in Wikipedia's List of Finnish magazines. No masthead, issue, or media kit for a publication named 'Pankki'. Likely catalog hallucination.",
+      "sourceUrl": "https://www.finanssiala.fi/en/topics/publications-and-statistics/"
+    },
+    {
+      "id": "cmpmdiqat02y00hu0ieteyfch",
+      "name": "Pinta",
+      "exists": false,
+      "confidence": "medium",
+      "evidence": "Searched 'Pinta lehti Finland magazine' and 'Pinta aikakauslehti'. pinta.fi is a marketing/painting business, not a periodical. No standalone Finnish magazine titled 'Pinta' found; not in Wikipedia's List of Finnish magazines. Closest real title is the painting-trade member magazine 'Väri- ja Pinta' (Pintaurakoitsijat ry), which has CEASED publication, and is not named simply 'Pinta'. No evidence of a current publication titled 'Pinta'.",
+      "sourceUrl": "https://pintaurakoitsijat.fi/"
+    },
+    {
+      "id": "cmpmdiqat02yo0hu0n26civq8",
+      "name": "Poliisi-lehti",
+      "exists": false,
+      "correctedName": "Poliisi & Oikeus",
+      "confidence": "high",
+      "evidence": "poliisi.fi is the Finnish Police agency site (newsroom), not a magazine publisher; no title 'Poliisi-lehti' exists. The actual police professional/member magazine is 'Poliisi & Oikeus' (publisher Suomen Poliisijärjestöjen Liitto, SPJL), published ~5x/year at poliisijaoikeus.fi, formerly 'Poliisimies' until 1995. The catalog's known URL (poliisi.fi) is the wrong publisher, so this entry is a misattribution; the real adjacent title is Poliisi & Oikeus.",
+      "sourceUrl": "https://www.poliisijaoikeus.fi/"
+    },
+    {
+      "id": "cmpmdiqar02vz0hu0aw2j5vk3",
+      "name": "Suomen Hiihtotapahtumat",
+      "exists": false,
+      "confidence": "high",
+      "evidence": "Searched 'Suomen Hiihtotapahtumat hiihtoliitto julkaisu'. The Finnish Ski Association (hiihtoliitto.fi) publishes a competition calendar (Hiihtokalenteri) and news but no periodical titled 'Suomen Hiihtotapahtumat' (literally 'Finnish Ski Events'). No masthead, issue, or media-kit listing. Reads as a generated descriptive phrase, not a real title. Likely hallucination.",
+      "sourceUrl": "https://hiihtoliitto.fi/en/front-page/"
+    },
+    {
+      "id": "cmpmdiqat02xw0hu0taaxuoen",
+      "name": "Suomen Maa- ja Metsätalous",
+      "exists": false,
+      "confidence": "high",
+      "evidence": "Searched 'Suomen Maa- ja Metsätalous lehti julkaisu'. maaseutu.fi is the Finnish rural/EU-financing government portal, not a magazine. The real Finnish agriculture/forestry periodicals are 'Maaseudun Tulevaisuus', 'Metsälehti', etc. No publication titled 'Suomen Maa- ja Metsätalous' found; it is a generic descriptive phrase ('Finnish Agriculture and Forestry'). Likely hallucination.",
+      "sourceUrl": "https://www.maaseuduntulevaisuus.fi/aihe/maa-ja-metsatalous"
+    },
+    {
+      "id": "cmpmdiqat02y30hu0dcl8chla",
+      "name": "Suomen Sähköalan Liitto",
+      "exists": false,
+      "confidence": "high",
+      "evidence": "The catalog URL ssl.fi issues a 301 redirect to suunnistusliitto.fi (Finnish Orienteering Federation), an unrelated org. No organization 'Suomen Sähköalan Liitto' exists; the electrical trade union is 'Sähköalojen ammattiliitto' (Sähköliitto) and electrical pro magazines are 'Sähkö & Tele' (SIL ry) and 'Sähkömaailma'. 'Suomen Sähköalan Liitto' is an org name, not a publication, and it does not exist. Hallucination/misattribution.",
+      "sourceUrl": "https://suunnistusliitto.fi/"
+    },
+    {
+      "id": "cmpmdiqap02tc0hu05s0cv32b",
+      "name": "Tammelan Sanomat",
+      "exists": false,
+      "confidence": "high",
+      "evidence": "Searched 'Tammelan Sanomat Forssa sanomalehti'. No newspaper by this name found. Tammela is covered by Forssan Lehti (the listed URL, an unrelated active paper) and the now-defunct free sheet Seutu-Sanomat (closed 2020). No masthead, archive, or registry entry for 'Tammelan Sanomat'. Likely hallucination.",
+      "sourceUrl": "https://www.forssanlehti.fi/aihe/Tammelan_kunta"
+    },
+    {
+      "id": "cmpmdiqas02x70hu0ken301p7",
+      "name": "Tehy-Opetus",
+      "exists": false,
+      "correctedName": "Tehy-lehti",
+      "confidence": "high",
+      "evidence": "Searched Tehy publications. tehy.fi has a teacher/education member category but its only member magazine is 'Tehy-lehti' (published 11x/year, healthcare/education/social sector). No separate publication titled 'Tehy-Opetus' exists. Misattributed catalog entry; the real title is Tehy-lehti.",
+      "sourceUrl": "https://www.tehylehti.fi/fi"
+    },
+    {
+      "id": "cmpmdiqau02z60hu05g9uin2u",
+      "name": "Vakuutuslehti",
+      "exists": false,
+      "confidence": "medium",
+      "evidence": "Searched 'Vakuutuslehti' and 'Vakuutusväki'. The catalog URL finanssiala.fi is an industry org, not a magazine, and publishes no title 'Vakuutuslehti' ('insurance magazine', a generic phrase). Not in Wikipedia's List of Finnish magazines. The closest historic union magazine 'Vakuutusväki' is tied to a union (Vakuutusväen Liitto) that merged into a larger union (Ammattiliitto Pro era), and is not named 'Vakuutuslehti'. No current publication under this exact name found.",
+      "sourceUrl": "https://www.finanssiala.fi/en/topics/publications-and-statistics/"
+    },
+    {
+      "id": "cmpmdiqap02tg0hu08mwhsn64",
+      "name": "Sastamalan Lehti",
+      "exists": false,
+      "confidence": "high",
+      "evidence": "Searched 'Sastamalan Lehti sanomalehti Sastamala'. No newspaper by this exact name found. The Sastamala area is served by Tyrvään Sanomat (oldest local paper, est. 1894) and Alueviesti (the listed publisher's paper); the church paper is Sananjalka. No masthead, archive, or media-kit entry for 'Sastamalan Lehti'. Likely hallucination.",
+      "sourceUrl": "https://en.wikipedia.org/wiki/Tyrv%C3%A4%C3%A4n_Sanomat"
+    },
+    {
+      "id": "cmpmdiqb703ga0hu0jbry1sk5",
+      "name": "Irish Dentist",
+      "exists": false,
+      "confidence": "high",
+      "evidence": "Fetched irishdentist.ie directly: it is a generic news/lifestyle aggregator blog ('Discovering the news that shapes the world') covering global health, politics, economy and lifestyle — not a dental publication and not aimed at Irish dentists. Searched for an Irish dental publication named 'Irish Dentist'; the real Irish dental titles are 'Ireland's Dental Magazine' (irelandsdentalmag.ie) and 'Journal of the Irish Dental Association' (jida.ie) — neither is named 'Irish Dentist'. No masthead or media kit for a title called 'Irish Dentist' exists.",
+      "sourceUrl": "https://www.irishdentist.ie"
+    },
+    {
+      "id": "cmpmdiqa101uq0hu0uoppfev8",
+      "name": "Allmenninn",
+      "exists": false,
+      "confidence": "high",
+      "evidence": "Searched for 'Allmenningen'/'Allmenninn' as a publication of Norsk forening for allmennmedisin (NFA). NFA exists (founded 2006) but publishes via Tidsskrift for Den norske legeforening; no journal or magazine named 'Allmenninn' or 'Allmenningen' is found anywhere. The listed domain allmenningen.no is a parked page. Likely a hallucinated catalog entry.",
+      "sourceUrl": "https://tidsskriftet.no/2025/06/aktuelt-i-foreningen/nye-styrer-i-allmennlegeforeningen-og-norsk-forening-allmennmedisin"
+    },
+    {
+      "id": "cmpmdiqa101uv0hu0mrjoq8oo",
+      "name": "Annonsørforeningens magasin",
+      "exists": false,
+      "confidence": "high",
+      "evidence": "ANFO (anfo.no) is a live, active advertisers' interest organization that runs events ('Den Store Annonsørdagen') and publishes reports, but no search hit anywhere references a magazine literally titled 'Annonsørforeningens magasin'. No masthead, issue, or media-kit listing found. Likely a hallucinated catalog title.",
+      "sourceUrl": "https://anfo.no/"
+    },
+    {
+      "id": "cmpmdiqa201vb0hu0ufbq0obr",
+      "name": "Bankhefte",
+      "exists": false,
+      "confidence": "high",
+      "evidence": "Searched Finans Norge publications. Finans Norge's actual publication is 'Finansrett' (finansnorge.no/om-finans-norge/finansrett), published 4x/year. No publication named 'Bankhefte' is found at Finans Norge or anywhere else. Likely a hallucinated catalog title.",
+      "sourceUrl": "https://www.finansnorge.no/om-finans-norge/finansrett/"
+    },
+    {
+      "id": "cmpmdiqa201vg0hu0k4h089k3",
+      "name": "Beauty Forum",
+      "exists": false,
+      "confidence": "medium",
+      "evidence": "Beauty Forum exists as a trade-publication brand in German (beauty-forum.com), Swedish (beautyforum.se) and Danish (beautyforumDK) editions, but no Norwegian edition was found. Norwegian beauty-trade publications are different titles (e.g. Kosmetikkmagasinet, NFVB's content). No NHO link and no Norwegian 'Beauty Forum' masthead found, so the NO market label appears hallucinated/mislabeled.",
+      "sourceUrl": "https://beautyforum.se/prislista"
+    },
+    {
+      "id": "cmpmdiq9y01pi0hu0cx64qvve",
+      "name": "Birkebeiner'n",
+      "exists": false,
+      "confidence": "high",
+      "evidence": "birkebeiner.no (redirects to birken.no) is the Birken sporting-event brand. There WAS a real magazine 'Magasinet Birken', but the official page states 'Magasinet Birken ble utgitt fram til og med 2020' — it ceased publication in 2020 and is no longer current. No title named 'Birkebeiner'n' exists; the historical magazine had a different name and is not currently published.",
+      "sourceUrl": "https://birken.no/no/magasinet-birken"
+    },
+    {
+      "id": "cmpmdiq9y01pn0hu0srhezk4p",
+      "name": "Bo Magasin",
+      "exists": false,
+      "confidence": "medium",
+      "evidence": "No Norwegian publication exists under the exact name 'Bo Magasin'. The catalog URL bonytt.no points to 'Bonytt' (a live Norwegian interior magazine, founded 1941, now on klikk.no) — a differently named title. Other real titles are 'Bo Bedre' and 'Boligmagasinet'. 'Bo Magasin' itself has no masthead and appears mislabeled/hallucinated.",
+      "sourceUrl": "https://en.wikipedia.org/wiki/Bonytt"
+    },
+    {
+      "id": "cmpmdiqa201vx0hu06nfuw31g",
+      "name": "BUFi",
+      "exists": false,
+      "confidence": "high",
+      "evidence": "Searched for a Bufdir publication named 'BUFi'. Bufdir (Barne-, ungdoms- og familiedirektoratet) publishes at bufdir.no but no magazine or publication called 'BUFi' is found. The domain bufi.no is an unrelated static page. Likely a hallucinated catalog entry.",
+      "sourceUrl": "https://www.bufdir.no/"
+    },
+    {
+      "id": "cmpmdiq9y01q80hu0gyrehpzu",
+      "name": "Det Norske Akademis Magasin",
+      "exists": false,
+      "confidence": "high",
+      "evidence": "Fetched the Academy's own utgivelser page (detnorskeakademi.no/akademiets-utgivelser): it lists Thorleif Dahls Kulturbibliotek, Norske klassikere forteller, Norske essayister, dictionaries, NAOB and Norsk Riksmålsordbok — but NO magazine, and nothing called 'Det Norske Akademis Magasin'. No such magazine found anywhere. Likely hallucinated.",
+      "sourceUrl": "https://www.detnorskeakademi.no/akademiets-utgivelser/"
+    },
+    {
+      "id": "cmpmdiq9z01qg0hu02ybr2dam",
+      "name": "Eksisten",
+      "exists": false,
+      "confidence": "high",
+      "evidence": "Searched for a theology journal/magazine 'Eksisten' from Det teologiske fakultet (UiO). Real faculty-linked journals are 'Teologisk tidsskrift' and 'Tidsskrift for Praktisk Teologi'; nothing named 'Eksisten' appears on tf.uio.no or in any journal registry. No footprint found. Likely a hallucinated catalog entry.",
+      "sourceUrl": "https://www.tf.uio.no/"
+    },
+    {
+      "id": "cmpmdiqa301wp0hu0y4zehsyl",
+      "name": "Elektro",
+      "exists": false,
+      "confidence": "high",
+      "evidence": "Searched for an electrical trade magazine named 'Elektro' tied to elektro.no/Nelfo. The real trade journal of the Norwegian electrical-installer association (formerly Nelfo, now NHO Elektro) is 'Elmagasinet' (Fagtidsskriftet for elektrobransjen, elmagasinet.no, current issues e.g. 7-2025). No publication titled simply 'Elektro' exists; elektro.no is a contractor (Elgruppen), not a magazine. Catalog mismatch.",
+      "sourceUrl": "https://elmagasinet.no/",
+      "correctedName": "Elmagasinet"
+    },
+    {
+      "id": "cmpmdiqa301wz0hu0m1gx7cqr",
+      "name": "Felleskjøpet Mølla",
+      "exists": false,
+      "confidence": "high",
+      "evidence": "Searched for a Felleskjøpet publication named 'Mølla' / 'Felleskjøpet Mølla'. No such magazine surfaced. Felleskjøpet's known member/customer magazines are 'Samvirke' and 'Vårt Felleskjøp'; 'mølle/mølla' only appears in unrelated contexts (Norgesmøllene mills). No live signal for this title; likely a hallucinated catalog entry.",
+      "sourceUrl": "https://www.felleskjopet.no"
+    },
+    {
+      "id": "cmpmdiq9x01o30hu08xv2p77z",
+      "name": "Forskerforum Student",
+      "exists": false,
+      "confidence": "high",
+      "evidence": "Searched for a separate student edition 'Forskerforum Student'. Forskerforbundet publishes one journal, 'Forskerforum' (forskerforum.no, current issues, ~56th volume). Student members simply receive the same Forskerforum (the only distinction is delivery frequency); 'Forskerforbundet student' is the student organization, not a publication. No separate title 'Forskerforum Student' exists. Likely hallucinated.",
+      "sourceUrl": "https://www.forskerforbundet.no/bli-medlem/studentmedlemskap"
+    },
+    {
+      "id": "cmpmdiqa301xe0hu0sgs1qg3q",
+      "name": "Fotball",
+      "exists": false,
+      "confidence": "medium",
+      "evidence": "Searched for a magazine titled 'Fotball' from Norges Fotballforbund. fotball.no is the federation's portal, not a magazine, and no member magazine by that exact name surfaced. No current masthead or media-kit listing found for a publication simply titled 'Fotball'. No live signal; questionable as a media title.",
+      "sourceUrl": "https://www.fotball.no/"
+    },
+    {
+      "id": "cmpmdiqaa026h0hu09tknuieq",
+      "name": "Frihagen",
+      "exists": false,
+      "confidence": "high",
+      "evidence": "Searched for an SPK (Statens pensjonskasse) publication named 'Frihagen'. SPK's site yields only service/pension pages, no member magazine by this name. 'Frihagen' is a Norwegian surname (admin-law scholar Arvid Frihagen). No evidence of any current publication by that title. Likely hallucinated.",
+      "sourceUrl": "https://www.spk.no/"
+    },
+    {
+      "id": "cmpmdiqa301xz0hu0byb61z8b",
+      "name": "Hjertelig",
+      "exists": false,
+      "confidence": "high",
+      "evidence": "Searched for an LHL magazine named 'Hjertelig'. LHL's actual member magazine is 'Et bedre liv' (current issue nr. 1, 2026, PDF on lhl.no). No publication titled 'Hjertelig' found. Likely hallucinated.",
+      "sourceUrl": "https://www.lhl.no/trenger-du-hjelp/magasinet-et-bedre-liv/",
+      "correctedName": "Et bedre liv"
+    },
+    {
+      "id": "cmpmdiqab027f0hu0y75qd7od",
+      "name": "Hund",
+      "exists": false,
+      "confidence": "medium",
+      "evidence": "Searched for a Norwegian publication titled simply 'Hund'. None found. The catalog URL hund.no is a pet-boarding kennel, not a magazine. Norsk Kennel Klub's journal is 'Hundesport'; other Norwegian dog titles are 'Vi Med Hund' and 'Hund & Fritid' (note: a magazine 'HUNDEN' exists but is Danish, from Dansk Kennel Klub). No title 'Hund' in NO. Likely hallucinated/mismapped.",
+      "sourceUrl": "https://www.magasinarkivet.no/nokkelord/?nokkelord=hund+"
+    },
+    {
+      "id": "cmpmdiqaa027a0hu0iu534c9k",
+      "name": "Idrettsmagasinet",
+      "exists": false,
+      "confidence": "medium",
+      "evidence": "Searched for an NIF (Norges idrettsforbund) publication named 'Idrettsmagasinet'. No NIF magazine by that name surfaced; NIF's historic title is 'Norsk Idrett'. 'Idrettsmagasinet' appears only as a generic phrase (e.g. TV sports segments), not as a current NIF media title. No live signal; likely hallucinated.",
+      "sourceUrl": "https://www.idrettsforbundet.no/"
+    },
+    {
+      "id": "cmpmdiqa401ya0hu0rzk6347l",
+      "name": "Imam-Forum",
+      "exists": false,
+      "confidence": "high",
+      "evidence": "Searched for an Islamsk Råd Norge (IRN) publication named 'Imam-Forum'. IRN's site (irn.no) lists a publication 'Kunnskapsboken' but nothing titled 'Imam-Forum'. IRN runs religious-leader conferences but no such named title/masthead exists. Likely hallucinated.",
+      "sourceUrl": "https://irn.no/"
+    },
+    {
+      "id": "cmpmdiq9x01o50hu0jnttk6sa",
+      "name": "Inside",
+      "exists": false,
+      "confidence": "high",
+      "evidence": "Searched for an 'Inside' publication at both BI (Handelshøyskolen BI) and Dagens Naeringsliv (dn.no, the known URL). BI's alumni program offers newsletters but no magazine named 'Inside'; dn.no publishes the weekend magazine 'D2', not 'Inside'. No masthead, current issue, or media-kit listing for a Norwegian publication named 'Inside' was found. Likely a hallucinated catalog entry.",
+      "sourceUrl": "https://www.bi.no/en/business-and-alumni/alumni/"
+    },
+    {
+      "id": "cmpmdiq9u01k00hu05o21x2m7",
+      "name": "Khrono Forskning",
+      "exists": false,
+      "confidence": "high",
+      "evidence": "Khrono (khrono.no) is a real, independent news outlet covering higher education and research in Norway, but there is no separate publication titled 'Khrono Forskning'. Searches surfaced only Khrono's general site and its topic/tag pages (e.g. /emne/forskning), not a distinct named title. 'Forskning' is a subject Khrono covers, not a separate masthead. Likely a duplicated/hallucinated entry derived from Khrono.",
+      "sourceUrl": "https://www.khrono.no/"
+    },
+    {
+      "id": "cmpmdiqa401yn0hu0jges8fo5",
+      "name": "Kirken.no Magasin",
+      "exists": false,
+      "confidence": "high",
+      "evidence": "kirken.no is the institutional website of the Church of Norway (Den norske kirke). No national advertising magazine titled 'Kirken.no Magasin' exists. Searches returned only local parish publications (e.g. 'Magasinet Kime' in Indre Ostfold) and a one-off 'Klimarettferdighetsmagasin', not a title named 'Kirken.no Magasin'. Likely a hallucinated entry.",
+      "sourceUrl": "https://www.kirken.no/"
+    },
+    {
+      "id": "cmpmdiq9z01ro0hu0otpooqg4",
+      "name": "Klar",
+      "exists": false,
+      "confidence": "high",
+      "evidence": "Searched for a Norwegian publication named 'Klar'. Found only 'Klar Tale', a distinct easy-to-read newspaper (a different title, not 'Klar'). The known URL klar.no is described as a parked placeholder. No masthead, issue, or media kit for a publication simply named 'Klar' was found. Likely a hallucinated entry.",
+      "sourceUrl": "https://en.wikipedia.org/wiki/Klar_Tale_(newspaper)"
+    },
+    {
+      "id": "cmpmdiqaa026u0hu0wusrx8g3",
+      "name": "Klassisk",
+      "exists": false,
+      "confidence": "high",
+      "evidence": "Searched for a Norwegian magazine/journal named 'Klassisk' (classical music). Found related but differently-named resources: the site klassiskmusikk.com, NRK Klassisk (a radio channel), and academic musicology journals (none titled simply 'Klassisk'). The known URL klassisk.no reportedly resolves to a sports retailer. No masthead for a publication named 'Klassisk' found. Likely hallucinated.",
+      "sourceUrl": "https://www.klassiskmusikk.com/"
+    },
+    {
+      "id": "cmpmdiqab027r0hu0i95fryk7",
+      "name": "Kokkeyrket",
+      "exists": false,
+      "confidence": "high",
+      "evidence": "Searched for a Norwegian trade/industry magazine named 'Kokkeyrket'. 'kokkeyrket' appears only as the common noun for 'the chef profession' (e.g. on NKL's site), not as a publication title. No fagblad/bransjeblad by that name found; relevant trade content appears under other names (e.g. Kjokkenskriveren). The known URL matogvin.no redirects to a liquor company. Likely a hallucinated entry.",
+      "sourceUrl": "https://nkl.no/om-nkl/"
+    },
+    {
+      "id": "cmpmdiqa001s10hu0bvc3k4fh",
+      "name": "LHL Vi",
+      "exists": false,
+      "confidence": "high",
+      "evidence": "LHL's current member magazine is titled 'Et bedre liv' (confirmed on lhl.no with multiple 2022-2024 PDF issues). Its historical predecessor was 'Det nytter'. No LHL magazine named 'Vi' was found. Likely a hallucinated title.",
+      "sourceUrl": "https://www.lhl.no/trenger-du-hjelp/magasinet-et-bedre-liv/"
+    },
+    {
+      "id": "cmpmdiqa501zx0hu00mdz3icp",
+      "name": "Misjon idag",
+      "exists": false,
+      "confidence": "high",
+      "evidence": "Searched for a Normisjon/mission publication named 'Misjon idag' / 'Misjon i dag'. Normisjon's actual magazine is 'Agenda 3:16'. No publication titled 'Misjon idag' was found; results returned other organisations' titles (e.g. NMS, Misjon Uten Grenser) but nothing matching. The known URL misjonshuset.no is a Normisjon mission-house site, not a magazine. Likely a hallucinated entry.",
+      "sourceUrl": "https://snl.no/Normisjon"
+    },
+    {
+      "id": "cmpmdiqa6021e0hu04lsixl8v",
+      "name": "Norsk Romsenter Magasin",
+      "exists": false,
+      "confidence": "high",
+      "evidence": "Norsk Romsenter (romsenter.no) renamed to Direktoratet for romvirksomhet in Sept 2025. It has a 'Publikasjoner' page (currently returning 404) but no periodical titled 'Magasin' or 'Norsk Romsenter Magasin' was found in searches. No masthead or current issue of such a magazine exists. Likely a hallucinated title.",
+      "sourceUrl": "https://www.romsenter.no/"
+    },
+    {
+      "id": "cmpmdiqa6021l0hu002nngnsb",
+      "name": "Norsk Squash Magasin",
+      "exists": false,
+      "confidence": "high",
+      "evidence": "Searched for 'Norsk Squash Magasin' in connection with Norges Squashforbund (squash.no). The federation is active (site, rankings, social media) but no magazine/tidsskrift by this name was found; the site references only a newsletter. No masthead or issue exists. Likely a hallucinated title.",
+      "sourceUrl": "https://www.squash.no/"
+    },
+    {
+      "id": "cmpmdiqa6021n0hu040v5o9h5",
+      "name": "Norsk Steindustri",
+      "exists": false,
+      "confidence": "high",
+      "evidence": "Searched 'Norsk Steindustri' as a Norwegian magazine/journal and against Norsk Bergindustri. No publication of this name found in Fagpressekatalogen, Wikipedia magazine lists, or anywhere. norskstein.no is a parked page. The relevant trade body Norsk Bergindustri merged into Norsk Industri on 1 Jan 2026; their site shows no journal of this name. No masthead, issue, or media-kit evidence exists. Likely hallucinated.",
+      "sourceUrl": "https://www.norskbergindustri.no/"
+    },
+    {
+      "id": "cmpmdiqaa026z0hu0zqnm8hn0",
+      "name": "Pent",
+      "exists": false,
+      "confidence": "high",
+      "evidence": "Searched 'Pent magasin Norge'. pent.no is a VG/Schibsted weather-forecast service ('Pent: Vaervarsel for Oslo'), with a VG Pent.no app on Google Play and a VG support page 'Hva er Pent?'. There is no magazine or media publication named 'Pent'. Catalog mismatch/hallucination.",
+      "sourceUrl": "https://pent.no/"
+    },
+    {
+      "id": "cmpmdiqa7022o0hu0hk7ocyes",
+      "name": "Røntgensikret",
+      "exists": false,
+      "confidence": "high",
+      "evidence": "Searched 'Rontgensikret' against Norsk Sykepleierforbund and generally. NSF's publication is 'Sykepleien'; no NSF or any other publication named 'Rontgensikret' appears in search results, magazine directories, or press registries. rontgen.no redirects to a private radiology clinic. No evidence this publication ever existed. Likely hallucinated.",
+      "sourceUrl": "https://sykepleien.no/en"
+    },
+    {
+      "id": "cmpmdiqa001t40hu0ju5tasrj",
+      "name": "Salt",
+      "exists": false,
+      "confidence": "high",
+      "evidence": "Searched 'Salt magasin Norge'. salt.no is Saltimport (a salt supplier company). The Fagpressekatalogen entry 0243 that surfaces for 'Salt'/coastal terms is actually the journal KYSTEN (Forbundet KYSTEN), covering kystkultur/trebater - not a publication named 'Salt'. salted.no is an Oslo arts/sauna venue (SALT art project), not a magazine. No Norwegian magazine titled 'Salt' confirmed at salt.no.",
+      "sourceUrl": "https://fagpressekatalogen.no/magasiner/0243/"
+    },
+    {
+      "id": "cmpmdiqa7022t0hu0za7rkbss",
+      "name": "Searcher",
+      "exists": false,
+      "confidence": "high",
+      "evidence": "Searched 'Searcher magasin Norge tidsskrift'. No Norwegian publication named 'Searcher' appears in any magazine directory, Wikipedia list, or Magasinarkivet. The known URL snl.no is Store norske leksikon (unrelated). 'Searcher' as publisher is self-referential. No masthead/issue evidence. Likely hallucinated.",
+      "sourceUrl": "https://no.wikipedia.org/wiki/Liste_over_norske_tidsskrifter"
+    },
+    {
+      "id": "cmpmdiqa7022z0hu0pt4u67zg",
+      "name": "Slik er det",
+      "exists": false,
+      "confidence": "high",
+      "evidence": "Searched 'Slik er det LHL medlemsblad'. LHL's member magazine is 'Et bedre liv' (formerly 'Det nytter', first issue 1978), sent to members 3x/year. No LHL publication named 'Slik er det' exists. Known URL tv2.no is mismatched. Likely hallucinated.",
+      "sourceUrl": "https://www.lhl.no/om-lhl/var-historie/"
+    },
+    {
+      "id": "cmpmdiqa702330hu05g2e3t64",
+      "name": "Spektrum",
+      "exists": false,
+      "confidence": "high",
+      "evidence": "Searched 'Spektrum Autismeforeningen'. Autismeforeningen i Norge's actual member magazine is 'Autisme i dag', published 4x/year with a current issue 1/2025 (verified on flippingbook and issuu). No autism publication named 'Spektrum' exists; spektrum.no is unrelated (Spektrum Profil AS). Real publication has a different name.",
+      "correctedName": "Autisme i dag",
+      "sourceUrl": "https://online.flippingbook.com/view/901913239"
+    },
+    {
+      "id": "cmpmdiqaa027b0hu0ibem0ckh",
+      "name": "Sportsmanship",
+      "exists": false,
+      "confidence": "high",
+      "evidence": "Searched 'Sportsmanship magasin Norge idrett'. 'sportsmanship' returns only a Store norske leksikon dictionary definition. The Norwegian sports-trade magazine is 'Sport' (discontinued 2023). No Norwegian media publication named 'Sportsmanship' exists; sportsmanship.com is unreachable. Likely hallucinated.",
+      "sourceUrl": "https://snl.no/sportsmanship"
+    },
+    {
+      "id": "cmpmdiqa7023d0hu0v066uw95",
+      "name": "Stå",
+      "exists": false,
+      "confidence": "high",
+      "evidence": "Searched 'Sta Norges Bandyforbund medlemsblad'. Bandyforbundet.no (the federation for bandy/floorball/hockey) shows no publication named 'Sta'. Known URL sta.no is an architecture firm (Schjelderup Trondahl arkitekter). No masthead/issue/media-kit evidence anywhere. Likely mis-mapped/hallucinated.",
+      "sourceUrl": "https://bandyforbundet.no/forbundet/"
+    },
+    {
+      "id": "cmpmdiqa101tm0hu0nat06rjf",
+      "name": "Studio",
+      "exists": false,
+      "confidence": "medium",
+      "evidence": "Searched 'Studio magasin Norge'. The only hit is a Magasinarkivet.no archive entry for a magazine 'Studio' - an archive of past/discontinued Norwegian periodicals, not evidence of a currently-published title, and not tied to studio.no. The known URL studio.no is a personal artist portfolio (Rolf Jansson Art), not a publication. No current masthead, issue, or media-kit at studio.no. No evidence of a currently-published outlet named 'Studio' at this domain.",
+      "sourceUrl": "https://www.magasinarkivet.no/studio/"
+    },
+    {
+      "id": "cmpmdiqaa026j0hu09ceh3jb4",
+      "name": "Šuoŋ",
+      "exists": false,
+      "confidence": "high",
+      "evidence": "Searched 'Šuoŋ publication Norway Sami magazine' and 'Šuoŋ sámi/samisk/music/musikk'. No publication, masthead, or media-kit by this name exists. Searches surface only generic Sámi-music/joik content and other Sámi titles (Ávvir, Gába, Nuorat). The known URL nordnorskdebatt.no is an unrelated Amedia debate site that does not list any 'Šuoŋ' title. Appears to be a garbled/hallucinated catalog entry.",
+      "sourceUrl": "https://en.wikipedia.org/wiki/S%C3%A1mi_media"
+    },
+    {
+      "id": "cmpmdiqa8023p0hu0c1opevo8",
+      "name": "Tidens Tale",
+      "exists": false,
+      "confidence": "high",
+      "evidence": "Searched '\"Tidens Tale\" Norwegian magazine publication'. No current Norwegian magazine by this name found; results return only folklore books and unrelated phrase usage. The known URL dnt.no (Den Norske Turistforening) publishes 'Fjell og Vidde', not 'Tidens Tale'. No masthead or current issue found. Likely hallucinated.",
+      "sourceUrl": "https://en.wikipedia.org/wiki/List_of_Norwegian_magazines"
+    },
+    {
+      "id": "cmpmdiqaa02760hu01p22mrsa",
+      "name": "Transportforum",
+      "exists": false,
+      "confidence": "high",
+      "evidence": "A journal named 'Transportforum' did exist — published by Transportbedriftenes Landsforening / NHO Transport from 1989 until the end of 2014 — but it was DISCONTINUED at the end of 2014 and is NOT currently published (transport.no 'Om oss' confirms the journal ceased end-2014). The catalog URL transportarbeider.no is the former transport union (merged into Fellesforbundet 2019), not this title. No current issue or media-kit exists. Marking exists=false because it is not a currently-published outlet.",
+      "sourceUrl": "https://www.transport.no/om-oss/"
+    },
+    {
+      "id": "cmpmdiqa802480hu0niejufdv",
+      "name": "Tungtransporten",
+      "exists": false,
+      "confidence": "high",
+      "evidence": "Searched 'Tungtransporten NLF magasin Norges Lastebileier-Forbund'. No publication titled 'Tungtransporten' from NLF found. NLF's actual member magazine is 'NLF-Magasinet' (current issues on Issuu, e.g. 1/2025). The known URL tungt.no is the trade site 'Tungt' by Nordiske Fagmedier, a different brand. No masthead for 'Tungtransporten'. Likely hallucinated.",
+      "sourceUrl": "https://issuu.com/modul.no/docs/nlf-magasinet_1_2025"
+    },
+    {
+      "id": "cmpmdiqa8024j0hu03a0c0g63",
+      "name": "Veisikkerhet",
+      "exists": false,
+      "confidence": "high",
+      "evidence": "Searched '\"Veisikkerhet\" Trygg Trafikk magasin/blad' and Trygg Trafikk medlemsblad/tidsskrift. Trygg Trafikk produces educational materials, newsletters and an annual report (årsrapport), but no magazine titled 'Veisikkerhet' appears in any search, press registry, or on their site. Likely a hallucinated title.",
+      "sourceUrl": "https://www.tryggtrafikk.no/"
+    },
+    {
+      "id": "cmpmdiqa101u60hu0ll7lc7re",
+      "name": "Vi med Hest",
+      "exists": false,
+      "confidence": "high",
+      "evidence": "Searched '\"Vi med Hest\" magasin hest Norge'. No Norwegian magazine by this name found; results surface other titles (Hesteliv, Magasinet Hest, HÉST, Hestene). The known URL hestesport.no is dead (Vercel DEPLOYMENT_NOT_FOUND). magasinarkivet.no returned 403 but its keyword index does not surface this title. Likely hallucinated or dead.",
+      "sourceUrl": "https://www.magasinarkivet.no/nokkelord/?nokkelord=Hesteliv+-+Norges+viktigste+hestemagasin"
+    },
+    {
+      "id": "cmpmdiqa9025c0hu0ydbjbxxr",
+      "name": "Coop Medlem",
+      "exists": false,
+      "confidence": "high",
+      "evidence": "Fetched coop.no/medlem/coop-medlem-magasin/ — the page describes the Coop membership PROGRAM and app (1% kjøpeutbytte, kuponger, member offers), not a titled standalone member magazine. App Store / Google Play listings ('Coop medlem') are the membership app. No print/digital magazine titled 'Coop Medlem' with its own masthead/issues is published; it is a loyalty program, not an advertising-catalog media outlet.",
+      "sourceUrl": "https://coop.no/medlem/coop-medlem-magasin/"
+    },
+    {
+      "id": "cmpmdiqah02hu0hu0i2eh2yrl",
+      "name": "Fritänk",
+      "exists": false,
+      "confidence": "high",
+      "evidence": "Searched '\"Fritänk\" tidning Frimurarorden Sverige'. No publication named 'Fritänk' found anywhere. The Svenska Frimurare Orden's magazine is 'Frimuraren' (published via their Issuu). No masthead or media-kit for 'Fritänk'. Likely a hallucinated/wrong title.",
+      "sourceUrl": "https://issuu.com/svenskafrimurareorden"
+    },
+    {
+      "id": "cmpmdiqai02j20hu0r7cxhjsl",
+      "name": "Hakon",
+      "exists": false,
+      "confidence": "high",
+      "evidence": "Searched '\"Hakon\" tidning ICA Sverige magasin'. No titled publication called 'Hakon' exists. icagruppen.se is ICA's corporate site. 'Hakon' refers to Hakonbolaget / Hakon Swenson (historical) and the Hakon Swenson Foundation. ICA's own magazines are ICA-tidningen and ICA-Kuriren. There is a 'new magazine' ABOUT the Hakon Swenson Foundation's initiatives, but it is not titled 'Hakon'. No publication by this exact name.",
+      "sourceUrl": "https://www.icahandlarna.se/nyheter/nytt-magasin-om-hakon-swenson-stiftelsens-initiativ/"
+    },
+    {
+      "id": "cmpmdiqai02id0hu0v0if3ied",
+      "name": "Hästen",
+      "exists": false,
+      "confidence": "high",
+      "evidence": "Searched '\"Hästen\" tidning hästtidning Sverige'. No equestrian magazine called 'Hästen' found; real Swedish horse titles are Min Häst, Häst & Ryttare (Svenska Ridsportförbundet), Kentaur, Hippson. The known URL hastnet.se is 'Hästnet', a horse classifieds marketplace, not a publication. Title appears to be a mismatch/hallucination.",
+      "sourceUrl": "https://sv.wikipedia.org/wiki/Min_H%C3%A4st"
+    },
+    {
+      "id": "cmpmdiqaf02ed0hu0yjyacren",
+      "name": "Hemma med IKEA",
+      "exists": false,
+      "confidence": "high",
+      "evidence": "Searched 'Hemma med IKEA' as a Swedish publication. No magazine/title by this exact name exists. ikea.com/se is IKEA's e-commerce site; IKEA's relevant publication was the print catalogue, which ceased in 2021 (last paper edition). 'Livet hemma' is an IKEA content section, not a separately-named publication called 'Hemma med IKEA'. Likely an AI-invented catalog entry from the IKEA homepage.",
+      "sourceUrl": "https://www.ikea.com/se/sv/this-is-ikea/about-us/fran-mobelutstallning-till-destination-for-livet-hemma-pub014b9490/"
+    },
+    {
+      "id": "cmpmdiqai02iv0hu0r28a6jfo",
+      "name": "HRT",
+      "exists": false,
+      "confidence": "high",
+      "evidence": "Searched 'HRT' as a Swedish publication and the domain hrt.se. All results are medical content (hormone replacement therapy). The domain hrt.se is parked/for-sale. No publication named 'HRT' exists in any Swedish media listing. Likely hallucinated.",
+      "sourceUrl": "https://www.kb.se/eng/loans-and-services/search-services/svenska-tidningar.html"
+    },
+    {
+      "id": "cmpmdiqai02iu0hu074q9ui9y",
+      "name": "Hus & Mark",
+      "exists": false,
+      "confidence": "high",
+      "evidence": "Searched 'Hus & Mark' magazine/tidning and the domain husmark.se. No such magazine exists; husmark.se is a one.com parking page. Real Swedish home magazines found are 'Hus & Hem' (different title) and 'Villaägaren', but nothing named 'Hus & Mark'. Likely hallucinated/parked.",
+      "sourceUrl": "https://se.readly.com/magazines/hus-och-hem"
+    },
+    {
+      "id": "cmpmdiqai02iw0hu0b3hvrg22",
+      "name": "Insight",
+      "exists": false,
+      "confidence": "medium",
+      "evidence": "Searched 'Insight' magazine Sweden and the domain insight-magazine.com (returns HTTP 403, Cloudflare-blocked). 'Insight' in Sweden refers to Insight Inc., an IT solutions integrator (se.insight.com), not an editorial magazine. Other 'Insight' magazines found are non-Swedish (theinsightmag.com, insightmag.org, etc.). No Swedish editorial publication titled 'Insight' confirmed. Generic name; no real SE source found.",
+      "sourceUrl": "https://se.insight.com/sv_SE/home.html"
+    },
+    {
+      "id": "cmpmdiqah02hk0hu0gd1twqhh",
+      "name": "Kommun & Politik",
+      "exists": false,
+      "confidence": "high",
+      "evidence": "Searched SKR / Sveriges Kommuner och Regioner publications. No SKR magazine named 'Kommun & Politik' exists. SKR's known publication is 'Dagens Samhälle' (weekly, formerly SKR-owned, bought by Bonnier News/Di-gruppen in 2019). skr.se is the member org, not a publication. Closest academic title is 'Kommunal ekonomi och politik' (different name, journal). Likely hallucinated.",
+      "sourceUrl": "https://sv.wikipedia.org/wiki/Dagens_Samh%C3%A4lle"
+    },
+    {
+      "id": "cmpmdiqai02i70hu00jzuktga",
+      "name": "Längdåkning",
+      "exists": false,
+      "confidence": "high",
+      "evidence": "Searched 'Längdåkning' as a publication on skidor.com. 'Längdåkning' (cross-country skiing) is a sport-discipline section on Svenska Skidförbundet's site, not a publication. Their digital newsletter is 'Nyheter i Längdsverige'; no standalone magazine titled 'Längdåkning' exists. The real Swedish ski magazine is 'Åka Skidor'. Catalog hallucination from a section heading.",
+      "sourceUrl": "https://www.skidor.com/idrotter/langdakning/nyheter/2025/2025-05-09-hall-dig-uppdaterad---missa-inte-maj-manads-nyheter-i-langdsverige"
+    },
+    {
+      "id": "cmpmdiqai02hz0hu0bunwevv6",
+      "name": "Liv & Hälsa",
+      "exists": false,
+      "confidence": "high",
+      "evidence": "Searched 'Liv & Hälsa' on adventist.se. 'Liv' and 'Hälsa' are navigation sections on the Adventist site. The denomination's actual magazine is 'Missionären', renamed 'AdventLiv' in June 2021. No publication titled 'Liv & Hälsa' exists. Likely hallucinated from menu labels.",
+      "sourceUrl": "https://www.adventist.se/info/missionaren/915/1"
+    },
+    {
+      "id": "cmpmdiqag02f70hu0iyzj3znt",
+      "name": "MM Sport",
+      "exists": false,
+      "confidence": "high",
+      "evidence": "Searched 'MM Sport' as a Swedish publication and mmsports.se. MM Sports is a sports-nutrition/training-gear e-commerce retailer (founded 2002), not an editorial publication. No media title 'MM Sport' carrying advertising exists. They merely resell 'Body Magazine' (a separate title). Likely hallucinated from a retailer homepage.",
+      "sourceUrl": "https://www.mmsports.se/content/om-mm-sports"
+    },
+    {
+      "id": "cmpmdiqai02i80hu0uw3ny3ij",
+      "name": "På Snö",
+      "exists": false,
+      "confidence": "high",
+      "evidence": "Searched 'På Snö' as a Swedish ski publication; known url pa.se is a GoDaddy for-sale parked page. No magazine titled 'På Snö' found. 'Alla på snö' is a youth activity/section of Svenska Skidförbundet, not a standalone publication. Real Swedish ski magazines are 'Åka Skidor' and 'Älska Snö' (SkiStar). No live signal for 'På Snö'. Likely hallucinated/dead.",
+      "sourceUrl": "https://sv.wikipedia.org/wiki/%C3%85ka_Skidor"
+    },
+    {
+      "id": "cmpmdiqah02gg0hu0ojj3qup2",
+      "name": "Plast & Kemiteknik",
+      "exists": false,
+      "confidence": "high",
+      "evidence": "Searched 'Plast & Kemiteknik' (SE) and fetched the known URL plastnet.se directly. plastnet.se publishes 'Plastforum' (described as the leading trade magazine for the plastics, rubber and composites industry), plus sister titles Recycling, Packnet and Defence Nordic. No publication named 'Plast & Kemiteknik' appears on the site or anywhere in search. Likely an AI catalog error conflating the plastics theme with chemistry; the real adjacent title is Plastforum.",
+      "sourceUrl": "https://www.plastnet.se",
+      "correctedName": "Plastforum"
+    },
+    {
+      "id": "cmpmdiqai02j50hu09bj6uud4",
+      "name": "Resia News",
+      "exists": false,
+      "confidence": "high",
+      "evidence": "Searched 'Resia News' (SE). Resia is a travel agency founded 1974 that was rebranded to Reed & Mackay in November 2023; resia.se has only a corporate 'Nyheter' (press/news) page, not an editorial media title. No publication called 'Resia News' exists. Note: a separate Swedish travel magazine 'RES' (res.se, founded 1981) exists but is a different name/entity.",
+      "sourceUrl": "https://www.resia.se/foretag/nyheter"
+    },
+    {
+      "id": "cmpmdiqai02i50hu0ifxkpx4j",
+      "name": "Skidsport",
+      "exists": false,
+      "confidence": "high",
+      "evidence": "Searched 'Skidsport' magazine/tidning (SE) including subscription terms. No publication titled 'Skidsport' found. skidor.com is the Swedish Ski Federation (organization, not a magazine). Sweden's actual ski publications are 'Åka Skidor' (akaskidor.se, since 1974, Egmont) and 'Langd.se' for cross-country. Likely a conflated/hallucinated entry.",
+      "sourceUrl": "https://www.akaskidor.se/"
+    },
+    {
+      "id": "cmpmdiqah02hl0hu018xteuuu",
+      "name": "Tidningen Pension",
+      "exists": false,
+      "confidence": "high",
+      "evidence": "Searched 'Tidningen Pension' + Pensionsmyndigheten (SE). The listed publisher pensionsmyndigheten.se is the Swedish Pension Authority (state agency since 2010) that publishes informational web pages, statistics and press releases, not a magazine titled 'Tidningen Pension'. No such publication found anywhere. Likely hallucinated.",
+      "sourceUrl": "https://www.pensionsmyndigheten.se/"
+    },
+    {
+      "id": "cmpmdiqai02il0hu0yf9dsr5z",
+      "name": "Universitetsvärlden",
+      "exists": false,
+      "confidence": "high",
+      "evidence": "Searched 'Universitetsvärlden' as a magazine (SE) including UKÄ. No publication by this exact name exists. The listed publisher uka.se (Swedish Higher Education Authority) publishes reports and statistics, not a magazine. 'Nyheter från universitetsvärlden' is merely a news-aggregation section on University of Gothenburg's staff portal. The real adjacent higher-education title is SULF's 'Universitetsläraren' (sulf.se). Likely hallucinated.",
+      "sourceUrl": "https://sulf.se/en/about-sulf/universitetslararenmagazine/",
+      "correctedName": "Universitetsläraren"
+    },
+    {
+      "id": "cmpmdiqaf02ej0hu05sf2dr80",
+      "name": "Vinmagasinet",
+      "exists": false,
+      "confidence": "medium",
+      "evidence": "Searched 'Vinmagasinet' wine magazine (SE). The catalog URL aktiebolag.se is a company-registry placeholder, not a magazine. No standalone Swedish publication titled exactly 'Vinmagasinet' exists; the word is a generic descriptor used inside two real but differently-named titles: 'Vinmagasinet Livets Goda' (livetsgoda.se) and 'Vinmagasinet Törst' (torst.se). Because the bare name does not match a real masthead and the URL is a placeholder, treating as not verified; if intended it would be Vinmagasinet Livets Goda.",
+      "sourceUrl": "https://www.livetsgoda.se/",
+      "correctedName": "Vinmagasinet Livets Goda"
+    },
+    {
+      "id": "cmpmdiqaf02en0hu0z2uewrt6",
+      "name": "Vintage",
+      "exists": false,
+      "confidence": "high",
+      "evidence": "Searched 'Vintage' magazine (SE) and the known URL vintage.se (noted as an 'under construction' placeholder with no articles, dates or publication content). No evidence of a real native-ad publication titled 'Vintage' in Sweden. Search returns only unrelated second-hand/vintage retail sites (magasin.se, vintagekartan.se, vintagemagasinet.se furniture shop). Likely hallucinated/placeholder.",
+      "sourceUrl": "https://www.vintage.se"
+    }
+  ]
+}

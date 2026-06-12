@@ -1,6 +1,7 @@
 import { redirect } from "next/navigation";
 import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
+import { SafeEmail } from "@/components/safe-email";
 import {
   approveCandidateAction,
   rejectCandidateAction,
@@ -291,7 +292,7 @@ export default async function PublisherContactsPage({
               <td className="py-2 pr-4">{c.publisher.titles.length}</td>
               <td className="py-2 pr-4">
                 <div>{c.name ?? "—"}</div>
-                <div className="text-slate-700">{c.email}</div>
+                <div className="text-slate-700"><SafeEmail address={c.email} /></div>
                 <div className="text-slate-500 text-xs">{c.role ?? ""}</div>
               </td>
               <td className="py-2 pr-4">{c.confidence}</td>

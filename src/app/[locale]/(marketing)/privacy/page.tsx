@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { getTranslations } from "next-intl/server";
 import { LandingShell } from "@/app/landing-shell";
 import { MailLink } from "@/components";
+import { withSafeEmails } from "@/components/safe-email";
 
 export async function generateMetadata({
   params,
@@ -53,7 +54,7 @@ export default async function PrivacyPage({
         {sections.map((s) => (
           <section className="legal-section" key={s}>
             <h2>{t(`${s}.title`)}</h2>
-            <p className="prose">{t(`${s}.body`)}</p>
+            <p className="prose">{withSafeEmails(t(`${s}.body`))}</p>
           </section>
         ))}
 

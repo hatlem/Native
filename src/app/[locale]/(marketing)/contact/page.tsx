@@ -3,6 +3,7 @@ import { getTranslations } from "next-intl/server";
 import { Link } from "@/i18n/navigation";
 import { LandingShell } from "@/app/landing-shell";
 import { MailLink } from "@/components";
+import { SafeEmail, withSafeEmails } from "@/components/safe-email";
 import { TeamRow } from "./_components/TeamRow";
 
 export async function generateMetadata({
@@ -49,7 +50,7 @@ export default async function ContactPage({
                 <h3>{t(`channels.${c.id}.title`)}</h3>
                 <p className="muted">{t(`channels.${c.id}.body`)}</p>
                 <MailLink className="channel-email" to={c.email}>
-                  {c.email}
+                  <SafeEmail address={c.email} />
                 </MailLink>
               </article>
             ))}
@@ -68,7 +69,7 @@ export default async function ContactPage({
           </ul>
           <p className="pull">
             <strong>{t("pullTitle")}</strong>
-            {t("pullBody")}
+            {withSafeEmails(t("pullBody"))}
           </p>
         </div>
 

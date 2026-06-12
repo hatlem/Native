@@ -7,6 +7,7 @@ import {
   detachContactAction,
 } from "@/app/price-actions";
 import { SubmitButton } from "@/components";
+import { SafeEmail } from "@/components/safe-email";
 
 export async function SalesContactsPanel({
   locale,
@@ -52,7 +53,7 @@ export async function SalesContactsPanel({
                   <span className="muted small"> · {t("primary")}</span>
                 )}
                 <div className="muted small">
-                  {c.email}
+                  <SafeEmail address={c.email} />
                   {c.phone ? ` · ${c.phone}` : ""}
                 </div>
                 {c.role && <div className="muted small">{c.role}</div>}
@@ -98,7 +99,7 @@ export async function SalesContactsPanel({
               <select name="salesContactId" required>
                 {availableToAttach.map((c) => (
                   <option key={c.id} value={c.id}>
-                    {c.name} — {c.email}
+                    {c.name} — <SafeEmail address={c.email} />
                   </option>
                 ))}
               </select>

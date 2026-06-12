@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import type { AnchorHTMLAttributes, ReactNode } from "react";
+import { SafeEmail } from "./safe-email";
 
 type Props = {
   to: string;
@@ -37,14 +38,14 @@ export function MailLink({ to, subject, body, children, ...rest }: Props) {
           window.location.href = buildMailto(to, subject, body);
         }}
       >
-        {children ?? to}
+        {children ?? <SafeEmail address={to} />}
       </a>
     );
   }
 
   return (
     <a {...rest} href={buildMailto(to, subject, body)}>
-      {children ?? to}
+      {children ?? <SafeEmail address={to} />}
     </a>
   );
 }

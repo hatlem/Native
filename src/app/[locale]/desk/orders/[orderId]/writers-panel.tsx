@@ -6,6 +6,7 @@ import {
   removeWriterFromPool,
 } from "@/app/writer-pool-actions";
 import type { ContentLanguage, ContentTopic } from "@prisma/client";
+import { SafeEmail } from "@/components/safe-email";
 
 type Props = {
   locale: string;
@@ -42,7 +43,7 @@ export async function WritersPanel({
           return (
             <li key={w.id} className="flex items-center justify-between py-2">
               <div className="text-sm">
-                <span className="font-medium">{w.name ?? w.email}</span>
+                <span className="font-medium">{w.name ?? <SafeEmail address={w.email} />}</span>
                 <span className="ml-2 text-xs text-neutral-500">
                   {w.languages.map((l) => l.language).join(", ") || "no langs"}
                   {" · "}

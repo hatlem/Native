@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Link, usePathname } from "@/i18n/navigation";
 import { BrandWordmark } from "@/app/brand";
+import { SafeEmail } from "@/components/safe-email";
 import type { NavItem } from "@/lib/nav";
 
 type PaletteSection = { section: string; items: NavItem[] };
@@ -178,7 +179,7 @@ export function NavShell({
                 <div className="panel">
                   <div className="who">
                     <div className="role">{user.roleLabel}</div>
-                    <div className="email">{user.email}</div>
+                    <div className="email"><SafeEmail address={user.email} /></div>
                   </div>
                   {menuItems.map((m) => (
                     <Link key={m.key} href={m.href} className="menu-item">
@@ -257,7 +258,7 @@ export function NavShell({
                 <div className="muted" style={{ fontSize: "0.78rem" }}>
                   {user.roleLabel}
                 </div>
-                <div style={{ fontSize: "0.92rem" }}>{user.email}</div>
+                <div style={{ fontSize: "0.92rem" }}><SafeEmail address={user.email} /></div>
                 {signOutAction}
               </>
             ) : authActions ? (

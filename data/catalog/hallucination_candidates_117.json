@@ -1,0 +1,821 @@
+[
+  {
+    "id": "cmpmdiqbh03w60hu0ur2mlqfu",
+    "name": "Schweizer Hotelier",
+    "market": "CH",
+    "websiteUrl": "https://www.hotellerie-suisse.ch",
+    "note": "No HotellerieSuisse title by this name found; their actual publications are 'htr hotelrevue' and 'Hotelière'. Likely hallucinated or confused with the independent 'Hotelier' magazine (different publisher, hotelier.ch). hotellerie-suisse.ch known URL is also wrong (correct is hotelleriesuisse.ch)"
+  },
+  {
+    "id": "cmpmdiqbh03we0hu0942wa3rm",
+    "name": "Schweizer Verkehrs Revue",
+    "market": "CH",
+    "websiteUrl": "https://cargorail.ch",
+    "note": "No publication by this name found; cargorail.ch (VAP) publishes no magazine called this. Likely hallucinated/mismatched catalog entry; only similarly-named real titles (Schweizer Eisenbahn-Revue, Strasse & Verkehr) exist."
+  },
+  {
+    "id": "cmpmdiqbd03pb0hu0xu6np7y3",
+    "name": "Bauwirtschaft",
+    "market": "DE",
+    "websiteUrl": "https://www.bauverlag.de",
+    "note": "No Bauverlag title named 'Bauwirtschaft' exists (its 17 brands omit it); the only 'Bauwirtschaft' (BauW) is a Werner Verlag/Wolters Kluwer journal — different publisher. Catalog url is just bauverlag.de publisher homepage. Likely misattributed/hallucinated entry"
+  },
+  {
+    "id": "cmpmdiqbd03q80hu0608kov04",
+    "name": "klasse!",
+    "market": "DE",
+    "websiteUrl": "https://www.klett.de",
+    "note": "Klett 'Klasse!' is a German-as-foreign-language coursebook series (Lehrwerk A1-B1), not a magazine/periodical; no evidence of an ad-carrying publication by this name from Klett — likely mis-seeded catalog entry"
+  },
+  {
+    "id": "cmpmdiqan02r30hu0z81ii4vq",
+    "name": "Atom",
+    "market": "DK",
+    "websiteUrl": "https://www.dtu.dk",
+    "note": "DTU's actual magazine is 'Dynamo' (alumni.dtu.dk/nyheder/dynamo). No evidence of any DTU publication named 'Atom' in searches, alumni, or history dept. Likely mis-seeded/hallucinated"
+  },
+  {
+    "id": "cmpmdiqal02n30hu0eiuaml7g",
+    "name": "Bilen",
+    "market": "DK",
+    "websiteUrl": "https://www.fdm.dk",
+    "note": "FDM's member magazine is 'Motor' (since 1906); no FDM publication called 'Bilen' found — likely hallucinated/misnamed"
+  },
+  {
+    "id": "cmpmdiqal02mz0hu0evy08xlm",
+    "name": "Dansk",
+    "market": "DK",
+    "websiteUrl": "https://dansk.dk",
+    "note": "Catalog url dansk.dk is a family clothing chain ('Vi klær familien på'), not a magazine; the real DANSK fashion magazine domain danskmagazine.com is now a hijacked/spam site 'FreshScope'. No current live publication signal"
+  },
+  {
+    "id": "cmpmdiqam02pc0hu0z302eu4q",
+    "name": "DanskFire",
+    "market": "DK",
+    "websiteUrl": "https://brs.dk",
+    "note": "No evidence any publication named 'DanskFire' exists; brs.dk is Beredskabsstyrelsen (Danish Emergency Management Agency), which publishes statistics, not a magazine by this name. Likely a hallucinated catalog entry"
+  },
+  {
+    "id": "cmpmdiqan02ql0hu0mtqj1u04",
+    "name": "DBU Magasin",
+    "market": "DK",
+    "websiteUrl": "https://www.dbu.dk",
+    "note": "No current national publication titled 'DBU Magasin'; dbu.dk is the football federation site, not a magazine. Closest title 'Magasinet Fodbold' (DBU Jylland) ceased autumn 2025. No live magazine signal"
+  },
+  {
+    "id": "cmpmdiqan02qp0hu0c1grw01u",
+    "name": "Faglig Senior",
+    "market": "DK",
+    "websiteUrl": "https://foa.dk/senior",
+    "note": "foa.dk/senior is about senior work-arrangement rights, not a magazine; Faglige Seniorer org publishes only Seniorhaandbogen + a newsletter — no publication titled 'Faglig Senior' exists"
+  },
+  {
+    "id": "cmpmdiqao02rb0hu0baugxkph",
+    "name": "FOTM (Frivilligt Folkelig Oplysning)",
+    "market": "DK",
+    "websiteUrl": "https://www.dfs.dk",
+    "note": "No organization or publication under the acronym 'FOTM' exists; dfs.dk is Dansk Folkeoplysnings Samraad (umbrella org) which publishes no title by this name — appears to be a hallucinated/garbled catalog entry"
+  },
+  {
+    "id": "cmpmdiqal02nj0hu097jzceqx",
+    "name": "Hesten",
+    "market": "DK",
+    "websiteUrl": "https://www.hesten.dk",
+    "note": "hesten.dk is a generic 'horse information & facts' content page, not a publication; no Danish magazine titled 'Hesten' found in searches or Danske Medier media database. Likely a hallucinated catalog title."
+  },
+  {
+    "id": "cmpmdiqao02rc0hu0jguv2wie",
+    "name": "HR Magasinet",
+    "market": "DK",
+    "websiteUrl": "https://www.djoef.dk",
+    "note": "No Djøf publication called 'HR Magasinet' exists; Djøf publishes 'Djøfbladet' (current to June 2026). djoef.dk is the union site, not a magazine of this name. Likely hallucinated title."
+  },
+  {
+    "id": "cmpmdiqal02nf0hu0i8vcgoqa",
+    "name": "Hund & Træning",
+    "market": "DK",
+    "websiteUrl": "https://www.dkk.dk",
+    "note": "Dansk Kennel Klub's member magazine is 'Hunden' (10x/year); no publication titled 'Hund & Træning' found at dkk.dk or in searches. Likely a hallucinated/incorrect title."
+  },
+  {
+    "id": "cmpmdiqal02ng0hu05d47kn57",
+    "name": "Kennel-Bladet",
+    "market": "DK",
+    "websiteUrl": "https://www.dkk.dk",
+    "note": "DKK (publisher) is active, but its member magazine has been 'HUNDEN' since Jan 1891; no evidence of any DKK title called 'Kennel-Bladet'. Likely mis-seeded name; could not confirm it ever existed."
+  },
+  {
+    "id": "cmpmdiqal02na0hu0oomz5vvb",
+    "name": "Lystfiskeri Magasinet",
+    "market": "DK",
+    "websiteUrl": "https://www.lystfiskeren.dk",
+    "note": "No magazine by this exact name found. Known URL lystfiskeren.dk is a fishing-gear e-commerce retailer (since 1992), not a publisher. Real DK fishing mags are Lystfiskermagasinet, Sportsfiskeren, Fisk & Fri — none match. Likely a hallucinated/garbled title."
+  },
+  {
+    "id": "cmpmdiqal02o30hu0oytakvue",
+    "name": "Maden",
+    "market": "DK",
+    "websiteUrl": "https://maden.dk",
+    "note": "Known URL maden.dk is a BBQ food-delivery/catering business in Næstved (43 'BBQ' mentions, menus, levering), not a magazine. No DK food magazine simply titled 'Maden' confirmed. Likely a hallucinated/misattributed entry."
+  },
+  {
+    "id": "cmpmdiqan02pr0hu0do3egoac",
+    "name": "Madkærligheden",
+    "market": "DK",
+    "websiteUrl": "https://madkærlighed.dk",
+    "note": "Known URL madkærlighed.dk does not resolve (HTTP 000, connection refused). No magazine by this name found; nearest is recipe site 'Mad og Kærlighed' (madogkaerlighed.dk), a different title. Likely hallucinated."
+  },
+  {
+    "id": "cmpmdiqan02qu0hu0hs2q5bzh",
+    "name": "Mit liv",
+    "market": "DK",
+    "websiteUrl": "https://www.mitliv.dk",
+    "note": "mitliv.dk is a diabetes/health webshop by ReaMed A/S, not a magazine; no editorial/advertising publication exists at this domain"
+  },
+  {
+    "id": "cmpmdiqan02py0hu0n8w6auyz",
+    "name": "Murermester",
+    "market": "DK",
+    "websiteUrl": "https://murermester.dk",
+    "note": "No 'Murermester' guild magazine found; murermester.dk is a Copenhagen masonry contractor (Terence Twigg ApS), not a publication. Likely hallucinated title"
+  },
+  {
+    "id": "cmpmdiqal02nx0hu0b8d9a6sh",
+    "name": "Strix Magazine",
+    "market": "DK",
+    "websiteUrl": "https://www.strix.com",
+    "note": "Known URL strix.com is Strix Group Plc, a kettle-control manufacturer on the Isle of Man — not a magazine. No Danish 'Strix Magazine' found in any media registry or search. Likely hallucinated/misattributed."
+  },
+  {
+    "id": "cmpmdiqam02ok0hu0yzvdo13j",
+    "name": "Sundhed i Praksis",
+    "market": "DK",
+    "websiteUrl": "https://www.laeger.dk",
+    "note": "No evidence of any DK publication by this name; laeger.dk is the Danish Medical Association with no such title. Likely hallucinated."
+  },
+  {
+    "id": "cmpmdiqam02p90hu0wgecpwsn",
+    "name": "Tjenestemandsbladet",
+    "market": "DK",
+    "websiteUrl": "https://cs.dk",
+    "note": "Publisher CS publishes 'CS Bladet' (now a digital newsletter), not 'Tjenestemandsbladet'; no independent publication by this name found. Likely wrong name/hallucinated."
+  },
+  {
+    "id": "cmpmdiqal02nc0hu0vd2atys5",
+    "name": "Vand & Vind",
+    "market": "DK",
+    "websiteUrl": "https://www.havnen.dk",
+    "note": "Likely hallucinated: known URL havnen.dk is a housing cooperative in Odense, not a magazine; no publication 'Vand & Vind' found anywhere"
+  },
+  {
+    "id": "cmpmdiqal02o50hu05a1z6bhi",
+    "name": "Vin & Mad",
+    "market": "DK",
+    "websiteUrl": "https://www.vinogmad.dk",
+    "note": "Likely hallucinated: vinogmad.dk is a wine/spirits webshop (self-described netbutik), not an editorial magazine"
+  },
+  {
+    "id": "cmpmdiqak02mc0hu07i13f3ml",
+    "name": "Disney Magasinet",
+    "market": "DK",
+    "websiteUrl": "https://www.egmont.dk",
+    "note": "Egmont DK official magasiner page lists no 'Disney Magasinet'; they publish named Disney titles (Anders And, Disney Prinsesser) but no title with this exact generic name. Likely AI-hallucinated."
+  },
+  {
+    "id": "cmpmdiqam02o90hu032g5lr18",
+    "name": "Smag",
+    "market": "DK",
+    "websiteUrl": "https://www.gastro.dk",
+    "note": "Known URL gastro.dk 301-redirects to euroman.dk/gastro (a 'Gastro' food section of Euroman, published by Story House Egmont) — not a standalone 'Smag' title. No independent publication named 'Smag' could be confirmed; searches return only 'Smag og behag', a Copenhagen restaurant SMAG, and generic food magazines. Likely a misattributed/hallucinated catalog entry; the listed publisher 'Smag (DK)' has no corroborating live signal."
+  },
+  {
+    "id": "cmpmdiqat02yf0hu0sgysuru2",
+    "name": "Autoala",
+    "market": "FI",
+    "websiteUrl": "https://www.autoala.fi",
+    "note": "No publication named 'Autoala' found; autoala.fi is an automotive-careers campaign site, not a magazine. The actual auto trade magazine is Suomen Autolehti. Likely hallucinated title."
+  },
+  {
+    "id": "cmpmdiqat02ye0hu0ycggotdy",
+    "name": "Auto-Foorumi",
+    "market": "FI",
+    "websiteUrl": "https://akl.fi",
+    "note": "No publication by this name found on AKL's site or anywhere; only unrelated automotive web forums (autofoorumi.fi etc.). AKL's uutishuone lists no such member magazine. Likely hallucinated."
+  },
+  {
+    "id": "cmpmdiqau02z50hu0h9x5l58h",
+    "name": "Eläke",
+    "market": "FI",
+    "websiteUrl": "https://www.elakeliitto.fi",
+    "note": "No Finnish magazine named exactly 'Eläke' exists; Eläkeliitto's actual member magazine is 'EL-Sanomat'. Likely a garbled/hallucinated catalog entry."
+  },
+  {
+    "id": "cmpmdiqau02z20hu0zqulwgi4",
+    "name": "Helluntailehti",
+    "market": "FI",
+    "websiteUrl": "https://www.helluntaikirkko.fi",
+    "note": "No Finnish title named 'Helluntailehti' found; cataloged URL is the Pentecostal church org (helluntaikirkko.fi), not a magazine — the movement's actual magazine is Ristin Voitto (Aikamedia). Likely a generic/hallucinated entry"
+  },
+  {
+    "id": "cmpmdiqar02vy0hu0me1xoni6",
+    "name": "Kiekkomaa",
+    "market": "FI",
+    "websiteUrl": "https://www.jatkoaika.com",
+    "note": "No trace of 'Kiekkomaa' anywhere: not on jatkoaika.com (which brands as 'Jatkoaika'), kiekkomaa.fi is NXDOMAIN, no media/search hits. Likely hallucinated/misattributed."
+  },
+  {
+    "id": "cmpmdiqau02za0hu00lcv5lh4",
+    "name": "Kunnallisuusvirka",
+    "market": "FI",
+    "websiteUrl": "https://www.kt.fi",
+    "note": "No such title exists; KT (kt.fi) publishes 'KT-lehti', not 'Kunnallisuusvirka', which returns zero hits anywhere. Likely hallucinated."
+  },
+  {
+    "id": "cmpmdiqas02wm0hu0i2h4de5s",
+    "name": "Lemmikkitaikuri",
+    "market": "FI",
+    "websiteUrl": "https://taikuri.com",
+    "note": "No publication of this name found anywhere; known url taikuri.com redirects to an afternic.com for-sale/parked page. Closest real title 'Lemmikki' ceased Dec 2014. Likely hallucinated."
+  },
+  {
+    "id": "cmpmdiqau02z90hu0vb6tpf19",
+    "name": "Liike",
+    "market": "FI",
+    "websiteUrl": "https://www.liike.fi",
+    "note": "liike.fi is Liikunnan Kehitysyhteistyo LiiKe ry, a sports-development NGO, not a magazine; no publication called 'Liike' exists there (newest site content Oct 2024)."
+  },
+  {
+    "id": "cmpmdiqas02wr0hu0tm4psjj4",
+    "name": "Luontoilta",
+    "market": "FI",
+    "websiteUrl": "https://luontoliitto.fi",
+    "note": "Luonto-Liitto (luontoliitto.fi) publishes member magazines Sieppo and Nuorten Luonto; no magazine named 'Luontoilta' found on the publisher site or in search. Likely hallucinated."
+  },
+  {
+    "id": "cmpmdiqat02y40hu0uhzij4vk",
+    "name": "LVI-Lehti",
+    "market": "FI",
+    "websiteUrl": "https://www.lvi-tu.fi",
+    "note": "Publisher LVI-TU (lvi-tu.fi) is a live org but publishes a newsletter (Uutiskirje), not a magazine named 'LVI-Lehti'. The sector magazine is the separately-published Talotekniikka-lehti. No 'LVI-Lehti' title confirmed."
+  },
+  {
+    "id": "cmpmdiqat02xv0hu0wgkytocs",
+    "name": "Maatilan Tila",
+    "market": "FI",
+    "websiteUrl": "https://www.maaseuduntulevaisuus.fi",
+    "note": "No publication named 'Maatilan Tila' found in any search; only Maaseudun Tulevaisuus (the stated url) and its 'Maatila' topic section exist. Likely a hallucinated/mislabeled catalog entry; no live signal for this exact title."
+  },
+  {
+    "id": "cmpmdiqar02vq0hu0xdt2u2uw",
+    "name": "Mopo",
+    "market": "FI",
+    "websiteUrl": "https://www.mopo.fi",
+    "note": "mopo.fi is not a publication: raw HTML is a meta-refresh redirect to moposport.fi ('Mopo Sport'), a moped/vehicle retail shop. No evidence of any magazine named 'Mopo'. Catalog entry appears to be a misclassified retail domain."
+  },
+  {
+    "id": "cmpmdiqap02t90hu0um7jxzfo",
+    "name": "Nuorten Sara",
+    "market": "FI",
+    "websiteUrl": "https://www.nuortenelama.fi",
+    "note": "No publication 'Nuorten Sara' found. Stated url nuortenelama.fi is a general youth-guidance portal, unrelated; a historical magazine 'Sara' appears only in a media-museum archive (defunct). Likely a hallucinated catalog entry; no live signal."
+  },
+  {
+    "id": "cmpmdiqau02z70hu0e3jdg2i3",
+    "name": "Pankki",
+    "market": "FI",
+    "websiteUrl": "https://www.finanssiala.fi",
+    "note": "No evidence Finanssiala (Finance Finland) publishes a magazine titled 'Pankki'; their own site lists only news/columns/statements, no such magazine; likely catalog hallucination"
+  },
+  {
+    "id": "cmpmdiqat02y00hu0ieteyfch",
+    "name": "Pinta",
+    "market": "FI",
+    "websiteUrl": "https://www.pinta.fi",
+    "note": "Known URL pinta.fi is a marketing agency (Visuaalinen Pinta Oy), not a magazine; no Finnish periodical titled 'Pinta' found; publisher 'Pinta' appears to be a misattribution / catalog hallucination"
+  },
+  {
+    "id": "cmpmdiqat02yo0hu0n26civq8",
+    "name": "Poliisi-lehti",
+    "market": "FI",
+    "websiteUrl": "https://poliisi.fi",
+    "note": "poliisi.fi is the Finnish Police agency site (newsroom, not a magazine publisher); no publication titled 'Poliisi-lehti' found. The actual police professional magazine is 'Poliisi & Oikeus' (publisher SPJL). Likely misattributed/hallucinated title."
+  },
+  {
+    "id": "cmpmdiqar02vz0hu0aw2j5vk3",
+    "name": "Suomen Hiihtotapahtumat",
+    "market": "FI",
+    "websiteUrl": "https://www.hiihtoliitto.fi",
+    "note": "No publication by this name exists; hiihtoliitto.fi (Ski Association) has no such title and there is no media/registry listing — likely hallucinated catalog entry"
+  },
+  {
+    "id": "cmpmdiqat02xw0hu0taaxuoen",
+    "name": "Suomen Maa- ja Metsätalous",
+    "market": "FI",
+    "websiteUrl": "https://maaseutu.fi",
+    "note": "No such publication; maaseutu.fi is the Finnish Ministry of Agriculture EU rural-financing government portal, not a magazine. Likely hallucinated title"
+  },
+  {
+    "id": "cmpmdiqat02y30hu0dcl8chla",
+    "name": "Suomen Sähköalan Liitto",
+    "market": "FI",
+    "websiteUrl": "https://www.ssl.fi",
+    "note": "ssl.fi 301-redirects to suunnistusliitto.fi (Finnish Orienteering Federation); no 'Suomen Sähköalan Liitto' org/publication exists (electrical union is Sähköalojen ammattiliitto). Hallucinated"
+  },
+  {
+    "id": "cmpmdiqap02tc0hu05s0cv32b",
+    "name": "Tammelan Sanomat",
+    "market": "FI",
+    "websiteUrl": "https://www.forssanlehti.fi",
+    "note": "No evidence of a paper by this name (searches for history/closure/merge found nothing); known url forssanlehti.fi is the unrelated active Forssan Lehti. Likely hallucinated"
+  },
+  {
+    "id": "cmpmdiqas02x70hu0ken301p7",
+    "name": "Tehy-Opetus",
+    "market": "FI",
+    "websiteUrl": "https://www.tehy.fi",
+    "note": "No publication by this name exists; tehy.fi 'opettaja' is a teacher MEMBERSHIP category whose magazine is just Tehy-lehti. Likely hallucinated/misattributed catalog entry"
+  },
+  {
+    "id": "cmpmdiqau02z60hu05g9uin2u",
+    "name": "Vakuutuslehti",
+    "market": "FI",
+    "websiteUrl": "https://www.finanssiala.fi",
+    "note": "No current signal for a title 'Vakuutuslehti'; catalog URL is finanssiala.fi (an industry org, not a magazine). Closest match 'Vakuutusväki' (Vakuutusväen Liitto) — and that union merged into Ammattiliitto Pro on 31 Dec 2020. Likely misattributed/defunct"
+  },
+  {
+    "id": "cmpmdiqap02tg0hu08mwhsn64",
+    "name": "Sastamalan Lehti",
+    "market": "FI",
+    "websiteUrl": "https://www.alueviesti.fi",
+    "note": "No publication named 'Sastamalan Lehti' found in searches or on listed publisher (Aluelehdet Oy/Alueviesti). The Sastamala area is served by Alueviesti and Tyrvään Sanomat - no evidence this exact title ever existed."
+  },
+  {
+    "id": "cmpmdiqb703ga0hu0jbry1sk5",
+    "name": "Irish Dentist",
+    "market": "IE",
+    "websiteUrl": "https://www.irishdentist.ie",
+    "note": "irishdentist.ie is a generic AI-content WordPress blog (set up Feb 2024, 'Discovering the news that shapes the world', global news/holiday articles) — not a dental publication. No evidence a real 'Irish Dentist' title exists (real Irish dental titles: irishdentistry.ie, irelandsdentalmag.ie). Likely hallucinated."
+  },
+  {
+    "id": "cmpmdiqa101uq0hu0uoppfev8",
+    "name": "Allmenninn",
+    "market": "NO",
+    "websiteUrl": "https://www.allmenningen.no",
+    "note": "No publication called 'Allmenninn' (or 'Allmenningen') found for NFA; the listed domain allmenningen.no returns a 'Parked' page. The org Norsk forening for allmennmedisin exists but publishes via tidsskriftet.no, not this title. Likely garbled/hallucinated catalog entry."
+  },
+  {
+    "id": "cmpmdiqa101uv0hu0mrjoq8oo",
+    "name": "Annonsørforeningens magasin",
+    "market": "NO",
+    "websiteUrl": "https://www.anfo.no",
+    "note": "ANFO site (anfo.no) is live and active (news to June 2026) but publishes reports/events, not a magazine; no hit anywhere for the literal title 'Annonsørforeningens magasin' — likely a hallucinated catalog entry"
+  },
+  {
+    "id": "cmpmdiqa201vb0hu0ufbq0obr",
+    "name": "Bankhefte",
+    "market": "NO",
+    "websiteUrl": "https://www.finansnorge.no",
+    "note": "No publication named 'Bankhefte' found at Finans Norge or anywhere; Finans Norge's actual publications are Finansrett etc. Likely a hallucinated catalog title."
+  },
+  {
+    "id": "cmpmdiqa201vg0hu0k4h089k3",
+    "name": "Beauty Forum",
+    "market": "NO",
+    "websiteUrl": "https://www.beauty-forum.com",
+    "note": "Beauty Forum exists only as German (beauty-forum.com), Swedish (beautyforum.se) and Danish (beautyforumdk) editions; no Norwegian edition and no NHO link found - publisher/market label appears hallucinated"
+  },
+  {
+    "id": "cmpmdiq9y01pi0hu0cx64qvve",
+    "name": "Birkebeiner'n",
+    "market": "NO",
+    "websiteUrl": "https://www.birkebeiner.no",
+    "note": "birkebeiner.no is a live, current site but it is the Birken sporting-event brand (races scheduled into 2027), not a publication/magazine; no evidence of a media title named 'Birkebeiner'n' - mislabeled as a publication"
+  },
+  {
+    "id": "cmpmdiq9y01pn0hu0srhezk4p",
+    "name": "Bo Magasin",
+    "market": "NO",
+    "websiteUrl": "https://www.bonytt.no",
+    "note": "No Norwegian publication confirmed under the exact name 'Bo Magasin'. Catalog url bonytt.no points to Bonytt (a live but differently-named magazine, now on klikk.no). Likely mislabeled/hallucinated; no live signal for 'Bo Magasin' specifically."
+  },
+  {
+    "id": "cmpmdiqa201vx0hu06nfuw31g",
+    "name": "BUFi",
+    "market": "NO",
+    "websiteUrl": "https://bufi.no",
+    "note": "No publication 'BUFi' from Bufdir exists; bufi.no serves a static page authored 2013 by 'Bulandet Fiskeindustri' (unrelated), HTTPS broken. Bufdir publishes at bufdir.no only. Likely hallucinated catalog entry."
+  },
+  {
+    "id": "cmpmdiq9y01q80hu0gyrehpzu",
+    "name": "Det Norske Akademis Magasin",
+    "market": "NO",
+    "websiteUrl": "https://www.detnorskeakademi.no",
+    "note": "Not listed on the Academy's own utgivelser page (which lists NAOB, Thorleif Dahls Kulturbibliotek, etc.); no magazine by this name found anywhere. Likely hallucinated catalog entry."
+  },
+  {
+    "id": "cmpmdiq9z01qg0hu02ybr2dam",
+    "name": "Eksisten",
+    "market": "NO",
+    "websiteUrl": "https://www.tf.uio.no",
+    "note": "No footprint anywhere; not listed on tf.uio.no faculty site, no publisher/journal registry match. Likely hallucinated catalog entry."
+  },
+  {
+    "id": "cmpmdiqa301wp0hu0y4zehsyl",
+    "name": "Elektro",
+    "market": "NO",
+    "websiteUrl": "https://www.elektro.no",
+    "note": "elektro.no is 'Elektrogruppen', a technical contractor (member of Nelfo), not a magazine. Nelfo's real trade journal is 'Elmagasinet'; no Nelfo magazine called 'Elektro' exists. Catalog mismatch."
+  },
+  {
+    "id": "cmpmdiqa301wz0hu0m1gx7cqr",
+    "name": "Felleskjøpet Mølla",
+    "market": "NO",
+    "websiteUrl": "https://www.felleskjopet.no",
+    "note": "No publication named 'Mølla' found from Felleskjøpet. Their member/customer magazines are 'Samvirke' and 'Vårt Felleskjøp'. No live signal for this title; likely a hallucinated catalog entry."
+  },
+  {
+    "id": "cmpmdiqa301x60hu07mt81l7d",
+    "name": "Folkehøgskolen",
+    "market": "NO",
+    "websiteUrl": "https://www.folkehogskole.no",
+    "note": "folkehogskole.no is a live school-finder portal, not a magazine. No current dated issue found under the exact title 'Folkehøgskolen'; the Christian branch's journal is named 'Steg'. No live signal for this specific title."
+  },
+  {
+    "id": "cmpmdiq9x01o30hu08xv2p77z",
+    "name": "Forskerforum Student",
+    "market": "NO",
+    "websiteUrl": "https://www.forskerforum.no",
+    "note": "No separate publication 'Forskerforum Student' exists. Forskerforbundet publishes the journal 'Forskerforum'; 'Forskerforbundet student' is an association, not a title. Likely hallucinated."
+  },
+  {
+    "id": "cmpmdiqa301xe0hu0sgs1qg3q",
+    "name": "Fotball",
+    "market": "NO",
+    "websiteUrl": "https://www.fotball.no",
+    "note": "fotball.no is the Norges Fotballforbund federation portal (live), not a magazine titled 'Fotball'. No member magazine by that name found; questionable as a native-ad media title."
+  },
+  {
+    "id": "cmpmdiqaa026h0hu09tknuieq",
+    "name": "Frihagen",
+    "market": "NO",
+    "websiteUrl": "https://www.spk.no",
+    "note": "No evidence of any SPK publication named 'Frihagen'; SPK is the state pension fund and its member magazine is not called this. 'Frihagen' is a Norwegian admin-law scholar surname (Arvid Frihagen). Likely hallucinated/misattributed catalog entry."
+  },
+  {
+    "id": "cmpmdiqa301xz0hu0byb61z8b",
+    "name": "Hjertelig",
+    "market": "NO",
+    "websiteUrl": "https://lhl.no",
+    "note": "No magazine named 'Hjertelig' found; LHL's actual member magazine is 'Et bedre liv'. 'Hjertelaget' is a generic name for local heart-support groups, none publishing this title. Likely hallucinated."
+  },
+  {
+    "id": "cmpmdiqab027f0hu0y75qd7od",
+    "name": "Hund",
+    "market": "NO",
+    "websiteUrl": "https://www.hund.no",
+    "note": "Catalog url hund.no is a pet-boarding kennel (Per og Pias), not a magazine. No Norwegian publication titled simply 'Hund' found; NKK's journal is 'Hundesport'. Likely hallucinated/mismapped."
+  },
+  {
+    "id": "cmpmdiqaa027a0hu0iu534c9k",
+    "name": "Idrettsmagasinet",
+    "market": "NO",
+    "websiteUrl": "https://www.idrettsforbundet.no",
+    "note": "No publication named 'Idrettsmagasinet' found for NIF; NIF's historic title is 'Norsk Idrett'. No live signal; likely hallucinated."
+  },
+  {
+    "id": "cmpmdiqa401ya0hu0rzk6347l",
+    "name": "Imam-Forum",
+    "market": "NO",
+    "websiteUrl": "https://www.irn.no",
+    "note": "No publication named 'Imam-Forum' found at Islamsk Råd Norge; IRN runs religious-leader conferences but no such named title. Likely hallucinated."
+  },
+  {
+    "id": "cmpmdiq9x01o50hu0jnttk6sa",
+    "name": "Inside",
+    "market": "NO",
+    "websiteUrl": "https://www.dn.no",
+    "note": "No publication called 'Inside' found at BI; BI's actual magazines are 'BI Marketing Magazine' and 'Leadership Magazine'. Known URL dn.no is Dagens Naeringsliv (publishes 'D2', not 'Inside'). No live signal; likely hallucinated/misattributed."
+  },
+  {
+    "id": "cmpmdiq9u01k00hu05o21x2m7",
+    "name": "Khrono Forskning",
+    "market": "NO",
+    "websiteUrl": "https://www.khrono.no",
+    "note": "No distinct publication by this name found; Khrono covers research news but there is no separate 'Khrono Forskning' title — likely a duplicated/hallucinated catalog entry of Khrono"
+  },
+  {
+    "id": "cmpmdiqa401yn0hu0jges8fo5",
+    "name": "Kirken.no Magasin",
+    "market": "NO",
+    "websiteUrl": "https://www.kirken.no",
+    "note": "No national magazine titled 'Kirken.no Magasin' exists; kirken.no is the Church of Norway institutional website. Local parishes publish 'menighetsblad' but no such national advertising title — likely hallucinated"
+  },
+  {
+    "id": "cmpmdiq9z01ro0hu0otpooqg4",
+    "name": "Klar",
+    "market": "NO",
+    "websiteUrl": "https://www.klar.no",
+    "note": "klar.no is a parked One.com placeholder domain; no Norwegian publication named 'Klar' found - likely hallucinated catalog entry"
+  },
+  {
+    "id": "cmpmdiqaa026u0hu0wusrx8g3",
+    "name": "Klassisk",
+    "market": "NO",
+    "websiteUrl": "https://www.klassisk.no",
+    "note": "klassisk.no resolves to Oslo Sportslager (sports retailer), not a magazine; no Norwegian publication 'Klassisk' found - likely hallucinated"
+  },
+  {
+    "id": "cmpmdiqab027r0hu0i95fryk7",
+    "name": "Kokkeyrket",
+    "market": "NO",
+    "websiteUrl": "https://www.matogvin.no",
+    "note": "matogvin.no 301-redirects to arcus.no (a liquor company); no trade magazine 'Kokkeyrket' exists - likely hallucinated catalog entry"
+  },
+  {
+    "id": "cmpmdiqa001s10hu0bvc3k4fh",
+    "name": "LHL Vi",
+    "market": "NO",
+    "websiteUrl": "https://www.lhl.no",
+    "note": "No LHL magazine named 'Vi' found; LHL's magazines are 'Et bedre liv' and 'SlagNytt & Afasiposten' — likely hallucinated title"
+  },
+  {
+    "id": "cmpmdiqa501zx0hu00mdz3icp",
+    "name": "Misjon idag",
+    "market": "NO",
+    "websiteUrl": "https://www.misjonshuset.no",
+    "note": "No evidence a publication 'Misjon idag' exists; multiple targeted searches found none. Known url misjonshuset.no is a Normisjon mission house site, not a magazine. Likely hallucinated catalog entry."
+  },
+  {
+    "id": "cmpmdiqa6021e0hu04lsixl8v",
+    "name": "Norsk Romsenter Magasin",
+    "market": "NO",
+    "websiteUrl": "https://www.romsenter.no",
+    "note": "No evidence any magazine titled 'Magasin' exists; agency renamed to Direktoratet for romvirksomhet (Sep 2025) and runs only a news website, no periodical. Likely a hallucinated title"
+  },
+  {
+    "id": "cmpmdiqa6021l0hu002nngnsb",
+    "name": "Norsk Squash Magasin",
+    "market": "NO",
+    "websiteUrl": "https://www.squash.no",
+    "note": "No evidence any such magazine exists; Norges Squashforbund site (squash.no) lists only a 'nyhetsbrev', no magazine/tidsskrift. Likely hallucinated title."
+  },
+  {
+    "id": "cmpmdiqa6021n0hu040v5o9h5",
+    "name": "Norsk Steindustri",
+    "market": "NO",
+    "websiteUrl": "https://norskstein.no",
+    "note": "Known domain norskstein.no returns a 'Parked' page (101 bytes); no publication evidence anywhere. Publisher Norsk Bergindustri merged into Norsk Industri on 1 Jan 2026. Likely hallucinated/defunct."
+  },
+  {
+    "id": "cmpmdiqaa026z0hu0zqnm8hn0",
+    "name": "Pent",
+    "market": "NO",
+    "websiteUrl": "https://pent.no",
+    "note": "pent.no is a VG/Schibsted weather service, not a 'Pent' publication; no such magazine confirmed (likely catalog mismatch/hallucination)"
+  },
+  {
+    "id": "cmpmdiqa7022o0hu0hk7ocyes",
+    "name": "Røntgensikret",
+    "market": "NO",
+    "websiteUrl": "https://www.rontgen.no",
+    "note": "No evidence this publication ever existed. Known url rontgen.no 404s / redirects to unilabs.no (private radiology clinic), not an NSF publisher. No web/press-registry hits for 'Røntgensikret'. Likely hallucinated catalog entry."
+  },
+  {
+    "id": "cmpmdiqa001t40hu0ju5tasrj",
+    "name": "Salt",
+    "market": "NO",
+    "websiteUrl": "https://www.salt.no",
+    "note": "Known url salt.no is 'Saltimport', a salt-supplier company (not a magazine; 2026 product pages). No Norwegian magazine 'Salt magasin' found at salt.no. Other 'SALT' entities exist (art project salted.no, marine research salt.nu) but none matches this catalog entry. Likely mismatched/hallucinated."
+  },
+  {
+    "id": "cmpmdiqa7022t0hu0za7rkbss",
+    "name": "Searcher",
+    "market": "NO",
+    "websiteUrl": "https://www.snl.no",
+    "note": "No Norwegian publication named Searcher exists; known URL is snl.no (Store norske leksikon), publisher 'Searcher' is self-referential. Likely hallucinated catalog row"
+  },
+  {
+    "id": "cmpmdiqa7022z0hu0pt4u67zg",
+    "name": "Slik er det",
+    "market": "NO",
+    "websiteUrl": "https://www.tv2.no",
+    "note": "No LHL publication named 'Slik er det' found; LHL's member magazine is 'Et bedre liv' (formerly 'Det nytter'). Known URL is tv2.no (mismatched). Likely hallucinated row"
+  },
+  {
+    "id": "cmpmdiqa702330hu05g2e3t64",
+    "name": "Spektrum",
+    "market": "NO",
+    "websiteUrl": "https://spektrum.no",
+    "note": "Autismeforeningen's actual member magazine is 'Autisme i dag' (issue 1/2025), not 'Spektrum'; spektrum.no resolves to unrelated 'Spektrum Profil AS'. No autism publication named Spektrum confirmed; likely a misattributed/hallucinated title."
+  },
+  {
+    "id": "cmpmdiqaa027b0hu0ibem0ckh",
+    "name": "Sportsmanship",
+    "market": "NO",
+    "websiteUrl": "https://sportsmanship.com",
+    "note": "sportsmanship.com unreachable (HTTP 000); no Norwegian media publication named 'Sportsmanship' exists. Closest match is unrelated brand-distribution firm 'Sportmanship' (sportmanship.com). Likely a hallucinated catalog title."
+  },
+  {
+    "id": "cmpmdiqa7023d0hu0v066uw95",
+    "name": "Stå",
+    "market": "NO",
+    "websiteUrl": "https://www.sta.no",
+    "note": "Known url sta.no is an architecture firm (Schjelderup Trondahl arkitekter); Norges Bandyforbund (bandyforbundet.no) shows no publication named 'Stå'. No live signal - likely mis-mapped/hallucinated."
+  },
+  {
+    "id": "cmpmdiqa101tm0hu0nat06rjf",
+    "name": "Studio",
+    "market": "NO",
+    "websiteUrl": "https://www.studio.no",
+    "note": "studio.no resolves to a personal artist portfolio (Rolf Jansson Art), not a publication/magazine; no evidence of a Norwegian media title named Studio at this domain"
+  },
+  {
+    "id": "cmpmdiqaa026j0hu09ceh3jb4",
+    "name": "Šuoŋ",
+    "market": "NO",
+    "websiteUrl": "https://www.nordnorskdebatt.no",
+    "note": "No publication called 'Šuoŋ' found in any search; publisher 'Šuoŋ' and known URL nordnorskdebatt.no (unrelated Amedia debate site) are inconsistent — likely a hallucinated/garbled catalog entry"
+  },
+  {
+    "id": "cmpmdiqa8023p0hu0c1opevo8",
+    "name": "Tidens Tale",
+    "market": "NO",
+    "websiteUrl": "https://www.dnt.no",
+    "note": "Zero evidence of any Norwegian magazine by this name; known URL dnt.no publishes Fjell og Vidde, not Tidens Tale. Likely hallucinated catalog entry"
+  },
+  {
+    "id": "cmpmdiqaa02760hu01p22mrsa",
+    "name": "Transportforum",
+    "market": "NO",
+    "websiteUrl": "https://www.transportarbeider.no",
+    "note": "No Norwegian publication 'Transportforum' found; the name matches a Swedish VTI conference. Catalog url transportarbeider.no is the transport union (merged into Fellesforbundet 2019), not a title. Likely mis-seeded/hallucinated."
+  },
+  {
+    "id": "cmpmdiqa802480hu0niejufdv",
+    "name": "Tungtransporten",
+    "market": "NO",
+    "websiteUrl": "https://www.tungt.no",
+    "note": "Known URL tungt.no is 'Tungt' by Nordiske Fagmedier (alive), NOT 'Tungtransporten' by NLF; NLF's actual member magazine is 'NLF-Magasinet'. No publication titled 'Tungtransporten' found from NLF - likely a hallucinated/mislabeled catalog title."
+  },
+  {
+    "id": "cmpmdiqa8024j0hu03a0c0g63",
+    "name": "Veisikkerhet",
+    "market": "NO",
+    "websiteUrl": "https://tryggtrafikk.no",
+    "note": "Trygg Trafikk's own site lists only newsletter/podcasts/teaching materials and no magazine 'Veisikkerhet'; no press-registry or issue evidence found. Likely a hallucinated title."
+  },
+  {
+    "id": "cmpmdiqa101u60hu0ll7lc7re",
+    "name": "Vi med Hest",
+    "market": "NO",
+    "websiteUrl": "https://www.hestesport.no",
+    "note": "Known url hestesport.no returns Vercel DEPLOYMENT_NOT_FOUND (no live site); no magazine 'Vi med Hest' found in any search. Likely hallucinated or dead."
+  },
+  {
+    "id": "cmpmdiqa9025c0hu0ydbjbxxr",
+    "name": "Coop Medlem",
+    "market": "NO",
+    "websiteUrl": "https://coopmedlem.no",
+    "note": "'Coop Medlem' is Coop Norge's membership program/app (coop.no/medlem; app on App Store/Google Play), not a standalone member magazine. The coop.no/medlem/coop-medlem-magasin page describes the program, not a magazine. No current NO Coop member magazine by this name confirmed."
+  },
+  {
+    "id": "cmpmdiqah02hu0hu0i2eh2yrl",
+    "name": "Fritänk",
+    "market": "SE",
+    "websiteUrl": "https://www.frimurarorden.se",
+    "note": "No publication named 'Fritänk' found anywhere; the Frimurarorden's magazine is 'Frimuraren'. Likely a hallucinated/wrong title."
+  },
+  {
+    "id": "cmpmdiqai02j20hu0r7cxhjsl",
+    "name": "Hakon",
+    "market": "SE",
+    "websiteUrl": "https://www.icagruppen.se",
+    "note": "No publication named 'Hakon' exists; icagruppen.se is ICA's corporate site. 'Hakon' is a historical company/person (Hakonbolaget/Hakon Swenson) and a media holding co (Hakon Media), not a titled publication. Likely hallucinated catalog entry."
+  },
+  {
+    "id": "cmpmdiqai02id0hu0v0if3ied",
+    "name": "Hästen",
+    "market": "SE",
+    "websiteUrl": "https://www.hastnet.se",
+    "note": "No equestrian magazine called 'Hästen' found. Known url hastnet.se is 'Hästnet', a horse classifieds marketplace, not a publication. Title appears to be a mismatch/hallucination."
+  },
+  {
+    "id": "cmpmdiqaf02ed0hu0yjyacren",
+    "name": "Hemma med IKEA",
+    "market": "SE",
+    "websiteUrl": "https://www.ikea.com/se",
+    "note": "No publication titled 'Hemma med IKEA' found. ikea.com is IKEA's e-commerce site; the IKEA print catalog (the relevant publication) ceased in 2021. Likely hallucinated catalog entry."
+  },
+  {
+    "id": "cmpmdiqai02iv0hu0r28a6jfo",
+    "name": "HRT",
+    "market": "SE",
+    "websiteUrl": "https://www.hrt.se",
+    "note": "Known url hrt.se is a parked/for-sale domain (redirects to fruits.co marketplace listing 'hrt.se | fruits'). No publication named 'HRT' found; searches return only hormone-therapy medical content. Likely hallucinated."
+  },
+  {
+    "id": "cmpmdiqai02iu0hu074q9ui9y",
+    "name": "Hus & Mark",
+    "market": "SE",
+    "websiteUrl": "https://husmark.se",
+    "note": "husmark.se now serves a one.com 'Hosted by' parking page (Last-Modified Oct 2024); no evidence a 'Hus & Mark' magazine exists. Likely hallucinated/parked."
+  },
+  {
+    "id": "cmpmdiqai02iw0hu0b3hvrg22",
+    "name": "Insight",
+    "market": "SE",
+    "websiteUrl": "https://insight-magazine.com",
+    "note": "insight-magazine.com is Cloudflare-blocked; no Swedish magazine titled 'Insight' found in any registry/listing. Generic name; likely hallucinated or non-SE."
+  },
+  {
+    "id": "cmpmdiqah02hk0hu0gd1twqhh",
+    "name": "Kommun & Politik",
+    "market": "SE",
+    "websiteUrl": "https://www.skr.se",
+    "note": "No SKR magazine by this name exists; known url skr.se is the member org, not a publication. Closest real title is academic journal 'Kommunal ekonomi och politik' (1997-2009, succeeded by 'Offentlig forvaltning'). Likely catalog hallucination"
+  },
+  {
+    "id": "cmpmdiqai02i70hu00jzuktga",
+    "name": "Längdåkning",
+    "market": "SE",
+    "websiteUrl": "https://www.skidor.com",
+    "note": "Not a publication - 'Langdakning' is the cross-country skiing discipline/section on Svenska Skidforbundet's skidor.com. The actual Swedish ski magazine is 'Aka Skidor'. Likely catalog hallucination"
+  },
+  {
+    "id": "cmpmdiqai02hz0hu0bunwevv6",
+    "name": "Liv & Hälsa",
+    "market": "SE",
+    "websiteUrl": "https://www.adventist.se",
+    "note": "No Adventist magazine named 'Liv & Halsa'; subscription page lists only 'AdventLiv' and 'Bibelstudium'. 'Liv'/'Halsa' are menu sections on adventist.se. Former Adventist outreach mag 'Liv i nutid' ceased ~1988-89. Likely hallucination"
+  },
+  {
+    "id": "cmpmdiqaf02eh0hu06w0f0b23",
+    "name": "Mersmak",
+    "market": "SE",
+    "websiteUrl": "https://mersmak.se",
+    "note": "Catalog url mersmak.se is an accounting firm explicitly stating no Coop/food link; no Axfood 'Mersmak' magazine exists (Coop's food mag is 'Mer Smak'); likely a mismatched/hallucinated entry"
+  },
+  {
+    "id": "cmpmdiqag02f70hu0iyzj3znt",
+    "name": "MM Sport",
+    "market": "SE",
+    "websiteUrl": "https://www.mmsports.se",
+    "note": "mmsports.se is a live supplements/training-gear e-commerce retailer (MM Sports), not an editorial publication. No evidence of a media title 'MM Sport' carrying native advertising."
+  },
+  {
+    "id": "cmpmdiqai02i80hu0uw3ny3ij",
+    "name": "På Snö",
+    "market": "SE",
+    "websiteUrl": "https://www.pa.se",
+    "note": "No magazine by this name found in any search; known url pa.se redirects to a GoDaddy for-sale parked page. Likely hallucinated/dead title, no live signal."
+  },
+  {
+    "id": "cmpmdiqah02gg0hu0ojj3qup2",
+    "name": "Plast & Kemiteknik",
+    "market": "SE",
+    "websiteUrl": "https://www.plastnet.se",
+    "note": "No publication by this exact name found anywhere; known URL plastnet.se actually serves a different live title (Plastforum). Likely catalog error/hallucination"
+  },
+  {
+    "id": "cmpmdiqai02j50hu09bj6uud4",
+    "name": "Resia News",
+    "market": "SE",
+    "websiteUrl": "https://www.resia.se",
+    "note": "No publication by this name exists; Resia is a travel agency (rebranded to Reed & Mackay in 2023) with only a corporate newsletter, not a media title. Likely a catalog hallucination."
+  },
+  {
+    "id": "cmpmdiqai02i50hu0ifxkpx4j",
+    "name": "Skidsport",
+    "market": "SE",
+    "websiteUrl": "https://www.skidor.com",
+    "note": "No publication titled 'Skidsport' found. skidor.com is the Swedish Ski Federation (org, not a magazine by this name); Sweden's ski magazines are Aka Skidor and Magasinet Skidor. Likely a conflated/hallucinated title."
+  },
+  {
+    "id": "cmpmdiqah02hl0hu018xteuuu",
+    "name": "Tidningen Pension",
+    "market": "SE",
+    "websiteUrl": "https://www.pensionsmyndigheten.se",
+    "note": "No publication named 'Tidningen Pension' found; Pensionsmyndigheten (listed publisher) issues press releases not a magazine by this name. Likely hallucinated entry"
+  },
+  {
+    "id": "cmpmdiqai02il0hu0yf9dsr5z",
+    "name": "Universitetsvärlden",
+    "market": "SE",
+    "websiteUrl": "https://www.uka.se",
+    "note": "No publication by this name exists; UKÄ publishes reports/stats, not a magazine called Universitetsvärlden. Likely hallucinated (real adjacent title is SULF's Universitetsläraren)."
+  },
+  {
+    "id": "cmpmdiqaf02ej0hu05sf2dr80",
+    "name": "Vinmagasinet",
+    "market": "SE",
+    "websiteUrl": "https://www.aktiebolag.se",
+    "note": "Catalog url aktiebolag.se is a company-registry placeholder, not a magazine. 'Vinmagasinet' alone is ambiguous; closest live match is Vinmagasinet Livets Goda (livetsgoda.se), but identity unconfirmed."
+  },
+  {
+    "id": "cmpmdiqaf02en0hu0z2uewrt6",
+    "name": "Vintage",
+    "market": "SE",
+    "websiteUrl": "https://www.vintage.se",
+    "note": "vintage.se is an 'under construction' placeholder ('I'm working on this page it's not done yet') with no articles, dates, or publication content; no evidence it ever existed as a real native-ad title."
+  }
+]

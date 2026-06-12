@@ -5,6 +5,7 @@ import { prisma } from "@/lib/prisma";
 import { loadRoster } from "@/lib/writers/roster";
 import { SubmitButton } from "@/components";
 import { createWriterInvite } from "@/app/writer-invite-actions";
+import { SafeEmail } from "@/components/safe-email";
 
 export const dynamic = "force-dynamic";
 
@@ -83,7 +84,7 @@ export default async function DeskWriters({
               <tbody>
                 {pendingInvites.map((invite) => (
                   <tr key={invite.id}>
-                    <td>{invite.email}</td>
+                    <td><SafeEmail address={invite.email} /></td>
                     <td className="muted small">
                       {invite.expiresAt.toLocaleDateString()}
                     </td>
@@ -123,7 +124,7 @@ export default async function DeskWriters({
               <tbody>
                 {roster.map((w) => (
                   <tr key={w.id}>
-                    <td>{w.name ?? w.email}</td>
+                    <td>{w.name ?? <SafeEmail address={w.email} />}</td>
                     <td>
                       {w.languages.length > 0
                         ? w.languages

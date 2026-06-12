@@ -2,6 +2,7 @@ import { getTranslations } from "next-intl/server";
 import { prisma } from "@/lib/prisma";
 import { isMembershipActive } from "@/lib/membership";
 import { SubmitButton } from "@/components";
+import { SafeEmail } from "@/components/safe-email";
 import {
   inviteToOrg,
   revokeMembership,
@@ -258,7 +259,7 @@ export async function TeamSection({ locale, orgId, isAdmin }: Props) {
                       : null;
                     return (
                       <tr key={inv.id}>
-                        <td>{inv.email}</td>
+                        <td><SafeEmail address={inv.email} /></td>
                         <td>{roleLabel}</td>
                         <td>{inv.canCommit ? t("yes") : t("no")}</td>
                         <td>{expires ?? "—"}</td>

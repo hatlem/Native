@@ -9,6 +9,7 @@ import {
 } from "@/app/price-actions";
 import { listContactsForTitle } from "@/lib/pricing/contacts";
 import { SubmitButton } from "@/components";
+import { SafeEmail } from "@/components/safe-email";
 
 export async function PriceRequestsPanel({
   locale,
@@ -53,7 +54,7 @@ export async function PriceRequestsPanel({
                 {contacts.map((c) => (
                   <option key={c.id} value={c.id}>
                     {c.name}
-                    {c.isPrimary ? ` (${t("primary")})` : ""} — {c.email}
+                    {c.isPrimary ? ` (${t("primary")})` : ""} — <SafeEmail address={c.email} />
                   </option>
                 ))}
               </select>
@@ -100,7 +101,7 @@ export async function PriceRequestsPanel({
                   >
                     <td style={{ padding: "10px 8px" }}>
                       <strong>{r.salesContact.name}</strong>
-                      <div className="muted small">{r.salesContact.email}</div>
+                      <div className="muted small"><SafeEmail address={r.salesContact.email} /></div>
                     </td>
                     <td style={{ padding: "10px 8px" }}>
                       {r.createdAt.toISOString().slice(0, 10)}

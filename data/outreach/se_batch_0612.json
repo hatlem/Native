@@ -1,0 +1,22 @@
+[
+  { "email": "info@idrottensaffarer.se", "title": "Idrottens Affärer", "site": "idrottensaffarer.se", "hook": "kunder som vill nå beslutsfattare och aktörer inom idrottsbranschen, och Idrottens Affärer är en självklar kanal där" },
+  { "email": "tony.gustavsson@squarepublishing.se", "title": "Kamera & Bild", "site": "kamerabild.se", "hook": "kunder som vill nå en foto- och bildintresserad publik, och Kamera & Bild är ett tydligt val där" },
+  { "email": "annons@haparandabladet.se", "title": "Haparandabladet", "site": "haparandabladet.se", "hook": "kunder som vill nå läsare i Haparanda och Tornedalen, och Haparandabladet når den lokala publiken direkt" },
+  { "email": "annons@lira.se", "title": "Lira Musikmagasin", "site": "lira.se", "hook": "kunder som vill nå en musikintresserad publik, och Lira Musikmagasin är en stark kanal där" },
+  { "email": "annons@husbyggaren.se", "title": "Husbyggaren", "site": "husbyggaren.se", "hook": "kunder som vill nå bygg- och fastighetsproffs, och Husbyggaren träffar precis den målgruppen" },
+  { "email": "annons@sandaren.se", "title": "Sändaren", "site": "sandaren.se", "hook": "kunder som vill nå en kristen läsekrets, och Sändaren är en etablerad kanal där" },
+  { "email": "annons@kyrkanstidning.se", "title": "Kyrkans Tidning", "site": "kyrkanstidning.se", "hook": "kunder som vill nå engagerade inom Svenska kyrkan och en kristen läsekrets, och Kyrkans Tidning når dem direkt" },
+  { "email": "annons@hemmetsvan.se", "title": "Hemmets Vän", "site": "hemmetsvan.se", "hook": "kunder som vill nå en kristen läsekrets, och Hemmets Vän är en tydlig kanal där" },
+  { "email": "annonsera@tandlakartidningen.se", "title": "Tandläkartidningen", "site": "tandlakartidningen.se", "hook": "kunder som vill nå tandläkare och tandvårdsprofession på ett trovärdigt sätt, och Tandläkartidningen är den naturliga kanalen" },
+  { "email": "annons@pausermedia.se", "title": "Vd-tidningen", "site": "vdtidningen.se", "hook": "kunder som vill nå vd:ar och beslutsfattare i näringslivet, och Vd-tidningen träffar precis den målgruppen" },
+  { "email": "gb@intelligentlogistik.se", "title": "Intelligent Logistik", "site": "intelligentlogistik.se", "hook": "kunder som vill nå beslutsfattare inom transport och logistik, och Intelligent Logistik är en självklar kanal där" },
+  { "email": "annons@dagen.se", "title": "Dagen", "site": "dagen.se", "hook": "kunder som vill nå en kristen läsekrets, och Dagen är en av de starkaste kanalerna där" },
+  { "email": "info@glanta.org", "title": "Glänta", "site": "glanta.org", "hook": "kunder som vill nå en kultur- och idéintresserad publik, och Glänta är en intressant kanal där" },
+  { "email": "per@anlaggningsvarlden.se", "title": "Anläggningsvärlden", "site": "anlaggningsvarlden.se", "hook": "kunder som vill nå proffs inom anläggning och entreprenad, och Anläggningsvärlden träffar den målgruppen" },
+  { "email": "miriam.andersson@travelnews.se", "title": "Travel News", "site": "travelnews.se", "hook": "kunder som vill nå rese- och turismbranschen, och Travel News är en självklar kanal där" },
+  { "email": "Yuksel.u@pausermedia.se", "title": "Miljö & Utveckling", "site": "miljo-utveckling.se", "hook": "kunder som vill nå hållbarhets- och miljöansvariga, och Miljö & Utveckling träffar precis den målgruppen" },
+  { "email": "maria@lime.nu", "title": "Jaktjournalen", "site": "jaktjournalen.se", "hook": "kunder som vill nå jakt- och friluftsintresserade, och Jaktjournalen är en stark kanal där" },
+  { "email": "vejde@adviser.se", "title": "Arkitektur", "site": "arkitektur.se", "hook": "kunder som vill nå arkitekter och gestaltningsproffs, och Arkitektur är den naturliga kanalen" },
+  { "email": "sandra@adviser.se", "title": "Forskning & Framsteg", "site": "fof.se", "hook": "kunder som vill nå en vetenskaps- och kunskapsintresserad publik, och Forskning & Framsteg är ett tydligt val där" },
+  { "email": "tony.sjosten@gotamedia.se", "title": "Götamedias regionala titlar", "site": "gotamedia.se", "titles_list": "Barometern, Borås Tidning, Smålandsposten, Kristianstadsbladet, Ystads Allehanda m.fl.", "hook": "kunder som vill nå läsare i södra Sverige, och era regionala titlar (Barometern, Borås Tidning, Smålandsposten, Ystads Allehanda m.fl.) täcker den publiken brett" }
+]
