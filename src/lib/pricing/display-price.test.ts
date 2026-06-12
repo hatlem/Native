@@ -27,6 +27,7 @@ function product(over: Record<string, unknown> = {}) {
     active: true,
     confirmedAt: CONFIRMED,
     type: "NATIVE_ARTICLE",
+    pricingModel: "FLAT",
     basePrice: 30_000,
     currency: "NOK",
     priceRules: [], // empty → default margin applies

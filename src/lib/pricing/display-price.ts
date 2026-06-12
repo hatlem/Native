@@ -33,9 +33,11 @@ export type DisplayProduct = {
   type: string;
   basePrice: unknown;
   currency: string;
-  // Optional for back-compat with callers/tests that predate unit
-  // handling; missing means FLAT (the schema default).
-  pricingModel?: string;
+  // REQUIRED: a Prisma `select` that omits this field made isFlat() treat
+  // CPM products as FLAT and band a 500 NOK CPM rate as "< 15k NOK" on
+  // the v1 API and CSV export (2026-06-12). Forcing the key means any
+  // select that forgets it fails typecheck instead of mispricing.
+  pricingModel: string;
   priceRules: { marginPct: unknown; seasonalMultiplier: unknown; minVolume: number }[];
   productionFee?: unknown;
 };

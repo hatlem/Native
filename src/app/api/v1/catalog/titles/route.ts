@@ -106,6 +106,7 @@ export async function GET(req: NextRequest) {
           id: true,
           type: true,
           basePrice: true,
+          pricingModel: true,
           currency: true,
           visibility: true,
           leadTimeDays: true,
@@ -152,6 +153,7 @@ export async function GET(req: NextRequest) {
           return {
             id: p.id,
             type: p.type,
+            pricingModel: p.pricingModel,
             priceBand: band ? bandLabel(band, p.currency) : null,
             currency: p.currency,
             visibility: band ? p.visibility : "INDICATIVE",

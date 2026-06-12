@@ -55,6 +55,7 @@ export async function GET(req: NextRequest) {
           id: true,
           type: true,
           basePrice: true,
+          pricingModel: true,
           currency: true,
           visibility: true,
           leadTimeDays: true,
