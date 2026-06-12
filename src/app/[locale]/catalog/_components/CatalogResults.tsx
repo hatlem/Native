@@ -89,9 +89,11 @@ export async function CatalogResults({
               {title.offersNativeContent ? (
                 <span className="tag">{t("card.offersNative")}</span>
               ) : null}
-              {title.products.map((p) => (
-                <span className="tag" key={p.id}>
-                  {tType(p.type)}
+              {/* One tag per distinct format — a title with five article
+                  products should read "Native-artikkel" once, not five times. */}
+              {[...new Set(title.products.map((p) => p.type))].map((type) => (
+                <span className="tag" key={type}>
+                  {tType(type)}
                 </span>
               ))}
               {visibleProducts.some((p) => p.visibility === "FIRM") ? (
