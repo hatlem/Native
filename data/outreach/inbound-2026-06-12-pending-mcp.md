@@ -57,3 +57,12 @@ Tips fra Maria: Sandnesposten god match sammen med Gjesdalbuen (Sør-Rogaland).
 - [x] Gjesdalbuen: contact + INBOUND + pakkequote 34580 NOK applied (cmqb3q4m3); CPM-ordinærpriser dokumentert i kontakt/logg — porteføljeutrulling avventer Andreas
 - [x] KM: OUTBOUND logget (cmqb3qlkn)
 - [~] Suomenmaa: desk-knappene var DØDE (nestet-form-bug, fikset i deploy) — deaktiveres når fixen er live
+
+## 5. Curation follow-up (needs migration — deferred until prod migration recovery is available)
+Big Issue + Gjesdalbuen quotes were logged via MCP with semantics in the includedText NOTE, not structured fields. Desk UI can set productionFee (done for Big Issue = £600) but NOT structured `inclusions`. To give buyers the "Garantert X visninger / Ferdig skrevet artikkel" line, a migration should set:
+- the-big-issue-uk NATIVE_ARTICLE: inclusions {production:"PUBLISHER", viewsTotal:5000}  (productionFee 600 already set 06-13)
+- gjesdalbuen-no package (cmpn1ct2p001z0hvyoomo5l2g): productionFee, inclusions {production:"PUBLISHER", viewsTotal:100000, frontpage:true, durationWeeks:3, articles:1}
+Why deferred: 2026-06-12 outage left no migration-recovery path mid-session (Chrome extension disconnected, Railway CLI logged out). Recovery is via Railway dashboard Postgres console (migrate-resolve) or `railway login`.
+
+## 6. Bonnier ownership — VERIFIED, no action
+Checked the rumored Bonnier Publications→Aller 2019 sale: FALSE (Bo Bedre = Bonnier since 1983; only Aller/Bonnier deal was 2014 Finnish titles). Bonnier subsidiaries (News / News Local / Publications / Magazines & Brands / Business) are legitimately distinct. No reassignment. Minor future cleanup only: "Komputer For Alle [NO]" sits under generic "Bonnier (NO)" but belongs in "Bonnier Publications (NO)".
