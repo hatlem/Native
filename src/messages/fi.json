@@ -2313,5 +2313,21 @@
     "saveOverride": "Tallenna korjaus",
     "frozenNoEdit": "Luvut on lukittu eikä niitä voi muokata.",
     "unknownPublisher": "Tuntematon julkaisija"
+  },
+  "rateCards": {
+    "title": "Hinnastot / mediakortit",
+    "empty": "Tälle nimikkeelle ei ole vielä tallennettu hinnastoasiakirjoja.",
+    "complete": "Kaupallinen profiili valmis",
+    "incomplete": "Puuttuu",
+    "missing_advertiser_content_price": "mainostajan sisällön hinta",
+    "missing_included_text": "mitä sisältyy",
+    "missing_own_content_allowed": "oman artikkelin käytäntö",
+    "included": "Sisältyy",
+    "excluded": "Ei sisälly",
+    "applied": "Lisätty katalogiin",
+    "pending": "Odottaa",
+    "ocr_PENDING": "OCR odottaa",
+    "ocr_DONE": "OCR valmis",
+    "ocr_FAILED": "OCR epäonnistui"
   }
 }

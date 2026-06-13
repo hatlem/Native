@@ -2313,5 +2313,21 @@
     "saveOverride": "Lagre korreksjon",
     "frozenNoEdit": "Tallene er låst og kan ikke redigeres.",
     "unknownPublisher": "Ukjent utgiver"
+  },
+  "rateCards": {
+    "title": "Prislister / mediekit",
+    "empty": "Ingen prislistedokumenter lagret for denne tittelen ennå.",
+    "complete": "Kommersiell profil komplett",
+    "incomplete": "Mangler",
+    "missing_advertiser_content_price": "pris for annonsørinnhold",
+    "missing_included_text": "hva som er inkludert",
+    "missing_own_content_allowed": "policy for egne artikler",
+    "included": "Inkludert",
+    "excluded": "Ikke inkludert",
+    "applied": "Lagt inn i katalogen",
+    "pending": "Venter",
+    "ocr_PENDING": "OCR venter",
+    "ocr_DONE": "OCR fullført",
+    "ocr_FAILED": "OCR feilet"
   }
 }

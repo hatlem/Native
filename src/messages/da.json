@@ -2314,5 +2314,21 @@
     "saveOverride": "Gem korrektion",
     "frozenNoEdit": "Tallene er låst og kan ikke redigeres.",
     "unknownPublisher": "Ukendt udgiver"
+  },
+  "rateCards": {
+    "title": "Prislister / mediekit",
+    "empty": "Ingen prisliste-dokumenter gemt for denne titel endnu.",
+    "complete": "Kommerciel profil komplet",
+    "incomplete": "Mangler",
+    "missing_advertiser_content_price": "pris for annoncørindhold",
+    "missing_included_text": "hvad der er inkluderet",
+    "missing_own_content_allowed": "politik for egne artikler",
+    "included": "Inkluderet",
+    "excluded": "Ikke inkluderet",
+    "applied": "Lagt i kataloget",
+    "pending": "Afventer",
+    "ocr_PENDING": "OCR afventer",
+    "ocr_DONE": "OCR færdig",
+    "ocr_FAILED": "OCR mislykkedes"
   }
 }

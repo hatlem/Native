@@ -2313,5 +2313,21 @@
     "saveOverride": "Spara korrigering",
     "frozenNoEdit": "Siffrorna är låsta och kan inte redigeras.",
     "unknownPublisher": "Okänd utgivare"
+  },
+  "rateCards": {
+    "title": "Prislistor / mediakit",
+    "empty": "Inga prislistedokument sparade för denna titel ännu.",
+    "complete": "Kommersiell profil komplett",
+    "incomplete": "Saknas",
+    "missing_advertiser_content_price": "pris för annonsörsinnehåll",
+    "missing_included_text": "vad som ingår",
+    "missing_own_content_allowed": "policy för egna artiklar",
+    "included": "Ingår",
+    "excluded": "Ingår inte",
+    "applied": "Tillagd i katalogen",
+    "pending": "Väntar",
+    "ocr_PENDING": "OCR väntar",
+    "ocr_DONE": "OCR klar",
+    "ocr_FAILED": "OCR misslyckades"
   }
 }

@@ -2182,5 +2182,21 @@
     "saveOverride": "Korrektur speichern",
     "frozenNoEdit": "Die Zahlen sind gesperrt und können nicht bearbeitet werden.",
     "unknownPublisher": "Unbekannter Verlag"
+  },
+  "rateCards": {
+    "title": "Preislisten / Mediadaten",
+    "empty": "Für diesen Titel sind noch keine Preislisten-Dokumente gespeichert.",
+    "complete": "Kommerzielles Profil vollständig",
+    "incomplete": "Fehlt",
+    "missing_advertiser_content_price": "Preis für Advertorial-Inhalte",
+    "missing_included_text": "was enthalten ist",
+    "missing_own_content_allowed": "Richtlinie für eigene Artikel",
+    "included": "Enthalten",
+    "excluded": "Nicht enthalten",
+    "applied": "Im Katalog übernommen",
+    "pending": "Ausstehend",
+    "ocr_PENDING": "OCR ausstehend",
+    "ocr_DONE": "OCR fertig",
+    "ocr_FAILED": "OCR fehlgeschlagen"
   }
 }
