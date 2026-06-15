@@ -11,6 +11,7 @@ import {
 } from "@/app/account-actions";
 import { SubmitButton } from "@/components";
 import { TeamSection } from "./team-section";
+import { LocaleSwitcher } from "./locale-switcher";
 
 export const dynamic = "force-dynamic";
 
@@ -160,6 +161,22 @@ export default async function AccountPage({
             />
           </div>
         </form>
+      </section>
+
+      <section className="section" id="language">
+        <div className="section-head">
+          <div>
+            <span className="eyebrow">{t("languageEyebrow")}</span>
+            <h2>{t("languageTitle")}</h2>
+          </div>
+        </div>
+        <div className="product-form card">
+          <div className="field">
+            <label htmlFor="acc-language">{t("languageLabel")}</label>
+            <LocaleSwitcher current={locale} />
+            <span className="hint">{t("languageHint")}</span>
+          </div>
+        </div>
       </section>
 
       <section className="section" id="company">

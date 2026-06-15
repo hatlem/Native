@@ -278,7 +278,7 @@ export default async function MyOrderPage({
           )}
 
           <div className="table-wrap" style={{ overflowX: "auto" }}>
-            <table className="data-table">
+            <table className="table">
               <thead>
                 <tr>
                   <th>{tcr("colPublisher")}</th>
