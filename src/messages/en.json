@@ -985,7 +985,9 @@
     "AT": "Austria",
     "CH": "Switzerland",
     "UK": "United Kingdom",
-    "IE": "Ireland"
+    "IE": "Ireland",
+    "NL": "Netherlands",
+    "BE": "Belgium"
   },
   "marketing": {
     "howCta": "How it works",

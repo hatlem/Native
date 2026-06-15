@@ -986,7 +986,9 @@
     "AT": "Itävalta",
     "CH": "Sveitsi",
     "UK": "Iso-Britannia",
-    "IE": "Irlanti"
+    "IE": "Irlanti",
+    "NL": "Alankomaat",
+    "BE": "Belgia"
   },
   "marketing": {
     "howCta": "Näin se toimii",

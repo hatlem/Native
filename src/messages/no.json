@@ -907,7 +907,9 @@
     "AT": "Østerrike",
     "CH": "Sveits",
     "UK": "Storbritannia",
-    "IE": "Irland"
+    "IE": "Irland",
+    "NL": "Nederland",
+    "BE": "Belgia"
   },
   "orders": {
     "eyebrow": "Bestillinger",
