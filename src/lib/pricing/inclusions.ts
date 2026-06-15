@@ -25,6 +25,10 @@ export type ProductInclusions = {
   report?: boolean;
   photographer?: boolean;
   translation?: boolean;
+  // Publisher-stated minimum spend / floor for custom or bespoke content
+  // (e.g. Schibsted/FT partner content). A gross commercial floor the
+  // publisher quotes openly — safe to surface, unlike marked-up net rates.
+  minSpend?: number;
 };
 
 const positiveInt = z.number().int().positive();
@@ -51,4 +55,5 @@ export const inclusionsSchema = z.strictObject({
   report: z.boolean().optional(),
   photographer: z.boolean().optional(),
   translation: z.boolean().optional(),
+  minSpend: positiveInt.optional(),
 }) satisfies z.ZodType<ProductInclusions>;

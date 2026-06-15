@@ -384,7 +384,8 @@
       "report": "Tulosraportti kampanjan jälkeen",
       "photographer": "Valokuvaaja sisältyy",
       "translation": "Käännös sisältyy",
-      "productionAdvertiser": "Toimitat valmiin artikkelin"
+      "productionAdvertiser": "Toimitat valmiin artikkelin",
+      "minSpend": "Vähimmäispanostus {currency} {amount, number}"
     },
     "publisherLinkHelp": "Katso kaikki nimikkeet julkaisijalta {name}"
   },

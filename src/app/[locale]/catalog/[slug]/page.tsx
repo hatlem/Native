@@ -39,9 +39,14 @@ const ARTICLE_TYPES = new Set(["NATIVE_ARTICLE", "ADVERTORIAL", "NATIVE_PLUS"]);
 function inclusionLines(
   inc: ProductInclusions | null,
   t: Awaited<ReturnType<typeof getTranslations>>,
+  currency: string,
 ): string[] {
   if (!inc) return [];
   const lines: string[] = [];
+  // Min-spend leads: it is the headline commercial fact for bespoke/custom
+  // content (Schibsted/FT partner content) and frames every other line.
+  if (inc.minSpend)
+    lines.push(t("inc.minSpend", { currency, amount: inc.minSpend }));
   if (inc.production === "PLATFORM") lines.push(t("inc.productionPlatform"));
   if (inc.production === "PUBLISHER") lines.push(t("inc.productionPublisher"));
   if (inc.production === "ADVERTISER") lines.push(t("inc.productionAdvertiser"));
@@ -353,6 +358,7 @@ export default async function TitleDetailPage({
                 const lines = inclusionLines(
                   p.inclusions as ProductInclusions | null,
                   t,
+                  p.currency,
                 );
                 if (lines.length === 0) return null;
                 return (

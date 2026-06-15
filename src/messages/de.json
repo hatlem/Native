@@ -384,7 +384,8 @@
       "report": "Ergebnisbericht nach der Kampagne",
       "photographer": "Fotograf inklusive",
       "translation": "Übersetzung inklusive",
-      "productionAdvertiser": "Sie liefern den fertigen Artikel"
+      "productionAdvertiser": "Sie liefern den fertigen Artikel",
+      "minSpend": "Mindestbuchung {currency} {amount, number}"
     },
     "publisherLinkHelp": "Alle Titel von {name} ansehen"
   },

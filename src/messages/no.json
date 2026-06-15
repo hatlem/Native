@@ -305,7 +305,8 @@
       "report": "Resultatrapport etter kampanjen",
       "photographer": "Fotograf inkludert",
       "translation": "Oversettelse inkludert",
-      "productionAdvertiser": "Du leverer ferdig artikkel"
+      "productionAdvertiser": "Du leverer ferdig artikkel",
+      "minSpend": "Minstekjøp {currency} {amount, number}"
     },
     "publisherLinkHelp": "Se alle titler fra {name}"
   },

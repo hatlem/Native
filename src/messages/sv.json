@@ -305,7 +305,8 @@
       "report": "Resultatrapport efter kampanjen",
       "photographer": "Fotograf ingår",
       "translation": "Översättning ingår",
-      "productionAdvertiser": "Du levererar färdig artikel"
+      "productionAdvertiser": "Du levererar färdig artikel",
+      "minSpend": "Lägsta budget {currency} {amount, number}"
     },
     "publisherLinkHelp": "Se alla titlar från {name}"
   },
