@@ -30,6 +30,12 @@ function prettyCategory(value: string): string {
   return words.charAt(0).toUpperCase() + words.slice(1);
 }
 
+// Written-content product types: the CPM rate buys distribution only and the
+// article itself is produced + billed separately ("rateProductionNote"). For
+// display / video CPM products the rate buys the placement, so that note must
+// not show — otherwise a native-display unit reads as if it were an article.
+const ARTICLE_TYPES = new Set(["NATIVE_ARTICLE", "ADVERTORIAL", "NATIVE_PLUS"]);
+
 function inclusionLines(
   inc: ProductInclusions | null,
   t: Awaited<ReturnType<typeof getTranslations>>,
@@ -396,7 +402,9 @@ export default async function TitleDetailPage({
                       · {tv("listIndicative")}
                     </span>
                   </div>
-                  <div className="muted small">{t("rateProductionNote")}</div>
+                  {ARTICLE_TYPES.has(p.type) ? (
+                    <div className="muted small">{t("rateProductionNote")}</div>
+                  ) : null}
                 </>
               ) : (
                 <div className="price muted">{tv("requestPrice")}</div>

@@ -20,12 +20,17 @@ const NOTE =
   "Hun ber om hvilken kunde/bransje for å spisse tilbudet (svar utestående). " +
   "PS fra henne: native har god CTR når innholdet er interessant.";
 
+// Native Premium/Standard are native DISPLAY formats (annonseweb.adressa.no
+// /products/2780/displayannonsering – CPM-priced placements), NOT editorial
+// native articles. Reels/Prerolls are video-native. Each carries its own
+// product type so the catalog never presents a display/video unit as an
+// "article".
 const QUOTES = [
-  { name: "Native Premium", price: 345, desc: "Native Premium (anbefales for høyeste CTR). annonseweb.adressa.no/products/2780 – native-premium." },
-  { name: "Native Standard", price: 260, desc: "Native Standard. annonseweb.adressa.no/products/2780 – native." },
-  { name: "Video – Reels", price: 400, desc: "Video-native, Reels. annonseweb.adressa.no/products/3030 – reels." },
-  { name: "Video – Prerolls", price: 500, desc: "Video-native, Prerolls. annonseweb.adressa.no/products/2780 – prerolls." },
-];
+  { name: "Native Premium", price: 345, type: "NATIVE_DISPLAY", desc: "Native Premium (anbefales for høyeste CTR). annonseweb.adressa.no/products/2780 – native-premium." },
+  { name: "Native Standard", price: 260, type: "NATIVE_DISPLAY", desc: "Native Standard. annonseweb.adressa.no/products/2780 – native." },
+  { name: "Video – Reels", price: 400, type: "CONTENT_VIDEO", desc: "Video-native, Reels. annonseweb.adressa.no/products/3030 – reels." },
+  { name: "Video – Prerolls", price: 500, type: "CONTENT_VIDEO", desc: "Video-native, Prerolls. annonseweb.adressa.no/products/2780 – prerolls." },
+] as const;
 
 async function main() {
   for (const n of NAMES) {
@@ -46,7 +51,7 @@ async function main() {
 
     for (const q of QUOTES) {
       await logQuote({
-        draftProductType: "NATIVE_ARTICLE",
+        draftProductType: q.type,
         draftProductName: `${q.name} (Polaris Media – ${t.name})`,
         draftProductDesc: q.desc,
         contactLogId: log.id,
