@@ -61,8 +61,8 @@ export async function TeamSection({ locale, orgId, isAdmin }: Props) {
       </div>
 
       {/* Members table */}
-      <div className="card" style={{ padding: 0, overflow: "hidden" }}>
-        <table className="data-table">
+      <div className="table-wrap" style={{ overflowX: "auto" }}>
+        <table className="table">
           <thead>
             <tr>
               <th>{t("colName")}</th>
@@ -235,8 +235,8 @@ export async function TeamSection({ locale, orgId, isAdmin }: Props) {
           {pendingInvites.length === 0 ? (
             <p className="muted small">{t("pendingNone")}</p>
           ) : (
-            <div className="card" style={{ padding: 0, overflow: "hidden" }}>
-              <table className="data-table">
+            <div className="table-wrap" style={{ overflowX: "auto" }}>
+              <table className="table">
                 <thead>
                   <tr>
                     <th>{t("colEmail")}</th>
