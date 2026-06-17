@@ -179,6 +179,7 @@ export async function logout(formData: FormData) {
   // already selected.
   const store = await cookies();
   store.delete(PLAN_COOKIE);
+  store.delete("nativespin_active_list");
   store.delete(PLAN_BRIEF_COOKIE);
   // Also drop the agency client-switch cookie so a logout doesn't
   // leave the next user with someone else's client context.

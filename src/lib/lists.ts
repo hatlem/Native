@@ -80,6 +80,38 @@ export async function ensureActiveList(orgId: string, activeId: string | null, c
   return (await loadList(created.id))!;
 }
 
+/** One-time fold of a legacy cookie basket into a fresh SavedList. Returns null if empty/all-invalid. */
+export async function migrateLegacyBasket(
+  orgId: string,
+  basket: Array<{ productId: string; quantity: number; withContent?: boolean }>,
+  createdById: string | null,
+) {
+  if (basket.length === 0) return null;
+  const valid = await prisma.product.findMany({
+    where: { id: { in: basket.map((b) => b.productId) }, active: true, bookable: true },
+    select: { id: true },
+  });
+  const validIds = new Set(valid.map((p) => p.id));
+  const rows = basket.filter((b) => validIds.has(b.productId));
+  if (rows.length === 0) return null;
+  return prisma.savedList.create({
+    data: {
+      organizationId: orgId,
+      name: "Imported list",
+      createdById,
+      items: {
+        create: rows.map((b, idx) => ({
+          productId: b.productId,
+          titleId: null,
+          quantity: clampQuantity(b.quantity),
+          withContent: !!b.withContent,
+          sortOrder: idx,
+        })),
+      },
+    },
+  });
+}
+
 async function nextSortOrder(listId: string): Promise<number> {
   const last = await prisma.savedListItem.findFirst({
     where: { listId },

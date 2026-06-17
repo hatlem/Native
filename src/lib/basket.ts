@@ -1,5 +1,9 @@
 import { cookies } from "next/headers";
 
+// DEPRECATED: the items-array basket cookie (`nativespin_plan`) is superseded by
+// the SavedList model + the `nativespin_active_list` pointer cookie. It is retained
+// only for (a) one-time migration of in-flight baskets into a SavedList and (b) the
+// order-template rehydrate path (until Task 8). No new code should WRITE this cookie.
 export const PLAN_COOKIE = "nativespin_plan";
 // Brief draft persisted alongside the basket so the buyer doesn't
 // lose their budget/audience/goal/brief text when the buy-gate

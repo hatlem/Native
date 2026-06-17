@@ -2,9 +2,11 @@
 
 import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
+import { cookies } from "next/headers";
 import { prisma } from "@/lib/prisma";
 import { loadScope, canActOnOrg } from "@/lib/scope";
 import { recordAudit } from "@/lib/audit";
+import { readBasket } from "@/lib/basket";
 import {
   ensureActiveList,
   addProductItem,
@@ -15,6 +17,7 @@ import {
   readActiveListId,
   writeActiveListId,
   clearActiveListId,
+  migrateLegacyBasket,
 } from "@/lib/lists";
 
 function str(formData: FormData, key: string): string {
@@ -33,7 +36,16 @@ async function requireActiveOrg(locale: string) {
 /** Resolve (lazy-create) the active list for the active org and persist its id. */
 async function activeList(locale: string) {
   const { scope, orgId } = await requireActiveOrg(locale);
-  const list = await ensureActiveList(orgId, await readActiveListId(), scope.userId);
+  let activeId = await readActiveListId();
+  if (!activeId) {
+    const legacy = await readBasket(); // legacy cookie, may be []
+    const migrated = legacy.length ? await migrateLegacyBasket(orgId, legacy, scope.userId ?? null) : null;
+    if (migrated) {
+      activeId = migrated.id;
+      (await cookies()).delete("nativespin_plan");
+    }
+  }
+  const list = await ensureActiveList(orgId, activeId, scope.userId);
   await writeActiveListId(list.id);
   return { scope, orgId, list };
 }

@@ -1,7 +1,7 @@
 import { test, before, after } from "node:test";
 import assert from "node:assert/strict";
 import { prisma } from "./prisma";
-import { ensureActiveList, addProductItem, addTitleItem, resolveTitleItem } from "./lists";
+import { ensureActiveList, addProductItem, addTitleItem, resolveTitleItem, migrateLegacyBasket } from "./lists";
 
 let orgId = "";
 let productId = "";
@@ -47,4 +47,22 @@ test("resolveTitleItem converts a title placeholder into a product line", async 
   const reloaded = await prisma.savedListItem.findUnique({ where: { id: item.id } });
   assert.equal(reloaded!.titleId, null);
   assert.equal(reloaded!.productId, productId);
+});
+
+test("migrateLegacyBasket folds a cookie basket into a new list", async () => {
+  const list = await migrateLegacyBasket(orgId, [{ productId, quantity: 3 }], null);
+  assert.ok(list);
+  const reloaded = await prisma.savedList.findUnique({ where: { id: list!.id }, include: { items: true } });
+  assert.equal(reloaded!.items.length, 1);
+  assert.equal(reloaded!.items[0].productId, productId);
+  assert.equal(reloaded!.items[0].quantity, 3);
+});
+
+test("migrateLegacyBasket returns null for an empty basket", async () => {
+  assert.equal(await migrateLegacyBasket(orgId, [], null), null);
+});
+
+test("migrateLegacyBasket drops products that are no longer active/bookable", async () => {
+  const list = await migrateLegacyBasket(orgId, [{ productId: "definitely-not-a-real-product-id", quantity: 1 }], null);
+  assert.equal(list, null);
 });
