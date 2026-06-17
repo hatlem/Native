@@ -34,7 +34,13 @@ export function NewsletterSignup({
         aria-hidden="true"
         className="newsletter-hp"
       />
-      <label className="sr-only" htmlFor={`nl-${source}`}>{t("newsletter.placeholder")}</label>
+      {/* A real accessible label — NOT the example address. An email-shaped
+          string in this SSR text node makes Cloudflare's Email Address
+          Obfuscation rewrite it into a `__cf_email__` span + a decode script
+          our CSP blocks, breaking React hydration (#418) across every public
+          footer. The example address stays as the placeholder attribute
+          (which CF leaves alone) for UX. */}
+      <label className="sr-only" htmlFor={`nl-${source}`}>{t("newsletter.emailLabel")}</label>
       <input
         id={`nl-${source}`}
         name="email"
