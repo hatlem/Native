@@ -1,22 +1,22 @@
 "use server";
 
-import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
 import { requireOnboardingBeforeBuy } from "@/lib/onboarding-gate";
 import { getWorkspace } from "@/lib/workspace";
 import {
-  PLAN_COOKIE,
-  PLAN_BRIEF_COOKIE,
   planBriefHasContent,
-  readBasket,
   writePlanBrief,
 } from "@/lib/basket";
+import {
+  readActiveListId,
+  ensureActiveList,
+  snapshotListToPlanData,
+} from "@/lib/lists";
 import { isProductPriceShown } from "@/lib/pricing-visibility";
 import { createFirmOrder } from "@/lib/commerce/firm-order";
 import { uniquePublisherIdsForProducts } from "@/lib/commerce/publishers";
-import { authorshipFromWithContent } from "@/lib/authorship";
 import { groupItemsByMarket } from "@/lib/quote-grouping";
 import { recordAudit } from "@/lib/audit";
 import { notifyDesk, notifyOrg, notifyPublisher } from "@/lib/notify";
@@ -90,25 +90,28 @@ export async function submitRequest(formData: FormData) {
     redirect(`/${locale}/signin`);
   }
 
-  const basket = await readBasket();
-  if (basket.length === 0) {
+  // Submit the active saved list — the durable replacement for the basket
+  // cookie. It can hold product lines (productId set) and Title placeholders
+  // (titleId set, productId null). The list is NOT consumed on submit.
+  const list = await ensureActiveList(org.id, await readActiveListId());
+  if (list.items.length === 0) redirect(`/${locale}/plan?error=1`);
+
+  const productItems = list.items.filter(
+    (i) => i.productId && i.product && i.product.active && i.product.bookable,
+  );
+  const titleItems = list.items.filter((i) => !i.productId && i.titleId);
+  if (productItems.length === 0 && titleItems.length === 0) {
     redirect(`/${locale}/plan?error=1`);
   }
 
-  const products = await prisma.product.findMany({
-    where: {
-      id: { in: basket.map((b) => b.productId) },
-      active: true,
-      bookable: true,
-    },
-    include: {
-      priceRules: true,
-      title: { include: { publisher: true, market: true } },
-    },
-  });
-  const byId = new Map(products.map((p) => [p.id, p]));
-  const items = basket.filter((b) => byId.has(b.productId));
-  if (items.length === 0) redirect(`/${locale}/plan?error=1`);
+  // Shape the downstream code already expects (groupItemsByMarket, allFirm,
+  // createFirmOrder). Title-only lines never enter `items`/`byId`.
+  const items = productItems.map((i) => ({
+    productId: i.productId as string,
+    quantity: i.quantity,
+    withContent: i.withContent,
+  }));
+  const byId = new Map(productItems.map((i) => [i.productId as string, i.product!]));
 
   // Multi-currency split: one Quote per placement market. A cross-
   // border basket (e.g. NO + SE + DE) becomes one Request with three
@@ -127,12 +130,17 @@ export async function submitRequest(formData: FormData) {
   // OR whose price hasn't been confirmed yet forces the basket onto
   // the RFQ path so we never auto-charge a buyer against a price
   // they couldn't see in the catalog.
-  const allFirm = items.every((i) => {
-    const product = byId.get(i.productId);
-    if (!product) return false;
-    if (product.visibility !== "FIRM") return false;
-    return isProductPriceShown(product, product.title);
-  });
+  // Any unresolved Title placeholder cannot be auto-priced, so its presence
+  // forces the desk RFQ path (never the instant all-firm order).
+  const allFirm =
+    titleItems.length === 0 &&
+    items.length > 0 &&
+    items.every((i) => {
+      const product = byId.get(i.productId);
+      if (!product) return false;
+      if (product.visibility !== "FIRM") return false;
+      return isProductPriceShown(product, product.title);
+    });
 
   // Commit gate: the all-firm path creates a CONFIRMED order immediately —
   // the same commitment as acceptQuote/acceptAllQuotesForRequest. Only
@@ -190,6 +198,31 @@ export async function submitRequest(formData: FormData) {
     // RFQ: create the plan + request for the desk to price later. No
     // quotes here — pricing is deferred to generateQuote.
     request = await prisma.$transaction(async (tx) => {
+      // Snapshot BOTH product lines and Title placeholders into the Plan so
+      // the desk sees the full ask — title-only lines land as
+      // PlanItem{titleId, productId:null} for the desk to resolve manually.
+      const planItems = [
+        ...snapshotListToPlanData(
+          productItems.map((i) => ({
+            productId: i.productId,
+            titleId: null,
+            quantity: i.quantity,
+            withContent: i.withContent,
+            authorshipMode: i.authorshipMode,
+            notes: i.notes,
+          })),
+        ),
+        ...snapshotListToPlanData(
+          titleItems.map((i) => ({
+            productId: null,
+            titleId: i.titleId,
+            quantity: i.quantity,
+            withContent: i.withContent,
+            authorshipMode: i.authorshipMode,
+            notes: i.notes,
+          })),
+        ),
+      ];
       const plan = await tx.plan.create({
         data: {
           organizationId: org.id,
@@ -202,12 +235,7 @@ export async function submitRequest(formData: FormData) {
           targetAudience: targetAudience || null,
           targetContext: targetContext || null,
           items: {
-            create: items.map((i) => ({
-              productId: i.productId,
-              quantity: i.quantity,
-              withContent: i.withContent ?? false,
-              authorshipMode: authorshipFromWithContent(i.withContent),
-            })),
+            create: planItems,
           },
         },
       });
@@ -228,6 +256,7 @@ export async function submitRequest(formData: FormData) {
           planId: plan.id,
           status: "SUBMITTED",
           briefSummary,
+          sourceListId: list.id,
         },
       });
       return { id: req.id };
@@ -263,13 +292,11 @@ export async function submitRequest(formData: FormData) {
     await notifyDesk({
       kind: "RFQ_SUBMITTED",
       title: "New RFQ",
-      body: `${org.name} submitted ${items.length} item(s).`,
+      body: `${org.name} submitted ${items.length + titleItems.length} item(s).`,
       link: `/${locale}/desk/${request.id}`,
     });
   }
 
-  const store = await cookies();
-  store.delete(PLAN_COOKIE);
-  store.delete(PLAN_BRIEF_COOKIE);
+  // The active saved list is durable — nothing to clear on submit.
   redirect(`/${locale}/requests/${request.id}`);
 }

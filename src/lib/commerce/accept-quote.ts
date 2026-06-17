@@ -24,13 +24,20 @@ export type AcceptablePlan = {
   endDate: Date | null;
   goal: string | null;
   audienceNote: string | null;
-  items: { productId: string; authorshipMode: AuthorshipMode }[];
+  // productId is nullable: a Plan can hold Title placeholders alongside
+  // product lines. Only product lines carry authorship that maps onto an
+  // order line, so the title rows are skipped when building the map.
+  items: { productId: string | null; authorshipMode: AuthorshipMode }[];
 };
 
 export function authorshipByProduct(
   plan: AcceptablePlan,
 ): Map<string, AuthorshipMode> {
-  return new Map(plan.items.map((i) => [i.productId, i.authorshipMode]));
+  return new Map(
+    plan.items
+      .filter((i): i is { productId: string; authorshipMode: AuthorshipMode } => !!i.productId)
+      .map((i) => [i.productId, i.authorshipMode]),
+  );
 }
 
 // Creates the order (CONFIRMED) with lines copied off the quote, attaches

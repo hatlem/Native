@@ -1,6 +1,7 @@
 import { cookies } from "next/headers";
 import { prisma } from "@/lib/prisma";
 import { clampQuantity } from "@/lib/basket";
+import type { AuthorshipMode } from "@/lib/authorship";
 
 export const ACTIVE_LIST_COOKIE = "nativespin_active_list";
 
@@ -46,7 +47,12 @@ const ITEM_INCLUDE = {
   items: {
     orderBy: { sortOrder: "asc" as const },
     include: {
-      product: { include: { title: { include: { publisher: true } }, priceRules: true } },
+      product: {
+        include: {
+          title: { include: { publisher: true, market: true } },
+          priceRules: true,
+        },
+      },
       title: { include: { publisher: true } },
     },
   },
@@ -120,4 +126,34 @@ export async function removeItem(itemId: string) {
 
 export async function setItemQuantity(itemId: string, quantity: number) {
   return prisma.savedListItem.update({ where: { id: itemId }, data: { quantity: clampQuantity(quantity) } });
+}
+
+export type PlanItemSnapshot = {
+  productId: string | null;
+  titleId: string | null;
+  quantity: number;
+  withContent: boolean;
+  authorshipMode: AuthorshipMode;
+  notes: string | null;
+};
+
+/** Project SavedListItems into PlanItem rows, preserving product/title shape. */
+export function snapshotListToPlanData(
+  items: Array<{
+    productId: string | null;
+    titleId: string | null;
+    quantity: number;
+    withContent: boolean;
+    authorshipMode: PlanItemSnapshot["authorshipMode"];
+    notes: string | null;
+  }>,
+): PlanItemSnapshot[] {
+  return items.map((i) => ({
+    productId: i.productId,
+    titleId: i.titleId,
+    quantity: i.quantity,
+    withContent: i.withContent,
+    authorshipMode: i.authorshipMode,
+    notes: i.notes,
+  }));
 }

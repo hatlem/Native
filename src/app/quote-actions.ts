@@ -43,8 +43,12 @@ export async function generateQuote(formData: FormData) {
     redirect(`/${locale}/desk/${requestId}`);
   }
 
+  // Title-only PlanItems (productId null) carry no price — the desk
+  // resolves them to concrete products manually later. Auto-quote prices
+  // product lines only; QuoteLine.productId is already nullable.
+  const productItems = request.plan.items.filter((i) => i.productId);
   const products = await prisma.product.findMany({
-    where: { id: { in: request.plan.items.map((i) => i.productId) } },
+    where: { id: { in: productItems.map((i) => i.productId as string) } },
     include: {
       priceRules: true,
       title: { include: { market: true } },
@@ -55,7 +59,10 @@ export async function generateQuote(formData: FormData) {
   // One quote per placement market — same grouping rule submitRequest
   // uses, so a buyer who briefed across NO + SE + DE gets three quotes
   // each in its local currency and VAT.
-  const groups = groupItemsByMarket(request.plan.items, byId);
+  const groups = groupItemsByMarket(
+    productItems.map((i) => ({ ...i, productId: i.productId as string })),
+    byId,
+  );
   if (groups.length === 0) redirect(`/${locale}/desk`);
 
   // Fee rules and margin defaults come from the same load so the quote

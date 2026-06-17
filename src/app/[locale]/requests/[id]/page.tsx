@@ -61,11 +61,28 @@ export default async function RequestPage({
     }
   }
 
+  // Plan items split into product lines and Title placeholders (productId
+  // null). Fetch products for the former and bare title names for the
+  // latter so PlanItemsSection can render placeholders without crashing.
+  const productIds = request.plan.items
+    .map((i) => i.productId)
+    .filter((id): id is string => !!id);
   const products = await prisma.product.findMany({
-    where: { id: { in: request.plan.items.map((i) => i.productId) } },
+    where: { id: { in: productIds } },
     include: { title: { include: { market: true } } },
   });
   const byId = new Map(products.map((p) => [p.id, p]));
+
+  const titleIds = request.plan.items
+    .map((i) => i.titleId)
+    .filter((id): id is string => !!id);
+  const titles = titleIds.length
+    ? await prisma.title.findMany({
+        where: { id: { in: titleIds } },
+        select: { id: true, name: true },
+      })
+    : [];
+  const titleById = new Map(titles.map((t) => [t.id, { name: t.name }]));
 
   // Resolve the assigned desk buyer's name so the buyer-facing page can
   // surface accountability ("Hentet av Astrid"). Schema has the FK column
@@ -147,7 +164,12 @@ export default async function RequestPage({
         }
       />
 
-      <PlanItemsSection locale={locale} items={request.plan.items} byId={byId} />
+      <PlanItemsSection
+        locale={locale}
+        items={request.plan.items}
+        byId={byId}
+        titleById={titleById}
+      />
 
       {quotes.length === 0 ? (
         <PendingQuoteSection

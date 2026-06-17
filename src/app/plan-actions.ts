@@ -78,18 +78,23 @@ export async function duplicatePlan(formData: FormData) {
   // Drop products that have been deactivated since the original order
   // ran. The buyer is told how many items survived so they don't
   // discover the loss after submitting.
+  // TODO(Task 8): rewrite onto SavedList. PlanItem.productId is now nullable
+  // (title placeholders), but `duplicatePlan` only ever runs against confirmed
+  // orders whose plan items are always product-backed — filter the nulls so
+  // the rehydrated basket stays well-typed.
+  const productSourceItems = sourceItems.filter((i) => i.productId);
   const stillActive = await prisma.product.findMany({
     where: {
-      id: { in: sourceItems.map((i) => i.productId) },
+      id: { in: productSourceItems.map((i) => i.productId as string) },
       active: true,
       bookable: true,
     },
     select: { id: true },
   });
   const activeIds = new Set(stillActive.map((p) => p.id));
-  const items: BasketItem[] = sourceItems
-    .filter((i) => activeIds.has(i.productId))
-    .map((i) => ({ productId: i.productId, quantity: i.quantity }));
+  const items: BasketItem[] = productSourceItems
+    .filter((i) => activeIds.has(i.productId as string))
+    .map((i) => ({ productId: i.productId as string, quantity: i.quantity }));
 
   await writeBasket(items);
   await recordAudit(

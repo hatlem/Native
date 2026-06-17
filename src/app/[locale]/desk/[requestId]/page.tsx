@@ -31,11 +31,29 @@ export default async function DeskRequestPage({
   });
   if (!request) notFound();
 
+  // Plan items split into product lines and Title placeholders (productId
+  // null). Fetch products for the former and bare title names for the
+  // latter so the desk sees the full ask without a null in the `in` array.
+  const productIds = request.plan.items
+    .map((i) => i.productId)
+    .filter((id): id is string => !!id);
   const products = await prisma.product.findMany({
-    where: { id: { in: request.plan.items.map((i) => i.productId) } },
+    where: { id: { in: productIds } },
     include: { title: true },
   });
   const byId = new Map(products.map((p) => [p.id, p]));
+
+  const titleIds = request.plan.items
+    .map((i) => i.titleId)
+    .filter((id): id is string => !!id);
+  const titles = titleIds.length
+    ? await prisma.title.findMany({
+        where: { id: { in: titleIds } },
+        select: { id: true, name: true },
+      })
+    : [];
+  const titleById = new Map(titles.map((t) => [t.id, t]));
+
   const quote = request.quotes[0];
 
   return (
@@ -87,6 +105,20 @@ export default async function DeskRequestPage({
         </div>
         <div className="grid">
           {request.plan.items.map((item) => {
+            // Title placeholder — no product chosen yet; the desk proposes
+            // the concrete placement.
+            if (!item.productId) {
+              const titleName = item.titleId
+                ? titleById.get(item.titleId)?.name ?? "Publication"
+                : "Publication";
+              return (
+                <article className="card" key={item.id}>
+                  <h3>{titleName}</h3>
+                  <p className="muted">Placement to be proposed by our desk</p>
+                  <span className="tag">× {item.quantity}</span>
+                </article>
+              );
+            }
             const p = byId.get(item.productId);
             return (
               <article className="card" key={item.id}>
