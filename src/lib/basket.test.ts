@@ -1,6 +1,6 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { parseBasket, serializeBasket, clampQuantity, MAX_QTY } from "./basket";
+import { parseBasket, clampQuantity, MAX_QTY } from "./basket";
 
 test("parseBasket returns empty for missing or blank input", () => {
   assert.deepEqual(parseBasket(undefined), []);
@@ -55,12 +55,12 @@ test("parseBasket carries the withContent flag (only literal true)", () => {
   ]);
 });
 
-test("serializeBasket round-trips through parseBasket", () => {
+test("parseBasket round-trips serialized items", () => {
   const items = [
     { productId: "p1", quantity: 1, withContent: false },
     { productId: "p2", quantity: 4, withContent: true },
   ];
-  assert.deepEqual(parseBasket(serializeBasket(items)), items);
+  assert.deepEqual(parseBasket(JSON.stringify(items)), items);
 });
 
 test("clampQuantity floors at 1", () => {

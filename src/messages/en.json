@@ -40,7 +40,8 @@
     "contentFees": "Content fees",
     "playbooks": "Playbooks",
     "writers": "Writers",
-    "metricsNeedsContact": "Metrics needed"
+    "metricsNeedsContact": "Metrics needed",
+    "lists": "Saved lists"
   },
   "orders": {
     "eyebrow": "Orders",
@@ -389,6 +390,21 @@
       "minSpend": "Minimum spend {currency} {amount, number}"
     },
     "publisherLinkHelp": "See every title from {name}"
+  },
+  "lists": {
+    "title": "Saved lists",
+    "empty": "No saved lists yet. Add a publication or placement to start one.",
+    "name": "List",
+    "items": "Items",
+    "lastSubmittedHeading": "Last submitted",
+    "itemCount": "{count} items",
+    "lastSubmitted": "Last submitted {date}",
+    "neverSubmitted": "Not submitted yet",
+    "open": "Open",
+    "rename": "Rename",
+    "duplicate": "Duplicate",
+    "archive": "Archive",
+    "navLabel": "Saved lists"
   },
   "plan": {
     "eyebrow": "Plan",

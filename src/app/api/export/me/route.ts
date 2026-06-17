@@ -53,7 +53,7 @@ export async function GET(req: NextRequest) {
     orgIds = ws.scopeOrgIds;
   }
 
-  const [orgs, users, plans, requests, orders, invoices] = await Promise.all([
+  const [orgs, users, plans, savedLists, requests, orders, invoices] = await Promise.all([
     prisma.organization.findMany({ where: { id: { in: orgIds } } }),
     prisma.user.findMany({
       where: { organizationId: { in: orgIds } },
@@ -62,6 +62,26 @@ export async function GET(req: NextRequest) {
     prisma.plan.findMany({
       where: { organizationId: { in: orgIds } },
       include: { items: true },
+    }),
+    prisma.savedList.findMany({
+      where: { organizationId: { in: orgIds } },
+      select: {
+        id: true,
+        name: true,
+        note: true,
+        archivedAt: true,
+        createdAt: true,
+        updatedAt: true,
+        items: {
+          select: {
+            productId: true,
+            titleId: true,
+            quantity: true,
+            withContent: true,
+            notes: true,
+          },
+        },
+      },
     }),
     prisma.request.findMany({
       where: { organizationId: { in: orgIds } },
@@ -87,6 +107,7 @@ export async function GET(req: NextRequest) {
       orgs,
       users,
       plans,
+      savedLists,
       requests,
       orders,
       invoices,
