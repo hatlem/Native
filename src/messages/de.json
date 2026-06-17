@@ -40,7 +40,8 @@
     "contentFees": "Content-Gebühren",
     "playbooks": "Playbooks",
     "writers": "Autoren",
-    "metricsNeedsContact": "Kennzahlen fehlen"
+    "metricsNeedsContact": "Kennzahlen fehlen",
+    "lists": "Gespeicherte Listen"
   },
   "orders": {
     "eyebrow": "Bestellungen",
@@ -295,7 +296,23 @@
       "teaserLink": "Anmelden, um alle Titel und Richtpreise zu sehen",
       "ctaBlockTitle": "Bereit, uns zu briefen?",
       "ctaBlockBody": "Konto anlegen, kurz schildern was und an wen Sie verkaufen — wir kommen innerhalb von 24 Stunden zurück mit den Titeln und Formaten, die passen."
-    }
+    },
+    "savePublication": "Publikation speichern"
+  },
+  "lists": {
+    "title": "Gespeicherte Listen",
+    "empty": "Noch keine gespeicherten Listen. Füge eine Publikation oder Platzierung hinzu, um zu beginnen.",
+    "name": "Liste",
+    "items": "Elemente",
+    "lastSubmittedHeading": "Zuletzt gesendet",
+    "itemCount": "{count} Elemente",
+    "lastSubmitted": "Zuletzt gesendet {date}",
+    "neverSubmitted": "Noch nicht gesendet",
+    "open": "Öffnen",
+    "rename": "Umbenennen",
+    "duplicate": "Duplizieren",
+    "archive": "Archivieren",
+    "navLabel": "Gespeicherte Listen"
   },
   "titleDetail": {
     "back": "Zurück zum Katalog",
@@ -423,7 +440,15 @@
     "briefLabel": "Wen möchten Sie erreichen?",
     "briefPlaceholder": "z. B. Wir verkaufen Software an Finanz- und Rechtsteams in Oslo",
     "briefHint": "Wir matchen Titel nach Zielgruppe, Branche und Region. Markt erforderlich; Budget optional.",
-    "recForBrief": "Auf Ihr Briefing abgestimmt"
+    "recForBrief": "Auf Ihr Briefing abgestimmt",
+    "titlePlaceholderNote": "Unser Team schlägt eine Platzierung vor und nennt den Preis.",
+    "pickPlacement": "Platzierung wählen …",
+    "resolve": "Platzierung verwenden",
+    "noPlacements": "Noch keine Platzierungen verfügbar",
+    "switchList": "Liste wechseln",
+    "newList": "Neue Liste",
+    "rename": "Umbenennen",
+    "savedListsLabel": "Deine Listen"
   },
   "rfq": {
     "org": "Firma",
@@ -487,7 +512,9 @@
     "pendingBuyerLabel": "Einkäufer",
     "pendingBuyerUnassigned": "Wird zugewiesen",
     "pendingSlaLabel": "Verbindliches Angebot erwartet bis",
-    "pendingBriefLabel": "Ihr Brief"
+    "pendingBriefLabel": "Ihr Brief",
+    "titlePlaceholderName": "Publikation",
+    "titlePlaceholderDesc": "Platzierung wird von unserem Team vorgeschlagen"
   },
   "desk": {
     "eyebrow": "Interner Desk",

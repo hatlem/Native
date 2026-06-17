@@ -80,6 +80,23 @@ export async function ensureActiveList(orgId: string, activeId: string | null, c
   return (await loadList(created.id))!;
 }
 
+/** Resolve the active list for RENDER without creating one: the cookie's list
+ *  if still owned + unarchived, else the org's most-recently-updated non-archived
+ *  list, else null. Server Components can't persist a cookie, so they must never
+ *  lazily create — that's the action path's job (ensureActiveList). */
+export async function resolveActiveList(orgId: string, activeId: string | null) {
+  if (activeId) {
+    const existing = await loadList(activeId);
+    if (existing && existing.organizationId === orgId && !existing.archivedAt) return existing;
+  }
+  const recent = await prisma.savedList.findFirst({
+    where: { organizationId: orgId, archivedAt: null },
+    orderBy: { updatedAt: "desc" },
+    select: { id: true },
+  });
+  return recent ? loadList(recent.id) : null;
+}
+
 /** One-time fold of a legacy cookie basket into a fresh SavedList. Returns null if empty/all-invalid. */
 export async function migrateLegacyBasket(
   orgId: string,

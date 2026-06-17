@@ -3,6 +3,7 @@ import assert from "node:assert/strict";
 import { prisma } from "./prisma";
 import {
   ensureActiveList,
+  resolveActiveList,
   addProductItem,
   addTitleItem,
   resolveTitleItem,
@@ -147,4 +148,35 @@ test("snapshot of a mixed list yields product + title PlanItems and preserves th
 
   await prisma.planItem.deleteMany({ where: { planId: plan.id } });
   await prisma.plan.delete({ where: { id: plan.id } });
+});
+
+// ── Group 4 — resolveActiveList (render-path read-only resolver) ────────────
+
+test("resolveActiveList never creates: returns null when org has no lists", async () => {
+  const fresh = await prisma.organization.create({ data: { name: "Empty Org Task10", type: "ADVERTISER", marketCode: "NO" } });
+  const before = await prisma.savedList.count({ where: { organizationId: fresh.id } });
+  const r = await resolveActiveList(fresh.id, null);
+  const after = await prisma.savedList.count({ where: { organizationId: fresh.id } });
+  assert.equal(r, null);
+  assert.equal(before, 0);
+  assert.equal(after, 0); // proved it did NOT create
+  await prisma.organization.delete({ where: { id: fresh.id } });
+});
+
+test("resolveActiveList falls back to the most-recent non-archived list when cookie is empty", async () => {
+  const a = await ensureActiveList(orgId, null);
+  await addProductItem(a.id, productId); // touch updatedAt
+  const r = await resolveActiveList(orgId, null);
+  assert.ok(r);
+  assert.equal(r!.organizationId, orgId);
+});
+
+test("resolveActiveList ignores a cookie id from another org and falls back", async () => {
+  const other = await prisma.organization.create({ data: { name: "Other Org R", type: "ADVERTISER", marketCode: "NO" } });
+  const theirs = await prisma.savedList.create({ data: { organizationId: other.id } });
+  const r = await resolveActiveList(orgId, theirs.id);
+  // must NOT return the other org's list
+  assert.notEqual(r?.id, theirs.id);
+  await prisma.savedList.delete({ where: { id: theirs.id } });
+  await prisma.organization.delete({ where: { id: other.id } });
 });

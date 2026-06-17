@@ -40,7 +40,8 @@
     "contentFees": "Innholdshonorar",
     "playbooks": "Spillebøker",
     "writers": "Skribenter",
-    "metricsNeedsContact": "Mangler tall"
+    "metricsNeedsContact": "Mangler tall",
+    "lists": "Lagrede lister"
   },
   "reports": {
     "title": "Rapporter",
@@ -216,7 +217,23 @@
       "teaserLink": "Logg inn for å se alle titler og veiledende priser",
       "ctaBlockTitle": "Klar til å gi oss en brief?",
       "ctaBlockBody": "Opprett konto, fortell oss hva du selger og til hvem — vi kommer tilbake innen 24 timer med titlene og formatene som passer."
-    }
+    },
+    "savePublication": "Lagre publikasjon"
+  },
+  "lists": {
+    "title": "Lagrede lister",
+    "empty": "Ingen lagrede lister ennå. Legg til en publikasjon eller plassering for å starte en.",
+    "name": "Liste",
+    "items": "Elementer",
+    "lastSubmittedHeading": "Sist sendt",
+    "itemCount": "{count} elementer",
+    "lastSubmitted": "Sist sendt {date}",
+    "neverSubmitted": "Ikke sendt ennå",
+    "open": "Åpne",
+    "rename": "Gi nytt navn",
+    "duplicate": "Dupliser",
+    "archive": "Arkiver",
+    "navLabel": "Lagrede lister"
   },
   "titleDetail": {
     "back": "Tilbake til katalogen",
@@ -344,7 +361,15 @@
     "briefLabel": "Hvem vil du nå?",
     "briefPlaceholder": "f.eks. Vi selger programvare til finans- og juristmiljøer i Oslo",
     "briefHint": "Vi matcher titler på målgruppe, bransje og region. Marked er påkrevd; budsjett er valgfritt.",
-    "recForBrief": "Matchet til briefen din"
+    "recForBrief": "Matchet til briefen din",
+    "titlePlaceholderNote": "Teamet vårt foreslår og priser en plassering.",
+    "pickPlacement": "Velg en plassering …",
+    "resolve": "Bruk plassering",
+    "noPlacements": "Ingen plasseringer tilgjengelige ennå",
+    "switchList": "Bytt liste",
+    "newList": "Ny liste",
+    "rename": "Gi nytt navn",
+    "savedListsLabel": "Dine lister"
   },
   "rfq": {
     "org": "Selskap",
@@ -408,7 +433,9 @@
     "pendingBuyerLabel": "Innkjøper",
     "pendingBuyerUnassigned": "Under tildeling",
     "pendingSlaLabel": "Fast tilbud forventet innen",
-    "pendingBriefLabel": "Din brief"
+    "pendingBriefLabel": "Din brief",
+    "titlePlaceholderName": "Publikasjon",
+    "titlePlaceholderDesc": "Plassering foreslås av teamet vårt"
   },
   "desk": {
     "eyebrow": "Internt desk",

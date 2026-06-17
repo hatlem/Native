@@ -40,7 +40,8 @@
     "contentFees": "Sisältömaksut",
     "playbooks": "Pelikirjat",
     "writers": "Kirjoittajat",
-    "metricsNeedsContact": "Mittarit puuttuvat"
+    "metricsNeedsContact": "Mittarit puuttuvat",
+    "lists": "Tallennetut listat"
   },
   "orders": {
     "eyebrow": "Tilaukset",
@@ -295,7 +296,23 @@
       "teaserLink": "Kirjaudu sisään nähdäksesi kaikki julkaisut ja suuntaa-antavan hinnoittelun",
       "ctaBlockTitle": "Valmis lähettämään briefin?",
       "ctaBlockBody": "Luo tili, kerro mitä myyt ja kenelle — palaamme 24 tunnin sisällä julkaisuilla ja formaateilla, jotka sopivat."
-    }
+    },
+    "savePublication": "Tallenna julkaisu"
+  },
+  "lists": {
+    "title": "Tallennetut listat",
+    "empty": "Ei tallennettuja listoja vielä. Aloita lisäämällä julkaisu tai mainospaikka.",
+    "name": "Lista",
+    "items": "Kohteet",
+    "lastSubmittedHeading": "Viimeksi lähetetty",
+    "itemCount": "{count} kohdetta",
+    "lastSubmitted": "Viimeksi lähetetty {date}",
+    "neverSubmitted": "Ei vielä lähetetty",
+    "open": "Avaa",
+    "rename": "Nimeä uudelleen",
+    "duplicate": "Monista",
+    "archive": "Arkistoi",
+    "navLabel": "Tallennetut listat"
   },
   "titleDetail": {
     "back": "Takaisin katalogiin",
@@ -423,7 +440,15 @@
     "briefLabel": "Kenet haluat tavoittaa?",
     "briefPlaceholder": "esim. Myymme ohjelmistoja talous- ja lakitiimeille Oslossa",
     "briefHint": "Sovitamme julkaisut yleisön, toimialan ja alueen mukaan. Markkina vaaditaan; budjetti valinnainen.",
-    "recForBrief": "Sovitettu briefiisi"
+    "recForBrief": "Sovitettu briefiisi",
+    "titlePlaceholderNote": "Tiimimme ehdottaa mainospaikkaa ja sen hinnan.",
+    "pickPlacement": "Valitse mainospaikka …",
+    "resolve": "Käytä mainospaikkaa",
+    "noPlacements": "Ei mainospaikkoja saatavilla vielä",
+    "switchList": "Vaihda listaa",
+    "newList": "Uusi lista",
+    "rename": "Nimeä uudelleen",
+    "savedListsLabel": "Omat listat"
   },
   "rfq": {
     "org": "Yritys",
@@ -487,7 +512,9 @@
     "pendingBuyerLabel": "Ostaja",
     "pendingBuyerUnassigned": "Osoitetaan",
     "pendingSlaLabel": "Kiinteä hinta odotetaan viimeistään",
-    "pendingBriefLabel": "Briefisi"
+    "pendingBriefLabel": "Briefisi",
+    "titlePlaceholderName": "Julkaisu",
+    "titlePlaceholderDesc": "Tiimimme ehdottaa mainospaikkaa"
   },
   "desk": {
     "eyebrow": "Sisäinen desk",

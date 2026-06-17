@@ -4,7 +4,7 @@ import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
 import { getWorkspace } from "@/lib/workspace";
 import { readPlanBrief } from "@/lib/basket";
-import { readActiveListId, ensureActiveList } from "@/lib/lists";
+import { readActiveListId, resolveActiveList } from "@/lib/lists";
 import { indicativeFromRules, toRateRules } from "@/lib/money";
 import { isProductPriceShown } from "@/lib/pricing-visibility";
 import { recommendTiered, type Candidate, type SupplementaryTitle } from "@/lib/recommend";
@@ -63,7 +63,7 @@ export default async function PlanPage({
       })
     : [];
   const activeList = ws?.activeOrgId
-    ? await ensureActiveList(ws.activeOrgId, await readActiveListId())
+    ? await resolveActiveList(ws.activeOrgId, await readActiveListId())
     : null;
   const listItems = activeList?.items ?? [];
 

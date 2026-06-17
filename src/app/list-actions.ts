@@ -9,6 +9,7 @@ import { recordAudit } from "@/lib/audit";
 import { readBasket } from "@/lib/basket";
 import {
   ensureActiveList,
+  resolveActiveList,
   addProductItem,
   addTitleItem,
   resolveTitleItem,
@@ -44,6 +45,10 @@ async function activeList(locale: string) {
       activeId = migrated.id;
       (await cookies()).delete("nativespin_plan");
     }
+  }
+  if (!activeId) {
+    const existing = await resolveActiveList(orgId, null);
+    if (existing) activeId = existing.id;
   }
   const list = await ensureActiveList(orgId, activeId, scope.userId);
   await writeActiveListId(list.id);
