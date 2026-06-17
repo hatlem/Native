@@ -97,7 +97,8 @@ export async function submitRequest(formData: FormData) {
   if (list.items.length === 0) redirect(`/${locale}/plan?error=1`);
 
   const productItems = list.items.filter(
-    (i) => i.productId && i.product && i.product.active && i.product.bookable,
+    (i): i is typeof i & { productId: string; product: NonNullable<typeof i.product> } =>
+      !!i.productId && !!i.product && i.product.active && i.product.bookable,
   );
   const titleItems = list.items.filter((i) => !i.productId && i.titleId);
   if (productItems.length === 0 && titleItems.length === 0) {
@@ -107,11 +108,11 @@ export async function submitRequest(formData: FormData) {
   // Shape the downstream code already expects (groupItemsByMarket, allFirm,
   // createFirmOrder). Title-only lines never enter `items`/`byId`.
   const items = productItems.map((i) => ({
-    productId: i.productId as string,
+    productId: i.productId,
     quantity: i.quantity,
     withContent: i.withContent,
   }));
-  const byId = new Map(productItems.map((i) => [i.productId as string, i.product!]));
+  const byId = new Map(productItems.map((i) => [i.productId, i.product]));
 
   // Multi-currency split: one Quote per placement market. A cross-
   // border basket (e.g. NO + SE + DE) becomes one Request with three
@@ -182,6 +183,7 @@ export async function submitRequest(formData: FormData) {
       orgName: org.name,
       items,
       byId,
+      sourceListId: list.id,
       brief: {
         briefText: brief,
         goal: goal || null,
@@ -201,28 +203,24 @@ export async function submitRequest(formData: FormData) {
       // Snapshot BOTH product lines and Title placeholders into the Plan so
       // the desk sees the full ask — title-only lines land as
       // PlanItem{titleId, productId:null} for the desk to resolve manually.
-      const planItems = [
-        ...snapshotListToPlanData(
-          productItems.map((i) => ({
-            productId: i.productId,
-            titleId: null,
-            quantity: i.quantity,
-            withContent: i.withContent,
-            authorshipMode: i.authorshipMode,
-            notes: i.notes,
-          })),
-        ),
-        ...snapshotListToPlanData(
-          titleItems.map((i) => ({
-            productId: null,
-            titleId: i.titleId,
-            quantity: i.quantity,
-            withContent: i.withContent,
-            authorshipMode: i.authorshipMode,
-            notes: i.notes,
-          })),
-        ),
-      ];
+      const planItems = snapshotListToPlanData([
+        ...productItems.map((i) => ({
+          productId: i.productId,
+          titleId: null,
+          quantity: i.quantity,
+          withContent: i.withContent,
+          authorshipMode: i.authorshipMode,
+          notes: i.notes,
+        })),
+        ...titleItems.map((i) => ({
+          productId: null,
+          titleId: i.titleId,
+          quantity: i.quantity,
+          withContent: i.withContent,
+          authorshipMode: i.authorshipMode,
+          notes: i.notes,
+        })),
+      ]);
       const plan = await tx.plan.create({
         data: {
           organizationId: org.id,

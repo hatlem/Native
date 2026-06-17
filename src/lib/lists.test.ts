@@ -36,14 +36,24 @@ test("cookie name is stable", () => {
   assert.equal(ACTIVE_LIST_COOKIE, "nativespin_active_list");
 });
 
-test("snapshotListToPlanData preserves product and title shape", () => {
+test("snapshotListToPlanData preserves field values without coercion", () => {
   const data = snapshotListToPlanData([
     { productId: "p1", titleId: null, quantity: 2, withContent: false, authorshipMode: "BUYER_SUPPLIED", notes: null },
-    { productId: null, titleId: "t1", quantity: 1, withContent: true, authorshipMode: "NATIVESPIN_PRODUCED", notes: "x" },
+    { productId: null, titleId: "t1", quantity: 1, withContent: true, authorshipMode: "NATIVESPIN_PRODUCED", notes: "keep" },
   ]);
   assert.equal(data.length, 2);
+  // product line shape
   assert.equal(data[0].productId, "p1");
   assert.equal(data[0].titleId, null);
+  assert.equal(data[0].withContent, false); // not coerced to true
+  assert.equal(data[0].notes, null);        // null survives, not ""
+  // title line shape
   assert.equal(data[1].productId, null);
   assert.equal(data[1].titleId, "t1");
+  assert.equal(data[1].quantity, 1);        // not clamped here
+  assert.equal(data[1].notes, "keep");
+});
+
+test("snapshotListToPlanData returns empty array for empty input", () => {
+  assert.deepEqual(snapshotListToPlanData([]), []);
 });

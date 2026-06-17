@@ -16,6 +16,7 @@ export default async function DeskRequestPage({
 }) {
   const { locale, requestId } = await params;
   const t = await getTranslations({ locale, namespace: "desk" });
+  const tr = await getTranslations({ locale, namespace: "requests" });
   const tType = await getTranslations({ locale, namespace: "productType" });
 
   const request = await prisma.request.findUnique({
@@ -109,12 +110,12 @@ export default async function DeskRequestPage({
             // the concrete placement.
             if (!item.productId) {
               const titleName = item.titleId
-                ? titleById.get(item.titleId)?.name ?? "Publication"
-                : "Publication";
+                ? titleById.get(item.titleId)?.name ?? tr("titlePlaceholderName")
+                : tr("titlePlaceholderName");
               return (
                 <article className="card" key={item.id}>
                   <h3>{titleName}</h3>
-                  <p className="muted">Placement to be proposed by our desk</p>
+                  <p className="muted">{tr("titlePlaceholderDesc")}</p>
                   <span className="tag">× {item.quantity}</span>
                 </article>
               );

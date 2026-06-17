@@ -481,6 +481,8 @@
     "itemsAndAge": "{items} items · {age}",
     "hasQuote": "Quote ready",
     "itemsEyebrow": "Brief",
+    "titlePlaceholderName": "Publication",
+    "titlePlaceholderDesc": "Placement to be proposed by our desk",
     "quoteEyebrow": "Firm pricing",
     "orderEyebrow": "Order",
     "pendingTitle": "Your brief is with the desk",

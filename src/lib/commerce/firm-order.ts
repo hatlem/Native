@@ -90,8 +90,9 @@ export async function createFirmOrder(args: {
   items: FirmOrderItem[];
   byId: Map<string, FirmOrderProduct>;
   brief?: FirmOrderBrief;
+  sourceListId?: string | null;
 }): Promise<{ requestId: string; orderIds: string[] }> {
-  const { organizationId, orgName, items, byId, brief } = args;
+  const { organizationId, orgName, items, byId, brief, sourceListId } = args;
   const goal = brief?.goal ?? null;
   const audience = brief?.audience ?? null;
   const targetGeo = brief?.targetGeo ?? null;
@@ -154,6 +155,7 @@ export async function createFirmOrder(args: {
         planId: plan.id,
         status: "CLOSED",
         briefSummary,
+        sourceListId: sourceListId ?? null,
       },
     });
 

@@ -27,12 +27,12 @@ export async function PlanItemsSection({
           // the concrete placement.
           if (!item.productId) {
             const titleName = item.titleId
-              ? titleById.get(item.titleId)?.name ?? "Publication"
-              : "Publication";
+              ? titleById.get(item.titleId)?.name ?? t("titlePlaceholderName")
+              : t("titlePlaceholderName");
             return (
               <article className="card" key={item.id}>
                 <h3>{titleName}</h3>
-                <p className="muted">Placement to be proposed by our desk</p>
+                <p className="muted">{t("titlePlaceholderDesc")}</p>
                 <span className="tag">× {item.quantity}</span>
               </article>
             );
