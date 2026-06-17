@@ -1,14 +1,8 @@
 "use server";
 
 import { redirect } from "next/navigation";
-import { revalidatePath } from "next/cache";
 import { prisma } from "@/lib/prisma";
-import {
-  clampQuantity,
-  readBasket,
-  writeBasket,
-  type BasketItem,
-} from "@/lib/basket";
+import { writeBasket, type BasketItem } from "@/lib/basket";
 import { recordAudit } from "@/lib/audit";
 import { loadScope, canActOnOrg } from "@/lib/scope";
 
@@ -17,87 +11,13 @@ function str(formData: FormData, key: string): string {
   return typeof v === "string" ? v.trim() : "";
 }
 
-export async function addToPlan(formData: FormData) {
-  const locale = str(formData, "locale") || "en";
-  const productId = str(formData, "productId");
-  if (productId) {
-    const items = await readBasket();
-    const existing = items.find((i) => i.productId === productId);
-    if (existing) existing.quantity += 1;
-    else items.push({ productId, quantity: 1 });
-    await writeBasket(items);
-  }
-  redirect(`/${locale}/plan`);
-}
-
-export async function addRecommendedPlan(formData: FormData) {
-  const locale = str(formData, "locale") || "en";
-  const ids = str(formData, "productIds")
-    .split(",")
-    .map((s) => s.trim())
-    .filter(Boolean);
-  if (ids.length > 0) {
-    const valid = await prisma.product.findMany({
-      where: { id: { in: ids }, active: true, bookable: true },
-      select: { id: true },
-    });
-    const validIds = new Set(valid.map((p) => p.id));
-    const items = await readBasket();
-    for (const id of ids) {
-      if (!validIds.has(id)) continue;
-      const existing = items.find((i) => i.productId === id);
-      if (existing) existing.quantity += 1;
-      else items.push({ productId: id, quantity: 1 });
-    }
-    await writeBasket(items);
-  }
-  redirect(`/${locale}/plan`);
-}
-
-export async function removeFromPlan(formData: FormData) {
-  const locale = str(formData, "locale") || "en";
-  const productId = str(formData, "productId");
-  const items = (await readBasket()).filter((i) => i.productId !== productId);
-  await writeBasket(items);
-  revalidatePath(`/${locale}/plan`);
-}
-
-// Set the quantity for one plan line directly (the plan-page stepper).
-// addToPlan keeps incrementing on catalog re-add; this lets the buyer
-// set an exact value. Clamped to [1, MAX_QTY]; never removes a line
-// (Remove is its own action).
-export async function setQuantity(formData: FormData) {
-  const locale = str(formData, "locale") || "en";
-  const productId = str(formData, "productId");
-  const qty = clampQuantity(Number(str(formData, "quantity")));
-  if (productId) {
-    const items = await readBasket();
-    const existing = items.find((i) => i.productId === productId);
-    if (existing) {
-      existing.quantity = qty;
-      await writeBasket(items);
-    }
-  }
-  redirect(`/${locale}/plan`);
-}
-
-// Toggle whether NativeSpin produces the content for one plan line.
-// Drives a CONTENT_FEE quote line at submit time. withContent="1" turns
-// it on, anything else off.
-export async function setContentProduction(formData: FormData) {
-  const locale = str(formData, "locale") || "en";
-  const productId = str(formData, "productId");
-  const on = str(formData, "withContent") === "1";
-  if (productId) {
-    const items = await readBasket();
-    const existing = items.find((i) => i.productId === productId);
-    if (existing) {
-      existing.withContent = on;
-      await writeBasket(items);
-    }
-  }
-  redirect(`/${locale}/plan`);
-}
+export {
+  addProductToList as addToPlan,
+  addRecommendedToList as addRecommendedPlan,
+  removeListItem as removeFromPlan,
+  setListItemQuantity as setQuantity,
+  setListItemContent as setContentProduction,
+} from "@/app/list-actions";
 
 // "Use as template" — rehydrate the in-flight basket cookie from a past
 // Plan tied to an Order. Closes Maja R2's gap: returning customers
