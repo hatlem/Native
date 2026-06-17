@@ -462,6 +462,7 @@ model Title {
   contactLogs       ContactLog[]
   rateCardDocuments RateCardDocument[]
   bookings          PublisherBooking[]
+  savedListItems    SavedListItem[]
 
   @@index([countryCode])
   @@index([type])
@@ -521,6 +522,7 @@ model Product {
   spec          Spec?
   availability  Availability[]
   priceQuotes   PriceQuote[]
+  savedListItems SavedListItem[]
 
   @@unique([titleId, externalRef])
 }
@@ -671,6 +673,7 @@ model Organization {
   apiKeys     ApiKey[]
   memberships Membership[]
   invites     OrgInvite[]
+  savedLists  SavedList[]
 }
 
 model User {
@@ -948,7 +951,8 @@ model PlanItem {
   id        String  @id @default(cuid())
   planId    String
   plan      Plan    @relation(fields: [planId], references: [id])
-  productId String
+  productId String?
+  titleId   String?
   quantity  Int     @default(1)
   // When true, the buyer wants NativeSpin to produce the native content
   // for this placement — adds a CONTENT_FEE line to the quote priced
@@ -963,6 +967,49 @@ model PlanItem {
   notes     String?
 }
 
+model SavedList {
+  id             String    @id @default(cuid())
+  organizationId String
+  organization   Organization @relation(fields: [organizationId], references: [id])
+  name           String    @default("Untitled list")
+  note           String?
+  budget         Decimal?  @db.Decimal(12, 2)
+  currency       String?
+  goal           String?
+  audienceNote   String?
+  targetGeo      String?
+  targetAudience String?
+  targetContext  String?
+  createdById    String?
+  archivedAt     DateTime?
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+
+  items   SavedListItem[]
+  requests Request[]
+
+  @@index([organizationId])
+  @@index([organizationId, archivedAt])
+}
+
+model SavedListItem {
+  id        String    @id @default(cuid())
+  listId    String
+  list      SavedList @relation(fields: [listId], references: [id], onDelete: Cascade)
+  productId String?
+  product   Product?  @relation(fields: [productId], references: [id])
+  titleId   String?
+  title     Title?    @relation(fields: [titleId], references: [id])
+  quantity  Int       @default(1)
+  withContent    Boolean        @default(false)
+  authorshipMode AuthorshipMode @default(BUYER_SUPPLIED)
+  notes     String?
+  sortOrder Int       @default(0)
+  createdAt DateTime  @default(now())
+
+  @@index([listId])
+}
+
 model Request {
   id             String        @id @default(cuid())
   organizationId String
@@ -972,6 +1019,8 @@ model Request {
   status         RequestStatus @default(DRAFT)
   briefSummary   String?
   assignedDeskUserId String?
+  sourceListId   String?
+  sourceList     SavedList? @relation(fields: [sourceListId], references: [id])
   createdAt      DateTime      @default(now())
   updatedAt      DateTime      @updatedAt
 
