@@ -3,7 +3,8 @@ import { MarketCode } from "@prisma/client";
 import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
 import { getWorkspace } from "@/lib/workspace";
-import { readBasket, readPlanBrief } from "@/lib/basket";
+import { readPlanBrief } from "@/lib/basket";
+import { readActiveListId, resolveActiveList } from "@/lib/lists";
 import { indicativeFromRules, toRateRules } from "@/lib/money";
 import { isProductPriceShown } from "@/lib/pricing-visibility";
 import { recommendTiered, type Candidate, type SupplementaryTitle } from "@/lib/recommend";
@@ -17,7 +18,8 @@ import {
 import { enrichBriefWithLLM, llmEnrichmentAvailable } from "@/lib/brief-match-llm";
 import { PlanBanners } from "./_components/PlanBanners";
 import { PlanStart } from "./_components/PlanStart";
-import { PlanLines } from "./_components/PlanLines";
+import { PlanLines, type PlanTitleLine } from "./_components/PlanLines";
+import { PlanListBar } from "./_components/PlanListBar";
 import { PlanSummary, type Rollup } from "./_components/PlanSummary";
 
 const MARKET_CODES = Object.values(MarketCode);
@@ -46,43 +48,77 @@ export default async function PlanPage({
     : null;
   const needsClient = !!ws?.isAgency && !ws.activeOrgId;
 
-  const basket = await readBasket();
   // Rehydrate the brief from the cookie submitRequest stashed before
   // the onboarding gate detour. Empty strings on the fresh path —
   // React leaves the input blank when defaultValue is "".
   const briefDraft = await readPlanBrief();
-  const products = basket.length
-    ? await prisma.product.findMany({
-        where: { id: { in: basket.map((b) => b.productId) } },
-        include: {
-          title: { include: { publisher: true } },
-          priceRules: true,
-        },
+
+  // The plan now operates on the active SavedList (not the legacy cookie
+  // basket). The switcher needs every non-archived list for this org.
+  const lists = ws?.activeOrgId
+    ? await prisma.savedList.findMany({
+        where: { organizationId: ws.activeOrgId, archivedAt: null },
+        orderBy: { updatedAt: "desc" },
+        select: { id: true, name: true, _count: { select: { items: true } } },
       })
     : [];
-  const byId = new Map(products.map((p) => [p.id, p]));
+  const activeList = ws?.activeOrgId
+    ? await resolveActiveList(ws.activeOrgId, await readActiveListId())
+    : null;
+  const listItems = activeList?.items ?? [];
 
-  const lines = basket
-    .map((b) => {
-      const p = byId.get(b.productId);
-      if (!p) return null;
+  const tType = await getTranslations({ locale, namespace: "productType" });
+
+  // PRODUCT lines: concrete placements. Same price logic as before, but
+  // keyed on the SavedListItem id so edits target the row, not the product.
+  const lines = listItems
+    .map((i) => {
+      if (!i.productId || !i.product) return null;
+      const p = i.product;
       const priceVisible = isProductPriceShown(p, p.title);
       const unit = priceVisible
         ? indicativeFromRules(
             Number(p.basePrice),
             toRateRules(p.priceRules),
-            b.quantity,
+            i.quantity,
           )
         : 0;
       return {
+        itemId: i.id,
         product: p,
-        quantity: b.quantity,
+        quantity: i.quantity,
         priceVisible,
-        withContent: b.withContent ?? false,
-        lineTotal: unit * b.quantity,
+        withContent: i.withContent,
+        lineTotal: unit * i.quantity,
       };
     })
     .filter((l): l is NonNullable<typeof l> => l !== null);
+
+  // PLACEHOLDER lines: a title with no product yet. Offer the title's
+  // active+bookable products so the buyer can resolve the line in place.
+  const placeholderItems = listItems.filter((i) => !i.productId && i.titleId && i.title);
+  const placeholderTitleIds = [
+    ...new Set(placeholderItems.map((i) => i.titleId as string)),
+  ];
+  const placementProducts = placeholderTitleIds.length
+    ? await prisma.product.findMany({
+        where: { titleId: { in: placeholderTitleIds }, active: true, bookable: true },
+        select: { id: true, type: true, titleId: true },
+      })
+    : [];
+  const placementsByTitle = new Map<string, { id: string; label: string }[]>();
+  for (const p of placementProducts) {
+    const arr = placementsByTitle.get(p.titleId) ?? [];
+    arr.push({ id: p.id, label: tType(p.type) });
+    placementsByTitle.set(p.titleId, arr);
+  }
+  const titleLines: PlanTitleLine[] = placeholderItems.map((i) => ({
+    itemId: i.id,
+    titleId: i.titleId as string,
+    titleName: i.title!.name,
+    quantity: i.quantity,
+    placements: placementsByTitle.get(i.titleId as string) ?? [],
+  }));
 
   const hasHiddenPrice = lines.some((l) => !l.priceVisible);
 
@@ -114,10 +150,12 @@ export default async function PlanPage({
     return score(a) - score(b);
   });
 
-  // A hidden-price line forces the whole basket onto the RFQ path —
-  // we can't checkout firm against a price the buyer hasn't seen.
+  // A hidden-price line — or any unresolved title placeholder — forces the
+  // whole basket onto the RFQ path. We can't checkout firm against a price
+  // the buyer hasn't seen, nor against a placement the desk hasn't proposed.
   const allFirm =
     lines.length > 0 &&
+    titleLines.length === 0 &&
     !hasHiddenPrice &&
     lines.every((l) => l.product.visibility === "FIRM");
 
@@ -136,7 +174,7 @@ export default async function PlanPage({
   // True when the results were ranked by the brief (drives the heading +
   // reason chips); false = plain budget recommender.
   let briefMatched = false;
-  if (basket.length === 0 && recMarket) {
+  if (listItems.length === 0 && recMarket) {
     const recProducts = await prisma.product.findMany({
       where: {
         active: true,
@@ -260,7 +298,16 @@ export default async function PlanPage({
 
       <PlanBanners locale={locale} error={sp.error} duplicate={sp.duplicate} />
 
-      {lines.length === 0 ? (
+      {lists.length > 0 ? (
+        <PlanListBar
+          locale={locale}
+          lists={lists}
+          activeListId={activeList?.id}
+          activeListName={activeList?.name}
+        />
+      ) : null}
+
+      {lines.length === 0 && titleLines.length === 0 ? (
         <PlanStart
           locale={locale}
           recBriefRaw={recBriefRaw}
@@ -273,7 +320,7 @@ export default async function PlanPage({
         />
       ) : (
         <div className="split">
-          <PlanLines locale={locale} lines={lines} hasHiddenPrice={hasHiddenPrice} />
+          <PlanLines locale={locale} lines={lines} titleLines={titleLines} hasHiddenPrice={hasHiddenPrice} />
           <PlanSummary
             locale={locale}
             totals={totals}

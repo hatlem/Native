@@ -1,116 +1,55 @@
 "use server";
 
 import { redirect } from "next/navigation";
-import { revalidatePath } from "next/cache";
 import { prisma } from "@/lib/prisma";
-import {
-  clampQuantity,
-  readBasket,
-  writeBasket,
-  type BasketItem,
-} from "@/lib/basket";
 import { recordAudit } from "@/lib/audit";
 import { loadScope, canActOnOrg } from "@/lib/scope";
+import { writeActiveListId } from "@/lib/lists";
+import {
+  addProductToList,
+  addRecommendedToList,
+  removeListItem,
+  setListItemQuantity,
+  setListItemContent,
+} from "@/app/list-actions";
 
 function str(formData: FormData, key: string): string {
   const v = formData.get(key);
   return typeof v === "string" ? v.trim() : "";
 }
 
+// Stable buyer-facing action names, kept as the import surface for the
+// catalog / plan / recommend components. A "use server" module may only
+// EXPORT async functions (no `export { x as y } from …` re-exports), so
+// these delegate to the canonical list actions rather than re-exporting.
 export async function addToPlan(formData: FormData) {
-  const locale = str(formData, "locale") || "en";
-  const productId = str(formData, "productId");
-  if (productId) {
-    const items = await readBasket();
-    const existing = items.find((i) => i.productId === productId);
-    if (existing) existing.quantity += 1;
-    else items.push({ productId, quantity: 1 });
-    await writeBasket(items);
-  }
-  redirect(`/${locale}/plan`);
+  return addProductToList(formData);
 }
-
 export async function addRecommendedPlan(formData: FormData) {
-  const locale = str(formData, "locale") || "en";
-  const ids = str(formData, "productIds")
-    .split(",")
-    .map((s) => s.trim())
-    .filter(Boolean);
-  if (ids.length > 0) {
-    const valid = await prisma.product.findMany({
-      where: { id: { in: ids }, active: true, bookable: true },
-      select: { id: true },
-    });
-    const validIds = new Set(valid.map((p) => p.id));
-    const items = await readBasket();
-    for (const id of ids) {
-      if (!validIds.has(id)) continue;
-      const existing = items.find((i) => i.productId === id);
-      if (existing) existing.quantity += 1;
-      else items.push({ productId: id, quantity: 1 });
-    }
-    await writeBasket(items);
-  }
-  redirect(`/${locale}/plan`);
+  return addRecommendedToList(formData);
 }
-
 export async function removeFromPlan(formData: FormData) {
-  const locale = str(formData, "locale") || "en";
-  const productId = str(formData, "productId");
-  const items = (await readBasket()).filter((i) => i.productId !== productId);
-  await writeBasket(items);
-  revalidatePath(`/${locale}/plan`);
+  return removeListItem(formData);
 }
-
-// Set the quantity for one plan line directly (the plan-page stepper).
-// addToPlan keeps incrementing on catalog re-add; this lets the buyer
-// set an exact value. Clamped to [1, MAX_QTY]; never removes a line
-// (Remove is its own action).
 export async function setQuantity(formData: FormData) {
-  const locale = str(formData, "locale") || "en";
-  const productId = str(formData, "productId");
-  const qty = clampQuantity(Number(str(formData, "quantity")));
-  if (productId) {
-    const items = await readBasket();
-    const existing = items.find((i) => i.productId === productId);
-    if (existing) {
-      existing.quantity = qty;
-      await writeBasket(items);
-    }
-  }
-  redirect(`/${locale}/plan`);
+  return setListItemQuantity(formData);
 }
-
-// Toggle whether NativeSpin produces the content for one plan line.
-// Drives a CONTENT_FEE quote line at submit time. withContent="1" turns
-// it on, anything else off.
 export async function setContentProduction(formData: FormData) {
-  const locale = str(formData, "locale") || "en";
-  const productId = str(formData, "productId");
-  const on = str(formData, "withContent") === "1";
-  if (productId) {
-    const items = await readBasket();
-    const existing = items.find((i) => i.productId === productId);
-    if (existing) {
-      existing.withContent = on;
-      await writeBasket(items);
-    }
-  }
-  redirect(`/${locale}/plan`);
+  return setListItemContent(formData);
 }
 
-// "Use as template" — rehydrate the in-flight basket cookie from a past
-// Plan tied to an Order. Closes Maja R2's gap: returning customers
-// who want to repeat what worked shouldn't rebuild the basket title
-// by title. The new in-flight plan is editable in /plan before the
-// buyer re-submits the RFQ.
+// "Use as template" — rehydrate a past Plan tied to an Order into a fresh
+// SavedList, then make it the active list. Closes Maja R2's gap: returning
+// customers who want to repeat what worked shouldn't rebuild the list title
+// by title. The new list is editable in /plan before the buyer re-submits
+// the RFQ.
 //
 // Authorisation: the order's organisation must be in the caller's
 // scope (own org or, for agencies, the selected client). Anything
-// else gets a redirect — no leaking of basket structure across orgs.
+// else gets a redirect — no leaking of list structure across orgs.
 //
 // Products that have been deactivated since the original order are
-// dropped from the rehydrated basket; the buyer sees a count message
+// dropped from the rehydrated list; the buyer sees a count message
 // at /plan and can find substitutes via the catalog.
 export async function duplicatePlan(formData: FormData) {
   const locale = str(formData, "locale") || "en";
@@ -157,36 +96,56 @@ export async function duplicatePlan(formData: FormData) {
 
   // Drop products that have been deactivated since the original order
   // ran. The buyer is told how many items survived so they don't
-  // discover the loss after submitting.
+  // discover the loss after submitting. PlanItem.productId is now
+  // nullable (title placeholders), but `duplicatePlan` only ever runs
+  // against confirmed orders whose plan items are product-backed —
+  // filter the nulls so the rehydrated list stays well-typed.
+  const productSourceItems = sourceItems.filter((i) => i.productId);
   const stillActive = await prisma.product.findMany({
     where: {
-      id: { in: sourceItems.map((i) => i.productId) },
+      id: { in: productSourceItems.map((i) => i.productId as string) },
       active: true,
       bookable: true,
     },
     select: { id: true },
   });
   const activeIds = new Set(stillActive.map((p) => p.id));
-  const items: BasketItem[] = sourceItems
-    .filter((i) => activeIds.has(i.productId))
-    .map((i) => ({ productId: i.productId, quantity: i.quantity }));
+  const survivingItems = productSourceItems.filter((i) =>
+    activeIds.has(i.productId as string),
+  );
 
-  await writeBasket(items);
+  const created = await prisma.savedList.create({
+    data: {
+      organizationId: order.organizationId,
+      name: "Reordered campaign",
+      createdById: scope.userId ?? null,
+      items: {
+        create: survivingItems.map((i, idx) => ({
+          productId: i.productId,
+          titleId: null,
+          quantity: i.quantity,
+          sortOrder: idx,
+        })),
+      },
+    },
+  });
+  await writeActiveListId(created.id);
+
   await recordAudit(
     scope.userId,
     "plan.duplicate",
     `Order:${orderId}`,
     {
       sourcePlanId: order.quote.request.plan.id,
-      restored: items.length,
-      dropped: sourceItems.length - items.length,
+      restored: survivingItems.length,
+      dropped: sourceItems.length - survivingItems.length,
     },
   );
 
-  const dropped = sourceItems.length - items.length;
+  const dropped = sourceItems.length - survivingItems.length;
   redirect(
     `/${locale}/plan?duplicate=` +
-      (items.length === 0
+      (survivingItems.length === 0
         ? "all-inactive"
         : dropped > 0
           ? `partial-${dropped}`

@@ -54,6 +54,7 @@ export function navItemsFor(
       return [
         { key: "catalog", label: t("catalog"), href: "/catalog" },
         { key: "plan", label: t("plan"), href: "/plan" },
+        { key: "lists", label: t("lists"), href: "/lists" },
         { key: "requests", label: t("requests"), href: "/requests" },
         { key: "orders", label: t("orders"), href: "/orders" },
         { key: "reports", label: t("reports"), href: "/reports" },
@@ -62,6 +63,7 @@ export function navItemsFor(
       return [
         { key: "catalog", label: t("catalog"), href: "/catalog" },
         { key: "plan", label: t("plan"), href: "/plan" },
+        { key: "lists", label: t("lists"), href: "/lists" },
         { key: "agency", label: t("agency"), href: "/agency" },
         { key: "requests", label: t("requests"), href: "/requests" },
         { key: "orders", label: t("orders"), href: "/orders" },
@@ -129,6 +131,7 @@ export function paletteItemsFor(
         return [
           { key: "catalog", label: t("catalog"), href: "/catalog" },
           { key: "plan", label: t("plan"), href: "/plan" },
+          { key: "lists", label: t("lists"), href: "/lists" },
           { key: "recommend", label: t("recommend"), href: "/recommend" },
           { key: "requests", label: t("requests"), href: "/requests" },
           { key: "orders", label: t("orders"), href: "/orders" },

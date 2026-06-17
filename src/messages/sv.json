@@ -40,7 +40,8 @@
     "contentFees": "Innehållsavgifter",
     "playbooks": "Spelböcker",
     "writers": "Skribenter",
-    "metricsNeedsContact": "Saknar mätvärden"
+    "metricsNeedsContact": "Saknar mätvärden",
+    "lists": "Sparade listor"
   },
   "reports": {
     "title": "Rapporter",
@@ -216,7 +217,23 @@
       "teaserLink": "Logga in för att se alla titlar och vägledande priser",
       "ctaBlockTitle": "Redo att brieffa oss?",
       "ctaBlockBody": "Skapa konto, berätta vad du säljer och till vem — vi återkommer inom 24 timmar med titlarna och formaten som passar."
-    }
+    },
+    "savePublication": "Spara publikation"
+  },
+  "lists": {
+    "title": "Sparade listor",
+    "empty": "Inga sparade listor ännu. Lägg till en publikation eller placering för att börja.",
+    "name": "Lista",
+    "items": "Objekt",
+    "lastSubmittedHeading": "Senast skickad",
+    "itemCount": "{count} objekt",
+    "lastSubmitted": "Senast skickad {date}",
+    "neverSubmitted": "Inte skickad ännu",
+    "open": "Öppna",
+    "rename": "Byt namn",
+    "duplicate": "Duplicera",
+    "archive": "Arkivera",
+    "navLabel": "Sparade listor"
   },
   "titleDetail": {
     "back": "Tillbaka till katalogen",
@@ -344,7 +361,15 @@
     "briefLabel": "Vilka vill du nå?",
     "briefPlaceholder": "t.ex. Vi säljer programvara till finans- och juristteam i Oslo",
     "briefHint": "Vi matchar titlar efter målgrupp, bransch och region. Marknad krävs; budget är valfri.",
-    "recForBrief": "Matchat mot din brief"
+    "recForBrief": "Matchat mot din brief",
+    "titlePlaceholderNote": "Vårt team föreslår och prissätter en placering.",
+    "pickPlacement": "Välj en placering …",
+    "resolve": "Använd placering",
+    "noPlacements": "Inga placeringar tillgängliga ännu",
+    "switchList": "Byt lista",
+    "newList": "Ny lista",
+    "rename": "Byt namn",
+    "savedListsLabel": "Dina listor"
   },
   "rfq": {
     "org": "Företag",
@@ -408,7 +433,9 @@
     "pendingBuyerLabel": "Inköpare",
     "pendingBuyerUnassigned": "Tilldelas",
     "pendingSlaLabel": "Firm pris förväntas senast",
-    "pendingBriefLabel": "Din brief"
+    "pendingBriefLabel": "Din brief",
+    "titlePlaceholderName": "Publikation",
+    "titlePlaceholderDesc": "Placering föreslås av vårt team"
   },
   "desk": {
     "eyebrow": "Internt desk",

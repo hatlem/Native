@@ -1,5 +1,9 @@
 import { cookies } from "next/headers";
 
+// DEPRECATED: the items-array basket cookie (`nativespin_plan`) is superseded by
+// the SavedList model + the `nativespin_active_list` pointer cookie. It is retained
+// only for (a) one-time migration of in-flight baskets into a SavedList and (b) the
+// order-template rehydrate path (until Task 8). No new code should WRITE this cookie.
 export const PLAN_COOKIE = "nativespin_plan";
 // Brief draft persisted alongside the basket so the buyer doesn't
 // lose their budget/audience/goal/brief text when the buy-gate
@@ -107,21 +111,12 @@ export async function readBasket(): Promise<BasketItem[]> {
   return parseBasket(store.get(PLAN_COOKIE)?.value);
 }
 
-export function serializeBasket(items: BasketItem[]): string {
-  return JSON.stringify(items);
-}
-
 const COOKIE_OPTS = {
   httpOnly: true,
   sameSite: "lax" as const,
   path: "/",
   maxAge: 60 * 60 * 24 * 7,
 };
-
-export async function writeBasket(items: BasketItem[]): Promise<void> {
-  const store = await cookies();
-  store.set(PLAN_COOKIE, serializeBasket(items), COOKIE_OPTS);
-}
 
 export async function writePlanBrief(brief: PlanBrief): Promise<void> {
   const store = await cookies();

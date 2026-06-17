@@ -13,6 +13,7 @@ import type { ProductInclusions } from "@/lib/pricing/inclusions";
 import { productDisplayNames } from "@/lib/pricing/display-name";
 import { loadPricingDefaults } from "@/lib/content-fee";
 import { addToPlan } from "@/app/plan-actions";
+import { saveTitleToList } from "@/app/list-actions";
 import { SubmitButton } from "@/components";
 import { localizeCategory, localizeTaxonomy, localizeVertical } from "@/lib/taxonomy-i18n";
 import type { AppLocale } from "@/i18n/routing";
@@ -92,6 +93,7 @@ export default async function TitleDetailPage({
   // CSP nonce from middleware — required for the inline ld+json <script> below.
   const nonce = (await headers()).get("x-nonce") ?? undefined;
   const t = await getTranslations({ locale, namespace: "titleDetail" });
+  const tCat = await getTranslations({ locale, namespace: "catalog" });
   const tf = await getTranslations({ locale, namespace: "firm" });
   const tType = await getTranslations({ locale, namespace: "productType" });
   const tMarket = await getTranslations({ locale, namespace: "market" });
@@ -228,6 +230,15 @@ export default async function TitleDetailPage({
               ))}
             </div>
           ) : null}
+          {/* Save the whole publication as a desk-resolved placeholder line —
+              the buyer picks the format later, or the desk proposes one. */}
+          <form action={saveTitleToList} style={{ marginTop: 12 }}>
+            <input type="hidden" name="locale" value={locale} />
+            <input type="hidden" name="titleId" value={title.id} />
+            <button type="submit" className="btn ghost small">
+              {tCat("savePublication")}
+            </button>
+          </form>
         </div>
 
         <aside className="card" aria-label={t("keyFacts")}>
