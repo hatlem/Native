@@ -2,6 +2,7 @@
   "heading": "Etkö ole vielä valmis juttelemaan?",
   "lead": "Saat silloin tällöin lyhyitä, asiapitoisia havaintoja natiivimainonnasta yhdeksällä markkina-alueellamme — uusia julkaisuja, formaatti-ideoita ja sitä, mikä oikeasti toimii. Voit perua tilauksen milloin tahansa.",
   "placeholder": "sina@yritys.fi",
+  "emailLabel": "Sähköpostiosoite",
   "button": "Pidä minut ajan tasalla",
   "sending": "Lähetetään …",
   "success": "Melkein valmista — vahvista tilaus sähköpostistasi.",
