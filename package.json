@@ -46,7 +46,7 @@
   "dependencies": {
     "@aws-sdk/client-s3": "^3.1055.0",
     "@aws-sdk/s3-request-presigner": "^3.1055.0",
-    "@getplatform/artifact-viewer": "git+ssh://git@github.com/hatlem/artifact-viewer.git#v1.3.0",
+    "@getplatform/artifact-viewer": "git+https://github.com/hatlem/artifact-viewer.git#v1.3.0",
     "@modelcontextprotocol/sdk": "^1.29.0",
     "@prisma/client": "^6.2.1",
     "bcryptjs": "^3.0.3",

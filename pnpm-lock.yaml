@@ -19,8 +19,8 @@ importers:
         specifier: ^3.1055.0
         version: 3.1055.0
       '@getplatform/artifact-viewer':
-        specifier: git+ssh://git@github.com/hatlem/artifact-viewer.git#v1.3.0
-        version: git+https://git@github.com:hatlem/artifact-viewer.git#f437ca78b4bd253f5fe79065ca3a311e25cb96c3(react-dom@19.2.6(react@19.2.6))(react@19.2.6)
+        specifier: git+https://github.com/hatlem/artifact-viewer.git#v1.3.0
+        version: https://codeload.github.com/hatlem/artifact-viewer/tar.gz/f437ca78b4bd253f5fe79065ca3a311e25cb96c3(react-dom@19.2.6(react@19.2.6))(react@19.2.6)
       '@modelcontextprotocol/sdk':
         specifier: ^1.29.0
         version: 1.29.0(zod@4.4.3)
@@ -435,8 +435,8 @@ packages:
   '@formatjs/intl-localematcher@0.8.8':
     resolution: {integrity: sha512-pBr2hVKWvkHVnfXegW+53NT9U2uaVQCc+EgzLPCCwXqBA3nvM5fPbK9IcJlNjV+NMKGyZ2F3ZSG78iGdxAAqbA==}
 
-  '@getplatform/artifact-viewer@git+https://git@github.com:hatlem/artifact-viewer.git#f437ca78b4bd253f5fe79065ca3a311e25cb96c3':
-    resolution: {commit: f437ca78b4bd253f5fe79065ca3a311e25cb96c3, repo: git@github.com:hatlem/artifact-viewer.git, type: git}
+  '@getplatform/artifact-viewer@https://codeload.github.com/hatlem/artifact-viewer/tar.gz/f437ca78b4bd253f5fe79065ca3a311e25cb96c3':
+    resolution: {tarball: https://codeload.github.com/hatlem/artifact-viewer/tar.gz/f437ca78b4bd253f5fe79065ca3a311e25cb96c3}
     version: 1.3.0
     peerDependencies:
       react: '>=18'
@@ -3363,7 +3363,7 @@ snapshots:
     dependencies:
       '@formatjs/fast-memoize': 3.1.5
 
-  '@getplatform/artifact-viewer@git+https://git@github.com:hatlem/artifact-viewer.git#f437ca78b4bd253f5fe79065ca3a311e25cb96c3(react-dom@19.2.6(react@19.2.6))(react@19.2.6)':
+  '@getplatform/artifact-viewer@https://codeload.github.com/hatlem/artifact-viewer/tar.gz/f437ca78b4bd253f5fe79065ca3a311e25cb96c3(react-dom@19.2.6(react@19.2.6))(react@19.2.6)':
     dependencies:
       react: 19.2.6
       react-dom: 19.2.6(react@19.2.6)
