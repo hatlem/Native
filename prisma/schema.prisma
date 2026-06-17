@@ -980,6 +980,7 @@ model SavedList {
   targetGeo      String?
   targetAudience String?
   targetContext  String?
+  // Soft reference (no FK) — the list survives if the creating user is removed.
   createdById    String?
   archivedAt     DateTime?
   createdAt      DateTime  @default(now())
@@ -988,7 +989,6 @@ model SavedList {
   items   SavedListItem[]
   requests Request[]
 
-  @@index([organizationId])
   @@index([organizationId, archivedAt])
 }
 
@@ -997,9 +997,9 @@ model SavedListItem {
   listId    String
   list      SavedList @relation(fields: [listId], references: [id], onDelete: Cascade)
   productId String?
-  product   Product?  @relation(fields: [productId], references: [id])
+  product   Product?  @relation(fields: [productId], references: [id], onDelete: SetNull)
   titleId   String?
-  title     Title?    @relation(fields: [titleId], references: [id])
+  title     Title?    @relation(fields: [titleId], references: [id], onDelete: SetNull)
   quantity  Int       @default(1)
   withContent    Boolean        @default(false)
   authorshipMode AuthorshipMode @default(BUYER_SUPPLIED)
@@ -1020,7 +1020,7 @@ model Request {
   briefSummary   String?
   assignedDeskUserId String?
   sourceListId   String?
-  sourceList     SavedList? @relation(fields: [sourceListId], references: [id])
+  sourceList     SavedList? @relation(fields: [sourceListId], references: [id], onDelete: SetNull)
   createdAt      DateTime      @default(now())
   updatedAt      DateTime      @updatedAt
 

@@ -26,13 +26,11 @@ CREATE TABLE IF NOT EXISTS "SavedList" (
   CONSTRAINT "SavedList_pkey" PRIMARY KEY ("id")
 );
 
-CREATE INDEX IF NOT EXISTS "SavedList_organizationId_idx"
-  ON "SavedList"("organizationId");
-
 CREATE INDEX IF NOT EXISTS "SavedList_organizationId_archivedAt_idx"
   ON "SavedList"("organizationId", "archivedAt");
 
 -- CreateTable: SavedListItem
+-- invariant "exactly one of productId/titleId" enforced in the app layer (lib/lists.ts)
 CREATE TABLE IF NOT EXISTS "SavedListItem" (
   "id"             TEXT             NOT NULL,
   "listId"         TEXT             NOT NULL,
@@ -80,12 +78,6 @@ EXCEPTION WHEN duplicate_object THEN null; END $$;
 DO $$ BEGIN
   ALTER TABLE "SavedListItem"
     ADD CONSTRAINT "SavedListItem_titleId_fkey" FOREIGN KEY ("titleId")
-    REFERENCES "Title"("id") ON DELETE SET NULL ON UPDATE CASCADE;
-EXCEPTION WHEN duplicate_object THEN null; END $$;
-
-DO $$ BEGIN
-  ALTER TABLE "PlanItem"
-    ADD CONSTRAINT "PlanItem_titleId_fkey" FOREIGN KEY ("titleId")
     REFERENCES "Title"("id") ON DELETE SET NULL ON UPDATE CASCADE;
 EXCEPTION WHEN duplicate_object THEN null; END $$;
 
