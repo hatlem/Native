@@ -5,19 +5,38 @@ import { prisma } from "@/lib/prisma";
 import { recordAudit } from "@/lib/audit";
 import { loadScope, canActOnOrg } from "@/lib/scope";
 import { writeActiveListId } from "@/lib/lists";
+import {
+  addProductToList,
+  addRecommendedToList,
+  removeListItem,
+  setListItemQuantity,
+  setListItemContent,
+} from "@/app/list-actions";
 
 function str(formData: FormData, key: string): string {
   const v = formData.get(key);
   return typeof v === "string" ? v.trim() : "";
 }
 
-export {
-  addProductToList as addToPlan,
-  addRecommendedToList as addRecommendedPlan,
-  removeListItem as removeFromPlan,
-  setListItemQuantity as setQuantity,
-  setListItemContent as setContentProduction,
-} from "@/app/list-actions";
+// Stable buyer-facing action names, kept as the import surface for the
+// catalog / plan / recommend components. A "use server" module may only
+// EXPORT async functions (no `export { x as y } from …` re-exports), so
+// these delegate to the canonical list actions rather than re-exporting.
+export async function addToPlan(formData: FormData) {
+  return addProductToList(formData);
+}
+export async function addRecommendedPlan(formData: FormData) {
+  return addRecommendedToList(formData);
+}
+export async function removeFromPlan(formData: FormData) {
+  return removeListItem(formData);
+}
+export async function setQuantity(formData: FormData) {
+  return setListItemQuantity(formData);
+}
+export async function setContentProduction(formData: FormData) {
+  return setListItemContent(formData);
+}
 
 // "Use as template" — rehydrate a past Plan tied to an Order into a fresh
 // SavedList, then make it the active list. Closes Maja R2's gap: returning
