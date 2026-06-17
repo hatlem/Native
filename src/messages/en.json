@@ -222,6 +222,7 @@
     "eyebrow": "Browse",
     "title": "Every title that runs native",
     "subtitle": "Filter by market, format and audience. Indicative pricing where the publisher has shared it — firm pricing on request via the desk.",
+    "savePublication": "Save publication",
     "resultCount": "{count, plural, =0 {No matches} =1 {1 title} other {# titles}}",
     "removeFilter": "Remove filter",
     "filters": {
@@ -423,7 +424,15 @@
     "briefLabel": "Who are you trying to reach?",
     "briefPlaceholder": "e.g. We sell software to finance and legal teams in Oslo",
     "briefHint": "We match titles by audience, industry and region. Market is required; budget is optional.",
-    "recForBrief": "Matched to your brief"
+    "recForBrief": "Matched to your brief",
+    "titlePlaceholderNote": "Our desk will propose and price a placement.",
+    "pickPlacement": "Pick a placement…",
+    "resolve": "Use placement",
+    "noPlacements": "No placements available yet",
+    "switchList": "Switch list",
+    "newList": "New list",
+    "rename": "Rename",
+    "savedListsLabel": "Your lists"
   },
   "rfq": {
     "org": "Company",
