@@ -2,7 +2,7 @@ import { test, before, after } from "node:test";
 import assert from "node:assert/strict";
 import { OrgType } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
-import { createFirmOrder } from "@/lib/commerce/firm-order";
+import { createFirmOrder, FirmOrderStaleError } from "@/lib/commerce/firm-order";
 import { createOrderFromQuote } from "@/lib/commerce/accept-quote";
 
 // DB-mutating integration test — skipped unless RUN_DB_IT=1, and only
@@ -117,6 +117,23 @@ if (!RUN_DB_IT) {
     // report groups on it.
     assert.equal(line.booking?.titleId, titleId);
     assert.equal(line.booking?.publisherId, publisherId);
+  });
+
+  test("createFirmOrder refuses (FirmOrderStaleError) when a product was deactivated after the snapshot", async () => {
+    const product = await prisma.product.findUniqueOrThrow({
+      where: { id: productId },
+      include: { priceRules: true, title: { include: { market: true } } },
+    });
+    const byId = new Map([[product.id, product]]); // stale snapshot — still looks active
+    // deactivate AFTER the snapshot was taken (the TOCTOU window the guard closes)
+    await prisma.product.update({ where: { id: productId }, data: { active: false } });
+    await assert.rejects(
+      createFirmOrder({ organizationId: orgId, orgName: "CO-IT org", items: [{ productId, quantity: 1 }], byId }),
+      (e) => e instanceof FirmOrderStaleError,
+    );
+    // and it created nothing — no charged order from the stale basket
+    assert.equal(await prisma.order.count({ where: { organizationId: orgId, status: "CONFIRMED" } }), 1);
+    await prisma.product.update({ where: { id: productId }, data: { active: true } }); // restore
   });
 
   test("createOrderFromQuote confirms a SENT quote with briefs/bookings on placement lines only", async () => {

@@ -11,6 +11,7 @@ import {
   migrateLegacyBasket,
   snapshotListToPlanData,
 } from "./lists";
+import { rehomeSavedListItems } from "./commerce/rehome-saved-list-items";
 
 let orgId = "";
 let productId = "";
@@ -249,4 +250,44 @@ test("resolveActiveList ignores a cookie id from another org and falls back", as
   assert.notEqual(r?.id, theirs.id);
   await prisma.savedList.delete({ where: { id: theirs.id } });
   await prisma.organization.delete({ where: { id: other.id } });
+});
+
+// ── rehomeSavedListItems (catalog-merge survivor re-pointing) ───────────────
+
+async function cloneProduct(): Promise<string> {
+  const src = await prisma.product.findUnique({ where: { id: productId } });
+  const c = await prisma.product.create({
+    data: {
+      titleId: src!.titleId, type: src!.type, name: src!.name + " (rehome-test)",
+      basePrice: src!.basePrice, currency: src!.currency, pricingModel: src!.pricingModel,
+      active: true, bookable: true,
+    },
+  });
+  return c.id;
+}
+
+test("rehomeSavedListItems re-points a line when the survivor is not already on the list", async () => {
+  const dead = await cloneProduct();
+  const listId = await freshList();
+  const item = await addProductItem(listId, dead);
+  const res = await prisma.$transaction((tx) => rehomeSavedListItems(tx, dead, productId));
+  assert.deepEqual(res, { moved: 1, merged: 0 });
+  const row = await prisma.savedListItem.findUnique({ where: { id: item.id } });
+  assert.equal(row!.productId, productId); // followed the survivor, not dropped
+  await prisma.product.delete({ where: { id: dead } });
+});
+
+test("rehomeSavedListItems merges quantities when the survivor is already on the list", async () => {
+  const dead = await cloneProduct();
+  const listId = await freshList();
+  await addProductItem(listId, productId); // survivor, qty 1
+  await prisma.savedListItem.updateMany({ where: { listId, productId }, data: { quantity: 2 } });
+  const deadItem = await addProductItem(listId, dead); // dead line, qty 1
+  const res = await prisma.$transaction((tx) => rehomeSavedListItems(tx, dead, productId));
+  assert.deepEqual(res, { moved: 0, merged: 1 });
+  assert.equal(await prisma.savedListItem.findUnique({ where: { id: deadItem.id } }), null); // dead line gone
+  const rows = await prisma.savedListItem.findMany({ where: { listId } });
+  assert.equal(rows.length, 1);
+  assert.equal(rows[0].quantity, 3); // 2 + 1 merged (clamped)
+  await prisma.product.delete({ where: { id: dead } });
 });

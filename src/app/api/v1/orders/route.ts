@@ -4,7 +4,7 @@ import { authenticateRequest } from "@/lib/api-auth";
 import { rfqLimiter } from "@/lib/rate-limit";
 import { isProductPriceShown } from "@/lib/pricing-visibility";
 import { parseOrderRequest } from "@/lib/api/order-request";
-import { createFirmOrder } from "@/lib/commerce/firm-order";
+import { createFirmOrder, FirmOrderStaleError } from "@/lib/commerce/firm-order";
 import { recordAudit } from "@/lib/audit";
 
 export const dynamic = "force-dynamic";
@@ -107,16 +107,24 @@ export async function POST(req: NextRequest) {
   });
   if (!org) return errJson(403, "NO_ORG", "Organization not found.");
 
-  const result = await createFirmOrder({
-    organizationId: org.id,
-    orgName: org.name,
-    items: parsed.items.map((i) => ({
-      productId: i.productId,
-      quantity: i.quantity,
-    })),
-    byId,
-    brief: parsed.reference ? { briefText: parsed.reference } : undefined,
-  });
+  let result: { requestId: string; orderIds: string[] };
+  try {
+    result = await createFirmOrder({
+      organizationId: org.id,
+      orgName: org.name,
+      items: parsed.items.map((i) => ({
+        productId: i.productId,
+        quantity: i.quantity,
+      })),
+      byId,
+      brief: parsed.reference ? { briefText: parsed.reference } : undefined,
+    });
+  } catch (e) {
+    if (e instanceof FirmOrderStaleError) {
+      return errJson(409, "PRODUCT_UNAVAILABLE", "A selected product is no longer available — re-check the catalog and retry.");
+    }
+    throw e;
+  }
 
   await recordAudit("system", "api.order.create", `Request:${result.requestId}`, {
     keyId: auth.keyId,

@@ -68,6 +68,16 @@ export type FirmOrderItem = {
   withContent?: boolean;
 };
 
+/** Thrown when a product became unavailable between the caller's snapshot and
+ *  the committing transaction. The caller should bounce the buyer to review the
+ *  refreshed basket rather than instant-charge a stale one. */
+export class FirmOrderStaleError extends Error {
+  constructor(message = "firm order stale") {
+    super(message);
+    this.name = "FirmOrderStaleError";
+  }
+}
+
 export type FirmOrderBrief = {
   // Freeform brief text → Request.briefSummary (with targeting lines folded in).
   briefText?: string | null;
@@ -117,6 +127,40 @@ export async function createFirmOrder(args: {
   );
 
   return prisma.$transaction(async (tx) => {
+    // Serialize firm-order creation per org so two simultaneous submits can't
+    // both mint a charged order — the second blocks here, then the dedup below
+    // short-circuits it. Transaction-scoped lock, auto-released on commit.
+    await tx.$executeRaw`SELECT pg_advisory_xact_lock(hashtext(${organizationId}))`;
+
+    // Idempotency: a retried / concurrent submit of the SAME saved list within a
+    // short window returns the order the first submit created — never a second
+    // charge. (Only /plan checkout passes sourceListId; the public API doesn't.)
+    if (sourceListId) {
+      const existing = await tx.request.findFirst({
+        where: { sourceListId, organizationId, createdAt: { gt: new Date(Date.now() - 30_000) } },
+        orderBy: { createdAt: "desc" },
+        select: { id: true, quotes: { select: { order: { select: { id: true } } } } },
+      });
+      if (existing) {
+        return {
+          requestId: existing.id,
+          orderIds: existing.quotes.map((q) => q.order?.id).filter((id): id is string => !!id),
+        };
+      }
+    }
+
+    // Re-validate against FRESH data inside the transaction: a product
+    // deactivated/unbooked after the caller's snapshot must not be instant-
+    // charged. We still price from the snapshot (the price the buyer saw), but
+    // refuse to charge for anything no longer purchasable.
+    const productIds = [...new Set(items.map((i) => i.productId))];
+    const liveCount = await tx.product.count({
+      where: { id: { in: productIds }, active: true, bookable: true },
+    });
+    if (liveCount !== productIds.length) {
+      throw new FirmOrderStaleError("A selected product is no longer available.");
+    }
+
     const plan = await tx.plan.create({
       data: {
         organizationId,
