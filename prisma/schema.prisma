@@ -997,9 +997,9 @@ model SavedListItem {
   listId    String
   list      SavedList @relation(fields: [listId], references: [id], onDelete: Cascade)
   productId String?
-  product   Product?  @relation(fields: [productId], references: [id], onDelete: SetNull)
+  product   Product?  @relation(fields: [productId], references: [id], onDelete: Cascade)
   titleId   String?
-  title     Title?    @relation(fields: [titleId], references: [id], onDelete: SetNull)
+  title     Title?    @relation(fields: [titleId], references: [id], onDelete: Cascade)
   quantity  Int       @default(1)
   withContent    Boolean        @default(false)
   authorshipMode AuthorshipMode @default(BUYER_SUPPLIED)
@@ -1007,7 +1007,14 @@ model SavedListItem {
   sortOrder Int       @default(0)
   createdAt DateTime  @default(now())
 
-  @@index([listId])
+  // NULL-distinct uniques: a list holds each product / each title at most once
+  // (the add path upserts on these). Postgres treats NULL as distinct, so the
+  // many title rows (productId NULL) / product rows (titleId NULL) never collide.
+  // The exactly-one-of(productId,titleId) CHECK lives in the migration SQL
+  // (Prisma can't model CHECK constraints).
+  @@unique([listId, productId])
+  @@unique([listId, titleId])
+  @@index([listId, sortOrder])
 }
 
 model Request {
