@@ -5,6 +5,9 @@ import { Link } from "@/i18n/navigation";
 import { formatMoney } from "@/lib/money";
 import { generateQuote } from "@/app/quote-actions";
 import { resolvePlanTitleItem, removePlanTitleItem } from "@/app/desk-actions";
+import { loadPricingDefaults } from "@/lib/content-fee";
+import { productBand, unitRate } from "@/lib/pricing/display-price";
+import { bandLabel } from "@/lib/pricing/bands";
 import { StatusBadge } from "@/app/status-badge";
 import { SubmitButton } from "@/components";
 
@@ -61,17 +64,48 @@ export default async function DeskRequestPage({
   const titleById = new Map(titles.map((t) => [t.id, t]));
 
   // Bookable placements per placeholder title, for the desk's resolve picker.
+  // Each option carries the indicative price band/rate (same helpers the catalog
+  // uses) so the desk picks an INFORMED placement, not just a type label. Read-
+  // only — the resolve action and its hidden inputs are unchanged.
+  const pricing = titleIds.length ? await loadPricingDefaults() : null;
   const placementProducts = titleIds.length
     ? await prisma.product.findMany({
         where: { titleId: { in: titleIds }, active: true, bookable: true },
-        select: { id: true, type: true, titleId: true },
+        select: {
+          id: true,
+          type: true,
+          titleId: true,
+          active: true,
+          confirmedAt: true,
+          pricingModel: true,
+          basePrice: true,
+          currency: true,
+          productionFee: true,
+          priceRules: { select: { marginPct: true, seasonalMultiplier: true, minVolume: true } },
+          title: {
+            select: {
+              pricesPublic: true,
+              productionFeeDefault: true,
+              market: { select: { code: true } },
+              publisher: { select: { pricesPublic: true } },
+            },
+          },
+        },
       })
     : [];
-  const placementsByTitle = new Map<string, { id: string; type: string }[]>();
+  const placementsByTitle = new Map<string, { id: string; label: string }[]>();
   for (const p of placementProducts) {
-    if (!p.titleId) continue;
+    if (!p.titleId || !p.title || !pricing) continue;
+    const band = productBand(p, p.title, pricing); // FLAT → Band | null
+    const rate = band ? null : unitRate(p, p.title, pricing); // CPM/CPC → {rate,unit} | null
+    const priceText = band
+      ? `${t("resolveFrom")} ${bandLabel(band, p.currency)}` // "from 25–40k NOK"
+      : rate
+        ? `≈ ${rate.rate} ${p.currency} ${rate.unit}` // "≈ 395 NOK CPM"
+        : null; // unconfirmed / price hidden → bare type label
+    const label = priceText ? `${tType(p.type)} — ${priceText}` : tType(p.type);
     const arr = placementsByTitle.get(p.titleId) ?? [];
-    arr.push({ id: p.id, type: p.type });
+    arr.push({ id: p.id, label });
     placementsByTitle.set(p.titleId, arr);
   }
 
@@ -160,7 +194,7 @@ export default async function DeskRequestPage({
                         </option>
                         {placements.map((p) => (
                           <option key={p.id} value={p.id}>
-                            {tType(p.type)}
+                            {p.label}
                           </option>
                         ))}
                       </select>
