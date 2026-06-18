@@ -52,4 +52,10 @@ jobs:
 
       - run: pnpm test
 
+      # DB-backed integration tests (*.it.test.ts) — they need the seeded
+      # Postgres service above + ALLOW_LOCAL_DB=1 (set by the test:it script).
+      # Without this step the saved-list integrity/concurrency tests never run
+      # in CI (the default `pnpm test` filters *.it.test.ts out).
+      - run: pnpm test:it
+
       - run: pnpm build
