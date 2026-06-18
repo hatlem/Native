@@ -15,7 +15,7 @@ import {
   snapshotListToPlanData,
 } from "@/lib/lists";
 import { isProductPriceShown } from "@/lib/pricing-visibility";
-import { createFirmOrder } from "@/lib/commerce/firm-order";
+import { createFirmOrder, FirmOrderStaleError } from "@/lib/commerce/firm-order";
 import { uniquePublisherIdsForProducts } from "@/lib/commerce/publishers";
 import { groupItemsByMarket } from "@/lib/quote-grouping";
 import { recordAudit } from "@/lib/audit";
@@ -227,23 +227,31 @@ export async function submitRequest(formData: FormData) {
     // — the single source of truth the POST /api/v1/orders endpoint also
     // uses. It mints the plan, an auto-accepted quote per market, and a
     // CONFIRMED order with briefs + publisher bookings.
-    const result = await createFirmOrder({
-      organizationId: org.id,
-      orgName: org.name,
-      items,
-      byId,
-      sourceListId: list.id,
-      brief: {
-        briefText: brief,
-        goal: goal || null,
-        audience: audience || null,
-        budget: budgetRaw ? Number(budgetRaw) || null : null,
-        currency: planCurrency,
-        targetGeo: targetGeo || null,
-        targetAudience: targetAudience || null,
-        targetContext: targetContext || null,
-      },
-    });
+    let result: { requestId: string; orderIds: string[] };
+    try {
+      result = await createFirmOrder({
+        organizationId: org.id,
+        orgName: org.name,
+        items,
+        byId,
+        sourceListId: list.id,
+        brief: {
+          briefText: brief,
+          goal: goal || null,
+          audience: audience || null,
+          budget: budgetRaw ? Number(budgetRaw) || null : null,
+          currency: planCurrency,
+          targetGeo: targetGeo || null,
+          targetAudience: targetAudience || null,
+          targetContext: targetContext || null,
+        },
+      });
+    } catch (e) {
+      // A product went unavailable between load and the committing transaction —
+      // bounce the buyer to review rather than instant-charge a stale basket.
+      if (e instanceof FirmOrderStaleError) redirect(`/${locale}/plan?error=unavailable`);
+      throw e;
+    }
     request = { id: result.requestId };
   } else {
     // RFQ: create the plan + request for the desk to price later. No
