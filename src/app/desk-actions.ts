@@ -238,3 +238,26 @@ export async function resolvePlanTitleItem(formData: FormData) {
   revalidatePath(`/${locale}/desk/${requestId}`);
   redirect(`/${locale}/desk/${requestId}`);
 }
+
+// Drop an unresolved Title placeholder from a Request's Plan. Recovery path for
+// a placeholder whose title has NO bookable placement (otherwise the request is
+// stuck unquotable forever). Desk-only; a product LINE can't be dropped here —
+// only an unresolved placeholder — so the buyer's firm ask is never silently
+// amputated. Audited.
+export async function removePlanTitleItem(formData: FormData) {
+  const locale = field(formData, "locale") || "en";
+  const userId = await requireDesk(locale);
+  const planItemId = field(formData, "planItemId");
+  const requestId = field(formData, "requestId");
+
+  const item = await prisma.planItem.findUnique({
+    where: { id: planItemId },
+    select: { productId: true, titleId: true },
+  });
+  if (item && !item.productId && item.titleId) {
+    await prisma.planItem.deleteMany({ where: { id: planItemId } });
+    await recordAudit(userId, "plan.removeTitle", `PlanItem:${planItemId}`, { requestId });
+  }
+  revalidatePath(`/${locale}/desk/${requestId}`);
+  redirect(`/${locale}/desk/${requestId}`);
+}

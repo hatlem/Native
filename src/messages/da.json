@@ -502,7 +502,8 @@
     "resolvePlacement": "Vælg en placering …",
     "resolveUse": "Brug placering",
     "resolveNoPlacements": "Ingen bookbare placeringer på denne titel endnu",
-    "resolveTitlesFirst": "{count, plural, =1 {1 placering mangler} other {# placeringer mangler}} et konkret produkt, før du kan give tilbud."
+    "resolveTitlesFirst": "{count, plural, =1 {1 placering mangler} other {# placeringer mangler}} et konkret produkt, før du kan give tilbud.",
+    "resolveRemove": "Fjern pladsholder"
   },
   "deskTitles": {
     "eyebrow": "Superadmin · titler",

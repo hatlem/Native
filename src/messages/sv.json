@@ -502,7 +502,8 @@
     "resolvePlacement": "Välj en placering …",
     "resolveUse": "Använd placering",
     "resolveNoPlacements": "Inga bokningsbara placeringar på den här titeln ännu",
-    "resolveTitlesFirst": "{count, plural, =1 {1 placering behöver} other {# placeringar behöver}} en konkret produkt innan du kan offerera."
+    "resolveTitlesFirst": "{count, plural, =1 {1 placering behöver} other {# placeringar behöver}} en konkret produkt innan du kan offerera.",
+    "resolveRemove": "Ta bort platshållare"
   },
   "deskTitles": {
     "eyebrow": "Superadmin · titlar",

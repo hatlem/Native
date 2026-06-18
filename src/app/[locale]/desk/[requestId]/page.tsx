@@ -4,7 +4,7 @@ import { prisma } from "@/lib/prisma";
 import { Link } from "@/i18n/navigation";
 import { formatMoney } from "@/lib/money";
 import { generateQuote } from "@/app/quote-actions";
-import { resolvePlanTitleItem } from "@/app/desk-actions";
+import { resolvePlanTitleItem, removePlanTitleItem } from "@/app/desk-actions";
 import { StatusBadge } from "@/app/status-badge";
 import { SubmitButton } from "@/components";
 
@@ -171,6 +171,17 @@ export default async function DeskRequestPage({
                   ) : (
                     <p className="muted small">{t("resolveNoPlacements")}</p>
                   )}
+                  {/* Recovery: drop a placeholder that can't be resolved (e.g.
+                      the title has no bookable placement) so the request isn't
+                      stuck unquotable. Only unresolved placeholders are droppable. */}
+                  <form action={removePlanTitleItem} className="resolve-line">
+                    <input type="hidden" name="locale" value={locale} />
+                    <input type="hidden" name="requestId" value={request.id} />
+                    <input type="hidden" name="planItemId" value={item.id} />
+                    <button type="submit" className="btn small ghost">
+                      {t("resolveRemove")}
+                    </button>
+                  </form>
                 </article>
               );
             }

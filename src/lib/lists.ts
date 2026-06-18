@@ -211,12 +211,14 @@ export async function resolveTitleItem(itemId: string, productId: string) {
     select: { id: true, quantity: true },
   });
   if (existingProduct && existingProduct.id !== itemId) {
+    // deleteMany (not delete) so a concurrent removal of the placeholder is a
+    // no-op rather than a P2025 that rolls back the whole merge.
     const [merged] = await prisma.$transaction([
       prisma.savedListItem.update({
         where: { id: existingProduct.id },
         data: { quantity: clampQuantity(existingProduct.quantity + item.quantity) },
       }),
-      prisma.savedListItem.delete({ where: { id: itemId } }),
+      prisma.savedListItem.deleteMany({ where: { id: itemId } }),
     ]);
     return merged;
   }

@@ -581,7 +581,8 @@
     "resolvePlacement": "Pick a placement…",
     "resolveUse": "Use placement",
     "resolveNoPlacements": "No bookable placements on this title yet",
-    "resolveTitlesFirst": "{count, plural, =1 {1 placement needs} other {# placements need}} a concrete product before you can quote."
+    "resolveTitlesFirst": "{count, plural, =1 {1 placement needs} other {# placements need}} a concrete product before you can quote.",
+    "resolveRemove": "Remove placeholder"
   },
   "deskTitles": {
     "eyebrow": "Super-admin · titles",

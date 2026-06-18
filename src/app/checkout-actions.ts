@@ -133,8 +133,14 @@ export async function submitRequest(formData: FormData) {
   // snapshot — or instant-charge — a stale list (line removed/added/qty changed
   // during the grouping + gate round-trips).
   const fingerprint = (
-    rows: Array<{ id: string; quantity: number; productId: string | null; titleId: string | null }>,
-  ) => rows.map((r) => `${r.id}:${r.quantity}:${r.productId ?? ""}:${r.titleId ?? ""}`).sort().join("|");
+    rows: Array<{ id: string; quantity: number; productId: string | null; titleId: string | null; withContent: boolean }>,
+  ) =>
+    rows
+      .map((r) => `${r.id}:${r.quantity}:${r.productId ?? ""}:${r.titleId ?? ""}:${r.withContent ? 1 : 0}`)
+      .sort()
+      .join("|");
+  // withContent is included because it drives CONTENT_FEE charges on the firm
+  // (instant-order) path — a concurrent toggle must invalidate the snapshot too.
   const loadedFingerprint = fingerprint(list.items);
 
   // Shape the downstream code already expects (groupItemsByMarket, allFirm,
@@ -209,7 +215,7 @@ export async function submitRequest(formData: FormData) {
   // stale snapshot / charging for a line they just removed.
   const freshItems = await prisma.savedListItem.findMany({
     where: { listId: list.id },
-    select: { id: true, quantity: true, productId: true, titleId: true },
+    select: { id: true, quantity: true, productId: true, titleId: true, withContent: true },
   });
   if (fingerprint(freshItems) !== loadedFingerprint) {
     redirect(`/${locale}/plan?error=changed`);

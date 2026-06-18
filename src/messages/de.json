@@ -581,7 +581,8 @@
     "resolvePlacement": "Platzierung wählen …",
     "resolveUse": "Platzierung verwenden",
     "resolveNoPlacements": "Noch keine buchbaren Platzierungen für diesen Titel",
-    "resolveTitlesFirst": "{count, plural, =1 {1 Platzierung benötigt} other {# Platzierungen benötigen}} ein konkretes Produkt, bevor Sie ein Angebot erstellen können."
+    "resolveTitlesFirst": "{count, plural, =1 {1 Platzierung benötigt} other {# Platzierungen benötigen}} ein konkretes Produkt, bevor Sie ein Angebot erstellen können.",
+    "resolveRemove": "Platzhalter entfernen"
   },
   "deskTitles": {
     "eyebrow": "Super-Admin · Titel",
