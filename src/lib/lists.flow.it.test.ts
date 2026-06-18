@@ -43,6 +43,13 @@ before(async () => {
 
 after(async () => {
   if (!RUN_DB_IT) return;
+  // child → parent (no onDelete:Cascade on Plan.org / Request.org), and Request
+  // before Plan because Request.planId is @unique. deleteMany is no-op-safe so
+  // teardown runs cleanly even if an assertion above threw mid-test (otherwise
+  // the org delete FK-faults and masks the real failure + leaks orphan rows).
+  await prisma.request.deleteMany({ where: { organizationId: orgId } });
+  await prisma.planItem.deleteMany({ where: { plan: { organizationId: orgId } } });
+  await prisma.plan.deleteMany({ where: { organizationId: orgId } });
   await prisma.savedListItem.deleteMany({ where: { list: { organizationId: orgId } } });
   await prisma.savedList.deleteMany({ where: { organizationId: orgId } });
   await prisma.organization.delete({ where: { id: orgId } });
@@ -72,6 +79,8 @@ if (!RUN_DB_IT) {
     const request = await prisma.request.create({
       data: { organizationId: orgId, planId: plan.id, status: "SUBMITTED", sourceListId: list.id },
     });
+    assert.equal(request.status, "SUBMITTED");
+    assert.equal(request.sourceListId, list.id, "RFQ traces back to the source saved list");
     const placeholder = plan.items.find((i) => i.titleId && !i.productId);
     assert.ok(placeholder, "RFQ snapshot must carry the unresolved title placeholder");
 
@@ -119,9 +128,7 @@ if (!RUN_DB_IT) {
     // 6. THE INVARIANT: the quote covers the buyer's product AND the desk-resolved placement.
     assert.ok(quotedProductIds.has(productAId), "quote must include the buyer's firm product line");
     assert.ok(quotedProductIds.has(productBId), "quote must include the desk-resolved placeholder product — not silently dropped");
-
-    await prisma.planItem.deleteMany({ where: { planId: plan.id } });
-    await prisma.request.delete({ where: { id: request.id } });
-    await prisma.plan.delete({ where: { id: plan.id } });
+    // (Plan/Request/SavedList rows are cleaned by the after() hook — resilient to
+    // an assertion failure above, unlike an in-body delete on the happy path.)
   });
 }
