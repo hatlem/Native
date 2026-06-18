@@ -375,7 +375,10 @@
     "errorAvailability": "En valgt placering er ikke tilgængelig denne måned.",
     "errorUnavailable": "En placering på din liste er ikke længere tilgængelig. Fjern den for at fortsætte.",
     "errorChanged": "Din liste blev ændret, mens du sendte. Gennemse den, og send igen.",
-    "lineUnavailable": "Ikke længere tilgængelig – fjern for at fortsætte"
+    "lineUnavailable": "Ikke længere tilgængelig – fjern for at fortsætte",
+    "needsClientTitle": "Vælg en kunde for at starte en plan",
+    "needsClientBody": "Som bureau bygger du planer på vegne af en kunde. Vælg én for at fortsætte.",
+    "needsClientCta": "Vælg kunde"
   },
   "rfq": {
     "org": "Virksomhed",

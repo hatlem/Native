@@ -454,7 +454,10 @@
     "errorAvailability": "Eine ausgewählte Platzierung ist diesen Monat nicht verfügbar.",
     "errorUnavailable": "Eine Platzierung auf Ihrer Liste ist nicht mehr verfügbar. Entfernen Sie sie, um fortzufahren.",
     "errorChanged": "Ihre Liste hat sich während des Sendens geändert. Bitte prüfen Sie sie und senden Sie erneut.",
-    "lineUnavailable": "Nicht mehr verfügbar – entfernen, um fortzufahren"
+    "lineUnavailable": "Nicht mehr verfügbar – entfernen, um fortzufahren",
+    "needsClientTitle": "Wählen Sie einen Kunden, um einen Plan zu starten",
+    "needsClientBody": "Als Agentur erstellen Sie Pläne im Auftrag eines Kunden. Wählen Sie einen aus, um fortzufahren.",
+    "needsClientCta": "Kunde wählen"
   },
   "rfq": {
     "org": "Firma",

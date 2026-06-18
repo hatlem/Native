@@ -24,7 +24,7 @@ export async function PlanListBar({
   const t = await getTranslations({ locale, namespace: "plan" });
 
   return (
-    <div className="plan-list-bar cluster" aria-label={t("savedListsLabel")}>
+    <div className="plan-list-bar cluster" role="group" aria-label={t("savedListsLabel")}>
       <form action={selectActiveList} className="cluster tight">
         <input type="hidden" name="locale" value={locale} />
         <select

@@ -21,6 +21,9 @@ export type PlanLine = {
   priceVisible: boolean;
   withContent: boolean;
   lineTotal: number;
+  // Product deactivated since it was added — flagged so the buyer removes it
+  // (submit refuses while it's present, instead of silently dropping it).
+  unavailable: boolean;
 };
 
 // A publication placeholder: a SavedListItem that references a Title but no
@@ -76,10 +79,15 @@ export async function PlanLines({
       ) : null}
       <div className="action-list">
         {lines.map((l) => (
-          <div className="item plan-item" key={l.itemId}>
+          <div className={`item plan-item${l.unavailable ? " plan-item-unavailable" : ""}`} key={l.itemId}>
             <span className="tag">{tType(l.product.type)}</span>
             <div>
               <div className="title">{l.product.title.name}</div>
+              {l.unavailable ? (
+                <div className="sub plan-line-unavailable" role="alert">
+                  {t("lineUnavailable")}
+                </div>
+              ) : null}
               <div className="sub plan-qty">
                 <form action={setQuantity} className="plan-qty-step">
                   <input type="hidden" name="locale" value={locale} />

@@ -454,7 +454,10 @@
     "errorAvailability": "Valittu mainospaikka ei ole saatavilla tässä kuussa.",
     "errorUnavailable": "Listallasi oleva mainospaikka ei ole enää saatavilla. Poista se jatkaaksesi.",
     "errorChanged": "Listasi muuttui lähetyksen aikana. Tarkista se ja lähetä uudelleen.",
-    "lineUnavailable": "Ei enää saatavilla – poista jatkaaksesi"
+    "lineUnavailable": "Ei enää saatavilla – poista jatkaaksesi",
+    "needsClientTitle": "Valitse asiakas aloittaaksesi suunnitelman",
+    "needsClientBody": "Toimistona rakennat suunnitelmia asiakkaan puolesta. Valitse asiakas jatkaaksesi.",
+    "needsClientCta": "Valitse asiakas"
   },
   "rfq": {
     "org": "Yritys",

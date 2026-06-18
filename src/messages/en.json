@@ -454,7 +454,10 @@
     "errorAvailability": "A selected placement isn't available this month.",
     "errorUnavailable": "A placement on your list is no longer available. Remove it to continue.",
     "errorChanged": "Your list changed while you were submitting. Review it and submit again.",
-    "lineUnavailable": "No longer available — remove to continue"
+    "lineUnavailable": "No longer available — remove to continue",
+    "needsClientTitle": "Pick a client to start a plan",
+    "needsClientBody": "As an agency you build plans on behalf of a client. Choose one to continue.",
+    "needsClientCta": "Choose a client"
   },
   "rfq": {
     "org": "Company",

@@ -13,11 +13,26 @@ export async function PlanBanners({
 }) {
   const t = await getTranslations({ locale, namespace: "plan" });
 
+  // Map each submit/checkout error code to its OWN message — previously every
+  // code rendered the generic "add a placement…" line, actively misleading a
+  // rate-limited / permission-denied / list-changed buyer.
+  const ERROR_KEYS: Record<string, string> = {
+    "1": "error",
+    client: "errorClient",
+    rate: "errorRate",
+    forbidden: "errorForbidden",
+    availability: "errorAvailability",
+    unavailable: "errorUnavailable",
+    changed: "errorChanged",
+  };
+  const errorCode = Array.isArray(error) ? error[0] : error;
+  const errorKey = errorCode ? (ERROR_KEYS[errorCode] ?? "error") : null;
+
   return (
     <>
-      {error ? (
+      {errorKey ? (
         <div className="banner-error" role="alert">
-          <span>{t("error")}</span>
+          <span>{t(errorKey)}</span>
         </div>
       ) : null}
 
