@@ -233,6 +233,20 @@ export async function resolvePlanTitleItem(formData: FormData) {
         productId,
         requestId,
       });
+      // Signal the buyer org that the placement they asked the desk to propose
+      // has been chosen (the "desk proposes" flow was previously silent to them).
+      const req = await prisma.request.findUnique({
+        where: { id: requestId },
+        select: { organizationId: true },
+      });
+      if (req) {
+        await notifyOrg(req.organizationId, {
+          kind: "PLACEMENT_PROPOSED",
+          title: "A placement was proposed for your request",
+          body: "Our desk selected a specific placement for a publication you asked it to propose. Review it on your request.",
+          link: `/${locale}/requests/${requestId}`,
+        });
+      }
     }
   }
   revalidatePath(`/${locale}/desk/${requestId}`);
@@ -257,6 +271,18 @@ export async function removePlanTitleItem(formData: FormData) {
   if (item && !item.productId && item.titleId) {
     await prisma.planItem.deleteMany({ where: { id: planItemId } });
     await recordAudit(userId, "plan.removeTitle", `PlanItem:${planItemId}`, { requestId });
+    const req = await prisma.request.findUnique({
+      where: { id: requestId },
+      select: { organizationId: true },
+    });
+    if (req) {
+      await notifyOrg(req.organizationId, {
+        kind: "PLACEMENT_PROPOSED",
+        title: "A placeholder was removed from your request",
+        body: "Our desk removed a publication placeholder that had no bookable placement. The rest of your request is unaffected.",
+        link: `/${locale}/requests/${requestId}`,
+      });
+    }
   }
   revalidatePath(`/${locale}/desk/${requestId}`);
   redirect(`/${locale}/desk/${requestId}`);

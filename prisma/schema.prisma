@@ -201,6 +201,10 @@ enum NotificationKind {
   // pull-out, desk decision). Buyer + publisher get this so they're not
   // surprised by the missing booking.
   ORDER_CANCELLED
+  // The desk acted on a title PLACEHOLDER the buyer asked it to propose —
+  // either picked a concrete placement, or removed a placeholder with no
+  // bookable option. The buyer asked the desk to decide; this is the signal back.
+  PLACEMENT_PROPOSED
 }
 
 enum JobStatus {
