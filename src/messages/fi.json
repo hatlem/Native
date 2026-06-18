@@ -582,7 +582,8 @@
     "resolveUse": "Käytä mainospaikkaa",
     "resolveNoPlacements": "Tällä julkaisulla ei ole vielä varattavia mainospaikkoja",
     "resolveTitlesFirst": "{count, plural, =1 {1 mainospaikka tarvitsee} other {# mainospaikkaa tarvitsee}} konkreettisen tuotteen ennen tarjousta.",
-    "resolveRemove": "Poista paikkamerkki"
+    "resolveRemove": "Poista paikkamerkki",
+    "resolveFrom": "alkaen"
   },
   "deskTitles": {
     "eyebrow": "Pääkäyttäjä · julkaisut",

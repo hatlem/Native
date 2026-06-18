@@ -142,6 +142,7 @@ export async function createFirmOrder(args: {
         select: { id: true, quotes: { select: { order: { select: { id: true } } } } },
       });
       if (existing) {
+        console.warn("firmorder.dedup_hit", { organizationId, sourceListId, requestId: existing.id });
         return {
           requestId: existing.id,
           orderIds: existing.quotes.map((q) => q.order?.id).filter((id): id is string => !!id),
@@ -158,6 +159,7 @@ export async function createFirmOrder(args: {
       where: { id: { in: productIds }, active: true, bookable: true },
     });
     if (liveCount !== productIds.length) {
+      console.warn("firmorder.stale", { organizationId, expected: productIds.length, live: liveCount });
       throw new FirmOrderStaleError("A selected product is no longer available.");
     }
 

@@ -54,8 +54,13 @@ jobs:
 
       # DB-backed integration tests (*.it.test.ts) — they need the seeded
       # Postgres service above + ALLOW_LOCAL_DB=1 (set by the test:it script).
-      # Without this step the saved-list integrity/concurrency tests never run
-      # in CI (the default `pnpm test` filters *.it.test.ts out).
+      # RUN_DB_IT=1 un-gates the 7 heavier suites (checkout / content-fee /
+      # api-contract / auth-tokens / campaign / contact-log / ratecard) and the
+      # saved-list flow test that self-skip otherwise — safe here because the
+      # postgres service + db:seed above is a fresh disposable DB every run.
+      # (store.it.test.ts's R2 round-trip still self-skips without R2_* creds.)
       - run: pnpm test:it
+        env:
+          RUN_DB_IT: "1"
 
       - run: pnpm build
