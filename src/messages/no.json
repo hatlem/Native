@@ -501,9 +501,9 @@
     "metricsNeedsContactOrder": "Bestilling",
     "resolvePlacement": "Velg en plassering …",
     "resolveUse": "Bruk plassering",
-    "resolveNoPlacements": "Ingen bookbare plasseringer på denne tittelen ennå",
+    "resolveNoPlacements": "Ingen plasseringer kan bestilles direkte på denne tittelen ennå",
     "resolveTitlesFirst": "{count, plural, =1 {1 plassering trenger} other {# plasseringer trenger}} et konkret produkt før du kan gi pris.",
-    "resolveRemove": "Fjern plassering"
+    "resolveRemove": "Fjern plassholder"
   },
   "deskTitles": {
     "eyebrow": "Superadmin · titler",
