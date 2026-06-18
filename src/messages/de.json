@@ -301,7 +301,7 @@
   },
   "lists": {
     "title": "Gespeicherte Listen",
-    "empty": "Noch keine gespeicherten Listen. Füge eine Publikation oder Platzierung hinzu, um zu beginnen.",
+    "empty": "Noch keine gespeicherten Listen. Fügen Sie eine Publikation oder Platzierung hinzu, um zu beginnen.",
     "name": "Liste",
     "items": "Elemente",
     "lastSubmittedHeading": "Zuletzt gesendet",
@@ -440,14 +440,14 @@
     "briefPlaceholder": "z. B. Wir verkaufen Software an Finanz- und Rechtsteams in Oslo",
     "briefHint": "Wir matchen Titel nach Zielgruppe, Branche und Region. Markt erforderlich; Budget optional.",
     "recForBrief": "Auf Ihr Briefing abgestimmt",
-    "titlePlaceholderNote": "Unser Team schlägt eine Platzierung vor und nennt den Preis.",
+    "titlePlaceholderNote": "Unser Desk schlägt eine Platzierung vor und nennt den Preis.",
     "pickPlacement": "Platzierung wählen …",
     "resolve": "Platzierung verwenden",
     "noPlacements": "Noch keine Platzierungen verfügbar",
     "switchList": "Liste wechseln",
     "newList": "Neue Liste",
     "rename": "Umbenennen",
-    "savedListsLabel": "Deine Listen",
+    "savedListsLabel": "Ihre Listen",
     "errorClient": "Wählen Sie zuerst einen Kunden, um einen Plan zu starten.",
     "errorRate": "Sie senden zu schnell. Bitte warten Sie einen Moment und versuchen Sie es erneut.",
     "errorForbidden": "Sie sind nicht berechtigt, diese Bestellung aufzugeben.",
@@ -523,7 +523,7 @@
     "pendingSlaLabel": "Verbindliches Angebot erwartet bis",
     "pendingBriefLabel": "Ihr Brief",
     "titlePlaceholderName": "Publikation",
-    "titlePlaceholderDesc": "Platzierung wird von unserem Team vorgeschlagen"
+    "titlePlaceholderDesc": "Platzierung wird von unserem Desk vorgeschlagen"
   },
   "desk": {
     "eyebrow": "Interner Desk",
