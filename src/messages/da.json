@@ -226,14 +226,13 @@
     "name": "Liste",
     "items": "Elementer",
     "lastSubmittedHeading": "Senest sendt",
-    "itemCount": "{count} elementer",
+    "itemCount": "{count, plural, =0 {0 elementer} =1 {1 element} other {# elementer}}",
     "lastSubmitted": "Senest sendt {date}",
     "neverSubmitted": "Endnu ikke sendt",
     "open": "Åbn",
     "rename": "Omdøb",
     "duplicate": "Duplikér",
-    "archive": "Arkivér",
-    "navLabel": "Gemte lister"
+    "archive": "Arkivér"
   },
   "titleDetail": {
     "back": "Tilbage til kataloget",
@@ -369,7 +368,14 @@
     "switchList": "Skift liste",
     "newList": "Ny liste",
     "rename": "Omdøb",
-    "savedListsLabel": "Dine lister"
+    "savedListsLabel": "Dine lister",
+    "errorClient": "Vælg en kunde først for at starte en plan.",
+    "errorRate": "Du sender for hurtigt. Vent et øjeblik, og prøv igen.",
+    "errorForbidden": "Du har ikke tilladelse til at afgive denne ordre.",
+    "errorAvailability": "En valgt placering er ikke tilgængelig denne måned.",
+    "errorUnavailable": "En placering på din liste er ikke længere tilgængelig. Fjern den for at fortsætte.",
+    "errorChanged": "Din liste blev ændret, mens du sendte. Gennemse den, og send igen.",
+    "lineUnavailable": "Ikke længere tilgængelig – fjern for at fortsætte"
   },
   "rfq": {
     "org": "Virksomhed",
@@ -489,7 +495,11 @@
     "metricsNeedsContactEmpty": "Ingen sager kræver opfølgning lige nu.",
     "metricsNeedsContactPublisher": "Udgiver",
     "metricsNeedsContactPlacements": "Placeringer",
-    "metricsNeedsContactOrder": "Ordre"
+    "metricsNeedsContactOrder": "Ordre",
+    "resolvePlacement": "Vælg en placering …",
+    "resolveUse": "Brug placering",
+    "resolveNoPlacements": "Ingen bookbare placeringer på denne titel endnu",
+    "resolveTitlesFirst": "{count, plural, =1 {1 placering mangler} other {# placeringer mangler}} et konkret produkt, før du kan give tilbud."
   },
   "deskTitles": {
     "eyebrow": "Superadmin · titler",

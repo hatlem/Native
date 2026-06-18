@@ -199,3 +199,42 @@ export async function cancelOrder(formData: FormData) {
 
   redirect(`/${locale}/desk/orders/${order.id}`);
 }
+
+// Resolve a Title placeholder on a submitted Request's Plan to a concrete
+// product, so the request can be quoted. This is the desk-side counterpart of
+// the buyer's resolveTitleLine (which acts on SavedListItem); here it acts on
+// the snapshotted PlanItem. Without it, a buyer who asked the desk to "propose
+// a placement" would have that line silently dropped from the quote/order, and
+// an all-title request could never be quoted at all. Desk-only; the chosen
+// product MUST belong to the placeholder's own title (no cross-publisher swap).
+export async function resolvePlanTitleItem(formData: FormData) {
+  const locale = field(formData, "locale") || "en";
+  const userId = await requireDesk(locale);
+  const planItemId = field(formData, "planItemId");
+  const productId = field(formData, "productId");
+  const requestId = field(formData, "requestId");
+
+  const item = await prisma.planItem.findUnique({
+    where: { id: planItemId },
+    select: { id: true, productId: true, titleId: true },
+  });
+  // Only an unresolved placeholder (titleId set, productId null) is resolvable.
+  if (item && !item.productId && item.titleId) {
+    const product = await prisma.product.findFirst({
+      where: { id: productId, titleId: item.titleId, active: true, bookable: true },
+      select: { id: true },
+    });
+    if (product) {
+      await prisma.planItem.update({
+        where: { id: planItemId },
+        data: { productId, titleId: null },
+      });
+      await recordAudit(userId, "plan.resolveTitle", `PlanItem:${planItemId}`, {
+        productId,
+        requestId,
+      });
+    }
+  }
+  revalidatePath(`/${locale}/desk/${requestId}`);
+  redirect(`/${locale}/desk/${requestId}`);
+}

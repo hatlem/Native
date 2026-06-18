@@ -43,9 +43,17 @@ export async function generateQuote(formData: FormData) {
     redirect(`/${locale}/desk/${requestId}`);
   }
 
-  // Title-only PlanItems (productId null) carry no price — the desk
-  // resolves them to concrete products manually later. Auto-quote prices
-  // product lines only; QuoteLine.productId is already nullable.
+  // Every Title placeholder (productId null) must be resolved to a concrete
+  // product BEFORE a quote can be produced. Otherwise auto-quote would price
+  // only the product lines and silently drop the placement the buyer asked the
+  // desk to propose — it would vanish from the quote, order and invoice. Bounce
+  // the desk to resolve them first (the desk request page exposes a picker).
+  const unresolvedTitles = request.plan.items.filter((i) => !i.productId && i.titleId);
+  if (unresolvedTitles.length > 0) {
+    redirect(`/${locale}/desk/${requestId}?error=unresolved-titles`);
+  }
+
+  // All items are now product-backed (titles resolved); price them all.
   const productItems = request.plan.items.filter((i) => i.productId);
   const products = await prisma.product.findMany({
     where: { id: { in: productItems.map((i) => i.productId as string) } },
@@ -63,7 +71,7 @@ export async function generateQuote(formData: FormData) {
     productItems.map((i) => ({ ...i, productId: i.productId as string })),
     byId,
   );
-  if (groups.length === 0) redirect(`/${locale}/desk`);
+  if (groups.length === 0) redirect(`/${locale}/desk/${requestId}?error=empty`);
 
   // Fee rules and margin defaults come from the same load so the quote
   // agrees with the catalog band the buyer saw (display-price.ts).
