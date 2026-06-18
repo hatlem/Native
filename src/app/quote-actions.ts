@@ -50,6 +50,7 @@ export async function generateQuote(formData: FormData) {
   // the desk to resolve them first (the desk request page exposes a picker).
   const unresolvedTitles = request.plan.items.filter((i) => !i.productId && i.titleId);
   if (unresolvedTitles.length > 0) {
+    console.warn("quote.blocked", { reason: "unresolved-titles", requestId, count: unresolvedTitles.length });
     redirect(`/${locale}/desk/${requestId}?error=unresolved-titles`);
   }
 

@@ -80,6 +80,7 @@ export async function submitRequest(formData: FormData) {
   await requireOnboardingBeforeBuy(session, locale, `/${locale}/plan`);
 
   if (!(await rfqLimiter.check(`rfq:${ws.activeOrgId}`)).ok) {
+    console.warn("checkout.blocked", { reason: "rate", orgId: ws.activeOrgId });
     redirect(`/${locale}/plan?error=rate`);
   }
 
@@ -117,7 +118,10 @@ export async function submitRequest(formData: FormData) {
   const deactivatedLines = list.items.filter(
     (i) => i.productId && (!i.product || !i.product.active || !i.product.bookable),
   );
-  if (deactivatedLines.length > 0) redirect(`/${locale}/plan?error=unavailable`);
+  if (deactivatedLines.length > 0) {
+    console.warn("checkout.blocked", { reason: "unavailable", orgId: org.id, lines: deactivatedLines.length });
+    redirect(`/${locale}/plan?error=unavailable`);
+  }
 
   const productItems = list.items.filter(
     (i): i is typeof i & { productId: string; product: NonNullable<typeof i.product> } =>
@@ -189,6 +193,7 @@ export async function submitRequest(formData: FormData) {
   if (allFirm) {
     const scope = await loadScope();
     if (!canCommitOnOrg(scope, org.id)) {
+      console.warn("checkout.blocked", { reason: "forbidden", orgId: org.id });
       redirect(`/${locale}/plan?error=forbidden`);
     }
   }
@@ -207,7 +212,10 @@ export async function submitRequest(formData: FormData) {
       },
       select: { productId: true },
     });
-    if (blocked) redirect(`/${locale}/plan?error=availability`);
+    if (blocked) {
+      console.warn("checkout.blocked", { reason: "availability", orgId: org.id, productId: blocked.productId });
+      redirect(`/${locale}/plan?error=availability`);
+    }
   }
 
   // Abort if the list changed since we loaded it (see fingerprint above) — the
@@ -218,6 +226,7 @@ export async function submitRequest(formData: FormData) {
     select: { id: true, quantity: true, productId: true, titleId: true, withContent: true },
   });
   if (fingerprint(freshItems) !== loadedFingerprint) {
+    console.warn("checkout.blocked", { reason: "changed", orgId: org.id, listId: list.id });
     redirect(`/${locale}/plan?error=changed`);
   }
 
@@ -249,7 +258,10 @@ export async function submitRequest(formData: FormData) {
     } catch (e) {
       // A product went unavailable between load and the committing transaction —
       // bounce the buyer to review rather than instant-charge a stale basket.
-      if (e instanceof FirmOrderStaleError) redirect(`/${locale}/plan?error=unavailable`);
+      if (e instanceof FirmOrderStaleError) {
+        console.warn("checkout.blocked", { reason: "unavailable", orgId: org.id, via: "firmOrderStale", listId: list.id });
+        redirect(`/${locale}/plan?error=unavailable`);
+      }
       throw e;
     }
     request = { id: result.requestId };

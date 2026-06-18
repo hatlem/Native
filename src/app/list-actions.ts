@@ -29,7 +29,11 @@ async function requireActiveOrg(locale: string) {
   const scope = await loadScope();
   const orgId = scope.workspace?.activeOrgId;
   if (!scope.userId) redirect(`/${locale}/signin`);
-  if (!orgId) redirect(`/${locale}/plan?error=client`); // agency must pick a client first
+  if (!orgId) {
+    // Agency with no client selected hit a list action — the no-client funnel.
+    console.warn("checkout.blocked", { reason: "client", userId: scope.userId });
+    redirect(`/${locale}/plan?error=client`);
+  }
   return { scope, orgId };
 }
 
