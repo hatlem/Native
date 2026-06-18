@@ -226,14 +226,13 @@
     "name": "Liste",
     "items": "Elementer",
     "lastSubmittedHeading": "Sist sendt",
-    "itemCount": "{count} elementer",
+    "itemCount": "{count, plural, =0 {0 elementer} =1 {1 element} other {# elementer}}",
     "lastSubmitted": "Sist sendt {date}",
     "neverSubmitted": "Ikke sendt ennå",
     "open": "Åpne",
     "rename": "Gi nytt navn",
     "duplicate": "Dupliser",
-    "archive": "Arkiver",
-    "navLabel": "Lagrede lister"
+    "archive": "Arkiver"
   },
   "titleDetail": {
     "back": "Tilbake til katalogen",
@@ -369,7 +368,17 @@
     "switchList": "Bytt liste",
     "newList": "Ny liste",
     "rename": "Gi nytt navn",
-    "savedListsLabel": "Dine lister"
+    "savedListsLabel": "Dine lister",
+    "errorClient": "Velg en kunde først for å starte en plan.",
+    "errorRate": "Du sender for raskt. Vent et øyeblikk og prøv igjen.",
+    "errorForbidden": "Du har ikke tillatelse til å legge inn denne bestillingen.",
+    "errorAvailability": "En valgt plassering er ikke tilgjengelig denne måneden.",
+    "errorUnavailable": "En plassering på listen din er ikke lenger tilgjengelig. Fjern den for å fortsette.",
+    "errorChanged": "Listen din ble endret mens du sendte. Se over og send på nytt.",
+    "lineUnavailable": "Ikke lenger tilgjengelig – fjern for å fortsette",
+    "needsClientTitle": "Velg en kunde for å starte en plan",
+    "needsClientBody": "Som byrå bygger du planer på vegne av en kunde. Velg én for å fortsette.",
+    "needsClientCta": "Velg kunde"
   },
   "rfq": {
     "org": "Selskap",
@@ -489,7 +498,12 @@
     "metricsNeedsContactEmpty": "Ingen saker krever oppfølging akkurat nå.",
     "metricsNeedsContactPublisher": "Utgiver",
     "metricsNeedsContactPlacements": "Plasseringer",
-    "metricsNeedsContactOrder": "Bestilling"
+    "metricsNeedsContactOrder": "Bestilling",
+    "resolvePlacement": "Velg en plassering …",
+    "resolveUse": "Bruk plassering",
+    "resolveNoPlacements": "Ingen bookbare plasseringer på denne tittelen ennå",
+    "resolveTitlesFirst": "{count, plural, =1 {1 plassering trenger} other {# plasseringer trenger}} et konkret produkt før du kan gi pris.",
+    "resolveRemove": "Fjern plassering"
   },
   "deskTitles": {
     "eyebrow": "Superadmin · titler",

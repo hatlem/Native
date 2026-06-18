@@ -4,6 +4,7 @@ import { prisma } from "@/lib/prisma";
 import { Link } from "@/i18n/navigation";
 import { formatMoney } from "@/lib/money";
 import { generateQuote } from "@/app/quote-actions";
+import { resolvePlanTitleItem, removePlanTitleItem } from "@/app/desk-actions";
 import { StatusBadge } from "@/app/status-badge";
 import { SubmitButton } from "@/components";
 
@@ -11,10 +12,14 @@ export const dynamic = "force-dynamic";
 
 export default async function DeskRequestPage({
   params,
+  searchParams,
 }: {
   params: Promise<{ locale: string; requestId: string }>;
+  searchParams: Promise<Record<string, string | string[] | undefined>>;
 }) {
   const { locale, requestId } = await params;
+  const sp = await searchParams;
+  const errorCode = typeof sp.error === "string" ? sp.error : "";
   const t = await getTranslations({ locale, namespace: "desk" });
   const tr = await getTranslations({ locale, namespace: "requests" });
   const tType = await getTranslations({ locale, namespace: "productType" });
@@ -54,6 +59,25 @@ export default async function DeskRequestPage({
       })
     : [];
   const titleById = new Map(titles.map((t) => [t.id, t]));
+
+  // Bookable placements per placeholder title, for the desk's resolve picker.
+  const placementProducts = titleIds.length
+    ? await prisma.product.findMany({
+        where: { titleId: { in: titleIds }, active: true, bookable: true },
+        select: { id: true, type: true, titleId: true },
+      })
+    : [];
+  const placementsByTitle = new Map<string, { id: string; type: string }[]>();
+  for (const p of placementProducts) {
+    if (!p.titleId) continue;
+    const arr = placementsByTitle.get(p.titleId) ?? [];
+    arr.push({ id: p.id, type: p.type });
+    placementsByTitle.set(p.titleId, arr);
+  }
+
+  const unresolvedTitleCount = request.plan.items.filter(
+    (i) => !i.productId && i.titleId,
+  ).length;
 
   const quote = request.quotes[0];
 
@@ -104,19 +128,60 @@ export default async function DeskRequestPage({
             <h2>{t("items")}</h2>
           </div>
         </div>
+        {errorCode === "unresolved-titles" ? (
+          <div className="banner-warn" role="alert">
+            <span>{t("resolveTitlesFirst", { count: unresolvedTitleCount })}</span>
+          </div>
+        ) : null}
         <div className="grid">
           {request.plan.items.map((item) => {
             // Title placeholder — no product chosen yet; the desk proposes
-            // the concrete placement.
+            // the concrete placement by picking a product OF THIS TITLE.
             if (!item.productId) {
               const titleName = item.titleId
                 ? titleById.get(item.titleId)?.name ?? tr("titlePlaceholderName")
                 : tr("titlePlaceholderName");
+              const placements = item.titleId
+                ? placementsByTitle.get(item.titleId) ?? []
+                : [];
               return (
                 <article className="card" key={item.id}>
                   <h3>{titleName}</h3>
                   <p className="muted">{tr("titlePlaceholderDesc")}</p>
                   <span className="tag">× {item.quantity}</span>
+                  {placements.length > 0 ? (
+                    <form action={resolvePlanTitleItem} className="resolve-line">
+                      <input type="hidden" name="locale" value={locale} />
+                      <input type="hidden" name="requestId" value={request.id} />
+                      <input type="hidden" name="planItemId" value={item.id} />
+                      <select name="productId" defaultValue="" aria-label={t("resolvePlacement")}>
+                        <option value="" disabled>
+                          {t("resolvePlacement")}
+                        </option>
+                        {placements.map((p) => (
+                          <option key={p.id} value={p.id}>
+                            {tType(p.type)}
+                          </option>
+                        ))}
+                      </select>
+                      <button type="submit" className="btn small">
+                        {t("resolveUse")}
+                      </button>
+                    </form>
+                  ) : (
+                    <p className="muted small">{t("resolveNoPlacements")}</p>
+                  )}
+                  {/* Recovery: drop a placeholder that can't be resolved (e.g.
+                      the title has no bookable placement) so the request isn't
+                      stuck unquotable. Only unresolved placeholders are droppable. */}
+                  <form action={removePlanTitleItem} className="resolve-line">
+                    <input type="hidden" name="locale" value={locale} />
+                    <input type="hidden" name="requestId" value={request.id} />
+                    <input type="hidden" name="planItemId" value={item.id} />
+                    <button type="submit" className="btn small ghost">
+                      {t("resolveRemove")}
+                    </button>
+                  </form>
                 </article>
               );
             }
@@ -136,16 +201,24 @@ export default async function DeskRequestPage({
         <section className="section">
           <div className="cta-block">
             <h2>{t("readyToQuoteTitle")}</h2>
-            <p className="muted">{t("readyToQuoteBody")}</p>
-            <form action={generateQuote}>
-              <input type="hidden" name="locale" value={locale} />
-              <input type="hidden" name="requestId" value={request.id} />
-              <SubmitButton
-                label={t("generate")}
-                pendingLabel={t("generating")}
-                className="btn large"
-              />
-            </form>
+            {unresolvedTitleCount > 0 ? (
+              // Block quoting until every placeholder has a concrete product —
+              // otherwise the placement would be dropped from the quote/order.
+              <p className="muted">{t("resolveTitlesFirst", { count: unresolvedTitleCount })}</p>
+            ) : (
+              <>
+                <p className="muted">{t("readyToQuoteBody")}</p>
+                <form action={generateQuote}>
+                  <input type="hidden" name="locale" value={locale} />
+                  <input type="hidden" name="requestId" value={request.id} />
+                  <SubmitButton
+                    label={t("generate")}
+                    pendingLabel={t("generating")}
+                    className="btn large"
+                  />
+                </form>
+              </>
+            )}
           </div>
         </section>
       ) : (

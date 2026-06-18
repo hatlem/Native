@@ -226,14 +226,13 @@
     "name": "Lista",
     "items": "Objekt",
     "lastSubmittedHeading": "Senast skickad",
-    "itemCount": "{count} objekt",
+    "itemCount": "{count, plural, =0 {0 objekt} =1 {1 objekt} other {# objekt}}",
     "lastSubmitted": "Senast skickad {date}",
     "neverSubmitted": "Inte skickad ännu",
     "open": "Öppna",
     "rename": "Byt namn",
     "duplicate": "Duplicera",
-    "archive": "Arkivera",
-    "navLabel": "Sparade listor"
+    "archive": "Arkivera"
   },
   "titleDetail": {
     "back": "Tillbaka till katalogen",
@@ -369,7 +368,17 @@
     "switchList": "Byt lista",
     "newList": "Ny lista",
     "rename": "Byt namn",
-    "savedListsLabel": "Dina listor"
+    "savedListsLabel": "Dina listor",
+    "errorClient": "Välj en kund först för att börja en plan.",
+    "errorRate": "Du skickar för snabbt. Vänta ett ögonblick och försök igen.",
+    "errorForbidden": "Du har inte behörighet att lägga den här beställningen.",
+    "errorAvailability": "En vald placering är inte tillgänglig den här månaden.",
+    "errorUnavailable": "En placering på din lista är inte längre tillgänglig. Ta bort den för att fortsätta.",
+    "errorChanged": "Din lista ändrades medan du skickade. Granska den och skicka igen.",
+    "lineUnavailable": "Inte längre tillgänglig – ta bort för att fortsätta",
+    "needsClientTitle": "Välj en kund för att börja en plan",
+    "needsClientBody": "Som byrå bygger du planer åt en kund. Välj en för att fortsätta.",
+    "needsClientCta": "Välj kund"
   },
   "rfq": {
     "org": "Företag",
@@ -489,7 +498,12 @@
     "metricsNeedsContactEmpty": "Inget kräver uppföljning just nu.",
     "metricsNeedsContactPublisher": "Utgivare",
     "metricsNeedsContactPlacements": "Placeringar",
-    "metricsNeedsContactOrder": "Order"
+    "metricsNeedsContactOrder": "Order",
+    "resolvePlacement": "Välj en placering …",
+    "resolveUse": "Använd placering",
+    "resolveNoPlacements": "Inga bokningsbara placeringar på den här titeln ännu",
+    "resolveTitlesFirst": "{count, plural, =1 {1 placering behöver} other {# placeringar behöver}} en konkret produkt innan du kan offerera.",
+    "resolveRemove": "Ta bort platshållare"
   },
   "deskTitles": {
     "eyebrow": "Superadmin · titlar",

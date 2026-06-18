@@ -305,14 +305,13 @@
     "name": "Liste",
     "items": "Elemente",
     "lastSubmittedHeading": "Zuletzt gesendet",
-    "itemCount": "{count} Elemente",
+    "itemCount": "{count, plural, =0 {0 Elemente} =1 {1 Element} other {# Elemente}}",
     "lastSubmitted": "Zuletzt gesendet {date}",
     "neverSubmitted": "Noch nicht gesendet",
     "open": "Öffnen",
     "rename": "Umbenennen",
     "duplicate": "Duplizieren",
-    "archive": "Archivieren",
-    "navLabel": "Gespeicherte Listen"
+    "archive": "Archivieren"
   },
   "titleDetail": {
     "back": "Zurück zum Katalog",
@@ -448,7 +447,17 @@
     "switchList": "Liste wechseln",
     "newList": "Neue Liste",
     "rename": "Umbenennen",
-    "savedListsLabel": "Deine Listen"
+    "savedListsLabel": "Deine Listen",
+    "errorClient": "Wählen Sie zuerst einen Kunden, um einen Plan zu starten.",
+    "errorRate": "Sie senden zu schnell. Bitte warten Sie einen Moment und versuchen Sie es erneut.",
+    "errorForbidden": "Sie sind nicht berechtigt, diese Bestellung aufzugeben.",
+    "errorAvailability": "Eine ausgewählte Platzierung ist diesen Monat nicht verfügbar.",
+    "errorUnavailable": "Eine Platzierung auf Ihrer Liste ist nicht mehr verfügbar. Entfernen Sie sie, um fortzufahren.",
+    "errorChanged": "Ihre Liste hat sich während des Sendens geändert. Bitte prüfen Sie sie und senden Sie erneut.",
+    "lineUnavailable": "Nicht mehr verfügbar – entfernen, um fortzufahren",
+    "needsClientTitle": "Wählen Sie einen Kunden, um einen Plan zu starten",
+    "needsClientBody": "Als Agentur erstellen Sie Pläne im Auftrag eines Kunden. Wählen Sie einen aus, um fortzufahren.",
+    "needsClientCta": "Kunde wählen"
   },
   "rfq": {
     "org": "Firma",
@@ -568,7 +577,12 @@
     "metricsNeedsContactEmpty": "Derzeit ist keine Nachverfolgung erforderlich.",
     "metricsNeedsContactPublisher": "Verlag",
     "metricsNeedsContactPlacements": "Platzierungen",
-    "metricsNeedsContactOrder": "Bestellung"
+    "metricsNeedsContactOrder": "Bestellung",
+    "resolvePlacement": "Platzierung wählen …",
+    "resolveUse": "Platzierung verwenden",
+    "resolveNoPlacements": "Noch keine buchbaren Platzierungen für diesen Titel",
+    "resolveTitlesFirst": "{count, plural, =1 {1 Platzierung benötigt} other {# Platzierungen benötigen}} ein konkretes Produkt, bevor Sie ein Angebot erstellen können.",
+    "resolveRemove": "Platzhalter entfernen"
   },
   "deskTitles": {
     "eyebrow": "Super-Admin · Titel",

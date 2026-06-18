@@ -3,6 +3,7 @@ import { MarketCode } from "@prisma/client";
 import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
 import { getWorkspace } from "@/lib/workspace";
+import { Link } from "@/i18n/navigation";
 import { readPlanBrief } from "@/lib/basket";
 import { readActiveListId, resolveActiveList } from "@/lib/lists";
 import { indicativeFromRules, toRateRules } from "@/lib/money";
@@ -90,6 +91,9 @@ export default async function PlanPage({
         priceVisible,
         withContent: i.withContent,
         lineTotal: unit * i.quantity,
+        // A product deactivated since it was added: still shown, but flagged so
+        // the buyer removes it (submit refuses while it's present — see E).
+        unavailable: !p.active || !p.bookable,
       };
     })
     .filter((l): l is NonNullable<typeof l> => l !== null);
@@ -307,7 +311,18 @@ export default async function PlanPage({
         />
       ) : null}
 
-      {lines.length === 0 && titleLines.length === 0 ? (
+      {needsClient ? (
+        // Agency with no client selected: don't drop them into the recommender
+        // (every "Add" would loop back here via requireActiveOrg) — give an
+        // actionable path to choose a client first.
+        <div className="empty-state">
+          <h2>{t("needsClientTitle")}</h2>
+          <p className="muted">{t("needsClientBody")}</p>
+          <Link href="/agency" className="btn">
+            {t("needsClientCta")}
+          </Link>
+        </div>
+      ) : lines.length === 0 && titleLines.length === 0 ? (
         <PlanStart
           locale={locale}
           recBriefRaw={recBriefRaw}

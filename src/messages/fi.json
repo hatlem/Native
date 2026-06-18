@@ -305,14 +305,13 @@
     "name": "Lista",
     "items": "Kohteet",
     "lastSubmittedHeading": "Viimeksi lähetetty",
-    "itemCount": "{count} kohdetta",
+    "itemCount": "{count, plural, =0 {0 kohdetta} =1 {1 kohde} other {# kohdetta}}",
     "lastSubmitted": "Viimeksi lähetetty {date}",
     "neverSubmitted": "Ei vielä lähetetty",
     "open": "Avaa",
     "rename": "Nimeä uudelleen",
     "duplicate": "Monista",
-    "archive": "Arkistoi",
-    "navLabel": "Tallennetut listat"
+    "archive": "Arkistoi"
   },
   "titleDetail": {
     "back": "Takaisin katalogiin",
@@ -448,7 +447,17 @@
     "switchList": "Vaihda listaa",
     "newList": "Uusi lista",
     "rename": "Nimeä uudelleen",
-    "savedListsLabel": "Omat listat"
+    "savedListsLabel": "Omat listat",
+    "errorClient": "Valitse ensin asiakas aloittaaksesi suunnitelman.",
+    "errorRate": "Lähetät liian nopeasti. Odota hetki ja yritä uudelleen.",
+    "errorForbidden": "Sinulla ei ole oikeutta tehdä tätä tilausta.",
+    "errorAvailability": "Valittu mainospaikka ei ole saatavilla tässä kuussa.",
+    "errorUnavailable": "Listallasi oleva mainospaikka ei ole enää saatavilla. Poista se jatkaaksesi.",
+    "errorChanged": "Listasi muuttui lähetyksen aikana. Tarkista se ja lähetä uudelleen.",
+    "lineUnavailable": "Ei enää saatavilla – poista jatkaaksesi",
+    "needsClientTitle": "Valitse asiakas aloittaaksesi suunnitelman",
+    "needsClientBody": "Toimistona rakennat suunnitelmia asiakkaan puolesta. Valitse asiakas jatkaaksesi.",
+    "needsClientCta": "Valitse asiakas"
   },
   "rfq": {
     "org": "Yritys",
@@ -568,7 +577,12 @@
     "metricsNeedsContactEmpty": "Mikään ei vaadi seurantaa tällä hetkellä.",
     "metricsNeedsContactPublisher": "Julkaisija",
     "metricsNeedsContactPlacements": "Sijoitukset",
-    "metricsNeedsContactOrder": "Tilaus"
+    "metricsNeedsContactOrder": "Tilaus",
+    "resolvePlacement": "Valitse mainospaikka …",
+    "resolveUse": "Käytä mainospaikkaa",
+    "resolveNoPlacements": "Tällä julkaisulla ei ole vielä varattavia mainospaikkoja",
+    "resolveTitlesFirst": "{count, plural, =1 {1 mainospaikka tarvitsee} other {# mainospaikkaa tarvitsee}} konkreettisen tuotteen ennen tarjousta.",
+    "resolveRemove": "Poista paikkamerkki"
   },
   "deskTitles": {
     "eyebrow": "Pääkäyttäjä · julkaisut",

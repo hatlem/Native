@@ -96,6 +96,29 @@ export async function submitRequest(formData: FormData) {
   const list = await ensureActiveList(org.id, await readActiveListId());
   if (list.items.length === 0) redirect(`/${locale}/plan?error=1`);
 
+  // Idempotency: a network-retried / double-clicked submit of the SAME list
+  // within a short window must not mint a second Request (and, on the firm
+  // path, a second CONFIRMED+charged order). Redirect the retry to the
+  // request the first submit just created.
+  const recent = await prisma.request.findFirst({
+    where: {
+      sourceListId: list.id,
+      organizationId: org.id,
+      createdAt: { gt: new Date(Date.now() - 10_000) },
+    },
+    orderBy: { createdAt: "desc" },
+    select: { id: true },
+  });
+  if (recent) redirect(`/${locale}/requests/${recent.id}`);
+
+  // A product deactivated AFTER it was added still renders on /plan (the page
+  // only hides its price). Refuse to submit a list that would silently amputate
+  // it — don't drop a line the buyer can still see. They must remove it first.
+  const deactivatedLines = list.items.filter(
+    (i) => i.productId && (!i.product || !i.product.active || !i.product.bookable),
+  );
+  if (deactivatedLines.length > 0) redirect(`/${locale}/plan?error=unavailable`);
+
   const productItems = list.items.filter(
     (i): i is typeof i & { productId: string; product: NonNullable<typeof i.product> } =>
       !!i.productId && !!i.product && i.product.active && i.product.bookable,
@@ -104,6 +127,21 @@ export async function submitRequest(formData: FormData) {
   if (productItems.length === 0 && titleItems.length === 0) {
     redirect(`/${locale}/plan?error=1`);
   }
+
+  // Fingerprint the item set at load; re-checked just before we write (below) so
+  // a concurrent edit from another agency seat / second tab can't make us
+  // snapshot — or instant-charge — a stale list (line removed/added/qty changed
+  // during the grouping + gate round-trips).
+  const fingerprint = (
+    rows: Array<{ id: string; quantity: number; productId: string | null; titleId: string | null; withContent: boolean }>,
+  ) =>
+    rows
+      .map((r) => `${r.id}:${r.quantity}:${r.productId ?? ""}:${r.titleId ?? ""}:${r.withContent ? 1 : 0}`)
+      .sort()
+      .join("|");
+  // withContent is included because it drives CONTENT_FEE charges on the firm
+  // (instant-order) path — a concurrent toggle must invalidate the snapshot too.
+  const loadedFingerprint = fingerprint(list.items);
 
   // Shape the downstream code already expects (groupItemsByMarket, allFirm,
   // createFirmOrder). Title-only lines never enter `items`/`byId`.
@@ -170,6 +208,17 @@ export async function submitRequest(formData: FormData) {
       select: { productId: true },
     });
     if (blocked) redirect(`/${locale}/plan?error=availability`);
+  }
+
+  // Abort if the list changed since we loaded it (see fingerprint above) — the
+  // buyer reviews the refreshed list and resubmits rather than us committing a
+  // stale snapshot / charging for a line they just removed.
+  const freshItems = await prisma.savedListItem.findMany({
+    where: { listId: list.id },
+    select: { id: true, quantity: true, productId: true, titleId: true, withContent: true },
+  });
+  if (fingerprint(freshItems) !== loadedFingerprint) {
+    redirect(`/${locale}/plan?error=changed`);
   }
 
   let request: { id: string };

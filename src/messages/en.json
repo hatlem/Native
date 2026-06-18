@@ -397,14 +397,13 @@
     "name": "List",
     "items": "Items",
     "lastSubmittedHeading": "Last submitted",
-    "itemCount": "{count} items",
+    "itemCount": "{count, plural, =0 {0 items} =1 {1 item} other {# items}}",
     "lastSubmitted": "Last submitted {date}",
     "neverSubmitted": "Not submitted yet",
     "open": "Open",
     "rename": "Rename",
     "duplicate": "Duplicate",
-    "archive": "Archive",
-    "navLabel": "Saved lists"
+    "archive": "Archive"
   },
   "plan": {
     "eyebrow": "Plan",
@@ -448,7 +447,17 @@
     "switchList": "Switch list",
     "newList": "New list",
     "rename": "Rename",
-    "savedListsLabel": "Your lists"
+    "savedListsLabel": "Your lists",
+    "errorClient": "Pick a client first to start a plan.",
+    "errorRate": "You're submitting too fast. Please wait a moment and try again.",
+    "errorForbidden": "You don't have permission to place this order.",
+    "errorAvailability": "A selected placement isn't available this month.",
+    "errorUnavailable": "A placement on your list is no longer available. Remove it to continue.",
+    "errorChanged": "Your list changed while you were submitting. Review it and submit again.",
+    "lineUnavailable": "No longer available — remove to continue",
+    "needsClientTitle": "Pick a client to start a plan",
+    "needsClientBody": "As an agency you build plans on behalf of a client. Choose one to continue.",
+    "needsClientCta": "Choose a client"
   },
   "rfq": {
     "org": "Company",
@@ -568,7 +577,12 @@
     "metricsNeedsContactEmpty": "Nothing needs follow-up right now.",
     "metricsNeedsContactPublisher": "Publisher",
     "metricsNeedsContactPlacements": "Placements",
-    "metricsNeedsContactOrder": "Order"
+    "metricsNeedsContactOrder": "Order",
+    "resolvePlacement": "Pick a placement…",
+    "resolveUse": "Use placement",
+    "resolveNoPlacements": "No bookable placements on this title yet",
+    "resolveTitlesFirst": "{count, plural, =1 {1 placement needs} other {# placements need}} a concrete product before you can quote.",
+    "resolveRemove": "Remove placeholder"
   },
   "deskTitles": {
     "eyebrow": "Super-admin · titles",
