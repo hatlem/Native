@@ -5,6 +5,7 @@ import { prisma } from "@/lib/prisma";
 import { recordAudit } from "@/lib/audit";
 import { loadScope, canActOnOrg } from "@/lib/scope";
 import { writeActiveListId } from "@/lib/lists";
+import { clampQuantity } from "@/lib/basket";
 import {
   addProductToList,
   addRecommendedToList,
@@ -114,16 +115,27 @@ export async function duplicatePlan(formData: FormData) {
     activeIds.has(i.productId as string),
   );
 
+  // Dedup by productId — an order can carry the same product across multiple
+  // PlanItems (e.g. two desk-resolved title lines for the same product). The
+  // new (listId,productId) unique would reject duplicate rows, so merge their
+  // quantities (clamped) into one line per product.
+  const byProduct = new Map<string, number>();
+  for (const i of survivingItems) {
+    const pid = i.productId as string;
+    byProduct.set(pid, clampQuantity((byProduct.get(pid) ?? 0) + i.quantity));
+  }
+  const lines = [...byProduct.entries()];
+
   const created = await prisma.savedList.create({
     data: {
       organizationId: order.organizationId,
       name: "Reordered campaign",
       createdById: scope.userId ?? null,
       items: {
-        create: survivingItems.map((i, idx) => ({
-          productId: i.productId,
+        create: lines.map(([productId, quantity], idx) => ({
+          productId,
           titleId: null,
-          quantity: i.quantity,
+          quantity,
           sortOrder: idx,
         })),
       },
@@ -131,21 +143,22 @@ export async function duplicatePlan(formData: FormData) {
   });
   await writeActiveListId(created.id);
 
+  // "dropped" reflects lines lost to deactivation (not same-product merges).
+  const dropped = sourceItems.length - survivingItems.length;
   await recordAudit(
     scope.userId,
     "plan.duplicate",
     `Order:${orderId}`,
     {
       sourcePlanId: order.quote.request.plan.id,
-      restored: survivingItems.length,
-      dropped: sourceItems.length - survivingItems.length,
+      restored: lines.length,
+      dropped,
     },
   );
 
-  const dropped = sourceItems.length - survivingItems.length;
   redirect(
     `/${locale}/plan?duplicate=` +
-      (survivingItems.length === 0
+      (lines.length === 0
         ? "all-inactive"
         : dropped > 0
           ? `partial-${dropped}`

@@ -8,8 +8,7 @@ import { loadScope, canActOnOrg } from "@/lib/scope";
 import { recordAudit } from "@/lib/audit";
 import { readBasket } from "@/lib/basket";
 import {
-  ensureActiveList,
-  resolveActiveList,
+  ensureActiveListId,
   addProductItem,
   addTitleItem,
   resolveTitleItem,
@@ -34,7 +33,10 @@ async function requireActiveOrg(locale: string) {
   return { scope, orgId };
 }
 
-/** Resolve (lazy-create) the active list for the active org and persist its id. */
+/** Resolve (adopt-or-create) the active list id for the active org and persist
+ *  it. Returns only the id — the add paths don't need the deep list tree.
+ *  ensureActiveListId adopts the org's most-recent list under a per-org advisory
+ *  lock, so a first-add race converges on one list rather than orphaning one. */
 async function activeList(locale: string) {
   const { scope, orgId } = await requireActiveOrg(locale);
   let activeId = await readActiveListId();
@@ -46,13 +48,9 @@ async function activeList(locale: string) {
       (await cookies()).delete("nativespin_plan");
     }
   }
-  if (!activeId) {
-    const existing = await resolveActiveList(orgId, null);
-    if (existing) activeId = existing.id;
-  }
-  const list = await ensureActiveList(orgId, activeId, scope.userId);
-  await writeActiveListId(list.id);
-  return { scope, orgId, list };
+  const listId = await ensureActiveListId(orgId, activeId, scope.userId);
+  await writeActiveListId(listId);
+  return { scope, orgId, listId };
 }
 
 export async function addProductToList(formData: FormData) {
@@ -64,8 +62,8 @@ export async function addProductToList(formData: FormData) {
       select: { id: true },
     });
     if (valid) {
-      const { list } = await activeList(locale);
-      await addProductItem(list.id, productId, str(formData, "withContent") === "1");
+      const { listId } = await activeList(locale);
+      await addProductItem(listId, productId, str(formData, "withContent") === "1");
     }
   }
   redirect(`/${locale}/plan`);
@@ -80,8 +78,10 @@ export async function addRecommendedToList(formData: FormData) {
       select: { id: true },
     });
     const validIds = new Set(valid.map((p) => p.id));
-    const { list } = await activeList(locale);
-    for (const id of ids) if (validIds.has(id)) await addProductItem(list.id, id);
+    const { listId } = await activeList(locale);
+    // distinct product ids → each upserts its own (listId,productId) row, so the
+    // adds are independent and safe to run concurrently (no serial round-trips).
+    await Promise.all(ids.filter((id) => validIds.has(id)).map((id) => addProductItem(listId, id)));
   }
   redirect(`/${locale}/plan`);
 }
@@ -92,19 +92,20 @@ export async function saveTitleToList(formData: FormData) {
   if (titleId) {
     const valid = await prisma.title.findFirst({ where: { id: titleId, active: true }, select: { id: true } });
     if (valid) {
-      const { list } = await activeList(locale);
-      await addTitleItem(list.id, titleId);
+      const { listId } = await activeList(locale);
+      await addTitleItem(listId, titleId);
     }
   }
   redirect(`/${locale}/plan`);
 }
 
-/** Shared guard: the item's list must be in the caller's scope. */
+/** Shared guard: the item's list must be in the caller's scope. Returns the
+ *  item (incl. its productId/titleId) so callers needn't re-query. */
 async function ownItem(locale: string, itemId: string) {
   const scope = await loadScope();
   const item = await prisma.savedListItem.findUnique({
     where: { id: itemId },
-    select: { id: true, list: { select: { organizationId: true } } },
+    select: { id: true, productId: true, titleId: true, list: { select: { organizationId: true } } },
   });
   if (!item || !canActOnOrg(scope, item.list.organizationId)) redirect(`/${locale}/plan`);
   return item;
@@ -130,7 +131,8 @@ export async function setListItemContent(formData: FormData) {
   const locale = str(formData, "locale") || "en";
   const itemId = str(formData, "itemId");
   await ownItem(locale, itemId);
-  await prisma.savedListItem.update({
+  // updateMany no-ops (no P2025) if the row was concurrently removed.
+  await prisma.savedListItem.updateMany({
     where: { id: itemId },
     data: { withContent: str(formData, "withContent") === "1" },
   });
@@ -141,9 +143,12 @@ export async function resolveTitleLine(formData: FormData) {
   const locale = str(formData, "locale") || "en";
   const itemId = str(formData, "itemId");
   const productId = str(formData, "productId");
-  await ownItem(locale, itemId);
+  const item = await ownItem(locale, itemId);
+  // Only a title placeholder is resolvable, and ONLY to a product OF THAT TITLE —
+  // a tampered/replayed POST can't swap in a different publisher's product.
+  if (!item.titleId) redirect(`/${locale}/plan`);
   const product = await prisma.product.findFirst({
-    where: { id: productId, active: true, bookable: true },
+    where: { id: productId, titleId: item.titleId, active: true, bookable: true },
     select: { id: true },
   });
   if (product) await resolveTitleItem(itemId, productId);

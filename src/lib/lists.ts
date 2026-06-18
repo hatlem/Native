@@ -226,12 +226,14 @@ export async function resolveTitleItem(itemId: string, productId: string) {
   });
 }
 
+/** Idempotent: deleteMany affects 0 rows (no P2025) if a concurrent action already removed it. */
 export async function removeItem(itemId: string) {
-  return prisma.savedListItem.delete({ where: { id: itemId } });
+  return prisma.savedListItem.deleteMany({ where: { id: itemId } });
 }
 
+/** Idempotent: updateMany no-ops (no P2025) if the row was concurrently removed. */
 export async function setItemQuantity(itemId: string, quantity: number) {
-  return prisma.savedListItem.update({ where: { id: itemId }, data: { quantity: clampQuantity(quantity) } });
+  return prisma.savedListItem.updateMany({ where: { id: itemId }, data: { quantity: clampQuantity(quantity) } });
 }
 
 export type PlanItemSnapshot = {
