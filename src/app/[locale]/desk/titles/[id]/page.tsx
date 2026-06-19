@@ -8,6 +8,7 @@ import {
   setPublisherPricesPublic,
   updateTitleProductionFee,
   updateProductPricing,
+  updateTitleAliases,
 } from "@/app/title-actions";
 import { pickContentFeeRule } from "@/lib/money";
 import { loadContentFeeRules } from "@/lib/content-fee";
@@ -359,6 +360,32 @@ export default async function DeskTitleEditPage({
             pendingLabel={t("savingPricing")}
             className="btn"
           />
+        </form>
+      </article>
+
+      {/* Søke-alias: merkenavn / alternative navn som katalogsøket skal treffe
+          (name + aliases er vekt A i Title.searchTsv). Søket fjerner punktum,
+          så en punktumfri form må også legges inn — se updateTitleAliases. */}
+      <article className="card" style={{ marginTop: 16 }}>
+        <form action={updateTitleAliases} className="product-form">
+          <input type="hidden" name="locale" value={locale} />
+          <input type="hidden" name="titleId" value={title.id} />
+          <div className="field">
+            <label htmlFor="aliases">Søke-alias</label>
+            <input
+              id="aliases"
+              name="aliases"
+              type="text"
+              defaultValue={title.aliases.join(", ")}
+              placeholder="AT.no, AT, ATno"
+            />
+            <p className="muted small">
+              Kommaseparert. Merkenavn / alternative navn katalogsøket skal
+              treffe. Søket fjerner punktum, så legg også til en punktumfri form
+              (f.eks. «ATno» for «AT.no»).
+            </p>
+          </div>
+          <SubmitButton label="Lagre alias" pendingLabel="Lagrer…" className="btn" />
         </form>
       </article>
 
