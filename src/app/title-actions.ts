@@ -395,6 +395,50 @@ export async function updateTitleProductionFee(formData: FormData) {
   redirect(`/${locale}/desk/titles/${titleId}?saved=1`);
 }
 
+// Edit a Title's search aliases — brand short-forms / alternate names the
+// catalog FTS should match (Title.searchTsv is weight A over name + aliases;
+// see 20260604170000_fts_keywords_description). Comma-separated input, trimmed,
+// de-duplicated, length/count-capped. Empty clears them (the title falls back
+// to matching by name only).
+//
+// NB: src/lib/catalog-search.ts strips non-alphanumerics from the query, so a
+// dotted brand like "AT.no" is searched as the lexeme prefix `atno:*`, while
+// the 'simple' dictionary tokenizes "AT.no" to `at.no` (dot kept) — which
+// `atno:*` does NOT match. Store a dot-free form ("ATno") alongside the display
+// form ("AT.no") for it to be findable. The form's placeholder hints at this.
+export async function updateTitleAliases(formData: FormData) {
+  const locale = field(formData, "locale") || "en";
+  const titleId = field(formData, "titleId");
+  const userId = await requireSuperadmin(locale);
+
+  const title = await prisma.title.findUnique({
+    where: { id: titleId },
+    select: { id: true, name: true },
+  });
+  if (!title) redirect(`/${locale}/desk/titles`);
+
+  const aliases = Array.from(
+    new Set(
+      field(formData, "aliases")
+        .split(",")
+        .map((s) => s.trim())
+        .filter((s) => s.length > 0)
+        .map((s) => s.slice(0, 80)),
+    ),
+  ).slice(0, 20);
+
+  await prisma.title.update({
+    where: { id: title.id },
+    data: { aliases },
+  });
+  await recordAudit(userId, "title.update_aliases", `Title:${title.id}`, {
+    name: title.name,
+    aliases,
+  });
+  revalidatePath(`/${locale}/desk/titles/${titleId}`);
+  redirect(`/${locale}/desk/titles/${titleId}?saved=1`);
+}
+
 // Per-product pricing overrides, the most-specific layer of both
 // cascades in one form:
 //
