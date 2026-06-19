@@ -3,7 +3,7 @@ import { headers } from "next/headers";
 import { notFound, redirect } from "next/navigation";
 import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
-import { getFavoritedTitleIds } from "@/lib/favorites";
+import { getFavoritedTitleIds, getListMembershipForTitles } from "@/lib/favorites";
 import { FavoriteButton } from "../_components/FavoriteButton";
 import { Link } from "@/i18n/navigation";
 import { intlLocale } from "@/lib/money";
@@ -127,14 +127,17 @@ export default async function TitleDetailPage({
   // Favorites: filled heart + the buyer's lists for the "add to list" menu.
   // session.user is guaranteed — the guard above redirects guests.
   const favUserId = session.user.id;
-  const favorited = (await getFavoritedTitleIds(favUserId, [title.id])).has(
-    title.id,
-  );
-  const favoriteLists = await prisma.favoriteList.findMany({
-    where: { userId: favUserId },
-    orderBy: { updatedAt: "desc" },
-    select: { id: true, name: true },
-  });
+  const [favoritedSet, favoriteLists, listMembership] = await Promise.all([
+    getFavoritedTitleIds(favUserId, [title.id]),
+    prisma.favoriteList.findMany({
+      where: { userId: favUserId },
+      orderBy: { updatedAt: "desc" },
+      select: { id: true, name: true },
+    }),
+    getListMembershipForTitles(favUserId, [title.id]),
+  ]);
+  const favorited = favoritedSet.has(title.id);
+  const inListIds = listMembership[title.id] ?? [];
 
   const pricing = await loadPricingDefaults();
 
@@ -210,6 +213,7 @@ export default async function TitleDetailPage({
               titleId={title.id}
               initialFavorited={favorited}
               lists={favoriteLists}
+              inListIds={inListIds}
             />
           </div>
           <p className="muted">

@@ -2,7 +2,7 @@ import { getTranslations } from "next-intl/server";
 import { MarketCode, ProductType, Prisma } from "@prisma/client";
 import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
-import { getFavoritedTitleIds } from "@/lib/favorites";
+import { getFavoritedTitleIds, getListMembershipForTitles } from "@/lib/favorites";
 import { searchTitleIds } from "@/lib/catalog-search";
 import { CatalogFilters } from "./_components/CatalogFilters";
 import { CatalogMarketing } from "./_components/CatalogMarketing";
@@ -219,13 +219,15 @@ export default async function CatalogPage({
   // empty heart) + their lists for the "add to list" dropdown. session.user
   // is guaranteed here — the marketing splash returns above for guests.
   const userId = session.user.id;
-  const [favoritedIds, favoriteLists] = await Promise.all([
-    getFavoritedTitleIds(userId, titles.map((tt) => tt.id)),
+  const titleIds = titles.map((tt) => tt.id);
+  const [favoritedIds, favoriteLists, listMembership] = await Promise.all([
+    getFavoritedTitleIds(userId, titleIds),
     prisma.favoriteList.findMany({
       where: { userId },
       orderBy: { updatedAt: "desc" },
       select: { id: true, name: true },
     }),
+    getListMembershipForTitles(userId, titleIds),
   ]);
 
   const pageQuery = (p: number) => {
@@ -428,6 +430,7 @@ export default async function CatalogPage({
         compareMode={compareMode}
         favoritedIds={favoritedIds}
         favoriteLists={favoriteLists}
+        listMembership={listMembership}
       />
 
       <CatalogPagination

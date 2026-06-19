@@ -4,7 +4,7 @@ import { useState, useTransition, useRef, useEffect } from "react";
 import { useTranslations } from "next-intl";
 import {
   toggleFavorite,
-  addFavoriteToList,
+  setFavoriteListMembership,
   createFavoriteList,
 } from "@/app/favorites-actions";
 
@@ -15,22 +15,33 @@ export function FavoriteButton({
   titleId,
   initialFavorited,
   lists,
+  inListIds = [],
 }: {
   locale: string;
   titleId: string;
   initialFavorited: boolean;
   lists: FavListOption[];
+  /** Ids of the user's lists this title is already in — drives the checkmarks. */
+  inListIds?: string[];
 }) {
   const t = useTranslations("favorites");
   const [favorited, setFavorited] = useState(initialFavorited);
+  const [inLists, setInLists] = useState<Set<string>>(() => new Set(inListIds));
   const [menuOpen, setMenuOpen] = useState(false);
   const [pending, startTransition] = useTransition();
   const wrapRef = useRef<HTMLDivElement>(null);
+
+  // Stable primitive key: the membership array's identity changes every render,
+  // so depend on its joined value and rebuild the set from that inside the effect.
+  const inListKey = inListIds.join(",");
 
   // Reconcile to server truth after a revalidation re-renders the card.
   useEffect(() => {
     setFavorited(initialFavorited);
   }, [initialFavorited]);
+  useEffect(() => {
+    setInLists(new Set(inListKey ? inListKey.split(",") : []));
+  }, [inListKey]);
 
   // Close the menu on outside click.
   useEffect(() => {
@@ -54,15 +65,24 @@ export function FavoriteButton({
     });
   }
 
-  function onAddToList(listId: string) {
-    setFavorited(true);
+  // Toggle membership in ONE list. The menu stays open so several lists can be
+  // ticked in a row. Adding a list also lights the heart (it's now favorited).
+  function onToggleList(listId: string) {
+    const willBeMember = !inLists.has(listId);
+    setInLists((prev) => {
+      const next = new Set(prev);
+      if (willBeMember) next.add(listId);
+      else next.delete(listId);
+      return next;
+    });
+    if (willBeMember) setFavorited(true);
     const fd = new FormData();
     fd.set("locale", locale);
     fd.set("titleId", titleId);
     fd.set("listId", listId);
+    fd.set("member", willBeMember ? "1" : "0");
     startTransition(async () => {
-      await addFavoriteToList(fd);
-      setMenuOpen(false);
+      await setFavoriteListMembership(fd);
     });
   }
 
@@ -72,7 +92,7 @@ export function FavoriteButton({
     setFavorited(true);
     startTransition(async () => {
       await createFavoriteList(formData);
-      setMenuOpen(false);
+      // Keep the menu open; the new (checked) list arrives on revalidation.
     });
   }
 
@@ -104,13 +124,25 @@ export function FavoriteButton({
           <p className="fav-menu-title">{t("addToList")}</p>
           {lists.length > 0 ? (
             <ul>
-              {lists.map((l) => (
-                <li key={l.id}>
-                  <button type="button" role="menuitem" onClick={() => onAddToList(l.id)}>
-                    {l.name}
-                  </button>
-                </li>
-              ))}
+              {lists.map((l) => {
+                const checked = inLists.has(l.id);
+                return (
+                  <li key={l.id}>
+                    <button
+                      type="button"
+                      role="menuitemcheckbox"
+                      aria-checked={checked}
+                      className={checked ? "is-checked" : undefined}
+                      onClick={() => onToggleList(l.id)}
+                    >
+                      <span className="fav-check" aria-hidden="true">
+                        {checked ? "✓" : ""}
+                      </span>
+                      {l.name}
+                    </button>
+                  </li>
+                );
+              })}
             </ul>
           ) : (
             <p className="muted small">{t("noLists")}</p>

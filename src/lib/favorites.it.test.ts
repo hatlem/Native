@@ -5,11 +5,13 @@ import {
   toggleFavorite,
   addFavoriteToList,
   removeFavoriteFromList,
+  removeFavoriteFromListByTitle,
   createFavoriteList,
   renameFavoriteList,
   deleteFavoriteList,
   setFavoriteListShared,
   getFavoritedTitleIds,
+  getListMembershipForTitles,
   getFavoritesOverview,
 } from "./favorites";
 
@@ -114,6 +116,31 @@ test("getFavoritedTitleIds returns only this user's hearts for the given titles"
   assert.ok(ids.has(titleId));
   assert.ok(!ids.has(titleId2));
   await toggleFavorite(userId, titleId); // clean up
+});
+
+test("the same publication can live in multiple lists; membership map + per-title removal track it", async () => {
+  const listA = await createFavoriteList(userId, orgId, "Multi A");
+  const listB = await createFavoriteList(userId, orgId, "Multi B");
+
+  // Same title into BOTH lists — one Favorite row, two memberships.
+  await addFavoriteToList(userId, titleId, listA.id);
+  await addFavoriteToList(userId, titleId, listB.id);
+  assert.equal(await prisma.favorite.count({ where: { userId, titleId } }), 1, "one favorite row");
+
+  const membership = await getListMembershipForTitles(userId, [titleId]);
+  assert.deepEqual(
+    [...(membership[titleId] ?? [])].sort(),
+    [listA.id, listB.id].sort(),
+    "title reports membership in both lists",
+  );
+
+  // Remove from list A by title — still in B, heart kept.
+  await removeFavoriteFromListByTitle(userId, titleId, listA.id);
+  const after = await getListMembershipForTitles(userId, [titleId]);
+  assert.deepEqual(after[titleId], [listB.id], "only list B remains");
+  assert.equal(await prisma.favorite.count({ where: { userId, titleId } }), 1, "heart kept");
+
+  await toggleFavorite(userId, titleId); // clean up the heart (cascades remaining membership)
 });
 
 test("a favorite whose title is later deactivated is hidden from the overview", async () => {

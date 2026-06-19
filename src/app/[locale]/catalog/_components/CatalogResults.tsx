@@ -29,12 +29,14 @@ export async function CatalogResults({
   compareMode,
   favoritedIds,
   favoriteLists,
+  listMembership,
 }: {
   locale: string;
   titles: CatalogTitleRow[];
   compareMode: boolean;
   favoritedIds: Set<string>;
   favoriteLists: FavListOption[];
+  listMembership: Record<string, string[]>;
 }) {
   const t = await getTranslations({ locale, namespace: "catalog" });
   const tf = await getTranslations({ locale, namespace: "firm" });
@@ -84,6 +86,7 @@ export async function CatalogResults({
               titleId={title.id}
               initialFavorited={favoritedIds.has(title.id)}
               lists={favoriteLists}
+              inListIds={listMembership[title.id] ?? []}
             />
             <h3>
               <Link className="card-link" href={`/catalog/${title.slug}`}>
