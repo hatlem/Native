@@ -2,6 +2,7 @@ import { getTranslations } from "next-intl/server";
 import { MarketCode, ProductType, Prisma } from "@prisma/client";
 import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
+import { getFavoritedTitleIds } from "@/lib/favorites";
 import { searchTitleIds } from "@/lib/catalog-search";
 import { CatalogFilters } from "./_components/CatalogFilters";
 import { CatalogMarketing } from "./_components/CatalogMarketing";
@@ -214,6 +215,19 @@ export default async function CatalogPage({
   ]);
   const totalPages = Math.max(1, Math.ceil(totalCount / PAGE_SIZE));
 
+  // Favorites: which of this page's titles the buyer has hearted (filled vs
+  // empty heart) + their lists for the "add to list" dropdown. session.user
+  // is guaranteed here — the marketing splash returns above for guests.
+  const userId = session.user.id;
+  const [favoritedIds, favoriteLists] = await Promise.all([
+    getFavoritedTitleIds(userId, titles.map((tt) => tt.id)),
+    prisma.favoriteList.findMany({
+      where: { userId },
+      orderBy: { updatedAt: "desc" },
+      select: { id: true, name: true },
+    }),
+  ]);
+
   const pageQuery = (p: number) => {
     const params = new URLSearchParams();
     if (markets.length) params.set("market", markets.join(","));
@@ -408,7 +422,13 @@ export default async function CatalogPage({
         {t("resultCount", { count: totalCount })}
       </p>
 
-      <CatalogResults locale={locale} titles={titles} compareMode={compareMode} />
+      <CatalogResults
+        locale={locale}
+        titles={titles}
+        compareMode={compareMode}
+        favoritedIds={favoritedIds}
+        favoriteLists={favoriteLists}
+      />
 
       <CatalogPagination
         locale={locale}

@@ -41,7 +41,8 @@
     "playbooks": "Spelböcker",
     "writers": "Skribenter",
     "metricsNeedsContact": "Saknar mätvärden",
-    "lists": "Sparade listor"
+    "lists": "Sparade listor",
+    "favorites": "Favoriter"
   },
   "reports": {
     "title": "Rapporter",
@@ -218,7 +219,7 @@
       "ctaBlockTitle": "Redo att brieffa oss?",
       "ctaBlockBody": "Skapa konto, berätta vad du säljer och till vem — vi återkommer inom 24 timmar med titlarna och formaten som passar."
     },
-    "savePublication": "Spara publikation"
+    "savePublication": "Lägg till i plan för pris"
   },
   "lists": {
     "title": "Sparade listor",
@@ -233,6 +234,31 @@
     "rename": "Byt namn",
     "duplicate": "Duplicera",
     "archive": "Arkivera"
+  },
+  "favorites": {
+    "title": "Favoriter",
+    "lead": "Publikationer du har sparat. Öppna en för att lägga ett format i en plan.",
+    "add": "Lägg till i favoriter",
+    "remove": "Ta bort från favoriter",
+    "addToList": "Lägg till i en lista",
+    "noLists": "Inga listor ännu.",
+    "newListPlaceholder": "Namn på ny lista",
+    "createList": "Skapa lista",
+    "allHeading": "Alla favoriter",
+    "listsHeading": "Dina listor",
+    "sharedHeading": "Delat med dig",
+    "empty": "Inga favoriter ännu. Bläddra i katalogen och tryck på hjärtat på en publikation.",
+    "browseCta": "Bläddra i katalogen",
+    "itemCount": "{count, plural, =0 {Inga publikationer} =1 {1 publikation} other {# publikationer}}",
+    "share": "Dela med mitt team",
+    "unshare": "Sluta dela",
+    "sharedBadge": "Delad",
+    "rename": "Byt namn",
+    "delete": "Ta bort lista",
+    "open": "Öppna",
+    "removeFromList": "Ta bort",
+    "byOwner": "av {owner}",
+    "publishedBy": "{publisher} · {market}"
   },
   "titleDetail": {
     "back": "Tillbaka till katalogen",

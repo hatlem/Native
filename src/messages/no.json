@@ -41,7 +41,8 @@
     "playbooks": "Spillebøker",
     "writers": "Skribenter",
     "metricsNeedsContact": "Mangler tall",
-    "lists": "Lagrede lister"
+    "lists": "Lagrede lister",
+    "favorites": "Favoritter"
   },
   "reports": {
     "title": "Rapporter",
@@ -218,7 +219,7 @@
       "ctaBlockTitle": "Klar til å gi oss en brief?",
       "ctaBlockBody": "Opprett konto, fortell oss hva du selger og til hvem — vi kommer tilbake innen 24 timer med titlene og formatene som passer."
     },
-    "savePublication": "Lagre publikasjon"
+    "savePublication": "Legg i plan for pris"
   },
   "lists": {
     "title": "Lagrede lister",
@@ -233,6 +234,31 @@
     "rename": "Gi nytt navn",
     "duplicate": "Dupliser",
     "archive": "Arkiver"
+  },
+  "favorites": {
+    "title": "Favoritter",
+    "lead": "Publikasjoner du har lagret. Åpne en for å legge et format i en plan.",
+    "add": "Legg til i favoritter",
+    "remove": "Fjern fra favoritter",
+    "addToList": "Legg til i en liste",
+    "noLists": "Ingen lister ennå.",
+    "newListPlaceholder": "Navn på ny liste",
+    "createList": "Opprett liste",
+    "allHeading": "Alle favoritter",
+    "listsHeading": "Dine lister",
+    "sharedHeading": "Delt med deg",
+    "empty": "Ingen favoritter ennå. Bla i katalogen og trykk på hjertet på en publikasjon.",
+    "browseCta": "Bla i katalogen",
+    "itemCount": "{count, plural, =0 {Ingen publikasjoner} =1 {1 publikasjon} other {# publikasjoner}}",
+    "share": "Del med teamet mitt",
+    "unshare": "Slutt å dele",
+    "sharedBadge": "Delt",
+    "rename": "Gi nytt navn",
+    "delete": "Slett liste",
+    "open": "Åpne",
+    "removeFromList": "Fjern",
+    "byOwner": "av {owner}",
+    "publishedBy": "{publisher} · {market}"
   },
   "titleDetail": {
     "back": "Tilbake til katalogen",
