@@ -457,7 +457,10 @@
     "lineUnavailable": "Nicht mehr verfügbar – entfernen, um fortzufahren",
     "needsClientTitle": "Wählen Sie einen Kunden, um einen Plan zu starten",
     "needsClientBody": "Als Agentur erstellen Sie Pläne im Auftrag eines Kunden. Wählen Sie einen aus, um fortzufahren.",
-    "needsClientCta": "Kunde wählen"
+    "needsClientCta": "Kunde wählen",
+    "needsWorkspaceTitle": "Kein Arbeitsbereich zum Erstellen eines Plans",
+    "needsWorkspaceBody": "Dieses Konto ist noch nicht mit einem Käufer-Arbeitsbereich eingerichtet und kann daher keinen Plan erstellen. Kontaktieren Sie uns, dann richten wir einen ein.",
+    "needsWorkspaceCta": "Kontakt aufnehmen"
   },
   "rfq": {
     "org": "Firma",

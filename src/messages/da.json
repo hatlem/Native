@@ -378,7 +378,10 @@
     "lineUnavailable": "Ikke længere tilgængelig – fjern for at fortsætte",
     "needsClientTitle": "Vælg en kunde for at starte en plan",
     "needsClientBody": "Som bureau bygger du planer på vegne af en kunde. Vælg én for at fortsætte.",
-    "needsClientCta": "Vælg kunde"
+    "needsClientCta": "Vælg kunde",
+    "needsWorkspaceTitle": "Intet arbejdsområde at lave en plan i",
+    "needsWorkspaceBody": "Denne konto er endnu ikke sat op med et købsarbejdsområde, så den kan ikke lave en plan. Kontakt os, så sætter vi et op.",
+    "needsWorkspaceCta": "Kontakt os"
   },
   "rfq": {
     "org": "Virksomhed",

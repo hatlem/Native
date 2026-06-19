@@ -48,6 +48,12 @@ export default async function PlanPage({
       })
     : null;
   const needsClient = !!ws?.isAgency && !ws.activeOrgId;
+  // requireActiveOrg() bounces ANY "Add to plan" with no active org back here
+  // as ?error=client — not just agencies. A buyer always has a home org, so a
+  // missing org means an internal/unprovisioned account (desk, publisher,
+  // writer, superadmin) that wandered into the buyer flow. Both cases need an
+  // actionable empty state instead of a bare error banner with no way forward.
+  const needsWorkspace = !ws?.activeOrgId;
 
   // Rehydrate the brief from the cookie submitRequest stashed before
   // the onboarding gate detour. Empty strings on the fresh path —
@@ -300,7 +306,15 @@ export default async function PlanPage({
         <p className="lead">{t("lead")}</p>
       </header>
 
-      <PlanBanners locale={locale} error={sp.error} duplicate={sp.duplicate} />
+      {/* When we render the tailored no-workspace empty state below, it IS the
+          explanation — suppress the generic (and, for non-agencies, misleading
+          "pick a client") error banner so the two don't fight. Other errors,
+          which only occur once an org is active, still surface normally. */}
+      <PlanBanners
+        locale={locale}
+        error={needsWorkspace ? undefined : sp.error}
+        duplicate={sp.duplicate}
+      />
 
       {lists.length > 0 ? (
         <PlanListBar
@@ -311,17 +325,28 @@ export default async function PlanPage({
         />
       ) : null}
 
-      {needsClient ? (
-        // Agency with no client selected: don't drop them into the recommender
-        // (every "Add" would loop back here via requireActiveOrg) — give an
-        // actionable path to choose a client first.
-        <div className="empty-state">
-          <h2>{t("needsClientTitle")}</h2>
-          <p className="muted">{t("needsClientBody")}</p>
-          <Link href="/agency" className="btn">
-            {t("needsClientCta")}
-          </Link>
-        </div>
+      {needsWorkspace ? (
+        // No active org → requireActiveOrg bounced an "Add to plan" here.
+        // Never drop them into the recommender (every "Add" would loop back) —
+        // give an actionable path. Agencies pick/create a client; everyone
+        // else has no buyer workspace at all and needs to get set up.
+        needsClient ? (
+          <div className="empty-state">
+            <h2>{t("needsClientTitle")}</h2>
+            <p className="muted">{t("needsClientBody")}</p>
+            <Link href="/agency" className="btn">
+              {t("needsClientCta")}
+            </Link>
+          </div>
+        ) : (
+          <div className="empty-state">
+            <h2>{t("needsWorkspaceTitle")}</h2>
+            <p className="muted">{t("needsWorkspaceBody")}</p>
+            <Link href="/contact" className="btn">
+              {t("needsWorkspaceCta")}
+            </Link>
+          </div>
+        )
       ) : lines.length === 0 && titleLines.length === 0 ? (
         <PlanStart
           locale={locale}
