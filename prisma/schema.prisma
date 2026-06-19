@@ -467,6 +467,7 @@ model Title {
   rateCardDocuments RateCardDocument[]
   bookings          PublisherBooking[]
   savedListItems    SavedListItem[]
+  favorites         Favorite[]
 
   @@index([countryCode])
   @@index([type])
@@ -678,6 +679,7 @@ model Organization {
   memberships Membership[]
   invites     OrgInvite[]
   savedLists  SavedList[]
+  favoriteLists FavoriteList[]
 }
 
 model User {
@@ -708,6 +710,8 @@ model User {
   contactLogs            ContactLog[]       @relation("ContactLogAuthor")
   writerProfile          WriterProfile?
   metricsRequests        MetricsRequest[]   @relation("MetricsRequestCreator")
+  favorites              Favorite[]
+  favoriteLists          FavoriteList[]
 }
 
 // Super-admin emits these when activating a new publishing house in
@@ -1770,4 +1774,54 @@ model WriterInvite {
   createdAt       DateTime  @default(now())
 
   @@index([email])
+}
+
+// Favorites: a buyer's personal shortlist of publications (titles). Kept
+// entirely separate from the org-scoped SavedList/RFQ model — titles-only,
+// per-user, no money or quote semantics. A FavoriteList can be opt-in shared
+// with the owner's org (read-only for teammates).
+model Favorite {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  titleId   String
+  title     Title    @relation(fields: [titleId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+
+  listItems FavoriteListItem[]
+
+  @@unique([userId, titleId])
+  @@index([userId, createdAt])
+}
+
+model FavoriteList {
+  id             String        @id @default(cuid())
+  userId         String
+  user           User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  organizationId String?
+  organization   Organization? @relation(fields: [organizationId], references: [id], onDelete: SetNull)
+  name           String        @default("Untitled list")
+  sharedWithOrg  Boolean       @default(false)
+  createdAt      DateTime      @default(now())
+  updatedAt      DateTime      @updatedAt
+
+  items FavoriteListItem[]
+
+  @@index([userId])
+  @@index([organizationId, sharedWithOrg])
+}
+
+// Membership references a Favorite (not a Title) so a list is always a subset
+// of the owner's hearted pool; un-hearting cascades it out of every list.
+model FavoriteListItem {
+  id         String       @id @default(cuid())
+  listId     String
+  list       FavoriteList @relation(fields: [listId], references: [id], onDelete: Cascade)
+  favoriteId String
+  favorite   Favorite     @relation(fields: [favoriteId], references: [id], onDelete: Cascade)
+  sortOrder  Int          @default(0)
+  createdAt  DateTime     @default(now())
+
+  @@unique([listId, favoriteId])
+  @@index([listId, sortOrder])
 }
