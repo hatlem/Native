@@ -41,7 +41,8 @@
     "playbooks": "Spillebøger",
     "writers": "Skribenter",
     "metricsNeedsContact": "Mangler tal",
-    "lists": "Gemte lister"
+    "lists": "Gemte lister",
+    "favorites": "Favoritter"
   },
   "reports": {
     "title": "Rapporter",
@@ -218,7 +219,7 @@
       "ctaBlockTitle": "Klar til at briefe os?",
       "ctaBlockBody": "Opret konto, fortæl os hvad du sælger og til hvem — vi vender tilbage inden for 24 timer med titlerne og formaterne, der passer."
     },
-    "savePublication": "Gem publikation"
+    "savePublication": "Tilføj til plan for pris"
   },
   "lists": {
     "title": "Gemte lister",
@@ -233,6 +234,31 @@
     "rename": "Omdøb",
     "duplicate": "Duplikér",
     "archive": "Arkivér"
+  },
+  "favorites": {
+    "title": "Favoritter",
+    "lead": "Publikationer, du har gemt. Åbn en for at føje et format til en plan.",
+    "add": "Føj til favoritter",
+    "remove": "Fjern fra favoritter",
+    "addToList": "Føj til en liste",
+    "noLists": "Ingen lister endnu.",
+    "newListPlaceholder": "Navn på ny liste",
+    "createList": "Opret liste",
+    "allHeading": "Alle favoritter",
+    "listsHeading": "Dine lister",
+    "sharedHeading": "Delt med dig",
+    "empty": "Ingen favoritter endnu. Gennemse kataloget og tryk på hjertet ved en publikation.",
+    "browseCta": "Gennemse kataloget",
+    "itemCount": "{count, plural, =0 {Ingen publikationer} =1 {1 publikation} other {# publikationer}}",
+    "share": "Del med mit team",
+    "unshare": "Stop med at dele",
+    "sharedBadge": "Delt",
+    "rename": "Omdøb",
+    "delete": "Slet liste",
+    "open": "Åbn",
+    "removeFromList": "Fjern",
+    "byOwner": "af {owner}",
+    "publishedBy": "{publisher} · {market}"
   },
   "titleDetail": {
     "back": "Tilbage til kataloget",
