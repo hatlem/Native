@@ -125,17 +125,16 @@ export default async function TitleDetailPage({
   if (!title.active && title.lastVerifiedAt) notFound();
 
   // Favorites: filled heart + the buyer's lists for the "add to list" menu.
-  const favUserId = session?.user?.id ?? null;
-  const favorited = favUserId
-    ? (await getFavoritedTitleIds(favUserId, [title.id])).has(title.id)
-    : false;
-  const favoriteLists = favUserId
-    ? await prisma.favoriteList.findMany({
-        where: { userId: favUserId },
-        orderBy: { updatedAt: "desc" },
-        select: { id: true, name: true },
-      })
-    : [];
+  // session.user is guaranteed — the guard above redirects guests.
+  const favUserId = session.user.id;
+  const favorited = (await getFavoritedTitleIds(favUserId, [title.id])).has(
+    title.id,
+  );
+  const favoriteLists = await prisma.favoriteList.findMany({
+    where: { userId: favUserId },
+    orderBy: { updatedAt: "desc" },
+    select: { id: true, name: true },
+  });
 
   const pricing = await loadPricingDefaults();
 

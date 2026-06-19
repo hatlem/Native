@@ -208,6 +208,15 @@ const PUBLICATION_SELECT = {
   },
 } as const;
 
+// A title deactivated AFTER being favorited would still sit in the pool and
+// link to a /catalog/[slug] that 404s (the detail page hides inactive titles).
+// Hide those favorites and exclude them from list counts, so what the buyer
+// sees — and the counts beside each list — stay consistent with the catalog.
+const ACTIVE_LIST_ITEM = { favorite: { title: { active: true } } } as const;
+const ACTIVE_ITEM_COUNT = {
+  select: { items: { where: ACTIVE_LIST_ITEM } },
+} as const;
+
 /** Everything the /favorites page needs: the flat pool, the user's own lists,
  *  and same-org lists teammates have shared. */
 export async function getFavoritesOverview(
@@ -216,14 +225,14 @@ export async function getFavoritesOverview(
 ): Promise<FavoritesOverview> {
   const [favRows, ownLists, sharedRows] = await Promise.all([
     prisma.favorite.findMany({
-      where: { userId },
+      where: { userId, title: { active: true } },
       orderBy: { createdAt: "desc" },
       select: PUBLICATION_SELECT,
     }),
     prisma.favoriteList.findMany({
       where: { userId },
       orderBy: { updatedAt: "desc" },
-      select: { id: true, name: true, sharedWithOrg: true, _count: { select: { items: true } } },
+      select: { id: true, name: true, sharedWithOrg: true, _count: ACTIVE_ITEM_COUNT },
     }),
     organizationId
       ? prisma.favoriteList.findMany({
@@ -233,7 +242,7 @@ export async function getFavoritesOverview(
             id: true,
             name: true,
             sharedWithOrg: true,
-            _count: { select: { items: true } },
+            _count: ACTIVE_ITEM_COUNT,
             user: { select: { name: true, email: true } },
           },
         })
@@ -263,6 +272,7 @@ export async function getFavoriteListDetail(
       userId: true,
       organizationId: true,
       items: {
+        where: ACTIVE_LIST_ITEM,
         orderBy: { sortOrder: "asc" },
         select: { favorite: { select: PUBLICATION_SELECT } },
       },

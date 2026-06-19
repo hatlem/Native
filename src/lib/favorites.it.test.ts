@@ -115,3 +115,37 @@ test("getFavoritedTitleIds returns only this user's hearts for the given titles"
   assert.ok(!ids.has(titleId2));
   await toggleFavorite(userId, titleId); // clean up
 });
+
+test("a favorite whose title is later deactivated is hidden from the overview", async () => {
+  const market = await prisma.market.findFirst();
+  const publisher = await prisma.publisher.findFirst();
+  const tmp = await prisma.title.create({
+    data: {
+      name: "Fav IT Temp Title",
+      slug: `fav-it-temp-${userId}`,
+      publisherId: publisher!.id,
+      countryCode: market!.code,
+      marketId: market!.id,
+      category: "business",
+      active: true,
+    },
+  });
+  try {
+    await toggleFavorite(userId, tmp.id);
+    const whileActive = await getFavoritesOverview(userId, orgId);
+    assert.ok(
+      whileActive.favorites.some((f) => f.titleId === tmp.id),
+      "shows while the title is active",
+    );
+
+    await prisma.title.update({ where: { id: tmp.id }, data: { active: false } });
+    const whenInactive = await getFavoritesOverview(userId, orgId);
+    assert.ok(
+      !whenInactive.favorites.some((f) => f.titleId === tmp.id),
+      "hidden once the title is deactivated",
+    );
+  } finally {
+    await prisma.favorite.deleteMany({ where: { userId, titleId: tmp.id } });
+    await prisma.title.delete({ where: { id: tmp.id } }).catch(() => {});
+  }
+});

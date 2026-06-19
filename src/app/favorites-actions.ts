@@ -41,7 +41,13 @@ export async function addFavoriteToList(formData: FormData) {
   const listId = str(formData, "listId");
   const scope = await requireUser(locale);
   if (titleId && listId) {
-    await addFavoriteToListLib(scope.userId!, titleId, listId).catch(() => {});
+    // The lib throws on a forged/foreign listId (requireOwnList). Swallow it so
+    // the action is a silent no-op rather than a 500/leak — but LOG it, so a
+    // genuine failure (DB error, etc.) is observable instead of vanishing. Same
+    // rationale for every list-mutation catch below.
+    await addFavoriteToListLib(scope.userId!, titleId, listId).catch((e) =>
+      console.error("favorites.add_to_list_failed", e),
+    );
   }
   revalidatePath(`/${locale}/catalog`, "page");
   revalidatePath(`/${locale}/favorites`, "page");
@@ -53,7 +59,9 @@ export async function removeFavoriteFromList(formData: FormData) {
   const favoriteId = str(formData, "favoriteId");
   const scope = await requireUser(locale);
   if (listId && favoriteId) {
-    await removeFavoriteFromListLib(scope.userId!, listId, favoriteId).catch(() => {});
+    await removeFavoriteFromListLib(scope.userId!, listId, favoriteId).catch((e) =>
+      console.error("favorites.remove_from_list_failed", e),
+    );
   }
   revalidatePath(`/${locale}/favorites`, "page");
 }
@@ -66,7 +74,9 @@ export async function createFavoriteList(formData: FormData) {
   const orgId = scope.workspace?.activeOrgId ?? null;
   const list = await createFavoriteListLib(scope.userId!, orgId, name || "Untitled list");
   if (titleId) {
-    await addFavoriteToListLib(scope.userId!, titleId, list.id).catch(() => {});
+    await addFavoriteToListLib(scope.userId!, titleId, list.id).catch((e) =>
+      console.error("favorites.create_list_add_failed", e),
+    );
   }
   revalidatePath(`/${locale}/catalog`, "page");
   revalidatePath(`/${locale}/favorites`, "page");
@@ -77,7 +87,10 @@ export async function renameFavoriteList(formData: FormData) {
   const listId = str(formData, "listId");
   const name = str(formData, "name");
   const scope = await requireUser(locale);
-  if (listId) await renameFavoriteListLib(scope.userId!, listId, name).catch(() => {});
+  if (listId)
+    await renameFavoriteListLib(scope.userId!, listId, name).catch((e) =>
+      console.error("favorites.rename_list_failed", e),
+    );
   revalidatePath(`/${locale}/favorites`, "page");
 }
 
@@ -85,7 +98,10 @@ export async function deleteFavoriteList(formData: FormData) {
   const locale = str(formData, "locale") || "en";
   const listId = str(formData, "listId");
   const scope = await requireUser(locale);
-  if (listId) await deleteFavoriteListLib(scope.userId!, listId).catch(() => {});
+  if (listId)
+    await deleteFavoriteListLib(scope.userId!, listId).catch((e) =>
+      console.error("favorites.delete_list_failed", e),
+    );
   redirect(`/${locale}/favorites`);
 }
 
@@ -94,6 +110,9 @@ export async function setFavoriteListShared(formData: FormData) {
   const listId = str(formData, "listId");
   const shared = str(formData, "shared") === "1";
   const scope = await requireUser(locale);
-  if (listId) await setFavoriteListSharedLib(scope.userId!, listId, shared).catch(() => {});
+  if (listId)
+    await setFavoriteListSharedLib(scope.userId!, listId, shared).catch((e) =>
+      console.error("favorites.set_shared_failed", e),
+    );
   revalidatePath(`/${locale}/favorites`, "page");
 }
