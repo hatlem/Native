@@ -2211,7 +2211,7 @@ select:disabled {
 
 .spec-list {
   display: grid;
-  grid-template-columns: max-content 1fr;
+  grid-template-columns: minmax(0, max-content) minmax(0, 1fr);
   column-gap: 12px;
   row-gap: 2px;
   margin: 6px 0 0 0;
@@ -2223,6 +2223,8 @@ select:disabled {
 .spec-list dd {
   margin: 0;
   color: var(--text);
+  min-width: 0;
+  overflow-wrap: anywhere;
 }
 
 .split {
@@ -3527,6 +3529,31 @@ select:disabled {
   position: relative;
   z-index: 2;
 }
+
+/* Favorites heart + add-to-list menu (catalog cards and the detail header). */
+.fav-btn { position: absolute; top: 12px; right: 12px; display: flex; gap: 2px; z-index: 2; }
+/* In compare mode the title-selector takes the corner — shift the heart left. */
+.title-selector ~ .fav-btn { right: 48px; }
+.fav-heart, .fav-caret {
+  background: var(--surface); border: 1px solid var(--border); border-radius: var(--r-sm);
+  width: 30px; height: 30px; cursor: pointer; line-height: 1; color: var(--muted); padding: 0;
+  display: inline-flex; align-items: center; justify-content: center; font-size: 1rem;
+}
+.fav-heart.is-on { color: #e0245e; border-color: #e0245e; }
+.fav-heart:disabled, .fav-caret:disabled { opacity: 0.6; cursor: default; }
+.fav-menu {
+  position: absolute; top: 36px; right: 0; width: 220px; background: var(--surface);
+  border: 1px solid var(--border); border-radius: var(--r-md); padding: 10px;
+  box-shadow: var(--shadow-md); z-index: 3;
+}
+.fav-menu-title { margin: 0 0 6px; font-weight: 600; font-size: 0.8rem; }
+.fav-menu ul { list-style: none; margin: 0 0 8px; padding: 0; max-height: 180px; overflow-y: auto; }
+.fav-menu li button { width: 100%; text-align: left; background: none; border: 0; padding: 6px 4px; cursor: pointer; border-radius: var(--r-sm); }
+.fav-menu li button:hover { background: var(--surface-2); }
+.fav-newlist { display: flex; gap: 4px; }
+.fav-newlist input { flex: 1; min-width: 0; }
+/* On the detail header the heart sits inline next to the H1, not floated. */
+.detail-head .fav-btn { position: static; }
 .title-selector {
   position: absolute;
   top: 12px;

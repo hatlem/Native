@@ -10,6 +10,7 @@ import { EmptyState } from "@/app/empty-state";
 import { localizeCategory } from "@/lib/taxonomy-i18n";
 import type { AppLocale } from "@/i18n/routing";
 import { CompareSelectionProvider, TitleSelector } from "./CompareSelection";
+import { FavoriteButton, type FavListOption } from "./FavoriteButton";
 
 export type CatalogTitleRow = Prisma.TitleGetPayload<{
   include: {
@@ -26,10 +27,14 @@ export async function CatalogResults({
   locale,
   titles,
   compareMode,
+  favoritedIds,
+  favoriteLists,
 }: {
   locale: string;
   titles: CatalogTitleRow[];
   compareMode: boolean;
+  favoritedIds: Set<string>;
+  favoriteLists: FavListOption[];
 }) {
   const t = await getTranslations({ locale, namespace: "catalog" });
   const tf = await getTranslations({ locale, namespace: "firm" });
@@ -74,6 +79,12 @@ export async function CatalogResults({
         return (
           <article className="card catalog-card" key={title.id}>
             <TitleSelector id={title.id} />
+            <FavoriteButton
+              locale={locale}
+              titleId={title.id}
+              initialFavorited={favoritedIds.has(title.id)}
+              lists={favoriteLists}
+            />
             <h3>
               <Link className="card-link" href={`/catalog/${title.slug}`}>
                 {title.name}

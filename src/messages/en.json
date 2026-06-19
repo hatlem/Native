@@ -41,7 +41,8 @@
     "playbooks": "Playbooks",
     "writers": "Writers",
     "metricsNeedsContact": "Metrics needed",
-    "lists": "Saved lists"
+    "lists": "Saved lists",
+    "favorites": "Favorites"
   },
   "orders": {
     "eyebrow": "Orders",
@@ -404,6 +405,31 @@
     "rename": "Rename",
     "duplicate": "Duplicate",
     "archive": "Archive"
+  },
+  "favorites": {
+    "title": "Favorites",
+    "lead": "Publications you've saved. Open one to add a format to a plan.",
+    "add": "Add to favorites",
+    "remove": "Remove from favorites",
+    "addToList": "Add to a list",
+    "noLists": "No lists yet.",
+    "newListPlaceholder": "New list name",
+    "createList": "Create list",
+    "allHeading": "All favorites",
+    "listsHeading": "Your lists",
+    "sharedHeading": "Shared with you",
+    "empty": "No favorites yet. Browse the catalog and tap the heart on a publication.",
+    "browseCta": "Browse the catalog",
+    "itemCount": "{count, plural, =0 {No publications} =1 {1 publication} other {# publications}}",
+    "share": "Share with my team",
+    "unshare": "Stop sharing",
+    "sharedBadge": "Shared",
+    "rename": "Rename",
+    "delete": "Delete list",
+    "open": "Open",
+    "removeFromList": "Remove",
+    "byOwner": "by {owner}",
+    "publishedBy": "{publisher} · {market}"
   },
   "plan": {
     "eyebrow": "Plan",
