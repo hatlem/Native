@@ -7,6 +7,7 @@ import {
   toggleFavorite as toggleFavoriteLib,
   addFavoriteToList as addFavoriteToListLib,
   removeFavoriteFromList as removeFavoriteFromListLib,
+  removeFavoriteFromListByTitle as removeFavoriteFromListByTitleLib,
   createFavoriteList as createFavoriteListLib,
   renameFavoriteList as renameFavoriteListLib,
   deleteFavoriteList as deleteFavoriteListLib,
@@ -48,6 +49,26 @@ export async function addFavoriteToList(formData: FormData) {
     await addFavoriteToListLib(scope.userId!, titleId, listId).catch((e) =>
       console.error("favorites.add_to_list_failed", e),
     );
+  }
+  revalidatePath(`/${locale}/catalog`, "page");
+  revalidatePath(`/${locale}/favorites`, "page");
+}
+
+// Toggle a publication's membership in one list, addressed by titleId (the card
+// checklist knows the title + the desired state). member="1" adds (creating the
+// heart if needed), member="0" removes from that list while keeping the heart.
+// Lets a buyer put the same publication in several lists from the card.
+export async function setFavoriteListMembership(formData: FormData) {
+  const locale = str(formData, "locale") || "en";
+  const titleId = str(formData, "titleId");
+  const listId = str(formData, "listId");
+  const member = str(formData, "member") === "1";
+  const scope = await requireUser(locale);
+  if (titleId && listId) {
+    const op = member
+      ? addFavoriteToListLib(scope.userId!, titleId, listId)
+      : removeFavoriteFromListByTitleLib(scope.userId!, titleId, listId);
+    await op.catch((e) => console.error("favorites.set_membership_failed", e));
   }
   revalidatePath(`/${locale}/catalog`, "page");
   revalidatePath(`/${locale}/favorites`, "page");

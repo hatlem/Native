@@ -102,6 +102,23 @@ export async function removeFavoriteFromList(
   await prisma.favoriteListItem.deleteMany({ where: { listId, favoriteId } });
 }
 
+/** Remove a title from one of the user's lists, addressed by titleId (the card
+ *  knows the title, not the favorite row). Keeps the heart. No-op if the title
+ *  isn't favorited. Verifies list ownership. */
+export async function removeFavoriteFromListByTitle(
+  userId: string,
+  titleId: string,
+  listId: string,
+): Promise<void> {
+  await requireOwnList(userId, listId);
+  const fav = await prisma.favorite.findUnique({
+    where: { userId_titleId: { userId, titleId } },
+    select: { id: true },
+  });
+  if (!fav) return;
+  await prisma.favoriteListItem.deleteMany({ where: { listId, favoriteId: fav.id } });
+}
+
 export async function createFavoriteList(
   userId: string,
   organizationId: string | null,
@@ -157,6 +174,29 @@ export async function getFavoritedTitleIds(
     select: { titleId: true },
   });
   return new Set(rows.map((r) => r.titleId));
+}
+
+/** For each of the given titles, which of the user's lists already contain it —
+ *  drives the checked state of the card's "add to list" checklist so a buyer can
+ *  see (and toggle) membership across several lists at once. Returns a plain
+ *  object (titleId → listId[]) so it serializes across the server/client boundary. */
+export async function getListMembershipForTitles(
+  userId: string,
+  titleIds: string[],
+): Promise<Record<string, string[]>> {
+  if (titleIds.length === 0) return {};
+  const rows = await prisma.favoriteListItem.findMany({
+    where: {
+      list: { userId },
+      favorite: { userId, titleId: { in: titleIds } },
+    },
+    select: { listId: true, favorite: { select: { titleId: true } } },
+  });
+  const map: Record<string, string[]> = {};
+  for (const r of rows) {
+    (map[r.favorite.titleId] ??= []).push(r.listId);
+  }
+  return map;
 }
 
 function toListSummary(l: {

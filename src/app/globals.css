@@ -3548,8 +3548,10 @@ select:disabled {
 }
 .fav-menu-title { margin: 0 0 6px; font-weight: 600; font-size: 0.8rem; }
 .fav-menu ul { list-style: none; margin: 0 0 8px; padding: 0; max-height: 180px; overflow-y: auto; }
-.fav-menu li button { width: 100%; text-align: left; background: none; border: 0; padding: 6px 4px; cursor: pointer; border-radius: var(--r-sm); }
+.fav-menu li button { width: 100%; text-align: left; background: none; border: 0; padding: 6px 4px; cursor: pointer; border-radius: var(--r-sm); display: flex; align-items: center; gap: 6px; }
 .fav-menu li button:hover { background: var(--surface-2); }
+.fav-menu li button.is-checked { font-weight: 600; }
+.fav-check { display: inline-block; width: 1em; flex: none; text-align: center; color: #e0245e; }
 .fav-newlist { display: flex; gap: 4px; }
 .fav-newlist input { flex: 1; min-width: 0; }
 /* On the detail header the heart sits inline next to the H1, not floated. */
