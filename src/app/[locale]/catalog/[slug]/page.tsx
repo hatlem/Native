@@ -3,6 +3,8 @@ import { headers } from "next/headers";
 import { notFound, redirect } from "next/navigation";
 import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
+import { getFavoritedTitleIds } from "@/lib/favorites";
+import { FavoriteButton } from "../_components/FavoriteButton";
 import { Link } from "@/i18n/navigation";
 import { intlLocale } from "@/lib/money";
 import { isProductPriceShown, arePricesVisible } from "@/lib/pricing/visibility";
@@ -122,6 +124,19 @@ export default async function TitleDetailPage({
   if (title.discontinuedAt) notFound();
   if (!title.active && title.lastVerifiedAt) notFound();
 
+  // Favorites: filled heart + the buyer's lists for the "add to list" menu.
+  const favUserId = session?.user?.id ?? null;
+  const favorited = favUserId
+    ? (await getFavoritedTitleIds(favUserId, [title.id])).has(title.id)
+    : false;
+  const favoriteLists = favUserId
+    ? await prisma.favoriteList.findMany({
+        where: { userId: favUserId },
+        orderBy: { updatedAt: "desc" },
+        select: { id: true, name: true },
+      })
+    : [];
+
   const pricing = await loadPricingDefaults();
 
   // Title-level visibility gate (pricesPublic flags only) — used for
@@ -189,7 +204,15 @@ export default async function TitleDetailPage({
           rows with data render. */}
       <div className="detail-head">
         <div>
-          <h1>{title.name}</h1>
+          <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+            <h1 style={{ margin: 0 }}>{title.name}</h1>
+            <FavoriteButton
+              locale={locale}
+              titleId={title.id}
+              initialFavorited={favorited}
+              lists={favoriteLists}
+            />
+          </div>
           <p className="muted">
             {t("publishedBy")}{" "}
             {/* Media-house drill-down: every title from the same publisher
