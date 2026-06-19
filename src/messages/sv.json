@@ -378,7 +378,10 @@
     "lineUnavailable": "Inte längre tillgänglig – ta bort för att fortsätta",
     "needsClientTitle": "Välj en kund för att starta en plan",
     "needsClientBody": "Som byrå bygger du planer åt en kund. Välj en för att fortsätta.",
-    "needsClientCta": "Välj kund"
+    "needsClientCta": "Välj kund",
+    "needsWorkspaceTitle": "Ingen arbetsyta att skapa en plan i",
+    "needsWorkspaceBody": "Det här kontot har ännu ingen köpararbetsyta, så det går inte att skapa en plan. Hör av dig så ordnar vi en.",
+    "needsWorkspaceCta": "Kontakta oss"
   },
   "rfq": {
     "org": "Företag",

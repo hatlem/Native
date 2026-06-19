@@ -378,7 +378,10 @@
     "lineUnavailable": "Ikke lenger tilgjengelig – fjern for å fortsette",
     "needsClientTitle": "Velg en kunde for å starte en plan",
     "needsClientBody": "Som byrå bygger du planer på vegne av en kunde. Velg én for å fortsette.",
-    "needsClientCta": "Velg kunde"
+    "needsClientCta": "Velg kunde",
+    "needsWorkspaceTitle": "Ingen arbeidsflate å lage en plan i",
+    "needsWorkspaceBody": "Denne kontoen har ikke en kjøperarbeidsflate ennå, så den kan ikke lage en plan. Ta kontakt, så setter vi opp en.",
+    "needsWorkspaceCta": "Kontakt oss"
   },
   "rfq": {
     "org": "Selskap",

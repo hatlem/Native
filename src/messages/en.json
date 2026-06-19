@@ -457,7 +457,10 @@
     "lineUnavailable": "No longer available — remove to continue",
     "needsClientTitle": "Pick a client to start a plan",
     "needsClientBody": "As an agency you build plans on behalf of a client. Choose one to continue.",
-    "needsClientCta": "Choose a client"
+    "needsClientCta": "Choose a client",
+    "needsWorkspaceTitle": "No workspace to build a plan in",
+    "needsWorkspaceBody": "This account isn't set up with a buyer workspace yet, so it can't build a plan. Get in touch and we'll set one up.",
+    "needsWorkspaceCta": "Contact us"
   },
   "rfq": {
     "org": "Company",

@@ -457,7 +457,10 @@
     "lineUnavailable": "Ei enää saatavilla – poista jatkaaksesi",
     "needsClientTitle": "Valitse asiakas aloittaaksesi suunnitelman",
     "needsClientBody": "Toimistona rakennat suunnitelmia asiakkaan puolesta. Valitse asiakas jatkaaksesi.",
-    "needsClientCta": "Valitse asiakas"
+    "needsClientCta": "Valitse asiakas",
+    "needsWorkspaceTitle": "Ei työtilaa suunnitelman tekemiseen",
+    "needsWorkspaceBody": "Tälle tilille ei ole vielä määritetty ostajan työtilaa, joten suunnitelmaa ei voi tehdä. Ota yhteyttä, niin luomme sellaisen.",
+    "needsWorkspaceCta": "Ota yhteyttä"
   },
   "rfq": {
     "org": "Yritys",
