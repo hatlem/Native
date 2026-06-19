@@ -11,6 +11,7 @@
   /* Surfaces & lines (light) */
   --bg: #f6f6f4;
   --surface: #ffffff;
+  --fav-accent: #e0245e;
   --surface-2: #fbfbf8;
   --surface-3: #f1f1ed;
   --border: #e6e4dd;
@@ -96,6 +97,7 @@
   :root:not([data-theme="light"]) {
     --bg: #0c0d10;
     --surface: #15171b;
+    --fav-accent: #ff4d7d;
     --surface-2: #1a1c21;
     --surface-3: #20232a;
     --border: #2a2d34;
@@ -135,6 +137,7 @@
   color-scheme: dark;
   --bg: #0c0d10;
   --surface: #15171b;
+  --fav-accent: #ff4d7d;
   --surface-2: #1a1c21;
   --surface-3: #20232a;
   --border: #2a2d34;
@@ -3539,7 +3542,7 @@ select:disabled {
   width: 30px; height: 30px; cursor: pointer; line-height: 1; color: var(--muted); padding: 0;
   display: inline-flex; align-items: center; justify-content: center; font-size: 1rem;
 }
-.fav-heart.is-on { color: #e0245e; border-color: #e0245e; }
+.fav-heart.is-on { color: var(--fav-accent); border-color: var(--fav-accent); }
 .fav-heart:disabled, .fav-caret:disabled { opacity: 0.6; cursor: default; }
 .fav-menu {
   position: absolute; top: 36px; right: 0; width: 220px; background: var(--surface);
@@ -3548,14 +3551,15 @@ select:disabled {
 }
 .fav-menu-title { margin: 0 0 6px; font-weight: 600; font-size: 0.8rem; }
 .fav-menu ul { list-style: none; margin: 0 0 8px; padding: 0; max-height: 180px; overflow-y: auto; }
-.fav-menu li button { width: 100%; text-align: left; background: none; border: 0; padding: 6px 4px; cursor: pointer; border-radius: var(--r-sm); display: flex; align-items: center; gap: 6px; }
-.fav-menu li button:hover { background: var(--surface-2); }
-.fav-menu li button.is-checked { font-weight: 600; }
-.fav-check { display: inline-block; width: 1em; flex: none; text-align: center; color: #e0245e; }
+.fav-list-opt { display: flex; align-items: center; gap: 8px; width: 100%; padding: 6px 4px; cursor: pointer; border-radius: var(--r-sm); }
+.fav-list-opt:hover { background: var(--surface-2); }
+.fav-list-opt.is-checked { font-weight: 600; }
+.fav-list-opt input { accent-color: var(--fav-accent); flex: none; }
 .fav-newlist { display: flex; gap: 4px; }
 .fav-newlist input { flex: 1; min-width: 0; }
-/* On the detail header the heart sits inline next to the H1, not floated. */
-.detail-head .fav-btn { position: static; }
+/* On the detail header the heart sits inline beside the H1 (not floated to the
+   card corner), but it still needs a positioning context for its popover. */
+.detail-head .fav-btn { position: relative; }
 .title-selector {
   position: absolute;
   top: 12px;

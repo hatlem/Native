@@ -21,13 +21,18 @@ export default async function FavoritesPage({
   const session = await auth();
   if (!session?.user) redirect(`/${locale}/signin?next=/${locale}/favorites`);
   const scope = await loadScope();
-  const orgId = scope.workspace?.activeOrgId ?? null;
+  // Sharing/visibility is keyed off the user's own team (home org), not the
+  // selected client — see the agency-scope fix in favorites-actions.ts.
+  const orgId = scope.workspace?.homeOrgId ?? null;
   const userId = scope.userId!;
 
   const listParam = typeof sp.list === "string" ? sp.list : undefined;
   const openList = listParam
     ? await getFavoriteListDetail(userId, orgId, listParam)
     : null;
+  // The param pointed at a list the viewer can't see (deleted, or no longer
+  // shared) — tell them rather than silently dropping to the overview.
+  const listUnavailable = !!listParam && !openList;
 
   const overview = await getFavoritesOverview(userId, orgId);
 
@@ -43,6 +48,7 @@ export default async function FavoritesPage({
         lists={overview.lists}
         sharedLists={overview.sharedLists}
         openList={openList}
+        listUnavailable={listUnavailable}
       />
     </>
   );

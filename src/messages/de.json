@@ -42,7 +42,9 @@
     "writers": "Autoren",
     "metricsNeedsContact": "Kennzahlen fehlen",
     "lists": "Gespeicherte Listen",
-    "favorites": "Favoriten"
+    "favorites": "Favoriten",
+    "listsDesc": "Planlisten, die Sie zur Preisbildung an das Desk senden",
+    "favoritesDesc": "Ihre persönlichen Publikations-Listen"
   },
   "orders": {
     "eyebrow": "Bestellungen",
@@ -337,7 +339,11 @@
     "open": "Öffnen",
     "removeFromList": "Entfernen",
     "byOwner": "von {owner}",
-    "publishedBy": "{publisher} · {market}"
+    "publishedBy": "{publisher} · {market}",
+    "sharedByReadOnly": "Geteilt von {owner} · schreibgeschützt",
+    "confirmDelete": "Bestätigen",
+    "cancelDelete": "Abbrechen",
+    "listUnavailable": "Diese Liste ist nicht mehr verfügbar."
   },
   "titleDetail": {
     "back": "Zurück zum Katalog",

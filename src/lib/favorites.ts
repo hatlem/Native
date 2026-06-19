@@ -15,6 +15,8 @@ export type FavoriteListSummary = {
   sharedWithOrg: boolean;
   itemCount: number;
   ownerName: string | null;
+  // The owner's home org this list shares within; null = not shareable yet.
+  organizationId: string | null;
 };
 
 export type FavoritesOverview = {
@@ -28,6 +30,7 @@ export type FavoriteListDetail = {
   name: string;
   sharedWithOrg: boolean;
   isOwner: boolean;
+  ownerName: string | null;
   items: FavoritePublication[];
 };
 
@@ -156,6 +159,15 @@ export async function setFavoriteListShared(
   shared: boolean,
 ): Promise<void> {
   await requireOwnList(userId, listId);
+  if (shared) {
+    // Can't share a list with no home org to share within (no-org owner). No-op
+    // rather than a "Shared" badge that nobody can actually see.
+    const list = await prisma.favoriteList.findUnique({
+      where: { id: listId },
+      select: { organizationId: true },
+    });
+    if (!list?.organizationId) return;
+  }
   await prisma.favoriteList.update({
     where: { id: listId },
     data: { sharedWithOrg: shared },
@@ -170,7 +182,9 @@ export async function getFavoritedTitleIds(
 ): Promise<Set<string>> {
   if (titleIds.length === 0) return new Set();
   const rows = await prisma.favorite.findMany({
-    where: { userId, titleId: { in: titleIds } },
+    // Callers pass active titles today; the title.active guard is cheap
+    // insurance against a future caller surfacing hearts for 404-ing titles.
+    where: { userId, titleId: { in: titleIds }, title: { active: true } },
     select: { titleId: true },
   });
   return new Set(rows.map((r) => r.titleId));
@@ -188,7 +202,7 @@ export async function getListMembershipForTitles(
   const rows = await prisma.favoriteListItem.findMany({
     where: {
       list: { userId },
-      favorite: { userId, titleId: { in: titleIds } },
+      favorite: { userId, titleId: { in: titleIds }, title: { active: true } },
     },
     select: { listId: true, favorite: { select: { titleId: true } } },
   });
@@ -203,6 +217,7 @@ function toListSummary(l: {
   id: string;
   name: string;
   sharedWithOrg: boolean;
+  organizationId: string | null;
   _count: { items: number };
   user?: { name: string | null; email: string } | null;
 }): FavoriteListSummary {
@@ -212,6 +227,7 @@ function toListSummary(l: {
     sharedWithOrg: l.sharedWithOrg,
     itemCount: l._count.items,
     ownerName: l.user ? (l.user.name ?? l.user.email) : null,
+    organizationId: l.organizationId,
   };
 }
 
@@ -272,7 +288,7 @@ export async function getFavoritesOverview(
     prisma.favoriteList.findMany({
       where: { userId },
       orderBy: { updatedAt: "desc" },
-      select: { id: true, name: true, sharedWithOrg: true, _count: ACTIVE_ITEM_COUNT },
+      select: { id: true, name: true, sharedWithOrg: true, organizationId: true, _count: ACTIVE_ITEM_COUNT },
     }),
     organizationId
       ? prisma.favoriteList.findMany({
@@ -282,6 +298,7 @@ export async function getFavoritesOverview(
             id: true,
             name: true,
             sharedWithOrg: true,
+            organizationId: true,
             _count: ACTIVE_ITEM_COUNT,
             user: { select: { name: true, email: true } },
           },
@@ -311,6 +328,7 @@ export async function getFavoriteListDetail(
       sharedWithOrg: true,
       userId: true,
       organizationId: true,
+      user: { select: { name: true, email: true } },
       items: {
         where: ACTIVE_LIST_ITEM,
         orderBy: { sortOrder: "asc" },
@@ -328,6 +346,7 @@ export async function getFavoriteListDetail(
     name: list.name,
     sharedWithOrg: list.sharedWithOrg,
     isOwner,
+    ownerName: list.user ? (list.user.name ?? list.user.email) : null,
     items: list.items.map((i) => toPublication(i.favorite)),
   };
 }

@@ -14,7 +14,7 @@ const base = (over: Partial<Scope>): Scope => ({
 });
 
 const ws = (over: Partial<NonNullable<Scope["workspace"]>>) => ({
-  userId: "u1", isAgency: false, agencyOrgId: null,
+  userId: "u1", isAgency: false, agencyOrgId: null, homeOrgId: "o1",
   activeOrgId: "o1", scopeOrgIds: ["o1"], activeRole: "MEMBER" as const, activeCanCommit: true,
   ...over,
 });

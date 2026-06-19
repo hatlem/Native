@@ -13,6 +13,11 @@ export type Workspace = {
   userId: string;
   isAgency: boolean;
   agencyOrgId: string | null;
+  // The user's OWN employer org (User.organization). For an agency this is the
+  // agency itself; for an advertiser, their own org; null for membership-only
+  // (no home org) users. Stable across client switching — use this, not
+  // activeOrgId, for "my team" scoping like favorites sharing.
+  homeOrgId: string | null;
   // The org buyer actions operate on. Advertiser = own org; agency =
   // the selected client (null until one is picked).
   activeOrgId: string | null;
@@ -94,6 +99,7 @@ export async function getWorkspace(
         userId,
         isAgency: false,
         agencyOrgId: null,
+        homeOrgId: null,
         activeOrgId,
         scopeOrgIds: membershipOrgIds,
         activeRole: active?.role ?? null,
@@ -114,6 +120,7 @@ export async function getWorkspace(
       userId,
       isAgency: false,
       agencyOrgId: null,
+      homeOrgId,
       activeOrgId,
       scopeOrgIds: Array.from(new Set([homeOrgId, ...membershipOrgIds])),
       activeRole: active?.role ?? null,
@@ -139,6 +146,7 @@ export async function getWorkspace(
     userId,
     isAgency: true,
     agencyOrgId: org.id,
+    homeOrgId: org.id,
     activeOrgId,
     scopeOrgIds: Array.from(new Set([org.id, ...clientIds, ...membershipOrgIds])),
     activeRole: active?.role ?? null,

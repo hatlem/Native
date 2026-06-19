@@ -42,7 +42,9 @@
     "writers": "Kirjoittajat",
     "metricsNeedsContact": "Mittarit puuttuvat",
     "lists": "Tallennetut listat",
-    "favorites": "Suosikit"
+    "favorites": "Suosikit",
+    "listsDesc": "Suunnitelmalistat, jotka lähetät tiskille hinnoittelua varten",
+    "favoritesDesc": "Henkilökohtaiset julkaisulistasi"
   },
   "orders": {
     "eyebrow": "Tilaukset",
@@ -337,7 +339,11 @@
     "open": "Avaa",
     "removeFromList": "Poista",
     "byOwner": "jakanut {owner}",
-    "publishedBy": "{publisher} · {market}"
+    "publishedBy": "{publisher} · {market}",
+    "sharedByReadOnly": "Jakanut {owner} · vain luku",
+    "confirmDelete": "Vahvista",
+    "cancelDelete": "Peruuta",
+    "listUnavailable": "Listaa ei ole enää saatavilla."
   },
   "titleDetail": {
     "back": "Takaisin katalogiin",

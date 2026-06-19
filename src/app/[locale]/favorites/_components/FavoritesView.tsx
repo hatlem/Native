@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useTranslations } from "next-intl";
 import { Link } from "@/i18n/navigation";
+import { EmptyState } from "@/app/empty-state";
 import {
   renameFavoriteList,
   deleteFavoriteList,
@@ -11,6 +12,7 @@ import {
   toggleFavorite,
   createFavoriteList,
 } from "@/app/favorites-actions";
+import { saveTitleToList } from "@/app/list-actions";
 import type {
   FavoritePublication,
   FavoriteListSummary,
@@ -25,18 +27,24 @@ const UL_RESET: React.CSSProperties = {
   gap: 8,
 };
 
+type RemoveMode = "list" | "heart" | null;
+
 function PubCard({
   locale,
   pub,
-  listId,
-  removeLabel,
   publishedBy,
+  addToPlanLabel,
+  removeMode,
+  removeLabel,
+  listId,
 }: {
   locale: string;
   pub: FavoritePublication;
-  listId?: string;
-  removeLabel: string;
   publishedBy: string;
+  addToPlanLabel: string;
+  removeMode: RemoveMode;
+  removeLabel?: string;
+  listId?: string;
 }) {
   return (
     <article className="card">
@@ -46,21 +54,28 @@ function PubCard({
         </Link>
       </h3>
       <div className="muted">{publishedBy}</div>
-      <div className="cluster" style={{ marginTop: 8, gap: 6 }}>
-        {listId ? (
+      <div className="cluster" style={{ marginTop: 8, gap: 6, flexWrap: "wrap" }}>
+        {/* A per-viewer buying action — adds the publication to the viewer's own
+            plan for desk pricing. Works even from a teammate's read-only list. */}
+        <form action={saveTitleToList}>
+          <input type="hidden" name="locale" value={locale} />
+          <input type="hidden" name="titleId" value={pub.titleId} />
+          <button type="submit" className="btn ghost small">{addToPlanLabel}</button>
+        </form>
+        {removeMode === "list" && listId ? (
           <form action={removeFavoriteFromList}>
             <input type="hidden" name="locale" value={locale} />
             <input type="hidden" name="listId" value={listId} />
             <input type="hidden" name="favoriteId" value={pub.favoriteId} />
             <button type="submit" className="btn ghost small">{removeLabel}</button>
           </form>
-        ) : (
+        ) : removeMode === "heart" ? (
           <form action={toggleFavorite}>
             <input type="hidden" name="locale" value={locale} />
             <input type="hidden" name="titleId" value={pub.titleId} />
             <button type="submit" className="btn ghost small">{removeLabel}</button>
           </form>
-        )}
+        ) : null}
       </div>
     </article>
   );
@@ -95,20 +110,61 @@ function RenameForm({
   );
 }
 
+function DeleteListForm({
+  locale,
+  listId,
+  label,
+  confirmLabel,
+  cancelLabel,
+}: {
+  locale: string;
+  listId: string;
+  label: string;
+  confirmLabel: string;
+  cancelLabel: string;
+}) {
+  const [confirming, setConfirming] = useState(false);
+  if (!confirming) {
+    return (
+      <button type="button" className="btn ghost small" onClick={() => setConfirming(true)}>
+        {label}
+      </button>
+    );
+  }
+  // Two-step: deleting a list (and its memberships) is irreversible, so make
+  // the second click deliberate — mirrors RenameForm's inline-edit pattern.
+  return (
+    <span className="cluster" style={{ gap: 4 }}>
+      <form action={deleteFavoriteList}>
+        <input type="hidden" name="locale" value={locale} />
+        <input type="hidden" name="listId" value={listId} />
+        <button type="submit" className="btn small danger">{confirmLabel}</button>
+      </form>
+      <button type="button" className="btn ghost small" onClick={() => setConfirming(false)}>
+        {cancelLabel}
+      </button>
+    </span>
+  );
+}
+
 export function FavoritesView({
   locale,
   favorites,
   lists,
   sharedLists,
   openList,
+  listUnavailable = false,
 }: {
   locale: string;
   favorites: FavoritePublication[];
   lists: FavoriteListSummary[];
   sharedLists: FavoriteListSummary[];
   openList: FavoriteListDetail | null;
+  listUnavailable?: boolean;
 }) {
   const t = useTranslations("favorites");
+  const tc = useTranslations("catalog");
+  const addToPlanLabel = tc("savePublication");
   const publishedBy = (pub: FavoritePublication) =>
     t("publishedBy", { publisher: pub.publisherName, market: pub.marketCode });
 
@@ -123,6 +179,11 @@ export function FavoritesView({
           {openList.name}
           {openList.sharedWithOrg ? ` · ${t("sharedBadge")}` : ""}
         </h1>
+        {!openList.isOwner ? (
+          <p className="note">
+            {t("sharedByReadOnly", { owner: openList.ownerName ?? "—" })}
+          </p>
+        ) : null}
         {openList.items.length === 0 ? (
           <p className="muted">{t("itemCount", { count: 0 })}</p>
         ) : (
@@ -132,9 +193,11 @@ export function FavoritesView({
                 key={pub.favoriteId}
                 locale={locale}
                 pub={pub}
-                listId={openList.isOwner ? openList.id : undefined}
-                removeLabel={t("removeFromList")}
                 publishedBy={publishedBy(pub)}
+                addToPlanLabel={addToPlanLabel}
+                removeMode={openList.isOwner ? "list" : null}
+                removeLabel={t("removeFromList")}
+                listId={openList.id}
               />
             ))}
           </div>
@@ -145,13 +208,23 @@ export function FavoritesView({
 
   return (
     <section style={{ display: "grid", gap: 28 }}>
+      {listUnavailable ? (
+        <div className="banner-info" role="status">
+          <span>{t("listUnavailable")}</span>
+        </div>
+      ) : null}
+
       <div>
-        <h2>{t("allHeading")}</h2>
+        <h2>
+          {t("allHeading")}
+          {favorites.length > 0 ? ` (${favorites.length})` : ""}
+        </h2>
         {favorites.length === 0 ? (
-          <div className="empty-state">
-            <p className="muted">{t("empty")}</p>
-            <Link href="/catalog" className="btn">{t("browseCta")}</Link>
-          </div>
+          <EmptyState
+            title={t("empty")}
+            primaryHref="/catalog"
+            primaryLabel={t("browseCta")}
+          />
         ) : (
           <div className="grid">
             {favorites.map((pub) => (
@@ -159,8 +232,10 @@ export function FavoritesView({
                 key={pub.favoriteId}
                 locale={locale}
                 pub={pub}
-                removeLabel={t("remove")}
                 publishedBy={publishedBy(pub)}
+                addToPlanLabel={addToPlanLabel}
+                removeMode="heart"
+                removeLabel={t("remove")}
               />
             ))}
           </div>
@@ -191,20 +266,26 @@ export function FavoritesView({
                   {l.sharedWithOrg ? ` · ${t("sharedBadge")}` : ""}
                 </Link>
                 <div className="cluster" style={{ gap: 6, flexWrap: "wrap" }}>
-                  <form action={setFavoriteListShared}>
-                    <input type="hidden" name="locale" value={locale} />
-                    <input type="hidden" name="listId" value={l.id} />
-                    <input type="hidden" name="shared" value={l.sharedWithOrg ? "0" : "1"} />
-                    <button type="submit" className="btn ghost small">
-                      {l.sharedWithOrg ? t("unshare") : t("share")}
-                    </button>
-                  </form>
+                  {/* Sharing needs a home org to share within; hide the toggle
+                      entirely for a no-org list rather than offer a dead no-op. */}
+                  {l.organizationId ? (
+                    <form action={setFavoriteListShared}>
+                      <input type="hidden" name="locale" value={locale} />
+                      <input type="hidden" name="listId" value={l.id} />
+                      <input type="hidden" name="shared" value={l.sharedWithOrg ? "0" : "1"} />
+                      <button type="submit" className="btn ghost small">
+                        {l.sharedWithOrg ? t("unshare") : t("share")}
+                      </button>
+                    </form>
+                  ) : null}
                   <RenameForm locale={locale} listId={l.id} current={l.name} label={t("rename")} />
-                  <form action={deleteFavoriteList}>
-                    <input type="hidden" name="locale" value={locale} />
-                    <input type="hidden" name="listId" value={l.id} />
-                    <button type="submit" className="btn ghost small">{t("delete")}</button>
-                  </form>
+                  <DeleteListForm
+                    locale={locale}
+                    listId={l.id}
+                    label={t("delete")}
+                    confirmLabel={t("confirmDelete")}
+                    cancelLabel={t("cancelDelete")}
+                  />
                 </div>
               </li>
             ))}
