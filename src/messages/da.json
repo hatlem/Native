@@ -42,7 +42,9 @@
     "writers": "Skribenter",
     "metricsNeedsContact": "Mangler tal",
     "lists": "Gemte lister",
-    "favorites": "Favoritter"
+    "favorites": "Favoritter",
+    "listsDesc": "Planlister du sender til desken til prissætning",
+    "favoritesDesc": "Dine personlige lister over publikationer"
   },
   "reports": {
     "title": "Rapporter",
@@ -258,7 +260,11 @@
     "open": "Åbn",
     "removeFromList": "Fjern",
     "byOwner": "af {owner}",
-    "publishedBy": "{publisher} · {market}"
+    "publishedBy": "{publisher} · {market}",
+    "sharedByReadOnly": "Delt af {owner} · skrivebeskyttet",
+    "confirmDelete": "Bekræft",
+    "cancelDelete": "Annuller",
+    "listUnavailable": "Den liste er ikke længere tilgængelig."
   },
   "titleDetail": {
     "back": "Tilbage til kataloget",

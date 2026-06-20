@@ -42,7 +42,9 @@
     "writers": "Skribenter",
     "metricsNeedsContact": "Saknar mätvärden",
     "lists": "Sparade listor",
-    "favorites": "Favoriter"
+    "favorites": "Favoriter",
+    "listsDesc": "Planlistor du skickar till desken för prissättning",
+    "favoritesDesc": "Dina personliga listor över publikationer"
   },
   "reports": {
     "title": "Rapporter",
@@ -258,7 +260,11 @@
     "open": "Öppna",
     "removeFromList": "Ta bort",
     "byOwner": "av {owner}",
-    "publishedBy": "{publisher} · {market}"
+    "publishedBy": "{publisher} · {market}",
+    "sharedByReadOnly": "Delad av {owner} · skrivskyddad",
+    "confirmDelete": "Bekräfta",
+    "cancelDelete": "Avbryt",
+    "listUnavailable": "Den listan är inte längre tillgänglig."
   },
   "titleDetail": {
     "back": "Tillbaka till katalogen",

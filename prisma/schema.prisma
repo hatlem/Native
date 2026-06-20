@@ -1824,4 +1824,7 @@ model FavoriteListItem {
 
   @@unique([listId, favoriteId])
   @@index([listId, sortOrder])
+  // favoriteId-led lookups: getListMembershipForTitles (runs every catalog
+  // render) and the active-item _count subqueries join on favoriteId.
+  @@index([favoriteId])
 }

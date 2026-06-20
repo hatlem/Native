@@ -42,7 +42,9 @@
     "writers": "Writers",
     "metricsNeedsContact": "Metrics needed",
     "lists": "Saved lists",
-    "favorites": "Favorites"
+    "favorites": "Favorites",
+    "listsDesc": "Plan lists you send to the desk for pricing",
+    "favoritesDesc": "Your personal shortlists of publications"
   },
   "orders": {
     "eyebrow": "Orders",
@@ -429,7 +431,11 @@
     "open": "Open",
     "removeFromList": "Remove",
     "byOwner": "by {owner}",
-    "publishedBy": "{publisher} · {market}"
+    "publishedBy": "{publisher} · {market}",
+    "sharedByReadOnly": "Shared by {owner} · read-only",
+    "confirmDelete": "Confirm",
+    "cancelDelete": "Cancel",
+    "listUnavailable": "That list is no longer available."
   },
   "plan": {
     "eyebrow": "Plan",

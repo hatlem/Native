@@ -42,7 +42,9 @@
     "writers": "Skribenter",
     "metricsNeedsContact": "Mangler tall",
     "lists": "Lagrede lister",
-    "favorites": "Favoritter"
+    "favorites": "Favoritter",
+    "listsDesc": "Planlister du sender til desken for prising",
+    "favoritesDesc": "Dine personlige lister over publikasjoner"
   },
   "reports": {
     "title": "Rapporter",
@@ -258,7 +260,11 @@
     "open": "Åpne",
     "removeFromList": "Fjern",
     "byOwner": "av {owner}",
-    "publishedBy": "{publisher} · {market}"
+    "publishedBy": "{publisher} · {market}",
+    "sharedByReadOnly": "Delt av {owner} · skrivebeskyttet",
+    "confirmDelete": "Bekreft",
+    "cancelDelete": "Avbryt",
+    "listUnavailable": "Den listen er ikke lenger tilgjengelig."
   },
   "titleDetail": {
     "back": "Tilbake til katalogen",

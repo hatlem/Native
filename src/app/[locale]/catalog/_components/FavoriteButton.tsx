@@ -21,7 +21,7 @@ export function FavoriteButton({
   titleId: string;
   initialFavorited: boolean;
   lists: FavListOption[];
-  /** Ids of the user's lists this title is already in — drives the checkmarks. */
+  /** Ids of the user's lists this title is already in — drives the checkboxes. */
   inListIds?: string[];
 }) {
   const t = useTranslations("favorites");
@@ -30,6 +30,8 @@ export function FavoriteButton({
   const [menuOpen, setMenuOpen] = useState(false);
   const [pending, startTransition] = useTransition();
   const wrapRef = useRef<HTMLDivElement>(null);
+  const caretRef = useRef<HTMLButtonElement>(null);
+  const menuRef = useRef<HTMLDivElement>(null);
 
   // Stable primitive key: the membership array's identity changes every render,
   // so depend on its joined value and rebuild the set from that inside the effect.
@@ -43,7 +45,7 @@ export function FavoriteButton({
     setInLists(new Set(inListKey ? inListKey.split(",") : []));
   }, [inListKey]);
 
-  // Close the menu on outside click.
+  // Close on outside click; move focus into the popover when it opens.
   useEffect(() => {
     if (!menuOpen) return;
     function onDocClick(e: MouseEvent) {
@@ -52,11 +54,21 @@ export function FavoriteButton({
       }
     }
     document.addEventListener("mousedown", onDocClick);
+    menuRef.current?.querySelector<HTMLElement>("input, button")?.focus();
     return () => document.removeEventListener("mousedown", onDocClick);
   }, [menuOpen]);
 
+  function closeMenu() {
+    setMenuOpen(false);
+    caretRef.current?.focus();
+  }
+
   function onToggle() {
-    setFavorited((v) => !v); // optimistic
+    const next = !favorited;
+    setFavorited(next);
+    // Un-hearting cascades the favorite out of every list server-side; mirror
+    // that optimistically so the checkboxes don't show stale memberships.
+    if (!next) setInLists(new Set());
     const fd = new FormData();
     fd.set("locale", locale);
     fd.set("titleId", titleId);
@@ -65,8 +77,8 @@ export function FavoriteButton({
     });
   }
 
-  // Toggle membership in ONE list. The menu stays open so several lists can be
-  // ticked in a row. Adding a list also lights the heart (it's now favorited).
+  // Toggle membership in ONE list. The popover stays open so several lists can
+  // be ticked in a row. Adding a list also lights the heart (it's now favorited).
   function onToggleList(listId: string) {
     const willBeMember = !inLists.has(listId);
     setInLists((prev) => {
@@ -92,12 +104,21 @@ export function FavoriteButton({
     setFavorited(true);
     startTransition(async () => {
       await createFavoriteList(formData);
-      // Keep the menu open; the new (checked) list arrives on revalidation.
+      // Keep the popover open; the new (checked) list arrives on revalidation.
     });
   }
 
   return (
-    <div className="fav-btn" ref={wrapRef}>
+    <div
+      className="fav-btn"
+      ref={wrapRef}
+      onKeyDown={(e) => {
+        if (e.key === "Escape" && menuOpen) {
+          e.stopPropagation();
+          closeMenu();
+        }
+      }}
+    >
       <button
         type="button"
         className={`fav-heart${favorited ? " is-on" : ""}`}
@@ -110,17 +131,18 @@ export function FavoriteButton({
         {favorited ? "♥" : "♡"}
       </button>
       <button
+        ref={caretRef}
         type="button"
         className="fav-caret"
         aria-label={t("addToList")}
-        aria-haspopup="menu"
+        aria-haspopup="true"
         aria-expanded={menuOpen}
         onClick={() => setMenuOpen((v) => !v)}
       >
         {"▾"}
       </button>
       {menuOpen ? (
-        <div className="fav-menu" role="menu">
+        <div className="fav-menu" role="group" aria-label={t("addToList")} ref={menuRef}>
           <p className="fav-menu-title">{t("addToList")}</p>
           {lists.length > 0 ? (
             <ul>
@@ -128,18 +150,14 @@ export function FavoriteButton({
                 const checked = inLists.has(l.id);
                 return (
                   <li key={l.id}>
-                    <button
-                      type="button"
-                      role="menuitemcheckbox"
-                      aria-checked={checked}
-                      className={checked ? "is-checked" : undefined}
-                      onClick={() => onToggleList(l.id)}
-                    >
-                      <span className="fav-check" aria-hidden="true">
-                        {checked ? "✓" : ""}
-                      </span>
-                      {l.name}
-                    </button>
+                    <label className={`fav-list-opt${checked ? " is-checked" : ""}`}>
+                      <input
+                        type="checkbox"
+                        checked={checked}
+                        onChange={() => onToggleList(l.id)}
+                      />
+                      <span>{l.name}</span>
+                    </label>
                   </li>
                 );
               })}

@@ -30,7 +30,10 @@ export async function toggleFavorite(formData: FormData) {
   const locale = str(formData, "locale") || "en";
   const titleId = str(formData, "titleId");
   const scope = await requireUser(locale);
-  if (titleId) await toggleFavoriteLib(scope.userId!, titleId);
+  if (titleId)
+    await toggleFavoriteLib(scope.userId!, titleId).catch((e) =>
+      console.error("favorites.toggle_failed", e),
+    );
   // Revalidate wherever a heart may render. `page` form keeps it cheap.
   revalidatePath(`/${locale}/catalog`, "page");
   revalidatePath(`/${locale}/favorites`, "page");
@@ -92,7 +95,9 @@ export async function createFavoriteList(formData: FormData) {
   const name = str(formData, "name");
   const titleId = str(formData, "titleId"); // optional: add this title on create
   const scope = await requireUser(locale);
-  const orgId = scope.workspace?.activeOrgId ?? null;
+  // Share scope is the user's OWN team (home org), never the volatile selected
+  // client — otherwise an agency user's list would land under the client org.
+  const orgId = scope.workspace?.homeOrgId ?? null;
   const list = await createFavoriteListLib(scope.userId!, orgId, name || "Untitled list");
   if (titleId) {
     await addFavoriteToListLib(scope.userId!, titleId, list.id).catch((e) =>
