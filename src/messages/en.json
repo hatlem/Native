@@ -492,7 +492,10 @@
     "needsClientCta": "Choose a client",
     "needsWorkspaceTitle": "No workspace to build a plan in",
     "needsWorkspaceBody": "This account isn't set up with a buyer workspace yet, so it can't build a plan. Get in touch and we'll set one up.",
-    "needsWorkspaceCta": "Contact us"
+    "needsWorkspaceCta": "Contact us",
+    "needsStaffTitle": "The plan builder is for advertiser accounts",
+    "needsStaffBody": "You're signed in as a staff account, which doesn't have an advertiser workspace. Head back to your console to keep working.",
+    "needsStaffCta": "Go to your console"
   },
   "rfq": {
     "org": "Company",

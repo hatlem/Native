@@ -413,7 +413,10 @@
     "needsClientCta": "Vælg kunde",
     "needsWorkspaceTitle": "Intet arbejdsområde at lave en plan i",
     "needsWorkspaceBody": "Denne konto er endnu ikke sat op med et købsarbejdsområde, så den kan ikke lave en plan. Kontakt os, så sætter vi et op.",
-    "needsWorkspaceCta": "Kontakt os"
+    "needsWorkspaceCta": "Kontakt os",
+    "needsStaffTitle": "Planlæggeren er for annoncørkonti",
+    "needsStaffBody": "Du er logget ind med en stab-/adminkonto, som ikke har et annoncørarbejdsområde. Gå tilbage til konsollen for at fortsætte.",
+    "needsStaffCta": "Gå til konsollen"
   },
   "rfq": {
     "org": "Virksomhed",

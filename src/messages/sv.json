@@ -413,7 +413,10 @@
     "needsClientCta": "Välj kund",
     "needsWorkspaceTitle": "Ingen arbetsyta att skapa en plan i",
     "needsWorkspaceBody": "Det här kontot har ännu ingen köpararbetsyta, så det går inte att skapa en plan. Hör av dig så ordnar vi en.",
-    "needsWorkspaceCta": "Kontakta oss"
+    "needsWorkspaceCta": "Kontakta oss",
+    "needsStaffTitle": "Planeraren är för annonsörskonton",
+    "needsStaffBody": "Du är inloggad med ett personal-/adminkonto, som inte har en annonsörsarbetsyta. Gå tillbaka till konsolen för att fortsätta.",
+    "needsStaffCta": "Gå till konsolen"
   },
   "rfq": {
     "org": "Företag",

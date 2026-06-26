@@ -492,7 +492,10 @@
     "needsClientCta": "Valitse asiakas",
     "needsWorkspaceTitle": "Ei työtilaa suunnitelman tekemiseen",
     "needsWorkspaceBody": "Tälle tilille ei ole vielä määritetty ostajan työtilaa, joten suunnitelmaa ei voi tehdä. Ota yhteyttä, niin luomme sellaisen.",
-    "needsWorkspaceCta": "Ota yhteyttä"
+    "needsWorkspaceCta": "Ota yhteyttä",
+    "needsStaffTitle": "Suunnittelutyökalu on mainostajatileille",
+    "needsStaffBody": "Olet kirjautunut henkilökunta-/admin-tilillä, jolla ei ole mainostajan työtilaa. Palaa konsoliin jatkaaksesi.",
+    "needsStaffCta": "Siirry konsoliin"
   },
   "rfq": {
     "org": "Yritys",

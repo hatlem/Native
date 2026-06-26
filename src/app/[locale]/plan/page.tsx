@@ -40,6 +40,17 @@ export default async function PlanPage({
 
   const session = await auth();
 
+  // A missing buyer workspace on /plan almost always means a staff/internal
+  // account (desk, superadmin, publisher, writer) wandered in — real buyers
+  // get an org + admin membership at signup. Tell those accounts the truth
+  // (this flow is for advertisers) and point them back to their console,
+  // instead of the misleading "we'll set one up" buyer-provisioning copy.
+  const role = session?.user?.role;
+  const isStaffAccount =
+    role === "DESK" || role === "SUPERADMIN" || role === "PUBLISHER" || role === "CONTENT";
+  const consoleHref =
+    role === "PUBLISHER" ? "/publisher" : role === "CONTENT" ? "/writer" : "/desk";
+
   const ws = await getWorkspace(session?.user?.id);
   const activeOrg = ws?.activeOrgId
     ? await prisma.organization.findUnique({
@@ -336,6 +347,14 @@ export default async function PlanPage({
             <p className="muted">{t("needsClientBody")}</p>
             <Link href="/agency" className="btn">
               {t("needsClientCta")}
+            </Link>
+          </div>
+        ) : isStaffAccount ? (
+          <div className="empty-state">
+            <h2>{t("needsStaffTitle")}</h2>
+            <p className="muted">{t("needsStaffBody")}</p>
+            <Link href={consoleHref} className="btn">
+              {t("needsStaffCta")}
             </Link>
           </div>
         ) : (
