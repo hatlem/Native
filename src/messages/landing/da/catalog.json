@@ -2,7 +2,7 @@
   "labelNum": "06 ·",
   "labelText": "Et udsnit af inventaret",
   "h2": "Otte titler fra det levende katalog. Indikativt, ikke en prisliste.",
-  "ask": "Få adgang til alle 240 →",
+  "ask": "Få adgang til alle {totalCount} →",
   "thTitle": "Titel",
   "thPublisher": "Udgiver",
   "thMarket": "Marked",

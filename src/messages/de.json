@@ -492,7 +492,10 @@
     "needsClientCta": "Kunde wählen",
     "needsWorkspaceTitle": "Kein Arbeitsbereich zum Erstellen eines Plans",
     "needsWorkspaceBody": "Dieses Konto ist noch nicht mit einem Käufer-Arbeitsbereich eingerichtet und kann daher keinen Plan erstellen. Kontaktieren Sie uns, dann richten wir einen ein.",
-    "needsWorkspaceCta": "Kontakt aufnehmen"
+    "needsWorkspaceCta": "Kontakt aufnehmen",
+    "needsStaffTitle": "Der Planer ist für Werbetreibenden-Konten",
+    "needsStaffBody": "Sie sind mit einem Mitarbeiter-/Admin-Konto angemeldet, das keinen Werbetreibenden-Arbeitsbereich hat. Kehren Sie zu Ihrer Konsole zurück, um weiterzuarbeiten.",
+    "needsStaffCta": "Zur Konsole"
   },
   "rfq": {
     "org": "Firma",

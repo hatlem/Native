@@ -413,7 +413,10 @@
     "needsClientCta": "Velg kunde",
     "needsWorkspaceTitle": "Ingen arbeidsflate å lage en plan i",
     "needsWorkspaceBody": "Denne kontoen har ikke en kjøperarbeidsflate ennå, så den kan ikke lage en plan. Ta kontakt, så setter vi opp en.",
-    "needsWorkspaceCta": "Kontakt oss"
+    "needsWorkspaceCta": "Kontakt oss",
+    "needsStaffTitle": "Planleggeren er for annonsørkontoer",
+    "needsStaffBody": "Du er logget inn med en stab-/adminkonto, som ikke har et annonsørarbeidsområde. Gå tilbake til konsollen for å fortsette.",
+    "needsStaffCta": "Gå til konsollen"
   },
   "rfq": {
     "org": "Selskap",
