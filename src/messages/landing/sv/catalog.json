@@ -2,7 +2,7 @@
   "labelNum": "06 ·",
   "labelText": "Ett urval ur inventeringen",
   "h2": "Åtta titlar hämtade från den levande katalogen. Indikativt, inte en prislista.",
-  "ask": "Få tillgång till alla 240 →",
+  "ask": "Få tillgång till alla {totalCount} →",
   "thTitle": "Titel",
   "thPublisher": "Förlag",
   "thMarket": "Marknad",

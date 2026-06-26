@@ -1193,7 +1193,7 @@ body:has(.bn) .drawer-link:hover { background: rgba(20,17,12,0.06) !important; }
 .foot-newsletter .copy{margin-bottom:10px}
 .newsletter-block{text-align:center}
 .newsletter-block .lead{margin-left:auto;margin-right:auto;max-width:560px}
-.newsletter-block .newsletter-form{justify-content:center}
+.newsletter-block .newsletter-form{justify-content:center;max-width:520px;margin:0 auto}
 .pub-strip{padding:28px 0;border-top:1px solid var(--line);border-bottom:1px solid var(--line)}
 .pub-strip-label{font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-mute);margin-bottom:14px}
 .pub-strip-row{display:flex;flex-wrap:wrap;gap:14px 22px;list-style:none;margin:0;padding:0;align-items:center}
@@ -1206,8 +1206,6 @@ body:has(.bn) .drawer-link:hover { background: rgba(20,17,12,0.06) !important; }
 
 /* ── Preview visuals (landing showcase mocks) — namespaced .bn ── */
 .bn { --bn-grain: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.4'/%3E%3C/svg%3E"); }
-
-.bn .hero-showcase { margin-top: clamp(28px, 3.4vw, 48px); }
 
 /* generic native-article frame */
 .bn .na-frame { background:#fff; border:1.5px solid var(--ink); border-radius:7px; overflow:hidden; box-shadow:0 18px 44px -26px rgba(20,17,12,.55); max-width:680px; }
@@ -1230,12 +1228,13 @@ body:has(.bn) .drawer-link:hover { background: rgba(20,17,12,0.06) !important; }
 .bn .na-cols i.f { width:42%; background:rgba(20,17,12,.2); }
 
 /* native vs display */
-.bn .vsd { display:grid; grid-template-columns:1fr 1fr; gap:22px; align-items:start; margin-bottom:clamp(20px,2.4vw,32px); }
+.bn .vsd { display:grid; grid-template-columns:1fr 1fr; gap:22px; align-items:stretch; margin-bottom:clamp(20px,2.4vw,32px); }
+.bn .vsd .vsd-col { display:flex; flex-direction:column; }
 .bn .vsd .vsd-label { font-size:11px; text-transform:uppercase; letter-spacing:.14em; font-weight:700; margin-bottom:11px; display:flex; align-items:center; gap:8px; }
 .bn .vsd .vsd-tick { width:18px; height:18px; border-radius:50%; display:inline-flex; align-items:center; justify-content:center; color:#fff; font-size:11px; line-height:1; }
 .bn .vsd .good .vsd-tick { background:var(--ok); }
 .bn .vsd .bad .vsd-tick { background:var(--NO); }
-.bn .vsd .mini { background:#fff; border:1.5px solid var(--ink); border-radius:5px; overflow:hidden; }
+.bn .vsd .mini { background:#fff; border:1.5px solid var(--ink); border-radius:5px; overflow:hidden; flex:1; }
 .bn .vsd .mini .mini-head { padding:9px 14px; border-bottom:2px solid #14110C; font-family:Georgia,serif; font-weight:700; font-size:14px; color:#14110C; }
 .bn .vsd .mini .mini-body { padding:12px 14px; position:relative; color:#14110C; }
 .bn .vsd .mini .mini-tag { font-size:8px; text-transform:uppercase; letter-spacing:.16em; font-weight:700; color:var(--ink-mute); border:1px solid var(--hair); padding:3px 7px; border-radius:2px; background:#f4f0e6; display:inline-block; }

@@ -1,6 +1,9 @@
 import type { ReactNode } from "react";
+import { redirect } from "next/navigation";
 import { getTranslations } from "next-intl/server";
 import { ProductType } from "@prisma/client";
+import { auth } from "@/auth";
+import { landingForRole } from "@/lib/roles";
 import { Link } from "@/i18n/navigation";
 import { prisma } from "@/lib/prisma";
 import { intlLocale } from "@/lib/money";
@@ -8,7 +11,6 @@ import { LandingShell } from "@/app/landing-shell";
 import { MailLink } from "@/components";
 import { NewsletterSignup } from "./_components/NewsletterSignup";
 import { PublisherStrip } from "./_components/PublisherStrip";
-import { HeroArticleMock } from "./_components/HeroArticleMock";
 import { NativeVsDisplay } from "./_components/NativeVsDisplay";
 import { GoldenRuleExcerpt } from "./_components/GoldenRuleExcerpt";
 import { BriefToQuote } from "./_components/BriefToQuote";
@@ -51,6 +53,17 @@ export default async function HomePage({
   params: Promise<{ locale: string }>;
 }) {
   const { locale } = await params;
+
+  // Signed-in users don't need the marketing pitch — send them straight to
+  // their actionable home (catalog for buyers/agencies, the console for
+  // desk/admin, the portal for publishers/writers) so they land on a page
+  // that tells them what to do next. Done before the catalog queries below
+  // so we don't run them for a session we're about to redirect.
+  const session = await auth();
+  if (session?.user) {
+    redirect(landingForRole(session.user.role, locale));
+  }
+
   const t = await getTranslations({ locale, namespace: "landing" });
 
   // Catalog reach: report the full catalogued size (3,000+ titles across
@@ -82,7 +95,11 @@ export default async function HomePage({
       },
     }),
     prisma.publisher.findMany({
-      where: { titles: { some: {} } },
+      // Universitetsforlaget is an academic press (~75 scholarly journals) that
+      // tops the showcase by raw title count but doesn't represent the native-ad
+      // publishers we want to feature. Keep its titles in the catalog — just
+      // exclude it from this landing strip.
+      where: { titles: { some: {} }, NOT: { name: { startsWith: "Universitetsforlaget" } } },
       include: {
         market: { select: { code: true } },
         titles: {
@@ -155,9 +172,6 @@ export default async function HomePage({
               </div>
               <p>{t("hero.sideBody")}</p>
             </aside>
-          </div>
-          <div className="hero-showcase">
-            <HeroArticleMock locale={locale} />
           </div>
         </div>
       </section>
@@ -309,7 +323,7 @@ export default async function HomePage({
               <h2>{t("catalog.h2")}</h2>
             </div>
             <a href="#request" className="ask">
-              {t("catalog.ask")}
+              {t("catalog.ask", { totalCount: totalTitles })}
             </a>
           </div>
 

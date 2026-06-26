@@ -2,7 +2,7 @@
   "labelNum": "06 ·",
   "labelText": "A sample of inventory",
   "h2": "Eight titles drawn from the live catalog. Indicative, not a price list.",
-  "ask": "Access the full 240 →",
+  "ask": "Access the full {totalCount} →",
   "thTitle": "Title",
   "thPublisher": "Publisher",
   "thMarket": "Market",

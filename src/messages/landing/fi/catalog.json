@@ -1,7 +1,7 @@
 {
   "labelText": "Otos varastosta",
   "h2": "Kahdeksan julkaisua poimittu live-katalogista. Suuntaa-antava, ei hinnasto.",
-  "ask": "Avaa koko 3 000+ →",
+  "ask": "Avaa koko {totalCount} →",
   "thTitle": "Julkaisu",
   "thPublisher": "Kustantaja",
   "thMarket": "Markkina",
