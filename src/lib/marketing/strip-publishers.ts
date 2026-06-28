@@ -2,11 +2,13 @@ import { prisma } from "@/lib/prisma";
 
 export type StripPublisher = { id: string; name: string; logoUrl: string | null };
 
-// Top publishers by title count — the same ordering the homepage grid uses,
-// surfaced as a slim logo/name strip. Real publishers only.
+// Top publishers by title count — the same ordering (and exclusions) the
+// homepage grid uses, surfaced as a slim logo/name strip. Real publishers
+// only; Universitetsforlaget (academic press) is kept out of the showcase
+// in both places.
 export async function getStripPublishers(limit = 10): Promise<StripPublisher[]> {
   const rows = await prisma.publisher.findMany({
-    where: { titles: { some: {} } },
+    where: { titles: { some: {} }, NOT: { name: { startsWith: "Universitetsforlaget" } } },
     select: {
       id: true,
       name: true,
