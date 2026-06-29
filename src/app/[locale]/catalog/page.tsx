@@ -223,26 +223,25 @@ export default async function CatalogPage({
   // is guaranteed here — the marketing splash returns above for guests.
   const userId = session.user.id;
   const titleIds = titles.map((tt) => tt.id);
-  const dismissedAt =
-    (
-      await prisma.user.findUnique({
-        where: { id: session.user.id },
+  const [favoritedIds, favoriteLists, listMembership, bookingUserRow] =
+    await Promise.all([
+      getFavoritedTitleIds(userId, titleIds),
+      prisma.favoriteList.findMany({
+        where: { userId },
+        orderBy: { updatedAt: "desc" },
+        select: { id: true, name: true },
+      }),
+      getListMembershipForTitles(userId, titleIds),
+      prisma.user.findUnique({
+        where: { id: userId },
         select: { bookingPromptDismissedAt: true },
-      })
-    )?.bookingPromptDismissedAt ?? null;
+      }),
+    ]);
+  const dismissedAt = bookingUserRow?.bookingPromptDismissedAt ?? null;
   const showBookingBanner = shouldShowBookingBanner({
     audience: audienceFor(session),
     dismissedAt,
   });
-  const [favoritedIds, favoriteLists, listMembership] = await Promise.all([
-    getFavoritedTitleIds(userId, titleIds),
-    prisma.favoriteList.findMany({
-      where: { userId },
-      orderBy: { updatedAt: "desc" },
-      select: { id: true, name: true },
-    }),
-    getListMembershipForTitles(userId, titleIds),
-  ]);
 
   const pageQuery = (p: number) => {
     const params = new URLSearchParams();

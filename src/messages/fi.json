@@ -306,7 +306,7 @@
     },
     "savePublication": "Lisää suunnitelmaan hintaa varten",
     "bookCallTitle": "Haluatko apua natiivin ostamiseen?",
-    "bookCallBody": "Varaa ilmainen 15 minuutin puhelu — tiimimme auttaa sinua suunnittelemaan, valitsemaan julkaisut ja sijoittamaan kampanjan.",
+    "bookCallBody": "Varaa ilmainen 15 minuutin puhelu — deskimme auttaa sinua suunnittelemaan, valitsemaan julkaisut ja sijoittamaan kampanjan.",
     "bookCallCta": "Varaa puhelu",
     "bookCallDismiss": "Sulje"
   },
@@ -2080,7 +2080,8 @@
     "submitting": "Tallennetaan…",
     "error": "Molemmat kentät ovat pakollisia.",
     "callHeading": "Vielä yksi asia — autamme sinua ostamaan natiivia",
-    "callBody": "Varaa ilmainen 15 minuutin puhelu, niin tiimimme auttaa sinua suunnittelemaan ja sijoittamaan ensimmäisen natiivikampanjasi.",
+    "callBody": "Varaa ilmainen 15 minuutin puhelu, niin deskimme auttaa sinua suunnittelemaan ja sijoittamaan ensimmäisen natiivikampanjasi.",
+    "callCta": "Varaa puhelu",
     "callSkip": "Ohita toistaiseksi →"
   },
   "account": {

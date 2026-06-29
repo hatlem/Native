@@ -25,7 +25,7 @@ export function GetTalkBooking({
   text,
 }: {
   mode: "inline" | "popup";
-  text?: string;
+  text: string;
 }) {
   const rawId = useId();
   const containerId = `gettalk-${rawId.replace(/[^a-zA-Z0-9_-]/g, "")}`;
@@ -54,7 +54,7 @@ export function GetTalkBooking({
     return (
       <div className="gettalk-booking">
         <MailLink to={DESK_EMAIL} className="btn primary">
-          {text ?? "Book a call"}
+          {text}
         </MailLink>
       </div>
     );
@@ -71,7 +71,7 @@ export function GetTalkBooking({
         target="_blank"
         rel="noreferrer"
       >
-        {text ?? "Book a call"}
+        {text}
       </a>
     </div>
   );

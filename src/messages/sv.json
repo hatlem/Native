@@ -2081,6 +2081,7 @@
     "error": "Båda fälten är obligatoriska.",
     "callHeading": "En sak till — låt oss hjälpa dig köpa native",
     "callBody": "Boka ett kostnadsfritt 15-minuterssamtal, så hjälper vårt desk dig att planera och placera din första native-kampanj.",
+    "callCta": "Boka ett samtal",
     "callSkip": "Hoppa över för nu →"
   },
   "account": {

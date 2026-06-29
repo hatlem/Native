@@ -40,7 +40,7 @@ export default async function OnboardingCallPage({
       <section className="onboarding-call wrap">
         <h1>{t("callHeading")}</h1>
         <p className="lead">{t("callBody")}</p>
-        <GetTalkBooking mode="inline" />
+        <GetTalkBooking mode="inline" text={t("callCta")} />
         <p>
           <a href={next}>{t("callSkip")}</a>
         </p>

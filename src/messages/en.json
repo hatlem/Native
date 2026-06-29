@@ -2096,6 +2096,7 @@
     "error": "Both fields are required.",
     "callHeading": "One last thing — let's help you buy native",
     "callBody": "Book a free 15-minute call and our desk will help you scope and place your first native campaign.",
+    "callCta": "Book a call",
     "callSkip": "Skip for now →"
   },
   "rateCard": {
