@@ -304,7 +304,11 @@
       "teaserLink": "Sign in to see every title and indicative pricing",
       "ctaBlockTitle": "Ready to brief us?",
       "ctaBlockBody": "Create an account, tell us what you're selling and to whom — we'll come back within 24 hours with the titles and formats that fit."
-    }
+    },
+    "bookCallTitle": "Want a hand buying native?",
+    "bookCallBody": "Book a free 15-minute call — our desk helps you scope, pick titles and place the campaign.",
+    "bookCallCta": "Book a call",
+    "bookCallDismiss": "Dismiss"
   },
   "titleDetail": {
     "back": "Back to catalog",
@@ -2089,7 +2093,10 @@
     "phoneHint": "Direct line for the desk. Not used for marketing.",
     "submit": "Complete setup",
     "submitting": "Saving…",
-    "error": "Both fields are required."
+    "error": "Both fields are required.",
+    "callHeading": "One last thing — let's help you buy native",
+    "callBody": "Book a free 15-minute call and our desk will help you scope and place your first native campaign.",
+    "callSkip": "Skip for now →"
   },
   "rateCard": {
     "pageTitle": "Rate card request",

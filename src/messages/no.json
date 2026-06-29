@@ -225,7 +225,11 @@
       "ctaBlockTitle": "Klar til å gi oss en brief?",
       "ctaBlockBody": "Opprett konto, fortell oss hva du selger og til hvem — vi kommer tilbake innen 24 timer med titlene og formatene som passer."
     },
-    "savePublication": "Legg i plan for pris"
+    "savePublication": "Legg i plan for pris",
+    "bookCallTitle": "Vil du ha hjelp til å kjøpe native?",
+    "bookCallBody": "Book en gratis 15-minutters samtale — desken hjelper deg å sette opp, velge titler og plassere kampanjen.",
+    "bookCallCta": "Book en samtale",
+    "bookCallDismiss": "Lukk"
   },
   "lists": {
     "title": "Lagrede lister",
@@ -2074,7 +2078,10 @@
     "phoneHint": "Direkte­linje til desken. Brukes ikke til markedsføring.",
     "submit": "Fullfør oppsett",
     "submitting": "Lagrer…",
-    "error": "Begge feltene er obligatoriske."
+    "error": "Begge feltene er obligatoriske.",
+    "callHeading": "Én siste ting — la oss hjelpe deg å kjøpe native",
+    "callBody": "Book en gratis 15-minutters samtale, så hjelper desken deg å sette opp og plassere din første native-kampanje.",
+    "callSkip": "Hopp over nå →"
   },
   "rateCard": {
     "pageTitle": "Rate card-forespørsel",
