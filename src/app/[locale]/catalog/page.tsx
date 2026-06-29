@@ -386,10 +386,27 @@ export default async function CatalogPage({
       href: filterHref("q"),
     });
 
+  // First-run nudge: a buyer who hasn't started a list yet, landing on a
+  // clean catalog (no search/filter), gets a 3-step "what to do next" guide.
+  // Returning/active buyers (any saved list, or any active query) don't see it.
+  const showStartGuide =
+    favoriteLists.length === 0 && !q && page === 1 && activeFilters.length === 0;
+
   return (
     <section>
       <h1>{t("title")}</h1>
       <p className="muted">{t("subtitle")}</p>
+
+      {showStartGuide ? (
+        <div className="catalog-start" role="note">
+          <strong>{t("startHeading")}</strong>
+          <ol>
+            <li>{t("startS1")}</li>
+            <li>{t("startS2")}</li>
+            <li>{t("startS3")}</li>
+          </ol>
+        </div>
+      ) : null}
 
       <CatalogFilters
         markets={MARKET_CODES.map((m) => ({ value: m, label: tMarket(m) }))}

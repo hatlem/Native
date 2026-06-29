@@ -199,6 +199,10 @@
       "next": "Næste",
       "page": "Side {page} af {total}"
     },
+    "startHeading": "Ny her? Sådan køber du",
+    "startS1": "Lav shortliste — sæt hjerte på de titler, der passer, i en gemt liste.",
+    "startS2": "Planlæg — åbn listen som en plan for at se vejledende totaler.",
+    "startS3": "Få tilbud — send den til vores desk for en fast pris inden for 24 timer.",
     "indicativeNote": "Priserne er vejledende. En fast pris bekræftes af vores indkøbsteam baseret på tilgængelighed, sæson og volumen.",
     "noResults": "Ingen titler matcher disse filtre.",
     "clearFilters": "Ryd filtre",

@@ -4288,3 +4288,28 @@ footer a:hover {
 .plan-start { max-width: 560px; }
 .plan-start-form { display: grid; gap: 12px; }
 .plan-start-results { margin-top: 20px; display: grid; gap: 16px; }
+
+/* First-run "how buying works" nudge on the catalog */
+.catalog-start {
+  margin: 16px 0 4px;
+  padding: 16px 18px;
+  border: 1px solid var(--line, #e3ddcd);
+  border-radius: 10px;
+  background: var(--surface-2, #faf7ef);
+}
+.catalog-start strong {
+  display: block;
+  font-size: 0.95rem;
+  margin-bottom: 8px;
+}
+.catalog-start ol {
+  margin: 0;
+  padding-left: 18px;
+  display: grid;
+  gap: 6px;
+}
+.catalog-start li {
+  font-size: 0.9rem;
+  color: var(--ink-mute, #5b5648);
+  line-height: 1.4;
+}
