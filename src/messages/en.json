@@ -279,6 +279,10 @@
       "next": "Next",
       "page": "Page {page} of {total}"
     },
+    "startHeading": "New here? How buying works",
+    "startS1": "Shortlist — heart the titles that fit into a saved list.",
+    "startS2": "Plan — open your list as a plan to see indicative totals.",
+    "startS3": "Quote — send it to our desk for a firm price within 24 hours.",
     "indicativeNote": "Prices are indicative. A firm price is confirmed by our buying desk based on availability, season and volume.",
     "noResults": "No titles match these filters.",
     "clearFilters": "Clear filters",

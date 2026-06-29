@@ -199,6 +199,10 @@
       "next": "Nästa",
       "page": "Sida {page} av {total}"
     },
+    "startHeading": "Ny här? Så köper du",
+    "startS1": "Gör kortlista — hjärta titlarna som passar, in i en sparad lista.",
+    "startS2": "Planera — öppna listan som en plan för att se vägledande totaler.",
+    "startS3": "Få offert — skicka den till vår desk för fast pris inom 24 timmar.",
     "indicativeNote": "Priserna är vägledande. Ett fast pris bekräftas av vårt inköpsteam baserat på tillgänglighet, säsong och volym.",
     "noResults": "Inga titlar matchar dessa filter.",
     "clearFilters": "Rensa filter",

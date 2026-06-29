@@ -278,6 +278,10 @@
       "next": "Weiter",
       "page": "Seite {page} von {total}"
     },
+    "startHeading": "Neu hier? So funktioniert der Einkauf",
+    "startS1": "Auswahlliste — markiere passende Titel mit Herz in einer gespeicherten Liste.",
+    "startS2": "Planen — öffne deine Liste als Plan, um Richtwerte zu sehen.",
+    "startS3": "Angebot — sende sie an unser Desk für einen Festpreis innerhalb von 24 Stunden.",
     "indicativeNote": "Preise sind Richtwerte. Der verbindliche Preis wird von unserem Einkaufs-Desk auf Basis von Verfügbarkeit, Saison und Volumen bestätigt.",
     "noResults": "Keine Titel entsprechen diesen Filtern.",
     "clearFilters": "Filter zurücksetzen",

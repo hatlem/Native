@@ -199,6 +199,10 @@
       "next": "Neste",
       "page": "Side {page} av {total}"
     },
+    "startHeading": "Ny her? Slik kjøper du",
+    "startS1": "Lag kortliste — hjerte titlene som passer, inn i en lagret liste.",
+    "startS2": "Planlegg — åpne listen som en plan for å se veiledende totaler.",
+    "startS3": "Få tilbud — send den til desken for fast pris innen 24 timer.",
     "indicativeNote": "Prisene er veiledende. Endelig pris bekreftes av kjøpsteamet basert på tilgjengelighet, sesong og volum.",
     "noResults": "Ingen titler matcher disse filtrene.",
     "clearFilters": "Nullstill filtre",

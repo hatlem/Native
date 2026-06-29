@@ -278,6 +278,10 @@
       "next": "Seuraava",
       "page": "Sivu {page} / {total}"
     },
+    "startHeading": "Uusi täällä? Näin ostat",
+    "startS1": "Tee lista — lisää sopivat lehdet sydämellä tallennettuun listaan.",
+    "startS2": "Suunnittele — avaa lista suunnitelmana nähdäksesi suuntaa-antavat summat.",
+    "startS3": "Pyydä tarjous — lähetä se tiimillemme, kiinteä hinta 24 tunnissa.",
     "indicativeNote": "Hinnat ovat suuntaa-antavia. Ostodeskimme vahvistaa kiinteän hinnan saatavuuden, kauden ja volyymin perusteella.",
     "noResults": "Yksikään julkaisu ei vastaa näitä suodattimia.",
     "clearFilters": "Tyhjennä suodattimet",
