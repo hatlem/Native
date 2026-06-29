@@ -4313,3 +4313,9 @@ footer a:hover {
   color: var(--ink-mute, #5b5648);
   line-height: 1.4;
 }
+
+/* Book-a-call banner on the buyer catalog */
+.book-call-banner { display:flex; gap:16px; align-items:center; justify-content:space-between; margin:0 0 16px; padding:14px 18px; border:1px solid var(--line,#e3ddcd); border-radius:10px; background:var(--surface-2,#faf7ef); }
+.book-call-banner p { margin:4px 0 0; font-size:0.9rem; }
+.book-call-banner-actions { display:flex; align-items:center; gap:10px; }
+.book-call-banner-dismiss { background:none; border:none; font-size:20px; line-height:1; cursor:pointer; color:var(--ink-mute,#5b5648); }

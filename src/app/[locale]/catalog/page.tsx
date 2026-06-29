@@ -18,6 +18,9 @@ import {
   PAGE_SIZE,
   parseCatalogParams,
 } from "./filters";
+import { audienceFor } from "@/lib/nav";
+import { shouldShowBookingBanner } from "@/lib/booking-prompt";
+import { CatalogBookCallBanner } from "./_components/CatalogBookCallBanner";
 
 export const dynamic = "force-dynamic";
 
@@ -220,6 +223,17 @@ export default async function CatalogPage({
   // is guaranteed here — the marketing splash returns above for guests.
   const userId = session.user.id;
   const titleIds = titles.map((tt) => tt.id);
+  const dismissedAt =
+    (
+      await prisma.user.findUnique({
+        where: { id: session.user.id },
+        select: { bookingPromptDismissedAt: true },
+      })
+    )?.bookingPromptDismissedAt ?? null;
+  const showBookingBanner = shouldShowBookingBanner({
+    audience: audienceFor(session),
+    dismissedAt,
+  });
   const [favoritedIds, favoriteLists, listMembership] = await Promise.all([
     getFavoritedTitleIds(userId, titleIds),
     prisma.favoriteList.findMany({
@@ -394,6 +408,7 @@ export default async function CatalogPage({
 
   return (
     <section>
+      {showBookingBanner ? <CatalogBookCallBanner /> : null}
       <h1>{t("title")}</h1>
       <p className="muted">{t("subtitle")}</p>
 
