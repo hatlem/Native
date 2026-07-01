@@ -320,6 +320,18 @@ export default async function TitleDetailPage({
                 <dd>{title.nativeFit}</dd>
               </>
             ) : null}
+            {title.vertical ? (
+              <>
+                <dt>{t("factVertical")}</dt>
+                <dd>{localizeTaxonomy(title.vertical, locale as AppLocale)}</dd>
+              </>
+            ) : null}
+            {title.audience ? (
+              <>
+                <dt>{t("factReaderProfile")}</dt>
+                <dd>{title.audience}</dd>
+              </>
+            ) : null}
             <dt>{t("factCategory")}</dt>
             <dd>{prettyCategory(localizeCategory(title.category, locale as AppLocale))}</dd>
           </dl>

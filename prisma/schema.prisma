@@ -90,6 +90,15 @@ enum OrgType {
   AGENCY
 }
 
+// Buyer's self-declared kind, chosen during the campaign flow's KYC step.
+// Distinct from OrgType (which drives agency client-scoping): a BRAND buys for
+// itself, an AGENCY on behalf of clients, a PUBLISHER promotes its own titles.
+enum BusinessType {
+  BRAND
+  AGENCY
+  PUBLISHER
+}
+
 enum UserRole {
   BUYER
   APPROVER
@@ -485,6 +494,13 @@ model Title {
   @@unique([publisherId, externalRef])
 }
 
+// The period a sponsorship on this product is sold in. Native formats vary:
+// some titles sell by week, some by month. Drives the campaign schedule grid.
+enum BookingUnit {
+  WEEK
+  MONTH
+}
+
 model Product {
   id           String          @id @default(cuid())
   titleId      String
@@ -492,6 +508,11 @@ model Product {
   type         ProductType
   name         String
   description  String?
+  // Booking period + minimum run. bookingUnit is the schedule-grid
+  // granularity (WEEK|MONTH); minDurationUnits is the shortest run the
+  // publisher accepts (e.g. 4 = "must book at least 4 weeks"). Null = none.
+  bookingUnit      BookingUnit @default(MONTH)
+  minDurationUnits Int?
   // Publisher's own SKU for this product, for idempotent ingestion.
   // Unique within a title; null for non-ingested products.
   externalRef  String?
@@ -664,6 +685,17 @@ model Organization {
   // required before the user can submit an RFQ.
   marketCode    MarketCode?
   vatId         String?
+  // KYC / billing block, collected in the campaign flow (soft gate — never
+  // blocks browsing/shortlisting, only nudged before sending a proposal).
+  // businessType is the buyer's self-declared kind; legalName + address feed
+  // invoicing. All nullable so signup/onboarding can defer them.
+  businessType  BusinessType?
+  legalName     String?
+  billingEmail  String?
+  addressLine1  String?
+  addressLine2  String?
+  postalCode    String?
+  city          String?
   parentOrgId   String?
   parentOrg     Organization?  @relation("AgencyClients", fields: [parentOrgId], references: [id])
   clients       Organization[] @relation("AgencyClients")
@@ -1012,6 +1044,11 @@ model SavedListItem {
   quantity  Int       @default(1)
   withContent    Boolean        @default(false)
   authorshipMode AuthorshipMode @default(BUYER_SUPPLIED)
+  // Campaign schedule chosen in the flow's Schedule step: first period and how
+  // many of the product's booking units to run (contiguous). Null = not yet
+  // scheduled. scheduleStart is the first-of-month/week anchor (UTC midnight).
+  scheduleStart  DateTime?
+  scheduleUnits  Int?
   notes     String?
   sortOrder Int       @default(0)
   createdAt DateTime  @default(now())

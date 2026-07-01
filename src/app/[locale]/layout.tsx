@@ -21,6 +21,7 @@ import {
   paletteItemsFor,
   userMenuItemsFor,
 } from "@/lib/nav";
+import { campaignFlowEnabled } from "@/lib/flags";
 import "../globals.css";
 
 const inter = Inter({
@@ -122,8 +123,9 @@ export default async function LocaleLayout({
   const nonce = (await headers()).get("x-nonce") ?? undefined;
 
   const audience = audienceFor(session);
-  const nav = navItemsFor(audience, t);
-  const palette = paletteItemsFor(audience, t);
+  const navOpts = { campaignFlow: campaignFlowEnabled() };
+  const nav = navItemsFor(audience, t, navOpts);
+  const palette = paletteItemsFor(audience, t, navOpts);
   const userMenu = userMenuItemsFor(audience, t);
 
   const appName = tc("appName");

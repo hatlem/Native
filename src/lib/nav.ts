@@ -38,9 +38,19 @@ export function audienceFor(session: SessionShape | null | undefined): Audience 
   return "advertiser";
 }
 
+export type NavOptions = { campaignFlow?: boolean };
+
+// The guided-flow front door, prepended to the buyer nav when the
+// campaignFlow flag is on. During Phase 0 it sits alongside the existing
+// items; the full menu cutover happens later (Phase 7).
+function campaignItem(t: (key: string) => string): NavItem {
+  return { key: "campaign", label: t("campaign"), href: "/campaign" };
+}
+
 export function navItemsFor(
   audience: Audience,
   t: (key: string) => string,
+  opts: NavOptions = {},
 ): NavItem[] {
   switch (audience) {
     case "public":
@@ -51,6 +61,16 @@ export function navItemsFor(
         { key: "for-publishers", label: t("forPublishers"), href: "/for-publishers" },
       ];
     case "advertiser":
+      // Campaign-flow cutover: the guided flow is the whole front door. The
+      // old 7-item buyer menu collapses to the flow + a "Campaigns" hub for
+      // in-flight work; Catalog/Lists/Favorites/Orders/Reports stay reachable
+      // via the command palette (paletteItemsFor keeps them all).
+      if (opts.campaignFlow) {
+        return [
+          campaignItem(t),
+          { key: "campaigns", label: t("campaigns"), href: "/requests" },
+        ];
+      }
       return [
         { key: "catalog", label: t("catalog"), href: "/catalog" },
         { key: "plan", label: t("plan"), href: "/plan" },
@@ -61,6 +81,13 @@ export function navItemsFor(
         { key: "reports", label: t("reports"), href: "/reports" },
       ];
     case "agency":
+      if (opts.campaignFlow) {
+        return [
+          campaignItem(t),
+          { key: "campaigns", label: t("campaigns"), href: "/requests" },
+          { key: "agency", label: t("agency"), href: "/agency" },
+        ];
+      }
       return [
         { key: "catalog", label: t("catalog"), href: "/catalog" },
         { key: "plan", label: t("plan"), href: "/plan" },
@@ -125,12 +152,14 @@ export function userMenuItemsFor(
 export function paletteItemsFor(
   audience: Audience,
   t: (key: string) => string,
+  opts: NavOptions = {},
 ): { section: string; items: NavItem[] }[] {
   const goWork: NavItem[] = (() => {
     switch (audience) {
       case "advertiser":
       case "agency":
         return [
+          ...(opts.campaignFlow ? [campaignItem(t)] : []),
           { key: "catalog", label: t("catalog"), href: "/catalog" },
           { key: "plan", label: t("plan"), href: "/plan" },
           { key: "lists", label: t("lists"), href: "/lists", description: t("listsDesc") },
