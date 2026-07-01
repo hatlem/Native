@@ -404,7 +404,12 @@
     },
     "publisherLinkHelp": "See every title from {name}",
     "factVertical": "Vertical",
-    "factReaderProfile": "Reader profile"
+    "factReaderProfile": "Reader profile",
+    "availabilityTitle": "Availability",
+    "avail_open": "Open",
+    "avail_limited": "Limited",
+    "avail_full": "Sold out",
+    "availabilityNote": "Upcoming months across all formats. Firm booking is confirmed on your proposal."
   },
   "lists": {
     "title": "Saved lists",
