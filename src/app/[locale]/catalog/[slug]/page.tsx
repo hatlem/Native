@@ -5,6 +5,7 @@ import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
 import { getFavoritedTitleIds, getListMembershipForTitles } from "@/lib/favorites";
 import { FavoriteButton } from "../_components/FavoriteButton";
+import { AvailabilityStrip } from "../_components/AvailabilityStrip";
 import { Link } from "@/i18n/navigation";
 import { intlLocale } from "@/lib/money";
 import { isProductPriceShown, arePricesVisible } from "@/lib/pricing/visibility";
@@ -337,6 +338,11 @@ export default async function TitleDetailPage({
           </dl>
         </aside>
       </div>
+
+      <AvailabilityStrip
+        locale={locale}
+        productIds={title.products.map((p) => p.id)}
+      />
 
       {!needsQuote ? (
         <div className="section-head">

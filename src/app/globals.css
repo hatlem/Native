@@ -4483,6 +4483,34 @@ footer a:hover {
 .shortlist-continue { display: block; text-align: center; margin-top: var(--s-4); }
 .xsmall { font-size: 0.75rem; }
 
+/* Title-detail availability strip */
+.availability-strip { margin: var(--s-5) 0; }
+.availability-strip h3 { margin: 0 0 var(--s-2); font-size: 1rem; }
+.availability-months {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--s-2);
+}
+.availability-month {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 6rem;
+  padding: var(--s-2) var(--s-3);
+  border: 1px solid var(--border);
+  border-radius: var(--r-sm);
+  background: var(--surface);
+}
+.availability-month-label { font-weight: 600; font-size: 0.85rem; }
+.availability-month-state { font-size: 0.75rem; color: var(--muted); }
+.availability-month.is-open { border-color: var(--accent); }
+.availability-month.is-open .availability-month-state { color: var(--accent); }
+.availability-month.is-limited { border-color: var(--border-strong); }
+.availability-month.is-full { opacity: 0.55; }
+
 /* Schedule step */
 .schedule-list { display: flex; flex-direction: column; gap: var(--s-3); margin: var(--s-4) 0; }
 .schedule-row { padding: var(--s-4); }
