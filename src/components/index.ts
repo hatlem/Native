@@ -12,3 +12,4 @@ export { QuoteCard } from "./quote-card";
 export { SubmitButton } from "./submit-button";
 export { MailLink } from "./mail-link";
 export { SafeEmail, withSafeEmails } from "./safe-email";
+export { GetTalkBooking, resolveBookingFallbackHref } from "./get-talk-booking";

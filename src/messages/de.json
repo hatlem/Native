@@ -304,7 +304,11 @@
       "ctaBlockTitle": "Bereit, uns zu briefen?",
       "ctaBlockBody": "Konto anlegen, kurz schildern was und an wen Sie verkaufen — wir kommen innerhalb von 24 Stunden zurück mit den Titeln und Formaten, die passen."
     },
-    "savePublication": "Zum Plan für Preis hinzufügen"
+    "savePublication": "Zum Plan für Preis hinzufügen",
+    "bookCallTitle": "Möchten Sie Hilfe beim Native-Einkauf?",
+    "bookCallBody": "Buchen Sie ein kostenloses 15-minütiges Gespräch — unser Desk hilft Ihnen bei Planung, Titelauswahl und Kampagnenplatzierung.",
+    "bookCallCta": "Gespräch buchen",
+    "bookCallDismiss": "Schließen"
   },
   "lists": {
     "title": "Gespeicherte Listen",
@@ -1931,7 +1935,11 @@
     "phoneHint": "Direkter Draht zum Desk. Nicht für Marketing.",
     "submit": "Einrichtung abschließen",
     "submitting": "Speichern…",
-    "error": "Beide Felder sind erforderlich."
+    "error": "Beide Felder sind erforderlich.",
+    "callHeading": "Noch eine Sache — wir helfen Ihnen beim Native-Einkauf",
+    "callBody": "Buchen Sie ein kostenloses 15-minütiges Gespräch, und unser Desk hilft Ihnen, Ihre erste Native-Kampagne zu planen und zu platzieren.",
+    "callCta": "Gespräch buchen",
+    "callSkip": "Jetzt überspringen →"
   },
   "account": {
     "eyebrow": "Konto",

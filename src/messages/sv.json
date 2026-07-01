@@ -225,7 +225,11 @@
       "ctaBlockTitle": "Redo att brieffa oss?",
       "ctaBlockBody": "Skapa konto, berätta vad du säljer och till vem — vi återkommer inom 24 timmar med titlarna och formaten som passar."
     },
-    "savePublication": "Lägg till i plan för pris"
+    "savePublication": "Lägg till i plan för pris",
+    "bookCallTitle": "Vill du ha hjälp att köpa native?",
+    "bookCallBody": "Boka ett kostnadsfritt 15-minuterssamtal — vårt desk hjälper dig att planera, välja titlar och placera kampanjen.",
+    "bookCallCta": "Boka ett samtal",
+    "bookCallDismiss": "Stäng"
   },
   "lists": {
     "title": "Sparade listor",
@@ -2074,7 +2078,11 @@
     "phoneHint": "Direkt­nummer till desken. Används inte för marknadsföring.",
     "submit": "Slutför inställning",
     "submitting": "Sparar…",
-    "error": "Båda fälten är obligatoriska."
+    "error": "Båda fälten är obligatoriska.",
+    "callHeading": "En sak till — låt oss hjälpa dig köpa native",
+    "callBody": "Boka ett kostnadsfritt 15-minuterssamtal, så hjälper vårt desk dig att planera och placera din första native-kampanj.",
+    "callCta": "Boka ett samtal",
+    "callSkip": "Hoppa över för nu →"
   },
   "account": {
     "eyebrow": "Konto",

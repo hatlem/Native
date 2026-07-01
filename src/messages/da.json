@@ -225,7 +225,11 @@
       "ctaBlockTitle": "Klar til at briefe os?",
       "ctaBlockBody": "Opret konto, fortæl os hvad du sælger og til hvem — vi vender tilbage inden for 24 timer med titlerne og formaterne, der passer."
     },
-    "savePublication": "Tilføj til plan for pris"
+    "savePublication": "Tilføj til plan for pris",
+    "bookCallTitle": "Vil du have hjælp til at købe native?",
+    "bookCallBody": "Book et gratis 15-minutters opkald — vores desk hjælper dig med at planlægge, vælge titler og placere kampagnen.",
+    "bookCallCta": "Book et opkald",
+    "bookCallDismiss": "Luk"
   },
   "lists": {
     "title": "Gemte lister",
@@ -2075,7 +2079,11 @@
     "phoneHint": "Direkte nummer til desken. Bruges ikke til markedsføring.",
     "submit": "Afslut opsætning",
     "submitting": "Gemmer…",
-    "error": "Begge felter er obligatoriske."
+    "error": "Begge felter er obligatoriske.",
+    "callHeading": "Én ting til — lad os hjælpe dig med at købe native",
+    "callBody": "Book et gratis 15-minutters opkald, og vores desk hjælper dig med at planlægge og placere din første native-kampagne.",
+    "callCta": "Book et opkald",
+    "callSkip": "Spring over for nu →"
   },
   "account": {
     "eyebrow": "Konto",

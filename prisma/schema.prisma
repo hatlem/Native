@@ -698,6 +698,7 @@ model User {
   emailVerifiedAt DateTime?
   lastSignInIp    String?
   lastSignInAt    DateTime?
+  bookingPromptDismissedAt DateTime?
 
   notifications          Notification[]
   magicLinkTokens        MagicLinkToken[]
