@@ -57,6 +57,15 @@ async function activeList(locale: string) {
   return { scope, orgId, listId };
 }
 
+// A same-origin relative path (starts with a single "/") the caller wants to
+// return to after the add, e.g. the campaign flow's Discover step. Falls back
+// to the given default. The single-slash check blocks "//host" open redirects.
+function safeReturnTo(formData: FormData, locale: string, fallback: string): string {
+  const raw = str(formData, "returnTo");
+  if (raw.startsWith("/") && !raw.startsWith("//")) return `/${locale}${raw}`;
+  return `/${locale}${fallback}`;
+}
+
 export async function addProductToList(formData: FormData) {
   const locale = str(formData, "locale") || "en";
   const productId = str(formData, "productId");
@@ -70,7 +79,7 @@ export async function addProductToList(formData: FormData) {
       await addProductItem(listId, productId, str(formData, "withContent") === "1");
     }
   }
-  redirect(`/${locale}/plan`);
+  redirect(safeReturnTo(formData, locale, "/plan"));
 }
 
 export async function addRecommendedToList(formData: FormData) {
@@ -141,6 +150,26 @@ export async function setListItemContent(formData: FormData) {
     data: { withContent: str(formData, "withContent") === "1" },
   });
   redirect(`/${locale}/plan`);
+}
+
+// Campaign flow — set a shortlist item's schedule (first period + unit count).
+// The UI enforces the product minimum via the input; we store what's posted and
+// leave validation to the estimate/submit path. updateMany no-ops if removed.
+export async function setItemSchedule(formData: FormData) {
+  const locale = str(formData, "locale") || "en";
+  const itemId = str(formData, "itemId");
+  await ownItem(locale, itemId);
+  const startRaw = str(formData, "scheduleStart");
+  const start = /^\d{4}-\d{2}-\d{2}$/.test(startRaw) ? new Date(`${startRaw}T00:00:00Z`) : null;
+  const units = Number(str(formData, "scheduleUnits"));
+  await prisma.savedListItem.updateMany({
+    where: { id: itemId },
+    data: {
+      scheduleStart: start,
+      scheduleUnits: Number.isFinite(units) && units > 0 ? Math.floor(units) : null,
+    },
+  });
+  redirect(safeReturnTo(formData, locale, "/plan"));
 }
 
 export async function resolveTitleLine(formData: FormData) {

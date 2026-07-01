@@ -75,5 +75,5 @@ export async function saveOnboarding(formData: FormData) {
     hasPhone: true,
   });
 
-  redirect(next);
+  redirect(`/${locale}/onboarding/call?next=${encodeURIComponent(next)}`);
 }
