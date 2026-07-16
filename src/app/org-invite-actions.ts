@@ -358,24 +358,27 @@ export async function claimOrgInvite(formData: FormData) {
     { inviteId: inv.id, mode: "new" },
   );
 
-  if (form.passwordless) {
-    // No password to sign in with — mint a single-use magic-link token
-    // and bounce through the consume route, which sets the session
-    // cookie and lands the user by role.
-    const raw = generateToken();
-    await prisma.magicLinkToken.create({
-      data: {
-        userId: createdUserId,
-        tokenHash: hashToken(raw),
-        expiresAt: tokenExpiry(),
-        requestedIp: ip,
-      },
-    });
-    redirect(`/${locale}/magic-link/${raw}`);
-  }
-
   try {
-    await signIn("credentials", { email: inv.email, password, redirect: false });
+    if (form.passwordless) {
+      // No password to sign in with — mint a single-use magic-link token
+      // and consume it in-process via the magic-link provider. Redirecting
+      // through the GET consume route doesn't work from a server action:
+      // the action's own fetch follows the redirect and consumes the token
+      // server-side, so the browser's real navigation finds it already used
+      // and the session cookie never reaches the client.
+      const raw = generateToken();
+      await prisma.magicLinkToken.create({
+        data: {
+          userId: createdUserId,
+          tokenHash: hashToken(raw),
+          expiresAt: tokenExpiry(),
+          requestedIp: ip,
+        },
+      });
+      await signIn("magic-link", { token: raw, redirect: false });
+    } else {
+      await signIn("credentials", { email: inv.email, password, redirect: false });
+    }
   } catch (error) {
     if (error instanceof AuthError) {
       redirect(`/${locale}/signin`);
