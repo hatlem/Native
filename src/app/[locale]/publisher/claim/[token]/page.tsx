@@ -36,6 +36,7 @@ export default async function ClaimPublisherInvitePage({
 
   const t = await getTranslations({ locale, namespace: "auth" });
   const tc = await getTranslations({ locale, namespace: "common" });
+  const ti = await getTranslations({ locale, namespace: "invite" });
 
   const invite = await prisma.publisherInvite.findUnique({
     where: { token },
@@ -130,9 +131,8 @@ export default async function ClaimPublisherInvitePage({
                 type="password"
                 autoComplete="new-password"
                 minLength={8}
-                required
               />
-              <span className="hint">{t("pwHint")}</span>
+              <span className="hint">{ti("passwordOptionalHint")}</span>
             </div>
             <div className="actions">
               <SubmitButton

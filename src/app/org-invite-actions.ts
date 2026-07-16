@@ -22,7 +22,7 @@ import {
   validateOrgClaim,
   validateClaimForm,
 } from "@/lib/org-invite";
-import { generateToken, hashToken, tokenExpiry } from "@/lib/tokens";
+import { passwordlessSignIn } from "@/lib/passwordless-signin";
 
 const LOCALES = ["en", "no", "sv", "da", "fi", "de"] as const;
 type Locale = (typeof LOCALES)[number];
@@ -360,22 +360,7 @@ export async function claimOrgInvite(formData: FormData) {
 
   try {
     if (form.passwordless) {
-      // No password to sign in with — mint a single-use magic-link token
-      // and consume it in-process via the magic-link provider. Redirecting
-      // through the GET consume route doesn't work from a server action:
-      // the action's own fetch follows the redirect and consumes the token
-      // server-side, so the browser's real navigation finds it already used
-      // and the session cookie never reaches the client.
-      const raw = generateToken();
-      await prisma.magicLinkToken.create({
-        data: {
-          userId: createdUserId,
-          tokenHash: hashToken(raw),
-          expiresAt: tokenExpiry(),
-          requestedIp: ip,
-        },
-      });
-      await signIn("magic-link", { token: raw, redirect: false });
+      await passwordlessSignIn(createdUserId, ip);
     } else {
       await signIn("credentials", { email: inv.email, password, redirect: false });
     }

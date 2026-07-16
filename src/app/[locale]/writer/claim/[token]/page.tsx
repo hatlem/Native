@@ -33,6 +33,7 @@ export default async function ClaimWriterInvitePage({
 
   const t = await getTranslations({ locale, namespace: "auth" });
   const tc = await getTranslations({ locale, namespace: "common" });
+  const ti = await getTranslations({ locale, namespace: "invite" });
 
   const invite = await prisma.writerInvite.findUnique({ where: { token } });
   const verdict = checkInvite(invite);
@@ -119,9 +120,8 @@ export default async function ClaimWriterInvitePage({
                 type="password"
                 autoComplete="new-password"
                 minLength={8}
-                required
               />
-              <span className="hint">{t("pwHint")}</span>
+              <span className="hint">{ti("passwordOptionalHint")}</span>
             </div>
             <div className="actions">
               <SubmitButton

@@ -8,6 +8,8 @@ import { prisma } from "@/lib/prisma";
 import { authLimiter } from "@/lib/rate-limit";
 import { recordAudit } from "@/lib/audit";
 import { clientIp } from "@/lib/client-ip";
+import { validateClaimForm } from "@/lib/org-invite";
+import { passwordlessSignIn } from "@/lib/passwordless-signin";
 
 // Claim a publisher-invite token: validate it (single-use, time-limited),
 // create a User in PUBLISHER role bound to the pre-existing Publisher
@@ -33,7 +35,10 @@ export async function claimPublisherInvite(formData: FormData) {
     redirect(`/${locale}/publisher/claim/${token}?error=rate`);
   }
 
-  if (!token || !name || password.length < 8) {
+  // Password is optional — an empty one creates a passwordless account
+  // that signs in via the magic-link provider (same as org invites).
+  const form = validateClaimForm(name, password);
+  if (!token || !form.ok) {
     redirect(`/${locale}/publisher/claim/${token}?error=1`);
   }
 
@@ -60,7 +65,7 @@ export async function claimPublisherInvite(formData: FormData) {
     redirect(`/${locale}/publisher/claim/${token}?error=1`);
   }
 
-  const passwordHash = await bcrypt.hash(password, 10);
+  const passwordHash = form.passwordless ? null : await bcrypt.hash(password, 10);
 
   let createdUserId: string | null = null;
   try {
@@ -100,11 +105,15 @@ export async function claimPublisherInvite(formData: FormData) {
   );
 
   try {
-    await signIn("credentials", {
-      email: invite.email,
-      password,
-      redirect: false,
-    });
+    if (form.passwordless) {
+      await passwordlessSignIn(createdUserId, ip);
+    } else {
+      await signIn("credentials", {
+        email: invite.email,
+        password,
+        redirect: false,
+      });
+    }
   } catch (error) {
     if (error instanceof AuthError) {
       redirect(`/${locale}/signin`);
@@ -134,7 +143,9 @@ export async function claimWriterInviteSignup(formData: FormData) {
     redirect(`/${locale}/writer/claim/${token}?error=rate`);
   }
 
-  if (!token || !name || password.length < 8) {
+  // Password optional — mirrors claimPublisherInvite.
+  const form = validateClaimForm(name, password);
+  if (!token || !form.ok) {
     redirect(`/${locale}/writer/claim/${token}?error=1`);
   }
 
@@ -149,7 +160,7 @@ export async function claimWriterInviteSignup(formData: FormData) {
     redirect(`/${locale}/writer/claim/${token}?error=1`);
   }
 
-  const passwordHash = await bcrypt.hash(password, 10);
+  const passwordHash = form.passwordless ? null : await bcrypt.hash(password, 10);
 
   let createdUserId: string | null = null;
   try {
@@ -186,11 +197,15 @@ export async function claimWriterInviteSignup(formData: FormData) {
   );
 
   try {
-    await signIn("credentials", {
-      email: invite.email,
-      password,
-      redirect: false,
-    });
+    if (form.passwordless) {
+      await passwordlessSignIn(createdUserId, ip);
+    } else {
+      await signIn("credentials", {
+        email: invite.email,
+        password,
+        redirect: false,
+      });
+    }
   } catch (error) {
     if (error instanceof AuthError) {
       redirect(`/${locale}/signin`);
