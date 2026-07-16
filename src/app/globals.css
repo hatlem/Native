@@ -4565,3 +4565,10 @@ footer a:hover {
   font: inherit;
   width: 100%;
 }
+
+/* GetTalk booking embed: the fallback link only exists for when embed.js
+   can't render (script blocked, handle missing at runtime). Once the widget
+   has rendered into its container, showing both is a duplicate CTA. */
+.gettalk-booking > div:not(:empty) + .gettalk-booking-fallback {
+  display: none;
+}
