@@ -185,9 +185,8 @@ export default async function OrgInvitePage({
                 autoComplete="new-password"
                 placeholder={t("passwordPlaceholder")}
                 minLength={8}
-                required
               />
-              <span className="hint">{ta("pwHint")}</span>
+              <span className="hint">{t("passwordOptionalHint")}</span>
             </div>
             <div className="actions">
               <SubmitButton

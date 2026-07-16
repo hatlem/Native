@@ -54,6 +54,21 @@ export function validateOrgClaim(
   return { ok: true, mode: "existing" };
 }
 
+export type ClaimFormVerdict =
+  | { ok: true; passwordless: boolean }
+  | { ok: false };
+
+// New-account claim form: name is required; password is optional. An empty
+// password means "sign me in via the invite link" (magic-link style) — the
+// account is created without a hash and the user can set one later under
+// Account. A non-empty password must still meet the minimum length.
+export function validateClaimForm(name: string, password: string): ClaimFormVerdict {
+  if (name.length < 1) return { ok: false };
+  if (password.length === 0) return { ok: true, passwordless: true };
+  if (password.length < 8) return { ok: false };
+  return { ok: true, passwordless: false };
+}
+
 export function validateDelegationDate(delegationExpiresAt: Date | null, now: Date = new Date()): boolean {
   if (delegationExpiresAt === null) return true;
   return delegationExpiresAt.getTime() > now.getTime();

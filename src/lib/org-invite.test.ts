@@ -8,6 +8,7 @@ import {
   validateDelegationDate,
   isDelegatedAdminForbidden,
   buildOrgInviteEmail,
+  validateClaimForm,
   ORG_INVITE_TTL_DAYS,
 } from "./org-invite";
 
@@ -149,4 +150,18 @@ test("localized invite emails translate the role word (no raw enum)", () => {
     const built = buildOrgInviteEmail({ locale, orgName: "Org", inviterName: "I", link: "L", role: "RESTRICTED", delegationExpiresAt: null });
     assert.ok(!/\brestricted\b/i.test(built.text), `${locale} leaked raw role word: ${built.text}`);
   }
+});
+
+test("claim form: password is optional — empty means passwordless", () => {
+  assert.deepEqual(validateClaimForm("Camilla", ""), { ok: true, passwordless: true });
+});
+
+test("claim form: a provided password must still be 8+ chars", () => {
+  assert.deepEqual(validateClaimForm("Camilla", "short"), { ok: false });
+  assert.deepEqual(validateClaimForm("Camilla", "longenough"), { ok: true, passwordless: false });
+});
+
+test("claim form: name stays required either way", () => {
+  assert.deepEqual(validateClaimForm("", ""), { ok: false });
+  assert.deepEqual(validateClaimForm("", "longenough"), { ok: false });
 });

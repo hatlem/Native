@@ -20,7 +20,9 @@ import {
   buildOrgInviteEmail,
   orgInviteLink,
   validateOrgClaim,
+  validateClaimForm,
 } from "@/lib/org-invite";
+import { generateToken, hashToken, tokenExpiry } from "@/lib/tokens";
 
 const LOCALES = ["en", "no", "sv", "da", "fi", "de"] as const;
 type Locale = (typeof LOCALES)[number];
@@ -303,10 +305,13 @@ export async function claimOrgInvite(formData: FormData) {
   }
 
   // mode === "new": create account, membership, mark claimed, sign in.
-  if (name.length < 1 || password.length < 8) {
+  // Password is optional — an empty one creates a passwordless account and
+  // signs in through the magic-link consume route instead of credentials.
+  const form = validateClaimForm(name, password);
+  if (!form.ok) {
     redirect(`/${locale}/invite/${token}?error=form`);
   }
-  const passwordHash = await bcrypt.hash(password, 10);
+  const passwordHash = form.passwordless ? null : await bcrypt.hash(password, 10);
 
   let createdUserId: string | null = null;
   try {
@@ -352,6 +357,22 @@ export async function claimOrgInvite(formData: FormData) {
     `Organization:${inv.organizationId}`,
     { inviteId: inv.id, mode: "new" },
   );
+
+  if (form.passwordless) {
+    // No password to sign in with — mint a single-use magic-link token
+    // and bounce through the consume route, which sets the session
+    // cookie and lands the user by role.
+    const raw = generateToken();
+    await prisma.magicLinkToken.create({
+      data: {
+        userId: createdUserId,
+        tokenHash: hashToken(raw),
+        expiresAt: tokenExpiry(),
+        requestedIp: ip,
+      },
+    });
+    redirect(`/${locale}/magic-link/${raw}`);
+  }
 
   try {
     await signIn("credentials", { email: inv.email, password, redirect: false });
