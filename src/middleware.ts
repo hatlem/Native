@@ -23,6 +23,11 @@ function buildCsp(nonce: string): string {
     ? " https://www.googletagmanager.com https://*.google-analytics.com https://*.analytics.google.com"
     : "";
   const gtmFrame = hasGtm ? " https://www.googletagmanager.com" : "";
+  // GetTalk booking embeds (onboarding call step + catalog banner popup)
+  // render an <iframe src="https://gettalk.co/...">.
+  const getTalkFrame = process.env.NEXT_PUBLIC_GETTALK_USERNAME
+    ? " https://gettalk.co"
+    : "";
   // Next.js dev wraps every module in eval() (eval-source-map), so without
   // 'unsafe-eval' the React bootstrap silently fails and the page never
   // hydrates. Production uses static chunks and doesn't need this.
@@ -41,7 +46,7 @@ function buildCsp(nonce: string): string {
     `img-src 'self' data: https:`,
     `font-src 'self' data:`,
     `connect-src 'self'${gtmConnect}`,
-    `frame-src 'self'${gtmFrame}`,
+    `frame-src 'self'${gtmFrame}${getTalkFrame}`,
     `frame-ancestors 'none'`,
     `base-uri 'self'`,
     `form-action 'self'`,
