@@ -7,6 +7,7 @@ import { claimOrgInvite } from "@/app/org-invite-actions";
 import { logout } from "@/app/auth-actions";
 import { LandingShell } from "@/app/landing-shell";
 import { SubmitButton } from "@/components";
+import { withSafeEmails } from "@/components/safe-email";
 
 export const dynamic = "force-dynamic";
 
@@ -74,10 +75,12 @@ export default async function OrgInvitePage({
           <span className="utility-code">!</span>
           <h1>{t("wrongAccountTitle")}</h1>
           <p className="lead">
-            {t("wrongAccountBody", {
-              inviteEmail: invite!.email,
-              authedEmail: session!.user!.email!,
-            })}
+            {withSafeEmails(
+              t("wrongAccountBody", {
+                inviteEmail: invite!.email,
+                authedEmail: session!.user!.email!,
+              }),
+            )}
           </p>
           <div className="cluster">
             <form action={logout}>
@@ -99,13 +102,13 @@ export default async function OrgInvitePage({
         <section className="auth-shell">
           <div className="marketing">
             <h1>{t("title", { org: orgName })}</h1>
-            <p className="lead">{t("invitationFor", { email: invite!.email })}</p>
+            <p className="lead">{withSafeEmails(t("invitationFor", { email: invite!.email }))}</p>
           </div>
 
           <div className="auth-card">
             <div className="head">
               <h2>{t("title", { org: orgName })}</h2>
-              <p>{t("invitationFor", { email: invite!.email })}</p>
+              <p>{withSafeEmails(t("invitationFor", { email: invite!.email }))}</p>
             </div>
 
             {error ? (
@@ -136,13 +139,13 @@ export default async function OrgInvitePage({
       <section className="auth-shell">
         <div className="marketing">
           <h1>{t("title", { org: orgName })}</h1>
-          <p className="lead">{t("invitationFor", { email: invite!.email })}</p>
+          <p className="lead">{withSafeEmails(t("invitationFor", { email: invite!.email }))}</p>
         </div>
 
         <div className="auth-card">
           <div className="head">
             <h2>{t("title", { org: orgName })}</h2>
-            <p>{t("invitationFor", { email: invite!.email })}</p>
+            <p>{withSafeEmails(t("invitationFor", { email: invite!.email }))}</p>
           </div>
 
           {error ? (
