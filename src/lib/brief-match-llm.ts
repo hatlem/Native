@@ -13,7 +13,9 @@ import type { BriefFacets, GeoScope } from "@/lib/brief-match";
 import { gatewayChat, gatewayConfigured } from "@/lib/gateway-chat";
 
 const MODEL = "claude-sonnet-4-6";
-const TIMEOUT_MS = 6000;
+// ~3.5s observed through the gateway; 10s leaves headroom without stalling
+// the campaign recommender, which stays deterministic-only on timeout.
+const TIMEOUT_MS = 10000;
 
 // Constrain the model to the closed facet vocabulary the catalog actually
 // uses, so its output composes with the deterministic scorer.

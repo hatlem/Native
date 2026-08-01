@@ -2,7 +2,10 @@ import { type Article, type PreviewInput, marketLanguageName } from "./schema";
 import { gatewayChat, gatewayConfigured } from "@/lib/gateway-chat";
 
 const MODEL = "claude-sonnet-4-6";
-const TIMEOUT_MS = 12000;
+// The gateway hop plus a 4-6 paragraph article measures ~20-26s end to end;
+// 12s aborted mid-flight, so every preview fell back to the template while the
+// gateway still billed for the completed generation.
+const TIMEOUT_MS = 45000;
 
 const TONE_HINT: Record<PreviewInput["tone"], string> = {
   warm: "warm and human",
