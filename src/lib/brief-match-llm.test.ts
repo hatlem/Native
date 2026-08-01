@@ -35,7 +35,9 @@ test("sanitizeLlmFacets is defensive against junk", () => {
   assert.deepEqual(out.geoScopes, []);
 });
 
-test("llmEnrichmentAvailable reflects the API key", () => {
+test("llmEnrichmentAvailable reflects the gateway key", () => {
   assert.equal(llmEnrichmentAvailable({}), false);
-  assert.equal(llmEnrichmentAvailable({ ANTHROPIC_API_KEY: "sk-x" }), true);
+  assert.equal(llmEnrichmentAvailable({ ANTHROPIC_API_KEY: "sk-x" }), false);
+  assert.equal(llmEnrichmentAvailable({ GETPLATFORM_AI_KEY: "k" }), true);
+  assert.equal(llmEnrichmentAvailable({ GETPLATFORM_API_KEY: "k" }), true);
 });

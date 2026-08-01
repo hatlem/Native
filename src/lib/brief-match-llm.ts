@@ -5,14 +5,14 @@
 // phrasing the taxonomy misses and to expand to related terms, returning the
 // same Partial<BriefFacets> shape that mergeFacets() folds in.
 //
-// Strictly optional and fail-open: with no ANTHROPIC_API_KEY, on timeout, or
-// on any error/parse failure it returns {} so matching runs deterministic-
-// only. It never throws to the caller.
+// Strictly optional and fail-open: with no gateway key, on timeout, or on any
+// error/parse failure it returns {} so matching runs deterministic-only. It
+// never throws to the caller.
 
 import type { BriefFacets, GeoScope } from "@/lib/brief-match";
+import { gatewayChat, gatewayConfigured } from "@/lib/gateway-chat";
 
 const MODEL = "claude-sonnet-4-6";
-const ENDPOINT = "https://api.anthropic.com/v1/messages";
 const TIMEOUT_MS = 6000;
 
 // Constrain the model to the closed facet vocabulary the catalog actually
@@ -63,42 +63,25 @@ export function sanitizeLlmFacets(raw: RawFacets): Partial<BriefFacets> {
 }
 
 export function llmEnrichmentAvailable(env: Record<string, string | undefined> = process.env): boolean {
-  return !!env.ANTHROPIC_API_KEY;
+  return gatewayConfigured(env);
 }
 
 export async function enrichBriefWithLLM(brief: string): Promise<Partial<BriefFacets>> {
-  const apiKey = process.env.ANTHROPIC_API_KEY;
-  if (!apiKey || !brief.trim()) return {};
+  if (!brief.trim()) return {};
 
-  const ctrl = new AbortController();
-  const timer = setTimeout(() => ctrl.abort(), TIMEOUT_MS);
-  try {
-    const res = await fetch(ENDPOINT, {
-      method: "POST",
-      signal: ctrl.signal,
-      headers: {
-        "content-type": "application/json",
-        "x-api-key": apiKey,
-        "anthropic-version": "2023-06-01",
-      },
-      body: JSON.stringify({
-        model: MODEL,
-        max_tokens: 400,
-        system: SYSTEM,
-        messages: [{ role: "user", content: brief.slice(0, 2000) }],
-      }),
-    });
-    if (!res.ok) return {};
-    const data = (await res.json()) as { content?: { type: string; text?: string }[] };
-    const text = data.content?.find((b) => b.type === "text")?.text ?? "";
-    const json = extractJson(text);
-    if (!json) return {};
-    return sanitizeLlmFacets(json);
-  } catch {
-    return {}; // fail-open: deterministic-only
-  } finally {
-    clearTimeout(timer);
-  }
+  const result = await gatewayChat({
+    entityId: "nativespin-system",
+    model: MODEL,
+    system: SYSTEM,
+    messages: [{ role: "user", content: brief.slice(0, 2000) }],
+    maxTokens: 400,
+    timeoutMs: TIMEOUT_MS,
+  });
+  if (!result) return {}; // fail-open: deterministic-only
+
+  const json = extractJson(result.text);
+  if (!json) return {};
+  return sanitizeLlmFacets(json);
 }
 
 // Pull the first JSON object out of the model's text, tolerating stray prose
