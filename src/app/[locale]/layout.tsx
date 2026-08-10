@@ -130,11 +130,15 @@ export default async function LocaleLayout({
   const palette = paletteItemsFor(audience, t, navOpts);
   const userMenu = userMenuItemsFor(audience, t);
 
-  // Draft-list badge on "Kampanjer": the collapsed campaign-flow nav has no
-  // other way to signal unsent SavedLists exist, so the nav item itself is
-  // the notification. Only worth the extra query for the buyer roles that
-  // see the collapsed nav in the first place.
-  if (navOpts.campaignFlow && (audience === "advertiser" || audience === "agency")) {
+  // The campaign-flow buyer nav collapses to 2 links (Planlegg kampanje +
+  // Kampanjer) — Catalog/Lists/Favorites/Orders/Reports only survive via
+  // the command palette, so these roles get the extra affordances below.
+  const showCollapsedBuyerNav =
+    navOpts.campaignFlow && (audience === "advertiser" || audience === "agency");
+
+  // Draft-list badge on "Kampanjer": the nav item itself becomes the
+  // notification for unsent SavedLists.
+  if (showCollapsedBuyerNav) {
     const ws = await getWorkspace(session?.user?.id);
     const draftListCount = ws?.activeOrgId ? await countUnsentLists(ws.activeOrgId) : 0;
     if (draftListCount > 0) {
@@ -160,6 +164,7 @@ export default async function LocaleLayout({
               palette={palette}
               menuItems={userMenu}
               signedIn={signedIn}
+              showPaletteHint={showCollapsedBuyerNav}
               user={
                 session?.user?.email
                   ? {

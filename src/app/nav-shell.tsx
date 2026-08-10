@@ -21,6 +21,11 @@ type Props = {
   signedIn: boolean;
   signOutAction?: React.ReactNode;
   authActions?: { signIn: string; signUp: string };
+  // Visible ⌘K affordance — only worth the header space when the top nav
+  // is collapsed enough that Lists/Plan aren't otherwise one click away
+  // (the campaign-flow buyer nav). Desk/publisher/writer keep their full
+  // nav, so they don't need it.
+  showPaletteHint?: boolean;
   labels: {
     skip: string;
     menu: string;
@@ -52,6 +57,7 @@ export function NavShell({
   signOutAction,
   authActions,
   labels,
+  showPaletteHint = false,
 }: Props) {
   const pathname = usePathname();
   const [drawerOpen, setDrawerOpen] = useState(false);
@@ -167,6 +173,17 @@ export function NavShell({
           </nav>
 
           <div className="nav-actions">
+            {showPaletteHint ? (
+              <button
+                type="button"
+                className="cmdk-trigger"
+                onClick={openPalette}
+                aria-label={labels.search}
+              >
+                <span className="cmdk-placeholder">{labels.searchPlaceholder}</span>
+                <kbd>⌘K</kbd>
+              </button>
+            ) : null}
             {signedIn && user ? (
               <details
                 ref={userMenuRef}
