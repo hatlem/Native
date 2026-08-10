@@ -161,6 +161,7 @@ export function NavShell({
                 aria-current={isActive(pathname, item.href) ? "page" : undefined}
               >
                 {item.label}
+                {item.badge ? <span className="nav-badge">{item.badge}</span> : null}
               </Link>
             ))}
           </nav>
@@ -242,6 +243,7 @@ export function NavShell({
                 onClick={closeDrawer}
               >
                 {item.label}
+                {item.badge ? <span className="nav-badge">{item.badge}</span> : null}
               </Link>
             ))}
             {signedIn

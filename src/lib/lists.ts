@@ -124,6 +124,30 @@ export async function resolveActiveList(orgId: string, activeId: string | null) 
   return recent ? loadList(recent.id) : null;
 }
 
+/** Lists for `orgId` that have never been submitted (no Request row yet) —
+ *  the "find my way back" surface for the Kampanjer hub. Loaded with full
+ *  item/product data so callers can estimate a total (see plan-total.ts). */
+export async function loadUnsentLists(orgId: string) {
+  return prisma.savedList.findMany({
+    where: { organizationId: orgId, archivedAt: null, requests: { none: {} } },
+    orderBy: { updatedAt: "desc" },
+    include: {
+      ...ITEM_INCLUDE,
+      _count: { select: { items: true } },
+    },
+  });
+}
+
+export type UnsentList = Awaited<ReturnType<typeof loadUnsentLists>>[number];
+
+/** Cheap count-only version of `loadUnsentLists` for the nav badge — no item
+ *  data, just how many. */
+export async function countUnsentLists(orgId: string): Promise<number> {
+  return prisma.savedList.count({
+    where: { organizationId: orgId, archivedAt: null, requests: { none: {} } },
+  });
+}
+
 /** One-time fold of a legacy cookie basket into a fresh SavedList. Returns null if empty/all-invalid. */
 export async function migrateLegacyBasket(
   orgId: string,

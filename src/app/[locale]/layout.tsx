@@ -5,6 +5,8 @@ import { getMessages, getTranslations } from "next-intl/server";
 import { headers } from "next/headers";
 import { notFound, redirect } from "next/navigation";
 import { prisma } from "@/lib/prisma";
+import { getWorkspace } from "@/lib/workspace";
+import { countUnsentLists } from "@/lib/lists";
 import { Inter } from "next/font/google";
 import { routing } from "@/i18n/routing";
 import { Link } from "@/i18n/navigation";
@@ -124,9 +126,23 @@ export default async function LocaleLayout({
 
   const audience = audienceFor(session);
   const navOpts = { campaignFlow: campaignFlowEnabled() };
-  const nav = navItemsFor(audience, t, navOpts);
+  let nav = navItemsFor(audience, t, navOpts);
   const palette = paletteItemsFor(audience, t, navOpts);
   const userMenu = userMenuItemsFor(audience, t);
+
+  // Draft-list badge on "Kampanjer": the collapsed campaign-flow nav has no
+  // other way to signal unsent SavedLists exist, so the nav item itself is
+  // the notification. Only worth the extra query for the buyer roles that
+  // see the collapsed nav in the first place.
+  if (navOpts.campaignFlow && (audience === "advertiser" || audience === "agency")) {
+    const ws = await getWorkspace(session?.user?.id);
+    const draftListCount = ws?.activeOrgId ? await countUnsentLists(ws.activeOrgId) : 0;
+    if (draftListCount > 0) {
+      nav = nav.map((item) =>
+        item.key === "campaigns" ? { ...item, badge: draftListCount } : item,
+      );
+    }
+  }
 
   const appName = tc("appName");
   const signedIn = Boolean(session?.user);

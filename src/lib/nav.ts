@@ -8,6 +8,9 @@ export type NavItem = {
   label: string;
   href: string;
   description?: string;
+  // Small count pill next to the label — e.g. unsent draft lists on
+  // "Kampanjer" — set by the caller (layout.tsx), not computed here.
+  badge?: number;
 };
 
 export type Audience =
