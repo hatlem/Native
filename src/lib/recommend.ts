@@ -16,6 +16,10 @@ export type Candidate = {
   // Why this title matched the brief (facet chips), when brief matching is
   // used. Absent for the plain budget recommender.
   reasons?: string[];
+  // Grounded, one-sentence reason from the optional LLM rerank
+  // (brief-rerank-llm.ts), in the request locale. Absent when the rerank
+  // was skipped, unavailable, or failed — callers fall back to `reasons`.
+  reasonText?: string;
 };
 
 export type Recommendation = {

@@ -21,7 +21,7 @@ const TIMEOUT_MS = 10000;
 // uses, so its output composes with the deterministic scorer.
 const SYSTEM = `You extract advertising-audience facets from a marketing brief for a Nordic/European native-advertising marketplace. Return ONLY a compact JSON object, no prose, with this exact shape:
 {"audienceType": "B2B" | "B2C" | null,
- "industries": string[],   // lowercase canonical keys from: finance, legal, health, fitness, agriculture, tech, marketing, retail, energy, education, auto, construction, sports, food, politics, charity
+ "industries": string[],   // lowercase canonical keys from: finance, legal, health, fitness, agriculture, tech, marketing, retail, energy, education, auto, construction, sports, food, politics, charity, transport, machinery, trades
  "geoScopes": string[],    // any of: National, Regional, Local, International
  "locations": string[],    // lowercase city/region names mentioned or strongly implied
  "keywords": string[]}     // up to 6 extra lowercase single-word topics
@@ -38,7 +38,7 @@ type RawFacets = {
 const VALID_INDUSTRIES = new Set([
   "finance", "legal", "health", "fitness", "agriculture", "tech", "marketing",
   "retail", "energy", "education", "auto", "construction", "sports", "food",
-  "politics", "charity",
+  "politics", "charity", "transport", "machinery", "trades",
 ]);
 const VALID_SCOPES = new Set(["National", "Regional", "Local", "International"]);
 

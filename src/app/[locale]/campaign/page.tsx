@@ -71,6 +71,7 @@ export default async function CampaignPage({
           market: recMarket,
           budget: Number(recBudget) > 0 ? Number(recBudget) : undefined,
           brief: recBrief || undefined,
+          locale,
         })
       : null;
 

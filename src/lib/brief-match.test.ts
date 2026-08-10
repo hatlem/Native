@@ -7,6 +7,7 @@ import {
   mergeFacets,
   facetsAreEmpty,
   type MatchableTitle,
+  type BriefFacets,
 } from "./brief-match";
 
 const title = (over: Partial<MatchableTitle>): MatchableTitle => ({
@@ -22,6 +23,12 @@ const title = (over: Partial<MatchableTitle>): MatchableTitle => ({
   locationNote: null,
   digitalReach: null,
   monthlyReach: null,
+  description: null,
+  keywords: [],
+  aliases: [],
+  audienceNote: null,
+  city: null,
+  region: null,
   ...over,
 });
 
@@ -91,4 +98,79 @@ test("mergeFacets unions and only fills a missing audienceType", () => {
 test("facetsAreEmpty detects a signal-free brief", () => {
   assert.equal(facetsAreEmpty(extractFacets("hello there")), false); // "hello"/"there" -> keywords
   assert.equal(facetsAreEmpty(extractFacets("to the and of")), true); // all stopwords
+});
+
+// ---------- Word-boundary matching (short-term substring bugs) ----------
+
+test("extractFacets does not spuriously match short terms inside unrelated words", () => {
+  // "with" contains "it" as a substring — must not trigger the tech industry.
+  const f = extractFacets("we sell fleet tracking with GPS");
+  assert.ok(!f.industries.includes("tech"));
+  // "fleet"/"tracking" should surface the new transport industry instead.
+  assert.ok(f.industries.includes("transport"));
+});
+
+test("scoreTitle does not match short industry terms as substrings of unrelated words", () => {
+  const facetsAuto: BriefFacets = { audienceType: null, industries: ["auto"], geoScopes: [], locations: [], keywords: [] };
+  // "car" (auto trigger) must not match inside "healthcare".
+  const healthTitle = title({ vertical: "B2B – Healthcare" });
+  assert.equal(scoreTitle(healthTitle, facetsAuto).score, 0);
+
+  const facetsTech: BriefFacets = { audienceType: null, industries: ["tech"], geoScopes: [], locations: [], keywords: [] };
+  // "it" (tech trigger) must not match inside "Health & Fitness" or "Hospitality".
+  assert.equal(scoreTitle(title({ vertical: "Health & Fitness" }), facetsTech).score, 0);
+  assert.equal(scoreTitle(title({ vertical: "B2B – Hospitality" }), facetsTech).score, 0);
+});
+
+// ---------- New transport/machinery/trades industries ----------
+
+test("extractFacets recognizes the transport/logistics/fleet industry multilingually", () => {
+  assert.ok(extractFacets("we manage a fleet of trucks and vans").industries.includes("transport"));
+  assert.ok(extractFacets("vi har en bilpark med lastebiler og logistikk").industries.includes("transport"));
+});
+
+test("extractFacets recognizes machinery and trades industries", () => {
+  assert.ok(extractFacets("entreprenører med anleggsmaskiner").industries.includes("machinery"));
+  assert.ok(extractFacets("håndverkere som elektriker og rørlegger").industries.includes("trades"));
+});
+
+// ---------- Topical-score demotion ----------
+
+test("matchTitles filters out a B2B-only title when the brief has topical facets it doesn't match", () => {
+  const facets: BriefFacets = { audienceType: "B2B", industries: ["transport"], geoScopes: [], locations: [], keywords: [] };
+  const offTopic = title({ id: "hospitality", b2bB2c: "B2B", vertical: "B2B – Hospitality", nativeFit: "High", digitalReach: 500000 });
+  const onTopic = title({ id: "transport", b2bB2c: "B2B", vertical: "B2B – Transport & Logistics", nativeFit: "High", digitalReach: 1000 });
+  const ranked = matchTitles([offTopic, onTopic], facets);
+  assert.equal(ranked.length, 1);
+  assert.equal(ranked[0].title.id, "transport");
+});
+
+test("matchTitles still matches on audience alone when the brief has no topical facets", () => {
+  const facets: BriefFacets = { audienceType: "B2B", industries: [], geoScopes: [], locations: [], keywords: [] };
+  const b2bOnly = title({ id: "biz", b2bB2c: "B2B" });
+  const ranked = matchTitles([b2bOnly], facets);
+  assert.equal(ranked.length, 1);
+  assert.equal(ranked[0].title.id, "biz");
+});
+
+// ---------- Structured (keywords[]/aliases[]/description) fields ----------
+
+test("scoreTitle picks up keywords[]/aliases[]/description and outranks a tags-only match", () => {
+  const facets: BriefFacets = { audienceType: null, industries: [], geoScopes: [], locations: [], keywords: ["salmon"] };
+  const structuredMatch = title({ keywords: ["Salmon Farming"] });
+  const aliasMatch = title({ aliases: ["Salmon Business"] });
+  const descriptionMatch = title({ description: "Coverage of salmon farming and aquaculture." });
+  const tagsOnlyMatch = title({ tags: "salmon, aquaculture" });
+  const noMatch = title({ vertical: "Sports" });
+
+  const structured = scoreTitle(structuredMatch, facets);
+  const alias = scoreTitle(aliasMatch, facets);
+  const description = scoreTitle(descriptionMatch, facets);
+  const tagsOnly = scoreTitle(tagsOnlyMatch, facets);
+  const none = scoreTitle(noMatch, facets);
+
+  assert.ok(structured.score > 0 && alias.score > 0 && description.score > 0);
+  assert.equal(none.score, 0);
+  // A structured keywords[] hit outweighs a freetext (tags-only) hit.
+  assert.ok(structured.score > tagsOnly.score);
 });

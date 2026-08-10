@@ -40,6 +40,15 @@ export type MatchableTitle = {
   locationNote: string | null;
   digitalReach: number | null;
   monthlyReach: number | null;
+  // Richer per-title fields (curated, not CSV-import lineage). A brief that
+  // only overlaps with these — not the coarse vertical/audience/category —
+  // should still be able to find and rank the title.
+  description: string | null;
+  keywords: string[];
+  aliases: string[];
+  audienceNote: string | null;
+  city: string | null;
+  region: string | null;
 };
 
 export type TitleMatch = {
@@ -89,6 +98,19 @@ const INDUSTRY_TERMS: Record<string, string[]> = {
   food: ["food", "drink", "restaurant", "culinary", "mat", "drikke", "ruoka", "essen", "lebensmittel"],
   politics: ["politics", "political", "government", "policy", "politikk", "politik", "politiikka"],
   charity: ["charity", "nonprofit", "third sector", "ngo", "veldedighet", "välgörenhet"],
+  transport: [
+    "transport", "logistics", "logistikk", "fleet", "flåte", "trucking",
+    "lastebil", "truck", "trucks", "van", "vans", "varebil", "shipping",
+    "maritime", "spedisjon", "kuljetus", "logistik",
+  ],
+  machinery: [
+    "machinery", "machines", "anleggsmaskin", "maskin", "entreprenør",
+    "equipment", "baumaschinen",
+  ],
+  trades: [
+    "trades", "tradespeople", "håndverk", "håndverker", "elektriker",
+    "rørlegger", "hantverkare", "handwerk", "craftsmen",
+  ],
 };
 
 const GEO_SCOPE_TERMS: Record<GeoScope, string[]> = {
@@ -122,8 +144,27 @@ function normalize(text: string): string {
 }
 
 // Does the haystack contain the term as a word-ish substring?
+//
+// Short terms (<5 chars) are ambiguous as raw substrings — "it" (tech) hides
+// inside "with", "car" (auto) hides inside "healthcare", "by" (Local) hides
+// inside almost any English brief — so those are matched at word boundaries
+// only. Terms >= 5 chars keep the looser substring match: it's deliberate
+// that "health" (health) matches inside "healthcare".
+const WORD_BOUNDARY_TERM_CACHE = new Map<string, RegExp>();
+
+function wordBoundaryRegex(term: string): RegExp {
+  let re = WORD_BOUNDARY_TERM_CACHE.get(term);
+  if (!re) {
+    const escaped = term.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+    re = new RegExp(`(?<![\\p{L}\\p{N}])${escaped}(?![\\p{L}\\p{N}])`, "u");
+    WORD_BOUNDARY_TERM_CACHE.set(term, re);
+  }
+  return re;
+}
+
 function contains(haystack: string, term: string): boolean {
-  return haystack.includes(term);
+  if (term.length >= 5) return haystack.includes(term);
+  return wordBoundaryRegex(term).test(haystack);
 }
 
 export function extractFacets(brief: string): BriefFacets {
@@ -187,15 +228,39 @@ const W = {
   geoScope: 2,
   location: 3,
   localBoost: 1,
+  // A brief keyword found in the title's curated keywords[] array is a much
+  // stronger signal than the same word merely appearing somewhere in the
+  // loose facetText blob (e.g. buried in a tags string) — see `keyword`.
+  structuredKeyword: 3,
   keyword: 1,
   nativeFitHigh: 1,
 };
 
-export function scoreTitle(title: MatchableTitle, facets: BriefFacets): { score: number; reasons: string[] } {
+export function scoreTitle(
+  title: MatchableTitle,
+  facets: BriefFacets,
+): { score: number; reasons: string[]; topicalScore: number } {
   let score = 0;
+  // Sum of industry/keyword/location hits only — i.e. evidence the title is
+  // actually ABOUT what the brief asked for, as opposed to just matching the
+  // audience type or geography. Used by matchTitles to stop a broad B2B/geo
+  // match from outranking topical relevance (see matchTitles).
+  let topicalScore = 0;
   const reasons: string[] = [];
 
-  const facetText = [title.vertical, title.audience, title.category, title.tags]
+  const structuredKeywords = (title.keywords ?? []).map((k) => k.toLowerCase());
+  const facetText = [
+    title.vertical,
+    title.audience,
+    title.category,
+    title.tags,
+    title.description,
+    title.audienceNote,
+    title.city,
+    title.region,
+    structuredKeywords.join(" "),
+    (title.aliases ?? []).join(" "),
+  ]
     .filter(Boolean)
     .join(" ")
     .toLowerCase();
@@ -207,8 +272,9 @@ export function scoreTitle(title: MatchableTitle, facets: BriefFacets): { score:
 
   for (const ind of facets.industries) {
     const terms = INDUSTRY_TERMS[ind] ?? [ind];
-    if (terms.some((t) => facetText.includes(t))) {
+    if (terms.some((t) => contains(facetText, t))) {
       score += W.industry;
+      topicalScore += W.industry;
       reasons.push(ind);
     }
   }
@@ -222,9 +288,10 @@ export function scoreTitle(title: MatchableTitle, facets: BriefFacets): { score:
 
   if (facets.locations.length && title.locationNote) {
     const loc = title.locationNote.toLowerCase();
-    const hit = facets.locations.find((p) => loc.includes(p));
+    const hit = facets.locations.find((p) => contains(loc, p));
     if (hit) {
       score += W.location;
+      topicalScore += W.location;
       reasons.push(hit);
     }
     // A place was named and this title is local/regional → small boost.
@@ -234,8 +301,14 @@ export function scoreTitle(title: MatchableTitle, facets: BriefFacets): { score:
   }
 
   for (const kw of facets.keywords) {
-    if (facetText.includes(kw)) {
+    const structuredHit = structuredKeywords.some((k) => contains(k, kw));
+    if (structuredHit) {
+      score += W.structuredKeyword;
+      topicalScore += W.structuredKeyword;
+      if (!reasons.includes(kw)) reasons.push(kw);
+    } else if (contains(facetText, kw)) {
       score += W.keyword;
+      topicalScore += W.keyword;
       if (!reasons.includes(kw)) reasons.push(kw);
     }
   }
@@ -247,7 +320,7 @@ export function scoreTitle(title: MatchableTitle, facets: BriefFacets): { score:
     score += W.nativeFitHigh;
   }
 
-  return { score, reasons };
+  return { score, reasons, topicalScore };
 }
 
 export type MatchOptions = { limit?: number; minScore?: number };
@@ -258,16 +331,24 @@ export function matchTitles(
   opts: MatchOptions = {},
 ): TitleMatch[] {
   const minScore = opts.minScore ?? 1;
+  // When the brief names an industry/topic, audience/geo alone can't be
+  // enough — a B2B title with zero topical evidence must not outrank (or
+  // even appear ahead of) a title that actually matches the topic, no matter
+  // how large its reach. A pure audience/geo brief ("B2B companies in
+  // Norway") still matches on audience/geo alone, unchanged.
+  const hasTopicalFacets = facets.industries.length > 0 || facets.keywords.length > 0;
   const scored = titles
     .map((title) => ({ title, ...scoreTitle(title, facets) }))
     .filter((m) => m.score >= minScore)
+    .filter((m) => !hasTopicalFacets || m.topicalScore >= 1)
     .sort(
       (a, b) =>
         b.score - a.score ||
         (b.title.digitalReach ?? b.title.monthlyReach ?? 0) -
           (a.title.digitalReach ?? a.title.monthlyReach ?? 0) ||
         a.title.name.localeCompare(b.title.name),
-    );
+    )
+    .map(({ topicalScore: _topicalScore, ...rest }) => rest);
   return opts.limit ? scored.slice(0, opts.limit) : scored;
 }
 
