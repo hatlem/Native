@@ -6,6 +6,7 @@ import { isProductPriceShown } from "@/lib/pricing/visibility";
 import { bandLabel } from "@/lib/pricing/bands";
 import { titleBand, titleRate } from "@/lib/pricing/display-price";
 import { loadPricingDefaults } from "@/lib/content-fee";
+import { titleDisplayName } from "@/lib/title-display";
 import { EmptyState } from "@/app/empty-state";
 import { localizeCategory } from "@/lib/taxonomy-i18n";
 import type { AppLocale } from "@/i18n/routing";
@@ -30,6 +31,7 @@ export async function CatalogResults({
   favoritedIds,
   favoriteLists,
   listMembership,
+  noOrg = false,
 }: {
   locale: string;
   titles: CatalogTitleRow[];
@@ -37,6 +39,8 @@ export async function CatalogResults({
   favoritedIds: Set<string>;
   favoriteLists: FavListOption[];
   listMembership: Record<string, string[]>;
+  /** Agency session with no client selected — no org to scope lists to. */
+  noOrg?: boolean;
 }) {
   const t = await getTranslations({ locale, namespace: "catalog" });
   const tf = await getTranslations({ locale, namespace: "firm" });
@@ -87,10 +91,11 @@ export async function CatalogResults({
               initialFavorited={favoritedIds.has(title.id)}
               lists={favoriteLists}
               inListIds={listMembership[title.id] ?? []}
+              noOrg={noOrg}
             />
             <h3>
               <Link className="card-link" href={`/catalog/${title.slug}`}>
-                {title.name}
+                {titleDisplayName(title)}
               </Link>
             </h3>
             <div className="muted">

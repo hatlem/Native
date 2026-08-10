@@ -3,7 +3,10 @@ import { headers } from "next/headers";
 import { notFound, redirect } from "next/navigation";
 import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
-import { getFavoritedTitleIds, getListMembershipForTitles } from "@/lib/favorites";
+import { getFavoritedTitleIds } from "@/lib/favorites";
+import { loadScope } from "@/lib/scope";
+import { savedListMembershipMap } from "@/lib/saved-list-membership";
+import { titleDomain } from "@/lib/title-display";
 import { FavoriteButton } from "../_components/FavoriteButton";
 import { AvailabilityStrip } from "../_components/AvailabilityStrip";
 import { Link } from "@/i18n/navigation";
@@ -125,20 +128,40 @@ export default async function TitleDetailPage({
   if (title.discontinuedAt) notFound();
   if (!title.active && title.lastVerifiedAt) notFound();
 
-  // Favorites: filled heart + the buyer's lists for the "add to list" menu.
-  // session.user is guaranteed — the guard above redirects guests.
+  // Favorites: filled heart + the buyer's real SavedLists (the same lists
+  // /plan and /lists work from, not the separate FavoriteList model) for the
+  // "add to list" menu. session.user is guaranteed — the guard above
+  // redirects guests.
   const favUserId = session.user.id;
-  const [favoritedSet, favoriteLists, listMembership] = await Promise.all([
+  const scope = await loadScope();
+  const orgId = scope.workspace?.activeOrgId ?? null;
+  const [favoritedSet, favoriteLists, membershipRows] = await Promise.all([
     getFavoritedTitleIds(favUserId, [title.id]),
-    prisma.favoriteList.findMany({
-      where: { userId: favUserId },
-      orderBy: { updatedAt: "desc" },
-      select: { id: true, name: true },
-    }),
-    getListMembershipForTitles(favUserId, [title.id]),
+    orgId
+      ? prisma.savedList.findMany({
+          where: { organizationId: orgId, archivedAt: null },
+          orderBy: { updatedAt: "desc" },
+          select: { id: true, name: true },
+        })
+      : Promise.resolve([]),
+    orgId
+      ? prisma.savedListItem.findMany({
+          where: {
+            list: { organizationId: orgId, archivedAt: null },
+            OR: [{ titleId: title.id }, { product: { titleId: title.id } }],
+          },
+          select: {
+            listId: true,
+            titleId: true,
+            product: { select: { titleId: true } },
+          },
+        })
+      : Promise.resolve([]),
   ]);
   const favorited = favoritedSet.has(title.id);
-  const inListIds = listMembership[title.id] ?? [];
+  const noOrg = !orgId;
+  const listMembership = savedListMembershipMap(membershipRows);
+  const inListIds = listMembership.get(title.id) ?? [];
 
   const pricing = await loadPricingDefaults();
 
@@ -181,6 +204,10 @@ export default async function TitleDetailPage({
       : { "@type": "AggregateOffer", offers: ldOffers },
   };
   const needsQuote = title.products.length === 0;
+  // Domain-style brand name ("AT.no") when known — surfaced next to the
+  // publisher line so a title reads "Anlegg & Transport" · AT.no rather than
+  // only the (sometimes generic) editorial name.
+  const domain = titleDomain(title);
 
   return (
     <section>
@@ -215,6 +242,7 @@ export default async function TitleDetailPage({
               initialFavorited={favorited}
               lists={favoriteLists}
               inListIds={inListIds}
+              noOrg={noOrg}
             />
           </div>
           <p className="muted">
@@ -228,6 +256,7 @@ export default async function TitleDetailPage({
               {title.publisher.name}
             </Link>{" "}
             · {tMarket(title.market.code)}
+            {domain ? ` · ${domain}` : null}
           </p>
           {title.description ? (
             <p style={{ marginTop: 8 }}>{title.description}</p>
@@ -268,7 +297,7 @@ export default async function TitleDetailPage({
           </form>
         </div>
 
-        <aside className="card" aria-label={t("keyFacts")}>
+        <aside className="card key-facts" aria-label={t("keyFacts")}>
           <h3 style={{ marginTop: 0 }}>{t("keyFacts")}</h3>
           <dl className="spec-list">
             {title.digitalReach ? (

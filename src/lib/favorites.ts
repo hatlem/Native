@@ -1,4 +1,5 @@
 import { prisma } from "./prisma";
+import { catalogVisibleTitleWhere } from "./catalog-visibility";
 
 export type FavoritePublication = {
   favoriteId: string;
@@ -35,7 +36,9 @@ export type FavoriteListDetail = {
 };
 
 /** Heart / un-heart a title for a user. Idempotent: returns the resulting
- *  state. A missing/inactive title is a no-op (returns favorited:false). */
+ *  state. A title the catalog doesn't show (discontinued, or missing) is a
+ *  no-op (returns favorited:false) — active/unverified research titles ARE
+ *  favoritable, matching catalogVisibleTitleWhere. */
 export async function toggleFavorite(
   userId: string,
   titleId: string,
@@ -49,7 +52,7 @@ export async function toggleFavorite(
     return { favorited: false };
   }
   const title = await prisma.title.findFirst({
-    where: { id: titleId, active: true },
+    where: { id: titleId, ...catalogVisibleTitleWhere },
     select: { id: true },
   });
   if (!title) return { favorited: false };
@@ -78,7 +81,7 @@ export async function addFavoriteToList(
 ): Promise<void> {
   await requireOwnList(userId, listId);
   const title = await prisma.title.findFirst({
-    where: { id: titleId, active: true },
+    where: { id: titleId, ...catalogVisibleTitleWhere },
     select: { id: true },
   });
   if (!title) return;
@@ -182,9 +185,10 @@ export async function getFavoritedTitleIds(
 ): Promise<Set<string>> {
   if (titleIds.length === 0) return new Set();
   const rows = await prisma.favorite.findMany({
-    // Callers pass active titles today; the title.active guard is cheap
-    // insurance against a future caller surfacing hearts for 404-ing titles.
-    where: { userId, titleId: { in: titleIds }, title: { active: true } },
+    // Must agree with the catalog surface (active OR unverified, never
+    // discontinued) — a narrower guard here silently reverts hearts the
+    // buyer just set on a research-only row (the "dead first click" bug).
+    where: { userId, titleId: { in: titleIds }, title: catalogVisibleTitleWhere },
     select: { titleId: true },
   });
   return new Set(rows.map((r) => r.titleId));
@@ -202,7 +206,7 @@ export async function getListMembershipForTitles(
   const rows = await prisma.favoriteListItem.findMany({
     where: {
       list: { userId },
-      favorite: { userId, titleId: { in: titleIds }, title: { active: true } },
+      favorite: { userId, titleId: { in: titleIds }, title: catalogVisibleTitleWhere },
     },
     select: { listId: true, favorite: { select: { titleId: true } } },
   });
@@ -268,7 +272,7 @@ const PUBLICATION_SELECT = {
 // link to a /catalog/[slug] that 404s (the detail page hides inactive titles).
 // Hide those favorites and exclude them from list counts, so what the buyer
 // sees — and the counts beside each list — stay consistent with the catalog.
-const ACTIVE_LIST_ITEM = { favorite: { title: { active: true } } } as const;
+const ACTIVE_LIST_ITEM = { favorite: { title: catalogVisibleTitleWhere } } as const;
 const ACTIVE_ITEM_COUNT = {
   select: { items: { where: ACTIVE_LIST_ITEM } },
 } as const;
@@ -281,7 +285,7 @@ export async function getFavoritesOverview(
 ): Promise<FavoritesOverview> {
   const [favRows, ownLists, sharedRows] = await Promise.all([
     prisma.favorite.findMany({
-      where: { userId, title: { active: true } },
+      where: { userId, title: catalogVisibleTitleWhere },
       orderBy: { createdAt: "desc" },
       select: PUBLICATION_SELECT,
     }),

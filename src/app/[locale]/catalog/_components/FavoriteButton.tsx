@@ -2,11 +2,8 @@
 
 import { useState, useTransition, useRef, useEffect } from "react";
 import { useTranslations } from "next-intl";
-import {
-  toggleFavorite,
-  setFavoriteListMembership,
-  createFavoriteList,
-} from "@/app/favorites-actions";
+import { toggleFavorite } from "@/app/favorites-actions";
+import { setListTitleMembership, createListWithTitle } from "@/app/list-actions";
 
 export type FavListOption = { id: string; name: string };
 
@@ -16,13 +13,17 @@ export function FavoriteButton({
   initialFavorited,
   lists,
   inListIds = [],
+  noOrg = false,
 }: {
   locale: string;
   titleId: string;
   initialFavorited: boolean;
+  /** The buyer's SavedLists (org-scoped) — drives the "add to list" checklist. */
   lists: FavListOption[];
   /** Ids of the user's lists this title is already in — drives the checkboxes. */
   inListIds?: string[];
+  /** Agency session with no client selected — no org to scope lists to. */
+  noOrg?: boolean;
 }) {
   const t = useTranslations("favorites");
   const [favorited, setFavorited] = useState(initialFavorited);
@@ -66,9 +67,9 @@ export function FavoriteButton({
   function onToggle() {
     const next = !favorited;
     setFavorited(next);
-    // Un-hearting cascades the favorite out of every list server-side; mirror
-    // that optimistically so the checkboxes don't show stale memberships.
-    if (!next) setInLists(new Set());
+    // The heart (personal shortlist) and SavedList membership (org-level, the
+    // popover checklist) are independent systems now — un-hearting must NOT
+    // touch list membership.
     const fd = new FormData();
     fd.set("locale", locale);
     fd.set("titleId", titleId);
@@ -77,8 +78,10 @@ export function FavoriteButton({
     });
   }
 
-  // Toggle membership in ONE list. The popover stays open so several lists can
-  // be ticked in a row. Adding a list also lights the heart (it's now favorited).
+  // Toggle membership in ONE SavedList. The popover stays open so several
+  // lists can be ticked in a row. List membership is org-level (shared with
+  // the whole team via /plan and /lists); the heart stays a personal
+  // shortlist, so ticking a list does NOT light the heart.
   function onToggleList(listId: string) {
     const willBeMember = !inLists.has(listId);
     setInLists((prev) => {
@@ -87,30 +90,28 @@ export function FavoriteButton({
       else next.delete(listId);
       return next;
     });
-    if (willBeMember) setFavorited(true);
     const fd = new FormData();
     fd.set("locale", locale);
     fd.set("titleId", titleId);
     fd.set("listId", listId);
     fd.set("member", willBeMember ? "1" : "0");
     startTransition(async () => {
-      await setFavoriteListMembership(fd);
+      await setListTitleMembership(fd);
     });
   }
 
   function onCreateList(formData: FormData) {
     formData.set("locale", locale);
     formData.set("titleId", titleId);
-    setFavorited(true);
     startTransition(async () => {
-      await createFavoriteList(formData);
+      await createListWithTitle(formData);
       // Keep the popover open; the new (checked) list arrives on revalidation.
     });
   }
 
   return (
     <div
-      className="fav-btn"
+      className={`fav-btn${menuOpen ? " is-open" : ""}`}
       ref={wrapRef}
       onKeyDown={(e) => {
         if (e.key === "Escape" && menuOpen) {
@@ -144,39 +145,48 @@ export function FavoriteButton({
       {menuOpen ? (
         <div className="fav-menu" role="group" aria-label={t("addToList")} ref={menuRef}>
           <p className="fav-menu-title">{t("addToList")}</p>
-          {lists.length > 0 ? (
-            <ul>
-              {lists.map((l) => {
-                const checked = inLists.has(l.id);
-                return (
-                  <li key={l.id}>
-                    <label className={`fav-list-opt${checked ? " is-checked" : ""}`}>
-                      <input
-                        type="checkbox"
-                        checked={checked}
-                        onChange={() => onToggleList(l.id)}
-                      />
-                      <span>{l.name}</span>
-                    </label>
-                  </li>
-                );
-              })}
-            </ul>
+          {noOrg ? (
+            // Agency session, no client selected: there's no org to scope a
+            // SavedList to, so neither the checklist nor "new list" can work
+            // — say why instead of the misleading "no lists yet".
+            <p className="muted small">{t("noOrgHint")}</p>
           ) : (
-            <p className="muted small">{t("noLists")}</p>
+            <>
+              {lists.length > 0 ? (
+                <ul>
+                  {lists.map((l) => {
+                    const checked = inLists.has(l.id);
+                    return (
+                      <li key={l.id}>
+                        <label className={`fav-list-opt${checked ? " is-checked" : ""}`}>
+                          <input
+                            type="checkbox"
+                            checked={checked}
+                            onChange={() => onToggleList(l.id)}
+                          />
+                          <span>{l.name}</span>
+                        </label>
+                      </li>
+                    );
+                  })}
+                </ul>
+              ) : (
+                <p className="muted small">{t("noLists")}</p>
+              )}
+              <form action={onCreateList} className="fav-newlist">
+                <input
+                  name="name"
+                  placeholder={t("newListPlaceholder")}
+                  aria-label={t("newListPlaceholder")}
+                  maxLength={80}
+                  required
+                />
+                <button type="submit" className="btn ghost small">
+                  {t("createList")}
+                </button>
+              </form>
+            </>
           )}
-          <form action={onCreateList} className="fav-newlist">
-            <input
-              name="name"
-              placeholder={t("newListPlaceholder")}
-              aria-label={t("newListPlaceholder")}
-              maxLength={80}
-              required
-            />
-            <button type="submit" className="btn ghost small">
-              {t("createList")}
-            </button>
-          </form>
         </div>
       ) : null}
     </div>

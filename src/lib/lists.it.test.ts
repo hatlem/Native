@@ -12,6 +12,9 @@ import {
   snapshotListToPlanData,
 } from "./lists";
 import { rehomeSavedListItems } from "./commerce/rehome-saved-list-items";
+import { catalogVisibleTitleWhere } from "./catalog-visibility";
+import { toggleFavorite } from "./favorites";
+import { canActOnOrg, type Scope } from "./scope";
 
 let orgId = "";
 let productId = "";
@@ -290,4 +293,143 @@ test("rehomeSavedListItems merges quantities when the survivor is already on the
   assert.equal(rows.length, 1);
   assert.equal(rows[0].quantity, 3); // 2 + 1 merged (clamped)
   await prisma.product.delete({ where: { id: dead } });
+});
+
+// ── catalog "add to list" popover + favorites guard swap ───────────────────
+// list-actions.ts's setListTitleMembership/createListWithTitle and
+// favorites.ts's toggleFavorite etc. all now gate on catalogVisibleTitleWhere
+// instead of a bare `active: true`, so hearting/listing a catalog-visible but
+// UNVERIFIED research title (active:false, lastVerifiedAt:null) — exactly the
+// "dead first click" bug's trigger — persists instead of silently no-opping.
+// The server actions themselves call loadScope() (next-auth session), which
+// this DB-only harness can't drive, so these tests exercise the exact guard
+// fragment / query / DB semantics those actions are built from.
+
+let researchTitleId = "";
+let discontinuedTitleId = "";
+let favUserId = "";
+
+before(async () => {
+  const seed = await prisma.title.findFirst({ where: { products: { some: {} } } });
+  const research = await prisma.title.create({
+    data: {
+      name: "IT Unverified Research Title",
+      slug: `it-unverified-research-${Date.now()}`,
+      publisherId: seed!.publisherId,
+      countryCode: seed!.countryCode,
+      marketId: seed!.marketId,
+      category: "trade-press",
+      active: false,
+      lastVerifiedAt: null,
+    },
+  });
+  researchTitleId = research.id;
+  const discontinued = await prisma.title.create({
+    data: {
+      name: "IT Discontinued Title",
+      slug: `it-discontinued-${Date.now()}`,
+      publisherId: seed!.publisherId,
+      countryCode: seed!.countryCode,
+      marketId: seed!.marketId,
+      category: "trade-press",
+      active: true,
+      discontinuedAt: new Date(),
+    },
+  });
+  discontinuedTitleId = discontinued.id;
+  const user = await prisma.user.create({ data: { email: `lists-it-fav-${Date.now()}@nativespin.test` } });
+  favUserId = user.id;
+});
+
+after(async () => {
+  await prisma.favorite.deleteMany({ where: { userId: favUserId } });
+  await prisma.user.delete({ where: { id: favUserId } });
+  await prisma.savedListItem.deleteMany({ where: { titleId: { in: [researchTitleId, discontinuedTitleId] } } });
+  await prisma.title.delete({ where: { id: researchTitleId } });
+  await prisma.title.delete({ where: { id: discontinuedTitleId } });
+});
+
+test("catalogVisibleTitleWhere matches an unverified (active:false, lastVerifiedAt:null) research title", async () => {
+  const found = await prisma.title.findFirst({
+    where: { id: researchTitleId, ...catalogVisibleTitleWhere },
+    select: { id: true },
+  });
+  assert.ok(found, "the shared guard must surface titles the catalog itself shows");
+});
+
+test("catalogVisibleTitleWhere excludes a discontinued title even though active:true", async () => {
+  const found = await prisma.title.findFirst({
+    where: { id: discontinuedTitleId, ...catalogVisibleTitleWhere },
+    select: { id: true },
+  });
+  assert.equal(found, null);
+});
+
+test("setListTitleMembership add-flow: guard passes and addTitleItem is idempotent for a research title (regression for the dead-heart/dead-click bug)", async () => {
+  const listId = await freshList();
+  const guarded = await prisma.title.findFirst({
+    where: { id: researchTitleId, ...catalogVisibleTitleWhere },
+    select: { id: true },
+  });
+  assert.ok(guarded, "the old active:true-only guard would have rejected this title and silently no-opped");
+  const a = await addTitleItem(listId, guarded!.id);
+  const b = await addTitleItem(listId, guarded!.id); // double add via the checklist
+  assert.equal(a.id, b.id);
+  assert.equal(await prisma.savedListItem.count({ where: { listId, titleId: researchTitleId } }), 1);
+});
+
+test("setListTitleMembership remove-flow: deletes both a title placeholder row and a product-line row of the same title", async () => {
+  const listId = await freshList();
+  await addTitleItem(listId, titleId); // placeholder row
+  await addProductItem(listId, productId); // productId belongs to titleId (see `before`)
+  assert.equal(await prisma.savedListItem.count({ where: { listId } }), 2);
+  await prisma.savedListItem.deleteMany({
+    where: { listId, OR: [{ titleId }, { product: { titleId } }] },
+  });
+  assert.equal(await prisma.savedListItem.count({ where: { listId } }), 0);
+});
+
+test("canActOnOrg rejects a listId belonging to another org (the guard setListTitleMembership/createListWithTitle rely on)", async () => {
+  const other = await prisma.organization.create({
+    data: { name: "Other Org Membership Guard", type: "ADVERTISER", marketCode: "NO" },
+  });
+  const theirList = await prisma.savedList.create({ data: { organizationId: other.id } });
+  const scope: Scope = {
+    session: null,
+    role: "BUYER",
+    userId: "it-test-user",
+    isDesk: false,
+    isPublisher: false,
+    workspace: {
+      userId: "it-test-user",
+      isAgency: false,
+      agencyOrgId: null,
+      homeOrgId: orgId,
+      activeOrgId: orgId,
+      scopeOrgIds: [orgId],
+      activeRole: null,
+      activeCanCommit: true,
+    },
+  };
+  assert.equal(canActOnOrg(scope, theirList.organizationId), false, "must not be able to act on another org's list");
+  assert.equal(canActOnOrg(scope, orgId), true, "must still be able to act on its own scoped org");
+  await prisma.savedList.delete({ where: { id: theirList.id } });
+  await prisma.organization.delete({ where: { id: other.id } });
+});
+
+test("toggleFavorite hearts an unverified research title (regression for the dead-heart bug)", async () => {
+  const first = await toggleFavorite(favUserId, researchTitleId);
+  assert.equal(first.favorited, true, "the old active:true-only guard would have returned favorited:false");
+  assert.ok(await prisma.favorite.findUnique({ where: { userId_titleId: { userId: favUserId, titleId: researchTitleId } } }));
+  const second = await toggleFavorite(favUserId, researchTitleId); // un-heart
+  assert.equal(second.favorited, false);
+});
+
+test("toggleFavorite still no-ops on a discontinued title", async () => {
+  const result = await toggleFavorite(favUserId, discontinuedTitleId);
+  assert.equal(result.favorited, false);
+  assert.equal(
+    await prisma.favorite.findUnique({ where: { userId_titleId: { userId: favUserId, titleId: discontinuedTitleId } } }),
+    null,
+  );
 });

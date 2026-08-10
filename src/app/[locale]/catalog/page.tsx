@@ -2,8 +2,11 @@ import { getTranslations } from "next-intl/server";
 import { MarketCode, ProductType, Prisma } from "@prisma/client";
 import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
-import { getFavoritedTitleIds, getListMembershipForTitles } from "@/lib/favorites";
-import { searchTitleIds } from "@/lib/catalog-search";
+import { getFavoritedTitleIds } from "@/lib/favorites";
+import { searchTitleIds, searchWhereFor } from "@/lib/catalog-search";
+import { catalogVisibleTitleWhere } from "@/lib/catalog-visibility";
+import { savedListMembershipMap } from "@/lib/saved-list-membership";
+import { loadScope } from "@/lib/scope";
 import { CatalogFilters } from "./_components/CatalogFilters";
 import { CatalogMarketing } from "./_components/CatalogMarketing";
 import { CatalogResults } from "./_components/CatalogResults";
@@ -129,12 +132,6 @@ export default async function CatalogPage({
   }
 
   const where: Prisma.TitleWhereInput = {
-    // Show commerce-active titles AND unverified research-catalog rows;
-    // hide titles the desk has verified as not offering native.
-    OR: [{ active: true }, { lastVerifiedAt: null }],
-    // Never surface titles marked discontinued (nedlagt/duplikat), even if
-    // they're still unverified research rows.
-    discontinuedAt: null,
     ...(markets.length
       ? markets.length === 1
         ? { market: { code: markets[0] } }
@@ -146,25 +143,29 @@ export default async function CatalogPage({
     ...(verticals.length ? { vertical: { in: verticals } } : {}),
     ...(regions.length ? { region: { in: regions } } : {}),
     ...(publisher ? { publisherId: publisher } : {}),
-    // AND-wrapped so each condition composes with the type filter's own
-    // products.some — see andConditions above for what goes in here.
-    ...(andConditions.length ? { AND: andConditions } : {}),
     ...(nativeFit ? { nativeFit } : {}),
     ...(b2bB2c ? { b2bB2c } : {}),
     ...(reach ? { reach } : {}),
-    ...(matchedIds
-      ? { id: { in: matchedIds } }
-      : q
-        ? {
-            OR: [
-              { name: { contains: q, mode: "insensitive" } },
-              { category: { contains: q, mode: "insensitive" } },
-              { vertical: { contains: q, mode: "insensitive" } },
-              { tags: { contains: q, mode: "insensitive" } },
-              { city: { contains: q, mode: "insensitive" } },
-            ],
-          }
-        : {}),
+    // AND-composed rather than spread: catalogVisibleTitleWhere and the
+    // search fallback (buildIlikeFallbackWhere) can each independently
+    // produce a top-level `OR` key. Spreading them into the same object
+    // literal would let the later one silently clobber the earlier one
+    // (object spread: last key wins) — dropping the visibility guard
+    // whenever a search falls through to the ILIKE fallback. Combining
+    // them as separate AND members keeps both `OR`s intact and composes
+    // correctly with the type filter's own products.some in andConditions.
+    AND: [
+      // Show commerce-active titles AND unverified research-catalog rows;
+      // hide titles the desk has verified as not offering native, and never
+      // surface titles marked discontinued (nedlagt/duplikat). Shared with
+      // favorites.ts/list-actions.ts so the guards can't drift apart.
+      catalogVisibleTitleWhere,
+      // A non-empty FTS hit list wins outright; an empty-or-absent FTS result
+      // (including a valid tsquery that simply matched nothing) falls through
+      // to the synonym-aware ILIKE fallback instead of pinning `id IN ()`.
+      searchWhereFor(q, matchedIds),
+      ...andConditions,
+    ],
   };
 
   const verticalRows = await prisma.title.findMany({
@@ -219,24 +220,51 @@ export default async function CatalogPage({
   const totalPages = Math.max(1, Math.ceil(totalCount / PAGE_SIZE));
 
   // Favorites: which of this page's titles the buyer has hearted (filled vs
-  // empty heart) + their lists for the "add to list" dropdown. session.user
-  // is guaranteed here — the marketing splash returns above for guests.
+  // empty heart). The "add to list" dropdown, however, is the buyer's real
+  // SavedList set — the same lists /plan and /lists work from — not the
+  // separate (and for most buyers empty) FavoriteList model. session.user is
+  // guaranteed here — the marketing splash returns above for guests.
   const userId = session.user.id;
   const titleIds = titles.map((tt) => tt.id);
-  const [favoritedIds, favoriteLists, listMembership, bookingUserRow] =
+  const scope = await loadScope();
+  const orgId = scope.workspace?.activeOrgId ?? null;
+  const [favoritedIds, savedLists, membershipRows, bookingUserRow] =
     await Promise.all([
       getFavoritedTitleIds(userId, titleIds),
-      prisma.favoriteList.findMany({
-        where: { userId },
-        orderBy: { updatedAt: "desc" },
-        select: { id: true, name: true },
-      }),
-      getListMembershipForTitles(userId, titleIds),
+      orgId
+        ? prisma.savedList.findMany({
+            where: { organizationId: orgId, archivedAt: null },
+            orderBy: { updatedAt: "desc" },
+            select: { id: true, name: true },
+          })
+        : Promise.resolve([]),
+      orgId && titleIds.length
+        ? prisma.savedListItem.findMany({
+            where: {
+              list: { organizationId: orgId, archivedAt: null },
+              OR: [
+                { titleId: { in: titleIds } },
+                { product: { titleId: { in: titleIds } } },
+              ],
+            },
+            select: {
+              listId: true,
+              titleId: true,
+              product: { select: { titleId: true } },
+            },
+          })
+        : Promise.resolve([]),
       prisma.user.findUnique({
         where: { id: userId },
         select: { bookingPromptDismissedAt: true },
       }),
     ]);
+  const favoriteLists = savedLists;
+  // An agency session with no client selected has no org to scope lists to —
+  // show a "choose a client first" hint instead of the misleading "no lists".
+  const noOrg = !orgId;
+  const membershipMap = savedListMembershipMap(membershipRows);
+  const listMembership: Record<string, string[]> = Object.fromEntries(membershipMap);
   const dismissedAt = bookingUserRow?.bookingPromptDismissedAt ?? null;
   const showBookingBanner = shouldShowBookingBanner({
     audience: audienceFor(session),
@@ -462,6 +490,7 @@ export default async function CatalogPage({
         favoritedIds={favoritedIds}
         favoriteLists={favoriteLists}
         listMembership={listMembership}
+        noOrg={noOrg}
       />
 
       <CatalogPagination

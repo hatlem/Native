@@ -7,6 +7,7 @@ import { prisma } from "@/lib/prisma";
 import { loadScope, canActOnOrg } from "@/lib/scope";
 import { recordAudit } from "@/lib/audit";
 import { readBasket } from "@/lib/basket";
+import { catalogVisibleTitleWhere } from "@/lib/catalog-visibility";
 import {
   ensureActiveListId,
   addProductItem,
@@ -99,17 +100,95 @@ export async function addRecommendedToList(formData: FormData) {
   redirect(`/${locale}/plan`);
 }
 
+// Bulk-adopt every hearted title (the personal favorites pool) into the active
+// list in one go — the hearts↔lists bridge surfaced on /plan. Same idempotent
+// upsert as every other add path, so re-running it (e.g. after hearting more
+// titles) never duplicates a line.
+export async function addAllFavoritesToList(formData: FormData) {
+  const locale = str(formData, "locale") || "en";
+  const { scope, listId } = await activeList(locale);
+  const favs = await prisma.favorite.findMany({
+    where: { userId: scope.userId!, title: catalogVisibleTitleWhere },
+    select: { titleId: true },
+  });
+  await Promise.all(favs.map((f) => addTitleItem(listId, f.titleId)));
+  redirect(`/${locale}/plan`);
+}
+
 export async function saveTitleToList(formData: FormData) {
   const locale = str(formData, "locale") || "en";
   const titleId = str(formData, "titleId");
   if (titleId) {
-    const valid = await prisma.title.findFirst({ where: { id: titleId, active: true }, select: { id: true } });
+    const valid = await prisma.title.findFirst({ where: { id: titleId, ...catalogVisibleTitleWhere }, select: { id: true } });
     if (valid) {
       const { listId } = await activeList(locale);
       await addTitleItem(listId, titleId);
     }
   }
   redirect(`/${locale}/plan`);
+}
+
+// Toggle a title's membership in one SavedList, addressed by titleId — the
+// catalog card's "add to list" checklist knows the title + desired state, not
+// a SavedListItem id. Lets a buyer put the same publication on several lists
+// from the popover without leaving the catalog. No redirect: called from a
+// popover, not a full-page form.
+export async function setListTitleMembership(formData: FormData) {
+  const locale = str(formData, "locale") || "en";
+  const titleId = str(formData, "titleId");
+  const listId = str(formData, "listId");
+  const member = str(formData, "member") === "1";
+  const scope = await loadScope();
+  if (titleId && listId) {
+    const list = await prisma.savedList.findUnique({
+      where: { id: listId },
+      select: { organizationId: true, archivedAt: true },
+    });
+    if (list && !list.archivedAt && canActOnOrg(scope, list.organizationId)) {
+      if (member) {
+        const valid = await prisma.title.findFirst({
+          where: { id: titleId, ...catalogVisibleTitleWhere },
+          select: { id: true },
+        });
+        if (valid) await addTitleItem(listId, titleId);
+      } else {
+        // Drop both a title placeholder line AND an already-resolved product
+        // line of this title — the checklist only knows "on this list or not".
+        await prisma.savedListItem.deleteMany({
+          where: { listId, OR: [{ titleId }, { product: { titleId } }] },
+        });
+      }
+    }
+  }
+  revalidatePath(`/${locale}/catalog`);
+  revalidatePath(`/${locale}/plan`);
+  revalidatePath(`/${locale}/lists`);
+}
+
+// Create a brand-new SavedList and seed it with one title in a single popover
+// action ("+ New list" inside "add to list"). No redirect — stays on the
+// catalog page.
+export async function createListWithTitle(formData: FormData) {
+  const locale = str(formData, "locale") || "en";
+  const titleId = str(formData, "titleId");
+  const scope = await loadScope();
+  const orgId = scope.workspace?.activeOrgId;
+  if (scope.userId && orgId && titleId) {
+    const valid = await prisma.title.findFirst({
+      where: { id: titleId, ...catalogVisibleTitleWhere },
+      select: { id: true },
+    });
+    if (valid) {
+      const list = await prisma.savedList.create({
+        data: { organizationId: orgId, name: str(formData, "name") || "Untitled list", createdById: scope.userId },
+      });
+      await addTitleItem(list.id, titleId);
+      await recordAudit(scope.userId, "list.create", `SavedList:${list.id}`, { orgId });
+    }
+  }
+  revalidatePath(`/${locale}/catalog`);
+  revalidatePath(`/${locale}/plan`);
+  revalidatePath(`/${locale}/lists`);
 }
 
 /** Shared guard: the item's list must be in the caller's scope. Returns the
