@@ -8,15 +8,11 @@ import { readPlanBrief } from "@/lib/basket";
 import { readActiveListId, resolveActiveList } from "@/lib/lists";
 import { indicativeFromRules, toRateRules } from "@/lib/money";
 import { isProductPriceShown } from "@/lib/pricing-visibility";
-import { recommendTiered, type Candidate, type SupplementaryTitle } from "@/lib/recommend";
-import {
-  extractFacets,
-  mergeFacets,
-  matchTitles,
-  facetsAreEmpty,
-  type MatchableTitle,
-} from "@/lib/brief-match";
-import { enrichBriefWithLLM, llmEnrichmentAvailable } from "@/lib/brief-match-llm";
+import { titleDisplayName } from "@/lib/title-display";
+import { catalogVisibleTitleWhere } from "@/lib/catalog-visibility";
+import type { Candidate, SupplementaryTitle } from "@/lib/recommend";
+import { recommendForBrief } from "@/lib/campaign-recommend";
+import { addAllFavoritesToList } from "@/app/list-actions";
 import { PlanBanners } from "./_components/PlanBanners";
 import { PlanStart } from "./_components/PlanStart";
 import { PlanLines, type PlanTitleLine } from "./_components/PlanLines";
@@ -136,7 +132,7 @@ export default async function PlanPage({
   const titleLines: PlanTitleLine[] = placeholderItems.map((i) => ({
     itemId: i.id,
     titleId: i.titleId as string,
-    titleName: i.title!.name,
+    titleName: titleDisplayName(i.title!),
     quantity: i.quantity,
     placements: placementsByTitle.get(i.titleId as string) ?? [],
   }));
@@ -195,119 +191,36 @@ export default async function PlanPage({
   // True when the results were ranked by the brief (drives the heading +
   // reason chips); false = plain budget recommender.
   let briefMatched = false;
+  // Same catalog-grounded matcher the campaign Discover step uses — one
+  // source of truth for dedup-by-title, taxonomy matching and the optional
+  // LLM rerank, instead of a parallel hand-rolled copy on this page.
   if (listItems.length === 0 && recMarket) {
-    const recProducts = await prisma.product.findMany({
-      where: {
-        active: true,
-        bookable: true,
-        title: { active: true, market: { code: recMarket as MarketCode } },
-      },
-      include: {
-        title: {
-          include: {
-            publisher: { select: { pricesPublic: true } },
-            market: { select: { currency: true } },
-          },
-        },
-        priceRules: true,
-      },
+    const result = await recommendForBrief({
+      market: recMarket,
+      budget: recBudget,
+      brief: recBriefRaw,
+      locale,
     });
-    recCurrency = recProducts[0]?.currency ?? "EUR";
-    const priced: Candidate[] = [];
-    const unpricedByTitle = new Map<string, SupplementaryTitle>();
-    for (const p of recProducts) {
-      const reach = p.title.digitalReach ?? p.title.monthlyReach ?? 0;
-      const currency = p.currency ?? p.title.market?.currency ?? "EUR";
-      // Tier 1 only when the buyer would actually see a € figure — active,
-      // sales-confirmed, prices public (same gate as the catalog + /recommend).
-      // Unconfirmed-but-public-price products fall through to Tier 2 "Request
-      // price", never a fabricated indicative figure.
-      if (isProductPriceShown(p, p.title)) {
-        priced.push({
-          productId: p.id,
-          titleId: p.titleId,
-          titleName: p.title.name,
-          category: p.title.category,
-          type: p.type,
-          reach,
-          unitPrice: indicativeFromRules(Number(p.basePrice), toRateRules(p.priceRules)),
-        });
-      } else if (!unpricedByTitle.has(p.titleId)) {
-        unpricedByTitle.set(p.titleId, {
-          titleId: p.titleId,
-          titleName: p.title.name,
-          productId: p.id,
-          reach,
-          currency,
-        });
-      }
-    }
-    // Brief-driven matching: rank/filter the same candidates by how well
-    // each title fits the buyer's free-text brief (hybrid: deterministic
-    // taxonomy + optional LLM enrichment). Falls back to the budget
-    // recommender when the brief yields no usable signal.
-    let facets = recBriefRaw ? extractFacets(recBriefRaw) : null;
-    if (facets && llmEnrichmentAvailable()) {
-      facets = mergeFacets(facets, await enrichBriefWithLLM(recBriefRaw));
-    }
-
-    if (facets && !facetsAreEmpty(facets)) {
-      const matchables = new Map<string, MatchableTitle>();
-      for (const p of recProducts) {
-        if (matchables.has(p.titleId)) continue;
-        matchables.set(p.titleId, {
-          id: p.titleId,
-          name: p.title.name,
-          b2bB2c: p.title.b2bB2c,
-          vertical: p.title.vertical,
-          audience: p.title.audience,
-          category: p.title.category,
-          reach: p.title.reach,
-          nativeFit: p.title.nativeFit,
-          tags: p.title.tags,
-          locationNote: p.title.locationNote,
-          digitalReach: p.title.digitalReach,
-          monthlyReach: p.title.monthlyReach,
-        });
-      }
-      const matches = matchTitles([...matchables.values()], facets);
-      const rank = new Map(matches.map((m, i) => [m.title.id, i]));
-      const reasonsByTitle = new Map(matches.map((m) => [m.title.id, m.reasons]));
-
-      const matchedPriced = priced
-        .filter((c) => rank.has(c.titleId))
-        .sort((a, b) => (rank.get(a.titleId)! - rank.get(b.titleId)!))
-        .map((c) => ({ ...c, reasons: reasonsByTitle.get(c.titleId) ?? [] }));
-
-      // Greedy budget cap (one product per title already); no budget = all.
-      // Cap the list to the strongest matches so a broad brief doesn't dump
-      // hundreds of rows.
-      const MAX_PICKS = 12;
-      const cap = recBudget > 0 ? recBudget : Number.MAX_SAFE_INTEGER;
-      const picks: Candidate[] = [];
-      let spend = 0;
-      for (const c of matchedPriced) {
-        if (picks.length >= MAX_PICKS) break;
-        if (spend + c.unitPrice > cap) continue;
-        picks.push(c);
-        spend += c.unitPrice;
-      }
-
-      const supplementary = [...unpricedByTitle.values()]
-        .filter((s) => rank.has(s.titleId))
-        .sort((a, b) => (rank.get(a.titleId)! - rank.get(b.titleId)!))
-        .slice(0, 6);
-
-      rec = { picks, supplementary };
-      briefMatched = true;
-    } else {
-      rec = recommendTiered(
-        priced,
-        [...unpricedByTitle.values()],
-        recBudget > 0 ? recBudget : Number.MAX_SAFE_INTEGER,
-      );
-    }
+    rec = { picks: result.picks, supplementary: result.supplementary };
+    recCurrency = result.currency;
+    briefMatched = result.briefMatched;
   }
+
+  // Hearts→lists bridge: count titles the buyer has favorited that aren't
+  // already a line on the active list, so the strip only shows when it has
+  // something to offer.
+  const listTitleIds = new Set<string>();
+  for (const l of lines) listTitleIds.add(l.product.titleId);
+  for (const tl of titleLines) listTitleIds.add(tl.titleId);
+  const favoriteCount = session?.user?.id
+    ? await prisma.favorite.count({
+        where: {
+          userId: session.user.id,
+          title: catalogVisibleTitleWhere,
+          titleId: { notIn: [...listTitleIds] },
+        },
+      })
+    : 0;
 
   return (
     <>
@@ -334,6 +247,21 @@ export default async function PlanPage({
           activeListId={activeList?.id}
           activeListName={activeList?.name}
         />
+      ) : null}
+
+      {/* Hearts→lists bridge: hearted titles live in a separate personal
+          favorites pool (see catalog "Legg til i en liste"); this bulk-adopts
+          every one not already on the active list, in one submit. */}
+      {!needsWorkspace && favoriteCount > 0 ? (
+        <div className="banner-info" role="status" style={{ justifyContent: "space-between" }}>
+          <span>{t("favoritesStripTitle", { count: favoriteCount })}</span>
+          <form action={addAllFavoritesToList}>
+            <input type="hidden" name="locale" value={locale} />
+            <button type="submit" className="btn small ghost">
+              {t("addFavorites")}
+            </button>
+          </form>
+        </div>
       ) : null}
 
       {needsWorkspace ? (

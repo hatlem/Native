@@ -45,3 +45,44 @@ describe("locale key parity", () => {
     });
   }
 });
+
+/** Look up a dot-path key ("plan.activeList") in a nested messages object. */
+function getPath(obj: unknown, path: string): unknown {
+  return path.split(".").reduce<unknown>((acc, key) => {
+    if (acc && typeof acc === "object") return (acc as Record<string, unknown>)[key];
+    return undefined;
+  }, obj);
+}
+
+// The parity check above only proves a key EXISTS in every locale — it can't
+// catch a value that was copy-pasted from en.json verbatim and never actually
+// translated (this happened for real: catalog.factReaderProfile shipped as
+// the literal English string "Reader profile" in every non-English locale).
+// Keep this list small and targeted at keys with a known copy-paste history —
+// it's a leak guard, not a general translation-quality linter.
+const UNTRANSLATED_LEAK_GUARD_KEYS = [
+  // Rendered via getTranslations({ namespace: "titleDetail" }) at
+  // catalog/[slug]/page.tsx — lives in the `titleDetail` namespace, not
+  // `catalog`, despite the informal dotted name it's usually referred to by.
+  "titleDetail.factReaderProfile",
+  "plan.activeList",
+  "plan.renamePlaceholder",
+  "plan.newListPlaceholder",
+];
+
+describe("untranslated leak guard", () => {
+  for (const key of UNTRANSLATED_LEAK_GUARD_KEYS) {
+    const enValue = getPath(en, key);
+
+    for (const [locale, messages] of Object.entries(LOCALES)) {
+      it(`"${locale}" ${key} is translated, not copy-pasted English`, () => {
+        const localeValue = getPath(messages, key);
+        assert.notEqual(
+          localeValue,
+          enValue,
+          `Locale "${locale}" key "${key}" still matches the English value verbatim: ${JSON.stringify(enValue)}`,
+        );
+      });
+    }
+  }
+});

@@ -37,6 +37,10 @@ export async function PlanStart({
     namespace: "priceVisibility",
   });
   const tMarket = await getTranslations({ locale, namespace: "market" });
+  // "Why this fits" only exists in the campaign namespace today (the
+  // Discover step's twin surface) — reused here rather than duplicating
+  // the key into "plan" as well.
+  const tc = await getTranslations({ locale, namespace: "campaign" });
 
   return (
     <div className="plan-start">
@@ -81,8 +85,15 @@ export async function PlanStart({
                   <div className="item" key={p.productId}>
                     <div>
                       <div className="title">{p.titleName}</div>
-                      <div className="sub muted small">{tType(p.type)} · {tr("fromPrice", { price: formatMoney(p.unitPrice, recCurrency, locale) })} · {p.reach.toLocaleString(locale)} {t("reach")}</div>
-                      {p.reasons && p.reasons.length > 0 ? (
+                      <div className="sub muted small">
+                        {tType(p.type)} · {tr("fromPrice", { price: formatMoney(p.unitPrice, recCurrency, locale) })}
+                        {p.reach > 0 ? ` · ${p.reach.toLocaleString(locale)} ${t("reach")}` : ""}
+                      </div>
+                      {p.reasonText ? (
+                        <div className="sub small" style={{ marginTop: "0.35rem" }}>
+                          <span className="muted">{tc("whyFits")}</span> {p.reasonText}
+                        </div>
+                      ) : p.reasons && p.reasons.length > 0 ? (
                         <div className="cluster tight" style={{ marginTop: "0.35rem" }}>
                           {p.reasons.slice(0, 4).map((r) => (
                             <span className="tag" key={r}>{r}</span>
@@ -108,7 +119,10 @@ export async function PlanStart({
                   <div className="item" key={s.productId}>
                     <div>
                       <div className="title">{s.titleName}</div>
-                      <div className="sub muted small">{tv("requestPrice")} · {s.reach.toLocaleString(locale)} {t("reach")}</div>
+                      <div className="sub muted small">
+                        {tv("requestPrice")}
+                        {s.reach > 0 ? ` · ${s.reach.toLocaleString(locale)} ${t("reach")}` : ""}
+                      </div>
                     </div>
                     <form action={addToPlan}>
                       <input type="hidden" name="locale" value={locale} />

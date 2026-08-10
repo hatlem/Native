@@ -254,6 +254,7 @@
     "remove": "Fjern fra favoritter",
     "addToList": "Legg til i en liste",
     "noLists": "Ingen lister ennå.",
+    "noOrgHint": "Velg en kunde for å se og opprette lister.",
     "newListPlaceholder": "Navn på ny liste",
     "createList": "Opprett liste",
     "allHeading": "Alle favoritter",
@@ -368,7 +369,7 @@
     },
     "publisherLinkHelp": "Se alle titler fra {name}",
     "factVertical": "Vertical",
-    "factReaderProfile": "Reader profile",
+    "factReaderProfile": "Leserprofil",
     "availabilityTitle": "Tilgjengelighet",
     "avail_open": "Ledig",
     "avail_limited": "Begrenset",
@@ -433,7 +434,12 @@
     "needsWorkspaceCta": "Kontakt oss",
     "needsStaffTitle": "Planleggeren er for annonsørkontoer",
     "needsStaffBody": "Du er logget inn med en stab-/adminkonto, som ikke har et annonsørarbeidsområde. Gå tilbake til konsollen for å fortsette.",
-    "needsStaffCta": "Gå til konsollen"
+    "needsStaffCta": "Gå til konsollen",
+    "activeList": "Aktiv liste",
+    "renamePlaceholder": "Listenavn",
+    "newListPlaceholder": "f.eks. ABAX fagpresse Q3",
+    "favoritesStripTitle": "{count, plural, =1 {1 favoritt mangler i denne listen} other {# favoritter mangler i denne listen}}",
+    "addFavorites": "Legg til i denne listen"
   },
   "rfq": {
     "org": "Selskap",

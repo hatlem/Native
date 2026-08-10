@@ -128,10 +128,12 @@ export async function ShortlistRail({ locale, items }: Props) {
             <span>—</span>
           </div>
         )}
-        <div className="shortlist-estimate-row">
-          <span>{t("estimateReach")}</span>
-          <span>{estimate.reach.toLocaleString(locale)}</span>
-        </div>
+        {estimate.reach > 0 ? (
+          <div className="shortlist-estimate-row">
+            <span>{t("estimateReach")}</span>
+            <span>{estimate.reach.toLocaleString(locale)}</span>
+          </div>
+        ) : null}
         <p className="muted xsmall">{t("estimateNote")}</p>
       </div>
 

@@ -432,6 +432,7 @@
     "remove": "Remove from favorites",
     "addToList": "Add to a list",
     "noLists": "No lists yet.",
+    "noOrgHint": "Choose a client to see and create lists.",
     "newListPlaceholder": "New list name",
     "createList": "Create list",
     "allHeading": "All favorites",
@@ -512,7 +513,12 @@
     "needsWorkspaceCta": "Contact us",
     "needsStaffTitle": "The plan builder is for advertiser accounts",
     "needsStaffBody": "You're signed in as a staff account, which doesn't have an advertiser workspace. Head back to your console to keep working.",
-    "needsStaffCta": "Go to your console"
+    "needsStaffCta": "Go to your console",
+    "activeList": "Active list",
+    "renamePlaceholder": "List name",
+    "newListPlaceholder": "e.g. ABAX trade press Q3",
+    "favoritesStripTitle": "{count, plural, =1 {1 favorite not in this list yet} other {# favorites not in this list yet}}",
+    "addFavorites": "Add to this list"
   },
   "rfq": {
     "org": "Company",

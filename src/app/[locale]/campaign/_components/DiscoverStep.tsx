@@ -106,10 +106,15 @@ export async function DiscoverStep({ locale, market, budget, brief, recommendati
                             {tType(p.type)} ·{" "}
                             {t("fromPrice", {
                               price: formatMoney(p.unitPrice, currency, locale),
-                            })}{" "}
-                            · {p.reach.toLocaleString(locale)} {t("reach")}
+                            })}
+                            {p.reach > 0 ? ` · ${p.reach.toLocaleString(locale)} ${t("reach")}` : ""}
                           </div>
-                          {rationale ? (
+                          {p.reasonText ? (
+                            <div className="discover-why small">
+                              <span className="discover-why-label">{t("whyFits")}</span>{" "}
+                              {p.reasonText}
+                            </div>
+                          ) : rationale ? (
                             <div className="discover-why small">
                               <span className="discover-why-label">{t("whyFits")}</span>{" "}
                               {rationale}
@@ -140,7 +145,8 @@ export async function DiscoverStep({ locale, market, budget, brief, recommendati
                       <div>
                         <div className="title">{s.titleName}</div>
                         <div className="sub muted small">
-                          {t("requestPrice")} · {s.reach.toLocaleString(locale)} {t("reach")}
+                          {t("requestPrice")}
+                          {s.reach > 0 ? ` · ${s.reach.toLocaleString(locale)} ${t("reach")}` : ""}
                         </div>
                       </div>
                       <form action={addProductToList}>

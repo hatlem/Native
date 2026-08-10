@@ -333,6 +333,7 @@
     "remove": "Aus Favoriten entfernen",
     "addToList": "Zu einer Liste hinzufügen",
     "noLists": "Noch keine Listen.",
+    "noOrgHint": "Wählen Sie einen Kunden aus, um Listen zu sehen und zu erstellen.",
     "newListPlaceholder": "Name der neuen Liste",
     "createList": "Liste erstellen",
     "allHeading": "Alle Favoriten",
@@ -447,7 +448,7 @@
     },
     "publisherLinkHelp": "Alle Titel von {name} ansehen",
     "factVertical": "Vertical",
-    "factReaderProfile": "Reader profile",
+    "factReaderProfile": "Leserprofil",
     "availabilityTitle": "Verfügbarkeit",
     "avail_open": "Frei",
     "avail_limited": "Begrenzt",
@@ -512,7 +513,12 @@
     "needsWorkspaceCta": "Kontakt aufnehmen",
     "needsStaffTitle": "Der Planer ist für Werbetreibenden-Konten",
     "needsStaffBody": "Sie sind mit einem Mitarbeiter-/Admin-Konto angemeldet, das keinen Werbetreibenden-Arbeitsbereich hat. Kehren Sie zu Ihrer Konsole zurück, um weiterzuarbeiten.",
-    "needsStaffCta": "Zur Konsole"
+    "needsStaffCta": "Zur Konsole",
+    "activeList": "Aktive Liste",
+    "renamePlaceholder": "Listenname",
+    "newListPlaceholder": "z. B. ABAX Fachpresse Q3",
+    "favoritesStripTitle": "{count, plural, =1 {1 Favorit fehlt in dieser Liste} other {# Favoriten fehlen in dieser Liste}}",
+    "addFavorites": "Zu dieser Liste hinzufügen"
   },
   "rfq": {
     "org": "Firma",

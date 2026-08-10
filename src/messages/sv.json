@@ -254,6 +254,7 @@
     "remove": "Ta bort från favoriter",
     "addToList": "Lägg till i en lista",
     "noLists": "Inga listor ännu.",
+    "noOrgHint": "Välj en kund för att se och skapa listor.",
     "newListPlaceholder": "Namn på ny lista",
     "createList": "Skapa lista",
     "allHeading": "Alla favoriter",
@@ -368,7 +369,7 @@
     },
     "publisherLinkHelp": "Se alla titlar från {name}",
     "factVertical": "Vertical",
-    "factReaderProfile": "Reader profile",
+    "factReaderProfile": "Läsarprofil",
     "availabilityTitle": "Tillgänglighet",
     "avail_open": "Ledig",
     "avail_limited": "Begränsat",
@@ -433,7 +434,12 @@
     "needsWorkspaceCta": "Kontakta oss",
     "needsStaffTitle": "Planeraren är för annonsörskonton",
     "needsStaffBody": "Du är inloggad med ett personal-/adminkonto, som inte har en annonsörsarbetsyta. Gå tillbaka till konsolen för att fortsätta.",
-    "needsStaffCta": "Gå till konsolen"
+    "needsStaffCta": "Gå till konsolen",
+    "activeList": "Aktiv lista",
+    "renamePlaceholder": "Listnamn",
+    "newListPlaceholder": "t.ex. ABAX fackpress Q3",
+    "favoritesStripTitle": "{count, plural, =1 {1 favorit saknas i den här listan} other {# favoriter saknas i den här listan}}",
+    "addFavorites": "Lägg till i den här listan"
   },
   "rfq": {
     "org": "Företag",

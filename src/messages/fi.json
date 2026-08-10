@@ -333,6 +333,7 @@
     "remove": "Poista suosikeista",
     "addToList": "Lisää listalle",
     "noLists": "Ei listoja vielä.",
+    "noOrgHint": "Valitse asiakas nähdäksesi ja luodaksesi listoja.",
     "newListPlaceholder": "Uuden listan nimi",
     "createList": "Luo lista",
     "allHeading": "Kaikki suosikit",
@@ -447,7 +448,7 @@
     },
     "publisherLinkHelp": "Katso kaikki nimikkeet julkaisijalta {name}",
     "factVertical": "Vertical",
-    "factReaderProfile": "Reader profile",
+    "factReaderProfile": "Lukijaprofiili",
     "availabilityTitle": "Saatavuus",
     "avail_open": "Vapaa",
     "avail_limited": "Rajallinen",
@@ -512,7 +513,12 @@
     "needsWorkspaceCta": "Ota yhteyttä",
     "needsStaffTitle": "Suunnittelutyökalu on mainostajatileille",
     "needsStaffBody": "Olet kirjautunut henkilökunta-/admin-tilillä, jolla ei ole mainostajan työtilaa. Palaa konsoliin jatkaaksesi.",
-    "needsStaffCta": "Siirry konsoliin"
+    "needsStaffCta": "Siirry konsoliin",
+    "activeList": "Aktiivinen lista",
+    "renamePlaceholder": "Listan nimi",
+    "newListPlaceholder": "esim. ABAX ammattilehdet Q3",
+    "favoritesStripTitle": "{count, plural, =1 {1 suosikki puuttuu tästä listasta} other {# suosikkia puuttuu tästä listasta}}",
+    "addFavorites": "Lisää tähän listaan"
   },
   "rfq": {
     "org": "Yritys",

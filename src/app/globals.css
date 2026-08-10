@@ -414,10 +414,15 @@ main.container {
   position: sticky;
   top: 0;
   z-index: 50;
-  background: color-mix(in srgb, var(--bg) 80%, transparent);
+  /* 92% (was 80%) opacity plus a promoted compositor layer — the standard
+     mitigation for Chromium's sticky + backdrop-filter ghost-repaint bug,
+     where a stale blurred copy of the header is left painted mid-scroll. */
+  background: color-mix(in srgb, var(--bg) 92%, transparent);
   backdrop-filter: saturate(180%) blur(14px);
   -webkit-backdrop-filter: saturate(180%) blur(14px);
   border-bottom: 1px solid var(--border);
+  transform: translateZ(0);
+  will-change: transform;
 }
 
 .site-header > .container {
@@ -2238,6 +2243,13 @@ select:disabled {
   margin-top: var(--s-5);
 }
 
+/* .action-list's own margin-top (var(--s-4)) stacks on top of .split's,
+   double-spacing the lines column against the sticky summary card and
+   inflating the whitespace under a short line list. */
+.split .action-list {
+  margin-top: var(--s-3);
+}
+
 @media (max-width: 880px) {
   .split { grid-template-columns: 1fr; }
 }
@@ -2772,10 +2784,69 @@ select:disabled {
   accent-color: var(--warning);
 }
 
-/* ---------- Plan summary sidebar ---------- */
+/* ---------- Plan list bar (switch / rename / new-list) ---------- */
 
+.plan-list-bar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--s-4);
+  align-items: flex-end;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--r-md);
+  padding: var(--s-3) var(--s-4);
+  margin-top: var(--s-4);
+}
+
+.plan-list-bar-group {
+  display: grid;
+  gap: 4px;
+}
+
+.plan-list-bar-group > label {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.plan-list-bar-controls {
+  display: flex;
+  gap: var(--s-2);
+  align-items: center;
+}
+
+@media (max-width: 640px) {
+  .plan-list-bar {
+    flex-direction: column;
+    align-items: stretch;
+  }
+}
+
+/* ---------- Plan lines + summary sidebar ---------- */
+
+/* tag | title+meta | qty/content controls | price+remove — four aligned
+   tracks so price and remove sit in their own column across every row,
+   instead of drifting with however tall the middle cell happens to be. */
 .plan-item {
-  grid-template-columns: auto 1fr auto;
+  grid-template-columns: auto minmax(0, 1fr) auto auto;
+  align-items: center;
+}
+
+.plan-line-controls {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  align-items: flex-start;
+}
+
+.plan-line-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  align-items: flex-end;
+  min-width: 110px;
 }
 
 .plan-line-price {
@@ -2784,6 +2855,20 @@ select:disabled {
   font-family: var(--font-display);
   font-weight: 660;
   white-space: nowrap;
+}
+
+@media (max-width: 640px) {
+  .plan-item {
+    grid-template-columns: auto minmax(0, 1fr);
+  }
+  .plan-line-controls,
+  .plan-line-actions {
+    grid-column: 1 / -1;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    min-width: 0;
+  }
 }
 
 .plan-summary {
@@ -3535,6 +3620,12 @@ select:disabled {
 
 /* Favorites heart + add-to-list menu (catalog cards and the detail header). */
 .fav-btn { position: absolute; top: 12px; right: 12px; display: flex; gap: 2px; z-index: 2; }
+/* Every interactive element in a catalog card shares z-index:2 (see the
+   :where() rule above), so an OPEN popover would otherwise be painted over
+   by later-DOM-order siblings in the next card/row — not clipped, just
+   stacked underneath. Lift the whole trapped stacking context above them
+   while the menu is open. */
+.fav-btn.is-open { z-index: 30; }
 /* In compare mode the title-selector takes the corner — shift the heart left. */
 .title-selector ~ .fav-btn { right: 48px; }
 .fav-heart, .fav-caret {
@@ -3545,7 +3636,8 @@ select:disabled {
 .fav-heart.is-on { color: var(--fav-accent); border-color: var(--fav-accent); }
 .fav-heart:disabled, .fav-caret:disabled { opacity: 0.6; cursor: default; }
 .fav-menu {
-  position: absolute; top: 36px; right: 0; width: 220px; background: var(--surface);
+  position: absolute; top: 36px; right: 0; width: min(280px, calc(100vw - 40px));
+  background: var(--surface);
   border: 1px solid var(--border); border-radius: var(--r-md); padding: 10px;
   box-shadow: var(--shadow-md); z-index: 3;
 }
@@ -3555,8 +3647,11 @@ select:disabled {
 .fav-list-opt:hover { background: var(--surface-2); }
 .fav-list-opt.is-checked { font-weight: 600; }
 .fav-list-opt input { accent-color: var(--fav-accent); flex: none; }
-.fav-newlist { display: flex; gap: 4px; }
-.fav-newlist input { flex: 1; min-width: 0; }
+/* Column layout (not a cramped inline row) so the full menu width is
+   available to the input — the Norwegian "Navn på ny liste" placeholder no
+   longer truncates. */
+.fav-newlist { display: flex; flex-direction: column; gap: 6px; }
+.fav-newlist input { width: 100%; min-width: 0; }
 /* On the detail header the heart sits inline beside the H1 (not floated to the
    card corner), but it still needs a positioning context for its popover. */
 .detail-head .fav-btn { position: relative; }
@@ -3797,6 +3892,20 @@ body:has(.compare-bar) {
 
 .detail-head h1 {
   margin: 0 0 var(--s-2);
+}
+
+/* Key-facts aside: tighter than the default .card padding + row spacing so a
+   short fact list doesn't leave a tall empty band in the fixed 280px right
+   column next to a longer identity column. */
+.key-facts {
+  padding: var(--s-4);
+}
+.key-facts h3 {
+  margin: 0 0 var(--s-2);
+  font-size: 0.95rem;
+}
+.key-facts .spec-list {
+  row-gap: 4px;
 }
 
 .detail-head .lead {

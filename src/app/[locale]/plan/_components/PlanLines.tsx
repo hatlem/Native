@@ -1,6 +1,7 @@
 import { getTranslations } from "next-intl/server";
 import type { Prisma } from "@prisma/client";
 import { formatMoney } from "@/lib/money";
+import { titleDisplayName } from "@/lib/title-display";
 import { removeFromPlan, setQuantity, setContentProduction } from "@/app/plan-actions";
 import { resolveTitleLine } from "@/app/list-actions";
 
@@ -82,13 +83,15 @@ export async function PlanLines({
           <div className={`item plan-item${l.unavailable ? " plan-item-unavailable" : ""}`} key={l.itemId}>
             <span className="tag">{tType(l.product.type)}</span>
             <div>
-              <div className="title">{l.product.title.name}</div>
+              <div className="title">{titleDisplayName(l.product.title)}</div>
               {l.unavailable ? (
                 <div className="sub plan-line-unavailable" role="alert">
                   {t("lineUnavailable")}
                 </div>
               ) : null}
-              <div className="sub plan-qty">
+            </div>
+            <div className="plan-line-controls">
+              <div className="plan-qty">
                 <form action={setQuantity} className="plan-qty-step">
                   <input type="hidden" name="locale" value={locale} />
                   <input type="hidden" name="itemId" value={l.itemId} />
@@ -117,7 +120,7 @@ export async function PlanLines({
                 </button>
               </form>
             </div>
-            <div className="cluster tight">
+            <div className="plan-line-actions">
               {l.priceVisible ? (
                 <span className="price plan-line-price">
                   {formatMoney(l.lineTotal, l.product.currency, locale)}
@@ -145,6 +148,8 @@ export async function PlanLines({
               <div className="title">{tl.titleName}</div>
               <div className="sub muted small">{t("titlePlaceholderNote")}</div>
               <div className="sub muted small">{t("qty")}: {tl.quantity}</div>
+            </div>
+            <div className="plan-line-controls">
               {tl.placements.length > 0 ? (
                 <form action={resolveTitleLine} className="plan-content-toggle">
                   <input type="hidden" name="locale" value={locale} />
@@ -161,7 +166,7 @@ export async function PlanLines({
                 <div className="sub muted small">{t("noPlacements")}</div>
               )}
             </div>
-            <div className="cluster tight">
+            <div className="plan-line-actions">
               <span className="muted small plan-line-price">
                 {tv("requestPrice")}
               </span>
