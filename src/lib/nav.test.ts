@@ -11,7 +11,7 @@ test("audienceFor: role/orgType → audience", () => {
   assert.equal(audienceFor({ user: { role: "DESK" } }), "desk");
 });
 
-test("advertiser nav: default keeps the classic menu, Home leading", () => {
+test("advertiser nav: default keeps the classic menu, Home leading, no separate Orders (merged into Requests)", () => {
   const keys = navItemsFor("advertiser", t).map((i) => i.key);
   assert.deepEqual(keys, [
     "home",
@@ -20,7 +20,6 @@ test("advertiser nav: default keeps the classic menu, Home leading", () => {
     "lists",
     "favorites",
     "requests",
-    "orders",
     "reports",
   ]);
 });

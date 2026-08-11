@@ -1,0 +1,24 @@
+export type CampaignStage = 1 | 2 | 3 | 4 | 5;
+
+// Plan built -> Sent -> Quoted -> Approved -> Live, derived from Request +
+// latest Quote + (if the quote became one) Order — never from Request.status
+// alone. firm-order.ts (instant-book / firm-price checkout) creates the
+// Request directly at status "CLOSED" with an ACCEPTED quote and a
+// CONFIRMED order in the same transaction — so a CLOSED request can mean
+// "dead RFQ" (no order) or "already at Approved/Live" (has an order), and
+// only checking Order existence first tells them apart.
+export function deriveStage(input: {
+  requestStatus: string;
+  quoteStatus: string | null;
+  orderStatus: string | null;
+}): CampaignStage {
+  if (input.orderStatus) {
+    return ["LIVE", "COMPLETED", "INVOICED"].includes(input.orderStatus) ? 5 : 4;
+  }
+  // A quote exists but hasn't become an order yet — still "Quoted" even if
+  // it has since expired or been declined; the row should keep surfacing
+  // at this stage rather than silently reverting to "Sent".
+  if (input.quoteStatus) return 3;
+  if (input.requestStatus === "DRAFT") return 1;
+  return 2;
+}

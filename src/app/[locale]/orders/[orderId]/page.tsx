@@ -97,7 +97,9 @@ export default async function MyOrderPage({
   return (
     <>
       <nav className="breadcrumb">
-        <Link href="/orders" className="small-link">
+        {/* /orders (list) permanently redirects to /requests ("Quotes &
+            orders") — link straight there instead of bouncing through it. */}
+        <Link href="/requests" className="small-link">
           ← {t("title")}
         </Link>
       </nav>

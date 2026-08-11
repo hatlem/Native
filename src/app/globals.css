@@ -5973,3 +5973,187 @@ footer a:hover {
   min-height: 48px;
   border-radius: 5px;
 }
+
+/* ---------- Quotes & orders (merged campaign pipeline) ---------- */
+
+.campaign-tabs {
+  display: flex;
+  gap: var(--s-1);
+  margin-top: var(--s-4);
+  border-bottom: 1px solid var(--border);
+}
+
+.campaign-tab {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 10px 14px;
+  margin-bottom: -1px;
+  border-bottom: 2px solid transparent;
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: var(--muted);
+}
+.campaign-tab:hover {
+  color: var(--text);
+}
+.campaign-tab.is-active {
+  border-bottom-color: var(--ink);
+  color: var(--heading);
+  font-weight: 600;
+}
+.campaign-tab__count {
+  font-weight: 400;
+  color: var(--muted);
+}
+
+.campaign-row-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: var(--s-4);
+}
+
+.campaign-row {
+  position: relative;
+  display: grid;
+  grid-template-columns: 1fr 300px 160px 190px;
+  gap: 20px;
+  align-items: center;
+  padding: 18px 22px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--r-md);
+}
+@media (max-width: 880px) {
+  .campaign-row {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Stretched-link pattern: fills the row so clicking anywhere navigates,
+   while real controls (name link, action button/form) sit above it at a
+   higher z-index and capture their own clicks first — no JS needed. */
+.campaign-row__click {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+}
+
+.campaign-row__main {
+  position: relative;
+  z-index: 2;
+  min-width: 0;
+}
+.campaign-row__title-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+.campaign-row__name {
+  font-size: 1.09rem;
+  font-weight: 640;
+  color: var(--heading);
+}
+.campaign-row__name:hover {
+  color: var(--accent);
+}
+.campaign-row__meta {
+  margin-top: 4px;
+  font-size: 0.85rem;
+  color: var(--muted);
+}
+
+.campaign-row__total {
+  position: relative;
+  z-index: 2;
+  text-align: right;
+}
+.campaign-row__total-amount {
+  font-size: 1rem;
+  font-weight: 660;
+  color: var(--heading);
+  font-variant-numeric: tabular-nums;
+}
+.campaign-row__qualifier {
+  margin-top: 2px;
+  font-size: 0.78rem;
+  color: var(--muted);
+}
+
+.campaign-row__action {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  justify-content: flex-end;
+}
+.campaign-row__action-btn {
+  white-space: nowrap;
+}
+
+.campaign-row__footer {
+  grid-column: 1 / -1;
+  position: relative;
+  z-index: 2;
+  margin-top: 4px;
+  padding-top: 12px;
+  border-top: 1px solid var(--border);
+  font-size: 0.82rem;
+  line-height: 1.5;
+  color: var(--muted-strong);
+}
+
+.pipeline-track {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+}
+.pipeline-track__segment {
+  display: flex;
+  align-items: center;
+  flex: 1;
+}
+.pipeline-track__dot {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: var(--surface);
+  border: 1px solid var(--border-strong);
+  flex: none;
+}
+.pipeline-track__line {
+  flex: 1;
+  height: 1px;
+  background: var(--border-strong);
+}
+.pipeline-track__segment.is-done .pipeline-track__dot {
+  background: var(--success);
+  border-color: var(--success);
+}
+.pipeline-track__segment.is-done .pipeline-track__line {
+  background: var(--success);
+}
+.pipeline-track__segment.is-current .pipeline-track__dot {
+  background: var(--accent);
+  border-color: var(--accent);
+}
+.pipeline-track__segment.is-current--warning .pipeline-track__dot {
+  background: var(--warning);
+  border-color: var(--warning);
+}
+.pipeline-track__label {
+  margin-left: 8px;
+  font-size: 0.78rem;
+  color: var(--muted);
+  white-space: nowrap;
+}
+
+@media (max-width: 880px) {
+  .pipeline-track {
+    grid-row: 2;
+  }
+  .pipeline-track__label {
+    display: none;
+  }
+}

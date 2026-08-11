@@ -1,186 +1,250 @@
 import { getTranslations } from "next-intl/server";
-import { intlLocale, formatMoney } from "@/lib/money";
 import { redirect } from "next/navigation";
-import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
-import { getWorkspace } from "@/lib/workspace";
+import { loadScope } from "@/lib/scope";
 import { loadUnsentLists } from "@/lib/lists";
 import { estimateListTotals } from "@/lib/plan-total";
 import { Link } from "@/i18n/navigation";
-import { StatusBadge } from "@/app/status-badge";
 import { EmptyState } from "@/app/empty-state";
-import { DraftListRow } from "./_components/DraftListRow";
+import { formatMoney, intlLocale } from "@/lib/money";
+import { timeAgo } from "@/lib/time-ago";
+import { deriveStage, type CampaignStage } from "@/lib/campaign-stage";
+import { CampaignRow, type RowAction } from "./_components/CampaignRow";
 
 export const dynamic = "force-dynamic";
 
-function timeAgo(date: Date, locale: string): string {
-  const diff = Date.now() - date.getTime();
-  const minutes = Math.floor(diff / 60_000);
-  const hours = Math.floor(minutes / 60);
-  const days = Math.floor(hours / 24);
-  const rtf = new Intl.RelativeTimeFormat(intlLocale(locale), { numeric: "auto" });
-  if (days >= 1) return rtf.format(-days, "day");
-  if (hours >= 1) return rtf.format(-hours, "hour");
-  if (minutes >= 1) return rtf.format(-minutes, "minute");
-  return rtf.format(0, "minute");
+const TABS = ["needsYou", "inProgress", "live", "done", "all"] as const;
+type Tab = (typeof TABS)[number];
+
+type Row = {
+  id: string;
+  name: string;
+  statusValue: string;
+  meta: string;
+  stage: CampaignStage;
+  tab: Exclude<Tab, "all">;
+  totalLabel: string | null;
+  qualifier: string;
+  action: RowAction;
+  href: string;
+  footerNote?: string;
+};
+
+// Everything that isn't awaiting the buyer and isn't live/done yet — plan
+// built, sent to the desk, or approved and in production.
+function tabForRow(orderStatus: string | null, quoteStatus: string | null, requestStatus: string): Exclude<Tab, "all"> {
+  if (orderStatus === "CANCELLED") return "done";
+  if (orderStatus === "LIVE") return "live";
+  if (orderStatus === "COMPLETED" || orderStatus === "INVOICED") return "done";
+  if (orderStatus) return "inProgress";
+  if (quoteStatus === "SENT") return "needsYou";
+  if (quoteStatus === "EXPIRED" || quoteStatus === "DECLINED") return "done";
+  if (requestStatus === "CLOSED") return "done";
+  return "inProgress";
 }
 
 export default async function RequestsPage({
   params,
+  searchParams,
 }: {
   params: Promise<{ locale: string }>;
+  searchParams: Promise<Record<string, string | string[] | undefined>>;
 }) {
   const { locale } = await params;
+  const sp = await searchParams;
   const t = await getTranslations({ locale, namespace: "requests" });
-  const tNav = await getTranslations({ locale, namespace: "nav" });
+  const tOrders = await getTranslations({ locale, namespace: "orders" });
 
-  const session = await auth();
+  const scope = await loadScope();
+  if (!scope.workspace) redirect(`/${locale}/signin`);
+  const ws = scope.workspace;
 
-  const ws = await getWorkspace(session?.user?.id);
-  if (!ws) redirect(`/${locale}/signin`);
+  const tabRaw = typeof sp.tab === "string" ? sp.tab : "";
+  const activeTab: Tab = (TABS as readonly string[]).includes(tabRaw) ? (tabRaw as Tab) : "needsYou";
 
-  const [requests, draftCount, quotedCount, acceptedCount, unsentLists] = await Promise.all([
+  const dateFmt = new Intl.DateTimeFormat(intlLocale(locale), { day: "numeric", month: "short" });
+  const stageLabels: [string, string, string, string, string] = [
+    t("stagePlanBuilt"),
+    t("stageSent"),
+    t("stageQuoted"),
+    t("stageApproved"),
+    t("stageLive"),
+  ];
+
+  const [unsentLists, requests] = await Promise.all([
+    // Scoped to the active org only: the "Finish & send" action reuses
+    // selectActiveList -> /plan, which only ever renders the active org's
+    // lists, so a different client's draft here would resolve wrong.
+    ws.activeOrgId ? loadUnsentLists(ws.activeOrgId) : Promise.resolve([]),
     prisma.request.findMany({
       where: { organizationId: { in: ws.scopeOrgIds } },
-      orderBy: { createdAt: "desc" },
+      orderBy: { updatedAt: "desc" },
       include: {
-        plan: { select: { name: true, items: true } },
-        quotes: { select: { id: true }, take: 1 },
+        organization: { select: { name: true } },
+        plan: { select: { name: true, items: { select: { id: true } } } },
+        quotes: {
+          orderBy: { createdAt: "desc" },
+          take: 1,
+          include: {
+            order: {
+              include: { invoices: { orderBy: { createdAt: "desc" }, take: 1, select: { status: true } } },
+            },
+          },
+        },
       },
     }),
-    prisma.request.count({
-      where: { organizationId: { in: ws.scopeOrgIds }, status: "DRAFT" },
-    }),
-    prisma.request.count({
-      where: { organizationId: { in: ws.scopeOrgIds }, status: "QUOTED" },
-    }),
-    prisma.request.count({
-      where: { organizationId: { in: ws.scopeOrgIds }, status: "CLOSED" },
-    }),
-    // Scoped to the active org only (not the full agency scopeOrgIds): the
-    // "Continue" action reuses selectActiveList -> /plan, which itself only
-    // ever renders the active org's lists — surfacing a different client's
-    // drafts here would silently resolve to the wrong list on /plan.
-    ws.activeOrgId ? loadUnsentLists(ws.activeOrgId) : Promise.resolve([]),
   ]);
 
-  const drafts = unsentLists.map((list) => {
+  const rows: Row[] = [];
+
+  for (const list of unsentLists) {
     const totals = estimateListTotals(list.items);
-    return {
-      id: list.id,
+    rows.push({
+      id: `draft-${list.id}`,
       name: list.name,
-      itemCount: list._count.items,
-      age: timeAgo(list.updatedAt, locale),
-      amountLabel: totals.length
+      statusValue: "DRAFT",
+      meta: t("metaPlanBuilt", { items: list._count.items, age: timeAgo(list.updatedAt, locale) }),
+      stage: 1,
+      tab: "inProgress",
+      totalLabel: totals.length
         ? totals.map((tot) => formatMoney(tot.amount, tot.currency, locale)).join(" + ")
         : null,
-    };
-  });
+      qualifier: t("qualifierIndicative"),
+      action: { kind: "select-list", listId: list.id, locale, label: t("actionFinishSend") },
+      // No dedicated view for an unsent list — the row background just
+      // opens /plan (whatever list happens to be active there today); only
+      // the action button reliably switches to THIS list first.
+      href: "/plan",
+    });
+  }
+
+  for (const r of requests) {
+    const quote = r.quotes[0] ?? null;
+    const order = quote?.order ?? null;
+    const invoiceStatus = order?.invoices[0]?.status ?? null;
+    const stage = deriveStage({
+      requestStatus: r.status,
+      quoteStatus: quote?.status ?? null,
+      orderStatus: order?.status ?? null,
+    });
+    const tab = tabForRow(order?.status ?? null, quote?.status ?? null, r.status);
+
+    let qualifier: string;
+    if (order) {
+      if (invoiceStatus === "PAID") qualifier = t("qualifierPaid");
+      else if (invoiceStatus === "ISSUED" || invoiceStatus === "OVERDUE") qualifier = t("qualifierInvoiced");
+      else qualifier = t("qualifierConfirmed");
+    } else if (quote) {
+      if (quote.status === "SENT") {
+        qualifier = quote.validUntil
+          ? t("qualifierFirmExpires", { date: dateFmt.format(quote.validUntil) })
+          : t("qualifierFirm");
+      } else if (quote.status === "EXPIRED") qualifier = t("qualifierExpired");
+      else if (quote.status === "DECLINED") qualifier = t("qualifierDeclined");
+      else qualifier = t("qualifierIndicative");
+    } else {
+      qualifier = stage === 1 ? t("qualifierIndicative") : t("qualifierSent");
+    }
+
+    const totalLabel = order
+      ? formatMoney(Number(quote!.total), quote!.currency, locale)
+      : quote
+        ? formatMoney(Number(quote.total), quote.currency, locale)
+        : null;
+
+    const detailHref = `/requests/${r.id}`;
+    const orderHref = order ? `/orders/${order.id}` : detailHref;
+    const action: RowAction =
+      tab === "needsYou"
+        ? { kind: "link", href: detailHref, label: t("actionReviewQuote"), primary: true }
+        : stage === 4
+          ? { kind: "link", href: orderHref, label: t("actionSeePlacements"), primary: false }
+          : stage === 5
+            ? { kind: "link", href: orderHref, label: t("actionOpenReport"), primary: false }
+            : { kind: "link", href: detailHref, label: t("actionView"), primary: false };
+
+    rows.push({
+      id: r.id,
+      name: r.plan.name,
+      statusValue: order?.status ?? quote?.status ?? r.status,
+      meta: t("metaCampaign", {
+        items: r.plan.items.length,
+        age: timeAgo(r.createdAt, locale),
+        org: r.organization.name,
+      }),
+      stage,
+      tab,
+      totalLabel,
+      qualifier,
+      action,
+      href: tab === "needsYou" || stage <= 3 ? detailHref : orderHref,
+    });
+  }
+
+  const counts: Record<Tab, number> = {
+    needsYou: rows.filter((r) => r.tab === "needsYou").length,
+    inProgress: rows.filter((r) => r.tab === "inProgress").length,
+    live: rows.filter((r) => r.tab === "live").length,
+    done: rows.filter((r) => r.tab === "done").length,
+    all: rows.length,
+  };
+  const visibleRows = activeTab === "all" ? rows : rows.filter((r) => r.tab === activeTab);
+
+  // Plain <a>, not next-intl's <Link>: same-route RSC soft navigation is
+  // currently broken in production for this app (see catalog's
+  // CatalogSort.tsx) — a <Link> tab click here would be silently inert.
+  const tabHref = (tab: Tab) => (tab === "needsYou" ? `/${locale}/requests` : `/${locale}/requests?tab=${tab}`);
 
   return (
     <>
-      <header className="page-header">
-        <span className="eyebrow accent">{t("eyebrow")}</span>
-        <h1>{t("listTitle")}</h1>
-        <p className="lead">{t("listLead")}</p>
-      </header>
-
-      {drafts.length > 0 ? (
-        <section className="section">
-          <div className="section-head">
-            <div>
-              <h2>{t("draftListsHeading")}</h2>
-              <p className="lead">{t("draftListsLead")}</p>
-            </div>
-          </div>
-          <div className="action-list">
-            {drafts.map((d) => (
-              <DraftListRow
-                key={d.id}
-                locale={locale}
-                listId={d.id}
-                name={d.name}
-                badgeLabel={t("draftListsHeading")}
-                metaLabel={t("itemsAndAge", { items: d.itemCount, age: d.age })}
-                amountLabel={d.amountLabel ? `${t("draftListsEstimate")}: ${d.amountLabel}` : null}
-                continueLabel={t("draftListsContinue")}
-              />
-            ))}
-          </div>
-        </section>
-      ) : null}
-
-      {requests.length > 0 ? (
-        <div className="kpi-grid">
-          <div className="kpi">
-            <div className="label">{t("kpiTotal")}</div>
-            <div className="value">{requests.length}</div>
-            <div className="delta">{t("kpiTotalSub")}</div>
-          </div>
-          <div className="kpi">
-            <div className="label">{t("kpiQuoted")}</div>
-            <div className="value">{quotedCount}</div>
-            <div className="delta">{t("kpiQuotedSub")}</div>
-          </div>
-          <div className="kpi">
-            <div className="label">{t("kpiDraft")}</div>
-            <div className="value">{draftCount}</div>
-            <div className="delta">{t("kpiDraftSub")}</div>
-          </div>
-          <div className="kpi">
-            <div className="label">{t("kpiClosed")}</div>
-            <div className="value">{acceptedCount}</div>
-            <div className="delta">{t("kpiClosedSub")}</div>
-          </div>
+      <div className="section-head">
+        <div>
+          <h1>{t("pipelineTitle")}</h1>
+          <p className="lead">{t("pipelineLead")}</p>
         </div>
-      ) : null}
+        <Link href="/catalog" className="btn">
+          {t("newCampaignCta")}
+        </Link>
+      </div>
 
-      <section className="section">
-        <div className="section-head">
-          <div>
-            <span className="eyebrow">{t("listEyebrow")}</span>
-            <h2>{t("listHeading")}</h2>
-          </div>
-          <Link href="/catalog" className="btn small secondary">
-            {t("newRequestCta")}
-          </Link>
+      <nav className="campaign-tabs" aria-label={t("tabsLabel")}>
+        {TABS.map((tab) => (
+          <a
+            key={tab}
+            href={tabHref(tab)}
+            className={`campaign-tab${tab === activeTab ? " is-active" : ""}`}
+          >
+            {t(`tab_${tab}`)} <span className="campaign-tab__count">{counts[tab]}</span>
+          </a>
+        ))}
+      </nav>
+
+      {visibleRows.length === 0 ? (
+        <EmptyState
+          title={t("noneForTab")}
+          primaryHref="/catalog"
+          primaryLabel={tOrders("newOrderCta")}
+        />
+      ) : (
+        <div className="campaign-row-list">
+          {visibleRows.map((row) => (
+            <CampaignRow
+              key={row.id}
+              name={row.name}
+              statusValue={row.statusValue}
+              meta={row.meta}
+              stage={row.stage}
+              stageLabels={stageLabels}
+              currentStageLabel={stageLabels[row.stage - 1]}
+              totalLabel={row.totalLabel}
+              qualifier={row.qualifier}
+              action={row.action}
+              footerNote={row.footerNote}
+              href={row.href}
+            />
+          ))}
         </div>
-
-        {requests.length === 0 && drafts.length === 0 ? (
-          <EmptyState
-            title={t("none")}
-            primaryHref="/catalog"
-            primaryLabel={tNav("catalog")}
-            secondaryHref="/recommend"
-            secondaryLabel={tNav("recommend")}
-          />
-        ) : requests.length === 0 ? (
-          <p className="lead muted">{t("draftListsEmptyNote")}</p>
-        ) : (
-          <div className="action-list">
-            {requests.map((r) => (
-              <Link
-                key={r.id}
-                href={`/requests/${r.id}`}
-                className="item"
-              >
-                <StatusBadge value={r.status} />
-                <div>
-                  <div className="title">{r.plan.name}</div>
-                  <div className="sub">
-                    {t("itemsAndAge", {
-                      items: r.plan.items.length,
-                      age: timeAgo(r.createdAt, locale),
-                    })}
-                    {r.quotes.length > 0 ? ` · ${t("hasQuote")}` : ""}
-                  </div>
-                </div>
-                <span className="chev" aria-hidden>→</span>
-              </Link>
-            ))}
-          </div>
-        )}
-      </section>
+      )}
     </>
   );
 }

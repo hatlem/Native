@@ -45,6 +45,9 @@ const nextConfig: NextConfig = {
         permanent: false,
       },
       { source: "/:locale/docs", destination: "/:locale/api", permanent: false },
+      // /orders merged into /requests ("Quotes & orders") — permanent per
+      // the design decision, unlike the two entries above.
+      { source: "/:locale/orders", destination: "/:locale/requests", permanent: true },
     ];
   },
   // /.well-known/openapi.json is the conventional discovery URL for
