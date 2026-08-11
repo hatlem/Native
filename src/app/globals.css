@@ -2024,6 +2024,12 @@ label {
   font-weight: 500;
 }
 
+.field .warn {
+  font-size: 0.82rem;
+  color: var(--warning);
+  font-weight: 500;
+}
+
 .filters input:not([type="checkbox"]):not([type="radio"]),
 .filters select,
 .filters textarea,
@@ -2838,6 +2844,14 @@ select:disabled {
   align-items: center;
 }
 
+/* .banner-info carries no margin of its own (it's also used as the FIRST
+   element on a page in PlanBanners/FavoritesView/etc.) — scoped here rather
+   than adding margin-top to the shared class, which would double up
+   spacing in those other contexts. */
+.plan-favorites-strip {
+  margin-top: var(--s-4);
+}
+
 @media (max-width: 640px) {
   .plan-list-bar {
     flex-direction: column;
@@ -2849,8 +2863,11 @@ select:disabled {
 
 /* tag | title+meta | qty/content controls | price+remove — four aligned
    tracks so price and remove sit in their own column across every row,
-   instead of drifting with however tall the middle cell happens to be. */
-.plan-item {
+   instead of drifting with however tall the middle cell happens to be.
+   Selector must out-specificity ".action-list .item" (2 classes) or the
+   base 3-column grid wins and the 4th cell (actions) wraps onto its own
+   implicit row — the exact bug this was written to prevent. */
+.action-list .item.plan-item {
   grid-template-columns: auto minmax(0, 1fr) auto auto;
   align-items: center;
 }
@@ -2860,6 +2877,22 @@ select:disabled {
   flex-direction: column;
   gap: 6px;
   align-items: flex-start;
+}
+
+/* .btn.ghost is transparent-on-transparent at rest — fine for a low-stakes
+   "Fjern" link, but the content-production toggle is an actual optional
+   add-on decision and read as inert plain text. A dashed border is the
+   common "optional, click to add" signal without the weight of a filled
+   button; it disappears once the add-on is active (solid .btn, no .ghost). */
+.plan-content-btn.ghost {
+  border: 1px dashed var(--border-strong);
+  color: var(--muted-strong);
+}
+
+.plan-content-btn.ghost:hover {
+  border-color: var(--accent);
+  color: var(--accent-hover);
+  background: var(--accent-soft);
 }
 
 .plan-line-actions {
@@ -2879,7 +2912,7 @@ select:disabled {
 }
 
 @media (max-width: 640px) {
-  .plan-item {
+  .action-list .item.plan-item {
     grid-template-columns: auto minmax(0, 1fr);
   }
   .plan-line-controls,
@@ -4072,6 +4105,16 @@ body:has(.compare-bar) {
   min-width: auto;
   margin: 0;
   accent-color: var(--accent);
+}
+
+/* Equal-width tracks so rows break at the same point regardless of an
+   individual label's length — a flex-wrap of intrinsic-width items (the
+   previous, undefined ".checkbox-grid") wraps short labels two-per-line and
+   long ones alone, which reads as random rather than a grid. */
+.checkbox-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: var(--s-2) var(--s-4);
 }
 
 .product-form .actions {

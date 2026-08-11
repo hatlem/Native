@@ -5,6 +5,7 @@ import { formatMoney } from "@/lib/money";
 import { submitRequest } from "@/app/checkout-actions";
 import { AUDIENCE_SEGMENTS } from "@/lib/targeting/segments";
 import { SubmitButton } from "@/components";
+import { BudgetField } from "./BudgetField";
 
 // Per-currency rollup computed in page.tsx — visible-price lines
 // accumulate an amount, locked-price lines only flag their currency.
@@ -39,6 +40,11 @@ export async function PlanSummary({
     locale,
     namespace: "priceVisibility",
   });
+
+  // Only compare the budget field against a single-currency total — a
+  // mixed-currency basket has no one number to warn against.
+  const visibleTotals = totals.filter(([, r]) => r.hasVisible);
+  const singleTotal = visibleTotals.length === 1 ? visibleTotals[0] : null;
 
   return (
     <aside className="plan-summary">
@@ -82,16 +88,12 @@ export async function PlanSummary({
           <p className="muted small">
             {tr("requestingAs")}: <strong>{activeOrg.name}</strong>
           </p>
-          <div className="field">
-            <label htmlFor="budget">{tr("budget")}</label>
-            <input
-              id="budget"
-              name="budget"
-              type="number"
-              min="0"
-              defaultValue={briefDraft.budget}
-            />
-          </div>
+          <BudgetField
+            locale={locale}
+            defaultValue={briefDraft.budget}
+            currency={singleTotal ? singleTotal[0] : null}
+            total={singleTotal ? singleTotal[1].amount : 0}
+          />
           <div className="field">
             <label htmlFor="audience">{tr("audience")}</label>
             <input
@@ -112,7 +114,7 @@ export async function PlanSummary({
             <label>{tr("targetAudienceLabel")}</label>
             <div className="checkbox-grid">
               {AUDIENCE_SEGMENTS.map((s) => (
-                <label key={s} className="checkbox">
+                <label key={s} className="checkbox-row">
                   <input
                     type="checkbox"
                     name="targetAudience"

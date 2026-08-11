@@ -107,6 +107,11 @@ export default async function PlanPage({
         // A product deactivated since it was added: still shown, but flagged so
         // the buyer removes it (submit refuses while it's present — see E).
         unavailable: !p.active || !p.bookable,
+        // Set only via the campaign flow's Schedule step — most buyers who
+        // build a list straight from /plan never touch it, so PlanLines
+        // falls back to the product's stated minimum run.
+        scheduleStart: i.scheduleStart,
+        scheduleUnits: i.scheduleUnits,
       };
     })
     .filter((l): l is NonNullable<typeof l> => l !== null);
@@ -253,7 +258,7 @@ export default async function PlanPage({
           favorites pool (see catalog "Legg til i en liste"); this bulk-adopts
           every one not already on the active list, in one submit. */}
       {!needsWorkspace && favoriteCount > 0 ? (
-        <div className="banner-info" role="status" style={{ justifyContent: "space-between" }}>
+        <div className="banner-info plan-favorites-strip" role="status" style={{ justifyContent: "space-between" }}>
           <span>{t("favoritesStripTitle", { count: favoriteCount })}</span>
           <form action={addAllFavoritesToList}>
             <input type="hidden" name="locale" value={locale} />

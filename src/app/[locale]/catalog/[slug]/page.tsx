@@ -15,7 +15,7 @@ import { isProductPriceShown, arePricesVisible } from "@/lib/pricing/visibility"
 import { bandLabel } from "@/lib/pricing/bands";
 import { productBand, titleBand, unitRate } from "@/lib/pricing/display-price";
 import { resolveProductionFee } from "@/lib/pricing/production-fee";
-import type { ProductInclusions } from "@/lib/pricing/inclusions";
+import { inclusionLines, type ProductInclusions } from "@/lib/pricing/inclusions";
 import { productDisplayNames } from "@/lib/pricing/display-name";
 import { loadPricingDefaults } from "@/lib/content-fee";
 import { addToPlan } from "@/app/plan-actions";
@@ -42,49 +42,6 @@ function prettyCategory(value: string): string {
 // display / video CPM products the rate buys the placement, so that note must
 // not show — otherwise a native-display unit reads as if it were an article.
 const ARTICLE_TYPES = new Set(["NATIVE_ARTICLE", "ADVERTORIAL", "NATIVE_PLUS"]);
-
-function inclusionLines(
-  inc: ProductInclusions | null,
-  t: Awaited<ReturnType<typeof getTranslations>>,
-  currency: string,
-): string[] {
-  if (!inc) return [];
-  const lines: string[] = [];
-  // Min-spend leads: it is the headline commercial fact for bespoke/custom
-  // content (Schibsted/FT partner content) and frames every other line.
-  if (inc.minSpend)
-    lines.push(t("inc.minSpend", { currency, amount: inc.minSpend }));
-  if (inc.production === "PLATFORM") lines.push(t("inc.productionPlatform"));
-  if (inc.production === "PUBLISHER") lines.push(t("inc.productionPublisher"));
-  if (inc.production === "ADVERTISER") lines.push(t("inc.productionAdvertiser"));
-  if (inc.viewsPerWeek)
-    lines.push(t("inc.viewsPerWeek", { amount: inc.viewsPerWeek }));
-  if (inc.viewsPerMonth)
-    lines.push(t("inc.viewsPerMonth", { amount: inc.viewsPerMonth }));
-  if (inc.viewsTotal)
-    lines.push(t("inc.viewsTotal", { amount: inc.viewsTotal }));
-  if (inc.readsTotal)
-    lines.push(t("inc.readsTotal", { amount: inc.readsTotal }));
-  if (inc.articles && inc.articles > 1)
-    lines.push(t("inc.articles", { count: inc.articles }));
-  if (inc.frontpage) lines.push(t("inc.frontpage"));
-  if (inc.sovPct) lines.push(t("inc.sov", { pct: inc.sovPct }));
-  if (inc.newsletter) lines.push(t("inc.newsletter"));
-  if (inc.socialChannels?.length)
-    lines.push(t("inc.socialChannels", { channels: inc.socialChannels.join(", ") }));
-  else if (inc.social) lines.push(t("inc.social"));
-  if (inc.video) lines.push(t("inc.video"));
-  if (inc.photographer) lines.push(t("inc.photographer"));
-  if (inc.translation) lines.push(t("inc.translation"));
-  if (inc.report) lines.push(t("inc.report"));
-  if (inc.print) lines.push(t("inc.print"));
-  if (inc.rights) lines.push(t("inc.rights"));
-  if (inc.searchableMonths)
-    lines.push(t("inc.searchable", { months: inc.searchableMonths }));
-  if (inc.durationWeeks)
-    lines.push(t("inc.duration", { weeks: inc.durationWeeks }));
-  return lines;
-}
 
 export default async function TitleDetailPage({
   params,
