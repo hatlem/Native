@@ -89,9 +89,11 @@ export function CatalogMobileBar({
         </button>
       </div>
 
-      <div className={`catalog-rail-sheet${sheetOpen ? " is-open" : ""}`}>
+      <div className={`catalog-rail-sheet${sheetOpen ? " is-open" : ""}`} aria-label={t("heading")}>
+        {/* CatalogRail renders its own "Narrow it down" eyebrow + Reset
+            row — this header only adds the close control the rail itself
+            has no reason to know about. */}
         <div className="catalog-rail-sheet__head">
-          <span className="catalog-rail-sheet__title">{t("heading")}</span>
           <button
             type="button"
             className="catalog-rail-sheet__close"

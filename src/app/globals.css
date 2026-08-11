@@ -6530,17 +6530,10 @@ footer a:hover {
   .catalog-rail-sheet__head {
     display: flex;
     align-items: center;
-    justify-content: space-between;
-    padding: 16px 20px;
+    justify-content: flex-end;
+    padding: 12px 16px;
     border-bottom: 1px solid var(--border);
     flex: none;
-  }
-  .catalog-rail-sheet__title {
-    font-size: 0.7rem;
-    font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: 0.08em;
-    color: var(--muted);
   }
   .catalog-rail-sheet__close {
     background: transparent;
