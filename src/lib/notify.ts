@@ -11,6 +11,8 @@
 
 import { NotificationKind } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
+import { appUrl, appName } from "@/lib/url";
+import { layout } from "@/lib/mail/templates/layout";
 
 export type EmailMessage = {
   to: string;
@@ -45,6 +47,15 @@ export type NotifyInput = {
   link?: string;
 };
 
+// In-app notifications keep the relative link (read by the app's own
+// <Link>), but a relative path in an email is just inert text — Gmail
+// won't auto-link "/en/desk/xyz" the way it would a real URL. Resolve to
+// absolute only for the outbound email.
+function absoluteLink(link: string | undefined): string | undefined {
+  if (!link) return undefined;
+  return /^https?:\/\//.test(link) ? link : `${appUrl().replace(/\/$/, "")}${link}`;
+}
+
 async function writeOne(userId: string, n: NotifyInput, email?: string | null) {
   await prisma.notification.create({
     data: {
@@ -56,11 +67,20 @@ async function writeOne(userId: string, n: NotifyInput, email?: string | null) {
     },
   });
   if (email) {
+    const link = absoluteLink(n.link);
     try {
       await emailAdapter({
         to: email,
         subject: n.title,
-        text: (n.body ?? "") + (n.link ? `\n\n${n.link}` : ""),
+        text: (n.body ?? "") + (link ? `\n\nView: ${link}` : ""),
+        html: layout({
+          preheader: n.body ?? n.title,
+          heading: n.title,
+          body: n.body ?? "",
+          cta: link ? { label: "View", url: link } : undefined,
+          footer: "This is an automated notification from NativeSpin.",
+          appName: appName(),
+        }),
       });
     } catch (err) {
       console.error("notify.email_failed", { userId, err });
