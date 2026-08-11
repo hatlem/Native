@@ -186,7 +186,7 @@ function ShortlistBar({
           <span className="shortlist-bar__total-label">{t("totalLabel")}</span>
           <span className="shortlist-bar__total-amount">
             {totals.length
-              ? totals.map((line) => formatMoney(line.amount, line.currency, locale)).join(" + ")
+              ? totals.map((line) => formatMoney(line.amount, line.currency, locale)).join(" · ")
               : t("totalPending")}
           </span>
         </div>
