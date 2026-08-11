@@ -8,6 +8,7 @@ import { searchTitleIds, searchWhereFor } from "@/lib/catalog-search";
 import { catalogVisibleTitleWhere } from "@/lib/catalog-visibility";
 import { savedListMembershipMap } from "@/lib/saved-list-membership";
 import { loadScope } from "@/lib/scope";
+import { loadRelevanceSignals } from "@/lib/catalog-relevance";
 import { readActiveListId, resolveActiveList } from "@/lib/lists";
 import { estimateListTotals } from "@/lib/plan-total";
 import { titleDisplayName } from "@/lib/title-display";
@@ -182,6 +183,9 @@ export default async function CatalogPage({
 
   const where = buildWhere(true);
 
+  const scope = await loadScope();
+  const orgId = scope.workspace?.activeOrgId ?? null;
+
   const verticalRows = await prisma.title.findMany({
     where: { active: true, vertical: { not: null } },
     select: { vertical: true },
@@ -194,15 +198,21 @@ export default async function CatalogPage({
 
   // Distinct regions present from the geo backfill — drives the region
   // multiselect. Null regions (national/unknown titles) don't appear.
+  // Coverage is sparse and uneven (a handful of UK/Belgian sub-national
+  // titles, one Norwegian one, etc.), so the raw region name alone reads
+  // as an arbitrary grab-bag — pairing each with its country disambiguates
+  // it. distinct(["region"]) + ordering by countryCode picks one country
+  // deterministically per region even in the (currently nonexistent) case
+  // of a region name shared across markets.
   const regionRows = await prisma.title.findMany({
     where: { region: { not: null } },
-    select: { region: true },
+    select: { region: true, countryCode: true },
     distinct: ["region"],
-    orderBy: { region: "asc" },
+    orderBy: [{ region: "asc" }, { countryCode: "asc" }],
   });
   const regionOptions = regionRows
-    .map((r) => r.region!)
-    .filter((v) => v.trim().length > 0);
+    .filter((r) => r.region && r.region.trim().length > 0)
+    .map((r) => ({ value: r.region!, country: r.countryCode as MarketCode }));
 
   // Resolve the publisher-filter chip label (name, not cuid). Invalid id
   // simply matches nothing — no error path needed.
@@ -213,42 +223,97 @@ export default async function CatalogPage({
       })
     : null;
 
-  const [totalCount, titles] = await Promise.all([
-    prisma.title.count({ where }),
-    prisma.title.findMany({
-      where,
-      include: {
-        publisher: true,
-        market: true,
-        products: {
-          where: { active: true },
-          include: { priceRules: true },
-        },
-      },
-      // Commerce-active titles surface first, always; the buyer's sort
-      // choice only decides the tiebreak within that split. "reach" ranks
-      // by digital reach first, monthly (print/legacy) reach as fallback
-      // for titles with no digital figure — not a true coalesce, but Prisma
-      // has no cross-column coalesce in orderBy, and digital is the primary
-      // metric for native anyway. nulls: "last" on both is required —
-      // Postgres defaults DESC to NULLS FIRST, which would rank reach-less
-      // titles above titles with a real number. "newest" surfaces recently
-      // touched rows.
-      orderBy:
-        sort === "reach"
-          ? [
-              { active: "desc" as const },
-              { digitalReach: { sort: "desc" as const, nulls: "last" as const } },
-              { monthlyReach: { sort: "desc" as const, nulls: "last" as const } },
-              { name: "asc" as const },
-            ]
-          : sort === "newest"
-            ? [{ active: "desc" as const }, { updatedAt: "desc" as const }]
-            : [{ active: "desc" as const }, { name: "asc" as const }],
-      take: PAGE_SIZE,
-      skip: (page - 1) * PAGE_SIZE,
-    }),
-  ]);
+  const titleInclude = {
+    publisher: true,
+    market: true,
+    products: {
+      where: { active: true },
+      include: { priceRules: true },
+    },
+  } satisfies Prisma.TitleInclude;
+
+  // Commerce-active titles surface first, always; the buyer's sort choice
+  // only decides the tiebreak within that split. "reach" ranks by digital
+  // reach first, monthly (print/legacy) reach as fallback for titles with
+  // no digital figure — not a true coalesce, but Prisma has no
+  // cross-column coalesce in orderBy, and digital is the primary metric
+  // for native anyway. nulls: "last" on both is required — Postgres
+  // defaults DESC to NULLS FIRST, which would rank reach-less titles
+  // above titles with a real number. "newest" surfaces recently touched
+  // rows. Unset ("relevance") shares the same tiebreak as every explicit
+  // sort's own tiebreak — name asc — the personalization happens one
+  // level up, in which tier a title lands in, not in this ordering.
+  const orderBy: Prisma.TitleOrderByWithRelationInput[] =
+    sort === "reach"
+      ? [
+          { active: "desc" },
+          { digitalReach: { sort: "desc", nulls: "last" } },
+          { monthlyReach: { sort: "desc", nulls: "last" } },
+          { name: "asc" },
+        ]
+      : sort === "newest"
+        ? [{ active: "desc" }, { updatedAt: "desc" }]
+        : [{ active: "desc" }, { name: "asc" }];
+
+  const skip = (page - 1) * PAGE_SIZE;
+
+  // "Relevance" (no explicit sort) is personalized: titles matching the
+  // org's billing market or the verticals it has already shown interest
+  // in (favorited / added to a plan) surface first, as their own ordered
+  // tier, ahead of everything else — same tiebreak within each tier. No
+  // signal (guest activity, brand-new org) falls straight through to the
+  // plain query below, unchanged from before this existed.
+  const relevance =
+    sort === undefined && orgId ? await loadRelevanceSignals(orgId) : null;
+  const relevanceOr: Prisma.TitleWhereInput[] = [];
+  if (relevance?.marketCode) relevanceOr.push({ countryCode: relevance.marketCode });
+  if (relevance?.affinityVerticals.length) {
+    relevanceOr.push({ vertical: { in: relevance.affinityVerticals } });
+  }
+
+  let totalCount: number;
+  let titles: Prisma.TitleGetPayload<{ include: typeof titleInclude }>[];
+
+  if (relevanceOr.length > 0) {
+    const whereRelevant: Prisma.TitleWhereInput = { AND: [where, { OR: relevanceOr }] };
+    const whereRest: Prisma.TitleWhereInput = { AND: [where, { NOT: { OR: relevanceOr } }] };
+    const [countRelevant, countRest] = await Promise.all([
+      prisma.title.count({ where: whereRelevant }),
+      prisma.title.count({ where: whereRest }),
+    ]);
+    totalCount = countRelevant + countRest;
+
+    const rows: Prisma.TitleGetPayload<{ include: typeof titleInclude }>[] = [];
+    if (skip < countRelevant) {
+      rows.push(
+        ...(await prisma.title.findMany({
+          where: whereRelevant,
+          include: titleInclude,
+          orderBy,
+          take: Math.min(PAGE_SIZE, countRelevant - skip),
+          skip,
+        })),
+      );
+    }
+    const remaining = PAGE_SIZE - rows.length;
+    if (remaining > 0) {
+      rows.push(
+        ...(await prisma.title.findMany({
+          where: whereRest,
+          include: titleInclude,
+          orderBy,
+          take: remaining,
+          skip: Math.max(0, skip - countRelevant),
+        })),
+      );
+    }
+    titles = rows;
+  } else {
+    [totalCount, titles] = await Promise.all([
+      prisma.title.count({ where }),
+      prisma.title.findMany({ where, include: titleInclude, orderBy, take: PAGE_SIZE, skip }),
+    ]);
+  }
   const totalPages = Math.max(1, Math.ceil(totalCount / PAGE_SIZE));
 
   // Favorites: which of this page's titles the buyer has hearted (filled vs
@@ -258,8 +323,6 @@ export default async function CatalogPage({
   // guaranteed here — the marketing splash returns above for guests.
   const userId = session.user.id;
   const titleIds = titles.map((tt) => tt.id);
-  const scope = await loadScope();
-  const orgId = scope.workspace?.activeOrgId ?? null;
   const [favoritedIds, savedLists, membershipRows, bookingUserRow] =
     await Promise.all([
       getFavoritedTitleIds(userId, titleIds),
@@ -519,7 +582,7 @@ export default async function CatalogPage({
           b2bB2cs={B2B_B2C_VALUES.map((v) => ({ value: v, label: v }))}
           reaches={REACH_VALUES.map((v) => ({ value: v, label: tReach(v) }))}
           categories={verticalOptions.map((v) => ({ value: v, label: v }))}
-          regions={regionOptions.map((v) => ({ value: v, label: v }))}
+          regions={regionOptions.map((r) => ({ value: r.value, label: `${r.value} (${tMarket(r.country)})` }))}
           unpricedCount={unpricedCount}
           initial={{
             q,
@@ -546,7 +609,7 @@ export default async function CatalogPage({
             b2bB2cs={B2B_B2C_VALUES.map((v) => ({ value: v, label: v }))}
             reaches={REACH_VALUES.map((v) => ({ value: v, label: tReach(v) }))}
             categories={verticalOptions.map((v) => ({ value: v, label: v }))}
-            regions={regionOptions.map((v) => ({ value: v, label: v }))}
+            regions={regionOptions.map((r) => ({ value: r.value, label: `${r.value} (${tMarket(r.country)})` }))}
             unpricedCount={unpricedCount}
             initial={{
               q,
