@@ -117,9 +117,12 @@ export function CatalogRail({
     window.location.href = window.location.pathname;
   }
 
-  const advancedCount = [initial.nativeFit, initial.regions.length > 0, initial.compareMode].filter(
-    Boolean,
-  ).length;
+  const advancedCount = [
+    initial.nativeFit,
+    initial.regions.length > 0,
+    initial.compareMode,
+    initial.onlyPriced,
+  ].filter(Boolean).length;
   const selectedMarkets = new Set(initial.markets);
   const primaryMarket =
     initial.markets.length > 0
@@ -178,7 +181,9 @@ export function CatalogRail({
           ) : null}
         </div>
         <p className="catalog-rail__submeta">
-          {t("marketCount", { n: Math.max(selectedMarkets.size, 1), total: markets.length })}
+          {selectedMarkets.size === 0
+            ? t("marketCountAll", { total: markets.length })
+            : t("marketCount", { n: selectedMarkets.size, total: markets.length })}
           {" · "}
           <button
             type="button"
@@ -289,23 +294,6 @@ export function CatalogRail({
         </label>
       </div>
 
-      <div className="catalog-rail__group">
-        <h3>{t("priceHeading")}</h3>
-        <label className="catalog-rail__check">
-          <input
-            type="checkbox"
-            checked={initial.onlyPriced}
-            onChange={(e) => toggleFlag("onlyPriced", e.target.checked)}
-          />
-          <span>
-            <strong>{tf("onlyPriced")}</strong>
-          </span>
-        </label>
-        {initial.onlyPriced && unpricedCount && unpricedCount > 0 ? (
-          <p className="catalog-rail__note">{t("unpricedNote", { count: unpricedCount })}</p>
-        ) : null}
-      </div>
-
       <button
         type="button"
         className="catalog-rail__advanced-toggle"
@@ -360,6 +348,19 @@ export function CatalogRail({
               <small>{tf("compareModeHint")}</small>
             </span>
           </label>
+          <label className="catalog-rail__check">
+            <input
+              type="checkbox"
+              checked={initial.onlyPriced}
+              onChange={(e) => toggleFlag("onlyPriced", e.target.checked)}
+            />
+            <span>
+              <strong>{tf("onlyPriced")}</strong>
+            </span>
+          </label>
+          {initial.onlyPriced && unpricedCount && unpricedCount > 0 ? (
+            <p className="catalog-rail__note">{t("unpricedNote", { count: unpricedCount })}</p>
+          ) : null}
         </div>
       ) : null}
     </aside>

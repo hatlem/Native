@@ -288,7 +288,8 @@
       "whereHeading": "Where should it run?",
       "whereHint": "Markets you want to reach.",
       "marketCount": "{n} of {total} markets",
-      "addAnother": "add another",
+      "marketCountAll": "All {total} markets",
+      "addAnother": "Add another",
       "whoHeading": "Who reads it?",
       "whoHint": "Audience and subject area.",
       "both": "Both",
@@ -302,7 +303,6 @@
       "newsletterHint": "Also sent to the title's subscriber list.",
       "videoLabel": "Video",
       "videoHint": "Produced video included in the placement.",
-      "priceHeading": "Price",
       "unpricedNote": "{count, plural, =1 {1 more title is} other {# more titles are}} in the catalog without published pricing. The desk can price it for you.",
       "advancedToggle": "{count, plural, =0 {Advanced filters} other {Advanced filters (#)}}",
       "mobileFilters": "Filters"

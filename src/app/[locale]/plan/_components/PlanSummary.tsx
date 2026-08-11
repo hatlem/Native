@@ -133,7 +133,7 @@ export async function PlanSummary({
               ? totals
                   .filter(([, r]) => r.hasVisible)
                   .map(([cur, r]) => formatMoney(r.amount, cur, locale))
-                  .join(" + ")
+                  .join(" · ")
               : t("pricingOnRequest")}
           </span>
         </div>

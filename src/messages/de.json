@@ -339,7 +339,7 @@
       "whereHeading": "Wo soll es laufen?",
       "whereHint": "Die Märkte, die du erreichen willst.",
       "marketCount": "{n} von {total} Märkten",
-      "addAnother": "weiteren hinzufügen",
+      "addAnother": "Weiteren hinzufügen",
       "whoHeading": "Wer liest es?",
       "whoHint": "Zielgruppe und Themenbereich.",
       "both": "Beide",
@@ -353,10 +353,10 @@
       "newsletterHint": "Wird auch an die Abonnenten des Titels verschickt.",
       "videoLabel": "Video",
       "videoHint": "Produziertes Video ist in der Platzierung enthalten.",
-      "priceHeading": "Preis",
       "unpricedNote": "{count, plural, =1 {1 weiterer Titel im Katalog hat noch keinen veröffentlichten Preis. Unser Desk kann ihn für dich bepreisen.} other {# weitere Titel im Katalog haben noch keinen veröffentlichten Preis. Unser Desk kann sie für dich bepreisen.}}",
       "advancedToggle": "{count, plural, =0 {Erweiterte Filter} other {Erweiterte Filter (#)}}",
-      "mobileFilters": "Filter"
+      "mobileFilters": "Filter",
+      "marketCountAll": "Alle {total} Märkte"
     },
     "shortlist": {
       "untitledPlan": "deinen Plan",

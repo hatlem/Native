@@ -339,7 +339,7 @@
       "whereHeading": "Missä sen pitäisi näkyä?",
       "whereHint": "Markkinat, jotka haluat tavoittaa.",
       "marketCount": "{n}/{total} markkinaa",
-      "addAnother": "lisää toinen",
+      "addAnother": "Lisää toinen",
       "whoHeading": "Kuka sitä lukee?",
       "whoHint": "Kohderyhmä ja aihealue.",
       "both": "Molemmat",
@@ -353,10 +353,10 @@
       "newsletterHint": "Lähetetään myös julkaisun tilaajille.",
       "videoLabel": "Video",
       "videoHint": "Tuotettu video sisältyy sijoitteluun.",
-      "priceHeading": "Hinta",
       "unpricedNote": "{count, plural, =1 {Katalogissa on vielä 1 julkaisu ilman julkaistua hintaa. Deskimme voi hinnoitella sen.} other {Katalogissa on vielä # julkaisua ilman julkaistua hintaa. Deskimme voi hinnoitella ne.}}",
       "advancedToggle": "{count, plural, =0 {Lisäsuodattimet} other {Lisäsuodattimet (#)}}",
-      "mobileFilters": "Suodattimet"
+      "mobileFilters": "Suodattimet",
+      "marketCountAll": "Kaikki {total} markkinaa"
     },
     "shortlist": {
       "untitledPlan": "suunnitelmasi",

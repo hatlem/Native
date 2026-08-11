@@ -107,7 +107,7 @@ export default async function RequestsPage({
       stage: 1,
       tab: "inProgress",
       totalLabel: totals.length
-        ? totals.map((tot) => formatMoney(tot.amount, tot.currency, locale)).join(" + ")
+        ? totals.map((tot) => formatMoney(tot.amount, tot.currency, locale)).join(" · ")
         : null,
       qualifier: t("qualifierIndicative"),
       action: { kind: "select-list", listId: list.id, locale, label: t("actionFinishSend") },

@@ -252,7 +252,7 @@
       "whereHeading": "Var ska den synas?",
       "whereHint": "Marknaderna ni vill nå.",
       "marketCount": "{n} av {total} marknader",
-      "addAnother": "lägg till fler",
+      "addAnother": "Lägg till fler",
       "whoHeading": "Vem läser den?",
       "whoHint": "Målgrupp och ämnesområde.",
       "both": "Båda",
@@ -266,10 +266,10 @@
       "newsletterHint": "Skickas även till titelns prenumeranter.",
       "videoLabel": "Video",
       "videoHint": "Producerad video ingår i placeringen.",
-      "priceHeading": "Pris",
       "unpricedNote": "{count, plural, =1 {1 titel till finns i katalogen utan publicerat pris. Vår desk kan prissätta den åt er.} other {# titlar till finns i katalogen utan publicerat pris. Vår desk kan prissätta dem åt er.}}",
       "advancedToggle": "{count, plural, =0 {Avancerade filter} other {Avancerade filter (#)}}",
-      "mobileFilters": "Filter"
+      "mobileFilters": "Filter",
+      "marketCountAll": "Alla {total} marknader"
     },
     "shortlist": {
       "untitledPlan": "din plan",

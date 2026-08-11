@@ -252,7 +252,7 @@
       "whereHeading": "Hvor skal den køre?",
       "whereHint": "Markederne, I vil nå.",
       "marketCount": "{n} af {total} markeder",
-      "addAnother": "tilføj flere",
+      "addAnother": "Tilføj flere",
       "whoHeading": "Hvem læser den?",
       "whoHint": "Målgruppe og emneområde.",
       "both": "Begge",
@@ -266,10 +266,10 @@
       "newsletterHint": "Sendes også til titlens abonnenter.",
       "videoLabel": "Video",
       "videoHint": "Produceret video er inkluderet i placeringen.",
-      "priceHeading": "Pris",
       "unpricedNote": "{count, plural, =1 {1 titel mere findes i kataloget uden offentliggjort pris. Vores desk kan prissætte den.} other {# titler mere findes i kataloget uden offentliggjort pris. Vores desk kan prissætte dem.}}",
       "advancedToggle": "{count, plural, =0 {Avancerede filtre} other {Avancerede filtre (#)}}",
-      "mobileFilters": "Filtre"
+      "mobileFilters": "Filtre",
+      "marketCountAll": "Alle {total} markeder"
     },
     "shortlist": {
       "untitledPlan": "din plan",

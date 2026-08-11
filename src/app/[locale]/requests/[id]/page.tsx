@@ -157,7 +157,7 @@ export default async function RequestPage({
                   .map((q) =>
                     formatMoney(Number(q.total), q.currency, locale),
                   )
-                  .join(" + ")}
+                  .join(" · ")}
               </MetaRow>
             ) : null}
           </>
