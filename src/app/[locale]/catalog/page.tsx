@@ -346,6 +346,7 @@ export default async function CatalogPage({
     if (newsletterIncluded) params.set("newsletterIncluded", "1");
     if (videoIncluded) params.set("videoIncluded", "1");
     if (compareMode) params.set("compareMode", "1");
+    if (density === "cards") params.set("density", "cards");
     if (q) params.set("q", q);
     if (p > 1) params.set("page", String(p));
     const s = params.toString();
@@ -410,6 +411,7 @@ export default async function CatalogPage({
     if (reach) params.set("reach", reach);
     if (sort) params.set("sort", sort);
     if (compareMode) params.set("compareMode", "1");
+    if (density === "cards") params.set("density", "cards");
     if (q && except !== "q") params.set("q", q);
     const s = params.toString();
     return s ? `/catalog?${s}` : "/catalog";
