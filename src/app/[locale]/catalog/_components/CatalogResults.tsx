@@ -222,7 +222,10 @@ function CatalogListRow({
           ) : null}
         </div>
         <div className="catalog-row__meta">
-          <Link href={`/catalog?publisher=${title.publisher.id}`}>{title.publisher.name}</Link>
+          {/* Plain <a>, not <Link>: same-route RSC soft navigation is
+              currently broken in production on this page (see
+              CatalogSort.tsx) — a <Link> here would be silently inert. */}
+          <a href={`/${locale}/catalog?publisher=${title.publisher.id}`}>{title.publisher.name}</a>
           {" · "}
           {tMarket(title.market.code)}
           {reach ? (
@@ -363,7 +366,10 @@ function CatalogCard({
         </Link>
       </h3>
       <div className="muted">
-        <Link href={`/catalog?publisher=${title.publisher.id}`}>{title.publisher.name}</Link>{" "}
+        {/* Plain <a>, not <Link>: same-route RSC soft navigation is
+            currently broken in production on this page (see
+            CatalogSort.tsx) — a <Link> here would be silently inert. */}
+        <a href={`/${locale}/catalog?publisher=${title.publisher.id}`}>{title.publisher.name}</a>{" "}
         · {tMarket(title.market.code)}
       </div>
       <div>

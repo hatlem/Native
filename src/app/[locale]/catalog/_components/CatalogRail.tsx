@@ -2,7 +2,6 @@
 
 import { useRef, useState } from "react";
 import { useSearchParams } from "next/navigation";
-import { useRouter, usePathname } from "@/i18n/navigation";
 import { useTranslations } from "next-intl";
 
 type Option = { value: string; label: string };
@@ -49,8 +48,6 @@ export function CatalogRail({
   unpricedCount,
   initial,
 }: Props) {
-  const router = useRouter();
-  const pathname = usePathname();
   const sp = useSearchParams();
   const t = useTranslations("catalog.rail");
   const tf = useTranslations("catalog.filters");
@@ -62,11 +59,13 @@ export function CatalogRail({
   const marketRef = useRef<HTMLDivElement>(null);
   const categoryRef = useRef<HTMLDivElement>(null);
 
+  // Full navigation, not router.replace() — see CatalogSort.tsx for why:
+  // same-route RSC soft navigation is currently broken in production.
   function commit(updater: (params: URLSearchParams) => void) {
     const next = new URLSearchParams(sp.toString());
     updater(next);
     next.delete("page");
-    router.replace(`${pathname}?${next.toString()}`, { scroll: false });
+    window.location.href = `${window.location.pathname}?${next.toString()}`;
   }
 
   function debouncedSearch(value: string) {
@@ -115,7 +114,7 @@ export function CatalogRail({
   }
 
   function reset() {
-    router.replace(pathname, { scroll: false });
+    window.location.href = window.location.pathname;
   }
 
   const advancedCount = [initial.nativeFit, initial.regions.length > 0, initial.compareMode].filter(
