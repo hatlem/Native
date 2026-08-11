@@ -4122,7 +4122,10 @@ select:disabled {
   gap: var(--s-4);
   padding: 14px 24px;
   background: var(--ink);
-  color: #fff;
+  /* --primary-contrast, not a literal #fff: --ink inverts to near-white in
+     dark mode, and white-on-white was unreadable. --primary-contrast is
+     defined to contrast --ink in both themes. */
+  color: var(--primary-contrast);
   border-top: 1px solid var(--border-strong);
 }
 
@@ -4163,7 +4166,7 @@ select:disabled {
 .shortlist-bar__chip {
   padding: 4px 11px;
   border-radius: var(--r-pill);
-  background: rgba(255, 255, 255, 0.09);
+  background: color-mix(in srgb, var(--primary-contrast) 9%, transparent);
   font-size: 0.78rem;
   white-space: nowrap;
 }
@@ -4181,7 +4184,7 @@ select:disabled {
 .shortlist-bar__total-label {
   display: block;
   font-size: 0.72rem;
-  color: rgba(255, 255, 255, 0.6);
+  color: color-mix(in srgb, var(--primary-contrast) 60%, transparent);
   text-transform: uppercase;
   letter-spacing: 0.04em;
 }
@@ -4193,13 +4196,17 @@ select:disabled {
 }
 
 .shortlist-bar__cta {
-  background: #fff;
+  /* var(--ink) is the bar's own background — using it here (instead of a
+     literal color) keeps the button legible against the bar in both
+     themes: --primary-contrast and --ink are defined to contrast each
+     other in both light and dark. */
+  background: var(--primary-contrast);
   color: var(--ink);
   min-height: 44px;
   white-space: nowrap;
 }
 .shortlist-bar__cta:hover {
-  background: rgba(255, 255, 255, 0.9);
+  background: color-mix(in srgb, var(--primary-contrast) 90%, var(--ink));
 }
 
 @media (max-width: 640px) {
