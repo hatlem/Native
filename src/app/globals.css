@@ -3239,6 +3239,15 @@ select:disabled {
 .split:has(.plan-summary-col) {
   grid-template-columns: minmax(0, 1fr) 400px;
 }
+/* :has() adds specificity (0,2,0) vs plain .split's (0,1,0) — without this,
+   the rule above wins even inside the @media(max-width:880px) collapse
+   below it in source order, since specificity beats source order. Re-state
+   the collapse at matching specificity so mobile still gets one column. */
+@media (max-width: 880px) {
+  .split:has(.plan-summary-col) {
+    grid-template-columns: 1fr;
+  }
+}
 
 .plan-summary {
   background: var(--surface);
