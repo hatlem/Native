@@ -6157,3 +6157,52 @@ footer a:hover {
     display: none;
   }
 }
+
+/* ---------- Mobile catalog (2c) + mobile plan (2d) polish ---------- */
+
+@media (max-width: 640px) {
+  /* "The heart is 44×44 with an aria-label — do not shrink it" — scoped to
+     mobile only; the 30px desktop size is unrelated and stays as-is. */
+  .fav-heart,
+  .fav-caret {
+    width: 44px;
+    height: 44px;
+  }
+  .title-selector ~ .fav-btn {
+    right: 52px;
+  }
+
+  .catalog-row__actions {
+    justify-content: flex-start;
+    flex-wrap: wrap;
+  }
+  .catalog-row__actions > * {
+    min-height: 44px;
+  }
+  .catalog-row__cta {
+    width: auto;
+    flex: 1;
+  }
+  .catalog-row__preview {
+    flex: 1;
+  }
+
+  .catalog-rail__search {
+    min-height: 44px;
+    font-size: 16px; /* prevents iOS auto-zoom on focus */
+  }
+
+  .plan-qty-stepper button {
+    width: 36px;
+    height: 36px;
+  }
+  .plan-line-card__schedule {
+    width: 100%;
+    justify-content: center;
+    min-height: 40px;
+  }
+  .plan-line-card__controls {
+    flex-direction: column;
+    align-items: stretch;
+  }
+}
