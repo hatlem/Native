@@ -2642,5 +2642,27 @@
     "kycPostal": "Postnummer",
     "kycCity": "Ort",
     "kycSave": "Spara uppgifter"
+  },
+  "buyerHome": {
+    "headingNeeds": "{count, plural, =1 {1 sak behöver dig} other {# saker behöver dig}}",
+    "headingRunning": "{count, plural, =1 {1 kampanj är live} other {# kampanjer är live}}",
+    "headingIdle": "Inget behöver dig just nu",
+    "sub": "{needs, plural, =0 {} =1 {En offert väntar på godkännande. } other {# offerter och utkast väntar på godkännande. }}{running, plural, =0 {} =1 {En kampanj är live.} other {# kampanjer är live.}}",
+    "subIdle": "Starta en ny kampanj, eller bläddra i katalogen för din nästa placering.",
+    "expiresIn": "Går ut {date}",
+    "quoteReadyBody": "En fast offert på {amount} väntar på ditt godkännande.",
+    "reviewQuote": "Granska offert",
+    "draftReadyTitle": "Ett utkast är klart",
+    "draftReadyBody": "Skribenten har skickat ett utkast — ta en titt och godkänn det, eller be om ändringar.",
+    "readDrafts": "Läs utkast",
+    "runningHeading": "Igång nu",
+    "allCampaigns": "Alla kampanjer",
+    "runningEmpty": "Inga kampanjer igång än.",
+    "browseCatalog": "Bläddra i katalogen",
+    "lines": "{count, plural, =1 {1 rad} other {# rader}}",
+    "startHeading": "Starta något",
+    "startDescribe": "Beskriv en kampanj",
+    "startBrowse": "Bläddra i katalogen",
+    "startRepeat": "Upprepa en tidigare kampanj"
   }
 }

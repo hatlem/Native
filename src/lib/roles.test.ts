@@ -17,8 +17,8 @@ test("landingForRole routes publishers to the portal", () => {
   assert.equal(landingForRole("PUBLISHER", "sv"), "/sv/publisher");
 });
 
-test("landingForRole sends buyers and unknown roles to the catalog", () => {
-  assert.equal(landingForRole("BUYER", "da"), "/da/catalog");
-  assert.equal(landingForRole(undefined, "en"), "/en/catalog");
-  assert.equal(landingForRole("WHATEVER", "en"), "/en/catalog");
+test("landingForRole sends buyers and unknown roles to Home", () => {
+  assert.equal(landingForRole("BUYER", "da"), "/da/home");
+  assert.equal(landingForRole(undefined, "en"), "/en/home");
+  assert.equal(landingForRole("WHATEVER", "en"), "/en/home");
 });

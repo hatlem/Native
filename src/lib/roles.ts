@@ -1,6 +1,6 @@
 // Where each role lands after authentication. Buyers (and any org-side
-// account) go to the catalog; desk/admin to the console; publishers to
-// their portal.
+// account) go to Home; desk/admin to the console; publishers to their
+// portal.
 export function landingForRole(
   role: string | undefined,
   locale: string,
@@ -15,6 +15,6 @@ export function landingForRole(
     case "SUPERADMIN":
       return `/${locale}/desk`;
     default:
-      return `/${locale}/catalog`;
+      return `/${locale}/home`;
   }
 }

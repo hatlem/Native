@@ -2643,5 +2643,27 @@
     "kycPostal": "Postnummer",
     "kycCity": "By",
     "kycSave": "Gem oplysninger"
+  },
+  "buyerHome": {
+    "headingNeeds": "{count, plural, =1 {1 ting har brug for dig} other {# ting har brug for dig}}",
+    "headingRunning": "{count, plural, =1 {1 kampagne er live} other {# kampagner er live}}",
+    "headingIdle": "Intet har brug for dig lige nu",
+    "sub": "{needs, plural, =0 {} =1 {Et tilbud venter på godkendelse. } other {# tilbud og udkast venter på godkendelse. }}{running, plural, =0 {} =1 {Én kampagne er live.} other {# kampagner er live.}}",
+    "subIdle": "Start en ny kampagne, eller gennemse kataloget til din næste placering.",
+    "expiresIn": "Udløber {date}",
+    "quoteReadyBody": "Et fast tilbud på {amount} venter på din godkendelse.",
+    "reviewQuote": "Se tilbud",
+    "draftReadyTitle": "Et udkast er klart",
+    "draftReadyBody": "Skribenten har afleveret et udkast — tag et kig og godkend det, eller bed om ændringer.",
+    "readDrafts": "Læs udkast",
+    "runningHeading": "Kører nu",
+    "allCampaigns": "Alle kampagner",
+    "runningEmpty": "Ingen kampagner kører endnu.",
+    "browseCatalog": "Gennemse kataloget",
+    "lines": "{count, plural, =1 {1 linje} other {# linjer}}",
+    "startHeading": "Start noget",
+    "startDescribe": "Beskriv en kampagne",
+    "startBrowse": "Gennemse kataloget",
+    "startRepeat": "Gentag en tidligere kampagne"
   }
 }

@@ -2511,5 +2511,27 @@
     "kycPostal": "Postleitzahl",
     "kycCity": "Stadt",
     "kycSave": "Daten speichern"
+  },
+  "buyerHome": {
+    "headingNeeds": "{count, plural, =1 {1 Sache braucht dich} other {# Dinge brauchen dich}}",
+    "headingRunning": "{count, plural, =1 {1 Kampagne läuft} other {# Kampagnen laufen}}",
+    "headingIdle": "Gerade braucht nichts deine Aufmerksamkeit",
+    "sub": "{needs, plural, =0 {} =1 {Ein Angebot wartet auf deine Freigabe. } other {# Angebote und Entwürfe warten auf deine Freigabe. }}{running, plural, =0 {} =1 {Eine Kampagne läuft.} other {# Kampagnen laufen.}}",
+    "subIdle": "Starte eine neue Kampagne oder durchsuche den Katalog für deine nächste Platzierung.",
+    "expiresIn": "Läuft ab {date}",
+    "quoteReadyBody": "Ein Festpreisangebot über {amount} wartet auf deine Freigabe.",
+    "reviewQuote": "Angebot prüfen",
+    "draftReadyTitle": "Ein Entwurf ist fertig",
+    "draftReadyBody": "Der Autor hat einen Entwurf abgegeben — sieh ihn dir an und gib ihn frei oder fordere Änderungen an.",
+    "readDrafts": "Entwürfe lesen",
+    "runningHeading": "Aktuell laufend",
+    "allCampaigns": "Alle Kampagnen",
+    "runningEmpty": "Noch keine Kampagne läuft.",
+    "browseCatalog": "Katalog durchsuchen",
+    "lines": "{count, plural, =1 {1 Zeile} other {# Zeilen}}",
+    "startHeading": "Etwas starten",
+    "startDescribe": "Kampagne beschreiben",
+    "startBrowse": "Katalog durchsuchen",
+    "startRepeat": "Vergangene Kampagne wiederholen"
   }
 }

@@ -70,11 +70,13 @@ export function navItemsFor(
       // via the command palette (paletteItemsFor keeps them all).
       if (opts.campaignFlow) {
         return [
+          { key: "home", label: t("home"), href: "/home" },
           campaignItem(t),
           { key: "campaigns", label: t("campaigns"), href: "/requests" },
         ];
       }
       return [
+        { key: "home", label: t("home"), href: "/home" },
         { key: "catalog", label: t("catalog"), href: "/catalog" },
         { key: "plan", label: t("plan"), href: "/plan" },
         { key: "lists", label: t("lists"), href: "/lists", description: t("listsDesc") },
@@ -86,12 +88,14 @@ export function navItemsFor(
     case "agency":
       if (opts.campaignFlow) {
         return [
+          { key: "home", label: t("home"), href: "/home" },
           campaignItem(t),
           { key: "campaigns", label: t("campaigns"), href: "/requests" },
           { key: "agency", label: t("agency"), href: "/agency" },
         ];
       }
       return [
+        { key: "home", label: t("home"), href: "/home" },
         { key: "catalog", label: t("catalog"), href: "/catalog" },
         { key: "plan", label: t("plan"), href: "/plan" },
         { key: "lists", label: t("lists"), href: "/lists", description: t("listsDesc") },
@@ -162,6 +166,7 @@ export function paletteItemsFor(
       case "advertiser":
       case "agency":
         return [
+          { key: "home", label: t("home"), href: "/home" },
           ...(opts.campaignFlow ? [campaignItem(t)] : []),
           { key: "catalog", label: t("catalog"), href: "/catalog" },
           { key: "plan", label: t("plan"), href: "/plan" },

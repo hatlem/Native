@@ -148,6 +148,26 @@ export default async function LocaleLayout({
     }
   }
 
+  // "Needs you" badge on Home — same count the Home page itself renders as
+  // cards, kept in sync by construction since both read the same two
+  // conditions (Quote SENT, ContentAsset IN_REVIEW).
+  if (audience === "advertiser" || audience === "agency") {
+    const ws = await getWorkspace(session?.user?.id);
+    if (ws) {
+      const orgIds = ws.scopeOrgIds;
+      const [quoteCount, contentCount] = await Promise.all([
+        prisma.quote.count({ where: { status: "SENT", request: { organizationId: { in: orgIds } } } }),
+        prisma.contentAsset.count({
+          where: { status: "IN_REVIEW", brief: { orderLine: { order: { organizationId: { in: orgIds } } } } },
+        }),
+      ]);
+      const needsCount = quoteCount + contentCount;
+      if (needsCount > 0) {
+        nav = nav.map((item) => (item.key === "home" ? { ...item, badge: needsCount } : item));
+      }
+    }
+  }
+
   const appName = tc("appName");
   const signedIn = Boolean(session?.user);
 

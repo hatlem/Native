@@ -11,9 +11,10 @@ test("audienceFor: role/orgType → audience", () => {
   assert.equal(audienceFor({ user: { role: "DESK" } }), "desk");
 });
 
-test("advertiser nav: default keeps the classic 7-item menu", () => {
+test("advertiser nav: default keeps the classic menu, Home leading", () => {
   const keys = navItemsFor("advertiser", t).map((i) => i.key);
   assert.deepEqual(keys, [
+    "home",
     "catalog",
     "plan",
     "lists",
@@ -24,14 +25,14 @@ test("advertiser nav: default keeps the classic 7-item menu", () => {
   ]);
 });
 
-test("advertiser nav: campaignFlow cutover replaces menu with flow + campaigns", () => {
+test("advertiser nav: campaignFlow cutover replaces menu with home + flow + campaigns", () => {
   const keys = navItemsFor("advertiser", t, { campaignFlow: true }).map((i) => i.key);
-  assert.deepEqual(keys, ["campaign", "campaigns"]);
+  assert.deepEqual(keys, ["home", "campaign", "campaigns"]);
 });
 
 test("agency nav: campaignFlow cutover keeps the agency switcher", () => {
   const keys = navItemsFor("agency", t, { campaignFlow: true }).map((i) => i.key);
-  assert.deepEqual(keys, ["campaign", "campaigns", "agency"]);
+  assert.deepEqual(keys, ["home", "campaign", "campaigns", "agency"]);
 });
 
 test("staff navs are unaffected by the campaignFlow flag", () => {

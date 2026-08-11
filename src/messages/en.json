@@ -2641,5 +2641,27 @@
     "kycPostal": "Postal code",
     "kycCity": "City",
     "kycSave": "Save details"
+  },
+  "buyerHome": {
+    "headingNeeds": "{count, plural, =1 {1 thing needs you} other {# things need you}}",
+    "headingRunning": "{count, plural, =1 {1 campaign is live} other {# campaigns are live}}",
+    "headingIdle": "Nothing needs you right now",
+    "sub": "{needs, plural, =0 {} =1 {A quote is waiting for approval. } other {# quotes and drafts are waiting for approval. }}{running, plural, =0 {} =1 {One campaign is live.} other {# campaigns are live.}}",
+    "subIdle": "Start a new campaign, or browse the catalog for your next placement.",
+    "expiresIn": "Expires {date}",
+    "quoteReadyBody": "A firm quote for {amount} is ready for your approval.",
+    "reviewQuote": "Review quote",
+    "draftReadyTitle": "A draft is ready to read",
+    "draftReadyBody": "The writer has finished a draft — take a look and approve it, or ask for changes.",
+    "readDrafts": "Read drafts",
+    "runningHeading": "Running now",
+    "allCampaigns": "All campaigns",
+    "runningEmpty": "No campaigns running yet.",
+    "browseCatalog": "Browse the catalog",
+    "lines": "{count, plural, =1 {1 line} other {# lines}}",
+    "startHeading": "Start something",
+    "startDescribe": "Describe a campaign",
+    "startBrowse": "Browse the catalog",
+    "startRepeat": "Repeat a past campaign"
   }
 }

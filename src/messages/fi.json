@@ -2642,5 +2642,27 @@
     "kycPostal": "Postinumero",
     "kycCity": "Kaupunki",
     "kycSave": "Tallenna tiedot"
+  },
+  "buyerHome": {
+    "headingNeeds": "{count, plural, =1 {1 asia tarvitsee sinua} other {# asiaa tarvitsee sinua}}",
+    "headingRunning": "{count, plural, =1 {1 kampanja on käynnissä} other {# kampanjaa on käynnissä}}",
+    "headingIdle": "Mikään ei tarvitse sinua juuri nyt",
+    "sub": "{needs, plural, =0 {} =1 {Yksi tarjous odottaa hyväksyntää. } other {# tarjousta ja luonnosta odottaa hyväksyntää. }}{running, plural, =0 {} =1 {Yksi kampanja on käynnissä.} other {# kampanjaa on käynnissä.}}",
+    "subIdle": "Aloita uusi kampanja tai selaa katalogia seuraavaa sijoittelua varten.",
+    "expiresIn": "Vanhenee {date}",
+    "quoteReadyBody": "Kiinteä tarjous, {amount}, odottaa hyväksyntääsi.",
+    "reviewQuote": "Tarkista tarjous",
+    "draftReadyTitle": "Luonnos on valmis",
+    "draftReadyBody": "Kirjoittaja on lähettänyt luonnoksen — käy katsomassa ja hyväksy se, tai pyydä muutoksia.",
+    "readDrafts": "Lue luonnokset",
+    "runningHeading": "Käynnissä nyt",
+    "allCampaigns": "Kaikki kampanjat",
+    "runningEmpty": "Yhtään kampanjaa ei ole vielä käynnissä.",
+    "browseCatalog": "Selaa katalogia",
+    "lines": "{count, plural, =1 {1 rivi} other {# riviä}}",
+    "startHeading": "Aloita jotain",
+    "startDescribe": "Kuvaile kampanja",
+    "startBrowse": "Selaa katalogia",
+    "startRepeat": "Toista aiempi kampanja"
   }
 }
