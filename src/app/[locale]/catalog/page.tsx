@@ -1,5 +1,6 @@
 import { getTranslations } from "next-intl/server";
 import { MarketCode, ProductType, Prisma } from "@prisma/client";
+import { Link } from "@/i18n/navigation";
 import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
 import { getFavoritedTitleIds } from "@/lib/favorites";
@@ -7,15 +8,19 @@ import { searchTitleIds, searchWhereFor } from "@/lib/catalog-search";
 import { catalogVisibleTitleWhere } from "@/lib/catalog-visibility";
 import { savedListMembershipMap } from "@/lib/saved-list-membership";
 import { loadScope } from "@/lib/scope";
-import { CatalogFilters } from "./_components/CatalogFilters";
+import { readActiveListId, resolveActiveList } from "@/lib/lists";
+import { estimateListTotals } from "@/lib/plan-total";
+import { titleDisplayName } from "@/lib/title-display";
+import { CatalogRail } from "./_components/CatalogRail";
 import { CatalogSort } from "./_components/CatalogSort";
+import { CatalogDensityToggle } from "./_components/CatalogDensityToggle";
+import { ShortlistProvider } from "./_components/Shortlist";
 import { CatalogMarketing } from "./_components/CatalogMarketing";
-import { CatalogResults } from "./_components/CatalogResults";
+import { CatalogResults, type Density } from "./_components/CatalogResults";
 import { CatalogPagination } from "./_components/CatalogPagination";
 import { ActiveFilterChips } from "./_components/ActiveFilterChips";
 import {
   MARKET_CODES,
-  PRODUCT_TYPES,
   NATIVE_FIT_VALUES,
   B2B_B2C_VALUES,
   REACH_VALUES,
@@ -63,7 +68,6 @@ export default async function CatalogPage({
     newsletterIncluded,
     videoIncluded,
     compareMode,
-    advancedOpen,
     q,
     page,
   } = parseCatalogParams(sp);
@@ -73,26 +77,26 @@ export default async function CatalogPage({
   // can't form a valid query (e.g. only punctuation).
   const matchedIds = await searchTitleIds(q);
 
-  // AND-composed conditions collected in one array so multiple filters that
-  // each need their own products.some (onlyPriced + the semantic
-  // deliverable filters) compose instead of overwriting each other's AND.
-  const andConditions: Prisma.TitleWhereInput[] = [];
-  if (onlyPriced) {
-    // "Priced titles only" = a buyer can actually see a € figure. Mirror
-    // isProductPriceShown (src/lib/pricing/visibility.ts): an active,
-    // sales-confirmed product AND both title + publisher prices public.
-    andConditions.push(
-      { products: { some: { active: true, confirmedAt: { not: null } } } },
-      { pricesPublic: true },
-      { publisher: { is: { pricesPublic: true } } },
-    );
-  }
+  // "Priced titles only" = a buyer can actually see a € figure. Mirror
+  // isProductPriceShown (src/lib/pricing/visibility.ts): an active,
+  // sales-confirmed product AND both title + publisher prices public.
+  // Kept separate from the other AND-composed conditions (rather than
+  // pushed straight into one array) so the rail's "N more titles without
+  // published pricing" note can build the exact same where, minus just
+  // this condition, without fragile structural filtering after the fact.
+  const onlyPricedConditions: Prisma.TitleWhereInput[] = [
+    { products: { some: { active: true, confirmedAt: { not: null } } } },
+    { pricesPublic: true },
+    { publisher: { is: { pricesPublic: true } } },
+  ];
+
   // Semantic-deliverable filters read curated Product.inclusions (Json).
   // Prisma JSON `path` filters on Postgres only match when the key exists
   // and the value compares — verified against the local atnative DB.
+  const semanticConditions: Prisma.TitleWhereInput[] = [];
   if (producedForYou) {
     // Publisher's editorial desk writes the content for the advertiser.
-    andConditions.push({
+    semanticConditions.push({
       products: {
         some: {
           active: true,
@@ -104,7 +108,7 @@ export default async function CatalogPage({
   if (guaranteedReach) {
     // Any committed reach number counts. `gt: 0` doubles as a key-existence
     // check: a missing path never satisfies a numeric comparison.
-    andConditions.push({
+    semanticConditions.push({
       products: {
         some: {
           active: true,
@@ -119,56 +123,63 @@ export default async function CatalogPage({
     });
   }
   if (newsletterIncluded) {
-    andConditions.push({
+    semanticConditions.push({
       products: {
         some: { active: true, inclusions: { path: ["newsletter"], equals: true } },
       },
     });
   }
   if (videoIncluded) {
-    andConditions.push({
+    semanticConditions.push({
       products: {
         some: { active: true, inclusions: { path: ["video"], equals: true } },
       },
     });
   }
 
-  const where: Prisma.TitleWhereInput = {
-    ...(markets.length
-      ? markets.length === 1
-        ? { market: { code: markets[0] } }
-        : { market: { code: { in: markets } } }
-      : {}),
-    ...(types.length
-      ? { products: { some: { type: { in: types }, active: true } } }
-      : {}),
-    ...(verticals.length ? { vertical: { in: verticals } } : {}),
-    ...(regions.length ? { region: { in: regions } } : {}),
-    ...(publisher ? { publisherId: publisher } : {}),
-    ...(nativeFit ? { nativeFit } : {}),
-    ...(b2bB2c ? { b2bB2c } : {}),
-    ...(reach ? { reach } : {}),
-    // AND-composed rather than spread: catalogVisibleTitleWhere and the
-    // search fallback (buildIlikeFallbackWhere) can each independently
-    // produce a top-level `OR` key. Spreading them into the same object
-    // literal would let the later one silently clobber the earlier one
-    // (object spread: last key wins) — dropping the visibility guard
-    // whenever a search falls through to the ILIKE fallback. Combining
-    // them as separate AND members keeps both `OR`s intact and composes
-    // correctly with the type filter's own products.some in andConditions.
-    AND: [
-      // Show commerce-active titles AND unverified research-catalog rows;
-      // hide titles the desk has verified as not offering native, and never
-      // surface titles marked discontinued (nedlagt/duplikat). Shared with
-      // favorites.ts/list-actions.ts so the guards can't drift apart.
-      catalogVisibleTitleWhere,
-      // A non-empty FTS hit list wins outright; an empty-or-absent FTS result
-      // (including a valid tsquery that simply matched nothing) falls through
-      // to the synonym-aware ILIKE fallback instead of pinning `id IN ()`.
-      searchWhereFor(q, matchedIds),
-      ...andConditions,
-    ],
-  };
+  function buildWhere(includeOnlyPriced: boolean): Prisma.TitleWhereInput {
+    return {
+      ...(markets.length
+        ? markets.length === 1
+          ? { market: { code: markets[0] } }
+          : { market: { code: { in: markets } } }
+        : {}),
+      ...(types.length
+        ? { products: { some: { type: { in: types }, active: true } } }
+        : {}),
+      ...(verticals.length ? { vertical: { in: verticals } } : {}),
+      ...(regions.length ? { region: { in: regions } } : {}),
+      ...(publisher ? { publisherId: publisher } : {}),
+      ...(nativeFit ? { nativeFit } : {}),
+      ...(b2bB2c ? { b2bB2c } : {}),
+      ...(reach ? { reach } : {}),
+      // AND-composed rather than spread: catalogVisibleTitleWhere and the
+      // search fallback (buildIlikeFallbackWhere) can each independently
+      // produce a top-level `OR` key. Spreading them into the same object
+      // literal would let the later one silently clobber the earlier one
+      // (object spread: last key wins) — dropping the visibility guard
+      // whenever a search falls through to the ILIKE fallback. Combining
+      // them as separate AND members keeps both `OR`s intact and composes
+      // correctly with the type filter's own products.some above.
+      AND: [
+        // Show commerce-active titles AND unverified research-catalog rows;
+        // hide titles the desk has verified as not offering native, and
+        // never surface titles marked discontinued (nedlagt/duplikat).
+        // Shared with favorites.ts/list-actions.ts so the guards can't
+        // drift apart.
+        catalogVisibleTitleWhere,
+        // A non-empty FTS hit list wins outright; an empty-or-absent FTS
+        // result (including a valid tsquery that simply matched nothing)
+        // falls through to the synonym-aware ILIKE fallback instead of
+        // pinning `id IN ()`.
+        searchWhereFor(q, matchedIds),
+        ...(includeOnlyPriced && onlyPriced ? onlyPricedConditions : []),
+        ...semanticConditions,
+      ],
+    };
+  }
+
+  const where = buildWhere(true);
 
   const verticalRows = await prisma.title.findMany({
     where: { active: true, vertical: { not: null } },
@@ -290,6 +301,30 @@ export default async function CatalogPage({
     audience: audienceFor(session),
     dismissedAt,
   });
+
+  // Sticky shortlist bar's starting state: the active list's current
+  // product ids + total, so the bar (and each row's "on plan" state)
+  // reflects what's really on the plan before any optimistic click.
+  const activeList = orgId ? await resolveActiveList(orgId, await readActiveListId()) : null;
+  const shortlistProductIds = (activeList?.items ?? [])
+    .map((i) => i.productId)
+    .filter((id): id is string => id !== null);
+  const shortlistTotals = activeList ? estimateListTotals(activeList.items) : [];
+  const planName = activeList?.name ?? t("shortlist.untitledPlan");
+
+  // "42 more titles without published pricing" — only meaningful once
+  // onlyPriced is actually narrowing the list; same query with that one
+  // condition dropped tells us how many.
+  let unpricedCount: number | null = null;
+  if (onlyPriced) {
+    const broaderCount = await prisma.title.count({ where: buildWhere(false) });
+    unpricedCount = Math.max(0, broaderCount - totalCount);
+  }
+
+  const density: Density = sp.density === "cards" ? "cards" : "list";
+  // A single selected market earns a mention in the H1 ("… run native in
+  // Norway"); multiple markets or none fall back to the market-less count.
+  const marketLabel = markets.length === 1 ? tMarket(markets[0]) : null;
 
   const pageQuery = (p: number) => {
     const params = new URLSearchParams();
@@ -465,74 +500,102 @@ export default async function CatalogPage({
     favoriteLists.length === 0 && !q && page === 1 && activeFilters.length === 0;
 
   return (
-    <section>
-      {showBookingBanner ? <CatalogBookCallBanner /> : null}
-      <h1>{t("title")}</h1>
-      <p className="muted">{t("subtitle")}</p>
+    <ShortlistProvider
+      locale={locale}
+      planName={planName}
+      initialCount={shortlistProductIds.length}
+      initialProductIds={shortlistProductIds}
+      initialTotals={shortlistTotals}
+    >
+      <section className="catalog-page">
+        {showBookingBanner ? <CatalogBookCallBanner /> : null}
 
-      {showStartGuide ? (
-        <div className="catalog-start" role="note">
-          <strong>{t("startHeading")}</strong>
-          <ol>
-            <li>{t("startS1")}</li>
-            <li>{t("startS2")}</li>
-            <li>{t("startS3")}</li>
-          </ol>
+        <div className="catalog-layout">
+          <CatalogRail
+            markets={MARKET_CODES.map((m) => ({ value: m, label: tMarket(m) }))}
+            nativeFits={NATIVE_FIT_VALUES.map((v) => ({ value: v, label: tFit(v) }))}
+            b2bB2cs={B2B_B2C_VALUES.map((v) => ({ value: v, label: v }))}
+            reaches={REACH_VALUES.map((v) => ({ value: v, label: tReach(v) }))}
+            categories={verticalOptions.map((v) => ({ value: v, label: v }))}
+            regions={regionOptions.map((v) => ({ value: v, label: v }))}
+            unpricedCount={unpricedCount}
+            initial={{
+              q,
+              markets,
+              types,
+              verticals,
+              regions,
+              nativeFit: nativeFit ?? "",
+              b2bB2c: b2bB2c ?? "",
+              reach: reach ?? "",
+              onlyPriced,
+              producedForYou,
+              guaranteedReach,
+              newsletterIncluded,
+              videoIncluded,
+              compareMode,
+            }}
+          />
+
+          <div className="catalog-results-col">
+            {showStartGuide ? (
+              <div className="catalog-start" role="note">
+                <strong>{t("startHeading")}</strong>
+                <ol>
+                  <li>{t("startS1")}</li>
+                  <li>{t("startS2")}</li>
+                  <li>{t("startS3")}</li>
+                </ol>
+              </div>
+            ) : null}
+
+            <div className="catalog-results-head">
+              <div>
+                <h1>
+                  {marketLabel
+                    ? t("resultsHeadingInMarket", { count: totalCount, market: marketLabel })
+                    : t("resultsHeading", { count: totalCount })}
+                </h1>
+                <p className="catalog-results-sub">{t("resultsSubline")}</p>
+              </div>
+              <div className="catalog-results-controls">
+                <CatalogSort initial={sort ?? ""} />
+                <CatalogDensityToggle initial={density} />
+              </div>
+            </div>
+
+            <ActiveFilterChips locale={locale} filters={activeFilters} />
+
+            <CatalogResults
+              locale={locale}
+              titles={titles}
+              density={density}
+              compareMode={compareMode}
+              favoritedIds={favoritedIds}
+              favoriteLists={favoriteLists}
+              listMembership={listMembership}
+              noOrg={noOrg}
+            />
+
+            <CatalogPagination
+              locale={locale}
+              page={page}
+              totalPages={totalPages}
+              pageQuery={pageQuery}
+            />
+
+            <div className="catalog-prompt">
+              <div>
+                <strong>{t("notSureHeading")}</strong>
+                <p>{t("notSureBody")}</p>
+              </div>
+              <Link href="/recommend" className="btn secondary">
+                {t("notSureCta")}
+              </Link>
+            </div>
+          </div>
         </div>
-      ) : null}
-
-      <CatalogFilters
-        markets={MARKET_CODES.map((m) => ({ value: m, label: tMarket(m) }))}
-        formats={PRODUCT_TYPES.map((pt) => ({ value: pt, label: tType(pt) }))}
-        nativeFits={NATIVE_FIT_VALUES.map((v) => ({ value: v, label: tFit(v) }))}
-        b2bB2cs={B2B_B2C_VALUES.map((v) => ({ value: v, label: v }))}
-        reaches={REACH_VALUES.map((v) => ({ value: v, label: tReach(v) }))}
-        categories={verticalOptions.map((v) => ({ value: v, label: v }))}
-        regions={regionOptions.map((v) => ({ value: v, label: v }))}
-        initial={{
-          q,
-          markets,
-          types,
-          verticals,
-          regions,
-          nativeFit: nativeFit ?? "",
-          b2bB2c: b2bB2c ?? "",
-          reach: reach ?? "",
-          onlyPriced,
-          producedForYou,
-          guaranteedReach,
-          newsletterIncluded,
-          videoIncluded,
-          advancedOpen,
-          compareMode,
-        }}
-      />
-
-      <ActiveFilterChips locale={locale} filters={activeFilters} />
-
-      <div className="catalog-result-bar">
-        <p className="muted">{t("resultCount", { count: totalCount })}</p>
-        <CatalogSort initial={sort ?? ""} />
-      </div>
-
-      <CatalogResults
-        locale={locale}
-        titles={titles}
-        compareMode={compareMode}
-        favoritedIds={favoritedIds}
-        favoriteLists={favoriteLists}
-        listMembership={listMembership}
-        noOrg={noOrg}
-      />
-
-      <CatalogPagination
-        locale={locale}
-        page={page}
-        totalPages={totalPages}
-        pageQuery={pageQuery}
-      />
-
-      <p className="note">{t("indicativeNote")}</p>
-    </section>
+      </section>
+    </ShortlistProvider>
   );
 }

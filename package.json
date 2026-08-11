@@ -2,7 +2,7 @@
   "name": "nativespin",
   "version": "0.0.1",
   "private": true,
-  "description": "NativeSpin \u2014 Nordic marketplace for buying native content and native advertising in newspapers and magazines.",
+  "description": "NativeSpin — Nordic marketplace for buying native content and native advertising in newspapers and magazines.",
   "scripts": {
     "dev": "next dev",
     "build": "prisma generate && next build",
@@ -63,6 +63,7 @@
     "cheerio": "^1.2.0",
     "disposable-email-domains": "^1.0.62",
     "free-email-domains": "^1.9.17",
+    "lucide-react": "^1.31.0",
     "next": "^15.5.21",
     "next-auth": "5.0.0-beta.32",
     "next-intl": "^4.12.0",

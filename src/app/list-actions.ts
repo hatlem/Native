@@ -83,6 +83,54 @@ export async function addProductToList(formData: FormData) {
   redirect(safeReturnTo(formData, locale, "/plan"));
 }
 
+export type ShortlistAddResult =
+  | { ok: true; listId: string }
+  | { ok: false; reason: "signin" | "no-client" | "invalid-product" };
+
+// Client-invoked counterpart to addProductToList: same validation and
+// upsert, but returns a result instead of redirecting. The catalog's
+// optimistic "Add to plan" button calls this directly (not via a <form
+// action>) and must stay on /catalog — reverting its own optimistic state
+// on {ok:false} rather than following a server redirect. Deliberately not
+// sharing activeList()/requireActiveOrg() above: those redirect on
+// failure, which is exactly the behavior this needs to not have, and
+// duplicating a few lines here is safer than changing a helper several
+// other (redirecting) actions in this file depend on.
+export async function addProductToActiveList(
+  productId: string,
+  withContent: boolean,
+  locale: string,
+): Promise<ShortlistAddResult> {
+  const scope = await loadScope();
+  if (!scope.userId) return { ok: false, reason: "signin" };
+  const orgId = scope.workspace?.activeOrgId;
+  if (!orgId) return { ok: false, reason: "no-client" };
+
+  const valid = await prisma.product.findFirst({
+    where: { id: productId, active: true, bookable: true },
+    select: { id: true },
+  });
+  if (!valid) return { ok: false, reason: "invalid-product" };
+
+  let activeId = await readActiveListId();
+  if (!activeId) {
+    const legacy = await readBasket();
+    const migrated = legacy.length
+      ? await migrateLegacyBasket(orgId, legacy, scope.userId)
+      : null;
+    if (migrated) {
+      activeId = migrated.id;
+      (await cookies()).delete("nativespin_plan");
+    }
+  }
+  const listId = await ensureActiveListId(orgId, activeId, scope.userId);
+  await writeActiveListId(listId);
+  await addProductItem(listId, productId, withContent);
+  revalidatePath(`/${locale}/plan`);
+  revalidatePath(`/${locale}/requests`);
+  return { ok: true, listId };
+}
+
 export async function addRecommendedToList(formData: FormData) {
   const locale = str(formData, "locale") || "en";
   const ids = str(formData, "productIds").split(",").map((s) => s.trim()).filter(Boolean);
