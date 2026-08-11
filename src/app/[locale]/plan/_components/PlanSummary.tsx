@@ -3,21 +3,24 @@ import { Link } from "@/i18n/navigation";
 import type { PlanBrief } from "@/lib/basket";
 import { formatMoney } from "@/lib/money";
 import { submitRequest } from "@/app/checkout-actions";
-import { AUDIENCE_SEGMENTS } from "@/lib/targeting/segments";
 import { SubmitButton } from "@/components";
-import { BudgetField } from "./BudgetField";
+import { PlanBriefFields } from "./PlanBriefFields";
 
 // Per-currency rollup computed in page.tsx — visible-price lines
 // accumulate an amount, locked-price lines only flag their currency.
 export type Rollup = { amount: number; hasVisible: boolean; hasHidden: boolean };
 
-// Right column of the split: per-currency totals plus the brief form
-// that submits the basket as a firm plan or RFQ.
+// Right column, top card: per-currency totals, the instant-book split, and
+// the brief form that submits the basket as a firm plan or RFQ. The
+// "What happens next" card is a sibling, rendered by page.tsx — this
+// component owns only the summary + form.
 export async function PlanSummary({
   locale,
   totals,
   hasHiddenPrice,
   allFirm,
+  firmLineCount,
+  lineCount,
   needsClient,
   activeOrg,
   briefDraft,
@@ -26,6 +29,8 @@ export async function PlanSummary({
   totals: [string, Rollup][];
   hasHiddenPrice: boolean;
   allFirm: boolean;
+  firmLineCount: number;
+  lineCount: number;
   needsClient: boolean;
   activeOrg: { name: string } | null;
   briefDraft: PlanBrief;
@@ -33,13 +38,9 @@ export async function PlanSummary({
   const t = await getTranslations({ locale, namespace: "plan" });
   const tf = await getTranslations({ locale, namespace: "firm" });
   const tr = await getTranslations({ locale, namespace: "rfq" });
-  const tSeg = await getTranslations({ locale, namespace: "targetSegment" });
   const ta = await getTranslations({ locale, namespace: "auth" });
   const tNav = await getTranslations({ locale, namespace: "nav" });
-  const tv = await getTranslations({
-    locale,
-    namespace: "priceVisibility",
-  });
+  const tv = await getTranslations({ locale, namespace: "priceVisibility" });
 
   // Only compare the budget field against a single-currency total — a
   // mixed-currency basket has no one number to warn against.
@@ -50,27 +51,30 @@ export async function PlanSummary({
     <aside className="plan-summary">
       <div className="plan-summary-head">
         <span className="muted small">{t("estTotal")}</span>
-        <div className="plan-summary-total">
-          {totals
-            .filter(([, r]) => r.hasVisible)
-            .map(([cur, r]) => (
-              <div className="price" key={cur}>
-                {formatMoney(r.amount, cur, locale)}
-                {r.hasHidden ? (
-                  <span className="muted small"> + {tv("requestPrice")}</span>
-                ) : null}
-              </div>
-            ))}
-          {hasHiddenPrice && !totals.some(([, r]) => r.hasVisible) ? (
-            <div className="muted small">{t("pricingOnRequest")}</div>
-          ) : null}
-        </div>
-        {allFirm ? (
-          <span className="badge badge-info dotless">
-            ⚡ {tf("badge")}
+        {firmLineCount > 0 && firmLineCount < lineCount ? (
+          <span className="badge badge-info dotless plan-summary-firm-pill">
+            ⚡ {t("firmOfTotal", { firm: firmLineCount, total: lineCount })}
           </span>
+        ) : allFirm ? (
+          <span className="badge badge-info dotless">⚡ {tf("badge")}</span>
         ) : null}
       </div>
+      <div className="plan-summary-total">
+        {totals
+          .filter(([, r]) => r.hasVisible)
+          .map(([cur, r]) => (
+            <div className="price" key={cur}>
+              {formatMoney(r.amount, cur, locale)}
+              {r.hasHidden ? <span className="muted small"> + {tv("requestPrice")}</span> : null}
+            </div>
+          ))}
+        {hasHiddenPrice && !totals.some(([, r]) => r.hasVisible) ? (
+          <div className="muted small">{t("pricingOnRequest")}</div>
+        ) : null}
+      </div>
+      {hasHiddenPrice ? <p className="plan-summary-note">{t("plusDeskPriced")}</p> : null}
+
+      <div className="plan-summary-divider" />
 
       <h3>{allFirm ? tf("planTitle") : t("rfqTitle")}</h3>
       {allFirm ? <p className="muted small">{tf("planNote")}</p> : null}
@@ -88,80 +92,18 @@ export async function PlanSummary({
           <p className="muted small">
             {tr("requestingAs")}: <strong>{activeOrg.name}</strong>
           </p>
-          <BudgetField
+          <PlanBriefFields
             locale={locale}
-            defaultValue={briefDraft.budget}
+            briefDraft={briefDraft}
             currency={singleTotal ? singleTotal[0] : null}
             total={singleTotal ? singleTotal[1].amount : 0}
           />
-          <div className="field">
-            <label htmlFor="audience">{tr("audience")}</label>
-            <input
-              id="audience"
-              name="audience"
-              defaultValue={briefDraft.audience}
-            />
-          </div>
-          <div className="field">
-            <label htmlFor="goal">{tr("goal")}</label>
-            <input
-              id="goal"
-              name="goal"
-              defaultValue={briefDraft.goal}
-            />
-          </div>
-          <div className="field">
-            <label>{tr("targetAudienceLabel")}</label>
-            <div className="checkbox-grid">
-              {AUDIENCE_SEGMENTS.map((s) => (
-                <label key={s} className="checkbox-row">
-                  <input
-                    type="checkbox"
-                    name="targetAudience"
-                    value={s}
-                    defaultChecked={briefDraft.targetAudience
-                      .split(",")
-                      .includes(s)}
-                  />
-                  {tSeg(s)}
-                </label>
-              ))}
-            </div>
-          </div>
-          <div className="field">
-            <label htmlFor="targetGeo">{tr("targetGeoLabel")}</label>
-            <input
-              id="targetGeo"
-              name="targetGeo"
-              defaultValue={briefDraft.targetGeo}
-              placeholder={tr("targetGeoPlaceholder")}
-            />
-          </div>
-          <div className="field">
-            <label htmlFor="targetContext">{tr("targetContextLabel")}</label>
-            <input
-              id="targetContext"
-              name="targetContext"
-              defaultValue={briefDraft.targetContext}
-              placeholder={tr("targetContextPlaceholder")}
-            />
-          </div>
-          <div className="field">
-            <label htmlFor="brief">{tr("brief")}</label>
-            <textarea
-              id="brief"
-              name="brief"
-              rows={3}
-              defaultValue={briefDraft.brief}
-            />
-          </div>
           <SubmitButton
             label={allFirm ? tf("planSubmit") : tr("submit")}
-            pendingLabel={
-              allFirm ? tf("planSubmitting") : tr("submitting")
-            }
+            pendingLabel={allFirm ? tf("planSubmitting") : tr("submitting")}
             className="btn block"
           />
+          <p className="plan-summary-reassurance">{t("reassurance")}</p>
         </form>
       ) : (
         <div className="auth-fallback">

@@ -1,5 +1,4 @@
 import { getTranslations } from "next-intl/server";
-import { intlLocale } from "@/lib/money";
 import { redirect } from "next/navigation";
 import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
@@ -8,20 +7,9 @@ import { safeExternalUrl } from "@/lib/security";
 import { EmptyState } from "@/app/empty-state";
 import { markAllRead } from "@/app/notification-actions";
 import { SubmitButton } from "@/components";
+import { timeAgo } from "@/lib/time-ago";
 
 export const dynamic = "force-dynamic";
-
-function timeAgo(date: Date, locale: string): string {
-  const diff = Date.now() - date.getTime();
-  const minutes = Math.floor(diff / 60_000);
-  const hours = Math.floor(minutes / 60);
-  const days = Math.floor(hours / 24);
-  const rtf = new Intl.RelativeTimeFormat(intlLocale(locale), { numeric: "auto" });
-  if (days >= 1) return rtf.format(-days, "day");
-  if (hours >= 1) return rtf.format(-hours, "hour");
-  if (minutes >= 1) return rtf.format(-minutes, "minute");
-  return rtf.format(0, "minute");
-}
 
 export default async function NotificationsPage({
   params,

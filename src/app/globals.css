@@ -2811,118 +2811,433 @@ select:disabled {
   accent-color: var(--warning);
 }
 
-/* ---------- Plan list bar (switch / rename / new-list) ---------- */
+/* ---------- Plan step rail ---------- */
 
-.plan-list-bar {
+.plan-steps {
   display: flex;
+  align-items: center;
+  list-style: none;
+  margin: var(--s-4) 0 0;
+  padding: 0;
+}
+
+.plan-step {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.plan-step__circle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  border-radius: var(--r-pill);
+  font-size: 0.78rem;
+  font-weight: 700;
+  border: 1px solid var(--border-strong);
+  background: var(--surface);
+  color: var(--muted);
+}
+
+.plan-step__label {
+  font-size: 0.86rem;
+  color: var(--muted);
+}
+
+.plan-step__connector {
+  width: 32px;
+  height: 1px;
+  background: var(--border-strong);
+  margin: 0 10px;
+}
+
+.plan-step--done .plan-step__circle {
+  background: var(--success-soft);
+  border-color: var(--success);
+  color: var(--success);
+}
+.plan-step--done .plan-step__label {
+  color: var(--muted);
+}
+.plan-step--done .plan-step__connector {
+  background: var(--success);
+}
+
+.plan-step--current .plan-step__circle {
+  background: var(--ink);
+  border-color: var(--ink);
+  color: var(--primary-contrast);
+}
+.plan-step--current .plan-step__label {
+  color: var(--heading);
+  font-weight: 600;
+}
+
+@media (max-width: 640px) {
+  .plan-steps {
+    flex-wrap: wrap;
+    row-gap: var(--s-2);
+  }
+  .plan-step__label {
+    display: none;
+  }
+}
+
+/* ---------- Plan title block (replaces the old three-group list bar) ---------- */
+
+.plan-title-block {
+  margin-top: var(--s-3);
+}
+
+.plan-title-block__row {
+  display: flex;
+  align-items: center;
+  gap: var(--s-3);
   flex-wrap: wrap;
+}
+
+.plan-title-block__row h1 {
+  margin: 0;
+}
+
+.plan-title-block__rename-btn {
+  background: transparent;
+  border: 0;
+  padding: 0;
+  color: var(--accent);
+  font-size: 0.9rem;
+  font-weight: 540;
+  cursor: pointer;
+}
+.plan-title-block__rename-btn:hover {
+  color: var(--accent-hover);
+}
+
+.plan-title-block__rename-form {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex: 1;
+  min-width: 260px;
+}
+.plan-title-block__rename-input {
+  flex: 1;
+  min-width: 200px;
+  font-size: 1.3rem;
+  font-weight: 640;
+  padding: 6px 10px;
+}
+
+.plan-title-block__switcher {
+  position: relative;
+  margin-left: auto;
+}
+
+.plan-title-block__popover {
+  position: absolute;
+  top: calc(100% + 8px);
+  right: 0;
+  z-index: 30;
+  width: 300px;
+  background: var(--surface);
+  border: 1px solid var(--border-strong);
+  border-radius: var(--r-md);
+  box-shadow: var(--shadow-md);
+  padding: var(--s-4);
+  display: flex;
+  flex-direction: column;
   gap: var(--s-4);
-  align-items: flex-end;
+}
+
+.plan-title-block__popover-form {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.plan-title-block__popover-form label {
+  font-size: 0.7rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--muted);
+}
+.plan-title-block__popover-form select,
+.plan-title-block__popover-form input {
+  min-height: 38px;
+}
+.plan-title-block__popover-form button {
+  align-self: flex-start;
+}
+
+.plan-title-block__sub {
+  margin: 4px 0 0;
+  font-size: 0.9rem;
+  color: var(--muted);
+}
+
+/* ---------- Plan lines ---------- */
+
+.plan-lines-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin: var(--s-5) 0 var(--s-3);
+}
+
+.plan-lines-eyebrow {
+  font-size: 0.7rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--muted);
+}
+
+.plan-line-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.plan-line-card {
+  display: grid;
+  grid-template-columns: 1fr 150px 130px;
+  gap: 18px;
+  align-items: start;
+  padding: 18px 20px;
   background: var(--surface);
   border: 1px solid var(--border);
   border-radius: var(--r-md);
-  padding: var(--s-3) var(--s-4);
-  margin-top: var(--s-4);
 }
-
-.plan-list-bar-group {
-  display: grid;
-  gap: 4px;
-}
-
-.plan-list-bar-group > label {
-  font-size: 0.75rem;
-  font-weight: 600;
-  color: var(--muted);
-  text-transform: uppercase;
-  letter-spacing: 0.06em;
-}
-
-.plan-list-bar-controls {
-  display: flex;
-  gap: var(--s-2);
-  align-items: center;
-}
-
-/* .banner-info carries no margin of its own (it's also used as the FIRST
-   element on a page in PlanBanners/FavoritesView/etc.) — scoped here rather
-   than adding margin-top to the shared class, which would double up
-   spacing in those other contexts. */
-.plan-favorites-strip {
-  margin-top: var(--s-4);
+.plan-line-card--needs-price {
+  border-color: color-mix(in srgb, var(--warning) 45%, var(--border));
 }
 
 @media (max-width: 640px) {
-  .plan-list-bar {
-    flex-direction: column;
-    align-items: stretch;
+  .plan-line-card {
+    grid-template-columns: 1fr;
   }
 }
 
-/* ---------- Plan lines + summary sidebar ---------- */
-
-/* tag | title+meta | qty/content controls | price+remove — four aligned
-   tracks so price and remove sit in their own column across every row,
-   instead of drifting with however tall the middle cell happens to be.
-   Selector must out-specificity ".action-list .item" (2 classes) or the
-   base 3-column grid wins and the 4th cell (actions) wraps onto its own
-   implicit row — the exact bug this was written to prevent. */
-.action-list .item.plan-item {
-  grid-template-columns: auto minmax(0, 1fr) auto auto;
+.plan-line-card__title-row {
+  display: flex;
   align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
 }
-
-.plan-line-controls {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-  align-items: flex-start;
+.plan-line-card__title {
+  font-size: 1.09rem;
+  font-weight: 640;
+  color: var(--heading);
 }
-
-/* .btn.ghost is transparent-on-transparent at rest — fine for a low-stakes
-   "Fjern" link, but the content-production toggle is an actual optional
-   add-on decision and read as inert plain text. A dashed border is the
-   common "optional, click to add" signal without the weight of a filled
-   button; it disappears once the add-on is active (solid .btn, no .ghost). */
-.plan-content-btn.ghost {
-  border: 1px dashed var(--border-strong);
-  color: var(--muted-strong);
-}
-
-.plan-content-btn.ghost:hover {
-  border-color: var(--accent);
-  color: var(--accent-hover);
-  background: var(--accent-soft);
-}
-
-.plan-line-actions {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-  align-items: flex-end;
-  min-width: 110px;
-}
-
-.plan-line-price {
-  margin: 0 !important;
-  font-size: 1rem;
-  font-family: var(--font-display);
-  font-weight: 660;
+.plan-line-card__pill {
   white-space: nowrap;
 }
 
+.plan-line-card__meta {
+  margin-top: 4px;
+  font-size: 0.85rem;
+  color: var(--muted);
+}
+
+.plan-line-card__unavailable {
+  margin-top: 6px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--danger);
+}
+
+.plan-line-card__controls {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 12px;
+  flex-wrap: wrap;
+}
+
+.plan-qty-stepper {
+  display: inline-flex;
+  align-items: center;
+  border: 1px solid var(--border-strong);
+  border-radius: var(--r-sm);
+  overflow: hidden;
+}
+.plan-qty-stepper form {
+  display: inline;
+}
+.plan-qty-stepper button {
+  width: 30px;
+  height: 32px;
+  background: var(--surface);
+  border: 0;
+  color: var(--text);
+  font-size: 1rem;
+  cursor: pointer;
+}
+.plan-qty-stepper button:hover:not(:disabled) {
+  background: var(--surface-2);
+}
+.plan-qty-stepper button:disabled {
+  color: var(--muted);
+  cursor: not-allowed;
+}
+.plan-qty-stepper > span {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 28px;
+  height: 32px;
+  border-left: 1px solid var(--border);
+  border-right: 1px solid var(--border);
+  font-size: 0.86rem;
+  font-variant-numeric: tabular-nums;
+}
+
+.plan-line-card__schedule {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 32px;
+  padding: 0 11px;
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  border-radius: var(--r-sm);
+  color: var(--text);
+  font-size: 0.8rem;
+}
+.plan-line-card__schedule:hover {
+  border-color: var(--muted);
+}
+
+.plan-line-card__price {
+  text-align: right;
+}
+.plan-line-card__total {
+  display: block;
+  font-size: 1.05rem;
+  font-weight: 660;
+  color: var(--heading);
+  font-variant-numeric: tabular-nums;
+}
+.plan-line-card__total--muted {
+  color: var(--muted-strong);
+  font-size: 0.92rem;
+}
+.plan-line-card__breakdown {
+  display: block;
+  margin-top: 4px;
+  font-size: 0.78rem;
+  color: var(--muted);
+  line-height: 1.45;
+}
+
+.plan-line-card__actions {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 8px;
+}
+.plan-line-card__write-check {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  background: transparent;
+  border: 0;
+  padding: 0;
+  font-size: 0.8rem;
+  color: var(--text);
+  cursor: pointer;
+}
+.plan-line-card__write-check-box {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 15px;
+  height: 15px;
+  border: 1px solid var(--border-strong);
+  border-radius: 3px;
+  font-size: 0.68rem;
+  color: var(--accent);
+}
+.plan-line-card__write-check[aria-pressed="true"] .plan-line-card__write-check-box {
+  border-color: var(--accent);
+  background: var(--accent-soft);
+}
+.plan-line-card__remove {
+  background: transparent;
+  border: 0;
+  padding: 0;
+  font-size: 0.8rem;
+  color: var(--muted);
+  cursor: pointer;
+}
+.plan-line-card__remove:hover {
+  color: var(--danger);
+}
+
+.plan-line-card__price-note {
+  grid-column: 1 / -1;
+  margin-top: 4px;
+  padding: 10px 12px;
+  background: var(--warning-soft);
+  border-radius: var(--r-sm);
+  font-size: 0.8rem;
+  line-height: 1.5;
+  color: var(--warning);
+}
+
+.plan-line-card__resolve {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
 @media (max-width: 640px) {
-  .action-list .item.plan-item {
-    grid-template-columns: auto minmax(0, 1fr);
+  .plan-line-card__price {
+    text-align: left;
   }
-  .plan-line-controls,
-  .plan-line-actions {
-    grid-column: 1 / -1;
+  .plan-line-card__actions {
     flex-direction: row;
     align-items: center;
     justify-content: space-between;
-    min-width: 0;
   }
+}
+
+.plan-favorites-bridge {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--s-3);
+  margin-top: var(--s-4);
+  padding: 14px 18px;
+  background: var(--surface-2);
+  border: 1px dashed var(--border-strong);
+  border-radius: var(--r-md);
+  font-size: 0.86rem;
+}
+
+/* ---------- Plan summary sidebar ---------- */
+
+.plan-summary-col {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  position: sticky;
+  top: 20px;
+  align-self: start;
+}
+@media (max-width: 880px) {
+  .plan-summary-col {
+    position: static;
+  }
+}
+
+/* Right column widens from .split's shared 320px to 400px on /plan only —
+   the brief's fields need the room the narrower default was built for a
+   plainer summary card. */
+.split:has(.plan-summary-col) {
+  grid-template-columns: minmax(0, 1fr) 400px;
 }
 
 .plan-summary {
@@ -2930,24 +3245,20 @@ select:disabled {
   border: 1px solid var(--border);
   border-radius: var(--r-lg);
   padding: var(--s-5);
-  position: sticky;
-  top: 84px;
   display: flex;
   flex-direction: column;
   gap: var(--s-3);
 }
 
-@media (max-width: 880px) {
-  .plan-summary { position: static; }
-}
-
 .plan-summary-head {
   display: flex;
-  flex-direction: column;
-  gap: var(--s-1);
-  padding-bottom: var(--s-3);
-  border-bottom: 1px solid var(--border);
-  margin-bottom: var(--s-2);
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--s-3);
+}
+
+.plan-summary-firm-pill {
+  white-space: nowrap;
 }
 
 .plan-summary-total .price {
@@ -2955,8 +3266,133 @@ select:disabled {
   font-size: 1.6rem;
 }
 
+.plan-summary-note {
+  margin: 0;
+  font-size: 0.82rem;
+  line-height: 1.5;
+  color: var(--muted);
+}
+
+.plan-summary-divider {
+  height: 1px;
+  background: var(--border);
+  margin: 4px 0;
+}
+
 .plan-summary h3 {
   margin: 0;
+}
+
+.plan-summary-reassurance {
+  margin: 4px 0 0;
+  text-align: center;
+  font-size: 0.78rem;
+  color: var(--muted);
+}
+
+.plan-timing-options {
+  display: flex;
+  gap: 8px;
+}
+.plan-timing-option {
+  flex: 1;
+  min-height: 36px;
+  border: 1px solid var(--border-strong);
+  border-radius: var(--r-sm);
+  background: var(--surface);
+  color: var(--muted-strong);
+  font-size: 0.82rem;
+  font-weight: 540;
+  cursor: pointer;
+}
+.plan-timing-option:hover {
+  border-color: var(--muted);
+}
+.plan-timing-option.is-active {
+  background: var(--accent-soft);
+  border-color: var(--accent);
+  color: var(--accent-hover);
+}
+
+.plan-brief-disclosure-toggle {
+  align-self: flex-start;
+  margin-top: 4px;
+  padding-top: 10px;
+  border-top: 1px solid var(--border);
+  width: 100%;
+  text-align: left;
+  background: transparent;
+  border-left: 0;
+  border-right: 0;
+  border-bottom: 0;
+  color: var(--accent);
+  font-size: 0.82rem;
+  font-weight: 540;
+  cursor: pointer;
+}
+.plan-brief-disclosure-toggle:hover {
+  color: var(--accent-hover);
+}
+
+.plan-brief-disclosure {
+  display: flex;
+  flex-direction: column;
+  gap: var(--s-3);
+}
+/* display:none, not unmounted — the fields stay in the DOM (and submitted
+   with the form) even while visually collapsed; only visibility toggles. */
+.plan-brief-disclosure.is-collapsed {
+  display: none;
+}
+
+.plan-next-card {
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  border-radius: var(--r-md);
+  padding: 20px 22px;
+}
+.plan-next-card h3 {
+  margin: 0 0 var(--s-3);
+  font-size: 0.95rem;
+}
+
+.plan-next-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--s-3);
+}
+.plan-next-item {
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+}
+.plan-next-item__circle {
+  flex: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 21px;
+  height: 21px;
+  border-radius: var(--r-pill);
+  background: var(--surface);
+  border: 1px solid var(--border-strong);
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: var(--muted-strong);
+}
+.plan-next-item__title {
+  font-size: 0.86rem;
+  font-weight: 600;
+  color: var(--heading);
+}
+.plan-next-item__body {
+  margin-top: 2px;
+  font-size: 0.8rem;
+  line-height: 1.5;
+  color: var(--muted);
 }
 
 .auth-fallback {

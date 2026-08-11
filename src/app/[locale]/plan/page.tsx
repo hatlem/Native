@@ -12,12 +12,15 @@ import { titleDisplayName } from "@/lib/title-display";
 import { catalogVisibleTitleWhere } from "@/lib/catalog-visibility";
 import type { Candidate, SupplementaryTitle } from "@/lib/recommend";
 import { recommendForBrief } from "@/lib/campaign-recommend";
-import { addAllFavoritesToList } from "@/app/list-actions";
+import { loadPricingDefaults } from "@/lib/content-fee";
+import { timeAgo } from "@/lib/time-ago";
 import { PlanBanners } from "./_components/PlanBanners";
 import { PlanStart } from "./_components/PlanStart";
+import { PlanSteps, type PlanStep } from "./_components/PlanSteps";
+import { PlanTitleBlock } from "./_components/PlanTitleBlock";
 import { PlanLines, type PlanTitleLine } from "./_components/PlanLines";
-import { PlanListBar } from "./_components/PlanListBar";
 import { PlanSummary, type Rollup } from "./_components/PlanSummary";
+import { WhatHappensNext } from "./_components/WhatHappensNext";
 
 const MARKET_CODES = Object.values(MarketCode);
 
@@ -181,6 +184,33 @@ export default async function PlanPage({
     !hasHiddenPrice &&
     lines.every((l) => l.product.visibility === "FIRM");
 
+  const firmLineCount = lines.filter((l) => l.product.visibility === "FIRM").length;
+
+  // Content-fee rules for PlanLines' per-line price breakdown ("38 000
+  // placement + 7 000 article") — same load as the catalog/quote surfaces
+  // so the indicative figure agrees with what the formal quote will charge.
+  const pricing = await loadPricingDefaults();
+
+  // Step rail: "Find titles" is always done by the time there are lines on
+  // /plan. The remaining three steps come from the most recent Request this
+  // list has been submitted as (none yet = still building), its latest
+  // Quote, and whether that quote has an Order (accepted).
+  const submittedRequest = activeList
+    ? await prisma.request.findFirst({
+        where: { sourceListId: activeList.id },
+        orderBy: { createdAt: "desc" },
+        select: {
+          quotes: {
+            orderBy: { createdAt: "desc" },
+            take: 1,
+            select: { order: { select: { id: true } } },
+          },
+        },
+      })
+    : null;
+  const hasOrder = !!submittedRequest?.quotes[0]?.order;
+  const currentStep: PlanStep = hasOrder ? 4 : submittedRequest ? 3 : 2;
+
   // Empty-state recommendation: budget + market → tiered title suggestions.
   const recMarketRaw = typeof sp.recMarket === "string" ? sp.recMarket : "";
   const recBudgetRaw = typeof sp.recBudget === "string" ? sp.recBudget : "";
@@ -227,13 +257,19 @@ export default async function PlanPage({
       })
     : 0;
 
+  const placementCount = lines.length + titleLines.length;
+  const hasLines = placementCount > 0;
+  const lastEdited = activeList ? timeAgo(activeList.updatedAt, locale) : "";
+
   return (
     <>
-      <header className="page-header">
-        <span className="eyebrow accent">{t("eyebrow")}</span>
-        <h1>{t("title")}</h1>
-        <p className="lead">{t("lead")}</p>
-      </header>
+      {hasLines && !needsWorkspace ? null : (
+        <header className="page-header">
+          <span className="eyebrow accent">{t("eyebrow")}</span>
+          <h1>{t("title")}</h1>
+          <p className="lead">{t("lead")}</p>
+        </header>
+      )}
 
       {/* When we render the tailored no-workspace empty state below, it IS the
           explanation — suppress the generic (and, for non-agencies, misleading
@@ -244,30 +280,6 @@ export default async function PlanPage({
         error={needsWorkspace ? undefined : sp.error}
         duplicate={sp.duplicate}
       />
-
-      {lists.length > 0 ? (
-        <PlanListBar
-          locale={locale}
-          lists={lists}
-          activeListId={activeList?.id}
-          activeListName={activeList?.name}
-        />
-      ) : null}
-
-      {/* Hearts→lists bridge: hearted titles live in a separate personal
-          favorites pool (see catalog "Legg til i en liste"); this bulk-adopts
-          every one not already on the active list, in one submit. */}
-      {!needsWorkspace && favoriteCount > 0 ? (
-        <div className="banner-info plan-favorites-strip" role="status" style={{ justifyContent: "space-between" }}>
-          <span>{t("favoritesStripTitle", { count: favoriteCount })}</span>
-          <form action={addAllFavoritesToList}>
-            <input type="hidden" name="locale" value={locale} />
-            <button type="submit" className="btn small ghost">
-              {t("addFavorites")}
-            </button>
-          </form>
-        </div>
-      ) : null}
 
       {needsWorkspace ? (
         // No active org → requireActiveOrg bounced an "Add to plan" here.
@@ -299,7 +311,7 @@ export default async function PlanPage({
             </Link>
           </div>
         )
-      ) : lines.length === 0 && titleLines.length === 0 ? (
+      ) : !hasLines ? (
         <PlanStart
           locale={locale}
           recBriefRaw={recBriefRaw}
@@ -311,18 +323,51 @@ export default async function PlanPage({
           briefMatched={briefMatched}
         />
       ) : (
-        <div className="split">
-          <PlanLines locale={locale} lines={lines} titleLines={titleLines} hasHiddenPrice={hasHiddenPrice} />
-          <PlanSummary
+        <>
+          <PlanSteps locale={locale} currentStep={currentStep} />
+          <PlanTitleBlock
             locale={locale}
-            totals={totals}
-            hasHiddenPrice={hasHiddenPrice}
-            allFirm={allFirm}
-            needsClient={needsClient}
-            activeOrg={activeOrg}
-            briefDraft={briefDraft}
+            planName={activeList?.name ?? t("title")}
+            activeListId={activeList?.id}
+            placementCount={placementCount}
+            orgName={activeOrg?.name ?? null}
+            lastEdited={lastEdited}
+            lists={lists}
           />
-        </div>
+          <div className="split">
+            <div>
+              <PlanLines
+                locale={locale}
+                lines={lines}
+                titleLines={titleLines}
+                hasHiddenPrice={hasHiddenPrice}
+                feeRules={pricing.feeRules}
+              />
+              {favoriteCount > 0 ? (
+                <div className="plan-favorites-bridge">
+                  <span>{t("favoritesStripTitle", { count: favoriteCount })}</span>
+                  <Link href="/favorites" className="btn small secondary">
+                    {t("reviewFavorites")}
+                  </Link>
+                </div>
+              ) : null}
+            </div>
+            <div className="plan-summary-col">
+              <PlanSummary
+                locale={locale}
+                totals={totals}
+                hasHiddenPrice={hasHiddenPrice}
+                allFirm={allFirm}
+                firmLineCount={firmLineCount}
+                lineCount={lines.length}
+                needsClient={needsClient}
+                activeOrg={activeOrg}
+                briefDraft={briefDraft}
+              />
+              <WhatHappensNext locale={locale} />
+            </div>
+          </div>
+        </>
       )}
     </>
   );
