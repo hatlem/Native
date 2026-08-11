@@ -16,6 +16,8 @@ export const NATIVE_FIT_VALUES = ["High", "Medium", "Low"] as const;
 export const B2B_B2C_VALUES = ["B2B", "B2C"] as const;
 export const REACH_VALUES = ["National", "Regional", "Local", "Niche"] as const;
 export const PAGE_SIZE = 60;
+// "" (unset) = the default active-first/alphabetical order.
+export const SORT_VALUES = ["reach", "newest"] as const;
 
 export function asEnum<T extends string>(
   value: string | undefined,
@@ -70,6 +72,10 @@ export function parseCatalogParams(
     typeof sp.reach === "string" ? sp.reach : undefined,
     REACH_VALUES,
   );
+  const sort = asEnum(
+    typeof sp.sort === "string" ? sp.sort : undefined,
+    SORT_VALUES,
+  );
   // Publisher/media-house filter — set by clicking the publisher name on
   // a title card or detail page ("see everything from Amedia").
   const publisher = typeof sp.publisher === "string" ? sp.publisher.trim() : "";
@@ -102,6 +108,7 @@ export function parseCatalogParams(
     nativeFit,
     b2bB2c,
     reach,
+    sort,
     onlyPriced,
     publisher,
     producedForYou,

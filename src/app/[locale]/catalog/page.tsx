@@ -8,6 +8,7 @@ import { catalogVisibleTitleWhere } from "@/lib/catalog-visibility";
 import { savedListMembershipMap } from "@/lib/saved-list-membership";
 import { loadScope } from "@/lib/scope";
 import { CatalogFilters } from "./_components/CatalogFilters";
+import { CatalogSort } from "./_components/CatalogSort";
 import { CatalogMarketing } from "./_components/CatalogMarketing";
 import { CatalogResults } from "./_components/CatalogResults";
 import { CatalogPagination } from "./_components/CatalogPagination";
@@ -54,6 +55,7 @@ export default async function CatalogPage({
     nativeFit,
     b2bB2c,
     reach,
+    sort,
     onlyPriced,
     publisher,
     producedForYou,
@@ -211,8 +213,26 @@ export default async function CatalogPage({
           include: { priceRules: true },
         },
       },
-      // Commerce-active titles surface first, then research catalog by name.
-      orderBy: [{ active: "desc" }, { name: "asc" }],
+      // Commerce-active titles surface first, always; the buyer's sort
+      // choice only decides the tiebreak within that split. "reach" ranks
+      // by digital reach first, monthly (print/legacy) reach as fallback
+      // for titles with no digital figure — not a true coalesce, but Prisma
+      // has no cross-column coalesce in orderBy, and digital is the primary
+      // metric for native anyway. nulls: "last" on both is required —
+      // Postgres defaults DESC to NULLS FIRST, which would rank reach-less
+      // titles above titles with a real number. "newest" surfaces recently
+      // touched rows.
+      orderBy:
+        sort === "reach"
+          ? [
+              { active: "desc" as const },
+              { digitalReach: { sort: "desc" as const, nulls: "last" as const } },
+              { monthlyReach: { sort: "desc" as const, nulls: "last" as const } },
+              { name: "asc" as const },
+            ]
+          : sort === "newest"
+            ? [{ active: "desc" as const }, { updatedAt: "desc" as const }]
+            : [{ active: "desc" as const }, { name: "asc" as const }],
       take: PAGE_SIZE,
       skip: (page - 1) * PAGE_SIZE,
     }),
@@ -276,8 +296,14 @@ export default async function CatalogPage({
     if (markets.length) params.set("market", markets.join(","));
     if (types.length) params.set("types", types.join(","));
     if (verticals.length) params.set("vertical", verticals.join(","));
+    // region/reach were parsed but never threaded through pageQuery —
+    // paginating (or removing an unrelated filter chip) silently dropped
+    // them. Same bug, same fix, for both.
+    if (regions.length) params.set("region", regions.join(","));
     if (nativeFit) params.set("nativeFit", nativeFit);
     if (b2bB2c) params.set("b2bB2c", b2bB2c);
+    if (reach) params.set("reach", reach);
+    if (sort) params.set("sort", sort);
     if (onlyPriced) params.set("onlyPriced", "1");
     if (publisher) params.set("publisher", publisher);
     if (producedForYou) params.set("producedForYou", "1");
@@ -343,6 +369,11 @@ export default async function CatalogPage({
       params.set("newsletterIncluded", "1");
     if (videoIncluded && except !== "videoIncluded")
       params.set("videoIncluded", "1");
+    // No removable chip exists for these (yet), so — same as compareMode
+    // just above — they're never the `except` target: always keep them.
+    if (regions.length) params.set("region", regions.join(","));
+    if (reach) params.set("reach", reach);
+    if (sort) params.set("sort", sort);
     if (compareMode) params.set("compareMode", "1");
     if (q && except !== "q") params.set("q", q);
     const s = params.toString();
@@ -479,9 +510,10 @@ export default async function CatalogPage({
 
       <ActiveFilterChips locale={locale} filters={activeFilters} />
 
-      <p className="muted" style={{ marginTop: 12 }}>
-        {t("resultCount", { count: totalCount })}
-      </p>
+      <div className="catalog-result-bar">
+        <p className="muted">{t("resultCount", { count: totalCount })}</p>
+        <CatalogSort initial={sort ?? ""} />
+      </div>
 
       <CatalogResults
         locale={locale}

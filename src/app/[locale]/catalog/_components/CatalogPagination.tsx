@@ -1,4 +1,6 @@
 import { getTranslations } from "next-intl/server";
+import { Link } from "@/i18n/navigation";
+import { pageWindow } from "@/lib/catalog-pagination";
 
 export async function CatalogPagination({
   locale,
@@ -13,29 +15,50 @@ export async function CatalogPagination({
 }) {
   if (totalPages <= 1) return null;
   const t = await getTranslations({ locale, namespace: "catalog" });
+  const items = pageWindow(page, totalPages);
 
   return (
     <nav
       className="pagination"
-      style={{
-        marginTop: 24,
-        display: "flex",
-        gap: 12,
-        alignItems: "center",
-      }}
+      aria-label={t("pagination.page", { page, total: totalPages })}
     >
       {page > 1 ? (
-        <a href={pageQuery(page - 1) || "?"}>← {t("pagination.prev")}</a>
+        <Link href={`/catalog${pageQuery(page - 1)}`} className="pagination-step">
+          ← {t("pagination.prev")}
+        </Link>
       ) : (
-        <span className="muted">← {t("pagination.prev")}</span>
+        <span className="pagination-step is-disabled" aria-disabled="true">
+          ← {t("pagination.prev")}
+        </span>
       )}
-      <span className="muted">
-        {t("pagination.page", { page, total: totalPages })}
-      </span>
+
+      <div className="pagination-pages">
+        {items.map((item, i) =>
+          item === "ellipsis" ? (
+            <span key={`e${i}`} className="pagination-ellipsis" aria-hidden="true">
+              …
+            </span>
+          ) : (
+            <Link
+              key={item}
+              href={`/catalog${pageQuery(item)}`}
+              className={`pagination-page${item === page ? " is-current" : ""}`}
+              aria-current={item === page ? "page" : undefined}
+            >
+              {item}
+            </Link>
+          ),
+        )}
+      </div>
+
       {page < totalPages ? (
-        <a href={pageQuery(page + 1)}>{t("pagination.next")} →</a>
+        <Link href={`/catalog${pageQuery(page + 1)}`} className="pagination-step">
+          {t("pagination.next")} →
+        </Link>
       ) : (
-        <span className="muted">{t("pagination.next")} →</span>
+        <span className="pagination-step is-disabled" aria-disabled="true">
+          {t("pagination.next")} →
+        </span>
       )}
     </nav>
   );

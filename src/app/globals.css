@@ -3386,6 +3386,107 @@ select:disabled {
   border: 1px solid transparent;
 }
 
+/* Catalog's windowed page-number strip — additive to the rules above
+   (TitlesPagination.tsx still uses the plain prev/page-count/next markup
+   those target, so nothing here replaces them). */
+.pagination-pages {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.pagination-step,
+.pagination-page {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 44px;
+  padding: 8px 14px;
+  border-radius: var(--r-sm);
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--text);
+  font-weight: 540;
+  text-decoration: none;
+  transition: background var(--t-fast), color var(--t-fast), border-color var(--t-fast);
+}
+
+.pagination-page {
+  min-width: 44px;
+  padding: 8px;
+}
+
+.pagination-step:hover,
+.pagination-page:hover {
+  background: var(--surface-2);
+  color: var(--heading);
+  border-color: var(--border-strong);
+}
+
+.pagination-page.is-current {
+  background: var(--ink);
+  color: var(--primary-contrast);
+  border-color: var(--ink);
+  cursor: default;
+}
+
+.pagination-page.is-current:hover {
+  background: var(--ink);
+  color: var(--primary-contrast);
+}
+
+.pagination-step.is-disabled {
+  color: var(--muted);
+  border-color: transparent;
+  background: transparent;
+  cursor: default;
+}
+
+.pagination-ellipsis {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 24px;
+  color: var(--muted);
+}
+
+@media (max-width: 640px) {
+  /* Full page strip can outgrow a phone width fast at ~48 pages — keep
+     prev/next reachable and let the numbers scroll horizontally rather
+     than wrapping into a multi-row jumble. */
+  .pagination-pages {
+    overflow-x: auto;
+    max-width: 55vw;
+  }
+}
+
+/* ---------- Catalog result bar (count + sort) ---------- */
+
+.catalog-result-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: var(--s-3);
+  margin-top: 12px;
+}
+
+.catalog-result-bar > p {
+  margin: 0;
+}
+
+.catalog-sort {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.catalog-sort label {
+  font-size: 0.85rem;
+  color: var(--muted);
+  font-weight: 540;
+}
+
 /* Skeleton placeholders */
 .skel {
   background: linear-gradient(
