@@ -62,7 +62,7 @@ export async function CatalogResults({
     />
   ) : (
     <CompareSelectionProvider enabled={compareMode}>
-    <div className="grid">
+    <div className="grid catalog-grid">
       {titles.map((title) => {
         // Per-product visibility: active + confirmedAt + pricesPublic flags.
         // The card shows a bucket BAND, never an exact figure — exact prices
@@ -178,9 +178,9 @@ export async function CatalogResults({
                   · {tv("listIndicative")}
                 </span>
               </div>
-            ) : anyHidden ? (
-              <div className="price muted">{tv("requestPrice")}</div>
             ) : null}
+            {/* No duplicate "Be om tilbud" footer here — the anyHidden tag
+                pill above (line ~130) already says it once. */}
           </article>
         );
       })}

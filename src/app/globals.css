@@ -3655,6 +3655,15 @@ select:disabled {
 
 /* ---------- Per-card compare selector ---------- */
 
+/* CSS Grid's default align-items:stretch forces every card in a row to the
+   row's tallest neighbor, but content isn't bottom-anchored — a title with
+   no description/reach/price ends up with a dead gap where a fuller
+   neighbor has real content. Cards size to their own content instead;
+   ragged bottoms across rows read as a normal content grid, not a bug. */
+.catalog-grid {
+  align-items: start;
+}
+
 .catalog-card {
   position: relative;
 }
