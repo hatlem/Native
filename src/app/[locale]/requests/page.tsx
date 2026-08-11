@@ -60,7 +60,7 @@ export default async function RequestsPage({
   const ws = scope.workspace;
 
   const tabRaw = typeof sp.tab === "string" ? sp.tab : "";
-  const activeTab: Tab = (TABS as readonly string[]).includes(tabRaw) ? (tabRaw as Tab) : "needsYou";
+  const explicitTab: Tab | null = (TABS as readonly string[]).includes(tabRaw) ? (tabRaw as Tab) : null;
 
   const dateFmt = new Intl.DateTimeFormat(intlLocale(locale), { day: "numeric", month: "short" });
   const stageLabels: [string, string, string, string, string] = [
@@ -188,12 +188,22 @@ export default async function RequestsPage({
     done: rows.filter((r) => r.tab === "done").length,
     all: rows.length,
   };
+
+  // No explicit ?tab= — land on the first tab that actually has something
+  // in it (needsYou first, since it's the most actionable), rather than
+  // always defaulting to needsYou and risking an empty screen while other
+  // tabs sit non-empty right next to it. A genuinely empty pipeline still
+  // falls through to needsYou, which carries the "New order" onboarding CTA.
+  const DEFAULT_PRIORITY: Exclude<Tab, "all">[] = ["needsYou", "inProgress", "live", "done"];
+  const activeTab: Tab =
+    explicitTab ?? DEFAULT_PRIORITY.find((tab) => counts[tab] > 0) ?? "needsYou";
+
   const visibleRows = activeTab === "all" ? rows : rows.filter((r) => r.tab === activeTab);
 
   // Plain <a>, not next-intl's <Link>: same-route RSC soft navigation is
   // currently broken in production for this app (see catalog's
   // CatalogSort.tsx) — a <Link> tab click here would be silently inert.
-  const tabHref = (tab: Tab) => (tab === "needsYou" ? `/${locale}/requests` : `/${locale}/requests?tab=${tab}`);
+  const tabHref = (tab: Tab) => `/${locale}/requests?tab=${tab}`;
 
   return (
     <>
