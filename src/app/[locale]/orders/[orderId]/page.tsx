@@ -10,6 +10,7 @@ import { duplicatePlan } from "@/app/plan-actions";
 import { clicksByOrderLine } from "@/lib/metrics/store";
 import { ctrPct } from "@/lib/reporting";
 import { SubmitButton } from "@/components";
+import { approveContentAsset, requestContentChanges } from "@/app/content-review-actions";
 
 export const dynamic = "force-dynamic";
 
@@ -229,6 +230,60 @@ export default async function MyOrderPage({
                     </a>
                   ) : null;
                 })()}
+
+                {latest && latest.status === "IN_REVIEW" ? (
+                  <div className="content-review">
+                    <h4 className="content-review__heading">{t("draftReviewHeading")}</h4>
+                    {latest.body ? (
+                      <div className="content-review__body">{latest.body}</div>
+                    ) : latest.bodyUrl ? (
+                      <a
+                        href={latest.bodyUrl}
+                        target="_blank"
+                        rel="noreferrer noopener"
+                        className="link small"
+                      >
+                        {t("draftReviewOpenFile")} ↗
+                      </a>
+                    ) : null}
+                    <div className="content-review__actions">
+                      <form action={approveContentAsset}>
+                        <input type="hidden" name="locale" value={locale} />
+                        <input type="hidden" name="assetId" value={latest.id} />
+                        <SubmitButton
+                          label={t("draftApprove")}
+                          pendingLabel={t("draftApproving")}
+                          className="btn small"
+                        />
+                      </form>
+                      <details className="content-review__changes">
+                        <summary className="btn small secondary content-review__changes-toggle">
+                          {t("draftRequestChanges")}
+                        </summary>
+                        <form action={requestContentChanges} className="content-review__changes-form">
+                          <input type="hidden" name="locale" value={locale} />
+                          <input type="hidden" name="assetId" value={latest.id} />
+                          <textarea
+                            name="note"
+                            rows={3}
+                            placeholder={t("draftChangesPlaceholder")}
+                            required
+                          />
+                          <SubmitButton
+                            label={t("draftSendChanges")}
+                            pendingLabel={t("draftApproving")}
+                            className="btn small secondary"
+                          />
+                        </form>
+                      </details>
+                    </div>
+                  </div>
+                ) : latest && latest.status === "CHANGES_REQUESTED" && latest.reviewNotes ? (
+                  <div className="content-review content-review--sent">
+                    <span className="muted small">{t("draftChangesSentNote")}</span>
+                    <p className="content-review__note">“{latest.reviewNotes}”</p>
+                  </div>
+                ) : null}
 
                 {!isContentFee ? (
                   <dl className="spec-grid perf-panel">

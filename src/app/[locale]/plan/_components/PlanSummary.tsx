@@ -48,6 +48,7 @@ export async function PlanSummary({
   const singleTotal = visibleTotals.length === 1 ? visibleTotals[0] : null;
 
   return (
+    <>
     <aside className="plan-summary">
       <div className="plan-summary-head">
         <span className="muted small">{t("estTotal")}</span>
@@ -87,7 +88,7 @@ export async function PlanSummary({
           </Link>
         </p>
       ) : activeOrg ? (
-        <form action={submitRequest} className="product-form">
+        <form id="plan-request-form" action={submitRequest} className="product-form">
           <input type="hidden" name="locale" value={locale} />
           <p className="muted small">
             {tr("requestingAs")}: <strong>{activeOrg.name}</strong>
@@ -98,10 +99,13 @@ export async function PlanSummary({
             currency={singleTotal ? singleTotal[0] : null}
             total={singleTotal ? singleTotal[1].amount : 0}
           />
+          {/* Mobile-only submit lives in the sticky bottom bar below (same
+              form, via the form="" attribute) — this one stays for desktop,
+              where there's no fixed bottom bar to duplicate it into. */}
           <SubmitButton
             label={allFirm ? tf("planSubmit") : tr("submit")}
             pendingLabel={allFirm ? tf("planSubmitting") : tr("submitting")}
-            className="btn block"
+            className="btn block plan-summary-submit-desktop"
           />
           <p className="plan-summary-reassurance">{t("reassurance")}</p>
         </form>
@@ -119,5 +123,26 @@ export async function PlanSummary({
         </div>
       )}
     </aside>
+
+    {!needsClient && activeOrg ? (
+      <div className="plan-mobile-submit-bar">
+        <div className="plan-mobile-submit-bar__total">
+          <span className="plan-mobile-submit-bar__label">{t("estTotal")}</span>
+          <span className="plan-mobile-submit-bar__amount">
+            {totals.some(([, r]) => r.hasVisible)
+              ? totals
+                  .filter(([, r]) => r.hasVisible)
+                  .map(([cur, r]) => formatMoney(r.amount, cur, locale))
+                  .join(" + ")
+              : t("pricingOnRequest")}
+          </span>
+        </div>
+        <button type="submit" form="plan-request-form" className="btn block">
+          {allFirm ? tf("planSubmit") : tr("submit")}
+        </button>
+        <p className="plan-mobile-submit-bar__reassurance">{t("reassurance")}</p>
+      </div>
+    ) : null}
+    </>
   );
 }

@@ -2,6 +2,7 @@
 
 import { useRef, useState } from "react";
 import { useTranslations } from "next-intl";
+import { Link } from "@/i18n/navigation";
 import { renameList, selectActiveList, createList } from "@/app/list-actions";
 
 export type PlanListSummary = { id: string; name: string; _count: { items: number } };
@@ -35,6 +36,23 @@ export function PlanTitleBlock({
 
   return (
     <div className="plan-title-block">
+      {/* Mobile-only sticky top bar (2d spec): "← Titles" / plan name / Edit,
+          sharing the same rename state as the desktop row below rather than
+          duplicating the rename form. */}
+      <div className="plan-title-block__mobile-top">
+        <Link href="/catalog" className="plan-title-block__mobile-back">
+          ← {t("mobileBackToTitles")}
+        </Link>
+        <span className="plan-title-block__mobile-name">{planName}</span>
+        <button
+          type="button"
+          className="plan-title-block__mobile-edit"
+          onClick={() => setRenaming(true)}
+        >
+          {t("mobileEdit")}
+        </button>
+      </div>
+
       <div className="plan-title-block__row">
         {renaming ? (
           <form

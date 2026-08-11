@@ -76,7 +76,15 @@
     "orderDetailLead": "Produktionsstatus, Lieferung und Live-Platzierungen für jede Position dieser Bestellung.",
     "linesEyebrow": "Bestellpositionen",
     "useAsTemplate": "Als Vorlage verwenden",
-    "duplicating": "Wird dupliziert…"
+    "duplicating": "Wird dupliziert…",
+    "draftReviewHeading": "Entwurf bereit zur Durchsicht",
+    "draftReviewOpenFile": "Entwurf öffnen",
+    "draftApprove": "Freigeben",
+    "draftApproving": "Speichert…",
+    "draftRequestChanges": "Änderungen anfordern",
+    "draftChangesPlaceholder": "Was soll der Autor ändern?",
+    "draftSendChanges": "Senden",
+    "draftChangesSentNote": "Du hast Änderungen angefordert:"
   },
   "notifications": {
     "eyebrow": "Posteingang",
@@ -347,7 +355,8 @@
       "videoHint": "Produziertes Video ist in der Platzierung enthalten.",
       "priceHeading": "Preis",
       "unpricedNote": "{count, plural, =1 {1 weiterer Titel im Katalog hat noch keinen veröffentlichten Preis. Unser Desk kann ihn für dich bepreisen.} other {# weitere Titel im Katalog haben noch keinen veröffentlichten Preis. Unser Desk kann sie für dich bepreisen.}}",
-      "advancedToggle": "{count, plural, =0 {Erweiterte Filter} other {Erweiterte Filter (#)}}"
+      "advancedToggle": "{count, plural, =0 {Erweiterte Filter} other {Erweiterte Filter (#)}}",
+      "mobileFilters": "Filter"
     },
     "shortlist": {
       "untitledPlan": "deinen Plan",
@@ -628,7 +637,9 @@
       "item2Body": "Tausche einen Titel, ändere den Monat oder entferne eine Zeile. Nichts ist verbindlich, bevor du zustimmst.",
       "item3Title": "Wir schreiben, platzieren und berichten",
       "item3Body": "Entwürfe gehen zur Freigabe an dich. Live-Links und Ergebnisse landen in den Berichten."
-    }
+    },
+    "mobileBackToTitles": "Titel",
+    "mobileEdit": "Bearbeiten"
   },
   "rfq": {
     "org": "Firma",

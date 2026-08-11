@@ -268,7 +268,8 @@
       "videoHint": "Produsert video inkludert i plasseringen.",
       "priceHeading": "Pris",
       "unpricedNote": "{count, plural, =1 {1 tittel til er i katalogen uten publisert pris. Desken kan prise den.} other {# titler til er i katalogen uten publisert pris. Desken kan prise dem.}}",
-      "advancedToggle": "{count, plural, =0 {Avanserte filtre} other {Avanserte filtre (#)}}"
+      "advancedToggle": "{count, plural, =0 {Avanserte filtre} other {Avanserte filtre (#)}}",
+      "mobileFilters": "Filtre"
     },
     "shortlist": {
       "untitledPlan": "planen",
@@ -549,7 +550,9 @@
       "item2Body": "Bytt en tittel, endre måned, eller fjern en linje. Ingenting er bindende før du sier ja.",
       "item3Title": "Vi skriver, plasserer og rapporterer",
       "item3Body": "Utkast sendes til deg for godkjenning. Lenker og resultater havner i Rapporter."
-    }
+    },
+    "mobileBackToTitles": "Titler",
+    "mobileEdit": "Rediger"
   },
   "rfq": {
     "org": "Selskap",
@@ -1190,7 +1193,15 @@
     "orderDetailLead": "Produksjonsstatus, leveranser og live-plasseringer for hver linje i denne bestillingen.",
     "linesEyebrow": "Bestillingslinjer",
     "useAsTemplate": "Bruk som mal",
-    "duplicating": "Dupliserer…"
+    "duplicating": "Dupliserer…",
+    "draftReviewHeading": "Utkast klart for gjennomsyn",
+    "draftReviewOpenFile": "Åpne utkastet",
+    "draftApprove": "Godkjenn",
+    "draftApproving": "Lagrer…",
+    "draftRequestChanges": "Be om endringer",
+    "draftChangesPlaceholder": "Hva bør skribenten endre?",
+    "draftSendChanges": "Send",
+    "draftChangesSentNote": "Du ba om endringer:"
   },
   "notifications": {
     "eyebrow": "Innboks",

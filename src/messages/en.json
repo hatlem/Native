@@ -76,7 +76,15 @@
     "orderDetailLead": "Production status, deliverables and live placements for every line in this order.",
     "linesEyebrow": "Order lines",
     "useAsTemplate": "Use as template",
-    "duplicating": "Duplicating…"
+    "duplicating": "Duplicating…",
+    "draftReviewHeading": "Draft ready for your review",
+    "draftReviewOpenFile": "Open the draft",
+    "draftApprove": "Approve",
+    "draftApproving": "Saving…",
+    "draftRequestChanges": "Request changes",
+    "draftChangesPlaceholder": "What should the writer change?",
+    "draftSendChanges": "Send",
+    "draftChangesSentNote": "You asked for changes:"
   },
   "notifications": {
     "eyebrow": "Inbox",
@@ -296,7 +304,8 @@
       "videoHint": "Produced video included in the placement.",
       "priceHeading": "Price",
       "unpricedNote": "{count, plural, =1 {1 more title is} other {# more titles are}} in the catalog without published pricing. The desk can price it for you.",
-      "advancedToggle": "{count, plural, =0 {Advanced filters} other {Advanced filters (#)}}"
+      "advancedToggle": "{count, plural, =0 {Advanced filters} other {Advanced filters (#)}}",
+      "mobileFilters": "Filters"
     },
     "shortlist": {
       "untitledPlan": "your plan",
@@ -605,6 +614,8 @@
     "briefQ2": "When should it run?",
     "briefAdvancedToggle": "Add budget, audience segments and geography",
     "reviewFavorites": "Review them",
+    "mobileBackToTitles": "Titles",
+    "mobileEdit": "Edit",
     "timing": {
       "q3": "Q3 2026",
       "q4": "Q4 2026",

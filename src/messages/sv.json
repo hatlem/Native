@@ -268,7 +268,8 @@
       "videoHint": "Producerad video ingår i placeringen.",
       "priceHeading": "Pris",
       "unpricedNote": "{count, plural, =1 {1 titel till finns i katalogen utan publicerat pris. Vår desk kan prissätta den åt er.} other {# titlar till finns i katalogen utan publicerat pris. Vår desk kan prissätta dem åt er.}}",
-      "advancedToggle": "{count, plural, =0 {Avancerade filter} other {Avancerade filter (#)}}"
+      "advancedToggle": "{count, plural, =0 {Avancerade filter} other {Avancerade filter (#)}}",
+      "mobileFilters": "Filter"
     },
     "shortlist": {
       "untitledPlan": "din plan",
@@ -549,7 +550,9 @@
       "item2Body": "Byt en titel, ändra månad eller ta bort en rad. Inget är bindande förrän du säger ja.",
       "item3Title": "Vi skriver, placerar och rapporterar",
       "item3Body": "Utkast skickas till dig för godkännande. Länkar och resultat hamnar i Rapporter."
-    }
+    },
+    "mobileBackToTitles": "Titlar",
+    "mobileEdit": "Redigera"
   },
   "rfq": {
     "org": "Företag",
@@ -1190,7 +1193,15 @@
     "orderDetailLead": "Produktionsstatus, leveranser och live-placeringar för varje rad i denna beställning.",
     "linesEyebrow": "Orderrader",
     "useAsTemplate": "Använd som mall",
-    "duplicating": "Duplicerar…"
+    "duplicating": "Duplicerar…",
+    "draftReviewHeading": "Utkast klart för granskning",
+    "draftReviewOpenFile": "Öppna utkastet",
+    "draftApprove": "Godkänn",
+    "draftApproving": "Sparar…",
+    "draftRequestChanges": "Begär ändringar",
+    "draftChangesPlaceholder": "Vad ska skribenten ändra?",
+    "draftSendChanges": "Skicka",
+    "draftChangesSentNote": "Du begärde ändringar:"
   },
   "notifications": {
     "eyebrow": "Inkorg",

@@ -12,19 +12,35 @@ export async function PlanSteps({ locale, currentStep }: { locale: string; curre
   const labels = [t("find"), t("build"), t("quote"), t("approve")];
 
   return (
-    <ol className="plan-steps" aria-label={t("label")}>
-      {steps.map((n, i) => {
-        const state = n < currentStep ? "done" : n === currentStep ? "current" : "upcoming";
-        return (
-          <li key={n} className={`plan-step plan-step--${state}`}>
-            <span className="plan-step__circle" aria-hidden="true">
-              {state === "done" ? "✓" : n}
-            </span>
-            <span className="plan-step__label">{labels[i]}</span>
-            {n < steps.length ? <span className="plan-step__connector" aria-hidden="true" /> : null}
-          </li>
-        );
-      })}
-    </ol>
+    <>
+      <ol className="plan-steps" aria-label={t("label")}>
+        {steps.map((n, i) => {
+          const state = n < currentStep ? "done" : n === currentStep ? "current" : "upcoming";
+          return (
+            <li key={n} className={`plan-step plan-step--${state}`}>
+              <span className="plan-step__circle" aria-hidden="true">
+                {state === "done" ? "✓" : n}
+              </span>
+              <span className="plan-step__label">{labels[i]}</span>
+              {n < steps.length ? <span className="plan-step__connector" aria-hidden="true" /> : null}
+            </li>
+          );
+        })}
+      </ol>
+
+      {/* Mobile-only: bars instead of circles+labels, per the 2d spec.
+          Same data, CSS toggles which of the two renders — no client
+          state needed since currentStep never changes without a reload. */}
+      <ol className="plan-steps-mobile" aria-label={t("label")}>
+        {steps.map((n) => {
+          const state = n < currentStep ? "done" : n === currentStep ? "current" : "upcoming";
+          return (
+            <li key={n} className={`plan-steps-mobile__bar plan-steps-mobile__bar--${state}`}>
+              <span className="sr-only">{labels[n - 1]}</span>
+            </li>
+          );
+        })}
+      </ol>
+    </>
   );
 }

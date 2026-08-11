@@ -76,7 +76,15 @@
     "orderDetailLead": "Tuotantotila, toimitukset ja live-sijoittelut jokaiselle riville tässä tilauksessa.",
     "linesEyebrow": "Tilausrivit",
     "useAsTemplate": "Käytä mallina",
-    "duplicating": "Monistetaan…"
+    "duplicating": "Monistetaan…",
+    "draftReviewHeading": "Luonnos valmis tarkistettavaksi",
+    "draftReviewOpenFile": "Avaa luonnos",
+    "draftApprove": "Hyväksy",
+    "draftApproving": "Tallennetaan…",
+    "draftRequestChanges": "Pyydä muutoksia",
+    "draftChangesPlaceholder": "Mitä kirjoittajan pitäisi muuttaa?",
+    "draftSendChanges": "Lähetä",
+    "draftChangesSentNote": "Pyysit muutoksia:"
   },
   "notifications": {
     "eyebrow": "Saapuneet",
@@ -347,7 +355,8 @@
       "videoHint": "Tuotettu video sisältyy sijoitteluun.",
       "priceHeading": "Hinta",
       "unpricedNote": "{count, plural, =1 {Katalogissa on vielä 1 julkaisu ilman julkaistua hintaa. Deskimme voi hinnoitella sen.} other {Katalogissa on vielä # julkaisua ilman julkaistua hintaa. Deskimme voi hinnoitella ne.}}",
-      "advancedToggle": "{count, plural, =0 {Lisäsuodattimet} other {Lisäsuodattimet (#)}}"
+      "advancedToggle": "{count, plural, =0 {Lisäsuodattimet} other {Lisäsuodattimet (#)}}",
+      "mobileFilters": "Suodattimet"
     },
     "shortlist": {
       "untitledPlan": "suunnitelmasi",
@@ -628,7 +637,9 @@
       "item2Body": "Vaihda julkaisu, muuta kuukautta tai poista rivi. Mikään ei ole sitova ennen kuin hyväksyt.",
       "item3Title": "Kirjoitamme, sijoitamme ja raportoimme",
       "item3Body": "Luonnokset lähetetään sinulle hyväksyttäväksi. Linkit ja tulokset löytyvät Raporteista."
-    }
+    },
+    "mobileBackToTitles": "Julkaisut",
+    "mobileEdit": "Muokkaa"
   },
   "rfq": {
     "org": "Yritys",

@@ -12,6 +12,7 @@ import { readActiveListId, resolveActiveList } from "@/lib/lists";
 import { estimateListTotals } from "@/lib/plan-total";
 import { titleDisplayName } from "@/lib/title-display";
 import { CatalogRail } from "./_components/CatalogRail";
+import { CatalogMobileBar } from "./_components/CatalogMobileBar";
 import { CatalogSort } from "./_components/CatalogSort";
 import { CatalogDensityToggle } from "./_components/CatalogDensityToggle";
 import { ShortlistProvider } from "./_components/Shortlist";
@@ -511,6 +512,32 @@ export default async function CatalogPage({
     >
       <section className="catalog-page">
         {showBookingBanner ? <CatalogBookCallBanner /> : null}
+
+        <CatalogMobileBar
+          markets={MARKET_CODES.map((m) => ({ value: m, label: tMarket(m) }))}
+          nativeFits={NATIVE_FIT_VALUES.map((v) => ({ value: v, label: tFit(v) }))}
+          b2bB2cs={B2B_B2C_VALUES.map((v) => ({ value: v, label: v }))}
+          reaches={REACH_VALUES.map((v) => ({ value: v, label: tReach(v) }))}
+          categories={verticalOptions.map((v) => ({ value: v, label: v }))}
+          regions={regionOptions.map((v) => ({ value: v, label: v }))}
+          unpricedCount={unpricedCount}
+          initial={{
+            q,
+            markets,
+            types,
+            verticals,
+            regions,
+            nativeFit: nativeFit ?? "",
+            b2bB2c: b2bB2c ?? "",
+            reach: reach ?? "",
+            onlyPriced,
+            producedForYou,
+            guaranteedReach,
+            newsletterIncluded,
+            videoIncluded,
+            compareMode,
+          }}
+        />
 
         <div className="catalog-layout">
           <CatalogRail
