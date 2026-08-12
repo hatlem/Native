@@ -257,10 +257,23 @@ export default async function CatalogPage({
 
   const skip = (page - 1) * PAGE_SIZE;
 
-  // "Relevance" (no explicit sort) is personalized: titles matching the
-  // org's billing market or the verticals it has already shown interest
-  // in (favorited / added to a plan) surface first, as their own ordered
-  // tier, ahead of everything else — same tiebreak within each tier. No
+  // Within the personalized tier, lead with reach rather than the
+  // alphabet — "relevant to you" should also mean "worth looking at,"
+  // not just first in the dictionary. The non-personalized tier and every
+  // explicit sort keep the plain `orderBy` above, untouched.
+  const relevantOrderBy: Prisma.TitleOrderByWithRelationInput[] = [
+    { active: "desc" },
+    { digitalReach: { sort: "desc", nulls: "last" } },
+    { monthlyReach: { sort: "desc", nulls: "last" } },
+    { name: "asc" },
+  ];
+
+  // "Relevance" (no explicit sort) is personalized — but not just an echo
+  // of what the org already saved. Signals blend the org's billing market,
+  // its own favorited/planned verticals, AND what similar buyers in the
+  // same market are actively favoriting/planning right now, so browsing
+  // surfaces genuine discovery, not only a mirror of past picks. Matching
+  // titles land in their own ordered tier ahead of everything else. No
   // signal (guest activity, brand-new org) falls straight through to the
   // plain query below, unchanged from before this existed.
   const relevance =
@@ -289,7 +302,7 @@ export default async function CatalogPage({
         ...(await prisma.title.findMany({
           where: whereRelevant,
           include: titleInclude,
-          orderBy,
+          orderBy: relevantOrderBy,
           take: Math.min(PAGE_SIZE, countRelevant - skip),
           skip,
         })),
