@@ -9,6 +9,7 @@ import { catalogVisibleTitleWhere } from "@/lib/catalog-visibility";
 import { savedListMembershipMap } from "@/lib/saved-list-membership";
 import { loadScope } from "@/lib/scope";
 import { loadRelevanceSignals } from "@/lib/catalog-relevance";
+import { loadVerticalOptions } from "@/lib/catalog-taxonomy";
 import { readActiveListId, resolveActiveList } from "@/lib/lists";
 import { estimateListTotals } from "@/lib/plan-total";
 import { titleDisplayName } from "@/lib/title-display";
@@ -185,16 +186,9 @@ export default async function CatalogPage({
 
   const scope = await loadScope();
   const orgId = scope.workspace?.activeOrgId ?? null;
+  const activeList = orgId ? await resolveActiveList(orgId, await readActiveListId()) : null;
 
-  const verticalRows = await prisma.title.findMany({
-    where: { active: true, vertical: { not: null } },
-    select: { vertical: true },
-    distinct: ["vertical"],
-    orderBy: { vertical: "asc" },
-  });
-  const verticalOptions = verticalRows
-    .map((r) => r.vertical!)
-    .filter((v) => v.trim().length > 0);
+  const verticalOptions = await loadVerticalOptions();
 
   // Distinct regions present from the geo backfill — drives the region
   // multiselect. Null regions (national/unknown titles) don't appear.
@@ -269,15 +263,25 @@ export default async function CatalogPage({
   ];
 
   // "Relevance" (no explicit sort) is personalized — but not just an echo
-  // of what the org already saved. Signals blend the org's billing market,
-  // its own favorited/planned verticals, AND what similar buyers in the
-  // same market are actively favoriting/planning right now, so browsing
-  // surfaces genuine discovery, not only a mirror of past picks. Matching
-  // titles land in their own ordered tier ahead of everything else. No
-  // signal (guest activity, brand-new org) falls straight through to the
-  // plain query below, unchanged from before this existed.
+  // of what the org already saved. When the active plan has explicit
+  // targeting (SavedList.targetVerticals — set from /plan), THAT wins
+  // outright, so an org running several plans for different profiles gets
+  // each one ranked for its own profile. Otherwise, signals blend the org's
+  // billing market, its own favorited/planned verticals, AND what similar
+  // buyers in the same market are actively favoriting/planning right now,
+  // so browsing surfaces genuine discovery, not only a mirror of past
+  // picks. Matching titles land in their own ordered tier ahead of
+  // everything else. No signal (guest activity, brand-new org) falls
+  // straight through to the plain query below, unchanged from before this
+  // existed.
+  const explicitVerticals = (activeList?.targetVerticals ?? "")
+    .split(",")
+    .map((v) => v.trim())
+    .filter(Boolean);
   const relevance =
-    sort === undefined && orgId ? await loadRelevanceSignals(orgId) : null;
+    sort === undefined && orgId
+      ? await loadRelevanceSignals(orgId, explicitVerticals)
+      : null;
   const relevanceOr: Prisma.TitleWhereInput[] = [];
   if (relevance?.marketCode) relevanceOr.push({ countryCode: relevance.marketCode });
   if (relevance?.affinityVerticals.length) {
@@ -382,7 +386,7 @@ export default async function CatalogPage({
   // Sticky shortlist bar's starting state: the active list's current
   // product ids + total, so the bar (and each row's "on plan" state)
   // reflects what's really on the plan before any optimistic click.
-  const activeList = orgId ? await resolveActiveList(orgId, await readActiveListId()) : null;
+  // (activeList itself was already resolved above, ahead of the relevance query.)
   const shortlistProductIds = (activeList?.items ?? [])
     .map((i) => i.productId)
     .filter((id): id is string => id !== null);

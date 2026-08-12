@@ -347,6 +347,26 @@ export async function renameList(formData: FormData) {
   revalidatePath(`/${locale}/lists`);
 }
 
+// Which verticals THIS plan is targeting — drives its own catalog-relevance
+// ranking (see loadRelevanceSignals), independent of any other plan the org
+// runs. Saved instantly (not gated behind full RFQ submission) so it takes
+// effect the moment the buyer switches back to browsing the catalog.
+export async function setListTargetVerticals(formData: FormData) {
+  const locale = str(formData, "locale") || "en";
+  const listId = str(formData, "listId");
+  const scope = await loadScope();
+  const list = await prisma.savedList.findUnique({ where: { id: listId }, select: { organizationId: true } });
+  if (list && canActOnOrg(scope, list.organizationId)) {
+    const verticals = formData.getAll("targetVerticals").map((v) => String(v).trim()).filter(Boolean);
+    await prisma.savedList.update({
+      where: { id: listId },
+      data: { targetVerticals: verticals.length ? verticals.join(",") : null },
+    });
+  }
+  revalidatePath(`/${locale}/plan`);
+  revalidatePath(`/${locale}/catalog`);
+}
+
 export async function archiveList(formData: FormData) {
   const locale = str(formData, "locale") || "en";
   const listId = str(formData, "listId");

@@ -14,10 +14,12 @@ import type { Candidate, SupplementaryTitle } from "@/lib/recommend";
 import { recommendForBrief } from "@/lib/campaign-recommend";
 import { loadPricingDefaults } from "@/lib/content-fee";
 import { timeAgo } from "@/lib/time-ago";
+import { loadVerticalOptions } from "@/lib/catalog-taxonomy";
 import { PlanBanners } from "./_components/PlanBanners";
 import { PlanStart } from "./_components/PlanStart";
 import { PlanSteps, type PlanStep } from "./_components/PlanSteps";
 import { PlanTitleBlock } from "./_components/PlanTitleBlock";
+import { PlanTargeting } from "./_components/PlanTargeting";
 import { PlanLines, type PlanTitleLine } from "./_components/PlanLines";
 import { PlanSummary, type Rollup } from "./_components/PlanSummary";
 import { WhatHappensNext } from "./_components/WhatHappensNext";
@@ -83,6 +85,11 @@ export default async function PlanPage({
     ? await resolveActiveList(ws.activeOrgId, await readActiveListId())
     : null;
   const listItems = activeList?.items ?? [];
+  const verticalOptions = activeList ? await loadVerticalOptions() : [];
+  const targetVerticals = (activeList?.targetVerticals ?? "")
+    .split(",")
+    .map((v) => v.trim())
+    .filter(Boolean);
 
   const tType = await getTranslations({ locale, namespace: "productType" });
 
@@ -333,6 +340,12 @@ export default async function PlanPage({
             orgName={activeOrg?.name ?? null}
             lastEdited={lastEdited}
             lists={lists}
+          />
+          <PlanTargeting
+            locale={locale}
+            activeListId={activeList?.id}
+            verticalOptions={verticalOptions}
+            selected={targetVerticals}
           />
           <div className="split">
             <div>

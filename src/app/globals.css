@@ -6556,3 +6556,27 @@ footer a:hover {
     min-height: 48px;
   }
 }
+
+.plan-targeting {
+  margin: var(--s-3) 0 var(--s-5);
+  padding: var(--s-3) var(--s-4);
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  border-radius: var(--r-sm);
+}
+.plan-targeting__summary {
+  cursor: pointer;
+  list-style: none;
+  font-weight: 600;
+  font-size: 0.9rem;
+  color: var(--heading);
+}
+.plan-targeting__summary::-webkit-details-marker {
+  display: none;
+}
+.plan-targeting__form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--s-3);
+  margin-top: var(--s-3);
+}

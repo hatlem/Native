@@ -1021,6 +1021,13 @@ model SavedList {
   targetGeo      String?
   targetAudience String?
   targetContext  String?
+  // CSV of Title.vertical values this specific plan is targeting — lets one
+  // org run several plans for different profiles (e.g. ABAX running a
+  // trucking plan and a separate seafood plan) without one polluting the
+  // other's catalog relevance. Set from /plan, read by the catalog's
+  // relevance ranking; independent of targetAudience (free-text brief copy
+  // for the desk, not a structured signal).
+  targetVerticals String?
   // Soft reference (no FK) — the list survives if the creating user is removed.
   createdById    String?
   archivedAt     DateTime?

@@ -80,12 +80,26 @@ function topByCount(rows: { title: { vertical: string | null } | null }[], n: nu
 // same market are actively favoriting/planning, so browsing surfaces things
 // worth discovering, not just a mirror of past activity. Org-scoped (not
 // user-scoped) so the whole team benefits from what any seat has done.
-export async function loadRelevanceSignals(organizationId: string): Promise<RelevanceSignals> {
+//
+// `explicitVerticals` — the active plan's own targeting (see
+// SavedList.targetVerticals) — wins outright when set: a company can run
+// several plans for different profiles (a trucking plan and a separate
+// seafood plan, say), and each should rank the catalog for ITS profile, not
+// a blend across every plan the org has ever touched. Skips the
+// own/market lookups entirely in that case — there's nothing to blend.
+export async function loadRelevanceSignals(
+  organizationId: string,
+  explicitVerticals: string[] = [],
+): Promise<RelevanceSignals> {
   const org = await prisma.organization.findUnique({
     where: { id: organizationId },
     select: { marketCode: true },
   });
   const marketCode = org?.marketCode ?? null;
+
+  if (explicitVerticals.length > 0) {
+    return { marketCode, affinityVerticals: explicitVerticals.slice(0, MAX_AFFINITY_VERTICALS) };
+  }
 
   const [own, market] = await Promise.all([
     ownTopVerticals(organizationId),
