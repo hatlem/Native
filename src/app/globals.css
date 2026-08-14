@@ -6049,17 +6049,24 @@ footer a:hover {
   z-index: 1;
   /* Draft rows render this as a <button> (needs to submit the
      select-active-list form), not an <a> — reset the browser's default
-     button chrome so it stays an invisible full-row hit target. */
+     button chrome (including UA appearance, which border:0 alone doesn't
+     clear in every browser) so it stays an invisible full-row hit target. */
+  appearance: none;
   background: transparent;
   border: 0;
+  border-radius: 0;
   padding: 0;
+  box-shadow: none;
   cursor: pointer;
 }
 
 .campaign-row__name-btn {
+  appearance: none;
   background: transparent;
   border: 0;
+  border-radius: 0;
   padding: 0;
+  box-shadow: none;
   font: inherit;
   text-align: left;
   cursor: pointer;
