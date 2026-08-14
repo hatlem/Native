@@ -282,10 +282,22 @@ export default async function CatalogPage({
     sort === undefined && orgId
       ? await loadRelevanceSignals(orgId, explicitVerticals)
       : null;
+  // Explicit per-plan targeting is a request to narrow, not broaden: OR-ing
+  // in a country match here would let every same-market title back in
+  // (a national tabloid has nothing to do with a trucking-only plan just
+  // because both happen to be Swedish), diluting the one signal the buyer
+  // actually set. Country only qualifies the tier in the implicit/blended
+  // case, where the goal is a wide discovery net.
   const relevanceOr: Prisma.TitleWhereInput[] = [];
-  if (relevance?.marketCode) relevanceOr.push({ countryCode: relevance.marketCode });
-  if (relevance?.affinityVerticals.length) {
-    relevanceOr.push({ vertical: { in: relevance.affinityVerticals } });
+  if (explicitVerticals.length > 0) {
+    if (relevance?.affinityVerticals.length) {
+      relevanceOr.push({ vertical: { in: relevance.affinityVerticals } });
+    }
+  } else {
+    if (relevance?.marketCode) relevanceOr.push({ countryCode: relevance.marketCode });
+    if (relevance?.affinityVerticals.length) {
+      relevanceOr.push({ vertical: { in: relevance.affinityVerticals } });
+    }
   }
 
   let totalCount: number;
