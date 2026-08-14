@@ -6047,6 +6047,22 @@ footer a:hover {
   position: absolute;
   inset: 0;
   z-index: 1;
+  /* Draft rows render this as a <button> (needs to submit the
+     select-active-list form), not an <a> — reset the browser's default
+     button chrome so it stays an invisible full-row hit target. */
+  background: transparent;
+  border: 0;
+  padding: 0;
+  cursor: pointer;
+}
+
+.campaign-row__name-btn {
+  background: transparent;
+  border: 0;
+  padding: 0;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
 }
 
 .campaign-row__main {
