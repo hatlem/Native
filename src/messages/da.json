@@ -449,6 +449,8 @@
     "decrement": "Reducér antal",
     "increment": "Forøg antal",
     "estTotal": "Anslået vejledende total",
+    "totalForItems": "{amount} for {count, plural, =1 {1 titel} other {# titler}}",
+    "multiCurrencyNote": "Titler faktureres i udgiverens egen valuta — begge beløb skal betales, det er ikke et valg af valuta.",
     "rfqTitle": "Anmod om et fast tilbud",
     "error": "Tilføj mindst én placering og udfyld virksomhed, e-mail og marked.",
     "linesEyebrow": "Valgt",

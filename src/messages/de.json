@@ -536,6 +536,8 @@
     "decrement": "Menge verringern",
     "increment": "Menge erhöhen",
     "estTotal": "Geschätzter Richtwert",
+    "totalForItems": "{amount} für {count, plural, =1 {1 Titel} other {# Titel}}",
+    "multiCurrencyNote": "Titel werden in der Währung des jeweiligen Verlags abgerechnet — beide Beträge sind fällig, das ist keine Wahl der Zahlungswährung.",
     "rfqTitle": "Festes Angebot anfordern",
     "error": "Mindestens eine Platzierung hinzufügen und Firma, E-Mail und Markt ausfüllen.",
     "linesEyebrow": "Ausgewählt",

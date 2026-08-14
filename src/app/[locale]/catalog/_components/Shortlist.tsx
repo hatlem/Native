@@ -14,7 +14,7 @@ import { Link } from "@/i18n/navigation";
 import { formatMoney } from "@/lib/money";
 import { addProductToActiveList } from "@/app/list-actions";
 
-type LineTotal = { currency: string; amount: number };
+type LineTotal = { currency: string; amount: number; itemCount: number };
 
 type ShortlistItem = {
   productId: string;
@@ -110,16 +110,22 @@ export function ShortlistProvider({
 
   const count = initialCount + added.length;
   const totals = useMemo(() => {
-    const byCurrency = new Map<string, number>();
+    const byCurrency = new Map<string, { amount: number; itemCount: number }>();
     for (const line of initialTotals) {
-      byCurrency.set(line.currency, (byCurrency.get(line.currency) ?? 0) + line.amount);
+      const entry = byCurrency.get(line.currency) ?? { amount: 0, itemCount: 0 };
+      entry.amount += line.amount;
+      entry.itemCount += line.itemCount;
+      byCurrency.set(line.currency, entry);
     }
     for (const item of added) {
       if (item.amount != null && item.currency) {
-        byCurrency.set(item.currency, (byCurrency.get(item.currency) ?? 0) + item.amount);
+        const entry = byCurrency.get(item.currency) ?? { amount: 0, itemCount: 0 };
+        entry.amount += item.amount;
+        entry.itemCount += 1;
+        byCurrency.set(item.currency, entry);
       }
     }
-    return Array.from(byCurrency, ([currency, amount]) => ({ currency, amount }));
+    return Array.from(byCurrency, ([currency, r]) => ({ currency, amount: r.amount, itemCount: r.itemCount }));
   }, [initialTotals, added]);
 
   return (
@@ -160,6 +166,7 @@ function ShortlistBar({
   recentTitles: string[];
 }) {
   const t = useTranslations("catalog.shortlist");
+  const tPlan = useTranslations("plan");
   // "up to four title chips" — most-recently-added first reads as
   // confirmation of what you just did, not an arbitrary slice.
   const chips = recentTitles.slice(-4).reverse();
@@ -186,7 +193,16 @@ function ShortlistBar({
           <span className="shortlist-bar__total-label">{t("totalLabel")}</span>
           <span className="shortlist-bar__total-amount">
             {totals.length
-              ? totals.map((line) => formatMoney(line.amount, line.currency, locale)).join(" · ")
+              ? totals.length > 1
+                ? totals
+                    .map((line) =>
+                      tPlan("totalForItems", {
+                        amount: formatMoney(line.amount, line.currency, locale),
+                        count: line.itemCount,
+                      }),
+                    )
+                    .join(" + ")
+                : formatMoney(totals[0].amount, totals[0].currency, locale)
               : t("totalPending")}
           </span>
         </div>

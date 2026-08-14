@@ -449,6 +449,8 @@
     "decrement": "Minska antal",
     "increment": "Öka antal",
     "estTotal": "Uppskattad vägledande summa",
+    "totalForItems": "{amount} för {count, plural, =1 {1 titel} other {# titlar}}",
+    "multiCurrencyNote": "Titlar faktureras i utgivarens egen valuta — båda beloppen ska betalas, det här är inte ett val av valuta.",
     "rfqTitle": "Begär en fast offert",
     "error": "Lägg till minst en placering och fyll i företag, e-post och marknad.",
     "linesEyebrow": "Valt",

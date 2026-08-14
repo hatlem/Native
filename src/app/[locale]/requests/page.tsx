@@ -54,6 +54,7 @@ export default async function RequestsPage({
   const sp = await searchParams;
   const t = await getTranslations({ locale, namespace: "requests" });
   const tOrders = await getTranslations({ locale, namespace: "orders" });
+  const tPlan = await getTranslations({ locale, namespace: "plan" });
 
   const scope = await loadScope();
   if (!scope.workspace) redirect(`/${locale}/signin`);
@@ -107,7 +108,16 @@ export default async function RequestsPage({
       stage: 1,
       tab: "inProgress",
       totalLabel: totals.length
-        ? totals.map((tot) => formatMoney(tot.amount, tot.currency, locale)).join(" · ")
+        ? totals.length > 1
+          ? totals
+              .map((tot) =>
+                tPlan("totalForItems", {
+                  amount: formatMoney(tot.amount, tot.currency, locale),
+                  count: tot.itemCount,
+                }),
+              )
+              .join(" + ")
+          : formatMoney(totals[0].amount, totals[0].currency, locale)
         : null,
       qualifier: t("qualifierIndicative"),
       action: { kind: "select-list", listId: list.id, locale, label: t("actionFinishSend") },

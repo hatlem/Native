@@ -536,6 +536,8 @@
     "decrement": "Decrease quantity",
     "increment": "Increase quantity",
     "estTotal": "Estimated indicative total",
+    "totalForItems": "{amount} for {count, plural, =1 {1 title} other {# titles}}",
+    "multiCurrencyNote": "Titles bill in their publisher's own currency — both amounts are due, this isn't a choice of currency to pay in.",
     "rfqTitle": "Request a firm quote",
     "error": "Add at least one placement and fill in company, email and market.",
     "linesEyebrow": "Selected",

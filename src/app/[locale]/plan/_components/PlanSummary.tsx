@@ -8,7 +8,10 @@ import { PlanBriefFields } from "./PlanBriefFields";
 
 // Per-currency rollup computed in page.tsx — visible-price lines
 // accumulate an amount, locked-price lines only flag their currency.
-export type Rollup = { amount: number; hasVisible: boolean; hasHidden: boolean };
+// itemCount is what turns "SEK 95,565 + €92" from a puzzle (is that a
+// choice of currency to pay in?) into a plain fact: two currencies, each
+// tied to the titles actually priced in it, both due.
+export type Rollup = { amount: number; hasVisible: boolean; hasHidden: boolean; itemCount: number };
 
 // Right column, top card: per-currency totals, the instant-book split, and
 // the brief form that submits the basket as a firm plan or RFQ. The
@@ -69,6 +72,9 @@ export async function PlanSummary({
               {r.hasHidden ? <span className="muted small"> + {tv("requestPrice")}</span> : null}
             </div>
           ))}
+        {visibleTotals.length > 1 ? (
+          <p className="plan-summary-note">{t("multiCurrencyNote")}</p>
+        ) : null}
         {hasHiddenPrice && !totals.some(([, r]) => r.hasVisible) ? (
           <div className="muted small">{t("pricingOnRequest")}</div>
         ) : null}
@@ -129,11 +135,14 @@ export async function PlanSummary({
         <div className="plan-mobile-submit-bar__total">
           <span className="plan-mobile-submit-bar__label">{t("estTotal")}</span>
           <span className="plan-mobile-submit-bar__amount">
-            {totals.some(([, r]) => r.hasVisible)
-              ? totals
-                  .filter(([, r]) => r.hasVisible)
-                  .map(([cur, r]) => formatMoney(r.amount, cur, locale))
-                  .join(" · ")
+            {visibleTotals.length > 0
+              ? visibleTotals.length > 1
+                ? visibleTotals
+                    .map(([cur, r]) =>
+                      t("totalForItems", { amount: formatMoney(r.amount, cur, locale), count: r.itemCount }),
+                    )
+                    .join(" + ")
+                : formatMoney(visibleTotals[0][1].amount, visibleTotals[0][0], locale)
               : t("pricingOnRequest")}
           </span>
         </div>

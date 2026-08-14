@@ -166,7 +166,9 @@ export default async function PlanPage({
       amount: 0,
       hasVisible: false,
       hasHidden: false,
+      itemCount: 0,
     };
+    r.itemCount += 1;
     if (l.priceVisible) {
       r.amount += l.lineTotal;
       r.hasVisible = true;
