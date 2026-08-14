@@ -6047,26 +6047,28 @@ footer a:hover {
   position: absolute;
   inset: 0;
   z-index: 1;
-  /* Draft rows render this as a <button> (needs to submit the
-     select-active-list form), not an <a> — reset the browser's default
-     button chrome (including UA appearance, which border:0 alone doesn't
-     clear in every browser) so it stays an invisible full-row hit target. */
-  appearance: none;
-  background: transparent;
-  border: 0;
-  border-radius: 0;
-  padding: 0;
-  box-shadow: none;
+  /* Draft rows render this as a <button type="submit"> (needs to submit
+     the select-active-list form), not an <a>. The !important pins below
+     beat form:not(.filters):not(.cmdk-form) button[type="submit"]:not(.btn)
+     (a global reset for bare submit buttons elsewhere in the app) on
+     specificity — that rule is what was leaking a visible border/background
+     onto what must stay an invisible full-row hit target. */
+  appearance: none !important;
+  background: transparent !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  padding: 0 !important;
+  box-shadow: none !important;
   cursor: pointer;
 }
 
 .campaign-row__name-btn {
-  appearance: none;
-  background: transparent;
-  border: 0;
-  border-radius: 0;
-  padding: 0;
-  box-shadow: none;
+  appearance: none !important;
+  background: transparent !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  padding: 0 !important;
+  box-shadow: none !important;
   font: inherit;
   text-align: left;
   cursor: pointer;
