@@ -8,6 +8,7 @@ import { prisma } from "@/lib/prisma";
 import { recordAudit } from "@/lib/audit";
 import { notifyOrg, notifyPublisher } from "@/lib/notify";
 import { requireDesk } from "@/lib/desk-guard";
+import { findDueWaves } from "@/lib/programme";
 import {
   canCancelOrder,
   cancelBlockReason,
@@ -46,14 +47,43 @@ export async function advanceOrder(formData: FormData) {
         from: order.status,
         to: next,
       });
-      await notifyOrg(order.organizationId, {
-        kind: "ASSET_REVIEW",
-        title: `Order ${next.toLowerCase().replace(/_/g, " ")}`,
-        link: `/${locale}/orders/${order.id}`,
-      });
+      if (next === "COMPLETED") {
+        // The buyer's cue to plan the next wave. If this order was a wave of
+        // a programme and the following wave is now due, send them to Home,
+        // where the "next wave due" card opens that wave (a bare /plan link
+        // would show whichever list happens to be active); otherwise to the
+        // finished order, which offers "Plan next wave" (a full copy of the
+        // list, ready to edit).
+        const planName = await orderPlanName(order.id);
+        const due = (await findDueWaves([order.organizationId], new Date()))[0] ?? null;
+        await notifyOrg(order.organizationId, {
+          kind: "ORDER_COMPLETED",
+          title: `Campaign finished: ${planName}`,
+          body: due
+            ? `Wave ${due.waveNumber} of ${due.plannedWaves} is ready to send${
+                due.articleAngle ? ` — angle: ${due.articleAngle}` : ""
+              }. A fresh article now, while readers still remember the last one, is what turns one placement into a campaign that sticks.`
+            : `Your placements have run. Native works through repetition — plan the next wave with a fresh article angle while readers still remember this one.`,
+          link: due ? `/${locale}/home` : `/${locale}/orders/${order.id}`,
+        });
+      } else {
+        await notifyOrg(order.organizationId, {
+          kind: "ASSET_REVIEW",
+          title: `Order ${next.toLowerCase().replace(/_/g, " ")}`,
+          link: `/${locale}/orders/${order.id}`,
+        });
+      }
     }
   }
   redirect(`/${locale}/desk/orders/${orderId}`);
+}
+
+async function orderPlanName(orderId: string): Promise<string> {
+  const o = await prisma.order.findUnique({
+    where: { id: orderId },
+    select: { quote: { select: { request: { select: { plan: { select: { name: true } } } } } } },
+  });
+  return o?.quote.request.plan.name ?? "your campaign";
 }
 
 // Update the post-order follow-up commitment note on the order. Lets

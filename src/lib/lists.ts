@@ -134,6 +134,8 @@ export async function loadUnsentLists(orgId: string) {
     include: {
       ...ITEM_INCLUDE,
       _count: { select: { items: true } },
+      // Wave membership, so the pipeline can label "Wave 2 of 3".
+      programme: { select: { id: true, name: true, plannedWaves: true } },
     },
   });
 }

@@ -83,6 +83,9 @@ export default async function RequestsPage({
       include: {
         organization: { select: { name: true } },
         plan: { select: { name: true, items: { select: { id: true } } } },
+        sourceList: {
+          select: { waveNumber: true, programme: { select: { plannedWaves: true } } },
+        },
         quotes: {
           orderBy: { createdAt: "desc" },
           take: 1,
@@ -97,6 +100,15 @@ export default async function RequestsPage({
   ]);
 
   const rows: Row[] = [];
+
+  // "Wave 2 of 3 · from 6 Oct" on a draft that belongs to a programme.
+  const waveFooter = (list: (typeof unsentLists)[number]): string | undefined => {
+    if (!list.programme || !list.waveNumber) return undefined;
+    let start: Date | null = null;
+    for (const i of list.items) if (i.scheduleStart && (!start || i.scheduleStart < start)) start = i.scheduleStart;
+    const vars = { n: list.waveNumber, of: list.programme.plannedWaves };
+    return start ? t("waveNoteDated", { ...vars, date: dateFmt.format(start) }) : t("waveNote", vars);
+  };
 
   for (const list of unsentLists) {
     const totals = estimateListTotals(list.items);
@@ -121,6 +133,7 @@ export default async function RequestsPage({
         : null,
       qualifier: t("qualifierIndicative"),
       action: { kind: "select-list", listId: list.id, locale, label: t("actionFinishSend") },
+      footerNote: waveFooter(list),
       // Unused by CampaignRow for a select-list action (it renders the
       // whole row as a form against that action instead, so every click —
       // row background or title — switches to THIS list before landing on
@@ -175,7 +188,15 @@ export default async function RequestsPage({
             ? { kind: "link", href: orderHref, label: t("actionOpenReport"), primary: false }
             : { kind: "link", href: detailHref, label: t("actionView"), primary: false };
 
+    const wave = r.sourceList?.programme && r.sourceList.waveNumber
+      ? { n: r.sourceList.waveNumber, of: r.sourceList.programme.plannedWaves }
+      : null;
     rows.push({
+      footerNote: wave
+        ? tab === "done" && order
+          ? t("waveDoneNote", wave)
+          : t("waveNote", wave)
+        : undefined,
       id: r.id,
       name: r.plan.name,
       statusValue: order?.status ?? quote?.status ?? r.status,

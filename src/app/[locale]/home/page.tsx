@@ -8,7 +8,9 @@ import { EmptyState } from "@/app/empty-state";
 import { formatMoney, intlLocale } from "@/lib/money";
 import { timeAgo } from "@/lib/time-ago";
 import { campaignFlowEnabled } from "@/lib/flags";
-import { FileCheck, PenLine, Search, RotateCcw } from "lucide-react";
+import { FileCheck, PenLine, Search, RotateCcw, Repeat } from "lucide-react";
+import { findDueWaves } from "@/lib/programme";
+import { selectActiveList } from "@/app/list-actions";
 
 export const dynamic = "force-dynamic";
 
@@ -24,7 +26,7 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
   // plus content drafts a writer has moved to review. ContentAsset has no
   // buyer-facing approve action yet — the card links to the order it
   // belongs to (the closest existing surface) rather than inventing one.
-  const [pendingQuotes, pendingContent, orders] = await Promise.all([
+  const [pendingQuotes, pendingContent, orders, dueWaves] = await Promise.all([
     prisma.quote.findMany({
       where: { status: "SENT", request: { organizationId: { in: orgIds } } },
       orderBy: { createdAt: "desc" },
@@ -66,9 +68,14 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
         lines: { select: { id: true } },
       },
     }),
+    // Programme waves whose turn it is: the previous wave is live/finished, or
+    // this wave's start is close. Scoped to the ACTIVE org only, because the
+    // CTA switches the active list (selectActiveList → /plan), which only
+    // ever renders the active org's lists.
+    scope.workspace.activeOrgId ? findDueWaves([scope.workspace.activeOrgId], new Date()) : Promise.resolve([]),
   ]);
 
-  const needsCount = pendingQuotes.length + pendingContent.length;
+  const needsCount = pendingQuotes.length + pendingContent.length + dueWaves.length;
   const runningCount = orders.length;
   const dateFmt = new Intl.DateTimeFormat(intlLocale(locale), { day: "numeric", month: "short" });
 
@@ -112,6 +119,41 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
               <Link href={`/requests/${q.request.id}`} className="btn small">
                 {t("reviewQuote")}
               </Link>
+            </div>
+          ))}
+          {dueWaves.map((w) => (
+            <div className="home-needs-card home-needs-card--accent" key={`wave-${w.listId}`}>
+              <span className="home-needs-card__icon" aria-hidden="true">
+                <Repeat size={19} strokeWidth={1.7} />
+              </span>
+              <div className="home-needs-card__body">
+                <div className="home-needs-card__title-row">
+                  <span className="home-needs-card__title">
+                    {t("nextWaveTitle", { name: w.programmeName, n: w.waveNumber, of: w.plannedWaves })}
+                  </span>
+                  {w.scheduleStart ? (
+                    <span className="badge badge-info dotless">{dateFmt.format(w.scheduleStart)}</span>
+                  ) : null}
+                </div>
+                <p className="home-needs-card__desc">
+                  {w.reason === "previous-live"
+                    ? t("nextWaveBodyPreviousLive", { prev: w.waveNumber - 1, n: w.waveNumber })
+                    : w.reason === "previous-done"
+                      ? t("nextWaveBodyPreviousDone", { prev: w.waveNumber - 1, n: w.waveNumber })
+                      : t("nextWaveBodyDateNear", {
+                          n: w.waveNumber,
+                          date: w.scheduleStart ? dateFmt.format(w.scheduleStart) : "",
+                        })}
+                  {w.articleAngle ? <> {t("nextWaveAngle", { angle: w.articleAngle })}</> : null}
+                </p>
+              </div>
+              <form action={selectActiveList}>
+                <input type="hidden" name="locale" value={locale} />
+                <input type="hidden" name="listId" value={w.listId} />
+                <button type="submit" className="btn small">
+                  {t("openWave")}
+                </button>
+              </form>
             </div>
           ))}
           {pendingContent.map((c) => {
@@ -191,7 +233,9 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
             <Search size={17} strokeWidth={1.7} aria-hidden="true" />
             {t("startBrowse")}
           </Link>
-          <Link href="/plan" className="btn secondary block home-start-btn">
+          {/* Finished campaigns live on the Done tab; each order there offers
+              "Plan next wave" (a full copy of the list, ready to edit). */}
+          <Link href="/requests?tab=done" className="btn secondary block home-start-btn">
             <RotateCcw size={17} strokeWidth={1.7} aria-hidden="true" />
             {t("startRepeat")}
           </Link>
