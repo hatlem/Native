@@ -61,11 +61,21 @@ export async function startProgramme(formData: FormData) {
       spacingWeeks,
     });
   } catch (e) {
-    if (e instanceof ProgrammeError) redirect(`/${locale}/plan?programme=${e.code}`);
+    // Unreachable from the UI (the form only renders for a non-programme
+    // list with lines) — a tampered/replayed POST just lands back on /plan.
+    if (e instanceof ProgrammeError) {
+      console.warn("programme.blocked", { reason: e.code, listId: list.id });
+      redirect(`/${locale}/plan`);
+    }
     throw e;
   }
   await writeActiveListId(list.id);
-  redirect(`/${locale}/plan?programme=created`);
+  // Plain /plan, never /plan?programme=…: this action is posted FROM /plan,
+  // and a same-route redirect that only changes searchParams trips the RSC
+  // "router state header" 503 in prod (see CatalogSort.tsx) — the form would
+  // sit on "Creating…" forever with the programme already made. The wave
+  // strip that replaces the form is the confirmation.
+  redirect(`/${locale}/plan`);
 }
 
 // Edit this wave's article angle from the wave strip on /plan.

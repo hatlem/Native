@@ -304,7 +304,6 @@ export default async function PlanPage({
         locale={locale}
         error={needsWorkspace ? undefined : sp.error}
         duplicate={sp.duplicate}
-        programme={sp.programme}
       />
 
       {needsWorkspace ? (
