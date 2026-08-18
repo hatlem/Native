@@ -214,6 +214,9 @@ enum NotificationKind {
   // either picked a concrete placement, or removed a placeholder with no
   // bookable option. The buyer asked the desk to decide; this is the signal back.
   PLACEMENT_PROPOSED
+  // Order reached COMPLETED — the buyer's cue to plan the next wave of the
+  // programme (or start one). Distinct from the generic advance ping.
+  ORDER_COMPLETED
 }
 
 enum JobStatus {
@@ -711,6 +714,7 @@ model Organization {
   memberships Membership[]
   invites     OrgInvite[]
   savedLists  SavedList[]
+  programmes  CampaignProgramme[]
   favoriteLists FavoriteList[]
 }
 
@@ -1005,6 +1009,11 @@ model PlanItem {
   // withContent today. Persisted (not just derived) so it can be carried
   // onto the OrderLine at confirmation.
   authorshipMode AuthorshipMode @default(BUYER_SUPPLIED)
+  // Snapshot of SavedListItem.scheduleStart/scheduleUnits at submit — the
+  // buyer's stated flight for this line. min/max over items becomes
+  // Plan.startDate/endDate and, from there, Order.flightStart/EndDate.
+  scheduleStart  DateTime?
+  scheduleUnits  Int?
   notes     String?
 }
 
@@ -1028,6 +1037,13 @@ model SavedList {
   // relevance ranking; independent of targetAudience (free-text brief copy
   // for the desk, not a structured signal).
   targetVerticals String?
+  // Programme membership: a multi-wave campaign is N lists sharing titles and
+  // targeting; this list is wave `waveNumber` (1-based) of `programme`, with
+  // its own editorial `articleAngle` (folded into the desk brief on submit).
+  programmeId  String?
+  programme    CampaignProgramme? @relation(fields: [programmeId], references: [id], onDelete: SetNull)
+  waveNumber   Int?
+  articleAngle String?
   // Soft reference (no FK) — the list survives if the creating user is removed.
   createdById    String?
   archivedAt     DateTime?
@@ -1036,6 +1052,31 @@ model SavedList {
 
   items   SavedListItem[]
   requests Request[]
+
+  @@unique([programmeId, waveNumber])
+  @@index([organizationId, archivedAt])
+}
+
+// A multi-wave campaign: N SavedLists (waves) sharing titles/targeting, spaced
+// by `spacingWeeks`, each with its own article angle. Waves submit through the
+// normal SavedList → Request → Order chain one at a time, so nothing downstream
+// of the list knows about programmes.
+model CampaignProgramme {
+  id             String       @id @default(cuid())
+  organizationId String
+  organization   Organization @relation(fields: [organizationId], references: [id])
+  name           String
+  plannedWaves   Int
+  spacingWeeks   Int
+  // i18n key under plan.programme.rationale.* explaining the recommended
+  // cadence — never LLM prose.
+  rationaleKey   String?
+  createdById    String?
+  archivedAt     DateTime?
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
+
+  waves SavedList[]
 
   @@index([organizationId, archivedAt])
 }
