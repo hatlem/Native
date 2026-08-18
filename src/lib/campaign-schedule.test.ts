@@ -5,6 +5,8 @@ import {
   upcomingWeeks,
   upcomingPeriods,
   clampUnits,
+  addPeriods,
+  planWindowFromItems,
 } from "./campaign-schedule";
 
 const base = new Date("2026-07-01T12:00:00Z"); // a Wednesday
@@ -44,4 +46,37 @@ test("clampUnits: enforces minimum and integer floor", () => {
   assert.equal(clampUnits(6, 4), 6); // above min kept
   assert.equal(clampUnits(2.9, null), 2); // floor, min defaults to 1
   assert.equal(clampUnits(0, null), 1); // never below 1
+});
+
+test("addPeriods: WEEK adds 7 days per unit, MONTH adds calendar months", () => {
+  assert.equal(
+    addPeriods(new Date("2026-06-29T00:00:00Z"), 2, "WEEK").toISOString().slice(0, 10),
+    "2026-07-13",
+  );
+  assert.equal(
+    addPeriods(new Date("2026-01-01T00:00:00Z"), 1, "MONTH").toISOString().slice(0, 10),
+    "2026-02-01",
+  );
+  assert.equal(
+    addPeriods(new Date("2026-11-01T00:00:00Z"), 3, "MONTH").toISOString().slice(0, 10),
+    "2027-02-01",
+  );
+});
+
+test("planWindowFromItems: nulls when nothing is scheduled", () => {
+  assert.deepEqual(
+    planWindowFromItems([{ scheduleStart: null, scheduleUnits: null, bookingUnit: "MONTH" }]),
+    { start: null, end: null },
+  );
+  assert.deepEqual(planWindowFromItems([]), { start: null, end: null });
+});
+
+test("planWindowFromItems: earliest start, latest exclusive end across units", () => {
+  const w = planWindowFromItems([
+    { scheduleStart: new Date("2026-09-01T00:00:00Z"), scheduleUnits: 1, bookingUnit: "MONTH" },
+    { scheduleStart: new Date("2026-08-31T00:00:00Z"), scheduleUnits: 2, bookingUnit: "WEEK" },
+    { scheduleStart: null, scheduleUnits: 4, bookingUnit: "WEEK" }, // ignored: no start
+  ]);
+  assert.equal(w.start?.toISOString().slice(0, 10), "2026-08-31");
+  assert.equal(w.end?.toISOString().slice(0, 10), "2026-10-01");
 });

@@ -18,6 +18,7 @@ import {
 } from "@/lib/money";
 import { groupItemsByMarket } from "@/lib/quote-grouping";
 import { loadPricingDefaults, contentFeeLinesForGroup } from "@/lib/content-fee";
+import { planWindowFromItems, type BookingUnit } from "@/lib/campaign-schedule";
 import {
   authorshipFromWithContent,
   authorshipForOrderLine,
@@ -56,6 +57,10 @@ export function toQuotable(
 // query and the API order query hydrate at least these.
 export type FirmOrderProduct = ProductWithRules & {
   type: string;
+  // Schedule-grid unit (WEEK|MONTH) — turns a line's scheduleUnits into a
+  // flight window. Optional: the public API's product query may not hydrate
+  // it, in which case MONTH (the catalog default) is assumed.
+  bookingUnit?: BookingUnit;
   title: {
     marketId: string;
     market: { code: string; currency: string; vatRatePct: unknown };
@@ -66,6 +71,10 @@ export type FirmOrderItem = {
   productId: string;
   quantity: number;
   withContent?: boolean;
+  // Buyer's chosen flight for this line (SavedListItem.scheduleStart/Units).
+  // Snapshotted onto PlanItem; min/max becomes Plan.startDate/endDate.
+  scheduleStart?: Date | null;
+  scheduleUnits?: number | null;
 };
 
 /** Thrown when a product became unavailable between the caller's snapshot and
@@ -163,12 +172,21 @@ export async function createFirmOrder(args: {
       throw new FirmOrderStaleError("A selected product is no longer available.");
     }
 
+    const flight = planWindowFromItems(
+      items.map((i) => ({
+        scheduleStart: i.scheduleStart ?? null,
+        scheduleUnits: i.scheduleUnits ?? null,
+        bookingUnit: byId.get(i.productId)?.bookingUnit ?? "MONTH",
+      })),
+    );
     const plan = await tx.plan.create({
       data: {
         organizationId,
         name: `${orgName} — campaign`,
         budget: brief?.budget ?? null,
         currency: brief?.currency ?? planCurrency,
+        startDate: flight.start,
+        endDate: flight.end,
         goal,
         audienceNote: audience,
         targetGeo,
@@ -180,6 +198,8 @@ export async function createFirmOrder(args: {
             quantity: i.quantity,
             withContent: i.withContent ?? false,
             authorshipMode: authorshipByProduct.get(i.productId)!,
+            scheduleStart: i.scheduleStart ?? null,
+            scheduleUnits: i.scheduleUnits ?? null,
           })),
         },
       },

@@ -268,10 +268,14 @@ export type PlanItemSnapshot = {
   quantity: number;
   withContent: boolean;
   authorshipMode: AuthorshipMode;
+  scheduleStart: Date | null;
+  scheduleUnits: number | null;
   notes: string | null;
 };
 
-/** Project SavedListItems into PlanItem rows, preserving product/title shape. */
+/** Project SavedListItems into PlanItem rows, preserving product/title shape
+ *  and the buyer's per-line schedule (which becomes the plan's flight window
+ *  via planWindowFromItems). */
 export function snapshotListToPlanData(
   items: Array<{
     productId: string | null;
@@ -279,6 +283,8 @@ export function snapshotListToPlanData(
     quantity: number;
     withContent: boolean;
     authorshipMode: PlanItemSnapshot["authorshipMode"];
+    scheduleStart?: Date | null;
+    scheduleUnits?: number | null;
     notes: string | null;
   }>,
 ): PlanItemSnapshot[] {
@@ -288,6 +294,8 @@ export function snapshotListToPlanData(
     quantity: i.quantity,
     withContent: i.withContent,
     authorshipMode: i.authorshipMode,
+    scheduleStart: i.scheduleStart ?? null,
+    scheduleUnits: i.scheduleUnits ?? null,
     notes: i.notes,
   }));
 }

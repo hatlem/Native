@@ -121,9 +121,11 @@ export default async function RequestsPage({
         : null,
       qualifier: t("qualifierIndicative"),
       action: { kind: "select-list", listId: list.id, locale, label: t("actionFinishSend") },
-      // No dedicated view for an unsent list — the row background just
-      // opens /plan (whatever list happens to be active there today); only
-      // the action button reliably switches to THIS list first.
+      // Unused by CampaignRow for a select-list action (it renders the
+      // whole row as a form against that action instead, so every click —
+      // row background or title — switches to THIS list before landing on
+      // /plan). Kept only because Row.href is non-optional; any value here
+      // is dead.
       href: "/plan",
     });
   }

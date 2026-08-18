@@ -51,3 +51,38 @@ export function clampUnits(requested: number, min: number | null | undefined): n
   const r = Math.floor(requested);
   return Number.isFinite(r) && r > floor ? r : floor;
 }
+
+// Exclusive end of a run of `units` booking periods starting at `start`
+// (a period anchor: Monday / first-of-month, UTC). MONTH steps calendar
+// months so a 1-unit run starting 1 Jan ends 1 Feb regardless of month length.
+export function addPeriods(start: Date, units: number, unit: BookingUnit): Date {
+  const n = Math.max(0, Math.floor(units));
+  if (unit === "WEEK") return new Date(start.getTime() + n * 7 * 86_400_000);
+  return new Date(
+    Date.UTC(start.getUTCFullYear(), start.getUTCMonth() + n, start.getUTCDate()),
+  );
+}
+
+// The plan-level flight window implied by per-line schedules: earliest start
+// to latest (exclusive) end. Lines without a start are ignored; a line with a
+// start but no unit count is treated as one period. All-null → nulls, so the
+// desk's manual flight window (saveFlightWindow) stays the only writer when
+// the buyer never scheduled anything.
+export function planWindowFromItems(
+  items: Array<{
+    scheduleStart: Date | null;
+    scheduleUnits: number | null;
+    bookingUnit: BookingUnit;
+  }>,
+): { start: Date | null; end: Date | null } {
+  let start: Date | null = null;
+  let end: Date | null = null;
+  for (const it of items) {
+    if (!it.scheduleStart) continue;
+    const s = it.scheduleStart;
+    const e = addPeriods(s, it.scheduleUnits ?? 1, it.bookingUnit);
+    if (!start || s < start) start = s;
+    if (!end || e > end) end = e;
+  }
+  return { start, end };
+}

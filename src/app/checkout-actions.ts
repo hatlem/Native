@@ -15,6 +15,7 @@ import {
   snapshotListToPlanData,
 } from "@/lib/lists";
 import { isProductPriceShown } from "@/lib/pricing-visibility";
+import { planWindowFromItems } from "@/lib/campaign-schedule";
 import { createFirmOrder, FirmOrderStaleError } from "@/lib/commerce/firm-order";
 import { uniquePublisherIdsForProducts } from "@/lib/commerce/publishers";
 import { groupItemsByMarket } from "@/lib/quote-grouping";
@@ -153,6 +154,8 @@ export async function submitRequest(formData: FormData) {
     productId: i.productId,
     quantity: i.quantity,
     withContent: i.withContent,
+    scheduleStart: i.scheduleStart,
+    scheduleUnits: i.scheduleUnits,
   }));
   const byId = new Map(productItems.map((i) => [i.productId, i.product]));
 
@@ -279,6 +282,8 @@ export async function submitRequest(formData: FormData) {
           quantity: i.quantity,
           withContent: i.withContent,
           authorshipMode: i.authorshipMode,
+          scheduleStart: i.scheduleStart,
+          scheduleUnits: i.scheduleUnits,
           notes: i.notes,
         })),
         ...titleItems.map((i) => ({
@@ -287,15 +292,29 @@ export async function submitRequest(formData: FormData) {
           quantity: i.quantity,
           withContent: i.withContent,
           authorshipMode: i.authorshipMode,
+          scheduleStart: i.scheduleStart,
+          scheduleUnits: i.scheduleUnits,
           notes: i.notes,
         })),
       ]);
+      // The buyer's per-line schedule → the plan's flight window → (on
+      // acceptance) Order.flightStart/EndDate. Placeholder lines have no
+      // product yet, so their unit is unknown; MONTH is the catalog default.
+      const flight = planWindowFromItems(
+        list.items.map((i) => ({
+          scheduleStart: i.scheduleStart,
+          scheduleUnits: i.scheduleUnits,
+          bookingUnit: i.product?.bookingUnit ?? "MONTH",
+        })),
+      );
       const plan = await tx.plan.create({
         data: {
           organizationId: org.id,
           name: `${org.name} — campaign`,
           budget: budgetRaw ? Number(budgetRaw) || null : null,
           currency: planCurrency,
+          startDate: flight.start,
+          endDate: flight.end,
           goal: goal || null,
           audienceNote: audience || null,
           targetGeo: targetGeo || null,
