@@ -176,6 +176,10 @@ test("a favorite whose title is later deactivated is hidden from the overview", 
       marketId: market!.id,
       category: "business",
       active: true,
+      // Verified: catalogVisibleTitleWhere keeps UNVERIFIED rows visible even
+      // when inactive (research rows), so only a verified title actually
+      // disappears on deactivation — which is what this test is about.
+      lastVerifiedAt: new Date(),
     },
   });
   try {
