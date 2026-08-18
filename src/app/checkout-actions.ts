@@ -16,6 +16,7 @@ import {
 } from "@/lib/lists";
 import { isProductPriceShown } from "@/lib/pricing-visibility";
 import { planWindowFromItems } from "@/lib/campaign-schedule";
+import { withWaveAngle } from "@/lib/programme";
 import { createFirmOrder, FirmOrderStaleError } from "@/lib/commerce/firm-order";
 import { uniquePublisherIdsForProducts } from "@/lib/commerce/publishers";
 import { groupItemsByMarket } from "@/lib/quote-grouping";
@@ -97,6 +98,12 @@ export async function submitRequest(formData: FormData) {
   // (titleId set, productId null). The list is NOT consumed on submit.
   const list = await ensureActiveList(org.id, await readActiveListId());
   if (list.items.length === 0) redirect(`/${locale}/plan?error=1`);
+
+  // A wave of a programme carries its own article angle — put it at the top
+  // of the desk-facing brief so the desk and the writer start from THIS
+  // wave's idea, not a rerun of the last one. The buyer's own text is kept
+  // verbatim below it (and stays untouched in the cookie draft).
+  const deskBrief = await withWaveAngle(brief, list);
 
   // Idempotency: a network-retried / double-clicked submit of the SAME list
   // within a short window must not mint a second Request (and, on the firm
@@ -248,7 +255,7 @@ export async function submitRequest(formData: FormData) {
         byId,
         sourceListId: list.id,
         brief: {
-          briefText: brief,
+          briefText: deskBrief,
           goal: goal || null,
           audience: audience || null,
           budget: budgetRaw ? Number(budgetRaw) || null : null,
@@ -334,7 +341,7 @@ export async function submitRequest(formData: FormData) {
         targetContext && `Context: ${targetContext}`,
       ].filter(Boolean);
       const briefSummary =
-        [brief, ...targetingLines].filter(Boolean).join("\n") || null;
+        [deskBrief, ...targetingLines].filter(Boolean).join("\n") || null;
 
       const req = await tx.request.create({
         data: {

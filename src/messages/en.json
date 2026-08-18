@@ -75,7 +75,7 @@
     "newOrderCta": "New order",
     "orderDetailLead": "Production status, deliverables and live placements for every line in this order.",
     "linesEyebrow": "Order lines",
-    "useAsTemplate": "Use as template",
+    "useAsTemplate": "Plan next wave",
     "duplicating": "Duplicating…",
     "draftReviewHeading": "Draft ready for your review",
     "draftReviewOpenFile": "Open the draft",
@@ -645,6 +645,58 @@
       "item2Body": "Swap a title, change the month, or drop a line. Nothing is committed until you say yes.",
       "item3Title": "We write, place and report",
       "item3Body": "Drafts come to you for approval. Live links and performance land in Reports."
+    },
+    "programme": {
+      "summary": "Run this as a programme",
+      "summaryHint": "{waves} waves, {weeks} weeks apart — recommended",
+      "why": "One article gets read once. A programme puts your story in front of the same readers several times, each time from a new angle — that's what moves them from \"seen it\" to \"trust it\".",
+      "bullet1": "Keep the same core titles across waves so readers meet you again — repetition builds recall. Add one or two new titles per wave for reach.",
+      "bullet2": "Write a fresh article for every wave. Same story, new angle: first the problem, then the proof, then how it works.",
+      "bullet3": "Space waves 4–8 weeks apart — close enough to build on each other, far enough apart that each article lands on its own.",
+      "wavesLabel": "Waves",
+      "wavesOption": "{count} waves",
+      "spacingLabel": "Spacing",
+      "spacingOption": "{weeks} weeks apart",
+      "angleLabel": "Wave {n} — article angle",
+      "anglePlaceholder": "e.g. Why fleet downtime costs more than you think",
+      "angle": {
+        "problem": "The problem — why the status quo costs more than people think",
+        "proof": "The proof — a customer story or numbers that show it works",
+        "howto": "How it works — a practical guide readers can act on",
+        "comparison": "The comparison — how the options stack up, honestly"
+      },
+      "rationale": {
+        "default": "Three waves six weeks apart is the sweet spot for most B2B campaigns: enough repetition to build recall, enough spacing to keep each article fresh.",
+        "monthlyCycle": "Your plan includes monthly titles, so waves are spaced eight weeks apart — roughly every second issue.",
+        "weeklyCycle": "All your titles publish weekly, so waves can sit four weeks apart without wearing out.",
+        "launch": "This reads like a launch: four tighter waves build momentum around the date.",
+        "awareness": "Awareness builds slowly — waves are spaced a little wider so each article lands on its own."
+      },
+      "preview": "Wave {n}: from {date}",
+      "previewFirst": "Wave 1: this plan, as scheduled",
+      "start": "Create programme",
+      "starting": "Creating…",
+      "createdBanner": "Programme created — you're looking at wave 1. Switch between waves in the strip above the plan.",
+      "errorAlreadyInProgramme": "This plan is already part of a programme.",
+      "errorEmpty": "Add at least one title before starting a programme.",
+      "errorNotFound": "That plan couldn't be found.",
+      "stripTitle": "{name} — wave {n} of {of}",
+      "stripSpacing": "{weeks} weeks apart",
+      "waveChip": "Wave {n}",
+      "state": {
+        "draft": "Draft",
+        "sent": "Sent",
+        "quoted": "Quoted",
+        "booked": "Booked",
+        "live": "Live",
+        "done": "Done"
+      },
+      "thisWave": "This wave",
+      "openWave": "Open",
+      "noDate": "Date not set",
+      "angleEdit": "This wave's article angle",
+      "angleSave": "Save angle",
+      "angleHint": "The desk and writer start from this — keep it different from the other waves."
     }
   },
   "rfq": {
@@ -732,7 +784,7 @@
     "stageSent": "Sent",
     "stageQuoted": "Quoted",
     "stageApproved": "Approved",
-    "stageLive": "Live",
+    "stageLive": "Live / done",
     "metaPlanBuilt": "{items, plural, =1 {1 title} other {# titles}} · not sent yet · edited {age}",
     "metaCampaign": "{items, plural, =1 {1 title} other {# titles}} · sent {age} · {org}",
     "qualifierIndicative": "indicative",
@@ -748,7 +800,10 @@
     "actionReviewQuote": "Review quote",
     "actionSeePlacements": "See placements",
     "actionOpenReport": "Open report",
-    "actionView": "View"
+    "actionView": "View",
+    "waveNote": "Wave {n} of {of}",
+    "waveNoteDated": "Wave {n} of {of} · from {date}",
+    "waveDoneNote": "Wave {n} of {of} finished"
   },
   "desk": {
     "eyebrow": "Internal desk",
@@ -2710,6 +2765,12 @@
     "startHeading": "Start something",
     "startDescribe": "Describe a campaign",
     "startBrowse": "Browse the catalog",
-    "startRepeat": "Repeat a past campaign"
+    "startRepeat": "Plan your next wave",
+    "nextWaveTitle": "{name} — wave {n} of {of}",
+    "nextWaveBodyPreviousLive": "Wave {prev} is live. Send wave {n} now — a fresh article while readers still remember the last one.",
+    "nextWaveBodyPreviousDone": "Wave {prev} has finished. Send wave {n} to keep the story going.",
+    "nextWaveBodyDateNear": "Wave {n} is scheduled from {date}. Send it now so the desk has time to book it.",
+    "nextWaveAngle": "Angle: {angle}",
+    "openWave": "Open wave"
   }
 }

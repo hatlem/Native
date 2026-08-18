@@ -6605,3 +6605,254 @@ footer a:hover {
   gap: var(--s-3);
   margin-top: var(--s-3);
 }
+
+/* ---------- Campaign programme (multi-wave) on /plan ---------- */
+.plan-programme {
+  margin: 0 0 var(--s-5);
+  padding: var(--s-3) var(--s-4);
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  border-radius: var(--r-sm);
+}
+.plan-programme__summary {
+  display: flex;
+  align-items: center;
+  gap: var(--s-2);
+  cursor: pointer;
+  list-style: none;
+  font-weight: 600;
+  font-size: 0.9rem;
+  color: var(--heading);
+}
+.plan-programme__summary::-webkit-details-marker {
+  display: none;
+}
+.plan-programme__summary svg {
+  color: var(--accent);
+  flex: none;
+}
+.plan-programme__body {
+  margin-top: var(--s-3);
+  display: flex;
+  flex-direction: column;
+  gap: var(--s-3);
+}
+.plan-programme__why {
+  margin: 0;
+  max-width: 62ch;
+  color: var(--text);
+}
+.plan-programme__bullets {
+  margin: 0;
+  padding-left: 1.2em;
+  max-width: 62ch;
+  color: var(--muted-strong);
+  font-size: 0.9rem;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.plan-programme__form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--s-3);
+  padding-top: var(--s-3);
+  border-top: 1px solid var(--border);
+}
+.plan-programme__controls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--s-4);
+  align-items: flex-end;
+}
+.plan-programme__fieldset {
+  border: 0;
+  padding: 0;
+  margin: 0;
+  min-width: 0;
+}
+.plan-programme__fieldset legend,
+.plan-programme__spacing > span {
+  display: block;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--muted-strong);
+  margin-bottom: 6px;
+  padding: 0;
+}
+.plan-programme__segmented {
+  display: inline-flex;
+  border: 1px solid var(--border);
+  border-radius: var(--r-sm);
+  overflow: hidden;
+  background: var(--surface);
+}
+.plan-programme__seg {
+  padding: 6px 12px;
+  font-size: 0.9rem;
+  cursor: pointer;
+  border-right: 1px solid var(--border);
+  color: var(--muted-strong);
+}
+.plan-programme__seg:last-child {
+  border-right: 0;
+}
+.plan-programme__seg.is-active {
+  background: var(--accent-soft);
+  color: var(--accent-hover);
+  font-weight: 600;
+}
+.plan-programme__seg input {
+  position: absolute;
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+.plan-programme__seg:focus-within {
+  outline: 2px solid var(--accent);
+  outline-offset: -2px;
+}
+.plan-programme__spacing select {
+  min-width: 12rem;
+}
+.plan-programme__rationale {
+  margin: 0;
+  font-size: 0.9rem;
+  color: var(--muted-strong);
+  max-width: 62ch;
+}
+.plan-programme__waves {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: var(--s-2);
+}
+.plan-programme__wave {
+  display: grid;
+  gap: 4px;
+  padding: var(--s-2) var(--s-3);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--r-sm);
+}
+.plan-programme__wave-head {
+  display: flex;
+  gap: var(--s-2);
+  align-items: baseline;
+  flex-wrap: wrap;
+}
+.plan-programme__wave-num {
+  font-weight: 600;
+  font-size: 0.85rem;
+  color: var(--heading);
+}
+.plan-programme__angle input,
+.plan-programme__angle-row input {
+  width: 100%;
+}
+.plan-programme__form .btn {
+  align-self: flex-start;
+}
+
+/* Wave strip: the programme's waves once it exists */
+.plan-programme__strip-head {
+  display: flex;
+  align-items: center;
+  gap: var(--s-2);
+  flex-wrap: wrap;
+  margin-bottom: var(--s-3);
+}
+.plan-programme__strip-head svg {
+  color: var(--accent);
+  flex: none;
+}
+.wave-strip {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: var(--s-2);
+}
+.wave-strip__item form {
+  height: 100%;
+}
+.wave-strip__card {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 4px;
+  width: 100%;
+  height: 100%;
+  padding: var(--s-2) var(--s-3);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--r-sm);
+  text-align: left;
+  font: inherit;
+  color: inherit;
+}
+.wave-strip__card--btn {
+  cursor: pointer;
+  appearance: none;
+}
+.wave-strip__card--btn:hover {
+  border-color: var(--accent);
+}
+.wave-strip__item.is-current .wave-strip__card {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 2px var(--accent-soft);
+}
+.wave-strip__num {
+  font-weight: 600;
+  font-size: 0.85rem;
+  color: var(--heading);
+}
+.wave-strip__date {
+  font-size: 0.8rem;
+  color: var(--muted-strong);
+}
+.wave-strip__angle {
+  font-size: 0.8rem;
+  color: var(--text);
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+.wave-strip__you,
+.wave-strip__open {
+  margin-top: auto;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--accent-hover);
+}
+.wave-strip__state--draft { color: var(--muted-strong); background: var(--surface-2); }
+.wave-strip__state--sent,
+.wave-strip__state--quoted { color: var(--accent-hover); background: var(--accent-soft); }
+.wave-strip__state--booked,
+.wave-strip__state--live { color: var(--success); background: var(--success-soft); }
+.wave-strip__state--done { color: var(--muted-strong); background: var(--surface-2); text-decoration: none; }
+.plan-programme__angle-form {
+  margin-top: var(--s-3);
+  display: grid;
+  gap: 6px;
+}
+.plan-programme__angle-form label {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--muted-strong);
+}
+.plan-programme__angle-row {
+  display: flex;
+  gap: var(--s-2);
+}
+.plan-programme__angle-row input {
+  flex: 1;
+}
+@media (max-width: 640px) {
+  .plan-programme__angle-row {
+    flex-direction: column;
+  }
+}

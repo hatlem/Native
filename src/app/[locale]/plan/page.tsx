@@ -23,6 +23,9 @@ import { PlanTargeting } from "./_components/PlanTargeting";
 import { PlanLines, type PlanTitleLine } from "./_components/PlanLines";
 import { PlanSummary, type Rollup } from "./_components/PlanSummary";
 import { WhatHappensNext } from "./_components/WhatHappensNext";
+import { PlanProgramme } from "./_components/PlanProgramme";
+import { loadProgrammeForList, recommendCadence } from "@/lib/programme";
+import type { BookingUnit } from "@/lib/campaign-schedule";
 
 const MARKET_CODES = Object.values(MarketCode);
 
@@ -266,6 +269,19 @@ export default async function PlanPage({
       })
     : 0;
 
+  // Programme panel inputs: the wave strip when this list is a wave, else the
+  // recommended cadence for the titles on it (booking units + goal drive the
+  // rules) and wave 1's anchor = the earliest scheduled line.
+  const programmeView = activeList ? await loadProgrammeForList(activeList.id) : null;
+  const bookingUnits = lines.map((l) => l.product.bookingUnit as BookingUnit);
+  const cadence = recommendCadence({ goal: activeList?.goal ?? null, bookingUnits });
+  let firstStart: Date | null = null;
+  for (const l of lines) {
+    if (l.scheduleStart && (!firstStart || l.scheduleStart < firstStart)) firstStart = l.scheduleStart;
+  }
+  // The grid the preview snaps to: MONTH if any monthly title (the coarser grid wins).
+  const previewUnit: BookingUnit = bookingUnits.includes("MONTH") ? "MONTH" : "WEEK";
+
   const placementCount = lines.length + titleLines.length;
   const hasLines = placementCount > 0;
   const lastEdited = activeList ? timeAgo(activeList.updatedAt, locale) : "";
@@ -288,6 +304,7 @@ export default async function PlanPage({
         locale={locale}
         error={needsWorkspace ? undefined : sp.error}
         duplicate={sp.duplicate}
+        programme={sp.programme}
       />
 
       {needsWorkspace ? (
@@ -349,6 +366,16 @@ export default async function PlanPage({
             verticalOptions={verticalOptions}
             selected={targetVerticals}
           />
+          {activeList ? (
+            <PlanProgramme
+              locale={locale}
+              listId={activeList.id}
+              view={programmeView}
+              cadence={cadence}
+              firstStart={firstStart}
+              unit={previewUnit}
+            />
+          ) : null}
           <div className="split">
             <div>
               <PlanLines

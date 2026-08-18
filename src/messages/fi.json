@@ -75,7 +75,7 @@
     "newOrderCta": "Uusi tilaus",
     "orderDetailLead": "Tuotantotila, toimitukset ja live-sijoittelut jokaiselle riville tässä tilauksessa.",
     "linesEyebrow": "Tilausrivit",
-    "useAsTemplate": "Käytä mallina",
+    "useAsTemplate": "Suunnittele seuraava kierros",
     "duplicating": "Monistetaan…",
     "draftReviewHeading": "Luonnos valmis tarkistettavaksi",
     "draftReviewOpenFile": "Avaa luonnos",
@@ -645,7 +645,59 @@
       "item3Body": "Luonnokset lähetetään sinulle hyväksyttäväksi. Linkit ja tulokset löytyvät Raporteista."
     },
     "mobileBackToTitles": "Julkaisut",
-    "mobileEdit": "Muokkaa"
+    "mobileEdit": "Muokkaa",
+    "programme": {
+      "summary": "Aja tämä ohjelmana",
+      "summaryHint": "{waves} kierrosta, {weeks} viikon välein – suositus",
+      "why": "Yksi artikkeli luetaan kerran. Ohjelma tuo tarinanne samojen lukijoiden eteen useita kertoja, joka kerta uudesta näkökulmasta – juuri se siirtää heidät ”olen nähnyt” -tilasta ”luotan tähän” -tilaan.",
+      "bullet1": "Pidä samat ydinjulkaisut mukana kaikilla kierroksilla, jotta lukijat kohtaavat teidät uudelleen – toisto rakentaa tunnistettavuutta. Lisää joka kierrokselle yksi tai kaksi uutta julkaisua tavoittavuuden vuoksi.",
+      "bullet2": "Kirjoita jokaiselle kierrokselle uusi artikkeli. Sama tarina, uusi näkökulma: ensin ongelma, sitten todiste, sitten miten se toimii.",
+      "bullet3": "Jätä kierrosten väliin 4–8 viikkoa – tarpeeksi lähelle, jotta ne rakentuvat toistensa päälle, tarpeeksi kauas, jotta jokainen artikkeli saa oman tilansa.",
+      "wavesLabel": "Kierrokset",
+      "wavesOption": "{count} kierrosta",
+      "spacingLabel": "Väli",
+      "spacingOption": "{weeks} viikon välein",
+      "angleLabel": "Kierros {n} – artikkelin näkökulma",
+      "anglePlaceholder": "esim. Miksi kaluston seisokit maksavat enemmän kuin luulet",
+      "angle": {
+        "problem": "Ongelma – miksi nykytila maksaa enemmän kuin ihmiset luulevat",
+        "proof": "Todiste – asiakastarina tai luvut, jotka osoittavat, että se toimii",
+        "howto": "Näin se toimii – käytännön opas, jonka pohjalta lukija voi toimia",
+        "comparison": "Vertailu – miten vaihtoehdot pärjäävät, rehellisesti kerrottuna"
+      },
+      "rationale": {
+        "default": "Kolme kierrosta kuuden viikon välein osuu useimmille B2B-kampanjoille: tarpeeksi toistoa tunnistettavuuteen, tarpeeksi väliä, jotta jokainen artikkeli tuntuu tuoreelta.",
+        "monthlyCycle": "Suunnitelmassa on kuukausijulkaisuja, joten kierrokset ovat kahdeksan viikon välein – noin joka toinen numero.",
+        "weeklyCycle": "Kaikki julkaisunne ilmestyvät viikoittain, joten kierrokset voivat olla neljän viikon välein kulumatta.",
+        "launch": "Tämä näyttää lanseeraukselta: neljä tiheämpää kierrosta rakentaa vauhtia päivämäärän ympärille.",
+        "awareness": "Tunnettuus rakentuu hitaasti – kierrokset ovat hieman harvemmassa, jotta jokainen artikkeli saa laskeutua omillaan."
+      },
+      "preview": "Kierros {n}: alkaen {date}",
+      "previewFirst": "Kierros 1: tämä suunnitelma aikataulun mukaan",
+      "start": "Luo ohjelma",
+      "starting": "Luodaan…",
+      "createdBanner": "Ohjelma luotu – katsot kierrosta 1. Vaihda kierrosten välillä suunnitelman yläpuolella olevasta nauhasta.",
+      "errorAlreadyInProgramme": "Tämä suunnitelma on jo osa ohjelmaa.",
+      "errorEmpty": "Lisää vähintään yksi julkaisu ennen ohjelman aloittamista.",
+      "errorNotFound": "Suunnitelmaa ei löytynyt.",
+      "stripTitle": "{name} – kierros {n}/{of}",
+      "stripSpacing": "{weeks} viikon välein",
+      "waveChip": "Kierros {n}",
+      "state": {
+        "draft": "Luonnos",
+        "sent": "Lähetetty",
+        "quoted": "Tarjous",
+        "booked": "Varattu",
+        "live": "Live",
+        "done": "Valmis"
+      },
+      "thisWave": "Tämä kierros",
+      "openWave": "Avaa",
+      "noDate": "Päivää ei asetettu",
+      "angleEdit": "Tämän kierroksen artikkelin näkökulma",
+      "angleSave": "Tallenna näkökulma",
+      "angleHint": "Deski ja kirjoittaja lähtevät tästä – pidä se erilaisena kuin muilla kierroksilla."
+    }
   },
   "rfq": {
     "org": "Yritys",
@@ -732,7 +784,7 @@
     "stageSent": "Lähetetty",
     "stageQuoted": "Tarjottu",
     "stageApproved": "Hyväksytty",
-    "stageLive": "Live",
+    "stageLive": "Live / valmis",
     "metaPlanBuilt": "{items, plural, =1 {1 julkaisu} other {# julkaisua}} · ei vielä lähetetty · muokattu {age}",
     "metaCampaign": "{items, plural, =1 {1 julkaisu} other {# julkaisua}} · lähetetty {age} · {org}",
     "qualifierIndicative": "suuntaa-antava",
@@ -748,7 +800,10 @@
     "actionReviewQuote": "Tarkista tarjous",
     "actionSeePlacements": "Katso sijoittelut",
     "actionOpenReport": "Avaa raportti",
-    "actionView": "Näytä"
+    "actionView": "Näytä",
+    "waveNote": "Kierros {n}/{of}",
+    "waveNoteDated": "Kierros {n}/{of} · alkaen {date}",
+    "waveDoneNote": "Kierros {n}/{of} valmis"
   },
   "desk": {
     "eyebrow": "Sisäinen desk",
@@ -2711,6 +2766,12 @@
     "startHeading": "Aloita jotain",
     "startDescribe": "Kuvaile kampanja",
     "startBrowse": "Selaa katalogia",
-    "startRepeat": "Toista aiempi kampanja"
+    "startRepeat": "Suunnittele seuraava kierros",
+    "nextWaveTitle": "{name} – kierros {n}/{of}",
+    "nextWaveBodyPreviousLive": "Kierros {prev} on livenä. Lähetä kierros {n} nyt – uusi artikkeli, kun lukijat vielä muistavat edellisen.",
+    "nextWaveBodyPreviousDone": "Kierros {prev} on valmis. Lähetä kierros {n}, jotta tarina jatkuu.",
+    "nextWaveBodyDateNear": "Kierros {n} on aikataulutettu alkamaan {date}. Lähetä se nyt, jotta deski ehtii varata.",
+    "nextWaveAngle": "Näkökulma: {angle}",
+    "openWave": "Avaa kierros"
   }
 }

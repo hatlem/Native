@@ -75,7 +75,7 @@
     "newOrderCta": "Neue Bestellung",
     "orderDetailLead": "Produktionsstatus, Lieferung und Live-Platzierungen für jede Position dieser Bestellung.",
     "linesEyebrow": "Bestellpositionen",
-    "useAsTemplate": "Als Vorlage verwenden",
+    "useAsTemplate": "Nächste Welle planen",
     "duplicating": "Wird dupliziert…",
     "draftReviewHeading": "Entwurf bereit zur Durchsicht",
     "draftReviewOpenFile": "Entwurf öffnen",
@@ -645,7 +645,59 @@
       "item3Body": "Entwürfe gehen zur Freigabe an dich. Live-Links und Ergebnisse landen in den Berichten."
     },
     "mobileBackToTitles": "Titel",
-    "mobileEdit": "Bearbeiten"
+    "mobileEdit": "Bearbeiten",
+    "programme": {
+      "summary": "Als Programm ausspielen",
+      "summaryHint": "{waves} Wellen, {weeks} Wochen Abstand – empfohlen",
+      "why": "Ein Artikel wird einmal gelesen. Ein Programm bringt Ihre Geschichte mehrfach vor dieselben Leser, jedes Mal aus einem neuen Blickwinkel – genau das führt von „schon gesehen“ zu „dem vertraue ich“.",
+      "bullet1": "Behalten Sie dieselben Kerntitel über alle Wellen, damit Leser Ihnen wieder begegnen – Wiederholung schafft Erinnerung. Ergänzen Sie pro Welle ein bis zwei neue Titel für Reichweite.",
+      "bullet2": "Schreiben Sie für jede Welle einen neuen Artikel. Gleiche Geschichte, neuer Blickwinkel: erst das Problem, dann der Beleg, dann wie es funktioniert.",
+      "bullet3": "Lassen Sie 4–8 Wochen zwischen den Wellen – nah genug, um aufeinander aufzubauen, weit genug, damit jeder Artikel für sich wirkt.",
+      "wavesLabel": "Wellen",
+      "wavesOption": "{count} Wellen",
+      "spacingLabel": "Abstand",
+      "spacingOption": "{weeks} Wochen Abstand",
+      "angleLabel": "Welle {n} – Blickwinkel des Artikels",
+      "anglePlaceholder": "z. B. Warum Stillstand in der Flotte mehr kostet, als Sie denken",
+      "angle": {
+        "problem": "Das Problem – warum der Status quo mehr kostet, als man denkt",
+        "proof": "Der Beleg – eine Kundengeschichte oder Zahlen, die zeigen, dass es funktioniert",
+        "howto": "So funktioniert es – ein praktischer Leitfaden, nach dem Leser handeln können",
+        "comparison": "Der Vergleich – wie die Optionen abschneiden, ehrlich erzählt"
+      },
+      "rationale": {
+        "default": "Drei Wellen im Abstand von sechs Wochen sind für die meisten B2B-Kampagnen ideal: genug Wiederholung für Erinnerung, genug Abstand, damit jeder Artikel frisch wirkt.",
+        "monthlyCycle": "Ihr Plan enthält Monatstitel, deshalb liegen die Wellen acht Wochen auseinander – etwa jede zweite Ausgabe.",
+        "weeklyCycle": "Alle Ihre Titel erscheinen wöchentlich, deshalb können die Wellen vier Wochen auseinanderliegen, ohne sich abzunutzen.",
+        "launch": "Das klingt nach einem Launch: vier dichtere Wellen bauen Schwung rund um den Termin auf.",
+        "awareness": "Bekanntheit wächst langsam – die Wellen liegen etwas weiter auseinander, damit jeder Artikel für sich landet."
+      },
+      "preview": "Welle {n}: ab {date}",
+      "previewFirst": "Welle 1: dieser Plan, wie terminiert",
+      "start": "Programm anlegen",
+      "starting": "Wird angelegt…",
+      "createdBanner": "Programm angelegt – Sie sehen Welle 1. Wechseln Sie zwischen den Wellen in der Leiste über dem Plan.",
+      "errorAlreadyInProgramme": "Dieser Plan ist bereits Teil eines Programms.",
+      "errorEmpty": "Fügen Sie mindestens einen Titel hinzu, bevor Sie ein Programm starten.",
+      "errorNotFound": "Der Plan wurde nicht gefunden.",
+      "stripTitle": "{name} – Welle {n} von {of}",
+      "stripSpacing": "{weeks} Wochen Abstand",
+      "waveChip": "Welle {n}",
+      "state": {
+        "draft": "Entwurf",
+        "sent": "Gesendet",
+        "quoted": "Angebot",
+        "booked": "Gebucht",
+        "live": "Live",
+        "done": "Abgeschlossen"
+      },
+      "thisWave": "Diese Welle",
+      "openWave": "Öffnen",
+      "noDate": "Kein Datum",
+      "angleEdit": "Blickwinkel des Artikels für diese Welle",
+      "angleSave": "Blickwinkel speichern",
+      "angleHint": "Desk und Autor starten hiervon – halten Sie ihn anders als in den übrigen Wellen."
+    }
   },
   "rfq": {
     "org": "Firma",
@@ -732,7 +784,7 @@
     "stageSent": "Gesendet",
     "stageQuoted": "Angebot erhalten",
     "stageApproved": "Freigegeben",
-    "stageLive": "Live",
+    "stageLive": "Live / abgeschlossen",
     "metaPlanBuilt": "{items, plural, =1 {1 Titel} other {# Titel}} · noch nicht gesendet · bearbeitet {age}",
     "metaCampaign": "{items, plural, =1 {1 Titel} other {# Titel}} · gesendet {age} · {org}",
     "qualifierIndicative": "Richtwert",
@@ -748,7 +800,10 @@
     "actionReviewQuote": "Angebot prüfen",
     "actionSeePlacements": "Platzierungen ansehen",
     "actionOpenReport": "Bericht öffnen",
-    "actionView": "Ansehen"
+    "actionView": "Ansehen",
+    "waveNote": "Welle {n} von {of}",
+    "waveNoteDated": "Welle {n} von {of} · ab {date}",
+    "waveDoneNote": "Welle {n} von {of} abgeschlossen"
   },
   "desk": {
     "eyebrow": "Interner Desk",
@@ -2580,6 +2635,12 @@
     "startHeading": "Etwas starten",
     "startDescribe": "Kampagne beschreiben",
     "startBrowse": "Katalog durchsuchen",
-    "startRepeat": "Vergangene Kampagne wiederholen"
+    "startRepeat": "Nächste Welle planen",
+    "nextWaveTitle": "{name} – Welle {n} von {of}",
+    "nextWaveBodyPreviousLive": "Welle {prev} ist live. Senden Sie Welle {n} jetzt – ein neuer Artikel, solange die Leser den letzten noch im Kopf haben.",
+    "nextWaveBodyPreviousDone": "Welle {prev} ist abgeschlossen. Senden Sie Welle {n}, damit die Geschichte weitergeht.",
+    "nextWaveBodyDateNear": "Welle {n} ist ab {date} geplant. Senden Sie sie jetzt, damit der Desk Zeit zum Buchen hat.",
+    "nextWaveAngle": "Blickwinkel: {angle}",
+    "openWave": "Welle öffnen"
   }
 }

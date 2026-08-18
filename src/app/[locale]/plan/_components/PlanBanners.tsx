@@ -6,10 +6,12 @@ export async function PlanBanners({
   locale,
   error,
   duplicate,
+  programme,
 }: {
   locale: string;
   error: string | string[] | undefined;
   duplicate: string | string[] | undefined;
+  programme?: string | string[] | undefined;
 }) {
   const t = await getTranslations({ locale, namespace: "plan" });
 
@@ -28,8 +30,25 @@ export async function PlanBanners({
   const errorCode = Array.isArray(error) ? error[0] : error;
   const errorKey = errorCode ? (ERROR_KEYS[errorCode] ?? "error") : null;
 
+  // startProgramme outcomes: created, or one of ProgrammeError's codes.
+  const PROGRAMME_ERROR_KEYS: Record<string, string> = {
+    "already-in-programme": "programme.errorAlreadyInProgramme",
+    empty: "programme.errorEmpty",
+    "not-found": "programme.errorNotFound",
+  };
+  const programmeCode = Array.isArray(programme) ? programme[0] : programme;
+
   return (
     <>
+      {programmeCode === "created" ? (
+        <div className="banner-info" role="status">
+          <span>{t("programme.createdBanner")}</span>
+        </div>
+      ) : programmeCode && PROGRAMME_ERROR_KEYS[programmeCode] ? (
+        <div className="banner-error" role="alert">
+          <span>{t(PROGRAMME_ERROR_KEYS[programmeCode])}</span>
+        </div>
+      ) : null}
       {errorKey ? (
         <div className="banner-error" role="alert">
           <span>{t(errorKey)}</span>

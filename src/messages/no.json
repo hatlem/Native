@@ -558,7 +558,59 @@
       "item3Body": "Utkast sendes til deg for godkjenning. Lenker og resultater havner i Rapporter."
     },
     "mobileBackToTitles": "Titler",
-    "mobileEdit": "Rediger"
+    "mobileEdit": "Rediger",
+    "programme": {
+      "summary": "Kjør dette som et program",
+      "summaryHint": "{waves} runder, {weeks} uker mellom – anbefalt",
+      "why": "Én artikkel blir lest én gang. Et program setter historien din foran de samme leserne flere ganger, hver gang fra en ny vinkel – det er det som flytter dem fra «har sett det» til «stoler på det».",
+      "bullet1": "Behold de samme kjernetitlene gjennom rundene, så leserne møter dere igjen – gjentakelse bygger gjenkjennelse. Legg til én–to nye titler per runde for rekkevidde.",
+      "bullet2": "Skriv en ny artikkel til hver runde. Samme historie, ny vinkel: først problemet, så beviset, så hvordan det fungerer.",
+      "bullet3": "La det gå 4–8 uker mellom rundene – tett nok til å bygge på hverandre, langt nok til at hver artikkel får stå på egne bein.",
+      "wavesLabel": "Runder",
+      "wavesOption": "{count} runder",
+      "spacingLabel": "Avstand",
+      "spacingOption": "{weeks} uker mellom",
+      "angleLabel": "Runde {n} – artikkelvinkel",
+      "anglePlaceholder": "f.eks. Hvorfor stillstand i flåten koster mer enn du tror",
+      "angle": {
+        "problem": "Problemet – hvorfor dagens løsning koster mer enn folk tror",
+        "proof": "Beviset – en kundehistorie eller tall som viser at det virker",
+        "howto": "Slik fungerer det – en praktisk guide leserne kan handle på",
+        "comparison": "Sammenligningen – hvordan alternativene står seg, ærlig fortalt"
+      },
+      "rationale": {
+        "default": "Tre runder med seks ukers mellomrom treffer best for de fleste B2B-kampanjer: nok gjentakelse til å bygge gjenkjennelse, nok avstand til at hver artikkel føles ny.",
+        "monthlyCycle": "Planen inneholder månedstitler, så rundene ligger åtte uker fra hverandre – omtrent annenhver utgave.",
+        "weeklyCycle": "Alle titlene dine kommer ut ukentlig, så rundene kan ligge fire uker fra hverandre uten å slite seg ut.",
+        "launch": "Dette ser ut som en lansering: fire tettere runder bygger fart rundt datoen.",
+        "awareness": "Kjennskap bygges sakte – rundene ligger litt lenger fra hverandre så hver artikkel får lande for seg selv."
+      },
+      "preview": "Runde {n}: fra {date}",
+      "previewFirst": "Runde 1: denne planen, som planlagt",
+      "start": "Opprett program",
+      "starting": "Oppretter…",
+      "createdBanner": "Programmet er opprettet – du ser på runde 1. Bytt mellom rundene i stripen over planen.",
+      "errorAlreadyInProgramme": "Denne planen er allerede del av et program.",
+      "errorEmpty": "Legg til minst én tittel før du starter et program.",
+      "errorNotFound": "Fant ikke planen.",
+      "stripTitle": "{name} – runde {n} av {of}",
+      "stripSpacing": "{weeks} uker mellom",
+      "waveChip": "Runde {n}",
+      "state": {
+        "draft": "Utkast",
+        "sent": "Sendt",
+        "quoted": "Tilbud",
+        "booked": "Booket",
+        "live": "Live",
+        "done": "Ferdig"
+      },
+      "thisWave": "Denne runden",
+      "openWave": "Åpne",
+      "noDate": "Dato ikke satt",
+      "angleEdit": "Artikkelvinkel for denne runden",
+      "angleSave": "Lagre vinkel",
+      "angleHint": "Desken og skribenten starter herfra – hold den ulik de andre rundene."
+    }
   },
   "rfq": {
     "org": "Selskap",
@@ -645,7 +697,7 @@
     "stageSent": "Sendt",
     "stageQuoted": "Tilbud gitt",
     "stageApproved": "Godkjent",
-    "stageLive": "Live",
+    "stageLive": "Live / ferdig",
     "metaPlanBuilt": "{items, plural, =1 {1 tittel} other {# titler}} · ikke sendt ennå · redigert {age}",
     "metaCampaign": "{items, plural, =1 {1 tittel} other {# titler}} · sendt {age} · {org}",
     "qualifierIndicative": "veiledende",
@@ -661,7 +713,10 @@
     "actionReviewQuote": "Se tilbudet",
     "actionSeePlacements": "Se plasseringer",
     "actionOpenReport": "Åpne rapport",
-    "actionView": "Se"
+    "actionView": "Se",
+    "waveNote": "Runde {n} av {of}",
+    "waveNoteDated": "Runde {n} av {of} · fra {date}",
+    "waveDoneNote": "Runde {n} av {of} ferdig"
   },
   "desk": {
     "eyebrow": "Internt desk",
@@ -1198,7 +1253,7 @@
     "newOrderCta": "Ny bestilling",
     "orderDetailLead": "Produksjonsstatus, leveranser og live-plasseringer for hver linje i denne bestillingen.",
     "linesEyebrow": "Bestillingslinjer",
-    "useAsTemplate": "Bruk som mal",
+    "useAsTemplate": "Planlegg neste runde",
     "duplicating": "Dupliserer…",
     "draftReviewHeading": "Utkast klart for gjennomsyn",
     "draftReviewOpenFile": "Åpne utkastet",
@@ -2711,6 +2766,12 @@
     "startHeading": "Start noe",
     "startDescribe": "Beskriv en kampanje",
     "startBrowse": "Bla gjennom katalogen",
-    "startRepeat": "Gjenta en tidligere kampanje"
+    "startRepeat": "Planlegg neste runde",
+    "nextWaveTitle": "{name} – runde {n} av {of}",
+    "nextWaveBodyPreviousLive": "Runde {prev} er live. Send runde {n} nå – en ny artikkel mens leserne fortsatt husker den forrige.",
+    "nextWaveBodyPreviousDone": "Runde {prev} er ferdig. Send runde {n} for å holde historien i gang.",
+    "nextWaveBodyDateNear": "Runde {n} er planlagt fra {date}. Send den nå så desken rekker å booke.",
+    "nextWaveAngle": "Vinkel: {angle}",
+    "openWave": "Åpne runden"
   }
 }
