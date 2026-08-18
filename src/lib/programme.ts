@@ -161,6 +161,9 @@ export async function copyListForNewWave(
     programmeId?: string;
     waveNumber?: number;
     articleAngle?: string | null;
+    // Drop line schedules instead of shifting them — for a copy of a
+    // finished campaign whose dates are all in the past.
+    resetSchedule?: boolean;
     createdById: string | null;
   },
   tx: Prisma.TransactionClient,
@@ -191,11 +194,12 @@ export async function copyListForNewWave(
           authorshipMode: i.authorshipMode,
           notes: i.notes,
           sortOrder: i.sortOrder,
-          scheduleStart:
-            i.scheduleStart && opts.shiftWeeks > 0
+          scheduleStart: opts.resetSchedule
+            ? null
+            : i.scheduleStart && opts.shiftWeeks > 0
               ? shiftScheduleStart(i.scheduleStart, opts.shiftWeeks, i.product?.bookingUnit ?? "MONTH")
               : i.scheduleStart,
-          scheduleUnits: i.scheduleUnits,
+          scheduleUnits: opts.resetSchedule ? null : i.scheduleUnits,
         })),
       },
     },
