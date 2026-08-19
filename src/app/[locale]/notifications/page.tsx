@@ -2,7 +2,6 @@ import { getTranslations } from "next-intl/server";
 import { redirect } from "next/navigation";
 import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
-import { Link } from "@/i18n/navigation";
 import { safeExternalUrl } from "@/lib/security";
 import { EmptyState } from "@/app/empty-state";
 import { markAllRead } from "@/app/notification-actions";
@@ -73,6 +72,14 @@ export default async function NotificationsPage({
             // Defence-in-depth: any pre-existing publisher-controlled URLs
             // (e.g. liveUrl) saved before the write-side sanitiser would
             // otherwise reach the buyer's <a href>.
+            // Plain <a>, not next-intl's <Link>: n.link is a stored,
+            // already-complete path (e.g. "/no/plan/open?list=x") built by
+            // the notice's own locale (an org's home-market language, not
+            // whatever locale the viewer's UI happens to be in right now).
+            // next-intl's <Link> always prepends the CURRENT locale to any
+            // local href it's given, with no awareness a href might already
+            // carry one — that both double-prefixes the URL (404) and would
+            // silently override the notice's intended language.
             const safeLink = safeExternalUrl(n.link);
             const inner = (
               <>
@@ -95,13 +102,13 @@ export default async function NotificationsPage({
               </>
             );
             return safeLink ? (
-              <Link
+              <a
                 key={n.id}
                 href={safeLink}
                 className={`item ${n.readAt ? "item-read" : ""}`}
               >
                 {inner}
-              </Link>
+              </a>
             ) : (
               <div
                 key={n.id}
