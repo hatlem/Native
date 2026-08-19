@@ -65,7 +65,7 @@
     "disposable-email-domains": "^1.0.62",
     "free-email-domains": "^1.9.17",
     "lucide-react": "^1.31.0",
-    "next": "^15.5.21",
+    "next": "^16.3.1",
     "next-auth": "5.0.0-beta.32",
     "next-intl": "^4.12.0",
     "pdf-parse": "^2.4.5",
