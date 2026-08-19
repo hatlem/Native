@@ -606,9 +606,11 @@
       "thisWave": "Denne runde",
       "openWave": "Åbn",
       "noDate": "Dato ikke sat",
-      "angleEdit": "Artikelvinkel for denne runde",
-      "angleSave": "Gem vinkel",
       "angleHint": "Desken og skribenten starter herfra – hold den forskellig fra de andre runder.",
+      "viewArticle": "Åbn artikel",
+      "unlinkArticle": "Fjern kobling",
+      "noArticleYet": "Ingen artikel koblet til denne runde endnu.",
+      "createArticleForWave": "Opret artikel",
       "autoSendLabel": "Send hver runde automatisk, når tiden er inde",
       "autoSendHint": "Hver runde går til desken som en almindelig anmodning, når datoen nærmer sig – du godkender stadig tilbuddet, før noget bookes eller opkræves.",
       "waveTotal": "≈ {amount}",
@@ -1078,7 +1080,8 @@
     "vetoSubmit": "Bekræft afvisning",
     "vetoSubmitting": "Bekræfter…",
     "vetoError": "Afvisning afvist",
-    "retractedLabel": "Tilbagekaldt"
+    "retractedLabel": "Tilbagekaldt",
+    "vetoSharedWarning": "Denne artikel kører også på {count} andre placering(er) — de påvirkes ikke af denne tilbagetrækning."
   },
   "invoice": {
     "title": "Faktura",
@@ -1405,7 +1408,10 @@
     "linkHint": "Denne artikel er ikke koblet til en placering endnu.",
     "linkEmpty": "Ingen ledige placeringer i din organisation.",
     "linkCta": "Kobl til",
-    "linkedTo": "Koblet til"
+    "placementRetracted": "Trukket tilbage",
+    "unlinkCta": "Fjern kobling",
+    "sharedArticleWarning": "Denne artikel er koblet til {count} andre placeringer — dine ændringer påvirker dem alle.",
+    "specNotChecked": "ikke tjekket"
   },
   "marketing": {
     "howCta": "Sådan virker det",

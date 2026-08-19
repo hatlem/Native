@@ -109,7 +109,7 @@ export default async function ArticleDetailPage({
                   {p.label}
                 </a>
                 {p.retractedAt ? (
-                  <span className="badge badge-error dotless">{t("placementRetracted")}</span>
+                  <span className="badge badge-danger dotless">{t("placementRetracted")}</span>
                 ) : null}
                 <form action={unlinkArticleFromOrderLine}>
                   <input type="hidden" name="locale" value={locale} />
@@ -155,7 +155,7 @@ export default async function ArticleDetailPage({
                   {p.specPassed === true
                     ? ` ${t("detailSpecPassed")}`
                     : p.specPassed === false
-                      ? ` ${t("detailSpecFailed")}`
+                      ? ` ${t("detailSpecFailed")}${p.specNotes ? `: ${p.specNotes}` : ""}`
                       : ` ${t("specNotChecked")}`}
                 </span>
                 <form action={runSpecCheck}>
