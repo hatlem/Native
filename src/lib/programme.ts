@@ -8,7 +8,8 @@
 import type { Prisma } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
 import { deriveStage } from "@/lib/campaign-stage";
-import { clampCadence, shiftScheduleStart } from "@/lib/programme-cadence";
+import { clampCadence, currentPeriodStart, shiftScheduleStart } from "@/lib/programme-cadence";
+import type { BookingUnit } from "@/lib/campaign-schedule";
 
 export * from "@/lib/programme-cadence";
 
@@ -31,6 +32,30 @@ const WAVE_SOURCE_INCLUDE = {
 export type WaveSourceList = Prisma.SavedListGetPayload<{ include: typeof WAVE_SOURCE_INCLUDE }>;
 
 /**
+ * The scheduleStart a copied line gets. A scheduled source line keeps its date
+ * shifted onto the wave's slot. An UNSCHEDULED line falls back to the wave's
+ * anchor — the current period at creation time shifted by the wave's offset —
+ * exactly what planWaveDates previews on the /plan form ("Wave k: from …").
+ * Without the fallback, waves born from an unscheduled plan had no dates at
+ * all ("Date not set"), so findDueWaves' date-near nudge could never fire.
+ * scheduleUnits deliberately stays null: the publisher's minimum run applies
+ * downstream, same as any other unscheduled-length line.
+ */
+function copiedScheduleStart(
+  item: { scheduleStart: Date | null; product: { bookingUnit: BookingUnit } | null },
+  opts: { shiftWeeks: number; resetSchedule?: boolean; anchorNow?: Date },
+): Date | null {
+  if (opts.resetSchedule) return null;
+  const unit = item.product?.bookingUnit ?? "MONTH";
+  if (item.scheduleStart) {
+    return opts.shiftWeeks > 0 ? shiftScheduleStart(item.scheduleStart, opts.shiftWeeks, unit) : item.scheduleStart;
+  }
+  if (!opts.anchorNow) return null;
+  const first = currentPeriodStart(unit, opts.anchorNow);
+  return opts.shiftWeeks > 0 ? shiftScheduleStart(first, opts.shiftWeeks, unit) : first;
+}
+
+/**
  * Copy a list into a new one — everything the buyer set (budget, currency,
  * goal, targeting, targetVerticals, note) and every item incl. content mode,
  * notes, sort order — with each scheduled item shifted forward by
@@ -48,6 +73,9 @@ export async function copyListForNewWave(
     // Drop line schedules instead of shifting them — for a copy of a
     // finished campaign whose dates are all in the past.
     resetSchedule?: boolean;
+    // When set, unscheduled source lines get the wave anchor implied by this
+    // "now" instead of staying dateless (see copiedScheduleStart).
+    anchorNow?: Date;
     createdById: string | null;
   },
   tx: Prisma.TransactionClient,
@@ -78,11 +106,7 @@ export async function copyListForNewWave(
           authorshipMode: i.authorshipMode,
           notes: i.notes,
           sortOrder: i.sortOrder,
-          scheduleStart: opts.resetSchedule
-            ? null
-            : i.scheduleStart && opts.shiftWeeks > 0
-              ? shiftScheduleStart(i.scheduleStart, opts.shiftWeeks, i.product?.bookingUnit ?? "MONTH")
-              : i.scheduleStart,
+          scheduleStart: copiedScheduleStart(i, opts),
           scheduleUnits: opts.resetSchedule ? null : i.scheduleUnits,
         })),
       },
@@ -105,8 +129,14 @@ export async function createProgramme(input: {
   spacingWeeks: number;
   angles: Array<string | null>;
   rationaleKey: string | null;
+  // Opt-in auto-send: the sweep submits each due wave as a normal RFQ.
+  autoSend?: boolean;
+  // Injectable "today" so wave anchors are deterministic in tests; the wave
+  // dates persisted here must match what planWaveDates previewed on /plan.
+  now?: Date;
 }): Promise<{ programmeId: string; waveListIds: string[] }> {
   const { waves, spacingWeeks } = clampCadence(input.waves, input.spacingWeeks);
+  const now = input.now ?? new Date();
   const source = await prisma.savedList.findUnique({
     where: { id: input.sourceListId },
     include: WAVE_SOURCE_INCLUDE,
@@ -131,6 +161,7 @@ export async function createProgramme(input: {
         plannedWaves: waves,
         spacingWeeks,
         rationaleKey: input.rationaleKey,
+        autoSendEnabled: input.autoSend ?? false,
         createdById: input.userId,
       },
       select: { id: true },
@@ -155,6 +186,7 @@ export async function createProgramme(input: {
             programmeId: programme.id,
             waveNumber: k,
             articleAngle: angle(k - 1),
+            anchorNow: now,
             createdById: input.userId,
           },
           tx,
@@ -169,6 +201,7 @@ export type WaveState = "draft" | "sent" | "quoted" | "booked" | "live" | "done"
 
 export type ProgrammeView = {
   id: string;
+  organizationId: string;
   name: string;
   plannedWaves: number;
   spacingWeeks: number;
@@ -229,11 +262,19 @@ function earliestStart(items: Array<{ scheduleStart: Date | null }>): Date | nul
 }
 
 function toView(
-  p: { id: string; name: string; plannedWaves: number; spacingWeeks: number; rationaleKey: string | null },
+  p: {
+    id: string;
+    organizationId: string;
+    name: string;
+    plannedWaves: number;
+    spacingWeeks: number;
+    rationaleKey: string | null;
+  },
   waves: WaveRow[],
 ): ProgrammeView {
   return {
     id: p.id,
+    organizationId: p.organizationId,
     name: p.name,
     plannedWaves: p.plannedWaves,
     spacingWeeks: p.spacingWeeks,
@@ -266,6 +307,7 @@ export async function loadProgrammeForList(listId: string): Promise<ProgrammeVie
 export type DueWave = {
   listId: string;
   programmeId: string;
+  organizationId: string;
   programmeName: string;
   waveNumber: number;
   plannedWaves: number;
@@ -277,44 +319,65 @@ export type DueWave = {
 const DUE_HORIZON_DAYS = 21;
 
 /**
+ * Pure due filter over one programme view: the first draft wave (never wave 1)
+ * whose previous wave is live/finished, or whose own start is within the
+ * three-week horizon. At most one wave per programme — the next one only —
+ * so the buyer gets a single nudge, and the auto-send sweep sends a single
+ * wave per programme per run.
+ */
+export function dueWaveFromView(view: ProgrammeView, now: Date): DueWave | null {
+  const horizon = new Date(now.getTime() + DUE_HORIZON_DAYS * 86_400_000);
+  for (let i = 1; i < view.waves.length; i++) {
+    const w = view.waves[i];
+    if (w.state !== "draft") continue;
+    const prev = view.waves[i - 1];
+    let reason: DueWave["reason"] | null = null;
+    if (prev.state === "done") reason = "previous-done";
+    else if (prev.state === "live") reason = "previous-live";
+    else if (w.scheduleStart && w.scheduleStart <= horizon) reason = "date-near";
+    // No reason yet — a later draft wave may still be date-near (e.g. wave 2
+    // dateless, wave 3 scheduled), so keep scanning instead of bailing out.
+    if (!reason) continue;
+    return {
+      listId: w.listId,
+      programmeId: view.id,
+      organizationId: view.organizationId,
+      programmeName: view.name,
+      waveNumber: w.waveNumber,
+      plannedWaves: view.plannedWaves,
+      articleAngle: w.articleAngle,
+      scheduleStart: w.scheduleStart,
+      reason,
+    };
+  }
+  return null;
+}
+
+async function findDueWavesWhere(where: Prisma.CampaignProgrammeWhereInput, now: Date): Promise<DueWave[]> {
+  const programmes = await prisma.campaignProgramme.findMany({
+    where: { ...where, archivedAt: null },
+    include: { waves: { where: { archivedAt: null }, include: WAVE_STATE_INCLUDE } },
+    orderBy: { createdAt: "desc" },
+  });
+  return programmes
+    .map((p) => dueWaveFromView(toView(p, p.waves), now))
+    .filter((d): d is DueWave => d !== null);
+}
+
+/**
  * Waves the buyer should act on now: still a draft, and either the previous
  * wave is live/finished or this wave's start is within three weeks. Wave 1 is
  * never "due" (it's just an unsent plan — /requests already shows those).
  */
 export async function findDueWaves(orgIds: string[], now: Date): Promise<DueWave[]> {
   if (orgIds.length === 0) return [];
-  const programmes = await prisma.campaignProgramme.findMany({
-    where: { organizationId: { in: orgIds }, archivedAt: null },
-    include: { waves: { where: { archivedAt: null }, include: WAVE_STATE_INCLUDE } },
-    orderBy: { createdAt: "desc" },
-  });
-  const horizon = new Date(now.getTime() + DUE_HORIZON_DAYS * 86_400_000);
-  const due: DueWave[] = [];
-  for (const p of programmes) {
-    const view = toView(p, p.waves);
-    for (let i = 1; i < view.waves.length; i++) {
-      const w = view.waves[i];
-      if (w.state !== "draft") continue;
-      const prev = view.waves[i - 1];
-      let reason: DueWave["reason"] | null = null;
-      if (prev.state === "done") reason = "previous-done";
-      else if (prev.state === "live") reason = "previous-live";
-      else if (w.scheduleStart && w.scheduleStart <= horizon) reason = "date-near";
-      if (!reason) continue;
-      due.push({
-        listId: w.listId,
-        programmeId: view.id,
-        programmeName: view.name,
-        waveNumber: w.waveNumber,
-        plannedWaves: view.plannedWaves,
-        articleAngle: w.articleAngle,
-        scheduleStart: w.scheduleStart,
-        reason,
-      });
-      break; // one nudge per programme: the next wave only
-    }
-  }
-  return due;
+  return findDueWavesWhere({ organizationId: { in: orgIds } }, now);
+}
+
+/** Due waves across ALL orgs, restricted to programmes that opted in to
+ *  auto-send — the sweep's work list (see programme-autosend.ts). */
+export async function findDueAutoSendWaves(now: Date): Promise<DueWave[]> {
+  return findDueWavesWhere({ autoSendEnabled: true }, now);
 }
 
 export async function setWaveAngle(listId: string, angle: string | null): Promise<void> {

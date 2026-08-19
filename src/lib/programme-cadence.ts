@@ -107,6 +107,11 @@ export function shiftScheduleStart(start: Date, weeks: number, unit: BookingUnit
   return new Date(Date.UTC(start.getUTCFullYear(), start.getUTCMonth() + months, 1));
 }
 
+/** The current period anchor (Monday / first-of-month, UTC midnight) at `base`. */
+export function currentPeriodStart(unit: BookingUnit, base: Date): Date {
+  return new Date(`${upcomingPeriods(unit, 1, base)[0].iso}T00:00:00Z`);
+}
+
 /** Anchor dates for each wave. Wave 1 = firstStart, or the current period
  *  when the source list has no schedule yet. */
 export function planWaveDates(
@@ -116,7 +121,7 @@ export function planWaveDates(
   unit: BookingUnit,
   base: Date,
 ): Array<Date | null> {
-  const first = firstStart ?? new Date(`${upcomingPeriods(unit, 1, base)[0].iso}T00:00:00Z`);
+  const first = firstStart ?? currentPeriodStart(unit, base);
   return Array.from({ length: waves }, (_, i) =>
     i === 0 ? first : shiftScheduleStart(first, spacingWeeks * i, unit),
   );
