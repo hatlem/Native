@@ -97,7 +97,7 @@ export async function GET(req: NextRequest) {
         lines: {
           include: {
             brief: true,
-            article: { include: { versions: true } },
+            articlePlacement: { include: { article: { include: { versions: true } } } },
             booking: true,
           },
         },

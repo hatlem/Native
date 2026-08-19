@@ -50,7 +50,7 @@ export async function OrderSection({
             .filter((line) => line.kind === "INVENTORY" && line.productId)
             .map((line) => {
             const p = line.productId ? byId.get(line.productId) : undefined;
-            const asset = line.article?.versions[0];
+            const asset = line.articlePlacement?.article.versions[0];
             return (
               <article className="card" key={line.id}>
                 <h3>{p?.title.name ?? line.productId}</h3>
@@ -62,7 +62,7 @@ export async function OrderSection({
                         {tp("status")}:
                       </span>
                       <StatusBadge value={asset.status} />
-                      {asset.specPassed === true ? (
+                      {line.articlePlacement?.specPassed === true ? (
                         <span className="badge badge-success dotless">
                           ✓
                         </span>

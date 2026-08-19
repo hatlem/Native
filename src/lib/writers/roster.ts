@@ -22,12 +22,16 @@ export async function loadRoster(): Promise<RosterWriter[]> {
       specialties: { select: { topic: true } },
       assignedLines: {
         select: {
-          article: {
+          articlePlacement: {
             select: {
-              versions: {
-                orderBy: { version: "desc" },
-                take: 1,
-                select: { status: true },
+              article: {
+                select: {
+                  versions: {
+                    orderBy: { version: "desc" },
+                    take: 1,
+                    select: { status: true },
+                  },
+                },
               },
             },
           },
@@ -38,7 +42,7 @@ export async function loadRoster(): Promise<RosterWriter[]> {
 
   return writers.map((w) => {
     const activeAssignments = w.assignedLines.filter((line) =>
-      isAssignmentActive(line.article?.versions[0]?.status ?? null),
+      isAssignmentActive(line.articlePlacement?.article.versions[0]?.status ?? null),
     ).length;
     return {
       id: w.id,

@@ -1,11 +1,9 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { OrderStatus, ContentAssetStatus } from "@prisma/client";
+import { OrderStatus } from "@prisma/client";
 import {
   canCancelOrder,
   cancelBlockReason,
-  canRetractAsset,
-  retractBlockReason,
   normaliseReason,
 } from "./cancellation";
 
@@ -34,21 +32,6 @@ test("cancelBlockReason surfaces the right next-step prompt per terminal status"
   // No reason when cancellation is allowed — empty string lets the UI
   // decide between "no block" and "explain block".
   assert.equal(cancelBlockReason(OrderStatus.CONFIRMED), "");
-});
-
-test("canRetractAsset allows every non-retracted draft state, including FINAL", () => {
-  // Editorial veto fires *after* spec-check passes; FINAL must be
-  // retractable or the firewall promise is empty in practice.
-  assert.equal(canRetractAsset(ContentAssetStatus.DRAFT), true);
-  assert.equal(canRetractAsset(ContentAssetStatus.IN_REVIEW), true);
-  assert.equal(canRetractAsset(ContentAssetStatus.CHANGES_REQUESTED), true);
-  assert.equal(canRetractAsset(ContentAssetStatus.APPROVED), true);
-  assert.equal(canRetractAsset(ContentAssetStatus.FINAL), true);
-});
-
-test("canRetractAsset refuses an already-retracted asset (idempotent)", () => {
-  assert.equal(canRetractAsset(ContentAssetStatus.RETRACTED), false);
-  assert.match(retractBlockReason(ContentAssetStatus.RETRACTED), /already/i);
 });
 
 test("normaliseReason trims and drops empty input", () => {

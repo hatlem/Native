@@ -30,12 +30,16 @@ export default async function WriterHome({
           id: true,
           productId: true,
           brief: { select: { message: true } },
-          article: {
+          articlePlacement: {
             select: {
-              versions: {
-                orderBy: { version: "desc" },
-                take: 1,
-                select: { status: true },
+              article: {
+                select: {
+                  versions: {
+                    orderBy: { version: "desc" },
+                    take: 1,
+                    select: { status: true },
+                  },
+                },
               },
             },
           },
@@ -85,7 +89,7 @@ export default async function WriterHome({
                 </Link>
                 <div className="text-xs text-neutral-500">
                   {product?.title.countryCode} ·{" "}
-                  {line.article?.versions[0]?.status ?? "NOT STARTED"}
+                  {line.articlePlacement?.article.versions[0]?.status ?? "NOT STARTED"}
                 </div>
               </li>
             );

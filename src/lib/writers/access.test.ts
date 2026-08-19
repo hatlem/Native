@@ -50,7 +50,6 @@ test("an assignment is active until its latest asset is FINAL/RETRACTED", () => 
   assert.equal(isAssignmentActive("DRAFT"), true);
   assert.equal(isAssignmentActive("IN_REVIEW"), true);
   assert.equal(isAssignmentActive("FINAL"), false);
-  assert.equal(isAssignmentActive("RETRACTED"), false);
 });
 
 test("canWriteArticle: DESK can always write", () => {

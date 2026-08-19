@@ -7,7 +7,6 @@ import { Link } from "@/i18n/navigation";
 import { updateBooking, rejectAsset, submitBookingImpressions } from "@/app/publisher-actions";
 import { StatusBadge } from "@/app/status-badge";
 import { EmptyState } from "@/app/empty-state";
-import { canRetractAsset } from "@/lib/cancellation";
 import { SubmitButton } from "@/components";
 
 export const dynamic = "force-dynamic";
@@ -57,9 +56,18 @@ export default async function PublisherOrdersPage({
         include: {
           order: true,
           booking: { include: { metrics: true } },
-          article: {
-            include: {
-              versions: { orderBy: { version: "desc" }, take: 1 },
+          articlePlacement: {
+            select: {
+              id: true,
+              articleId: true,
+              retractedAt: true,
+              retractionNote: true,
+              article: {
+                select: {
+                  versions: { orderBy: { version: "desc" }, take: 1 },
+                  _count: { select: { placements: true } },
+                },
+              },
             },
           },
         },
@@ -216,8 +224,7 @@ export default async function PublisherOrdersPage({
                       allowed to retract. Distinct from the desk-side
                       "request changes" soft path: this is a hard
                       rejection that flips ContentAsset → RETRACTED. */}
-                  {line.article?.versions[0] &&
-                  canRetractAsset(line.article.versions[0].status) ? (
+                  {line.articlePlacement?.article.versions[0] && !line.articlePlacement.retractedAt ? (
                     <details className="spec-details veto-block">
                       <summary>
                         <span className="btn small ghost">
@@ -228,13 +235,18 @@ export default async function PublisherOrdersPage({
                         <input type="hidden" name="locale" value={locale} />
                         <input
                           type="hidden"
-                          name="assetId"
-                          value={line.article.versions[0].id}
+                          name="placementId"
+                          value={line.articlePlacement.id}
                         />
                         <h4 style={{ margin: "12px 0 4px" }}>
                           {tp("vetoTitle")}
                         </h4>
                         <p className="muted small">{tp("vetoHint")}</p>
+                        {(line.articlePlacement?.article._count.placements ?? 0) > 1 ? (
+                          <p className="muted small">
+                            {tp("vetoSharedWarning", { count: (line.articlePlacement!.article._count.placements - 1) })}
+                          </p>
+                        ) : null}
                         <div className="field">
                           <label htmlFor={`veto-${line.id}`}>
                             {tp("vetoReasonLabel")}
@@ -256,10 +268,10 @@ export default async function PublisherOrdersPage({
                         </div>
                       </form>
                     </details>
-                  ) : line.article?.versions[0]?.status === "RETRACTED" ? (
+                  ) : line.articlePlacement?.retractedAt ? (
                     <p className="muted small">
                       <strong>{tp("retractedLabel")}:</strong>{" "}
-                      {line.article.versions[0].retractionNote ?? ""}
+                      {line.articlePlacement.retractionNote ?? ""}
                     </p>
                   ) : null}
                 </article>

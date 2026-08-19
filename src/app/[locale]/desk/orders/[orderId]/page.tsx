@@ -34,7 +34,9 @@ export default async function DeskOrderPage({
       lines: {
         include: {
           brief: true,
-          article: { include: { versions: { orderBy: { version: "desc" } } } },
+          articlePlacement: {
+            include: { article: { include: { versions: { orderBy: { version: "desc" } } } } },
+          },
           trackedLinks: true,
           booking: {
             include: {
