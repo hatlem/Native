@@ -26,14 +26,12 @@ async function loadAssetForBuyer(assetId: string) {
     select: {
       id: true,
       status: true,
-      brief: {
+      article: {
         select: {
-          orderLine: {
-            select: {
-              orderId: true,
-              order: { select: { organizationId: true } },
-            },
-          },
+          id: true,
+          organizationId: true,
+          orderLineId: true,
+          orderLine: { select: { orderId: true } },
         },
       },
     },
@@ -51,21 +49,21 @@ export async function approveContentAsset(formData: FormData) {
   if (
     !asset ||
     asset.status !== "IN_REVIEW" ||
-    !canActOnOrg(scope, asset.brief.orderLine.order.organizationId)
+    !canActOnOrg(scope, asset.article.organizationId)
   ) {
-    redirect(`/${locale}/orders/${asset?.brief.orderLine.orderId ?? ""}`);
+    redirect(`/${locale}/articles/${asset?.article.id ?? ""}`);
   }
 
-  const orderId = asset.brief.orderLine.orderId;
+  const orderId = asset.article.orderLine?.orderId ?? null;
   await prisma.contentAsset.update({ where: { id: assetId }, data: { status: "APPROVED" } });
   await recordAudit(session.user.id, "asset.status", `ContentAsset:${assetId}`, { status: "APPROVED" });
   await notifyDesk({
     kind: "ASSET_REVIEW",
     title: "Buyer approved a draft",
-    link: `/${locale}/desk/orders/${orderId}`,
+    link: orderId ? `/${locale}/desk/orders/${orderId}` : `/${locale}/desk/articles/${asset.article.id}`,
   });
 
-  redirect(`/${locale}/orders/${orderId}`);
+  redirect(orderId ? `/${locale}/orders/${orderId}` : `/${locale}/articles/${asset.article.id}`);
 }
 
 export async function requestContentChanges(formData: FormData) {
@@ -80,12 +78,12 @@ export async function requestContentChanges(formData: FormData) {
   if (
     !asset ||
     asset.status !== "IN_REVIEW" ||
-    !canActOnOrg(scope, asset.brief.orderLine.order.organizationId)
+    !canActOnOrg(scope, asset.article.organizationId)
   ) {
-    redirect(`/${locale}/orders/${asset?.brief.orderLine.orderId ?? ""}`);
+    redirect(`/${locale}/articles/${asset?.article.id ?? ""}`);
   }
 
-  const orderId = asset.brief.orderLine.orderId;
+  const orderId = asset.article.orderLine?.orderId ?? null;
   await prisma.contentAsset.update({
     where: { id: assetId },
     data: { status: "CHANGES_REQUESTED", reviewNotes: note || null },
@@ -96,8 +94,8 @@ export async function requestContentChanges(formData: FormData) {
   await notifyDesk({
     kind: "ASSET_REVIEW",
     title: "Buyer requested changes to a draft",
-    link: `/${locale}/desk/orders/${orderId}`,
+    link: orderId ? `/${locale}/desk/orders/${orderId}` : `/${locale}/desk/articles/${asset.article.id}`,
   });
 
-  redirect(`/${locale}/orders/${orderId}`);
+  redirect(orderId ? `/${locale}/orders/${orderId}` : `/${locale}/articles/${asset.article.id}`);
 }
