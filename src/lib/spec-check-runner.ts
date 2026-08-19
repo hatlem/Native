@@ -1,26 +1,25 @@
-// Pulls an asset, looks up the product spec + title's market, runs
-// `specCheck`, persists the result. Shared between the desk's manual
-// trigger and the queued job kicked off by `saveDraft`.
+// Pulls a placement's effective asset (locked version if one exists,
+// otherwise the article's latest), looks up the placement's product spec +
+// title's market, runs `specCheck`, persists the result onto the
+// placement — never onto the shared ContentAsset, since two placements of
+// the same article can have different product requirements.
 
 import { prisma } from "@/lib/prisma";
 import { registerJob } from "@/lib/jobs";
 import { specCheck } from "@/lib/spec-check";
+import { resolveEffectiveAsset } from "@/lib/writers/placement";
 
-export async function runSpecCheckForAsset(assetId: string): Promise<void> {
-  const asset = await prisma.contentAsset.findUnique({
-    where: { id: assetId },
-    include: {
-      article: { include: { orderLine: { select: { productId: true } } } },
-    },
+export async function runSpecCheckForPlacement(placementId: string): Promise<void> {
+  const placement = await prisma.articlePlacement.findUnique({
+    where: { id: placementId },
+    include: { orderLine: { select: { productId: true } } },
   });
-  if (!asset) return;
+  if (!placement) return;
 
-  // Uploaded files are never spec-checked (no reliable text to check).
-  if (!asset.body) return;
+  const asset = await resolveEffectiveAsset(placement);
+  if (!asset?.body) return; // no text, or an uploaded file — never spec-checked
 
-  // Spec check needs a placement's Product to know word-count/disclosure
-  // requirements. An article not yet linked to a placement has none.
-  const productId = asset.article.orderLine?.productId;
+  const productId = placement.orderLine.productId;
   if (!productId) return;
 
   const product = await prisma.product.findUnique({
@@ -38,11 +37,11 @@ export async function runSpecCheckForAsset(assetId: string): Promise<void> {
     marketDisclosure: product?.title.market.disclosureLabel ?? null,
   });
 
-  await prisma.contentAsset.update({
-    where: { id: asset.id },
+  await prisma.articlePlacement.update({
+    where: { id: placement.id },
     data: {
       specPassed: result.passed,
-      reviewNotes: result.passed
+      specNotes: result.passed
         ? `Spec passed (${result.words} words)`
         : result.issues.join("; "),
     },
@@ -53,7 +52,7 @@ let registered = false;
 export function registerSpecCheckJob(): void {
   if (registered) return;
   registered = true;
-  registerJob<{ assetId: string }>("spec.check", async ({ assetId }) => {
-    await runSpecCheckForAsset(assetId);
+  registerJob<{ placementId: string }>("spec.check", async ({ placementId }) => {
+    await runSpecCheckForPlacement(placementId);
   });
 }
