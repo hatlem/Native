@@ -605,7 +605,9 @@
       "noDate": "Dato ikke satt",
       "angleEdit": "Artikkelvinkel for denne runden",
       "angleSave": "Lagre vinkel",
-      "angleHint": "Desken og skribenten starter herfra – hold den ulik de andre rundene."
+      "angleHint": "Desken og skribenten starter herfra – hold den ulik de andre rundene.",
+      "autoSendLabel": "Send hver runde automatisk når tiden er inne",
+      "autoSendHint": "Hver runde går til desken som en vanlig forespørsel når datoen nærmer seg – du godkjenner fortsatt tilbudet før noe bestilles eller belastes."
     }
   },
   "rfq": {

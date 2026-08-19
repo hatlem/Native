@@ -692,7 +692,9 @@
       "noDate": "Kein Datum",
       "angleEdit": "Blickwinkel des Artikels für diese Welle",
       "angleSave": "Blickwinkel speichern",
-      "angleHint": "Desk und Autor starten hiervon – halten Sie ihn anders als in den übrigen Wellen."
+      "angleHint": "Desk und Autor starten hiervon – halten Sie ihn anders als in den übrigen Wellen.",
+      "autoSendLabel": "Jede Welle automatisch senden, wenn sie fällig ist",
+      "autoSendHint": "Jede Welle geht als normale Anfrage an den Desk, sobald ihr Termin näher rückt – Sie geben das Angebot weiterhin frei, bevor etwas gebucht oder abgerechnet wird."
     }
   },
   "rfq": {

@@ -1071,6 +1071,9 @@ model CampaignProgramme {
   // i18n key under plan.programme.rationale.* explaining the recommended
   // cadence — never LLM prose.
   rationaleKey   String?
+  // Opt-in: the auto-send sweep submits each due wave to the desk as a normal
+  // RFQ. Never books or charges anything — the buyer still approves the quote.
+  autoSendEnabled Boolean     @default(false)
   createdById    String?
   archivedAt     DateTime?
   createdAt      DateTime     @default(now())

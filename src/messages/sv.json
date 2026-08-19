@@ -605,7 +605,9 @@
       "noDate": "Datum ej satt",
       "angleEdit": "Artikelvinkel för den här omgången",
       "angleSave": "Spara vinkel",
-      "angleHint": "Desken och skribenten utgår härifrån – håll den skild från de andra omgångarna."
+      "angleHint": "Desken och skribenten utgår härifrån – håll den skild från de andra omgångarna.",
+      "autoSendLabel": "Skicka varje omgång automatiskt när det är dags",
+      "autoSendHint": "Varje omgång går till desken som en vanlig förfrågan när datumet närmar sig – du godkänner fortfarande offerten innan något bokas eller debiteras."
     }
   },
   "rfq": {

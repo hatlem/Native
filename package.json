@@ -19,6 +19,7 @@
     "send-rate-card-batch": "tsx scripts/send-rate-card-batch.ts",
     "build-metrics-campaign": "tsx scripts/build-metrics-campaign.ts",
     "send-metrics-batch": "tsx scripts/send-metrics-batch.ts",
+    "send-due-waves": "tsx scripts/send-due-waves.ts",
     "freeze-metrics-campaigns": "tsx scripts/freeze-metrics-campaigns.ts",
     "seed-content-fees": "tsx scripts/seed-content-fees.ts",
     "issue-publisher-key": "tsx scripts/issue-publisher-key.ts",

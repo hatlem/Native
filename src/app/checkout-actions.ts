@@ -9,19 +9,15 @@ import {
   planBriefHasContent,
   writePlanBrief,
 } from "@/lib/basket";
-import {
-  readActiveListId,
-  ensureActiveList,
-  snapshotListToPlanData,
-} from "@/lib/lists";
+import { readActiveListId, ensureActiveList } from "@/lib/lists";
 import { isProductPriceShown } from "@/lib/pricing-visibility";
-import { planWindowFromItems } from "@/lib/campaign-schedule";
 import { withWaveAngle } from "@/lib/programme";
 import { createFirmOrder, FirmOrderStaleError } from "@/lib/commerce/firm-order";
+import { submitListAsRfq } from "@/lib/commerce/submit-rfq";
 import { uniquePublisherIdsForProducts } from "@/lib/commerce/publishers";
 import { groupItemsByMarket } from "@/lib/quote-grouping";
 import { recordAudit } from "@/lib/audit";
-import { notifyDesk, notifyOrg, notifyPublisher } from "@/lib/notify";
+import { notifyOrg, notifyPublisher } from "@/lib/notify";
 import { isAudienceSegment } from "@/lib/targeting/segments";
 import { rfqLimiter } from "@/lib/rate-limit";
 import { loadScope, canCommitOnOrg } from "@/lib/scope";
@@ -276,92 +272,42 @@ export async function submitRequest(formData: FormData) {
     }
     request = { id: result.requestId };
   } else {
-    // RFQ: create the plan + request for the desk to price later. No
-    // quotes here — pricing is deferred to generateQuote.
-    request = await prisma.$transaction(async (tx) => {
-      // Snapshot BOTH product lines and Title placeholders into the Plan so
-      // the desk sees the full ask — title-only lines land as
-      // PlanItem{titleId, productId:null} for the desk to resolve manually.
-      const planItems = snapshotListToPlanData([
-        ...productItems.map((i) => ({
-          productId: i.productId,
-          titleId: null,
-          quantity: i.quantity,
-          withContent: i.withContent,
-          authorshipMode: i.authorshipMode,
-          scheduleStart: i.scheduleStart,
-          scheduleUnits: i.scheduleUnits,
-          notes: i.notes,
-        })),
-        ...titleItems.map((i) => ({
-          productId: null,
-          titleId: i.titleId,
-          quantity: i.quantity,
-          withContent: i.withContent,
-          authorshipMode: i.authorshipMode,
-          scheduleStart: i.scheduleStart,
-          scheduleUnits: i.scheduleUnits,
-          notes: i.notes,
-        })),
-      ]);
-      // The buyer's per-line schedule → the plan's flight window → (on
-      // acceptance) Order.flightStart/EndDate. Placeholder lines have no
-      // product yet, so their unit is unknown; MONTH is the catalog default.
-      const flight = planWindowFromItems(
-        list.items.map((i) => ({
-          scheduleStart: i.scheduleStart,
-          scheduleUnits: i.scheduleUnits,
-          bookingUnit: i.product?.bookingUnit ?? "MONTH",
-        })),
-      );
-      const plan = await tx.plan.create({
-        data: {
-          organizationId: org.id,
-          name: `${org.name} — campaign`,
-          budget: budgetRaw ? Number(budgetRaw) || null : null,
-          currency: planCurrency,
-          startDate: flight.start,
-          endDate: flight.end,
-          goal: goal || null,
-          audienceNote: audience || null,
-          targetGeo: targetGeo || null,
-          targetAudience: targetAudience || null,
-          targetContext: targetContext || null,
-          items: {
-            create: planItems,
-          },
-        },
-      });
-
-      // Fold structured targeting intent into the desk-facing brief so the
-      // desk sees it as readable lines, not just buried Plan columns.
-      const targetingLines = [
-        targetGeo && `Geo: ${targetGeo}`,
-        targetAudience && `Audience: ${targetAudience}`,
-        targetContext && `Context: ${targetContext}`,
-      ].filter(Boolean);
-      const briefSummary =
-        [deskBrief, ...targetingLines].filter(Boolean).join("\n") || null;
-
-      const req = await tx.request.create({
-        data: {
-          organizationId: org.id,
-          planId: plan.id,
-          status: "SUBMITTED",
-          briefSummary,
-          sourceListId: list.id,
-        },
-      });
-      return { id: req.id };
+    // RFQ: extracted to the lib so the programme auto-send sweep can submit
+    // a due wave through the exact same path (plan snapshot, flight window,
+    // wave-angle brief, request, audit, desk notification). The shared
+    // pre-checks above (idempotency, deactivated lines, emptiness) normally
+    // guarantee "submitted"; the lib re-runs them, so a race between those
+    // checks and this write still resolves to the same redirects.
+    const rfq = await submitListAsRfq({
+      list,
+      org: { id: org.id, name: org.name },
+      brief: {
+        text: brief,
+        goal: goal || null,
+        audience: audience || null,
+        budget: budgetRaw ? Number(budgetRaw) || null : null,
+        targetGeo: targetGeo || null,
+        targetAudience: targetAudience || null,
+        targetContext: targetContext || null,
+      },
+      actorUserId: session?.user?.id ?? null,
+      locale,
+      auditIp: await clientIp(),
     });
+    if (rfq.outcome === "duplicate") redirect(`/${locale}/requests/${rfq.requestId}`);
+    if (rfq.outcome === "unavailable") redirect(`/${locale}/plan?error=unavailable`);
+    if (rfq.outcome === "empty") redirect(`/${locale}/plan?error=1`);
+    request = { id: rfq.requestId };
   }
 
-  await recordAudit(session?.user?.id ?? null, "request.submit", `Request:${request.id}`, {
-    orgId: org.id,
-    allFirm,
-    ip: await clientIp(),
-  });
   if (allFirm) {
+    // The RFQ branch audits inside submitListAsRfq; the firm branch keeps
+    // its audit row here, same fields as before.
+    await recordAudit(session?.user?.id ?? null, "request.submit", `Request:${request.id}`, {
+      orgId: org.id,
+      allFirm,
+      ip: await clientIp(),
+    });
     // Self-serve confirmation: notify the buying org and every publisher
     // whose products are in the order so they see the booking instantly.
     await notifyOrg(org.id, {
@@ -381,13 +327,6 @@ export async function submitRequest(formData: FormData) {
         }),
       ),
     );
-  } else {
-    await notifyDesk({
-      kind: "RFQ_SUBMITTED",
-      title: "New RFQ",
-      body: `${org.name} submitted ${items.length + titleItems.length} item(s).`,
-      link: `/${locale}/desk/${request.id}`,
-    });
   }
 
   // The active saved list is durable — nothing to clear on submit.
