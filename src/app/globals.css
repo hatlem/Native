@@ -6856,3 +6856,116 @@ footer a:hover {
     flex-direction: column;
   }
 }
+
+/* ---------- Requests timeline (/requests?tab=timeline) ---------- */
+
+.requests-timeline {
+  margin-top: var(--s-4);
+}
+
+.requests-timeline__lead {
+  font-size: 0.9rem;
+  color: var(--muted);
+}
+
+.requests-timeline__month {
+  margin-top: var(--s-4);
+}
+
+.requests-timeline__heading {
+  font-size: 0.95rem;
+  font-weight: 640;
+  color: var(--heading);
+  padding-bottom: 8px;
+  border-bottom: 1px solid var(--border);
+}
+
+.requests-timeline__list {
+  list-style: none;
+  margin: 10px 0 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+/* One entry = one flex line that WRAPS on narrow screens (name, wave note,
+   badge, amount fold under each other) — the page must never scroll
+   sideways, so nothing in here gets a fixed width or nowrap except the
+   amount figure itself. */
+.requests-timeline__entry {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px 10px;
+  width: 100%;
+  padding: 12px 16px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--r-md);
+  color: var(--text);
+  transition: border-color var(--t-fast);
+}
+.requests-timeline__entry:hover {
+  border-color: var(--muted);
+}
+.requests-timeline__entry:hover .requests-timeline__name {
+  color: var(--accent);
+}
+
+.requests-timeline__form {
+  display: block;
+}
+
+/* Draft entries render as a <button type="submit"> — the whole entry is the
+   select-active-list form, mirroring CampaignRow, so clicking it switches to
+   THAT list before landing on /plan. The !important pins beat the global
+   form:not(.filters):not(.cmdk-form) button[type="submit"]:not(.btn) reset
+   (higher specificity than any single class), which would otherwise restyle
+   the entry into a small grey chip. */
+.requests-timeline__entry--btn {
+  appearance: none !important;
+  background: var(--surface) !important;
+  color: var(--text) !important;
+  border: 1px solid var(--border) !important;
+  border-radius: var(--r-md) !important;
+  padding: 12px 16px !important;
+  min-height: 0 !important;
+  font-size: inherit !important;
+  font-weight: inherit !important;
+  box-shadow: none !important;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+.requests-timeline__entry--btn:hover {
+  background: var(--surface) !important;
+  color: var(--text) !important;
+  border-color: var(--muted) !important;
+}
+
+.requests-timeline__name {
+  font-weight: 620;
+  color: var(--heading);
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.requests-timeline__wave {
+  font-size: 0.82rem;
+  color: var(--muted);
+}
+
+.requests-timeline__amount {
+  margin-left: auto;
+  font-weight: 640;
+  color: var(--heading);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.requests-timeline__empty {
+  margin: 10px 0 0;
+  padding: 2px 0;
+  color: var(--muted);
+}

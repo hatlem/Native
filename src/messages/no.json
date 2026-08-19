@@ -712,7 +712,11 @@
     "actionView": "Se",
     "waveNote": "Runde {n} av {of}",
     "waveNoteDated": "Runde {n} av {of} · fra {date}",
-    "waveDoneNote": "Runde {n} av {of} ferdig"
+    "waveDoneNote": "Runde {n} av {of} ferdig",
+    "timelineTab": "Tidslinje",
+    "timelineLead": "Når alt kjører — de neste seks månedene, måned for måned. Utkast uten datoer ligger nederst.",
+    "timelineNotScheduled": "Ikke planlagt ennå",
+    "timelineEmptyMonth": "Ingenting kjører denne måneden"
   },
   "desk": {
     "eyebrow": "Internt desk",
