@@ -41,7 +41,14 @@ export function audienceFor(session: SessionShape | null | undefined): Audience 
   return "advertiser";
 }
 
-export type NavOptions = { campaignFlow?: boolean };
+export type NavOptions = {
+  campaignFlow?: boolean;
+  // True when a DESK/SUPERADMIN user also holds an active org Membership
+  // (e.g. an agency staffer helping a client build their plan directly).
+  // Without this, the buyer flow is unreachable from a staff session: it's
+  // absent from both the desk top nav and, by default, the palette too.
+  hasOrgAccess?: boolean;
+};
 
 // The guided-flow front door, prepended to the buyer nav when the
 // campaignFlow flag is on. During Phase 0 it sits alongside the existing
@@ -217,6 +224,14 @@ export function paletteItemsFor(
             ? [{ key: "deskTitles", label: t("titles"), href: "/desk/titles" }]
             : []),
           { key: "catalog", label: t("catalog"), href: "/catalog" },
+          ...(opts.hasOrgAccess
+            ? opts.campaignFlow
+              ? [campaignItem(t), { key: "campaigns", label: t("campaigns"), href: "/requests" }]
+              : [
+                  { key: "plan", label: t("plan"), href: "/plan" },
+                  { key: "lists", label: t("lists"), href: "/lists", description: t("listsDesc") },
+                ]
+            : []),
           { key: "notifications", label: t("notifications"), href: "/notifications" },
         ];
       default:

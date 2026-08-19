@@ -125,7 +125,13 @@ export default async function LocaleLayout({
   const nonce = (await headers()).get("x-nonce") ?? undefined;
 
   const audience = audienceFor(session);
-  const navOpts = { campaignFlow: campaignFlowEnabled() };
+  // Staff (desk/superadmin) who also hold a buyer-org Membership — e.g.
+  // helping a client build their plan directly — otherwise have no way
+  // back into the buyer flow from a desk-only session; see NavOptions.
+  const staffHasOrgAccess =
+    (audience === "desk" || audience === "superadmin") &&
+    (await getWorkspace(session?.user?.id)) !== null;
+  const navOpts = { campaignFlow: campaignFlowEnabled(), hasOrgAccess: staffHasOrgAccess };
   let nav = navItemsFor(audience, t, navOpts);
   const palette = paletteItemsFor(audience, t, navOpts);
   const userMenu = userMenuItemsFor(audience, t);
