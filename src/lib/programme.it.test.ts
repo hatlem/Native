@@ -2,7 +2,13 @@ import { test, before, after } from "node:test";
 import assert from "node:assert/strict";
 import { prisma } from "./prisma";
 import { ensureActiveList, addProductItem } from "./lists";
-import { createProgramme, loadProgrammeForList, findDueWaves, ProgrammeError } from "./programme";
+import {
+  createProgramme,
+  dissolveProgramme,
+  loadProgrammeForList,
+  findDueWaves,
+  ProgrammeError,
+} from "./programme";
 
 // Programme domain logic at the lib layer (server actions need a session and
 // throw NEXT_REDIRECT — same convention as lists.flow.it.test.ts). Covers the
@@ -151,5 +157,53 @@ if (!RUN_DB_IT) {
     assert.equal(due[0].reason, "previous-live");
     assert.equal(due[0].waveNumber, 2);
     assert.equal(due[0].plannedWaves, 2);
+  });
+
+  test("dissolveProgramme: submitted wave survives renamed, unsent copies archive, programme archives", async () => {
+    const source = await prisma.savedList.create({
+      data: { organizationId: orgId, name: "Dissolve test" },
+    });
+    await addProductItem(source.id, productId);
+    const { programmeId, waveListIds } = await createProgramme({
+      sourceListId: source.id,
+      organizationId: orgId,
+      userId: null,
+      waves: 3,
+      spacingWeeks: 6,
+      angles: ["Problem", "Proof", "How-to"],
+      rationaleKey: null,
+    });
+
+    // Wave 1 was submitted — it must survive the dissolve un-archived.
+    const plan = await prisma.plan.create({ data: { organizationId: orgId, name: "dissolve-w1" } });
+    await prisma.request.create({
+      data: { organizationId: orgId, planId: plan.id, status: "SUBMITTED", sourceListId: waveListIds[0] },
+    });
+
+    const result = await dissolveProgramme(programmeId);
+    assert.equal(result.kept, 1);
+    assert.equal(result.archived, 2);
+
+    const w1 = await prisma.savedList.findUniqueOrThrow({ where: { id: waveListIds[0] } });
+    assert.equal(w1.archivedAt, null, "the submitted wave stays live");
+    assert.equal(w1.name, "Dissolve test", "the ' · Wave 1' suffix is stripped");
+    assert.equal(w1.programmeId, null);
+    assert.equal(w1.waveNumber, null);
+    assert.equal(w1.articleAngle, null);
+
+    for (const id of [waveListIds[1], waveListIds[2]]) {
+      const w = await prisma.savedList.findUniqueOrThrow({ where: { id } });
+      assert.ok(w.archivedAt, "unsent copies are archived");
+      assert.equal(w.name, "Dissolve test", "archived copies also lose the suffix");
+      assert.equal(w.programmeId, null);
+      assert.equal(w.waveNumber, null);
+      assert.equal(w.articleAngle, null);
+    }
+
+    const programme = await prisma.campaignProgramme.findUniqueOrThrow({ where: { id: programmeId } });
+    assert.ok(programme.archivedAt, "the programme row itself is archived");
+
+    // The strip disappears for every former wave — /plan renders a plain list.
+    assert.equal(await loadProgrammeForList(waveListIds[0]), null);
   });
 }

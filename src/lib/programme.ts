@@ -357,3 +357,59 @@ export async function withWaveAngle(
   const line = `Article angle (wave ${list.waveNumber} of ${of}): ${angle}`;
   return brief ? `${line}\n${brief}` : line;
 }
+
+/**
+ * Undo "Run this as a programme": every wave becomes an ordinary plan again —
+ * the " · Wave N" name suffix goes, programme fields are nulled. Waves after
+ * the first that were never submitted (no Request row) are pure copies the
+ * buyer never touched downstream, so they're archived rather than left to
+ * litter /lists as near-identical plans; wave 1 and anything already sent
+ * always survives un-archived (submitted work is real, archived copies of it
+ * would orphan the buyer's paper trail). The programme row itself is archived,
+ * not deleted — audit references and any stale FK stay resolvable.
+ *
+ * One transaction: a half-dissolved programme (some waves plain, some still
+ * enrolled) would confuse every surface that groups by programmeId.
+ */
+export async function dissolveProgramme(
+  programmeId: string,
+): Promise<{ kept: number; archived: number }> {
+  return prisma.$transaction(async (tx) => {
+    const waves = await tx.savedList.findMany({
+      where: { programmeId },
+      select: {
+        id: true,
+        name: true,
+        waveNumber: true,
+        archivedAt: true,
+        _count: { select: { requests: true } },
+      },
+    });
+    const now = new Date();
+    let kept = 0;
+    let archived = 0;
+    for (const w of waves) {
+      const isUnsentCopy = (w.waveNumber ?? 0) > 1 && w._count.requests === 0;
+      // Already-archived waves keep their original archivedAt; everything
+      // else either stays live (kept) or is archived as part of the dissolve.
+      const archiveNow = isUnsentCopy && !w.archivedAt;
+      await tx.savedList.update({
+        where: { id: w.id },
+        data: {
+          name: w.name.replace(/\s*·\s*Wave \d+$/i, ""),
+          programmeId: null,
+          waveNumber: null,
+          articleAngle: null,
+          ...(archiveNow ? { archivedAt: now } : {}),
+        },
+      });
+      if (archiveNow || w.archivedAt) archived++;
+      else kept++;
+    }
+    await tx.campaignProgramme.update({
+      where: { id: programmeId },
+      data: { archivedAt: now },
+    });
+    return { kept, archived };
+  });
+}

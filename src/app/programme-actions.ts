@@ -5,7 +5,12 @@ import { prisma } from "@/lib/prisma";
 import { recordAudit } from "@/lib/audit";
 import { loadScope, canActOnOrg } from "@/lib/scope";
 import { writeActiveListId } from "@/lib/lists";
-import { createProgramme, setWaveAngle, ProgrammeError } from "@/lib/programme";
+import {
+  createProgramme,
+  dissolveProgramme as dissolveProgrammeLists,
+  setWaveAngle,
+  ProgrammeError,
+} from "@/lib/programme";
 
 function str(formData: FormData, key: string): string {
   const v = formData.get(key);
@@ -75,6 +80,31 @@ export async function startProgramme(formData: FormData) {
   // "router state header" 503 in prod (see CatalogSort.tsx) — the form would
   // sit on "Creating…" forever with the programme already made. The wave
   // strip that replaces the form is the confirmation.
+  redirect(`/${locale}/plan`);
+}
+
+// "Dissolve programme" from the wave strip — the undo for startProgramme.
+// Waves revert to ordinary plans; unsent copies are archived; the programme
+// row is archived. The list posted is any wave of the programme (whichever
+// the buyer had open) — the lib resolves and dissolves the whole programme.
+export async function dissolveProgramme(formData: FormData) {
+  const locale = str(formData, "locale") || "en";
+  const listId = str(formData, "listId");
+  const { scope, list } = await ownList(locale, listId);
+  const wave = await prisma.savedList.findUnique({
+    where: { id: list.id },
+    select: { programmeId: true },
+  });
+  // Not a wave (already dissolved in another tab, or a tampered POST) —
+  // nothing to do, land back on /plan which now shows a plain list.
+  if (!wave?.programmeId) redirect(`/${locale}/plan`);
+  const { kept, archived } = await dissolveProgrammeLists(wave.programmeId);
+  await recordAudit(scope.userId ?? null, "programme.dissolve", `CampaignProgramme:${wave.programmeId}`, {
+    listId: list.id,
+    kept,
+    archived,
+  });
+  // Plain /plan for the same RSC same-route reason as startProgramme above.
   redirect(`/${locale}/plan`);
 }
 
