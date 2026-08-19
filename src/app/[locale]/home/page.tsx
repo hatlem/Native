@@ -24,8 +24,9 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
 
   // "Needs you": quotes sent by the desk awaiting the buyer's approval,
   // plus content drafts a writer has moved to review. ContentAsset has no
-  // buyer-facing approve action yet — the card links to the order it
-  // belongs to (the closest existing surface) rather than inventing one.
+  // buyer-facing approve action yet — the card links straight to the
+  // article; there's no single order to route to once an article can back
+  // multiple placements.
   const [pendingQuotes, pendingContent, orders, dueWaves] = await Promise.all([
     prisma.quote.findMany({
       where: { status: "SENT", request: { organizationId: { in: orgIds } } },
