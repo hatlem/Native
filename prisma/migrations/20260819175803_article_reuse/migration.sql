@@ -22,14 +22,19 @@ ALTER TABLE "ArticlePlacement" ADD CONSTRAINT "ArticlePlacement_orderLineId_fkey
 ALTER TABLE "ArticlePlacement" ADD CONSTRAINT "ArticlePlacement_articleId_fkey" FOREIGN KEY ("articleId") REFERENCES "Article"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 ALTER TABLE "ArticlePlacement" ADD CONSTRAINT "ArticlePlacement_lockedAssetId_fkey" FOREIGN KEY ("lockedAssetId") REFERENCES "ContentAsset"("id") ON DELETE SET NULL ON UPDATE CASCADE;
 
--- AlterTable: SavedList gets articleId (additive)
+-- AlterTable: SavedList gets articleId (additive), articleAngle retired.
 ALTER TABLE "SavedList" ADD COLUMN "articleId" TEXT;
 ALTER TABLE "SavedList" ADD CONSTRAINT "SavedList_articleId_fkey" FOREIGN KEY ("articleId") REFERENCES "Article"("id") ON DELETE SET NULL ON UPDATE CASCADE;
+ALTER TABLE "SavedList" DROP COLUMN "articleAngle";
 
 -- Backfill: one ArticlePlacement per existing 1:1 Article.orderLineId link,
 -- carrying over the (about-to-be-dropped) per-asset spec/retraction fields
 -- from that article's latest ContentAsset version, and locking to that
--- version if its status was already FINAL.
+-- version if its status was already FINAL. LEFT JOIN LATERAL (not an inner
+-- join): a staffed-but-undrafted line has a linked Article with zero
+-- ContentAsset rows (no draft submitted yet — a normal, currently-live
+-- production state), and that Article must still get a placement row with
+-- every asset-derived column NULL, not be silently dropped.
 INSERT INTO "ArticlePlacement" ("id", "orderLineId", "articleId", "lockedAssetId", "specPassed", "specNotes", "retractedAt", "retractedBy", "retractionNote", "createdAt", "updatedAt")
 SELECT
   'plc_' || a.id,
@@ -44,14 +49,29 @@ SELECT
   a."createdAt",
   a."updatedAt"
 FROM "Article" a
-JOIN LATERAL (
+LEFT JOIN LATERAL (
   SELECT ca.id, ca.status, ca."specPassed", ca."reviewNotes", ca."retractedAt", ca."retractedBy", ca."retractionNote"
   FROM "ContentAsset" ca
   WHERE ca."articleId" = a.id
-  ORDER BY ca.version DESC
+  ORDER BY ca.version DESC, ca."createdAt" DESC, ca.id DESC
   LIMIT 1
 ) latest ON true
 WHERE a."orderLineId" IS NOT NULL;
+
+-- Guard: every Article with a non-null orderLineId must have produced
+-- exactly one ArticlePlacement row. This is the last point at which the
+-- invariant is checkable — Article.orderLineId is dropped right after —
+-- so a regression here must abort the migration loudly rather than
+-- silently destroy the only record of the link.
+DO $$
+DECLARE expected INT; actual INT;
+BEGIN
+  SELECT count(*) INTO expected FROM "Article" WHERE "orderLineId" IS NOT NULL;
+  SELECT count(*) INTO actual FROM "ArticlePlacement";
+  IF expected <> actual THEN
+    RAISE EXCEPTION 'ArticlePlacement backfill lost rows: % links, % placements', expected, actual;
+  END IF;
+END $$;
 
 -- Now that the backfill has read them, drop the fields ArticlePlacement replaces.
 ALTER TABLE "ContentAsset" DROP COLUMN "specPassed";
