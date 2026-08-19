@@ -1863,7 +1863,8 @@ git commit -m "feat(content): show every linked placement on the articles overvi
 
 - [ ] **Step 1: Rewrite the query**
 
-Read the current file (quoted in full earlier in this plan). Replace the `article`
+Read the current file directly — it is not reproduced in full in this plan
+document, only the specific transformations below. Replace the `article`
 query's `orderLineId`/`orderLine` fields with a `placements` list, and resolve the
 effective asset via the helper instead of always reading `versions[0]`:
 
@@ -2002,81 +2003,153 @@ a per-item unlink button, and keep the "link another" form always available:
 Import `unlinkArticleFromOrderLine` alongside the existing `linkArticleToOrderLine`
 import from `@/app/article-library-actions`.
 
-- [ ] **Step 3: Add the sibling-placement warning above the write/upload forms**
+- [ ] **Step 3: Replace the rest of the page body with the exact block below**
 
-Directly above the `saveDraft` form and the `UploadForm`, add:
+Everything from the sibling-placement warning through the buyer-review section
+replaces the original file's write form / `UploadForm` / download link / status
+line / spec-check form / submit-for-review form / review-notes paragraph /
+approve-reject section as ONE block — the original single "run spec check" form
+(keyed by `assetId`) is deleted entirely here, not renamed; its replacement is
+the new per-placement spec-check list, placed BEFORE the write form instead of
+after (so a placement's spec status is visible before you start editing shared
+text that affects it):
 
 ```tsx
+{placementsWithAsset.length > 0 ? (
+  <div className="space-y-2">
+    {placementsWithAsset.map((p) =>
+      p.effectiveAsset ? (
+        <div key={`spec-${p.id}`} className="flex items-center gap-3 text-sm">
+          <span>
+            {p.label}:
+            {p.specPassed === true
+              ? ` ${t("detailSpecPassed")}`
+              : p.specPassed === false
+                ? ` ${t("detailSpecFailed")}`
+                : ` ${t("specNotChecked")}`}
+          </span>
+          <form action={runSpecCheck}>
+            <input type="hidden" name="locale" value={locale} />
+            <input type="hidden" name="placementId" value={p.id} />
+            <button type="submit" className="underline">
+              {t("detailRunSpecCheck")}
+            </button>
+          </form>
+        </div>
+      ) : null,
+    )}
+  </div>
+) : null}
+
 {placementsWithAsset.length > 1 ? (
   <p className="text-xs text-amber-700">
     {t("sharedArticleWarning", { count: placementsWithAsset.length })}
   </p>
 ) : null}
-```
 
-(One warning covers both the write form and the upload form below it, since
-they're adjacent on the page — no need to duplicate it per form.)
+<form action={saveDraft} className="space-y-2">
+  <input type="hidden" name="locale" value={locale} />
+  <input type="hidden" name="articleId" value={articleId} />
+  <label className="block text-sm font-medium">{t("detailWriteHeading")}</label>
+  <textarea
+    name="body"
+    defaultValue={latestArticleVersion?.bodyUrl ? "" : (latestArticleVersion?.body ?? "")}
+    rows={18}
+    className="w-full rounded border p-2 font-mono text-sm"
+  />
+  <button type="submit" className="rounded bg-black px-3 py-1.5 text-sm text-white">
+    {t("detailSaveDraft")}
+  </button>
+</form>
 
-- [ ] **Step 4: Update the write/status forms to use the article's latest version, not a single ambiguous "latest"**
+<UploadForm
+  articleId={articleId}
+  locale={locale}
+  saveDraftAction={saveUploadedDraft}
+  labels={{
+    heading: t("detailUploadHeading"),
+    hint: t("detailUploadHint"),
+    uploading: t("detailUploading"),
+    save: t("detailSaveDraft"),
+  }}
+/>
 
-The existing `saveDraft` form's `defaultValue` and the status/spec-check controls
-below it currently read from a single `latest` variable. Replace every reference
-to the old `latest` (from the pre-Task-11 version of this file) with
-`latestArticleVersion` (defined in Step 1) for the write form and the
-status/submit-for-review controls — those operate on the article's shared
-authoring state, not any one placement. Do NOT wire the spec-check/submit
-controls to `placementsWithAsset` — spec-check is per placement (see Step 5),
-but "save draft" / "submit for review" / status stay article-level, matching
-`saveDraft`/`setAssetStatus` which are still keyed by `articleId`/`assetId`
-respectively, unchanged in that respect from before this plan.
+{downloadUrl ? (
+  <p className="text-sm">
+    <a href={downloadUrl} target="_blank" rel="noreferrer noopener" className="underline">
+      {t("detailDownloadFile")} ↗
+    </a>
+  </p>
+) : null}
 
-- [ ] **Step 5: Per-placement spec-check controls**
+{latestArticleVersion ? (
+  <div className="flex items-center gap-4 text-sm">
+    <span>
+      {t("detailStatus")}: <StatusBadge value={latestArticleVersion.status} />
+    </span>
+    <form action={setAssetStatus}>
+      <input type="hidden" name="locale" value={locale} />
+      <input type="hidden" name="assetId" value={latestArticleVersion.id} />
+      <input type="hidden" name="target" value="IN_REVIEW" />
+      <button type="submit" className="underline">
+        {t("detailSubmitForReview")}
+      </button>
+    </form>
+  </div>
+) : null}
 
-Below the placements list (Step 2), for each placement with an effective asset,
-add its own spec-check control — this replaces the old single "run spec check"
-button, since spec-check is now genuinely per placement:
+{latestArticleVersion?.reviewNotes ? (
+  <p className="text-sm text-amber-700">
+    {t("detailReviewNotes")}: {latestArticleVersion.reviewNotes}
+  </p>
+) : null}
 
-```tsx
-{placementsWithAsset.map((p) =>
-  p.effectiveAsset ? (
-    <div key={`spec-${p.id}`} className="flex items-center gap-3 text-sm">
-      <span>
-        {p.label}:
-        {p.specPassed === true
-          ? ` ${t("detailSpecPassed")}`
-          : p.specPassed === false
-            ? ` ${t("detailSpecFailed")}`
-            : ` ${t("specNotChecked")}`}
-      </span>
-      <form action={runSpecCheck}>
+{latestArticleVersion?.status === "IN_REVIEW" && canActOnOrg(scope, article.organizationId) ? (
+  <section className="space-y-2 rounded border p-4">
+    <h2 className="text-sm font-semibold">{tOrders("draftReviewHeading")}</h2>
+    <div className="flex items-center gap-3">
+      <form action={approveContentAsset}>
         <input type="hidden" name="locale" value={locale} />
-        <input type="hidden" name="placementId" value={p.id} />
-        <button type="submit" className="underline">
-          {t("detailRunSpecCheck")}
+        <input type="hidden" name="assetId" value={latestArticleVersion.id} />
+        <button type="submit" className="rounded bg-black px-3 py-1.5 text-sm text-white">
+          {tOrders("draftApprove")}
+        </button>
+      </form>
+      <form action={requestContentChanges} className="flex items-center gap-2">
+        <input type="hidden" name="locale" value={locale} />
+        <input type="hidden" name="assetId" value={latestArticleVersion.id} />
+        <input
+          type="text"
+          name="note"
+          placeholder={tOrders("draftChangesPlaceholder")}
+          className="rounded border p-2 text-sm"
+        />
+        <button type="submit" className="rounded border px-3 py-1.5 text-sm">
+          {tOrders("draftSendChanges")}
         </button>
       </form>
     </div>
-  ) : null,
-)}
+  </section>
+) : null}
 ```
 
-Place this block right after the placements `<ul>`/link form section from Step 2,
-before the write/upload forms.
+Note what changed from the original file, spelled out so the transformation is
+unambiguous: the shared status line no longer shows `specPassed` (that's now
+shown per placement, in the block above the write form); the old
+`assetId`-keyed "run spec check" form is gone, replaced by the per-placement
+list; `approveContentAsset`/`requestContentChanges` do NOT get an `orderId`
+hidden field here (Task 6 made it an optional hint — this page has no single
+order to hint at, matching Task 6's design); every other field/form is
+unchanged from the original file, just reading `latestArticleVersion` instead of
+`latest`. `t("linkCta")` and `unlinkArticleFromOrderLine` come from Step 2 above,
+already in scope in the same component.
 
-- [ ] **Step 6: Update the buyer-review section's forms**
-
-The existing `approveContentAsset`/`requestContentChanges` forms near the bottom
-of the file do not pass an `orderId` (Task 6 made it an optional hint) — leave
-them as-is here; an article on this page may have zero, one, or many linked
-placements, so there is no single order to hint at. This matches Task 6's design:
-absent hint → redirect/notify link falls back to the article page.
-
-- [ ] **Step 7: Typecheck**
+- [ ] **Step 4: Typecheck**
 
 Run: `pnpm typecheck 2>&1 | grep -A2 "articles/\[articleId\]"`
 Expected: no errors.
 
-- [ ] **Step 8: Commit**
+- [ ] **Step 5: Commit**
 
 ```bash
 git add "src/app/[locale]/articles/[articleId]/page.tsx"
