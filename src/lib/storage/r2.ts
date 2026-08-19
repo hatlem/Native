@@ -2,17 +2,27 @@ import { S3Client, PutObjectCommand, GetObjectCommand } from "@aws-sdk/client-s3
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 import { randomUUID } from "node:crypto";
 
-const ALLOWED_TYPES = new Set([
+export const RATE_CARD_TYPES: ReadonlySet<string> = new Set([
   "application/pdf",
   "application/vnd.openxmlformats-officedocument.presentationml.presentation",
   "application/vnd.ms-powerpoint",
   "image/png",
   "image/jpeg",
 ]);
+
+export const ARTICLE_TYPES: ReadonlySet<string> = new Set([
+  "application/pdf",
+  "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+  "text/plain",
+]);
+
 const MAX_BYTES = 25 * 1024 * 1024;
 
-export function validateContentType(ct: string): boolean {
-  return ALLOWED_TYPES.has(ct.toLowerCase());
+export function validateContentType(
+  ct: string,
+  allowedTypes: ReadonlySet<string> = RATE_CARD_TYPES,
+): boolean {
+  return allowedTypes.has(ct.toLowerCase());
 }
 
 export function isAllowedSize(bytes: number): boolean {
@@ -60,8 +70,9 @@ export async function presignUpload(args: {
   contentType: string;
   bytes: number;
   ttlSec?: number;
+  allowedTypes?: ReadonlySet<string>;
 }): Promise<{ url: string; key: string }> {
-  if (!validateContentType(args.contentType)) {
+  if (!validateContentType(args.contentType, args.allowedTypes)) {
     throw new Error(`content_type_not_allowed:${args.contentType}`);
   }
   if (!isAllowedSize(args.bytes)) {
@@ -92,8 +103,9 @@ export async function putObject(args: {
   filename: string;
   contentType: string;
   body: Buffer;
+  allowedTypes?: ReadonlySet<string>;
 }): Promise<{ key: string; sizeBytes: number }> {
-  if (!validateContentType(args.contentType)) {
+  if (!validateContentType(args.contentType, args.allowedTypes)) {
     throw new Error(`content_type_not_allowed:${args.contentType}`);
   }
   if (!isAllowedSize(args.body.byteLength)) {
