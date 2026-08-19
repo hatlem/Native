@@ -2,11 +2,11 @@ import { test } from "node:test";
 import assert from "node:assert/strict";
 import { prisma } from "@/lib/prisma";
 import { canWriteArticle } from "@/lib/writers/access";
-import { ensureArticleForLine } from "@/lib/writers/article";
 
 // This suite exercises the DB-backed paths that access.ts's unit tests
-// (Task 2) can't cover: Prisma relations, the unique orderLineId
-// constraint, and the writer-assignment auto-creation hook (Task 5).
+// (Task 2) can't cover: Prisma relations, the unique ArticlePlacement.
+// orderLineId constraint, and the writer-assignment auto-creation hook
+// (Task 5).
 
 test("buyer can create an unlinked article, upload a file, and see it in their org's overview", async () => {
   const org = await prisma.organization.create({ data: { name: "IT Test Org", type: "ADVERTISER" } });
@@ -22,7 +22,6 @@ test("buyer can create an unlinked article, upload a file, and see it in their o
       createdByRole: "BUYER",
     },
   });
-  assert.equal(article.orderLineId, null);
 
   const version = await prisma.contentAsset.create({
     data: { articleId: article.id, version: 1, status: "DRAFT", bodyUrl: "articles/x/2026-08-19/abc-file.pdf" },
@@ -39,40 +38,38 @@ test("buyer can create an unlinked article, upload a file, and see it in their o
   await prisma.organization.delete({ where: { id: org.id } });
 });
 
-test("an order line can be linked to at most one article (unique constraint)", async () => {
+test("an order line can be linked to at most one placement (unique constraint), but one article can have many placements", async () => {
   const org = await prisma.organization.create({ data: { name: "IT Test Org 2", type: "ADVERTISER" } });
   const user = await prisma.user.create({
     data: { email: `it-buyer2-${Date.now()}@example.com`, role: "BUYER", organizationId: org.id },
   });
-  // Quote hangs off Request -> Plan (no direct organizationId on Quote in
-  // the current schema), so build the full chain to get a real, valid
-  // Quote/Order pair rather than hand-waving the FKs.
-  const plan = await prisma.plan.create({ data: { organizationId: org.id } });
-  const request = await prisma.request.create({
-    data: { organizationId: org.id, planId: plan.id, status: "DRAFT" },
-  });
-  const quote = await prisma.quote.create({
-    data: { requestId: request.id, status: "ACCEPTED", currency: "EUR", subtotal: 0, vatPct: 0, total: 0 },
-  });
-  const order = await prisma.order.create({
-    data: { organizationId: org.id, quoteId: quote.id, status: "CONFIRMED" },
-  });
-  const line = await prisma.orderLine.create({
-    data: { orderId: order.id, kind: "INVENTORY", authorshipMode: "BUYER_SUPPLIED", quantity: 1, lineTotal: 0 },
-  });
+  const plan = await prisma.plan.create({ data: { organizationId: org.id, name: "IT plan" } });
+  const request = await prisma.request.create({ data: { organizationId: org.id, planId: plan.id, status: "DRAFT" } });
+  const quote = await prisma.quote.create({ data: { requestId: request.id, status: "ACCEPTED", currency: "EUR", subtotal: 0, vatPct: 0, total: 0 } });
+  const order = await prisma.order.create({ data: { organizationId: org.id, quoteId: quote.id, status: "CONFIRMED" } });
+  const lineA = await prisma.orderLine.create({ data: { orderId: order.id, kind: "INVENTORY", authorshipMode: "BUYER_SUPPLIED", quantity: 1, lineTotal: 0 } });
+  const lineB = await prisma.orderLine.create({ data: { orderId: order.id, kind: "INVENTORY", authorshipMode: "BUYER_SUPPLIED", quantity: 1, lineTotal: 0 } });
 
-  const first = await prisma.article.create({
-    data: { organizationId: org.id, title: "First", createdByUserId: user.id, createdByRole: "BUYER", orderLineId: line.id },
+  const article = await prisma.article.create({
+    data: { organizationId: org.id, title: "Shared piece", createdByUserId: user.id, createdByRole: "BUYER" },
   });
+  const placementA = await prisma.articlePlacement.create({ data: { orderLineId: lineA.id, articleId: article.id } });
+  // Same article, a DIFFERENT line — must succeed (this is the reuse this
+  // whole plan exists to enable).
+  const placementB = await prisma.articlePlacement.create({ data: { orderLineId: lineB.id, articleId: article.id } });
+  assert.equal(await prisma.articlePlacement.count({ where: { articleId: article.id } }), 2);
 
+  // A SECOND placement on the SAME line must reject.
+  const otherArticle = await prisma.article.create({
+    data: { organizationId: org.id, title: "Different piece", createdByUserId: user.id, createdByRole: "BUYER" },
+  });
   await assert.rejects(() =>
-    prisma.article.create({
-      data: { organizationId: org.id, title: "Second", createdByUserId: user.id, createdByRole: "BUYER", orderLineId: line.id },
-    }),
+    prisma.articlePlacement.create({ data: { orderLineId: lineA.id, articleId: otherArticle.id } }),
   );
 
-  await prisma.article.delete({ where: { id: first.id } });
-  await prisma.orderLine.delete({ where: { id: line.id } });
+  await prisma.articlePlacement.deleteMany({ where: { id: { in: [placementA.id, placementB.id] } } });
+  await prisma.article.deleteMany({ where: { id: { in: [article.id, otherArticle.id] } } });
+  await prisma.orderLine.deleteMany({ where: { id: { in: [lineA.id, lineB.id] } } });
   await prisma.order.delete({ where: { id: order.id } });
   await prisma.quote.delete({ where: { id: quote.id } });
   await prisma.request.delete({ where: { id: request.id } });
@@ -81,62 +78,54 @@ test("an order line can be linked to at most one article (unique constraint)", a
   await prisma.organization.delete({ where: { id: org.id } });
 });
 
-test("ensureArticleForLine is idempotent: concurrent first-writes yield one Article", async () => {
-  const org = await prisma.organization.create({ data: { name: "IT Test Org 4", type: "ADVERTISER" } });
+test("retracting one placement doesn't affect a sibling placement of the same article; FINAL locks unlocked placements", async () => {
+  const org = await prisma.organization.create({ data: { name: "IT Test Org 5", type: "ADVERTISER" } });
   const user = await prisma.user.create({
-    data: { email: `it-desk-${Date.now()}@example.com`, role: "DESK" },
+    data: { email: `it-buyer5-${Date.now()}@example.com`, role: "BUYER", organizationId: org.id },
   });
-  const writerUser = await prisma.user.create({
-    data: { email: `it-writer3-${Date.now()}@example.com`, role: "CONTENT" },
-  });
-  const writerProfile = await prisma.writerProfile.create({ data: { userId: writerUser.id } });
-  const plan = await prisma.plan.create({ data: { organizationId: org.id } });
-  const request = await prisma.request.create({
-    data: { organizationId: org.id, planId: plan.id, status: "DRAFT" },
-  });
-  const quote = await prisma.quote.create({
-    data: { requestId: request.id, status: "ACCEPTED", currency: "EUR", subtotal: 0, vatPct: 0, total: 0 },
-  });
-  const order = await prisma.order.create({
-    data: { organizationId: org.id, quoteId: quote.id, status: "CONFIRMED" },
-  });
-  const line = await prisma.orderLine.create({
-    data: { orderId: order.id, kind: "INVENTORY", authorshipMode: "NATIVESPIN_PRODUCED", quantity: 1, lineTotal: 0 },
-  });
+  const plan = await prisma.plan.create({ data: { organizationId: org.id, name: "IT plan 5" } });
+  const request = await prisma.request.create({ data: { organizationId: org.id, planId: plan.id, status: "DRAFT" } });
+  const quote = await prisma.quote.create({ data: { requestId: request.id, status: "ACCEPTED", currency: "EUR", subtotal: 0, vatPct: 0, total: 0 } });
+  const order = await prisma.order.create({ data: { organizationId: org.id, quoteId: quote.id, status: "CONFIRMED" } });
+  const lineA = await prisma.orderLine.create({ data: { orderId: order.id, kind: "INVENTORY", authorshipMode: "BUYER_SUPPLIED", quantity: 1, lineTotal: 0 } });
+  const lineB = await prisma.orderLine.create({ data: { orderId: order.id, kind: "INVENTORY", authorshipMode: "BUYER_SUPPLIED", quantity: 1, lineTotal: 0 } });
 
-  const args = {
-    orderLineId: line.id,
-    organizationId: org.id,
-    title: "Untitled article",
-    createdByUserId: user.id,
-    createdByRole: "DESK" as const,
-  };
-  // Two racing callers (desk staffing a writer + desk composing a draft)
-  // must collapse onto the single row the unique orderLineId allows.
-  const [a, b] = await Promise.all([
-    ensureArticleForLine(args),
-    ensureArticleForLine(args),
-  ]);
-  assert.equal(a.id, b.id);
-  assert.equal(await prisma.article.count({ where: { orderLineId: line.id } }), 1);
+  const article = await prisma.article.create({
+    data: { organizationId: org.id, title: "Shared piece 2", createdByUserId: user.id, createdByRole: "BUYER" },
+  });
+  const placementA = await prisma.articlePlacement.create({ data: { orderLineId: lineA.id, articleId: article.id } });
+  const placementB = await prisma.articlePlacement.create({ data: { orderLineId: lineB.id, articleId: article.id } });
 
-  // A re-assignment repoints the existing row rather than creating one.
-  const reassigned = await ensureArticleForLine({ ...args, assignedWriterId: writerProfile.id });
-  assert.equal(reassigned.id, a.id);
-  assert.equal(reassigned.assignedWriterId, writerProfile.id);
+  // Retract A only.
+  await prisma.articlePlacement.update({
+    where: { id: placementA.id },
+    data: { retractedAt: new Date(), retractedBy: user.id, retractionNote: "test" },
+  });
+  const reloadedB = await prisma.articlePlacement.findUniqueOrThrow({ where: { id: placementB.id } });
+  assert.equal(reloadedB.retractedAt, null);
 
-  // Omitting assignedWriterId leaves the current writer untouched.
-  const untouched = await ensureArticleForLine(args);
-  assert.equal(untouched.assignedWriterId, writerProfile.id);
+  // Now go FINAL — both unlocked placements (B is unlocked; A is retracted
+  // but that's an independent field, not a lock state) should lock to it.
+  const finalVersion = await prisma.contentAsset.create({
+    data: { articleId: article.id, version: 1, body: "final text", status: "FINAL" },
+  });
+  const { lockPlacementsOnFinal } = await import("@/lib/writers/placement");
+  await lockPlacementsOnFinal(article.id, finalVersion.id);
 
-  await prisma.article.delete({ where: { id: a.id } });
-  await prisma.orderLine.delete({ where: { id: line.id } });
+  const lockedA = await prisma.articlePlacement.findUniqueOrThrow({ where: { id: placementA.id } });
+  const lockedB = await prisma.articlePlacement.findUniqueOrThrow({ where: { id: placementB.id } });
+  assert.equal(lockedA.lockedAssetId, finalVersion.id);
+  assert.equal(lockedB.lockedAssetId, finalVersion.id);
+  assert.notEqual(lockedA.retractedAt, null); // retraction survives the lock
+
+  await prisma.articlePlacement.deleteMany({ where: { id: { in: [placementA.id, placementB.id] } } });
+  await prisma.contentAsset.delete({ where: { id: finalVersion.id } });
+  await prisma.article.delete({ where: { id: article.id } });
+  await prisma.orderLine.deleteMany({ where: { id: { in: [lineA.id, lineB.id] } } });
   await prisma.order.delete({ where: { id: order.id } });
   await prisma.quote.delete({ where: { id: quote.id } });
   await prisma.request.delete({ where: { id: request.id } });
   await prisma.plan.delete({ where: { id: plan.id } });
-  await prisma.writerProfile.delete({ where: { id: writerProfile.id } });
-  await prisma.user.delete({ where: { id: writerUser.id } });
   await prisma.user.delete({ where: { id: user.id } });
   await prisma.organization.delete({ where: { id: org.id } });
 });
