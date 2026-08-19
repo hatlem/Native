@@ -244,7 +244,11 @@ git commit -m "feat(db): add ArticlePlacement, drop 1:1 Article-OrderLine link"
 **Interfaces:**
 - Consumes: `prisma` client, `ArticlePlacement`/`Article`/`ContentAsset` models from Task 1.
 - Produces: `resolveEffectiveAsset(placement)`, `ensurePlacementForLine(args)`,
-  `lockPlacementsOnFinal(articleId, assetId)` — consumed by Tasks 3, 4, 5, 6, 7, 9.
+  `lockPlacementsOnFinal(articleId, assetId)`, `articleTitleForLine(orderLineId)`
+  — consumed by Tasks 3, 4, 5, 6, 7, 9. `articleTitleForLine` lives here (not
+  inlined into `desk-content-actions.ts`) because TWO call sites need it: Task 5's
+  `saveLineDraft` AND Task 5's fix to `writer-pool-actions.ts`'s
+  `assignWriterToLine` — a shared module beats duplicating the same lookup twice.
 
 - [ ] **Step 1: Write the file**
 
@@ -259,6 +263,24 @@ export type EffectiveAsset = {
   bodyUrl: string | null;
   reviewNotes: string | null;
 };
+
+// The display title a new Article gets when born from a specific line: the
+// line's product/title name, falling back to a generic label. Shared by
+// every line-keyed article-creation entry point (Task 5's saveLineDraft and
+// its fix to writer-pool-actions.ts's assignWriterToLine).
+export async function articleTitleForLine(orderLineId: string): Promise<string> {
+  const line = await prisma.orderLine.findUnique({
+    where: { id: orderLineId },
+    select: { productId: true },
+  });
+  const product = line?.productId
+    ? await prisma.product.findUnique({
+        where: { id: line.productId },
+        select: { title: { select: { name: true } } },
+      })
+    : null;
+  return product?.title.name ?? "Untitled article";
+}
 
 // Which ContentAsset a placement is currently showing: its locked version
 // once one exists (set the moment any version of the article went FINAL
@@ -707,17 +729,20 @@ git commit -m "feat(content): rewrite article linking for many-placements-per-ar
 
 **Files:**
 - Modify: `src/app/desk-content-actions.ts`
+- Modify: `src/app/writer-pool-actions.ts`
 
 **Interfaces:**
-- Consumes: `ensurePlacementForLine`, `lockPlacementsOnFinal` (Task 2, replacing
-  `ensureArticleForLine`/`articleTitleForLine` import from `@/lib/writers/article` —
-  that whole file's job is now split between `placement.ts`'s `ensurePlacementForLine`
-  for placement/writer assignment and a small local title-lookup helper, see below).
-  `runSpecCheckForPlacement` (Task 3, replacing `runSpecCheckForAsset`).
+- Consumes: `ensurePlacementForLine`, `articleTitleForLine`, `lockPlacementsOnFinal`
+  (Task 2, replacing `ensureArticleForLine`/`articleTitleForLine` imported from the
+  old `@/lib/writers/article`, which this task deletes). `runSpecCheckForPlacement`
+  (Task 3, replacing `runSpecCheckForAsset`).
 - Produces: `confirmTrackedLinks` (UNCHANGED), `saveDraft`, `saveLineDraft`,
   `saveUploadedDraft`, `runSpecCheck`, `setAssetStatus` — all rewritten. Consumed by
   Task 8 (writer page), Task 9 (batch: desk order page forms), Task 11 (article
-  detail page).
+  detail page). `writer-pool-actions.ts`'s `assignWriterToLine` is also fixed here
+  (found during Task 1's review — it imports from the same soon-deleted
+  `@/lib/writers/article`, and its unassign branch writes to `Article.orderLineId`,
+  a field Task 1 removed).
 
 - [ ] **Step 1: Replace the whole file**
 
@@ -734,7 +759,7 @@ import { runSpecCheckForPlacement, registerSpecCheckJob } from "@/lib/spec-check
 import { ensureTrackedLinks } from "@/lib/metrics/store";
 import { rewriteBodyLinks } from "@/lib/metrics/links";
 import { requireLineWriter, requireArticleWriter } from "@/lib/writers/guard";
-import { ensurePlacementForLine } from "@/lib/writers/placement";
+import { ensurePlacementForLine, articleTitleForLine } from "@/lib/writers/placement";
 
 registerSpecCheckJob();
 
@@ -752,22 +777,6 @@ const SELF_SERVE_ASSET_TARGETS: ReadonlySet<ContentAssetStatus> = new Set([
 function field(formData: FormData, key: string): string {
   const v = formData.get(key);
   return typeof v === "string" ? v.trim() : "";
-}
-
-// The display title a new Article gets when born from a specific line: the
-// line's product/title name, falling back to a generic label.
-async function articleTitleForLine(orderLineId: string): Promise<string> {
-  const line = await prisma.orderLine.findUnique({
-    where: { id: orderLineId },
-    select: { productId: true },
-  });
-  const product = line?.productId
-    ? await prisma.product.findUnique({
-        where: { id: line.productId },
-        select: { title: { select: { name: true } } },
-      })
-    : null;
-  return product?.title.name ?? "Untitled article";
 }
 
 // Where a content action returns the actor to. `orderLineIdHint`, when
@@ -1068,25 +1077,88 @@ rest of the file's static imports, use a normal static `import { lockPlacementsO
 `ensurePlacementForLine` import); either is fine, prefer the static one for
 consistency with the rest of this file's style.
 
-Also delete `src/lib/writers/article.ts` in this task — its two exports
-(`articleTitleForLine`, `ensureArticleForLine`) are now `articleTitleForLine`
-(moved inline above, since it's small and only used here) and
-`ensurePlacementForLine` (Task 2). Confirm nothing else imports the old file
-(`grep -rn "lib/writers/article\"" src/`) before deleting it.
+- [ ] **Step 2: Fix `writer-pool-actions.ts`**
 
-- [ ] **Step 2: Typecheck**
+Found during Task 1's review: `src/app/writer-pool-actions.ts`'s `assignWriterToLine`
+imports `ensureArticleForLine, articleTitleForLine` from `@/lib/writers/article` (the
+file this task deletes below), and its unassign branch writes
+`prisma.article.updateMany({ where: { orderLineId }, data: { assignedWriterId: null } })`
+— `Article.orderLineId` no longer exists after Task 1.
 
-Run: `pnpm typecheck 2>&1 | grep -A2 "desk-content-actions"`
-Expected: no errors from this file (callers not yet updated — the writer page,
-desk order page forms, article detail page — are expected to still error until
-Tasks 8, 9, 11 land).
+Read the current file in full first. Change the import line from
+```ts
+import { ensureArticleForLine, articleTitleForLine } from "@/lib/writers/article";
+```
+to
+```ts
+import { ensurePlacementForLine, articleTitleForLine } from "@/lib/writers/placement";
+```
 
-- [ ] **Step 3: Commit**
+Replace the unassign branch's `Article.updateMany` call — it can no longer filter
+by `orderLineId` on `Article` directly, so it goes through the placement instead:
+```ts
+if (writerId === "") {
+  await prisma.orderLine.update({
+    where: { id: orderLineId },
+    data: { assignedWriterId: null, assignedAt: null, assignedById: null },
+  });
+  const placement = await prisma.articlePlacement.findUnique({
+    where: { orderLineId },
+    select: { articleId: true },
+  });
+  if (placement) {
+    await prisma.article.update({
+      where: { id: placement.articleId },
+      data: { assignedWriterId: null },
+    });
+  }
+  await recordAudit(userId, "line.unassign", `OrderLine:${orderLineId}`);
+  await recordAudit(userId, "article.unassign", `OrderLine:${orderLineId}`);
+  redirect(`/${locale}/desk/orders/${orderId}`);
+}
+```
+
+Replace the assign branch's `ensureArticleForLine(...)` call with
+`ensurePlacementForLine(...)` — same argument shape, no other change:
+```ts
+await ensurePlacementForLine({
+  orderLineId,
+  organizationId: updatedLine.order.organizationId,
+  title: await articleTitleForLine(orderLineId),
+  createdByUserId: userId,
+  createdByRole: "DESK",
+  assignedWriterId: writerId,
+});
+await recordAudit(userId, "article.assign", `OrderLine:${orderLineId}`, { writerId });
+```
+
+The comment above the old call ("First assignment for this line creates its
+Article... ensureArticleForLine keys on the unique orderLineId, so two concurrent
+assignments... converge on one row instead of racing") should be updated to
+reference `ensurePlacementForLine` and `ArticlePlacement.orderLineId` instead —
+same idempotent-upsert behavior, new names.
+
+- [ ] **Step 3: Delete `src/lib/writers/article.ts`**
+
+Its two exports (`articleTitleForLine`, `ensureArticleForLine`) are now
+`articleTitleForLine` and `ensurePlacementForLine`, both exported from
+`src/lib/writers/placement.ts` (Task 2). Confirm nothing else imports the old file
+(`grep -rn "lib/writers/article\"" src/` — after Steps 1-2 above, this should
+return nothing) before deleting it.
+
+- [ ] **Step 4: Typecheck**
+
+Run: `pnpm typecheck 2>&1 | grep -A2 "desk-content-actions\|writer-pool-actions"`
+Expected: no errors from either file (other callers not yet updated — the writer
+page, desk order page forms, article detail page — are expected to still error
+until Tasks 8, 9, 11 land).
+
+- [ ] **Step 5: Commit**
 
 ```bash
-git add src/app/desk-content-actions.ts
+git add src/app/desk-content-actions.ts src/app/writer-pool-actions.ts
 git rm src/lib/writers/article.ts
-git commit -m "feat(content): rewrite desk-content-actions for multi-placement articles"
+git commit -m "feat(content): rewrite desk-content-actions and writer-pool-actions for multi-placement articles"
 ```
 
 ---
@@ -1499,6 +1571,8 @@ git commit -m "feat(content): read writer line page via ArticlePlacement"
 - Modify: `src/app/[locale]/writer/page.tsx`
 - Modify: `src/lib/writers/roster.ts`
 - Modify: `src/app/api/export/me/route.ts`
+- Modify: `src/lib/writers/access.ts`
+- Modify: `src/lib/writers/access.test.ts`
 
 **Interfaces:**
 - Consumes: `resolveEffectiveAsset` (Task 2) where a page needs the
@@ -1742,6 +1816,39 @@ articlePlacement: { include: { article: { include: { versions: true } } } },
 booking: true } }`. No other change — the response flows through as-is via
 `NextResponse.json`.
 
+- [ ] **Step 11b: `src/lib/writers/access.ts` and `access.test.ts`**
+
+Found during Task 1's review: `isAssignmentActive` still compares to the literal
+`"RETRACTED"`, which no longer exists on `ContentAssetStatus` after Task 1 (it's
+a compile error, not a silent bug — but fix it here rather than leaving it for
+someone to trip over). Read the current file. Change:
+```ts
+export function isAssignmentActive(
+  latestAssetStatus: ContentAssetStatus | null,
+): boolean {
+  return latestAssetStatus !== "FINAL" && latestAssetStatus !== "RETRACTED";
+}
+```
+to:
+```ts
+export function isAssignmentActive(
+  latestAssetStatus: ContentAssetStatus | null,
+): boolean {
+  return latestAssetStatus !== "FINAL";
+}
+```
+(Retraction is no longer a `ContentAssetStatus` value at all — it lives on
+`ArticlePlacement.retractedAt` now, per Task 1/7. "Active" here only ever meant
+"the writer still owes work on this," which `FINAL` alone already captures
+correctly; a retracted placement doesn't change whether the underlying writing
+is done.)
+
+In `src/lib/writers/access.test.ts`, remove the now-invalid assertion
+`assert.equal(isAssignmentActive("RETRACTED"), false);` — `"RETRACTED"` is not a
+valid `ContentAssetStatus` value anymore, so this line won't compile. Leave the
+other four assertions in that test (`null`, `"DRAFT"`, `"IN_REVIEW"`, `"FINAL"`)
+unchanged — they still hold under the new implementation.
+
 - [ ] **Step 12: Confirm no file was missed**
 
 Run: `pnpm typecheck 2>&1 | grep -B2 "error TS" | grep "\.tsx\?:" | sed -E 's/\(.*//' | sort -u`
@@ -1758,7 +1865,7 @@ from whatever the pre-task baseline was, and nothing else changes).
 - [ ] **Step 14: Commit**
 
 ```bash
-git add "src/app/[locale]/orders/[orderId]/page.tsx" "src/app/[locale]/publisher/orders/page.tsx" "src/app/[locale]/desk/orders/[orderId]/page.tsx" "src/app/[locale]/desk/orders/[orderId]/lines-section.tsx" "src/app/[locale]/desk/orders/[orderId]/campaign-section.tsx" "src/app/[locale]/requests/[id]/page.tsx" "src/app/[locale]/requests/[id]/_components/OrderSection.tsx" "src/app/[locale]/requests/[id]/_components/types.ts" "src/app/[locale]/writer/page.tsx" src/lib/writers/roster.ts src/app/api/export/me/route.ts src/lib/cancellation.ts src/lib/cancellation.test.ts
+git add "src/app/[locale]/orders/[orderId]/page.tsx" "src/app/[locale]/publisher/orders/page.tsx" "src/app/[locale]/desk/orders/[orderId]/page.tsx" "src/app/[locale]/desk/orders/[orderId]/lines-section.tsx" "src/app/[locale]/desk/orders/[orderId]/campaign-section.tsx" "src/app/[locale]/requests/[id]/page.tsx" "src/app/[locale]/requests/[id]/_components/OrderSection.tsx" "src/app/[locale]/requests/[id]/_components/types.ts" "src/app/[locale]/writer/page.tsx" src/lib/writers/roster.ts src/app/api/export/me/route.ts src/lib/cancellation.ts src/lib/cancellation.test.ts src/lib/writers/access.ts src/lib/writers/access.test.ts
 git commit -m "fix(content): repoint remaining OrderLine.article reads at ArticlePlacement"
 ```
 
