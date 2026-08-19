@@ -76,7 +76,7 @@ export async function advanceOrder(formData: FormData) {
             ? {
                 waveNumber: due.waveNumber,
                 plannedWaves: due.plannedWaves,
-                articleAngle: due.articleAngle,
+                articleTitle: due.articleTitle,
               }
             : null,
         });

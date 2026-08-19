@@ -42,8 +42,8 @@ export async function ProgrammePanel({ locale, orderId }: { locale: string; orde
             <span className="muted small">
               {w.scheduleStart ? dateFmt.format(w.scheduleStart) : t("noDate")}
             </span>
-            {w.articleAngle ? (
-              <span className="desk-programme__angle">{w.articleAngle}</span>
+            {w.articleTitle ? (
+              <span className="desk-programme__angle">{w.articleTitle}</span>
             ) : null}
             {w.listId === listId ? (
               <span className="desk-programme__this">{t("thisOrder")}</span>

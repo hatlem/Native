@@ -8,7 +8,7 @@ test("en: due wave with angle keeps the desk-actions baseline meaning", () => {
   const n = buildOrderCompletedNotice({
     locale: "en",
     planName: "ABAX Q3",
-    due: { waveNumber: 2, plannedWaves: 4, articleAngle: "Why fleet downtime costs more than you think" },
+    due: { waveNumber: 2, plannedWaves: 4, articleTitle: "Why fleet downtime costs more than you think" },
   });
   assert.equal(n.title, "Campaign finished: ABAX Q3");
   assert.ok(n.body.includes("Wave 2 of 4 is ready to send"));
@@ -20,7 +20,7 @@ test("en: due wave without angle omits the angle clause", () => {
   const n = buildOrderCompletedNotice({
     locale: "en",
     planName: "ABAX Q3",
-    due: { waveNumber: 3, plannedWaves: 4, articleAngle: null },
+    due: { waveNumber: 3, plannedWaves: 4, articleTitle: null },
   });
   assert.ok(n.body.includes("Wave 3 of 4"));
   assert.ok(!n.body.includes("angle:"));
@@ -37,7 +37,7 @@ test("no: due wave uses programme terminology (runde/vinkel)", () => {
   const n = buildOrderCompletedNotice({
     locale: "no",
     planName: "ABAX Q3",
-    due: { waveNumber: 2, plannedWaves: 4, articleAngle: "Hvorfor stillstand koster" },
+    due: { waveNumber: 2, plannedWaves: 4, articleTitle: "Hvorfor stillstand koster" },
   });
   assert.equal(n.title, "Kampanjen er ferdig: ABAX Q3");
   assert.ok(n.body.includes("Runde 2 av 4"));
@@ -57,7 +57,7 @@ test("all six locales produce non-empty, locale-distinct copy for both variants"
     const due = buildOrderCompletedNotice({
       locale,
       planName: "Plan",
-      due: { waveNumber: 1, plannedWaves: 3, articleAngle: "Angle" },
+      due: { waveNumber: 1, plannedWaves: 3, articleTitle: "Angle" },
     });
     const finished = buildOrderCompletedNotice({ locale, planName: "Plan", due: null });
     assert.ok(due.title.includes("Plan"), `${locale} due title missing plan name`);
