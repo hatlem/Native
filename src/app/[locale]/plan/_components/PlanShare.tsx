@@ -3,6 +3,7 @@ import { Link2 } from "lucide-react";
 import { shareList, unshareList } from "@/app/list-actions";
 import { shareUrl } from "@/lib/list-share";
 import { appUrl } from "@/lib/url";
+import { intlLocale } from "@/lib/money";
 
 // Client-share control: a native <details> (same pattern as PlanTargeting)
 // that mints/kills the read-only share link for this list. The URL renders in
@@ -12,24 +13,47 @@ export async function PlanShare({
   locale,
   listId,
   shareToken,
+  shareViewedAt,
+  shareViewCount,
+  clientApprovedAt,
 }: {
   locale: string;
   listId: string;
   shareToken: string | null;
+  shareViewedAt: Date | null;
+  shareViewCount: number;
+  clientApprovedAt: Date | null;
 }) {
   const t = await getTranslations({ locale, namespace: "plan.share" });
+  const dateFmt = new Intl.DateTimeFormat(intlLocale(locale), {
+    day: "numeric",
+    month: "short",
+    hour: "2-digit",
+    minute: "2-digit",
+  });
 
   return (
     <details className="plan-share" open={!!shareToken}>
       <summary className="plan-share__summary">
         <Link2 size={15} strokeWidth={1.8} aria-hidden="true" />
         <span>{t("summary")}</span>
-        {shareToken ? <span className="badge badge-success dotless">{t("activeBadge")}</span> : null}
+        {clientApprovedAt ? (
+          <span className="badge badge-success dotless">{t("approvedBadge")}</span>
+        ) : shareToken ? (
+          <span className="badge badge-success dotless">{t("activeBadge")}</span>
+        ) : null}
       </summary>
       <div className="plan-share__body">
         {shareToken ? (
           <>
             <p className="muted small">{t("activeHint")}</p>
+            <p className="muted small plan-share__engagement">
+              {clientApprovedAt
+                ? t("engagementApproved", { date: dateFmt.format(clientApprovedAt) })
+                : shareViewedAt
+                  ? t("engagementViewed", { date: dateFmt.format(shareViewedAt), count: shareViewCount })
+                  : t("engagementNone")}
+            </p>
             <input
               type="text"
               readOnly

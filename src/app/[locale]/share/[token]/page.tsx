@@ -1,7 +1,8 @@
 import type { Metadata } from "next";
 import { getTranslations } from "next-intl/server";
 import { notFound } from "next/navigation";
-import { loadSharedList } from "@/lib/list-share";
+import { loadSharedList, recordShareView } from "@/lib/list-share";
+import { approveSharedPlan } from "@/app/share-actions";
 import { formatMoney, indicativeFromRules, toRateRules, intlLocale } from "@/lib/money";
 import { isProductPriceShown } from "@/lib/pricing-visibility";
 import { titleDisplayName } from "@/lib/title-display";
@@ -29,6 +30,10 @@ export default async function SharedListPage({
   const { locale, token } = await params;
   const list = await loadSharedList(token);
   if (!list) notFound();
+  // Engagement stamp for the owner's Share panel ("last opened by the
+  // client…"). Deliberately awaited — a lost write here is a lie in the
+  // panel, and it's one indexed UPDATE.
+  await recordShareView(token);
 
   const t = await getTranslations({ locale, namespace: "shareList" });
   const tType = await getTranslations({ locale, namespace: "productType" });
@@ -129,6 +134,21 @@ export default async function SharedListPage({
         {hasHidden && totals.size > 0 ? <span className="muted small">{t("plusOnRequest")}</span> : null}
       </div>
       <p className="muted small share-list__disclaimer">{t("disclaimer")}</p>
+
+      {list.clientApprovedAt ? (
+        <div className="share-list__approved" role="status">
+          ✓ {t("approvedAt", { date: dateFmt.format(list.clientApprovedAt) })}
+        </div>
+      ) : (
+        <form action={approveSharedPlan} className="share-list__approve">
+          <input type="hidden" name="locale" value={locale} />
+          <input type="hidden" name="token" value={token} />
+          <p className="muted small">{t("approveHint")}</p>
+          <button type="submit" className="btn">
+            {t("approveCta")}
+          </button>
+        </form>
+      )}
 
       <footer className="share-list__footer">
         <span className="muted small">{t("footer")}</span>

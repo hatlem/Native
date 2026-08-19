@@ -712,7 +712,11 @@
       "regenerate": "New link",
       "disable": "Disable link",
       "offHint": "Create a read-only link your client can open without an account — for sign-off on titles, timing and budget.",
-      "enable": "Create share link"
+      "enable": "Create share link",
+      "approvedBadge": "Client approved",
+      "engagementApproved": "Your client approved this plan {date}.",
+      "engagementViewed": "Last opened {date} · {count, plural, =1 {1 view} other {# views}}.",
+      "engagementNone": "Not opened yet."
     }
   },
   "rfq": {
@@ -2804,6 +2808,9 @@
     "plusOnRequest": "+ items priced on request",
     "disclaimer": "Indicative prices — a firm quote confirms final pricing before anything is booked.",
     "footer": "Prepared with NativeSpin — native advertising in premium newspapers and trade press.",
-    "from": "From {date}"
+    "from": "From {date}",
+    "approveHint": "Happy with titles, timing and budget? Approving tells your contact to send the plan on — nothing is booked or charged by this.",
+    "approveCta": "Approve this plan",
+    "approvedAt": "Plan approved {date}. Your contact takes it from here."
   }
 }

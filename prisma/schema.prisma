@@ -214,6 +214,9 @@ enum NotificationKind {
   // either picked a concrete placement, or removed a placeholder with no
   // bookable option. The buyer asked the desk to decide; this is the signal back.
   PLACEMENT_PROPOSED
+  // The client clicked "Approve this plan" on a share link — the buyer's cue
+  // to submit the plan to the desk.
+  PLAN_CLIENT_APPROVED
   // Order reached COMPLETED — the buyer's cue to plan the next wave of the
   // programme (or start one). Distinct from the generic advance ping.
   ORDER_COMPLETED
@@ -1049,6 +1052,13 @@ model SavedList {
   // Regenerated on every enable; clearing it kills the link instantly.
   shareToken     String?   @unique
   shareCreatedAt DateTime?
+  // Client engagement on the share link: last open + count (any holder of
+  // the URL — the owner previewing counts too), and the client's explicit
+  // "approve this plan" click. Approval survives token rotation; disabling
+  // sharing clears nothing (it's a fact about the plan, not the link).
+  shareViewedAt    DateTime?
+  shareViewCount   Int       @default(0)
+  clientApprovedAt DateTime?
   // Soft reference (no FK) — the list survives if the creating user is removed.
   createdById    String?
   archivedAt     DateTime?

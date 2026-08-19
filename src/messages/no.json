@@ -625,7 +625,11 @@
       "regenerate": "Ny lenke",
       "disable": "Deaktiver lenken",
       "offHint": "Lag en skrivebeskyttet lenke kunden kan åpne uten konto – for godkjenning av titler, timing og budsjett.",
-      "enable": "Lag delingslenke"
+      "enable": "Lag delingslenke",
+      "approvedBadge": "Kunden godkjente",
+      "engagementApproved": "Kunden godkjente planen {date}.",
+      "engagementViewed": "Sist åpnet {date} · {count, plural, =1 {1 visning} other {# visninger}}.",
+      "engagementNone": "Ikke åpnet ennå."
     }
   },
   "rfq": {
@@ -2805,6 +2809,9 @@
     "plusOnRequest": "+ linjer prises på forespørsel",
     "disclaimer": "Veiledende priser – et fast tilbud bekrefter endelig pris før noe bestilles.",
     "footer": "Laget med NativeSpin – native annonsering i ledende aviser og fagpresse.",
-    "from": "Fra {date}"
+    "from": "Fra {date}",
+    "approveHint": "Fornøyd med titler, timing og budsjett? Godkjenning gir kontakten din beskjed om å sende planen videre – ingenting bestilles eller belastes av dette.",
+    "approveCta": "Godkjenn planen",
+    "approvedAt": "Planen ble godkjent {date}. Kontakten din tar det videre herfra."
   }
 }

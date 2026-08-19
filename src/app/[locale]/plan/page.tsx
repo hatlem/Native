@@ -498,6 +498,9 @@ export default async function PlanPage({
                   locale={locale}
                   listId={activeList.id}
                   shareToken={activeList.shareToken}
+                  shareViewedAt={activeList.shareViewedAt}
+                  shareViewCount={activeList.shareViewCount}
+                  clientApprovedAt={activeList.clientApprovedAt}
                 />
               ) : null}
             </div>

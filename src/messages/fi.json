@@ -712,7 +712,11 @@
       "regenerate": "Uusi linkki",
       "disable": "Poista linkki käytöstä",
       "offHint": "Luo vain luku -linkki, jonka asiakas voi avata ilman tiliä – julkaisujen, ajoituksen ja budjetin hyväksyntään.",
-      "enable": "Luo jakolinkki"
+      "enable": "Luo jakolinkki",
+      "approvedBadge": "Asiakas hyväksyi",
+      "engagementApproved": "Asiakas hyväksyi suunnitelman {date}.",
+      "engagementViewed": "Viimeksi avattu {date} · {count, plural, =1 {1 katselu} other {# katselua}}.",
+      "engagementNone": "Ei vielä avattu."
     }
   },
   "rfq": {
@@ -2805,6 +2809,9 @@
     "plusOnRequest": "+ rivejä hinnoitellaan pyynnöstä",
     "disclaimer": "Suuntaa antavat hinnat – kiinteä tarjous vahvistaa lopullisen hinnan ennen varauksia.",
     "footer": "Tehty NativeSpinillä – native-mainontaa johtavissa lehdissä ja ammattimediassa.",
-    "from": "Alkaen {date}"
+    "from": "Alkaen {date}",
+    "approveHint": "Tyytyväinen julkaisuihin, ajoitukseen ja budjettiin? Hyväksyntä kertoo yhteyshenkilöllesi, että suunnitelman voi lähettää eteenpäin – mitään ei varata eikä veloiteta tästä.",
+    "approveCta": "Hyväksy suunnitelma",
+    "approvedAt": "Suunnitelma hyväksyttiin {date}. Yhteyshenkilösi jatkaa tästä."
   }
 }

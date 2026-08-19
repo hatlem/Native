@@ -712,7 +712,11 @@
       "regenerate": "Neuer Link",
       "disable": "Link deaktivieren",
       "offHint": "Erstellen Sie einen schreibgeschützten Link, den Ihr Kunde ohne Konto öffnen kann – zur Freigabe von Titeln, Timing und Budget.",
-      "enable": "Freigabelink erstellen"
+      "enable": "Freigabelink erstellen",
+      "approvedBadge": "Vom Kunden freigegeben",
+      "engagementApproved": "Ihr Kunde hat den Plan am {date} freigegeben.",
+      "engagementViewed": "Zuletzt geöffnet {date} · {count, plural, =1 {1 Aufruf} other {# Aufrufe}}.",
+      "engagementNone": "Noch nicht geöffnet."
     }
   },
   "rfq": {
@@ -2674,6 +2678,9 @@
     "plusOnRequest": "+ Positionen auf Anfrage",
     "disclaimer": "Richtpreise – ein verbindliches Angebot bestätigt den Endpreis, bevor etwas gebucht wird.",
     "footer": "Erstellt mit NativeSpin – Native Advertising in führenden Zeitungen und Fachmedien.",
-    "from": "Ab {date}"
+    "from": "Ab {date}",
+    "approveHint": "Zufrieden mit Titeln, Timing und Budget? Die Freigabe signalisiert Ihrem Kontakt, den Plan weiterzuschicken – nichts wird dadurch gebucht oder berechnet.",
+    "approveCta": "Plan freigeben",
+    "approvedAt": "Plan am {date} freigegeben. Ihr Kontakt übernimmt ab hier."
   }
 }

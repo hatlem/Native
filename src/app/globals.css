@@ -7145,3 +7145,22 @@ footer a:hover {
   padding-top: var(--s-3);
   border-top: 1px solid var(--border);
 }
+
+.share-list__approve {
+  margin-top: var(--s-4);
+  padding: var(--s-3) var(--s-4);
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  border-radius: var(--r-sm);
+  display: grid;
+  gap: var(--s-2);
+  justify-items: start;
+}
+.share-list__approved {
+  margin-top: var(--s-4);
+  padding: var(--s-3) var(--s-4);
+  background: var(--success-soft);
+  color: var(--success);
+  border-radius: var(--r-sm);
+  font-weight: 600;
+}

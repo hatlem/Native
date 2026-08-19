@@ -625,7 +625,11 @@
       "regenerate": "Nyt link",
       "disable": "Deaktiver linket",
       "offHint": "Lav et skrivebeskyttet link, kunden kan åbne uden konto – til godkendelse af titler, timing og budget.",
-      "enable": "Lav delingslink"
+      "enable": "Lav delingslink",
+      "approvedBadge": "Kunden godkendte",
+      "engagementApproved": "Kunden godkendte planen {date}.",
+      "engagementViewed": "Senest åbnet {date} · {count, plural, =1 {1 visning} other {# visninger}}.",
+      "engagementNone": "Ikke åbnet endnu."
     }
   },
   "rfq": {
@@ -2806,6 +2810,9 @@
     "plusOnRequest": "+ linjer prissættes på forespørgsel",
     "disclaimer": "Vejledende priser – et fast tilbud bekræfter endelig pris, før noget bookes.",
     "footer": "Lavet med NativeSpin – native annoncering i førende aviser og fagpresse.",
-    "from": "Fra {date}"
+    "from": "Fra {date}",
+    "approveHint": "Tilfreds med titler, timing og budget? En godkendelse fortæller din kontakt, at planen kan sendes videre – intet bookes eller opkræves af dette.",
+    "approveCta": "Godkend planen",
+    "approvedAt": "Planen blev godkendt {date}. Din kontakt tager den videre herfra."
   }
 }

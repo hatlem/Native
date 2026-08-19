@@ -625,7 +625,11 @@
       "regenerate": "Ny länk",
       "disable": "Inaktivera länken",
       "offHint": "Skapa en skrivskyddad länk kunden kan öppna utan konto – för godkännande av titlar, timing och budget.",
-      "enable": "Skapa delningslänk"
+      "enable": "Skapa delningslänk",
+      "approvedBadge": "Kunden godkände",
+      "engagementApproved": "Kunden godkände planen {date}.",
+      "engagementViewed": "Senast öppnad {date} · {count, plural, =1 {1 visning} other {# visningar}}.",
+      "engagementNone": "Inte öppnad ännu."
     }
   },
   "rfq": {
@@ -2805,6 +2809,9 @@
     "plusOnRequest": "+ rader prissätts på förfrågan",
     "disclaimer": "Riktpriser – en fast offert bekräftar slutligt pris innan något bokas.",
     "footer": "Skapad med NativeSpin – native advertising i ledande tidningar och fackpress.",
-    "from": "Från {date}"
+    "from": "Från {date}",
+    "approveHint": "Nöjd med titlar, timing och budget? Ett godkännande säger till din kontakt att skicka planen vidare – inget bokas eller debiteras av detta.",
+    "approveCta": "Godkänn planen",
+    "approvedAt": "Planen godkändes {date}. Din kontakt tar det vidare härifrån."
   }
 }
