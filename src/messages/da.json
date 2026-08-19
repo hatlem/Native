@@ -616,6 +616,16 @@
       "dissolveSummary": "Opløs programmet …",
       "dissolveBody": "Hver runde bliver en almindelig plan igen. Runder, I aldrig har sendt ind, arkiveres, så de ikke roder jeres planer til – alt, der allerede er sendt til desken, røres ikke.",
       "dissolveConfirm": "Opløs programmet"
+    },
+    "share": {
+      "summary": "Del med kunden",
+      "activeBadge": "Link aktivt",
+      "activeHint": "Alle med dette link kan se planen – uden login. Nyt link eller deaktivering dræber det gamle med det samme.",
+      "urlLabel": "Delingslink",
+      "regenerate": "Nyt link",
+      "disable": "Deaktiver linket",
+      "offHint": "Lav et skrivebeskyttet link, kunden kan åbne uden konto – til godkendelse af titler, timing og budget.",
+      "enable": "Lav delingslink"
     }
   },
   "rfq": {
@@ -2785,5 +2795,17 @@
     "nextWaveBodyDateNear": "Runde {n} er planlagt fra {date}. Send den nu, så desken når at booke.",
     "nextWaveAngle": "Vinkel: {angle}",
     "openWave": "Åbn runden"
+  },
+  "shareList": {
+    "eyebrow": "Medieplan fra {org}",
+    "waveNote": "Runde {n} af {of}",
+    "qty": "{count} placeringer",
+    "weWriteIt": "Artikel skrevet af NativeSpin",
+    "placementTbd": "Placering foreslås af desken",
+    "totalLabel": "Estimeret vejledende totalpris",
+    "plusOnRequest": "+ linjer prissættes på forespørgsel",
+    "disclaimer": "Vejledende priser – et fast tilbud bekræfter endelig pris, før noget bookes.",
+    "footer": "Lavet med NativeSpin – native annoncering i førende aviser og fagpresse.",
+    "from": "Fra {date}"
   }
 }

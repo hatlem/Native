@@ -703,6 +703,16 @@
       "dissolveSummary": "Pura ohjelma…",
       "dissolveBody": "Jokaisesta kierroksesta tulee taas tavallinen suunnitelma. Lähettämättömät kierrokset arkistoidaan, etteivät ne sotke suunnitelmianne – kaikki jo deskille lähetetty säilyy ennallaan.",
       "dissolveConfirm": "Pura ohjelma"
+    },
+    "share": {
+      "summary": "Jaa asiakkaalle",
+      "activeBadge": "Linkki aktiivinen",
+      "activeHint": "Kuka tahansa linkin saanut näkee suunnitelman – ilman kirjautumista. Uusi linkki tai poisto tappaa vanhan heti.",
+      "urlLabel": "Jakolinkki",
+      "regenerate": "Uusi linkki",
+      "disable": "Poista linkki käytöstä",
+      "offHint": "Luo vain luku -linkki, jonka asiakas voi avata ilman tiliä – julkaisujen, ajoituksen ja budjetin hyväksyntään.",
+      "enable": "Luo jakolinkki"
     }
   },
   "rfq": {
@@ -2784,5 +2794,17 @@
     "nextWaveBodyDateNear": "Kierros {n} on aikataulutettu alkamaan {date}. Lähetä se nyt, jotta deski ehtii varata.",
     "nextWaveAngle": "Näkökulma: {angle}",
     "openWave": "Avaa kierros"
+  },
+  "shareList": {
+    "eyebrow": "Mediasuunnitelma: {org}",
+    "waveNote": "Kierros {n}/{of}",
+    "qty": "{count} sijoittelua",
+    "weWriteIt": "Artikkelin kirjoittaa NativeSpin",
+    "placementTbd": "Deski ehdottaa sijoittelun",
+    "totalLabel": "Arvioitu suuntaa antava kokonaishinta",
+    "plusOnRequest": "+ rivejä hinnoitellaan pyynnöstä",
+    "disclaimer": "Suuntaa antavat hinnat – kiinteä tarjous vahvistaa lopullisen hinnan ennen varauksia.",
+    "footer": "Tehty NativeSpinillä – native-mainontaa johtavissa lehdissä ja ammattimediassa.",
+    "from": "Alkaen {date}"
   }
 }

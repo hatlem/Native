@@ -20,6 +20,7 @@ import {
   clearActiveListId,
   migrateLegacyBasket,
 } from "@/lib/lists";
+import { enableListShare, disableListShare } from "@/lib/list-share";
 
 function str(formData: FormData, key: string): string {
   const v = formData.get(key);
@@ -378,6 +379,34 @@ export async function archiveList(formData: FormData) {
     if ((await readActiveListId()) === listId) await clearActiveListId();
   }
   redirect(`/${locale}/lists`);
+}
+
+// Client-share link: enable mints a fresh token (re-enabling never revives a
+// link that already circulated), disable kills it instantly. Owner-guarded
+// like every other list mutation; the public page itself does the lookup by
+// token only.
+export async function shareList(formData: FormData) {
+  const locale = str(formData, "locale") || "en";
+  const listId = str(formData, "listId");
+  const scope = await loadScope();
+  const list = await prisma.savedList.findUnique({ where: { id: listId }, select: { organizationId: true } });
+  if (list && canActOnOrg(scope, list.organizationId)) {
+    await enableListShare(listId);
+    await recordAudit(scope.userId ?? null, "list.share_enable", `SavedList:${listId}`, {});
+  }
+  redirect(`/${locale}/plan`);
+}
+
+export async function unshareList(formData: FormData) {
+  const locale = str(formData, "locale") || "en";
+  const listId = str(formData, "listId");
+  const scope = await loadScope();
+  const list = await prisma.savedList.findUnique({ where: { id: listId }, select: { organizationId: true } });
+  if (list && canActOnOrg(scope, list.organizationId)) {
+    await disableListShare(listId);
+    await recordAudit(scope.userId ?? null, "list.share_disable", `SavedList:${listId}`, {});
+  }
+  redirect(`/${locale}/plan`);
 }
 
 export async function duplicateList(formData: FormData) {

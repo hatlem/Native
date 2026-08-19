@@ -7051,3 +7051,97 @@ footer a:hover {
   padding: 2px 0;
   color: var(--muted);
 }
+
+/* ---------- Client-share: control on /plan + public share page ---------- */
+.plan-share {
+  margin-top: var(--s-3);
+  padding: var(--s-3) var(--s-4);
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  border-radius: var(--r-sm);
+}
+.plan-share__summary {
+  display: flex;
+  align-items: center;
+  gap: var(--s-2);
+  cursor: pointer;
+  list-style: none;
+  font-weight: 600;
+  font-size: 0.9rem;
+  color: var(--heading);
+}
+.plan-share__summary::-webkit-details-marker {
+  display: none;
+}
+.plan-share__summary svg {
+  color: var(--accent);
+  flex: none;
+}
+.plan-share__body {
+  margin-top: var(--s-3);
+  display: grid;
+  gap: var(--s-2);
+}
+.plan-share__url {
+  width: 100%;
+  font-size: 0.8rem;
+  font-family: var(--font-mono, ui-monospace, monospace);
+}
+.plan-share__actions {
+  display: flex;
+  gap: var(--s-2);
+  flex-wrap: wrap;
+}
+
+.share-list {
+  max-width: 720px;
+  margin: 0 auto;
+  padding: var(--s-6) var(--s-4) var(--s-7);
+}
+.share-list__header {
+  margin-bottom: var(--s-5);
+}
+.share-list__lines {
+  display: grid;
+  gap: var(--s-2);
+}
+.share-list__line {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--s-3);
+  padding: var(--s-3) var(--s-4);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--r-sm);
+}
+.share-list__line-title {
+  font-weight: 600;
+  color: var(--heading);
+}
+.share-list__line-price {
+  font-weight: 640;
+  color: var(--heading);
+  font-variant-numeric: tabular-nums;
+  text-align: right;
+  flex: none;
+}
+.share-list__totals {
+  display: flex;
+  align-items: baseline;
+  gap: var(--s-2);
+  flex-wrap: wrap;
+  margin-top: var(--s-4);
+  padding-top: var(--s-3);
+  border-top: 1px solid var(--border-strong);
+  font-size: 1.05rem;
+}
+.share-list__disclaimer {
+  margin-top: var(--s-2);
+  max-width: 58ch;
+}
+.share-list__footer {
+  margin-top: var(--s-6);
+  padding-top: var(--s-3);
+  border-top: 1px solid var(--border);
+}

@@ -16,6 +16,7 @@ import { loadPricingDefaults } from "@/lib/content-fee";
 import { timeAgo } from "@/lib/time-ago";
 import { loadVerticalOptions } from "@/lib/catalog-taxonomy";
 import { PlanBanners } from "./_components/PlanBanners";
+import { PlanShare } from "./_components/PlanShare";
 import { PlanStart } from "./_components/PlanStart";
 import { PlanSteps, type PlanStep } from "./_components/PlanSteps";
 import { PlanTitleBlock } from "./_components/PlanTitleBlock";
@@ -492,6 +493,13 @@ export default async function PlanPage({
                 briefDraft={briefDraft}
               />
               <WhatHappensNext locale={locale} />
+              {activeList ? (
+                <PlanShare
+                  locale={locale}
+                  listId={activeList.id}
+                  shareToken={activeList.shareToken}
+                />
+              ) : null}
             </div>
           </div>
         </>

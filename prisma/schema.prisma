@@ -1044,6 +1044,11 @@ model SavedList {
   programme    CampaignProgramme? @relation(fields: [programmeId], references: [id], onDelete: SetNull)
   waveNumber   Int?
   articleAngle String?
+  // Client-share link: an unguessable 256-bit token that renders a read-only
+  // view of this list at /share/[token] with no sign-in. Null = not shared.
+  // Regenerated on every enable; clearing it kills the link instantly.
+  shareToken     String?   @unique
+  shareCreatedAt DateTime?
   // Soft reference (no FK) — the list survives if the creating user is removed.
   createdById    String?
   archivedAt     DateTime?

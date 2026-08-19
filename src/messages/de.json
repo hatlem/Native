@@ -703,6 +703,16 @@
       "dissolveSummary": "Programm auflösen …",
       "dissolveBody": "Jede Welle wird wieder ein gewöhnlicher Plan. Nie eingereichte Wellen-Kopien werden archiviert, damit sie Ihre Pläne nicht unübersichtlich machen – alles bereits an den Desk Gesendete bleibt unberührt.",
       "dissolveConfirm": "Programm auflösen"
+    },
+    "share": {
+      "summary": "Mit dem Kunden teilen",
+      "activeBadge": "Link aktiv",
+      "activeHint": "Jeder mit diesem Link sieht den Plan – ohne Anmeldung. Neuer Link oder Deaktivieren macht den alten sofort ungültig.",
+      "urlLabel": "Freigabelink",
+      "regenerate": "Neuer Link",
+      "disable": "Link deaktivieren",
+      "offHint": "Erstellen Sie einen schreibgeschützten Link, den Ihr Kunde ohne Konto öffnen kann – zur Freigabe von Titeln, Timing und Budget.",
+      "enable": "Freigabelink erstellen"
     }
   },
   "rfq": {
@@ -2653,5 +2663,17 @@
     "nextWaveBodyDateNear": "Welle {n} ist ab {date} geplant. Senden Sie sie jetzt, damit der Desk Zeit zum Buchen hat.",
     "nextWaveAngle": "Blickwinkel: {angle}",
     "openWave": "Welle öffnen"
+  },
+  "shareList": {
+    "eyebrow": "Mediaplan von {org}",
+    "waveNote": "Welle {n} von {of}",
+    "qty": "{count} Platzierungen",
+    "weWriteIt": "Artikel von NativeSpin geschrieben",
+    "placementTbd": "Platzierung wird vom Desk vorgeschlagen",
+    "totalLabel": "Geschätzter Richtpreis gesamt",
+    "plusOnRequest": "+ Positionen auf Anfrage",
+    "disclaimer": "Richtpreise – ein verbindliches Angebot bestätigt den Endpreis, bevor etwas gebucht wird.",
+    "footer": "Erstellt mit NativeSpin – Native Advertising in führenden Zeitungen und Fachmedien.",
+    "from": "Ab {date}"
   }
 }

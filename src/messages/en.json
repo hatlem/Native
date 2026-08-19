@@ -703,6 +703,16 @@
       "dissolveSummary": "Dissolve programme…",
       "dissolveBody": "Each wave becomes an ordinary plan again. Wave copies you never sent are archived so they don't clutter your plans — anything already sent to the desk is untouched.",
       "dissolveConfirm": "Dissolve programme"
+    },
+    "share": {
+      "summary": "Share with your client",
+      "activeBadge": "Link active",
+      "activeHint": "Anyone with this link can view the plan — no sign-in. Regenerating or disabling kills the old link immediately.",
+      "urlLabel": "Share link",
+      "regenerate": "New link",
+      "disable": "Disable link",
+      "offHint": "Create a read-only link your client can open without an account — for sign-off on titles, timing and budget.",
+      "enable": "Create share link"
     }
   },
   "rfq": {
@@ -2783,5 +2793,17 @@
     "nextWaveBodyDateNear": "Wave {n} is scheduled from {date}. Send it now so the desk has time to book it.",
     "nextWaveAngle": "Angle: {angle}",
     "openWave": "Open wave"
+  },
+  "shareList": {
+    "eyebrow": "Media plan from {org}",
+    "waveNote": "Wave {n} of {of}",
+    "qty": "{count} placements",
+    "weWriteIt": "Article written by NativeSpin",
+    "placementTbd": "Placement to be proposed by the desk",
+    "totalLabel": "Estimated indicative total",
+    "plusOnRequest": "+ items priced on request",
+    "disclaimer": "Indicative prices — a firm quote confirms final pricing before anything is booked.",
+    "footer": "Prepared with NativeSpin — native advertising in premium newspapers and trade press.",
+    "from": "From {date}"
   }
 }

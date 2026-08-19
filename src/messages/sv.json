@@ -616,6 +616,16 @@
       "dissolveSummary": "Lös upp programmet …",
       "dissolveBody": "Varje omgång blir en vanlig plan igen. Omgångar ni aldrig skickat in arkiveras, så att de inte skräpar ner bland era planer – allt som redan skickats till desken rörs inte.",
       "dissolveConfirm": "Lös upp programmet"
+    },
+    "share": {
+      "summary": "Dela med kunden",
+      "activeBadge": "Länk aktiv",
+      "activeHint": "Alla med den här länken kan se planen – utan inloggning. Ny länk eller inaktivering dödar den gamla direkt.",
+      "urlLabel": "Delningslänk",
+      "regenerate": "Ny länk",
+      "disable": "Inaktivera länken",
+      "offHint": "Skapa en skrivskyddad länk kunden kan öppna utan konto – för godkännande av titlar, timing och budget.",
+      "enable": "Skapa delningslänk"
     }
   },
   "rfq": {
@@ -2784,5 +2794,17 @@
     "nextWaveBodyDateNear": "Omgång {n} är planerad från {date}. Skicka den nu så att desken hinner boka.",
     "nextWaveAngle": "Vinkel: {angle}",
     "openWave": "Öppna omgången"
+  },
+  "shareList": {
+    "eyebrow": "Medieplan från {org}",
+    "waveNote": "Omgång {n} av {of}",
+    "qty": "{count} placeringar",
+    "weWriteIt": "Artikel skriven av NativeSpin",
+    "placementTbd": "Placering föreslås av desken",
+    "totalLabel": "Uppskattat riktpris totalt",
+    "plusOnRequest": "+ rader prissätts på förfrågan",
+    "disclaimer": "Riktpriser – en fast offert bekräftar slutligt pris innan något bokas.",
+    "footer": "Skapad med NativeSpin – native advertising i ledande tidningar och fackpress.",
+    "from": "Från {date}"
   }
 }
