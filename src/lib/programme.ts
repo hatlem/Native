@@ -1,7 +1,7 @@
 // Campaign programmes — multi-wave planning (DB side).
 //
 // A programme is N SavedLists ("waves") sharing titles + targeting, spaced by
-// a cadence, each with its own article angle. Everything downstream of a list
+// a cadence, each optionally linked to its own Article. Everything downstream of a list
 // (Request → Quote → Order) is untouched: a wave submits like any list.
 // The pure cadence rules live in programme-cadence.ts (re-exported here).
 
@@ -69,7 +69,6 @@ export async function copyListForNewWave(
     shiftWeeks: number;
     programmeId?: string;
     waveNumber?: number;
-    articleAngle?: string | null;
     // Drop line schedules instead of shifting them — for a copy of a
     // finished campaign whose dates are all in the past.
     resetSchedule?: boolean;
@@ -95,7 +94,6 @@ export async function copyListForNewWave(
       targetVerticals: source.targetVerticals,
       programmeId: opts.programmeId ?? null,
       waveNumber: opts.waveNumber ?? null,
-      articleAngle: opts.articleAngle ?? null,
       createdById: opts.createdById,
       items: {
         create: source.items.map((i) => ({
@@ -127,7 +125,6 @@ export async function createProgramme(input: {
   userId: string | null;
   waves: number;
   spacingWeeks: number;
-  angles: Array<string | null>;
   rationaleKey: string | null;
   // Opt-in auto-send: the sweep submits each due wave as a normal RFQ.
   autoSend?: boolean;
@@ -147,10 +144,6 @@ export async function createProgramme(input: {
   if (source.programmeId) throw new ProgrammeError("already-in-programme");
   if (source.items.length === 0) throw new ProgrammeError("empty");
 
-  const angle = (k: number) => {
-    const a = input.angles[k]?.trim();
-    return a ? a.slice(0, 300) : null;
-  };
   const baseName = source.name.replace(/\s*·\s*Wave \d+$/i, "");
 
   return prisma.$transaction(async (tx) => {
@@ -171,7 +164,6 @@ export async function createProgramme(input: {
       data: {
         programmeId: programme.id,
         waveNumber: 1,
-        articleAngle: angle(0),
         name: `${baseName} · Wave 1`,
       },
     });
@@ -185,7 +177,6 @@ export async function createProgramme(input: {
             shiftWeeks: spacingWeeks * (k - 1),
             programmeId: programme.id,
             waveNumber: k,
-            articleAngle: angle(k - 1),
             anchorNow: now,
             createdById: input.userId,
           },
@@ -210,7 +201,8 @@ export type ProgrammeView = {
     listId: string;
     waveNumber: number;
     name: string;
-    articleAngle: string | null;
+    articleId: string | null;
+    articleTitle: string | null;
     scheduleStart: Date | null;
     state: WaveState;
     orderId: string | null;
@@ -220,6 +212,7 @@ export type ProgrammeView = {
 
 const WAVE_STATE_INCLUDE = {
   items: { select: { scheduleStart: true } },
+  article: { select: { id: true, title: true } },
   requests: {
     orderBy: { createdAt: "desc" as const },
     take: 1,
@@ -286,7 +279,8 @@ function toView(
         listId: w.id,
         waveNumber: w.waveNumber as number,
         name: w.name,
-        articleAngle: w.articleAngle,
+        articleId: w.article?.id ?? null,
+        articleTitle: w.article?.title ?? null,
         scheduleStart: earliestStart(w.items),
         ...waveState(w),
       })),
@@ -311,7 +305,8 @@ export type DueWave = {
   programmeName: string;
   waveNumber: number;
   plannedWaves: number;
-  articleAngle: string | null;
+  articleId: string | null;
+  articleTitle: string | null;
   scheduleStart: Date | null;
   reason: "previous-live" | "previous-done" | "date-near";
 };
@@ -362,7 +357,8 @@ export function dueWaveFromView(
       programmeName: view.name,
       waveNumber: w.waveNumber,
       plannedWaves: view.plannedWaves,
-      articleAngle: w.articleAngle,
+      articleId: w.articleId,
+      articleTitle: w.articleTitle,
       scheduleStart: w.scheduleStart,
       reason,
     };
@@ -401,10 +397,17 @@ export async function findDueAutoSendWaves(now: Date): Promise<DueWave[]> {
   return findDueWavesWhere({ autoSendEnabled: true }, now, { requirePreviousSubmitted: true });
 }
 
-export async function setWaveAngle(listId: string, angle: string | null): Promise<void> {
+export async function linkWaveArticle(listId: string, articleId: string): Promise<void> {
   await prisma.savedList.updateMany({
     where: { id: listId },
-    data: { articleAngle: angle && angle.trim() ? angle.trim().slice(0, 300) : null },
+    data: { articleId },
+  });
+}
+
+export async function unlinkWaveArticle(listId: string): Promise<void> {
+  await prisma.savedList.updateMany({
+    where: { id: listId },
+    data: { articleId: null },
   });
 }
 
@@ -429,7 +432,7 @@ export async function sourceListForOrder(orderId: string): Promise<WaveSourceLis
  */
 export async function withWaveAngle(
   brief: string,
-  list: { programmeId: string | null; waveNumber: number | null; articleAngle: string | null },
+  list: { programmeId: string | null; waveNumber: number | null; articleTitle: string | null },
 ): Promise<string> {
   if (!list.programmeId || !list.waveNumber) return brief;
   const programme = await prisma.campaignProgramme.findUnique({
@@ -437,7 +440,7 @@ export async function withWaveAngle(
     select: { plannedWaves: true },
   });
   const of = programme?.plannedWaves ?? list.waveNumber;
-  const angle = list.articleAngle?.trim() || "(not set — fresh angle for this wave)";
+  const angle = list.articleTitle?.trim() || "(not set — no article linked for this wave)";
   const line = `Article angle (wave ${list.waveNumber} of ${of}): ${angle}`;
   return brief ? `${line}\n${brief}` : line;
 }
@@ -483,7 +486,7 @@ export async function dissolveProgramme(
           name: w.name.replace(/\s*·\s*Wave \d+$/i, ""),
           programmeId: null,
           waveNumber: null,
-          articleAngle: null,
+          articleId: null,
           ...(archiveNow ? { archivedAt: now } : {}),
         },
       });

@@ -89,7 +89,7 @@ export default async function SharedListPage({
         {list.programme && list.waveNumber ? (
           <p className="muted">
             {t("waveNote", { n: list.waveNumber, of: list.programme.plannedWaves })}
-            {list.articleAngle ? ` · ${list.articleAngle}` : ""}
+            {list.article?.title ? ` · ${list.article.title}` : ""}
           </p>
         ) : null}
       </header>

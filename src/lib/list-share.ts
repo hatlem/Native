@@ -41,7 +41,8 @@ export const SHARED_LIST_SELECT = {
   archivedAt: true,
   clientApprovedAt: true,
   waveNumber: true,
-  articleAngle: true,
+  articleId: true,
+  article: { select: { title: true } },
   items: {
     orderBy: [{ sortOrder: "asc" }, { createdAt: "asc" }],
     select: {

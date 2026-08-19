@@ -103,8 +103,13 @@ export async function submitRequest(formData: FormData) {
   // A wave of a programme carries its own article angle — put it at the top
   // of the desk-facing brief so the desk and the writer start from THIS
   // wave's idea, not a rerun of the last one. The buyer's own text is kept
-  // verbatim below it (and stays untouched in the cookie draft).
-  const deskBrief = await withWaveAngle(brief, list);
+  // verbatim below it (and stays untouched in the cookie draft). The active
+  // list's own include (lists.ts) doesn't hydrate the article relation, so
+  // it's fetched here — nested, to match RfqSourceList's shape below.
+  const article = list.articleId
+    ? await prisma.article.findUnique({ where: { id: list.articleId }, select: { title: true } })
+    : null;
+  const deskBrief = await withWaveAngle(brief, { ...list, articleTitle: article?.title ?? null });
 
   // Idempotency: a network-retried / double-clicked submit of the SAME list
   // within a short window must not mint a second Request (and, on the firm
@@ -285,7 +290,7 @@ export async function submitRequest(formData: FormData) {
     // guarantee "submitted"; the lib re-runs them, so a race between those
     // checks and this write still resolves to the same redirects.
     const rfq = await submitListAsRfq({
-      list,
+      list: { ...list, article },
       org: { id: org.id, name: org.name },
       brief: {
         text: brief,
