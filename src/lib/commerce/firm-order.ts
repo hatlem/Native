@@ -87,6 +87,37 @@ export class FirmOrderStaleError extends Error {
   }
 }
 
+/** Thrown when the source saved list was edited between the caller's snapshot
+ *  and the committing transaction. The caller should bounce the buyer to
+ *  review the refreshed list rather than commit/charge the stale snapshot. */
+export class FirmOrderChangedError extends Error {
+  constructor(message = "source list changed") {
+    super(message);
+    this.name = "FirmOrderChangedError";
+  }
+}
+
+/** Order-insensitive identity of a saved list's rows — the exact fields whose
+ *  concurrent change must invalidate a submit (line set, qty, product/title,
+ *  withContent → CONTENT_FEE). Shared by /plan submit and the in-txn guard. */
+export function fingerprintListItems(
+  rows: Array<{
+    id: string;
+    quantity: number;
+    productId: string | null;
+    titleId: string | null;
+    withContent: boolean;
+  }>,
+): string {
+  return rows
+    .map(
+      (r) =>
+        `${r.id}:${r.quantity}:${r.productId ?? ""}:${r.titleId ?? ""}:${r.withContent ? 1 : 0}`,
+    )
+    .sort()
+    .join("|");
+}
+
 export type FirmOrderBrief = {
   // Freeform brief text → Request.briefSummary (with targeting lines folded in).
   briefText?: string | null;
@@ -110,8 +141,13 @@ export async function createFirmOrder(args: {
   byId: Map<string, FirmOrderProduct>;
   brief?: FirmOrderBrief;
   sourceListId?: string | null;
+  // When set, the source list is re-fingerprinted INSIDE the transaction and
+  // the order refused (FirmOrderChangedError) on mismatch — closes the
+  // caller's check-then-act window (audit residual: fingerprint TOCTOU).
+  // Only /plan checkout passes it; the public API has no list.
+  listGuard?: { listId: string; fingerprint: string } | null;
 }): Promise<{ requestId: string; orderIds: string[] }> {
-  const { organizationId, orgName, items, byId, brief, sourceListId } = args;
+  const { organizationId, orgName, items, byId, brief, sourceListId, listGuard } = args;
   const goal = brief?.goal ?? null;
   const audience = brief?.audience ?? null;
   const targetGeo = brief?.targetGeo ?? null;
@@ -156,6 +192,21 @@ export async function createFirmOrder(args: {
           requestId: existing.id,
           orderIds: existing.quotes.map((q) => q.order?.id).filter((id): id is string => !!id),
         };
+      }
+    }
+
+    // Re-check the source list against the caller's fingerprint now that we
+    // hold the per-org lock: an edit from another seat/tab that landed after
+    // the caller's pre-flight check must invalidate this submit, not get
+    // silently charged from the stale snapshot.
+    if (listGuard) {
+      const freshRows = await tx.savedListItem.findMany({
+        where: { listId: listGuard.listId },
+        select: { id: true, quantity: true, productId: true, titleId: true, withContent: true },
+      });
+      if (fingerprintListItems(freshRows) !== listGuard.fingerprint) {
+        console.warn("firmorder.changed", { organizationId, listId: listGuard.listId });
+        throw new FirmOrderChangedError();
       }
     }
 

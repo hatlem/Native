@@ -2,7 +2,13 @@ import { test, before, after } from "node:test";
 import assert from "node:assert/strict";
 import { OrgType } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
-import { createFirmOrder, FirmOrderStaleError } from "@/lib/commerce/firm-order";
+import {
+  createFirmOrder,
+  FirmOrderStaleError,
+  FirmOrderChangedError,
+  fingerprintListItems,
+} from "@/lib/commerce/firm-order";
+import { submitListAsRfq, RFQ_LIST_INCLUDE } from "@/lib/commerce/submit-rfq";
 import { createOrderFromQuote } from "@/lib/commerce/accept-quote";
 
 // DB-mutating integration test — skipped unless RUN_DB_IT=1, and only
@@ -134,6 +140,111 @@ if (!RUN_DB_IT) {
     // and it created nothing — no charged order from the stale basket
     assert.equal(await prisma.order.count({ where: { organizationId: orgId, status: "CONFIRMED" } }), 1);
     await prisma.product.update({ where: { id: productId }, data: { active: true } }); // restore
+  });
+
+  test("createFirmOrder refuses (FirmOrderChangedError) when the source list was edited after the fingerprint", async () => {
+    const product = await prisma.product.findUniqueOrThrow({
+      where: { id: productId },
+      include: { priceRules: true, title: { include: { market: true } } },
+    });
+    const byId = new Map([[product.id, product]]);
+    // Buyer's list as loaded at submit time…
+    const list = await prisma.savedList.create({
+      data: {
+        organizationId: orgId,
+        name: "CO-IT guard list",
+        items: { create: [{ productId, quantity: 1 }] },
+      },
+      include: { items: true },
+    });
+    const staleFingerprint = fingerprintListItems(list.items);
+    // …edited by another seat AFTER the caller's pre-flight check (the
+    // check-then-act window the in-transaction guard closes).
+    await prisma.savedListItem.updateMany({ where: { listId: list.id }, data: { quantity: 10 } });
+
+    const before = await prisma.order.count({ where: { organizationId: orgId } });
+    await assert.rejects(
+      createFirmOrder({
+        organizationId: orgId,
+        orgName: "CO-IT org",
+        items: [{ productId, quantity: 1 }],
+        byId,
+        sourceListId: list.id,
+        listGuard: { listId: list.id, fingerprint: staleFingerprint },
+      }),
+      (e) => e instanceof FirmOrderChangedError,
+    );
+    assert.equal(
+      await prisma.order.count({ where: { organizationId: orgId } }),
+      before,
+      "no order minted from the stale snapshot",
+    );
+
+    // With the FRESH fingerprint the same submit succeeds.
+    const fresh = await prisma.savedListItem.findMany({
+      where: { listId: list.id },
+      select: { id: true, quantity: true, productId: true, titleId: true, withContent: true },
+    });
+    const ok = await createFirmOrder({
+      organizationId: orgId,
+      orgName: "CO-IT org",
+      items: [{ productId, quantity: 10 }],
+      byId,
+      sourceListId: list.id,
+      listGuard: { listId: list.id, fingerprint: fingerprintListItems(fresh) },
+    });
+    assert.equal(ok.orderIds.length, 1);
+    await prisma.savedListItem.deleteMany({ where: { listId: list.id } });
+    await prisma.savedList.delete({ where: { id: list.id } });
+  });
+
+  test("submitListAsRfq: two concurrent submits of the same list mint exactly one Request", async () => {
+    // The audit's "gap5 double-submit" residual: both callers pass the cheap
+    // pre-check (neither Request committed yet); the in-transaction advisory
+    // lock + dedup must make the loser adopt the winner's Request.
+    const created = await prisma.savedList.create({
+      data: {
+        organizationId: orgId,
+        name: "CO-IT rfq race list",
+        items: { create: [{ productId, quantity: 1 }] },
+      },
+      select: { id: true },
+    });
+    const list = await prisma.savedList.findUniqueOrThrow({
+      where: { id: created.id },
+      include: RFQ_LIST_INCLUDE,
+    });
+    const input = {
+      list,
+      org: { id: orgId, name: "CO-IT org" },
+      brief: {
+        text: "Race brief",
+        goal: null,
+        audience: null,
+        budget: null,
+        targetGeo: null,
+        targetAudience: null,
+        targetContext: null,
+      },
+      actorUserId: null,
+    };
+    const [a, b] = await Promise.all([submitListAsRfq(input), submitListAsRfq(input)]);
+
+    const outcomes = [a.outcome, b.outcome].sort();
+    assert.deepEqual(outcomes, ["duplicate", "submitted"], "one winner, one deduped loser");
+    const winner = a.outcome === "submitted" ? a : b;
+    const loser = a.outcome === "duplicate" ? a : b;
+    assert.equal(
+      (loser as { requestId: string }).requestId,
+      (winner as { requestId: string }).requestId,
+      "the loser adopts the winner's request",
+    );
+    assert.equal(
+      await prisma.request.count({ where: { sourceListId: created.id } }),
+      1,
+      "exactly one Request for the raced list",
+    );
+    await prisma.savedListItem.deleteMany({ where: { listId: created.id } });
   });
 
   test("createOrderFromQuote confirms a SENT quote with briefs/bookings on placement lines only", async () => {

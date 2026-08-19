@@ -12,7 +12,12 @@ import {
 import { readActiveListId, ensureActiveList } from "@/lib/lists";
 import { isProductPriceShown } from "@/lib/pricing-visibility";
 import { withWaveAngle } from "@/lib/programme";
-import { createFirmOrder, FirmOrderStaleError } from "@/lib/commerce/firm-order";
+import {
+  createFirmOrder,
+  FirmOrderStaleError,
+  FirmOrderChangedError,
+  fingerprintListItems,
+} from "@/lib/commerce/firm-order";
 import { submitListAsRfq } from "@/lib/commerce/submit-rfq";
 import { uniquePublisherIdsForProducts } from "@/lib/commerce/publishers";
 import { groupItemsByMarket } from "@/lib/quote-grouping";
@@ -140,16 +145,10 @@ export async function submitRequest(formData: FormData) {
   // a concurrent edit from another agency seat / second tab can't make us
   // snapshot — or instant-charge — a stale list (line removed/added/qty changed
   // during the grouping + gate round-trips).
-  const fingerprint = (
-    rows: Array<{ id: string; quantity: number; productId: string | null; titleId: string | null; withContent: boolean }>,
-  ) =>
-    rows
-      .map((r) => `${r.id}:${r.quantity}:${r.productId ?? ""}:${r.titleId ?? ""}:${r.withContent ? 1 : 0}`)
-      .sort()
-      .join("|");
   // withContent is included because it drives CONTENT_FEE charges on the firm
   // (instant-order) path — a concurrent toggle must invalidate the snapshot too.
-  const loadedFingerprint = fingerprint(list.items);
+  // (Definition shared with createFirmOrder's in-transaction guard.)
+  const loadedFingerprint = fingerprintListItems(list.items);
 
   // Shape the downstream code already expects (groupItemsByMarket, allFirm,
   // createFirmOrder). Title-only lines never enter `items`/`byId`.
@@ -231,7 +230,7 @@ export async function submitRequest(formData: FormData) {
     where: { listId: list.id },
     select: { id: true, quantity: true, productId: true, titleId: true, withContent: true },
   });
-  if (fingerprint(freshItems) !== loadedFingerprint) {
+  if (fingerprintListItems(freshItems) !== loadedFingerprint) {
     console.warn("checkout.blocked", { reason: "changed", orgId: org.id, listId: list.id });
     redirect(`/${locale}/plan?error=changed`);
   }
@@ -249,6 +248,7 @@ export async function submitRequest(formData: FormData) {
         orgName: org.name,
         items,
         byId,
+        listGuard: { listId: list.id, fingerprint: loadedFingerprint },
         sourceListId: list.id,
         brief: {
           briefText: deskBrief,
@@ -267,6 +267,12 @@ export async function submitRequest(formData: FormData) {
       if (e instanceof FirmOrderStaleError) {
         console.warn("checkout.blocked", { reason: "unavailable", orgId: org.id, via: "firmOrderStale", listId: list.id });
         redirect(`/${locale}/plan?error=unavailable`);
+      }
+      // The list was edited (another seat/tab) after our pre-flight fingerprint
+      // check — same buyer outcome as the pre-flight catch: review & resubmit.
+      if (e instanceof FirmOrderChangedError) {
+        console.warn("checkout.blocked", { reason: "changed", orgId: org.id, via: "firmOrderChanged", listId: list.id });
+        redirect(`/${locale}/plan?error=changed`);
       }
       throw e;
     }

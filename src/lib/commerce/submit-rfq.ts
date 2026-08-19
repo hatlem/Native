@@ -165,6 +165,24 @@ export async function submitListAsRfq(input: {
   // RFQ: create the plan + request for the desk to price later. No quotes
   // here — pricing is deferred to generateQuote.
   const request = await prisma.$transaction(async (tx) => {
+    // Serialize submits per org (same lock key as createFirmOrder and the
+    // list-adoption path in lists.ts) and re-run the double-submit check
+    // INSIDE the lock: two tabs submitting the same list concurrently both
+    // pass the cheap pre-check above (neither Request is committed yet) —
+    // the loser must adopt the winner's Request instead of minting a
+    // duplicate RFQ for the desk. (Audit residual "gap5 double-submit".)
+    await tx.$executeRaw`SELECT pg_advisory_xact_lock(hashtext(${org.id}))`;
+    const dupe = await tx.request.findFirst({
+      where: {
+        sourceListId: list.id,
+        organizationId: org.id,
+        createdAt: { gt: new Date(Date.now() - 10_000) },
+      },
+      orderBy: { createdAt: "desc" },
+      select: { id: true },
+    });
+    if (dupe) return { id: dupe.id, duped: true };
+
     // Snapshot BOTH product lines and Title placeholders into the Plan so
     // the desk sees the full ask — title-only lines land as
     // PlanItem{titleId, productId:null} for the desk to resolve manually.
@@ -238,8 +256,15 @@ export async function submitListAsRfq(input: {
         sourceListId: list.id,
       },
     });
-    return { id: req.id };
+    return { id: req.id, duped: false };
   });
+
+  // A deduped concurrent retry adopts the first submit's request — skip the
+  // duplicate audit entry and desk notification.
+  if (request.duped) {
+    console.warn("rfq.dedup_hit", { orgId: org.id, listId: list.id, requestId: request.id });
+    return { outcome: "duplicate", requestId: request.id };
+  }
 
   await recordAudit(input.actorUserId, "request.submit", `Request:${request.id}`, {
     orgId: org.id,
