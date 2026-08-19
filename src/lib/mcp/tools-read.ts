@@ -8,9 +8,43 @@ import {
 import { listPendingQuotes, getPriceHistory } from "@/lib/pricing/quotes";
 import { requestStatus } from "@/lib/pricing/requests";
 import { listForTitle as listContactLogsForTitle } from "@/lib/pricing/contact-log";
-import type { MarketCode } from "@prisma/client";
+import { searchTitleIds, searchWhereFor } from "@/lib/catalog-search";
+import type { MarketCode, Prisma } from "@prisma/client";
 
 export const readToolDefinitions = {
+  native_search_titles: {
+    description:
+      "Search titles by name, alias, or keyword (fuzzy — full-text search with an ILIKE/alias fallback, the same engine that powers the buyer catalog search). Use this to find a title's id/slug when you only know the publication's name — don't guess a slug for native_get_title.",
+    parameters: z.object({
+      query: z.string().min(1),
+      market: z.enum(["NO", "SE", "DK", "FI", "DE", "AT", "CH", "UK", "IE"]).optional(),
+      limit: z.number().int().min(1).max(50).default(20),
+    }),
+    handler: async (args: { query: string; market?: MarketCode; limit: number }) => {
+      const matchedIds = await searchTitleIds(args.query);
+      const where: Prisma.TitleWhereInput = {
+        ...searchWhereFor(args.query, matchedIds),
+        ...(args.market ? { market: { code: args.market } } : {}),
+      };
+      const titles = await prisma.title.findMany({
+        where,
+        include: { publisher: true, market: true },
+        orderBy: { name: "asc" },
+        take: args.limit,
+      });
+      return titles.map((t) => ({
+        id: t.id,
+        slug: t.slug,
+        name: t.name,
+        market: t.market.code,
+        publisherId: t.publisherId,
+        publisherName: t.publisher.name,
+        websiteUrl: t.websiteUrl,
+        active: t.active,
+      }));
+    },
+  },
+
   native_list_titles_needing_price_check: {
     description:
       "List titles whose latest confirmed price is older than N days (or never confirmed). Use to find candidates for a price-check outreach.",

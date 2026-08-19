@@ -8,6 +8,7 @@ import { POST as postOrder } from "@/app/api/v1/orders/route";
 import { GET as getTitles } from "@/app/api/v1/catalog/titles/route";
 import { GET as getTitle } from "@/app/api/v1/catalog/titles/[id]/route";
 import { buildMcpServerForToken } from "@/lib/mcp/server";
+import { readToolDefinitions } from "@/lib/mcp/tools-read";
 
 // DB-mutating integration test — skipped unless RUN_DB_IT=1, and only
 // against a DISPOSABLE database. Exercises the public /api/v1 contract
@@ -375,5 +376,16 @@ if (!RUN_DB_IT) {
   test("mcp: pricing:admin key opens the MCP server", async () => {
     const server = await buildMcpServerForToken(pricingAdminToken);
     assert.ok(server, "desk pricing:admin key should get an MCP server");
+  });
+
+  test("mcp: native_search_titles finds a title by partial name without a known slug", async () => {
+    const results = await readToolDefinitions.native_search_titles.handler({
+      query: "API-IT Tit",
+      limit: 20,
+    });
+    assert.ok(
+      results.some((r) => r.id === titleId),
+      "search should surface the seeded title from a partial name match",
+    );
   });
 }
