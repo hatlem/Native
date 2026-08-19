@@ -4,6 +4,7 @@ import {
   canWriteLine,
   canAssignWriter,
   isAssignmentActive,
+  canWriteArticle,
 } from "./access";
 
 test("desk and superadmin can always write a line", () => {
@@ -50,4 +51,113 @@ test("an assignment is active until its latest asset is FINAL/RETRACTED", () => 
   assert.equal(isAssignmentActive("IN_REVIEW"), true);
   assert.equal(isAssignmentActive("FINAL"), false);
   assert.equal(isAssignmentActive("RETRACTED"), false);
+});
+
+test("canWriteArticle: DESK can always write", () => {
+  assert.equal(
+    canWriteArticle({
+      role: "DESK",
+      userId: "u1",
+      organizationId: "org1",
+      scopeOrgIds: [],
+      assignedWriterUserId: null,
+    }),
+    true,
+  );
+});
+
+test("canWriteArticle: SUPERADMIN can always write", () => {
+  assert.equal(
+    canWriteArticle({
+      role: "SUPERADMIN",
+      userId: "u1",
+      organizationId: "org1",
+      scopeOrgIds: [],
+      assignedWriterUserId: null,
+    }),
+    true,
+  );
+});
+
+test("canWriteArticle: CONTENT can write only if assigned to this article", () => {
+  assert.equal(
+    canWriteArticle({
+      role: "CONTENT",
+      userId: "writer1",
+      organizationId: "org1",
+      scopeOrgIds: [],
+      assignedWriterUserId: "writer1",
+    }),
+    true,
+  );
+  assert.equal(
+    canWriteArticle({
+      role: "CONTENT",
+      userId: "writer1",
+      organizationId: "org1",
+      scopeOrgIds: [],
+      assignedWriterUserId: "someone-else",
+    }),
+    false,
+  );
+  assert.equal(
+    canWriteArticle({
+      role: "CONTENT",
+      userId: "writer1",
+      organizationId: "org1",
+      scopeOrgIds: [],
+      assignedWriterUserId: null,
+    }),
+    false,
+  );
+});
+
+test("canWriteArticle: BUYER/APPROVER/ORG_ADMIN can write only within their org scope", () => {
+  for (const role of ["BUYER", "APPROVER", "ORG_ADMIN"]) {
+    assert.equal(
+      canWriteArticle({
+        role,
+        userId: "buyer1",
+        organizationId: "org1",
+        scopeOrgIds: ["org1", "org2"],
+        assignedWriterUserId: null,
+      }),
+      true,
+      `${role} in scope should be able to write`,
+    );
+    assert.equal(
+      canWriteArticle({
+        role,
+        userId: "buyer1",
+        organizationId: "org3",
+        scopeOrgIds: ["org1", "org2"],
+        assignedWriterUserId: null,
+      }),
+      false,
+      `${role} out of scope should not be able to write`,
+    );
+  }
+});
+
+test("canWriteArticle: PUBLISHER and unauthenticated cannot write", () => {
+  assert.equal(
+    canWriteArticle({
+      role: "PUBLISHER",
+      userId: "pub1",
+      organizationId: "org1",
+      scopeOrgIds: ["org1"],
+      assignedWriterUserId: null,
+    }),
+    false,
+  );
+  assert.equal(
+    canWriteArticle({
+      role: "BUYER",
+      userId: undefined,
+      organizationId: "org1",
+      scopeOrgIds: ["org1"],
+      assignedWriterUserId: null,
+    }),
+    false,
+  );
 });

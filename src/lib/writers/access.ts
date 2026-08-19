@@ -30,3 +30,20 @@ export function isAssignmentActive(
 ): boolean {
   return latestAssetStatus !== "FINAL" && latestAssetStatus !== "RETRACTED";
 }
+
+const ORG_SCOPED_ROLES = new Set(["BUYER", "APPROVER", "ORG_ADMIN"]);
+
+export function canWriteArticle(args: {
+  role: string | undefined;
+  userId: string | undefined;
+  organizationId: string;
+  scopeOrgIds: string[];
+  assignedWriterUserId: string | null | undefined;
+}): boolean {
+  const { role, userId, organizationId, scopeOrgIds, assignedWriterUserId } = args;
+  if (!userId) return false;
+  if (role === "DESK" || role === "SUPERADMIN") return true;
+  if (role === "CONTENT") return assignedWriterUserId === userId;
+  if (role && ORG_SCOPED_ROLES.has(role)) return scopeOrgIds.includes(organizationId);
+  return false;
+}
