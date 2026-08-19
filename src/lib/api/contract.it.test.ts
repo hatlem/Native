@@ -18,12 +18,17 @@ import { mutateToolDefinitions } from "@/lib/mcp/tools-mutate";
 // the RFQ-only gate, the happy order path, and catalog price redaction.
 const RUN_DB_IT = process.env.RUN_DB_IT === "1";
 
-function orderReq(token: string | null, body: unknown): NextRequest {
+function orderReq(
+  token: string | null,
+  body: unknown,
+  extraHeaders: Record<string, string> = {},
+): NextRequest {
   return new NextRequest("http://localhost/api/v1/orders", {
     method: "POST",
     headers: {
       "content-type": "application/json",
       ...(token ? { authorization: `Bearer ${token}` } : {}),
+      ...extraHeaders,
     },
     body: typeof body === "string" ? body : JSON.stringify(body),
   });
@@ -267,6 +272,80 @@ if (!RUN_DB_IT) {
     const request = await prisma.request.findUniqueOrThrow({ where: { id: body.requestId } });
     assert.equal(request.status, "CLOSED");
     assert.ok(request.briefSummary?.includes("API-IT campaign"));
+  });
+
+  // ---- POST /api/v1/orders + Idempotency-Key ----
+
+  test("orders: malformed Idempotency-Key → 400 BAD_IDEMPOTENCY_KEY", async () => {
+    for (const bad of ["", "has space", "x".repeat(256), "nøkkel"]) {
+      const res = await postOrder(
+        orderReq(
+          ordersToken,
+          { items: [{ productId: firmProductId, quantity: 1 }] },
+          { "idempotency-key": bad },
+        ),
+      );
+      assert.equal(res.status, 400, `key ${JSON.stringify(bad)} should be rejected`);
+      assert.equal((await res.json()).error.code, "BAD_IDEMPOTENCY_KEY");
+    }
+  });
+
+  test("orders: retry with the same Idempotency-Key replays the 201 — never a second order", async () => {
+    const body = {
+      items: [{ productId: firmProductId, quantity: 1 }],
+      reference: "API-IT idempotent",
+    };
+    const key = `api-it-idem-${Date.now()}`;
+    const first = await postOrder(orderReq(ordersToken, body, { "idempotency-key": key }));
+    assert.equal(first.status, 201);
+    assert.equal(first.headers.get("idempotency-replayed"), null);
+    const firstBody = await first.json();
+
+    const ordersBefore = await prisma.order.count({ where: { organizationId: orgId } });
+
+    // Byte-identical retry (same JSON.stringify output) → stored replay.
+    const retry = await postOrder(orderReq(ordersToken, body, { "idempotency-key": key }));
+    assert.equal(retry.status, 201);
+    assert.equal(retry.headers.get("idempotency-replayed"), "true");
+    assert.deepEqual(await retry.json(), firstBody);
+
+    const ordersAfter = await prisma.order.count({ where: { organizationId: orgId } });
+    assert.equal(ordersAfter, ordersBefore, "a replayed request must not mint another order");
+  });
+
+  test("orders: same Idempotency-Key with a different body → 422 IDEMPOTENCY_KEY_REUSE", async () => {
+    const key = `api-it-reuse-${Date.now()}`;
+    const first = await postOrder(
+      orderReq(
+        ordersToken,
+        { items: [{ productId: firmProductId, quantity: 1 }] },
+        { "idempotency-key": key },
+      ),
+    );
+    assert.equal(first.status, 201);
+
+    const res = await postOrder(
+      orderReq(
+        ordersToken,
+        { items: [{ productId: firmProductId, quantity: 2 }] },
+        { "idempotency-key": key },
+      ),
+    );
+    assert.equal(res.status, 422);
+    assert.equal((await res.json()).error.code, "IDEMPOTENCY_KEY_REUSE");
+  });
+
+  test("orders: deterministic failures are stored and replayed under the same key", async () => {
+    const key = `api-it-fail-${Date.now()}`;
+    const body = { items: [{ productId: "nope-123", quantity: 1 }] };
+    const first = await postOrder(orderReq(ordersToken, body, { "idempotency-key": key }));
+    assert.equal(first.status, 422);
+    assert.equal((await first.json()).error.code, "UNKNOWN_PRODUCT");
+
+    const retry = await postOrder(orderReq(ordersToken, body, { "idempotency-key": key }));
+    assert.equal(retry.status, 422);
+    assert.equal(retry.headers.get("idempotency-replayed"), "true");
+    assert.equal((await retry.json()).error.code, "UNKNOWN_PRODUCT");
   });
 
   // ---- GET /api/v1/catalog/titles ----
