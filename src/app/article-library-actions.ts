@@ -1,7 +1,7 @@
 "use server";
 
 import { redirect } from "next/navigation";
-import type { UserRole } from "@prisma/client";
+import { Prisma, type UserRole } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
 import { recordAudit } from "@/lib/audit";
 import { loadScope, canActOnOrg } from "@/lib/scope";
@@ -90,10 +90,13 @@ export async function linkArticleToOrderLine(formData: FormData) {
       where: { id: articleId },
       data: { orderLineId },
     });
-  } catch {
-    // P2002 unique violation — someone else linked this line first between
-    // our read and write. Surface as a link error rather than a crash.
-    redirect(`/${locale}/articles/${articleId}?error=taken`);
+  } catch (error) {
+    if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === "P2002") {
+      // Unique violation — someone else linked this line first between our
+      // read and write. Surface as a link error rather than a crash.
+      redirect(`/${locale}/articles/${articleId}?error=taken`);
+    }
+    throw error;
   }
   await recordAudit(userId, "article.link", `Article:${articleId}`, { orderLineId });
 
