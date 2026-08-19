@@ -9,6 +9,8 @@ import { recordAudit } from "@/lib/audit";
 import { notifyOrg, notifyPublisher } from "@/lib/notify";
 import { requireDesk } from "@/lib/desk-guard";
 import { findDueWaves } from "@/lib/programme";
+import { marketDefaultLocale } from "@/lib/market-locale";
+import { buildOrderCompletedNotice } from "@/lib/order-completed-notice";
 import {
   canCancelOrder,
   cancelBlockReason,
@@ -54,17 +56,35 @@ export async function advanceOrder(formData: FormData) {
         // would show whichever list happens to be active); otherwise to the
         // finished order, which offers "Plan next wave" (a full copy of the
         // list, ready to edit).
+        // This notification is read by the BUYER org, so both copy and
+        // link locale come from the org's home market — not from `locale`,
+        // which is the desk associate's UI language and previously leaked
+        // into the buyer's inbox (English body, desk-locale link).
         const planName = await orderPlanName(order.id);
         const due = (await findDueWaves([order.organizationId], new Date()))[0] ?? null;
+        const org = await prisma.organization.findUnique({
+          where: { id: order.organizationId },
+          select: { marketCode: true },
+        });
+        // marketCode is nullable until onboarding completes; English is
+        // the safe default for an org without a declared home market.
+        const buyerLocale = org?.marketCode ? marketDefaultLocale(org.marketCode) : "en";
+        const notice = buildOrderCompletedNotice({
+          locale: buyerLocale,
+          planName,
+          due: due
+            ? {
+                waveNumber: due.waveNumber,
+                plannedWaves: due.plannedWaves,
+                articleAngle: due.articleAngle,
+              }
+            : null,
+        });
         await notifyOrg(order.organizationId, {
           kind: "ORDER_COMPLETED",
-          title: `Campaign finished: ${planName}`,
-          body: due
-            ? `Wave ${due.waveNumber} of ${due.plannedWaves} is ready to send${
-                due.articleAngle ? ` — angle: ${due.articleAngle}` : ""
-              }. A fresh article now, while readers still remember the last one, is what turns one placement into a campaign that sticks.`
-            : `Your placements have run. Native works through repetition — plan the next wave with a fresh article angle while readers still remember this one.`,
-          link: due ? `/${locale}/home` : `/${locale}/orders/${order.id}`,
+          title: notice.title,
+          body: notice.body,
+          link: due ? `/${buyerLocale}/home` : `/${buyerLocale}/orders/${order.id}`,
         });
       } else {
         await notifyOrg(order.organizationId, {
