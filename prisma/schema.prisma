@@ -154,10 +154,6 @@ enum ContentAssetStatus {
   CHANGES_REQUESTED
   APPROVED
   FINAL
-  // Publisher invoked editorial veto — the draft is hard-rejected, not
-  // a soft "please tweak". Asset row stays for audit; status flag keeps
-  // it out of any "current asset" picker.
-  RETRACTED
 }
 
 enum BookingStatus {
@@ -1072,11 +1068,12 @@ model SavedList {
   targetVerticals String?
   // Programme membership: a multi-wave campaign is N lists sharing titles and
   // targeting; this list is wave `waveNumber` (1-based) of `programme`, with
-  // its own editorial `articleAngle` (folded into the desk brief on submit).
-  programmeId  String?
-  programme    CampaignProgramme? @relation(fields: [programmeId], references: [id], onDelete: SetNull)
-  waveNumber   Int?
-  articleAngle String?
+  // its own linked `article` (the desk brief folds it in on submit).
+  programmeId String?
+  programme   CampaignProgramme? @relation(fields: [programmeId], references: [id], onDelete: SetNull)
+  waveNumber  Int?
+  articleId   String?
+  article     Article?           @relation(fields: [articleId], references: [id])
   // Client-share link: an unguessable 256-bit token that renders a read-only
   // view of this list at /share/[token] with no sign-in. Null = not shared.
   // Regenerated on every enable; clearing it kills the link instantly.
@@ -1269,10 +1266,10 @@ model OrderLine {
   // convention as Order.cancelledBy.
   assignedById     String?
 
-  brief        ContentBrief?
-  article      Article?
-  booking      PublisherBooking?
-  trackedLinks TrackedLink[]
+  brief            ContentBrief?
+  articlePlacement ArticlePlacement?
+  booking          PublisherBooking?
+  trackedLinks     TrackedLink[]
 
   @@index([assignedWriterId])
 }
@@ -1299,15 +1296,34 @@ model Article {
   createdByRole    UserRole
   assignedWriterId String?
   assignedWriter   WriterProfile? @relation("ArticleAssignedWriter", fields: [assignedWriterId], references: [id])
-  orderLineId      String?       @unique
-  orderLine        OrderLine?    @relation(fields: [orderLineId], references: [id])
   createdAt        DateTime      @default(now())
   updatedAt        DateTime      @updatedAt
 
-  versions ContentAsset[]
+  versions   ContentAsset[]
+  placements ArticlePlacement[]
+  savedLists SavedList[]
 
   @@index([organizationId])
   @@index([assignedWriterId])
+}
+
+model ArticlePlacement {
+  id             String        @id @default(cuid())
+  orderLineId    String        @unique
+  orderLine      OrderLine     @relation(fields: [orderLineId], references: [id])
+  articleId      String
+  article        Article       @relation(fields: [articleId], references: [id])
+  lockedAssetId  String?
+  lockedAsset    ContentAsset? @relation(fields: [lockedAssetId], references: [id])
+  specPassed     Boolean?
+  specNotes      String?
+  retractedAt    DateTime?
+  retractedBy    String?
+  retractionNote String?
+  createdAt      DateTime      @default(now())
+  updatedAt      DateTime      @updatedAt
+
+  @@index([articleId])
 }
 
 model ContentAsset {
@@ -1320,14 +1336,7 @@ model ContentAsset {
   authorWriterId String?
   authorWriter   WriterProfile? @relation("AssetAuthor", fields: [authorWriterId], references: [id])
   bodyUrl     String? // pointer into object storage
-  specPassed  Boolean?
   reviewNotes String?
-  // Publisher-side editorial veto stamp. Separate from `reviewNotes`
-  // because the audit chain needs to distinguish a soft "request
-  // changes" comment from a hard "this will not run" decision.
-  retractedAt     DateTime?
-  retractedBy     String?
-  retractionNote  String?
   // Lineage pointer for cross-market content reuse (Maja R2's gap).
   // When a writer adapts an existing article for a new market — e.g.
   // the Danish "Sådan slipper du HR-konsulenten" piece becomes the
@@ -1340,6 +1349,8 @@ model ContentAsset {
   adaptations     ContentAsset[] @relation("AssetLineage")
   createdAt   DateTime           @default(now())
   updatedAt   DateTime           @updatedAt
+
+  lockedInPlacements ArticlePlacement[]
 
   @@index([sourceAssetId])
   @@index([authorWriterId])
