@@ -9,9 +9,30 @@ import { listPendingQuotes, getPriceHistory } from "@/lib/pricing/quotes";
 import { requestStatus } from "@/lib/pricing/requests";
 import { listForTitle as listContactLogsForTitle } from "@/lib/pricing/contact-log";
 import { searchTitleIds, searchWhereFor } from "@/lib/catalog-search";
+import { searchPublishers } from "@/lib/pricing/titles";
 import type { MarketCode, Prisma } from "@prisma/client";
 
 export const readToolDefinitions = {
+  native_search_publishers: {
+    description:
+      "Search publishers by name (substring, case-insensitive). Use before native_create_title to find an existing publisher instead of guessing whether one already exists — e.g. a sales house that already reps another title in the catalog.",
+    parameters: z.object({
+      query: z.string().min(1),
+      market: z.enum(["NO", "SE", "DK", "FI", "DE", "AT", "CH", "UK", "IE"]).optional(),
+      limit: z.number().int().min(1).max(50).default(20),
+    }),
+    handler: async (args: { query: string; market?: MarketCode; limit: number }) => {
+      const publishers = await searchPublishers(args);
+      return publishers.map((p) => ({
+        id: p.id,
+        name: p.name,
+        market: p.market.code,
+        countryCode: p.countryCode,
+        pricesPublic: p.pricesPublic,
+      }));
+    },
+  },
+
   native_search_titles: {
     description:
       "Search titles by name, alias, or keyword (fuzzy — full-text search with an ILIKE/alias fallback, the same engine that powers the buyer catalog search). Use this to find a title's id/slug when you only know the publication's name — don't guess a slug for native_get_title.",

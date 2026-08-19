@@ -9,6 +9,7 @@ import { GET as getTitles } from "@/app/api/v1/catalog/titles/route";
 import { GET as getTitle } from "@/app/api/v1/catalog/titles/[id]/route";
 import { buildMcpServerForToken } from "@/lib/mcp/server";
 import { readToolDefinitions } from "@/lib/mcp/tools-read";
+import { mutateToolDefinitions } from "@/lib/mcp/tools-mutate";
 
 // DB-mutating integration test — skipped unless RUN_DB_IT=1, and only
 // against a DISPOSABLE database. Exercises the public /api/v1 contract
@@ -387,5 +388,48 @@ if (!RUN_DB_IT) {
       results.some((r) => r.id === titleId),
       "search should surface the seeded title from a partial name match",
     );
+  });
+
+  test("mcp: native_search_publishers finds a publisher by partial name", async () => {
+    const results = await readToolDefinitions.native_search_publishers.handler({
+      query: "API-IT publisher",
+      limit: 20,
+    });
+    assert.ok(
+      results.some((r) => r.id === publisherId),
+      "search should surface the seeded publisher from a partial name match",
+    );
+  });
+
+  test("mcp: native_create_title creates an inactive, unverified title under an existing publisher", async () => {
+    const mutators = mutateToolDefinitions("api-it");
+    const created = await mutators.native_create_title.handler({
+      publisherId,
+      name: "API-IT New Title",
+      category: "trade-press",
+    });
+    assert.equal(created.active, false, "new titles must stay inactive until desk review");
+    assert.equal(created.verificationStatus, "UNVERIFIED");
+    assert.equal(created.publisherId, publisherId);
+    assert.equal(created.marketId, (await readToolDefinitions.native_get_title.handler({ idOrSlug: titleId }))!.marketId);
+
+    const found = await readToolDefinitions.native_search_titles.handler({
+      query: "API-IT New Title",
+      limit: 20,
+    });
+    assert.ok(found.some((r) => r.id === created.id));
+  });
+
+  test("mcp: native_create_title marks a title LIVE when verifiedFromReply is set", async () => {
+    const mutators = mutateToolDefinitions("api-it");
+    const created = await mutators.native_create_title.handler({
+      publisherId,
+      name: "API-IT Verified Title",
+      category: "trade-press",
+      verifiedFromReply: true,
+      verificationSource: "sales-contact@example.com",
+    });
+    assert.equal(created.verificationStatus, "LIVE");
+    assert.equal(created.verificationSource, "sales-contact@example.com");
   });
 }

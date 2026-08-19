@@ -12,6 +12,7 @@ import {
 import { applyQuote, logQuote, activateQuoteProducts } from "@/lib/pricing/quotes";
 import { inclusionsSchema, type ProductInclusions } from "@/lib/pricing/inclusions";
 import { createContactLog } from "@/lib/pricing/contact-log";
+import { createTitle } from "@/lib/pricing/titles";
 import type { ProductType, ContactChannel, ContactDirection } from "@prisma/client";
 
 const productTypeSchema = z.enum([
@@ -45,6 +46,34 @@ export const mutateToolDefinitions = (actorId: string) => ({
       role?: string;
       notes?: string;
     }) => createSalesContact({ ...a, actorId }),
+  },
+
+  native_create_title: {
+    description:
+      "Create a new Title under an existing Publisher — for a publication that doesn't exist in the catalog yet (e.g. transcribing a price reply for a title you couldn't find via native_search_titles). Find the publisherId first with native_search_publishers; this tool does not create Publishers. The title is created inactive (curation gate) so the desk reviews it before it reaches the public catalog — follow up with native_log_contact / native_log_quote_draft / native_apply_quote to attach the confirmed price, and native_activate_quote_products once you're ready to make it bookable.",
+    parameters: z.object({
+      publisherId: z.string(),
+      name: z.string(),
+      category: z.string(),
+      websiteUrl: z.string().optional(),
+      audienceNote: z.string().optional(),
+      verifiedFromReply: z
+        .boolean()
+        .optional()
+        .describe(
+          "Set true only when a real sales contact positively confirmed this title is live (e.g. replied with prices) — marks verificationStatus LIVE instead of the default UNVERIFIED.",
+        ),
+      verificationSource: z.string().optional().describe("e.g. the contact's email address or the reply that confirmed it"),
+    }),
+    handler: async (a: {
+      publisherId: string;
+      name: string;
+      category: string;
+      websiteUrl?: string;
+      audienceNote?: string;
+      verifiedFromReply?: boolean;
+      verificationSource?: string;
+    }) => createTitle({ ...a, actorId }),
   },
 
   native_attach_sales_contact: {
