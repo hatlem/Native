@@ -1,6 +1,7 @@
 "use server";
 
 import { redirect } from "next/navigation";
+import type { UserRole } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
 import { recordAudit } from "@/lib/audit";
 import { loadScope, canActOnOrg } from "@/lib/scope";
@@ -12,7 +13,6 @@ import {
   unlinkWaveArticle,
   ProgrammeError,
 } from "@/lib/programme";
-import { createArticle } from "@/app/article-library-actions";
 
 function str(formData: FormData, key: string): string {
   const v = formData.get(key);
@@ -128,4 +128,28 @@ export async function unlinkWaveArticleAction(formData: FormData) {
   await unlinkWaveArticle(list.id);
   await recordAudit(scope.userId ?? null, "programme.wave_article_unlink", `SavedList:${list.id}`);
   redirect(`/${locale}/plan`);
+}
+
+// Create a brand-new article and link it to this wave in one step — the
+// "create new" branch of the wave-article form. Duplicates a few lines of
+// createArticle's body rather than composing it, because createArticle
+// redirects internally and Server Actions can't easily chain one action's
+// mutation without its redirect firing first.
+export async function createAndLinkWaveArticle(formData: FormData) {
+  const locale = str(formData, "locale") || "en";
+  const listId = str(formData, "listId");
+  const title = str(formData, "title");
+  const { scope, list } = await ownList(locale, listId);
+  if (!title) redirect(`/${locale}/plan`);
+  const article = await prisma.article.create({
+    data: {
+      organizationId: list.organizationId,
+      title,
+      createdByUserId: scope.userId ?? "",
+      createdByRole: (scope.role as UserRole) ?? "BUYER",
+    },
+  });
+  await linkWaveArticle(list.id, article.id);
+  await recordAudit(scope.userId ?? null, "programme.wave_article_create", `SavedList:${list.id}`, { articleId: article.id });
+  redirect(`/${locale}/articles/${article.id}`);
 }
