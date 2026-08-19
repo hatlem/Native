@@ -10,15 +10,17 @@ export async function runSpecCheckForAsset(assetId: string): Promise<void> {
   const asset = await prisma.contentAsset.findUnique({
     where: { id: assetId },
     include: {
-      brief: { include: { orderLine: { select: { productId: true } } } },
+      article: { include: { orderLine: { select: { productId: true } } } },
     },
   });
   if (!asset) return;
 
-  // Briefs only attach to inventory (placement) order lines, so productId
-  // is present in practice; bail defensively if a content-fee line ever
-  // reaches here.
-  const productId = asset.brief.orderLine.productId;
+  // Uploaded files are never spec-checked (no reliable text to check).
+  if (!asset.body) return;
+
+  // Spec check needs a placement's Product to know word-count/disclosure
+  // requirements. An article not yet linked to a placement has none.
+  const productId = asset.article.orderLine?.productId;
   if (!productId) return;
 
   const product = await prisma.product.findUnique({
@@ -29,7 +31,7 @@ export async function runSpecCheckForAsset(assetId: string): Promise<void> {
     },
   });
   const result = specCheck({
-    body: asset.body ?? "",
+    body: asset.body,
     wordCountMin: product?.spec?.wordCountMin ?? null,
     wordCountMax: product?.spec?.wordCountMax ?? null,
     titleDisclosure: product?.spec?.disclosureLabel ?? null,
