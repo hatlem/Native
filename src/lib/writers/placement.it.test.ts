@@ -72,6 +72,7 @@ test("resolveEffectiveAsset follows the latest version when unlocked", async () 
 
   await prisma.contentAsset.deleteMany({ where: { articleId: article.id } });
   await prisma.article.delete({ where: { id: article.id } });
+  await prisma.notification.deleteMany({ where: { userId: user.id } });
   await prisma.user.delete({ where: { id: user.id } });
   await prisma.organization.delete({ where: { id: org.id } });
 });
@@ -91,6 +92,7 @@ test("resolveEffectiveAsset returns the locked version even after a newer one ex
 
   await prisma.contentAsset.deleteMany({ where: { articleId: article.id } });
   await prisma.article.delete({ where: { id: article.id } });
+  await prisma.notification.deleteMany({ where: { userId: user.id } });
   await prisma.user.delete({ where: { id: user.id } });
   await prisma.organization.delete({ where: { id: org.id } });
 });
@@ -121,6 +123,7 @@ test("ensurePlacementForLine creates on first call, reuses on second", async () 
   await prisma.articlePlacement.delete({ where: { id: first.id } });
   await prisma.article.delete({ where: { id: first.articleId } });
   await cleanup();
+  await prisma.notification.deleteMany({ where: { userId: user.id } });
   await prisma.user.delete({ where: { id: user.id } });
   await prisma.organization.delete({ where: { id: org.id } });
 });
@@ -164,6 +167,7 @@ test("ensurePlacementForLine applies assignedWriterId to the Article (not the pl
   await prisma.article.delete({ where: { id: created.articleId } });
   await cleanup();
   await prisma.writerProfile.delete({ where: { id: writerProfile.id } });
+  await prisma.notification.deleteMany({ where: { userId: { in: [writerUser.id, deskUser.id] } } });
   await prisma.user.delete({ where: { id: writerUser.id } });
   await prisma.user.delete({ where: { id: deskUser.id } });
   await prisma.organization.delete({ where: { id: org.id } });
@@ -199,6 +203,7 @@ test("ensurePlacementForLine resolves a genuine concurrent race for the same lin
   await prisma.articlePlacement.deleteMany({ where: { orderLineId: line.id } });
   await prisma.article.deleteMany({ where: { organizationId: org.id } });
   await cleanup();
+  await prisma.notification.deleteMany({ where: { userId: user.id } });
   await prisma.user.delete({ where: { id: user.id } });
   await prisma.organization.delete({ where: { id: org.id } });
 });
@@ -232,6 +237,7 @@ test("lockPlacementsOnFinal locks every unlocked placement of the article, leave
   await prisma.article.delete({ where: { id: article.id } });
   await cleanup1();
   await cleanup2();
+  await prisma.notification.deleteMany({ where: { userId: user.id } });
   await prisma.user.delete({ where: { id: user.id } });
   await prisma.organization.delete({ where: { id: org.id } });
 });
