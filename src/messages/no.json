@@ -726,6 +726,7 @@
     "timelineTab": "Tidslinje",
     "timelineLead": "Når alt kjører — de neste seks månedene, måned for måned. Utkast uten datoer ligger nederst.",
     "timelineNotScheduled": "Ikke planlagt ennå",
+    "timelineLater": "Senere",
     "timelineEmptyMonth": "Ingenting kjører denne måneden"
   },
   "desk": {

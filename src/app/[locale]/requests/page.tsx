@@ -296,6 +296,7 @@ export default async function RequestsPage({
   // when the timeline view is actually being rendered.
   let timelineMonths: TimelineMonthGroup[] = [];
   let timelineUnscheduled: TimelineEntry[] = [];
+  let timelineLater: TimelineEntry[] = [];
   if (activeView === "timeline") {
     // timeZone: "UTC" because month anchors are UTC midnights — a local-time
     // formatter west of UTC would label them with the previous month.
@@ -324,6 +325,15 @@ export default async function RequestsPage({
         .map((c) => c.entry),
     }));
     timelineUnscheduled = timeline.filter((c) => !c.window).map((c) => c.entry);
+    // Scheduled past the 6-month window (a 4-wave programme's last waves,
+    // say) — without this bucket those campaigns appear NOWHERE on the
+    // timeline, which reads as data loss. Entirely-past windows are done
+    // running and stay off a forward-looking view.
+    const windowEnd = monthsWindow(new Date(), 6)[5].end;
+    timelineLater = timeline
+      .filter((c) => c.window && c.window.start >= windowEnd)
+      .sort((a, b) => a.window!.start.getTime() - b.window!.start.getTime())
+      .map((c) => c.entry);
   }
 
   // Plain <a>, not next-intl's <Link>: same-route RSC soft navigation is
@@ -368,7 +378,9 @@ export default async function RequestsPage({
           lead={t("timelineLead")}
           months={timelineMonths}
           unscheduled={timelineUnscheduled}
+          later={timelineLater}
           notScheduledHeading={t("timelineNotScheduled")}
+          laterHeading={t("timelineLater")}
           emptyMonthLabel={t("timelineEmptyMonth")}
         />
       ) : visibleRows.length === 0 ? (

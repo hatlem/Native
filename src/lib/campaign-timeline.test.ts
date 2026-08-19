@@ -85,6 +85,16 @@ test("orderWindow: flight ending on the last day of a month counts in that month
   assert.ok(w && !intersectsMonth(w, sep));
 });
 
+test("orderWindow: a schedule-derived EXCLUSIVE end (Plan.endDate) does not bleed into the next month", () => {
+  // "1 MONTH from 1 Aug" → Plan.endDate = 1 Sep (exclusive) → flightEndDate = 1 Sep.
+  // The order runs in August only — never under September.
+  const w = orderWindow(new Date("2026-08-01T00:00:00Z"), new Date("2026-09-01T00:00:00Z"));
+  assert.equal(w?.end.toISOString(), "2026-09-01T00:00:00.000Z");
+  assert.ok(w && intersectsMonth(w, aug()));
+  const sep = monthsWindow(new Date("2026-09-15T00:00:00Z"), 1)[0];
+  assert.ok(w && !intersectsMonth(w, sep));
+});
+
 test("orderWindow: a single known date is used for both ends", () => {
   const onlyStart = orderWindow(new Date("2026-08-10T00:00:00Z"), null);
   assert.equal(onlyStart?.end.toISOString(), "2026-08-11T00:00:00.000Z");

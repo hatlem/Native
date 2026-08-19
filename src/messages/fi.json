@@ -813,6 +813,7 @@
     "timelineTab": "Aikajana",
     "timelineLead": "Milloin mikäkin on käynnissä — seuraavat kuusi kuukautta, kuukausi kerrallaan. Päiväämättömät luonnokset ovat alimpana.",
     "timelineNotScheduled": "Ei vielä aikataulussa",
+    "timelineLater": "Myöhemmin",
     "timelineEmptyMonth": "Tässä kuussa ei ole mitään käynnissä"
   },
   "desk": {

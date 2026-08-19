@@ -726,6 +726,7 @@
     "timelineTab": "Tidslinje",
     "timelineLead": "Hvornår det hele kører — de næste seks måneder, måned for måned. Kladder uden datoer ligger nederst.",
     "timelineNotScheduled": "Ikke planlagt endnu",
+    "timelineLater": "Senere",
     "timelineEmptyMonth": "Intet kører denne måned"
   },
   "desk": {

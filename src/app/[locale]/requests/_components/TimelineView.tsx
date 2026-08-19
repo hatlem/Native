@@ -82,14 +82,20 @@ export function TimelineView({
   lead,
   months,
   unscheduled,
+  later,
   notScheduledHeading,
+  laterHeading,
   emptyMonthLabel,
 }: {
   lead: string;
   months: TimelineMonthGroup[];
   /** Drafts (and undated orders) with no run window — shown after the months. */
   unscheduled: TimelineEntry[];
+  /** Scheduled beyond the 6-month window — a later programme wave must still
+   *  appear somewhere, or the timeline reads as having lost it. */
+  later: TimelineEntry[];
   notScheduledHeading: string;
+  laterHeading: string;
   /** Accessible name for the visual "—" placeholder in an empty month. */
   emptyMonthLabel: string;
 }) {
@@ -112,6 +118,13 @@ export function TimelineView({
           )}
         </section>
       ))}
+
+      {later.length > 0 ? (
+        <section className="requests-timeline__month">
+          <h2 className="requests-timeline__heading">{laterHeading}</h2>
+          <EntryList entries={later} />
+        </section>
+      ) : null}
 
       {unscheduled.length > 0 ? (
         <section className="requests-timeline__month">

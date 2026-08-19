@@ -813,6 +813,7 @@
     "timelineTab": "Zeitleiste",
     "timelineLead": "Wann was läuft — die nächsten sechs Monate, Monat für Monat. Entwürfe ohne Termin stehen ganz unten.",
     "timelineNotScheduled": "Noch nicht terminiert",
+    "timelineLater": "Später",
     "timelineEmptyMonth": "Diesen Monat läuft nichts"
   },
   "desk": {

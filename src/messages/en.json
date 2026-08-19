@@ -813,6 +813,7 @@
     "timelineTab": "Timeline",
     "timelineLead": "When everything runs — the next six months, month by month. Drafts without dates sit at the bottom.",
     "timelineNotScheduled": "Not scheduled yet",
+    "timelineLater": "Later",
     "timelineEmptyMonth": "Nothing running this month"
   },
   "desk": {

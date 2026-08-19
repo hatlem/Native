@@ -7041,7 +7041,9 @@ footer a:hover {
   font-weight: 640;
   color: var(--heading);
   font-variant-numeric: tabular-nums;
-  white-space: nowrap;
+  /* Multi-currency drafts join totals with " + " — nowrap made those overflow
+     the viewport on narrow screens; wrapping to the right edge is fine. */
+  text-align: right;
 }
 
 .requests-timeline__empty {

@@ -726,6 +726,7 @@
     "timelineTab": "Tidslinje",
     "timelineLead": "När allt rullar — de kommande sex månaderna, månad för månad. Utkast utan datum ligger längst ner.",
     "timelineNotScheduled": "Inte schemalagt ännu",
+    "timelineLater": "Senare",
     "timelineEmptyMonth": "Inget rullar den här månaden"
   },
   "desk": {

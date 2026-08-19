@@ -325,7 +325,19 @@ const DUE_HORIZON_DAYS = 21;
  * so the buyer gets a single nudge, and the auto-send sweep sends a single
  * wave per programme per run.
  */
-export function dueWaveFromView(view: ProgrammeView, now: Date): DueWave | null {
+export function dueWaveFromView(
+  view: ProgrammeView,
+  now: Date,
+  opts?: {
+    // Auto-send only: "date-near" may not fire while the PREVIOUS wave is
+    // still an unsent draft. Without this, a freshly created programme whose
+    // persisted anchors start in the current period would auto-submit wave 2
+    // (then 3, 4…) within the hour — before the buyer ever sent wave 1. The
+    // human nudge keeps the looser rule: a reminder is harmless, a submit
+    // is not.
+    requirePreviousSubmitted?: boolean;
+  },
+): DueWave | null {
   const horizon = new Date(now.getTime() + DUE_HORIZON_DAYS * 86_400_000);
   for (let i = 1; i < view.waves.length; i++) {
     const w = view.waves[i];
@@ -334,7 +346,12 @@ export function dueWaveFromView(view: ProgrammeView, now: Date): DueWave | null 
     let reason: DueWave["reason"] | null = null;
     if (prev.state === "done") reason = "previous-done";
     else if (prev.state === "live") reason = "previous-live";
-    else if (w.scheduleStart && w.scheduleStart <= horizon) reason = "date-near";
+    else if (
+      w.scheduleStart &&
+      w.scheduleStart <= horizon &&
+      !(opts?.requirePreviousSubmitted && prev.state === "draft")
+    )
+      reason = "date-near";
     // No reason yet — a later draft wave may still be date-near (e.g. wave 2
     // dateless, wave 3 scheduled), so keep scanning instead of bailing out.
     if (!reason) continue;
@@ -353,14 +370,18 @@ export function dueWaveFromView(view: ProgrammeView, now: Date): DueWave | null 
   return null;
 }
 
-async function findDueWavesWhere(where: Prisma.CampaignProgrammeWhereInput, now: Date): Promise<DueWave[]> {
+async function findDueWavesWhere(
+  where: Prisma.CampaignProgrammeWhereInput,
+  now: Date,
+  opts?: { requirePreviousSubmitted?: boolean },
+): Promise<DueWave[]> {
   const programmes = await prisma.campaignProgramme.findMany({
     where: { ...where, archivedAt: null },
     include: { waves: { where: { archivedAt: null }, include: WAVE_STATE_INCLUDE } },
     orderBy: { createdAt: "desc" },
   });
   return programmes
-    .map((p) => dueWaveFromView(toView(p, p.waves), now))
+    .map((p) => dueWaveFromView(toView(p, p.waves), now, opts))
     .filter((d): d is DueWave => d !== null);
 }
 
@@ -377,7 +398,7 @@ export async function findDueWaves(orgIds: string[], now: Date): Promise<DueWave
 /** Due waves across ALL orgs, restricted to programmes that opted in to
  *  auto-send — the sweep's work list (see programme-autosend.ts). */
 export async function findDueAutoSendWaves(now: Date): Promise<DueWave[]> {
-  return findDueWavesWhere({ autoSendEnabled: true }, now);
+  return findDueWavesWhere({ autoSendEnabled: true }, now, { requirePreviousSubmitted: true });
 }
 
 export async function setWaveAngle(listId: string, angle: string | null): Promise<void> {
