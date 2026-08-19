@@ -716,6 +716,7 @@ model Organization {
   savedLists  SavedList[]
   programmes  CampaignProgramme[]
   favoriteLists FavoriteList[]
+  articles    Article[]
 }
 
 model User {
@@ -1230,6 +1231,7 @@ model OrderLine {
   assignedById     String?
 
   brief        ContentBrief?
+  article      Article?
   booking      PublisherBooking?
   trackedLinks TrackedLink[]
 
@@ -1247,14 +1249,32 @@ model ContentBrief {
   dontNotes   String?
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
+}
 
-  assets ContentAsset[]
+model Article {
+  id               String        @id @default(cuid())
+  organizationId   String
+  organization     Organization  @relation(fields: [organizationId], references: [id])
+  title            String
+  createdByUserId  String
+  createdByRole    UserRole
+  assignedWriterId String?
+  assignedWriter   WriterProfile? @relation("ArticleAssignedWriter", fields: [assignedWriterId], references: [id])
+  orderLineId      String?       @unique
+  orderLine        OrderLine?    @relation(fields: [orderLineId], references: [id])
+  createdAt        DateTime      @default(now())
+  updatedAt        DateTime      @updatedAt
+
+  versions ContentAsset[]
+
+  @@index([organizationId])
+  @@index([assignedWriterId])
 }
 
 model ContentAsset {
   id          String             @id @default(cuid())
-  briefId     String
-  brief       ContentBrief       @relation(fields: [briefId], references: [id])
+  articleId   String
+  article     Article            @relation(fields: [articleId], references: [id])
   version     Int                @default(1)
   status      ContentAssetStatus @default(DRAFT)
   body        String?
@@ -1819,6 +1839,7 @@ model WriterProfile {
   poolMemberships OrderWriterPool[]
   assignedLines   OrderLine[]       @relation("LineAssignedWriter")
   authoredAssets  ContentAsset[]    @relation("AssetAuthor")
+  assignedArticles Article[]        @relation("ArticleAssignedWriter")
 }
 
 model WriterLanguage {
