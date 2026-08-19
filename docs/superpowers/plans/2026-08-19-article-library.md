@@ -673,13 +673,11 @@ In `src/app/writer-pool-actions.ts`, replace the final block of `assignWriterToL
 with:
 
 ```ts
-  const [updatedLine] = await prisma.$transaction([
-    prisma.orderLine.update({
-      where: { id: orderLineId },
-      data: { assignedWriterId: writerId, assignedById: userId, assignedAt: new Date() },
-      select: { id: true, order: { select: { organizationId: true } } },
-    }),
-  ]);
+  const updatedLine = await prisma.orderLine.update({
+    where: { id: orderLineId },
+    data: { assignedWriterId: writerId, assignedById: userId, assignedAt: new Date() },
+    select: { id: true, order: { select: { organizationId: true } } },
+  });
   await recordAudit(userId, "line.assign", `OrderLine:${orderLineId}`, { writerId });
 
   // First assignment for this line creates its Article; a re-assignment
@@ -744,7 +742,7 @@ Expected: no errors.
 
 - [ ] **Step 3: Manual verification**
 
-This action has no existing unit test (it's a server action with redirects, consistent with the rest of the file). Verify via the integration test in Task 14, which exercises this path end-to-end.
+This action has no existing unit test (it's a server action with redirects, consistent with the rest of the file). Verify via the integration test in Task 15, which exercises this path end-to-end.
 
 - [ ] **Step 4: Commit**
 
@@ -1151,6 +1149,7 @@ git commit -m "feat(content): repoint spec-check-runner at Article, skip when un
 "use server";
 
 import { redirect } from "next/navigation";
+import type { UserRole } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
 import { recordAudit } from "@/lib/audit";
 import { loadScope, canActOnOrg } from "@/lib/scope";
@@ -1177,7 +1176,10 @@ export async function createArticle(formData: FormData) {
       organizationId,
       title,
       createdByUserId: userId,
-      createdByRole: role as never,
+      // `role` comes from requireOrgArticleAccess, sourced from the
+      // authenticated session's DB-backed User.role — always a valid
+      // UserRole at runtime, so this cast (not a validated narrowing) is safe.
+      createdByRole: role as UserRole,
     },
   });
   await recordAudit(userId, "article.create", `Article:${article.id}`, { organizationId });
@@ -1738,6 +1740,15 @@ export default async function ArticlesPage({
     : [];
   const titleByProductId = new Map(products.map((p) => [p.id, p.title.name]));
 
+  const authorIds = [...new Set(articles.map((a) => a.createdByUserId))];
+  const authors = authorIds.length
+    ? await prisma.user.findMany({
+        where: { id: { in: authorIds } },
+        select: { id: true, name: true, email: true },
+      })
+    : [];
+  const authorNameById = new Map(authors.map((u) => [u.id, u.name ?? u.email]));
+
   return (
     <>
       <header className="page-header">
@@ -1770,6 +1781,7 @@ export default async function ArticlesPage({
                 <tr>
                   <th>{t("colTitle")}</th>
                   <th>{t("colStatus")}</th>
+                  <th>{t("colAuthor")}</th>
                   <th>{t("colPlacement")}</th>
                   <th></th>
                 </tr>
@@ -1787,6 +1799,9 @@ export default async function ArticlesPage({
                       </td>
                       <td data-label={t("colStatus")}>
                         <StatusBadge value={status} />
+                      </td>
+                      <td data-label={t("colAuthor")}>
+                        {authorNameById.get(a.createdByUserId) ?? "—"}
                       </td>
                       <td data-label={t("colPlacement")}>
                         {a.orderLine ? (
@@ -1837,7 +1852,9 @@ git commit -m "feat(content): add buyer-facing articles overview page"
 - Create: `src/app/[locale]/articles/[articleId]/upload-form.tsx` (client component — file input needs `useState`/`fetch` for the presign-then-PUT flow)
 
 **Interfaces:**
-- Consumes: `createArticle`, `presignArticleUpload`, `linkArticleToOrderLine` (Task 9), `saveDraft`, `saveUploadedDraft`, `runSpecCheck`, `setAssetStatus` (Task 6), `requireArticleWriter` (Task 3), `approveContentAsset`, `requestContentChanges` (Task 7).
+- Consumes: `createArticle`, `presignArticleUpload`, `linkArticleToOrderLine` (Task 9), `saveDraft`, `saveUploadedDraft`, `runSpecCheck`, `setAssetStatus` (Task 6), `requireArticleWriter` (Task 3), `approveContentAsset`, `requestContentChanges` (Task 7), `loadScope`/`canActOnOrg` (`src/lib/scope.ts`, unchanged).
+
+**Important:** the existing `/orders/[orderId]` page renders the buyer approve/request-changes UI, but only for assets reachable through a *linked* order. An unlinked article that reaches `IN_REVIEW` has no other page — this detail page MUST also render that UI (reusing Task 7's actions and the existing `orders` namespace's `draftReviewHeading`/`draftApprove`/`draftChangesPlaceholder`/`draftSendChanges` keys, via a second `getTranslations({ locale, namespace: "orders" })` call), gated on `canActOnOrg(scope, article.organizationId)` and `latest.status === "IN_REVIEW"`, or the buyer-review path breaks for every unlinked article. Do not skip this section.
 
 - [ ] **Step 1: Write the "new article" page**
 
@@ -1990,9 +2007,11 @@ import { getTranslations } from "next-intl/server";
 import { redirect } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import { requireArticleWriter } from "@/lib/writers/guard";
+import { loadScope, canActOnOrg } from "@/lib/scope";
 import { StatusBadge } from "@/app/status-badge";
 import { saveDraft, saveUploadedDraft, runSpecCheck, setAssetStatus } from "@/app/desk-content-actions";
 import { linkArticleToOrderLine } from "@/app/article-library-actions";
+import { approveContentAsset, requestContentChanges } from "@/app/content-review-actions";
 import { UploadForm } from "./upload-form";
 
 export default async function ArticleDetailPage({
@@ -2002,7 +2021,9 @@ export default async function ArticleDetailPage({
 }) {
   const { locale, articleId } = await params;
   const t = await getTranslations({ locale, namespace: "articles" });
+  const tOrders = await getTranslations({ locale, namespace: "orders" });
   await requireArticleWriter(articleId, locale); // redirects if not allowed
+  const scope = await loadScope();
 
   const article = await prisma.article.findUnique({
     where: { id: articleId },
@@ -2150,10 +2171,40 @@ export default async function ArticleDetailPage({
           {t("detailReviewNotes")}: {latest.reviewNotes}
         </p>
       ) : null}
+
+      {latest?.status === "IN_REVIEW" && canActOnOrg(scope, article.organizationId) ? (
+        <section className="space-y-2 rounded border p-4">
+          <h2 className="text-sm font-semibold">{tOrders("draftReviewHeading")}</h2>
+          <div className="flex items-center gap-3">
+            <form action={approveContentAsset}>
+              <input type="hidden" name="locale" value={locale} />
+              <input type="hidden" name="assetId" value={latest.id} />
+              <button type="submit" className="rounded bg-black px-3 py-1.5 text-sm text-white">
+                {tOrders("draftApprove")}
+              </button>
+            </form>
+            <form action={requestContentChanges} className="flex items-center gap-2">
+              <input type="hidden" name="locale" value={locale} />
+              <input type="hidden" name="assetId" value={latest.id} />
+              <input
+                type="text"
+                name="note"
+                placeholder={tOrders("draftChangesPlaceholder")}
+                className="rounded border p-2 text-sm"
+              />
+              <button type="submit" className="rounded border px-3 py-1.5 text-sm">
+                {tOrders("draftSendChanges")}
+              </button>
+            </form>
+          </div>
+        </section>
+      ) : null}
     </main>
   );
 }
 ```
+
+Note: `approveContentAsset`/`requestContentChanges` (Task 7) redirect to `/${locale}/articles/${asset.article.id}` for an unlinked article (confirmed in Task 7's code above) — so after approving here, the buyer lands back on this same page and sees the updated status. `article.organizationId` is already selected in this page's `prisma.article.findUnique` query above.
 
 - [ ] **Step 4: Typecheck**
 
@@ -2174,7 +2225,137 @@ git commit -m "feat(content): add article create/write/upload/link detail page"
 
 ---
 
-### Task 14: Integration test — end-to-end article library flow
+### Task 14: Fix remaining `brief`/`briefId` references across 15 read-only display files
+
+**Context — why this task exists:** Task 1's implementer discovered that renaming `ContentAsset.briefId/brief` to `articleId/article` (and removing `ContentBrief.assets`) breaks 15 files beyond the 4 that Tasks 6, 7, 8, and 10 already fix — every one of them does `include: { brief: { include: { assets: {...} } } }` in a Prisma query and then reads `line.brief?.assets[0]` (or the `ContentAsset`-side equivalent `asset.brief.orderLine...`) to show a draft's status somewhere read-only (order detail pages, the writer roster, the publisher veto action, home page cards, etc). This task fixes all 15. It has no dependency on Tasks 2-13 — only on Task 1's schema — so it's safe to implement independently of them, but MUST land before Task 15's full-suite `pnpm typecheck` check.
+
+**The mechanical pattern (applies to most files):** `ContentBrief` itself is unchanged and still holds `message`/`audience`/`doNotes`/`dontNotes` directly on `OrderLine.brief` — leave every reference to those fields alone. Only the **`assets`** sub-relation moved. So each fix is:
+1. In the Prisma query: keep `brief: { select/include: {...} }` for any brief-owned fields (message/audience/etc.) as-is, MINUS its `assets` sub-select — and add a **sibling** `article: { include: { versions: { orderBy: { version: "desc" }, take: N } } } }` (same `take`/`orderBy` the old `assets` sub-select had) alongside it. If a query's `brief` include had *only* `assets` and nothing else, replace the whole `brief: {...}` block with `article: {...}` — don't leave an empty `brief: {}`.
+2. In the code that reads it: `line.brief?.assets[0]` → `line.article?.versions[0]` (and similarly for `.assets` used as a full array, e.g. `line.brief?.assets ?? []` → `line.article?.versions ?? []`). `line.brief?.audience`/`.message`/etc. stay exactly as they are.
+3. Where code descends from `ContentAsset` to its parent (`asset.brief.orderLine...`), change to `asset.article.orderLine...` — but note `Article.orderLine` is **nullable** (an article can be unlinked), unlike the old `ContentBrief.orderLine` which was always present. Add a null check where the brief believed nullability, per file below.
+
+**Files (grouped by fix shape):**
+
+**Group A — pure rename, `assets[0]`/`assets` read-only display, no null-safety concern** (the `OrderLine`/`Order`-side queries — an `OrderLine` you're already rendering always came from a confirmed `Order`, but the *article* linked to it may not exist yet if no writer/buyer has created one, which is exactly the same "no draft yet" case the old code already handled via `?.`):
+
+- `src/app/[locale]/orders/[orderId]/page.tsx:34-38` — query:
+  ```ts
+  lines: {
+    include: {
+      article: {
+        include: { versions: { orderBy: { version: "desc" }, take: 1 } },
+      },
+      booking: { /* unchanged */ },
+    },
+  },
+  ```
+  Line 172: `const latest = line.brief?.assets[0];` → `const latest = line.article?.versions[0];`
+
+- `src/app/[locale]/publisher/orders/page.tsx:60-64` — query's `brief: { include: { assets: {...} } }` → `article: { include: { versions: { orderBy: { version: "desc" }, take: 1 } } }`.
+  Lines 219-220, 232, 259, 262: every `line.brief?.assets[0]` / `line.brief.assets[0]` → `line.article?.versions[0]` / `line.article.versions[0]`.
+
+- `src/app/[locale]/desk/orders/[orderId]/page.tsx:35` — `brief: { include: { assets: { orderBy: { version: "desc" } } } },` is the ONLY thing inside this `brief` include, but the sibling `trackedLinks`/`booking` includes at lines 36-44 stay. Add `article: { include: { versions: { orderBy: { version: "desc" } } } },` as a new sibling include next to `brief` (keep `brief` too — nothing else in this file reads `.brief.assets`, confirm via grep before removing `brief` entirely: `lines-section.tsx` and `campaign-section.tsx`, which receive `order.lines` from this query, read `line.brief.audience`/`.message`, so `brief` must stay in the include, just without `assets`). Since Prisma generates this file's `order` type inline (no named type import), no separate type file needs updating here.
+
+- `src/lib/writers/roster.ts:25-34` — query's `brief: { select: { assets: {...} } }` → `article: { select: { versions: { orderBy: { version: "desc" }, take: 1, select: { status: true } } } }`.
+  Line 41: `isAssignmentActive(line.brief?.assets[0]?.status ?? null)` → `isAssignmentActive(line.article?.versions[0]?.status ?? null)`.
+
+- `src/app/[locale]/writer/page.tsx:32-41` — query's `brief: { select: { message: true, assets: {...} } }` — `message` is a `ContentBrief` field (stays under `brief`), `assets` moves out. Result:
+  ```ts
+  brief: { select: { message: true } },
+  article: {
+    select: {
+      versions: { orderBy: { version: "desc" }, take: 1, select: { status: true } },
+    },
+  },
+  ```
+  Line 88: `line.brief?.assets[0]?.status ?? "NOT STARTED"` → `line.article?.versions[0]?.status ?? "NOT STARTED"`.
+
+- `src/app/[locale]/requests/[id]/_components/OrderSection.tsx:53` and its type source `src/app/[locale]/requests/[id]/_components/types.ts:20-24` — in `types.ts`, the `QuoteWithOrder` type's nested `brief: { include: { assets: {...} } }` → `article: { include: { versions: { orderBy: "desc"; take: 1 } } }` (this is a `Prisma...GetPayload` type literal, not a runtime query — the actual query lives in `requests/[id]/page.tsx`, fixed below, and this type must mirror it exactly or the two go out of sync). In `OrderSection.tsx` line 53: `const asset = line.brief?.assets[0];` → `const asset = line.article?.versions[0];`.
+
+- `src/app/[locale]/requests/[id]/page.tsx:39-43` — query's nested `brief: { include: { assets: {...} } }` (inside `quotes.order.lines`) → `article: { include: { versions: { orderBy: { version: "desc" }, take: 1 } } }`. **Do not touch line 179's `briefSummary={request.briefSummary}`** — that's an unrelated top-level `Request.briefSummary` string field, not `ContentBrief`; grep matched it as a false positive.
+
+- `src/app/[locale]/desk/orders/[orderId]/lines-section.tsx:29` (type) and `:73` (usage) — the `OrderForLines` type's `brief: { include: { assets: {...} } }` at line 29 has nothing else under `brief` in this type, so replace the whole line with `article: { include: { versions: { orderBy: "desc" } } };`. But this component ALSO reads `line.brief.audience`/`.message` at lines 183-198 (unchanged fields) — since the type comes from the *page's* actual query (not this file), and the page's query (Task above, `desk/orders/[orderId]/page.tsx`) keeps `brief` alongside the new `article`, update this type to keep BOTH: `brief: { select: { audience: true; message: true; doNotes: true; dontNotes: true } };` (matching exactly what `ContentBrief` fields are read in this file — check the full file for any other `line.brief.*` field reads and include those too) plus the new `article: {...}`. Line 73: `const assets = line.brief?.assets ?? [];` → `const assets = line.article?.versions ?? [];`.
+
+- `src/app/[locale]/desk/orders/[orderId]/campaign-section.tsx:25, 45` — same shape as `lines-section.tsx`: two `Prisma...GetPayload` type literals (`LineWithBooking`, nested inside `OrderForCampaign`) each with `brief: { include: { assets: { orderBy: { version: "desc" } } } };` and nothing else under `brief`. Check this file for any `line.brief.*` (non-assets) field reads first (grep found none beyond the type declarations) — if none, replace both occurrences' `brief: {...}` entirely with `article: { include: { versions: { orderBy: { version: "desc" } } } };`. If you do find a runtime `.brief.` field read elsewhere in this file that the earlier grep missed, keep `brief` alongside `article` the same way `lines-section.tsx` does.
+
+**Group B — needs an added null check, not just a rename** (an `Article` can be unlinked, unlike the old `ContentBrief` which always had an `orderLine`):
+
+- `src/app/publisher-actions.ts:269-321` (`rejectAsset`) — query at 269-285: `include: { brief: { select: { orderLine: { select: { productId: true, order: { select: { id: true, organizationId: true } } } } } } }` → `include: { article: { select: { orderLine: { select: { productId: true, order: { select: { id: true, organizationId: true } } } } } } }`. Then at line 293, 320-321, `asset.brief.orderLine...` → `asset.article.orderLine...`, but `Article.orderLine` is nullable — a publisher can only veto content that's actually placed with them (an unlinked article has no publisher to veto from), so add a guard right after the existing `if (!asset) { redirect(...) }` block (line 287-289):
+  ```ts
+  if (!asset.article.orderLine) {
+    redirect(`/${locale}/publisher/orders?veto=not-found`);
+  }
+  ```
+  After that guard, `asset.article.orderLine` is non-null for the rest of the function (TypeScript narrows it within this function body since nothing reassigns `asset` in between — if it doesn't narrow automatically due to the property access being re-evaluated, assign `const orderLine = asset.article.orderLine;` right after the guard and use `orderLine.productId`/`orderLine.order.id`/`orderLine.order.organizationId` in place of the three later reads at lines 293, 320, 321).
+
+- `src/app/[locale]/home/page.tsx:42-56` (`pendingContent` query) — this is the one place in this task where the fix is a genuine improvement, not just a rename: the current `where: { status: "IN_REVIEW", brief: { orderLine: { order: { organizationId: { in: orgIds } } } } }` requires an `OrderLine` to exist, which would silently exclude any unlinked (buyer-supplied, not-yet-placed) article's `IN_REVIEW` draft from ever showing up here — a real gap now that unlinked articles exist. Since `Article` carries `organizationId` directly, filter on that instead:
+  ```ts
+  prisma.contentAsset.findMany({
+    where: { status: "IN_REVIEW", article: { organizationId: { in: orgIds } } },
+    orderBy: { updatedAt: "desc" },
+    take: 5,
+    select: {
+      id: true,
+      article: {
+        select: {
+          id: true,
+          orderLine: {
+            select: { order: { select: { id: true } }, booking: { select: { title: { select: { name: true } } } } },
+          },
+        },
+      },
+    },
+  }),
+  ```
+  Then at lines 160-161, `c.brief.orderLine.order.id` / `c.brief.orderLine.booking?.title?.name` need null-safety since `c.article.orderLine` can now be null for an unlinked article:
+  ```ts
+  const orderId = c.article.orderLine?.order.id ?? null;
+  const titleName = c.article.orderLine?.booking?.title?.name ?? "";
+  ```
+  Find where `orderId` is used below (the card's link target) and make it conditional: link to `/${locale}/orders/${orderId}` when `orderId` is non-null, otherwise `/${locale}/articles/${c.article.id}` (mirrors the same pattern Task 13's detail page and Task 6's `setAssetStatus` already use for this exact linked-vs-unlinked distinction).
+
+- `src/app/[locale]/layout.tsx:159-162` (`contentCount` query) — same fix as `home/page.tsx`, same reasoning (unlinked articles must still count toward the "needs you" badge — the comment at line 151-153 explicitly says this count must stay in sync with the Home page's cards, which the fix above already changed):
+  ```ts
+  prisma.contentAsset.count({
+    where: { status: "IN_REVIEW", article: { organizationId: { in: orgIds } } },
+  }),
+  ```
+
+**Group C — pure field rename, no relation/null-safety change:**
+
+- `src/lib/asset-lineage.ts:15` (`LineageNode.briefId: string`) → `articleId: string`. Lines 57 (`select: { ..., briefId: true, ... }` inside `adaptationsOf`) → `articleId: true`. (`rootOf` and `adaptationContext` don't reference `briefId` at all — leave them untouched.)
+
+- `src/app/api/export/me/route.ts:92` — `include: { lines: { include: { brief: { include: { assets: true } }, booking: true } } }` → `include: { lines: { include: { article: { include: { versions: true } }, booking: true } } }`. Check whether the exported JSON downstream reads `.brief`/`.assets` by key name anywhere else in this file (grep this whole file for `brief`/`assets` beyond line 92 — if the response is returned as-is via `NextResponse.json(...)` with no further field access, no other change is needed since the shape just flows through).
+
+**What to verify:**
+
+- [ ] **Step 1: Apply every fix above.**
+
+- [ ] **Step 2: Confirm no other file was missed**
+
+Run: `pnpm typecheck 2>&1 | grep -B2 "error TS" | grep "\.tsx\?:" | sed -E 's/\(.*//' | sort -u`
+Expected: this lists only files touched by Tasks 6, 7, 8, 9, 10 (not yet run if you're doing this task before those — that's fine, cross-check the file list against the plan's other tasks) — zero files from the 15 listed above should remain. If any of the 15 files still errors, you missed a reference in it; re-grep that file for `brief`/`Brief`/`assets` and fix what's left.
+
+- [ ] **Step 3: Full typecheck**
+
+Run: `pnpm typecheck`
+If Tasks 6-10 haven't landed yet, errors from `desk-content-actions.ts`, `content-review-actions.ts`, `spec-check-runner.ts`, and `writer/lines/[lineId]/page.tsx` are expected (those are fixed by their own tasks) — confirm every remaining error is in exactly those 4 files and nothing else.
+
+- [ ] **Step 4: Run the full unit suite**
+
+Run: `pnpm test`
+Expected: same pass count as before this task (this task touches no test files — it's fixing type/query shape in existing display code, behavior-preserving).
+
+- [ ] **Step 5: Commit**
+
+```bash
+git add "src/app/[locale]/orders/[orderId]/page.tsx" "src/app/[locale]/publisher/orders/page.tsx" "src/app/[locale]/desk/orders/[orderId]/page.tsx" "src/app/[locale]/desk/orders/[orderId]/lines-section.tsx" "src/app/[locale]/desk/orders/[orderId]/campaign-section.tsx" "src/app/[locale]/requests/[id]/page.tsx" "src/app/[locale]/requests/[id]/_components/OrderSection.tsx" "src/app/[locale]/requests/[id]/_components/types.ts" src/lib/writers/roster.ts src/app/publisher-actions.ts "src/app/[locale]/home/page.tsx" src/lib/asset-lineage.ts "src/app/[locale]/writer/page.tsx" src/app/api/export/me/route.ts "src/app/[locale]/layout.tsx"
+git commit -m "fix(content): repoint remaining brief/assets references at Article"
+```
+
+---
+
+### Task 15: Integration test — end-to-end article library flow
 
 **Files:**
 - Create: `src/app/article-library.it.test.ts`
