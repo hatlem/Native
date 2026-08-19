@@ -27,17 +27,46 @@ export async function disableListShare(listId: string): Promise<void> {
   });
 }
 
-/** Everything the public share page renders. Deliberately EXCLUDES the
- *  list's internal note, org billing fields and anything desk-facing —
- *  the client sees what a proposal shows: lines, schedule, prices, totals. */
-export const SHARED_LIST_INCLUDE = {
+/** Everything the public share page renders — and NOTHING else. An explicit
+ *  `select` at every level, never a bare `include`: an `include` returns all
+ *  scalars, which on this UNAUTHENTICATED page would pull the list's internal
+ *  `note`/`budget`, the raw net `basePrice`, and `Title.commercialExtra`
+ *  (desk-only negotiation notes) into the query — kept off the wire today only
+ *  because the page has no client component, i.e. one refactor from a leak.
+ *  The select makes the exclusion a property of the data, not of the render. */
+export const SHARED_LIST_SELECT = {
+  id: true,
+  name: true,
+  organizationId: true,
+  archivedAt: true,
+  clientApprovedAt: true,
+  waveNumber: true,
+  articleAngle: true,
   items: {
     orderBy: [{ sortOrder: "asc" }, { createdAt: "asc" }],
-    include: {
+    select: {
+      id: true,
+      productId: true,
+      quantity: true,
+      withContent: true,
+      scheduleStart: true,
       product: {
-        include: {
-          title: { include: { publisher: { select: { name: true, pricesPublic: true } } } },
+        select: {
+          type: true,
+          basePrice: true,
+          currency: true,
+          active: true,
+          confirmedAt: true,
           priceRules: true,
+          title: {
+            select: {
+              name: true,
+              websiteUrl: true,
+              aliases: true,
+              pricesPublic: true,
+              publisher: { select: { name: true, pricesPublic: true } },
+            },
+          },
         },
       },
       title: { select: { name: true, websiteUrl: true, aliases: true } },
@@ -45,7 +74,7 @@ export const SHARED_LIST_INCLUDE = {
   },
   programme: { select: { name: true, plannedWaves: true } },
   organization: { select: { name: true } },
-} satisfies Prisma.SavedListInclude;
+} satisfies Prisma.SavedListSelect;
 
 /** The list behind a share token — null for unknown tokens and for lists
  *  archived after sharing (archiving is an implicit revoke). */
@@ -53,7 +82,7 @@ export async function loadSharedList(token: string) {
   if (!token || token.length < 20) return null; // never match on junk/empty
   const list = await prisma.savedList.findUnique({
     where: { shareToken: token },
-    include: SHARED_LIST_INCLUDE,
+    select: SHARED_LIST_SELECT,
   });
   if (!list || list.archivedAt) return null;
   return list;

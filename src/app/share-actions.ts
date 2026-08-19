@@ -4,6 +4,7 @@ import { redirect } from "next/navigation";
 import { approveSharedList } from "@/lib/list-share";
 import { notifyOrg } from "@/lib/notify";
 import { recordAudit } from "@/lib/audit";
+import { safeLocale } from "@/i18n/routing";
 
 function str(formData: FormData, key: string): string {
   const v = formData.get(key);
@@ -15,7 +16,7 @@ function str(formData: FormData, key: string): string {
 // itself. It can only flip clientApprovedAt on the list the token resolves
 // to — idempotently, notifying the owning org once.
 export async function approveSharedPlan(formData: FormData) {
-  const locale = str(formData, "locale") || "en";
+  const locale = safeLocale(str(formData, "locale"));
   const token = str(formData, "token");
   const approved = await approveSharedList(token);
   if (approved) {

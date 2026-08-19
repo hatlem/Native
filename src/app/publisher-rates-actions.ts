@@ -7,6 +7,7 @@
 import { redirect } from "next/navigation";
 import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
+import { safeLocale } from "@/i18n/routing";
 import {
   confirmProductPrice,
   updateProductPrice,
