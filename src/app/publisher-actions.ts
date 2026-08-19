@@ -1,17 +1,13 @@
 "use server";
 
 import { redirect } from "next/navigation";
-import {
-  PriceVisibility,
-  BookingStatus,
-  ContentAssetStatus,
-} from "@prisma/client";
+import { PriceVisibility, BookingStatus } from "@prisma/client";
 import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
 import { recordAudit } from "@/lib/audit";
 import { notifyDesk, notifyOrg } from "@/lib/notify";
 import { safeExternalUrl } from "@/lib/security";
-import { canRetractAsset, normaliseReason } from "@/lib/cancellation";
+import { normaliseReason } from "@/lib/cancellation";
 import { parseImpressions } from "@/lib/metrics/validate";
 
 function field(formData: FormData, key: string): string {
@@ -237,17 +233,22 @@ export async function submitBookingImpressions(formData: FormData) {
   redirect(`/${locale}/publisher/orders`);
 }
 
-// Publisher invokes the editorial veto on a draft. Distinct from the
+// Publisher invokes the editorial veto on a placement. Distinct from the
 // soft "request changes" workflow (which goes via `setAssetStatus`
 // CHANGES_REQUESTED on the desk side) — this is the hard rejection
 // the FagPresse/DK Finans scenario surfaced as missing.
 //
-// Authorisation: the asset's brief must hang off an OrderLine whose
-// product belongs to a Title this publisher owns. Anything else and we
-// silently redirect — no leaking of asset metadata across publishers.
+// Authorisation: the placement's OrderLine must belong to a Product whose
+// Title this publisher owns. Anything else and we silently redirect — no
+// leaking of placement metadata across publishers.
+//
+// Retraction is scoped to the specific ArticlePlacement the publisher
+// owns, not the shared Article/ContentAsset — one publisher retracting
+// their placement must not affect other placements sharing the same
+// article.
 //
 // Side-effects:
-//   - asset status → RETRACTED + retraction metadata persisted
+//   - placement retraction metadata persisted (retractedAt/By/Note)
 //   - desk + buyer org receive EDITORIAL_VETO notification with the
 //     publisher's stated reason (audit chain demands it)
 //   - audit row records publisher actor + reason
@@ -259,70 +260,59 @@ export async function submitBookingImpressions(formData: FormData) {
 export async function rejectAsset(formData: FormData) {
   const locale = field(formData, "locale") || "en";
   const { publisherId, userId } = await requirePublisher(locale);
-  const assetId = field(formData, "assetId");
+  const placementId = field(formData, "placementId");
   const reason = normaliseReason(field(formData, "reason"));
 
   if (!reason) {
     redirect(`/${locale}/publisher/orders?veto=reason-required`);
   }
 
-  const asset = await prisma.contentAsset.findUnique({
-    where: { id: assetId },
-    include: {
-      article: {
+  const placement = await prisma.articlePlacement.findUnique({
+    where: { id: placementId },
+    select: {
+      retractedAt: true,
+      orderLine: {
         select: {
-          orderLine: {
-            select: {
-              productId: true,
-              order: {
-                select: { id: true, organizationId: true },
-              },
-            },
-          },
+          productId: true,
+          order: { select: { id: true, organizationId: true } },
         },
       },
     },
   });
 
-  if (!asset) {
-    redirect(`/${locale}/publisher/orders?veto=not-found`);
-  }
-
-  if (!asset.article.orderLine) {
+  if (!placement) {
     redirect(`/${locale}/publisher/orders?veto=not-found`);
   }
 
   const product = await prisma.product.findUnique({
     // Briefs only attach to inventory lines, so productId is present.
-    where: { id: asset.article.orderLine.productId ?? "" },
+    where: { id: placement.orderLine.productId ?? "" },
     select: { title: { select: { publisherId: true } } },
   });
   if (product?.title.publisherId !== publisherId) {
     redirect(`/${locale}/publisher/orders`);
   }
 
-  if (!canRetractAsset(asset.status)) {
+  if (placement.retractedAt) {
     redirect(`/${locale}/publisher/orders?veto=already-retracted`);
   }
 
-  await prisma.contentAsset.update({
-    where: { id: asset.id },
+  await prisma.articlePlacement.update({
+    where: { id: placementId },
     data: {
-      status: ContentAssetStatus.RETRACTED,
       retractedAt: new Date(),
       retractedBy: userId,
       retractionNote: reason,
     },
   });
 
-  await recordAudit(userId, "asset.retract", `ContentAsset:${asset.id}`, {
-    from: asset.status,
+  await recordAudit(userId, "placement.retract", `ArticlePlacement:${placementId}`, {
     reason,
     publisherId,
   });
 
-  const orderId = asset.article.orderLine.order.id;
-  const orgId = asset.article.orderLine.order.organizationId;
+  const orderId = placement.orderLine.order.id;
+  const orgId = placement.orderLine.order.organizationId;
 
   await notifyDesk({
     kind: "EDITORIAL_VETO",
