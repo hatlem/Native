@@ -607,7 +607,14 @@
       "angleSave": "Spara vinkel",
       "angleHint": "Desken och skribenten utgår härifrån – håll den skild från de andra omgångarna.",
       "autoSendLabel": "Skicka varje omgång automatiskt när det är dags",
-      "autoSendHint": "Varje omgång går till desken som en vanlig förfrågan när datumet närmar sig – du godkänner fortfarande offerten innan något bokas eller debiteras."
+      "autoSendHint": "Varje omgång går till desken som en vanlig förfrågan när datumet närmar sig – du godkänner fortfarande offerten innan något bokas eller debiteras.",
+      "waveTotal": "≈ {amount}",
+      "pacingTotal": "Alla omgångar tillsammans: ≈ {amount}",
+      "pacingBudget": "mot er budget på {amount} per omgång",
+      "overlapWarning": "{title} går i omgång {a} och omgång {b} samtidigt – sprid ut dem, eller välj en annan titel.",
+      "dissolveSummary": "Lös upp programmet …",
+      "dissolveBody": "Varje omgång blir en vanlig plan igen. Omgångar ni aldrig skickat in arkiveras, så att de inte skräpar ner bland era planer – allt som redan skickats till desken rörs inte.",
+      "dissolveConfirm": "Lös upp programmet"
     }
   },
   "rfq": {

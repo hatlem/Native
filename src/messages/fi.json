@@ -694,7 +694,14 @@
       "angleSave": "Tallenna näkökulma",
       "angleHint": "Deski ja kirjoittaja lähtevät tästä – pidä se erilaisena kuin muilla kierroksilla.",
       "autoSendLabel": "Lähetä jokainen kierros automaattisesti, kun sen aika koittaa",
-      "autoSendHint": "Jokainen kierros lähtee deskille tavallisena pyyntönä, kun päivämäärä lähestyy – hyväksyt silti tarjouksen ennen kuin mitään varataan tai veloitetaan."
+      "autoSendHint": "Jokainen kierros lähtee deskille tavallisena pyyntönä, kun päivämäärä lähestyy – hyväksyt silti tarjouksen ennen kuin mitään varataan tai veloitetaan.",
+      "waveTotal": "≈ {amount}",
+      "pacingTotal": "Kaikki kierrokset yhteensä: ≈ {amount}",
+      "pacingBudget": "budjettinne on {amount} kierrosta kohden",
+      "overlapWarning": "{title} pyörii kierroksella {a} ja kierroksella {b} yhtä aikaa – jaksota ne erilleen tai vaihda julkaisua.",
+      "dissolveSummary": "Pura ohjelma…",
+      "dissolveBody": "Jokaisesta kierroksesta tulee taas tavallinen suunnitelma. Lähettämättömät kierrokset arkistoidaan, etteivät ne sotke suunnitelmianne – kaikki jo deskille lähetetty säilyy ennallaan.",
+      "dissolveConfirm": "Pura ohjelma"
     }
   },
   "rfq": {
