@@ -49,8 +49,14 @@ after(async () => {
   await prisma.campaignProgramme.deleteMany({ where: { organizationId: orgId } });
   // The runAutoSendSweep test links a real Article to a wave (a wave no
   // longer gets an angle prefilled at creation) — clean it up before the
-  // org delete, same as every other FK-bearing row above.
+  // org delete, same as every other FK-bearing row above. The Article's
+  // createdByUserId also needs its own User cleaned up, or it leaks a row
+  // on every run (Article.createdByUserId has no cascade) — and the sweep's
+  // notifyDesk/notifyOrg calls leave that user a Notification row, which
+  // must go first (Notification.userId has no cascade either).
   await prisma.article.deleteMany({ where: { organizationId: orgId } });
+  await prisma.notification.deleteMany({ where: { user: { organizationId: orgId } } });
+  await prisma.user.deleteMany({ where: { organizationId: orgId } });
   await prisma.organization.delete({ where: { id: orgId } });
 });
 
