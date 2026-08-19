@@ -46,7 +46,8 @@
     "listsDesc": "Planlister du sender til desken for prising",
     "favoritesDesc": "Dine personlige lister over publikasjoner",
     "campaign": "Planlegg kampanje",
-    "campaigns": "Kampanjer"
+    "campaigns": "Kampanjer",
+    "rates": "Priser"
   },
   "reports": {
     "title": "Rapporter",
@@ -1154,7 +1155,23 @@
     "fileFormats": "Filformater",
     "requirements": "Krav",
     "saveSpec": "Lagre spesifikasjon",
-    "availability": "Tilgjengelighet"
+    "availability": "Tilgjengelighet",
+    "ratesTitle": "Prisene dine, bekreftet av deg.",
+    "ratesLead": "Bekreft en pris som fortsatt gjelder, eller lagre den nye når den endres. Bekreftede priser holder titlene dine klare for tilbud — desken varsles ved hver endring.",
+    "ratesColProduct": "Produkt",
+    "ratesColPrice": "Grunnpris",
+    "ratesColUnit": "Bookes per",
+    "ratesColConfirmed": "Sist bekreftet",
+    "ratesColUpdate": "Oppdater",
+    "ratesConfirm": "Bekreft gjeldende pris",
+    "ratesConfirming": "Bekrefter…",
+    "ratesConfirmedOn": "Bekreftet {date}",
+    "ratesNeverConfirmed": "Aldri bekreftet",
+    "ratesInactive": "Ikke i katalogen",
+    "ratesUnitWeek": "Uke",
+    "ratesUnitMonth": "Måned",
+    "ratesMinUnits": "Minste booking: {count}",
+    "ratesPriceOnlyNote": "Denne siden endrer kun priser. Katalogstatus — aktiv, bookbar, synlighet — håndteres av NativeSpin-desken."
   },
   "formats": {
     "metaTitle": "Native-formater — NativeSpin",

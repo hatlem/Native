@@ -107,6 +107,7 @@ export function navItemsFor(
       return [
         { key: "publisher", label: t("publisher"), href: "/publisher" },
         { key: "publisherOrders", label: t("orders"), href: "/publisher/orders" },
+        { key: "publisherRates", label: t("rates"), href: "/publisher/rates" },
         { key: "availability", label: t("availability"), href: "/publisher/availability" },
       ];
     case "writer":
@@ -182,6 +183,7 @@ export function paletteItemsFor(
         return [
           { key: "publisher", label: t("publisher"), href: "/publisher" },
           { key: "publisherOrders", label: t("orders"), href: "/publisher/orders" },
+          { key: "publisherRates", label: t("rates"), href: "/publisher/rates" },
           { key: "availability", label: t("availability"), href: "/publisher/availability" },
           { key: "notifications", label: t("notifications"), href: "/notifications" },
         ];

@@ -46,7 +46,8 @@
     "listsDesc": "Planlisten, die Sie zur Preisbildung an das Desk senden",
     "favoritesDesc": "Ihre persönlichen Publikations-Listen",
     "campaign": "Kampagne planen",
-    "campaigns": "Kampagnen"
+    "campaigns": "Kampagnen",
+    "rates": "Preise"
   },
   "orders": {
     "eyebrow": "Bestellungen",
@@ -1241,7 +1242,23 @@
     "fileFormats": "Dateiformate",
     "requirements": "Anforderungen",
     "saveSpec": "Spec speichern",
-    "availability": "Verfügbarkeit"
+    "availability": "Verfügbarkeit",
+    "ratesTitle": "Ihre Preise, von Ihnen bestätigt.",
+    "ratesLead": "Bestätigen Sie einen Preis, der weiterhin gilt, oder speichern Sie den neuen, wenn er sich ändert. Bestätigte Preise halten Ihre Titel angebotsfähig — der Desk wird über jede Änderung informiert.",
+    "ratesColProduct": "Produkt",
+    "ratesColPrice": "Grundpreis",
+    "ratesColUnit": "Buchung pro",
+    "ratesColConfirmed": "Zuletzt bestätigt",
+    "ratesColUpdate": "Aktualisieren",
+    "ratesConfirm": "Aktuellen Preis bestätigen",
+    "ratesConfirming": "Wird bestätigt…",
+    "ratesConfirmedOn": "Bestätigt am {date}",
+    "ratesNeverConfirmed": "Noch nie bestätigt",
+    "ratesInactive": "Nicht im Katalog",
+    "ratesUnitWeek": "Woche",
+    "ratesUnitMonth": "Monat",
+    "ratesMinUnits": "Mindestbuchung: {count}",
+    "ratesPriceOnlyNote": "Diese Seite ändert nur Preise. Der Katalogstatus — aktiv, buchbar, Sichtbarkeit — wird vom NativeSpin-Desk verwaltet."
   },
   "formats": {
     "metaTitle": "Native-Formate — NativeSpin",
