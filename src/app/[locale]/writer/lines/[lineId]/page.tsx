@@ -17,12 +17,16 @@ export default async function WriterLine({
       orderId: true,
       brief: {
         select: {
-          id: true,
           message: true,
           audience: true,
           doNotes: true,
           dontNotes: true,
-          assets: {
+        },
+      },
+      article: {
+        select: {
+          id: true,
+          versions: {
             orderBy: { version: "desc" },
             take: 1,
             select: {
@@ -38,11 +42,12 @@ export default async function WriterLine({
     },
   });
 
-  if (!line?.brief) {
+  if (!line?.brief || !line.article) {
     return <main className="p-6 text-sm">No brief for this line yet.</main>;
   }
 
-  const latest = line.brief.assets[0];
+  const latest = line.article.versions[0];
+  const articleId = line.article.id;
 
   return (
     <main className="mx-auto max-w-3xl space-y-6 p-6">
@@ -71,7 +76,7 @@ export default async function WriterLine({
       <form action={saveDraft} className="space-y-2">
         <input type="hidden" name="locale" value={locale} />
         <input type="hidden" name="orderId" value={line.orderId} />
-        <input type="hidden" name="orderLineId" value={line.id} />
+        <input type="hidden" name="articleId" value={articleId} />
         <label className="block text-sm font-medium">Article</label>
         <textarea
           name="body"
