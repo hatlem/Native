@@ -87,8 +87,12 @@ if (!RUN_DB_IT) {
     const listId = await freshList();
     const item = await prisma.savedListItem.create({ data: { listId, titleId } });
 
+    // The sweep is system-wide and this suite shares its database with every
+    // other .it.test.ts file, so its counters are global: assert ">= 1" plus
+    // the per-item evidence below, never an exact global count.
     const first = await runPlacementReadySweep();
-    assert.equal(first.notified, 1);
+    assert.ok(first.notified >= 1, "the sweep notified at least this item");
+    assert.equal(first.failed, 0, "no item failed");
 
     const buyerNotifs = await prisma.notification.findMany({
       where: { userId: buyerUserId, kind: "TITLE_PRODUCT_READY" },
@@ -106,12 +110,19 @@ if (!RUN_DB_IT) {
     });
     assert.ok(marker, "audit marker recorded");
 
-    const second = await runPlacementReadySweep();
-    assert.equal(second.notified, 0, "already-notified item is skipped on rerun");
+    // Rerun: the marker latch must hold for THIS item. Scoped to this suite's
+    // own users, so a concurrent placeholder elsewhere in the shared DB can't
+    // make it flap.
+    await runPlacementReadySweep();
     assert.equal(
       await prisma.notification.count({ where: { userId: buyerUserId, kind: "TITLE_PRODUCT_READY" } }),
       1,
       "no duplicate notification",
+    );
+    assert.equal(
+      await prisma.notification.count({ where: { userId: deskUserId, kind: "TITLE_PRODUCT_READY" } }),
+      1,
+      "no duplicate desk notification",
     );
   });
 
@@ -121,22 +132,68 @@ if (!RUN_DB_IT) {
     const titleNotBookable = await freshTitleWithProduct({ bookable: false });
     const titleUnconfirmed = await freshTitleWithProduct({ confirmed: false });
     const listId = await freshList();
-    await prisma.savedListItem.create({ data: { listId, titleId: titleNone } });
-    await prisma.savedListItem.create({ data: { listId, titleId: titleInactive } });
-    await prisma.savedListItem.create({ data: { listId, titleId: titleNotBookable } });
-    await prisma.savedListItem.create({ data: { listId, titleId: titleUnconfirmed } });
+    const items = await Promise.all(
+      [titleNone, titleInactive, titleNotBookable, titleUnconfirmed].map((titleId) =>
+        prisma.savedListItem.create({ data: { listId, titleId } }),
+      ),
+    );
 
-    const res = await runPlacementReadySweep();
-    assert.equal(res.notified, 0);
+    await runPlacementReadySweep();
+
+    // Scoped evidence, not the sweep's global counter: none of THESE items may
+    // have been marked notified, and nothing may link to THIS list.
+    assert.equal(
+      await prisma.auditLog.count({
+        where: {
+          action: "placement-ready.notified",
+          entity: { in: items.map((i) => `SavedListItem:${i.id}`) },
+        },
+      }),
+      0,
+      "no marker for a placeholder without a qualifying product",
+    );
+    assert.equal(
+      await prisma.notification.count({
+        where: { kind: "TITLE_PRODUCT_READY", link: { contains: `list=${listId}` } },
+      }),
+      0,
+      "no notification deep-links to this list",
+    );
+  });
+
+  test("skips placeholders on an archived list (its deep link could not land there)", async () => {
+    const titleId = await freshTitleWithProduct({ active: true, bookable: true, confirmed: true });
+    const list = await prisma.savedList.create({
+      data: { organizationId: orgId, archivedAt: new Date() },
+    });
+    const item = await prisma.savedListItem.create({ data: { listId: list.id, titleId } });
+
+    await runPlacementReadySweep();
+
+    const marker = await prisma.auditLog.findFirst({
+      where: { entity: `SavedListItem:${item.id}`, action: "placement-ready.notified" },
+    });
+    assert.equal(marker, null, "archived list is not swept");
+    assert.equal(
+      await prisma.notification.count({
+        where: { kind: "TITLE_PRODUCT_READY", link: { contains: `list=${list.id}` } },
+      }),
+      0,
+      "no notification deep-links to the archived list",
+    );
   });
 
   test("runPlacementReadySweepWithLock delegates to the sweep when uncontended", async () => {
     const titleId = await freshTitleWithProduct({ active: true, bookable: true, confirmed: true });
     const listId = await freshList();
-    await prisma.savedListItem.create({ data: { listId, titleId } });
+    const item = await prisma.savedListItem.create({ data: { listId, titleId } });
 
     const res = await runPlacementReadySweepWithLock();
     assert.ok(res, "lock was acquired and the sweep ran");
-    assert.equal(res!.notified, 1);
+    assert.ok(res!.notified >= 1, "the sweep ran inside the lock and notified");
+    const marker = await prisma.auditLog.findFirst({
+      where: { entity: `SavedListItem:${item.id}`, action: "placement-ready.notified" },
+    });
+    assert.ok(marker, "this item was notified through the locked path");
   });
 }

@@ -56,7 +56,7 @@ export async function startSchedules(): Promise<void> {
     schedule("placement-ready", PLACEMENT_READY_OFFSET_MS, async () => {
       const res = await runPlacementReadySweepWithLock();
       if (!res) return "sweep skipped: another instance holds the lock";
-      return `sweep done: notified=${res.notified}`;
+      return `sweep done: notified=${res.notified} failed=${res.failed}`;
     });
   }
 }
