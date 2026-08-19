@@ -9,7 +9,7 @@ import { enqueue } from "@/lib/jobs";
 import { runSpecCheckForAsset, registerSpecCheckJob } from "@/lib/spec-check-runner";
 import { ensureTrackedLinks } from "@/lib/metrics/store";
 import { rewriteBodyLinks } from "@/lib/metrics/links";
-import { requireLineWriter } from "@/lib/writers/guard";
+import { requireLineWriter, requireArticleWriter } from "@/lib/writers/guard";
 
 registerSpecCheckJob();
 
@@ -69,28 +69,21 @@ export async function confirmTrackedLinks(formData: FormData) {
 
 export async function saveDraft(formData: FormData) {
   const locale = field(formData, "locale") || "en";
-  const orderLineId = field(formData, "orderLineId");
+  const articleId = field(formData, "articleId");
   const orderId = field(formData, "orderId");
   const body = field(formData, "body");
-  // Optional: writer flags this as an adaptation of a previously
-  // shipped asset. Persisted on ContentAsset.sourceAssetId so the
-  // desk can charge adaptation-rate instead of greenfield and the
-  // audit chain shows quote-reuse lineage (Maja R2's deeper gap).
   const sourceAssetId = field(formData, "sourceAssetId") || null;
-  const { userId, writerProfileId, role } = await requireLineWriter(
-    orderLineId,
-    locale,
-  );
+  const { userId, writerProfileId, role } = await requireArticleWriter(articleId, locale);
 
-  const brief = await prisma.contentBrief.findUnique({
-    where: { orderLineId },
-    include: { assets: { orderBy: { version: "desc" }, take: 1 } },
-  });
-  if (brief && body) {
-    const nextVersion = (brief.assets[0]?.version ?? 0) + 1;
+  if (body) {
+    const latest = await prisma.contentAsset.findFirst({
+      where: { articleId },
+      orderBy: { version: "desc" },
+    });
+    const nextVersion = (latest?.version ?? 0) + 1;
     const asset = await prisma.contentAsset.create({
       data: {
-        briefId: brief.id,
+        articleId,
         version: nextVersion,
         status: "DRAFT",
         body,
@@ -102,13 +95,48 @@ export async function saveDraft(formData: FormData) {
       version: nextVersion,
       sourceAssetId: sourceAssetId || null,
     });
-    // Queue spec check rather than block the form submission.
     await enqueue("spec.check", { assetId: asset.id });
   }
-  // CONTENT writers return to their console; desk stays on the order page.
   redirect(
     role === "CONTENT"
-      ? `/${locale}/writer/lines/${orderLineId}`
+      ? `/${locale}/articles/${articleId}`
+      : `/${locale}/desk/orders/${orderId}`,
+  );
+}
+
+// The client obtains a presigned PUT url via presignArticleUpload
+// (src/app/article-library-actions.ts, Task 9), PUTs the file directly to
+// R2, then submits this action with the returned key as bodyUrl.
+export async function saveUploadedDraft(formData: FormData) {
+  const locale = field(formData, "locale") || "en";
+  const articleId = field(formData, "articleId");
+  const orderId = field(formData, "orderId");
+  const bodyUrl = field(formData, "bodyUrl");
+  const { userId, writerProfileId, role } = await requireArticleWriter(articleId, locale);
+
+  if (bodyUrl) {
+    const latest = await prisma.contentAsset.findFirst({
+      where: { articleId },
+      orderBy: { version: "desc" },
+    });
+    const nextVersion = (latest?.version ?? 0) + 1;
+    const asset = await prisma.contentAsset.create({
+      data: {
+        articleId,
+        version: nextVersion,
+        status: "DRAFT",
+        bodyUrl,
+        authorWriterId: writerProfileId,
+      },
+    });
+    await recordAudit(userId, "asset.draft_upload", `ContentAsset:${asset.id}`, {
+      version: nextVersion,
+    });
+    // No spec.check enqueue — uploaded files are never spec-checked (design §Status flow and spec check).
+  }
+  redirect(
+    role === "CONTENT"
+      ? `/${locale}/articles/${articleId}`
       : `/${locale}/desk/orders/${orderId}`,
   );
 }
@@ -119,17 +147,17 @@ export async function runSpecCheck(formData: FormData) {
   const orderId = field(formData, "orderId");
   const asset = await prisma.contentAsset.findUnique({
     where: { id: assetId },
-    select: { brief: { select: { orderLineId: true } } },
+    select: { articleId: true },
   });
-  const orderLineId = asset?.brief.orderLineId ?? "";
-  const { userId, role } = await requireLineWriter(orderLineId, locale);
+  const articleId = asset?.articleId ?? "";
+  const { userId, role } = await requireArticleWriter(articleId, locale);
 
   await runSpecCheckForAsset(assetId);
   await recordAudit(userId, "asset.spec_check", `ContentAsset:${assetId}`);
 
   redirect(
     role === "CONTENT"
-      ? `/${locale}/writer/lines/${orderLineId}`
+      ? `/${locale}/articles/${articleId}`
       : `/${locale}/desk/orders/${orderId}`,
   );
 }
@@ -139,25 +167,22 @@ export async function setAssetStatus(formData: FormData) {
   const assetId = field(formData, "assetId");
   const orderId = field(formData, "orderId");
   const target = field(formData, "target") as ContentAssetStatus;
-  const assetForLine = await prisma.contentAsset.findUnique({
+  const assetForArticle = await prisma.contentAsset.findUnique({
     where: { id: assetId },
-    select: { brief: { select: { orderLineId: true } } },
+    select: { articleId: true },
   });
-  const orderLineId = assetForLine?.brief.orderLineId ?? "";
-  const { userId, role } = await requireLineWriter(orderLineId, locale);
+  const articleId = assetForArticle?.articleId ?? "";
+  const { userId, role } = await requireArticleWriter(articleId, locale);
 
-  // Writers can only hand a draft off for review. APPROVED / FINAL /
-  // CHANGES_REQUESTED stay with the desk + buyer.
   if (role === "CONTENT" && !CONTENT_ASSET_TARGETS.has(target)) {
-    redirect(`/${locale}/writer/lines/${orderLineId}`);
+    redirect(`/${locale}/articles/${articleId}`);
   }
 
   if (ASSET_TARGETS.includes(target)) {
     const asset = await prisma.contentAsset.findUnique({
       where: { id: assetId },
-      include: { brief: { select: { orderLine: { select: { orderId: true, id: true } } } } },
+      include: { article: { select: { organizationId: true, orderLineId: true } } },
     });
-    // FINAL requires a passing spec check.
     if (asset && !(target === "FINAL" && asset.specPassed !== true)) {
       await prisma.contentAsset.update({
         where: { id: asset.id },
@@ -166,26 +191,23 @@ export async function setAssetStatus(formData: FormData) {
       await recordAudit(userId, "asset.status", `ContentAsset:${asset.id}`, {
         status: target,
       });
-      // The buyer cares about review/approval transitions — notify them.
-      const order = await prisma.order.findUnique({
-        where: { id: asset.brief.orderLine.orderId },
-        select: { organizationId: true },
-      });
-      if (order && (target === "IN_REVIEW" || target === "CHANGES_REQUESTED")) {
-        await notifyOrg(order.organizationId, {
+      if (target === "IN_REVIEW" || target === "CHANGES_REQUESTED") {
+        await notifyOrg(asset.article.organizationId, {
           kind: "ASSET_REVIEW",
           title:
             target === "IN_REVIEW"
               ? "Content draft ready for review"
               : "Content changes requested",
-          link: `/${locale}/orders/${asset.brief.orderLine.orderId}`,
+          link: asset.article.orderLineId
+            ? `/${locale}/orders/${orderId}`
+            : `/${locale}/articles/${articleId}`,
         });
       }
     }
   }
   redirect(
     role === "CONTENT"
-      ? `/${locale}/writer/lines/${orderLineId}`
+      ? `/${locale}/articles/${articleId}`
       : `/${locale}/desk/orders/${orderId}`,
   );
 }
