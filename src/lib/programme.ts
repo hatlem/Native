@@ -251,7 +251,7 @@ function waveState(row: WaveRow): { state: WaveState; orderId: string | null; re
   if (stage <= 2) state = "sent";
   else if (stage === 3) state = "quoted";
   else if (stage === 4) state = "booked";
-  else state = order && ["COMPLETED", "INVOICED"].includes(order.status) ? "done" : "live";
+  else state = stage === 6 ? "done" : "live";
   return { state, orderId: order?.id ?? null, requestId: req.id };
 }
 

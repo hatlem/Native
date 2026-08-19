@@ -27,11 +27,12 @@ test("order exists but not live -> Approved", () => {
   }
 });
 
-test("order is live/completed/invoiced -> Live", () => {
-  for (const orderStatus of ["LIVE", "COMPLETED", "INVOICED"]) {
+test("order is live -> Live; completed/invoiced -> Finished", () => {
+  assert.equal(deriveStage({ requestStatus: "CLOSED", quoteStatus: "ACCEPTED", orderStatus: "LIVE" }), 5);
+  for (const orderStatus of ["COMPLETED", "INVOICED"]) {
     assert.equal(
       deriveStage({ requestStatus: "CLOSED", quoteStatus: "ACCEPTED", orderStatus }),
-      5,
+      6,
       orderStatus,
     );
   }

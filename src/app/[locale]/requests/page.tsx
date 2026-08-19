@@ -73,12 +73,13 @@ export default async function RequestsPage({
   const explicitTab: Tab | null = explicitView && explicitView !== "timeline" ? explicitView : null;
 
   const dateFmt = new Intl.DateTimeFormat(intlLocale(locale), { day: "numeric", month: "short" });
-  const stageLabels: [string, string, string, string, string] = [
+  const stageLabels: [string, string, string, string, string, string] = [
     t("stagePlanBuilt"),
     t("stageSent"),
     t("stageQuoted"),
     t("stageApproved"),
     t("stageLive"),
+    t("stageFinished"),
   ];
 
   const [unsentLists, requests] = await Promise.all([
@@ -221,7 +222,7 @@ export default async function RequestsPage({
         ? { kind: "link", href: detailHref, label: t("actionReviewQuote"), primary: true }
         : stage === 4
           ? { kind: "link", href: orderHref, label: t("actionSeePlacements"), primary: false }
-          : stage === 5
+          : stage >= 5
             ? { kind: "link", href: orderHref, label: t("actionOpenReport"), primary: false }
             : { kind: "link", href: detailHref, label: t("actionView"), primary: false };
 

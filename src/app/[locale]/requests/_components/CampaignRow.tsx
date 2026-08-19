@@ -35,7 +35,7 @@ export function CampaignRow({
   statusValue: string;
   meta: string;
   stage: CampaignStage;
-  stageLabels: [string, string, string, string, string];
+  stageLabels: [string, string, string, string, string, string];
   currentStageLabel: string;
   totalLabel: string | null;
   qualifier: string;
