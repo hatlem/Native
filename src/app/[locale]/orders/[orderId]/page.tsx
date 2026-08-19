@@ -33,8 +33,8 @@ export default async function MyOrderPage({
       invoices: { select: { id: true, status: true } },
       lines: {
         include: {
-          brief: {
-            include: { assets: { orderBy: { version: "desc" }, take: 1 } },
+          article: {
+            include: { versions: { orderBy: { version: "desc" }, take: 1 } },
           },
           booking: {
               include: {
@@ -169,7 +169,7 @@ export default async function MyOrderPage({
           {order.lines.map((line) => {
             const p = line.productId ? byId.get(line.productId) : undefined;
             const isContentFee = line.kind === "CONTENT_FEE";
-            const latest = line.brief?.assets[0];
+            const latest = line.article?.versions[0];
             return (
               <article className="card line-card" key={line.id}>
                 <div className="line-head">

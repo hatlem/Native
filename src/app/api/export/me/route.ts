@@ -89,7 +89,7 @@ export async function GET(req: NextRequest) {
     }),
     prisma.order.findMany({
       where: { organizationId: { in: orgIds } },
-      include: { lines: { include: { brief: { include: { assets: true } }, booking: true } } },
+      include: { lines: { include: { article: { include: { versions: true } }, booking: true } } },
     }),
     prisma.invoice.findMany({
       where: { organizationId: { in: orgIds } },

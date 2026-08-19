@@ -57,9 +57,9 @@ export default async function PublisherOrdersPage({
         include: {
           order: true,
           booking: { include: { metrics: true } },
-          brief: {
+          article: {
             include: {
-              assets: { orderBy: { version: "desc" }, take: 1 },
+              versions: { orderBy: { version: "desc" }, take: 1 },
             },
           },
         },
@@ -216,8 +216,8 @@ export default async function PublisherOrdersPage({
                       allowed to retract. Distinct from the desk-side
                       "request changes" soft path: this is a hard
                       rejection that flips ContentAsset → RETRACTED. */}
-                  {line.brief?.assets[0] &&
-                  canRetractAsset(line.brief.assets[0].status) ? (
+                  {line.article?.versions[0] &&
+                  canRetractAsset(line.article.versions[0].status) ? (
                     <details className="spec-details veto-block">
                       <summary>
                         <span className="btn small ghost">
@@ -229,7 +229,7 @@ export default async function PublisherOrdersPage({
                         <input
                           type="hidden"
                           name="assetId"
-                          value={line.brief.assets[0].id}
+                          value={line.article.versions[0].id}
                         />
                         <h4 style={{ margin: "12px 0 4px" }}>
                           {tp("vetoTitle")}
@@ -256,10 +256,10 @@ export default async function PublisherOrdersPage({
                         </div>
                       </form>
                     </details>
-                  ) : line.brief?.assets[0]?.status === "RETRACTED" ? (
+                  ) : line.article?.versions[0]?.status === "RETRACTED" ? (
                     <p className="muted small">
                       <strong>{tp("retractedLabel")}:</strong>{" "}
-                      {line.brief.assets[0].retractionNote ?? ""}
+                      {line.article.versions[0].retractionNote ?? ""}
                     </p>
                   ) : null}
                 </article>

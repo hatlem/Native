@@ -50,7 +50,7 @@ export async function OrderSection({
             .filter((line) => line.kind === "INVENTORY" && line.productId)
             .map((line) => {
             const p = line.productId ? byId.get(line.productId) : undefined;
-            const asset = line.brief?.assets[0];
+            const asset = line.article?.versions[0];
             return (
               <article className="card" key={line.id}>
                 <h3>{p?.title.name ?? line.productId}</h3>

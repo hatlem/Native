@@ -269,7 +269,7 @@ export async function rejectAsset(formData: FormData) {
   const asset = await prisma.contentAsset.findUnique({
     where: { id: assetId },
     include: {
-      brief: {
+      article: {
         select: {
           orderLine: {
             select: {
@@ -288,9 +288,13 @@ export async function rejectAsset(formData: FormData) {
     redirect(`/${locale}/publisher/orders?veto=not-found`);
   }
 
+  if (!asset.article.orderLine) {
+    redirect(`/${locale}/publisher/orders?veto=not-found`);
+  }
+
   const product = await prisma.product.findUnique({
     // Briefs only attach to inventory lines, so productId is present.
-    where: { id: asset.brief.orderLine.productId ?? "" },
+    where: { id: asset.article.orderLine.productId ?? "" },
     select: { title: { select: { publisherId: true } } },
   });
   if (product?.title.publisherId !== publisherId) {
@@ -317,8 +321,8 @@ export async function rejectAsset(formData: FormData) {
     publisherId,
   });
 
-  const orderId = asset.brief.orderLine.order.id;
-  const orgId = asset.brief.orderLine.order.organizationId;
+  const orderId = asset.article.orderLine.order.id;
+  const orgId = asset.article.orderLine.order.organizationId;
 
   await notifyDesk({
     kind: "EDITORIAL_VETO",

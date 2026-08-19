@@ -26,7 +26,8 @@ type OrderForLines = Prisma.OrderGetPayload<{
     quote: true;
     lines: {
       include: {
-        brief: { include: { assets: { orderBy: { version: "desc" } } } };
+        brief: true;
+        article: { include: { versions: { orderBy: { version: "desc" } } } };
         trackedLinks: true;
       };
     };
@@ -70,7 +71,7 @@ export async function LinesSection({
         {order.lines.map((line) => {
           const p = line.productId ? byId.get(line.productId) : undefined;
           const isContentFee = line.kind === "CONTENT_FEE";
-          const assets = line.brief?.assets ?? [];
+          const assets = line.article?.versions ?? [];
           const latest = assets[0];
           const pb = p
             ? pickPlaybook(
