@@ -87,8 +87,13 @@ export default async function PlanPage({
         select: { id: true, name: true, _count: { select: { items: true } } },
       })
     : [];
+  // A `?list=` query param (used by the placement-ready-sweep notification
+  // link) wins for this render over the cookie. resolveActiveList already
+  // rejects any id that doesn't belong to ws.activeOrgId, so a link to
+  // someone else's list just falls back — never leaks a cross-org list.
+  const listParam = typeof sp.list === "string" && sp.list.trim() ? sp.list.trim() : null;
   const activeList = ws?.activeOrgId
-    ? await resolveActiveList(ws.activeOrgId, await readActiveListId())
+    ? await resolveActiveList(ws.activeOrgId, listParam ?? (await readActiveListId()))
     : null;
   const listItems = activeList?.items ?? [];
   const verticalOptions = activeList ? await loadVerticalOptions() : [];
