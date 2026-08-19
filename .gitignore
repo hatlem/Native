@@ -57,3 +57,4 @@ docs/outreach-sources/**/*.eml
 docs/outreach-sources/**/*.zip
 docs/outreach-sources/_dl-*/
 .superpowers/
+.worktrees/
