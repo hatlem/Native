@@ -534,6 +534,7 @@
     "remove": "Poista",
     "qty": "Määrä",
     "decrement": "Vähennä määrää",
+    "decrementRemoves": "Poista julkaisu suunnitelmasta",
     "increment": "Lisää määrää",
     "estTotal": "Arvioitu suuntaa-antava yhteissumma",
     "totalForItems": "{amount}, {count, plural, =1 {1 julkaisu} other {# julkaisua}}",

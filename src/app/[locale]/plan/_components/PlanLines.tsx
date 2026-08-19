@@ -168,11 +168,20 @@ export async function PlanLines({
                 ) : null}
                 <div className="plan-line-card__controls">
                   <div className="plan-qty-stepper">
-                    <form action={setQuantity}>
+                    {/* At quantity 1 the minus removes the line (cart
+                        convention) instead of sitting dead-disabled — a
+                        no-op "−" reads as broken. Same server action the
+                        Remove button uses; label says what it will do. */}
+                    <form action={l.quantity <= 1 ? removeFromPlan : setQuantity}>
                       <input type="hidden" name="locale" value={locale} />
                       <input type="hidden" name="itemId" value={l.itemId} />
-                      <input type="hidden" name="quantity" value={l.quantity - 1} />
-                      <button type="submit" aria-label={t("decrement")} disabled={l.quantity <= 1}>
+                      {l.quantity > 1 ? (
+                        <input type="hidden" name="quantity" value={l.quantity - 1} />
+                      ) : null}
+                      <button
+                        type="submit"
+                        aria-label={l.quantity <= 1 ? t("decrementRemoves") : t("decrement")}
+                      >
                         −
                       </button>
                     </form>

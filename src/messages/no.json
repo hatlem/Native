@@ -447,6 +447,7 @@
     "remove": "Fjern",
     "qty": "Antall",
     "decrement": "Reduser antall",
+    "decrementRemoves": "Fjern tittelen fra planen",
     "increment": "Øk antall",
     "estTotal": "Estimert veiledende total",
     "totalForItems": "{amount} for {count, plural, =1 {1 tittel} other {# titler}}",

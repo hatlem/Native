@@ -534,6 +534,7 @@
     "remove": "Entfernen",
     "qty": "Menge",
     "decrement": "Menge verringern",
+    "decrementRemoves": "Titel aus dem Plan entfernen",
     "increment": "Menge erhöhen",
     "estTotal": "Geschätzter Richtwert",
     "totalForItems": "{amount} für {count, plural, =1 {1 Titel} other {# Titel}}",

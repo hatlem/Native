@@ -3067,13 +3067,24 @@ select:disabled {
   display: inline;
 }
 .plan-qty-stepper button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   width: 30px;
   height: 32px;
   background: var(--surface);
-  border: 0;
   color: var(--text);
   font-size: 1rem;
   cursor: pointer;
+  /* The global bare-submit reset (form … button[type="submit"]:not(.btn))
+     outranks this class and injects 9px/16px padding + 38px min-height +
+     its own border/radius — which shoves the glyph off-centre and breaks
+     the stepper pill into separate boxes. Pin the geometry (same
+     precedent as .campaign-row__click). */
+  padding: 0 !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  min-height: 32px !important;
 }
 .plan-qty-stepper button:hover:not(:disabled) {
   background: var(--surface-2);
