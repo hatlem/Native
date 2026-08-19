@@ -10,12 +10,12 @@ let orgId = "";
 let deskUserId = "";
 let buyerUserId = "";
 let publisherId = "";
-let marketCode: MarketCode = "NO";
+let marketCode!: MarketCode;
 
 before(async () => {
   if (!RUN_DB_IT) return;
   const market = await prisma.market.findFirst({ select: { code: true } });
-  marketCode = market?.code ?? "NO";
+  marketCode = market!.code;
   const org = await prisma.organization.create({
     data: { name: "Placement Sweep IT Org", type: "ADVERTISER", marketCode },
   });
