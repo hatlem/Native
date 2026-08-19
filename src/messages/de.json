@@ -692,7 +692,14 @@
       "noDate": "Kein Datum",
       "angleEdit": "Blickwinkel des Artikels für diese Welle",
       "angleSave": "Blickwinkel speichern",
-      "angleHint": "Desk und Autor starten hiervon – halten Sie ihn anders als in den übrigen Wellen."
+      "angleHint": "Desk und Autor starten hiervon – halten Sie ihn anders als in den übrigen Wellen.",
+      "waveTotal": "≈ {amount}",
+      "pacingTotal": "Alle Wellen zusammen: ≈ {amount}",
+      "pacingBudget": "gegenüber Ihrem Budget von {amount} pro Welle",
+      "overlapWarning": "{title} läuft in Welle {a} und Welle {b} gleichzeitig – ziehen Sie die Wellen auseinander oder wechseln Sie den Titel.",
+      "dissolveSummary": "Programm auflösen …",
+      "dissolveBody": "Jede Welle wird wieder ein gewöhnlicher Plan. Nie eingereichte Wellen-Kopien werden archiviert, damit sie Ihre Pläne nicht unübersichtlich machen – alles bereits an den Desk Gesendete bleibt unberührt.",
+      "dissolveConfirm": "Programm auflösen"
     }
   },
   "rfq": {

@@ -23,8 +23,10 @@ import { PlanTargeting } from "./_components/PlanTargeting";
 import { PlanLines, type PlanTitleLine } from "./_components/PlanLines";
 import { PlanSummary, type Rollup } from "./_components/PlanSummary";
 import { WhatHappensNext } from "./_components/WhatHappensNext";
-import { PlanProgramme } from "./_components/PlanProgramme";
+import { PlanProgramme, type ProgrammePacing } from "./_components/PlanProgramme";
 import { loadProgrammeForList, recommendCadence } from "@/lib/programme";
+import { estimateListTotals } from "@/lib/plan-total";
+import { scheduleOverlapWarnings, type ScheduleOverlapWarning } from "@/lib/programme-warnings";
 import type { BookingUnit } from "@/lib/campaign-schedule";
 
 const MARKET_CODES = Object.values(MarketCode);
@@ -273,6 +275,88 @@ export default async function PlanPage({
   // recommended cadence for the titles on it (booking units + goal drive the
   // rules) and wave 1's anchor = the earliest scheduled line.
   const programmeView = activeList ? await loadProgrammeForList(activeList.id) : null;
+
+  // Budget pacing + overlap warnings across the programme's waves. One lean
+  // query for all (≤4) wave lists: only the fields estimateListTotals and
+  // scheduleOverlapWarnings need — never the full ITEM_INCLUDE hydration.
+  let pacing: ProgrammePacing | null = null;
+  let overlapWarnings: ScheduleOverlapWarning[] = [];
+  if (programmeView) {
+    const waveItems = await prisma.savedListItem.findMany({
+      where: { listId: { in: programmeView.waves.map((w) => w.listId) } },
+      select: {
+        listId: true,
+        productId: true,
+        quantity: true,
+        scheduleStart: true,
+        scheduleUnits: true,
+        product: {
+          select: {
+            currency: true,
+            basePrice: true,
+            active: true,
+            confirmedAt: true,
+            bookingUnit: true,
+            titleId: true,
+            priceRules: { select: { marginPct: true, seasonalMultiplier: true, minVolume: true } },
+            title: {
+              select: {
+                name: true,
+                pricesPublic: true,
+                publisher: { select: { pricesPublic: true } },
+              },
+            },
+          },
+        },
+      },
+    });
+    const itemsByList = new Map<string, typeof waveItems>();
+    for (const i of waveItems) {
+      const arr = itemsByList.get(i.listId) ?? [];
+      arr.push(i);
+      itemsByList.set(i.listId, arr);
+    }
+    // Per-wave indicative totals; only priced lines produce an amount, so a
+    // wave of hidden-price titles shows no figure rather than a misleading 0.
+    const perWave = programmeView.waves.map((w) => ({
+      listId: w.listId,
+      totals: estimateListTotals(itemsByList.get(w.listId) ?? [])
+        .filter((tot) => tot.amount > 0)
+        .map((tot) => ({ currency: tot.currency, amount: tot.amount })),
+    }));
+    const programmeByCurrency = new Map<string, number>();
+    for (const w of perWave) {
+      for (const tot of w.totals) {
+        programmeByCurrency.set(tot.currency, (programmeByCurrency.get(tot.currency) ?? 0) + tot.amount);
+      }
+    }
+    const budgetAmount = activeList?.budget != null ? Number(activeList.budget) : 0;
+    pacing = {
+      perWave,
+      programmeTotals: [...programmeByCurrency.entries()].map(([currency, amount]) => ({
+        currency,
+        amount,
+      })),
+      // A list budget is per plan — i.e. per wave — so the comparison line
+      // reads "vs your budget of X per wave", not "X for the programme".
+      budget:
+        budgetAmount > 0 && activeList?.currency
+          ? { amount: budgetAmount, currency: activeList.currency }
+          : null,
+    };
+    overlapWarnings = scheduleOverlapWarnings(
+      programmeView.waves.map((w) => ({
+        waveNumber: w.waveNumber,
+        items: (itemsByList.get(w.listId) ?? []).map((i) => ({
+          titleId: i.product?.titleId ?? null,
+          titleName: i.product?.title.name ?? "",
+          scheduleStart: i.scheduleStart,
+          scheduleUnits: i.scheduleUnits,
+          bookingUnit: (i.product?.bookingUnit ?? "MONTH") as BookingUnit,
+        })),
+      })),
+    );
+  }
   const bookingUnits = lines.map((l) => l.product.bookingUnit as BookingUnit);
   const cadence = recommendCadence({ goal: activeList?.goal ?? null, bookingUnits });
   let firstStart: Date | null = null;
@@ -373,6 +457,8 @@ export default async function PlanPage({
               cadence={cadence}
               firstStart={firstStart}
               unit={previewUnit}
+              pacing={pacing}
+              warnings={overlapWarnings}
             />
           ) : null}
           <div className="split">

@@ -6851,6 +6851,59 @@ footer a:hover {
 .plan-programme__angle-row input {
   flex: 1;
 }
+/* Per-wave indicative total on a strip card */
+.wave-strip__total {
+  font-size: 0.8rem;
+  color: var(--muted-strong);
+  font-variant-numeric: tabular-nums;
+}
+/* Same-title simultaneous-run warnings under the strip */
+.plan-programme__warnings {
+  list-style: none;
+  margin: var(--s-2) 0 0;
+  padding: 0;
+  display: grid;
+  gap: 4px;
+}
+.plan-programme__warning {
+  font-size: 0.85rem;
+  color: var(--warning);
+  max-width: 62ch;
+}
+/* Programme-total / budget pacing line under the strip */
+.plan-programme__pacing {
+  margin: var(--s-2) 0 0;
+  font-size: 0.85rem;
+  color: var(--muted-strong);
+  font-variant-numeric: tabular-nums;
+}
+/* Dissolve disclosure: deliberately quiet — opening it is the confirm step */
+.plan-programme__dissolve {
+  margin-top: var(--s-3);
+  padding-top: var(--s-3);
+  border-top: 1px solid var(--border);
+}
+.plan-programme__dissolve summary {
+  cursor: pointer;
+  list-style: none;
+  font-size: 0.85rem;
+  color: var(--muted-strong);
+}
+.plan-programme__dissolve summary::-webkit-details-marker {
+  display: none;
+}
+.plan-programme__dissolve-body {
+  margin-top: var(--s-2);
+  display: grid;
+  gap: var(--s-2);
+  justify-items: start;
+}
+.plan-programme__dissolve-body p {
+  margin: 0;
+  font-size: 0.85rem;
+  color: var(--muted-strong);
+  max-width: 62ch;
+}
 @media (max-width: 640px) {
   .plan-programme__angle-row {
     flex-direction: column;

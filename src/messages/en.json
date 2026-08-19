@@ -692,7 +692,14 @@
       "noDate": "Date not set",
       "angleEdit": "This wave's article angle",
       "angleSave": "Save angle",
-      "angleHint": "The desk and writer start from this — keep it different from the other waves."
+      "angleHint": "The desk and writer start from this — keep it different from the other waves.",
+      "waveTotal": "≈ {amount}",
+      "pacingTotal": "All waves together: ≈ {amount}",
+      "pacingBudget": "vs your budget of {amount} per wave",
+      "overlapWarning": "{title} runs in wave {a} and wave {b} at the same time — space them out or vary the title.",
+      "dissolveSummary": "Dissolve programme…",
+      "dissolveBody": "Each wave becomes an ordinary plan again. Wave copies you never sent are archived so they don't clutter your plans — anything already sent to the desk is untouched.",
+      "dissolveConfirm": "Dissolve programme"
     }
   },
   "rfq": {

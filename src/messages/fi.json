@@ -692,7 +692,14 @@
       "noDate": "Päivää ei asetettu",
       "angleEdit": "Tämän kierroksen artikkelin näkökulma",
       "angleSave": "Tallenna näkökulma",
-      "angleHint": "Deski ja kirjoittaja lähtevät tästä – pidä se erilaisena kuin muilla kierroksilla."
+      "angleHint": "Deski ja kirjoittaja lähtevät tästä – pidä se erilaisena kuin muilla kierroksilla.",
+      "waveTotal": "≈ {amount}",
+      "pacingTotal": "Kaikki kierrokset yhteensä: ≈ {amount}",
+      "pacingBudget": "budjettinne on {amount} kierrosta kohden",
+      "overlapWarning": "{title} pyörii kierroksella {a} ja kierroksella {b} yhtä aikaa – jaksota ne erilleen tai vaihda julkaisua.",
+      "dissolveSummary": "Pura ohjelma…",
+      "dissolveBody": "Jokaisesta kierroksesta tulee taas tavallinen suunnitelma. Lähettämättömät kierrokset arkistoidaan, etteivät ne sotke suunnitelmianne – kaikki jo deskille lähetetty säilyy ennallaan.",
+      "dissolveConfirm": "Pura ohjelma"
     }
   },
   "rfq": {

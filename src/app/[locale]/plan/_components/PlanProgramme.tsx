@@ -1,11 +1,21 @@
 import { getTranslations } from "next-intl/server";
 import { Repeat } from "lucide-react";
 import { selectActiveList } from "@/app/list-actions";
-import { updateWaveAngle } from "@/app/programme-actions";
+import { updateWaveAngle, dissolveProgramme } from "@/app/programme-actions";
 import type { ProgrammeView, CadencePlan } from "@/lib/programme";
+import type { ScheduleOverlapWarning } from "@/lib/programme-warnings";
 import type { BookingUnit } from "@/lib/campaign-schedule";
-import { intlLocale } from "@/lib/money";
+import { intlLocale, formatMoney } from "@/lib/money";
 import { ProgrammeForm } from "./ProgrammeForm";
+
+// Budget picture across the programme, computed by /plan's page from a lean
+// per-wave item query: indicative totals per wave (priced lines only), the
+// programme-wide sum per currency, and the list's per-wave budget when set.
+export type ProgrammePacing = {
+  perWave: Array<{ listId: string; totals: Array<{ currency: string; amount: number }> }>;
+  programmeTotals: Array<{ currency: string; amount: number }>;
+  budget: { amount: number; currency: string } | null;
+};
 
 // Multi-wave planning on /plan. Two states:
 //  - plain list → a collapsed "Run this as a programme" disclosure with the
@@ -21,6 +31,8 @@ export async function PlanProgramme({
   cadence,
   firstStart,
   unit,
+  pacing,
+  warnings = [],
 }: {
   locale: string;
   listId: string;
@@ -28,6 +40,8 @@ export async function PlanProgramme({
   cadence: CadencePlan;
   firstStart: Date | null;
   unit: BookingUnit;
+  pacing?: ProgrammePacing | null;
+  warnings?: ScheduleOverlapWarning[];
 }) {
   const t = await getTranslations({ locale, namespace: "plan.programme" });
   const dateFmt = new Intl.DateTimeFormat(intlLocale(locale), { day: "numeric", month: "short" });
@@ -64,6 +78,14 @@ export async function PlanProgramme({
 
   const current = view.waves.find((w) => w.listId === listId) ?? null;
 
+  // "12 000 kr + €900" — multi-currency waves join with "+" so the figure
+  // reads as two charges that both apply, never a choice (the Erlend rule).
+  const joinTotals = (totals: Array<{ currency: string; amount: number }>) =>
+    totals.map((tot) => formatMoney(tot.amount, tot.currency, locale)).join(" + ");
+  const totalsByList = new Map(
+    (pacing?.perWave ?? []).map((w) => [w.listId, w.totals] as const),
+  );
+
   return (
     <section className="plan-programme plan-programme--strip" aria-label={t("summary")}>
       <div className="plan-programme__strip-head">
@@ -76,6 +98,7 @@ export async function PlanProgramme({
       <ol className="wave-strip">
         {view.waves.map((w) => {
           const isCurrent = w.listId === listId;
+          const waveTotals = totalsByList.get(w.listId) ?? [];
           const body = (
             <>
               <span className="wave-strip__num">{t("waveChip", { n: w.waveNumber })}</span>
@@ -85,6 +108,11 @@ export async function PlanProgramme({
               <span className="wave-strip__date">
                 {w.scheduleStart ? dateFmt.format(w.scheduleStart) : t("noDate")}
               </span>
+              {waveTotals.length > 0 ? (
+                <span className="wave-strip__total">
+                  {t("waveTotal", { amount: joinTotals(waveTotals) })}
+                </span>
+              ) : null}
               {w.articleAngle ? <span className="wave-strip__angle">{w.articleAngle}</span> : null}
             </>
           );
@@ -109,6 +137,25 @@ export async function PlanProgramme({
           );
         })}
       </ol>
+      {warnings.length > 0 ? (
+        <ul className="plan-programme__warnings">
+          {warnings.map((w) => (
+            <li key={`${w.titleName}-${w.waveA}-${w.waveB}`} className="plan-programme__warning">
+              {t("overlapWarning", { title: w.titleName, a: w.waveA, b: w.waveB })}
+            </li>
+          ))}
+        </ul>
+      ) : null}
+      {pacing && pacing.programmeTotals.length > 0 ? (
+        <p className="plan-programme__pacing">
+          {t("pacingTotal", { amount: joinTotals(pacing.programmeTotals) })}
+          {pacing.budget
+            ? ` — ${t("pacingBudget", {
+                amount: formatMoney(pacing.budget.amount, pacing.budget.currency, locale),
+              })}`
+            : null}
+        </p>
+      ) : null}
       {current ? (
         <form action={updateWaveAngle} className="plan-programme__angle-form">
           <input type="hidden" name="locale" value={locale} />
@@ -130,6 +177,22 @@ export async function PlanProgramme({
           <p className="muted small">{t("angleHint")}</p>
         </form>
       ) : null}
+      {/* The undo. A native disclosure keeps the destructive-looking option
+          out of the default view without any client JS — opening it IS the
+          "are you sure" step, so no browser confirm dialog on submit. */}
+      <details className="plan-programme__dissolve">
+        <summary>{t("dissolveSummary")}</summary>
+        <div className="plan-programme__dissolve-body">
+          <p>{t("dissolveBody")}</p>
+          <form action={dissolveProgramme}>
+            <input type="hidden" name="locale" value={locale} />
+            <input type="hidden" name="listId" value={listId} />
+            <button type="submit" className="btn small secondary">
+              {t("dissolveConfirm")}
+            </button>
+          </form>
+        </div>
+      </details>
     </section>
   );
 }

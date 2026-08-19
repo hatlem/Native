@@ -605,7 +605,14 @@
       "noDate": "Datum ej satt",
       "angleEdit": "Artikelvinkel för den här omgången",
       "angleSave": "Spara vinkel",
-      "angleHint": "Desken och skribenten utgår härifrån – håll den skild från de andra omgångarna."
+      "angleHint": "Desken och skribenten utgår härifrån – håll den skild från de andra omgångarna.",
+      "waveTotal": "≈ {amount}",
+      "pacingTotal": "Alla omgångar tillsammans: ≈ {amount}",
+      "pacingBudget": "mot er budget på {amount} per omgång",
+      "overlapWarning": "{title} går i omgång {a} och omgång {b} samtidigt – sprid ut dem, eller välj en annan titel.",
+      "dissolveSummary": "Lös upp programmet …",
+      "dissolveBody": "Varje omgång blir en vanlig plan igen. Omgångar ni aldrig skickat in arkiveras, så att de inte skräpar ner bland era planer – allt som redan skickats till desken rörs inte.",
+      "dissolveConfirm": "Lös upp programmet"
     }
   },
   "rfq": {

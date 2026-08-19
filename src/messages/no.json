@@ -605,7 +605,14 @@
       "noDate": "Dato ikke satt",
       "angleEdit": "Artikkelvinkel for denne runden",
       "angleSave": "Lagre vinkel",
-      "angleHint": "Desken og skribenten starter herfra – hold den ulik de andre rundene."
+      "angleHint": "Desken og skribenten starter herfra – hold den ulik de andre rundene.",
+      "waveTotal": "≈ {amount}",
+      "pacingTotal": "Alle rundene samlet: ≈ {amount}",
+      "pacingBudget": "mot budsjettet ditt på {amount} per runde",
+      "overlapWarning": "{title} går i runde {a} og runde {b} samtidig – spre dem, eller velg en annen tittel.",
+      "dissolveSummary": "Løs opp programmet …",
+      "dissolveBody": "Hver runde blir en vanlig plan igjen. Runder du aldri sendte inn, arkiveres, så de ikke roter til planene dine – alt som allerede er sendt til desken, røres ikke.",
+      "dissolveConfirm": "Løs opp programmet"
     }
   },
   "rfq": {
