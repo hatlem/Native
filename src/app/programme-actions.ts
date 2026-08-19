@@ -44,6 +44,8 @@ export async function startProgramme(formData: FormData) {
     .map((v) => (typeof v === "string" ? v.trim().slice(0, 300) : ""))
     .map((v) => v || null);
   const rationaleKey = str(formData, "rationaleKey") || null;
+  // Opt-in checkbox: unchecked boxes are simply absent from the POST.
+  const autoSend = formData.get("autoSend") === "1";
 
   try {
     const result = await createProgramme({
@@ -54,11 +56,13 @@ export async function startProgramme(formData: FormData) {
       spacingWeeks,
       angles,
       rationaleKey,
+      autoSend,
     });
     await recordAudit(scope.userId ?? null, "programme.create", `CampaignProgramme:${result.programmeId}`, {
       sourceListId: list.id,
       waves: result.waveListIds.length,
       spacingWeeks,
+      autoSend,
     });
   } catch (e) {
     // Unreachable from the UI (the form only renders for a non-programme

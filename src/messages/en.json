@@ -692,7 +692,9 @@
       "noDate": "Date not set",
       "angleEdit": "This wave's article angle",
       "angleSave": "Save angle",
-      "angleHint": "The desk and writer start from this — keep it different from the other waves."
+      "angleHint": "The desk and writer start from this — keep it different from the other waves.",
+      "autoSendLabel": "Send each wave automatically when it's due",
+      "autoSendHint": "Each wave goes to the desk as a normal request when its time comes — you still approve the quote before anything is booked or charged."
     }
   },
   "rfq": {

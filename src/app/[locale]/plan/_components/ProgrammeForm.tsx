@@ -133,6 +133,17 @@ export function ProgrammeForm({
         })}
       </ol>
 
+      {/* Opt-in auto-send. Kept unchecked by default on purpose: sending a
+          wave to the desk is a deliberate act, and the hint spells out that
+          the buyer still approves the quote before anything is committed. */}
+      <label className="plan-programme__autosend">
+        <input type="checkbox" name="autoSend" value="1" />
+        <span>
+          {t("autoSendLabel")}
+          <span className="muted small plan-programme__autosend-hint">{t("autoSendHint")}</span>
+        </span>
+      </label>
+
       <SubmitButton label={t("start")} pending={t("starting")} />
     </form>
   );

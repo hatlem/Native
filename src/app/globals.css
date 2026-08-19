@@ -6754,6 +6754,22 @@ footer a:hover {
 .plan-programme__form .btn {
   align-self: flex-start;
 }
+/* Opt-in auto-send checkbox: box aligns with the label's first line, the
+   hint wraps underneath as its own muted line. */
+.plan-programme__autosend {
+  display: flex;
+  gap: var(--s-2);
+  align-items: flex-start;
+  max-width: 62ch;
+}
+.plan-programme__autosend input {
+  margin-top: 0.2em;
+  flex: none;
+}
+.plan-programme__autosend-hint {
+  display: block;
+  margin-top: 2px;
+}
 
 /* Wave strip: the programme's waves once it exists */
 .plan-programme__strip-head {
