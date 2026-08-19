@@ -62,7 +62,11 @@ LEFT JOIN "Product" p ON p.id = ol."productId"
 LEFT JOIN "Title" t ON t.id = p."titleId"
 JOIN author_pick au ON au.brief_id = cb.id
 JOIN "User" usr ON usr.id = au.user_id
-WHERE EXISTS (SELECT 1 FROM "ContentAsset" ca WHERE ca."briefId" = cb.id);
+-- Two kinds of brief need an Article: one that already owns drafts, and
+-- one on a line that is staffed but not yet written (the journalist is
+-- locked out of the writer page without an Article to write into).
+WHERE EXISTS (SELECT 1 FROM "ContentAsset" ca WHERE ca."briefId" = cb.id)
+   OR ol."assignedWriterId" IS NOT NULL;
 
 -- AlterTable: add articleId (nullable first so the UPDATE below can run)
 ALTER TABLE "ContentAsset" ADD COLUMN "articleId" TEXT;

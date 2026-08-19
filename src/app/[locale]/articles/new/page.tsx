@@ -29,7 +29,7 @@ export default async function NewArticlePage({
           <input type="hidden" name="organizationId" value={orgs[0].id} />
         ) : (
           <div>
-            <label className="block text-sm font-medium">Organization</label>
+            <label className="block text-sm font-medium">{t("newOrganizationLabel")}</label>
             <select name="organizationId" className="w-full rounded border p-2 text-sm">
               {orgs.map((o) => (
                 <option key={o.id} value={o.id}>

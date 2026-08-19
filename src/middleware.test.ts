@@ -72,6 +72,8 @@ test("CSP regression: buildCsp still emits the nonce and the same directive shap
   assert.match(csp, /style-src 'self' 'unsafe-inline'/);
   assert.match(csp, /img-src 'self' data: https:/);
   assert.match(csp, /font-src 'self' data:/);
+  // Browser uploads PUT straight to R2 with a presigned url.
+  assert.match(csp, /connect-src 'self' https:\/\/\*\.r2\.cloudflarestorage\.com/);
   assert.match(csp, /frame-ancestors 'none'/);
   assert.match(csp, /base-uri 'self'/);
   assert.match(csp, /form-action 'self'/);

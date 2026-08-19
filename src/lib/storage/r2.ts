@@ -94,6 +94,21 @@ export async function presignDownload(args: { key: string; ttlSec?: number }): P
   return getSignedUrl(client(), cmd, { expiresIn: args.ttlSec ?? 3600 });
 }
 
+// Render-path variant: a page that merely *offers* a download must not
+// 500 because R2 credentials are missing (local dev, preview) or the
+// signer is unavailable. Callers render no link when this returns null.
+export async function presignDownloadOrNull(args: {
+  key: string;
+  ttlSec?: number;
+}): Promise<string | null> {
+  try {
+    return await presignDownload(args);
+  } catch (error) {
+    console.error("presign_download_failed", args.key, error);
+    return null;
+  }
+}
+
 // Server-side direct upload. Used when the bytes already live on the
 // server (e.g. a PDF pulled from an email reply / forwarded inbox)
 // rather than coming from a browser via a presigned PUT. Same client,

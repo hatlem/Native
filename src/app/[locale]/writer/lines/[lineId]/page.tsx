@@ -14,7 +14,6 @@ export default async function WriterLine({
     where: { id: lineId },
     select: {
       id: true,
-      orderId: true,
       brief: {
         select: {
           message: true,
@@ -75,7 +74,6 @@ export default async function WriterLine({
 
       <form action={saveDraft} className="space-y-2">
         <input type="hidden" name="locale" value={locale} />
-        <input type="hidden" name="orderId" value={line.orderId} />
         <input type="hidden" name="articleId" value={articleId} />
         <label className="block text-sm font-medium">Article</label>
         <textarea
@@ -104,7 +102,6 @@ export default async function WriterLine({
           </span>
           <form action={runSpecCheck}>
             <input type="hidden" name="locale" value={locale} />
-            <input type="hidden" name="orderId" value={line.orderId} />
             <input type="hidden" name="assetId" value={latest.id} />
             <button type="submit" className="underline">
               Run spec check
@@ -112,7 +109,6 @@ export default async function WriterLine({
           </form>
           <form action={setAssetStatus}>
             <input type="hidden" name="locale" value={locale} />
-            <input type="hidden" name="orderId" value={line.orderId} />
             <input type="hidden" name="assetId" value={latest.id} />
             <input type="hidden" name="target" value="IN_REVIEW" />
             <button type="submit" className="underline">

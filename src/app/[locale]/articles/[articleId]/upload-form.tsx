@@ -7,13 +7,11 @@ import { saveUploadedDraft } from "@/app/desk-content-actions";
 export function UploadForm({
   articleId,
   locale,
-  orderId,
   saveDraftAction,
   labels,
 }: {
   articleId: string;
   locale: string;
-  orderId: string;
   saveDraftAction: typeof saveUploadedDraft;
   labels: { heading: string; hint: string; uploading: string; save: string };
 }) {
@@ -58,7 +56,6 @@ export function UploadForm({
       {error ? <p className="text-sm text-red-700">{error}</p> : null}
       <form action={saveDraftAction}>
         <input type="hidden" name="locale" value={locale} />
-        <input type="hidden" name="orderId" value={orderId} />
         <input type="hidden" name="articleId" value={articleId} />
         <input type="hidden" name="bodyUrl" value={key ?? ""} />
         <button

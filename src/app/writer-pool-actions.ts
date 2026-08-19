@@ -6,6 +6,7 @@ import { prisma } from "@/lib/prisma";
 import { recordAudit } from "@/lib/audit";
 import { canAssignWriter } from "@/lib/writers/access";
 import { writerStaffableLine } from "@/lib/authorship";
+import { ensureArticleForLine, articleTitleForLine } from "@/lib/writers/article";
 
 function field(formData: FormData, key: string): string {
   const v = formData.get(key);
@@ -109,34 +110,17 @@ export async function assignWriterToLine(formData: FormData) {
 
   // First assignment for this line creates its Article; a re-assignment
   // (previous writer swapped for a new one) just repoints assignedWriterId.
-  const existing = await prisma.article.findUnique({ where: { orderLineId } });
-  if (existing) {
-    await prisma.article.update({
-      where: { id: existing.id },
-      data: { assignedWriterId: writerId },
-    });
-  } else {
-    const lineForArticle = await prisma.orderLine.findUnique({
-      where: { id: orderLineId },
-      select: { productId: true },
-    });
-    const product = lineForArticle?.productId
-      ? await prisma.product.findUnique({
-          where: { id: lineForArticle.productId },
-          select: { title: { select: { name: true } } },
-        })
-      : null;
-    await prisma.article.create({
-      data: {
-        organizationId: updatedLine.order.organizationId,
-        title: product?.title.name ?? "Untitled article",
-        createdByUserId: userId,
-        createdByRole: "DESK",
-        assignedWriterId: writerId,
-        orderLineId,
-      },
-    });
-  }
+  // ensureArticleForLine keys on the unique orderLineId, so two
+  // concurrent assignments to the same line converge on one row instead
+  // of racing between a find and a create.
+  await ensureArticleForLine({
+    orderLineId,
+    organizationId: updatedLine.order.organizationId,
+    title: await articleTitleForLine(orderLineId),
+    createdByUserId: userId,
+    createdByRole: "DESK",
+    assignedWriterId: writerId,
+  });
   await recordAudit(userId, "article.assign", `OrderLine:${orderLineId}`, { writerId });
 
   redirect(`/${locale}/desk/orders/${orderId}`);

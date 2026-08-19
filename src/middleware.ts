@@ -45,7 +45,9 @@ export function buildCsp(nonce: string): string {
     `style-src 'self' 'unsafe-inline'`,
     `img-src 'self' data: https:`,
     `font-src 'self' data:`,
-    `connect-src 'self'${gtmConnect}`,
+    // Article/rate-card uploads go straight from the browser to R2 with
+    // a presigned PUT (fetch), so the bucket host must be connectable.
+    `connect-src 'self' https://*.r2.cloudflarestorage.com${gtmConnect}`,
     `frame-src 'self'${gtmFrame}${getTalkFrame}`,
     `frame-ancestors 'none'`,
     `base-uri 'self'`,

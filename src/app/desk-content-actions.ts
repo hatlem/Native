@@ -1,7 +1,7 @@
 "use server";
 
 import { redirect } from "next/navigation";
-import { ContentAssetStatus } from "@prisma/client";
+import { ContentAssetStatus, type UserRole } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
 import { recordAudit } from "@/lib/audit";
 import { notifyOrg } from "@/lib/notify";
@@ -10,6 +10,7 @@ import { runSpecCheckForAsset, registerSpecCheckJob } from "@/lib/spec-check-run
 import { ensureTrackedLinks } from "@/lib/metrics/store";
 import { rewriteBodyLinks } from "@/lib/metrics/links";
 import { requireLineWriter, requireArticleWriter } from "@/lib/writers/guard";
+import { ensureArticleForLine, articleTitleForLine } from "@/lib/writers/article";
 
 registerSpecCheckJob();
 
@@ -20,16 +21,88 @@ const ASSET_TARGETS: ContentAssetStatus[] = [
   "FINAL",
 ];
 
-// What status transitions the CONTENT role is allowed to invoke from
-// setAssetStatus. CONTENT hands a draft to the desk for review; it
-// never approves or finalises (those gates belong to the buyer + desk).
-const CONTENT_ASSET_TARGETS: ReadonlySet<ContentAssetStatus> = new Set([
+// What status transitions a non-desk role is allowed to invoke from
+// setAssetStatus. A journalist hands a draft to the desk for review; a
+// buyer/approver/org-admin writing their own article does the same. None
+// of them approves or finalises from here — the buyer's approve /
+// request-changes gate lives in content-review-actions.ts, which
+// independently requires the asset to be IN_REVIEW.
+const SELF_SERVE_ASSET_TARGETS: ReadonlySet<ContentAssetStatus> = new Set([
   ContentAssetStatus.IN_REVIEW,
 ]);
 
 function field(formData: FormData, key: string): string {
   const v = formData.get(key);
   return typeof v === "string" ? v.trim() : "";
+}
+
+// Where an Article sits in the order tree, resolved from the DB rather
+// than from a hidden form field: an article may be unlinked (no
+// placement chosen yet), in which case there is no order to return to.
+async function articleRouting(
+  articleId: string,
+): Promise<{ orderId: string; orderLineId: string | null }> {
+  const article = await prisma.article.findUnique({
+    where: { id: articleId },
+    select: { orderLineId: true, orderLine: { select: { orderId: true } } },
+  });
+  return {
+    orderId: article?.orderLine?.orderId ?? "",
+    orderLineId: article?.orderLineId ?? null,
+  };
+}
+
+// Where a content action returns the actor to. Desk/superadmin work out
+// of the order page; a journalist works out of the writer line page,
+// which is the only surface that shows the ContentBrief. Everyone else —
+// buyers, approvers, org admins, plus anyone acting on an article with
+// no placement yet — works out of the article detail page.
+function afterContentAction(args: {
+  locale: string;
+  role: string;
+  articleId: string;
+  orderId: string;
+  orderLineId: string | null;
+}): string {
+  const { locale, role, articleId, orderId, orderLineId } = args;
+  if ((role === "DESK" || role === "SUPERADMIN") && orderId) {
+    return `/${locale}/desk/orders/${orderId}`;
+  }
+  if (role === "CONTENT" && orderLineId) {
+    return `/${locale}/writer/lines/${orderLineId}`;
+  }
+  return `/${locale}/articles/${articleId}`;
+}
+
+// Appends a new DRAFT version to an article. Shared by the article-keyed
+// and the line-keyed entry points below so both produce identical rows.
+async function appendDraftVersion(args: {
+  articleId: string;
+  body: string;
+  sourceAssetId: string | null;
+  writerProfileId: string | null;
+  userId: string;
+}): Promise<void> {
+  const latest = await prisma.contentAsset.findFirst({
+    where: { articleId: args.articleId },
+    orderBy: { version: "desc" },
+  });
+  const nextVersion = (latest?.version ?? 0) + 1;
+  const asset = await prisma.contentAsset.create({
+    data: {
+      articleId: args.articleId,
+      version: nextVersion,
+      status: "DRAFT",
+      body: args.body,
+      sourceAssetId: args.sourceAssetId,
+      authorWriterId: args.writerProfileId,
+    },
+  });
+  await recordAudit(args.userId, "asset.draft", `ContentAsset:${asset.id}`, {
+    version: nextVersion,
+    sourceAssetId: args.sourceAssetId,
+  });
+  await enqueue("spec.check", { assetId: asset.id });
 }
 
 // Desk confirms which auto-detected outbound links in a produced article
@@ -70,38 +143,62 @@ export async function confirmTrackedLinks(formData: FormData) {
 export async function saveDraft(formData: FormData) {
   const locale = field(formData, "locale") || "en";
   const articleId = field(formData, "articleId");
-  const orderId = field(formData, "orderId");
   const body = field(formData, "body");
   const sourceAssetId = field(formData, "sourceAssetId") || null;
   const { userId, writerProfileId, role } = await requireArticleWriter(articleId, locale);
 
   if (body) {
-    const latest = await prisma.contentAsset.findFirst({
-      where: { articleId },
-      orderBy: { version: "desc" },
-    });
-    const nextVersion = (latest?.version ?? 0) + 1;
-    const asset = await prisma.contentAsset.create({
-      data: {
-        articleId,
-        version: nextVersion,
-        status: "DRAFT",
-        body,
-        sourceAssetId: sourceAssetId || null,
-        authorWriterId: writerProfileId,
-      },
-    });
-    await recordAudit(userId, "asset.draft", `ContentAsset:${asset.id}`, {
-      version: nextVersion,
-      sourceAssetId: sourceAssetId || null,
-    });
-    await enqueue("spec.check", { assetId: asset.id });
+    await appendDraftVersion({ articleId, body, sourceAssetId, writerProfileId, userId });
   }
-  redirect(
+  const routing = await articleRouting(articleId);
+  redirect(afterContentAction({ locale, role, articleId, ...routing }));
+}
+
+// The desk composes drafts from the order page, where the unit of work is
+// the order line, not the article. A line drafted before any writer is
+// staffed has no Article yet, so create one on the way in.
+export async function saveLineDraft(formData: FormData) {
+  const locale = field(formData, "locale") || "en";
+  const orderLineId = field(formData, "orderLineId");
+  const body = field(formData, "body");
+  const sourceAssetId = field(formData, "sourceAssetId") || null;
+  const { userId, writerProfileId, role } = await requireLineWriter(orderLineId, locale);
+
+  const line = await prisma.orderLine.findUnique({
+    where: { id: orderLineId },
+    select: {
+      orderId: true,
+      assignedWriterId: true,
+      order: { select: { organizationId: true } },
+    },
+  });
+  if (!line) redirect(`/${locale}/desk/orders`);
+
+  // requireLineWriter only admits desk/superadmin and the line's own
+  // journalist, so those are the only two places to return to.
+  const back =
     role === "CONTENT"
-      ? `/${locale}/articles/${articleId}`
-      : `/${locale}/desk/orders/${orderId}`,
-  );
+      ? `/${locale}/writer/lines/${orderLineId}`
+      : `/${locale}/desk/orders/${line.orderId}`;
+
+  if (body) {
+    const article = await ensureArticleForLine({
+      orderLineId,
+      organizationId: line.order.organizationId,
+      title: await articleTitleForLine(orderLineId),
+      createdByUserId: userId,
+      createdByRole: role as UserRole,
+      assignedWriterId: line.assignedWriterId,
+    });
+    await appendDraftVersion({
+      articleId: article.id,
+      body,
+      sourceAssetId,
+      writerProfileId,
+      userId,
+    });
+  }
+  redirect(back);
 }
 
 // The client obtains a presigned PUT url via presignArticleUpload
@@ -110,9 +207,19 @@ export async function saveDraft(formData: FormData) {
 export async function saveUploadedDraft(formData: FormData) {
   const locale = field(formData, "locale") || "en";
   const articleId = field(formData, "articleId");
-  const orderId = field(formData, "orderId");
   const bodyUrl = field(formData, "bodyUrl");
   const { userId, writerProfileId, role } = await requireArticleWriter(articleId, locale);
+  const routing = await articleRouting(articleId);
+  const back = afterContentAction({ locale, role, articleId, ...routing });
+
+  // The key round-trips through the browser after the presigned PUT, so
+  // it is user-controlled. Pin it to the prefix presignArticleUpload
+  // issues for THIS article — otherwise a crafted submit could store any
+  // object key in the bucket (another org's rate card, say) and have the
+  // article page presign a download link for it.
+  if (bodyUrl && !bodyUrl.startsWith(`articles/${articleId}/`)) {
+    redirect(back);
+  }
 
   if (bodyUrl) {
     const latest = await prisma.contentAsset.findFirst({
@@ -134,17 +241,12 @@ export async function saveUploadedDraft(formData: FormData) {
     });
     // No spec.check enqueue — uploaded files are never spec-checked (design §Status flow and spec check).
   }
-  redirect(
-    role === "CONTENT"
-      ? `/${locale}/articles/${articleId}`
-      : `/${locale}/desk/orders/${orderId}`,
-  );
+  redirect(back);
 }
 
 export async function runSpecCheck(formData: FormData) {
   const locale = field(formData, "locale") || "en";
   const assetId = field(formData, "assetId");
-  const orderId = field(formData, "orderId");
   const asset = await prisma.contentAsset.findUnique({
     where: { id: assetId },
     select: { articleId: true },
@@ -155,17 +257,13 @@ export async function runSpecCheck(formData: FormData) {
   await runSpecCheckForAsset(assetId);
   await recordAudit(userId, "asset.spec_check", `ContentAsset:${assetId}`);
 
-  redirect(
-    role === "CONTENT"
-      ? `/${locale}/articles/${articleId}`
-      : `/${locale}/desk/orders/${orderId}`,
-  );
+  const routing = await articleRouting(articleId);
+  redirect(afterContentAction({ locale, role, articleId, ...routing }));
 }
 
 export async function setAssetStatus(formData: FormData) {
   const locale = field(formData, "locale") || "en";
   const assetId = field(formData, "assetId");
-  const orderId = field(formData, "orderId");
   const target = field(formData, "target") as ContentAssetStatus;
   const assetForArticle = await prisma.contentAsset.findUnique({
     where: { id: assetId },
@@ -173,9 +271,14 @@ export async function setAssetStatus(formData: FormData) {
   });
   const articleId = assetForArticle?.articleId ?? "";
   const { userId, role } = await requireArticleWriter(articleId, locale);
+  const routing = await articleRouting(articleId);
+  const back = afterContentAction({ locale, role, articleId, ...routing });
 
-  if (role === "CONTENT" && !CONTENT_ASSET_TARGETS.has(target)) {
-    redirect(`/${locale}/articles/${articleId}`);
+  // Only the desk drives the full status machine. Every other role that
+  // can reach this action — journalist, buyer, approver, org admin — may
+  // only hand a draft over for review from here.
+  if (role !== "DESK" && role !== "SUPERADMIN" && !SELF_SERVE_ASSET_TARGETS.has(target)) {
+    redirect(back);
   }
 
   if (ASSET_TARGETS.includes(target)) {
@@ -213,9 +316,5 @@ export async function setAssetStatus(formData: FormData) {
       }
     }
   }
-  redirect(
-    role === "CONTENT"
-      ? `/${locale}/articles/${articleId}`
-      : `/${locale}/desk/orders/${orderId}`,
-  );
+  redirect(back);
 }

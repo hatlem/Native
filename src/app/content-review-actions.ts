@@ -60,7 +60,9 @@ export async function approveContentAsset(formData: FormData) {
   await notifyDesk({
     kind: "ASSET_REVIEW",
     title: "Buyer approved a draft",
-    link: orderId ? `/${locale}/desk/orders/${orderId}` : `/${locale}/desk/articles/${asset.article.id}`,
+    // An unlinked article has no desk order page to point at; the article
+    // detail page is reachable for desk/superadmin too (canWriteArticle).
+    link: orderId ? `/${locale}/desk/orders/${orderId}` : `/${locale}/articles/${asset.article.id}`,
   });
 
   redirect(orderId ? `/${locale}/orders/${orderId}` : `/${locale}/articles/${asset.article.id}`);
@@ -94,7 +96,8 @@ export async function requestContentChanges(formData: FormData) {
   await notifyDesk({
     kind: "ASSET_REVIEW",
     title: "Buyer requested changes to a draft",
-    link: orderId ? `/${locale}/desk/orders/${orderId}` : `/${locale}/desk/articles/${asset.article.id}`,
+    // See approveContentAsset: no /desk/articles route exists.
+    link: orderId ? `/${locale}/desk/orders/${orderId}` : `/${locale}/articles/${asset.article.id}`,
   });
 
   redirect(orderId ? `/${locale}/orders/${orderId}` : `/${locale}/articles/${asset.article.id}`);

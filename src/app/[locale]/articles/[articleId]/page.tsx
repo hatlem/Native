@@ -6,6 +6,7 @@ import { loadScope, canActOnOrg } from "@/lib/scope";
 import { StatusBadge } from "@/app/status-badge";
 import { saveDraft, saveUploadedDraft, runSpecCheck, setAssetStatus } from "@/app/desk-content-actions";
 import { linkArticleToOrderLine } from "@/app/article-library-actions";
+import { presignDownloadOrNull } from "@/lib/storage/r2";
 import { approveContentAsset, requestContentChanges } from "@/app/content-review-actions";
 import { UploadForm } from "./upload-form";
 
@@ -27,7 +28,7 @@ export default async function ArticleDetailPage({
       title: true,
       organizationId: true,
       orderLineId: true,
-      orderLine: { select: { orderId: true } },
+      orderLine: { select: { orderId: true, productId: true } },
       versions: {
         orderBy: { version: "desc" },
         take: 1,
@@ -46,6 +47,22 @@ export default async function ArticleDetailPage({
 
   const latest = article.versions[0];
   const orderId = article.orderLine?.orderId ?? "";
+
+  // Uploaded drafts store an R2 object key, not a reachable URL — sign a
+  // short-lived GET so the reader can actually open the file.
+  const downloadUrl = latest?.bodyUrl
+    ? await presignDownloadOrNull({ key: latest.bodyUrl })
+    : null;
+
+  // Label the linked placement with its publication name, the same way
+  // the overview table does, falling back to the generic column label.
+  const linkedProduct = article.orderLine?.productId
+    ? await prisma.product.findUnique({
+        where: { id: article.orderLine.productId },
+        select: { title: { select: { name: true } } },
+      })
+    : null;
+  const linkedLabel = linkedProduct?.title.name ?? t("colPlacement");
 
   const eligibleLines = article.orderLineId
     ? []
@@ -74,7 +91,7 @@ export default async function ArticleDetailPage({
         <p className="text-sm">
           {t("linkedTo")}:{" "}
           <a href={`/${locale}/orders/${orderId}`} className="underline">
-            {t("colPlacement")}
+            {linkedLabel}
           </a>
         </p>
       ) : (
@@ -104,7 +121,6 @@ export default async function ArticleDetailPage({
 
       <form action={saveDraft} className="space-y-2">
         <input type="hidden" name="locale" value={locale} />
-        <input type="hidden" name="orderId" value={orderId} />
         <input type="hidden" name="articleId" value={articleId} />
         <label className="block text-sm font-medium">{t("detailWriteHeading")}</label>
         <textarea
@@ -121,7 +137,6 @@ export default async function ArticleDetailPage({
       <UploadForm
         articleId={articleId}
         locale={locale}
-        orderId={orderId}
         saveDraftAction={saveUploadedDraft}
         labels={{
           heading: t("detailUploadHeading"),
@@ -130,6 +145,19 @@ export default async function ArticleDetailPage({
           save: t("detailSaveDraft"),
         }}
       />
+
+      {downloadUrl ? (
+        <p className="text-sm">
+          <a
+            href={downloadUrl}
+            target="_blank"
+            rel="noreferrer noopener"
+            className="underline"
+          >
+            {t("detailDownloadFile")} ↗
+          </a>
+        </p>
+      ) : null}
 
       {latest ? (
         <div className="flex items-center gap-4 text-sm">
@@ -143,7 +171,6 @@ export default async function ArticleDetailPage({
           </span>
           <form action={runSpecCheck}>
             <input type="hidden" name="locale" value={locale} />
-            <input type="hidden" name="orderId" value={orderId} />
             <input type="hidden" name="assetId" value={latest.id} />
             <button type="submit" className="underline">
               {t("detailRunSpecCheck")}
@@ -151,7 +178,6 @@ export default async function ArticleDetailPage({
           </form>
           <form action={setAssetStatus}>
             <input type="hidden" name="locale" value={locale} />
-            <input type="hidden" name="orderId" value={orderId} />
             <input type="hidden" name="assetId" value={latest.id} />
             <input type="hidden" name="target" value="IN_REVIEW" />
             <button type="submit" className="underline">
