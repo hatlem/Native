@@ -889,7 +889,22 @@
     "resolveNoPlacements": "Tällä julkaisulla ei ole vielä varattavia mainospaikkoja",
     "resolveTitlesFirst": "{count, plural, =1 {1 mainospaikka tarvitsee} other {# mainospaikkaa tarvitsee}} konkreettisen tuotteen ennen tarjousta.",
     "resolveRemove": "Poista paikkamerkki",
-    "resolveFrom": "alkaen"
+    "resolveFrom": "alkaen",
+    "programme": {
+      "title": "{name} – kierros {n}/{of}",
+      "spacing": "{weeks} viikon välein",
+      "wave": "Kierros {n}",
+      "noDate": "Ei päivää",
+      "thisOrder": "tämä tilaus",
+      "state": {
+        "draft": "Luonnos",
+        "sent": "Lähetetty",
+        "quoted": "Tarjous",
+        "booked": "Varattu",
+        "live": "Live",
+        "done": "Valmis"
+      }
+    }
   },
   "deskTitles": {
     "eyebrow": "Pääkäyttäjä · julkaisut",

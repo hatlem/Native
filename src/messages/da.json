@@ -802,7 +802,22 @@
     "resolveNoPlacements": "Ingen bookbare placeringer på denne titel endnu",
     "resolveTitlesFirst": "{count, plural, =1 {1 placering mangler} other {# placeringer mangler}} et konkret produkt, før du kan give tilbud.",
     "resolveRemove": "Fjern pladsholder",
-    "resolveFrom": "fra"
+    "resolveFrom": "fra",
+    "programme": {
+      "title": "{name} – runde {n} af {of}",
+      "spacing": "{weeks} uger imellem",
+      "wave": "Runde {n}",
+      "noDate": "Ingen dato",
+      "thisOrder": "denne ordre",
+      "state": {
+        "draft": "Kladde",
+        "sent": "Sendt",
+        "quoted": "Tilbud",
+        "booked": "Booket",
+        "live": "Live",
+        "done": "Færdig"
+      }
+    }
   },
   "deskTitles": {
     "eyebrow": "Superadmin · titler",

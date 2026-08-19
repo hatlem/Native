@@ -889,7 +889,22 @@
     "resolveNoPlacements": "No bookable placements on this title yet",
     "resolveTitlesFirst": "{count, plural, =1 {1 placement needs} other {# placements need}} a concrete product before you can quote.",
     "resolveRemove": "Remove placeholder",
-    "resolveFrom": "from"
+    "resolveFrom": "from",
+    "programme": {
+      "title": "{name} — wave {n} of {of}",
+      "spacing": "{weeks} weeks apart",
+      "wave": "Wave {n}",
+      "noDate": "No date",
+      "thisOrder": "this order",
+      "state": {
+        "draft": "Draft",
+        "sent": "Sent",
+        "quoted": "Quoted",
+        "booked": "Booked",
+        "live": "Live",
+        "done": "Done"
+      }
+    }
   },
   "deskTitles": {
     "eyebrow": "Super-admin · titles",

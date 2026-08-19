@@ -8,6 +8,7 @@ import { CancelledSummary } from "./cancelled-summary";
 import { LinesSection } from "./lines-section";
 import { WritersPanel } from "./writers-panel";
 import { CampaignSection } from "./campaign-section";
+import { ProgrammePanel } from "./programme-panel";
 
 export const dynamic = "force-dynamic";
 
@@ -117,6 +118,8 @@ export default async function DeskOrderPage({
       ) : null}
 
       <CancelledSummary locale={locale} order={order} invoice={invoice} />
+
+      <ProgrammePanel locale={locale} orderId={order.id} />
 
       {["CONFIRMED", "IN_PRODUCTION", "SCHEDULED", "LIVE", "COMPLETED"].includes(order.status) ? (
         <WritersPanel

@@ -7164,3 +7164,54 @@ footer a:hover {
   border-radius: var(--r-sm);
   font-weight: 600;
 }
+
+/* ---------- Desk: programme context on the order page ---------- */
+.desk-programme {
+  margin: var(--s-4) 0;
+  padding: var(--s-3) var(--s-4);
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  border-radius: var(--r-sm);
+}
+.desk-programme__head {
+  display: flex;
+  align-items: baseline;
+  gap: var(--s-2);
+  flex-wrap: wrap;
+  margin-bottom: var(--s-2);
+}
+.desk-programme__waves {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 6px;
+}
+.desk-programme__wave {
+  display: flex;
+  align-items: baseline;
+  gap: var(--s-2);
+  flex-wrap: wrap;
+  padding: 6px var(--s-2);
+  border-radius: var(--r-sm);
+}
+.desk-programme__wave.is-current {
+  background: var(--surface);
+  border: 1px solid var(--accent);
+}
+.desk-programme__wave-num {
+  font-weight: 600;
+  font-size: 0.85rem;
+  color: var(--heading);
+  min-width: 4.5rem;
+}
+.desk-programme__angle {
+  font-size: 0.85rem;
+  color: var(--text);
+}
+.desk-programme__this {
+  margin-left: auto;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--accent-hover);
+}

@@ -802,7 +802,22 @@
     "resolveNoPlacements": "Inga bokningsbara placeringar på den här titeln ännu",
     "resolveTitlesFirst": "{count, plural, =1 {1 placering behöver} other {# placeringar behöver}} en konkret produkt innan du kan offerera.",
     "resolveRemove": "Ta bort platshållare",
-    "resolveFrom": "från"
+    "resolveFrom": "från",
+    "programme": {
+      "title": "{name} – omgång {n} av {of}",
+      "spacing": "{weeks} veckor emellan",
+      "wave": "Omgång {n}",
+      "noDate": "Inget datum",
+      "thisOrder": "den här ordern",
+      "state": {
+        "draft": "Utkast",
+        "sent": "Skickad",
+        "quoted": "Offert",
+        "booked": "Bokad",
+        "live": "Live",
+        "done": "Klar"
+      }
+    }
   },
   "deskTitles": {
     "eyebrow": "Superadmin · titlar",

@@ -802,7 +802,22 @@
     "resolveNoPlacements": "Ingen plasseringer kan bestilles direkte på denne tittelen ennå",
     "resolveTitlesFirst": "{count, plural, =1 {1 plassering trenger} other {# plasseringer trenger}} et konkret produkt før du kan gi pris.",
     "resolveRemove": "Fjern plassholder",
-    "resolveFrom": "fra"
+    "resolveFrom": "fra",
+    "programme": {
+      "title": "{name} – runde {n} av {of}",
+      "spacing": "{weeks} uker mellom",
+      "wave": "Runde {n}",
+      "noDate": "Ingen dato",
+      "thisOrder": "denne ordren",
+      "state": {
+        "draft": "Utkast",
+        "sent": "Sendt",
+        "quoted": "Tilbud",
+        "booked": "Booket",
+        "live": "Live",
+        "done": "Ferdig"
+      }
+    }
   },
   "deskTitles": {
     "eyebrow": "Superadmin · titler",
