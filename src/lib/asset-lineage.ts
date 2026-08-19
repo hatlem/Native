@@ -12,7 +12,7 @@ export type LineageNode = {
   id: string;
   version: number;
   status: string;
-  briefId: string;
+  articleId: string;
   createdAt: Date;
 };
 
@@ -54,7 +54,7 @@ export async function adaptationsOf(rootAssetId: string): Promise<LineageNode[]>
         id: true,
         version: true,
         status: true,
-        briefId: true,
+        articleId: true,
         createdAt: true,
       },
       orderBy: { createdAt: "asc" },

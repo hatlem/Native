@@ -89,7 +89,19 @@ export async function GET(req: NextRequest) {
     }),
     prisma.order.findMany({
       where: { organizationId: { in: orgIds } },
-      include: { lines: { include: { brief: { include: { assets: true } }, booking: true } } },
+      // `brief` alongside `article`: the ContentBrief (message/audience/
+      // do/don't) is org-supplied personal-ish data the export must keep,
+      // and it is no longer reachable through the asset tree now that
+      // ContentAsset hangs off Article instead of ContentBrief.
+      include: {
+        lines: {
+          include: {
+            brief: true,
+            article: { include: { versions: true } },
+            booking: true,
+          },
+        },
+      },
     }),
     prisma.invoice.findMany({
       where: { organizationId: { in: orgIds } },

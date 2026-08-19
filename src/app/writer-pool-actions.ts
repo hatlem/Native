@@ -6,6 +6,7 @@ import { prisma } from "@/lib/prisma";
 import { recordAudit } from "@/lib/audit";
 import { canAssignWriter } from "@/lib/writers/access";
 import { writerStaffableLine } from "@/lib/authorship";
+import { ensureArticleForLine, articleTitleForLine } from "@/lib/writers/article";
 
 function field(formData: FormData, key: string): string {
   const v = formData.get(key);
@@ -70,7 +71,12 @@ export async function assignWriterToLine(formData: FormData) {
       where: { id: orderLineId },
       data: { assignedWriterId: null, assignedAt: null, assignedById: null },
     });
+    await prisma.article.updateMany({
+      where: { orderLineId },
+      data: { assignedWriterId: null },
+    });
     await recordAudit(userId, "line.unassign", `OrderLine:${orderLineId}`);
+    await recordAudit(userId, "article.unassign", `OrderLine:${orderLineId}`);
     redirect(`/${locale}/desk/orders/${orderId}`);
   }
 
@@ -95,11 +101,27 @@ export async function assignWriterToLine(formData: FormData) {
     redirect(`/${locale}/desk/orders/${orderId}`);
   }
 
-  await prisma.orderLine.update({
+  const updatedLine = await prisma.orderLine.update({
     where: { id: orderLineId },
     data: { assignedWriterId: writerId, assignedById: userId, assignedAt: new Date() },
+    select: { id: true, order: { select: { organizationId: true } } },
   });
   await recordAudit(userId, "line.assign", `OrderLine:${orderLineId}`, { writerId });
+
+  // First assignment for this line creates its Article; a re-assignment
+  // (previous writer swapped for a new one) just repoints assignedWriterId.
+  // ensureArticleForLine keys on the unique orderLineId, so two
+  // concurrent assignments to the same line converge on one row instead
+  // of racing between a find and a create.
+  await ensureArticleForLine({
+    orderLineId,
+    organizationId: updatedLine.order.organizationId,
+    title: await articleTitleForLine(orderLineId),
+    createdByUserId: userId,
+    createdByRole: "DESK",
+    assignedWriterId: writerId,
+  });
+  await recordAudit(userId, "article.assign", `OrderLine:${orderLineId}`, { writerId });
 
   redirect(`/${locale}/desk/orders/${orderId}`);
 }

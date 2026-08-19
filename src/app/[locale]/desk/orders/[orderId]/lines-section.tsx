@@ -2,7 +2,7 @@ import { getTranslations } from "next-intl/server";
 import type { Playbook, Prisma } from "@prisma/client";
 import { formatMoney } from "@/lib/money";
 import {
-  saveDraft,
+  saveLineDraft,
   runSpecCheck,
   setAssetStatus,
 } from "@/app/desk-content-actions";
@@ -26,7 +26,8 @@ type OrderForLines = Prisma.OrderGetPayload<{
     quote: true;
     lines: {
       include: {
-        brief: { include: { assets: { orderBy: { version: "desc" } } } };
+        brief: true;
+        article: { include: { versions: { orderBy: { version: "desc" } } } };
         trackedLinks: true;
       };
     };
@@ -70,7 +71,7 @@ export async function LinesSection({
         {order.lines.map((line) => {
           const p = line.productId ? byId.get(line.productId) : undefined;
           const isContentFee = line.kind === "CONTENT_FEE";
-          const assets = line.brief?.assets ?? [];
+          const assets = line.article?.versions ?? [];
           const latest = assets[0];
           const pb = p
             ? pickPlaybook(
@@ -240,7 +241,6 @@ export async function LinesSection({
                 <div className="asset-actions">
                   <form action={runSpecCheck}>
                     <input type="hidden" name="locale" value={locale} />
-                    <input type="hidden" name="orderId" value={order.id} />
                     <input type="hidden" name="assetId" value={latest.id} />
                     <button type="submit" className="btn small secondary">
                       {tp("specCheck")}
@@ -256,7 +256,6 @@ export async function LinesSection({
                   ).map(([target, label]) => (
                     <form action={setAssetStatus} key={target}>
                       <input type="hidden" name="locale" value={locale} />
-                      <input type="hidden" name="orderId" value={order.id} />
                       <input type="hidden" name="assetId" value={latest.id} />
                       <input type="hidden" name="target" value={target} />
                       <button type="submit" className="btn small ghost">
@@ -272,9 +271,11 @@ export async function LinesSection({
                   {tp("draftLabel")}
                   <span className="muted small">{tp("composeNew")}</span>
                 </summary>
-                <form action={saveDraft} className="product-form">
+                {/* Line-keyed, not article-keyed: the desk can compose the
+                    first draft before a writer is staffed, so the action
+                    creates the line's Article if it doesn't exist yet. */}
+                <form action={saveLineDraft} className="product-form">
                   <input type="hidden" name="locale" value={locale} />
-                  <input type="hidden" name="orderId" value={order.id} />
                   <input type="hidden" name="orderLineId" value={line.id} />
                   <div className="field">
                     <label htmlFor={`body-${line.id}`}>

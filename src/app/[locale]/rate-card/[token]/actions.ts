@@ -8,7 +8,7 @@ import { checkRateCardRequest } from "@/lib/outreach/tokens";
 import { addSuppression } from "@/lib/outreach/suppression";
 import { recordAudit } from "@/lib/audit";
 import { rfqLimiter } from "@/lib/rate-limit";
-import { presignUpload } from "@/lib/storage/r2";
+import { presignUpload, RATE_CARD_TYPES } from "@/lib/storage/r2";
 
 function f(fd: FormData, k: string): string {
   const v = fd.get(k);
@@ -40,6 +40,7 @@ export async function presignRateCardUpload(args: {
     filename: args.filename,
     contentType: args.contentType,
     bytes: args.bytes,
+    allowedTypes: RATE_CARD_TYPES,
   });
 }
 

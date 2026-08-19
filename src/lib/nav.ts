@@ -50,6 +50,14 @@ function campaignItem(t: (key: string) => string): NavItem {
   return { key: "campaign", label: t("campaign"), href: "/campaign" };
 }
 
+// The article library — where a buyer/approver/org admin writes or
+// uploads the copy for a placement, with or without a booking behind it.
+// Buyer-side only: journalists reach their pieces from /writer, and desk
+// works out of the order page.
+function articlesItem(t: (key: string) => string): NavItem {
+  return { key: "articles", label: t("articles"), href: "/articles" };
+}
+
 export function navItemsFor(
   audience: Audience,
   t: (key: string) => string,
@@ -73,6 +81,7 @@ export function navItemsFor(
           { key: "home", label: t("home"), href: "/home" },
           campaignItem(t),
           { key: "campaigns", label: t("campaigns"), href: "/requests" },
+          articlesItem(t),
         ];
       }
       return [
@@ -82,6 +91,7 @@ export function navItemsFor(
         { key: "lists", label: t("lists"), href: "/lists", description: t("listsDesc") },
         { key: "favorites", label: t("favorites"), href: "/favorites", description: t("favoritesDesc") },
         { key: "requests", label: t("requests"), href: "/requests" },
+        articlesItem(t),
         { key: "reports", label: t("reports"), href: "/reports" },
       ];
     case "agency":
@@ -90,6 +100,7 @@ export function navItemsFor(
           { key: "home", label: t("home"), href: "/home" },
           campaignItem(t),
           { key: "campaigns", label: t("campaigns"), href: "/requests" },
+          articlesItem(t),
           { key: "agency", label: t("agency"), href: "/agency" },
         ];
       }
@@ -101,6 +112,7 @@ export function navItemsFor(
         { key: "favorites", label: t("favorites"), href: "/favorites", description: t("favoritesDesc") },
         { key: "agency", label: t("agency"), href: "/agency" },
         { key: "requests", label: t("requests"), href: "/requests" },
+        articlesItem(t),
         { key: "reports", label: t("reports"), href: "/reports" },
       ];
     case "publisher":
@@ -173,6 +185,7 @@ export function paletteItemsFor(
         { key: "favorites", label: t("favorites"), href: "/favorites", description: t("favoritesDesc") },
           { key: "recommend", label: t("recommend"), href: "/recommend" },
           { key: "requests", label: t("requests"), href: "/requests" },
+          articlesItem(t),
           { key: "reports", label: t("reports"), href: "/reports" },
           ...(audience === "agency"
             ? [{ key: "agency", label: t("agency"), href: "/agency" }]

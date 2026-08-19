@@ -11,6 +11,7 @@ import { clicksByOrderLine } from "@/lib/metrics/store";
 import { ctrPct } from "@/lib/reporting";
 import { SubmitButton } from "@/components";
 import { approveContentAsset, requestContentChanges } from "@/app/content-review-actions";
+import { presignDownloadOrNull } from "@/lib/storage/r2";
 
 export const dynamic = "force-dynamic";
 
@@ -33,8 +34,8 @@ export default async function MyOrderPage({
       invoices: { select: { id: true, status: true } },
       lines: {
         include: {
-          brief: {
-            include: { assets: { orderBy: { version: "desc" }, take: 1 } },
+          article: {
+            include: { versions: { orderBy: { version: "desc" }, take: 1 } },
           },
           booking: {
               include: {
@@ -94,6 +95,17 @@ export default async function MyOrderPage({
   });
   const byId = new Map(products.map((p) => [p.id, p]));
   const invoice = order.invoices[0];
+
+  // An uploaded draft stores an R2 object key, not a reachable URL — sign
+  // a short-lived GET so the buyer can open the file. Only drafts awaiting
+  // review render a link, so only those are worth signing.
+  const draftDownloadUrls = new Map<string, string>();
+  for (const line of order.lines) {
+    const latest = line.article?.versions[0];
+    if (!latest?.bodyUrl || latest.status !== "IN_REVIEW") continue;
+    const url = await presignDownloadOrNull({ key: latest.bodyUrl });
+    if (url) draftDownloadUrls.set(latest.id, url);
+  }
 
   return (
     <>
@@ -169,7 +181,7 @@ export default async function MyOrderPage({
           {order.lines.map((line) => {
             const p = line.productId ? byId.get(line.productId) : undefined;
             const isContentFee = line.kind === "CONTENT_FEE";
-            const latest = line.brief?.assets[0];
+            const latest = line.article?.versions[0];
             return (
               <article className="card line-card" key={line.id}>
                 <div className="line-head">
@@ -236,9 +248,9 @@ export default async function MyOrderPage({
                     <h4 className="content-review__heading">{t("draftReviewHeading")}</h4>
                     {latest.body ? (
                       <div className="content-review__body">{latest.body}</div>
-                    ) : latest.bodyUrl ? (
+                    ) : draftDownloadUrls.get(latest.id) ? (
                       <a
-                        href={latest.bodyUrl}
+                        href={draftDownloadUrls.get(latest.id)}
                         target="_blank"
                         rel="noreferrer noopener"
                         className="link small"

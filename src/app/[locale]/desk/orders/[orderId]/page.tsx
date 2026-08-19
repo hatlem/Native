@@ -33,7 +33,8 @@ export default async function DeskOrderPage({
       creditNotes: true,
       lines: {
         include: {
-          brief: { include: { assets: { orderBy: { version: "desc" } } } },
+          brief: true,
+          article: { include: { versions: { orderBy: { version: "desc" } } } },
           trackedLinks: true,
           booking: {
             include: {

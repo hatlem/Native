@@ -158,7 +158,7 @@ export default async function LocaleLayout({
       const [quoteCount, contentCount] = await Promise.all([
         prisma.quote.count({ where: { status: "SENT", request: { organizationId: { in: orgIds } } } }),
         prisma.contentAsset.count({
-          where: { status: "IN_REVIEW", brief: { orderLine: { order: { organizationId: { in: orgIds } } } } },
+          where: { status: "IN_REVIEW", article: { organizationId: { in: orgIds } } },
         }),
       ]);
       const needsCount = quoteCount + contentCount;

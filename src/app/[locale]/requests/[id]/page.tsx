@@ -36,9 +36,9 @@ export default async function RequestPage({
               invoices: true,
               lines: {
                 include: {
-                  brief: {
+                  article: {
                     include: {
-                      assets: { orderBy: { version: "desc" }, take: 1 },
+                      versions: { orderBy: { version: "desc" }, take: 1 },
                     },
                   },
                 },

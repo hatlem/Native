@@ -40,13 +40,14 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
       },
     }),
     prisma.contentAsset.findMany({
-      where: { status: "IN_REVIEW", brief: { orderLine: { order: { organizationId: { in: orgIds } } } } },
+      where: { status: "IN_REVIEW", article: { organizationId: { in: orgIds } } },
       orderBy: { updatedAt: "desc" },
       take: 5,
       select: {
         id: true,
-        brief: {
+        article: {
           select: {
+            id: true,
             orderLine: {
               select: { order: { select: { id: true } }, booking: { select: { title: { select: { name: true } } } } },
             },
@@ -157,8 +158,9 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
             </div>
           ))}
           {pendingContent.map((c) => {
-            const orderId = c.brief.orderLine.order.id;
-            const titleName = c.brief.orderLine.booking?.title?.name ?? "";
+            const orderId = c.article.orderLine?.order.id ?? null;
+            const titleName = c.article.orderLine?.booking?.title?.name ?? "";
+            const draftHref = orderId ? `/orders/${orderId}` : `/articles/${c.article.id}`;
             return (
               <div className="home-needs-card home-needs-card--success" key={`content-${c.id}`}>
                 <span className="home-needs-card__icon home-needs-card__icon--success" aria-hidden="true">
@@ -173,7 +175,7 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
                   </div>
                   <p className="home-needs-card__desc">{t("draftReadyBody")}</p>
                 </div>
-                <Link href={`/orders/${orderId}`} className="btn small secondary">
+                <Link href={draftHref} className="btn small secondary">
                   {t("readDrafts")}
                 </Link>
               </div>
