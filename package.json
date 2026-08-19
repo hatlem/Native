@@ -2,7 +2,7 @@
   "name": "nativespin",
   "version": "0.0.1",
   "private": true,
-  "description": "NativeSpin — Nordic marketplace for buying native content and native advertising in newspapers and magazines.",
+  "description": "NativeSpin \u2014 Nordic marketplace for buying native content and native advertising in newspapers and magazines.",
   "scripts": {
     "dev": "next dev",
     "build": "prisma generate && next build",
@@ -88,5 +88,8 @@
     "tsx": "^4.19.2",
     "typescript": "^5.7.3"
   },
-  "packageManager": "pnpm@10.33.0"
+  "packageManager": "pnpm@10.33.0",
+  "engines": {
+    "node": ">=20.9.0"
+  }
 }
