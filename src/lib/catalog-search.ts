@@ -18,12 +18,15 @@ import { expandTerm } from "@/lib/search-synonyms";
 const MAX_SYNONYMS_PER_WORD = 15;
 
 function normalizeWords(raw: string): string[] {
-  // Strip anything that isn't a letter/number; tsquery is strict about
-  // operators and we want a forgiving "match every word" feel.
+  // SPLIT on anything that isn't a letter/number — never delete separators
+  // inside a word: "API-IT" must become [api, it] (matching Postgres's own
+  // tokenization of the hyphenated lexeme), not the unsearchable "apiit";
+  // "AT.no" must become [at, no], whose prefix queries match the 'at.no'
+  // host lexeme. tsquery is strict about operators, so only bare
+  // letter/number tokens survive.
   return raw
     .toLowerCase()
-    .split(/\s+/)
-    .map((t) => t.replace(/[^\p{Letter}\p{Number}]/gu, ""))
+    .split(/[^\p{Letter}\p{Number}]+/u)
     .filter((t) => t.length >= 2);
 }
 

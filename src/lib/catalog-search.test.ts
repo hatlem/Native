@@ -21,10 +21,6 @@ test("buildTsQuery: a synonym word expands into a parenthesized OR group", () =>
   assert.ok(terms.includes("transport:*"));
 });
 
-test("buildTsQuery: dot-stripping regression (AT.no -> atno:*)", () => {
-  assert.equal(buildTsQuery("AT.no"), "atno:*");
-});
-
 test("buildTsQuery: punctuation-only / 1-char words produce empty string", () => {
   assert.equal(buildTsQuery("!!!"), "");
   assert.equal(buildTsQuery("a"), "");
@@ -98,4 +94,12 @@ test("searchWhereFor: null matchedIds with a query falls back to ILIKE", () => {
 test("searchWhereFor: no query and no matchedIds returns {}", () => {
   assert.deepEqual(searchWhereFor("", null), {});
   assert.deepEqual(searchWhereFor("", []), {});
+});
+
+test("buildTsQuery: separators inside a word split into tokens, never fuse", () => {
+  // "API-IT" must query api:* & it:* (Postgres tokenizes the hyphenated
+  // lexeme into parts) — the old behavior fused it into the unsearchable
+  // "apiit". Dots likewise: "AT.no" prefix-matches the 'at.no' host lexeme.
+  assert.equal(buildTsQuery("API-IT New Title"), "api:* & it:* & new:* & title:*");
+  assert.equal(buildTsQuery("AT.no"), "at:* & no:*");
 });
