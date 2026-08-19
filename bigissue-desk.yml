@@ -1,0 +1,188 @@
+- main [ref=e22]:
+  - generic [ref=e91]:
+    - paragraph [ref=e92]:
+      - link "← Avbryt" [ref=e93] [cursor=pointer]:
+        - /url: /no/desk/titles
+    - heading "Rediger tittel · The Big Issue" [level=1] [ref=e94]
+    - paragraph [ref=e95]: The Big Issue (UK) · Storbritannia · Social
+    - article [ref=e96]:
+      - generic [ref=e97]:
+        - generic [ref=e98]:
+          - generic [ref=e99]: Listepris
+          - spinbutton "Listepris" [ref=e100]
+          - paragraph [ref=e101]: Utgivers offisielle listepris for en standardplassering. Vises som overstreket forankring på tilbud til annonsør.
+        - generic [ref=e102]:
+          - generic [ref=e103]: Valuta
+          - textbox "Valuta" [ref=e104]:
+            - /placeholder: GBP
+            - text: GBP
+        - generic [ref=e105]:
+          - generic [ref=e106]:
+            - checkbox "Vis priser til annonsør" [checked] [ref=e107]
+            - text: Vis priser til annonsør
+          - paragraph [ref=e108]: Av = katalogen viser «Kontakt for pris» i stedet for tall. Direktekjøp er også deaktivert.
+        - button "Lagre endringer" [ref=e109] [cursor=pointer]
+    - article [ref=e110]:
+      - heading "Synlighet for hele utgiver" [level=2] [ref=e111]
+      - paragraph [ref=e112]: Utgivers priser er offentlige
+      - generic [ref=e113]:
+        - generic [ref=e114]:
+          - checkbox "Vis priser til annonsør (The Big Issue (UK))" [checked] [ref=e115]
+          - text: Vis priser til annonsør (The Big Issue (UK))
+        - button "Lagre endringer" [ref=e117] [cursor=pointer]
+    - article [ref=e118]:
+      - generic [ref=e119]:
+        - generic [ref=e120]:
+          - generic [ref=e121]: Standard produksjonsgebyr
+          - spinbutton "Standard produksjonsgebyr" [ref=e122]
+          - paragraph [ref=e123]: Tomt = arver standarden fra desken. 0 = utgiveren inkluderer produksjon.
+        - button "Lagre prising" [ref=e124] [cursor=pointer]
+    - article [ref=e125]:
+      - heading "Produktprising" [level=2] [ref=e126]
+      - list [ref=e127]:
+        - listitem [ref=e128]:
+          - strong [ref=e129]: Native article
+          - generic [ref=e130]: NATIVE_ARTICLE · 3000 GBP
+          - generic [ref=e131]:
+            - text: "Produksjon:"
+            - strong [ref=e132]: vi produserer
+            - text: — gebyr 200 GBP (standard sats)
+          - generic [ref=e133]: "Mediet oppgir inkludert: INBOUND 06-12 Tim Deeks (Canopy Media/Big Issue): £3000 + £600 produksjon (separat gebyr). Artikkel skrives av Big Issue-redaksjonen etter full brief; annonsør godkjenner før publisering. Garantert 5000 visninger per artikkel. Ledetid 4–6 uker. Merkes Commercial/Sponsored. Semantikk for kurering: production=PUBLISHER, viewsTotal=5000, productionFee=600 GBP, leadTimeDays=42."
+          - generic [ref=e134]:
+            - generic [ref=e135]:
+              - generic [ref=e136]: Provisjon %
+              - spinbutton "Provisjon %" [ref=e137]
+              - paragraph [ref=e138]: Tomt = arver markedets standardprovisjon.
+            - generic [ref=e139]:
+              - generic [ref=e140]: Produksjonsgebyr
+              - spinbutton "Produksjonsgebyr" [ref=e141]
+              - paragraph [ref=e142]: Tomt = arver. 0 = utgiveren inkluderer produksjon.
+            - button "Lagre prising" [ref=e143] [cursor=pointer]
+    - article [ref=e144]:
+      - heading "Publikasjonsdata" [level=2] [ref=e145]
+      - paragraph [ref=e146]: Strukturert kommersiell/redaksjonell profil fanget fra svar. Vises kun på desk – aldri for forbruker.
+      - generic [ref=e147]:
+        - generic [ref=e148]:
+          - term [ref=e149]: Prisdata fra (dato)
+          - definition [ref=e150]: —
+        - generic [ref=e151]:
+          - term [ref=e152]: Sist verifisert
+          - definition [ref=e153]: 2026-06-06
+        - generic [ref=e154]:
+          - term [ref=e155]: Tilbyr annonsørinnhold
+          - definition [ref=e156]: Ukjent
+        - generic [ref=e157]:
+          - term [ref=e158]: Egne artikler (ownContent)
+          - definition [ref=e159]: UNKNOWN
+        - generic [ref=e160]:
+          - term [ref=e161]: Innholdspolicy
+          - definition [ref=e162]: —
+        - generic [ref=e163]:
+          - term [ref=e164]: Beskrivelse
+          - definition [ref=e165]: —
+        - generic [ref=e166]:
+          - term [ref=e167]: Nøkkelord
+          - definition [ref=e168]: —
+        - generic [ref=e169]:
+          - term [ref=e170]: Alias
+          - definition [ref=e171]: —
+        - generic [ref=e172]:
+          - term [ref=e173]: Mangler (outstanding)
+          - definition [ref=e174]: —
+        - generic [ref=e175]:
+          - term [ref=e176]: Digital rekkevidde
+          - definition [ref=e177]: —
+        - generic [ref=e178]:
+          - term [ref=e179]: Månedlig rekkevidde
+          - definition [ref=e180]: —
+        - generic [ref=e181]:
+          - term [ref=e182]: Opplag
+          - definition [ref=e183]: —
+        - generic [ref=e184]:
+          - term [ref=e185]: Facebook-følgere
+          - definition [ref=e186]: —
+        - generic [ref=e187]:
+          - term [ref=e188]: Instagram-følgere
+          - definition [ref=e189]: —
+        - generic [ref=e190]:
+          - term [ref=e191]: Byråprovisjon
+          - definition [ref=e192]: —
+    - article [ref=e193]:
+      - heading "Salgskontakter" [level=2] [ref=e194]
+      - paragraph [ref=e195]: Ingen salgskontakter knyttet til denne tittelen.
+      - group [ref=e196]:
+        - generic "Koble til eksisterende kontakt" [ref=e197] [cursor=pointer]
+        - option "Tim Deeks — tim.deeks@canopymedia.co.uk" [selected]
+      - group [ref=e198]:
+        - generic "Legg til ny kontakt" [ref=e199] [cursor=pointer]
+    - article [ref=e200]:
+      - heading "Prisforespørsler" [level=2] [ref=e201]
+      - group [ref=e202]:
+        - generic "Send ny forespørsel" [ref=e203] [cursor=pointer]
+      - paragraph [ref=e204]: Ingen forespørsler for denne tittelen ennå.
+    - article [ref=e205]:
+      - heading "Avventer pristilbud" [level=2] [ref=e206]
+      - paragraph [ref=e207]: Ingen tilbud venter på gjennomgang for denne tittelen.
+    - article [ref=e208]:
+      - heading "Kontakthistorikk" [level=2] [ref=e209]
+      - list [ref=e210]:
+        - listitem [ref=e211]:
+          - generic [ref=e212]:
+            - generic [ref=e213]:
+              - strong [ref=e214]: ← E-post
+              - generic [ref=e215]: De svarte · 2026-06-12 · Tim Deeks
+              - generic [ref=e216]: "INBOUND 06-12 16:56 Tim Deeks (Canopy Media, Big Issues salgshus): komplett tilbud. Sponsored article på bigissue.com skrevet av Big Issue-redaksjonen etter full brief; annonsør får godkjenne endringer før publisering. £3000 + £600 produksjonsgebyr. GARANTERT 5000 visninger per artikkel. Ledetid 4–6 uker fra booking. Merkes «Commercial or Sponsored content»."
+            - button "Slett" [ref=e218] [cursor=pointer]
+          - list [ref=e219]:
+            - listitem [ref=e220]: "└─ Native article: 3000 GBP · Hva som er inkludert: INBOUND 06-12 Tim Deeks (Canopy Media/Big Issue): £3000 + £600 produksjon (separat gebyr). Artikkel skrives av Big Issue-redaksjonen etter full brief; annonsør godkjenner før publisering. Garantert 5000 visninger per artikkel. Ledetid 4–6 uker. Merkes Commercial/Sponsored. Semantikk for kurering: production=PUBLISHER, viewsTotal=5000, productionFee=600 GBP, leadTimeDays=42. · Lagt inn i katalogen"
+          - group [ref=e221]:
+            - generic "Registrer tilbud" [ref=e222] [cursor=pointer]
+            - option "La produkt stå tomt for et fritekst-tilbud." [selected]
+            - option "Native article"
+          - group [ref=e223]:
+            - generic "Rediger" [ref=e224] [cursor=pointer]
+            - option "E-post" [selected]
+            - option "Telefon"
+            - option "Webskjema"
+            - option "LinkedIn"
+            - option "Annet"
+            - option "Vi tok kontakt"
+            - option "De svarte" [selected]
+            - option "— ingen —" [selected]
+        - listitem [ref=e225]:
+          - generic [ref=e226]:
+            - generic [ref=e227]:
+              - strong [ref=e228]: → E-post
+              - generic [ref=e229]: Vi tok kontakt · 2026-06-12
+              - generic [ref=e230]: Rate-card request emailed to tim.deeks@canopymedia.co.uk (native/sponsored content, The Big Issue). From Admirate / Andreas Hatlem, andreas@admirate.no. UK outreach batch 2026-06-12.
+            - button "Slett" [ref=e232] [cursor=pointer]
+          - group [ref=e233]:
+            - generic "Registrer tilbud" [ref=e234] [cursor=pointer]
+            - option "La produkt stå tomt for et fritekst-tilbud." [selected]
+            - option "Native article"
+          - group [ref=e235]:
+            - generic "Rediger" [ref=e236] [cursor=pointer]
+            - option "E-post" [selected]
+            - option "Telefon"
+            - option "Webskjema"
+            - option "LinkedIn"
+            - option "Annet"
+            - option "Vi tok kontakt" [selected]
+            - option "De svarte"
+            - option "— ingen —" [selected]
+      - group [ref=e237]:
+        - generic "Logg en kontakt" [ref=e238] [cursor=pointer]
+        - option "E-post" [selected]
+        - option "Telefon"
+        - option "Webskjema"
+        - option "LinkedIn"
+        - option "Annet"
+        - option "Vi tok kontakt" [selected]
+        - option "De svarte"
+        - option "— ingen —" [selected]
+    - article [ref=e239]:
+      - heading "rateCards.title" [level=2] [ref=e240]
+      - status [ref=e241]:
+        - strong [ref=e242]: "rateCards.incomplete:"
+        - text: rateCards.missing_own_content_allowed
+      - paragraph [ref=e243]: rateCards.empty

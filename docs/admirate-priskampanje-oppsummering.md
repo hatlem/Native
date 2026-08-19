@@ -183,3 +183,39 @@ Skip-kilde i prod: titler med `ContactLog` OUTBOUND. Send-script: `scripts/log-o
 - MCP: `https://nativespin.com/api/mcp` (`X-API-Key`, scope `pricing:admin`)
 - Innkommende svar: GetMailer `GET https://getmailer.co/api/inbox` (regel videresender til `svar@getia.no`)
 - Avsender: `andreas@admirate.no` (Outlook, signatur «Admirate (uten telefon)»)
+
+## Utsending 2026-06-24 — Ocast-harvest residual (native-fokus, 32 mottakere)
+Etter Ocast-prisinnsamling + media-kit-harvest (64 priser fanget) gjensto disse uten publisert native-pris. Deduplisert mot all tidligere ContactLog + dok-lister + samme hus-domene + harvestede titler. Native-fokusert mal, budsjett-linje, **ingen annonsør navngitt**. Sendt fra andreas@admirate.no, To-felt zoom-verifisert per e-post. 28/32 logget som ContactLog OUTBOUND (4 mangler katalogtittel — kun her).
+
+- cm@hockeynews.se (SE) — HockeyNews
+- alexander@roslagenmediagroup.se (SE) — Allt om Norrtälje
+- jonathan@mbriqmedia.se (SE) — VDsvepet, CFOsvepet, HRsvepet
+- advertising@forzafootball.com (SE) — Forza Football
+- kontakt@swedroid.se (SE) — Swedroid
+- stefan@hrnytt.se (SE) — HRnytt
+- annoncer@pol.dk (DK) — Politiken
+- annons@barometern.se (SE) — Barometern
+- backoffice.ebp@eb.dk (DK) — Ekstra Bladet
+- annonser@qx.se (SE) — QX Förlag
+- annons@tidningen.se (SE) — Torslanda-Öckerötidningen
+- jerker.johansson@norrahalland.se (SE) — Norra Halland
+- dennis.zirath@addhealthmedia.com (SE) — Praktisk Medicin
+- mikael.gullstrom@dagensps.se (SE) — Realtid
+- annonsera@kurera.se (SE) — Kurera
+- annonce@dinavis.dk (DK) — Jyllands-Postens Lokalaviser
+- staffan.ekberg@news55.se (SE) — E55
+- annonser@venneslatidende.no (NO) — Vennesla Tidende
+- annonser@lp.no (NO) — Lillesands-Posten
+- stefan.fredrikson@reaktion.se (SE) — Våra Hem
+- jan.astrom@storkom.se (SE) — Grönt Samhällsbyggande
+- kontakt@filmtopp.se (SE) — Filmtopp
+- annonse@lister24.no (NO) — Lister
+- martin@freeride.se (SE) — Freeride
+- annonse@andalsnes-avis.no (NO) — Åndalsnes Avis
+- advertise@intrafish.com (NO) — IntraFish
+- sales@bold.dk (DK) — Bold
+- hei@gaffa.no (NO) — GAFFA Norge
+- annonse@fjuken.no (NO) — Fjuken
+- annonse@fjordabladet.no (NO) — Fjordabladet
+- julie.berge@smp.no (NO) — AESby
+- dejan@personalledarskap.se (SE) — Personal & Ledarskap
