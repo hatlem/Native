@@ -911,11 +911,36 @@ model ApiKey {
   expiresAt      DateTime?
   revokedAt      DateTime?
 
-  webhooks PartnerWebhook[]
+  webhooks        PartnerWebhook[]
+  idempotencyKeys ApiIdempotencyKey[]
 
   @@index([organizationId])
   @@index([publisherId])
   @@index([revokedAt])
+}
+
+// One row per (apiKeyId, Idempotency-Key header) on POST /api/v1/orders.
+// Created "pending" BEFORE the order transaction, completed with the stored
+// response after — a client-retried request replays the stored response
+// instead of minting (and charging) a second order. requestHash (sha-256 of
+// the raw body) guards against accidental key reuse with a different payload.
+model ApiIdempotencyKey {
+  id             String   @id @default(cuid())
+  apiKeyId       String
+  apiKey         ApiKey   @relation(fields: [apiKeyId], references: [id], onDelete: Cascade)
+  key            String
+  requestHash    String
+  // "pending" (reserved, response not stored yet) | "completed".
+  status         String   @default("pending")
+  responseStatus Int?
+  responseBody   Json?
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  @@unique([apiKeyId, key])
+  // For an eventual retention sweep (rows are only meaningful for the
+  // client's retry horizon).
+  @@index([createdAt])
 }
 
 // Partner-program webhook subscription (v0). Lets an API-key holder
