@@ -75,6 +75,7 @@ export async function assignWriterToLine(formData: FormData) {
       data: { assignedWriterId: null },
     });
     await recordAudit(userId, "line.unassign", `OrderLine:${orderLineId}`);
+    await recordAudit(userId, "article.unassign", `OrderLine:${orderLineId}`);
     redirect(`/${locale}/desk/orders/${orderId}`);
   }
 
@@ -115,16 +116,13 @@ export async function assignWriterToLine(formData: FormData) {
       data: { assignedWriterId: writerId },
     });
   } else {
-    const line = await prisma.orderLine.findUnique({
+    const lineForArticle = await prisma.orderLine.findUnique({
       where: { id: orderLineId },
-      select: {
-        productId: true,
-        order: { select: { organizationId: true } },
-      },
+      select: { productId: true },
     });
-    const product = line?.productId
+    const product = lineForArticle?.productId
       ? await prisma.product.findUnique({
-          where: { id: line.productId },
+          where: { id: lineForArticle.productId },
           select: { title: { select: { name: true } } },
         })
       : null;
