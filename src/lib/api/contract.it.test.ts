@@ -172,8 +172,11 @@ if (!RUN_DB_IT) {
     await prisma.plan.deleteMany({ where: { organizationId: orgId } });
     await prisma.apiKey.deleteMany({ where: { id: { in: keyIds } } });
     await prisma.organization.deleteMany({ where: { id: orgId } });
-    await prisma.product.deleteMany({ where: { titleId } });
-    await prisma.title.deleteMany({ where: { id: titleId } });
+    await prisma.product.deleteMany({ where: { title: { publisherId } } });
+    // By publisherId, not just the seeded titleId: the native_create_title
+    // tests mint additional titles under this publisher, and leaving them
+    // FK-faults the publisher delete below (masking real failures).
+    await prisma.title.deleteMany({ where: { publisherId } });
     await prisma.publisher.deleteMany({ where: { id: publisherId } });
   });
 
