@@ -56,9 +56,11 @@ export async function presignArticleUpload(args: {
   });
 }
 
-// Links an unlinked Article to an eligible INVENTORY OrderLine in the same
-// organization that doesn't already have an article. Enforces the 1:1
-// invariant at the DB level too (Article.orderLineId is unique).
+// Links an Article to an eligible INVENTORY OrderLine in the same
+// organization that doesn't already have a placement. An article may be
+// linked to any number of lines — the ArticlePlacement's unique
+// orderLineId is what enforces "at most one article per line", not
+// anything on Article.
 export async function linkArticleToOrderLine(formData: FormData) {
   const locale = field(formData, "locale") || "en";
   const articleId = field(formData, "articleId");
@@ -67,9 +69,12 @@ export async function linkArticleToOrderLine(formData: FormData) {
 
   const article = await prisma.article.findUnique({
     where: { id: articleId },
-    select: { organizationId: true, orderLineId: true },
+    select: {
+      organizationId: true,
+      versions: { orderBy: { version: "desc" }, take: 1, select: { id: true, status: true } },
+    },
   });
-  if (!article || article.orderLineId) redirect(`/${locale}/articles/${articleId}`);
+  if (!article) redirect(`/${locale}/articles/${articleId}`);
 
   const line = await prisma.orderLine.findUnique({
     where: { id: orderLineId },
@@ -85,10 +90,15 @@ export async function linkArticleToOrderLine(formData: FormData) {
     redirect(`/${locale}/articles/${articleId}?error=link`);
   }
 
+  // If the article's latest version is already FINAL, this placement
+  // locks to it immediately — there is no "still drafting" window to wait
+  // through for a placement that arrives after the writing is done.
+  const latest = article.versions[0];
+  const lockedAssetId = latest?.status === "FINAL" ? latest.id : null;
+
   try {
-    await prisma.article.update({
-      where: { id: articleId },
-      data: { orderLineId },
+    await prisma.articlePlacement.create({
+      data: { orderLineId, articleId, lockedAssetId },
     });
   } catch (error) {
     if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === "P2002") {
@@ -99,6 +109,28 @@ export async function linkArticleToOrderLine(formData: FormData) {
     throw error;
   }
   await recordAudit(userId, "article.link", `Article:${articleId}`, { orderLineId });
+
+  redirect(`/${locale}/articles/${articleId}`);
+}
+
+// Removes one placement without touching the article or any of its other
+// placements.
+export async function unlinkArticleFromOrderLine(formData: FormData) {
+  const locale = field(formData, "locale") || "en";
+  const articleId = field(formData, "articleId");
+  const placementId = field(formData, "placementId");
+  const { userId } = await requireArticleWriter(articleId, locale);
+
+  const placement = await prisma.articlePlacement.findUnique({
+    where: { id: placementId },
+    select: { articleId: true },
+  });
+  if (!placement || placement.articleId !== articleId) {
+    redirect(`/${locale}/articles/${articleId}`);
+  }
+
+  await prisma.articlePlacement.delete({ where: { id: placementId } });
+  await recordAudit(userId, "article.unlink", `Article:${articleId}`, { placementId });
 
   redirect(`/${locale}/articles/${articleId}`);
 }
