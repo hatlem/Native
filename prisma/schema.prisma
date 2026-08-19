@@ -1304,6 +1304,7 @@ model ContentAsset {
 
   @@index([sourceAssetId])
   @@index([authorWriterId])
+  @@index([articleId])
 }
 
 model PublisherBooking {

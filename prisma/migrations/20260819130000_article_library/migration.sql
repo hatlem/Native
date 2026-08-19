@@ -27,20 +27,30 @@ ALTER TABLE "Article" ADD CONSTRAINT "Article_orderLineId_fkey" FOREIGN KEY ("or
 -- ContentAsset version. organizationId comes from the order; title is
 -- derived from the placement's product/title name, falling back to a
 -- truncated brief message, then to "Untitled article"; createdByUserId
--- is the earliest version's author (falling back to any DESK/SUPERADMIN
--- user, since every org has at least one desk account managing it).
+-- is the earliest version *that has* an author (a v1 with no author and
+-- a v2 with one picks v2's author), falling back to any DESK/SUPERADMIN
+-- user, since every org has at least one desk account managing it.
+-- createdByRole is resolved from that SAME user (via the author_pick CTE
+-- + join to User) rather than hardcoded, so the two columns can never
+-- disagree about who/what role created the row.
+WITH author_pick AS (
+  SELECT
+    cb.id AS brief_id,
+    COALESCE(
+      (SELECT wp."userId" FROM "ContentAsset" ca
+         JOIN "WriterProfile" wp ON wp.id = ca."authorWriterId"
+        WHERE ca."briefId" = cb.id ORDER BY ca."version" ASC LIMIT 1),
+      (SELECT u.id FROM "User" u WHERE u.role IN ('DESK', 'SUPERADMIN') ORDER BY u."createdAt" ASC LIMIT 1)
+    ) AS user_id
+  FROM "ContentBrief" cb
+)
 INSERT INTO "Article" ("id", "organizationId", "title", "createdByUserId", "createdByRole", "assignedWriterId", "orderLineId", "createdAt", "updatedAt")
 SELECT
   'mig_' || cb.id,
   o."organizationId",
   COALESCE(t."name", NULLIF(LEFT(cb."message", 80), ''), 'Untitled article'),
-  COALESCE(
-    (SELECT wp."userId" FROM "ContentAsset" ca
-       JOIN "WriterProfile" wp ON wp.id = ca."authorWriterId"
-      WHERE ca."briefId" = cb.id ORDER BY ca."version" ASC LIMIT 1),
-    (SELECT u.id FROM "User" u WHERE u.role IN ('DESK', 'SUPERADMIN') ORDER BY u."createdAt" ASC LIMIT 1)
-  ),
-  'CONTENT',
+  usr.id,
+  usr.role,
   ol."assignedWriterId",
   cb."orderLineId",
   cb."createdAt",
@@ -50,15 +60,14 @@ JOIN "OrderLine" ol ON ol.id = cb."orderLineId"
 JOIN "Order" o ON o.id = ol."orderId"
 LEFT JOIN "Product" p ON p.id = ol."productId"
 LEFT JOIN "Title" t ON t.id = p."titleId"
+JOIN author_pick au ON au.brief_id = cb.id
+JOIN "User" usr ON usr.id = au.user_id
 WHERE EXISTS (SELECT 1 FROM "ContentAsset" ca WHERE ca."briefId" = cb.id);
 
 -- AlterTable: add articleId (nullable first so the UPDATE below can run)
 ALTER TABLE "ContentAsset" ADD COLUMN "articleId" TEXT;
 
-UPDATE "ContentAsset" ca
-SET "articleId" = 'mig_' || ca."briefId"
-FROM "ContentBrief" cb
-WHERE cb.id = ca."briefId";
+UPDATE "ContentAsset" SET "articleId" = 'mig_' || "briefId";
 
 -- Every ContentAsset row now has an articleId (backfilled above, since
 -- the INSERT's WHERE EXISTS guarantees an Article exists for every brief
@@ -67,3 +76,6 @@ ALTER TABLE "ContentAsset" ALTER COLUMN "articleId" SET NOT NULL;
 ALTER TABLE "ContentAsset" DROP CONSTRAINT "ContentAsset_briefId_fkey";
 ALTER TABLE "ContentAsset" DROP COLUMN "briefId";
 ALTER TABLE "ContentAsset" ADD CONSTRAINT "ContentAsset_articleId_fkey" FOREIGN KEY ("articleId") REFERENCES "Article"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- CreateIndex
+CREATE INDEX "ContentAsset_articleId_idx" ON "ContentAsset"("articleId");
