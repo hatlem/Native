@@ -5,6 +5,7 @@ import type { UserRole } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
 import { recordAudit } from "@/lib/audit";
 import { loadScope, canActOnOrg } from "@/lib/scope";
+import { requireOrgArticleAccess } from "@/lib/writers/guard";
 import { writeActiveListId } from "@/lib/lists";
 import {
   createProgramme,
@@ -116,6 +117,11 @@ export async function linkWaveArticleAction(formData: FormData) {
   const listId = str(formData, "listId");
   const articleId = str(formData, "articleId");
   const { scope, list } = await ownList(locale, listId);
+  const article = await prisma.article.findUnique({
+    where: { id: articleId },
+    select: { organizationId: true },
+  });
+  if (!article || article.organizationId !== list.organizationId) redirect(`/${locale}/plan`);
   await linkWaveArticle(list.id, articleId);
   await recordAudit(scope.userId ?? null, "programme.wave_article_link", `SavedList:${list.id}`, { articleId });
   redirect(`/${locale}/plan`);
@@ -139,17 +145,18 @@ export async function createAndLinkWaveArticle(formData: FormData) {
   const locale = str(formData, "locale") || "en";
   const listId = str(formData, "listId");
   const title = str(formData, "title");
-  const { scope, list } = await ownList(locale, listId);
+  const { list } = await ownList(locale, listId);
+  const { userId, role } = await requireOrgArticleAccess(list.organizationId, locale);
   if (!title) redirect(`/${locale}/plan`);
   const article = await prisma.article.create({
     data: {
       organizationId: list.organizationId,
       title,
-      createdByUserId: scope.userId ?? "",
-      createdByRole: (scope.role as UserRole) ?? "BUYER",
+      createdByUserId: userId,
+      createdByRole: role as UserRole,
     },
   });
   await linkWaveArticle(list.id, article.id);
-  await recordAudit(scope.userId ?? null, "programme.wave_article_create", `SavedList:${list.id}`, { articleId: article.id });
+  await recordAudit(userId, "programme.wave_article_create", `SavedList:${list.id}`, { articleId: article.id });
   redirect(`/${locale}/articles/${article.id}`);
 }

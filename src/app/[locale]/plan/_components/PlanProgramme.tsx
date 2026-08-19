@@ -26,9 +26,10 @@ export type ProgrammePacing = {
 // Multi-wave planning on /plan. Two states:
 //  - plain list → a collapsed "Run this as a programme" disclosure with the
 //    recommended cadence pre-filled (why + how, then the form);
-//  - a wave of a programme → the wave strip: every wave's state/date/angle,
-//    the current one highlighted, others switchable (selectActiveList), and
-//    this wave's angle editable in place.
+//  - a wave of a programme → the wave strip: every wave's state/date/linked
+//    article, the current one highlighted, others switchable
+//    (selectActiveList), and this wave's article linkable/creatable/unlinkable
+//    in place.
 // Native <details> for the disclosure — same pattern as PlanTargeting.
 export async function PlanProgramme({
   locale,
@@ -203,13 +204,16 @@ export async function PlanProgramme({
                 <form action={linkWaveArticleAction} className="plan-programme__angle-row">
                   <input type="hidden" name="locale" value={locale} />
                   <input type="hidden" name="listId" value={listId} />
-                  <select name="articleId">
-                    {otherArticles.map((a) => (
-                      <option key={a.id} value={a.id}>
-                        {a.title}
-                      </option>
-                    ))}
-                  </select>
+                  <label>
+                    <span className="sr-only">{t("anglePlaceholder")}</span>
+                    <select name="articleId">
+                      {otherArticles.map((a) => (
+                        <option key={a.id} value={a.id}>
+                          {a.title}
+                        </option>
+                      ))}
+                    </select>
+                  </label>
                   <button type="submit" className="btn small secondary">
                     {tArticles("linkCta")}
                   </button>
@@ -218,7 +222,10 @@ export async function PlanProgramme({
               <form action={createAndLinkWaveArticle} className="plan-programme__angle-row">
                 <input type="hidden" name="locale" value={locale} />
                 <input type="hidden" name="listId" value={listId} />
-                <input type="text" name="title" placeholder={t("anglePlaceholder")} required />
+                <label>
+                  <span className="sr-only">{t("anglePlaceholder")}</span>
+                  <input type="text" name="title" placeholder={t("anglePlaceholder")} required />
+                </label>
                 <button type="submit" className="btn small secondary">
                   {t("createArticleForWave")}
                 </button>
