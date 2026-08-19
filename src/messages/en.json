@@ -46,7 +46,8 @@
     "listsDesc": "Plan lists you send to the desk for pricing",
     "favoritesDesc": "Your personal shortlists of publications",
     "campaign": "Plan a campaign",
-    "campaigns": "Campaigns"
+    "campaigns": "Campaigns",
+    "rates": "Rates"
   },
   "orders": {
     "eyebrow": "Orders",
@@ -1240,7 +1241,23 @@
     "fileFormats": "File formats",
     "requirements": "Requirements",
     "saveSpec": "Save spec",
-    "availability": "Availability"
+    "availability": "Availability",
+    "ratesTitle": "Your prices, confirmed by you.",
+    "ratesLead": "Confirm a price that still holds, or save the new one when it changes. Confirmed prices keep your titles quotable — the desk is notified of every change.",
+    "ratesColProduct": "Product",
+    "ratesColPrice": "Base price",
+    "ratesColUnit": "Booked per",
+    "ratesColConfirmed": "Last confirmed",
+    "ratesColUpdate": "Update",
+    "ratesConfirm": "Confirm current price",
+    "ratesConfirming": "Confirming…",
+    "ratesConfirmedOn": "Confirmed {date}",
+    "ratesNeverConfirmed": "Never confirmed",
+    "ratesInactive": "Not in catalog",
+    "ratesUnitWeek": "Week",
+    "ratesUnitMonth": "Month",
+    "ratesMinUnits": "Minimum booking: {count}",
+    "ratesPriceOnlyNote": "This page changes prices only. Catalog status — active, bookable, visibility — is managed by the NativeSpin desk."
   },
   "formats": {
     "metaTitle": "Native formats — NativeSpin",

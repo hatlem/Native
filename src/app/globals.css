@@ -7215,3 +7215,38 @@ footer a:hover {
   font-weight: 600;
   color: var(--accent-hover);
 }
+
+/* ---------- Publisher rate confirmation (/publisher/rates) ---------- */
+/* Compact per-row price editor: number input + save inline, confirm
+   button beneath. Inputs inherit .field-less styling, so size locally. */
+.rates-actions {
+  display: flex;
+  flex-direction: column;
+  gap: var(--s-2);
+  align-items: flex-end;
+}
+.rates-save {
+  display: flex;
+  gap: var(--s-2);
+  align-items: center;
+}
+.rates-save input[type="number"] {
+  width: 8.5rem;
+  padding: 6px 8px;
+  border: 1px solid var(--border);
+  border-radius: var(--r-sm);
+  background: var(--surface);
+  color: var(--text);
+  font: inherit;
+  font-variant-numeric: tabular-nums;
+  text-align: right;
+}
+@media (max-width: 720px) {
+  .rates-actions {
+    align-items: stretch;
+  }
+  .rates-save input[type="number"] {
+    flex: 1;
+    width: auto;
+  }
+}

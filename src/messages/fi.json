@@ -46,7 +46,8 @@
     "listsDesc": "Suunnitelmalistat, jotka lähetät tiskille hinnoittelua varten",
     "favoritesDesc": "Henkilökohtaiset julkaisulistasi",
     "campaign": "Suunnittele kampanja",
-    "campaigns": "Kampanjat"
+    "campaigns": "Kampanjat",
+    "rates": "Hinnat"
   },
   "orders": {
     "eyebrow": "Tilaukset",
@@ -1241,7 +1242,23 @@
     "fileFormats": "Tiedostoformaatit",
     "requirements": "Vaatimukset",
     "saveSpec": "Tallenna spesifikaatio",
-    "availability": "Saatavuus"
+    "availability": "Saatavuus",
+    "ratesTitle": "Hintasi, itse vahvistamasi.",
+    "ratesLead": "Vahvista hinta, joka pätee yhä, tai tallenna uusi, kun hinta muuttuu. Vahvistetut hinnat pitävät julkaisusi tarjousvalmiina — deski saa ilmoituksen jokaisesta muutoksesta.",
+    "ratesColProduct": "Tuote",
+    "ratesColPrice": "Perushinta",
+    "ratesColUnit": "Varausjakso",
+    "ratesColConfirmed": "Viimeksi vahvistettu",
+    "ratesColUpdate": "Päivitä",
+    "ratesConfirm": "Vahvista nykyinen hinta",
+    "ratesConfirming": "Vahvistetaan…",
+    "ratesConfirmedOn": "Vahvistettu {date}",
+    "ratesNeverConfirmed": "Ei vielä vahvistettu",
+    "ratesInactive": "Ei katalogissa",
+    "ratesUnitWeek": "Viikko",
+    "ratesUnitMonth": "Kuukausi",
+    "ratesMinUnits": "Vähimmäisvaraus: {count}",
+    "ratesPriceOnlyNote": "Tällä sivulla muutetaan vain hintoja. Katalogin tila — aktiivinen, varattavissa, näkyvyys — on NativeSpin-deskin hallinnassa."
   },
   "formats": {
     "metaTitle": "Natiiviformaatit — NativeSpin",
