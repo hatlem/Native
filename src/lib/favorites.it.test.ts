@@ -48,6 +48,9 @@ after(async () => {
   if (!RUN_DB_IT) return;
   await prisma.favoriteList.deleteMany({ where: { userId: { in: [userId, mateId, outsiderId] } } });
   await prisma.favorite.deleteMany({ where: { userId: { in: [userId, mateId, outsiderId] } } });
+  // notifyDesk/notifyOrg from parallel suites can stamp Notification rows on
+  // transient test users mid-run — clear them or the user delete FK-faults.
+  await prisma.notification.deleteMany({ where: { user: { id: { in: [userId, mateId, outsiderId] } } } });
   await prisma.user.deleteMany({ where: { id: { in: [userId, mateId, outsiderId] } } });
   await prisma.organization.deleteMany({ where: { id: { in: [orgId, otherOrgId] } } });
 });

@@ -266,6 +266,10 @@ if (!RUN_DB_IT) {
     await prisma.planItem.deleteMany({ where: { plan: { organizationId: orgId } } });
     await prisma.plan.deleteMany({ where: { organizationId: orgId } });
     await prisma.auditLog.deleteMany({ where: { actor: actorId } });
+    // Parallel suites notifyDesk() every SUPERADMIN — including this transient
+    // test operator — so Notification rows can appear mid-run and FK-block the
+    // user delete.
+    await prisma.notification.deleteMany({ where: { userId: actorId } });
     await prisma.user.deleteMany({ where: { id: actorId } });
     await prisma.organization.deleteMany({ where: { id: orgId } });
   });

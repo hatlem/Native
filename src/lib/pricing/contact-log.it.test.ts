@@ -52,6 +52,9 @@ if (!RUN_DB_IT) {
     await prisma.product.deleteMany({ where: { titleId } });
     await prisma.title.deleteMany({ where: { id: titleId } });
     await prisma.publisher.deleteMany({ where: { id: publisherId } });
+    // notifyDesk/notifyOrg from parallel suites can stamp Notification rows on
+    // transient test users mid-run — clear them or the user delete FK-faults.
+    await prisma.notification.deleteMany({ where: { user: { id: userId } } });
     await prisma.user.deleteMany({ where: { id: userId } });
   });
 

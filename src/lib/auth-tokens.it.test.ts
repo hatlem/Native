@@ -34,6 +34,9 @@ if (!RUN_DB_IT) {
 
   after(async () => {
     // Token rows cascade off the user.
+    // notifyDesk/notifyOrg from parallel suites can stamp Notification rows on
+    // transient test users mid-run — clear them or the user delete FK-faults.
+    await prisma.notification.deleteMany({ where: { user: { id: userId } } });
     await prisma.user.deleteMany({ where: { id: userId } });
   });
 
