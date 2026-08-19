@@ -1,7 +1,7 @@
 import { test, before, after } from "node:test";
 import assert from "node:assert/strict";
 import { prisma } from "./prisma";
-import { runPlacementReadySweep } from "./placement-ready-sweep";
+import { runPlacementReadySweep, runPlacementReadySweepWithLock } from "./placement-ready-sweep";
 import type { MarketCode } from "@prisma/client";
 
 const RUN_DB_IT = process.env.RUN_DB_IT === "1";
@@ -128,5 +128,15 @@ if (!RUN_DB_IT) {
 
     const res = await runPlacementReadySweep();
     assert.equal(res.notified, 0);
+  });
+
+  test("runPlacementReadySweepWithLock delegates to the sweep when uncontended", async () => {
+    const titleId = await freshTitleWithProduct({ active: true, bookable: true, confirmed: true });
+    const listId = await freshList();
+    await prisma.savedListItem.create({ data: { listId, titleId } });
+
+    const res = await runPlacementReadySweepWithLock();
+    assert.ok(res, "lock was acquired and the sweep ran");
+    assert.equal(res!.notified, 1);
   });
 }

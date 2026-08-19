@@ -8,6 +8,7 @@
 const SWEEP_EVERY_MS = 60 * 60_000;
 const BOOT_DELAY_MS = 2 * 60_000; // off the deploy's hot path
 const METRICS_OFFSET_MS = 5 * 60_000; // stagger so the two jobs never contend
+const PLACEMENT_READY_OFFSET_MS = 10 * 60_000; // stagger clear of autosend (0) and metrics (5min)
 
 export async function startSchedules(): Promise<void> {
   // Dev hot-reload can re-evaluate this module; keep exactly one schedule.
@@ -47,6 +48,15 @@ export async function startSchedules(): Promise<void> {
       if (!res) return "sweep skipped: another instance holds the lock";
       if (!res.ran) return "sweep skipped: already ran today (latch)";
       return `sweep done: created=${res.built?.requests_created ?? 0} frozen=${res.frozen ?? 0} sent=${res.sent ?? 0} skipped=${JSON.stringify(res.skipped ?? {})}`;
+    });
+  }
+
+  if (process.env.PLACEMENT_READY_SWEEP !== "0") {
+    const { runPlacementReadySweepWithLock } = await import("@/lib/placement-ready-sweep");
+    schedule("placement-ready", PLACEMENT_READY_OFFSET_MS, async () => {
+      const res = await runPlacementReadySweepWithLock();
+      if (!res) return "sweep skipped: another instance holds the lock";
+      return `sweep done: notified=${res.notified}`;
     });
   }
 }

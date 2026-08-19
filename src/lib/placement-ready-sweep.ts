@@ -81,3 +81,17 @@ export async function runPlacementReadySweep(): Promise<PlacementReadySweepResul
   }
   return { notified };
 }
+
+/** Same xact-scoped advisory-lock pattern as the metrics sweep: null means
+ *  another instance holds the lock this tick. */
+export async function runPlacementReadySweepWithLock(): Promise<PlacementReadySweepResult | null> {
+  return prisma.$transaction(
+    async (tx) => {
+      const [{ locked }] = await tx.$queryRaw<[{ locked: boolean }]>`
+        SELECT pg_try_advisory_xact_lock(hashtext('placement-ready-sweep')) AS locked`;
+      if (!locked) return null;
+      return runPlacementReadySweep();
+    },
+    { timeout: 5 * 60_000, maxWait: 10_000 },
+  );
+}
