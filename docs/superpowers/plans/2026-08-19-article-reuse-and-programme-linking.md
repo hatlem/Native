@@ -2841,11 +2841,26 @@ git commit -m "feat(i18n): add locale copy for shared articles and wave linking"
 
 - [ ] **Step 1: Read the current file in full**
 
-The existing three tests assert the 1:1 invariant directly (an unlinked article's
-`orderLineId` is null; creating a second `Article` with the same `orderLineId`
-must reject; `canWriteArticle`'s journalist-assignment scenario). Read the current
-file before editing — the third test (journalist assignment via a real DB-loaded
-`WriterProfile`) needs no changes at all; only the first two need rework.
+The current file actually has FOUR tests, not three — a fourth
+("`ensureArticleForLine` is idempotent: concurrent first-writes yield one
+Article") was added later, by the prior feature's own final-review fix wave, to
+cover a concurrency race. Read the current file before editing.
+
+Three assert the old 1:1 invariant directly and need rework (an unlinked
+article's `orderLineId` is null; creating a second `Article` with the same
+`orderLineId` must reject; the concurrent-`ensureArticleForLine` race). The
+third test in the original three — `canWriteArticle`'s journalist-assignment
+scenario — needs no changes at all.
+
+**Delete the fourth test outright** (`import { ensureArticleForLine } from
+"@/lib/writers/article";` at the top of the file, and the whole `test(
+"ensureArticleForLine is idempotent...")` block) rather than porting it forward
+— `@/lib/writers/article` no longer exists (Task 5 deleted it), and the race
+condition it covered (two concurrent first-writes for the same line converging
+on one row) is now fully covered by Task 2's `src/lib/writers/placement.it.test.ts`,
+which tests the exact same race against `ensurePlacementForLine` (the function
+that replaced `ensureArticleForLine`). Keeping both would just duplicate
+coverage of the same behavior under two different function names.
 
 - [ ] **Step 2: Replace the two invalidated tests, add two new ones**
 
