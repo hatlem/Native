@@ -181,7 +181,15 @@ export async function setAssetStatus(formData: FormData) {
   if (ASSET_TARGETS.includes(target)) {
     const asset = await prisma.contentAsset.findUnique({
       where: { id: assetId },
-      include: { article: { select: { organizationId: true, orderLineId: true } } },
+      include: {
+        article: {
+          select: {
+            organizationId: true,
+            orderLineId: true,
+            orderLine: { select: { orderId: true } },
+          },
+        },
+      },
     });
     if (asset && !(target === "FINAL" && asset.specPassed !== true)) {
       await prisma.contentAsset.update({
@@ -198,8 +206,8 @@ export async function setAssetStatus(formData: FormData) {
             target === "IN_REVIEW"
               ? "Content draft ready for review"
               : "Content changes requested",
-          link: asset.article.orderLineId
-            ? `/${locale}/orders/${orderId}`
+          link: asset.article.orderLine
+            ? `/${locale}/orders/${asset.article.orderLine.orderId}`
             : `/${locale}/articles/${articleId}`,
         });
       }
