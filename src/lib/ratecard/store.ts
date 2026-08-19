@@ -1,6 +1,6 @@
 import { prisma } from "@/lib/prisma";
 import { recordAudit } from "@/lib/audit";
-import { putObject, presignDownload } from "@/lib/storage/r2";
+import { putObject, presignDownload, RATE_CARD_TYPES } from "@/lib/storage/r2";
 import type { RateCardDocument } from "@prisma/client";
 
 const PREFIX = "rate-cards";
@@ -30,6 +30,7 @@ export async function storeRateCardDocument(
     filename: args.fileName,
     contentType,
     body: args.buffer,
+    allowedTypes: RATE_CARD_TYPES,
   });
 
   const doc = await prisma.rateCardDocument.create({
