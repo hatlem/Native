@@ -30,9 +30,18 @@ export type Workspace = {
   activeCanCommit: boolean;
 };
 
-async function loadMemberships(userId: string): Promise<MembershipRow[]> {
+// Exported (only) so it's independently testable without a Next.js request
+// scope — getWorkspace itself calls cookies(), which node:test can't
+// provide, so the multi-membership ordering it depends on has to be
+// verified at this layer instead.
+export async function loadMemberships(userId: string): Promise<MembershipRow[]> {
   const rows = await prisma.membership.findMany({
     where: { userId },
+    // Deterministic order so activeOrgId (below) doesn't depend on
+    // whatever order Postgres happens to return rows in. Newest-granted
+    // wins by default — the org a staff member was JUST given access to
+    // is the one they're almost always here to work on.
+    orderBy: { createdAt: "desc" },
     select: {
       userId: true,
       organizationId: true,
