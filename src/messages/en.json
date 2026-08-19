@@ -808,7 +808,11 @@
     "actionView": "View",
     "waveNote": "Wave {n} of {of}",
     "waveNoteDated": "Wave {n} of {of} · from {date}",
-    "waveDoneNote": "Wave {n} of {of} finished"
+    "waveDoneNote": "Wave {n} of {of} finished",
+    "timelineTab": "Timeline",
+    "timelineLead": "When everything runs — the next six months, month by month. Drafts without dates sit at the bottom.",
+    "timelineNotScheduled": "Not scheduled yet",
+    "timelineEmptyMonth": "Nothing running this month"
   },
   "desk": {
     "eyebrow": "Internal desk",

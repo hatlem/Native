@@ -9,12 +9,20 @@ import { EmptyState } from "@/app/empty-state";
 import { formatMoney, intlLocale } from "@/lib/money";
 import { timeAgo } from "@/lib/time-ago";
 import { deriveStage, type CampaignStage } from "@/lib/campaign-stage";
+import { monthsWindow, intersectsMonth, draftWindow, orderWindow, type RunWindow } from "@/lib/campaign-timeline";
 import { CampaignRow, type RowAction } from "./_components/CampaignRow";
+import { TimelineView, type TimelineEntry, type TimelineMonthGroup } from "./_components/TimelineView";
 
 export const dynamic = "force-dynamic";
 
 const TABS = ["needsYou", "inProgress", "live", "done", "all"] as const;
 type Tab = (typeof TABS)[number];
+
+// "timeline" is a VIEW over the same campaigns (bucketed by run month), not
+// a status filter — it never has a count badge and never participates in the
+// default-tab fallback; it only activates via an explicit ?tab=timeline.
+const VIEWS = [...TABS, "timeline"] as const;
+type View = (typeof VIEWS)[number];
 
 type Row = {
   id: string;
@@ -61,7 +69,8 @@ export default async function RequestsPage({
   const ws = scope.workspace;
 
   const tabRaw = typeof sp.tab === "string" ? sp.tab : "";
-  const explicitTab: Tab | null = (TABS as readonly string[]).includes(tabRaw) ? (tabRaw as Tab) : null;
+  const explicitView: View | null = (VIEWS as readonly string[]).includes(tabRaw) ? (tabRaw as View) : null;
+  const explicitTab: Tab | null = explicitView && explicitView !== "timeline" ? explicitView : null;
 
   const dateFmt = new Intl.DateTimeFormat(intlLocale(locale), { day: "numeric", month: "short" });
   const stageLabels: [string, string, string, string, string] = [
@@ -101,6 +110,11 @@ export default async function RequestsPage({
 
   const rows: Row[] = [];
 
+  // Timeline view: each campaign paired with its run window (null → the
+  // trailing "Not scheduled yet" bucket). Built alongside `rows` so both
+  // views share the exact same names, statuses, amounts and click targets.
+  const timeline: Array<{ window: RunWindow | null; entry: TimelineEntry }> = [];
+
   // "Wave 2 of 3 · from 6 Oct" on a draft that belongs to a programme.
   const waveFooter = (list: (typeof unsentLists)[number]): string | undefined => {
     if (!list.programme || !list.waveNumber) return undefined;
@@ -112,6 +126,18 @@ export default async function RequestsPage({
 
   for (const list of unsentLists) {
     const totals = estimateListTotals(list.items);
+    const totalLabel = totals.length
+      ? totals.length > 1
+        ? totals
+            .map((tot) =>
+              tPlan("totalForItems", {
+                amount: formatMoney(tot.amount, tot.currency, locale),
+                count: tot.itemCount,
+              }),
+            )
+            .join(" + ")
+        : formatMoney(totals[0].amount, totals[0].currency, locale)
+      : null;
     rows.push({
       id: `draft-${list.id}`,
       name: list.name,
@@ -119,18 +145,7 @@ export default async function RequestsPage({
       meta: t("metaPlanBuilt", { items: list._count.items, age: timeAgo(list.updatedAt, locale) }),
       stage: 1,
       tab: "inProgress",
-      totalLabel: totals.length
-        ? totals.length > 1
-          ? totals
-              .map((tot) =>
-                tPlan("totalForItems", {
-                  amount: formatMoney(tot.amount, tot.currency, locale),
-                  count: tot.itemCount,
-                }),
-              )
-              .join(" + ")
-          : formatMoney(totals[0].amount, totals[0].currency, locale)
-        : null,
+      totalLabel,
       qualifier: t("qualifierIndicative"),
       action: { kind: "select-list", listId: list.id, locale, label: t("actionFinishSend") },
       footerNote: waveFooter(list),
@@ -140,6 +155,28 @@ export default async function RequestsPage({
       // /plan). Kept only because Row.href is non-optional; any value here
       // is dead.
       href: "/plan",
+    });
+    timeline.push({
+      // Placeholder lines have no product yet, so their booking unit is
+      // unknown; MONTH is the catalog default (same fallback checkout uses).
+      window: draftWindow(
+        list.items.map((i) => ({
+          scheduleStart: i.scheduleStart,
+          scheduleUnits: i.scheduleUnits,
+          bookingUnit: i.product?.bookingUnit ?? "MONTH",
+        })),
+      ),
+      entry: {
+        id: `draft-${list.id}`,
+        name: list.name,
+        statusValue: "DRAFT",
+        totalLabel,
+        waveNote:
+          list.programme && list.waveNumber
+            ? t("waveNote", { n: list.waveNumber, of: list.programme.plannedWaves })
+            : null,
+        action: { kind: "select-list", listId: list.id, locale },
+      },
     });
   }
 
@@ -191,6 +228,27 @@ export default async function RequestsPage({
     const wave = r.sourceList?.programme && r.sourceList.waveNumber
       ? { n: r.sourceList.waveNumber, of: r.sourceList.programme.plannedWaves }
       : null;
+    const rowHref = tab === "needsYou" || stage <= 3 ? detailHref : orderHref;
+
+    // Timeline shows what actually RUNS: confirmed orders placed by their
+    // flight window (an order the desk hasn't dated yet lands in the "Not
+    // scheduled yet" bucket via a null window). Cancelled orders don't run,
+    // so they stay out entirely; a request without an order isn't booked
+    // anywhere yet, so it doesn't claim a month either.
+    if (order && order.status !== "CANCELLED") {
+      timeline.push({
+        window: orderWindow(order.flightStartDate, order.flightEndDate),
+        entry: {
+          id: r.id,
+          name: r.plan.name,
+          statusValue: order.status,
+          totalLabel,
+          waveNote: wave ? t("waveNote", wave) : null,
+          action: { kind: "link", href: rowHref },
+        },
+      });
+    }
+
     rows.push({
       footerNote: wave
         ? tab === "done" && order
@@ -210,7 +268,7 @@ export default async function RequestsPage({
       totalLabel,
       qualifier,
       action,
-      href: tab === "needsYou" || stage <= 3 ? detailHref : orderHref,
+      href: rowHref,
     });
   }
 
@@ -230,13 +288,48 @@ export default async function RequestsPage({
   const DEFAULT_PRIORITY: Exclude<Tab, "all">[] = ["needsYou", "inProgress", "live", "done"];
   const activeTab: Tab =
     explicitTab ?? DEFAULT_PRIORITY.find((tab) => counts[tab] > 0) ?? "needsYou";
+  const activeView: View = explicitView === "timeline" ? "timeline" : activeTab;
 
   const visibleRows = activeTab === "all" ? rows : rows.filter((r) => r.tab === activeTab);
+
+  // Bucket campaigns into the next six months (current month first) only
+  // when the timeline view is actually being rendered.
+  let timelineMonths: TimelineMonthGroup[] = [];
+  let timelineUnscheduled: TimelineEntry[] = [];
+  if (activeView === "timeline") {
+    // timeZone: "UTC" because month anchors are UTC midnights — a local-time
+    // formatter west of UTC would label them with the previous month.
+    const monthFmt = new Intl.DateTimeFormat(intlLocale(locale), {
+      month: "long",
+      year: "numeric",
+      timeZone: "UTC",
+    });
+    // Intl gives lowercase month names in several of our locales ("august
+    // 2026" in nb/sv/da/fi); as standalone headings they read better
+    // capitalized, matching how calendars title their months.
+    const heading = (d: Date) => {
+      const s = monthFmt.format(d);
+      return s.charAt(0).toLocaleUpperCase(intlLocale(locale)) + s.slice(1);
+    };
+    timelineMonths = monthsWindow(new Date(), 6).map((month) => ({
+      key: month.key,
+      heading: heading(month.start),
+      entries: timeline
+        .filter((c) => c.window && intersectsMonth(c.window, month))
+        .sort(
+          (a, b) =>
+            a.window!.start.getTime() - b.window!.start.getTime() ||
+            a.entry.name.localeCompare(b.entry.name),
+        )
+        .map((c) => c.entry),
+    }));
+    timelineUnscheduled = timeline.filter((c) => !c.window).map((c) => c.entry);
+  }
 
   // Plain <a>, not next-intl's <Link>: same-route RSC soft navigation is
   // currently broken in production for this app (see catalog's
   // CatalogSort.tsx) — a <Link> tab click here would be silently inert.
-  const tabHref = (tab: Tab) => `/${locale}/requests?tab=${tab}`;
+  const tabHref = (tab: View) => `/${locale}/requests?tab=${tab}`;
 
   return (
     <>
@@ -255,14 +348,30 @@ export default async function RequestsPage({
           <a
             key={tab}
             href={tabHref(tab)}
-            className={`campaign-tab${tab === activeTab ? " is-active" : ""}`}
+            className={`campaign-tab${tab === activeView ? " is-active" : ""}`}
           >
             {t(`tab_${tab}`)} <span className="campaign-tab__count">{counts[tab]}</span>
           </a>
         ))}
+        {/* A view, not a filter: no count badge — it shows the same campaigns
+            arranged by month, so a count would just repeat "All". */}
+        <a
+          href={tabHref("timeline")}
+          className={`campaign-tab${activeView === "timeline" ? " is-active" : ""}`}
+        >
+          {t("timelineTab")}
+        </a>
       </nav>
 
-      {visibleRows.length === 0 ? (
+      {activeView === "timeline" ? (
+        <TimelineView
+          lead={t("timelineLead")}
+          months={timelineMonths}
+          unscheduled={timelineUnscheduled}
+          notScheduledHeading={t("timelineNotScheduled")}
+          emptyMonthLabel={t("timelineEmptyMonth")}
+        />
+      ) : visibleRows.length === 0 ? (
         <EmptyState
           title={t("noneForTab")}
           primaryHref="/catalog"

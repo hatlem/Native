@@ -721,7 +721,11 @@
     "actionView": "Se",
     "waveNote": "Runde {n} af {of}",
     "waveNoteDated": "Runde {n} af {of} · fra {date}",
-    "waveDoneNote": "Runde {n} af {of} færdig"
+    "waveDoneNote": "Runde {n} af {of} færdig",
+    "timelineTab": "Tidslinje",
+    "timelineLead": "Hvornår det hele kører — de næste seks måneder, måned for måned. Kladder uden datoer ligger nederst.",
+    "timelineNotScheduled": "Ikke planlagt endnu",
+    "timelineEmptyMonth": "Intet kører denne måned"
   },
   "desk": {
     "eyebrow": "Internt desk",

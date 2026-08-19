@@ -808,7 +808,11 @@
     "actionView": "Näytä",
     "waveNote": "Kierros {n}/{of}",
     "waveNoteDated": "Kierros {n}/{of} · alkaen {date}",
-    "waveDoneNote": "Kierros {n}/{of} valmis"
+    "waveDoneNote": "Kierros {n}/{of} valmis",
+    "timelineTab": "Aikajana",
+    "timelineLead": "Milloin mikäkin on käynnissä — seuraavat kuusi kuukautta, kuukausi kerrallaan. Päiväämättömät luonnokset ovat alimpana.",
+    "timelineNotScheduled": "Ei vielä aikataulussa",
+    "timelineEmptyMonth": "Tässä kuussa ei ole mitään käynnissä"
   },
   "desk": {
     "eyebrow": "Sisäinen desk",

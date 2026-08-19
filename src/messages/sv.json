@@ -721,7 +721,11 @@
     "actionView": "Visa",
     "waveNote": "Omgång {n} av {of}",
     "waveNoteDated": "Omgång {n} av {of} · från {date}",
-    "waveDoneNote": "Omgång {n} av {of} klar"
+    "waveDoneNote": "Omgång {n} av {of} klar",
+    "timelineTab": "Tidslinje",
+    "timelineLead": "När allt rullar — de kommande sex månaderna, månad för månad. Utkast utan datum ligger längst ner.",
+    "timelineNotScheduled": "Inte schemalagt ännu",
+    "timelineEmptyMonth": "Inget rullar den här månaden"
   },
   "desk": {
     "eyebrow": "Internt desk",

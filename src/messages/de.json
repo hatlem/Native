@@ -808,7 +808,11 @@
     "actionView": "Ansehen",
     "waveNote": "Welle {n} von {of}",
     "waveNoteDated": "Welle {n} von {of} · ab {date}",
-    "waveDoneNote": "Welle {n} von {of} abgeschlossen"
+    "waveDoneNote": "Welle {n} von {of} abgeschlossen",
+    "timelineTab": "Zeitleiste",
+    "timelineLead": "Wann was läuft — die nächsten sechs Monate, Monat für Monat. Entwürfe ohne Termin stehen ganz unten.",
+    "timelineNotScheduled": "Noch nicht terminiert",
+    "timelineEmptyMonth": "Diesen Monat läuft nichts"
   },
   "desk": {
     "eyebrow": "Interner Desk",
