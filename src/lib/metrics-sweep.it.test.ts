@@ -11,7 +11,7 @@ const RUN_DB_IT = process.env.RUN_DB_IT === "1";
 
 after(async () => {
   if (!RUN_DB_IT) return;
-  await prisma.auditLog.deleteMany({ where: { entity: "MetricsSweep:daily" } });
+  await prisma.auditLog.deleteMany({ where: { entity: { startsWith: "MetricsSweep:daily" } } });
 });
 
 if (!RUN_DB_IT) {
@@ -19,7 +19,7 @@ if (!RUN_DB_IT) {
 } else {
   test("daily latch: first acquire wins, the window blocks, expiry reopens", async () => {
     // Isolate from any real marker rows.
-    await prisma.auditLog.deleteMany({ where: { entity: "MetricsSweep:daily" } });
+    await prisma.auditLog.deleteMany({ where: { entity: { startsWith: "MetricsSweep:daily" } } });
 
     const now = new Date("2026-08-19T06:00:00Z");
     assert.equal(await acquireDailyLatch(now), true, "first run of the day acquires");
@@ -27,7 +27,7 @@ if (!RUN_DB_IT) {
     assert.equal(
       await acquireDailyLatch(new Date("2026-08-19T23:00:00Z")),
       false,
-      "17h later is still inside the 20h window",
+      "same UTC day, hours later — still latched",
     );
     assert.equal(
       await acquireDailyLatch(new Date("2026-08-20T06:00:00Z")),
@@ -37,7 +37,7 @@ if (!RUN_DB_IT) {
   });
 
   test("runMetricsSweepWithLock: latched day reports ran=false and sends nothing", async () => {
-    await prisma.auditLog.deleteMany({ where: { entity: "MetricsSweep:daily" } });
+    await prisma.auditLog.deleteMany({ where: { entity: { startsWith: "MetricsSweep:daily" } } });
     // Pre-latch "today", then run the full locked sweep: it must bail before
     // build/freeze/send (ran=false, no batch fields).
     const now = new Date("2026-08-21T06:00:00Z");

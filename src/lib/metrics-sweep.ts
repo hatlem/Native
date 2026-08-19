@@ -7,10 +7,10 @@
 // Safety model, in order:
 //  1. pg_try_advisory_xact_lock — only one app instance runs at a time
 //     (xact-scoped: released on commit AND rollback/timeout, never leaks).
-//  2. A once-per-day latch INSIDE the lock: the newest AuditLog marker row
-//     within 20h wins. The marker is written BEFORE any email goes out, so a
-//     crash mid-send can only ever UNDER-send today — publisher emails must
-//     never double-send. (The scripts remain available for manual catch-up.)
+//  2. A once-per-UTC-day latch INSIDE the lock (AuditLog marker keyed by
+//     day). The marker is written BEFORE any email goes out, so a crash
+//     mid-send can only ever UNDER-send today — publisher emails must never
+//     double-send. (The scripts remain available for manual catch-up.)
 //  3. outreachLimiter (8/h) still paces individual sends; a rate-limited
 //     batch simply resumes on a later day's sweep.
 
@@ -23,10 +23,13 @@ import {
   sendMetricsRequestStep,
 } from "@/lib/campaign-reporting/campaign";
 
-const LATCH_ENTITY = "MetricsSweep:daily";
-// 20h, not 24: an hourly tick drifting a few minutes per day must not skip
-// a whole day because yesterday's run finished 23h58m ago.
-const LATCH_WINDOW_MS = 20 * 3_600_000;
+// One marker row per UTC calendar day, the day encoded in the entity itself —
+// so the latch compares against the sweep's INTENDED day, not the marker
+// row's insertion clock (which made injected-clock tests impossible and tied
+// correctness to DB wall time). A tick straddling midnight can start the new
+// day immediately; that's safe: sendMetricsRequestStep reschedules each
+// request's own nextStepAt, so a given request can never double-send.
+const latchEntity = (now: Date) => `MetricsSweep:daily:${now.toISOString().slice(0, 10)}`;
 
 export type MetricsSweepResult = {
   ran: boolean;
@@ -36,16 +39,14 @@ export type MetricsSweepResult = {
   skipped?: Record<string, number>;
 };
 
-/** True exactly once per latch window: checks for a fresh marker and writes
- *  one atomically-enough (callers hold the advisory lock, which serializes
- *  check-then-write across instances). */
+/** True exactly once per UTC day: checks for the day's marker and writes it.
+ *  Atomically-enough — callers hold the advisory lock, which serializes the
+ *  check-then-write across instances. */
 export async function acquireDailyLatch(now: Date = new Date()): Promise<boolean> {
-  const recent = await prisma.auditLog.findFirst({
-    where: { entity: LATCH_ENTITY, createdAt: { gt: new Date(now.getTime() - LATCH_WINDOW_MS) } },
-    select: { id: true },
-  });
-  if (recent) return false;
-  await recordAudit(null, "metrics.sweep", LATCH_ENTITY, { at: now.toISOString() });
+  const entity = latchEntity(now);
+  const existing = await prisma.auditLog.findFirst({ where: { entity }, select: { id: true } });
+  if (existing) return false;
+  await recordAudit(null, "metrics.sweep", entity, { at: now.toISOString() });
   return true;
 }
 
