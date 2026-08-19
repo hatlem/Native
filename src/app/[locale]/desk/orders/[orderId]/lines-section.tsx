@@ -214,16 +214,16 @@ export async function LinesSection({
                           </span>
                           <StatusBadge value={a.status} />
                           {/* specPassed now lives on the placement, not the
-                              asset version — it reflects "does the currently
-                              effective draft pass this placement's spec",
-                              so only the latest version in the timeline
-                              carries the badge. */}
-                          {a.id === latest?.id && line.articlePlacement?.specPassed === true ? (
+                              asset version — it reflects "does the placement's
+                              effective draft pass its spec", so the badge
+                              belongs on the locked asset once locked, and
+                              otherwise on the latest version. */}
+                          {a.id === (line.articlePlacement?.lockedAssetId ?? latest?.id) && line.articlePlacement?.specPassed === true ? (
                             <span className="badge badge-success dotless">
                               ✓ {tp("specPass")}
                             </span>
                           ) : null}
-                          {a.id === latest?.id && line.articlePlacement?.specPassed === false ? (
+                          {a.id === (line.articlePlacement?.lockedAssetId ?? latest?.id) && line.articlePlacement?.specPassed === false ? (
                             <span className="badge badge-warning dotless">
                               ⚠ {tp("specFail")}
                             </span>
@@ -248,7 +248,11 @@ export async function LinesSection({
                 <div className="asset-actions">
                   <form action={runSpecCheck}>
                     <input type="hidden" name="locale" value={locale} />
-                    <input type="hidden" name="assetId" value={latest.id} />
+                    <input
+                      type="hidden"
+                      name="placementId"
+                      value={line.articlePlacement?.id ?? ""}
+                    />
                     <button type="submit" className="btn small secondary">
                       {tp("specCheck")}
                     </button>
