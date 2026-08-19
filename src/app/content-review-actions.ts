@@ -9,7 +9,7 @@ import { notifyDesk } from "@/lib/notify";
 
 // Buyer-side counterpart to desk-content-actions.ts's setAssetStatus: a
 // buyer may only move a draft from IN_REVIEW to APPROVED or
-// CHANGES_REQUESTED — never to DRAFT/FINAL/RETRACTED, which stay
+// CHANGES_REQUESTED — never to DRAFT/FINAL, which stay
 // desk/writer-only. Separate from setAssetStatus (which uses
 // requireLineWriter, a DESK/CONTENT-only guard) because the authorization
 // shape is different: buyers are checked against the order's organization,

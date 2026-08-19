@@ -223,7 +223,8 @@ export default async function PublisherOrdersPage({
                       exists and is in a state the publisher is still
                       allowed to retract. Distinct from the desk-side
                       "request changes" soft path: this is a hard
-                      rejection that flips ContentAsset → RETRACTED. */}
+                      rejection that sets ArticlePlacement.retractedAt
+                      (retractedBy/retractionNote alongside it). */}
                   {line.articlePlacement?.article.versions[0] && !line.articlePlacement.retractedAt ? (
                     <details className="spec-details veto-block">
                       <summary>

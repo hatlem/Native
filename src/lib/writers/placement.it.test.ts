@@ -237,9 +237,15 @@ test("lockPlacementsOnFinal locks every unlocked placement of the article, leave
 });
 
 test("articleTitleForLine resolves the line's product/title name, falling back to a generic label when there's no product or the product is unresolvable", async () => {
-  const market = await prisma.market.create({
-    data: { code: "NO", name: "Norway", currency: "NOK", vatRatePct: 25 },
-  });
+  // Market "NO" is seeded (pnpm db:seed runs before pnpm test:it in CI, and
+  // dev DBs are seeded too), and Market.code is @unique — so this must reuse
+  // the seeded row rather than unconditionally `create`, matching the
+  // findFirstOrThrow({ where: { code: "NO" } }) pattern used throughout the
+  // other *.it.test.ts files (see content-fee.it.test.ts, checkout.it.test.ts,
+  // campaign.it.test.ts, api/contract.it.test.ts, ratecard/store.it.test.ts,
+  // pricing/contact-log.it.test.ts). Not owned by this test, so it's never
+  // deleted in teardown either.
+  const market = await prisma.market.findFirstOrThrow({ where: { code: "NO" } });
   const publisher = await prisma.publisher.create({
     data: { name: `IT Publisher ${Date.now()}`, countryCode: market.code, marketId: market.id },
   });
@@ -277,5 +283,6 @@ test("articleTitleForLine resolves the line's product/title name, falling back t
   await prisma.product.delete({ where: { id: product.id } });
   await prisma.title.delete({ where: { id: title.id } });
   await prisma.publisher.delete({ where: { id: publisher.id } });
-  await prisma.market.delete({ where: { id: market.id } });
+  // market is the seeded shared row (found via findFirstOrThrow above, never
+  // created here) — do not delete it.
 });

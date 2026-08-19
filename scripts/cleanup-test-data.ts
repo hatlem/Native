@@ -39,6 +39,10 @@ async function main() {
     for (const q of quotes) {
       const order = await p.order.findUnique({ where: { quoteId: q.id } });
       if (order) {
+        // ArticlePlacement.orderLineId is now ON DELETE RESTRICT (was SET
+        // NULL on the old Article.orderLineId FK) — clear placements before
+        // deleting their OrderLines or the deleteMany below fails.
+        await p.articlePlacement.deleteMany({ where: { orderLine: { orderId: order.id } } });
         await p.orderLine.deleteMany({ where: { orderId: order.id } });
         await p.invoice.deleteMany({ where: { orderId: order.id } });
         await p.creditNote.deleteMany({ where: { orderId: order.id } });

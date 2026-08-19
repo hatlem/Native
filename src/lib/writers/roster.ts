@@ -12,8 +12,8 @@ export type RosterWriter = WriterForMatch & {
 };
 
 // All writer profiles with languages, specialties, and a live count of
-// active assignments (assigned lines whose latest asset isn't FINAL/
-// RETRACTED). Used by the desk Writers panel for match ranking.
+// active assignments (assigned lines whose latest asset isn't FINAL).
+// Used by the desk Writers panel for match ranking.
 export async function loadRoster(): Promise<RosterWriter[]> {
   const writers = await prisma.writerProfile.findMany({
     include: {

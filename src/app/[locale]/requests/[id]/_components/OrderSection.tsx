@@ -3,6 +3,7 @@ import type { Invoice } from "@prisma/client";
 import { Link } from "@/i18n/navigation";
 import { StatusBadge } from "@/app/status-badge";
 import { SectionHead } from "@/components";
+import { resolveEffectiveAsset } from "@/lib/writers/placement";
 import type { OrderWithDetails, ProductWithTitle } from "./types";
 
 // Confirmed-order section — inventory lines with production status,
@@ -22,6 +23,19 @@ export async function OrderSection({
   const tType = await getTranslations({ locale, namespace: "productType" });
   const tp = await getTranslations({ locale, namespace: "production" });
   const ti = await getTranslations({ locale, namespace: "invoice" });
+
+  // Version-locking-aware status: the locked version once the placement is
+  // FINAL-locked, otherwise the article's latest — never just "the newest
+  // version", which can belong to a sibling placement's draft on a shared
+  // article. Resolve all lines before the JSX since the render below is a
+  // synchronous .map(). Mirrors orders/[orderId]/page.tsx.
+  const effectiveAssets = new Map<string, Awaited<ReturnType<typeof resolveEffectiveAsset>>>();
+  for (const o of orders) {
+    for (const line of o.lines) {
+      if (!line.articlePlacement) continue;
+      effectiveAssets.set(line.id, await resolveEffectiveAsset(line.articlePlacement));
+    }
+  }
 
   return (
     <section className="section">
@@ -50,7 +64,7 @@ export async function OrderSection({
             .filter((line) => line.kind === "INVENTORY" && line.productId)
             .map((line) => {
             const p = line.productId ? byId.get(line.productId) : undefined;
-            const asset = line.articlePlacement?.article.versions[0];
+            const asset = effectiveAssets.get(line.id) ?? null;
             return (
               <article className="card" key={line.id}>
                 <h3>{p?.title.name ?? line.productId}</h3>

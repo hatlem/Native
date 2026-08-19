@@ -173,7 +173,7 @@ export default async function ArticleDetailPage({
 
       {placementsWithAsset.length > 1 ? (
         <p className="text-xs text-amber-700">
-          {t("sharedArticleWarning", { count: placementsWithAsset.length })}
+          {t("sharedArticleWarning", { count: placementsWithAsset.length - 1 })}
         </p>
       ) : null}
 

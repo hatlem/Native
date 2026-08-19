@@ -123,10 +123,17 @@ export async function unlinkArticleFromOrderLine(formData: FormData) {
 
   const placement = await prisma.articlePlacement.findUnique({
     where: { id: placementId },
-    select: { articleId: true },
+    select: { articleId: true, retractedAt: true },
   });
   if (!placement || placement.articleId !== articleId) {
     redirect(`/${locale}/articles/${articleId}`);
+  }
+  if (placement.retractedAt) {
+    // A publisher's retraction is an editorial veto — unlinking (and thus
+    // freeing the OrderLine to be relinked) would silently erase it, since
+    // the retractedAt/retractedBy/retractionNote state lives only on this
+    // row and doesn't survive the delete.
+    redirect(`/${locale}/articles/${articleId}?error=retracted`);
   }
 
   await prisma.articlePlacement.delete({ where: { id: placementId } });

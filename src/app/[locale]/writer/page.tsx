@@ -2,6 +2,7 @@ import { redirect } from "next/navigation";
 import Link from "next/link";
 import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
+import { resolveEffectiveAsset } from "@/lib/writers/placement";
 
 export default async function WriterHome({
   params,
@@ -32,15 +33,8 @@ export default async function WriterHome({
           brief: { select: { message: true } },
           articlePlacement: {
             select: {
-              article: {
-                select: {
-                  versions: {
-                    orderBy: { version: "desc" },
-                    take: 1,
-                    select: { status: true },
-                  },
-                },
-              },
+              articleId: true,
+              lockedAssetId: true,
             },
           },
           order: { select: { id: true } },
@@ -48,6 +42,17 @@ export default async function WriterHome({
         orderBy: { assignedAt: "desc" },
       })
     : [];
+
+  // Version-locking-aware status: the locked version once the placement is
+  // FINAL-locked, otherwise the article's latest — never just "the newest
+  // version", which can belong to a sibling placement's draft on a shared
+  // article. Resolve all lines before the JSX since the render below is a
+  // synchronous .map(). See orders/[orderId]/page.tsx for the same pattern.
+  const effectiveAssets = new Map<string, Awaited<ReturnType<typeof resolveEffectiveAsset>>>();
+  for (const line of lines) {
+    if (!line.articlePlacement) continue;
+    effectiveAssets.set(line.id, await resolveEffectiveAsset(line.articlePlacement));
+  }
 
   // Resolve products separately (OrderLine has no direct product relation)
   const productIds = lines
@@ -89,7 +94,7 @@ export default async function WriterHome({
                 </Link>
                 <div className="text-xs text-neutral-500">
                   {product?.title.countryCode} ·{" "}
-                  {line.articlePlacement?.article.versions[0]?.status ?? "NOT STARTED"}
+                  {effectiveAssets.get(line.id)?.status ?? "NOT STARTED"}
                 </div>
               </li>
             );
