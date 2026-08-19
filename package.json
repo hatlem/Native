@@ -7,7 +7,7 @@
     "dev": "next dev",
     "build": "prisma generate && next build",
     "start": "prisma migrate deploy && next start",
-    "lint": "next lint",
+    "lint": "eslint . --ext .js,.jsx,.ts,.tsx --max-warnings 0",
     "typecheck": "tsc --noEmit",
     "test": "tsx --test $(find src -name '*.test.ts' ! -name '*.it.test.ts')",
     "prisma:generate": "prisma generate",
