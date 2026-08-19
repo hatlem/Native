@@ -24,17 +24,21 @@ export default async function ArticlesPage({
     orderBy: { updatedAt: "desc" },
     include: {
       versions: { orderBy: { version: "desc" }, take: 1, select: { status: true } },
-      orderLine: {
+      placements: {
         select: {
-          orderId: true,
-          productId: true,
+          orderLine: {
+            select: {
+              orderId: true,
+              productId: true,
+            },
+          },
         },
       },
     },
   });
 
   const productIds = articles
-    .map((a) => a.orderLine?.productId)
+    .flatMap((a) => a.placements.map((p) => p.orderLine.productId))
     .filter((id): id is string => !!id);
   const products = productIds.length
     ? await prisma.product.findMany({
@@ -93,9 +97,6 @@ export default async function ArticlesPage({
               <tbody>
                 {articles.map((a) => {
                   const status = a.versions[0]?.status ?? "DRAFT";
-                  const placementName = a.orderLine?.productId
-                    ? titleByProductId.get(a.orderLine.productId)
-                    : null;
                   return (
                     <tr key={a.id}>
                       <td data-label={t("colTitle")}>
@@ -108,10 +109,18 @@ export default async function ArticlesPage({
                         {authorNameById.get(a.createdByUserId) ?? "—"}
                       </td>
                       <td data-label={t("colPlacement")}>
-                        {a.orderLine ? (
-                          <Link href={`/orders/${a.orderLine.orderId}`}>
-                            {placementName ?? t("colPlacement")}
-                          </Link>
+                        {a.placements.length > 0 ? (
+                          <ul className="cluster tight list-none p-0">
+                            {a.placements.map((p, i) => (
+                              <li key={i}>
+                                <Link href={`/orders/${p.orderLine.orderId}`}>
+                                  {p.orderLine.productId
+                                    ? (titleByProductId.get(p.orderLine.productId) ?? t("colPlacement"))
+                                    : t("colPlacement")}
+                                </Link>
+                              </li>
+                            ))}
+                          </ul>
                         ) : (
                           <span className="badge badge-neutral">{t("notLinked")}</span>
                         )}
