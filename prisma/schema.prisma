@@ -220,6 +220,10 @@ enum NotificationKind {
   // Order reached COMPLETED — the buyer's cue to plan the next wave of the
   // programme (or start one). Distinct from the generic advance ping.
   ORDER_COMPLETED
+  // A placeholder SavedListItem's Title just gained a confirmed, bookable
+  // Product — nudges the buyer + desk to resolve it via "Bruk plassering".
+  // Never auto-prices; purely informational. See the placement-ready sweep.
+  TITLE_PRODUCT_READY
 }
 
 enum JobStatus {
