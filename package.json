@@ -2,7 +2,7 @@
   "name": "nativespin",
   "version": "0.0.1",
   "private": true,
-  "description": "NativeSpin \u2014 Nordic marketplace for buying native content and native advertising in newspapers and magazines.",
+  "description": "NativeSpin — Nordic marketplace for buying native content and native advertising in newspapers and magazines.",
   "scripts": {
     "dev": "next dev",
     "build": "prisma generate && next build",
@@ -62,6 +62,7 @@
     "@getplatform/artifact-viewer": "git+https://github.com/hatlem/artifact-viewer.git#v1.3.0",
     "@modelcontextprotocol/sdk": "^1.29.0",
     "@prisma/client": "^6.2.1",
+    "@react-pdf/renderer": "^4.6.1",
     "bcryptjs": "^3.0.3",
     "cheerio": "^1.2.0",
     "disposable-email-domains": "^1.0.62",
