@@ -1116,6 +1116,7 @@
     "magicLinkTitle": "Sign in with a link",
     "magicLinkLead": "We'll email you a one-tap sign-in link.",
     "magicLinkButton": "Send sign-in link",
+    "magicLinkSending": "Sending…",
     "checkTitle": "Check your inbox",
     "checkLead": "If that email is registered, we just sent a link. It expires in 15 minutes.",
     "checkVerifyTitle": "Verify your email to sign in",

@@ -1,7 +1,6 @@
 "use server";
 
 import { AuthError } from "next-auth";
-import { redirect } from "next/navigation";
 import { cookies } from "next/headers";
 import { after } from "next/server";
 import bcrypt from "bcryptjs";
@@ -19,7 +18,14 @@ import { clientIp } from "@/lib/client-ip";
 import { PLAN_COOKIE, PLAN_BRIEF_COOKIE } from "@/lib/basket";
 import { CLIENT_COOKIE } from "@/lib/workspace";
 
-export async function authenticate(formData: FormData) {
+// Returns the destination instead of calling next/navigation's redirect().
+// The signin page's forms are client wrappers that navigate via
+// `window.location.href` on the result — Next's own client-side transition
+// to a *different* route after a server action is the same "router state
+// header could not be parsed" failure mode as the same-route case documented
+// in programme-actions.ts / CatalogSort.tsx, and was hanging real sign-ins
+// on /check-email. A full navigation sidesteps it entirely.
+export async function authenticate(formData: FormData): Promise<{ redirectTo: string }> {
   const locale = String(formData.get("locale") || "en");
   const email = String(formData.get("email") || "")
     .toLowerCase()
@@ -35,7 +41,7 @@ export async function authenticate(formData: FormData) {
   ]);
   const emailParam = email ? `&email=${encodeURIComponent(email)}` : "";
   if (!ipCheck.ok || !emailCheck.ok) {
-    redirect(`/${locale}/signin?error=rate${emailParam}`);
+    return { redirectTo: `/${locale}/signin?error=rate${emailParam}` };
   }
 
   try {
@@ -74,11 +80,11 @@ export async function authenticate(formData: FormData) {
             }
             await recordAudit(unverifiedUserId, "auth.verify_email_resent", `User:${email}`, { ip });
           });
-          redirect(`/${locale}/check-email?verify=1`);
+          return { redirectTo: `/${locale}/check-email?verify=1` };
         }
       }
       await recordAudit(email || "anonymous", "auth.signin_failed", `User:${email}`, { ip });
-      redirect(`/${locale}/signin?error=1${emailParam}`);
+      return { redirectTo: `/${locale}/signin?error=1${emailParam}` };
     }
     throw error;
   }
@@ -98,14 +104,13 @@ export async function authenticate(formData: FormData) {
       resetUrl: `${appUrl()}/${locale}/forgot-password`,
     });
   }
-  // Outside the try: redirect() throws NEXT_REDIRECT, which must not be caught.
-  redirect(landingForRole(user?.role, locale));
+  return { redirectTo: landingForRole(user?.role, locale) };
 }
 
 // Magic-link sign-in: user submits email, we email them a one-tap link.
 // We always redirect to /check-email, regardless of whether the email
 // matched a real account, to avoid account enumeration.
-export async function requestMagicLink(formData: FormData) {
+export async function requestMagicLink(formData: FormData): Promise<{ redirectTo: string }> {
   const locale = String(formData.get("locale") || "en");
   const email = String(formData.get("email") || "")
     .toLowerCase()
@@ -117,11 +122,11 @@ export async function requestMagicLink(formData: FormData) {
     authLimiter.check(`magic-link:email:${email}`),
   ]);
   if (!ipCheck.ok || !emailCheck.ok) {
-    redirect(`/${locale}/signin?error=rate`);
+    return { redirectTo: `/${locale}/signin?error=rate` };
   }
 
   if (!email) {
-    redirect(`/${locale}/check-email`);
+    return { redirectTo: `/${locale}/check-email` };
   }
 
   const user = await prisma.user.findUnique({
@@ -166,7 +171,7 @@ export async function requestMagicLink(formData: FormData) {
     });
   }
 
-  redirect(`/${locale}/check-email`);
+  return { redirectTo: `/${locale}/check-email` };
 }
 
 export async function logout(formData: FormData) {

@@ -992,6 +992,7 @@
     "magicLinkTitle": "Logga in med länk",
     "magicLinkLead": "Vi skickar en inloggningslänk via e-post.",
     "magicLinkButton": "Skicka inloggningslänk",
+    "magicLinkSending": "Skickar…",
     "checkTitle": "Kolla din inkorg",
     "checkLead": "Om e-postadressen är registrerad har vi precis skickat en länk. Den går ut om 15 minuter.",
     "checkVerifyTitle": "Bekräfta din e-post för att logga in",

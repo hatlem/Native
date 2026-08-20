@@ -3,10 +3,9 @@ import { redirect } from "next/navigation";
 import { auth } from "@/auth";
 import { Link } from "@/i18n/navigation";
 import { landingForRole } from "@/lib/roles";
-import { authenticate, requestMagicLink } from "@/app/auth-actions";
 import { LandingShell } from "@/app/landing-shell";
-import { SubmitButton } from "@/components";
 import { DemoChips, type DemoAccount } from "./demo-chips";
+import { PasswordSignInForm, MagicLinkForm } from "./signin-forms";
 import { withSafeEmails } from "@/components/safe-email";
 
 export const dynamic = "force-dynamic";
@@ -72,34 +71,16 @@ export default async function SignInPage({
             </div>
           ) : null}
 
-          <form action={authenticate} noValidate>
-            <input type="hidden" name="locale" value={locale} />
-            <div className="field">
-              <label htmlFor="email">{t("email")}</label>
-              <input
-                id="email"
-                name="email"
-                type="email"
-                autoComplete="email"
-                autoFocus
-                required
-                defaultValue={initialEmail}
-              />
-            </div>
-            <div className="field">
-              <label htmlFor="password">{t("password")}</label>
-              <input
-                id="password"
-                name="password"
-                type="password"
-                autoComplete="current-password"
-                required
-              />
-            </div>
-            <div className="actions">
-              <SubmitButton label={t("submit")} pendingLabel={t("signingIn")} />
-            </div>
-          </form>
+          <PasswordSignInForm
+            locale={locale}
+            initialEmail={initialEmail}
+            labels={{
+              email: t("email"),
+              password: t("password"),
+              submit: t("submit"),
+              signingIn: t("signingIn"),
+            }}
+          />
 
           <div className="alt" style={{ marginTop: 8 }}>
             <Link href="/forgot-password">{t("forgotLink")}</Link>
@@ -114,18 +95,14 @@ export default async function SignInPage({
             <p>{t("magicLinkLead")}</p>
           </div>
 
-          <form action={requestMagicLink} noValidate>
-            <input type="hidden" name="locale" value={locale} />
-            <div className="field">
-              <label htmlFor="magic-email">{t("email")}</label>
-              <input id="magic-email" name="email" type="email" autoComplete="email" required />
-            </div>
-            <div className="actions">
-              <button type="submit" className="btn primary block">
-                {t("magicLinkButton")}
-              </button>
-            </div>
-          </form>
+          <MagicLinkForm
+            locale={locale}
+            labels={{
+              email: t("email"),
+              button: t("magicLinkButton"),
+              sending: t("magicLinkSending"),
+            }}
+          />
 
           {/* Demo accounts are seeded with known-weak passwords; only expose
               the chip helper outside production so credential-stuffing the

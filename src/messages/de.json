@@ -1117,6 +1117,7 @@
     "magicLinkTitle": "Mit Link anmelden",
     "magicLinkLead": "Wir senden Ihnen einen Anmeldelink per E-Mail.",
     "magicLinkButton": "Anmeldelink senden",
+    "magicLinkSending": "Wird gesendet…",
     "checkTitle": "Posteingang prüfen",
     "checkLead": "Wenn diese E-Mail registriert ist, haben wir gerade einen Link gesendet. Er läuft in 15 Minuten ab.",
     "checkVerifyTitle": "E-Mail-Adresse bestätigen, um sich anzumelden",

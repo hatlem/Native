@@ -1117,6 +1117,7 @@
     "magicLinkTitle": "Kirjaudu linkillä",
     "magicLinkLead": "Lähetämme sähköpostiisi kertakäyttöisen kirjautumislinkin.",
     "magicLinkButton": "Lähetä kirjautumislinkki",
+    "magicLinkSending": "Lähetetään…",
     "checkTitle": "Tarkista sähköpostisi",
     "checkLead": "Jos osoite on rekisteröity, lähetimme juuri linkin. Se vanhenee 15 minuutissa.",
     "checkVerifyTitle": "Vahvista sähköpostiosoitteesi kirjautuaksesi sisään",

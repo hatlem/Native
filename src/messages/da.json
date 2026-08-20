@@ -992,6 +992,7 @@
     "magicLinkTitle": "Log ind med link",
     "magicLinkLead": "Vi sender dig et login-link på e-mail.",
     "magicLinkButton": "Send login-link",
+    "magicLinkSending": "Sender…",
     "checkTitle": "Tjek din indbakke",
     "checkLead": "Hvis e-mailen er registreret, har vi netop sendt et link. Det udløber om 15 minutter.",
     "checkVerifyTitle": "Bekræft din e-mail for at logge ind",
