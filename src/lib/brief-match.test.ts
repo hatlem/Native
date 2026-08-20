@@ -168,6 +168,21 @@ test("extractFacets recognizes aquaculture/seafood/maritime terms multilingually
   assert.ok(extractFacets("reaching maritime and salmon farming buyers").industries.includes("aquaculture"));
 });
 
+test("extractFacets does not let a pure transport/maritime-logistics brief also match aquaculture", () => {
+  // "maritime" is ambiguous between transport (shipping/maritime logistics)
+  // and aquaculture (fish farming) — transport already owns it in
+  // INDUSTRY_TERMS, so the aquaculture entry (sourced wholesale from the
+  // search-synonyms seafood/maritime group) must not also claim it. A brief
+  // about fleet/shipping/maritime logistics should surface transport only.
+  const f1 = extractFacets("fleet managers in shipping and maritime logistics");
+  assert.ok(f1.industries.includes("transport"));
+  assert.ok(!f1.industries.includes("aquaculture"));
+
+  const f2 = extractFacets("We want to reach maritime transport and logistics buyers");
+  assert.ok(f2.industries.includes("transport"));
+  assert.ok(!f2.industries.includes("aquaculture"));
+});
+
 test("scoreTitle surfaces a salmon/aquaculture trade title on an English-only aquaculture brief", () => {
   const f = extractFacets("We want to reach the aquaculture industry in Norway");
   // Modeled on the real salmon-business-no catalog row: vertical/audience

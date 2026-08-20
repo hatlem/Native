@@ -93,7 +93,18 @@ const INDUSTRY_TERMS: Record<string, string[]> = {
   // the two taxonomies never drift apart: a buyer who only says "aquaculture"
   // (English) still resolves to the same industry as one who says "havbruk"
   // or "sjømat", and both surface titles carrying the Norwegian keywords.
-  aquaculture: expandTerm("aquaculture"),
+  //
+  // "maritim"/"maritime" are filtered back out here: they're ambiguous
+  // between transport (shipping/maritime logistics) and aquaculture (fish
+  // farming), and `transport` above already owns them. Without this filter
+  // a pure transport brief ("maritime logistics") would also surface
+  // fish-farming trade press. Filtered at this call site — not in
+  // search-synonyms.ts itself — because catalog-search.ts consumes the same
+  // shared group and legitimately wants "maritime" to resolve to the
+  // seafood/aquaculture titles when a buyer searches for it directly.
+  aquaculture: expandTerm("aquaculture").filter(
+    (t) => t !== "maritim" && t !== "maritime",
+  ),
   tech: ["tech", "technology", "software", "saas", "it", "digital", "teknologi", "ohjelmisto"],
   marketing: ["marketing", "advertising", "media", "agency", "reklame", "markedsføring", "marknadsföring", "werbung", "markkinointi"],
   retail: ["retail", "ecommerce", "e-commerce", "shop", "handel", "varehandel", "detaljhandel", "einzelhandel", "vähittäiskauppa"],
