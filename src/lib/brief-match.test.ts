@@ -153,6 +153,37 @@ test("matchTitles still matches on audience alone when the brief has no topical 
   assert.equal(ranked[0].title.id, "biz");
 });
 
+// ---------- Aquaculture/seafood/maritime industry (search-synonyms consult) ----------
+
+test("extractFacets recognizes the aquaculture industry from an English-only brief", () => {
+  // No "salmon"/"havbruk" mentioned — just the English industry name — must
+  // still resolve to the aquaculture industry key.
+  const f = extractFacets("We want to reach the aquaculture industry in Norway");
+  assert.ok(f.industries.includes("aquaculture"));
+});
+
+test("extractFacets recognizes aquaculture/seafood/maritime terms multilingually via the shared synonym groups", () => {
+  assert.ok(extractFacets("vi selger til havbruksnæringen").industries.includes("aquaculture"));
+  assert.ok(extractFacets("targeting the seafood and fisheries sector").industries.includes("aquaculture"));
+  assert.ok(extractFacets("reaching maritime and salmon farming buyers").industries.includes("aquaculture"));
+});
+
+test("scoreTitle surfaces a salmon/aquaculture trade title on an English-only aquaculture brief", () => {
+  const f = extractFacets("We want to reach the aquaculture industry in Norway");
+  // Modeled on the real salmon-business-no catalog row: vertical/audience
+  // carry "Maritime"/"seafood industry", keywords carry the Norwegian terms —
+  // none of which contain the English word "aquaculture" itself.
+  const salmonBusiness = title({
+    id: "salmon-business-no",
+    vertical: "B2B – Maritime",
+    audience: "Maritime/seafood industry",
+    keywords: ["akvakultur", "oppdrett", "havbruk", "sjømat", "salmon", "laks"],
+  });
+  const { score, reasons } = scoreTitle(salmonBusiness, f);
+  assert.ok(score > 0, "aquaculture brief should match the salmon/seafood title");
+  assert.ok(reasons.includes("aquaculture"));
+});
+
 // ---------- Structured (keywords[]/aliases[]/description) fields ----------
 
 test("scoreTitle picks up keywords[]/aliases[]/description and outranks a tags-only match", () => {

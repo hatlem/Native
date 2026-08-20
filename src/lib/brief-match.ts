@@ -11,6 +11,8 @@
 // (brief-match-llm.ts) produces the same BriefFacets shape and is merged in
 // before scoring.
 
+import { expandTerm } from "@/lib/search-synonyms";
+
 export type AudienceType = "B2B" | "B2C";
 export type GeoScope = "National" | "Regional" | "Local" | "International";
 
@@ -87,6 +89,11 @@ const INDUSTRY_TERMS: Record<string, string[]> = {
   health: ["health", "healthcare", "medical", "pharma", "pharmaceutical", "nurse", "nurses", "doctor", "helse", "sykepleier", "lege", "sundhed", "gesundheit", "terveys", "hälsa"],
   fitness: ["fitness", "training", "workout", "gym", "trening", "träning", "træning", "kunto"],
   agriculture: ["agriculture", "farming", "farmer", "farmers", "landbruk", "gård", "lantbruk", "bonde", "landwirtschaft", "maatalous"],
+  // Sourced from search-synonyms.ts's aquaculture/seafood/maritime group so
+  // the two taxonomies never drift apart: a buyer who only says "aquaculture"
+  // (English) still resolves to the same industry as one who says "havbruk"
+  // or "sjømat", and both surface titles carrying the Norwegian keywords.
+  aquaculture: expandTerm("aquaculture"),
   tech: ["tech", "technology", "software", "saas", "it", "digital", "teknologi", "ohjelmisto"],
   marketing: ["marketing", "advertising", "media", "agency", "reklame", "markedsføring", "marknadsföring", "werbung", "markkinointi"],
   retail: ["retail", "ecommerce", "e-commerce", "shop", "handel", "varehandel", "detaljhandel", "einzelhandel", "vähittäiskauppa"],
