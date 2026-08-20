@@ -1,6 +1,19 @@
 {
   "common": {
-    "appName": "NativeSpin"
+    "appName": "NativeSpin",
+    "feedbackWidget": {
+      "buttonTitle": "Send tilbakemelding",
+      "title": "Send tilbakemelding",
+      "close": "Lukk",
+      "typeLabel": "Type",
+      "typeFeedback": "Tilbakemelding",
+      "typeBug": "Feil",
+      "placeholder": "Hva har du på hjertet?",
+      "sendFeedback": "Send",
+      "sending": "Sender …",
+      "successMessage": "Takk — vi har mottatt den.",
+      "errorFailed": "Kunne ikke sende. Prøv igjen."
+    }
   },
   "nav": {
     "home": "Hjem",

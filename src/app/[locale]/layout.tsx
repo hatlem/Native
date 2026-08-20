@@ -16,7 +16,7 @@ import { GtmScripts, GtmNoscript } from "@/app/gtm";
 import { NavShell } from "@/app/nav-shell";
 import { PublicHeader } from "@/app/public-header";
 import { BrandWordmark } from "@/app/brand";
-import { MailLink } from "@/components";
+import { MailLink, FeedbackWidget } from "@/components";
 import {
   audienceFor,
   navItemsFor,
@@ -267,6 +267,8 @@ export default async function LocaleLayout({
               </div>
             </div>
           </footer>
+
+          <FeedbackWidget />
         </NextIntlClientProvider>
       </body>
     </html>

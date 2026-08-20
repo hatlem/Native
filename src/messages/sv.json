@@ -1,6 +1,19 @@
 {
   "common": {
-    "appName": "NativeSpin"
+    "appName": "NativeSpin",
+    "feedbackWidget": {
+      "buttonTitle": "Skicka feedback",
+      "title": "Skicka feedback",
+      "close": "Stäng",
+      "typeLabel": "Typ",
+      "typeFeedback": "Feedback",
+      "typeBug": "Bugg",
+      "placeholder": "Vad har du på hjärtat?",
+      "sendFeedback": "Skicka",
+      "sending": "Skickar …",
+      "successMessage": "Tack — vi har tagit emot den.",
+      "errorFailed": "Kunde inte skicka. Försök igen."
+    }
   },
   "nav": {
     "home": "Hem",

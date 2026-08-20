@@ -7250,3 +7250,102 @@ footer a:hover {
     width: auto;
   }
 }
+
+/* Feedback widget — floating trigger + modal, reachable from every page. */
+.feedback-fab {
+  position: fixed;
+  right: 20px;
+  bottom: 20px;
+  z-index: 90;
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  border-radius: 999px;
+  background: var(--surface);
+  color: var(--text);
+  border: 1px solid var(--border-strong);
+  box-shadow: var(--shadow-lg);
+  cursor: pointer;
+  transition:
+    background var(--t-fast),
+    transform var(--t-fast);
+}
+
+.feedback-fab:hover {
+  background: var(--surface-2);
+  transform: translateY(-1px);
+}
+
+.feedback-overlay {
+  place-items: flex-end;
+  padding: 0 20px 84px 0;
+}
+
+.feedback-panel {
+  width: min(380px, 90vw);
+  padding: 18px 20px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.feedback-panel-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.feedback-panel-head h2 {
+  font-size: 1rem;
+  margin: 0;
+}
+
+.feedback-panel-body {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.feedback-panel-body label {
+  font-size: 0.8rem;
+  color: var(--muted);
+  font-weight: 580;
+}
+
+.feedback-panel-body textarea {
+  resize: vertical;
+  min-height: 96px;
+}
+
+.feedback-panel-actions {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.feedback-error {
+  color: var(--danger);
+  font-size: 0.85rem;
+  margin: 0;
+}
+
+.feedback-success {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  align-items: flex-start;
+}
+
+.feedback-success p {
+  margin: 0;
+}
+
+@media (max-width: 480px) {
+  .feedback-overlay {
+    padding: 0 12px 76px;
+  }
+  .feedback-panel {
+    width: 100%;
+  }
+}

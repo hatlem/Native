@@ -1,6 +1,19 @@
 {
   "common": {
-    "appName": "NativeSpin"
+    "appName": "NativeSpin",
+    "feedbackWidget": {
+      "buttonTitle": "Feedback senden",
+      "title": "Feedback senden",
+      "close": "Schließen",
+      "typeLabel": "Typ",
+      "typeFeedback": "Feedback",
+      "typeBug": "Fehler",
+      "placeholder": "Was möchten Sie uns mitteilen?",
+      "sendFeedback": "Senden",
+      "sending": "Wird gesendet …",
+      "successMessage": "Danke — wir haben es erhalten.",
+      "errorFailed": "Senden fehlgeschlagen. Bitte versuchen Sie es erneut."
+    }
   },
   "nav": {
     "home": "Start",
