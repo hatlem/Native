@@ -58,3 +58,4 @@ docs/outreach-sources/**/*.zip
 docs/outreach-sources/_dl-*/
 .superpowers/
 .worktrees/
+.workflow-reports/
