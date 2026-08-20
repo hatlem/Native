@@ -933,7 +933,7 @@
     "resolveRemove": "Remove placeholder",
     "resolveFrom": "from",
     "salesContactMissing": "No contact on file",
-    "costVsSell": "Cost {cost} · Customer pays {sell}",
+    "costVsSell": "Bought for {cost} — customer pays {sell}",
     "programme": {
       "title": "{name} — wave {n} of {of}",
       "spacing": "{weeks} weeks apart",

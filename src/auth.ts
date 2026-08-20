@@ -2,6 +2,7 @@ import NextAuth from "next-auth";
 import Credentials from "next-auth/providers/credentials";
 import { headers } from "next/headers";
 import bcrypt from "bcryptjs";
+import type { UserRole } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
 import { assertSecret } from "@/lib/security";
 import { authLimiter } from "@/lib/rate-limit";
@@ -119,7 +120,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
       if (user) {
         const u = user as {
           id: string;
-          role?: string;
+          role?: UserRole;
           orgId?: string | null;
           orgType?: string | null;
         };
@@ -133,7 +134,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
     session({ session, token }) {
       if (session.user) {
         session.user.id = (token.uid as string) ?? "";
-        session.user.role = (token.role as string) ?? "BUYER";
+        session.user.role = (token.role as UserRole) ?? "BUYER";
         session.user.orgId = (token.orgId as string | null) ?? null;
         session.user.orgType = (token.orgType as string | null) ?? null;
       }

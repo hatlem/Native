@@ -7,6 +7,7 @@
 // the resetPassword action so the semantics are testable against a real
 // database without a request scope.
 
+import type { UserRole } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
 import { hashToken } from "@/lib/tokens";
 
@@ -14,7 +15,7 @@ export type ConsumedMagicLinkUser = {
   id: string;
   email: string;
   name: string | null;
-  role: string;
+  role: UserRole;
   orgId: string | null;
   orgType: string | null;
 };
