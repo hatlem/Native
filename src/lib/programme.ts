@@ -16,7 +16,7 @@ export * from "@/lib/programme-cadence";
 // ---------- DB: create / load / due ----------
 
 export class ProgrammeError extends Error {
-  constructor(public code: "already-in-programme" | "not-found" | "empty") {
+  constructor(public code: "already-in-programme" | "not-found" | "empty" | "cross-org") {
     super(`programme:${code}`);
     this.name = "ProgrammeError";
   }
@@ -397,7 +397,19 @@ export async function findDueAutoSendWaves(now: Date): Promise<DueWave[]> {
   return findDueWavesWhere({ autoSendEnabled: true }, now, { requirePreviousSubmitted: true });
 }
 
+// Defense-in-depth: linkWaveArticleAction already rejects a cross-org
+// articleId before calling this, but the check lives here too so a future
+// caller can't reopen a cross-tenant article link by skipping the action's
+// own guard (or by a race between that guard and this write).
 export async function linkWaveArticle(listId: string, articleId: string): Promise<void> {
+  const [list, article] = await Promise.all([
+    prisma.savedList.findUnique({ where: { id: listId }, select: { organizationId: true } }),
+    prisma.article.findUnique({ where: { id: articleId }, select: { organizationId: true } }),
+  ]);
+  if (!list) throw new ProgrammeError("not-found");
+  if (!article || article.organizationId !== list.organizationId) {
+    throw new ProgrammeError("cross-org");
+  }
   await prisma.savedList.updateMany({
     where: { id: listId },
     data: { articleId },

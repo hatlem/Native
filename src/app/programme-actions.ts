@@ -122,7 +122,18 @@ export async function linkWaveArticleAction(formData: FormData) {
     select: { organizationId: true },
   });
   if (!article || article.organizationId !== list.organizationId) redirect(`/${locale}/plan`);
-  await linkWaveArticle(list.id, articleId);
+  try {
+    await linkWaveArticle(list.id, articleId);
+  } catch (e) {
+    // Unreachable in normal operation — this function's own check above
+    // already agrees with linkWaveArticle's — but a race (the article gets
+    // deleted between the two checks) now lands here instead of a 500.
+    if (e instanceof ProgrammeError) {
+      console.warn("programme.wave_article_link.blocked", { reason: e.code, listId: list.id });
+      redirect(`/${locale}/plan`);
+    }
+    throw e;
+  }
   await recordAudit(scope.userId ?? null, "programme.wave_article_link", `SavedList:${list.id}`, { articleId });
   redirect(`/${locale}/plan`);
 }
