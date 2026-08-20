@@ -932,6 +932,7 @@
     "resolveTitlesFirst": "{count, plural, =1 {1 Platzierung benötigt} other {# Platzierungen benötigen}} ein konkretes Produkt, bevor Sie ein Angebot erstellen können.",
     "resolveRemove": "Platzhalter entfernen",
     "resolveFrom": "ab",
+    "salesContactMissing": "Kein Kontakt hinterlegt",
     "costVsSell": "Eingekauft für {cost} — Kunde zahlt {sell}",
     "programme": {
       "title": "{name} – Welle {n} von {of}",

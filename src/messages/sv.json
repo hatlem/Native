@@ -807,6 +807,7 @@
     "resolveTitlesFirst": "{count, plural, =1 {1 placering behöver} other {# placeringar behöver}} en konkret produkt innan du kan offerera.",
     "resolveRemove": "Ta bort platshållare",
     "resolveFrom": "från",
+    "salesContactMissing": "Ingen kontakt registrerad",
     "costVsSell": "Inköpt för {cost} — kund betalar {sell}",
     "programme": {
       "title": "{name} – omgång {n} av {of}",

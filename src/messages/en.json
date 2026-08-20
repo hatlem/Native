@@ -932,6 +932,7 @@
     "resolveTitlesFirst": "{count, plural, =1 {1 placement needs} other {# placements need}} a concrete product before you can quote.",
     "resolveRemove": "Remove placeholder",
     "resolveFrom": "from",
+    "salesContactMissing": "No contact on file",
     "costVsSell": "Cost {cost} · Customer pays {sell}",
     "programme": {
       "title": "{name} — wave {n} of {of}",

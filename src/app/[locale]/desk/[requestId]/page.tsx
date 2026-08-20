@@ -62,6 +62,29 @@ export default async function DeskRequestPage({
   });
   const byId = new Map(products.map((p) => [p.id, p]));
 
+  // Primary sales contact per title, for the resolve/quote line cards below —
+  // the desk works this page to decide what to book, and needs the same
+  // "who do I call" answer that currently only lives on /desk/titles/[id].
+  // One SalesContact can be primary per title (SalesContactTitle.isPrimary);
+  // titleIds is built below, so gather the set from both resolved products
+  // and unresolved placeholders up front.
+  const allTitleIds = [
+    ...new Set([
+      ...products.map((p) => p.titleId).filter((id): id is string => !!id),
+      ...request.plan.items.map((i) => i.titleId).filter((id): id is string => !!id),
+    ]),
+  ];
+  const primaryContacts = allTitleIds.length
+    ? await prisma.salesContactTitle.findMany({
+        where: { titleId: { in: allTitleIds }, isPrimary: true },
+        select: {
+          titleId: true,
+          salesContact: { select: { name: true, email: true, phone: true } },
+        },
+      })
+    : [];
+  const contactByTitleId = new Map(primaryContacts.map((c) => [c.titleId, c.salesContact]));
+
   const titleIds = request.plan.items
     .map((i) => i.titleId)
     .filter((id): id is string => !!id);
@@ -124,6 +147,20 @@ export default async function DeskRequestPage({
   ).length;
 
   const quote = request.quotes[0];
+
+  // Who to actually reach out to for this title — the answer used to live
+  // only on /desk/titles/[id], several clicks away from where the desk is
+  // deciding what to book.
+  function ContactLine({ titleId }: { titleId: string | null | undefined }) {
+    const contact = titleId ? contactByTitleId.get(titleId) : undefined;
+    if (!contact) return <p className="muted small">{t("salesContactMissing")}</p>;
+    return (
+      <p className="muted small">
+        {contact.name} · <a href={`mailto:${contact.email}`}>{contact.email}</a>
+        {contact.phone ? ` · ${contact.phone}` : ""}
+      </p>
+    );
+  }
 
   return (
     <>
@@ -193,6 +230,7 @@ export default async function DeskRequestPage({
                   <h3>{titleName}</h3>
                   <p className="muted">{tr("titlePlaceholderDesc")}</p>
                   <span className="tag">× {item.quantity}</span>
+                  <ContactLine titleId={item.titleId} />
                   {placements.length > 0 ? (
                     <form action={resolvePlanTitleItem} className="resolve-line">
                       <input type="hidden" name="locale" value={locale} />
@@ -235,6 +273,7 @@ export default async function DeskRequestPage({
                 <h3>{p?.title.name ?? item.productId}</h3>
                 <p className="muted">{p ? tType(p.type) : ""}</p>
                 <span className="tag">× {item.quantity}</span>
+                <ContactLine titleId={p?.titleId} />
               </article>
             );
           })}
