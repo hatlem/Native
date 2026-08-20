@@ -2454,6 +2454,25 @@ now has `articleTitle` (a `SavedList.article?.title` lookup at the call site) �
 read each caller and adjust the `select`/data shape it passes in, mirroring
 whatever it previously did for `articleAngle`.
 
+`src/lib/commerce/submit-rfq.ts` is not just a caller here — it OWNS the
+`RfqSourceList` type (`articleAngle: string | null;` in its own type
+definition) and the `RFQ_LIST_INCLUDE` Prisma include used to hydrate it for
+the auto-send sweep. Change the type field to `articleTitle: string | null;`,
+add `article: { select: { title: true } }` to `RFQ_LIST_INCLUDE`, and update
+the `withWaveAngle(brief.text, list)` call site inside `submitListAsRfq` to
+read `list.article?.title` when building the object (or, if `RFQ_LIST_INCLUDE`
+now shapes the field as nested `article.title` rather than a flat
+`articleTitle`, adjust `RfqSourceList`'s type to match and flatten it once at
+the call site — whichever keeps `withWaveAngle`'s own signature, from Step 4
+above, satisfied without changes). This single fix is what resolves the
+`RfqSourceList`-shaped typecheck errors in `src/app/checkout-actions.ts`,
+`src/lib/commerce/checkout.it.test.ts`, and `src/lib/programme-autosend.ts` —
+none of those three files reference `articleAngle` directly; they all fail
+because they construct or pass through an `RfqSourceList`-shaped value that
+`submit-rfq.ts` still typed with the old field. Re-typecheck all three after
+this change (folded into Step 7 below) rather than treating them as separate
+work.
+
 - [ ] **Step 5: `programme-actions.ts` — replace `updateWaveAngle`**
 
 ```ts
@@ -2499,16 +2518,46 @@ not back to `/plan`. Task 14's "create" entry point sends the buyer to the new
 article's own page to write/upload, then they come back to `/plan` and link it —
 covered in Task 14's design below.)
 
-- [ ] **Step 6: Typecheck**
+- [ ] **Step 6: Fix the client-share page's `articleAngle` read (found during
+      Task 9's review — a concurrent feature, not originally in this plan's
+      scope, that reads the same doomed column)**
+
+`src/lib/list-share.ts`'s `SHARED_LIST_SELECT` (an explicit, security-motivated
+`select` for the unauthenticated `/share/[token]` page — never widen it to an
+`include`) has `articleAngle: true,`. Replace it with the article's title:
+```ts
+articleId: true,
+article: { select: { title: true } },
+```
+Then in `src/app/[locale]/share/[token]/page.tsx`, replace:
+```tsx
+{list.articleAngle ? ` · ${list.articleAngle}` : ""}
+```
+with:
+```tsx
+{list.article?.title ? ` · ${list.article.title}` : ""}
+```
+Grep `src/lib/list-share.it.test.ts` and `src/app/share-actions.ts`/
+`src/app/list-actions.ts` for any other `articleAngle` reference (none are
+expected — confirmed clean during Task 9's review — but confirm rather than
+assume, since this whole area was outside the plan's original scan).
+
+- [ ] **Step 7: Typecheck**
 
 Run: `pnpm typecheck 2>&1 | grep -A2 "programme"`
 Expected: errors remain in `PlanProgramme.tsx` (Task 14) and `home/page.tsx`
 (already updated in Task 12, should now be clean) — confirm no OTHER files error.
 
-- [ ] **Step 7: Commit**
+Also run: `pnpm typecheck 2>&1 | grep -E "list-share|share/\[token\]|checkout-actions|checkout\.it\.test|programme-autosend"`
+Expected: clean (these were the residual `articleAngle`-shaped errors Task 9's
+review found still open across the codebase; this task's Step 4 fix to
+`submit-rfq.ts`'s `RfqSourceList` type and this Step 6 fix together should
+close every one of them).
+
+- [ ] **Step 8: Commit**
 
 ```bash
-git add src/lib/programme.ts src/app/programme-actions.ts
+git add src/lib/programme.ts src/app/programme-actions.ts src/lib/list-share.ts "src/app/[locale]/share/[token]/page.tsx"
 git commit -m "feat(programme): replace free-text article angle with real article linking"
 ```
 
@@ -2681,6 +2730,8 @@ git commit -m "feat(programme): wave article create/link/unlink UI"
 
 **Files:**
 - Modify: `src/messages/en.json`, `no.json`, `da.json`, `sv.json`, `fi.json`, `de.json`
+- Modify: `src/app/[locale]/articles/[articleId]/page.tsx` (two small follow-up
+  fixes from Task 11's review — Step 2b)
 
 **Interfaces:**
 - Produces: four new `articles` namespace keys, four new `plan.programme` keys,
@@ -2811,6 +2862,49 @@ German (`de.json`):
 "createArticleForWave": "Artikel erstellen"
 ```
 
+- [ ] **Step 2b: Remove the orphaned `linkedTo` key, and two small Task 11
+      follow-ups found during Task 11's review**
+
+`articles.linkedTo` (all six locale files) was only ever rendered by the
+single-placement paragraph that Task 11 removed — grep `src` to confirm zero
+remaining references, then delete the key from all six files.
+
+Task 11's review also found two small, non-blocking issues in
+`src/app/[locale]/articles/[articleId]/page.tsx` worth fixing here since this
+task is already touching that page's copy:
+
+1. **`specNotes` is fetched but never rendered.** The per-placement spec-check
+   block (around where `detailSpecFailed` is shown) has the failure reason
+   sitting unused in `p.specNotes`. Find:
+   ```tsx
+   {p.specPassed === true
+     ? ` ${t("detailSpecPassed")}`
+     : p.specPassed === false
+       ? ` ${t("detailSpecFailed")}`
+       : ` ${t("specNotChecked")}`}
+   ```
+   and add the reason after it, only when failed and notes exist:
+   ```tsx
+   {p.specPassed === true
+     ? ` ${t("detailSpecPassed")}`
+     : p.specPassed === false
+       ? ` ${t("detailSpecFailed")}${p.specNotes ? `: ${p.specNotes}` : ""}`
+       : ` ${t("specNotChecked")}`}
+   ```
+   No new locale key needed.
+
+2. **`badge-error` is not a class this codebase defines** — `globals.css` has
+   `.badge-neutral`/`.badge-info`/`.badge-success`/`.badge-warning`/
+   `.badge-danger`, no `.badge-error`. The retracted-placement badge silently
+   renders as an unstyled neutral badge. Find:
+   ```tsx
+   <span className="badge badge-error dotless">{t("placementRetracted")}</span>
+   ```
+   and change `badge-error` to `badge-danger`.
+
+Both are one-line changes in the same file; commit them alongside this task's
+locale files.
+
 - [ ] **Step 3: Run the locale parity test**
 
 Run: `pnpm exec tsx --test src/messages/locale-parity.test.ts`
@@ -2824,7 +2918,7 @@ labels, a different, narrower test. Use `locale-parity.test.ts` here.)
 - [ ] **Step 4: Commit**
 
 ```bash
-git add src/messages/*.json
+git add src/messages/*.json "src/app/[locale]/articles/[articleId]/page.tsx"
 git commit -m "feat(i18n): add locale copy for shared articles and wave linking"
 ```
 
