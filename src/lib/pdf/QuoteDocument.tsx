@@ -1,16 +1,22 @@
+import path from "node:path";
 import { Document, Page, View, Text, StyleSheet, Font } from "@react-pdf/renderer";
 import { formatMoney, intlLocale } from "@/lib/money";
 import type { QuotePdfData } from "./quote-pdf-data";
 
 // react-pdf's built-in Helvetica has no Nordic glyphs (æ/ø/å, etc.) — every
 // quote must render Norwegian text correctly, so we register a real
-// Unicode font instead of leaving that to the default.
+// Unicode font instead of leaving that to the default. Self-hosted from
+// public/fonts/ rather than fetched from Google's CDN at render time —
+// gstatic's per-version file hashes rotate and go stale (the original
+// hardcoded v13 URL 404'd in production), so PDF generation must not depend
+// on a live external fetch succeeding.
+const FONTS_DIR = path.join(process.cwd(), "public", "fonts");
 Font.register({
   family: "Inter",
   fonts: [
-    { src: "https://fonts.gstatic.com/s/inter/v13/UcC73FwrK3iLTeHuS_fvQtMwCp50KnMa1ZL7.ttf" },
+    { src: path.join(FONTS_DIR, "Inter-Regular.ttf") },
     {
-      src: "https://fonts.gstatic.com/s/inter/v13/UcC73FwrK3iLTeHuS_fvQtMwCp50KnMa2JL7.ttf",
+      src: path.join(FONTS_DIR, "Inter-Bold.ttf"),
       fontWeight: 700,
     },
   ],
