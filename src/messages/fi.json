@@ -1,6 +1,20 @@
 {
   "common": {
-    "appName": "NativeSpin"
+    "appName": "NativeSpin",
+    "feedback": {
+      "sendFeedback": "Lähetä palautetta",
+      "title": "Lähetä palautetta",
+      "typeLabel": "Tyyppi",
+      "typeFeedback": "Palaute",
+      "typeBug": "Virhe",
+      "placeholder": "Mitä haluat kertoa?",
+      "send": "Lähetä",
+      "sending": "Lähetetään…",
+      "thankYou": "Kiitos — saimme sen.",
+      "sendFailed": "Lähetys epäonnistui. Yritä uudelleen?",
+      "enterFeedback": "Kirjoita ensin jotain.",
+      "close": "Sulje"
+    }
   },
   "nav": {
     "home": "Etusivu",

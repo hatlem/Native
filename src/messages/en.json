@@ -1,6 +1,20 @@
 {
   "common": {
-    "appName": "NativeSpin"
+    "appName": "NativeSpin",
+    "feedback": {
+      "sendFeedback": "Send feedback",
+      "title": "Send feedback",
+      "typeLabel": "Type",
+      "typeFeedback": "Feedback",
+      "typeBug": "Bug",
+      "placeholder": "What's on your mind?",
+      "send": "Send",
+      "sending": "Sending…",
+      "thankYou": "Thanks — we got it.",
+      "sendFailed": "Couldn't send that. Try again?",
+      "enterFeedback": "Write something first.",
+      "close": "Close"
+    }
   },
   "nav": {
     "home": "Home",

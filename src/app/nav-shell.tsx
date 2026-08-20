@@ -4,6 +4,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Link, usePathname } from "@/i18n/navigation";
 import { BrandWordmark } from "@/app/brand";
 import { SafeEmail } from "@/components/safe-email";
+import { FeedbackWidget } from "@/components/feedback-widget";
 import type { NavItem } from "@/lib/nav";
 
 type PaletteSection = { section: string; items: NavItem[] };
@@ -184,6 +185,7 @@ export function NavShell({
                 <kbd>⌘K</kbd>
               </button>
             ) : null}
+            {signedIn ? <FeedbackWidget /> : null}
             {signedIn && user ? (
               <details
                 ref={userMenuRef}

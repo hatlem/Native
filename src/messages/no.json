@@ -1,6 +1,20 @@
 {
   "common": {
-    "appName": "NativeSpin"
+    "appName": "NativeSpin",
+    "feedback": {
+      "sendFeedback": "Send tilbakemelding",
+      "title": "Send tilbakemelding",
+      "typeLabel": "Type",
+      "typeFeedback": "Tilbakemelding",
+      "typeBug": "Feil",
+      "placeholder": "Hva har du på hjertet?",
+      "send": "Send",
+      "sending": "Sender…",
+      "thankYou": "Takk — vi har mottatt den.",
+      "sendFailed": "Klarte ikke å sende. Prøv igjen?",
+      "enterFeedback": "Skriv noe først.",
+      "close": "Lukk"
+    }
   },
   "nav": {
     "home": "Hjem",
