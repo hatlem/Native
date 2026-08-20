@@ -16,6 +16,7 @@ import { groupItemsByMarket } from "@/lib/quote-grouping";
 import { recordAudit } from "@/lib/audit";
 import { notifyDesk, notifyOrg, notifyPublisher } from "@/lib/notify";
 import { loadScope, canActOnOrg, canCommitOnOrg } from "@/lib/scope";
+import { generateQuotePdf as renderQuotePdf } from "@/lib/pdf/generate-quote-pdf";
 
 function str(formData: FormData, key: string): string {
   const v = formData.get(key);
@@ -43,19 +44,17 @@ export async function generateQuote(formData: FormData) {
     redirect(`/${locale}/desk/${requestId}`);
   }
 
-  // Every Title placeholder (productId null) must be resolved to a concrete
-  // product BEFORE a quote can be produced. Otherwise auto-quote would price
-  // only the product lines and silently drop the placement the buyer asked the
-  // desk to propose — it would vanish from the quote, order and invoice. Bounce
-  // the desk to resolve them first (the desk request page exposes a picker).
-  const unresolvedTitles = request.plan.items.filter((i) => !i.productId && i.titleId);
-  if (unresolvedTitles.length > 0) {
-    console.warn("quote.blocked", { reason: "unresolved-titles", requestId, count: unresolvedTitles.length });
+  // A still-unresolved Title placeholder (productId null) is priced as
+  // "mangler produkt" (missing product) — it stays on the request, visible
+  // and resolvable from the desk page, but is excluded from THIS quote
+  // rather than blocking it. Silently dropping it from the request would
+  // lose the placement; leaving it in Plan.items (untouched here) keeps it
+  // resolvable and quotable later. Only block when NOTHING is quotable yet.
+  const productItems = request.plan.items.filter((i) => i.productId);
+  if (productItems.length === 0) {
+    console.warn("quote.blocked", { reason: "nothing-resolved", requestId });
     redirect(`/${locale}/desk/${requestId}?error=unresolved-titles`);
   }
-
-  // All items are now product-backed (titles resolved); price them all.
-  const productItems = request.plan.items.filter((i) => i.productId);
   const products = await prisma.product.findMany({
     where: { id: { in: productItems.map((i) => i.productId as string) } },
     include: {
@@ -144,6 +143,34 @@ export async function generateQuote(formData: FormData) {
       .toISOString()
       .slice(0, 10)}.`,
     link: `/${locale}/requests/${request.id}`,
+  });
+
+  redirect(`/${locale}/desk/${requestId}`);
+}
+
+// Renders a new customer-safe PDF for an already-generated (frozen) Quote.
+// Desk-only. Never touches pricing — see generate-quote-pdf.ts.
+export async function generateQuotePdf(formData: FormData) {
+  const locale = str(formData, "locale") || "en";
+  const quoteId = str(formData, "quoteId");
+  const requestId = str(formData, "requestId");
+
+  const scope = await loadScope();
+  if (!scope.isDesk || !scope.userId) redirect(`/${locale}/signin`);
+
+  const doc = await renderQuotePdf({
+    quoteId,
+    locale,
+    generatedById: scope.userId,
+    preparedBy: {
+      name: scope.session?.user?.name ?? null,
+      email: scope.session?.user?.email ?? "desk@nativespin.com",
+    },
+  });
+
+  await recordAudit(scope.userId, "quote.pdf.generate", `Quote:${quoteId}`, {
+    documentId: doc.id,
+    version: doc.version,
   });
 
   redirect(`/${locale}/desk/${requestId}`);

@@ -30,9 +30,14 @@ export default async function DeskReportsPage({
   const to = await getTranslations({ locale, namespace: "order" });
   const td = await getTranslations({ locale, namespace: "desk" });
 
-  const [requestCount, orders, orderLines, markets, invoices] =
+  const [requestCount, quotedRequestCount, orders, orderLines, markets, invoices] =
     await Promise.all([
       prisma.request.count(),
+      // Requests that reached the quote stage at least once — a relational
+      // count (not `status: "QUOTED"`) so a request that later moved on to
+      // CLOSED without ordering still counts as having passed through
+      // "quoted" for the funnel below.
+      prisma.request.count({ where: { quotes: { some: {} } } }),
       prisma.order.findMany({
         select: {
           status: true,
@@ -190,6 +195,13 @@ export default async function DeskReportsPage({
         <div className="kpi">
           <div className="label">{t("requests")}</div>
           <div className="value">{requestCount}</div>
+        </div>
+        <div className="kpi">
+          <div className="label">{t("quoted")}</div>
+          <div className="value">{quotedRequestCount}</div>
+          <div className="delta">
+            {conversionPct(requestCount, quotedRequestCount)}% {t("quotedSub")}
+          </div>
         </div>
         <div className="kpi">
           <div className="label">{to("orders")}</div>

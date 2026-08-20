@@ -753,6 +753,7 @@ model User {
   metricsRequests        MetricsRequest[]   @relation("MetricsRequestCreator")
   favorites              Favorite[]
   favoriteLists          FavoriteList[]
+  quoteDocumentsGenerated QuoteDocument[]   @relation("QuoteDocumentGenerator")
 }
 
 // Super-admin emits these when activating a new publishing house in
@@ -1189,6 +1190,28 @@ model Quote {
 
   lines QuoteLine[]
   order Order?
+  documents QuoteDocument[]
+}
+
+// A generated customer-facing PDF for a Quote. The Quote's price data is
+// frozen at generateQuote time (QuoteLine.unitCost/lineTotal); a
+// QuoteDocument is a separate, append-only rendering of that frozen data —
+// regenerating never re-prices, it only re-renders (and bumps `version`) so
+// a desk user can hand out an updated-looking PDF (new date, fixed typo in
+// notes) without touching the commercial numbers the buyer already saw.
+model QuoteDocument {
+  id            String   @id @default(cuid())
+  quoteId       String
+  quote         Quote    @relation(fields: [quoteId], references: [id])
+  version       Int
+  locale        String
+  objectKey     String
+  generatedAt   DateTime @default(now())
+  generatedById String
+  generatedBy   User     @relation("QuoteDocumentGenerator", fields: [generatedById], references: [id])
+
+  @@unique([quoteId, version])
+  @@index([quoteId])
 }
 
 model QuoteLine {

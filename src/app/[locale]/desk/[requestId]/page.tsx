@@ -5,7 +5,7 @@ import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
 import { Link } from "@/i18n/navigation";
 import { formatMoney } from "@/lib/money";
-import { generateQuote } from "@/app/quote-actions";
+import { generateQuote, generateQuotePdf } from "@/app/quote-actions";
 import { resolvePlanTitleItem, removePlanTitleItem } from "@/app/desk-actions";
 import { loadPricingDefaults } from "@/lib/content-fee";
 import { productBand, unitRate } from "@/lib/pricing/display-price";
@@ -13,6 +13,8 @@ import { bandLabel } from "@/lib/pricing/bands";
 import { StatusBadge } from "@/app/status-badge";
 import { SubmitButton } from "@/components";
 import { canSeeCostVsSell } from "@/lib/roles";
+import { presignDownload } from "@/lib/storage/r2";
+import { intlLocale } from "@/lib/money";
 
 export const dynamic = "force-dynamic";
 
@@ -44,7 +46,11 @@ export default async function DeskRequestPage({
       plan: { include: { items: true } },
       quotes: {
         orderBy: { createdAt: "desc" },
-        include: { lines: true, order: true },
+        include: {
+          lines: true,
+          order: true,
+          documents: { orderBy: { version: "desc" } },
+        },
       },
     },
   });
@@ -145,8 +151,21 @@ export default async function DeskRequestPage({
   const unresolvedTitleCount = request.plan.items.filter(
     (i) => !i.productId && i.titleId,
   ).length;
+  const resolvedItemCount = request.plan.items.filter((i) => i.productId).length;
 
-  const quote = request.quotes[0];
+  // Pre-sign every quote document's download URL up front (server render,
+  // short-lived) — same pattern as RateCardsPanel.
+  const quotesWithDownloadUrls = await Promise.all(
+    request.quotes.map(async (q) => ({
+      ...q,
+      documents: await Promise.all(
+        q.documents.map(async (d) => ({
+          ...d,
+          url: await presignDownload({ key: d.objectKey }).catch(() => null),
+        })),
+      ),
+    })),
+  );
 
   // Who to actually reach out to for this title — the answer used to live
   // only on /desk/titles/[id], several clicks away from where the desk is
@@ -191,11 +210,15 @@ export default async function DeskRequestPage({
             <span className="muted small">{t("items")}</span>
             <span className="value">{request.plan.items.length}</span>
           </div>
-          {quote ? (
+          {quotesWithDownloadUrls.length === 1 ? (
             <div className="meta-row">
               <span className="muted small">{t("total")}</span>
               <span className="value">
-                {formatMoney(Number(quote.total), quote.currency, locale)}
+                {formatMoney(
+                  Number(quotesWithDownloadUrls[0].total),
+                  quotesWithDownloadUrls[0].currency,
+                  locale,
+                )}
               </span>
             </div>
           ) : null}
@@ -280,17 +303,24 @@ export default async function DeskRequestPage({
         </div>
       </section>
 
-      {!quote ? (
+      {quotesWithDownloadUrls.length === 0 ? (
         <section className="section">
           <div className="cta-block">
             <h2>{t("readyToQuoteTitle")}</h2>
-            {unresolvedTitleCount > 0 ? (
-              // Block quoting until every placeholder has a concrete product —
-              // otherwise the placement would be dropped from the quote/order.
+            {resolvedItemCount === 0 ? (
+              // Nothing quotable yet — every placement is still a placeholder.
               <p className="muted">{t("resolveTitlesFirst", { count: unresolvedTitleCount })}</p>
             ) : (
               <>
                 <p className="muted">{t("readyToQuoteBody")}</p>
+                {unresolvedTitleCount > 0 ? (
+                  <p className="muted small">
+                    {t("readyToQuotePartial", {
+                      priced: resolvedItemCount,
+                      pending: unresolvedTitleCount,
+                    })}
+                  </p>
+                ) : null}
                 <form action={generateQuote}>
                   <input type="hidden" name="locale" value={locale} />
                   <input type="hidden" name="requestId" value={request.id} />
@@ -305,88 +335,131 @@ export default async function DeskRequestPage({
           </div>
         </section>
       ) : (
-        <section className="section">
-          <div className="section-head">
-            <div>
-              <span className="eyebrow">{t("quoteEyebrow")}</span>
-              <h2>{t("quote")}</h2>
+        quotesWithDownloadUrls.map((quote) => (
+          <section className="section" key={quote.id}>
+            <div className="section-head">
+              <div>
+                <span className="eyebrow">{t("quoteEyebrow")}</span>
+                <h2>{t("pdfQuoteLabel", { currency: quote.currency })}</h2>
+              </div>
+              {quote.order ? (
+                <Link
+                  href={`/desk/orders/${quote.order.id}`}
+                  className="btn small secondary"
+                >
+                  {t("openOrder")} →
+                </Link>
+              ) : null}
             </div>
-            {quote.order ? (
-              <Link
-                href={`/desk/orders/${quote.order.id}`}
-                className="btn small secondary"
-              >
-                {t("openOrder")} →
-              </Link>
-            ) : null}
-          </div>
-          <article className="card quote-card">
-            <div className="quote-lines">
-              {quote.lines.map((l) => (
-                <Fragment key={l.id}>
-                  <div className="quote-line">
-                    <span>
-                      {l.description}{" "}
-                      <span className="muted">
-                        × {l.quantity} · margin {Number(l.marginPct)}%
+            <article className="card quote-card">
+              <div className="quote-lines">
+                {quote.lines.map((l) => (
+                  <Fragment key={l.id}>
+                    <div className="quote-line">
+                      <span>
+                        {l.description}{" "}
+                        <span className="muted">
+                          × {l.quantity} · margin {Number(l.marginPct)}%
+                        </span>
                       </span>
-                    </span>
-                    <span className="num">
-                      {formatMoney(Number(l.lineTotal), quote.currency, locale)}
-                    </span>
-                  </div>
-                  {isSuperadmin ? (
-                    <div className="muted small">
-                      {t("costVsSell", {
-                        cost: formatMoney(
-                          Number(l.unitCost) * l.quantity,
-                          quote.currency,
-                          locale,
-                        ),
-                        sell: formatMoney(Number(l.lineTotal), quote.currency, locale),
-                      })}
+                      <span className="num">
+                        {formatMoney(Number(l.lineTotal), quote.currency, locale)}
+                      </span>
                     </div>
-                  ) : null}
-                </Fragment>
-              ))}
-            </div>
-            <div className="quote-totals">
-              <div className="quote-row">
-                <span className="muted">{t("subtotal")}</span>
-                <span className="num">
-                  {formatMoney(Number(quote.subtotal), quote.currency, locale)}
-                </span>
+                    {isSuperadmin ? (
+                      <div className="muted small">
+                        {t("costVsSell", {
+                          cost: formatMoney(
+                            Number(l.unitCost) * l.quantity,
+                            quote.currency,
+                            locale,
+                          ),
+                          sell: formatMoney(Number(l.lineTotal), quote.currency, locale),
+                        })}
+                      </div>
+                    ) : null}
+                  </Fragment>
+                ))}
               </div>
-              <div className="quote-row">
-                <span className="muted">
-                  {t("vat")} ({Number(quote.vatPct)}%)
-                </span>
-                <span className="num">
-                  {formatMoney(
-                    Number(quote.total) - Number(quote.subtotal),
-                    quote.currency,
-                    locale,
-                  )}
-                </span>
+              <div className="quote-totals">
+                <div className="quote-row">
+                  <span className="muted">{t("subtotal")}</span>
+                  <span className="num">
+                    {formatMoney(Number(quote.subtotal), quote.currency, locale)}
+                  </span>
+                </div>
+                <div className="quote-row">
+                  <span className="muted">
+                    {t("vat")} ({Number(quote.vatPct)}%)
+                  </span>
+                  <span className="num">
+                    {formatMoney(
+                      Number(quote.total) - Number(quote.subtotal),
+                      quote.currency,
+                      locale,
+                    )}
+                  </span>
+                </div>
+                <div className="quote-row total">
+                  <span>{t("total")}</span>
+                  <span className="num">
+                    {formatMoney(Number(quote.total), quote.currency, locale)}
+                  </span>
+                </div>
               </div>
-              <div className="quote-row total">
-                <span>{t("total")}</span>
-                <span className="num">
-                  {formatMoney(Number(quote.total), quote.currency, locale)}
-                </span>
+              {quote.order ? (
+                <div className="banner-success" role="status">
+                  ✓ {t("acceptedOrder")}
+                </div>
+              ) : (
+                <div className="quote-cta">
+                  <span className="muted small">{t("awaiting")}</span>
+                </div>
+              )}
+              <div className="quote-pdf-section">
+                <h3>{t("pdfSection")}</h3>
+                {quote.documents.length === 0 ? (
+                  <p className="muted small">{t("pdfNone")}</p>
+                ) : (
+                  <ul className="quote-pdf-versions">
+                    {quote.documents.map((d) => (
+                      <li key={d.id}>
+                        {d.url ? (
+                          <a href={d.url} target="_blank" rel="noreferrer">
+                            {t("pdfVersionRow", {
+                              version: d.version,
+                              date: new Intl.DateTimeFormat(intlLocale(locale), {
+                                dateStyle: "medium",
+                                timeStyle: "short",
+                              }).format(d.generatedAt),
+                            })}
+                          </a>
+                        ) : (
+                          t("pdfVersionRow", {
+                            version: d.version,
+                            date: new Intl.DateTimeFormat(intlLocale(locale)).format(
+                              d.generatedAt,
+                            ),
+                          })
+                        )}
+                      </li>
+                    ))}
+                  </ul>
+                )}
+                <form action={generateQuotePdf}>
+                  <input type="hidden" name="locale" value={locale} />
+                  <input type="hidden" name="requestId" value={request.id} />
+                  <input type="hidden" name="quoteId" value={quote.id} />
+                  <SubmitButton
+                    label={t("pdfGenerate")}
+                    pendingLabel={t("pdfGenerating")}
+                    className="btn small"
+                  />
+                </form>
               </div>
-            </div>
-            {quote.order ? (
-              <div className="banner-success" role="status">
-                ✓ {t("acceptedOrder")}
-              </div>
-            ) : (
-              <div className="quote-cta">
-                <span className="muted small">{t("awaiting")}</span>
-              </div>
-            )}
-          </article>
-        </section>
+            </article>
+          </section>
+        ))
       )}
     </>
   );
