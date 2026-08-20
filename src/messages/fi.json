@@ -932,6 +932,7 @@
     "resolveTitlesFirst": "{count, plural, =1 {1 mainospaikka tarvitsee} other {# mainospaikkaa tarvitsee}} konkreettisen tuotteen ennen tarjousta.",
     "resolveRemove": "Poista paikkamerkki",
     "resolveFrom": "alkaen",
+    "costVsSell": "Ostettu hintaan {cost} — asiakas maksaa {sell}",
     "programme": {
       "title": "{name} – kierros {n}/{of}",
       "spacing": "{weeks} viikon välein",

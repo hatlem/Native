@@ -807,6 +807,7 @@
     "resolveTitlesFirst": "{count, plural, =1 {1 placering mangler} other {# placeringer mangler}} et konkret produkt, før du kan give tilbud.",
     "resolveRemove": "Fjern pladsholder",
     "resolveFrom": "fra",
+    "costVsSell": "Indkøbt for {cost} — kunden betaler {sell}",
     "programme": {
       "title": "{name} – runde {n} af {of}",
       "spacing": "{weeks} uger imellem",

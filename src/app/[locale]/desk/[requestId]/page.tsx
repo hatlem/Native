@@ -1,5 +1,7 @@
+import { Fragment } from "react";
 import { getTranslations } from "next-intl/server";
 import { notFound } from "next/navigation";
+import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
 import { Link } from "@/i18n/navigation";
 import { formatMoney } from "@/lib/money";
@@ -26,6 +28,13 @@ export default async function DeskRequestPage({
   const t = await getTranslations({ locale, namespace: "desk" });
   const tr = await getTranslations({ locale, namespace: "requests" });
   const tType = await getTranslations({ locale, namespace: "productType" });
+  // Cost-vs-sell (unitCost/margin) is publisher-sensitive commercial data —
+  // gated to SUPERADMIN only. This page otherwise stays open to any desk
+  // role, so we scope the check to the one span that needs it below rather
+  // than redirecting the whole page (see desk/titles/[id]/page.tsx for the
+  // full-page variant of this same role check).
+  const session = await auth();
+  const isSuperadmin = session?.user?.role === "SUPERADMIN";
 
   const request = await prisma.request.findUnique({
     where: { id: requestId },
@@ -274,17 +283,31 @@ export default async function DeskRequestPage({
           <article className="card quote-card">
             <div className="quote-lines">
               {quote.lines.map((l) => (
-                <div key={l.id} className="quote-line">
-                  <span>
-                    {l.description}{" "}
-                    <span className="muted">
-                      × {l.quantity} · margin {Number(l.marginPct)}%
+                <Fragment key={l.id}>
+                  <div className="quote-line">
+                    <span>
+                      {l.description}{" "}
+                      <span className="muted">
+                        × {l.quantity} · margin {Number(l.marginPct)}%
+                      </span>
                     </span>
-                  </span>
-                  <span className="num">
-                    {formatMoney(Number(l.lineTotal), quote.currency, locale)}
-                  </span>
-                </div>
+                    <span className="num">
+                      {formatMoney(Number(l.lineTotal), quote.currency, locale)}
+                    </span>
+                  </div>
+                  {isSuperadmin ? (
+                    <div className="muted small">
+                      {t("costVsSell", {
+                        cost: formatMoney(
+                          Number(l.unitCost) * l.quantity,
+                          quote.currency,
+                          locale,
+                        ),
+                        sell: formatMoney(Number(l.lineTotal), quote.currency, locale),
+                      })}
+                    </div>
+                  ) : null}
+                </Fragment>
               ))}
             </div>
             <div className="quote-totals">
