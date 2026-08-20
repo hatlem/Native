@@ -12,6 +12,7 @@ import { productBand, unitRate } from "@/lib/pricing/display-price";
 import { bandLabel } from "@/lib/pricing/bands";
 import { StatusBadge } from "@/app/status-badge";
 import { SubmitButton } from "@/components";
+import { canSeeCostVsSell } from "@/lib/roles";
 
 export const dynamic = "force-dynamic";
 
@@ -34,7 +35,7 @@ export default async function DeskRequestPage({
   // than redirecting the whole page (see desk/titles/[id]/page.tsx for the
   // full-page variant of this same role check).
   const session = await auth();
-  const isSuperadmin = session?.user?.role === "SUPERADMIN";
+  const isSuperadmin = canSeeCostVsSell(session?.user?.role);
 
   const request = await prisma.request.findUnique({
     where: { id: requestId },
