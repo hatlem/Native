@@ -27,7 +27,9 @@ type OrderForLines = Prisma.OrderGetPayload<{
     lines: {
       include: {
         brief: true;
-        article: { include: { versions: { orderBy: { version: "desc" } } } };
+        articlePlacement: {
+          include: { article: { include: { versions: { orderBy: { version: "desc" } } } } };
+        };
         trackedLinks: true;
       };
     };
@@ -71,7 +73,7 @@ export async function LinesSection({
         {order.lines.map((line) => {
           const p = line.productId ? byId.get(line.productId) : undefined;
           const isContentFee = line.kind === "CONTENT_FEE";
-          const assets = line.article?.versions ?? [];
+          const assets = line.articlePlacement?.article.versions ?? [];
           const latest = assets[0];
           const pb = p
             ? pickPlaybook(
@@ -211,12 +213,17 @@ export async function LinesSection({
                             {tp("version")} {a.version}
                           </span>
                           <StatusBadge value={a.status} />
-                          {a.specPassed === true ? (
+                          {/* specPassed now lives on the placement, not the
+                              asset version — it reflects "does the placement's
+                              effective draft pass its spec", so the badge
+                              belongs on the locked asset once locked, and
+                              otherwise on the latest version. */}
+                          {a.id === (line.articlePlacement?.lockedAssetId ?? latest?.id) && line.articlePlacement?.specPassed === true ? (
                             <span className="badge badge-success dotless">
                               ✓ {tp("specPass")}
                             </span>
                           ) : null}
-                          {a.specPassed === false ? (
+                          {a.id === (line.articlePlacement?.lockedAssetId ?? latest?.id) && line.articlePlacement?.specPassed === false ? (
                             <span className="badge badge-warning dotless">
                               ⚠ {tp("specFail")}
                             </span>
@@ -241,7 +248,11 @@ export async function LinesSection({
                 <div className="asset-actions">
                   <form action={runSpecCheck}>
                     <input type="hidden" name="locale" value={locale} />
-                    <input type="hidden" name="assetId" value={latest.id} />
+                    <input
+                      type="hidden"
+                      name="placementId"
+                      value={line.articlePlacement?.id ?? ""}
+                    />
                     <button type="submit" className="btn small secondary">
                       {tp("specCheck")}
                     </button>

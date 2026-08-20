@@ -12,6 +12,7 @@ import { ctrPct } from "@/lib/reporting";
 import { SubmitButton } from "@/components";
 import { approveContentAsset, requestContentChanges } from "@/app/content-review-actions";
 import { presignDownloadOrNull } from "@/lib/storage/r2";
+import { resolveEffectiveAsset } from "@/lib/writers/placement";
 
 export const dynamic = "force-dynamic";
 
@@ -34,8 +35,13 @@ export default async function MyOrderPage({
       invoices: { select: { id: true, status: true } },
       lines: {
         include: {
-          article: {
-            include: { versions: { orderBy: { version: "desc" }, take: 1 } },
+          articlePlacement: {
+            select: {
+              id: true,
+              articleId: true,
+              lockedAssetId: true,
+              specPassed: true,
+            },
           },
           booking: {
               include: {
@@ -99,9 +105,15 @@ export default async function MyOrderPage({
   // An uploaded draft stores an R2 object key, not a reachable URL — sign
   // a short-lived GET so the buyer can open the file. Only drafts awaiting
   // review render a link, so only those are worth signing.
+  const effectiveAssets = new Map<string, Awaited<ReturnType<typeof resolveEffectiveAsset>>>();
+  for (const line of order.lines) {
+    if (!line.articlePlacement) continue;
+    effectiveAssets.set(line.id, await resolveEffectiveAsset(line.articlePlacement));
+  }
+
   const draftDownloadUrls = new Map<string, string>();
   for (const line of order.lines) {
-    const latest = line.article?.versions[0];
+    const latest = effectiveAssets.get(line.id) ?? null;
     if (!latest?.bodyUrl || latest.status !== "IN_REVIEW") continue;
     const url = await presignDownloadOrNull({ key: latest.bodyUrl });
     if (url) draftDownloadUrls.set(latest.id, url);
@@ -181,7 +193,7 @@ export default async function MyOrderPage({
           {order.lines.map((line) => {
             const p = line.productId ? byId.get(line.productId) : undefined;
             const isContentFee = line.kind === "CONTENT_FEE";
-            const latest = line.article?.versions[0];
+            const latest = effectiveAssets.get(line.id) ?? null;
             return (
               <article className="card line-card" key={line.id}>
                 <div className="line-head">
@@ -209,7 +221,7 @@ export default async function MyOrderPage({
                     {latest ? (
                       <span className="cluster tight">
                         <StatusBadge value={latest.status} />
-                        {latest.specPassed === true ? (
+                        {line.articlePlacement?.specPassed === true ? (
                           <span className="badge badge-success dotless">
                             ✓
                           </span>
@@ -262,6 +274,7 @@ export default async function MyOrderPage({
                       <form action={approveContentAsset}>
                         <input type="hidden" name="locale" value={locale} />
                         <input type="hidden" name="assetId" value={latest.id} />
+                        <input type="hidden" name="orderId" value={order.id} />
                         <SubmitButton
                           label={t("draftApprove")}
                           pendingLabel={t("draftApproving")}
@@ -275,6 +288,7 @@ export default async function MyOrderPage({
                         <form action={requestContentChanges} className="content-review__changes-form">
                           <input type="hidden" name="locale" value={locale} />
                           <input type="hidden" name="assetId" value={latest.id} />
+                          <input type="hidden" name="orderId" value={order.id} />
                           <textarea
                             name="note"
                             rows={3}

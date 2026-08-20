@@ -24,8 +24,9 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
 
   // "Needs you": quotes sent by the desk awaiting the buyer's approval,
   // plus content drafts a writer has moved to review. ContentAsset has no
-  // buyer-facing approve action yet — the card links to the order it
-  // belongs to (the closest existing surface) rather than inventing one.
+  // buyer-facing approve action yet — the card links straight to the
+  // article; there's no single order to route to once an article can back
+  // multiple placements.
   const [pendingQuotes, pendingContent, orders, dueWaves] = await Promise.all([
     prisma.quote.findMany({
       where: { status: "SENT", request: { organizationId: { in: orgIds } } },
@@ -45,14 +46,7 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
       take: 5,
       select: {
         id: true,
-        article: {
-          select: {
-            id: true,
-            orderLine: {
-              select: { order: { select: { id: true } }, booking: { select: { title: { select: { name: true } } } } },
-            },
-          },
-        },
+        article: { select: { id: true } },
       },
     }),
     prisma.order.findMany({
@@ -145,7 +139,7 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
                           n: w.waveNumber,
                           date: w.scheduleStart ? dateFmt.format(w.scheduleStart) : "",
                         })}
-                  {w.articleAngle ? <> {t("nextWaveAngle", { angle: w.articleAngle })}</> : null}
+                  {w.articleTitle ? <> {t("nextWaveAngle", { angle: w.articleTitle })}</> : null}
                 </p>
               </div>
               <form action={selectActiveList}>
@@ -158,9 +152,7 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
             </div>
           ))}
           {pendingContent.map((c) => {
-            const orderId = c.article.orderLine?.order.id ?? null;
-            const titleName = c.article.orderLine?.booking?.title?.name ?? "";
-            const draftHref = orderId ? `/orders/${orderId}` : `/articles/${c.article.id}`;
+            const draftHref = `/articles/${c.article.id}`;
             return (
               <div className="home-needs-card home-needs-card--success" key={`content-${c.id}`}>
                 <span className="home-needs-card__icon home-needs-card__icon--success" aria-hidden="true">
@@ -169,9 +161,6 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
                 <div className="home-needs-card__body">
                   <div className="home-needs-card__title-row">
                     <span className="home-needs-card__title">{t("draftReadyTitle")}</span>
-                    {titleName ? (
-                      <span className="badge badge-success dotless">{titleName}</span>
-                    ) : null}
                   </div>
                   <p className="home-needs-card__desc">{t("draftReadyBody")}</p>
                 </div>

@@ -18,7 +18,7 @@ export type OrderCompletedNoticeInput = {
   due: null | {
     waveNumber: number;
     plannedWaves: number;
-    articleAngle: string | null;
+    articleTitle: string | null;
   };
 };
 
@@ -26,7 +26,7 @@ type NoticeStrings = {
   title: (planName: string) => string;
   // The next programme wave is drafted and due: nudge them to send it
   // while the previous placement is still fresh in readers' minds.
-  bodyDue: (waveNumber: number, plannedWaves: number, articleAngle: string | null) => string;
+  bodyDue: (waveNumber: number, plannedWaves: number, articleTitle: string | null) => string;
   // No due wave: the campaign is simply finished — sell the repetition
   // logic and point them at planning the next wave.
   bodyFinished: string;
@@ -97,7 +97,7 @@ export function buildOrderCompletedNotice(
   return {
     title: s.title(input.planName),
     body: input.due
-      ? s.bodyDue(input.due.waveNumber, input.due.plannedWaves, input.due.articleAngle)
+      ? s.bodyDue(input.due.waveNumber, input.due.plannedWaves, input.due.articleTitle)
       : s.bodyFinished,
   };
 }

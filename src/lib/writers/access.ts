@@ -23,12 +23,14 @@ export function canAssignWriter(
 }
 
 // Capacity counting: an assignment is "active" until its latest content
-// asset reaches FINAL or RETRACTED. No asset yet (null) still counts —
-// the writer owes an article.
+// asset reaches FINAL. No asset yet (null) still counts — the writer owes
+// an article. Retraction no longer flows through ContentAssetStatus (it's
+// a per-placement field now) and doesn't change whether the underlying
+// writing is done, so it plays no part in this check.
 export function isAssignmentActive(
   latestAssetStatus: ContentAssetStatus | null,
 ): boolean {
-  return latestAssetStatus !== "FINAL" && latestAssetStatus !== "RETRACTED";
+  return latestAssetStatus !== "FINAL";
 }
 
 const ORG_SCOPED_ROLES = new Set(["BUYER", "APPROVER", "ORG_ADMIN"]);

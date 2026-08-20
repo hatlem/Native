@@ -9,7 +9,7 @@ import { notifyDesk } from "@/lib/notify";
 
 // Buyer-side counterpart to desk-content-actions.ts's setAssetStatus: a
 // buyer may only move a draft from IN_REVIEW to APPROVED or
-// CHANGES_REQUESTED — never to DRAFT/FINAL/RETRACTED, which stay
+// CHANGES_REQUESTED — never to DRAFT/FINAL, which stay
 // desk/writer-only. Separate from setAssetStatus (which uses
 // requireLineWriter, a DESK/CONTENT-only guard) because the authorization
 // shape is different: buyers are checked against the order's organization,
@@ -26,14 +26,7 @@ async function loadAssetForBuyer(assetId: string) {
     select: {
       id: true,
       status: true,
-      article: {
-        select: {
-          id: true,
-          organizationId: true,
-          orderLineId: true,
-          orderLine: { select: { orderId: true } },
-        },
-      },
+      article: { select: { id: true, organizationId: true } },
     },
   });
 }
@@ -41,6 +34,7 @@ async function loadAssetForBuyer(assetId: string) {
 export async function approveContentAsset(formData: FormData) {
   const locale = field(formData, "locale") || "en";
   const assetId = field(formData, "assetId");
+  const orderId = field(formData, "orderId") || null;
   const session = await auth();
   if (!session?.user?.id) redirect(`/${locale}/signin`);
 
@@ -54,7 +48,6 @@ export async function approveContentAsset(formData: FormData) {
     redirect(`/${locale}/articles/${asset?.article.id ?? ""}`);
   }
 
-  const orderId = asset.article.orderLine?.orderId ?? null;
   await prisma.contentAsset.update({ where: { id: assetId }, data: { status: "APPROVED" } });
   await recordAudit(session.user.id, "asset.status", `ContentAsset:${assetId}`, { status: "APPROVED" });
   await notifyDesk({
@@ -72,6 +65,7 @@ export async function requestContentChanges(formData: FormData) {
   const locale = field(formData, "locale") || "en";
   const assetId = field(formData, "assetId");
   const note = field(formData, "note");
+  const orderId = field(formData, "orderId") || null;
   const session = await auth();
   if (!session?.user?.id) redirect(`/${locale}/signin`);
 
@@ -85,7 +79,6 @@ export async function requestContentChanges(formData: FormData) {
     redirect(`/${locale}/articles/${asset?.article.id ?? ""}`);
   }
 
-  const orderId = asset.article.orderLine?.orderId ?? null;
   await prisma.contentAsset.update({
     where: { id: assetId },
     data: { status: "CHANGES_REQUESTED", reviewNotes: note || null },

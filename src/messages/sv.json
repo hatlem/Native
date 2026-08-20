@@ -606,9 +606,11 @@
       "thisWave": "Den här omgången",
       "openWave": "Öppna",
       "noDate": "Datum ej satt",
-      "angleEdit": "Artikelvinkel för den här omgången",
-      "angleSave": "Spara vinkel",
       "angleHint": "Desken och skribenten utgår härifrån – håll den skild från de andra omgångarna.",
+      "viewArticle": "Öppna artikel",
+      "unlinkArticle": "Ta bort koppling",
+      "noArticleYet": "Ingen artikel kopplad till den här omgången ännu.",
+      "createArticleForWave": "Skapa artikel",
       "autoSendLabel": "Skicka varje omgång automatiskt när det är dags",
       "autoSendHint": "Varje omgång går till desken som en vanlig förfrågan när datumet närmar sig – du godkänner fortfarande offerten innan något bokas eller debiteras.",
       "waveTotal": "≈ {amount}",
@@ -1078,7 +1080,8 @@
     "vetoSubmit": "Bekräfta avvisning",
     "vetoSubmitting": "Bekräftar…",
     "vetoError": "Avvisning nekades",
-    "retractedLabel": "Återkallad"
+    "retractedLabel": "Återkallad",
+    "vetoSharedWarning": "Den här artikeln körs också på {count} andra placering(ar) — de påverkas inte av den här indragningen."
   },
   "invoice": {
     "title": "Faktura",
@@ -1405,7 +1408,10 @@
     "linkHint": "Den här artikeln är inte kopplad till en placering ännu.",
     "linkEmpty": "Inga lediga placeringar i din organisation.",
     "linkCta": "Koppla",
-    "linkedTo": "Kopplad till"
+    "placementRetracted": "Indragen",
+    "unlinkCta": "Ta bort koppling",
+    "sharedArticleWarning": "Den här artikeln är kopplad till {count} andra placeringar — dina ändringar påverkar alla.",
+    "specNotChecked": "inte kontrollerad"
   },
   "marketing": {
     "howCta": "Så funkar det",

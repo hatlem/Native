@@ -244,7 +244,11 @@ git commit -m "feat(db): add ArticlePlacement, drop 1:1 Article-OrderLine link"
 **Interfaces:**
 - Consumes: `prisma` client, `ArticlePlacement`/`Article`/`ContentAsset` models from Task 1.
 - Produces: `resolveEffectiveAsset(placement)`, `ensurePlacementForLine(args)`,
-  `lockPlacementsOnFinal(articleId, assetId)` — consumed by Tasks 3, 4, 5, 6, 7, 9.
+  `lockPlacementsOnFinal(articleId, assetId)`, `articleTitleForLine(orderLineId)`
+  — consumed by Tasks 3, 4, 5, 6, 7, 9. `articleTitleForLine` lives here (not
+  inlined into `desk-content-actions.ts`) because TWO call sites need it: Task 5's
+  `saveLineDraft` AND Task 5's fix to `writer-pool-actions.ts`'s
+  `assignWriterToLine` — a shared module beats duplicating the same lookup twice.
 
 - [ ] **Step 1: Write the file**
 
@@ -259,6 +263,24 @@ export type EffectiveAsset = {
   bodyUrl: string | null;
   reviewNotes: string | null;
 };
+
+// The display title a new Article gets when born from a specific line: the
+// line's product/title name, falling back to a generic label. Shared by
+// every line-keyed article-creation entry point (Task 5's saveLineDraft and
+// its fix to writer-pool-actions.ts's assignWriterToLine).
+export async function articleTitleForLine(orderLineId: string): Promise<string> {
+  const line = await prisma.orderLine.findUnique({
+    where: { id: orderLineId },
+    select: { productId: true },
+  });
+  const product = line?.productId
+    ? await prisma.product.findUnique({
+        where: { id: line.productId },
+        select: { title: { select: { name: true } } },
+      })
+    : null;
+  return product?.title.name ?? "Untitled article";
+}
 
 // Which ContentAsset a placement is currently showing: its locked version
 // once one exists (set the moment any version of the article went FINAL
@@ -707,17 +729,20 @@ git commit -m "feat(content): rewrite article linking for many-placements-per-ar
 
 **Files:**
 - Modify: `src/app/desk-content-actions.ts`
+- Modify: `src/app/writer-pool-actions.ts`
 
 **Interfaces:**
-- Consumes: `ensurePlacementForLine`, `lockPlacementsOnFinal` (Task 2, replacing
-  `ensureArticleForLine`/`articleTitleForLine` import from `@/lib/writers/article` —
-  that whole file's job is now split between `placement.ts`'s `ensurePlacementForLine`
-  for placement/writer assignment and a small local title-lookup helper, see below).
-  `runSpecCheckForPlacement` (Task 3, replacing `runSpecCheckForAsset`).
+- Consumes: `ensurePlacementForLine`, `articleTitleForLine`, `lockPlacementsOnFinal`
+  (Task 2, replacing `ensureArticleForLine`/`articleTitleForLine` imported from the
+  old `@/lib/writers/article`, which this task deletes). `runSpecCheckForPlacement`
+  (Task 3, replacing `runSpecCheckForAsset`).
 - Produces: `confirmTrackedLinks` (UNCHANGED), `saveDraft`, `saveLineDraft`,
   `saveUploadedDraft`, `runSpecCheck`, `setAssetStatus` — all rewritten. Consumed by
   Task 8 (writer page), Task 9 (batch: desk order page forms), Task 11 (article
-  detail page).
+  detail page). `writer-pool-actions.ts`'s `assignWriterToLine` is also fixed here
+  (found during Task 1's review — it imports from the same soon-deleted
+  `@/lib/writers/article`, and its unassign branch writes to `Article.orderLineId`,
+  a field Task 1 removed).
 
 - [ ] **Step 1: Replace the whole file**
 
@@ -734,7 +759,7 @@ import { runSpecCheckForPlacement, registerSpecCheckJob } from "@/lib/spec-check
 import { ensureTrackedLinks } from "@/lib/metrics/store";
 import { rewriteBodyLinks } from "@/lib/metrics/links";
 import { requireLineWriter, requireArticleWriter } from "@/lib/writers/guard";
-import { ensurePlacementForLine } from "@/lib/writers/placement";
+import { ensurePlacementForLine, articleTitleForLine } from "@/lib/writers/placement";
 
 registerSpecCheckJob();
 
@@ -752,22 +777,6 @@ const SELF_SERVE_ASSET_TARGETS: ReadonlySet<ContentAssetStatus> = new Set([
 function field(formData: FormData, key: string): string {
   const v = formData.get(key);
   return typeof v === "string" ? v.trim() : "";
-}
-
-// The display title a new Article gets when born from a specific line: the
-// line's product/title name, falling back to a generic label.
-async function articleTitleForLine(orderLineId: string): Promise<string> {
-  const line = await prisma.orderLine.findUnique({
-    where: { id: orderLineId },
-    select: { productId: true },
-  });
-  const product = line?.productId
-    ? await prisma.product.findUnique({
-        where: { id: line.productId },
-        select: { title: { select: { name: true } } },
-      })
-    : null;
-  return product?.title.name ?? "Untitled article";
 }
 
 // Where a content action returns the actor to. `orderLineIdHint`, when
@@ -1068,25 +1077,88 @@ rest of the file's static imports, use a normal static `import { lockPlacementsO
 `ensurePlacementForLine` import); either is fine, prefer the static one for
 consistency with the rest of this file's style.
 
-Also delete `src/lib/writers/article.ts` in this task — its two exports
-(`articleTitleForLine`, `ensureArticleForLine`) are now `articleTitleForLine`
-(moved inline above, since it's small and only used here) and
-`ensurePlacementForLine` (Task 2). Confirm nothing else imports the old file
-(`grep -rn "lib/writers/article\"" src/`) before deleting it.
+- [ ] **Step 2: Fix `writer-pool-actions.ts`**
 
-- [ ] **Step 2: Typecheck**
+Found during Task 1's review: `src/app/writer-pool-actions.ts`'s `assignWriterToLine`
+imports `ensureArticleForLine, articleTitleForLine` from `@/lib/writers/article` (the
+file this task deletes below), and its unassign branch writes
+`prisma.article.updateMany({ where: { orderLineId }, data: { assignedWriterId: null } })`
+— `Article.orderLineId` no longer exists after Task 1.
 
-Run: `pnpm typecheck 2>&1 | grep -A2 "desk-content-actions"`
-Expected: no errors from this file (callers not yet updated — the writer page,
-desk order page forms, article detail page — are expected to still error until
-Tasks 8, 9, 11 land).
+Read the current file in full first. Change the import line from
+```ts
+import { ensureArticleForLine, articleTitleForLine } from "@/lib/writers/article";
+```
+to
+```ts
+import { ensurePlacementForLine, articleTitleForLine } from "@/lib/writers/placement";
+```
 
-- [ ] **Step 3: Commit**
+Replace the unassign branch's `Article.updateMany` call — it can no longer filter
+by `orderLineId` on `Article` directly, so it goes through the placement instead:
+```ts
+if (writerId === "") {
+  await prisma.orderLine.update({
+    where: { id: orderLineId },
+    data: { assignedWriterId: null, assignedAt: null, assignedById: null },
+  });
+  const placement = await prisma.articlePlacement.findUnique({
+    where: { orderLineId },
+    select: { articleId: true },
+  });
+  if (placement) {
+    await prisma.article.update({
+      where: { id: placement.articleId },
+      data: { assignedWriterId: null },
+    });
+  }
+  await recordAudit(userId, "line.unassign", `OrderLine:${orderLineId}`);
+  await recordAudit(userId, "article.unassign", `OrderLine:${orderLineId}`);
+  redirect(`/${locale}/desk/orders/${orderId}`);
+}
+```
+
+Replace the assign branch's `ensureArticleForLine(...)` call with
+`ensurePlacementForLine(...)` — same argument shape, no other change:
+```ts
+await ensurePlacementForLine({
+  orderLineId,
+  organizationId: updatedLine.order.organizationId,
+  title: await articleTitleForLine(orderLineId),
+  createdByUserId: userId,
+  createdByRole: "DESK",
+  assignedWriterId: writerId,
+});
+await recordAudit(userId, "article.assign", `OrderLine:${orderLineId}`, { writerId });
+```
+
+The comment above the old call ("First assignment for this line creates its
+Article... ensureArticleForLine keys on the unique orderLineId, so two concurrent
+assignments... converge on one row instead of racing") should be updated to
+reference `ensurePlacementForLine` and `ArticlePlacement.orderLineId` instead —
+same idempotent-upsert behavior, new names.
+
+- [ ] **Step 3: Delete `src/lib/writers/article.ts`**
+
+Its two exports (`articleTitleForLine`, `ensureArticleForLine`) are now
+`articleTitleForLine` and `ensurePlacementForLine`, both exported from
+`src/lib/writers/placement.ts` (Task 2). Confirm nothing else imports the old file
+(`grep -rn "lib/writers/article\"" src/` — after Steps 1-2 above, this should
+return nothing) before deleting it.
+
+- [ ] **Step 4: Typecheck**
+
+Run: `pnpm typecheck 2>&1 | grep -A2 "desk-content-actions\|writer-pool-actions"`
+Expected: no errors from either file (other callers not yet updated — the writer
+page, desk order page forms, article detail page — are expected to still error
+until Tasks 8, 9, 11 land).
+
+- [ ] **Step 5: Commit**
 
 ```bash
-git add src/app/desk-content-actions.ts
+git add src/app/desk-content-actions.ts src/app/writer-pool-actions.ts
 git rm src/lib/writers/article.ts
-git commit -m "feat(content): rewrite desk-content-actions for multi-placement articles"
+git commit -m "feat(content): rewrite desk-content-actions and writer-pool-actions for multi-placement articles"
 ```
 
 ---
@@ -1499,6 +1571,8 @@ git commit -m "feat(content): read writer line page via ArticlePlacement"
 - Modify: `src/app/[locale]/writer/page.tsx`
 - Modify: `src/lib/writers/roster.ts`
 - Modify: `src/app/api/export/me/route.ts`
+- Modify: `src/lib/writers/access.ts`
+- Modify: `src/lib/writers/access.test.ts`
 
 **Interfaces:**
 - Consumes: `resolveEffectiveAsset` (Task 2) where a page needs the
@@ -1742,6 +1816,39 @@ articlePlacement: { include: { article: { include: { versions: true } } } },
 booking: true } }`. No other change — the response flows through as-is via
 `NextResponse.json`.
 
+- [ ] **Step 11b: `src/lib/writers/access.ts` and `access.test.ts`**
+
+Found during Task 1's review: `isAssignmentActive` still compares to the literal
+`"RETRACTED"`, which no longer exists on `ContentAssetStatus` after Task 1 (it's
+a compile error, not a silent bug — but fix it here rather than leaving it for
+someone to trip over). Read the current file. Change:
+```ts
+export function isAssignmentActive(
+  latestAssetStatus: ContentAssetStatus | null,
+): boolean {
+  return latestAssetStatus !== "FINAL" && latestAssetStatus !== "RETRACTED";
+}
+```
+to:
+```ts
+export function isAssignmentActive(
+  latestAssetStatus: ContentAssetStatus | null,
+): boolean {
+  return latestAssetStatus !== "FINAL";
+}
+```
+(Retraction is no longer a `ContentAssetStatus` value at all — it lives on
+`ArticlePlacement.retractedAt` now, per Task 1/7. "Active" here only ever meant
+"the writer still owes work on this," which `FINAL` alone already captures
+correctly; a retracted placement doesn't change whether the underlying writing
+is done.)
+
+In `src/lib/writers/access.test.ts`, remove the now-invalid assertion
+`assert.equal(isAssignmentActive("RETRACTED"), false);` — `"RETRACTED"` is not a
+valid `ContentAssetStatus` value anymore, so this line won't compile. Leave the
+other four assertions in that test (`null`, `"DRAFT"`, `"IN_REVIEW"`, `"FINAL"`)
+unchanged — they still hold under the new implementation.
+
 - [ ] **Step 12: Confirm no file was missed**
 
 Run: `pnpm typecheck 2>&1 | grep -B2 "error TS" | grep "\.tsx\?:" | sed -E 's/\(.*//' | sort -u`
@@ -1758,7 +1865,7 @@ from whatever the pre-task baseline was, and nothing else changes).
 - [ ] **Step 14: Commit**
 
 ```bash
-git add "src/app/[locale]/orders/[orderId]/page.tsx" "src/app/[locale]/publisher/orders/page.tsx" "src/app/[locale]/desk/orders/[orderId]/page.tsx" "src/app/[locale]/desk/orders/[orderId]/lines-section.tsx" "src/app/[locale]/desk/orders/[orderId]/campaign-section.tsx" "src/app/[locale]/requests/[id]/page.tsx" "src/app/[locale]/requests/[id]/_components/OrderSection.tsx" "src/app/[locale]/requests/[id]/_components/types.ts" "src/app/[locale]/writer/page.tsx" src/lib/writers/roster.ts src/app/api/export/me/route.ts src/lib/cancellation.ts src/lib/cancellation.test.ts
+git add "src/app/[locale]/orders/[orderId]/page.tsx" "src/app/[locale]/publisher/orders/page.tsx" "src/app/[locale]/desk/orders/[orderId]/page.tsx" "src/app/[locale]/desk/orders/[orderId]/lines-section.tsx" "src/app/[locale]/desk/orders/[orderId]/campaign-section.tsx" "src/app/[locale]/requests/[id]/page.tsx" "src/app/[locale]/requests/[id]/_components/OrderSection.tsx" "src/app/[locale]/requests/[id]/_components/types.ts" "src/app/[locale]/writer/page.tsx" src/lib/writers/roster.ts src/app/api/export/me/route.ts src/lib/cancellation.ts src/lib/cancellation.test.ts src/lib/writers/access.ts src/lib/writers/access.test.ts
 git commit -m "fix(content): repoint remaining OrderLine.article reads at ArticlePlacement"
 ```
 
@@ -1863,7 +1970,8 @@ git commit -m "feat(content): show every linked placement on the articles overvi
 
 - [ ] **Step 1: Rewrite the query**
 
-Read the current file (quoted in full earlier in this plan). Replace the `article`
+Read the current file directly — it is not reproduced in full in this plan
+document, only the specific transformations below. Replace the `article`
 query's `orderLineId`/`orderLine` fields with a `placements` list, and resolve the
 effective asset via the helper instead of always reading `versions[0]`:
 
@@ -2002,81 +2110,153 @@ a per-item unlink button, and keep the "link another" form always available:
 Import `unlinkArticleFromOrderLine` alongside the existing `linkArticleToOrderLine`
 import from `@/app/article-library-actions`.
 
-- [ ] **Step 3: Add the sibling-placement warning above the write/upload forms**
+- [ ] **Step 3: Replace the rest of the page body with the exact block below**
 
-Directly above the `saveDraft` form and the `UploadForm`, add:
+Everything from the sibling-placement warning through the buyer-review section
+replaces the original file's write form / `UploadForm` / download link / status
+line / spec-check form / submit-for-review form / review-notes paragraph /
+approve-reject section as ONE block — the original single "run spec check" form
+(keyed by `assetId`) is deleted entirely here, not renamed; its replacement is
+the new per-placement spec-check list, placed BEFORE the write form instead of
+after (so a placement's spec status is visible before you start editing shared
+text that affects it):
 
 ```tsx
+{placementsWithAsset.length > 0 ? (
+  <div className="space-y-2">
+    {placementsWithAsset.map((p) =>
+      p.effectiveAsset ? (
+        <div key={`spec-${p.id}`} className="flex items-center gap-3 text-sm">
+          <span>
+            {p.label}:
+            {p.specPassed === true
+              ? ` ${t("detailSpecPassed")}`
+              : p.specPassed === false
+                ? ` ${t("detailSpecFailed")}`
+                : ` ${t("specNotChecked")}`}
+          </span>
+          <form action={runSpecCheck}>
+            <input type="hidden" name="locale" value={locale} />
+            <input type="hidden" name="placementId" value={p.id} />
+            <button type="submit" className="underline">
+              {t("detailRunSpecCheck")}
+            </button>
+          </form>
+        </div>
+      ) : null,
+    )}
+  </div>
+) : null}
+
 {placementsWithAsset.length > 1 ? (
   <p className="text-xs text-amber-700">
     {t("sharedArticleWarning", { count: placementsWithAsset.length })}
   </p>
 ) : null}
-```
 
-(One warning covers both the write form and the upload form below it, since
-they're adjacent on the page — no need to duplicate it per form.)
+<form action={saveDraft} className="space-y-2">
+  <input type="hidden" name="locale" value={locale} />
+  <input type="hidden" name="articleId" value={articleId} />
+  <label className="block text-sm font-medium">{t("detailWriteHeading")}</label>
+  <textarea
+    name="body"
+    defaultValue={latestArticleVersion?.bodyUrl ? "" : (latestArticleVersion?.body ?? "")}
+    rows={18}
+    className="w-full rounded border p-2 font-mono text-sm"
+  />
+  <button type="submit" className="rounded bg-black px-3 py-1.5 text-sm text-white">
+    {t("detailSaveDraft")}
+  </button>
+</form>
 
-- [ ] **Step 4: Update the write/status forms to use the article's latest version, not a single ambiguous "latest"**
+<UploadForm
+  articleId={articleId}
+  locale={locale}
+  saveDraftAction={saveUploadedDraft}
+  labels={{
+    heading: t("detailUploadHeading"),
+    hint: t("detailUploadHint"),
+    uploading: t("detailUploading"),
+    save: t("detailSaveDraft"),
+  }}
+/>
 
-The existing `saveDraft` form's `defaultValue` and the status/spec-check controls
-below it currently read from a single `latest` variable. Replace every reference
-to the old `latest` (from the pre-Task-11 version of this file) with
-`latestArticleVersion` (defined in Step 1) for the write form and the
-status/submit-for-review controls — those operate on the article's shared
-authoring state, not any one placement. Do NOT wire the spec-check/submit
-controls to `placementsWithAsset` — spec-check is per placement (see Step 5),
-but "save draft" / "submit for review" / status stay article-level, matching
-`saveDraft`/`setAssetStatus` which are still keyed by `articleId`/`assetId`
-respectively, unchanged in that respect from before this plan.
+{downloadUrl ? (
+  <p className="text-sm">
+    <a href={downloadUrl} target="_blank" rel="noreferrer noopener" className="underline">
+      {t("detailDownloadFile")} ↗
+    </a>
+  </p>
+) : null}
 
-- [ ] **Step 5: Per-placement spec-check controls**
+{latestArticleVersion ? (
+  <div className="flex items-center gap-4 text-sm">
+    <span>
+      {t("detailStatus")}: <StatusBadge value={latestArticleVersion.status} />
+    </span>
+    <form action={setAssetStatus}>
+      <input type="hidden" name="locale" value={locale} />
+      <input type="hidden" name="assetId" value={latestArticleVersion.id} />
+      <input type="hidden" name="target" value="IN_REVIEW" />
+      <button type="submit" className="underline">
+        {t("detailSubmitForReview")}
+      </button>
+    </form>
+  </div>
+) : null}
 
-Below the placements list (Step 2), for each placement with an effective asset,
-add its own spec-check control — this replaces the old single "run spec check"
-button, since spec-check is now genuinely per placement:
+{latestArticleVersion?.reviewNotes ? (
+  <p className="text-sm text-amber-700">
+    {t("detailReviewNotes")}: {latestArticleVersion.reviewNotes}
+  </p>
+) : null}
 
-```tsx
-{placementsWithAsset.map((p) =>
-  p.effectiveAsset ? (
-    <div key={`spec-${p.id}`} className="flex items-center gap-3 text-sm">
-      <span>
-        {p.label}:
-        {p.specPassed === true
-          ? ` ${t("detailSpecPassed")}`
-          : p.specPassed === false
-            ? ` ${t("detailSpecFailed")}`
-            : ` ${t("specNotChecked")}`}
-      </span>
-      <form action={runSpecCheck}>
+{latestArticleVersion?.status === "IN_REVIEW" && canActOnOrg(scope, article.organizationId) ? (
+  <section className="space-y-2 rounded border p-4">
+    <h2 className="text-sm font-semibold">{tOrders("draftReviewHeading")}</h2>
+    <div className="flex items-center gap-3">
+      <form action={approveContentAsset}>
         <input type="hidden" name="locale" value={locale} />
-        <input type="hidden" name="placementId" value={p.id} />
-        <button type="submit" className="underline">
-          {t("detailRunSpecCheck")}
+        <input type="hidden" name="assetId" value={latestArticleVersion.id} />
+        <button type="submit" className="rounded bg-black px-3 py-1.5 text-sm text-white">
+          {tOrders("draftApprove")}
+        </button>
+      </form>
+      <form action={requestContentChanges} className="flex items-center gap-2">
+        <input type="hidden" name="locale" value={locale} />
+        <input type="hidden" name="assetId" value={latestArticleVersion.id} />
+        <input
+          type="text"
+          name="note"
+          placeholder={tOrders("draftChangesPlaceholder")}
+          className="rounded border p-2 text-sm"
+        />
+        <button type="submit" className="rounded border px-3 py-1.5 text-sm">
+          {tOrders("draftSendChanges")}
         </button>
       </form>
     </div>
-  ) : null,
-)}
+  </section>
+) : null}
 ```
 
-Place this block right after the placements `<ul>`/link form section from Step 2,
-before the write/upload forms.
+Note what changed from the original file, spelled out so the transformation is
+unambiguous: the shared status line no longer shows `specPassed` (that's now
+shown per placement, in the block above the write form); the old
+`assetId`-keyed "run spec check" form is gone, replaced by the per-placement
+list; `approveContentAsset`/`requestContentChanges` do NOT get an `orderId`
+hidden field here (Task 6 made it an optional hint — this page has no single
+order to hint at, matching Task 6's design); every other field/form is
+unchanged from the original file, just reading `latestArticleVersion` instead of
+`latest`. `t("linkCta")` and `unlinkArticleFromOrderLine` come from Step 2 above,
+already in scope in the same component.
 
-- [ ] **Step 6: Update the buyer-review section's forms**
-
-The existing `approveContentAsset`/`requestContentChanges` forms near the bottom
-of the file do not pass an `orderId` (Task 6 made it an optional hint) — leave
-them as-is here; an article on this page may have zero, one, or many linked
-placements, so there is no single order to hint at. This matches Task 6's design:
-absent hint → redirect/notify link falls back to the article page.
-
-- [ ] **Step 7: Typecheck**
+- [ ] **Step 4: Typecheck**
 
 Run: `pnpm typecheck 2>&1 | grep -A2 "articles/\[articleId\]"`
 Expected: no errors.
 
-- [ ] **Step 8: Commit**
+- [ ] **Step 5: Commit**
 
 ```bash
 git add "src/app/[locale]/articles/[articleId]/page.tsx"
@@ -2274,6 +2454,25 @@ now has `articleTitle` (a `SavedList.article?.title` lookup at the call site) �
 read each caller and adjust the `select`/data shape it passes in, mirroring
 whatever it previously did for `articleAngle`.
 
+`src/lib/commerce/submit-rfq.ts` is not just a caller here — it OWNS the
+`RfqSourceList` type (`articleAngle: string | null;` in its own type
+definition) and the `RFQ_LIST_INCLUDE` Prisma include used to hydrate it for
+the auto-send sweep. Change the type field to `articleTitle: string | null;`,
+add `article: { select: { title: true } }` to `RFQ_LIST_INCLUDE`, and update
+the `withWaveAngle(brief.text, list)` call site inside `submitListAsRfq` to
+read `list.article?.title` when building the object (or, if `RFQ_LIST_INCLUDE`
+now shapes the field as nested `article.title` rather than a flat
+`articleTitle`, adjust `RfqSourceList`'s type to match and flatten it once at
+the call site — whichever keeps `withWaveAngle`'s own signature, from Step 4
+above, satisfied without changes). This single fix is what resolves the
+`RfqSourceList`-shaped typecheck errors in `src/app/checkout-actions.ts`,
+`src/lib/commerce/checkout.it.test.ts`, and `src/lib/programme-autosend.ts` —
+none of those three files reference `articleAngle` directly; they all fail
+because they construct or pass through an `RfqSourceList`-shaped value that
+`submit-rfq.ts` still typed with the old field. Re-typecheck all three after
+this change (folded into Step 7 below) rather than treating them as separate
+work.
+
 - [ ] **Step 5: `programme-actions.ts` — replace `updateWaveAngle`**
 
 ```ts
@@ -2319,16 +2518,46 @@ not back to `/plan`. Task 14's "create" entry point sends the buyer to the new
 article's own page to write/upload, then they come back to `/plan` and link it —
 covered in Task 14's design below.)
 
-- [ ] **Step 6: Typecheck**
+- [ ] **Step 6: Fix the client-share page's `articleAngle` read (found during
+      Task 9's review — a concurrent feature, not originally in this plan's
+      scope, that reads the same doomed column)**
+
+`src/lib/list-share.ts`'s `SHARED_LIST_SELECT` (an explicit, security-motivated
+`select` for the unauthenticated `/share/[token]` page — never widen it to an
+`include`) has `articleAngle: true,`. Replace it with the article's title:
+```ts
+articleId: true,
+article: { select: { title: true } },
+```
+Then in `src/app/[locale]/share/[token]/page.tsx`, replace:
+```tsx
+{list.articleAngle ? ` · ${list.articleAngle}` : ""}
+```
+with:
+```tsx
+{list.article?.title ? ` · ${list.article.title}` : ""}
+```
+Grep `src/lib/list-share.it.test.ts` and `src/app/share-actions.ts`/
+`src/app/list-actions.ts` for any other `articleAngle` reference (none are
+expected — confirmed clean during Task 9's review — but confirm rather than
+assume, since this whole area was outside the plan's original scan).
+
+- [ ] **Step 7: Typecheck**
 
 Run: `pnpm typecheck 2>&1 | grep -A2 "programme"`
 Expected: errors remain in `PlanProgramme.tsx` (Task 14) and `home/page.tsx`
 (already updated in Task 12, should now be clean) — confirm no OTHER files error.
 
-- [ ] **Step 7: Commit**
+Also run: `pnpm typecheck 2>&1 | grep -E "list-share|share/\[token\]|checkout-actions|checkout\.it\.test|programme-autosend"`
+Expected: clean (these were the residual `articleAngle`-shaped errors Task 9's
+review found still open across the codebase; this task's Step 4 fix to
+`submit-rfq.ts`'s `RfqSourceList` type and this Step 6 fix together should
+close every one of them).
+
+- [ ] **Step 8: Commit**
 
 ```bash
-git add src/lib/programme.ts src/app/programme-actions.ts
+git add src/lib/programme.ts src/app/programme-actions.ts src/lib/list-share.ts "src/app/[locale]/share/[token]/page.tsx"
 git commit -m "feat(programme): replace free-text article angle with real article linking"
 ```
 
@@ -2501,6 +2730,8 @@ git commit -m "feat(programme): wave article create/link/unlink UI"
 
 **Files:**
 - Modify: `src/messages/en.json`, `no.json`, `da.json`, `sv.json`, `fi.json`, `de.json`
+- Modify: `src/app/[locale]/articles/[articleId]/page.tsx` (two small follow-up
+  fixes from Task 11's review — Step 2b)
 
 **Interfaces:**
 - Produces: four new `articles` namespace keys, four new `plan.programme` keys,
@@ -2631,6 +2862,49 @@ German (`de.json`):
 "createArticleForWave": "Artikel erstellen"
 ```
 
+- [ ] **Step 2b: Remove the orphaned `linkedTo` key, and two small Task 11
+      follow-ups found during Task 11's review**
+
+`articles.linkedTo` (all six locale files) was only ever rendered by the
+single-placement paragraph that Task 11 removed — grep `src` to confirm zero
+remaining references, then delete the key from all six files.
+
+Task 11's review also found two small, non-blocking issues in
+`src/app/[locale]/articles/[articleId]/page.tsx` worth fixing here since this
+task is already touching that page's copy:
+
+1. **`specNotes` is fetched but never rendered.** The per-placement spec-check
+   block (around where `detailSpecFailed` is shown) has the failure reason
+   sitting unused in `p.specNotes`. Find:
+   ```tsx
+   {p.specPassed === true
+     ? ` ${t("detailSpecPassed")}`
+     : p.specPassed === false
+       ? ` ${t("detailSpecFailed")}`
+       : ` ${t("specNotChecked")}`}
+   ```
+   and add the reason after it, only when failed and notes exist:
+   ```tsx
+   {p.specPassed === true
+     ? ` ${t("detailSpecPassed")}`
+     : p.specPassed === false
+       ? ` ${t("detailSpecFailed")}${p.specNotes ? `: ${p.specNotes}` : ""}`
+       : ` ${t("specNotChecked")}`}
+   ```
+   No new locale key needed.
+
+2. **`badge-error` is not a class this codebase defines** — `globals.css` has
+   `.badge-neutral`/`.badge-info`/`.badge-success`/`.badge-warning`/
+   `.badge-danger`, no `.badge-error`. The retracted-placement badge silently
+   renders as an unstyled neutral badge. Find:
+   ```tsx
+   <span className="badge badge-error dotless">{t("placementRetracted")}</span>
+   ```
+   and change `badge-error` to `badge-danger`.
+
+Both are one-line changes in the same file; commit them alongside this task's
+locale files.
+
 - [ ] **Step 3: Run the locale parity test**
 
 Run: `pnpm exec tsx --test src/messages/locale-parity.test.ts`
@@ -2644,7 +2918,7 @@ labels, a different, narrower test. Use `locale-parity.test.ts` here.)
 - [ ] **Step 4: Commit**
 
 ```bash
-git add src/messages/*.json
+git add src/messages/*.json "src/app/[locale]/articles/[articleId]/page.tsx"
 git commit -m "feat(i18n): add locale copy for shared articles and wave linking"
 ```
 
@@ -2661,11 +2935,26 @@ git commit -m "feat(i18n): add locale copy for shared articles and wave linking"
 
 - [ ] **Step 1: Read the current file in full**
 
-The existing three tests assert the 1:1 invariant directly (an unlinked article's
-`orderLineId` is null; creating a second `Article` with the same `orderLineId`
-must reject; `canWriteArticle`'s journalist-assignment scenario). Read the current
-file before editing — the third test (journalist assignment via a real DB-loaded
-`WriterProfile`) needs no changes at all; only the first two need rework.
+The current file actually has FOUR tests, not three — a fourth
+("`ensureArticleForLine` is idempotent: concurrent first-writes yield one
+Article") was added later, by the prior feature's own final-review fix wave, to
+cover a concurrency race. Read the current file before editing.
+
+Three assert the old 1:1 invariant directly and need rework (an unlinked
+article's `orderLineId` is null; creating a second `Article` with the same
+`orderLineId` must reject; the concurrent-`ensureArticleForLine` race). The
+third test in the original three — `canWriteArticle`'s journalist-assignment
+scenario — needs no changes at all.
+
+**Delete the fourth test outright** (`import { ensureArticleForLine } from
+"@/lib/writers/article";` at the top of the file, and the whole `test(
+"ensureArticleForLine is idempotent...")` block) rather than porting it forward
+— `@/lib/writers/article` no longer exists (Task 5 deleted it), and the race
+condition it covered (two concurrent first-writes for the same line converging
+on one row) is now fully covered by Task 2's `src/lib/writers/placement.it.test.ts`,
+which tests the exact same race against `ensurePlacementForLine` (the function
+that replaced `ensureArticleForLine`). Keeping both would just duplicate
+coverage of the same behavior under two different function names.
 
 - [ ] **Step 2: Replace the two invalidated tests, add two new ones**
 

@@ -40,10 +40,12 @@ export type RfqSourceList = {
   id: string;
   organizationId: string;
   // Wave membership — withWaveAngle prefixes the desk brief for waves and
-  // passes plain lists through unchanged.
+  // passes plain lists through unchanged. Nested (not a flat articleTitle)
+  // to match what RFQ_LIST_INCLUDE actually hydrates via Prisma; flattened
+  // once below, at the withWaveAngle call site.
   programmeId: string | null;
   waveNumber: number | null;
-  articleAngle: string | null;
+  article: { title: string } | null;
   items: RfqListItem[];
 };
 
@@ -93,6 +95,7 @@ export const RFQ_LIST_INCLUDE = {
       },
     },
   },
+  article: { select: { title: true } },
 } satisfies Prisma.SavedListInclude;
 
 export async function submitListAsRfq(input: {
@@ -114,8 +117,9 @@ export async function submitListAsRfq(input: {
   // A wave of a programme carries its own article angle — put it at the top
   // of the desk-facing brief so the desk and the writer start from THIS
   // wave's idea, not a rerun of the last one. The buyer's own text is kept
-  // verbatim below it.
-  const deskBrief = await withWaveAngle(brief.text, list);
+  // verbatim below it. withWaveAngle takes a flat articleTitle; RfqSourceList
+  // carries it nested (matching RFQ_LIST_INCLUDE's Prisma shape) — flatten here.
+  const deskBrief = await withWaveAngle(brief.text, { ...list, articleTitle: list.article?.title ?? null });
 
   // Idempotency: a network-retried / double-clicked submit of the SAME list
   // within a short window must not mint a second Request. The caller resolves

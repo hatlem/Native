@@ -7,7 +7,6 @@ import { startProgramme } from "@/app/programme-actions";
 import {
   WAVE_OPTIONS,
   SPACING_OPTIONS,
-  anglesFor,
   planWaveDates,
   type CadencePlan,
 } from "@/lib/programme-cadence";
@@ -23,10 +22,10 @@ function SubmitButton({ label, pending }: { label: string; pending: string }) {
   );
 }
 
-// The "Run this as a programme" form. Client-side only so the angle rows and
-// the wave-date preview follow the waves/spacing controls live — the pure
-// cadence math (programme-cadence.ts) runs on both sides, so what the buyer
-// previews here is exactly what startProgramme will create.
+// The "Run this as a programme" form. Client-side only so the wave-date
+// preview follows the waves/spacing controls live — the pure cadence math
+// (programme-cadence.ts) runs on both sides, so what the buyer previews
+// here is exactly what startProgramme will create.
 export function ProgrammeForm({
   locale,
   listId,
@@ -63,7 +62,6 @@ export function ProgrammeForm({
       ),
     [firstStart, waves, spacing, unit, now],
   );
-  const angleDefaults = anglesFor(waves, cadence);
 
   return (
     <form action={startProgramme} className="plan-programme__form">
@@ -117,17 +115,6 @@ export function ProgrammeForm({
                       : t("noDate")}
                 </span>
               </div>
-              <label className="plan-programme__angle">
-                <span className="sr-only">{t("angleLabel", { n: i + 1 })}</span>
-                <input
-                  type="text"
-                  name="angle"
-                  maxLength={300}
-                  // Keyed by wave index so switching 3→4 waves keeps typed angles.
-                  defaultValue={t(`angle.${angleDefaults[i]}`)}
-                  placeholder={t("anglePlaceholder")}
-                />
-              </label>
             </li>
           );
         })}

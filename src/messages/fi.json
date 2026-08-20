@@ -170,7 +170,10 @@
     "linkHint": "Tätä artikkelia ei ole vielä liitetty sijoitteluun.",
     "linkEmpty": "Ei vapaita sijoitteluja organisaatiossasi.",
     "linkCta": "Liitä",
-    "linkedTo": "Liitetty"
+    "placementRetracted": "Peruutettu",
+    "unlinkCta": "Poista linkitys",
+    "sharedArticleWarning": "Tämä artikkeli on linkitetty {count} muuhun sijoitteluun — muutoksesi vaikuttavat kaikkiin.",
+    "specNotChecked": "ei tarkistettu"
   },
   "reports": {
     "title": "Raportit",
@@ -728,9 +731,11 @@
       "thisWave": "Tämä kierros",
       "openWave": "Avaa",
       "noDate": "Päivää ei asetettu",
-      "angleEdit": "Tämän kierroksen artikkelin näkökulma",
-      "angleSave": "Tallenna näkökulma",
       "angleHint": "Deski ja kirjoittaja lähtevät tästä – pidä se erilaisena kuin muilla kierroksilla.",
+      "viewArticle": "Avaa artikkeli",
+      "unlinkArticle": "Poista linkitys",
+      "noArticleYet": "Tähän kierrokseen ei ole vielä linkitetty artikkelia.",
+      "createArticleForWave": "Luo artikkeli",
       "autoSendLabel": "Lähetä jokainen kierros automaattisesti, kun sen aika koittaa",
       "autoSendHint": "Jokainen kierros lähtee deskille tavallisena pyyntönä, kun päivämäärä lähestyy – hyväksyt silti tarjouksen ennen kuin mitään varataan tai veloitetaan.",
       "waveTotal": "≈ {amount}",
@@ -1200,7 +1205,8 @@
     "vetoSubmit": "Vahvista hylkäys",
     "vetoSubmitting": "Vahvistetaan…",
     "vetoError": "Hylkäys evätty",
-    "retractedLabel": "Peruutettu"
+    "retractedLabel": "Peruutettu",
+    "vetoSharedWarning": "Tämä artikkeli on käytössä myös {count} muussa sijoittelussa — tämä peruutus ei vaikuta niihin."
   },
   "invoice": {
     "title": "Lasku",

@@ -1,14 +1,17 @@
 "use server";
 
 import { redirect } from "next/navigation";
+import type { UserRole } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
 import { recordAudit } from "@/lib/audit";
 import { loadScope, canActOnOrg } from "@/lib/scope";
+import { requireOrgArticleAccess } from "@/lib/writers/guard";
 import { writeActiveListId } from "@/lib/lists";
 import {
   createProgramme,
   dissolveProgramme as dissolveProgrammeLists,
-  setWaveAngle,
+  linkWaveArticle,
+  unlinkWaveArticle,
   ProgrammeError,
 } from "@/lib/programme";
 
@@ -44,10 +47,6 @@ export async function startProgramme(formData: FormData) {
 
   const waves = Number(str(formData, "waves"));
   const spacingWeeks = Number(str(formData, "spacingWeeks"));
-  const angles = formData
-    .getAll("angle")
-    .map((v) => (typeof v === "string" ? v.trim().slice(0, 300) : ""))
-    .map((v) => v || null);
   const rationaleKey = str(formData, "rationaleKey") || null;
   // Opt-in checkbox: unchecked boxes are simply absent from the POST.
   const autoSend = formData.get("autoSend") === "1";
@@ -59,7 +58,6 @@ export async function startProgramme(formData: FormData) {
       userId: scope.userId ?? null,
       waves,
       spacingWeeks,
-      angles,
       rationaleKey,
       autoSend,
     });
@@ -112,11 +110,53 @@ export async function dissolveProgramme(formData: FormData) {
   redirect(`/${locale}/plan`);
 }
 
-// Edit this wave's article angle from the wave strip on /plan.
-export async function updateWaveAngle(formData: FormData) {
+// Link an existing (unlinked-elsewhere-or-not) article to this wave —
+// reuses the same organization-scoped article picker flow, not a new one.
+export async function linkWaveArticleAction(formData: FormData) {
   const locale = str(formData, "locale") || "en";
   const listId = str(formData, "listId");
-  const { list } = await ownList(locale, listId);
-  await setWaveAngle(list.id, str(formData, "angle") || null);
+  const articleId = str(formData, "articleId");
+  const { scope, list } = await ownList(locale, listId);
+  const article = await prisma.article.findUnique({
+    where: { id: articleId },
+    select: { organizationId: true },
+  });
+  if (!article || article.organizationId !== list.organizationId) redirect(`/${locale}/plan`);
+  await linkWaveArticle(list.id, articleId);
+  await recordAudit(scope.userId ?? null, "programme.wave_article_link", `SavedList:${list.id}`, { articleId });
   redirect(`/${locale}/plan`);
+}
+
+export async function unlinkWaveArticleAction(formData: FormData) {
+  const locale = str(formData, "locale") || "en";
+  const listId = str(formData, "listId");
+  const { scope, list } = await ownList(locale, listId);
+  await unlinkWaveArticle(list.id);
+  await recordAudit(scope.userId ?? null, "programme.wave_article_unlink", `SavedList:${list.id}`);
+  redirect(`/${locale}/plan`);
+}
+
+// Create a brand-new article and link it to this wave in one step — the
+// "create new" branch of the wave-article form. Duplicates a few lines of
+// createArticle's body rather than composing it, because createArticle
+// redirects internally and Server Actions can't easily chain one action's
+// mutation without its redirect firing first.
+export async function createAndLinkWaveArticle(formData: FormData) {
+  const locale = str(formData, "locale") || "en";
+  const listId = str(formData, "listId");
+  const title = str(formData, "title");
+  const { list } = await ownList(locale, listId);
+  const { userId, role } = await requireOrgArticleAccess(list.organizationId, locale);
+  if (!title) redirect(`/${locale}/plan`);
+  const article = await prisma.article.create({
+    data: {
+      organizationId: list.organizationId,
+      title,
+      createdByUserId: userId,
+      createdByRole: role as UserRole,
+    },
+  });
+  await linkWaveArticle(list.id, article.id);
+  await recordAudit(userId, "programme.wave_article_create", `SavedList:${list.id}`, { articleId: article.id });
+  redirect(`/${locale}/articles/${article.id}`);
 }

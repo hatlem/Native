@@ -10,7 +10,7 @@
 // is not eligible for un-cancellation. If a customer wants to revive a
 // dead booking, the desk issues a fresh quote.
 
-import { OrderStatus, ContentAssetStatus } from "@prisma/client";
+import { OrderStatus } from "@prisma/client";
 
 // Orders that can still be cancelled. Anything past LIVE is too late —
 // the article has run, the publisher has earned, the invoice is in
@@ -43,30 +43,6 @@ export function cancelBlockReason(status: OrderStatus): string {
     default:
       return "Order cannot be cancelled in its current state.";
   }
-}
-
-// Assets the publisher can hard-veto. FINAL is intentionally allowed:
-// the editorial firewall fires *after* spec-check passes and may catch
-// content that satisfied the rules-engine but fails the editor's read.
-// What you can't veto is something already RETRACTED (idempotency).
-const VETOABLE_ASSET_STATUSES: ReadonlySet<ContentAssetStatus> = new Set([
-  ContentAssetStatus.DRAFT,
-  ContentAssetStatus.IN_REVIEW,
-  ContentAssetStatus.CHANGES_REQUESTED,
-  ContentAssetStatus.APPROVED,
-  ContentAssetStatus.FINAL,
-]);
-
-export function canRetractAsset(status: ContentAssetStatus): boolean {
-  return VETOABLE_ASSET_STATUSES.has(status);
-}
-
-export function retractBlockReason(status: ContentAssetStatus): string {
-  if (canRetractAsset(status)) return "";
-  if (status === ContentAssetStatus.RETRACTED) {
-    return "Draft has already been retracted.";
-  }
-  return "Draft cannot be retracted in its current state.";
 }
 
 // Normalises the free-text reason a desk/publisher actor supplies when

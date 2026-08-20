@@ -170,7 +170,10 @@
     "linkHint": "Dieser Artikel ist noch mit keiner Platzierung verknüpft.",
     "linkEmpty": "Keine freien Platzierungen in deiner Organisation.",
     "linkCta": "Verknüpfen",
-    "linkedTo": "Verknüpft mit"
+    "placementRetracted": "Zurückgezogen",
+    "unlinkCta": "Verknüpfung entfernen",
+    "sharedArticleWarning": "Dieser Artikel ist mit {count} weiteren Platzierungen verknüpft — deine Änderungen wirken sich auf alle aus.",
+    "specNotChecked": "nicht geprüft"
   },
   "reports": {
     "title": "Berichte",
@@ -728,9 +731,11 @@
       "thisWave": "Diese Welle",
       "openWave": "Öffnen",
       "noDate": "Kein Datum",
-      "angleEdit": "Blickwinkel des Artikels für diese Welle",
-      "angleSave": "Blickwinkel speichern",
       "angleHint": "Desk und Autor starten hiervon – halten Sie ihn anders als in den übrigen Wellen.",
+      "viewArticle": "Artikel öffnen",
+      "unlinkArticle": "Verknüpfung entfernen",
+      "noArticleYet": "Diesem Wave ist noch kein Artikel zugeordnet.",
+      "createArticleForWave": "Artikel erstellen",
       "autoSendLabel": "Jede Welle automatisch senden, wenn sie fällig ist",
       "autoSendHint": "Jede Welle geht als normale Anfrage an den Desk, sobald ihr Termin näher rückt – Sie geben das Angebot weiterhin frei, bevor etwas gebucht oder abgerechnet wird.",
       "waveTotal": "≈ {amount}",
@@ -1200,7 +1205,8 @@
     "vetoSubmit": "Ablehnung bestätigen",
     "vetoSubmitting": "Wird bestätigt…",
     "vetoError": "Ablehnung verweigert",
-    "retractedLabel": "Zurückgezogen"
+    "retractedLabel": "Zurückgezogen",
+    "vetoSharedWarning": "Dieser Artikel läuft auch auf {count} weiteren Platzierungen — sie sind von diesem Widerruf nicht betroffen."
   },
   "invoice": {
     "title": "Rechnung",

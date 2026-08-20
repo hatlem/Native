@@ -45,12 +45,11 @@ test("a writer can only be assigned if present in the pool", () => {
   assert.equal(canAssignWriter([], "w1"), false);
 });
 
-test("an assignment is active until its latest asset is FINAL/RETRACTED", () => {
+test("an assignment is active until its latest asset is FINAL", () => {
   assert.equal(isAssignmentActive(null), true); // assigned, not yet written
   assert.equal(isAssignmentActive("DRAFT"), true);
   assert.equal(isAssignmentActive("IN_REVIEW"), true);
   assert.equal(isAssignmentActive("FINAL"), false);
-  assert.equal(isAssignmentActive("RETRACTED"), false);
 });
 
 test("canWriteArticle: DESK can always write", () => {

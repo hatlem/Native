@@ -170,7 +170,10 @@
     "linkHint": "This article isn't linked to a placement yet.",
     "linkEmpty": "No unlinked placements available in your organization.",
     "linkCta": "Link",
-    "linkedTo": "Linked to"
+    "placementRetracted": "Retracted",
+    "unlinkCta": "Unlink",
+    "sharedArticleWarning": "This article is linked to {count} other placements — your changes will affect all of them.",
+    "specNotChecked": "not checked"
   },
   "reports": {
     "title": "Reports",
@@ -728,9 +731,11 @@
       "thisWave": "This wave",
       "openWave": "Open",
       "noDate": "Date not set",
-      "angleEdit": "This wave's article angle",
-      "angleSave": "Save angle",
       "angleHint": "The desk and writer start from this — keep it different from the other waves.",
+      "viewArticle": "View article",
+      "unlinkArticle": "Unlink",
+      "noArticleYet": "No article linked to this wave yet.",
+      "createArticleForWave": "Create article",
       "autoSendLabel": "Send each wave automatically when it's due",
       "autoSendHint": "Each wave goes to the desk as a normal request when its time comes — you still approve the quote before anything is booked or charged.",
       "waveTotal": "≈ {amount}",
@@ -1199,7 +1204,8 @@
     "vetoSubmit": "Confirm rejection",
     "vetoSubmitting": "Confirming…",
     "vetoError": "Rejection refused",
-    "retractedLabel": "Retracted"
+    "retractedLabel": "Retracted",
+    "vetoSharedWarning": "This article also runs on {count} other placement(s) — they will not be affected by this retraction."
   },
   "invoice": {
     "title": "Invoice",

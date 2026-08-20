@@ -1,5 +1,6 @@
 import { prisma } from "@/lib/prisma";
 import { requireLineWriter } from "@/lib/writers/guard";
+import { resolveEffectiveAsset } from "@/lib/writers/placement";
 import { saveDraft, runSpecCheck, setAssetStatus } from "@/app/desk-content-actions";
 
 export default async function WriterLine({
@@ -8,12 +9,13 @@ export default async function WriterLine({
   params: Promise<{ locale: string; lineId: string }>;
 }) {
   const { locale, lineId } = await params;
-  await requireLineWriter(lineId, locale); // redirects if not assigned
+  await requireLineWriter(lineId, locale); // redirects if not allowed
 
   const line = await prisma.orderLine.findUnique({
     where: { id: lineId },
     select: {
       id: true,
+      orderId: true,
       brief: {
         select: {
           message: true,
@@ -22,31 +24,23 @@ export default async function WriterLine({
           dontNotes: true,
         },
       },
-      article: {
+      articlePlacement: {
         select: {
           id: true,
-          versions: {
-            orderBy: { version: "desc" },
-            take: 1,
-            select: {
-              id: true,
-              status: true,
-              body: true,
-              specPassed: true,
-              reviewNotes: true,
-            },
-          },
+          articleId: true,
+          lockedAssetId: true,
+          specPassed: true,
         },
       },
     },
   });
 
-  if (!line?.brief || !line.article) {
+  if (!line?.brief || !line.articlePlacement) {
     return <main className="p-6 text-sm">No brief for this line yet.</main>;
   }
 
-  const latest = line.article.versions[0];
-  const articleId = line.article.id;
+  const articleId = line.articlePlacement.articleId;
+  const latest = await resolveEffectiveAsset(line.articlePlacement);
 
   return (
     <main className="mx-auto max-w-3xl space-y-6 p-6">
@@ -75,10 +69,11 @@ export default async function WriterLine({
       <form action={saveDraft} className="space-y-2">
         <input type="hidden" name="locale" value={locale} />
         <input type="hidden" name="articleId" value={articleId} />
+        <input type="hidden" name="orderLineId" value={line.id} />
         <label className="block text-sm font-medium">Article</label>
         <textarea
           name="body"
-          defaultValue={latest?.body ?? ""}
+          defaultValue={latest?.bodyUrl ? "" : (latest?.body ?? "")}
           rows={18}
           className="w-full rounded border p-2 font-mono text-sm"
         />
@@ -94,15 +89,15 @@ export default async function WriterLine({
         <div className="flex items-center gap-4 text-sm">
           <span>
             Status: <strong>{latest.status}</strong>
-            {latest.specPassed === true
+            {line.articlePlacement.specPassed === true
               ? " · spec ✓"
-              : latest.specPassed === false
+              : line.articlePlacement.specPassed === false
                 ? " · spec ✗"
                 : ""}
           </span>
           <form action={runSpecCheck}>
             <input type="hidden" name="locale" value={locale} />
-            <input type="hidden" name="assetId" value={latest.id} />
+            <input type="hidden" name="placementId" value={line.articlePlacement.id} />
             <button type="submit" className="underline">
               Run spec check
             </button>
@@ -110,6 +105,7 @@ export default async function WriterLine({
           <form action={setAssetStatus}>
             <input type="hidden" name="locale" value={locale} />
             <input type="hidden" name="assetId" value={latest.id} />
+            <input type="hidden" name="orderLineId" value={line.id} />
             <input type="hidden" name="target" value="IN_REVIEW" />
             <button type="submit" className="underline">
               Submit for review

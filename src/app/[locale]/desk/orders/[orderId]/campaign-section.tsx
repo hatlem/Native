@@ -22,7 +22,9 @@ type BookingWithDetails = Prisma.PublisherBookingGetPayload<{
 
 type LineWithBooking = Prisma.OrderLineGetPayload<{
   include: {
-    article: { include: { versions: { orderBy: { version: "desc" } } } };
+    articlePlacement: {
+      include: { article: { include: { versions: { orderBy: { version: "desc" } } } } };
+    };
     trackedLinks: true;
     booking: {
       include: {
@@ -42,7 +44,9 @@ type OrderForCampaign = Prisma.OrderGetPayload<{
     creditNotes: true;
     lines: {
       include: {
-        article: { include: { versions: { orderBy: { version: "desc" } } } };
+        articlePlacement: {
+      include: { article: { include: { versions: { orderBy: { version: "desc" } } } } };
+    };
         trackedLinks: true;
         booking: {
           include: {

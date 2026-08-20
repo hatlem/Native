@@ -6,7 +6,7 @@ import { prisma } from "@/lib/prisma";
 import { recordAudit } from "@/lib/audit";
 import { canAssignWriter } from "@/lib/writers/access";
 import { writerStaffableLine } from "@/lib/authorship";
-import { ensureArticleForLine, articleTitleForLine } from "@/lib/writers/article";
+import { ensurePlacementForLine, articleTitleForLine } from "@/lib/writers/placement";
 
 function field(formData: FormData, key: string): string {
   const v = formData.get(key);
@@ -71,10 +71,16 @@ export async function assignWriterToLine(formData: FormData) {
       where: { id: orderLineId },
       data: { assignedWriterId: null, assignedAt: null, assignedById: null },
     });
-    await prisma.article.updateMany({
+    const placement = await prisma.articlePlacement.findUnique({
       where: { orderLineId },
-      data: { assignedWriterId: null },
+      select: { articleId: true },
     });
+    if (placement) {
+      await prisma.article.update({
+        where: { id: placement.articleId },
+        data: { assignedWriterId: null },
+      });
+    }
     await recordAudit(userId, "line.unassign", `OrderLine:${orderLineId}`);
     await recordAudit(userId, "article.unassign", `OrderLine:${orderLineId}`);
     redirect(`/${locale}/desk/orders/${orderId}`);
@@ -108,12 +114,13 @@ export async function assignWriterToLine(formData: FormData) {
   });
   await recordAudit(userId, "line.assign", `OrderLine:${orderLineId}`, { writerId });
 
-  // First assignment for this line creates its Article; a re-assignment
-  // (previous writer swapped for a new one) just repoints assignedWriterId.
-  // ensureArticleForLine keys on the unique orderLineId, so two
-  // concurrent assignments to the same line converge on one row instead
-  // of racing between a find and a create.
-  await ensureArticleForLine({
+  // First assignment for this line creates its ArticlePlacement (and the
+  // Article it points to); a re-assignment (previous writer swapped for a
+  // new one) just repoints assignedWriterId. ensurePlacementForLine keys
+  // on the unique ArticlePlacement.orderLineId, so two concurrent
+  // assignments to the same line converge on one row instead of racing
+  // between a find and a create.
+  await ensurePlacementForLine({
     orderLineId,
     organizationId: updatedLine.order.organizationId,
     title: await articleTitleForLine(orderLineId),

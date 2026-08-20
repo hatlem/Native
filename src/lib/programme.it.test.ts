@@ -10,6 +10,7 @@ import {
   sourceListForOrder,
   planWaveDates,
   dissolveProgramme,
+  linkWaveArticle,
   ProgrammeError,
 } from "./programme";
 import { runAutoSendSweep } from "./programme-autosend";
@@ -46,6 +47,16 @@ after(async () => {
   await prisma.savedListItem.deleteMany({ where: { list: { organizationId: orgId } } });
   await prisma.savedList.deleteMany({ where: { organizationId: orgId } });
   await prisma.campaignProgramme.deleteMany({ where: { organizationId: orgId } });
+  // The runAutoSendSweep test links a real Article to a wave (a wave no
+  // longer gets an angle prefilled at creation) — clean it up before the
+  // org delete, same as every other FK-bearing row above. The Article's
+  // createdByUserId also needs its own User cleaned up, or it leaks a row
+  // on every run (Article.createdByUserId has no cascade) — and the sweep's
+  // notifyDesk/notifyOrg calls leave that user a Notification row, which
+  // must go first (Notification.userId has no cascade either).
+  await prisma.article.deleteMany({ where: { organizationId: orgId } });
+  await prisma.notification.deleteMany({ where: { user: { organizationId: orgId } } });
+  await prisma.user.deleteMany({ where: { organizationId: orgId } });
   await prisma.organization.delete({ where: { id: orgId } });
 });
 
@@ -80,7 +91,6 @@ if (!RUN_DB_IT) {
       userId: null,
       waves: 3,
       spacingWeeks: 8,
-      angles: ["Problem", "Proof", "How-to"],
       rationaleKey: "monthlyCycle",
       now: new Date("2026-08-18T00:00:00Z"),
     });
@@ -93,7 +103,9 @@ if (!RUN_DB_IT) {
       include: { items: true },
     });
     assert.deepEqual(waves.map((w) => w.waveNumber), [1, 2, 3]);
-    assert.deepEqual(waves.map((w) => w.articleAngle), ["Problem", "Proof", "How-to"]);
+    // No angle prefill on create/copy anymore — every wave starts unlinked;
+    // the buyer links or creates an article per wave afterward from the UI.
+    assert.deepEqual(waves.map((w) => w.articleId), [null, null, null]);
     const w2 = waves[1];
     assert.equal(w2.name, "ABAX trade press · Wave 2");
     assert.equal(Number(w2.budget), 120000);
@@ -117,7 +129,6 @@ if (!RUN_DB_IT) {
         userId: null,
         waves: 2,
         spacingWeeks: 4,
-        angles: [],
         rationaleKey: null,
       }),
       (e: unknown) => e instanceof ProgrammeError && e.code === "already-in-programme",
@@ -138,7 +149,6 @@ if (!RUN_DB_IT) {
       userId: null,
       waves: 3,
       spacingWeeks: 6,
-      angles: [null, null, null],
       rationaleKey: "default",
       now,
     });
@@ -260,7 +270,6 @@ if (!RUN_DB_IT) {
       userId: null,
       waves: 2,
       spacingWeeks: 6,
-      angles: [null, null],
       rationaleKey: "default",
       now: new Date("2026-08-18T00:00:00Z"),
     });
@@ -303,7 +312,6 @@ if (!RUN_DB_IT) {
         userId: null,
         waves: 2,
         spacingWeeks: 6,
-        angles: ["First angle", "Second angle"],
         rationaleKey: "default",
         autoSend,
         now,
@@ -322,6 +330,22 @@ if (!RUN_DB_IT) {
     const auto = await makeProgramme("Auto prog", true);
     const manual = await makeProgramme("Manual prog", false);
 
+    // A wave no longer gets an angle prefilled at creation — the buyer links
+    // an article to it from the UI. Link one to the due wave directly so
+    // withWaveAngle's brief-prefix behavior still gets real coverage here.
+    const user = await prisma.user.create({
+      data: { email: `it-programme-${Date.now()}@example.com`, role: "BUYER", organizationId: orgId },
+    });
+    const article = await prisma.article.create({
+      data: {
+        organizationId: orgId,
+        title: "Second angle",
+        createdByUserId: user.id,
+        createdByRole: "BUYER",
+      },
+    });
+    await linkWaveArticle(auto[1], article.id);
+
     await runAutoSendSweep(now);
 
     // The opted-in wave was submitted through the normal RFQ path…
@@ -331,8 +355,8 @@ if (!RUN_DB_IT) {
     });
     assert.equal(sentRequests.length, 1, "exactly one request for the due auto-send wave");
     assert.equal(sentRequests[0].status, "SUBMITTED");
-    // …with the wave's angle at the top of the desk brief and the list's
-    // stored brief fields on the plan.
+    // …with the wave's linked article title at the top of the desk brief and
+    // the list's stored brief fields on the plan.
     assert.match(sentRequests[0].briefSummary ?? "", /wave 2 of 2.*Second angle/);
     assert.equal(sentRequests[0].plan.goal, "Awareness");
     assert.equal(Number(sentRequests[0].plan.budget), 10000);
@@ -357,7 +381,6 @@ if (!RUN_DB_IT) {
       userId: null,
       waves: 3,
       spacingWeeks: 6,
-      angles: ["Problem", "Proof", "How-to"],
       rationaleKey: null,
     });
 
@@ -376,7 +399,7 @@ if (!RUN_DB_IT) {
     assert.equal(w1.name, "Dissolve test", "the ' · Wave 1' suffix is stripped");
     assert.equal(w1.programmeId, null);
     assert.equal(w1.waveNumber, null);
-    assert.equal(w1.articleAngle, null);
+    assert.equal(w1.articleId, null);
 
     for (const id of [waveListIds[1], waveListIds[2]]) {
       const w = await prisma.savedList.findUniqueOrThrow({ where: { id } });
@@ -384,7 +407,7 @@ if (!RUN_DB_IT) {
       assert.equal(w.name, "Dissolve test", "archived copies also lose the suffix");
       assert.equal(w.programmeId, null);
       assert.equal(w.waveNumber, null);
-      assert.equal(w.articleAngle, null);
+      assert.equal(w.articleId, null);
     }
 
     const programme = await prisma.campaignProgramme.findUniqueOrThrow({ where: { id: programmeId } });

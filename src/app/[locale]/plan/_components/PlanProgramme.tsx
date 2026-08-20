@@ -1,7 +1,13 @@
 import { getTranslations } from "next-intl/server";
 import { Repeat } from "lucide-react";
 import { selectActiveList } from "@/app/list-actions";
-import { updateWaveAngle, dissolveProgramme } from "@/app/programme-actions";
+import {
+  linkWaveArticleAction,
+  unlinkWaveArticleAction,
+  createAndLinkWaveArticle,
+  dissolveProgramme,
+} from "@/app/programme-actions";
+import { prisma } from "@/lib/prisma";
 import type { ProgrammeView, CadencePlan } from "@/lib/programme";
 import type { ScheduleOverlapWarning } from "@/lib/programme-warnings";
 import type { BookingUnit } from "@/lib/campaign-schedule";
@@ -20,9 +26,10 @@ export type ProgrammePacing = {
 // Multi-wave planning on /plan. Two states:
 //  - plain list → a collapsed "Run this as a programme" disclosure with the
 //    recommended cadence pre-filled (why + how, then the form);
-//  - a wave of a programme → the wave strip: every wave's state/date/angle,
-//    the current one highlighted, others switchable (selectActiveList), and
-//    this wave's angle editable in place.
+//  - a wave of a programme → the wave strip: every wave's state/date/linked
+//    article, the current one highlighted, others switchable
+//    (selectActiveList), and this wave's article linkable/creatable/unlinkable
+//    in place.
 // Native <details> for the disclosure — same pattern as PlanTargeting.
 export async function PlanProgramme({
   locale,
@@ -44,6 +51,7 @@ export async function PlanProgramme({
   warnings?: ScheduleOverlapWarning[];
 }) {
   const t = await getTranslations({ locale, namespace: "plan.programme" });
+  const tArticles = await getTranslations({ locale, namespace: "articles" });
   const dateFmt = new Intl.DateTimeFormat(intlLocale(locale), { day: "numeric", month: "short" });
 
   if (!view) {
@@ -77,6 +85,25 @@ export async function PlanProgramme({
   }
 
   const current = view.waves.find((w) => w.listId === listId) ?? null;
+
+  // Only queried when this wave has no article yet — no need to hit the DB
+  // for the "linked" view, or when there's no current wave at all.
+  const otherArticles =
+    current && !current.articleId
+      ? await (async () => {
+          const list = await prisma.savedList.findUnique({
+            where: { id: listId },
+            select: { organizationId: true },
+          });
+          if (!list) return [];
+          return prisma.article.findMany({
+            where: { organizationId: list.organizationId },
+            orderBy: { updatedAt: "desc" },
+            take: 20,
+            select: { id: true, title: true },
+          });
+        })()
+      : [];
 
   // "12 000 kr + €900" — multi-currency waves join with "+" so the figure
   // reads as two charges that both apply, never a choice (the Erlend rule).
@@ -113,7 +140,7 @@ export async function PlanProgramme({
                   {t("waveTotal", { amount: joinTotals(waveTotals) })}
                 </span>
               ) : null}
-              {w.articleAngle ? <span className="wave-strip__angle">{w.articleAngle}</span> : null}
+              {w.articleTitle ? <span className="wave-strip__angle">{w.articleTitle}</span> : null}
             </>
           );
           return (
@@ -157,25 +184,56 @@ export async function PlanProgramme({
         </p>
       ) : null}
       {current ? (
-        <form action={updateWaveAngle} className="plan-programme__angle-form">
-          <input type="hidden" name="locale" value={locale} />
-          <input type="hidden" name="listId" value={listId} />
-          <label htmlFor="wave-angle">{t("angleEdit")}</label>
-          <div className="plan-programme__angle-row">
-            <input
-              id="wave-angle"
-              type="text"
-              name="angle"
-              maxLength={300}
-              defaultValue={current.articleAngle ?? ""}
-              placeholder={t("anglePlaceholder")}
-            />
-            <button type="submit" className="btn small secondary">
-              {t("angleSave")}
-            </button>
-          </div>
+        <div className="plan-programme__angle-form">
+          {current.articleId ? (
+            <div className="plan-programme__angle-row">
+              <a href={`/${locale}/articles/${current.articleId}`} className="link">
+                {current.articleTitle ?? t("viewArticle")}
+              </a>
+              <form action={unlinkWaveArticleAction}>
+                <input type="hidden" name="locale" value={locale} />
+                <input type="hidden" name="listId" value={listId} />
+                <button type="submit" className="btn small secondary">
+                  {t("unlinkArticle")}
+                </button>
+              </form>
+            </div>
+          ) : (
+            <div className="plan-programme__angle-row">
+              {otherArticles.length > 0 ? (
+                <form action={linkWaveArticleAction} className="plan-programme__angle-row">
+                  <input type="hidden" name="locale" value={locale} />
+                  <input type="hidden" name="listId" value={listId} />
+                  <label>
+                    <span className="sr-only">{t("anglePlaceholder")}</span>
+                    <select name="articleId">
+                      {otherArticles.map((a) => (
+                        <option key={a.id} value={a.id}>
+                          {a.title}
+                        </option>
+                      ))}
+                    </select>
+                  </label>
+                  <button type="submit" className="btn small secondary">
+                    {tArticles("linkCta")}
+                  </button>
+                </form>
+              ) : null}
+              <form action={createAndLinkWaveArticle} className="plan-programme__angle-row">
+                <input type="hidden" name="locale" value={locale} />
+                <input type="hidden" name="listId" value={listId} />
+                <label>
+                  <span className="sr-only">{t("anglePlaceholder")}</span>
+                  <input type="text" name="title" placeholder={t("anglePlaceholder")} required />
+                </label>
+                <button type="submit" className="btn small secondary">
+                  {t("createArticleForWave")}
+                </button>
+              </form>
+            </div>
+          )}
           <p className="muted small">{t("angleHint")}</p>
-        </form>
+        </div>
       ) : null}
       {/* The undo. A native disclosure keeps the destructive-looking option
           out of the default view without any client JS — opening it IS the
