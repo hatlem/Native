@@ -242,12 +242,32 @@ export function resolveDefaultMarginPct(
   return pickMarginRule(rules, marketCode)?.marginPct ?? DEFAULT_MARGIN_PCT;
 }
 
+// Lines flagged priceOnRequest go out on the quote WITHOUT an amount
+// ("pris på forespørsel") and never count toward subtotal/total — the
+// footnote on the customer document says they are confirmed separately.
 export function quoteTotals(
-  lines: { lineTotal: number }[],
+  lines: { lineTotal: number; priceOnRequest?: boolean }[],
   vatPct: number,
 ): { subtotal: number; total: number } {
-  const subtotal = lines.reduce((s, l) => s + l.lineTotal, 0);
+  const subtotal = lines.reduce(
+    (s, l) => (l.priceOnRequest ? s : s + l.lineTotal),
+    0,
+  );
   return { subtotal, total: Math.round(withVat(subtotal, vatPct)) };
+}
+
+// Inverse of firmLineTotal for a desk override: given the rate-card cost
+// and the seller's new line total, what margin % did the seller just
+// price at? Keeps the superadmin cost-vs-sell readout truthful after a
+// manual reprice. Zero-cost lines (content fees, unknown cost) keep 0.
+export function marginPctFromSell(
+  unitCost: number,
+  quantity: number,
+  lineTotal: number,
+): number {
+  const cost = unitCost * quantity;
+  if (cost <= 0) return 0;
+  return Math.round((lineTotal / cost - 1) * 10000) / 100;
 }
 
 // Normalise persisted PriceRules (Prisma Decimals) into plain RateRules.

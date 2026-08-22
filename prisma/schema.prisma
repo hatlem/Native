@@ -754,6 +754,7 @@ model User {
   favorites              Favorite[]
   favoriteLists          FavoriteList[]
   quoteDocumentsGenerated QuoteDocument[]   @relation("QuoteDocumentGenerator")
+  quoteLinePricesSet      QuoteLine[]       @relation("QuoteLinePriceSetter")
 }
 
 // Super-admin emits these when activating a new publishing house in
@@ -1231,6 +1232,16 @@ model QuoteLine {
   marginPct     Decimal  @db.Decimal(5, 2)
   lineTotal     Decimal  @db.Decimal(12, 2)
   availability  String?
+  // Line pricing state. priceOnRequest = the line goes out on the quote
+  // WITHOUT an amount and is excluded from subtotal/total ("pris på
+  // forespørsel") — the default for lines quoted off an unconfirmed
+  // (blueprint-estimated) product price. The desk resolves it by setting a
+  // concrete customer price; priceSetBy/At record who last did so (a full
+  // trail also lands in AuditLog as quote.line.price).
+  priceOnRequest Boolean  @default(false)
+  priceSetById   String?
+  priceSetBy     User?    @relation("QuoteLinePriceSetter", fields: [priceSetById], references: [id])
+  priceSetAt     DateTime?
 }
 
 model Order {

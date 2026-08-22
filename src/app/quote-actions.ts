@@ -4,6 +4,7 @@ import { redirect } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import {
   computeQuoteLines,
+  marginPctFromSell,
   quoteTotals,
   resolveDefaultMarginPct,
   type QuotableItem,
@@ -78,26 +79,53 @@ export async function generateQuote(formData: FormData) {
   const defaults = await loadPricingDefaults();
   const validUntil = new Date(Date.now() + 14 * 24 * 60 * 60 * 1000);
 
+  // A line quoted off an unconfirmed (blueprint-estimated) product price
+  // must not present the estimate as a firm figure — it goes out as
+  // "price on request" until the desk sets a concrete customer price.
+  // The sibling content-fee line follows its placement: if the placement
+  // itself is unpriced, so is the production fee folded into it.
+  const priceOnRequestFor = (productId: string | null): boolean => {
+    if (!productId) return false;
+    const product = byId.get(productId);
+    if (!product) return true;
+    return product.confirmedAt === null || Number(product.basePrice) <= 0;
+  };
+
   const created = await prisma.$transaction(async (tx) => {
-    const quotes: { id: string; currency: string; total: number }[] = [];
+    const quotes: {
+      id: string;
+      currency: string;
+      total: number;
+      onRequestCount: number;
+    }[] = [];
     for (const group of groups) {
-      const lines = [
-        ...computeQuoteLines(
-          group.items
-            .map((item) => {
-              const product = byId.get(item.productId);
-              return product ? toQuotable(product, item.quantity) : null;
-            })
-            .filter((q): q is QuotableItem => q !== null),
-          resolveDefaultMarginPct(defaults.marginRules, group.marketCode),
+      const inventoryLines = computeQuoteLines(
+        group.items
+          .map((item) => {
+            const product = byId.get(item.productId);
+            return product ? toQuotable(product, item.quantity) : null;
+          })
+          .filter((q): q is QuotableItem => q !== null),
+        resolveDefaultMarginPct(defaults.marginRules, group.marketCode),
+      ).map((line) => ({
+        ...line,
+        priceOnRequest: priceOnRequestFor(line.productId),
+      }));
+      const onRequestNames = new Set(
+        inventoryLines.filter((l) => l.priceOnRequest).map((l) => l.description),
+      );
+      const feeLines = contentFeeLinesForGroup(
+        group.items,
+        byId,
+        group.marketCode,
+        defaults.feeRules,
+      ).map((line) => ({
+        ...line,
+        priceOnRequest: onRequestNames.has(
+          line.description.replace(/^Content production — /, ""),
         ),
-        ...contentFeeLinesForGroup(
-          group.items,
-          byId,
-          group.marketCode,
-          defaults.feeRules,
-        ),
-      ];
+      }));
+      const lines = [...inventoryLines, ...feeLines];
       const { subtotal, total } = quoteTotals(lines, group.vatPct);
       const quote = await tx.quote.create({
         data: {
@@ -111,7 +139,12 @@ export async function generateQuote(formData: FormData) {
           lines: { create: lines },
         },
       });
-      quotes.push({ id: quote.id, currency: group.currency, total });
+      quotes.push({
+        id: quote.id,
+        currency: group.currency,
+        total,
+        onRequestCount: lines.filter((l) => l.priceOnRequest).length,
+      });
     }
     await tx.request.update({
       where: { id: request.id },
@@ -133,16 +166,113 @@ export async function generateQuote(formData: FormData) {
   const totalsBody = created
     .map((q) => `${q.total} ${q.currency}`)
     .join(" + ");
+  const onRequestTotal = created.reduce((s, q) => s + q.onRequestCount, 0);
   await notifyOrg(request.organizationId, {
     kind: "QUOTE_READY",
     title:
       created.length === 1
         ? "Your quote is ready"
         : `Your ${created.length} quotes are ready`,
-    body: `Total ${totalsBody}, valid until ${validUntil
-      .toISOString()
-      .slice(0, 10)}.`,
+    body: `Total ${totalsBody}${
+      onRequestTotal > 0
+        ? ` (${onRequestTotal} line${onRequestTotal === 1 ? "" : "s"} priced on request)`
+        : ""
+    }, valid until ${validUntil.toISOString().slice(0, 10)}.`,
     link: `/${locale}/requests/${request.id}`,
+  });
+
+  redirect(`/${locale}/desk/${requestId}`);
+}
+
+// Desk override of one quote line's customer price. Two intents:
+//   intent=set     — give the line a concrete customer total (prices a
+//                    "pris på forespørsel" line, or reprices a priced one)
+//   intent=onRequest — send the line out without an amount instead
+// Only while the quote has no order: once a buyer accepted, the numbers
+// they accepted are immutable. Every change stamps priceSetBy/At on the
+// line and lands in AuditLog with the before/after amounts.
+export async function setQuoteLinePrice(formData: FormData) {
+  const locale = str(formData, "locale") || "en";
+  const requestId = str(formData, "requestId");
+  const quoteId = str(formData, "quoteId");
+  const lineId = str(formData, "lineId");
+  const intent = str(formData, "intent");
+
+  const scope = await loadScope();
+  if (!scope.isDesk || !scope.userId) redirect(`/${locale}/signin`);
+
+  const quote = await prisma.quote.findUnique({
+    where: { id: quoteId },
+    include: { lines: true, order: true },
+  });
+  if (!quote || quote.requestId !== requestId) {
+    redirect(`/${locale}/desk/${requestId}`);
+  }
+  const line = quote.lines.find((l) => l.id === lineId);
+  if (!line || quote.order) {
+    redirect(`/${locale}/desk/${requestId}`);
+  }
+
+  let update: {
+    priceOnRequest: boolean;
+    lineTotal?: number;
+    marginPct?: number;
+  };
+  if (intent === "onRequest") {
+    update = { priceOnRequest: true };
+  } else {
+    // Accept "25 000", "25000.50", "25 000,50" — digits, spaces, one
+    // decimal separator. Reject anything non-positive or unparseable.
+    const raw = str(formData, "lineTotal").replace(/[\s ]/g, "").replace(",", ".");
+    const lineTotal = Number(raw);
+    if (!Number.isFinite(lineTotal) || lineTotal <= 0) {
+      redirect(`/${locale}/desk/${requestId}?error=bad-price`);
+    }
+    update = {
+      priceOnRequest: false,
+      lineTotal: Math.round(lineTotal),
+      marginPct: marginPctFromSell(
+        Number(line.unitCost),
+        line.quantity,
+        Math.round(lineTotal),
+      ),
+    };
+  }
+
+  await prisma.$transaction(async (tx) => {
+    await tx.quoteLine.update({
+      where: { id: line.id },
+      data: {
+        ...update,
+        priceSetById: scope.userId,
+        priceSetAt: new Date(),
+      },
+    });
+    const lines = quote.lines.map((l) =>
+      l.id === line.id
+        ? {
+            lineTotal: update.lineTotal ?? Number(l.lineTotal),
+            priceOnRequest: update.priceOnRequest,
+          }
+        : {
+            lineTotal: Number(l.lineTotal),
+            priceOnRequest: l.priceOnRequest,
+          },
+    );
+    const { subtotal, total } = quoteTotals(lines, Number(quote.vatPct));
+    await tx.quote.update({
+      where: { id: quote.id },
+      data: { subtotal, total },
+    });
+  });
+
+  await recordAudit(scope.userId, "quote.line.price", `QuoteLine:${line.id}`, {
+    quoteId: quote.id,
+    requestId,
+    intent: update.priceOnRequest ? "onRequest" : "set",
+    previousLineTotal: Number(line.lineTotal),
+    previousPriceOnRequest: line.priceOnRequest,
+    ...(update.lineTotal != null ? { lineTotal: update.lineTotal } : {}),
   });
 
   redirect(`/${locale}/desk/${requestId}`);
@@ -202,12 +332,20 @@ export async function acceptQuote(formData: FormData) {
     redirect(`/${locale}/requests/${quote.requestId}`);
   }
 
+  // "Pris på forespørsel" lines carry no agreed amount — the buyer is
+  // accepting the priced lines only; the rest is confirmed separately by
+  // the desk. A quote with nothing priced has nothing to accept.
+  const pricedLines = quote.lines.filter((l) => !l.priceOnRequest);
+  if (pricedLines.length === 0) {
+    redirect(`/${locale}/requests/${quote.requestId}`);
+  }
+
   // Order/brief/booking creation + quote ACCEPTED live in the shared
   // accept-quote helper; the request close rides in the same transaction.
   const { orderId, productIds } = await prisma.$transaction(async (tx) => {
     const result = await createOrderFromQuote(tx, {
       organizationId: quote.request.organizationId,
-      quote: { id: quote.id, lines: quote.lines },
+      quote: { id: quote.id, lines: pricedLines },
       plan: quote.request.plan,
     });
     await tx.request.update({
@@ -269,7 +407,12 @@ export async function acceptAllQuotesForRequest(formData: FormData) {
     redirect(`/${locale}/signin`);
   }
 
-  const openQuotes = request.quotes.filter((q) => !q.order);
+  // Same rule as acceptQuote: only priced lines become order lines; a
+  // quote whose every line is still "pris på forespørsel" is skipped
+  // (nothing agreed to accept on it yet).
+  const openQuotes = request.quotes
+    .map((q) => ({ ...q, lines: q.lines.filter((l) => !l.priceOnRequest) }))
+    .filter((q) => !q.order && q.lines.length > 0);
   if (openQuotes.length === 0) {
     redirect(`/${locale}/requests/${request.id}`);
   }

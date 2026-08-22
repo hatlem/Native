@@ -762,7 +762,9 @@
     "timelineLead": "Når alt kjører — de neste seks månedene, måned for måned. Utkast uten datoer ligger nederst.",
     "timelineNotScheduled": "Ikke planlagt ennå",
     "timelineLater": "Senere",
-    "timelineEmptyMonth": "Ingenting kjører denne måneden"
+    "timelineEmptyMonth": "Ingenting kjører denne måneden",
+    "priceOnRequest": "Pris på forespørsel",
+    "priceOnRequestNote": "Linjer merket «pris på forespørsel» kommer i tillegg til totalen over og bekreftes separat."
   },
   "desk": {
     "eyebrow": "Internt desk",
@@ -847,7 +849,16 @@
         "live": "Live",
         "done": "Ferdig"
       }
-    }
+    },
+    "linePriceInvalid": "Ugyldig pris — oppgi et positivt beløp.",
+    "lineStateSummary": "{priced} priset · {onRequest} pris på forespørsel",
+    "linePriceOnRequest": "Pris på forespørsel",
+    "linePriceReference": "Katalogreferanse: {reference}",
+    "linePriceSetBy": "Pris satt av {name} · {date}",
+    "linePriceSetByUnknown": "desk",
+    "linePricePlaceholder": "Kundepris ({currency})",
+    "linePriceSave": "Sett pris",
+    "linePriceMarkOnRequest": "Send som pris på forespørsel"
   },
   "deskTitles": {
     "eyebrow": "Superadmin · titler",

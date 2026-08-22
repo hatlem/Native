@@ -887,7 +887,9 @@
     "timelineLead": "Wann was läuft — die nächsten sechs Monate, Monat für Monat. Entwürfe ohne Termin stehen ganz unten.",
     "timelineNotScheduled": "Noch nicht terminiert",
     "timelineLater": "Später",
-    "timelineEmptyMonth": "Diesen Monat läuft nichts"
+    "timelineEmptyMonth": "Diesen Monat läuft nichts",
+    "priceOnRequest": "Preis auf Anfrage",
+    "priceOnRequestNote": "Mit „Preis auf Anfrage“ markierte Zeilen kommen zur obigen Summe hinzu und werden separat bestätigt."
   },
   "desk": {
     "eyebrow": "Interner Desk",
@@ -972,7 +974,16 @@
         "live": "Live",
         "done": "Abgeschlossen"
       }
-    }
+    },
+    "linePriceInvalid": "Ungültiger Preis — geben Sie einen positiven Betrag ein.",
+    "lineStateSummary": "{priced} bepreist · {onRequest} Preis auf Anfrage",
+    "linePriceOnRequest": "Preis auf Anfrage",
+    "linePriceReference": "Katalogreferenz: {reference}",
+    "linePriceSetBy": "Preis gesetzt von {name} · {date}",
+    "linePriceSetByUnknown": "Desk",
+    "linePricePlaceholder": "Kundenpreis ({currency})",
+    "linePriceSave": "Preis setzen",
+    "linePriceMarkOnRequest": "Als Preis auf Anfrage senden"
   },
   "deskTitles": {
     "eyebrow": "Super-Admin · Titel",

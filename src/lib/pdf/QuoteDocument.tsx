@@ -105,7 +105,6 @@ export function QuoteDocument({
   messages: Messages;
 }) {
   const money = (amount: number) => formatMoney(amount, data.currency, locale);
-  const priced = data.rows.filter((r) => !r.priceOnRequest);
   const onRequest = data.rows.filter((r) => r.priceOnRequest);
 
   return (
@@ -206,7 +205,7 @@ export function QuoteDocument({
           <Text>{t(messages, "paymentTerms")}</Text>
         </View>
 
-        {onRequest.length > 0 && priced.length > 0 ? (
+        {onRequest.length > 0 ? (
           <Text style={styles.footnote}>{t(messages, "footnote")}</Text>
         ) : null}
 

@@ -887,7 +887,9 @@
     "timelineLead": "Milloin mikäkin on käynnissä — seuraavat kuusi kuukautta, kuukausi kerrallaan. Päiväämättömät luonnokset ovat alimpana.",
     "timelineNotScheduled": "Ei vielä aikataulussa",
     "timelineLater": "Myöhemmin",
-    "timelineEmptyMonth": "Tässä kuussa ei ole mitään käynnissä"
+    "timelineEmptyMonth": "Tässä kuussa ei ole mitään käynnissä",
+    "priceOnRequest": "Hinta pyynnöstä",
+    "priceOnRequestNote": "Rivit, joissa lukee ”hinta pyynnöstä”, tulevat yllä olevan summan lisäksi ja vahvistetaan erikseen."
   },
   "desk": {
     "eyebrow": "Sisäinen desk",
@@ -972,7 +974,16 @@
         "live": "Live",
         "done": "Valmis"
       }
-    }
+    },
+    "linePriceInvalid": "Virheellinen hinta — anna positiivinen summa.",
+    "lineStateSummary": "{priced} hinnoiteltu · {onRequest} hinta pyynnöstä",
+    "linePriceOnRequest": "Hinta pyynnöstä",
+    "linePriceReference": "Katalogiviite: {reference}",
+    "linePriceSetBy": "Hinnan asetti {name} · {date}",
+    "linePriceSetByUnknown": "desk",
+    "linePricePlaceholder": "Asiakashinta ({currency})",
+    "linePriceSave": "Aseta hinta",
+    "linePriceMarkOnRequest": "Lähetä hintana pyynnöstä"
   },
   "deskTitles": {
     "eyebrow": "Pääkäyttäjä · julkaisut",
