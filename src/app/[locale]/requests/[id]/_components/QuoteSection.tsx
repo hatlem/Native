@@ -67,6 +67,7 @@ export async function QuoteSection({
           productId: l.productId,
           lineTotal: l.lineTotal,
           quantity: l.quantity,
+          priceOnRequest: l.priceOnRequest,
         })),
       },
       organization: { name: organizationName },
@@ -173,11 +174,13 @@ export async function QuoteSection({
                               </span>
                             ) : null}
                             <span className="qn-line-amount num">
-                              {formatMoney(
-                                line.lineTotal,
-                                q.currency,
-                                locale,
-                              )}
+                              {line.priceOnRequest
+                                ? t("priceOnRequest")
+                                : formatMoney(
+                                    line.lineTotal,
+                                    q.currency,
+                                    locale,
+                                  )}
                             </span>
                           </div>
                         </header>
@@ -236,6 +239,11 @@ export async function QuoteSection({
                     </span>
                   </div>
                 </div>
+                {narrative.lines.some((l) => l.priceOnRequest) ? (
+                  <p className="muted small">
+                    {t("priceOnRequestNote")}
+                  </p>
+                ) : null}
               </div>
             </div>
           );

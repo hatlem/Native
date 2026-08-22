@@ -93,19 +93,22 @@ export async function loadQuotePdfData(
       const product = l.productId ? productById.get(l.productId) : undefined;
       const fee = contentFeeByProductName.get(l.description) ?? 0;
       const rowTotal = Number(l.lineTotal) + fee;
+      // A "pris på forespørsel" line ships with no amount at all — the
+      // stored lineTotal is an internal estimate the customer must never
+      // see, so both figures are nulled, not just hidden by the template.
+      const priceOnRequest = l.priceOnRequest;
       return {
         titleName: product?.title.name ?? l.description,
         marketCode: product?.title.market.code ?? "",
         format: product?.type ?? "",
         quantity: l.quantity,
-        unitPrice: l.quantity > 0 ? rowTotal / l.quantity : rowTotal,
-        rowTotal,
-        // No line in this system is currently resolvable-but-unpriced — every
-        // INVENTORY line always carries a persisted lineTotal (see
-        // Product.basePrice, which is NOT NULL). Kept as a field, defaulted
-        // false, so the PDF template already supports the state described in
-        // the originating request if that ever changes upstream.
-        priceOnRequest: false,
+        unitPrice: priceOnRequest
+          ? null
+          : l.quantity > 0
+            ? rowTotal / l.quantity
+            : rowTotal,
+        rowTotal: priceOnRequest ? null : rowTotal,
+        priceOnRequest,
         circulation: product?.title.circulation ?? null,
         digitalReach: product?.title.digitalReach ?? null,
         audience: product?.title.audience ?? null,

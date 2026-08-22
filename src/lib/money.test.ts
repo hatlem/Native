@@ -15,6 +15,7 @@ import {
   computeContentFeeLines,
   pickMarginRule,
   resolveDefaultMarginPct,
+  marginPctFromSell,
   type RateRule,
   type ContentFeeRuleSpec,
   type MarginRuleSpec,
@@ -251,4 +252,40 @@ test("computeQuoteLines honors an explicit default margin", () => {
     20,
   );
   assert.equal(tiered.marginPct, 18);
+});
+
+test("quoteTotals excludes price-on-request lines from subtotal and total", () => {
+  const { subtotal, total } = quoteTotals(
+    [
+      { lineTotal: 10000, priceOnRequest: false },
+      { lineTotal: 99999, priceOnRequest: true },
+      { lineTotal: 5000 },
+    ],
+    25,
+  );
+  assert.equal(subtotal, 15000);
+  assert.equal(total, 18750);
+});
+
+test("quoteTotals with every line on request is zero, not the estimates", () => {
+  const { subtotal, total } = quoteTotals(
+    [
+      { lineTotal: 10000, priceOnRequest: true },
+      { lineTotal: 5000, priceOnRequest: true },
+    ],
+    25,
+  );
+  assert.equal(subtotal, 0);
+  assert.equal(total, 0);
+});
+
+test("marginPctFromSell inverts firmLineTotal", () => {
+  // cost 10000, sold at 12500 -> 25%
+  assert.equal(marginPctFromSell(10000, 1, 12500), 25);
+  // multi-unit: cost 2 x 5000, sold at 12500 -> 25%
+  assert.equal(marginPctFromSell(5000, 2, 12500), 25);
+  // selling below cost is a negative margin, not clamped
+  assert.equal(marginPctFromSell(10000, 1, 9000), -10);
+  // zero/unknown cost (content fees) reports 0 rather than dividing by zero
+  assert.equal(marginPctFromSell(0, 1, 12500), 0);
 });

@@ -887,7 +887,9 @@
     "timelineLead": "When everything runs — the next six months, month by month. Drafts without dates sit at the bottom.",
     "timelineNotScheduled": "Not scheduled yet",
     "timelineLater": "Later",
-    "timelineEmptyMonth": "Nothing running this month"
+    "timelineEmptyMonth": "Nothing running this month",
+    "priceOnRequest": "Price on request",
+    "priceOnRequestNote": "Lines marked “price on request” are additional to the total above and will be confirmed separately."
   },
   "desk": {
     "eyebrow": "Internal desk",
@@ -972,7 +974,16 @@
         "live": "Live",
         "done": "Done"
       }
-    }
+    },
+    "linePriceInvalid": "Invalid price — enter a positive amount.",
+    "lineStateSummary": "{priced} priced · {onRequest} price on request",
+    "linePriceOnRequest": "Price on request",
+    "linePriceReference": "Catalog reference: {reference}",
+    "linePriceSetBy": "Price set by {name} · {date}",
+    "linePriceSetByUnknown": "desk",
+    "linePricePlaceholder": "Customer price ({currency})",
+    "linePriceSave": "Set price",
+    "linePriceMarkOnRequest": "Send as price on request"
   },
   "deskTitles": {
     "eyebrow": "Super-admin · titles",

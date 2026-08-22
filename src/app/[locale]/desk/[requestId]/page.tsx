@@ -5,11 +5,19 @@ import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
 import { Link } from "@/i18n/navigation";
 import { formatMoney } from "@/lib/money";
-import { generateQuote, generateQuotePdf } from "@/app/quote-actions";
+import {
+  generateQuote,
+  generateQuotePdf,
+  setQuoteLinePrice,
+} from "@/app/quote-actions";
 import { resolvePlanTitleItem, removePlanTitleItem } from "@/app/desk-actions";
 import { loadPricingDefaults } from "@/lib/content-fee";
-import { productBand, unitRate } from "@/lib/pricing/display-price";
-import { bandLabel } from "@/lib/pricing/bands";
+import {
+  customerPrice,
+  productBand,
+  unitRate,
+} from "@/lib/pricing/display-price";
+import { bandLabel, priceBand } from "@/lib/pricing/bands";
 import { StatusBadge } from "@/app/status-badge";
 import { SubmitButton } from "@/components";
 import { canSeeCostVsSell } from "@/lib/roles";
@@ -47,7 +55,11 @@ export default async function DeskRequestPage({
       quotes: {
         orderBy: { createdAt: "desc" },
         include: {
-          lines: true,
+          lines: {
+            include: {
+              priceSetBy: { select: { name: true, email: true } },
+            },
+          },
           order: true,
           documents: { orderBy: { version: "desc" } },
         },
@@ -106,7 +118,8 @@ export default async function DeskRequestPage({
   // Each option carries the indicative price band/rate (same helpers the catalog
   // uses) so the desk picks an INFORMED placement, not just a type label. Read-
   // only — the resolve action and its hidden inputs are unchanged.
-  const pricing = titleIds.length ? await loadPricingDefaults() : null;
+  const pricing =
+    titleIds.length || request.quotes.length ? await loadPricingDefaults() : null;
   const placementProducts = titleIds.length
     ? await prisma.product.findMany({
         where: { titleId: { in: titleIds }, active: true, bookable: true },
@@ -152,6 +165,66 @@ export default async function DeskRequestPage({
     (i) => !i.productId && i.titleId,
   ).length;
   const resolvedItemCount = request.plan.items.filter((i) => i.productId).length;
+
+  // Catalog price reference per quote-line product — the "interval" the
+  // desk sees next to the editable price field. Desk-internal: the buyer
+  // visibility gate (confirmedAt/pricesPublic) is deliberately bypassed,
+  // because the whole point is pricing lines whose catalog price ISN'T
+  // buyer-visible yet. Unconfirmed products are labelled as estimates by
+  // the UI, not silently presented as firm.
+  const quoteLineProductIds = [
+    ...new Set(
+      request.quotes
+        .flatMap((q) => q.lines)
+        .map((l) => l.productId)
+        .filter((id): id is string => !!id),
+    ),
+  ];
+  const referenceByProductId = new Map<string, string>();
+  if (quoteLineProductIds.length && pricing) {
+    const refProducts = await prisma.product.findMany({
+      where: { id: { in: quoteLineProductIds } },
+      select: {
+        id: true,
+        type: true,
+        active: true,
+        confirmedAt: true,
+        pricingModel: true,
+        basePrice: true,
+        currency: true,
+        productionFee: true,
+        priceRules: {
+          select: { marginPct: true, seasonalMultiplier: true, minVolume: true },
+        },
+        title: {
+          select: {
+            productionFeeDefault: true,
+            market: { select: { code: true } },
+          },
+        },
+      },
+    });
+    for (const p of refProducts) {
+      const deskTitle = {
+        ...p.title,
+        pricesPublic: true,
+        publisher: { pricesPublic: true },
+      };
+      if (!p.pricingModel || p.pricingModel === "FLAT") {
+        const band = priceBand(customerPrice(p, deskTitle, pricing), p.currency);
+        referenceByProductId.set(p.id, bandLabel(band, p.currency));
+      } else {
+        const rate = unitRate(
+          { ...p, active: true, confirmedAt: p.confirmedAt ?? new Date(0) },
+          deskTitle,
+          pricing,
+        );
+        if (rate) {
+          referenceByProductId.set(p.id, `≈ ${rate.rate} ${p.currency} ${rate.unit}`);
+        }
+      }
+    }
+  }
 
   // Pre-sign every quote document's download URL up front (server render,
   // short-lived) — same pattern as RateCardsPanel.
@@ -352,34 +425,122 @@ export default async function DeskRequestPage({
               ) : null}
             </div>
             <article className="card quote-card">
+              {errorCode === "bad-price" ? (
+                <div className="banner-warn" role="alert">
+                  <span>{t("linePriceInvalid")}</span>
+                </div>
+              ) : null}
+              <p className="muted small">
+                {t("lineStateSummary", {
+                  priced: quote.lines.filter((l) => !l.priceOnRequest).length,
+                  onRequest: quote.lines.filter((l) => l.priceOnRequest).length,
+                })}
+              </p>
               <div className="quote-lines">
-                {quote.lines.map((l) => (
-                  <Fragment key={l.id}>
-                    <div className="quote-line">
-                      <span>
-                        {l.description}{" "}
-                        <span className="muted">
-                          × {l.quantity} · margin {Number(l.marginPct)}%
+                {quote.lines.map((l) => {
+                  const reference = l.productId
+                    ? referenceByProductId.get(l.productId)
+                    : undefined;
+                  const editable = !quote.order;
+                  return (
+                    <Fragment key={l.id}>
+                      <div className="quote-line">
+                        <span>
+                          {l.description}{" "}
+                          <span className="muted">
+                            × {l.quantity}
+                            {l.priceOnRequest
+                              ? ""
+                              : ` · margin ${Number(l.marginPct)}%`}
+                          </span>
                         </span>
-                      </span>
-                      <span className="num">
-                        {formatMoney(Number(l.lineTotal), quote.currency, locale)}
-                      </span>
-                    </div>
-                    {isSuperadmin ? (
-                      <div className="muted small">
-                        {t("costVsSell", {
-                          cost: formatMoney(
-                            Number(l.unitCost) * l.quantity,
-                            quote.currency,
-                            locale,
-                          ),
-                          sell: formatMoney(Number(l.lineTotal), quote.currency, locale),
-                        })}
+                        <span className="num">
+                          {l.priceOnRequest ? (
+                            <span className="tag">{t("linePriceOnRequest")}</span>
+                          ) : (
+                            formatMoney(Number(l.lineTotal), quote.currency, locale)
+                          )}
+                        </span>
                       </div>
-                    ) : null}
-                  </Fragment>
-                ))}
+                      {reference ? (
+                        <div className="muted small">
+                          {t("linePriceReference", { reference })}
+                        </div>
+                      ) : null}
+                      {l.priceSetAt ? (
+                        <div className="muted small">
+                          {t("linePriceSetBy", {
+                            name:
+                              l.priceSetBy?.name ??
+                              l.priceSetBy?.email ??
+                              t("linePriceSetByUnknown"),
+                            date: new Intl.DateTimeFormat(intlLocale(locale), {
+                              dateStyle: "medium",
+                              timeStyle: "short",
+                            }).format(l.priceSetAt),
+                          })}
+                        </div>
+                      ) : null}
+                      {isSuperadmin && !l.priceOnRequest ? (
+                        <div className="muted small">
+                          {t("costVsSell", {
+                            cost: formatMoney(
+                              Number(l.unitCost) * l.quantity,
+                              quote.currency,
+                              locale,
+                            ),
+                            sell: formatMoney(
+                              Number(l.lineTotal),
+                              quote.currency,
+                              locale,
+                            ),
+                          })}
+                        </div>
+                      ) : null}
+                      {editable ? (
+                        <div className="resolve-line">
+                          <form action={setQuoteLinePrice} className="resolve-line">
+                            <input type="hidden" name="locale" value={locale} />
+                            <input type="hidden" name="requestId" value={request.id} />
+                            <input type="hidden" name="quoteId" value={quote.id} />
+                            <input type="hidden" name="lineId" value={l.id} />
+                            <input type="hidden" name="intent" value="set" />
+                            <input
+                              type="text"
+                              name="lineTotal"
+                              inputMode="decimal"
+                              placeholder={t("linePricePlaceholder", {
+                                currency: quote.currency,
+                              })}
+                              aria-label={t("linePricePlaceholder", {
+                                currency: quote.currency,
+                              })}
+                            />
+                            <button type="submit" className="btn small">
+                              {t("linePriceSave")}
+                            </button>
+                          </form>
+                          {!l.priceOnRequest ? (
+                            <form action={setQuoteLinePrice}>
+                              <input type="hidden" name="locale" value={locale} />
+                              <input
+                                type="hidden"
+                                name="requestId"
+                                value={request.id}
+                              />
+                              <input type="hidden" name="quoteId" value={quote.id} />
+                              <input type="hidden" name="lineId" value={l.id} />
+                              <input type="hidden" name="intent" value="onRequest" />
+                              <button type="submit" className="btn small ghost">
+                                {t("linePriceMarkOnRequest")}
+                              </button>
+                            </form>
+                          ) : null}
+                        </div>
+                      ) : null}
+                    </Fragment>
+                  );
+                })}
               </div>
               <div className="quote-totals">
                 <div className="quote-row">

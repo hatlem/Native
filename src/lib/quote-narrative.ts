@@ -27,6 +27,10 @@ export type QuoteNarrativeLine = {
   productType: string;
   quantity: number;
   lineTotal: number;
+  // "Pris på forespørsel" — the line is part of the offer but carries no
+  // amount; the page renders a label instead of lineTotal and the anchor
+  // discount framing is suppressed (there is no price to discount).
+  priceOnRequest: boolean;
   anchor: QuoteAnchor | null;
 };
 
@@ -43,6 +47,7 @@ type NarrativeQuoteLine = {
   productId: string | null;
   lineTotal: unknown;
   quantity: number;
+  priceOnRequest?: boolean;
 };
 
 type NarrativeQuote = {
@@ -90,8 +95,12 @@ export function buildQuoteNarrative(
         product?.type ?? (kind === "CONTENT_FEE" ? "CONTENT_FEE" : "NATIVE_ARTICLE"),
       quantity: line.quantity,
       lineTotal: Number(line.lineTotal),
+      priceOnRequest: line.priceOnRequest ?? false,
       anchor:
-        kind === "INVENTORY" && rateCardPerUnit != null && rateCardPerUnit > 0
+        kind === "INVENTORY" &&
+        !line.priceOnRequest &&
+        rateCardPerUnit != null &&
+        rateCardPerUnit > 0
           ? {
               rateCard: rateCardPerUnit * line.quantity,
               currency: title?.publishedRateCurrency ?? quote.currency,

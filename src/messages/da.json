@@ -762,7 +762,9 @@
     "timelineLead": "Hvornår det hele kører — de næste seks måneder, måned for måned. Kladder uden datoer ligger nederst.",
     "timelineNotScheduled": "Ikke planlagt endnu",
     "timelineLater": "Senere",
-    "timelineEmptyMonth": "Intet kører denne måned"
+    "timelineEmptyMonth": "Intet kører denne måned",
+    "priceOnRequest": "Pris på forespørgsel",
+    "priceOnRequestNote": "Linjer markeret ”pris på forespørgsel” kommer oveni totalen ovenfor og bekræftes separat."
   },
   "desk": {
     "eyebrow": "Internt desk",
@@ -847,7 +849,16 @@
         "live": "Live",
         "done": "Færdig"
       }
-    }
+    },
+    "linePriceInvalid": "Ugyldig pris — angiv et positivt beløb.",
+    "lineStateSummary": "{priced} prissat · {onRequest} pris på forespørgsel",
+    "linePriceOnRequest": "Pris på forespørgsel",
+    "linePriceReference": "Katalogreference: {reference}",
+    "linePriceSetBy": "Pris sat af {name} · {date}",
+    "linePriceSetByUnknown": "desk",
+    "linePricePlaceholder": "Kundepris ({currency})",
+    "linePriceSave": "Sæt pris",
+    "linePriceMarkOnRequest": "Send som pris på forespørgsel"
   },
   "deskTitles": {
     "eyebrow": "Superadmin · titler",
