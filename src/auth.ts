@@ -66,6 +66,14 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         const ok = await bcrypt.compare(password, user.passwordHash);
         if (!ok) return null;
 
+        // Off-boarding gate: a deactivated account (self-service from
+        // /account, or a super-admin from /desk/users) keeps its password
+        // hash so the state is reversible, but must not authenticate. The
+        // `authenticate()` server action re-checks this after the failure so
+        // the user gets "deactivated", not "wrong password" — see
+        // src/app/auth-actions.ts.
+        if (user.deactivatedAt) return null;
+
         // Verification gate: a user who signed up with a password but
         // never clicked the magic-link in their inbox hasn't proven
         // ownership of the address — refuse credentials sign-in until

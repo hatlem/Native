@@ -149,6 +149,9 @@ export function navItemsFor(
         { key: "desk", label: t("desk"), href: "/desk" },
         { key: "deskOrders", label: t("orders"), href: "/desk/orders" },
         { key: "deskTitles", label: t("titles"), href: "/desk/titles" },
+        // Super-admin only: /desk/users grants and revokes access, which is a
+        // different kind of authority from running the order desk.
+        { key: "deskUsers", label: t("users"), href: "/desk/users" },
         { key: "deskContentFees", label: t("contentFees"), href: "/desk/content-fees" },
         { key: "deskPlaybooks", label: t("playbooks"), href: "/desk/playbooks" },
         { key: "deskWriters", label: t("writers"), href: "/desk/writers" },
@@ -221,7 +224,10 @@ export function paletteItemsFor(
           { key: "deskContentFees", label: t("contentFees"), href: "/desk/content-fees" },
           { key: "deskReports", label: t("reports"), href: "/desk/reports" },
           ...(audience === "superadmin"
-            ? [{ key: "deskTitles", label: t("titles"), href: "/desk/titles" }]
+            ? [
+                { key: "deskTitles", label: t("titles"), href: "/desk/titles" },
+                { key: "deskUsers", label: t("users"), href: "/desk/users" },
+              ]
             : []),
           { key: "catalog", label: t("catalog"), href: "/catalog" },
           ...(opts.hasOrgAccess

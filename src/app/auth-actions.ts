@@ -55,8 +55,25 @@ export async function authenticate(formData: FormData): Promise<{ redirectTo: st
       // compare so we don't leak existence to anyone with a guess.
       const u = await prisma.user.findUnique({
         where: { email },
-        select: { id: true, passwordHash: true, emailVerifiedAt: true },
+        select: {
+          id: true,
+          passwordHash: true,
+          emailVerifiedAt: true,
+          deactivatedAt: true,
+        },
       });
+      // Deactivated account, correct password: "Invalid email or password"
+      // would send this user round the password-reset loop forever (the reset
+      // succeeds, the sign-in still fails). Same enumeration trade-off as the
+      // unverified branch below — gated on a successful bcrypt compare, so a
+      // guesser learns nothing.
+      if (u?.passwordHash && u.deactivatedAt) {
+        const ok = await bcrypt.compare(password, u.passwordHash);
+        if (ok) {
+          await recordAudit(u.id, "auth.signin_deactivated", `User:${email}`, { ip });
+          return { redirectTo: `/${locale}/signin?error=deactivated${emailParam}` };
+        }
+      }
       if (u?.passwordHash && !u.emailVerifiedAt) {
         const ok = await bcrypt.compare(password, u.passwordHash);
         if (ok) {
