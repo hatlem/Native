@@ -64,10 +64,20 @@ export async function getWorkspace(
   const [user, memberships] = await Promise.all([
     prisma.user.findUnique({
       where: { id: userId },
-      select: { organization: { select: { id: true, type: true } } },
+      select: {
+        deactivatedAt: true,
+        organization: { select: { id: true, type: true } },
+      },
     }),
     loadMemberships(userId),
   ]);
+
+  // Sessions are JWTs, so an account deactivated mid-session keeps a valid
+  // cookie until it expires. Denying the workspace here is what makes the
+  // deactivation bite on everything org-scoped — API routes and server
+  // actions included — not just the page render the layout guards. Costs
+  // nothing: the row was already being read.
+  if (user?.deactivatedAt) return null;
 
   const now = new Date();
   const membershipOrgIds = activeScopeOrgIds(memberships, now);

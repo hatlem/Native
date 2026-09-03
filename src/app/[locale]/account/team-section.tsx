@@ -29,7 +29,7 @@ export async function TeamSection({ locale, orgId, isAdmin }: Props) {
         canCommit: true,
         expiresAt: true,
         status: true,
-        user: { select: { name: true, email: true } },
+        user: { select: { name: true, email: true, deactivatedAt: true } },
       },
       orderBy: { createdAt: "asc" },
     }),
@@ -90,6 +90,11 @@ export async function TeamSection({ locale, orgId, isAdmin }: Props) {
               const expires = m.expiresAt
                 ? m.expiresAt.toISOString().slice(0, 10)
                 : null;
+              // A deactivated account keeps its seat (so reactivation is a
+              // single click, not a re-invite) but cannot sign in — the seat
+              // list has to say so, or an admin sees "Active" for someone who
+              // has been locked out for a month.
+              const deactivated = Boolean(m.user?.deactivatedAt);
               const roleLabel =
                 m.role === "ADMIN"
                   ? t("roleAdmin")
@@ -103,8 +108,16 @@ export async function TeamSection({ locale, orgId, isAdmin }: Props) {
                   <td>{roleLabel}</td>
                   <td>{m.canCommit ? t("yes") : t("no")}</td>
                   <td>
-                    <span className={active ? "badge-active" : "badge-muted"}>
-                      {active ? t("statusActive") : t("statusExpired")}
+                    <span
+                      className={
+                        active && !deactivated ? "badge-active" : "badge-muted"
+                      }
+                    >
+                      {deactivated
+                        ? t("statusDeactivated")
+                        : active
+                          ? t("statusActive")
+                          : t("statusExpired")}
                     </span>
                   </td>
                   <td>{expires ?? "—"}</td>
