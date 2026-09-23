@@ -2952,6 +2952,8 @@
     "vertical": "Vertical",
     "frequency": "Frequency",
     "pageOf": "Page {page} of {pages}",
-    "preparedFor": "Quote for"
+    "preparedFor": "Quote for",
+    "viewOnline": "View this quote online, accept it, and follow the campaign in NativeSpin:",
+    "footerLink": "Open in NativeSpin"
   }
 }

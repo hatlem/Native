@@ -2953,6 +2953,8 @@
     "vertical": "Vertikal",
     "frequency": "Frekvens",
     "pageOf": "Sida {page} av {pages}",
-    "preparedFor": "Offert till"
+    "preparedFor": "Offert till",
+    "viewOnline": "Se offerten online, godkänn den och följ kampanjen i NativeSpin:",
+    "footerLink": "Öppna i NativeSpin"
   }
 }

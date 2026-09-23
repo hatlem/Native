@@ -2822,6 +2822,8 @@
     "vertical": "Branche",
     "frequency": "Erscheinungsweise",
     "pageOf": "Seite {page} von {pages}",
-    "preparedFor": "Angebot für"
+    "preparedFor": "Angebot für",
+    "viewOnline": "Angebot online ansehen, freigeben und die Kampagne in NativeSpin verfolgen:",
+    "footerLink": "In NativeSpin öffnen"
   }
 }

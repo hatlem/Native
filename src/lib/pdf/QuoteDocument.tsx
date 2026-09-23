@@ -1,5 +1,5 @@
 import path from "node:path";
-import { Document, Page, View, Text, StyleSheet, Font } from "@react-pdf/renderer";
+import { Document, Page, View, Text, Link, StyleSheet, Font } from "@react-pdf/renderer";
 import { formatMoney, intlLocale } from "@/lib/money";
 import type { QuotePdfData } from "./quote-pdf-data";
 
@@ -29,7 +29,16 @@ const styles = StyleSheet.create({
   headRow: { flexDirection: "row", justifyContent: "space-between", marginBottom: 16 },
   metaLabel: { fontSize: 7, color: "#666", textTransform: "uppercase" },
   metaValue: { fontSize: 9, marginBottom: 6 },
-  intro: { fontSize: 9.5, marginBottom: 16, lineHeight: 1.4 },
+  intro: { fontSize: 9.5, marginBottom: 10, lineHeight: 1.4 },
+  online: {
+    marginBottom: 16,
+    padding: 8,
+    backgroundColor: "#f4f4f4",
+    borderRadius: 3,
+  },
+  onlineText: { fontSize: 8.5, color: "#444", marginBottom: 2 },
+  onlineLink: { fontSize: 8.5, color: "#1a4fd6", textDecoration: "none" },
+  footerLink: { color: "#999", textDecoration: "none" },
   table: { marginBottom: 4 },
   tHead: {
     flexDirection: "row",
@@ -66,7 +75,10 @@ const styles = StyleSheet.create({
   grandTotalLabel: { fontSize: 10, fontWeight: 700 },
   grandTotalValue: { fontSize: 10, fontWeight: 700 },
   notes: { marginTop: 20, fontSize: 8, color: "#555", lineHeight: 1.5 },
-  footnote: { marginTop: 8, fontSize: 7.5, color: "#888", fontStyle: "italic" },
+  // No fontStyle: only Inter Regular/Bold are registered, and react-pdf
+  // throws on an unregistered italic — which failed every quote carrying a
+  // price-on-request line (the only case that renders this footnote).
+  footnote: { marginTop: 8, fontSize: 7.5, color: "#888" },
   footer: {
     position: "absolute",
     bottom: 20,
@@ -111,7 +123,9 @@ export function QuoteDocument({
     <Document title={t(messages, "documentTitle", { quoteNumber: data.quoteNumber })}>
       <Page size="A4" style={styles.page}>
         <Text style={styles.brand}>NativeSpin</Text>
-        <Text style={styles.brandSub}>nativespin.com</Text>
+        <Link src={data.onlineUrl} style={[styles.brandSub, { textDecoration: "none" }]}>
+          nativespin.com
+        </Link>
 
         <View style={styles.headRow}>
           <View>
@@ -137,6 +151,13 @@ export function QuoteDocument({
         </View>
 
         <Text style={styles.intro}>{t(messages, "intro", { org: data.organizationName })}</Text>
+
+        <View style={styles.online}>
+          <Text style={styles.onlineText}>{t(messages, "viewOnline")}</Text>
+          <Link src={data.onlineUrl} style={styles.onlineLink}>
+            {data.onlineUrl}
+          </Link>
+        </View>
 
         <View style={styles.table}>
           <View style={styles.tHead}>
@@ -211,6 +232,9 @@ export function QuoteDocument({
 
         <View style={styles.footer} fixed>
           <Text>{data.organizationName}</Text>
+          <Link src={data.onlineUrl} style={styles.footerLink}>
+            {t(messages, "footerLink")}
+          </Link>
           <Text
             render={({ pageNumber, totalPages }) =>
               t(messages, "pageOf", { page: pageNumber, pages: totalPages })

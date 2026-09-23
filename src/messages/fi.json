@@ -2953,6 +2953,8 @@
     "vertical": "Toimiala",
     "frequency": "Ilmestymistiheys",
     "pageOf": "Sivu {page}/{pages}",
-    "preparedFor": "Tarjous asiakkaalle"
+    "preparedFor": "Tarjous asiakkaalle",
+    "viewOnline": "Katso tarjous verkossa, hyväksy se ja seuraa kampanjaa NativeSpinissä:",
+    "footerLink": "Avaa NativeSpinissä"
   }
 }

@@ -1,4 +1,5 @@
 import { prisma } from "@/lib/prisma";
+import { quoteOnlineUrl } from "./quote-online-url";
 
 // Everything a customer-facing quote PDF is allowed to render. No cost,
 // margin, publisher sales-contact, or internal ID ever enters this shape —
@@ -31,6 +32,8 @@ export type QuotePdfData = {
   organizationName: string;
   preparedByName: string;
   preparedByEmail: string;
+  // Absolute link to the buyer's live quote page — see quote-online-url.ts.
+  onlineUrl: string;
   rows: QuotePdfRow[];
 };
 
@@ -45,6 +48,7 @@ const CONTENT_FEE_PREFIX = "Content production — ";
 export async function loadQuotePdfData(
   quoteId: string,
   preparedBy: { name: string | null; email: string },
+  locale: string,
 ): Promise<QuotePdfData> {
   const quote = await prisma.quote.findUniqueOrThrow({
     where: { id: quoteId },
@@ -129,6 +133,7 @@ export async function loadQuotePdfData(
     organizationName: quote.request.organization.name,
     preparedByName: preparedBy.name ?? "NativeSpin desk",
     preparedByEmail: preparedBy.email,
+    onlineUrl: quoteOnlineUrl(quote.requestId, locale),
     rows,
   };
 }
