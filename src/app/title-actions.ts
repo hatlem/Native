@@ -198,10 +198,19 @@ export async function sendPublisherInvite(formData: FormData) {
   const rawEmail = field(formData, "email").toLowerCase();
   const userId = await requireSuperadmin(locale);
 
+  // The form lives on the title detail page (that's where the publisher is in
+  // front of you), so land the outcome banner back there rather than on the
+  // titles list. Falls back to the list when called without a title — this
+  // action was written before it had any UI at all.
+  const titleId = field(formData, "titleId");
+  const backTo = titleId
+    ? `/${locale}/desk/titles/${titleId}`
+    : `/${locale}/desk/titles`;
+
   // Light email validation — we'd rather refuse a typo here than send
   // an invite to nowhere and have it look like spam if it lands later.
   if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(rawEmail)) {
-    redirect(`/${locale}/desk/titles?invite=invalid-email`);
+    redirect(`${backTo}?invite=invalid-email`);
   }
 
   // Same company-email gate as buyer signup — gating here, not at
@@ -209,7 +218,7 @@ export async function sendPublisherInvite(formData: FormData) {
   // the invite was issued to. Catches it before the row is created.
   const policy = await checkBusinessEmailWithMx(rawEmail);
   if (!policy.ok) {
-    redirect(`/${locale}/desk/titles?invite=email-business`);
+    redirect(`${backTo}?invite=email-business`);
   }
 
   const publisher = await prisma.publisher.findUnique({
@@ -217,7 +226,7 @@ export async function sendPublisherInvite(formData: FormData) {
     select: { id: true, name: true },
   });
   if (!publisher) {
-    redirect(`/${locale}/desk/titles?invite=not-found`);
+    redirect(`${backTo}?invite=not-found`);
   }
 
   const session = await auth();
@@ -254,7 +263,7 @@ export async function sendPublisherInvite(formData: FormData) {
     console.error("publisher.invite_email_failed", { publisherId, err });
   }
 
-  redirect(`/${locale}/desk/titles?invite=sent`);
+  redirect(`${backTo}?invite=sent`);
 }
 
 // Update the buyer-facing pricing fields on a Title: publishedRateCard

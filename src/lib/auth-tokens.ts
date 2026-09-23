@@ -46,6 +46,11 @@ export async function consumeMagicLinkToken(
   });
   if (!row) return null;
 
+  // A deactivated account cannot be signed into, by any route. The token is
+  // already burnt at this point (the atomic consume above), which is what we
+  // want: a stale link in an off-boarded user's inbox is spent, not reusable.
+  if (row.user.deactivatedAt) return null;
+
   if (!row.user.emailVerifiedAt) {
     await prisma.user.update({
       where: { id: row.userId },
@@ -103,4 +108,85 @@ export async function consumePasswordResetToken(
 
     return { ok: true, userId: row.userId, email: row.user.email };
   });
+}
+
+export type EmailChangeOutcome =
+  | { ok: true; userId: string; oldEmail: string; newEmail: string }
+  | { ok: false; reason: "expired" | "taken" };
+
+// Consume an email-change token: validate, re-check that the address is
+// still free, move it, and invalidate the user's other open change tokens.
+//
+// The free-address check has to happen HERE, not only when the change was
+// requested: two people can each hold a pending token for the same address
+// (nothing reserves it), and the loser must be told rather than crashing on
+// the unique index. The P2002 catch closes the last sliver of that race —
+// two confirmations landing in the same millisecond.
+//
+// Clicking the link is proof of mailbox ownership, so the move also stamps
+// emailVerifiedAt: an account whose address just changed is verified against
+// the new address, never carrying the old one's verification forward
+// implicitly.
+export async function consumeEmailChangeToken(
+  raw: string,
+): Promise<EmailChangeOutcome> {
+  if (!raw) return { ok: false, reason: "expired" };
+  const hash = hashToken(raw);
+  const now = new Date();
+
+  try {
+    return await prisma.$transaction<EmailChangeOutcome>(async (tx) => {
+      const updated = await tx.emailChangeToken.updateMany({
+        where: { tokenHash: hash, consumedAt: null, expiresAt: { gt: now } },
+        data: { consumedAt: now },
+      });
+      if (updated.count !== 1) return { ok: false, reason: "expired" };
+
+      const row = await tx.emailChangeToken.findUnique({
+        where: { tokenHash: hash },
+        select: {
+          userId: true,
+          newEmail: true,
+          user: { select: { email: true } },
+        },
+      });
+      if (!row) return { ok: false, reason: "expired" };
+
+      const taken = await tx.user.findUnique({
+        where: { email: row.newEmail },
+        select: { id: true },
+      });
+      if (taken && taken.id !== row.userId) {
+        return { ok: false, reason: "taken" };
+      }
+
+      await tx.user.update({
+        where: { id: row.userId },
+        data: { email: row.newEmail, emailVerifiedAt: now },
+      });
+
+      await tx.emailChangeToken.updateMany({
+        where: { userId: row.userId, consumedAt: null, NOT: { tokenHash: hash } },
+        data: { consumedAt: now },
+      });
+
+      return {
+        ok: true,
+        userId: row.userId,
+        oldEmail: row.user.email,
+        newEmail: row.newEmail,
+      };
+    });
+  } catch (err) {
+    // Unique violation on User.email — someone else won the same address
+    // between the check above and the write.
+    if (
+      typeof err === "object" &&
+      err !== null &&
+      (err as { code?: string }).code === "P2002"
+    ) {
+      return { ok: false, reason: "taken" };
+    }
+    throw err;
+  }
 }

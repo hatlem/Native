@@ -6,7 +6,14 @@ import { MarketCode } from "@prisma/client";
 import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
 import { recordAudit } from "@/lib/audit";
-import { resolveOrgMembership } from "@/lib/membership";
+import {
+  resolveOrgMembership,
+  wouldRemoveLastAdmin,
+  type MembershipRow,
+} from "@/lib/membership";
+import { canDeactivateSelf } from "@/lib/user-admin";
+import { signOut } from "@/auth";
+import { normaliseEmail } from "@/lib/email-change";
 
 const MARKET_CODES = Object.values(MarketCode) as string[];
 
@@ -133,4 +140,99 @@ export async function setPassword(formData: FormData) {
     hadPasswordBefore: !!user.passwordHash,
   });
   redirect(`/${locale}/account?ok=password#password`);
+}
+
+// Self-service off-boarding. Deactivation, not deletion: orders, quotes and
+// invoices this user signed are financial records the platform has to keep,
+// and an anonymised-user cascade through those tables is a different (and
+// much larger) piece of work than "let me out". What the user gets is the
+// thing they actually asked for — the account stops working immediately, on
+// every sign-in route — and it is reversible by a super-admin if they come
+// back, which a delete would not be.
+//
+// Two guards stand between the button and the stamp, both of which exist to
+// stop a single click stranding other people:
+//   - the last active super-admin can't walk out (nobody left to let anyone
+//     back in, including them)
+//   - the last admin of an org can't either, or that org's team, billing and
+//     seats become unmanageable for everyone in it
+export async function deactivateOwnAccount(formData: FormData) {
+  const locale = String(formData.get("locale") || "en");
+  const session = await auth();
+  if (!session?.user?.id) redirect(`/${locale}/signin`);
+  const userId = session.user.id;
+
+  const user = await prisma.user.findUnique({
+    where: { id: userId },
+    select: { id: true, email: true, role: true, deactivatedAt: true },
+  });
+  if (!user) redirect(`/${locale}/signin`);
+  if (user.deactivatedAt) {
+    // Already off-boarded in another tab: nothing to do but end the session.
+    await signOut({ redirectTo: `/${locale}` });
+    return;
+  }
+
+  // Typed confirmation. The one destructive control on this page that isn't
+  // undoable by the user themselves, so it asks for the address rather than
+  // trusting a single click — the pattern the desk's order-cancel form uses
+  // for the same reason.
+  const typed = normaliseEmail(String(formData.get("confirmEmail") || ""));
+  if (typed !== normaliseEmail(user.email)) {
+    redirect(`/${locale}/account?error=confirm#danger`);
+  }
+
+  const allUsers = await prisma.user.findMany({
+    where: { role: "SUPERADMIN" },
+    select: { id: true, role: true, deactivatedAt: true },
+  });
+  if (!canDeactivateSelf(user, allUsers).ok) {
+    redirect(`/${locale}/account?error=last_superadmin#danger`);
+  }
+
+  // Org side: check every org where this user holds an active ADMIN seat.
+  const myMemberships = await prisma.membership.findMany({
+    where: { userId },
+    select: {
+      userId: true,
+      organizationId: true,
+      role: true,
+      canCommit: true,
+      expiresAt: true,
+      status: true,
+    },
+  });
+  const now = new Date();
+  const adminOrgIds = myMemberships
+    .filter((m) => m.role === "ADMIN")
+    .map((m) => m.organizationId);
+  if (adminOrgIds.length > 0) {
+    const peers = (await prisma.membership.findMany({
+      where: { organizationId: { in: adminOrgIds } },
+      select: {
+        userId: true,
+        organizationId: true,
+        role: true,
+        canCommit: true,
+        expiresAt: true,
+        status: true,
+      },
+    })) as MembershipRow[];
+    for (const orgId of adminOrgIds) {
+      const rows = peers.filter((m) => m.organizationId === orgId);
+      if (wouldRemoveLastAdmin(rows, userId, now)) {
+        redirect(`/${locale}/account?error=last_admin#danger`);
+      }
+    }
+  }
+
+  await prisma.user.update({
+    where: { id: userId },
+    data: { deactivatedAt: now },
+  });
+  await recordAudit(userId, "user.deactivated_self", `User:${userId}`, {
+    email: user.email,
+  });
+
+  await signOut({ redirectTo: `/${locale}` });
 }

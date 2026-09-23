@@ -86,3 +86,19 @@ test("desk (non-superadmin) palette also gets buyer-flow items with org access",
     .map((i) => i.key);
   assert.ok(keys.includes("plan"));
 });
+
+test("the user console is super-admin only — desk staff can't reach it from the nav", () => {
+  const superadmin = navItemsFor("superadmin", t).map((i) => i.key);
+  const desk = navItemsFor("desk", t).map((i) => i.key);
+  assert.ok(superadmin.includes("deskUsers"));
+  assert.ok(!desk.includes("deskUsers"));
+
+  const superPalette = paletteItemsFor("superadmin", t)
+    .flatMap((s) => s.items)
+    .map((i) => i.key);
+  const deskPalette = paletteItemsFor("desk", t)
+    .flatMap((s) => s.items)
+    .map((i) => i.key);
+  assert.ok(superPalette.includes("deskUsers"));
+  assert.ok(!deskPalette.includes("deskUsers"));
+});
