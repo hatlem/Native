@@ -3,17 +3,7 @@ import { prisma } from "@/lib/prisma";
 import { putObject } from "@/lib/storage/r2";
 import { loadQuotePdfData } from "./quote-pdf-data";
 import { QuoteDocument } from "./QuoteDocument";
-import enMessages from "@/messages/en.json";
-import noMessages from "@/messages/no.json";
-
-const PDF_MESSAGES: Record<string, Record<string, string>> = {
-  en: enMessages.quotePdf,
-  no: noMessages.quotePdf,
-};
-
-function messagesFor(locale: string): Record<string, string> {
-  return PDF_MESSAGES[locale] ?? PDF_MESSAGES.en;
-}
+import { quoteMessagesFor } from "./quote-messages";
 
 // Renders the CURRENT frozen Quote data as a new customer-safe PDF, uploads
 // it to R2, and records it as the next version for this quote. Never
@@ -27,8 +17,8 @@ export async function generateQuotePdf(args: {
   generatedById: string;
   preparedBy: { name: string | null; email: string };
 }): Promise<{ id: string; version: number; objectKey: string }> {
-  const data = await loadQuotePdfData(args.quoteId, args.preparedBy);
-  const messages = messagesFor(args.locale);
+  const data = await loadQuotePdfData(args.quoteId, args.preparedBy, args.locale);
+  const messages = quoteMessagesFor(args.locale);
   const buffer = await renderToBuffer(
     QuoteDocument({ data, locale: args.locale, messages }),
   );

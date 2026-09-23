@@ -959,6 +959,7 @@
     "pdfGenerating": "PDF wird erstellt…",
     "pdfVersionRow": "Version {version} · {date}",
     "pdfDownload": "Herunterladen",
+    "docxDownload": "Word herunterladen (.docx)",
     "pdfNone": "Noch kein PDF erstellt.",
     "pdfQuoteLabel": "Angebot · {currency}",
     "programme": {
@@ -2874,7 +2875,9 @@
     "vertical": "Branche",
     "frequency": "Erscheinungsweise",
     "pageOf": "Seite {page} von {pages}",
-    "preparedFor": "Angebot für"
+    "preparedFor": "Angebot für",
+    "viewOnline": "Angebot online ansehen, freigeben und die Kampagne in NativeSpin verfolgen:",
+    "footerLink": "In NativeSpin öffnen"
   },
   "deskUsers": {
     "eyebrow": "Administration",

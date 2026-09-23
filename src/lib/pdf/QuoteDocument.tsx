@@ -1,7 +1,8 @@
 import path from "node:path";
-import { Document, Page, View, Text, StyleSheet, Font } from "@react-pdf/renderer";
+import { Document, Page, View, Text, Link, StyleSheet, Font } from "@react-pdf/renderer";
 import { formatMoney, intlLocale } from "@/lib/money";
 import type { QuotePdfData } from "./quote-pdf-data";
+import { qt as t, quoteFormatLabel, quoteRowBlurb, type QuoteMessages } from "./quote-messages";
 
 // react-pdf's built-in Helvetica has no Nordic glyphs (æ/ø/å, etc.) — every
 // quote must render Norwegian text correctly, so we register a real
@@ -29,7 +30,16 @@ const styles = StyleSheet.create({
   headRow: { flexDirection: "row", justifyContent: "space-between", marginBottom: 16 },
   metaLabel: { fontSize: 7, color: "#666", textTransform: "uppercase" },
   metaValue: { fontSize: 9, marginBottom: 6 },
-  intro: { fontSize: 9.5, marginBottom: 16, lineHeight: 1.4 },
+  intro: { fontSize: 9.5, marginBottom: 10, lineHeight: 1.4 },
+  online: {
+    marginBottom: 16,
+    padding: 8,
+    backgroundColor: "#f4f4f4",
+    borderRadius: 3,
+  },
+  onlineText: { fontSize: 8.5, color: "#444", marginBottom: 2 },
+  onlineLink: { fontSize: 8.5, color: "#1a4fd6", textDecoration: "none" },
+  footerLink: { color: "#999", textDecoration: "none" },
   table: { marginBottom: 4 },
   tHead: {
     flexDirection: "row",
@@ -66,7 +76,10 @@ const styles = StyleSheet.create({
   grandTotalLabel: { fontSize: 10, fontWeight: 700 },
   grandTotalValue: { fontSize: 10, fontWeight: 700 },
   notes: { marginTop: 20, fontSize: 8, color: "#555", lineHeight: 1.5 },
-  footnote: { marginTop: 8, fontSize: 7.5, color: "#888", fontStyle: "italic" },
+  // No fontStyle: only Inter Regular/Bold are registered, and react-pdf
+  // throws on an unregistered italic — which failed every quote carrying a
+  // price-on-request line (the only case that renders this footnote).
+  footnote: { marginTop: 8, fontSize: 7.5, color: "#888" },
   footer: {
     position: "absolute",
     bottom: 20,
@@ -81,16 +94,6 @@ const styles = StyleSheet.create({
   },
 });
 
-type Messages = Record<string, string>;
-
-function t(messages: Messages, key: string, values?: Record<string, string | number>): string {
-  let s = messages[key] ?? key;
-  if (values) {
-    for (const [k, v] of Object.entries(values)) s = s.replaceAll(`{${k}}`, String(v));
-  }
-  return s;
-}
-
 function formatDate(date: Date, locale: string): string {
   return new Intl.DateTimeFormat(intlLocale(locale), { dateStyle: "medium" }).format(date);
 }
@@ -102,7 +105,7 @@ export function QuoteDocument({
 }: {
   data: QuotePdfData;
   locale: string;
-  messages: Messages;
+  messages: QuoteMessages;
 }) {
   const money = (amount: number) => formatMoney(amount, data.currency, locale);
   const onRequest = data.rows.filter((r) => r.priceOnRequest);
@@ -111,7 +114,9 @@ export function QuoteDocument({
     <Document title={t(messages, "documentTitle", { quoteNumber: data.quoteNumber })}>
       <Page size="A4" style={styles.page}>
         <Text style={styles.brand}>NativeSpin</Text>
-        <Text style={styles.brandSub}>nativespin.com</Text>
+        <Link src={data.onlineUrl} style={[styles.brandSub, { textDecoration: "none" }]}>
+          nativespin.com
+        </Link>
 
         <View style={styles.headRow}>
           <View>
@@ -138,6 +143,13 @@ export function QuoteDocument({
 
         <Text style={styles.intro}>{t(messages, "intro", { org: data.organizationName })}</Text>
 
+        <View style={styles.online}>
+          <Text style={styles.onlineText}>{t(messages, "viewOnline")}</Text>
+          <Link src={data.onlineUrl} style={styles.onlineLink}>
+            {data.onlineUrl}
+          </Link>
+        </View>
+
         <View style={styles.table}>
           <View style={styles.tHead}>
             <Text style={[styles.tHeadCell, styles.colTitle]}>{t(messages, "colTitle")}</Text>
@@ -147,42 +159,30 @@ export function QuoteDocument({
             <Text style={[styles.tHeadCell, styles.colUnit]}>{t(messages, "colUnitPrice")}</Text>
             <Text style={[styles.tHeadCell, styles.colTotal]}>{t(messages, "colRowTotal")}</Text>
           </View>
-          {data.rows.map((row, i) => (
-            <View key={i} style={styles.tRow}>
-              <View style={styles.colTitle}>
-                <Text style={styles.tCell}>{row.titleName}</Text>
-                {row.circulation || row.digitalReach || row.audience || row.vertical || row.frequency ? (
-                  <Text style={styles.blurb}>
-                    {[
-                      row.digitalReach
-                        ? `${t(messages, "digitalReach")}: ${row.digitalReach.toLocaleString(intlLocale(locale))}`
-                        : row.circulation
-                          ? `${t(messages, "circulation")}: ${row.circulation.toLocaleString(intlLocale(locale))}`
-                          : null,
-                      row.vertical ? `${t(messages, "vertical")}: ${row.vertical}` : null,
-                      row.audience ? `${t(messages, "audience")}: ${row.audience}` : null,
-                      row.frequency ? `${t(messages, "frequency")}: ${row.frequency}` : null,
-                    ]
-                      .filter(Boolean)
-                      .join(" · ")}
-                  </Text>
-                ) : null}
+          {data.rows.map((row, i) => {
+            const blurb = quoteRowBlurb(row, messages, locale);
+            return (
+              <View key={i} style={styles.tRow}>
+                <View style={styles.colTitle}>
+                  <Text style={styles.tCell}>{row.titleName}</Text>
+                  {blurb ? <Text style={styles.blurb}>{blurb}</Text> : null}
+                </View>
+                <Text style={[styles.tCell, styles.colMarket]}>{row.marketCode}</Text>
+                <Text style={[styles.tCell, styles.colFormat]}>{quoteFormatLabel(row.format, locale)}</Text>
+                <Text style={[styles.tCell, styles.colQty]}>{row.quantity}</Text>
+                <Text style={[styles.tCell, styles.colUnit]}>
+                  {row.priceOnRequest || row.unitPrice === null
+                    ? t(messages, "priceOnRequest")
+                    : money(row.unitPrice)}
+                </Text>
+                <Text style={[styles.tCell, styles.colTotal]}>
+                  {row.priceOnRequest || row.rowTotal === null
+                    ? t(messages, "priceOnRequest")
+                    : money(row.rowTotal)}
+                </Text>
               </View>
-              <Text style={[styles.tCell, styles.colMarket]}>{row.marketCode}</Text>
-              <Text style={[styles.tCell, styles.colFormat]}>{row.format}</Text>
-              <Text style={[styles.tCell, styles.colQty]}>{row.quantity}</Text>
-              <Text style={[styles.tCell, styles.colUnit]}>
-                {row.priceOnRequest || row.unitPrice === null
-                  ? t(messages, "priceOnRequest")
-                  : money(row.unitPrice)}
-              </Text>
-              <Text style={[styles.tCell, styles.colTotal]}>
-                {row.priceOnRequest || row.rowTotal === null
-                  ? t(messages, "priceOnRequest")
-                  : money(row.rowTotal)}
-              </Text>
-            </View>
-          ))}
+            );
+          })}
         </View>
 
         <View style={styles.totals}>
@@ -211,6 +211,9 @@ export function QuoteDocument({
 
         <View style={styles.footer} fixed>
           <Text>{data.organizationName}</Text>
+          <Link src={data.onlineUrl} style={styles.footerLink}>
+            {t(messages, "footerLink")}
+          </Link>
           <Text
             render={({ pageNumber, totalPages }) =>
               t(messages, "pageOf", { page: pageNumber, pages: totalPages })

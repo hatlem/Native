@@ -834,6 +834,7 @@
     "pdfGenerating": "Lager PDF…",
     "pdfVersionRow": "Versjon {version} · {date}",
     "pdfDownload": "Last ned",
+    "docxDownload": "Last ned Word (.docx)",
     "pdfNone": "Ingen PDF generert ennå.",
     "pdfQuoteLabel": "Tilbud · {currency}",
     "programme": {
@@ -3005,7 +3006,9 @@
     "vertical": "Vertikal",
     "frequency": "Frekvens",
     "pageOf": "Side {page} av {pages}",
-    "preparedFor": "Tilbud til"
+    "preparedFor": "Tilbud til",
+    "viewOnline": "Se tilbudet på nett, godkjenn det og følg kampanjen i NativeSpin:",
+    "footerLink": "Åpne i NativeSpin"
   },
   "deskUsers": {
     "eyebrow": "Administrasjon",

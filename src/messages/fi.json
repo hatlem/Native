@@ -959,6 +959,7 @@
     "pdfGenerating": "Luodaan PDF:ää…",
     "pdfVersionRow": "Versio {version} · {date}",
     "pdfDownload": "Lataa",
+    "docxDownload": "Lataa Word (.docx)",
     "pdfNone": "PDF:ää ei ole vielä luotu.",
     "pdfQuoteLabel": "Tarjous · {currency}",
     "programme": {
@@ -3005,7 +3006,9 @@
     "vertical": "Toimiala",
     "frequency": "Ilmestymistiheys",
     "pageOf": "Sivu {page}/{pages}",
-    "preparedFor": "Tarjous asiakkaalle"
+    "preparedFor": "Tarjous asiakkaalle",
+    "viewOnline": "Katso tarjous verkossa, hyväksy se ja seuraa kampanjaa NativeSpinissä:",
+    "footerLink": "Avaa NativeSpinissä"
   },
   "deskUsers": {
     "eyebrow": "Hallinta",

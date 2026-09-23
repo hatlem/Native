@@ -834,6 +834,7 @@
     "pdfGenerating": "Laver PDF…",
     "pdfVersionRow": "Version {version} · {date}",
     "pdfDownload": "Download",
+    "docxDownload": "Download Word (.docx)",
     "pdfNone": "Ingen PDF lavet endnu.",
     "pdfQuoteLabel": "Tilbud · {currency}",
     "programme": {
@@ -3006,7 +3007,9 @@
     "vertical": "Vertikal",
     "frequency": "Frekvens",
     "pageOf": "Side {page} af {pages}",
-    "preparedFor": "Tilbud til"
+    "preparedFor": "Tilbud til",
+    "viewOnline": "Se tilbuddet online, godkend det, og følg kampagnen i NativeSpin:",
+    "footerLink": "Åbn i NativeSpin"
   },
   "deskUsers": {
     "eyebrow": "Administration",
