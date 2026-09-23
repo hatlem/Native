@@ -958,6 +958,7 @@
     "pdfGenerating": "PDF wird erstellt…",
     "pdfVersionRow": "Version {version} · {date}",
     "pdfDownload": "Herunterladen",
+    "docxDownload": "Word herunterladen (.docx)",
     "pdfNone": "Noch kein PDF erstellt.",
     "pdfQuoteLabel": "Angebot · {currency}",
     "programme": {

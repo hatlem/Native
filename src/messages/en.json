@@ -958,6 +958,7 @@
     "pdfGenerating": "Generating PDF…",
     "pdfVersionRow": "Version {version} · {date}",
     "pdfDownload": "Download",
+    "docxDownload": "Download Word (.docx)",
     "pdfNone": "No PDF generated yet.",
     "pdfQuoteLabel": "Quote · {currency}",
     "programme": {

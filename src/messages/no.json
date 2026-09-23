@@ -833,6 +833,7 @@
     "pdfGenerating": "Lager PDF…",
     "pdfVersionRow": "Versjon {version} · {date}",
     "pdfDownload": "Last ned",
+    "docxDownload": "Last ned Word (.docx)",
     "pdfNone": "Ingen PDF generert ennå.",
     "pdfQuoteLabel": "Tilbud · {currency}",
     "programme": {

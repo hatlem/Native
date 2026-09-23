@@ -833,6 +833,7 @@
     "pdfGenerating": "Skapar PDF…",
     "pdfVersionRow": "Version {version} · {date}",
     "pdfDownload": "Ladda ner",
+    "docxDownload": "Ladda ner Word (.docx)",
     "pdfNone": "Ingen PDF skapad ännu.",
     "pdfQuoteLabel": "Offert · {currency}",
     "programme": {

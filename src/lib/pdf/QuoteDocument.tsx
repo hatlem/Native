@@ -2,6 +2,7 @@ import path from "node:path";
 import { Document, Page, View, Text, Link, StyleSheet, Font } from "@react-pdf/renderer";
 import { formatMoney, intlLocale } from "@/lib/money";
 import type { QuotePdfData } from "./quote-pdf-data";
+import { qt as t, quoteRowBlurb, type QuoteMessages } from "./quote-messages";
 
 // react-pdf's built-in Helvetica has no Nordic glyphs (æ/ø/å, etc.) — every
 // quote must render Norwegian text correctly, so we register a real
@@ -93,16 +94,6 @@ const styles = StyleSheet.create({
   },
 });
 
-type Messages = Record<string, string>;
-
-function t(messages: Messages, key: string, values?: Record<string, string | number>): string {
-  let s = messages[key] ?? key;
-  if (values) {
-    for (const [k, v] of Object.entries(values)) s = s.replaceAll(`{${k}}`, String(v));
-  }
-  return s;
-}
-
 function formatDate(date: Date, locale: string): string {
   return new Intl.DateTimeFormat(intlLocale(locale), { dateStyle: "medium" }).format(date);
 }
@@ -114,7 +105,7 @@ export function QuoteDocument({
 }: {
   data: QuotePdfData;
   locale: string;
-  messages: Messages;
+  messages: QuoteMessages;
 }) {
   const money = (amount: number) => formatMoney(amount, data.currency, locale);
   const onRequest = data.rows.filter((r) => r.priceOnRequest);
@@ -168,42 +159,30 @@ export function QuoteDocument({
             <Text style={[styles.tHeadCell, styles.colUnit]}>{t(messages, "colUnitPrice")}</Text>
             <Text style={[styles.tHeadCell, styles.colTotal]}>{t(messages, "colRowTotal")}</Text>
           </View>
-          {data.rows.map((row, i) => (
-            <View key={i} style={styles.tRow}>
-              <View style={styles.colTitle}>
-                <Text style={styles.tCell}>{row.titleName}</Text>
-                {row.circulation || row.digitalReach || row.audience || row.vertical || row.frequency ? (
-                  <Text style={styles.blurb}>
-                    {[
-                      row.digitalReach
-                        ? `${t(messages, "digitalReach")}: ${row.digitalReach.toLocaleString(intlLocale(locale))}`
-                        : row.circulation
-                          ? `${t(messages, "circulation")}: ${row.circulation.toLocaleString(intlLocale(locale))}`
-                          : null,
-                      row.vertical ? `${t(messages, "vertical")}: ${row.vertical}` : null,
-                      row.audience ? `${t(messages, "audience")}: ${row.audience}` : null,
-                      row.frequency ? `${t(messages, "frequency")}: ${row.frequency}` : null,
-                    ]
-                      .filter(Boolean)
-                      .join(" · ")}
-                  </Text>
-                ) : null}
+          {data.rows.map((row, i) => {
+            const blurb = quoteRowBlurb(row, messages, locale);
+            return (
+              <View key={i} style={styles.tRow}>
+                <View style={styles.colTitle}>
+                  <Text style={styles.tCell}>{row.titleName}</Text>
+                  {blurb ? <Text style={styles.blurb}>{blurb}</Text> : null}
+                </View>
+                <Text style={[styles.tCell, styles.colMarket]}>{row.marketCode}</Text>
+                <Text style={[styles.tCell, styles.colFormat]}>{row.format}</Text>
+                <Text style={[styles.tCell, styles.colQty]}>{row.quantity}</Text>
+                <Text style={[styles.tCell, styles.colUnit]}>
+                  {row.priceOnRequest || row.unitPrice === null
+                    ? t(messages, "priceOnRequest")
+                    : money(row.unitPrice)}
+                </Text>
+                <Text style={[styles.tCell, styles.colTotal]}>
+                  {row.priceOnRequest || row.rowTotal === null
+                    ? t(messages, "priceOnRequest")
+                    : money(row.rowTotal)}
+                </Text>
               </View>
-              <Text style={[styles.tCell, styles.colMarket]}>{row.marketCode}</Text>
-              <Text style={[styles.tCell, styles.colFormat]}>{row.format}</Text>
-              <Text style={[styles.tCell, styles.colQty]}>{row.quantity}</Text>
-              <Text style={[styles.tCell, styles.colUnit]}>
-                {row.priceOnRequest || row.unitPrice === null
-                  ? t(messages, "priceOnRequest")
-                  : money(row.unitPrice)}
-              </Text>
-              <Text style={[styles.tCell, styles.colTotal]}>
-                {row.priceOnRequest || row.rowTotal === null
-                  ? t(messages, "priceOnRequest")
-                  : money(row.rowTotal)}
-              </Text>
-            </View>
-          ))}
+            );
+          })}
         </View>
 
         <View style={styles.totals}>

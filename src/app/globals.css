@@ -3708,6 +3708,13 @@ select:disabled {
   color: var(--accent);
 }
 
+.quote-pdf-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--s-2);
+}
+
 /* ---------- Quote narrative (customer-facing template) ----------
    Renders a quote as: campaign outcome at the top, bundled "what
    you get" articles with a strikethrough rate-card anchor and the

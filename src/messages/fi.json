@@ -958,6 +958,7 @@
     "pdfGenerating": "Luodaan PDF:ää…",
     "pdfVersionRow": "Versio {version} · {date}",
     "pdfDownload": "Lataa",
+    "docxDownload": "Lataa Word (.docx)",
     "pdfNone": "PDF:ää ei ole vielä luotu.",
     "pdfQuoteLabel": "Tarjous · {currency}",
     "programme": {

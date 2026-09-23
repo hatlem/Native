@@ -833,6 +833,7 @@
     "pdfGenerating": "Laver PDF…",
     "pdfVersionRow": "Version {version} · {date}",
     "pdfDownload": "Download",
+    "docxDownload": "Download Word (.docx)",
     "pdfNone": "Ingen PDF lavet endnu.",
     "pdfQuoteLabel": "Tilbud · {currency}",
     "programme": {

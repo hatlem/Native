@@ -66,6 +66,7 @@
     "bcryptjs": "^3.0.3",
     "cheerio": "^1.2.0",
     "disposable-email-domains": "^1.0.62",
+    "docx": "^9.7.2",
     "free-email-domains": "^1.9.17",
     "lucide-react": "^1.31.0",
     "next": "^16.3.1",
