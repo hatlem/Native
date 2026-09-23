@@ -9,6 +9,7 @@ import {
   updateTitleProductionFee,
   updateProductPricing,
   updateTitleAliases,
+  sendPublisherInvite,
 } from "@/app/title-actions";
 import { pickContentFeeRule } from "@/lib/money";
 import { loadContentFeeRules } from "@/lib/content-fee";
@@ -182,6 +183,19 @@ export default async function DeskTitleEditPage({
 
   const saved = typeof sp.saved === "string" ? sp.saved : null;
   const error = typeof sp.error === "string" ? sp.error : null;
+  const invite = typeof sp.invite === "string" ? sp.invite : null;
+
+  // Has this publisher already been invited to claim a portal account? The
+  // panel below reads very differently depending on the answer — "invite them"
+  // vs "they were invited on the 3rd and haven't clicked yet".
+  const [pendingInvite, portalUsers] = await Promise.all([
+    prisma.publisherInvite.findFirst({
+      where: { publisherId: title.publisher.id, claimedAt: null },
+      orderBy: { createdAt: "desc" },
+      select: { email: true, expiresAt: true },
+    }),
+    prisma.user.count({ where: { publisherId: title.publisher.id } }),
+  ]);
 
   return (
     <section>
@@ -205,6 +219,23 @@ export default async function DeskTitleEditPage({
           <span>
             ✓ {t("saved")} ({t("publisherPricesPublic").toLowerCase()})
           </span>
+        </div>
+      ) : null}
+      {invite === "sent" ? (
+        <div className="banner-success" role="status">
+          <span>{t("inviteSent")}</span>
+        </div>
+      ) : invite === "invalid-email" ? (
+        <div className="banner-error" role="alert">
+          <span>{t("inviteInvalidEmail")}</span>
+        </div>
+      ) : invite === "email-business" ? (
+        <div className="banner-error" role="alert">
+          <span>{t("inviteBusinessEmail")}</span>
+        </div>
+      ) : invite === "not-found" ? (
+        <div className="banner-error" role="alert">
+          <span>{t("inviteNotFound")}</span>
         </div>
       ) : null}
       {error === "invalid-rate" ? (
@@ -322,6 +353,50 @@ export default async function DeskTitleEditPage({
               className="btn small"
             />
           </div>
+        </form>
+      </article>
+
+      {/* Publisher portal invitation. sendPublisherInvite has existed since the
+          claim flow was built but had no UI anywhere, so onboarding a
+          publisher meant hand-writing the email and inserting the invite row
+          by hand. This is that action's front door. */}
+      <article className="card" style={{ marginTop: 16 }}>
+        <h2>{t("inviteHeading")}</h2>
+        <p className="muted small">
+          {portalUsers > 0
+            ? t("inviteAlreadyClaimed", { count: portalUsers })
+            : t("inviteLead", { publisher: title.publisher.name })}
+        </p>
+        {pendingInvite ? (
+          <p className="muted small">
+            {t("invitePending", {
+              email: pendingInvite.email,
+              expires: pendingInvite.expiresAt.toISOString().slice(0, 10),
+            })}
+          </p>
+        ) : null}
+        <form action={sendPublisherInvite} className="product-form">
+          <input type="hidden" name="locale" value={locale} />
+          <input type="hidden" name="publisherId" value={title.publisher.id} />
+          <input type="hidden" name="titleId" value={title.id} />
+          <div className="field">
+            <label htmlFor="invite-email">{t("inviteEmailLabel")}</label>
+            <input
+              id="invite-email"
+              name="email"
+              type="email"
+              required
+              autoComplete="off"
+              placeholder="commercial@publisher.com"
+              defaultValue={pendingInvite?.email ?? ""}
+            />
+            <p className="muted small">{t("inviteEmailHelp")}</p>
+          </div>
+          <SubmitButton
+            label={pendingInvite ? t("inviteResend") : t("inviteSend")}
+            pendingLabel={t("saving")}
+            className="btn small"
+          />
         </form>
       </article>
 

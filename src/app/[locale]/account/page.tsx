@@ -8,7 +8,10 @@ import {
   updateCompany,
   updateProfile,
   setPassword,
+  deactivateOwnAccount,
 } from "@/app/account-actions";
+import { requestEmailChange } from "@/app/account-email-actions";
+import { accountOkKey, accountErrorKey } from "@/lib/account-messages";
 import { SubmitButton } from "@/components";
 import { TeamSection } from "./team-section";
 import { LocaleSwitcher } from "./locale-switcher";
@@ -17,11 +20,15 @@ export const dynamic = "force-dynamic";
 
 const MARKET_CODES = Object.values(MarketCode);
 
-// Authenticated-user account/profile page. Three sections, each
+// Authenticated-user account/profile page. One section per concern, each
 // scoped to its own form + server action:
 //   - Profile (name, phone)
+//   - Language
+//   - Sign-in email (confirm-to-new-address change flow)
 //   - Company (org name + billing market)
 //   - Password (set or change)
+//   - Team (org admins)
+//   - Data & account (export, deactivate)
 //
 // Lives in the same authenticated layout as /catalog, /plan etc. so
 // users get the standard nav around it. Banner messages on success
@@ -60,42 +67,16 @@ export default async function AccountPage({
   const t = await getTranslations({ locale, namespace: "account" });
   const tMarket = await getTranslations({ locale, namespace: "market" });
 
-  const okCode = typeof sp.ok === "string" ? sp.ok : undefined;
-  const errCode = typeof sp.error === "string" ? sp.error : undefined;
-  const okMessage = okCode === "profile"
-    ? t("okProfile")
-    : okCode === "company"
-      ? t("okCompany")
-      : okCode === "password"
-        ? t("okPassword")
-        : okCode === "invited"
-          ? t("okInvited")
-          : okCode === "revoked"
-            ? t("okRevoked")
-            : okCode === "updated"
-              ? t("okUpdated")
-              : okCode === "invite_revoked"
-                ? t("okInviteRevoked")
-                : okCode === "joined"
-                  ? t("okJoined")
-                  : null;
-  const errMessage = errCode === "phone"
-    ? t("errPhone")
-    : errCode === "company"
-      ? t("errCompany")
-      : errCode === "password_length"
-        ? t("errPasswordLength")
-        : errCode === "current_password"
-          ? t("errCurrentPassword")
-          : errCode === "forbidden"
-            ? t("errForbidden")
-            : errCode === "last_admin"
-              ? t("errLastAdmin")
-              : errCode === "already_member"
-                ? t("errAlreadyMember")
-                : errCode === "admin_delegation"
-                  ? t("errAdminDelegation")
-                  : null;
+  // Banner copy comes from a lookup table (@/lib/account-messages), not the
+  // ternary chain that used to live here — that chain had no branch for six of
+  // the codes the actions actually emit, so those failures showed the user
+  // nothing at all. Unknown error codes now fall back to a generic message.
+  const okKey = accountOkKey(typeof sp.ok === "string" ? sp.ok : undefined);
+  const errKey = accountErrorKey(
+    typeof sp.error === "string" ? sp.error : undefined,
+  );
+  const okMessage = okKey ? t(okKey) : null;
+  const errMessage = errKey ? t(errKey) : null;
 
   return (
     <>
@@ -127,7 +108,7 @@ export default async function AccountPage({
           <input type="hidden" name="locale" value={locale} />
           <div className="field">
             <label htmlFor="acc-email">{t("emailLabel")}</label>
-            <input id="acc-email" type="email" value={user.email} disabled />
+            <input id="acc-email" type="email" value={user.email} disabled readOnly />
             <span className="hint">{t("emailHint")}</span>
           </div>
           <div className="field">
@@ -179,6 +160,56 @@ export default async function AccountPage({
         </div>
       </section>
 
+      {/* Sign-in email. The address moves only when the link sent to the NEW
+          mailbox is clicked — see @/app/account-email-actions. Password
+          holders re-authenticate here; magic-link-only accounts can't, so for
+          them the confirmation link is the whole gate. */}
+      <section className="section" id="email">
+        <div className="section-head">
+          <div>
+            <span className="eyebrow">{t("emailEyebrow")}</span>
+            <h2>{t("emailTitle")}</h2>
+          </div>
+        </div>
+        <form action={requestEmailChange} className="product-form card">
+          <input type="hidden" name="locale" value={locale} />
+          <div className="field">
+            <label htmlFor="acc-new-email">{t("newEmailLabel")}</label>
+            <input
+              id="acc-new-email"
+              name="newEmail"
+              type="email"
+              autoComplete="email"
+              required
+              placeholder={t("newEmailPlaceholder")}
+            />
+            <span className="hint">{t("emailChangeHint")}</span>
+          </div>
+          {user.passwordHash ? (
+            <div className="field">
+              <label htmlFor="acc-email-pw">{t("currentPasswordLabel")}</label>
+              <input
+                id="acc-email-pw"
+                name="currentPassword"
+                type="password"
+                autoComplete="current-password"
+                required
+              />
+            </div>
+          ) : null}
+          <div className="actions">
+            <SubmitButton
+              label={t("saveEmail")}
+              pendingLabel={t("saving")}
+            />
+          </div>
+        </form>
+      </section>
+
+      {/* Desk, publisher and writer accounts have no organisation of their
+          own — updateCompany refuses for them, so rendering an empty,
+          permanently-disabled company card was pure confusion. */}
+      {user.organization ? (
       <section className="section" id="company">
         <div className="section-head">
           <div>
@@ -229,6 +260,7 @@ export default async function AccountPage({
           )}
         </form>
       </section>
+      ) : null}
 
       <section className="section" id="password">
         <div className="section-head">
@@ -283,6 +315,67 @@ export default async function AccountPage({
           isAdmin={ws.activeRole === "ADMIN"}
         />
       )}
+
+      {/* Data & account. The export endpoint has existed since the GDPR work
+          landed but nothing linked to it, so in practice no user could reach
+          it. A plain <a> rather than a form: it's a GET that streams JSON. */}
+      <section className="section" id="data">
+        <div className="section-head">
+          <div>
+            <span className="eyebrow">{t("dataEyebrow")}</span>
+            <h2>{t("dataTitle")}</h2>
+          </div>
+        </div>
+        <div className="product-form card">
+          <div className="field">
+            <label>{t("exportLabel")}</label>
+            <p className="muted small">
+              {ws ? t("exportHint") : t("exportNoOrgHint")}
+            </p>
+            {ws ? (
+              <p>
+                <a className="btn secondary" href="/api/export/me" download>
+                  {t("exportButton")}
+                </a>
+              </p>
+            ) : null}
+          </div>
+        </div>
+
+        {/* Deactivation sits behind a disclosure + a typed confirmation, the
+            same friction the desk's order-cancel control uses. It is the one
+            control here the user cannot undo themselves. */}
+        <details className="spec-details card" id="danger" style={{ marginTop: "1rem" }}>
+          <summary>
+            <span className="btn secondary block">{t("deactivateSummary")}</span>
+          </summary>
+          <form action={deactivateOwnAccount} className="product-form">
+            <input type="hidden" name="locale" value={locale} />
+            <h3 style={{ margin: "12px 0 4px" }}>{t("deactivateTitle")}</h3>
+            <p className="muted small">{t("deactivateHint")}</p>
+            <div className="field">
+              <label htmlFor="acc-deactivate-confirm">
+                {t("deactivateConfirmLabel")}
+              </label>
+              <input
+                id="acc-deactivate-confirm"
+                name="confirmEmail"
+                type="email"
+                autoComplete="off"
+                required
+                placeholder={user.email}
+              />
+            </div>
+            <div className="actions">
+              <SubmitButton
+                label={t("deactivateButton")}
+                pendingLabel={t("deactivating")}
+                className="btn danger block"
+              />
+            </div>
+          </form>
+        </details>
+      </section>
     </>
   );
 }

@@ -607,16 +607,25 @@ export default async function DeskRequestPage({
                     ))}
                   </ul>
                 )}
-                <form action={generateQuotePdf}>
-                  <input type="hidden" name="locale" value={locale} />
-                  <input type="hidden" name="requestId" value={request.id} />
-                  <input type="hidden" name="quoteId" value={quote.id} />
-                  <SubmitButton
-                    label={t("pdfGenerate")}
-                    pendingLabel={t("pdfGenerating")}
-                    className="btn small"
-                  />
-                </form>
+                <div className="quote-pdf-actions">
+                  <form action={generateQuotePdf}>
+                    <input type="hidden" name="locale" value={locale} />
+                    <input type="hidden" name="requestId" value={request.id} />
+                    <input type="hidden" name="quoteId" value={quote.id} />
+                    <SubmitButton
+                      label={t("pdfGenerate")}
+                      pendingLabel={t("pdfGenerating")}
+                      className="btn small"
+                    />
+                  </form>
+                  <a
+                    className="btn small ghost"
+                    href={`/api/export/quote-docx/${quote.id}?locale=${locale}`}
+                    download
+                  >
+                    {t("docxDownload")}
+                  </a>
+                </div>
               </div>
             </article>
           </section>

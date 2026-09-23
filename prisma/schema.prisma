@@ -739,10 +739,16 @@ model User {
   lastSignInIp    String?
   lastSignInAt    DateTime?
   bookingPromptDismissedAt DateTime?
+  // Soft off-boarding. Set by the user themselves (/account) or by a
+  // super-admin (/desk/users); every sign-in path refuses a stamped
+  // account. Nullable rather than a boolean so the log tells us WHEN,
+  // and so reactivation is a single clear -> null.
+  deactivatedAt   DateTime?
 
   notifications          Notification[]
   magicLinkTokens        MagicLinkToken[]
   passwordResetTokens    PasswordResetToken[]
+  emailChangeTokens      EmailChangeToken[]
   priceRequestsRequested PriceRequest[]     @relation("PriceRequestRequester")
   priceQuotesApplied     PriceQuote[]       @relation("PriceQuoteApplier")
   rateCardRequests       RateCardRequest[]  @relation("RateCardRequestCreator")
@@ -1515,6 +1521,27 @@ model PasswordResetToken {
   id          String    @id @default(cuid())
   userId      String
   user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  tokenHash   String    @unique
+  expiresAt   DateTime
+  consumedAt  DateTime?
+  requestedIp String?
+  createdAt   DateTime  @default(now())
+
+  @@index([userId])
+  @@index([expiresAt])
+}
+
+// Single-use email-change token. Same shape as the two above plus the
+// address being moved TO — the change only lands when the link sent to
+// the NEW mailbox is clicked, which is what proves ownership of it.
+// Uniqueness against User.email is re-checked at consume time: two
+// people can both hold a pending token for the same address, and only
+// the first to click may have it.
+model EmailChangeToken {
+  id          String    @id @default(cuid())
+  userId      String
+  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  newEmail    String
   tokenHash   String    @unique
   expiresAt   DateTime
   consumedAt  DateTime?

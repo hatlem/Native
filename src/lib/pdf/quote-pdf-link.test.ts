@@ -4,7 +4,9 @@ import { renderToBuffer } from "@react-pdf/renderer";
 import { QuoteDocument } from "./QuoteDocument";
 import { quoteOnlineUrl } from "./quote-online-url";
 import type { QuotePdfData } from "./quote-pdf-data";
+import enMessages from "@/messages/en.json";
 import svMessages from "@/messages/sv.json";
+import { quoteFormatLabel } from "./quote-messages";
 
 test("quoteOnlineUrl: absolute buyer request page, no double slash", () => {
   const prev = process.env.AUTH_URL;
@@ -76,4 +78,13 @@ test("QuoteDocument: renders with a price-on-request line and links back online"
   const uris = pdf.match(/\/URI \(([^)]*)\)/g) ?? [];
   assert.ok(uris.length >= 3, `expected >=3 link annotations, got ${uris.length}`);
   for (const u of uris) assert.ok(u.includes(onlineUrl), `unexpected link target: ${u}`);
+});
+
+test("quoteFormatLabel: localized catalog name, never the raw enum", () => {
+  assert.equal(quoteFormatLabel("NATIVE_ARTICLE", "sv"), svMessages.productType.NATIVE_ARTICLE);
+  assert.equal(quoteFormatLabel("PACKAGE", "sv"), svMessages.productType.PACKAGE);
+  // Unknown locale falls back to English; unknown type to the stored value.
+  assert.equal(quoteFormatLabel("NATIVE_ARTICLE", "xx"), enMessages.productType.NATIVE_ARTICLE);
+  assert.equal(quoteFormatLabel("SOMETHING_NEW", "sv"), "SOMETHING_NEW");
+  assert.equal(quoteFormatLabel("", "sv"), "");
 });

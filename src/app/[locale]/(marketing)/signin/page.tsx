@@ -40,9 +40,19 @@ export default async function SignInPage({
       ? t("rateLimited")
       : errorCode === "magic_expired"
         ? t("magicLinkExpired")
-        : errorCode
-          ? t("failed")
-          : null;
+        : errorCode === "deactivated"
+          ? t("deactivatedSignin")
+          : errorCode
+            ? t("failed")
+            : null;
+  // The email-change confirmation lands here signed out (the route clears the
+  // session, and the link is usually opened on another device) — without this
+  // banner the user is looking at a plain sign-in form with no sign that the
+  // change they just confirmed actually went through.
+  const okMessage =
+    (typeof sp.ok === "string" ? sp.ok : undefined) === "email_changed"
+      ? t("emailChangedOk")
+      : null;
   const initialEmail = typeof sp.email === "string" ? sp.email : "";
 
   return (
@@ -63,6 +73,12 @@ export default async function SignInPage({
             <h2>{t("title")}</h2>
             <p>{t("signinSubtitle")}</p>
           </div>
+
+          {okMessage ? (
+            <div className="banner-info" role="status">
+              <span>{okMessage}</span>
+            </div>
+          ) : null}
 
           {errorMessage ? (
             <div className="banner-error" role="alert">

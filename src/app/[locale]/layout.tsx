@@ -177,6 +177,23 @@ export default async function LocaleLayout({
   const appName = tc("appName");
   const signedIn = Boolean(session?.user);
 
+  // A JWT session outlives the account it was minted for: deactivating a user
+  // (self-service or from /desk/users) can't reach into an already-issued
+  // cookie. This is the render-side half of that gate — every authenticated
+  // page in the app nests inside this layout, so one check here replaces a
+  // per-page guard, and `children` is never rendered for a deactivated
+  // session. (getWorkspace covers the API/server-action half.)
+  const deactivated = session?.user?.id
+    ? Boolean(
+        (
+          await prisma.user.findUnique({
+            where: { id: session.user.id },
+            select: { deactivatedAt: true },
+          })
+        )?.deactivatedAt,
+      )
+    : false;
+
   return (
     <html lang={locale} className={inter.variable}>
       <body>
@@ -223,7 +240,22 @@ export default async function LocaleLayout({
           )}
 
           <main id="main" className="container">
-            {children}
+            {deactivated ? (
+              <section className="section">
+                <header className="page-header">
+                  <h1>{ta("deactivatedTitle")}</h1>
+                  <p className="lead">{ta("deactivatedBody")}</p>
+                </header>
+                <form action={logout}>
+                  <input type="hidden" name="locale" value={locale} />
+                  <button type="submit" className="btn primary">
+                    {ta("signout")}
+                  </button>
+                </form>
+              </section>
+            ) : (
+              children
+            )}
           </main>
 
           <footer>
