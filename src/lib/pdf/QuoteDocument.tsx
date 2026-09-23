@@ -2,7 +2,7 @@ import path from "node:path";
 import { Document, Page, View, Text, Link, StyleSheet, Font } from "@react-pdf/renderer";
 import { formatMoney, intlLocale } from "@/lib/money";
 import type { QuotePdfData } from "./quote-pdf-data";
-import { qt as t, quoteRowBlurb, type QuoteMessages } from "./quote-messages";
+import { qt as t, quoteFormatLabel, quoteRowBlurb, type QuoteMessages } from "./quote-messages";
 
 // react-pdf's built-in Helvetica has no Nordic glyphs (æ/ø/å, etc.) — every
 // quote must render Norwegian text correctly, so we register a real
@@ -168,7 +168,7 @@ export function QuoteDocument({
                   {blurb ? <Text style={styles.blurb}>{blurb}</Text> : null}
                 </View>
                 <Text style={[styles.tCell, styles.colMarket]}>{row.marketCode}</Text>
-                <Text style={[styles.tCell, styles.colFormat]}>{row.format}</Text>
+                <Text style={[styles.tCell, styles.colFormat]}>{quoteFormatLabel(row.format, locale)}</Text>
                 <Text style={[styles.tCell, styles.colQty]}>{row.quantity}</Text>
                 <Text style={[styles.tCell, styles.colUnit]}>
                   {row.priceOnRequest || row.unitPrice === null

@@ -8,6 +8,7 @@ import { quoteOnlineUrl } from "./quote-online-url";
 export type QuotePdfRow = {
   titleName: string;
   marketCode: string;
+  // Raw ProductType enum value; renderers localize it via quoteFormatLabel.
   format: string;
   quantity: number;
   unitPrice: number | null;

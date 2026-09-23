@@ -11,17 +11,26 @@ import svMessages from "@/messages/sv.json";
 // and DOCX renderers so both formats always say the same thing.
 export type QuoteMessages = Record<string, string>;
 
-const QUOTE_MESSAGES: Record<string, QuoteMessages> = {
-  da: daMessages.quotePdf,
-  de: deMessages.quotePdf,
-  en: enMessages.quotePdf,
-  fi: fiMessages.quotePdf,
-  no: noMessages.quotePdf,
-  sv: svMessages.quotePdf,
-};
+const ALL = { da: daMessages, de: deMessages, en: enMessages, fi: fiMessages, no: noMessages, sv: svMessages };
+
+const QUOTE_MESSAGES: Record<string, QuoteMessages> = Object.fromEntries(
+  Object.entries(ALL).map(([locale, m]) => [locale, m.quotePdf]),
+);
+
+// ProductType enum value → the buyer-facing format name the catalog uses.
+const FORMAT_LABELS: Record<string, Record<string, string>> = Object.fromEntries(
+  Object.entries(ALL).map(([locale, m]) => [locale, m.productType]),
+);
 
 export function quoteMessagesFor(locale: string): QuoteMessages {
   return QUOTE_MESSAGES[locale] ?? QUOTE_MESSAGES.en;
+}
+
+// "Native-artikel" rather than the raw enum value `NATIVE_ARTICLE`. Falls
+// back to English, then to the stored value, so an unknown type still shows.
+export function quoteFormatLabel(format: string, locale: string): string {
+  if (!format) return "";
+  return FORMAT_LABELS[locale]?.[format] ?? FORMAT_LABELS.en[format] ?? format;
 }
 
 export function qt(

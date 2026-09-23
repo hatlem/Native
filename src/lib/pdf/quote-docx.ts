@@ -17,7 +17,7 @@ import {
 } from "docx";
 import { formatMoney, intlLocale } from "@/lib/money";
 import type { QuotePdfData, QuotePdfRow } from "./quote-pdf-data";
-import { qt as t, quoteRowBlurb, type QuoteMessages } from "./quote-messages";
+import { qt as t, quoteFormatLabel, quoteRowBlurb, type QuoteMessages } from "./quote-messages";
 
 // Editable (.docx) twin of QuoteDocument.tsx: same QuotePdfData, same copy,
 // same customer-safe fields, so the desk can tweak wording before sending
@@ -154,7 +154,7 @@ export async function renderQuoteDocx(
         const blurb = quoteRowBlurb(row, messages, locale);
         const values = [
           row.marketCode,
-          row.format,
+          quoteFormatLabel(row.format, locale),
           String(row.quantity),
           rowPrice(row, row.unitPrice, messages, money),
           rowPrice(row, row.rowTotal, messages, money),

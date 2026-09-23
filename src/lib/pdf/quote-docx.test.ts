@@ -68,6 +68,8 @@ test("renderQuoteDocx: valid docx with localized copy, rows and the POR footnote
   assert.match(body, /Pris på förfrågan/);
   assert.match(body, /Se offerten online/);
   assert.match(body, /Rader märkta/); // footnote only renders with a POR line
+  assert.match(body, /Native-artikel/);
+  assert.doesNotMatch(body, /NATIVE_ARTICLE/);
 });
 
 test("renderQuoteDocx: every hyperlink targets the live quote page", async () => {
