@@ -1,8 +1,9 @@
 // Wraps Postgres FTS for the catalog: query against the `searchTsv`
 // generated column (name + aliases weight A, category + keywords weight B,
 // vertical weight B, audienceNote + description weight C, legacy tags
-// weight C — see migrations 20260604170000_fts_keywords_description and
-// 20260701020000_fts_vertical_tags), fall back to plain ILIKE (extended
+// weight C, website host weight B — see migrations
+// 20260604170000_fts_keywords_description, 20260701020000_fts_vertical_tags
+// and 20260924120000_fts_split_separators), fall back to plain ILIKE (extended
 // with the same synonym expansion, plus keywords/aliases array lookups)
 // when FTS finds nothing or the query can't build a tsquery at all.
 // Returns matching Title ids so the caller can keep using Prisma includes
@@ -39,15 +40,41 @@ function normalizeWords(raw: string): string[] {
  * Returns "" when the query has no matchable words.
  */
 export function buildTsQuery(raw: string): string {
-  const words = normalizeWords(raw);
-  if (words.length === 0) return "";
-  return words
-    .map((w) => {
-      const variants = expandTerm(w).slice(0, MAX_SYNONYMS_PER_WORD);
-      if (variants.length <= 1) return `${w}:*`;
-      return `(${variants.map((v) => `${v}:*`).join(" | ")})`;
-    })
-    .join(" & ");
+  const parts: string[] = [];
+  for (const chunk of raw.split(/\s+/)) {
+    // A domain ("vg.no", "t-online.de", a pasted URL) also matches the
+    // title's website host, indexed whole as a host lexeme. The host's split
+    // words stay as the alternative so "AT.no" still finds the name "AT.no";
+    // a URL's scheme/www/path never become search words.
+    const host = domainOf(chunk);
+    const words = normalizeWords(host ?? chunk);
+    if (words.length === 0) continue;
+    const group = words.map(wordTerm).join(" & ");
+    parts.push(host ? `(${host}:* | ${words.length > 1 ? `(${group})` : group})` : group);
+  }
+  return parts.join(" & ");
+}
+
+function wordTerm(w: string): string {
+  const variants = expandTerm(w).slice(0, MAX_SYNONYMS_PER_WORD);
+  if (variants.length <= 1) return `${w}:*`;
+  return `(${variants.map((v) => `${v}:*`).join(" | ")})`;
+}
+
+// Labels of letters/digits joined by single inner hyphens, 2+ labels, and a
+// letters-only TLD — the shape Postgres's parser reads as one host token.
+// Only these characters can reach the tsquery, so no operator can leak in.
+const DOMAIN_RE = /^(?:[\p{Letter}\p{Number}](?:[\p{Letter}\p{Number}-]*[\p{Letter}\p{Number}])?\.)+\p{Letter}{2,}$/u;
+
+/** "https://www.VG.no/nyheter" → "vg.no"; null when the chunk isn't a domain. */
+export function domainOf(chunk: string): string | null {
+  const host = chunk
+    .trim()
+    .toLowerCase()
+    .replace(/^[a-z][a-z0-9+.-]*:\/\//, "")
+    .replace(/^www\./, "")
+    .split(/[/?#:]/)[0];
+  return DOMAIN_RE.test(host) ? host : null;
 }
 
 /**
