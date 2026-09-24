@@ -1,6 +1,6 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { buildTsQuery, buildIlikeFallbackWhere, searchWhereFor } from "./catalog-search";
+import { buildTsQuery, buildIlikeFallbackWhere, domainOf, searchWhereFor } from "./catalog-search";
 
 test("buildTsQuery: plain word with no synonyms becomes word:*", () => {
   assert.equal(buildTsQuery("foo"), "foo:*");
@@ -101,5 +101,32 @@ test("buildTsQuery: separators inside a word split into tokens, never fuse", () 
   // lexeme into parts) — the old behavior fused it into the unsearchable
   // "apiit". Dots likewise: "AT.no" prefix-matches the 'at.no' host lexeme.
   assert.equal(buildTsQuery("API-IT New Title"), "api:* & it:* & new:* & title:*");
-  assert.equal(buildTsQuery("AT.no"), "at:* & no:*");
+  assert.equal(buildTsQuery("AT.no"), "(at.no:* | (at:* & no:*))");
+});
+
+test("buildTsQuery: a domain also matches the whole website host", () => {
+  assert.equal(buildTsQuery("vg.no"), "(vg.no:* | (vg:* & no:*))");
+  assert.equal(buildTsQuery("t-online.de"), "(t-online.de:* | (online:* & de:*))");
+  // A pasted URL resolves to its host (scheme/www/path dropped); other
+  // words stay AND-ed alongside.
+  assert.equal(
+    buildTsQuery("native https://www.Nyteknik.se/annonsera"),
+    "native:* & (nyteknik.se:* | (nyteknik:* & se:*))",
+  );
+});
+
+test("buildTsQuery: slash-joined names split into AND-ed words", () => {
+  // Pairs with the index splitting "/" (20260924120000_fts_split_separators):
+  // "Bärgslagsbladet/Arboga Tidning" must be findable by "Arboga Tidning".
+  assert.equal(buildTsQuery("Bärgslagsbladet/Arboga"), "bärgslagsbladet:* & arboga:*");
+});
+
+test("domainOf: only host-shaped chunks qualify", () => {
+  assert.equal(domainOf("E24.no"), "e24.no");
+  assert.equal(domainOf("http://bobedre.dk/"), "bobedre.dk");
+  assert.equal(domainOf("KK"), null);
+  assert.equal(domainOf("1.5"), null);
+  assert.equal(domainOf("API-IT"), null);
+  assert.equal(domainOf("a..b"), null);
+  assert.equal(domainOf("vg.no'|x"), null);
 });
