@@ -890,7 +890,13 @@
     "timelineLater": "Später",
     "timelineEmptyMonth": "Diesen Monat läuft nichts",
     "priceOnRequest": "Preis auf Anfrage",
-    "priceOnRequestNote": "Mit „Preis auf Anfrage“ markierte Zeilen kommen zur obigen Summe hinzu und werden separat bestätigt."
+    "priceOnRequestNote": "Mit „Preis auf Anfrage“ markierte Zeilen kommen zur obigen Summe hinzu und werden separat bestätigt.",
+    "quoteExpiredTitle": "Dieses Angebot ist am {date} abgelaufen.",
+    "quoteExpiredTitleNoDate": "Dieses Angebot ist abgelaufen.",
+    "quoteExpiredBody": "Preise sind nur für begrenzte Zeit garantiert. Bitten Sie den Desk um ein erneuertes Angebot – Sie können es annehmen, sobald es bereitsteht.",
+    "requestRenewal": "Erneuertes Angebot anfordern",
+    "requestingRenewal": "Wird gesendet …",
+    "renewalRequested": "Der Desk wurde gebeten, das Angebot zu erneuern. Sie erhalten eine Benachrichtigung, sobald Sie es annehmen können."
   },
   "desk": {
     "eyebrow": "Interner Desk",
@@ -985,7 +991,13 @@
     "linePriceSetByUnknown": "Desk",
     "linePricePlaceholder": "Kundenpreis ({currency})",
     "linePriceSave": "Preis setzen",
-    "linePriceMarkOnRequest": "Als Preis auf Anfrage senden"
+    "linePriceMarkOnRequest": "Als Preis auf Anfrage senden",
+    "quoteValidUntil": "Verbindlich bis {date}",
+    "quoteExpiredOn": "Abgelaufen am {date}",
+    "quoteNoExpiry": "Kein Ablaufdatum",
+    "renewQuote": "Angebot erneuern",
+    "renewingQuote": "Wird erneuert …",
+    "renewQuoteHint": "Der Kunde kann ein abgelaufenes Angebot nicht annehmen. Die Erneuerung hält diese Preise weitere 14 Tage – passen Sie zuerst Positionen an, falls sich Preise geändert haben."
   },
   "deskTitles": {
     "eyebrow": "Super-Admin · Titel",

@@ -765,7 +765,13 @@
     "timelineLater": "Senere",
     "timelineEmptyMonth": "Ingenting kjører denne måneden",
     "priceOnRequest": "Pris på forespørsel",
-    "priceOnRequestNote": "Linjer merket «pris på forespørsel» kommer i tillegg til totalen over og bekreftes separat."
+    "priceOnRequestNote": "Linjer merket «pris på forespørsel» kommer i tillegg til totalen over og bekreftes separat.",
+    "quoteExpiredTitle": "Tilbudet gikk ut {date}.",
+    "quoteExpiredTitleNoDate": "Tilbudet har gått ut.",
+    "quoteExpiredBody": "Prisene er bare garantert en begrenset periode. Be desken om et fornyet tilbud – du kan godta det så snart det er klart.",
+    "requestRenewal": "Be om fornyet tilbud",
+    "requestingRenewal": "Sender …",
+    "renewalRequested": "Desken har fått beskjed om å fornye tilbudet. Du får et varsel når du kan godta det."
   },
   "desk": {
     "eyebrow": "Internt desk",
@@ -860,7 +866,13 @@
     "linePriceSetByUnknown": "desk",
     "linePricePlaceholder": "Kundepris ({currency})",
     "linePriceSave": "Sett pris",
-    "linePriceMarkOnRequest": "Send som pris på forespørsel"
+    "linePriceMarkOnRequest": "Send som pris på forespørsel",
+    "quoteValidUntil": "Fast til {date}",
+    "quoteExpiredOn": "Utløpt {date}",
+    "quoteNoExpiry": "Ingen utløpsdato",
+    "renewQuote": "Forny tilbudet",
+    "renewingQuote": "Fornyer …",
+    "renewQuoteHint": "Kunden kan ikke godta et utløpt tilbud. Fornyelsen beholder disse prisene i 14 nye dager – juster linjene først hvis prisene har endret seg."
   },
   "deskTitles": {
     "eyebrow": "Superadmin · titler",

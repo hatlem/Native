@@ -9,6 +9,7 @@ import { EmptyState } from "@/app/empty-state";
 import { formatMoney, intlLocale } from "@/lib/money";
 import { timeAgo } from "@/lib/time-ago";
 import { deriveStage, type CampaignStage } from "@/lib/campaign-stage";
+import { effectiveQuoteStatus } from "@/lib/commerce/quote-validity";
 import { monthsWindow, intersectsMonth, draftWindow, orderWindow, type RunWindow } from "@/lib/campaign-timeline";
 import { CampaignRow, type RowAction } from "./_components/CampaignRow";
 import { TimelineView, type TimelineEntry, type TimelineMonthGroup } from "./_components/TimelineView";
@@ -185,12 +186,15 @@ export default async function RequestsPage({
     const quote = r.quotes[0] ?? null;
     const order = quote?.order ?? null;
     const invoiceStatus = order?.invoices[0]?.status ?? null;
+    // Stored status lags the clock: a SENT quote past validUntil reads as
+    // EXPIRED everywhere on this page (see quote-validity.ts).
+    const quoteStatus = quote ? effectiveQuoteStatus(quote) : null;
     const stage = deriveStage({
       requestStatus: r.status,
-      quoteStatus: quote?.status ?? null,
+      quoteStatus,
       orderStatus: order?.status ?? null,
     });
-    const tab = tabForRow(order?.status ?? null, quote?.status ?? null, r.status);
+    const tab = tabForRow(order?.status ?? null, quoteStatus, r.status);
 
     let qualifier: string;
     if (order) {
@@ -198,12 +202,12 @@ export default async function RequestsPage({
       else if (invoiceStatus === "ISSUED" || invoiceStatus === "OVERDUE") qualifier = t("qualifierInvoiced");
       else qualifier = t("qualifierConfirmed");
     } else if (quote) {
-      if (quote.status === "SENT") {
+      if (quoteStatus === "SENT") {
         qualifier = quote.validUntil
           ? t("qualifierFirmExpires", { date: dateFmt.format(quote.validUntil) })
           : t("qualifierFirm");
-      } else if (quote.status === "EXPIRED") qualifier = t("qualifierExpired");
-      else if (quote.status === "DECLINED") qualifier = t("qualifierDeclined");
+      } else if (quoteStatus === "EXPIRED") qualifier = t("qualifierExpired");
+      else if (quoteStatus === "DECLINED") qualifier = t("qualifierDeclined");
       else qualifier = t("qualifierIndicative");
     } else {
       qualifier = stage === 1 ? t("qualifierIndicative") : t("qualifierSent");
@@ -258,7 +262,7 @@ export default async function RequestsPage({
         : undefined,
       id: r.id,
       name: r.plan.name,
-      statusValue: order?.status ?? quote?.status ?? r.status,
+      statusValue: order?.status ?? quoteStatus ?? r.status,
       meta: t("metaCampaign", {
         items: r.plan.items.length,
         age: timeAgo(r.createdAt, locale),

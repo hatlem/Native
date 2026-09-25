@@ -890,7 +890,13 @@
     "timelineLater": "Later",
     "timelineEmptyMonth": "Nothing running this month",
     "priceOnRequest": "Price on request",
-    "priceOnRequestNote": "Lines marked “price on request” are additional to the total above and will be confirmed separately."
+    "priceOnRequestNote": "Lines marked “price on request” are additional to the total above and will be confirmed separately.",
+    "quoteExpiredTitle": "This offer expired on {date}.",
+    "quoteExpiredTitleNoDate": "This offer has expired.",
+    "quoteExpiredBody": "Prices are only guaranteed for a limited time. Ask the desk for a renewed offer — you can accept it as soon as it is back.",
+    "requestRenewal": "Ask for a renewed offer",
+    "requestingRenewal": "Sending…",
+    "renewalRequested": "The desk has been asked to renew it. You will get a notification when it is ready to accept."
   },
   "desk": {
     "eyebrow": "Internal desk",
@@ -985,7 +991,13 @@
     "linePriceSetByUnknown": "desk",
     "linePricePlaceholder": "Customer price ({currency})",
     "linePriceSave": "Set price",
-    "linePriceMarkOnRequest": "Send as price on request"
+    "linePriceMarkOnRequest": "Send as price on request",
+    "quoteValidUntil": "Firm until {date}",
+    "quoteExpiredOn": "Expired {date}",
+    "quoteNoExpiry": "No expiry date",
+    "renewQuote": "Renew quote",
+    "renewingQuote": "Renewing…",
+    "renewQuoteHint": "The buyer can’t accept an expired quote. Renewing keeps these prices for another 14 days — reprice any lines first if rates have changed."
   },
   "deskTitles": {
     "eyebrow": "Super-admin · titles",

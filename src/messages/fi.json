@@ -890,7 +890,13 @@
     "timelineLater": "Myöhemmin",
     "timelineEmptyMonth": "Tässä kuussa ei ole mitään käynnissä",
     "priceOnRequest": "Hinta pyynnöstä",
-    "priceOnRequestNote": "Rivit, joissa lukee ”hinta pyynnöstä”, tulevat yllä olevan summan lisäksi ja vahvistetaan erikseen."
+    "priceOnRequestNote": "Rivit, joissa lukee ”hinta pyynnöstä”, tulevat yllä olevan summan lisäksi ja vahvistetaan erikseen.",
+    "quoteExpiredTitle": "Tarjous vanheni {date}.",
+    "quoteExpiredTitleNoDate": "Tarjous on vanhentunut.",
+    "quoteExpiredBody": "Hinnat ovat voimassa vain rajoitetun ajan. Pyydä Deskiä uusimaan tarjous – voit hyväksyä sen heti, kun se on valmis.",
+    "requestRenewal": "Pyydä uusittu tarjous",
+    "requestingRenewal": "Lähetetään …",
+    "renewalRequested": "Deskiä on pyydetty uusimaan tarjous. Saat ilmoituksen, kun voit hyväksyä sen."
   },
   "desk": {
     "eyebrow": "Sisäinen desk",
@@ -985,7 +991,13 @@
     "linePriceSetByUnknown": "desk",
     "linePricePlaceholder": "Asiakashinta ({currency})",
     "linePriceSave": "Aseta hinta",
-    "linePriceMarkOnRequest": "Lähetä hintana pyynnöstä"
+    "linePriceMarkOnRequest": "Lähetä hintana pyynnöstä",
+    "quoteValidUntil": "Sitova {date} asti",
+    "quoteExpiredOn": "Vanheni {date}",
+    "quoteNoExpiry": "Ei päättymispäivää",
+    "renewQuote": "Uusi tarjous",
+    "renewingQuote": "Uusitaan …",
+    "renewQuoteHint": "Asiakas ei voi hyväksyä vanhentunutta tarjousta. Uusiminen pitää nämä hinnat voimassa 14 päivää lisää – päivitä rivien hinnat ensin, jos ne ovat muuttuneet."
   },
   "deskTitles": {
     "eyebrow": "Pääkäyttäjä · julkaisut",

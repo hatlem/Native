@@ -9,7 +9,8 @@ import {
   fingerprintListItems,
 } from "@/lib/commerce/firm-order";
 import { submitListAsRfq, RFQ_LIST_INCLUDE } from "@/lib/commerce/submit-rfq";
-import { createOrderFromQuote } from "@/lib/commerce/accept-quote";
+import { createOrderFromQuote, QuoteNotAcceptableError } from "@/lib/commerce/accept-quote";
+import { reconcileExpiredQuotes } from "@/lib/commerce/quote-expiry";
 
 // DB-mutating integration test — skipped unless RUN_DB_IT=1, and only
 // against a DISPOSABLE database. Proves both checkout legs end to end:
@@ -348,5 +349,91 @@ if (!RUN_DB_IT) {
 
     const quote = await prisma.quote.findUniqueOrThrow({ where: { id: seeded.quote.id } });
     assert.equal(quote.status, "ACCEPTED");
+  });
+
+  // Seeds a one-line RFQ quote with the given status/validity for the
+  // acceptance-gate tests below.
+  async function seedQuote(status: "SENT" | "DECLINED", validUntil: Date | null) {
+    const plan = await prisma.plan.create({
+      data: {
+        organizationId: orgId,
+        name: "CO-IT gate plan",
+        currency: "NOK",
+        items: { create: [{ productId, quantity: 1, authorshipMode: "NATIVESPIN_PRODUCED" }] },
+      },
+      include: { items: true },
+    });
+    const request = await prisma.request.create({
+      data: { organizationId: orgId, planId: plan.id, status: "QUOTED" },
+    });
+    const quote = await prisma.quote.create({
+      data: {
+        requestId: request.id,
+        status,
+        validUntil,
+        currency: "NOK",
+        subtotal: 15000,
+        vatPct: 25,
+        total: 18750,
+        lines: {
+          create: [
+            {
+              kind: "INVENTORY",
+              productId,
+              description: "CO-IT gated placement",
+              quantity: 1,
+              unitCost: 10000,
+              marginPct: 50,
+              lineTotal: 15000,
+            },
+          ],
+        },
+      },
+      include: { lines: true },
+    });
+    return { plan, quote };
+  }
+
+  const accept = (seeded: Awaited<ReturnType<typeof seedQuote>>) =>
+    prisma.$transaction((tx) =>
+      createOrderFromQuote(tx, {
+        organizationId: orgId,
+        quote: { id: seeded.quote.id, lines: seeded.quote.lines },
+        plan: seeded.plan,
+      }),
+    );
+
+  test("createOrderFromQuote refuses an expired quote and writes nothing", async () => {
+    const seeded = await seedQuote("SENT", new Date(Date.now() - 60_000));
+    await assert.rejects(accept(seeded), QuoteNotAcceptableError);
+    assert.equal(await prisma.order.count({ where: { quoteId: seeded.quote.id } }), 0);
+    const after = await prisma.quote.findUniqueOrThrow({ where: { id: seeded.quote.id } });
+    assert.equal(after.status, "SENT", "rolled back — status untouched");
+  });
+
+  test("createOrderFromQuote refuses a quote that isn't SENT", async () => {
+    const seeded = await seedQuote("DECLINED", new Date(Date.now() + 86_400_000));
+    await assert.rejects(accept(seeded), QuoteNotAcceptableError);
+    assert.equal(await prisma.order.count({ where: { quoteId: seeded.quote.id } }), 0);
+  });
+
+  test("a double accept yields exactly one order", async () => {
+    const seeded = await seedQuote("SENT", new Date(Date.now() + 86_400_000));
+    const results = await Promise.allSettled([accept(seeded), accept(seeded)]);
+    assert.equal(results.filter((r) => r.status === "fulfilled").length, 1);
+    assert.equal(await prisma.order.count({ where: { quoteId: seeded.quote.id } }), 1);
+  });
+
+  test("reconcileExpiredQuotes flips only lapsed SENT quotes to EXPIRED", async () => {
+    const lapsed = await seedQuote("SENT", new Date(Date.now() - 60_000));
+    const live = await seedQuote("SENT", new Date(Date.now() + 86_400_000));
+    await reconcileExpiredQuotes({ requestId: lapsed.quote.requestId });
+    await reconcileExpiredQuotes({ requestId: live.quote.requestId });
+    const [a, b] = await Promise.all([
+      prisma.quote.findUniqueOrThrow({ where: { id: lapsed.quote.id } }),
+      prisma.quote.findUniqueOrThrow({ where: { id: live.quote.id } }),
+    ]);
+    assert.equal(a.status, "EXPIRED");
+    assert.equal(b.status, "SENT");
   });
 }
