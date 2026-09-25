@@ -4904,8 +4904,9 @@ select:disabled {
 .fav-newlist { display: flex; flex-direction: column; gap: 6px; }
 .fav-newlist input { width: 100%; min-width: 0; }
 /* On the detail header the heart sits inline beside the H1 (not floated to the
-   card corner), but it still needs a positioning context for its popover. */
-.detail-head .fav-btn { position: relative; }
+   card corner), but it still needs a positioning context for its popover, and
+   must not be squeezed when a long title name takes the rest of the row. */
+.detail-head .fav-btn { position: relative; flex-shrink: 0; }
 .title-selector {
   position: absolute;
   top: 12px;
@@ -5141,8 +5142,15 @@ body:has(.compare-bar) {
   .detail-head { grid-template-columns: 1fr; gap: var(--s-4); }
 }
 
+/* The H1 is a flex item beside the heart, so its default min-width:auto pins
+   it to its longest word — a Nordic compound like "Anleggsmaskinentreprenøren"
+   at display size then overflows the column by hundreds of px. Let it shrink,
+   hyphenate by the page's lang, and break as a last resort. */
 .detail-head h1 {
   margin: 0 0 var(--s-2);
+  min-width: 0;
+  overflow-wrap: anywhere;
+  hyphens: auto;
 }
 
 /* Key-facts aside: tighter than the default .card padding + row spacing so a
