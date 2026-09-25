@@ -3884,6 +3884,29 @@ select:disabled {
   border-top: 1px solid var(--border);
 }
 
+/* Expired firm offer: replaces the accept CTA. Same footprint as
+   .banner-success so the quote card's footer doesn't jump between states. */
+.quote-expired {
+  padding: var(--s-4) var(--s-5);
+  background: var(--warning-soft);
+  border-top: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--s-4);
+  flex-wrap: wrap;
+}
+.quote-expired__text {
+  margin: 0;
+  flex: 1 1 280px;
+  font-size: 0.92rem;
+}
+.quote-expired__text strong {
+  display: block;
+  color: var(--warning);
+  font-weight: 600;
+}
+
 /* ---------- Utility pages (404, error, loading) ---------- */
 
 .utility-page {
@@ -7379,4 +7402,14 @@ footer a:hover {
     flex: 1;
     width: auto;
   }
+}
+
+/* Desk quote card: validity line + "Renew quote" when the window closed. */
+.quote-validity {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--s-3);
+  flex-wrap: wrap;
+  margin-bottom: var(--s-2);
 }

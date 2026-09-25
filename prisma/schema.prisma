@@ -220,6 +220,9 @@ enum NotificationKind {
   // Product — nudges the buyer + desk to resolve it via "Bruk plassering".
   // Never auto-prices; purely informational. See the placement-ready sweep.
   TITLE_PRODUCT_READY
+  // A buyer tried to go ahead on a quote whose validity window had closed and
+  // asked the desk to renew it (quote-actions.ts requestQuoteRenewal).
+  QUOTE_RENEWAL_REQUESTED
 }
 
 enum JobStatus {

@@ -11,6 +11,8 @@ import { campaignFlowEnabled } from "@/lib/flags";
 import { FileCheck, PenLine, Search, RotateCcw, Repeat } from "lucide-react";
 import { findDueWaves } from "@/lib/programme";
 import { selectActiveList } from "@/app/list-actions";
+import { acceptableQuoteWhere } from "@/lib/commerce/quote-validity";
+import { reconcileExpiredQuotesInBackground } from "@/lib/commerce/quote-expiry";
 
 export const dynamic = "force-dynamic";
 
@@ -22,14 +24,17 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
 
   const t = await getTranslations({ locale, namespace: "buyerHome" });
 
-  // "Needs you": quotes sent by the desk awaiting the buyer's approval,
-  // plus content drafts a writer has moved to review. ContentAsset has no
-  // buyer-facing approve action yet — the card links straight to the
-  // article; there's no single order to route to once an article can back
-  // multiple placements.
+  // "Needs you": quotes sent by the desk awaiting the buyer's approval —
+  // only while still inside their validity window; an expired quote can't be
+  // accepted, so it lives on the request page (with "ask for renewal") rather
+  // than here — plus content drafts a writer has moved to review.
+  // ContentAsset has no buyer-facing approve action yet — the card links
+  // straight to the article; there's no single order to route to once an
+  // article can back multiple placements.
+  reconcileExpiredQuotesInBackground({ organizationIds: orgIds });
   const [pendingQuotes, pendingContent, orders, dueWaves] = await Promise.all([
     prisma.quote.findMany({
-      where: { status: "SENT", request: { organizationId: { in: orgIds } } },
+      where: { ...acceptableQuoteWhere(), order: null, request: { organizationId: { in: orgIds } } },
       orderBy: { createdAt: "desc" },
       take: 5,
       select: {

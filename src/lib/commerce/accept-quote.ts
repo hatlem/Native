@@ -4,13 +4,27 @@
 // order/brief/booking shape can't drift between the two paths.
 //
 // The caller owns the surrounding gates (scope, commit authority,
-// already-ordered check) and the request-level status update.
+// already-ordered check) and the request-level status update; the
+// quote-validity gate (SENT + unexpired) is enforced here, atomically.
 
 import type { Prisma } from "@prisma/client";
 import {
   authorshipForOrderLine,
   type AuthorshipMode,
 } from "@/lib/authorship";
+import { acceptableQuoteWhere } from "@/lib/commerce/quote-validity";
+
+/**
+ * The quote was no longer acceptable when the transaction ran: it expired,
+ * or it isn't SENT (already accepted by a concurrent click, declined, or a
+ * draft). Nothing was written; the caller rolls back and tells the buyer.
+ */
+export class QuoteNotAcceptableError extends Error {
+  constructor(readonly quoteId: string) {
+    super(`Quote ${quoteId} is not acceptable (expired or not SENT)`);
+    this.name = "QuoteNotAcceptableError";
+  }
+}
 
 export type AcceptableQuoteLine = {
   kind: "INVENTORY" | "CONTENT_FEE";
@@ -40,20 +54,32 @@ export function authorshipByProduct(
   );
 }
 
-// Creates the order (CONFIRMED) with lines copied off the quote, attaches
-// briefs + publisher bookings to placement lines only (CONTENT_FEE lines
-// are billing-only), and marks the quote ACCEPTED. Returns the order id
-// plus the product ids on the quote for publisher notification fan-out.
+// Marks the quote ACCEPTED, creates the order (CONFIRMED) with lines copied
+// off the quote, and attaches briefs + publisher bookings to placement lines
+// only (CONTENT_FEE lines are billing-only). Returns the order id plus the
+// product ids on the quote for publisher notification fan-out.
+//
+// The ACCEPTED flip runs first as a compare-and-set on "SENT and still inside
+// validUntil": a quote that expired between page load and click — or was
+// already accepted by a concurrent request — throws QuoteNotAcceptableError
+// before any order row exists, so the caller's transaction rolls back clean.
 export async function createOrderFromQuote(
   tx: Prisma.TransactionClient,
   args: {
     organizationId: string;
     quote: { id: string; lines: AcceptableQuoteLine[] };
     plan: AcceptablePlan;
+    now?: Date;
   },
 ): Promise<{ orderId: string; productIds: string[] }> {
   const { organizationId, quote, plan } = args;
   const authorship = authorshipByProduct(plan);
+
+  const claimed = await tx.quote.updateMany({
+    where: { id: quote.id, ...acceptableQuoteWhere(args.now ?? new Date()) },
+    data: { status: "ACCEPTED" },
+  });
+  if (claimed.count !== 1) throw new QuoteNotAcceptableError(quote.id);
 
   const order = await tx.order.create({
     data: {
@@ -85,11 +111,6 @@ export async function createOrderFromQuote(
   });
   await tx.publisherBooking.createMany({
     data: placementLines.map((line) => ({ orderLineId: line.id })),
-  });
-
-  await tx.quote.update({
-    where: { id: quote.id },
-    data: { status: "ACCEPTED" },
   });
 
   return {

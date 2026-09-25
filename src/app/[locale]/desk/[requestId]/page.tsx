@@ -8,6 +8,7 @@ import { formatMoney } from "@/lib/money";
 import {
   generateQuote,
   generateQuotePdf,
+  renewQuote,
   setQuoteLinePrice,
 } from "@/app/quote-actions";
 import { resolvePlanTitleItem, removePlanTitleItem } from "@/app/desk-actions";
@@ -23,6 +24,7 @@ import { SubmitButton } from "@/components";
 import { canSeeCostVsSell } from "@/lib/roles";
 import { presignDownload } from "@/lib/storage/r2";
 import { intlLocale } from "@/lib/money";
+import { isQuoteExpired } from "@/lib/commerce/quote-validity";
 
 export const dynamic = "force-dynamic";
 
@@ -430,6 +432,34 @@ export default async function DeskRequestPage({
                   <span>{t("linePriceInvalid")}</span>
                 </div>
               ) : null}
+              {quote.order ? null : (
+                <div className="quote-validity">
+                  <span className={isQuoteExpired(quote) ? "tag" : "muted small"}>
+                    {quote.validUntil
+                      ? t(isQuoteExpired(quote) ? "quoteExpiredOn" : "quoteValidUntil", {
+                          date: new Intl.DateTimeFormat(intlLocale(locale), {
+                            dateStyle: "medium",
+                          }).format(quote.validUntil),
+                        })
+                      : t("quoteNoExpiry")}
+                  </span>
+                  {isQuoteExpired(quote) ? (
+                    <form action={renewQuote}>
+                      <input type="hidden" name="locale" value={locale} />
+                      <input type="hidden" name="requestId" value={request.id} />
+                      <input type="hidden" name="quoteId" value={quote.id} />
+                      <SubmitButton
+                        label={t("renewQuote")}
+                        pendingLabel={t("renewingQuote")}
+                        className="btn small"
+                      />
+                    </form>
+                  ) : null}
+                </div>
+              )}
+              {quote.order || !isQuoteExpired(quote) ? null : (
+                <p className="muted small">{t("renewQuoteHint")}</p>
+              )}
               <p className="muted small">
                 {t("lineStateSummary", {
                   priced: quote.lines.filter((l) => !l.priceOnRequest).length,

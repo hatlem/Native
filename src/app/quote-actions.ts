@@ -11,7 +11,15 @@ import {
 } from "@/lib/money";
 import { loadPricingDefaults, contentFeeLinesForGroup } from "@/lib/content-fee";
 import { toQuotable } from "@/lib/commerce/firm-order";
-import { createOrderFromQuote } from "@/lib/commerce/accept-quote";
+import { createOrderFromQuote, QuoteNotAcceptableError } from "@/lib/commerce/accept-quote";
+import {
+  RENEWAL_REQUEST_COOLDOWN_MS,
+  RENEWAL_REQUESTED_AUDIT_ACTION,
+  isQuoteAcceptable,
+  isQuoteExpired,
+  quoteValidUntilFrom,
+} from "@/lib/commerce/quote-validity";
+import { reconcileExpiredQuotes } from "@/lib/commerce/quote-expiry";
 import { uniquePublisherIdsForProducts } from "@/lib/commerce/publishers";
 import { groupItemsByMarket } from "@/lib/quote-grouping";
 import { recordAudit } from "@/lib/audit";
@@ -22,6 +30,22 @@ import { generateQuotePdf as renderQuotePdf } from "@/lib/pdf/generate-quote-pdf
 function str(formData: FormData, key: string): string {
   const v = formData.get(key);
   return typeof v === "string" ? v.trim() : "";
+}
+
+// The atomic accept gate refused: either a concurrent click already accepted
+// these quotes (a double-submit — land on the request quietly, it's done) or
+// they expired mid-click (catch the stored status up, tell the buyer).
+async function redirectAfterRefusedAccept(
+  locale: string,
+  requestId: string,
+  quoteIds: string[],
+): Promise<never> {
+  const alreadyAccepted = await prisma.quote.count({
+    where: { id: { in: quoteIds }, status: "ACCEPTED" },
+  });
+  if (alreadyAccepted === quoteIds.length) redirect(`/${locale}/requests/${requestId}`);
+  await reconcileExpiredQuotes({ requestId });
+  redirect(`/${locale}/requests/${requestId}?error=quote-expired`);
 }
 
 export async function generateQuote(formData: FormData) {
@@ -77,7 +101,7 @@ export async function generateQuote(formData: FormData) {
   // Fee rules and margin defaults come from the same load so the quote
   // agrees with the catalog band the buyer saw (display-price.ts).
   const defaults = await loadPricingDefaults();
-  const validUntil = new Date(Date.now() + 14 * 24 * 60 * 60 * 1000);
+  const validUntil = quoteValidUntilFrom(new Date());
 
   // A line quoted off an unconfirmed (blueprint-estimated) product price
   // must not present the estimate as a firm figure — it goes out as
@@ -331,6 +355,12 @@ export async function acceptQuote(formData: FormData) {
   if (quote.order) {
     redirect(`/${locale}/requests/${quote.requestId}`);
   }
+  // A firm offer is only firm inside its window: an expired quote must be
+  // renewed by the desk before it can become an order.
+  if (!isQuoteAcceptable(quote)) {
+    if (isQuoteExpired(quote)) await reconcileExpiredQuotes({ requestId: quote.requestId });
+    redirect(`/${locale}/requests/${quote.requestId}?error=quote-expired`);
+  }
 
   // "Pris på forespørsel" lines carry no agreed amount — the buyer is
   // accepting the priced lines only; the rest is confirmed separately by
@@ -342,18 +372,27 @@ export async function acceptQuote(formData: FormData) {
 
   // Order/brief/booking creation + quote ACCEPTED live in the shared
   // accept-quote helper; the request close rides in the same transaction.
-  const { orderId, productIds } = await prisma.$transaction(async (tx) => {
-    const result = await createOrderFromQuote(tx, {
-      organizationId: quote.request.organizationId,
-      quote: { id: quote.id, lines: pricedLines },
-      plan: quote.request.plan,
+  // The helper re-checks validity atomically, so a quote that expires
+  // between the check above and this write still can't be accepted.
+  let accepted: { orderId: string; productIds: string[] };
+  try {
+    accepted = await prisma.$transaction(async (tx) => {
+      const result = await createOrderFromQuote(tx, {
+        organizationId: quote.request.organizationId,
+        quote: { id: quote.id, lines: pricedLines },
+        plan: quote.request.plan,
+      });
+      await tx.request.update({
+        where: { id: quote.requestId },
+        data: { status: "CLOSED" },
+      });
+      return result;
     });
-    await tx.request.update({
-      where: { id: quote.requestId },
-      data: { status: "CLOSED" },
-    });
-    return result;
-  });
+  } catch (err) {
+    if (!(err instanceof QuoteNotAcceptableError)) throw err;
+    return redirectAfterRefusedAccept(locale, quote.requestId, [quote.id]);
+  }
+  const { orderId, productIds } = accepted;
 
   await recordAudit(scope.userId, "quote.accept", `Quote:${quote.id}`, {
     requestId: quote.requestId,
@@ -410,30 +449,45 @@ export async function acceptAllQuotesForRequest(formData: FormData) {
   // Same rule as acceptQuote: only priced lines become order lines; a
   // quote whose every line is still "pris på forespørsel" is skipped
   // (nothing agreed to accept on it yet).
+  // Declined/draft quotes are not on offer; an expired one is on offer but
+  // can't be taken — and a multi-market campaign is all-or-nothing, so one
+  // expired market blocks the whole accept until the desk renews it.
+  const now = new Date();
   const openQuotes = request.quotes
+    .filter((q) => !q.order && (q.status === "SENT" || q.status === "EXPIRED"))
     .map((q) => ({ ...q, lines: q.lines.filter((l) => !l.priceOnRequest) }))
-    .filter((q) => !q.order && q.lines.length > 0);
+    .filter((q) => q.lines.length > 0);
   if (openQuotes.length === 0) {
     redirect(`/${locale}/requests/${request.id}`);
   }
+  if (openQuotes.some((q) => !isQuoteAcceptable(q, now))) {
+    await reconcileExpiredQuotes({ requestId: request.id }, now);
+    redirect(`/${locale}/requests/${request.id}?error=quote-expired`);
+  }
 
-  const createdOrders = await prisma.$transaction(async (tx) => {
-    const orders: { orderId: string; productIds: string[] }[] = [];
-    for (const quote of openQuotes) {
-      orders.push(
-        await createOrderFromQuote(tx, {
-          organizationId: request.organizationId,
-          quote: { id: quote.id, lines: quote.lines },
-          plan: request.plan,
-        }),
-      );
-    }
-    await tx.request.update({
-      where: { id: request.id },
-      data: { status: "CLOSED" },
+  let createdOrders: { orderId: string; productIds: string[] }[];
+  try {
+    createdOrders = await prisma.$transaction(async (tx) => {
+      const orders: { orderId: string; productIds: string[] }[] = [];
+      for (const quote of openQuotes) {
+        orders.push(
+          await createOrderFromQuote(tx, {
+            organizationId: request.organizationId,
+            quote: { id: quote.id, lines: quote.lines },
+            plan: request.plan,
+          }),
+        );
+      }
+      await tx.request.update({
+        where: { id: request.id },
+        data: { status: "CLOSED" },
+      });
+      return orders;
     });
-    return orders;
-  });
+  } catch (err) {
+    if (!(err instanceof QuoteNotAcceptableError)) throw err;
+    return redirectAfterRefusedAccept(locale, request.id, openQuotes.map((q) => q.id));
+  }
 
   for (const o of createdOrders) {
     await recordAudit(scope.userId, "quote.accept", `Order:${o.orderId}`, {
@@ -463,4 +517,106 @@ export async function acceptAllQuotesForRequest(formData: FormData) {
   );
 
   redirect(`/${locale}/requests/${request.id}`);
+}
+
+// Buyer side of an expired quote: the price guarantee lapsed, so the buyer
+// can't accept — they ask the desk to renew instead. One desk ping per
+// request per day, however often the button is pressed.
+export async function requestQuoteRenewal(formData: FormData) {
+  const locale = str(formData, "locale") || "en";
+  const requestId = str(formData, "requestId");
+
+  const request = await prisma.request.findUnique({
+    where: { id: requestId },
+    select: {
+      id: true,
+      organizationId: true,
+      organization: { select: { name: true } },
+      quotes: { select: { id: true, status: true, validUntil: true, order: { select: { id: true } } } },
+    },
+  });
+  if (!request) redirect(`/${locale}/requests`);
+
+  const scope = await loadScope();
+  if (!canActOnOrg(scope, request.organizationId)) {
+    redirect(`/${locale}/signin`);
+  }
+
+  const expired = request.quotes.filter((q) => !q.order && isQuoteExpired(q));
+  if (expired.length === 0) {
+    redirect(`/${locale}/requests/${request.id}`);
+  }
+
+  const entity = `Request:${request.id}`;
+  const recentAsk = await prisma.auditLog.findFirst({
+    where: {
+      entity,
+      action: RENEWAL_REQUESTED_AUDIT_ACTION,
+      createdAt: { gte: new Date(Date.now() - RENEWAL_REQUEST_COOLDOWN_MS) },
+    },
+    select: { id: true },
+  });
+  if (!recentAsk) {
+    await recordAudit(scope.userId, RENEWAL_REQUESTED_AUDIT_ACTION, entity, {
+      quoteIds: expired.map((q) => q.id),
+    });
+    await notifyDesk({
+      kind: "QUOTE_RENEWAL_REQUESTED",
+      title: "Quote renewal requested",
+      body: `${request.organization.name} wants to go ahead, but the quote has expired. Renew it (and reprice lines if rates moved) to reopen acceptance.`,
+      link: `/${locale}/desk/${request.id}`,
+    });
+  }
+
+  redirect(`/${locale}/requests/${request.id}`);
+}
+
+// Desk side: give an expired (or about-to-expire) quote a fresh validity
+// window. Prices are kept as they are — the desk reprices individual lines
+// with setQuoteLinePrice first if rates have moved.
+export async function renewQuote(formData: FormData) {
+  const locale = str(formData, "locale") || "en";
+  const requestId = str(formData, "requestId");
+  const quoteId = str(formData, "quoteId");
+
+  const scope = await loadScope();
+  if (!scope.isDesk || !scope.userId) redirect(`/${locale}/signin`);
+
+  const quote = await prisma.quote.findUnique({
+    where: { id: quoteId },
+    select: {
+      id: true,
+      requestId: true,
+      status: true,
+      validUntil: true,
+      total: true,
+      currency: true,
+      order: { select: { id: true } },
+      request: { select: { organizationId: true } },
+    },
+  });
+  if (!quote || quote.requestId !== requestId) redirect(`/${locale}/desk`);
+  if (quote.order || (quote.status !== "SENT" && quote.status !== "EXPIRED")) {
+    redirect(`/${locale}/desk/${requestId}`);
+  }
+
+  const validUntil = quoteValidUntilFrom(new Date());
+  await prisma.quote.update({
+    where: { id: quote.id },
+    data: { status: "SENT", validUntil },
+  });
+  await recordAudit(scope.userId, "quote.renew", `Quote:${quote.id}`, {
+    requestId,
+    previousStatus: quote.status,
+    previousValidUntil: quote.validUntil?.toISOString() ?? null,
+    validUntil: validUntil.toISOString(),
+  });
+  await notifyOrg(quote.request.organizationId, {
+    kind: "QUOTE_READY",
+    title: "Your quote has been renewed",
+    body: `Total ${quote.total} ${quote.currency}, valid until ${validUntil.toISOString().slice(0, 10)}.`,
+    link: `/${locale}/requests/${requestId}`,
+  });
+
+  redirect(`/${locale}/desk/${requestId}`);
 }

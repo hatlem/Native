@@ -765,7 +765,13 @@
     "timelineLater": "Senare",
     "timelineEmptyMonth": "Inget rullar den här månaden",
     "priceOnRequest": "Pris på förfrågan",
-    "priceOnRequestNote": "Rader markerade ”pris på förfrågan” tillkommer utöver totalen ovan och bekräftas separat."
+    "priceOnRequestNote": "Rader markerade ”pris på förfrågan” tillkommer utöver totalen ovan och bekräftas separat.",
+    "quoteExpiredTitle": "Offerten gick ut {date}.",
+    "quoteExpiredTitleNoDate": "Offerten har gått ut.",
+    "quoteExpiredBody": "Priserna gäller bara under en begränsad tid. Be desken om en förnyad offert – du kan acceptera den så snart den är klar.",
+    "requestRenewal": "Be om förnyad offert",
+    "requestingRenewal": "Skickar …",
+    "renewalRequested": "Desken har ombetts att förnya offerten. Du får en avisering när du kan acceptera den."
   },
   "desk": {
     "eyebrow": "Internt desk",
@@ -860,7 +866,13 @@
     "linePriceSetByUnknown": "desk",
     "linePricePlaceholder": "Kundpris ({currency})",
     "linePriceSave": "Sätt pris",
-    "linePriceMarkOnRequest": "Skicka som pris på förfrågan"
+    "linePriceMarkOnRequest": "Skicka som pris på förfrågan",
+    "quoteValidUntil": "Fast till {date}",
+    "quoteExpiredOn": "Gick ut {date}",
+    "quoteNoExpiry": "Inget slutdatum",
+    "renewQuote": "Förnya offerten",
+    "renewingQuote": "Förnyar …",
+    "renewQuoteHint": "Kunden kan inte acceptera en utgången offert. Förnyelsen behåller dessa priser i 14 nya dagar – justera raderna först om priserna har ändrats."
   },
   "deskTitles": {
     "eyebrow": "Superadmin · titlar",

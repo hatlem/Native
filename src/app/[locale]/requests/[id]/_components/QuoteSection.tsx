@@ -1,10 +1,11 @@
 import { getTranslations } from "next-intl/server";
-import { formatMoney } from "@/lib/money";
+import { formatMoney, intlLocale } from "@/lib/money";
 import {
   buildQuoteNarrative,
   anchorDiscountPct,
 } from "@/lib/quote-narrative";
-import { acceptAllQuotesForRequest } from "@/app/quote-actions";
+import { acceptAllQuotesForRequest, requestQuoteRenewal } from "@/app/quote-actions";
+import { isQuoteExpired } from "@/lib/commerce/quote-validity";
 import { StatusBadge } from "@/app/status-badge";
 import { SectionHead, SubmitButton } from "@/components";
 import type {
@@ -15,7 +16,8 @@ import type {
 
 // Quote narrative — per-currency "what you get" blocks, investment
 // totals, terms, and the accept CTA (or the accepted banner once every
-// quote has an order).
+// quote has an order, or the "expired — ask for renewal" state once an
+// open quote's validity window has closed).
 export async function QuoteSection({
   locale,
   quotes,
@@ -26,6 +28,7 @@ export async function QuoteSection({
   totalQuoteLines,
   allAccepted,
   orders,
+  renewalRequested = false,
 }: {
   locale: string;
   quotes: QuoteWithOrder[];
@@ -36,6 +39,7 @@ export async function QuoteSection({
   totalQuoteLines: number;
   allAccepted: boolean;
   orders: OrderWithDetails[];
+  renewalRequested?: boolean;
 }) {
   const t = await getTranslations({ locale, namespace: "requests" });
   const tType = await getTranslations({ locale, namespace: "productType" });
@@ -87,6 +91,17 @@ export async function QuoteSection({
     .map((q) => q.validUntil)
     .filter((d): d is Date => !!d)
     .sort((a, b) => a.getTime() - b.getTime())[0];
+  // Accepting is all-or-nothing across markets, so one expired open quote
+  // blocks the CTA until the desk renews it.
+  const expiredQuotes = allAccepted ? [] : quotes.filter((q) => !q.order && isQuoteExpired(q));
+  const expired = expiredQuotes.length > 0;
+  const firstLapse = expiredQuotes
+    .map((q) => q.validUntil)
+    .filter((d): d is Date => !!d)
+    .sort((a, b) => a.getTime() - b.getTime())[0];
+  const expiredOn = firstLapse
+    ? new Intl.DateTimeFormat(intlLocale(locale), { dateStyle: "long" }).format(firstLapse)
+    : null;
   return (
     <section className="section">
       <SectionHead
@@ -267,6 +282,26 @@ export async function QuoteSection({
           <div className="banner-success" role="status">
             ✓ {t("accepted")} — {t("orderStatus")}:{" "}
             <StatusBadge value={orders[0].status} />
+          </div>
+        ) : expired ? (
+          <div className="quote-expired" role="status">
+            <p className="quote-expired__text">
+              <strong>
+                {expiredOn ? t("quoteExpiredTitle", { date: expiredOn }) : t("quoteExpiredTitleNoDate")}
+              </strong>
+              {renewalRequested ? t("renewalRequested") : t("quoteExpiredBody")}
+            </p>
+            {renewalRequested ? null : (
+              <form action={requestQuoteRenewal}>
+                <input type="hidden" name="locale" value={locale} />
+                <input type="hidden" name="requestId" value={requestId} />
+                <SubmitButton
+                  label={t("requestRenewal")}
+                  pendingLabel={t("requestingRenewal")}
+                  className="btn"
+                />
+              </form>
+            )}
           </div>
         ) : (
           <form

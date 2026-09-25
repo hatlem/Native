@@ -10,6 +10,12 @@ import { Breadcrumb, DetailHead, MetaRow } from "@/components";
 import { PlanItemsSection } from "./_components/PlanItemsSection";
 import { PendingQuoteSection } from "./_components/PendingQuoteSection";
 import { QuoteSection } from "./_components/QuoteSection";
+import {
+  RENEWAL_REQUEST_COOLDOWN_MS,
+  RENEWAL_REQUESTED_AUDIT_ACTION,
+  isQuoteExpired,
+} from "@/lib/commerce/quote-validity";
+import { reconcileExpiredQuotesInBackground } from "@/lib/commerce/quote-expiry";
 import { OrderSection } from "./_components/OrderSection";
 
 export const dynamic = "force-dynamic";
@@ -121,6 +127,19 @@ export default async function RequestPage({
   );
   const orders = quotes.flatMap((q) => (q.order ? [q.order] : []));
   const allAccepted = quotes.length > 0 && orders.length === quotes.length;
+  // Catch stored quote status up with the clock (bookkeeping), and show
+  // "renewal requested" while the buyer's last ask is inside its cooldown.
+  reconcileExpiredQuotesInBackground({ requestId: request.id });
+  const renewalRequested = quotes.some((q) => !q.order && isQuoteExpired(q))
+    ? !!(await prisma.auditLog.findFirst({
+        where: {
+          entity: `Request:${request.id}`,
+          action: RENEWAL_REQUESTED_AUDIT_ACTION,
+          createdAt: { gte: new Date(Date.now() - RENEWAL_REQUEST_COOLDOWN_MS) },
+        },
+        select: { id: true },
+      }))
+    : false;
   const orderInvoice = orders[0]?.invoices[0];
 
   // Aggregate item count across quotes for the campaign-banner outcome
@@ -193,6 +212,7 @@ export default async function RequestPage({
           totalQuoteLines={totalQuoteLines}
           allAccepted={allAccepted}
           orders={orders}
+          renewalRequested={renewalRequested}
         />
       )}
 
