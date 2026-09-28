@@ -38,6 +38,7 @@ const row = {
   audience: null,
   vertical: null,
   frequency: null,
+  customerNote: null,
 };
 const data: QuotePdfData = {
   quoteId: "q1",
@@ -53,7 +54,14 @@ const data: QuotePdfData = {
   preparedByEmail: "desk@nativespin.com",
   onlineUrl,
   rows: [
-    { ...row, titleName: "Svensk Åkeritidning", unitPrice: 17250, rowTotal: 17250, priceOnRequest: false },
+    {
+      ...row,
+      titleName: "Svensk Åkeritidning",
+      unitPrice: 17250,
+      rowTotal: 17250,
+      priceOnRequest: false,
+      customerNote: "Finns även som 1 vecka för 15 000 SEK.",
+    },
     // The stored estimate must never leak for an on-request line.
     { ...row, titleName: "Intelligent Logistik", unitPrice: null, rowTotal: null, priceOnRequest: true },
   ],
@@ -70,6 +78,9 @@ test("renderQuoteDocx: valid docx with localized copy, rows and the POR footnote
   assert.match(body, /Rader märkta/); // footnote only renders with a POR line
   assert.match(body, /Native-artikel/);
   assert.doesNotMatch(body, /NATIVE_ARTICLE/);
+  // The customer-visible line note renders once, labelled, under its row.
+  assert.match(body, /Kommentar: Finns även som 1 vecka för 15 000 SEK\./);
+  assert.equal(body.match(/Kommentar:/g)?.length, 1);
 });
 
 test("renderQuoteDocx: every hyperlink targets the live quote page", async () => {

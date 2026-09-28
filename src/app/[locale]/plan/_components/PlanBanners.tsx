@@ -24,6 +24,7 @@ export async function PlanBanners({
     availability: "errorAvailability",
     unavailable: "errorUnavailable",
     changed: "errorChanged",
+    "note-too-long": "errorNoteTooLong",
   };
   const errorCode = Array.isArray(error) ? error[0] : error;
   const errorKey = errorCode ? (ERROR_KEYS[errorCode] ?? "error") : null;

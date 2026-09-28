@@ -9,8 +9,10 @@ import {
   generateQuote,
   generateQuotePdf,
   renewQuote,
+  setQuoteLineNote,
   setQuoteLinePrice,
 } from "@/app/quote-actions";
+import { LINE_NOTE_MAX } from "@/lib/line-note";
 import { resolvePlanTitleItem, removePlanTitleItem } from "@/app/desk-actions";
 import { loadPricingDefaults } from "@/lib/content-fee";
 import {
@@ -432,6 +434,11 @@ export default async function DeskRequestPage({
                   <span>{t("linePriceInvalid")}</span>
                 </div>
               ) : null}
+              {errorCode === "note-too-long" ? (
+                <div className="banner-warn" role="alert">
+                  <span>{t("lineNoteTooLong", { max: LINE_NOTE_MAX })}</span>
+                </div>
+              ) : null}
               {quote.order ? null : (
                 <div className="quote-validity">
                   <span className={isQuoteExpired(quote) ? "tag" : "muted small"}>
@@ -526,6 +533,36 @@ export default async function DeskRequestPage({
                             ),
                           })}
                         </div>
+                      ) : null}
+                      {l.customerNote ? (
+                        <p className="line-note__text">
+                          <span className="line-note__label">{t("lineNoteLabel")}</span>
+                          {l.customerNote}
+                        </p>
+                      ) : null}
+                      {editable ? (
+                        <details className="line-note__edit">
+                          <summary>
+                            {l.customerNote ? t("lineNoteEdit") : t("lineNoteAdd")}
+                          </summary>
+                          <form action={setQuoteLineNote} className="line-note__form">
+                            <input type="hidden" name="locale" value={locale} />
+                            <input type="hidden" name="requestId" value={request.id} />
+                            <input type="hidden" name="quoteId" value={quote.id} />
+                            <input type="hidden" name="lineId" value={l.id} />
+                            <textarea
+                              name="note"
+                              rows={3}
+                              maxLength={LINE_NOTE_MAX}
+                              defaultValue={l.customerNote ?? ""}
+                              aria-label={t("lineNoteLabel")}
+                            />
+                            <p className="muted small">{t("lineNoteHint")}</p>
+                            <button type="submit" className="btn small">
+                              {t("lineNoteSave")}
+                            </button>
+                          </form>
+                        </details>
                       ) : null}
                       {editable ? (
                         <div className="resolve-line">

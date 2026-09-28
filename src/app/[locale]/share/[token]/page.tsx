@@ -19,8 +19,8 @@ export const metadata: Metadata = {
 // Read-only client view of a shared plan: what an agency forwards to their
 // advertiser for sign-off. No sign-in, addressed purely by the unguessable
 // token. Shows exactly what a proposal shows — lines, schedule, indicative
-// prices, totals — and nothing desk- or org-internal (no internal note, no
-// margins, no emails: Cloudflare rewrites SSR'd emails and cascades React
+// prices, totals, the customer-visible line notes — and nothing desk- or
+// org-internal (no internal list note, no margins, no emails: Cloudflare rewrites SSR'd emails and cascades React
 // hydration errors, see SafeEmail).
 export default async function SharedListPage({
   params,
@@ -64,6 +64,7 @@ export default async function SharedListPage({
         quantity: i.quantity,
         withContent: i.withContent,
         scheduleStart: i.scheduleStart,
+        notes: i.notes,
         priceVisible,
         currency: p.currency,
         lineTotal: unit * i.quantity,
@@ -107,6 +108,12 @@ export default async function SharedListPage({
               {l.scheduleStart ? (
                 <div className="muted small">{t("from", { date: dateFmt.format(l.scheduleStart) })}</div>
               ) : null}
+              {l.notes ? (
+                <p className="line-note__text">
+                  <span className="line-note__label">{t("noteLabel")}</span>
+                  {l.notes}
+                </p>
+              ) : null}
             </div>
             <div className="share-list__line-price">
               {l.priceVisible ? formatMoney(l.lineTotal, l.currency, locale) : tv("requestPrice")}
@@ -118,6 +125,12 @@ export default async function SharedListPage({
             <div className="share-list__line-main">
               <div className="share-list__line-title">{titleDisplayName(i.title!)}</div>
               <div className="muted small">{t("placementTbd")}</div>
+              {i.notes ? (
+                <p className="line-note__text">
+                  <span className="line-note__label">{t("noteLabel")}</span>
+                  {i.notes}
+                </p>
+              ) : null}
             </div>
             <div className="share-list__line-price">{tv("requestPrice")}</div>
           </div>

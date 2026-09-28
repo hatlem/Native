@@ -21,6 +21,7 @@ import {
   migrateLegacyBasket,
 } from "@/lib/lists";
 import { enableListShare, disableListShare } from "@/lib/list-share";
+import { normalizeLineNote } from "@/lib/line-note";
 
 function str(formData: FormData, key: string): string {
   const v = formData.get(key);
@@ -276,6 +277,22 @@ export async function setListItemContent(formData: FormData) {
   await prisma.savedListItem.updateMany({
     where: { id: itemId },
     data: { withContent: str(formData, "withContent") === "1" },
+  });
+  redirect(`/${locale}/plan`);
+}
+
+// Customer-visible line note ("Merknad") — shown on /plan and the /share view
+// and carried onto the quote. Anyone who can act on the list's org may edit it.
+export async function setListItemNote(formData: FormData) {
+  const locale = str(formData, "locale") || "en";
+  const itemId = str(formData, "itemId");
+  await ownItem(locale, itemId);
+  const parsed = normalizeLineNote(formData.get("note"));
+  if (!parsed.ok) redirect(`/${locale}/plan?error=note-too-long`);
+  const scope = await loadScope();
+  await prisma.savedListItem.updateMany({ where: { id: itemId }, data: { notes: parsed.note } });
+  await recordAudit(scope.userId ?? null, "list.item_note", `SavedListItem:${itemId}`, {
+    cleared: parsed.note === null,
   });
   redirect(`/${locale}/plan`);
 }

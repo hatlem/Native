@@ -4,7 +4,8 @@ import type { Prisma } from "@prisma/client";
 import { Link } from "@/i18n/navigation";
 import { formatMoney, intlLocale } from "@/lib/money";
 import { titleDisplayName } from "@/lib/title-display";
-import { removeFromPlan, setQuantity, setContentProduction } from "@/app/plan-actions";
+import { removeFromPlan, setQuantity, setContentProduction, setLineNote } from "@/app/plan-actions";
+import { LINE_NOTE_MAX } from "@/lib/line-note";
 import { resolveTitleLine } from "@/app/list-actions";
 import { pickContentFeeRule, contentFeeAmount, type ContentFeeRuleSpec } from "@/lib/money";
 
@@ -32,6 +33,8 @@ export type PlanLine = {
   // Null for lines added straight from /plan or the catalog — most of them.
   scheduleStart: Date | null;
   scheduleUnits: number | null;
+  // Customer-visible "Merknad" (SavedListItem.notes).
+  notes: string | null;
 };
 
 // A publication placeholder: a SavedListItem that references a Title but no
@@ -43,6 +46,7 @@ export type PlanTitleLine = {
   titleName: string;
   quantity: number;
   placements: { id: string; label: string }[];
+  notes: string | null;
 };
 
 function periodLabel(
@@ -97,6 +101,50 @@ function breakdown(
     });
   }
   return "";
+}
+
+// The customer-visible line note plus its inline editor. A native <details>
+// disclosure keeps this server-only (no client JS), like the rest of the file.
+function LineNote({
+  locale,
+  itemId,
+  notes,
+  t,
+}: {
+  locale: string;
+  itemId: string;
+  notes: string | null;
+  t: Awaited<ReturnType<typeof getTranslations>>;
+}) {
+  return (
+    <div className="line-note">
+      {notes ? (
+        <p className="line-note__text">
+          <span className="line-note__label">{t("lineNoteLabel")}</span>
+          {notes}
+        </p>
+      ) : null}
+      <details className="line-note__edit">
+        <summary>{notes ? t("lineNoteEdit") : t("lineNoteAdd")}</summary>
+        <form action={setLineNote} className="line-note__form">
+          <input type="hidden" name="locale" value={locale} />
+          <input type="hidden" name="itemId" value={itemId} />
+          <textarea
+            name="note"
+            rows={3}
+            maxLength={LINE_NOTE_MAX}
+            defaultValue={notes ?? ""}
+            placeholder={t("lineNotePlaceholder")}
+            aria-label={t("lineNoteLabel")}
+          />
+          <p className="muted small">{t("lineNoteHint")}</p>
+          <button type="submit" className="btn small">
+            {t("lineNoteSave")}
+          </button>
+        </form>
+      </details>
+    </div>
+  );
 }
 
 // Left column of the split: the basket line list with quantity
@@ -166,6 +214,7 @@ export async function PlanLines({
                     {t("lineUnavailable")}
                   </div>
                 ) : null}
+                <LineNote locale={locale} itemId={l.itemId} notes={l.notes} t={t} />
                 <div className="plan-line-card__controls">
                   <div className="plan-qty-stepper">
                     {/* At quantity 1 the minus removes the line (cart
@@ -257,6 +306,7 @@ export async function PlanLines({
                 </span>
               </div>
               <div className="plan-line-card__meta">{t("titlePlaceholderNote")}</div>
+              <LineNote locale={locale} itemId={tl.itemId} notes={tl.notes} t={t} />
               <div className="plan-line-card__controls">
                 {tl.placements.length > 0 ? (
                   <form action={resolveTitleLine} className="plan-line-card__resolve">

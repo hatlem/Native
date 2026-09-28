@@ -776,7 +776,14 @@
       "engagementApproved": "Asiakas hyväksyi suunnitelman {date}.",
       "engagementViewed": "Viimeksi avattu {date} · {count, plural, =1 {1 katselu} other {# katselua}}.",
       "engagementNone": "Ei vielä avattu."
-    }
+    },
+    "lineNoteLabel": "Huomautus",
+    "lineNoteAdd": "Lisää huomautus",
+    "lineNoteEdit": "Muokkaa huomautusta",
+    "lineNoteSave": "Tallenna huomautus",
+    "lineNotePlaceholder": "Esim. saatavana myös 1 viikoksi hintaan 15 000 SEK",
+    "lineNoteHint": "Näkyy kaikille, jotka näkevät suunnitelman, myös jaetuissa linkeissä ja tarjouksessa.",
+    "errorNoteTooLong": "Huomautus on liian pitkä. Pidä se alle 500 merkissä."
   },
   "rfq": {
     "org": "Yritys",
@@ -896,7 +903,8 @@
     "quoteExpiredBody": "Hinnat ovat voimassa vain rajoitetun ajan. Pyydä Deskiä uusimaan tarjous – voit hyväksyä sen heti, kun se on valmis.",
     "requestRenewal": "Pyydä uusittu tarjous",
     "requestingRenewal": "Lähetetään …",
-    "renewalRequested": "Deskiä on pyydetty uusimaan tarjous. Saat ilmoituksen, kun voit hyväksyä sen."
+    "renewalRequested": "Deskiä on pyydetty uusimaan tarjous. Saat ilmoituksen, kun voit hyväksyä sen.",
+    "lineNoteLabel": "Huomautus"
   },
   "desk": {
     "eyebrow": "Sisäinen desk",
@@ -997,7 +1005,13 @@
     "quoteNoExpiry": "Ei päättymispäivää",
     "renewQuote": "Uusi tarjous",
     "renewingQuote": "Uusitaan …",
-    "renewQuoteHint": "Asiakas ei voi hyväksyä vanhentunutta tarjousta. Uusiminen pitää nämä hinnat voimassa 14 päivää lisää – päivitä rivien hinnat ensin, jos ne ovat muuttuneet."
+    "renewQuoteHint": "Asiakas ei voi hyväksyä vanhentunutta tarjousta. Uusiminen pitää nämä hinnat voimassa 14 päivää lisää – päivitä rivien hinnat ensin, jos ne ovat muuttuneet.",
+    "lineNoteLabel": "Huomautus asiakkaalle",
+    "lineNoteAdd": "Lisää huomautus asiakkaalle",
+    "lineNoteEdit": "Muokkaa huomautusta asiakkaalle",
+    "lineNoteSave": "Tallenna huomautus",
+    "lineNoteHint": "Näytetään asiakkaalle tarjoussivulla ja PDF:ssä.",
+    "lineNoteTooLong": "Huomautus on liian pitkä. Pidä se alle {max} merkissä."
   },
   "deskTitles": {
     "eyebrow": "Pääkäyttäjä · julkaisut",
@@ -2990,7 +3004,8 @@
     "from": "Alkaen {date}",
     "approveHint": "Tyytyväinen julkaisuihin, ajoitukseen ja budjettiin? Hyväksyntä kertoo yhteyshenkilöllesi, että suunnitelman voi lähettää eteenpäin – mitään ei varata eikä veloiteta tästä.",
     "approveCta": "Hyväksy suunnitelma",
-    "approvedAt": "Suunnitelma hyväksyttiin {date}. Yhteyshenkilösi jatkaa tästä."
+    "approvedAt": "Suunnitelma hyväksyttiin {date}. Yhteyshenkilösi jatkaa tästä.",
+    "noteLabel": "Huomautus"
   },
   "quotePdf": {
     "documentTitle": "Tarjous {quoteNumber}",
@@ -3020,7 +3035,8 @@
     "pageOf": "Sivu {page}/{pages}",
     "preparedFor": "Tarjous asiakkaalle",
     "viewOnline": "Katso tarjous verkossa, hyväksy se ja seuraa kampanjaa NativeSpinissä:",
-    "footerLink": "Avaa NativeSpinissä"
+    "footerLink": "Avaa NativeSpinissä",
+    "noteLabel": "Huomautus"
   },
   "deskUsers": {
     "eyebrow": "Hallinta",

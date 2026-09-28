@@ -1054,6 +1054,8 @@ model PlanItem {
   // Plan.startDate/endDate and, from there, Order.flightStart/EndDate.
   scheduleStart  DateTime?
   scheduleUnits  Int?
+  // Customer-visible line note, snapshotted from SavedListItem.notes at
+  // submit; seeds QuoteLine.customerNote when the desk generates the quote.
   notes     String?
 }
 
@@ -1153,6 +1155,9 @@ model SavedListItem {
   // scheduled. scheduleStart is the first-of-month/week anchor (UTC midnight).
   scheduleStart  DateTime?
   scheduleUnits  Int?
+  // Customer-visible line note ("Merknad"): shown on /plan, the /share view
+  // and carried into PlanItem.notes -> QuoteLine.customerNote. Plain text,
+  // max 500 chars (lib/line-note.ts).
   notes     String?
   sortOrder Int       @default(0)
   createdAt DateTime  @default(now())
@@ -1251,6 +1256,11 @@ model QuoteLine {
   priceSetById   String?
   priceSetBy     User?    @relation("QuoteLinePriceSetter", fields: [priceSetById], references: [id])
   priceSetAt     DateTime?
+  // Customer-visible note on this line ("Merknad"), rendered on the buyer's
+  // quote page and in the quote PDF/DOCX. Seeded from PlanItem.notes when the
+  // quote is generated; the desk edits it per line. Plain text, max 500 chars
+  // (lib/line-note.ts).
+  customerNote   String?
 }
 
 model Order {

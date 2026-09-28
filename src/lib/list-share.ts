@@ -51,6 +51,8 @@ export const SHARED_LIST_SELECT = {
       quantity: true,
       withContent: true,
       scheduleStart: true,
+      // Customer-visible line note — the one per-line note the client sees.
+      notes: true,
       product: {
         select: {
           type: true,

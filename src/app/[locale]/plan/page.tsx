@@ -133,6 +133,7 @@ export default async function PlanPage({
         // falls back to the product's stated minimum run.
         scheduleStart: i.scheduleStart,
         scheduleUnits: i.scheduleUnits,
+        notes: i.notes,
       };
     })
     .filter((l): l is NonNullable<typeof l> => l !== null);
@@ -161,6 +162,7 @@ export default async function PlanPage({
     titleName: titleDisplayName(i.title!),
     quantity: i.quantity,
     placements: placementsByTitle.get(i.titleId as string) ?? [],
+    notes: i.notes,
   }));
 
   const hasHiddenPrice = lines.some((l) => !l.priceVisible);

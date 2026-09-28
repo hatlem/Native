@@ -651,7 +651,14 @@
       "engagementApproved": "Kunden godkjente planen {date}.",
       "engagementViewed": "Sist åpnet {date} · {count, plural, =1 {1 visning} other {# visninger}}.",
       "engagementNone": "Ikke åpnet ennå."
-    }
+    },
+    "lineNoteLabel": "Merknad",
+    "lineNoteAdd": "Legg til merknad",
+    "lineNoteEdit": "Rediger merknad",
+    "lineNoteSave": "Lagre merknad",
+    "lineNotePlaceholder": "F.eks. finnes også som 1 uke for 15 000 SEK",
+    "lineNoteHint": "Synlig for alle som ser planen, også via delte lenker og i tilbudet.",
+    "errorNoteTooLong": "Merknaden er for lang. Hold den under 500 tegn."
   },
   "rfq": {
     "org": "Selskap",
@@ -771,7 +778,8 @@
     "quoteExpiredBody": "Prisene er bare garantert en begrenset periode. Be desken om et fornyet tilbud – du kan godta det så snart det er klart.",
     "requestRenewal": "Be om fornyet tilbud",
     "requestingRenewal": "Sender …",
-    "renewalRequested": "Desken har fått beskjed om å fornye tilbudet. Du får et varsel når du kan godta det."
+    "renewalRequested": "Desken har fått beskjed om å fornye tilbudet. Du får et varsel når du kan godta det.",
+    "lineNoteLabel": "Merknad"
   },
   "desk": {
     "eyebrow": "Internt desk",
@@ -872,7 +880,13 @@
     "quoteNoExpiry": "Ingen utløpsdato",
     "renewQuote": "Forny tilbudet",
     "renewingQuote": "Fornyer …",
-    "renewQuoteHint": "Kunden kan ikke godta et utløpt tilbud. Fornyelsen beholder disse prisene i 14 nye dager – juster linjene først hvis prisene har endret seg."
+    "renewQuoteHint": "Kunden kan ikke godta et utløpt tilbud. Fornyelsen beholder disse prisene i 14 nye dager – juster linjene først hvis prisene har endret seg.",
+    "lineNoteLabel": "Merknad til kunden",
+    "lineNoteAdd": "Legg til merknad til kunden",
+    "lineNoteEdit": "Rediger merknad til kunden",
+    "lineNoteSave": "Lagre merknad",
+    "lineNoteHint": "Vises for kunden på tilbudssiden og i PDF-en.",
+    "lineNoteTooLong": "Merknaden er for lang. Hold den under {max} tegn."
   },
   "deskTitles": {
     "eyebrow": "Superadmin · titler",
@@ -2990,7 +3004,8 @@
     "from": "Fra {date}",
     "approveHint": "Fornøyd med titler, timing og budsjett? Godkjenning gir kontakten din beskjed om å sende planen videre – ingenting bestilles eller belastes av dette.",
     "approveCta": "Godkjenn planen",
-    "approvedAt": "Planen ble godkjent {date}. Kontakten din tar det videre herfra."
+    "approvedAt": "Planen ble godkjent {date}. Kontakten din tar det videre herfra.",
+    "noteLabel": "Merknad"
   },
   "quotePdf": {
     "documentTitle": "Tilbud {quoteNumber}",
@@ -3020,7 +3035,8 @@
     "pageOf": "Side {page} av {pages}",
     "preparedFor": "Tilbud til",
     "viewOnline": "Se tilbudet på nett, godkjenn det og følg kampanjen i NativeSpin:",
-    "footerLink": "Åpne i NativeSpin"
+    "footerLink": "Åpne i NativeSpin",
+    "noteLabel": "Merknad"
   },
   "deskUsers": {
     "eyebrow": "Administrasjon",
