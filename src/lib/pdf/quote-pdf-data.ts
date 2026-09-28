@@ -19,6 +19,8 @@ export type QuotePdfRow = {
   audience: string | null;
   vertical: string | null;
   frequency: string | null;
+  // Customer-visible line note ("Merknad"), plain text. Null when unset.
+  customerNote: string | null;
 };
 
 export type QuotePdfData = {
@@ -119,6 +121,7 @@ export async function loadQuotePdfData(
         audience: product?.title.audience ?? null,
         vertical: product?.title.vertical ?? null,
         frequency: product?.title.frequency ?? null,
+        customerNote: l.customerNote,
       };
     });
 

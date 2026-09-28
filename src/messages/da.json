@@ -651,7 +651,14 @@
       "engagementApproved": "Kunden godkendte planen {date}.",
       "engagementViewed": "Senest åbnet {date} · {count, plural, =1 {1 visning} other {# visninger}}.",
       "engagementNone": "Ikke åbnet endnu."
-    }
+    },
+    "lineNoteLabel": "Bemærkning",
+    "lineNoteAdd": "Tilføj bemærkning",
+    "lineNoteEdit": "Rediger bemærkning",
+    "lineNoteSave": "Gem bemærkning",
+    "lineNotePlaceholder": "F.eks. fås også som 1 uge for 15.000 SEK",
+    "lineNoteHint": "Synlig for alle, der ser planen, også via delte links og i tilbuddet.",
+    "errorNoteTooLong": "Bemærkningen er for lang. Hold den under 500 tegn."
   },
   "rfq": {
     "org": "Virksomhed",
@@ -771,7 +778,8 @@
     "quoteExpiredBody": "Priserne er kun garanteret i en begrænset periode. Bed desken om et fornyet tilbud – du kan acceptere det, så snart det er klar.",
     "requestRenewal": "Bed om fornyet tilbud",
     "requestingRenewal": "Sender …",
-    "renewalRequested": "Desken er blevet bedt om at forny tilbuddet. Du får en notifikation, når du kan acceptere det."
+    "renewalRequested": "Desken er blevet bedt om at forny tilbuddet. Du får en notifikation, når du kan acceptere det.",
+    "lineNoteLabel": "Bemærkning"
   },
   "desk": {
     "eyebrow": "Internt desk",
@@ -872,7 +880,13 @@
     "quoteNoExpiry": "Ingen udløbsdato",
     "renewQuote": "Forny tilbuddet",
     "renewingQuote": "Fornyer …",
-    "renewQuoteHint": "Kunden kan ikke acceptere et udløbet tilbud. Fornyelsen beholder disse priser i 14 nye dage – justér linjerne først, hvis priserne har ændret sig."
+    "renewQuoteHint": "Kunden kan ikke acceptere et udløbet tilbud. Fornyelsen beholder disse priser i 14 nye dage – justér linjerne først, hvis priserne har ændret sig.",
+    "lineNoteLabel": "Bemærkning til kunden",
+    "lineNoteAdd": "Tilføj bemærkning til kunden",
+    "lineNoteEdit": "Rediger bemærkning til kunden",
+    "lineNoteSave": "Gem bemærkning",
+    "lineNoteHint": "Vises for kunden på tilbudssiden og i PDF’en.",
+    "lineNoteTooLong": "Bemærkningen er for lang. Hold den under {max} tegn."
   },
   "deskTitles": {
     "eyebrow": "Superadmin · titler",
@@ -2991,7 +3005,8 @@
     "from": "Fra {date}",
     "approveHint": "Tilfreds med titler, timing og budget? En godkendelse fortæller din kontakt, at planen kan sendes videre – intet bookes eller opkræves af dette.",
     "approveCta": "Godkend planen",
-    "approvedAt": "Planen blev godkendt {date}. Din kontakt tager den videre herfra."
+    "approvedAt": "Planen blev godkendt {date}. Din kontakt tager den videre herfra.",
+    "noteLabel": "Bemærkning"
   },
   "quotePdf": {
     "documentTitle": "Tilbud {quoteNumber}",
@@ -3021,7 +3036,8 @@
     "pageOf": "Side {page} af {pages}",
     "preparedFor": "Tilbud til",
     "viewOnline": "Se tilbuddet online, godkend det, og følg kampagnen i NativeSpin:",
-    "footerLink": "Åbn i NativeSpin"
+    "footerLink": "Åbn i NativeSpin",
+    "noteLabel": "Bemærkning"
   },
   "deskUsers": {
     "eyebrow": "Administration",

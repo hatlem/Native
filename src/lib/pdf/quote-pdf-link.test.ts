@@ -51,6 +51,7 @@ test("QuoteDocument: renders with a price-on-request line and links back online"
         audience: null,
         vertical: null,
         frequency: null,
+        customerNote: "Finns även som 1 vecka för 15 000 SEK.",
       },
       {
         titleName: "Intelligent Logistik",
@@ -65,6 +66,7 @@ test("QuoteDocument: renders with a price-on-request line and links back online"
         audience: null,
         vertical: null,
         frequency: null,
+        customerNote: null,
       },
     ],
   };

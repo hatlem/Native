@@ -651,7 +651,14 @@
       "engagementApproved": "Kunden godkände planen {date}.",
       "engagementViewed": "Senast öppnad {date} · {count, plural, =1 {1 visning} other {# visningar}}.",
       "engagementNone": "Inte öppnad ännu."
-    }
+    },
+    "lineNoteLabel": "Kommentar",
+    "lineNoteAdd": "Lägg till kommentar",
+    "lineNoteEdit": "Redigera kommentar",
+    "lineNoteSave": "Spara kommentar",
+    "lineNotePlaceholder": "T.ex. finns även som 1 vecka för 15 000 SEK",
+    "lineNoteHint": "Syns för alla som ser planen, även via delade länkar och i offerten.",
+    "errorNoteTooLong": "Kommentaren är för lång. Håll den under 500 tecken."
   },
   "rfq": {
     "org": "Företag",
@@ -771,7 +778,8 @@
     "quoteExpiredBody": "Priserna gäller bara under en begränsad tid. Be desken om en förnyad offert – du kan acceptera den så snart den är klar.",
     "requestRenewal": "Be om förnyad offert",
     "requestingRenewal": "Skickar …",
-    "renewalRequested": "Desken har ombetts att förnya offerten. Du får en avisering när du kan acceptera den."
+    "renewalRequested": "Desken har ombetts att förnya offerten. Du får en avisering när du kan acceptera den.",
+    "lineNoteLabel": "Kommentar"
   },
   "desk": {
     "eyebrow": "Internt desk",
@@ -872,7 +880,13 @@
     "quoteNoExpiry": "Inget slutdatum",
     "renewQuote": "Förnya offerten",
     "renewingQuote": "Förnyar …",
-    "renewQuoteHint": "Kunden kan inte acceptera en utgången offert. Förnyelsen behåller dessa priser i 14 nya dagar – justera raderna först om priserna har ändrats."
+    "renewQuoteHint": "Kunden kan inte acceptera en utgången offert. Förnyelsen behåller dessa priser i 14 nya dagar – justera raderna först om priserna har ändrats.",
+    "lineNoteLabel": "Kommentar till kunden",
+    "lineNoteAdd": "Lägg till kommentar till kunden",
+    "lineNoteEdit": "Redigera kommentar till kunden",
+    "lineNoteSave": "Spara kommentar",
+    "lineNoteHint": "Visas för kunden på offertsidan och i PDF:en.",
+    "lineNoteTooLong": "Kommentaren är för lång. Håll den under {max} tecken."
   },
   "deskTitles": {
     "eyebrow": "Superadmin · titlar",
@@ -2990,7 +3004,8 @@
     "from": "Från {date}",
     "approveHint": "Nöjd med titlar, timing och budget? Ett godkännande säger till din kontakt att skicka planen vidare – inget bokas eller debiteras av detta.",
     "approveCta": "Godkänn planen",
-    "approvedAt": "Planen godkändes {date}. Din kontakt tar det vidare härifrån."
+    "approvedAt": "Planen godkändes {date}. Din kontakt tar det vidare härifrån.",
+    "noteLabel": "Kommentar"
   },
   "quotePdf": {
     "documentTitle": "Offert {quoteNumber}",
@@ -3020,7 +3035,8 @@
     "pageOf": "Sida {page} av {pages}",
     "preparedFor": "Offert till",
     "viewOnline": "Se offerten online, godkänn den och följ kampanjen i NativeSpin:",
-    "footerLink": "Öppna i NativeSpin"
+    "footerLink": "Öppna i NativeSpin",
+    "noteLabel": "Kommentar"
   },
   "deskUsers": {
     "eyebrow": "Administration",

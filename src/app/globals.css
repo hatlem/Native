@@ -3284,6 +3284,62 @@ select:disabled {
   color: var(--warning);
 }
 
+/* Customer-visible per-line note ("Merknad") — /plan, /share, the buyer's
+   quote page and the desk quote editor share these classes. */
+.line-note {
+  margin-top: var(--s-2);
+}
+.line-note__text {
+  margin: var(--s-2) 0 0;
+  padding: 8px 12px;
+  background: var(--accent-soft);
+  border-left: 2px solid var(--accent);
+  border-radius: var(--r-sm);
+  font-size: 0.85rem;
+  line-height: 1.45;
+  color: var(--text);
+  white-space: pre-line;
+  overflow-wrap: anywhere;
+}
+.line-note__label {
+  display: block;
+  margin-bottom: 2px;
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--muted-strong);
+}
+.line-note__edit {
+  margin-top: var(--s-2);
+}
+.line-note__edit > summary {
+  cursor: pointer;
+  width: fit-content;
+  font-size: 0.8rem;
+  color: var(--accent);
+  transition: color var(--t-fast);
+}
+.line-note__edit > summary:hover {
+  color: var(--accent-hover);
+}
+.line-note__form {
+  display: grid;
+  gap: var(--s-2);
+  margin-top: var(--s-2);
+  max-width: 520px;
+}
+.line-note__form textarea {
+  width: 100%;
+  min-height: 72px;
+  resize: vertical;
+  font: inherit;
+  font-size: 0.85rem;
+}
+.line-note__form .btn {
+  justify-self: start;
+}
+
 .plan-line-card__resolve {
   display: flex;
   gap: 8px;

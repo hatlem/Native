@@ -776,7 +776,14 @@
       "engagementApproved": "Ihr Kunde hat den Plan am {date} freigegeben.",
       "engagementViewed": "Zuletzt geöffnet {date} · {count, plural, =1 {1 Aufruf} other {# Aufrufe}}.",
       "engagementNone": "Noch nicht geöffnet."
-    }
+    },
+    "lineNoteLabel": "Hinweis",
+    "lineNoteAdd": "Hinweis hinzufügen",
+    "lineNoteEdit": "Hinweis bearbeiten",
+    "lineNoteSave": "Hinweis speichern",
+    "lineNotePlaceholder": "Z. B. auch als 1 Woche für 15.000 SEK erhältlich",
+    "lineNoteHint": "Für alle sichtbar, die diesen Plan sehen – auch über geteilte Links und im Angebot.",
+    "errorNoteTooLong": "Der Hinweis ist zu lang. Bitte unter 500 Zeichen bleiben."
   },
   "rfq": {
     "org": "Firma",
@@ -896,7 +903,8 @@
     "quoteExpiredBody": "Preise sind nur für begrenzte Zeit garantiert. Bitten Sie den Desk um ein erneuertes Angebot – Sie können es annehmen, sobald es bereitsteht.",
     "requestRenewal": "Erneuertes Angebot anfordern",
     "requestingRenewal": "Wird gesendet …",
-    "renewalRequested": "Der Desk wurde gebeten, das Angebot zu erneuern. Sie erhalten eine Benachrichtigung, sobald Sie es annehmen können."
+    "renewalRequested": "Der Desk wurde gebeten, das Angebot zu erneuern. Sie erhalten eine Benachrichtigung, sobald Sie es annehmen können.",
+    "lineNoteLabel": "Hinweis"
   },
   "desk": {
     "eyebrow": "Interner Desk",
@@ -997,7 +1005,13 @@
     "quoteNoExpiry": "Kein Ablaufdatum",
     "renewQuote": "Angebot erneuern",
     "renewingQuote": "Wird erneuert …",
-    "renewQuoteHint": "Der Kunde kann ein abgelaufenes Angebot nicht annehmen. Die Erneuerung hält diese Preise weitere 14 Tage – passen Sie zuerst Positionen an, falls sich Preise geändert haben."
+    "renewQuoteHint": "Der Kunde kann ein abgelaufenes Angebot nicht annehmen. Die Erneuerung hält diese Preise weitere 14 Tage – passen Sie zuerst Positionen an, falls sich Preise geändert haben.",
+    "lineNoteLabel": "Hinweis an den Kunden",
+    "lineNoteAdd": "Hinweis an den Kunden hinzufügen",
+    "lineNoteEdit": "Hinweis an den Kunden bearbeiten",
+    "lineNoteSave": "Hinweis speichern",
+    "lineNoteHint": "Wird dem Kunden auf der Angebotsseite und im PDF angezeigt.",
+    "lineNoteTooLong": "Der Hinweis ist zu lang. Bitte unter {max} Zeichen bleiben."
   },
   "deskTitles": {
     "eyebrow": "Super-Admin · Titel",
@@ -2859,7 +2873,8 @@
     "from": "Ab {date}",
     "approveHint": "Zufrieden mit Titeln, Timing und Budget? Die Freigabe signalisiert Ihrem Kontakt, den Plan weiterzuschicken – nichts wird dadurch gebucht oder berechnet.",
     "approveCta": "Plan freigeben",
-    "approvedAt": "Plan am {date} freigegeben. Ihr Kontakt übernimmt ab hier."
+    "approvedAt": "Plan am {date} freigegeben. Ihr Kontakt übernimmt ab hier.",
+    "noteLabel": "Hinweis"
   },
   "quotePdf": {
     "documentTitle": "Angebot {quoteNumber}",
@@ -2889,7 +2904,8 @@
     "pageOf": "Seite {page} von {pages}",
     "preparedFor": "Angebot für",
     "viewOnline": "Angebot online ansehen, freigeben und die Kampagne in NativeSpin verfolgen:",
-    "footerLink": "In NativeSpin öffnen"
+    "footerLink": "In NativeSpin öffnen",
+    "noteLabel": "Hinweis"
   },
   "deskUsers": {
     "eyebrow": "Administration",

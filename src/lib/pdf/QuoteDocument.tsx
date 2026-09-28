@@ -80,6 +80,8 @@ const styles = StyleSheet.create({
   // throws on an unregistered italic — which failed every quote carrying a
   // price-on-request line (the only case that renders this footnote).
   footnote: { marginTop: 8, fontSize: 7.5, color: "#888" },
+  // No italic Inter face is registered, so the note is set apart by colour.
+  lineNote: { marginTop: 2, fontSize: 7.5, color: "#2f4a6d" },
   footer: {
     position: "absolute",
     bottom: 20,
@@ -166,6 +168,11 @@ export function QuoteDocument({
                 <View style={styles.colTitle}>
                   <Text style={styles.tCell}>{row.titleName}</Text>
                   {blurb ? <Text style={styles.blurb}>{blurb}</Text> : null}
+                  {row.customerNote ? (
+                    <Text style={styles.lineNote}>
+                      {t(messages, "noteLabel")}: {row.customerNote}
+                    </Text>
+                  ) : null}
                 </View>
                 <Text style={[styles.tCell, styles.colMarket]}>{row.marketCode}</Text>
                 <Text style={[styles.tCell, styles.colFormat]}>{quoteFormatLabel(row.format, locale)}</Text>

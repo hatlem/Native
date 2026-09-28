@@ -26,6 +26,7 @@ import { recordAudit } from "@/lib/audit";
 import { notifyDesk, notifyOrg, notifyPublisher } from "@/lib/notify";
 import { loadScope, canActOnOrg, canCommitOnOrg } from "@/lib/scope";
 import { generateQuotePdf as renderQuotePdf } from "@/lib/pdf/generate-quote-pdf";
+import { normalizeLineNote, noteByProductId } from "@/lib/line-note";
 
 function str(formData: FormData, key: string): string {
   const v = formData.get(key);
@@ -115,6 +116,9 @@ export async function generateQuote(formData: FormData) {
     return product.confirmedAt === null || Number(product.basePrice) <= 0;
   };
 
+  // The buyer-facing line note travels from the plan line onto the quote line.
+  const noteByProduct = noteByProductId(productItems);
+
   const created = await prisma.$transaction(async (tx) => {
     const quotes: {
       id: string;
@@ -134,6 +138,7 @@ export async function generateQuote(formData: FormData) {
       ).map((line) => ({
         ...line,
         priceOnRequest: priceOnRequestFor(line.productId),
+        customerNote: line.productId ? (noteByProduct.get(line.productId) ?? null) : null,
       }));
       const onRequestNames = new Set(
         inventoryLines.filter((l) => l.priceOnRequest).map((l) => l.description),
@@ -297,6 +302,43 @@ export async function setQuoteLinePrice(formData: FormData) {
     previousLineTotal: Number(line.lineTotal),
     previousPriceOnRequest: line.priceOnRequest,
     ...(update.lineTotal != null ? { lineTotal: update.lineTotal } : {}),
+  });
+
+  redirect(`/${locale}/desk/${requestId}`);
+}
+
+// Desk edits the customer-visible note on one quote line. Allowed until the
+// quote has become an order — after that the order is the record.
+export async function setQuoteLineNote(formData: FormData) {
+  const locale = str(formData, "locale") || "en";
+  const requestId = str(formData, "requestId");
+  const quoteId = str(formData, "quoteId");
+  const lineId = str(formData, "lineId");
+
+  const scope = await loadScope();
+  if (!scope.isDesk || !scope.userId) redirect(`/${locale}/signin`);
+
+  const line = await prisma.quoteLine.findUnique({
+    where: { id: lineId },
+    select: {
+      id: true,
+      customerNote: true,
+      quote: { select: { id: true, requestId: true, order: { select: { id: true } } } },
+    },
+  });
+  if (!line || line.quote.id !== quoteId || line.quote.requestId !== requestId || line.quote.order) {
+    redirect(`/${locale}/desk/${requestId}`);
+  }
+
+  const parsed = normalizeLineNote(formData.get("note"));
+  if (!parsed.ok) redirect(`/${locale}/desk/${requestId}?error=note-too-long`);
+
+  await prisma.quoteLine.update({ where: { id: line.id }, data: { customerNote: parsed.note } });
+  await recordAudit(scope.userId, "quote.line.note", `QuoteLine:${line.id}`, {
+    quoteId,
+    requestId,
+    hadNote: line.customerNote !== null,
+    cleared: parsed.note === null,
   });
 
   redirect(`/${locale}/desk/${requestId}`);

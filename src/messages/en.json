@@ -776,7 +776,14 @@
       "engagementApproved": "Your client approved this plan {date}.",
       "engagementViewed": "Last opened {date} · {count, plural, =1 {1 view} other {# views}}.",
       "engagementNone": "Not opened yet."
-    }
+    },
+    "lineNoteLabel": "Note",
+    "lineNoteAdd": "Add note",
+    "lineNoteEdit": "Edit note",
+    "lineNoteSave": "Save note",
+    "lineNotePlaceholder": "E.g. also available as 1 week for 15,000 SEK",
+    "lineNoteHint": "Visible to everyone who sees this plan, including shared links and the quote.",
+    "errorNoteTooLong": "The note is too long. Keep it under 500 characters."
   },
   "rfq": {
     "org": "Company",
@@ -896,7 +903,8 @@
     "quoteExpiredBody": "Prices are only guaranteed for a limited time. Ask the desk for a renewed offer — you can accept it as soon as it is back.",
     "requestRenewal": "Ask for a renewed offer",
     "requestingRenewal": "Sending…",
-    "renewalRequested": "The desk has been asked to renew it. You will get a notification when it is ready to accept."
+    "renewalRequested": "The desk has been asked to renew it. You will get a notification when it is ready to accept.",
+    "lineNoteLabel": "Note"
   },
   "desk": {
     "eyebrow": "Internal desk",
@@ -997,7 +1005,13 @@
     "quoteNoExpiry": "No expiry date",
     "renewQuote": "Renew quote",
     "renewingQuote": "Renewing…",
-    "renewQuoteHint": "The buyer can’t accept an expired quote. Renewing keeps these prices for another 14 days — reprice any lines first if rates have changed."
+    "renewQuoteHint": "The buyer can’t accept an expired quote. Renewing keeps these prices for another 14 days — reprice any lines first if rates have changed.",
+    "lineNoteLabel": "Note to customer",
+    "lineNoteAdd": "Add note to customer",
+    "lineNoteEdit": "Edit note to customer",
+    "lineNoteSave": "Save note",
+    "lineNoteHint": "Shown to the customer on the quote page and in the PDF.",
+    "lineNoteTooLong": "The note is too long. Keep it under {max} characters."
   },
   "deskTitles": {
     "eyebrow": "Super-admin · titles",
@@ -2989,7 +3003,8 @@
     "from": "From {date}",
     "approveHint": "Happy with titles, timing and budget? Approving tells your contact to send the plan on — nothing is booked or charged by this.",
     "approveCta": "Approve this plan",
-    "approvedAt": "Plan approved {date}. Your contact takes it from here."
+    "approvedAt": "Plan approved {date}. Your contact takes it from here.",
+    "noteLabel": "Note"
   },
   "quotePdf": {
     "documentTitle": "Quote {quoteNumber}",
@@ -3019,7 +3034,8 @@
     "pageOf": "Page {page} of {pages}",
     "preparedFor": "Quote for",
     "viewOnline": "View this quote online, accept it, and follow the campaign in NativeSpin:",
-    "footerLink": "Open in NativeSpin"
+    "footerLink": "Open in NativeSpin",
+    "noteLabel": "Note"
   },
   "deskUsers": {
     "eyebrow": "Admin",

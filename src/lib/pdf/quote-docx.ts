@@ -41,11 +41,15 @@ const COLS = [26, 10, 18, 10, 16, 20] as const;
 const CONTENT_TWIPS = 11906 - 2 * 800;
 const grid = (pcts: readonly number[]) => pcts.map((p) => Math.round((CONTENT_TWIPS * p) / 100));
 
-function run(text: string, opts: { bold?: boolean; size?: number; color?: string } = {}) {
+function run(
+  text: string,
+  opts: { bold?: boolean; italics?: boolean; size?: number; color?: string } = {},
+) {
   return new TextRun({
     text,
     font: FONT,
     bold: opts.bold,
+    italics: opts.italics,
     size: opts.size ?? SIZE.body,
     color: opts.color ?? COLOR.text,
   });
@@ -166,6 +170,16 @@ export async function renderQuoteDocx(
               [
                 para([run(row.titleName)]),
                 ...(blurb ? [para([run(blurb, { size: SIZE.small, color: COLOR.muted })])] : []),
+                ...(row.customerNote
+                  ? [
+                      para([
+                        run(`${t(messages, "noteLabel")}: ${row.customerNote}`, {
+                          size: SIZE.small,
+                          italics: true,
+                        }),
+                      ]),
+                    ]
+                  : []),
               ],
               COLS[0],
               { bottom: RULE },

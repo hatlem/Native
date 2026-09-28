@@ -85,7 +85,10 @@ export async function QuoteSection({
       ? byId.get(firstProductId)
       : undefined;
     const marketCode = firstProduct?.title.market.code ?? "";
-    return { quote: q, narrative, marketCode };
+    const noteByLineId = new Map(
+      q.lines.filter((l) => l.customerNote).map((l) => [l.id, l.customerNote as string]),
+    );
+    return { quote: q, narrative, marketCode, noteByLineId };
   });
   const earliestValidUntil = quotes
     .map((q) => q.validUntil)
@@ -127,7 +130,7 @@ export async function QuoteSection({
           </p>
         </header>
 
-        {quoteViews.map(({ quote: q, narrative, marketCode }) => {
+        {quoteViews.map(({ quote: q, narrative, marketCode, noteByLineId }) => {
           const vatAmount =
             Number(q.total) - Number(q.subtotal);
           return (
@@ -205,6 +208,12 @@ export async function QuoteSection({
                               <li key={i}>{b}</li>
                             ))}
                           </ul>
+                        ) : null}
+                        {noteByLineId.get(line.lineId) ? (
+                          <p className="line-note__text">
+                            <span className="line-note__label">{t("lineNoteLabel")}</span>
+                            {noteByLineId.get(line.lineId)}
+                          </p>
                         ) : null}
                       </article>
                     );
