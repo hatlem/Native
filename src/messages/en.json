@@ -783,7 +783,12 @@
     "lineNoteSave": "Save note",
     "lineNotePlaceholder": "E.g. also available as 1 week for 15,000 SEK",
     "lineNoteHint": "Visible to everyone who sees this plan, including shared links and the quote.",
-    "errorNoteTooLong": "The note is too long. Keep it under 500 characters."
+    "errorNoteTooLong": "The note is too long. Keep it under 500 characters.",
+    "moveToAlternatives": "Move to alternatives",
+    "alternativesHeading": "Alternatives – not included in the total",
+    "alternativesIntro": "Titles we also recommend for this campaign. They are not part of the plan or the total until you add them.",
+    "alternativeBadge": "Alternative",
+    "addAlternativeToPlan": "Add to plan"
   },
   "rfq": {
     "org": "Company",
@@ -3004,7 +3009,9 @@
     "approveHint": "Happy with titles, timing and budget? Approving tells your contact to send the plan on — nothing is booked or charged by this.",
     "approveCta": "Approve this plan",
     "approvedAt": "Plan approved {date}. Your contact takes it from here.",
-    "noteLabel": "Note"
+    "noteLabel": "Note",
+    "alternativesHeading": "Alternatives – not included in the total",
+    "alternativesIntro": "Titles we also recommend. They are not part of the plan or the total."
   },
   "quotePdf": {
     "documentTitle": "Quote {quoteNumber}",

@@ -783,7 +783,12 @@
     "lineNoteSave": "Hinweis speichern",
     "lineNotePlaceholder": "Z. B. auch als 1 Woche für 15.000 SEK erhältlich",
     "lineNoteHint": "Für alle sichtbar, die diesen Plan sehen – auch über geteilte Links und im Angebot.",
-    "errorNoteTooLong": "Der Hinweis ist zu lang. Bitte unter 500 Zeichen bleiben."
+    "errorNoteTooLong": "Der Hinweis ist zu lang. Bitte unter 500 Zeichen bleiben.",
+    "moveToAlternatives": "Zu Alternativen verschieben",
+    "alternativesHeading": "Alternativen – nicht in der Summe enthalten",
+    "alternativesIntro": "Titel, die wir für diese Kampagne ebenfalls empfehlen. Sie gehören erst zum Plan und zur Summe, wenn Sie sie hinzufügen.",
+    "alternativeBadge": "Alternative",
+    "addAlternativeToPlan": "Zum Plan hinzufügen"
   },
   "rfq": {
     "org": "Firma",
@@ -2874,7 +2879,9 @@
     "approveHint": "Zufrieden mit Titeln, Timing und Budget? Die Freigabe signalisiert Ihrem Kontakt, den Plan weiterzuschicken – nichts wird dadurch gebucht oder berechnet.",
     "approveCta": "Plan freigeben",
     "approvedAt": "Plan am {date} freigegeben. Ihr Kontakt übernimmt ab hier.",
-    "noteLabel": "Hinweis"
+    "noteLabel": "Hinweis",
+    "alternativesHeading": "Alternativen – nicht in der Summe enthalten",
+    "alternativesIntro": "Titel, die wir ebenfalls empfehlen. Sie gehören nicht zum Plan oder zur Summe."
   },
   "quotePdf": {
     "documentTitle": "Angebot {quoteNumber}",

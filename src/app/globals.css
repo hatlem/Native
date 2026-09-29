@@ -3284,6 +3284,23 @@ select:disabled {
   color: var(--warning);
 }
 
+/* Recommended alternatives beside a plan — visually secondary, outside totals. */
+.plan-alternatives,
+.share-list__alternatives {
+  margin-top: var(--s-5);
+  padding-top: var(--s-4);
+  border-top: 1px dashed var(--border-strong);
+}
+.plan-alternatives__heading,
+.share-list__alternatives-heading {
+  margin: 0 0 var(--s-1);
+  font-size: 1.05rem;
+}
+.plan-line-card--alternative {
+  background: var(--surface-2);
+  border-style: dashed;
+}
+
 /* Customer-visible per-line note ("Merknad") — /plan, /share, the buyer's
    quote page and the desk quote editor share these classes. */
 .line-note {

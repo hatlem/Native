@@ -6,6 +6,7 @@
 // Postgres advisory lock so parallel Railway instances never double-run) and
 // from scripts/send-due-waves.ts by hand.
 
+import { committedItems } from "@/lib/lists";
 import { prisma } from "@/lib/prisma";
 import { findDueAutoSendWaves, type DueWave } from "@/lib/programme";
 import { submitListAsRfq, RFQ_LIST_INCLUDE } from "@/lib/commerce/submit-rfq";
@@ -29,7 +30,7 @@ async function sendDueWave(wave: DueWave): Promise<"sent" | "skipped"> {
       organization: { select: { id: true, name: true, marketCode: true } },
     },
   });
-  if (!list || list.archivedAt || list.requests.length > 0 || list.items.length === 0) {
+  if (!list || list.archivedAt || list.requests.length > 0 || committedItems(list.items).length === 0) {
     return "skipped";
   }
   // The manual submit path gates on onboarding (org.marketCode drives VAT and

@@ -201,7 +201,7 @@ export async function createFirmOrder(args: {
     // silently charged from the stale snapshot.
     if (listGuard) {
       const freshRows = await tx.savedListItem.findMany({
-        where: { listId: listGuard.listId },
+        where: { listId: listGuard.listId, isAlternative: false },
         select: { id: true, quantity: true, productId: true, titleId: true, withContent: true },
       });
       if (fingerprintListItems(freshRows) !== listGuard.fingerprint) {

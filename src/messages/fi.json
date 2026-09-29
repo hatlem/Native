@@ -783,7 +783,12 @@
     "lineNoteSave": "Tallenna huomautus",
     "lineNotePlaceholder": "Esim. saatavana myös 1 viikoksi hintaan 15 000 SEK",
     "lineNoteHint": "Näkyy kaikille, jotka näkevät suunnitelman, myös jaetuissa linkeissä ja tarjouksessa.",
-    "errorNoteTooLong": "Huomautus on liian pitkä. Pidä se alle 500 merkissä."
+    "errorNoteTooLong": "Huomautus on liian pitkä. Pidä se alle 500 merkissä.",
+    "moveToAlternatives": "Siirrä vaihtoehtoihin",
+    "alternativesHeading": "Vaihtoehdot – eivät sisälly kokonaissummaan",
+    "alternativesIntro": "Nimikkeet, joita suosittelemme myös tähän kampanjaan. Ne eivät kuulu suunnitelmaan tai kokonaissummaan ennen kuin lisäätte ne.",
+    "alternativeBadge": "Vaihtoehto",
+    "addAlternativeToPlan": "Lisää suunnitelmaan"
   },
   "rfq": {
     "org": "Yritys",
@@ -3005,7 +3010,9 @@
     "approveHint": "Tyytyväinen julkaisuihin, ajoitukseen ja budjettiin? Hyväksyntä kertoo yhteyshenkilöllesi, että suunnitelman voi lähettää eteenpäin – mitään ei varata eikä veloiteta tästä.",
     "approveCta": "Hyväksy suunnitelma",
     "approvedAt": "Suunnitelma hyväksyttiin {date}. Yhteyshenkilösi jatkaa tästä.",
-    "noteLabel": "Huomautus"
+    "noteLabel": "Huomautus",
+    "alternativesHeading": "Vaihtoehdot – eivät sisälly kokonaissummaan",
+    "alternativesIntro": "Nimikkeet, joita suosittelemme myös. Ne eivät kuulu suunnitelmaan tai kokonaissummaan."
   },
   "quotePdf": {
     "documentTitle": "Tarjous {quoteNumber}",

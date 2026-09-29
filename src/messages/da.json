@@ -658,7 +658,12 @@
     "lineNoteSave": "Gem bemærkning",
     "lineNotePlaceholder": "F.eks. fås også som 1 uge for 15.000 SEK",
     "lineNoteHint": "Synlig for alle, der ser planen, også via delte links og i tilbuddet.",
-    "errorNoteTooLong": "Bemærkningen er for lang. Hold den under 500 tegn."
+    "errorNoteTooLong": "Bemærkningen er for lang. Hold den under 500 tegn.",
+    "moveToAlternatives": "Flyt til alternativer",
+    "alternativesHeading": "Alternativer – ikke med i totalen",
+    "alternativesIntro": "Titler vi også anbefaler til kampagnen. De er ikke med i planen eller totalen, før I tilføjer dem.",
+    "alternativeBadge": "Alternativ",
+    "addAlternativeToPlan": "Tilføj til planen"
   },
   "rfq": {
     "org": "Virksomhed",
@@ -3006,7 +3011,9 @@
     "approveHint": "Tilfreds med titler, timing og budget? En godkendelse fortæller din kontakt, at planen kan sendes videre – intet bookes eller opkræves af dette.",
     "approveCta": "Godkend planen",
     "approvedAt": "Planen blev godkendt {date}. Din kontakt tager den videre herfra.",
-    "noteLabel": "Bemærkning"
+    "noteLabel": "Bemærkning",
+    "alternativesHeading": "Alternativer – ikke med i totalen",
+    "alternativesIntro": "Titler vi også anbefaler. De er ikke med i planen eller totalen."
   },
   "quotePdf": {
     "documentTitle": "Tilbud {quoteNumber}",

@@ -4,7 +4,7 @@ import type { Prisma } from "@prisma/client";
 import { Link } from "@/i18n/navigation";
 import { formatMoney, intlLocale } from "@/lib/money";
 import { titleDisplayName } from "@/lib/title-display";
-import { removeFromPlan, setQuantity, setContentProduction, setLineNote } from "@/app/plan-actions";
+import { removeFromPlan, setQuantity, setContentProduction, setLineNote, setLineAlternative } from "@/app/plan-actions";
 import { LINE_NOTE_MAX } from "@/lib/line-note";
 import { resolveTitleLine } from "@/app/list-actions";
 import { pickContentFeeRule, contentFeeAmount, type ContentFeeRuleSpec } from "@/lib/money";
@@ -35,6 +35,8 @@ export type PlanLine = {
   scheduleUnits: number | null;
   // Customer-visible "Merknad" (SavedListItem.notes).
   notes: string | null;
+  // Recommended alternative: shown in its own section, never totalled.
+  isAlternative: boolean;
 };
 
 // A publication placeholder: a SavedListItem that references a Title but no
@@ -47,6 +49,7 @@ export type PlanTitleLine = {
   quantity: number;
   placements: { id: string; label: string }[];
   notes: string | null;
+  isAlternative: boolean;
 };
 
 function periodLabel(
@@ -147,6 +150,32 @@ function LineNote({
   );
 }
 
+// Moves a line between the plan and its recommended alternatives.
+function AlternativeToggle({
+  locale,
+  itemId,
+  toAlternative,
+  label,
+  className,
+}: {
+  locale: string;
+  itemId: string;
+  toAlternative: boolean;
+  label: string;
+  className: string;
+}) {
+  return (
+    <form action={setLineAlternative}>
+      <input type="hidden" name="locale" value={locale} />
+      <input type="hidden" name="itemId" value={itemId} />
+      <input type="hidden" name="isAlternative" value={toAlternative ? "1" : "0"} />
+      <button type="submit" className={className}>
+        {label}
+      </button>
+    </form>
+  );
+}
+
 // Left column of the split: the basket line list with quantity
 // steppers, content-production toggle and remove buttons, plus the
 // title-placeholder rows.
@@ -154,12 +183,16 @@ export async function PlanLines({
   locale,
   lines,
   titleLines,
+  altLines = [],
+  altTitleLines = [],
   hasHiddenPrice,
   feeRules,
 }: {
   locale: string;
   lines: PlanLine[];
   titleLines: PlanTitleLine[];
+  altLines?: PlanLine[];
+  altTitleLines?: PlanTitleLine[];
   hasHiddenPrice: boolean;
   feeRules: ContentFeeRuleSpec[];
 }) {
@@ -280,6 +313,13 @@ export async function PlanLines({
                     {t("weWriteIt")}
                   </button>
                 </form>
+                <AlternativeToggle
+                  locale={locale}
+                  itemId={l.itemId}
+                  toAlternative
+                  label={t("moveToAlternatives")}
+                  className="plan-line-card__remove"
+                />
                 <form action={removeFromPlan}>
                   <input type="hidden" name="locale" value={locale} />
                   <input type="hidden" name="itemId" value={l.itemId} />
@@ -335,6 +375,13 @@ export async function PlanLines({
               <span className="plan-line-card__total plan-line-card__total--muted">{tv("requestPrice")}</span>
             </div>
             <div className="plan-line-card__actions">
+              <AlternativeToggle
+                locale={locale}
+                itemId={tl.itemId}
+                toAlternative
+                label={t("moveToAlternatives")}
+                className="plan-line-card__remove"
+              />
               <form action={removeFromPlan}>
                 <input type="hidden" name="locale" value={locale} />
                 <input type="hidden" name="itemId" value={tl.itemId} />
@@ -346,6 +393,85 @@ export async function PlanLines({
           </div>
         ))}
       </div>
+
+      {altLines.length + altTitleLines.length > 0 ? (
+        <section className="plan-alternatives" aria-labelledby="plan-alternatives-heading">
+          <h3 id="plan-alternatives-heading" className="plan-alternatives__heading">
+            {t("alternativesHeading")}
+          </h3>
+          <p className="muted small">{t("alternativesIntro")}</p>
+          <div className="plan-line-list">
+            {altLines.map((l) => (
+              <div className="plan-line-card plan-line-card--alternative" key={l.itemId}>
+                <div className="plan-line-card__main">
+                  <div className="plan-line-card__title-row">
+                    <span className="plan-line-card__title">{titleDisplayName(l.product.title)}</span>
+                    <span className="badge badge-neutral dotless plan-line-card__pill">{t("alternativeBadge")}</span>
+                  </div>
+                  <div className="plan-line-card__meta">
+                    {tType(l.product.type)} · {l.product.title.publisher.name}
+                  </div>
+                  <LineNote locale={locale} itemId={l.itemId} notes={l.notes} t={t} />
+                </div>
+                <div className="plan-line-card__price">
+                  {l.priceVisible ? (
+                    <span className="plan-line-card__total">{formatMoney(l.lineTotal, l.product.currency, locale)}</span>
+                  ) : (
+                    <span className="plan-line-card__total plan-line-card__total--muted">{tv("requestPrice")}</span>
+                  )}
+                </div>
+                <div className="plan-line-card__actions">
+                  <AlternativeToggle
+                    locale={locale}
+                    itemId={l.itemId}
+                    toAlternative={false}
+                    label={t("addAlternativeToPlan")}
+                    className="btn small"
+                  />
+                  <form action={removeFromPlan}>
+                    <input type="hidden" name="locale" value={locale} />
+                    <input type="hidden" name="itemId" value={l.itemId} />
+                    <button type="submit" className="plan-line-card__remove">
+                      {t("remove")}
+                    </button>
+                  </form>
+                </div>
+              </div>
+            ))}
+            {altTitleLines.map((tl) => (
+              <div className="plan-line-card plan-line-card--alternative" key={tl.itemId}>
+                <div className="plan-line-card__main">
+                  <div className="plan-line-card__title-row">
+                    <span className="plan-line-card__title">{tl.titleName}</span>
+                    <span className="badge badge-neutral dotless plan-line-card__pill">{t("alternativeBadge")}</span>
+                  </div>
+                  <div className="plan-line-card__meta">{t("titlePlaceholderNote")}</div>
+                  <LineNote locale={locale} itemId={tl.itemId} notes={tl.notes} t={t} />
+                </div>
+                <div className="plan-line-card__price">
+                  <span className="plan-line-card__total plan-line-card__total--muted">{tv("requestPrice")}</span>
+                </div>
+                <div className="plan-line-card__actions">
+                  <AlternativeToggle
+                    locale={locale}
+                    itemId={tl.itemId}
+                    toAlternative={false}
+                    label={t("addAlternativeToPlan")}
+                    className="btn small"
+                  />
+                  <form action={removeFromPlan}>
+                    <input type="hidden" name="locale" value={locale} />
+                    <input type="hidden" name="itemId" value={tl.itemId} />
+                    <button type="submit" className="plan-line-card__remove">
+                      {t("remove")}
+                    </button>
+                  </form>
+                </div>
+              </div>
+            ))}
+          </div>
+        </section>
+      ) : null}
     </div>
   );
 }

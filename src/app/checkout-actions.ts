@@ -9,7 +9,7 @@ import {
   planBriefHasContent,
   writePlanBrief,
 } from "@/lib/basket";
-import { readActiveListId, ensureActiveList } from "@/lib/lists";
+import { readActiveListId, ensureActiveList, committedItems } from "@/lib/lists";
 import { isProductPriceShown } from "@/lib/pricing-visibility";
 import { withWaveAngle } from "@/lib/programme";
 import {
@@ -98,7 +98,9 @@ export async function submitRequest(formData: FormData) {
   // cookie. It can hold product lines (productId set) and Title placeholders
   // (titleId set, productId null). The list is NOT consumed on submit.
   const list = await ensureActiveList(org.id, await readActiveListId());
-  if (list.items.length === 0) redirect(`/${locale}/plan?error=1`);
+  // Recommended alternatives are never part of a submit or an order.
+  const planItems = committedItems(list.items);
+  if (planItems.length === 0) redirect(`/${locale}/plan?error=1`);
 
   // A wave of a programme carries its own article angle — put it at the top
   // of the desk-facing brief so the desk and the writer start from THIS
@@ -129,7 +131,7 @@ export async function submitRequest(formData: FormData) {
   // A product deactivated AFTER it was added still renders on /plan (the page
   // only hides its price). Refuse to submit a list that would silently amputate
   // it — don't drop a line the buyer can still see. They must remove it first.
-  const deactivatedLines = list.items.filter(
+  const deactivatedLines = planItems.filter(
     (i) => i.productId && (!i.product || !i.product.active || !i.product.bookable),
   );
   if (deactivatedLines.length > 0) {
@@ -137,11 +139,11 @@ export async function submitRequest(formData: FormData) {
     redirect(`/${locale}/plan?error=unavailable`);
   }
 
-  const productItems = list.items.filter(
+  const productItems = planItems.filter(
     (i): i is typeof i & { productId: string; product: NonNullable<typeof i.product> } =>
       !!i.productId && !!i.product && i.product.active && i.product.bookable,
   );
-  const titleItems = list.items.filter((i) => !i.productId && i.titleId);
+  const titleItems = planItems.filter((i) => !i.productId && i.titleId);
   if (productItems.length === 0 && titleItems.length === 0) {
     redirect(`/${locale}/plan?error=1`);
   }
@@ -153,7 +155,7 @@ export async function submitRequest(formData: FormData) {
   // withContent is included because it drives CONTENT_FEE charges on the firm
   // (instant-order) path — a concurrent toggle must invalidate the snapshot too.
   // (Definition shared with createFirmOrder's in-transaction guard.)
-  const loadedFingerprint = fingerprintListItems(list.items);
+  const loadedFingerprint = fingerprintListItems(planItems);
 
   // Shape the downstream code already expects (groupItemsByMarket, allFirm,
   // createFirmOrder). Title-only lines never enter `items`/`byId`.
@@ -232,7 +234,7 @@ export async function submitRequest(formData: FormData) {
   // buyer reviews the refreshed list and resubmits rather than us committing a
   // stale snapshot / charging for a line they just removed.
   const freshItems = await prisma.savedListItem.findMany({
-    where: { listId: list.id },
+    where: { listId: list.id, isAlternative: false },
     select: { id: true, quantity: true, productId: true, titleId: true, withContent: true },
   });
   if (fingerprintListItems(freshItems) !== loadedFingerprint) {

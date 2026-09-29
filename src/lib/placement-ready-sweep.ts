@@ -36,7 +36,7 @@ export async function runPlacementReadySweep(): Promise<PlacementReadySweepResul
     // correctness: resolveActiveList refuses to render an archived list and
     // silently falls back to another one, so the notification's deep link
     // could not land the buyer on the plan it talks about.
-    where: { productId: null, titleId: { not: null }, list: { archivedAt: null } },
+    where: { productId: null, titleId: { not: null }, isAlternative: false, list: { archivedAt: null } },
     select: {
       id: true,
       titleId: true,

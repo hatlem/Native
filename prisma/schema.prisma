@@ -1158,6 +1158,10 @@ model SavedListItem {
   // Customer-visible line note ("Merknad"): shown on /plan, the /share view
   // and carried into PlanItem.notes -> QuoteLine.customerNote. Plain text,
   // max 500 chars (lib/line-note.ts).
+  // "Alternativ": an option we recommend alongside the plan but that is NOT
+  // part of it — shown in its own section on /plan and /share, never counted
+  // in totals, never submitted or ordered (lib/lists.ts committedItems).
+  isAlternative Boolean @default(false)
   notes     String?
   sortOrder Int       @default(0)
   createdAt DateTime  @default(now())

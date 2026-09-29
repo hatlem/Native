@@ -658,7 +658,12 @@
     "lineNoteSave": "Spara kommentar",
     "lineNotePlaceholder": "T.ex. finns även som 1 vecka för 15 000 SEK",
     "lineNoteHint": "Syns för alla som ser planen, även via delade länkar och i offerten.",
-    "errorNoteTooLong": "Kommentaren är för lång. Håll den under 500 tecken."
+    "errorNoteTooLong": "Kommentaren är för lång. Håll den under 500 tecken.",
+    "moveToAlternatives": "Flytta till alternativ",
+    "alternativesHeading": "Alternativ – ingår inte i totalen",
+    "alternativesIntro": "Titlar vi också rekommenderar för kampanjen. De ingår inte i planen eller totalen förrän ni lägger till dem.",
+    "alternativeBadge": "Alternativ",
+    "addAlternativeToPlan": "Lägg till i planen"
   },
   "rfq": {
     "org": "Företag",
@@ -3005,7 +3010,9 @@
     "approveHint": "Nöjd med titlar, timing och budget? Ett godkännande säger till din kontakt att skicka planen vidare – inget bokas eller debiteras av detta.",
     "approveCta": "Godkänn planen",
     "approvedAt": "Planen godkändes {date}. Din kontakt tar det vidare härifrån.",
-    "noteLabel": "Kommentar"
+    "noteLabel": "Kommentar",
+    "alternativesHeading": "Alternativ – ingår inte i totalen",
+    "alternativesIntro": "Titlar vi också rekommenderar. De ingår inte i planen eller totalen."
   },
   "quotePdf": {
     "documentTitle": "Offert {quoteNumber}",

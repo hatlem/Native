@@ -658,7 +658,12 @@
     "lineNoteSave": "Lagre merknad",
     "lineNotePlaceholder": "F.eks. finnes også som 1 uke for 15 000 SEK",
     "lineNoteHint": "Synlig for alle som ser planen, også via delte lenker og i tilbudet.",
-    "errorNoteTooLong": "Merknaden er for lang. Hold den under 500 tegn."
+    "errorNoteTooLong": "Merknaden er for lang. Hold den under 500 tegn.",
+    "moveToAlternatives": "Flytt til alternativer",
+    "alternativesHeading": "Alternativer – ikke med i totalen",
+    "alternativesIntro": "Titler vi også anbefaler for denne kampanjen. De er ikke med i planen eller totalen før dere legger dem til.",
+    "alternativeBadge": "Alternativ",
+    "addAlternativeToPlan": "Legg til i planen"
   },
   "rfq": {
     "org": "Selskap",
@@ -3005,7 +3010,9 @@
     "approveHint": "Fornøyd med titler, timing og budsjett? Godkjenning gir kontakten din beskjed om å sende planen videre – ingenting bestilles eller belastes av dette.",
     "approveCta": "Godkjenn planen",
     "approvedAt": "Planen ble godkjent {date}. Kontakten din tar det videre herfra.",
-    "noteLabel": "Merknad"
+    "noteLabel": "Merknad",
+    "alternativesHeading": "Alternativer – ikke med i totalen",
+    "alternativesIntro": "Titler vi også anbefaler. De er ikke med i planen eller totalen."
   },
   "quotePdf": {
     "documentTitle": "Tilbud {quoteNumber}",

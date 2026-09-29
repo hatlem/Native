@@ -196,8 +196,34 @@ async function nextSortOrder(listId: string): Promise<number> {
  * Atomic upsert on the (listId, productId) unique — two concurrent adds (double
  * click / two tabs) can no longer create duplicate rows; the second is a bump.
  */
+/** The lines that ARE the plan: everything except recommended alternatives.
+ *  Every total, submit and order path goes through this, so an alternative can
+ *  only ever be bought after the buyer explicitly adds it to the plan. */
+export function committedItems<T extends { isAlternative?: boolean | null }>(items: readonly T[]): T[] {
+  return items.filter((i) => !i.isAlternative);
+}
+
+/** Recommended alternatives shown beside the plan. */
+export function alternativeItems<T extends { isAlternative?: boolean | null }>(items: readonly T[]): T[] {
+  return items.filter((i) => !!i.isAlternative);
+}
+
+/** Move a line between the plan and its alternatives. Idempotent. */
+export async function setItemAlternative(itemId: string, isAlternative: boolean) {
+  return prisma.savedListItem.updateMany({ where: { id: itemId }, data: { isAlternative } });
+}
+
 export async function addProductItem(listId: string, productId: string, withContent = false) {
   assertItemShape({ productId, titleId: null });
+  // Adding a product that sits among the alternatives promotes it into the
+  // plan as-is (no quantity bump) — that is what "add" means to the buyer.
+  const existing = await prisma.savedListItem.findUnique({
+    where: { listId_productId: { listId, productId } },
+    select: { id: true, isAlternative: true },
+  });
+  if (existing?.isAlternative) {
+    return prisma.savedListItem.update({ where: { id: existing.id }, data: { isAlternative: false } });
+  }
   const item = await prisma.savedListItem.upsert({
     where: { listId_productId: { listId, productId } },
     create: { listId, productId, titleId: null, withContent, sortOrder: await nextSortOrder(listId) },
@@ -216,7 +242,8 @@ export async function addTitleItem(listId: string, titleId: string) {
   return prisma.savedListItem.upsert({
     where: { listId_titleId: { listId, titleId } },
     create: { listId, titleId, productId: null, sortOrder: await nextSortOrder(listId) },
-    update: {}, // already present — no-op (do not duplicate or bump a placeholder)
+    // Already present: no duplicate/bump, but an alternative is promoted into the plan.
+    update: { isAlternative: false },
   });
 }
 
