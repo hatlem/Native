@@ -98,7 +98,7 @@ if (!RUN_DB_IT) {
       where: { userId: buyerUserId, kind: "TITLE_PRODUCT_READY" },
     });
     assert.equal(buyerNotifs.length, 1);
-    assert.ok(buyerNotifs[0].link?.includes(`list=${listId}`), "link deep-links to the list");
+    assert.ok(buyerNotifs[0].link?.endsWith(`/plan/${listId}`), "link deep-links to the plan's own address");
 
     const deskNotifs = await prisma.notification.findMany({
       where: { userId: deskUserId, kind: "TITLE_PRODUCT_READY" },
@@ -154,7 +154,7 @@ if (!RUN_DB_IT) {
     );
     assert.equal(
       await prisma.notification.count({
-        where: { kind: "TITLE_PRODUCT_READY", link: { contains: `list=${listId}` } },
+        where: { kind: "TITLE_PRODUCT_READY", link: { endsWith: `/plan/${listId}` } },
       }),
       0,
       "no notification deep-links to this list",

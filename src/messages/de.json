@@ -788,7 +788,21 @@
     "alternativesHeading": "Alternativen – nicht in der Summe enthalten",
     "alternativesIntro": "Titel, die wir für diese Kampagne ebenfalls empfehlen. Sie gehören erst zum Plan und zur Summe, wenn Sie sie hinzufügen.",
     "alternativeBadge": "Alternative",
-    "addAlternativeToPlan": "Zum Plan hinzufügen"
+    "addAlternativeToPlan": "Zum Plan hinzufügen",
+    "lineSearch": "Im Plan suchen",
+    "lineSearchPlaceholder": "Titel, Verlage, Hinweise durchsuchen …",
+    "lineSearchShowing": "{shown} von {total}",
+    "lineSearchNoMatch": "Keine Positionen passen zur Suche.",
+    "lineSortBy": "Reihenfolge",
+    "lineSortCustom": "Ihre Reihenfolge",
+    "lineSortTitle": "Titel A–Z",
+    "lineSortPublisher": "Verlag",
+    "lineSortPrice": "Preis, höchster zuerst",
+    "lineDragHandle": "Zum Verschieben ziehen",
+    "lineDragInstructions": "Position verschieben: Leertaste zum Aufnehmen, Pfeiltasten zum Bewegen, Leertaste zum Ablegen. Escape bricht ab.",
+    "lineSearchBlocksDrag": "Suche leeren, um die Reihenfolge zu ändern",
+    "lineOrderSaveFailed": "Die Reihenfolge konnte nicht gespeichert werden – Plan wird neu geladen.",
+    "lineMovedAnnouncement": "Verschoben auf Position {position} von {total}"
   },
   "rfq": {
     "org": "Firma",

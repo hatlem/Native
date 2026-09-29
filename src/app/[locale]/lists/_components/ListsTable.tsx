@@ -4,7 +4,6 @@ import {
   renameList,
   duplicateList,
   archiveList,
-  selectActiveList,
 } from "@/app/list-actions";
 
 type ListRow = {
@@ -80,13 +79,14 @@ export async function ListsTable({ locale, lists, heading, emptyLabel }: Props) 
                     </td>
                     <td className="actions-col">
                       <div className="cluster tight">
-                        <form action={selectActiveList}>
-                          <input type="hidden" name="listId" value={list.id} />
-                          <input type="hidden" name="locale" value={locale} />
-                          <button type="submit" className="link">
-                            {t("open")}
-                          </button>
-                        </form>
+                        {/* A plain link to the plan's own address — opens in a new
+                            tab, can be copied. Full navigation, not <Link>: opening
+                            another plan detours through the /plan/open route
+                            handler (it makes the plan active), which a client-side
+                            RSC fetch can't follow. */}
+                        <a href={`/${locale}/plan/${list.id}`} className="link">
+                          {t("open")}
+                        </a>
                         <form action={duplicateList}>
                           <input type="hidden" name="listId" value={list.id} />
                           <input type="hidden" name="locale" value={locale} />

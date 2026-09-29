@@ -663,7 +663,21 @@
     "alternativesHeading": "Alternativer – ikke med i totalen",
     "alternativesIntro": "Titler vi også anbefaler for denne kampanjen. De er ikke med i planen eller totalen før dere legger dem til.",
     "alternativeBadge": "Alternativ",
-    "addAlternativeToPlan": "Legg til i planen"
+    "addAlternativeToPlan": "Legg til i planen",
+    "lineSearch": "Søk i planen",
+    "lineSearchPlaceholder": "Søk i titler, utgivere, merknader …",
+    "lineSearchShowing": "Viser {shown} av {total}",
+    "lineSearchNoMatch": "Ingen linjer passer søket.",
+    "lineSortBy": "Rekkefølge",
+    "lineSortCustom": "Din rekkefølge",
+    "lineSortTitle": "Tittel A–Å",
+    "lineSortPublisher": "Utgiver",
+    "lineSortPrice": "Pris, høyest først",
+    "lineDragHandle": "Dra for å flytte",
+    "lineDragInstructions": "For å flytte en linje: trykk mellomrom for å løfte den, flytt med piltastene og trykk mellomrom igjen for å slippe. Escape avbryter.",
+    "lineSearchBlocksDrag": "tøm søket for å endre rekkefølgen",
+    "lineOrderSaveFailed": "Rekkefølgen ble ikke lagret – laster planen på nytt.",
+    "lineMovedAnnouncement": "Flyttet til plass {position} av {total}"
   },
   "rfq": {
     "org": "Selskap",

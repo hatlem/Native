@@ -663,7 +663,21 @@
     "alternativesHeading": "Alternativ – ingår inte i totalen",
     "alternativesIntro": "Titlar vi också rekommenderar för kampanjen. De ingår inte i planen eller totalen förrän ni lägger till dem.",
     "alternativeBadge": "Alternativ",
-    "addAlternativeToPlan": "Lägg till i planen"
+    "addAlternativeToPlan": "Lägg till i planen",
+    "lineSearch": "Sök i planen",
+    "lineSearchPlaceholder": "Sök bland titlar, utgivare, kommentarer …",
+    "lineSearchShowing": "Visar {shown} av {total}",
+    "lineSearchNoMatch": "Inga rader matchar sökningen.",
+    "lineSortBy": "Ordning",
+    "lineSortCustom": "Din ordning",
+    "lineSortTitle": "Titel A–Ö",
+    "lineSortPublisher": "Utgivare",
+    "lineSortPrice": "Pris, högst först",
+    "lineDragHandle": "Dra för att flytta",
+    "lineDragInstructions": "Flytta en rad: tryck mellanslag för att lyfta den, flytta med piltangenterna och tryck mellanslag igen för att släppa. Escape avbryter.",
+    "lineSearchBlocksDrag": "töm sökningen för att ändra ordningen",
+    "lineOrderSaveFailed": "Ordningen kunde inte sparas – laddar om planen.",
+    "lineMovedAnnouncement": "Flyttad till plats {position} av {total}"
   },
   "rfq": {
     "org": "Företag",

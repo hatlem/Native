@@ -788,7 +788,21 @@
     "alternativesHeading": "Alternatives – not included in the total",
     "alternativesIntro": "Titles we also recommend for this campaign. They are not part of the plan or the total until you add them.",
     "alternativeBadge": "Alternative",
-    "addAlternativeToPlan": "Add to plan"
+    "addAlternativeToPlan": "Add to plan",
+    "lineSearch": "Search this plan",
+    "lineSearchPlaceholder": "Search titles, publishers, notes…",
+    "lineSearchShowing": "Showing {shown} of {total}",
+    "lineSearchNoMatch": "No lines match your search.",
+    "lineSortBy": "Order",
+    "lineSortCustom": "Your order",
+    "lineSortTitle": "Title A–Z",
+    "lineSortPublisher": "Publisher",
+    "lineSortPrice": "Price, highest first",
+    "lineDragHandle": "Drag to reorder",
+    "lineDragInstructions": "To reorder, press Space to pick up the line, use the arrow keys to move it, and Space again to drop it. Escape cancels.",
+    "lineSearchBlocksDrag": "clear the search to reorder",
+    "lineOrderSaveFailed": "The order could not be saved — reloading the plan.",
+    "lineMovedAnnouncement": "Moved to position {position} of {total}"
   },
   "rfq": {
     "org": "Company",
