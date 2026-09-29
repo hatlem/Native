@@ -29,7 +29,8 @@ export const SYNONYM_GROUPS: readonly (readonly string[])[] = [
     "lastebil", "lastbil", "lastvogn", "lkw", "truck", "trucks", "trucking",
     "transport", "logistikk", "logistik", "logistics", "godstransport",
     "varebil", "yrkesbil", "yrkestrafikk", "vognpark", "flåte", "flate",
-    "fleet", "buss", "bus", "spedisjon", "kuljetus",
+    "fleet", "buss", "bus", "spedisjon", "kuljetus", "tungtransport",
+    "tungt", "vogntog", "trailer", "semitrailer",
   ],
   // Construction & heavy machinery.
   [
@@ -48,6 +49,45 @@ export const SYNONYM_GROUPS: readonly (readonly string[])[] = [
     "landbruk", "lantbruk", "landbrug", "jordbruk", "agriculture", "farming",
     "bonde", "gartner", "gartneri", "trädgård", "tradgard", "hage",
     "landwirtschaft", "maatalous",
+  ],
+  // Electricians & electrical installers (a core ABAX trade).
+  [
+    "elektriker", "elektrikar", "elektrikare", "elektro", "elinstallasjon",
+    "elektroinstallatør", "elektroinstallator", "installatør", "installator",
+    "elinstallatör", "elinstallator", "electrician", "electrical",
+    "sähköasentaja", "sahkoasentaja",
+  ],
+  // Plumbing, HVAC & heating.
+  [
+    "rørlegger", "rorlegger", "rørentreprenør", "rorentreprenor", "rørfag",
+    "vvs", "rörmokare", "rormokare", "plumber", "plumbing", "ventilasjon",
+    "ventilation", "varmepumpe", "kulde", "lvi",
+  ],
+  // Painters & decorators.
+  [
+    "maler", "malermester", "malerfag", "målare", "malare", "painter",
+    "painting", "maalari",
+  ],
+  // Carpenters & general trades.
+  [
+    "håndverker", "handverker", "håndverk", "handverk", "tømrer", "tomrer",
+    "snekker", "byggmester", "hantverkare", "hantverk", "håndværker",
+    "handvaerker", "craftsman", "tradesman", "handwerker",
+  ],
+  // Forestry & wood industry.
+  [
+    "skog", "skogbruk", "skogsbruk", "skovbrug", "forestry", "tømmer",
+    "tommer", "sagbruk", "treindustri", "metsä", "metsa", "forst",
+  ],
+  // Waste, recycling & renovation fleets.
+  [
+    "avfall", "renovasjon", "gjenvinning", "återvinning", "atervinning",
+    "genbrug", "affald", "recycling", "waste", "kierrätys", "kierratys",
+  ],
+  // Municipalities & public sector operations.
+  [
+    "kommune", "kommunal", "kommunar", "kommun", "municipality", "municipal",
+    "kunta", "gemeinde",
   ],
   // Events & live entertainment.
   [
@@ -76,6 +116,9 @@ export function expandTerm(term: string): string[] {
   if (!index) index = buildIndex();
   const normalized = normalizeSynonymTerm(term);
   const group = index.get(normalized);
-  if (group) return [...group];
+  // The searched word always comes first: callers cap the variant list
+  // (catalog-search.ts MAX_SYNONYMS_PER_WORD), and a long group must never
+  // cut the buyer's own word out of their own query.
+  if (group) return [normalized, ...group.filter((t) => t !== normalized)];
   return [normalized];
 }
