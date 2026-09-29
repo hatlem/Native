@@ -59,3 +59,26 @@ test("expandTerm normalizes its input before lookup", () => {
   const out = expandTerm("LASTEBIL");
   assert.ok(out.includes("transport"));
 });
+
+test("expandTerm always puts the searched word first, even in groups longer than the query cap", () => {
+  for (const group of SYNONYM_GROUPS) {
+    for (const term of group) {
+      assert.equal(expandTerm(term)[0], term, `"${term}" is not first in its own expansion`);
+    }
+  }
+  // "semitrailer" sits past index 15 in the transport group.
+  assert.equal(expandTerm("semitrailer")[0], "semitrailer");
+});
+
+test("expandTerm covers the trades ABAX sells to", () => {
+  assert.ok(expandTerm("elektriker").includes("installatør"));
+  assert.ok(expandTerm("elektriker").includes("elektro"));
+  assert.ok(expandTerm("rørlegger").includes("vvs"));
+  assert.ok(expandTerm("rorlegger").includes("rørlegger"));
+  assert.ok(expandTerm("maler").includes("malermester"));
+  assert.ok(expandTerm("tømrer").includes("håndverker"));
+  assert.ok(expandTerm("tungt").includes("lastebil"));
+  assert.ok(expandTerm("skogbruk").includes("forestry"));
+  assert.ok(expandTerm("renovasjon").includes("avfall"));
+  assert.ok(expandTerm("kommune").includes("municipality"));
+});

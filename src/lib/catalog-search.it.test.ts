@@ -18,6 +18,8 @@ const TITLES = [
   { key: "ton", name: "t-online.de/auto", aliases: [], url: "https://www.t-online.de/auto" },
   { key: "bb", name: "Bo Bedre (DK)", aliases: ["Bobedre.dk"], url: "https://www.bobedre.dk" },
   { key: "merged", name: "StrategicRISK", aliases: ["Strategic Risk"], url: "https://www.strategic-risk-global.com" },
+  { key: "installer", name: "Installatøren", aliases: [], url: "https://www.fts-it-installer.example" },
+  { key: "semi", name: "Semitrailer Nytt", aliases: [], url: "https://www.fts-it-semi.example" },
 ] as const;
 
 const ids: Record<string, string> = {};
@@ -78,4 +80,13 @@ test("FTS: both names of a merged title find the survivor", { skip: !RUN_DB_IT }
   assert.ok(await finds("StrategicRISK", "merged"));
   assert.ok(await finds("Strategic Risk", "merged"));
   assert.ok(await finds("Verdens Gang", "vg"));
+});
+
+test("FTS: trade vocabulary reaches titles named with a synonym", { skip: !RUN_DB_IT }, async () => {
+  // A buyer searching the everyday word must find the trade title.
+  assert.ok(await finds("elektriker", "installer"));
+  assert.ok(await finds("elektro", "installer"));
+  // "semitrailer" sits past the per-word synonym cap in the transport group;
+  // the searched word itself must still be queried.
+  assert.ok(await finds("semitrailer", "semi"));
 });
