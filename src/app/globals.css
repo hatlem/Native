@@ -3284,6 +3284,11 @@ select:disabled {
   color: var(--warning);
 }
 
+/* Welcome after claiming an org invite (app/joined-notice.tsx). */
+.joined-notice {
+  margin-bottom: var(--s-4);
+}
+
 /* Recommended alternatives beside a plan — visually secondary, outside totals. */
 .plan-alternatives,
 .share-list__alternatives {

@@ -2,6 +2,7 @@
 
 import { AuthError } from "next-auth";
 import { redirect } from "next/navigation";
+import { cookies } from "next/headers";
 import bcrypt from "bcryptjs";
 import { signIn } from "@/auth";
 import { prisma } from "@/lib/prisma";
@@ -23,6 +24,8 @@ import {
   validateClaimForm,
 } from "@/lib/org-invite";
 import { passwordlessSignIn } from "@/lib/passwordless-signin";
+import { CLIENT_COOKIE } from "@/lib/workspace";
+import { inviteLandingPath } from "@/lib/invite-landing";
 
 const LOCALES = ["en", "no", "sv", "da", "fi", "de"] as const;
 type Locale = (typeof LOCALES)[number];
@@ -220,6 +223,21 @@ export async function revokeInvite(formData: FormData) {
 
 // ─────────────────────────────────────────────────────────────────────────────
 
+// After a claim, make the joined org the active one — an existing user who
+// already belongs to another org would otherwise keep seeing that org — and
+// land them on the new team's plans (lib/invite-landing.ts).
+async function landInJoinedOrg(locale: string, organizationId: string): Promise<never> {
+  const store = await cookies();
+  store.set(CLIENT_COOKIE, organizationId, {
+    httpOnly: true,
+    sameSite: "lax",
+    path: "/",
+    maxAge: 60 * 60 * 24 * 30,
+  });
+  const planCount = await prisma.savedList.count({ where: { organizationId, archivedAt: null } });
+  redirect(inviteLandingPath(locale, planCount));
+}
+
 export async function claimOrgInvite(formData: FormData) {
   const locale = asLocale(String(formData.get("locale") || "en"));
   const token = String(formData.get("token") || "").trim();
@@ -301,7 +319,7 @@ export async function claimOrgInvite(formData: FormData) {
       `Organization:${inv.organizationId}`,
       { inviteId: inv.id, mode: "existing" },
     );
-    redirect(`/${locale}/account?ok=joined#team`);
+    await landInJoinedOrg(locale, inv.organizationId);
   }
 
   // mode === "new": create account, membership, mark claimed, sign in.
@@ -370,5 +388,5 @@ export async function claimOrgInvite(formData: FormData) {
     }
     throw error;
   }
-  redirect(`/${locale}/account?ok=joined#team`);
+  await landInJoinedOrg(locale, inv.organizationId);
 }

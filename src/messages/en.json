@@ -3128,5 +3128,9 @@
     "SENT": "Sent",
     "SUBMITTED": "Submitted",
     "VOID": "Void"
+  },
+  "joinedNotice": {
+    "lists": "Welcome to {org}. These are your team's plans — open one to see the titles, prices and notes.",
+    "home": "Welcome to {org}. You're now part of the team on NativeSpin."
   }
 }

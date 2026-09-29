@@ -3129,5 +3129,9 @@
     "SENT": "Skickad",
     "SUBMITTED": "Inskickad",
     "VOID": "Makulerad"
+  },
+  "joinedNotice": {
+    "lists": "Välkommen till {org}. Här är ditt teams planer – öppna en för att se titlar, priser och kommentarer.",
+    "home": "Välkommen till {org}. Nu är du med i teamet på NativeSpin."
   }
 }

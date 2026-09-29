@@ -13,11 +13,19 @@ import { findDueWaves } from "@/lib/programme";
 import { selectActiveList } from "@/app/list-actions";
 import { acceptableQuoteWhere } from "@/lib/commerce/quote-validity";
 import { reconcileExpiredQuotesInBackground } from "@/lib/commerce/quote-expiry";
+import { JoinedNotice } from "@/app/joined-notice";
 
 export const dynamic = "force-dynamic";
 
-export default async function HomePage({ params }: { params: Promise<{ locale: string }> }) {
+export default async function HomePage({
+  params,
+  searchParams,
+}: {
+  params: Promise<{ locale: string }>;
+  searchParams: Promise<Record<string, string | string[] | undefined>>;
+}) {
   const { locale } = await params;
+  const joined = (await searchParams).joined === "1";
   const scope = await loadScope();
   if (!scope.workspace) redirect(`/${locale}/signin`);
   const orgIds = scope.workspace.scopeOrgIds;
@@ -83,6 +91,7 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
 
   return (
     <section>
+      {joined ? <JoinedNotice locale={locale} organizationId={scope.workspace.activeOrgId} variant="home" /> : null}
       <h1>
         {needsCount > 0
           ? t("headingNeeds", { count: needsCount })
