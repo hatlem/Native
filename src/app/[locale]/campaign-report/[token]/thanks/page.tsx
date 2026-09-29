@@ -9,9 +9,9 @@ export default async function CampaignReportThanksPage({
   const t = await getTranslations({ locale, namespace: "campaignReport" });
 
   return (
-    <main className="p-8 max-w-prose mx-auto">
+    <div className="p-8 max-w-prose mx-auto">
       <h1 className="text-2xl font-semibold">{t("thanksTitle")}</h1>
       <p className="mt-2">{t("thanksBody")}</p>
-    </main>
+    </div>
   );
 }

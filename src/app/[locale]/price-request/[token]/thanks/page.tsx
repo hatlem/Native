@@ -8,9 +8,9 @@ export default async function ThanksPage({
   const { locale } = await params;
   const t = await getTranslations({ locale, namespace: "priceRequestForm" });
   return (
-    <main>
+    <div>
       <h1>{t("thanks.title")}</h1>
       <p>{t("thanks.body")}</p>
-    </main>
+    </div>
   );
 }

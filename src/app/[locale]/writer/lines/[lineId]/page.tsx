@@ -36,14 +36,14 @@ export default async function WriterLine({
   });
 
   if (!line?.brief || !line.articlePlacement) {
-    return <main className="p-6 text-sm">No brief for this line yet.</main>;
+    return <div className="p-6 text-sm">No brief for this line yet.</div>;
   }
 
   const articleId = line.articlePlacement.articleId;
   const latest = await resolveEffectiveAsset(line.articlePlacement);
 
   return (
-    <main className="mx-auto max-w-3xl space-y-6 p-6">
+    <div className="mx-auto max-w-3xl space-y-6 p-6">
       <section>
         <h1 className="text-lg font-semibold">Brief</h1>
         <dl className="mt-2 space-y-1 text-sm">
@@ -119,6 +119,6 @@ export default async function WriterLine({
           Review notes: {latest.reviewNotes}
         </p>
       ) : null}
-    </main>
+    </div>
   );
 }
