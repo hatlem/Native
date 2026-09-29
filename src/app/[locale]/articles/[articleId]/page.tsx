@@ -96,7 +96,7 @@ export default async function ArticleDetailPage({
   const titleByEligibleProductId = new Map(eligibleProducts.map((p) => [p.id, p.title.name]));
 
   return (
-    <main className="mx-auto max-w-3xl space-y-6 p-6">
+    <div className="mx-auto max-w-3xl space-y-6 p-6">
       <h1 className="text-lg font-semibold">{article.title}</h1>
 
       <section className="space-y-2 rounded border p-4">
@@ -261,6 +261,6 @@ export default async function ArticleDetailPage({
           </div>
         </section>
       ) : null}
-    </main>
+    </div>
   );
 }

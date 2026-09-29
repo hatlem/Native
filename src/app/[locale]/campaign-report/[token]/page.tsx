@@ -16,10 +16,10 @@ export default async function CampaignReportPage({
   const req = await findMetricsRequestByToken(token);
   if (!req) {
     return (
-      <main className="p-8 max-w-prose mx-auto">
+      <div className="p-8 max-w-prose mx-auto">
         <h1 className="text-xl font-semibold">{t("pageTitle")}</h1>
         <p className="mt-2">{t("statusNotFound")}</p>
-      </main>
+      </div>
     );
   }
 
@@ -38,12 +38,12 @@ export default async function CampaignReportPage({
           ? "statusCancelled"
           : "statusExpired";
     return (
-      <main className="p-8 max-w-prose mx-auto">
+      <div className="p-8 max-w-prose mx-auto">
         <h1 className="text-xl font-semibold">{t("pageTitle")}</h1>
         <p className="mt-2">
           {t(statusKey as "statusExpired" | "statusResponded" | "statusCancelled")}
         </p>
-      </main>
+      </div>
     );
   }
 
@@ -64,12 +64,12 @@ export default async function CampaignReportPage({
   }));
 
   return (
-    <main className="p-8 max-w-3xl mx-auto">
+    <div className="p-8 max-w-3xl mx-auto">
       <h1 className="text-2xl font-semibold">{t("pageTitle")}</h1>
       <p className="mt-2 text-gray-600">
         {t("intro", { publisher: req.publisher.name })}
       </p>
       <MetricsForm token={token} locale={locale} bookings={bookings} />
-    </main>
+    </div>
   );
 }

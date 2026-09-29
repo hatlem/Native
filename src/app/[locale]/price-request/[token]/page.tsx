@@ -25,10 +25,10 @@ export default async function PriceRequestFormPage({
 
   if (!verdict?.ok) {
     return (
-      <main>
+      <div>
         <h1>{t(`closed.${verdict?.reason ?? "unknown"}.title`)}</h1>
         <p>{t(`closed.${verdict?.reason ?? "unknown"}.body`)}</p>
-      </main>
+      </div>
     );
   }
 
@@ -36,7 +36,7 @@ export default async function PriceRequestFormPage({
   await markRequestOpened(token);
 
   return (
-    <main>
+    <div>
       <header>
         <h1>{t("hi", { name: req.salesContact.name })}</h1>
         <p>{t("intro", { title: req.title.name, publisher: req.title.publisher.name })}</p>
@@ -107,6 +107,6 @@ export default async function PriceRequestFormPage({
 
         <button type="submit">{t("submit")}</button>
       </form>
-    </main>
+    </div>
   );
 }

@@ -89,7 +89,7 @@ export default async function SharedListPage({
   }
 
   return (
-    <main className="share-list">
+    <article className="share-list">
       <header className="share-list__header">
         <span className="eyebrow accent">{t("eyebrow", { org: list.organization.name })}</span>
         <h1>{list.name}</h1>
@@ -214,6 +214,6 @@ export default async function SharedListPage({
       <footer className="share-list__footer">
         <span className="muted small">{t("footer")}</span>
       </footer>
-    </main>
+    </article>
   );
 }

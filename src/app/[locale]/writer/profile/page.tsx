@@ -25,12 +25,12 @@ export default async function WriterProfilePage({
   });
   if (!profile) {
     return (
-      <main className="mx-auto max-w-2xl p-6">
+      <div className="mx-auto max-w-2xl p-6">
         <h1 className="text-lg font-semibold">My profile</h1>
         <p className="mt-4 text-sm text-neutral-500">
           This account has no writer profile.
         </p>
-      </main>
+      </div>
     );
   }
 
@@ -38,7 +38,7 @@ export default async function WriterProfilePage({
   const myTopics = new Set(profile.specialties.map((s) => s.topic));
 
   return (
-    <main className="mx-auto max-w-2xl p-6">
+    <div className="mx-auto max-w-2xl p-6">
       <h1 className="text-lg font-semibold">My profile</h1>
       <form action={updateWriterProfile} className="mt-4 space-y-4 text-sm">
         <input type="hidden" name="locale" value={locale} />
@@ -167,6 +167,6 @@ export default async function WriterProfilePage({
           Save profile
         </button>
       </form>
-    </main>
+    </div>
   );
 }

@@ -20,10 +20,10 @@ export default async function RateCardPage({
 
   if (!req) {
     return (
-      <main className="p-8 max-w-prose mx-auto">
+      <div className="p-8 max-w-prose mx-auto">
         <h1 className="text-xl font-semibold">{t("pageTitle")}</h1>
         <p className="mt-2">{t("statusNotFound")}</p>
-      </main>
+      </div>
     );
   }
 
@@ -41,10 +41,10 @@ export default async function RateCardPage({
         ? "statusCancelled"
         : "statusExpired";
     return (
-      <main className="p-8 max-w-prose mx-auto">
+      <div className="p-8 max-w-prose mx-auto">
         <h1 className="text-xl font-semibold">{t("pageTitle")}</h1>
         <p className="mt-2">{t(statusKey as "statusExpired" | "statusResponded" | "statusCancelled")}</p>
-      </main>
+      </div>
     );
   }
 
@@ -56,7 +56,7 @@ export default async function RateCardPage({
   const defaultCurrency = currencyByLocale[locale] ?? "EUR";
 
   return (
-    <main className="p-8 max-w-3xl mx-auto">
+    <div className="p-8 max-w-3xl mx-auto">
       <h1 className="text-2xl font-semibold">{t("pageTitle")}</h1>
       <p className="mt-2 text-slate-700">
         {t("intro", { count: req.titles.length })}{" "}
@@ -90,6 +90,6 @@ export default async function RateCardPage({
         defaultCurrency={defaultCurrency}
         submitAction={submitRateCardAction}
       />
-    </main>
+    </div>
   );
 }

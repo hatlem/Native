@@ -72,7 +72,7 @@ export default async function WriterHome({
   const productById = new Map(products.map((p) => [p.id, p]));
 
   return (
-    <main className="mx-auto max-w-3xl p-6">
+    <div className="mx-auto max-w-3xl p-6">
       <h1 className="text-lg font-semibold">My assignments</h1>
       {lines.length === 0 ? (
         <p className="mt-4 text-sm text-neutral-500">
@@ -101,6 +101,6 @@ export default async function WriterHome({
           })}
         </ul>
       )}
-    </main>
+    </div>
   );
 }

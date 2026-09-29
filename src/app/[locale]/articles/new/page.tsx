@@ -21,7 +21,7 @@ export default async function NewArticlePage({
   });
 
   return (
-    <main className="mx-auto max-w-lg space-y-4 p-6">
+    <div className="mx-auto max-w-lg space-y-4 p-6">
       <h1 className="text-lg font-semibold">{t("newHeading")}</h1>
       <form action={createArticle} className="space-y-3">
         <input type="hidden" name="locale" value={locale} />
@@ -56,6 +56,6 @@ export default async function NewArticlePage({
           {t("createCta")}
         </button>
       </form>
-    </main>
+    </div>
   );
 }
