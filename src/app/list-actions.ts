@@ -315,7 +315,7 @@ export async function setListItemAlternative(formData: FormData) {
 }
 
 // Reorder one section of a plan (the plan lines or its alternatives) —
-// drag-and-drop, the move buttons and one-click sort all end here. Section
+// drag-and-drop (pointer or keyboard) and one-click sort both end here. Section
 // membership comes from the database, never from the client; the id list must
 // be exactly that section (lib/plan-reorder.ts), so a stale tab is refused
 // rather than silently reshuffling lines it never saw. No redirect: the client
