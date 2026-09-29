@@ -3129,5 +3129,9 @@
     "SENT": "Sendt",
     "SUBMITTED": "Sendt inn",
     "VOID": "Annullert"
+  },
+  "joinedNotice": {
+    "lists": "Velkommen til {org}. Her er planene til teamet ditt – åpne en for å se titler, priser og merknader.",
+    "home": "Velkommen til {org}. Nå er du med i teamet på NativeSpin."
   }
 }
