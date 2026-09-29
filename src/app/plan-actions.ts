@@ -14,6 +14,7 @@ import {
   setListItemQuantity,
   setListItemContent,
   setListItemNote,
+  setListItemAlternative,
 } from "@/app/list-actions";
 
 function str(formData: FormData, key: string): string {
@@ -42,6 +43,9 @@ export async function setContentProduction(formData: FormData) {
 }
 export async function setLineNote(formData: FormData) {
   return setListItemNote(formData);
+}
+export async function setLineAlternative(formData: FormData) {
+  return setListItemAlternative(formData);
 }
 
 // "Plan next wave" (formerly "Use as template") — start a fresh, editable

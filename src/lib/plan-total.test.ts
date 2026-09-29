@@ -85,3 +85,11 @@ test("a title placeholder line (no product) is skipped entirely", () => {
 test("empty item list returns no totals", () => {
   assert.deepEqual(estimateListTotals([]), []);
 });
+
+test("estimateListTotals skips recommended alternatives", () => {
+  const plan = fakeItem({ productId: "p1", basePrice: 1000 });
+  const alt = { ...fakeItem({ productId: "p2", basePrice: 5000 }), isAlternative: true } as FakeItem;
+  const [total] = estimateListTotals([plan, alt]);
+  assert.equal(total.itemCount, 1);
+  assert.deepEqual(estimateListTotals([alt]), []);
+});

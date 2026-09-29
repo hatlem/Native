@@ -10,6 +10,7 @@
 // server action — this module is pure domain logic plus DB, so it is testable
 // (see programme.it.test.ts) and callable from background jobs.
 
+import { committedItems } from "@/lib/lists";
 import type { Prisma } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
 import { snapshotListToPlanData } from "@/lib/lists";
@@ -31,6 +32,8 @@ export type RfqListItem = {
   scheduleStart: Date | null;
   scheduleUnits: number | null;
   notes: string | null;
+  // Recommended alternatives are filtered out before anything is submitted.
+  isAlternative: boolean;
   product:
     | ({ active: boolean; bookable: boolean; bookingUnit: BookingUnit } & QuoteGroupingProduct)
     | null;
@@ -112,6 +115,8 @@ export async function submitListAsRfq(input: {
   auditIp?: string;
 }): Promise<SubmitRfqResult> {
   const { list, org, brief } = input;
+  // Only the plan itself is ever submitted — recommended alternatives stay behind.
+  const items = committedItems(list.items);
   const locale = input.locale ?? "en";
 
   // A wave of a programme carries its own article angle — put it at the top
@@ -138,7 +143,7 @@ export async function submitListAsRfq(input: {
   // A product deactivated AFTER it was added still renders on /plan (the page
   // only hides its price). Refuse to submit a list that would silently amputate
   // it — don't drop a line the buyer can still see. They must remove it first.
-  const deactivatedLines = list.items.filter(
+  const deactivatedLines = items.filter(
     (i) => i.productId && (!i.product || !i.product.active || !i.product.bookable),
   );
   if (deactivatedLines.length > 0) {
@@ -146,11 +151,11 @@ export async function submitListAsRfq(input: {
     return { outcome: "unavailable" };
   }
 
-  const productItems = list.items.filter(
+  const productItems = items.filter(
     (i): i is RfqListItem & { productId: string; product: NonNullable<RfqListItem["product"]> } =>
       !!i.productId && !!i.product && i.product.active && i.product.bookable,
   );
-  const titleItems = list.items.filter((i) => !i.productId && i.titleId);
+  const titleItems = items.filter((i) => !i.productId && i.titleId);
   if (productItems.length === 0 && titleItems.length === 0) {
     return { outcome: "empty" };
   }
@@ -216,7 +221,7 @@ export async function submitListAsRfq(input: {
     // acceptance) Order.flightStart/EndDate. Placeholder lines have no
     // product yet, so their unit is unknown; MONTH is the catalog default.
     const flight = planWindowFromItems(
-      list.items.map((i) => ({
+      items.map((i) => ({
         scheduleStart: i.scheduleStart,
         scheduleUnits: i.scheduleUnits,
         bookingUnit: i.product?.bookingUnit ?? "MONTH",

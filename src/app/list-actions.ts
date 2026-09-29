@@ -15,6 +15,7 @@ import {
   resolveTitleItem,
   removeItem,
   setItemQuantity,
+  setItemAlternative,
   readActiveListId,
   writeActiveListId,
   clearActiveListId,
@@ -297,6 +298,20 @@ export async function setListItemNote(formData: FormData) {
   redirect(`/${locale}/plan`);
 }
 
+// Move a line between the plan and its recommended alternatives. An
+// alternative is never counted in totals or submitted (lib/lists.ts
+// committedItems); "Legg til i planen" is the only way it becomes buyable.
+export async function setListItemAlternative(formData: FormData) {
+  const locale = str(formData, "locale") || "en";
+  const itemId = str(formData, "itemId");
+  await ownItem(locale, itemId);
+  const isAlternative = str(formData, "isAlternative") === "1";
+  await setItemAlternative(itemId, isAlternative);
+  const scope = await loadScope();
+  await recordAudit(scope.userId ?? null, "list.item_alternative", `SavedListItem:${itemId}`, { isAlternative });
+  redirect(`/${locale}/plan`);
+}
+
 // Campaign flow — set a shortlist item's schedule (first period + unit count).
 // The UI enforces the product minimum via the input; we store what's posted and
 // leave validation to the estimate/submit path. updateMany no-ops if removed.
@@ -446,6 +461,7 @@ export async function duplicateList(formData: FormData) {
           withContent: i.withContent,
           authorshipMode: i.authorshipMode,
           notes: i.notes,
+          isAlternative: i.isAlternative,
           sortOrder: i.sortOrder,
         })),
       },

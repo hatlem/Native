@@ -53,6 +53,8 @@ export const SHARED_LIST_SELECT = {
       scheduleStart: true,
       // Customer-visible line note — the one per-line note the client sees.
       notes: true,
+      // Recommended alternatives render in their own section, outside totals.
+      isAlternative: true,
       product: {
         select: {
           type: true,

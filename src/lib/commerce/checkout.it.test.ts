@@ -248,6 +248,54 @@ if (!RUN_DB_IT) {
     await prisma.savedListItem.deleteMany({ where: { listId: created.id } });
   });
 
+  test("submitListAsRfq never submits recommended alternatives", async () => {
+    // One real plan line plus a recommended alternative (a title placeholder
+    // for the same publication). Only the plan line may reach the desk.
+    const created = await prisma.savedList.create({
+      data: {
+        organizationId: orgId,
+        name: "CO-IT alternatives list",
+        items: {
+          create: [
+            { productId, quantity: 1 },
+            { titleId, quantity: 1, isAlternative: true },
+          ],
+        },
+      },
+      select: { id: true },
+    });
+    const list = await prisma.savedList.findUniqueOrThrow({ where: { id: created.id }, include: RFQ_LIST_INCLUDE });
+    const res = await submitListAsRfq({
+      list,
+      org: { id: orgId, name: "CO-IT org" },
+      brief: { text: "Alt brief", goal: null, audience: null, budget: null, targetGeo: null, targetAudience: null, targetContext: null },
+      actorUserId: null,
+    });
+    assert.equal(res.outcome, "submitted");
+    const request = await prisma.request.findUniqueOrThrow({
+      where: { id: (res as { requestId: string }).requestId },
+      select: { plan: { select: { items: { select: { productId: true, titleId: true } } } } },
+    });
+    assert.deepEqual(request.plan.items, [{ productId, titleId: null }], "only the plan line is submitted");
+    await prisma.savedListItem.deleteMany({ where: { listId: created.id } });
+  });
+
+  test("submitListAsRfq treats a list of only alternatives as empty", async () => {
+    const created = await prisma.savedList.create({
+      data: { organizationId: orgId, name: "CO-IT only-alternatives", items: { create: [{ productId, quantity: 1, isAlternative: true }] } },
+      select: { id: true },
+    });
+    const list = await prisma.savedList.findUniqueOrThrow({ where: { id: created.id }, include: RFQ_LIST_INCLUDE });
+    const res = await submitListAsRfq({
+      list,
+      org: { id: orgId, name: "CO-IT org" },
+      brief: { text: "x", goal: null, audience: null, budget: null, targetGeo: null, targetAudience: null, targetContext: null },
+      actorUserId: null,
+    });
+    assert.equal(res.outcome, "empty");
+    await prisma.savedListItem.deleteMany({ where: { listId: created.id } });
+  });
+
   test("createOrderFromQuote confirms a SENT quote with briefs/bookings on placement lines only", async () => {
     // Seed an RFQ the way submitRequest + generateQuote leave it.
     const seeded = await prisma.$transaction(async (tx) => {

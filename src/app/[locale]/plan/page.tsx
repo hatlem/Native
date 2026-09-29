@@ -106,7 +106,7 @@ export default async function PlanPage({
 
   // PRODUCT lines: concrete placements. Same price logic as before, but
   // keyed on the SavedListItem id so edits target the row, not the product.
-  const lines = listItems
+  const allLines = listItems
     .map((i) => {
       if (!i.productId || !i.product) return null;
       const p = i.product;
@@ -134,9 +134,14 @@ export default async function PlanPage({
         scheduleStart: i.scheduleStart,
         scheduleUnits: i.scheduleUnits,
         notes: i.notes,
+        isAlternative: i.isAlternative,
       };
     })
     .filter((l): l is NonNullable<typeof l> => l !== null);
+  // Recommended alternatives render in their own section and never feed the
+  // totals, the firm-checkout decision or the submit (lib/lists.ts).
+  const lines = allLines.filter((l) => !l.isAlternative);
+  const altLines = allLines.filter((l) => l.isAlternative);
 
   // PLACEHOLDER lines: a title with no product yet. Offer the title's
   // active+bookable products so the buyer can resolve the line in place.
@@ -156,14 +161,17 @@ export default async function PlanPage({
     arr.push({ id: p.id, label: tType(p.type) });
     placementsByTitle.set(p.titleId, arr);
   }
-  const titleLines: PlanTitleLine[] = placeholderItems.map((i) => ({
+  const allTitleLines: PlanTitleLine[] = placeholderItems.map((i) => ({
     itemId: i.id,
     titleId: i.titleId as string,
     titleName: titleDisplayName(i.title!),
     quantity: i.quantity,
     placements: placementsByTitle.get(i.titleId as string) ?? [],
     notes: i.notes,
+    isAlternative: i.isAlternative,
   }));
+  const titleLines = allTitleLines.filter((l) => !l.isAlternative);
+  const altTitleLines = allTitleLines.filter((l) => l.isAlternative);
 
   const hasHiddenPrice = lines.some((l) => !l.priceVisible);
 
@@ -291,7 +299,7 @@ export default async function PlanPage({
   let overlapWarnings: ScheduleOverlapWarning[] = [];
   if (programmeView) {
     const waveItems = await prisma.savedListItem.findMany({
-      where: { listId: { in: programmeView.waves.map((w) => w.listId) } },
+      where: { listId: { in: programmeView.waves.map((w) => w.listId) }, isAlternative: false },
       select: {
         listId: true,
         productId: true,
@@ -475,6 +483,8 @@ export default async function PlanPage({
                 locale={locale}
                 lines={lines}
                 titleLines={titleLines}
+                altLines={altLines}
+                altTitleLines={altTitleLines}
                 hasHiddenPrice={hasHiddenPrice}
                 feeRules={pricing.feeRules}
               />

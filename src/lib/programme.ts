@@ -103,6 +103,7 @@ export async function copyListForNewWave(
           withContent: i.withContent,
           authorshipMode: i.authorshipMode,
           notes: i.notes,
+          isAlternative: i.isAlternative,
           sortOrder: i.sortOrder,
           scheduleStart: copiedScheduleStart(i, opts),
           scheduleUnits: opts.resetSchedule ? null : i.scheduleUnits,

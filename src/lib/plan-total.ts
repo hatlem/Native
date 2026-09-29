@@ -12,6 +12,8 @@ export type ListTotal = { currency: string; amount: number; hasHidden: boolean; 
 export type EstimableListItem = {
   productId: string | null;
   quantity: number;
+  // Recommended alternatives are shown beside a plan but never totalled.
+  isAlternative?: boolean;
   product:
     | (ProductWithConfirmation & {
         currency: string;
@@ -35,6 +37,7 @@ export type EstimableListItem = {
 export function estimateListTotals(items: EstimableListItem[]): ListTotal[] {
   const byCurrency = new Map<string, ListTotal>();
   for (const item of items) {
+    if (item.isAlternative) continue;
     if (!item.productId || !item.product) continue;
     const product = item.product;
     const entry = byCurrency.get(product.currency) ?? {

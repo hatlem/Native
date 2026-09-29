@@ -48,7 +48,7 @@ export default async function SharedListPage({
   // Same price maths and visibility rules as /plan: visible-price lines show
   // their indicative total, hidden-price lines say "on request" — the client
   // sees what their agency sees, never more.
-  const lines = list.items
+  const allLines = list.items
     .filter((i) => i.productId && i.product)
     .map((i) => {
       const p = i.product!;
@@ -65,12 +65,18 @@ export default async function SharedListPage({
         withContent: i.withContent,
         scheduleStart: i.scheduleStart,
         notes: i.notes,
+        isAlternative: i.isAlternative,
         priceVisible,
         currency: p.currency,
         lineTotal: unit * i.quantity,
       };
     });
-  const placeholders = list.items.filter((i) => !i.productId && i.title);
+  const allPlaceholders = list.items.filter((i) => !i.productId && i.title);
+  // Recommended alternatives are shown in their own section and never totalled.
+  const altLines = allLines.filter((l) => l.isAlternative);
+  const lines = allLines.filter((l) => !l.isAlternative);
+  const altPlaceholders = allPlaceholders.filter((i) => i.isAlternative);
+  const placeholders = allPlaceholders.filter((i) => !i.isAlternative);
 
   const totals = new Map<string, number>();
   let hasHidden = placeholders.length > 0;
@@ -146,6 +152,48 @@ export default async function SharedListPage({
         </strong>
         {hasHidden && totals.size > 0 ? <span className="muted small">{t("plusOnRequest")}</span> : null}
       </div>
+      {altLines.length + altPlaceholders.length > 0 ? (
+        <section className="share-list__alternatives">
+          <h2 className="share-list__alternatives-heading">{t("alternativesHeading")}</h2>
+          <p className="muted small">{t("alternativesIntro")}</p>
+          <div className="share-list__lines">
+            {altLines.map((l) => (
+              <div className="share-list__line" key={l.id}>
+                <div className="share-list__line-main">
+                  <div className="share-list__line-title">{l.name}</div>
+                  <div className="muted small">
+                    {l.type} · {l.publisher}
+                  </div>
+                  {l.notes ? (
+                    <p className="line-note__text">
+                      <span className="line-note__label">{t("noteLabel")}</span>
+                      {l.notes}
+                    </p>
+                  ) : null}
+                </div>
+                <div className="share-list__line-price">
+                  {l.priceVisible ? formatMoney(l.lineTotal, l.currency, locale) : tv("requestPrice")}
+                </div>
+              </div>
+            ))}
+            {altPlaceholders.map((i) => (
+              <div className="share-list__line" key={i.id}>
+                <div className="share-list__line-main">
+                  <div className="share-list__line-title">{titleDisplayName(i.title!)}</div>
+                  <div className="muted small">{t("placementTbd")}</div>
+                  {i.notes ? (
+                    <p className="line-note__text">
+                      <span className="line-note__label">{t("noteLabel")}</span>
+                      {i.notes}
+                    </p>
+                  ) : null}
+                </div>
+                <div className="share-list__line-price">{tv("requestPrice")}</div>
+              </div>
+            ))}
+          </div>
+        </section>
+      ) : null}
       <p className="muted small share-list__disclaimer">{t("disclaimer")}</p>
 
       {list.clientApprovedAt ? (
