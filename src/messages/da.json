@@ -663,7 +663,21 @@
     "alternativesHeading": "Alternativer – ikke med i totalen",
     "alternativesIntro": "Titler vi også anbefaler til kampagnen. De er ikke med i planen eller totalen, før I tilføjer dem.",
     "alternativeBadge": "Alternativ",
-    "addAlternativeToPlan": "Tilføj til planen"
+    "addAlternativeToPlan": "Tilføj til planen",
+    "lineSearch": "Søg i planen",
+    "lineSearchPlaceholder": "Søg i titler, udgivere, bemærkninger …",
+    "lineSearchShowing": "Viser {shown} af {total}",
+    "lineSearchNoMatch": "Ingen linjer matcher søgningen.",
+    "lineSortBy": "Rækkefølge",
+    "lineSortCustom": "Din rækkefølge",
+    "lineSortTitle": "Titel A–Å",
+    "lineSortPublisher": "Udgiver",
+    "lineSortPrice": "Pris, højest først",
+    "lineDragHandle": "Træk for at flytte",
+    "lineDragInstructions": "Flyt en linje: tryk mellemrum for at løfte den, flyt med piletasterne, og tryk mellemrum igen for at slippe. Escape annullerer.",
+    "lineSearchBlocksDrag": "ryd søgningen for at ændre rækkefølgen",
+    "lineOrderSaveFailed": "Rækkefølgen kunne ikke gemmes – genindlæser planen.",
+    "lineMovedAnnouncement": "Flyttet til plads {position} af {total}"
   },
   "rfq": {
     "org": "Virksomhed",

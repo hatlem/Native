@@ -788,7 +788,21 @@
     "alternativesHeading": "Vaihtoehdot – eivät sisälly kokonaissummaan",
     "alternativesIntro": "Nimikkeet, joita suosittelemme myös tähän kampanjaan. Ne eivät kuulu suunnitelmaan tai kokonaissummaan ennen kuin lisäätte ne.",
     "alternativeBadge": "Vaihtoehto",
-    "addAlternativeToPlan": "Lisää suunnitelmaan"
+    "addAlternativeToPlan": "Lisää suunnitelmaan",
+    "lineSearch": "Hae suunnitelmasta",
+    "lineSearchPlaceholder": "Hae julkaisuja, kustantajia, huomautuksia…",
+    "lineSearchShowing": "Näytetään {shown}/{total}",
+    "lineSearchNoMatch": "Mikään rivi ei vastaa hakua.",
+    "lineSortBy": "Järjestys",
+    "lineSortCustom": "Oma järjestys",
+    "lineSortTitle": "Nimi A–Ö",
+    "lineSortPublisher": "Kustantaja",
+    "lineSortPrice": "Hinta, kallein ensin",
+    "lineDragHandle": "Siirrä vetämällä",
+    "lineDragInstructions": "Siirrä riviä: nosta välilyönnillä, siirrä nuolinäppäimillä ja pudota välilyönnillä. Esc peruuttaa.",
+    "lineSearchBlocksDrag": "tyhjennä haku muuttaaksesi järjestystä",
+    "lineOrderSaveFailed": "Järjestystä ei voitu tallentaa – ladataan suunnitelma uudelleen.",
+    "lineMovedAnnouncement": "Siirretty kohtaan {position}/{total}"
   },
   "rfq": {
     "org": "Yritys",

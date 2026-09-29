@@ -1,6 +1,7 @@
 "use server";
 
 import { redirect } from "next/navigation";
+import { planPath } from "@/lib/plan-path";
 import { revalidatePath } from "next/cache";
 import { cookies } from "next/headers";
 import { prisma } from "@/lib/prisma";
@@ -23,6 +24,7 @@ import {
 } from "@/lib/lists";
 import { enableListShare, disableListShare } from "@/lib/list-share";
 import { normalizeLineNote } from "@/lib/line-note";
+import { reorderSection, ReorderMismatchError } from "@/lib/plan-reorder";
 
 function str(formData: FormData, key: string): string {
   const v = formData.get(key);
@@ -129,7 +131,7 @@ export async function addProductToActiveList(
   const listId = await ensureActiveListId(orgId, activeId, scope.userId);
   await writeActiveListId(listId);
   await addProductItem(listId, productId, withContent);
-  revalidatePath(`/${locale}/plan`);
+  revalidatePath(`/${locale}/plan`, "layout");
   revalidatePath(`/${locale}/requests`);
   return { ok: true, listId };
 }
@@ -212,7 +214,7 @@ export async function setListTitleMembership(formData: FormData) {
     }
   }
   revalidatePath(`/${locale}/catalog`);
-  revalidatePath(`/${locale}/plan`);
+  revalidatePath(`/${locale}/plan`, "layout");
   revalidatePath(`/${locale}/lists`);
 }
 
@@ -238,7 +240,7 @@ export async function createListWithTitle(formData: FormData) {
     }
   }
   revalidatePath(`/${locale}/catalog`);
-  revalidatePath(`/${locale}/plan`);
+  revalidatePath(`/${locale}/plan`, "layout");
   revalidatePath(`/${locale}/lists`);
 }
 
@@ -259,7 +261,7 @@ export async function removeListItem(formData: FormData) {
   const itemId = str(formData, "itemId");
   await ownItem(locale, itemId);
   await removeItem(itemId);
-  revalidatePath(`/${locale}/plan`);
+  revalidatePath(`/${locale}/plan`, "layout");
 }
 
 export async function setListItemQuantity(formData: FormData) {
@@ -267,7 +269,7 @@ export async function setListItemQuantity(formData: FormData) {
   const itemId = str(formData, "itemId");
   await ownItem(locale, itemId);
   await setItemQuantity(itemId, Number(str(formData, "quantity")));
-  revalidatePath(`/${locale}/plan`);
+  revalidatePath(`/${locale}/plan`, "layout");
 }
 
 export async function setListItemContent(formData: FormData) {
@@ -310,6 +312,51 @@ export async function setListItemAlternative(formData: FormData) {
   const scope = await loadScope();
   await recordAudit(scope.userId ?? null, "list.item_alternative", `SavedListItem:${itemId}`, { isAlternative });
   redirect(`/${locale}/plan`);
+}
+
+// Reorder one section of a plan (the plan lines or its alternatives) —
+// drag-and-drop (pointer or keyboard) and one-click sort both end here. Section
+// membership comes from the database, never from the client; the id list must
+// be exactly that section (lib/plan-reorder.ts), so a stale tab is refused
+// rather than silently reshuffling lines it never saw. No redirect: the client
+// already shows the new order, and a same-route re-navigation is what breaks
+// soft nav on this app (see catalog). Returns ok=false when refused so the UI
+// can reload the page to the server's order.
+export async function reorderListItems(input: {
+  listId: string;
+  section: "plan" | "alternatives";
+  itemIds: string[];
+}): Promise<{ ok: boolean }> {
+  const scope = await loadScope();
+  const list = await prisma.savedList.findUnique({
+    where: { id: input.listId },
+    select: {
+      organizationId: true,
+      archivedAt: true,
+      items: { select: { id: true, sortOrder: true, createdAt: true, isAlternative: true } },
+    },
+  });
+  if (!list || list.archivedAt || !canActOnOrg(scope, list.organizationId)) return { ok: false };
+  const sectionIds = list.items
+    .filter((i) => i.isAlternative === (input.section === "alternatives"))
+    .map((i) => i.id);
+  let rows: { id: string; sortOrder: number }[];
+  try {
+    rows = reorderSection(list.items, sectionIds, input.itemIds);
+  } catch (err) {
+    if (err instanceof ReorderMismatchError) return { ok: false };
+    throw err;
+  }
+  const changed = rows.filter((r) => list.items.find((i) => i.id === r.id)?.sortOrder !== r.sortOrder);
+  if (changed.length === 0) return { ok: true };
+  await prisma.$transaction(
+    changed.map((r) => prisma.savedListItem.update({ where: { id: r.id }, data: { sortOrder: r.sortOrder } })),
+  );
+  await recordAudit(scope.userId ?? null, "list.reordered", `SavedList:${input.listId}`, {
+    section: input.section,
+    count: input.itemIds.length,
+  });
+  return { ok: true };
 }
 
 // Campaign flow — set a shortlist item's schedule (first period + unit count).
@@ -364,8 +411,11 @@ export async function selectActiveList(formData: FormData) {
   const listId = str(formData, "listId");
   const scope = await loadScope();
   const list = await prisma.savedList.findUnique({ where: { id: listId }, select: { organizationId: true } });
-  if (list && canActOnOrg(scope, list.organizationId)) await writeActiveListId(listId);
-  redirect(`/${locale}/plan`);
+  if (list && canActOnOrg(scope, list.organizationId)) {
+    await writeActiveListId(listId);
+    redirect(planPath(locale, listId));
+  }
+  redirect(planPath(locale));
 }
 
 export async function renameList(formData: FormData) {
@@ -376,7 +426,7 @@ export async function renameList(formData: FormData) {
   if (list && canActOnOrg(scope, list.organizationId)) {
     await prisma.savedList.update({ where: { id: listId }, data: { name: str(formData, "name") || "Untitled list" } });
   }
-  revalidatePath(`/${locale}/plan`);
+  revalidatePath(`/${locale}/plan`, "layout");
   revalidatePath(`/${locale}/lists`);
 }
 
@@ -396,7 +446,7 @@ export async function setListTargetVerticals(formData: FormData) {
       data: { targetVerticals: verticals.length ? verticals.join(",") : null },
     });
   }
-  revalidatePath(`/${locale}/plan`);
+  revalidatePath(`/${locale}/plan`, "layout");
   revalidatePath(`/${locale}/catalog`);
 }
 

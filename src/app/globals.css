@@ -3284,6 +3284,84 @@ select:disabled {
   color: var(--warning);
 }
 
+/* Plan line search + ordering (plan/_components/PlanLineBoard.tsx). */
+.plan-board__toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--s-2);
+  align-items: center;
+  margin-bottom: var(--s-2);
+}
+/* The field keeps the global input style (border, focus ring); the icon
+   sits inside its left padding. */
+.plan-board__search {
+  flex: 1 1 240px;
+  position: relative;
+  display: block;
+}
+.plan-board__search svg {
+  position: absolute;
+  left: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--muted);
+  pointer-events: none;
+}
+.plan-board__search input[type="search"] {
+  padding-left: 36px;
+}
+.plan-board__sort {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.plan-board__status:empty {
+  display: none;
+}
+.plan-board__row {
+  display: flex;
+  align-items: stretch;
+  gap: 6px;
+  position: relative;
+}
+.plan-board__card {
+  flex: 1;
+  min-width: 0;
+}
+.plan-board__card > .plan-line-card {
+  height: 100%;
+}
+.plan-board__handle {
+  flex: 0 0 auto;
+  align-self: flex-start;
+  display: grid;
+  place-items: center;
+  width: 24px;
+  height: 36px;
+  margin-top: 14px;
+  border: 0;
+  border-radius: var(--r-sm);
+  background: transparent;
+  color: var(--muted);
+  cursor: grab;
+  touch-action: none;
+}
+.plan-board__handle:hover,
+.plan-board__handle:focus-visible {
+  background: var(--surface-2);
+  color: var(--ink);
+}
+.plan-board__row--dragging {
+  z-index: 2;
+  opacity: 0.92;
+}
+.plan-board__row--dragging .plan-line-card {
+  box-shadow: 0 8px 24px rgb(0 0 0 / 0.12);
+}
+.plan-board__row--dragging .plan-board__handle {
+  cursor: grabbing;
+}
+
 /* Welcome after claiming an org invite (app/joined-notice.tsx). */
 .joined-notice {
   margin-bottom: var(--s-4);
@@ -6599,11 +6677,13 @@ footer a:hover {
     position: sticky;
     top: 0;
     z-index: 15;
-    padding: 10px 20px;
+    padding: 10px var(--s-4);
     background: var(--bg);
     border-bottom: 1px solid var(--border);
-    margin: 0 calc(-1 * var(--s-5));
-    width: calc(100% + 2 * var(--s-5));
+    /* Full-bleed to the mobile container gutter (.container is --s-4 at
+       ≤760px); --s-5 here overflowed the viewport by 8px. */
+    margin: 0 calc(-1 * var(--s-4));
+    width: calc(100% + 2 * var(--s-4));
   }
 
   .plan-title-block__mobile-top {
@@ -6722,7 +6802,7 @@ footer a:hover {
     -webkit-backdrop-filter: blur(14px);
     backdrop-filter: blur(14px);
     border-bottom: 1px solid var(--border);
-    margin: 0 calc(-1 * var(--s-5));
+    margin: 0 calc(-1 * var(--s-4));
   }
   :root:not([data-theme="light"]) .catalog-mobile-bar {
     background: rgba(10, 11, 13, 0.85);

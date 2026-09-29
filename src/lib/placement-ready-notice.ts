@@ -62,10 +62,10 @@ export function buildPlacementReadyNotice(input: {
   return {
     title: s.title(input.titleName),
     body: s.body(input.titleName, input.listName),
-    // /plan/open is a Route Handler that makes this list the active one (writes
-    // the cookie) before landing on /plan — so the page the buyer sees and the
-    // list their "Send til desk" button submits are always the same list.
-    link: `/${locale}/plan/open?list=${input.listId}`,
+    // The plan's own address. /plan/[listId] makes it the active list (via
+    // /plan/open) before rendering, so the page the buyer sees and the list
+    // their "Send til desk" button submits are always the same list.
+    link: `/${locale}/plan/${input.listId}`,
     locale,
   };
 }
