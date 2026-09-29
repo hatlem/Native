@@ -433,3 +433,40 @@ test("toggleFavorite still no-ops on a discontinued title", async () => {
     null,
   );
 });
+
+// ── "Sist endret": line changes bump the list (DB trigger) ────────────────
+
+test("every line change moves the list's updatedAt (add, edit, alternative, remove)", async () => {
+  const listId = await freshList();
+  const stale = new Date("2020-01-01T00:00:00Z");
+  const age = () => prisma.savedList.update({ where: { id: listId }, data: { updatedAt: stale } });
+  const touched = async (what: string) => {
+    const { updatedAt } = await prisma.savedList.findUniqueOrThrow({ where: { id: listId }, select: { updatedAt: true } });
+    assert.ok(updatedAt > stale, `${what} must bump SavedList.updatedAt`);
+  };
+
+  await age();
+  const item = await addProductItem(listId, productId);
+  await touched("adding a line");
+
+  await age();
+  await prisma.savedListItem.update({ where: { id: item.id }, data: { isAlternative: true } });
+  await touched("moving a line to alternatives");
+
+  await age();
+  await prisma.savedListItem.update({ where: { id: item.id }, data: { notes: "Merknad" } });
+  await touched("editing a note");
+
+  await age();
+  await prisma.savedListItem.delete({ where: { id: item.id } });
+  await touched("removing a line");
+
+  await prisma.savedList.delete({ where: { id: listId } });
+});
+
+test("deleting a list with lines still cascades (trigger tolerates the parent going away)", async () => {
+  const listId = await freshList();
+  await addProductItem(listId, productId);
+  await prisma.savedList.delete({ where: { id: listId } });
+  assert.equal(await prisma.savedListItem.count({ where: { listId } }), 0);
+});
