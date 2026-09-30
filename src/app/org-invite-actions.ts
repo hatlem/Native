@@ -296,7 +296,7 @@ export async function claimOrgInvite(formData: FormData) {
 
   let createdUserId: string | null = null;
   try {
-    createdUserId = await createAccountFromInvite(inv, { name: name || null, passwordHash });
+    createdUserId = await createAccountFromInvite(inv, { name: name || null, passwordHash, locale });
   } catch {
     // Unique-email violation: the address already has an account.
     // Send them to sign-in — their existing session pairs them to the org.

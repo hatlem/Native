@@ -776,6 +776,11 @@ model User {
   // under; bumping it (password reset or change) ends every older session
   // on its next request. See src/lib/session-version.ts.
   sessionVersion  Int       @default(0)
+  // The language this user reads NativeSpin in: the UI locale of their
+  // latest sign-in, or the language their invite was sent in. Every email
+  // and notice addressed to them renders in it (src/lib/notify.ts). Null
+  // until they first sign in; senders then fall back to the org's market.
+  locale          String?
 
   notifications          Notification[]
   magicLinkTokens        MagicLinkToken[]
@@ -813,6 +818,10 @@ model PublisherInvite {
   claimedByUserId String?
   createdBy       String
   createdAt       DateTime  @default(now())
+  // Language the invite email (and claim link) went out in — chosen by the
+  // desk, defaulting to the publisher's market language. Becomes the portal
+  // user's User.locale when claimed.
+  locale          String    @default("en")
 
   @@index([publisherId])
   @@index([email])

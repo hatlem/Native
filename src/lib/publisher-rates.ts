@@ -129,6 +129,7 @@ async function ownProduct(publisherId: string, productId: string) {
     select: {
       id: true,
       titleId: true,
+      type: true,
       basePrice: true,
       currency: true,
       title: { select: { name: true } },
@@ -179,8 +180,6 @@ export async function updateProductPrice(args: {
   productId: string;
   basePrice: number;
   actorUserId: string;
-  // Only used to build the desk notification link; desk UI is per-locale.
-  locale?: string;
 }): Promise<void> {
   if (!isValidBasePrice(args.basePrice)) {
     throw new PublisherRatesError("invalid-price");
@@ -204,12 +203,19 @@ export async function updateProductPrice(args: {
   // QUOTE_READY is the least-bad existing kind: "fresh pricing is ready
   // for you to look at". Adding a dedicated enum value is a migration we
   // deliberately avoid here.
-  const locale = args.locale ?? "en";
   await notifyDesk({
     kind: "QUOTE_READY",
-    title: "Publisher updated a price",
-    body: `${product.title.name}: ${from} → ${args.basePrice} ${product.currency} (confirmed by the publisher)`,
-    link: `/${locale}/desk/titles/${product.titleId}`,
+    template: {
+      key: "publisherPriceUpdated",
+      params: {
+        titleName: product.title.name,
+        titleId: product.titleId,
+        productType: product.type,
+        from,
+        to: args.basePrice,
+        currency: product.currency,
+      },
+    },
   });
 }
 
@@ -223,7 +229,6 @@ export async function updateProductLeadTime(args: {
   productId: string;
   leadTimeDays: number;
   actorUserId: string;
-  locale?: string;
 }): Promise<{ changed: boolean }> {
   if (
     !Number.isInteger(args.leadTimeDays) ||
@@ -248,12 +253,18 @@ export async function updateProductLeadTime(args: {
     `Product:${product.id}`,
     { publisherId: args.publisherId, from: current.leadTimeDays, to: args.leadTimeDays },
   );
-  const locale = args.locale ?? "en";
   await notifyDesk({
     kind: "QUOTE_READY",
-    title: "Publisher updated a lead time",
-    body: `${product.title.name}: ${current.leadTimeDays ?? "–"} → ${args.leadTimeDays} days (set by the publisher)`,
-    link: `/${locale}/desk/titles/${product.titleId}`,
+    template: {
+      key: "publisherLeadTimeUpdated",
+      params: {
+        titleName: product.title.name,
+        titleId: product.titleId,
+        productType: product.type,
+        from: current.leadTimeDays,
+        to: args.leadTimeDays,
+      },
+    },
   });
   return { changed: true };
 }

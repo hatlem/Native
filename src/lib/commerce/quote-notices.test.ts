@@ -1,10 +1,6 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import {
-  buildDeskQuoteAcceptedNotice,
-  buildOrderConfirmedNotice,
-  buildQuoteSentNotice,
-} from "./quote-notices";
+import { buildOrderConfirmedNotice, buildQuoteSentNotice } from "./quote-notices";
 
 const LOCALES = ["en", "no", "sv", "da", "fi", "de"] as const;
 const VALID_UNTIL = new Date("2026-10-14T23:59:59.999Z");
@@ -113,13 +109,4 @@ test("unknown locales fall back to English", () => {
     buildOrderConfirmedNotice({ locale: "nl", planName: "P" }).title,
     "Order confirmed: P",
   );
-});
-
-test("desk notice only says multi-market when more than one market accepted", () => {
-  const single = buildDeskQuoteAcceptedNotice({ orgName: "Acme", planName: "P", orderCount: 1 });
-  assert.equal(single.title, "Quote accepted");
-  assert.ok(!single.body.includes("market"));
-  const multi = buildDeskQuoteAcceptedNotice({ orgName: "Acme", planName: "P", orderCount: 3 });
-  assert.equal(multi.title, "3 quotes accepted");
-  assert.match(multi.body, /3-market campaign/);
 });

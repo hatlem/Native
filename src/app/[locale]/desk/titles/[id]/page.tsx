@@ -21,6 +21,8 @@ import { ContactHistoryPanel } from "./_components/ContactHistoryPanel";
 import { RateCardsPanel } from "./_components/RateCardsPanel";
 import { SubmitButton } from "@/components";
 import { withSafeEmails } from "@/components/safe-email";
+import { marketDefaultLocale } from "@/lib/market-locale";
+import { NOTICE_LOCALES } from "@/lib/notices/messages";
 
 export const dynamic = "force-dynamic";
 
@@ -183,6 +185,8 @@ export default async function DeskTitleEditPage({
   const t = await getTranslations({ locale, namespace: "titleAdmin" });
   const tType = await getTranslations({ locale, namespace: "productType" });
   const tMarket = await getTranslations({ locale, namespace: "market" });
+  // Language names for the invite-language picker (shared with the writer invite).
+  const tWriters = await getTranslations({ locale, namespace: "deskWriters" });
 
   const saved = typeof sp.saved === "string" ? sp.saved : null;
   const error = typeof sp.error === "string" ? sp.error : null;
@@ -396,6 +400,21 @@ export default async function DeskTitleEditPage({
               defaultValue={pendingInvite?.email ?? ""}
             />
             <p className="muted small">{t("inviteEmailHelp")}</p>
+          </div>
+          <div className="field">
+            <label htmlFor="invite-locale">{t("inviteLanguageLabel")}</label>
+            <select
+              id="invite-locale"
+              name="inviteLocale"
+              defaultValue={marketDefaultLocale(title.market.code)}
+            >
+              {NOTICE_LOCALES.map((l) => (
+                <option key={l} value={l}>
+                  {tWriters(`inviteLanguage.${l}`)}
+                </option>
+              ))}
+            </select>
+            <p className="muted small">{t("inviteLanguageHint")}</p>
           </div>
           <SubmitButton
             label={pendingInvite ? t("inviteResend") : t("inviteSend")}

@@ -2444,7 +2444,9 @@
     "inviteBusinessEmail": "Verwenden Sie eine Firmenadresse — kostenlose und Wegwerf-Anbieter werden nicht akzeptiert.",
     "inviteNotFound": "Diesen Verlag gibt es nicht mehr — laden Sie die Seite neu.",
     "priceUnconfirmed": "Preis nicht bestätigt",
-    "productInactive": "inaktiv"
+    "productInactive": "inaktiv",
+    "inviteLanguageLabel": "Sprache der E-Mail",
+    "inviteLanguageHint": "Einladung, Registrierungsseite und Portalkonto verwenden diese Sprache. Standard ist der Markt des Titels."
   },
   "salesContacts": {
     "title": "Vertriebskontakte",
@@ -3551,5 +3553,139 @@
   "viewOnly": {
     "title": "Nur Lesezugriff",
     "body": "Sie sehen alles, was Ihr Team hier hat, können es aber nicht ändern. Wenden Sie sich an einen Administrator, wenn Sie etwas bearbeiten, senden oder annehmen müssen."
+  },
+  "notices": {
+    "email": {
+      "cta": "In NativeSpin öffnen",
+      "linkLine": "In NativeSpin öffnen: {url}",
+      "footer": "Dies ist eine automatische Benachrichtigung von NativeSpin."
+    },
+    "orderInProduction": {
+      "title": "Ihr Auftrag ist in Produktion: {plan}",
+      "body": "Wir buchen {count, plural, one {die Platzierung} other {die # Platzierungen}} bei den Verlagen und bringen die Inhalte auf den Weg. Wir melden uns, sobald ein Entwurf zur Prüfung bereitliegt."
+    },
+    "orderScheduled": {
+      "title": "Ihre Kampagne ist eingeplant: {plan}",
+      "bodyRange": "Die Veröffentlichung ist für {start} – {end} gebucht. Wir melden uns, sobald die erste Platzierung online ist.",
+      "bodyFrom": "Die Veröffentlichung ist ab {start} gebucht. Wir melden uns, sobald die erste Platzierung online ist.",
+      "bodyUndated": "Jede Platzierung hat einen festen Termin beim Verlag. Wir melden uns, sobald die erste online ist."
+    },
+    "orderCancelled": {
+      "title": "Auftrag storniert: {plan}",
+      "body": "Der NativeSpin-Desk hat diesen Auftrag storniert. Grund: {reason}"
+    },
+    "draftReady": {
+      "title": "Entwurf zur Prüfung bereit: {article}",
+      "body": "Version {version} von „{article}“ ist fertig. Lesen Sie sie und geben Sie sie frei oder bitten Sie um Änderungen."
+    },
+    "draftSentBack": {
+      "title": "Entwurf zur Überarbeitung zurückgegeben: {article}",
+      "body": "Unser Desk hat Änderungen an Version {version} von „{article}“ angefordert. Sie erhalten den überarbeiteten Entwurf zur Prüfung, sobald er fertig ist."
+    },
+    "invoiceIssued": {
+      "title": "Rechnung gestellt: {plan}",
+      "body": "Gesamt {amount} inkl. MwSt., fällig am {due}. Öffnen Sie die Rechnung, um das PDF herunterzuladen."
+    },
+    "creditNoteIssued": {
+      "title": "Gutschrift erstellt: {plan}",
+      "body": "Die Rechnung über {amount} wurde vollständig gutgeschrieben. Grund: {reason}"
+    },
+    "bookingConfirmed": {
+      "title": "{title} hat Ihre Buchung bestätigt",
+      "body": "{title} hat die Platzierung in {plan} bestätigt. Wir melden uns, sobald sie online ist."
+    },
+    "placementLive": {
+      "title": "Ihre Platzierung ist online bei {title}",
+      "body": "Die Platzierung in {plan} ist bei {title} veröffentlicht. Öffnen Sie sie, um sie so zu sehen wie die Leser."
+    },
+    "editorialVeto": {
+      "title": "{title} kann diesen Entwurf nicht veröffentlichen",
+      "body": "{title} hat die Veröffentlichung des Entwurfs in {plan} aus redaktionellen Gründen abgelehnt: {reason}. Unser Desk meldet sich zum weiteren Vorgehen."
+    },
+    "placementProposed": {
+      "title": "Der Desk hat eine Platzierung bei {title} gewählt",
+      "body": "Sie hatten uns gebeten, eine Platzierung bei {title} vorzuschlagen. Wir haben {format} gewählt – Sie finden sie in Ihrer Anfrage."
+    },
+    "placeholderRemoved": {
+      "title": "{title} wurde aus Ihrer Anfrage entfernt",
+      "body": "Für {title} können wir derzeit keine Platzierung buchen, daher hat unser Desk den Titel aus Ihrer Anfrage genommen. Der Rest der Anfrage bleibt unverändert."
+    },
+    "rfqSubmitted": {
+      "title": "Neue Anfrage von {org}: {plan}",
+      "intro": "{org} hat „{plan}“ mit {count, plural, one {# Position} other {# Positionen}} eingereicht.",
+      "budget": "Budget: {amount}",
+      "brief": "Briefing:",
+      "noBrief": "Es wurde kein Briefing geschrieben.",
+      "lines": "Positionen:",
+      "line": "{title} – {format} × {quantity}",
+      "lineWithContent": "{title} – {format} × {quantity}, geschrieben von NativeSpin",
+      "linePlaceholder": "{title} – der Desk schlägt die Platzierung vor",
+      "moreLines": "…und {count} weitere"
+    },
+    "quoteAccepted": {
+      "title": "{count, plural, one {Angebot angenommen} other {# Angebote angenommen}}: {plan}",
+      "body": "{count, plural, one {{org} hat das Angebot für {plan} angenommen. Der Auftrag ist bestätigt.} other {{org} hat eine Kampagne in # Märkten angenommen ({plan}). # Aufträge sind bestätigt.}}"
+    },
+    "quoteRenewal": {
+      "title": "Angebotsverlängerung angefragt: {plan}",
+      "body": "{org} möchte weitermachen, aber das Angebot ist abgelaufen. Verlängern Sie es (und passen Sie die Preise an, falls sich die Tarife geändert haben), damit es wieder angenommen werden kann."
+    },
+    "deskBookingConfirmed": {
+      "title": "{title} hat eine Buchung bestätigt",
+      "body": "{title} hat seine Platzierung im Auftrag „{plan}“ von {org} bestätigt."
+    },
+    "deskPlacementLive": {
+      "title": "Platzierung online bei {title}",
+      "body": "{title} hat die Platzierung im Auftrag „{plan}“ von {org} veröffentlicht."
+    },
+    "deskEditorialVeto": {
+      "title": "{title} hat sein redaktionelles Veto eingelegt",
+      "body": "{title} veröffentlicht den Entwurf im Auftrag „{plan}“ von {org} nicht. Grund: {reason}"
+    },
+    "deskDraftApproved": {
+      "title": "{org} hat einen Entwurf freigegeben: {article}",
+      "body": "Version {version} von „{article}“ ist freigegeben. Stellen Sie sie fertig, um sie für die Platzierungen festzuschreiben."
+    },
+    "deskChangesRequested": {
+      "title": "{org} bittet um Änderungen: {article}",
+      "body": "{org} hat Version {version} von „{article}“ zur Überarbeitung zurückgegeben.",
+      "comment": "Kommentar: „{comment}“",
+      "noComment": "Es wurde kein Kommentar hinterlassen."
+    },
+    "publisherPrice": {
+      "title": "Preis vom Verlag geändert: {title}",
+      "body": "{title}, {format}: {from} → {to}, vom Verlag bestätigt."
+    },
+    "publisherLeadTime": {
+      "title": "Vorlaufzeit vom Verlag geändert: {title}",
+      "body": "{title}, {format}: Vorlauf von {from} auf {to} geändert. Prüfen Sie geplante Kampagnen, die jetzt zu früh starten.",
+      "days": "{count, plural, one {# Tag} other {# Tage}}",
+      "unset": "nicht festgelegt"
+    },
+    "bookingNew": {
+      "title": "Neue Buchung von {org}",
+      "bodyInstant": "{org} hat eine Direktbestellung aufgegeben, die Ihre Titel umfasst. Bestätigen Sie jede Buchung im Verlagsportal.",
+      "bodyQuote": "{org} hat ein Angebot angenommen, das Ihre Titel umfasst. Bestätigen Sie jede Buchung im Verlagsportal."
+    },
+    "publisherOrderCancelled": {
+      "title": "Auftrag storniert: {org}",
+      "body": "Der NativeSpin-Desk hat den Auftrag von {org} storniert. Buchungen auf Ihren Titeln, die noch nicht gelaufen sind, sind storniert. Grund: {reason}"
+    },
+    "writerChangesRequested": {
+      "title": "Änderungen gewünscht: {article}",
+      "bodyClient": "Der Kunde hat Version {version} von „{article}“ zur Überarbeitung zurückgegeben.",
+      "bodyDesk": "Der NativeSpin-Desk hat Version {version} von „{article}“ zur Überarbeitung zurückgegeben.",
+      "comment": "Kommentar: „{comment}“"
+    }
+  },
+  "publisherInviteEmail": {
+    "subject": "Einladung zur Partnerschaft für {publisher} – NativeSpin",
+    "greeting": "Hallo,",
+    "added": "{inviter} hat {publisher} in den NativeSpin-Katalog aufgenommen und Sie eingeladen, ein Konto im Verlagsportal anzulegen.",
+    "inviterFallback": "Das NativeSpin-Team",
+    "portal": "Im Portal halten Sie Preislisten, Spezifikationen, Verfügbarkeiten und Buchungen für die Titel aktuell, die NativeSpin-Kunden über uns buchen können.",
+    "claim": "Konto hier anlegen (der Link ist {days} Tage gültig):",
+    "ignore": "Falls Sie diese Nachricht nicht erwartet haben, können Sie sie ignorieren – der Link kann nur einmal verwendet werden.",
+    "signoff": "– NativeSpin"
   }
 }

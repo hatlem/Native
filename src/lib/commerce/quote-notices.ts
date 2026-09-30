@@ -1,12 +1,11 @@
 // Notification copy for the quote lifecycle: the buyer's "your quote is
-// ready / renewed" when the desk sends it, the buyer's order confirmation
-// when they accept, and the desk's "quote accepted".
+// ready / renewed" when the desk sends it, and the buyer's order
+// confirmation when they accept (or place an instant order).
 //
-// Buyer copy is localized by the org's home market and lives in code next to
-// its senders, the same convention as order-completed-notice.ts: it is
-// rendered server-side at send time (in-app row + email via notifyOrg), never
-// through next-intl. Desk copy stays English like every other desk
-// notification.
+// Rendered through the notice templates (lib/notice-template.ts `quoteSent`,
+// `orderConfirmed`) in each recipient's language, never through next-intl.
+// The desk's "quote accepted" is the `deskQuoteAccepted` template
+// (lib/notices/desk-notices.ts).
 
 import { formatMoney, intlLocale } from "@/lib/money";
 import type { BuyerLocale } from "@/lib/market-locale";
@@ -171,26 +170,4 @@ export function buildOrderConfirmedNotice(input: {
 }): { title: string; body: string } {
   const s = stringsFor(input.locale);
   return { title: s.orderTitle(input.planName), body: s.orderBody };
-}
-
-/**
- * Desk-facing "quote accepted". One order per placement market, so the order
- * count is the market count — "multi-market" is only said when it's true.
- */
-export function buildDeskQuoteAcceptedNotice(input: {
-  orgName: string;
-  planName: string;
-  orderCount: number;
-}): { title: string; body: string } {
-  const { orgName, planName, orderCount } = input;
-  if (orderCount > 1) {
-    return {
-      title: `${orderCount} quotes accepted`,
-      body: `${orgName} accepted a ${orderCount}-market campaign (${planName}) — ${orderCount} orders confirmed.`,
-    };
-  }
-  return {
-    title: "Quote accepted",
-    body: `${orgName} accepted the quote for ${planName} — the order is confirmed.`,
-  };
 }

@@ -194,6 +194,17 @@ export function writerInviteEmail(args: {
   });
 }
 
+/** The assignment's subject + body on their own: the writer's in-app notice
+ *  (notice template `writerAssigned`) reads the same copy as this email. */
+export function writerAssignedCopy(args: {
+  locale: EmailLocale;
+  format: string;
+  titleName: string;
+}): { title: string; body: string } {
+  const c = COPY[args.locale].assigned;
+  return { title: c.subject(args.titleName), body: c.body(args.format, args.titleName) };
+}
+
 export function writerAssignedEmail(args: {
   locale: EmailLocale;
   // Localized format label ("Native-artikkel").

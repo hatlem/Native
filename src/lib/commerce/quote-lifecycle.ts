@@ -7,9 +7,7 @@
 import { prisma } from "@/lib/prisma";
 import { recordAudit } from "@/lib/audit";
 import { notifyDesk, notifyOrg, notifyPublisher } from "@/lib/notify";
-import { marketDefaultLocale } from "@/lib/market-locale";
 import { uniquePublisherIdsForProducts } from "@/lib/commerce/publishers";
-import { buildDeskQuoteAcceptedNotice } from "@/lib/commerce/quote-notices";
 
 export type SendDraftQuotesResult =
   // The drafts are SENT and the buyer org was notified.
@@ -52,7 +50,6 @@ export async function sendDraftQuotes(input: {
     select: {
       id: true,
       organizationId: true,
-      organization: { select: { marketCode: true } },
       plan: { select: { name: true } },
       quotes: {
         where: { status: "DRAFT", order: null },
@@ -127,13 +124,10 @@ export async function sendDraftQuotes(input: {
     });
   }
 
-  // Written for the buyer org: the email in its home market's language (not
-  // the desk associate's UI locale); the inbox row re-renders in each
-  // reader's own language (lib/notice-template.ts).
-  const marketCode = request.organization.marketCode;
+  // Written for the buyer org: each member reads it in their own language
+  // (not the desk associate's UI locale) — lib/notify.ts.
   await notifyOrg(request.organizationId, {
     kind: "QUOTE_READY",
-    locale: marketCode ? marketDefaultLocale(marketCode) : "en",
     template: {
       key: "quoteSent",
       params: {
@@ -166,18 +160,13 @@ export async function sendDraftQuotes(input: {
 export async function notifyQuoteAccepted(args: {
   organizationId: string;
   orgName: string;
-  marketCode: string | null;
   planName: string;
   requestId: string;
   orders: { orderId: string; productIds: string[] }[];
-  // UI locale of whoever accepted — used for the desk and publisher links,
-  // as before; the buyer's own notice follows the org's market.
-  actorLocale: string;
 }): Promise<void> {
   const { orders } = args;
   await notifyOrg(args.organizationId, {
     kind: "QUOTE_ACCEPTED",
-    locale: args.marketCode ? marketDefaultLocale(args.marketCode) : "en",
     template: {
       key: "orderConfirmed",
       params: {
@@ -190,19 +179,17 @@ export async function notifyQuoteAccepted(args: {
     },
   });
 
-  const desk = buildDeskQuoteAcceptedNotice({
-    orgName: args.orgName,
-    planName: args.planName,
-    orderCount: orders.length,
-  });
   await notifyDesk({
     kind: "QUOTE_ACCEPTED",
-    title: desk.title,
-    body: desk.body,
-    link:
-      orders.length === 1
-        ? `/${args.actorLocale}/desk/orders/${orders[0].orderId}`
-        : `/${args.actorLocale}/desk/orders`,
+    template: {
+      key: "deskQuoteAccepted",
+      params: {
+        orgName: args.orgName,
+        planName: args.planName,
+        orderCount: orders.length,
+        orderId: orders.length === 1 ? orders[0].orderId : null,
+      },
+    },
   });
 
   const pubIds = await uniquePublisherIdsForProducts(orders.flatMap((o) => o.productIds));
@@ -210,9 +197,7 @@ export async function notifyQuoteAccepted(args: {
     pubIds.map((pid) =>
       notifyPublisher(pid, {
         kind: "BOOKING_NEW",
-        title: "New booking",
-        body: "A confirmed order requires booking on your end.",
-        link: `/${args.actorLocale}/publisher/orders`,
+        template: { key: "bookingNew", params: { orgName: args.orgName, via: "quote" } },
       }),
     ),
   );

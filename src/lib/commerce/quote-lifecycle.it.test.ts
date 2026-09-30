@@ -256,11 +256,9 @@ if (!RUN_DB_IT) {
     await notifyQuoteAccepted({
       organizationId: orgId,
       orgName: `QL-IT org ${REF}`,
-      marketCode: "NO",
       planName: plan.name,
       requestId,
       orders: [accepted],
-      actorLocale: "no",
     });
     const confirmations = await prisma.notification.findMany({
       where: { userId: buyerId, kind: "QUOTE_ACCEPTED", link: `/no/orders/${accepted.orderId}` },

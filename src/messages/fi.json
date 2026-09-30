@@ -2587,7 +2587,9 @@
     "inviteBusinessEmail": "Käytä yritysosoitetta — ilmais- ja kertakäyttöpalveluja ei hyväksytä.",
     "inviteNotFound": "Kustantajaa ei enää ole — lataa sivu uudelleen.",
     "priceUnconfirmed": "hintaa ei vahvistettu",
-    "productInactive": "ei käytössä"
+    "productInactive": "ei käytössä",
+    "inviteLanguageLabel": "Sähköpostin kieli",
+    "inviteLanguageHint": "Kutsu, rekisteröitymissivu ja portaalitili ovat tällä kielellä. Oletuksena julkaisun markkinan kieli."
   },
   "salesContacts": {
     "title": "Myyntiyhteystiedot",
@@ -3682,5 +3684,139 @@
   "viewOnly": {
     "title": "Vain lukuoikeus",
     "body": "Näet kaiken, mitä tiimilläsi on täällä, mutta et voi muuttaa sitä. Pyydä ylläpitäjää, jos sinun täytyy muokata, lähettää tai hyväksyä."
+  },
+  "notices": {
+    "email": {
+      "cta": "Avaa NativeSpinissä",
+      "linkLine": "Avaa NativeSpinissä: {url}",
+      "footer": "Tämä on NativeSpinin automaattinen ilmoitus."
+    },
+    "orderInProduction": {
+      "title": "Tilaus on tuotannossa: {plan}",
+      "body": "Varaamme {count, plural, one {sijoittelun} other {# sijoittelua}} julkaisijoilta ja käynnistämme sisällön tuotannon. Kerromme, kun luonnos on valmis tarkistettavaksi."
+    },
+    "orderScheduled": {
+      "title": "Kampanja on aikataulutettu: {plan}",
+      "bodyRange": "Julkaisu on varattu ajalle {start}–{end}. Kerromme heti, kun ensimmäinen sijoittelu on julkaistu.",
+      "bodyFrom": "Julkaisu on varattu alkaen {start}. Kerromme heti, kun ensimmäinen sijoittelu on julkaistu.",
+      "bodyUndated": "Jokaisella sijoittelulla on nyt paikka julkaisijan aikataulussa. Kerromme heti, kun ensimmäinen on julkaistu."
+    },
+    "orderCancelled": {
+      "title": "Tilaus on peruttu: {plan}",
+      "body": "NativeSpinin desk on perunut tämän tilauksen. Syy: {reason}"
+    },
+    "draftReady": {
+      "title": "Luonnos valmis tarkistettavaksi: {article}",
+      "body": "Luonnoksen ”{article}” versio {version} on valmis. Lue se ja hyväksy se tai pyydä muutoksia."
+    },
+    "draftSentBack": {
+      "title": "Luonnos palautettu muokattavaksi: {article}",
+      "body": "Desk on pyytänyt muutoksia luonnoksen ”{article}” versioon {version}. Saat muokatun luonnoksen tarkistettavaksi, kun se on valmis."
+    },
+    "invoiceIssued": {
+      "title": "Lasku lähetetty: {plan}",
+      "body": "Yhteensä {amount} sis. alv, eräpäivä {due}. Avaa lasku ladataksesi PDF-tiedoston."
+    },
+    "creditNoteIssued": {
+      "title": "Hyvityslasku lähetetty: {plan}",
+      "body": "Lasku, jonka summa on {amount}, on hyvitetty kokonaan. Syy: {reason}"
+    },
+    "bookingConfirmed": {
+      "title": "{title} vahvisti varauksesi",
+      "body": "{title} on vahvistanut sijoittelun kampanjassa {plan}. Kerromme, kun se on julkaistu."
+    },
+    "placementLive": {
+      "title": "Sijoittelusi on julkaistu: {title}",
+      "body": "Kampanjan {plan} sijoittelu on julkaistu julkaisussa {title}. Avaa se nähdäksesi sen lukijan silmin."
+    },
+    "editorialVeto": {
+      "title": "{title} ei voi julkaista tätä luonnosta",
+      "body": "{title} on toimituksellisista syistä kieltäytynyt julkaisemasta kampanjan {plan} luonnosta: {reason}. Desk on sinuun yhteydessä jatkosta."
+    },
+    "placementProposed": {
+      "title": "Desk valitsi sijoittelun: {title}",
+      "body": "Pyysit meitä ehdottamaan sijoittelua julkaisussa {title}. Valitsimme muodon {format} – löydät sen pyynnöstäsi."
+    },
+    "placeholderRemoved": {
+      "title": "{title} poistettiin pyynnöstäsi",
+      "body": "Julkaisussa {title} ei ole juuri nyt varattavaa sijoittelua, joten desk poisti sen pyynnöstäsi. Muu pyyntö pysyy ennallaan."
+    },
+    "rfqSubmitted": {
+      "title": "Uusi pyyntö: {org} – {plan}",
+      "intro": "{org} lähetti suunnitelman ”{plan}”, jossa on {count, plural, one {# rivi} other {# riviä}}.",
+      "budget": "Budjetti: {amount}",
+      "brief": "Brief:",
+      "noBrief": "Briefiä ei ole kirjoitettu.",
+      "lines": "Rivit:",
+      "line": "{title} – {format} × {quantity}",
+      "lineWithContent": "{title} – {format} × {quantity}, NativeSpin kirjoittaa",
+      "linePlaceholder": "{title} – desk ehdottaa sijoittelua",
+      "moreLines": "…ja {count} muuta"
+    },
+    "quoteAccepted": {
+      "title": "{count, plural, one {Tarjous hyväksytty} other {# tarjousta hyväksytty}}: {plan}",
+      "body": "{count, plural, one {{org} hyväksyi tarjouksen ({plan}). Tilaus on vahvistettu.} other {{org} hyväksyi # markkinan kampanjan ({plan}). # tilausta on vahvistettu.}}"
+    },
+    "quoteRenewal": {
+      "title": "Tarjouksen uusimista pyydetty: {plan}",
+      "body": "{org} haluaa edetä, mutta tarjous on vanhentunut. Uusi se (ja päivitä rivien hinnat, jos hinnat ovat muuttuneet), jotta sen voi taas hyväksyä."
+    },
+    "deskBookingConfirmed": {
+      "title": "{title} vahvisti varauksen",
+      "body": "{title} vahvisti sijoittelunsa asiakkaan {org} tilauksessa ”{plan}”."
+    },
+    "deskPlacementLive": {
+      "title": "Sijoittelu julkaistu: {title}",
+      "body": "{title} julkaisi sijoittelun asiakkaan {org} tilauksessa ”{plan}”."
+    },
+    "deskEditorialVeto": {
+      "title": "{title} käytti toimituksellista veto-oikeuttaan",
+      "body": "{title} ei julkaise luonnosta asiakkaan {org} tilauksessa ”{plan}”. Syy: {reason}"
+    },
+    "deskDraftApproved": {
+      "title": "{org} hyväksyi luonnoksen: {article}",
+      "body": "Luonnoksen ”{article}” versio {version} on hyväksytty. Viimeistele se, niin se lukitaan sijoitteluihin."
+    },
+    "deskChangesRequested": {
+      "title": "{org} pyytää muutoksia: {article}",
+      "body": "{org} palautti luonnoksen ”{article}” version {version} muokattavaksi.",
+      "comment": "Heidän kommenttinsa: ”{comment}”",
+      "noComment": "He eivät jättäneet kommenttia."
+    },
+    "publisherPrice": {
+      "title": "Julkaisija päivitti hinnan: {title}",
+      "body": "{title}, {format}: {from} → {to}, julkaisijan vahvistama."
+    },
+    "publisherLeadTime": {
+      "title": "Julkaisija päivitti toimitusajan: {title}",
+      "body": "{title}, {format}: ennakkovaraus muuttui {from} → {to}. Tarkista suunnitellut kampanjat, jotka alkavat nyt liian pian.",
+      "days": "{count, plural, one {# päivä} other {# päivää}}",
+      "unset": "ei asetettu"
+    },
+    "bookingNew": {
+      "title": "Uusi varaus: {org}",
+      "bodyInstant": "{org} teki suoratilauksen, joka sisältää julkaisujanne. Vahvista jokainen varaus julkaisijaportaalissa.",
+      "bodyQuote": "{org} hyväksyi tarjouksen, joka sisältää julkaisujanne. Vahvista jokainen varaus julkaisijaportaalissa."
+    },
+    "publisherOrderCancelled": {
+      "title": "Tilaus peruttu: {org}",
+      "body": "NativeSpinin desk on perunut asiakkaan {org} tilauksen. Julkaisujenne varaukset, joita ei ole vielä julkaistu, on peruttu. Syy: {reason}"
+    },
+    "writerChangesRequested": {
+      "title": "Muutoksia pyydetty: {article}",
+      "bodyClient": "Asiakas palautti luonnoksen ”{article}” version {version} muokattavaksi.",
+      "bodyDesk": "NativeSpinin desk palautti luonnoksen ”{article}” version {version} muokattavaksi.",
+      "comment": "Kommentti: ”{comment}”"
+    }
+  },
+  "publisherInviteEmail": {
+    "subject": "Kumppanuuskutsu: {publisher} – NativeSpin",
+    "greeting": "Hei,",
+    "added": "{inviter} on lisännyt julkaisijan {publisher} NativeSpinin katalogiin ja kutsunut sinut luomaan tilin julkaisijaportaaliin.",
+    "inviterFallback": "NativeSpin-tiimi",
+    "portal": "Portaalissa pidät ajan tasalla hinnastot, tekniset vaatimukset, saatavuuden ja varaukset niille julkaisuille, joita NativeSpinin asiakkaat voivat varata kauttamme.",
+    "claim": "Luo tili tästä (linkki vanhenee {days} päivän kuluttua):",
+    "ignore": "Jos et odottanut tätä viestiä, voit jättää sen huomiotta – linkkiä voi käyttää vain kerran.",
+    "signoff": "– NativeSpin"
   }
 }

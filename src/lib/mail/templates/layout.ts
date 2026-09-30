@@ -58,7 +58,7 @@ export function layout(args: LayoutArgs): string {
     </td></tr>
     <tr><td style="background:${COLOR_CARD};border:1px solid ${COLOR_HAIR};border-radius:10px;padding:32px;">
       <h1 style="margin:0 0 12px;font-size:22px;line-height:1.3;color:${COLOR_INK};">${escapeHtml(args.heading)}</h1>
-      <p style="margin:0;font-size:15px;line-height:1.55;color:${COLOR_INK};">${escapeHtml(args.body)}</p>
+      <p style="margin:0;font-size:15px;line-height:1.55;color:${COLOR_INK};white-space:pre-line;">${escapeHtml(args.body)}</p>
       ${cta}
       <p style="margin:24px 0 0;font-size:13px;color:${COLOR_MUTED};line-height:1.5;">${escapeHtml(args.footer)}${footerLink}</p>
     </td></tr>
