@@ -467,7 +467,7 @@ export default async function TitleDetailPage({
               ) : (
                 <div className="price muted">{tv("requestPrice")}</div>
               )}
-              {band && p.visibility === "FIRM" ? (
+              {band && isInstantOrderable(p, title) ? (
                 <span className="tag">⚡ {tf("badge")}</span>
               ) : null}
               {/* Publisher-stated lead time when we have it; otherwise an

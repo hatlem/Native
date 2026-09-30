@@ -1,6 +1,6 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { isValidTimeZone, zonedDateString, zonedEndOfDay, displayTimeZone } from "./time-zone";
+import { isValidTimeZone, zonedDateString, zonedEndOfDay, displayTimeZone, formatZonedDateTime } from "./time-zone";
 import { MARKET_TIME_ZONES, SUPPORTED_MARKETS, marketTimeZone } from "./markets";
 
 test("zonedEndOfDay is local 23:59:59.999, on summer and winter time", () => {
@@ -43,4 +43,13 @@ test("a share view at 07:51 UTC reads 09:51 in Oslo (CEST)", () => {
     timeZone: displayTimeZone({ marketCode: "NO", locale: "no" }),
   });
   assert.equal(fmt.format(new Date("2026-09-30T07:51:00Z")), "09:51");
+});
+
+test("formatZonedDateTime prints wall-clock time in the given zone, not the server's UTC", () => {
+  const cancelledAt = new Date("2026-09-30T09:42:00Z");
+  const oslo = formatZonedDateTime(cancelledAt, "no", "Europe/Oslo");
+  assert.match(oslo, /30\. sep\. 2026/);
+  assert.match(oslo, /11:42/);
+  assert.doesNotMatch(oslo, /09:42|2026-09-30/);
+  assert.match(formatZonedDateTime(cancelledAt, "en", "Europe/London"), /10:42/);
 });

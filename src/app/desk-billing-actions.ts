@@ -10,6 +10,7 @@ import { normaliseReason, type CancelActor } from "@/lib/cancellation";
 import { issueFullCreditNote, issueInvoiceForOrder } from "@/lib/billing";
 import { syncCreditNoteToAccounting, syncInvoiceToAccounting } from "@/lib/accounting-sync";
 import { orderNoticeContext } from "@/lib/notice-context";
+import { invoicePdfAvailable } from "@/lib/seller";
 
 // Desk billing: issue the invoice for a completed order, credit it in full,
 // and retry an accounting push that failed. The DB rules live in
@@ -51,6 +52,7 @@ export async function issueInvoice(formData: FormData) {
           total: result.total,
           currency: result.currency,
           dueAt: result.dueAt.toISOString(),
+          pdfAvailable: invoicePdfAvailable(result.currency),
         },
       },
     });

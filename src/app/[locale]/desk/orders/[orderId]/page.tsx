@@ -2,6 +2,7 @@ import { getTranslations } from "next-intl/server";
 import { notFound } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import { lineOrder } from "@/lib/commerce/line-order";
+import { marketTimeZone } from "@/lib/markets";
 import { Link } from "@/i18n/navigation";
 import { clicksByOrderLine } from "@/lib/metrics/store";
 import { OrderHeader } from "./order-header";
@@ -46,7 +47,8 @@ export default async function DeskOrderPage({
     where: { id: orderId },
     include: {
       organization: true,
-      quote: true,
+      // The buyer's request brief: the per-line brief falls back to it.
+      quote: { include: { request: { select: { briefSummary: true } } } },
       invoices: true,
       creditNotes: true,
       lines: {
@@ -200,7 +202,12 @@ export default async function DeskOrderPage({
 
       <AccountingStatus locale={locale} orderId={order.id} invoice={invoice} creditNotes={order.creditNotes} />
 
-      <CancelledSummary locale={locale} order={order} invoice={invoice} />
+      <CancelledSummary
+        locale={locale}
+        order={order}
+        invoice={invoice}
+        timeZone={marketTimeZone(order.organization.marketCode)}
+      />
 
       <ProgrammePanel locale={locale} orderId={order.id} />
 
@@ -219,6 +226,7 @@ export default async function DeskOrderPage({
         order={order}
         byId={byId}
         matchablePlaybooks={matchablePlaybooks}
+        requestBrief={order.quote.request.briefSummary}
       />
 
       <CampaignSection

@@ -58,6 +58,23 @@ export function isTerminalAssetStatus(status: ContentAssetStatus): boolean {
 
 type Db = PrismaClient | Prisma.TransactionClient;
 
+// The round a version handed over for review now opens: one past the
+// article's highest round so far. Rounds count hand-overs to the client,
+// not saves — `version` goes up on every save, so numbering the buyer's
+// first review "Version 5" exposed the writer's drafts. A version sent back
+// and resubmitted as-is opens a new round too: the buyer reviews it again.
+//
+// Call inside the transaction that writes the round: the article row is
+// locked first, so two concurrent hand-overs can't both read the same max.
+export async function nextReviewRound(tx: Prisma.TransactionClient, articleId: string): Promise<number> {
+  await tx.$queryRaw`SELECT 1 FROM "Article" WHERE "id" = ${articleId} FOR UPDATE`;
+  const { _max } = await tx.contentAsset.aggregate({
+    where: { articleId },
+    _max: { reviewRound: true },
+  });
+  return (_max.reviewRound ?? 0) + 1;
+}
+
 // Marks every OPEN version older than `version` as SUPERSEDED. Approved and
 // final versions are left alone: they record what was signed off, and a
 // FINAL one may be locked by a placement. Returns how many rows changed.

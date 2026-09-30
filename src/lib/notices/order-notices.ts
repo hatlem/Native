@@ -132,15 +132,22 @@ export const ORDER_TEMPLATES = {
       total: z.number(),
       currency: z.string(),
       dueAt: isoDateTime,
+      // Whether the invoice PDF could be rendered when the notice went out
+      // (lib/seller invoicePdfAvailable). The PDF refuses to render until the
+      // seller's legal details are configured, so the body only promises a
+      // download when there is one. Absent on notices stored before the flag
+      // existed; those get the wording that never over-promises.
+      pdfAvailable: z.boolean().optional(),
     }),
     render: (p, locale) => {
       const t = noticeT(locale);
+      const values = {
+        amount: noticeMoney(p.total, p.currency, locale),
+        due: noticeDate(p.dueAt, locale),
+      };
       return {
         title: t("invoiceIssued.title", { plan: p.planName }),
-        body: t("invoiceIssued.body", {
-          amount: noticeMoney(p.total, p.currency, locale),
-          due: noticeDate(p.dueAt, locale),
-        }),
+        body: p.pdfAvailable ? t("invoiceIssued.body", values) : t("invoiceIssued.bodyNoPdf", values),
         link: `/${locale}/invoices/${p.invoiceId}`,
       };
     },

@@ -5368,6 +5368,14 @@ select:disabled {
 body:has(.compare-bar) {
   padding-bottom: 96px;
 }
+/* The plan bar (.shortlist-bar, sticky, full width) shares the bottom edge.
+   With both on screen the pill used to sit on top of it and cover the plan
+   total ("⁄2 725 kr"); it now floats just above the bar. The bar's height
+   varies (it wraps on narrow screens), so ShortlistBar measures it into
+   --shortlist-bar-h. */
+body:has(.shortlist-bar) .compare-bar {
+  bottom: var(--shortlist-bar-h, 0px);
+}
 .compare-bar__inner {
   pointer-events: auto;
   display: flex;
@@ -7196,8 +7204,12 @@ footer a:hover {
     border-right: 0;
     padding: 20px 20px 40px;
   }
+  /* Full width minus the 16px gutters: stretched by the column flex parent,
+     not `.btn.block`'s width:100% — that adds the side margins on top of the
+     viewport width and pushed the right edge 16px off-screen at 375. */
   .catalog-rail-sheet__apply {
     flex: none;
+    align-self: stretch;
     margin: 12px 16px calc(12px + env(safe-area-inset-bottom));
     min-height: 48px;
   }

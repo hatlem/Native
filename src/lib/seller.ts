@@ -14,6 +14,8 @@
 // set, invoice PDFs refuse to render (sellerGaps) and the desk is told which
 // variables are missing.
 
+import { localizedCountry } from "@/lib/country-label";
+
 export type SellerDetails = {
   legalName: string;
   orgNumber: string | null;
@@ -154,12 +156,21 @@ export function sellerGaps(seller: SellerDetails, currency: string): SellerGap[]
   return gaps;
 }
 
-// The seller's address block, in print order.
-export function sellerAddressLines(seller: SellerDetails): string[] {
+// Whether an invoice in `currency` can be downloaded as a PDF right now — the
+// one rule the invoice pages, the PDF route and the "invoice issued" notice
+// share, so no surface promises a PDF the route would refuse.
+export function invoicePdfAvailable(currency: string, seller: SellerDetails = loadSellerDetails()): boolean {
+  return sellerGaps(seller, currency).length === 0;
+}
+
+// The seller's address block, in print order. The country is stored once in
+// the environment (in English by default) but printed in the document's
+// language: "Norge" on a Norwegian invoice, "Norwegen" on a German one.
+export function sellerAddressLines(seller: SellerDetails, locale: string): string[] {
   return [
     seller.addressLine1,
     seller.addressLine2,
     [seller.postalCode, seller.city].filter(Boolean).join(" "),
-    seller.country,
+    seller.country ? localizedCountry(seller.country, locale) : null,
   ].filter((l): l is string => Boolean(l && l.trim()));
 }

@@ -9,6 +9,10 @@ import {
   updateMembership,
   revokeInvite,
 } from "@/app/org-invite-actions";
+import { intlLocale } from "@/lib/money";
+import { displayTimeZone, zonedDateString } from "@/lib/time-zone";
+import type { MembershipRole } from "@/lib/membership";
+import { RoleCommitFields } from "./role-commit-fields";
 
 type Props = {
   locale: string;
@@ -19,7 +23,7 @@ type Props = {
 export async function TeamSection({ locale, orgId, isAdmin }: Props) {
   const t = await getTranslations({ locale, namespace: "account" });
 
-  const [members, pendingInvites] = await Promise.all([
+  const [members, pendingInvites, org] = await Promise.all([
     prisma.membership.findMany({
       where: { organizationId: orgId },
       select: {
@@ -47,9 +51,26 @@ export async function TeamSection({ locale, orgId, isAdmin }: Props) {
           orderBy: { createdAt: "desc" },
         })
       : Promise.resolve([]),
+    prisma.organization.findUnique({ where: { id: orgId }, select: { marketCode: true } }),
   ]);
 
   const now = new Date();
+  const roleCommitLabels = {
+    roleAdmin: t("roleAdmin"),
+    roleMember: t("roleMember"),
+    roleRestricted: t("roleRestricted"),
+    canCommit: t("canCommitLabel"),
+    adminNote: t("canCommitAdminNote"),
+    restrictedNote: t("canCommitRestrictedNote"),
+  };
+  // Dates in the reader's language ("14. okt. 2026", not "2026-10-14"). A
+  // delegation end is a picked calendar day stored at UTC midnight, so it is
+  // read in UTC; an invite's expiry is an instant, read on the org's clock.
+  const dateFmt = (timeZone: string) =>
+    new Intl.DateTimeFormat(intlLocale(locale), { dateStyle: "medium", timeZone });
+  const calendarDate = dateFmt("UTC");
+  const orgZone = displayTimeZone({ marketCode: org?.marketCode, locale });
+  const orgDate = dateFmt(orgZone);
 
   return (
     <section className="section" id="team">
@@ -92,7 +113,7 @@ export async function TeamSection({ locale, orgId, isAdmin }: Props) {
                 now,
               );
               const expires = m.expiresAt
-                ? m.expiresAt.toISOString().slice(0, 10)
+                ? calendarDate.format(m.expiresAt)
                 : null;
               // A deactivated account keeps its seat (so reactivation is a
               // single click, not a re-invite) but cannot sign in — the seat
@@ -162,35 +183,21 @@ export async function TeamSection({ locale, orgId, isAdmin }: Props) {
                             name="userId"
                             value={m.userId}
                           />
-                          <select name="role" defaultValue={m.role}>
-                            <option value="ADMIN">{t("roleAdmin")}</option>
-                            <option value="MEMBER">{t("roleMember")}</option>
-                            <option value="RESTRICTED">
-                              {t("roleRestricted")}
-                            </option>
-                          </select>
-                          <label
-                            className="checkbox-label"
-                            title={t("canCommitLabel")}
-                          >
-                            {/* Admins always have commit authority and a
-                                view-only (RESTRICTED) seat never has it
-                                (lib/membership commitGrantFor) — both shown
-                                locked rather than as a choice the server
-                                would override. */}
-                            <input
-                              type="checkbox"
-                              name="canCommit"
-                              defaultChecked={
-                                m.role !== "RESTRICTED" && (m.canCommit || m.role === "ADMIN")
-                              }
-                              disabled={m.role === "ADMIN" || m.role === "RESTRICTED"}
-                            />
-                            {t("colCommit")}
-                          </label>
-                          {m.role === "RESTRICTED" ? (
-                            <span className="hint">{t("canCommitRestrictedNote")}</span>
-                          ) : null}
+                          {/* Admins always have commit authority and a
+                              view-only (RESTRICTED) seat never has it — the
+                              box locks live as the role changes. */}
+                          <RoleCommitFields
+                            variant="inline"
+                            defaultRole={m.role as MembershipRole}
+                            defaultCanCommit={m.canCommit}
+                            labels={{
+                              ...roleCommitLabels,
+                              canCommit: t("colCommit"),
+                              // The row stays compact: only the view-only
+                              // rule needs saying beside a locked box.
+                              adminNote: "",
+                            }}
+                          />
                           <SubmitButton
                             label={t("saveMember")}
                             pendingLabel={t("saving")}
@@ -238,30 +245,21 @@ export async function TeamSection({ locale, orgId, isAdmin }: Props) {
                 placeholder={t("emailPlaceholder")}
               />
             </div>
-            <div className="field">
-              <label htmlFor="team-role">{t("colRole")}</label>
-              <select id="team-role" name="role" defaultValue="MEMBER">
-                <option value="ADMIN">{t("roleAdmin")}</option>
-                <option value="MEMBER">{t("roleMember")}</option>
-                <option value="RESTRICTED">{t("roleRestricted")}</option>
-              </select>
-            </div>
-            <div className="field">
-              <label className="checkbox-label">
-                <input type="checkbox" name="canCommit" />
-                {t("canCommitLabel")}
-              </label>
-              <span className="hint">
-                {t("canCommitAdminNote")} {t("canCommitRestrictedNote")}
-              </span>
-            </div>
+            <RoleCommitFields
+              variant="stacked"
+              defaultRole="MEMBER"
+              defaultCanCommit={false}
+              roleSelectId="team-role"
+              roleLabel={t("colRole")}
+              labels={roleCommitLabels}
+            />
             <div className="field">
               <label htmlFor="team-delegation">{t("delegationEndsLabel")}</label>
               <input
                 id="team-delegation"
                 name="delegationExpiresAt"
                 type="date"
-                min={now.toISOString().slice(0, 10)}
+                min={zonedDateString(now, orgZone)}
               />
             </div>
             <div className="actions">
@@ -298,7 +296,7 @@ export async function TeamSection({ locale, orgId, isAdmin }: Props) {
                           ? t("roleMember")
                           : t("roleRestricted");
                     const expires = inv.expiresAt
-                      ? inv.expiresAt.toISOString().slice(0, 10)
+                      ? orgDate.format(inv.expiresAt)
                       : null;
                     return (
                       <tr key={inv.id}>

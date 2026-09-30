@@ -162,7 +162,7 @@ export function CatalogMobileBar({
             initial={initial}
           />
         </div>
-        <button type="button" className="catalog-rail-sheet__apply btn block" onClick={apply}>
+        <button type="button" className="catalog-rail-sheet__apply btn" onClick={apply}>
           {tf("apply")} {draftCount > 0 ? `(${draftCount})` : ""}
         </button>
       </div>

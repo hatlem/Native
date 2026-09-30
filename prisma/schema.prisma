@@ -1474,6 +1474,12 @@ model ContentAsset {
   article     Article            @relation(fields: [articleId], references: [id])
   version     Int                @default(1)
   status      ContentAssetStatus @default(DRAFT)
+  // The review round this version was last handed to the client in: 1 for
+  // the first draft sent for review, 2 for the next, … `version` counts every
+  // save (a writer may save five times before submitting); the buyer, and
+  // every notice about a submitted draft, count review rounds. Null for a
+  // version never sent for review. Set by setAssetStatus (IN_REVIEW).
+  reviewRound Int?
   body        String?
   authorWriterId String?
   authorWriter   WriterProfile? @relation("AssetAuthor", fields: [authorWriterId], references: [id])

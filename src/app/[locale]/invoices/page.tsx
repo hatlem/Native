@@ -5,7 +5,7 @@ import { Link } from "@/i18n/navigation";
 import { formatMoney, intlLocale } from "@/lib/money";
 import { loadScope } from "@/lib/scope";
 import { invoiceNumber } from "@/lib/pdf/invoice-pdf-data";
-import { loadSellerDetails, sellerGaps } from "@/lib/seller";
+import { invoicePdfAvailable, loadSellerDetails } from "@/lib/seller";
 import { EmptyState } from "@/app/empty-state";
 import { StatusBadge } from "@/app/status-badge";
 
@@ -42,6 +42,8 @@ export default async function InvoicesPage({
   // Agencies bill several clients; name the customer only when it varies.
   const showCustomer = orgIds.length > 1;
   const seller = loadSellerDetails();
+  // Mention the PDF download only when at least one listed invoice has one.
+  const anyPdf = invoices.some((inv) => invoicePdfAvailable(inv.currency, seller));
   const date = (d: Date | null) =>
     d ? new Intl.DateTimeFormat(intlLocale(locale), { dateStyle: "medium" }).format(d) : "—";
 
@@ -49,7 +51,7 @@ export default async function InvoicesPage({
     <>
       <header className="page-header">
         <h1>{t("listTitle")}</h1>
-        <p className="lead">{t("listLead")}</p>
+        <p className="lead">{anyPdf ? t("listLead") : t("listLeadNoPdf")}</p>
       </header>
 
       {invoices.length === 0 ? (
@@ -87,7 +89,7 @@ export default async function InvoicesPage({
                   </td>
                   <td className="num">{formatMoney(Number(inv.total), inv.currency, locale)}</td>
                   <td>
-                    {sellerGaps(seller, inv.currency).length === 0 ? (
+                    {invoicePdfAvailable(inv.currency, seller) ? (
                       // Plain <a>: a route-handler download.
                       <a
                         className="small-link"

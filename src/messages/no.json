@@ -307,6 +307,7 @@
       "untitledPlan": "planen",
       "barLabel": "Utvalg",
       "summaryCount": "{count, plural, =1 {1 tittel på} other {# titler på}}",
+      "summaryCountFormats": "{titles, plural, =1 {1 tittel} other {# titler}} · {formats, plural, =1 {1 format} other {# formater}} på",
       "totalLabel": "Veiledende totalsum",
       "totalPending": "Prises av desken",
       "reviewPlan": "Se planen",
@@ -1376,6 +1377,7 @@
     "audience": "Målgruppe",
     "noAssets": "Ingen innhold ennå.",
     "version": "Versjon",
+    "reviewRound": "sendt til kunden som versjon {round}",
     "status": "Status",
     "specPass": "Spesifikasjon godkjent",
     "specFail": "Spesifikasjonsavvik",
@@ -1428,6 +1430,7 @@
     "pageOf": "Side {page} av {pages}",
     "listTitle": "Fakturaer",
     "listLead": "Alle fakturaer for organisasjonen din. Åpne en for å se linjene, eller last ned PDF-en.",
+    "listLeadNoPdf": "Alle fakturaer for organisasjonen din. Åpne en for å se linjene og hvordan du betaler.",
     "emptyTitle": "Ingen fakturaer ennå",
     "emptyHint": "Fakturaer dukker opp her når en kampanje har kjørt og er fakturert.",
     "emptyCta": "Se kampanjene dine",
@@ -1447,6 +1450,7 @@
   },
   "firm": {
     "badge": "Øyeblikkelig bestilling",
+    "badgeSomeFormats": "Øyeblikkelig bestilling for enkelte formater",
     "planTitle": "Bekreft bestillingen",
     "planNote": "Alle elementer har fast pris — innsending bekrefter bestillingen umiddelbart, uten venting på kjøpsteamet.",
     "planSubmit": "Bekreft bestilling",
@@ -1500,6 +1504,7 @@
     "save": "Lagre",
     "saving": "Lagrer…",
     "firm": "Fast (øyeblikkelig bestilling)",
+    "firmNotInstant": "Fast (via forespørsel til prisen er bekreftet og offentlig)",
     "indicative": "Veiledende (forespørsel)",
     "status": "Bestillingsstatus",
     "booking": "Bookingstatus",
@@ -2919,7 +2924,7 @@
     "languageEyebrow": "Innstillinger",
     "languageTitle": "Språk",
     "languageLabel": "Visningsspråk",
-    "languageHint": "Endrer språket i hele NativeSpin. Lagres i denne nettleseren.",
+    "languageHint": "Endrer språket i hele NativeSpin, også i e-postene og varslene vi sender deg.",
     "companyEyebrow": "Firma",
     "companyTitle": "Firmainfo",
     "orgLabel": "Firmanavn",
@@ -3764,7 +3769,8 @@
     },
     "invoiceIssued": {
       "title": "Faktura utstedt: {plan}",
-      "body": "Totalt {amount} inkl. mva., forfall {due}. Åpne fakturaen for å laste ned PDF-en."
+      "body": "Totalt {amount} inkl. mva., forfall {due}. Åpne fakturaen for å laste ned PDF-en.",
+      "bodyNoPdf": "Totalt {amount} inkl. mva., forfall {due}. Åpne fakturaen for å se linjene og hvordan du betaler."
     },
     "creditNoteIssued": {
       "title": "Kreditnota utstedt: {plan}",

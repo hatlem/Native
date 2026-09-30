@@ -447,6 +447,7 @@
       "untitledPlan": "deinen Plan",
       "barLabel": "Auswahl",
       "summaryCount": "{count, plural, =1 {1 Titel in} other {# Titel in}}",
+      "summaryCountFormats": "{titles, plural, =1 {1 Titel} other {# Titel}} · {formats, plural, =1 {1 Format} other {# Formate}} in",
       "totalLabel": "Richtpreis gesamt",
       "totalPending": "Wird von uns bepreist",
       "reviewPlan": "Plan ansehen",
@@ -1516,6 +1517,7 @@
     "audience": "Zielgruppe",
     "noAssets": "Noch kein Inhalt.",
     "version": "Version",
+    "reviewRound": "an den Kunden gesendet als Version {round}",
     "status": "Status",
     "specPass": "Spec bestanden",
     "specFail": "Spec-Probleme",
@@ -1568,6 +1570,7 @@
     "pageOf": "Seite {page} von {pages}",
     "listTitle": "Rechnungen",
     "listLead": "Alle Rechnungen Ihrer Organisation. Öffnen Sie eine, um die Positionen zu sehen, oder laden Sie das PDF herunter.",
+    "listLeadNoPdf": "Alle Rechnungen Ihrer Organisation. Öffnen Sie eine, um die Positionen und die Zahlungsangaben zu sehen.",
     "emptyTitle": "Noch keine Rechnungen",
     "emptyHint": "Rechnungen erscheinen hier, sobald eine Kampagne gelaufen ist und abgerechnet wurde.",
     "emptyCta": "Zu Ihren Kampagnen",
@@ -1587,6 +1590,7 @@
   },
   "firm": {
     "badge": "Sofortbestellung",
+    "badgeSomeFormats": "Sofortbestellung für einige Formate",
     "planTitle": "Bestellung bestätigen",
     "planNote": "Alle Positionen sind festpreisig — mit dem Absenden wird Ihre Bestellung sofort bestätigt, keine Wartezeit beim Einkaufs-Desk.",
     "planSubmit": "Bestellung bestätigen",
@@ -1640,6 +1644,7 @@
     "save": "Speichern",
     "saving": "Wird gespeichert…",
     "firm": "Festpreis (Sofortbestellung)",
+    "firmNotInstant": "Festpreis (per Anfrage, bis der Preis bestätigt und öffentlich ist)",
     "indicative": "Richtpreis (RFQ)",
     "status": "Bestellstatus",
     "booking": "Buchungsstatus",
@@ -2715,7 +2720,7 @@
     "languageEyebrow": "Einstellungen",
     "languageTitle": "Sprache",
     "languageLabel": "Anzeigesprache",
-    "languageHint": "Ändert die Sprache in ganz NativeSpin. Wird in diesem Browser gespeichert.",
+    "languageHint": "Ändert die Sprache in ganz NativeSpin – auch in den E-Mails und Benachrichtigungen, die wir Ihnen senden.",
     "companyEyebrow": "Unternehmen",
     "companyTitle": "Firmendaten",
     "orgLabel": "Firmenname",
@@ -3633,7 +3638,8 @@
     },
     "invoiceIssued": {
       "title": "Rechnung gestellt: {plan}",
-      "body": "Gesamt {amount} inkl. MwSt., fällig am {due}. Öffnen Sie die Rechnung, um das PDF herunterzuladen."
+      "body": "Gesamt {amount} inkl. MwSt., fällig am {due}. Öffnen Sie die Rechnung, um das PDF herunterzuladen.",
+      "bodyNoPdf": "Gesamt {amount} inkl. MwSt., fällig am {due}. Öffnen Sie die Rechnung, um die Positionen und die Zahlungsangaben zu sehen."
     },
     "creditNoteIssued": {
       "title": "Gutschrift erstellt: {plan}",

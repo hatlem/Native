@@ -114,7 +114,7 @@ export function InvoiceDocument({
               Norwegian sales document must state them. */}
           <View style={styles.seller}>
             <Text style={styles.sellerName}>{seller.legalName}</Text>
-            {sellerAddressLines(seller).map((line, i) => (
+            {sellerAddressLines(seller, locale).map((line, i) => (
               <Text key={i}>{line}</Text>
             ))}
             <Text>{registrationLine(seller, messages)}</Text>

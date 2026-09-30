@@ -394,6 +394,7 @@
       "untitledPlan": "your plan",
       "barLabel": "Shortlist",
       "summaryCount": "{count, plural, =1 {1 title on} other {# titles on}}",
+      "summaryCountFormats": "{titles, plural, =1 {1 title} other {# titles}} · {formats, plural, =1 {1 format} other {# formats}} on",
       "totalLabel": "Indicative total",
       "totalPending": "Priced by the desk",
       "reviewPlan": "Review plan",
@@ -1516,6 +1517,7 @@
     "audience": "Audience",
     "noAssets": "No content yet.",
     "version": "Version",
+    "reviewRound": "sent to the client as version {round}",
     "status": "Status",
     "specPass": "Spec passed",
     "specFail": "Spec issues",
@@ -1568,6 +1570,7 @@
     "pageOf": "Page {page} of {pages}",
     "listTitle": "Invoices",
     "listLead": "Every invoice for your organization. Open one to see the lines, or download the PDF.",
+    "listLeadNoPdf": "Every invoice for your organization. Open one to see the lines and how to pay.",
     "emptyTitle": "No invoices yet",
     "emptyHint": "Invoices appear here once a campaign has run and been billed.",
     "emptyCta": "See your campaigns",
@@ -1587,6 +1590,7 @@
   },
   "firm": {
     "badge": "Instant order",
+    "badgeSomeFormats": "Instant order on some formats",
     "planTitle": "Confirm your order",
     "planNote": "All items are firm-priced — submitting confirms your order instantly, no buying-desk wait.",
     "planSubmit": "Confirm order",
@@ -1640,6 +1644,7 @@
     "save": "Save",
     "saving": "Saving…",
     "firm": "Firm (instant order)",
+    "firmNotInstant": "Firm (via request until the price is confirmed and public)",
     "indicative": "Indicative (RFQ)",
     "status": "Order status",
     "booking": "Booking status",
@@ -2935,7 +2940,7 @@
     "languageEyebrow": "Preferences",
     "languageTitle": "Language",
     "languageLabel": "Display language",
-    "languageHint": "Changes the language across NativeSpin. Saved to this browser.",
+    "languageHint": "Changes the language across NativeSpin, including the emails and notices we send you.",
     "companyEyebrow": "Company",
     "companyTitle": "Company info",
     "orgLabel": "Company name",
@@ -3764,7 +3769,8 @@
     },
     "invoiceIssued": {
       "title": "Invoice issued: {plan}",
-      "body": "Total {amount} incl. VAT, due {due}. Open the invoice to download the PDF."
+      "body": "Total {amount} incl. VAT, due {due}. Open the invoice to download the PDF.",
+      "bodyNoPdf": "Total {amount} incl. VAT, due {due}. Open the invoice to see the lines and how to pay."
     },
     "creditNoteIssued": {
       "title": "Credit note issued: {plan}",

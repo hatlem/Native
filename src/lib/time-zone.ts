@@ -4,6 +4,7 @@
 // at 23:59 UTC, which is already 01:59 on the 22nd there.
 
 import { isSupportedMarket, marketTimeZone } from "@/lib/markets";
+import { intlLocale } from "@/lib/money";
 
 const partsFormatters = new Map<string, Intl.DateTimeFormat>();
 
@@ -87,6 +88,19 @@ const LOCALE_TIME_ZONES: Record<string, string> = {
   de: "Europe/Berlin",
   en: "Europe/London",
 };
+
+/**
+ * "30. sep. 2026, 11:42" — an instant as a date and wall-clock time in
+ * `timeZone`, in the UI language. Pass the zone explicitly: the server clock
+ * is UTC, so a formatter without one prints 09:42 for 11:42 in Oslo.
+ */
+export function formatZonedDateTime(instant: Date, locale: string, timeZone: string): string {
+  return new Intl.DateTimeFormat(intlLocale(locale), {
+    dateStyle: "medium",
+    timeStyle: "short",
+    timeZone,
+  }).format(instant);
+}
 
 /** The IANA zone to show wall-clock times in for this viewer. */
 export function displayTimeZone(input: { marketCode?: string | null; locale: string }): string {
