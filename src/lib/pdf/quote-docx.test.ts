@@ -7,6 +7,10 @@ import { zipEntry } from "./zip-entry";
 
 const onlineUrl = "https://www.nativespin.com/sv/requests/req_123";
 const row = {
+  kind: "PLACEMENT" as const,
+  articleFee: null,
+  hours: null,
+  hourlyRate: null,
   marketCode: "SE",
   format: "NATIVE_ARTICLE",
   quantity: 1,
@@ -45,7 +49,39 @@ const data: QuotePdfData = {
     // The stored estimate must never leak for an on-request line.
     { ...row, titleName: "Intelligent Logistik", unitPrice: null, rowTotal: null, priceOnRequest: true },
   ],
+  articleScopes: [],
 };
+
+test("renderQuoteDocx: extra-work row, folded article fee and the article scope", async () => {
+  const withScope: QuotePdfData = {
+    ...data,
+    rows: [
+      { ...row, titleName: "Svensk Åkeritidning", unitPrice: 19250, rowTotal: 19250, priceOnRequest: false, articleFee: 2000 },
+      {
+        ...row,
+        kind: "EXTRA_WORK",
+        titleName: "Tredje revideringsomgången",
+        marketCode: "",
+        format: "",
+        digitalReach: null,
+        unitPrice: 3200,
+        rowTotal: 3200,
+        priceOnRequest: false,
+        hours: 2,
+        hourlyRate: 1600,
+      },
+    ],
+    articleScopes: [{ titles: ["Svensk Åkeritidning"], lines: ["En genomsnittlig native-artikel (cirka 600–900 ord)"] }],
+  };
+  const body = zipEntry(await renderQuoteDocx(withScope, "sv", quoteMessagesFor("sv")), "word/document.xml");
+  assert.match(body, /Inkl\. artikel skriven av NativeSpin · från/);
+  assert.match(body, /Extraarbete \/ revision/);
+  assert.match(body, /Tredje revideringsomgången · 2 h × /);
+  assert.match(body, /Det här ingår i en artikel skriven av NativeSpin/);
+  assert.match(body, /En genomsnittlig native-artikel \(cirka 600–900 ord\)/);
+  // A single scope names no titles (it applies to every fee row).
+  assert.equal(body.match(/Svensk Åkeritidning/g)?.length, 1);
+});
 
 test("renderQuoteDocx: valid docx with localized copy, rows and the POR footnote", async () => {
   const docx = await renderQuoteDocx(data, "sv", quoteMessagesFor("sv"));

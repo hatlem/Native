@@ -588,7 +588,7 @@
     "whoWritesIt": "Hvem skriver artiklen",
     "needsPriceNote": "Denne udgiver har ikke offentliggjort listepris. At sende planen beder vores desk om at prissætte den — resten af din plan påvirkes ikke.",
     "breakdownUnpriced": "Bekræftes inden for 24 timer",
-    "breakdownWithArticle": "{placement} placering + {article} pr. artikel",
+    "breakdownWithArticle": "{placement} placering · Artikel skrevet af NativeSpin · fra {article}",
     "breakdownQtyWithArticle": "{n} × {unit}, artikel inkluderet",
     "breakdownArticleIncluded": "Artikel inkluderet",
     "breakdownQty": "{n} × {unit}",
@@ -746,7 +746,7 @@
       "item3Title": "Vi skriver, placerer og rapporterer",
       "item3Body": "Udkast sendes til dig til godkendelse. Links og resultater lander i Rapporter."
     },
-    "breakdownQtyWithArticleFee": "{n} × {unit} placering + {article} pr. artikel (én artikel til alle {n})",
+    "breakdownQtyWithArticleFee": "{n} × {unit} placering · Artikel skrevet af NativeSpin · fra {article} (én artikel til alle {n})",
     "inclVatFirmPart": "{amount} inkl. moms for de linjer, du kan bestille med det samme",
     "estimateNote": "≈ er et prisinterval. Den nøjagtige pris får du i tilbuddet.",
     "breakdownPlacements": "{n} placeringer",
@@ -1459,7 +1459,9 @@
     "pdfUnavailableDesk": "PDF'en kan ikke dannes, før NativeSpins selskabsoplysninger er sat i servermiljøet. Sæt disse variabler, og deploy igen:",
     "sellerVarMissing": "ikke sat",
     "sellerVarInvalid": "sat, men kontrolcifferet passer ikke",
-    "pdfPending": "Vis"
+    "pdfPending": "Vis",
+    "extraWork": "Ekstraarbejde",
+    "extraWorkDetail": "{hours} t × {rate}/t"
   },
   "firm": {
     "badge": "Øjeblikkelig bestilling",
@@ -2577,14 +2579,14 @@
       "NATIVE_ARTICLE": [
         "Forhandlet placering på {titleName}, skrevet i titlens redaktionelle stemme",
         "Artikel{length} skrevet af en brancheekspert",
-        "To revisionsrunder og din godkendelse før udgivelse",
+        "Din godkendelse før udgivelse",
         "Distribution i {titleName}s native-feed og nyhedsbrev",
         "Kliksporing på hvert link, vi indsætter, rapporteret ved aftalte tidspunkter"
       ],
       "ADVERTORIAL": [
         "Forhandlet placering på {titleName}, tydeligt mærket som betalt indhold",
         "Brandledet artikel{length} skrevet efter udgiverens redaktionelle standard",
-        "Én revisionsrunde og din godkendelse før udgivelse",
+        "Din godkendelse før udgivelse",
         "Distribution i {titleName}s indholds-feed",
         "Kliksporing på hvert link, vi indsætter, rapporteret ved aftalte tidspunkter"
       ],
@@ -3441,7 +3443,11 @@
     "preparedFor": "Tilbud til",
     "viewOnline": "Se tilbuddet online, godkend det, og følg kampagnen i NativeSpin:",
     "footerLink": "Åbn i NativeSpin",
-    "noteLabel": "Bemærkning"
+    "noteLabel": "Bemærkning",
+    "articleScopeHeading": "Det indeholder en artikel skrevet af NativeSpin",
+    "extraWork": "Ekstraarbejde / revision",
+    "inclArticle": "Inkl. artikel skrevet af NativeSpin · fra {amount}",
+    "extraWorkDetail": "{hours} t × {rate}/t"
   },
   "deskUsers": {
     "eyebrow": "Administration",
@@ -3974,5 +3980,52 @@
     "pricesNothingBooked": "Intet bliver booket, før et tilbud er godkendt.",
     "footerLink": "Åbn planen",
     "pageOf": "Side {page} af {pages}"
+  },
+  "articleScope": {
+    "feeLabel": "Artikel skrevet af NativeSpin · fra {amount}",
+    "heading": "Det indeholder artiklen",
+    "average": "En gennemsnitlig native-artikel ({words})",
+    "wordsTypical": "ca. {min, number}–{max, number} ord",
+    "wordsRange": "{min, number}–{max, number} ord",
+    "wordsMin": "mindst {min, number} ord",
+    "wordsMax": "op til {max, number} ord",
+    "rounds": "{rounds, plural, one {Brief og én revisionsrunde før godkendelse} other {Brief og # revisionsrunder før godkendelse}}",
+    "marking": "Mærket »{label}« efter mediets regler for annoncørindhold",
+    "markingGeneric": "Mærket efter mediets regler for annoncørindhold",
+    "hourly": "Interviews, billeder, ekstra revisionsrunder og andet ekstraarbejde faktureres pr. time: {rate}/time",
+    "hourlyNoRate": "Interviews, billeder, ekstra revisionsrunder og andet ekstraarbejde faktureres pr. time",
+    "extraWorkTitle": "Ekstraarbejde / revision",
+    "extraWorkDetail": "{hours, number} t × {rate}/t"
+  },
+  "extraWork": {
+    "heading": "Ekstraarbejde / revision",
+    "quoteLead": "Fakturér timer ud over artiklens aftalte omfang på dette udkast, til {rate}/time ({currency}).",
+    "orderLead": "Timer aftalt efter at tilbuddet blev accepteret, til {rate}/time ({currency}). De kommer med på fakturaen, når den udstedes.",
+    "noRate": "Der er ikke sat nogen timepris for {currency}. En superadmin sætter den under Indholdsgebyrer, før timer kan faktureres.",
+    "hoursLabel": "Timer",
+    "hoursHint": "Kvarterer, f.eks. 1,5",
+    "descriptionLabel": "Beskrivelse",
+    "descriptionPlaceholder": "f.eks. Tredje revisionsrunde, interview med direktøren",
+    "add": "Tilføj ekstraarbejde",
+    "adding": "Tilføjer …",
+    "remove": "Fjern",
+    "removing": "Fjerner …",
+    "invoiced": "Faktureret",
+    "toBeInvoiced": "Kommer på næste faktura",
+    "orderLocked": "Fakturaen er udstedt, så der kan ikke lægges mere ekstraarbejde på denne ordre.",
+    "orderClosed": "Ordren er annulleret, så der kan ikke tilføjes ekstraarbejde.",
+    "errorInvalid": "Angiv timer i kvarterer (for eksempel 1,5) og en kort beskrivelse.",
+    "errorNoRate": "Der er endnu ingen timepris for denne valuta.",
+    "errorLocked": "Det kan ikke længere ændres: tilbuddet er sendt, eller ordren er faktureret.",
+    "buyerHeading": "Ekstraarbejde",
+    "buyerLead": "Arbejde ud over artiklens aftalte omfang, faktureret pr. time.",
+    "ratesHeading": "Timepris for ekstraarbejde",
+    "ratesLead": "Faktureres for interviews, billeder, ekstra revisionsrunder og andet arbejde ud over artiklens aftalte omfang. Køberne ser timeprisen, hvor artikelprisen forklares. En ændring giver aldrig ny pris på linjer, der allerede er faktureret.",
+    "ratesCurrency": "Valuta",
+    "ratesRate": "Pris pr. time",
+    "ratesSave": "Gem timepriser",
+    "ratesSaving": "Gemmer …",
+    "ratesReadOnly": "Kun en superadmin kan ændre timepriserne.",
+    "ratesError": "Angiv en timepris over 0 for hver valuta."
   }
 }

@@ -85,6 +85,9 @@ if (!RUN_DB_IT) {
           type: "NATIVE_ARTICLE",
           name: "PDL-IT native",
           basePrice: 29000,
+          // The offer's own article fee, so the band below doesn't move with
+          // whatever the desk's fee rules hold in the test database.
+          productionFee: 12000,
           currency: "NOK",
           visibility: "INDICATIVE",
           confirmedAt: new Date(),

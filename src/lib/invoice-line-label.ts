@@ -13,9 +13,12 @@ import { feePlacementDescription } from "@/lib/commerce/placements";
 
 export type LabelledInvoiceLine = {
   description: string;
-  kind?: "INVENTORY" | "CONTENT_FEE" | null;
+  kind?: "INVENTORY" | "CONTENT_FEE" | "EXTRA_WORK" | null;
   titleName?: string | null;
   productType?: string | null;
+  // EXTRA_WORK lines: the hours billed and the rate they were billed at.
+  hours?: unknown;
+  hourlyRate?: unknown;
 };
 
 export type LabelDeps = {
@@ -23,6 +26,10 @@ export type LabelDeps = {
   formatLabel: (productType: string) => string;
   // Localized "Content production" prefix.
   contentProduction: string;
+  // Localized "Extra work" prefix, and the "2.5 h × NOK 1,650/h" detail for
+  // an extra-work line's hours.
+  extraWork: string;
+  extraWorkDetail: (hours: number, hourlyRate: number) => string;
 };
 
 const PRODUCT_TYPES: ReadonlySet<string> = new Set(Object.values(ProductType));
@@ -43,6 +50,15 @@ function humanizeProductName(name: string, deps: LabelDeps): string {
 }
 
 export function invoiceLineLabel(line: LabelledInvoiceLine, deps: LabelDeps): string {
+  // The desk's own description of the work ("Third revision round"), then
+  // the hours it bills.
+  if (line.kind === "EXTRA_WORK") {
+    const detail =
+      line.hours != null && line.hourlyRate != null
+        ? ` (${deps.extraWorkDetail(Number(line.hours), Number(line.hourlyRate))})`
+        : "";
+    return `${deps.extraWork}: ${line.description}${detail}`;
+  }
   const feeFor = feePlacementDescription(line.description);
   const isFee = line.kind === "CONTENT_FEE" || feeFor !== null;
   const base = line.titleName

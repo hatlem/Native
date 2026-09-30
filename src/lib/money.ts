@@ -101,7 +101,7 @@ export type QuotableItem = {
 };
 
 export type QuoteLineComputation = {
-  kind: "INVENTORY" | "CONTENT_FEE";
+  kind: "INVENTORY" | "CONTENT_FEE" | "EXTRA_WORK";
   // Null for CONTENT_FEE lines — they bill our production service.
   productId: string | null;
   description: string;

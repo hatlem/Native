@@ -13,7 +13,7 @@ import { createHash } from "node:crypto";
 
 export type FingerprintLine = {
   id: string;
-  kind: "INVENTORY" | "CONTENT_FEE";
+  kind: "INVENTORY" | "CONTENT_FEE" | "EXTRA_WORK";
   productId: string | null;
   quantity: number;
   lineTotal: unknown;

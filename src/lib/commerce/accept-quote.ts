@@ -8,7 +8,7 @@
 // quote-validity gate (SENT + unexpired) and the offer gate (the quote is
 // still the one the buyer looked at) are enforced here, atomically.
 
-import type { Prisma } from "@prisma/client";
+import type { LineKind, Prisma } from "@prisma/client";
 import {
   authorshipForOrderLine,
   type AuthorshipMode,
@@ -32,7 +32,7 @@ export class QuoteNotAcceptableError extends Error {
 }
 
 export type AcceptableQuoteLine = {
-  kind: "INVENTORY" | "CONTENT_FEE";
+  kind: LineKind;
   productId: string | null;
   quantity: number;
   lineTotal: Prisma.Decimal | number;
@@ -64,7 +64,10 @@ export function authorshipByProduct(
 
 // Marks the quote ACCEPTED, creates the order (CONFIRMED) with lines copied
 // off the quote, and attaches briefs + publisher bookings to placement lines
-// only (CONTENT_FEE lines are billing-only). Returns the order id plus the
+// only (CONTENT_FEE lines are billing-only). EXTRA_WORK quote lines are not
+// copied: order lines are what gets fulfilled (placements, the articles we
+// write), while agreed hours are billing only and are invoiced, with their
+// hours and description, straight from the accepted quote (lib/billing.ts). Returns the order id plus the
 // product ids on the quote for publisher notification fan-out.
 //
 // The ACCEPTED flip runs first as a compare-and-set on "SENT and still inside
@@ -118,7 +121,7 @@ export async function createOrderFromQuote(
       flightStartDate: plan.startDate ?? null,
       flightEndDate: plan.endDate ?? null,
       lines: {
-        create: quote.lines.map((l) => ({
+        create: quote.lines.filter((l) => l.kind !== "EXTRA_WORK").map((l) => ({
           kind: l.kind,
           authorshipMode: authorshipForOrderLine(l, authorship),
           productId: l.productId,

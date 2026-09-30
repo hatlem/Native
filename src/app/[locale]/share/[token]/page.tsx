@@ -6,7 +6,8 @@ import { approvalState, loadSharedList, planVersion, recordShareView } from "@/l
 import { approveSharedPlan } from "@/app/share-actions";
 import { formatMoney, intlLocale } from "@/lib/money";
 import { titleDisplayName } from "@/lib/title-display";
-import { loadPricingDefaults } from "@/lib/content-fee";
+import { loadExtraWorkRates, loadPricingDefaults } from "@/lib/content-fee";
+import { articleFeeLabel, articleScope, articleScopeLines } from "@/lib/article-scope";
 import { estimateListTotals, hasFigure, hasUnpricedLines, lineDisplay } from "@/lib/plan-total";
 import { lineFigureLabel, totalLabel } from "@/lib/pricing/total-label";
 import { formatRunRange, runBounds } from "@/lib/run-period";
@@ -51,6 +52,7 @@ export default async function SharedListPage({
   const tPlan = await getTranslations({ locale, namespace: "plan" });
   const tType = await getTranslations({ locale, namespace: "productType" });
   const tv = await getTranslations({ locale, namespace: "priceVisibility" });
+  const tScope = await getTranslations({ locale, namespace: "articleScope" });
   const dateFmt = new Intl.DateTimeFormat(intlLocale(locale), {
     day: "numeric",
     month: "short",
@@ -59,7 +61,7 @@ export default async function SharedListPage({
   });
   const money = (amount: number, currency: string) => formatMoney(amount, currency, locale);
 
-  const pricing = await loadPricingDefaults();
+  const [pricing, extraWorkRates] = await Promise.all([loadPricingDefaults(), loadExtraWorkRates()]);
   const allTotals = estimateListTotals(list.items, pricing);
   const totals = allTotals.filter(hasFigure);
   const anyEstimate = totals.some((r) => r.estimate !== null);
@@ -78,7 +80,16 @@ export default async function SharedListPage({
       const p = i.product;
       // Exact only for an instant-orderable line; otherwise the band, the
       // rate, or "on request" — never a 0 (lib/plan-total.ts lineDisplay).
-      const figure = lineFigureLabel(lineDisplay(i, pricing), p.currency, locale, tv("priceOnRequest"));
+      const display = lineDisplay(i, pricing);
+      const figure = lineFigureLabel(display, p.currency, locale, tv("priceOnRequest"));
+      // A line we write names its article fee as "from" where the figure is
+      // exact (the included scope has a fixed price; extra work is billed on
+      // top), and lists what that scope is (lib/article-scope.ts).
+      const weWrite = inTotal && i.withContent;
+      const writeLabel =
+        weWrite && display.kind === "exact" && display.contentFee > 0
+          ? articleFeeLabel(display.contentFee, p.currency, locale, tScope)
+          : t("weWriteIt");
       return (
         <div className="share-list__line" key={i.id}>
           <div className="share-list__line-main">
@@ -86,7 +97,7 @@ export default async function SharedListPage({
             <div className="muted small">
               {tType(p.type)} · {p.title.publisher.name}
               {inTotal && i.quantity > 1 ? ` · ${t("qty", { count: i.quantity })}` : ""}
-              {inTotal && i.withContent ? ` · ${t("weWriteIt")}` : ""}
+              {weWrite ? ` · ${writeLabel}` : ""}
               {inTotal && !i.withContent && publisherCanWrite(p) ? ` · ${t("publisherWritesIt")}` : ""}
             </div>
             {inTotal && i.scheduleStart ? (
@@ -99,6 +110,16 @@ export default async function SharedListPage({
                   unit: p.bookingUnit,
                 })}
               </div>
+            ) : null}
+            {weWrite ? (
+              <details className="article-scope">
+                <summary>{tScope("heading")}</summary>
+                <ul>
+                  {articleScopeLines(articleScope(p, p.currency, extraWorkRates), tScope, locale).map((line) => (
+                    <li key={line}>{line}</li>
+                  ))}
+                </ul>
+              </details>
             ) : null}
             {i.notes ? (
               <p className="line-note__text">

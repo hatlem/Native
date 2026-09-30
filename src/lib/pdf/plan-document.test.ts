@@ -8,6 +8,7 @@ import { formatMoney } from "@/lib/money";
 import { estimateListTotals, lineDisplay, linePrice, type PlanPricing } from "@/lib/plan-total";
 import { lineBreakdown } from "@/lib/plan-line-text";
 import { lineFigureLabel, totalLabel } from "@/lib/pricing/total-label";
+import { DEFAULT_EXTRA_WORK_RATES } from "@/lib/pricing/extra-work";
 import enMessages from "@/messages/en.json";
 import noMessages from "@/messages/no.json";
 import { buildPlanDocument, planDocumentFilename, type PlanDocumentInput } from "./plan-document";
@@ -157,6 +158,7 @@ const input = (overrides: Partial<PlanDocumentInput> = {}): PlanDocumentInput =>
   link: { kind: "plan", url: "https://www.nativespin.com/en/plan/list-1" },
   generatedAt: new Date("2026-09-30T10:00:00Z"),
   timeZone: "Europe/Oslo",
+  extraWorkRates: DEFAULT_EXTRA_WORK_RATES,
   ...overrides,
 });
 
@@ -236,6 +238,56 @@ test("the total is the page's total, and the exact part's VAT only", () => {
     en.plan.inclVatFirmPart.replace("{amount}", formatMoney(total.totalInclVat, "NOK", "en")),
   ]);
   assert.deepEqual(doc.total.notes, [en.priceVisibility.plusOnRequest, en.plan.estimateNote]);
+});
+
+// The legend's article-scope entries: the heading line and the list after it.
+const scopeLegend = (lines: string[], heading: string) => {
+  const at = lines.indexOf(`${heading}:`);
+  return at < 0 ? null : lines.slice(at + 1, at + 5).map((l) => l.replace(/^• /, ""));
+};
+
+test("article scope: in the legend when NativeSpin writes a line, typical length without a spec", () => {
+  const doc = buildPlanDocument(input());
+  const lines = doc.prices.lines;
+  // Right after the legend line it explains.
+  const content = lines.findIndex((l) => l.includes(en.shareList.weWriteIt));
+  assert.equal(lines[content + 1], `${en.articleScope.heading}:`);
+  assert.deepEqual(scopeLegend(lines, en.articleScope.heading), [
+    "An average native article (about 600–900 words)",
+    "Your brief plus one revision round before approval",
+    "Labelled following the publication's rules for advertiser content",
+    `Interviews, images, extra revision rounds and other extra work are billed per hour: ${formatMoney(1650, "NOK", "en")}/hour`,
+  ]);
+
+  // No line we write (the buyer or the publisher writes every one): not a word of it.
+  const noneWritten = { ...list, items: [onRequest, publisherWrites] } as unknown as SharedList;
+  assert.equal(scopeLegend(buildPlanDocument(input({ list: noneWritten })).prices.lines, en.articleScope.heading), null);
+});
+
+test("article scope: the format's spec sets the length and the marking; stated rounds win", async () => {
+  const spec = { wordCountMin: 500, wordCountMax: 700, disclosureLabel: "Annonsørinnhold" };
+  const written = item({
+    product: {
+      ...product({ basePrice: 40000, name: "Anlegg & Transport", domain: "at.no", inclusions: { revisionRounds: 2 } }),
+      spec,
+    } as unknown as ReturnType<typeof product>,
+  });
+  const withSpec = { ...list, items: [written] } as unknown as SharedList;
+  const doc = buildPlanDocument(input({ list: withSpec, locale: "no" }));
+  assert.deepEqual(scopeLegend(doc.prices.lines, noMessages.articleScope.heading)?.slice(0, 3), [
+    "En gjennomsnittlig native-artikkel (500–700 ord)",
+    "Brief og 2 revisjonsrunder før godkjenning",
+    "Merket «Annonsørinnhold» etter publikasjonens regler for annonsørinnhold",
+  ]);
+
+  // Both renderers print it.
+  const docx = zipEntry(await renderPlanDocx(doc), "word/document.xml");
+  assert.ok(docx.includes(noMessages.articleScope.heading));
+  assert.ok(docx.includes("500–700 ord"));
+  const parser = new PDFParse({ data: new Uint8Array(await renderToBuffer(PlanDocumentPdf({ doc }))) });
+  const pdf = (await parser.getText()).text;
+  await parser.destroy();
+  assert.ok(pdf.includes(noMessages.articleScope.heading));
 });
 
 test("the brief is the team's; the client's copy is the share page, with the share link", () => {
@@ -339,6 +391,14 @@ test("the price legend explains only the labels the document carries", () => {
     alternatives: pd.pricesAlternatives,
   };
   const vat = pd.pricesVat.replace("{currencies}", "NOK");
+  // A line we write is explained with what its article includes.
+  const scope = [
+    `${en.articleScope.heading}:`,
+    "• An average native article (about 600–900 words)",
+    "• Your brief plus one revision round before approval",
+    "• Labelled following the publication's rules for advertiser content",
+    `• Interviews, images, extra revision rounds and other extra work are billed per hour: ${formatMoney(1650, "NOK", "en")}/hour`,
+  ];
   const legendOf = (planItems: Item[]) =>
     buildPlanDocument(input({ list: { ...list, items: planItems } })).prices.lines;
 
@@ -350,6 +410,7 @@ test("the price legend explains only the labels the document carries", () => {
     legend.rate,
     legend.onRequest,
     legend.nativespin,
+    ...scope,
     legend.publisher,
     legend.alternatives,
     pd.pricesNothingBooked,
@@ -360,10 +421,10 @@ test("the price legend explains only the labels the document carries", () => {
   assert.deepEqual(legendOf([publisherWrites]), [vat, legend.exact, legend.publisher, pd.pricesNothingBooked]);
 
   // A banded line we write: the band is explained, a rate is not.
-  assert.deepEqual(legendOf([band]), [vat, legend.band, legend.nativespin, pd.pricesNothingBooked]);
+  assert.deepEqual(legendOf([band]), [vat, legend.band, legend.nativespin, ...scope, pd.pricesNothingBooked]);
 
   // A rate line is explained as a rate, not as a price band.
-  assert.deepEqual(legendOf([rate]), [vat, legend.rate, legend.nativespin, pd.pricesNothingBooked]);
+  assert.deepEqual(legendOf([rate]), [vat, legend.rate, legend.nativespin, ...scope, pd.pricesNothingBooked]);
 
   // A title the desk still places: "on request", no currency (no product yet)
   // and no authorship.

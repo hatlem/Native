@@ -8,6 +8,7 @@ import { prisma } from "@/lib/prisma";
 import type { ContentFeeRuleSpec, MarginRuleSpec, QuoteLineComputation } from "@/lib/money";
 import type { AuthorshipMode } from "@/lib/authorship";
 import { contentFeeLinesFor, type FeeProduct } from "@/lib/pricing/production-fee";
+import type { ExtraWorkRateSpec } from "@/lib/pricing/extra-work";
 
 export async function loadContentFeeRules(): Promise<ContentFeeRuleSpec[]> {
   const rules = await prisma.contentFeeRule.findMany({
@@ -58,4 +59,11 @@ export function contentFeeLinesForGroup(
   rules: ContentFeeRuleSpec[],
 ): QuoteLineComputation[] {
   return contentFeeLinesFor(groupItems, byId, marketCode, rules);
+}
+
+// The hourly rate for extra work, per billing currency (ExtraWorkRate). One
+// small table, read wherever the article scope is shown or hours are billed.
+export async function loadExtraWorkRates(): Promise<ExtraWorkRateSpec[]> {
+  const rows = await prisma.extraWorkRate.findMany({ orderBy: { currency: "asc" } });
+  return rows.map((r) => ({ currency: r.currency, hourlyRate: Number(r.hourlyRate) }));
 }

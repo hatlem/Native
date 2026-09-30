@@ -11,6 +11,10 @@ import { issueFullCreditNote, issueInvoiceForOrder } from "@/lib/billing";
 import { syncCreditNoteToAccounting, syncInvoiceToAccounting } from "@/lib/accounting-sync";
 import { orderNoticeContext } from "@/lib/notice-context";
 import { invoicePdfAvailable } from "@/lib/seller";
+import { recordAudit } from "@/lib/audit";
+import { loadExtraWorkRates } from "@/lib/content-fee";
+import { addOrderExtraWork, removeOrderExtraWork } from "@/lib/commerce/order-extra-work";
+import { parseExtraWorkInput } from "@/lib/pricing/extra-work";
 
 // Desk billing: issue the invoice for a completed order, credit it in full,
 // and retry an accounting push that failed. The DB rules live in
@@ -133,4 +137,58 @@ export async function retryAccountingSync(formData: FormData) {
   }
   revalidatePath(orderPath(locale, orderId));
   redirect(orderPath(locale, orderId));
+}
+
+// Extra work agreed after the quote was accepted: hours × the order
+// currency's rate, onto the invoice when it is issued. The rules (and the
+// lock against a concurrent invoice issue) are lib/commerce/order-extra-work.ts.
+export async function addOrderExtraWorkAction(formData: FormData) {
+  const locale = field(formData, "locale") || "en";
+  const orderId = field(formData, "orderId");
+  const userId = await requireDesk(locale);
+
+  const input = parseExtraWorkInput({
+    hours: formData.get("hours"),
+    description: formData.get("description"),
+  });
+  if (!input.ok) redirect(`${orderPath(locale, orderId)}?extraWork=invalid`);
+
+  const result = await addOrderExtraWork({
+    orderId,
+    hours: input.value.hours,
+    description: input.value.description,
+    actorUserId: userId,
+    rates: await loadExtraWorkRates(),
+  });
+  if (result.outcome === "not-found") redirect(orderPath(locale, orderId));
+  if (result.outcome !== "added") {
+    redirect(`${orderPath(locale, orderId)}?extraWork=${result.outcome === "no-rate" ? "no-rate" : "locked"}`);
+  }
+  await recordAudit(userId, "order.extra_work.add", `OrderExtraWork:${result.entryId}`, {
+    orderId,
+    hours: input.value.hours,
+    hourlyRate: result.hourlyRate,
+    lineTotal: result.lineTotal,
+    currency: result.currency,
+  });
+  revalidatePath(orderPath(locale, orderId));
+  redirect(`${orderPath(locale, orderId)}`);
+}
+
+export async function removeOrderExtraWorkAction(formData: FormData) {
+  const locale = field(formData, "locale") || "en";
+  const orderId = field(formData, "orderId");
+  const entryId = field(formData, "entryId");
+  const userId = await requireDesk(locale);
+
+  const result = await removeOrderExtraWork({ orderId, entryId });
+  if (result.outcome === "locked") redirect(`${orderPath(locale, orderId)}?extraWork=locked`);
+  if (result.outcome === "removed") {
+    await recordAudit(userId, "order.extra_work.remove", `OrderExtraWork:${entryId}`, {
+      orderId,
+      lineTotal: result.lineTotal,
+    });
+    revalidatePath(orderPath(locale, orderId));
+  }
+  redirect(`${orderPath(locale, orderId)}`);
 }

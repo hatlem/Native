@@ -1,4 +1,14 @@
+import { createTranslator, type AbstractIntlMessages } from "next-intl";
 import { prisma } from "@/lib/prisma";
+import { safeLocale } from "@/i18n/routing";
+import { articleScope, articleScopeLines, type Translate } from "@/lib/article-scope";
+import { loadExtraWorkRates } from "@/lib/content-fee";
+import daMessages from "@/messages/da.json";
+import deMessages from "@/messages/de.json";
+import enMessages from "@/messages/en.json";
+import fiMessages from "@/messages/fi.json";
+import noMessages from "@/messages/no.json";
+import svMessages from "@/messages/sv.json";
 import { lineOrder } from "@/lib/commerce/line-order";
 import { feePlacementDescription } from "@/lib/commerce/placements";
 import { paymentTermsDaysFor } from "@/lib/payment-terms";
@@ -10,6 +20,9 @@ import { quoteOnlineUrl } from "./quote-online-url";
 // the PDF template only ever sees fields declared here, so a future template
 // edit can't accidentally leak one by spreading a wider object.
 export type QuotePdfRow = {
+  // A publisher placement (with any article fee folded in), or desk-billed
+  // extra hours (titleName is then the desk's description of the work).
+  kind: "PLACEMENT" | "EXTRA_WORK";
   titleName: string;
   marketCode: string;
   // Raw ProductType enum value; renderers localize it via quoteFormatLabel.
@@ -25,7 +38,20 @@ export type QuotePdfRow = {
   frequency: string | null;
   // Customer-visible line note ("Merknad"), plain text. Null when unset.
   customerNote: string | null;
+  // The article fee folded into this placement row (an article NativeSpin
+  // writes), shown as "incl. article ... from X". Null when there is none or
+  // the row is priced on request.
+  articleFee: number | null;
+  // EXTRA_WORK rows: hours x rate. Null on a placement row.
+  hours: number | null;
+  hourlyRate: number | null;
 };
+
+// What an article NativeSpin writes includes (lib/article-scope.ts), already
+// in the document's language. One entry per distinct scope: normally one;
+// several only when the placements' specs differ (e.g. word counts), each
+// then naming the titles it applies to.
+export type QuotePdfArticleScope = { titles: string[]; lines: string[] };
 
 export type QuotePdfData = {
   quoteId: string;
@@ -52,7 +78,19 @@ export type QuotePdfData = {
   // holding both copies can tell which one counts. Null for a first quote.
   revision: { number: number; replacesQuoteNumber: string } | null;
   rows: QuotePdfRow[];
+  // Empty when no row carries an article fee.
+  articleScopes: QuotePdfArticleScope[];
 };
+
+const MESSAGES = { da: daMessages, de: deMessages, en: enMessages, fi: fiMessages, no: noMessages, sv: svMessages };
+
+// next-intl outside a request (a route handler renders the documents): the
+// same ICU strings, plurals included, that the quote page uses.
+function scopeTranslator(locale: string): Translate {
+  const appLocale = safeLocale(locale);
+  const messages = MESSAGES[appLocale] as unknown as AbstractIntlMessages;
+  return createTranslator({ locale: appLocale, messages, namespace: "articleScope" }) as Translate;
+}
 
 // The customer-facing quote number: the tail of the id, upper-cased.
 export function quoteNumberFor(quoteId: string): string {
@@ -106,6 +144,10 @@ export async function loadQuotePdfData(
     select: {
       id: true,
       type: true,
+      // The article scope: word count and marking from the spec, stated
+      // revision rounds from the offer's inclusions.
+      inclusions: true,
+      spec: { select: { wordCountMin: true, wordCountMax: true, disclosureLabel: true } },
       title: {
         select: {
           name: true,
@@ -114,7 +156,7 @@ export async function loadQuotePdfData(
           audience: true,
           vertical: true,
           frequency: true,
-          market: { select: { code: true } },
+          market: { select: { code: true, disclosureLabel: true } },
         },
       },
     },
@@ -131,9 +173,35 @@ export async function loadQuotePdfData(
     );
   }
 
+  const rates = await loadExtraWorkRates();
+  const t = scopeTranslator(locale);
+  const scopeByKey = new Map<string, QuotePdfArticleScope>();
+
   const rows: QuotePdfRow[] = quote.lines
-    .filter((l) => l.kind === "INVENTORY")
-    .map((l) => {
+    .filter((l) => l.kind === "INVENTORY" || l.kind === "EXTRA_WORK")
+    .map((l): QuotePdfRow => {
+      if (l.kind === "EXTRA_WORK") {
+        const lineTotal = Number(l.lineTotal);
+        return {
+          kind: "EXTRA_WORK",
+          titleName: l.description,
+          marketCode: "",
+          format: "",
+          quantity: 1,
+          unitPrice: l.priceOnRequest ? null : lineTotal,
+          rowTotal: l.priceOnRequest ? null : lineTotal,
+          priceOnRequest: l.priceOnRequest,
+          circulation: null,
+          digitalReach: null,
+          audience: null,
+          vertical: null,
+          frequency: null,
+          customerNote: l.customerNote,
+          articleFee: null,
+          hours: l.hours != null ? Number(l.hours) : null,
+          hourlyRate: l.hourlyRate != null ? Number(l.hourlyRate) : null,
+        };
+      }
       const product = l.productId ? productById.get(l.productId) : undefined;
       const fee = contentFeeByProductName.get(l.description) ?? 0;
       const rowTotal = Number(l.lineTotal) + fee;
@@ -141,7 +209,16 @@ export async function loadQuotePdfData(
       // stored lineTotal is an internal estimate the customer must never
       // see, so both figures are nulled, not just hidden by the template.
       const priceOnRequest = l.priceOnRequest;
+      if (fee > 0) {
+        const lines = articleScopeLines(articleScope(product, quote.currency, rates), t, locale);
+        const key = lines.join("\n");
+        const scope = scopeByKey.get(key) ?? { titles: [], lines };
+        const titleName = product?.title.name ?? l.description;
+        if (!scope.titles.includes(titleName)) scope.titles.push(titleName);
+        scopeByKey.set(key, scope);
+      }
       return {
+        kind: "PLACEMENT",
         titleName: product?.title.name ?? l.description,
         marketCode: product?.title.market.code ?? "",
         format: product?.type ?? "",
@@ -159,6 +236,9 @@ export async function loadQuotePdfData(
         vertical: product?.title.vertical ?? null,
         frequency: product?.title.frequency ?? null,
         customerNote: l.customerNote,
+        articleFee: fee > 0 && !priceOnRequest ? fee : null,
+        hours: null,
+        hourlyRate: null,
       };
     });
 
@@ -181,5 +261,6 @@ export async function loadQuotePdfData(
       ? { number: quote.revision, replacesQuoteNumber: quoteNumberFor(quote.previousQuoteId) }
       : null,
     rows,
+    articleScopes: [...scopeByKey.values()],
   };
 }

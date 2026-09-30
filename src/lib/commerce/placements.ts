@@ -5,7 +5,7 @@
 // (BUG-final-local-5). Every count a buyer or the desk reads goes through
 // here. Pure, so the rule unit-tests without a database.
 
-type LineWithKind = { kind?: "INVENTORY" | "CONTENT_FEE" | null };
+type LineWithKind = { kind?: "INVENTORY" | "CONTENT_FEE" | "EXTRA_WORK" | null };
 
 /** A placement line: the publisher inventory the buyer booked. Lines without
  *  a kind predate content fees and are placements. */

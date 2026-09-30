@@ -13,6 +13,8 @@ import { WritersPanel } from "./writers-panel";
 import { CampaignSection } from "./campaign-section";
 import { ProgrammePanel } from "./programme-panel";
 import { AccountingStatus } from "./accounting-status";
+import { ExtraWorkPanel } from "./extra-work-panel";
+import { loadExtraWorkRates } from "@/lib/content-fee";
 import { cancelBlockKey } from "@/lib/cancellation";
 import { deliveryGap, nextOrderStatus } from "@/lib/order-lifecycle";
 
@@ -49,15 +51,29 @@ export default async function DeskOrderPage({
     include: {
       organization: true,
       // The buyer's request brief: the per-line brief falls back to it. The
-      // quote's lines tell which placement each content fee writes for.
+      // quote's lines tell which placement each content fee writes for, and
+      // its extra-work lines show beside the hours added since.
       quote: {
         include: {
           request: { select: { briefSummary: true } },
-          lines: { select: { kind: true, description: true, productId: true, position: true } },
+          lines: {
+            orderBy: lineOrder(),
+            select: {
+              id: true,
+              kind: true,
+              description: true,
+              productId: true,
+              position: true,
+              hours: true,
+              hourlyRate: true,
+              lineTotal: true,
+            },
+          },
         },
       },
       invoices: true,
       creditNotes: true,
+      extraWork: { orderBy: [{ createdAt: "asc" }, { id: "asc" }] },
       lines: {
         orderBy: lineOrder(),
         include: {
@@ -99,6 +115,7 @@ export default async function DeskOrderPage({
     },
   });
   const clicks = await clicksByOrderLine(order.lines.map((l) => l.id));
+  const extraWorkRates = await loadExtraWorkRates();
 
   const feePlacements = orderFeePlacements(order.lines, order.quote.lines);
   const products = await prisma.product.findMany({
@@ -236,6 +253,20 @@ export default async function DeskOrderPage({
         feePlacements={feePlacements}
         matchablePlaybooks={matchablePlaybooks}
         requestBrief={order.quote.request.briefSummary}
+      />
+
+      <ExtraWorkPanel
+        locale={locale}
+        order={{
+          id: order.id,
+          status: order.status,
+          currency: order.quote.currency,
+          invoices: order.invoices,
+        }}
+        entries={order.extraWork}
+        quoteLines={order.quote.lines.filter((l) => l.kind === "EXTRA_WORK")}
+        rates={extraWorkRates}
+        errorCode={typeof sp.extraWork === "string" ? sp.extraWork : undefined}
       />
 
       <CampaignSection

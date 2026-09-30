@@ -13,6 +13,7 @@ import { releaseInstantOrderList } from "@/lib/commerce/list-commit";
 import { recordAudit } from "@/lib/audit";
 import { invoiceDueAt, paymentTermsDaysFor } from "@/lib/payment-terms";
 import { lineOrder } from "@/lib/commerce/line-order";
+import { quoteTotals } from "@/lib/money";
 import { feePlacementDescription } from "@/lib/commerce/placements";
 import {
   ORDER_STATUS_AFTER_FULL_CREDIT,
@@ -83,40 +84,86 @@ export async function issueInvoiceForOrder(args: {
       lineTotal,
       // Invoice lines keep the quote's display order (line-order.ts).
       position: l.position,
+      // An extra-work line agreed on the quote keeps its hours × rate.
+      hours: l.hours,
+      hourlyRate: l.hourlyRate,
     };
   });
+  const lastPosition = lines.reduce((max, l) => Math.max(max, l.position), -1);
 
-  const invoice = await prisma.$transaction(async (tx) => {
+  const issued = await prisma.$transaction(async (tx) => {
     const claimed = await tx.order.updateMany({
       where: { id: order.id, status: OrderStatus.COMPLETED },
       data: { status: OrderStatus.INVOICED },
     });
     if (claimed.count !== 1) return null;
-    return tx.invoice.create({
+    // Extra work agreed after acceptance (lib/commerce/order-extra-work.ts),
+    // read AFTER the claim: an entry added concurrently either committed
+    // before it (and is billed here) or waits on the order row and is then
+    // refused (the order is INVOICED).
+    const extras = await tx.orderExtraWork.findMany({
+      where: { orderId: order.id, invoiceId: null },
+      orderBy: [{ createdAt: "asc" }, { id: "asc" }],
+    });
+    const extraLines = extras.map((e, i) => ({
+      description: e.description,
+      kind: "EXTRA_WORK" as const,
+      productId: null,
+      titleName: null,
+      productType: null,
+      // Quantity 1 with the whole amount as the unit: hours can be
+      // fractional, InvoiceLine.quantity (and the accounting push) can't.
+      quantity: 1,
+      unitAmount: e.lineTotal,
+      lineTotal: e.lineTotal,
+      position: lastPosition + 1 + i,
+      hours: e.hours,
+      hourlyRate: e.hourlyRate,
+    }));
+    // The accepted quote's own figures when nothing was added (so an
+    // invoice bills exactly what was accepted); otherwise the same VAT rule
+    // over the accepted subtotal plus the extra work.
+    const totals =
+      extras.length === 0
+        ? { subtotal: Number(q.subtotal), total: Number(q.total) }
+        : quoteTotals(
+            [{ lineTotal: Number(q.subtotal) }, ...extras.map((e) => ({ lineTotal: Number(e.lineTotal) }))],
+            Number(q.vatPct),
+          );
+    const invoice = await tx.invoice.create({
       data: {
         organizationId: order.organizationId,
         orderId: order.id,
         status: "ISSUED",
         currency: q.currency,
-        subtotal: q.subtotal,
+        subtotal: totals.subtotal,
         vatPct: q.vatPct,
-        total: q.total,
+        total: totals.total,
         issuedAt: now,
         dueAt,
         paymentTermsDays,
-        lines: { create: lines },
+        lines: { create: [...lines, ...extraLines] },
       },
     });
+    if (extras.length > 0) {
+      await tx.orderExtraWork.updateMany({
+        where: { id: { in: extras.map((e) => e.id) }, invoiceId: null },
+        data: { invoiceId: invoice.id },
+      });
+    }
+    return { invoice, total: totals.total, extraWorkCount: extras.length };
   });
-  if (!invoice) return { ok: false, reason: "not-invoiceable" };
+  if (!issued) return { ok: false, reason: "not-invoiceable" };
+  const { invoice, total } = issued;
 
   await recordAudit(args.actorId, "invoice.issue", `Invoice:${invoice.id}`, {
     orderId: order.id,
-    total: Number(q.total),
+    total,
     currency: q.currency,
     paymentTermsDays,
+    ...(issued.extraWorkCount > 0 ? { extraWorkLines: issued.extraWorkCount } : {}),
   });
-  return { ok: true, invoiceId: invoice.id, total: Number(q.total), currency: q.currency, dueAt };
+  return { ok: true, invoiceId: invoice.id, total, currency: q.currency, dueAt };
 }
 
 export type IssueCreditNoteResult =

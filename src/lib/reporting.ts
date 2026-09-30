@@ -47,7 +47,7 @@ export function conversionPct(requests: number, orders: number): number {
 // service. Caller passes lines from a single currency.
 
 export type RevenueLine = {
-  kind: "INVENTORY" | "CONTENT_FEE";
+  kind: "INVENTORY" | "CONTENT_FEE" | "EXTRA_WORK";
   unitCost: number;
   quantity: number;
   lineTotal: number;
@@ -66,7 +66,9 @@ export function revenueSplit(lines: RevenueLine[]): RevenueSplit {
   let marginRevenue = 0;
   let contentFeeRevenue = 0;
   for (const l of lines) {
-    if (l.kind === "CONTENT_FEE") {
+    // Billed extra hours are the same production service as the article
+    // fee, not a markup on inventory.
+    if (l.kind === "CONTENT_FEE" || l.kind === "EXTRA_WORK") {
       contentFeeRevenue += l.lineTotal;
     } else {
       marginRevenue += l.lineTotal - l.unitCost * l.quantity;

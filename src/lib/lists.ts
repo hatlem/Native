@@ -59,6 +59,9 @@ const ITEM_INCLUDE = {
         include: {
           title: { include: { publisher: true, market: true } },
           priceRules: true,
+          // The format's length and marking: what an article we write
+          // includes (lib/article-scope.ts).
+          spec: true,
         },
       },
       title: { include: { publisher: true } },

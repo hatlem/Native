@@ -89,6 +89,9 @@ export const SHARED_LIST_SELECT = {
           // and whether the publisher can write it (the share page says who does).
           productionFee: true,
           inclusions: true,
+          // What an article we write includes (lib/article-scope.ts): the
+          // format's length and required marking.
+          spec: { select: { wordCountMin: true, wordCountMax: true, disclosureLabel: true } },
           // Only the rate-card fields the price engine reads (lib/plan-total.ts).
           priceRules: { select: { marginPct: true, seasonalMultiplier: true, minVolume: true } },
           title: {
@@ -104,7 +107,8 @@ export const SHARED_LIST_SELECT = {
               publisher: { select: { name: true, pricesPublic: true } },
               // The market drives the default margin, the content-fee rule
               // and VAT — the same inputs /plan prices with.
-              market: { select: { code: true, vatRatePct: true } },
+              // (disclosureLabel: the market's advertiser-content marking.)
+              market: { select: { code: true, vatRatePct: true, disclosureLabel: true } },
             },
           },
         },

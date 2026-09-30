@@ -728,7 +728,7 @@
     "whoWritesIt": "Who writes the article",
     "needsPriceNote": "This publisher hasn't published list pricing. Sending the plan asks the desk to price it — the rest of your plan is unaffected.",
     "breakdownUnpriced": "Confirmed within 24 hours",
-    "breakdownWithArticle": "{placement} placement + {article} per article",
+    "breakdownWithArticle": "{placement} placement · Article written by NativeSpin · from {article}",
     "breakdownQtyWithArticle": "{n} × {unit}, article included",
     "breakdownArticleIncluded": "Article included",
     "breakdownQty": "{n} × {unit}",
@@ -886,7 +886,7 @@
       "item3Title": "We write, place and report",
       "item3Body": "Drafts come to you for approval. Live links and performance land in Reports."
     },
-    "breakdownQtyWithArticleFee": "{n} × {unit} placement + {article} per article (one article for all {n})",
+    "breakdownQtyWithArticleFee": "{n} × {unit} placement · Article written by NativeSpin · from {article} (one article for all {n})",
     "inclVatFirmPart": "{amount} incl. VAT for the instant-order lines",
     "estimateNote": "≈ marks a price band. The desk confirms the exact price in your quote.",
     "breakdownPlacements": "{n} placements",
@@ -1599,7 +1599,9 @@
     "pdfUnavailableDesk": "The PDF won't render until NativeSpin's legal details are set in the server environment. Set these variables and redeploy:",
     "sellerVarMissing": "not set",
     "sellerVarInvalid": "set, but fails its checksum",
-    "pdfPending": "View"
+    "pdfPending": "View",
+    "extraWork": "Extra work",
+    "extraWorkDetail": "{hours} h × {rate}/h"
   },
   "firm": {
     "badge": "Instant order",
@@ -2576,14 +2578,14 @@
       "NATIVE_ARTICLE": [
         "Negotiated placement on {titleName}, written in the title's editorial voice",
         "Article{length} written by a vertical-specialist journalist",
-        "Two rounds of revisions and your sign-off before publish",
+        "Your sign-off before publish",
         "Distribution across {titleName}'s native feed and newsletter",
         "Click-through tracking on every link we place, reported at agreed checkpoints"
       ],
       "ADVERTORIAL": [
         "Negotiated placement on {titleName}, clearly labelled as paid content",
         "Brand-led article{length} written to the publisher's editorial standard",
-        "One round of revisions and your sign-off before publish",
+        "Your sign-off before publish",
         "Distribution in {titleName}'s content feed",
         "Click-through tracking on every link we place, reported at agreed checkpoints"
       ],
@@ -3440,7 +3442,11 @@
     "preparedFor": "Quote for",
     "viewOnline": "View this quote online, accept it, and follow the campaign in NativeSpin:",
     "footerLink": "Open in NativeSpin",
-    "noteLabel": "Note"
+    "noteLabel": "Note",
+    "articleScopeHeading": "What an article written by NativeSpin includes",
+    "extraWork": "Extra work / revision",
+    "inclArticle": "Incl. article written by NativeSpin · from {amount}",
+    "extraWorkDetail": "{hours} h × {rate}/h"
   },
   "deskUsers": {
     "eyebrow": "Admin",
@@ -3973,5 +3979,52 @@
     "pricesNothingBooked": "Nothing is booked until a quote has been approved.",
     "footerLink": "Open the plan",
     "pageOf": "Page {page} of {pages}"
+  },
+  "articleScope": {
+    "feeLabel": "Article written by NativeSpin · from {amount}",
+    "heading": "What the article includes",
+    "average": "An average native article ({words})",
+    "wordsTypical": "about {min, number}–{max, number} words",
+    "wordsRange": "{min, number}–{max, number} words",
+    "wordsMin": "at least {min, number} words",
+    "wordsMax": "up to {max, number} words",
+    "rounds": "{rounds, plural, one {Your brief plus one revision round before approval} other {Your brief plus # revision rounds before approval}}",
+    "marking": "Labelled “{label}”, following the publication's rules for advertiser content",
+    "markingGeneric": "Labelled following the publication's rules for advertiser content",
+    "hourly": "Interviews, images, extra revision rounds and other extra work are billed per hour: {rate}/hour",
+    "hourlyNoRate": "Interviews, images, extra revision rounds and other extra work are billed per hour",
+    "extraWorkTitle": "Extra work / revision",
+    "extraWorkDetail": "{hours, number} h × {rate}/h"
+  },
+  "extraWork": {
+    "heading": "Extra work / revision",
+    "quoteLead": "Bill hours beyond the article's included scope on this draft, at {rate}/hour ({currency}).",
+    "orderLead": "Hours agreed after the quote was accepted, at {rate}/hour ({currency}). They go onto the invoice when it's issued.",
+    "noRate": "No hourly rate is set for {currency}. A superadmin sets one under Content fees before hours can be billed.",
+    "hoursLabel": "Hours",
+    "hoursHint": "Quarter-hour steps, e.g. 1.5",
+    "descriptionLabel": "Description",
+    "descriptionPlaceholder": "e.g. Third revision round, interview with the CEO",
+    "add": "Add extra work",
+    "adding": "Adding…",
+    "remove": "Remove",
+    "removing": "Removing…",
+    "invoiced": "Invoiced",
+    "toBeInvoiced": "On the next invoice",
+    "orderLocked": "The invoice has been issued, so no more extra work can be added to this order.",
+    "orderClosed": "This order is cancelled, so no extra work can be added.",
+    "errorInvalid": "Enter hours in quarter-hour steps (for example 1.5) and a short description.",
+    "errorNoRate": "There is no hourly rate for this currency yet.",
+    "errorLocked": "This can no longer be changed: the quote has been sent or the order invoiced.",
+    "buyerHeading": "Extra work",
+    "buyerLead": "Work beyond the article's included scope, billed per hour.",
+    "ratesHeading": "Hourly rate for extra work",
+    "ratesLead": "Billed for interviews, images, extra revision rounds and other work beyond an article's included scope. Buyers see the rate wherever the article fee is explained. A change never reprices lines already billed.",
+    "ratesCurrency": "Currency",
+    "ratesRate": "Rate per hour",
+    "ratesSave": "Save rates",
+    "ratesSaving": "Saving…",
+    "ratesReadOnly": "Only a superadmin can change the hourly rates.",
+    "ratesError": "Enter a rate greater than 0 for each currency."
   }
 }

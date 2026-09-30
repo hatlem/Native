@@ -728,7 +728,7 @@
     "whoWritesIt": "Kuka kirjoittaa artikkelin",
     "needsPriceNote": "Tämä julkaisija ei ole julkaissut listahintaa. Suunnitelman lähettäminen pyytää deskiämme hinnoittelemaan sen — muu osa suunnitelmastasi ei muutu.",
     "breakdownUnpriced": "Vahvistetaan 24 tunnissa",
-    "breakdownWithArticle": "{placement} sijoittelu + {article} / artikkeli",
+    "breakdownWithArticle": "{placement} sijoittelu · Artikkelin kirjoittaa NativeSpin · alkaen {article}",
     "breakdownQtyWithArticle": "{n} × {unit}, artikkeli sisältyy",
     "breakdownArticleIncluded": "Artikkeli sisältyy",
     "breakdownQty": "{n} × {unit}",
@@ -886,7 +886,7 @@
       "item3Title": "Kirjoitamme, julkaisemme ja raportoimme",
       "item3Body": "Luonnokset tulevat sinulle hyväksyttäviksi. Linkit ja tulokset löytyvät Raporteista."
     },
-    "breakdownQtyWithArticleFee": "{n} × {unit} sijoittelu + {article} / artikkeli (yksi artikkeli kaikkiin {n})",
+    "breakdownQtyWithArticleFee": "{n} × {unit} sijoittelu · Artikkelin kirjoittaa NativeSpin · alkaen {article} (yksi artikkeli kaikkiin {n})",
     "inclVatFirmPart": "{amount} sis. alv pikatilattavista riveistä",
     "estimateNote": "≈ tarkoittaa hintahaarukkaa. Tarkan hinnan saat tarjouksesta.",
     "breakdownPlacements": "{n} sijoittelua",
@@ -1599,7 +1599,9 @@
     "pdfUnavailableDesk": "PDF:ää ei voi luoda ennen kuin NativeSpinin yritystiedot on asetettu palvelinympäristöön. Aseta nämä muuttujat ja julkaise uudelleen:",
     "sellerVarMissing": "ei asetettu",
     "sellerVarInvalid": "asetettu, mutta tarkiste ei täsmää",
-    "pdfPending": "Näytä"
+    "pdfPending": "Näytä",
+    "extraWork": "Lisätyö",
+    "extraWorkDetail": "{hours} h × {rate}/h"
   },
   "firm": {
     "badge": "Pikatilaus",
@@ -2576,14 +2578,14 @@
       "NATIVE_ARTICLE": [
         "Neuvoteltu julkaisu mediassa {titleName}, kirjoitettu median toimituksellisella äänellä",
         "Artikkeli{length} toimialaa tuntevan toimittajan kirjoittama",
-        "Kaksi korjauskierrosta ja hyväksyntäsi ennen julkaisua",
+        "Hyväksyntäsi ennen julkaisua",
         "Levitys {titleName}-median native-syötteessä ja uutiskirjeessä",
         "Klikkiseuranta jokaiselle lisäämällemme linkille, raportoituna sovittuina ajankohtina"
       ],
       "ADVERTORIAL": [
         "Neuvoteltu julkaisu mediassa {titleName}, selkeästi merkittynä maksetuksi sisällöksi",
         "Brändijohtoinen artikkeli{length} julkaisijan toimituksellisten standardien mukaan",
-        "Yksi korjauskierros ja hyväksyntäsi ennen julkaisua",
+        "Hyväksyntäsi ennen julkaisua",
         "Levitys {titleName}-median sisältösyötteessä",
         "Klikkiseuranta jokaiselle lisäämällemme linkille, raportoituna sovittuina ajankohtina"
       ],
@@ -3440,7 +3442,11 @@
     "preparedFor": "Tarjous asiakkaalle",
     "viewOnline": "Katso tarjous verkossa, hyväksy se ja seuraa kampanjaa NativeSpinissä:",
     "footerLink": "Avaa NativeSpinissä",
-    "noteLabel": "Huomautus"
+    "noteLabel": "Huomautus",
+    "articleScopeHeading": "NativeSpinin kirjoittamaan artikkeliin sisältyy",
+    "extraWork": "Lisätyö / korjaus",
+    "inclArticle": "Sis. NativeSpinin kirjoittaman artikkelin · alkaen {amount}",
+    "extraWorkDetail": "{hours} h × {rate}/h"
   },
   "deskUsers": {
     "eyebrow": "Hallinta",
@@ -3973,5 +3979,52 @@
     "pricesNothingBooked": "Mitään ei varata ennen kuin tarjous on hyväksytty.",
     "footerLink": "Avaa suunnitelma",
     "pageOf": "Sivu {page}/{pages}"
+  },
+  "articleScope": {
+    "feeLabel": "Artikkelin kirjoittaa NativeSpin · alkaen {amount}",
+    "heading": "Artikkeliin sisältyy",
+    "average": "Tavanomainen natiiviartikkeli ({words})",
+    "wordsTypical": "noin {min, number}–{max, number} sanaa",
+    "wordsRange": "{min, number}–{max, number} sanaa",
+    "wordsMin": "vähintään {min, number} sanaa",
+    "wordsMax": "enintään {max, number} sanaa",
+    "rounds": "{rounds, plural, one {Brief ja yksi korjauskierros ennen hyväksyntää} other {Brief ja # korjauskierrosta ennen hyväksyntää}}",
+    "marking": "Merkitty ”{label}” julkaisun mainossisältöä koskevien sääntöjen mukaan",
+    "markingGeneric": "Merkitty julkaisun mainossisältöä koskevien sääntöjen mukaan",
+    "hourly": "Haastattelut, kuvat, ylimääräiset korjauskierrokset ja muu lisätyö laskutetaan tuntiperusteisesti: {rate}/tunti",
+    "hourlyNoRate": "Haastattelut, kuvat, ylimääräiset korjauskierrokset ja muu lisätyö laskutetaan tuntiperusteisesti",
+    "extraWorkTitle": "Lisätyö / korjaus",
+    "extraWorkDetail": "{hours, number} h × {rate}/h"
+  },
+  "extraWork": {
+    "heading": "Lisätyö / korjaus",
+    "quoteLead": "Laskuta artikkelin sovitun laajuuden ylittävät tunnit tällä luonnoksella, {rate}/tunti ({currency}).",
+    "orderLead": "Tunnit, joista on sovittu tarjouksen hyväksymisen jälkeen, {rate}/tunti ({currency}). Ne tulevat laskulle, kun lasku laaditaan.",
+    "noRate": "Valuutalle {currency} ei ole asetettu tuntihintaa. Superadmin asettaa sen kohdassa Sisältömaksut ennen kuin tunteja voi laskuttaa.",
+    "hoursLabel": "Tunnit",
+    "hoursHint": "Vartin tarkkuudella, esim. 1,5",
+    "descriptionLabel": "Kuvaus",
+    "descriptionPlaceholder": "esim. Kolmas korjauskierros, toimitusjohtajan haastattelu",
+    "add": "Lisää lisätyö",
+    "adding": "Lisätään …",
+    "remove": "Poista",
+    "removing": "Poistetaan …",
+    "invoiced": "Laskutettu",
+    "toBeInvoiced": "Tulee seuraavalle laskulle",
+    "orderLocked": "Lasku on jo laadittu, joten tälle tilaukselle ei voi enää lisätä lisätyötä.",
+    "orderClosed": "Tilaus on peruttu, joten lisätyötä ei voi lisätä.",
+    "errorInvalid": "Anna tunnit vartin tarkkuudella (esimerkiksi 1,5) ja lyhyt kuvaus.",
+    "errorNoRate": "Tälle valuutalle ei ole vielä tuntihintaa.",
+    "errorLocked": "Tätä ei voi enää muuttaa: tarjous on lähetetty tai tilaus laskutettu.",
+    "buyerHeading": "Lisätyö",
+    "buyerLead": "Artikkelin sovitun laajuuden ylittävä työ, laskutetaan tuntiperusteisesti.",
+    "ratesHeading": "Lisätyön tuntihinta",
+    "ratesLead": "Laskutetaan haastatteluista, kuvista, ylimääräisistä korjauskierroksista ja muusta artikkelin sovitun laajuuden ylittävästä työstä. Ostajat näkevät tuntihinnan kaikkialla, missä artikkelin hinta selitetään. Muutos ei koskaan hinnoittele uudelleen jo laskutettuja rivejä.",
+    "ratesCurrency": "Valuutta",
+    "ratesRate": "Hinta tunnilta",
+    "ratesSave": "Tallenna tuntihinnat",
+    "ratesSaving": "Tallennetaan …",
+    "ratesReadOnly": "Vain superadmin voi muuttaa tuntihintoja.",
+    "ratesError": "Anna jokaiselle valuutalle nollaa suurempi tuntihinta."
   }
 }

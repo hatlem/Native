@@ -1,6 +1,7 @@
 import { prisma } from "@/lib/prisma";
 import { lineOrder } from "@/lib/commerce/line-order";
 import { invoiceLineLabel } from "@/lib/invoice-line-label";
+import { formatMoney, intlLocale } from "@/lib/money";
 import { qt, quoteFormatLabel } from "./quote-messages";
 import { invoiceMessagesFor } from "./invoice-messages";
 
@@ -65,6 +66,12 @@ export async function loadInvoicePdfData(
   const deps = {
     formatLabel: (type: string) => quoteFormatLabel(type, locale),
     contentProduction: qt(messages, "contentProduction"),
+    extraWork: qt(messages, "extraWork"),
+    extraWorkDetail: (hours: number, rate: number) =>
+      qt(messages, "extraWorkDetail", {
+        hours: new Intl.NumberFormat(intlLocale(locale)).format(hours),
+        rate: formatMoney(rate, invoice.currency, locale),
+      }),
   };
   const credit = invoice.creditNotes[0];
   const org = invoice.organization;

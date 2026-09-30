@@ -17,6 +17,7 @@ import { ArticlePreview } from "@/components/article-preview";
 import { approveContentAsset, requestContentChanges } from "@/app/content-review-actions";
 import { presignDownloadOrNull } from "@/lib/storage/r2";
 import { resolveEffectiveAsset } from "@/lib/writers/placement";
+import { OrderExtraWorkSection } from "./extra-work-section";
 
 export const dynamic = "force-dynamic";
 
@@ -371,6 +372,13 @@ export default async function MyOrderPage({
           })}
         </div>
       </section>
+
+      <OrderExtraWorkSection
+        locale={locale}
+        orderId={order.id}
+        quoteId={order.quoteId}
+        currency={order.quote.currency}
+      />
 
       {campaignRows.length > 0 && (
         <section className="section">

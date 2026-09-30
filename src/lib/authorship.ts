@@ -153,7 +153,7 @@ export function writerAssignableForMode(mode: AuthorshipMode): boolean {
 // placement — the article is briefed and written against the INVENTORY line.
 // So staffing requires BOTH the placement axis (kind) and the authorship axis.
 export function writerStaffableLine(line: {
-  kind: "INVENTORY" | "CONTENT_FEE";
+  kind: "INVENTORY" | "CONTENT_FEE" | "EXTRA_WORK";
   authorshipMode: AuthorshipMode;
 }): boolean {
   return line.kind === "INVENTORY" && writerAssignableForMode(line.authorshipMode);
@@ -165,7 +165,7 @@ export function writerStaffableLine(line: {
 // (and carry no productId to look up). An INVENTORY line whose product isn't in
 // the map falls back to the safe default.
 export function authorshipForOrderLine(
-  line: { kind: "INVENTORY" | "CONTENT_FEE"; productId: string | null },
+  line: { kind: "INVENTORY" | "CONTENT_FEE" | "EXTRA_WORK"; productId: string | null },
   authorshipByProduct: Map<string, AuthorshipMode>,
 ): AuthorshipMode {
   if (line.kind === "CONTENT_FEE") return "NATIVESPIN_PRODUCED";

@@ -64,6 +64,12 @@ enum PricingModel {
 enum LineKind {
   INVENTORY
   CONTENT_FEE
+  // Work beyond the article's included scope (extra revision rounds,
+  // interviews, images), billed per hour at the buyer currency's
+  // ExtraWorkRate. On a quote it is a desk-added DRAFT line; after acceptance
+  // it is an OrderExtraWork entry that becomes an invoice line at issue.
+  // Service revenue like CONTENT_FEE, never a placement.
+  EXTRA_WORK
 }
 
 // Who writes the article for a placement — a separate axis from LineKind
@@ -660,6 +666,20 @@ model ContentFeeRule {
   updatedAt     DateTime     @updatedAt
 
   @@index([active, productType, marketCode])
+}
+
+// The hourly rate for extra work beyond an article's included scope (extra
+// revision rounds, interviews, images), one row per billing currency. The
+// buyer sees it wherever the article fee is explained; the desk bills hours
+// against it (EXTRA_WORK quote lines, OrderExtraWork). Each billed line
+// snapshots the rate it used, so editing a rate never reprices an existing
+// quote or order. Edited by SUPERADMIN on /desk/content-fees.
+model ExtraWorkRate {
+  id         String   @id @default(cuid())
+  currency   String   @unique // ISO 4217
+  hourlyRate Decimal  @db.Decimal(12, 2)
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
 }
 
 // Desk-owned default commission (%) applied when a product carries no
@@ -1347,6 +1367,11 @@ model QuoteLine {
   // by (position, id) via lib/commerce/line-order.ts; the value is copied
   // onto OrderLine/InvoiceLine so the order and invoice read the same way.
   position       Int      @default(0)
+  // EXTRA_WORK lines only: the hours billed and the hourly rate snapshotted
+  // when the desk added the line (lineTotal = hours × hourlyRate). Null on
+  // every other kind.
+  hours          Decimal? @db.Decimal(6, 2)
+  hourlyRate     Decimal? @db.Decimal(12, 2)
 }
 
 model Order {
@@ -1377,6 +1402,7 @@ model Order {
   updatedAt    DateTime     @updatedAt
 
   lines           OrderLine[]
+  extraWork       OrderExtraWork[]
   invoices        Invoice[]
   creditNotes     CreditNote[]
   writerPool      OrderWriterPool[]
@@ -1414,6 +1440,32 @@ model OrderLine {
   trackedLinks     TrackedLink[]
 
   @@index([assignedWriterId])
+}
+
+// Extra work the desk bills on an order after the quote was accepted (extra
+// revision rounds, interviews, images): the accepted quote is immutable, so
+// hours agreed later live here and go onto the invoice when it is issued
+// (lib/billing.ts). invoiceId is set in the issuing transaction; an entry
+// with one is billed and can no longer be removed. Priced like an EXTRA_WORK
+// quote line: hours × the currency's ExtraWorkRate, snapshotted.
+model OrderExtraWork {
+  id          String   @id @default(cuid())
+  orderId     String
+  order       Order    @relation(fields: [orderId], references: [id])
+  description String
+  hours       Decimal  @db.Decimal(6, 2)
+  hourlyRate  Decimal  @db.Decimal(12, 2)
+  currency    String
+  lineTotal   Decimal  @db.Decimal(12, 2)
+  // Desk user who added it. Bare id, like Order.cancelledBy.
+  createdById String
+  invoiceId   String?
+  invoice     Invoice? @relation(fields: [invoiceId], references: [id])
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([orderId])
+  @@index([invoiceId])
 }
 
 model ContentBrief {
@@ -1566,6 +1618,7 @@ model Invoice {
 
   lines       InvoiceLine[]
   creditNotes CreditNote[]
+  extraWork   OrderExtraWork[]
 }
 
 model InvoiceLine {
@@ -1587,6 +1640,11 @@ model InvoiceLine {
   // Display order on the invoice — copied from the QuoteLine it bills (see
   // QuoteLine.position).
   position    Int     @default(0)
+  // EXTRA_WORK lines only (see QuoteLine.hours): quantity stays 1 so the
+  // accounting push bills lineTotal, and these carry the hours × rate the
+  // invoice shows.
+  hours       Decimal? @db.Decimal(6, 2)
+  hourlyRate  Decimal? @db.Decimal(12, 2)
 }
 
 // Refund issued against an Invoice. Lives separately from the

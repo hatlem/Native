@@ -3354,6 +3354,30 @@ select:disabled {
   color: var(--muted);
   line-height: 1.45;
 }
+/* "What the article includes" on a line NativeSpin writes (plan line, share
+   page): a compact disclosure, collapsed by default. */
+.article-scope {
+  margin-top: 6px;
+  font-size: 0.78rem;
+  color: var(--muted);
+  line-height: 1.45;
+  text-align: left;
+}
+.article-scope > summary {
+  cursor: pointer;
+  color: var(--muted-strong);
+}
+/* On a plan card it sits in the right-aligned price column. */
+.plan-line-card__scope > summary {
+  text-align: right;
+}
+.article-scope ul {
+  margin: 6px 0 0;
+  padding-left: 1.1em;
+}
+.article-scope li + li {
+  margin-top: 2px;
+}
 
 .plan-line-card__actions {
   display: flex;

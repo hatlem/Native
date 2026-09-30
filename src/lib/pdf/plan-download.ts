@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { renderToBuffer } from "@react-pdf/renderer";
 import { safeLocale } from "@/i18n/routing";
 import { recordAudit } from "@/lib/audit";
-import { loadPricingDefaults } from "@/lib/content-fee";
+import { loadExtraWorkRates, loadPricingDefaults } from "@/lib/content-fee";
 import { SHARED_LIST_SELECT, shareUrl, type SharedList } from "@/lib/list-share";
 import { planPath } from "@/lib/plan-path";
 import { prisma } from "@/lib/prisma";
@@ -93,10 +93,12 @@ export async function planDownloadResponse(args: {
   actor: string | null;
 }): Promise<NextResponse> {
   const locale = safeLocale(args.locale);
+  const [pricing, extraWorkRates] = await Promise.all([loadPricingDefaults(), loadExtraWorkRates()]);
   const doc = buildPlanDocument({
     list: args.list,
     brief: args.brief,
-    pricing: await loadPricingDefaults(),
+    pricing,
+    extraWorkRates,
     locale,
     audience: args.audience,
     link: args.link,

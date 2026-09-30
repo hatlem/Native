@@ -14,6 +14,8 @@ import {
 import { lineBreakdown, type Translate } from "@/lib/plan-line-text";
 import { lineFigureLabel, totalLabel } from "@/lib/pricing/total-label";
 import { publisherCanWrite } from "@/lib/authorship";
+import { articleScope, articleScopeLines, hourlyRateLabel } from "@/lib/article-scope";
+import type { ExtraWorkRateSpec } from "@/lib/pricing/extra-work";
 import { formatRunRange, runBounds } from "@/lib/run-period";
 import { localizeVertical } from "@/lib/taxonomy-i18n";
 import { titleDisplayName } from "@/lib/title-display";
@@ -80,6 +82,9 @@ export type PlanDocumentInput = {
   generatedAt: Date;
   // The org market's zone: the date on the document is the org's calendar day.
   timeZone: string;
+  // The hourly rate per currency for work beyond an article's included scope
+  // (lib/content-fee.ts loadExtraWorkRates), quoted in the article-scope block.
+  extraWorkRates: readonly ExtraWorkRateSpec[];
 };
 
 export type PlanDocumentRow = {
@@ -131,6 +136,9 @@ export type PlanDocument = {
   noteLabel: string;
   sections: PlanDocumentSection[];
   total: { heading: string; label: string; rows: PlanDocumentTotal[]; empty: string | null; notes: string[] };
+  // "How the prices work". With a line NativeSpin writes it also says what
+  // that article includes and what is billed per hour on top
+  // (lib/article-scope.ts), the list /plan and the share page show.
   prices: { heading: string; lines: string[] };
   footer: { org: string; linkLabel: string; pageOf: string };
   // "NativeSpin – <plan name> – <YYYY-MM-DD>", without the extension.
@@ -300,6 +308,8 @@ export function buildPlanDocument(input: PlanDocumentInput): PlanDocument {
     has("rate") ? td("pricesRate", { label: tv("listIndicative") }) : null,
     has("onRequest") || has("placeholder") ? td("pricesOnRequest", { label: priceOnRequest }) : null,
     hasAuthor("nativespin") ? td("pricesContent", { label: tShare("weWriteIt") }) : null,
+    // …and, keyed on the same label, what that article includes.
+    ...(hasAuthor("nativespin") ? articleScopeLegend(planItems, input.extraWorkRates, locale) : []),
     hasAuthor("publisher") ? td("pricesPublisherWrites", { label: tShare("publisherWritesIt") }) : null,
     altItems.length > 0 ? td("pricesAlternatives") : null,
     td("pricesNothingBooked"),
@@ -361,6 +371,24 @@ export function buildPlanDocument(input: PlanDocumentInput): PlanDocument {
     footer: { org: list.organization.name, linkLabel: td("footerLink"), pageOf: MESSAGES[locale].planDocument.pageOf },
     filename: planDocumentFilename(list.name, input.generatedAt, input.timeZone),
   };
+}
+
+// What an article NativeSpin writes includes, as legend lines: the heading,
+// then the list /plan shows on a line we write — from the first such line
+// (its format's word count and marking), with the hourly rate of every
+// currency the plan's written lines bill in.
+function articleScopeLegend(planItems: Item[], rates: readonly ExtraWorkRateSpec[], locale: AppLocale): string[] {
+  const written = planItems.flatMap((i) => (i.withContent && i.product ? [i.product] : []));
+  if (written.length === 0) return [];
+  const t = translator(locale, "articleScope");
+  const rateLabels = [...new Set(written.map((p) => p.currency))]
+    .map((currency) => hourlyRateLabel(articleScope(null, currency, rates), locale))
+    .filter((l): l is string => l !== null);
+  const scope = articleScope(written[0], written[0].currency, rates);
+  return [
+    `${t("heading")}:`,
+    ...articleScopeLines(scope, t, locale, rateLabels.length ? rateLabels.join(" / ") : null).map((l) => `• ${l}`),
+  ];
 }
 
 // The brief as /plan's brief form holds it (lib/plan-brief.ts planBriefValues),
