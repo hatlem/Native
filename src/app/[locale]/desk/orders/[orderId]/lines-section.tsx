@@ -14,6 +14,7 @@ import { PlaybookCard } from "@/components/playbook-card";
 import { SubmitButton } from "@/components";
 import { nextAssetStatuses } from "@/lib/content/versions";
 import { lineBrief } from "@/lib/writers/line-brief";
+import { isPlacementLine } from "@/lib/commerce/placements";
 
 type ProductWithTitle = Prisma.ProductGetPayload<{
   include: { title: true };
@@ -50,6 +51,9 @@ type Props = {
   locale: string;
   order: OrderForLines;
   byId: Map<string, ProductWithTitle>;
+  // Content-fee order line id → the placement (quote line) it writes for
+  // (lib/commerce/placements.ts orderFeePlacements).
+  feePlacements: Map<string, { productId: string | null }>;
   matchablePlaybooks: MatchablePlaybook[];
   // The buyer's request brief (Request.briefSummary) — see lineBrief().
   requestBrief: string | null;
@@ -59,6 +63,7 @@ export async function LinesSection({
   locale,
   order,
   byId,
+  feePlacements,
   matchablePlaybooks,
   requestBrief,
 }: Props) {
@@ -66,6 +71,18 @@ export async function LinesSection({
   const tp = await getTranslations({ locale, namespace: "production" });
   const tType = await getTranslations({ locale, namespace: "productType" });
   const tw = await getTranslations({ locale, namespace: "deskWriters.panel" });
+
+  // The deliverables are the placements. A content fee bills our article
+  // for one of them: it has nothing to write, brief or version, so it is
+  // listed with the fees, named after its placement, not as a line card with
+  // an empty version history.
+  const placementLines = order.lines.filter(isPlacementLine);
+  const feeLines = order.lines.filter((l) => !isPlacementLine(l));
+  const feeLabel = (lineId: string) => {
+    const productId = feePlacements.get(lineId)?.productId;
+    const p = productId ? byId.get(productId) : undefined;
+    return p ? `${tType("CONTENT_FEE")} · ${p.title.name} – ${tType(p.type)}` : tType("CONTENT_FEE");
+  };
 
   return (
     <section className="section">
@@ -77,9 +94,8 @@ export async function LinesSection({
       </div>
 
       <div className="stack-4">
-        {order.lines.map((line) => {
+        {placementLines.map((line) => {
           const p = line.productId ? byId.get(line.productId) : undefined;
-          const isContentFee = line.kind === "CONTENT_FEE";
           const assets = line.articlePlacement?.article.versions ?? [];
           const latest = assets[0];
           // Placement lines carry a brief; content-fee lines never do.
@@ -96,10 +112,7 @@ export async function LinesSection({
             <article className="card desk-line-card" key={line.id}>
               <div className="line-head">
                 <div>
-                  <h3>
-                    {p?.title.name ??
-                      (isContentFee ? tType("CONTENT_FEE") : "—")}
-                  </h3>
+                  <h3>{p?.title.name ?? "—"}</h3>
                   <p className="muted small">{p ? tType(p.type) : ""}</p>
                 </div>
                 <div className="price" style={{ marginTop: 0 }}>
@@ -211,7 +224,7 @@ export async function LinesSection({
                 )}
               </div>
 
-              {latest && !isContentFee && order.status !== "CANCELLED" ? (
+              {latest && order.status !== "CANCELLED" ? (
                 <div className="asset-actions">
                   <form action={runSpecCheck}>
                     <input type="hidden" name="locale" value={locale} />
@@ -249,9 +262,8 @@ export async function LinesSection({
                 </div>
               ) : null}
 
-              {/* No editor where there is nothing to write: a CONTENT_FEE
-                  line is billing-only, and a cancelled order is closed. */}
-              {!isContentFee && order.status !== "CANCELLED" ? (
+              {/* No editor on a cancelled order: it is closed. */}
+              {order.status !== "CANCELLED" ? (
               <details className="spec-details">
                 <summary>
                   {tp("draftLabel")}
@@ -285,6 +297,27 @@ export async function LinesSection({
             </article>
           );
         })}
+
+        {feeLines.length > 0 ? (
+          <article className="card desk-line-card">
+            <h3>{t("feeLinesHeading")}</h3>
+            <p className="muted small">{t("feeLinesNote")}</p>
+            <div className="table-wrap">
+              <table className="table">
+                <tbody>
+                  {feeLines.map((line) => (
+                    <tr key={line.id}>
+                      <td>{feeLabel(line.id)}</td>
+                      <td className="num">
+                        {formatMoney(Number(line.lineTotal), order.quote.currency, locale)}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </article>
+        ) : null}
       </div>
     </section>
   );

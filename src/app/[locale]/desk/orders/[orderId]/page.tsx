@@ -2,6 +2,7 @@ import { getTranslations } from "next-intl/server";
 import { notFound } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import { lineOrder } from "@/lib/commerce/line-order";
+import { orderFeePlacements } from "@/lib/commerce/placements";
 import { marketTimeZone } from "@/lib/markets";
 import { Link } from "@/i18n/navigation";
 import { clicksByOrderLine } from "@/lib/metrics/store";
@@ -47,8 +48,14 @@ export default async function DeskOrderPage({
     where: { id: orderId },
     include: {
       organization: true,
-      // The buyer's request brief: the per-line brief falls back to it.
-      quote: { include: { request: { select: { briefSummary: true } } } },
+      // The buyer's request brief: the per-line brief falls back to it. The
+      // quote's lines tell which placement each content fee writes for.
+      quote: {
+        include: {
+          request: { select: { briefSummary: true } },
+          lines: { select: { kind: true, description: true, productId: true, position: true } },
+        },
+      },
       invoices: true,
       creditNotes: true,
       lines: {
@@ -93,10 +100,11 @@ export default async function DeskOrderPage({
   });
   const clicks = await clicksByOrderLine(order.lines.map((l) => l.id));
 
+  const feePlacements = orderFeePlacements(order.lines, order.quote.lines);
   const products = await prisma.product.findMany({
     where: {
       id: {
-        in: order.lines
+        in: [...order.lines, ...feePlacements.values()]
           .map((l) => l.productId)
           .filter((id): id is string => !!id),
       },
@@ -225,6 +233,7 @@ export default async function DeskOrderPage({
         locale={locale}
         order={order}
         byId={byId}
+        feePlacements={feePlacements}
         matchablePlaybooks={matchablePlaybooks}
         requestBrief={order.quote.request.briefSummary}
       />
