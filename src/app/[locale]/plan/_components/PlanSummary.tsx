@@ -2,7 +2,8 @@ import { getTranslations } from "next-intl/server";
 import { Link } from "@/i18n/navigation";
 import type { PlanBriefValues, TimingOption } from "@/lib/plan-brief";
 import { formatMoney } from "@/lib/money";
-import type { ListTotal } from "@/lib/plan-total";
+import { hasFigure, type ListTotal } from "@/lib/plan-total";
+import { totalFloor, totalLabel } from "@/lib/pricing/total-label";
 import { submitRequest } from "@/app/checkout-actions";
 import { SubmitButton } from "@/components";
 import { PlanBriefFields } from "./PlanBriefFields";
@@ -13,9 +14,11 @@ import { PlanBriefFields } from "./PlanBriefFields";
 // component owns only the summary + form.
 //
 // `totals` come from estimateListTotals — the same engine the order prices
-// with — so the figure here includes content fees and is the amount the buyer
-// commits to. It is shown excluding VAT (how the desk quotes and the catalog
-// lists prices), with the VAT-inclusive figure beside it; on the instant path
+// with, content fees included. Instant-orderable lines add up exactly; every
+// other priced line adds its price band, so a mixed plan reads
+// "45 000 kr + ≈ 40–60k NOK" (lib/pricing/total-label.ts). Shown excluding VAT
+// (how the desk quotes and the catalog lists prices), with the VAT-inclusive
+// figure of the exact part beside it; on the instant path (every line exact)
 // the VAT-inclusive amount is repeated at the button, because that click is
 // the commitment.
 export async function PlanSummary({
@@ -70,20 +73,25 @@ export async function PlanSummary({
 
   // Only compare the budget field against a single-currency total — a
   // mixed-currency basket has no one number to warn against.
-  const visibleTotals = totals.filter((r) => r.hasVisible);
+  const visibleTotals = totals.filter(hasFigure);
   const singleTotal = visibleTotals.length === 1 ? visibleTotals[0] : null;
   const money = (amount: number, currency: string) => formatMoney(amount, currency, locale);
+  // Exact part and/or band range, the one format every plan surface uses.
+  const label = (r: ListTotal) => totalLabel(r, locale) ?? "";
 
   // "25 741 kr" or, across currencies, "SEK 95 565 for 4 titles + €92 for 1 title".
-  const joinTotals = (pick: (r: ListTotal) => number) =>
+  const joinTotals = (format: (r: ListTotal) => string) =>
     visibleTotals.length > 1
       ? visibleTotals
-          .map((r) => t("totalForItems", { amount: money(pick(r), r.currency), count: r.itemCount }))
+          .map((r) => t("totalForItems", { amount: format(r), count: r.itemCount }))
           .join(" + ")
       : visibleTotals.length === 1
-        ? money(pick(visibleTotals[0]), visibleTotals[0].currency)
+        ? format(visibleTotals[0])
         : null;
-  const commitAmount = instant ? joinTotals((r) => r.totalInclVat) : null;
+  // The instant path only exists when every line is exact, so the commitment
+  // is always an exact, VAT-inclusive figure.
+  const commitAmount = instant ? joinTotals((r) => money(r.totalInclVat, r.currency)) : null;
+  const anyEstimate = visibleTotals.some((r) => r.estimate !== null);
 
   const submitLabel = instant ? tf("planSubmit") : rfqInstead ? tf("sendAsRfq") : tr("submit");
   const reassurance = instant ? tf("reassurance") : t("reassurance");
@@ -108,20 +116,27 @@ export async function PlanSummary({
         {visibleTotals.map((r) => (
           <div key={r.currency}>
             <div className="price">
-              {money(r.amount, r.currency)}{" "}
-              <span className="muted small">{t("exVat")}</span>
-              {r.hasHidden ? <span className="muted small"> + {tv("requestPrice")}</span> : null}
+              {label(r)} <span className="muted small">{t("exVat")}</span>
+              {r.hasOnRequest ? <span className="muted small"> + {tv("requestPrice")}</span> : null}
             </div>
-            {r.contentFees > 0 ? (
+            {/* The content-fee split and the VAT-inclusive figure are exact
+                arithmetic, so they only describe the exact (instant-orderable)
+                part; a band has no exact VAT to add. */}
+            {r.hasExact && !r.estimate && r.contentFees > 0 ? (
               <p className="plan-summary-note">
                 {t("includesContentFees", { amount: money(r.contentFees, r.currency) })}
               </p>
             ) : null}
-            <p className="plan-summary-note">
-              {t("inclVatLine", { amount: money(r.totalInclVat, r.currency) })}
-            </p>
+            {r.hasExact ? (
+              <p className="plan-summary-note">
+                {r.estimate
+                  ? t("inclVatFirmPart", { amount: money(r.totalInclVat, r.currency) })
+                  : t("inclVatLine", { amount: money(r.totalInclVat, r.currency) })}
+              </p>
+            ) : null}
           </div>
         ))}
+        {anyEstimate ? <p className="plan-summary-note">{t("estimateNote")}</p> : null}
         {visibleTotals.length > 1 ? (
           <p className="plan-summary-note">{t("multiCurrencyNote")}</p>
         ) : null}
@@ -164,7 +179,8 @@ export async function PlanSummary({
             initial={brief}
             timingOptions={timingOptions}
             currency={singleTotal ? singleTotal.currency : null}
-            total={singleTotal ? singleTotal.amount : 0}
+            totalFloor={singleTotal ? totalFloor(singleTotal) : 0}
+            totalLabel={singleTotal ? label(singleTotal) : ""}
           />
           {commitAmount ? (
             <p className="plan-summary-commit">{tf("commitAmount", { amount: commitAmount })}</p>
@@ -207,7 +223,7 @@ export async function PlanSummary({
             {instant
               ? t("inclVatLine", { amount: commitAmount ?? "" })
               : visibleTotals.length > 0
-                ? `${joinTotals((r) => r.amount)} ${t("exVat")}`
+                ? `${joinTotals(label)} ${t("exVat")}`
                 : t("pricingOnRequest")}
           </span>
         </div>

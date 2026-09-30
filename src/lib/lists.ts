@@ -1,7 +1,13 @@
 import { cookies } from "next/headers";
 import { prisma } from "@/lib/prisma";
 import { clampQuantity, MAX_QTY } from "@/lib/basket";
-import { contentIntent, mergeContentIntent, type AuthorshipMode } from "@/lib/authorship";
+import {
+  contentIntent,
+  defaultContentIntent,
+  mergeContentIntent,
+  publisherProducesContent,
+  type AuthorshipMode,
+} from "@/lib/authorship";
 
 export const ACTIVE_LIST_COOKIE = "nativespin_active_list";
 
@@ -232,11 +238,25 @@ export async function setItemAlternative(itemId: string, isAlternative: boolean)
   return prisma.savedListItem.updateMany({ where: { id: itemId }, data: { isAlternative } });
 }
 
-export async function addProductItem(listId: string, productId: string, withContent = false) {
+// The select defaultContentIntent reads (lib/authorship.ts).
+const CONTENT_DEFAULT_SELECT = {
+  inclusions: true,
+  productionFee: true,
+  title: { select: { productionFeeDefault: true } },
+} as const;
+
+/**
+ * Add a product line. `withContent` is the buyer's explicit "We write it"
+ * choice when the surface offers one; omitted (every catalog/title/compare/
+ * recommender add), a NEW line takes defaultContentIntent — ON, because the
+ * band the buyer saw includes the article, unless the publisher produces it.
+ */
+export async function addProductItem(listId: string, productId: string, withContent?: boolean) {
   assertItemShape({ productId, titleId: null });
   // Adding "with content" to a line that's already there turns content on for
   // it (never off — a plain re-add must not drop a content request the buyer
-  // made earlier). Same OR rule as every other merge of two lines.
+  // made earlier, nor re-enable one they switched off). Same OR rule as every
+  // other merge of two lines; the default only ever applies to a new row.
   const contentOn = withContent ? contentIntent(true) : {};
   // Adding a product that sits among the alternatives promotes it into the
   // plan as-is (no quantity bump) — that is what "add" means to the buyer.
@@ -250,13 +270,19 @@ export async function addProductItem(listId: string, productId: string, withCont
       data: { isAlternative: false, ...contentOn },
     });
   }
+  const created =
+    withContent === undefined
+      ? defaultContentIntent(
+          await prisma.product.findUnique({ where: { id: productId }, select: CONTENT_DEFAULT_SELECT }),
+        )
+      : contentIntent(withContent);
   const item = await prisma.savedListItem.upsert({
     where: { listId_productId: { listId, productId } },
     create: {
       listId,
       productId,
       titleId: null,
-      ...contentIntent(withContent),
+      ...created,
       sortOrder: await nextSortOrder(listId),
     },
     update: { quantity: { increment: 1 }, ...contentOn },
@@ -268,12 +294,20 @@ export async function addProductItem(listId: string, productId: string, withCont
   return item;
 }
 
-/** Append a title placeholder. Idempotent via the (listId, titleId) unique upsert. */
+/** Append a title placeholder. Idempotent via the (listId, titleId) unique upsert.
+ *  A new placeholder starts with "We write it" on, like a catalog product add
+ *  (defaultContentIntent); the desk quotes the article with the placement. */
 export async function addTitleItem(listId: string, titleId: string) {
   assertItemShape({ productId: null, titleId });
   return prisma.savedListItem.upsert({
     where: { listId_titleId: { listId, titleId } },
-    create: { listId, titleId, productId: null, sortOrder: await nextSortOrder(listId) },
+    create: {
+      listId,
+      titleId,
+      productId: null,
+      ...defaultContentIntent(null),
+      sortOrder: await nextSortOrder(listId),
+    },
     // Already present: no duplicate/bump, but an alternative is promoted into the plan.
     update: { isAlternative: false },
   });
@@ -310,9 +344,18 @@ export async function resolveTitleItem(itemId: string, productId: string) {
     ]);
     return merged;
   }
+  // The placeholder's "We write it" carries over — unless the chosen placement
+  // is written by the publisher's own studio, where NativeSpin writing it
+  // doesn't apply (the same exception a direct add makes).
+  const product = await prisma.product.findUnique({ where: { id: productId }, select: CONTENT_DEFAULT_SELECT });
+  const publisherWrites = !!product && publisherProducesContent(product);
   return prisma.savedListItem.update({
     where: { id: itemId },
-    data: { productId, titleId: null },
+    data: {
+      productId,
+      titleId: null,
+      ...(publisherWrites ? defaultContentIntent(product) : {}),
+    },
   });
 }
 

@@ -317,12 +317,62 @@ test("addProductItem with content stores NATIVESPIN_PRODUCED", async () => {
 
 test("re-adding with content turns content on; a plain re-add never turns it off", async () => {
   const listId = await freshList();
-  const item = await addProductItem(listId, productId);
+  const item = await addProductItem(listId, productId, false);
   assert.deepEqual(await pair(item.id), { withContent: false, authorshipMode: "BUYER_SUPPLIED" });
   await addProductItem(listId, productId, true);
   assert.deepEqual(await pair(item.id), { withContent: true, authorshipMode: "NATIVESPIN_PRODUCED" });
   await addProductItem(listId, productId);
   assert.deepEqual(await pair(item.id), { withContent: true, authorshipMode: "NATIVESPIN_PRODUCED" });
+});
+
+// The catalog band includes the article, so a line added without an explicit
+// choice (catalog, title page, compare, recommenders) starts with "We write
+// it" on — and the buyer's "off" survives a later plain re-add.
+test("a plain add defaults to 'We write it'; a re-add never re-enables it once switched off", async () => {
+  const listId = await freshList();
+  const item = await addProductItem(listId, productId);
+  assert.deepEqual(await pair(item.id), { withContent: true, authorshipMode: "NATIVESPIN_PRODUCED" });
+  await setItemContent(item.id, false);
+  await addProductItem(listId, productId);
+  assert.deepEqual(await pair(item.id), { withContent: false, authorshipMode: "BUYER_SUPPLIED" });
+});
+
+test("a publisher-produced placement defaults to PUBLISHER_PRODUCED, no content fee", async () => {
+  const listId = await freshList();
+  const studio = await prisma.product.create({
+    data: {
+      titleId,
+      type: "NATIVE_ARTICLE",
+      name: "Lists IT studio article",
+      basePrice: 10000,
+      currency: "NOK",
+      inclusions: { production: "PUBLISHER" },
+    },
+  });
+  try {
+    const item = await addProductItem(listId, studio.id);
+    assert.deepEqual(await pair(item.id), { withContent: false, authorshipMode: "PUBLISHER_PRODUCED" });
+  } finally {
+    await prisma.savedListItem.deleteMany({ where: { productId: studio.id } });
+    await prisma.product.delete({ where: { id: studio.id } });
+  }
+});
+
+test("a title placeholder defaults to 'We write it'; resolving onto a publisher-produced placement drops it", async () => {
+  const listId = await freshList();
+  const placeholder = await addTitleItem(listId, titleId);
+  assert.deepEqual(await pair(placeholder.id), { withContent: true, authorshipMode: "NATIVESPIN_PRODUCED" });
+  const studio = await prisma.product.create({
+    data: { titleId, type: "NATIVE_ARTICLE", name: "Lists IT studio 2", basePrice: 10000, currency: "NOK", productionFee: 0 },
+  });
+  try {
+    const resolved = await resolveTitleItem(placeholder.id, studio.id);
+    assert.ok(resolved);
+    assert.deepEqual(await pair(resolved.id), { withContent: false, authorshipMode: "PUBLISHER_PRODUCED" });
+  } finally {
+    await prisma.savedListItem.deleteMany({ where: { productId: studio.id } });
+    await prisma.product.delete({ where: { id: studio.id } });
+  }
 });
 
 test("setItemContent toggles the pair both ways", async () => {
@@ -336,7 +386,7 @@ test("setItemContent toggles the pair both ways", async () => {
 
 test("setItemContent off leaves a publisher-produced line alone", async () => {
   const listId = await freshList();
-  const item = await addProductItem(listId, productId);
+  const item = await addProductItem(listId, productId, false);
   await prisma.savedListItem.update({ where: { id: item.id }, data: { authorshipMode: "PUBLISHER_PRODUCED" } });
   await setItemContent(item.id, false);
   assert.deepEqual(await pair(item.id), { withContent: false, authorshipMode: "PUBLISHER_PRODUCED" });

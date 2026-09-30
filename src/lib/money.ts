@@ -180,11 +180,19 @@ export type ContentFeeItem = {
   name: string;
   productType: string;
   isAdaptation?: boolean;
+  // The offer's or publication's own production fee (Product.productionFee,
+  // else Title.productionFeeDefault), which beats the desk rule — the same
+  // cascade the catalog band is priced with (pricing/production-fee.ts).
+  // Null/undefined = inherit the rule. An explicit 0 means the publisher
+  // includes production: no fee line. Greenfield only — an adaptation is
+  // always priced from the rule's adaptation fee.
+  fee?: number | null;
 };
 
 // Produce CONTENT_FEE quote lines for placements the buyer wants us to
-// write. Items with no matching active rule are skipped (no silent
-// zero-priced line — the desk sees the gap and sets a rule).
+// write. Items with no matching active rule (and no offer-level fee) are
+// skipped (no silent zero-priced line — the desk sees the gap and sets a
+// rule).
 export function computeContentFeeLines(
   items: ContentFeeItem[],
   rules: ContentFeeRuleSpec[],
@@ -192,9 +200,11 @@ export function computeContentFeeLines(
 ): QuoteLineComputation[] {
   const lines: QuoteLineComputation[] = [];
   for (const item of items) {
-    const rule = pickContentFeeRule(rules, item.productType, marketCode);
-    if (!rule) continue;
-    const fee = Math.round(contentFeeAmount(rule, item.isAdaptation));
+    const offerFee = item.isAdaptation ? null : (item.fee ?? null);
+    const rule = offerFee === null ? pickContentFeeRule(rules, item.productType, marketCode) : null;
+    if (offerFee === null && !rule) continue;
+    const fee = Math.round(offerFee ?? contentFeeAmount(rule!, item.isAdaptation));
+    if (fee <= 0) continue;
     lines.push({
       kind: "CONTENT_FEE",
       productId: null,

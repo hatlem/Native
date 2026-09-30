@@ -40,3 +40,16 @@ export function isProductPriceShown(
   return arePricesVisible(title);
 }
 
+// Instant-orderable = the buyer can order this line self-serve, with no desk
+// quote: a FIRM price that is also shown (the three gates above). The one rule
+// behind the /plan checkout's instant path, the public order API, and "exact
+// figure vs band" on every plan surface (lib/plan-total.ts lineDisplay): the
+// only prices a buyer sees exactly before a quote are the ones they can order
+// at that price right now.
+export function isInstantOrderable(
+  product: ProductWithConfirmation & { visibility: string },
+  title: TitleWithVisibility,
+): boolean {
+  return product.visibility === "FIRM" && isProductPriceShown(product, title);
+}
+

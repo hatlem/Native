@@ -32,10 +32,15 @@ before(async () => {
   orgId = org.id;
   // a Title with >=2 active+bookable products, so the placeholder resolves to a
   // DIFFERENT product than the buyer's product line.
-  const title = await prisma.title.findFirst({
+  // `some` only guarantees one product, and other suites leave single-product
+  // fixture titles behind — pick the first title that really has two.
+  const candidates = await prisma.title.findMany({
     where: { products: { some: { active: true, bookable: true } } },
     include: { products: { where: { active: true, bookable: true }, take: 2 } },
+    orderBy: { createdAt: "asc" },
+    take: 50,
   });
+  const title = candidates.find((t) => t.products.length >= 2);
   titleId = title!.id;
   productAId = title!.products[0].id;
   productBId = title!.products[1].id;

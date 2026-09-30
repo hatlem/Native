@@ -53,6 +53,51 @@ export function contentIntent(
   return { withContent: false, authorshipMode };
 }
 
+// ---------------------------------------------------------------------------
+// The default for a NEW line — added from the catalog, the title page,
+// compare, the recommenders, a heart, a list checklist. The catalog's price
+// band is all-in: it includes the article (display-price.ts customerPrice adds
+// the production fee). So a line starts with "We write it" ON — the plan then
+// shows the price the buyer saw, and the buyer switches it off on /plan if
+// they bring their own copy.
+//
+// Except where content doesn't apply: the publisher's own studio writes it
+// (Product.inclusions.production = "PUBLISHER", or an explicit production fee
+// of 0 on the offer/publication — schema: "0 = publisher includes
+// production"). Then the line records PUBLISHER_PRODUCED, which bills no
+// content fee and staffs no writer.
+//
+// A title placeholder (no product yet) has nothing to say otherwise, so it
+// takes the same ON default; resolving it onto a publisher-produced placement
+// applies the exception then (lib/lists.ts resolveTitleItem).
+// ---------------------------------------------------------------------------
+
+export type ContentDefaultSource = {
+  inclusions?: unknown;
+  productionFee?: unknown;
+  title?: { productionFeeDefault?: unknown } | null;
+};
+
+function isExplicitZero(v: unknown): boolean {
+  return v != null && Number(v) === 0;
+}
+
+export function publisherProducesContent(product: ContentDefaultSource): boolean {
+  const inclusions = product.inclusions as { production?: unknown } | null | undefined;
+  if (inclusions?.production === "PUBLISHER") return true;
+  // First set fee wins, as in resolveProductionFee: an offer-level fee (even a
+  // non-zero one) overrides the publication default.
+  if (product.productionFee != null) return isExplicitZero(product.productionFee);
+  return isExplicitZero(product.title?.productionFeeDefault);
+}
+
+export function defaultContentIntent(product: ContentDefaultSource | null): ContentIntent {
+  if (product && publisherProducesContent(product)) {
+    return { withContent: false, authorshipMode: "PUBLISHER_PRODUCED" };
+  }
+  return contentIntent(true);
+}
+
 // Two lines folding into one (same product added twice, a placeholder resolved
 // onto an existing line, a catalog merge): if either asked us to write it, the
 // survivor does — dropping a content request silently loses a paid service the

@@ -210,7 +210,8 @@
       "publisher": "Utgiver",
       "densityLabel": "Visning",
       "densityList": "Liste",
-      "densityCards": "Kort"
+      "densityCards": "Kort",
+      "price": "Pris"
     },
     "compareBar": {
       "label": "{count, plural, =1 {1 tittel valgt} other {# titler valgt}}",
@@ -298,7 +299,9 @@
       "mobileFilters": "Filtre",
       "marketCountAll": "Alle {total} markeder",
       "formatHeading": "Hvilket format?",
-      "formatHint": "Native-artikkel, advertorial, display, video …"
+      "formatHint": "Native-artikkel, advertorial, display, video …",
+      "priceHeading": "Hva vil du bruke per plassering?",
+      "priceHint": "Prisintervall per plassering, inkl. artikkel."
     },
     "shortlist": {
       "untitledPlan": "planen",
@@ -729,6 +732,9 @@
       "item3Body": "Utkast sendes til deg for godkjenning. Lenker og resultater havner i Rapporter."
     },
     "breakdownQtyWithArticleFee": "{n} × {unit} plassering + {article} per artikkel (én artikkel for alle {n})",
+    "inclVatFirmPart": "{amount} inkl. mva. for linjene du kan bestille direkte",
+    "estimateNote": "≈ er et prisintervall. Den nøyaktige prisen får du i tilbudet.",
+    "breakdownPlacements": "{n} plasseringer",
     "noticePlanReadOnly": "Du har bare lesetilgang til denne planen, så ingenting ble endret."
   },
   "rfq": {
@@ -1396,7 +1402,19 @@
     "emptyTitle": "Ingen fakturaer ennå",
     "emptyHint": "Fakturaer dukker opp her når en kampanje har kjørt og er fakturert.",
     "emptyCta": "Se kampanjene dine",
-    "colCustomer": "Kunde"
+    "colCustomer": "Kunde",
+    "seller": "Fra",
+    "sellerOrgNumber": "Org.nr.",
+    "sellerVatNumber": "MVA-nr.",
+    "paymentHeading": "Betalingsinformasjon",
+    "bankAccount": "Kontonummer",
+    "paymentReference": "Referanse",
+    "pdfUnavailableHeading": "PDF-en er ikke klar ennå",
+    "pdfUnavailable": "Vi gjør ferdig fakturadokumentet. Beløpene under er endelige — ta kontakt hvis du trenger PDF-en nå.",
+    "pdfUnavailableDesk": "PDF-en kan ikke lages før NativeSpins selskapsopplysninger er satt i servermiljøet. Sett disse variablene og deploy på nytt:",
+    "sellerVarMissing": "ikke satt",
+    "sellerVarInvalid": "satt, men kontrollsifferet stemmer ikke",
+    "pdfPending": "Vis"
   },
   "firm": {
     "badge": "Øyeblikkelig bestilling",
@@ -1671,7 +1689,7 @@
     "rowReach": "Månedlig dekning",
     "rowLeadTime": "Ledetid",
     "rowFormats": "Tilgjengelige formater",
-    "rowFromPrice": "Fra pris",
+    "rowFromPrice": "Prisintervall",
     "rowAction": "Handling"
   },
   "availability": {
@@ -2530,7 +2548,7 @@
     "planRfqOnly": "En eller flere titler i planen krever et tilbud — øyeblikkelig bestilling er deaktivert til prisen er bekreftet.",
     "listIndicative": "Listepris (veiledende)",
     "listIndicativeHelp": "Veiledende listepris — endelig pris bekreftes etter en kort brief.",
-    "productionIncluded": "Ferdig skrevet artikkel inkludert",
+    "productionIncluded": "inkl. artikkel",
     "firmTurnaround": "Fast pris normalt innen 24 timer"
   },
   "titleAdmin": {

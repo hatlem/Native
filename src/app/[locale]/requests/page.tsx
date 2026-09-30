@@ -4,7 +4,8 @@ import { redirect } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import { loadScope } from "@/lib/scope";
 import { loadUnsentLists } from "@/lib/lists";
-import { estimateListTotals } from "@/lib/plan-total";
+import { estimateListTotals, hasFigure } from "@/lib/plan-total";
+import { totalLabel as planTotalLabel } from "@/lib/pricing/total-label";
 import { loadPricingDefaults } from "@/lib/content-fee";
 import { Link } from "@/i18n/navigation";
 import { EmptyState } from "@/app/empty-state";
@@ -140,18 +141,20 @@ export default async function RequestsPage({
   // the amount the plan would actually commit to (content fees included).
   const pricing = await loadPricingDefaults();
   for (const list of unsentLists) {
-    const totals = estimateListTotals(list.items, pricing);
+    // Exact for instant-orderable lines, a band range for the rest — the
+    // same figure /plan shows (lib/plan-total.ts, lib/pricing/total-label.ts).
+    const totals = estimateListTotals(list.items, pricing).filter(hasFigure);
     const totalLabel = totals.length
       ? totals.length > 1
         ? totals
             .map((tot) =>
               tPlan("totalForItems", {
-                amount: formatMoney(tot.amount, tot.currency, locale),
+                amount: planTotalLabel(tot, locale) ?? "",
                 count: tot.itemCount,
               }),
             )
             .join(" + ")
-        : formatMoney(totals[0].amount, totals[0].currency, locale)
+        : planTotalLabel(totals[0], locale)
       : null;
     rows.push({
       id: `draft-${list.id}`,

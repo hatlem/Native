@@ -210,7 +210,8 @@
       "publisher": "Udgiver",
       "densityLabel": "Visning",
       "densityList": "Liste",
-      "densityCards": "Kort"
+      "densityCards": "Kort",
+      "price": "Pris"
     },
     "compareBar": {
       "label": "{count, plural, =1 {1 titel valgt} other {# titler valgt}}",
@@ -298,7 +299,9 @@
       "mobileFilters": "Filtre",
       "marketCountAll": "Alle {total} markeder",
       "formatHeading": "Hvilket format?",
-      "formatHint": "Native-artikel, advertorial, display, video …"
+      "formatHint": "Native-artikel, advertorial, display, video …",
+      "priceHeading": "Hvad vil du bruge pr. placering?",
+      "priceHint": "Prisinterval pr. placering, inkl. artikel."
     },
     "shortlist": {
       "untitledPlan": "din plan",
@@ -729,6 +732,9 @@
       "item3Body": "Udkast sendes til dig til godkendelse. Links og resultater lander i Rapporter."
     },
     "breakdownQtyWithArticleFee": "{n} × {unit} placering + {article} pr. artikel (én artikel til alle {n})",
+    "inclVatFirmPart": "{amount} inkl. moms for de linjer, du kan bestille med det samme",
+    "estimateNote": "≈ er et prisinterval. Den nøjagtige pris får du i tilbuddet.",
+    "breakdownPlacements": "{n} placeringer",
     "noticePlanReadOnly": "Du har kun læseadgang til denne plan, så intet blev ændret."
   },
   "rfq": {
@@ -1396,7 +1402,19 @@
     "emptyTitle": "Ingen fakturaer endnu",
     "emptyHint": "Fakturaer vises her, når en kampagne er kørt og faktureret.",
     "emptyCta": "Se dine kampagner",
-    "colCustomer": "Kunde"
+    "colCustomer": "Kunde",
+    "seller": "Fra",
+    "sellerOrgNumber": "Org.nr.",
+    "sellerVatNumber": "Momsnr.",
+    "paymentHeading": "Betalingsoplysninger",
+    "bankAccount": "Kontonummer",
+    "paymentReference": "Reference",
+    "pdfUnavailableHeading": "PDF'en er ikke klar endnu",
+    "pdfUnavailable": "Vi gør fakturadokumentet færdigt. Beløbene nedenfor er endelige — kontakt os, hvis du har brug for PDF'en nu.",
+    "pdfUnavailableDesk": "PDF'en kan ikke dannes, før NativeSpins selskabsoplysninger er sat i servermiljøet. Sæt disse variabler, og deploy igen:",
+    "sellerVarMissing": "ikke sat",
+    "sellerVarInvalid": "sat, men kontrolcifferet passer ikke",
+    "pdfPending": "Vis"
   },
   "firm": {
     "badge": "Øjeblikkelig bestilling",
@@ -1671,7 +1689,7 @@
     "rowReach": "Månedlig rækkevidde",
     "rowLeadTime": "Leveringstid",
     "rowFormats": "Tilgængelige formater",
-    "rowFromPrice": "Fra pris",
+    "rowFromPrice": "Prisinterval",
     "rowAction": "Handling"
   },
   "availability": {
@@ -2531,7 +2549,7 @@
     "planRfqOnly": "En eller flere titler i din plan kræver et tilbud — øjeblikkelig bestilling er deaktiveret, indtil prisen er bekræftet.",
     "listIndicative": "Listepris (vejledende)",
     "listIndicativeHelp": "Vejledende listepris — den endelige pris bekræftes efter en kort brief.",
-    "productionIncluded": "Færdigskrevet artikel inkluderet",
+    "productionIncluded": "inkl. artikel",
     "firmTurnaround": "Fast pris typisk inden for 24 timer"
   },
   "titleAdmin": {

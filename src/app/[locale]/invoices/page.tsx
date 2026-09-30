@@ -5,6 +5,7 @@ import { Link } from "@/i18n/navigation";
 import { formatMoney, intlLocale } from "@/lib/money";
 import { loadScope } from "@/lib/scope";
 import { invoiceNumber } from "@/lib/pdf/invoice-pdf-data";
+import { loadSellerDetails, sellerGaps } from "@/lib/seller";
 import { EmptyState } from "@/app/empty-state";
 import { StatusBadge } from "@/app/status-badge";
 
@@ -40,6 +41,7 @@ export default async function InvoicesPage({
   });
   // Agencies bill several clients; name the customer only when it varies.
   const showCustomer = orgIds.length > 1;
+  const seller = loadSellerDetails();
   const date = (d: Date | null) =>
     d ? new Intl.DateTimeFormat(intlLocale(locale), { dateStyle: "medium" }).format(d) : "—";
 
@@ -85,14 +87,22 @@ export default async function InvoicesPage({
                   </td>
                   <td className="num">{formatMoney(Number(inv.total), inv.currency, locale)}</td>
                   <td>
-                    {/* Plain <a>: a route-handler download. */}
-                    <a
-                      className="small-link"
-                      href={`/api/export/invoice-pdf/${inv.id}?locale=${locale}`}
-                      download
-                    >
-                      {t("download")}
-                    </a>
+                    {sellerGaps(seller, inv.currency).length === 0 ? (
+                      // Plain <a>: a route-handler download.
+                      <a
+                        className="small-link"
+                        href={`/api/export/invoice-pdf/${inv.id}?locale=${locale}`}
+                        download
+                      >
+                        {t("download")}
+                      </a>
+                    ) : (
+                      // The PDF refuses to render without the seller's legal
+                      // details (lib/seller.ts); the invoice page explains.
+                      <Link className="small-link" href={`/invoices/${inv.id}`}>
+                        {t("pdfPending")}
+                      </Link>
+                    )}
                   </td>
                 </tr>
               ))}

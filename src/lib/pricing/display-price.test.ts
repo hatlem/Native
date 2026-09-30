@@ -1,6 +1,7 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import {
+  bandIncludesArticle,
   customerPrice,
   plannablePrice,
   productBand,
@@ -172,6 +173,36 @@ test("titleRate falls back to the cheapest shown unit rate when no flat band exi
 
 test("titleRate is null when only FLAT products exist (band owns the card)", () => {
   assert.equal(titleRate([product()], TITLE, DEFAULTS), null);
+});
+
+test("bandIncludesArticle: an article fee in the band means the article is in it", () => {
+  assert.equal(bandIncludesArticle(product(), TITLE, DEFAULTS), true);
+});
+
+test("bandIncludesArticle: explicit 0 fee = the publisher includes production", () => {
+  // Spec: "productionFee = 0 → cascade stops; 'Includes written article'
+  // still shown" — the article is produced, just not billed by us.
+  assert.equal(bandIncludesArticle(product({ productionFee: 0 }), TITLE, DEFAULTS), true);
+  assert.equal(customerPrice(product({ productionFee: 0 }), TITLE, DEFAULTS), 34_500);
+  assert.equal(bandIncludesArticle(product(), { ...TITLE, productionFeeDefault: 0 }, DEFAULTS), true);
+});
+
+test("bandIncludesArticle: no fee rule and no stated producer → no article claim", () => {
+  assert.equal(bandIncludesArticle(product(), TITLE, { feeRules: [], marginRules: [] }), false);
+});
+
+test("the publisher's studio writes it: article included, but no fee of ours in the band", () => {
+  const studio = product({ inclusions: { production: "PUBLISHER" } });
+  assert.equal(bandIncludesArticle(studio, TITLE, DEFAULTS), true);
+  // A catalog add of this product starts PUBLISHER_PRODUCED (no content fee),
+  // so the band is the placement alone — what the plan and order charge.
+  assert.equal(customerPrice(studio, TITLE, DEFAULTS), 34_500);
+});
+
+test("customerPrice: the offer's own article fee beats the desk rule", () => {
+  // 34 500 placement + the offer's 5 000 (not the rule's 2 000).
+  assert.equal(customerPrice(product({ productionFee: 5_000 }), TITLE, DEFAULTS), 39_500);
+  assert.equal(customerPrice(product(), { ...TITLE, productionFeeDefault: 4_000 }, DEFAULTS), 38_500);
 });
 
 test("plannablePrice: the all-in placement price for FLAT products only", () => {

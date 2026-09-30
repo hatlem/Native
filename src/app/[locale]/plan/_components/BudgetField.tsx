@@ -13,21 +13,28 @@ export function BudgetField({
   value,
   onChange,
   currency,
-  total,
+  totalFloor,
+  totalLabel,
 }: {
   locale: string;
   value: string;
   onChange: (value: string) => void;
-  // Null when the basket is empty, has no visible-price lines, or spans
-  // more than one currency — comparing a single budget number against a
-  // mixed-currency basket would be a guess, so the warning stays off.
+  // Null when the basket is empty, has no priced lines, or spans more than
+  // one currency — comparing a single budget number against a mixed-currency
+  // basket would be a guess, so the warning stays off.
   currency: string | null;
-  total: number;
+  // The least the plan can cost (exact lines + the bottom of the band range,
+  // lib/pricing/total-label.ts totalFloor) — the warning only fires when the
+  // budget can't cover even that. Never an exact estimate of a banded line:
+  // this is a client component, so the figure ships in the page payload.
+  totalFloor: number;
+  // The total as the summary prints it ("45 000 kr + ≈ 40–60k NOK").
+  totalLabel: string;
 }) {
   const t = useTranslations("rfq");
   const numeric = Number(value);
   const showWarning =
-    currency != null && numeric > 0 && total > 0 && numeric < total * WARNING_THRESHOLD;
+    currency != null && numeric > 0 && totalFloor > 0 && numeric < totalFloor * WARNING_THRESHOLD;
 
   return (
     <div className="field">
@@ -44,7 +51,7 @@ export function BudgetField({
         <p className="warn" role="status">
           {t("budgetWarning", {
             budget: formatMoney(numeric, currency!, locale),
-            total: formatMoney(total, currency!, locale),
+            total: totalLabel,
           })}
         </p>
       ) : null}
