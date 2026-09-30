@@ -66,3 +66,27 @@ if (!RUN_DB_IT) {
     );
   });
 }
+
+test("the database refuses an ADMIN seat or invite without commit authority", { skip: !RUN_DB_IT }, async () => {
+  await assert.rejects(
+    prisma.membership.update({
+      where: { userId_organizationId: { userId, organizationId: olderOrgId } },
+      data: { canCommit: false },
+    }),
+    /Membership_admin_commits/,
+  );
+  await assert.rejects(
+    prisma.orgInvite.create({
+      data: {
+        organizationId: olderOrgId,
+        email: `admin-no-commit-${olderOrgId}@example.com`,
+        role: "ADMIN",
+        canCommit: false,
+        token: `admin-no-commit-${olderOrgId}`,
+        expiresAt: new Date(Date.now() + 86_400_000),
+        createdById: userId,
+      },
+    }),
+    /OrgInvite_admin_commits/,
+  );
+});

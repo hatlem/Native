@@ -2484,7 +2484,8 @@
     "deactivateButton": "Mein Konto deaktivieren",
     "deactivating": "Wird deaktiviert…",
     "errDelegation": "Das Enddatum der Delegation ist kein gültiges Datum.",
-    "errDelegationPast": "Das Enddatum der Delegation muss in der Zukunft liegen."
+    "errDelegationPast": "Das Enddatum der Delegation muss in der Zukunft liegen.",
+    "canCommitAdminNote": "Administratoren haben immer Bestellrecht."
   },
   "rateCard": {
     "pageTitle": "Rate-Card-Anfrage",

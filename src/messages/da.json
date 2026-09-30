@@ -2628,7 +2628,8 @@
     "deactivateButton": "Deaktivér min konto",
     "deactivating": "Deaktiverer…",
     "errDelegation": "Slutdatoen for delegeringen er ikke en gyldig dato.",
-    "errDelegationPast": "Slutdatoen for delegeringen skal ligge i fremtiden."
+    "errDelegationPast": "Slutdatoen for delegeringen skal ligge i fremtiden.",
+    "canCommitAdminNote": "Administratorer har altid bestillingsret."
   },
   "rateCard": {
     "pageTitle": "Rate card-anmodning",
