@@ -20,8 +20,9 @@ export function deriveStage(input: {
   }
   // A quote exists but hasn't become an order yet — still "Quoted" even if
   // it has since expired or been declined; the row should keep surfacing
-  // at this stage rather than silently reverting to "Sent".
-  if (input.quoteStatus) return 3;
+  // at this stage rather than silently reverting to "Sent". A DRAFT is the
+  // desk still pricing — not yet a quote the buyer has — so it stays "Sent".
+  if (input.quoteStatus && input.quoteStatus !== "DRAFT") return 3;
   if (input.requestStatus === "DRAFT") return 1;
   return 2;
 }

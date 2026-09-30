@@ -1,5 +1,6 @@
 import { getTranslations } from "next-intl/server";
 import { prisma } from "@/lib/prisma";
+import { buyerVisibleQuoteWhere } from "@/lib/commerce/quote-validity";
 import { Link } from "@/i18n/navigation";
 import { formatMoney } from "@/lib/money";
 import {
@@ -37,7 +38,8 @@ export default async function DeskReportsPage({
       // count (not `status: "QUOTED"`) so a request that later moved on to
       // CLOSED without ordering still counts as having passed through
       // "quoted" for the funnel below.
-      prisma.request.count({ where: { quotes: { some: {} } } }),
+      // A DRAFT the desk hasn't sent doesn't count as quoted.
+      prisma.request.count({ where: { quotes: { some: buyerVisibleQuoteWhere() } } }),
       prisma.order.findMany({
         select: {
           status: true,

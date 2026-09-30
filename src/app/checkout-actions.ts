@@ -19,6 +19,7 @@ import {
   fingerprintListItems,
 } from "@/lib/commerce/firm-order";
 import { submitListAsRfq } from "@/lib/commerce/submit-rfq";
+import { planNameFor } from "@/lib/plan-name";
 import { uniquePublisherIdsForProducts } from "@/lib/commerce/publishers";
 import { groupItemsByMarket } from "@/lib/quote-grouping";
 import { recordAudit } from "@/lib/audit";
@@ -253,6 +254,7 @@ export async function submitRequest(formData: FormData) {
       result = await createFirmOrder({
         organizationId: org.id,
         orgName: org.name,
+        planName: planNameFor({ listName: list.name, orgName: org.name, locale }),
         items,
         byId,
         listGuard: { listId: list.id, fingerprint: loadedFingerprint },

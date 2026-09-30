@@ -1265,6 +1265,12 @@ model QuoteLine {
   // quote is generated; the desk edits it per line. Plain text, max 500 chars
   // (lib/line-note.ts).
   customerNote   String?
+  // Display order within the quote (0-based, as generated). Postgres returns
+  // rows in physical order, and an UPDATE moves a row to the end — so without
+  // an explicit key a repriced line jumps to the bottom. Every reader orders
+  // by (position, id) via lib/commerce/line-order.ts; the value is copied
+  // onto OrderLine/InvoiceLine so the order and invoice read the same way.
+  position       Int      @default(0)
 }
 
 model Order {
@@ -1322,6 +1328,9 @@ model OrderLine {
   // Desk user who made the assignment. Bare id (no relation), same
   // convention as Order.cancelledBy.
   assignedById     String?
+  // Display order within the order — copied from the QuoteLine it came from
+  // (see QuoteLine.position).
+  position         Int      @default(0)
 
   brief            ContentBrief?
   articlePlacement ArticlePlacement?
@@ -1472,6 +1481,9 @@ model InvoiceLine {
   quantity    Int     @default(1)
   unitAmount  Decimal @db.Decimal(12, 2)
   lineTotal   Decimal @db.Decimal(12, 2)
+  // Display order on the invoice — copied from the QuoteLine it bills (see
+  // QuoteLine.position).
+  position    Int     @default(0)
 }
 
 // Refund issued against an Invoice. Lives separately from the

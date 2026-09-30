@@ -1,4 +1,5 @@
 import { prisma } from "@/lib/prisma";
+import { lineOrder } from "@/lib/commerce/line-order";
 import { quoteOnlineUrl } from "./quote-online-url";
 
 // Everything a customer-facing quote PDF is allowed to render. No cost,
@@ -56,7 +57,7 @@ export async function loadQuotePdfData(
   const quote = await prisma.quote.findUniqueOrThrow({
     where: { id: quoteId },
     include: {
-      lines: true,
+      lines: { orderBy: lineOrder() },
       request: { include: { organization: { select: { name: true } } } },
     },
   });

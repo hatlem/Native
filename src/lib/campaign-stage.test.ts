@@ -50,3 +50,8 @@ test("firm-order gotcha: Request.status CLOSED with an order is NOT stage 1/2", 
 test("closed request with no quote/order at all -> Sent bucket (dead RFQ), not Plan built", () => {
   assert.equal(deriveStage({ requestStatus: "CLOSED", quoteStatus: null, orderStatus: null }), 2);
 });
+
+test("a desk DRAFT quote is not a quote the buyer has — still Sent, not Quoted", () => {
+  assert.equal(deriveStage({ requestStatus: "IN_REVIEW", quoteStatus: "DRAFT", orderStatus: null }), 2);
+  assert.equal(deriveStage({ requestStatus: "QUOTED", quoteStatus: "SENT", orderStatus: null }), 3);
+});

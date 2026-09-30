@@ -8,6 +8,7 @@
 import type { Prisma } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
 import { deriveStage } from "@/lib/campaign-stage";
+import { buyerVisibleQuoteWhere } from "@/lib/commerce/quote-validity";
 import { clampCadence, currentPeriodStart, shiftScheduleStart } from "@/lib/programme-cadence";
 import type { BookingUnit } from "@/lib/campaign-schedule";
 
@@ -220,7 +221,9 @@ const WAVE_STATE_INCLUDE = {
     select: {
       id: true,
       status: true,
+      // Buyer-facing wave state: a desk draft isn't "quoted" yet.
       quotes: {
+        where: buyerVisibleQuoteWhere(),
         orderBy: { createdAt: "desc" as const },
         take: 1,
         select: { status: true, order: { select: { id: true, status: true } } },

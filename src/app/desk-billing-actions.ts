@@ -3,6 +3,7 @@
 import { redirect } from "next/navigation";
 import { OrderStatus } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
+import { lineOrder } from "@/lib/commerce/line-order";
 import { recordAudit } from "@/lib/audit";
 import { notifyOrg } from "@/lib/notify";
 import { requireDesk } from "@/lib/desk-guard";
@@ -103,7 +104,11 @@ export async function issueInvoice(formData: FormData) {
 
   const order = await prisma.order.findUnique({
     where: { id: orderId },
-    include: { quote: { include: { lines: true } }, invoices: true, lines: true },
+    include: {
+      quote: { include: { lines: { orderBy: lineOrder() } } },
+      invoices: true,
+      lines: true,
+    },
   });
 
   if (order && order.invoices.length === 0) {
@@ -122,12 +127,19 @@ export async function issueInvoice(formData: FormData) {
           issuedAt: new Date(),
           dueAt,
           lines: {
-            create: q.lines.map((l) => ({
-              description: l.description,
-              quantity: l.quantity,
-              unitAmount: l.lineTotal,
-              lineTotal: l.lineTotal,
-            })),
+            // Only what the buyer accepted is billed: "price on request"
+            // lines never became order lines and are excluded from the
+            // quote total, so they must not appear on the invoice either.
+            // Invoice lines keep the quote's display order.
+            create: q.lines
+              .filter((l) => !l.priceOnRequest)
+              .map((l) => ({
+                description: l.description,
+                quantity: l.quantity,
+                unitAmount: l.lineTotal,
+                lineTotal: l.lineTotal,
+                position: l.position,
+              })),
           },
         },
       }),
