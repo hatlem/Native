@@ -3165,5 +3165,11 @@
   "joinedNotice": {
     "lists": "Velkommen til {org}. Her er dit teams planer – åbn en for at se titler, priser og bemærkninger.",
     "home": "Velkommen til {org}. Nu er du med i teamet på NativeSpin."
+  },
+  "listNames": {
+    "untitled": "Ny plan",
+    "imported": "Importeret plan",
+    "reordered": "Bestilt igen",
+    "copyOf": "{name} (kopi)"
   }
 }

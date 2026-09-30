@@ -3164,5 +3164,11 @@
   "joinedNotice": {
     "lists": "Welcome to {org}. These are your team's plans — open one to see the titles, prices and notes.",
     "home": "Welcome to {org}. You're now part of the team on NativeSpin."
+  },
+  "listNames": {
+    "untitled": "New plan",
+    "imported": "Imported plan",
+    "reordered": "Reordered campaign",
+    "copyOf": "{name} (copy)"
   }
 }

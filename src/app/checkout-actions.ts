@@ -27,6 +27,7 @@ import { isAudienceSegment } from "@/lib/targeting/segments";
 import { rfqLimiter } from "@/lib/rate-limit";
 import { loadScope, canCommitOnOrg } from "@/lib/scope";
 import { clientIp } from "@/lib/client-ip";
+import { listNames } from "@/lib/list-names";
 
 function str(formData: FormData, key: string): string {
   const v = formData.get(key);
@@ -97,7 +98,12 @@ export async function submitRequest(formData: FormData) {
   // Submit the active saved list — the durable replacement for the basket
   // cookie. It can hold product lines (productId set) and Title placeholders
   // (titleId set, productId null). The list is NOT consumed on submit.
-  const list = await ensureActiveList(org.id, await readActiveListId());
+  const list = await ensureActiveList(
+    org.id,
+    await readActiveListId(),
+    undefined,
+    (await listNames(locale)).untitled,
+  );
   // Recommended alternatives are never part of a submit or an order.
   const planItems = committedItems(list.items);
   if (planItems.length === 0) redirect(`/${locale}/plan?error=1`);

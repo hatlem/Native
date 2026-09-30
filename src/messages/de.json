@@ -3033,5 +3033,11 @@
   "joinedNotice": {
     "lists": "Willkommen bei {org}. Das sind die Pläne Ihres Teams – öffnen Sie einen, um Titel, Preise und Hinweise zu sehen.",
     "home": "Willkommen bei {org}. Sie gehören jetzt zum Team auf NativeSpin."
+  },
+  "listNames": {
+    "untitled": "Neuer Plan",
+    "imported": "Importierter Plan",
+    "reordered": "Erneut bestellte Kampagne",
+    "copyOf": "{name} (Kopie)"
   }
 }

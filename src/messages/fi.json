@@ -3164,5 +3164,11 @@
   "joinedNotice": {
     "lists": "Tervetuloa, {org}. Tässä ovat tiimisi suunnitelmat – avaa yksi nähdäksesi julkaisut, hinnat ja huomautukset.",
     "home": "Tervetuloa, {org}. Olet nyt mukana tiimissä NativeSpinissä."
+  },
+  "listNames": {
+    "untitled": "Uusi suunnitelma",
+    "imported": "Tuotu suunnitelma",
+    "reordered": "Uudelleen tilattu kampanja",
+    "copyOf": "{name} (kopio)"
   }
 }

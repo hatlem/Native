@@ -25,6 +25,7 @@ import {
 import { enableListShare, disableListShare } from "@/lib/list-share";
 import { normalizeLineNote } from "@/lib/line-note";
 import { reorderSection, ReorderMismatchError } from "@/lib/plan-reorder";
+import { listNames } from "@/lib/list-names";
 
 function str(formData: FormData, key: string): string {
   const v = formData.get(key);
@@ -52,13 +53,21 @@ async function activeList(locale: string) {
   let activeId = await readActiveListId();
   if (!activeId) {
     const legacy = await readBasket(); // legacy cookie, may be []
-    const migrated = legacy.length ? await migrateLegacyBasket(orgId, legacy, scope.userId ?? null) : null;
+    const names = await listNames(locale);
+    const migrated = legacy.length
+      ? await migrateLegacyBasket(orgId, legacy, scope.userId ?? null, names.imported)
+      : null;
     if (migrated) {
       activeId = migrated.id;
       (await cookies()).delete("nativespin_plan");
     }
   }
-  const listId = await ensureActiveListId(orgId, activeId, scope.userId);
+  const listId = await ensureActiveListId(
+    orgId,
+    activeId,
+    scope.userId,
+    (await listNames(locale)).untitled,
+  );
   await writeActiveListId(listId);
   return { scope, orgId, listId };
 }
@@ -121,14 +130,14 @@ export async function addProductToActiveList(
   if (!activeId) {
     const legacy = await readBasket();
     const migrated = legacy.length
-      ? await migrateLegacyBasket(orgId, legacy, scope.userId)
+      ? await migrateLegacyBasket(orgId, legacy, scope.userId, (await listNames(locale)).imported)
       : null;
     if (migrated) {
       activeId = migrated.id;
       (await cookies()).delete("nativespin_plan");
     }
   }
-  const listId = await ensureActiveListId(orgId, activeId, scope.userId);
+  const listId = await ensureActiveListId(orgId, activeId, scope.userId, (await listNames(locale)).untitled);
   await writeActiveListId(listId);
   await addProductItem(listId, productId, withContent);
   revalidatePath(`/${locale}/plan`, "layout");
@@ -233,7 +242,7 @@ export async function createListWithTitle(formData: FormData) {
     });
     if (valid) {
       const list = await prisma.savedList.create({
-        data: { organizationId: orgId, name: str(formData, "name") || "Untitled list", createdById: scope.userId },
+        data: { organizationId: orgId, name: str(formData, "name") || (await listNames(locale)).untitled, createdById: scope.userId },
       });
       await addTitleItem(list.id, titleId);
       await recordAudit(scope.userId, "list.create", `SavedList:${list.id}`, { orgId });
@@ -399,7 +408,7 @@ export async function createList(formData: FormData) {
   const locale = str(formData, "locale") || "en";
   const { scope, orgId } = await requireActiveOrg(locale);
   const list = await prisma.savedList.create({
-    data: { organizationId: orgId, name: str(formData, "name") || "Untitled list", createdById: scope.userId ?? null },
+    data: { organizationId: orgId, name: str(formData, "name") || (await listNames(locale)).untitled, createdById: scope.userId ?? null },
   });
   await writeActiveListId(list.id);
   await recordAudit(scope.userId ?? null, "list.create", `SavedList:${list.id}`, { orgId });
@@ -424,7 +433,7 @@ export async function renameList(formData: FormData) {
   const scope = await loadScope();
   const list = await prisma.savedList.findUnique({ where: { id: listId }, select: { organizationId: true } });
   if (list && canActOnOrg(scope, list.organizationId)) {
-    await prisma.savedList.update({ where: { id: listId }, data: { name: str(formData, "name") || "Untitled list" } });
+    await prisma.savedList.update({ where: { id: listId }, data: { name: str(formData, "name") || (await listNames(locale)).untitled } });
   }
   revalidatePath(`/${locale}/plan`, "layout");
   revalidatePath(`/${locale}/lists`);
@@ -500,7 +509,7 @@ export async function duplicateList(formData: FormData) {
   const copy = await prisma.savedList.create({
     data: {
       organizationId: source.organizationId,
-      name: `${source.name} (copy)`,
+      name: (await listNames(locale)).copyOf(source.name),
       note: source.note,
       createdById: scope.userId ?? null,
       items: {
