@@ -7,7 +7,7 @@ import { notFound, redirect } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import { getWorkspace } from "@/lib/workspace";
 import { countUnsentLists } from "@/lib/lists";
-import { Inter } from "next/font/google";
+import { inter } from "@/fonts";
 import { routing } from "@/i18n/routing";
 import { Link } from "@/i18n/navigation";
 import { auth } from "@/auth";
@@ -25,12 +25,6 @@ import {
 } from "@/lib/nav";
 import { campaignFlowEnabled } from "@/lib/flags";
 import "../globals.css";
-
-const inter = Inter({
-  subsets: ["latin"],
-  display: "swap",
-  variable: "--font-inter",
-});
 
 export async function generateMetadata({
   params,

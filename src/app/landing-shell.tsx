@@ -1,5 +1,5 @@
 import type { ReactNode } from "react";
-import { Inter } from "next/font/google";
+import { inter2 as inter } from "@/fonts";
 import { headers } from "next/headers";
 import { getTranslations } from "next-intl/server";
 import { Link } from "@/i18n/navigation";
@@ -7,13 +7,6 @@ import { BrandWordmark } from "@/app/brand";
 import { MailLink } from "@/components";
 import { NewsletterSignup } from "@/app/[locale]/(marketing)/_components/NewsletterSignup";
 import { STYLES } from "./landing-styles";
-
-const inter = Inter({
-  subsets: ["latin"],
-  variable: "--font-inter",
-  display: "swap",
-  weight: ["400", "500", "600"],
-});
 
 const DESK_SUBJECT = "Talk to the NativeSpin desk";
 
