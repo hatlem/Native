@@ -28,7 +28,15 @@ before(async () => {
     data: { name: "Lists IT Org", type: "AGENCY", marketCode: market?.code ?? "NO" },
   });
   orgId = org.id;
-  const title = await prisma.title.findFirst({ where: { products: { some: {} } }, include: { products: true } });
+  // An active + bookable product, deterministically: "first title with any
+  // product" could land on another suite's inactive leftovers in a shared DB,
+  // and several paths below (legacy-basket import) only accept bookable ones.
+  const bookable = { active: true, bookable: true };
+  const title = await prisma.title.findFirst({
+    where: { products: { some: bookable } },
+    orderBy: { id: "asc" },
+    include: { products: { where: bookable, orderBy: { id: "asc" } } },
+  });
   titleId = title!.id;
   productId = title!.products[0].id;
   // a second, distinct bookable product for merge/cross tests

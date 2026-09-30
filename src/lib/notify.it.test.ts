@@ -42,6 +42,13 @@ if (!RUN_DB_IT) {
         data: { email: `${REF}-sv@example.test`, organizationId: org.id, locale: "sv" },
       })
     ).id;
+    // Recipients are the org's ACTIVE seats, not the home-org column.
+    await prisma.membership.createMany({
+      data: [
+        { userId: norwegianId, organizationId: org.id, role: "ADMIN", canCommit: true },
+        { userId: swedishId, organizationId: org.id, role: "MEMBER" },
+      ],
+    });
     const writer = await prisma.user.create({
       data: { email: `${REF}-writer@example.test`, role: "CONTENT", locale: "no" },
     });
@@ -72,6 +79,9 @@ if (!RUN_DB_IT) {
     await prisma.contentAsset.deleteMany({ where: { articleId } });
     await prisma.article.deleteMany({ where: { id: articleId } });
     await prisma.writerProfile.deleteMany({ where: { userId: writerUserId } });
+    await prisma.membership.deleteMany({ where: { organizationId: orgId } });
+    await prisma.notification.deleteMany({ where: { user: { email: { startsWith: `${REF}-seat` } } } });
+    await prisma.user.deleteMany({ where: { email: { startsWith: `${REF}-seat` } } });
     await prisma.user.deleteMany({ where: { id: { in: users } } });
     await prisma.organization.deleteMany({ where: { id: orgId } });
   });
@@ -148,5 +158,33 @@ if (!RUN_DB_IT) {
     // The desk's copy carries the comment as well.
     const desk = sent.find((m) => m.to !== `${REF}-writer@example.test`);
     if (desk) assert.match(desk.text, /Legg til et avsnitt om drivstoff/);
+  });
+
+  test("org notices follow ACTIVE seats: revoked/expired get nothing, seat-only members get them", async () => {
+    const revoked = await prisma.user.create({ data: { email: `${REF}-seat-revoked@example.test`, organizationId: orgId } });
+    const expired = await prisma.user.create({ data: { email: `${REF}-seat-expired@example.test`, organizationId: orgId } });
+    // Home org elsewhere (null here): belongs to this org only through a seat.
+    const seatOnly = await prisma.user.create({ data: { email: `${REF}-seat-only@example.test` } });
+    await prisma.membership.createMany({
+      data: [
+        { userId: revoked.id, organizationId: orgId, role: "MEMBER", status: "REVOKED" },
+        { userId: expired.id, organizationId: orgId, role: "MEMBER", expiresAt: new Date(Date.now() - 60_000) },
+        { userId: seatOnly.id, organizationId: orgId, role: "MEMBER" },
+      ],
+    });
+    sent.length = 0;
+    await notifyOrg(orgId, {
+      kind: "INVOICE_ISSUED",
+      template: {
+        key: "invoiceIssued",
+        params: { planName: "Seats", invoiceId: "inv-seat", total: 1, currency: "NOK", dueAt: "2026-10-30T00:00:00.000Z" },
+      },
+    });
+    const to = new Set(sent.map((m) => m.to));
+    assert.ok(to.has(`${REF}-seat-only@example.test`), "a seat-only member is notified");
+    assert.ok(!to.has(`${REF}-seat-revoked@example.test`), "a revoked member is not notified");
+    assert.ok(!to.has(`${REF}-seat-expired@example.test`), "an expired seat is not notified");
+    const inbox = await prisma.notification.count({ where: { userId: { in: [revoked.id, expired.id] } } });
+    assert.equal(inbox, 0);
   });
 }
