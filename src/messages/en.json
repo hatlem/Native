@@ -63,7 +63,10 @@
     "campaign": "Plan a campaign",
     "campaigns": "Campaigns",
     "rates": "Rates",
-    "users": "Users"
+    "users": "Users",
+    "invoices": "Invoices",
+    "orgSwitcherLabel": "Organisation",
+    "orgSwitchTo": "Switch to {org}"
   },
   "orders": {
     "eyebrow": "Orders",
@@ -175,10 +178,6 @@
     "detailSaveDraft": "Save draft",
     "detailUploading": "Uploading…",
     "detailDownloadFile": "Download the file",
-    "detailStatus": "Status",
-    "detailSpecPassed": "spec ✓",
-    "detailSpecFailed": "spec ✗",
-    "detailRunSpecCheck": "Run spec check",
     "detailSubmitForReview": "Submit for review",
     "detailReviewNotes": "Review notes",
     "linkHeading": "Link to a placement",
@@ -188,7 +187,22 @@
     "placementRetracted": "Retracted",
     "unlinkCta": "Unlink",
     "sharedArticleWarning": "This article is linked to {count} other placements — your changes will affect all of them.",
-    "specNotChecked": "not checked"
+    "detailUploadFailed": "Upload failed. Try a different file.",
+    "detailUploadUnavailable": "File uploads aren't available right now. Paste the text into the editor instead.",
+    "backToArticles": "All articles",
+    "versionLabel": "Version {version}",
+    "byAuthor": "By {name}",
+    "previewHeading": "Preview",
+    "previewEmpty": "No text yet.",
+    "awaitingReview": "Waiting for the client's review.",
+    "placementsHeading": "Placements",
+    "specPassed": "Spec OK",
+    "specFailed": "Spec issues",
+    "saving": "Saving…",
+    "orderRef": "order {ref}",
+    "draftLabel": "Article text",
+    "draftHint": "Plain text with light Markdown: # for headings, **bold**, *italic*, - for lists, [text](link).",
+    "submitBlockedSpec": "A placement's format spec isn't met yet — check the placements above."
   },
   "reports": {
     "title": "Reports",
@@ -229,7 +243,8 @@
     "suggestedMargin": "Suggested",
     "basis_win-rate": "from win rate",
     "basis_category-median": "category median",
-    "basis_default": "default"
+    "basis_default": "default",
+    "exportInvoicesCsv": "Export invoices (CSV)"
   },
   "agency": {
     "eyebrow": "Agency",
@@ -594,6 +609,9 @@
     "decrementRemoves": "Remove this title from the plan",
     "increment": "Increase quantity",
     "estTotal": "Estimated indicative total",
+    "exVat": "excl. VAT",
+    "inclVatLine": "{amount} incl. VAT",
+    "includesContentFees": "Includes {amount} for content production.",
     "totalForItems": "{amount} for {count, plural, =1 {1 title} other {# titles}}",
     "multiCurrencyNote": "Titles bill in their publisher's own currency — both amounts are due, this isn't a choice of currency to pay in.",
     "rfqTitle": "Request a firm quote",
@@ -870,6 +888,8 @@
     "titlePlaceholderDesc": "Placement to be proposed by our desk",
     "quoteEyebrow": "Firm pricing",
     "orderEyebrow": "Order",
+    "openOrder": "Open order",
+    "openOrderMarket": "Open order · {currency}",
     "pendingTitle": "Your brief is with the desk",
     "pendingBuyerLabel": "Buyer",
     "pendingBuyerUnassigned": "Being assigned",
@@ -923,7 +943,9 @@
     "requestRenewal": "Ask for a renewed offer",
     "requestingRenewal": "Sending…",
     "renewalRequested": "The desk has been asked to renew it. You will get a notification when it is ready to accept.",
-    "lineNoteLabel": "Note"
+    "lineNoteLabel": "Note",
+    "noCommitTitle": "You can't accept this quote yourself.",
+    "noCommitBody": "Accepting it places a binding order for {org}, which takes ordering rights. Ask an administrator to accept it, or to give you ordering rights under Account → Team."
   },
   "desk": {
     "eyebrow": "Internal desk",
@@ -1024,13 +1046,28 @@
     "quoteNoExpiry": "No expiry date",
     "renewQuote": "Renew quote",
     "renewingQuote": "Renewing…",
-    "renewQuoteHint": "The buyer can’t accept an expired quote. Renewing keeps these prices for another 14 days — reprice any lines first if rates have changed.",
+    "renewQuoteHint": "The buyer can’t accept an expired quote. Renewing keeps these prices until the date you pick — reprice any lines first if rates have changed.",
+    "quoteDraftBadge": "Draft — not sent",
+    "quoteDraftHint": "The customer can’t see this quote yet. Price the lines, then send it below.",
+    "sendTitle": "Send to the customer",
+    "sendBody": "{count, plural, =1 {The quote goes} other {All # quotes go}} out together. The customer gets one email with the total and can accept until the date below.",
+    "sendValidUntil": "Valid until",
+    "sendValidUntilHint": "Defaults to {days} days, at most {max}. The customer can accept until the end of that day.",
+    "send": "Send quote",
+    "sending": "Sending…",
+    "sendUnpriced": "Price at least one line on each quote before sending — a quote with every line on request gives the customer nothing to accept.",
+    "validUntilInvalid": "Enter a valid date.",
+    "validUntilPast": "The validity date can’t be in the past.",
+    "validUntilTooFar": "A quote can be valid for at most {max} days.",
+    "renewValidUntil": "New validity",
     "lineNoteLabel": "Note to customer",
     "lineNoteAdd": "Add note to customer",
     "lineNoteEdit": "Edit note to customer",
     "lineNoteSave": "Save note",
     "lineNoteHint": "Shown to the customer on the quote page and in the PDF.",
-    "lineNoteTooLong": "The note is too long. Keep it under {max} characters."
+    "lineNoteTooLong": "The note is too long. Keep it under {max} characters.",
+    "pdfStorageUnavailable": "File storage (R2) isn't configured in this environment, so the PDF can't be saved. Download the Word version instead.",
+    "pdfFailed": "The PDF couldn't be generated. Try again, or download the Word version."
   },
   "deskTitles": {
     "eyebrow": "Super-admin · titles",
@@ -1075,7 +1112,8 @@
       "all": "All",
       "unverified": "Not yet checked",
       "active": "Native available",
-      "no-native": "No native offered"
+      "no-native": "No native offered",
+      "awaitingPrice": "Awaiting confirmed price"
     },
     "reach": "Monthly reach",
     "circulation": "Circulation",
@@ -1095,7 +1133,8 @@
       "deactivate": "Deactivate",
       "edit": "Edit",
       "marking": "Marking…",
-      "deactivating": "Deactivating…"
+      "deactivating": "Deactivating…",
+      "resetVerification": "Reset to not checked"
     },
     "freshness": {
       "column": "Price freshness",
@@ -1133,7 +1172,55 @@
     "active": "Active",
     "inactive": "Inactive",
     "assignments": "{active} active",
-    "assignmentsOf": "{active} / {max} active"
+    "assignmentsOf": "{active} / {max} active",
+    "inviteLanguage": {
+      "en": "English",
+      "no": "Norwegian",
+      "sv": "Swedish",
+      "da": "Danish",
+      "fi": "Finnish",
+      "de": "German"
+    },
+    "emailPlaceholder": "writer@example.com",
+    "inviteLanguageLabel": "Email language",
+    "inviteLanguageHint": "The invite and the account page open in this language.",
+    "inviteSent": "Invite emailed to <addr></addr>.",
+    "inviteNotSent": "The invite for <addr></addr> was created, but the email didn't go out. Resend it below or share the link by hand.",
+    "errorInvalidEmail": "Enter a valid email address.",
+    "errorExistingAccount": "This address already has a NativeSpin account, so it can't claim a writer invite. Ask a superadmin to change the account's role instead.",
+    "colEmail": "Email",
+    "colLanguage": "Language",
+    "colDelivery": "Delivery",
+    "emailedOn": "Sent {date}",
+    "notEmailed": "Not sent",
+    "resend": "Resend",
+    "colName": "Name",
+    "colLanguages": "Languages",
+    "colSpecialties": "Specialties",
+    "colStatus": "Status",
+    "colLoad": "Load",
+    "panel": {
+      "eyebrow": "Production",
+      "title": "Writers for this order",
+      "lead": "Ranked by language ({language}) and specialty ({topics}). Add candidates to this order's pool, then assign one per line below.",
+      "empty": "No writers in the roster yet — invite one under Writers.",
+      "colWriter": "Writer",
+      "colLanguages": "Languages",
+      "colSpecialties": "Specialties",
+      "colLoad": "Load",
+      "inPool": "In pool",
+      "inactive": "Not taking work",
+      "overCapacity": "Over capacity",
+      "none": "None given",
+      "loadOf": "{active} / {max} active",
+      "load": "{active} active",
+      "add": "Add to pool",
+      "remove": "Remove",
+      "saving": "Saving…",
+      "writerLabel": "Writer",
+      "unassigned": "— Not assigned —",
+      "assign": "Assign"
+    }
   },
   "auth": {
     "title": "Sign in",
@@ -1220,6 +1307,8 @@
     "emailChangedOk": "Email address updated — sign in with your new address.",
     "deactivatedTitle": "This account is deactivated",
     "deactivatedBody": "Your account has been switched off, so there's nothing here to use. Sign out below, and contact the desk if you think this is a mistake.",
+    "writerClaimSubmit": "Create writer account",
+    "writerClaimSubmitting": "Creating…",
     "regEmailBusiness": "Use your work email. Personal addresses (Gmail, Yahoo and the like) and disposable inboxes aren't accepted.",
     "regEmailInvalid": "That email address doesn't look right. Check it for typos.",
     "regEmailNoMailServer": "We couldn't find a mail server for that domain, so mail to it would never arrive. Check the address for typos.",
@@ -1263,16 +1352,61 @@
     "cancelBlocked": "This order can no longer be cancelled.",
     "cancelError": "Cancellation refused",
     "cancelledAtLabel": "Cancelled",
-    "cancelledByLabel": "By",
+    "cancelledByLabel": "Cancelled by",
     "cancelledReasonLabel": "Reason",
     "creditNoteButton": "Issue credit note",
     "creditNoteTitle": "Refund the invoice",
-    "creditNoteHint": "Refund {amount} against the issued invoice. The reason is logged on the credit note and shown to the buyer.",
+    "creditNoteHint": "Refunds {amount} in full and cancels the order. The reason is logged on the credit note and shown to the buyer.",
     "creditNoteReasonLabel": "Reason",
-    "creditNoteReasonPlaceholder": "e.g. Order cancelled after invoice issued; publisher editorial veto.",
+    "creditNoteReasonPlaceholder": "e.g. Placement didn't run as agreed; buyer disputed the invoice.",
     "creditNoteSubmit": "Issue credit note",
     "issuingCreditNote": "Issuing…",
-    "creditNoteIssuedLabel": "Credit note issued"
+    "creditNoteIssuedLabel": "Credit note issued",
+    "cancelBlock": {
+      "ran": "The campaign has run, so the order can't be cancelled. Invoice it, then issue a credit note if the buyer shouldn't pay.",
+      "invoiced": "The invoice is issued. Issue a credit note to refund it; that also cancels the order.",
+      "cancelled": "The order is already cancelled.",
+      "other": "The order can't be cancelled in its current state."
+    },
+    "cancelErrors": {
+      "reasonRequired": "Add a reason before cancelling.",
+      "notFound": "Order not found.",
+      "blocked": "This order can no longer be cancelled."
+    },
+    "creditError": "Credit note not issued",
+    "creditErrors": {
+      "reasonRequired": "Add a reason; it goes on the credit note.",
+      "notFound": "Order not found.",
+      "noInvoice": "There's no issued invoice to credit.",
+      "alreadyCredited": "This invoice has already been credited.",
+      "wrongOrderStatus": "Only an invoiced order can be credited."
+    },
+    "accountingSynced": "{doc} is synced to {provider} (no. {number}).",
+    "accountingSyncedNoNumber": "{doc} is synced to {provider}.",
+    "accountingLocalOnly": "{doc} is kept in NativeSpin only: no accounting integration is configured.",
+    "accountingFailed": "{doc} couldn't be synced to {provider}: {error}",
+    "accountingNotSent": "{doc} hasn't been sent to accounting.",
+    "accountingRetry": "Retry sync",
+    "accountingRetrying": "Syncing…",
+    "accountingDocInvoice": "The invoice",
+    "accountingDocCreditNote": "The credit note",
+    "advanceGuardTitle": "{missing, plural, =1 {1 placement has} other {# placements have}} no published link",
+    "advanceGuardLeadLive": "Marking the order live tells the buyer their campaign is published. These placements have no published link yet:",
+    "advanceGuardLeadCompleted": "Completing the order tells the buyer the campaign has run. These placements have no published link yet:",
+    "advanceGuardConfirm": "I've checked these placements and want to advance anyway",
+    "advanceGuardNote": "The buyer's email only counts placements that are actually published.",
+    "advanceError": "Status not changed",
+    "advanceErrors": {
+      "unconfirmed": "Tick the confirmation to advance while placements are still unpublished.",
+      "moved": "The order changed status in the meantime. Check it and try again."
+    },
+    "unknownPlacement": "Unnamed placement",
+    "cancelledByRole": {
+      "DESK": "NativeSpin desk",
+      "SUPERADMIN": "NativeSpin (admin)",
+      "PUBLISHER": "The publisher",
+      "BUYER": "The buyer"
+    }
   },
   "production": {
     "brief": "Brief",
@@ -1313,14 +1447,40 @@
     "currency": "Currency",
     "subtotal": "Subtotal",
     "vat": "VAT",
-    "total": "Total"
+    "total": "Total",
+    "number": "Invoice number",
+    "download": "Download PDF",
+    "documentTitle": "Invoice {number}",
+    "colDescription": "Description",
+    "colQty": "Qty",
+    "colUnitPrice": "Unit price",
+    "colAmount": "Amount",
+    "vatWithPct": "VAT ({pct}%)",
+    "vatId": "VAT ID",
+    "contentProduction": "Content production",
+    "creditedHeading": "Credited",
+    "creditedBody": "This invoice was credited in full on {date} ({amount}).",
+    "creditedReason": "Reason: {reason}",
+    "accountingRef": "Accounting ref.",
+    "pageOf": "Page {page} of {pages}",
+    "listTitle": "Invoices",
+    "listLead": "Every invoice for your organization. Open one to see the lines, or download the PDF.",
+    "emptyTitle": "No invoices yet",
+    "emptyHint": "Invoices appear here once a campaign has run and been billed.",
+    "emptyCta": "See your campaigns",
+    "colCustomer": "Customer"
   },
   "firm": {
     "badge": "Instant order",
     "planTitle": "Confirm your order",
     "planNote": "All items are firm-priced — submitting confirms your order instantly, no buying-desk wait.",
     "planSubmit": "Confirm order",
-    "planSubmitting": "Placing order…"
+    "planSubmitting": "Placing order…",
+    "orderTotal": "Order total",
+    "commitAmount": "You're ordering for {amount} incl. VAT.",
+    "reassurance": "Confirming places a binding order at this price — there's no separate quote to approve.",
+    "noCommitNote": "Your role doesn't include ordering rights, so you can't confirm this order yourself. Send it as a quote request instead — an admin on your team can accept the quote.",
+    "sendAsRfq": "Send as quote request"
   },
   "publisher": {
     "title": "Publisher portal",
@@ -1395,7 +1555,10 @@
     "ratesUnitWeek": "Week",
     "ratesUnitMonth": "Month",
     "ratesMinUnits": "Minimum booking: {count}",
-    "ratesPriceOnlyNote": "This page changes prices only. Catalog status — active, bookable, visibility — is managed by the NativeSpin desk."
+    "ratesPriceOnlyNote": "This page changes prices only. Catalog status — active, bookable, visibility — is managed by the NativeSpin desk.",
+    "changePriceOnRates": "Change on the rates page",
+    "notBookable": "Not bookable",
+    "catalogStatusNote": "Prices change on the rates page. Catalog status (bookable, and whether a product can be ordered instantly) is managed by the NativeSpin desk."
   },
   "formats": {
     "metaTitle": "Native formats",
@@ -2009,7 +2172,7 @@
     },
     "fees": {
       "title": "Fees and payment",
-      "body": "Pricing follows the active fee schedule (see /pricing). Invoices are issued in the buyer's market currency, with VAT applied per local law. Payment terms default to net 30 days unless otherwise agreed."
+      "body": "Pricing follows the active fee schedule (see /pricing). Invoices are issued in the buyer's market currency, with VAT applied per local law. Payment terms default to net 14 days unless otherwise agreed."
     },
     "liability": {
       "title": "Liability",
@@ -2226,7 +2389,7 @@
     "listEyebrow": "Existing",
     "listTitle": "All keys",
     "colName": "Name",
-    "colOrg": "Org",
+    "colOrg": "Organization",
     "colScopes": "Scopes",
     "colCreated": "Created",
     "colLastUsed": "Last used",
@@ -2239,11 +2402,8 @@
     "revokeConfirm": "This cannot be undone. Existing integrations using this key will stop working immediately.",
     "revokeConfirmCta": "Yes, revoke key",
     "docsHintPrefix": "Public docs available at",
-    "deniedTitle": "API keys (SUPERADMIN only)",
-    "deniedLead": "This page is for NativeSpin platform admins.",
     "deniedBody": "Public-catalog API keys are issued by NativeSpin superadmins. If your role legitimately needs API-key issuance — or you're a partner trying to get a key — reach out to the desk and we'll wire you up.",
-    "deniedCta": "Email the desk",
-    "deniedBack": "Back to /desk"
+    "orgPlatformShort": "NativeSpin platform"
   },
   "quoteNarrative": {
     "sectionCampaign": "Your campaign",
@@ -2256,7 +2416,6 @@
     "anchorSavings": "−{pct}% vs rate card",
     "anchorNote": "The publisher's public rate card for this placement. Your all-in price includes editorial production, placement, revisions and reporting.",
     "whyThisPrice": "NativeSpin maintains direct editorial relationships with every title in your quote. We negotiate placement, commission a vertical-specialist writer, manage editorial review with the publisher, and report on performance. You get one accountable partner and one all-in price — not a media invoice, a writer invoice and an agency retainer.",
-    "termsPayment": "50% on acceptance, 50% on publish.",
     "termsCancellation": "Full refund before the article brief is approved; 50% refund before first draft; non-refundable once the publisher slot is confirmed.",
     "termsValidity": "Quote valid for 14 days. Publisher availability confirmed at acceptance.",
     "bullets": {
@@ -2331,7 +2490,9 @@
     "inviteSent": "Invitation sent.",
     "inviteInvalidEmail": "That doesn't look like a valid email address.",
     "inviteBusinessEmail": "Use a company address — free and disposable providers aren't accepted.",
-    "inviteNotFound": "That publisher no longer exists — reload the page."
+    "inviteNotFound": "That publisher no longer exists — reload the page.",
+    "priceUnconfirmed": "price not confirmed",
+    "productInactive": "inactive"
   },
   "salesContacts": {
     "title": "Sales contacts",
@@ -2548,7 +2709,10 @@
     "callHeading": "One last thing — let's help you buy native",
     "callBody": "Book a free 15-minute call and our desk will help you scope and place your first native campaign.",
     "callCta": "Book a call",
-    "callSkip": "Skip for now →"
+    "callSkip": "Skip for now →",
+    "marketBlocked": "{org} has no billing market yet. An administrator of {org} needs to set it under Account before the team can send requests.",
+    "blockedTitle": "{org} isn't set up for billing yet",
+    "blockedBack": "Back to the plan"
   },
   "rateCard": {
     "pageTitle": "Rate card request",
@@ -2606,7 +2770,8 @@
     "contentProductionLabel": "Who writes the content?",
     "content_advertiser": "The advertiser can deliver their own articles",
     "content_publisher": "Articles must be written by your department",
-    "content_both": "Both are possible"
+    "content_both": "Both are possible",
+    "uploadUnavailable": "File upload isn't available right now. Paste a link to your rate card or media kit below instead."
   },
   "account": {
     "eyebrow": "Account",
@@ -2718,10 +2883,14 @@
     "errDelegation": "That delegation end date isn't a valid date.",
     "errDelegationPast": "The delegation end date has to be in the future.",
     "canCommitAdminNote": "Administrators can always commit.",
+    "statusRevoked": "Removed",
     "errEmailDomain": "We couldn't find a mail server for that domain. Check the address for typos."
   },
   "invite": {
     "title": "Join {org}",
+    "lead": "Your team plans and buys native advertising on NativeSpin. Join to work in the same plans, quotes and orders.",
+    "acceptTitle": "One click and you're in",
+    "createTitle": "Create your account",
     "invitationFor": "Invitation for {email}",
     "accept": "Accept invitation",
     "createAndJoin": "Create account & join",
@@ -2733,7 +2902,10 @@
     "wrongAccountTitle": "Wrong account",
     "wrongAccountBody": "This invite is for {inviteEmail}. You're signed in as {authedEmail}.",
     "signOut": "Sign out",
-    "genericError": "Something went wrong. Check your details and try again."
+    "genericError": "Something went wrong. Check your details and try again.",
+    "alreadyMemberTitle": "You're already in {org}",
+    "alreadyMemberBody": "Your seat on this team is active, so there's nothing to accept.",
+    "alreadyMemberCta": "Go to your workspace"
   },
   "contentFees": {
     "eyebrow": "Desk",
@@ -2915,7 +3087,21 @@
     "overrideHint": " — desk correction",
     "saveOverride": "Save override",
     "frozenNoEdit": "Metrics are frozen and cannot be edited.",
-    "unknownPublisher": "Unknown publisher"
+    "unknownPublisher": "Unknown publisher",
+    "metricsNowTitle": "Metrics requests",
+    "metricsNowNotEnded": "Publishers are asked for their numbers once the flight has ended. Set the flight end date above; the daily sweep sends requests the day after it.",
+    "metricsNowNothing": "Every publisher on this order already has a metrics request — see each one's status below.",
+    "metricsNowHint": "{count, plural, =1 {1 publisher hasn't been asked yet.} other {# publishers haven't been asked yet.}} The daily sweep would send it tomorrow.",
+    "metricsNowButton": "Send metrics request now",
+    "metricsNowNoPublisher": "{count, plural, =1 {1 booking has} other {# bookings have}} no publisher on record, so no request can be sent for {count, plural, =1 {it} other {them}}.",
+    "requestStatusValue": {
+      "NEEDS_CONTACT": "Needs a contact",
+      "PENDING": "Waiting for numbers",
+      "PARTIAL": "Partly reported",
+      "COMPLETE": "Reported",
+      "EXPIRED": "Expired",
+      "CANCELLED": "Cancelled"
+    }
   },
   "campaign": {
     "eyebrow": "Plan a campaign",
@@ -3025,7 +3211,12 @@
     "nextWaveBodyPreviousDone": "Wave {prev} has finished. Send wave {n} to keep the story going.",
     "nextWaveBodyDateNear": "Wave {n} is scheduled from {date}. Send it now so the desk has time to book it.",
     "nextWaveAngle": "Angle: {angle}",
-    "openWave": "Open wave"
+    "openWave": "Open wave",
+    "awaitingTeamHeading": "Waiting on someone with ordering rights",
+    "quoteAwaitingTeamBody": "A firm quote for {amount} is ready. Someone on your team with ordering rights needs to accept it.",
+    "viewQuote": "View quote",
+    "noAccessTitle": "You're not on a team right now",
+    "noAccessBody": "Your access to your organisation's workspace has ended: an administrator removed it, or it was time-limited and has expired. Ask an administrator to invite you again; the new invite brings back your team's plans and requests."
   },
   "shareList": {
     "eyebrow": "Media plan from {org}",
@@ -3063,7 +3254,6 @@
     "vat": "VAT ({pct}%)",
     "total": "Total",
     "vatStatus": "Prices are shown excluding VAT unless stated otherwise above.",
-    "paymentTerms": "Payment terms: net 14 days from invoice date.",
     "footnote": "Lines marked \"price on request\" are additional to the total above and are confirmed separately before booking.",
     "circulation": "Circulation",
     "digitalReach": "Digital reach/month",
@@ -3130,7 +3320,17 @@
     "errRole": "That role isn't one we recognise.",
     "errDeactivatedTarget": "That account is deactivated. Reactivate it first — a sign-in email it can't use only confuses the recipient.",
     "errEmailFailed": "The email couldn't be sent. Nothing else was changed.",
-    "errGeneric": "Something went wrong and nothing was saved. Try again."
+    "errGeneric": "Something went wrong and nothing was saved. Try again.",
+    "termsHeading": "Customer payment terms",
+    "termsLead": "Net days from the invoice date. Applies to new quotes and invoices; issued invoices keep their terms. The default is {days} days.",
+    "termsOrgLabel": "Customer",
+    "termsDaysLabel": "Payment terms (days)",
+    "termsSave": "Save terms",
+    "termsCustomHeading": "Customers with non-default terms",
+    "termsNoneCustom": "Every customer is on the default terms.",
+    "termsDaysValue": "{days, plural, one {net # day} other {net # days}}",
+    "okTerms": "Payment terms saved.",
+    "errTerms": "Enter whole days between 1 and 120."
   },
   "status": {
     "ACCEPTED": "Accepted",
@@ -3159,11 +3359,217 @@
     "SCHEDULED": "Scheduled",
     "SENT": "Sent",
     "SUBMITTED": "Submitted",
-    "VOID": "Void"
+    "VOID": "Void",
+    "SUPERSEDED": "Superseded"
   },
   "joinedNotice": {
     "lists": "Welcome to {org}. These are your team's plans — open one to see the titles, prices and notes.",
     "home": "Welcome to {org}. You're now part of the team on NativeSpin."
+  },
+  "paymentTerms": {
+    "line": "{days, plural, one {Payment terms: net # day from invoice date.} other {Payment terms: net # days from invoice date.}}"
+  },
+  "superadminOnly": {
+    "eyebrow": "Superadmins only",
+    "lead": "This page is for NativeSpin platform admins.",
+    "body": "Your account has desk access, but this page needs the superadmin role. If you need it for your work, email the desk and a superadmin will help you or grant access.",
+    "cta": "Email the desk",
+    "back": "Back to the desk",
+    "mailSubject": "Access request: {area} — NativeSpin"
+  },
+  "publisherContacts": {
+    "eyebrow": "Desk · outreach",
+    "title": "Publisher contacts",
+    "lead": "Review harvested ad-sales contacts before they are used, then run the rate-card request campaign.",
+    "tabsLabel": "Views",
+    "tabReview": "Review candidates",
+    "tabCampaign": "Rate-card campaign",
+    "ok": {
+      "approved": "Contact approved.",
+      "rejected": "Contact rejected.",
+      "bulk": "{approved} approved, {failed} failed.",
+      "built": "Campaign refreshed: {created} new requests, {skipped} skipped.",
+      "sent": "{count, plural, =0 {No emails sent.} =1 {1 email sent.} other {# emails sent.}}",
+      "one": "Email sent."
+    },
+    "errorGeneric": "That didn't work: {detail}",
+    "working": "Working…",
+    "buildCampaign": "Build / refresh campaign",
+    "batchSizeLabel": "Batch size",
+    "sendBatch": "Send batch (next due)",
+    "kpiTotal": "Requests",
+    "state": {
+      "draft": "Draft",
+      "inFlight": "In flight",
+      "responded": "Responded",
+      "cancelled": "Cancelled"
+    },
+    "noRequests": "No rate-card requests yet — build the campaign to create them.",
+    "colRecipient": "Recipient",
+    "colTitles": "Titles",
+    "colLocale": "Language",
+    "colStep": "Step",
+    "colStatus": "Status",
+    "colNextDue": "Next due",
+    "stepOf": "{sent}/{max}",
+    "sendOne": "Send",
+    "candidateStatus": {
+      "PENDING": "Pending review",
+      "APPROVED": "Approved",
+      "REJECTED": "Rejected"
+    },
+    "titlesByChannel": "Titles by sales channel:",
+    "channel": {
+      "DIRECT": "Direct",
+      "IN_HOUSE": "In-house arm",
+      "REP": "Rep house",
+      "MIXED": "Mixed",
+      "UNKNOWN": "Unknown"
+    },
+    "pendingEyebrow": "Review",
+    "pendingTitle": "Candidates waiting for review",
+    "bulkApproveLabel": "Approve all with confidence ≥",
+    "bulkApprove": "Bulk-approve",
+    "noCandidates": "No candidates waiting for review.",
+    "colPublisher": "Publisher",
+    "colMarket": "Market",
+    "colChannel": "Channel",
+    "colCandidate": "Candidate",
+    "colConfidence": "Confidence",
+    "colSource": "Source",
+    "viewSource": "View",
+    "approve": "Approve",
+    "reject": "Reject"
+  },
+  "writerEnums": {
+    "language": {
+      "NO": "Norwegian",
+      "SV": "Swedish",
+      "DA": "Danish",
+      "FI": "Finnish",
+      "DE": "German",
+      "EN": "English"
+    },
+    "topic": {
+      "FINANCE": "Finance",
+      "HEALTH": "Health",
+      "TECH": "Tech",
+      "LIFESTYLE": "Lifestyle",
+      "B2B": "B2B",
+      "TRAVEL": "Travel",
+      "FOOD": "Food & drink",
+      "CULTURE": "Culture",
+      "SUSTAINABILITY": "Sustainability",
+      "OTHER": "Other"
+    },
+    "proficiency": {
+      "NATIVE": "Native",
+      "FLUENT": "Fluent",
+      "WORKING": "Working"
+    }
+  },
+  "writer": {
+    "eyebrow": "Writer portal",
+    "backToAssignments": "My assignments",
+    "untitledAssignment": "Assignment",
+    "status": {
+      "notStarted": "Not started"
+    },
+    "home": {
+      "title": "My assignments",
+      "lead": "Everything the desk has assigned to you. Open one to see the brief, the format spec and the playbook, then write and send it for review.",
+      "profileCta": "Edit my profile",
+      "emptyTitle": "No assignments yet",
+      "emptyBody": "When the desk assigns you an article, it shows up here and you get an email.",
+      "colTitle": "Publication",
+      "colFormat": "Format",
+      "colMarket": "Market",
+      "colStatus": "Status",
+      "colAssigned": "Assigned",
+      "open": "Open"
+    },
+    "line": {
+      "notReady": "The brief for this assignment isn't ready yet. The desk will let you know when it is.",
+      "changesRequested": "Changes requested:",
+      "closed": "This assignment is closed — the order was cancelled, the placement withdrawn, or the article is final. Nothing more to write here.",
+      "draftEyebrow": "Your draft",
+      "draftHeading": "Write the article",
+      "inReviewNote": "This draft is with the client for review. Saving now creates a new version; send that for review when it's ready.",
+      "draftLabel": "Article text",
+      "draftPlaceholder": "# Headline\n\nIntro…",
+      "draftHint": "Plain text with light Markdown: # for headings, **bold**, *italic*, - for lists, [text](link). Include the disclosure label.",
+      "saveDraft": "Save draft",
+      "saving": "Saving…",
+      "submit": "Send for review",
+      "submitBlocked": "Fix the spec issues above, save, and then send it for review.",
+      "awaitingReview": "Sent for review — you'll be notified if the client asks for changes."
+    },
+    "brief": {
+      "heading": "Brief",
+      "message": "Campaign message",
+      "messageMissing": "No campaign message yet — ask the desk before you start.",
+      "audience": "Audience",
+      "do": "Do",
+      "dont": "Don't",
+      "references": "References"
+    },
+    "spec": {
+      "heading": "Format spec",
+      "words": "Length",
+      "wordsRange": "{min}–{max} words",
+      "wordsMin": "At least {min} words",
+      "wordsMax": "At most {max} words",
+      "notSpecified": "Not specified",
+      "images": "Images",
+      "imagesMin": "{count, plural, =1 {At least 1 image} other {At least # images}}",
+      "disclosure": "Disclosure label (required)",
+      "fileFormats": "File formats",
+      "videoLength": "Video length",
+      "videoSeconds": "Up to {seconds} seconds",
+      "shoppable": "Product links",
+      "shoppableMax": "{count, plural, =1 {Up to 1 product} other {Up to # products}}",
+      "requirements": "Other requirements",
+      "checkHeading": "Spec check",
+      "passed": "Passes",
+      "failed": "Needs fixing",
+      "notChecked": "Save the draft as text to check it against the format spec.",
+      "passedDetail": "The draft meets the format spec ({words} words).",
+      "failDisclosure": "The disclosure label “{label}” is missing. Readers must see that this is paid content.",
+      "failTooShort": "Too short: {words} words, the format needs at least {min}.",
+      "failTooLong": "Too long: {words} words, the format allows at most {max}."
+    },
+    "profile": {
+      "title": "My profile",
+      "lead": "The desk matches writers to briefs on language, specialty and capacity — keep this up to date.",
+      "noProfile": "This account has no writer profile.",
+      "saved": "Profile saved.",
+      "fixErrors": "Nothing was saved — fix the highlighted fields and try again.",
+      "bio": "About you",
+      "bioPlaceholder": "Beats you cover, publications you've written for, tone you're known for…",
+      "languages": "Languages you write in",
+      "languagesHint": "Set your level for each language you can write in. At least one is required.",
+      "languageNone": "Don't write in it",
+      "specialties": "Specialties",
+      "ratePerArticle": "Rate per article",
+      "ratePerWord": "Rate per word",
+      "currency": "Currency",
+      "currencyNone": "— Choose —",
+      "maxActiveAssignments": "Max active assignments",
+      "maxActiveAssignmentsHint": "Leave empty for no limit.",
+      "portfolioUrl": "Portfolio link",
+      "active": "Available for new work",
+      "save": "Save profile",
+      "saving": "Saving…",
+      "errors": {
+        "bio": "Keep it under 2,000 characters.",
+        "languages": "Choose at least one language.",
+        "ratePerArticle": "Enter an amount greater than 0, like 4500.",
+        "ratePerWord": "Enter an amount greater than 0, like 3.5.",
+        "currency": "Choose the currency for your rates.",
+        "maxActiveAssignments": "Enter a whole number from 1 to 50, or leave it empty.",
+        "portfolioUrl": "Enter a full link starting with https://"
+      }
+    }
   },
   "listNames": {
     "untitled": "New plan",

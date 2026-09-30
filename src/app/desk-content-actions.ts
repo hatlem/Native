@@ -6,7 +6,16 @@ import { prisma } from "@/lib/prisma";
 import { recordAudit } from "@/lib/audit";
 import { notifyOrg } from "@/lib/notify";
 import { enqueue } from "@/lib/jobs";
-import { runSpecCheckForPlacement, registerSpecCheckJob } from "@/lib/spec-check-runner";
+import {
+  runSpecCheckForPlacement,
+  registerSpecCheckJob,
+  specFailuresForSubmission,
+} from "@/lib/spec-check-runner";
+import {
+  isTerminalAssetStatus,
+  supersedeOlderVersions,
+  supersedesOlderVersions,
+} from "@/lib/content/versions";
 import { ensureTrackedLinks } from "@/lib/metrics/store";
 import { rewriteBodyLinks } from "@/lib/metrics/links";
 import { requireLineWriter, requireArticleWriter } from "@/lib/writers/guard";
@@ -286,11 +295,45 @@ export async function setAssetStatus(formData: FormData) {
       where: { id: assetId },
       include: { article: { select: { organizationId: true } } },
     });
+    // A superseded version is history — nothing may move it again.
+    if (asset && isTerminalAssetStatus(asset.status)) redirect(back);
+
+    // Handing a draft over for review is gated on the spec (disclosure
+    // label, word count). The desk drives the full machine and may still
+    // override; everyone else is held back until the draft passes, and the
+    // writer page lists exactly which rules fail. Only the article's
+    // newest version can be submitted — an older one is already stale.
+    if (asset && target === "IN_REVIEW" && role !== "DESK" && role !== "SUPERADMIN") {
+      const newest = await prisma.contentAsset.findFirst({
+        where: { articleId: asset.articleId },
+        orderBy: { version: "desc" },
+        select: { id: true },
+      });
+      if (newest?.id !== asset.id) redirect(back);
+      const failing = await specFailuresForSubmission({
+        articleId: asset.articleId,
+        assetId: asset.id,
+      });
+      if (failing.length > 0) {
+        await recordAudit(userId, "asset.submit_blocked", `ContentAsset:${asset.id}`, {
+          placements: failing.map((f) => f.placementId),
+          issues: failing.flatMap((f) => f.evaluation.result.issues),
+        });
+        redirect(back);
+      }
+    }
+
     if (asset) {
       await prisma.contentAsset.update({
         where: { id: asset.id },
         data: { status: target },
       });
+      if (supersedesOlderVersions(target)) {
+        await supersedeOlderVersions(prisma, {
+          articleId: asset.articleId,
+          version: asset.version,
+        });
+      }
       // FINAL is never gated on spec compliance (that's per-placement,
       // informational only) — but it does lock every currently-unlocked
       // placement of this article to this exact version.

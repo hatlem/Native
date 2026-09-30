@@ -24,6 +24,7 @@ import { NextResponse, type NextRequest } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { authenticateRequest } from "@/lib/api-auth";
 import { rfqLimiter } from "@/lib/rate-limit";
+import { lineOrder } from "@/lib/commerce/line-order";
 
 export const dynamic = "force-dynamic";
 
@@ -65,6 +66,7 @@ export async function GET(
     include: {
       request: { select: { id: true, organizationId: true } },
       lines: {
+        orderBy: lineOrder(),
         select: {
           id: true,
           quantity: true,
@@ -76,7 +78,11 @@ export async function GET(
     },
   });
 
-  if (!quote) return errJson(404, "NOT_FOUND", "Quote not found.");
+  // A DRAFT is the desk's unsent work in progress — not a quote the buyer
+  // (or their integration) has received. Same 404 as a missing id.
+  if (!quote || quote.status === "DRAFT") {
+    return errJson(404, "NOT_FOUND", "Quote not found.");
+  }
 
   // Org-scoping: an org-scoped key can only see quotes for its own org.
   // Platform keys (organizationId null) see any quote.

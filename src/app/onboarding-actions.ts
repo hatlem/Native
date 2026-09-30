@@ -4,7 +4,7 @@ import { redirect } from "next/navigation";
 import { MarketCode } from "@prisma/client";
 import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
-import { safeNext } from "@/lib/onboarding-gate";
+import { loadOnboardingState, safeNext } from "@/lib/onboarding-gate";
 import { recordAudit } from "@/lib/audit";
 import { SUPPORTED_MARKETS } from "@/lib/markets";
 
@@ -26,11 +26,14 @@ function isValidPhone(raw: string): boolean {
   return raw.length <= 32 && digits >= 6;
 }
 
-// Save onboarding (post-signup) details: Faktureringsmarked on the
-// user's org + phone on the user. Onboarding is deferred — a user
-// only lands here when they trigger a buy/RFQ without these fields,
-// so on success we redirect back to wherever the gate fired from
-// (defaults to /catalog when arrived at directly).
+// Save first-time org onboarding: the billing market on the org being
+// onboarded plus the phone of the person onboarding it. Only someone allowed
+// to set the market, and only while the org has none (lib/onboarding-gate
+// onboardingNeeds); anyone else — a member invited into an org that is
+// already set up — has nothing to save here, and a market posted by them is
+// never written. Onboarding is deferred: a user only lands here when they
+// trigger a buy/RFQ first, so on success we redirect back to wherever the
+// gate fired from (defaults to /catalog when arrived at directly).
 export async function saveOnboarding(formData: FormData) {
   const locale = String(formData.get("locale") || "en");
   const next = safeNext(
@@ -40,38 +43,44 @@ export async function saveOnboarding(formData: FormData) {
   const session = await auth();
   if (!session?.user?.id) redirect(`/${locale}/signin`);
 
-  const market = String(formData.get("market") || "").trim();
-  const phoneRaw = String(formData.get("phone") || "");
-  const phone = normalisePhone(phoneRaw);
+  const state = await loadOnboardingState(session.user.id);
+  if (!state.org) {
+    // Edge case: user without an org to onboard (e.g. publisher invite
+    // mid-claim, or a member whose access was removed). Onboarding doesn't
+    // apply — bounce them home.
+    redirect(`/${locale}/`);
+  }
+  // Already onboarded (nothing to ask), or waiting on an admin (the page
+  // says so): nothing to write either way.
+  if (state.complete) redirect(next);
+  if (!state.askMarket) {
+    redirect(`/${locale}/onboarding?next=${encodeURIComponent(next)}`);
+  }
 
+  const market = String(formData.get("market") || "").trim();
+  const phone = normalisePhone(String(formData.get("phone") || ""));
   if (!MARKET_CODES.includes(market) || !isValidPhone(phone)) {
     redirect(
       `/${locale}/onboarding?error=1&next=${encodeURIComponent(next)}`,
     );
   }
 
-  const user = await prisma.user.findUnique({
-    where: { id: session.user.id },
-    select: { id: true, organizationId: true },
-  });
-  if (!user?.organizationId) {
-    // Edge case: user without an org (e.g. publisher invite mid-claim).
-    // Onboarding doesn't apply — bounce them home.
-    redirect(`/${locale}/`);
-  }
-
   await prisma.$transaction([
-    prisma.organization.update({
-      where: { id: user.organizationId },
+    // Conditional on the market still being unset: two admins racing through
+    // first-time onboarding can't overwrite each other, and this path can
+    // never change a market that has already been chosen.
+    prisma.organization.updateMany({
+      where: { id: state.org.id, marketCode: null },
       data: { marketCode: market as MarketCode },
     }),
     prisma.user.update({
-      where: { id: user.id },
+      where: { id: state.userId },
       data: { phone },
     }),
   ]);
 
-  await recordAudit(user.id, "user.onboarding_completed", `User:${user.id}`, {
+  await recordAudit(state.userId, "user.onboarding_completed", `User:${state.userId}`, {
+    organizationId: state.org.id,
     market,
     hasPhone: true,
   });

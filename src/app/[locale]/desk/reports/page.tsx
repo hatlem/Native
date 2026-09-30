@@ -1,5 +1,6 @@
 import { getTranslations } from "next-intl/server";
 import { prisma } from "@/lib/prisma";
+import { buyerVisibleQuoteWhere } from "@/lib/commerce/quote-validity";
 import { Link } from "@/i18n/navigation";
 import { formatMoney } from "@/lib/money";
 import {
@@ -29,6 +30,8 @@ export default async function DeskReportsPage({
   const t = await getTranslations({ locale, namespace: "reports" });
   const to = await getTranslations({ locale, namespace: "order" });
   const td = await getTranslations({ locale, namespace: "desk" });
+  const tStatus = await getTranslations({ locale, namespace: "status" });
+  const statusLabel = (key: string) => (tStatus.has(key) ? tStatus(key) : key);
 
   const [requestCount, quotedRequestCount, orders, orderLines, markets, invoices] =
     await Promise.all([
@@ -37,7 +40,8 @@ export default async function DeskReportsPage({
       // count (not `status: "QUOTED"`) so a request that later moved on to
       // CLOSED without ordering still counts as having passed through
       // "quoted" for the funnel below.
-      prisma.request.count({ where: { quotes: { some: {} } } }),
+      // A DRAFT the desk hasn't sent doesn't count as quoted.
+      prisma.request.count({ where: { quotes: { some: buyerVisibleQuoteWhere() } } }),
       prisma.order.findMany({
         select: {
           status: true,
@@ -323,7 +327,7 @@ export default async function DeskReportsPage({
           <div className="section-head">
             <h2>{t("byStatus")}</h2>
           </div>
-          <BreakdownList rows={statusRows} t={t} kind="count" />
+          <BreakdownList rows={statusRows} t={t} kind="count" label={statusLabel} />
         </section>
 
         <section>
@@ -336,11 +340,16 @@ export default async function DeskReportsPage({
         <section>
           <div className="section-head">
             <h2>{t("invoices")}</h2>
+            {/* Desk-only route; a plain <a> because it's a file download. */}
+            <a className="small-link" href="/api/export/invoices.csv" download>
+              {t("exportInvoicesCsv")}
+            </a>
           </div>
           <BreakdownList
             rows={invoiceRows.map((r) => ({ key: r.group, count: r.amount }))}
             t={t}
             kind="count"
+            label={statusLabel}
           />
         </section>
       </div>
@@ -352,10 +361,14 @@ function BreakdownList({
   rows,
   t,
   kind,
+  label = (k) => k,
 }: {
   rows: { key: string; count: number }[];
   t: (k: string) => string;
   kind: "count";
+  // Display label for a row key — status enums go through the status
+  // namespace instead of rendering raw ("INVOICED").
+  label?: (key: string) => string;
 }) {
   if (rows.length === 0) return <p className="muted">{t("none")}</p>;
   const total = rows.reduce((s, r) => s + r.count, 0) || 1;
@@ -366,7 +379,7 @@ function BreakdownList({
         return (
           <div className="breakdown-row" key={r.key}>
             <div className="breakdown-label">
-              <span>{r.key}</span>
+              <span>{label(r.key)}</span>
               <span className="muted small">{kind === "count" ? r.count : r.count}</span>
             </div>
             <div className="breakdown-bar" aria-hidden>

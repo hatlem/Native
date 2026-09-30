@@ -1,4 +1,5 @@
 import { getTranslations } from "next-intl/server";
+import { viewOrgIds } from "@/lib/workspace";
 import { redirect } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import { Link } from "@/i18n/navigation";
@@ -66,7 +67,7 @@ export default async function MyOrdersPage({
   const dir: SortDir = dirRaw === "asc" ? "asc" : "desc";
 
   const orders = await prisma.order.findMany({
-    where: { organizationId: { in: scope.workspace.scopeOrgIds } },
+    where: { organizationId: { in: viewOrgIds(scope.workspace) } },
     orderBy: buildOrderBy(sort, dir),
     include: {
       organization: { select: { name: true } },

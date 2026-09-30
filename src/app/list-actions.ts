@@ -1,6 +1,9 @@
 "use server";
 
 import { redirect } from "next/navigation";
+import { headers } from "next/headers";
+import { signinPath } from "@/lib/auth-gate";
+import { appUrl } from "@/lib/url";
 import { planPath } from "@/lib/plan-path";
 import { revalidatePath } from "next/cache";
 import { cookies } from "next/headers";
@@ -16,6 +19,7 @@ import {
   resolveTitleItem,
   removeItem,
   setItemQuantity,
+  setItemContent,
   setItemAlternative,
   readActiveListId,
   writeActiveListId,
@@ -24,8 +28,21 @@ import {
 } from "@/lib/lists";
 import { enableListShare, disableListShare } from "@/lib/list-share";
 import { normalizeLineNote } from "@/lib/line-note";
+import { contentIntent } from "@/lib/authorship";
 import { reorderSection, ReorderMismatchError } from "@/lib/plan-reorder";
 import { listNames } from "@/lib/list-names";
+
+// Same-origin path of the page that posted the action, if the browser said.
+async function refererPath(): Promise<string | null> {
+  const referer = (await headers()).get("referer");
+  if (!referer) return null;
+  try {
+    const url = new URL(referer);
+    return url.origin === new URL(appUrl()).origin ? url.pathname + url.search : null;
+  } catch {
+    return null;
+  }
+}
 
 function str(formData: FormData, key: string): string {
   const v = formData.get(key);
@@ -35,7 +52,10 @@ function str(formData: FormData, key: string): string {
 async function requireActiveOrg(locale: string) {
   const scope = await loadScope();
   const orgId = scope.workspace?.activeOrgId;
-  if (!scope.userId) redirect(`/${locale}/signin`);
+  // Signed out (e.g. "Add all to plan" on the public recommender): send them
+  // to sign in and back to the page they acted on, not to a bare /signin that
+  // forgets what they were doing.
+  if (!scope.userId) redirect(signinPath(locale, await refererPath()));
   if (!orgId) {
     // Agency with no client selected hit a list action — the no-client funnel.
     console.warn("checkout.blocked", { reason: "client", userId: scope.userId });
@@ -285,11 +305,7 @@ export async function setListItemContent(formData: FormData) {
   const locale = str(formData, "locale") || "en";
   const itemId = str(formData, "itemId");
   await ownItem(locale, itemId);
-  // updateMany no-ops (no P2025) if the row was concurrently removed.
-  await prisma.savedListItem.updateMany({
-    where: { id: itemId },
-    data: { withContent: str(formData, "withContent") === "1" },
-  });
+  await setItemContent(itemId, str(formData, "withContent") === "1");
   redirect(`/${locale}/plan`);
 }
 
@@ -517,8 +533,7 @@ export async function duplicateList(formData: FormData) {
           productId: i.productId,
           titleId: i.titleId,
           quantity: i.quantity,
-          withContent: i.withContent,
-          authorshipMode: i.authorshipMode,
+          ...contentIntent(i.withContent, i.authorshipMode),
           notes: i.notes,
           isAlternative: i.isAlternative,
           sortOrder: i.sortOrder,

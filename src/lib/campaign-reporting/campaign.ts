@@ -6,6 +6,7 @@ import {
   groupBookingsByPublisher,
   resolveRecipient,
   computeRequestStatus,
+  canRequestMetricsNow,
 } from "./status";
 import { buildMetricsEmail, type MetricsLocale } from "./email";
 import { localeForMarketCode } from "@/lib/outreach/email";
@@ -36,6 +37,84 @@ function metricsReplyTo(base: string | undefined, token: string): string | undef
 
 // ---------- Build ----------
 
+// Order shape the request builder needs: its bookings with publisher and
+// market, grouped per publisher into one MetricsRequest each.
+const ORDER_FOR_METRICS = {
+  id: true,
+  status: true,
+  flightEndDate: true,
+  lines: {
+    select: {
+      booking: {
+        select: {
+          id: true,
+          publisherId: true,
+          status: true,
+          title: { select: { market: { select: { code: true } } } },
+        },
+      },
+    },
+  },
+} satisfies Prisma.OrderSelect;
+
+type OrderForMetrics = Prisma.OrderGetPayload<{ select: typeof ORDER_FOR_METRICS }>;
+
+// Creates the missing MetricsRequest per publisher for one order (existing
+// ones are left alone, so this is idempotent). Shared by the daily sweep
+// and the desk's "send metrics request now".
+async function ensureMetricsRequestsForOrder(
+  order: OrderForMetrics,
+  createdById: string,
+): Promise<{ created: number; needsContact: number }> {
+  let created = 0, needsContact = 0;
+  const bookings = order.lines.map((l) => l.booking).filter((b): b is NonNullable<typeof b> => !!b);
+  const groups = groupBookingsByPublisher(bookings);
+  for (const g of groups) {
+    const existing = await prisma.metricsRequest.findUnique({
+      where: { orderId_publisherId: { orderId: order.id, publisherId: g.publisherId } },
+    });
+    if (existing) continue;
+
+    const contacts = await prisma.salesContactTitle.findMany({
+      where: { salesContact: { publisherId: g.publisherId }, title: { bookings: { some: { id: { in: g.bookingIds } } } } },
+      select: { isPrimary: true, salesContact: { select: { email: true, name: true } } },
+    });
+    const recipient = resolveRecipient(
+      contacts.map((c) => ({ email: c.salesContact.email, name: c.salesContact.name, isPrimary: c.isPrimary })),
+    );
+
+    // Dominant locale from the bookings' markets.
+    const groupBookings = bookings.filter((b) => g.bookingIds.includes(b.id));
+    const locCount = new Map<MetricsLocale, number>();
+    for (const b of groupBookings) {
+      if (!b.title?.market) continue;
+      const loc = localeForMarketCode(b.title.market.code) as MetricsLocale;
+      locCount.set(loc, (locCount.get(loc) ?? 0) + 1);
+    }
+    const locale = [...locCount.entries()].sort((a, b) => b[1] - a[1])[0]?.[0] ?? "en";
+
+    const req = await prisma.metricsRequest.create({
+      data: {
+        orderId: order.id,
+        publisherId: g.publisherId,
+        recipientEmail: recipient?.email ?? null,
+        recipientName: recipient?.name ?? null,
+        locale,
+        token: newMetricsToken(),
+        status: recipient ? "PENDING" : "NEEDS_CONTACT",
+        expiresAt: metricsExpiryFromNow(),
+        createdById,
+        bookings: { create: g.bookingIds.map((bookingId) => ({ bookingId })) },
+      },
+    });
+    if (recipient) created++; else needsContact++;
+    await recordAudit(createdById, "metrics_request.create", `MetricsRequest:${req.id}`, {
+      orderId: order.id, publisherId: g.publisherId, bookings: g.bookingIds.length, hasContact: !!recipient,
+    });
+  }
+  return { created, needsContact };
+}
+
 export async function buildMetricsCampaign(args: {
   createdById: string;
   now?: Date;
@@ -43,72 +122,58 @@ export async function buildMetricsCampaign(args: {
   const now = args.now ?? new Date();
   const orders = await prisma.order.findMany({
     where: { flightEndDate: { lt: now, not: null }, status: { notIn: ["QUOTED", "CANCELLED"] } },
-    select: {
-      id: true, status: true, flightEndDate: true,
-      lines: {
-        select: {
-          booking: {
-            select: {
-              id: true, publisherId: true, status: true,
-              title: { select: { market: { select: { code: true } } } },
-            },
-          },
-        },
-      },
-    },
+    select: ORDER_FOR_METRICS,
   });
 
   let created = 0, needsContact = 0, scanned = 0;
   for (const order of orders) {
     if (!isOrderEligibleForScan(order, now, GRACE_DAYS)) continue;
     scanned++;
-    const bookings = order.lines.map((l) => l.booking).filter((b): b is NonNullable<typeof b> => !!b);
-    const groups = groupBookingsByPublisher(bookings);
-    for (const g of groups) {
-      const existing = await prisma.metricsRequest.findUnique({
-        where: { orderId_publisherId: { orderId: order.id, publisherId: g.publisherId } },
-      });
-      if (existing) continue;
-
-      const contacts = await prisma.salesContactTitle.findMany({
-        where: { salesContact: { publisherId: g.publisherId }, title: { bookings: { some: { id: { in: g.bookingIds } } } } },
-        select: { isPrimary: true, salesContact: { select: { email: true, name: true } } },
-      });
-      const recipient = resolveRecipient(
-        contacts.map((c) => ({ email: c.salesContact.email, name: c.salesContact.name, isPrimary: c.isPrimary })),
-      );
-
-      // Dominant locale from the bookings' markets.
-      const groupBookings = bookings.filter((b) => g.bookingIds.includes(b.id));
-      const locCount = new Map<MetricsLocale, number>();
-      for (const b of groupBookings) {
-        if (!b.title?.market) continue;
-        const loc = localeForMarketCode(b.title.market.code) as MetricsLocale;
-        locCount.set(loc, (locCount.get(loc) ?? 0) + 1);
-      }
-      const locale = [...locCount.entries()].sort((a, b) => b[1] - a[1])[0]?.[0] ?? "en";
-
-      const req = await prisma.metricsRequest.create({
-        data: {
-          orderId: order.id,
-          publisherId: g.publisherId,
-          recipientEmail: recipient?.email ?? null,
-          recipientName: recipient?.name ?? null,
-          locale,
-          token: newMetricsToken(),
-          status: recipient ? "PENDING" : "NEEDS_CONTACT",
-          expiresAt: metricsExpiryFromNow(),
-          createdById: args.createdById,
-          bookings: { create: g.bookingIds.map((bookingId) => ({ bookingId })) },
-        },
-      });
-      if (recipient) created++; else needsContact++;
-      await recordAudit(args.createdById, "metrics_request.create", `MetricsRequest:${req.id}`, {
-        orderId: order.id, publisherId: g.publisherId, bookings: g.bookingIds.length, hasContact: !!recipient,
-      });
-    }
+    const r = await ensureMetricsRequestsForOrder(order, args.createdById);
+    created += r.created;
+    needsContact += r.needsContact;
   }
   return { requests_created: created, needs_contact: needsContact, orders_scanned: scanned };
+}
+
+export type MetricsNowResult =
+  | { ok: false; reason: "not_found" | "not_ended" }
+  | { ok: true; created: number; needsContact: number; sent: number; skipped: number };
+
+// Desk "send metrics request now" for one order: build any missing requests,
+// then send the first email of every request that hasn't had one yet.
+// Follow-ups stay with the daily sweep's cadence; requests without a
+// contact surface on /desk/metrics-needs-contact exactly as the sweep's do.
+export async function sendMetricsRequestsNow(args: {
+  orderId: string;
+  actorId: string;
+  now?: Date;
+}): Promise<MetricsNowResult> {
+  const now = args.now ?? new Date();
+  const order = await prisma.order.findUnique({
+    where: { id: args.orderId },
+    select: ORDER_FOR_METRICS,
+  });
+  if (!order) return { ok: false, reason: "not_found" };
+  if (!canRequestMetricsNow(order, now)) return { ok: false, reason: "not_ended" };
+
+  const { created, needsContact } = await ensureMetricsRequestsForOrder(order, args.actorId);
+  const unsent = await prisma.metricsRequest.findMany({
+    where: {
+      orderId: order.id,
+      sentCount: 0,
+      status: { in: ["PENDING", "PARTIAL"] },
+      recipientEmail: { not: null },
+    },
+    select: { id: true },
+  });
+  let sent = 0, skipped = 0;
+  for (const r of unsent) {
+    const res = await sendMetricsRequestStep({ requestId: r.id, actorId: args.actorId });
+    if ("sent" in res) sent++;
+    else skipped++;
+  }
+  return { ok: true, created, needsContact, sent, skipped };
 }
 
 // ---------- Select batch ----------

@@ -1,6 +1,7 @@
 import { getTranslations } from "next-intl/server";
 import { notFound } from "next/navigation";
 import { prisma } from "@/lib/prisma";
+import { lineOrder } from "@/lib/commerce/line-order";
 import { Link } from "@/i18n/navigation";
 import { clicksByOrderLine } from "@/lib/metrics/store";
 import { OrderHeader } from "./order-header";
@@ -9,6 +10,23 @@ import { LinesSection } from "./lines-section";
 import { WritersPanel } from "./writers-panel";
 import { CampaignSection } from "./campaign-section";
 import { ProgrammePanel } from "./programme-panel";
+import { AccountingStatus } from "./accounting-status";
+import { cancelBlockKey } from "@/lib/cancellation";
+import { deliveryGap, nextOrderStatus } from "@/lib/order-lifecycle";
+
+// ?credit= codes from desk-billing-actions issueCreditNote → `order`
+// message keys. Unknown codes render nothing rather than raw text.
+const CREDIT_ERROR_KEYS: Readonly<Record<string, string>> = {
+  "reason-required": "creditErrors.reasonRequired",
+  "not-found": "creditErrors.notFound",
+  "no-invoice": "creditErrors.noInvoice",
+  "already-credited": "creditErrors.alreadyCredited",
+  "wrong-order-status": "creditErrors.wrongOrderStatus",
+};
+
+function creditErrorKey(code: string | string[] | undefined): string | null {
+  return typeof code === "string" ? (CREDIT_ERROR_KEYS[code] ?? null) : null;
+}
 
 export const dynamic = "force-dynamic";
 
@@ -32,6 +50,7 @@ export default async function DeskOrderPage({
       invoices: true,
       creditNotes: true,
       lines: {
+        orderBy: lineOrder(),
         include: {
           brief: true,
           articlePlacement: {
@@ -83,7 +102,50 @@ export default async function DeskOrderPage({
     include: { title: true },
   });
   const byId = new Map(products.map((p) => [p.id, p]));
-  const invoice = order.invoices[0];
+  // The order's current invoice: an open one if any, else the latest
+  // (a credited invoice stays visible with its credit note).
+  const invoice =
+    order.invoices.find((i) => i.status !== "CREDITED" && i.status !== "VOID") ??
+    [...order.invoices].sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime())[0];
+
+  // What "Advance" would claim, checked against delivery evidence.
+  const next = nextOrderStatus(order.status);
+  const tNames = await getTranslations({ locale, namespace: "productType" });
+  const gap = deliveryGap(
+    order.lines.map((l) => {
+      const product = l.productId ? byId.get(l.productId) : undefined;
+      const titleName = l.booking?.title?.name ?? product?.title.name;
+      return {
+        id: l.id,
+        kind: l.kind,
+        booking: l.booking ? { status: l.booking.status, liveUrl: l.booking.liveUrl } : null,
+        label: titleName
+          ? product
+            ? `${titleName} — ${tNames.has(product.type) ? tNames(product.type) : product.type}`
+            : titleName
+          : t("unknownPlacement"),
+      };
+    }),
+    next,
+  );
+
+  const cancelMessage =
+    cancelError === "blocked"
+      ? cancelBlockKey(order.status)
+        ? t(`cancelBlock.${cancelBlockKey(order.status)}`)
+        : t("cancelErrors.blocked")
+      : cancelError === "reason-required"
+        ? t("cancelErrors.reasonRequired")
+        : cancelError === "not-found"
+          ? t("cancelErrors.notFound")
+          : null;
+  const creditMessage = creditErrorKey(sp.credit);
+  const advanceMessage =
+    sp.advance === "unconfirmed"
+      ? t("advanceErrors.unconfirmed")
+      : sp.advance === "moved"
+        ? t("advanceErrors.moved")
+        : null;
 
   // Derive criteria from the first line that has a product/title.
   const firstProductLine = order.lines.find(
@@ -112,13 +174,31 @@ export default async function DeskOrderPage({
         </Link>
       </nav>
 
-      <OrderHeader locale={locale} order={order} invoice={invoice} />
+      <OrderHeader
+        locale={locale}
+        order={order}
+        invoice={invoice}
+        next={next}
+        gap={gap}
+      />
 
-      {cancelError ? (
+      {cancelMessage ? (
         <div className="banner-error" role="alert">
-          <strong>{t("cancelError")}:</strong> {cancelError}
+          <strong>{t("cancelError")}:</strong> {cancelMessage}
         </div>
       ) : null}
+      {creditMessage ? (
+        <div className="banner-error" role="alert">
+          <strong>{t("creditError")}:</strong> {t(creditMessage)}
+        </div>
+      ) : null}
+      {advanceMessage ? (
+        <div className="banner-error" role="alert">
+          <strong>{t("advanceError")}:</strong> {advanceMessage}
+        </div>
+      ) : null}
+
+      <AccountingStatus locale={locale} orderId={order.id} invoice={invoice} creditNotes={order.creditNotes} />
 
       <CancelledSummary locale={locale} order={order} invoice={invoice} />
 

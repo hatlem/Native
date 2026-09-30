@@ -254,9 +254,12 @@ export async function activateQuoteProducts(args: {
   // price came from a PriceQuote (publisher reply) or a script-seeded rate-card
   // import (e.g. confirmedSource "EgmontPrisfil2026"). Policy: if we have a
   // confirmed price, the product should be live so its band shows in the catalog.
+  // A zero basePrice is the "no price yet" sentinel (blueprint skeletons
+  // from markTitleNative) — never a confirmed price, so never activated.
   const where = {
     active: false,
     confirmedAt: { not: null },
+    basePrice: { gt: 0 },
     ...(args.titleId ? { titleId: args.titleId } : {}),
   };
   const products = await prisma.product.findMany({

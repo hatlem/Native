@@ -1,15 +1,17 @@
 import { getTranslations } from "next-intl/server";
+import { viewOrgIds } from "@/lib/workspace";
 import { redirect } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import { loadScope } from "@/lib/scope";
 import { loadUnsentLists } from "@/lib/lists";
 import { estimateListTotals } from "@/lib/plan-total";
+import { loadPricingDefaults } from "@/lib/content-fee";
 import { Link } from "@/i18n/navigation";
 import { EmptyState } from "@/app/empty-state";
 import { formatMoney, intlLocale } from "@/lib/money";
 import { timeAgo } from "@/lib/time-ago";
 import { deriveStage, type CampaignStage } from "@/lib/campaign-stage";
-import { effectiveQuoteStatus } from "@/lib/commerce/quote-validity";
+import { buyerVisibleQuoteWhere, effectiveQuoteStatus } from "@/lib/commerce/quote-validity";
 import { monthsWindow, intersectsMonth, draftWindow, orderWindow, type RunWindow } from "@/lib/campaign-timeline";
 import { CampaignRow, type RowAction } from "./_components/CampaignRow";
 import { TimelineView, type TimelineEntry, type TimelineMonthGroup } from "./_components/TimelineView";
@@ -64,6 +66,7 @@ export default async function RequestsPage({
   const t = await getTranslations({ locale, namespace: "requests" });
   const tOrders = await getTranslations({ locale, namespace: "orders" });
   const tPlan = await getTranslations({ locale, namespace: "plan" });
+  const tInvoice = await getTranslations({ locale, namespace: "invoice" });
 
   const scope = await loadScope();
   if (!scope.workspace) redirect(`/${locale}/signin`);
@@ -89,7 +92,7 @@ export default async function RequestsPage({
     // lists, so a different client's draft here would resolve wrong.
     ws.activeOrgId ? loadUnsentLists(ws.activeOrgId) : Promise.resolve([]),
     prisma.request.findMany({
-      where: { organizationId: { in: ws.scopeOrgIds } },
+      where: { organizationId: { in: viewOrgIds(ws) } },
       orderBy: { updatedAt: "desc" },
       include: {
         organization: { select: { name: true } },
@@ -97,7 +100,10 @@ export default async function RequestsPage({
         sourceList: {
           select: { waveNumber: true, programme: { select: { plannedWaves: true } } },
         },
+        // Drafts are desk-internal: until the desk sends the quote the row
+        // stays at "sent to the desk" (see buyerVisibleQuoteWhere).
         quotes: {
+          where: buyerVisibleQuoteWhere(),
           orderBy: { createdAt: "desc" },
           take: 1,
           include: {
@@ -126,8 +132,11 @@ export default async function RequestsPage({
     return start ? t("waveNoteDated", { ...vars, date: dateFmt.format(start) }) : t("waveNote", vars);
   };
 
+  // Same fee and margin rules the order prices with, so a draft's card shows
+  // the amount the plan would actually commit to (content fees included).
+  const pricing = await loadPricingDefaults();
   for (const list of unsentLists) {
-    const totals = estimateListTotals(list.items);
+    const totals = estimateListTotals(list.items, pricing);
     const totalLabel = totals.length
       ? totals.length > 1
         ? totals
@@ -353,9 +362,14 @@ export default async function RequestsPage({
           <h1>{t("pipelineTitle")}</h1>
           <p className="lead">{t("pipelineLead")}</p>
         </div>
-        <Link href="/catalog" className="btn">
-          {t("newCampaignCta")}
-        </Link>
+        <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+          <Link href="/invoices" className="btn secondary">
+            {tInvoice("listTitle")}
+          </Link>
+          <Link href="/catalog" className="btn">
+            {t("newCampaignCta")}
+          </Link>
+        </div>
       </div>
 
       <nav className="campaign-tabs" aria-label={t("tabsLabel")}>

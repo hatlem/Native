@@ -1,7 +1,7 @@
 import { cookies } from "next/headers";
 import { prisma } from "@/lib/prisma";
 import { clampQuantity, MAX_QTY } from "@/lib/basket";
-import type { AuthorshipMode } from "@/lib/authorship";
+import { contentIntent, mergeContentIntent, type AuthorshipMode } from "@/lib/authorship";
 
 export const ACTIVE_LIST_COOKIE = "nativespin_active_list";
 
@@ -187,7 +187,7 @@ export async function migrateLegacyBasket(
           productId: b.productId,
           titleId: null,
           quantity: clampQuantity(b.quantity),
-          withContent: !!b.withContent,
+          ...contentIntent(!!b.withContent),
           sortOrder: idx,
         })),
       },
@@ -228,6 +228,10 @@ export async function setItemAlternative(itemId: string, isAlternative: boolean)
 
 export async function addProductItem(listId: string, productId: string, withContent = false) {
   assertItemShape({ productId, titleId: null });
+  // Adding "with content" to a line that's already there turns content on for
+  // it (never off — a plain re-add must not drop a content request the buyer
+  // made earlier). Same OR rule as every other merge of two lines.
+  const contentOn = withContent ? contentIntent(true) : {};
   // Adding a product that sits among the alternatives promotes it into the
   // plan as-is (no quantity bump) — that is what "add" means to the buyer.
   const existing = await prisma.savedListItem.findUnique({
@@ -235,12 +239,21 @@ export async function addProductItem(listId: string, productId: string, withCont
     select: { id: true, isAlternative: true },
   });
   if (existing?.isAlternative) {
-    return prisma.savedListItem.update({ where: { id: existing.id }, data: { isAlternative: false } });
+    return prisma.savedListItem.update({
+      where: { id: existing.id },
+      data: { isAlternative: false, ...contentOn },
+    });
   }
   const item = await prisma.savedListItem.upsert({
     where: { listId_productId: { listId, productId } },
-    create: { listId, productId, titleId: null, withContent, sortOrder: await nextSortOrder(listId) },
-    update: { quantity: { increment: 1 } },
+    create: {
+      listId,
+      productId,
+      titleId: null,
+      ...contentIntent(withContent),
+      sortOrder: await nextSortOrder(listId),
+    },
+    update: { quantity: { increment: 1 }, ...contentOn },
   });
   // upsert's increment can't express min(); cap to MAX_QTY in a follow-up.
   if (item.quantity > MAX_QTY) {
@@ -269,12 +282,12 @@ export async function addTitleItem(listId: string, titleId: string) {
 export async function resolveTitleItem(itemId: string, productId: string) {
   const item = await prisma.savedListItem.findUnique({
     where: { id: itemId },
-    select: { listId: true, quantity: true },
+    select: { listId: true, quantity: true, withContent: true },
   });
   if (!item) return null;
   const existingProduct = await prisma.savedListItem.findUnique({
     where: { listId_productId: { listId: item.listId, productId } },
-    select: { id: true, quantity: true },
+    select: { id: true, quantity: true, withContent: true, authorshipMode: true },
   });
   if (existingProduct && existingProduct.id !== itemId) {
     // deleteMany (not delete) so a concurrent removal of the placeholder is a
@@ -282,7 +295,10 @@ export async function resolveTitleItem(itemId: string, productId: string) {
     const [merged] = await prisma.$transaction([
       prisma.savedListItem.update({
         where: { id: existingProduct.id },
-        data: { quantity: clampQuantity(existingProduct.quantity + item.quantity) },
+        data: {
+          quantity: clampQuantity(existingProduct.quantity + item.quantity),
+          ...mergeContentIntent(existingProduct, item),
+        },
       }),
       prisma.savedListItem.deleteMany({ where: { id: itemId } }),
     ]);
@@ -297,6 +313,21 @@ export async function resolveTitleItem(itemId: string, productId: string) {
 /** Idempotent: deleteMany affects 0 rows (no P2025) if a concurrent action already removed it. */
 export async function removeItem(itemId: string) {
   return prisma.savedListItem.deleteMany({ where: { id: itemId } });
+}
+
+/**
+ * The buyer's "We write it" toggle. Writes withContent and authorshipMode as
+ * one pair (contentIntent) so the RFQ snapshot, content-fee lines and writer
+ * staffing — which all read authorshipMode — follow what the buyer pressed.
+ * Turning it off only touches a line that is on: a publisher-produced line is
+ * already off, and a stale "off" post must not rewrite it to buyer-supplied.
+ * Idempotent: updateMany no-ops if the row was concurrently removed.
+ */
+export async function setItemContent(itemId: string, withContent: boolean) {
+  return prisma.savedListItem.updateMany({
+    where: withContent ? { id: itemId } : { id: itemId, withContent: true },
+    data: contentIntent(withContent),
+  });
 }
 
 /** Idempotent: updateMany no-ops (no P2025) if the row was concurrently removed. */

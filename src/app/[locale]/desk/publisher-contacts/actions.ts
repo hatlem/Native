@@ -38,14 +38,19 @@ export async function approveCandidateAction(formData: FormData) {
     role: f(formData, "role") || undefined,
     phone: f(formData, "phone") || undefined,
   };
+  // redirect() works by throwing, so it must stay outside the try: inside
+  // it, the success redirect was caught and re-reported as an error.
+  let error: string | null = null;
   try {
     await approveCandidate({ candidateId, reviewedById: userId, overrides });
-    redirect(`/${locale}/desk/publisher-contacts?ok=approved`);
   } catch (err) {
-    redirect(
-      `/${locale}/desk/publisher-contacts?err=${encodeURIComponent((err as Error).message)}`,
-    );
+    error = (err as Error).message;
   }
+  redirect(
+    error
+      ? `/${locale}/desk/publisher-contacts?err=${encodeURIComponent(error)}`
+      : `/${locale}/desk/publisher-contacts?ok=approved`,
+  );
 }
 
 export async function rejectCandidateAction(formData: FormData) {

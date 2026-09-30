@@ -8,6 +8,7 @@ import {
   writeBookingMetric,
   recomputeRequestStatus,
   sendMetricsRequestStep,
+  sendMetricsRequestsNow,
 } from "@/lib/campaign-reporting/campaign";
 
 // These actions are bound with .bind() from client components rather
@@ -70,6 +71,23 @@ export async function saveBookingMetricOverride(bookingId: string, fd: FormData)
   if (booking?.orderLine.orderId) {
     revalidatePath(`/desk/orders/${booking.orderLine.orderId}`);
   }
+}
+
+// Desk "send metrics request now": builds this order's missing publisher
+// requests and sends each first email immediately instead of waiting for
+// the once-a-day sweep. The campaign section re-renders with each
+// request's status (sent, or "needs contact" when no address is on file).
+export async function sendMetricsRequestNow(orderId: string) {
+  const session = await auth();
+  const role = session?.user?.role;
+  if (!session?.user || (role !== "DESK" && role !== "SUPERADMIN")) {
+    throw new Error("forbidden");
+  }
+  const result = await sendMetricsRequestsNow({ orderId, actorId: session.user.id });
+  await recordAudit(session.user.id, "metrics_request.send_now", `Order:${orderId}`, result);
+  // The route is locale-prefixed; revalidate the page pattern so every
+  // locale's copy of this order page refreshes.
+  revalidatePath("/[locale]/desk/orders/[orderId]", "page");
 }
 
 export async function resendMetricsRequest(requestId: string) {

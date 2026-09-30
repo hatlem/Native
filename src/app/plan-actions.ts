@@ -6,6 +6,7 @@ import { recordAudit } from "@/lib/audit";
 import { loadScope, canActOnOrg } from "@/lib/scope";
 import { writeActiveListId } from "@/lib/lists";
 import { clampQuantity } from "@/lib/basket";
+import { contentIntent, mergeContentIntent, type ContentIntent } from "@/lib/authorship";
 import { sourceListForOrder, copyListForNewWave } from "@/lib/programme";
 import {
   addProductToList,
@@ -172,17 +173,16 @@ export async function duplicatePlan(formData: FormData) {
   // PlanItems (e.g. two desk-resolved title lines for the same product). The
   // (listId,productId) unique would reject duplicate rows, so merge their
   // quantities (clamped) into one line per product; content mode is OR-ed.
-  const byProduct = new Map<
-    string,
-    { quantity: number; withContent: boolean; authorshipMode: (typeof survivingItems)[number]["authorshipMode"]; notes: string | null }
-  >();
+  // PlanItems snapshotted before the pair was kept in sync can disagree, so
+  // the copy re-derives it (contentIntent) rather than trusting both columns.
+  const byProduct = new Map<string, ContentIntent & { quantity: number; notes: string | null }>();
   for (const i of survivingItems) {
     const pid = i.productId as string;
     const prev = byProduct.get(pid);
+    const own = contentIntent(i.withContent, i.authorshipMode);
     byProduct.set(pid, {
       quantity: clampQuantity((prev?.quantity ?? 0) + i.quantity),
-      withContent: (prev?.withContent ?? false) || i.withContent,
-      authorshipMode: i.withContent ? i.authorshipMode : (prev?.authorshipMode ?? i.authorshipMode),
+      ...(prev ? mergeContentIntent(prev, own) : own),
       notes: prev?.notes ?? i.notes,
     });
   }

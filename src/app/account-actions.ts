@@ -7,12 +7,9 @@ import { AuthError } from "next-auth";
 import { auth, signIn, signOut } from "@/auth";
 import { prisma } from "@/lib/prisma";
 import { recordAudit } from "@/lib/audit";
-import {
-  resolveOrgMembership,
-  wouldRemoveLastAdmin,
-  type MembershipRow,
-} from "@/lib/membership";
+import { wouldRemoveLastAdmin, type MembershipRow } from "@/lib/membership";
 import { canDeactivateSelf } from "@/lib/user-admin";
+import { companySeat, getWorkspace } from "@/lib/workspace";
 import { normaliseEmail } from "@/lib/email-change";
 import { SUPPORTED_MARKETS } from "@/lib/markets";
 
@@ -66,37 +63,27 @@ export async function updateCompany(formData: FormData) {
     redirect(`/${locale}/account?error=company#company`);
   }
 
-  const user = await prisma.user.findUnique({
-    where: { id: session.user.id },
-    select: { organizationId: true, role: true },
-  });
-  if (!user?.organizationId) {
+  // The company is the org the user is working in (lib/workspace companySeat)
+  // — the same one /account shows — and only an ADMIN seat in it may edit.
+  // Resolving it from the workspace rather than User.organizationId matters
+  // twice over: a member of several orgs edits the org they switched to, and
+  // a removed member (no workspace) edits nothing.
+  const ws = await getWorkspace(session.user.id);
+  const seat = ws ? companySeat(ws) : null;
+  if (!seat?.orgId) {
     redirect(`/${locale}/account?error=no_org#company`);
   }
-  // Only an ADMIN of the org may edit company info. Multi-seat has landed,
-  // so a MEMBER/RESTRICTED seat must not rename the org or change its market.
-  const memberships = await prisma.membership.findMany({
-    where: { userId: session.user.id, organizationId: user.organizationId },
-    select: {
-      userId: true,
-      organizationId: true,
-      role: true,
-      canCommit: true,
-      expiresAt: true,
-      status: true,
-    },
-  });
-  if (resolveOrgMembership(memberships, user.organizationId, new Date())?.role !== "ADMIN") {
+  if (!seat.isAdmin) {
     redirect(`/${locale}/account?error=forbidden#company`);
   }
   await prisma.organization.update({
-    where: { id: user.organizationId },
+    where: { id: seat.orgId },
     data: {
       name: orgName,
       marketCode: market as MarketCode,
     },
   });
-  await recordAudit(session.user.id, "organization.updated", `Organization:${user.organizationId}`, {
+  await recordAudit(session.user.id, "organization.updated", `Organization:${seat.orgId}`, {
     name: orgName,
     market,
   });

@@ -18,6 +18,7 @@ import { appUrl, appName } from "@/lib/url";
 import { clientIp } from "@/lib/client-ip";
 import { PLAN_COOKIE, PLAN_BRIEF_COOKIE } from "@/lib/basket";
 import { CLIENT_COOKIE } from "@/lib/workspace";
+import { safeNext } from "@/lib/auth-gate";
 
 // Returns the destination instead of calling next/navigation's redirect().
 // The signin page's forms are client wrappers that navigate via
@@ -32,9 +33,13 @@ export async function authenticate(formData: FormData): Promise<{ redirectTo: st
     .toLowerCase()
     .trim();
   const password = String(formData.get("password") || "");
+  // The page the visitor was sent here from (middleware / page guards put it
+  // on /signin?next=…). Kept through a failed attempt, honoured on success.
+  const next = safeNext(String(formData.get("next") || ""), "");
+  const nextParam = next ? `&next=${encodeURIComponent(next)}` : "";
 
   const ip = await clientIp();
-  const emailParam = email ? `&email=${encodeURIComponent(email)}` : "";
+  const emailParam = (email ? `&email=${encodeURIComponent(email)}` : "") + nextParam;
 
   // No rate-limit check here: the credentials provider (src/auth.ts) owns
   // the sign-in limiter, per email AND per IP, so every route in is covered
@@ -87,7 +92,7 @@ export async function authenticate(formData: FormData): Promise<{ redirectTo: st
               requestedIp: ip,
             },
           });
-          const url = `${appUrl()}/${locale}/magic-link/${raw}`;
+          const url = `${appUrl()}/${locale}/magic-link/${raw}${next ? `?next=${encodeURIComponent(next)}` : ""}`;
           const msg = magicLinkEmail({ url, locale, appName: appName() });
           const unverifiedUserId = u.id;
           after(async () => {
@@ -122,7 +127,7 @@ export async function authenticate(formData: FormData): Promise<{ redirectTo: st
       resetUrl: `${appUrl()}/${locale}/forgot-password`,
     });
   }
-  return { redirectTo: landingForRole(user?.role, locale) };
+  return { redirectTo: next || landingForRole(user?.role, locale) };
 }
 
 // Magic-link sign-in: user submits email, we email them a one-tap link.
@@ -133,6 +138,10 @@ export async function requestMagicLink(formData: FormData): Promise<{ redirectTo
   const email = String(formData.get("email") || "")
     .toLowerCase()
     .trim();
+  // Carried on the emailed link so the one-tap sign-in lands where the
+  // visitor was headed (the consume route re-validates it).
+  const next = safeNext(String(formData.get("next") || ""), "");
+  const nextParam = next ? `&next=${encodeURIComponent(next)}` : "";
 
   const ip = await clientIp();
   const [ipCheck, emailCheck] = await Promise.all([
@@ -140,14 +149,14 @@ export async function requestMagicLink(formData: FormData): Promise<{ redirectTo
     authLimiter.check(`magic-link:email:${email}`),
   ]);
   if (!ipCheck.ok || !emailCheck.ok) {
-    return { redirectTo: `/${locale}/signin?error=rate` };
+    return { redirectTo: `/${locale}/signin?error=rate${nextParam}` };
   }
 
   // Nothing typed is a form error, not a request: "if that address is
   // registered we sent a link" would be a lie about an address that was
   // never given. It says nothing about any account, so it's safe to say.
   if (!email) {
-    return { redirectTo: `/${locale}/signin?error=magic_empty` };
+    return { redirectTo: `/${locale}/signin?error=magic_empty${nextParam}` };
   }
 
   const user = await prisma.user.findUnique({
@@ -173,7 +182,7 @@ export async function requestMagicLink(formData: FormData): Promise<{ redirectTo
     // ~10²ms) and the unknown-email branch (audit only, ~10ms). Both
     // branches return the same /check-email redirect on the same code
     // path — the post-response work is invisible to the attacker.
-    const url = `${appUrl()}/${locale}/magic-link/${raw}`;
+    const url = `${appUrl()}/${locale}/magic-link/${raw}${next ? `?next=${encodeURIComponent(next)}` : ""}`;
     const msg = magicLinkEmail({ url, locale, appName: appName() });
     const userId = user.id;
     const userEmail = user.email;

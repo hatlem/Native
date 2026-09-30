@@ -8,7 +8,7 @@ import { checkRateCardRequest } from "@/lib/outreach/tokens";
 import { addSuppression } from "@/lib/outreach/suppression";
 import { recordAudit } from "@/lib/audit";
 import { rfqLimiter } from "@/lib/rate-limit";
-import { presignUpload, RATE_CARD_TYPES } from "@/lib/storage/r2";
+import { presignUploadResult, RATE_CARD_TYPES } from "@/lib/storage/r2";
 
 function f(fd: FormData, k: string): string {
   const v = fd.get(k);
@@ -35,7 +35,7 @@ export async function presignRateCardUpload(args: {
     cancelledAt: req.cancelledAt,
   });
   if (!verdict?.ok) throw new Error(`request_${verdict?.reason ?? "missing"}`);
-  return presignUpload({
+  return presignUploadResult({
     prefix: `rate-cards/${args.token}`,
     filename: args.filename,
     contentType: args.contentType,

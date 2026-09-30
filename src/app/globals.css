@@ -680,6 +680,38 @@ main.container {
   color: var(--heading);
 }
 
+/* Org switcher (user menu + drawer) for members of several orgs */
+.org-switcher {
+  border-bottom: 1px solid var(--border);
+  margin-bottom: var(--s-2);
+  padding-bottom: var(--s-2);
+}
+.org-switcher__label {
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--muted);
+  padding: 4px 10px;
+}
+.org-switcher__current,
+.org-switcher__current:hover {
+  font-weight: 600;
+  color: var(--heading);
+  background: transparent;
+  cursor: default;
+}
+.org-switcher__current span,
+.org-switcher__spacer {
+  display: inline-block;
+  width: 1em;
+  color: var(--accent);
+}
+.drawer .sheet .org-switcher {
+  border-bottom: 0;
+  margin-bottom: 0;
+}
+
 /* Mobile menu toggle */
 .menu-toggle {
   display: none;
@@ -1434,6 +1466,21 @@ form:not(.filters):not(.cmdk-form) button[type="submit"]:not(.btn):hover {
   background: var(--surface-2);
   color: var(--heading);
   border-color: var(--muted);
+}
+
+/* Org switcher entries are menu rows, not standalone buttons (same
+   specificity as the rule above, so it has to come after it). */
+.user-menu .org-switcher form button[type="submit"].menu-item,
+.drawer .org-switcher form button[type="submit"].menu-item {
+  border: 0;
+  min-height: 0;
+  padding: 8px 10px;
+  font-size: 0.92rem;
+  font-weight: 400;
+}
+.user-menu .org-switcher form button[type="submit"].menu-item:hover,
+.drawer .org-switcher form button[type="submit"].menu-item:hover {
+  border: 0;
 }
 
 /* ---------- Cards & grid ---------- */
@@ -3545,6 +3592,15 @@ select:disabled {
   margin: 0;
 }
 
+/* The amount the instant-order click commits to, right above that button. */
+.plan-summary-commit {
+  margin: 0;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--heading);
+  font-variant-numeric: tabular-nums;
+}
+
 .plan-summary-reassurance {
   margin: 4px 0 0;
   text-align: center;
@@ -5463,6 +5519,19 @@ body:has(.compare-bar) {
   gap: var(--s-3);
 }
 
+/* Read-only price on the publisher product card (status sits in its header). */
+.product-facts {
+  margin: 0 0 var(--s-4);
+}
+.product-facts dt {
+  font-size: 0.78rem;
+  color: var(--muted);
+  margin-bottom: 2px;
+}
+.product-facts dd {
+  margin: 0;
+}
+
 .product-form .grid-2 {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -5687,6 +5756,13 @@ footer a:hover {
     text-transform: uppercase;
     color: var(--muted);
     margin-bottom: 2px;
+  }
+  /* Team seats: the admin controls get their own strip under the facts. */
+  .table-wrap.team-table td.team-table__actions:empty { display: none; }
+  .table-wrap.team-table td.team-table__actions {
+    margin-top: var(--s-2);
+    padding-top: var(--s-3);
+    border-top: 1px solid var(--border);
   }
 }
 
@@ -7570,4 +7646,92 @@ footer a:hover {
   gap: var(--s-3);
   flex-wrap: wrap;
   margin-bottom: var(--s-2);
+}
+
+/* ---------- Fieldset variant of .field (grouped controls) ---------- */
+
+fieldset.field {
+  border: 0;
+  padding: 0;
+  margin: 0;
+  min-width: 0;
+}
+fieldset.field > legend {
+  padding: 0;
+  margin-bottom: 6px;
+  font-size: 0.85rem;
+  font-weight: 540;
+  color: var(--heading);
+}
+
+/* ---------- Article preview (rendered draft, see ArticlePreview) ---------- */
+
+.article-preview {
+  max-width: 70ch;
+  color: var(--text);
+  font-size: 1rem;
+  line-height: 1.65;
+  overflow-wrap: anywhere;
+}
+.article-preview > :first-child {
+  margin-top: 0;
+}
+.article-preview > :last-child {
+  margin-bottom: 0;
+}
+.article-preview h2,
+.article-preview h3,
+.article-preview h4,
+.article-preview h5,
+.article-preview h6 {
+  margin: 1.4em 0 0.5em;
+  color: var(--heading);
+  line-height: 1.25;
+}
+.article-preview h2 { font-size: 1.55rem; }
+.article-preview h3 { font-size: 1.25rem; }
+.article-preview h4,
+.article-preview h5,
+.article-preview h6 { font-size: 1.05rem; }
+.article-preview p,
+.article-preview ul,
+.article-preview ol,
+.article-preview blockquote {
+  margin: 0 0 1em;
+}
+.article-preview ul,
+.article-preview ol {
+  padding-left: 1.4em;
+}
+.article-preview blockquote {
+  padding-left: var(--s-3);
+  border-left: 3px solid var(--border-strong);
+  color: var(--muted-strong);
+  font-style: italic;
+}
+.article-preview hr {
+  border: 0;
+  border-top: 1px solid var(--border);
+  margin: 1.5em 0;
+}
+.article-preview code {
+  padding: 0.1em 0.35em;
+  border-radius: var(--r-xs);
+  background: var(--surface-3);
+  font-size: 0.9em;
+}
+.article-preview a {
+  color: var(--accent);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+/* ---------- Disabled buttons ---------- */
+/* A disabled action (e.g. "Send for review" while the spec check fails)
+   must look unavailable, not just ignore the click. */
+.btn:disabled,
+.btn[aria-disabled="true"] {
+  opacity: 0.45;
+  cursor: not-allowed;
+  pointer-events: none;
 }

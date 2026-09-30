@@ -1,6 +1,6 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { specCheck } from "./spec-check";
+import { specCheck, describeSpecFailure } from "./spec-check";
 
 test("passes when body has both required disclosures and length is OK", () => {
   const r = specCheck({
@@ -132,4 +132,22 @@ test("plain labels remain a substring match (back-compat)", () => {
     titleDisclosure: "Annonse",
   });
   assert.equal(r.passed, true);
+});
+
+// The writer portal localizes each failed rule, so the structured failures
+// must say exactly which rule failed and with which numbers.
+test("reports each failed rule as a structured failure", () => {
+  const r = specCheck({
+    body: "A short draft with no label.",
+    wordCountMin: 500,
+    wordCountMax: 900,
+    marketDisclosure: "Annonsørinnhold",
+  });
+  assert.equal(r.passed, false);
+  assert.deepEqual(r.failures, [
+    { rule: "disclosure", label: "Annonsørinnhold" },
+    { rule: "tooShort", words: 6, min: 500 },
+  ]);
+  // The persisted English notes stay in sync with the structured form.
+  assert.deepEqual(r.issues, r.failures.map(describeSpecFailure));
 });

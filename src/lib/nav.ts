@@ -65,6 +65,11 @@ function articlesItem(t: (key: string) => string): NavItem {
   return { key: "articles", label: t("articles"), href: "/articles" };
 }
 
+// The buyer's invoice list (org-scoped). User menu + palette, not top bar.
+function invoicesItem(t: (key: string) => string): NavItem {
+  return { key: "invoices", label: t("invoices"), href: "/invoices" };
+}
+
 export function navItemsFor(
   audience: Audience,
   t: (key: string) => string,
@@ -169,8 +174,13 @@ export function userMenuItemsFor(
   t: (key: string) => string,
 ): NavItem[] {
   if (audience === "public") return [];
+  // Buyers are billed; invoices are a "find it when I need it" destination,
+  // so they live here rather than in the capped top bar.
+  const billing: NavItem[] =
+    audience === "advertiser" || audience === "agency" ? [invoicesItem(t)] : [];
   return [
     { key: "notifications", label: t("notifications"), href: "/notifications" },
+    ...billing,
     { key: "account", label: t("account"), href: "/account" },
   ];
 }
@@ -197,6 +207,7 @@ export function paletteItemsFor(
           { key: "requests", label: t("requests"), href: "/requests" },
           articlesItem(t),
           { key: "reports", label: t("reports"), href: "/reports" },
+          invoicesItem(t),
           ...(audience === "agency"
             ? [{ key: "agency", label: t("agency"), href: "/agency" }]
             : []),

@@ -2,12 +2,13 @@ import { getTranslations } from "next-intl/server";
 import { redirect } from "next/navigation";
 import { planPath } from "@/lib/plan-path";
 import { auth } from "@/auth";
+import { loadScope, canCommitOnOrg } from "@/lib/scope";
+import { signinPath } from "@/lib/auth-gate";
 import { prisma } from "@/lib/prisma";
 import { getWorkspace } from "@/lib/workspace";
 import { Link } from "@/i18n/navigation";
 import { readPlanBrief } from "@/lib/basket";
 import { readActiveListId, resolveActiveList } from "@/lib/lists";
-import { indicativeFromRules, toRateRules } from "@/lib/money";
 import { isProductPriceShown } from "@/lib/pricing-visibility";
 import { titleDisplayName } from "@/lib/title-display";
 import { catalogVisibleTitleWhere } from "@/lib/catalog-visibility";
@@ -23,11 +24,11 @@ import { PlanSteps, type PlanStep } from "./PlanSteps";
 import { PlanTitleBlock } from "./PlanTitleBlock";
 import { PlanTargeting } from "./PlanTargeting";
 import { PlanLines, type PlanTitleLine } from "./PlanLines";
-import { PlanSummary, type Rollup } from "./PlanSummary";
+import { PlanSummary } from "./PlanSummary";
 import { WhatHappensNext } from "./WhatHappensNext";
 import { PlanProgramme, type ProgrammePacing } from "./PlanProgramme";
 import { loadProgrammeForList, recommendCadence } from "@/lib/programme";
-import { estimateListTotals } from "@/lib/plan-total";
+import { estimateListTotals, placementLineTotal } from "@/lib/plan-total";
 import { scheduleOverlapWarnings, type ScheduleOverlapWarning } from "@/lib/programme-warnings";
 import type { BookingUnit } from "@/lib/campaign-schedule";
 import { SUPPORTED_MARKETS } from "@/lib/markets";
@@ -54,6 +55,11 @@ export async function PlanView({
   const t = await getTranslations({ locale, namespace: "plan" });
 
   const session = await auth();
+  // Signed out: sign in first and come back here (middleware already does
+  // this for a plain page load; this covers an expired session cookie).
+  if (!session?.user) {
+    redirect(signinPath(locale, expectedListId ? `/${locale}/plan/${expectedListId}` : `/${locale}/plan`));
+  }
 
   // A missing buyer workspace on /plan almost always means a staff/internal
   // account (desk, superadmin, publisher, writer) wandered in — real buyers
@@ -113,6 +119,11 @@ export async function PlanView({
 
   const tType = await getTranslations({ locale, namespace: "productType" });
 
+  // Desk-owned fee + margin rules: the per-line figures, the summary total and
+  // PlanLines' breakdown ("38 000 placement + 7 000 article") are all priced
+  // from the same load the order uses, so /plan shows what the order charges.
+  const pricing = await loadPricingDefaults();
+
   // PRODUCT lines: concrete placements. Same price logic as before, but
   // keyed on the SavedListItem id so edits target the row, not the product.
   // Display position of every line (listItems is already in sortOrder), so
@@ -123,20 +134,13 @@ export async function PlanView({
       if (!i.productId || !i.product) return null;
       const p = i.product;
       const priceVisible = isProductPriceShown(p, p.title);
-      const unit = priceVisible
-        ? indicativeFromRules(
-            Number(p.basePrice),
-            toRateRules(p.priceRules),
-            i.quantity,
-          )
-        : 0;
       return {
         itemId: i.id,
         product: p,
         quantity: i.quantity,
         priceVisible,
         withContent: i.withContent,
-        lineTotal: unit * i.quantity,
+        lineTotal: priceVisible ? placementLineTotal(p, i.quantity, pricing.marginRules) : 0,
         // A product deactivated since it was added: still shown, but flagged so
         // the buyer removes it (submit refuses while it's present — see E).
         unavailable: !p.active || !p.bookable,
@@ -189,51 +193,34 @@ export async function PlanView({
 
   const hasHiddenPrice = lines.some((l) => !l.priceVisible);
 
-  // Per-currency rollup. Visible-price lines accumulate; locked-price
-  // lines still register their currency so a tri-Nordic basket shows
-  // NOK + SEK + DKK rows up front — even when only one of them has a
-  // visible total today. Hiding the locked currencies entirely was the
-  // Erlend bug: the CFO defense relies on seeing all three lines.
-  const totalsByCurrency = new Map<string, Rollup>();
-  for (const l of lines) {
-    const cur = l.product.currency;
-    const r = totalsByCurrency.get(cur) ?? {
-      amount: 0,
-      hasVisible: false,
-      hasHidden: false,
-      itemCount: 0,
-    };
-    r.itemCount += 1;
-    if (l.priceVisible) {
-      r.amount += l.lineTotal;
-      r.hasVisible = true;
-    } else {
-      r.hasHidden = true;
-    }
-    totalsByCurrency.set(cur, r);
-  }
-  // Render order: visible-only first, then mixed, then hidden-only —
-  // so the "real number" lines lead and "from desk" lines follow.
-  const totals = [...totalsByCurrency.entries()].sort(([, a], [, b]) => {
-    const score = (r: Rollup) => (r.hasVisible ? 0 : 1);
-    return score(a) - score(b);
-  });
+  // Per-currency totals, content fees and VAT included — the amount the plan
+  // commits to (lib/plan-total.ts, the order's own pricing engine). Locked-price
+  // lines still register their currency so a tri-Nordic basket shows NOK + SEK
+  // + DKK rows up front — even when only one of them has a visible total
+  // today. Hiding the locked currencies entirely was the Erlend bug: the CFO
+  // defense relies on seeing all three lines. Render order: visible-price
+  // currencies first, so the "real number" lines lead.
+  const totals = estimateListTotals(listItems, pricing).sort(
+    (a, b) => Number(!a.hasVisible) - Number(!b.hasVisible),
+  );
 
-  // A hidden-price line — or any unresolved title placeholder — forces the
-  // whole basket onto the RFQ path. We can't checkout firm against a price
-  // the buyer hasn't seen, nor against a placement the desk hasn't proposed.
-  const allFirm =
-    lines.length > 0 &&
-    titleLines.length === 0 &&
-    !hasHiddenPrice &&
-    lines.every((l) => l.product.visibility === "FIRM");
+  // A line is instant-orderable only when it is firm-priced AND its price is
+  // shown — the exact per-line test submitRequest applies (checkout-actions).
+  // Counting FIRM alone claimed "1 of 2 available as instant order" on a plan
+  // whose every line read "Contact for price".
+  const instantOrderable = (l: (typeof lines)[number]) =>
+    l.product.visibility === "FIRM" && l.priceVisible;
 
-  const firmLineCount = lines.filter((l) => l.product.visibility === "FIRM").length;
+  // Any line that isn't instant-orderable — or any unresolved title
+  // placeholder — forces the whole basket onto the RFQ path. We can't checkout
+  // firm against a price the buyer hasn't seen, nor against a placement the
+  // desk hasn't proposed.
+  const allFirm = lines.length > 0 && titleLines.length === 0 && lines.every(instantOrderable);
+  const firmLineCount = lines.filter(instantOrderable).length;
 
-  // Content-fee rules for PlanLines' per-line price breakdown ("38 000
-  // placement + 7 000 article") — same load as the catalog/quote surfaces
-  // so the indicative figure agrees with what the formal quote will charge.
-  const pricing = await loadPricingDefaults();
+  // The instant path creates a confirmed order, so it needs ordering rights on
+  // the active org (the same canCommitOnOrg gate submitRequest enforces).
+  const canCommit = ws?.activeOrgId ? canCommitOnOrg(await loadScope(), ws.activeOrgId) : false;
 
   // Step rail: "Find titles" is always done by the time there are lines on
   // /plan. The remaining three steps come from the most recent Request this
@@ -318,10 +305,12 @@ export async function PlanView({
         listId: true,
         productId: true,
         quantity: true,
+        withContent: true,
         scheduleStart: true,
         scheduleUnits: true,
         product: {
           select: {
+            type: true,
             currency: true,
             basePrice: true,
             active: true,
@@ -334,6 +323,7 @@ export async function PlanView({
                 name: true,
                 pricesPublic: true,
                 publisher: { select: { pricesPublic: true } },
+                market: { select: { code: true, vatRatePct: true } },
               },
             },
           },
@@ -350,7 +340,7 @@ export async function PlanView({
     // wave of hidden-price titles shows no figure rather than a misleading 0.
     const perWave = programmeView.waves.map((w) => ({
       listId: w.listId,
-      totals: estimateListTotals(itemsByList.get(w.listId) ?? [])
+      totals: estimateListTotals(itemsByList.get(w.listId) ?? [], pricing)
         .filter((tot) => tot.amount > 0)
         .map((tot) => ({ currency: tot.currency, amount: tot.amount })),
     }));
@@ -520,8 +510,9 @@ export async function PlanView({
                 totals={totals}
                 hasHiddenPrice={hasHiddenPrice}
                 allFirm={allFirm}
+                canCommit={canCommit}
                 firmLineCount={firmLineCount}
-                lineCount={lines.length}
+                lineCount={placementCount}
                 needsClient={needsClient}
                 activeOrg={activeOrg}
                 briefDraft={briefDraft}

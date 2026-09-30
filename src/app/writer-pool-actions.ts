@@ -7,6 +7,7 @@ import { recordAudit } from "@/lib/audit";
 import { canAssignWriter } from "@/lib/writers/access";
 import { writerStaffableLine } from "@/lib/authorship";
 import { ensurePlacementForLine, articleTitleForLine } from "@/lib/writers/placement";
+import { sendWriterAssignedEmail } from "@/lib/writers/notify";
 
 function field(formData: FormData, key: string): string {
   const v = formData.get(key);
@@ -101,11 +102,14 @@ export async function assignWriterToLine(formData: FormData) {
   // to either is a category error, so reject it even on a tampered form.
   const line = await prisma.orderLine.findUnique({
     where: { id: orderLineId },
-    select: { kind: true, authorshipMode: true },
+    select: { kind: true, authorshipMode: true, assignedWriterId: true },
   });
   if (!line || !writerStaffableLine(line)) {
     redirect(`/${locale}/desk/orders/${orderId}`);
   }
+  // Re-submitting the same writer (the select posts its current value) is
+  // not a new assignment and must not re-email them.
+  const isNewAssignment = line.assignedWriterId !== writerId;
 
   const updatedLine = await prisma.orderLine.update({
     where: { id: orderLineId },
@@ -129,6 +133,10 @@ export async function assignWriterToLine(formData: FormData) {
     assignedWriterId: writerId,
   });
   await recordAudit(userId, "article.assign", `OrderLine:${orderLineId}`, { writerId });
+
+  if (isNewAssignment) {
+    await sendWriterAssignedEmail({ orderLineId, writerId });
+  }
 
   redirect(`/${locale}/desk/orders/${orderId}`);
 }

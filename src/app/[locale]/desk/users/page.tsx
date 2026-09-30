@@ -1,7 +1,7 @@
 import { getTranslations } from "next-intl/server";
-import { redirect } from "next/navigation";
+import { superadminPageGate } from "@/lib/desk-guard";
 import { Prisma, UserRole } from "@prisma/client";
-import { auth } from "@/auth";
+import { SuperadminOnly } from "@/components/superadmin-only";
 import { prisma } from "@/lib/prisma";
 import { Link } from "@/i18n/navigation";
 import { SubmitButton } from "@/components";
@@ -14,7 +14,13 @@ import {
   setUserDeactivated,
   sendUserPasswordReset,
   sendUserSignInLink,
+  setOrgPaymentTerms,
 } from "@/app/user-admin-actions";
+import {
+  DEFAULT_PAYMENT_TERMS_DAYS,
+  MAX_PAYMENT_TERMS_DAYS,
+  MIN_PAYMENT_TERMS_DAYS,
+} from "@/lib/payment-terms";
 
 export const dynamic = "force-dynamic";
 
@@ -47,13 +53,10 @@ export default async function DeskUsersPage({
 }) {
   const { locale } = await params;
   const sp = await searchParams;
-  const session = await auth();
-  if (session?.user?.role !== "SUPERADMIN") {
-    redirect(`/${locale}/desk`);
-  }
-  const actorId = session.user.id;
-
   const t = await getTranslations({ locale, namespace: "deskUsers" });
+  const gate = await superadminPageGate(locale);
+  if (!gate.allowed) return <SuperadminOnly locale={locale} area={t("title")} />;
+  const actorId = gate.userId;
 
   const q = str(sp, "q");
   const editId = str(sp, "edit");
@@ -93,7 +96,7 @@ export default async function DeskUsersPage({
       take: PAGE_SIZE,
     }),
     prisma.organization.findMany({
-      select: { id: true, name: true },
+      select: { id: true, name: true, paymentTermsDays: true },
       orderBy: { name: "asc" },
       take: PICKER_LIMIT,
     }),
@@ -105,6 +108,9 @@ export default async function DeskUsersPage({
   ]);
 
   const pageCount = Math.max(1, Math.ceil(total / PAGE_SIZE));
+  const customTermOrgs = orgs.filter(
+    (o) => o.paymentTermsDays !== DEFAULT_PAYMENT_TERMS_DAYS,
+  );
   const editing = editId ? users.find((u) => u.id === editId) : undefined;
 
   const okKey = deskUsersOkKey(str(sp, "ok"));
@@ -277,6 +283,68 @@ export default async function DeskUsersPage({
           )}
         </section>
       ) : null}
+
+      {/* Per-customer payment terms — one source of truth for quote text,
+          quote documents and invoice due dates (lib/payment-terms.ts).
+          Lives here because this is the SUPERADMIN-only console. */}
+      <section className="section" id="payment-terms">
+        <div className="section-head">
+          <div>
+            <h2>{t("termsHeading")}</h2>
+            <p className="muted small">
+              {t("termsLead", { days: DEFAULT_PAYMENT_TERMS_DAYS })}
+            </p>
+          </div>
+        </div>
+        <div className="card stack-4">
+          <form action={setOrgPaymentTerms} className="product-form">
+            {context}
+            <div className="field">
+              <label htmlFor="terms-org">{t("termsOrgLabel")}</label>
+              <select id="terms-org" name="organizationId" required defaultValue="">
+                <option value="" disabled>
+                  —
+                </option>
+                {orgs.map((o) => (
+                  <option key={o.id} value={o.id}>
+                    {o.name} · {t("termsDaysValue", { days: o.paymentTermsDays })}
+                  </option>
+                ))}
+              </select>
+            </div>
+            <div className="field">
+              <label htmlFor="terms-days">{t("termsDaysLabel")}</label>
+              <input
+                id="terms-days"
+                name="paymentTermsDays"
+                type="number"
+                inputMode="numeric"
+                min={MIN_PAYMENT_TERMS_DAYS}
+                max={MAX_PAYMENT_TERMS_DAYS}
+                step={1}
+                required
+                defaultValue={DEFAULT_PAYMENT_TERMS_DAYS}
+              />
+            </div>
+            <SubmitButton className="btn" label={t("termsSave")} pendingLabel={t("saving")} />
+          </form>
+
+          <div>
+            <h3>{t("termsCustomHeading")}</h3>
+            {customTermOrgs.length === 0 ? (
+              <p className="muted small">{t("termsNoneCustom")}</p>
+            ) : (
+              <ul>
+                {customTermOrgs.map((o) => (
+                  <li key={o.id}>
+                    {o.name}: {t("termsDaysValue", { days: o.paymentTermsDays })}
+                  </li>
+                ))}
+              </ul>
+            )}
+          </div>
+        </div>
+      </section>
 
       <section className="section">
         <div className="section-head">

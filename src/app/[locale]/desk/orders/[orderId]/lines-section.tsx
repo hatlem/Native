@@ -10,6 +10,8 @@ import { assignWriterToLine } from "@/app/writer-pool-actions";
 import { writerStaffableLine } from "@/lib/authorship";
 import { StatusBadge } from "@/app/status-badge";
 import { pickPlaybook } from "@/lib/playbook";
+import { PlaybookCard } from "@/components/playbook-card";
+import { SubmitButton } from "@/components";
 
 type ProductWithTitle = Prisma.ProductGetPayload<{
   include: { title: true };
@@ -58,7 +60,7 @@ export async function LinesSection({
   const t = await getTranslations({ locale, namespace: "order" });
   const tp = await getTranslations({ locale, namespace: "production" });
   const tType = await getTranslations({ locale, namespace: "productType" });
-  const tpb = await getTranslations({ locale, namespace: "playbooks" });
+  const tw = await getTranslations({ locale, namespace: "deskWriters.panel" });
 
   return (
     <section className="section">
@@ -103,85 +105,34 @@ export async function LinesSection({
               </div>
 
               {order.writerPool.length > 0 && writerStaffableLine(line) ? (
-                <form action={assignWriterToLine} className="flex items-center gap-2">
+                <form action={assignWriterToLine} className="cluster tight">
                   <input type="hidden" name="locale" value={locale} />
                   <input type="hidden" name="orderId" value={order.id} />
                   <input type="hidden" name="orderLineId" value={line.id} />
+                  <label className="small" htmlFor={`writer-${line.id}`}>
+                    {tw("writerLabel")}
+                  </label>
                   <select
+                    id={`writer-${line.id}`}
                     name="writerId"
                     defaultValue={line.assignedWriterId ?? ""}
-                    className="text-xs border rounded px-1 py-0.5"
                   >
-                    <option value="">— Unassigned —</option>
+                    <option value="">{tw("unassigned")}</option>
                     {order.writerPool.map((pool) => (
                       <option key={pool.writerId} value={pool.writerId}>
                         {pool.writer.user.name ?? pool.writer.user.email}
                       </option>
                     ))}
                   </select>
-                  <button type="submit" className="ml-2 text-xs underline">
-                    Assign
-                  </button>
+                  <SubmitButton
+                    label={tw("assign")}
+                    pendingLabel={tw("saving")}
+                    className="btn small secondary"
+                  />
                 </form>
               ) : null}
 
-              {pb ? (
-                <div className="card playbook-card" style={{ marginTop: 0 }}>
-                  <span className="eyebrow accent">{tpb("matchedEyebrow")}</span>
-                  <h4 style={{ margin: "0.25rem 0" }}>{pb.title}</h4>
-                  {pb.angle ? (
-                    <p className="small">
-                      <strong>{tpb("angle")}:</strong> {pb.angle}
-                    </p>
-                  ) : null}
-                  {pb.structure ? (
-                    <p className="small">
-                      <strong>{tpb("structure")}:</strong> {pb.structure}
-                    </p>
-                  ) : null}
-                  <div className="grid two">
-                    {pb.doList ? (
-                      <div>
-                        <p className="small muted">{tpb("doList")}</p>
-                        <ul className="small">
-                          {pb.doList
-                            .split("\n")
-                            .filter((s) => s.trim())
-                            .map((s, i) => (
-                              <li key={i}>{s.trim()}</li>
-                            ))}
-                        </ul>
-                      </div>
-                    ) : null}
-                    {pb.dontList ? (
-                      <div>
-                        <p className="small muted">{tpb("dontList")}</p>
-                        <ul className="small">
-                          {pb.dontList
-                            .split("\n")
-                            .filter((s) => s.trim())
-                            .map((s, i) => (
-                              <li key={i}>{s.trim()}</li>
-                            ))}
-                        </ul>
-                      </div>
-                    ) : null}
-                  </div>
-                  {pb.exampleHeadlines ? (
-                    <details>
-                      <summary className="small">{tpb("exampleHeadlines")}</summary>
-                      <ul className="small">
-                        {pb.exampleHeadlines
-                          .split("\n")
-                          .filter((s) => s.trim())
-                          .map((s, i) => (
-                            <li key={i}>{s.trim()}</li>
-                          ))}
-                      </ul>
-                    </details>
-                  ) : null}
-                </div>
-              ) : null}
+              {pb ? <PlaybookCard locale={locale} playbook={pb} /> : null}
 
               {line.brief?.audience || line.brief?.message ? (
                 <dl className="spec-grid">
@@ -244,7 +195,7 @@ export async function LinesSection({
                 )}
               </div>
 
-              {latest ? (
+              {latest && !isContentFee && order.status !== "CANCELLED" ? (
                 <div className="asset-actions">
                   <form action={runSpecCheck}>
                     <input type="hidden" name="locale" value={locale} />
@@ -277,6 +228,9 @@ export async function LinesSection({
                 </div>
               ) : null}
 
+              {/* No editor where there is nothing to write: a CONTENT_FEE
+                  line is billing-only, and a cancelled order is closed. */}
+              {!isContentFee && order.status !== "CANCELLED" ? (
               <details className="spec-details">
                 <summary>
                   {tp("draftLabel")}
@@ -306,6 +260,7 @@ export async function LinesSection({
                   </div>
                 </form>
               </details>
+              ) : null}
             </article>
           );
         })}

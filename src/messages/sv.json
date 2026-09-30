@@ -63,7 +63,10 @@
     "campaign": "Planera kampanj",
     "campaigns": "Kampanjer",
     "rates": "Priser",
-    "users": "Användare"
+    "users": "Användare",
+    "invoices": "Fakturor",
+    "orgSwitcherLabel": "Organisation",
+    "orgSwitchTo": "Byt till {org}"
   },
   "reports": {
     "title": "Rapporter",
@@ -104,7 +107,8 @@
     "suggestedMargin": "Föreslagen",
     "basis_win-rate": "från vinstandel",
     "basis_category-median": "kategorimedian",
-    "basis_default": "standard"
+    "basis_default": "standard",
+    "exportInvoicesCsv": "Exportera fakturor (CSV)"
   },
   "agency": {
     "eyebrow": "Byrå",
@@ -469,6 +473,9 @@
     "decrementRemoves": "Ta bort titeln från planen",
     "increment": "Öka antal",
     "estTotal": "Uppskattad vägledande summa",
+    "exVat": "exkl. moms",
+    "inclVatLine": "{amount} inkl. moms",
+    "includesContentFees": "Inklusive {amount} för innehållsproduktion.",
     "totalForItems": "{amount} för {count, plural, =1 {1 titel} other {# titlar}}",
     "multiCurrencyNote": "Titlar faktureras i utgivarens egen valuta — båda beloppen ska betalas, det här är inte ett val av valuta.",
     "rfqTitle": "Begär en fast offert",
@@ -743,6 +750,8 @@
     "itemsEyebrow": "Brief",
     "quoteEyebrow": "Firm pris",
     "orderEyebrow": "Beställning",
+    "openOrder": "Öppna beställningen",
+    "openOrderMarket": "Öppna beställningen · {currency}",
     "pendingTitle": "Din brief ligger hos desk",
     "pendingBuyerLabel": "Inköpare",
     "pendingBuyerUnassigned": "Tilldelas",
@@ -798,7 +807,9 @@
     "requestRenewal": "Be om förnyad offert",
     "requestingRenewal": "Skickar …",
     "renewalRequested": "Desken har ombetts att förnya offerten. Du får en avisering när du kan acceptera den.",
-    "lineNoteLabel": "Kommentar"
+    "lineNoteLabel": "Kommentar",
+    "noCommitTitle": "Du kan inte godkänna den här offerten själv.",
+    "noCommitBody": "Att godkänna den lägger en bindande beställning för {org}, och det kräver beställningsrätt. Be en administratör godkänna offerten, eller ge dig beställningsrätt under Konto → Team."
   },
   "desk": {
     "eyebrow": "Internt desk",
@@ -899,13 +910,28 @@
     "quoteNoExpiry": "Inget slutdatum",
     "renewQuote": "Förnya offerten",
     "renewingQuote": "Förnyar …",
-    "renewQuoteHint": "Kunden kan inte acceptera en utgången offert. Förnyelsen behåller dessa priser i 14 nya dagar – justera raderna först om priserna har ändrats.",
+    "renewQuoteHint": "Kunden kan inte acceptera en utgången offert. Förnyelsen behåller dessa priser fram till datumet du väljer – justera raderna först om priserna har ändrats.",
+    "quoteDraftBadge": "Utkast – inte skickad",
+    "quoteDraftHint": "Kunden ser inte offerten än. Prissätt raderna och skicka den nedan.",
+    "sendTitle": "Skicka till kunden",
+    "sendBody": "{count, plural, =1 {Offerten skickas} other {Alla # offerter skickas}} samtidigt. Kunden får ett mejl med totalbeloppet och kan acceptera fram till datumet nedan.",
+    "sendValidUntil": "Giltig till",
+    "sendValidUntilHint": "Standard är {days} dagar, högst {max}. Kunden kan acceptera dagen ut.",
+    "send": "Skicka offert",
+    "sending": "Skickar…",
+    "sendUnpriced": "Prissätt minst en rad i varje offert innan du skickar – en offert där alla rader är på förfrågan ger kunden inget att acceptera.",
+    "validUntilInvalid": "Ange ett giltigt datum.",
+    "validUntilPast": "Giltighetsdatumet kan inte ligga bakåt i tiden.",
+    "validUntilTooFar": "En offert kan vara giltig i högst {max} dagar.",
+    "renewValidUntil": "Ny giltighet",
     "lineNoteLabel": "Kommentar till kunden",
     "lineNoteAdd": "Lägg till kommentar till kunden",
     "lineNoteEdit": "Redigera kommentar till kunden",
     "lineNoteSave": "Spara kommentar",
     "lineNoteHint": "Visas för kunden på offertsidan och i PDF:en.",
-    "lineNoteTooLong": "Kommentaren är för lång. Håll den under {max} tecken."
+    "lineNoteTooLong": "Kommentaren är för lång. Håll den under {max} tecken.",
+    "pdfStorageUnavailable": "Fillagring (R2) är inte konfigurerad i den här miljön, så PDF:en kan inte sparas. Ladda ner Word-versionen i stället.",
+    "pdfFailed": "PDF:en kunde inte skapas. Försök igen eller ladda ner Word-versionen."
   },
   "deskTitles": {
     "eyebrow": "Superadmin · titlar",
@@ -950,7 +976,8 @@
       "all": "Alla",
       "unverified": "Ej kontrollerade än",
       "active": "Erbjuder native",
-      "no-native": "Erbjuder inte native"
+      "no-native": "Erbjuder inte native",
+      "awaitingPrice": "Väntar på bekräftat pris"
     },
     "reach": "Räckvidd per månad",
     "circulation": "Upplaga",
@@ -970,7 +997,8 @@
       "deactivate": "Inaktivera",
       "edit": "Redigera",
       "marking": "Markerar…",
-      "deactivating": "Inaktiverar…"
+      "deactivating": "Inaktiverar…",
+      "resetVerification": "Återställ till ej kontrollerad"
     },
     "freshness": {
       "column": "Prisfärskhet",
@@ -1008,7 +1036,55 @@
     "active": "Aktiv",
     "inactive": "Inaktiv",
     "assignments": "{active} aktiva",
-    "assignmentsOf": "{active} / {max} aktiva"
+    "assignmentsOf": "{active} / {max} aktiva",
+    "inviteLanguage": {
+      "en": "Engelska",
+      "no": "Norska",
+      "sv": "Svenska",
+      "da": "Danska",
+      "fi": "Finska",
+      "de": "Tyska"
+    },
+    "emailPlaceholder": "skribent@exempel.se",
+    "inviteLanguageLabel": "Språk i mejlet",
+    "inviteLanguageHint": "Inbjudan och kontosidan öppnas på det här språket.",
+    "inviteSent": "Inbjudan är skickad till <addr></addr>.",
+    "inviteNotSent": "Inbjudan till <addr></addr> är skapad, men mejlet gick inte iväg. Skicka det igen nedan eller dela länken själv.",
+    "errorInvalidEmail": "Ange en giltig e-postadress.",
+    "errorExistingAccount": "Den här adressen har redan ett NativeSpin-konto och kan inte ta emot en skribentinbjudan. Be en superadministratör ändra kontots roll i stället.",
+    "colEmail": "E-post",
+    "colLanguage": "Språk",
+    "colDelivery": "Utskick",
+    "emailedOn": "Skickat {date}",
+    "notEmailed": "Inte skickat",
+    "resend": "Skicka igen",
+    "colName": "Namn",
+    "colLanguages": "Språk",
+    "colSpecialties": "Specialområden",
+    "colStatus": "Status",
+    "colLoad": "Beläggning",
+    "panel": {
+      "eyebrow": "Produktion",
+      "title": "Skribenter för den här beställningen",
+      "lead": "Rangordnade efter språk ({language}) och specialområde ({topics}). Lägg kandidater i poolen för den här beställningen och tilldela sedan en per rad nedan.",
+      "empty": "Inga skribenter ännu – bjud in en under Skribenter.",
+      "colWriter": "Skribent",
+      "colLanguages": "Språk",
+      "colSpecialties": "Specialområden",
+      "colLoad": "Beläggning",
+      "inPool": "I poolen",
+      "inactive": "Tar inte uppdrag",
+      "overCapacity": "Över kapacitet",
+      "none": "Inte angivet",
+      "loadOf": "{active} / {max} aktiva",
+      "load": "{active} aktiva",
+      "add": "Lägg i poolen",
+      "remove": "Ta bort",
+      "saving": "Sparar…",
+      "writerLabel": "Skribent",
+      "unassigned": "— Inte tilldelad —",
+      "assign": "Tilldela"
+    }
   },
   "auth": {
     "title": "Logga in",
@@ -1096,6 +1172,8 @@
     "emailChangedOk": "E-postadressen är uppdaterad — logga in med din nya adress.",
     "deactivatedTitle": "Det här kontot är avaktiverat",
     "deactivatedBody": "Ditt konto är avstängt, så det finns inget att använda här. Logga ut nedan, och kontakta desken om du tror att det är ett misstag.",
+    "writerClaimSubmit": "Skapa skribentkonto",
+    "writerClaimSubmitting": "Skapar…",
     "regEmailInvalid": "E-postadressen ser inte riktigt rätt ut. Kolla att den är rätt skriven.",
     "regEmailNoMailServer": "Vi hittar ingen e-postserver för den domänen, så mejl dit skulle aldrig komma fram. Kolla att adressen är rätt skriven.",
     "emailRequired": "Fyll i din e-postadress först.",
@@ -1138,16 +1216,61 @@
     "cancelBlocked": "Denna order kan inte längre avbrytas.",
     "cancelError": "Avbokning avvisad",
     "cancelledAtLabel": "Avbruten",
-    "cancelledByLabel": "By",
+    "cancelledByLabel": "Avbokad av",
     "cancelledReasonLabel": "Anledning",
     "creditNoteButton": "Utfärda kreditnota",
     "creditNoteTitle": "Återbetala fakturan",
-    "creditNoteHint": "Återbetala {amount} mot den utfärdade fakturan. Anledningen loggas på kreditnotan och visas för köparen.",
+    "creditNoteHint": "Återbetalar {amount} i sin helhet och avbryter ordern. Anledningen loggas på kreditnotan och visas för köparen.",
     "creditNoteReasonLabel": "Anledning",
-    "creditNoteReasonPlaceholder": "t.ex. Order avbruten efter att fakturan utfärdats; utgivarens redaktionella veto.",
+    "creditNoteReasonPlaceholder": "t.ex. Placeringen gick inte som avtalat; köparen bestred fakturan.",
     "creditNoteSubmit": "Utfärda kreditnota",
     "issuingCreditNote": "Utfärdar…",
-    "creditNoteIssuedLabel": "Kreditnota utfärdad"
+    "creditNoteIssuedLabel": "Kreditnota utfärdad",
+    "cancelBlock": {
+      "ran": "Kampanjen har gått, så ordern kan inte avbrytas. Fakturera den och utfärda en kreditnota om köparen inte ska betala.",
+      "invoiced": "Fakturan är utfärdad. Utfärda en kreditnota för att återbetala den – då avbryts även ordern.",
+      "cancelled": "Ordern är redan avbruten.",
+      "other": "Ordern kan inte avbrytas i sin nuvarande status."
+    },
+    "cancelErrors": {
+      "reasonRequired": "Ange en anledning innan du avbryter.",
+      "notFound": "Ordern hittades inte.",
+      "blocked": "Denna order kan inte längre avbrytas."
+    },
+    "creditError": "Kreditnotan utfärdades inte",
+    "creditErrors": {
+      "reasonRequired": "Ange en anledning – den står på kreditnotan.",
+      "notFound": "Ordern hittades inte.",
+      "noInvoice": "Det finns ingen utfärdad faktura att kreditera.",
+      "alreadyCredited": "Den här fakturan är redan krediterad.",
+      "wrongOrderStatus": "Endast en fakturerad order kan krediteras."
+    },
+    "accountingSynced": "{doc} är synkad till {provider} (nr {number}).",
+    "accountingSyncedNoNumber": "{doc} är synkad till {provider}.",
+    "accountingLocalOnly": "{doc} finns bara i NativeSpin – ingen bokföringsintegration är konfigurerad.",
+    "accountingFailed": "{doc} kunde inte synkas till {provider}: {error}",
+    "accountingNotSent": "{doc} har inte skickats till bokföringen.",
+    "accountingRetry": "Försök synka igen",
+    "accountingRetrying": "Synkar…",
+    "accountingDocInvoice": "Fakturan",
+    "accountingDocCreditNote": "Kreditnotan",
+    "advanceGuardTitle": "{missing, plural, =1 {1 placering saknar} other {# placeringar saknar}} publicerad länk",
+    "advanceGuardLeadLive": "När ordern markeras som live får köparen veta att kampanjen är publicerad. De här placeringarna har ingen publicerad länk än:",
+    "advanceGuardLeadCompleted": "När ordern slutförs får köparen veta att kampanjen har gått. De här placeringarna har ingen publicerad länk än:",
+    "advanceGuardConfirm": "Jag har kontrollerat de här placeringarna och vill gå vidare ändå",
+    "advanceGuardNote": "Mejlet till köparen räknar bara placeringar som faktiskt är publicerade.",
+    "advanceError": "Status ändrades inte",
+    "advanceErrors": {
+      "unconfirmed": "Kryssa i bekräftelsen för att gå vidare medan placeringar fortfarande är opublicerade.",
+      "moved": "Ordern har bytt status under tiden. Kontrollera den och försök igen."
+    },
+    "unknownPlacement": "Placering utan namn",
+    "cancelledByRole": {
+      "DESK": "NativeSpins desk",
+      "SUPERADMIN": "NativeSpin (administratör)",
+      "PUBLISHER": "Publicisten",
+      "BUYER": "Kunden"
+    }
   },
   "production": {
     "brief": "Brief",
@@ -1188,14 +1311,40 @@
     "currency": "Valuta",
     "subtotal": "Delsumma",
     "vat": "Moms",
-    "total": "Totalt"
+    "total": "Totalt",
+    "number": "Fakturanummer",
+    "download": "Ladda ner PDF",
+    "documentTitle": "Faktura {number}",
+    "colDescription": "Beskrivning",
+    "colQty": "Antal",
+    "colUnitPrice": "Á-pris",
+    "colAmount": "Belopp",
+    "vatWithPct": "Moms ({pct} %)",
+    "vatId": "Momsreg.nr",
+    "contentProduction": "Innehållsproduktion",
+    "creditedHeading": "Krediterad",
+    "creditedBody": "Fakturan krediterades i sin helhet {date} ({amount}).",
+    "creditedReason": "Anledning: {reason}",
+    "accountingRef": "Bokföringsref.",
+    "pageOf": "Sida {page} av {pages}",
+    "listTitle": "Fakturor",
+    "listLead": "Alla fakturor för din organisation. Öppna en för att se raderna, eller ladda ner PDF:en.",
+    "emptyTitle": "Inga fakturor än",
+    "emptyHint": "Fakturor visas här när en kampanj har gått och fakturerats.",
+    "emptyCta": "Se dina kampanjer",
+    "colCustomer": "Kund"
   },
   "firm": {
     "badge": "Direktbeställning",
     "planTitle": "Bekräfta din order",
     "planNote": "Alla poster har fast pris — att skicka in bekräftar din order direkt, ingen väntan på inköpsteamet.",
     "planSubmit": "Bekräfta order",
-    "planSubmitting": "Lägger order…"
+    "planSubmitting": "Lägger order…",
+    "orderTotal": "Totalt för beställningen",
+    "commitAmount": "Du beställer för {amount} inkl. moms.",
+    "reassurance": "När du bekräftar lägger du en bindande beställning till det här priset — det kommer ingen separat offert att godkänna.",
+    "noCommitNote": "Din roll saknar beställningsrätt, så du kan inte bekräfta beställningen själv. Skicka den som en offertförfrågan i stället — en administratör i teamet kan godkänna offerten.",
+    "sendAsRfq": "Skicka som offertförfrågan"
   },
   "publisher": {
     "title": "Utgivarportal",
@@ -1270,7 +1419,10 @@
     "ratesUnitWeek": "Vecka",
     "ratesUnitMonth": "Månad",
     "ratesMinUnits": "Minsta bokning: {count}",
-    "ratesPriceOnlyNote": "Den här sidan ändrar endast priser. Katalogstatus — aktiv, bokningsbar, synlighet — hanteras av NativeSpin-desken."
+    "ratesPriceOnlyNote": "Den här sidan ändrar endast priser. Katalogstatus — aktiv, bokningsbar, synlighet — hanteras av NativeSpin-desken.",
+    "changePriceOnRates": "Ändra på prissidan",
+    "notBookable": "Inte bokningsbar",
+    "catalogStatusNote": "Priser ändrar du på prissidan. Katalogstatus (bokningsbar, och om en produkt kan direktbeställas) hanteras av NativeSpin-desken."
   },
   "formats": {
     "metaTitle": "Native-format",
@@ -1493,10 +1645,6 @@
     "detailSaveDraft": "Spara utkast",
     "detailUploading": "Laddar upp…",
     "detailDownloadFile": "Ladda ner filen",
-    "detailStatus": "Status",
-    "detailSpecPassed": "spec ✓",
-    "detailSpecFailed": "spec ✗",
-    "detailRunSpecCheck": "Kör specifikationskontroll",
     "detailSubmitForReview": "Skicka för granskning",
     "detailReviewNotes": "Kommentarer",
     "linkHeading": "Koppla till en placering",
@@ -1506,7 +1654,22 @@
     "placementRetracted": "Indragen",
     "unlinkCta": "Ta bort koppling",
     "sharedArticleWarning": "Den här artikeln är kopplad till {count} andra placeringar — dina ändringar påverkar alla.",
-    "specNotChecked": "inte kontrollerad"
+    "detailUploadFailed": "Uppladdningen misslyckades. Prova en annan fil.",
+    "detailUploadUnavailable": "Filuppladdning är inte tillgänglig just nu. Klistra in texten i redigeraren i stället.",
+    "backToArticles": "Alla artiklar",
+    "versionLabel": "Version {version}",
+    "byAuthor": "Skriven av {name}",
+    "previewHeading": "Förhandsvisning",
+    "previewEmpty": "Ingen text ännu.",
+    "awaitingReview": "Väntar på kundens granskning.",
+    "placementsHeading": "Placeringar",
+    "specPassed": "Formatkrav uppfyllda",
+    "specFailed": "Avvikelser från formatkrav",
+    "saving": "Sparar…",
+    "orderRef": "beställning {ref}",
+    "draftLabel": "Artikeltext",
+    "draftHint": "Ren text med enkel Markdown: # för rubriker, **fet**, *kursiv*, - för listor, [text](länk).",
+    "submitBlockedSpec": "Formatkraven för en placering är inte uppfyllda ännu – kontrollera placeringarna ovan."
   },
   "marketing": {
     "howCta": "Så funkar det",
@@ -2009,7 +2172,7 @@
     },
     "fees": {
       "title": "Avgifter och betalning",
-      "body": "Prissättning enligt aktuell avgiftsplan (se /pricing). Fakturor utfärdas i köparens marknadsvaluta med moms per lokal lag. Betalningsvillkor är netto 30 dagar om inget annat avtalas."
+      "body": "Prissättning enligt aktuell avgiftsplan (se /pricing). Fakturor utfärdas i köparens marknadsvaluta med moms per lokal lag. Betalningsvillkor är netto 14 dagar om inget annat avtalas."
     },
     "liability": {
       "title": "Ansvar",
@@ -2211,39 +2374,36 @@
     "errorScopes": "Minst ett giltigt scope krävs (catalog:read, catalog:*, orders:write, pricing:admin).",
     "errorInternalOnly": "pricing:admin är endast internt — kan bara utfärdas som en NativeSpin-plattformsnyckel (utan organisation).",
     "errorOrgRequired": "orders:write måste vara kopplad till en organisation — välj en ägande organisation ovan.",
-    "issueEyebrow": "Issue",
+    "issueEyebrow": "Utfärda",
     "issueTitle": "Utfärda en ny nyckel",
     "nameLabel": "Namn / partner",
     "orgLabel": "Ägar-organisation (valfritt)",
     "orgPlatform": "NativeSpin-plattformsnyckel (ingen org)",
-    "scopesLabel": "Scopes",
+    "scopesLabel": "Behörigheter (scopes)",
     "scopesHint": "Kommaseparerade. Alternativ: catalog:read, orders:write (orders:write måste kopplas till en organisation). pricing:admin är endast internt.",
     "ttlLabel": "Förfaller om (dagar)",
     "ttlPlaceholder": "Inget utgångsdatum",
     "ttlHint": "Lämna tomt för inget utgångsdatum; max 1825 dagar (5 år).",
     "issueSubmit": "Generera nyckel",
     "issuing": "Genererar…",
-    "listEyebrow": "Existing",
+    "listEyebrow": "Befintliga",
     "listTitle": "Alla nycklar",
-    "colName": "Name",
-    "colOrg": "Org",
-    "colScopes": "Scopes",
-    "colCreated": "Created",
+    "colName": "Namn",
+    "colOrg": "Organisation",
+    "colScopes": "Behörigheter",
+    "colCreated": "Skapad",
     "colLastUsed": "Senast använd",
     "colStatus": "Status",
-    "status_active": "Active",
-    "status_expired": "Expired",
-    "status_revoked": "Revoked",
-    "revoke": "Revoke",
+    "status_active": "Aktiv",
+    "status_expired": "Utgången",
+    "status_revoked": "Återkallad",
+    "revoke": "Återkalla",
     "revoking": "Återkallar…",
     "revokeConfirm": "Detta kan inte ångras. Befintliga integrationer som använder den här nyckeln slutar att fungera direkt.",
     "revokeConfirmCta": "Ja, återkalla nyckeln",
     "docsHintPrefix": "Offentlig dokumentation finns på",
-    "deniedTitle": "API-nycklar (endast SUPERADMIN)",
-    "deniedLead": "Denna sida är för NativeSpins plattforms-administratörer.",
     "deniedBody": "Offentliga katalog-API-nycklar utfärdas av NativeSpin-superadmins. Om din roll legitimt behöver nyckel-utfärdande — eller du är partner som behöver en nyckel — kontakta desken så ordnar vi det.",
-    "deniedCta": "Mejla desken",
-    "deniedBack": "Tillbaka till /desk"
+    "orgPlatformShort": "NativeSpin-plattformen"
   },
   "quoteNarrative": {
     "sectionCampaign": "Din kampanj",
@@ -2256,7 +2416,6 @@
     "anchorSavings": "−{pct}% mot listpris",
     "anchorNote": "Utgivarens offentliga listpris för placeringen. Ditt totalpris inkluderar innehållsproduktion, placering, revideringar och rapportering.",
     "whyThisPrice": "NativeSpin har direkta redaktionella relationer med alla titlar i offerten. Vi förhandlar placeringen, anlitar en branschspecialiserad skribent, hanterar redaktionell granskning med utgivaren och rapporterar på resultatet. Du får en ansvarig partner och ett totalpris — inte en mediafaktura, en skribentfaktura och ett byråarvode.",
-    "termsPayment": "50 % vid godkännande, 50 % vid publicering.",
     "termsCancellation": "Full återbetalning innan artikelbriefen är godkänd; 50 % återbetalning innan första utkastet; ingen återbetalning efter att utgivarens slot är bekräftad.",
     "termsValidity": "Offerten gäller i 14 dagar. Tillgänglighet hos utgivaren bekräftas vid godkännande.",
     "bullets": {
@@ -2331,7 +2490,9 @@
     "inviteSent": "Inbjudan är skickad.",
     "inviteInvalidEmail": "Det ser inte ut som en giltig e-postadress.",
     "inviteBusinessEmail": "Använd en företagsadress — gratis- och engångstjänster godtas inte.",
-    "inviteNotFound": "Förlaget finns inte längre — ladda om sidan."
+    "inviteNotFound": "Förlaget finns inte längre — ladda om sidan.",
+    "priceUnconfirmed": "pris ej bekräftat",
+    "productInactive": "inaktiv"
   },
   "salesContacts": {
     "title": "Säljkontakter",
@@ -2532,7 +2693,10 @@
     "callHeading": "En sak till — låt oss hjälpa dig köpa native",
     "callBody": "Boka ett kostnadsfritt 15-minuterssamtal, så hjälper vårt desk dig att planera och placera din första native-kampanj.",
     "callCta": "Boka ett samtal",
-    "callSkip": "Hoppa över för nu →"
+    "callSkip": "Hoppa över för nu →",
+    "marketBlocked": "{org} har ingen faktureringsmarknad ännu. En administratör i {org} behöver välja den under Konto innan teamet kan skicka förfrågningar.",
+    "blockedTitle": "{org} är inte konfigurerat för fakturering ännu",
+    "blockedBack": "Tillbaka till planen"
   },
   "account": {
     "eyebrow": "Konto",
@@ -2644,6 +2808,7 @@
     "errDelegation": "Slutdatumet för delegeringen är inte ett giltigt datum.",
     "errDelegationPast": "Slutdatumet för delegeringen måste ligga i framtiden.",
     "canCommitAdminNote": "Administratörer har alltid beställningsrätt.",
+    "statusRevoked": "Borttagen",
     "errEmailDomain": "Vi hittar ingen e-postserver för den domänen. Kolla att adressen är rätt skriven."
   },
   "rateCard": {
@@ -2702,10 +2867,14 @@
     "contentProductionLabel": "Vem skriver innehållet?",
     "content_advertiser": "Annonsören kan leverera egna artiklar",
     "content_publisher": "Artiklarna måste skrivas av er avdelning",
-    "content_both": "Båda är möjliga"
+    "content_both": "Båda är möjliga",
+    "uploadUnavailable": "Filuppladdning är inte tillgänglig just nu. Klistra in en länk till prislista eller mediakit nedan i stället."
   },
   "invite": {
     "title": "Gå med i {org}",
+    "lead": "Ditt team planerar och köper native-annonsering i NativeSpin. Gå med och arbeta i samma planer, offerter och beställningar.",
+    "acceptTitle": "Ett klick, så är du med",
+    "createTitle": "Skapa ditt konto",
     "invitationFor": "Inbjudan till {email}",
     "accept": "Acceptera inbjudan",
     "createAndJoin": "Skapa konto och gå med",
@@ -2717,7 +2886,10 @@
     "wrongAccountTitle": "Fel konto",
     "wrongAccountBody": "Inbjudan gäller {inviteEmail}. Du är inloggad som {authedEmail}.",
     "signOut": "Logga ut",
-    "genericError": "Något gick fel. Kontrollera uppgifterna och försök igen."
+    "genericError": "Något gick fel. Kontrollera uppgifterna och försök igen.",
+    "alreadyMemberTitle": "Du är redan med i {org}",
+    "alreadyMemberBody": "Du har redan tillgång till det här teamet, så det finns inget att godkänna.",
+    "alreadyMemberCta": "Gå till arbetsytan"
   },
   "contentFees": {
     "eyebrow": "Desk",
@@ -2863,7 +3035,7 @@
     "noData": "—",
     "pending": "Väntar på rapportering",
     "coverageCaveat": "{n} av {m} placeringar har rapporterat visningar. Övriga uppdateras när utgivaren skickar in siffror.",
-    "downloadCsv": "Ladda ned CSV",
+    "downloadCsv": "Ladda ner CSV",
     "reachDisclaimer": "Visningar är rapporterade av utgivaren. Egna klick spåras via vår länk.",
     "pageTitle": "Kampanjrapportformulär",
     "statusNotFound": "Den här länken är inte giltig eller har gått ut.",
@@ -2899,7 +3071,21 @@
     "overrideHint": " — desk-korrigering",
     "saveOverride": "Spara korrigering",
     "frozenNoEdit": "Siffrorna är låsta och kan inte redigeras.",
-    "unknownPublisher": "Okänd utgivare"
+    "unknownPublisher": "Okänd utgivare",
+    "metricsNowTitle": "Förfrågningar om siffror",
+    "metricsNowNotEnded": "Publicisterna ombeds om sina siffror när kampanjperioden är slut. Ange slutdatum ovan; den dagliga körningen skickar förfrågningarna dagen efter.",
+    "metricsNowNothing": "Alla publicister på den här beställningen har redan en förfrågan om siffror – se status för var och en nedan.",
+    "metricsNowHint": "{count, plural, =1 {1 publicist har inte fått förfrågan ännu.} other {# publicister har inte fått förfrågan ännu.}} Den dagliga körningen skulle skicka den i morgon.",
+    "metricsNowButton": "Skicka förfrågan om siffror nu",
+    "metricsNowNoPublisher": "{count, plural, =1 {1 bokning saknar} other {# bokningar saknar}} publicist, så ingen förfrågan kan skickas för {count, plural, =1 {den} other {dem}}.",
+    "requestStatusValue": {
+      "NEEDS_CONTACT": "Saknar kontakt",
+      "PENDING": "Väntar på siffror",
+      "PARTIAL": "Delvis rapporterad",
+      "COMPLETE": "Rapporterad",
+      "EXPIRED": "Utgången",
+      "CANCELLED": "Avbruten"
+    }
   },
   "rateCards": {
     "title": "Prislistor / mediakit",
@@ -3025,7 +3211,12 @@
     "nextWaveBodyPreviousDone": "Omgång {prev} är klar. Skicka omgång {n} för att hålla berättelsen igång.",
     "nextWaveBodyDateNear": "Omgång {n} är planerad från {date}. Skicka den nu så att desken hinner boka.",
     "nextWaveAngle": "Vinkel: {angle}",
-    "openWave": "Öppna omgången"
+    "openWave": "Öppna omgången",
+    "awaitingTeamHeading": "Väntar på någon med beställningsrätt",
+    "quoteAwaitingTeamBody": "En fast offert på {amount} är klar. Någon i teamet med beställningsrätt behöver godkänna den.",
+    "viewQuote": "Visa offerten",
+    "noAccessTitle": "Du är inte med i något team just nu",
+    "noAccessBody": "Din åtkomst till organisationens arbetsyta har upphört: en administratör har tagit bort den, eller så var den tidsbegränsad och har gått ut. Be en administratör att bjuda in dig igen, så får du tillbaka teamets planer och förfrågningar."
   },
   "shareList": {
     "eyebrow": "Medieplan från {org}",
@@ -3063,7 +3254,6 @@
     "vat": "Moms ({pct}%)",
     "total": "Totalt",
     "vatStatus": "Priser anges exklusive moms om inget annat anges ovan.",
-    "paymentTerms": "Betalningsvillkor: netto 14 dagar från fakturadatum.",
     "footnote": "Rader märkta \"pris på förfrågan\" tillkommer utöver totalen ovan och bekräftas separat före bokning.",
     "circulation": "Upplaga",
     "digitalReach": "Digital räckvidd/mån",
@@ -3130,7 +3320,17 @@
     "errRole": "Den rollen känner vi inte igen.",
     "errDeactivatedTarget": "Kontot är avaktiverat. Aktivera det först — ett inloggningsmejl som inte går att använda förvirrar bara mottagaren.",
     "errEmailFailed": "Mejlet kunde inte skickas. Inget annat ändrades.",
-    "errGeneric": "Något gick fel och ingenting sparades. Försök igen."
+    "errGeneric": "Något gick fel och ingenting sparades. Försök igen.",
+    "termsHeading": "Betalningsvillkor per kund",
+    "termsLead": "Netto dagar från fakturadatum. Gäller nya offerter och fakturor; utfärdade fakturor behåller sina villkor. Standard är {days} dagar.",
+    "termsOrgLabel": "Kund",
+    "termsDaysLabel": "Betalningsvillkor (dagar)",
+    "termsSave": "Spara villkor",
+    "termsCustomHeading": "Kunder med avvikande villkor",
+    "termsNoneCustom": "Alla kunder har standardvillkoren.",
+    "termsDaysValue": "{days, plural, one {netto # dag} other {netto # dagar}}",
+    "okTerms": "Betalningsvillkoren är sparade.",
+    "errTerms": "Ange hela dagar mellan 1 och 120."
   },
   "status": {
     "ACCEPTED": "Accepterad",
@@ -3159,11 +3359,217 @@
     "SCHEDULED": "Schemalagd",
     "SENT": "Skickad",
     "SUBMITTED": "Inskickad",
-    "VOID": "Makulerad"
+    "VOID": "Makulerad",
+    "SUPERSEDED": "Ersatt"
   },
   "joinedNotice": {
     "lists": "Välkommen till {org}. Här är ditt teams planer – öppna en för att se titlar, priser och kommentarer.",
     "home": "Välkommen till {org}. Nu är du med i teamet på NativeSpin."
+  },
+  "paymentTerms": {
+    "line": "{days, plural, one {Betalningsvillkor: netto # dag från fakturadatum.} other {Betalningsvillkor: netto # dagar från fakturadatum.}}"
+  },
+  "superadminOnly": {
+    "eyebrow": "Endast för superadministratörer",
+    "lead": "Den här sidan är för NativeSpins plattformsadministratörer.",
+    "body": "Ditt konto har desk-åtkomst, men den här sidan kräver superadmin-rollen. Behöver du den i ditt arbete kan du mejla desken, så hjälper en superadministratör dig eller ger dig åtkomst.",
+    "cta": "Mejla desken",
+    "back": "Tillbaka till desken",
+    "mailSubject": "Begäran om åtkomst: {area} — NativeSpin"
+  },
+  "publisherContacts": {
+    "eyebrow": "Desk · uppsökande",
+    "title": "Publicistkontakter",
+    "lead": "Granska insamlade annonskontakter innan de används och kör sedan kampanjen med prisförfrågningar.",
+    "tabsLabel": "Vyer",
+    "tabReview": "Granska kandidater",
+    "tabCampaign": "Priskampanj",
+    "ok": {
+      "approved": "Kontakten är godkänd.",
+      "rejected": "Kontakten är avvisad.",
+      "bulk": "{approved} godkända, {failed} misslyckades.",
+      "built": "Kampanjen är uppdaterad: {created} nya förfrågningar, {skipped} överhoppade.",
+      "sent": "{count, plural, =0 {Inga mejl skickade.} =1 {1 mejl skickat.} other {# mejl skickade.}}",
+      "one": "Mejlet är skickat."
+    },
+    "errorGeneric": "Det gick inte: {detail}",
+    "working": "Arbetar…",
+    "buildCampaign": "Bygg / uppdatera kampanjen",
+    "batchSizeLabel": "Antal i omgången",
+    "sendBatch": "Skicka omgång (nästa på tur)",
+    "kpiTotal": "Förfrågningar",
+    "state": {
+      "draft": "Utkast",
+      "inFlight": "Pågår",
+      "responded": "Besvarad",
+      "cancelled": "Avbruten"
+    },
+    "noRequests": "Inga prisförfrågningar ännu — bygg kampanjen för att skapa dem.",
+    "colRecipient": "Mottagare",
+    "colTitles": "Titlar",
+    "colLocale": "Språk",
+    "colStep": "Steg",
+    "colStatus": "Status",
+    "colNextDue": "Nästa på tur",
+    "stepOf": "{sent}/{max}",
+    "sendOne": "Skicka",
+    "candidateStatus": {
+      "PENDING": "Väntar på granskning",
+      "APPROVED": "Godkända",
+      "REJECTED": "Avvisade"
+    },
+    "titlesByChannel": "Titlar per säljkanal:",
+    "channel": {
+      "DIRECT": "Direkt",
+      "IN_HOUSE": "Eget säljbolag",
+      "REP": "Säljhus",
+      "MIXED": "Blandat",
+      "UNKNOWN": "Okänd"
+    },
+    "pendingEyebrow": "Granskning",
+    "pendingTitle": "Kandidater som väntar",
+    "bulkApproveLabel": "Godkänn alla med säkerhet ≥",
+    "bulkApprove": "Godkänn alla",
+    "noCandidates": "Inga kandidater väntar på granskning.",
+    "colPublisher": "Publicist",
+    "colMarket": "Marknad",
+    "colChannel": "Kanal",
+    "colCandidate": "Kandidat",
+    "colConfidence": "Säkerhet",
+    "colSource": "Källa",
+    "viewSource": "Visa",
+    "approve": "Godkänn",
+    "reject": "Avvisa"
+  },
+  "writerEnums": {
+    "language": {
+      "NO": "Norska",
+      "SV": "Svenska",
+      "DA": "Danska",
+      "FI": "Finska",
+      "DE": "Tyska",
+      "EN": "Engelska"
+    },
+    "topic": {
+      "FINANCE": "Ekonomi",
+      "HEALTH": "Hälsa",
+      "TECH": "Teknik",
+      "LIFESTYLE": "Livsstil",
+      "B2B": "B2B",
+      "TRAVEL": "Resor",
+      "FOOD": "Mat och dryck",
+      "CULTURE": "Kultur",
+      "SUSTAINABILITY": "Hållbarhet",
+      "OTHER": "Övrigt"
+    },
+    "proficiency": {
+      "NATIVE": "Modersmål",
+      "FLUENT": "Flytande",
+      "WORKING": "God arbetsnivå"
+    }
+  },
+  "writer": {
+    "eyebrow": "Skribentportal",
+    "backToAssignments": "Mina uppdrag",
+    "untitledAssignment": "Uppdrag",
+    "status": {
+      "notStarted": "Inte påbörjad"
+    },
+    "home": {
+      "title": "Mina uppdrag",
+      "lead": "Allt som desken har gett dig. Öppna ett uppdrag för att se briefen, formatkraven och playbooken, skriv texten och skicka den för granskning.",
+      "profileCta": "Redigera min profil",
+      "emptyTitle": "Inga uppdrag ännu",
+      "emptyBody": "När desken ger dig en artikel dyker den upp här och du får ett mejl.",
+      "colTitle": "Publikation",
+      "colFormat": "Format",
+      "colMarket": "Marknad",
+      "colStatus": "Status",
+      "colAssigned": "Tilldelad",
+      "open": "Öppna"
+    },
+    "line": {
+      "notReady": "Briefen för det här uppdraget är inte klar ännu. Desken hör av sig när den är det.",
+      "changesRequested": "Ändringar önskas:",
+      "closed": "Det här uppdraget är avslutat – beställningen är avbokad, placeringen tillbakadragen eller artikeln färdigställd. Det finns inget mer att skriva här.",
+      "draftEyebrow": "Ditt utkast",
+      "draftHeading": "Skriv artikeln",
+      "inReviewNote": "Det här utkastet ligger hos kunden för granskning. Sparar du nu blir det en ny version – skicka den för granskning när den är klar.",
+      "draftLabel": "Artikeltext",
+      "draftPlaceholder": "# Rubrik\n\nIngress…",
+      "draftHint": "Ren text med enkel Markdown: # för rubriker, **fet**, *kursiv*, - för listor, [text](länk). Glöm inte märkningen.",
+      "saveDraft": "Spara utkast",
+      "saving": "Sparar…",
+      "submit": "Skicka för granskning",
+      "submitBlocked": "Åtgärda avvikelserna ovan, spara och skicka sedan för granskning.",
+      "awaitingReview": "Skickat för granskning – du får besked om kunden vill ha ändringar."
+    },
+    "brief": {
+      "heading": "Brief",
+      "message": "Budskap",
+      "messageMissing": "Inget budskap ännu – fråga desken innan du börjar.",
+      "audience": "Målgrupp",
+      "do": "Gör",
+      "dont": "Undvik",
+      "references": "Referenser"
+    },
+    "spec": {
+      "heading": "Formatkrav",
+      "words": "Längd",
+      "wordsRange": "{min}–{max} ord",
+      "wordsMin": "Minst {min} ord",
+      "wordsMax": "Högst {max} ord",
+      "notSpecified": "Inte angivet",
+      "images": "Bilder",
+      "imagesMin": "{count, plural, =1 {Minst 1 bild} other {Minst # bilder}}",
+      "disclosure": "Märkning (obligatorisk)",
+      "fileFormats": "Filformat",
+      "videoLength": "Videolängd",
+      "videoSeconds": "Upp till {seconds} sekunder",
+      "shoppable": "Produktlänkar",
+      "shoppableMax": "{count, plural, =1 {Upp till 1 produkt} other {Upp till # produkter}}",
+      "requirements": "Övriga krav",
+      "checkHeading": "Formatkontroll",
+      "passed": "Godkänd",
+      "failed": "Behöver åtgärdas",
+      "notChecked": "Spara utkastet som text för att kontrollera det mot formatkraven.",
+      "passedDetail": "Utkastet uppfyller formatkraven ({words} ord).",
+      "failDisclosure": "Märkningen ”{label}” saknas. Läsarna måste se att det här är betalt innehåll.",
+      "failTooShort": "För kort: {words} ord, formatet kräver minst {min}.",
+      "failTooLong": "För lång: {words} ord, formatet tillåter högst {max}."
+    },
+    "profile": {
+      "title": "Min profil",
+      "lead": "Desken matchar skribenter mot briefer efter språk, specialområde och kapacitet – håll profilen uppdaterad.",
+      "noProfile": "Det här kontot har ingen skribentprofil.",
+      "saved": "Profilen är sparad.",
+      "fixErrors": "Inget sparades – rätta de markerade fälten och försök igen.",
+      "bio": "Om dig",
+      "bioPlaceholder": "Ämnen du bevakar, medier du har skrivit för, tonen du är känd för …",
+      "languages": "Språk du skriver på",
+      "languagesHint": "Välj nivå för varje språk du kan skriva på. Minst ett krävs.",
+      "languageNone": "Skriver inte på det",
+      "specialties": "Specialområden",
+      "ratePerArticle": "Pris per artikel",
+      "ratePerWord": "Pris per ord",
+      "currency": "Valuta",
+      "currencyNone": "— Välj —",
+      "maxActiveAssignments": "Max aktiva uppdrag",
+      "maxActiveAssignmentsHint": "Lämna tomt för ingen gräns.",
+      "portfolioUrl": "Länk till portfolio",
+      "active": "Tillgänglig för nya uppdrag",
+      "save": "Spara profilen",
+      "saving": "Sparar…",
+      "errors": {
+        "bio": "Håll det under 2 000 tecken.",
+        "languages": "Välj minst ett språk.",
+        "ratePerArticle": "Ange ett belopp över 0, till exempel 4500.",
+        "ratePerWord": "Ange ett belopp över 0, till exempel 3,5.",
+        "currency": "Välj valuta för dina priser.",
+        "maxActiveAssignments": "Ange ett heltal från 1 till 50 eller lämna fältet tomt.",
+        "portfolioUrl": "Ange en fullständig länk som börjar med https://"
+      }
+    }
   },
   "listNames": {
     "untitled": "Ny plan",

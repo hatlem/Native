@@ -5,6 +5,9 @@ import {
   blueprintFor,
   basePriceFor,
   marketAdjustments,
+  blueprintProductData,
+  reactivatableProductsWhere,
+  BLUEPRINT_SOURCE,
 } from "./activation-blueprint";
 
 const NATIVE_ARTICLE = {
@@ -64,4 +67,61 @@ test("marketAdjustments returns baseline shape for unknown markets", () => {
   const adj = marketAdjustments(fake);
   assert.equal(adj.perThousandFactor, 1.0);
   assert.equal(adj.floor, 0);
+});
+
+// Catalog data standard: "confirmed, never guessed". Marking a title as
+// offering native must not publish a reach-based estimate as a live price.
+test("blueprintProductData creates an unpriced, inactive, unbookable skeleton", () => {
+  const [row] = blueprintFor(MarketCode.NO);
+  const data = blueprintProductData({
+    titleId: "t1",
+    titleName: "4-3-3",
+    currency: "NOK",
+    disclosureLabel: "Annonsørinnhold",
+    row,
+  });
+  assert.equal(data.active, false);
+  assert.equal(data.bookable, false);
+  assert.equal(data.basePrice, 0);
+  assert.equal(data.confirmedAt, null);
+  assert.equal(data.confirmedSource, BLUEPRINT_SOURCE);
+  assert.equal(data.visibility, PriceVisibility.INDICATIVE);
+  assert.equal(data.leadTimeDays, null);
+});
+
+test("blueprintProductData names products in words, never raw enums", () => {
+  for (const row of blueprintFor(MarketCode.NO)) {
+    const { name } = blueprintProductData({
+      titleId: "t1",
+      titleName: "Aftenposten",
+      currency: "NOK",
+      disclosureLabel: null,
+      row,
+    });
+    assert.doesNotMatch(name, /[A-Z]{2,}_[A-Z]+/, name);
+    assert.match(name, /^Aftenposten — /);
+  }
+});
+
+test("blueprintProductData keeps only the market disclosure label in the spec", () => {
+  const [row] = blueprintFor(MarketCode.SE);
+  const data = blueprintProductData({
+    titleId: "t1",
+    titleName: "Dagens Nyheter",
+    currency: "SEK",
+    disclosureLabel: "Annons",
+    row,
+  });
+  const spec = (data.spec as { create: Record<string, unknown> }).create;
+  assert.equal(spec.disclosureLabel, "Annons");
+  assert.equal(spec.wordCountMin, undefined);
+  assert.equal(spec.wordCountMax, undefined);
+});
+
+test("reactivatableProductsWhere only lets confirmed, priced products back live", () => {
+  assert.deepEqual(reactivatableProductsWhere("t1"), {
+    titleId: "t1",
+    confirmedAt: { not: null },
+    basePrice: { gt: 0 },
+  });
 });

@@ -11,44 +11,73 @@ import { requireDesk } from "@/lib/desk-guard";
 import { findDueWaves } from "@/lib/programme";
 import { marketDefaultLocale } from "@/lib/market-locale";
 import { buildOrderCompletedNotice } from "@/lib/order-completed-notice";
+import { buildOrderLiveNotice } from "@/lib/order-live-notice";
+import { deliveryGap, nextOrderStatus } from "@/lib/order-lifecycle";
 import {
   canCancelOrder,
-  cancelBlockReason,
   normaliseReason,
   type CancelActor,
 } from "@/lib/cancellation";
-
-const ORDER_FLOW: OrderStatus[] = [
-  "CONFIRMED",
-  "IN_PRODUCTION",
-  "SCHEDULED",
-  "LIVE",
-  "COMPLETED",
-];
 
 function field(formData: FormData, key: string): string {
   const v = formData.get(key);
   return typeof v === "string" ? v.trim() : "";
 }
 
+// Move the order one step along ORDER_FLOW. LIVE and COMPLETED tell the
+// buyer their campaign ran, so advancing into them while placements have
+// no published link needs the desk's explicit confirmation (the order page
+// lists what's missing), is audited as an override, and the buyer's email
+// states the published count rather than claiming delivery.
 export async function advanceOrder(formData: FormData) {
   const locale = field(formData, "locale") || "en";
   const orderId = field(formData, "orderId");
+  // The status the desk saw when it clicked; a stale form (another tab
+  // already advanced) must not skip a step or confirm the wrong gap.
+  const expectedFrom = field(formData, "from");
+  const confirmedUndelivered = formData.get("confirmUndelivered") === "on";
   const userId = await requireDesk(locale);
+  const back = `/${locale}/desk/orders/${orderId}`;
 
-  const order = await prisma.order.findUnique({ where: { id: orderId } });
+  const order = await prisma.order.findUnique({
+    where: { id: orderId },
+    include: {
+      lines: {
+        select: {
+          id: true,
+          kind: true,
+          booking: { select: { status: true, liveUrl: true } },
+        },
+      },
+    },
+  });
   if (order) {
-    const idx = ORDER_FLOW.indexOf(order.status);
-    if (idx >= 0 && idx < ORDER_FLOW.length - 1) {
-      const next = ORDER_FLOW[idx + 1];
-      await prisma.order.update({
-        where: { id: order.id },
+    const next = nextOrderStatus(order.status);
+    if (next) {
+      if (expectedFrom && expectedFrom !== order.status) redirect(`${back}?advance=moved`);
+      const gap = deliveryGap(
+        order.lines.map((l) => ({ ...l, label: l.id })),
+        next,
+      );
+      if (gap.needsConfirmation && !confirmedUndelivered) {
+        redirect(`${back}?advance=unconfirmed`);
+      }
+      const moved = await prisma.order.updateMany({
+        where: { id: order.id, status: order.status },
         data: { status: next },
       });
+      if (moved.count !== 1) redirect(`${back}?advance=moved`);
       await recordAudit(userId, "order.advance", `Order:${order.id}`, {
         from: order.status,
         to: next,
+        placements: gap.total,
+        published: gap.published.length,
+        // Present only when the desk overrode the delivery guard.
+        ...(gap.needsConfirmation
+          ? { deliveryOverride: true, unpublishedLineIds: gap.missing.map((l) => l.id) }
+          : {}),
       });
+      const delivery = { published: gap.published.length, total: gap.total };
       if (next === "COMPLETED") {
         // The buyer's cue to plan the next wave. If this order was a wave of
         // a programme and the following wave is now due, send them to Home,
@@ -56,19 +85,9 @@ export async function advanceOrder(formData: FormData) {
         // would show whichever list happens to be active); otherwise to the
         // finished order, which offers "Plan next wave" (a full copy of the
         // list, ready to edit).
-        // This notification is read by the BUYER org, so both copy and
-        // link locale come from the org's home market — not from `locale`,
-        // which is the desk associate's UI language and previously leaked
-        // into the buyer's inbox (English body, desk-locale link).
         const planName = await orderPlanName(order.id);
         const due = (await findDueWaves([order.organizationId], new Date()))[0] ?? null;
-        const org = await prisma.organization.findUnique({
-          where: { id: order.organizationId },
-          select: { marketCode: true },
-        });
-        // marketCode is nullable until onboarding completes; English is
-        // the safe default for an org without a declared home market.
-        const buyerLocale = org?.marketCode ? marketDefaultLocale(org.marketCode) : "en";
+        const buyerLocale = await orgLocale(order.organizationId);
         const notice = buildOrderCompletedNotice({
           locale: buyerLocale,
           planName,
@@ -79,12 +98,28 @@ export async function advanceOrder(formData: FormData) {
                 articleTitle: due.articleTitle,
               }
             : null,
+          delivery,
         });
         await notifyOrg(order.organizationId, {
           kind: "ORDER_COMPLETED",
           title: notice.title,
           body: notice.body,
           link: due ? `/${buyerLocale}/home` : `/${buyerLocale}/orders/${order.id}`,
+        });
+      } else if (next === "LIVE") {
+        // Copy built from the evidence, not the status: "published" only
+        // when every placement has a published link.
+        const buyerLocale = await orgLocale(order.organizationId);
+        const notice = buildOrderLiveNotice({
+          locale: buyerLocale,
+          planName: await orderPlanName(order.id),
+          ...delivery,
+        });
+        await notifyOrg(order.organizationId, {
+          kind: "ASSET_REVIEW",
+          title: notice.title,
+          body: notice.body,
+          link: `/${buyerLocale}/orders/${order.id}`,
         });
       } else {
         await notifyOrg(order.organizationId, {
@@ -95,7 +130,19 @@ export async function advanceOrder(formData: FormData) {
       }
     }
   }
-  redirect(`/${locale}/desk/orders/${orderId}`);
+  redirect(back);
+}
+
+// Buyer-facing notifications are read by the BUYER org, so copy and link
+// locale come from the org's home market, not from the desk associate's UI
+// language (which previously leaked into the buyer's inbox). marketCode is
+// nullable until onboarding completes; English is the safe default.
+async function orgLocale(organizationId: string): Promise<string> {
+  const org = await prisma.organization.findUnique({
+    where: { id: organizationId },
+    select: { marketCode: true },
+  });
+  return org?.marketCode ? marketDefaultLocale(org.marketCode) : "en";
 }
 
 async function orderPlanName(orderId: string): Promise<string> {
@@ -172,10 +219,8 @@ export async function cancelOrder(formData: FormData) {
     redirect(`/${locale}/desk/orders/${orderId}?cancel=not-found`);
   }
   if (!canCancelOrder(order.status)) {
-    redirect(
-      `/${locale}/desk/orders/${orderId}?cancel=` +
-        encodeURIComponent(cancelBlockReason(order.status)),
-    );
+    // The page explains why (cancelBlockKey) next to the banner.
+    redirect(`/${locale}/desk/orders/${orderId}?cancel=blocked`);
   }
 
   const session = await auth();

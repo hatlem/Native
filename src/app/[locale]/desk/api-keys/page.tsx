@@ -1,11 +1,11 @@
 import { cookies } from "next/headers";
 import { getTranslations } from "next-intl/server";
-import { redirect } from "next/navigation";
-import { auth } from "@/auth";
+import { superadminPageGate } from "@/lib/desk-guard";
+import { SuperadminOnly } from "@/components/superadmin-only";
 import { prisma } from "@/lib/prisma";
 import { Link } from "@/i18n/navigation";
 import { createApiKey, revokeApiKey } from "@/app/admin-actions";
-import { MailLink, SubmitButton } from "@/components";
+import { SubmitButton } from "@/components";
 
 export const dynamic = "force-dynamic";
 
@@ -25,41 +25,10 @@ export default async function ApiKeysPage({
 }) {
   const { locale } = await params;
   const sp = await searchParams;
-  const session = await auth();
-  // Unauthenticated → bounce to signin so the next-auth callback URL
-  // lands them back here. Authenticated but wrong role → render an
-  // explicit permission-denied state below so DESK users don't get
-  // silently looped through /signin → /desk and conclude "this link
-  // is broken".
-  if (!session?.user) {
-    redirect(`/${locale}/signin`);
-  }
   const t = await getTranslations({ locale, namespace: "apiKeys" });
-  if (session.user.role !== "SUPERADMIN") {
-    return (
-      <section className="section">
-        <header className="page-header">
-          <span className="eyebrow accent">{t("eyebrow")}</span>
-          <h1>{t("deniedTitle")}</h1>
-          <p className="lead">{t("deniedLead")}</p>
-        </header>
-        <div className="card">
-          <p>{t("deniedBody")}</p>
-          <p className="cluster" style={{ marginTop: 16 }}>
-            <MailLink
-              to="desk@nativespin.com"
-              subject="API key access — NativeSpin"
-              className="btn small secondary"
-            >
-              {t("deniedCta")}
-            </MailLink>
-            <Link href="/desk" className="btn small ghost">
-              {t("deniedBack")}
-            </Link>
-          </p>
-        </div>
-      </section>
-    );
+  const gate = await superadminPageGate(locale);
+  if (!gate.allowed) {
+    return <SuperadminOnly locale={locale} area={t("title")} body={t("deniedBody")} />;
   }
 
   // Read the one-time flash cookie set by createApiKey. We deliberately
@@ -223,7 +192,7 @@ export default async function ApiKeysPage({
                   <tr key={k.id}>
                     <td data-label={t("colName")}>{k.name}</td>
                     <td className="muted" data-label={t("colOrg")}>
-                      {k.organization?.name ?? "— platform —"}
+                      {k.organization?.name ?? t("orgPlatformShort")}
                     </td>
                     <td className="muted small" data-label={t("colScopes")}>{k.scopes}</td>
                     <td className="muted small" data-label={t("colCreated")}>

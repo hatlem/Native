@@ -63,7 +63,10 @@
     "campaign": "Suunnittele kampanja",
     "campaigns": "Kampanjat",
     "rates": "Hinnat",
-    "users": "Käyttäjät"
+    "users": "Käyttäjät",
+    "invoices": "Laskut",
+    "orgSwitcherLabel": "Organisaatio",
+    "orgSwitchTo": "Vaihda organisaatioon {org}"
   },
   "orders": {
     "eyebrow": "Tilaukset",
@@ -175,10 +178,6 @@
     "detailSaveDraft": "Tallenna luonnos",
     "detailUploading": "Ladataan…",
     "detailDownloadFile": "Lataa tiedosto",
-    "detailStatus": "Tila",
-    "detailSpecPassed": "spec ✓",
-    "detailSpecFailed": "spec ✗",
-    "detailRunSpecCheck": "Suorita spec-tarkistus",
     "detailSubmitForReview": "Lähetä tarkistettavaksi",
     "detailReviewNotes": "Kommentit",
     "linkHeading": "Liitä sijoitteluun",
@@ -188,7 +187,22 @@
     "placementRetracted": "Peruutettu",
     "unlinkCta": "Poista linkitys",
     "sharedArticleWarning": "Tämä artikkeli on linkitetty {count} muuhun sijoitteluun — muutoksesi vaikuttavat kaikkiin.",
-    "specNotChecked": "ei tarkistettu"
+    "detailUploadFailed": "Lataus epäonnistui. Kokeile toista tiedostoa.",
+    "detailUploadUnavailable": "Tiedostojen lataus ei ole juuri nyt käytettävissä. Liitä teksti editoriin.",
+    "backToArticles": "Kaikki artikkelit",
+    "versionLabel": "Versio {version}",
+    "byAuthor": "Kirjoittaja: {name}",
+    "previewHeading": "Esikatselu",
+    "previewEmpty": "Ei vielä tekstiä.",
+    "awaitingReview": "Odottaa asiakkaan tarkastusta.",
+    "placementsHeading": "Sijoitukset",
+    "specPassed": "Vaatimukset täyttyvät",
+    "specFailed": "Poikkeamia vaatimuksista",
+    "saving": "Tallennetaan…",
+    "orderRef": "tilaus {ref}",
+    "draftLabel": "Artikkelin teksti",
+    "draftHint": "Pelkkää tekstiä ja kevyttä Markdownia: # otsikoille, **lihavointi**, *kursiivi*, - listoille, [teksti](linkki).",
+    "submitBlockedSpec": "Jonkin sijoituksen formaattivaatimukset eivät vielä täyty – tarkista sijoitukset yllä."
   },
   "reports": {
     "title": "Raportit",
@@ -229,7 +243,8 @@
     "suggestedMargin": "Ehdotettu",
     "basis_win-rate": "voittoprosentista",
     "basis_category-median": "kategorian mediaani",
-    "basis_default": "oletus"
+    "basis_default": "oletus",
+    "exportInvoicesCsv": "Vie laskut (CSV)"
   },
   "agency": {
     "eyebrow": "Toimisto",
@@ -594,6 +609,9 @@
     "decrementRemoves": "Poista julkaisu suunnitelmasta",
     "increment": "Lisää määrää",
     "estTotal": "Arvioitu suuntaa-antava yhteissumma",
+    "exVat": "alv 0 %",
+    "inclVatLine": "{amount} sis. alv",
+    "includesContentFees": "Sisältää sisällöntuotantoa {amount}.",
     "totalForItems": "{amount}, {count, plural, =1 {1 julkaisu} other {# julkaisua}}",
     "multiCurrencyNote": "Julkaisut laskutetaan kustantajan omassa valuutassa — molemmat summat erääntyvät, tämä ei ole valuutan valinta.",
     "rfqTitle": "Pyydä kiinteä tarjous",
@@ -868,6 +886,8 @@
     "itemsEyebrow": "Brief",
     "quoteEyebrow": "Kiinteä hinnoittelu",
     "orderEyebrow": "Tilaus",
+    "openOrder": "Avaa tilaus",
+    "openOrderMarket": "Avaa tilaus · {currency}",
     "pendingTitle": "Briefisi on deskillä",
     "pendingBuyerLabel": "Ostaja",
     "pendingBuyerUnassigned": "Osoitetaan",
@@ -923,7 +943,9 @@
     "requestRenewal": "Pyydä uusittu tarjous",
     "requestingRenewal": "Lähetetään …",
     "renewalRequested": "Deskiä on pyydetty uusimaan tarjous. Saat ilmoituksen, kun voit hyväksyä sen.",
-    "lineNoteLabel": "Huomautus"
+    "lineNoteLabel": "Huomautus",
+    "noCommitTitle": "Et voi hyväksyä tätä tarjousta itse.",
+    "noCommitBody": "Hyväksyminen tekee sitovan tilauksen organisaatiolle {org}, ja siihen tarvitaan tilausoikeus. Pyydä ylläpitäjää hyväksymään tarjous tai antamaan sinulle tilausoikeus kohdassa Tili → Tiimi."
   },
   "desk": {
     "eyebrow": "Sisäinen desk",
@@ -1024,13 +1046,28 @@
     "quoteNoExpiry": "Ei päättymispäivää",
     "renewQuote": "Uusi tarjous",
     "renewingQuote": "Uusitaan …",
-    "renewQuoteHint": "Asiakas ei voi hyväksyä vanhentunutta tarjousta. Uusiminen pitää nämä hinnat voimassa 14 päivää lisää – päivitä rivien hinnat ensin, jos ne ovat muuttuneet.",
+    "renewQuoteHint": "Asiakas ei voi hyväksyä vanhentunutta tarjousta. Uusiminen pitää nämä hinnat voimassa valitsemaasi päivään asti – päivitä rivien hinnat ensin, jos ne ovat muuttuneet.",
+    "quoteDraftBadge": "Luonnos – ei lähetetty",
+    "quoteDraftHint": "Asiakas ei vielä näe tätä tarjousta. Hinnoittele rivit ja lähetä tarjous alta.",
+    "sendTitle": "Lähetä asiakkaalle",
+    "sendBody": "{count, plural, =1 {Tarjous lähtee} other {Kaikki # tarjousta lähtevät}} kerralla. Asiakas saa yhden sähköpostin, jossa on kokonaissumma, ja voi hyväksyä sen alla olevaan päivään asti.",
+    "sendValidUntil": "Voimassa asti",
+    "sendValidUntilHint": "Oletuksena {days} päivää, enintään {max}. Asiakas voi hyväksyä tarjouksen päivän loppuun asti.",
+    "send": "Lähetä tarjous",
+    "sending": "Lähetetään…",
+    "sendUnpriced": "Hinnoittele jokaisesta tarjouksesta vähintään yksi rivi ennen lähettämistä – jos kaikki rivit hinnoitellaan pyynnöstä, asiakkaalla ei ole mitään hyväksyttävää.",
+    "validUntilInvalid": "Anna kelvollinen päivämäärä.",
+    "validUntilPast": "Voimassaolopäivä ei voi olla menneisyydessä.",
+    "validUntilTooFar": "Tarjous voi olla voimassa enintään {max} päivää.",
+    "renewValidUntil": "Uusi voimassaolo",
     "lineNoteLabel": "Huomautus asiakkaalle",
     "lineNoteAdd": "Lisää huomautus asiakkaalle",
     "lineNoteEdit": "Muokkaa huomautusta asiakkaalle",
     "lineNoteSave": "Tallenna huomautus",
     "lineNoteHint": "Näytetään asiakkaalle tarjoussivulla ja PDF:ssä.",
-    "lineNoteTooLong": "Huomautus on liian pitkä. Pidä se alle {max} merkissä."
+    "lineNoteTooLong": "Huomautus on liian pitkä. Pidä se alle {max} merkissä.",
+    "pdfStorageUnavailable": "Tiedostotallennusta (R2) ei ole määritetty tähän ympäristöön, joten PDF:ää ei voi tallentaa. Lataa Word-versio sen sijaan.",
+    "pdfFailed": "PDF:n luonti epäonnistui. Yritä uudelleen tai lataa Word-versio."
   },
   "deskTitles": {
     "eyebrow": "Pääkäyttäjä · julkaisut",
@@ -1075,7 +1112,8 @@
       "all": "Kaikki",
       "unverified": "Ei vielä tarkistettu",
       "active": "Natiivi saatavilla",
-      "no-native": "Ei tarjoa natiivia"
+      "no-native": "Ei tarjoa natiivia",
+      "awaitingPrice": "Odottaa vahvistettua hintaa"
     },
     "reach": "Kuukausittainen tavoittavuus",
     "circulation": "Levikki",
@@ -1095,7 +1133,8 @@
       "deactivate": "Poista käytöstä",
       "edit": "Muokkaa",
       "marking": "Merkitään…",
-      "deactivating": "Inaktivoidaan…"
+      "deactivating": "Inaktivoidaan…",
+      "resetVerification": "Palauta tarkistamattomaksi"
     },
     "freshness": {
       "column": "Hintojen tuoreus",
@@ -1133,7 +1172,55 @@
     "active": "Aktiivinen",
     "inactive": "Ei aktiivinen",
     "assignments": "{active} aktiivinen",
-    "assignmentsOf": "{active} / {max} aktiivinen"
+    "assignmentsOf": "{active} / {max} aktiivinen",
+    "inviteLanguage": {
+      "en": "Englanti",
+      "no": "Norja",
+      "sv": "Ruotsi",
+      "da": "Tanska",
+      "fi": "Suomi",
+      "de": "Saksa"
+    },
+    "emailPlaceholder": "kirjoittaja@esimerkki.fi",
+    "inviteLanguageLabel": "Sähköpostin kieli",
+    "inviteLanguageHint": "Kutsu ja tilisivu avautuvat tällä kielellä.",
+    "inviteSent": "Kutsu lähetettiin osoitteeseen <addr></addr>.",
+    "inviteNotSent": "Kutsu osoitteeseen <addr></addr> luotiin, mutta sähköposti ei lähtenyt. Lähetä se uudelleen alta tai jaa linkki itse.",
+    "errorInvalidEmail": "Anna kelvollinen sähköpostiosoite.",
+    "errorExistingAccount": "Tällä osoitteella on jo NativeSpin-tili, joten sillä ei voi ottaa vastaan kirjoittajakutsua. Pyydä pääkäyttäjää vaihtamaan tilin rooli.",
+    "colEmail": "Sähköposti",
+    "colLanguage": "Kieli",
+    "colDelivery": "Lähetys",
+    "emailedOn": "Lähetetty {date}",
+    "notEmailed": "Ei lähetetty",
+    "resend": "Lähetä uudelleen",
+    "colName": "Nimi",
+    "colLanguages": "Kielet",
+    "colSpecialties": "Erikoisalat",
+    "colStatus": "Tila",
+    "colLoad": "Kuormitus",
+    "panel": {
+      "eyebrow": "Tuotanto",
+      "title": "Tämän tilauksen kirjoittajat",
+      "lead": "Järjestetty kielen ({language}) ja erikoisalan ({topics}) mukaan. Lisää ehdokkaat tämän tilauksen pooliin ja määritä sitten yksi kullekin riville alla.",
+      "empty": "Kirjoittajia ei vielä ole – kutsu joku kohdassa Kirjoittajat.",
+      "colWriter": "Kirjoittaja",
+      "colLanguages": "Kielet",
+      "colSpecialties": "Erikoisalat",
+      "colLoad": "Kuormitus",
+      "inPool": "Poolissa",
+      "inactive": "Ei ota töitä",
+      "overCapacity": "Yli kapasiteetin",
+      "none": "Ei ilmoitettu",
+      "loadOf": "{active} / {max} aktiivista",
+      "load": "{active} aktiivista",
+      "add": "Lisää pooliin",
+      "remove": "Poista",
+      "saving": "Tallennetaan…",
+      "writerLabel": "Kirjoittaja",
+      "unassigned": "— Ei määritetty —",
+      "assign": "Määritä"
+    }
   },
   "auth": {
     "title": "Kirjaudu sisään",
@@ -1221,6 +1308,8 @@
     "emailChangedOk": "Sähköpostiosoite päivitetty — kirjaudu sisään uudella osoitteellasi.",
     "deactivatedTitle": "Tämä tili on poistettu käytöstä",
     "deactivatedBody": "Tilisi on suljettu, joten täällä ei ole mitään käytettävää. Kirjaudu ulos alta, ja ota yhteyttä deskiin, jos tämä on mielestäsi virhe.",
+    "writerClaimSubmit": "Luo kirjoittajatili",
+    "writerClaimSubmitting": "Luodaan…",
     "regEmailInvalid": "Sähköpostiosoite ei näytä oikealta. Tarkista, ettei siinä ole kirjoitusvirhettä.",
     "regEmailNoMailServer": "Verkkotunnukselle ei löydy sähköpostipalvelinta, joten viestit eivät menisi perille. Tarkista osoite kirjoitusvirheiden varalta.",
     "emailRequired": "Kirjoita ensin sähköpostiosoitteesi.",
@@ -1263,16 +1352,61 @@
     "cancelBlocked": "Tätä tilausta ei voi enää peruuttaa.",
     "cancelError": "Peruutus hylätty",
     "cancelledAtLabel": "Peruutettu",
-    "cancelledByLabel": "By",
+    "cancelledByLabel": "Perunut",
     "cancelledReasonLabel": "Syy",
     "creditNoteButton": "Anna hyvityslasku",
     "creditNoteTitle": "Palauta lasku",
-    "creditNoteHint": "Palauta {amount} annettua laskua vastaan. Syy kirjataan hyvityslaskulle ja näytetään ostajalle.",
+    "creditNoteHint": "Hyvittää {amount} kokonaan ja peruuttaa tilauksen. Syy kirjataan hyvityslaskulle ja näytetään ostajalle.",
     "creditNoteReasonLabel": "Syy",
-    "creditNoteReasonPlaceholder": "esim. Tilaus peruutettu laskutuksen jälkeen; kustantajan toimituksellinen veto.",
+    "creditNoteReasonPlaceholder": "esim. Sijoittelu ei toteutunut sovitusti; ostaja kiisti laskun.",
     "creditNoteSubmit": "Anna hyvityslasku",
     "issuingCreditNote": "Annetaan…",
-    "creditNoteIssuedLabel": "Hyvityslasku annettu"
+    "creditNoteIssuedLabel": "Hyvityslasku annettu",
+    "cancelBlock": {
+      "ran": "Kampanja on jo pyörinyt, joten tilausta ei voi peruuttaa. Laskuta se ja anna hyvityslasku, jos ostajan ei kuulu maksaa.",
+      "invoiced": "Lasku on lähetetty. Anna hyvityslasku sen hyvittämiseksi – samalla tilaus peruutetaan.",
+      "cancelled": "Tilaus on jo peruutettu.",
+      "other": "Tilausta ei voi peruuttaa sen nykyisessä tilassa."
+    },
+    "cancelErrors": {
+      "reasonRequired": "Lisää syy ennen peruutusta.",
+      "notFound": "Tilausta ei löytynyt.",
+      "blocked": "Tätä tilausta ei voi enää peruuttaa."
+    },
+    "creditError": "Hyvityslaskua ei annettu",
+    "creditErrors": {
+      "reasonRequired": "Lisää syy – se tulostuu hyvityslaskulle.",
+      "notFound": "Tilausta ei löytynyt.",
+      "noInvoice": "Hyvitettävää lähetettyä laskua ei ole.",
+      "alreadyCredited": "Tämä lasku on jo hyvitetty.",
+      "wrongOrderStatus": "Vain laskutetun tilauksen voi hyvittää."
+    },
+    "accountingSynced": "{doc} on synkronoitu palveluun {provider} (nro {number}).",
+    "accountingSyncedNoNumber": "{doc} on synkronoitu palveluun {provider}.",
+    "accountingLocalOnly": "{doc} on vain NativeSpinissä – kirjanpitointegraatiota ei ole määritetty.",
+    "accountingFailed": "{doc} ei synkronoitunut palveluun {provider}: {error}",
+    "accountingNotSent": "{doc} ei ole vielä mennyt kirjanpitoon.",
+    "accountingRetry": "Yritä synkronointia uudelleen",
+    "accountingRetrying": "Synkronoidaan…",
+    "accountingDocInvoice": "Lasku",
+    "accountingDocCreditNote": "Hyvityslasku",
+    "advanceGuardTitle": "{missing, plural, =1 {1 sijoittelulta puuttuu} other {# sijoittelulta puuttuu}} julkaistu linkki",
+    "advanceGuardLeadLive": "Kun tilaus merkitään liveksi, ostaja saa tiedon, että kampanja on julkaistu. Näillä sijoitteluilla ei ole vielä julkaistua linkkiä:",
+    "advanceGuardLeadCompleted": "Kun tilaus merkitään valmiiksi, ostaja saa tiedon, että kampanja on pyörinyt. Näillä sijoitteluilla ei ole vielä julkaistua linkkiä:",
+    "advanceGuardConfirm": "Olen tarkistanut nämä sijoittelut ja haluan jatkaa silti",
+    "advanceGuardNote": "Ostajan sähköposti laskee vain oikeasti julkaistut sijoittelut.",
+    "advanceError": "Tilaa ei muutettu",
+    "advanceErrors": {
+      "unconfirmed": "Rastita vahvistus jatkaaksesi, vaikka sijoitteluja on vielä julkaisematta.",
+      "moved": "Tilauksen tila muuttui välillä. Tarkista se ja yritä uudelleen."
+    },
+    "unknownPlacement": "Nimetön sijoittelu",
+    "cancelledByRole": {
+      "DESK": "NativeSpinin desk",
+      "SUPERADMIN": "NativeSpin (ylläpitäjä)",
+      "PUBLISHER": "Julkaisija",
+      "BUYER": "Asiakas"
+    }
   },
   "production": {
     "brief": "Brief",
@@ -1313,14 +1447,40 @@
     "currency": "Valuutta",
     "subtotal": "Välisumma",
     "vat": "ALV",
-    "total": "Yhteensä"
+    "total": "Yhteensä",
+    "number": "Laskun numero",
+    "download": "Lataa PDF",
+    "documentTitle": "Lasku {number}",
+    "colDescription": "Kuvaus",
+    "colQty": "Määrä",
+    "colUnitPrice": "Yksikköhinta",
+    "colAmount": "Summa",
+    "vatWithPct": "ALV ({pct} %)",
+    "vatId": "ALV-tunnus",
+    "contentProduction": "Sisällöntuotanto",
+    "creditedHeading": "Hyvitetty",
+    "creditedBody": "Lasku hyvitettiin kokonaan {date} ({amount}).",
+    "creditedReason": "Syy: {reason}",
+    "accountingRef": "Kirjanpitoviite",
+    "pageOf": "Sivu {page}/{pages}",
+    "listTitle": "Laskut",
+    "listLead": "Kaikki organisaatiosi laskut. Avaa lasku nähdäksesi rivit tai lataa PDF.",
+    "emptyTitle": "Ei vielä laskuja",
+    "emptyHint": "Laskut näkyvät täällä, kun kampanja on pyörinyt ja laskutettu.",
+    "emptyCta": "Katso kampanjasi",
+    "colCustomer": "Asiakas"
   },
   "firm": {
     "badge": "Pikatilaus",
     "planTitle": "Vahvista tilauksesi",
     "planNote": "Kaikilla riveillä on kiinteä hinta — lähettäminen vahvistaa tilauksesi heti, ei deskin odotusta.",
     "planSubmit": "Vahvista tilaus",
-    "planSubmitting": "Tilaus tehdään…"
+    "planSubmitting": "Tilaus tehdään…",
+    "orderTotal": "Tilauksen yhteissumma",
+    "commitAmount": "Tilaat yhteensä {amount} (sis. alv).",
+    "reassurance": "Vahvistamalla teet sitovan tilauksen tähän hintaan — erillistä tarjousta ei tule hyväksyttäväksi.",
+    "noCommitNote": "Roolillasi ei ole tilausoikeutta, joten et voi vahvistaa tilausta itse. Lähetä se tarjouspyyntönä — tiimisi ylläpitäjä voi hyväksyä tarjouksen.",
+    "sendAsRfq": "Lähetä tarjouspyyntönä"
   },
   "publisher": {
     "title": "Kustantajaportaali",
@@ -1395,7 +1555,10 @@
     "ratesUnitWeek": "Viikko",
     "ratesUnitMonth": "Kuukausi",
     "ratesMinUnits": "Vähimmäisvaraus: {count}",
-    "ratesPriceOnlyNote": "Tällä sivulla muutetaan vain hintoja. Katalogin tila — aktiivinen, varattavissa, näkyvyys — on NativeSpin-deskin hallinnassa."
+    "ratesPriceOnlyNote": "Tällä sivulla muutetaan vain hintoja. Katalogin tila — aktiivinen, varattavissa, näkyvyys — on NativeSpin-deskin hallinnassa.",
+    "changePriceOnRates": "Muuta hintasivulla",
+    "notBookable": "Ei varattavissa",
+    "catalogStatusNote": "Hintoja muutetaan hintasivulla. Luettelotilasta (varattavuus ja se, voiko tuotteen tilata heti) vastaa NativeSpinin desk."
   },
   "formats": {
     "metaTitle": "Natiiviformaatit",
@@ -2009,7 +2172,7 @@
     },
     "fees": {
       "title": "Maksut ja maksaminen",
-      "body": "Hinnoittelu noudattaa voimassa olevaa hinnastoa (ks. /pricing). Laskut laaditaan ostajan markkinan valuutassa, ja ALV sovelletaan paikallisen lain mukaan. Maksuehto on oletuksena netto 30 päivää, ellei toisin sovita."
+      "body": "Hinnoittelu noudattaa voimassa olevaa hinnastoa (ks. /pricing). Laskut laaditaan ostajan markkinan valuutassa, ja ALV sovelletaan paikallisen lain mukaan. Maksuehto on oletuksena netto 14 päivää, ellei toisin sovita."
     },
     "liability": {
       "title": "Vastuu",
@@ -2211,39 +2374,36 @@
     "errorScopes": "Vähintään yksi kelvollinen scope vaaditaan (catalog:read, catalog:*, orders:write, pricing:admin).",
     "errorInternalOnly": "pricing:admin on vain sisäinen — se voidaan myöntää vain NativeSpin-alusta-avaimena (ilman organisaatiota).",
     "errorOrgRequired": "orders:write on sidottava organisaatioon — valitse omistava organisaatio yltä.",
-    "issueEyebrow": "Issue",
+    "issueEyebrow": "Myönnä",
     "issueTitle": "Myönnä uusi avain",
     "nameLabel": "Nimi / kumppani",
     "orgLabel": "Omistava organisaatio (valinnainen)",
     "orgPlatform": "NativeSpin-alustaavain (ei organisaatiota)",
-    "scopesLabel": "Scopes",
+    "scopesLabel": "Oikeudet (scopes)",
     "scopesHint": "Pilkuilla erotettuna. Vaihtoehdot: catalog:read, orders:write (orders:write on sidottava organisaatioon). pricing:admin on vain sisäinen.",
     "ttlLabel": "Vanhenee (päivissä)",
     "ttlPlaceholder": "Ei vanhenemista",
     "ttlHint": "Jätä tyhjäksi, jos vanhenemista ei ole; enintään 1825 päivää (5 vuotta).",
     "issueSubmit": "Luo avain",
     "issuing": "Luodaan…",
-    "listEyebrow": "Existing",
+    "listEyebrow": "Olemassa olevat",
     "listTitle": "Kaikki avaimet",
-    "colName": "Name",
-    "colOrg": "Org",
-    "colScopes": "Scopes",
-    "colCreated": "Created",
+    "colName": "Nimi",
+    "colOrg": "Organisaatio",
+    "colScopes": "Oikeudet",
+    "colCreated": "Luotu",
     "colLastUsed": "Viimeksi käytetty",
-    "colStatus": "Status",
-    "status_active": "Active",
-    "status_expired": "Expired",
-    "status_revoked": "Revoked",
-    "revoke": "Revoke",
+    "colStatus": "Tila",
+    "status_active": "Aktiivinen",
+    "status_expired": "Vanhentunut",
+    "status_revoked": "Peruttu",
+    "revoke": "Peru",
     "revoking": "Peruutetaan…",
     "revokeConfirm": "Tätä ei voi peruuttaa. Tätä avainta käyttävät olemassa olevat integraatiot lakkaavat toimimasta välittömästi.",
     "revokeConfirmCta": "Kyllä, peruuta avain",
     "docsHintPrefix": "Julkinen dokumentaatio saatavilla osoitteessa",
-    "deniedTitle": "API-avaimet (vain SUPERADMIN)",
-    "deniedLead": "Tämä sivu on NativeSpinin alusta-järjestelmänvalvojille.",
     "deniedBody": "Julkisen luettelon API-avaimet myöntää NativeSpin-superadmin. Jos roolisi tarvitsee laillisesti avaimen myöntämistä — tai olet kumppani joka tarvitsee avaimen — ota yhteyttä deskiin niin järjestämme sen.",
-    "deniedCta": "Lähetä deskille sähköposti",
-    "deniedBack": "Takaisin /desk"
+    "orgPlatformShort": "NativeSpin-alusta"
   },
   "quoteNarrative": {
     "sectionCampaign": "Kampanjasi",
@@ -2256,7 +2416,6 @@
     "anchorSavings": "−{pct}% listahintaan verrattuna",
     "anchorNote": "Julkaisijan virallinen listahinta tälle julkaisulle. Kokonaishintaasi sisältyy sisällöntuotanto, julkaisu, korjaukset ja raportointi.",
     "whyThisPrice": "NativeSpinllä on suorat toimitukselliset suhteet kaikkiin tarjouksen medioihin. Neuvottelemme julkaisun, palkkaamme toimialaa tuntevan toimittajan, hoidamme toimituksellisen tarkistuksen julkaisijan kanssa ja toimitamme raportoinnin. Saat yhden vastuullisen kumppanin ja yhden kokonaishinnan — emme erikseen medialaskua, kirjoittajalaskua ja toimistopalkkiota.",
-    "termsPayment": "50 % hyväksynnän yhteydessä, 50 % julkaisun yhteydessä.",
     "termsCancellation": "Täysi palautus ennen artikkelibrieffin hyväksyntää; 50 % palautus ennen ensimmäistä luonnosta; ei palautusta enää julkaisijan paikan vahvistuksen jälkeen.",
     "termsValidity": "Tarjous voimassa 14 päivää. Julkaisijan saatavuus vahvistetaan hyväksynnän yhteydessä.",
     "bullets": {
@@ -2331,7 +2490,9 @@
     "inviteSent": "Kutsu lähetetty.",
     "inviteInvalidEmail": "Tämä ei näytä kelvolliselta sähköpostiosoitteelta.",
     "inviteBusinessEmail": "Käytä yritysosoitetta — ilmais- ja kertakäyttöpalveluja ei hyväksytä.",
-    "inviteNotFound": "Kustantajaa ei enää ole — lataa sivu uudelleen."
+    "inviteNotFound": "Kustantajaa ei enää ole — lataa sivu uudelleen.",
+    "priceUnconfirmed": "hintaa ei vahvistettu",
+    "productInactive": "ei käytössä"
   },
   "salesContacts": {
     "title": "Myyntiyhteystiedot",
@@ -2532,7 +2693,10 @@
     "callHeading": "Vielä yksi asia — autamme sinua ostamaan natiivia",
     "callBody": "Varaa ilmainen 15 minuutin puhelu, niin deskimme auttaa sinua suunnittelemaan ja sijoittamaan ensimmäisen natiivikampanjasi.",
     "callCta": "Varaa puhelu",
-    "callSkip": "Ohita toistaiseksi →"
+    "callSkip": "Ohita toistaiseksi →",
+    "marketBlocked": "Organisaatiolla {org} ei ole vielä laskutusmarkkinaa. Organisaation {org} ylläpitäjän on valittava se Tili-sivulla ennen kuin tiimi voi lähettää tarjouspyyntöjä.",
+    "blockedTitle": "Organisaation {org} laskutusta ei ole vielä määritetty",
+    "blockedBack": "Takaisin suunnitelmaan"
   },
   "account": {
     "eyebrow": "Tili",
@@ -2644,6 +2808,7 @@
     "errDelegation": "Delegoinnin päättymispäivä ei ole kelvollinen päivämäärä.",
     "errDelegationPast": "Delegoinnin päättymispäivän on oltava tulevaisuudessa.",
     "canCommitAdminNote": "Ylläpitäjillä on aina tilausoikeus.",
+    "statusRevoked": "Poistettu",
     "errEmailDomain": "Verkkotunnukselle ei löydy sähköpostipalvelinta. Tarkista osoite kirjoitusvirheiden varalta."
   },
   "rateCard": {
@@ -2702,10 +2867,14 @@
     "contentProductionLabel": "Kuka kirjoittaa sisällön?",
     "content_advertiser": "Mainostaja voi toimittaa omat artikkelinsa",
     "content_publisher": "Artikkelit on kirjoitettava osastonne toimesta",
-    "content_both": "Molemmat ovat mahdollisia"
+    "content_both": "Molemmat ovat mahdollisia",
+    "uploadUnavailable": "Tiedoston lataus ei ole juuri nyt käytettävissä. Liitä alle linkki hinnastoon tai mediakorttiin."
   },
   "invite": {
     "title": "Liity organisaatioon {org}",
+    "lead": "Tiimisi suunnittelee ja ostaa natiivimainontaa NativeSpinissä. Liity mukaan ja työskentele samoissa suunnitelmissa, tarjouksissa ja tilauksissa.",
+    "acceptTitle": "Yksi klikkaus, ja olet mukana",
+    "createTitle": "Luo tilisi",
     "invitationFor": "Kutsu osoitteelle {email}",
     "accept": "Hyväksy kutsu",
     "createAndJoin": "Luo tili ja liity",
@@ -2717,7 +2886,10 @@
     "wrongAccountTitle": "Väärä tili",
     "wrongAccountBody": "Kutsu on osoitettu käyttäjälle {inviteEmail}. Olet kirjautunut sisään käyttäjänä {authedEmail}.",
     "signOut": "Kirjaudu ulos",
-    "genericError": "Jokin meni pieleen. Tarkista tiedot ja yritä uudelleen."
+    "genericError": "Jokin meni pieleen. Tarkista tiedot ja yritä uudelleen.",
+    "alreadyMemberTitle": "Olet jo mukana: {org}",
+    "alreadyMemberBody": "Sinulla on jo pääsy tähän tiimiin, joten hyväksyttävää ei ole.",
+    "alreadyMemberCta": "Siirry työtilaan"
   },
   "contentFees": {
     "eyebrow": "Desk",
@@ -2899,7 +3071,21 @@
     "overrideHint": " — desk-korjaus",
     "saveOverride": "Tallenna korjaus",
     "frozenNoEdit": "Luvut on lukittu eikä niitä voi muokata.",
-    "unknownPublisher": "Tuntematon julkaisija"
+    "unknownPublisher": "Tuntematon julkaisija",
+    "metricsNowTitle": "Lukupyynnöt",
+    "metricsNowNotEnded": "Julkaisijoilta pyydetään luvut, kun kampanjajakso on päättynyt. Aseta päättymispäivä yllä; päivittäinen ajo lähettää pyynnöt seuraavana päivänä.",
+    "metricsNowNothing": "Jokaisella tämän tilauksen julkaisijalla on jo lukupyyntö – katso kunkin tila alta.",
+    "metricsNowHint": "{count, plural, =1 {1 julkaisijalle ei ole vielä lähetetty pyyntöä.} other {# julkaisijalle ei ole vielä lähetetty pyyntöä.}} Päivittäinen ajo lähettäisi sen huomenna.",
+    "metricsNowButton": "Lähetä lukupyyntö nyt",
+    "metricsNowNoPublisher": "{count, plural, =1 {1 varaukselta puuttuu} other {# varaukselta puuttuu}} julkaisija, joten pyyntöä ei voi lähettää.",
+    "requestStatusValue": {
+      "NEEDS_CONTACT": "Yhteyshenkilö puuttuu",
+      "PENDING": "Odottaa lukuja",
+      "PARTIAL": "Osittain raportoitu",
+      "COMPLETE": "Raportoitu",
+      "EXPIRED": "Vanhentunut",
+      "CANCELLED": "Peruttu"
+    }
   },
   "rateCards": {
     "title": "Hinnastot / mediakortit",
@@ -3025,7 +3211,12 @@
     "nextWaveBodyPreviousDone": "Kierros {prev} on valmis. Lähetä kierros {n}, jotta tarina jatkuu.",
     "nextWaveBodyDateNear": "Kierros {n} on aikataulutettu alkamaan {date}. Lähetä se nyt, jotta deski ehtii varata.",
     "nextWaveAngle": "Näkökulma: {angle}",
-    "openWave": "Avaa kierros"
+    "openWave": "Avaa kierros",
+    "awaitingTeamHeading": "Odottaa tilausoikeudellista henkilöä",
+    "quoteAwaitingTeamBody": "Kiinteä {amount} tarjous on valmis. Tiimistäsi tilausoikeudellisen henkilön on hyväksyttävä se.",
+    "viewQuote": "Näytä tarjous",
+    "noAccessTitle": "Et ole tällä hetkellä minkään tiimin jäsen",
+    "noAccessBody": "Pääsysi organisaatiosi työtilaan on päättynyt: ylläpitäjä on poistanut sen, tai se oli määräaikainen ja on vanhentunut. Pyydä ylläpitäjää kutsumaan sinut uudelleen, niin saat tiimin suunnitelmat ja tarjouspyynnöt takaisin."
   },
   "shareList": {
     "eyebrow": "Mediasuunnitelma: {org}",
@@ -3063,7 +3254,6 @@
     "vat": "ALV ({pct}%)",
     "total": "Yhteensä",
     "vatStatus": "Hinnat ovat ilman ALV:tä, ellei yllä toisin mainita.",
-    "paymentTerms": "Maksuehdot: netto 14 päivää laskun päiväyksestä.",
     "footnote": "Rivit, joissa lukee \"hinta pyynnöstä\", tulevat yllä olevan summan lisäksi ja vahvistetaan erikseen ennen varausta.",
     "circulation": "Levikki",
     "digitalReach": "Digitaalinen kattavuus/kk",
@@ -3130,7 +3320,17 @@
     "errRole": "Emme tunnista tätä roolia.",
     "errDeactivatedTarget": "Tili on poistettu käytöstä. Ota se ensin käyttöön — kirjautumisviesti, jota ei voi käyttää, vain hämmentää vastaanottajaa.",
     "errEmailFailed": "Sähköpostia ei voitu lähettää. Mitään muuta ei muutettu.",
-    "errGeneric": "Jokin meni pieleen eikä mitään tallennettu. Yritä uudelleen."
+    "errGeneric": "Jokin meni pieleen eikä mitään tallennettu. Yritä uudelleen.",
+    "termsHeading": "Asiakaskohtaiset maksuehdot",
+    "termsLead": "Netto päivää laskun päiväyksestä. Koskee uusia tarjouksia ja laskuja; lähetetyt laskut säilyttävät ehtonsa. Oletus on {days} päivää.",
+    "termsOrgLabel": "Asiakas",
+    "termsDaysLabel": "Maksuaika (päivää)",
+    "termsSave": "Tallenna ehdot",
+    "termsCustomHeading": "Asiakkaat, joilla on poikkeavat ehdot",
+    "termsNoneCustom": "Kaikilla asiakkailla on oletusehdot.",
+    "termsDaysValue": "{days, plural, one {netto # päivä} other {netto # päivää}}",
+    "okTerms": "Maksuehdot tallennettu.",
+    "errTerms": "Anna kokonaisia päiviä väliltä 1–120."
   },
   "status": {
     "ACCEPTED": "Hyväksytty",
@@ -3159,11 +3359,217 @@
     "SCHEDULED": "Aikataulutettu",
     "SENT": "Lähetetty",
     "SUBMITTED": "Jätetty",
-    "VOID": "Mitätöity"
+    "VOID": "Mitätöity",
+    "SUPERSEDED": "Korvattu"
   },
   "joinedNotice": {
     "lists": "Tervetuloa, {org}. Tässä ovat tiimisi suunnitelmat – avaa yksi nähdäksesi julkaisut, hinnat ja huomautukset.",
     "home": "Tervetuloa, {org}. Olet nyt mukana tiimissä NativeSpinissä."
+  },
+  "paymentTerms": {
+    "line": "{days, plural, one {Maksuehdot: netto # päivä laskun päiväyksestä.} other {Maksuehdot: netto # päivää laskun päiväyksestä.}}"
+  },
+  "superadminOnly": {
+    "eyebrow": "Vain pääkäyttäjille",
+    "lead": "Tämä sivu on NativeSpinin alustan ylläpitäjille.",
+    "body": "Tililläsi on desk-oikeudet, mutta tämä sivu vaatii pääkäyttäjän roolin. Jos tarvitset sitä työssäsi, lähetä sähköpostia deskille, niin pääkäyttäjä auttaa tai antaa sinulle pääsyn.",
+    "cta": "Lähetä sähköpostia deskille",
+    "back": "Takaisin deskille",
+    "mailSubject": "Käyttöoikeuspyyntö: {area} — NativeSpin"
+  },
+  "publisherContacts": {
+    "eyebrow": "Desk · yhteydenotot",
+    "title": "Julkaisijoiden yhteyshenkilöt",
+    "lead": "Tarkista kerätyt mainosmyynnin yhteyshenkilöt ennen käyttöä ja aja sitten hintapyyntökampanja.",
+    "tabsLabel": "Näkymät",
+    "tabReview": "Tarkista ehdokkaat",
+    "tabCampaign": "Hintakampanja",
+    "ok": {
+      "approved": "Yhteyshenkilö hyväksytty.",
+      "rejected": "Yhteyshenkilö hylätty.",
+      "bulk": "{approved} hyväksytty, {failed} epäonnistui.",
+      "built": "Kampanja päivitetty: {created} uutta pyyntöä, {skipped} ohitettu.",
+      "sent": "{count, plural, =0 {Sähköposteja ei lähetetty.} =1 {1 sähköposti lähetetty.} other {# sähköpostia lähetetty.}}",
+      "one": "Sähköposti lähetetty."
+    },
+    "errorGeneric": "Toiminto epäonnistui: {detail}",
+    "working": "Käsitellään…",
+    "buildCampaign": "Rakenna / päivitä kampanja",
+    "batchSizeLabel": "Erän koko",
+    "sendBatch": "Lähetä erä (seuraavaksi erääntyvät)",
+    "kpiTotal": "Pyynnöt",
+    "state": {
+      "draft": "Luonnos",
+      "inFlight": "Käynnissä",
+      "responded": "Vastattu",
+      "cancelled": "Peruttu"
+    },
+    "noRequests": "Hintapyyntöjä ei vielä ole — rakenna kampanja luodaksesi ne.",
+    "colRecipient": "Vastaanottaja",
+    "colTitles": "Julkaisut",
+    "colLocale": "Kieli",
+    "colStep": "Vaihe",
+    "colStatus": "Tila",
+    "colNextDue": "Seuraava",
+    "stepOf": "{sent}/{max}",
+    "sendOne": "Lähetä",
+    "candidateStatus": {
+      "PENDING": "Odottaa tarkistusta",
+      "APPROVED": "Hyväksytyt",
+      "REJECTED": "Hylätyt"
+    },
+    "titlesByChannel": "Julkaisut myyntikanavittain:",
+    "channel": {
+      "DIRECT": "Suora",
+      "IN_HOUSE": "Oma myyntiyhtiö",
+      "REP": "Myyntitalo",
+      "MIXED": "Useita",
+      "UNKNOWN": "Tuntematon"
+    },
+    "pendingEyebrow": "Tarkistus",
+    "pendingTitle": "Tarkistusta odottavat ehdokkaat",
+    "bulkApproveLabel": "Hyväksy kaikki, joiden varmuus ≥",
+    "bulkApprove": "Hyväksy kaikki",
+    "noCandidates": "Tarkistusta odottavia ehdokkaita ei ole.",
+    "colPublisher": "Julkaisija",
+    "colMarket": "Markkina",
+    "colChannel": "Kanava",
+    "colCandidate": "Ehdokas",
+    "colConfidence": "Varmuus",
+    "colSource": "Lähde",
+    "viewSource": "Näytä",
+    "approve": "Hyväksy",
+    "reject": "Hylkää"
+  },
+  "writerEnums": {
+    "language": {
+      "NO": "Norja",
+      "SV": "Ruotsi",
+      "DA": "Tanska",
+      "FI": "Suomi",
+      "DE": "Saksa",
+      "EN": "Englanti"
+    },
+    "topic": {
+      "FINANCE": "Talous",
+      "HEALTH": "Terveys",
+      "TECH": "Teknologia",
+      "LIFESTYLE": "Lifestyle",
+      "B2B": "B2B",
+      "TRAVEL": "Matkailu",
+      "FOOD": "Ruoka ja juoma",
+      "CULTURE": "Kulttuuri",
+      "SUSTAINABILITY": "Kestävyys",
+      "OTHER": "Muu"
+    },
+    "proficiency": {
+      "NATIVE": "Äidinkieli",
+      "FLUENT": "Sujuva",
+      "WORKING": "Työkieli"
+    }
+  },
+  "writer": {
+    "eyebrow": "Kirjoittajaportaali",
+    "backToAssignments": "Omat toimeksiannot",
+    "untitledAssignment": "Toimeksianto",
+    "status": {
+      "notStarted": "Ei aloitettu"
+    },
+    "home": {
+      "title": "Omat toimeksiannot",
+      "lead": "Kaikki, mitä desk on antanut sinulle. Avaa toimeksianto nähdäksesi briiffin, formaatin vaatimukset ja playbookin, kirjoita teksti ja lähetä se tarkastettavaksi.",
+      "profileCta": "Muokkaa profiiliani",
+      "emptyTitle": "Ei vielä toimeksiantoja",
+      "emptyBody": "Kun desk antaa sinulle artikkelin, se näkyy täällä ja saat sähköpostin.",
+      "colTitle": "Julkaisu",
+      "colFormat": "Formaatti",
+      "colMarket": "Markkina",
+      "colStatus": "Tila",
+      "colAssigned": "Määritetty",
+      "open": "Avaa"
+    },
+    "line": {
+      "notReady": "Tämän toimeksiannon briiffi ei ole vielä valmis. Desk ilmoittaa, kun se on.",
+      "changesRequested": "Muutoksia pyydetty:",
+      "closed": "Tämä toimeksianto on päättynyt – tilaus on peruttu, sijoitus vedetty pois tai artikkeli on valmis. Tänne ei ole enää kirjoitettavaa.",
+      "draftEyebrow": "Luonnoksesi",
+      "draftHeading": "Kirjoita artikkeli",
+      "inReviewNote": "Tämä luonnos on asiakkaalla tarkastettavana. Jos tallennat nyt, syntyy uusi versio – lähetä se tarkastettavaksi, kun se on valmis.",
+      "draftLabel": "Artikkelin teksti",
+      "draftPlaceholder": "# Otsikko\n\nIngressi…",
+      "draftHint": "Pelkkää tekstiä ja kevyttä Markdownia: # otsikoille, **lihavointi**, *kursiivi*, - listoille, [teksti](linkki). Muista merkintä.",
+      "saveDraft": "Tallenna luonnos",
+      "saving": "Tallennetaan…",
+      "submit": "Lähetä tarkastettavaksi",
+      "submitBlocked": "Korjaa yllä olevat puutteet, tallenna ja lähetä sitten tarkastettavaksi.",
+      "awaitingReview": "Lähetetty tarkastettavaksi – saat tiedon, jos asiakas pyytää muutoksia."
+    },
+    "brief": {
+      "heading": "Briiffi",
+      "message": "Kampanjan viesti",
+      "messageMissing": "Kampanjan viestiä ei vielä ole – kysy deskiltä ennen kuin aloitat.",
+      "audience": "Kohderyhmä",
+      "do": "Tee näin",
+      "dont": "Vältä",
+      "references": "Viitteet"
+    },
+    "spec": {
+      "heading": "Formaatin vaatimukset",
+      "words": "Pituus",
+      "wordsRange": "{min}–{max} sanaa",
+      "wordsMin": "Vähintään {min} sanaa",
+      "wordsMax": "Enintään {max} sanaa",
+      "notSpecified": "Ei määritetty",
+      "images": "Kuvat",
+      "imagesMin": "{count, plural, =1 {Vähintään 1 kuva} other {Vähintään # kuvaa}}",
+      "disclosure": "Mainosmerkintä (pakollinen)",
+      "fileFormats": "Tiedostomuodot",
+      "videoLength": "Videon pituus",
+      "videoSeconds": "Enintään {seconds} sekuntia",
+      "shoppable": "Tuotelinkit",
+      "shoppableMax": "{count, plural, =1 {Enintään 1 tuote} other {Enintään # tuotetta}}",
+      "requirements": "Muut vaatimukset",
+      "checkHeading": "Formaatin tarkistus",
+      "passed": "Kunnossa",
+      "failed": "Vaatii korjausta",
+      "notChecked": "Tallenna luonnos tekstinä, niin se tarkistetaan formaatin vaatimuksia vasten.",
+      "passedDetail": "Luonnos täyttää formaatin vaatimukset ({words} sanaa).",
+      "failDisclosure": "Merkintä ”{label}” puuttuu. Lukijan on nähtävä, että kyse on maksetusta sisällöstä.",
+      "failTooShort": "Liian lyhyt: {words} sanaa, formaatti vaatii vähintään {min}.",
+      "failTooLong": "Liian pitkä: {words} sanaa, formaatti sallii enintään {max}."
+    },
+    "profile": {
+      "title": "Oma profiili",
+      "lead": "Desk yhdistää kirjoittajat briiffeihin kielen, erikoisalan ja kapasiteetin perusteella – pidä profiilisi ajan tasalla.",
+      "noProfile": "Tällä tilillä ei ole kirjoittajaprofiilia.",
+      "saved": "Profiili tallennettu.",
+      "fixErrors": "Mitään ei tallennettu – korjaa merkityt kentät ja yritä uudelleen.",
+      "bio": "Tietoa sinusta",
+      "bioPlaceholder": "Aiheet, joita seuraat, mediat, joihin olet kirjoittanut, tyyli, josta sinut tunnetaan…",
+      "languages": "Kielet, joilla kirjoitat",
+      "languagesHint": "Valitse taso jokaiselle kielelle, jolla voit kirjoittaa. Vähintään yksi vaaditaan.",
+      "languageNone": "En kirjoita tällä",
+      "specialties": "Erikoisalat",
+      "ratePerArticle": "Hinta per artikkeli",
+      "ratePerWord": "Hinta per sana",
+      "currency": "Valuutta",
+      "currencyNone": "— Valitse —",
+      "maxActiveAssignments": "Aktiivisia toimeksiantoja enintään",
+      "maxActiveAssignmentsHint": "Jätä tyhjäksi, jos rajaa ei ole.",
+      "portfolioUrl": "Portfolion linkki",
+      "active": "Käytettävissä uusiin töihin",
+      "save": "Tallenna profiili",
+      "saving": "Tallennetaan…",
+      "errors": {
+        "bio": "Pidä se alle 2 000 merkissä.",
+        "languages": "Valitse vähintään yksi kieli.",
+        "ratePerArticle": "Anna nollaa suurempi summa, esimerkiksi 4500.",
+        "ratePerWord": "Anna nollaa suurempi summa, esimerkiksi 3,5.",
+        "currency": "Valitse hintojesi valuutta.",
+        "maxActiveAssignments": "Anna kokonaisluku 1–50 tai jätä kenttä tyhjäksi.",
+        "portfolioUrl": "Anna koko linkki, joka alkaa https://"
+      }
+    }
   },
   "listNames": {
     "untitled": "Uusi suunnitelma",

@@ -754,7 +754,7 @@ async function main() {
     data: { name: BUYER_ORG, type: "ADVERTISER", marketCode: MarketCode.NO },
   });
   const buyerHash = await bcrypt.hash(BUYER_PASSWORD, 10);
-  await prisma.user.upsert({
+  const buyer = await prisma.user.upsert({
     where: { email: BUYER_EMAIL },
     update: {
       passwordHash: buyerHash,
@@ -778,7 +778,7 @@ async function main() {
     data: { name: AGENCY_ORG, type: "AGENCY", marketCode: MarketCode.NO },
   });
   const agencyHash = await bcrypt.hash(AGENCY_PASSWORD, 10);
-  await prisma.user.upsert({
+  const agency = await prisma.user.upsert({
     where: { email: AGENCY_EMAIL },
     update: {
       passwordHash: agencyHash,
@@ -811,6 +811,23 @@ async function main() {
         },
       });
     }
+  }
+
+  // Both demo accounts created their org, so both hold its permanent ADMIN
+  // seat — what signup gives every org creator. Access, team management and
+  // ordering rights all come from this row (lib/workspace); without it the
+  // demo buyer has no workspace at all. The membership backfill migration
+  // runs before seeding, so it can't cover a fresh database. Upsert so a
+  // re-seed also heals a seat someone changed or removed while testing.
+  for (const [userId, organizationId] of [
+    [buyer.id, buyerOrg.id],
+    [agency.id, agencyOrg.id],
+  ] as const) {
+    await prisma.membership.upsert({
+      where: { userId_organizationId: { userId, organizationId } },
+      update: { role: "ADMIN", canCommit: true, expiresAt: null, status: "ACTIVE" },
+      create: { userId, organizationId, role: "ADMIN", canCommit: true },
+    });
   }
 
   const titleCount = await prisma.title.count();
