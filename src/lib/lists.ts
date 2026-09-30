@@ -64,6 +64,12 @@ async function loadList(id: string) {
   return prisma.savedList.findUnique({ where: { id }, include: ITEM_INCLUDE });
 }
 
+/** One list with the full item tree render/submit need. The caller has
+ *  already resolved which list (lib/plan-target.ts) and checked access. */
+export async function loadListWithItems(id: string) {
+  return loadList(id);
+}
+
 export type ActiveList = NonNullable<Awaited<ReturnType<typeof loadList>>>;
 
 /**

@@ -167,7 +167,8 @@
   },
   "home": {
     "title": "Køb native-indhold i premium aviser og magasiner",
-    "subtitle": "Et transparent katalog over hver titel der tilbyder native på tværs af 9 markeder. Giv os en brief — vi skriver det og booker det, også hvor programmatisk ikke er muligt."
+    "subtitle": "Et transparent katalog over hver titel der tilbyder native på tværs af 9 markeder. Giv os en brief — vi skriver det og booker det, også hvor programmatisk ikke er muligt.",
+    "nextWaveBodyDateNear": "Runde {n} er planlagt fra {date} – send den nu, så desken når at booke."
   },
   "catalog": {
     "eyebrow": "Udforsk",
@@ -295,7 +296,9 @@
       "unpricedNote": "{count, plural, =1 {1 titel mere findes i kataloget uden offentliggjort pris. Vores desk kan prissætte den.} other {# titler mere findes i kataloget uden offentliggjort pris. Vores desk kan prissætte dem.}}",
       "advancedToggle": "{count, plural, =0 {Avancerede filtre} other {Avancerede filtre (#)}}",
       "mobileFilters": "Filtre",
-      "marketCountAll": "Alle {total} markeder"
+      "marketCountAll": "Alle {total} markeder",
+      "formatHeading": "Hvilket format?",
+      "formatHint": "Native-artikel, advertorial, display, video …"
     },
     "shortlist": {
       "untitledPlan": "din plan",
@@ -321,7 +324,9 @@
       "askForPrice": "Bed om pris"
     },
     "exportCsv": "Download kataloget (CSV)",
-    "exportCsvMarket": "Download titler i {market} (CSV)"
+    "exportCsvMarket": "Download titler i {market} (CSV)",
+    "noMatchHeading": "Ingen resultater",
+    "searchSomeWords": "Ingen titler matcher alle ord i »{q}«, så disse matcher nogle af dem."
   },
   "lists": {
     "title": "Gemte lister",
@@ -341,7 +346,9 @@
     "undo": "Fortryd",
     "archivedHeading": "Arkiveret ({count})",
     "archivedOn": "arkiveret {date}",
-    "restore": "Gendan"
+    "restore": "Gendan",
+    "emptyCta": "Gå på opdagelse i kataloget",
+    "emptySecondaryCta": "Start en plan"
   },
   "favorites": {
     "title": "Favoritter",
@@ -470,7 +477,7 @@
       "minSpend": "Minimumsforbrug {currency} {amount, number}"
     },
     "publisherLinkHelp": "Se alle titler fra {name}",
-    "factVertical": "Vertical",
+    "factVertical": "Emneområde",
     "factReaderProfile": "Læserprofil",
     "availabilityTitle": "Tilgængelighed",
     "avail_open": "Ledig",
@@ -496,7 +503,7 @@
     "totalForItems": "{amount} for {count, plural, =1 {1 titel} other {# titler}}",
     "multiCurrencyNote": "Titler faktureres i udgiverens egen valuta — begge beløb skal betales, det er ikke et valg af valuta.",
     "rfqTitle": "Anmod om et fast tilbud",
-    "error": "Tilføj mindst én placering og udfyld virksomhed, e-mail og marked.",
+    "error": "Noget gik galt, da planen skulle sendes. Se den igennem, og prøv igen.",
     "linesEyebrow": "Valgt",
     "linesHeading": "Dine placeringer",
     "scheduledPeriod": "Fra {date} · {n} {unit}",
@@ -565,7 +572,7 @@
     "weWriteIt": "Vi skriver den",
     "needsPriceNote": "Denne udgiver har ikke offentliggjort listepris. At sende planen beder vores desk om at prissætte den — resten af din plan påvirkes ikke.",
     "breakdownUnpriced": "Bekræftes inden for 24 timer",
-    "breakdownWithArticle": "{placement} placering + {article} artikel",
+    "breakdownWithArticle": "{placement} placering + {article} pr. artikel",
     "breakdownQtyWithArticle": "{n} × {unit}, artikel inkluderet",
     "breakdownArticleIncluded": "Artikel inkluderet",
     "breakdownQty": "{n} × {unit}",
@@ -578,19 +585,19 @@
     "briefAdvancedToggle": "Tilføj budget, målgrupper og geografi",
     "reviewFavorites": "Se dem",
     "timing": {
-      "q3": "Q3 2026",
-      "q4": "Q4 2026",
       "flexible": "Fleksibelt",
-      "q3Sentence": "Ønsket tidspunkt: Q3 2026.",
-      "q4Sentence": "Ønsket tidspunkt: Q4 2026.",
-      "flexibleSentence": "Tidspunktet er fleksibelt."
+      "flexibleSentence": "Tidspunktet er fleksibelt.",
+      "quarter": "Q{quarter} {year}",
+      "quarterSentence": "Ønsket tidspunkt: Q{quarter} {year}."
     },
     "steps": {
       "label": "Planens fremdrift",
       "find": "Find titler",
       "build": "Byg planen",
       "quote": "Få et fast tilbud",
-      "approve": "Godkend og kør"
+      "approve": "Godkend og kør",
+      "confirm": "Bekræft bestillingen",
+      "run": "Produceres og køres"
     },
     "next": {
       "heading": "Hvad sker der nu",
@@ -630,7 +637,6 @@
         "awareness": "Kendskab bygges langsomt – runderne ligger lidt længere fra hinanden, så hver artikel lander for sig selv."
       },
       "preview": "fra {date}",
-      "previewFirst": "denne plan, som planlagt",
       "start": "Opret program",
       "starting": "Opretter…",
       "stripTitle": "{name} – runde {n} af {of}",
@@ -660,7 +666,8 @@
       "overlapWarning": "{title} kører i runde {a} og runde {b} samtidig – spred dem, eller vælg en anden titel.",
       "dissolveSummary": "Opløs programmet …",
       "dissolveBody": "Hver runde bliver en almindelig plan igen. Runder, I aldrig har sendt ind, arkiveres, så de ikke roder jeres planer til – alt, der allerede er sendt til desken, røres ikke.",
-      "dissolveConfirm": "Opløs programmet"
+      "dissolveConfirm": "Opløs programmet",
+      "waveName": "{name} · Runde {n}"
     },
     "share": {
       "summary": "Del med kunden",
@@ -674,7 +681,9 @@
       "approvedBadge": "Kunden godkendte",
       "engagementApproved": "Kunden godkendte planen {date}.",
       "engagementViewed": "Senest åbnet {date} · {count, plural, =1 {1 visning} other {# visninger}}.",
-      "engagementNone": "Ikke åbnet endnu."
+      "engagementNone": "Ikke åbnet endnu.",
+      "staleBadge": "Godkendt før ændringer",
+      "engagementStale": "Kunden godkendte en tidligere version {date}. Planen er ændret siden, så bed dem se på den igen."
     },
     "lineNoteLabel": "Bemærkning",
     "lineNoteAdd": "Tilføj bemærkning",
@@ -703,7 +712,23 @@
     "lineOrderSaveFailed": "Rækkefølgen kunne ikke gemmes – genindlæser planen.",
     "lineMovedAnnouncement": "Flyttet til plads {position} af {total}",
     "noticePlanArchived": "Den plan er arkiveret, så du ser din nuværende plan i stedet. Du kan gendanne den under Gemte lister.",
-    "noticePlanUnavailable": "Vi kunne ikke åbne den plan — linket kan være forældet, eller planen hører til et andet arbejdsområde. Dette er din nuværende plan."
+    "noticePlanUnavailable": "Vi kunne ikke åbne den plan — linket kan være forældet, eller planen hører til et andet arbejdsområde. Dette er din nuværende plan.",
+    "errorEmpty": "Læg mindst én placering i planen, før du sender den. Alternativer sendes ikke.",
+    "nothingToSend": "Flyt mindst én linje ind i planen for at sende den. Alternativer sendes ikke.",
+    "briefSaving": "Gemmer …",
+    "briefSaved": "Gemt i denne plan.",
+    "briefSaveFailed": "Kunne ikke gemme lige nu. Din tekst er her stadig og følger med, når du sender planen.",
+    "briefAutosaveHint": "Gemmes i planen, mens du skriver.",
+    "nextInstant": {
+      "heading": "Hvad sker der nu",
+      "item1Title": "Bestillingen bekræftes med det samme",
+      "item1Body": "Alle linjer har fast pris, så når du bekræfter, er bestillingen lagt ind. Du venter ikke på et tilbud.",
+      "item2Title": "Vi briefer udgiverne",
+      "item2Body": "Hver udgiver får bookingen og din brief. Skal noget ændres, klarer desken det sammen med dig.",
+      "item3Title": "Vi skriver, placerer og rapporterer",
+      "item3Body": "Udkast sendes til dig til godkendelse. Links og resultater lander i Rapporter."
+    },
+    "breakdownQtyWithArticleFee": "{n} × {unit} placering + {article} pr. artikel (én artikel til alle {n})"
   },
   "rfq": {
     "org": "Virksomhed",
@@ -1822,7 +1847,7 @@
     "step5Title": "Gå live og rapportér",
     "step5Body": "Udgiveren booker og publicerer. I får live-URL, sporing og en faktura med korrekt moms for jeres marked.",
     "modesTitle": "To bookingmåder",
-    "modeFirmTag": "Direkte",
+    "modeFirmTag": "Øjeblikkelig",
     "modeFirmTitle": "Fastpris — selvbetjening",
     "modeFirmBody": "Produkter med offentlig fastpris kan bookes direkte fra planen. Ingen desk-overdragelse, ingen ventetid.",
     "modeRfqTitle": "Prisanmodning — håndteret",
@@ -3269,7 +3294,9 @@
     "approvedAt": "Planen blev godkendt {date}. Din kontakt tager den videre herfra.",
     "noteLabel": "Bemærkning",
     "alternativesHeading": "Alternativer – ikke med i totalen",
-    "alternativesIntro": "Titler vi også anbefaler. De er ikke med i planen eller totalen."
+    "alternativesIntro": "Titler vi også anbefaler. De er ikke med i planen eller totalen.",
+    "changedSinceApproval": "Du godkendte en tidligere version af planen {date}. Den er ændret siden, så se den igennem og godkend igen.",
+    "approveAgainCta": "Godkend den opdaterede plan"
   },
   "quotePdf": {
     "documentTitle": "Tilbud {quoteNumber}",

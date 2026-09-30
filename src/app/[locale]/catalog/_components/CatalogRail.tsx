@@ -8,6 +8,8 @@ type Option = { value: string; label: string };
 
 type Props = {
   markets: Option[];
+  // Buyable formats (FORMAT_KEYS) with localized labels: the `types` param.
+  formats: Option[];
   nativeFits: Option[];
   b2bB2cs: Option[];
   reaches: Option[];
@@ -30,16 +32,29 @@ type Props = {
     videoIncluded: boolean;
     compareMode: boolean;
   };
+  // Staged (the mobile sheet): choices collect in a draft and nothing
+  // navigates until the sheet's "Apply" does. Unstaged (the desktop rail):
+  // every choice navigates at once.
+  staged?: boolean;
+  // Staged only: the draft query, reported on every change.
+  onDraftChange?: (draft: URLSearchParams) => void;
 };
 
 const SEARCH_DEBOUNCE_MS = 300;
+
+const list = (v: string | null) => (v ?? "").split(",").filter(Boolean);
 
 // Replaces CatalogFilters.tsx's full-width slab: a 268px rail grouped into
 // four plain-language questions instead of a flat row of technical labels.
 // Same URL-param model underneath (boolean flags as ?flag=1, multi-selects
 // comma-joined) — this only changes how the controls are grouped and worded.
+//
+// What the controls show is derived from `params` — the query the next
+// navigation will carry — so a staged rail (mobile sheet) reflects each tap
+// before anything reloads.
 export function CatalogRail({
   markets,
+  formats,
   nativeFits,
   b2bB2cs,
   reaches,
@@ -47,57 +62,72 @@ export function CatalogRail({
   regions,
   unpricedCount,
   initial,
+  staged = false,
+  onDraftChange,
 }: Props) {
   const sp = useSearchParams();
   const t = useTranslations("catalog.rail");
   const tf = useTranslations("catalog.filters");
 
+  const [params, setParams] = useState(() => new URLSearchParams(sp.toString()));
   const [q, setQ] = useState(initial.q);
   const [marketOpen, setMarketOpen] = useState(false);
+  const [formatOpen, setFormatOpen] = useState(false);
   const [categoryOpen, setCategoryOpen] = useState(false);
   const [advancedOpen, setAdvancedOpen] = useState(false);
   const marketRef = useRef<HTMLDivElement>(null);
+  const formatRef = useRef<HTMLDivElement>(null);
   const categoryRef = useRef<HTMLDivElement>(null);
 
-  // Full navigation, not router.replace() — see CatalogSort.tsx for why:
-  // same-route RSC soft navigation is currently broken in production.
+  // Unstaged: full navigation, not router.replace() — see CatalogSort.tsx
+  // for why: same-route RSC soft navigation is currently broken in
+  // production. Staged: only the draft changes.
   function commit(updater: (params: URLSearchParams) => void) {
-    const next = new URLSearchParams(sp.toString());
+    const next = new URLSearchParams(params.toString());
     updater(next);
     next.delete("page");
+    if (staged) {
+      setParams(next);
+      onDraftChange?.(next);
+      return;
+    }
     window.location.href = `${window.location.pathname}?${next.toString()}`;
   }
 
   function debouncedSearch(value: string) {
     setQ(value);
-    window.clearTimeout((debouncedSearch as { _t?: number })._t);
-    (debouncedSearch as { _t?: number })._t = window.setTimeout(() => {
+    const apply = () =>
       commit((p) => {
         if (value) p.set("q", value);
         else p.delete("q");
       });
-    }, SEARCH_DEBOUNCE_MS);
+    // A staged draft takes the text at once; a live rail waits for a pause.
+    if (staged) return apply();
+    window.clearTimeout((debouncedSearch as { _t?: number })._t);
+    (debouncedSearch as { _t?: number })._t = window.setTimeout(apply, SEARCH_DEBOUNCE_MS);
   }
 
-  function toggleMarket(value: string) {
-    const current = sp.get("market")?.split(",").filter(Boolean) ?? [];
-    const has = current.includes(value);
-    const next = has ? current.filter((v) => v !== value) : [...current, value];
+  function toggleIn(key: string, value: string) {
+    const current = list(params.get(key));
+    const next = current.includes(value) ? current.filter((v) => v !== value) : [...current, value];
     commit((p) => {
-      if (next.length) p.set("market", next.join(","));
-      else p.delete("market");
+      if (next.length) p.set(key, next.join(","));
+      else p.delete(key);
     });
   }
-
-  function toggleCategory(value: string) {
-    const current = sp.get("vertical")?.split(",").filter(Boolean) ?? [];
-    const has = current.includes(value);
-    const next = has ? current.filter((v) => v !== value) : [...current, value];
+  const toggleMarket = (value: string) => toggleIn("market", value);
+  const toggleCategory = (value: string) => toggleIn("vertical", value);
+  const toggleFormat = (value: string) => {
+    // Reads the legacy single `type` param too (old shared links), and
+    // folds it into `types` on the first change.
+    const current = list(params.get("types") ?? params.get("type"));
+    const next = current.includes(value) ? current.filter((v) => v !== value) : [...current, value];
     commit((p) => {
-      if (next.length) p.set("vertical", next.join(","));
-      else p.delete("vertical");
+      p.delete("type");
+      if (next.length) p.set("types", next.join(","));
+      else p.delete("types");
     });
-  }
+  };
 
   function setSingle(key: string, value: string) {
     commit((p) => {
@@ -114,23 +144,48 @@ export function CatalogRail({
   }
 
   function reset() {
+    if (staged) {
+      setQ("");
+      const empty = new URLSearchParams();
+      setParams(empty);
+      onDraftChange?.(empty);
+      return;
+    }
     window.location.href = window.location.pathname;
   }
 
+  // What the controls show: the draft (staged) or the page's own query.
+  const view = {
+    markets: list(params.get("market")),
+    types: list(params.get("types") ?? params.get("type")),
+    verticals: list(params.get("vertical")),
+    regions: list(params.get("region")),
+    nativeFit: params.get("nativeFit") ?? "",
+    b2bB2c: params.get("b2bB2c") ?? "",
+    onlyPriced: params.get("onlyPriced") === "1",
+    producedForYou: params.get("producedForYou") === "1",
+    guaranteedReach: params.get("guaranteedReach") === "1",
+    newsletterIncluded: params.get("newsletterIncluded") === "1",
+    videoIncluded: params.get("videoIncluded") === "1",
+    compareMode: params.get("compareMode") === "1",
+  };
+
   const advancedCount = [
-    initial.nativeFit,
-    initial.regions.length > 0,
-    initial.compareMode,
-    initial.onlyPriced,
+    view.nativeFit,
+    view.regions.length > 0,
+    view.compareMode,
+    view.onlyPriced,
   ].filter(Boolean).length;
-  const selectedMarkets = new Set(initial.markets);
-  const primaryMarket =
-    initial.markets.length > 0
-      ? (markets.find((m) => m.value === initial.markets[0])?.label ?? initial.markets[0])
+  const firstLabel = (options: Option[], values: string[]) =>
+    values.length > 0
+      ? `${options.find((o) => o.value === values[0])?.label ?? values[0]}${values.length > 1 ? ` +${values.length - 1}` : ""}`
       : tf("all");
-  const selectedCategories = new Set(initial.verticals);
-  const primaryCategory =
-    initial.verticals.length > 0 ? initial.verticals[0] : tf("all");
+  const selectedMarkets = new Set(view.markets);
+  const primaryMarket = firstLabel(markets, view.markets);
+  const selectedFormats = new Set(view.types);
+  const primaryFormat = firstLabel(formats, view.types);
+  const selectedCategories = new Set(view.verticals);
+  const primaryCategory = firstLabel(categories, view.verticals);
 
   return (
     <aside className="catalog-rail">
@@ -196,6 +251,37 @@ export function CatalogRail({
       </div>
 
       <div className="catalog-rail__group">
+        <h3>{t("formatHeading")}</h3>
+        <p className="catalog-rail__hint">{t("formatHint")}</p>
+        <div className="catalog-rail__select-box" ref={formatRef}>
+          <button
+            type="button"
+            className="catalog-rail__select-trigger"
+            onClick={() => setFormatOpen((o) => !o)}
+            aria-haspopup="true"
+            aria-expanded={formatOpen}
+          >
+            <span>{primaryFormat}</span>
+            <span aria-hidden="true">⌄</span>
+          </button>
+          {formatOpen ? (
+            <div className="catalog-rail__popover" role="dialog">
+              {formats.map((f) => (
+                <label key={f.value} className="catalog-rail__popover-row">
+                  <input
+                    type="checkbox"
+                    checked={selectedFormats.has(f.value)}
+                    onChange={() => toggleFormat(f.value)}
+                  />
+                  <span>{f.label}</span>
+                </label>
+              ))}
+            </div>
+          ) : null}
+        </div>
+      </div>
+
+      <div className="catalog-rail__group">
         <h3>{t("whoHeading")}</h3>
         <p className="catalog-rail__hint">{t("whoHint")}</p>
         <div className="catalog-rail__select-box" ref={categoryRef}>
@@ -229,7 +315,7 @@ export function CatalogRail({
             <button
               key={v.value}
               type="button"
-              className={`catalog-rail__segment${initial.b2bB2c === v.value ? " is-active" : ""}`}
+              className={`catalog-rail__segment${view.b2bB2c === v.value ? " is-active" : ""}`}
               onClick={() => setSingle("b2bB2c", v.value)}
             >
               {v.label}
@@ -237,7 +323,7 @@ export function CatalogRail({
           ))}
           <button
             type="button"
-            className={`catalog-rail__segment${initial.b2bB2c === "" ? " is-active" : ""}`}
+            className={`catalog-rail__segment${view.b2bB2c === "" ? " is-active" : ""}`}
             onClick={() => setSingle("b2bB2c", "")}
           >
             {t("both")}
@@ -251,7 +337,7 @@ export function CatalogRail({
         <label className="catalog-rail__check">
           <input
             type="checkbox"
-            checked={initial.producedForYou}
+            checked={view.producedForYou}
             onChange={(e) => toggleFlag("producedForYou", e.target.checked)}
           />
           <span>
@@ -262,7 +348,7 @@ export function CatalogRail({
         <label className="catalog-rail__check">
           <input
             type="checkbox"
-            checked={initial.guaranteedReach}
+            checked={view.guaranteedReach}
             onChange={(e) => toggleFlag("guaranteedReach", e.target.checked)}
           />
           <span>
@@ -273,7 +359,7 @@ export function CatalogRail({
         <label className="catalog-rail__check">
           <input
             type="checkbox"
-            checked={initial.newsletterIncluded}
+            checked={view.newsletterIncluded}
             onChange={(e) => toggleFlag("newsletterIncluded", e.target.checked)}
           />
           <span>
@@ -284,7 +370,7 @@ export function CatalogRail({
         <label className="catalog-rail__check">
           <input
             type="checkbox"
-            checked={initial.videoIncluded}
+            checked={view.videoIncluded}
             onChange={(e) => toggleFlag("videoIncluded", e.target.checked)}
           />
           <span>
@@ -309,7 +395,7 @@ export function CatalogRail({
             <label htmlFor="rail-nativeFit">{tf("nativeFit")}</label>
             <select
               id="rail-nativeFit"
-              value={initial.nativeFit}
+              value={view.nativeFit}
               onChange={(e) => setSingle("nativeFit", e.target.value)}
             >
               <option value="">{tf("all")}</option>
@@ -325,7 +411,7 @@ export function CatalogRail({
               <label htmlFor="rail-region">{tf("region")}</label>
               <select
                 id="rail-region"
-                value={initial.regions[0] ?? ""}
+                value={view.regions[0] ?? ""}
                 onChange={(e) => setSingle("region", e.target.value)}
               >
                 <option value="">{tf("allRegions")}</option>
@@ -340,7 +426,7 @@ export function CatalogRail({
           <label className="catalog-rail__check">
             <input
               type="checkbox"
-              checked={initial.compareMode}
+              checked={view.compareMode}
               onChange={(e) => toggleFlag("compareMode", e.target.checked)}
             />
             <span>
@@ -351,14 +437,14 @@ export function CatalogRail({
           <label className="catalog-rail__check">
             <input
               type="checkbox"
-              checked={initial.onlyPriced}
+              checked={view.onlyPriced}
               onChange={(e) => toggleFlag("onlyPriced", e.target.checked)}
             />
             <span>
               <strong>{tf("onlyPriced")}</strong>
             </span>
           </label>
-          {initial.onlyPriced && unpricedCount && unpricedCount > 0 ? (
+          {view.onlyPriced && unpricedCount && unpricedCount > 0 ? (
             <p className="catalog-rail__note">{t("unpricedNote", { count: unpricedCount })}</p>
           ) : null}
         </div>

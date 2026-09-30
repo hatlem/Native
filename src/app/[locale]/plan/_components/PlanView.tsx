@@ -7,7 +7,7 @@ import { signinPath } from "@/lib/auth-gate";
 import { prisma } from "@/lib/prisma";
 import { getWorkspace } from "@/lib/workspace";
 import { Link } from "@/i18n/navigation";
-import { readPlanBrief } from "@/lib/basket";
+import { planBriefValues, timingOptions } from "@/lib/plan-brief";
 import { readActiveListId, resolveActiveList } from "@/lib/lists";
 import { titleDisplayName } from "@/lib/title-display";
 import { intlLocale } from "@/lib/money";
@@ -20,9 +20,10 @@ import type { Candidate, SupplementaryTitle } from "@/lib/recommend";
 import { recommendForBrief } from "@/lib/campaign-recommend";
 import { loadPricingDefaults } from "@/lib/content-fee";
 import { timeAgo } from "@/lib/time-ago";
-import { loadVerticalOptions } from "@/lib/catalog-taxonomy";
+import { loadVerticalOptions, localizedVerticalOptions } from "@/lib/catalog-taxonomy";
 import { PlanBanners } from "./PlanBanners";
 import { PlanShare } from "./PlanShare";
+import { approvalState, planVersion } from "@/lib/list-share";
 import { PlanStart } from "./PlanStart";
 import { PlanSteps, type PlanStep } from "./PlanSteps";
 import { PlanTitleBlock } from "./PlanTitleBlock";
@@ -41,9 +42,10 @@ const MARKET_CODES = SUPPORTED_MARKETS;
 
 // The plan page body, shared by /plan (no active list yet: start/empty states)
 // and /plan/[listId] (the canonical, shareable address of one plan). The list
-// rendered is always the ACTIVE list from the cookie — /plan/[listId] makes
-// sure the cookie names that list first (via /plan/open), so what this renders
-// and what "Send" submits can never disagree.
+// rendered is the ACTIVE list from the cookie, which /plan/[listId] aligns with
+// its address first (via /plan/open). Every form here posts that list's id and
+// the actions act on it (lib/plan-target.ts), so another tab moving the cookie
+// on afterwards can't make "Send" or a line edit land on a different plan.
 export async function PlanView({
   locale,
   sp,
@@ -91,11 +93,6 @@ export async function PlanView({
   // actionable empty state instead of a bare error banner with no way forward.
   const needsWorkspace = !ws?.activeOrgId;
 
-  // Rehydrate the brief from the cookie submitRequest stashed before
-  // the onboarding gate detour. Empty strings on the fresh path —
-  // React leaves the input blank when defaultValue is "".
-  const briefDraft = await readPlanBrief();
-
   // The plan now operates on the active SavedList (not the legacy cookie
   // basket). The switcher needs every non-archived list for this org.
   const lists = ws?.activeOrgId
@@ -105,11 +102,10 @@ export async function PlanView({
         select: { id: true, name: true, _count: { select: { items: true } } },
       })
     : [];
-  // The active list comes from the cookie ONLY. Deep links that need to switch
-  // it (the placement-ready notification) go through /plan/open, which writes
-  // the cookie and redirects here — so what this page renders and what the
-  // submit button acts on (submitRequest reads the same cookie) can never
-  // disagree.
+  // The active list comes from the cookie, which /plan/[listId] has aligned
+  // with its address (via /plan/open) before rendering. The page's forms post
+  // this list's id, so what they act on is the plan shown here even if another
+  // tab moves the cookie on afterwards (lib/plan-target.ts).
   const activeList = ws?.activeOrgId
     ? await resolveActiveList(ws.activeOrgId, await readActiveListId())
     : null;
@@ -117,7 +113,7 @@ export async function PlanView({
     redirect(planPath(locale, null, { ...sp, notice: "plan-unavailable" }));
   }
   const listItems = activeList?.items ?? [];
-  const verticalOptions = activeList ? await loadVerticalOptions() : [];
+  const verticalOptions = activeList ? localizedVerticalOptions(await loadVerticalOptions(), locale) : [];
   const targetVerticals = (activeList?.targetVerticals ?? "")
     .split(",")
     .map((v) => v.trim())
@@ -248,6 +244,7 @@ export async function PlanView({
     itemId: i.id,
     titleId: i.titleId as string,
     titleName: titleDisplayName(i.title!),
+    publisherName: i.title!.publisher.name,
     quantity: i.quantity,
     placements: placementsByTitle.get(i.titleId as string) ?? [],
     notes: i.notes,
@@ -258,6 +255,19 @@ export async function PlanView({
   const altTitleLines = allTitleLines.filter((l) => l.isAlternative);
 
   const hasHiddenPrice = lines.some((l) => !l.priceVisible);
+
+  // Sold-out / editorially closed periods, so the lines' inline date picker
+  // disables them (same data the campaign flow's Schedule step reads).
+  const blockedPeriods = new Set(
+    lines.length
+      ? (
+          await prisma.availability.findMany({
+            where: { productId: { in: lines.map((l) => l.product.id) }, blocked: true },
+            select: { productId: true, year: true, month: true },
+          })
+        ).map((r) => `${r.productId}:${r.year}-${r.month}`)
+      : [],
+  );
 
   // Per-currency totals, content fees and VAT included — the amount the plan
   // commits to (lib/plan-total.ts, the order's own pricing engine). Locked-price
@@ -458,7 +468,10 @@ export async function PlanView({
 
   return (
     <>
-      {hasLines && !needsWorkspace ? null : (
+      {/* A named plan keeps its own title block (name, rename, "Switch plan")
+          even while empty, so a buyer who just created one can see which plan
+          is active and switch back. The generic header is for no plan at all. */}
+      {activeList && !needsWorkspace ? null : (
         <header className="page-header">
           <span className="eyebrow accent">{t("eyebrow")}</span>
           <h1>{t("title")}</h1>
@@ -508,8 +521,21 @@ export async function PlanView({
           </div>
         )
       ) : !hasLines ? (
+        <>
+          {activeList ? (
+            <PlanTitleBlock
+              locale={locale}
+              planName={activeList.name}
+              activeListId={activeList.id}
+              placementCount={0}
+              orgName={activeOrg?.name ?? null}
+              lastEdited={lastEdited}
+              lists={lists}
+            />
+          ) : null}
         <PlanStart
           locale={locale}
+          listId={activeList?.id ?? null}
           recBriefRaw={recBriefRaw}
           recMarket={recMarket}
           recBudgetRaw={recBudgetRaw}
@@ -517,9 +543,10 @@ export async function PlanView({
           rec={rec}
           briefMatched={briefMatched}
         />
+        </>
       ) : (
         <>
-          <PlanSteps locale={locale} currentStep={currentStep} />
+          <PlanSteps locale={locale} currentStep={currentStep} instant={allFirm && canCommit} />
           <PlanTitleBlock
             locale={locale}
             planName={activeList?.name ?? t("title")}
@@ -557,6 +584,7 @@ export async function PlanView({
                 altLines={altLines}
                 altTitleLines={altTitleLines}
                 hasHiddenPrice={hasHiddenPrice}
+                blockedPeriods={blockedPeriods}
               />
               {favoriteCount > 0 ? (
                 <div className="plan-favorites-bridge">
@@ -570,6 +598,7 @@ export async function PlanView({
             <div className="plan-summary-col">
               <PlanSummary
                 locale={locale}
+                listId={activeList!.id}
                 totals={totals}
                 hasHiddenPrice={hasHiddenPrice}
                 allFirm={allFirm}
@@ -578,9 +607,10 @@ export async function PlanView({
                 lineCount={placementCount}
                 needsClient={needsClient}
                 activeOrg={activeOrg}
-                briefDraft={briefDraft}
+                brief={planBriefValues(activeList!)}
+                timingOptions={timingOptions(new Date())}
               />
-              <WhatHappensNext locale={locale} />
+              <WhatHappensNext locale={locale} instant={allFirm && canCommit} />
               {activeList ? (
                 <PlanShare
                   locale={locale}
@@ -588,7 +618,7 @@ export async function PlanView({
                   shareToken={activeList.shareToken}
                   shareViewedAt={activeList.shareViewedAt}
                   shareViewCount={activeList.shareViewCount}
-                  clientApprovedAt={activeList.clientApprovedAt}
+                  approval={approvalState(activeList, planVersion(activeList.items))}
                 />
               ) : null}
             </div>

@@ -7,7 +7,8 @@ import { formatMoney, intlLocale } from "@/lib/money";
 import { titleDisplayName } from "@/lib/title-display";
 import { removeFromPlan, setQuantity, setContentProduction, setLineNote, setLineAlternative } from "@/app/plan-actions";
 import { LINE_NOTE_MAX } from "@/lib/line-note";
-import { resolveTitleLine } from "@/app/list-actions";
+import { resolveTitleLine, setItemSchedule } from "@/app/list-actions";
+import { upcomingPeriods, type BookingUnit } from "@/lib/campaign-schedule";
 import { PlanLineBoard, type PlanBoardEntry } from "./PlanLineBoard";
 
 type PlanProduct = Prisma.ProductGetPayload<{
@@ -53,6 +54,9 @@ export type PlanTitleLine = {
   itemId: string;
   titleId: string;
   titleName: string;
+  // Sorts "By publisher" among the product lines (an empty name sorted every
+  // placeholder first).
+  publisherName: string;
   quantity: number;
   placements: { id: string; label: string }[];
   notes: string | null;
@@ -77,29 +81,105 @@ function periodLabel(
 }
 
 // The transparency the single total figure lacks: what the line total is
-// actually made of. Only the pieces we can compute indicatively pre-quote —
-// the content fee is desk-owned pricing resolved by the same rule the order
-// applies (lib/plan-total.ts linePrice), and it is already inside the line
-// total above this text — the breakdown explains the figure, never adds to it.
-function breakdown(
-  l: PlanLine,
-  locale: string,
-  t: Awaited<ReturnType<typeof getTranslations>>,
-): string {
+// actually made of. The parts come from lib/plan-total.ts linePrice() (the
+// rule the order prices with), so they always add up to the line total shown
+// beside them; the breakdown explains the figure, never adds to it. The
+// content fee is charged once per line: one article, used for every run.
+function breakdown(l: PlanLine, locale: string, t: Awaited<ReturnType<typeof getTranslations>>): string {
   if (!l.priceVisible) return t("breakdownUnpriced");
-  const unit = formatMoney(l.placementTotal / l.quantity, l.product.currency, locale);
-  if (l.withContent) {
-    if (l.contentFee > 0) {
-      return t("breakdownWithArticle", {
-        placement: formatMoney(l.placementTotal, l.product.currency, locale),
-        article: formatMoney(l.contentFee, l.product.currency, locale),
-      });
-    }
-    if (l.quantity > 1) return t("breakdownQtyWithArticle", { n: l.quantity, unit });
-    return t("breakdownArticleIncluded");
+  const money = (n: number) => formatMoney(n, l.product.currency, locale);
+  if (l.withContent && l.contentFee > 0) {
+    return l.quantity > 1
+      ? t("breakdownQtyWithArticleFee", {
+          n: l.quantity,
+          unit: money(l.placementTotal / l.quantity),
+          article: money(l.contentFee),
+        })
+      : t("breakdownWithArticle", { placement: money(l.placementTotal), article: money(l.contentFee) });
   }
-  if (l.quantity > 1) return t("breakdownQty", { n: l.quantity, unit });
+  if (l.withContent) {
+    // "We write it" with no fee rule: production is included in the price.
+    return l.quantity > 1
+      ? t("breakdownQtyWithArticle", { n: l.quantity, unit: money(l.placementTotal / l.quantity) })
+      : t("breakdownArticleIncluded");
+  }
+  if (l.quantity > 1) {
+    return t("breakdownQty", { n: l.quantity, unit: money(l.placementTotal / l.quantity) });
+  }
   return "";
+}
+
+// How many start periods the inline date picker offers (months or weeks).
+const SCHEDULE_PERIODS = 12;
+
+// "Set dates" on a line: a native <details> disclosure with the line's start
+// period and run length, saved through the same action the campaign flow's
+// Schedule step uses. It lives on the plan itself, so it works whether or not
+// the campaign flow is switched on (it used to link to /campaign, a 404 while
+// that flag is off).
+function LineSchedule({
+  locale,
+  l,
+  blockedPeriods,
+  label,
+  tCampaign,
+}: {
+  locale: string;
+  l: PlanLine;
+  blockedPeriods: ReadonlySet<string>;
+  label: string;
+  tCampaign: Awaited<ReturnType<typeof getTranslations>>;
+}) {
+  const unit = l.product.bookingUnit as BookingUnit;
+  const min = l.product.minDurationUnits ?? 1;
+  const periods = upcomingPeriods(unit, SCHEDULE_PERIODS, new Date());
+  const current = l.scheduleStart ? new Date(l.scheduleStart).toISOString().slice(0, 10) : "";
+  const fmt = new Intl.DateTimeFormat(intlLocale(locale), {
+    ...(unit === "WEEK" ? { day: "numeric", month: "short" } : { month: "long", year: "numeric" }),
+    timeZone: "UTC",
+  });
+  return (
+    <details className="plan-line-card__schedule">
+      <summary>
+        <Calendar size={14} strokeWidth={1.7} aria-hidden="true" />
+        {label}
+      </summary>
+      <form action={setItemSchedule} className="plan-line-card__schedule-form">
+        <input type="hidden" name="locale" value={locale} />
+        <input type="hidden" name="itemId" value={l.itemId} />
+        <label>
+          <span className="label">{tCampaign("scheduleStartLabel")}</span>
+          <select name="scheduleStart" defaultValue={current} required>
+            <option value="" disabled>
+              {tCampaign("scheduleStartPlaceholder")}
+            </option>
+            {/* A saved start that has scrolled out of the offered window stays selectable. */}
+            {current && !periods.some((p) => p.iso === current) ? (
+              <option value={current}>{fmt.format(new Date(`${current}T00:00:00Z`))}</option>
+            ) : null}
+            {periods.map((p) => {
+              const soldOut = blockedPeriods.has(`${l.product.id}:${p.year}-${p.month}`);
+              return (
+                <option key={p.iso} value={p.iso} disabled={soldOut}>
+                  {fmt.format(new Date(`${p.iso}T00:00:00Z`))}
+                  {soldOut ? ` (${tCampaign("soldOut")})` : ""}
+                </option>
+              );
+            })}
+          </select>
+        </label>
+        <label>
+          <span className="label">
+            {unit === "WEEK" ? tCampaign("scheduleWeeksLabel") : tCampaign("scheduleMonthsLabel")}
+          </span>
+          <input type="number" name="scheduleUnits" min={min} defaultValue={l.scheduleUnits ?? min} />
+        </label>
+        <button type="submit" className="btn small">
+          {tCampaign("scheduleSave")}
+        </button>
+      </form>
+    </details>
+  );
 }
 
 // The customer-visible line note plus its inline editor. A native <details>
@@ -183,6 +263,7 @@ export async function PlanLines({
   altLines = [],
   altTitleLines = [],
   hasHiddenPrice,
+  blockedPeriods = new Set<string>(),
 }: {
   locale: string;
   listId: string;
@@ -191,6 +272,8 @@ export async function PlanLines({
   altLines?: PlanLine[];
   altTitleLines?: PlanTitleLine[];
   hasHiddenPrice: boolean;
+  // Sold-out / closed periods for the date picker, keyed "productId:YYYY-M".
+  blockedPeriods?: ReadonlySet<string>;
 }) {
   const t = await getTranslations({ locale, namespace: "plan" });
   const tType = await getTranslations({ locale, namespace: "productType" });
@@ -214,8 +297,8 @@ export async function PlanLines({
   const titleEntry = (tl: PlanTitleLine, node: ReactNode): PlanBoardEntry => ({
     id: tl.itemId,
     position: tl.position,
-    search: [tl.titleName, tl.notes ?? ""].join(" "),
-    sort: { id: tl.itemId, title: tl.titleName, publisher: "", price: null },
+    search: [tl.titleName, tl.publisherName, tl.notes ?? ""].join(" "),
+    sort: { id: tl.itemId, title: tl.titleName, publisher: tl.publisherName, price: null },
     node,
   });
 
@@ -280,10 +363,13 @@ export async function PlanLines({
                   </button>
                 </form>
               </div>
-              <Link href="/campaign?step=schedule" className="plan-line-card__schedule">
-                <Calendar size={14} strokeWidth={1.7} aria-hidden="true" />
-                {period ?? t("setDates")}
-              </Link>
+              <LineSchedule
+                locale={locale}
+                l={l}
+                blockedPeriods={blockedPeriods}
+                label={period ?? t("setDates")}
+                tCampaign={tCampaign}
+              />
             </div>
           </div>
 

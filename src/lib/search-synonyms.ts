@@ -96,6 +96,53 @@ export const SYNONYM_GROUPS: readonly (readonly string[])[] = [
   ],
 ];
 
+// ---------- spelling variants (æ/ø/å typed as ASCII, and back) ----------
+
+// A buyer on a keyboard without æ/ø/å types "tromso", "baerum", "orsta"; the
+// index holds "tromsø", "bærum", "ørsta" (the 'simple' FTS config doesn't
+// fold diacritics). spellingVariants() produces the æ/ø/å spellings of an
+// ASCII query word, so both the FTS query and the ILIKE fallback look for
+// them. Only in that direction: a buyer who types "Sør" means Sør, and
+// folding it to "sor" would pull in every "Sor…" title.
+
+// ASCII spellings of æ/ø/å/ä/ö/ü: digraphs first (they are unambiguous),
+// then single letters.
+const DIGRAPHS: ReadonlyArray<readonly [string, readonly string[]]> = [
+  ["ae", ["æ", "ä"]],
+  ["oe", ["ø", "ö"]],
+  ["aa", ["å"]],
+  ["ue", ["ü"]],
+];
+const SINGLES: Readonly<Record<string, readonly string[]>> = {
+  o: ["ø", "ö"],
+  a: ["å", "ä"],
+  u: ["ü"],
+};
+const MAX_SPELLING_VARIANTS = 10;
+
+/**
+ * The æ/ø/å spellings of an ASCII query word, never including the word
+ * itself: the forms with ONE letter or digraph restored (each position on
+ * its own, which covers real place and trade names: tromso → tromsø,
+ * baerum → bærum, orsta → ørsta, malmo → malmö), capped so a long word can't
+ * blow up the query. A word that already has such letters, and two-letter
+ * words ("at" is not "åt"), have none.
+ */
+export function spellingVariants(word: string): string[] {
+  const w = normalizeSynonymTerm(word);
+  if (w.length < 3 || /[æøåäöü]/.test(w)) return [];
+  const out = new Set<string>();
+  for (const [ascii, letters] of DIGRAPHS) {
+    for (let i = w.indexOf(ascii); i >= 0; i = w.indexOf(ascii, i + 1)) {
+      for (const l of letters) out.add(w.slice(0, i) + l + w.slice(i + ascii.length));
+    }
+  }
+  for (let i = 0; i < w.length; i++) {
+    for (const l of SINGLES[w[i]] ?? []) out.add(w.slice(0, i) + l + w.slice(i + 1));
+  }
+  return [...out].slice(0, MAX_SPELLING_VARIANTS);
+}
+
 let index: Map<string, readonly string[]> | null = null;
 
 function buildIndex(): Map<string, readonly string[]> {

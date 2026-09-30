@@ -1,8 +1,15 @@
 import { test, before, after } from "node:test";
 import assert from "node:assert/strict";
 import { prisma } from "./prisma";
-import { ensureActiveList, addProductItem } from "./lists";
-import { enableListShare, disableListShare, loadSharedList } from "./list-share";
+import { ensureActiveList, addProductItem, setItemQuantity } from "./lists";
+import {
+  approvalState,
+  approveSharedList,
+  enableListShare,
+  disableListShare,
+  loadSharedList,
+  planVersion,
+} from "./list-share";
 
 // Client-share links at the lib layer (server actions need a session — same
 // convention as the other *.it suites). The invariants a public, unauthenticated
@@ -68,5 +75,75 @@ if (!RUN_DB_IT) {
     const again = await enableListShare(list.id);
     await prisma.savedList.update({ where: { id: list.id }, data: { archivedAt: new Date() } });
     assert.equal(await loadSharedList(again), null, "archived list never renders");
+  });
+
+  test("client approval covers one version: stale after a line change, cleared by a new link", async () => {
+    const list = await prisma.savedList.create({ data: { organizationId: orgId, name: "Approval IT" } });
+    const item = await addProductItem(list.id, productId);
+    const token = await enableListShare(list.id);
+    const shown = await loadSharedList(token);
+    const version = planVersion(shown!.items);
+
+    // A version the page never showed approves nothing.
+    assert.deepEqual(await approveSharedList(token, "not-the-shown-version"), { outcome: "changed" });
+
+    const first = await approveSharedList(token, version);
+    assert.equal(first.outcome, "approved");
+    // Double click / second tab: no second approval (and no second notice).
+    assert.deepEqual(await approveSharedList(token, version), { outcome: "already" });
+    let row = await prisma.savedList.findUniqueOrThrow({ where: { id: list.id } });
+    assert.equal(approvalState(row, version).kind, "current");
+
+    // The buyer changes a line after approval: the approval is for an earlier
+    // version ("approved before changes"), and the client can approve again.
+    await setItemQuantity(item.id, 3);
+    const changed = planVersion((await loadSharedList(token))!.items);
+    assert.notEqual(changed, version);
+    row = await prisma.savedList.findUniqueOrThrow({ where: { id: list.id } });
+    assert.equal(approvalState(row, changed).kind, "stale");
+    // Approving from a page loaded BEFORE the change is refused.
+    assert.deepEqual(await approveSharedList(token, version), { outcome: "changed" });
+    assert.equal((await approveSharedList(token, changed)).outcome, "approved");
+    row = await prisma.savedList.findUniqueOrThrow({ where: { id: list.id } });
+    assert.equal(approvalState(row, changed).kind, "current");
+
+    // A new link starts a new review round.
+    await enableListShare(list.id);
+    row = await prisma.savedList.findUniqueOrThrow({ where: { id: list.id } });
+    assert.equal(row.clientApprovedAt, null);
+    assert.equal(approvalState(row, changed).kind, "none");
+  });
+
+  test("planVersion ignores alternatives and line order", async () => {
+    const list = await prisma.savedList.create({ data: { organizationId: orgId, name: "Version IT" } });
+    await addProductItem(list.id, productId);
+    const items = await prisma.savedListItem.findMany({ where: { listId: list.id } });
+    const base = planVersion(items);
+    assert.equal(planVersion([...items].reverse()), base);
+    assert.equal(
+      planVersion([...items, { ...items[0], id: "alt", isAlternative: true }]),
+      base,
+      "an alternative is not part of what the client approves",
+    );
+  });
+
+  test("an approval from before versioning reads as stale, and the client can approve again", async () => {
+    const list = await prisma.savedList.create({
+      data: { organizationId: orgId, name: "Legacy approval IT", clientApprovedAt: new Date("2026-09-01T10:00:00Z") },
+    });
+    await addProductItem(list.id, productId);
+    const token = await enableListShare(list.id);
+    // enableListShare starts a new review round; restore the legacy state.
+    await prisma.savedList.update({
+      where: { id: list.id },
+      data: { clientApprovedAt: new Date("2026-09-01T10:00:00Z"), clientApprovedVersion: null },
+    });
+    const shown = await loadSharedList(token);
+    const version = planVersion(shown!.items);
+    let row = await prisma.savedList.findUniqueOrThrow({ where: { id: list.id } });
+    assert.equal(approvalState(row, version).kind, "stale");
+    assert.equal((await approveSharedList(token, version)).outcome, "approved");
+    row = await prisma.savedList.findUniqueOrThrow({ where: { id: list.id } });
+    assert.equal(approvalState(row, version).kind, "current");
   });
 }

@@ -1,6 +1,6 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { reorderSection, sortLines, displayOrder, ReorderMismatchError } from "./plan-reorder";
+import { reorderSection, sortLines, displayOrder, detectSortKey, ReorderMismatchError } from "./plan-reorder";
 
 const at = (s: number) => new Date(Date.UTC(2026, 8, 29, 12, 0, s));
 // Plan lines a, b, c interleaved with alternatives X, Y.
@@ -70,4 +70,17 @@ test("sortLines: publisher, then title within a publisher", () => {
     { id: "3", title: "Anleggsmagasinet", publisher: "Nordiske Medier", price: null },
   ];
   assert.deepEqual(sortLines(lines, "publisher", "nb"), ["3", "1", "2"]);
+});
+
+test("detectSortKey: a saved order that one sort reproduces shows that sort after reload", () => {
+  const a = { id: "a", title: "Aftenposten", publisher: "Schibsted", price: 100 };
+  const b = { id: "b", title: "Budstikka", publisher: "Amedia", price: 200 };
+  const c = { id: "c", title: "iTromsø", publisher: "Polaris", price: 300 };
+  assert.equal(detectSortKey([a, b, c], "nb"), "title");
+  assert.equal(detectSortKey([b, c, a], "nb"), "publisher"); // Amedia, Polaris, Schibsted
+  assert.equal(detectSortKey([c, b, a], "nb"), "price"); // highest first
+  // An order no sort produces is the buyer's own.
+  assert.equal(detectSortKey([c, a, b], "nb"), "custom");
+  // One line can't tell sorts apart.
+  assert.equal(detectSortKey([a], "nb"), "custom");
 });

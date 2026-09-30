@@ -305,7 +305,8 @@
   },
   "home": {
     "title": "Osta natiivisisältöä premium-sanoma- ja aikakauslehdistä",
-    "subtitle": "Läpinäkyvä katalogi jokaisesta tittelistä, joka tarjoaa natiivia 9 markkinalla. Lähetä brief — kirjoitamme sen ja varaamme sen, myös sinne missä programmaattinen ei toimi."
+    "subtitle": "Läpinäkyvä katalogi jokaisesta tittelistä, joka tarjoaa natiivia 9 markkinalla. Lähetä brief — kirjoitamme sen ja varaamme sen, myös sinne missä programmaattinen ei toimi.",
+    "nextWaveBodyDateNear": "Kierros {n} alkaa {date} – lähetä se nyt, jotta deski ehtii varata."
   },
   "catalog": {
     "eyebrow": "Selaa",
@@ -433,7 +434,9 @@
       "unpricedNote": "{count, plural, =1 {Katalogissa on vielä 1 julkaisu ilman julkaistua hintaa. Deskimme voi hinnoitella sen.} other {Katalogissa on vielä # julkaisua ilman julkaistua hintaa. Deskimme voi hinnoitella ne.}}",
       "advancedToggle": "{count, plural, =0 {Lisäsuodattimet} other {Lisäsuodattimet (#)}}",
       "mobileFilters": "Suodattimet",
-      "marketCountAll": "Kaikki {total} markkinaa"
+      "marketCountAll": "Kaikki {total} markkinaa",
+      "formatHeading": "Mikä formaatti?",
+      "formatHint": "Natiiviartikkeli, advertoriaali, display, video …"
     },
     "shortlist": {
       "untitledPlan": "suunnitelmasi",
@@ -459,7 +462,9 @@
       "askForPrice": "Pyydä hintaa"
     },
     "exportCsv": "Lataa luettelo (CSV)",
-    "exportCsvMarket": "Lataa julkaisut: {market} (CSV)"
+    "exportCsvMarket": "Lataa julkaisut: {market} (CSV)",
+    "noMatchHeading": "Ei osumia",
+    "searchSomeWords": "Mikään julkaisu ei vastaa kaikkia hakusanoja ”{q}”, joten nämä vastaavat osaa niistä."
   },
   "lists": {
     "title": "Tallennetut listat",
@@ -479,7 +484,9 @@
     "undo": "Kumoa",
     "archivedHeading": "Arkistoidut ({count})",
     "archivedOn": "arkistoitu {date}",
-    "restore": "Palauta"
+    "restore": "Palauta",
+    "emptyCta": "Selaa katalogia",
+    "emptySecondaryCta": "Aloita suunnitelma"
   },
   "favorites": {
     "title": "Suosikit",
@@ -608,7 +615,7 @@
       "minSpend": "Vähimmäispanostus {currency} {amount, number}"
     },
     "publisherLinkHelp": "Katso kaikki nimikkeet julkaisijalta {name}",
-    "factVertical": "Vertical",
+    "factVertical": "Aihealue",
     "factReaderProfile": "Lukijaprofiili",
     "availabilityTitle": "Saatavuus",
     "avail_open": "Vapaa",
@@ -634,7 +641,7 @@
     "totalForItems": "{amount}, {count, plural, =1 {1 julkaisu} other {# julkaisua}}",
     "multiCurrencyNote": "Julkaisut laskutetaan kustantajan omassa valuutassa — molemmat summat erääntyvät, tämä ei ole valuutan valinta.",
     "rfqTitle": "Pyydä kiinteä tarjous",
-    "error": "Lisää vähintään yksi sijoittelu ja täytä yritys, sähköposti ja markkina.",
+    "error": "Suunnitelman lähettäminen epäonnistui. Tarkista se ja yritä uudelleen.",
     "linesEyebrow": "Valittu",
     "linesHeading": "Sijoittelusi",
     "scheduledPeriod": "Alkaen {date} · {n} {unit}",
@@ -703,7 +710,7 @@
     "weWriteIt": "Kirjoitamme sen",
     "needsPriceNote": "Tämä julkaisija ei ole julkaissut listahintaa. Suunnitelman lähettäminen pyytää deskiämme hinnoittelemaan sen — muu osa suunnitelmastasi ei muutu.",
     "breakdownUnpriced": "Vahvistetaan 24 tunnissa",
-    "breakdownWithArticle": "{placement} sijoittelu + {article} artikkeli",
+    "breakdownWithArticle": "{placement} sijoittelu + {article} / artikkeli",
     "breakdownQtyWithArticle": "{n} × {unit}, artikkeli sisältyy",
     "breakdownArticleIncluded": "Artikkeli sisältyy",
     "breakdownQty": "{n} × {unit}",
@@ -716,19 +723,19 @@
     "briefAdvancedToggle": "Lisää budjetti, kohderyhmät ja maantiede",
     "reviewFavorites": "Katso ne",
     "timing": {
-      "q3": "Q3 2026",
-      "q4": "Q4 2026",
       "flexible": "Joustava",
-      "q3Sentence": "Toivottu ajankohta: Q3 2026.",
-      "q4Sentence": "Toivottu ajankohta: Q4 2026.",
-      "flexibleSentence": "Ajankohta on joustava."
+      "flexibleSentence": "Ajankohta on joustava.",
+      "quarter": "Q{quarter} {year}",
+      "quarterSentence": "Toivottu ajankohta: Q{quarter} {year}."
     },
     "steps": {
       "label": "Suunnitelman eteneminen",
       "find": "Etsi julkaisuja",
       "build": "Rakenna suunnitelma",
       "quote": "Pyydä kiinteä tarjous",
-      "approve": "Hyväksy ja käynnistä"
+      "approve": "Hyväksy ja käynnistä",
+      "confirm": "Vahvista tilaus",
+      "run": "Tuotanto ja julkaisu"
     },
     "next": {
       "heading": "Mitä tapahtuu seuraavaksi",
@@ -768,7 +775,6 @@
         "awareness": "Tunnettuus rakentuu hitaasti – kierrokset ovat hieman harvemmassa, jotta jokainen artikkeli saa laskeutua omillaan."
       },
       "preview": "alkaen {date}",
-      "previewFirst": "tämä suunnitelma aikataulun mukaan",
       "start": "Luo ohjelma",
       "starting": "Luodaan…",
       "stripTitle": "{name} – kierros {n}/{of}",
@@ -798,7 +804,8 @@
       "overlapWarning": "{title} pyörii kierroksella {a} ja kierroksella {b} yhtä aikaa – jaksota ne erilleen tai vaihda julkaisua.",
       "dissolveSummary": "Pura ohjelma…",
       "dissolveBody": "Jokaisesta kierroksesta tulee taas tavallinen suunnitelma. Lähettämättömät kierrokset arkistoidaan, etteivät ne sotke suunnitelmianne – kaikki jo deskille lähetetty säilyy ennallaan.",
-      "dissolveConfirm": "Pura ohjelma"
+      "dissolveConfirm": "Pura ohjelma",
+      "waveName": "{name} · Kierros {n}"
     },
     "share": {
       "summary": "Jaa asiakkaalle",
@@ -812,7 +819,9 @@
       "approvedBadge": "Asiakas hyväksyi",
       "engagementApproved": "Asiakas hyväksyi suunnitelman {date}.",
       "engagementViewed": "Viimeksi avattu {date} · {count, plural, =1 {1 katselu} other {# katselua}}.",
-      "engagementNone": "Ei vielä avattu."
+      "engagementNone": "Ei vielä avattu.",
+      "staleBadge": "Hyväksytty ennen muutoksia",
+      "engagementStale": "Asiakas hyväksyi aiemman version {date}. Suunnitelma on muuttunut sen jälkeen, joten pyydä häntä katsomaan se uudelleen."
     },
     "lineNoteLabel": "Huomautus",
     "lineNoteAdd": "Lisää huomautus",
@@ -841,7 +850,23 @@
     "lineOrderSaveFailed": "Järjestystä ei voitu tallentaa – ladataan suunnitelma uudelleen.",
     "lineMovedAnnouncement": "Siirretty kohtaan {position}/{total}",
     "noticePlanArchived": "Suunnitelma on arkistoitu, joten näet sen sijaan nykyisen suunnitelmasi. Voit palauttaa sen kohdasta Tallennetut listat.",
-    "noticePlanUnavailable": "Emme saaneet suunnitelmaa auki — linkki voi olla vanhentunut, tai suunnitelma kuuluu toiseen työtilaan. Tämä on nykyinen suunnitelmasi."
+    "noticePlanUnavailable": "Emme saaneet suunnitelmaa auki — linkki voi olla vanhentunut, tai suunnitelma kuuluu toiseen työtilaan. Tämä on nykyinen suunnitelmasi.",
+    "errorEmpty": "Lisää suunnitelmaan vähintään yksi sijoittelu ennen lähettämistä. Vaihtoehtoja ei lähetetä.",
+    "nothingToSend": "Siirrä vähintään yksi rivi suunnitelmaan, jotta voit lähettää sen. Vaihtoehtoja ei lähetetä.",
+    "briefSaving": "Tallennetaan…",
+    "briefSaved": "Tallennettu tähän suunnitelmaan.",
+    "briefSaveFailed": "Tallennus ei juuri nyt onnistunut. Tekstisi on tallessa ja lähtee mukaan, kun lähetät suunnitelman.",
+    "briefAutosaveHint": "Tallentuu suunnitelmaan kirjoittaessasi.",
+    "nextInstant": {
+      "heading": "Mitä seuraavaksi tapahtuu",
+      "item1Title": "Tilaus vahvistuu heti",
+      "item1Body": "Kaikilla riveillä on kiinteä hinta, joten vahvistus tekee tilauksen. Tarjousta ei tarvitse odottaa.",
+      "item2Title": "Briiffaamme julkaisijat",
+      "item2Body": "Jokainen julkaisija saa varauksen ja briiffisi. Jos jotain pitää muuttaa, deski hoitaa sen kanssasi.",
+      "item3Title": "Kirjoitamme, julkaisemme ja raportoimme",
+      "item3Body": "Luonnokset tulevat sinulle hyväksyttäviksi. Linkit ja tulokset löytyvät Raporteista."
+    },
+    "breakdownQtyWithArticleFee": "{n} × {unit} sijoittelu + {article} / artikkeli (yksi artikkeli kaikkiin {n})"
   },
   "rfq": {
     "org": "Yritys",
@@ -3268,7 +3293,9 @@
     "approvedAt": "Suunnitelma hyväksyttiin {date}. Yhteyshenkilösi jatkaa tästä.",
     "noteLabel": "Huomautus",
     "alternativesHeading": "Vaihtoehdot – eivät sisälly kokonaissummaan",
-    "alternativesIntro": "Nimikkeet, joita suosittelemme myös. Ne eivät kuulu suunnitelmaan tai kokonaissummaan."
+    "alternativesIntro": "Nimikkeet, joita suosittelemme myös. Ne eivät kuulu suunnitelmaan tai kokonaissummaan.",
+    "changedSinceApproval": "Hyväksyit suunnitelman aiemman version {date}. Se on muuttunut sen jälkeen, joten tarkista se ja hyväksy uudelleen.",
+    "approveAgainCta": "Hyväksy päivitetty suunnitelma"
   },
   "quotePdf": {
     "documentTitle": "Tarjous {quoteNumber}",

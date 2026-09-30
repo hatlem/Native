@@ -174,7 +174,13 @@ export default async function RequestPage({
         meta={
           <>
             <MetaRow label={t("status")}>
-              <StatusBadge value={request.status} />
+              {/* A request that became an order is CLOSED by design (an
+                  instant order closes it at once); "Closed" next to a
+                  confirmed order read like a cancellation, so the order's
+                  own status stands in for it. */}
+              <StatusBadge
+                value={request.status === "CLOSED" && orders.length > 0 ? orders[0].status : request.status}
+              />
             </MetaRow>
             <MetaRow label={t("items")}>{request.plan.items.length}</MetaRow>
             {quotes.length > 0 ? (

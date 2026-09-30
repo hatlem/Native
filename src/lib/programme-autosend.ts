@@ -46,10 +46,11 @@ async function sendDueWave(wave: DueWave): Promise<"sent" | "skipped"> {
     list,
     org: { id: list.organization.id, name: list.organization.name },
     // The wave's stored brief fields — what the buyer set on the list (waves
-    // copy them from wave 1). brief.text stays empty: the desk-facing brief
-    // becomes the wave's article-angle line via withWaveAngle.
+    // copy them from wave 1). The desk-facing brief leads with the wave's
+    // article-angle line (withWaveAngle), with the plan's saved brief text
+    // below it, as a manual submit from /plan would send it.
     brief: {
-      text: "",
+      text: list.briefText ?? "",
       goal: list.goal,
       audience: list.audienceNote,
       budget: list.budget != null ? Number(list.budget) : null,

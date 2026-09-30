@@ -9,7 +9,7 @@ import type { Prisma } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
 import { deriveStage } from "@/lib/campaign-stage";
 import { buyerVisibleQuoteWhere } from "@/lib/commerce/quote-validity";
-import { clampCadence, currentPeriodStart, shiftScheduleStart } from "@/lib/programme-cadence";
+import { clampCadence, shiftScheduleStart, stripWaveSuffix, waveOneStart } from "@/lib/programme-cadence";
 import type { BookingUnit } from "@/lib/campaign-schedule";
 import { contentIntent } from "@/lib/authorship";
 
@@ -34,14 +34,16 @@ const WAVE_SOURCE_INCLUDE = {
 export type WaveSourceList = Prisma.SavedListGetPayload<{ include: typeof WAVE_SOURCE_INCLUDE }>;
 
 /**
- * The scheduleStart a copied line gets. A scheduled source line keeps its date
- * shifted onto the wave's slot. An UNSCHEDULED line falls back to the wave's
- * anchor — the current period at creation time shifted by the wave's offset —
+ * The scheduleStart a copied line gets. With `anchorNow` (programme waves) the
+ * line starts from its wave-1 date (waveOneStart: its own start while that is
+ * still ahead, else the next period start) shifted onto the wave's slot —
  * exactly what planWaveDates previews on the /plan form ("Wave k: from …").
- * Without the fallback, waves born from an unscheduled plan had no dates at
- * all ("Date not set"), so findDueWaves' date-near nudge could never fire.
- * scheduleUnits deliberately stays null: the publisher's minimum run applies
- * downstream, same as any other unscheduled-length line.
+ * Anchoring an unscheduled or stale line at the next period, never the current
+ * one, is what keeps a programme created on 30 Sep from dating wave 2 on 1 Oct
+ * and nagging "send it now" the moment it exists.
+ * Without anchorNow a scheduled line keeps its date, shifted; an unscheduled
+ * one stays unscheduled. scheduleUnits deliberately stays as it was (null =
+ * the publisher's minimum run applies downstream).
  */
 function copiedScheduleStart(
   item: { scheduleStart: Date | null; product: { bookingUnit: BookingUnit } | null },
@@ -49,12 +51,9 @@ function copiedScheduleStart(
 ): Date | null {
   if (opts.resetSchedule) return null;
   const unit = item.product?.bookingUnit ?? "MONTH";
-  if (item.scheduleStart) {
-    return opts.shiftWeeks > 0 ? shiftScheduleStart(item.scheduleStart, opts.shiftWeeks, unit) : item.scheduleStart;
-  }
-  if (!opts.anchorNow) return null;
-  const first = currentPeriodStart(unit, opts.anchorNow);
-  return opts.shiftWeeks > 0 ? shiftScheduleStart(first, opts.shiftWeeks, unit) : first;
+  const start = opts.anchorNow ? waveOneStart(item.scheduleStart, unit, opts.anchorNow) : item.scheduleStart;
+  if (!start) return null;
+  return opts.shiftWeeks > 0 ? shiftScheduleStart(start, opts.shiftWeeks, unit) : start;
 }
 
 /**
@@ -89,6 +88,9 @@ export async function copyListForNewWave(
       budget: source.budget,
       currency: source.currency,
       goal: source.goal,
+      // The brief text carries over; its timing pick doesn't (each wave runs
+      // at its own dates).
+      briefText: source.briefText,
       audienceNote: source.audienceNote,
       targetGeo: source.targetGeo,
       targetAudience: source.targetAudience,
@@ -133,6 +135,9 @@ export async function createProgramme(input: {
   // Injectable "today" so wave anchors are deterministic in tests; the wave
   // dates persisted here must match what planWaveDates previewed on /plan.
   now?: Date;
+  // How a wave is named, in the creator's language ("Spring · Runde 2").
+  // English when not given (tests, scripts).
+  waveName?: (baseName: string, waveNumber: number) => string;
 }): Promise<{ programmeId: string; waveListIds: string[] }> {
   const { waves, spacingWeeks } = clampCadence(input.waves, input.spacingWeeks);
   const now = input.now ?? new Date();
@@ -146,7 +151,8 @@ export async function createProgramme(input: {
   if (source.programmeId) throw new ProgrammeError("already-in-programme");
   if (source.items.length === 0) throw new ProgrammeError("empty");
 
-  const baseName = source.name.replace(/\s*·\s*Wave \d+$/i, "");
+  const baseName = stripWaveSuffix(source.name);
+  const waveName = input.waveName ?? ((base: string, n: number) => `${base} · Wave ${n}`);
 
   return prisma.$transaction(async (tx) => {
     const programme = await tx.campaignProgramme.create({
@@ -166,16 +172,26 @@ export async function createProgramme(input: {
       data: {
         programmeId: programme.id,
         waveNumber: 1,
-        name: `${baseName} · Wave 1`,
+        name: waveName(baseName, 1),
       },
     });
+    // Wave 1 is the source plan itself: its unscheduled (or already past)
+    // lines get the date the form previewed for wave 1, so wave 1 isn't
+    // "Date not set" while waves 2..N have dates measured from it.
+    for (const item of source.items) {
+      const unit = item.product?.bookingUnit ?? "MONTH";
+      const start = waveOneStart(item.scheduleStart, unit, now);
+      if (item.scheduleStart?.getTime() !== start.getTime()) {
+        await tx.savedListItem.update({ where: { id: item.id }, data: { scheduleStart: start } });
+      }
+    }
     const waveListIds = [source.id];
     for (let k = 2; k <= waves; k++) {
       waveListIds.push(
         await copyListForNewWave(
           source,
           {
-            name: `${baseName} · Wave ${k}`,
+            name: waveName(baseName, k),
             shiftWeeks: spacingWeeks * (k - 1),
             programmeId: programme.id,
             waveNumber: k,
@@ -499,7 +515,7 @@ export async function dissolveProgramme(
       await tx.savedList.update({
         where: { id: w.id },
         data: {
-          name: w.name.replace(/\s*·\s*Wave \d+$/i, ""),
+          name: stripWaveSuffix(w.name),
           programmeId: null,
           waveNumber: null,
           articleId: null,

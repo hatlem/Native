@@ -1,9 +1,11 @@
 import { getTranslations } from "next-intl/server";
 
-// Static three-step reassurance card — same copy regardless of basket
-// contents, so no props beyond locale.
-export async function WhatHappensNext({ locale }: { locale: string }) {
-  const t = await getTranslations({ locale, namespace: "plan.next" });
+// Static three-step reassurance card. Two versions: the desk-quoted path
+// (we price it, you approve, we run it) and the instant order (confirmed at
+// once, then produced and run), so the card never promises a quote to a buyer
+// who is about to place a binding order.
+export async function WhatHappensNext({ locale, instant = false }: { locale: string; instant?: boolean }) {
+  const t = await getTranslations({ locale, namespace: instant ? "plan.nextInstant" : "plan.next" });
   const items = [1, 2, 3] as const;
 
   return (

@@ -50,6 +50,17 @@ test("unknown keys and params from another shape fall back to the stored strings
   assert.equal(renderStoredNotice("placementReady", { titleName: "x" }, "no"), null);
 });
 
+// BUG-buyer-plan-23: the client-approval notice was English everywhere and
+// linked to /plan (whatever plan the reader last had open).
+test("client approval renders per reader and links to the approved plan", () => {
+  const stored = { planName: "Q4 trade press", listId: "list9" };
+  const no = renderStoredNotice("clientApproved", stored, "no");
+  assert.equal(no?.title, "Kunden godkjente: Q4 trade press");
+  assert.equal(no?.link, "/no/plan/list9");
+  assert.equal(renderStoredNotice("clientApproved", stored, "de")?.link, "/de/plan/list9");
+  assert.equal(renderNotice({ key: "clientApproved", params: stored }, "en").title, "Client approved: Q4 trade press");
+});
+
 test("order templates keep their deep links per viewer", () => {
   const confirmed = renderStoredNotice("orderConfirmed", { planName: "P", requestId: "r", orderId: null }, "fi");
   assert.equal(confirmed?.link, "/fi/requests/r");

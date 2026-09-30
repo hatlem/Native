@@ -5,9 +5,9 @@ import { cookies } from "next/headers";
 // only for (a) one-time migration of in-flight baskets into a SavedList and (b) the
 // order-template rehydrate path (until Task 8). No new code should WRITE this cookie.
 export const PLAN_COOKIE = "nativespin_plan";
-// Brief draft persisted alongside the basket so the buyer doesn't
-// lose their budget/audience/goal/brief text when the buy-gate
-// detours them to /onboarding. Cleared on successful submit.
+// DEPRECATED: the brief draft cookie. The brief now lives on the plan itself
+// (SavedList.briefText & co, lib/plan-brief.ts); nothing writes it any more.
+// Kept only so sign-out still deletes a copy left in a browser.
 export const PLAN_BRIEF_COOKIE = "nativespin_brief";
 
 export const MAX_QTY = 20;
@@ -27,63 +27,6 @@ export type BasketItem = {
   // cookie payload; absent/false means bring-your-own-content.
   withContent?: boolean;
 };
-
-export type PlanBrief = {
-  budget: string;
-  audience: string;
-  goal: string;
-  brief: string;
-  targetGeo: string;
-  targetAudience: string;
-  targetContext: string;
-};
-
-const EMPTY_BRIEF: PlanBrief = {
-  budget: "",
-  audience: "",
-  goal: "",
-  brief: "",
-  targetGeo: "",
-  targetAudience: "",
-  targetContext: "",
-};
-
-// Pure: tolerate any untrusted cookie payload and normalise. Caps each
-// field length so a hostile cookie can't blow up the page render.
-export function parsePlanBrief(raw: string | undefined | null): PlanBrief {
-  if (!raw) return EMPTY_BRIEF;
-  try {
-    const parsed: unknown = JSON.parse(raw);
-    if (!parsed || typeof parsed !== "object") return EMPTY_BRIEF;
-    const o = parsed as Record<string, unknown>;
-    const str = (v: unknown, max: number) =>
-      typeof v === "string" ? v.slice(0, max) : "";
-    return {
-      budget: str(o.budget, 32),
-      audience: str(o.audience, 200),
-      goal: str(o.goal, 200),
-      brief: str(o.brief, 4000),
-      targetGeo: str(o.targetGeo, 200),
-      targetAudience: str(o.targetAudience, 400),
-      targetContext: str(o.targetContext, 200),
-    };
-  } catch {
-    return EMPTY_BRIEF;
-  }
-}
-
-export async function readPlanBrief(): Promise<PlanBrief> {
-  const store = await cookies();
-  return parsePlanBrief(store.get(PLAN_BRIEF_COOKIE)?.value);
-}
-
-export function serializePlanBrief(brief: PlanBrief): string {
-  return JSON.stringify(brief);
-}
-
-export function planBriefHasContent(brief: PlanBrief): boolean {
-  return !!(brief.budget || brief.audience || brief.goal || brief.brief);
-}
 
 // Pure: tolerate any untrusted cookie payload and normalise to a safe basket.
 export function parseBasket(raw: string | undefined | null): BasketItem[] {
@@ -111,14 +54,3 @@ export async function readBasket(): Promise<BasketItem[]> {
   return parseBasket(store.get(PLAN_COOKIE)?.value);
 }
 
-const COOKIE_OPTS = {
-  httpOnly: true,
-  sameSite: "lax" as const,
-  path: "/",
-  maxAge: 60 * 60 * 24 * 7,
-};
-
-export async function writePlanBrief(brief: PlanBrief): Promise<void> {
-  const store = await cookies();
-  store.set(PLAN_BRIEF_COOKIE, serializePlanBrief(brief), COOKIE_OPTS);
-}

@@ -7,7 +7,7 @@ import { loadScope, canActOnOrg } from "@/lib/scope";
 import { writeActiveListId } from "@/lib/lists";
 import { clampQuantity } from "@/lib/basket";
 import { contentIntent, mergeContentIntent, type ContentIntent } from "@/lib/authorship";
-import { sourceListForOrder, copyListForNewWave } from "@/lib/programme";
+import { sourceListForOrder, copyListForNewWave, stripWaveSuffix } from "@/lib/programme";
 import {
   addProductToList,
   addRecommendedToList,
@@ -128,7 +128,7 @@ export async function duplicatePlan(formData: FormData) {
     const dropped = sourceList.items.length - survivingItems.length;
     if (survivingItems.length === 0) redirect(`/${locale}/plan?duplicate=all-inactive`);
 
-    const baseName = sourceList.name.replace(/\s*·\s*Wave \d+$/i, "");
+    const baseName = stripWaveSuffix(sourceList.name);
     const createdId = await prisma.$transaction((tx) =>
       copyListForNewWave(
         { ...sourceList, items: survivingItems },

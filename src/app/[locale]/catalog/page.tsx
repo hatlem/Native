@@ -4,12 +4,15 @@ import { Link } from "@/i18n/navigation";
 import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
 import { getFavoritedTitleIds } from "@/lib/favorites";
-import { searchTitleIds, searchWhereFor } from "@/lib/catalog-search";
+import { resolveCatalogSearch } from "@/lib/catalog-search";
+import { redirect } from "next/navigation";
 import { catalogVisibleTitleWhere } from "@/lib/catalog-visibility";
 import { savedListMembershipMap } from "@/lib/saved-list-membership";
 import { loadScope } from "@/lib/scope";
 import { loadRelevanceSignals } from "@/lib/catalog-relevance";
-import { loadVerticalOptions } from "@/lib/catalog-taxonomy";
+import { loadVerticalOptions, localizedVerticalOptions } from "@/lib/catalog-taxonomy";
+import { localizeVertical } from "@/lib/taxonomy-i18n";
+import { safeLocale } from "@/i18n/routing";
 import { readActiveListId, resolveActiveList } from "@/lib/lists";
 import { barTotals, planLineCount } from "@/lib/plan-total";
 import { loadPricingDefaults } from "@/lib/content-fee";
@@ -25,6 +28,7 @@ import { CatalogPagination } from "./_components/CatalogPagination";
 import { ActiveFilterChips } from "./_components/ActiveFilterChips";
 import {
   MARKET_CODES,
+  FORMAT_KEYS,
   NATIVE_FIT_VALUES,
   B2B_B2C_VALUES,
   REACH_VALUES,
@@ -76,10 +80,10 @@ export default async function CatalogPage({
     page,
   } = parseCatalogParams(sp);
 
-  // FTS-first: ask Postgres for Title ids matching the query, then
-  // intersect with the rest of the filter. Falls back to ILIKE if FTS
-  // can't form a valid query (e.g. only punctuation).
-  const matchedIds = await searchTitleIds(q);
+  // FTS-first: titles matching every word of the query (FTS, then ILIKE),
+  // widened to titles matching any word only when none match them all
+  // (lib/catalog-search.ts resolveCatalogSearch).
+  const search = await resolveCatalogSearch(q);
 
   // "Priced titles only" = a buyer can actually see a € figure. Mirror
   // isProductPriceShown (src/lib/pricing/visibility.ts): an active,
@@ -172,11 +176,10 @@ export default async function CatalogPage({
         // Shared with favorites.ts/list-actions.ts so the guards can't
         // drift apart.
         catalogVisibleTitleWhere,
-        // A non-empty FTS hit list wins outright; an empty-or-absent FTS
-        // result (including a valid tsquery that simply matched nothing)
-        // falls through to the synonym-aware ILIKE fallback instead of
-        // pinning `id IN ()`.
-        searchWhereFor(q, matchedIds),
+        // The tiered search clause: a non-empty FTS hit list wins outright;
+        // an empty one falls through to the synonym-aware ILIKE fallback
+        // instead of pinning `id IN ()`.
+        search?.where ?? {},
         ...(includeOnlyPriced && onlyPriced ? onlyPricedConditions : []),
         ...semanticConditions,
       ],
@@ -189,7 +192,11 @@ export default async function CatalogPage({
   const orgId = scope.workspace?.activeOrgId ?? null;
   const activeList = orgId ? await resolveActiveList(orgId, await readActiveListId()) : null;
 
-  const verticalOptions = await loadVerticalOptions();
+  // The buyable formats for the rail's format filter (?types=).
+  const formatOptions = FORMAT_KEYS.map((k) => ({ value: k, label: tType(k) }));
+
+  // Labels in the buyer's language; values stay the stored taxonomy terms.
+  const verticalOptions = localizedVerticalOptions(await loadVerticalOptions(), locale);
 
   // Distinct regions present from the geo backfill — drives the region
   // multiselect. Null regions (national/unknown titles) don't appear.
@@ -345,6 +352,23 @@ export default async function CatalogPage({
     ]);
   }
   const totalPages = Math.max(1, Math.ceil(totalCount / PAGE_SIZE));
+  // Filters that narrow the catalog (search included): with any of them a
+  // zero count means "no match", not "the catalog is empty".
+  const narrowed =
+    !!q ||
+    markets.length > 0 ||
+    types.length > 0 ||
+    verticals.length > 0 ||
+    regions.length > 0 ||
+    !!publisher ||
+    !!nativeFit ||
+    !!b2bB2c ||
+    !!reach ||
+    onlyPriced ||
+    producedForYou ||
+    guaranteedReach ||
+    newsletterIncluded ||
+    videoIncluded;
 
   // Favorites: which of this page's titles the buyer has hearted (filled vs
   // empty heart). The "add to list" dropdown, however, is the buyer's real
@@ -450,6 +474,12 @@ export default async function CatalogPage({
     return s ? `?${s}` : "";
   };
 
+  // A page past the end (a stale bookmark, ?page=999, a filter that shrank the
+  // results) goes to the last page instead of showing "1 065 titles" above an
+  // empty list. The pagination links are plain <a>s, so this is always a full
+  // navigation, never the same-route soft navigation that breaks in prod.
+  if (page > totalPages && totalCount > 0) redirect(`/${locale}/catalog${pageQuery(totalPages)}`);
+
   // Build "remove this one filter" hrefs. When the user clicks an active-
   // filter chip we want to keep every other filter intact and just drop
   // the one they clicked — page is reset to 1 because the result set
@@ -539,7 +569,7 @@ export default async function CatalogPage({
   for (const v of verticals) {
     activeFilters.push({
       key: `vertical-${v}`,
-      label: `${t("filters.category")}: ${v}`,
+      label: `${t("filters.category")}: ${localizeVertical(v, safeLocale(locale))}`,
       href: filterHref("vertical", { dropVertical: v }),
     });
   }
@@ -611,10 +641,11 @@ export default async function CatalogPage({
 
         <CatalogMobileBar
           markets={MARKET_CODES.map((m) => ({ value: m, label: tMarket(m) }))}
+          formats={formatOptions}
           nativeFits={NATIVE_FIT_VALUES.map((v) => ({ value: v, label: tFit(v) }))}
           b2bB2cs={B2B_B2C_VALUES.map((v) => ({ value: v, label: v }))}
           reaches={REACH_VALUES.map((v) => ({ value: v, label: tReach(v) }))}
-          categories={verticalOptions.map((v) => ({ value: v, label: v }))}
+          categories={verticalOptions}
           regions={regionOptions.map((r) => ({ value: r.value, label: `${r.value} (${tMarket(r.country)})` }))}
           unpricedCount={unpricedCount}
           initial={{
@@ -638,10 +669,11 @@ export default async function CatalogPage({
         <div className="catalog-layout">
           <CatalogRail
             markets={MARKET_CODES.map((m) => ({ value: m, label: tMarket(m) }))}
+            formats={formatOptions}
             nativeFits={NATIVE_FIT_VALUES.map((v) => ({ value: v, label: tFit(v) }))}
             b2bB2cs={B2B_B2C_VALUES.map((v) => ({ value: v, label: v }))}
             reaches={REACH_VALUES.map((v) => ({ value: v, label: tReach(v) }))}
-            categories={verticalOptions.map((v) => ({ value: v, label: v }))}
+            categories={verticalOptions}
             regions={regionOptions.map((r) => ({ value: r.value, label: `${r.value} (${tMarket(r.country)})` }))}
             unpricedCount={unpricedCount}
             initial={{
@@ -677,11 +709,17 @@ export default async function CatalogPage({
             <div className="catalog-results-head">
               <div>
                 <h1>
-                  {marketLabel
-                    ? t("resultsHeadingInMarket", { count: totalCount, market: marketLabel })
-                    : t("resultsHeading", { count: totalCount })}
+                  {totalCount === 0 && narrowed
+                    ? t("noMatchHeading")
+                    : marketLabel
+                      ? t("resultsHeadingInMarket", { count: totalCount, market: marketLabel })
+                      : t("resultsHeading", { count: totalCount })}
                 </h1>
-                <p className="catalog-results-sub">{t("resultsSubline")}</p>
+                <p className="catalog-results-sub">
+                  {search?.match === "some" && totalCount > 0
+                    ? t("searchSomeWords", { q })
+                    : t("resultsSubline")}
+                </p>
               </div>
               <div className="catalog-results-controls">
                 <CatalogSort initial={sort ?? ""} />

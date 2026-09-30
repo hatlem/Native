@@ -1,5 +1,6 @@
 import { getTranslations } from "next-intl/server";
 import { setListTargetVerticals } from "@/app/list-actions";
+import type { VerticalOption } from "@/lib/catalog-taxonomy";
 
 // Which verticals THIS plan is targeting — a company running several plans
 // (a trucking campaign and a separate seafood campaign, say) can give each
@@ -16,20 +17,22 @@ export async function PlanTargeting({
 }: {
   locale: string;
   activeListId?: string;
-  verticalOptions: string[];
+  // Stored taxonomy values with labels in the buyer's language.
+  verticalOptions: VerticalOption[];
   selected: string[];
 }) {
   const t = await getTranslations({ locale, namespace: "plan" });
   if (!activeListId || verticalOptions.length === 0) return null;
 
   const selectedSet = new Set(selected);
+  const labelOf = new Map(verticalOptions.map((o) => [o.value, o.label]));
 
   return (
     <details className="plan-targeting">
       <summary className="plan-targeting__summary">
         {t("targetingSummary")}{" "}
         <span className="muted small">
-          {selected.length ? selected.join(", ") : t("targetingUnset")}
+          {selected.length ? selected.map((v) => labelOf.get(v) ?? v).join(", ") : t("targetingUnset")}
         </span>
       </summary>
       <form action={setListTargetVerticals} className="plan-targeting__form">
@@ -37,15 +40,15 @@ export async function PlanTargeting({
         <input type="hidden" name="listId" value={activeListId} />
         <p className="muted small">{t("targetingHint")}</p>
         <div className="checkbox-grid">
-          {verticalOptions.map((v) => (
-            <label key={v} className="checkbox-row">
+          {verticalOptions.map((o) => (
+            <label key={o.value} className="checkbox-row">
               <input
                 type="checkbox"
                 name="targetVerticals"
-                value={v}
-                defaultChecked={selectedSet.has(v)}
+                value={o.value}
+                defaultChecked={selectedSet.has(o.value)}
               />
-              {v}
+              {o.label}
             </label>
           ))}
         </div>

@@ -20,6 +20,7 @@ import { buildOrderConfirmedNotice, buildQuoteSentNotice } from "@/lib/commerce/
 import { buildOrderCompletedNotice } from "@/lib/order-completed-notice";
 import { buildOrderLiveNotice } from "@/lib/order-live-notice";
 import { buildAutoSendNotice } from "@/lib/programme-autosend-notice";
+import { buildClientApprovalNotice } from "@/lib/client-approval-notice";
 
 export type RenderedNotice = { title: string; body: string; link: string };
 
@@ -101,6 +102,10 @@ const TEMPLATES = {
       requestId: id,
     }),
     render: (p, locale) => buildAutoSendNotice({ marketCode: null, ...p, locale }),
+  }),
+  clientApproved: defineTemplate({
+    params: z.object({ planName: z.string(), listId: id }),
+    render: (p, locale) => buildClientApprovalNotice({ marketCode: null, ...p, locale }),
   }),
 };
 

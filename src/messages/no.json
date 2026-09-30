@@ -167,7 +167,8 @@
   },
   "home": {
     "title": "Kjøp native-innhold i premium aviser og magasiner",
-    "subtitle": "En transparent katalog over hver tittel som tilbyr native på tvers av 9 markeder. Gi oss en brief — vi skriver det og bestiller det, også der programmatisk ikke er mulig."
+    "subtitle": "En transparent katalog over hver tittel som tilbyr native på tvers av 9 markeder. Gi oss en brief — vi skriver det og bestiller det, også der programmatisk ikke er mulig.",
+    "nextWaveBodyDateNear": "Runde {n} er planlagt fra {date} – send den nå, så rekker desken å booke."
   },
   "catalog": {
     "eyebrow": "Utforsk",
@@ -295,7 +296,9 @@
       "unpricedNote": "{count, plural, =1 {1 tittel til er i katalogen uten publisert pris. Desken kan prise den.} other {# titler til er i katalogen uten publisert pris. Desken kan prise dem.}}",
       "advancedToggle": "{count, plural, =0 {Avanserte filtre} other {Avanserte filtre (#)}}",
       "mobileFilters": "Filtre",
-      "marketCountAll": "Alle {total} markeder"
+      "marketCountAll": "Alle {total} markeder",
+      "formatHeading": "Hvilket format?",
+      "formatHint": "Native-artikkel, advertorial, display, video …"
     },
     "shortlist": {
       "untitledPlan": "planen",
@@ -321,7 +324,9 @@
       "askForPrice": "Be om pris"
     },
     "exportCsv": "Last ned katalogen (CSV)",
-    "exportCsvMarket": "Last ned titler i {market} (CSV)"
+    "exportCsvMarket": "Last ned titler i {market} (CSV)",
+    "noMatchHeading": "Ingen treff",
+    "searchSomeWords": "Ingen titler matcher alle ordene i «{q}», så disse matcher noen av dem."
   },
   "lists": {
     "title": "Lagrede lister",
@@ -341,7 +346,9 @@
     "undo": "Angre",
     "archivedHeading": "Arkivert ({count})",
     "archivedOn": "arkivert {date}",
-    "restore": "Gjenopprett"
+    "restore": "Gjenopprett",
+    "emptyCta": "Utforsk katalogen",
+    "emptySecondaryCta": "Start en plan"
   },
   "favorites": {
     "title": "Favoritter",
@@ -470,7 +477,7 @@
       "minSpend": "Minstekjøp {currency} {amount, number}"
     },
     "publisherLinkHelp": "Se alle titler fra {name}",
-    "factVertical": "Vertical",
+    "factVertical": "Fagområde",
     "factReaderProfile": "Leserprofil",
     "availabilityTitle": "Tilgjengelighet",
     "avail_open": "Ledig",
@@ -496,7 +503,7 @@
     "totalForItems": "{amount} for {count, plural, =1 {1 tittel} other {# titler}}",
     "multiCurrencyNote": "Titler faktureres i utgiverens egen valuta — begge beløpene skal betales, dette er ikke et valg av valuta.",
     "rfqTitle": "Be om et fast tilbud",
-    "error": "Legg til minst én plassering og fyll inn selskap, e-post og marked.",
+    "error": "Noe gikk galt da planen skulle sendes. Se over den og prøv igjen.",
     "linesEyebrow": "Valgt",
     "linesHeading": "Plasseringene dine",
     "scheduledPeriod": "Fra {date} · {n} {unit}",
@@ -565,7 +572,7 @@
     "weWriteIt": "Vi skriver den",
     "needsPriceNote": "Denne utgiveren har ikke publisert listepris. Å sende planen ber desken om å prise den — resten av planen din påvirkes ikke.",
     "breakdownUnpriced": "Bekreftes innen 24 timer",
-    "breakdownWithArticle": "{placement} plassering + {article} artikkel",
+    "breakdownWithArticle": "{placement} plassering + {article} per artikkel",
     "breakdownQtyWithArticle": "{n} × {unit}, artikkel inkludert",
     "breakdownArticleIncluded": "Artikkel inkludert",
     "breakdownQty": "{n} × {unit}",
@@ -578,19 +585,19 @@
     "briefAdvancedToggle": "Legg til budsjett, målgrupper og geografi",
     "reviewFavorites": "Se dem",
     "timing": {
-      "q3": "Q3 2026",
-      "q4": "Q4 2026",
       "flexible": "Fleksibelt",
-      "q3Sentence": "Ønsket tidspunkt: Q3 2026.",
-      "q4Sentence": "Ønsket tidspunkt: Q4 2026.",
-      "flexibleSentence": "Tidspunktet er fleksibelt."
+      "flexibleSentence": "Tidspunktet er fleksibelt.",
+      "quarter": "Q{quarter} {year}",
+      "quarterSentence": "Ønsket tidspunkt: Q{quarter} {year}."
     },
     "steps": {
       "label": "Planfremdrift",
       "find": "Finn titler",
       "build": "Bygg planen",
       "quote": "Få fast tilbud",
-      "approve": "Godkjenn og kjør"
+      "approve": "Godkjenn og kjør",
+      "confirm": "Bekreft bestillingen",
+      "run": "Produseres og kjøres"
     },
     "next": {
       "heading": "Hva skjer videre",
@@ -630,7 +637,6 @@
         "awareness": "Kjennskap bygges sakte – rundene ligger litt lenger fra hverandre så hver artikkel får lande for seg selv."
       },
       "preview": "fra {date}",
-      "previewFirst": "denne planen, som planlagt",
       "start": "Opprett program",
       "starting": "Oppretter…",
       "stripTitle": "{name} – runde {n} av {of}",
@@ -660,7 +666,8 @@
       "overlapWarning": "{title} går i runde {a} og runde {b} samtidig – spre dem, eller velg en annen tittel.",
       "dissolveSummary": "Løs opp programmet …",
       "dissolveBody": "Hver runde blir en vanlig plan igjen. Runder du aldri sendte inn, arkiveres, så de ikke roter til planene dine – alt som allerede er sendt til desken, røres ikke.",
-      "dissolveConfirm": "Løs opp programmet"
+      "dissolveConfirm": "Løs opp programmet",
+      "waveName": "{name} · Runde {n}"
     },
     "share": {
       "summary": "Del med kunden",
@@ -674,7 +681,9 @@
       "approvedBadge": "Kunden godkjente",
       "engagementApproved": "Kunden godkjente planen {date}.",
       "engagementViewed": "Sist åpnet {date} · {count, plural, =1 {1 visning} other {# visninger}}.",
-      "engagementNone": "Ikke åpnet ennå."
+      "engagementNone": "Ikke åpnet ennå.",
+      "staleBadge": "Godkjent før endringer",
+      "engagementStale": "Kunden godkjente en tidligere versjon {date}. Planen er endret siden, så be dem se på den igjen."
     },
     "lineNoteLabel": "Merknad",
     "lineNoteAdd": "Legg til merknad",
@@ -703,7 +712,23 @@
     "lineOrderSaveFailed": "Rekkefølgen ble ikke lagret – laster planen på nytt.",
     "lineMovedAnnouncement": "Flyttet til plass {position} av {total}",
     "noticePlanArchived": "Den planen er arkivert, så du ser den gjeldende planen din i stedet. Du kan gjenopprette den under Lagrede lister.",
-    "noticePlanUnavailable": "Vi fikk ikke åpnet den planen — lenken kan være utdatert, eller planen tilhører et annet arbeidsområde. Dette er den gjeldende planen din."
+    "noticePlanUnavailable": "Vi fikk ikke åpnet den planen — lenken kan være utdatert, eller planen tilhører et annet arbeidsområde. Dette er den gjeldende planen din.",
+    "errorEmpty": "Legg minst én plassering i planen før du sender den. Alternativer sendes ikke.",
+    "nothingToSend": "Flytt minst én linje inn i planen for å sende den. Alternativer sendes ikke.",
+    "briefSaving": "Lagrer …",
+    "briefSaved": "Lagret i denne planen.",
+    "briefSaveFailed": "Fikk ikke lagret akkurat nå. Teksten din er fortsatt her og følger med når du sender planen.",
+    "briefAutosaveHint": "Lagres i planen mens du skriver.",
+    "nextInstant": {
+      "heading": "Hva skjer videre",
+      "item1Title": "Bestillingen bekreftes med en gang",
+      "item1Body": "Alle linjene har fast pris, så når du bekrefter, er bestillingen lagt inn. Du venter ikke på noe tilbud.",
+      "item2Title": "Vi briefer utgiverne",
+      "item2Body": "Hver utgiver får bookingen og briefen din. Trenger du å endre noe, ordner desken det sammen med deg.",
+      "item3Title": "Vi skriver, plasserer og rapporterer",
+      "item3Body": "Utkast sendes til deg for godkjenning. Lenker og resultater havner i Rapporter."
+    },
+    "breakdownQtyWithArticleFee": "{n} × {unit} plassering + {article} per artikkel (én artikkel for alle {n})"
   },
   "rfq": {
     "org": "Selskap",
@@ -885,7 +910,7 @@
     "metricsNeedsContactOrder": "Bestilling",
     "resolvePlacement": "Velg en plassering …",
     "resolveUse": "Bruk plassering",
-    "resolveNoPlacements": "Ingen plasseringer kan bestilles direkte på denne tittelen ennå",
+    "resolveNoPlacements": "Ingen bestillbare plasseringer på denne tittelen ennå",
     "resolveTitlesFirst": "{count, plural, =1 {1 plassering trenger} other {# plasseringer trenger}} et konkret produkt før du kan gi pris.",
     "resolveRemove": "Fjern plassholder",
     "resolveFrom": "fra",
@@ -1822,7 +1847,7 @@
     "step5Title": "Gå live og rapporter",
     "step5Body": "Utgiver bestiller og publiserer. Dere får live-URL, sporing og en faktura med riktig MVA for markedet deres.",
     "modesTitle": "To bestillingsmoduser",
-    "modeFirmTag": "Direkte",
+    "modeFirmTag": "Øyeblikkelig",
     "modeFirmTitle": "Fastpris — selvbetjening",
     "modeFirmBody": "Produkter med offentlig fastpris kan bestilles direkte fra planen. Ingen desk-overlevering, ingen ventetid.",
     "modeRfqTitle": "Forespørsel om pris — administrert",
@@ -3268,7 +3293,9 @@
     "approvedAt": "Planen ble godkjent {date}. Kontakten din tar det videre herfra.",
     "noteLabel": "Merknad",
     "alternativesHeading": "Alternativer – ikke med i totalen",
-    "alternativesIntro": "Titler vi også anbefaler. De er ikke med i planen eller totalen."
+    "alternativesIntro": "Titler vi også anbefaler. De er ikke med i planen eller totalen.",
+    "changedSinceApproval": "Du godkjente en tidligere versjon av planen {date}. Den er endret siden, så se over den og godkjenn på nytt.",
+    "approveAgainCta": "Godkjenn den oppdaterte planen"
   },
   "quotePdf": {
     "documentTitle": "Tilbud {quoteNumber}",

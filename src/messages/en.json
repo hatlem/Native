@@ -305,7 +305,8 @@
   },
   "home": {
     "title": "Buy native content in premium newspapers and magazines",
-    "subtitle": "A transparent catalog of every title that offers native across 9 markets. Brief us once — we write it, we book it, even where programmatic isn't possible."
+    "subtitle": "A transparent catalog of every title that offers native across 9 markets. Brief us once — we write it, we book it, even where programmatic isn't possible.",
+    "nextWaveBodyDateNear": "Wave {n} is scheduled from {date}. Send it now so the desk has time to book it."
   },
   "catalog": {
     "eyebrow": "Browse",
@@ -380,7 +381,9 @@
       "videoHint": "Produced video included in the placement.",
       "unpricedNote": "{count, plural, =1 {1 more title is} other {# more titles are}} in the catalog without published pricing. The desk can price it for you.",
       "advancedToggle": "{count, plural, =0 {Advanced filters} other {Advanced filters (#)}}",
-      "mobileFilters": "Filters"
+      "mobileFilters": "Filters",
+      "formatHeading": "Which format?",
+      "formatHint": "Native article, advertorial, display, video …"
     },
     "shortlist": {
       "untitledPlan": "your plan",
@@ -459,7 +462,9 @@
     "bookCallCta": "Book a call",
     "bookCallDismiss": "Dismiss",
     "exportCsv": "Download catalog (CSV)",
-    "exportCsvMarket": "Download {market} titles (CSV)"
+    "exportCsvMarket": "Download {market} titles (CSV)",
+    "noMatchHeading": "No titles match",
+    "searchSomeWords": "No title matches every word of “{q}”, so these match some of them."
   },
   "titleDetail": {
     "back": "Back to catalog",
@@ -552,7 +557,7 @@
       "minSpend": "Minimum spend {currency} {amount, number}"
     },
     "publisherLinkHelp": "See every title from {name}",
-    "factVertical": "Vertical",
+    "factVertical": "Subject area",
     "factReaderProfile": "Reader profile",
     "availabilityTitle": "Availability",
     "avail_open": "Open",
@@ -578,7 +583,9 @@
     "undo": "Undo",
     "archivedHeading": "Archived ({count})",
     "archivedOn": "archived {date}",
-    "restore": "Restore"
+    "restore": "Restore",
+    "emptyCta": "Browse the catalog",
+    "emptySecondaryCta": "Start a plan"
   },
   "favorites": {
     "title": "Favorites",
@@ -634,7 +641,7 @@
     "totalForItems": "{amount} for {count, plural, =1 {1 title} other {# titles}}",
     "multiCurrencyNote": "Titles bill in their publisher's own currency — both amounts are due, this isn't a choice of currency to pay in.",
     "rfqTitle": "Request a firm quote",
-    "error": "Add at least one placement and fill in company, email and market.",
+    "error": "Something went wrong sending the plan. Check it and try again.",
     "linesEyebrow": "Selected",
     "linesHeading": "Your placements",
     "scheduledPeriod": "From {date} · {n} {unit}",
@@ -703,7 +710,7 @@
     "weWriteIt": "We write it",
     "needsPriceNote": "This publisher hasn't published list pricing. Sending the plan asks the desk to price it — the rest of your plan is unaffected.",
     "breakdownUnpriced": "Confirmed within 24 hours",
-    "breakdownWithArticle": "{placement} placement + {article} article",
+    "breakdownWithArticle": "{placement} placement + {article} per article",
     "breakdownQtyWithArticle": "{n} × {unit}, article included",
     "breakdownArticleIncluded": "Article included",
     "breakdownQty": "{n} × {unit}",
@@ -718,19 +725,19 @@
     "mobileBackToTitles": "Titles",
     "mobileEdit": "Edit",
     "timing": {
-      "q3": "Q3 2026",
-      "q4": "Q4 2026",
       "flexible": "Flexible",
-      "q3Sentence": "Preferred timing: Q3 2026.",
-      "q4Sentence": "Preferred timing: Q4 2026.",
-      "flexibleSentence": "Timing is flexible."
+      "flexibleSentence": "Timing is flexible.",
+      "quarter": "Q{quarter} {year}",
+      "quarterSentence": "Preferred timing: Q{quarter} {year}."
     },
     "steps": {
       "label": "Plan progress",
       "find": "Find titles",
       "build": "Build the plan",
       "quote": "Get a firm quote",
-      "approve": "Approve & run"
+      "approve": "Approve & run",
+      "confirm": "Confirm the order",
+      "run": "Produced & run"
     },
     "next": {
       "heading": "What happens next",
@@ -768,7 +775,6 @@
         "awareness": "Awareness builds slowly — waves are spaced a little wider so each article lands on its own."
       },
       "preview": "from {date}",
-      "previewFirst": "this plan, as scheduled",
       "start": "Create programme",
       "starting": "Creating…",
       "stripTitle": "{name} — wave {n} of {of}",
@@ -798,7 +804,8 @@
       "overlapWarning": "{title} runs in wave {a} and wave {b} at the same time — space them out or vary the title.",
       "dissolveSummary": "Dissolve programme…",
       "dissolveBody": "Each wave becomes an ordinary plan again. Wave copies you never sent are archived so they don't clutter your plans — anything already sent to the desk is untouched.",
-      "dissolveConfirm": "Dissolve programme"
+      "dissolveConfirm": "Dissolve programme",
+      "waveName": "{name} · Wave {n}"
     },
     "share": {
       "summary": "Share with your client",
@@ -812,7 +819,9 @@
       "approvedBadge": "Client approved",
       "engagementApproved": "Your client approved this plan {date}.",
       "engagementViewed": "Last opened {date} · {count, plural, =1 {1 view} other {# views}}.",
-      "engagementNone": "Not opened yet."
+      "engagementNone": "Not opened yet.",
+      "staleBadge": "Approved before changes",
+      "engagementStale": "Your client approved an earlier version on {date}. The plan has changed since, so ask them to look at it again."
     },
     "lineNoteLabel": "Note",
     "lineNoteAdd": "Add note",
@@ -841,7 +850,23 @@
     "lineOrderSaveFailed": "The order could not be saved — reloading the plan.",
     "lineMovedAnnouncement": "Moved to position {position} of {total}",
     "noticePlanArchived": "That plan is archived, so you're looking at your current plan instead. You can restore it under Saved lists.",
-    "noticePlanUnavailable": "We couldn't open that plan — the link may be out of date, or the plan belongs to another workspace. This is your current plan."
+    "noticePlanUnavailable": "We couldn't open that plan — the link may be out of date, or the plan belongs to another workspace. This is your current plan.",
+    "errorEmpty": "Add at least one placement to the plan before sending it. Alternatives aren't sent.",
+    "nothingToSend": "Move at least one line into the plan to send it. Alternatives aren't sent.",
+    "briefSaving": "Saving…",
+    "briefSaved": "Saved to this plan.",
+    "briefSaveFailed": "Couldn't save just now. Your text is still here and goes with the plan when you send it.",
+    "briefAutosaveHint": "Saved to this plan as you type.",
+    "nextInstant": {
+      "heading": "What happens next",
+      "item1Title": "Your order is confirmed at once",
+      "item1Body": "Every line has a firm price, so confirming places the order. There's no quote to wait for.",
+      "item2Title": "We brief the publishers",
+      "item2Body": "Each publisher gets the booking and your brief. Need a change? The desk sorts it out with you.",
+      "item3Title": "We write, place and report",
+      "item3Body": "Drafts come to you for approval. Live links and performance land in Reports."
+    },
+    "breakdownQtyWithArticleFee": "{n} × {unit} placement + {article} per article (one article for all {n})"
   },
   "rfq": {
     "org": "Company",
@@ -3268,7 +3293,9 @@
     "approvedAt": "Plan approved {date}. Your contact takes it from here.",
     "noteLabel": "Note",
     "alternativesHeading": "Alternatives – not included in the total",
-    "alternativesIntro": "Titles we also recommend. They are not part of the plan or the total."
+    "alternativesIntro": "Titles we also recommend. They are not part of the plan or the total.",
+    "changedSinceApproval": "You approved an earlier version of this plan on {date}. It has changed since, so take a look and approve it again.",
+    "approveAgainCta": "Approve the updated plan"
   },
   "quotePdf": {
     "documentTitle": "Quote {quoteNumber}",

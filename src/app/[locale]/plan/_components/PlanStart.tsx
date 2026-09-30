@@ -12,6 +12,7 @@ const MARKET_CODES = SUPPORTED_MARKETS;
 // tiered title suggestions rendered alongside once a market is chosen.
 export async function PlanStart({
   locale,
+  listId,
   recBriefRaw,
   recMarket,
   recBudgetRaw,
@@ -20,6 +21,9 @@ export async function PlanStart({
   briefMatched,
 }: {
   locale: string;
+  // The (empty) plan this page shows, when there is one: "Add" puts the pick on
+  // it, not on whatever plan another tab made active.
+  listId: string | null;
   recBriefRaw: string;
   recMarket: string;
   recBudgetRaw: string;
@@ -102,6 +106,7 @@ export async function PlanStart({
                     </div>
                     <form action={addToPlan}>
                       <input type="hidden" name="locale" value={locale} />
+                      {listId ? <input type="hidden" name="listId" value={listId} /> : null}
                       <input type="hidden" name="productId" value={p.productId} />
                       <button type="submit" className="btn small">{t("add")}</button>
                     </form>
@@ -125,6 +130,7 @@ export async function PlanStart({
                     </div>
                     <form action={addToPlan}>
                       <input type="hidden" name="locale" value={locale} />
+                      {listId ? <input type="hidden" name="listId" value={listId} /> : null}
                       <input type="hidden" name="productId" value={s.productId} />
                       <button type="submit" className="btn small ghost">{t("add")}</button>
                     </form>

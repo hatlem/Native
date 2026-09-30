@@ -37,7 +37,8 @@ export function ProgrammeForm({
   locale: string;
   listId: string;
   cadence: CadencePlan;
-  // Earliest scheduled line on this list (ISO date) — wave 1's anchor.
+  // Earliest scheduled line on this list (ISO date). Wave 1 starts there while
+  // it is still ahead, else at the next period start (waveOneStart).
   firstStart: string | null;
   unit: BookingUnit;
   // Server-provided "today" (ISO) so the preview is deterministic across SSR/CSR.
@@ -108,11 +109,7 @@ export function ProgrammeForm({
               <div className="plan-programme__wave-head">
                 <span className="plan-programme__wave-num">{t("waveChip", { n: i + 1 })}</span>
                 <span className="muted small">
-                  {i === 0 && !firstStart
-                    ? t("previewFirst")
-                    : d
-                      ? t("preview", { n: i + 1, date: dateFmt.format(d) })
-                      : t("noDate")}
+                  {d ? t("preview", { n: i + 1, date: dateFmt.format(d) }) : t("noDate")}
                 </span>
               </div>
             </li>

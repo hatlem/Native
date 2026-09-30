@@ -1,6 +1,6 @@
 import { getTranslations } from "next-intl/server";
 import { Repeat } from "lucide-react";
-import { selectActiveList } from "@/app/list-actions";
+import { planPath } from "@/lib/plan-path";
 import {
   linkWaveArticleAction,
   unlinkWaveArticleAction,
@@ -27,9 +27,9 @@ export type ProgrammePacing = {
 //  - plain list → a collapsed "Run this as a programme" disclosure with the
 //    recommended cadence pre-filled (why + how, then the form);
 //  - a wave of a programme → the wave strip: every wave's state/date/linked
-//    article, the current one highlighted, others switchable
-//    (selectActiveList), and this wave's article linkable/creatable/unlinkable
-//    in place.
+//    article, the current one highlighted, the others plain links to their
+//    own /plan/<listId> (so a wave opens in a new tab too), and this wave's
+//    article linkable/creatable/unlinkable in place.
 // Native <details> for the disclosure — same pattern as PlanTargeting.
 export async function PlanProgramme({
   locale,
@@ -151,14 +151,13 @@ export async function PlanProgramme({
                   <span className="wave-strip__you">{t("thisWave")}</span>
                 </div>
               ) : (
-                <form action={selectActiveList}>
-                  <input type="hidden" name="locale" value={locale} />
-                  <input type="hidden" name="listId" value={w.listId} />
-                  <button type="submit" className="wave-strip__card wave-strip__card--btn">
-                    {body}
-                    <span className="wave-strip__open">{t("openWave")} →</span>
-                  </button>
-                </form>
+                // A plain <a> (full navigation), not next/link: a client-side
+                // hop between two /plan/<id> addresses is the same-route soft
+                // navigation that 503s in prod (see CatalogSort.tsx).
+                <a href={planPath(locale, w.listId)} className="wave-strip__card wave-strip__card--btn">
+                  {body}
+                  <span className="wave-strip__open">{t("openWave")} →</span>
+                </a>
               )}
             </li>
           );

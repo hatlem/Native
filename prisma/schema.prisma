@@ -1089,6 +1089,11 @@ model SavedList {
   targetGeo      String?
   targetAudience String?
   targetContext  String?
+  // The plan brief as typed on /plan: what the campaign sells (free text) and
+  // the preferred timing ("2026-Q4" or "flexible", lib/plan-brief.ts). Saved
+  // as the buyer types, so it belongs to this plan and survives navigation.
+  briefText      String?
+  briefTiming    String?
   // CSV of Title.vertical values this specific plan is targeting — lets one
   // org run several plans for different profiles (e.g. ABAX running a
   // trucking plan and a separate seafood plan) without one polluting the
@@ -1111,11 +1116,14 @@ model SavedList {
   shareCreatedAt DateTime?
   // Client engagement on the share link: last open + count (any holder of
   // the URL — the owner previewing counts too), and the client's explicit
-  // "approve this plan" click. Approval survives token rotation; disabling
-  // sharing clears nothing (it's a fact about the plan, not the link).
+  // "approve this plan" click. An approval covers ONE version of the plan:
+  // clientApprovedVersion is the version the client saw (lib/list-share.ts
+  // planVersion). Once the lines change it reads "approved before changes";
+  // issuing a new link clears the approval. Disabling sharing clears nothing.
   shareViewedAt    DateTime?
   shareViewCount   Int       @default(0)
   clientApprovedAt DateTime?
+  clientApprovedVersion String?
   // Soft reference (no FK) — the list survives if the creating user is removed.
   createdById    String?
   archivedAt     DateTime?

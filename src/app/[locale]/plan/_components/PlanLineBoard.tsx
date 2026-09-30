@@ -33,7 +33,7 @@ import {
 } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import { reorderListItems } from "@/app/list-actions";
-import { sortLines, type SortKey, type SortableLine } from "@/lib/plan-reorder";
+import { sortLines, detectSortKey, type SortKey, type SortableLine } from "@/lib/plan-reorder";
 
 export type PlanBoardEntry = {
   id: string;
@@ -98,7 +98,14 @@ export function PlanLineBoard({
   labels: Labels;
 }) {
   const [query, setQuery] = useState("");
-  const [sortKey, setSortKey] = useState<SortKey | "custom">("custom");
+  // The saved order may be the result of an earlier one-click sort: show that
+  // sort in the select again rather than "Your order".
+  const [sortKey, setSortKey] = useState<SortKey | "custom">(() =>
+    detectSortKey(
+      [...plan].sort((x, y) => x.position - y.position).map((e) => e.sort),
+      locale,
+    ),
+  );
   const [planOrder, setPlanOrder] = useState(() => idsOf(plan));
   const [altOrder, setAltOrder] = useState(() => idsOf(alternatives));
   const [failed, setFailed] = useState(false);

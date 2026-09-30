@@ -305,7 +305,8 @@
   },
   "home": {
     "title": "Native-Inhalte in Premium-Zeitungen und Magazinen kaufen",
-    "subtitle": "Ein transparenter Katalog mit jedem Titel, der Native in 9 Märkten anbietet. Einmal briefen — wir schreiben, wir buchen, auch dort, wo Programmatic nicht funktioniert."
+    "subtitle": "Ein transparenter Katalog mit jedem Titel, der Native in 9 Märkten anbietet. Einmal briefen — wir schreiben, wir buchen, auch dort, wo Programmatic nicht funktioniert.",
+    "nextWaveBodyDateNear": "Welle {n} ist ab {date} geplant – senden Sie sie jetzt, damit der Desk Zeit zum Buchen hat."
   },
   "catalog": {
     "eyebrow": "Durchstöbern",
@@ -433,7 +434,9 @@
       "unpricedNote": "{count, plural, =1 {1 weiterer Titel im Katalog hat noch keinen veröffentlichten Preis. Unser Desk kann ihn für dich bepreisen.} other {# weitere Titel im Katalog haben noch keinen veröffentlichten Preis. Unser Desk kann sie für dich bepreisen.}}",
       "advancedToggle": "{count, plural, =0 {Erweiterte Filter} other {Erweiterte Filter (#)}}",
       "mobileFilters": "Filter",
-      "marketCountAll": "Alle {total} Märkte"
+      "marketCountAll": "Alle {total} Märkte",
+      "formatHeading": "Welches Format?",
+      "formatHint": "Native-Artikel, Advertorial, Display, Video …"
     },
     "shortlist": {
       "untitledPlan": "deinen Plan",
@@ -459,7 +462,9 @@
       "askForPrice": "Preis anfragen"
     },
     "exportCsv": "Katalog herunterladen (CSV)",
-    "exportCsvMarket": "Titel in {market} herunterladen (CSV)"
+    "exportCsvMarket": "Titel in {market} herunterladen (CSV)",
+    "noMatchHeading": "Keine Treffer",
+    "searchSomeWords": "Kein Titel passt zu allen Wörtern von „{q}“, diese passen zu einigen davon."
   },
   "lists": {
     "title": "Gespeicherte Listen",
@@ -479,7 +484,9 @@
     "undo": "Rückgängig",
     "archivedHeading": "Archiviert ({count})",
     "archivedOn": "archiviert am {date}",
-    "restore": "Wiederherstellen"
+    "restore": "Wiederherstellen",
+    "emptyCta": "Katalog durchsuchen",
+    "emptySecondaryCta": "Plan beginnen"
   },
   "favorites": {
     "title": "Favoriten",
@@ -608,7 +615,7 @@
       "minSpend": "Mindestbuchung {currency} {amount, number}"
     },
     "publisherLinkHelp": "Alle Titel von {name} ansehen",
-    "factVertical": "Vertical",
+    "factVertical": "Themenbereich",
     "factReaderProfile": "Leserprofil",
     "availabilityTitle": "Verfügbarkeit",
     "avail_open": "Frei",
@@ -634,7 +641,7 @@
     "totalForItems": "{amount} für {count, plural, =1 {1 Titel} other {# Titel}}",
     "multiCurrencyNote": "Titel werden in der Währung des jeweiligen Verlags abgerechnet — beide Beträge sind fällig, das ist keine Wahl der Zahlungswährung.",
     "rfqTitle": "Festes Angebot anfordern",
-    "error": "Mindestens eine Platzierung hinzufügen und Firma, E-Mail und Markt ausfüllen.",
+    "error": "Beim Senden des Plans ist etwas schiefgegangen. Prüfen Sie ihn und versuchen Sie es erneut.",
     "linesEyebrow": "Ausgewählt",
     "linesHeading": "Ihre Platzierungen",
     "scheduledPeriod": "Ab {date} · {n} {unit}",
@@ -703,7 +710,7 @@
     "weWriteIt": "Wir schreiben ihn",
     "needsPriceNote": "Dieser Verlag hat noch keinen Listenpreis veröffentlicht. Das Senden des Plans bittet unseren Desk, ihn zu bepreisen — der Rest deines Plans bleibt unberührt.",
     "breakdownUnpriced": "Wird innerhalb von 24 Stunden bestätigt",
-    "breakdownWithArticle": "{placement} Platzierung + {article} Artikel",
+    "breakdownWithArticle": "{placement} Platzierung + {article} pro Artikel",
     "breakdownQtyWithArticle": "{n} × {unit}, Artikel inbegriffen",
     "breakdownArticleIncluded": "Artikel inbegriffen",
     "breakdownQty": "{n} × {unit}",
@@ -716,19 +723,19 @@
     "briefAdvancedToggle": "Budget, Zielgruppen und Geografie hinzufügen",
     "reviewFavorites": "Ansehen",
     "timing": {
-      "q3": "Q3 2026",
-      "q4": "Q4 2026",
       "flexible": "Flexibel",
-      "q3Sentence": "Bevorzugter Zeitraum: Q3 2026.",
-      "q4Sentence": "Bevorzugter Zeitraum: Q4 2026.",
-      "flexibleSentence": "Der Zeitraum ist flexibel."
+      "flexibleSentence": "Der Zeitraum ist flexibel.",
+      "quarter": "Q{quarter} {year}",
+      "quarterSentence": "Bevorzugter Zeitraum: Q{quarter} {year}."
     },
     "steps": {
       "label": "Planfortschritt",
       "find": "Titel finden",
       "build": "Plan erstellen",
       "quote": "Festpreis einholen",
-      "approve": "Freigeben & starten"
+      "approve": "Freigeben & starten",
+      "confirm": "Bestellung bestätigen",
+      "run": "Produktion & Start"
     },
     "next": {
       "heading": "Wie geht es weiter",
@@ -768,7 +775,6 @@
         "awareness": "Bekanntheit wächst langsam – die Wellen liegen etwas weiter auseinander, damit jeder Artikel für sich landet."
       },
       "preview": "ab {date}",
-      "previewFirst": "dieser Plan, wie terminiert",
       "start": "Programm anlegen",
       "starting": "Wird angelegt…",
       "stripTitle": "{name} – Welle {n} von {of}",
@@ -798,7 +804,8 @@
       "overlapWarning": "{title} läuft in Welle {a} und Welle {b} gleichzeitig – ziehen Sie die Wellen auseinander oder wechseln Sie den Titel.",
       "dissolveSummary": "Programm auflösen …",
       "dissolveBody": "Jede Welle wird wieder ein gewöhnlicher Plan. Nie eingereichte Wellen-Kopien werden archiviert, damit sie Ihre Pläne nicht unübersichtlich machen – alles bereits an den Desk Gesendete bleibt unberührt.",
-      "dissolveConfirm": "Programm auflösen"
+      "dissolveConfirm": "Programm auflösen",
+      "waveName": "{name} · Welle {n}"
     },
     "share": {
       "summary": "Mit dem Kunden teilen",
@@ -812,7 +819,9 @@
       "approvedBadge": "Vom Kunden freigegeben",
       "engagementApproved": "Ihr Kunde hat den Plan am {date} freigegeben.",
       "engagementViewed": "Zuletzt geöffnet {date} · {count, plural, =1 {1 Aufruf} other {# Aufrufe}}.",
-      "engagementNone": "Noch nicht geöffnet."
+      "engagementNone": "Noch nicht geöffnet.",
+      "staleBadge": "Vor Änderungen freigegeben",
+      "engagementStale": "Ihr Kunde hat am {date} eine frühere Version freigegeben. Der Plan hat sich seitdem geändert. Bitten Sie ihn, noch einmal draufzuschauen."
     },
     "lineNoteLabel": "Hinweis",
     "lineNoteAdd": "Hinweis hinzufügen",
@@ -841,7 +850,23 @@
     "lineOrderSaveFailed": "Die Reihenfolge konnte nicht gespeichert werden – Plan wird neu geladen.",
     "lineMovedAnnouncement": "Verschoben auf Position {position} von {total}",
     "noticePlanArchived": "Dieser Plan ist archiviert, deshalb sehen Sie stattdessen Ihren aktuellen Plan. Sie können ihn unter Gespeicherte Listen wiederherstellen.",
-    "noticePlanUnavailable": "Wir konnten diesen Plan nicht öffnen — der Link ist vielleicht veraltet, oder der Plan gehört zu einem anderen Arbeitsbereich. Das ist Ihr aktueller Plan."
+    "noticePlanUnavailable": "Wir konnten diesen Plan nicht öffnen — der Link ist vielleicht veraltet, oder der Plan gehört zu einem anderen Arbeitsbereich. Das ist Ihr aktueller Plan.",
+    "errorEmpty": "Nehmen Sie mindestens eine Platzierung in den Plan auf, bevor Sie ihn senden. Alternativen werden nicht gesendet.",
+    "nothingToSend": "Verschieben Sie mindestens eine Zeile in den Plan, um ihn zu senden. Alternativen werden nicht gesendet.",
+    "briefSaving": "Wird gespeichert …",
+    "briefSaved": "In diesem Plan gespeichert.",
+    "briefSaveFailed": "Speichern hat gerade nicht geklappt. Ihr Text bleibt hier und geht mit, wenn Sie den Plan senden.",
+    "briefAutosaveHint": "Wird beim Tippen im Plan gespeichert.",
+    "nextInstant": {
+      "heading": "Wie es weitergeht",
+      "item1Title": "Ihre Bestellung ist sofort bestätigt",
+      "item1Body": "Alle Zeilen haben einen Festpreis, mit der Bestätigung ist also bestellt. Auf ein Angebot müssen Sie nicht warten.",
+      "item2Title": "Wir briefen die Verlage",
+      "item2Body": "Jeder Verlag erhält die Buchung und Ihr Briefing. Soll sich etwas ändern, klärt der Desk das mit Ihnen.",
+      "item3Title": "Wir schreiben, platzieren und berichten",
+      "item3Body": "Entwürfe kommen zur Freigabe zu Ihnen. Links und Ergebnisse landen in den Berichten."
+    },
+    "breakdownQtyWithArticleFee": "{n} × {unit} Platzierung + {article} pro Artikel (ein Artikel für alle {n})"
   },
   "rfq": {
     "org": "Firma",
@@ -3137,7 +3162,9 @@
     "approvedAt": "Plan am {date} freigegeben. Ihr Kontakt übernimmt ab hier.",
     "noteLabel": "Hinweis",
     "alternativesHeading": "Alternativen – nicht in der Summe enthalten",
-    "alternativesIntro": "Titel, die wir ebenfalls empfehlen. Sie gehören nicht zum Plan oder zur Summe."
+    "alternativesIntro": "Titel, die wir ebenfalls empfehlen. Sie gehören nicht zum Plan oder zur Summe.",
+    "changedSinceApproval": "Sie haben am {date} eine frühere Version dieses Plans freigegeben. Er hat sich seitdem geändert. Bitte prüfen Sie ihn und geben Sie ihn erneut frei.",
+    "approveAgainCta": "Aktualisierten Plan freigeben"
   },
   "quotePdf": {
     "documentTitle": "Angebot {quoteNumber}",

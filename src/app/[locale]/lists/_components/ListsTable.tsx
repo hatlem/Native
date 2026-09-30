@@ -1,4 +1,5 @@
 import { getTranslations } from "next-intl/server";
+import { EmptyState } from "@/app/empty-state";
 import { intlLocale } from "@/lib/money";
 import {
   renameList,
@@ -36,7 +37,14 @@ export async function ListsTable({ locale, lists, heading, emptyLabel }: Props) 
       </header>
 
       {lists.length === 0 ? (
-        <p className="lead muted">{emptyLabel}</p>
+        // A way forward, not just a sentence: plans start in the catalog.
+        <EmptyState
+          title={emptyLabel}
+          primaryHref="/catalog"
+          primaryLabel={t("emptyCta")}
+          secondaryHref="/plan"
+          secondaryLabel={t("emptySecondaryCta")}
+        />
       ) : (
         <div className="table-wrap responsive">
           <table className="table">

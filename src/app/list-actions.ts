@@ -34,6 +34,9 @@ import { enableListShare, disableListShare } from "@/lib/list-share";
 import { normalizeLineNote } from "@/lib/line-note";
 import { contentIntent } from "@/lib/authorship";
 import { reorderSection, ReorderMismatchError } from "@/lib/plan-reorder";
+import { alignActivePlan, refusalNotice, resolvePlanTarget, type PlanTargetList } from "@/lib/plan-target";
+import { saveListBrief, type RawListBrief } from "@/lib/plan-brief";
+import type { Scope } from "@/lib/scope";
 import { listNames } from "@/lib/list-names";
 
 // Same-origin path of the page that posted the action, if the browser said.
@@ -71,8 +74,15 @@ async function requireActiveOrg(locale: string) {
 /** Resolve (adopt-or-create) the active list id for the active org and persist
  *  it. Returns only the id — the add paths don't need the deep list tree.
  *  ensureActiveListId adopts the org's most-recent list under a per-org advisory
- *  lock, so a first-add race converges on one list rather than orphaning one. */
-async function activeList(locale: string) {
+ *  lock, so a first-add race converges on one list rather than orphaning one.
+ *  A form on /plan/<listId> posts its listId: that plan wins over the cookie
+ *  (see ownList), so an add from the page lands on the plan the page shows. */
+async function activeList(locale: string, postedListId = "") {
+  if (postedListId) {
+    const { scope, list } = await ownList(locale, postedListId);
+    await alignLinePlan(scope, list);
+    return { scope, orgId: list.organizationId, listId: list.id };
+  }
   const { scope, orgId } = await requireActiveOrg(locale);
   let activeId = await readActiveListId();
   if (!activeId) {
@@ -114,8 +124,9 @@ export async function addProductToList(formData: FormData) {
       select: { id: true },
     });
     if (valid) {
-      const { listId } = await activeList(locale);
+      const { listId } = await activeList(locale, str(formData, "listId"));
       await addProductItem(listId, productId, str(formData, "withContent") === "1");
+      if (!str(formData, "returnTo")) redirect(planPath(locale, listId));
     }
   }
   redirect(safeReturnTo(formData, locale, "/plan"));
@@ -288,40 +299,76 @@ export async function createListWithTitle(formData: FormData) {
   revalidatePath(`/${locale}/lists`);
 }
 
-/** Shared guard: the item's list must be in the caller's scope. Returns the
- *  item (incl. its productId/titleId) so callers needn't re-query. */
+/** Shared guard for line actions: the item's list must be in the caller's
+ *  scope and not archived. The list comes from the ITEM, never from the
+ *  active-list cookie, so an edit in a tab showing plan A stays on plan A even
+ *  after another tab opened plan B. Afterwards that plan is made the active
+ *  one again (alignLinePlan) and the action lands on its own /plan/<listId>. */
 async function ownItem(locale: string, itemId: string) {
   const scope = await loadScope();
-  const item = await prisma.savedListItem.findUnique({
-    where: { id: itemId },
-    select: { id: true, productId: true, titleId: true, list: { select: { organizationId: true } } },
-  });
-  if (!item || !canActOnOrg(scope, item.list.organizationId)) redirect(`/${locale}/plan`);
-  return item;
+  const item = itemId
+    ? await prisma.savedListItem.findUnique({
+        where: { id: itemId },
+        select: {
+          id: true,
+          productId: true,
+          titleId: true,
+          list: { select: { id: true, organizationId: true, archivedAt: true } },
+        },
+      })
+    : null;
+  if (!item || item.list.archivedAt || !canActOnOrg(scope, item.list.organizationId)) {
+    // The /plan notice says why (archived only for a plan in the viewer's own
+    // scope, so the notice can't probe other orgs).
+    const archived = !!item?.list.archivedAt && canActOnOrg(scope, item.list.organizationId);
+    redirect(planPath(locale, null, { notice: archived ? "plan-archived" : "plan-unavailable" }));
+  }
+  return { scope, item, list: { id: item.list.id, organizationId: item.list.organizationId } };
+}
+
+/** After a line action: make the edited plan the active one for a buyer
+ *  working in that org (the desk has no workspace and no active plan). */
+async function alignLinePlan(scope: Scope, list: PlanTargetList) {
+  if (scope.workspace?.scopeOrgIds.includes(list.organizationId)) {
+    await alignActivePlan(scope.workspace, list);
+  }
+}
+
+/** Guard for actions addressed by a posted listId (rename, targeting, share,
+ *  brief): the same rules as submit (lib/plan-target.ts). */
+async function ownList(locale: string, listId: string) {
+  const scope = await loadScope();
+  if (!scope.userId) redirect(signinPath(locale, await refererPath()));
+  const target = await resolvePlanTarget(scope.workspace, listId);
+  if (!target.ok) redirect(planPath(locale, null, refusalNotice(target)));
+  return { scope, list: target.list };
 }
 
 export async function removeListItem(formData: FormData) {
   const locale = str(formData, "locale") || "en";
   const itemId = str(formData, "itemId");
-  await ownItem(locale, itemId);
+  const { scope, list } = await ownItem(locale, itemId);
   await removeItem(itemId);
+  await alignLinePlan(scope, list);
   revalidatePath(`/${locale}/plan`, "layout");
 }
 
 export async function setListItemQuantity(formData: FormData) {
   const locale = str(formData, "locale") || "en";
   const itemId = str(formData, "itemId");
-  await ownItem(locale, itemId);
+  const { scope, list } = await ownItem(locale, itemId);
   await setItemQuantity(itemId, Number(str(formData, "quantity")));
+  await alignLinePlan(scope, list);
   revalidatePath(`/${locale}/plan`, "layout");
 }
 
 export async function setListItemContent(formData: FormData) {
   const locale = str(formData, "locale") || "en";
   const itemId = str(formData, "itemId");
-  await ownItem(locale, itemId);
+  const { scope, list } = await ownItem(locale, itemId);
   await setItemContent(itemId, str(formData, "withContent") === "1");
-  redirect(`/${locale}/plan`);
+  await alignLinePlan(scope, list);
+  redirect(planPath(locale, list.id));
 }
 
 // Customer-visible line note ("Merknad") — shown on /plan and the /share view
@@ -329,15 +376,15 @@ export async function setListItemContent(formData: FormData) {
 export async function setListItemNote(formData: FormData) {
   const locale = str(formData, "locale") || "en";
   const itemId = str(formData, "itemId");
-  await ownItem(locale, itemId);
+  const { scope, list } = await ownItem(locale, itemId);
+  await alignLinePlan(scope, list);
   const parsed = normalizeLineNote(formData.get("note"));
-  if (!parsed.ok) redirect(`/${locale}/plan?error=note-too-long`);
-  const scope = await loadScope();
+  if (!parsed.ok) redirect(planPath(locale, list.id, { error: "note-too-long" }));
   await prisma.savedListItem.updateMany({ where: { id: itemId }, data: { notes: parsed.note } });
   await recordAudit(scope.userId ?? null, "list.item_note", `SavedListItem:${itemId}`, {
     cleared: parsed.note === null,
   });
-  redirect(`/${locale}/plan`);
+  redirect(planPath(locale, list.id));
 }
 
 // Move a line between the plan and its recommended alternatives. An
@@ -346,12 +393,12 @@ export async function setListItemNote(formData: FormData) {
 export async function setListItemAlternative(formData: FormData) {
   const locale = str(formData, "locale") || "en";
   const itemId = str(formData, "itemId");
-  await ownItem(locale, itemId);
+  const { scope, list } = await ownItem(locale, itemId);
   const isAlternative = str(formData, "isAlternative") === "1";
   await setItemAlternative(itemId, isAlternative);
-  const scope = await loadScope();
   await recordAudit(scope.userId ?? null, "list.item_alternative", `SavedListItem:${itemId}`, { isAlternative });
-  redirect(`/${locale}/plan`);
+  await alignLinePlan(scope, list);
+  redirect(planPath(locale, list.id));
 }
 
 // Reorder one section of a plan (the plan lines or its alternatives) —
@@ -405,7 +452,7 @@ export async function reorderListItems(input: {
 export async function setItemSchedule(formData: FormData) {
   const locale = str(formData, "locale") || "en";
   const itemId = str(formData, "itemId");
-  await ownItem(locale, itemId);
+  const { scope, list } = await ownItem(locale, itemId);
   const startRaw = str(formData, "scheduleStart");
   const start = /^\d{4}-\d{2}-\d{2}$/.test(startRaw) ? new Date(`${startRaw}T00:00:00Z`) : null;
   const units = Number(str(formData, "scheduleUnits"));
@@ -416,23 +463,27 @@ export async function setItemSchedule(formData: FormData) {
       scheduleUnits: Number.isFinite(units) && units > 0 ? Math.floor(units) : null,
     },
   });
-  redirect(safeReturnTo(formData, locale, "/plan"));
+  await alignLinePlan(scope, list);
+  // The campaign flow passes its own returnTo; /plan's inline date form lands
+  // back on the plan it edited.
+  redirect(str(formData, "returnTo") ? safeReturnTo(formData, locale, "/plan") : planPath(locale, list.id));
 }
 
 export async function resolveTitleLine(formData: FormData) {
   const locale = str(formData, "locale") || "en";
   const itemId = str(formData, "itemId");
   const productId = str(formData, "productId");
-  const item = await ownItem(locale, itemId);
+  const { scope, item, list } = await ownItem(locale, itemId);
+  await alignLinePlan(scope, list);
   // Only a title placeholder is resolvable, and ONLY to a product OF THAT TITLE —
   // a tampered/replayed POST can't swap in a different publisher's product.
-  if (!item.titleId) redirect(`/${locale}/plan`);
+  if (!item.titleId) redirect(planPath(locale, list.id));
   const product = await prisma.product.findFirst({
     where: { id: productId, titleId: item.titleId, active: true, bookable: true },
     select: { id: true },
   });
   if (product) await resolveTitleItem(itemId, productId);
-  redirect(`/${locale}/plan`);
+  redirect(planPath(locale, list.id));
 }
 
 export async function createList(formData: FormData) {
@@ -443,29 +494,21 @@ export async function createList(formData: FormData) {
   });
   await writeActiveListId(list.id);
   await recordAudit(scope.userId ?? null, "list.create", `SavedList:${list.id}`, { orgId });
-  redirect(`/${locale}/plan`);
+  redirect(planPath(locale, list.id));
 }
 
 export async function selectActiveList(formData: FormData) {
   const locale = str(formData, "locale") || "en";
-  const listId = str(formData, "listId");
-  const scope = await loadScope();
-  const list = await prisma.savedList.findUnique({ where: { id: listId }, select: { organizationId: true } });
-  if (list && canActOnOrg(scope, list.organizationId)) {
-    await writeActiveListId(listId);
-    redirect(planPath(locale, listId));
-  }
-  redirect(planPath(locale));
+  const { scope, list } = await ownList(locale, str(formData, "listId"));
+  await alignLinePlan(scope, list);
+  redirect(planPath(locale, list.id));
 }
 
 export async function renameList(formData: FormData) {
   const locale = str(formData, "locale") || "en";
-  const listId = str(formData, "listId");
-  const scope = await loadScope();
-  const list = await prisma.savedList.findUnique({ where: { id: listId }, select: { organizationId: true } });
-  if (list && canActOnOrg(scope, list.organizationId)) {
-    await prisma.savedList.update({ where: { id: listId }, data: { name: str(formData, "name") || (await listNames(locale)).untitled } });
-  }
+  const { scope, list } = await ownList(locale, str(formData, "listId"));
+  await prisma.savedList.update({ where: { id: list.id }, data: { name: str(formData, "name") || (await listNames(locale)).untitled } });
+  await alignLinePlan(scope, list);
   revalidatePath(`/${locale}/plan`, "layout");
   revalidatePath(`/${locale}/lists`);
 }
@@ -476,18 +519,29 @@ export async function renameList(formData: FormData) {
 // effect the moment the buyer switches back to browsing the catalog.
 export async function setListTargetVerticals(formData: FormData) {
   const locale = str(formData, "locale") || "en";
-  const listId = str(formData, "listId");
-  const scope = await loadScope();
-  const list = await prisma.savedList.findUnique({ where: { id: listId }, select: { organizationId: true } });
-  if (list && canActOnOrg(scope, list.organizationId)) {
-    const verticals = formData.getAll("targetVerticals").map((v) => String(v).trim()).filter(Boolean);
-    await prisma.savedList.update({
-      where: { id: listId },
-      data: { targetVerticals: verticals.length ? verticals.join(",") : null },
-    });
-  }
+  const { scope, list } = await ownList(locale, str(formData, "listId"));
+  const verticals = formData.getAll("targetVerticals").map((v) => String(v).trim()).filter(Boolean);
+  await prisma.savedList.update({
+    where: { id: list.id },
+    data: { targetVerticals: verticals.length ? verticals.join(",") : null },
+  });
+  await alignLinePlan(scope, list);
   revalidatePath(`/${locale}/plan`, "layout");
   revalidatePath(`/${locale}/catalog`);
+}
+
+export type SavePlanBriefResult = { ok: boolean };
+
+// Autosave of /plan's brief fields, called by the form as the buyer types (not
+// a <form action>: no navigation, no re-render that would reset the inputs).
+// The brief belongs to the plan the page shows, addressed by its listId.
+export async function savePlanBrief(listId: string, brief: RawListBrief): Promise<SavePlanBriefResult> {
+  const scope = await loadScope();
+  if (!scope.userId) return { ok: false };
+  const target = await resolvePlanTarget(scope.workspace, listId);
+  if (!target.ok) return { ok: false };
+  await saveListBrief(target.list.id, brief);
+  return { ok: true };
 }
 
 export async function archiveList(formData: FormData) {
@@ -533,26 +587,20 @@ export async function restoreList(formData: FormData) {
 // token only.
 export async function shareList(formData: FormData) {
   const locale = str(formData, "locale") || "en";
-  const listId = str(formData, "listId");
-  const scope = await loadScope();
-  const list = await prisma.savedList.findUnique({ where: { id: listId }, select: { organizationId: true } });
-  if (list && canActOnOrg(scope, list.organizationId)) {
-    await enableListShare(listId);
-    await recordAudit(scope.userId ?? null, "list.share_enable", `SavedList:${listId}`, {});
-  }
-  redirect(`/${locale}/plan`);
+  const { scope, list } = await ownList(locale, str(formData, "listId"));
+  await enableListShare(list.id);
+  await recordAudit(scope.userId ?? null, "list.share_enable", `SavedList:${list.id}`, {});
+  await alignLinePlan(scope, list);
+  redirect(planPath(locale, list.id));
 }
 
 export async function unshareList(formData: FormData) {
   const locale = str(formData, "locale") || "en";
-  const listId = str(formData, "listId");
-  const scope = await loadScope();
-  const list = await prisma.savedList.findUnique({ where: { id: listId }, select: { organizationId: true } });
-  if (list && canActOnOrg(scope, list.organizationId)) {
-    await disableListShare(listId);
-    await recordAudit(scope.userId ?? null, "list.share_disable", `SavedList:${listId}`, {});
-  }
-  redirect(`/${locale}/plan`);
+  const { scope, list } = await ownList(locale, str(formData, "listId"));
+  await disableListShare(list.id);
+  await recordAudit(scope.userId ?? null, "list.share_disable", `SavedList:${list.id}`, {});
+  await alignLinePlan(scope, list);
+  redirect(planPath(locale, list.id));
 }
 
 export async function duplicateList(formData: FormData) {
@@ -569,6 +617,16 @@ export async function duplicateList(formData: FormData) {
       organizationId: source.organizationId,
       name: t("copyName", { name: source.name }),
       note: source.note,
+      // The brief is part of the plan, so the copy starts from it too.
+      briefText: source.briefText,
+      briefTiming: source.briefTiming,
+      budget: source.budget,
+      currency: source.currency,
+      goal: source.goal,
+      targetAudience: source.targetAudience,
+      targetGeo: source.targetGeo,
+      targetContext: source.targetContext,
+      targetVerticals: source.targetVerticals,
       createdById: scope.userId ?? null,
       items: {
         create: source.items.map((i) => ({
@@ -585,5 +643,5 @@ export async function duplicateList(formData: FormData) {
   });
   await writeActiveListId(copy.id);
   await recordAudit(scope.userId ?? null, "list.duplicate", `SavedList:${copy.id}`, { sourceId: listId });
-  redirect(`/${locale}/plan`);
+  redirect(planPath(locale, copy.id));
 }
