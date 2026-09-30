@@ -2685,7 +2685,8 @@
     "deactivateButton": "Deaktiver kontoen min",
     "deactivating": "Deaktiverer…",
     "errDelegation": "Sluttdatoen for delegeringen er ikke en gyldig dato.",
-    "errDelegationPast": "Sluttdatoen for delegeringen må være frem i tid."
+    "errDelegationPast": "Sluttdatoen for delegeringen må være frem i tid.",
+    "canCommitAdminNote": "Administratorer har alltid bestillingsrett."
   },
   "invite": {
     "title": "Bli med i {org}",

@@ -54,3 +54,14 @@ export function wouldRemoveLastAdmin(
   );
   return activeAdmins.length === 1 && activeAdmins[0].userId === targetUserId;
 }
+
+/**
+ * Commit authority (accept quotes, place orders) for a seat. An ADMIN always
+ * has it: an admin can grant it to anyone, themselves included, so an admin
+ * without it was never a real restriction, only a wall the first time they
+ * tried to accept a quote. Enforced in the database too (CHECK constraints on
+ * Membership and OrgInvite), so every writer must route through this.
+ */
+export function commitGrantFor(role: MembershipRole, requested: boolean): boolean {
+  return role === "ADMIN" || requested;
+}

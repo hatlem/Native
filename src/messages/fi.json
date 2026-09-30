@@ -2627,7 +2627,8 @@
     "deactivateButton": "Poista tilini käytöstä",
     "deactivating": "Poistetaan käytöstä…",
     "errDelegation": "Delegoinnin päättymispäivä ei ole kelvollinen päivämäärä.",
-    "errDelegationPast": "Delegoinnin päättymispäivän on oltava tulevaisuudessa."
+    "errDelegationPast": "Delegoinnin päättymispäivän on oltava tulevaisuudessa.",
+    "canCommitAdminNote": "Ylläpitäjillä on aina tilausoikeus."
   },
   "rateCard": {
     "pageTitle": "Rate card -pyyntö",

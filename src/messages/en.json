@@ -2700,7 +2700,8 @@
     "deactivateButton": "Deactivate my account",
     "deactivating": "Deactivating…",
     "errDelegation": "That delegation end date isn't a valid date.",
-    "errDelegationPast": "The delegation end date has to be in the future."
+    "errDelegationPast": "The delegation end date has to be in the future.",
+    "canCommitAdminNote": "Administrators can always commit."
   },
   "invite": {
     "title": "Join {org}",

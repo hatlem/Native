@@ -157,10 +157,15 @@ export async function TeamSection({ locale, orgId, isAdmin }: Props) {
                             className="checkbox-label"
                             title={t("canCommitLabel")}
                           >
+                            {/* Admins always have commit authority
+                                (lib/membership commitGrantFor) — shown
+                                ticked and locked rather than as a choice
+                                that the server would override. */}
                             <input
                               type="checkbox"
                               name="canCommit"
-                              defaultChecked={m.canCommit}
+                              defaultChecked={m.canCommit || m.role === "ADMIN"}
+                              disabled={m.role === "ADMIN"}
                             />
                             {t("colCommit")}
                           </label>
@@ -224,6 +229,7 @@ export async function TeamSection({ locale, orgId, isAdmin }: Props) {
                 <input type="checkbox" name="canCommit" />
                 {t("canCommitLabel")}
               </label>
+              <span className="hint">{t("canCommitAdminNote")}</span>
             </div>
             <div className="field">
               <label htmlFor="team-delegation">{t("delegationEndsLabel")}</label>

@@ -173,7 +173,9 @@ export async function updateUserOrg(formData: FormData) {
         // An ADMIN seat is permanent by construction (same rule as
         // updateMembership in org-invite-actions) — otherwise an org can end
         // up with zero active admins the moment a delegation lapses.
-        ...(orgRole === "ADMIN" ? { expiresAt: null } : {}),
+        // …and always carries commit authority (lib/membership commitGrantFor;
+        // a DB CHECK rejects an ADMIN seat without it).
+        ...(orgRole === "ADMIN" ? { expiresAt: null, canCommit: true } : {}),
       },
     });
   }

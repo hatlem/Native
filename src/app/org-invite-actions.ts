@@ -12,7 +12,7 @@ import { emailAdapter } from "@/lib/notify";
 import { loadScope } from "@/lib/scope";
 import { authLimiter } from "@/lib/rate-limit";
 import { clientIp } from "@/lib/client-ip";
-import { resolveOrgMembership, wouldRemoveLastAdmin, type MembershipRole } from "@/lib/membership";
+import { resolveOrgMembership, wouldRemoveLastAdmin, commitGrantFor, type MembershipRole } from "@/lib/membership";
 import {
   newInviteToken,
   expiryFromNow,
@@ -48,7 +48,7 @@ export async function inviteToOrg(formData: FormData) {
 
   const email = String(formData.get("email") || "").toLowerCase().trim();
   const role = String(formData.get("role") || "MEMBER") as MembershipRole;
-  const canCommit = formData.get("canCommit") === "on";
+  const canCommit = commitGrantFor(role, formData.get("canCommit") === "on");
   const delegationRaw = String(formData.get("delegationExpiresAt") || "").trim();
   const delegationExpiresAt = delegationRaw ? new Date(delegationRaw) : null;
 
@@ -179,7 +179,7 @@ export async function updateMembership(formData: FormData) {
   const { session, orgId } = await requireActiveAdmin(locale);
   const targetUserId = String(formData.get("userId") || "");
   const role = String(formData.get("role") || "MEMBER") as MembershipRole;
-  const canCommit = formData.get("canCommit") === "on";
+  const canCommit = commitGrantFor(role, formData.get("canCommit") === "on");
   if (!targetUserId) redirect(`/${locale}/account?error=1#team`);
   if (!["ADMIN", "MEMBER", "RESTRICTED"].includes(role)) {
     redirect(`/${locale}/account?error=role#team`);
@@ -303,7 +303,7 @@ export async function claimOrgInvite(formData: FormData) {
           userId: session!.user!.id,
           organizationId: inv.organizationId,
           role: inv.role,
-          canCommit: inv.canCommit,
+          canCommit: commitGrantFor(inv.role, inv.canCommit),
           expiresAt: inv.delegationExpiresAt,
           invitedById: inv.createdById ?? null,
         },
@@ -351,7 +351,7 @@ export async function claimOrgInvite(formData: FormData) {
           userId: user.id,
           organizationId: inv.organizationId,
           role: inv.role,
-          canCommit: inv.canCommit,
+          canCommit: commitGrantFor(inv.role, inv.canCommit),
           expiresAt: inv.delegationExpiresAt,
           invitedById: inv.createdById ?? null,
         },
