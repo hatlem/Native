@@ -20,8 +20,8 @@ export function isMembershipActive(m: MembershipRow, now: Date = new Date()): bo
 }
 
 /** isMembershipActive as a Prisma where: ACTIVE and not past its expiry. For
- *  queries that list an org's people (the GDPR export), which must agree
- *  with who actually has access. */
+ *  queries that pick people by their seat (notification recipients, the GDPR
+ *  export, rosters), which must agree with who actually has access. */
 export function activeMembershipWhere(now: Date = new Date()): Prisma.MembershipWhereInput {
   return { status: "ACTIVE", OR: [{ expiresAt: null }, { expiresAt: { gt: now } }] };
 }
