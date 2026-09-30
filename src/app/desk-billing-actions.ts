@@ -151,7 +151,7 @@ export async function addOrderExtraWorkAction(formData: FormData) {
     hours: formData.get("hours"),
     description: formData.get("description"),
   });
-  if (!input.ok) redirect(`${orderPath(locale, orderId)}?extraWork=invalid#extra-work`);
+  if (!input.ok) redirect(`${orderPath(locale, orderId)}?extraWork=invalid`);
 
   const result = await addOrderExtraWork({
     orderId,
@@ -162,7 +162,7 @@ export async function addOrderExtraWorkAction(formData: FormData) {
   });
   if (result.outcome === "not-found") redirect(orderPath(locale, orderId));
   if (result.outcome !== "added") {
-    redirect(`${orderPath(locale, orderId)}?extraWork=${result.outcome === "no-rate" ? "no-rate" : "locked"}#extra-work`);
+    redirect(`${orderPath(locale, orderId)}?extraWork=${result.outcome === "no-rate" ? "no-rate" : "locked"}`);
   }
   await recordAudit(userId, "order.extra_work.add", `OrderExtraWork:${result.entryId}`, {
     orderId,
@@ -172,7 +172,7 @@ export async function addOrderExtraWorkAction(formData: FormData) {
     currency: result.currency,
   });
   revalidatePath(orderPath(locale, orderId));
-  redirect(`${orderPath(locale, orderId)}#extra-work`);
+  redirect(`${orderPath(locale, orderId)}`);
 }
 
 export async function removeOrderExtraWorkAction(formData: FormData) {
@@ -182,7 +182,7 @@ export async function removeOrderExtraWorkAction(formData: FormData) {
   const userId = await requireDesk(locale);
 
   const result = await removeOrderExtraWork({ orderId, entryId });
-  if (result.outcome === "locked") redirect(`${orderPath(locale, orderId)}?extraWork=locked#extra-work`);
+  if (result.outcome === "locked") redirect(`${orderPath(locale, orderId)}?extraWork=locked`);
   if (result.outcome === "removed") {
     await recordAudit(userId, "order.extra_work.remove", `OrderExtraWork:${entryId}`, {
       orderId,
@@ -190,5 +190,5 @@ export async function removeOrderExtraWorkAction(formData: FormData) {
     });
     revalidatePath(orderPath(locale, orderId));
   }
-  redirect(`${orderPath(locale, orderId)}#extra-work`);
+  redirect(`${orderPath(locale, orderId)}`);
 }

@@ -27,6 +27,7 @@ import {
 } from "@/lib/commerce/quote-validity";
 import { reconcileExpiredQuotes } from "@/lib/commerce/quote-expiry";
 import { lineOrder } from "@/lib/commerce/line-order";
+import { feePlacementDescription } from "@/lib/commerce/placements";
 import { notifyQuoteAccepted, sendDraftQuotes } from "@/lib/commerce/quote-lifecycle";
 import {
   addQuoteExtraWorkLine,
@@ -198,7 +199,7 @@ export async function generateQuote(formData: FormData) {
       ).map((line) => ({
         ...line,
         priceOnRequest: onRequestNames.has(
-          line.description.replace(/^Content production — /, ""),
+          feePlacementDescription(line.description) ?? "",
         ),
       }));
       // Generation order is the display order (lib/commerce/line-order.ts).
@@ -381,7 +382,7 @@ export async function addQuoteExtraWork(formData: FormData) {
     hours: formData.get("hours"),
     description: formData.get("description"),
   });
-  if (!input.ok) redirect(`/${locale}/desk/${requestId}?error=extra-work-invalid&ewQuote=${quoteId}#quote-${quoteId}`);
+  if (!input.ok) redirect(`/${locale}/desk/${requestId}?error=extra-work-invalid&ewQuote=${quoteId}`);
 
   const result = await addQuoteExtraWorkLine({
     requestId,
@@ -391,7 +392,7 @@ export async function addQuoteExtraWork(formData: FormData) {
     rates: await loadExtraWorkRates(),
   });
   if (result.outcome === "locked") redirect(`/${locale}/desk/${requestId}?error=quote-locked`);
-  if (result.outcome === "no-rate") redirect(`/${locale}/desk/${requestId}?error=extra-work-no-rate&ewQuote=${quoteId}#quote-${quoteId}`);
+  if (result.outcome === "no-rate") redirect(`/${locale}/desk/${requestId}?error=extra-work-no-rate&ewQuote=${quoteId}`);
   if (result.outcome !== "added") redirect(`/${locale}/desk/${requestId}`);
 
   await recordAudit(scope.userId, "quote.line.extra_work", `QuoteLine:${result.lineId}`, {
@@ -401,7 +402,7 @@ export async function addQuoteExtraWork(formData: FormData) {
     hourlyRate: result.hourlyRate,
     lineTotal: result.lineTotal,
   });
-  redirect(`/${locale}/desk/${requestId}#quote-${quoteId}`);
+  redirect(`/${locale}/desk/${requestId}`);
 }
 
 export async function removeQuoteExtraWork(formData: FormData) {
@@ -422,7 +423,7 @@ export async function removeQuoteExtraWork(formData: FormData) {
     requestId,
     lineTotal: result.lineTotal,
   });
-  redirect(`/${locale}/desk/${requestId}#quote-${quoteId}`);
+  redirect(`/${locale}/desk/${requestId}`);
 }
 
 // "Revider tilbud": open a DRAFT revision of a quote the buyer holds (SENT or

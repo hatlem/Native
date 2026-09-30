@@ -9,6 +9,7 @@
 // already-issued invoices read properly too.
 
 import { ProductType } from "@prisma/client";
+import { feePlacementDescription } from "@/lib/commerce/placements";
 
 export type LabelledInvoiceLine = {
   description: string;
@@ -31,7 +32,6 @@ export type LabelDeps = {
   extraWorkDetail: (hours: number, hourlyRate: number) => string;
 };
 
-const CONTENT_FEE_PREFIX = "Content production — ";
 const PRODUCT_TYPES: ReadonlySet<string> = new Set(Object.values(ProductType));
 // A trailing " — ENUM" / " - ENUM" / " · ENUM" segment on a product name.
 const TRAILING_ENUM = /\s+[—–\-·]\s+([A-Z][A-Z_]+)\s*$/;
@@ -59,12 +59,10 @@ export function invoiceLineLabel(line: LabelledInvoiceLine, deps: LabelDeps): st
         : "";
     return `${deps.extraWork}: ${line.description}${detail}`;
   }
-  const isFee = line.kind === "CONTENT_FEE" || line.description.startsWith(CONTENT_FEE_PREFIX);
+  const feeFor = feePlacementDescription(line.description);
+  const isFee = line.kind === "CONTENT_FEE" || feeFor !== null;
   const base = line.titleName
     ? withFormat(line.titleName, line.productType, deps)
-    : humanizeProductName(
-        isFee ? line.description.replace(CONTENT_FEE_PREFIX, "") : line.description,
-        deps,
-      );
+    : humanizeProductName(feeFor ?? line.description, deps);
   return isFee ? `${deps.contentProduction}: ${base}` : base;
 }

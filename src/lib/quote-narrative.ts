@@ -15,7 +15,7 @@
 // the existing i18n layer. Anchor amounts scale with line quantity so
 // the discount framing stays correct on multi-unit lines.
 
-import { placementCount } from "@/lib/commerce/placements";
+import { feePlacementDescription, placementCount } from "@/lib/commerce/placements";
 
 export type QuoteAnchor = {
   rateCard: number;
@@ -75,11 +75,6 @@ type NarrativeQuoteLine = {
   hourlyRate?: unknown;
 };
 
-// The content-fee description convention (money.ts computeContentFeeLines,
-// also read by quote-pdf-data.ts): the fee names the sibling INVENTORY
-// line's description, which is the product name it was priced under.
-const CONTENT_FEE_PREFIX = "Content production — ";
-
 type NarrativeQuote = {
   currency: string;
   lines: NarrativeQuoteLine[];
@@ -114,10 +109,11 @@ export function buildQuoteNarrative(
     const product = productsById.get(line.productId);
     if (product) placementByDescription.set(line.description, { productId: line.productId, product });
   }
-  const feePlacement = (line: NarrativeQuoteLine): { productId: string; product: NarrativeProduct } | undefined =>
-    line.description?.startsWith(CONTENT_FEE_PREFIX)
-      ? placementByDescription.get(line.description.slice(CONTENT_FEE_PREFIX.length))
-      : undefined;
+  // The fee names its placement's description (lib/commerce/placements.ts).
+  const feePlacement = (line: NarrativeQuoteLine): { productId: string; product: NarrativeProduct } | undefined => {
+    const name = line.description ? feePlacementDescription(line.description) : null;
+    return name === null ? undefined : placementByDescription.get(name);
+  };
 
   const lines: QuoteNarrativeLine[] = quote.lines.map((line) => {
     const kind = line.kind ?? "INVENTORY";

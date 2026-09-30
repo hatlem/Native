@@ -246,9 +246,9 @@ export async function updateExtraWorkRates(formData: FormData) {
       .map((currency) => ({ currency, hourlyRate: field(formData, `r_${currency}`) })),
   });
   if (result.outcome === "forbidden") redirect(`/${locale}/signin`);
-  if (result.outcome === "invalid") redirect(`/${locale}/desk/content-fees?error=rates#extra-work-rates`);
+  if (result.outcome === "invalid") redirect(`/${locale}/desk/content-fees?error=rates`);
   revalidatePath(`/${locale}/desk/content-fees`);
-  redirect(`/${locale}/desk/content-fees#extra-work-rates`);
+  redirect(`/${locale}/desk/content-fees`);
 }
 
 // Flip active on/off so a rule can be retired without losing its history

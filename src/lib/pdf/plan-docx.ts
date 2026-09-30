@@ -169,13 +169,6 @@ export async function renderPlanDocx(doc: PlanDocument): Promise<Buffer> {
           ...brief,
           ...section(planSection, doc),
           ...total,
-          // What an article NativeSpin writes includes (lib/article-scope.ts).
-          ...(doc.articleScope
-            ? [
-                heading(doc.articleScope.heading, 320),
-                ...doc.articleScope.lines.map((l) => para([run(`• ${l}`, { size: 17, color: "333333" })], { after: 60 })),
-              ]
-            : []),
           ...otherSections.flatMap((s) => section(s, doc)),
           heading(doc.prices.heading, 320),
           ...doc.prices.lines.map((l) => para([run(l, { size: 17, color: "333333" })], { after: 60 })),

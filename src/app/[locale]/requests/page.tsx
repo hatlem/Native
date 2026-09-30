@@ -89,7 +89,7 @@ export default async function RequestsPage({
       orderBy: { updatedAt: "desc" },
       include: {
         organization: { select: { name: true } },
-        plan: { select: { name: true, items: { select: { id: true } } } },
+        plan: { select: { name: true, _count: { select: { items: true } } } },
         sourceList: {
           select: { waveNumber: true, programme: { select: { plannedWaves: true } } },
         },
@@ -149,7 +149,7 @@ export default async function RequestsPage({
             .join(" + ")
         : planTotalLabel(totals[0], locale)
       : placements > 0
-        ? tv("requestPrice")
+        ? tv("priceOnRequest")
         : null;
     rows.push({
       id: `draft-${list.id}`,
@@ -157,7 +157,7 @@ export default async function RequestsPage({
       statusValue: "DRAFT",
       meta:
         placements > 0
-          ? t("metaPlanBuilt", { items: placements, age: timeAgo(list.updatedAt, locale) })
+          ? t("metaPlanBuilt", { placements, age: timeAgo(list.updatedAt, locale) })
           : t("metaPlanAlternativesOnly", { alternatives, age: timeAgo(list.updatedAt, locale) }),
       stage: 1,
       tab: "inProgress",
@@ -294,8 +294,13 @@ export default async function RequestsPage({
       id: r.id,
       name: r.plan.name,
       statusValue: order?.status ?? quoteStatus ?? r.status,
+      // Placements, as the request page, the order and /lists count them: two
+      // formats of one title are two placements, never "2 titles"
+      // (BUG-final-verify-1). Every PlanItem is one: submitting snapshots
+      // the plan's placements and title placeholders, never its alternatives
+      // (submit-rfq.ts committedItems, the planLineCount rule).
       meta: t("metaCampaign", {
-        items: r.plan.items.length,
+        placements: r.plan._count.items,
         age: timeAgo(r.createdAt, locale),
         org: r.organization.name,
       }),

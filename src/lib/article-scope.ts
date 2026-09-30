@@ -91,8 +91,15 @@ export function hourlyRateLabel(scope: Pick<ArticleScope, "hourlyRate" | "curren
  * The included scope as a short list, in the `articleScope` namespace. Four
  * lines: length, rounds, marking, what is billed per hour.
  */
-export function articleScopeLines(scope: ArticleScope, t: Translate, locale: string): string[] {
-  const rate = hourlyRateLabel(scope, locale);
+export function articleScopeLines(
+  scope: ArticleScope,
+  t: Translate,
+  locale: string,
+  // A document spanning several currencies states every one's rate
+  // ("1 650 kr / 1 600 SEK"); by default, the scope's own currency.
+  rateLabel: string | null = hourlyRateLabel(scope, locale),
+): string[] {
+  const rate = rateLabel;
   return [
     t("average", { words: wordsText(scope.words, t) }),
     t("rounds", { rounds: scope.revisionRounds }),

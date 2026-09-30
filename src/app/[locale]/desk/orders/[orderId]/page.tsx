@@ -2,6 +2,7 @@ import { getTranslations } from "next-intl/server";
 import { notFound } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import { lineOrder } from "@/lib/commerce/line-order";
+import { orderFeePlacements } from "@/lib/commerce/placements";
 import { marketTimeZone } from "@/lib/markets";
 import { Link } from "@/i18n/navigation";
 import { clicksByOrderLine } from "@/lib/metrics/store";
@@ -50,11 +51,24 @@ export default async function DeskOrderPage({
     include: {
       organization: true,
       // The buyer's request brief: the per-line brief falls back to it. The
-      // quote's extra-work lines show beside the hours added since.
+      // quote's lines tell which placement each content fee writes for, and
+      // its extra-work lines show beside the hours added since.
       quote: {
         include: {
           request: { select: { briefSummary: true } },
-          lines: { where: { kind: "EXTRA_WORK" }, orderBy: lineOrder() },
+          lines: {
+            orderBy: lineOrder(),
+            select: {
+              id: true,
+              kind: true,
+              description: true,
+              productId: true,
+              position: true,
+              hours: true,
+              hourlyRate: true,
+              lineTotal: true,
+            },
+          },
         },
       },
       invoices: true,
@@ -103,10 +117,11 @@ export default async function DeskOrderPage({
   const clicks = await clicksByOrderLine(order.lines.map((l) => l.id));
   const extraWorkRates = await loadExtraWorkRates();
 
+  const feePlacements = orderFeePlacements(order.lines, order.quote.lines);
   const products = await prisma.product.findMany({
     where: {
       id: {
-        in: order.lines
+        in: [...order.lines, ...feePlacements.values()]
           .map((l) => l.productId)
           .filter((id): id is string => !!id),
       },
@@ -235,6 +250,7 @@ export default async function DeskOrderPage({
         locale={locale}
         order={order}
         byId={byId}
+        feePlacements={feePlacements}
         matchablePlaybooks={matchablePlaybooks}
         requestBrief={order.quote.request.briefSummary}
       />
@@ -248,7 +264,7 @@ export default async function DeskOrderPage({
           invoices: order.invoices,
         }}
         entries={order.extraWork}
-        quoteLines={order.quote.lines}
+        quoteLines={order.quote.lines.filter((l) => l.kind === "EXTRA_WORK")}
         rates={extraWorkRates}
         errorCode={typeof sp.extraWork === "string" ? sp.extraWork : undefined}
       />

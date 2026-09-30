@@ -14,7 +14,7 @@ import {
 import { lineBreakdown, type Translate } from "@/lib/plan-line-text";
 import { lineFigureLabel, totalLabel } from "@/lib/pricing/total-label";
 import { publisherCanWrite } from "@/lib/authorship";
-import { articleScope, articleScopeLines } from "@/lib/article-scope";
+import { articleScope, articleScopeLines, hourlyRateLabel } from "@/lib/article-scope";
 import type { ExtraWorkRateSpec } from "@/lib/pricing/extra-work";
 import { formatRunRange, runBounds } from "@/lib/run-period";
 import { localizeVertical } from "@/lib/taxonomy-i18n";
@@ -96,6 +96,9 @@ export type PlanDocumentRow = {
   subtitle: string;
   // Quantity, who writes the article, the booked run.
   details: string | null;
+  // Who the details say writes the article; null where they say nothing (an
+  // alternative, a placeholder). The price legend explains only these labels.
+  author: Authorship | null;
   note: string | null;
   reach: string;
   price: string;
@@ -133,17 +136,18 @@ export type PlanDocument = {
   noteLabel: string;
   sections: PlanDocumentSection[];
   total: { heading: string; label: string; rows: PlanDocumentTotal[]; empty: string | null; notes: string[] };
+  // "How the prices work". With a line NativeSpin writes it also says what
+  // that article includes and what is billed per hour on top
+  // (lib/article-scope.ts), the list /plan and the share page show.
   prices: { heading: string; lines: string[] };
-  // What an article NativeSpin writes includes, and what is billed per hour
-  // on top (lib/article-scope.ts) — the list /plan and the share page show
-  // under a line we write. Null when the plan has no such line.
-  articleScope: { heading: string; lines: string[] } | null;
   footer: { org: string; linkLabel: string; pageOf: string };
   // "NativeSpin – <plan name> – <YYYY-MM-DD>", without the extension.
   filename: string;
 };
 
 type Item = SharedList["items"][number];
+
+type Authorship = "nativespin" | "publisher";
 
 // Characters no file system (or mail client) takes in a name, plus control
 // characters; the plan name is the buyer's own free text.
@@ -185,10 +189,17 @@ export function buildPlanDocument(input: PlanDocumentInput): PlanDocument {
       const reach = p.title.digitalReach ?? p.title.monthlyReach ?? null;
       // What the plan lines and the share page say about a line in the plan;
       // an alternative is shown bare, as on both pages.
+      const author: Authorship | null = !inPlan
+        ? null
+        : i.withContent
+          ? "nativespin"
+          : canWrite
+            ? "publisher"
+            : null;
       const details = inPlan
         ? [
             i.quantity > 1 ? tShare("qty", { count: i.quantity }) : null,
-            i.withContent ? tShare("weWriteIt") : canWrite ? tShare("publisherWritesIt") : null,
+            author === "nativespin" ? tShare("weWriteIt") : author === "publisher" ? tShare("publisherWritesIt") : null,
             i.scheduleStart
               ? tPlan("runPeriod", {
                   range: formatRunRange(i.scheduleStart, i.scheduleUnits, p.bookingUnit, locale),
@@ -215,6 +226,7 @@ export function buildPlanDocument(input: PlanDocumentInput): PlanDocument {
         title: titleDisplayName(p.title),
         subtitle: `${tType(p.type)} · ${p.title.publisher.name}`,
         details: details.length ? details.join(" · ") : null,
+        author,
         note: i.notes,
         reach: reach ? td("reachValue", { count: number.format(reach) }) : "–",
         price: lineFigureLabel(display, p.currency, locale, priceOnRequest),
@@ -237,6 +249,7 @@ export function buildPlanDocument(input: PlanDocumentInput): PlanDocument {
       title: titleDisplayName(i.title),
       subtitle: `${i.title.publisher.name} · ${tShare("placementTbd")}`,
       details: null,
+      author: null,
       note: i.notes,
       reach: "–",
       price: priceOnRequest,
@@ -275,9 +288,14 @@ export function buildPlanDocument(input: PlanDocumentInput): PlanDocument {
     totals.length > 1 ? tPlan("multiCurrencyNote") : null,
   ].filter((n): n is string => n !== null);
 
+  // "How the prices work" explains only what the document actually prints:
+  // each line is keyed on a label some row carries, so a plan with no rate
+  // line never explains rates, and one where every article is the
+  // publisher's never mentions NativeSpin's writing.
   const allRows = sections.flatMap((s) => s.rows);
   const has = (kind: LineDisplay["kind"] | "placeholder") =>
     allRows.some((r) => (r.display ? r.display.kind === kind : kind === "placeholder"));
+  const hasAuthor = (author: Authorship) => allRows.some((r) => r.author === author);
   const currencies = [...new Set(list.items.flatMap((i) => (i.product ? [i.product.currency] : [])))];
   const pricesLines = [
     currencies.length
@@ -286,11 +304,13 @@ export function buildPlanDocument(input: PlanDocumentInput): PlanDocument {
         })
       : null,
     has("exact") ? td("pricesExact", { label: td("statusExact") }) : null,
-    has("band") || has("rate") ? td("pricesIndicative", { label: tv("listIndicative") }) : null,
+    has("band") ? td("pricesIndicative", { label: tv("listIndicative") }) : null,
+    has("rate") ? td("pricesRate", { label: tv("listIndicative") }) : null,
     has("onRequest") || has("placeholder") ? td("pricesOnRequest", { label: priceOnRequest }) : null,
-    planItems.some((i) => i.product && (i.withContent || publisherCanWrite(i.product)))
-      ? td("pricesContent", { label: tShare("weWriteIt") })
-      : null,
+    hasAuthor("nativespin") ? td("pricesContent", { label: tShare("weWriteIt") }) : null,
+    // …and, keyed on the same label, what that article includes.
+    ...(hasAuthor("nativespin") ? articleScopeLegend(planItems, input.extraWorkRates, locale) : []),
+    hasAuthor("publisher") ? td("pricesPublisherWrites", { label: tShare("publisherWritesIt") }) : null,
     altItems.length > 0 ? td("pricesAlternatives") : null,
     td("pricesNothingBooked"),
   ].filter((l): l is string => l !== null);
@@ -346,7 +366,6 @@ export function buildPlanDocument(input: PlanDocumentInput): PlanDocument {
       notes: totalNotes,
     },
     prices: { heading: td("pricesHeading"), lines: pricesLines },
-    articleScope: articleScopeBlock(planItems, input.extraWorkRates, locale),
     // The raw "Page {page} of {pages}" template: the page numbers are only
     // known to the renderer (the PDF's render prop, Word's page fields).
     footer: { org: list.organization.name, linkLabel: td("footerLink"), pageOf: MESSAGES[locale].planDocument.pageOf },
@@ -354,21 +373,22 @@ export function buildPlanDocument(input: PlanDocumentInput): PlanDocument {
   };
 }
 
-// The article-scope block: one list for the whole document, from the first
-// line NativeSpin writes (its format's word count and marking, its currency's
-// hourly rate) — the same list that line shows on /plan.
-function articleScopeBlock(
-  planItems: Item[],
-  rates: readonly ExtraWorkRateSpec[],
-  locale: AppLocale,
-): PlanDocument["articleScope"] {
-  const written = planItems.find((i) => i.withContent && i.product)?.product;
-  if (!written) return null;
+// What an article NativeSpin writes includes, as legend lines: the heading,
+// then the list /plan shows on a line we write — from the first such line
+// (its format's word count and marking), with the hourly rate of every
+// currency the plan's written lines bill in.
+function articleScopeLegend(planItems: Item[], rates: readonly ExtraWorkRateSpec[], locale: AppLocale): string[] {
+  const written = planItems.flatMap((i) => (i.withContent && i.product ? [i.product] : []));
+  if (written.length === 0) return [];
   const t = translator(locale, "articleScope");
-  return {
-    heading: t("heading"),
-    lines: articleScopeLines(articleScope(written, written.currency, rates), t, locale),
-  };
+  const rateLabels = [...new Set(written.map((p) => p.currency))]
+    .map((currency) => hourlyRateLabel(articleScope(null, currency, rates), locale))
+    .filter((l): l is string => l !== null);
+  const scope = articleScope(written[0], written[0].currency, rates);
+  return [
+    `${t("heading")}:`,
+    ...articleScopeLines(scope, t, locale, rateLabels.length ? rateLabels.join(" / ") : null).map((l) => `• ${l}`),
+  ];
 }
 
 // The brief as /plan's brief form holds it (lib/plan-brief.ts planBriefValues),

@@ -465,7 +465,7 @@ export default async function TitleDetailPage({
                   ) : null}
                 </>
               ) : (
-                <div className="price muted">{tv("requestPrice")}</div>
+                <div className="price muted">{tv("priceOnRequest")}</div>
               )}
               {band && isInstantOrderable(p, title) ? (
                 <span className="tag">⚡ {tf("badge")}</span>

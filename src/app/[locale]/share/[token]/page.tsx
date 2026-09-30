@@ -81,7 +81,7 @@ export default async function SharedListPage({
       // Exact only for an instant-orderable line; otherwise the band, the
       // rate, or "on request" — never a 0 (lib/plan-total.ts lineDisplay).
       const display = lineDisplay(i, pricing);
-      const figure = lineFigureLabel(display, p.currency, locale, tv("requestPrice"));
+      const figure = lineFigureLabel(display, p.currency, locale, tv("priceOnRequest"));
       // A line we write names its article fee as "from" where the figure is
       // exact (the included scope has a fixed price; extra work is billed on
       // top), and lists what that scope is (lib/article-scope.ts).
@@ -145,7 +145,7 @@ export default async function SharedListPage({
             </p>
           ) : null}
         </div>
-        <div className="share-list__line-price">{tv("requestPrice")}</div>
+        <div className="share-list__line-price">{tv("priceOnRequest")}</div>
       </div>
     );
   };
@@ -192,7 +192,7 @@ export default async function SharedListPage({
             </div>
           ))
         ) : (
-          <strong>{tv("requestPrice")}</strong>
+          <strong>{tv("priceOnRequest")}</strong>
         )}
         {hasHidden && totals.length > 0 ? <span className="muted small">{tv("plusOnRequest")}</span> : null}
         {anyEstimate ? <p className="muted small">{tPlan("estimateNote")}</p> : null}

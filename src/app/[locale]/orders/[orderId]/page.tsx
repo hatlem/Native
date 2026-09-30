@@ -2,7 +2,7 @@ import { getTranslations } from "next-intl/server";
 import { notFound } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import { lineOrder } from "@/lib/commerce/line-order";
-import { placementCount } from "@/lib/commerce/placements";
+import { orderFeePlacements, placementCount } from "@/lib/commerce/placements";
 import { Link } from "@/i18n/navigation";
 import { formatMoney, intlLocale } from "@/lib/money";
 import { loadScope, canActOnOrg, canEditOnOrg } from "@/lib/scope";
@@ -36,7 +36,9 @@ export default async function MyOrderPage({
   const order = await prisma.order.findUnique({
     where: { id: orderId },
     include: {
-      quote: true,
+      // The quote's lines only to tell which placement each content fee
+      // writes for (orderFeePlacements); the order's own lines are below.
+      quote: { include: { lines: { select: { kind: true, description: true, productId: true, position: true } } } },
       invoices: { select: { id: true, status: true } },
       lines: {
         orderBy: lineOrder(),
@@ -98,10 +100,14 @@ export default async function MyOrderPage({
   const fmtNum = (n: number | null) =>
     n === null ? null : n.toLocaleString(intlLocale(locale));
 
+  // Each content fee is labelled with the placement it writes for, as the
+  // quote labels it: three bare "Content production" cards said nothing
+  // about which article each one pays for (BUG-final-verify-2).
+  const feePlacements = orderFeePlacements(order.lines, order.quote.lines);
   const products = await prisma.product.findMany({
     where: {
       id: {
-        in: order.lines
+        in: [...order.lines, ...feePlacements.values()]
           .map((l) => l.productId)
           .filter((id): id is string => !!id),
       },
@@ -204,17 +210,27 @@ export default async function MyOrderPage({
           {order.lines.map((line) => {
             const p = line.productId ? byId.get(line.productId) : undefined;
             const isContentFee = line.kind === "CONTENT_FEE";
+            const feeProductId = isContentFee ? feePlacements.get(line.id)?.productId : null;
+            const feeFor = feeProductId ? byId.get(feeProductId) : undefined;
             const latest = effectiveAssets.get(line.id) ?? null;
             return (
               <article className="card line-card" key={line.id}>
                 <div className="line-head">
                   <div>
+                    {/* A fee reads like its quote row: the placement's
+                        title, then "Content production · <format>". */}
                     <h3>
-                      {p?.title.name ??
+                      {(isContentFee ? feeFor : p)?.title.name ??
                         (isContentFee ? tType("CONTENT_FEE") : "—")}
                     </h3>
                     <p className="muted small">
-                      {p ? tType(p.type) : ""}
+                      {isContentFee
+                        ? feeFor
+                          ? `${tType("CONTENT_FEE")} · ${tType(feeFor.type)}`
+                          : ""
+                        : p
+                          ? tType(p.type)
+                          : ""}
                     </p>
                   </div>
                   <div className="price" style={{ marginTop: 0 }}>

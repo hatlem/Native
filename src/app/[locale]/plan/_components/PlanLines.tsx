@@ -97,7 +97,7 @@ function periodLabel(
 
 // The line's figure, by kind (lib/pricing/total-label.ts lineFigureLabel, the
 // wording the share page and the plan download use too): exact money,
-// "≈ 40–60k NOK", "≈ 395 NOK CPM" or "Contact for price".
+// "≈ 40–60k NOK", "≈ 395 NOK CPM" or "Price on request".
 function LineFigure({
   l,
   locale,
@@ -472,7 +472,7 @@ export async function PlanLines({
           </div>
 
           <div className="plan-line-card__price">
-            <LineFigure l={l} locale={locale} onRequest={tv("requestPrice")} />
+            <LineFigure l={l} locale={locale} onRequest={tv("priceOnRequest")} />
             <span className="plan-line-card__breakdown">
               {lineBreakdown({ ...l, currency: l.product.currency }, locale, t, tv)}
             </span>
@@ -569,7 +569,7 @@ export async function PlanLines({
             </div>
           </div>
           <div className="plan-line-card__price">
-            <span className="plan-line-card__total plan-line-card__total--muted">{tv("requestPrice")}</span>
+            <span className="plan-line-card__total plan-line-card__total--muted">{tv("priceOnRequest")}</span>
           </div>
           {readOnly ? null : (
           <div className="plan-line-card__actions">
@@ -613,7 +613,7 @@ export async function PlanLines({
             <LineNote locale={locale} itemId={l.itemId} notes={l.notes} t={t} readOnly={readOnly} />
           </div>
           <div className="plan-line-card__price">
-            <LineFigure l={l} locale={locale} onRequest={tv("requestPrice")} />
+            <LineFigure l={l} locale={locale} onRequest={tv("priceOnRequest")} />
           </div>
           {readOnly ? null : (
           <div className="plan-line-card__actions">
@@ -649,7 +649,7 @@ export async function PlanLines({
             <LineNote locale={locale} itemId={tl.itemId} notes={tl.notes} t={t} readOnly={readOnly} />
           </div>
           <div className="plan-line-card__price">
-            <span className="plan-line-card__total plan-line-card__total--muted">{tv("requestPrice")}</span>
+            <span className="plan-line-card__total plan-line-card__total--muted">{tv("priceOnRequest")}</span>
           </div>
           {readOnly ? null : (
           <div className="plan-line-card__actions">

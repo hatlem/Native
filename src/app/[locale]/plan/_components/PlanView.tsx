@@ -236,7 +236,7 @@ export async function PlanView({
           }`
         : rate
           ? `≈ ${rate.rate} ${p.currency} ${rate.unit}`
-          : tv("requestPrice");
+          : tv("priceOnRequest");
       return `${names[i]} · ${price}`;
     });
     // Still identical (same type, no inclusions, same band)? Number them so
@@ -298,7 +298,7 @@ export async function PlanView({
   // shown — isInstantOrderable, the per-line test submitRequest applies
   // (checkout-actions), which lineDisplay reports as its "exact" kind.
   // Counting FIRM alone claimed "1 of 2 available as instant order" on a plan
-  // whose every line read "Contact for price".
+  // whose every line read "Price on request".
   const instantOrderable = (l: (typeof lines)[number]) => l.display.kind === "exact";
 
   // Any line that isn't instant-orderable — or any unresolved title
