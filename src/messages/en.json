@@ -894,7 +894,16 @@
     "runPeriod": "{range} · {unit, select, WEEK {{n, plural, one {# week} other {# weeks}}} other {{n, plural, one {# month} other {# months}}}}",
     "orderedTitle": "Ordered {date}",
     "orderedBody": "This plan has been ordered, and changes here don't change the order. To book these placements again, plan the next wave: it copies this plan into a new one you can edit and order.",
-    "orderedView": "See the order"
+    "orderedView": "See the order",
+    "download": {
+      "heading": "Download plan",
+      "hint": "A copy for sharing inside your team, for example with a colleague or your manager.",
+      "liveHint": "Sending it to your client? Use “Share with your client” below: the link always shows the latest version.",
+      "pdf": "PDF",
+      "word": "Word",
+      "pdfLabel": "Download the plan as a PDF",
+      "wordLabel": "Download the plan as a Word document"
+    }
   },
   "rfq": {
     "org": "Company",
@@ -3391,7 +3400,15 @@
     "alternativesHeading": "Alternatives – not included in the total",
     "alternativesIntro": "Titles we also recommend. They are not part of the plan or the total.",
     "changedSinceApproval": "You approved an earlier version of this plan on {date}. It has changed since, so take a look and approve it again.",
-    "approveAgainCta": "Approve the updated plan"
+    "approveAgainCta": "Approve the updated plan",
+    "download": {
+      "heading": "Download this plan",
+      "hint": "A copy to save or pass on. This page always shows the latest version.",
+      "pdf": "PDF",
+      "word": "Word",
+      "pdfLabel": "Download the plan as a PDF",
+      "wordLabel": "Download the plan as a Word document"
+    }
   },
   "quotePdf": {
     "documentTitle": "Quote {quoteNumber}",
@@ -3916,5 +3933,43 @@
     "audience": "Audience",
     "geo": "Geography",
     "context": "Editorial context"
+  },
+  "planDocument": {
+    "documentTitle": "Media plan: {name}",
+    "eyebrow": "Media plan",
+    "preparedFor": "Prepared for {org} · {date}",
+    "intro": "This is a copy of the plan as it stood on {date}. The prices follow the same rules as in NativeSpin; how they work is explained at the end.",
+    "linkShare": "The latest version of this plan is online. Anyone with the link can open it, no login needed:",
+    "linkPlan": "The latest version of this plan is in NativeSpin (login required):",
+    "linkInvite": "Colleagues without access can be invited under Account → Team.",
+    "briefHeading": "Brief",
+    "briefCampaign": "Campaign",
+    "briefTiming": "Timing",
+    "briefBudget": "Budget",
+    "briefAudience": "Audience segments",
+    "briefGeo": "Geographic focus",
+    "briefContext": "Editorial context",
+    "briefTargeting": "Targeting",
+    "planHeading": "Publications in the plan",
+    "colPublication": "Publication",
+    "colReach": "Reach",
+    "colPrice": "Price",
+    "colStatus": "Status",
+    "reachValue": "{count} readers/month",
+    "statusExact": "Confirmed price",
+    "statusOnRequest": "Priced by the desk",
+    "statusPlaceholder": "The desk proposes a placement",
+    "priceOnRequest": "Price on request",
+    "totalHeading": "Total",
+    "pricesHeading": "How the prices work",
+    "pricesVat": "Prices are in {currencies}, excluding VAT.",
+    "pricesExact": "“{label}” is the publisher’s confirmed price: these lines can be ordered at exactly this price.",
+    "pricesIndicative": "“{label}” is shown as a price band (≈). The desk confirms the exact price in the quote, based on volume and season.",
+    "pricesOnRequest": "“{label}”: the desk prices these lines once the plan is sent, usually within 24 hours. They are not in the total.",
+    "pricesContent": "“{label}” means writing the article is included in the price. Where the publisher writes it, NativeSpin adds no fee.",
+    "pricesAlternatives": "The alternatives are recommendations only: they are not part of the plan or the total.",
+    "pricesNothingBooked": "Nothing is booked until a quote has been approved.",
+    "footerLink": "Open the plan",
+    "pageOf": "Page {page} of {pages}"
   }
 }

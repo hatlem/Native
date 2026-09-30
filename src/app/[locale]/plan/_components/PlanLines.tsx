@@ -3,8 +3,9 @@ import { Calendar } from "lucide-react";
 import type { ReactNode } from "react";
 import type { Prisma } from "@prisma/client";
 import { Link } from "@/i18n/navigation";
-import { formatMoney, intlLocale } from "@/lib/money";
-import { bandLabel } from "@/lib/pricing/bands";
+import { intlLocale } from "@/lib/money";
+import { lineFigureLabel } from "@/lib/pricing/total-label";
+import { lineBreakdown } from "@/lib/plan-line-text";
 import { lineSortValue, type LineDisplay } from "@/lib/plan-total";
 import { titleDisplayName } from "@/lib/title-display";
 import { removeFromPlan, setQuantity, setContentProduction, setLineNote, setLineAlternative } from "@/app/plan-actions";
@@ -91,59 +92,9 @@ function periodLabel(
   });
 }
 
-// The transparency the single total figure lacks: what the line total is
-// actually made of. For an exact line the parts come from lib/plan-total.ts
-// (the rule the order prices with), so they always add up to the line total
-// shown beside them; the breakdown explains the figure, never adds to it. The
-// content fee is charged once per line: one article, used for every run.
-//
-// A banded line gets no exact parts — they would give away the figure the band
-// stands in for — only what the band covers: the quantity and whether the
-// article is in it.
-function breakdown(
-  l: PlanLine,
-  locale: string,
-  t: Awaited<ReturnType<typeof getTranslations>>,
-  tv: Awaited<ReturnType<typeof getTranslations>>,
-): string {
-  const d = l.display;
-  if (d.kind === "onRequest") return t("breakdownUnpriced");
-  if (d.kind === "rate") return tv("listIndicative");
-  // Unticked on a placement the publisher's studio can write: the publisher
-  // writes it (PUBLISHER_PRODUCED), so the line says so rather than looking
-  // like the buyer owes us copy — also for a view-only seat, which sees no
-  // choice buttons.
-  const publisherWrites = !l.withContent && l.publisherCanWrite ? t("publisherWritesIt") : null;
-  if (d.kind === "band") {
-    const parts = [
-      l.quantity > 1 ? t("breakdownPlacements", { n: l.quantity }) : null,
-      d.withContent ? tv("productionIncluded") : publisherWrites,
-      tv("listIndicative"),
-    ];
-    return parts.filter(Boolean).join(" · ");
-  }
-  const money = (n: number) => formatMoney(n, l.product.currency, locale);
-  if (l.withContent && d.contentFee > 0) {
-    return l.quantity > 1
-      ? t("breakdownQtyWithArticleFee", {
-          n: l.quantity,
-          unit: money(d.placement / l.quantity),
-          article: money(d.contentFee),
-        })
-      : t("breakdownWithArticle", { placement: money(d.placement), article: money(d.contentFee) });
-  }
-  if (l.withContent) {
-    // "We write it" with no fee rule: production is included in the price.
-    return l.quantity > 1
-      ? t("breakdownQtyWithArticle", { n: l.quantity, unit: money(d.placement / l.quantity) })
-      : t("breakdownArticleIncluded");
-  }
-  const qty = l.quantity > 1 ? t("breakdownQty", { n: l.quantity, unit: money(d.placement / l.quantity) }) : null;
-  return [qty, publisherWrites].filter(Boolean).join(" · ");
-}
-
-// The line's figure, by kind: exact money, "≈ 40–60k NOK", "≈ 395 NOK CPM" or
-// "Contact for price".
+// The line's figure, by kind (lib/pricing/total-label.ts lineFigureLabel, the
+// wording the share page and the plan download use too): exact money,
+// "≈ 40–60k NOK", "≈ 395 NOK CPM" or "Contact for price".
 function LineFigure({
   l,
   locale,
@@ -153,22 +104,12 @@ function LineFigure({
   locale: string;
   onRequest: string;
 }) {
-  const d = l.display;
-  const currency = l.product.currency;
-  switch (d.kind) {
-    case "exact":
-      return <span className="plan-line-card__total">{formatMoney(d.total, currency, locale)}</span>;
-    case "band":
-      return <span className="plan-line-card__total">≈ {bandLabel(d.band, currency)}</span>;
-    case "rate":
-      return (
-        <span className="plan-line-card__total">
-          ≈ {d.rate} {currency} {d.unit}
-        </span>
-      );
-    case "onRequest":
-      return <span className="plan-line-card__total plan-line-card__total--muted">{onRequest}</span>;
-  }
+  const muted = l.display.kind === "onRequest" ? " plan-line-card__total--muted" : "";
+  return (
+    <span className={`plan-line-card__total${muted}`}>
+      {lineFigureLabel(l.display, l.product.currency, locale, onRequest)}
+    </span>
+  );
 }
 
 // "We write it": a real submit <button>, not an <input type="checkbox"> — this
@@ -523,7 +464,9 @@ export async function PlanLines({
 
           <div className="plan-line-card__price">
             <LineFigure l={l} locale={locale} onRequest={tv("requestPrice")} />
-            <span className="plan-line-card__breakdown">{breakdown(l, locale, t, tv)}</span>
+            <span className="plan-line-card__breakdown">
+              {lineBreakdown({ ...l, currency: l.product.currency }, locale, t, tv)}
+            </span>
           </div>
 
           {readOnly ? null : (

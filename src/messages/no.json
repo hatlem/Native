@@ -754,7 +754,16 @@
     "runPeriod": "{range} · {unit, select, WEEK {{n, plural, one {# uke} other {# uker}}} other {{n, plural, one {# måned} other {# måneder}}}}",
     "orderedTitle": "Bestilt {date}",
     "orderedBody": "Denne planen er bestilt, og endringer her endrer ikke bestillingen. Vil du booke de samme plasseringene igjen, planlegger du neste runde: da kopieres planen til en ny som du kan endre og bestille.",
-    "orderedView": "Se bestillingen"
+    "orderedView": "Se bestillingen",
+    "download": {
+      "heading": "Last ned plan",
+      "hint": "En kopi du kan dele internt, for eksempel med en kollega eller lederen din.",
+      "liveHint": "Skal den til kunden? Bruk «Del med kunden» under – lenken viser alltid siste versjon.",
+      "pdf": "PDF",
+      "word": "Word",
+      "pdfLabel": "Last ned planen som PDF",
+      "wordLabel": "Last ned planen som Word-dokument"
+    }
   },
   "rfq": {
     "org": "Selskap",
@@ -3391,7 +3400,15 @@
     "alternativesHeading": "Alternativer – ikke med i totalen",
     "alternativesIntro": "Titler vi også anbefaler. De er ikke med i planen eller totalen.",
     "changedSinceApproval": "Du godkjente en tidligere versjon av planen {date}. Den er endret siden, så se over den og godkjenn på nytt.",
-    "approveAgainCta": "Godkjenn den oppdaterte planen"
+    "approveAgainCta": "Godkjenn den oppdaterte planen",
+    "download": {
+      "heading": "Last ned planen",
+      "hint": "En kopi du kan lagre eller sende videre. Denne siden viser alltid siste versjon.",
+      "pdf": "PDF",
+      "word": "Word",
+      "pdfLabel": "Last ned planen som PDF",
+      "wordLabel": "Last ned planen som Word-dokument"
+    }
   },
   "quotePdf": {
     "documentTitle": "Tilbud {quoteNumber}",
@@ -3916,5 +3933,43 @@
     "audience": "Målgruppe",
     "geo": "Geografi",
     "context": "Redaksjonell kontekst"
+  },
+  "planDocument": {
+    "documentTitle": "Medieplan: {name}",
+    "eyebrow": "Medieplan",
+    "preparedFor": "Utarbeidet for {org} · {date}",
+    "intro": "Dette er en kopi av planen slik den så ut {date}. Prisene følger de samme reglene som i NativeSpin – hvordan de fungerer, står til slutt.",
+    "linkShare": "Den nyeste versjonen av planen ligger på nett. Alle med lenken kan åpne den, uten innlogging:",
+    "linkPlan": "Den nyeste versjonen av planen ligger i NativeSpin (krever innlogging):",
+    "linkInvite": "Kolleger som ikke har tilgang, kan inviteres under Konto → Team.",
+    "briefHeading": "Brief",
+    "briefCampaign": "Kampanje",
+    "briefTiming": "Tidspunkt",
+    "briefBudget": "Budsjett",
+    "briefAudience": "Målgrupper",
+    "briefGeo": "Geografisk fokus",
+    "briefContext": "Redaksjonell kontekst",
+    "briefTargeting": "Målretting",
+    "planHeading": "Publikasjoner i planen",
+    "colPublication": "Publikasjon",
+    "colReach": "Rekkevidde",
+    "colPrice": "Pris",
+    "colStatus": "Status",
+    "reachValue": "{count} lesere/mnd",
+    "statusExact": "Bekreftet pris",
+    "statusOnRequest": "Desken setter prisen",
+    "statusPlaceholder": "Desken foreslår plassering",
+    "priceOnRequest": "Pris på forespørsel",
+    "totalHeading": "Totalt",
+    "pricesHeading": "Slik fungerer prisene",
+    "pricesVat": "Prisene er i {currencies} eksklusive mva.",
+    "pricesExact": "«{label}» er utgiverens bekreftede pris: disse linjene kan bestilles til akkurat denne prisen.",
+    "pricesIndicative": "«{label}» vises som prisintervall (≈). Desken bekrefter fast pris i tilbudet, basert på volum og sesong.",
+    "pricesOnRequest": "«{label}»: desken priser disse linjene når planen sendes, som regel innen 24 timer. De er ikke med i totalen.",
+    "pricesContent": "«{label}» betyr at artikkelen er med i prisen. Der utgiveren skriver den, legger NativeSpin ikke på noe honorar.",
+    "pricesAlternatives": "Alternativene er bare anbefalinger og er ikke med i planen eller totalen.",
+    "pricesNothingBooked": "Ingenting bestilles før et tilbud er godkjent.",
+    "footerLink": "Åpne planen",
+    "pageOf": "Side {page} av {pages}"
   }
 }

@@ -1,17 +1,12 @@
 import {
   AlignmentType,
-  BorderStyle,
   Document,
-  ExternalHyperlink,
   Footer,
   Packer,
-  PageNumber,
   Paragraph,
   ShadingType,
   Table,
-  TableCell,
   TableRow,
-  TextRun,
   WidthType,
   type IBorderOptions,
 } from "docx";
@@ -19,69 +14,30 @@ import { formatMoney, intlLocale } from "@/lib/money";
 import { paymentTermsLine } from "@/lib/payment-terms-text";
 import type { QuotePdfData, QuotePdfRow } from "./quote-pdf-data";
 import { qt as t, quoteFormatLabel, quoteRowBlurb, type QuoteMessages } from "./quote-messages";
+import {
+  A4_PAGE,
+  COLOR,
+  FONT,
+  HEAVY_RULE,
+  NONE,
+  NO_BORDERS,
+  RULE,
+  SIZE,
+  cell,
+  grid,
+  link,
+  pageOfRuns,
+  para,
+  run,
+} from "./docx-kit";
 
 // Editable (.docx) twin of QuoteDocument.tsx: same QuotePdfData, same copy,
 // same customer-safe fields, so the desk can tweak wording before sending
 // without the numbers drifting from the PDF. Opens in Word, LibreOffice
 // (incl. save-as .odt), Pages and Google Docs.
 
-const FONT = "Inter";
-// docx sizes are half-points: 18 = 9pt, matching the PDF's body size.
-const SIZE = { body: 18, small: 15, brand: 32, label: 14 } as const;
-const COLOR = { text: "1A1A1A", muted: "666666", faint: "888888", link: "1A4FD6" };
-
-const NONE: IBorderOptions = { style: BorderStyle.NONE, size: 0, color: "FFFFFF" };
-const NO_BORDERS = { top: NONE, bottom: NONE, left: NONE, right: NONE };
-const RULE: IBorderOptions = { style: BorderStyle.SINGLE, size: 4, color: "DDDDDD" };
-const HEAVY_RULE: IBorderOptions = { style: BorderStyle.SINGLE, size: 8, color: "1A1A1A" };
-
-// Column widths in percent, identical to the PDF table. LibreOffice ignores
-// per-cell percentages, so tables also get an explicit twip grid.
+// Column widths in percent, identical to the PDF table.
 const COLS = [26, 10, 18, 10, 16, 20] as const;
-// A4 width 11906 twips minus two 800-twip margins.
-const CONTENT_TWIPS = 11906 - 2 * 800;
-const grid = (pcts: readonly number[]) => pcts.map((p) => Math.round((CONTENT_TWIPS * p) / 100));
-
-function run(
-  text: string,
-  opts: { bold?: boolean; italics?: boolean; size?: number; color?: string } = {},
-) {
-  return new TextRun({
-    text,
-    font: FONT,
-    bold: opts.bold,
-    italics: opts.italics,
-    size: opts.size ?? SIZE.body,
-    color: opts.color ?? COLOR.text,
-  });
-}
-
-function link(url: string, text: string, size: number = SIZE.body, color: string = COLOR.link) {
-  return new ExternalHyperlink({
-    link: url,
-    children: [new TextRun({ text, font: FONT, size, color, underline: {} })],
-  });
-}
-
-function cell(
-  children: Paragraph[],
-  widthPct: number,
-  borders: { top?: IBorderOptions; bottom?: IBorderOptions } = {},
-) {
-  return new TableCell({
-    children,
-    width: { size: widthPct, type: WidthType.PERCENTAGE },
-    borders: { ...NO_BORDERS, ...borders },
-    margins: { top: 80, bottom: 80, left: 0, right: 80 },
-  });
-}
-
-function para(
-  children: (TextRun | ExternalHyperlink)[],
-  opts: { align?: (typeof AlignmentType)[keyof typeof AlignmentType]; after?: number } = {},
-) {
-  return new Paragraph({ children, alignment: opts.align, spacing: { after: opts.after ?? 0 } });
-}
 
 function metaBlock(label: string, value: string) {
   return [
@@ -248,11 +204,7 @@ export async function renderQuoteDocx(
     sections: [
       {
         properties: {
-          // A4 with the PDF's 40pt (800 twip) margins.
-          page: {
-            size: { width: 11906, height: 16838 },
-            margin: { top: 800, bottom: 800, left: 800, right: 800 },
-          },
+          page: A4_PAGE,
         },
         footers: { default: footer },
         children: [
@@ -287,16 +239,3 @@ export async function renderQuoteDocx(
   return Packer.toBuffer(doc);
 }
 
-function pageOfRuns(template: string): TextRun[] {
-  const style = { font: FONT, size: SIZE.label, color: "999999" };
-  return template
-    .split(/(\{page\}|\{pages\})/)
-    .filter(Boolean)
-    .map((part) =>
-      part === "{page}"
-        ? new TextRun({ ...style, children: [PageNumber.CURRENT] })
-        : part === "{pages}"
-          ? new TextRun({ ...style, children: [PageNumber.TOTAL_PAGES] })
-          : new TextRun({ ...style, text: part }),
-    );
-}

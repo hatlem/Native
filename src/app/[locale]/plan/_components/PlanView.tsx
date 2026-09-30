@@ -22,6 +22,7 @@ import { loadPricingDefaults } from "@/lib/content-fee";
 import { timeAgo } from "@/lib/time-ago";
 import { loadVerticalOptions, localizedVerticalOptions } from "@/lib/catalog-taxonomy";
 import { ViewOnlyNote } from "@/components/view-only-note";
+import { PlanDownload } from "@/components/plan-download";
 import { publisherCanWrite } from "@/lib/authorship";
 import { liveOrderForList } from "@/lib/commerce/list-commit";
 import { PlanBanners } from "./PlanBanners";
@@ -638,6 +639,17 @@ export async function PlanView({
                 readOnly={readOnly}
               />
               {readOnly || ordered ? null : <WhatHappensNext locale={locale} instant={allFirm && canCommit} />}
+              {/* A copy to pass around the team, view-only seats included (it
+                  is a read-out, like this page for them). Only a seat that can
+                  create the client link below is pointed at it. */}
+              {activeList ? (
+                <PlanDownload
+                  locale={locale}
+                  basePath={`/api/export/plan/${encodeURIComponent(activeList.id)}`}
+                  variant="plan"
+                  showLiveHint={!readOnly}
+                />
+              ) : null}
               {/* Sharing mints/kills a client link — a change a view-only seat
                   can't make, so the whole control is left out. */}
               {activeList && !readOnly ? (

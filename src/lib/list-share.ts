@@ -38,7 +38,8 @@ export async function disableListShare(listId: string): Promise<void> {
   });
 }
 
-/** Everything the public share page renders — and NOTHING else. An explicit
+/** Everything the public share page and its plan download (lib/pdf/
+ *  plan-document.ts) render — and NOTHING else. An explicit
  *  `select` at every level, never a bare `include`: an `include` returns all
  *  scalars, which on this UNAUTHENTICATED page would pull the list's internal
  *  `note`/`budget`, the raw net `basePrice`, and `Title.commercialExtra`
@@ -95,6 +96,9 @@ export const SHARED_LIST_SELECT = {
               name: true,
               websiteUrl: true,
               aliases: true,
+              // Public catalog reach, for the downloaded plan's reach column.
+              digitalReach: true,
+              monthlyReach: true,
               pricesPublic: true,
               productionFeeDefault: true,
               publisher: { select: { name: true, pricesPublic: true } },
@@ -105,11 +109,12 @@ export const SHARED_LIST_SELECT = {
           },
         },
       },
-      title: { select: { name: true, websiteUrl: true, aliases: true } },
+      title: { select: { name: true, websiteUrl: true, aliases: true, publisher: { select: { name: true } } } },
     },
   },
   programme: { select: { name: true, plannedWaves: true } },
-  organization: { select: { name: true } },
+  // The market sets the time zone the downloaded plan is dated in.
+  organization: { select: { name: true, marketCode: true } },
 } satisfies Prisma.SavedListSelect;
 
 /** The list behind a share token — null for unknown tokens and for lists
