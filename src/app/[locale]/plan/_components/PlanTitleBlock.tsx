@@ -20,6 +20,7 @@ export function PlanTitleBlock({
   orgName,
   lastEdited,
   lists,
+  readOnly = false,
 }: {
   locale: string;
   planName: string;
@@ -28,6 +29,9 @@ export function PlanTitleBlock({
   orgName: string | null;
   lastEdited: string;
   lists: PlanListSummary[];
+  // View-only seat: no rename and no "new plan". Switching between the team's
+  // plans stays — it only chooses which one to look at.
+  readOnly?: boolean;
 }) {
   const t = useTranslations("plan");
   const [renaming, setRenaming] = useState(false);
@@ -44,17 +48,19 @@ export function PlanTitleBlock({
           ← {t("mobileBackToTitles")}
         </Link>
         <span className="plan-title-block__mobile-name">{planName}</span>
-        <button
-          type="button"
-          className="plan-title-block__mobile-edit"
-          onClick={() => setRenaming(true)}
-        >
-          {t("mobileEdit")}
-        </button>
+        {readOnly ? null : (
+          <button
+            type="button"
+            className="plan-title-block__mobile-edit"
+            onClick={() => setRenaming(true)}
+          >
+            {t("mobileEdit")}
+          </button>
+        )}
       </div>
 
       <div className="plan-title-block__row">
-        {renaming ? (
+        {renaming && !readOnly ? (
           <form
             action={renameList}
             className="plan-title-block__rename-form"
@@ -80,9 +86,11 @@ export function PlanTitleBlock({
         ) : (
           <>
             <h1>{planName}</h1>
-            <button type="button" className="plan-title-block__rename-btn" onClick={() => setRenaming(true)}>
-              {t("rename")}
-            </button>
+            {readOnly ? null : (
+              <button type="button" className="plan-title-block__rename-btn" onClick={() => setRenaming(true)}>
+                {t("rename")}
+              </button>
+            )}
           </>
         )}
         <div className="plan-title-block__switcher" ref={switcherRef}>
@@ -111,6 +119,7 @@ export function PlanTitleBlock({
                   {t("switchList")}
                 </button>
               </form>
+              {readOnly ? null : (
               <form action={createList} className="plan-title-block__popover-form">
                 <input type="hidden" name="locale" value={locale} />
                 <label htmlFor="plan-switch-new">{t("newList")}</label>
@@ -125,6 +134,7 @@ export function PlanTitleBlock({
                   {t("newList")}
                 </button>
               </form>
+              )}
             </div>
           ) : null}
         </div>

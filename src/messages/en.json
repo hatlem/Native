@@ -866,7 +866,8 @@
       "item3Title": "We write, place and report",
       "item3Body": "Drafts come to you for approval. Live links and performance land in Reports."
     },
-    "breakdownQtyWithArticleFee": "{n} × {unit} placement + {article} per article (one article for all {n})"
+    "breakdownQtyWithArticleFee": "{n} × {unit} placement + {article} per article (one article for all {n})",
+    "noticePlanReadOnly": "You have view-only access to this plan, so nothing was changed."
   },
   "rfq": {
     "org": "Company",
@@ -991,7 +992,11 @@
     "renewalRequested": "The desk has been asked to renew it. You will get a notification when it is ready to accept.",
     "lineNoteLabel": "Note",
     "noCommitTitle": "You can't accept this quote yourself.",
-    "noCommitBody": "Accepting it places a binding order for {org}, which takes ordering rights. Ask an administrator to accept it, or to give you ordering rights under Account → Team."
+    "noCommitBody": "Accepting it places a binding order for {org}, which takes ordering rights. Ask an administrator to accept it, or to give you ordering rights under Account → Team.",
+    "quoteRevisionNote": "Revision {revision} — replaces the quote you received earlier.",
+    "supersededEyebrow": "Earlier versions",
+    "supersededRow": "Revision {revision} ({total}) is no longer valid.",
+    "supersededBy": "See revision {revision} →"
   },
   "desk": {
     "eyebrow": "Internal desk",
@@ -1092,7 +1097,7 @@
     "quoteNoExpiry": "No expiry date",
     "renewQuote": "Renew quote",
     "renewingQuote": "Renewing…",
-    "renewQuoteHint": "The buyer can’t accept an expired quote. Renewing keeps these prices until the date you pick — reprice any lines first if rates have changed.",
+    "renewQuoteHint": "The buyer can’t accept an expired quote. Renewing keeps these prices until the date you pick. If rates have changed, revise the quote instead.",
     "quoteDraftBadge": "Draft — not sent",
     "quoteDraftHint": "The customer can’t see this quote yet. Price the lines, then send it below.",
     "sendTitle": "Send to the customer",
@@ -1113,7 +1118,22 @@
     "lineNoteHint": "Shown to the customer on the quote page and in the PDF.",
     "lineNoteTooLong": "The note is too long. Keep it under {max} characters.",
     "pdfStorageUnavailable": "File storage (R2) isn't configured in this environment, so the PDF can't be saved. Download the Word version instead.",
-    "pdfFailed": "The PDF couldn't be generated. Try again, or download the Word version."
+    "pdfFailed": "The PDF couldn't be generated. Try again, or download the Word version.",
+    "pdfSuperseded": "This quote has been replaced by a revision, so no new document is made from it. Use the revision's PDF instead.",
+    "reviseQuote": "Revise quote",
+    "revisingQuote": "Opening revision…",
+    "reviseQuoteHint": "A sent quote is locked. Revising opens an editable copy; sending it replaces this quote and tells the customer once, with the new total.",
+    "quoteRevisionBadge": "Revision {revision}",
+    "quoteSupersededBadge": "Replaced",
+    "quoteSupersededBy": "Replaced by revision {revision}. The customer can no longer accept it.",
+    "quoteRevisionPending": "Revision {revision} is being drafted — the customer still holds this one until you send it.",
+    "quoteRevisionDraftHint": "The customer still holds revision {previous} and can accept it until you send this one. Sending replaces it and tells them once, with the new total.",
+    "discardRevision": "Discard revision",
+    "discardingRevision": "Discarding…",
+    "quoteLocked": "This quote has been sent, so its lines are locked. Revise it to change prices or notes.",
+    "quoteNotRevisable": "This quote can’t be revised: it has been accepted, or it is closed.",
+    "revisionPredecessorClosed": "Not sent: the quote this revision would replace is no longer open — the customer may just have accepted it. Discard the revision.",
+    "sendRevisionNote": "Sending replaces the earlier quote: the customer can no longer accept it, and gets one notification with the new total."
   },
   "deskTitles": {
     "eyebrow": "Super-admin · titles",
@@ -2943,7 +2963,9 @@
     "errDelegationPast": "The delegation end date has to be in the future.",
     "canCommitAdminNote": "Administrators can always commit.",
     "statusRevoked": "Removed",
-    "errEmailDomain": "We couldn't find a mail server for that domain. Check the address for typos."
+    "errEmailDomain": "We couldn't find a mail server for that domain. Check the address for typos.",
+    "roleHelp": "Admins manage the team and can do everything. Members build plans, send requests and — with “Can commit” — accept quotes. Restricted is view-only: sees the team’s plans, requests, quotes, orders, reports, articles and invoices, but can’t change, send, accept or share anything.",
+    "canCommitRestrictedNote": "Restricted members are view-only and can’t commit."
   },
   "invite": {
     "title": "Join {org}",
@@ -3300,6 +3322,8 @@
   "quotePdf": {
     "documentTitle": "Quote {quoteNumber}",
     "quoteNumber": "Quote number",
+    "revision": "Revision",
+    "revisionValue": "{revision} — replaces quote {previous}",
     "date": "Date",
     "validUntil": "Valid until",
     "preparedBy": "Prepared by",
@@ -3636,5 +3660,9 @@
     "untitled": "New plan",
     "imported": "Imported plan",
     "reordered": "Reordered campaign"
+  },
+  "viewOnly": {
+    "title": "View-only access",
+    "body": "You can see everything your team has here, but not change it. Ask an administrator if you need to edit, send or accept."
   }
 }

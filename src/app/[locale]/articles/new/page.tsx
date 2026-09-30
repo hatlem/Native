@@ -2,6 +2,7 @@ import { getTranslations } from "next-intl/server";
 import { redirect } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import { loadScope } from "@/lib/scope";
+import { ViewOnlyNote } from "@/components/view-only-note";
 import { createArticle } from "@/app/article-library-actions";
 
 export default async function NewArticlePage({
@@ -15,10 +16,21 @@ export default async function NewArticlePage({
   const scope = await loadScope();
   if (!scope.workspace) redirect(`/${locale}/signin`);
 
+  // Only orgs the viewer may create in: a view-only (RESTRICTED) seat's org
+  // is readable but not writable (createArticle refuses it).
   const orgs = await prisma.organization.findMany({
-    where: { id: { in: scope.workspace.scopeOrgIds } },
+    where: { id: { in: scope.workspace.editOrgIds } },
     select: { id: true, name: true },
   });
+
+  if (orgs.length === 0) {
+    return (
+      <div className="mx-auto max-w-lg space-y-4 p-6">
+        <h1 className="text-lg font-semibold">{t("newHeading")}</h1>
+        <ViewOnlyNote locale={locale} />
+      </div>
+    );
+  }
 
   return (
     <div className="mx-auto max-w-lg space-y-4 p-6">

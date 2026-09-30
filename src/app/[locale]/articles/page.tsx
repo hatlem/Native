@@ -4,6 +4,7 @@ import { redirect } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import { Link } from "@/i18n/navigation";
 import { loadScope } from "@/lib/scope";
+import { ViewOnlyNote } from "@/components/view-only-note";
 import { EmptyState } from "@/app/empty-state";
 import { StatusBadge } from "@/app/status-badge";
 import { articleHeadline } from "@/lib/content/markdown";
@@ -22,6 +23,10 @@ export default async function ArticlesPage({
 
   const scope = await loadScope();
   if (!scope.workspace) redirect(`/${locale}/signin`);
+  // "New article" only where the viewer may create one: a view-only
+  // (RESTRICTED) seat reads the library but can't add to it.
+  const ws = scope.workspace;
+  const canCreate = viewOrgIds(ws).some((id) => ws.editOrgIds.includes(id));
 
   const articles = await prisma.article.findMany({
     where: { organizationId: { in: viewOrgIds(scope.workspace) } },
@@ -97,16 +102,20 @@ export default async function ArticlesPage({
             <span className="eyebrow">{t("eyebrow")}</span>
             <h2>{t("title")}</h2>
           </div>
-          <Link href="/articles/new" className="btn small secondary">
-            {t("newArticleCta")}
-          </Link>
+          {canCreate ? (
+            <Link href="/articles/new" className="btn small secondary">
+              {t("newArticleCta")}
+            </Link>
+          ) : null}
         </div>
+
+        {canCreate ? null : <ViewOnlyNote locale={locale} />}
 
         {articles.length === 0 ? (
           <EmptyState
             title={t("none")}
-            primaryHref="/articles/new"
-            primaryLabel={t("newArticleCta")}
+            primaryHref={canCreate ? "/articles/new" : undefined}
+            primaryLabel={canCreate ? t("newArticleCta") : undefined}
           />
         ) : (
           <div className="table-wrap responsive">

@@ -728,7 +728,8 @@
       "item3Title": "Vi skriver, placerar och rapporterar",
       "item3Body": "Utkast skickas till dig för godkännande. Länkar och resultat hamnar i Rapporter."
     },
-    "breakdownQtyWithArticleFee": "{n} × {unit} placering + {article} per artikel (en artikel för alla {n})"
+    "breakdownQtyWithArticleFee": "{n} × {unit} placering + {article} per artikel (en artikel för alla {n})",
+    "noticePlanReadOnly": "Du har bara läsbehörighet till den här planen, så inget ändrades."
   },
   "rfq": {
     "org": "Företag",
@@ -853,7 +854,11 @@
     "renewalRequested": "Desken har ombetts att förnya offerten. Du får en avisering när du kan acceptera den.",
     "lineNoteLabel": "Kommentar",
     "noCommitTitle": "Du kan inte godkänna den här offerten själv.",
-    "noCommitBody": "Att godkänna den lägger en bindande beställning för {org}, och det kräver beställningsrätt. Be en administratör godkänna offerten, eller ge dig beställningsrätt under Konto → Team."
+    "noCommitBody": "Att godkänna den lägger en bindande beställning för {org}, och det kräver beställningsrätt. Be en administratör godkänna offerten, eller ge dig beställningsrätt under Konto → Team.",
+    "quoteRevisionNote": "Version {revision} – ersätter offerten du fick tidigare.",
+    "supersededEyebrow": "Tidigare versioner",
+    "supersededRow": "Version {revision} ({total}) gäller inte längre.",
+    "supersededBy": "Se version {revision} →"
   },
   "desk": {
     "eyebrow": "Internt desk",
@@ -954,7 +959,7 @@
     "quoteNoExpiry": "Inget slutdatum",
     "renewQuote": "Förnya offerten",
     "renewingQuote": "Förnyar …",
-    "renewQuoteHint": "Kunden kan inte acceptera en utgången offert. Förnyelsen behåller dessa priser fram till datumet du väljer – justera raderna först om priserna har ändrats.",
+    "renewQuoteHint": "Kunden kan inte acceptera en utgången offert. Förnyelsen behåller dessa priser fram till datumet du väljer. Har priserna ändrats reviderar du offerten i stället.",
     "quoteDraftBadge": "Utkast – inte skickad",
     "quoteDraftHint": "Kunden ser inte offerten än. Prissätt raderna och skicka den nedan.",
     "sendTitle": "Skicka till kunden",
@@ -975,7 +980,22 @@
     "lineNoteHint": "Visas för kunden på offertsidan och i PDF:en.",
     "lineNoteTooLong": "Kommentaren är för lång. Håll den under {max} tecken.",
     "pdfStorageUnavailable": "Fillagring (R2) är inte konfigurerad i den här miljön, så PDF:en kan inte sparas. Ladda ner Word-versionen i stället.",
-    "pdfFailed": "PDF:en kunde inte skapas. Försök igen eller ladda ner Word-versionen."
+    "pdfFailed": "PDF:en kunde inte skapas. Försök igen eller ladda ner Word-versionen.",
+    "pdfSuperseded": "Offerten har ersatts av en ny version, så inga nya dokument skapas av den. Använd den nya versionens PDF i stället.",
+    "reviseQuote": "Revidera offert",
+    "revisingQuote": "Öppnar revision …",
+    "reviseQuoteHint": "En skickad offert är låst. En revision är en redigerbar kopia; när du skickar den ersätter den den här offerten, och kunden får besked en gång med den nya totalen.",
+    "quoteRevisionBadge": "Version {revision}",
+    "quoteSupersededBadge": "Ersatt",
+    "quoteSupersededBy": "Ersatt av version {revision}. Kunden kan inte längre godkänna den.",
+    "quoteRevisionPending": "Version {revision} håller på att tas fram – kunden har kvar den här tills du skickar den.",
+    "quoteRevisionDraftHint": "Kunden har kvar version {previous} och kan godkänna den tills du skickar den här. När du skickar ersätts den, och kunden får besked en gång med den nya totalen.",
+    "discardRevision": "Släng revisionen",
+    "discardingRevision": "Slänger …",
+    "quoteLocked": "Offerten är skickad, så raderna är låsta. Revidera den för att ändra priser eller anteckningar.",
+    "quoteNotRevisable": "Offerten kan inte revideras: den är godkänd eller avslutad.",
+    "revisionPredecessorClosed": "Inte skickad: offerten som revisionen skulle ersätta är inte längre öppen – kunden kan precis ha godkänt den. Släng revisionen.",
+    "sendRevisionNote": "När du skickar ersätts den tidigare offerten: kunden kan inte längre godkänna den och får en avisering med den nya totalen."
   },
   "deskTitles": {
     "eyebrow": "Superadmin · titlar",
@@ -2866,7 +2886,9 @@
     "errDelegationPast": "Slutdatumet för delegeringen måste ligga i framtiden.",
     "canCommitAdminNote": "Administratörer har alltid beställningsrätt.",
     "statusRevoked": "Borttagen",
-    "errEmailDomain": "Vi hittar ingen e-postserver för den domänen. Kolla att adressen är rätt skriven."
+    "errEmailDomain": "Vi hittar ingen e-postserver för den domänen. Kolla att adressen är rätt skriven.",
+    "roleHelp": "Administratörer hanterar teamet och kan göra allt. Medlemmar bygger planer, skickar förfrågningar och – med beställningsrätt – godkänner offerter. Begränsad ger bara läsbehörighet: ser teamets planer, förfrågningar, offerter, beställningar, rapporter, artiklar och fakturor, men kan inte ändra, skicka, godkänna eller dela något.",
+    "canCommitRestrictedNote": "Användare med begränsad åtkomst kan bara läsa och kan inte få beställningsrätt."
   },
   "rateCard": {
     "pageTitle": "Rate card-förfrågan",
@@ -3300,6 +3322,8 @@
   "quotePdf": {
     "documentTitle": "Offert {quoteNumber}",
     "quoteNumber": "Offertnummer",
+    "revision": "Version",
+    "revisionValue": "{revision} – ersätter offert {previous}",
     "date": "Datum",
     "validUntil": "Giltig till",
     "preparedBy": "Upprättad av",
@@ -3636,5 +3660,9 @@
     "untitled": "Ny plan",
     "imported": "Importerad plan",
     "reordered": "Beställd igen"
+  },
+  "viewOnly": {
+    "title": "Endast läsbehörighet",
+    "body": "Du ser allt ditt team har här, men kan inte ändra något. Fråga en administratör om du behöver redigera, skicka eller godkänna."
   }
 }

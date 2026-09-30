@@ -22,15 +22,19 @@ import { intlLocale } from "@/lib/money";
 import {
   QUOTE_VALIDITY_DAYS,
   QUOTE_VALIDITY_MAX_DAYS,
+  isQuoteEditable,
   isQuoteExpired,
+  isQuoteRevisable,
   quoteValidUntilInputValue,
 } from "@/lib/commerce/quote-validity";
 import { lineOrder } from "@/lib/commerce/line-order";
 import { invoiceLineLabel } from "@/lib/invoice-line-label";
 import {
+  discardQuoteRevisionAction,
   generateQuote,
   generateQuotePdf,
   renewQuote,
+  reviseQuoteAction,
   sendQuote,
   setQuoteLineNote,
   setQuoteLinePrice,
@@ -52,12 +56,23 @@ export default async function DeskRequestPage({
   // checked on render so the desk sees why no PDF can be made before
   // clicking, not after.
   const storageReady = isStorageConfigured();
-  const pdfNotice: "pdfStorageUnavailable" | "pdfFailed" | null = !storageReady ||
+  const pdfNotice: "pdfStorageUnavailable" | "pdfFailed" | "pdfSuperseded" | null = !storageReady ||
     sp.pdf === "storage-unavailable"
     ? "pdfStorageUnavailable"
     : sp.pdf === "failed"
       ? "pdfFailed"
-      : null;
+      : sp.pdf === "superseded"
+        ? "pdfSuperseded"
+        : null;
+  // Quote-level refusals from the line-edit / revision / send actions.
+  const quoteError =
+    errorCode === "quote-locked"
+      ? "quoteLocked"
+      : errorCode === "quote-not-revisable"
+        ? "quoteNotRevisable"
+        : errorCode === "revision-predecessor-closed"
+          ? "revisionPredecessorClosed"
+          : null;
   const t = await getTranslations({ locale, namespace: "desk" });
   const tr = await getTranslations({ locale, namespace: "requests" });
   const tType = await getTranslations({ locale, namespace: "productType" });
@@ -89,6 +104,9 @@ export default async function DeskRequestPage({
           },
           order: true,
           documents: { orderBy: { version: "desc" } },
+          // Revision chain (lib/commerce/quote-revision.ts).
+          nextRevision: { select: { id: true, revision: true, status: true } },
+          previousQuote: { select: { id: true, revision: true } },
         },
       },
     },
@@ -465,17 +483,33 @@ export default async function DeskRequestPage({
               <span>{validityError}</span>
             </div>
           ) : null}
+          {quoteError ? (
+            <div className="banner-warn" role="alert">
+              <span>{t(quoteError)}</span>
+            </div>
+          ) : null}
           {quotesWithDownloadUrls.map((quote) => (
-            <section className="section" key={quote.id}>
+            <section className="section" key={quote.id} id={`quote-${quote.id}`}>
               <div className="section-head">
                 <div>
                   <span className="eyebrow">{t("quoteEyebrow")}</span>
                   <h2>
                     {t("pdfQuoteLabel", { currency: quote.currency })}
+                    {quote.revision > 1 ? (
+                      <>
+                        {" "}
+                        <span className="tag">{t("quoteRevisionBadge", { revision: quote.revision })}</span>
+                      </>
+                    ) : null}
                     {quote.status === "DRAFT" ? (
                       <>
                         {" "}
                         <span className="tag">{t("quoteDraftBadge")}</span>
+                      </>
+                    ) : quote.status === "SUPERSEDED" ? (
+                      <>
+                        {" "}
+                        <span className="tag">{t("quoteSupersededBadge")}</span>
                       </>
                     ) : null}
                   </h2>
@@ -500,8 +534,33 @@ export default async function DeskRequestPage({
                     <span>{t("lineNoteTooLong", { max: LINE_NOTE_MAX })}</span>
                   </div>
                 ) : null}
-                {quote.status === "DRAFT" ? (
+                {quote.status === "DRAFT" && quote.previousQuote ? (
+                  // An unsent revision: the customer still holds its predecessor.
+                  <div className="quote-validity">
+                    <p className="muted small">
+                      {t("quoteRevisionDraftHint", { previous: quote.previousQuote.revision })}
+                    </p>
+                    <form action={discardQuoteRevisionAction}>
+                      <input type="hidden" name="locale" value={locale} />
+                      <input type="hidden" name="requestId" value={request.id} />
+                      <input type="hidden" name="quoteId" value={quote.id} />
+                      <SubmitButton
+                        label={t("discardRevision")}
+                        pendingLabel={t("discardingRevision")}
+                        className="btn small ghost"
+                      />
+                    </form>
+                  </div>
+                ) : quote.status === "DRAFT" ? (
                   <p className="muted small">{t("quoteDraftHint")}</p>
+                ) : quote.status === "SUPERSEDED" ? (
+                  <p className="muted small">
+                    {quote.nextRevision ? (
+                      <a href={`#quote-${quote.nextRevision.id}`}>
+                        {t("quoteSupersededBy", { revision: quote.nextRevision.revision })}
+                      </a>
+                    ) : null}
+                  </p>
                 ) : quote.order ? null : (
                   <div className="quote-validity">
                     <span className={isQuoteExpired(quote) ? "tag" : "muted small"}>
@@ -534,6 +593,30 @@ export default async function DeskRequestPage({
                 {quote.order || !isQuoteExpired(quote) ? null : (
                   <p className="muted small">{t("renewQuoteHint")}</p>
                 )}
+                {/* A sent offer is locked: its lines change only through a
+                    revision (lib/commerce/quote-revision.ts). One revision at
+                    a time — while one is drafted, point at it instead. */}
+                {quote.nextRevision && quote.nextRevision.status === "DRAFT" ? (
+                  <p className="muted small">
+                    <a href={`#quote-${quote.nextRevision.id}`}>
+                      {t("quoteRevisionPending", { revision: quote.nextRevision.revision })}
+                    </a>
+                  </p>
+                ) : isQuoteRevisable(quote) ? (
+                  <div className="quote-validity">
+                    <form action={reviseQuoteAction}>
+                      <input type="hidden" name="locale" value={locale} />
+                      <input type="hidden" name="requestId" value={request.id} />
+                      <input type="hidden" name="quoteId" value={quote.id} />
+                      <SubmitButton
+                        label={t("reviseQuote")}
+                        pendingLabel={t("revisingQuote")}
+                        className="btn small secondary"
+                      />
+                    </form>
+                    <p className="muted small">{t("reviseQuoteHint")}</p>
+                  </div>
+                ) : null}
                 <p className="muted small">
                   {t("lineStateSummary", {
                     priced: quote.lines.filter((l) => !l.priceOnRequest).length,
@@ -545,7 +628,8 @@ export default async function DeskRequestPage({
                     const reference = l.productId
                       ? referenceByProductId.get(l.productId)
                       : undefined;
-                    const editable = !quote.order;
+                    // Only a DRAFT's lines change; a sent quote is revised instead.
+                    const editable = isQuoteEditable(quote);
                     return (
                       <Fragment key={l.id}>
                         <div className="quote-line">
@@ -716,7 +800,7 @@ export default async function DeskRequestPage({
                   <div className="banner-success" role="status">
                     ✓ {t("acceptedOrder")}
                   </div>
-                ) : quote.status === "DRAFT" ? null : (
+                ) : quote.status === "DRAFT" || quote.status === "SUPERSEDED" ? null : (
                   <div className="quote-cta">
                     <span className="muted small">{t("awaiting")}</span>
                   </div>
@@ -756,6 +840,10 @@ export default async function DeskRequestPage({
                       {t(pdfNotice)}
                     </p>
                   ) : null}
+                  {/* A replaced quote is history: its earlier PDFs stay listed
+                      above, but no new customer document is made from it
+                      (lib/pdf/quote-pdf-data QuoteSupersededError). */}
+                  {quote.status === "SUPERSEDED" ? null : (
                   <div className="quote-pdf-actions">
                     {/* Without object storage a PDF version can't be saved,
                         so the button would only ever fail — explain up front. */}
@@ -779,6 +867,7 @@ export default async function DeskRequestPage({
                       {t("docxDownload")}
                     </a>
                   </div>
+                  )}
                 </div>
               </article>
             </section>
@@ -788,6 +877,9 @@ export default async function DeskRequestPage({
               <div className="cta-block">
                 <h2>{t("sendTitle")}</h2>
                 <p className="muted">{t("sendBody", { count: draftQuotes.length })}</p>
+                {draftQuotes.some((q) => q.previousQuoteId) ? (
+                  <p className="muted small">{t("sendRevisionNote")}</p>
+                ) : null}
                 {errorCode === "send-unpriced" ? (
                   <div className="banner-warn" role="alert">
                     <span>{t("sendUnpriced")}</span>

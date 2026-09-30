@@ -4,7 +4,8 @@ import { prisma } from "@/lib/prisma";
 import { lineOrder } from "@/lib/commerce/line-order";
 import { Link } from "@/i18n/navigation";
 import { formatMoney, intlLocale } from "@/lib/money";
-import { loadScope, canActOnOrg } from "@/lib/scope";
+import { loadScope, canActOnOrg, canEditOnOrg } from "@/lib/scope";
+import { ViewOnlyNote } from "@/components/view-only-note";
 import { safeExternalUrl } from "@/lib/security";
 import { StatusBadge } from "@/app/status-badge";
 import { duplicatePlan } from "@/app/plan-actions";
@@ -60,6 +61,9 @@ export default async function MyOrderPage({
 
   const scope = await loadScope();
   if (!canActOnOrg(scope, order.organizationId)) notFound();
+  // A view-only (RESTRICTED) seat follows the order but can't copy it into a
+  // new plan or approve / send back an article draft (the actions refuse it).
+  const canEdit = canEditOnOrg(scope, order.organizationId);
 
   const tperf = await getTranslations({ locale, namespace: "performance" });
   const tcr = await getTranslations({ locale, namespace: "campaignReport" });
@@ -172,15 +176,17 @@ export default async function MyOrderPage({
               in-flight basket from this order's original plan. The
               user lands on /plan to edit titles, dates, and budget
               before re-submitting the RFQ. */}
-          <form action={duplicatePlan}>
-            <input type="hidden" name="locale" value={locale} />
-            <input type="hidden" name="orderId" value={order.id} />
-            <SubmitButton
-              label={t("useAsTemplate")}
-              pendingLabel={t("duplicating")}
-              className="btn small secondary block"
-            />
-          </form>
+          {canEdit ? (
+            <form action={duplicatePlan}>
+              <input type="hidden" name="locale" value={locale} />
+              <input type="hidden" name="orderId" value={order.id} />
+              <SubmitButton
+                label={t("useAsTemplate")}
+                pendingLabel={t("duplicating")}
+                className="btn small secondary block"
+              />
+            </form>
+          ) : null}
         </aside>
       </header>
 
@@ -272,6 +278,7 @@ export default async function MyOrderPage({
                         {t("draftReviewOpenFile")} ↗
                       </a>
                     ) : null}
+                    {canEdit ? (
                     <div className="content-review__actions">
                       <form action={approveContentAsset}>
                         <input type="hidden" name="locale" value={locale} />
@@ -305,6 +312,9 @@ export default async function MyOrderPage({
                         </form>
                       </details>
                     </div>
+                    ) : (
+                      <ViewOnlyNote locale={locale} />
+                    )}
                   </div>
                 ) : latest && latest.status === "CHANGES_REQUESTED" && latest.reviewNotes ? (
                   <div className="content-review content-review--sent">

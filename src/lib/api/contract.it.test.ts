@@ -8,6 +8,7 @@ import { POST as postOrder } from "@/app/api/v1/orders/route";
 import { GET as getTitles } from "@/app/api/v1/catalog/titles/route";
 import { GET as getTitle } from "@/app/api/v1/catalog/titles/[id]/route";
 import { GET as getQuote } from "@/app/api/v1/quotes/[id]/route";
+import { PUT as putPublisherProducts } from "@/app/api/v1/publisher/products/route";
 import { OPENAPI_SPEC } from "@/lib/api/openapi-spec";
 import { conformanceErrors, responseSchema } from "@/lib/api/openapi-conformance";
 import { buildMcpServerForToken } from "@/lib/mcp/server";
@@ -63,10 +64,15 @@ if (!RUN_DB_IT) {
   // Own key for the catalog param/contract tests: the per-key rate limit
   // (20/min) would otherwise be shared with the tests above.
   let paramsToken: string;
+  // catalog:write, bound to the test publisher (the ingestion API).
+  let publisherToken: string;
+  // Own key for the quote-revision reads, clear of the shared rate limit.
+  let quotesToken: string;
 
   async function mintKey(opts: {
     scopes: string;
     organizationId?: string | null;
+    publisherId?: string | null;
     revokedAt?: Date;
   }): Promise<string> {
     const raw = generateApiToken();
@@ -76,6 +82,7 @@ if (!RUN_DB_IT) {
         tokenHash: hashApiToken(raw),
         scopes: opts.scopes,
         organizationId: opts.organizationId ?? null,
+        publisherId: opts.publisherId ?? null,
         revokedAt: opts.revokedAt ?? null,
         createdBy: "api-it",
       },
@@ -169,6 +176,8 @@ if (!RUN_DB_IT) {
     catalogToken = await mintKey({ scopes: "catalog:read" });
     pricingAdminToken = await mintKey({ scopes: "pricing:admin" });
     paramsToken = await mintKey({ scopes: "catalog:read" });
+    publisherToken = await mintKey({ scopes: "catalog:write", publisherId });
+    quotesToken = await mintKey({ scopes: "catalog:read" });
   });
 
   after(async () => {
@@ -622,5 +631,179 @@ if (!RUN_DB_IT) {
     });
     assert.equal(created.verificationStatus, "LIVE");
     assert.equal(created.verificationSource, "sales-contact@example.com");
+  });
+
+  // ---- GET /api/v1/quotes/[id]: revisions ----
+
+  test("quotes: a superseded quote names its revision, and both conform to the spec", async () => {
+    const request = await prisma.request.findFirstOrThrow({
+      where: { organizationId: orgId },
+      select: { id: true },
+    });
+    const base = { requestId: request.id, currency: "NOK", subtotal: 1000, vatPct: 25, total: 1250 };
+    const old = await prisma.quote.create({
+      data: { ...base, status: "SUPERSEDED", supersededAt: new Date() },
+    });
+    const revision = await prisma.quote.create({
+      data: { ...base, status: "SENT", revision: 2, previousQuoteId: old.id, validUntil: new Date(Date.now() + 86_400_000) },
+    });
+    const read = async (id: string) =>
+      getQuote(
+        new NextRequest(`http://localhost/api/v1/quotes/${id}`, {
+          headers: { authorization: `Bearer ${quotesToken}` },
+        }),
+        { params: Promise.resolve({ id }) },
+      );
+    const schema = responseSchema(OPENAPI_SPEC, "/api/v1/quotes/{id}", "get", 200);
+
+    const oldRes = await read(old.id);
+    assert.equal(oldRes.status, 200);
+    const oldBody = await oldRes.json();
+    assert.equal(oldBody.status, "SUPERSEDED");
+    assert.equal(oldBody.revision, 1);
+    assert.equal(oldBody.superseded_by_quote_id, revision.id);
+    assert.deepEqual(conformanceErrors(OPENAPI_SPEC, schema, oldBody), []);
+
+    const newBody = await (await read(revision.id)).json();
+    assert.equal(newBody.revision, 2);
+    assert.equal(newBody.supersedes_quote_id, old.id);
+    assert.equal(newBody.superseded_by_quote_id, null);
+    assert.deepEqual(conformanceErrors(OPENAPI_SPEC, schema, newBody), []);
+
+    await prisma.quote.delete({ where: { id: revision.id } });
+    await prisma.quote.delete({ where: { id: old.id } });
+  });
+
+  test("quotes: an unsent (DRAFT) revision is never named, nor readable", async () => {
+    const request = await prisma.request.findFirstOrThrow({
+      where: { organizationId: orgId },
+      select: { id: true },
+    });
+    const base = { requestId: request.id, currency: "NOK", subtotal: 1000, vatPct: 25, total: 1250 };
+    const sent = await prisma.quote.create({ data: { ...base, status: "SENT" } });
+    const draft = await prisma.quote.create({
+      data: { ...base, status: "DRAFT", revision: 2, previousQuoteId: sent.id },
+    });
+    const res = await getQuote(
+      new NextRequest(`http://localhost/api/v1/quotes/${sent.id}`, {
+        headers: { authorization: `Bearer ${quotesToken}` },
+      }),
+      { params: Promise.resolve({ id: sent.id }) },
+    );
+    assert.equal((await res.json()).superseded_by_quote_id, null);
+    const draftRes = await getQuote(
+      new NextRequest(`http://localhost/api/v1/quotes/${draft.id}`, {
+        headers: { authorization: `Bearer ${quotesToken}` },
+      }),
+      { params: Promise.resolve({ id: draft.id }) },
+    );
+    assert.equal(draftRes.status, 404);
+    await prisma.quote.delete({ where: { id: draft.id } });
+    await prisma.quote.delete({ where: { id: sent.id } });
+  });
+
+  // ---- PUT /api/v1/publisher/products: the portal rule ----
+
+  const ingestReq = (token: string, products: unknown[]) =>
+    new NextRequest("http://localhost/api/v1/publisher/products", {
+      method: "PUT",
+      headers: { "content-type": "application/json", authorization: `Bearer ${token}` },
+      body: JSON.stringify({ products }),
+    });
+  const ingestProduct = (over: Record<string, unknown> = {}) => ({
+    externalRef: "api-it-sku-1",
+    type: "NATIVE_ARTICLE",
+    name: "API-IT ingested native",
+    basePrice: 18000,
+    currency: "NOK",
+    leadTimeDays: 10,
+    title: {
+      externalRef: "api-it-title-ext",
+      name: "API-IT Ingested Title",
+      marketCode: "NO",
+      category: "business",
+    },
+    ...over,
+  });
+  const storedIngested = () =>
+    prisma.product.findFirstOrThrow({
+      where: { externalRef: "api-it-sku-1", title: { publisherId, externalRef: "api-it-title-ext" } },
+      select: { basePrice: true, visibility: true, bookable: true, leadTimeDays: true, confirmedAt: true },
+    });
+
+  test("publisher products: a new product lands with its opening price and default desk status", async () => {
+    const res = await putPublisherProducts(ingestReq(publisherToken, [ingestProduct()]));
+    assert.equal(res.status, 200);
+    assert.deepEqual(
+      conformanceErrors(
+        OPENAPI_SPEC,
+        responseSchema(OPENAPI_SPEC, "/api/v1/publisher/products", "put", 200),
+        await res.json(),
+      ),
+      [],
+    );
+    const p = await storedIngested();
+    assert.equal(Number(p.basePrice), 18000);
+    assert.equal(p.visibility, "INDICATIVE");
+    assert.equal(p.bookable, true);
+    assert.equal(p.confirmedAt, null, "an ingested price is unconfirmed until the desk confirms it");
+  });
+
+  test("publisher products: fields the portal allows (lead time) still update; stored values echo back fine", async () => {
+    const res = await putPublisherProducts(
+      ingestReq(publisherToken, [ingestProduct({ leadTimeDays: 21, visibility: "INDICATIVE", bookable: true })]),
+    );
+    assert.equal(res.status, 200);
+    assert.equal((await storedIngested()).leadTimeDays, 21);
+  });
+
+  test("publisher products: changing price, visibility or bookable → 422 DESK_OWNED_FIELD naming the field", async () => {
+    // The desk has since made it firm and repriced it — the publisher's
+    // payload must not undo either.
+    await prisma.product.updateMany({
+      where: { externalRef: "api-it-sku-1", title: { publisherId } },
+      data: { visibility: "FIRM", basePrice: 20000 },
+    });
+    const cases: [Record<string, unknown>, string][] = [
+      [{ basePrice: 25000, visibility: "FIRM" }, "basePrice"],
+      [{ basePrice: 20000, visibility: "INDICATIVE" }, "visibility"],
+      [{ basePrice: 20000, bookable: false }, "bookable"],
+    ];
+    for (const [over, field] of cases) {
+      const res = await putPublisherProducts(ingestReq(publisherToken, [ingestProduct({ ...over, leadTimeDays: 30 })]));
+      assert.equal(res.status, 422, field);
+      const body = await res.json();
+      assert.equal(body.error.code, "DESK_OWNED_FIELD");
+      assert.match(body.error.message, new RegExp(field));
+      assert.deepEqual(
+        body.error.details.map((d: { field: string; path: string }) => [d.field, d.path]),
+        [[field, `products.0.${field}`]],
+      );
+      assert.deepEqual(
+        conformanceErrors(
+          OPENAPI_SPEC,
+          responseSchema(OPENAPI_SPEC, "/api/v1/publisher/products", "put", 422),
+          body,
+        ),
+        [],
+      );
+    }
+    const p = await storedIngested();
+    assert.equal(Number(p.basePrice), 20000, "the desk's price stands");
+    assert.equal(p.visibility, "FIRM");
+    assert.equal(p.bookable, true);
+    assert.equal(p.leadTimeDays, 21, "a refused batch writes nothing, not even the allowed fields");
+  });
+
+  test("publisher products: a new product can't arrive instantly orderable", async () => {
+    const res = await putPublisherProducts(
+      ingestReq(publisherToken, [ingestProduct({ externalRef: "api-it-sku-firm", visibility: "FIRM" })]),
+    );
+    assert.equal(res.status, 422);
+    assert.equal((await res.json()).error.details[0].field, "visibility");
+    assert.equal(
+      await prisma.product.count({ where: { externalRef: "api-it-sku-firm", title: { publisherId } } }),
+      0,
+    );
   });
 }

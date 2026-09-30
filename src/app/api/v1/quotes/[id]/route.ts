@@ -65,6 +65,9 @@ export async function GET(
     where: { id },
     include: {
       request: { select: { id: true, organizationId: true } },
+      // Only named once this quote is SUPERSEDED (see below): before that the
+      // successor is a draft revision, the desk's unsent work.
+      nextRevision: { select: { id: true } },
       lines: {
         orderBy: lineOrder(),
         select: {
@@ -102,6 +105,14 @@ export async function GET(
     vat_pct: String(quote.vatPct),
     total: String(quote.total),
     valid_until: quote.validUntil?.toISOString() ?? null,
+    // Revisions: a sent quote never changes; the desk sends a new revision
+    // that supersedes it. `superseded_by_quote_id` points at the quote that
+    // counts now, and is only set once this one is SUPERSEDED.
+    revision: quote.revision,
+    supersedes_quote_id: quote.previousQuoteId,
+    superseded_by_quote_id:
+      quote.status === "SUPERSEDED" && quote.nextRevision ? quote.nextRevision.id : null,
+    superseded_at: quote.supersededAt?.toISOString() ?? null,
     notes: quote.notes,
     lines: quote.lines.map((l) => ({
       id: l.id,

@@ -14,18 +14,31 @@ export async function PlanTargeting({
   activeListId,
   verticalOptions,
   selected,
+  readOnly = false,
 }: {
   locale: string;
   activeListId?: string;
   // Stored taxonomy values with labels in the buyer's language.
   verticalOptions: VerticalOption[];
   selected: string[];
+  // View-only seat: the targeting is read out, not offered as a form.
+  readOnly?: boolean;
 }) {
   const t = await getTranslations({ locale, namespace: "plan" });
   if (!activeListId || verticalOptions.length === 0) return null;
 
   const selectedSet = new Set(selected);
   const labelOf = new Map(verticalOptions.map((o) => [o.value, o.label]));
+
+  if (readOnly) {
+    if (selected.length === 0) return null;
+    return (
+      <p className="plan-targeting__summary">
+        {t("targetingSummary")}{" "}
+        <span className="muted small">{selected.map((v) => labelOf.get(v) ?? v).join(", ")}</span>
+      </p>
+    );
+  }
 
   return (
     <details className="plan-targeting">

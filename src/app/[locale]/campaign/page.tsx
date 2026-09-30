@@ -2,6 +2,8 @@ import { getTranslations } from "next-intl/server";
 import { notFound, redirect } from "next/navigation";
 import { auth } from "@/auth";
 import { PageHeader } from "@/components";
+import { ViewOnlyNote } from "@/components/view-only-note";
+import { Link } from "@/i18n/navigation";
 import { campaignFlowEnabled } from "@/lib/flags";
 import { recommendForBrief } from "@/lib/campaign-recommend";
 import { getWorkspace } from "@/lib/workspace";
@@ -108,6 +110,25 @@ export default async function CampaignPage({
     { key: "proposal", label: t("stepProposal") },
   ];
   const currentIndex = STEP_ORDER.indexOf(current);
+
+  // The campaign flow is a builder from its first step to its last (add,
+  // schedule, KYC, send). A view-only (RESTRICTED) seat can't use any of it,
+  // so it gets the note and a way to the team's plan instead of a wizard whose
+  // every button the server would refuse.
+  if (orgId && !ws?.activeCanEdit) {
+    const tShort = await getTranslations({ locale, namespace: "catalog.shortlist" });
+    return (
+      <>
+        <PageHeader eyebrow={t("eyebrow")} title={t("title")} lead={t("lead")} />
+        <ViewOnlyNote locale={locale} />
+        <p>
+          <Link href="/plan" className="btn secondary">
+            {tShort("reviewPlan")} →
+          </Link>
+        </p>
+      </>
+    );
+  }
 
   return (
     <>

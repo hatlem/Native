@@ -6,6 +6,7 @@ import { intlLocale } from "@/lib/money";
 import { restoreList } from "@/app/list-actions";
 import { ListsTable } from "./_components/ListsTable";
 import { JoinedNotice } from "@/app/joined-notice";
+import { ViewOnlyNote } from "@/components/view-only-note";
 
 export const dynamic = "force-dynamic";
 
@@ -29,6 +30,9 @@ export default async function ListsPage({
   const session = await auth();
   const ws = await getWorkspace(session?.user?.id);
   const orgId = ws?.activeOrgId ?? null;
+  // A view-only seat sees the org's plans but can't rename, duplicate,
+  // archive or restore them (lib/scope canEditOnOrg refuses those actions).
+  const readOnly = !!orgId && !ws?.activeCanEdit;
   const [lists, archived] = orgId
     ? await Promise.all([
         prisma.savedList.findMany({
@@ -58,7 +62,8 @@ export default async function ListsPage({
   return (
     <>
       {joined ? <JoinedNotice locale={locale} organizationId={orgId} variant="lists" /> : null}
-      {justArchived ? (
+      {readOnly ? <ViewOnlyNote locale={locale} /> : null}
+      {justArchived && !readOnly ? (
         <div className="banner-info" role="status">
           <span>{t("archivedNotice", { name: justArchived.name })}</span>
           <form action={restoreList}>
@@ -70,7 +75,7 @@ export default async function ListsPage({
           </form>
         </div>
       ) : null}
-      <ListsTable locale={locale} lists={lists} heading={t("title")} emptyLabel={t("empty")} />
+      <ListsTable locale={locale} lists={lists} heading={t("title")} emptyLabel={t("empty")} readOnly={readOnly} />
       {archived.length > 0 ? (
         <details className="lists-archived">
           <summary>{t("archivedHeading", { count: archived.length })}</summary>
@@ -84,13 +89,15 @@ export default async function ListsPage({
                     {t("archivedOn", { date: dateFmt.format(l.archivedAt!) })}
                   </span>
                 </span>
-                <form action={restoreList}>
-                  <input type="hidden" name="listId" value={l.id} />
-                  <input type="hidden" name="locale" value={locale} />
-                  <button type="submit" className="link">
-                    {t("restore")}
-                  </button>
-                </form>
+                {readOnly ? null : (
+                  <form action={restoreList}>
+                    <input type="hidden" name="listId" value={l.id} />
+                    <input type="hidden" name="locale" value={locale} />
+                    <button type="submit" className="link">
+                      {t("restore")}
+                    </button>
+                  </form>
+                )}
               </li>
             ))}
           </ul>

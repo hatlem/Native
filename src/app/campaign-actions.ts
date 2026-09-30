@@ -5,7 +5,7 @@ import { BusinessType } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
 import { auth } from "@/auth";
 import { getWorkspace } from "@/lib/workspace";
-import { loadScope, canActOnOrg } from "@/lib/scope";
+import { loadScope, canEditOnOrg } from "@/lib/scope";
 
 function str(formData: FormData, key: string): string {
   const v = formData.get(key);
@@ -25,7 +25,8 @@ export async function saveKyc(formData: FormData) {
   const ws = await getWorkspace(session.user.id);
   const orgId = ws?.activeOrgId;
   const scope = await loadScope();
-  if (!orgId || !canActOnOrg(scope, orgId)) redirect(`/${locale}/campaign?step=proposal`);
+  // Writing the org's billing details is an edit: not for a view-only seat.
+  if (!orgId || !canEditOnOrg(scope, orgId)) redirect(`/${locale}/campaign?step=proposal`);
 
   const businessTypeRaw = str(formData, "businessType");
   const businessType = BUSINESS_TYPES.includes(businessTypeRaw)
