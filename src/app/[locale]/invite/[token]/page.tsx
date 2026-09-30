@@ -29,6 +29,7 @@ export default async function OrgInvitePage({
 
   const t = await getTranslations({ locale, namespace: "invite" });
   const ta = await getTranslations({ locale, namespace: "auth" });
+  const te = await getTranslations({ locale, namespace: "errors" });
 
   const invite = await prisma.orgInvite.findUnique({
     where: { token },
@@ -53,7 +54,7 @@ export default async function OrgInvitePage({
           <p className="lead">{t("unavailableBody")}</p>
           <div className="cluster">
             <Link href="/" className="btn primary">
-              {ta("backHome")}
+              {te("backHome")}
             </Link>
           </div>
         </div>

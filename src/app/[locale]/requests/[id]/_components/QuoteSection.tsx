@@ -144,9 +144,15 @@ export async function QuoteSection({
                 </span>
                 <div className="qn-lines">
                   {narrative.lines.map((line) => {
-                    const bullets = tn.raw(
-                      `bullets.${line.productType}`,
-                    ) as unknown;
+                    // Curated "what you get" bullets exist only for the
+                    // core placement types; a content-fee line (or a
+                    // newer type without copy yet) gets none. Guard with
+                    // has() — raw() on a missing key logs
+                    // MISSING_MESSAGE on every render.
+                    const bulletsKey = `bullets.${line.productType}`;
+                    const bullets = tn.has(bulletsKey)
+                      ? (tn.raw(bulletsKey) as unknown)
+                      : null;
                     const items = Array.isArray(bullets)
                       ? (bullets as string[]).map((b) =>
                           b.replaceAll(

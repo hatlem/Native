@@ -37,6 +37,7 @@ export default async function ClaimPublisherInvitePage({
   const t = await getTranslations({ locale, namespace: "auth" });
   const tc = await getTranslations({ locale, namespace: "common" });
   const ti = await getTranslations({ locale, namespace: "invite" });
+  const te = await getTranslations({ locale, namespace: "errors" });
 
   const invite = await prisma.publisherInvite.findUnique({
     where: { token },
@@ -64,7 +65,7 @@ export default async function ClaimPublisherInvitePage({
           </p>
           <div className="cluster">
             <Link href="/" className="btn primary">
-              {t("backHome")}
+              {te("backHome")}
             </Link>
           </div>
         </div>
