@@ -11,6 +11,7 @@ import { recordAudit } from "@/lib/audit";
 import { exportLimiter } from "@/lib/rate-limit";
 import { buyerVisibleQuoteWhere } from "@/lib/commerce/quote-validity";
 import { lineOrder } from "@/lib/commerce/line-order";
+import { activeMembershipWhere } from "@/lib/membership";
 import { BUYER_REQUEST_SELECT, BUYER_ORDER_SELECT } from "@/lib/export/buyer-export";
 
 export const dynamic = "force-dynamic";
@@ -56,11 +57,24 @@ export async function GET(req: NextRequest) {
     orgIds = ws.scopeOrgIds;
   }
 
-  const [orgs, users, plans, savedLists, requests, orders, invoices] = await Promise.all([
+  const [orgs, memberships, plans, savedLists, requests, orders, invoices] = await Promise.all([
     prisma.organization.findMany({ where: { id: { in: orgIds } } }),
-    prisma.user.findMany({
-      where: { organizationId: { in: orgIds } },
-      select: { id: true, email: true, name: true, role: true, createdAt: true },
+    // The org's people are its ACTIVE memberships (the access model since
+    // memberships replaced the home-org column), not User.organizationId:
+    // that listed 1 of 3 members of a team whose others joined by invite.
+    // Only what the org's own team table shows: who, and their role there.
+    prisma.membership.findMany({
+      where: {
+        AND: [{ organizationId: { in: orgIds } }, activeMembershipWhere()],
+        user: { deactivatedAt: null },
+      },
+      orderBy: [{ organizationId: "asc" }, { createdAt: "asc" }],
+      select: {
+        organizationId: true,
+        role: true,
+        canCommit: true,
+        user: { select: { id: true, email: true, name: true } },
+      },
     }),
     prisma.plan.findMany({
       where: { organizationId: { in: orgIds } },
@@ -127,7 +141,15 @@ export async function GET(req: NextRequest) {
     {
       generatedAt: new Date().toISOString(),
       orgs,
-      users,
+      // One row per member per org, flattened: who, and their role there.
+      users: memberships.map((m) => ({
+        id: m.user.id,
+        email: m.user.email,
+        name: m.user.name,
+        organizationId: m.organizationId,
+        role: m.role,
+        canCommit: m.canCommit,
+      })),
       plans,
       savedLists,
       requests,

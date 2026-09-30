@@ -10,6 +10,7 @@ import { bandLabel } from "@/lib/pricing/bands";
 import { titleBand } from "@/lib/pricing/display-price";
 import { loadPricingDefaults } from "@/lib/content-fee";
 import { EmptyState } from "@/app/empty-state";
+import { catalogVisibleTitleWhere } from "@/lib/catalog-visibility";
 import { localizeCategory } from "@/lib/taxonomy-i18n";
 import type { AppLocale } from "@/i18n/routing";
 import { titleDisplayName } from "@/lib/title-display";
@@ -50,7 +51,25 @@ export default async function ComparePage({
     .filter(Boolean)
     .slice(0, 6); // cap so we don't blow up the layout
 
-  if (ids.length === 0) {
+  const titles = ids.length
+    ? await prisma.title.findMany({
+        where: { AND: [{ id: { in: ids } }, catalogVisibleTitleWhere] },
+        include: {
+          publisher: true,
+          market: true,
+          products: { where: { active: true }, include: { priceRules: true, spec: true } },
+        },
+      })
+    : [];
+
+  const ordered = ids
+    .map((id) => titles.find((t) => t.id === id))
+    .filter((t): t is (typeof titles)[number] => !!t);
+
+  // Nothing to compare: no ids, or only ids that match no visible title (a
+  // stale link, a title since discontinued). Same empty state either way,
+  // never an empty table.
+  if (ordered.length === 0) {
     return (
       <section>
         <h1>{t("title")}</h1>
@@ -63,23 +82,6 @@ export default async function ComparePage({
       </section>
     );
   }
-
-  const titles = await prisma.title.findMany({
-    where: {
-      id: { in: ids },
-      OR: [{ active: true }, { lastVerifiedAt: null }],
-      discontinuedAt: null,
-    },
-    include: {
-      publisher: true,
-      market: true,
-      products: { where: { active: true }, include: { priceRules: true, spec: true } },
-    },
-  });
-
-  const ordered = ids
-    .map((id) => titles.find((t) => t.id === id))
-    .filter((t): t is (typeof titles)[number] => !!t);
 
   const pricing = await loadPricingDefaults();
 

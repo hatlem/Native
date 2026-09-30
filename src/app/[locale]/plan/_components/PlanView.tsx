@@ -23,6 +23,7 @@ import { timeAgo } from "@/lib/time-ago";
 import { loadVerticalOptions, localizedVerticalOptions } from "@/lib/catalog-taxonomy";
 import { PlanBanners } from "./PlanBanners";
 import { PlanShare } from "./PlanShare";
+import { displayTimeZone } from "@/lib/time-zone";
 import { approvalState, planVersion } from "@/lib/list-share";
 import { PlanStart } from "./PlanStart";
 import { PlanSteps, type PlanStep } from "./PlanSteps";
@@ -618,6 +619,7 @@ export async function PlanView({
                   shareToken={activeList.shareToken}
                   shareViewedAt={activeList.shareViewedAt}
                   shareViewCount={activeList.shareViewCount}
+                  timeZone={displayTimeZone({ marketCode: activeOrg?.marketCode, locale })}
                   approval={approvalState(activeList, planVersion(activeList.items))}
                 />
               ) : null}

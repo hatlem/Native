@@ -19,6 +19,7 @@ import {
 import { groupItemsByMarket } from "@/lib/quote-grouping";
 import { loadPricingDefaults, contentFeeLinesForGroup } from "@/lib/content-fee";
 import { planWindowFromItems, type BookingUnit } from "@/lib/campaign-schedule";
+import { fingerprintListItems } from "@/lib/commerce/list-fingerprint";
 import {
   authorshipFromWithContent,
   authorshipForOrderLine,
@@ -99,29 +100,12 @@ export class FirmOrderChangedError extends Error {
   }
 }
 
-/** Order-insensitive identity of a saved list's rows — the exact fields whose
- *  concurrent change must invalidate a submit (line set, qty, product/title,
- *  withContent → CONTENT_FEE). Shared by /plan submit and the in-txn guard. */
-export function fingerprintListItems(
-  rows: Array<{
-    id: string;
-    quantity: number;
-    productId: string | null;
-    titleId: string | null;
-    withContent: boolean;
-  }>,
-): string {
-  return rows
-    .map(
-      (r) =>
-        `${r.id}:${r.quantity}:${r.productId ?? ""}:${r.titleId ?? ""}:${r.withContent ? 1 : 0}`,
-    )
-    .sort()
-    .join("|");
-}
+// The list identity lives in a pure module so the client-approval version
+// (lib/plan-version.ts) builds on it without importing Prisma.
+export { fingerprintListItems } from "@/lib/commerce/list-fingerprint";
 
 export type FirmOrderBrief = {
-  // Freeform brief text → Request.briefSummary (with targeting lines folded in).
+  // Freeform brief text → Request.briefSummary (targeting → Plan columns).
   briefText?: string | null;
   // Campaign goal → Plan.goal + each ContentBrief.message.
   goal?: string | null;
@@ -261,15 +245,10 @@ export async function createFirmOrder(args: {
       },
     });
 
-    // Fold structured targeting intent into the desk-facing brief so the
-    // desk sees it as readable lines, not just buried Plan columns.
-    const targetingLines = [
-      targetGeo && `Geo: ${targetGeo}`,
-      targetAudience && `Audience: ${targetAudience}`,
-      targetContext && `Context: ${targetContext}`,
-    ].filter(Boolean);
-    const briefSummary =
-      [brief?.briefText, ...targetingLines].filter(Boolean).join("\n") || null;
+    // The buyer's own words only. Targeting stays in the Plan columns and
+    // renders with localized labels (BriefTargeting); folding it in here as
+    // English "Audience: b2b-decision-makers" lines showed raw keys.
+    const briefSummary = brief?.briefText || null;
 
     const req = await tx.request.create({
       data: {

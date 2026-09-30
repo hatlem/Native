@@ -8,6 +8,7 @@ import {
   WAVE_OPTIONS,
   SPACING_OPTIONS,
   planWaveDates,
+  spacingInMonths,
   type CadencePlan,
 } from "@/lib/programme-cadence";
 import type { BookingUnit } from "@/lib/campaign-schedule";
@@ -99,7 +100,22 @@ export function ProgrammeForm({
           </select>
         </label>
       </div>
-      <p className="plan-programme__rationale">{t(`rationale.${cadence.rationaleKey}`)}</p>
+      <p className="plan-programme__rationale">
+        {/* The recommendation's reason only while the controls still show
+            the recommendation: it names its own numbers ("eight weeks
+            apart"), which contradict any other pick. */}
+        {waves === cadence.waves && spacing === cadence.spacingWeeks
+          ? t(`rationale.${cadence.rationaleKey}`)
+          : t("rationale.custom", {
+              waves,
+              weeks: spacing,
+              recWaves: cadence.waves,
+              recWeeks: cadence.spacingWeeks,
+            })}
+        {/* Month-grid titles move in whole months, so "4 weeks" lands a
+            month apart: say so rather than let the dates look wrong. */}
+        {unit === "MONTH" ? ` ${t("rationale.monthRounding", { months: spacingInMonths(spacing) })}` : null}
+      </p>
 
       <ol className="plan-programme__waves">
         {Array.from({ length: waves }, (_, i) => {

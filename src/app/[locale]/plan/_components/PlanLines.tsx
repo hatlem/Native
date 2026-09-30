@@ -8,7 +8,8 @@ import { titleDisplayName } from "@/lib/title-display";
 import { removeFromPlan, setQuantity, setContentProduction, setLineNote, setLineAlternative } from "@/app/plan-actions";
 import { LINE_NOTE_MAX } from "@/lib/line-note";
 import { resolveTitleLine, setItemSchedule } from "@/app/list-actions";
-import { upcomingPeriods, type BookingUnit } from "@/lib/campaign-schedule";
+import { startablePeriods, type BookingUnit } from "@/lib/campaign-schedule";
+import { formatRunRange, runBounds } from "@/lib/run-period";
 import { PlanLineBoard, type PlanBoardEntry } from "./PlanLineBoard";
 
 type PlanProduct = Prisma.ProductGetPayload<{
@@ -64,20 +65,21 @@ export type PlanTitleLine = {
   position: number;
 };
 
+// The line's booked run with its length ("Oct – Nov 2026 · 2 months"): the
+// start alone hid how long the line runs. Null until the buyer sets dates.
 function periodLabel(
   l: Pick<PlanLine, "scheduleStart" | "scheduleUnits" | "product">,
-  tCampaign: Awaited<ReturnType<typeof getTranslations>>,
+  t: Awaited<ReturnType<typeof getTranslations>>,
   locale: string,
 ): string | null {
-  if (!l.scheduleStart || !l.scheduleUnits) return null;
-  const unit = l.product.bookingUnit;
-  const dateFmt = new Intl.DateTimeFormat(intlLocale(locale), {
-    day: "numeric",
-    month: "short",
-    ...(unit === "MONTH" ? { year: "numeric" } : {}),
-    timeZone: "UTC",
+  if (!l.scheduleStart) return null;
+  const unit = l.product.bookingUnit as BookingUnit;
+  const start = new Date(l.scheduleStart);
+  return t("runPeriod", {
+    range: formatRunRange(start, l.scheduleUnits, unit, locale),
+    n: runBounds(start, l.scheduleUnits, unit).units,
+    unit,
   });
-  return dateFmt.format(new Date(l.scheduleStart));
 }
 
 // The transparency the single total figure lacks: what the line total is
@@ -132,7 +134,7 @@ function LineSchedule({
 }) {
   const unit = l.product.bookingUnit as BookingUnit;
   const min = l.product.minDurationUnits ?? 1;
-  const periods = upcomingPeriods(unit, SCHEDULE_PERIODS, new Date());
+  const periods = startablePeriods(unit, SCHEDULE_PERIODS, new Date());
   const current = l.scheduleStart ? new Date(l.scheduleStart).toISOString().slice(0, 10) : "";
   const fmt = new Intl.DateTimeFormat(intlLocale(locale), {
     ...(unit === "WEEK" ? { day: "numeric", month: "short" } : { month: "long", year: "numeric" }),
@@ -305,7 +307,7 @@ export async function PlanLines({
   const planEntries: PlanBoardEntry[] = [
     ...lines.map((l) => {
       const reach = l.product.title.digitalReach ?? l.product.title.monthlyReach ?? null;
-      const period = periodLabel(l, tCampaign, locale);
+      const period = periodLabel(l, t, locale);
       const isFirm = l.product.visibility === "FIRM";
       return productEntry(
         l,

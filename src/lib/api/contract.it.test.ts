@@ -279,6 +279,9 @@ if (!RUN_DB_IT) {
     const request = await prisma.request.findUniqueOrThrow({ where: { id: body.requestId } });
     assert.equal(request.status, "CLOSED");
     assert.ok(request.briefSummary?.includes("API-IT campaign"));
+    // The reference names the campaign, as a plan name typed on /plan does.
+    const plan = await prisma.plan.findUniqueOrThrow({ where: { id: request.planId } });
+    assert.equal(plan.name, "API-IT campaign");
   });
 
   // ---- POST /api/v1/orders + Idempotency-Key ----

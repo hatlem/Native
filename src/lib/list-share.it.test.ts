@@ -114,6 +114,37 @@ if (!RUN_DB_IT) {
     assert.equal(approvalState(row, changed).kind, "none");
   });
 
+  test("an approval goes stale when the line dates or the customer note change", async () => {
+    const list = await prisma.savedList.create({ data: { organizationId: orgId, name: "Approval dates IT" } });
+    const item = await addProductItem(list.id, productId);
+    const token = await enableListShare(list.id);
+    const approve = async () => {
+      const v = planVersion((await loadSharedList(token))!.items);
+      assert.equal((await approveSharedList(token, v)).outcome, "approved");
+      return v;
+    };
+    const stateNow = async () => {
+      const row = await prisma.savedList.findUniqueOrThrow({ where: { id: list.id } });
+      return approvalState(row, planVersion((await loadSharedList(token))!.items)).kind;
+    };
+
+    await approve();
+    // The share page shows the run: setting dates is a change to approve.
+    await prisma.savedListItem.update({
+      where: { id: item.id },
+      data: { scheduleStart: new Date("2026-10-01T00:00:00Z"), scheduleUnits: 1 },
+    });
+    assert.equal(await stateNow(), "stale", "dates set after approval");
+    await approve();
+    await prisma.savedListItem.update({ where: { id: item.id }, data: { scheduleUnits: 2 } });
+    assert.equal(await stateNow(), "stale", "run length changed after approval");
+    await approve();
+    await prisma.savedListItem.update({ where: { id: item.id }, data: { notes: "Next to the match report" } });
+    assert.equal(await stateNow(), "stale", "customer note changed after approval");
+    await approve();
+    assert.equal(await stateNow(), "current");
+  });
+
   test("planVersion ignores alternatives and line order", async () => {
     const list = await prisma.savedList.create({ data: { organizationId: orgId, name: "Version IT" } });
     await addProductItem(list.id, productId);

@@ -38,7 +38,10 @@ export default async function ListsPage({
             id: true,
             name: true,
             updatedAt: true,
-            _count: { select: { items: true } },
+            // Placements and recommended alternatives are counted apart: an
+            // alternatives-only plan has nothing to send (lib/lists.ts).
+            _count: { select: { items: { where: { isAlternative: false } } } },
+            items: { where: { isAlternative: true }, select: { id: true } },
             requests: { select: { createdAt: true }, orderBy: { createdAt: "desc" }, take: 1 },
           },
         }),
@@ -46,7 +49,12 @@ export default async function ListsPage({
           where: { organizationId: orgId, archivedAt: { not: null } },
           orderBy: { archivedAt: "desc" },
           take: ARCHIVED_SHOWN,
-          select: { id: true, name: true, archivedAt: true, _count: { select: { items: true } } },
+          select: {
+            id: true,
+            name: true,
+            archivedAt: true,
+            _count: { select: { items: { where: { isAlternative: false } } } },
+          },
         }),
       ])
     : [[], []];
@@ -80,7 +88,7 @@ export default async function ListsPage({
                 <span>
                   <strong>{l.name}</strong>{" "}
                   <span className="muted small">
-                    {t("itemCount", { count: l._count.items })} ·{" "}
+                    {t("placementCount", { count: l._count.items })} ·{" "}
                     {t("archivedOn", { date: dateFmt.format(l.archivedAt!) })}
                   </span>
                 </span>

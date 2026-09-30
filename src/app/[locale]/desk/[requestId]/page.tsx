@@ -15,6 +15,8 @@ import {
 } from "@/lib/pricing/display-price";
 import { bandLabel, priceBand } from "@/lib/pricing/bands";
 import { StatusBadge } from "@/app/status-badge";
+import { BriefTargeting } from "@/app/brief-targeting";
+import { briefWithoutFoldedTargeting } from "@/lib/brief-targeting";
 import { MailLink, SafeEmail, SubmitButton, withSafeEmails } from "@/components";
 import { canSeeCostVsSell } from "@/lib/roles";
 import { isStorageConfigured, presignDownload } from "@/lib/storage/r2";
@@ -94,6 +96,8 @@ export default async function DeskRequestPage({
     },
   });
   if (!request) notFound();
+  // The buyer's own words; targeting renders from the plan (BriefTargeting).
+  const briefText = briefWithoutFoldedTargeting(request.briefSummary);
 
   // Plan items split into product lines and Title placeholders (productId
   // null). Fetch products for the former and bare title names for the
@@ -319,9 +323,8 @@ export default async function DeskRequestPage({
           <h1>
             {t("request")} · {request.organization.name}
           </h1>
-          {request.briefSummary ? (
-            <p className="lead">{request.briefSummary}</p>
-          ) : null}
+          {briefText ? <p className="lead">{briefText}</p> : null}
+          <BriefTargeting locale={locale} plan={request.plan} />
         </div>
         <aside className="detail-meta">
           <div className="meta-row">

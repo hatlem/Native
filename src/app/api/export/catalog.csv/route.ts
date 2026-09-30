@@ -3,18 +3,14 @@
 // /api/v1/catalog/titles JSON contract — they want a one-click CSV
 // they can pipe into Notion / Airtable / their planning spreadsheet.
 //
-// Auth: any signed-in user. Same content visibility as the catalog
-// page itself (gated catalog is the visibility unit). Price is shown
-// as a band label (e.g. "25–40k NOK") using the same helper as the
-// catalog card — never the net basePrice or exact customer figure.
-//
-// Query params:
-//   - market (NO/SE/DK/FI/DE/AT/CH/UK/IE): filter by market.
-// (No format / cursor filters — this export is "give me what the
-// catalog shows me" in one file. Heavy slicers can use the JSON API.)
+// Auth: any signed-in user. The file is "what the catalog shows me": the
+// same query params as /catalog (market, types, vertical, region, b2bB2c,
+// search q, …, sort), parsed by the same parseCatalogParams and filtered
+// by the same buildCatalogWhere, visibility guard included. All pages, one
+// file. Price is shown as a band label (e.g. "25–40k NOK") using the same
+// helper as the catalog card — never the net basePrice or exact figure.
 
 import { NextResponse, type NextRequest } from "next/server";
-import { MarketCode } from "@prisma/client";
 import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
 import { csv } from "@/lib/csv";
@@ -22,10 +18,11 @@ import { bandLabel } from "@/lib/pricing/bands";
 import { titleBand } from "@/lib/pricing/display-price";
 import { loadPricingDefaults } from "@/lib/content-fee";
 import { recordAudit } from "@/lib/audit";
+import { resolveCatalogSearch } from "@/lib/catalog-search";
+import { parseCatalogParams } from "@/app/[locale]/catalog/filters";
+import { buildCatalogWhere, catalogOrderBy } from "@/app/[locale]/catalog/catalog-where";
 
 export const dynamic = "force-dynamic";
-
-const MARKET_CODES = Object.values(MarketCode) as string[];
 
 export async function GET(req: NextRequest) {
   const session = await auth();
@@ -33,19 +30,12 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({ error: "unauthorized" }, { status: 401 });
   }
 
-  const url = new URL(req.url);
-  const marketParam = url.searchParams.get("market");
-  const market =
-    marketParam && MARKET_CODES.includes(marketParam)
-      ? (marketParam as MarketCode)
-      : undefined;
+  const filters = parseCatalogParams(Object.fromEntries(req.nextUrl.searchParams));
+  const search = await resolveCatalogSearch(filters.q);
 
   const titles = await prisma.title.findMany({
-    where: {
-      active: true,
-      ...(market ? { market: { code: market } } : {}),
-    },
-    orderBy: [{ name: "asc" }],
+    where: buildCatalogWhere(filters, search),
+    orderBy: catalogOrderBy(filters.sort),
     include: {
       publisher: { select: { name: true, pricesPublic: true } },
       market: { select: { code: true, currency: true, disclosureLabel: true } },
@@ -103,12 +93,14 @@ export async function GET(req: NextRequest) {
 
   await recordAudit(session.user.id, "catalog.csv_export", `User:${session.user.id}`, {
     rows: rows.length,
-    market: market ?? "ALL",
+    market: filters.markets.length ? filters.markets.join(",") : "ALL",
+    // The query that produced the file, for "why did my export have N rows".
+    query: req.nextUrl.searchParams.toString(),
   });
 
   const body = csv(rows);
   const today = new Date().toISOString().slice(0, 10);
-  const suffix = market ? `-${market}` : "";
+  const suffix = filters.markets.length === 1 ? `-${filters.markets[0]}` : "";
   return new NextResponse(body, {
     headers: {
       "Content-Type": "text/csv; charset=utf-8",

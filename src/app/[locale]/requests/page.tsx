@@ -4,7 +4,7 @@ import { redirect } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import { loadScope } from "@/lib/scope";
 import { loadUnsentLists } from "@/lib/lists";
-import { estimateListTotals } from "@/lib/plan-total";
+import { estimateListTotals, planLineCount } from "@/lib/plan-total";
 import { loadPricingDefaults } from "@/lib/content-fee";
 import { Link } from "@/i18n/navigation";
 import { EmptyState } from "@/app/empty-state";
@@ -67,6 +67,7 @@ export default async function RequestsPage({
   const tOrders = await getTranslations({ locale, namespace: "orders" });
   const tPlan = await getTranslations({ locale, namespace: "plan" });
   const tInvoice = await getTranslations({ locale, namespace: "invoice" });
+  const tv = await getTranslations({ locale, namespace: "priceVisibility" });
 
   const scope = await loadScope();
   if (!scope.workspace) redirect(`/${locale}/signin`);
@@ -136,7 +137,13 @@ export default async function RequestsPage({
   // the amount the plan would actually commit to (content fees included).
   const pricing = await loadPricingDefaults();
   for (const list of unsentLists) {
-    const totals = estimateListTotals(list.items, pricing);
+    // Placements only: recommended alternatives sit outside the plan's total
+    // and its submit, so an alternatives-only plan has nothing to send yet.
+    const placements = planLineCount(list.items);
+    const alternatives = list.items.length - placements;
+    // Currencies with nothing priced yet drop out: their lines are "price on
+    // request", never "0 kr".
+    const totals = estimateListTotals(list.items, pricing).filter((tot) => tot.hasVisible);
     const totalLabel = totals.length
       ? totals.length > 1
         ? totals
@@ -148,17 +155,28 @@ export default async function RequestsPage({
             )
             .join(" + ")
         : formatMoney(totals[0].amount, totals[0].currency, locale)
-      : null;
+      : placements > 0
+        ? tv("requestPrice")
+        : null;
     rows.push({
       id: `draft-${list.id}`,
       name: list.name,
       statusValue: "DRAFT",
-      meta: t("metaPlanBuilt", { items: list._count.items, age: timeAgo(list.updatedAt, locale) }),
+      meta:
+        placements > 0
+          ? t("metaPlanBuilt", { items: placements, age: timeAgo(list.updatedAt, locale) })
+          : t("metaPlanAlternativesOnly", { alternatives, age: timeAgo(list.updatedAt, locale) }),
       stage: 1,
       tab: "inProgress",
       totalLabel,
-      qualifier: t("qualifierIndicative"),
-      action: { kind: "select-list", listId: list.id, locale, label: t("actionFinishSend") },
+      // "indicative" qualifies an amount; with no amount there is nothing to qualify.
+      qualifier: totals.length ? t("qualifierIndicative") : "",
+      action: {
+        kind: "select-list",
+        listId: list.id,
+        locale,
+        label: placements > 0 ? t("actionFinishSend") : t("actionContinuePlan"),
+      },
       footerNote: waveFooter(list),
       // Unused by CampaignRow for a select-list action (it renders the
       // whole row as a form against that action instead, so every click —

@@ -81,31 +81,76 @@ export function PlanBriefFields({
   const latest = useRef({ campaignText, timing, budget, segments, geo, context });
   latest.current = { campaignText, timing, budget, segments, geo, context };
 
-  const save = useCallback(async () => {
+  // An edit not yet sent: set on every change, cleared when a save starts.
+  const pending = useRef(false);
+
+  const payload = useCallback(() => {
     const v = latest.current;
+    return {
+      briefText: v.campaignText,
+      briefTiming: v.timing,
+      budget: v.budget,
+      budgetCurrency: currency,
+      targetAudience: v.segments,
+      targetGeo: v.geo,
+      targetContext: v.context,
+    };
+  }, [currency]);
+
+  const save = useCallback(async () => {
+    window.clearTimeout(timer.current);
+    pending.current = false;
     setSaveState("saving");
     try {
-      const res = await savePlanBrief(listId, {
-        briefText: v.campaignText,
-        briefTiming: v.timing,
-        budget: v.budget,
-        budgetCurrency: currency,
-        targetAudience: v.segments,
-        targetGeo: v.geo,
-        targetContext: v.context,
-      });
+      const res = await savePlanBrief(listId, payload());
       setSaveState(res.ok ? "saved" : "error");
     } catch {
       setSaveState("error");
     }
-  }, [listId, currency]);
+  }, [listId, payload]);
+
+  // Leaving before the debounce fires used to drop the last edit: the
+  // cleanup only cleared the timer. The pending edit is now sent on the way
+  // out, with a keepalive fetch (api/plan/brief) the browser finishes after
+  // the page is gone; a server action call would die with it.
+  const flush = useCallback(() => {
+    if (!pending.current) return;
+    window.clearTimeout(timer.current);
+    pending.current = false;
+    void fetch("/api/plan/brief", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ listId, brief: payload() }),
+      keepalive: true,
+      credentials: "same-origin",
+    }).catch(() => {
+      // The page is going away; nothing left to tell the buyer.
+    });
+  }, [listId, payload]);
 
   useEffect(() => {
     if (!dirty.current) return;
+    pending.current = true;
     window.clearTimeout(timer.current);
     timer.current = window.setTimeout(() => void save(), SAVE_DELAY_MS);
     return () => window.clearTimeout(timer.current);
   }, [campaignText, timing, budget, segments, geo, context, save]);
+
+  // Every way out of the page: tab hidden (app switch, mobile background),
+  // pagehide (close, reload, full navigation, bfcache), and unmount (a
+  // client-side navigation to another route).
+  useEffect(() => {
+    const onHidden = () => {
+      if (document.visibilityState === "hidden") flush();
+    };
+    document.addEventListener("visibilitychange", onHidden);
+    window.addEventListener("pagehide", flush);
+    return () => {
+      document.removeEventListener("visibilitychange", onHidden);
+      window.removeEventListener("pagehide", flush);
+      flush();
+    };
+  }, [flush]);
 
   // Mark dirty, then update — every edit goes through this.
   const edit = <T,>(set: (v: T) => void) => (v: T) => {

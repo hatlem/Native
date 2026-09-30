@@ -1,3 +1,5 @@
+import type { Prisma } from "@prisma/client";
+
 export type MembershipRole = "ADMIN" | "MEMBER" | "RESTRICTED";
 export type MembershipStatus = "ACTIVE" | "EXPIRED" | "REVOKED";
 
@@ -15,6 +17,13 @@ export function isMembershipActive(m: MembershipRow, now: Date = new Date()): bo
   if (m.status !== "ACTIVE") return false;
   if (m.expiresAt && m.expiresAt.getTime() <= now.getTime()) return false;
   return true;
+}
+
+/** isMembershipActive as a Prisma where: ACTIVE and not past its expiry. For
+ *  queries that list an org's people (the GDPR export), which must agree
+ *  with who actually has access. */
+export function activeMembershipWhere(now: Date = new Date()): Prisma.MembershipWhereInput {
+  return { status: "ACTIVE", OR: [{ expiresAt: null }, { expiresAt: { gt: now } }] };
 }
 
 export function activeScopeOrgIds(

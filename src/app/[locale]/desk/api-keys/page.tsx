@@ -7,6 +7,8 @@ import { Link } from "@/i18n/navigation";
 import { createApiKey, revokeApiKey } from "@/app/admin-actions";
 import { SubmitButton } from "@/components";
 import { ISSUABLE_SCOPES } from "@/lib/api-key";
+import { buildBindingOptions } from "@/lib/api-key-binding-options";
+import { BindingPicker } from "./BindingPicker";
 
 export const dynamic = "force-dynamic";
 
@@ -80,18 +82,43 @@ export default async function ApiKeysPage({
     },
   });
 
+  // Every organisation and publisher: the picker searches them client-side.
+  // Publishers carry their market and first titles, which is what tells the
+  // three "AB"s apart (lib/api-key-binding-options.ts).
   const [orgs, publishers] = await Promise.all([
     prisma.organization.findMany({
-      orderBy: { name: "asc" },
-      select: { id: true, name: true },
-      take: 500,
+      select: { id: true, name: true, type: true, marketCode: true },
     }),
     prisma.publisher.findMany({
-      orderBy: { name: "asc" },
-      select: { id: true, name: true },
-      take: 2000,
+      select: {
+        id: true,
+        name: true,
+        countryCode: true,
+        _count: { select: { titles: true } },
+        titles: { orderBy: { name: "asc" }, take: 2, select: { name: true } },
+      },
     }),
   ]);
+  const bindingOptions = buildBindingOptions(
+    {
+      orgs,
+      publishers: publishers.map((p) => ({
+        id: p.id,
+        name: p.name,
+        countryCode: p.countryCode,
+        titles: p.titles.map((x) => x.name),
+        titleCount: p._count.titles,
+      })),
+    },
+    {
+      platform: t("orgPlatform"),
+      advertiser: t("bindingAdvertiser"),
+      agency: t("bindingAgency"),
+      moreTitles: (count) => t("bindingMoreTitles", { count }),
+      noTitles: t("bindingNoTitles"),
+    },
+    locale,
+  );
 
   return (
     <>
@@ -136,25 +163,9 @@ export default async function ApiKeysPage({
           </div>
           <div className="field">
             <label htmlFor="key-binding">{t("bindingLabel")}</label>
-            {/* One select for the binding: a key acts for the platform, ONE
-                organization or ONE publisher — never two at once. */}
-            <select id="key-binding" name="binding" defaultValue="">
-              <option value="">— {t("orgPlatform")} —</option>
-              <optgroup label={t("bindingOrgs")}>
-                {orgs.map((o) => (
-                  <option key={o.id} value={`org:${o.id}`}>
-                    {o.name}
-                  </option>
-                ))}
-              </optgroup>
-              <optgroup label={t("bindingPublishers")}>
-                {publishers.map((p) => (
-                  <option key={p.id} value={`pub:${p.id}`}>
-                    {p.name}
-                  </option>
-                ))}
-              </optgroup>
-            </select>
+            {/* One binding: a key acts for the platform, ONE organization
+                or ONE publisher — never two at once. */}
+            <BindingPicker id="key-binding" name="binding" options={bindingOptions} />
             <span className="hint">{t("bindingHint")}</span>
           </div>
           <fieldset className="field checkbox-fieldset">

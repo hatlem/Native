@@ -13,6 +13,7 @@ import {
   deleteFavoriteList as deleteFavoriteListLib,
   setFavoriteListShared as setFavoriteListSharedLib,
 } from "@/lib/favorites";
+import type { CollectionAddState } from "@/lib/favorites";
 import { listNames } from "@/lib/list-names";
 
 function str(formData: FormData, key: string): string {
@@ -40,22 +41,29 @@ export async function toggleFavorite(formData: FormData) {
   revalidatePath(`/${locale}/favorites`, "page");
 }
 
-export async function addFavoriteToList(formData: FormData) {
+// "Add to collection" on a /favorites card (useActionState): returns what
+// happened so the card can say "Added to X" or "Already in X" instead of
+// silently doing nothing on a repeat.
+export async function addFavoriteToCollection(
+  _prev: CollectionAddState,
+  formData: FormData,
+): Promise<CollectionAddState> {
   const locale = str(formData, "locale") || "en";
   const titleId = str(formData, "titleId");
   const listId = str(formData, "listId");
   const scope = await requireUser(locale);
-  if (titleId && listId) {
-    // The lib throws on a forged/foreign listId (requireOwnList). Swallow it so
-    // the action is a silent no-op rather than a 500/leak — but LOG it, so a
-    // genuine failure (DB error, etc.) is observable instead of vanishing. Same
-    // rationale for every list-mutation catch below.
-    await addFavoriteToListLib(scope.userId!, titleId, listId).catch((e) =>
-      console.error("favorites.add_to_list_failed", e),
-    );
-  }
+  if (!titleId || !listId) return { outcome: "unavailable", listId: null };
+  // The lib throws on a forged/foreign listId (requireOwnList). Report it as
+  // unavailable rather than a 500/leak — but LOG it, so a genuine failure
+  // (DB error, etc.) is observable instead of vanishing. Same rationale for
+  // every list-mutation catch below.
+  const outcome = await addFavoriteToListLib(scope.userId!, titleId, listId).catch((e) => {
+    console.error("favorites.add_to_list_failed", e);
+    return "unavailable" as const;
+  });
   revalidatePath(`/${locale}/catalog`, "page");
   revalidatePath(`/${locale}/favorites`, "page");
+  return { outcome, listId };
 }
 
 // Toggle a publication's membership in one list, addressed by titleId (the card

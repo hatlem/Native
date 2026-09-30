@@ -8,6 +8,9 @@ export type FavoritePublication = {
   slug: string;
   publisherName: string;
   marketCode: string;
+  // The favorite owner's collections this publication is already in, so a
+  // card can say "In: Trade press" and offer only the others.
+  collectionIds: string[];
 };
 
 export type FavoriteListSummary = {
@@ -25,6 +28,12 @@ export type FavoritesOverview = {
   lists: FavoriteListSummary[];
   sharedLists: FavoriteListSummary[];
 };
+
+/** What "Add to collection" did: the card's feedback line says which. */
+export type AddToCollectionOutcome = "added" | "already" | "unavailable";
+
+/** The /favorites card's "Add to collection" form state (useActionState). */
+export type CollectionAddState = { outcome: AddToCollectionOutcome; listId: string | null } | null;
 
 export type FavoriteListDetail = {
   id: string;
@@ -78,24 +87,26 @@ export async function addFavoriteToList(
   userId: string,
   titleId: string,
   listId: string,
-): Promise<void> {
+): Promise<AddToCollectionOutcome> {
   await requireOwnList(userId, listId);
   const title = await prisma.title.findFirst({
     where: { id: titleId, ...catalogVisibleTitleWhere },
     select: { id: true },
   });
-  if (!title) return;
+  if (!title) return "unavailable";
   const favorite = await prisma.favorite.upsert({
     where: { userId_titleId: { userId, titleId } },
     create: { userId, titleId },
     update: {},
     select: { id: true },
   });
-  await prisma.favoriteListItem.upsert({
-    where: { listId_favoriteId: { listId, favoriteId: favorite.id } },
-    create: { listId, favoriteId: favorite.id },
-    update: {},
+  // createMany + skipDuplicates: one statement that says whether a row was
+  // made, so "already in this collection" is reported, never silent.
+  const { count } = await prisma.favoriteListItem.createMany({
+    data: [{ listId, favoriteId: favorite.id }],
+    skipDuplicates: true,
   });
+  return count === 1 ? "added" : "already";
 }
 
 /** Remove a favorite from a list (keeps the heart). Verifies ownership. */
@@ -244,6 +255,7 @@ function toPublication(f: {
     market: { code: string };
     publisher: { name: string };
   };
+  listItems: { listId: string }[];
 }): FavoritePublication {
   return {
     favoriteId: f.id,
@@ -252,6 +264,7 @@ function toPublication(f: {
     slug: f.title.slug,
     publisherName: f.title.publisher.name,
     marketCode: f.title.market.code,
+    collectionIds: f.listItems.map((i) => i.listId),
   };
 }
 
@@ -266,6 +279,7 @@ const PUBLICATION_SELECT = {
       publisher: { select: { name: true } },
     },
   },
+  listItems: { select: { listId: true } },
 } as const;
 
 // A title deactivated AFTER being favorited would still sit in the pool and

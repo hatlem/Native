@@ -249,15 +249,10 @@ export async function submitListAsRfq(input: {
       },
     });
 
-    // Fold structured targeting intent into the desk-facing brief so the
-    // desk sees it as readable lines, not just buried Plan columns.
-    const targetingLines = [
-      brief.targetGeo && `Geo: ${brief.targetGeo}`,
-      brief.targetAudience && `Audience: ${brief.targetAudience}`,
-      brief.targetContext && `Context: ${brief.targetContext}`,
-    ].filter(Boolean);
-    const briefSummary =
-      [deskBrief, ...targetingLines].filter(Boolean).join("\n") || null;
+    // The buyer's own words only. Targeting stays in the Plan columns and
+    // renders with localized labels (BriefTargeting); folding it in here as
+    // English "Audience: b2b-decision-makers" lines showed raw keys.
+    const briefSummary = deskBrief || null;
 
     const req = await tx.request.create({
       data: {

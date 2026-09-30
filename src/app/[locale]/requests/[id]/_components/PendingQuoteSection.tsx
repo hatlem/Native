@@ -2,6 +2,8 @@ import { getTranslations } from "next-intl/server";
 import type { Prisma } from "@prisma/client";
 import { intlLocale } from "@/lib/money";
 import { SafeEmail } from "@/components/safe-email";
+import { BriefTargeting } from "@/app/brief-targeting";
+import { briefTargeting, briefWithoutFoldedTargeting, type PlanTargeting } from "@/lib/brief-targeting";
 
 type AssignedBuyer = Prisma.UserGetPayload<{
   select: { name: true; email: true };
@@ -15,13 +17,18 @@ export async function PendingQuoteSection({
   assignedBuyer,
   slaTarget,
   briefSummary,
+  targeting,
 }: {
   locale: string;
   assignedBuyer: AssignedBuyer | null;
   slaTarget: Date;
   briefSummary: string | null;
+  // The plan's structured targeting, shown with localized labels.
+  targeting: PlanTargeting;
 }) {
   const t = await getTranslations({ locale, namespace: "requests" });
+  const briefText = briefWithoutFoldedTargeting(briefSummary);
+  const hasTargeting = briefTargeting(targeting) !== null;
 
   return (
     <section className="section">
@@ -53,10 +60,11 @@ export async function PendingQuoteSection({
             </dd>
           </div>
         </dl>
-        {briefSummary ? (
+        {briefText || hasTargeting ? (
           <details className="pending-brief">
             <summary>{t("pendingBriefLabel")}</summary>
-            <p>{briefSummary}</p>
+            {briefText ? <p>{briefText}</p> : null}
+            <BriefTargeting locale={locale} plan={targeting} />
           </details>
         ) : null}
       </div>

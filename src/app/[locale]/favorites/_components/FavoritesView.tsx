@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useActionState, useState } from "react";
 import { useTranslations } from "next-intl";
 import { Link } from "@/i18n/navigation";
 import { EmptyState } from "@/app/empty-state";
@@ -11,7 +11,8 @@ import {
   removeFavoriteFromList,
   toggleFavorite,
   createFavoriteList,
-  addFavoriteToList,
+  addFavoriteToCollection,
+  setFavoriteListMembership,
 } from "@/app/favorites-actions";
 import { saveTitleToList } from "@/app/list-actions";
 import type {
@@ -50,7 +51,7 @@ function PubCard({
   // The viewer's own collections, offered as "Add to collection" — the only
   // way a favorite gets into one (the catalog heart's menu adds to saved
   // lists, i.e. plans). Omitted inside a collection view.
-  collections?: { options: { id: string; name: string }[]; label: string; submit: string };
+  collections?: { options: { id: string; name: string }[] };
 }) {
   return (
     <article className="card">
@@ -84,27 +85,90 @@ function PubCard({
         ) : null}
       </div>
       {collections && collections.options.length > 0 ? (
-        <form action={addFavoriteToList} className="cluster tight" style={{ marginTop: 8 }}>
+        <CollectionControl locale={locale} pub={pub} options={collections.options} />
+      ) : null}
+    </article>
+  );
+}
+
+// A favorite's collections on its card: which ones it is already in (each
+// removable), and "Add to collection" offering only the others, with a line
+// that says what the add did. Adding used to show every collection, the
+// card never said where a favorite already was, and a repeat add silently
+// did nothing.
+function CollectionControl({
+  locale,
+  pub,
+  options,
+}: {
+  locale: string;
+  pub: FavoritePublication;
+  options: { id: string; name: string }[];
+}) {
+  const t = useTranslations("favorites");
+  const [state, formAction, pending] = useActionState(addFavoriteToCollection, null);
+  const nameOf = (id: string | null) => options.find((o) => o.id === id)?.name ?? "";
+  const member = new Set(pub.collectionIds);
+  const inCollections = options.filter((o) => member.has(o.id));
+  const offered = options.filter((o) => !member.has(o.id));
+  return (
+    <div className="favorite-collections">
+      {inCollections.length > 0 ? (
+        <div className="favorite-collections__in">
+          <span className="muted small">{t("inCollections")}</span>
+          {inCollections.map((c) => (
+            <form key={c.id} action={setFavoriteListMembership} className="favorite-collections__chip">
+              <input type="hidden" name="locale" value={locale} />
+              <input type="hidden" name="titleId" value={pub.titleId} />
+              <input type="hidden" name="listId" value={c.id} />
+              <input type="hidden" name="member" value="0" />
+              <span>{c.name}</span>
+              <button type="submit" aria-label={t("removeFromCollection", { name: c.name })}>
+                ×
+              </button>
+            </form>
+          ))}
+        </div>
+      ) : null}
+      {offered.length > 0 ? (
+        <form action={formAction} className="cluster tight">
           <input type="hidden" name="locale" value={locale} />
           <input type="hidden" name="titleId" value={pub.titleId} />
           <select
             name="listId"
-            aria-label={collections.label}
-            defaultValue={collections.options[0].id}
+            aria-label={t("addToCollection")}
+            // Re-keyed when the offered set changes, so the default is always
+            // a collection it isn't in yet.
+            key={offered.map((o) => o.id).join(",")}
+            defaultValue={offered[0].id}
             style={{ width: "auto", minWidth: 0, flex: "1 1 140px" }}
           >
-            {collections.options.map((c) => (
+            {offered.map((c) => (
               <option key={c.id} value={c.id}>
                 {c.name}
               </option>
             ))}
           </select>
-          <button type="submit" className="btn ghost small">
-            {collections.submit}
+          <button type="submit" className="btn ghost small" disabled={pending}>
+            {t("addToCollectionSubmit")}
           </button>
         </form>
+      ) : (
+        <p className="muted small">{t("inAllCollections")}</p>
+      )}
+      {state ? (
+        <p
+          className={`favorite-collections__status${state.outcome === "unavailable" ? " is-error" : ""}`}
+          role="status"
+        >
+          {state.outcome === "added"
+            ? t("addedToCollection", { name: nameOf(state.listId) })
+            : state.outcome === "already"
+              ? t("alreadyInCollection", { name: nameOf(state.listId) })
+              : t("collectionAddFailed")}
+        </p>
       ) : null}
-    </article>
+    </div>
   );
 }
 
@@ -263,11 +327,7 @@ export function FavoritesView({
                 addToPlanLabel={addToPlanLabel}
                 removeMode="heart"
                 removeLabel={t("remove")}
-                collections={{
-                  options: lists.map((l) => ({ id: l.id, name: l.name })),
-                  label: t("addToCollection"),
-                  submit: t("addToCollectionSubmit"),
-                }}
+                collections={{ options: lists.map((l) => ({ id: l.id, name: l.name })) }}
               />
             ))}
           </div>

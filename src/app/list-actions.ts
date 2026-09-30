@@ -38,6 +38,7 @@ import { alignActivePlan, refusalNotice, resolvePlanTarget, type PlanTargetList 
 import { saveListBrief, type RawListBrief } from "@/lib/plan-brief";
 import type { Scope } from "@/lib/scope";
 import { listNames } from "@/lib/list-names";
+import { clampUnits } from "@/lib/campaign-schedule";
 
 // Same-origin path of the page that posted the action, if the browser said.
 async function refererPath(): Promise<string | null> {
@@ -446,21 +447,26 @@ export async function reorderListItems(input: {
   return { ok: true };
 }
 
-// Campaign flow — set a shortlist item's schedule (first period + unit count).
-// The UI enforces the product minimum via the input; we store what's posted and
-// leave validation to the estimate/submit path. updateMany no-ops if removed.
+// Set a line's schedule (first period + unit count), from /plan's "Set dates"
+// or the campaign flow. The run length is clamped to the publisher's minimum
+// here too, not only by the input's `min`: the stored run is what the plan,
+// the share page and the order's flight window show. updateMany no-ops if
+// the line was removed meanwhile.
 export async function setItemSchedule(formData: FormData) {
   const locale = str(formData, "locale") || "en";
   const itemId = str(formData, "itemId");
-  const { scope, list } = await ownItem(locale, itemId);
+  const { scope, item, list } = await ownItem(locale, itemId);
   const startRaw = str(formData, "scheduleStart");
   const start = /^\d{4}-\d{2}-\d{2}$/.test(startRaw) ? new Date(`${startRaw}T00:00:00Z`) : null;
   const units = Number(str(formData, "scheduleUnits"));
+  const product = item.productId
+    ? await prisma.product.findUnique({ where: { id: item.productId }, select: { minDurationUnits: true } })
+    : null;
   await prisma.savedListItem.updateMany({
     where: { id: itemId },
     data: {
       scheduleStart: start,
-      scheduleUnits: Number.isFinite(units) && units > 0 ? Math.floor(units) : null,
+      scheduleUnits: Number.isFinite(units) && units > 0 ? clampUnits(units, product?.minDurationUnits) : null,
     },
   });
   await alignLinePlan(scope, list);
