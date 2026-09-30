@@ -10,7 +10,6 @@ import { getWorkspace } from "@/lib/workspace";
 import { Link } from "@/i18n/navigation";
 import { readPlanBrief } from "@/lib/basket";
 import { readActiveListId, resolveActiveList } from "@/lib/lists";
-import { isProductPriceShown } from "@/lib/pricing-visibility";
 import { titleDisplayName } from "@/lib/title-display";
 import { catalogVisibleTitleWhere } from "@/lib/catalog-visibility";
 import type { Candidate, SupplementaryTitle } from "@/lib/recommend";
@@ -29,7 +28,7 @@ import { PlanSummary } from "./PlanSummary";
 import { WhatHappensNext } from "./WhatHappensNext";
 import { PlanProgramme, type ProgrammePacing } from "./PlanProgramme";
 import { loadProgrammeForList, recommendCadence } from "@/lib/programme";
-import { estimateListTotals, placementLineTotal } from "@/lib/plan-total";
+import { estimateListTotals, linePrice } from "@/lib/plan-total";
 import { scheduleOverlapWarnings, type ScheduleOverlapWarning } from "@/lib/programme-warnings";
 import type { BookingUnit } from "@/lib/campaign-schedule";
 
@@ -133,14 +132,19 @@ export async function PlanView({
     .map((i) => {
       if (!i.productId || !i.product) return null;
       const p = i.product;
-      const priceVisible = isProductPriceShown(p, p.title);
+      // The same per-line split the summary total adds up (lib/plan-total.ts):
+      // a "We write it" line's figure includes its content fee, so the line
+      // and the total can never disagree.
+      const price = linePrice(i, pricing);
       return {
         itemId: i.id,
         product: p,
         quantity: i.quantity,
-        priceVisible,
+        priceVisible: price !== null,
         withContent: i.withContent,
-        lineTotal: priceVisible ? placementLineTotal(p, i.quantity, pricing.marginRules) : 0,
+        placementTotal: price?.placement ?? 0,
+        contentFee: price?.contentFee ?? 0,
+        lineTotal: price?.total ?? 0,
         // A product deactivated since it was added: still shown, but flagged so
         // the buyer removes it (submit refuses while it's present — see E).
         unavailable: !p.active || !p.bookable,
@@ -493,7 +497,6 @@ export async function PlanView({
                 altLines={altLines}
                 altTitleLines={altTitleLines}
                 hasHiddenPrice={hasHiddenPrice}
-                feeRules={pricing.feeRules}
               />
               {favoriteCount > 0 ? (
                 <div className="plan-favorites-bridge">
