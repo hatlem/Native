@@ -5,8 +5,9 @@
 // decision (resolveTitleLine, src/app/list-actions.ts), preserving the
 // desk-RFQ gate an unresolved placeholder always forces.
 //
-// Copy lives in placement-ready-notice.ts (localized by the org's market,
-// same convention as programme-autosend-notice.ts).
+// Copy lives in placement-ready-notice.ts, sent as a notice template
+// (notice-template.ts): the email in the org's market language, the inbox
+// row re-rendered in each reader's language.
 //
 // Idempotency reuses AuditLog as a per-item marker — the same trick
 // metrics-sweep.ts uses for its once-per-day latch, keyed per item
@@ -15,7 +16,7 @@
 import { prisma } from "@/lib/prisma";
 import { recordAudit } from "@/lib/audit";
 import { notifyOrg, notifyDesk } from "@/lib/notify";
-import { buildPlacementReadyNotice } from "@/lib/placement-ready-notice";
+import { marketDefaultLocale } from "@/lib/market-locale";
 
 const NOTIFIED_ACTION = "placement-ready.notified";
 const entityFor = (itemId: string) => `SavedListItem:${itemId}`;
@@ -40,6 +41,7 @@ export async function runPlacementReadySweep(): Promise<PlacementReadySweepResul
     select: {
       id: true,
       titleId: true,
+      createdAt: true,
       list: {
         select: {
           id: true,
@@ -74,41 +76,38 @@ export async function runPlacementReadySweep(): Promise<PlacementReadySweepResul
       });
       if (already) continue;
 
+      // "…now has a price" means the title GAINED a priced placement after
+      // the placeholder was added. A placeholder added to an already-priced
+      // title (the buyer can pick its placement on the plan right away) must
+      // not fire: that sent "Arkitektur har nu ett pris" seconds after the
+      // buyer added Arkitektur, when nothing had changed.
       const product = await prisma.product.findFirst({
-        where: { titleId: item.titleId!, active: true, bookable: true, confirmedAt: { not: null } },
+        where: {
+          titleId: item.titleId!,
+          active: true,
+          bookable: true,
+          confirmedAt: { gt: item.createdAt },
+        },
         select: { id: true },
       });
       if (!product) continue;
 
-      // Buyer copy in the org's market language; desk copy in English, the
-      // source language of this codebase (there is no per-desk-user locale).
-      const buyer = buildPlacementReadyNotice({
-        marketCode: item.list.organization.marketCode,
-        titleName: item.title!.name,
-        listName: item.list.name,
-        listId: item.list.id,
-      });
-      const desk = buildPlacementReadyNotice({
-        marketCode: null,
-        titleName: item.title!.name,
-        listName: item.list.name,
-        listId: item.list.id,
-        locale: "en",
-      });
+      // Stored as a template, so each inbox renders it in its reader's
+      // language; the emails go out in the org's market language (buyer) and
+      // English, the source language (desk — there is no per-user locale).
+      const template = {
+        key: "placementReady",
+        params: { titleName: item.title!.name, listName: item.list.name, listId: item.list.id },
+      } as const;
+      const marketCode = item.list.organization.marketCode;
 
       await Promise.all([
         notifyOrg(item.list.organizationId, {
           kind: "TITLE_PRODUCT_READY",
-          title: buyer.title,
-          body: buyer.body,
-          link: buyer.link,
+          template,
+          locale: marketCode ? marketDefaultLocale(marketCode) : "en",
         }),
-        notifyDesk({
-          kind: "TITLE_PRODUCT_READY",
-          title: desk.title,
-          body: desk.body,
-          link: desk.link,
-        }),
+        notifyDesk({ kind: "TITLE_PRODUCT_READY", template, locale: "en" }),
       ]);
       await recordAudit(null, NOTIFIED_ACTION, entity, { productId: product.id });
       notified++;

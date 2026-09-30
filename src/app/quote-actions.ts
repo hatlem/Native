@@ -21,7 +21,6 @@ import {
 } from "@/lib/commerce/quote-validity";
 import { reconcileExpiredQuotes } from "@/lib/commerce/quote-expiry";
 import { lineOrder } from "@/lib/commerce/line-order";
-import { buildQuoteSentNotice } from "@/lib/commerce/quote-notices";
 import { notifyQuoteAccepted, sendDraftQuotes } from "@/lib/commerce/quote-lifecycle";
 import { marketDefaultLocale } from "@/lib/market-locale";
 import { groupItemsByMarket } from "@/lib/quote-grouping";
@@ -698,20 +697,22 @@ export async function renewQuote(formData: FormData) {
     validUntil: validUntil.toISOString(),
   });
   const marketCode = quote.request.organization.marketCode;
-  const buyerLocale = marketCode ? marketDefaultLocale(marketCode) : "en";
-  const notice = buildQuoteSentNotice({
-    locale: buyerLocale,
-    planName: quote.request.plan.name,
-    quotes: [{ total: Number(quote.total), currency: quote.currency }],
-    onRequestCount: quote.lines.filter((l) => l.priceOnRequest).length,
-    validUntil,
-    renewed: true,
-  });
+  // Email in the org's market language; the inbox row re-renders in each
+  // reader's own (lib/notice-template.ts).
   await notifyOrg(quote.request.organizationId, {
     kind: "QUOTE_READY",
-    title: notice.title,
-    body: notice.body,
-    link: `/${buyerLocale}/requests/${requestId}`,
+    locale: marketCode ? marketDefaultLocale(marketCode) : "en",
+    template: {
+      key: "quoteSent",
+      params: {
+        planName: quote.request.plan.name,
+        quotes: [{ total: Number(quote.total), currency: quote.currency }],
+        onRequestCount: quote.lines.filter((l) => l.priceOnRequest).length,
+        validUntil: validUntil.toISOString(),
+        renewed: true,
+        requestId,
+      },
+    },
   });
 
   redirect(`/${locale}/desk/${requestId}`);

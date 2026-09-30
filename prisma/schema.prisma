@@ -887,9 +887,15 @@ model Notification {
   userId    String
   user      User             @relation(fields: [userId], references: [id])
   kind      NotificationKind
+  // Rendered in the email's language (the org's market) — the fallback for
+  // rows without a template and the text of the email that went out.
   title     String
   body      String?
   link      String?
+  // Templated notices (src/lib/notice-template.ts): /notifications re-renders
+  // title/body/link from these in the VIEWER's locale.
+  messageKey    String?
+  messageParams Json?
   readAt    DateTime?
   createdAt DateTime         @default(now())
 
