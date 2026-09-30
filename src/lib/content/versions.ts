@@ -27,6 +27,30 @@ export function supersedesOlderVersions(status: ContentAssetStatus): boolean {
   return SUPERSEDING_STATUSES.has(status);
 }
 
+// Where a version may go next. The desk drives the machine, but only
+// forward: an APPROVED version is signed off, so its next step is FINAL
+// (which locks the placements), not another round of review; FINAL and
+// SUPERSEDED are history. The desk may approve without a formal review
+// round (the buyer said yes by email) and may send an approval back only
+// while it's still in review. Other roles only ever hand a draft over for
+// review (desk-content-actions SELF_SERVE_ASSET_TARGETS), a subset of this.
+const NEXT_ASSET_STATUSES: Readonly<Record<ContentAssetStatus, readonly ContentAssetStatus[]>> = {
+  DRAFT: [ContentAssetStatus.IN_REVIEW, ContentAssetStatus.APPROVED],
+  CHANGES_REQUESTED: [ContentAssetStatus.IN_REVIEW, ContentAssetStatus.APPROVED],
+  IN_REVIEW: [ContentAssetStatus.APPROVED, ContentAssetStatus.CHANGES_REQUESTED],
+  APPROVED: [ContentAssetStatus.FINAL],
+  FINAL: [],
+  SUPERSEDED: [],
+};
+
+export function nextAssetStatuses(from: ContentAssetStatus): readonly ContentAssetStatus[] {
+  return NEXT_ASSET_STATUSES[from];
+}
+
+export function canMoveAsset(from: ContentAssetStatus, to: ContentAssetStatus): boolean {
+  return NEXT_ASSET_STATUSES[from].includes(to);
+}
+
 // Terminal states: no further transition may start from them.
 export function isTerminalAssetStatus(status: ContentAssetStatus): boolean {
   return status === ContentAssetStatus.SUPERSEDED;

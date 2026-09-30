@@ -2,7 +2,9 @@ import { test } from "node:test";
 import assert from "node:assert/strict";
 import {
   OPEN_ASSET_STATUSES,
+  canMoveAsset,
   isTerminalAssetStatus,
+  nextAssetStatuses,
   supersedesOlderVersions,
   supersedeOlderVersions,
 } from "./versions";
@@ -39,4 +41,23 @@ test("supersedeOlderVersions touches only older, still-open versions of the arti
   // Approved/final history is never rewritten.
   assert.ok(!OPEN_ASSET_STATUSES.includes("APPROVED"));
   assert.ok(!OPEN_ASSET_STATUSES.includes("FINAL"));
+});
+
+test("an approved version moves only forward to FINAL, never back into review", () => {
+  assert.deepEqual(nextAssetStatuses("APPROVED"), ["FINAL"]);
+  for (const to of ["IN_REVIEW", "APPROVED", "CHANGES_REQUESTED", "DRAFT"] as const) {
+    assert.equal(canMoveAsset("APPROVED", to), false, to);
+  }
+  assert.equal(canMoveAsset("APPROVED", "FINAL"), true);
+});
+
+test("review moves: submit from a draft, decide from review, nothing from history", () => {
+  assert.equal(canMoveAsset("DRAFT", "IN_REVIEW"), true);
+  assert.equal(canMoveAsset("CHANGES_REQUESTED", "IN_REVIEW"), true);
+  assert.equal(canMoveAsset("IN_REVIEW", "APPROVED"), true);
+  assert.equal(canMoveAsset("IN_REVIEW", "CHANGES_REQUESTED"), true);
+  assert.equal(canMoveAsset("IN_REVIEW", "IN_REVIEW"), false);
+  assert.equal(canMoveAsset("DRAFT", "FINAL"), false);
+  assert.deepEqual(nextAssetStatuses("FINAL"), []);
+  assert.deepEqual(nextAssetStatuses("SUPERSEDED"), []);
 });

@@ -29,3 +29,26 @@ export type SupportedMarket = (typeof SUPPORTED_MARKETS)[number];
 export function isSupportedMarket(value: unknown): value is SupportedMarket {
   return (SUPPORTED_MARKETS as readonly unknown[]).includes(value);
 }
+
+// The civil time zone each market lives on. A buyer-facing date (a quote's
+// "valid until") is a day on the buyer's calendar, so it starts and ends in
+// their zone, whatever zone the server happens to run in.
+export const MARKET_TIME_ZONES = {
+  NO: "Europe/Oslo",
+  SE: "Europe/Stockholm",
+  DK: "Europe/Copenhagen",
+  FI: "Europe/Helsinki",
+  DE: "Europe/Berlin",
+  AT: "Europe/Vienna",
+  CH: "Europe/Zurich",
+  UK: "Europe/London",
+  IE: "Europe/Dublin",
+} as const satisfies Record<SupportedMarket, string>;
+
+// The desk's own zone: the fallback for an organisation that hasn't picked
+// its billing market yet (that happens in onboarding).
+export const HOUSE_TIME_ZONE = "Europe/Oslo";
+
+export function marketTimeZone(marketCode: string | null | undefined): string {
+  return isSupportedMarket(marketCode) ? MARKET_TIME_ZONES[marketCode] : HOUSE_TIME_ZONE;
+}

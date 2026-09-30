@@ -41,6 +41,11 @@ export type EmailAdapter = (msg: EmailMessage) => Promise<void>;
 
 const consoleAdapter: EmailAdapter = async (msg) => {
   console.log("[email]", msg.to, "·", msg.subject);
+  // Routing headers are part of what a local run needs to verify (the contact
+  // form's Reply-To is the sender, outreach comes from partnerships@), so
+  // print them whenever a caller overrides the adapter defaults.
+  if (msg.from) console.log("[email-from]", msg.to, "·", msg.from);
+  if (msg.replyTo) console.log("[email-reply-to]", msg.to, "·", msg.replyTo);
   // Local E2E runs have no inbox: EMAIL_LOG_BODY=1 prints the plain-text body
   // so magic links and invite links can be followed. Console adapter only —
   // with RESEND_API_KEY set (prod) this adapter is never installed.

@@ -79,8 +79,8 @@ const styles = StyleSheet.create({
   },
 });
 
-function formatDate(date: Date, locale: string): string {
-  return new Intl.DateTimeFormat(intlLocale(locale), { dateStyle: "medium" }).format(date);
+function formatDate(date: Date, locale: string, timeZone: string): string {
+  return new Intl.DateTimeFormat(intlLocale(locale), { dateStyle: "medium", timeZone }).format(date);
 }
 
 export function QuoteDocument({
@@ -123,11 +123,11 @@ export function QuoteDocument({
           </View>
           <View>
             <Text style={styles.metaLabel}>{t(messages, "date")}</Text>
-            <Text style={styles.metaValue}>{formatDate(data.createdAt, locale)}</Text>
+            <Text style={styles.metaValue}>{formatDate(data.createdAt, locale, data.timeZone)}</Text>
             {data.validUntil ? (
               <>
                 <Text style={styles.metaLabel}>{t(messages, "validUntil")}</Text>
-                <Text style={styles.metaValue}>{formatDate(data.validUntil, locale)}</Text>
+                <Text style={styles.metaValue}>{formatDate(data.validUntil, locale, data.timeZone)}</Text>
               </>
             ) : null}
             <Text style={styles.metaLabel}>{t(messages, "preparedBy")}</Text>

@@ -171,6 +171,14 @@ body:has(.bn) .drawer-link:hover { background: rgba(20,17,12,0.06) !important; }
 .bn a { color: inherit; text-decoration: none; }
 .bn ::selection { background: var(--ink); color: var(--paper); }
 
+/* Long compounds in display headings (de "Datenschutzerklärung",
+   "Marktplatz-Nutzungsbedingungen") are wider than a 375px column at these
+   sizes. globals.css hyphenates them on phones by the page's lang;
+   "anywhere" is the net for a word the browser has no dictionary for and,
+   unlike break-word, also lets the heading's grid/flex parent shrink
+   instead of overflowing the viewport. */
+.bn h1, .bn h2 { overflow-wrap: anywhere; }
+
 .bn .wrap { max-width: var(--max); margin: 0 auto; padding-left: var(--pad); padding-right: var(--pad); }
 
 /* — Shared label / eyebrow — */
@@ -454,7 +462,15 @@ body:has(.bn) .drawer-link:hover { background: rgba(20,17,12,0.06) !important; }
   color: var(--ink-mute);
   padding: 14px 16px 14px 0;
   border-bottom: 1px solid var(--hair);
+  /* The app stylesheet's .table also leaks a tinted, sticky, nowrap header
+     band and a row-hover tint. The cells here are flush with the text
+     column by design, which against a tinted band read as missing padding
+     (the first column sat on the band's left edge). No band, no tint. */
+  background: none;
+  position: static;
+  white-space: normal;
 }
+.bn .table tbody tr:hover { background: none; }
 .bn .table tbody td {
   padding: 14px 16px 14px 0;
   border-bottom: 1px solid var(--hair);
@@ -945,6 +961,21 @@ body:has(.bn) .drawer-link:hover { background: rgba(20,17,12,0.06) !important; }
   font-size: 12px; font-weight: 600; color: var(--NO); margin-top: 2px;
 }
 .bn .auth-card .field [aria-invalid="true"] { border-color: var(--NO); }
+/* Signup "did you mean …?" prompt: a question, not an error banner, so it
+   sits with the field it's about and keeps the site's ink palette. */
+.bn .auth-card .email-typo {
+  display: grid; gap: 8px; margin-top: 4px;
+  padding: 12px 14px; border-left: 3px solid var(--NO); background: var(--paper);
+  font-size: 14px; line-height: 1.5;
+}
+.bn .auth-card .email-typo p { margin: 0; overflow-wrap: anywhere; }
+.bn .auth-card .email-typo__use {
+  justify-self: start; min-height: 44px; padding: 10px 14px;
+  border: 2px solid var(--ink); border-radius: 2px; background: var(--ink); color: var(--paper);
+  font: inherit; font-size: 14px; font-weight: 600; cursor: pointer;
+  max-width: 100%; overflow-wrap: anywhere; text-align: left;
+}
+.bn .auth-card .email-typo__use:hover { background: var(--paper); color: var(--ink); }
 .bn .contact-sent { align-self: start; }
 .bn .onboarding-call__skip { margin: clamp(24px, 3vw, 36px) 0 0; }
 /* Footerless shells (onboarding steps, loading) still fill the viewport

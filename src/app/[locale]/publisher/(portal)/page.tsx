@@ -6,16 +6,23 @@ import { Link } from "@/i18n/navigation";
 import { updateProduct, updateSpec } from "@/app/publisher-actions";
 import { SubmitButton } from "@/components";
 import { formatMoney } from "@/lib/money";
-import { MAX_LEAD_TIME_DAYS } from "@/lib/publisher-rates";
+import { MAX_LEAD_TIME_DAYS, parseLeadTimeSaveStatus } from "@/lib/publisher-rates";
 
 export const dynamic = "force-dynamic";
 
 export default async function PublisherDashboard({
   params,
+  searchParams,
 }: {
   params: Promise<{ locale: string }>;
+  searchParams: Promise<Record<string, string | string[] | undefined>>;
 }) {
   const { locale } = await params;
+  const sp = await searchParams;
+  // Result of the last lead-time save (publisher-actions updateProduct),
+  // shown on that product's card only.
+  const leadTimeStatus = parseLeadTimeSaveStatus(sp.leadTime);
+  const leadTimeProduct = typeof sp.product === "string" ? sp.product : null;
   const t = await getTranslations({ locale, namespace: "publisher" });
   const tn = await getTranslations({ locale, namespace: "nav" });
   const tType = await getTranslations({ locale, namespace: "productType" });
@@ -165,7 +172,7 @@ export default async function PublisherDashboard({
                 ) : (
                   <div className="grid two tight">
                     {title.products.map((p) => (
-                      <article key={p.id} className="card product-card">
+                      <article key={p.id} id={`product-${p.id}`} className="card product-card">
                         <header className="product-head">
                           <div>
                             <h4>{tType(p.type)}</h4>
@@ -201,6 +208,17 @@ export default async function PublisherDashboard({
                         <form action={updateProduct} className="product-form">
                           <input type="hidden" name="locale" value={locale} />
                           <input type="hidden" name="productId" value={p.id} />
+                          {leadTimeProduct === p.id && leadTimeStatus === "saved" ? (
+                            <div className="banner-success" role="status">
+                              <span>
+                                ✓ {t("leadTimeSaved", { days: p.leadTimeDays ?? 0 })}
+                              </span>
+                            </div>
+                          ) : leadTimeProduct === p.id && leadTimeStatus === "unchanged" ? (
+                            <div className="banner-info" role="status">
+                              <span>{t("leadTimeUnchanged", { days: p.leadTimeDays ?? 0 })}</span>
+                            </div>
+                          ) : null}
                           <div className="field">
                             <label htmlFor={`lt-${p.id}`}>
                               {t("leadTime")}
@@ -213,7 +231,22 @@ export default async function PublisherDashboard({
                               max={MAX_LEAD_TIME_DAYS}
                               required
                               defaultValue={p.leadTimeDays ?? ""}
+                              aria-invalid={
+                                leadTimeProduct === p.id && leadTimeStatus === "invalid"
+                                  ? true
+                                  : undefined
+                              }
+                              aria-describedby={
+                                leadTimeProduct === p.id && leadTimeStatus === "invalid"
+                                  ? `lt-err-${p.id}`
+                                  : undefined
+                              }
                             />
+                            {leadTimeProduct === p.id && leadTimeStatus === "invalid" ? (
+                              <span className="err" id={`lt-err-${p.id}`} role="alert">
+                                {t("leadTimeInvalid", { max: MAX_LEAD_TIME_DAYS })}
+                              </span>
+                            ) : null}
                             <span className="hint">{t("catalogStatusNote")}</span>
                           </div>
                           <div className="actions">

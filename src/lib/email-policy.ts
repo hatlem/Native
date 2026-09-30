@@ -3,7 +3,9 @@
 // (mailinator, 10minutemail, …) are rejected so we don't onboard
 // accounts that can't be tied back to a real organisation. The async
 // variant additionally rejects domains with no MX records (parked,
-// dead, or typo'd domains like "gnail.com").
+// dead, or typo'd domains). Typo-squatted lookalikes of the big providers
+// ("gnail.com") DO have MX records, so `suggestEmailDomain` catches those
+// separately and the caller asks the user to confirm.
 //
 // Lists come from canonical public sources synced through npm:
 //   - disposable-email-domains  → github.com/disposable-email-domains/disposable-email-domains
@@ -57,6 +59,93 @@ export function checkBusinessEmail(email: string): EmailPolicyVerdict {
   if (DISPOSABLE.has(domain)) return { ok: false, reason: "disposable" };
   if (FREE.has(domain)) return { ok: false, reason: "personal" };
   return { ok: true };
+}
+
+// Lookalikes of the big mail providers. Typo-squatters register domains
+// like "gnail.com" and give them MX records on purpose, so the MX check
+// below lets them through and a mistyped signup mails its magic link to a
+// stranger. The public lists already cover the common misspellings they
+// know about (gmial.com, hotmial.com are listed as free mail), so this
+// only has to catch the unknown ones.
+//
+// Ordered by how often buyers in our markets use them: ties go to the
+// earlier, likelier provider.
+const POPULAR_MAIL_DOMAINS: readonly string[] = [
+  "gmail.com",
+  "outlook.com",
+  "hotmail.com",
+  "icloud.com",
+  "yahoo.com",
+  "live.com",
+  "googlemail.com",
+  "online.no",
+  "hotmail.no",
+  "live.no",
+  "hotmail.se",
+  "telia.com",
+  "gmx.de",
+  "gmx.net",
+  "web.de",
+  "t-online.de",
+  "bluewin.ch",
+  "hotmail.co.uk",
+  "yahoo.co.uk",
+  "btinternet.com",
+  "aol.com",
+  "protonmail.com",
+  "proton.me",
+];
+
+// Optimal-string-alignment distance: Levenshtein plus adjacent swaps, so
+// "gmial" is one edit from "gmail", the way a fast typist gets it wrong.
+function editDistance(a: string, b: string): number {
+  const d: number[][] = Array.from({ length: a.length + 1 }, (_, i) =>
+    Array.from({ length: b.length + 1 }, (_, j) => (i === 0 ? j : j === 0 ? i : 0)),
+  );
+  for (let i = 1; i <= a.length; i++) {
+    for (let j = 1; j <= b.length; j++) {
+      const cost = a[i - 1] === b[j - 1] ? 0 : 1;
+      d[i][j] = Math.min(d[i - 1][j] + 1, d[i][j - 1] + 1, d[i - 1][j - 1] + cost);
+      if (i > 1 && j > 1 && a[i - 1] === b[j - 2] && a[i - 2] === b[j - 1]) {
+        d[i][j] = Math.min(d[i][j], d[i - 2][j - 2] + 1);
+      }
+    }
+  }
+  return d[a.length][b.length];
+}
+
+// One slip for short domains; two for longer ones, where two slips still
+// leave the name unmistakable ("hotmaill.con"). Short real domains sit
+// too close together for a second edit ("gmx.de" / "gmx.at").
+function typoBudget(target: string): number {
+  return target.length >= 10 ? 2 : 1;
+}
+
+// Returns the corrected address when the domain looks like a typo of a
+// big mail provider, or null. A suggestion, never a verdict: a real
+// company can own a domain one letter away from a provider, so callers
+// ask the user to confirm and must let the address through when they do.
+// Domains on the public lists are real (or already rejected) and never
+// count as typos: "mail.com" is not a misspelt "gmail.com".
+export function suggestEmailDomain(email: string): string | null {
+  const domain = domainOf(email);
+  if (!domain) return null;
+  if (EXTRA_ALLOWED.has(domain) || FREE.has(domain) || DISPOSABLE.has(domain)) return null;
+
+  let best: { domain: string; distance: number } | null = null;
+  for (const candidate of POPULAR_MAIL_DOMAINS) {
+    if (candidate === domain) return null;
+    const distance = editDistance(domain, candidate);
+    if (distance > typoBudget(candidate)) continue;
+    if (!best || distance < best.distance) best = { domain: candidate, distance };
+  }
+  if (!best) return null;
+  const trimmed = email.trim().toLowerCase();
+  return `${trimmed.slice(0, trimmed.lastIndexOf("@"))}@${best.domain}`;
+}
+
+export function emailDomain(email: string): string | null {
+  return domainOf(email);
 }
 
 // DNS resolver timeout — Node's default for resolveMx falls through to

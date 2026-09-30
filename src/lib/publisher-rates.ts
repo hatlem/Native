@@ -113,6 +113,13 @@ export async function loadPublisherRateCard(
 // extra digit can't silently push a title out of every campaign window.
 export const MAX_LEAD_TIME_DAYS = 365;
 
+// How a portal lead-time save ended, shown on the product's card.
+export type LeadTimeSaveStatus = "saved" | "unchanged" | "invalid";
+
+export function parseLeadTimeSaveStatus(value: unknown): LeadTimeSaveStatus | null {
+  return value === "saved" || value === "unchanged" || value === "invalid" ? value : null;
+}
+
 export function parseLeadTimeDays(raw: string): number | null {
   if (!/^\d+$/.test(raw.trim())) return null;
   const n = Number(raw);

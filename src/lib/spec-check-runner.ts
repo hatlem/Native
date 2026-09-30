@@ -45,6 +45,7 @@ export async function evaluateSpecForPlacement(
     body: asset.body,
     wordCountMin: product?.spec?.wordCountMin ?? null,
     wordCountMax: product?.spec?.wordCountMax ?? null,
+    imagesMin: product?.spec?.imagesMin ?? null,
     titleDisclosure: product?.spec?.disclosureLabel ?? null,
     marketDisclosure: product?.title.market.disclosureLabel ?? null,
   });
@@ -64,9 +65,12 @@ export async function runSpecCheckForPlacement(
     where: { id: placementId },
     data: {
       specPassed: result.passed,
-      specNotes: result.passed
-        ? `Spec passed (${result.words} words)`
-        : result.issues.join("; "),
+      // Warnings ride along in the notes (the desk reads them) without
+      // touching specPassed, which gates the review hand-over.
+      specNotes: [
+        ...(result.passed ? [`Spec passed (${result.words} words)`] : result.issues),
+        ...result.warningNotes.map((w) => `Warning: ${w}`),
+      ].join("; "),
     },
   });
   return evaluation;

@@ -24,11 +24,13 @@ import { intlLocale } from "@/lib/money";
 import {
   QUOTE_VALIDITY_DAYS,
   QUOTE_VALIDITY_MAX_DAYS,
+  formatQuoteValidUntil,
   isQuoteEditable,
   isQuoteExpired,
   isQuoteRevisable,
   quoteValidUntilInputValue,
 } from "@/lib/commerce/quote-validity";
+import { marketTimeZone } from "@/lib/markets";
 import { lineOrder } from "@/lib/commerce/line-order";
 import { invoiceLineLabel } from "@/lib/invoice-line-label";
 import {
@@ -293,12 +295,17 @@ export default async function DeskRequestPage({
   // until "Send quote" sends them all at once with the chosen validity.
   const draftQuotes = request.quotes.filter((q) => q.status === "DRAFT" && !q.order);
   const now = new Date();
+  // Validity is a day on the BUYER's calendar (their org's market zone):
+  // the date field, the parse in quote-actions and the "valid until" line
+  // all use it, so the desk and the buyer print the same day.
+  const buyerTimeZone = marketTimeZone(request.organization.marketCode);
   const validityInput = {
-    defaultValue: quoteValidUntilInputValue(now),
-    min: quoteValidUntilInputValue(now, now),
+    defaultValue: quoteValidUntilInputValue(now, undefined, buyerTimeZone),
+    min: quoteValidUntilInputValue(now, now, buyerTimeZone),
     max: quoteValidUntilInputValue(
       now,
       new Date(now.getTime() + QUOTE_VALIDITY_MAX_DAYS * 24 * 60 * 60 * 1000),
+      buyerTimeZone,
     ),
   };
   const validityError =
@@ -569,9 +576,12 @@ export default async function DeskRequestPage({
                     <span className={isQuoteExpired(quote) ? "tag" : "muted small"}>
                       {quote.validUntil
                         ? t(isQuoteExpired(quote) ? "quoteExpiredOn" : "quoteValidUntil", {
-                            date: new Intl.DateTimeFormat(intlLocale(locale), {
-                              dateStyle: "medium",
-                            }).format(quote.validUntil),
+                            date: formatQuoteValidUntil(
+                              quote.validUntil,
+                              locale,
+                              buyerTimeZone,
+                              "medium",
+                            ),
                           })
                         : t("quoteNoExpiry")}
                     </span>

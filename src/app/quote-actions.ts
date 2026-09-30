@@ -28,6 +28,7 @@ import {
 } from "@/lib/commerce/quote-edits";
 import { discardQuoteRevision, reviseQuote } from "@/lib/commerce/quote-revision";
 import { marketDefaultLocale } from "@/lib/market-locale";
+import { marketTimeZone } from "@/lib/markets";
 import { groupItemsByMarket } from "@/lib/quote-grouping";
 import { recordAudit } from "@/lib/audit";
 import { notifyDesk, notifyOrg } from "@/lib/notify";
@@ -220,7 +221,17 @@ export async function sendQuote(formData: FormData) {
   const scope = await loadScope();
   if (!scope.isDesk || !scope.userId) redirect(`/${locale}/signin`);
 
-  const parsed = parseQuoteValidUntil(str(formData, "validUntil"));
+  // The picked date is a day on the buyer's calendar: it ends at midnight
+  // in their organisation's zone, the zone every surface prints it in.
+  const org = await prisma.request.findUnique({
+    where: { id: requestId },
+    select: { organization: { select: { marketCode: true } } },
+  });
+  const parsed = parseQuoteValidUntil(
+    str(formData, "validUntil"),
+    new Date(),
+    marketTimeZone(org?.organization.marketCode),
+  );
   if (!parsed.ok) {
     redirect(`/${locale}/desk/${requestId}?error=valid-until-${parsed.reason}`);
   }
@@ -678,6 +689,8 @@ export async function renewQuote(formData: FormData) {
       request: {
         select: {
           organizationId: true,
+          // The validity date is a day in this org's zone.
+          organization: { select: { marketCode: true } },
           plan: { select: { name: true } },
         },
       },
@@ -688,8 +701,13 @@ export async function renewQuote(formData: FormData) {
     redirect(`/${locale}/desk/${requestId}`);
   }
 
-  // Same validity field as sending; blank keeps the default window.
-  const parsed = parseQuoteValidUntil(str(formData, "validUntil"));
+  // Same validity field as sending (a day in the buyer org's zone); blank
+  // keeps the default window.
+  const parsed = parseQuoteValidUntil(
+    str(formData, "validUntil"),
+    new Date(),
+    marketTimeZone(quote.request.organization.marketCode),
+  );
   if (!parsed.ok) {
     redirect(`/${locale}/desk/${requestId}?error=valid-until-${parsed.reason}`);
   }

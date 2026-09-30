@@ -47,6 +47,20 @@ function renderInline(nodes: Inline[]): ReactNode[] {
             {renderInline(node.children)}
           </a>
         );
+      case "image":
+        // A writer-hosted image (absolute http(s) only, see the parser). No
+        // referrer, so the host doesn't learn which review page loaded it.
+        return (
+          // eslint-disable-next-line @next/next/no-img-element -- arbitrary external host; next/image needs each host allow-listed
+          <img
+            key={i}
+            className="article-preview__image"
+            src={node.src}
+            alt={node.alt}
+            loading="lazy"
+            referrerPolicy="no-referrer"
+          />
+        );
     }
   });
 }

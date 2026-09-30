@@ -1015,6 +1015,8 @@
     "supersededEyebrow": "Frühere Versionen",
     "supersededRow": "Version {revision} ({total}) ist nicht mehr gültig.",
     "supersededBy": "Zu Version {revision} →",
+    "quoteDownloadPdf": "PDF herunterladen",
+    "quoteDownloadDocx": "Word herunterladen (.docx)",
     "metaPlanAlternativesOnly": "Noch keine Platzierungen · {alternatives, plural, one {# Alternative} other {# Alternativen}} · bearbeitet {age}",
     "actionContinuePlan": "Weiter planen",
     "qualifierAwaitingTeam": "wartet auf jemanden mit Bestellberechtigung",
@@ -1403,7 +1405,10 @@
     "emailRequired": "Bitte zuerst Ihre E-Mail-Adresse eingeben.",
     "attemptsRateLimited": "Zu viele Versuche. Bitte eine Minute warten und erneut versuchen.",
     "checkSignupTitle": "Bestätigen Sie Ihre E-Mail-Adresse",
-    "checkSignupLead": "Wir haben einen Link an die angegebene Adresse geschickt. Öffnen Sie ihn, um die Adresse zu bestätigen und sich anzumelden; er läuft in 15 Minuten ab. Gab es für die Adresse schon ein Konto, erklärt die E-Mail, wie Sie wieder hineinkommen."
+    "checkSignupLead": "Wir haben einen Link an die angegebene Adresse geschickt. Öffnen Sie ihn, um die Adresse zu bestätigen und sich anzumelden; er läuft in 15 Minuten ab. Gab es für die Adresse schon ein Konto, erklärt die E-Mail, wie Sie wieder hineinkommen.",
+    "regEmailTypoQuestion": "Meinten Sie <b>{email}</b>?",
+    "regEmailTypoUse": "{email} verwenden",
+    "regEmailTypoKeep": "Ist {domain} richtig? Dann klicken Sie einfach erneut auf „Konto erstellen“."
   },
   "order": {
     "title": "Bestellung",
@@ -1658,7 +1663,10 @@
     "ratesPriceOnlyNote": "Diese Seite ändert nur Preise. Der Katalogstatus — aktiv, buchbar, Sichtbarkeit — wird vom NativeSpin-Desk verwaltet.",
     "changePriceOnRates": "Auf der Preisseite ändern",
     "notBookable": "Nicht buchbar",
-    "catalogStatusNote": "Preise ändern Sie auf der Preisseite. Den Katalogstatus (buchbar und ob ein Produkt sofort bestellbar ist) verwaltet das NativeSpin-Desk."
+    "catalogStatusNote": "Preise ändern Sie auf der Preisseite. Den Katalogstatus (buchbar und ob ein Produkt sofort bestellbar ist) verwaltet das NativeSpin-Desk.",
+    "leadTimeSaved": "Vorlaufzeit gespeichert: {days, plural, =1 {1 Tag} other {# Tage}}. Der Desk ist informiert.",
+    "leadTimeUnchanged": "Keine Änderung: Die Vorlaufzeit beträgt bereits {days, plural, =1 {1 Tag} other {# Tage}}.",
+    "leadTimeInvalid": "Geben Sie eine ganze Zahl von Tagen zwischen 1 und {max} ein. Es wurde nichts gespeichert."
   },
   "formats": {
     "metaTitle": "Native-Formate",
@@ -2393,18 +2401,17 @@
     "anchorNote": "Der öffentliche Listenpreis des Verlags für diese Platzierung. Ihr Komplettpreis enthält Inhaltsproduktion, Platzierung, Revisionen und Reporting.",
     "whyThisPrice": "NativeSpin pflegt direkte redaktionelle Beziehungen zu allen Titeln in Ihrem Angebot. Wir verhandeln die Platzierung, beauftragen eine fachkundige Autorin oder einen fachkundigen Autor, koordinieren die redaktionelle Abnahme mit dem Verlag und liefern das Reporting. Sie haben einen verantwortlichen Partner und einen Komplettpreis — keine getrennte Medienrechnung, Autorenrechnung und Agenturpauschale.",
     "termsCancellation": "Volle Rückerstattung vor Freigabe des Briefings; 50 % Rückerstattung vor dem ersten Entwurf; nach Bestätigung des Slots beim Verlag nicht erstattungsfähig.",
-    "termsValidity": "Angebot gilt 14 Tage. Verfügbarkeit beim Verlag wird bei Annahme bestätigt.",
     "bullets": {
       "NATIVE_ARTICLE": [
         "Verhandelte Platzierung in {titleName}, geschrieben in der redaktionellen Stimme des Titels",
-        "Artikel (1.200–1.500 Wörter) verfasst von einer fachkundigen Journalistin oder einem fachkundigen Journalisten",
+        "Artikel{length} verfasst von einer fachkundigen Journalistin oder einem fachkundigen Journalisten",
         "Zwei Korrekturrunden und Ihre Freigabe vor Veröffentlichung",
         "Distribution im Native-Feed und Newsletter von {titleName}",
         "Klick-Tracking auf jedem von uns gesetzten Link, berichtet zu vereinbarten Zeitpunkten"
       ],
       "ADVERTORIAL": [
         "Verhandelte Platzierung in {titleName}, klar als bezahlter Inhalt gekennzeichnet",
-        "Markenführender Artikel (800–1.200 Wörter) nach den redaktionellen Standards des Verlags",
+        "Markenführender Artikel{length} nach den redaktionellen Standards des Verlags",
         "Eine Korrekturrunde und Ihre Freigabe vor Veröffentlichung",
         "Distribution im Content-Feed von {titleName}",
         "Klick-Tracking auf jedem von uns gesetzten Link, berichtet zu vereinbarten Zeitpunkten"
@@ -2416,12 +2423,17 @@
         "Klick-Tracking auf jedem von uns gesetzten Link, plus berichtete Impressionen, zu vereinbarten Zeitpunkten"
       ],
       "PACKAGE": [
-        "Redaktioneller Artikel in {titleName} (1.200–1.500 Wörter)",
+        "Redaktioneller Artikel in {titleName}{length}",
         "Native-Display-Verstärkung im selben Titel",
         "Gemeinsame redaktionelle Abnahme und gemeinsamer Veröffentlichungstermin",
         "Klick-Tracking auf jedem von uns gesetzten Link, berichtet zu vereinbarten Zeitpunkten"
       ]
-    }
+    },
+    "termsValidUntil": "Angebot gültig bis einschließlich {date}. Verfügbarkeit beim Verlag wird bei Annahme bestätigt.",
+    "termsAvailability": "Verfügbarkeit beim Verlag wird bei Annahme bestätigt.",
+    "wordsRange": "{min, number}–{max, number} Wörter",
+    "wordsMin": "mindestens {min, number} Wörter",
+    "wordsMax": "höchstens {max, number} Wörter"
   },
   "priceVisibility": {
     "requestPrice": "Preis auf Anfrage",
@@ -3494,7 +3506,7 @@
       "inReviewNote": "Dieser Entwurf liegt beim Kunden zur Freigabe. Wenn Sie jetzt speichern, entsteht eine neue Version – reichen Sie diese ein, sobald sie fertig ist.",
       "draftLabel": "Artikeltext",
       "draftPlaceholder": "# Überschrift\n\nEinleitung…",
-      "draftHint": "Reiner Text mit einfachem Markdown: # für Überschriften, **fett**, *kursiv*, - für Listen, [Text](Link). Denken Sie an die Kennzeichnung.",
+      "draftHint": "Reiner Text mit einfachem Markdown: # für Überschriften, **fett**, *kursiv*, - für Listen, [Text](Link), ![Bildunterschrift](Bildlink) für Bilder. Denken Sie an die Kennzeichnung.",
       "saveDraft": "Entwurf speichern",
       "saving": "Speichern…",
       "submit": "Zur Freigabe einreichen",
@@ -3533,7 +3545,10 @@
       "passedDetail": "Der Entwurf erfüllt die Formatvorgaben ({words} Wörter).",
       "failDisclosure": "Die Kennzeichnung „{label}“ fehlt. Leser:innen müssen sehen, dass es sich um bezahlte Inhalte handelt.",
       "failTooShort": "Zu kurz: {words} Wörter, das Format verlangt mindestens {min}.",
-      "failTooLong": "Zu lang: {words} Wörter, das Format erlaubt höchstens {max}."
+      "failTooLong": "Zu lang: {words} Wörter, das Format erlaubt höchstens {max}.",
+      "imagesHow": "Fügen Sie Bilder im Entwurf als ![Bildunterschrift](https://link-zum-bild) ein.",
+      "warnTooFewImages": "Zu wenige Bilder: {images, plural, =0 {noch keine} other {#}}, das Format sieht mindestens {min} vor. Das hält die Übergabe zur Prüfung nicht auf, aber fügen Sie sie nach Möglichkeit ein, jeweils als ![Bildunterschrift](https://link-zum-bild).",
+      "warningsLabel": "Sollten Sie beheben:"
     },
     "profile": {
       "title": "Mein Profil",
@@ -3710,6 +3725,41 @@
     "claim": "Konto hier anlegen (der Link ist {days} Tage gültig):",
     "ignore": "Falls Sie diese Nachricht nicht erwartet haben, können Sie sie ignorieren – der Link kann nur einmal verwendet werden.",
     "signoff": "– NativeSpin"
+  },
+  "pageTitle": {
+    "catalog": "Katalog",
+    "catalogCompare": "Titel vergleichen",
+    "home": "Start",
+    "plan": "Ihr Plan",
+    "lists": "Gespeicherte Listen",
+    "favorites": "Favoriten",
+    "requests": "Anfragen",
+    "orders": "Bestellungen",
+    "invoices": "Rechnungen",
+    "articles": "Artikel",
+    "reports": "Berichte",
+    "campaign": "Kampagne planen",
+    "notifications": "Posteingang",
+    "account": "Konto",
+    "agency": "Agentur",
+    "onboarding": "Loslegen",
+    "onboardingCall": "Mit dem Desk sprechen",
+    "invite": "Team beitreten",
+    "writer": "Autorenportal",
+    "publisher": "Verlagsportal",
+    "desk": "Desk",
+    "deskRequest": "Anfrage",
+    "deskOrders": "Bestellungen",
+    "deskTitles": "Titel",
+    "deskUsers": "Benutzer",
+    "deskWriters": "Autoren",
+    "deskPriceQuotes": "Preisangebote",
+    "deskPublisherContacts": "Verlagskontakte",
+    "deskReports": "Berichte",
+    "deskPlaybooks": "Playbooks",
+    "deskContentFees": "Content-Gebühren",
+    "deskApiKeys": "API-Schlüssel",
+    "deskMetricsNeedsContact": "Kennzahlen fehlen"
   },
   "briefTargeting": {
     "audience": "Zielgruppe",

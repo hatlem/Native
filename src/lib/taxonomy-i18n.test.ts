@@ -5,6 +5,8 @@ import {
   localizeCategory,
   localizeTaxonomy,
   localizeVertical,
+  readableCategory,
+  titleCategoryLabel,
 } from "./taxonomy-i18n";
 
 describe("localizeCategory", () => {
@@ -169,5 +171,40 @@ describe("localizeVertical covers the whole vertical taxonomy", () => {
     assert.equal(localizeVertical("B2B – Transport & Logistics", "no"), "B2B – transport og logistikk");
     assert.equal(localizeVertical("B2B – Legal", "sv"), "B2B – juridik");
     assert.equal(localizeVertical("News (National)", "no"), "Nyheter (riks)");
+  });
+});
+
+describe("titleCategoryLabel (catalog cards)", () => {
+  const vg = { category: "Abonnementsavis riks", vertical: "News (National)", market: { code: "NO" } };
+
+  it("keeps a source-language category for readers of that language", () => {
+    assert.equal(titleCategoryLabel(vg, "no"), "Abonnementsavis riks");
+    assert.equal(
+      titleCategoryLabel({ category: "Ruoka/kauppa", vertical: "Food & Drink", market: { code: "FI" } }, "fi"),
+      "Ruoka/kauppa",
+    );
+  });
+
+  it("falls back to the translated vertical for everyone else", () => {
+    assert.equal(titleCategoryLabel(vg, "en"), "News (National)");
+    assert.equal(titleCategoryLabel(vg, "de"), "Nachrichten (überregional)");
+    assert.equal(titleCategoryLabel(vg, "sv"), "Nyheter (riks)");
+    // English source sheets (DE/AT/CH/UK/IE): raw for en, vertical elsewhere.
+    const deAuto = { category: "Auto club", vertical: "Auto & Motor", market: { code: "DE" } };
+    assert.equal(titleCategoryLabel(deAuto, "en"), "Auto club");
+    assert.equal(titleCategoryLabel(deAuto, "de"), "Auto & Motor");
+  });
+
+  it("translates canonical categories and keeps the raw label when there is nothing better", () => {
+    assert.equal(titleCategoryLabel({ category: "Health", vertical: null, market: { code: "SE" } }, "de"), "Gesundheit");
+    assert.equal(
+      titleCategoryLabel({ category: "Næringsliv digital", vertical: null, market: { code: "NO" } }, "de"),
+      "Næringsliv digital",
+    );
+  });
+
+  it("readableCategory says when a label can't be shown", () => {
+    assert.equal(readableCategory("Tabloid riks", "NO", "en"), null);
+    assert.equal(readableCategory("Tabloid riks", "NO", "no"), "Tabloid riks");
   });
 });

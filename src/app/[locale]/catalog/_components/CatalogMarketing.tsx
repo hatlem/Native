@@ -1,10 +1,12 @@
 import { getTranslations } from "next-intl/server";
 import { prisma } from "@/lib/prisma";
 import { catalogTitleCount } from "@/lib/catalog-stats";
+import { catalogVisibleTitleWhere } from "@/lib/catalog-visibility";
+import { SUPPORTED_MARKETS } from "@/lib/markets";
 import { Link } from "@/i18n/navigation";
 import { intlLocale } from "@/lib/money";
 import { LandingShell } from "@/app/landing-shell";
-import { localizeCategory } from "@/lib/taxonomy-i18n";
+import { titleCategoryLabel } from "@/lib/taxonomy-i18n";
 import type { AppLocale } from "@/i18n/routing";
 import { FORMAT_KEYS } from "../filters";
 
@@ -19,10 +21,17 @@ export async function CatalogMarketing({ locale }: { locale: string }) {
       // Same count as the home page and page titles — see @/lib/catalog-stats.
       catalogTitleCount(),
       prisma.product.count({ where: { active: true } }),
+      // Markets the catalog actually sells in: the served nine that have
+      // titles. Prod still holds active titles in NL/BE (MarketCode enum
+      // leftovers, see @/lib/markets), which made this read "11 markets"
+      // next to every other surface's 9.
       prisma.title
         .findMany({
-          where: { active: true },
-          select: { market: { select: { code: true } } },
+          where: {
+            ...catalogVisibleTitleWhere,
+            market: { code: { in: [...SUPPORTED_MARKETS] } },
+          },
+          select: { marketId: true },
           distinct: ["marketId"],
         })
         .then((rows) => rows.length),
@@ -111,7 +120,7 @@ export async function CatalogMarketing({ locale }: { locale: string }) {
                 <p className="muted">{title.publisher.name}</p>
                 {title.category ? (
                   <p className="muted small">
-                    {localizeCategory(title.category, locale as AppLocale)}
+                    {titleCategoryLabel(title, locale as AppLocale)}
                   </p>
                 ) : null}
                 <p className="muted small" style={{ marginTop: 12 }}>
