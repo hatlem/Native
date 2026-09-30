@@ -3387,11 +3387,51 @@ select:disabled {
   border-color: var(--accent);
   background: var(--accent-soft);
 }
-/* Publisher-produced placement: a statement where the toggle would be — the
-   publisher's studio writes the article, so there is nothing to switch. */
-.plan-line-card__write-note {
+/* Who writes it, where the publisher's studio can: "We write it" or "Let the
+   publisher write it" — a two-option choice with radio-shaped indicators, in
+   the same scale as the "We write it" checkbox it replaces on those lines. */
+.plan-line-card__writer-choice {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 5px;
+}
+.plan-line-card__writer-option {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  background: transparent;
+  border: 0;
+  padding: 0;
   font-size: 0.8rem;
-  color: var(--muted);
+  color: var(--muted-strong);
+  cursor: pointer;
+  text-align: left;
+}
+.plan-line-card__writer-option[aria-pressed="true"] {
+  color: var(--text);
+  cursor: default;
+}
+.plan-line-card__writer-dot {
+  flex: none;
+  width: 15px;
+  height: 15px;
+  border: 1px solid var(--border-strong);
+  border-radius: 50%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+.plan-line-card__writer-option[aria-pressed="true"] .plan-line-card__writer-dot {
+  border-color: var(--accent);
+  background: var(--accent-soft);
+}
+.plan-line-card__writer-option[aria-pressed="true"] .plan-line-card__writer-dot::after {
+  content: "";
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--accent);
 }
 .plan-line-card__remove {
   background: transparent;

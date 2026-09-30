@@ -8,6 +8,13 @@
 //   4. 0 — no rule configured; the band still renders.
 // The fee is added AFTER the margin (flat, not marked up).
 //
+// Whether it is charged is the LINE's business, not the product's: a line
+// NativeSpin writes (NATIVESPIN_PRODUCED) pays it — also on a placement the
+// publisher's studio could have written, since the buyer chose us — and a
+// line the buyer or the publisher writes doesn't. Nothing here zeroes a fee
+// by product; an explicit 0 on the offer is still a valid fee ("no production
+// charge on this offer", e.g. Byggmesteren's advertorial).
+//
 // ONE figure everywhere: articleFee() is what the catalog band folds in
 // (display-price.ts customerPrice), what a "We write it" plan line adds
 // (plan-total.ts linePrice) and what the order and the desk quote bill
@@ -21,7 +28,7 @@ import {
   type ContentFeeRuleSpec,
   type QuoteLineComputation,
 } from "../money";
-import { nativeSpinProduces, publisherProducesContent, type AuthorshipMode } from "../authorship";
+import { nativeSpinProduces, type AuthorshipMode } from "../authorship";
 
 export function resolveProductionFee(args: {
   productFee: number | null | undefined;
@@ -41,10 +48,9 @@ export type FeeProduct = {
   type: string;
   productionFee?: unknown;
   // Curated deliverables (pricing/inclusions.ts). REQUIRED, not optional:
-  // "production": "PUBLISHER" means the publisher's studio writes the article,
-  // so no fee of ours applies — a select that forgot it charged our fee on an
-  // article the publisher already produces (BUG-final-prod-1). Forcing the key
-  // makes such a select fail typecheck instead of overcharging.
+  // "production": "PUBLISHER" is what offers the buyer "Let the publisher
+  // write it" (authorship.ts publisherCanWrite), so every surface that prices
+  // a line can tell which choice the line holds.
   inclusions: unknown;
   title?: { productionFeeDefault?: unknown } | null;
 };
@@ -57,12 +63,10 @@ export function offerProductionFee(product: FeeProduct): number | null {
   return titleFee != null ? Number(titleFee) : null;
 }
 
-// The article fee for one placement, by the order's own line builder: 0 when
-// no fee applies — and always 0 on a publisher-produced placement: the
-// publisher's studio writes that article, so there is nothing for us to write
-// or bill, whatever the desk rule for the format says.
+// Our article fee for one placement WE write, by the order's own line builder
+// (0 when no layer of the cascade sets one). Callers charge it only on a
+// NATIVESPIN_PRODUCED line.
 export function articleFee(product: FeeProduct, marketCode: string, rules: ContentFeeRuleSpec[]): number {
-  if (publisherProducesContent(product)) return 0;
   return computeContentFeeLines(
     [{ name: "", productType: product.type, fee: offerProductionFee(product) }],
     rules,
@@ -73,8 +77,8 @@ export function articleFee(product: FeeProduct, marketCode: string, rules: Conte
 // CONTENT_FEE lines for one market group of an order or quote: the items
 // NativeSpin writes (authorshipMode when present, else the legacy withContent
 // toggle — the two are kept in sync), each priced by the cascade above. A
-// publisher-produced placement never gets one, even if a stale row still asks
-// for "We write it": the fee would bill an article the publisher writes.
+// buyer- or publisher-written line never gets one; a line we write always
+// does, whoever else could have written it.
 export function contentFeeLinesFor(
   groupItems: { productId: string; withContent?: boolean; authorshipMode?: AuthorshipMode }[],
   byId: Map<string, FeeProduct & { name: string }>,
@@ -84,7 +88,7 @@ export function contentFeeLinesFor(
   const feeItems = groupItems
     .filter((i) => (i.authorshipMode ? nativeSpinProduces(i.authorshipMode) : !!i.withContent))
     .map((i) => byId.get(i.productId))
-    .filter((p): p is FeeProduct & { name: string } => !!p && !publisherProducesContent(p))
+    .filter((p): p is FeeProduct & { name: string } => !!p)
     .map((p) => ({ name: p.name, productType: p.type, fee: offerProductionFee(p) }));
   return computeContentFeeLines(feeItems, rules, marketCode);
 }

@@ -20,7 +20,7 @@ import {
   type ContentFeeRuleSpec,
 } from "./money";
 import type { UnsentList } from "./lists";
-import { defaultContentIntent } from "./authorship";
+import { defaultContentIntent, placementContentIntent } from "./authorship";
 import { customerPrice, productBand } from "./pricing/display-price";
 import { contentFeeLinesFor } from "./pricing/production-fee";
 import { priceBand } from "./pricing/bands";
@@ -253,14 +253,15 @@ test("contentFeeFor follows the cascade: offer fee, then publication fee, then t
   assert.equal(contentFeeFor({ type: "NATIVE_ARTICLE", inclusions: null, productionFee: 0 }, "NO", NO_FEES), 0);
 });
 
-// BUG-final-prod-1: Tungt.no's offer says the publisher's studio writes the
-// article (inclusions.production = PUBLISHER) but sets no fee of its own, so
-// the desk rule priced a "We write it" line at +2 000 kr — our fee for an
-// article the publisher already produces. No layer of the cascade applies.
-test("contentFeeFor charges nothing on a publisher-produced placement, whatever the desk rule says", () => {
-  const publisherWrites = { type: "NATIVE_DISPLAY", inclusions: { production: "PUBLISHER" } };
-  assert.equal(contentFeeFor(publisherWrites, "NO", NO_FEES), 0);
-  assert.equal(contentFeeFor({ ...publisherWrites, productionFee: 5000 }, "NO", NO_FEES), 0);
+// Who writes it is the buyer's choice, and the fee follows that choice, not
+// the product: on a placement the publisher's studio could write (Tungt.no's
+// "Advertorial med tekstforfatter", inclusions.production = PUBLISHER), a line
+// we write is billed our fee like any other — the desk rule, or the offer's
+// own fee. "Let the publisher write it" is simply a line that asks for none.
+test("contentFeeFor prices our article on a publisher-capable placement by the normal cascade", () => {
+  const publisherCanWrite = { type: "NATIVE_DISPLAY", inclusions: { production: "PUBLISHER" } };
+  assert.equal(contentFeeFor(publisherCanWrite, "NO", NO_FEES), 8000);
+  assert.equal(contentFeeFor({ ...publisherCanWrite, productionFee: 5000 }, "NO", NO_FEES), 5000);
 });
 
 // BUG-buyer-plan-r2-2: the catalog showed Aftenposten's Native display as
@@ -303,8 +304,9 @@ test("the catalog band contains the plan line and the order total for the same p
       priceRules: [],
       title,
     };
-    // The line a catalog add creates: "We write it" per the add default.
-    const intent = defaultContentIntent(product);
+    // The line a catalog add creates: "We write it" per the add default —
+    // on every product, publisher-capable ones included.
+    const intent = defaultContentIntent();
     const item = { productId: "p", quantity: 1, withContent: intent.withContent, product } as unknown as FakeItem;
 
     const band = productBand(product, title, pricing);
@@ -324,6 +326,86 @@ test("the catalog band contains the plan line and the order total for the same p
     assert.equal(plan.total, order, `plan = order for ${label}`);
     assert.equal(customerPrice(product, title, pricing), plan.total, `band basis = plan for ${label}`);
     assert.deepEqual(priceBand(plan.total, "NOK"), band, `band contains the plan price for ${label}`);
+
+    // The buyer's other choice ("Let the publisher write it" / own copy):
+    // the plan and the order still agree, and never exceed the band's basis.
+    const off = placementContentIntent(false, product);
+    const offPlan = linePrice({ ...item, withContent: off.withContent } as FakeItem, pricing);
+    const offFees = contentFeeLinesFor(
+      [{ productId: "p", withContent: off.withContent, authorshipMode: off.authorshipMode }],
+      new Map([["p", product]]),
+      "NO",
+      NO_FEES,
+    );
+    assert.equal(offFees.length, 0, `no fee when we don't write it for ${label}`);
+    assert.ok(offPlan && offPlan.contentFee === 0 && offPlan.total <= plan.total, `off ≤ default for ${label}`);
+  }
+});
+
+// Acceptance criteria from the real ABAX offers (2026-09-30): on a
+// publisher-capable placement a line WE write must reproduce the all-in figure
+// the offer quoted — placement × 1.15 (default margin) + our fee from the
+// market/format rule — on the band basis, the plan line and the order alike.
+// Byggmesteren's advertorial carries an explicit productionFee of 0 ("no
+// production charge on this offer"), so it stays at 35 075 with the line on.
+// Fixtures mirror the prod products (no price rules, no publication fee).
+test("ABAX offers: a NativeSpin-written line on a publisher-capable product matches the offer sent", () => {
+  const feeRules: ContentFeeRuleSpec[] = [
+    { marketCode: "SE", productType: "NATIVE_ARTICLE", currency: "SEK", greenfieldFee: 2000, adaptationFee: null, active: true },
+    { marketCode: "NO", productType: "NATIVE_ARTICLE", currency: "NOK", greenfieldFee: 2000, adaptationFee: null, active: true },
+    { marketCode: "NO", productType: "ADVERTORIAL", currency: "NOK", greenfieldFee: 1500, adaptationFee: null, active: true },
+  ];
+  const pricing: PlanPricing = { feeRules, marginRules: [] };
+  const offers = [
+    { name: "Svensk Åkeritidning — Native-artikel (webb, sponsrad, startsida)", market: "SE", currency: "SEK", type: "NATIVE_ARTICLE", basePrice: 22500, inclusions: { frontpage: true, production: "PUBLISHER" }, productionFee: null, expected: 27875 },
+    { name: "Trailer — Native-artikel (trailer.se, 2 veckor)", market: "SE", currency: "SEK", type: "NATIVE_ARTICLE", basePrice: 20000, inclusions: { production: "PUBLISHER", durationWeeks: 2 }, productionFee: null, expected: 25000 },
+    { name: "Anlegg & Transport — Native content (publisher-produsert)", market: "NO", currency: "NOK", type: "NATIVE_ARTICLE", basePrice: 49000, inclusions: { production: "PUBLISHER", frontpage: true, newsletter: true }, productionFee: null, expected: 58350 },
+    { name: "AnleggsMagasinet — Advertorial med tekstforfatter", market: "NO", currency: "NOK", type: "NATIVE_ARTICLE", basePrice: 15000, inclusions: { production: "PUBLISHER" }, productionFee: null, expected: 19250 },
+    { name: "Tungt.no — Advertorial med tekstforfatter", market: "NO", currency: "NOK", type: "NATIVE_ARTICLE", basePrice: 15000, inclusions: { production: "PUBLISHER" }, productionFee: null, expected: 19250 },
+    { name: "TransportMagasinet — Advertorial med tekstforfatter", market: "NO", currency: "NOK", type: "NATIVE_ARTICLE", basePrice: 15000, inclusions: { production: "PUBLISHER" }, productionFee: null, expected: 19250 },
+    { name: "Yrkestrafikk — Annonsørinnhold print, inkl. produksjon", market: "NO", currency: "NOK", type: "ADVERTORIAL", basePrice: 42300, inclusions: { print: true, production: "PUBLISHER" }, productionFee: null, expected: 50145 },
+    { name: "Byggmesteren — Redaksjonell helside (advertorial)", market: "NO", currency: "NOK", type: "ADVERTORIAL", basePrice: 30500, inclusions: { print: true, production: "PUBLISHER" }, productionFee: 0, expected: 35075 },
+  ];
+  for (const o of offers) {
+    const title = {
+      pricesPublic: true,
+      publisher: null,
+      productionFeeDefault: null,
+      market: { code: o.market, vatRatePct: 25 },
+    };
+    const product = {
+      id: "p",
+      name: o.name,
+      type: o.type,
+      currency: o.currency,
+      basePrice: o.basePrice,
+      active: true,
+      confirmedAt: new Date("2026-09-29"),
+      visibility: "FIRM",
+      pricingModel: "FLAT",
+      productionFee: o.productionFee,
+      inclusions: o.inclusions,
+      priceRules: [],
+      title,
+    };
+    const intent = defaultContentIntent();
+    assert.equal(intent.authorshipMode, "NATIVESPIN_PRODUCED");
+    const item = { productId: "p", quantity: 1, withContent: intent.withContent, product } as unknown as FakeItem;
+
+    const display = lineDisplay(item, pricing);
+    assert.equal(display.kind, "exact", o.name);
+    assert.equal(display.kind === "exact" && display.total, o.expected, `plan line for ${o.name}`);
+    assert.equal(customerPrice(product, title, pricing), o.expected, `band basis for ${o.name}`);
+    const order = [
+      ...computeQuoteLines([{ productId: "p", name: o.name, quantity: 1, basePrice: o.basePrice, rules: [] }], 15),
+      ...contentFeeLinesFor(
+        [{ productId: "p", withContent: intent.withContent, authorshipMode: intent.authorshipMode }],
+        new Map([["p", product]]),
+        o.market,
+        feeRules,
+      ),
+    ].reduce((sum, l) => sum + l.lineTotal, 0);
+    assert.equal(order, o.expected, `order for ${o.name}`);
   }
 });
 

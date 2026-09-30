@@ -11,6 +11,7 @@ import { estimateListTotals, hasFigure, hasUnpricedLines, lineDisplay } from "@/
 import { bandLabel } from "@/lib/pricing/bands";
 import { totalLabel } from "@/lib/pricing/total-label";
 import { formatRunRange, runBounds } from "@/lib/run-period";
+import { publisherCanWrite } from "@/lib/authorship";
 
 export const dynamic = "force-dynamic";
 
@@ -94,6 +95,7 @@ export default async function SharedListPage({
               {tType(p.type)} · {p.title.publisher.name}
               {inTotal && i.quantity > 1 ? ` · ${t("qty", { count: i.quantity })}` : ""}
               {inTotal && i.withContent ? ` · ${t("weWriteIt")}` : ""}
+              {inTotal && !i.withContent && publisherCanWrite(p) ? ` · ${t("publisherWritesIt")}` : ""}
             </div>
             {inTotal && i.scheduleStart ? (
               // The run with its length, as /plan shows it: the client

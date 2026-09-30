@@ -70,8 +70,9 @@ export type FirmOrderProduct = ProductWithRules & {
   // (pricing/production-fee.ts). Both callers hydrate them; absent, the
   // CONTENT_FEE line falls back to the desk rule.
   productionFee?: unknown;
-  // Required: "production": "PUBLISHER" means no content fee of ours
-  // (pricing/production-fee.ts), so every caller must hydrate it.
+  // Required: "production": "PUBLISHER" makes an unticked line
+  // PUBLISHER_PRODUCED rather than BUYER_SUPPLIED (authorship.ts
+  // placementContentIntent), so every caller must hydrate it.
   inclusions: unknown;
   title: {
     marketId: string;
@@ -169,9 +170,11 @@ export async function createFirmOrder(args: {
   // agrees with the catalog band the buyer saw (display-price.ts).
   const defaults = await loadPricingDefaults();
 
-  // Per-product authorship intent (projected from the buyer's withContent
-  // toggle; PUBLISHER_PRODUCED where the publisher's studio writes it), used to
-  // stamp both the PlanItem and the eventual OrderLine.
+  // Per-product authorship, from the buyer's choice on the line (on ⇒ we
+  // write it and bill the fee below; off ⇒ the publisher where their studio
+  // can write it, else the buyer), stamped on both the PlanItem and the
+  // OrderLine. The CONTENT_FEE lines below key off the same withContent, so
+  // the order charges our fee exactly on the lines it records as ours.
   const intentByProduct = new Map(
     items.map((i) => [i.productId, placementContentIntent(!!i.withContent, byId.get(i.productId))]),
   );

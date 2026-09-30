@@ -191,12 +191,13 @@ test("bandIncludesArticle: no fee rule and no stated producer → no article cla
   assert.equal(bandIncludesArticle(product(), TITLE, { feeRules: [], marginRules: [] }), false);
 });
 
-test("the publisher's studio writes it: article included, but no fee of ours in the band", () => {
+test("the publisher's studio could write it: the band still carries our article fee", () => {
   const studio = product({ inclusions: { production: "PUBLISHER" } });
   assert.equal(bandIncludesArticle(studio, TITLE, DEFAULTS), true);
-  // A catalog add of this product starts PUBLISHER_PRODUCED (no content fee),
-  // so the band is the placement alone — what the plan and order charge.
-  assert.equal(customerPrice(studio, TITLE, DEFAULTS), 34_500);
+  // A catalog add of this product starts "We write it" like any other, so the
+  // band is placement + our fee — what the plan and order charge by default.
+  // ("Let the publisher write it" on /plan drops the 2 000.)
+  assert.equal(customerPrice(studio, TITLE, DEFAULTS), 36_500);
 });
 
 test("customerPrice: the offer's own article fee beats the desk rule", () => {

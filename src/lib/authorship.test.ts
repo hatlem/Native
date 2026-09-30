@@ -11,7 +11,7 @@ import {
   contentIntent,
   defaultContentIntent,
   mergeContentIntent,
-  publisherProducesContent,
+  publisherCanWrite,
   placementContentIntent,
   type AuthorshipMode,
 } from "./authorship";
@@ -146,47 +146,46 @@ test("mergeContentIntent keeps a content request from either side", () => {
   );
 });
 
-// A catalog/title-page/compare/recommender add starts with "We write it" on:
-// the band the buyer saw includes the article.
-test("defaultContentIntent: a new line is NativeSpin-written by default", () => {
-  assert.deepEqual(defaultContentIntent({ inclusions: null, productionFee: null, title: null }), {
-    withContent: true,
-    authorshipMode: "NATIVESPIN_PRODUCED",
-  });
-  // A title placeholder (no product yet) takes the same default.
-  assert.deepEqual(defaultContentIntent(null), { withContent: true, authorshipMode: "NATIVESPIN_PRODUCED" });
+// Every add path — catalog, title page, compare, recommenders, a heart, a
+// placeholder — starts with "We write it" on: the band the buyer saw includes
+// our article fee. That includes a placement the publisher's studio could
+// write: who writes it is the buyer's choice, and the default earns our fee.
+test("defaultContentIntent: every new line is NativeSpin-written", () => {
+  assert.deepEqual(defaultContentIntent(), { withContent: true, authorshipMode: "NATIVESPIN_PRODUCED" });
 });
 
-test("defaultContentIntent: where the publisher writes it, content doesn't apply", () => {
-  const publisher = { withContent: false, authorshipMode: "PUBLISHER_PRODUCED" };
-  assert.deepEqual(defaultContentIntent({ inclusions: { production: "PUBLISHER" } }), publisher);
+test("publisherCanWrite: the studio flag or an explicit 0 fee offers the publisher's article", () => {
+  assert.equal(publisherCanWrite({ inclusions: { production: "PUBLISHER" } }), true);
   // Schema: an explicit 0 production fee = "publisher includes production".
-  assert.deepEqual(defaultContentIntent({ productionFee: 0 }), publisher);
-  assert.deepEqual(defaultContentIntent({ productionFee: null, title: { productionFeeDefault: 0 } }), publisher);
+  assert.equal(publisherCanWrite({ productionFee: 0 }), true);
+  assert.equal(publisherCanWrite({ productionFee: null, title: { productionFeeDefault: 0 } }), true);
+  // An offer-level fee overrides the publication default.
+  assert.equal(publisherCanWrite({ productionFee: 5000, title: { productionFeeDefault: 0 } }), false);
+  assert.equal(publisherCanWrite({ productionFee: null, title: { productionFeeDefault: 3000 } }), false);
+  assert.equal(publisherCanWrite({ inclusions: { production: "ADVERTISER" } }), false);
+  assert.equal(publisherCanWrite({}), false);
 });
 
-test("publisherProducesContent: an offer-level fee overrides the publication default", () => {
-  assert.equal(publisherProducesContent({ productionFee: 5000, title: { productionFeeDefault: 0 } }), false);
-  assert.equal(publisherProducesContent({ productionFee: null, title: { productionFeeDefault: 3000 } }), false);
-  assert.equal(publisherProducesContent({ inclusions: { production: "ADVERTISER" } }), false);
-});
-
-test("every default intent satisfies withContent ⇔ NATIVESPIN_PRODUCED", () => {
-  for (const src of [null, {}, { productionFee: 0 }, { inclusions: { production: "PUBLISHER" } }]) {
-    const r = defaultContentIntent(src);
-    assert.equal(r.withContent, r.authorshipMode === "NATIVESPIN_PRODUCED");
-  }
-});
-
-// BUG-final-prod-1: a publisher-produced line toggled to "We write it" (or
-// never toggled, which the firm path used to order as BUYER_SUPPLIED) must be
-// ordered as PUBLISHER_PRODUCED: no content fee, no writer, no copy asked of
-// the buyer.
-test("placementContentIntent: the publisher's studio wins over the row's toggle", () => {
+// The buyer's choice decides; the product only decides what "off" means.
+test("placementContentIntent: on is ours everywhere; off is the publisher's where they can write it", () => {
   const studio = { inclusions: { production: "PUBLISHER" } };
-  const publisher = { withContent: false, authorshipMode: "PUBLISHER_PRODUCED" };
-  assert.deepEqual(placementContentIntent(true, studio), publisher);
-  assert.deepEqual(placementContentIntent(false, studio), publisher);
-  assert.deepEqual(placementContentIntent(true, { inclusions: null }), contentIntent(true));
+  const ours = { withContent: true, authorshipMode: "NATIVESPIN_PRODUCED" };
+  // "We write it" on a publisher-capable placement is ours — and billed.
+  assert.deepEqual(placementContentIntent(true, studio), ours);
+  assert.deepEqual(placementContentIntent(true, { productionFee: 0 }), ours);
+  // "Let the publisher write it": never BUYER_SUPPLIED there.
+  assert.deepEqual(placementContentIntent(false, studio), { withContent: false, authorshipMode: "PUBLISHER_PRODUCED" });
+  // Elsewhere off means the buyer's own copy — never PUBLISHER_PRODUCED.
+  assert.deepEqual(placementContentIntent(true, { inclusions: null }), ours);
+  assert.deepEqual(placementContentIntent(false, { inclusions: null }), contentIntent(false));
   assert.deepEqual(placementContentIntent(false, null), contentIntent(false));
+});
+
+test("every placement intent satisfies withContent ⇔ NATIVESPIN_PRODUCED", () => {
+  for (const src of [null, {}, { productionFee: 0 }, { inclusions: { production: "PUBLISHER" } }]) {
+    for (const on of [true, false]) {
+      const r = placementContentIntent(on, src);
+      assert.equal(r.withContent, r.authorshipMode === "NATIVESPIN_PRODUCED", `${on}/${JSON.stringify(src)}`);
+    }
+  }
 });

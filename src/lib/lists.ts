@@ -5,7 +5,7 @@ import {
   contentIntent,
   defaultContentIntent,
   mergeContentIntent,
-  publisherProducesContent,
+  placementContentIntent,
   type AuthorshipMode,
 } from "@/lib/authorship";
 
@@ -184,10 +184,10 @@ export async function migrateLegacyBasket(
   if (basket.length === 0) return null;
   const valid = await prisma.product.findMany({
     where: { id: { in: basket.map((b) => b.productId) }, active: true, bookable: true },
-    select: { id: true },
+    select: { id: true, ...CONTENT_DEFAULT_SELECT },
   });
-  const validIds = new Set(valid.map((p) => p.id));
-  const rows = basket.filter((b) => validIds.has(b.productId));
+  const validById = new Map(valid.map((p) => [p.id, p]));
+  const rows = basket.filter((b) => validById.has(b.productId));
   if (rows.length === 0) return null;
   return prisma.savedList.create({
     data: {
@@ -199,7 +199,8 @@ export async function migrateLegacyBasket(
           productId: b.productId,
           titleId: null,
           quantity: clampQuantity(b.quantity),
-          ...contentIntent(!!b.withContent),
+          // No recorded choice → the add default (we write it).
+          ...placementContentIntent(b.withContent ?? true, validById.get(b.productId)),
           sortOrder: idx,
         })),
       },
@@ -238,7 +239,8 @@ export async function setItemAlternative(itemId: string, isAlternative: boolean)
   return prisma.savedListItem.updateMany({ where: { id: itemId }, data: { isAlternative } });
 }
 
-// The select defaultContentIntent reads (lib/authorship.ts).
+// The product fields placementContentIntent reads (lib/authorship.ts
+// publisherCanWrite): what "off" means for this placement.
 const CONTENT_DEFAULT_SELECT = {
   inclusions: true,
   productionFee: true,
@@ -249,7 +251,9 @@ const CONTENT_DEFAULT_SELECT = {
  * Add a product line. `withContent` is the buyer's explicit "We write it"
  * choice when the surface offers one; omitted (every catalog/title/compare/
  * recommender add), a NEW line takes defaultContentIntent — ON, because the
- * band the buyer saw includes the article, unless the publisher produces it.
+ * band the buyer saw includes our article fee. That holds on a placement the
+ * publisher's studio could write too: who writes it is the buyer's call on
+ * /plan, and we write it until they choose otherwise.
  */
 export async function addProductItem(listId: string, productId: string, withContent?: boolean) {
   assertItemShape({ productId, titleId: null });
@@ -271,11 +275,12 @@ export async function addProductItem(listId: string, productId: string, withCont
     });
   }
   const created =
-    withContent === undefined
-      ? defaultContentIntent(
+    withContent === undefined || withContent
+      ? defaultContentIntent()
+      : placementContentIntent(
+          false,
           await prisma.product.findUnique({ where: { id: productId }, select: CONTENT_DEFAULT_SELECT }),
-        )
-      : contentIntent(withContent);
+        );
   const item = await prisma.savedListItem.upsert({
     where: { listId_productId: { listId, productId } },
     create: {
@@ -305,7 +310,7 @@ export async function addTitleItem(listId: string, titleId: string) {
       listId,
       titleId,
       productId: null,
-      ...defaultContentIntent(null),
+      ...defaultContentIntent(),
       sortOrder: await nextSortOrder(listId),
     },
     // Already present: no duplicate/bump, but an alternative is promoted into the plan.
@@ -344,17 +349,16 @@ export async function resolveTitleItem(itemId: string, productId: string) {
     ]);
     return merged;
   }
-  // The placeholder's "We write it" carries over — unless the chosen placement
-  // is written by the publisher's own studio, where NativeSpin writing it
-  // doesn't apply (the same exception a direct add makes).
+  // The placeholder's "We write it" carries over as the buyer set it. Off
+  // re-derives against the chosen placement: the publisher where their studio
+  // can write it, else the buyer's own copy.
   const product = await prisma.product.findUnique({ where: { id: productId }, select: CONTENT_DEFAULT_SELECT });
-  const publisherWrites = !!product && publisherProducesContent(product);
   return prisma.savedListItem.update({
     where: { id: itemId },
     data: {
       productId,
       titleId: null,
-      ...(publisherWrites ? defaultContentIntent(product) : {}),
+      ...placementContentIntent(item.withContent, product),
     },
   });
 }
@@ -365,32 +369,25 @@ export async function removeItem(itemId: string) {
 }
 
 /**
- * The buyer's "We write it" toggle. Writes withContent and authorshipMode as
- * one pair (contentIntent) so the RFQ snapshot, content-fee lines and writer
- * staffing — which all read authorshipMode — follow what the buyer pressed.
- * Turning it off only touches a line that is on: a publisher-produced line is
- * already off, and a stale "off" post must not rewrite it to buyer-supplied.
+ * The buyer's "who writes it" choice. Writes withContent and authorshipMode
+ * as one pair (placementContentIntent) so the RFQ snapshot, content-fee lines
+ * and writer staffing — which all read authorshipMode — follow what the buyer
+ * pressed: on ⇒ NATIVESPIN_PRODUCED (our fee); off ⇒ PUBLISHER_PRODUCED on a
+ * placement the publisher's studio can write ("Let the publisher write it",
+ * no fee of ours), else BUYER_SUPPLIED. Never BUYER_SUPPLIED where the choice
+ * offered was the publisher, never PUBLISHER_PRODUCED where it wasn't.
+ * A title placeholder has no product yet, so its "off" is the buyer's copy
+ * until it is resolved (resolveTitleItem re-derives it).
  * Idempotent: updateMany no-ops if the row was concurrently removed.
- *
- * A placement the publisher's own studio writes has no toggle (/plan shows
- * "The publisher writes the article"): whatever is posted, the line is
- * (re)set to PUBLISHER_PRODUCED. Turning "We write it" on there would bill our
- * content fee for an article the publisher already produces (BUG-final-prod-1).
  */
 export async function setItemContent(itemId: string, withContent: boolean) {
   const row = await prisma.savedListItem.findUnique({
     where: { id: itemId },
     select: { product: { select: CONTENT_DEFAULT_SELECT } },
   });
-  if (row?.product && publisherProducesContent(row.product)) {
-    return prisma.savedListItem.updateMany({
-      where: { id: itemId },
-      data: defaultContentIntent(row.product),
-    });
-  }
   return prisma.savedListItem.updateMany({
-    where: withContent ? { id: itemId } : { id: itemId, withContent: true },
-    data: contentIntent(withContent),
+    where: { id: itemId },
+    data: placementContentIntent(withContent, row?.product),
   });
 }
 
