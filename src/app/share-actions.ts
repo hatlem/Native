@@ -3,7 +3,7 @@
 import { redirect } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import { approveSharedList } from "@/lib/list-share";
-import { buildClientApprovalNotice } from "@/lib/client-approval-notice";
+import { marketDefaultLocale } from "@/lib/market-locale";
 import { notifyOrg } from "@/lib/notify";
 import { recordAudit } from "@/lib/audit";
 import { safeLocale } from "@/i18n/routing";
@@ -30,16 +30,13 @@ export async function approveSharedPlan(formData: FormData) {
       where: { id: list.organizationId },
       select: { marketCode: true },
     });
-    const notice = buildClientApprovalNotice({
-      marketCode: org?.marketCode ?? null,
-      planName: list.name,
-      listId: list.id,
-    });
+    // A template (lib/client-approval-notice.ts): the email goes out in the
+    // org's market language and the inbox re-renders it in each reader's,
+    // linking to the approved plan itself.
     await notifyOrg(list.organizationId, {
       kind: "PLAN_CLIENT_APPROVED",
-      title: notice.title,
-      body: notice.body,
-      link: notice.link,
+      template: { key: "clientApproved", params: { planName: list.name, listId: list.id } },
+      locale: org?.marketCode ? marketDefaultLocale(org.marketCode) : "en",
     });
   }
   // Same address, no query: the page itself shows the outcome (approved, or

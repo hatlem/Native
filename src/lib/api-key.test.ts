@@ -7,6 +7,9 @@ import {
   looksLikeApiToken,
   parseScopes,
   hasScope,
+  parseKeyBinding,
+  validateKeyGrant,
+  type KeyBinding,
 } from "./api-key";
 
 test("generateApiToken emits the atn_ prefix and url-safe chars", () => {
@@ -77,4 +80,44 @@ test("hasScope: exact + wildcard + global", () => {
 
   const all = parseScopes("*");
   assert.equal(hasScope(all, "anything:goes"), true);
+});
+
+test("parseKeyBinding: platform, organization, publisher — nothing else", () => {
+  assert.deepEqual(parseKeyBinding(""), { kind: "platform" });
+  assert.deepEqual(parseKeyBinding("org:abc"), { kind: "organization", id: "abc" });
+  assert.deepEqual(parseKeyBinding("pub:xyz"), { kind: "publisher", id: "xyz" });
+  assert.equal(parseKeyBinding("org:"), null);
+  assert.equal(parseKeyBinding("abc"), null);
+  assert.equal(parseKeyBinding("usr:abc"), null);
+});
+
+const PLATFORM: KeyBinding = { kind: "platform" };
+const ORG: KeyBinding = { kind: "organization", id: "o1" };
+const PUB: KeyBinding = { kind: "publisher", id: "p1" };
+
+// BUG-prod-api-20: catalog:write was refused and no key could be bound to a
+// publisher, so the ingestion API was unusable.
+test("validateKeyGrant: catalog:write is issuable, and only to a publisher", () => {
+  assert.equal(validateKeyGrant(parseScopes("catalog:write"), PUB), null);
+  assert.equal(validateKeyGrant(parseScopes("catalog:read,catalog:write"), PUB), null);
+  assert.equal(validateKeyGrant(parseScopes("catalog:write"), PLATFORM), "publisher_required_scope");
+  assert.equal(validateKeyGrant(parseScopes("catalog:write"), ORG), "publisher_required_scope");
+});
+
+test("validateKeyGrant: orders:write needs an organization, pricing:admin the platform", () => {
+  assert.equal(validateKeyGrant(parseScopes("orders:write"), ORG), null);
+  assert.equal(validateKeyGrant(parseScopes("orders:write"), PLATFORM), "org_required_scope");
+  assert.equal(validateKeyGrant(parseScopes("orders:write"), PUB), "org_required_scope");
+  assert.equal(validateKeyGrant(parseScopes("pricing:admin"), PLATFORM), null);
+  assert.equal(validateKeyGrant(parseScopes("pricing:admin"), ORG), "internal_only_scope");
+  assert.equal(validateKeyGrant(parseScopes("pricing:admin"), PUB), "internal_only_scope");
+});
+
+test("validateKeyGrant: unknown or empty scopes are refused", () => {
+  assert.equal(validateKeyGrant(parseScopes(""), PLATFORM), "scopes");
+  assert.equal(validateKeyGrant(parseScopes("admin:*"), PLATFORM), "scopes");
+  assert.equal(validateKeyGrant(parseScopes("catalog:read,catlog:read"), PLATFORM), "scopes");
+  // The legacy wildcard stays issuable (existing integrations use it).
+  assert.equal(validateKeyGrant(parseScopes("catalog:*"), PLATFORM), null);
+  assert.equal(validateKeyGrant(parseScopes("catalog:read"), ORG), null);
 });

@@ -12,7 +12,6 @@ import { findDueAutoSendWaves, type DueWave } from "@/lib/programme";
 import { submitListAsRfq, RFQ_LIST_INCLUDE } from "@/lib/commerce/submit-rfq";
 import { notifyOrg } from "@/lib/notify";
 import { recordAudit } from "@/lib/audit";
-import { buildAutoSendNotice } from "@/lib/programme-autosend-notice";
 import { marketDefaultLocale } from "@/lib/market-locale";
 
 export type AutoSendSweepResult = { sent: number; skipped: number; failed: number };
@@ -70,18 +69,18 @@ async function sendDueWave(wave: DueWave): Promise<"sent" | "skipped"> {
   // Tell the buying org their wave went out — with a link to the request so
   // they land where the quote will appear. Localized by the org's market,
   // same convention as the ORDER_COMPLETED notice.
-  const notice = buildAutoSendNotice({
-    marketCode: list.organization.marketCode,
-    programmeName: wave.programmeName,
-    waveNumber: wave.waveNumber,
-    plannedWaves: wave.plannedWaves,
-    requestId: result.requestId,
-  });
   await notifyOrg(list.organizationId, {
     kind: "RFQ_SUBMITTED",
-    title: notice.title,
-    body: notice.body,
-    link: notice.link,
+    locale: marketDefaultLocale(list.organization.marketCode),
+    template: {
+      key: "programmeAutoSend",
+      params: {
+        programmeName: wave.programmeName,
+        waveNumber: wave.waveNumber,
+        plannedWaves: wave.plannedWaves,
+        requestId: result.requestId,
+      },
+    },
   });
   await recordAudit(null, "programme.autosend", `Request:${result.requestId}`, {
     programmeId: wave.programmeId,

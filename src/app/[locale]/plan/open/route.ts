@@ -18,7 +18,7 @@
 import { type NextRequest, NextResponse } from "next/server";
 import { auth } from "@/auth";
 import { getWorkspace } from "@/lib/workspace";
-import { alignActivePlan, resolvePlanTarget } from "@/lib/plan-target";
+import { alignActivePlan, refusalNotice, resolvePlanTarget } from "@/lib/plan-target";
 import { planPath } from "@/lib/plan-path";
 import { appUrl } from "@/lib/url";
 
@@ -37,7 +37,12 @@ export async function GET(
 
   // appUrl(), not request.url: behind Railway's proxy the inbound URL can carry
   // an internal host, and every other redirect in this app builds from appUrl().
-  if (!ws || !target.ok) return NextResponse.redirect(new URL(planPath(locale, null, rest), appUrl()));
+  // Say WHY the viewer lands on another plan: a stale bookmark silently showing
+  // a different plan read as "my plan changed" (refusalNotice).
+  if (!ws || !target.ok) {
+    const notice = listId ? refusalNotice(target) : undefined;
+    return NextResponse.redirect(new URL(planPath(locale, null, { ...rest, ...notice }), appUrl()));
+  }
 
   await alignActivePlan(ws, target.list);
   return NextResponse.redirect(new URL(planPath(locale, target.list.id, rest), appUrl()));

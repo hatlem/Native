@@ -1,33 +1,22 @@
 import { S3Client, PutObjectCommand, GetObjectCommand } from "@aws-sdk/client-s3";
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 import { randomUUID } from "node:crypto";
+import {
+  fileProblem,
+  isAllowedSize,
+  validateContentType,
+  RATE_CARD_TYPES,
+  type UploadProblem,
+} from "./upload-rules";
 
-export const RATE_CARD_TYPES: ReadonlySet<string> = new Set([
-  "application/pdf",
-  "application/vnd.openxmlformats-officedocument.presentationml.presentation",
-  "application/vnd.ms-powerpoint",
-  "image/png",
-  "image/jpeg",
-]);
-
-export const ARTICLE_TYPES: ReadonlySet<string> = new Set([
-  "application/pdf",
-  "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
-  "text/plain",
-]);
-
-const MAX_BYTES = 25 * 1024 * 1024;
-
-export function validateContentType(
-  ct: string,
-  allowedTypes: ReadonlySet<string> = RATE_CARD_TYPES,
-): boolean {
-  return allowedTypes.has(ct.toLowerCase());
-}
-
-export function isAllowedSize(bytes: number): boolean {
-  return bytes > 0 && bytes <= MAX_BYTES;
-}
+// The upload rules live in upload-rules.ts (no SDK import, so the browser
+// forms can use them too); re-exported for existing server-side imports.
+export {
+  ARTICLE_TYPES,
+  RATE_CARD_TYPES,
+  isAllowedSize,
+  validateContentType,
+} from "./upload-rules";
 
 export function buildObjectKey(args: { prefix: string; filename: string }): string {
   const date = new Date().toISOString().slice(0, 10);
@@ -102,14 +91,22 @@ function bucket(): string {
 // "storage isn't configured" has to travel as data for the UI to explain it.
 export type PresignUploadResult =
   | { ok: true; url: string; key: string }
-  | { ok: false; reason: "storage-unavailable" };
+  | { ok: false; reason: Exclude<UploadProblem, "upload-failed"> };
 
-// presignUpload, with missing configuration reported as a result instead
-// of thrown. Validation errors (type/size) still throw: those are caller
-// bugs or tampering, not an environment condition.
+// presignUpload, with every expected refusal reported as a result instead of
+// thrown: missing configuration, and a file of the wrong type or size. The
+// file checks used to throw, and a thrown server-action error reaches the
+// browser as a generic message — the form could only say "Upload failed.
+// Try a different file." whatever the cause (or, on the rate-card form, show
+// the raw error code).
 export async function presignUploadResult(
   args: Parameters<typeof presignUpload>[0],
 ): Promise<PresignUploadResult> {
+  const problem = fileProblem(
+    { type: args.contentType, size: args.bytes },
+    args.allowedTypes ?? RATE_CARD_TYPES,
+  );
+  if (problem) return { ok: false, reason: problem };
   if (!isStorageConfigured()) {
     console.error("storage.not_configured", { missing: missingStorageEnv(), prefix: args.prefix });
     return { ok: false, reason: "storage-unavailable" };

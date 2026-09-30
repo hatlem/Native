@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { presignArticleUpload } from "@/app/article-library-actions";
 import { saveUploadedDraft } from "@/app/desk-content-actions";
+import { ARTICLE_TYPES, fileProblem, type UploadProblem } from "@/lib/storage/upload-rules";
 
 export function UploadForm({
   articleId,
@@ -18,10 +19,21 @@ export function UploadForm({
     hint: string;
     uploading: string;
     save: string;
+    // One message per cause (lib/storage/upload-rules.ts UploadProblem): the
+    // old single "Upload failed. Try a different file." blamed the file for a
+    // storage outage and gave no hint what was wrong with a rejected one.
     failed: string;
     unavailable: string;
+    wrongType: string;
+    tooLarge: string;
   };
 }) {
+  const messageFor: Record<UploadProblem, string> = {
+    "file-type": labels.wrongType,
+    "file-size": labels.tooLarge,
+    "storage-unavailable": labels.unavailable,
+    "upload-failed": labels.failed,
+  };
   const [busy, setBusy] = useState(false);
   const [file, setFile] = useState<File | null>(null);
   const [key, setKey] = useState<string | null>(null);
@@ -32,6 +44,13 @@ export function UploadForm({
     setKey(null);
     setError(null);
     if (!f) return;
+    // Same rules the server enforces — checked here first so a wrong file is
+    // explained before any round trip.
+    const problem = fileProblem(f, ARTICLE_TYPES);
+    if (problem) {
+      setError(messageFor[problem]);
+      return;
+    }
     setBusy(true);
     try {
       const presigned = await presignArticleUpload({
@@ -42,9 +61,7 @@ export function UploadForm({
         bytes: f.size,
       });
       if (!presigned.ok) {
-        // Storage isn't configured: no other file would work either, so
-        // don't send the user off trying one.
-        setError(labels.unavailable);
+        setError(messageFor[presigned.reason]);
         return;
       }
       const res = await fetch(presigned.url, {
@@ -55,7 +72,7 @@ export function UploadForm({
       if (!res.ok) throw new Error(`upload_failed:${res.status}`);
       setKey(presigned.key);
     } catch {
-      setError(labels.failed);
+      setError(messageFor["upload-failed"]);
     } finally {
       setBusy(false);
     }

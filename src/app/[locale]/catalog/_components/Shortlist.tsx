@@ -13,10 +13,11 @@ import { useTranslations } from "next-intl";
 import { Link } from "@/i18n/navigation";
 import { formatMoney } from "@/lib/money";
 import { addProductToActiveList } from "@/app/list-actions";
-import type { PlanBarSummary } from "@/lib/plan-total";
 
-type LineTotal = PlanBarSummary["totals"][number];
+type LineTotal = { currency: string; amount: number; itemCount: number };
 
+// No price on the client: the bar's count and total come back from the
+// server action (lib/plan-total.ts), priced exactly as /plan prices them.
 type ShortlistItem = {
   productId: string;
   titleName: string;
@@ -37,39 +38,35 @@ export function useShortlist(): Ctx {
 }
 
 // Optimistic cross-row state for "Add to plan": a row's CTA flips to added
-// and the sticky bar's count goes up in the same tick, while
-// addProductToActiveList runs in the background — same architecture as
-// CompareSelectionProvider (a client Context + a bar the provider renders
-// itself), but this one calls a real server action, so it needs a revert path
-// on failure.
-//
-// Money is never computed here. The bar's total is the server's
-// (planBarSummary: the plan's own pricing, as /plan shows it), from the page
-// render or from the add action's result. Adding a product's price in the
-// browser used its NET base price (a margin leak) and, once the page
-// re-rendered with the new line, counted it twice.
+// immediately and the sticky bar's count/total increment in the same tick,
+// while addProductToActiveList runs in the background — same architecture
+// as CompareSelectionProvider (a client Context + a bar the provider
+// renders itself), but this one calls a real server action instead of only
+// touching local/localStorage state, so it needs a revert path on failure.
 export function ShortlistProvider({
   locale,
   planName,
-  initialPlan,
+  initialCount,
+  initialProductIds,
+  initialTotals,
   children,
 }: {
   locale: string;
   planName: string;
-  initialPlan: PlanBarSummary;
+  initialCount: number;
+  initialProductIds: string[];
+  initialTotals: LineTotal[];
   children: ReactNode;
 }) {
   const t = useTranslations("catalog.shortlist");
-  // The plan as the server last described it: the page's render, replaced by
-  // each successful add's result (whichever is newer).
-  const [plan, setPlan] = useState<PlanBarSummary>(initialPlan);
-  useEffect(() => setPlan(initialPlan), [initialPlan]);
-  // Adds still in flight: counted optimistically, not yet priced.
-  const [inFlight, setInFlight] = useState<ShortlistItem[]>([]);
-  // Titles added on this page, most recent last (the bar's chips).
-  const [recent, setRecent] = useState<string[]>([]);
+  const [added, setAdded] = useState<ShortlistItem[]>([]);
+  const [addedIds, setAddedIds] = useState<Set<string>>(() => new Set());
+  const [pendingIds, setPendingIds] = useState<Set<string>>(() => new Set());
   const [error, setError] = useState<string | null>(null);
-  const onPlanIds = useMemo(() => new Set(plan.productIds), [plan]);
+  // The server's latest word on the plan (count + totals); null until the
+  // first add on this page returns.
+  const [server, setServer] = useState<{ count: number; totals: LineTotal[] } | null>(null);
+  const initialIds = useMemo(() => new Set(initialProductIds), [initialProductIds]);
 
   useEffect(() => {
     if (!error) return;
@@ -77,26 +74,41 @@ export function ShortlistProvider({
     return () => clearTimeout(id);
   }, [error]);
 
-  const isPending = useCallback(
-    (productId: string) => inFlight.some((i) => i.productId === productId),
-    [inFlight],
-  );
   const isOnPlan = useCallback(
-    (productId: string) => onPlanIds.has(productId) || isPending(productId),
-    [onPlanIds, isPending],
+    (productId: string) => initialIds.has(productId) || addedIds.has(productId),
+    [initialIds, addedIds],
   );
+  const isPending = useCallback((productId: string) => pendingIds.has(productId), [pendingIds]);
 
   const add = useCallback(
     async (item: ShortlistItem, withContent: boolean) => {
-      setInFlight((f) => [...f, item]);
-      const result = await addProductToActiveList(item.productId, withContent, locale).catch(() => null);
-      setInFlight((f) => f.filter((i) => i.productId !== item.productId));
-      if (!result?.ok) {
-        setError(result?.reason === "no-client" ? t("errorNoClient") : t("errorGeneric"));
+      setPendingIds((p) => new Set(p).add(item.productId));
+      setAddedIds((s) => new Set(s).add(item.productId));
+      setAdded((a) => [...a, item]);
+
+      const result = await addProductToActiveList(item.productId, withContent, locale);
+
+      setPendingIds((p) => {
+        const next = new Set(p);
+        next.delete(item.productId);
+        return next;
+      });
+
+      if (!result.ok) {
+        setAddedIds((s) => {
+          const next = new Set(s);
+          next.delete(item.productId);
+          return next;
+        });
+        setAdded((a) => a.filter((i) => i.productId !== item.productId));
+        setError(result.reason === "no-client" ? t("errorNoClient") : t("errorGeneric"));
         return false;
       }
-      setPlan(result.plan);
-      setRecent((r) => [...r, item.titleName]);
+      // Concurrent adds resolve in any order; the one with the most lines is
+      // the latest state of the plan (adds only ever grow it).
+      setServer((prev) =>
+        prev && prev.count > result.count ? prev : { count: result.count, totals: result.totals },
+      );
       return true;
     },
     [locale, t],
@@ -104,9 +116,10 @@ export function ShortlistProvider({
 
   const value = useMemo<Ctx>(() => ({ isOnPlan, isPending, add }), [isOnPlan, isPending, add]);
 
-  // An in-flight add of a product already on the plan (a re-add bumps the
-  // quantity) isn't a new line.
-  const count = plan.count + inFlight.filter((i) => !onPlanIds.has(i.productId)).length;
+  // Optimistic count for adds still in flight; the total only ever shows a
+  // server-priced figure (the last one known while an add is pending).
+  const count = server ? server.count + pendingIds.size : initialCount + added.length;
+  const totals = server?.totals ?? initialTotals;
 
   return (
     <ShortlistCtx.Provider value={value}>
@@ -116,9 +129,8 @@ export function ShortlistProvider({
           locale={locale}
           planName={planName}
           count={count}
-          totals={plan.totals}
-          pricing={inFlight.length > 0}
-          recentTitles={[...recent, ...inFlight.map((i) => i.titleName)]}
+          totals={totals}
+          recentTitles={added.map((a) => a.titleName)}
         />
       ) : null}
       {error ? (
@@ -138,15 +150,12 @@ function ShortlistBar({
   planName,
   count,
   totals,
-  pricing,
   recentTitles,
 }: {
   locale: string;
   planName: string;
   count: number;
   totals: LineTotal[];
-  // An add is still on its way: the total shown is the one before it.
-  pricing: boolean;
   recentTitles: string[];
 }) {
   const t = useTranslations("catalog.shortlist");
@@ -175,7 +184,7 @@ function ShortlistBar({
       <div className="shortlist-bar__right">
         <div className="shortlist-bar__total">
           <span className="shortlist-bar__total-label">{t("totalLabel")}</span>
-          <span className="shortlist-bar__total-amount" aria-busy={pricing}>
+          <span className="shortlist-bar__total-amount">
             {totals.length
               ? totals.length > 1
                 ? totals

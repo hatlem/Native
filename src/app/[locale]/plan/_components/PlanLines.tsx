@@ -27,9 +27,8 @@ export type PlanLine = {
   quantity: number;
   priceVisible: boolean;
   withContent: boolean;
-  // What the order charges for this line: placementTotal (all runs) plus, for
-  // "We write it", contentFee (ONE article per line, whatever the quantity,
-  // as the order prices it). lineTotal = placementTotal + contentFee.
+  // lib/plan-total.ts linePrice(): lineTotal = placementTotal + contentFee —
+  // the figure the summary total adds up. All 0 when the price isn't shown.
   placementTotal: number;
   contentFee: number;
   lineTotal: number;
@@ -82,10 +81,10 @@ function periodLabel(
 }
 
 // The transparency the single total figure lacks: what the line total is
-// actually made of. The content fee comes from the page (contentFeeFor, the
-// desk-owned rule the order prices with), so the parts always add up to the
-// line total shown beside them. It is charged once per line: one article,
-// used for every run of the placement.
+// actually made of. The parts come from lib/plan-total.ts linePrice() (the
+// rule the order prices with), so they always add up to the line total shown
+// beside them; the breakdown explains the figure, never adds to it. The
+// content fee is charged once per line: one article, used for every run.
 function breakdown(l: PlanLine, locale: string, t: Awaited<ReturnType<typeof getTranslations>>): string {
   if (!l.priceVisible) return t("breakdownUnpriced");
   const money = (n: number) => formatMoney(n, l.product.currency, locale);

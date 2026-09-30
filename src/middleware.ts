@@ -45,7 +45,10 @@ export function buildCsp(nonce: string): string {
     // Tailwind + React inline `style=` attributes are pervasive; a
     // hash/nonce policy isn't feasible without a wholesale refactor.
     `style-src 'self' 'unsafe-inline'`,
-    `img-src 'self' data: https:`,
+    // blob: — the /preview tool shows a visitor's own hero photo straight
+    // from the file input via URL.createObjectURL (never uploaded). Only
+    // same-origin script can mint a blob: URL, so this admits no third party.
+    `img-src 'self' data: blob: https:`,
     `font-src 'self' data:`,
     // Article/rate-card uploads go straight from the browser to R2 with
     // a presigned PUT (fetch), so the bucket host must be connectable.

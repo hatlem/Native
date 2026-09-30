@@ -14,7 +14,7 @@ import { loadVerticalOptions, localizedVerticalOptions } from "@/lib/catalog-tax
 import { localizeVertical } from "@/lib/taxonomy-i18n";
 import { safeLocale } from "@/i18n/routing";
 import { readActiveListId, resolveActiveList } from "@/lib/lists";
-import { planBarSummary } from "@/lib/plan-total";
+import { barTotals, planLineCount } from "@/lib/plan-total";
 import { loadPricingDefaults } from "@/lib/content-fee";
 import { titleDisplayName } from "@/lib/title-display";
 import { CatalogRail } from "./_components/CatalogRail";
@@ -420,11 +420,17 @@ export default async function CatalogPage({
     dismissedAt,
   });
 
-  // Sticky shortlist bar's starting state: the active plan's lines and total,
-  // priced exactly as /plan prices them, so the bar (and each row's "on plan"
-  // state) reflects what's really on the plan before any click.
+  // Sticky shortlist bar's starting state: the active list's current
+  // product ids + total, so the bar (and each row's "on plan" state)
+  // reflects what's really on the plan before any optimistic click.
   // (activeList itself was already resolved above, ahead of the relevance query.)
-  const planBar = planBarSummary(activeList?.items ?? [], await loadPricingDefaults());
+  const shortlistProductIds = (activeList?.items ?? [])
+    .map((i) => i.productId)
+    .filter((id): id is string => id !== null);
+  // Every line the plan shows (placeholders included), priced server-side —
+  // the same count and totals the "Add to plan" action returns.
+  const shortlistCount = planLineCount(activeList?.items ?? []);
+  const shortlistTotals = activeList ? barTotals(activeList.items, await loadPricingDefaults()) : [];
   const planName = activeList?.name ?? t("shortlist.untitledPlan");
 
   // "42 more titles without published pricing" — only meaningful once
@@ -626,7 +632,9 @@ export default async function CatalogPage({
     <ShortlistProvider
       locale={locale}
       planName={planName}
-      initialPlan={planBar}
+      initialCount={shortlistCount}
+      initialProductIds={shortlistProductIds}
+      initialTotals={shortlistTotals}
     >
       <section className="catalog-page">
         {showBookingBanner ? <CatalogBookCallBanner /> : null}
@@ -661,7 +669,7 @@ export default async function CatalogPage({
         <div className="catalog-layout">
           <CatalogRail
             markets={MARKET_CODES.map((m) => ({ value: m, label: tMarket(m) }))}
-          formats={formatOptions}
+            formats={formatOptions}
             nativeFits={NATIVE_FIT_VALUES.map((v) => ({ value: v, label: tFit(v) }))}
             b2bB2cs={B2B_B2C_VALUES.map((v) => ({ value: v, label: v }))}
             reaches={REACH_VALUES.map((v) => ({ value: v, label: tReach(v) }))}
@@ -716,6 +724,19 @@ export default async function CatalogPage({
               <div className="catalog-results-controls">
                 <CatalogSort initial={sort ?? ""} />
                 <CatalogDensityToggle initial={density} />
+                {/* The CSV export (bands only, like the page) had no way in
+                    from the UI. It filters by one market at most, so the
+                    link carries the market only when exactly one is picked.
+                    Plain <a download>: it's a file, not a page. */}
+                <a
+                  className="small-link"
+                  href={`/api/export/catalog.csv${markets.length === 1 ? `?market=${markets[0]}` : ""}`}
+                  download
+                >
+                  {markets.length === 1
+                    ? t("exportCsvMarket", { market: tMarket(markets[0]) })
+                    : t("exportCsv")}
+                </a>
               </div>
             </div>
 

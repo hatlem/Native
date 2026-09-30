@@ -9,11 +9,7 @@ import { recordAudit } from "@/lib/audit";
 import { notifyDesk, notifyOrg, notifyPublisher } from "@/lib/notify";
 import { marketDefaultLocale } from "@/lib/market-locale";
 import { uniquePublisherIdsForProducts } from "@/lib/commerce/publishers";
-import {
-  buildDeskQuoteAcceptedNotice,
-  buildOrderConfirmedNotice,
-  buildQuoteSentNotice,
-} from "@/lib/commerce/quote-notices";
+import { buildDeskQuoteAcceptedNotice } from "@/lib/commerce/quote-notices";
 
 export type SendDraftQuotesResult =
   // The drafts are SENT and the buyer org was notified.
@@ -95,25 +91,26 @@ export async function sendDraftQuotes(input: {
     });
   }
 
-  // Written for the buyer org, so language and link locale come from its
-  // home market — not from the desk associate's UI locale.
+  // Written for the buyer org: the email in its home market's language (not
+  // the desk associate's UI locale); the inbox row re-renders in each
+  // reader's own language (lib/notice-template.ts).
   const marketCode = request.organization.marketCode;
-  const buyerLocale = marketCode ? marketDefaultLocale(marketCode) : "en";
-  const notice = buildQuoteSentNotice({
-    locale: buyerLocale,
-    planName: request.plan.name,
-    quotes: drafts.map((q) => ({ total: Number(q.total), currency: q.currency })),
-    onRequestCount: drafts.reduce(
-      (n, q) => n + q.lines.filter((l) => l.priceOnRequest).length,
-      0,
-    ),
-    validUntil,
-  });
   await notifyOrg(request.organizationId, {
     kind: "QUOTE_READY",
-    title: notice.title,
-    body: notice.body,
-    link: `/${buyerLocale}/requests/${request.id}`,
+    locale: marketCode ? marketDefaultLocale(marketCode) : "en",
+    template: {
+      key: "quoteSent",
+      params: {
+        planName: request.plan.name,
+        quotes: drafts.map((q) => ({ total: Number(q.total), currency: q.currency })),
+        onRequestCount: drafts.reduce(
+          (n, q) => n + q.lines.filter((l) => l.priceOnRequest).length,
+          0,
+        ),
+        validUntil: validUntil.toISOString(),
+        requestId: request.id,
+      },
+    },
   });
 
   return { outcome: "sent", quoteIds: drafts.map((q) => q.id) };
@@ -137,18 +134,19 @@ export async function notifyQuoteAccepted(args: {
   actorLocale: string;
 }): Promise<void> {
   const { orders } = args;
-  const buyerLocale = args.marketCode ? marketDefaultLocale(args.marketCode) : "en";
-  const confirmed = buildOrderConfirmedNotice({ locale: buyerLocale, planName: args.planName });
   await notifyOrg(args.organizationId, {
     kind: "QUOTE_ACCEPTED",
-    title: confirmed.title,
-    body: confirmed.body,
-    // One order: straight to it. Several (one per market): the request page
-    // lists them all with a link to each.
-    link:
-      orders.length === 1
-        ? `/${buyerLocale}/orders/${orders[0].orderId}`
-        : `/${buyerLocale}/requests/${args.requestId}`,
+    locale: args.marketCode ? marketDefaultLocale(args.marketCode) : "en",
+    template: {
+      key: "orderConfirmed",
+      params: {
+        planName: args.planName,
+        requestId: args.requestId,
+        // One order: straight to it. Several (one per market): the request
+        // page lists them all with a link to each.
+        orderId: orders.length === 1 ? orders[0].orderId : null,
+      },
+    },
   });
 
   const desk = buildDeskQuoteAcceptedNotice({

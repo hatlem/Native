@@ -119,9 +119,16 @@ export async function LinesSection({
                   >
                     <option value="">{tw("unassigned")}</option>
                     {order.writerPool.map((pool) => (
-                      <option key={pool.writerId} value={pool.writerId}>
-                        {pool.writer.user.name ?? pool.writer.user.email}
-                      </option>
+                      // `label`, not a text child: React SSR flattens <option>
+                      // children into one text node, which Cloudflare's email
+                      // obfuscation rewrites (breaking hydration). Attributes
+                      // are left alone — see safe-email.tsx.
+                      <option
+                        key={pool.writerId}
+                        value={pool.writerId}
+                        label={pool.writer.user.name ?? pool.writer.user.email}
+                      />
+
                     ))}
                   </select>
                   <SubmitButton

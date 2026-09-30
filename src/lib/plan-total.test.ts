@@ -1,6 +1,14 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { estimateListTotals, placementLineTotal, contentFeeFor, planBarSummary, type PlanPricing } from "./plan-total";
+import {
+  barTotals,
+  contentFeeFor,
+  estimateListTotals,
+  linePrice,
+  placementLineTotal,
+  planLineCount,
+  type PlanPricing,
+} from "./plan-total";
 import {
   computeContentFeeLines,
   computeQuoteLines,
@@ -214,27 +222,67 @@ test("placementLineTotal and contentFeeFor expose the per-line figures", () => {
   assert.equal(contentFeeFor("NATIVE_DISPLAY", "SE", NO_FEES), 0);
 });
 
-// ── The catalog's plan bar ──────────────────────────────────────────────────
-
-test("planBarSummary: the customer price (never the net base price), fees in, alternatives out", () => {
-  const withTitle = (i: FakeItem, titleId: string | null = null) => ({ ...i, titleId });
-  const items = [
-    withTitle(fakeItem({ productId: "p1", basePrice: 1000 })),
-    withTitle(fakeItem({ productId: "p2", basePrice: 10000, withContent: true, type: "NATIVE_DISPLAY" })),
-    withTitle({ ...fakeItem({ productId: "p3", basePrice: 5000 }), isAlternative: true } as FakeItem),
-    withTitle(fakeItem({ productId: null }), "title-1"),
-  ];
-  const summary = planBarSummary(items, { feeRules: NO_FEES, marginRules: [] });
-  assert.deepEqual(summary.productIds, ["p1", "p2"]);
-  // Two placements + one not-yet-placed title; the alternative isn't on the plan.
-  assert.equal(summary.count, 3);
-  // 1 150 + 11 500 + 8 000 article: what /plan shows. The net 1 000 would be
-  // a margin leak on a browse surface.
-  assert.deepEqual(summary.totals, [{ currency: "NOK", amount: 20650, itemCount: 2 }]);
+// BUG-prod-api-10: "We write it" showed "17 250 placement + 2 000 article"
+// under a line figure of 17 250. The line figure is placement + fee, and the
+// plan total is exactly the sum of the line figures.
+test("linePrice: a We-write-it line's total includes its content fee", () => {
+  const pricing: PlanPricing = { feeRules: NO_FEES, marginRules: [] };
+  assert.deepEqual(linePrice(fakeItem({ basePrice: 15000, withContent: true }), pricing), {
+    placement: 17250,
+    contentFee: 12000,
+    total: 29250,
+  });
+  assert.deepEqual(linePrice(fakeItem({ basePrice: 15000 }), pricing), {
+    placement: 17250,
+    contentFee: 0,
+    total: 17250,
+  });
 });
 
-test("planBarSummary: hidden-price lines add no figure", () => {
-  const summary = planBarSummary([{ ...fakeItem({ pricesPublic: false }), titleId: null }], NO_PRICING);
-  assert.equal(summary.count, 1);
-  assert.deepEqual(summary.totals, []);
+test("linePrice: one content fee per line whatever the quantity", () => {
+  const pricing: PlanPricing = { feeRules: NO_FEES, marginRules: [] };
+  assert.deepEqual(linePrice(fakeItem({ basePrice: 1000, quantity: 3, withContent: true }), pricing), {
+    placement: 3450,
+    contentFee: 12000,
+    total: 15450,
+  });
+});
+
+test("linePrice: null for hidden prices and placeholders, never a 0 figure", () => {
+  const pricing: PlanPricing = { feeRules: NO_FEES, marginRules: [] };
+  assert.equal(linePrice(fakeItem({ confirmedAt: null, withContent: true }), pricing), null);
+  assert.equal(linePrice(fakeItem({ productId: null }), pricing), null);
+});
+
+// BUG-prod-api-7: the catalog bar said "3 titles" for a 6-line plan.
+test("planLineCount counts placeholders, never alternatives", () => {
+  const items = [
+    fakeItem({}),
+    fakeItem({ productId: null }),
+    { ...fakeItem({}), isAlternative: true },
+  ];
+  assert.equal(planLineCount(items), 2);
+});
+
+test("barTotals: server-priced totals, nothing for a currency with no priced line", () => {
+  const pricing: PlanPricing = { feeRules: NO_FEES, marginRules: [] };
+  const items = [
+    fakeItem({ basePrice: 15000, withContent: true }),
+    fakeItem({ currency: "SEK", confirmedAt: null }),
+  ];
+  assert.deepEqual(barTotals(items, pricing), [{ currency: "NOK", amount: 29250, itemCount: 1 }]);
+});
+
+test("estimateListTotals is exactly the sum of the linePrice totals", () => {
+  const pricing: PlanPricing = { feeRules: NO_FEES, marginRules: [] };
+  const items = [
+    fakeItem({ basePrice: 15000, withContent: true }),
+    fakeItem({ basePrice: 9000, quantity: 2, type: "NATIVE_DISPLAY", withContent: true }),
+    fakeItem({ basePrice: 4000 }),
+    fakeItem({ confirmedAt: null, withContent: true }),
+  ];
+  const lineSum = items.reduce((sum, i) => sum + (linePrice(i, pricing)?.total ?? 0), 0);
+  const [total] = estimateListTotals(items, pricing);
+  assert.equal(total.amount, lineSum);
+  assert.equal(total.contentFees, 12000 + 8000);
 });

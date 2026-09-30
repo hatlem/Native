@@ -8,7 +8,7 @@ import { prisma } from "@/lib/prisma";
 import { recordAudit } from "@/lib/audit";
 import { loadScope } from "@/lib/scope";
 import { requireOrgArticleAccess } from "@/lib/writers/guard";
-import { alignActivePlan, resolvePlanTarget } from "@/lib/plan-target";
+import { alignActivePlan, refusalNotice, resolvePlanTarget } from "@/lib/plan-target";
 import { planPath } from "@/lib/plan-path";
 import {
   createProgramme,
@@ -33,7 +33,7 @@ async function ownList(locale: string, listId: string) {
   const scope = await loadScope();
   if (!scope.userId) redirect(`/${locale}/signin`);
   const target = await resolvePlanTarget(scope.workspace, listId);
-  if (!scope.workspace || !target.ok) redirect(planPath(locale, null, { error: "plan-unavailable" }));
+  if (!scope.workspace || !target.ok) redirect(planPath(locale, null, refusalNotice(target)));
   await alignActivePlan(scope.workspace, target.list);
   return { scope, list: target.list };
 }

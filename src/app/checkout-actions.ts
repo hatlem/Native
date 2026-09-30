@@ -6,7 +6,7 @@ import { prisma } from "@/lib/prisma";
 import { requireOnboardingBeforeBuy } from "@/lib/onboarding-gate";
 import { getWorkspace } from "@/lib/workspace";
 import { readActiveListId, ensureActiveListId, loadListWithItems, committedItems } from "@/lib/lists";
-import { alignActivePlan, resolvePlanTarget } from "@/lib/plan-target";
+import { alignActivePlan, refusalNotice, resolvePlanTarget } from "@/lib/plan-target";
 import { planPath } from "@/lib/plan-path";
 import { saveListBrief } from "@/lib/plan-brief";
 import { isProductPriceShown } from "@/lib/pricing-visibility";
@@ -68,7 +68,7 @@ export async function submitRequest(formData: FormData) {
     const target = await resolvePlanTarget(ws, postedListId);
     if (!target.ok) {
       console.warn("checkout.blocked", { reason: `list-${target.reason}`, userId: ws.userId, listId: postedListId });
-      redirect(planPath(locale, null, { error: "plan-unavailable" }));
+      redirect(planPath(locale, null, refusalNotice(target)));
     }
     listId = target.list.id;
     orgId = target.list.organizationId;
@@ -119,7 +119,7 @@ export async function submitRequest(formData: FormData) {
   // hold product lines (productId set) and Title placeholders (titleId set,
   // productId null). The list is NOT consumed on submit.
   const list = await loadListWithItems(listId);
-  if (!list) redirect(back("plan-unavailable"));
+  if (!list) redirect(planPath(locale, null, { notice: "plan-unavailable" }));
   // Recommended alternatives are never part of a submit or an order.
   const planItems = committedItems(list.items);
   if (planItems.length === 0) redirect(back("empty"));

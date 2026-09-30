@@ -372,10 +372,12 @@ export default async function DeskTitleEditPage({
         </p>
         {pendingInvite ? (
           <p className="muted small">
-            {t("invitePending", {
-              email: pendingInvite.email,
-              expires: pendingInvite.expiresAt.toISOString().slice(0, 10),
-            })}
+            {withSafeEmails(
+              t("invitePending", {
+                email: pendingInvite.email,
+                expires: pendingInvite.expiresAt.toISOString().slice(0, 10),
+              }),
+            )}
           </p>
         ) : null}
         <form action={sendPublisherInvite} className="product-form">

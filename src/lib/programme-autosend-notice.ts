@@ -50,8 +50,12 @@ export function buildAutoSendNotice(input: {
   waveNumber: number;
   plannedWaves: number;
   requestId: string;
+  // Render in this locale instead of the market default — /notifications
+  // re-renders the stored notice in the viewer's language.
+  locale?: BuyerLocale;
 }): { title: string; body: string; link: string; locale: BuyerLocale } {
-  const locale = input.marketCode ? marketDefaultLocale(input.marketCode) : "en";
+  const locale =
+    input.locale ?? (input.marketCode ? marketDefaultLocale(input.marketCode) : "en");
   const s = STRINGS[locale];
   return {
     title: s.title(input.waveNumber, input.plannedWaves),

@@ -6,10 +6,14 @@ export async function PlanBanners({
   locale,
   error,
   duplicate,
+  notice,
 }: {
   locale: string;
   error: string | string[] | undefined;
   duplicate: string | string[] | undefined;
+  // Set by /plan/open when the requested plan couldn't be opened and the
+  // viewer was sent to their current plan instead.
+  notice?: string | string[] | undefined;
 }) {
   const t = await getTranslations({ locale, namespace: "plan" });
 
@@ -19,7 +23,6 @@ export async function PlanBanners({
   const ERROR_KEYS: Record<string, string> = {
     "1": "error",
     empty: "errorEmpty",
-    "plan-unavailable": "errorPlanUnavailable",
     client: "errorClient",
     rate: "errorRate",
     forbidden: "errorForbidden",
@@ -31,8 +34,21 @@ export async function PlanBanners({
   const errorCode = Array.isArray(error) ? error[0] : error;
   const errorKey = errorCode ? (ERROR_KEYS[errorCode] ?? "error") : null;
 
+  const noticeCode = Array.isArray(notice) ? notice[0] : notice;
+  const noticeKey =
+    noticeCode === "plan-archived"
+      ? "noticePlanArchived"
+      : noticeCode === "plan-unavailable"
+        ? "noticePlanUnavailable"
+        : null;
+
   return (
     <>
+      {noticeKey ? (
+        <div className="banner-info" role="status">
+          <span>{t(noticeKey)}</span>
+        </div>
+      ) : null}
       {errorKey ? (
         <div className="banner-error" role="alert">
           <span>{t(errorKey)}</span>

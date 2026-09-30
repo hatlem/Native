@@ -1,8 +1,9 @@
-// Buyer-org notification copy for "your client approved the shared plan",
-// localized by the org's market (the programme-autosend-notice.ts convention:
-// notification copy lives next to its sender, and the recipient's locale comes
-// from the org market, since notifications have no per-user locale yet). The
-// approving client's own share-page language says nothing about the buyer's.
+// Buyer-org notification copy for "your client approved the shared plan".
+// Sent as a notice template (notice-template.ts `clientApproved`): the email
+// goes out in the org's market language, and /notifications re-renders it in
+// the reader's language. Same convention as programme-autosend-notice.ts: the
+// copy lives next to its sender. The approving client's own share-page
+// language says nothing about the buyer's, so it never picks the locale.
 
 import { marketDefaultLocale, type BuyerLocale } from "@/lib/market-locale";
 import { planPath } from "@/lib/plan-path";
@@ -40,8 +41,11 @@ export function buildClientApprovalNotice(input: {
   marketCode: string | null;
   planName: string;
   listId: string;
+  // Render in this locale instead of the market default (the inbox
+  // re-renders the stored notice in the viewer's language).
+  locale?: BuyerLocale;
 }): { title: string; body: string; link: string; locale: BuyerLocale } {
-  const locale = input.marketCode ? marketDefaultLocale(input.marketCode) : "en";
+  const locale = input.locale ?? (input.marketCode ? marketDefaultLocale(input.marketCode) : "en");
   const s = STRINGS[locale];
   return {
     title: s.title(input.planName),

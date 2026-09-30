@@ -112,7 +112,8 @@ export const SHARED_LIST_SELECT = {
           currency: true,
           active: true,
           confirmedAt: true,
-          priceRules: true,
+          // Only the rate-card fields the price engine reads (lib/plan-total.ts).
+          priceRules: { select: { marginPct: true, seasonalMultiplier: true, minVolume: true } },
           title: {
             select: {
               name: true,
@@ -120,8 +121,8 @@ export const SHARED_LIST_SELECT = {
               aliases: true,
               pricesPublic: true,
               publisher: { select: { name: true, pricesPublic: true } },
-              // Placement market: default margin, content-fee rule and VAT
-              // (the same pricing inputs /plan totals with).
+              // The market drives the default margin, the content-fee rule
+              // and VAT — the same inputs /plan prices with.
               market: { select: { code: true, vatRatePct: true } },
             },
           },

@@ -9,7 +9,9 @@
 // users. That keeps the call sites readable and lets us add desk
 // rotation, on-call schedules, etc. in one place.
 
-import { NotificationKind } from "@prisma/client";
+import { NotificationKind, Prisma } from "@prisma/client";
+import type { BuyerLocale } from "@/lib/market-locale";
+import { renderNotice, type NoticeTemplate } from "@/lib/notice-template";
 import { prisma } from "@/lib/prisma";
 import { appUrl, appName } from "@/lib/url";
 import { layout } from "@/lib/mail/templates/layout";
@@ -44,12 +46,35 @@ export function setEmailAdapter(next: EmailAdapter) {
   emailAdapter = next;
 }
 
-export type NotifyInput = {
+// Either finished strings, or a template (lib/notice-template.ts) plus the
+// locale its email goes out in. A templated notice is also stored as
+// key + params, so /notifications re-renders it in the viewer's language.
+export type NotifyInput =
+  | {
+      kind: NotificationKind;
+      title: string;
+      body?: string;
+      link?: string;
+    }
+  | {
+      kind: NotificationKind;
+      template: NoticeTemplate;
+      locale: BuyerLocale;
+    };
+
+type ResolvedNotice = {
   kind: NotificationKind;
   title: string;
   body?: string;
   link?: string;
+  template?: NoticeTemplate;
 };
+
+function resolve(n: NotifyInput): ResolvedNotice {
+  if (!("template" in n)) return n;
+  const rendered = renderNotice(n.template, n.locale);
+  return { kind: n.kind, ...rendered, template: n.template };
+}
 
 // In-app notifications keep the relative link (read by the app's own
 // <Link>), but a relative path in an email is just inert text — Gmail
@@ -60,7 +85,7 @@ function absoluteLink(link: string | undefined): string | undefined {
   return /^https?:\/\//.test(link) ? link : `${appUrl().replace(/\/$/, "")}${link}`;
 }
 
-async function writeOne(userId: string, n: NotifyInput, email?: string | null) {
+async function writeOne(userId: string, n: ResolvedNotice, email?: string | null) {
   await prisma.notification.create({
     data: {
       userId,
@@ -68,6 +93,8 @@ async function writeOne(userId: string, n: NotifyInput, email?: string | null) {
       title: n.title,
       body: n.body ?? null,
       link: n.link ?? null,
+      messageKey: n.template?.key ?? null,
+      messageParams: n.template ? (n.template.params as Prisma.InputJsonValue) : Prisma.DbNull,
     },
   });
   if (email) {
@@ -93,7 +120,8 @@ async function writeOne(userId: string, n: NotifyInput, email?: string | null) {
 }
 
 // Send to every desk/superadmin user.
-export async function notifyDesk(n: NotifyInput) {
+export async function notifyDesk(input: NotifyInput) {
+  const n = resolve(input);
   const users = await prisma.user.findMany({
     where: { role: { in: ["DESK", "SUPERADMIN"] } },
     select: { id: true, email: true },
@@ -102,7 +130,8 @@ export async function notifyDesk(n: NotifyInput) {
 }
 
 // Send to every user belonging to an org.
-export async function notifyOrg(organizationId: string, n: NotifyInput) {
+export async function notifyOrg(organizationId: string, input: NotifyInput) {
+  const n = resolve(input);
   const users = await prisma.user.findMany({
     where: { organizationId },
     select: { id: true, email: true },
@@ -111,7 +140,8 @@ export async function notifyOrg(organizationId: string, n: NotifyInput) {
 }
 
 // Send to every user belonging to a publisher (portal users).
-export async function notifyPublisher(publisherId: string, n: NotifyInput) {
+export async function notifyPublisher(publisherId: string, input: NotifyInput) {
+  const n = resolve(input);
   const users = await prisma.user.findMany({
     where: { publisherId },
     select: { id: true, email: true },

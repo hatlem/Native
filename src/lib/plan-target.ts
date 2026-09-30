@@ -44,6 +44,17 @@ export async function resolvePlanTarget(
 }
 
 /**
+ * The /plan notice explaining why the viewer landed on another plan than the
+ * one they asked for (PlanBanners: ?notice=). Archived gets its own wording;
+ * unknown and out-of-scope share one, so the notice can't probe other orgs
+ * (resolvePlanTarget only reports "archived" for a plan in the viewer's scope).
+ */
+export function refusalNotice(target: PlanTarget): { notice: "plan-archived" | "plan-unavailable" } | undefined {
+  if (target.ok) return undefined;
+  return { notice: target.reason === "archived" ? "plan-archived" : "plan-unavailable" };
+}
+
+/**
  * Make `list` the active plan (the cookie the catalog's add actions read). A
  * plan in another org the viewer can act on (agency client, second membership)
  * switches the active org too, exactly as opening it through /plan/open would.

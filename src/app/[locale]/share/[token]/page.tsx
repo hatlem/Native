@@ -5,10 +5,9 @@ import { notFound } from "next/navigation";
 import { approvalState, loadSharedList, planVersion, recordShareView } from "@/lib/list-share";
 import { approveSharedPlan } from "@/app/share-actions";
 import { formatMoney, intlLocale } from "@/lib/money";
-import { isProductPriceShown } from "@/lib/pricing-visibility";
 import { titleDisplayName } from "@/lib/title-display";
 import { loadPricingDefaults } from "@/lib/content-fee";
-import { contentFeeFor, estimateListTotals, placementLineTotal } from "@/lib/plan-total";
+import { estimateListTotals, linePrice } from "@/lib/plan-total";
 
 export const dynamic = "force-dynamic";
 
@@ -71,11 +70,8 @@ export default async function SharedListPage({
   const row = (i: (typeof list.items)[number], inTotal: boolean): ReactNode => {
     if (i.productId && i.product) {
       const p = i.product;
-      const priceVisible = isProductPriceShown(p, p.title);
-      const lineTotal = priceVisible
-        ? placementLineTotal(p, i.quantity, pricing.marginRules) +
-          (i.withContent ? contentFeeFor(p.type, p.title.market.code, pricing.feeRules) : 0)
-        : 0;
+      // Null when the price isn't shown: "on request", never a 0.
+      const price = linePrice(i, pricing);
       return (
         <div className="share-list__line" key={i.id}>
           <div className="share-list__line-main">
@@ -96,7 +92,7 @@ export default async function SharedListPage({
             ) : null}
           </div>
           <div className="share-list__line-price">
-            {priceVisible ? money(lineTotal, p.currency) : tv("requestPrice")}
+            {price ? money(price.total, p.currency) : tv("requestPrice")}
           </div>
         </div>
       );

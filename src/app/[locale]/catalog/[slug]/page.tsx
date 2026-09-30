@@ -23,6 +23,7 @@ import { saveTitleToList } from "@/app/list-actions";
 import { SubmitButton } from "@/components";
 import { localizeCategory, localizeTaxonomy, localizeVertical } from "@/lib/taxonomy-i18n";
 import type { AppLocale } from "@/i18n/routing";
+import { ESTIMATED_LEAD_TIME_DAYS } from "@/lib/lead-time";
 
 export const dynamic = "force-dynamic";
 
@@ -143,6 +144,8 @@ export default async function TitleDetailPage({
   const anyPriceVisible = title.products.some((p) =>
     isProductPriceShown(p, title),
   );
+  // Any format the buyer can add straight to the plan (priced or desk-quoted).
+  const hasBookable = title.products.some((p) => p.bookable);
   const ldBand = titleBand(title.products, title, pricing);
   const ld = {
     "@context": "https://schema.org",
@@ -192,7 +195,7 @@ export default async function TitleDetailPage({
           rows with data render. */}
       <div className="detail-head">
         <div>
-          <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+          <div className="detail-head__title">
             <h1 style={{ margin: 0 }}>{title.name}</h1>
             <FavoriteButton
               locale={locale}
@@ -246,15 +249,18 @@ export default async function TitleDetailPage({
               ))}
             </div>
           ) : null}
-          {/* Save the whole publication as a desk-resolved placeholder line —
-              the buyer picks the format later, or the desk proposes one. */}
-          <form action={saveTitleToList} style={{ marginTop: 12 }}>
-            <input type="hidden" name="locale" value={locale} />
-            <input type="hidden" name="titleId" value={title.id} />
-            <button type="submit" className="btn ghost small">
-              {tCat("savePublication")}
-            </button>
-          </form>
+          {/* Save the whole publication as a desk-resolved placeholder line
+              — only when there is no bookable format to add instead. Next
+              to real per-format "Add to plan" buttons it was a first,
+              unstyled CTA that put an UNPRICED placeholder on the plan for
+              a title that already had a price. */}
+          {hasBookable ? null : (
+            <form action={saveTitleToList} style={{ marginTop: 12 }}>
+              <input type="hidden" name="locale" value={locale} />
+              <input type="hidden" name="titleId" value={title.id} />
+              <SubmitButton label={tCat("savePublication")} pendingLabel={t("addingToPlan")} />
+            </form>
+          )}
         </div>
 
         <aside className="card key-facts" aria-label={t("keyFacts")}>
@@ -467,7 +473,7 @@ export default async function TitleDetailPage({
               <div className="muted" style={{ marginTop: 6 }}>
                 {p.leadTimeDays != null
                   ? `${t("leadTime")}: ${p.leadTimeDays} ${t("days")}`
-                  : `${t("leadTime")}: ${t("leadTimeEstimated", { days: 10 })}`}
+                  : `${t("leadTime")}: ${t("leadTimeEstimated", { days: ESTIMATED_LEAD_TIME_DAYS })}`}
               </div>
               {p.spec ? (
                 <div className="muted" style={{ marginTop: 10 }}>

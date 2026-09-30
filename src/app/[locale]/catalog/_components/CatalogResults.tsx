@@ -214,6 +214,10 @@ function CatalogListRow({
     <div className="catalog-row">
       <div className="catalog-row__main">
         <div className="catalog-row__title-line">
+          {/* Compare mode works in the (default) list view too — the
+              selector used to render only on cards, so ticking
+              "Compare" in list view did nothing visible. */}
+          <TitleSelector id={title.id} name={titleDisplayName(title)} />
           <Link className="catalog-row__title" href={`/catalog/${title.slug}`}>
             {titleDisplayName(title)}
           </Link>
@@ -345,7 +349,7 @@ function CatalogCard({
   const { title, visibleProducts, anyHidden, fromBand, fromRate, needsQuote, reach } = row;
   return (
     <article className="card catalog-card">
-      <TitleSelector id={title.id} />
+      <TitleSelector id={title.id} name={titleDisplayName(title)} />
       <FavoriteButton
         locale={locale}
         titleId={title.id}
