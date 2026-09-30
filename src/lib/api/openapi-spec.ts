@@ -5,16 +5,18 @@
 // evaluation flagged: even an auto-generated spec lets engineering
 // scope an integration ahead of the partnership contract).
 //
-// Lives at /api/openapi.json AND mirrored from /.well-known/openapi.json
-// via a rewrite in next.config so generic API discovery tools find it.
+// Served at /api/openapi.json (src/app/api/openapi.json/route.ts) AND
+// mirrored from /.well-known/openapi.json via a rewrite in next.config so
+// generic API discovery tools find it.
+//
+// Lives in lib (not the route file) so tests can import it: the spec is
+// pinned to the live handlers by openapi-conformance.ts —
+// contract.it.test.ts validates real responses against these schemas,
+// including that every field a response carries is documented here.
 
-import { NextResponse } from "next/server";
-import { MarketCode, ProductType } from "@prisma/client";
+import { MarketCode, PricingModel, ProductType, QuoteStatus } from "@prisma/client";
 
-export const dynamic = "force-static";
-export const revalidate = 3600; // re-render hourly; spec is rarely-changing.
-
-const SPEC = {
+export const OPENAPI_SPEC = {
   openapi: "3.1.0",
   info: {
     title: "NativeSpin Catalog API",
@@ -73,12 +75,209 @@ const SPEC = {
           },
         },
       },
+      // The detail endpoint's title: the list shape plus the publisher's
+      // country, the market VAT rate and each product's content spec.
+      TitleDetail: {
+        type: "object",
+        required: ["id", "slug", "name", "publisher", "market", "products"],
+        properties: {
+          id: { type: "string" },
+          slug: { type: "string" },
+          name: { type: "string" },
+          category: { type: "string", nullable: true },
+          monthlyReach: { type: "integer", nullable: true },
+          lastVerifiedAt: { type: "string", format: "date-time", nullable: true },
+          publisher: {
+            type: "object",
+            properties: {
+              id: { type: "string" },
+              name: { type: "string" },
+              countryCode: { type: "string", description: "The publisher's country code, e.g. NO." },
+            },
+          },
+          market: {
+            type: "object",
+            properties: {
+              code: { type: "string", enum: Object.values(MarketCode) },
+              currency: { type: "string" },
+              disclosureLabel: { type: "string", nullable: true },
+              vatRatePct: { type: "number", description: "Standard VAT rate in the market, e.g. 25." },
+            },
+          },
+          pricesVisible: { type: "boolean" },
+          products: {
+            type: "array",
+            items: { $ref: "#/components/schemas/ProductDetail" },
+          },
+        },
+      },
+      ProductDetail: {
+        type: "object",
+        required: ["id", "type", "visibility"],
+        properties: {
+          id: { type: "string" },
+          type: { type: "string", enum: Object.values(ProductType) },
+          pricingModel: { type: "string", enum: Object.values(PricingModel) },
+          priceBand: { type: "string", nullable: true },
+          currency: { type: "string", nullable: true },
+          visibility: { type: "string", enum: ["INDICATIVE", "FIRM"] },
+          leadTimeDays: { type: "integer", nullable: true },
+          spec: {
+            type: "object",
+            nullable: true,
+            description: "Content requirements for the placement, when the publisher states them.",
+            properties: {
+              wordCountMin: { type: "integer", nullable: true },
+              wordCountMax: { type: "integer", nullable: true },
+              imagesMin: { type: "integer", nullable: true },
+              disclosureLabel: { type: "string", nullable: true },
+              fileFormats: { type: "string", nullable: true },
+              requirements: { type: "string", nullable: true },
+            },
+          },
+        },
+      },
+      TitlePage: {
+        type: "object",
+        required: ["data", "page"],
+        properties: {
+          data: { type: "array", items: { $ref: "#/components/schemas/Title" } },
+          page: {
+            type: "object",
+            required: ["limit", "hasMore", "nextCursor"],
+            properties: {
+              limit: { type: "integer", description: "The effective page size (after clamping)." },
+              hasMore: { type: "boolean" },
+              nextCursor: {
+                type: "string",
+                nullable: true,
+                description:
+                  "Pass back unchanged as `cursor` for the next page. Null on the last page — only then is a sync complete.",
+              },
+            },
+          },
+        },
+      },
+      TitleResponse: {
+        type: "object",
+        required: ["data"],
+        properties: { data: { $ref: "#/components/schemas/TitleDetail" } },
+      },
+      Quote: {
+        type: "object",
+        description:
+          "A quote the desk has sent (drafts are never visible). Money fields are decimal strings in `currency`, excluding VAT unless named `total`.",
+        required: ["id", "request_id", "status", "currency", "subtotal", "vat_pct", "total", "lines"],
+        properties: {
+          id: { type: "string" },
+          request_id: { type: "string" },
+          status: {
+            type: "string",
+            enum: Object.values(QuoteStatus).filter((s) => s !== "DRAFT"),
+          },
+          currency: { type: "string" },
+          subtotal: { type: "string" },
+          vat_pct: { type: "string" },
+          total: { type: "string" },
+          valid_until: { type: "string", format: "date-time", nullable: true },
+          notes: { type: "string", nullable: true },
+          lines: {
+            type: "array",
+            items: {
+              type: "object",
+              required: ["id", "quantity", "line_total"],
+              properties: {
+                id: { type: "string" },
+                product_id: {
+                  type: "string",
+                  nullable: true,
+                  description: "Null for non-inventory lines such as content production.",
+                },
+                description: { type: "string" },
+                quantity: { type: "integer" },
+                line_total: { type: "string" },
+              },
+            },
+          },
+          created_at: { type: "string", format: "date-time" },
+          updated_at: { type: "string", format: "date-time" },
+        },
+      },
+      IngestSummary: {
+        type: "object",
+        required: ["titles_created", "titles_updated", "products_created", "products_updated", "skipped", "results"],
+        properties: {
+          titles_created: { type: "integer" },
+          titles_updated: { type: "integer" },
+          products_created: { type: "integer" },
+          products_updated: { type: "integer" },
+          skipped: {
+            type: "array",
+            items: {
+              type: "object",
+              properties: { external_ref: { type: "string" }, reason: { type: "string" } },
+            },
+          },
+          results: {
+            type: "array",
+            items: {
+              type: "object",
+              properties: {
+                external_ref: { type: "string" },
+                title_id: { type: "string" },
+                product_id: { type: "string" },
+              },
+            },
+          },
+        },
+      },
+      PublisherInventory: {
+        type: "object",
+        required: ["titles"],
+        properties: {
+          titles: {
+            type: "array",
+            items: {
+              type: "object",
+              properties: {
+                external_ref: { type: "string" },
+                name: { type: "string" },
+                active: { type: "boolean", description: "False while awaiting NativeSpin curation." },
+                market: { type: "string", description: "The title's market code, e.g. NO." },
+                category: { type: "string" },
+                products: {
+                  type: "array",
+                  items: {
+                    type: "object",
+                    properties: {
+                      external_ref: { type: "string" },
+                      type: { type: "string", enum: Object.values(ProductType) },
+                      name: { type: "string" },
+                      base_price: { type: "number", description: "Your rate-card cost, as ingested." },
+                      currency: { type: "string" },
+                      visibility: { type: "string", enum: ["INDICATIVE", "FIRM"] },
+                      bookable: { type: "boolean" },
+                      lead_time_days: { type: "integer", nullable: true },
+                    },
+                  },
+                },
+              },
+            },
+          },
+        },
+      },
       Product: {
         type: "object",
         required: ["id", "type", "visibility"],
         properties: {
           id: { type: "string" },
           type: { type: "string", enum: Object.values(ProductType) },
+          pricingModel: {
+            type: "string",
+            enum: Object.values(PricingModel),
+            description:
+              "FLAT = priced per placement (priceBand applies); CPM/CPC = volume-priced rate card (priceBand is null — the quote resolves the volume).",
+          },
           priceBand: {
             type: "string",
             nullable: true,
@@ -203,7 +402,11 @@ const SPEC = {
                   "EXPIRED",
                   "SCOPE",
                   "RATE_LIMITED",
+                  "BAD_PARAM",
                   "NOT_FOUND",
+                  "NOT_PUBLISHER_KEY",
+                  "VALIDATION_FAILED",
+                  "INGEST_FAILED",
                   "NO_ORG",
                   "BAD_JSON",
                   "BAD_BODY",
@@ -220,6 +423,19 @@ const SPEC = {
                 ],
               },
               message: { type: "string" },
+              details: {
+                type: "array",
+                description:
+                  "Present on BAD_PARAM (one entry per invalid query parameter: `param`, `message`) and VALIDATION_FAILED (one per invalid field: `path`, `message`).",
+                items: {
+                  type: "object",
+                  properties: {
+                    param: { type: "string" },
+                    path: { type: "string" },
+                    message: { type: "string" },
+                  },
+                },
+              },
             },
             required: ["code", "message"],
           },
@@ -233,49 +449,50 @@ const SPEC = {
       get: {
         summary: "List titles in the public catalog",
         description:
-          "Cursor-paginated. Stable sort by name + id ascending so a full sync doesn't miss rows when a new title is activated mid-sync. Rate-limited per API key.",
+          "Cursor-paginated. Stable sort by name + id ascending so a full sync doesn't miss rows when a title is activated or deactivated mid-sync. Follow `page.nextCursor` until it is null. Invalid query parameters are rejected with 400 BAD_PARAM (never silently ignored). Rate-limited per API key.",
         parameters: [
           {
             name: "market",
             in: "query",
             schema: { type: "string", enum: Object.values(MarketCode) },
-            description: "Filter by market.",
+            description: "Filter by market. Case-sensitive; any other value is a 400.",
           },
           {
             name: "format",
             in: "query",
             schema: { type: "string", enum: Object.values(ProductType) },
             description:
-              "Only return titles with at least one active product of this type.",
+              "Only return titles with at least one active product of this type. Any other value is a 400.",
           },
           {
             name: "limit",
             in: "query",
-            schema: { type: "integer", minimum: 1, maximum: 100, default: 50 },
+            schema: { type: "integer", minimum: 1, default: 50 },
+            description:
+              "Page size: a positive whole number. Values above 100 are clamped to 100; the effective size is echoed in `page.limit`.",
           },
           {
             name: "cursor",
             in: "query",
             schema: { type: "string" },
             description:
-              "Opaque pagination token returned in the previous response.",
+              "Opaque pagination token: `page.nextCursor` from the previous response, passed back unchanged. A token this API did not issue is a 400.",
           },
         ],
         responses: {
           "200": {
-            description: "Page of titles + nextCursor.",
+            description: "A page of titles.",
             content: {
               "application/json": {
-                schema: {
-                  type: "object",
-                  properties: {
-                    data: {
-                      type: "array",
-                      items: { $ref: "#/components/schemas/Title" },
-                    },
-                    nextCursor: { type: "string", nullable: true },
-                  },
-                },
+                schema: { $ref: "#/components/schemas/TitlePage" },
+              },
+            },
+          },
+          "400": {
+            description: "A query parameter is invalid (BAD_PARAM); `error.details` names each one.",
+            content: {
+              "application/json": {
+                schema: { $ref: "#/components/schemas/Error" },
               },
             },
           },
@@ -309,6 +526,53 @@ const SPEC = {
     "/api/v1/catalog/titles/{id}": {
       get: {
         summary: "Get one title by id.",
+        description: "Requires the catalog:read scope. The title is wrapped in `data`.",
+        parameters: [
+          {
+            name: "id",
+            in: "path",
+            required: true,
+            schema: { type: "string" },
+            description: "The title id (not its slug).",
+          },
+        ],
+        responses: {
+          "200": {
+            description: "The title.",
+            content: {
+              "application/json": {
+                schema: { $ref: "#/components/schemas/TitleResponse" },
+              },
+            },
+          },
+          "401": {
+            description: "Missing / invalid / revoked / expired bearer.",
+            content: { "application/json": { schema: { $ref: "#/components/schemas/Error" } } },
+          },
+          "403": {
+            description: "Key lacks catalog:read scope.",
+            content: { "application/json": { schema: { $ref: "#/components/schemas/Error" } } },
+          },
+          "404": {
+            description: "Not found, or not active in the catalog.",
+            content: {
+              "application/json": {
+                schema: { $ref: "#/components/schemas/Error" },
+              },
+            },
+          },
+          "429": {
+            description: "Rate-limited — back off + retry.",
+            content: { "application/json": { schema: { $ref: "#/components/schemas/Error" } } },
+          },
+        },
+      },
+    },
+    "/api/v1/quotes/{id}": {
+      get: {
+        summary: "Get one sent quote by id.",
+        description:
+          "Requires the catalog:read scope. A key bound to an organization sees only that organization's quotes; any other quote (and any unsent draft) is a 404. Exact figures appear here because a quote is the one place they belong — the catalog endpoints only ever return bands.",
         parameters: [
           {
             name: "id",
@@ -319,20 +583,24 @@ const SPEC = {
         ],
         responses: {
           "200": {
-            description: "The title.",
-            content: {
-              "application/json": {
-                schema: { $ref: "#/components/schemas/Title" },
-              },
-            },
+            description: "The quote.",
+            content: { "application/json": { schema: { $ref: "#/components/schemas/Quote" } } },
+          },
+          "401": {
+            description: "Missing / invalid / revoked / expired bearer.",
+            content: { "application/json": { schema: { $ref: "#/components/schemas/Error" } } },
+          },
+          "403": {
+            description: "Key lacks catalog:read scope.",
+            content: { "application/json": { schema: { $ref: "#/components/schemas/Error" } } },
           },
           "404": {
-            description: "Not found.",
-            content: {
-              "application/json": {
-                schema: { $ref: "#/components/schemas/Error" },
-              },
-            },
+            description: "Not found, not sent yet, or not visible to this key.",
+            content: { "application/json": { schema: { $ref: "#/components/schemas/Error" } } },
+          },
+          "429": {
+            description: "Rate-limited — back off + retry.",
+            content: { "application/json": { schema: { $ref: "#/components/schemas/Error" } } },
           },
         },
       },
@@ -351,17 +619,33 @@ const SPEC = {
           },
         },
         responses: {
-          "200": { description: "Upsert summary with per-item ids." },
+          "200": {
+            description: "Upsert summary with per-item ids.",
+            content: { "application/json": { schema: { $ref: "#/components/schemas/IngestSummary" } } },
+          },
+          "400": {
+            description: "Body is not valid JSON (BAD_JSON).",
+            content: { "application/json": { schema: { $ref: "#/components/schemas/Error" } } },
+          },
           "401": {
             description: "Auth failed.",
             content: { "application/json": { schema: { $ref: "#/components/schemas/Error" } } },
           },
           "403": {
-            description: "Key lacks catalog:write or is not bound to a publisher.",
+            description: "Key lacks catalog:write (SCOPE) or is not bound to a publisher (NOT_PUBLISHER_KEY).",
             content: { "application/json": { schema: { $ref: "#/components/schemas/Error" } } },
           },
           "422": {
-            description: "Payload failed validation (see error.details).",
+            description: "Payload failed validation (VALIDATION_FAILED; see error.details).",
+            content: { "application/json": { schema: { $ref: "#/components/schemas/Error" } } },
+          },
+          "429": {
+            description: "Rate-limited — back off + retry.",
+            content: { "application/json": { schema: { $ref: "#/components/schemas/Error" } } },
+          },
+          "500": {
+            description:
+              "The upsert failed part-way (INGEST_FAILED). Upserts are idempotent on externalRef, so retrying the same payload is safe.",
             content: { "application/json": { schema: { $ref: "#/components/schemas/Error" } } },
           },
         },
@@ -370,13 +654,20 @@ const SPEC = {
         summary: "Read back the calling publisher's ingested inventory.",
         security: [{ bearerAuth: [] }],
         responses: {
-          "200": { description: "The publisher's ingested titles and products." },
+          "200": {
+            description: "The publisher's ingested titles and products.",
+            content: { "application/json": { schema: { $ref: "#/components/schemas/PublisherInventory" } } },
+          },
           "401": {
             description: "Auth failed.",
             content: { "application/json": { schema: { $ref: "#/components/schemas/Error" } } },
           },
           "403": {
-            description: "Key lacks catalog:write or is not bound to a publisher.",
+            description: "Key lacks catalog:write (SCOPE) or is not bound to a publisher (NOT_PUBLISHER_KEY).",
+            content: { "application/json": { schema: { $ref: "#/components/schemas/Error" } } },
+          },
+          "429": {
+            description: "Rate-limited — back off + retry.",
             content: { "application/json": { schema: { $ref: "#/components/schemas/Error" } } },
           },
         },
@@ -461,12 +752,3 @@ const SPEC = {
     },
   },
 } as const;
-
-export async function GET() {
-  return NextResponse.json(SPEC, {
-    headers: {
-      // Spec is public — let CDNs cache it.
-      "Cache-Control": "public, max-age=3600, s-maxage=3600",
-    },
-  });
-}
