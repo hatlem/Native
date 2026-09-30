@@ -3,6 +3,7 @@ import { redirect } from "next/navigation";
 import { auth } from "@/auth";
 import { Link } from "@/i18n/navigation";
 import { landingForRole } from "@/lib/roles";
+import { safeNext } from "@/lib/auth-gate";
 import { LandingShell } from "@/app/landing-shell";
 import { DemoChips, type DemoAccount } from "./demo-chips";
 import { PasswordSignInForm, MagicLinkForm } from "./signin-forms";
@@ -27,8 +28,11 @@ export default async function SignInPage({
 }) {
   const { locale } = await params;
   const sp = await searchParams;
+  // Where to go after signing in: the page the visitor was sent here from
+  // (lib/auth-gate signinPath), when it is a same-origin path.
+  const next = safeNext(typeof sp.next === "string" ? sp.next : undefined, "");
   const session = await auth();
-  if (session?.user) redirect(landingForRole(session.user.role, locale));
+  if (session?.user) redirect(next || landingForRole(session.user.role, locale));
 
   const t = await getTranslations({ locale, namespace: "auth" });
   const tc = await getTranslations({ locale, namespace: "common" });
@@ -89,6 +93,7 @@ export default async function SignInPage({
 
           <PasswordSignInForm
             locale={locale}
+            next={next}
             initialEmail={initialEmail}
             labels={{
               email: t("email"),
@@ -113,6 +118,7 @@ export default async function SignInPage({
 
           <MagicLinkForm
             locale={locale}
+            next={next}
             labels={{
               email: t("email"),
               button: t("magicLinkButton"),

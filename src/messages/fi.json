@@ -63,7 +63,9 @@
     "campaign": "Suunnittele kampanja",
     "campaigns": "Kampanjat",
     "rates": "Hinnat",
-    "users": "Käyttäjät"
+    "users": "Käyttäjät",
+    "orgSwitcherLabel": "Organisaatio",
+    "orgSwitchTo": "Vaihda organisaatioon {org}"
   },
   "orders": {
     "eyebrow": "Tilaukset",
@@ -928,7 +930,9 @@
     "requestRenewal": "Pyydä uusittu tarjous",
     "requestingRenewal": "Lähetetään …",
     "renewalRequested": "Deskiä on pyydetty uusimaan tarjous. Saat ilmoituksen, kun voit hyväksyä sen.",
-    "lineNoteLabel": "Huomautus"
+    "lineNoteLabel": "Huomautus",
+    "noCommitTitle": "Et voi hyväksyä tätä tarjousta itse.",
+    "noCommitBody": "Hyväksyminen tekee sitovan tilauksen organisaatiolle {org}, ja siihen tarvitaan tilausoikeus. Pyydä ylläpitäjää hyväksymään tarjous tai antamaan sinulle tilausoikeus kohdassa Tili → Tiimi."
   },
   "desk": {
     "eyebrow": "Sisäinen desk",
@@ -1412,7 +1416,10 @@
     "ratesUnitWeek": "Viikko",
     "ratesUnitMonth": "Kuukausi",
     "ratesMinUnits": "Vähimmäisvaraus: {count}",
-    "ratesPriceOnlyNote": "Tällä sivulla muutetaan vain hintoja. Katalogin tila — aktiivinen, varattavissa, näkyvyys — on NativeSpin-deskin hallinnassa."
+    "ratesPriceOnlyNote": "Tällä sivulla muutetaan vain hintoja. Katalogin tila — aktiivinen, varattavissa, näkyvyys — on NativeSpin-deskin hallinnassa.",
+    "changePriceOnRates": "Muuta hintasivulla",
+    "notBookable": "Ei varattavissa",
+    "catalogStatusNote": "Hintoja muutetaan hintasivulla. Luettelotilasta (varattavuus ja se, voiko tuotteen tilata heti) vastaa NativeSpinin desk."
   },
   "formats": {
     "metaTitle": "Natiiviformaatit — NativeSpin",
@@ -2540,7 +2547,10 @@
     "callHeading": "Vielä yksi asia — autamme sinua ostamaan natiivia",
     "callBody": "Varaa ilmainen 15 minuutin puhelu, niin deskimme auttaa sinua suunnittelemaan ja sijoittamaan ensimmäisen natiivikampanjasi.",
     "callCta": "Varaa puhelu",
-    "callSkip": "Ohita toistaiseksi →"
+    "callSkip": "Ohita toistaiseksi →",
+    "marketBlocked": "Organisaatiolla {org} ei ole vielä laskutusmarkkinaa. Organisaation {org} ylläpitäjän on valittava se Tili-sivulla ennen kuin tiimi voi lähettää tarjouspyyntöjä.",
+    "blockedTitle": "Organisaation {org} laskutusta ei ole vielä määritetty",
+    "blockedBack": "Takaisin suunnitelmaan"
   },
   "account": {
     "eyebrow": "Tili",
@@ -2651,7 +2661,8 @@
     "deactivating": "Poistetaan käytöstä…",
     "errDelegation": "Delegoinnin päättymispäivä ei ole kelvollinen päivämäärä.",
     "errDelegationPast": "Delegoinnin päättymispäivän on oltava tulevaisuudessa.",
-    "canCommitAdminNote": "Ylläpitäjillä on aina tilausoikeus."
+    "canCommitAdminNote": "Ylläpitäjillä on aina tilausoikeus.",
+    "statusRevoked": "Poistettu"
   },
   "rateCard": {
     "pageTitle": "Rate card -pyyntö",
@@ -2727,7 +2738,10 @@
     "wrongAccountTitle": "Väärä tili",
     "wrongAccountBody": "Kutsu on osoitettu käyttäjälle {inviteEmail}. Olet kirjautunut sisään käyttäjänä {authedEmail}.",
     "signOut": "Kirjaudu ulos",
-    "genericError": "Jokin meni pieleen. Tarkista tiedot ja yritä uudelleen."
+    "genericError": "Jokin meni pieleen. Tarkista tiedot ja yritä uudelleen.",
+    "alreadyMemberTitle": "Olet jo mukana: {org}",
+    "alreadyMemberBody": "Sinulla on jo pääsy tähän tiimiin, joten hyväksyttävää ei ole.",
+    "alreadyMemberCta": "Siirry työtilaan"
   },
   "contentFees": {
     "eyebrow": "Desk",
@@ -3035,7 +3049,12 @@
     "nextWaveBodyPreviousDone": "Kierros {prev} on valmis. Lähetä kierros {n}, jotta tarina jatkuu.",
     "nextWaveBodyDateNear": "Kierros {n} on aikataulutettu alkamaan {date}. Lähetä se nyt, jotta deski ehtii varata.",
     "nextWaveAngle": "Näkökulma: {angle}",
-    "openWave": "Avaa kierros"
+    "openWave": "Avaa kierros",
+    "awaitingTeamHeading": "Odottaa tilausoikeudellista henkilöä",
+    "quoteAwaitingTeamBody": "Kiinteä {amount} tarjous on valmis. Tiimistäsi tilausoikeudellisen henkilön on hyväksyttävä se.",
+    "viewQuote": "Näytä tarjous",
+    "noAccessTitle": "Et ole tällä hetkellä minkään tiimin jäsen",
+    "noAccessBody": "Pääsysi organisaatiosi työtilaan on päättynyt: ylläpitäjä on poistanut sen, tai se oli määräaikainen ja on vanhentunut. Pyydä ylläpitäjää kutsumaan sinut uudelleen, niin saat tiimin suunnitelmat ja tarjouspyynnöt takaisin."
   },
   "shareList": {
     "eyebrow": "Mediasuunnitelma: {org}",

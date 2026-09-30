@@ -1,6 +1,9 @@
 "use server";
 
 import { redirect } from "next/navigation";
+import { headers } from "next/headers";
+import { signinPath } from "@/lib/auth-gate";
+import { appUrl } from "@/lib/url";
 import { planPath } from "@/lib/plan-path";
 import { revalidatePath } from "next/cache";
 import { cookies } from "next/headers";
@@ -28,6 +31,18 @@ import { normalizeLineNote } from "@/lib/line-note";
 import { contentIntent } from "@/lib/authorship";
 import { reorderSection, ReorderMismatchError } from "@/lib/plan-reorder";
 
+// Same-origin path of the page that posted the action, if the browser said.
+async function refererPath(): Promise<string | null> {
+  const referer = (await headers()).get("referer");
+  if (!referer) return null;
+  try {
+    const url = new URL(referer);
+    return url.origin === new URL(appUrl()).origin ? url.pathname + url.search : null;
+  } catch {
+    return null;
+  }
+}
+
 function str(formData: FormData, key: string): string {
   const v = formData.get(key);
   return typeof v === "string" ? v.trim() : "";
@@ -36,7 +51,10 @@ function str(formData: FormData, key: string): string {
 async function requireActiveOrg(locale: string) {
   const scope = await loadScope();
   const orgId = scope.workspace?.activeOrgId;
-  if (!scope.userId) redirect(`/${locale}/signin`);
+  // Signed out (e.g. "Add all to plan" on the public recommender): send them
+  // to sign in and back to the page they acted on, not to a bare /signin that
+  // forgets what they were doing.
+  if (!scope.userId) redirect(signinPath(locale, await refererPath()));
   if (!orgId) {
     // Agency with no client selected hit a list action — the no-client funnel.
     console.warn("checkout.blocked", { reason: "client", userId: scope.userId });

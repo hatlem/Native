@@ -3,6 +3,7 @@ import assert from "node:assert/strict";
 import {
   isValidBasePrice,
   parseBasePrice,
+  parseLeadTimeDays,
   MAX_BASE_PRICE,
 } from "./publisher-rates";
 
@@ -42,4 +43,13 @@ test("parseBasePrice: rejects empty, zero, garbage and out-of-range", () => {
   assert.equal(parseBasePrice("-100"), null);
   assert.equal(parseBasePrice("abc"), null);
   assert.equal(parseBasePrice("10000001"), null);
+});
+
+test("parseLeadTimeDays: whole days from 1 to the cap, nothing else", () => {
+  assert.equal(parseLeadTimeDays("10"), 10);
+  assert.equal(parseLeadTimeDays(" 1 "), 1);
+  assert.equal(parseLeadTimeDays("365"), 365);
+  for (const raw of ["", "0", "-2", "1.5", "366", "abc", "1e2"]) {
+    assert.equal(parseLeadTimeDays(raw), null, raw);
+  }
 });

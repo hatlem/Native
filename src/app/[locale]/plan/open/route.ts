@@ -17,11 +17,11 @@
 // membership) also switches the active org, as the org switcher would.
 
 import { type NextRequest, NextResponse } from "next/server";
-import { cookies } from "next/headers";
 import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
-import { CLIENT_COOKIE, getWorkspace } from "@/lib/workspace";
+import { getWorkspace } from "@/lib/workspace";
 import { writeActiveListId } from "@/lib/lists";
+import { switchActiveOrg } from "@/lib/active-org";
 import { planPath } from "@/lib/plan-path";
 import { appUrl } from "@/lib/url";
 
@@ -50,13 +50,9 @@ export async function GET(
   if (!canOpen) return NextResponse.redirect(new URL(planPath(locale, null, rest), appUrl()));
 
   if (list.organizationId !== ws.activeOrgId) {
-    (await cookies()).set(CLIENT_COOKIE, list.organizationId, {
-      httpOnly: true,
-      sameSite: "lax",
-      path: "/",
-      maxAge: 60 * 60 * 24 * 30,
-    });
+    await switchActiveOrg(list.organizationId, { activeListId: list.id });
+  } else {
+    await writeActiveListId(list.id);
   }
-  await writeActiveListId(list.id);
   return NextResponse.redirect(new URL(planPath(locale, list.id, rest), appUrl()));
 }

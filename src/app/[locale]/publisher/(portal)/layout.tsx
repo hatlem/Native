@@ -2,6 +2,11 @@ import type { ReactNode } from "react";
 import { redirect } from "next/navigation";
 import { auth } from "@/auth";
 
+// Guards the publisher portal proper. It sits on the (portal) route group, not
+// on /publisher itself, because /publisher/claim/<token> must stay reachable
+// signed out: that page is where an invited publisher CREATES their account,
+// so a "sign in first" guard above it made every publisher invite a dead end.
+// The claim page does its own checks (token validity, already signed in).
 export default async function PublisherLayout({
   children,
   params,

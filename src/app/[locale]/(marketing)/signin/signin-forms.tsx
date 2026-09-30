@@ -14,10 +14,13 @@ import { SubmitButton } from "@/components";
 
 export function PasswordSignInForm({
   locale,
+  next,
   initialEmail,
   labels,
 }: {
   locale: string;
+  // Same-origin path to land on after signing in ("" = the role's home).
+  next: string;
   initialEmail: string;
   labels: { email: string; password: string; submit: string; signingIn: string };
 }) {
@@ -29,6 +32,7 @@ export function PasswordSignInForm({
   return (
     <form action={action} noValidate>
       <input type="hidden" name="locale" value={locale} />
+      {next ? <input type="hidden" name="next" value={next} /> : null}
       <div className="field">
         <label htmlFor="email">{labels.email}</label>
         <input
@@ -54,9 +58,11 @@ export function PasswordSignInForm({
 
 export function MagicLinkForm({
   locale,
+  next,
   labels,
 }: {
   locale: string;
+  next: string;
   labels: { email: string; button: string; sending: string };
 }) {
   async function action(formData: FormData) {
@@ -67,6 +73,7 @@ export function MagicLinkForm({
   return (
     <form action={action} noValidate>
       <input type="hidden" name="locale" value={locale} />
+      {next ? <input type="hidden" name="next" value={next} /> : null}
       <div className="field">
         <label htmlFor="magic-email">{labels.email}</label>
         <input id="magic-email" name="email" type="email" autoComplete="email" required />

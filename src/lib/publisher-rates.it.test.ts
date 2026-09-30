@@ -5,6 +5,7 @@ import {
   loadPublisherRateCard,
   confirmProductPrice,
   updateProductPrice,
+  updateProductLeadTime,
   PublisherRatesError,
 } from "./publisher-rates";
 
@@ -207,5 +208,51 @@ if (!RUN_DB_IT) {
 
     const cardB = await loadPublisherRateCard(publisherBId);
     assert.equal(cardB.some((t) => t.id === titleAId), false);
+  });
+
+  test("updateProductLeadTime: lead time only — never instant-order, bookable or price", async () => {
+    const before = await prisma.product.findUniqueOrThrow({ where: { id: productAId } });
+    const result = await updateProductLeadTime({
+      publisherId: publisherAId,
+      productId: productAId,
+      leadTimeDays: 12,
+      actorUserId: ACTOR,
+    });
+    assert.deepEqual(result, { changed: true });
+    const p = await prisma.product.findUniqueOrThrow({ where: { id: productAId } });
+    assert.equal(p.leadTimeDays, 12);
+    // Catalog status stays the desk's: nothing the publisher can post here
+    // makes a product FIRM (instant order) or bookable.
+    assert.equal(p.visibility, before.visibility);
+    assert.equal(p.bookable, before.bookable);
+    assert.equal(p.active, before.active);
+    assert.equal(Number(p.basePrice), Number(before.basePrice));
+    assert.equal(p.confirmedAt?.getTime(), before.confirmedAt?.getTime());
+
+    const note = await prisma.notification.findFirst({
+      where: { link: { contains: `/desk/titles/${titleAId}` }, title: "Publisher updated a lead time" },
+    });
+    assert.ok(note, "the desk hears about it");
+
+    // Same value again: no write, no second notification.
+    assert.deepEqual(
+      await updateProductLeadTime({ publisherId: publisherAId, productId: productAId, leadTimeDays: 12, actorUserId: ACTOR }),
+      { changed: false },
+    );
+  });
+
+  test("updateProductLeadTime: foreign product and out-of-range values are refused", async () => {
+    await assert.rejects(
+      updateProductLeadTime({ publisherId: publisherBId, productId: productAId, leadTimeDays: 5, actorUserId: ACTOR }),
+      (err: unknown) => err instanceof PublisherRatesError && err.code === "not-found",
+    );
+    for (const leadTimeDays of [0, -3, 1.5, 366]) {
+      await assert.rejects(
+        updateProductLeadTime({ publisherId: publisherAId, productId: productAId, leadTimeDays, actorUserId: ACTOR }),
+        (err: unknown) => err instanceof PublisherRatesError && err.code === "invalid-lead-time",
+      );
+    }
+    const p = await prisma.product.findUniqueOrThrow({ where: { id: productAId } });
+    assert.equal(p.leadTimeDays, 12);
   });
 }

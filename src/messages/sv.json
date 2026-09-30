@@ -63,7 +63,9 @@
     "campaign": "Planera kampanj",
     "campaigns": "Kampanjer",
     "rates": "Priser",
-    "users": "Användare"
+    "users": "Användare",
+    "orgSwitcherLabel": "Organisation",
+    "orgSwitchTo": "Byt till {org}"
   },
   "reports": {
     "title": "Rapporter",
@@ -803,7 +805,9 @@
     "requestRenewal": "Be om förnyad offert",
     "requestingRenewal": "Skickar …",
     "renewalRequested": "Desken har ombetts att förnya offerten. Du får en avisering när du kan acceptera den.",
-    "lineNoteLabel": "Kommentar"
+    "lineNoteLabel": "Kommentar",
+    "noCommitTitle": "Du kan inte godkänna den här offerten själv.",
+    "noCommitBody": "Att godkänna den lägger en bindande beställning för {org}, och det kräver beställningsrätt. Be en administratör godkänna offerten, eller ge dig beställningsrätt under Konto → Team."
   },
   "desk": {
     "eyebrow": "Internt desk",
@@ -1287,7 +1291,10 @@
     "ratesUnitWeek": "Vecka",
     "ratesUnitMonth": "Månad",
     "ratesMinUnits": "Minsta bokning: {count}",
-    "ratesPriceOnlyNote": "Den här sidan ändrar endast priser. Katalogstatus — aktiv, bokningsbar, synlighet — hanteras av NativeSpin-desken."
+    "ratesPriceOnlyNote": "Den här sidan ändrar endast priser. Katalogstatus — aktiv, bokningsbar, synlighet — hanteras av NativeSpin-desken.",
+    "changePriceOnRates": "Ändra på prissidan",
+    "notBookable": "Inte bokningsbar",
+    "catalogStatusNote": "Priser ändrar du på prissidan. Katalogstatus (bokningsbar, och om en produkt kan direktbeställas) hanteras av NativeSpin-desken."
   },
   "formats": {
     "metaTitle": "Native-format — NativeSpin",
@@ -2540,7 +2547,10 @@
     "callHeading": "En sak till — låt oss hjälpa dig köpa native",
     "callBody": "Boka ett kostnadsfritt 15-minuterssamtal, så hjälper vårt desk dig att planera och placera din första native-kampanj.",
     "callCta": "Boka ett samtal",
-    "callSkip": "Hoppa över för nu →"
+    "callSkip": "Hoppa över för nu →",
+    "marketBlocked": "{org} har ingen faktureringsmarknad ännu. En administratör i {org} behöver välja den under Konto innan teamet kan skicka förfrågningar.",
+    "blockedTitle": "{org} är inte konfigurerat för fakturering ännu",
+    "blockedBack": "Tillbaka till planen"
   },
   "account": {
     "eyebrow": "Konto",
@@ -2651,7 +2661,8 @@
     "deactivating": "Avaktiverar…",
     "errDelegation": "Slutdatumet för delegeringen är inte ett giltigt datum.",
     "errDelegationPast": "Slutdatumet för delegeringen måste ligga i framtiden.",
-    "canCommitAdminNote": "Administratörer har alltid beställningsrätt."
+    "canCommitAdminNote": "Administratörer har alltid beställningsrätt.",
+    "statusRevoked": "Borttagen"
   },
   "rateCard": {
     "pageTitle": "Rate card-förfrågan",
@@ -2727,7 +2738,10 @@
     "wrongAccountTitle": "Fel konto",
     "wrongAccountBody": "Inbjudan gäller {inviteEmail}. Du är inloggad som {authedEmail}.",
     "signOut": "Logga ut",
-    "genericError": "Något gick fel. Kontrollera uppgifterna och försök igen."
+    "genericError": "Något gick fel. Kontrollera uppgifterna och försök igen.",
+    "alreadyMemberTitle": "Du är redan med i {org}",
+    "alreadyMemberBody": "Du har redan tillgång till det här teamet, så det finns inget att godkänna.",
+    "alreadyMemberCta": "Gå till arbetsytan"
   },
   "contentFees": {
     "eyebrow": "Desk",
@@ -3035,7 +3049,12 @@
     "nextWaveBodyPreviousDone": "Omgång {prev} är klar. Skicka omgång {n} för att hålla berättelsen igång.",
     "nextWaveBodyDateNear": "Omgång {n} är planerad från {date}. Skicka den nu så att desken hinner boka.",
     "nextWaveAngle": "Vinkel: {angle}",
-    "openWave": "Öppna omgången"
+    "openWave": "Öppna omgången",
+    "awaitingTeamHeading": "Väntar på någon med beställningsrätt",
+    "quoteAwaitingTeamBody": "En fast offert på {amount} är klar. Någon i teamet med beställningsrätt behöver godkänna den.",
+    "viewQuote": "Visa offerten",
+    "noAccessTitle": "Du är inte med i något team just nu",
+    "noAccessBody": "Din åtkomst till organisationens arbetsyta har upphört: en administratör har tagit bort den, eller så var den tidsbegränsad och har gått ut. Be en administratör att bjuda in dig igen, så får du tillbaka teamets planer och förfrågningar."
   },
   "shareList": {
     "eyebrow": "Medieplan från {org}",

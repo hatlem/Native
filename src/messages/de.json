@@ -63,7 +63,9 @@
     "campaign": "Kampagne planen",
     "campaigns": "Kampagnen",
     "rates": "Preise",
-    "users": "Benutzer"
+    "users": "Benutzer",
+    "orgSwitcherLabel": "Organisation",
+    "orgSwitchTo": "Zu {org} wechseln"
   },
   "orders": {
     "eyebrow": "Bestellungen",
@@ -928,7 +930,9 @@
     "requestRenewal": "Erneuertes Angebot anfordern",
     "requestingRenewal": "Wird gesendet …",
     "renewalRequested": "Der Desk wurde gebeten, das Angebot zu erneuern. Sie erhalten eine Benachrichtigung, sobald Sie es annehmen können.",
-    "lineNoteLabel": "Hinweis"
+    "lineNoteLabel": "Hinweis",
+    "noCommitTitle": "Sie können dieses Angebot nicht selbst annehmen.",
+    "noCommitBody": "Die Annahme ist eine verbindliche Bestellung für {org} und erfordert Bestellrecht. Bitten Sie einen Administrator, das Angebot anzunehmen oder Ihnen unter Konto → Team Bestellrecht zu geben."
   },
   "desk": {
     "eyebrow": "Interner Desk",
@@ -1412,7 +1416,10 @@
     "ratesUnitWeek": "Woche",
     "ratesUnitMonth": "Monat",
     "ratesMinUnits": "Mindestbuchung: {count}",
-    "ratesPriceOnlyNote": "Diese Seite ändert nur Preise. Der Katalogstatus — aktiv, buchbar, Sichtbarkeit — wird vom NativeSpin-Desk verwaltet."
+    "ratesPriceOnlyNote": "Diese Seite ändert nur Preise. Der Katalogstatus — aktiv, buchbar, Sichtbarkeit — wird vom NativeSpin-Desk verwaltet.",
+    "changePriceOnRates": "Auf der Preisseite ändern",
+    "notBookable": "Nicht buchbar",
+    "catalogStatusNote": "Preise ändern Sie auf der Preisseite. Den Katalogstatus (buchbar und ob ein Produkt sofort bestellbar ist) verwaltet das NativeSpin-Desk."
   },
   "formats": {
     "metaTitle": "Native-Formate — NativeSpin",
@@ -2397,7 +2404,10 @@
     "callHeading": "Noch eine Sache — wir helfen Ihnen beim Native-Einkauf",
     "callBody": "Buchen Sie ein kostenloses 15-minütiges Gespräch, und unser Desk hilft Ihnen, Ihre erste Native-Kampagne zu planen und zu platzieren.",
     "callCta": "Gespräch buchen",
-    "callSkip": "Jetzt überspringen →"
+    "callSkip": "Jetzt überspringen →",
+    "marketBlocked": "Für {org} ist noch kein Abrechnungsmarkt festgelegt. Ein Administrator von {org} muss ihn unter Konto einstellen, bevor das Team Anfragen senden kann.",
+    "blockedTitle": "{org} ist noch nicht für die Abrechnung eingerichtet",
+    "blockedBack": "Zurück zum Plan"
   },
   "account": {
     "eyebrow": "Konto",
@@ -2508,7 +2518,8 @@
     "deactivating": "Wird deaktiviert…",
     "errDelegation": "Das Enddatum der Delegation ist kein gültiges Datum.",
     "errDelegationPast": "Das Enddatum der Delegation muss in der Zukunft liegen.",
-    "canCommitAdminNote": "Administratoren haben immer Bestellrecht."
+    "canCommitAdminNote": "Administratoren haben immer Bestellrecht.",
+    "statusRevoked": "Entfernt"
   },
   "rateCard": {
     "pageTitle": "Rate-Card-Anfrage",
@@ -2584,7 +2595,10 @@
     "wrongAccountTitle": "Falsches Konto",
     "wrongAccountBody": "Diese Einladung gilt für {inviteEmail}. Sie sind als {authedEmail} angemeldet.",
     "signOut": "Abmelden",
-    "genericError": "Etwas ist schiefgelaufen. Überprüfen Sie Ihre Angaben und versuchen Sie es erneut."
+    "genericError": "Etwas ist schiefgelaufen. Überprüfen Sie Ihre Angaben und versuchen Sie es erneut.",
+    "alreadyMemberTitle": "Sie sind bereits Mitglied von {org}",
+    "alreadyMemberBody": "Sie haben bereits Zugang zu diesem Team – es gibt nichts anzunehmen.",
+    "alreadyMemberCta": "Zum Arbeitsbereich"
   },
   "contentFees": {
     "eyebrow": "Desk",
@@ -2904,7 +2918,12 @@
     "nextWaveBodyPreviousDone": "Welle {prev} ist abgeschlossen. Senden Sie Welle {n}, damit die Geschichte weitergeht.",
     "nextWaveBodyDateNear": "Welle {n} ist ab {date} geplant. Senden Sie sie jetzt, damit der Desk Zeit zum Buchen hat.",
     "nextWaveAngle": "Blickwinkel: {angle}",
-    "openWave": "Welle öffnen"
+    "openWave": "Welle öffnen",
+    "awaitingTeamHeading": "Wartet auf jemanden mit Bestellrecht",
+    "quoteAwaitingTeamBody": "Ein Festpreisangebot über {amount} ist fertig. Jemand aus deinem Team mit Bestellrecht muss es annehmen.",
+    "viewQuote": "Angebot ansehen",
+    "noAccessTitle": "Du bist gerade in keinem Team",
+    "noAccessBody": "Dein Zugang zum Arbeitsbereich deiner Organisation ist beendet: Ein Administrator hat ihn entfernt, oder er war befristet und ist abgelaufen. Bitte einen Administrator, dich erneut einzuladen – damit bekommst du die Pläne und Anfragen deines Teams zurück."
   },
   "shareList": {
     "eyebrow": "Mediaplan von {org}",

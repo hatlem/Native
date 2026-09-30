@@ -21,6 +21,9 @@ type Props = {
   menuItems: NavItem[];
   signedIn: boolean;
   signOutAction?: React.ReactNode;
+  // Server-rendered org switcher (app/org-switcher.tsx) — null unless the
+  // user holds seats in more than one org.
+  orgSwitcher?: React.ReactNode;
   authActions?: { signIn: string; signUp: string };
   // Visible ⌘K affordance — only worth the header space when the top nav
   // is collapsed enough that Lists/Plan aren't otherwise one click away
@@ -56,6 +59,7 @@ export function NavShell({
   menuItems,
   signedIn,
   signOutAction,
+  orgSwitcher,
   authActions,
   labels,
   showPaletteHint = false,
@@ -201,6 +205,7 @@ export function NavShell({
                     <div className="role">{user.roleLabel}</div>
                     <div className="email"><SafeEmail address={user.email} /></div>
                   </div>
+                  {orgSwitcher}
                   {menuItems.map((m) => (
                     <Link key={m.key} href={m.href} className="menu-item">
                       {m.label}
@@ -280,6 +285,7 @@ export function NavShell({
                   {user.roleLabel}
                 </div>
                 <div style={{ fontSize: "0.92rem" }}><SafeEmail address={user.email} /></div>
+                {orgSwitcher}
                 {signOutAction}
               </>
             ) : authActions ? (

@@ -8,6 +8,7 @@ import { logout } from "@/app/auth-actions";
 import { LandingShell } from "@/app/landing-shell";
 import { SubmitButton } from "@/components";
 import { withSafeEmails } from "@/components/safe-email";
+import { hasActiveSeat } from "@/lib/org-seats";
 
 export const dynamic = "force-dynamic";
 
@@ -34,6 +35,7 @@ export default async function OrgInvitePage({
   const t = await getTranslations({ locale, namespace: "invite" });
   const ta = await getTranslations({ locale, namespace: "auth" });
   const tc = await getTranslations({ locale, namespace: "common" });
+  const te = await getTranslations({ locale, namespace: "errors" });
 
   const invite = await prisma.orgInvite.findUnique({
     where: { token },
@@ -58,7 +60,7 @@ export default async function OrgInvitePage({
           <p className="lead">{t("unavailableBody")}</p>
           <div className="cluster">
             <Link href="/" className="btn primary">
-              {ta("backHome")}
+              {te("backHome")}
             </Link>
           </div>
         </div>
@@ -94,6 +96,26 @@ export default async function OrgInvitePage({
                 {t("signOut")}
               </button>
             </form>
+          </div>
+        </div>
+      </LandingShell>
+    );
+  }
+
+  // --- State 2a: Logged in as the invited email, seat already held ---
+  // Nothing to accept (the claim would refuse it); say so instead of offering
+  // a button that can only fail. A removed or lapsed seat is NOT held — that
+  // is the re-invite case, and it gets the normal Accept form below.
+  if (emailMatches && (await hasActiveSeat(session!.user!.id, invite!.organizationId))) {
+    return (
+      <LandingShell locale={locale} screenLabel="Already a member">
+        <div className="utility-page" role="status">
+          <h1>{t("alreadyMemberTitle", { org: orgName })}</h1>
+          <p className="lead">{t("alreadyMemberBody")}</p>
+          <div className="cluster">
+            <Link href="/home" className="btn primary">
+              {t("alreadyMemberCta")}
+            </Link>
           </div>
         </div>
       </LandingShell>

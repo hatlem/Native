@@ -1,8 +1,7 @@
 import { getTranslations } from "next-intl/server";
 import { notFound } from "next/navigation";
-import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
-import { getWorkspace } from "@/lib/workspace";
+import { loadScope, canActOnOrg, canCommitOnOrg } from "@/lib/scope";
 import { DataLayerEvent } from "@/app/data-layer-event";
 import { formatMoney } from "@/lib/money";
 import { StatusBadge } from "@/app/status-badge";
@@ -68,15 +67,11 @@ export default async function RequestPage({
   });
   if (!request) notFound();
 
-  const session = await auth();
-  const role = session?.user?.role;
-  const isDesk = role === "DESK" || role === "SUPERADMIN";
-  if (!isDesk) {
-    const ws = await getWorkspace(session?.user?.id);
-    if (!ws?.scopeOrgIds.includes(request.organizationId)) {
-      notFound();
-    }
-  }
+  const scope = await loadScope();
+  if (!canActOnOrg(scope, request.organizationId)) notFound();
+  // Whether THIS viewer may accept the quote (ordering rights in the request's
+  // org). Without them the accept button is replaced by who can act.
+  const canAccept = canCommitOnOrg(scope, request.organizationId);
 
   // Plan items split into product lines and Title placeholders (productId
   // null). Fetch products for the former and bare title names for the
@@ -220,6 +215,7 @@ export default async function RequestPage({
           allAccepted={allAccepted}
           orders={orders}
           renewalRequested={renewalRequested}
+          canAccept={canAccept}
         />
       )}
 

@@ -4,6 +4,7 @@ import { planPath } from "@/lib/plan-path";
 import { MarketCode } from "@prisma/client";
 import { auth } from "@/auth";
 import { loadScope, canCommitOnOrg } from "@/lib/scope";
+import { signinPath } from "@/lib/auth-gate";
 import { prisma } from "@/lib/prisma";
 import { getWorkspace } from "@/lib/workspace";
 import { Link } from "@/i18n/navigation";
@@ -54,6 +55,11 @@ export async function PlanView({
   const t = await getTranslations({ locale, namespace: "plan" });
 
   const session = await auth();
+  // Signed out: sign in first and come back here (middleware already does
+  // this for a plain page load; this covers an expired session cookie).
+  if (!session?.user) {
+    redirect(signinPath(locale, expectedListId ? `/${locale}/plan/${expectedListId}` : `/${locale}/plan`));
+  }
 
   // A missing buyer workspace on /plan almost always means a staff/internal
   // account (desk, superadmin, publisher, writer) wandered in — real buyers
