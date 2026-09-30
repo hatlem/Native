@@ -32,6 +32,10 @@ export type EmailAdapter = (msg: EmailMessage) => Promise<void>;
 
 const consoleAdapter: EmailAdapter = async (msg) => {
   console.log("[email]", msg.to, "·", msg.subject);
+  // Local E2E runs have no inbox: EMAIL_LOG_BODY=1 prints the plain-text body
+  // so magic links and invite links can be followed. Console adapter only —
+  // with RESEND_API_KEY set (prod) this adapter is never installed.
+  if (process.env.EMAIL_LOG_BODY === "1") console.log("[email-body]", msg.to, "\n" + msg.text);
 };
 
 // Swap by setting `emailAdapter` from the boot path; default is console.
