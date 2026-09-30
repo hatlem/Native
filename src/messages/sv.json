@@ -210,7 +210,8 @@
       "publisher": "Utgivare",
       "densityLabel": "Vy",
       "densityList": "Lista",
-      "densityCards": "Kort"
+      "densityCards": "Kort",
+      "price": "Pris"
     },
     "compareBar": {
       "label": "{count, plural, =1 {1 titel vald} other {# titlar valda}}",
@@ -298,7 +299,9 @@
       "mobileFilters": "Filter",
       "marketCountAll": "Alla {total} marknader",
       "formatHeading": "Vilket format?",
-      "formatHint": "Native-artikel, advertorial, display, video …"
+      "formatHint": "Native-artikel, advertorial, display, video …",
+      "priceHeading": "Vad vill du lägga per placering?",
+      "priceHint": "Prisintervall per placering, inkl. artikel."
     },
     "shortlist": {
       "untitledPlan": "din plan",
@@ -729,6 +732,9 @@
       "item3Body": "Utkast skickas till dig för godkännande. Länkar och resultat hamnar i Rapporter."
     },
     "breakdownQtyWithArticleFee": "{n} × {unit} placering + {article} per artikel (en artikel för alla {n})",
+    "inclVatFirmPart": "{amount} inkl. moms för raderna du kan beställa direkt",
+    "estimateNote": "≈ är ett prisintervall. Det exakta priset får du i offerten.",
+    "breakdownPlacements": "{n} placeringar",
     "noticePlanReadOnly": "Du har bara läsbehörighet till den här planen, så inget ändrades."
   },
   "rfq": {
@@ -1396,7 +1402,19 @@
     "emptyTitle": "Inga fakturor än",
     "emptyHint": "Fakturor visas här när en kampanj har gått och fakturerats.",
     "emptyCta": "Se dina kampanjer",
-    "colCustomer": "Kund"
+    "colCustomer": "Kund",
+    "seller": "Från",
+    "sellerOrgNumber": "Org.nr",
+    "sellerVatNumber": "Momsreg.nr",
+    "paymentHeading": "Betalningsuppgifter",
+    "bankAccount": "Kontonummer",
+    "paymentReference": "Referens",
+    "pdfUnavailableHeading": "PDF:en är inte klar än",
+    "pdfUnavailable": "Vi färdigställer fakturadokumentet. Beloppen nedan är slutliga — kontakta oss om du behöver PDF:en nu.",
+    "pdfUnavailableDesk": "PDF:en kan inte skapas förrän NativeSpins bolagsuppgifter är satta i servermiljön. Sätt de här variablerna och deploya igen:",
+    "sellerVarMissing": "inte satt",
+    "sellerVarInvalid": "satt, men kontrollsiffran stämmer inte",
+    "pdfPending": "Visa"
   },
   "firm": {
     "badge": "Omedelbar beställning",
@@ -1671,7 +1689,7 @@
     "rowReach": "Månadsräckvidd",
     "rowLeadTime": "Ledtid",
     "rowFormats": "Tillgängliga format",
-    "rowFromPrice": "Från pris",
+    "rowFromPrice": "Prisintervall",
     "rowAction": "Åtgärd"
   },
   "availability": {
@@ -2530,7 +2548,7 @@
     "planRfqOnly": "En eller flera titlar i din plan kräver offert — omedelbar beställning är inaktiverad tills priset är bekräftat.",
     "listIndicative": "Listpris (indikativt)",
     "listIndicativeHelp": "Indikativt listpris — det slutliga priset bekräftas efter en kort brief.",
-    "productionIncluded": "Färdigskriven artikel ingår",
+    "productionIncluded": "inkl. artikel",
     "firmTurnaround": "Fast pris vanligtvis inom 24 timmar"
   },
   "titleAdmin": {

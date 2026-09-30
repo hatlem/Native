@@ -6,6 +6,7 @@ import { formatMoney, intlLocale } from "@/lib/money";
 import { loadScope, canActOnOrg } from "@/lib/scope";
 import { invoiceLineLabel } from "@/lib/invoice-line-label";
 import { invoiceNumber } from "@/lib/pdf/invoice-pdf-data";
+import { loadSellerDetails, sellerAddressLines, sellerGaps } from "@/lib/seller";
 import { StatusBadge } from "@/app/status-badge";
 
 export const dynamic = "force-dynamic";
@@ -44,6 +45,12 @@ export default async function InvoicePage({
     new Intl.DateTimeFormat(intlLocale(locale), { dateStyle: "medium" }).format(d);
   const credit = invoice.creditNotes[0];
 
+  // The seller of record (lib/seller.ts). Until its legal details are
+  // configured the PDF route refuses to render; say so here instead of
+  // offering a download that fails — and tell the desk exactly what to set.
+  const seller = loadSellerDetails();
+  const sellerIncomplete = sellerGaps(seller, invoice.currency);
+
   return (
     <div className="invoice-shell">
       <header className="invoice-head">
@@ -55,18 +62,58 @@ export default async function InvoicePage({
         </div>
         <div style={{ display: "flex", gap: 12, alignItems: "center" }}>
           <StatusBadge value={invoice.status} />
-          {/* Plain <a>: a route handler download, not a page navigation. */}
-          <a
-            className="btn small secondary"
-            href={`/api/export/invoice-pdf/${invoice.id}?locale=${locale}`}
-            download
-          >
-            {t("download")}
-          </a>
+          {sellerIncomplete.length === 0 ? (
+            // Plain <a>: a route handler download, not a page navigation.
+            <a
+              className="btn small secondary"
+              href={`/api/export/invoice-pdf/${invoice.id}?locale=${locale}`}
+              download
+            >
+              {t("download")}
+            </a>
+          ) : null}
         </div>
       </header>
 
+      {sellerIncomplete.length > 0 ? (
+        <section className="banner-info" role="status" style={{ marginBottom: 16, display: "block" }}>
+          <strong>{t("pdfUnavailableHeading")}</strong>
+          <p style={{ margin: "4px 0 0" }}>{scope.isDesk ? t("pdfUnavailableDesk") : t("pdfUnavailable")}</p>
+          {scope.isDesk ? (
+            <ul style={{ margin: "6px 0 0" }}>
+              {sellerIncomplete.map((g) => (
+                <li key={g.variable}>
+                  <code>{g.variable}</code> — {g.problem === "missing" ? t("sellerVarMissing") : t("sellerVarInvalid")}
+                </li>
+              ))}
+            </ul>
+          ) : null}
+        </section>
+      ) : null}
+
       <dl className="invoice-meta">
+        <div>
+          <dt>{t("seller")}</dt>
+          <dd>
+            {seller.legalName}
+            {sellerAddressLines(seller).map((line) => (
+              <span key={line} className="muted small" style={{ display: "block" }}>
+                {line}
+              </span>
+            ))}
+            {seller.orgNumber ? (
+              <span className="muted small" style={{ display: "block" }}>
+                {t("sellerOrgNumber")} {seller.orgNumber}
+                {seller.registry ? ` · ${seller.registry}` : ""}
+              </span>
+            ) : null}
+            {seller.vatNumber ? (
+              <span className="muted small" style={{ display: "block" }}>
+                {t("sellerVatNumber")} {seller.vatNumber}
+              </span>
+            ) : null}
+          </dd>
+        </div>
         <div>
           <dt>{t("billTo")}</dt>
           <dd>{invoice.organization.name}</dd>
@@ -131,6 +178,19 @@ export default async function InvoicePage({
         </div>
         {invoice.paymentTermsDays ? (
           <p className="muted small">{tPay("line", { days: invoice.paymentTermsDays })}</p>
+        ) : null}
+        {sellerIncomplete.length === 0 ? (
+          <p className="muted small">
+            <strong>{t("paymentHeading")}:</strong>{" "}
+            {[
+              invoice.currency === "NOK" && seller.bankAccount ? `${t("bankAccount")} ${seller.bankAccount}` : null,
+              seller.iban ? `IBAN ${seller.iban}` : null,
+              seller.bic ? `BIC/SWIFT ${seller.bic}` : null,
+              `${t("paymentReference")} ${invoiceNumber(invoice.id)}`,
+            ]
+              .filter(Boolean)
+              .join(" · ")}
+          </p>
         ) : null}
       </article>
 

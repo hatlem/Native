@@ -12,7 +12,7 @@ type Option = { value: string; label: string };
 type RailInitial = ComponentProps<typeof CatalogRail>["initial"];
 
 // Filter params the "Filters N" count covers (search has its own box).
-const COUNTED_LISTS = ["market", "types", "vertical", "region"] as const;
+const COUNTED_LISTS = ["market", "types", "vertical", "region", "price"] as const;
 const COUNTED_FLAGS = [
   "nativeFit",
   "b2bB2c",
@@ -49,6 +49,7 @@ export function CatalogMobileBar({
   reaches,
   categories,
   regions,
+  priceBands,
   unpricedCount,
   initial,
 }: {
@@ -59,6 +60,7 @@ export function CatalogMobileBar({
   reaches: Option[];
   categories: Option[];
   regions: Option[];
+  priceBands: Option[];
   unpricedCount: number | null;
   initial: RailInitial;
 }) {
@@ -155,6 +157,7 @@ export function CatalogMobileBar({
             reaches={reaches}
             categories={categories}
             regions={regions}
+            priceBands={priceBands}
             unpricedCount={unpricedCount}
             initial={initial}
           />

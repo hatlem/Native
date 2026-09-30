@@ -1,11 +1,11 @@
 import { getTranslations } from "next-intl/server";
 import { Link } from "@/i18n/navigation";
-import { formatMoney } from "@/lib/money";
-import { indicativeFromRules, toRateRules } from "@/lib/money";
-import { isProductPriceShown } from "@/lib/pricing-visibility";
 import { removeListItem } from "@/app/list-actions";
 import type { ActiveList } from "@/lib/lists";
-import { computeEstimate, type EstimateLine } from "@/lib/campaign-estimate";
+import { computeReach } from "@/lib/campaign-estimate";
+import { loadPricingDefaults } from "@/lib/content-fee";
+import { estimateListTotals, hasFigure } from "@/lib/plan-total";
+import { totalLabel } from "@/lib/pricing/total-label";
 
 type Props = {
   locale: string;
@@ -15,6 +15,10 @@ type Props = {
 // Persistent right rail across every step: the shortlist (SavedList items) plus
 // a live per-currency spend + reach estimate. The SavedList is already durable,
 // so it *is* the saved draft — no separate save needed.
+//
+// Spend comes from the engine every plan surface shares (lib/plan-total.ts):
+// content fees included, exact only for instant-orderable lines and a price
+// band for the rest — the same figure /plan shows for this list.
 export async function ShortlistRail({ locale, items }: Props) {
   const t = await getTranslations({ locale, namespace: "campaign" });
   const tType = await getTranslations({ locale, namespace: "productType" });
@@ -22,53 +26,29 @@ export async function ShortlistRail({ locale, items }: Props) {
   const rows = items.map((i) => {
     if (i.product) {
       const p = i.product;
-      const priceVisible = isProductPriceShown(p, p.title);
-      const unit = priceVisible
-        ? indicativeFromRules(Number(p.basePrice), toRateRules(p.priceRules), i.quantity)
-        : 0;
-      const reach = p.title.digitalReach ?? p.title.monthlyReach ?? 0;
       return {
         key: i.id,
         titleName: p.title.name,
         typeLabel: tType(p.type),
         quantity: i.quantity,
-        line: {
-          currency: p.currency,
-          lineTotal: unit * i.quantity,
-          priceVisible,
-          titleId: p.titleId,
-          reach,
-        } as EstimateLine,
+        titleId: p.titleId,
+        reach: p.title.digitalReach ?? p.title.monthlyReach ?? 0,
       };
     }
     // Title placeholder — desk prices it later; counts toward reach only.
-    const reach = i.title?.digitalReach ?? i.title?.monthlyReach ?? 0;
     return {
       key: i.id,
       titleName: i.title?.name ?? "—",
       typeLabel: t("titlePlaceholder"),
       quantity: i.quantity,
-      line: null as EstimateLine | null,
-      reach,
+      titleId: i.titleId ?? i.id,
+      reach: i.title?.digitalReach ?? i.title?.monthlyReach ?? 0,
     };
   });
 
-  const estimate = computeEstimate(
-    rows
-      .map((r) => r.line ?? null)
-      .filter((l): l is EstimateLine => l !== null)
-      .concat(
-        // include placeholder reach as a hidden-price line so reach reflects it
-        rows
-          .filter((r) => !r.line)
-          .map((r) => ({
-            currency: "",
-            lineTotal: 0,
-            priceVisible: false,
-            titleId: r.key,
-            reach: (r as { reach?: number }).reach ?? 0,
-          })),
-      ),
+  const estimate = computeReach(rows);
+  const totals = estimateListTotals(items, await loadPricingDefaults()).sort(
+    (a, b) => Number(!hasFigure(a)) - Number(!hasFigure(b)),
   );
 
   return (
@@ -109,20 +89,16 @@ export async function ShortlistRail({ locale, items }: Props) {
 
       <div className="shortlist-estimate">
         <div className="shortlist-estimate-label">{t("estimateTitle")}</div>
-        {estimate.totals.filter((tot) => tot.currency).length > 0 ? (
-          estimate.totals
-            .filter((tot) => tot.currency)
-            .map((tot) => (
-              <div key={tot.currency} className="shortlist-estimate-row">
-                <span>{tot.currency}</span>
-                <span>
-                  {tot.hasVisible
-                    ? formatMoney(tot.amount, tot.currency, locale)
-                    : t("requestPrice")}
-                  {tot.hasVisible && tot.hasHidden ? ` + ${t("plusRequest")}` : ""}
-                </span>
-              </div>
-            ))
+        {totals.length > 0 ? (
+          totals.map((tot) => (
+            <div key={tot.currency} className="shortlist-estimate-row">
+              <span>{tot.currency}</span>
+              <span>
+                {totalLabel(tot, locale) ?? t("requestPrice")}
+                {hasFigure(tot) && tot.hasOnRequest ? ` + ${t("plusRequest")}` : ""}
+              </span>
+            </div>
+          ))
         ) : (
           <div className="shortlist-estimate-row muted">
             <span>—</span>

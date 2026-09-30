@@ -1,8 +1,54 @@
 # Catalog price bands + production fee — design
 
-**Date:** 2026-06-11 (amended same day after codebase audit)
-**Status:** Approved design, pending implementation plan
+**Date:** 2026-06-11 (amended same day after codebase audit; amended 2026-09-30, see below)
+**Status:** Implemented
 **Author:** Andreas + Claude
+
+## Amendment 2026-09-30 — the price-display rule before a quote
+
+Product decisions (Andreas), superseding "exact figures live ONLY in the quote
+flow" where they conflict:
+
+1. **Exact vs band, per line, one helper.** A plan line whose product the buyer
+   can order self-serve right now — `visibility = FIRM`, confirmed, price shown
+   (`isInstantOrderable`, `src/lib/pricing/visibility.ts`, the same rule the
+   instant order path and `POST /api/v1/orders` enforce) — shows its **exact**
+   price. Every other shown flat price shows its **band**; a CPM/CPC line shows
+   its rate; an unshown price says "Contact for price". The one helper is
+   `lineDisplay()` in `src/lib/plan-total.ts`; every surface uses it: plan
+   lines, the plan total, the catalog plan bar, the share page, the requests
+   list, the programme strip and the campaign rail. Browse surfaces (grid,
+   title page, compare, API, CSV, JSON-LD) stay band-only.
+2. **Mixed totals.** A total is the exact sum of the instant-orderable lines
+   plus the summed band range of the rest, e.g. `45 000 kr + ≈ 40–60k NOK`
+   (open top band: `≈ 90k+ NOK`), formatted by `src/lib/pricing/total-label.ts`.
+   Excl. VAT as before; the "incl. VAT" figure and the content-fee split are
+   exact arithmetic, so they describe the exact part only. No banded line's
+   exact estimate is ever sent to the browser (the plan bar, the budget nudge
+   and the line sort all receive band bounds).
+3. **One price basis.** The band, the plan line and the order price the same
+   thing with the same helpers: placement by the order's line builder
+   (`src/lib/pricing/line-price.ts`), article fee by the production-fee cascade
+   (`articleFee`, `src/lib/pricing/production-fee.ts`) — the order and the desk
+   quote now honour the offer/publication fee too (previously desk rule only,
+   so the band promised a price the order never charged). A line added from the
+   catalog starts with "We write it" on (`defaultContentIntent`,
+   `src/lib/authorship.ts`), because the band includes the article; where the
+   publisher's studio writes it (`inclusions.production = PUBLISHER`, or an
+   explicit fee of 0) the line starts `PUBLISHER_PRODUCED` and the band carries
+   no fee of ours. Every band label says "incl. article" when it contains one
+   (`bandIncludesArticle`). Tested: the band contains the plan line and the
+   order total for the same product and content choice.
+4. **Card band stays the lead product (decision #7).** The card band still
+   describes the product "Add to plan" adds (the native article, else the
+   cheapest); the compare row is labelled "Price band", not "From price", so
+   it no longer claims a minimum it isn't.
+5. **Stored band + filter.** `Title.priceBandTier` (currency-neutral tier,
+   indexed) is the card band, recomputed in TypeScript by
+   `src/lib/pricing/title-band.ts`; DB triggers invalidate it on every write
+   that can move a band (migration `20260930231000_title_price_band`). The
+   catalog rail's price filter (`?price=0,3`) filters and pages on it in the
+   database.
 
 ## Problem
 

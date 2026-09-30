@@ -140,7 +140,7 @@
     "rowReach": "Kuukausittainen tavoittavuus",
     "rowLeadTime": "Toimitusaika",
     "rowFormats": "Saatavilla olevat formaatit",
-    "rowFromPrice": "Alkaen",
+    "rowFromPrice": "Hintahaarukka",
     "rowAction": "Toiminto"
   },
   "availability": {
@@ -348,7 +348,8 @@
       "publisher": "Julkaisija",
       "densityLabel": "Näkymä",
       "densityList": "Lista",
-      "densityCards": "Kortit"
+      "densityCards": "Kortit",
+      "price": "Hinta"
     },
     "compareBar": {
       "label": "{count, plural, =1 {1 julkaisu valittu} other {# julkaisua valittu}}",
@@ -436,7 +437,9 @@
       "mobileFilters": "Suodattimet",
       "marketCountAll": "Kaikki {total} markkinaa",
       "formatHeading": "Mikä formaatti?",
-      "formatHint": "Natiiviartikkeli, advertoriaali, display, video …"
+      "formatHint": "Natiiviartikkeli, advertoriaali, display, video …",
+      "priceHeading": "Paljonko haluat käyttää sijoittelua kohden?",
+      "priceHint": "Hintahaarukka sijoittelua kohden, artikkeli mukaan lukien."
     },
     "shortlist": {
       "untitledPlan": "suunnitelmasi",
@@ -867,6 +870,9 @@
       "item3Body": "Luonnokset tulevat sinulle hyväksyttäviksi. Linkit ja tulokset löytyvät Raporteista."
     },
     "breakdownQtyWithArticleFee": "{n} × {unit} sijoittelu + {article} / artikkeli (yksi artikkeli kaikkiin {n})",
+    "inclVatFirmPart": "{amount} sis. alv pikatilattavista riveistä",
+    "estimateNote": "≈ tarkoittaa hintahaarukkaa. Tarkan hinnan saat tarjouksesta.",
+    "breakdownPlacements": "{n} sijoittelua",
     "noticePlanReadOnly": "Sinulla on tähän suunnitelmaan vain lukuoikeus, joten mitään ei muutettu."
   },
   "rfq": {
@@ -1534,7 +1540,19 @@
     "emptyTitle": "Ei vielä laskuja",
     "emptyHint": "Laskut näkyvät täällä, kun kampanja on pyörinyt ja laskutettu.",
     "emptyCta": "Katso kampanjasi",
-    "colCustomer": "Asiakas"
+    "colCustomer": "Asiakas",
+    "seller": "Myyjä",
+    "sellerOrgNumber": "Yritystunnus",
+    "sellerVatNumber": "ALV-numero",
+    "paymentHeading": "Maksutiedot",
+    "bankAccount": "Tilinumero",
+    "paymentReference": "Viite",
+    "pdfUnavailableHeading": "PDF ei ole vielä valmis",
+    "pdfUnavailable": "Viimeistelemme laskuasiakirjaa. Alla olevat summat ovat lopullisia — ota yhteyttä, jos tarvitset PDF:n heti.",
+    "pdfUnavailableDesk": "PDF:ää ei voi luoda ennen kuin NativeSpinin yritystiedot on asetettu palvelinympäristöön. Aseta nämä muuttujat ja julkaise uudelleen:",
+    "sellerVarMissing": "ei asetettu",
+    "sellerVarInvalid": "asetettu, mutta tarkiste ei täsmää",
+    "pdfPending": "Näytä"
   },
   "firm": {
     "badge": "Pikatilaus",
@@ -2530,7 +2548,7 @@
     "planRfqOnly": "Yksi tai useampi suunnitelmasi nimike vaatii tarjouksen — pikatilaus on poissa käytöstä, kunnes hinta on vahvistettu.",
     "listIndicative": "Listahinta (suuntaa-antava)",
     "listIndicativeHelp": "Suuntaa-antava listahinta — lopullinen hinta vahvistetaan lyhyen briiffin jälkeen.",
-    "productionIncluded": "Sisältää valmiiksi kirjoitetun artikkelin",
+    "productionIncluded": "sis. artikkelin",
     "firmTurnaround": "Kiinteä hinta yleensä 24 tunnin kuluessa"
   },
   "titleAdmin": {

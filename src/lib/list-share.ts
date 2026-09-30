@@ -112,6 +112,13 @@ export const SHARED_LIST_SELECT = {
           currency: true,
           active: true,
           confirmedAt: true,
+          // Exact figure vs band (lib/plan-total.ts lineDisplay): only an
+          // instant-orderable FIRM line is shown exactly; a CPM/CPC line shows
+          // its rate.
+          visibility: true,
+          pricingModel: true,
+          // The article fee's offer/publication layers (production-fee.ts).
+          productionFee: true,
           // Only the rate-card fields the price engine reads (lib/plan-total.ts).
           priceRules: { select: { marginPct: true, seasonalMultiplier: true, minVolume: true } },
           title: {
@@ -120,6 +127,7 @@ export const SHARED_LIST_SELECT = {
               websiteUrl: true,
               aliases: true,
               pricesPublic: true,
+              productionFeeDefault: true,
               publisher: { select: { name: true, pricesPublic: true } },
               // The market drives the default margin, the content-fee rule
               // and VAT — the same inputs /plan prices with.

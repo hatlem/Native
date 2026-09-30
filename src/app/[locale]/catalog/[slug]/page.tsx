@@ -11,10 +11,9 @@ import { FavoriteButton } from "../_components/FavoriteButton";
 import { AvailabilityStrip } from "../_components/AvailabilityStrip";
 import { Link } from "@/i18n/navigation";
 import { intlLocale } from "@/lib/money";
-import { isProductPriceShown, arePricesVisible } from "@/lib/pricing/visibility";
+import { isProductPriceShown, arePricesVisible, isInstantOrderable } from "@/lib/pricing/visibility";
 import { bandLabel } from "@/lib/pricing/bands";
-import { productBand, titleBand, unitRate } from "@/lib/pricing/display-price";
-import { resolveProductionFee } from "@/lib/pricing/production-fee";
+import { bandIncludesArticle, productBand, titleBand, unitRate } from "@/lib/pricing/display-price";
 import { inclusionLines, type ProductInclusions } from "@/lib/pricing/inclusions";
 import { productDisplayNames } from "@/lib/pricing/display-name";
 import { loadPricingDefaults } from "@/lib/content-fee";
@@ -432,21 +431,10 @@ export default async function TitleDetailPage({
                       · {tv("listIndicative")}
                     </span>
                   </div>
-                  {/* Only claim production is included when WE actually
-                      fold a production fee into this band — and defer to
-                      the curated inclusions when they state who produces. */}
-                  {!(p.inclusions as ProductInclusions | null)?.production &&
-                  resolveProductionFee({
-                    productFee:
-                      p.productionFee == null ? null : Number(p.productionFee),
-                    titleFee:
-                      title.productionFeeDefault == null
-                        ? null
-                        : Number(title.productionFeeDefault),
-                    productType: p.type,
-                    marketCode: title.market.code,
-                    rules: pricing.feeRules,
-                  }) > 0 ? (
+                  {/* Only claim the article is included when the band
+                      really contains it (display-price.ts, the one rule
+                      every band surface uses). */}
+                  {bandIncludesArticle(p, title, pricing) ? (
                     <div className="muted">✓ {tv("productionIncluded")}</div>
                   ) : null}
                 </>
@@ -512,7 +500,11 @@ export default async function TitleDetailPage({
                       pendingLabel={t("addingToPlan")}
                     />
                   </form>
-                  {band || rate ? <p className="note">{tv("firmTurnaround")}</p> : null}
+                  {/* "Firm price within 24 h" is the RFQ promise — an
+                      instant-order format already has its firm price. */}
+                  {(band || rate) && !isInstantOrderable(p, title) ? (
+                    <p className="note">{tv("firmTurnaround")}</p>
+                  ) : null}
                 </>
               ) : (
                 <p className="note">{t("unavailable")}</p>

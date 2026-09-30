@@ -12,7 +12,9 @@
 // render via unitRate() — banding a 345 NOK CPM as if it were an
 // article price produced absurd "< 15k" cards (the Adresseavisen bug).
 //
-// Exact figures live ONLY in the quote flow. Spec:
+// Browse surfaces never show an exact figure. Before a quote, the only exact
+// prices a buyer sees are plan lines they can instant-order (plan-total.ts
+// lineDisplay). Spec (and its 2026-09-30 amendment):
 // docs/superpowers/specs/2026-06-11-catalog-price-bands-design.md
 
 import {
@@ -21,9 +23,11 @@ import {
   toRateRules,
 } from "@/lib/money";
 import type { PricingDefaults } from "@/lib/content-fee";
+import { publisherProducesContent } from "@/lib/authorship";
 import { isProductPriceShown, type TitleWithVisibility } from "./visibility";
 import { priceBand, type Band } from "./bands";
-import { resolveProductionFee } from "./production-fee";
+import { articleFee } from "./production-fee";
+import { placementLineTotal } from "./line-price";
 
 // Structural types: Prisma rows satisfy these, and tests can pass plain
 // objects. Decimal fields are `unknown` and converted at the boundary.
@@ -40,6 +44,9 @@ export type DisplayProduct = {
   pricingModel: string;
   priceRules: { marginPct: unknown; seasonalMultiplier: unknown; minVolume: number }[];
   productionFee?: unknown;
+  // Curated deliverables (pricing/inclusions.ts): "production": "PUBLISHER"
+  // means the publisher's studio writes the article (no fee of ours).
+  inclusions?: unknown;
 };
 
 export type DisplayTitle = TitleWithVisibility & {
@@ -47,36 +54,60 @@ export type DisplayTitle = TitleWithVisibility & {
   market: { code: string };
 };
 
-function toNumberOrNull(v: unknown): number | null {
-  return v == null ? null : Number(v);
-}
-
 function isFlat(product: DisplayProduct): boolean {
   return !product.pricingModel || product.pricingModel === "FLAT";
 }
 
-// All-in customer price: marked-up indicative + flat production fee
-// (the fee is NOT marked up — it is our cost-recovery, not inventory).
-// Only meaningful for FLAT products; rate products go through unitRate.
+function feeSource(product: DisplayProduct, title: DisplayTitle) {
+  return {
+    type: product.type,
+    inclusions: product.inclusions,
+    productionFee: product.productionFee,
+    title: { productionFeeDefault: title.productionFeeDefault },
+  };
+}
+
+// The article fee this product's band folds in: the fee a line added from the
+// catalog is charged, because that line starts with "We write it" on
+// (authorship.ts defaultContentIntent) — unless the publisher's own studio
+// writes it, where the line starts PUBLISHER_PRODUCED and no fee is charged.
+function bandArticleFee(product: DisplayProduct, title: DisplayTitle, defaults: PricingDefaults): number {
+  const source = feeSource(product, title);
+  if (publisherProducesContent(source)) return 0;
+  return articleFee(source, title.market.code, defaults.feeRules);
+}
+
+// All-in customer price of ONE placement as a line added from the catalog is
+// priced: the placement by the order's line builder, plus the article fee
+// (flat, NOT marked up — our production service, not inventory). The same two
+// helpers price the plan line (plan-total.ts) and the order, so the band
+// always contains what the plan and the order charge for this product with
+// its default "We write it" choice. Only meaningful for FLAT products; rate
+// products go through unitRate.
 export function customerPrice(
   product: DisplayProduct,
   title: DisplayTitle,
   defaults: PricingDefaults,
 ): number {
-  const indicative = indicativeFromRules(
-    Number(product.basePrice),
-    toRateRules(product.priceRules),
-    1,
-    resolveDefaultMarginPct(defaults.marginRules, title.market.code),
+  return (
+    placementLineTotal(product, title.market.code, 1, defaults.marginRules) +
+    bandArticleFee(product, title, defaults)
   );
-  const fee = resolveProductionFee({
-    productFee: toNumberOrNull(product.productionFee),
-    titleFee: toNumberOrNull(title.productionFeeDefault),
-    productType: product.type,
-    marketCode: title.market.code,
-    rules: defaults.feeRules,
-  });
-  return Math.round(indicative) + fee;
+}
+
+// Whether a product's band includes a written article — the "incl. article"
+// every band label carries. True when the band folds in our article fee, or
+// the publisher's own studio writes it (the article is in the offer either
+// way). False only when no fee applies and nobody is stated to write it. One
+// rule for the catalog row and card, the title page, compare, the
+// recommenders and the plan's placement picker.
+export function bandIncludesArticle(
+  product: DisplayProduct,
+  title: DisplayTitle,
+  defaults: PricingDefaults,
+): boolean {
+  if (publisherProducesContent(feeSource(product, title))) return true;
+  return bandArticleFee(product, title, defaults) > 0;
 }
 
 // What one placement costs the buyer, for BUDGET PLANNING (the recommenders

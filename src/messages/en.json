@@ -140,7 +140,7 @@
     "rowReach": "Monthly reach",
     "rowLeadTime": "Lead time",
     "rowFormats": "Available formats",
-    "rowFromPrice": "From price",
+    "rowFromPrice": "Price band",
     "rowAction": "Action"
   },
   "availability": {
@@ -355,7 +355,8 @@
       "publisher": "Publisher",
       "densityLabel": "Layout",
       "densityList": "List",
-      "densityCards": "Cards"
+      "densityCards": "Cards",
+      "price": "Price"
     },
     "rail": {
       "heading": "Narrow it down",
@@ -383,7 +384,9 @@
       "advancedToggle": "{count, plural, =0 {Advanced filters} other {Advanced filters (#)}}",
       "mobileFilters": "Filters",
       "formatHeading": "Which format?",
-      "formatHint": "Native article, advertorial, display, video …"
+      "formatHint": "Native article, advertorial, display, video …",
+      "priceHeading": "What's your budget per placement?",
+      "priceHint": "Price band per placement, article included."
     },
     "shortlist": {
       "untitledPlan": "your plan",
@@ -867,6 +870,9 @@
       "item3Body": "Drafts come to you for approval. Live links and performance land in Reports."
     },
     "breakdownQtyWithArticleFee": "{n} × {unit} placement + {article} per article (one article for all {n})",
+    "inclVatFirmPart": "{amount} incl. VAT for the instant-order lines",
+    "estimateNote": "≈ marks a price band. The desk confirms the exact price in your quote.",
+    "breakdownPlacements": "{n} placements",
     "noticePlanReadOnly": "You have view-only access to this plan, so nothing was changed."
   },
   "rfq": {
@@ -1534,7 +1540,19 @@
     "emptyTitle": "No invoices yet",
     "emptyHint": "Invoices appear here once a campaign has run and been billed.",
     "emptyCta": "See your campaigns",
-    "colCustomer": "Customer"
+    "colCustomer": "Customer",
+    "seller": "From",
+    "sellerOrgNumber": "Org. no.",
+    "sellerVatNumber": "VAT no.",
+    "paymentHeading": "Payment details",
+    "bankAccount": "Bank account",
+    "paymentReference": "Reference",
+    "pdfUnavailableHeading": "PDF not available yet",
+    "pdfUnavailable": "We're finishing the invoice document. The amounts below are final — contact us if you need the PDF now.",
+    "pdfUnavailableDesk": "The PDF won't render until NativeSpin's legal details are set in the server environment. Set these variables and redeploy:",
+    "sellerVarMissing": "not set",
+    "sellerVarInvalid": "set, but fails its checksum",
+    "pdfPending": "View"
   },
   "firm": {
     "badge": "Instant order",
@@ -2530,7 +2548,7 @@
     "planRfqOnly": "One or more titles in your plan require a quote — instant order is disabled until we confirm pricing.",
     "listIndicative": "List price (indicative)",
     "listIndicativeHelp": "Indicative list rate — the final price is confirmed after a short brief.",
-    "productionIncluded": "Includes written article",
+    "productionIncluded": "incl. article",
     "firmTurnaround": "Firm price typically within 24 hours"
   },
   "titleAdmin": {

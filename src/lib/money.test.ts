@@ -196,6 +196,31 @@ test("computeContentFeeLines skips items with no matching rule", () => {
   assert.equal(lines.length, 0);
 });
 
+test("computeContentFeeLines: an offer-level fee beats the desk rule; 0 bills nothing", () => {
+  const lines = computeContentFeeLines(
+    [
+      { name: "Own fee", productType: "NATIVE_ARTICLE", fee: 4200 },
+      { name: "Publisher includes it", productType: "NATIVE_ARTICLE", fee: 0 },
+      { name: "Rule", productType: "NATIVE_ARTICLE", fee: null },
+      // No rule matches SE… but the offer states its own fee.
+    ],
+    FEE_RULES,
+    "NO",
+  );
+  assert.deepEqual(
+    lines.map((l) => [l.description, l.lineTotal]),
+    [
+      ["Content production — Own fee", 4200],
+      ["Content production — Rule", 15000],
+    ],
+  );
+  const noRule = computeContentFeeLines([{ name: "X", productType: "NATIVE_ARTICLE", fee: 3000 }], [], "SE");
+  assert.equal(noRule[0].lineTotal, 3000);
+  // An adaptation is always priced from the rule.
+  const adapt = computeContentFeeLines([{ name: "A", productType: "NATIVE_ARTICLE", fee: 4200, isAdaptation: true }], FEE_RULES, "NO");
+  assert.equal(adapt[0].lineTotal, contentFeeAmount(FEE_RULES.find((r) => r.productType === "NATIVE_ARTICLE" && r.marketCode === "NO")!, true));
+});
+
 // ---------- Default commission (MarginRule) ----------
 
 const MARGIN_RULES: MarginRuleSpec[] = [

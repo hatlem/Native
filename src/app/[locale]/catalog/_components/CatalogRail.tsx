@@ -15,6 +15,8 @@ type Props = {
   reaches: Option[];
   categories: Option[];
   regions: Option[];
+  // Price-band tiers (the `price` param), labelled in the browsed currencies.
+  priceBands: Option[];
   unpricedCount: number | null;
   initial: {
     q: string;
@@ -60,6 +62,7 @@ export function CatalogRail({
   reaches,
   categories,
   regions,
+  priceBands,
   unpricedCount,
   initial,
   staged = false,
@@ -74,6 +77,7 @@ export function CatalogRail({
   const [marketOpen, setMarketOpen] = useState(false);
   const [formatOpen, setFormatOpen] = useState(false);
   const [categoryOpen, setCategoryOpen] = useState(false);
+  const [priceOpen, setPriceOpen] = useState(false);
   const [advancedOpen, setAdvancedOpen] = useState(false);
   const marketRef = useRef<HTMLDivElement>(null);
   const formatRef = useRef<HTMLDivElement>(null);
@@ -117,6 +121,7 @@ export function CatalogRail({
   }
   const toggleMarket = (value: string) => toggleIn("market", value);
   const toggleCategory = (value: string) => toggleIn("vertical", value);
+  const togglePrice = (value: string) => toggleIn("price", value);
   const toggleFormat = (value: string) => {
     // Reads the legacy single `type` param too (old shared links), and
     // folds it into `types` on the first change.
@@ -160,6 +165,7 @@ export function CatalogRail({
     types: list(params.get("types") ?? params.get("type")),
     verticals: list(params.get("vertical")),
     regions: list(params.get("region")),
+    priceTiers: list(params.get("price")),
     nativeFit: params.get("nativeFit") ?? "",
     b2bB2c: params.get("b2bB2c") ?? "",
     onlyPriced: params.get("onlyPriced") === "1",
@@ -186,6 +192,12 @@ export function CatalogRail({
   const primaryFormat = firstLabel(formats, view.types);
   const selectedCategories = new Set(view.verticals);
   const primaryCategory = firstLabel(categories, view.verticals);
+  const selectedPrices = new Set(view.priceTiers);
+  // Cheapest selected tier first, whatever order they were ticked in.
+  const primaryPrice = firstLabel(
+    priceBands,
+    priceBands.map((p) => p.value).filter((v) => selectedPrices.has(v)),
+  );
 
   return (
     <aside className="catalog-rail">
@@ -378,6 +390,37 @@ export function CatalogRail({
             <small>{t("videoHint")}</small>
           </span>
         </label>
+      </div>
+
+      <div className="catalog-rail__group">
+        <h3>{t("priceHeading")}</h3>
+        <p className="catalog-rail__hint">{t("priceHint")}</p>
+        <div className="catalog-rail__select-box">
+          <button
+            type="button"
+            className="catalog-rail__select-trigger"
+            onClick={() => setPriceOpen((o) => !o)}
+            aria-haspopup="true"
+            aria-expanded={priceOpen}
+          >
+            <span>{primaryPrice}</span>
+            <span aria-hidden="true">⌄</span>
+          </button>
+          {priceOpen ? (
+            <div className="catalog-rail__popover" role="dialog" aria-label={tf("price")}>
+              {priceBands.map((p) => (
+                <label key={p.value} className="catalog-rail__popover-row">
+                  <input
+                    type="checkbox"
+                    checked={selectedPrices.has(p.value)}
+                    onChange={() => togglePrice(p.value)}
+                  />
+                  <span>{p.label}</span>
+                </label>
+              ))}
+            </div>
+          ) : null}
+        </div>
       </div>
 
       <button
