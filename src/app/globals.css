@@ -5560,6 +5560,22 @@ body:has(.compare-bar) {
   accent-color: var(--accent);
 }
 
+/* A labelled group of checkbox rows inside a form (e.g. API-key scopes):
+   a <fieldset> for the a11y grouping, without the browser's box. */
+.checkbox-fieldset {
+  border: 0;
+  padding: 0;
+  margin: 0;
+  min-width: 0;
+  display: grid;
+  gap: 6px;
+}
+.checkbox-fieldset legend {
+  padding: 0;
+  margin-bottom: 4px;
+  font-weight: 600;
+}
+
 /* Equal-width tracks so rows break at the same point regardless of an
    individual label's length — a flex-wrap of intrinsic-width items (the
    previous, undefined ".checkbox-grid") wraps short labels two-per-line and
