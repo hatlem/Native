@@ -5,9 +5,11 @@ import { getMessages, getTranslations } from "next-intl/server";
 import { headers } from "next/headers";
 import { notFound, redirect } from "next/navigation";
 import { prisma } from "@/lib/prisma";
-import { getWorkspace } from "@/lib/workspace";
+import { getWorkspace, viewOrgIds } from "@/lib/workspace";
+import { acceptableQuoteWhere } from "@/lib/commerce/quote-validity";
+import { OrgSwitcher } from "@/app/org-switcher";
 import { countUnsentLists } from "@/lib/lists";
-import { Inter } from "next/font/google";
+import { inter } from "@/fonts";
 import { routing } from "@/i18n/routing";
 import { Link } from "@/i18n/navigation";
 import { auth } from "@/auth";
@@ -25,12 +27,6 @@ import {
 } from "@/lib/nav";
 import { campaignFlowEnabled } from "@/lib/flags";
 import "../globals.css";
-
-const inter = Inter({
-  subsets: ["latin"],
-  display: "swap",
-  variable: "--font-inter",
-});
 
 export async function generateMetadata({
   params,
@@ -128,9 +124,10 @@ export default async function LocaleLayout({
   // Staff (desk/superadmin) who also hold a buyer-org Membership — e.g.
   // helping a client build their plan directly — otherwise have no way
   // back into the buyer flow from a desk-only session; see NavOptions.
+  // Resolved once per render and shared by every block below.
+  const workspace = await getWorkspace(session?.user?.id);
   const staffHasOrgAccess =
-    (audience === "desk" || audience === "superadmin") &&
-    (await getWorkspace(session?.user?.id)) !== null;
+    (audience === "desk" || audience === "superadmin") && workspace !== null;
   const navOpts = { campaignFlow: campaignFlowEnabled(), hasOrgAccess: staffHasOrgAccess };
   let nav = navItemsFor(audience, t, navOpts);
   const palette = paletteItemsFor(audience, t, navOpts);
@@ -145,7 +142,7 @@ export default async function LocaleLayout({
   // Draft-list badge on "Kampanjer": the nav item itself becomes the
   // notification for unsent SavedLists.
   if (showCollapsedBuyerNav) {
-    const ws = await getWorkspace(session?.user?.id);
+    const ws = workspace;
     const draftListCount = ws?.activeOrgId ? await countUnsentLists(ws.activeOrgId) : 0;
     if (draftListCount > 0) {
       nav = nav.map((item) =>
@@ -155,14 +152,18 @@ export default async function LocaleLayout({
   }
 
   // "Needs you" badge on Home — same count the Home page itself renders as
-  // cards, kept in sync by construction since both read the same two
-  // conditions (Quote SENT, ContentAsset IN_REVIEW).
+  // cards, kept in sync by construction since both read the same conditions
+  // over the same orgs (viewOrgIds): a quote waiting on the viewer (an org
+  // they can commit in) plus content drafts in review.
   if (audience === "advertiser" || audience === "agency") {
-    const ws = await getWorkspace(session?.user?.id);
+    const ws = workspace;
     if (ws) {
-      const orgIds = ws.scopeOrgIds;
+      const orgIds = viewOrgIds(ws);
+      const quoteOrgIds = orgIds.filter((id) => ws.commitOrgIds.includes(id));
       const [quoteCount, contentCount] = await Promise.all([
-        prisma.quote.count({ where: { status: "SENT", request: { organizationId: { in: orgIds } } } }),
+        prisma.quote.count({
+          where: { ...acceptableQuoteWhere(), order: null, request: { organizationId: { in: quoteOrgIds } } },
+        }),
         prisma.contentAsset.count({
           where: { status: "IN_REVIEW", article: { organizationId: { in: orgIds } } },
         }),
@@ -217,6 +218,7 @@ export default async function LocaleLayout({
                     }
                   : undefined
               }
+              orgSwitcher={<OrgSwitcher locale={locale} workspace={workspace} />}
               signOutAction={
                 <form action={logout}>
                   <input type="hidden" name="locale" value={locale} />

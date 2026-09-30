@@ -24,27 +24,35 @@ export async function QuoteSection({
   products,
   byId,
   organizationName,
+  paymentTermsDays,
   requestId,
   totalQuoteLines,
   allAccepted,
   orders,
   renewalRequested = false,
+  canAccept = true,
 }: {
   locale: string;
   quotes: QuoteWithOrder[];
   products: ProductWithTitle[];
   byId: Map<string, ProductWithTitle>;
   organizationName: string;
+  // The customer's agreed payment terms (lib/payment-terms.ts).
+  paymentTermsDays: number;
   requestId: string;
   totalQuoteLines: number;
   allAccepted: boolean;
   orders: OrderWithDetails[];
   renewalRequested?: boolean;
+  // False for a member without ordering rights: the accept form would only
+  // be refused server-side (quote-actions canCommitOnOrg), so say who can act.
+  canAccept?: boolean;
 }) {
   const t = await getTranslations({ locale, namespace: "requests" });
   const tType = await getTranslations({ locale, namespace: "productType" });
   const tn = await getTranslations({ locale, namespace: "quoteNarrative" });
   const tMarket = await getTranslations({ locale, namespace: "market" });
+  const tPay = await getTranslations({ locale, namespace: "paymentTerms" });
 
   // One narrative per quote — anchors, bullets and line totals
   // stay scoped to a single currency.
@@ -281,7 +289,7 @@ export async function QuoteSection({
         <div className="qn-block qn-terms">
           <span className="eyebrow">{tn("sectionTerms")}</span>
           <ul className="qn-terms-list">
-            <li>{tn("termsPayment")}</li>
+            <li>{tPay("line", { days: paymentTermsDays })}</li>
             <li>{tn("termsCancellation")}</li>
             <li>{tn("termsValidity")}</li>
           </ul>
@@ -311,6 +319,12 @@ export async function QuoteSection({
                 />
               </form>
             )}
+          </div>
+        ) : !canAccept ? (
+          <div className="banner-info" role="status">
+            <span>
+              <strong>{t("noCommitTitle")}</strong> {t("noCommitBody", { org: organizationName })}
+            </span>
           </div>
         ) : (
           <form

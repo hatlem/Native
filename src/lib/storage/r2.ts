@@ -41,27 +41,81 @@ export function buildObjectKey(args: { prefix: string; filename: string }): stri
   return `${args.prefix}/${date}/${uuid}-${safe}`;
 }
 
+const R2_ENV_VARS = [
+  "R2_ACCOUNT_ID",
+  "R2_ACCESS_KEY_ID",
+  "R2_SECRET_ACCESS_KEY",
+  "R2_BUCKET",
+] as const;
+
+// Thrown by every storage call when R2 credentials are missing (local dev,
+// previews, a misconfigured deploy). A distinct type so callers can turn it
+// into a clear "storage isn't configured" message instead of a 500.
+export class StorageNotConfiguredError extends Error {
+  constructor(readonly missing: readonly string[]) {
+    super(`Object storage not configured (missing ${missing.join(", ")})`);
+    this.name = "StorageNotConfiguredError";
+  }
+}
+
+export function missingStorageEnv(
+  env: Record<string, string | undefined> = process.env,
+): string[] {
+  return R2_ENV_VARS.filter((k) => !env[k]);
+}
+
+// Cheap upfront check, so an action can refuse before doing expensive work
+// (e.g. rendering a PDF) that could never be saved.
+export function isStorageConfigured(
+  env: Record<string, string | undefined> = process.env,
+): boolean {
+  return missingStorageEnv(env).length === 0;
+}
+
+function assertConfigured(): void {
+  const missing = missingStorageEnv();
+  if (missing.length > 0) throw new StorageNotConfiguredError(missing);
+}
+
 let _client: S3Client | null = null;
 function client(): S3Client {
   if (_client) return _client;
-  const accountId = process.env.R2_ACCOUNT_ID;
-  const accessKeyId = process.env.R2_ACCESS_KEY_ID;
-  const secretAccessKey = process.env.R2_SECRET_ACCESS_KEY;
-  if (!accountId) throw new Error("R2_ACCOUNT_ID not set");
-  if (!accessKeyId) throw new Error("R2_ACCESS_KEY_ID not set");
-  if (!secretAccessKey) throw new Error("R2_SECRET_ACCESS_KEY not set");
+  assertConfigured();
   _client = new S3Client({
     region: "auto",
-    endpoint: `https://${accountId}.r2.cloudflarestorage.com`,
-    credentials: { accessKeyId, secretAccessKey },
+    endpoint: `https://${process.env.R2_ACCOUNT_ID}.r2.cloudflarestorage.com`,
+    credentials: {
+      accessKeyId: process.env.R2_ACCESS_KEY_ID as string,
+      secretAccessKey: process.env.R2_SECRET_ACCESS_KEY as string,
+    },
   });
   return _client;
 }
 
 function bucket(): string {
-  const b = process.env.R2_BUCKET;
-  if (!b) throw new Error("R2_BUCKET not set");
-  return b;
+  assertConfigured();
+  return process.env.R2_BUCKET as string;
+}
+
+// Result shape for browser-initiated uploads. Server-action errors reach the
+// client as a generic message in production, so an expected condition like
+// "storage isn't configured" has to travel as data for the UI to explain it.
+export type PresignUploadResult =
+  | { ok: true; url: string; key: string }
+  | { ok: false; reason: "storage-unavailable" };
+
+// presignUpload, with missing configuration reported as a result instead
+// of thrown. Validation errors (type/size) still throw: those are caller
+// bugs or tampering, not an environment condition.
+export async function presignUploadResult(
+  args: Parameters<typeof presignUpload>[0],
+): Promise<PresignUploadResult> {
+  if (!isStorageConfigured()) {
+    console.error("storage.not_configured", { missing: missingStorageEnv(), prefix: args.prefix });
+    return { ok: false, reason: "storage-unavailable" };
+  }
+  const { url, key } = await presignUpload(args);
+  return { ok: true, url, key };
 }
 
 export async function presignUpload(args: {

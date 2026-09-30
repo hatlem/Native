@@ -19,6 +19,7 @@ import {
   fingerprintListItems,
 } from "@/lib/commerce/firm-order";
 import { submitListAsRfq } from "@/lib/commerce/submit-rfq";
+import { planNameFor } from "@/lib/plan-name";
 import { uniquePublisherIdsForProducts } from "@/lib/commerce/publishers";
 import { groupItemsByMarket } from "@/lib/quote-grouping";
 import { recordAudit } from "@/lib/audit";
@@ -187,7 +188,14 @@ export async function submitRequest(formData: FormData) {
   // they couldn't see in the catalog.
   // Any unresolved Title placeholder cannot be auto-priced, so its presence
   // forces the desk RFQ path (never the instant all-firm order).
+  //
+  // mode=rfq: the buyer explicitly asked for a quote instead. /plan offers it
+  // to a member without ordering rights on an all-firm plan, so they can send
+  // it for the desk to quote and an admin to accept, rather than hit the
+  // commit gate below. It can only ever move a submit OFF the instant path.
+  const rfqRequested = str(formData, "mode") === "rfq";
   const allFirm =
+    !rfqRequested &&
     titleItems.length === 0 &&
     items.length > 0 &&
     items.every((i) => {
@@ -253,6 +261,7 @@ export async function submitRequest(formData: FormData) {
       result = await createFirmOrder({
         organizationId: org.id,
         orgName: org.name,
+        planName: planNameFor({ listName: list.name, orgName: org.name, locale }),
         items,
         byId,
         listGuard: { listId: list.id, fingerprint: loadedFingerprint },

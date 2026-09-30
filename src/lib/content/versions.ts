@@ -37,7 +37,7 @@ type Db = PrismaClient | Prisma.TransactionClient;
 // Marks every OPEN version older than `version` as SUPERSEDED. Approved and
 // final versions are left alone: they record what was signed off, and a
 // FINAL one may be locked by a placement. Returns how many rows changed.
-// Mirrored by migration 20260930130100_supersede_stale_content_versions.
+// Mirrored by migration 20260930180100_supersede_stale_content_versions.
 export async function supersedeOlderVersions(
   db: Db,
   args: { articleId: string; version: number },

@@ -5,13 +5,6 @@ import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
 import { Link } from "@/i18n/navigation";
 import { formatMoney } from "@/lib/money";
-import {
-  generateQuote,
-  generateQuotePdf,
-  renewQuote,
-  setQuoteLineNote,
-  setQuoteLinePrice,
-} from "@/app/quote-actions";
 import { LINE_NOTE_MAX } from "@/lib/line-note";
 import { resolvePlanTitleItem, removePlanTitleItem } from "@/app/desk-actions";
 import { loadPricingDefaults } from "@/lib/content-fee";
@@ -24,9 +17,24 @@ import { bandLabel, priceBand } from "@/lib/pricing/bands";
 import { StatusBadge } from "@/app/status-badge";
 import { SubmitButton } from "@/components";
 import { canSeeCostVsSell } from "@/lib/roles";
-import { presignDownload } from "@/lib/storage/r2";
+import { isStorageConfigured, presignDownload } from "@/lib/storage/r2";
 import { intlLocale } from "@/lib/money";
-import { isQuoteExpired } from "@/lib/commerce/quote-validity";
+import {
+  QUOTE_VALIDITY_DAYS,
+  QUOTE_VALIDITY_MAX_DAYS,
+  isQuoteExpired,
+  quoteValidUntilInputValue,
+} from "@/lib/commerce/quote-validity";
+import { lineOrder } from "@/lib/commerce/line-order";
+import { invoiceLineLabel } from "@/lib/invoice-line-label";
+import {
+  generateQuote,
+  generateQuotePdf,
+  renewQuote,
+  sendQuote,
+  setQuoteLineNote,
+  setQuoteLinePrice,
+} from "@/app/quote-actions";
 
 export const dynamic = "force-dynamic";
 
@@ -40,9 +48,23 @@ export default async function DeskRequestPage({
   const { locale, requestId } = await params;
   const sp = await searchParams;
   const errorCode = typeof sp.error === "string" ? sp.error : "";
+  // Quote-PDF outcome (quote-actions.ts generateQuotePdf). Storage is also
+  // checked on render so the desk sees why no PDF can be made before
+  // clicking, not after.
+  const storageReady = isStorageConfigured();
+  const pdfNotice: "pdfStorageUnavailable" | "pdfFailed" | null = !storageReady ||
+    sp.pdf === "storage-unavailable"
+    ? "pdfStorageUnavailable"
+    : sp.pdf === "failed"
+      ? "pdfFailed"
+      : null;
   const t = await getTranslations({ locale, namespace: "desk" });
   const tr = await getTranslations({ locale, namespace: "requests" });
   const tType = await getTranslations({ locale, namespace: "productType" });
+  const lineLabelDeps = {
+    formatLabel: (type: string) => (tType.has(type) ? tType(type) : type),
+    contentProduction: tType("CONTENT_FEE"),
+  };
   // Cost-vs-sell (unitCost/margin) is publisher-sensitive commercial data —
   // gated to SUPERADMIN only. This page otherwise stays open to any desk
   // role, so we scope the check to the one span that needs it below rather
@@ -60,6 +82,7 @@ export default async function DeskRequestPage({
         orderBy: { createdAt: "desc" },
         include: {
           lines: {
+            orderBy: lineOrder(),
             include: {
               priceSetBy: { select: { name: true, email: true } },
             },
@@ -244,6 +267,27 @@ export default async function DeskRequestPage({
     })),
   );
 
+  // Draft quotes are the desk's work in progress: invisible to the buyer
+  // until "Send quote" sends them all at once with the chosen validity.
+  const draftQuotes = request.quotes.filter((q) => q.status === "DRAFT" && !q.order);
+  const now = new Date();
+  const validityInput = {
+    defaultValue: quoteValidUntilInputValue(now),
+    min: quoteValidUntilInputValue(now, now),
+    max: quoteValidUntilInputValue(
+      now,
+      new Date(now.getTime() + QUOTE_VALIDITY_MAX_DAYS * 24 * 60 * 60 * 1000),
+    ),
+  };
+  const validityError =
+    errorCode === "valid-until-invalid"
+      ? t("validUntilInvalid")
+      : errorCode === "valid-until-past"
+        ? t("validUntilPast")
+        : errorCode === "valid-until-too-far"
+          ? t("validUntilTooFar", { max: QUOTE_VALIDITY_MAX_DAYS })
+          : null;
+
   // Who to actually reach out to for this title — the answer used to live
   // only on /desk/titles/[id], several clicks away from where the desk is
   // deciding what to book.
@@ -412,291 +456,359 @@ export default async function DeskRequestPage({
           </div>
         </section>
       ) : (
-        quotesWithDownloadUrls.map((quote) => (
-          <section className="section" key={quote.id}>
-            <div className="section-head">
-              <div>
-                <span className="eyebrow">{t("quoteEyebrow")}</span>
-                <h2>{t("pdfQuoteLabel", { currency: quote.currency })}</h2>
-              </div>
-              {quote.order ? (
-                <Link
-                  href={`/desk/orders/${quote.order.id}`}
-                  className="btn small secondary"
-                >
-                  {t("openOrder")} →
-                </Link>
-              ) : null}
+        <>
+          {validityError ? (
+            <div className="banner-warn" role="alert">
+              <span>{validityError}</span>
             </div>
-            <article className="card quote-card">
-              {errorCode === "bad-price" ? (
-                <div className="banner-warn" role="alert">
-                  <span>{t("linePriceInvalid")}</span>
+          ) : null}
+          {quotesWithDownloadUrls.map((quote) => (
+            <section className="section" key={quote.id}>
+              <div className="section-head">
+                <div>
+                  <span className="eyebrow">{t("quoteEyebrow")}</span>
+                  <h2>
+                    {t("pdfQuoteLabel", { currency: quote.currency })}
+                    {quote.status === "DRAFT" ? (
+                      <>
+                        {" "}
+                        <span className="tag">{t("quoteDraftBadge")}</span>
+                      </>
+                    ) : null}
+                  </h2>
                 </div>
-              ) : null}
-              {errorCode === "note-too-long" ? (
-                <div className="banner-warn" role="alert">
-                  <span>{t("lineNoteTooLong", { max: LINE_NOTE_MAX })}</span>
-                </div>
-              ) : null}
-              {quote.order ? null : (
-                <div className="quote-validity">
-                  <span className={isQuoteExpired(quote) ? "tag" : "muted small"}>
-                    {quote.validUntil
-                      ? t(isQuoteExpired(quote) ? "quoteExpiredOn" : "quoteValidUntil", {
-                          date: new Intl.DateTimeFormat(intlLocale(locale), {
-                            dateStyle: "medium",
-                          }).format(quote.validUntil),
-                        })
-                      : t("quoteNoExpiry")}
-                  </span>
-                  {isQuoteExpired(quote) ? (
-                    <form action={renewQuote}>
-                      <input type="hidden" name="locale" value={locale} />
-                      <input type="hidden" name="requestId" value={request.id} />
-                      <input type="hidden" name="quoteId" value={quote.id} />
-                      <SubmitButton
-                        label={t("renewQuote")}
-                        pendingLabel={t("renewingQuote")}
-                        className="btn small"
-                      />
-                    </form>
-                  ) : null}
-                </div>
-              )}
-              {quote.order || !isQuoteExpired(quote) ? null : (
-                <p className="muted small">{t("renewQuoteHint")}</p>
-              )}
-              <p className="muted small">
-                {t("lineStateSummary", {
-                  priced: quote.lines.filter((l) => !l.priceOnRequest).length,
-                  onRequest: quote.lines.filter((l) => l.priceOnRequest).length,
-                })}
-              </p>
-              <div className="quote-lines">
-                {quote.lines.map((l) => {
-                  const reference = l.productId
-                    ? referenceByProductId.get(l.productId)
-                    : undefined;
-                  const editable = !quote.order;
-                  return (
-                    <Fragment key={l.id}>
-                      <div className="quote-line">
-                        <span>
-                          {l.description}{" "}
-                          <span className="muted">
-                            × {l.quantity}
-                            {l.priceOnRequest
-                              ? ""
-                              : ` · margin ${Number(l.marginPct)}%`}
-                          </span>
-                        </span>
-                        <span className="num">
-                          {l.priceOnRequest ? (
-                            <span className="tag">{t("linePriceOnRequest")}</span>
-                          ) : (
-                            formatMoney(Number(l.lineTotal), quote.currency, locale)
-                          )}
-                        </span>
-                      </div>
-                      {reference ? (
-                        <div className="muted small">
-                          {t("linePriceReference", { reference })}
-                        </div>
-                      ) : null}
-                      {l.priceSetAt ? (
-                        <div className="muted small">
-                          {t("linePriceSetBy", {
-                            name:
-                              l.priceSetBy?.name ??
-                              l.priceSetBy?.email ??
-                              t("linePriceSetByUnknown"),
+                {quote.order ? (
+                  <Link
+                    href={`/desk/orders/${quote.order.id}`}
+                    className="btn small secondary"
+                  >
+                    {t("openOrder")} →
+                  </Link>
+                ) : null}
+              </div>
+              <article className="card quote-card">
+                {errorCode === "bad-price" ? (
+                  <div className="banner-warn" role="alert">
+                    <span>{t("linePriceInvalid")}</span>
+                  </div>
+                ) : null}
+                {errorCode === "note-too-long" ? (
+                  <div className="banner-warn" role="alert">
+                    <span>{t("lineNoteTooLong", { max: LINE_NOTE_MAX })}</span>
+                  </div>
+                ) : null}
+                {quote.status === "DRAFT" ? (
+                  <p className="muted small">{t("quoteDraftHint")}</p>
+                ) : quote.order ? null : (
+                  <div className="quote-validity">
+                    <span className={isQuoteExpired(quote) ? "tag" : "muted small"}>
+                      {quote.validUntil
+                        ? t(isQuoteExpired(quote) ? "quoteExpiredOn" : "quoteValidUntil", {
                             date: new Intl.DateTimeFormat(intlLocale(locale), {
                               dateStyle: "medium",
-                              timeStyle: "short",
-                            }).format(l.priceSetAt),
-                          })}
+                            }).format(quote.validUntil),
+                          })
+                        : t("quoteNoExpiry")}
+                    </span>
+                    {isQuoteExpired(quote) ? (
+                      <form action={renewQuote} className="resolve-line">
+                        <input type="hidden" name="locale" value={locale} />
+                        <input type="hidden" name="requestId" value={request.id} />
+                        <input type="hidden" name="quoteId" value={quote.id} />
+                        <label className="muted small">
+                          {t("renewValidUntil")}{" "}
+                          <input type="date" name="validUntil" required {...validityInput} />
+                        </label>
+                        <SubmitButton
+                          label={t("renewQuote")}
+                          pendingLabel={t("renewingQuote")}
+                          className="btn small"
+                        />
+                      </form>
+                    ) : null}
+                  </div>
+                )}
+                {quote.order || !isQuoteExpired(quote) ? null : (
+                  <p className="muted small">{t("renewQuoteHint")}</p>
+                )}
+                <p className="muted small">
+                  {t("lineStateSummary", {
+                    priced: quote.lines.filter((l) => !l.priceOnRequest).length,
+                    onRequest: quote.lines.filter((l) => l.priceOnRequest).length,
+                  })}
+                </p>
+                <div className="quote-lines">
+                  {quote.lines.map((l) => {
+                    const reference = l.productId
+                      ? referenceByProductId.get(l.productId)
+                      : undefined;
+                    const editable = !quote.order;
+                    return (
+                      <Fragment key={l.id}>
+                        <div className="quote-line">
+                          <span>
+                            {/* The description is a snapshot of the product name
+                                at quoting time; older ones end in a raw type enum
+                                ("… — NATIVE_DISPLAY"), relabelled for display only. */}
+                            {invoiceLineLabel(
+                              { description: l.description, kind: l.kind },
+                              lineLabelDeps,
+                            )}{" "}
+                            <span className="muted">
+                              × {l.quantity}
+                              {l.priceOnRequest
+                                ? ""
+                                : ` · margin ${Number(l.marginPct)}%`}
+                            </span>
+                          </span>
+                          <span className="num">
+                            {l.priceOnRequest ? (
+                              <span className="tag">{t("linePriceOnRequest")}</span>
+                            ) : (
+                              formatMoney(Number(l.lineTotal), quote.currency, locale)
+                            )}
+                          </span>
                         </div>
-                      ) : null}
-                      {isSuperadmin && !l.priceOnRequest ? (
-                        <div className="muted small">
-                          {t("costVsSell", {
-                            cost: formatMoney(
-                              Number(l.unitCost) * l.quantity,
-                              quote.currency,
-                              locale,
-                            ),
-                            sell: formatMoney(
-                              Number(l.lineTotal),
-                              quote.currency,
-                              locale,
-                            ),
-                          })}
-                        </div>
-                      ) : null}
-                      {l.customerNote ? (
-                        <p className="line-note__text">
-                          <span className="line-note__label">{t("lineNoteLabel")}</span>
-                          {l.customerNote}
-                        </p>
-                      ) : null}
-                      {editable ? (
-                        <details className="line-note__edit">
-                          <summary>
-                            {l.customerNote ? t("lineNoteEdit") : t("lineNoteAdd")}
-                          </summary>
-                          <form action={setQuoteLineNote} className="line-note__form">
-                            <input type="hidden" name="locale" value={locale} />
-                            <input type="hidden" name="requestId" value={request.id} />
-                            <input type="hidden" name="quoteId" value={quote.id} />
-                            <input type="hidden" name="lineId" value={l.id} />
-                            <textarea
-                              name="note"
-                              rows={3}
-                              maxLength={LINE_NOTE_MAX}
-                              defaultValue={l.customerNote ?? ""}
-                              aria-label={t("lineNoteLabel")}
-                            />
-                            <p className="muted small">{t("lineNoteHint")}</p>
-                            <button type="submit" className="btn small">
-                              {t("lineNoteSave")}
-                            </button>
-                          </form>
-                        </details>
-                      ) : null}
-                      {editable ? (
-                        <div className="resolve-line">
-                          <form action={setQuoteLinePrice} className="resolve-line">
-                            <input type="hidden" name="locale" value={locale} />
-                            <input type="hidden" name="requestId" value={request.id} />
-                            <input type="hidden" name="quoteId" value={quote.id} />
-                            <input type="hidden" name="lineId" value={l.id} />
-                            <input type="hidden" name="intent" value="set" />
-                            <input
-                              type="text"
-                              name="lineTotal"
-                              inputMode="decimal"
-                              placeholder={t("linePricePlaceholder", {
-                                currency: quote.currency,
-                              })}
-                              aria-label={t("linePricePlaceholder", {
-                                currency: quote.currency,
-                              })}
-                            />
-                            <button type="submit" className="btn small">
-                              {t("linePriceSave")}
-                            </button>
-                          </form>
-                          {!l.priceOnRequest ? (
-                            <form action={setQuoteLinePrice}>
-                              <input type="hidden" name="locale" value={locale} />
-                              <input
-                                type="hidden"
-                                name="requestId"
-                                value={request.id}
-                              />
-                              <input type="hidden" name="quoteId" value={quote.id} />
-                              <input type="hidden" name="lineId" value={l.id} />
-                              <input type="hidden" name="intent" value="onRequest" />
-                              <button type="submit" className="btn small ghost">
-                                {t("linePriceMarkOnRequest")}
-                              </button>
-                            </form>
-                          ) : null}
-                        </div>
-                      ) : null}
-                    </Fragment>
-                  );
-                })}
-              </div>
-              <div className="quote-totals">
-                <div className="quote-row">
-                  <span className="muted">{t("subtotal")}</span>
-                  <span className="num">
-                    {formatMoney(Number(quote.subtotal), quote.currency, locale)}
-                  </span>
-                </div>
-                <div className="quote-row">
-                  <span className="muted">
-                    {t("vat")} ({Number(quote.vatPct)}%)
-                  </span>
-                  <span className="num">
-                    {formatMoney(
-                      Number(quote.total) - Number(quote.subtotal),
-                      quote.currency,
-                      locale,
-                    )}
-                  </span>
-                </div>
-                <div className="quote-row total">
-                  <span>{t("total")}</span>
-                  <span className="num">
-                    {formatMoney(Number(quote.total), quote.currency, locale)}
-                  </span>
-                </div>
-              </div>
-              {quote.order ? (
-                <div className="banner-success" role="status">
-                  ✓ {t("acceptedOrder")}
-                </div>
-              ) : (
-                <div className="quote-cta">
-                  <span className="muted small">{t("awaiting")}</span>
-                </div>
-              )}
-              <div className="quote-pdf-section">
-                <h3>{t("pdfSection")}</h3>
-                {quote.documents.length === 0 ? (
-                  <p className="muted small">{t("pdfNone")}</p>
-                ) : (
-                  <ul className="quote-pdf-versions">
-                    {quote.documents.map((d) => (
-                      <li key={d.id}>
-                        {d.url ? (
-                          <a href={d.url} target="_blank" rel="noreferrer">
-                            {t("pdfVersionRow", {
-                              version: d.version,
+                        {reference ? (
+                          <div className="muted small">
+                            {t("linePriceReference", { reference })}
+                          </div>
+                        ) : null}
+                        {l.priceSetAt ? (
+                          <div className="muted small">
+                            {t("linePriceSetBy", {
+                              name:
+                                l.priceSetBy?.name ??
+                                l.priceSetBy?.email ??
+                                t("linePriceSetByUnknown"),
                               date: new Intl.DateTimeFormat(intlLocale(locale), {
                                 dateStyle: "medium",
                                 timeStyle: "short",
-                              }).format(d.generatedAt),
+                              }).format(l.priceSetAt),
                             })}
-                          </a>
-                        ) : (
-                          t("pdfVersionRow", {
-                            version: d.version,
-                            date: new Intl.DateTimeFormat(intlLocale(locale)).format(
-                              d.generatedAt,
-                            ),
-                          })
-                        )}
-                      </li>
-                    ))}
-                  </ul>
-                )}
-                <div className="quote-pdf-actions">
-                  <form action={generateQuotePdf}>
-                    <input type="hidden" name="locale" value={locale} />
-                    <input type="hidden" name="requestId" value={request.id} />
-                    <input type="hidden" name="quoteId" value={quote.id} />
-                    <SubmitButton
-                      label={t("pdfGenerate")}
-                      pendingLabel={t("pdfGenerating")}
-                      className="btn small"
-                    />
-                  </form>
-                  <a
-                    className="btn small ghost"
-                    href={`/api/export/quote-docx/${quote.id}?locale=${locale}`}
-                    download
-                  >
-                    {t("docxDownload")}
-                  </a>
+                          </div>
+                        ) : null}
+                        {isSuperadmin && !l.priceOnRequest ? (
+                          <div className="muted small">
+                            {t("costVsSell", {
+                              cost: formatMoney(
+                                Number(l.unitCost) * l.quantity,
+                                quote.currency,
+                                locale,
+                              ),
+                              sell: formatMoney(
+                                Number(l.lineTotal),
+                                quote.currency,
+                                locale,
+                              ),
+                            })}
+                          </div>
+                        ) : null}
+                        {l.customerNote ? (
+                          <p className="line-note__text">
+                            <span className="line-note__label">{t("lineNoteLabel")}</span>
+                            {l.customerNote}
+                          </p>
+                        ) : null}
+                        {editable ? (
+                          <details className="line-note__edit">
+                            <summary>
+                              {l.customerNote ? t("lineNoteEdit") : t("lineNoteAdd")}
+                            </summary>
+                            <form action={setQuoteLineNote} className="line-note__form">
+                              <input type="hidden" name="locale" value={locale} />
+                              <input type="hidden" name="requestId" value={request.id} />
+                              <input type="hidden" name="quoteId" value={quote.id} />
+                              <input type="hidden" name="lineId" value={l.id} />
+                              <textarea
+                                name="note"
+                                rows={3}
+                                maxLength={LINE_NOTE_MAX}
+                                defaultValue={l.customerNote ?? ""}
+                                aria-label={t("lineNoteLabel")}
+                              />
+                              <p className="muted small">{t("lineNoteHint")}</p>
+                              <button type="submit" className="btn small">
+                                {t("lineNoteSave")}
+                              </button>
+                            </form>
+                          </details>
+                        ) : null}
+                        {editable ? (
+                          <div className="resolve-line">
+                            <form action={setQuoteLinePrice} className="resolve-line">
+                              <input type="hidden" name="locale" value={locale} />
+                              <input type="hidden" name="requestId" value={request.id} />
+                              <input type="hidden" name="quoteId" value={quote.id} />
+                              <input type="hidden" name="lineId" value={l.id} />
+                              <input type="hidden" name="intent" value="set" />
+                              <input
+                                type="text"
+                                name="lineTotal"
+                                inputMode="decimal"
+                                placeholder={t("linePricePlaceholder", {
+                                  currency: quote.currency,
+                                })}
+                                aria-label={t("linePricePlaceholder", {
+                                  currency: quote.currency,
+                                })}
+                              />
+                              <button type="submit" className="btn small">
+                                {t("linePriceSave")}
+                              </button>
+                            </form>
+                            {!l.priceOnRequest ? (
+                              <form action={setQuoteLinePrice}>
+                                <input type="hidden" name="locale" value={locale} />
+                                <input
+                                  type="hidden"
+                                  name="requestId"
+                                  value={request.id}
+                                />
+                                <input type="hidden" name="quoteId" value={quote.id} />
+                                <input type="hidden" name="lineId" value={l.id} />
+                                <input type="hidden" name="intent" value="onRequest" />
+                                <button type="submit" className="btn small ghost">
+                                  {t("linePriceMarkOnRequest")}
+                                </button>
+                              </form>
+                            ) : null}
+                          </div>
+                        ) : null}
+                      </Fragment>
+                    );
+                  })}
                 </div>
+                <div className="quote-totals">
+                  <div className="quote-row">
+                    <span className="muted">{t("subtotal")}</span>
+                    <span className="num">
+                      {formatMoney(Number(quote.subtotal), quote.currency, locale)}
+                    </span>
+                  </div>
+                  <div className="quote-row">
+                    <span className="muted">
+                      {t("vat")} ({Number(quote.vatPct)}%)
+                    </span>
+                    <span className="num">
+                      {formatMoney(
+                        Number(quote.total) - Number(quote.subtotal),
+                        quote.currency,
+                        locale,
+                      )}
+                    </span>
+                  </div>
+                  <div className="quote-row total">
+                    <span>{t("total")}</span>
+                    <span className="num">
+                      {formatMoney(Number(quote.total), quote.currency, locale)}
+                    </span>
+                  </div>
+                </div>
+                {quote.order ? (
+                  <div className="banner-success" role="status">
+                    ✓ {t("acceptedOrder")}
+                  </div>
+                ) : quote.status === "DRAFT" ? null : (
+                  <div className="quote-cta">
+                    <span className="muted small">{t("awaiting")}</span>
+                  </div>
+                )}
+                <div className="quote-pdf-section">
+                  <h3>{t("pdfSection")}</h3>
+                  {quote.documents.length === 0 ? (
+                    <p className="muted small">{t("pdfNone")}</p>
+                  ) : (
+                    <ul className="quote-pdf-versions">
+                      {quote.documents.map((d) => (
+                        <li key={d.id}>
+                          {d.url ? (
+                            <a href={d.url} target="_blank" rel="noreferrer">
+                              {t("pdfVersionRow", {
+                                version: d.version,
+                                date: new Intl.DateTimeFormat(intlLocale(locale), {
+                                  dateStyle: "medium",
+                                  timeStyle: "short",
+                                }).format(d.generatedAt),
+                              })}
+                            </a>
+                          ) : (
+                            t("pdfVersionRow", {
+                              version: d.version,
+                              date: new Intl.DateTimeFormat(intlLocale(locale)).format(
+                                d.generatedAt,
+                              ),
+                            })
+                          )}
+                        </li>
+                      ))}
+                    </ul>
+                  )}
+                  {pdfNotice ? (
+                    <p className="banner-error" role="alert">
+                      {t(pdfNotice)}
+                    </p>
+                  ) : null}
+                  <div className="quote-pdf-actions">
+                    {/* Without object storage a PDF version can't be saved,
+                        so the button would only ever fail — explain up front. */}
+                    {storageReady ? (
+                      <form action={generateQuotePdf}>
+                        <input type="hidden" name="locale" value={locale} />
+                        <input type="hidden" name="requestId" value={request.id} />
+                        <input type="hidden" name="quoteId" value={quote.id} />
+                        <SubmitButton
+                          label={t("pdfGenerate")}
+                          pendingLabel={t("pdfGenerating")}
+                          className="btn small"
+                        />
+                      </form>
+                    ) : null}
+                    <a
+                      className="btn small ghost"
+                      href={`/api/export/quote-docx/${quote.id}?locale=${locale}`}
+                      download
+                    >
+                      {t("docxDownload")}
+                    </a>
+                  </div>
+                </div>
+              </article>
+            </section>
+          ))}
+          {draftQuotes.length > 0 ? (
+            <section className="section">
+              <div className="cta-block">
+                <h2>{t("sendTitle")}</h2>
+                <p className="muted">{t("sendBody", { count: draftQuotes.length })}</p>
+                {errorCode === "send-unpriced" ? (
+                  <div className="banner-warn" role="alert">
+                    <span>{t("sendUnpriced")}</span>
+                  </div>
+                ) : null}
+                <form action={sendQuote} className="resolve-line">
+                  <input type="hidden" name="locale" value={locale} />
+                  <input type="hidden" name="requestId" value={request.id} />
+                  <label>
+                    {t("sendValidUntil")}{" "}
+                    <input type="date" name="validUntil" required {...validityInput} />
+                  </label>
+                  <SubmitButton
+                    label={t("send")}
+                    pendingLabel={t("sending")}
+                    className="btn large"
+                  />
+                </form>
+                <p className="muted small">
+                  {t("sendValidUntilHint", {
+                    days: QUOTE_VALIDITY_DAYS,
+                    max: QUOTE_VALIDITY_MAX_DAYS,
+                  })}
+                </p>
               </div>
-            </article>
-          </section>
-        ))
+            </section>
+          ) : null}
+        </>
       )}
     </>
   );

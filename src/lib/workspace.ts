@@ -4,6 +4,7 @@ import {
   type MembershipRole,
   type MembershipRow,
   activeScopeOrgIds,
+  isMembershipActive,
   resolveOrgMembership,
 } from "@/lib/membership";
 
@@ -13,17 +14,25 @@ export type Workspace = {
   userId: string;
   isAgency: boolean;
   agencyOrgId: string | null;
-  // The user's OWN employer org (User.organization). For an agency this is the
-  // agency itself; for an advertiser, their own org; null for membership-only
-  // (no home org) users. Stable across client switching — use this, not
-  // activeOrgId, for "my team" scoping like favorites sharing.
+  // The user's OWN team org (User.organization) — but only while they still
+  // hold an active seat in it (an agency's own org is the exception, see
+  // resolveWorkspace). Stable across client/org switching — use this, not
+  // activeOrgId, for "my team" scoping like favorites sharing. Null for
+  // membership-only users and for anyone whose seat in it was revoked or
+  // lapsed.
   homeOrgId: string | null;
-  // The org buyer actions operate on. Advertiser = own org; agency =
-  // the selected client (null until one is picked).
+  // The seat role in homeOrgId (null when there is no active seat). An agency
+  // edits its OWN company details with this, not with the client's role.
+  homeRole: MembershipRole | null;
+  // The org buyer actions operate on. Advertiser = the selected org (own org
+  // by default); agency = the selected client (null until one is picked).
   activeOrgId: string | null;
-  // Org ids this user may read: own/active org plus, for an agency, all
-  // of its client orgs. Used for request/quote/report scoping.
+  // Org ids this user may read: every org with an active seat plus, for an
+  // agency, all of its client orgs. Used for request/quote/report scoping.
   scopeOrgIds: string[];
+  // Orgs where this user may commit (accept a quote, place an order): an
+  // active seat with canCommit, or — for an agency — every org in scope.
+  commitOrgIds: string[];
   // Resolved authority for activeOrgId from the membership row (null when there
   // is no active membership for the active org, e.g. pure agency path).
   activeRole: MembershipRole | null;
@@ -54,13 +63,115 @@ export async function loadMemberships(userId: string): Promise<MembershipRow[]> 
   return rows as MembershipRow[];
 }
 
-// Resolve the acting workspace for a signed-in user. Returns null when the
-// user has no organization (e.g. desk/publisher accounts).
-export async function getWorkspace(
-  userId: string | undefined,
-): Promise<Workspace | null> {
-  if (!userId) return null;
+export type WorkspaceInputs = {
+  userId: string;
+  // User.organization — the pointer to the user's own team, NOT a grant.
+  homeOrg: { id: string; type: "ADVERTISER" | "AGENCY" } | null;
+  memberships: MembershipRow[];
+  // Client org ids of an AGENCY home org (ignored otherwise).
+  agencyClientIds: string[];
+  // Raw CLIENT_COOKIE value: a selection, validated here, never trusted.
+  selectedOrgId: string | null;
+  now: Date;
+};
 
+// The access model, as a pure function so it can be tested exhaustively.
+//
+// Access to an advertiser org comes ONLY from an active Membership. The home
+// org pointer (User.organizationId) used to be granted implicitly on top of
+// the seats, which meant revoking a member — or their delegation running out
+// — changed nothing for anyone whose account had been created by an invite
+// claim (the claim points the new account's home org at the inviting org).
+// Now the pointer only picks the DEFAULT active org among orgs the user
+// already holds a seat in. Signup gives the org creator an ADMIN seat, so
+// creators are unaffected.
+//
+// An AGENCY home org is different: only the desk binds a user to an agency
+// (there is no self-serve invite into one), and the agency's reach over its
+// client orgs comes from Organization.parentOrgId, not from seats. That path
+// is kept exactly as it was.
+export function resolveWorkspace(input: WorkspaceInputs): Workspace | null {
+  const { userId, homeOrg, memberships, now } = input;
+  const seatOrgIds = activeScopeOrgIds(memberships, now);
+
+  if (homeOrg?.type === "AGENCY") {
+    const clientIds = input.agencyClientIds;
+    const activeOrgId =
+      input.selectedOrgId && clientIds.includes(input.selectedOrgId) ? input.selectedOrgId : null;
+    const active = activeOrgId ? resolveOrgMembership(memberships, activeOrgId, now) : null;
+    const scopeOrgIds = Array.from(new Set([homeOrg.id, ...clientIds, ...seatOrgIds]));
+    return {
+      userId,
+      isAgency: true,
+      agencyOrgId: homeOrg.id,
+      homeOrgId: homeOrg.id,
+      homeRole: resolveOrgMembership(memberships, homeOrg.id, now)?.role ?? null,
+      activeOrgId,
+      scopeOrgIds,
+      // Agencies retain full control (including commit) over every org in
+      // their scope — the pre-existing agency access path.
+      commitOrgIds: scopeOrgIds,
+      activeRole: active?.role ?? null,
+      activeCanCommit: active?.canCommit ?? false,
+    };
+  }
+
+  // No active seat anywhere: no workspace. Revoked and lapsed members land
+  // here, as do staff accounts that were never given one.
+  if (seatOrgIds.length === 0) return null;
+
+  const homeOrgId = homeOrg && seatOrgIds.includes(homeOrg.id) ? homeOrg.id : null;
+  const activeOrgId =
+    input.selectedOrgId && seatOrgIds.includes(input.selectedOrgId)
+      ? input.selectedOrgId
+      : (homeOrgId ?? seatOrgIds[0]);
+  const active = resolveOrgMembership(memberships, activeOrgId, now);
+  const commitOrgIds = Array.from(
+    new Set(
+      memberships
+        .filter((m) => m.canCommit && isMembershipActive(m, now))
+        .map((m) => m.organizationId),
+    ),
+  );
+  return {
+    userId,
+    isAgency: false,
+    agencyOrgId: null,
+    homeOrgId,
+    homeRole: homeOrgId ? (resolveOrgMembership(memberships, homeOrgId, now)?.role ?? null) : null,
+    activeOrgId,
+    scopeOrgIds: seatOrgIds,
+    commitOrgIds,
+    activeRole: active?.role ?? null,
+    activeCanCommit: active?.canCommit ?? false,
+  };
+}
+
+// Orgs an overview page (home, requests, orders, reports) lists. A member of
+// several orgs sees the ORG THEY SWITCHED TO, not a blend of all of them —
+// the org switcher decides what they're looking at, while detail pages and
+// deep links still open anything in scopeOrgIds. An agency's overviews keep
+// spanning every client: that cross-client view is what the agency is for.
+export function viewOrgIds(ws: Workspace): string[] {
+  if (ws.isAgency) return ws.scopeOrgIds;
+  return ws.activeOrgId ? [ws.activeOrgId] : [];
+}
+
+// The organisation whose company details (name, billing market) /account
+// shows, and whether this workspace may edit them. An advertiser edits the
+// org it is working in; an agency edits its own company, never a client's.
+export function companySeat(ws: Workspace): { orgId: string | null; isAdmin: boolean } {
+  if (ws.isAgency) return { orgId: ws.agencyOrgId, isAdmin: ws.homeRole === "ADMIN" };
+  return { orgId: ws.activeOrgId, isAdmin: ws.activeRole === "ADMIN" };
+}
+
+// Resolve the workspace from the database for an explicit org selection.
+// getWorkspace is the request-scoped wrapper; this is what tests drive.
+export async function loadWorkspace(
+  userId: string,
+  selectedOrgId: string | null,
+  now: Date = new Date(),
+): Promise<Workspace | null> {
   const [user, memberships] = await Promise.all([
     prisma.user.findUnique({
       where: { id: userId },
@@ -77,10 +188,7 @@ export async function getWorkspace(
   // deactivation bite on everything org-scoped — API routes and server
   // actions included — not just the page render the layout guards. Costs
   // nothing: the row was already being read.
-  if (user?.deactivatedAt) return null;
-
-  const now = new Date();
-  const membershipOrgIds = activeScopeOrgIds(memberships, now);
+  if (!user || user.deactivatedAt) return null;
 
   // Opportunistic, on-action reconciliation (no cron/worker): once a membership
   // crosses its expiry, flip its stored status so audit/reporting stays accurate.
@@ -102,73 +210,34 @@ export async function getWorkspace(
       .catch((err) => console.error("membership.reconcile_failed", { userId, err }));
   }
 
-  const org = user?.organization;
+  const homeOrg = user.organization;
+  const agencyClientIds =
+    homeOrg?.type === "AGENCY"
+      ? (
+          await prisma.organization.findMany({
+            where: { parentOrgId: homeOrg.id },
+            select: { id: true },
+          })
+        ).map((c) => c.id)
+      : [];
 
-  if (!org) {
-    // No home org — build a workspace from memberships alone if possible.
-    if (membershipOrgIds.length > 0) {
-      const store = await cookies();
-      const selected = store.get(CLIENT_COOKIE)?.value ?? null;
-      const activeOrgId =
-        selected && membershipOrgIds.includes(selected)
-          ? selected
-          : membershipOrgIds[0];
-      const active = resolveOrgMembership(memberships, activeOrgId, now);
-      return {
-        userId,
-        isAgency: false,
-        agencyOrgId: null,
-        homeOrgId: null,
-        activeOrgId,
-        scopeOrgIds: membershipOrgIds,
-        activeRole: active?.role ?? null,
-        activeCanCommit: active?.canCommit ?? false,
-      };
-    }
-    return null;
-  }
-
-  if (org.type !== "AGENCY") {
-    const homeOrgId = org.id;
-    const store = await cookies();
-    const selected = store.get(CLIENT_COOKIE)?.value ?? null;
-    const activeOrgId =
-      selected && membershipOrgIds.includes(selected) ? selected : homeOrgId;
-    const active = resolveOrgMembership(memberships, activeOrgId, now);
-    return {
-      userId,
-      isAgency: false,
-      agencyOrgId: null,
-      homeOrgId,
-      activeOrgId,
-      scopeOrgIds: Array.from(new Set([homeOrgId, ...membershipOrgIds])),
-      activeRole: active?.role ?? null,
-      activeCanCommit: active?.canCommit ?? false,
-    };
-  }
-
-  const clients = await prisma.organization.findMany({
-    where: { parentOrgId: org.id },
-    select: { id: true },
-  });
-  const clientIds = clients.map((c) => c.id);
-  const store = await cookies();
-  const selected = store.get(CLIENT_COOKIE)?.value ?? null;
-  const activeOrgId =
-    selected && clientIds.includes(selected) ? selected : null;
-
-  const active = activeOrgId
-    ? resolveOrgMembership(memberships, activeOrgId, now)
-    : null;
-
-  return {
+  return resolveWorkspace({
     userId,
-    isAgency: true,
-    agencyOrgId: org.id,
-    homeOrgId: org.id,
-    activeOrgId,
-    scopeOrgIds: Array.from(new Set([org.id, ...clientIds, ...membershipOrgIds])),
-    activeRole: active?.role ?? null,
-    activeCanCommit: active?.canCommit ?? false,
-  };
+    homeOrg,
+    memberships,
+    agencyClientIds,
+    selectedOrgId,
+    now,
+  });
+}
+
+// Resolve the acting workspace for a signed-in user. Returns null when the
+// user holds no active seat and is not an agency (e.g. desk/publisher
+// accounts, or a member whose access was revoked or has lapsed).
+export async function getWorkspace(
+  userId: string | undefined,
+): Promise<Workspace | null> {
+  if (!userId) return null;
+  const store = await cookies();
+  return loadWorkspace(userId, store.get(CLIENT_COOKIE)?.value ?? null);
 }

@@ -6,6 +6,7 @@
 import { NextResponse } from "next/server";
 import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
+import { lineOrder } from "@/lib/commerce/line-order";
 import { recordAudit } from "@/lib/audit";
 import { buildAccountingInvoice } from "@/lib/accounting";
 
@@ -21,7 +22,7 @@ export async function GET() {
   const invoices = await prisma.invoice.findMany({
     orderBy: { issuedAt: "desc" },
     include: {
-      lines: true,
+      lines: { orderBy: lineOrder() },
       organization: { select: { id: true, name: true, vatId: true } },
     },
   });

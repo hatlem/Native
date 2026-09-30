@@ -9,6 +9,9 @@ import { prisma } from "@/lib/prisma";
 import { getWorkspace } from "@/lib/workspace";
 import { recordAudit } from "@/lib/audit";
 import { exportLimiter } from "@/lib/rate-limit";
+import { buyerVisibleQuoteWhere } from "@/lib/commerce/quote-validity";
+import { lineOrder } from "@/lib/commerce/line-order";
+import { BUYER_REQUEST_SELECT, BUYER_ORDER_SELECT } from "@/lib/export/buyer-export";
 
 export const dynamic = "force-dynamic";
 
@@ -83,29 +86,36 @@ export async function GET(req: NextRequest) {
         },
       },
     }),
-    prisma.request.findMany({
-      where: { organizationId: { in: orgIds } },
-      include: { quotes: { include: { lines: true } } },
-    }),
-    prisma.order.findMany({
-      where: { organizationId: { in: orgIds } },
-      // `brief` alongside `article`: the ContentBrief (message/audience/
-      // do/don't) is org-supplied personal-ish data the export must keep,
-      // and it is no longer reachable through the asset tree now that
-      // ContentAsset hangs off Article instead of ContentBrief.
-      include: {
-        lines: {
+    // A buyer's export holds what was sent to them; the desk's unsent DRAFT
+    // pricing and its internal fields only appear in a desk-run export.
+    isDesk
+      ? prisma.request.findMany({
+          where: { organizationId: { in: orgIds } },
+          include: { quotes: { include: { lines: { orderBy: lineOrder() } } } },
+        })
+      : prisma.request.findMany({ where: { organizationId: { in: orgIds } }, select: BUYER_REQUEST_SELECT }),
+    isDesk
+      ? prisma.order.findMany({
+          where: { organizationId: { in: orgIds } },
+          // `brief` alongside `article`: the ContentBrief (message/audience/
+          // do/don't) is org-supplied personal-ish data the export must keep,
+          // and it is no longer reachable through the asset tree now that
+          // ContentAsset hangs off Article instead of ContentBrief.
           include: {
-            brief: true,
-            articlePlacement: { include: { article: { include: { versions: true } } } },
-            booking: true,
+            lines: {
+              orderBy: lineOrder(),
+              include: {
+                brief: true,
+                articlePlacement: { include: { article: { include: { versions: true } } } },
+                booking: true,
+              },
+            },
           },
-        },
-      },
-    }),
+        })
+      : prisma.order.findMany({ where: { organizationId: { in: orgIds } }, select: BUYER_ORDER_SELECT }),
     prisma.invoice.findMany({
       where: { organizationId: { in: orgIds } },
-      include: { lines: true },
+      include: { lines: { orderBy: lineOrder() } },
     }),
   ]);
 

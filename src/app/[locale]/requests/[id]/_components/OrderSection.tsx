@@ -6,16 +6,21 @@ import { SectionHead } from "@/components";
 import { resolveEffectiveAsset } from "@/lib/writers/placement";
 import type { OrderWithDetails, ProductWithTitle } from "./types";
 
-// Confirmed-order section — inventory lines with production status,
-// plus a link to the invoice once one exists.
+// Confirmed-order section — inventory lines with production status, a link
+// to each order's own page (production, content review, campaign report —
+// otherwise only reachable from a notification) and to the invoice once one
+// exists. A multi-market request has one order per market, labelled by
+// currency.
 export async function OrderSection({
   locale,
   orders,
+  orderLinks,
   byId,
   orderInvoice,
 }: {
   locale: string;
   orders: OrderWithDetails[];
+  orderLinks: { id: string; currency: string }[];
   byId: Map<string, ProductWithTitle>;
   orderInvoice: Invoice | undefined;
 }) {
@@ -48,14 +53,24 @@ export async function OrderSection({
           </>
         }
         trailing={
-          orderInvoice ? (
-            <Link
-              href={`/invoices/${orderInvoice.id}`}
-              className="btn small secondary"
-            >
-              {ti("title")} →
-            </Link>
-          ) : null
+          <div className="cluster tight">
+            {orderLinks.map((o) => (
+              <Link key={o.id} href={`/orders/${o.id}`} className="btn small">
+                {orderLinks.length > 1
+                  ? t("openOrderMarket", { currency: o.currency })
+                  : t("openOrder")}{" "}
+                →
+              </Link>
+            ))}
+            {orderInvoice ? (
+              <Link
+                href={`/invoices/${orderInvoice.id}`}
+                className="btn small secondary"
+              >
+                {ti("title")} →
+              </Link>
+            ) : null}
+          </div>
         }
       />
       <div className="grid">

@@ -30,6 +30,40 @@ export function authorshipFromWithContent(
   return withContent ? "NATIVESPIN_PRODUCED" : "BUYER_SUPPLIED";
 }
 
+// The persisted pair behind the buyer's "We write it" toggle. SavedListItem
+// stores both columns (withContent drives the UI, authorshipMode drives the
+// RFQ snapshot, the content-fee lines and writer staffing), so every write path
+// — toggle, add, copy to a new list/wave, merge — builds the pair here and
+// nowhere else. A DB CHECK (SavedListItem_authorship_matches_content) backstops
+// it: withContent ⇔ NATIVESPIN_PRODUCED.
+//
+// `carried` is the mode the row (or its copy source) already holds. Turning
+// the toggle on always means NativeSpin writes it. Off keeps a carried
+// non-NativeSpin mode — PUBLISHER_PRODUCED has no toggle yet but must survive a
+// copy — and never a stale NATIVESPIN_PRODUCED.
+export type ContentIntent = { withContent: boolean; authorshipMode: AuthorshipMode };
+
+export function contentIntent(
+  withContent: boolean,
+  carried?: AuthorshipMode | null,
+): ContentIntent {
+  if (withContent) return { withContent: true, authorshipMode: "NATIVESPIN_PRODUCED" };
+  const authorshipMode =
+    carried && carried !== "NATIVESPIN_PRODUCED" ? carried : DEFAULT_AUTHORSHIP_MODE;
+  return { withContent: false, authorshipMode };
+}
+
+// Two lines folding into one (same product added twice, a placeholder resolved
+// onto an existing line, a catalog merge): if either asked us to write it, the
+// survivor does — dropping a content request silently loses a paid service the
+// buyer chose. Otherwise the survivor keeps its own mode.
+export function mergeContentIntent(
+  survivor: ContentIntent,
+  absorbed: Pick<ContentIntent, "withContent">,
+): ContentIntent {
+  return contentIntent(survivor.withContent || absorbed.withContent, survivor.authorshipMode);
+}
+
 // Reverse shim for code still reading the boolean until the UI exposes a full
 // mode selector. Only NativeSpin-produced is a content-fee placement.
 export function withContentFromAuthorship(mode: AuthorshipMode): boolean {

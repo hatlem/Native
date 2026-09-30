@@ -63,7 +63,10 @@
     "campaign": "Kampagne planen",
     "campaigns": "Kampagnen",
     "rates": "Preise",
-    "users": "Benutzer"
+    "users": "Benutzer",
+    "invoices": "Rechnungen",
+    "orgSwitcherLabel": "Organisation",
+    "orgSwitchTo": "Zu {org} wechseln"
   },
   "orders": {
     "eyebrow": "Bestellungen",
@@ -184,6 +187,8 @@
     "placementRetracted": "Zurückgezogen",
     "unlinkCta": "Verknüpfung entfernen",
     "sharedArticleWarning": "Dieser Artikel ist mit {count} weiteren Platzierungen verknüpft — deine Änderungen wirken sich auf alle aus.",
+    "detailUploadFailed": "Hochladen fehlgeschlagen. Versuchen Sie eine andere Datei.",
+    "detailUploadUnavailable": "Datei-Uploads sind gerade nicht verfügbar. Fügen Sie den Text stattdessen im Editor ein.",
     "backToArticles": "Alle Artikel",
     "versionLabel": "Version {version}",
     "byAuthor": "Von {name}",
@@ -197,7 +202,6 @@
     "orderRef": "Auftrag {ref}",
     "draftLabel": "Artikeltext",
     "draftHint": "Reiner Text mit einfachem Markdown: # für Überschriften, **fett**, *kursiv*, - für Listen, [Text](Link).",
-    "uploadFailed": "Upload fehlgeschlagen. Versuchen Sie eine andere Datei.",
     "submitBlockedSpec": "Die Formatvorgaben einer Platzierung sind noch nicht erfüllt – prüfen Sie die Platzierungen oben."
   },
   "reports": {
@@ -239,7 +243,8 @@
     "suggestedMargin": "Empfohlen",
     "basis_win-rate": "aus Gewinnrate",
     "basis_category-median": "Kategorie-Median",
-    "basis_default": "Standard"
+    "basis_default": "Standard",
+    "exportInvoicesCsv": "Rechnungen exportieren (CSV)"
   },
   "agency": {
     "eyebrow": "Agentur",
@@ -604,6 +609,9 @@
     "decrementRemoves": "Titel aus dem Plan entfernen",
     "increment": "Menge erhöhen",
     "estTotal": "Geschätzter Richtwert",
+    "exVat": "zzgl. MwSt.",
+    "inclVatLine": "{amount} inkl. MwSt.",
+    "includesContentFees": "Inklusive {amount} für die Content-Produktion.",
     "totalForItems": "{amount} für {count, plural, =1 {1 Titel} other {# Titel}}",
     "multiCurrencyNote": "Titel werden in der Währung des jeweiligen Verlags abgerechnet — beide Beträge sind fällig, das ist keine Wahl der Zahlungswährung.",
     "rfqTitle": "Festes Angebot anfordern",
@@ -878,6 +886,8 @@
     "itemsEyebrow": "Brief",
     "quoteEyebrow": "Festpreis",
     "orderEyebrow": "Bestellung",
+    "openOrder": "Bestellung öffnen",
+    "openOrderMarket": "Bestellung öffnen · {currency}",
     "pendingTitle": "Ihr Brief liegt beim Desk",
     "pendingBuyerLabel": "Einkäufer",
     "pendingBuyerUnassigned": "Wird zugewiesen",
@@ -933,7 +943,9 @@
     "requestRenewal": "Erneuertes Angebot anfordern",
     "requestingRenewal": "Wird gesendet …",
     "renewalRequested": "Der Desk wurde gebeten, das Angebot zu erneuern. Sie erhalten eine Benachrichtigung, sobald Sie es annehmen können.",
-    "lineNoteLabel": "Hinweis"
+    "lineNoteLabel": "Hinweis",
+    "noCommitTitle": "Sie können dieses Angebot nicht selbst annehmen.",
+    "noCommitBody": "Die Annahme ist eine verbindliche Bestellung für {org} und erfordert Bestellrecht. Bitten Sie einen Administrator, das Angebot anzunehmen oder Ihnen unter Konto → Team Bestellrecht zu geben."
   },
   "desk": {
     "eyebrow": "Interner Desk",
@@ -1034,13 +1046,28 @@
     "quoteNoExpiry": "Kein Ablaufdatum",
     "renewQuote": "Angebot erneuern",
     "renewingQuote": "Wird erneuert …",
-    "renewQuoteHint": "Der Kunde kann ein abgelaufenes Angebot nicht annehmen. Die Erneuerung hält diese Preise weitere 14 Tage – passen Sie zuerst Positionen an, falls sich Preise geändert haben.",
+    "renewQuoteHint": "Der Kunde kann ein abgelaufenes Angebot nicht annehmen. Die Erneuerung hält diese Preise bis zum gewählten Datum – passen Sie zuerst Positionen an, falls sich Preise geändert haben.",
+    "quoteDraftBadge": "Entwurf – nicht gesendet",
+    "quoteDraftHint": "Der Kunde sieht dieses Angebot noch nicht. Bepreisen Sie die Positionen und senden Sie es unten ab.",
+    "sendTitle": "An den Kunden senden",
+    "sendBody": "{count, plural, =1 {Das Angebot geht} other {Alle # Angebote gehen}} gemeinsam hinaus. Der Kunde erhält eine E-Mail mit dem Gesamtbetrag und kann bis zum unten genannten Datum annehmen.",
+    "sendValidUntil": "Gültig bis",
+    "sendValidUntilHint": "Standard sind {days} Tage, höchstens {max}. Der Kunde kann bis zum Ende dieses Tages annehmen.",
+    "send": "Angebot senden",
+    "sending": "Wird gesendet…",
+    "sendUnpriced": "Bepreisen Sie in jedem Angebot mindestens eine Position, bevor Sie senden – ein Angebot, bei dem alle Positionen auf Anfrage stehen, gibt dem Kunden nichts zum Annehmen.",
+    "validUntilInvalid": "Bitte geben Sie ein gültiges Datum ein.",
+    "validUntilPast": "Das Gültigkeitsdatum darf nicht in der Vergangenheit liegen.",
+    "validUntilTooFar": "Ein Angebot kann höchstens {max} Tage gültig sein.",
+    "renewValidUntil": "Neue Gültigkeit",
     "lineNoteLabel": "Hinweis an den Kunden",
     "lineNoteAdd": "Hinweis an den Kunden hinzufügen",
     "lineNoteEdit": "Hinweis an den Kunden bearbeiten",
     "lineNoteSave": "Hinweis speichern",
     "lineNoteHint": "Wird dem Kunden auf der Angebotsseite und im PDF angezeigt.",
-    "lineNoteTooLong": "Der Hinweis ist zu lang. Bitte unter {max} Zeichen bleiben."
+    "lineNoteTooLong": "Der Hinweis ist zu lang. Bitte unter {max} Zeichen bleiben.",
+    "pdfStorageUnavailable": "Dateispeicher (R2) ist in dieser Umgebung nicht eingerichtet, daher kann das PDF nicht gespeichert werden. Laden Sie stattdessen die Word-Version herunter.",
+    "pdfFailed": "Das PDF konnte nicht erstellt werden. Versuchen Sie es erneut oder laden Sie die Word-Version herunter."
   },
   "deskTitles": {
     "eyebrow": "Super-Admin · Titel",
@@ -1323,19 +1350,51 @@
     "cancelledReasonLabel": "Grund",
     "creditNoteButton": "Gutschrift ausstellen",
     "creditNoteTitle": "Rechnung erstatten",
-    "creditNoteHint": "Erstatten Sie {amount} gegen die ausgestellte Rechnung. Der Grund wird auf der Gutschrift protokolliert und dem Käufer angezeigt.",
+    "creditNoteHint": "Erstattet {amount} vollständig und storniert die Bestellung. Der Grund wird auf der Gutschrift protokolliert und dem Käufer angezeigt.",
     "creditNoteReasonLabel": "Grund",
-    "creditNoteReasonPlaceholder": "z.B. Bestellung nach Rechnungsstellung storniert; redaktionelles Veto des Verlags.",
+    "creditNoteReasonPlaceholder": "z. B. Platzierung lief nicht wie vereinbart; Käufer hat die Rechnung beanstandet.",
     "creditNoteSubmit": "Gutschrift ausstellen",
     "issuingCreditNote": "Wird ausgestellt…",
     "creditNoteIssuedLabel": "Gutschrift ausgestellt",
     "cancelBlock": {
-      "live": "Die Platzierung ist bereits live – stellen Sie stattdessen eine Gutschrift aus.",
-      "completed": "Der Auftrag ist abgeschlossen – stellen Sie stattdessen eine Gutschrift aus.",
-      "invoiced": "Die Rechnung ist gestellt – stellen Sie stattdessen eine Gutschrift dazu aus.",
-      "cancelled": "Der Auftrag ist bereits storniert.",
-      "other": "Der Auftrag kann in seinem aktuellen Zustand nicht storniert werden."
+      "ran": "Die Kampagne ist gelaufen, daher kann die Bestellung nicht storniert werden. Stellen Sie die Rechnung und danach eine Gutschrift aus, falls der Käufer nicht zahlen soll.",
+      "invoiced": "Die Rechnung ist ausgestellt. Stellen Sie eine Gutschrift aus, um sie zu erstatten – damit wird auch die Bestellung storniert.",
+      "cancelled": "Die Bestellung ist bereits storniert.",
+      "other": "Die Bestellung kann in ihrem aktuellen Status nicht storniert werden."
     },
+    "cancelErrors": {
+      "reasonRequired": "Geben Sie vor dem Stornieren einen Grund an.",
+      "notFound": "Bestellung nicht gefunden.",
+      "blocked": "Diese Bestellung kann nicht mehr storniert werden."
+    },
+    "creditError": "Gutschrift nicht ausgestellt",
+    "creditErrors": {
+      "reasonRequired": "Geben Sie einen Grund an – er steht auf der Gutschrift.",
+      "notFound": "Bestellung nicht gefunden.",
+      "noInvoice": "Es gibt keine ausgestellte Rechnung, die gutgeschrieben werden kann.",
+      "alreadyCredited": "Diese Rechnung wurde bereits gutgeschrieben.",
+      "wrongOrderStatus": "Nur eine in Rechnung gestellte Bestellung kann gutgeschrieben werden."
+    },
+    "accountingSynced": "{doc} ist mit {provider} synchronisiert (Nr. {number}).",
+    "accountingSyncedNoNumber": "{doc} ist mit {provider} synchronisiert.",
+    "accountingLocalOnly": "{doc} liegt nur in NativeSpin – es ist keine Buchhaltungsintegration eingerichtet.",
+    "accountingFailed": "{doc} konnte nicht mit {provider} synchronisiert werden: {error}",
+    "accountingNotSent": "{doc} wurde noch nicht an die Buchhaltung übermittelt.",
+    "accountingRetry": "Synchronisierung wiederholen",
+    "accountingRetrying": "Synchronisiere…",
+    "accountingDocInvoice": "Die Rechnung",
+    "accountingDocCreditNote": "Die Gutschrift",
+    "advanceGuardTitle": "{missing, plural, =1 {1 Platzierung hat} other {# Platzierungen haben}} keinen veröffentlichten Link",
+    "advanceGuardLeadLive": "Wenn der Auftrag live gesetzt wird, erfährt der Käufer, dass die Kampagne veröffentlicht ist. Diese Platzierungen haben noch keinen veröffentlichten Link:",
+    "advanceGuardLeadCompleted": "Wenn der Auftrag abgeschlossen wird, erfährt der Käufer, dass die Kampagne gelaufen ist. Diese Platzierungen haben noch keinen veröffentlichten Link:",
+    "advanceGuardConfirm": "Ich habe diese Platzierungen geprüft und möchte trotzdem fortfahren",
+    "advanceGuardNote": "Die E-Mail an den Käufer zählt nur tatsächlich veröffentlichte Platzierungen.",
+    "advanceError": "Status nicht geändert",
+    "advanceErrors": {
+      "unconfirmed": "Setzen Sie das Häkchen, um fortzufahren, während Platzierungen noch unveröffentlicht sind.",
+      "moved": "Der Auftrag hat inzwischen den Status gewechselt. Prüfen Sie ihn und versuchen Sie es erneut."
+    },
+    "unknownPlacement": "Unbenannte Platzierung",
     "cancelledByRole": {
       "DESK": "NativeSpin-Desk",
       "SUPERADMIN": "NativeSpin (Admin)",
@@ -1382,14 +1441,40 @@
     "currency": "Währung",
     "subtotal": "Zwischensumme",
     "vat": "MwSt.",
-    "total": "Gesamt"
+    "total": "Gesamt",
+    "number": "Rechnungsnummer",
+    "download": "PDF herunterladen",
+    "documentTitle": "Rechnung {number}",
+    "colDescription": "Beschreibung",
+    "colQty": "Menge",
+    "colUnitPrice": "Einzelpreis",
+    "colAmount": "Betrag",
+    "vatWithPct": "MwSt. ({pct} %)",
+    "vatId": "USt-IdNr.",
+    "contentProduction": "Content-Produktion",
+    "creditedHeading": "Gutgeschrieben",
+    "creditedBody": "Diese Rechnung wurde am {date} vollständig gutgeschrieben ({amount}).",
+    "creditedReason": "Grund: {reason}",
+    "accountingRef": "Buchhaltungsref.",
+    "pageOf": "Seite {page} von {pages}",
+    "listTitle": "Rechnungen",
+    "listLead": "Alle Rechnungen Ihrer Organisation. Öffnen Sie eine, um die Positionen zu sehen, oder laden Sie das PDF herunter.",
+    "emptyTitle": "Noch keine Rechnungen",
+    "emptyHint": "Rechnungen erscheinen hier, sobald eine Kampagne gelaufen ist und abgerechnet wurde.",
+    "emptyCta": "Zu Ihren Kampagnen",
+    "colCustomer": "Kunde"
   },
   "firm": {
     "badge": "Sofortbestellung",
     "planTitle": "Bestellung bestätigen",
     "planNote": "Alle Positionen sind festpreisig — mit dem Absenden wird Ihre Bestellung sofort bestätigt, keine Wartezeit beim Einkaufs-Desk.",
     "planSubmit": "Bestellung bestätigen",
-    "planSubmitting": "Bestellung wird aufgegeben…"
+    "planSubmitting": "Bestellung wird aufgegeben…",
+    "orderTotal": "Bestellsumme",
+    "commitAmount": "Sie bestellen für {amount} inkl. MwSt.",
+    "reassurance": "Mit der Bestätigung geben Sie eine verbindliche Bestellung zu diesem Preis auf — ein separates Angebot zur Freigabe gibt es nicht.",
+    "noCommitNote": "Ihre Rolle umfasst keine Bestellberechtigung, daher können Sie die Bestellung nicht selbst bestätigen. Senden Sie sie stattdessen als Angebotsanfrage — ein Admin in Ihrem Team kann das Angebot annehmen.",
+    "sendAsRfq": "Als Angebotsanfrage senden"
   },
   "publisher": {
     "title": "Verlagsportal",
@@ -1464,7 +1549,10 @@
     "ratesUnitWeek": "Woche",
     "ratesUnitMonth": "Monat",
     "ratesMinUnits": "Mindestbuchung: {count}",
-    "ratesPriceOnlyNote": "Diese Seite ändert nur Preise. Der Katalogstatus — aktiv, buchbar, Sichtbarkeit — wird vom NativeSpin-Desk verwaltet."
+    "ratesPriceOnlyNote": "Diese Seite ändert nur Preise. Der Katalogstatus — aktiv, buchbar, Sichtbarkeit — wird vom NativeSpin-Desk verwaltet.",
+    "changePriceOnRates": "Auf der Preisseite ändern",
+    "notBookable": "Nicht buchbar",
+    "catalogStatusNote": "Preise ändern Sie auf der Preisseite. Den Katalogstatus (buchbar und ob ein Produkt sofort bestellbar ist) verwaltet das NativeSpin-Desk."
   },
   "formats": {
     "metaTitle": "Native-Formate — NativeSpin",
@@ -2069,7 +2157,7 @@
     },
     "fees": {
       "title": "Gebühren und Zahlung",
-      "body": "Die Preisgestaltung folgt der aktuellen Gebührenordnung (siehe /pricing). Rechnungen werden in der Marktwährung des Käufers ausgestellt; die Umsatzsteuer wird nach lokalem Recht ausgewiesen. Zahlungsziel ist standardmäßig 30 Tage netto, sofern nicht anders vereinbart."
+      "body": "Die Preisgestaltung folgt der aktuellen Gebührenordnung (siehe /pricing). Rechnungen werden in der Marktwährung des Käufers ausgestellt; die Umsatzsteuer wird nach lokalem Recht ausgewiesen. Zahlungsziel ist standardmäßig 14 Tage netto, sofern nicht anders vereinbart."
     },
     "liability": {
       "title": "Haftung",
@@ -2170,7 +2258,6 @@
     "anchorSavings": "−{pct}% gegenüber Listenpreis",
     "anchorNote": "Der öffentliche Listenpreis des Verlags für diese Platzierung. Ihr Komplettpreis enthält Inhaltsproduktion, Platzierung, Revisionen und Reporting.",
     "whyThisPrice": "NativeSpin pflegt direkte redaktionelle Beziehungen zu allen Titeln in Ihrem Angebot. Wir verhandeln die Platzierung, beauftragen eine fachkundige Autorin oder einen fachkundigen Autor, koordinieren die redaktionelle Abnahme mit dem Verlag und liefern das Reporting. Sie haben einen verantwortlichen Partner und einen Komplettpreis — keine getrennte Medienrechnung, Autorenrechnung und Agenturpauschale.",
-    "termsPayment": "50 % bei Annahme, 50 % bei Veröffentlichung.",
     "termsCancellation": "Volle Rückerstattung vor Freigabe des Briefings; 50 % Rückerstattung vor dem ersten Entwurf; nach Bestätigung des Slots beim Verlag nicht erstattungsfähig.",
     "termsValidity": "Angebot gilt 14 Tage. Verfügbarkeit beim Verlag wird bei Annahme bestätigt.",
     "bullets": {
@@ -2448,7 +2535,10 @@
     "callHeading": "Noch eine Sache — wir helfen Ihnen beim Native-Einkauf",
     "callBody": "Buchen Sie ein kostenloses 15-minütiges Gespräch, und unser Desk hilft Ihnen, Ihre erste Native-Kampagne zu planen und zu platzieren.",
     "callCta": "Gespräch buchen",
-    "callSkip": "Jetzt überspringen →"
+    "callSkip": "Jetzt überspringen →",
+    "marketBlocked": "Für {org} ist noch kein Abrechnungsmarkt festgelegt. Ein Administrator von {org} muss ihn unter Konto einstellen, bevor das Team Anfragen senden kann.",
+    "blockedTitle": "{org} ist noch nicht für die Abrechnung eingerichtet",
+    "blockedBack": "Zurück zum Plan"
   },
   "account": {
     "eyebrow": "Konto",
@@ -2559,7 +2649,8 @@
     "deactivating": "Wird deaktiviert…",
     "errDelegation": "Das Enddatum der Delegation ist kein gültiges Datum.",
     "errDelegationPast": "Das Enddatum der Delegation muss in der Zukunft liegen.",
-    "canCommitAdminNote": "Administratoren haben immer Bestellrecht."
+    "canCommitAdminNote": "Administratoren haben immer Bestellrecht.",
+    "statusRevoked": "Entfernt"
   },
   "rateCard": {
     "pageTitle": "Rate-Card-Anfrage",
@@ -2617,10 +2708,14 @@
     "contentProductionLabel": "Wer schreibt die Inhalte?",
     "content_advertiser": "Der Werbetreibende kann eigene Artikel liefern",
     "content_publisher": "Artikel müssen von Ihrer Abteilung verfasst werden",
-    "content_both": "Beides ist möglich"
+    "content_both": "Beides ist möglich",
+    "uploadUnavailable": "Datei-Upload ist gerade nicht verfügbar. Fügen Sie stattdessen unten einen Link zu Preisliste oder Mediadaten ein."
   },
   "invite": {
     "title": "Treten Sie {org} bei",
+    "lead": "Ihr Team plant und bucht Native Advertising auf NativeSpin. Treten Sie bei und arbeiten Sie in denselben Plänen, Angeboten und Bestellungen.",
+    "acceptTitle": "Ein Klick, und Sie sind dabei",
+    "createTitle": "Konto erstellen",
     "invitationFor": "Einladung für {email}",
     "accept": "Einladung annehmen",
     "createAndJoin": "Konto erstellen und beitreten",
@@ -2632,7 +2727,10 @@
     "wrongAccountTitle": "Falsches Konto",
     "wrongAccountBody": "Diese Einladung gilt für {inviteEmail}. Sie sind als {authedEmail} angemeldet.",
     "signOut": "Abmelden",
-    "genericError": "Etwas ist schiefgelaufen. Überprüfen Sie Ihre Angaben und versuchen Sie es erneut."
+    "genericError": "Etwas ist schiefgelaufen. Überprüfen Sie Ihre Angaben und versuchen Sie es erneut.",
+    "alreadyMemberTitle": "Sie sind bereits Mitglied von {org}",
+    "alreadyMemberBody": "Sie haben bereits Zugang zu diesem Team – es gibt nichts anzunehmen.",
+    "alreadyMemberCta": "Zum Arbeitsbereich"
   },
   "contentFees": {
     "eyebrow": "Desk",
@@ -2966,7 +3064,12 @@
     "nextWaveBodyPreviousDone": "Welle {prev} ist abgeschlossen. Senden Sie Welle {n}, damit die Geschichte weitergeht.",
     "nextWaveBodyDateNear": "Welle {n} ist ab {date} geplant. Senden Sie sie jetzt, damit der Desk Zeit zum Buchen hat.",
     "nextWaveAngle": "Blickwinkel: {angle}",
-    "openWave": "Welle öffnen"
+    "openWave": "Welle öffnen",
+    "awaitingTeamHeading": "Wartet auf jemanden mit Bestellrecht",
+    "quoteAwaitingTeamBody": "Ein Festpreisangebot über {amount} ist fertig. Jemand aus deinem Team mit Bestellrecht muss es annehmen.",
+    "viewQuote": "Angebot ansehen",
+    "noAccessTitle": "Du bist gerade in keinem Team",
+    "noAccessBody": "Dein Zugang zum Arbeitsbereich deiner Organisation ist beendet: Ein Administrator hat ihn entfernt, oder er war befristet und ist abgelaufen. Bitte einen Administrator, dich erneut einzuladen – damit bekommst du die Pläne und Anfragen deines Teams zurück."
   },
   "shareList": {
     "eyebrow": "Mediaplan von {org}",
@@ -3004,7 +3107,6 @@
     "vat": "MwSt. ({pct}%)",
     "total": "Gesamt",
     "vatStatus": "Preise verstehen sich zzgl. MwSt., sofern oben nicht anders angegeben.",
-    "paymentTerms": "Zahlungsbedingungen: netto 14 Tage ab Rechnungsdatum.",
     "footnote": "Mit \"Preis auf Anfrage\" markierte Positionen kommen zur obigen Summe hinzu und werden separat vor der Buchung bestätigt.",
     "circulation": "Auflage",
     "digitalReach": "Digitale Reichweite/Monat",
@@ -3071,7 +3173,17 @@
     "errRole": "Diese Rolle kennen wir nicht.",
     "errDeactivatedTarget": "Dieses Konto ist deaktiviert. Reaktivieren Sie es zuerst — eine Anmelde-E-Mail, die nicht funktioniert, verwirrt den Empfänger nur.",
     "errEmailFailed": "Die E-Mail konnte nicht gesendet werden. Sonst wurde nichts geändert.",
-    "errGeneric": "Etwas ist schiefgelaufen, es wurde nichts gespeichert. Versuchen Sie es erneut."
+    "errGeneric": "Etwas ist schiefgelaufen, es wurde nichts gespeichert. Versuchen Sie es erneut.",
+    "termsHeading": "Zahlungsbedingungen je Kunde",
+    "termsLead": "Netto-Tage ab Rechnungsdatum. Gilt für neue Angebote und Rechnungen; ausgestellte Rechnungen behalten ihre Bedingungen. Standard sind {days} Tage.",
+    "termsOrgLabel": "Kunde",
+    "termsDaysLabel": "Zahlungsziel (Tage)",
+    "termsSave": "Bedingungen speichern",
+    "termsCustomHeading": "Kunden mit abweichenden Bedingungen",
+    "termsNoneCustom": "Alle Kunden haben die Standardbedingungen.",
+    "termsDaysValue": "{days, plural, one {netto # Tag} other {netto # Tage}}",
+    "okTerms": "Zahlungsbedingungen gespeichert.",
+    "errTerms": "Geben Sie ganze Tage zwischen 1 und 120 an."
   },
   "status": {
     "ACCEPTED": "Angenommen",
@@ -3106,6 +3218,9 @@
   "joinedNotice": {
     "lists": "Willkommen bei {org}. Das sind die Pläne Ihres Teams – öffnen Sie einen, um Titel, Preise und Hinweise zu sehen.",
     "home": "Willkommen bei {org}. Sie gehören jetzt zum Team auf NativeSpin."
+  },
+  "paymentTerms": {
+    "line": "{days, plural, one {Zahlungsbedingungen: netto # Tag ab Rechnungsdatum.} other {Zahlungsbedingungen: netto # Tage ab Rechnungsdatum.}}"
   },
   "superadminOnly": {
     "eyebrow": "Nur für Superadmins",

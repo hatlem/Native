@@ -345,7 +345,8 @@ export default async function ArticleDetailPage({
                 hint: t("detailUploadHint"),
                 uploading: t("detailUploading"),
                 save: t("detailSaveDraft"),
-                failed: t("uploadFailed"),
+                failed: t("detailUploadFailed"),
+                unavailable: t("detailUploadUnavailable"),
               }}
             />
 

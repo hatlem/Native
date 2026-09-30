@@ -1,8 +1,11 @@
 import { getTranslations } from "next-intl/server";
 import { notFound } from "next/navigation";
 import { prisma } from "@/lib/prisma";
-import { formatMoney } from "@/lib/money";
+import { lineOrder } from "@/lib/commerce/line-order";
+import { formatMoney, intlLocale } from "@/lib/money";
 import { loadScope, canActOnOrg } from "@/lib/scope";
+import { invoiceLineLabel } from "@/lib/invoice-line-label";
+import { invoiceNumber } from "@/lib/pdf/invoice-pdf-data";
 import { StatusBadge } from "@/app/status-badge";
 
 export const dynamic = "force-dynamic";
@@ -14,10 +17,16 @@ export default async function InvoicePage({
 }) {
   const { locale, id } = await params;
   const t = await getTranslations({ locale, namespace: "invoice" });
+  const tType = await getTranslations({ locale, namespace: "productType" });
+  const tPay = await getTranslations({ locale, namespace: "paymentTerms" });
 
   const invoice = await prisma.invoice.findUnique({
     where: { id },
-    include: { organization: true, lines: true },
+    include: {
+      organization: true,
+      lines: { orderBy: lineOrder() },
+      creditNotes: { orderBy: { issuedAt: "asc" }, take: 1 },
+    },
   });
   if (!invoice) notFound();
 
@@ -27,16 +36,34 @@ export default async function InvoicePage({
   const scope = await loadScope();
   if (!canActOnOrg(scope, invoice.organizationId)) notFound();
 
+  const labelDeps = {
+    formatLabel: (type: string) => (tType.has(type) ? tType(type) : type),
+    contentProduction: t("contentProduction"),
+  };
+  const date = (d: Date) =>
+    new Intl.DateTimeFormat(intlLocale(locale), { dateStyle: "medium" }).format(d);
+  const credit = invoice.creditNotes[0];
+
   return (
     <div className="invoice-shell">
       <header className="invoice-head">
         <div>
           <span className="eyebrow accent">{t("eyebrow")}</span>
           <h1>
-            {t("title")} #{invoice.id.slice(-8).toUpperCase()}
+            {t("title")} #{invoiceNumber(invoice.id)}
           </h1>
         </div>
-        <StatusBadge value={invoice.status} />
+        <div style={{ display: "flex", gap: 12, alignItems: "center" }}>
+          <StatusBadge value={invoice.status} />
+          {/* Plain <a>: a route handler download, not a page navigation. */}
+          <a
+            className="btn small secondary"
+            href={`/api/export/invoice-pdf/${invoice.id}?locale=${locale}`}
+            download
+          >
+            {t("download")}
+          </a>
+        </div>
       </header>
 
       <dl className="invoice-meta">
@@ -47,13 +74,13 @@ export default async function InvoicePage({
         {invoice.issuedAt ? (
           <div>
             <dt>{t("issued")}</dt>
-            <dd>{invoice.issuedAt.toISOString().slice(0, 10)}</dd>
+            <dd>{date(invoice.issuedAt)}</dd>
           </div>
         ) : null}
         {invoice.dueAt ? (
           <div>
             <dt>{t("due")}</dt>
-            <dd>{invoice.dueAt.toISOString().slice(0, 10)}</dd>
+            <dd>{date(invoice.dueAt)}</dd>
           </div>
         ) : null}
         <div>
@@ -67,7 +94,7 @@ export default async function InvoicePage({
           {invoice.lines.map((l) => (
             <div key={l.id} className="quote-line">
               <span>
-                {l.description}{" "}
+                {invoiceLineLabel(l, labelDeps)}{" "}
                 <span className="muted">× {l.quantity}</span>
               </span>
               <span className="num">
@@ -85,7 +112,7 @@ export default async function InvoicePage({
           </div>
           <div className="quote-row">
             <span className="muted">
-              {t("vat")} ({Number(invoice.vatPct)}%)
+              {t("vatWithPct", { pct: Number(invoice.vatPct) })}
             </span>
             <span className="num">
               {formatMoney(
@@ -102,7 +129,23 @@ export default async function InvoicePage({
             </span>
           </div>
         </div>
+        {invoice.paymentTermsDays ? (
+          <p className="muted small">{tPay("line", { days: invoice.paymentTermsDays })}</p>
+        ) : null}
       </article>
+
+      {credit ? (
+        <section className="banner-info" role="status" style={{ marginTop: 16, display: "block" }}>
+          <strong>{t("creditedHeading")}</strong>
+          <p style={{ margin: "4px 0 0" }}>
+            {t("creditedBody", {
+              date: date(credit.issuedAt),
+              amount: formatMoney(Number(credit.amount), credit.currency, locale),
+            })}{" "}
+            {t("creditedReason", { reason: credit.reason })}
+          </p>
+        </section>
+      ) : null}
     </div>
   );
 }

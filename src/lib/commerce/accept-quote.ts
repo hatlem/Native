@@ -13,6 +13,7 @@ import {
   type AuthorshipMode,
 } from "@/lib/authorship";
 import { acceptableQuoteWhere } from "@/lib/commerce/quote-validity";
+import { createPublisherBookings } from "@/lib/commerce/bookings";
 
 /**
  * The quote was no longer acceptable when the transaction ran: it expired,
@@ -31,6 +32,9 @@ export type AcceptableQuoteLine = {
   productId: string | null;
   quantity: number;
   lineTotal: Prisma.Decimal | number;
+  // The quote line's display position, carried onto the order line so the
+  // order reads in the same order the buyer accepted (line-order.ts).
+  position: number;
 };
 
 export type AcceptablePlan = {
@@ -95,6 +99,7 @@ export async function createOrderFromQuote(
           productId: l.productId,
           quantity: l.quantity,
           lineTotal: l.lineTotal,
+          position: l.position,
         })),
       },
     },
@@ -109,9 +114,9 @@ export async function createOrderFromQuote(
       audience: plan.audienceNote,
     })),
   });
-  await tx.publisherBooking.createMany({
-    data: placementLines.map((line) => ({ orderLineId: line.id })),
-  });
+  // Same factory as the instant path: every booking is anchored to its
+  // title/publisher, which the campaign report and metrics sweep group by.
+  await createPublisherBookings(tx, placementLines);
 
   return {
     orderId: order.id,

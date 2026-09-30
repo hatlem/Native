@@ -34,6 +34,7 @@ export default async function ClaimWriterInvitePage({
   const t = await getTranslations({ locale, namespace: "auth" });
   const tc = await getTranslations({ locale, namespace: "common" });
   const ti = await getTranslations({ locale, namespace: "invite" });
+  const te = await getTranslations({ locale, namespace: "errors" });
 
   const invite = await prisma.writerInvite.findUnique({ where: { token } });
   const verdict = checkInvite(invite);
@@ -58,7 +59,7 @@ export default async function ClaimWriterInvitePage({
           </p>
           <div className="cluster">
             <Link href="/" className="btn primary">
-              {t("backHome")}
+              {te("backHome")}
             </Link>
           </div>
         </div>

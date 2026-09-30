@@ -16,6 +16,7 @@ import {
   type IBorderOptions,
 } from "docx";
 import { formatMoney, intlLocale } from "@/lib/money";
+import { paymentTermsLine } from "@/lib/payment-terms-text";
 import type { QuotePdfData, QuotePdfRow } from "./quote-pdf-data";
 import { qt as t, quoteFormatLabel, quoteRowBlurb, type QuoteMessages } from "./quote-messages";
 
@@ -264,7 +265,9 @@ export async function renderQuoteDocx(
           totals,
           para([], { after: 320 }),
           para([run(t(messages, "vatStatus"), { size: 16, color: "555555" })]),
-          para([run(t(messages, "paymentTerms"), { size: 16, color: "555555" })], { after: 160 }),
+          para([run(paymentTermsLine(locale, data.paymentTermsDays), { size: 16, color: "555555" })], {
+            after: 160,
+          }),
           ...(hasOnRequest ? [para([run(t(messages, "footnote"), { size: SIZE.small, color: COLOR.faint })])] : []),
         ],
       },

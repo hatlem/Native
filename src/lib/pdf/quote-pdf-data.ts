@@ -1,4 +1,6 @@
 import { prisma } from "@/lib/prisma";
+import { lineOrder } from "@/lib/commerce/line-order";
+import { paymentTermsDaysFor } from "@/lib/payment-terms";
 import { quoteOnlineUrl } from "./quote-online-url";
 
 // Everything a customer-facing quote PDF is allowed to render. No cost,
@@ -37,6 +39,9 @@ export type QuotePdfData = {
   preparedByEmail: string;
   // Absolute link to the buyer's live quote page — see quote-online-url.ts.
   onlineUrl: string;
+  // The customer's agreed terms (lib/payment-terms.ts), stated on the
+  // document so quote and invoice can't disagree.
+  paymentTermsDays: number;
   rows: QuotePdfRow[];
 };
 
@@ -56,8 +61,10 @@ export async function loadQuotePdfData(
   const quote = await prisma.quote.findUniqueOrThrow({
     where: { id: quoteId },
     include: {
-      lines: true,
-      request: { include: { organization: { select: { name: true } } } },
+      lines: { orderBy: lineOrder() },
+      request: {
+        include: { organization: { select: { name: true, paymentTermsDays: true } } },
+      },
     },
   });
 
@@ -138,6 +145,7 @@ export async function loadQuotePdfData(
     preparedByName: preparedBy.name ?? "NativeSpin desk",
     preparedByEmail: preparedBy.email,
     onlineUrl: quoteOnlineUrl(quote.requestId, locale),
+    paymentTermsDays: paymentTermsDaysFor(quote.request.organization),
     rows,
   };
 }

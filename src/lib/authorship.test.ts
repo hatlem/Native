@@ -8,6 +8,8 @@ import {
   writerAssignableForMode,
   writerStaffableLine,
   authorshipForOrderLine,
+  contentIntent,
+  mergeContentIntent,
   type AuthorshipMode,
 } from "./authorship";
 
@@ -98,5 +100,45 @@ test("an inventory line with no known product falls back to the safe default", (
   assert.equal(
     authorshipForOrderLine({ kind: "INVENTORY", productId: null }, new Map()),
     "BUYER_SUPPLIED",
+  );
+});
+
+// The persisted pair must always satisfy the DB CHECK
+// (withContent ⇔ NATIVESPIN_PRODUCED) whatever the row carried before.
+test("contentIntent derives a consistent pair from the toggle", () => {
+  assert.deepEqual(contentIntent(true), { withContent: true, authorshipMode: "NATIVESPIN_PRODUCED" });
+  assert.deepEqual(contentIntent(false), { withContent: false, authorshipMode: "BUYER_SUPPLIED" });
+  // Turning it on wins over whatever the row carried.
+  assert.deepEqual(contentIntent(true, "PUBLISHER_PRODUCED"), {
+    withContent: true,
+    authorshipMode: "NATIVESPIN_PRODUCED",
+  });
+});
+
+test("contentIntent off keeps a carried non-NativeSpin mode, never a stale NativeSpin one", () => {
+  assert.equal(contentIntent(false, "PUBLISHER_PRODUCED").authorshipMode, "PUBLISHER_PRODUCED");
+  assert.equal(contentIntent(false, "NATIVESPIN_PRODUCED").authorshipMode, "BUYER_SUPPLIED");
+  assert.equal(contentIntent(false, null).authorshipMode, "BUYER_SUPPLIED");
+});
+
+test("every contentIntent result satisfies withContent ⇔ NATIVESPIN_PRODUCED", () => {
+  const modes: (AuthorshipMode | undefined)[] = [undefined, "BUYER_SUPPLIED", "NATIVESPIN_PRODUCED", "PUBLISHER_PRODUCED"];
+  for (const on of [true, false]) {
+    for (const carried of modes) {
+      const r = contentIntent(on, carried);
+      assert.equal(r.withContent, r.authorshipMode === "NATIVESPIN_PRODUCED", `${on}/${carried}`);
+    }
+  }
+});
+
+test("mergeContentIntent keeps a content request from either side", () => {
+  const off = contentIntent(false);
+  const on = contentIntent(true);
+  assert.deepEqual(mergeContentIntent(off, on), on);
+  assert.deepEqual(mergeContentIntent(on, off), on);
+  assert.deepEqual(mergeContentIntent(off, off), off);
+  assert.equal(
+    mergeContentIntent(contentIntent(false, "PUBLISHER_PRODUCED"), off).authorshipMode,
+    "PUBLISHER_PRODUCED",
   );
 });

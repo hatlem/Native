@@ -1,28 +1,41 @@
 import { getTranslations } from "next-intl/server";
-import type { Invoice, Prisma } from "@prisma/client";
+import type { Invoice, OrderStatus, Prisma } from "@prisma/client";
 import { Link } from "@/i18n/navigation";
 import { formatMoney } from "@/lib/money";
 import { advanceOrder, cancelOrder } from "@/app/desk-actions";
 import { issueInvoice } from "@/app/desk-billing-actions";
 import { StatusBadge } from "@/app/status-badge";
-import { canCancelOrder, cancelBlockCode } from "@/lib/cancellation";
+import { canCancelOrder, cancelBlockKey } from "@/lib/cancellation";
+import {
+  canIssueInvoice,
+  creditNoteEligibility,
+  type DeliveryGap,
+} from "@/lib/order-lifecycle";
+import { paymentTermsDaysFor } from "@/lib/payment-terms";
 import { SubmitButton } from "@/components";
-
-const NON_ADVANCEABLE = ["COMPLETED", "INVOICED", "CANCELLED"];
+import { CreditNoteForm } from "./credit-note-form";
 
 type OrderForHeader = Prisma.OrderGetPayload<{
-  include: { organization: true; quote: true };
+  include: { organization: true; quote: true; invoices: true; creditNotes: true };
 }>;
 
 type Props = {
   locale: string;
   order: OrderForHeader;
   invoice: Invoice | undefined;
+  // The status "Advance" moves to (null when the order is off the flow),
+  // and the delivery evidence behind it (order-lifecycle.ts).
+  next: OrderStatus | null;
+  gap: DeliveryGap;
 };
 
-export async function OrderHeader({ locale, order, invoice }: Props) {
+export async function OrderHeader({ locale, order, invoice, next, gap }: Props) {
   const t = await getTranslations({ locale, namespace: "order" });
   const td = await getTranslations({ locale, namespace: "desk" });
+  const tPay = await getTranslations({ locale, namespace: "paymentTerms" });
+
+  const credit = creditNoteEligibility(order.status, order.invoices, order.creditNotes);
+  const blockKey = cancelBlockKey(order.status);
 
   return (
     <header className="detail-head">
@@ -51,10 +64,33 @@ export async function OrderHeader({ locale, order, invoice }: Props) {
           </span>
         </div>
         <div className="detail-actions">
-          {!NON_ADVANCEABLE.includes(order.status) ? (
+          {next ? (
             <form action={advanceOrder}>
               <input type="hidden" name="locale" value={locale} />
               <input type="hidden" name="orderId" value={order.id} />
+              <input type="hidden" name="from" value={order.status} />
+              {gap.needsConfirmation ? (
+                // Advancing into LIVE/COMPLETED tells the buyer the campaign
+                // ran. Show what has no evidence and make the desk confirm.
+                <div className="banner-info" role="note" style={{ marginBottom: 8 }}>
+                  <strong>{t("advanceGuardTitle", { missing: gap.missing.length })}</strong>
+                  <p className="small" style={{ margin: "4px 0" }}>
+                    {next === "LIVE" ? t("advanceGuardLeadLive") : t("advanceGuardLeadCompleted")}
+                  </p>
+                  <ul className="small" style={{ margin: "4px 0 8px", paddingLeft: 18 }}>
+                    {gap.missing.map((l) => (
+                      <li key={l.id}>{l.label}</li>
+                    ))}
+                  </ul>
+                  <label className="small" style={{ display: "flex", gap: 6, alignItems: "flex-start" }}>
+                    <input type="checkbox" name="confirmUndelivered" required />
+                    <span>{t("advanceGuardConfirm")}</span>
+                  </label>
+                  <p className="muted small" style={{ margin: "4px 0 0" }}>
+                    {t("advanceGuardNote")}
+                  </p>
+                </div>
+              ) : null}
               <SubmitButton
                 label={t("advance")}
                 pendingLabel={t("advancing")}
@@ -62,10 +98,13 @@ export async function OrderHeader({ locale, order, invoice }: Props) {
               />
             </form>
           ) : null}
-          {order.status === "COMPLETED" && !invoice ? (
+          {canIssueInvoice(order.status, order.invoices) ? (
             <form action={issueInvoice}>
               <input type="hidden" name="locale" value={locale} />
               <input type="hidden" name="orderId" value={order.id} />
+              <p className="muted small" style={{ margin: "0 0 6px" }}>
+                {tPay("line", { days: paymentTermsDaysFor(order.organization) })}
+              </p>
               <SubmitButton
                 label={t("issueInvoice")}
                 pendingLabel={t("issuingInvoice")}
@@ -80,6 +119,9 @@ export async function OrderHeader({ locale, order, invoice }: Props) {
             >
               {t("viewInvoice")}
             </Link>
+          ) : null}
+          {order.status === "INVOICED" && credit.ok ? (
+            <CreditNoteForm locale={locale} orderId={order.id} invoice={credit.invoice} />
           ) : null}
           {canCancelOrder(order.status) ? (
             <details className="spec-details">
@@ -114,10 +156,8 @@ export async function OrderHeader({ locale, order, invoice }: Props) {
                 </div>
               </form>
             </details>
-          ) : order.status !== "CANCELLED" ? (
-            <p className="muted small">
-              {t("cancelBlocked")} {t(`cancelBlock.${cancelBlockCode(order.status) ?? "other"}`)}
-            </p>
+          ) : blockKey && blockKey !== "cancelled" ? (
+            <p className="muted small">{t(`cancelBlock.${blockKey}`)}</p>
           ) : null}
         </div>
       </aside>

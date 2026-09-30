@@ -6,7 +6,7 @@ import { prisma } from "@/lib/prisma";
 import { recordAudit } from "@/lib/audit";
 import { loadScope, canActOnOrg } from "@/lib/scope";
 import { requireOrgArticleAccess, requireArticleWriter } from "@/lib/writers/guard";
-import { presignUpload, ARTICLE_TYPES } from "@/lib/storage/r2";
+import { presignUploadResult, ARTICLE_TYPES, type PresignUploadResult } from "@/lib/storage/r2";
 import { linkableLinesWhere } from "@/lib/content/article-linking";
 
 function field(formData: FormData, key: string): string {
@@ -46,9 +46,9 @@ export async function presignArticleUpload(args: {
   filename: string;
   contentType: string;
   bytes: number;
-}): Promise<{ url: string; key: string }> {
+}): Promise<PresignUploadResult> {
   await requireArticleWriter(args.articleId, args.locale);
-  return presignUpload({
+  return presignUploadResult({
     prefix: `articles/${args.articleId}`,
     filename: args.filename,
     contentType: args.contentType,

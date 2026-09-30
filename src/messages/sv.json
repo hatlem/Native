@@ -63,7 +63,10 @@
     "campaign": "Planera kampanj",
     "campaigns": "Kampanjer",
     "rates": "Priser",
-    "users": "Användare"
+    "users": "Användare",
+    "invoices": "Fakturor",
+    "orgSwitcherLabel": "Organisation",
+    "orgSwitchTo": "Byt till {org}"
   },
   "reports": {
     "title": "Rapporter",
@@ -104,7 +107,8 @@
     "suggestedMargin": "Föreslagen",
     "basis_win-rate": "från vinstandel",
     "basis_category-median": "kategorimedian",
-    "basis_default": "standard"
+    "basis_default": "standard",
+    "exportInvoicesCsv": "Exportera fakturor (CSV)"
   },
   "agency": {
     "eyebrow": "Byrå",
@@ -469,6 +473,9 @@
     "decrementRemoves": "Ta bort titeln från planen",
     "increment": "Öka antal",
     "estTotal": "Uppskattad vägledande summa",
+    "exVat": "exkl. moms",
+    "inclVatLine": "{amount} inkl. moms",
+    "includesContentFees": "Inklusive {amount} för innehållsproduktion.",
     "totalForItems": "{amount} för {count, plural, =1 {1 titel} other {# titlar}}",
     "multiCurrencyNote": "Titlar faktureras i utgivarens egen valuta — båda beloppen ska betalas, det här är inte ett val av valuta.",
     "rfqTitle": "Begär en fast offert",
@@ -743,6 +750,8 @@
     "itemsEyebrow": "Brief",
     "quoteEyebrow": "Firm pris",
     "orderEyebrow": "Beställning",
+    "openOrder": "Öppna beställningen",
+    "openOrderMarket": "Öppna beställningen · {currency}",
     "pendingTitle": "Din brief ligger hos desk",
     "pendingBuyerLabel": "Inköpare",
     "pendingBuyerUnassigned": "Tilldelas",
@@ -798,7 +807,9 @@
     "requestRenewal": "Be om förnyad offert",
     "requestingRenewal": "Skickar …",
     "renewalRequested": "Desken har ombetts att förnya offerten. Du får en avisering när du kan acceptera den.",
-    "lineNoteLabel": "Kommentar"
+    "lineNoteLabel": "Kommentar",
+    "noCommitTitle": "Du kan inte godkänna den här offerten själv.",
+    "noCommitBody": "Att godkänna den lägger en bindande beställning för {org}, och det kräver beställningsrätt. Be en administratör godkänna offerten, eller ge dig beställningsrätt under Konto → Team."
   },
   "desk": {
     "eyebrow": "Internt desk",
@@ -899,13 +910,28 @@
     "quoteNoExpiry": "Inget slutdatum",
     "renewQuote": "Förnya offerten",
     "renewingQuote": "Förnyar …",
-    "renewQuoteHint": "Kunden kan inte acceptera en utgången offert. Förnyelsen behåller dessa priser i 14 nya dagar – justera raderna först om priserna har ändrats.",
+    "renewQuoteHint": "Kunden kan inte acceptera en utgången offert. Förnyelsen behåller dessa priser fram till datumet du väljer – justera raderna först om priserna har ändrats.",
+    "quoteDraftBadge": "Utkast – inte skickad",
+    "quoteDraftHint": "Kunden ser inte offerten än. Prissätt raderna och skicka den nedan.",
+    "sendTitle": "Skicka till kunden",
+    "sendBody": "{count, plural, =1 {Offerten skickas} other {Alla # offerter skickas}} samtidigt. Kunden får ett mejl med totalbeloppet och kan acceptera fram till datumet nedan.",
+    "sendValidUntil": "Giltig till",
+    "sendValidUntilHint": "Standard är {days} dagar, högst {max}. Kunden kan acceptera dagen ut.",
+    "send": "Skicka offert",
+    "sending": "Skickar…",
+    "sendUnpriced": "Prissätt minst en rad i varje offert innan du skickar – en offert där alla rader är på förfrågan ger kunden inget att acceptera.",
+    "validUntilInvalid": "Ange ett giltigt datum.",
+    "validUntilPast": "Giltighetsdatumet kan inte ligga bakåt i tiden.",
+    "validUntilTooFar": "En offert kan vara giltig i högst {max} dagar.",
+    "renewValidUntil": "Ny giltighet",
     "lineNoteLabel": "Kommentar till kunden",
     "lineNoteAdd": "Lägg till kommentar till kunden",
     "lineNoteEdit": "Redigera kommentar till kunden",
     "lineNoteSave": "Spara kommentar",
     "lineNoteHint": "Visas för kunden på offertsidan och i PDF:en.",
-    "lineNoteTooLong": "Kommentaren är för lång. Håll den under {max} tecken."
+    "lineNoteTooLong": "Kommentaren är för lång. Håll den under {max} tecken.",
+    "pdfStorageUnavailable": "Fillagring (R2) är inte konfigurerad i den här miljön, så PDF:en kan inte sparas. Ladda ner Word-versionen i stället.",
+    "pdfFailed": "PDF:en kunde inte skapas. Försök igen eller ladda ner Word-versionen."
   },
   "deskTitles": {
     "eyebrow": "Superadmin · titlar",
@@ -1188,19 +1214,51 @@
     "cancelledReasonLabel": "Anledning",
     "creditNoteButton": "Utfärda kreditnota",
     "creditNoteTitle": "Återbetala fakturan",
-    "creditNoteHint": "Återbetala {amount} mot den utfärdade fakturan. Anledningen loggas på kreditnotan och visas för köparen.",
+    "creditNoteHint": "Återbetalar {amount} i sin helhet och avbryter ordern. Anledningen loggas på kreditnotan och visas för köparen.",
     "creditNoteReasonLabel": "Anledning",
-    "creditNoteReasonPlaceholder": "t.ex. Order avbruten efter att fakturan utfärdats; utgivarens redaktionella veto.",
+    "creditNoteReasonPlaceholder": "t.ex. Placeringen gick inte som avtalat; köparen bestred fakturan.",
     "creditNoteSubmit": "Utfärda kreditnota",
     "issuingCreditNote": "Utfärdar…",
     "creditNoteIssuedLabel": "Kreditnota utfärdad",
     "cancelBlock": {
-      "live": "Placeringen är redan publicerad – utfärda en kreditnota i stället.",
-      "completed": "Beställningen är slutförd – utfärda en kreditnota i stället.",
-      "invoiced": "Fakturan är skickad – utfärda en kreditnota mot den i stället.",
-      "cancelled": "Beställningen är redan avbokad.",
-      "other": "Beställningen kan inte avbokas i sitt nuvarande läge."
+      "ran": "Kampanjen har gått, så ordern kan inte avbrytas. Fakturera den och utfärda en kreditnota om köparen inte ska betala.",
+      "invoiced": "Fakturan är utfärdad. Utfärda en kreditnota för att återbetala den – då avbryts även ordern.",
+      "cancelled": "Ordern är redan avbruten.",
+      "other": "Ordern kan inte avbrytas i sin nuvarande status."
     },
+    "cancelErrors": {
+      "reasonRequired": "Ange en anledning innan du avbryter.",
+      "notFound": "Ordern hittades inte.",
+      "blocked": "Denna order kan inte längre avbrytas."
+    },
+    "creditError": "Kreditnotan utfärdades inte",
+    "creditErrors": {
+      "reasonRequired": "Ange en anledning – den står på kreditnotan.",
+      "notFound": "Ordern hittades inte.",
+      "noInvoice": "Det finns ingen utfärdad faktura att kreditera.",
+      "alreadyCredited": "Den här fakturan är redan krediterad.",
+      "wrongOrderStatus": "Endast en fakturerad order kan krediteras."
+    },
+    "accountingSynced": "{doc} är synkad till {provider} (nr {number}).",
+    "accountingSyncedNoNumber": "{doc} är synkad till {provider}.",
+    "accountingLocalOnly": "{doc} finns bara i NativeSpin – ingen bokföringsintegration är konfigurerad.",
+    "accountingFailed": "{doc} kunde inte synkas till {provider}: {error}",
+    "accountingNotSent": "{doc} har inte skickats till bokföringen.",
+    "accountingRetry": "Försök synka igen",
+    "accountingRetrying": "Synkar…",
+    "accountingDocInvoice": "Fakturan",
+    "accountingDocCreditNote": "Kreditnotan",
+    "advanceGuardTitle": "{missing, plural, =1 {1 placering saknar} other {# placeringar saknar}} publicerad länk",
+    "advanceGuardLeadLive": "När ordern markeras som live får köparen veta att kampanjen är publicerad. De här placeringarna har ingen publicerad länk än:",
+    "advanceGuardLeadCompleted": "När ordern slutförs får köparen veta att kampanjen har gått. De här placeringarna har ingen publicerad länk än:",
+    "advanceGuardConfirm": "Jag har kontrollerat de här placeringarna och vill gå vidare ändå",
+    "advanceGuardNote": "Mejlet till köparen räknar bara placeringar som faktiskt är publicerade.",
+    "advanceError": "Status ändrades inte",
+    "advanceErrors": {
+      "unconfirmed": "Kryssa i bekräftelsen för att gå vidare medan placeringar fortfarande är opublicerade.",
+      "moved": "Ordern har bytt status under tiden. Kontrollera den och försök igen."
+    },
+    "unknownPlacement": "Placering utan namn",
     "cancelledByRole": {
       "DESK": "NativeSpins desk",
       "SUPERADMIN": "NativeSpin (administratör)",
@@ -1247,14 +1305,40 @@
     "currency": "Valuta",
     "subtotal": "Delsumma",
     "vat": "Moms",
-    "total": "Totalt"
+    "total": "Totalt",
+    "number": "Fakturanummer",
+    "download": "Ladda ner PDF",
+    "documentTitle": "Faktura {number}",
+    "colDescription": "Beskrivning",
+    "colQty": "Antal",
+    "colUnitPrice": "Á-pris",
+    "colAmount": "Belopp",
+    "vatWithPct": "Moms ({pct} %)",
+    "vatId": "Momsreg.nr",
+    "contentProduction": "Innehållsproduktion",
+    "creditedHeading": "Krediterad",
+    "creditedBody": "Fakturan krediterades i sin helhet {date} ({amount}).",
+    "creditedReason": "Anledning: {reason}",
+    "accountingRef": "Bokföringsref.",
+    "pageOf": "Sida {page} av {pages}",
+    "listTitle": "Fakturor",
+    "listLead": "Alla fakturor för din organisation. Öppna en för att se raderna, eller ladda ner PDF:en.",
+    "emptyTitle": "Inga fakturor än",
+    "emptyHint": "Fakturor visas här när en kampanj har gått och fakturerats.",
+    "emptyCta": "Se dina kampanjer",
+    "colCustomer": "Kund"
   },
   "firm": {
     "badge": "Direktbeställning",
     "planTitle": "Bekräfta din order",
     "planNote": "Alla poster har fast pris — att skicka in bekräftar din order direkt, ingen väntan på inköpsteamet.",
     "planSubmit": "Bekräfta order",
-    "planSubmitting": "Lägger order…"
+    "planSubmitting": "Lägger order…",
+    "orderTotal": "Totalt för beställningen",
+    "commitAmount": "Du beställer för {amount} inkl. moms.",
+    "reassurance": "När du bekräftar lägger du en bindande beställning till det här priset — det kommer ingen separat offert att godkänna.",
+    "noCommitNote": "Din roll saknar beställningsrätt, så du kan inte bekräfta beställningen själv. Skicka den som en offertförfrågan i stället — en administratör i teamet kan godkänna offerten.",
+    "sendAsRfq": "Skicka som offertförfrågan"
   },
   "publisher": {
     "title": "Utgivarportal",
@@ -1329,7 +1413,10 @@
     "ratesUnitWeek": "Vecka",
     "ratesUnitMonth": "Månad",
     "ratesMinUnits": "Minsta bokning: {count}",
-    "ratesPriceOnlyNote": "Den här sidan ändrar endast priser. Katalogstatus — aktiv, bokningsbar, synlighet — hanteras av NativeSpin-desken."
+    "ratesPriceOnlyNote": "Den här sidan ändrar endast priser. Katalogstatus — aktiv, bokningsbar, synlighet — hanteras av NativeSpin-desken.",
+    "changePriceOnRates": "Ändra på prissidan",
+    "notBookable": "Inte bokningsbar",
+    "catalogStatusNote": "Priser ändrar du på prissidan. Katalogstatus (bokningsbar, och om en produkt kan direktbeställas) hanteras av NativeSpin-desken."
   },
   "formats": {
     "metaTitle": "Native-format — NativeSpin",
@@ -1561,6 +1648,8 @@
     "placementRetracted": "Indragen",
     "unlinkCta": "Ta bort koppling",
     "sharedArticleWarning": "Den här artikeln är kopplad till {count} andra placeringar — dina ändringar påverkar alla.",
+    "detailUploadFailed": "Uppladdningen misslyckades. Prova en annan fil.",
+    "detailUploadUnavailable": "Filuppladdning är inte tillgänglig just nu. Klistra in texten i redigeraren i stället.",
     "backToArticles": "Alla artiklar",
     "versionLabel": "Version {version}",
     "byAuthor": "Skriven av {name}",
@@ -1574,7 +1663,6 @@
     "orderRef": "beställning {ref}",
     "draftLabel": "Artikeltext",
     "draftHint": "Ren text med enkel Markdown: # för rubriker, **fet**, *kursiv*, - för listor, [text](länk).",
-    "uploadFailed": "Uppladdningen misslyckades. Prova en annan fil.",
     "submitBlockedSpec": "Formatkraven för en placering är inte uppfyllda ännu – kontrollera placeringarna ovan."
   },
   "marketing": {
@@ -2069,7 +2157,7 @@
     },
     "fees": {
       "title": "Avgifter och betalning",
-      "body": "Prissättning enligt aktuell avgiftsplan (se /pricing). Fakturor utfärdas i köparens marknadsvaluta med moms per lokal lag. Betalningsvillkor är netto 30 dagar om inget annat avtalas."
+      "body": "Prissättning enligt aktuell avgiftsplan (se /pricing). Fakturor utfärdas i köparens marknadsvaluta med moms per lokal lag. Betalningsvillkor är netto 14 dagar om inget annat avtalas."
     },
     "liability": {
       "title": "Ansvar",
@@ -2313,7 +2401,6 @@
     "anchorSavings": "−{pct}% mot listpris",
     "anchorNote": "Utgivarens offentliga listpris för placeringen. Ditt totalpris inkluderar innehållsproduktion, placering, revideringar och rapportering.",
     "whyThisPrice": "NativeSpin har direkta redaktionella relationer med alla titlar i offerten. Vi förhandlar placeringen, anlitar en branschspecialiserad skribent, hanterar redaktionell granskning med utgivaren och rapporterar på resultatet. Du får en ansvarig partner och ett totalpris — inte en mediafaktura, en skribentfaktura och ett byråarvode.",
-    "termsPayment": "50 % vid godkännande, 50 % vid publicering.",
     "termsCancellation": "Full återbetalning innan artikelbriefen är godkänd; 50 % återbetalning innan första utkastet; ingen återbetalning efter att utgivarens slot är bekräftad.",
     "termsValidity": "Offerten gäller i 14 dagar. Tillgänglighet hos utgivaren bekräftas vid godkännande.",
     "bullets": {
@@ -2591,7 +2678,10 @@
     "callHeading": "En sak till — låt oss hjälpa dig köpa native",
     "callBody": "Boka ett kostnadsfritt 15-minuterssamtal, så hjälper vårt desk dig att planera och placera din första native-kampanj.",
     "callCta": "Boka ett samtal",
-    "callSkip": "Hoppa över för nu →"
+    "callSkip": "Hoppa över för nu →",
+    "marketBlocked": "{org} har ingen faktureringsmarknad ännu. En administratör i {org} behöver välja den under Konto innan teamet kan skicka förfrågningar.",
+    "blockedTitle": "{org} är inte konfigurerat för fakturering ännu",
+    "blockedBack": "Tillbaka till planen"
   },
   "account": {
     "eyebrow": "Konto",
@@ -2702,7 +2792,8 @@
     "deactivating": "Avaktiverar…",
     "errDelegation": "Slutdatumet för delegeringen är inte ett giltigt datum.",
     "errDelegationPast": "Slutdatumet för delegeringen måste ligga i framtiden.",
-    "canCommitAdminNote": "Administratörer har alltid beställningsrätt."
+    "canCommitAdminNote": "Administratörer har alltid beställningsrätt.",
+    "statusRevoked": "Borttagen"
   },
   "rateCard": {
     "pageTitle": "Rate card-förfrågan",
@@ -2760,10 +2851,14 @@
     "contentProductionLabel": "Vem skriver innehållet?",
     "content_advertiser": "Annonsören kan leverera egna artiklar",
     "content_publisher": "Artiklarna måste skrivas av er avdelning",
-    "content_both": "Båda är möjliga"
+    "content_both": "Båda är möjliga",
+    "uploadUnavailable": "Filuppladdning är inte tillgänglig just nu. Klistra in en länk till prislista eller mediakit nedan i stället."
   },
   "invite": {
     "title": "Gå med i {org}",
+    "lead": "Ditt team planerar och köper native-annonsering i NativeSpin. Gå med och arbeta i samma planer, offerter och beställningar.",
+    "acceptTitle": "Ett klick, så är du med",
+    "createTitle": "Skapa ditt konto",
     "invitationFor": "Inbjudan till {email}",
     "accept": "Acceptera inbjudan",
     "createAndJoin": "Skapa konto och gå med",
@@ -2775,7 +2870,10 @@
     "wrongAccountTitle": "Fel konto",
     "wrongAccountBody": "Inbjudan gäller {inviteEmail}. Du är inloggad som {authedEmail}.",
     "signOut": "Logga ut",
-    "genericError": "Något gick fel. Kontrollera uppgifterna och försök igen."
+    "genericError": "Något gick fel. Kontrollera uppgifterna och försök igen.",
+    "alreadyMemberTitle": "Du är redan med i {org}",
+    "alreadyMemberBody": "Du har redan tillgång till det här teamet, så det finns inget att godkänna.",
+    "alreadyMemberCta": "Gå till arbetsytan"
   },
   "contentFees": {
     "eyebrow": "Desk",
@@ -3097,7 +3195,12 @@
     "nextWaveBodyPreviousDone": "Omgång {prev} är klar. Skicka omgång {n} för att hålla berättelsen igång.",
     "nextWaveBodyDateNear": "Omgång {n} är planerad från {date}. Skicka den nu så att desken hinner boka.",
     "nextWaveAngle": "Vinkel: {angle}",
-    "openWave": "Öppna omgången"
+    "openWave": "Öppna omgången",
+    "awaitingTeamHeading": "Väntar på någon med beställningsrätt",
+    "quoteAwaitingTeamBody": "En fast offert på {amount} är klar. Någon i teamet med beställningsrätt behöver godkänna den.",
+    "viewQuote": "Visa offerten",
+    "noAccessTitle": "Du är inte med i något team just nu",
+    "noAccessBody": "Din åtkomst till organisationens arbetsyta har upphört: en administratör har tagit bort den, eller så var den tidsbegränsad och har gått ut. Be en administratör att bjuda in dig igen, så får du tillbaka teamets planer och förfrågningar."
   },
   "shareList": {
     "eyebrow": "Medieplan från {org}",
@@ -3135,7 +3238,6 @@
     "vat": "Moms ({pct}%)",
     "total": "Totalt",
     "vatStatus": "Priser anges exklusive moms om inget annat anges ovan.",
-    "paymentTerms": "Betalningsvillkor: netto 14 dagar från fakturadatum.",
     "footnote": "Rader märkta \"pris på förfrågan\" tillkommer utöver totalen ovan och bekräftas separat före bokning.",
     "circulation": "Upplaga",
     "digitalReach": "Digital räckvidd/mån",
@@ -3202,7 +3304,17 @@
     "errRole": "Den rollen känner vi inte igen.",
     "errDeactivatedTarget": "Kontot är avaktiverat. Aktivera det först — ett inloggningsmejl som inte går att använda förvirrar bara mottagaren.",
     "errEmailFailed": "Mejlet kunde inte skickas. Inget annat ändrades.",
-    "errGeneric": "Något gick fel och ingenting sparades. Försök igen."
+    "errGeneric": "Något gick fel och ingenting sparades. Försök igen.",
+    "termsHeading": "Betalningsvillkor per kund",
+    "termsLead": "Netto dagar från fakturadatum. Gäller nya offerter och fakturor; utfärdade fakturor behåller sina villkor. Standard är {days} dagar.",
+    "termsOrgLabel": "Kund",
+    "termsDaysLabel": "Betalningsvillkor (dagar)",
+    "termsSave": "Spara villkor",
+    "termsCustomHeading": "Kunder med avvikande villkor",
+    "termsNoneCustom": "Alla kunder har standardvillkoren.",
+    "termsDaysValue": "{days, plural, one {netto # dag} other {netto # dagar}}",
+    "okTerms": "Betalningsvillkoren är sparade.",
+    "errTerms": "Ange hela dagar mellan 1 och 120."
   },
   "status": {
     "ACCEPTED": "Accepterad",
@@ -3237,6 +3349,9 @@
   "joinedNotice": {
     "lists": "Välkommen till {org}. Här är ditt teams planer – öppna en för att se titlar, priser och kommentarer.",
     "home": "Välkommen till {org}. Nu är du med i teamet på NativeSpin."
+  },
+  "paymentTerms": {
+    "line": "{days, plural, one {Betalningsvillkor: netto # dag från fakturadatum.} other {Betalningsvillkor: netto # dagar från fakturadatum.}}"
   },
   "superadminOnly": {
     "eyebrow": "Endast för superadministratörer",

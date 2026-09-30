@@ -1,4 +1,5 @@
 import { getTranslations } from "next-intl/server";
+import { viewOrgIds } from "@/lib/workspace";
 import { redirect } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import { Link } from "@/i18n/navigation";
@@ -21,7 +22,7 @@ export default async function ArticlesPage({
   if (!scope.workspace) redirect(`/${locale}/signin`);
 
   const articles = await prisma.article.findMany({
-    where: { organizationId: { in: scope.workspace.scopeOrgIds } },
+    where: { organizationId: { in: viewOrgIds(scope.workspace) } },
     orderBy: { updatedAt: "desc" },
     include: {
       versions: {

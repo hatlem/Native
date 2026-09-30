@@ -3,8 +3,7 @@ import assert from "node:assert/strict";
 import { OrderStatus } from "@prisma/client";
 import {
   canCancelOrder,
-  cancelBlockReason,
-  cancelBlockCode,
+  cancelBlockKey,
   normaliseReason,
 } from "./cancellation";
 
@@ -25,14 +24,16 @@ test("canCancelOrder is idempotent on already-cancelled orders", () => {
   assert.equal(canCancelOrder(OrderStatus.CANCELLED), false);
 });
 
-test("cancelBlockReason surfaces the right next-step prompt per terminal status", () => {
-  assert.match(cancelBlockReason(OrderStatus.LIVE), /credit note/i);
-  assert.match(cancelBlockReason(OrderStatus.COMPLETED), /credit note/i);
-  assert.match(cancelBlockReason(OrderStatus.INVOICED), /credit note/i);
-  assert.match(cancelBlockReason(OrderStatus.CANCELLED), /already/i);
-  // No reason when cancellation is allowed — empty string lets the UI
-  // decide between "no block" and "explain block".
-  assert.equal(cancelBlockReason(OrderStatus.CONFIRMED), "");
+test("cancelBlockKey points each locked status at its reachable next step", () => {
+  // A campaign that ran is invoiced first, then credited if needed.
+  assert.equal(cancelBlockKey(OrderStatus.LIVE), "ran");
+  assert.equal(cancelBlockKey(OrderStatus.COMPLETED), "ran");
+  // An invoiced order is credited directly.
+  assert.equal(cancelBlockKey(OrderStatus.INVOICED), "invoiced");
+  assert.equal(cancelBlockKey(OrderStatus.CANCELLED), "cancelled");
+  // No key when cancellation is allowed.
+  assert.equal(cancelBlockKey(OrderStatus.CONFIRMED), null);
+  assert.equal(cancelBlockKey(OrderStatus.SCHEDULED), null);
 });
 
 test("normaliseReason trims and drops empty input", () => {
@@ -48,12 +49,4 @@ test("normaliseReason caps absurdly long input at a defensible length", () => {
   const out = normaliseReason(tooLong);
   assert.ok(out);
   assert.equal(out.length, 2000);
-});
-
-test("cancelBlockCode gives the desk UI a stable, localizable reason", () => {
-  assert.equal(cancelBlockCode(OrderStatus.CONFIRMED), null);
-  assert.equal(cancelBlockCode(OrderStatus.LIVE), "live");
-  assert.equal(cancelBlockCode(OrderStatus.COMPLETED), "completed");
-  assert.equal(cancelBlockCode(OrderStatus.INVOICED), "invoiced");
-  assert.equal(cancelBlockCode(OrderStatus.CANCELLED), "cancelled");
 });

@@ -2,8 +2,7 @@ import { getTranslations } from "next-intl/server";
 import { redirect } from "next/navigation";
 import { MarketCode } from "@prisma/client";
 import { auth } from "@/auth";
-import { prisma } from "@/lib/prisma";
-import { safeNext } from "@/lib/onboarding-gate";
+import { loadOnboardingState, safeNext } from "@/lib/onboarding-gate";
 import { saveOnboarding } from "@/app/onboarding-actions";
 import { LandingShell } from "@/app/landing-shell";
 import { SubmitButton } from "@/components";
@@ -16,8 +15,8 @@ const MARKET_CODES = Object.values(MarketCode);
 // answering at signup but the platform genuinely needs before they can
 // transact: their billing market (drives VAT + invoice currency) and a
 // phone number (drives desk-side reachability for time-pressured RFQs).
-// Layout-level gate sends authenticated users with org.marketCode IS
-// NULL here, so this page is the unblock for `/catalog` access.
+// The buy gate (lib/onboarding-gate) sends users here; only someone who may
+// set the org's market (onboardingNeeds) is asked for it.
 export default async function OnboardingPage({
   params,
   searchParams,
@@ -42,18 +41,33 @@ export default async function OnboardingPage({
     `/${locale}/catalog`,
   );
 
-  // If the user's org already has marketCode set AND they have a phone,
-  // they're done — no point sitting on this page.
-  const user = await prisma.user.findUnique({
-    where: { id: session.user.id },
-    select: {
-      phone: true,
-      name: true,
-      organization: { select: { name: true, marketCode: true } },
-    },
-  });
-  if (user?.organization?.marketCode && user.phone) {
+  // Onboarded already — for a member invited into a set-up org that is from
+  // their very first visit — so there is nothing to ask.
+  const state = await loadOnboardingState(session.user.id);
+  if (state.complete) {
     redirect(next);
+  }
+  // Nothing to onboard (no org to work in): same bounce as saveOnboarding.
+  if (!state.org) redirect(`/${locale}/`);
+  const orgName = state.org.name;
+
+  // The org isn't set up and this user can't set it up: say who can,
+  // instead of a form they have no right to submit.
+  if (state.marketBlocked) {
+    return (
+      <LandingShell locale={locale} screenLabel="Onboarding">
+        <div className="utility-page" role="status">
+          <span className="eyebrow accent">{t("eyebrow")}</span>
+          <h1>{t("blockedTitle", { org: orgName })}</h1>
+          <p className="lead">{t("marketBlocked", { org: orgName })}</p>
+          <div className="cluster">
+            <a href={next} className="btn primary">
+              {t("blockedBack")}
+            </a>
+          </div>
+        </div>
+      </LandingShell>
+    );
   }
 
   const errorCode = typeof sp.error === "string" ? sp.error : undefined;
@@ -92,7 +106,7 @@ export default async function OnboardingPage({
               <select
                 id="market"
                 name="market"
-                defaultValue={user?.organization?.marketCode ?? ""}
+                defaultValue={state.org.marketCode ?? ""}
                 required
               >
                 <option value="" disabled>
@@ -114,7 +128,7 @@ export default async function OnboardingPage({
                 name="phone"
                 type="tel"
                 autoComplete="tel"
-                defaultValue={user?.phone ?? ""}
+                defaultValue={state.phone ?? ""}
                 required
                 placeholder={t("phonePlaceholder")}
               />

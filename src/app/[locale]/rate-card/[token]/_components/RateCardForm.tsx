@@ -30,29 +30,38 @@ export default function RateCardForm({
   const [fileName, setFileName] = useState<string | null>(null);
   const [uploadError, setUploadError] = useState<string | null>(null);
   const [uploading, setUploading] = useState(false);
+  const [uploadUnavailable, setUploadUnavailable] = useState(false);
   const [pending, startTransition] = useTransition();
 
   async function onFileChange(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0];
     if (!file) return;
     setUploadError(null);
+    setUploadUnavailable(false);
     setObjectKey(null);
     setFileName(file.name);
     setUploading(true);
     try {
-      const { url, key } = await presignRateCardUpload({
+      const presigned = await presignRateCardUpload({
         token,
         filename: file.name,
         contentType: file.type,
         bytes: file.size,
       });
-      const res = await fetch(url, {
+      if (!presigned.ok) {
+        // Storage isn't configured: point the publisher at the link field
+        // instead of showing an error they can't act on.
+        setFileName(null);
+        setUploadUnavailable(true);
+        return;
+      }
+      const res = await fetch(presigned.url, {
         method: "PUT",
         body: file,
         headers: { "Content-Type": file.type },
       });
       if (!res.ok) throw new Error(`upload_failed_${res.status}`);
-      setObjectKey(key);
+      setObjectKey(presigned.key);
     } catch (err) {
       setUploadError((err as Error).message);
     } finally {
@@ -100,6 +109,7 @@ export default function RateCardForm({
           {uploading && <span className="hint">{t("uploading")}</span>}
           {objectKey && <span className="rc-ok">{t("uploadDone")}</span>}
           {uploadError && <span className="err">{t("uploadFailed", { error: uploadError })}</span>}
+          {uploadUnavailable && <span className="err">{t("uploadUnavailable")}</span>}
         </div>
 
         <div className="rc-or">{t("orSeparator")}</div>

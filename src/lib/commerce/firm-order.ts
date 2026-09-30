@@ -24,6 +24,8 @@ import {
   authorshipForOrderLine,
   type AuthorshipMode,
 } from "@/lib/authorship";
+import { createPublisherBookings } from "@/lib/commerce/bookings";
+import { planNameFor } from "@/lib/plan-name";
 
 // Minimal product shape the quote engine needs. Both the self-serve basket
 // query and the desk quote query hydrate at least these fields.
@@ -146,8 +148,11 @@ export async function createFirmOrder(args: {
   // caller's check-then-act window (audit residual: fingerprint TOCTOU).
   // Only /plan checkout passes it; the public API has no list.
   listGuard?: { listId: string; fingerprint: string } | null;
+  // Plan.name — the buyer's own name for the campaign (see planNameFor).
+  // Omitted by the public API, which has no list: an English org fallback.
+  planName?: string;
 }): Promise<{ requestId: string; orderIds: string[] }> {
-  const { organizationId, orgName, items, byId, brief, sourceListId, listGuard } = args;
+  const { organizationId, orgName, items, byId, brief, sourceListId, listGuard, planName } = args;
   const goal = brief?.goal ?? null;
   const audience = brief?.audience ?? null;
   const targetGeo = brief?.targetGeo ?? null;
@@ -233,7 +238,7 @@ export async function createFirmOrder(args: {
     const plan = await tx.plan.create({
       data: {
         organizationId,
-        name: `${orgName} — campaign`,
+        name: planName ?? planNameFor({ listName: null, orgName, locale: "en" }),
         budget: brief?.budget ?? null,
         currency: brief?.currency ?? planCurrency,
         startDate: flight.start,
@@ -278,7 +283,7 @@ export async function createFirmOrder(args: {
 
     const orderIds: string[] = [];
     for (const group of groups) {
-      const lines = [
+      const generated = [
         ...computeQuoteLines(
           group.items.map((i) =>
             toQuotable(byId.get(i.productId)!, i.quantity),
@@ -292,6 +297,8 @@ export async function createFirmOrder(args: {
           defaults.feeRules,
         ),
       ];
+      // Generation order is the display order (see lib/commerce/line-order.ts).
+      const lines = generated.map((l, position) => ({ ...l, position }));
       const { subtotal, total } = quoteTotals(lines, group.vatPct);
 
       const quote = await tx.quote.create({
@@ -320,6 +327,7 @@ export async function createFirmOrder(args: {
               productId: l.productId,
               quantity: l.quantity,
               lineTotal: l.lineTotal,
+              position: l.position,
             })),
           },
         },
@@ -337,21 +345,9 @@ export async function createFirmOrder(args: {
           audience,
         })),
       });
-      // Resolve title/publisher for placement lines so each booking is anchored to
-      // its publisher at creation (the campaign report groups by it).
-      const placementProductIds = placementLines.map((l) => l.productId).filter((id): id is string => !!id);
-      const placementProducts = await tx.product.findMany({
-        where: { id: { in: placementProductIds } },
-        select: { id: true, titleId: true, title: { select: { publisherId: true } } },
-      });
-      const titleByProduct = new Map(placementProducts.map((p) => [p.id, { titleId: p.titleId, publisherId: p.title.publisherId }]));
-
-      await tx.publisherBooking.createMany({
-        data: placementLines.map((l) => {
-          const ref = l.productId ? titleByProduct.get(l.productId) : undefined;
-          return { orderLineId: l.id, titleId: ref?.titleId ?? null, publisherId: ref?.publisherId ?? null };
-        }),
-      });
+      // Each booking is anchored to its title/publisher at creation (the
+      // campaign report and metrics sweep group by it).
+      await createPublisherBookings(tx, placementLines);
     }
 
     return { requestId: req.id, orderIds };

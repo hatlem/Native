@@ -13,6 +13,7 @@ export const DESK_USERS_OK_KEYS: Readonly<Record<string, string>> = {
   reactivated: "okReactivated",
   reset_sent: "okResetSent",
   link_sent: "okLinkSent",
+  terms: "okTerms",
 };
 
 export const DESK_USERS_ERROR_KEYS: Readonly<Record<string, string>> = {
@@ -24,6 +25,7 @@ export const DESK_USERS_ERROR_KEYS: Readonly<Record<string, string>> = {
   role: "errRole",
   deactivated_target: "errDeactivatedTarget",
   email_failed: "errEmailFailed",
+  terms: "errTerms",
 };
 
 const GENERIC_ERROR_KEY = "errGeneric";
