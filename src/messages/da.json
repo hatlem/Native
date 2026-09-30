@@ -1658,7 +1658,7 @@
     "placementRetracted": "Trukket tilbage",
     "unlinkCta": "Fjern kobling",
     "sharedArticleWarning": "Denne artikel er koblet til {count} andre placeringer — dine ændringer påvirker dem alle.",
-    "detailUploadFailed": "Upload mislykkedes. Prøv en anden fil.",
+    "detailUploadFailed": "Uploaden gik ikke igennem. Tjek forbindelsen, og prøv igen.",
     "detailUploadUnavailable": "Filupload er ikke tilgængelig lige nu. Indsæt teksten i editoren i stedet.",
     "backToArticles": "Alle artikler",
     "versionLabel": "Version {version}",
@@ -1673,7 +1673,9 @@
     "orderRef": "ordre {ref}",
     "draftLabel": "Artikeltekst",
     "draftHint": "Ren tekst med enkel Markdown: # til overskrifter, **fed**, *kursiv*, - til lister, [tekst](link).",
-    "submitBlockedSpec": "Formatkravene for en placering er ikke opfyldt endnu – tjek placeringerne ovenfor."
+    "submitBlockedSpec": "Formatkravene for en placering er ikke opfyldt endnu – tjek placeringerne ovenfor.",
+    "detailUploadWrongType": "Den filtype understøttes ikke. Upload en PDF, Word-fil (.docx) eller ren tekst.",
+    "detailUploadTooLarge": "Filen er tom eller større end 25 MB. Upload en mindre fil, eller indsæt teksten i editoren."
   },
   "marketing": {
     "howCta": "Sådan virker det",
@@ -2828,7 +2830,7 @@
     "uploadHint": "PDF, PPTX eller billede, maks 25 MB",
     "uploading": "Uploader…",
     "uploadDone": "Fil uploadet.",
-    "uploadFailed": "Upload mislykkedes: {error}",
+    "uploadFailed": "Uploaden gik ikke igennem. Tjek forbindelsen, og prøv igen — eller indsæt et link nedenfor i stedet.",
     "urlLabel": "Eller indsæt et link til rate card / media kit",
     "urlPlaceholder": "https://…",
     "ratesLabel": "Eller angiv priser per titel",
@@ -2874,7 +2876,9 @@
     "content_advertiser": "Annoncøren kan levere egne artikler",
     "content_publisher": "Artiklerne skal skrives af jeres afdeling",
     "content_both": "Begge dele er mulige",
-    "uploadUnavailable": "Filupload er ikke tilgængelig lige nu. Indsæt et link til prisliste eller mediekit nedenfor i stedet."
+    "uploadUnavailable": "Filupload er ikke tilgængelig lige nu. Indsæt et link til prisliste eller mediekit nedenfor i stedet.",
+    "uploadWrongType": "Den filtype modtages ikke. Upload en PDF, PowerPoint, PNG eller JPG.",
+    "uploadTooLarge": "Filen er tom eller større end 25 MB. Upload en mindre fil, eller indsæt et link nedenfor i stedet."
   },
   "invite": {
     "title": "Tilmeld dig {org}",

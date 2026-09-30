@@ -1658,7 +1658,7 @@
     "placementRetracted": "Trukket tilbake",
     "unlinkCta": "Fjern kobling",
     "sharedArticleWarning": "Denne artikkelen er koblet til {count} andre plasseringer — endringene dine påvirker alle.",
-    "detailUploadFailed": "Opplastingen feilet. Prøv en annen fil.",
+    "detailUploadFailed": "Opplastingen gikk ikke gjennom. Sjekk nettforbindelsen og prøv igjen.",
     "detailUploadUnavailable": "Filopplasting er ikke tilgjengelig akkurat nå. Lim inn teksten i editoren i stedet.",
     "backToArticles": "Alle artikler",
     "versionLabel": "Versjon {version}",
@@ -1673,7 +1673,9 @@
     "orderRef": "bestilling {ref}",
     "draftLabel": "Artikkeltekst",
     "draftHint": "Ren tekst med enkel Markdown: # for titler, **fet**, *kursiv*, - for lister, [tekst](lenke).",
-    "submitBlockedSpec": "Formatkravene for en plassering er ikke oppfylt ennå – sjekk plasseringene over."
+    "submitBlockedSpec": "Formatkravene for en plassering er ikke oppfylt ennå – sjekk plasseringene over.",
+    "detailUploadWrongType": "Den filtypen støttes ikke. Last opp en PDF, Word-fil (.docx) eller ren tekst.",
+    "detailUploadTooLarge": "Filen er tom eller større enn 25 MB. Last opp en mindre fil, eller lim inn teksten i editoren."
   },
   "marketing": {
     "howCta": "Slik fungerer det",
@@ -2715,7 +2717,7 @@
     "uploadHint": "PDF, PPTX eller bilde, maks 25 MB",
     "uploading": "Laster opp…",
     "uploadDone": "Fil lastet opp.",
-    "uploadFailed": "Opplasting feilet: {error}",
+    "uploadFailed": "Opplastingen gikk ikke gjennom. Sjekk nettforbindelsen og prøv igjen — eller lim inn en lenke nedenfor i stedet.",
     "urlLabel": "Eller lim inn en lenke til rate card / media kit",
     "urlPlaceholder": "https://…",
     "ratesLabel": "Eller skriv inn priser per tittel",
@@ -2761,7 +2763,9 @@
     "content_advertiser": "Annonsøren kan levere egne artikler",
     "content_publisher": "Artiklene må skrives av deres avdeling",
     "content_both": "Begge deler er mulig",
-    "uploadUnavailable": "Filopplasting er ikke tilgjengelig akkurat nå. Lim inn en lenke til prisliste eller mediekit nedenfor i stedet."
+    "uploadUnavailable": "Filopplasting er ikke tilgjengelig akkurat nå. Lim inn en lenke til prisliste eller mediekit nedenfor i stedet.",
+    "uploadWrongType": "Den filtypen tas ikke imot. Last opp en PDF, PowerPoint, PNG eller JPG.",
+    "uploadTooLarge": "Filen er tom eller større enn 25 MB. Last opp en mindre fil, eller lim inn en lenke nedenfor i stedet."
   },
   "account": {
     "eyebrow": "Konto",

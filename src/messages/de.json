@@ -187,7 +187,7 @@
     "placementRetracted": "Zurückgezogen",
     "unlinkCta": "Verknüpfung entfernen",
     "sharedArticleWarning": "Dieser Artikel ist mit {count} weiteren Platzierungen verknüpft — deine Änderungen wirken sich auf alle aus.",
-    "detailUploadFailed": "Hochladen fehlgeschlagen. Versuchen Sie eine andere Datei.",
+    "detailUploadFailed": "Der Upload hat nicht geklappt. Prüfen Sie Ihre Verbindung und versuchen Sie es erneut.",
     "detailUploadUnavailable": "Datei-Uploads sind gerade nicht verfügbar. Fügen Sie den Text stattdessen im Editor ein.",
     "backToArticles": "Alle Artikel",
     "versionLabel": "Version {version}",
@@ -202,7 +202,9 @@
     "orderRef": "Auftrag {ref}",
     "draftLabel": "Artikeltext",
     "draftHint": "Reiner Text mit einfachem Markdown: # für Überschriften, **fett**, *kursiv*, - für Listen, [Text](Link).",
-    "submitBlockedSpec": "Die Formatvorgaben einer Platzierung sind noch nicht erfüllt – prüfen Sie die Platzierungen oben."
+    "submitBlockedSpec": "Die Formatvorgaben einer Platzierung sind noch nicht erfüllt – prüfen Sie die Platzierungen oben.",
+    "detailUploadWrongType": "Dieser Dateityp wird nicht unterstützt. Laden Sie ein PDF, eine Word-Datei (.docx) oder reinen Text hoch.",
+    "detailUploadTooLarge": "Die Datei ist leer oder größer als 25 MB. Laden Sie eine kleinere Datei hoch oder fügen Sie den Text in den Editor ein."
   },
   "reports": {
     "title": "Berichte",
@@ -2684,7 +2686,7 @@
     "uploadHint": "PDF, PPTX oder Bild, max. 25 MB",
     "uploading": "Wird hochgeladen…",
     "uploadDone": "Datei hochgeladen.",
-    "uploadFailed": "Upload fehlgeschlagen: {error}",
+    "uploadFailed": "Der Upload hat nicht geklappt. Prüfen Sie Ihre Verbindung und versuchen Sie es erneut — oder fügen Sie unten einen Link ein.",
     "urlLabel": "Oder Link zur Rate Card / zum Media Kit einfügen",
     "urlPlaceholder": "https://…",
     "ratesLabel": "Oder Preise pro Titel eingeben",
@@ -2730,7 +2732,9 @@
     "content_advertiser": "Der Werbetreibende kann eigene Artikel liefern",
     "content_publisher": "Artikel müssen von Ihrer Abteilung verfasst werden",
     "content_both": "Beides ist möglich",
-    "uploadUnavailable": "Datei-Upload ist gerade nicht verfügbar. Fügen Sie stattdessen unten einen Link zu Preisliste oder Mediadaten ein."
+    "uploadUnavailable": "Datei-Upload ist gerade nicht verfügbar. Fügen Sie stattdessen unten einen Link zu Preisliste oder Mediadaten ein.",
+    "uploadWrongType": "Dieser Dateityp wird nicht angenommen. Laden Sie ein PDF, PowerPoint, PNG oder JPG hoch.",
+    "uploadTooLarge": "Die Datei ist leer oder größer als 25 MB. Laden Sie eine kleinere Datei hoch oder fügen Sie unten einen Link ein."
   },
   "invite": {
     "title": "Treten Sie {org} bei",

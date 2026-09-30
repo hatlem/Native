@@ -187,7 +187,7 @@
     "placementRetracted": "Retracted",
     "unlinkCta": "Unlink",
     "sharedArticleWarning": "This article is linked to {count} other placements — your changes will affect all of them.",
-    "detailUploadFailed": "Upload failed. Try a different file.",
+    "detailUploadFailed": "The upload didn't go through. Check your connection and try again.",
     "detailUploadUnavailable": "File uploads aren't available right now. Paste the text into the editor instead.",
     "backToArticles": "All articles",
     "versionLabel": "Version {version}",
@@ -202,7 +202,9 @@
     "orderRef": "order {ref}",
     "draftLabel": "Article text",
     "draftHint": "Plain text with light Markdown: # for headings, **bold**, *italic*, - for lists, [text](link).",
-    "submitBlockedSpec": "A placement's format spec isn't met yet — check the placements above."
+    "submitBlockedSpec": "A placement's format spec isn't met yet — check the placements above.",
+    "detailUploadWrongType": "That file type isn't supported. Upload a PDF, Word (.docx) or plain-text file.",
+    "detailUploadTooLarge": "That file is empty or larger than 25 MB. Upload a smaller file, or paste the text into the editor."
   },
   "reports": {
     "title": "Reports",
@@ -2730,7 +2732,7 @@
     "uploadHint": "PDF, PPTX or image, max 25 MB",
     "uploading": "Uploading…",
     "uploadDone": "File uploaded.",
-    "uploadFailed": "Upload failed: {error}",
+    "uploadFailed": "The upload didn't go through. Check your connection and try again — or paste a link below instead.",
     "urlLabel": "Or paste a URL to your rate card / media kit",
     "urlPlaceholder": "https://…",
     "ratesLabel": "Or enter rates per title",
@@ -2776,7 +2778,9 @@
     "content_advertiser": "The advertiser can deliver their own articles",
     "content_publisher": "Articles must be written by your department",
     "content_both": "Both are possible",
-    "uploadUnavailable": "File upload isn't available right now. Paste a link to your rate card or media kit below instead."
+    "uploadUnavailable": "File upload isn't available right now. Paste a link to your rate card or media kit below instead.",
+    "uploadWrongType": "That file type isn't accepted. Upload a PDF, PowerPoint, PNG or JPG.",
+    "uploadTooLarge": "That file is empty or larger than 25 MB. Upload a smaller file, or paste a link below instead."
   },
   "account": {
     "eyebrow": "Account",

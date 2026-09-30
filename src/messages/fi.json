@@ -187,7 +187,7 @@
     "placementRetracted": "Peruutettu",
     "unlinkCta": "Poista linkitys",
     "sharedArticleWarning": "Tämä artikkeli on linkitetty {count} muuhun sijoitteluun — muutoksesi vaikuttavat kaikkiin.",
-    "detailUploadFailed": "Lataus epäonnistui. Kokeile toista tiedostoa.",
+    "detailUploadFailed": "Lataus ei onnistunut. Tarkista yhteys ja yritä uudelleen.",
     "detailUploadUnavailable": "Tiedostojen lataus ei ole juuri nyt käytettävissä. Liitä teksti editoriin.",
     "backToArticles": "Kaikki artikkelit",
     "versionLabel": "Versio {version}",
@@ -202,7 +202,9 @@
     "orderRef": "tilaus {ref}",
     "draftLabel": "Artikkelin teksti",
     "draftHint": "Pelkkää tekstiä ja kevyttä Markdownia: # otsikoille, **lihavointi**, *kursiivi*, - listoille, [teksti](linkki).",
-    "submitBlockedSpec": "Jonkin sijoituksen formaattivaatimukset eivät vielä täyty – tarkista sijoitukset yllä."
+    "submitBlockedSpec": "Jonkin sijoituksen formaattivaatimukset eivät vielä täyty – tarkista sijoitukset yllä.",
+    "detailUploadWrongType": "Tätä tiedostotyyppiä ei tueta. Lataa PDF, Word-tiedosto (.docx) tai pelkkä teksti.",
+    "detailUploadTooLarge": "Tiedosto on tyhjä tai yli 25 Mt. Lataa pienempi tiedosto tai liitä teksti editoriin."
   },
   "reports": {
     "title": "Raportit",
@@ -2827,7 +2829,7 @@
     "uploadHint": "PDF, PPTX tai kuva, enintään 25 Mt",
     "uploading": "Ladataan…",
     "uploadDone": "Tiedosto ladattu.",
-    "uploadFailed": "Lataus epäonnistui: {error}",
+    "uploadFailed": "Lataus ei onnistunut. Tarkista yhteys ja yritä uudelleen — tai liitä linkki alle.",
     "urlLabel": "Tai liitä linkki rate cardiin / media kittiin",
     "urlPlaceholder": "https://…",
     "ratesLabel": "Tai syötä hinnat julkaisukohtaisesti",
@@ -2873,7 +2875,9 @@
     "content_advertiser": "Mainostaja voi toimittaa omat artikkelinsa",
     "content_publisher": "Artikkelit on kirjoitettava osastonne toimesta",
     "content_both": "Molemmat ovat mahdollisia",
-    "uploadUnavailable": "Tiedoston lataus ei ole juuri nyt käytettävissä. Liitä alle linkki hinnastoon tai mediakorttiin."
+    "uploadUnavailable": "Tiedoston lataus ei ole juuri nyt käytettävissä. Liitä alle linkki hinnastoon tai mediakorttiin.",
+    "uploadWrongType": "Tätä tiedostotyyppiä ei hyväksytä. Lataa PDF, PowerPoint, PNG tai JPG.",
+    "uploadTooLarge": "Tiedosto on tyhjä tai yli 25 Mt. Lataa pienempi tiedosto tai liitä linkki alle."
   },
   "invite": {
     "title": "Liity organisaatioon {org}",

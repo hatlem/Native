@@ -1658,7 +1658,7 @@
     "placementRetracted": "Indragen",
     "unlinkCta": "Ta bort koppling",
     "sharedArticleWarning": "Den här artikeln är kopplad till {count} andra placeringar — dina ändringar påverkar alla.",
-    "detailUploadFailed": "Uppladdningen misslyckades. Prova en annan fil.",
+    "detailUploadFailed": "Uppladdningen gick inte igenom. Kontrollera anslutningen och försök igen.",
     "detailUploadUnavailable": "Filuppladdning är inte tillgänglig just nu. Klistra in texten i redigeraren i stället.",
     "backToArticles": "Alla artiklar",
     "versionLabel": "Version {version}",
@@ -1673,7 +1673,9 @@
     "orderRef": "beställning {ref}",
     "draftLabel": "Artikeltext",
     "draftHint": "Ren text med enkel Markdown: # för rubriker, **fet**, *kursiv*, - för listor, [text](länk).",
-    "submitBlockedSpec": "Formatkraven för en placering är inte uppfyllda ännu – kontrollera placeringarna ovan."
+    "submitBlockedSpec": "Formatkraven för en placering är inte uppfyllda ännu – kontrollera placeringarna ovan.",
+    "detailUploadWrongType": "Den filtypen stöds inte. Ladda upp en PDF, Word-fil (.docx) eller ren text.",
+    "detailUploadTooLarge": "Filen är tom eller större än 25 MB. Ladda upp en mindre fil, eller klistra in texten i redigeraren."
   },
   "marketing": {
     "howCta": "Så funkar det",
@@ -2827,7 +2829,7 @@
     "uploadHint": "PDF, PPTX eller bild, max 25 MB",
     "uploading": "Laddar upp…",
     "uploadDone": "Fil uppladdad.",
-    "uploadFailed": "Uppladdning misslyckades: {error}",
+    "uploadFailed": "Uppladdningen gick inte igenom. Kontrollera anslutningen och försök igen — eller klistra in en länk nedan i stället.",
     "urlLabel": "Eller klistra in en länk till rate card / media kit",
     "urlPlaceholder": "https://…",
     "ratesLabel": "Eller ange priser per titel",
@@ -2873,7 +2875,9 @@
     "content_advertiser": "Annonsören kan leverera egna artiklar",
     "content_publisher": "Artiklarna måste skrivas av er avdelning",
     "content_both": "Båda är möjliga",
-    "uploadUnavailable": "Filuppladdning är inte tillgänglig just nu. Klistra in en länk till prislista eller mediakit nedan i stället."
+    "uploadUnavailable": "Filuppladdning är inte tillgänglig just nu. Klistra in en länk till prislista eller mediakit nedan i stället.",
+    "uploadWrongType": "Den filtypen tas inte emot. Ladda upp en PDF, PowerPoint, PNG eller JPG.",
+    "uploadTooLarge": "Filen är tom eller större än 25 MB. Ladda upp en mindre fil, eller klistra in en länk nedan i stället."
   },
   "invite": {
     "title": "Gå med i {org}",
