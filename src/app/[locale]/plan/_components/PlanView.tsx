@@ -253,7 +253,6 @@ export async function PlanView({
   const homeMarket = activeOrg?.marketCode ?? null;
 
   let rec: { picks: Candidate[]; supplementary: SupplementaryTitle[] } | null = null;
-  let recCurrency = "EUR";
   // True when the results were ranked by the brief (drives the heading +
   // reason chips); false = plain budget recommender.
   let briefMatched = false;
@@ -268,7 +267,6 @@ export async function PlanView({
       locale,
     });
     rec = { picks: result.picks, supplementary: result.supplementary };
-    recCurrency = result.currency;
     briefMatched = result.briefMatched;
   }
 
@@ -450,7 +448,6 @@ export async function PlanView({
           recBudgetRaw={recBudgetRaw}
           homeMarket={homeMarket}
           rec={rec}
-          recCurrency={recCurrency}
           briefMatched={briefMatched}
         />
       ) : (

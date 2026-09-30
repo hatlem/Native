@@ -837,12 +837,12 @@
     "requestingAs": "Anfrage als",
     "loginRequired": "Melden Sie sich an oder erstellen Sie ein Konto, um ein Angebot anzufordern:",
     "selectClient": "Wählen Sie einen Kunden, in dessen Namen Sie handeln, im",
-    "fromPrice": "ab {price}",
     "targetAudienceLabel": "Zielgruppensegmente (optional)",
     "targetGeoLabel": "Geografischer Fokus (optional)",
     "targetGeoPlaceholder": "z. B. NO, SE — oder Bayern, München",
     "targetContextLabel": "Redaktioneller Kontext (optional)",
-    "targetContextPlaceholder": "z. B. Wirtschaft, Lifestyle, Sport"
+    "targetContextPlaceholder": "z. B. Wirtschaft, Lifestyle, Sport",
+    "priceBand": "≈ {band}"
   },
   "requests": {
     "title": "Anfrage",
@@ -2997,7 +2997,6 @@
     "resultsAlsoConsider": "Ebenfalls einen Blick wert",
     "resultsEmpty": "Noch keine Treffer – versuchen Sie ein breiteres Briefing oder einen anderen Markt.",
     "whyFits": "Warum das passt:",
-    "fromPrice": "ab {price}",
     "reach": "Reichweite/Mon.",
     "requestPrice": "Preis anfragen",
     "addToShortlist": "Zur Auswahl hinzufügen",
@@ -3052,7 +3051,8 @@
     "kycAddress2": "Adresszeile 2",
     "kycPostal": "Postleitzahl",
     "kycCity": "Stadt",
-    "kycSave": "Daten speichern"
+    "kycSave": "Daten speichern",
+    "priceBand": "≈ {band}"
   },
   "buyerHome": {
     "headingNeeds": "{count, plural, =1 {1 Sache braucht dich} other {# Dinge brauchen dich}}",

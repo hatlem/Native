@@ -837,12 +837,12 @@
     "requestingAs": "Pyytäjä",
     "loginRequired": "Kirjaudu sisään tai luo tili pyytääksesi tarjouksen:",
     "selectClient": "Valitse asiakas, jonka puolesta toimit",
-    "fromPrice": "alkaen {price}",
     "targetAudienceLabel": "Yleisösegmentit (valinnainen)",
     "targetGeoLabel": "Maantieteellinen painopiste (valinnainen)",
     "targetGeoPlaceholder": "esim. NO, SE — tai Uusimaa, Helsinki",
     "targetContextLabel": "Toimituksellinen konteksti (valinnainen)",
-    "targetContextPlaceholder": "esim. talous, elämäntapa, urheilu"
+    "targetContextPlaceholder": "esim. talous, elämäntapa, urheilu",
+    "priceBand": "≈ {band}"
   },
   "requests": {
     "title": "Pyyntö",
@@ -3128,7 +3128,6 @@
     "resultsAlsoConsider": "Myös harkitsemisen arvoisia",
     "resultsEmpty": "Ei osumia vielä – kokeile laajempaa briiffiä tai toista markkinaa.",
     "whyFits": "Miksi tämä sopii:",
-    "fromPrice": "alkaen {price}",
     "reach": "tavoittavuus/kk",
     "requestPrice": "Pyydä hinta",
     "addToShortlist": "Lisää valintoihin",
@@ -3183,7 +3182,8 @@
     "kycAddress2": "Osoiterivi 2",
     "kycPostal": "Postinumero",
     "kycCity": "Kaupunki",
-    "kycSave": "Tallenna tiedot"
+    "kycSave": "Tallenna tiedot",
+    "priceBand": "≈ {band}"
   },
   "buyerHome": {
     "headingNeeds": "{count, plural, =1 {1 asia tarvitsee sinua} other {# asiaa tarvitsee sinua}}",

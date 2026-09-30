@@ -701,12 +701,12 @@
     "requestingAs": "Bestiller som",
     "loginRequired": "Log ind eller opret en konto for at anmode om tilbud:",
     "selectClient": "Vælg en kunde at handle for i",
-    "fromPrice": "fra {price}",
     "targetAudienceLabel": "Målgruppesegmenter (valgfrit)",
     "targetGeoLabel": "Geografisk fokus (valgfrit)",
     "targetGeoPlaceholder": "f.eks. NO, SE — eller Midtjylland, København",
     "targetContextLabel": "Redaktionel kontekst (valgfrit)",
-    "targetContextPlaceholder": "f.eks. erhverv, livsstil, sport"
+    "targetContextPlaceholder": "f.eks. erhverv, livsstil, sport",
+    "priceBand": "≈ {band}"
   },
   "requests": {
     "title": "Anmodning",
@@ -3129,7 +3129,6 @@
     "resultsAlsoConsider": "Også værd at overveje",
     "resultsEmpty": "Ingen match endnu – prøv et bredere brief eller et andet marked.",
     "whyFits": "Derfor passer den:",
-    "fromPrice": "fra {price}",
     "reach": "rækkevidde/md.",
     "requestPrice": "Bed om pris",
     "addToShortlist": "Føj til udvalg",
@@ -3184,7 +3183,8 @@
     "kycAddress2": "Adresselinje 2",
     "kycPostal": "Postnummer",
     "kycCity": "By",
-    "kycSave": "Gem oplysninger"
+    "kycSave": "Gem oplysninger",
+    "priceBand": "≈ {band}"
   },
   "buyerHome": {
     "headingNeeds": "{count, plural, =1 {1 ting har brug for dig} other {# ting har brug for dig}}",

@@ -701,12 +701,12 @@
     "requestingAs": "Bestiller som",
     "loginRequired": "Logg inn eller opprett en konto for å be om tilbud:",
     "selectClient": "Velg en kunde å handle for i",
-    "fromPrice": "fra {price}",
     "targetAudienceLabel": "Målgruppesegmenter (valgfritt)",
     "targetGeoLabel": "Geografisk fokus (valgfritt)",
     "targetGeoPlaceholder": "f.eks. NO, SE — eller Vestlandet, Oslo",
     "targetContextLabel": "Redaksjonell kontekst (valgfritt)",
-    "targetContextPlaceholder": "f.eks. næringsliv, livsstil, sport"
+    "targetContextPlaceholder": "f.eks. næringsliv, livsstil, sport",
+    "priceBand": "≈ {band}"
   },
   "requests": {
     "title": "Forespørsel",
@@ -3128,7 +3128,6 @@
     "resultsAlsoConsider": "Også verdt å vurdere",
     "resultsEmpty": "Ingen treff ennå – prøv en bredere brief eller et annet marked.",
     "whyFits": "Derfor passer den:",
-    "fromPrice": "fra {price}",
     "reach": "rekkevidde/mnd",
     "requestPrice": "Be om pris",
     "addToShortlist": "Legg i utvalget",
@@ -3183,7 +3182,8 @@
     "kycAddress2": "Adresselinje 2",
     "kycPostal": "Postnummer",
     "kycCity": "Poststed",
-    "kycSave": "Lagre opplysninger"
+    "kycSave": "Lagre opplysninger",
+    "priceBand": "≈ {band}"
   },
   "buyerHome": {
     "headingNeeds": "{count, plural, =1 {1 ting trenger deg} other {# ting trenger deg}}",

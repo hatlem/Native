@@ -8,7 +8,8 @@
 
 import { MarketCode } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
-import { plannablePrice } from "@/lib/pricing/display-price";
+import { plannablePrice, productBand } from "@/lib/pricing/display-price";
+import { bandLabel } from "@/lib/pricing/bands";
 import { loadPricingDefaults } from "@/lib/content-fee";
 import {
   extractFacets,
@@ -83,7 +84,8 @@ export async function recommendForBrief(input: {
     // Only a per-placement price can be fitted into a budget; CPM/CPC and
     // hidden-price products join the "price on request" tier instead.
     const unitPrice = plannablePrice(p, p.title, defaults);
-    if (unitPrice !== null) {
+    const band = productBand(p, p.title, defaults);
+    if (unitPrice !== null && band) {
       priced.push({
         productId: p.id,
         titleId: p.titleId,
@@ -92,6 +94,7 @@ export async function recommendForBrief(input: {
         type: p.type,
         reach,
         unitPrice,
+        priceBand: bandLabel(band, cur),
       });
     } else if (!unpricedByTitle.has(p.titleId)) {
       unpricedByTitle.set(p.titleId, {

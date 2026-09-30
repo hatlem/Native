@@ -837,12 +837,12 @@
     "requestingAs": "Requesting as",
     "loginRequired": "Sign in or create an account to request a quote:",
     "selectClient": "Select a client to act for in the",
-    "fromPrice": "from {price}",
     "targetAudienceLabel": "Audience segments (optional)",
     "targetGeoLabel": "Geographic focus (optional)",
     "targetGeoPlaceholder": "e.g. NO, SE — or Vestlandet, Oslo",
     "targetContextLabel": "Editorial context (optional)",
-    "targetContextPlaceholder": "e.g. business, lifestyle, sport"
+    "targetContextPlaceholder": "e.g. business, lifestyle, sport",
+    "priceBand": "≈ {band}"
   },
   "requests": {
     "title": "Request",
@@ -3128,7 +3128,6 @@
     "resultsAlsoConsider": "Also worth considering",
     "resultsEmpty": "No matching titles yet — try a broader brief or a different market.",
     "whyFits": "Why this fits:",
-    "fromPrice": "from {price}",
     "reach": "reach/mo",
     "requestPrice": "Request price",
     "addToShortlist": "Add to shortlist",
@@ -3183,7 +3182,8 @@
     "kycAddress2": "Address line 2",
     "kycPostal": "Postal code",
     "kycCity": "City",
-    "kycSave": "Save details"
+    "kycSave": "Save details",
+    "priceBand": "≈ {band}"
   },
   "buyerHome": {
     "headingNeeds": "{count, plural, =1 {1 thing needs you} other {# things need you}}",
