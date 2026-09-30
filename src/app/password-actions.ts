@@ -34,8 +34,10 @@ export async function requestPasswordReset(formData: FormData) {
     redirect(`/${locale}/forgot-password?error=rate`);
   }
 
+  // Same as the magic-link form: an empty submit is a form error, not a
+  // request we can pretend to have sent.
   if (!email) {
-    redirect(`/${locale}/check-email`);
+    redirect(`/${locale}/forgot-password?error=empty`);
   }
 
   const user = await prisma.user.findUnique({
@@ -102,8 +104,11 @@ export async function resetPassword(formData: FormData) {
     redirect(`/${locale}/reset-password/${token}?error=rate`);
   }
 
-  if (!token || newPassword.length < 8) {
-    redirect(`/${locale}/reset-password/${token}?error=1`);
+  if (!token) {
+    redirect(`/${locale}/forgot-password`);
+  }
+  if (newPassword.length < 8) {
+    redirect(`/${locale}/reset-password/${token}?error=password_length`);
   }
 
   const passwordHash = await bcrypt.hash(newPassword, 10);

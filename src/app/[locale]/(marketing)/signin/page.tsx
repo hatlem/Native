@@ -42,7 +42,9 @@ export default async function SignInPage({
         ? t("magicLinkExpired")
         : errorCode === "deactivated"
           ? t("deactivatedSignin")
-          : errorCode
+          : errorCode === "magic_empty"
+            ? t("emailRequired")
+            : errorCode
             ? t("failed")
             : null;
   // The email-change confirmation lands here signed out (the route clears the

@@ -1172,7 +1172,7 @@
     "pwHint": "Mindestens 8 Zeichen.",
     "noAccount": "Noch kein Konto?",
     "haveAccount": "Schon ein Konto?",
-    "regFailed": "Bitte alle Pflichtfelder ausfüllen (Passwort mind. 8 Zeichen).",
+    "regFailed": "Bitte Firmennamen und geschäftliche E-Mail-Adresse angeben.",
     "regRateLimited": "Zu viele Registrierungsversuche — bitte eine Minute warten und erneut versuchen.",
     "regEmailBusiness": "Bitte verwenden Sie Ihre geschäftliche E-Mail-Adresse — private E-Mails (gmail, yahoo usw.) und Wegwerf-Dienste sind nicht erlaubt.",
     "regExists": "Ein Konto mit dieser E-Mail existiert bereits.",
@@ -1214,13 +1214,19 @@
     "backToSignin": "Zurück zur Anmeldung",
     "signupSubtitleShort": "Drei Felder. Den Rest fragen wir nach dem Login.",
     "setPasswordSummary": "Passwort setzen (optional)",
-    "pwHintOptional": "Mindestens 8 Zeichen. Leer lassen für Magic-Link-only Anmeldung.",
-    "magicLinkSignupNote": "Passwort überspringen — wir senden einen Magic-Link zur Anmeldung.",
+    "pwHintOptional": "Mindestens 8 Zeichen. Leer lassen, dann melden Sie sich stattdessen über einen Link per E-Mail an.",
+    "magicLinkSignupNote": "Passwort überspringen, dann schicken wir Ihnen einen Anmeldelink per E-Mail.",
     "regPasswordTooShort": "Das Passwort muss mindestens 8 Zeichen lang sein.",
     "deactivatedSignin": "Dieses Konto wurde deaktiviert. Wenden Sie sich an das Desk, wenn es wieder aktiviert werden soll.",
     "emailChangedOk": "E-Mail-Adresse aktualisiert — melden Sie sich mit der neuen Adresse an.",
     "deactivatedTitle": "Dieses Konto ist deaktiviert",
-    "deactivatedBody": "Ihr Konto wurde abgeschaltet, hier gibt es also nichts zu tun. Melden Sie sich unten ab und wenden Sie sich an das Desk, falls das ein Versehen ist."
+    "deactivatedBody": "Ihr Konto wurde abgeschaltet, hier gibt es also nichts zu tun. Melden Sie sich unten ab und wenden Sie sich an das Desk, falls das ein Versehen ist.",
+    "regEmailInvalid": "Diese E-Mail-Adresse sieht nicht richtig aus. Bitte auf Tippfehler prüfen.",
+    "regEmailNoMailServer": "Für diese Domain finden wir keinen Mailserver, E-Mails dorthin kämen also nie an. Bitte die Adresse auf Tippfehler prüfen.",
+    "emailRequired": "Bitte zuerst Ihre E-Mail-Adresse eingeben.",
+    "attemptsRateLimited": "Zu viele Versuche. Bitte eine Minute warten und erneut versuchen.",
+    "checkSignupTitle": "Bestätigen Sie Ihre E-Mail-Adresse",
+    "checkSignupLead": "Wir haben einen Link an die angegebene Adresse geschickt. Öffnen Sie ihn, um die Adresse zu bestätigen und sich anzumelden; er läuft in 15 Minuten ab. Gab es für die Adresse schon ein Konto, erklärt die E-Mail, wie Sie wieder hineinkommen."
   },
   "order": {
     "title": "Bestellung",
@@ -2406,7 +2412,7 @@
     "currentPasswordLabel": "Aktuelles Passwort",
     "newPasswordLabel": "Neues Passwort",
     "pwHint": "Mindestens 8 Zeichen.",
-    "passwordlessNote": "Sie melden sich derzeit nur per Magic-Link an. Setzen Sie ein Passwort, wenn Sie beide Optionen wünschen.",
+    "passwordlessNote": "Sie melden sich derzeit nur über Links per E-Mail an. Legen Sie ein Passwort fest, wenn Sie beide Optionen möchten.",
     "savePasswordSet": "Passwort setzen",
     "savePasswordChange": "Passwort ändern",
     "saveMember": "Speichern",
@@ -2485,7 +2491,8 @@
     "deactivating": "Wird deaktiviert…",
     "errDelegation": "Das Enddatum der Delegation ist kein gültiges Datum.",
     "errDelegationPast": "Das Enddatum der Delegation muss in der Zukunft liegen.",
-    "canCommitAdminNote": "Administratoren haben immer Bestellrecht."
+    "canCommitAdminNote": "Administratoren haben immer Bestellrecht.",
+    "errEmailDomain": "Für diese Domain finden wir keinen Mailserver. Bitte die Adresse auf Tippfehler prüfen."
   },
   "rateCard": {
     "pageTitle": "Rate-Card-Anfrage",

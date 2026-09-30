@@ -16,7 +16,12 @@ export default async function ForgotPasswordPage({
   const sp = await searchParams;
   const t = await getTranslations({ locale, namespace: "auth" });
 
-  const rateLimited = sp.error === "rate";
+  const errorMessage =
+    sp.error === "rate"
+      ? t("attemptsRateLimited")
+      : sp.error === "empty"
+        ? t("emailRequired")
+        : null;
 
   return (
     <LandingShell locale={locale} screenLabel="Forgot password">
@@ -27,9 +32,9 @@ export default async function ForgotPasswordPage({
             <p>{t("forgotLead")}</p>
           </div>
 
-          {rateLimited ? (
+          {errorMessage ? (
             <div className="banner-error" role="alert">
-              <span>{t("failed")}</span>
+              <span>{errorMessage}</span>
             </div>
           ) : null}
 

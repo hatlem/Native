@@ -1047,7 +1047,7 @@
     "pwHint": "Minst 8 tegn.",
     "noAccount": "Ingen konto?",
     "haveAccount": "Har du allerede en konto?",
-    "regFailed": "Fyll ut alle obligatoriske felt (passord min. 8 tegn).",
+    "regFailed": "Fyll inn firmanavn og jobb-e-post.",
     "regRateLimited": "For mange registreringsforsøk — vent et minutt og prøv igjen.",
     "regEmailBusiness": "Bruk jobb-e-posten din — personlig e-post (gmail, yahoo, osv.) og engangs-/midlertidige e-posttjenester er ikke tillatt.",
     "regExists": "Det finnes allerede en konto med den e-posten.",
@@ -1089,13 +1089,19 @@
     "backToSignin": "Tilbake til innlogging",
     "signupSubtitleShort": "Tre felter. Vi spør om resten når du er inne.",
     "setPasswordSummary": "Sett et passord (valgfritt)",
-    "pwHintOptional": "Minst 8 tegn. La stå tomt for å logge inn med magic-link.",
-    "magicLinkSignupNote": "Hopp over passord, så sender vi deg en magic-link for innlogging.",
+    "pwHintOptional": "Minst 8 tegn. La feltet stå tomt, så logger du inn med en lenke på e-post i stedet.",
+    "magicLinkSignupNote": "Hopp over passordet, så sender vi deg en innloggingslenke på e-post.",
     "regPasswordTooShort": "Passordet må være minst 8 tegn.",
     "deactivatedSignin": "Denne kontoen er deaktivert. Kontakt desken hvis den skal slås på igjen.",
     "emailChangedOk": "E-postadressen er oppdatert — logg inn med den nye adressen.",
     "deactivatedTitle": "Denne kontoen er deaktivert",
-    "deactivatedBody": "Kontoen din er slått av, så det er ingenting å bruke her. Logg ut under, og kontakt desken hvis du tror dette er en feil."
+    "deactivatedBody": "Kontoen din er slått av, så det er ingenting å bruke her. Logg ut under, og kontakt desken hvis du tror dette er en feil.",
+    "regEmailInvalid": "Den e-postadressen ser ikke riktig ut. Sjekk om den er skrevet feil.",
+    "regEmailNoMailServer": "Vi finner ingen e-postserver for det domenet, så e-post dit kommer aldri frem. Sjekk om adressen er skrevet feil.",
+    "emailRequired": "Skriv inn e-postadressen din først.",
+    "attemptsRateLimited": "For mange forsøk. Vent et minutt og prøv igjen.",
+    "checkSignupTitle": "Bekreft e-postadressen din",
+    "checkSignupLead": "Vi har sendt en lenke til adressen du oppga. Åpne den for å bekrefte adressen og logge inn; den utløper om 15 minutter. Hadde adressen allerede en konto, forklarer e-posten hvordan du kommer inn igjen."
   },
   "order": {
     "title": "Bestilling",
@@ -2607,7 +2613,7 @@
     "currentPasswordLabel": "Nåværende passord",
     "newPasswordLabel": "Nytt passord",
     "pwHint": "Minst 8 tegn.",
-    "passwordlessNote": "Du logger nå inn med kun magic-link. Sett et passord hvis du vil ha begge muligheter.",
+    "passwordlessNote": "Du logger nå bare inn med lenker på e-post. Sett et passord hvis du vil ha begge mulighetene.",
     "savePasswordSet": "Sett passord",
     "savePasswordChange": "Endre passord",
     "saveMember": "Lagre",
@@ -2686,7 +2692,8 @@
     "deactivating": "Deaktiverer…",
     "errDelegation": "Sluttdatoen for delegeringen er ikke en gyldig dato.",
     "errDelegationPast": "Sluttdatoen for delegeringen må være frem i tid.",
-    "canCommitAdminNote": "Administratorer har alltid bestillingsrett."
+    "canCommitAdminNote": "Administratorer har alltid bestillingsrett.",
+    "errEmailDomain": "Vi finner ingen e-postserver for det domenet. Sjekk om adressen er skrevet feil."
   },
   "invite": {
     "title": "Bli med i {org}",

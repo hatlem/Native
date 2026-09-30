@@ -1047,7 +1047,7 @@
     "pwHint": "Mindst 8 tegn.",
     "noAccount": "Ingen konto?",
     "haveAccount": "Har du allerede en konto?",
-    "regFailed": "Udfyld alle påkrævede felter (adgangskode min. 8 tegn).",
+    "regFailed": "Udfyld firmanavn og arbejdsmail.",
     "regRateLimited": "For mange registreringsforsøg — vent et minut og prøv igen.",
     "regEmailBusiness": "Brug din arbejds-e-mail — personlig e-mail (gmail, yahoo m.fl.) og midlertidige e-mailtjenester er ikke tilladt.",
     "regExists": "Der findes allerede en konto med den e-mail.",
@@ -1089,13 +1089,19 @@
     "backToSignin": "Tilbage til login",
     "signupSubtitleShort": "Tre felter. Vi spørger om resten når du er inde.",
     "setPasswordSummary": "Sæt et kodeord (valgfrit)",
-    "pwHintOptional": "Mindst 8 tegn. Lad stå tomt for at logge ind med magic-link.",
-    "magicLinkSignupNote": "Spring kodeordet over, så sender vi en magic-link til login.",
+    "pwHintOptional": "Mindst 8 tegn. Lad feltet stå tomt, så logger du ind med et link på mail i stedet.",
+    "magicLinkSignupNote": "Spring adgangskoden over, så sender vi dig et login-link på mail.",
     "regPasswordTooShort": "Kodeordet skal være mindst 8 tegn.",
     "deactivatedSignin": "Denne konto er deaktiveret. Kontakt desken, hvis den skal tændes igen.",
     "emailChangedOk": "E-mailadressen er opdateret — log ind med din nye adresse.",
     "deactivatedTitle": "Denne konto er deaktiveret",
-    "deactivatedBody": "Din konto er slukket, så der er intet at bruge her. Log ud nedenfor, og kontakt desken, hvis du tror, det er en fejl."
+    "deactivatedBody": "Din konto er slukket, så der er intet at bruge her. Log ud nedenfor, og kontakt desken, hvis du tror, det er en fejl.",
+    "regEmailInvalid": "Den e-mailadresse ser ikke rigtig ud. Tjek, om den er stavet rigtigt.",
+    "regEmailNoMailServer": "Vi kan ikke finde en mailserver for det domæne, så mails dertil vil aldrig nå frem. Tjek, om adressen er stavet rigtigt.",
+    "emailRequired": "Skriv din e-mailadresse først.",
+    "attemptsRateLimited": "For mange forsøg. Vent et minut og prøv igen.",
+    "checkSignupTitle": "Bekræft din e-mailadresse",
+    "checkSignupLead": "Vi har sendt et link til den adresse, du opgav. Åbn det for at bekræfte adressen og logge ind; det udløber om 15 minutter. Havde adressen allerede en konto, forklarer mailen, hvordan du kommer ind igen."
   },
   "order": {
     "title": "Ordre",
@@ -2550,7 +2556,7 @@
     "currentPasswordLabel": "Nuværende kodeord",
     "newPasswordLabel": "Nyt kodeord",
     "pwHint": "Mindst 8 tegn.",
-    "passwordlessNote": "Du logger nu kun ind med magic-link. Sæt et kodeord hvis du vil have begge muligheder.",
+    "passwordlessNote": "Du logger nu kun ind med links på mail. Opret en adgangskode, hvis du vil have begge muligheder.",
     "savePasswordSet": "Sæt kodeord",
     "savePasswordChange": "Skift kodeord",
     "saveMember": "Gem",
@@ -2629,7 +2635,8 @@
     "deactivating": "Deaktiverer…",
     "errDelegation": "Slutdatoen for delegeringen er ikke en gyldig dato.",
     "errDelegationPast": "Slutdatoen for delegeringen skal ligge i fremtiden.",
-    "canCommitAdminNote": "Administratorer har altid bestillingsret."
+    "canCommitAdminNote": "Administratorer har altid bestillingsret.",
+    "errEmailDomain": "Vi kan ikke finde en mailserver for det domæne. Tjek, om adressen er stavet rigtigt."
   },
   "rateCard": {
     "pageTitle": "Rate card-anmodning",

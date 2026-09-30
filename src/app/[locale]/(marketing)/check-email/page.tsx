@@ -20,8 +20,22 @@ export default async function CheckEmailPage({
   // different copy so the user knows the email they just received is
   // a fresh send, not the original signup one.
   const verifyResend = sp.verify === "1";
-  const title = verifyResend ? t("checkVerifyTitle") : t("checkTitle");
-  const lead = verifyResend ? t("checkVerifyLead") : t("checkLead");
+  // ?signup=1 follows the signup form. "If that email is registered…" reads
+  // oddly straight after creating an account, so this variant says what
+  // actually happens — including for an address that already had an
+  // account, which gets a sign-in mail instead (same page either way, so the
+  // page itself reveals nothing about which one it was).
+  const afterSignup = sp.signup === "1";
+  const title = verifyResend
+    ? t("checkVerifyTitle")
+    : afterSignup
+      ? t("checkSignupTitle")
+      : t("checkTitle");
+  const lead = verifyResend
+    ? t("checkVerifyLead")
+    : afterSignup
+      ? t("checkSignupLead")
+      : t("checkLead");
 
   return (
     <LandingShell locale={locale} screenLabel="Check email">

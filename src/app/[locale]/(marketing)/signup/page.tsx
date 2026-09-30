@@ -30,11 +30,15 @@ export default async function SignUpPage({
       ? t("regRateLimited")
       : errorCode === "email_business"
         ? t("regEmailBusiness")
-        : errorCode === "password_length"
-          ? t("regPasswordTooShort")
-          : errorCode
-            ? t("regFailed")
-            : null;
+        : errorCode === "email_invalid"
+          ? t("regEmailInvalid")
+          : errorCode === "email_domain"
+            ? t("regEmailNoMailServer")
+            : errorCode === "password_length"
+              ? t("regPasswordTooShort")
+              : errorCode
+                ? t("regFailed")
+                : null;
   const sParam = (key: string) =>
     typeof sp[key] === "string" ? (sp[key] as string) : "";
   const initialName = sParam("name");

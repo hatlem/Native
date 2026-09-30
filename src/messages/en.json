@@ -1172,7 +1172,7 @@
     "pwHint": "At least 8 characters.",
     "noAccount": "No account?",
     "haveAccount": "Already have an account?",
-    "regFailed": "Please fill in all required fields (password min. 8 characters).",
+    "regFailed": "Fill in your company name and work email.",
     "regRateLimited": "Too many signup attempts — wait a minute and try again.",
     "regExists": "An account with that email already exists.",
     "inviteInvalidTitle": "This invite is no longer valid",
@@ -1213,13 +1213,20 @@
     "backToSignin": "Back to sign in",
     "signupSubtitleShort": "Three fields. We'll ask the rest once you're in.",
     "setPasswordSummary": "Set a password (optional)",
-    "pwHintOptional": "At least 8 characters. Leave blank to sign in via magic-link only.",
-    "magicLinkSignupNote": "Skip the password and we'll send you a magic-link to sign in.",
+    "pwHintOptional": "At least 8 characters. Leave it blank to sign in with an emailed link instead.",
+    "magicLinkSignupNote": "Skip the password and we'll email you a sign-in link.",
     "regPasswordTooShort": "Password must be at least 8 characters.",
     "deactivatedSignin": "This account has been deactivated. Contact the desk if you need it switched back on.",
     "emailChangedOk": "Email address updated — sign in with your new address.",
     "deactivatedTitle": "This account is deactivated",
-    "deactivatedBody": "Your account has been switched off, so there's nothing here to use. Sign out below, and contact the desk if you think this is a mistake."
+    "deactivatedBody": "Your account has been switched off, so there's nothing here to use. Sign out below, and contact the desk if you think this is a mistake.",
+    "regEmailBusiness": "Use your work email. Personal addresses (Gmail, Yahoo and the like) and disposable inboxes aren't accepted.",
+    "regEmailInvalid": "That email address doesn't look right. Check it for typos.",
+    "regEmailNoMailServer": "We couldn't find a mail server for that domain, so mail to it would never arrive. Check the address for typos.",
+    "emailRequired": "Enter your email address first.",
+    "attemptsRateLimited": "Too many attempts. Wait a minute and try again.",
+    "checkSignupTitle": "Confirm your email",
+    "checkSignupLead": "We've sent a link to the address you gave. Open it to confirm the address and sign in; it expires in 15 minutes. If that address already had an account, the email explains how to get back in."
   },
   "order": {
     "title": "Order",
@@ -2622,7 +2629,7 @@
     "currentPasswordLabel": "Current password",
     "newPasswordLabel": "New password",
     "pwHint": "At least 8 characters.",
-    "passwordlessNote": "You currently sign in via magic-link only. Set a password if you want both options.",
+    "passwordlessNote": "You currently sign in with emailed links only. Set a password if you want both options.",
     "savePasswordSet": "Set password",
     "savePasswordChange": "Change password",
     "saveMember": "Save",
@@ -2701,7 +2708,8 @@
     "deactivating": "Deactivating…",
     "errDelegation": "That delegation end date isn't a valid date.",
     "errDelegationPast": "The delegation end date has to be in the future.",
-    "canCommitAdminNote": "Administrators can always commit."
+    "canCommitAdminNote": "Administrators can always commit.",
+    "errEmailDomain": "We couldn't find a mail server for that domain. Check the address for typos."
   },
   "invite": {
     "title": "Join {org}",

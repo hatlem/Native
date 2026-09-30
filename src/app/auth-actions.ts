@@ -143,8 +143,11 @@ export async function requestMagicLink(formData: FormData): Promise<{ redirectTo
     return { redirectTo: `/${locale}/signin?error=rate` };
   }
 
+  // Nothing typed is a form error, not a request: "if that address is
+  // registered we sent a link" would be a lie about an address that was
+  // never given. It says nothing about any account, so it's safe to say.
   if (!email) {
-    return { redirectTo: `/${locale}/check-email` };
+    return { redirectTo: `/${locale}/signin?error=magic_empty` };
   }
 
   const user = await prisma.user.findUnique({

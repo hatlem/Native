@@ -1,4 +1,4 @@
-// Locale-keyed copy for the five auth emails. Co-located with the
+// Locale-keyed copy for the auth emails. Co-located with the
 // templates because they're tied to the email layout, not the UI
 // translation surface. If you add a sixth email, add its strings here.
 
@@ -65,6 +65,18 @@ type EmailStrings = {
     body: (newEmail: string) => string;
     footer: string;
   };
+  // Sent when someone signs up with an address that already has an account.
+  // The signup form answers exactly as it does for a new address (no account
+  // enumeration), so this mail is where the owner learns the account exists
+  // and gets a one-tap way back in.
+  accountExists: {
+    subject: (app: string) => string;
+    preheader: string;
+    heading: string;
+    body: (app: string) => string;
+    cta: string;
+    footer: string;
+  };
 };
 
 const en: EmailStrings = {
@@ -121,6 +133,14 @@ const en: EmailStrings = {
     heading: "Email change requested",
     body: (newEmail) => `Someone asked to change the sign-in email on your account to ${newEmail}. The change only happens once the link we sent to that address is clicked. If this wasn't you, reply to this email immediately and change your password.`,
     footer: "For your security, we email the old address on every email change.",
+  },
+  accountExists: {
+    subject: (app) => `You already have a ${app} account`,
+    preheader: "Your account is waiting for you.",
+    heading: "You already have an account",
+    body: (app) => `Someone, probably you, just tried to create a ${app} account with this email address. You already have one, so nothing new was created. Use the button below to sign in. The link is valid for 15 minutes and can only be used once. You don't need your password for it.`,
+    cta: "Sign in",
+    footer: "If this wasn't you, ignore this email. Nothing has changed on your account.",
   },
 };
 
@@ -179,6 +199,14 @@ const no: EmailStrings = {
     body: (newEmail) => `Noen har bedt om å endre innloggings-e-posten på kontoen din til ${newEmail}. Endringen skjer først når lenken vi sendte til den adressen blir klikket. Hvis det ikke var deg, svar på denne e-posten umiddelbart og bytt passord.`,
     footer: "Av sikkerhetshensyn varsler vi den gamle adressen ved enhver e-postendring.",
   },
+  accountExists: {
+    subject: (app) => `Du har allerede en konto hos ${app}`,
+    preheader: "Kontoen din venter på deg.",
+    heading: "Du har allerede en konto",
+    body: (app) => `Noen, sannsynligvis du, prøvde nettopp å opprette en ${app}-konto med denne e-postadressen. Du har allerede en, så ingenting nytt ble opprettet. Bruk knappen under for å logge inn. Lenken er gyldig i 15 minutter og kan bare brukes én gang. Du trenger ikke passordet for å bruke den.`,
+    cta: "Logg inn",
+    footer: "Var det ikke deg, kan du se bort fra denne e-posten. Ingenting er endret på kontoen din.",
+  },
 };
 
 const sv: EmailStrings = {
@@ -235,6 +263,14 @@ const sv: EmailStrings = {
     heading: "Begäran om e-poständring",
     body: (newEmail) => `Någon har begärt att ändra inloggningsadressen på ditt konto till ${newEmail}. Ändringen sker först när länken vi skickade till den adressen klickas. Om det inte var du, svara på det här mejlet omedelbart och byt lösenord.`,
     footer: "Av säkerhetsskäl meddelar vi den gamla adressen vid varje e-poständring.",
+  },
+  accountExists: {
+    subject: (app) => `Du har redan ett konto hos ${app}`,
+    preheader: "Ditt konto väntar på dig.",
+    heading: "Du har redan ett konto",
+    body: (app) => `Någon, troligen du, försökte nyss skapa ett ${app}-konto med den här e-postadressen. Du har redan ett, så inget nytt skapades. Logga in med knappen nedan. Länken gäller i 15 minuter och kan bara användas en gång. Du behöver inte ditt lösenord för att använda den.`,
+    cta: "Logga in",
+    footer: "Var det inte du kan du bortse från mejlet. Inget har ändrats på ditt konto.",
   },
 };
 
@@ -293,6 +329,14 @@ const da: EmailStrings = {
     body: (newEmail) => `Nogen har anmodet om at ændre login-e-mailen på din konto til ${newEmail}. Ændringen sker først, når linket vi sendte til den adresse bliver klikket. Hvis det ikke var dig, svar på denne e-mail med det samme og skift adgangskode.`,
     footer: "Af sikkerhedshensyn varsler vi den gamle adresse ved enhver e-mailændring.",
   },
+  accountExists: {
+    subject: (app) => `Du har allerede en konto hos ${app}`,
+    preheader: "Din konto venter på dig.",
+    heading: "Du har allerede en konto",
+    body: (app) => `Nogen, sandsynligvis dig, forsøgte lige at oprette en ${app}-konto med denne e-mailadresse. Du har allerede en, så der blev ikke oprettet noget nyt. Log ind med knappen nedenfor. Linket gælder i 15 minutter og kan kun bruges én gang. Du behøver ikke din adgangskode for at bruge det.`,
+    cta: "Log ind",
+    footer: "Var det ikke dig, kan du se bort fra denne e-mail. Intet er ændret på din konto.",
+  },
 };
 
 const de: EmailStrings = {
@@ -350,6 +394,14 @@ const de: EmailStrings = {
     body: (newEmail) => `Jemand hat darum gebeten, die Anmelde-E-Mail Ihres Kontos auf ${newEmail} zu ändern. Die Änderung erfolgt erst, wenn der Link an diese Adresse angeklickt wird. Falls Sie das nicht waren, antworten Sie sofort auf diese E-Mail und ändern Sie Ihr Passwort.`,
     footer: "Aus Sicherheitsgründen informieren wir die alte Adresse über jede E-Mail-Änderung.",
   },
+  accountExists: {
+    subject: (app) => `Sie haben bereits ein ${app}-Konto`,
+    preheader: "Ihr Konto wartet auf Sie.",
+    heading: "Sie haben bereits ein Konto",
+    body: (app) => `Jemand, vermutlich Sie selbst, wollte gerade mit dieser E-Mail-Adresse ein ${app}-Konto anlegen. Sie haben bereits eines, deshalb wurde nichts Neues erstellt. Melden Sie sich über die Schaltfläche unten an. Der Link ist 15 Minuten gültig und nur einmal verwendbar. Ihr Passwort brauchen Sie dafür nicht.`,
+    cta: "Anmelden",
+    footer: "Falls Sie das nicht waren, ignorieren Sie diese E-Mail. An Ihrem Konto hat sich nichts geändert.",
+  },
 };
 
 const fi: EmailStrings = {
@@ -406,6 +458,14 @@ const fi: EmailStrings = {
     heading: "Sähköpostiosoitteen vaihtoa pyydetty",
     body: (newEmail) => `Joku pyysi tilisi kirjautumissähköpostin vaihtamista osoitteeseen ${newEmail}. Muutos tapahtuu vasta, kun kyseiseen osoitteeseen lähetettyä linkkiä napsautetaan. Jos se et ollut sinä, vastaa tähän viestiin välittömästi ja vaihda salasanasi.`,
     footer: "Turvallisuussyistä ilmoitamme vanhaan osoitteeseen jokaisesta sähköpostin vaihdosta.",
+  },
+  accountExists: {
+    subject: (app) => `Sinulla on jo ${app}-tili`,
+    preheader: "Tilisi odottaa sinua.",
+    heading: "Sinulla on jo tili",
+    body: (app) => `Joku, luultavasti sinä, yritti juuri luoda ${app}-tilin tällä sähköpostiosoitteella. Sinulla on jo tili, joten uutta ei luotu. Kirjaudu sisään alla olevalla painikkeella. Linkki on voimassa 15 minuuttia ja toimii vain kerran. Et tarvitse siihen salasanaasi.`,
+    cta: "Kirjaudu sisään",
+    footer: "Jos se et ollut sinä, voit jättää viestin huomiotta. Tilillesi ei ole tehty muutoksia.",
   },
 };
 

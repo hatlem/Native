@@ -1172,7 +1172,7 @@
     "pwHint": "Vähintään 8 merkkiä.",
     "noAccount": "Ei tiliä?",
     "haveAccount": "Onko sinulla jo tili?",
-    "regFailed": "Täytä kaikki pakolliset kentät (salasana vähintään 8 merkkiä).",
+    "regFailed": "Täytä yrityksen nimi ja työsähköposti.",
     "regRateLimited": "Liian monta rekisteröitymisyritystä — odota hetki ja yritä uudelleen.",
     "regEmailBusiness": "Käytä työsähköpostiosoitettasi — henkilökohtaiset sähköpostit (gmail, yahoo ym.) ja kertakäyttöiset palvelut eivät ole sallittuja.",
     "regExists": "Tili tällä sähköpostilla on jo olemassa.",
@@ -1214,13 +1214,19 @@
     "backToSignin": "Takaisin kirjautumiseen",
     "signupSubtitleShort": "Kolme kenttää. Loput kysytään kun olet sisällä.",
     "setPasswordSummary": "Aseta salasana (valinnainen)",
-    "pwHintOptional": "Vähintään 8 merkkiä. Jätä tyhjäksi kirjautuaksesi vain magic-linkillä.",
-    "magicLinkSignupNote": "Ohita salasana, lähetämme magic-linkin kirjautumiseen.",
+    "pwHintOptional": "Vähintään 8 merkkiä. Jätä tyhjäksi, niin kirjaudut sähköpostiin lähetettävällä linkillä.",
+    "magicLinkSignupNote": "Ohita salasana, niin lähetämme kirjautumislinkin sähköpostiisi.",
     "regPasswordTooShort": "Salasanan on oltava vähintään 8 merkkiä.",
     "deactivatedSignin": "Tämä tili on poistettu käytöstä. Ota yhteyttä deskiin, jos se pitää ottaa uudelleen käyttöön.",
     "emailChangedOk": "Sähköpostiosoite päivitetty — kirjaudu sisään uudella osoitteellasi.",
     "deactivatedTitle": "Tämä tili on poistettu käytöstä",
-    "deactivatedBody": "Tilisi on suljettu, joten täällä ei ole mitään käytettävää. Kirjaudu ulos alta, ja ota yhteyttä deskiin, jos tämä on mielestäsi virhe."
+    "deactivatedBody": "Tilisi on suljettu, joten täällä ei ole mitään käytettävää. Kirjaudu ulos alta, ja ota yhteyttä deskiin, jos tämä on mielestäsi virhe.",
+    "regEmailInvalid": "Sähköpostiosoite ei näytä oikealta. Tarkista, ettei siinä ole kirjoitusvirhettä.",
+    "regEmailNoMailServer": "Verkkotunnukselle ei löydy sähköpostipalvelinta, joten viestit eivät menisi perille. Tarkista osoite kirjoitusvirheiden varalta.",
+    "emailRequired": "Kirjoita ensin sähköpostiosoitteesi.",
+    "attemptsRateLimited": "Liian monta yritystä. Odota hetki ja yritä uudelleen.",
+    "checkSignupTitle": "Vahvista sähköpostiosoitteesi",
+    "checkSignupLead": "Lähetimme linkin antamaasi osoitteeseen. Avaa se vahvistaaksesi osoitteen ja kirjautuaksesi; linkki vanhenee 15 minuutissa. Jos osoitteella oli jo tili, viestissä kerrotaan, miten pääset takaisin sisään."
   },
   "order": {
     "title": "Tilaus",
@@ -2549,7 +2555,7 @@
     "currentPasswordLabel": "Nykyinen salasana",
     "newPasswordLabel": "Uusi salasana",
     "pwHint": "Vähintään 8 merkkiä.",
-    "passwordlessNote": "Kirjaudut nyt vain magic-linkillä. Aseta salasana jos haluat molemmat vaihtoehdot.",
+    "passwordlessNote": "Kirjaudut nyt vain sähköpostiin lähetetyillä linkeillä. Aseta salasana, jos haluat molemmat vaihtoehdot.",
     "savePasswordSet": "Aseta salasana",
     "savePasswordChange": "Vaihda salasana",
     "saveMember": "Tallenna",
@@ -2628,7 +2634,8 @@
     "deactivating": "Poistetaan käytöstä…",
     "errDelegation": "Delegoinnin päättymispäivä ei ole kelvollinen päivämäärä.",
     "errDelegationPast": "Delegoinnin päättymispäivän on oltava tulevaisuudessa.",
-    "canCommitAdminNote": "Ylläpitäjillä on aina tilausoikeus."
+    "canCommitAdminNote": "Ylläpitäjillä on aina tilausoikeus.",
+    "errEmailDomain": "Verkkotunnukselle ei löydy sähköpostipalvelinta. Tarkista osoite kirjoitusvirheiden varalta."
   },
   "rateCard": {
     "pageTitle": "Rate card -pyyntö",
