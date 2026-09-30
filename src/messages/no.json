@@ -728,7 +728,8 @@
       "item3Title": "Vi skriver, plasserer og rapporterer",
       "item3Body": "Utkast sendes til deg for godkjenning. Lenker og resultater havner i Rapporter."
     },
-    "breakdownQtyWithArticleFee": "{n} × {unit} plassering + {article} per artikkel (én artikkel for alle {n})"
+    "breakdownQtyWithArticleFee": "{n} × {unit} plassering + {article} per artikkel (én artikkel for alle {n})",
+    "noticePlanReadOnly": "Du har bare lesetilgang til denne planen, så ingenting ble endret."
   },
   "rfq": {
     "org": "Selskap",
@@ -853,7 +854,11 @@
     "renewalRequested": "Desken har fått beskjed om å fornye tilbudet. Du får et varsel når du kan godta det.",
     "lineNoteLabel": "Merknad",
     "noCommitTitle": "Du kan ikke godta dette tilbudet selv.",
-    "noCommitBody": "Å godta det legger inn en bindende bestilling for {org}, og det krever bestillingsrett. Be en administrator godta tilbudet, eller gi deg bestillingsrett under Konto → Team."
+    "noCommitBody": "Å godta det legger inn en bindende bestilling for {org}, og det krever bestillingsrett. Be en administrator godta tilbudet, eller gi deg bestillingsrett under Konto → Team.",
+    "quoteRevisionNote": "Revisjon {revision} – erstatter tilbudet du fikk tidligere.",
+    "supersededEyebrow": "Tidligere versjoner",
+    "supersededRow": "Revisjon {revision} ({total}) gjelder ikke lenger.",
+    "supersededBy": "Se revisjon {revision} →"
   },
   "desk": {
     "eyebrow": "Internt desk",
@@ -954,7 +959,7 @@
     "quoteNoExpiry": "Ingen utløpsdato",
     "renewQuote": "Forny tilbudet",
     "renewingQuote": "Fornyer …",
-    "renewQuoteHint": "Kunden kan ikke godta et utløpt tilbud. Fornyelsen beholder disse prisene frem til datoen du velger – juster linjene først hvis prisene har endret seg.",
+    "renewQuoteHint": "Kunden kan ikke godta et utløpt tilbud. Fornyelsen beholder disse prisene frem til datoen du velger. Har prisene endret seg, reviderer du tilbudet i stedet.",
     "quoteDraftBadge": "Utkast — ikke sendt",
     "quoteDraftHint": "Kunden ser ikke dette tilbudet ennå. Prissett linjene, og send det nedenfor.",
     "sendTitle": "Send til kunden",
@@ -975,7 +980,22 @@
     "lineNoteHint": "Vises for kunden på tilbudssiden og i PDF-en.",
     "lineNoteTooLong": "Merknaden er for lang. Hold den under {max} tegn.",
     "pdfStorageUnavailable": "Fillagring (R2) er ikke satt opp i dette miljøet, så PDF-en kan ikke lagres. Last ned Word-versjonen i stedet.",
-    "pdfFailed": "PDF-en kunne ikke lages. Prøv igjen, eller last ned Word-versjonen."
+    "pdfFailed": "PDF-en kunne ikke lages. Prøv igjen, eller last ned Word-versjonen.",
+    "pdfSuperseded": "Tilbudet er erstattet av en revisjon, så det lages ikke nye dokumenter av det. Bruk PDF-en til revisjonen i stedet.",
+    "reviseQuote": "Revider tilbud",
+    "revisingQuote": "Åpner revisjon …",
+    "reviseQuoteHint": "Et sendt tilbud er låst. Revisjonen er en redigerbar kopi; når du sender den, erstatter den dette tilbudet, og kunden får beskjed én gang med ny totalsum.",
+    "quoteRevisionBadge": "Revisjon {revision}",
+    "quoteSupersededBadge": "Erstattet",
+    "quoteSupersededBy": "Erstattet av revisjon {revision}. Kunden kan ikke lenger godta det.",
+    "quoteRevisionPending": "Revisjon {revision} er under arbeid – kunden har fortsatt dette tilbudet til du sender den.",
+    "quoteRevisionDraftHint": "Kunden har fortsatt revisjon {previous} og kan godta den til du sender denne. Når du sender, erstattes den, og kunden får beskjed én gang med ny totalsum.",
+    "discardRevision": "Forkast revisjon",
+    "discardingRevision": "Forkaster …",
+    "quoteLocked": "Tilbudet er sendt, så linjene er låst. Revider tilbudet for å endre priser eller merknader.",
+    "quoteNotRevisable": "Tilbudet kan ikke revideres: det er godtatt eller avsluttet.",
+    "revisionPredecessorClosed": "Ikke sendt: tilbudet denne revisjonen skulle erstatte, er ikke lenger åpent – kunden kan nettopp ha godtatt det. Forkast revisjonen.",
+    "sendRevisionNote": "Når du sender, erstattes det forrige tilbudet: kunden kan ikke lenger godta det, og får én varsling med ny totalsum."
   },
   "deskTitles": {
     "eyebrow": "Superadmin · titler",
@@ -2927,7 +2947,9 @@
     "errDelegationPast": "Sluttdatoen for delegeringen må være frem i tid.",
     "canCommitAdminNote": "Administratorer har alltid bestillingsrett.",
     "statusRevoked": "Fjernet",
-    "errEmailDomain": "Vi finner ingen e-postserver for det domenet. Sjekk om adressen er skrevet feil."
+    "errEmailDomain": "Vi finner ingen e-postserver for det domenet. Sjekk om adressen er skrevet feil.",
+    "roleHelp": "Administratorer styrer teamet og kan gjøre alt. Medlemmer bygger planer, sender forespørsler og – med bestillingsrett – godtar tilbud. Begrenset gir bare lesetilgang: ser teamets planer, forespørsler, tilbud, bestillinger, rapporter, artikler og fakturaer, men kan ikke endre, sende, godta eller dele noe.",
+    "canCommitRestrictedNote": "Brukere med begrenset tilgang kan bare lese og kan ikke få bestillingsrett."
   },
   "invite": {
     "title": "Bli med i {org}",
@@ -3300,6 +3322,8 @@
   "quotePdf": {
     "documentTitle": "Tilbud {quoteNumber}",
     "quoteNumber": "Tilbudsnummer",
+    "revision": "Revisjon",
+    "revisionValue": "{revision} – erstatter tilbud {previous}",
     "date": "Dato",
     "validUntil": "Gyldig til",
     "preparedBy": "Utarbeidet av",
@@ -3636,5 +3660,9 @@
     "untitled": "Ny plan",
     "imported": "Importert plan",
     "reordered": "Bestilt på nytt"
+  },
+  "viewOnly": {
+    "title": "Bare lesetilgang",
+    "body": "Du ser alt teamet ditt har her, men kan ikke endre noe. Spør en administrator hvis du trenger å redigere, sende eller godta."
   }
 }

@@ -412,6 +412,9 @@ export default async function CatalogPage({
   // An agency session with no client selected has no org to scope lists to —
   // show a "choose a client first" hint instead of the misleading "no lists".
   const noOrg = !orgId;
+  // A view-only (RESTRICTED) seat browses the catalog like anyone, but gets no
+  // "Add to plan" or list checklist: both change the org's plans.
+  const readOnly = !!orgId && !scope.workspace?.activeCanEdit;
   const membershipMap = savedListMembershipMap(membershipRows);
   const listMembership: Record<string, string[]> = Object.fromEntries(membershipMap);
   const dismissedAt = bookingUserRow?.bookingPromptDismissedAt ?? null;
@@ -635,6 +638,7 @@ export default async function CatalogPage({
       initialCount={shortlistCount}
       initialProductIds={shortlistProductIds}
       initialTotals={shortlistTotals}
+      readOnly={readOnly}
     >
       <section className="catalog-page">
         {showBookingBanner ? <CatalogBookCallBanner /> : null}
@@ -751,6 +755,7 @@ export default async function CatalogPage({
               favoriteLists={favoriteLists}
               listMembership={listMembership}
               noOrg={noOrg}
+              readOnly={readOnly}
             />
 
             <CatalogPagination

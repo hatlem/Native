@@ -33,7 +33,8 @@ export async function GET(
   const { list: listId, ...rest } = search;
   const session = await auth();
   const ws = await getWorkspace(session?.user?.id);
-  const target = await resolvePlanTarget(ws, listId);
+  // Opening a plan is a read: a view-only seat may open any plan it can see.
+  const target = await resolvePlanTarget(ws, listId, "view");
 
   // appUrl(), not request.url: behind Railway's proxy the inbound URL can carry
   // an internal host, and every other redirect in this app builds from appUrl().

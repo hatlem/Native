@@ -119,6 +119,9 @@ export default async function TitleDetailPage({
   ]);
   const favorited = favoritedSet.has(title.id);
   const noOrg = !orgId;
+  // View-only (RESTRICTED) seat: reads the title like anyone, but "Add to
+  // plan", "Save publication" and the list checklist all change org plans.
+  const readOnly = !!orgId && !scope.workspace?.activeCanEdit;
   const listMembership = savedListMembershipMap(membershipRows);
   const inListIds = listMembership.get(title.id) ?? [];
 
@@ -204,6 +207,7 @@ export default async function TitleDetailPage({
               lists={favoriteLists}
               inListIds={inListIds}
               noOrg={noOrg}
+              readOnly={readOnly}
             />
           </div>
           <p className="muted">
@@ -254,7 +258,7 @@ export default async function TitleDetailPage({
               to real per-format "Add to plan" buttons it was a first,
               unstyled CTA that put an UNPRICED placeholder on the plan for
               a title that already had a price. */}
-          {hasBookable ? null : (
+          {hasBookable || readOnly ? null : (
             <form action={saveTitleToList} style={{ marginTop: 12 }}>
               <input type="hidden" name="locale" value={locale} />
               <input type="hidden" name="titleId" value={title.id} />
@@ -498,7 +502,7 @@ export default async function TitleDetailPage({
                   </dl>
                 </div>
               ) : null}
-              {p.bookable ? (
+              {p.bookable && readOnly ? null : p.bookable ? (
                 <>
                   <form action={addToPlan} style={{ marginTop: 12 }}>
                     <input type="hidden" name="locale" value={locale} />

@@ -36,9 +36,23 @@ export async function requireLineWriter(
   return { userId, role: role as string, writerProfileId };
 }
 
+// Which org set grants article access for an org-scoped (buyer) role. Every
+// action edits ("edit": only seats that may change things — lib/scope
+// canEditOnOrg); opening the article page is a "view", which a view-only
+// (RESTRICTED) seat may do. Desk, superadmin and the assigned writer are
+// unaffected either way.
+export type ArticleIntent = "view" | "edit";
+
+function orgIdsFor(scope: Awaited<ReturnType<typeof loadScope>>, intent: ArticleIntent): string[] {
+  const ws = scope.workspace;
+  if (!ws) return [];
+  return intent === "edit" ? ws.editOrgIds : ws.scopeOrgIds;
+}
+
 export async function requireArticleWriter(
   articleId: string,
   locale: string,
+  intent: ArticleIntent = "edit",
 ): Promise<{
   userId: string;
   role: string;
@@ -64,7 +78,7 @@ export async function requireArticleWriter(
     role,
     userId,
     organizationId: article.organizationId,
-    scopeOrgIds: scope.workspace?.scopeOrgIds ?? [],
+    scopeOrgIds: orgIdsFor(scope, intent),
     assignedWriterUserId: article.assignedWriter?.userId ?? null,
   });
   if (!ok) redirect(`/${locale}/articles`);
@@ -87,7 +101,8 @@ export async function requireOrgArticleAccess(
     role,
     userId,
     organizationId,
-    scopeOrgIds: scope.workspace?.scopeOrgIds ?? [],
+    // Only actions call this (create an article in the org): always an edit.
+    scopeOrgIds: orgIdsFor(scope, "edit"),
     assignedWriterUserId: null,
   });
   if (!ok) redirect(`/${locale}/articles`);

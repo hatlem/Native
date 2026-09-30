@@ -4,7 +4,7 @@ import { redirect } from "next/navigation";
 import { Prisma, type UserRole } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
 import { recordAudit } from "@/lib/audit";
-import { loadScope, canActOnOrg } from "@/lib/scope";
+import { loadScope, canEditOnOrg } from "@/lib/scope";
 import { requireOrgArticleAccess, requireArticleWriter } from "@/lib/writers/guard";
 import { presignUploadResult, ARTICLE_TYPES, type PresignUploadResult } from "@/lib/storage/r2";
 import { linkableLinesWhere } from "@/lib/content/article-linking";
@@ -93,7 +93,7 @@ export async function linkArticleToOrderLine(formData: FormData) {
     select: { id: true },
   });
   const scope = await loadScope();
-  if (!line || !canActOnOrg(scope, article.organizationId)) {
+  if (!line || !canEditOnOrg(scope, article.organizationId)) {
     redirect(`/${locale}/articles/${articleId}?error=link`);
   }
 

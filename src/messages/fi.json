@@ -866,7 +866,8 @@
       "item3Title": "Kirjoitamme, julkaisemme ja raportoimme",
       "item3Body": "Luonnokset tulevat sinulle hyväksyttäviksi. Linkit ja tulokset löytyvät Raporteista."
     },
-    "breakdownQtyWithArticleFee": "{n} × {unit} sijoittelu + {article} / artikkeli (yksi artikkeli kaikkiin {n})"
+    "breakdownQtyWithArticleFee": "{n} × {unit} sijoittelu + {article} / artikkeli (yksi artikkeli kaikkiin {n})",
+    "noticePlanReadOnly": "Sinulla on tähän suunnitelmaan vain lukuoikeus, joten mitään ei muutettu."
   },
   "rfq": {
     "org": "Yritys",
@@ -991,7 +992,11 @@
     "renewalRequested": "Deskiä on pyydetty uusimaan tarjous. Saat ilmoituksen, kun voit hyväksyä sen.",
     "lineNoteLabel": "Huomautus",
     "noCommitTitle": "Et voi hyväksyä tätä tarjousta itse.",
-    "noCommitBody": "Hyväksyminen tekee sitovan tilauksen organisaatiolle {org}, ja siihen tarvitaan tilausoikeus. Pyydä ylläpitäjää hyväksymään tarjous tai antamaan sinulle tilausoikeus kohdassa Tili → Tiimi."
+    "noCommitBody": "Hyväksyminen tekee sitovan tilauksen organisaatiolle {org}, ja siihen tarvitaan tilausoikeus. Pyydä ylläpitäjää hyväksymään tarjous tai antamaan sinulle tilausoikeus kohdassa Tili → Tiimi.",
+    "quoteRevisionNote": "Versio {revision} – korvaa aiemmin saamasi tarjouksen.",
+    "supersededEyebrow": "Aiemmat versiot",
+    "supersededRow": "Versio {revision} ({total}) ei ole enää voimassa.",
+    "supersededBy": "Katso versio {revision} →"
   },
   "desk": {
     "eyebrow": "Sisäinen desk",
@@ -1092,7 +1097,7 @@
     "quoteNoExpiry": "Ei päättymispäivää",
     "renewQuote": "Uusi tarjous",
     "renewingQuote": "Uusitaan …",
-    "renewQuoteHint": "Asiakas ei voi hyväksyä vanhentunutta tarjousta. Uusiminen pitää nämä hinnat voimassa valitsemaasi päivään asti – päivitä rivien hinnat ensin, jos ne ovat muuttuneet.",
+    "renewQuoteHint": "Asiakas ei voi hyväksyä vanhentunutta tarjousta. Uusiminen pitää nämä hinnat voimassa valitsemaasi päivään asti. Jos hinnat ovat muuttuneet, päivitä tarjous sen sijaan.",
     "quoteDraftBadge": "Luonnos – ei lähetetty",
     "quoteDraftHint": "Asiakas ei vielä näe tätä tarjousta. Hinnoittele rivit ja lähetä tarjous alta.",
     "sendTitle": "Lähetä asiakkaalle",
@@ -1113,7 +1118,22 @@
     "lineNoteHint": "Näytetään asiakkaalle tarjoussivulla ja PDF:ssä.",
     "lineNoteTooLong": "Huomautus on liian pitkä. Pidä se alle {max} merkissä.",
     "pdfStorageUnavailable": "Tiedostotallennusta (R2) ei ole määritetty tähän ympäristöön, joten PDF:ää ei voi tallentaa. Lataa Word-versio sen sijaan.",
-    "pdfFailed": "PDF:n luonti epäonnistui. Yritä uudelleen tai lataa Word-versio."
+    "pdfFailed": "PDF:n luonti epäonnistui. Yritä uudelleen tai lataa Word-versio.",
+    "pdfSuperseded": "Tarjous on korvattu uudella versiolla, joten siitä ei enää tehdä asiakirjoja. Käytä uuden version PDF:ää.",
+    "reviseQuote": "Päivitä tarjous",
+    "revisingQuote": "Avataan uutta versiota …",
+    "reviseQuoteHint": "Lähetetty tarjous on lukittu. Päivitys avaa muokattavan kopion; kun lähetät sen, se korvaa tämän tarjouksen ja asiakas saa yhden ilmoituksen uudesta kokonaissummasta.",
+    "quoteRevisionBadge": "Versio {revision}",
+    "quoteSupersededBadge": "Korvattu",
+    "quoteSupersededBy": "Korvattu versiolla {revision}. Asiakas ei voi enää hyväksyä sitä.",
+    "quoteRevisionPending": "Versio {revision} on työn alla – asiakkaalla on tämä tarjous, kunnes lähetät sen.",
+    "quoteRevisionDraftHint": "Asiakkaalla on yhä versio {previous}, ja hän voi hyväksyä sen, kunnes lähetät tämän. Lähettäminen korvaa sen, ja asiakas saa yhden ilmoituksen uudesta kokonaissummasta.",
+    "discardRevision": "Hylkää versio",
+    "discardingRevision": "Hylätään …",
+    "quoteLocked": "Tarjous on lähetetty, joten sen rivit on lukittu. Päivitä tarjous muuttaaksesi hintoja tai huomautuksia.",
+    "quoteNotRevisable": "Tarjousta ei voi päivittää: se on hyväksytty tai suljettu.",
+    "revisionPredecessorClosed": "Ei lähetetty: tarjous, jonka tämä versio korvaisi, ei ole enää avoinna – asiakas on ehkä juuri hyväksynyt sen. Hylkää versio.",
+    "sendRevisionNote": "Lähettäminen korvaa aiemman tarjouksen: asiakas ei voi enää hyväksyä sitä ja saa yhden ilmoituksen uudesta kokonaissummasta."
   },
   "deskTitles": {
     "eyebrow": "Pääkäyttäjä · julkaisut",
@@ -2866,7 +2886,9 @@
     "errDelegationPast": "Delegoinnin päättymispäivän on oltava tulevaisuudessa.",
     "canCommitAdminNote": "Ylläpitäjillä on aina tilausoikeus.",
     "statusRevoked": "Poistettu",
-    "errEmailDomain": "Verkkotunnukselle ei löydy sähköpostipalvelinta. Tarkista osoite kirjoitusvirheiden varalta."
+    "errEmailDomain": "Verkkotunnukselle ei löydy sähköpostipalvelinta. Tarkista osoite kirjoitusvirheiden varalta.",
+    "roleHelp": "Ylläpitäjät hallitsevat tiimiä ja voivat tehdä kaiken. Jäsenet kokoavat suunnitelmia, lähettävät tarjouspyyntöjä ja – tilausoikeudella – hyväksyvät tarjouksia. Rajoitettu on pelkkä lukuoikeus: näkee tiimin suunnitelmat, pyynnöt, tarjoukset, tilaukset, raportit, artikkelit ja laskut, mutta ei voi muuttaa, lähettää, hyväksyä tai jakaa mitään.",
+    "canCommitRestrictedNote": "Rajoitetut käyttäjät voivat vain lukea, eikä heille voi antaa tilausoikeutta."
   },
   "rateCard": {
     "pageTitle": "Rate card -pyyntö",
@@ -3300,6 +3322,8 @@
   "quotePdf": {
     "documentTitle": "Tarjous {quoteNumber}",
     "quoteNumber": "Tarjousnumero",
+    "revision": "Versio",
+    "revisionValue": "{revision} – korvaa tarjouksen {previous}",
     "date": "Päivämäärä",
     "validUntil": "Voimassa asti",
     "preparedBy": "Laatinut",
@@ -3636,5 +3660,9 @@
     "untitled": "Uusi suunnitelma",
     "imported": "Tuotu suunnitelma",
     "reordered": "Uudelleen tilattu kampanja"
+  },
+  "viewOnly": {
+    "title": "Vain lukuoikeus",
+    "body": "Näet kaiken, mitä tiimilläsi on täällä, mutta et voi muuttaa sitä. Pyydä ylläpitäjää, jos sinun täytyy muokata, lähettää tai hyväksyä."
   }
 }

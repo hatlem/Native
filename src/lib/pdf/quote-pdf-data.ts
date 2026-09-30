@@ -42,8 +42,17 @@ export type QuotePdfData = {
   // The customer's agreed terms (lib/payment-terms.ts), stated on the
   // document so quote and invoice can't disagree.
   paymentTermsDays: number;
+  // Set on a revision (lib/commerce/quote-revision.ts): the document says
+  // which revision it is and which quote number it replaces, so a customer
+  // holding both copies can tell which one counts. Null for a first quote.
+  revision: { number: number; replacesQuoteNumber: string } | null;
   rows: QuotePdfRow[];
 };
+
+// The customer-facing quote number: the tail of the id, upper-cased.
+export function quoteNumberFor(quoteId: string): string {
+  return quoteId.slice(-8).toUpperCase();
+}
 
 // A CONTENT_FEE line has no productId (money.ts computeContentFeeLines) and
 // carries `Content production — ${productName}` as its description — the
@@ -52,6 +61,19 @@ export type QuotePdfData = {
 // data layer, so folding the fee into the customer-facing unit price means
 // matching on that description convention.
 const CONTENT_FEE_PREFIX = "Content production — ";
+
+/**
+ * The quote was replaced by a sent revision (SUPERSEDED): it is no longer an
+ * offer, so no new customer document is rendered from it — the desk would be
+ * handing out numbers the customer can't accept. PDF versions made while it
+ * was live stay downloadable as history.
+ */
+export class QuoteSupersededError extends Error {
+  constructor(readonly quoteId: string) {
+    super(`Quote ${quoteId} is superseded by a revision`);
+    this.name = "QuoteSupersededError";
+  }
+}
 
 export async function loadQuotePdfData(
   quoteId: string,
@@ -67,6 +89,8 @@ export async function loadQuotePdfData(
       },
     },
   });
+  // Both renderers (PDF and DOCX) load through here, so this is the one gate.
+  if (quote.status === "SUPERSEDED") throw new QuoteSupersededError(quote.id);
 
   const productIds = quote.lines
     .map((l) => l.productId)
@@ -134,7 +158,7 @@ export async function loadQuotePdfData(
 
   return {
     quoteId: quote.id,
-    quoteNumber: quote.id.slice(-8).toUpperCase(),
+    quoteNumber: quoteNumberFor(quote.id),
     currency: quote.currency,
     vatPct: Number(quote.vatPct),
     subtotal: Number(quote.subtotal),
@@ -146,6 +170,9 @@ export async function loadQuotePdfData(
     preparedByEmail: preparedBy.email,
     onlineUrl: quoteOnlineUrl(quote.requestId, locale),
     paymentTermsDays: paymentTermsDaysFor(quote.request.organization),
+    revision: quote.previousQuoteId
+      ? { number: quote.revision, replacesQuoteNumber: quoteNumberFor(quote.previousQuoteId) }
+      : null,
     rows,
   };
 }

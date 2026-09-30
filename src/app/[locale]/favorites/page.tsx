@@ -49,6 +49,7 @@ export default async function FavoritesPage({
         sharedLists={overview.sharedLists}
         openList={openList}
         listUnavailable={listUnavailable}
+        readOnly={!!scope.workspace?.activeOrgId && !scope.workspace.activeCanEdit}
       />
     </>
   );

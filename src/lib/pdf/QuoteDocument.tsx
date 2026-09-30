@@ -109,6 +109,17 @@ export function QuoteDocument({
             <Text style={styles.metaValue}>{data.organizationName}</Text>
             <Text style={styles.metaLabel}>{t(messages, "quoteNumber")}</Text>
             <Text style={styles.metaValue}>{data.quoteNumber}</Text>
+            {data.revision ? (
+              <>
+                <Text style={styles.metaLabel}>{t(messages, "revision")}</Text>
+                <Text style={styles.metaValue}>
+                  {t(messages, "revisionValue", {
+                    revision: data.revision.number,
+                    previous: data.revision.replacesQuoteNumber,
+                  })}
+                </Text>
+              </>
+            ) : null}
           </View>
           <View>
             <Text style={styles.metaLabel}>{t(messages, "date")}</Text>

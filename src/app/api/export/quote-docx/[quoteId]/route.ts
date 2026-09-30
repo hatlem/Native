@@ -27,9 +27,17 @@ export async function GET(
     return NextResponse.json({ error: "forbidden" }, { status: 403 });
   }
 
-  const exists = await prisma.quote.findUnique({ where: { id: quoteId }, select: { id: true } });
+  const exists = await prisma.quote.findUnique({
+    where: { id: quoteId },
+    select: { id: true, status: true },
+  });
   if (!exists) {
     return NextResponse.json({ error: "not_found" }, { status: 404 });
+  }
+  // A quote a sent revision replaced is no longer an offer; export the
+  // revision instead (lib/pdf/quote-pdf-data QuoteSupersededError).
+  if (exists.status === "SUPERSEDED") {
+    return NextResponse.json({ error: "superseded" }, { status: 409 });
   }
 
   const locale = safeLocale(new URL(req.url).searchParams.get("locale"));

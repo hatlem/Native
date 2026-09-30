@@ -14,6 +14,7 @@ export function FavoriteButton({
   lists,
   inListIds = [],
   noOrg = false,
+  readOnly = false,
 }: {
   locale: string;
   titleId: string;
@@ -24,6 +25,9 @@ export function FavoriteButton({
   inListIds?: string[];
   /** Agency session with no client selected — no org to scope lists to. */
   noOrg?: boolean;
+  /** View-only (RESTRICTED) seat: the heart (a personal shortlist) stays, but
+   *  the org's lists can't be changed, so the "add to list" caret is left out. */
+  readOnly?: boolean;
 }) {
   const t = useTranslations("favorites");
   const [favorited, setFavorited] = useState(initialFavorited);
@@ -131,18 +135,20 @@ export function FavoriteButton({
       >
         {favorited ? "♥" : "♡"}
       </button>
-      <button
-        ref={caretRef}
-        type="button"
-        className="fav-caret"
-        aria-label={t("addToList")}
-        aria-haspopup="true"
-        aria-expanded={menuOpen}
-        onClick={() => setMenuOpen((v) => !v)}
-      >
-        {"▾"}
-      </button>
-      {menuOpen ? (
+      {readOnly ? null : (
+        <button
+          ref={caretRef}
+          type="button"
+          className="fav-caret"
+          aria-label={t("addToList")}
+          aria-haspopup="true"
+          aria-expanded={menuOpen}
+          onClick={() => setMenuOpen((v) => !v)}
+        >
+          {"▾"}
+        </button>
+      )}
+      {menuOpen && !readOnly ? (
         <div className="fav-menu" role="group" aria-label={t("addToList")} ref={menuRef}>
           <p className="fav-menu-title">{t("addToList")}</p>
           {noOrg ? (

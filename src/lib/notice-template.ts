@@ -50,6 +50,7 @@ const TEMPLATES = {
       onRequestCount: z.number().int().min(0),
       validUntil: z.iso.datetime(),
       renewed: z.boolean().optional(),
+      revision: z.number().int().min(2).optional(),
       requestId: id,
     }),
     render: (p, locale) => ({

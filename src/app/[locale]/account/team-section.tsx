@@ -59,6 +59,9 @@ export async function TeamSection({ locale, orgId, isAdmin }: Props) {
           <h2>{t("teamTitle")}</h2>
         </div>
       </div>
+      {/* The roles explained for everyone reading the table (and next to the
+          admin's role editor): Restricted is a view-only seat. */}
+      <p className="muted small">{t("roleHelp")}</p>
 
       {/* Members table. `responsive` stacks each row into a labelled card on
           phones — six columns plus the admin controls can't fit 375px. */}
@@ -170,18 +173,24 @@ export async function TeamSection({ locale, orgId, isAdmin }: Props) {
                             className="checkbox-label"
                             title={t("canCommitLabel")}
                           >
-                            {/* Admins always have commit authority
-                                (lib/membership commitGrantFor) — shown
-                                ticked and locked rather than as a choice
-                                that the server would override. */}
+                            {/* Admins always have commit authority and a
+                                view-only (RESTRICTED) seat never has it
+                                (lib/membership commitGrantFor) — both shown
+                                locked rather than as a choice the server
+                                would override. */}
                             <input
                               type="checkbox"
                               name="canCommit"
-                              defaultChecked={m.canCommit || m.role === "ADMIN"}
-                              disabled={m.role === "ADMIN"}
+                              defaultChecked={
+                                m.role !== "RESTRICTED" && (m.canCommit || m.role === "ADMIN")
+                              }
+                              disabled={m.role === "ADMIN" || m.role === "RESTRICTED"}
                             />
                             {t("colCommit")}
                           </label>
+                          {m.role === "RESTRICTED" ? (
+                            <span className="hint">{t("canCommitRestrictedNote")}</span>
+                          ) : null}
                           <SubmitButton
                             label={t("saveMember")}
                             pendingLabel={t("saving")}
@@ -242,7 +251,9 @@ export async function TeamSection({ locale, orgId, isAdmin }: Props) {
                 <input type="checkbox" name="canCommit" />
                 {t("canCommitLabel")}
               </label>
-              <span className="hint">{t("canCommitAdminNote")}</span>
+              <span className="hint">
+                {t("canCommitAdminNote")} {t("canCommitRestrictedNote")}
+              </span>
             </div>
             <div className="field">
               <label htmlFor="team-delegation">{t("delegationEndsLabel")}</label>

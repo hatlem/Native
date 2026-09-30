@@ -19,9 +19,14 @@ export type SendDraftQuotesResult =
   // A draft has every line on "price on request" — nothing to accept yet.
   | { outcome: "unpriced" }
   // Another send won the race; nothing was changed here.
-  | { outcome: "already-sent" };
+  | { outcome: "already-sent" }
+  // A revision's predecessor is no longer an open offer — the buyer accepted
+  // (or it was otherwise closed) while the revision was being drafted.
+  // Nothing was sent; the revision can only be discarded.
+  | { outcome: "predecessor-closed"; quoteIds: string[] };
 
 class DraftAlreadySentError extends Error {}
+class PredecessorClosedError extends Error {}
 
 /**
  * Send every unsent DRAFT quote on a request to the buyer — the only step
@@ -29,6 +34,12 @@ class DraftAlreadySentError extends Error {}
  * the buyer. All drafts go out together (one quote per placement market, one
  * inbox entry) with the validity the desk chose. The notice is built from the
  * stored totals AFTER the desk's pricing, so it carries the real amount.
+ *
+ * A draft that is a REVISION (quote-revision.ts) supersedes its predecessor in
+ * the same transaction: the old quote becomes SUPERSEDED (never acceptable
+ * again) at the instant the new one becomes SENT, so the buyer never holds two
+ * live offers for the same market, nor none. The notice then says the quote
+ * was revised.
  */
 export async function sendDraftQuotes(input: {
   requestId: string;
@@ -50,6 +61,8 @@ export async function sendDraftQuotes(input: {
           id: true,
           currency: true,
           total: true,
+          revision: true,
+          previousQuoteId: true,
           lines: { select: { priceOnRequest: true } },
         },
       },
@@ -68,8 +81,25 @@ export async function sendDraftQuotes(input: {
   // Compare-and-set on DRAFT: a double-click (or two desk users) sends once.
   // All-or-nothing — if any draft was sent concurrently, roll back rather
   // than notify the buyer twice.
+  const predecessorIds = drafts
+    .map((q) => q.previousQuoteId)
+    .filter((id): id is string => id !== null);
   try {
     await prisma.$transaction(async (tx) => {
+      // Supersede first: this compare-and-set races the buyer's accept, which
+      // claims the same row on status SENT (accept-quote.ts). Whichever
+      // commits first wins; the loser's count comes back short.
+      if (predecessorIds.length > 0) {
+        const superseded = await tx.quote.updateMany({
+          where: {
+            id: { in: predecessorIds },
+            status: { in: ["SENT", "EXPIRED"] },
+            order: null,
+          },
+          data: { status: "SUPERSEDED", supersededAt: new Date() },
+        });
+        if (superseded.count !== predecessorIds.length) throw new PredecessorClosedError();
+      }
       const flipped = await tx.quote.updateMany({
         where: { id: { in: drafts.map((q) => q.id) }, status: "DRAFT" },
         data: { status: "SENT", validUntil },
@@ -79,6 +109,9 @@ export async function sendDraftQuotes(input: {
     });
   } catch (err) {
     if (err instanceof DraftAlreadySentError) return { outcome: "already-sent" };
+    if (err instanceof PredecessorClosedError) {
+      return { outcome: "predecessor-closed", quoteIds: drafts.map((q) => q.id) };
+    }
     throw err;
   }
 
@@ -88,6 +121,9 @@ export async function sendDraftQuotes(input: {
       total: Number(q.total),
       currency: q.currency,
       validUntil: validUntil.toISOString(),
+      ...(q.previousQuoteId
+        ? { revision: q.revision, supersedesQuoteId: q.previousQuoteId }
+        : {}),
     });
   }
 
@@ -108,6 +144,11 @@ export async function sendDraftQuotes(input: {
           0,
         ),
         validUntil: validUntil.toISOString(),
+        // "Your quote has been revised (revision N)" — the newest revision
+        // number going out, when any draft replaces an earlier quote.
+        ...(predecessorIds.length > 0
+          ? { revision: Math.max(...drafts.filter((q) => q.previousQuoteId).map((q) => q.revision)) }
+          : {}),
         requestId: request.id,
       },
     },

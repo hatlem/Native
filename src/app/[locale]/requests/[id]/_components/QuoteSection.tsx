@@ -8,10 +8,12 @@ import { acceptAllQuotesForRequest, requestQuoteRenewal } from "@/app/quote-acti
 import { isQuoteExpired } from "@/lib/commerce/quote-validity";
 import { StatusBadge } from "@/app/status-badge";
 import { SectionHead, SubmitButton } from "@/components";
+import { ViewOnlyNote } from "@/components/view-only-note";
 import type {
   OrderWithDetails,
   ProductWithTitle,
   QuoteWithOrder,
+  SupersededQuote,
 } from "./types";
 
 // Quote narrative — per-currency "what you get" blocks, investment
@@ -31,6 +33,8 @@ export async function QuoteSection({
   orders,
   renewalRequested = false,
   canAccept = true,
+  canEdit = true,
+  supersededQuotes = [],
 }: {
   locale: string;
   quotes: QuoteWithOrder[];
@@ -47,6 +51,11 @@ export async function QuoteSection({
   // False for a member without ordering rights: the accept form would only
   // be refused server-side (quote-actions canCommitOnOrg), so say who can act.
   canAccept?: boolean;
+  // False for a view-only (RESTRICTED) seat: it reads the quote but can't
+  // accept it or ask the desk for a renewal (quote-actions canEditOnOrg).
+  canEdit?: boolean;
+  // Earlier quotes a sent revision replaced, listed as history.
+  supersededQuotes?: SupersededQuote[];
 }) {
   const t = await getTranslations({ locale, namespace: "requests" });
   const tType = await getTranslations({ locale, namespace: "productType" });
@@ -142,7 +151,7 @@ export async function QuoteSection({
           const vatAmount =
             Number(q.total) - Number(q.subtotal);
           return (
-            <div key={q.id}>
+            <div key={q.id} id={`quote-${q.id}`}>
               <div className="qn-block">
                 <span className="eyebrow">
                   {tn("sectionWhatYouGet")}
@@ -150,6 +159,9 @@ export async function QuoteSection({
                     ? ` · ${tMarket(marketCode)} (${q.currency})`
                     : ""}
                 </span>
+                {q.revision > 1 ? (
+                  <p className="muted small">{t("quoteRevisionNote", { revision: q.revision })}</p>
+                ) : null}
                 <div className="qn-lines">
                   {narrative.lines.map((line) => {
                     // Curated "what you get" bullets exist only for the
@@ -287,6 +299,27 @@ export async function QuoteSection({
           );
         })}
 
+        {supersededQuotes.length > 0 ? (
+          <div className="qn-block">
+            <span className="eyebrow">{t("supersededEyebrow")}</span>
+            <ul className="qn-terms-list">
+              {supersededQuotes.map((s) => (
+                <li key={s.id} className="muted small">
+                  {t("supersededRow", {
+                    revision: s.revision,
+                    total: formatMoney(s.total, s.currency, locale),
+                  })}{" "}
+                  {s.replacedBy ? (
+                    <a href={`#quote-${s.replacedBy.id}`}>
+                      {t("supersededBy", { revision: s.replacedBy.revision })}
+                    </a>
+                  ) : null}
+                </li>
+              ))}
+            </ul>
+          </div>
+        ) : null}
+
         <div className="qn-block qn-why">
           <span className="eyebrow">{tn("sectionWhyThisPrice")}</span>
           <p>{tn("whyThisPrice")}</p>
@@ -314,7 +347,7 @@ export async function QuoteSection({
               </strong>
               {renewalRequested ? t("renewalRequested") : t("quoteExpiredBody")}
             </p>
-            {renewalRequested ? null : (
+            {renewalRequested || !canEdit ? null : (
               <form action={requestQuoteRenewal}>
                 <input type="hidden" name="locale" value={locale} />
                 <input type="hidden" name="requestId" value={requestId} />
@@ -326,6 +359,8 @@ export async function QuoteSection({
               </form>
             )}
           </div>
+        ) : !canEdit ? (
+          <ViewOnlyNote locale={locale} />
         ) : !canAccept ? (
           <div className="banner-info" role="status">
             <span>
