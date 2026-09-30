@@ -79,6 +79,24 @@ export function customerPrice(
   return Math.round(indicative) + fee;
 }
 
+// What one placement costs the buyer, for BUDGET PLANNING (the recommenders
+// fitting a mix into a budget). Never rendered as a figure on a browse
+// surface — callers show productBand() instead.
+//
+// Null for CPM/CPC products: a rate is not a per-placement price, and
+// treating a 300 NOK CPM as a 345 NOK "article" put Nettavisen into public
+// recommendations at 345 kr (the /recommend bug). Their cost depends on
+// volume, which only the quote flow resolves. Null for hidden prices too.
+export function plannablePrice(
+  product: DisplayProduct,
+  title: DisplayTitle,
+  defaults: PricingDefaults,
+): number | null {
+  if (!isFlat(product)) return null;
+  if (!isProductPriceShown(product, title)) return null;
+  return customerPrice(product, title, defaults);
+}
+
 export function productBand(
   product: DisplayProduct,
   title: DisplayTitle,
