@@ -3,7 +3,7 @@ import { prisma } from "@/lib/prisma";
 import { Link } from "@/i18n/navigation";
 import { setItemSchedule } from "@/app/list-actions";
 import type { ActiveList } from "@/lib/lists";
-import { upcomingPeriods, type BookingUnit } from "@/lib/campaign-schedule";
+import { startablePeriods, type BookingUnit } from "@/lib/campaign-schedule";
 
 const PERIOD_COUNT = 6;
 const RETURN_TO = "/campaign?step=schedule";
@@ -54,7 +54,7 @@ export async function ScheduleStep({ locale, items }: Props) {
             const p = i.product!;
             const unit = p.bookingUnit as BookingUnit;
             const min = p.minDurationUnits ?? 1;
-            const periods = upcomingPeriods(unit, PERIOD_COUNT, base);
+            const periods = startablePeriods(unit, PERIOD_COUNT, base);
             const currentStart = i.scheduleStart
               ? new Date(i.scheduleStart).toISOString().slice(0, 10)
               : "";

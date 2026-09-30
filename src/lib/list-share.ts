@@ -5,51 +5,14 @@
 // a standing capability the owner can see and revoke), unique-indexed for the
 // lookup, and dies the moment the owner disables sharing.
 
-import { createHash } from "node:crypto";
 import type { Prisma } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
 import { generateToken } from "@/lib/tokens";
-import { committedItems } from "@/lib/lists";
-import { fingerprintListItems } from "@/lib/commerce/firm-order";
+import { approvalState, planVersion } from "@/lib/plan-version";
 
-// ---------- pure: which version of the plan an approval covers ----------
-
-type VersionedItem = {
-  id: string;
-  quantity: number;
-  productId: string | null;
-  titleId: string | null;
-  withContent: boolean;
-  isAlternative: boolean;
-};
-
-/** The version of a plan a client approves: a hash of its committed lines
- *  (alternatives excluded) with the identity the firm-order guard uses: line
- *  set, quantity, product/title and "We write it". Any change a client would
- *  have to see again changes it. */
-export function planVersion(items: readonly VersionedItem[]): string {
-  return createHash("sha256").update(fingerprintListItems(committedItems(items))).digest("hex");
-}
-
-export type ApprovalState =
-  | { kind: "none" }
-  // The client approved exactly the plan as it stands.
-  | { kind: "current"; approvedAt: Date }
-  // The client approved an earlier version; the lines changed since.
-  | { kind: "stale"; approvedAt: Date };
-
-/** An approval without a recorded version predates versioning: nothing says
- *  which lines it covered, so it counts as stale (never as a current
- *  approval of lines the client may not have seen). */
-export function approvalState(
-  list: { clientApprovedAt: Date | null; clientApprovedVersion: string | null },
-  currentVersion: string,
-): ApprovalState {
-  if (!list.clientApprovedAt) return { kind: "none" };
-  return list.clientApprovedVersion === currentVersion
-    ? { kind: "current", approvedAt: list.clientApprovedAt }
-    : { kind: "stale", approvedAt: list.clientApprovedAt };
-}
+// The approval version is pure (lib/plan-version.ts); re-exported so callers
+// keep one import for everything share-related.
+export { approvalState, planVersion, type ApprovalState } from "@/lib/plan-version";
 
 /** (Re)enable sharing: always mints a FRESH token, so re-enabling after a
  *  disable never resurrects a link that was already circulating. A new link
@@ -101,6 +64,8 @@ export const SHARED_LIST_SELECT = {
       quantity: true,
       withContent: true,
       scheduleStart: true,
+      // The run length the share page shows next to the start.
+      scheduleUnits: true,
       // Customer-visible line note — the one per-line note the client sees.
       notes: true,
       // Recommended alternatives render in their own section, outside totals.
@@ -108,6 +73,8 @@ export const SHARED_LIST_SELECT = {
       product: {
         select: {
           type: true,
+          // Turns scheduleUnits into weeks or months on the share page.
+          bookingUnit: true,
           basePrice: true,
           currency: true,
           active: true,
@@ -196,7 +163,17 @@ export async function approveSharedList(token: string, seenVersion: string): Pro
       clientApprovedAt: true,
       clientApprovedVersion: true,
       items: {
-        select: { id: true, quantity: true, productId: true, titleId: true, withContent: true, isAlternative: true },
+        select: {
+          id: true,
+          quantity: true,
+          productId: true,
+          titleId: true,
+          withContent: true,
+          isAlternative: true,
+          scheduleStart: true,
+          scheduleUnits: true,
+          notes: true,
+        },
       },
     },
   });

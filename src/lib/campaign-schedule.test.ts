@@ -4,6 +4,7 @@ import {
   upcomingMonths,
   upcomingWeeks,
   upcomingPeriods,
+  startablePeriods,
   clampUnits,
   addPeriods,
   planWindowFromItems,
@@ -39,6 +40,20 @@ test("upcomingWeeks: Sunday base uses the current (not next) Monday", () => {
 test("upcomingPeriods: dispatches on unit", () => {
   assert.equal(upcomingPeriods("MONTH", 1, base)[0].iso, "2026-07-01");
   assert.equal(upcomingPeriods("WEEK", 1, base)[0].iso, "2026-06-29");
+});
+
+test("startablePeriods: drops the current period on its last day only", () => {
+  // 30 September: September ends today, so October is the first start.
+  const lastDay = startablePeriods("MONTH", 2, new Date("2026-09-30T15:00:00Z"));
+  assert.deepEqual(lastDay.map((p) => p.iso), ["2026-10-01", "2026-11-01"]);
+  // 29 September: a day remains, September is still offered.
+  const dayBefore = startablePeriods("MONTH", 2, new Date("2026-09-29T15:00:00Z"));
+  assert.deepEqual(dayBefore.map((p) => p.iso), ["2026-09-01", "2026-10-01"]);
+  // Sunday ends the week; Saturday doesn't.
+  assert.equal(startablePeriods("WEEK", 1, new Date("2026-07-05T10:00:00Z"))[0].iso, "2026-07-06");
+  assert.equal(startablePeriods("WEEK", 1, new Date("2026-07-04T10:00:00Z"))[0].iso, "2026-06-29");
+  // December's last day rolls into January.
+  assert.equal(startablePeriods("MONTH", 1, new Date("2026-12-31T08:00:00Z"))[0].iso, "2027-01-01");
 });
 
 test("clampUnits: enforces minimum and integer floor", () => {

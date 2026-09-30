@@ -13,6 +13,8 @@ import {
 } from "@/lib/api/idempotency";
 import { createFirmOrder, FirmOrderStaleError } from "@/lib/commerce/firm-order";
 import { recordAudit } from "@/lib/audit";
+import { planNameFor } from "@/lib/plan-name";
+import { marketDefaultLocale } from "@/lib/market-locale";
 
 export const dynamic = "force-dynamic";
 
@@ -197,9 +199,18 @@ export async function POST(req: NextRequest) {
 
     const org = await prisma.organization.findUnique({
       where: { id: organizationId },
-      select: { id: true, name: true },
+      select: { id: true, name: true, marketCode: true },
     });
     if (!org) return fail(403, "NO_ORG", "Organization not found.");
+    // The caller's `reference` is the campaign's name on every buyer and
+    // desk surface, as a plan name typed on /plan is. Without one, the
+    // "<org> — campaign" fallback is written in the org's market language,
+    // not always English (planNameFor).
+    const planName = planNameFor({
+      listName: reference?.trim() || null,
+      orgName: org.name,
+      locale: org.marketCode ? marketDefaultLocale(org.marketCode) : "en",
+    });
 
     let result: { requestId: string; orderIds: string[] };
     try {
@@ -212,6 +223,7 @@ export async function POST(req: NextRequest) {
         })),
         byId,
         brief: reference ? { briefText: reference } : undefined,
+        planName,
       });
     } catch (e) {
       if (e instanceof FirmOrderStaleError) {

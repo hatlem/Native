@@ -4,7 +4,7 @@ import { redirect } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import { loadScope } from "@/lib/scope";
 import { loadUnsentLists } from "@/lib/lists";
-import { estimateListTotals, hasFigure } from "@/lib/plan-total";
+import { estimateListTotals, hasFigure, planLineCount } from "@/lib/plan-total";
 import { totalLabel as planTotalLabel } from "@/lib/pricing/total-label";
 import { loadPricingDefaults } from "@/lib/content-fee";
 import { Link } from "@/i18n/navigation";
@@ -15,13 +15,13 @@ import { deriveStage, type CampaignStage } from "@/lib/campaign-stage";
 import { buyerVisibleQuoteWhere, effectiveQuoteStatus } from "@/lib/commerce/quote-validity";
 import { monthsWindow, intersectsMonth, draftWindow, orderWindow, type RunWindow } from "@/lib/campaign-timeline";
 import { CampaignRow, type RowAction } from "./_components/CampaignRow";
+import { tabForRow, type RowTab } from "@/lib/request-tab";
 import { TimelineView, type TimelineEntry, type TimelineMonthGroup } from "./_components/TimelineView";
 
 export const dynamic = "force-dynamic";
 
 const TABS = ["needsYou", "inProgress", "live", "done", "all"] as const;
 type Tab = (typeof TABS)[number];
-
 // "timeline" is a VIEW over the same campaigns (bucketed by run month), not
 // a status filter — it never has a count badge and never participates in the
 // default-tab fallback; it only activates via an explicit ?tab=timeline.
@@ -34,26 +34,13 @@ type Row = {
   statusValue: string;
   meta: string;
   stage: CampaignStage;
-  tab: Exclude<Tab, "all">;
+  tab: RowTab;
   totalLabel: string | null;
   qualifier: string;
   action: RowAction;
   href: string;
   footerNote?: string;
 };
-
-// Everything that isn't awaiting the buyer and isn't live/done yet — plan
-// built, sent to the desk, or approved and in production.
-function tabForRow(orderStatus: string | null, quoteStatus: string | null, requestStatus: string): Exclude<Tab, "all"> {
-  if (orderStatus === "CANCELLED") return "done";
-  if (orderStatus === "LIVE") return "live";
-  if (orderStatus === "COMPLETED" || orderStatus === "INVOICED") return "done";
-  if (orderStatus) return "inProgress";
-  if (quoteStatus === "SENT") return "needsYou";
-  if (quoteStatus === "EXPIRED" || quoteStatus === "DECLINED") return "done";
-  if (requestStatus === "CLOSED") return "done";
-  return "inProgress";
-}
 
 export default async function RequestsPage({
   params,
@@ -68,6 +55,7 @@ export default async function RequestsPage({
   const tOrders = await getTranslations({ locale, namespace: "orders" });
   const tPlan = await getTranslations({ locale, namespace: "plan" });
   const tInvoice = await getTranslations({ locale, namespace: "invoice" });
+  const tv = await getTranslations({ locale, namespace: "priceVisibility" });
 
   const scope = await loadScope();
   if (!scope.workspace) redirect(`/${locale}/signin`);
@@ -141,8 +129,13 @@ export default async function RequestsPage({
   // the amount the plan would actually commit to (content fees included).
   const pricing = await loadPricingDefaults();
   for (const list of unsentLists) {
+    // Placements only: recommended alternatives sit outside the plan's total
+    // and its submit, so an alternatives-only plan has nothing to send yet.
+    const placements = planLineCount(list.items);
+    const alternatives = list.items.length - placements;
     // Exact for instant-orderable lines, a band range for the rest — the
     // same figure /plan shows (lib/plan-total.ts, lib/pricing/total-label.ts).
+    // A currency with nothing priced drops out: "price on request", never 0.
     const totals = estimateListTotals(list.items, pricing).filter(hasFigure);
     const totalLabel = totals.length
       ? totals.length > 1
@@ -155,17 +148,32 @@ export default async function RequestsPage({
             )
             .join(" + ")
         : planTotalLabel(totals[0], locale)
-      : null;
+      : placements > 0
+        ? tv("requestPrice")
+        : null;
     rows.push({
       id: `draft-${list.id}`,
       name: list.name,
       statusValue: "DRAFT",
-      meta: t("metaPlanBuilt", { items: list._count.items, age: timeAgo(list.updatedAt, locale) }),
+      meta:
+        placements > 0
+          ? t("metaPlanBuilt", { items: placements, age: timeAgo(list.updatedAt, locale) })
+          : t("metaPlanAlternativesOnly", { alternatives, age: timeAgo(list.updatedAt, locale) }),
       stage: 1,
       tab: "inProgress",
       totalLabel,
-      qualifier: t("qualifierIndicative"),
-      action: { kind: "select-list", listId: list.id, locale, label: canEdit ? t("actionFinishSend") : t("actionView") },
+      // "indicative" qualifies an amount; with no amount there is nothing to qualify.
+      qualifier: totals.length ? t("qualifierIndicative") : "",
+      action: {
+        kind: "select-list",
+        listId: list.id,
+        locale,
+        label: !canEdit
+          ? t("actionView")
+          : placements > 0
+            ? t("actionFinishSend")
+            : t("actionContinuePlan"),
+      },
       footerNote: waveFooter(list),
       // Unused by CampaignRow for a select-list action (it renders the
       // whole row as a form against that action instead, so every click —
@@ -210,7 +218,10 @@ export default async function RequestsPage({
       quoteStatus,
       orderStatus: order?.status ?? null,
     });
-    const tab = tabForRow(order?.status ?? null, quoteStatus, r.status);
+    const canCommit = ws.commitOrgIds.includes(r.organizationId);
+    const tab = tabForRow(order?.status ?? null, quoteStatus, r.status, canCommit);
+    // A sent quote this viewer can't accept: say who it waits on.
+    const awaitingTeam = quoteStatus === "SENT" && !canCommit;
 
     let qualifier: string;
     if (order) {
@@ -218,7 +229,9 @@ export default async function RequestsPage({
       else if (invoiceStatus === "ISSUED" || invoiceStatus === "OVERDUE") qualifier = t("qualifierInvoiced");
       else qualifier = t("qualifierConfirmed");
     } else if (quote) {
-      if (quoteStatus === "SENT") {
+      if (awaitingTeam) {
+        qualifier = t("qualifierAwaitingTeam");
+      } else if (quoteStatus === "SENT") {
         qualifier = quote.validUntil
           ? t("qualifierFirmExpires", { date: dateFmt.format(quote.validUntil) })
           : t("qualifierFirm");
@@ -244,7 +257,9 @@ export default async function RequestsPage({
           ? { kind: "link", href: orderHref, label: t("actionSeePlacements"), primary: false }
           : stage >= 5
             ? { kind: "link", href: orderHref, label: t("actionOpenReport"), primary: false }
-            : { kind: "link", href: detailHref, label: t("actionView"), primary: false };
+            : awaitingTeam
+              ? { kind: "link", href: detailHref, label: t("actionSeeQuote"), primary: false }
+              : { kind: "link", href: detailHref, label: t("actionView"), primary: false };
 
     const wave = r.sourceList?.programme && r.sourceList.waveNumber
       ? { n: r.sourceList.waveNumber, of: r.sourceList.programme.plannedWaves }

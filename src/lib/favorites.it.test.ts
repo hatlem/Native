@@ -71,12 +71,16 @@ test("toggleFavorite on an unknown title is a no-op", { skip: !RUN_DB_IT }, asyn
 
 test("addFavoriteToList auto-creates the Favorite when missing and is idempotent", { skip: !RUN_DB_IT }, async () => {
   const list = await createFavoriteList(userId, orgId, "B2B picks");
-  await addFavoriteToList(userId, titleId, list.id);
+  assert.equal(await addFavoriteToList(userId, titleId, list.id), "added");
   const fav = await prisma.favorite.findUnique({ where: { userId_titleId: { userId, titleId } } });
   assert.ok(fav, "favorite created");
   assert.equal(await prisma.favoriteListItem.count({ where: { listId: list.id } }), 1);
-  await addFavoriteToList(userId, titleId, list.id);
+  // Adding again says so instead of silently doing nothing.
+  assert.equal(await addFavoriteToList(userId, titleId, list.id), "already");
   assert.equal(await prisma.favoriteListItem.count({ where: { listId: list.id } }), 1);
+  // The overview tells each favorite which collections it is in.
+  const overview = await getFavoritesOverview(userId, orgId);
+  assert.deepEqual(overview.favorites.find((f) => f.titleId === titleId)?.collectionIds, [list.id]);
 });
 
 test("un-hearting a title cascades it out of every list", { skip: !RUN_DB_IT }, async () => {

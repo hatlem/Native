@@ -6,7 +6,6 @@ import { prisma } from "@/lib/prisma";
 import { getFavoritedTitleIds } from "@/lib/favorites";
 import { resolveCatalogSearch } from "@/lib/catalog-search";
 import { redirect } from "next/navigation";
-import { catalogVisibleTitleWhere } from "@/lib/catalog-visibility";
 import { savedListMembershipMap } from "@/lib/saved-list-membership";
 import { loadScope } from "@/lib/scope";
 import { loadRelevanceSignals } from "@/lib/catalog-relevance";
@@ -15,7 +14,7 @@ import { localizeVertical } from "@/lib/taxonomy-i18n";
 import { safeLocale } from "@/i18n/routing";
 import { readActiveListId, resolveActiveList } from "@/lib/lists";
 import { barTotals, planLineCount } from "@/lib/plan-total";
-import { priceBandWhere, refreshStaleTitlePriceBands } from "@/lib/pricing/title-band";
+import { refreshStaleTitlePriceBands } from "@/lib/pricing/title-band";
 import { BAND_TIER_COUNT, tierLabel } from "@/lib/pricing/bands";
 import { loadPricingDefaults } from "@/lib/content-fee";
 import { titleDisplayName } from "@/lib/title-display";
@@ -36,7 +35,9 @@ import {
   REACH_VALUES,
   PAGE_SIZE,
   parseCatalogParams,
+  catalogFilterParams,
 } from "./filters";
+import { buildCatalogWhere, catalogOrderBy } from "./catalog-where";
 import { audienceFor } from "@/lib/nav";
 import { shouldShowBookingBanner } from "@/lib/booking-prompt";
 import { CatalogBookCallBanner } from "./_components/CatalogBookCallBanner";
@@ -62,6 +63,7 @@ export default async function CatalogPage({
   const tFit = await getTranslations({ locale, namespace: "nativeFit" });
   const tReach = await getTranslations({ locale, namespace: "reachTier" });
 
+  const filters = parseCatalogParams(sp);
   const {
     markets,
     types,
@@ -81,7 +83,7 @@ export default async function CatalogPage({
     compareMode,
     q,
     page,
-  } = parseCatalogParams(sp);
+  } = filters;
 
   // The price-band filter reads the stored Title.priceBandTier. Bring any
   // band a recent write invalidated up to date first (usually nothing to do:
@@ -94,110 +96,8 @@ export default async function CatalogPage({
   // (lib/catalog-search.ts resolveCatalogSearch).
   const search = await resolveCatalogSearch(q);
 
-  // "Priced titles only" = a buyer can actually see a € figure. Mirror
-  // isProductPriceShown (src/lib/pricing/visibility.ts): an active,
-  // sales-confirmed product AND both title + publisher prices public.
-  // Kept separate from the other AND-composed conditions (rather than
-  // pushed straight into one array) so the rail's "N more titles without
-  // published pricing" note can build the exact same where, minus just
-  // this condition, without fragile structural filtering after the fact.
-  const onlyPricedConditions: Prisma.TitleWhereInput[] = [
-    { products: { some: { active: true, confirmedAt: { not: null } } } },
-    { pricesPublic: true },
-    { publisher: { is: { pricesPublic: true } } },
-  ];
-
-  // Semantic-deliverable filters read curated Product.inclusions (Json).
-  // Prisma JSON `path` filters on Postgres only match when the key exists
-  // and the value compares — verified against the local atnative DB.
-  const semanticConditions: Prisma.TitleWhereInput[] = [];
-  if (producedForYou) {
-    // Publisher's editorial desk writes the content for the advertiser.
-    semanticConditions.push({
-      products: {
-        some: {
-          active: true,
-          inclusions: { path: ["production"], equals: "PUBLISHER" },
-        },
-      },
-    });
-  }
-  if (guaranteedReach) {
-    // Any committed reach number counts. `gt: 0` doubles as a key-existence
-    // check: a missing path never satisfies a numeric comparison.
-    semanticConditions.push({
-      products: {
-        some: {
-          active: true,
-          OR: [
-            { inclusions: { path: ["viewsPerWeek"], gt: 0 } },
-            { inclusions: { path: ["viewsPerMonth"], gt: 0 } },
-            { inclusions: { path: ["viewsTotal"], gt: 0 } },
-            { inclusions: { path: ["readsTotal"], gt: 0 } },
-          ],
-        },
-      },
-    });
-  }
-  if (newsletterIncluded) {
-    semanticConditions.push({
-      products: {
-        some: { active: true, inclusions: { path: ["newsletter"], equals: true } },
-      },
-    });
-  }
-  if (videoIncluded) {
-    semanticConditions.push({
-      products: {
-        some: { active: true, inclusions: { path: ["video"], equals: true } },
-      },
-    });
-  }
-
-  function buildWhere(includeOnlyPriced: boolean): Prisma.TitleWhereInput {
-    return {
-      ...(markets.length
-        ? markets.length === 1
-          ? { market: { code: markets[0] } }
-          : { market: { code: { in: markets } } }
-        : {}),
-      ...(types.length
-        ? { products: { some: { type: { in: types }, active: true } } }
-        : {}),
-      ...(verticals.length ? { vertical: { in: verticals } } : {}),
-      ...(regions.length ? { region: { in: regions } } : {}),
-      ...(publisher ? { publisherId: publisher } : {}),
-      ...(nativeFit ? { nativeFit } : {}),
-      ...(b2bB2c ? { b2bB2c } : {}),
-      ...(reach ? { reach } : {}),
-      // Stored, indexed band tier — the database filters and pages on it.
-      ...priceBandWhere(priceTiers),
-      // AND-composed rather than spread: catalogVisibleTitleWhere and the
-      // search fallback (buildIlikeFallbackWhere) can each independently
-      // produce a top-level `OR` key. Spreading them into the same object
-      // literal would let the later one silently clobber the earlier one
-      // (object spread: last key wins) — dropping the visibility guard
-      // whenever a search falls through to the ILIKE fallback. Combining
-      // them as separate AND members keeps both `OR`s intact and composes
-      // correctly with the type filter's own products.some above.
-      AND: [
-        // Show commerce-active titles AND unverified research-catalog rows;
-        // hide titles the desk has verified as not offering native, and
-        // never surface titles marked discontinued (nedlagt/duplikat).
-        // Shared with favorites.ts/list-actions.ts so the guards can't
-        // drift apart.
-        catalogVisibleTitleWhere,
-        // The tiered search clause: a non-empty FTS hit list wins outright;
-        // an empty one falls through to the synonym-aware ILIKE fallback
-        // instead of pinning `id IN ()`.
-        search?.where ?? {},
-        ...(includeOnlyPriced && onlyPriced ? onlyPricedConditions : []),
-        ...semanticConditions,
-      ],
-    };
-  }
-
-  const where = buildWhere(true);
+  // Shared with the CSV export so "download" holds exactly these titles.
+  const where = buildCatalogWhere(filters, search);
 
   const scope = await loadScope();
   const orgId = scope.workspace?.activeOrgId ?? null;
@@ -261,27 +161,10 @@ export default async function CatalogPage({
   } satisfies Prisma.TitleInclude;
 
   // Commerce-active titles surface first, always; the buyer's sort choice
-  // only decides the tiebreak within that split. "reach" ranks by digital
-  // reach first, monthly (print/legacy) reach as fallback for titles with
-  // no digital figure — not a true coalesce, but Prisma has no
-  // cross-column coalesce in orderBy, and digital is the primary metric
-  // for native anyway. nulls: "last" on both is required — Postgres
-  // defaults DESC to NULLS FIRST, which would rank reach-less titles
-  // above titles with a real number. "newest" surfaces recently touched
-  // rows. Unset ("relevance") shares the same tiebreak as every explicit
-  // sort's own tiebreak — name asc — the personalization happens one
-  // level up, in which tier a title lands in, not in this ordering.
-  const orderBy: Prisma.TitleOrderByWithRelationInput[] =
-    sort === "reach"
-      ? [
-          { active: "desc" },
-          { digitalReach: { sort: "desc", nulls: "last" } },
-          { monthlyReach: { sort: "desc", nulls: "last" } },
-          { name: "asc" },
-        ]
-      : sort === "newest"
-        ? [{ active: "desc" }, { updatedAt: "desc" }]
-        : [{ active: "desc" }, { name: "asc" }];
+  // only decides the tiebreak within that split (catalog-where.ts). The
+  // personalization happens one level up, in which tier a title lands in,
+  // not in this ordering.
+  const orderBy = catalogOrderBy(sort);
 
   const skip = (page - 1) * PAGE_SIZE;
 
@@ -468,7 +351,7 @@ export default async function CatalogPage({
   // condition dropped tells us how many.
   let unpricedCount: number | null = null;
   if (onlyPriced) {
-    const broaderCount = await prisma.title.count({ where: buildWhere(false) });
+    const broaderCount = await prisma.title.count({ where: buildCatalogWhere(filters, search, { includeOnlyPriced: false }) });
     unpricedCount = Math.max(0, broaderCount - totalCount);
   }
 
@@ -477,29 +360,19 @@ export default async function CatalogPage({
   // Norway"); multiple markets or none fall back to the market-less count.
   const marketLabel = markets.length === 1 ? tMarket(markets[0]) : null;
 
+  // The export link carries the result set's params (not the view's).
+  const exportParams = catalogFilterParams(filters);
+  // Any filter or search beyond the market narrows the file below "the
+  // catalog in <market>", so the link says it's the filtered set.
+  const filtersNarrow = [...exportParams.keys()].some((k) => k !== "market");
+  if (sort) exportParams.set("sort", sort);
+  const exportHref = `/api/export/catalog.csv${exportParams.size ? `?${exportParams}` : ""}`;
+
   const pageQuery = (p: number) => {
-    const params = new URLSearchParams();
-    if (markets.length) params.set("market", markets.join(","));
-    if (types.length) params.set("types", types.join(","));
-    if (verticals.length) params.set("vertical", verticals.join(","));
-    // region/reach were parsed but never threaded through pageQuery —
-    // paginating (or removing an unrelated filter chip) silently dropped
-    // them. Same bug, same fix, for both.
-    if (regions.length) params.set("region", regions.join(","));
-    if (nativeFit) params.set("nativeFit", nativeFit);
-    if (b2bB2c) params.set("b2bB2c", b2bB2c);
-    if (reach) params.set("reach", reach);
-    if (priceTiers.length) params.set("price", priceTiers.join(","));
+    const params = catalogFilterParams(filters);
     if (sort) params.set("sort", sort);
-    if (onlyPriced) params.set("onlyPriced", "1");
-    if (publisher) params.set("publisher", publisher);
-    if (producedForYou) params.set("producedForYou", "1");
-    if (guaranteedReach) params.set("guaranteedReach", "1");
-    if (newsletterIncluded) params.set("newsletterIncluded", "1");
-    if (videoIncluded) params.set("videoIncluded", "1");
     if (compareMode) params.set("compareMode", "1");
     if (density === "cards") params.set("density", "cards");
-    if (q) params.set("q", q);
     if (p > 1) params.set("page", String(p));
     const s = params.toString();
     return s ? `?${s}` : "";
@@ -770,19 +643,18 @@ export default async function CatalogPage({
               <div className="catalog-results-controls">
                 <CatalogSort initial={sort ?? ""} />
                 <CatalogDensityToggle initial={density} />
-                {/* The CSV export (bands only, like the page) had no way in
-                    from the UI. It filters by one market at most, so the
-                    link carries the market only when exactly one is picked.
-                    Plain <a download>: it's a file, not a page. */}
-                <a
-                  className="small-link"
-                  href={`/api/export/catalog.csv${markets.length === 1 ? `?market=${markets[0]}` : ""}`}
-                  download
-                >
-                  {markets.length === 1
-                    ? t("exportCsvMarket", { market: tMarket(markets[0]) })
-                    : t("exportCsv")}
-                </a>
+                {/* The CSV export (bands only, like the page) holds exactly
+                    the titles on screen: same filters, search and sort, all
+                    pages. Plain <a download>: it's a file, not a page. */}
+                {totalCount > 0 ? (
+                  <a className="small-link" href={exportHref} download>
+                    {filtersNarrow
+                      ? t("exportCsvFiltered", { count: totalCount })
+                      : markets.length === 1
+                        ? t("exportCsvMarket", { market: tMarket(markets[0]) })
+                        : t("exportCsv")}
+                  </a>
+                ) : null}
               </div>
             </div>
 

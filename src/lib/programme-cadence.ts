@@ -103,8 +103,15 @@ export function clampCadence(waves: number, spacingWeeks: number): { waves: numb
  *  weeks to whole months (min 1) and re-snaps to the 1st. */
 export function shiftScheduleStart(start: Date, weeks: number, unit: BookingUnit): Date {
   if (unit === "WEEK") return new Date(start.getTime() + weeks * 7 * 86_400_000);
-  const months = Math.max(1, Math.round(weeks / 4.33));
+  const months = spacingInMonths(weeks);
   return new Date(Date.UTC(start.getUTCFullYear(), start.getUTCMonth() + months, 1));
+}
+
+/** A week spacing on the month grid: whole months, at least one (4 weeks →
+ *  1 month, 8 → 2, 12 → 3). The form's copy states this number, so it is
+ *  the one the wave dates use. */
+export function spacingInMonths(weeks: number): number {
+  return Math.max(1, Math.round(weeks / 4.33));
 }
 
 /** The current period anchor (Monday / first-of-month, UTC midnight) at `base`. */

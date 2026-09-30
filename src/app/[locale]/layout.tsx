@@ -7,7 +7,7 @@ import { notFound, redirect } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import { getWorkspace, viewOrgIds } from "@/lib/workspace";
 import { acceptableQuoteWhere } from "@/lib/commerce/quote-validity";
-import { OrgSwitcher } from "@/app/org-switcher";
+import { OrgSwitcher, switchableOrgs } from "@/app/org-switcher";
 import { countUnsentLists } from "@/lib/lists";
 import { inter } from "@/fonts";
 import { routing } from "@/i18n/routing";
@@ -65,7 +65,10 @@ export async function generateMetadata({
       locale: loc,
     },
     twitter: { card: "summary_large_image", title, description },
-    robots: { index: true, follow: true },
+    // No layout-level robots: "index, follow" is what crawlers assume
+    // without one, and emitting it here put it next to the noindex Next adds
+    // on every 404 (two conflicting robots metas). Pages that must stay out
+    // of the index (share links, auth pages) set their own.
   };
 }
 
@@ -126,6 +129,10 @@ export default async function LocaleLayout({
   // back into the buyer flow from a desk-only session; see NavOptions.
   // Resolved once per render and shared by every block below.
   const workspace = await getWorkspace(session?.user?.id);
+  // A member of several orgs sees which one is active in the header itself,
+  // not only inside the avatar menu: every buyer page is scoped to it.
+  const switchOrgs = await switchableOrgs(workspace);
+  const activeOrgName = switchOrgs?.find((o) => o.id === workspace?.activeOrgId)?.name ?? null;
   const staffHasOrgAccess =
     (audience === "desk" || audience === "superadmin") && workspace !== null;
   const navOpts = { campaignFlow: campaignFlowEnabled(), hasOrgAccess: staffHasOrgAccess };
@@ -218,7 +225,8 @@ export default async function LocaleLayout({
                     }
                   : undefined
               }
-              orgSwitcher={<OrgSwitcher locale={locale} workspace={workspace} />}
+              orgSwitcher={<OrgSwitcher locale={locale} workspace={workspace} orgs={switchOrgs} />}
+              activeOrgName={activeOrgName}
               signOutAction={
                 <form action={logout}>
                   <input type="hidden" name="locale" value={locale} />

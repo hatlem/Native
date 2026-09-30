@@ -11,7 +11,9 @@ type ListRow = {
   id: string;
   name: string;
   updatedAt: Date;
+  // Committed lines only; alternatives come separately.
   _count: { items: number };
+  items: { id: string }[];
   requests: { createdAt: Date }[];
 };
 
@@ -85,7 +87,10 @@ export async function ListsTable({ locale, lists, heading, emptyLabel, readOnly 
                       )}
                     </td>
                     <td data-label={t("items")} className="num">
-                      {t("itemCount", { count: list._count.items })}
+                      {t("placementCount", { count: list._count.items })}
+                      {list.items.length > 0 ? (
+                        <div className="muted small">{t("alternativeCount", { count: list.items.length })}</div>
+                      ) : null}
                     </td>
                     <td data-label={t("lastSubmittedHeading")}>
                       {lastSubmitted

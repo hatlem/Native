@@ -140,7 +140,8 @@ function wordClause(variantList: string[], publisherVariants: string[] = variant
   return {
     OR: [
       ...containsClauses,
-      ...publisherVariants.map((v) => ({ publisher: { name: { contains: v, mode: "insensitive" as const } } })),
+      // Word prefixes only: "Amedia" is not inside "Otavamedia".
+      ...publisherVariants.map((v) => ({ publisher: publisherNameWhere(v) })),
       { keywords: { hasSome: variantList } },
       { aliases: { hasSome: variantList } },
     ],
@@ -172,15 +173,31 @@ export function buildIlikeFallbackWhere(q: string, match: "all" | "some" = "all"
   return match === "all" ? { AND: clauses } : { OR: clauses };
 }
 
-/** Titles whose publisher's name contains every significant word, as typed
- *  or in its æ/ø/å spelling. Not synonyms: a substring match on a short
- *  synonym ("lvi") would hit unrelated names ("Svelviksposten"). */
+// What can precede a word inside a publisher name ("Amedia AS",
+// "Aller-Media", "Bonnier/Egmont", "Schibsted (Media)", "Tek.no", "Mo & Co").
+const NAME_WORD_BREAKS = [" ", "-", "/", "(", ".", "&", ",", "'", "+"] as const;
+
+/** Publishers whose name has a WORD starting with `v` (case-insensitive):
+ *  "Amedia" matches "Amedia AS" and "Amedia Utvikling", never the "amedia"
+ *  inside "Otavamedia" or "Tamedia". A plain substring match listed 31
+ *  Otavamedia titles for "Amedia". Prefix, not whole word, so typing
+ *  "Schib" still finds Schibsted. */
+export function publisherNameWhere(v: string): Prisma.PublisherWhereInput {
+  return {
+    OR: [
+      { name: { startsWith: v, mode: "insensitive" } },
+      ...NAME_WORD_BREAKS.map((b) => ({ name: { contains: `${b}${v}`, mode: "insensitive" as const } })),
+    ],
+  };
+}
+
+/** Titles whose publisher's name has every significant word (as a word
+ *  prefix), as typed or in its æ/ø/å spelling. Not synonyms: a short synonym
+ *  ("lvi") would hit unrelated names. */
 function publisherWhere(q: string): Prisma.TitleWhereInput {
   return {
     AND: significantWords(q).map((w) => ({
-      OR: [w, ...spellingVariants(w)].map((v) => ({
-        publisher: { name: { contains: v, mode: "insensitive" as const } },
-      })),
+      OR: [w, ...spellingVariants(w)].map((v) => ({ publisher: publisherNameWhere(v) })),
     })),
   };
 }

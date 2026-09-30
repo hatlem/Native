@@ -10,6 +10,7 @@ import { loadPricingDefaults } from "@/lib/content-fee";
 import { estimateListTotals, hasFigure, lineDisplay } from "@/lib/plan-total";
 import { bandLabel } from "@/lib/pricing/bands";
 import { totalLabel } from "@/lib/pricing/total-label";
+import { formatRunRange, runBounds } from "@/lib/run-period";
 
 export const dynamic = "force-dynamic";
 
@@ -96,7 +97,15 @@ export default async function SharedListPage({
               {inTotal && i.withContent ? ` · ${t("weWriteIt")}` : ""}
             </div>
             {inTotal && i.scheduleStart ? (
-              <div className="muted small">{t("from", { date: dateFmt.format(i.scheduleStart) })}</div>
+              // The run with its length, as /plan shows it: the client
+              // approves the timing, so "from 1 Oct" alone isn't enough.
+              <div className="muted small">
+                {tPlan("runPeriod", {
+                  range: formatRunRange(i.scheduleStart, i.scheduleUnits, p.bookingUnit, locale),
+                  n: runBounds(i.scheduleStart, i.scheduleUnits, p.bookingUnit).units,
+                  unit: p.bookingUnit,
+                })}
+              </div>
             ) : null}
             {i.notes ? (
               <p className="line-note__text">

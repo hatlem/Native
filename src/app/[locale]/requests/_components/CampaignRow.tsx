@@ -71,7 +71,7 @@ export function CampaignRow({
 
         <div className="campaign-row__total">
           {totalLabel ? <div className="campaign-row__total-amount">{totalLabel}</div> : null}
-          <div className="campaign-row__qualifier">{qualifier}</div>
+          {qualifier ? <div className="campaign-row__qualifier">{qualifier}</div> : null}
         </div>
 
         <div className="campaign-row__action">
@@ -102,7 +102,7 @@ export function CampaignRow({
 
       <div className="campaign-row__total">
         {totalLabel ? <div className="campaign-row__total-amount">{totalLabel}</div> : null}
-        <div className="campaign-row__qualifier">{qualifier}</div>
+        {qualifier ? <div className="campaign-row__qualifier">{qualifier}</div> : null}
       </div>
 
       <div className="campaign-row__action">

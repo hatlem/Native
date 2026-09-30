@@ -1,6 +1,6 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { isValidTimeZone, zonedDateString, zonedEndOfDay } from "./time-zone";
+import { isValidTimeZone, zonedDateString, zonedEndOfDay, displayTimeZone } from "./time-zone";
 import { MARKET_TIME_ZONES, SUPPORTED_MARKETS, marketTimeZone } from "./markets";
 
 test("zonedEndOfDay is local 23:59:59.999, on summer and winter time", () => {
@@ -28,4 +28,19 @@ test("every served market has a zone the runtime knows; unknown orgs use the des
   assert.equal(marketTimeZone(null), "Europe/Oslo");
   assert.equal(marketTimeZone("NL"), "Europe/Oslo");
   assert.equal(isValidTimeZone("Mars/Olympus"), false);
+});
+
+test("displayTimeZone: the org market wins, then the UI language", () => {
+  assert.equal(displayTimeZone({ marketCode: "NO", locale: "en" }), "Europe/Oslo");
+  assert.equal(displayTimeZone({ marketCode: null, locale: "fi" }), "Europe/Helsinki");
+  assert.equal(displayTimeZone({ marketCode: "XX", locale: "zz" }), "Europe/London");
+});
+
+test("a share view at 07:51 UTC reads 09:51 in Oslo (CEST)", () => {
+  const fmt = new Intl.DateTimeFormat("nb-NO", {
+    hour: "2-digit",
+    minute: "2-digit",
+    timeZone: displayTimeZone({ marketCode: "NO", locale: "no" }),
+  });
+  assert.equal(fmt.format(new Date("2026-09-30T07:51:00Z")), "09:51");
 });

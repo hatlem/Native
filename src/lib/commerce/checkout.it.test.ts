@@ -103,7 +103,10 @@ if (!RUN_DB_IT) {
     });
     assert.equal(request.status, "CLOSED");
     assert.ok(request.briefSummary?.includes("Launch story"));
-    assert.ok(request.briefSummary?.includes("Geo: Oslo"));
+    // Targeting lives in the Plan columns (rendered with localized labels by
+    // BriefTargeting), no longer folded into the summary as "Geo: …" lines.
+    assert.equal(request.briefSummary, "Launch story");
+    assert.equal(request.plan.targetGeo, "Oslo");
     assert.equal(request.plan.items.length, 1);
     assert.equal(request.quotes.length, 1);
     assert.equal(request.quotes[0].status, "ACCEPTED");

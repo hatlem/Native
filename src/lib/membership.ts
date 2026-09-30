@@ -1,3 +1,5 @@
+import type { Prisma } from "@prisma/client";
+
 export type MembershipRole = "ADMIN" | "MEMBER" | "RESTRICTED";
 export type MembershipStatus = "ACTIVE" | "EXPIRED" | "REVOKED";
 
@@ -17,13 +19,11 @@ export function isMembershipActive(m: MembershipRow, now: Date = new Date()): bo
   return true;
 }
 
-/** The same rule as isMembershipActive, as a Prisma filter, for queries that
- *  pick people by their seat (recipients, rosters) instead of loading rows. */
-export function activeMembershipWhere(now: Date = new Date()) {
-  return {
-    status: "ACTIVE" as const,
-    OR: [{ expiresAt: null }, { expiresAt: { gt: now } }],
-  };
+/** isMembershipActive as a Prisma where: ACTIVE and not past its expiry. For
+ *  queries that pick people by their seat (notification recipients, the GDPR
+ *  export, rosters), which must agree with who actually has access. */
+export function activeMembershipWhere(now: Date = new Date()): Prisma.MembershipWhereInput {
+  return { status: "ACTIVE", OR: [{ expiresAt: null }, { expiresAt: { gt: now } }] };
 }
 
 export function activeScopeOrgIds(

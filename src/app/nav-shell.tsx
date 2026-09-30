@@ -24,6 +24,9 @@ type Props = {
   // Server-rendered org switcher (app/org-switcher.tsx) — null unless the
   // user holds seats in more than one org.
   orgSwitcher?: React.ReactNode;
+  // The active org's name, shown beside the avatar — set only for a user
+  // with seats in several orgs, where it says which one every page shows.
+  activeOrgName?: string | null;
   authActions?: { signIn: string; signUp: string };
   // Visible ⌘K affordance — only worth the header space when the top nav
   // is collapsed enough that Lists/Plan aren't otherwise one click away
@@ -60,6 +63,7 @@ export function NavShell({
   signedIn,
   signOutAction,
   orgSwitcher,
+  activeOrgName = null,
   authActions,
   labels,
   showPaletteHint = false,
@@ -197,7 +201,12 @@ export function NavShell({
                 open={userMenuOpen}
                 onToggle={(e) => setUserMenuOpen((e.target as HTMLDetailsElement).open)}
               >
-                <summary aria-label={user.email}>
+                <summary aria-label={activeOrgName ? `${user.email} · ${activeOrgName}` : user.email}>
+                  {activeOrgName ? (
+                    <span className="user-menu__org" title={activeOrgName} aria-hidden="true">
+                      {activeOrgName}
+                    </span>
+                  ) : null}
                   <span className="avatar" aria-hidden="true">{user.initials}</span>
                 </summary>
                 <div className="panel">

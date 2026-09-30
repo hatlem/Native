@@ -222,6 +222,7 @@ export default async function RequestPage({
           assignedBuyer={assignedBuyer}
           slaTarget={slaTarget}
           briefSummary={request.briefSummary}
+          targeting={request.plan}
         />
       ) : (
         <QuoteSection

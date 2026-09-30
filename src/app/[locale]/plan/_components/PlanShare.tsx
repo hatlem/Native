@@ -16,6 +16,7 @@ export async function PlanShare({
   shareViewedAt,
   shareViewCount,
   approval,
+  timeZone,
 }: {
   locale: string;
   listId: string;
@@ -26,6 +27,8 @@ export async function PlanShare({
   // of an earlier version shows as "approved before changes", never as a
   // current approval the buyer could forward to the desk.
   approval: ApprovalState;
+  // Wall-clock zone for "last opened 09:51": the server runs in UTC.
+  timeZone: string;
 }) {
   const t = await getTranslations({ locale, namespace: "plan.share" });
   const dateFmt = new Intl.DateTimeFormat(intlLocale(locale), {
@@ -33,6 +36,7 @@ export async function PlanShare({
     month: "short",
     hour: "2-digit",
     minute: "2-digit",
+    timeZone,
   });
 
   return (

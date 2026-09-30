@@ -127,3 +127,38 @@ test("search: ASCII spellings find æ/ø/å names", { skip: !RUN_DB_IT }, async 
   assert.ok((await resolves("qwxbaerums", "zq")).found, "æ typed as ae");
   assert.ok((await resolves("Zqøyvik", "zq")).found, "as written");
 });
+
+test("search: a publisher name matches on word prefixes, never inside another name", { skip: !RUN_DB_IT }, async () => {
+  // "Amedia" listed 31 Otavamedia titles: the publisher match was a substring.
+  const market = await prisma.market.findFirstOrThrow({ select: { id: true, code: true } });
+  const mk = async (key: string, publisherName: string) => {
+    const pub = await prisma.publisher.create({
+      data: { id: `${PREFIX}pub-${key}`, name: publisherName, countryCode: market.code, marketId: market.id },
+    });
+    await prisma.title.create({
+      data: {
+        id: `${PREFIX}${key}`,
+        slug: `${PREFIX}${key}`,
+        name: `Pubtest ${key}`,
+        websiteUrl: `https://www.${PREFIX}${key}.example`,
+        category: "news",
+        countryCode: market.code,
+        marketId: market.id,
+        publisherId: pub.id,
+      },
+    });
+    ids[key] = `${PREFIX}${key}`;
+  };
+  try {
+    await mk("pubexact", "Qwxmedia Lokal");
+    await mk("pubinside", "Otaqwxmedia");
+    await mk("pubhyphen", "Aller-Qwxmedia");
+    assert.ok((await resolves("Qwxmedia", "pubexact")).found, "name starts with the word");
+    assert.ok((await resolves("qwxmed", "pubexact")).found, "a prefix of the word");
+    assert.ok((await resolves("Qwxmedia", "pubhyphen")).found, "a word after a hyphen");
+    assert.equal((await resolves("Qwxmedia", "pubinside")).found, false, "not inside another word");
+  } finally {
+    await prisma.title.deleteMany({ where: { id: { in: ["pubexact", "pubinside", "pubhyphen"].map((k) => `${PREFIX}${k}`) } } });
+    await prisma.publisher.deleteMany({ where: { id: { startsWith: `${PREFIX}pub-` } } });
+  }
+});

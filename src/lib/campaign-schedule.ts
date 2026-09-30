@@ -45,6 +45,18 @@ export function upcomingPeriods(unit: BookingUnit, count: number, base: Date): P
   return unit === "WEEK" ? upcomingWeeks(count, base) : upcomingMonths(count, base);
 }
 
+// The periods a buyer can still start a run in: upcomingPeriods minus the
+// current period when it ends today (September on 30 September, this week on
+// Sunday). A run booked there would be over before anything could publish.
+// The current period is kept while days remain, since mid-period starts are
+// normal for native runs.
+export function startablePeriods(unit: BookingUnit, count: number, base: Date): Period[] {
+  const tomorrow = Date.UTC(base.getUTCFullYear(), base.getUTCMonth(), base.getUTCDate() + 1);
+  const [current, ...rest] = upcomingPeriods(unit, count + 1, base);
+  const currentEnd = addPeriods(new Date(`${current.iso}T00:00:00Z`), 1, unit).getTime();
+  return currentEnd > tomorrow ? [current, ...rest].slice(0, count) : rest;
+}
+
 // Enforce the publisher's minimum run: never below max(1, min); floor to an int.
 export function clampUnits(requested: number, min: number | null | undefined): number {
   const floor = Math.max(1, min ?? 1);

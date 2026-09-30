@@ -139,3 +139,29 @@ export function parseCatalogParams(
     page,
   };
 }
+
+export type CatalogParams = ReturnType<typeof parseCatalogParams>;
+
+/** The params that decide WHICH titles match (filters + search), in the
+ *  shape parseCatalogParams reads back. Pagination links add their view
+ *  params (sort, density, page) on top; the CSV export link adds the sort,
+ *  so the file holds exactly the titles on screen. */
+export function catalogFilterParams(f: CatalogParams): URLSearchParams {
+  const params = new URLSearchParams();
+  if (f.markets.length) params.set("market", f.markets.join(","));
+  if (f.types.length) params.set("types", f.types.join(","));
+  if (f.verticals.length) params.set("vertical", f.verticals.join(","));
+  if (f.regions.length) params.set("region", f.regions.join(","));
+  if (f.nativeFit) params.set("nativeFit", f.nativeFit);
+  if (f.b2bB2c) params.set("b2bB2c", f.b2bB2c);
+  if (f.reach) params.set("reach", f.reach);
+  if (f.priceTiers.length) params.set("price", f.priceTiers.join(","));
+  if (f.onlyPriced) params.set("onlyPriced", "1");
+  if (f.publisher) params.set("publisher", f.publisher);
+  if (f.producedForYou) params.set("producedForYou", "1");
+  if (f.guaranteedReach) params.set("guaranteedReach", "1");
+  if (f.newsletterIncluded) params.set("newsletterIncluded", "1");
+  if (f.videoIncluded) params.set("videoIncluded", "1");
+  if (f.q) params.set("q", f.q);
+  return params;
+}

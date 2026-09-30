@@ -3173,7 +3173,11 @@ select:disabled {
 
 .plan-line-card {
   display: grid;
-  grid-template-columns: 1fr 150px 130px;
+  /* minmax(0, 1fr), not 1fr: a bare 1fr track never shrinks below its
+     content's min-content width, so at 375px the stepper row, the date
+     form and the note textarea pushed the column (and everything in it)
+     ~11px past the card's right border. */
+  grid-template-columns: minmax(0, 1fr) 150px 130px;
   gap: 18px;
   align-items: start;
   padding: 18px 20px;
@@ -3181,13 +3185,23 @@ select:disabled {
   border: 1px solid var(--border);
   border-radius: var(--r-md);
 }
+.plan-line-card > * {
+  min-width: 0;
+}
 .plan-line-card--needs-price {
   border-color: color-mix(in srgb, var(--warning) 45%, var(--border));
 }
 
 @media (max-width: 640px) {
   .plan-line-card {
-    grid-template-columns: 1fr;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 12px;
+    padding: 14px;
+  }
+  .plan-line-card textarea,
+  .plan-line-card select,
+  .plan-line-card input:not([type="hidden"]) {
+    max-width: 100%;
   }
 }
 
@@ -3564,8 +3578,12 @@ select:disabled {
   }
   .plan-line-card__actions {
     flex-direction: row;
+    /* Three controls ("We write it", "Move to alternatives", "Remove") don't
+       fit one 375px row; wrap instead of running past the card border. */
+    flex-wrap: wrap;
     align-items: center;
     justify-content: space-between;
+    row-gap: 4px;
   }
 }
 
@@ -4991,8 +5009,20 @@ select:disabled {
   flex-wrap: nowrap;
   align-items: flex-start;
 }
-.catalog-row__title-line:has(> .title-selector) .catalog-row__title {
+/* Title + ⚡ badge: one group that takes the rest of the line and wraps
+   inside itself, so in compare mode the badge drops below a long title
+   instead of squeezing it (the badge is nowrap). */
+.catalog-row__title-group {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px 8px;
+  flex: 1 1 auto;
   min-width: 0;
+}
+.catalog-row__title-group .catalog-row__title {
+  min-width: 0;
+  overflow-wrap: break-word;
 }
 
 /* ---------- Catalog "not sure what fits" prompt ---------- */
@@ -7958,4 +7988,144 @@ fieldset.field > legend {
   background: var(--surface);
   border: 1px solid var(--border);
   border-radius: var(--r-sm);
+}
+
+/* Active org beside the avatar, for users with seats in several orgs
+   (nav-shell.tsx). Truncates: the full name is in the menu below. */
+.user-menu__org {
+  max-width: 180px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 0.84rem;
+  font-weight: 560;
+  color: var(--muted-strong);
+}
+
+/* A request's targeting with localized labels (app/brief-targeting.tsx). */
+.brief-targeting {
+  display: grid;
+  gap: 6px;
+  margin: var(--s-2) 0 0;
+  font-size: 0.9rem;
+}
+.brief-targeting > div {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0 8px;
+}
+.brief-targeting dt {
+  color: var(--muted);
+}
+.brief-targeting dd {
+  margin: 0;
+  color: var(--text);
+}
+
+/* A favorite's collections on its /favorites card (FavoritesView.tsx). */
+.favorite-collections {
+  display: grid;
+  gap: 6px;
+  margin-top: 8px;
+}
+.favorite-collections__in {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+}
+.favorite-collections__chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 4px 2px 10px;
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  border-radius: var(--r-pill);
+  font-size: 0.8rem;
+}
+.favorite-collections__chip button[type="submit"] {
+  /* Outranks the global bare-submit reset, like .plan-qty-stepper. */
+  display: inline-grid;
+  place-items: center;
+  width: 20px;
+  height: 20px;
+  min-height: 20px !important;
+  padding: 0 !important;
+  border: 0 !important;
+  border-radius: 50% !important;
+  background: transparent;
+  color: var(--muted);
+  cursor: pointer;
+}
+.favorite-collections__chip button[type="submit"]:hover {
+  background: var(--surface);
+  color: var(--ink);
+}
+.favorite-collections__status {
+  margin: 0;
+  font-size: 0.82rem;
+  color: var(--muted);
+}
+.favorite-collections__status.is-error {
+  color: var(--danger);
+}
+
+/* /desk/api-keys "Acts for" combobox (BindingPicker.tsx). */
+.binding-picker {
+  position: relative;
+  display: grid;
+  gap: 6px;
+}
+.binding-picker__current {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 4px 8px;
+}
+.binding-picker__list {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  z-index: 20;
+  max-height: 320px;
+  overflow-y: auto;
+  margin: 4px 0 0;
+  padding: 4px;
+  list-style: none;
+  background: var(--surface);
+  border: 1px solid var(--border-strong);
+  border-radius: var(--r-sm);
+  box-shadow: var(--shadow-md);
+}
+.binding-picker__option {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  padding: 6px 10px;
+  border-radius: 6px;
+  cursor: pointer;
+}
+.binding-picker__option.is-active,
+.binding-picker__option[aria-selected="true"] {
+  background: var(--surface-2);
+}
+.binding-picker__group {
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--muted);
+}
+.binding-picker__name {
+  font-weight: 560;
+  color: var(--heading);
+}
+.binding-picker__detail {
+  font-size: 0.8rem;
+  color: var(--muted);
+  overflow-wrap: anywhere;
+}
+.binding-picker__empty,
+.binding-picker__more {
+  padding: 6px 10px;
 }
