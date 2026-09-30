@@ -1,4 +1,17 @@
 {
   "extends": "next/core-web-vitals",
-  "ignorePatterns": ["node_modules/", ".next/", "prisma/seed.ts"]
+  "ignorePatterns": ["node_modules/", ".next/", "prisma/seed.ts"],
+  "rules": {
+    "no-restricted-imports": [
+      "error",
+      {
+        "paths": [
+          {
+            "name": "next/font/google",
+            "message": "Use @/fonts (self-hosted) — next/font/google breaks Turbopack builds (vercel/next.js#99114)"
+          }
+        ]
+      }
+    ]
+  }
 }

@@ -1,5 +1,6 @@
 import type { Prisma } from "@prisma/client";
 import { clampQuantity } from "@/lib/basket";
+import { mergeContentIntent } from "@/lib/authorship";
 
 /**
  * Re-point every SavedListItem from a soon-to-be-deleted product onto a
@@ -16,7 +17,8 @@ import { clampQuantity } from "@/lib/basket";
  *
  * Handles the (listId, productId) unique: if the survivor is already a line on
  * the same list, the two lines merge (quantities summed, clamped) and the dead
- * line is removed; otherwise the dead line is simply re-pointed.
+ * line is removed (a content request on either side survives the merge);
+ * otherwise the dead line is simply re-pointed.
  */
 export async function rehomeSavedListItems(
   tx: Prisma.TransactionClient,
@@ -26,19 +28,23 @@ export async function rehomeSavedListItems(
   if (deadProductId === survivorProductId) return { moved: 0, merged: 0 };
   const deadItems = await tx.savedListItem.findMany({
     where: { productId: deadProductId },
-    select: { id: true, listId: true, quantity: true },
+    select: { id: true, listId: true, quantity: true, withContent: true },
   });
   let moved = 0;
   let merged = 0;
   for (const item of deadItems) {
     const existing = await tx.savedListItem.findUnique({
       where: { listId_productId: { listId: item.listId, productId: survivorProductId } },
-      select: { id: true, quantity: true },
+      select: { id: true, quantity: true, withContent: true, authorshipMode: true },
     });
     if (existing && existing.id !== item.id) {
       await tx.savedListItem.update({
         where: { id: existing.id },
-        data: { quantity: clampQuantity(existing.quantity + item.quantity) },
+        data: {
+          quantity: clampQuantity(existing.quantity + item.quantity),
+          // A content request on the dead line carries onto the survivor.
+          ...mergeContentIntent(existing, item),
+        },
       });
       await tx.savedListItem.delete({ where: { id: item.id } });
       merged++;

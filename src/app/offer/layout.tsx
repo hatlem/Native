@@ -1,6 +1,6 @@
 import type { ReactNode } from "react";
 import type { Metadata } from "next";
-import { Inter } from "next/font/google";
+import { inter } from "../../fonts";
 import "../globals.css";
 
 // Root layout for the public, top-level /offer/[token] artifact embed.
@@ -10,12 +10,6 @@ import "../globals.css";
 // language from each artifact's locale, so this shell stays intentionally
 // minimal — just the document, the Inter font token, and the design tokens
 // from globals.css that the viewer theme references.
-const inter = Inter({
-  subsets: ["latin"],
-  display: "swap",
-  variable: "--font-inter",
-});
-
 export const metadata: Metadata = {
   robots: { index: false, follow: false },
 };

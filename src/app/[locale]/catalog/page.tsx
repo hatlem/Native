@@ -12,6 +12,7 @@ import { loadRelevanceSignals } from "@/lib/catalog-relevance";
 import { loadVerticalOptions } from "@/lib/catalog-taxonomy";
 import { readActiveListId, resolveActiveList } from "@/lib/lists";
 import { estimateListTotals } from "@/lib/plan-total";
+import { loadPricingDefaults } from "@/lib/content-fee";
 import { titleDisplayName } from "@/lib/title-display";
 import { CatalogRail } from "./_components/CatalogRail";
 import { CatalogMobileBar } from "./_components/CatalogMobileBar";
@@ -402,7 +403,9 @@ export default async function CatalogPage({
   const shortlistProductIds = (activeList?.items ?? [])
     .map((i) => i.productId)
     .filter((id): id is string => id !== null);
-  const shortlistTotals = activeList ? estimateListTotals(activeList.items) : [];
+  const shortlistTotals = activeList
+    ? estimateListTotals(activeList.items, await loadPricingDefaults())
+    : [];
   const planName = activeList?.name ?? t("shortlist.untitledPlan");
 
   // "42 more titles without published pricing" — only meaningful once

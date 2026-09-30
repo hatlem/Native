@@ -8,6 +8,7 @@ import {
   addProductItem,
   addTitleItem,
   resolveTitleItem,
+  setItemContent,
   migrateLegacyBasket,
   snapshotListToPlanData,
 } from "./lists";
@@ -293,6 +294,94 @@ test("rehomeSavedListItems merges quantities when the survivor is already on the
   assert.equal(rows.length, 1);
   assert.equal(rows[0].quantity, 3); // 2 + 1 merged (clamped)
   await prisma.product.delete({ where: { id: dead } });
+});
+
+// ── "We write it" drives authorshipMode on every write path ─────────────────
+// The RFQ snapshot, the content-fee lines and writer staffing all read
+// authorshipMode; before, only withContent was written, so an RFQ plan with
+// "Vi skriver den" pressed produced no fee and an unstaffable order line.
+
+async function pair(id: string) {
+  const row = await prisma.savedListItem.findUnique({
+    where: { id },
+    select: { withContent: true, authorshipMode: true },
+  });
+  return row;
+}
+
+test("addProductItem with content stores NATIVESPIN_PRODUCED", async () => {
+  const listId = await freshList();
+  const item = await addProductItem(listId, productId, true);
+  assert.deepEqual(await pair(item.id), { withContent: true, authorshipMode: "NATIVESPIN_PRODUCED" });
+});
+
+test("re-adding with content turns content on; a plain re-add never turns it off", async () => {
+  const listId = await freshList();
+  const item = await addProductItem(listId, productId);
+  assert.deepEqual(await pair(item.id), { withContent: false, authorshipMode: "BUYER_SUPPLIED" });
+  await addProductItem(listId, productId, true);
+  assert.deepEqual(await pair(item.id), { withContent: true, authorshipMode: "NATIVESPIN_PRODUCED" });
+  await addProductItem(listId, productId);
+  assert.deepEqual(await pair(item.id), { withContent: true, authorshipMode: "NATIVESPIN_PRODUCED" });
+});
+
+test("setItemContent toggles the pair both ways", async () => {
+  const listId = await freshList();
+  const item = await addProductItem(listId, productId);
+  await setItemContent(item.id, true);
+  assert.deepEqual(await pair(item.id), { withContent: true, authorshipMode: "NATIVESPIN_PRODUCED" });
+  await setItemContent(item.id, false);
+  assert.deepEqual(await pair(item.id), { withContent: false, authorshipMode: "BUYER_SUPPLIED" });
+});
+
+test("setItemContent off leaves a publisher-produced line alone", async () => {
+  const listId = await freshList();
+  const item = await addProductItem(listId, productId);
+  await prisma.savedListItem.update({ where: { id: item.id }, data: { authorshipMode: "PUBLISHER_PRODUCED" } });
+  await setItemContent(item.id, false);
+  assert.deepEqual(await pair(item.id), { withContent: false, authorshipMode: "PUBLISHER_PRODUCED" });
+});
+
+test("the RFQ snapshot of a toggled line carries NativeSpin authorship", async () => {
+  const listId = await freshList();
+  const item = await addProductItem(listId, productId);
+  await setItemContent(item.id, true);
+  const rows = await prisma.savedListItem.findMany({ where: { listId } });
+  const [snap] = snapshotListToPlanData(rows);
+  assert.equal(snap.withContent, true);
+  assert.equal(snap.authorshipMode, "NATIVESPIN_PRODUCED");
+});
+
+test("resolving a placeholder onto a line keeps the placeholder's content request", async () => {
+  const listId = await freshList();
+  const productLine = await addProductItem(listId, productId);
+  const placeholder = await addTitleItem(listId, titleId);
+  await setItemContent(placeholder.id, true);
+  const merged = await resolveTitleItem(placeholder.id, productId);
+  assert.equal(merged!.id, productLine.id);
+  assert.deepEqual(await pair(productLine.id), { withContent: true, authorshipMode: "NATIVESPIN_PRODUCED" });
+});
+
+test("rehomeSavedListItems carries the dead line's content request onto the survivor", async () => {
+  const dead = await cloneProduct();
+  const listId = await freshList();
+  const survivor = await addProductItem(listId, productId);
+  await addProductItem(listId, dead, true);
+  await prisma.$transaction((tx) => rehomeSavedListItems(tx, dead, productId));
+  assert.deepEqual(await pair(survivor.id), { withContent: true, authorshipMode: "NATIVESPIN_PRODUCED" });
+  await prisma.product.delete({ where: { id: dead } });
+});
+
+test("migrateLegacyBasket derives authorship from the cookie's withContent", async () => {
+  const market = await prisma.market.findFirst();
+  const org = await prisma.organization.create({
+    data: { name: "Legacy authorship IT", type: "ADVERTISER", marketCode: market?.code ?? "NO" },
+  });
+  const list = await migrateLegacyBasket(org.id, [{ productId, quantity: 1, withContent: true }], null);
+  const [row] = await prisma.savedListItem.findMany({ where: { listId: list!.id } });
+  assert.equal(row.authorshipMode, "NATIVESPIN_PRODUCED");
+  await prisma.savedList.deleteMany({ where: { organizationId: org.id } });
+  await prisma.organization.delete({ where: { id: org.id } });
 });
 
 // ── catalog "add to list" popover + favorites guard swap ───────────────────

@@ -4,6 +4,7 @@ import { prisma } from "@/lib/prisma";
 import { loadScope } from "@/lib/scope";
 import { loadUnsentLists } from "@/lib/lists";
 import { estimateListTotals } from "@/lib/plan-total";
+import { loadPricingDefaults } from "@/lib/content-fee";
 import { Link } from "@/i18n/navigation";
 import { EmptyState } from "@/app/empty-state";
 import { formatMoney, intlLocale } from "@/lib/money";
@@ -129,8 +130,11 @@ export default async function RequestsPage({
     return start ? t("waveNoteDated", { ...vars, date: dateFmt.format(start) }) : t("waveNote", vars);
   };
 
+  // Same fee and margin rules the order prices with, so a draft's card shows
+  // the amount the plan would actually commit to (content fees included).
+  const pricing = await loadPricingDefaults();
   for (const list of unsentLists) {
-    const totals = estimateListTotals(list.items);
+    const totals = estimateListTotals(list.items, pricing);
     const totalLabel = totals.length
       ? totals.length > 1
         ? totals

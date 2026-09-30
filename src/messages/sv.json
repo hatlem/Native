@@ -469,6 +469,9 @@
     "decrementRemoves": "Ta bort titeln från planen",
     "increment": "Öka antal",
     "estTotal": "Uppskattad vägledande summa",
+    "exVat": "exkl. moms",
+    "inclVatLine": "{amount} inkl. moms",
+    "includesContentFees": "Inklusive {amount} för innehållsproduktion.",
     "totalForItems": "{amount} för {count, plural, =1 {1 titel} other {# titlar}}",
     "multiCurrencyNote": "Titlar faktureras i utgivarens egen valuta — båda beloppen ska betalas, det här är inte ett val av valuta.",
     "rfqTitle": "Begär en fast offert",
@@ -1204,7 +1207,12 @@
     "planTitle": "Bekräfta din order",
     "planNote": "Alla poster har fast pris — att skicka in bekräftar din order direkt, ingen väntan på inköpsteamet.",
     "planSubmit": "Bekräfta order",
-    "planSubmitting": "Lägger order…"
+    "planSubmitting": "Lägger order…",
+    "orderTotal": "Totalt för beställningen",
+    "commitAmount": "Du beställer för {amount} inkl. moms.",
+    "reassurance": "När du bekräftar lägger du en bindande beställning till det här priset — det kommer ingen separat offert att godkänna.",
+    "noCommitNote": "Din roll saknar beställningsrätt, så du kan inte bekräfta beställningen själv. Skicka den som en offertförfrågan i stället — en administratör i teamet kan godkänna offerten.",
+    "sendAsRfq": "Skicka som offertförfrågan"
   },
   "publisher": {
     "title": "Utgivarportal",
@@ -2705,6 +2713,9 @@
   },
   "invite": {
     "title": "Gå med i {org}",
+    "lead": "Ditt team planerar och köper native-annonsering i NativeSpin. Gå med och arbeta i samma planer, offerter och beställningar.",
+    "acceptTitle": "Ett klick, så är du med",
+    "createTitle": "Skapa ditt konto",
     "invitationFor": "Inbjudan till {email}",
     "accept": "Acceptera inbjudan",
     "createAndJoin": "Skapa konto och gå med",
