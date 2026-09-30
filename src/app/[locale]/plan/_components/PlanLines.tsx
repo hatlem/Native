@@ -29,10 +29,11 @@ export type PlanLine = {
   product: PlanProduct;
   quantity: number;
   withContent: boolean;
-  // The publisher's own studio writes this placement's article
-  // (lib/authorship.ts publisherProducesContent): no "We write it" toggle, no
-  // fee of ours — the line says who writes it instead.
-  publisherWrites: boolean;
+  // The publisher's own studio can write this placement's article
+  // (lib/authorship.ts publisherCanWrite): the buyer chooses between "We write
+  // it" (our fee) and "Let the publisher write it" (no fee of ours) instead of
+  // switching "We write it" on/off (which means bringing their own copy).
+  publisherCanWrite: boolean;
   // lib/plan-total.ts lineDisplay(): the exact figure (instant-orderable
   // lines: placement + content fee, what the summary adds up), the price band
   // (every other shown price), the unit rate (CPM/CPC) or "on request".
@@ -108,10 +109,15 @@ function breakdown(
   const d = l.display;
   if (d.kind === "onRequest") return t("breakdownUnpriced");
   if (d.kind === "rate") return tv("listIndicative");
+  // Unticked on a placement the publisher's studio can write: the publisher
+  // writes it (PUBLISHER_PRODUCED), so the line says so rather than looking
+  // like the buyer owes us copy — also for a view-only seat, which sees no
+  // choice buttons.
+  const publisherWrites = !l.withContent && l.publisherCanWrite ? t("publisherWritesIt") : null;
   if (d.kind === "band") {
     const parts = [
       l.quantity > 1 ? t("breakdownPlacements", { n: l.quantity }) : null,
-      d.withContent ? tv("productionIncluded") : null,
+      d.withContent ? tv("productionIncluded") : publisherWrites,
       tv("listIndicative"),
     ];
     return parts.filter(Boolean).join(" · ");
@@ -132,10 +138,8 @@ function breakdown(
       ? t("breakdownQtyWithArticle", { n: l.quantity, unit: money(d.placement / l.quantity) })
       : t("breakdownArticleIncluded");
   }
-  if (l.quantity > 1) {
-    return t("breakdownQty", { n: l.quantity, unit: money(d.placement / l.quantity) });
-  }
-  return "";
+  const qty = l.quantity > 1 ? t("breakdownQty", { n: l.quantity, unit: money(d.placement / l.quantity) }) : null;
+  return [qty, publisherWrites].filter(Boolean).join(" · ");
 }
 
 // The line's figure, by kind: exact money, "≈ 40–60k NOK", "≈ 395 NOK CPM" or
@@ -170,9 +174,9 @@ function LineFigure({
 // "We write it": a real submit <button>, not an <input type="checkbox"> — this
 // file is server-only (form actions, no client JS), and a genuine checkbox
 // would need an onChange handler to submit on click. Styled with a
-// checkbox-shaped indicator instead. Lines added from the catalog start with it
-// on (the catalog band includes the article — lib/authorship.ts); this is
-// where the buyer switches it off.
+// checkbox-shaped indicator instead. Every line starts with it on (the catalog
+// band includes the article — lib/authorship.ts); this is where the buyer
+// switches it off to bring their own copy.
 function WriteToggle({
   locale,
   itemId,
@@ -196,6 +200,42 @@ function WriteToggle({
         {label}
       </button>
     </form>
+  );
+}
+
+// Who writes it, on a placement the publisher's studio can write: two
+// explicit options rather than an on/off, because "off" isn't the buyer's
+// own copy here — it is the publisher's article. Each option is its own
+// submit button (same server-only reason as WriteToggle), posting the choice
+// it names; the chosen one is aria-pressed. "We write it" is the default and
+// carries our fee; "Let the publisher write it" carries none of ours.
+function WriterChoice({
+  locale,
+  itemId,
+  withContent,
+  labels,
+}: {
+  locale: string;
+  itemId: string;
+  withContent: boolean;
+  labels: { group: string; ours: string; publisher: string };
+}) {
+  const option = (ours: boolean, label: string) => (
+    <form action={setContentProduction}>
+      <input type="hidden" name="locale" value={locale} />
+      <input type="hidden" name="itemId" value={itemId} />
+      <input type="hidden" name="withContent" value={ours ? "1" : "0"} />
+      <button type="submit" className="plan-line-card__writer-option" aria-pressed={withContent === ours}>
+        <span className="plan-line-card__writer-dot" aria-hidden="true" />
+        {label}
+      </button>
+    </form>
+  );
+  return (
+    <div className="plan-line-card__writer-choice" role="group" aria-label={labels.group}>
+      {option(true, labels.ours)}
+      {option(false, labels.publisher)}
+    </div>
   );
 }
 
@@ -488,8 +528,13 @@ export async function PlanLines({
 
           {readOnly ? null : (
           <div className="plan-line-card__actions">
-            {l.publisherWrites ? (
-              <span className="plan-line-card__write-note">✓ {t("publisherWritesIt")}</span>
+            {l.publisherCanWrite ? (
+              <WriterChoice
+                locale={locale}
+                itemId={l.itemId}
+                withContent={l.withContent}
+                labels={{ group: t("whoWritesIt"), ours: t("weWriteIt"), publisher: t("letPublisherWrite") }}
+              />
             ) : (
               <WriteToggle locale={locale} itemId={l.itemId} withContent={l.withContent} label={t("weWriteIt")} />
             )}

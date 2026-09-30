@@ -94,7 +94,12 @@ if (!RUN_DB_IT) {
     // Placeholder first, THEN the price lands — the "gains" in the name.
     const titleId = await freshTitleWithProduct(null);
     const listId = await freshList();
-    const item = await prisma.savedListItem.create({ data: { listId, titleId } });
+    const item = await prisma.savedListItem.create({
+      // A second before the price lands: the sweep only counts a price that
+      // arrived AFTER the placeholder (strictly later), and a fast machine can
+      // otherwise stamp both in the same millisecond.
+      data: { listId, titleId, createdAt: new Date(Date.now() - 1_000) },
+    });
     await addProduct(titleId, { active: true, bookable: true, confirmed: true });
 
     // The sweep is system-wide and this suite shares its database with every
@@ -229,7 +234,12 @@ if (!RUN_DB_IT) {
   test("runPlacementReadySweepWithLock delegates to the sweep when uncontended", async () => {
     const titleId = await freshTitleWithProduct(null);
     const listId = await freshList();
-    const item = await prisma.savedListItem.create({ data: { listId, titleId } });
+    const item = await prisma.savedListItem.create({
+      // A second before the price lands: the sweep only counts a price that
+      // arrived AFTER the placeholder (strictly later), and a fast machine can
+      // otherwise stamp both in the same millisecond.
+      data: { listId, titleId, createdAt: new Date(Date.now() - 1_000) },
+    });
     await addProduct(titleId, { active: true, bookable: true, confirmed: true });
 
     // Each tick is capped (MAX_NOTIFICATIONS_PER_SWEEP), and other suites'

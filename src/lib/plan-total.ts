@@ -51,7 +51,8 @@ export type EstimableListItem = {
         // the offer's fee — the band and the plan disagreed (BUG-r2-2).
         productionFee: unknown;
         // Required for the same reason: "production": "PUBLISHER" means the
-        // publisher writes the article and no fee of ours is added.
+        // publisher can write the article (an unticked line is theirs, not the
+        // buyer's) — lib/authorship.ts publisherCanWrite.
         inclusions: unknown;
         priceRules: { marginPct: unknown; seasonalMultiplier: unknown; minVolume: number }[];
         title: TitleWithVisibility & {

@@ -5,10 +5,9 @@
 // "buyer brought their own copy" and "publisher produces it" as byte-identical
 // rows.
 //
-// `withContent` (the buyer's existing per-line toggle) is the v1 input and maps
-// 1:1 onto the first two modes. PUBLISHER_PRODUCED has no buyer toggle yet, but
-// is modelled now so the order record can represent it without a later schema
-// split — the enum is far cheaper to collapse than a boolean is to grow.
+// `withContent` (the buyer's per-line "We write it") is the input: on is
+// NATIVESPIN_PRODUCED; off is BUYER_SUPPLIED, or PUBLISHER_PRODUCED on a
+// placement the publisher's studio can write (placementContentIntent below).
 //
 // The string-literal values mirror the Prisma `AuthorshipMode` enum exactly, so
 // this type is interchangeable with the generated one (same pattern as
@@ -39,8 +38,8 @@ export function authorshipFromWithContent(
 //
 // `carried` is the mode the row (or its copy source) already holds. Turning
 // the toggle on always means NativeSpin writes it. Off keeps a carried
-// non-NativeSpin mode — PUBLISHER_PRODUCED has no toggle yet but must survive a
-// copy — and never a stale NATIVESPIN_PRODUCED.
+// non-NativeSpin mode — a copy (new list, next wave, reorder) keeps the
+// buyer's "Let the publisher write it" — and never a stale NATIVESPIN_PRODUCED.
 export type ContentIntent = { withContent: boolean; authorshipMode: AuthorshipMode };
 
 export function contentIntent(
@@ -54,22 +53,23 @@ export function contentIntent(
 }
 
 // ---------------------------------------------------------------------------
-// The default for a NEW line — added from the catalog, the title page,
-// compare, the recommenders, a heart, a list checklist. The catalog's price
-// band is all-in: it includes the article (display-price.ts customerPrice adds
-// the production fee). So a line starts with "We write it" ON — the plan then
-// shows the price the buyer saw, and the buyer switches it off on /plan if
-// they bring their own copy.
+// Who writes a line is the BUYER's choice, and every line starts with us
+// writing it: added from the catalog, the title page, compare, the
+// recommenders, a heart, a list checklist or as a title placeholder. The
+// catalog's price band is all-in — it includes our article fee
+// (display-price.ts customerPrice) — so the plan then shows the price the
+// buyer saw, and we earn on every placement unless the buyer opts out on /plan.
 //
-// Except where content doesn't apply: the publisher's own studio writes it
-// (Product.inclusions.production = "PUBLISHER", or an explicit production fee
-// of 0 on the offer/publication — schema: "0 = publisher includes
-// production"). Then the line records PUBLISHER_PRODUCED, which bills no
-// content fee and staffs no writer.
-//
-// A title placeholder (no product yet) has nothing to say otherwise, so it
-// takes the same ON default; resolving it onto a publisher-produced placement
-// applies the exception then (lib/lists.ts resolveTitleItem).
+// What "opting out" means depends on the placement:
+//   - most placements: the buyer brings their own copy (BUYER_SUPPLIED);
+//   - a placement the publisher's own studio can write
+//     (Product.inclusions.production = "PUBLISHER", or an explicit production
+//     fee of 0 on the offer/publication — schema: "0 = publisher includes
+//     production"): "Let the publisher write it" (PUBLISHER_PRODUCED). The
+//     buyer is never asked for copy there, and no fee of ours is charged.
+// The fee itself always follows the line's authorship, never the product
+// (pricing/production-fee.ts): NATIVESPIN_PRODUCED bills our fee even where
+// the publisher could have written it.
 // ---------------------------------------------------------------------------
 
 export type ContentDefaultSource = {
@@ -82,7 +82,10 @@ function isExplicitZero(v: unknown): boolean {
   return v != null && Number(v) === 0;
 }
 
-export function publisherProducesContent(product: ContentDefaultSource): boolean {
+// Whether the publisher's studio offers to write this placement's article —
+// i.e. whether /plan offers "Let the publisher write it" as the alternative
+// to "We write it".
+export function publisherCanWrite(product: ContentDefaultSource): boolean {
   const inclusions = product.inclusions as { production?: unknown } | null | undefined;
   if (inclusions?.production === "PUBLISHER") return true;
   // First set fee wins, as in resolveProductionFee: an offer-level fee (even a
@@ -91,27 +94,28 @@ export function publisherProducesContent(product: ContentDefaultSource): boolean
   return isExplicitZero(product.title?.productionFeeDefault);
 }
 
-export function defaultContentIntent(product: ContentDefaultSource | null): ContentIntent {
-  if (product && publisherProducesContent(product)) {
-    return { withContent: false, authorshipMode: "PUBLISHER_PRODUCED" };
-  }
+// A new line, from any add path: we write it.
+export function defaultContentIntent(): ContentIntent {
   return contentIntent(true);
 }
 
-// The intent a placement is ORDERED with: the row's own choice, except on a
-// placement the publisher's studio writes, which is PUBLISHER_PRODUCED
-// whatever the row says. /plan offers no toggle there and the fee engine bills
-// nothing for it (pricing/production-fee.ts), so an order line must not claim
-// NativeSpin writes it (that would staff one of our writers on it) — nor
-// BUYER_SUPPLIED, which asks the buyer for copy the publisher produces.
+// THE rule for a placement's authorship from the buyer's choice: on ⇒
+// NativeSpin writes it; off ⇒ the publisher where their studio can write it,
+// else the buyer's own copy. The /plan toggle, a placeholder resolved onto a
+// product, an explicit add and the instant order all go through it, so a line
+// is never PUBLISHER_PRODUCED on a placement the publisher doesn't write, nor
+// BUYER_SUPPLIED where the choice offered was the publisher. The fee is
+// charged iff the result is NATIVESPIN_PRODUCED (withContent), which is also
+// what the list fingerprint and the DB CHECK bind to.
 export function placementContentIntent(
   withContent: boolean,
   product: ContentDefaultSource | null | undefined,
 ): ContentIntent {
-  if (product && publisherProducesContent(product)) {
-    return { withContent: false, authorshipMode: "PUBLISHER_PRODUCED" };
-  }
-  return contentIntent(withContent);
+  if (withContent) return contentIntent(true);
+  return {
+    withContent: false,
+    authorshipMode: product && publisherCanWrite(product) ? "PUBLISHER_PRODUCED" : DEFAULT_AUTHORSHIP_MODE,
+  };
 }
 
 // Two lines folding into one (same product added twice, a placeholder resolved

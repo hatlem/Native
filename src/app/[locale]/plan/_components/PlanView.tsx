@@ -22,7 +22,7 @@ import { loadPricingDefaults } from "@/lib/content-fee";
 import { timeAgo } from "@/lib/time-ago";
 import { loadVerticalOptions, localizedVerticalOptions } from "@/lib/catalog-taxonomy";
 import { ViewOnlyNote } from "@/components/view-only-note";
-import { publisherProducesContent } from "@/lib/authorship";
+import { publisherCanWrite } from "@/lib/authorship";
 import { liveOrderForList } from "@/lib/commerce/list-commit";
 import { PlanBanners } from "./PlanBanners";
 import { PlanShare } from "./PlanShare";
@@ -155,7 +155,7 @@ export async function PlanView({
         quantity: i.quantity,
         display,
         withContent: i.withContent,
-        publisherWrites: publisherProducesContent(p),
+        publisherCanWrite: publisherCanWrite(p),
         // A product deactivated since it was added: still shown, but flagged so
         // the buyer removes it (submit refuses while it's present — see E).
         unavailable: !p.active || !p.bookable,

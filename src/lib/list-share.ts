@@ -85,7 +85,7 @@ export const SHARED_LIST_SELECT = {
           visibility: true,
           pricingModel: true,
           // The article fee's offer/publication layers (production-fee.ts),
-          // and whether the publisher writes the article (no fee of ours).
+          // and whether the publisher can write it (the share page says who does).
           productionFee: true,
           inclusions: true,
           // Only the rate-card fields the price engine reads (lib/plan-total.ts).

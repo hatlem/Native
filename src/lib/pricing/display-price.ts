@@ -23,7 +23,7 @@ import {
   toRateRules,
 } from "@/lib/money";
 import type { PricingDefaults } from "@/lib/content-fee";
-import { publisherProducesContent } from "@/lib/authorship";
+import { publisherCanWrite } from "@/lib/authorship";
 import { isProductPriceShown, type TitleWithVisibility } from "./visibility";
 import { priceBand, type Band } from "./bands";
 import { articleFee } from "./production-fee";
@@ -45,7 +45,7 @@ export type DisplayProduct = {
   priceRules: { marginPct: unknown; seasonalMultiplier: unknown; minVolume: number }[];
   productionFee?: unknown;
   // Curated deliverables (pricing/inclusions.ts): "production": "PUBLISHER"
-  // means the publisher's studio writes the article (no fee of ours).
+  // means the publisher's studio can write the article instead of us.
   inclusions?: unknown;
 };
 
@@ -68,11 +68,10 @@ function feeSource(product: DisplayProduct, title: DisplayTitle) {
 }
 
 // The article fee this product's band folds in: the fee a line added from the
-// catalog is charged, because that line starts with "We write it" on
-// (authorship.ts defaultContentIntent) — unless the publisher's own studio
-// writes it, where the line starts PUBLISHER_PRODUCED and no fee is charged
-// (articleFee itself returns 0 for those, so the band, the plan and the order
-// can't disagree about it).
+// catalog is charged, because every line starts with "We write it" on
+// (authorship.ts defaultContentIntent) — also where the publisher's studio
+// could write it instead. The band shows the default the buyer gets; choosing
+// "Let the publisher write it" on /plan can only lower the figure.
 function bandArticleFee(product: DisplayProduct, title: DisplayTitle, defaults: PricingDefaults): number {
   return articleFee(feeSource(product, title), title.market.code, defaults.feeRules);
 }
@@ -97,8 +96,8 @@ export function customerPrice(
 
 // Whether a product's band includes a written article — the "incl. article"
 // every band label carries. True when the band folds in our article fee, or
-// the publisher's own studio writes it (the article is in the offer either
-// way). False only when no fee applies and nobody is stated to write it. One
+// the publisher's own studio can write it (the article is in the offer either
+// way — e.g. an offer with an explicit 0 production fee). False only when no fee applies and nobody is stated to write it. One
 // rule for the catalog row and card, the title page, compare, the
 // recommenders and the plan's placement picker.
 export function bandIncludesArticle(
@@ -106,7 +105,7 @@ export function bandIncludesArticle(
   title: DisplayTitle,
   defaults: PricingDefaults,
 ): boolean {
-  if (publisherProducesContent(feeSource(product, title))) return true;
+  if (publisherCanWrite(feeSource(product, title))) return true;
   return bandArticleFee(product, title, defaults) > 0;
 }
 
