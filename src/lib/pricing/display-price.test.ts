@@ -1,6 +1,13 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { customerPrice, productBand, titleBand, titleRate, unitRate } from "./display-price";
+import {
+  customerPrice,
+  plannablePrice,
+  productBand,
+  titleBand,
+  titleRate,
+  unitRate,
+} from "./display-price";
 import type { PricingDefaults } from "@/lib/content-fee";
 import type { ContentFeeRuleSpec } from "../money";
 
@@ -165,4 +172,15 @@ test("titleRate falls back to the cheapest shown unit rate when no flat band exi
 
 test("titleRate is null when only FLAT products exist (band owns the card)", () => {
   assert.equal(titleRate([product()], TITLE, DEFAULTS), null);
+});
+
+test("plannablePrice: the all-in placement price for FLAT products only", () => {
+  assert.equal(plannablePrice(product(), TITLE, DEFAULTS), 36_500);
+  // A 300 NOK CPM is a rate, not a 345 NOK placement (the /recommend bug).
+  assert.equal(plannablePrice(product({ pricingModel: "CPM", basePrice: 300 }), TITLE, DEFAULTS), null);
+  assert.equal(plannablePrice(product({ confirmedAt: null }), TITLE, DEFAULTS), null);
+  assert.equal(
+    plannablePrice(product(), { ...TITLE, pricesPublic: false }, DEFAULTS),
+    null,
+  );
 });

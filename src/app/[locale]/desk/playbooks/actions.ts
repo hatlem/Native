@@ -6,6 +6,7 @@ import { MarketCode, ProductType } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
 import { recordAudit } from "@/lib/audit";
 import { loadScope } from "@/lib/scope";
+import { isSupportedMarket } from "@/lib/markets";
 
 function field(formData: FormData, key: string): string {
   const v = formData.get(key);
@@ -21,7 +22,7 @@ async function requireDesk(locale: string): Promise<string | undefined> {
 }
 
 function parseMarket(raw: string): MarketCode | null {
-  return (Object.values(MarketCode) as string[]).includes(raw)
+  return isSupportedMarket(raw)
     ? (raw as MarketCode)
     : null;
 }

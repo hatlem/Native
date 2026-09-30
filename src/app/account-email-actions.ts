@@ -8,7 +8,7 @@ import { recordAudit } from "@/lib/audit";
 import { authLimiter } from "@/lib/rate-limit";
 import { generateToken, hashToken, tokenExpiry } from "@/lib/tokens";
 import { validateEmailChange } from "@/lib/email-change";
-import { checkBusinessEmailWithMx } from "@/lib/email-policy";
+import { checkBusinessEmailWithMx, emailPolicyErrorCode } from "@/lib/email-policy";
 import { emailAdapter } from "@/lib/notify";
 import {
   emailChangeConfirmEmail,
@@ -89,7 +89,7 @@ export async function requestEmailChange(formData: FormData) {
       await recordAudit(userId, "user.email_change_rejected", `User:${userId}`, {
         reason: policy.reason,
       });
-      redirect(`/${locale}/account?error=email_business#email`);
+      redirect(`/${locale}/account?error=${emailPolicyErrorCode(policy.reason)}#email`);
     }
   }
 

@@ -283,12 +283,10 @@
     "subtitle": "Saa ehdotettu julkaisumiks markkinallesi ja budjetillesi.",
     "market": "Markkina",
     "budget": "Budjetti",
-    "category": "Kategoria",
-    "anyCategory": "Mikä tahansa kategoria",
+    "category": "Kohderyhmä",
+    "anyCategory": "Kaikki kohderyhmät",
     "suggest": "Ehdota miksi",
     "reach": "Tavoittavuus",
-    "cost": "Kustannus",
-    "remaining": "Budjettia jäljellä",
     "none": "Ei sopivaa miksiä tällä budjetilla — kokeile suurempaa budjettia tai toista markkinaa.",
     "addAll": "Lisää kaikki suunnitelmaan",
     "addingAll": "Lisätään…",
@@ -298,10 +296,12 @@
     "hintTitle": "Kerro markkinasi ja budjettisi",
     "marketPlaceholder": "Valitse markkina",
     "reachSub": "Yhdistetty kuukausittainen tavoittavuus",
-    "ofBudget": "/ {budget} budjetista",
-    "remainingSub": "Tilaa lisäriveille",
     "mixEyebrow": "Ehdotettu miksi",
-    "mixHeading": "Julkaisut, jotka sopivat briifiisi"
+    "mixHeading": "Julkaisut, jotka sopivat briifiisi",
+    "titles": "Julkaisut",
+    "fitsBudget": "Kaikki {budget} budjetin sisällä",
+    "bandNote": "Hinnat näytetään haarukoina. Desk vahvistaa tarkat hinnat tarjouksessasi.",
+    "reachUnknown": "ei ilmoitettu"
   },
   "home": {
     "title": "Osta natiivisisältöä premium-sanoma- ja aikakauslehdistä",
@@ -858,12 +858,12 @@
     "requestingAs": "Pyytäjä",
     "loginRequired": "Kirjaudu sisään tai luo tili pyytääksesi tarjouksen:",
     "selectClient": "Valitse asiakas, jonka puolesta toimit",
-    "fromPrice": "alkaen {price}",
     "targetAudienceLabel": "Yleisösegmentit (valinnainen)",
     "targetGeoLabel": "Maantieteellinen painopiste (valinnainen)",
     "targetGeoPlaceholder": "esim. NO, SE — tai Uusimaa, Helsinki",
     "targetContextLabel": "Toimituksellinen konteksti (valinnainen)",
-    "targetContextPlaceholder": "esim. talous, elämäntapa, urheilu"
+    "targetContextPlaceholder": "esim. talous, elämäntapa, urheilu",
+    "priceBand": "≈ {band}"
   },
   "requests": {
     "title": "Pyyntö",
@@ -1258,7 +1258,7 @@
     "signupTitle": "Luo tili",
     "signupSubtitle": "Viisi kenttää. Kysymme lopuista, kun tarvitset niitä.",
     "signupHeadline": "Ilmainen tili. Jokainen natiivititteli, jonka katamme.",
-    "signupLead": "3 000+ titteliä 9 markkinalla, läpinäkyvä hinta, kiinteä tarjous 24 tunnissa. Et sitoudu mihinkään ennen kuin lähetät briefin.",
+    "signupLead": "{count}+ titteliä 9 markkinalla, läpinäkyvä hinta, kiinteä tarjous 24 tunnissa. Et sitoudu mihinkään ennen kuin lähetät briefin.",
     "bulletCatalog": "Natiivi elää siellä, missä lukijat viettävät aikaa: 3–5× lukuaika vs display, lainattu uskottavuus tittelistä, indeksoitu ja pysyvä haussa.",
     "bulletDesk": "Koko katalogi auki, läpinäkyvä hinta. Ei puhelinkierroksia, ei PDF-hinnastoja, ei neljän viikon neuvotteluja.",
     "bulletReports": "Yksi brief. Desk neuvottelee, kirjoittaa, laaduntarkistaa, julkaisee. Sinä hyväksyt.",
@@ -1280,7 +1280,7 @@
     "pwHint": "Vähintään 8 merkkiä.",
     "noAccount": "Ei tiliä?",
     "haveAccount": "Onko sinulla jo tili?",
-    "regFailed": "Täytä kaikki pakolliset kentät (salasana vähintään 8 merkkiä).",
+    "regFailed": "Täytä yrityksen nimi ja työsähköposti.",
     "regRateLimited": "Liian monta rekisteröitymisyritystä — odota hetki ja yritä uudelleen.",
     "regEmailBusiness": "Käytä työsähköpostiosoitettasi — henkilökohtaiset sähköpostit (gmail, yahoo ym.) ja kertakäyttöiset palvelut eivät ole sallittuja.",
     "regExists": "Tili tällä sähköpostilla on jo olemassa.",
@@ -1322,15 +1322,21 @@
     "backToSignin": "Takaisin kirjautumiseen",
     "signupSubtitleShort": "Kolme kenttää. Loput kysytään kun olet sisällä.",
     "setPasswordSummary": "Aseta salasana (valinnainen)",
-    "pwHintOptional": "Vähintään 8 merkkiä. Jätä tyhjäksi kirjautuaksesi vain magic-linkillä.",
-    "magicLinkSignupNote": "Ohita salasana, lähetämme magic-linkin kirjautumiseen.",
+    "pwHintOptional": "Vähintään 8 merkkiä. Jätä tyhjäksi, niin kirjaudut sähköpostiin lähetettävällä linkillä.",
+    "magicLinkSignupNote": "Ohita salasana, niin lähetämme kirjautumislinkin sähköpostiisi.",
     "regPasswordTooShort": "Salasanan on oltava vähintään 8 merkkiä.",
     "deactivatedSignin": "Tämä tili on poistettu käytöstä. Ota yhteyttä deskiin, jos se pitää ottaa uudelleen käyttöön.",
     "emailChangedOk": "Sähköpostiosoite päivitetty — kirjaudu sisään uudella osoitteellasi.",
     "deactivatedTitle": "Tämä tili on poistettu käytöstä",
     "deactivatedBody": "Tilisi on suljettu, joten täällä ei ole mitään käytettävää. Kirjaudu ulos alta, ja ota yhteyttä deskiin, jos tämä on mielestäsi virhe.",
     "writerClaimSubmit": "Luo kirjoittajatili",
-    "writerClaimSubmitting": "Luodaan…"
+    "writerClaimSubmitting": "Luodaan…",
+    "regEmailInvalid": "Sähköpostiosoite ei näytä oikealta. Tarkista, ettei siinä ole kirjoitusvirhettä.",
+    "regEmailNoMailServer": "Verkkotunnukselle ei löydy sähköpostipalvelinta, joten viestit eivät menisi perille. Tarkista osoite kirjoitusvirheiden varalta.",
+    "emailRequired": "Kirjoita ensin sähköpostiosoitteesi.",
+    "attemptsRateLimited": "Liian monta yritystä. Odota hetki ja yritä uudelleen.",
+    "checkSignupTitle": "Vahvista sähköpostiosoitteesi",
+    "checkSignupLead": "Lähetimme linkin antamaasi osoitteeseen. Avaa se vahvistaaksesi osoitteen ja kirjautuaksesi; linkki vanhenee 15 minuutissa. Jos osoitteella oli jo tili, viestissä kerrotaan, miten pääset takaisin sisään."
   },
   "order": {
     "title": "Tilaus",
@@ -1576,7 +1582,7 @@
     "catalogStatusNote": "Hintoja muutetaan hintasivulla. Luettelotilasta (varattavuus ja se, voiko tuotteen tilata heti) vastaa NativeSpinin desk."
   },
   "formats": {
-    "metaTitle": "Natiiviformaatit — NativeSpin",
+    "metaTitle": "Natiiviformaatit",
     "eyebrow": "Formaatit",
     "title": "Neljä tapaa tehdä natiivia — valitse sopiva.",
     "lead": "Jokainen julkaisu katalogissamme tukee yhtä tai useampaa näistä neljästä formaatista. Ero on siinä, kenen ääntä maksat ja kuinka näkyvä brändi on.",
@@ -1826,7 +1832,7 @@
   },
   "about": {
     "eyebrow": "Tietoa",
-    "metaTitle": "Tietoa NativeSpinsta",
+    "metaTitle": "Meistä",
     "title": "Natiivi on operatiivisesti tuskallista. Me korjaamme sen.",
     "lead": "NativeSpin on markkinapaikka natiivisisällön ja natiivimainonnan ostamiseen sanoma- ja aikakauslehdistä — mukaan lukien ne monet, jotka eivät myy programmaattisesti.",
     "missionTitle": "Missio",
@@ -2018,7 +2024,7 @@
     "faqTitle": "Usein kysytyt kysymykset"
   },
   "contact": {
-    "metaTitle": "Yhteys NativeSpinen",
+    "metaTitle": "Yhteystiedot",
     "eyebrow": "Yhteystiedot",
     "title": "Ota yhteyttä",
     "lead": "Valitse oikea kanava alta tai käytä lomaketta. Vastaamme jokaiseen viestiin arkipäivän kuluessa.",
@@ -2057,7 +2063,16 @@
     "messagePlaceholder": "Mitä yrität tehdä ja milloin?",
     "submit": "Lähetä viesti",
     "altPrefix": "Kiinnostaa kuka on NativeSpinn takana?",
-    "altLink": "Lue meistä →"
+    "altLink": "Lue meistä →",
+    "sending": "Lähetetään…",
+    "sentTitle": "Viesti lähetetty",
+    "sentBody": "Kiitos. Viesti on nyt tiimillä, ja vastaamme sähköpostitse yhden työpäivän kuluessa.",
+    "errRequired": "Pakollinen kenttä.",
+    "errInvalid": "Valitse jokin vaihtoehdoista.",
+    "errEmail": "Sähköpostiosoite ei näytä oikealta.",
+    "errTooLong": "Teksti on liian pitkä. Lyhennä sitä hieman.",
+    "errRate": "Olet lähettänyt useita viestejä lyhyessä ajassa. Odota hetki ja yritä uudelleen.",
+    "errSend": "Viesti ei mennyt perille. Yritä uudelleen hetken päästä tai lähetä sähköpostia suoraan osoitteeseen hello@nativespin.com."
   },
   "security": {
     "metaTitle": "Tietoturva",
@@ -2343,8 +2358,8 @@
     }
   },
   "apiDocs": {
-    "metaTitle": "NativeSpin API",
-    "eyebrow": "Developers",
+    "metaTitle": "API",
+    "eyebrow": "Kehittäjät",
     "title": "NativeSpinin julkinen luettelo-API",
     "lead": "Luku-API NativeSpinin julkaisuluettelon päällä — suunniteltu toimistojen suunnittelutyökaluille (Atlas-tyyliin) ja adtech-kumppaneille, jotka tarvitsevat normalisoidut tarjontatiedot toimitukselliselle natiivisisällölle 9 markkinallamme — Norja, Ruotsi, Tanska, Suomi, Saksa, Itävalta, Sveitsi, Iso-Britannia ja Irlanti.",
     "authTitle": "Tunnistautuminen",
@@ -2356,11 +2371,11 @@
     "queryParams": "Kyselyparametrit",
     "detailBody": "Julkaisukohtaiset tiedot: kustantaja, markkina (ALV-kanta ja mainosmerkintä) sekä jokainen aktiivinen tuote sisältövaatimuksineen, toimitusaikoineen ja hintahaarukoineen.",
     "detailIncludes": "Hinnat ilmoitetaan haarukoina (esimerkiksi ”25–40k NOK”), ei koskaan tarkkoina summina: kiinteä hinta tulee tarjouksessa. Sisältövaatimuksiin kuuluvat sanamäärärajat, kuvien vähimmäismäärä ja mainosmerkintä.",
-    "paginationTitle": "Pagination",
+    "paginationTitle": "Sivutus",
     "paginationBody": "Kursoripohjainen. Lähetä page.nextCursor takaisin cursor-parametrina, kunnes se on null: vasta silloin synkronointi on valmis. Lajittelu on vakaa (nimi + id), joten täysi synkronointi ei ohita rivejä, vaikka julkaisuja aktivoitaisiin tai poistettaisiin käytöstä kesken ajon.",
     "limitsTitle": "Nopeusrajat",
     "limitsBody": "Avainkohtaiset purskeet tasoittuvat saman ämpärin kautta, jota RFQ-virtaus käyttää. 429-vastaus sisältää likimääräisen retry-after-arvon viestin rungossa. Jatkuvasti suurivolyymisille integraatiokumppaneille myönnetään korkeammat rajat — kysy avainta hakiessasi.",
-    "errorsTitle": "Errors",
+    "errorsTitle": "Virheet",
     "errorsBody": "Virheet palautetaan JSON-muodossa pysyvällä koodilla ja luettavalla viestillä. Virheellinen parametri palauttaa 400 BAD_PARAM -virheen, jonka error.details nimeää jokaisen; mitään ei ohiteta hiljaa. Kaikki koodit löytyvät OpenAPI-määrittelystä osoitteesta /api/openapi.json.",
     "ctaTitle": "Tarvitsetko avaimen?",
     "ctaBody": "Emme automaattisesti myönnä API-pääsyä — kumppani-integraatioilla on kaupallisia vaikutuksia, jotka haluamme keskustella ensin. Ota yhteyttä, niin saat toimivan avaimen yhden työpäivän kuluessa.",
@@ -2745,7 +2760,7 @@
     "currentPasswordLabel": "Nykyinen salasana",
     "newPasswordLabel": "Uusi salasana",
     "pwHint": "Vähintään 8 merkkiä.",
-    "passwordlessNote": "Kirjaudut nyt vain magic-linkillä. Aseta salasana jos haluat molemmat vaihtoehdot.",
+    "passwordlessNote": "Kirjaudut nyt vain sähköpostiin lähetetyillä linkeillä. Aseta salasana, jos haluat molemmat vaihtoehdot.",
     "savePasswordSet": "Aseta salasana",
     "savePasswordChange": "Vaihda salasana",
     "saveMember": "Tallenna",
@@ -2825,7 +2840,8 @@
     "errDelegation": "Delegoinnin päättymispäivä ei ole kelvollinen päivämäärä.",
     "errDelegationPast": "Delegoinnin päättymispäivän on oltava tulevaisuudessa.",
     "canCommitAdminNote": "Ylläpitäjillä on aina tilausoikeus.",
-    "statusRevoked": "Poistettu"
+    "statusRevoked": "Poistettu",
+    "errEmailDomain": "Verkkotunnukselle ei löydy sähköpostipalvelinta. Tarkista osoite kirjoitusvirheiden varalta."
   },
   "rateCard": {
     "pageTitle": "Rate card -pyyntö",
@@ -3146,7 +3162,6 @@
     "resultsAlsoConsider": "Myös harkitsemisen arvoisia",
     "resultsEmpty": "Ei osumia vielä – kokeile laajempaa briiffiä tai toista markkinaa.",
     "whyFits": "Miksi tämä sopii:",
-    "fromPrice": "alkaen {price}",
     "reach": "tavoittavuus/kk",
     "requestPrice": "Pyydä hinta",
     "addToShortlist": "Lisää valintoihin",
@@ -3201,7 +3216,8 @@
     "kycAddress2": "Osoiterivi 2",
     "kycPostal": "Postinumero",
     "kycCity": "Kaupunki",
-    "kycSave": "Tallenna tiedot"
+    "kycSave": "Tallenna tiedot",
+    "priceBand": "≈ {band}"
   },
   "buyerHome": {
     "headingNeeds": "{count, plural, =1 {1 asia tarvitsee sinua} other {# asiaa tarvitsee sinua}}",
@@ -3588,5 +3604,10 @@
         "portfolioUrl": "Anna koko linkki, joka alkaa https://"
       }
     }
+  },
+  "listNames": {
+    "untitled": "Uusi suunnitelma",
+    "imported": "Tuotu suunnitelma",
+    "reordered": "Uudelleen tilattu kampanja"
   }
 }

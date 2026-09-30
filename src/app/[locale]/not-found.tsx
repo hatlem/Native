@@ -1,6 +1,7 @@
 import { getLocale, getTranslations } from "next-intl/server";
 import { Link } from "@/i18n/navigation";
 import { LandingShell } from "@/app/landing-shell";
+import { NotFoundTitle } from "./not-found-title";
 
 export default async function NotFound() {
   const locale = await getLocale();
@@ -8,9 +9,11 @@ export default async function NotFound() {
   // bare string argument.
   const t = await getTranslations("errors");
   const tNav = await getTranslations("nav");
+  const tc = await getTranslations("common");
 
   return (
     <LandingShell locale={locale} screenLabel="Not found">
+      <NotFoundTitle title={`${t("notFoundTitle")} · ${tc("appName")}`} />
       <div className="utility-page">
         <span className="utility-code">404</span>
         <h1>{t("notFoundTitle")}</h1>

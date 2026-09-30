@@ -754,6 +754,10 @@ model User {
   // account. Nullable rather than a boolean so the log tells us WHEN,
   // and so reactivation is a single clear -> null.
   deactivatedAt   DateTime?
+  // Session revocation counter. Each JWT records the value it was minted
+  // under; bumping it (password reset or change) ends every older session
+  // on its next request. See src/lib/session-version.ts.
+  sessionVersion  Int       @default(0)
 
   notifications          Notification[]
   magicLinkTokens        MagicLinkToken[]

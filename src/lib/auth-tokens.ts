@@ -18,6 +18,7 @@ export type ConsumedMagicLinkUser = {
   role: UserRole;
   orgId: string | null;
   orgType: string | null;
+  sessionVersion: number;
 };
 
 // Consume a magic-link token: atomically mark it used, then resolve the
@@ -65,6 +66,7 @@ export async function consumeMagicLinkToken(
     role: row.user.role,
     orgId: row.user.organization?.id ?? null,
     orgType: row.user.organization?.type ?? null,
+    sessionVersion: row.user.sessionVersion,
   };
 }
 
@@ -74,7 +76,10 @@ export type PasswordResetOutcome =
 
 // Consume a password-reset token and apply the new password hash in one
 // transaction. Every other open reset token for the same user is
-// invalidated so a stale email link can't undo the change later.
+// invalidated so a stale email link can't undo the change later, and the
+// session version is bumped so every session opened before the reset ends
+// (a reset is the standard response to a compromised account — see
+// @/lib/session-version).
 export async function consumePasswordResetToken(
   raw: string,
   newPasswordHash: string,
@@ -98,7 +103,7 @@ export async function consumePasswordResetToken(
 
     await tx.user.update({
       where: { id: row.userId },
-      data: { passwordHash: newPasswordHash },
+      data: { passwordHash: newPasswordHash, sessionVersion: { increment: 1 } },
     });
 
     await tx.passwordResetToken.updateMany({

@@ -6,8 +6,9 @@ import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
 import { loadOnboardingState, safeNext } from "@/lib/onboarding-gate";
 import { recordAudit } from "@/lib/audit";
+import { SUPPORTED_MARKETS } from "@/lib/markets";
 
-const MARKET_CODES = Object.values(MarketCode) as string[];
+const MARKET_CODES: readonly string[] = SUPPORTED_MARKETS;
 
 // Phone format: keep the validation forgiving — international users
 // type with spaces, country prefixes (+47, +46, +45, …), dashes, and

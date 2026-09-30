@@ -12,7 +12,12 @@ export type Candidate = {
   category: string;
   type: string;
   reach: number;
+  // Exact all-in customer price — for fitting the budget ONLY. Never render
+  // it: browse surfaces show `priceBand` (display-price.ts bands).
   unitPrice: number;
+  // Buyer-facing band label ("15–25k NOK"), set by callers that render
+  // candidates. Absent in pure-ranking contexts (tests, internal callers).
+  priceBand?: string;
   // Why this title matched the brief (facet chips), when brief matching is
   // used. Absent for the plain budget recommender.
   reasons?: string[];

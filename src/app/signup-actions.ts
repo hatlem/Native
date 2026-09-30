@@ -10,7 +10,8 @@ import { generateToken, hashToken, tokenExpiry } from "@/lib/tokens";
 import { emailAdapter } from "@/lib/notify";
 import { magicLinkEmail } from "@/lib/mail/templates/magic-link";
 import { welcomeEmail } from "@/lib/mail/templates/welcome";
-import { checkBusinessEmailWithMx } from "@/lib/email-policy";
+import { accountExistsEmail } from "@/lib/mail/templates/account-exists";
+import { checkBusinessEmailWithMx, emailPolicyErrorCode } from "@/lib/email-policy";
 import { appUrl, appName } from "@/lib/url";
 import { clientIp } from "@/lib/client-ip";
 
@@ -53,20 +54,45 @@ export async function register(formData: FormData) {
 
   // Company-email gate: reject free providers (gmail, yahoo, …),
   // disposable services (mailinator, 10minutemail, …) and domains
-  // with no MX records (typos like "gnail.com", parked domains).
+  // with no MX records (typos like "gnail.com", parked domains). Each
+  // reason gets its own message — a typo isn't a Gmail problem.
   const policy = await checkBusinessEmailWithMx(email);
   if (!policy.ok) {
     await recordAudit(email, "auth.signup_email_rejected", `User:${email}`, {
       ip,
       reason: policy.reason,
     });
-    redirect(`/${locale}/signup?error=email_business${tail}`);
+    redirect(`/${locale}/signup?error=${emailPolicyErrorCode(policy.reason)}${tail}`);
   }
 
+  // Per-address cap on top of the per-IP one: every signup for an existing
+  // address mails its owner (below), so without it the form doubles as a
+  // way to flood someone's inbox from rotating IPs.
+  if (!(await authLimiter.check(`signup:email:${email}`)).ok) {
+    redirect(`/${locale}/signup?error=rate${tail}`);
+  }
+
+  // Hash before the existence check so both branches below pay the bcrypt
+  // cost — it's the dominant term, and parity keeps response time from
+  // telling an enumerator which branch ran.
   const passwordHash = passwordlessSignup
     ? null
     : await bcrypt.hash(password, 10);
-  let createdUserId: string | null = null;
+
+  // No account enumeration: an address that already has an account gets
+  // the same /check-email answer as a new one. The OWNER is the one told —
+  // by email, with a one-tap sign-in — so a real "I forgot I signed up"
+  // user gets straight back in and a prober learns nothing.
+  const existing = await prisma.user.findUnique({
+    where: { email },
+    select: { id: true, deactivatedAt: true },
+  });
+  if (existing) {
+    await notifyExistingAccount(existing, email, locale, ip);
+    redirect(`/${locale}/check-email?signup=1`);
+  }
+
+  let createdUserId: string;
   try {
     createdUserId = await prisma.$transaction(async (tx) => {
       const org = await tx.organization.create({
@@ -100,15 +126,18 @@ export async function register(formData: FormData) {
       });
       return user.id;
     });
-  } catch {
-    // Unique-email violation (or any create failure) — surface as a
-    // friendly "already registered" rather than a 500.
+  } catch (err) {
+    // Lost a race with a concurrent signup for the same address (unique
+    // violation on User.email): that is the "already exists" case, answered
+    // the same way as above. Anything else is a real failure.
+    if (!isUniqueViolation(err)) throw err;
+    const raced = await prisma.user.findUnique({
+      where: { email },
+      select: { id: true, deactivatedAt: true },
+    });
+    if (raced) await notifyExistingAccount(raced, email, locale, ip);
+    redirect(`/${locale}/check-email?signup=1`);
   }
-  // Don't leak whether the email already exists — same outcome as a
-  // generic validation failure. The legitimate owner sees a sign-in
-  // prompt via the standard ?error=1 banner; an attacker enumerating
-  // emails learns nothing.
-  if (!createdUserId) redirect(`/${locale}/signup?error=1${tail}`);
   await recordAudit(createdUserId, "user.register", `User:${email}`, {
     ip,
     orgName,
@@ -117,11 +146,14 @@ export async function register(formData: FormData) {
 
   const catalogUrl = `${appUrl()}/${locale}/onboarding`;
   const welcome = welcomeEmail({ catalogUrl, locale, appName: appName() });
-  try {
-    await emailAdapter({ to: email, subject: welcome.subject, text: welcome.text, html: welcome.html });
-  } catch (err) {
-    console.error("auth.welcome_email_failed", { userId: createdUserId, err });
-  }
+  const welcomeUserId = createdUserId;
+  after(async () => {
+    try {
+      await emailAdapter({ to: email, subject: welcome.subject, text: welcome.text, html: welcome.html });
+    } catch (err) {
+      console.error("auth.welcome_email_failed", { userId: welcomeUserId, err });
+    }
+  });
 
   // Both signup paths (password + passwordless) deliver a magic-link
   // and land the user on /check-email. The link consume in
@@ -156,5 +188,53 @@ export async function register(formData: FormData) {
       { ip },
     );
   });
-  redirect(`/${locale}/check-email`);
+  redirect(`/${locale}/check-email?signup=1`);
+}
+
+function isUniqueViolation(err: unknown): boolean {
+  return (
+    typeof err === "object" &&
+    err !== null &&
+    (err as { code?: string }).code === "P2002"
+  );
+}
+
+// The "you already have an account" mail for a signup that hit an existing
+// address. It carries a magic link, which also verifies an account that
+// signed up earlier and never clicked its first link. A deactivated account
+// gets nothing: the link couldn't sign it in, and "you're back" would be a
+// lie. Mail and audit run after the response, like every other auth mail,
+// so the two signup branches return on the same code path.
+async function notifyExistingAccount(
+  user: { id: string; deactivatedAt: Date | null },
+  email: string,
+  locale: string,
+  ip: string,
+): Promise<void> {
+  if (user.deactivatedAt) {
+    after(() => recordAudit(user.id, "auth.signup_existing_deactivated", `User:${email}`, { ip }));
+    return;
+  }
+  const raw = generateToken();
+  await prisma.magicLinkToken.create({
+    data: {
+      userId: user.id,
+      tokenHash: hashToken(raw),
+      expiresAt: tokenExpiry(),
+      requestedIp: ip,
+    },
+  });
+  const msg = accountExistsEmail({
+    url: `${appUrl()}/${locale}/magic-link/${raw}`,
+    locale,
+    appName: appName(),
+  });
+  after(async () => {
+    try {
+      await emailAdapter({ to: email, subject: msg.subject, text: msg.text, html: msg.html });
+    } catch (err) {
+      console.error("auth.account_exists_email_failed", { userId: user.id, err });
+    }
+    await recordAudit(user.id, "auth.signup_existing_account", `User:${email}`, { ip });
+  });
 }

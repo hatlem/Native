@@ -8,8 +8,9 @@
 
 import { MarketCode } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
-import { isProductPriceShown } from "@/lib/pricing-visibility";
-import { indicativeFromRules, toRateRules } from "@/lib/money";
+import { plannablePrice, productBand } from "@/lib/pricing/display-price";
+import { bandLabel } from "@/lib/pricing/bands";
+import { loadPricingDefaults } from "@/lib/content-fee";
 import {
   extractFacets,
   mergeFacets,
@@ -55,6 +56,7 @@ export async function recommendForBrief(input: {
   const brief = (input.brief ?? "").slice(0, BRIEF_MAX);
   const locale = input.locale ?? "en";
 
+  const defaults = await loadPricingDefaults();
   const recProducts = await prisma.product.findMany({
     where: {
       active: true,
@@ -65,7 +67,7 @@ export async function recommendForBrief(input: {
       title: {
         include: {
           publisher: { select: { pricesPublic: true } },
-          market: { select: { currency: true } },
+          market: { select: { code: true, currency: true } },
         },
       },
       priceRules: true,
@@ -79,7 +81,11 @@ export async function recommendForBrief(input: {
   for (const p of recProducts) {
     const reach = p.title.digitalReach ?? p.title.monthlyReach ?? 0;
     const cur = p.currency ?? p.title.market?.currency ?? "EUR";
-    if (isProductPriceShown(p, p.title)) {
+    // Only a per-placement price can be fitted into a budget; CPM/CPC and
+    // hidden-price products join the "price on request" tier instead.
+    const unitPrice = plannablePrice(p, p.title, defaults);
+    const band = productBand(p, p.title, defaults);
+    if (unitPrice !== null && band) {
       priced.push({
         productId: p.id,
         titleId: p.titleId,
@@ -87,7 +93,8 @@ export async function recommendForBrief(input: {
         category: p.title.category,
         type: p.type,
         reach,
-        unitPrice: indicativeFromRules(Number(p.basePrice), toRateRules(p.priceRules)),
+        unitPrice,
+        priceBand: bandLabel(band, cur),
       });
     } else if (!unpricedByTitle.has(p.titleId)) {
       unpricedByTitle.set(p.titleId, {

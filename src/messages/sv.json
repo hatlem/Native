@@ -145,12 +145,10 @@
     "subtitle": "Få ett förslag på titelmix för din marknad och budget.",
     "market": "Marknad",
     "budget": "Budget",
-    "category": "Kategori",
-    "anyCategory": "Alla kategorier",
+    "category": "Målgrupp",
+    "anyCategory": "Alla målgrupper",
     "suggest": "Föreslå en mix",
     "reach": "Räckvidd",
-    "cost": "Kostnad",
-    "remaining": "Budget kvar",
     "none": "Ingen mix får plats i den budgeten — prova högre budget eller en annan marknad.",
     "addAll": "Lägg alla i planen",
     "addingAll": "Lägger till…",
@@ -160,10 +158,12 @@
     "hintTitle": "Berätta marknad och budget",
     "marketPlaceholder": "Välj en marknad",
     "reachSub": "Samlad månatlig räckvidd",
-    "ofBudget": "av {budget} budget",
-    "remainingSub": "Utrymme för fler rader",
     "mixEyebrow": "Föreslagen mix",
-    "mixHeading": "Titlar som passar din brief"
+    "mixHeading": "Titlar som passar din brief",
+    "titles": "Titlar",
+    "fitsBudget": "Allt inom budgeten på {budget}",
+    "bandNote": "Priserna visas som intervall. Desken bekräftar exakta priser i din offert.",
+    "reachUnknown": "inte angiven"
   },
   "home": {
     "title": "Köp native-innehåll i premium tidningar och magasin",
@@ -720,12 +720,12 @@
     "requestingAs": "Beställer som",
     "loginRequired": "Logga in eller skapa ett konto för att begära offert:",
     "selectClient": "Välj en kund att agera för i",
-    "fromPrice": "från {price}",
     "targetAudienceLabel": "Målgruppssegment (valfritt)",
     "targetGeoLabel": "Geografiskt fokus (valfritt)",
     "targetGeoPlaceholder": "t.ex. NO, SE — eller Götaland, Stockholm",
     "targetContextLabel": "Redaktionellt sammanhang (valfritt)",
-    "targetContextPlaceholder": "t.ex. näringsliv, livsstil, sport"
+    "targetContextPlaceholder": "t.ex. näringsliv, livsstil, sport",
+    "priceBand": "≈ {band}"
   },
   "requests": {
     "title": "Förfrågan",
@@ -1120,7 +1120,7 @@
     "signupTitle": "Skapa konto",
     "signupSubtitle": "Fem fält. Vi frågar om resten när du behöver det.",
     "signupHeadline": "Gratis konto. Varje native-titel vi täcker.",
-    "signupLead": "3 000+ titlar över 9 marknader, transparent prissättning, fast offert inom 24 timmar. Du förbinder dig till ingenting förrän briefen är skickad.",
+    "signupLead": "{count}+ titlar över 9 marknader, transparent prissättning, fast offert inom 24 timmar. Du förbinder dig till ingenting förrän briefen är skickad.",
     "bulletCatalog": "Native lever där läsare lägger tid: 3–5× uppehållstid vs display, lånad trovärdighet från titeln, indexerad och bestående i sök.",
     "bulletDesk": "Hela katalogen öppen, transparent prissättning. Inga telefonrundor, inga PDF-prislistor, inga fyra veckors förhandlingar.",
     "bulletReports": "Brief en gång. Desken förhandlar, skriver, kvalitetssäkrar, publicerar. Du godkänner.",
@@ -1142,7 +1142,7 @@
     "pwHint": "Minst 8 tecken.",
     "noAccount": "Inget konto?",
     "haveAccount": "Har du redan ett konto?",
-    "regFailed": "Fyll i alla obligatoriska fält (lösenord min. 8 tecken).",
+    "regFailed": "Fyll i företagsnamn och jobbmejl.",
     "regRateLimited": "För många registreringsförsök — vänta en minut och försök igen.",
     "regEmailBusiness": "Använd din jobb-e-post — personlig e-post (gmail, yahoo m.fl.) och tillfälliga e-posttjänster tillåts inte.",
     "regExists": "Det finns redan ett konto med den e-postadressen.",
@@ -1184,15 +1184,21 @@
     "backToSignin": "Tillbaka till inloggning",
     "signupSubtitleShort": "Tre fält. Vi frågar om resten när du är inne.",
     "setPasswordSummary": "Sätt ett lösenord (valfritt)",
-    "pwHintOptional": "Minst 8 tecken. Lämna tomt för att logga in med magic-link.",
-    "magicLinkSignupNote": "Hoppa över lösenordet, så skickar vi en magic-link för inloggning.",
+    "pwHintOptional": "Minst 8 tecken. Lämna tomt så loggar du in med en länk via mejl i stället.",
+    "magicLinkSignupNote": "Hoppa över lösenordet, så mejlar vi en inloggningslänk.",
     "regPasswordTooShort": "Lösenordet måste vara minst 8 tecken.",
     "deactivatedSignin": "Det här kontot är avaktiverat. Kontakta desken om det ska slås på igen.",
     "emailChangedOk": "E-postadressen är uppdaterad — logga in med din nya adress.",
     "deactivatedTitle": "Det här kontot är avaktiverat",
     "deactivatedBody": "Ditt konto är avstängt, så det finns inget att använda här. Logga ut nedan, och kontakta desken om du tror att det är ett misstag.",
     "writerClaimSubmit": "Skapa skribentkonto",
-    "writerClaimSubmitting": "Skapar…"
+    "writerClaimSubmitting": "Skapar…",
+    "regEmailInvalid": "E-postadressen ser inte riktigt rätt ut. Kolla att den är rätt skriven.",
+    "regEmailNoMailServer": "Vi hittar ingen e-postserver för den domänen, så mejl dit skulle aldrig komma fram. Kolla att adressen är rätt skriven.",
+    "emailRequired": "Fyll i din e-postadress först.",
+    "attemptsRateLimited": "För många försök. Vänta en minut och försök igen.",
+    "checkSignupTitle": "Bekräfta din e-postadress",
+    "checkSignupLead": "Vi har skickat en länk till adressen du angav. Öppna den för att bekräfta adressen och logga in; den går ut om 15 minuter. Om adressen redan hade ett konto förklarar mejlet hur du kommer in igen."
   },
   "order": {
     "title": "Order",
@@ -1438,7 +1444,7 @@
     "catalogStatusNote": "Priser ändrar du på prissidan. Katalogstatus (bokningsbar, och om en produkt kan direktbeställas) hanteras av NativeSpin-desken."
   },
   "formats": {
-    "metaTitle": "Native-format — NativeSpin",
+    "metaTitle": "Native-format",
     "eyebrow": "Format",
     "title": "Fyra sätt att köra native — välj det som passar.",
     "lead": "Varje titel i vår katalog stödjer ett eller flera av dessa fyra format. Skillnaden är vems röst du betalar för och hur framträdande varumärket är.",
@@ -1826,7 +1832,7 @@
   },
   "about": {
     "eyebrow": "Om oss",
-    "metaTitle": "Om NativeSpin",
+    "metaTitle": "Om oss",
     "title": "Native är operativt jobbigt. Vi fixar det.",
     "lead": "NativeSpin är en marknadsplats för att köpa native-innehåll och native-annonsering i tidningar och tidskrifter — inklusive de många som inte säljer programmatiskt.",
     "missionTitle": "Mission",
@@ -2018,7 +2024,7 @@
     "faqTitle": "Vanliga frågor"
   },
   "contact": {
-    "metaTitle": "Kontakta NativeSpin",
+    "metaTitle": "Kontakt",
     "eyebrow": "Kontakt",
     "title": "Hör av er",
     "lead": "Välj rätt kanal nedan, eller använd formuläret. Vi svarar på alla meddelanden inom en arbetsdag.",
@@ -2057,7 +2063,16 @@
     "messagePlaceholder": "Vad försöker ni göra, och när?",
     "submit": "Skicka meddelande",
     "altPrefix": "Nyfiken på vilka som står bakom NativeSpin?",
-    "altLink": "Läs om oss →"
+    "altLink": "Läs om oss →",
+    "sending": "Skickar …",
+    "sentTitle": "Meddelandet är skickat",
+    "sentBody": "Tack. Meddelandet ligger hos teamet nu, och vi svarar via mejl inom en arbetsdag.",
+    "errRequired": "Måste fyllas i.",
+    "errInvalid": "Välj ett av alternativen.",
+    "errEmail": "E-postadressen ser inte riktigt rätt ut.",
+    "errTooLong": "Det är längre än vi kan ta emot. Korta ner det lite.",
+    "errRate": "Du har skickat flera meddelanden på kort tid. Vänta en stund och försök igen.",
+    "errSend": "Meddelandet kom inte fram till oss. Försök igen om en minut, eller mejla hello@nativespin.com direkt."
   },
   "security": {
     "metaTitle": "Säkerhet",
@@ -2343,8 +2358,8 @@
     }
   },
   "apiDocs": {
-    "metaTitle": "NativeSpin API",
-    "eyebrow": "Developers",
+    "metaTitle": "API",
+    "eyebrow": "Utvecklare",
     "title": "NativeSpins offentliga katalog-API",
     "lead": "Ett läs-API över NativeSpins titelkatalog — byggt för byråverktyg (Atlas-stil) och adtech-partner som behöver normaliserade utbudsdata för redaktionellt native över våra 9 marknader — Norge, Sverige, Danmark, Finland, Tyskland, Österrike, Schweiz, Storbritannien och Irland.",
     "authTitle": "Autentisering",
@@ -2356,11 +2371,11 @@
     "queryParams": "Frågeparametrar",
     "detailBody": "Detaljer per titel: utgivare, marknad (med momssats och annonsmärkning) och varje aktiv produkt med innehållskrav, ledtid och prisintervall.",
     "detailIncludes": "Priser anges som intervall (till exempel ”25–40k NOK”), aldrig som exakta belopp: det fasta priset kommer i en offert. Innehållskraven omfattar ordgränser, minsta antal bilder och annonsmärkningen.",
-    "paginationTitle": "Pagination",
+    "paginationTitle": "Paginering",
     "paginationBody": "Markörbaserad. Skicka tillbaka page.nextCursor som cursor tills den är null: först då är synken klar. Sorteringen är stabil (namn + id), så en full synk missar aldrig rader även om titlar aktiveras eller inaktiveras under tiden.",
     "limitsTitle": "Hastighetsgränser",
     "limitsBody": "Per-nyckel-bursts jämnas ut genom samma bucket som RFQ-flödet använder. Ett 429-svar inkluderar en ungefärlig retry-after i meddelandets brödtext. Långvariga hög-genomströmnings-partner får högre gränser — fråga när du frågar efter en nyckel.",
-    "errorsTitle": "Errors",
+    "errorsTitle": "Fel",
     "errorsBody": "Fel returneras som JSON med en stabil kod och ett läsbart meddelande. En ogiltig parameter ger 400 BAD_PARAM, där error.details namnger var och en; inget ignoreras i tysthet. Alla koder finns i OpenAPI-specifikationen på /api/openapi.json.",
     "ctaTitle": "Behöver du en nyckel?",
     "ctaBody": "Vi tillhandahåller inte API:t automatiskt — partnerintegrationer har kommersiella implikationer som vi vill prata igenom först. Hör av dig, så får du en fungerande nyckel inom en arbetsdag.",
@@ -2745,7 +2760,7 @@
     "currentPasswordLabel": "Nuvarande lösenord",
     "newPasswordLabel": "Nytt lösenord",
     "pwHint": "Minst 8 tecken.",
-    "passwordlessNote": "Du loggar nu in med endast magic-link. Sätt ett lösenord om du vill ha båda möjligheterna.",
+    "passwordlessNote": "Du loggar nu bara in med länkar via mejl. Ange ett lösenord om du vill ha båda möjligheterna.",
     "savePasswordSet": "Sätt lösenord",
     "savePasswordChange": "Ändra lösenord",
     "saveMember": "Spara",
@@ -2825,7 +2840,8 @@
     "errDelegation": "Slutdatumet för delegeringen är inte ett giltigt datum.",
     "errDelegationPast": "Slutdatumet för delegeringen måste ligga i framtiden.",
     "canCommitAdminNote": "Administratörer har alltid beställningsrätt.",
-    "statusRevoked": "Borttagen"
+    "statusRevoked": "Borttagen",
+    "errEmailDomain": "Vi hittar ingen e-postserver för den domänen. Kolla att adressen är rätt skriven."
   },
   "rateCard": {
     "pageTitle": "Rate card-förfrågan",
@@ -3146,7 +3162,6 @@
     "resultsAlsoConsider": "Också värt att överväga",
     "resultsEmpty": "Inga träffar ännu – prova en bredare brief eller en annan marknad.",
     "whyFits": "Därför passar den:",
-    "fromPrice": "från {price}",
     "reach": "räckvidd/mån",
     "requestPrice": "Begär pris",
     "addToShortlist": "Lägg till i urvalet",
@@ -3201,7 +3216,8 @@
     "kycAddress2": "Adressrad 2",
     "kycPostal": "Postnummer",
     "kycCity": "Ort",
-    "kycSave": "Spara uppgifter"
+    "kycSave": "Spara uppgifter",
+    "priceBand": "≈ {band}"
   },
   "buyerHome": {
     "headingNeeds": "{count, plural, =1 {1 sak behöver dig} other {# saker behöver dig}}",
@@ -3588,5 +3604,10 @@
         "portfolioUrl": "Ange en fullständig länk som börjar med https://"
       }
     }
+  },
+  "listNames": {
+    "untitled": "Ny plan",
+    "imported": "Importerad plan",
+    "reordered": "Beställd igen"
   }
 }

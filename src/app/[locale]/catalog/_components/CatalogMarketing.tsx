@@ -1,5 +1,6 @@
 import { getTranslations } from "next-intl/server";
 import { prisma } from "@/lib/prisma";
+import { catalogTitleCount } from "@/lib/catalog-stats";
 import { Link } from "@/i18n/navigation";
 import { intlLocale } from "@/lib/money";
 import { LandingShell } from "@/app/landing-shell";
@@ -15,7 +16,8 @@ export async function CatalogMarketing({ locale }: { locale: string }) {
 
   const [titleCount, productCount, distinctMarkets, featured] =
     await Promise.all([
-      prisma.title.count({ where: { active: true } }),
+      // Same count as the home page and page titles — see @/lib/catalog-stats.
+      catalogTitleCount(),
       prisma.product.count({ where: { active: true } }),
       prisma.title
         .findMany({
@@ -25,8 +27,9 @@ export async function CatalogMarketing({ locale }: { locale: string }) {
         })
         .then((rows) => rows.length),
       prisma.title.findMany({
-        where: { active: true },
-        orderBy: [{ monthlyReach: "desc" }, { name: "asc" }],
+        where: { active: true, monthlyReach: { not: null } },
+        // NULLS LAST: Postgres puts nulls first on DESC (see the home page).
+        orderBy: [{ monthlyReach: { sort: "desc", nulls: "last" } }, { name: "asc" }],
         take: 6,
         include: {
           publisher: { select: { name: true } },

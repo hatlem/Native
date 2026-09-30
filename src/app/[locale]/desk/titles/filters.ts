@@ -1,7 +1,8 @@
 import { MarketCode } from "@prisma/client";
 import type { FreshnessBucket } from "@/lib/pricing/freshness";
+import { SUPPORTED_MARKETS, isSupportedMarket } from "@/lib/markets";
 
-export const MARKET_CODES = Object.values(MarketCode);
+export const MARKET_CODES = SUPPORTED_MARKETS;
 export const STATUS_VALUES = ["all", "unverified", "active", "no-native"] as const;
 export type StatusFilter = (typeof STATUS_VALUES)[number];
 
@@ -23,7 +24,7 @@ export const URL_STATUS_VALUES = ["VERIFIED", "LIKELY_OK", "UNVERIFIED"] as cons
 export const PAGE_SIZE = 60;
 
 export function asMarket(value: string | undefined): MarketCode | undefined {
-  return value && (MARKET_CODES as string[]).includes(value)
+  return value && isSupportedMarket(value)
     ? (value as MarketCode)
     : undefined;
 }

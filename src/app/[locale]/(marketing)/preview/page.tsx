@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import { getTranslations } from "next-intl/server";
 import { prisma } from "@/lib/prisma";
 import { LandingShell } from "@/app/landing-shell";
@@ -8,13 +9,22 @@ import { PreviewStudio } from "../_components/PreviewStudio";
 
 export const dynamic = "force-dynamic";
 
-export const metadata = {
-  title: "Preview your own native ad — NativeSpin",
-};
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ locale: string }>;
+}): Promise<Metadata> {
+  const { locale } = await params;
+  const t = await getTranslations({ locale, namespace: "landing" });
+  return {
+    title: t("studio.metaTitle"),
+  };
+}
 
 export default async function PreviewPage({ params }: { params: Promise<{ locale: string }> }) {
   const { locale } = await params;
   const t = await getTranslations({ locale, namespace: "landing" });
+  const tMarket = await getTranslations({ locale, namespace: "market" });
 
   const rows = await prisma.market.findMany({
     select: { code: true, name: true, disclosureLabel: true },
@@ -24,7 +34,8 @@ export default async function PreviewPage({ params }: { params: Promise<{ locale
     .filter((m) => allowed.has(m.code))
     .map((m) => ({
       code: m.code as MarketCode,
-      name: m.name,
+      // Localized label, not Market.name (English: "Norway" on /no).
+      name: tMarket(m.code),
       disclosureLabel: m.disclosureLabel || "Sponsored content",
     }));
 

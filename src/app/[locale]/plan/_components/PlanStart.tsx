@@ -1,12 +1,12 @@
 import { getTranslations } from "next-intl/server";
 import { MarketCode } from "@prisma/client";
 import { Link } from "@/i18n/navigation";
-import { formatMoney } from "@/lib/money";
 import type { Candidate, SupplementaryTitle } from "@/lib/recommend";
 import { addToPlan } from "@/app/plan-actions";
 import { SubmitButton } from "@/components";
+import { SUPPORTED_MARKETS } from "@/lib/markets";
 
-const MARKET_CODES = Object.values(MarketCode);
+const MARKET_CODES = SUPPORTED_MARKETS;
 
 // Empty-basket start screen: brief + budget recommender form, with the
 // tiered title suggestions rendered alongside once a market is chosen.
@@ -17,7 +17,6 @@ export async function PlanStart({
   recBudgetRaw,
   homeMarket,
   rec,
-  recCurrency,
   briefMatched,
 }: {
   locale: string;
@@ -26,7 +25,6 @@ export async function PlanStart({
   recBudgetRaw: string;
   homeMarket: MarketCode | null;
   rec: { picks: Candidate[]; supplementary: SupplementaryTitle[] } | null;
-  recCurrency: string;
   briefMatched: boolean;
 }) {
   const t = await getTranslations({ locale, namespace: "plan" });
@@ -86,7 +84,8 @@ export async function PlanStart({
                     <div>
                       <div className="title">{p.titleName}</div>
                       <div className="sub muted small">
-                        {tType(p.type)} · {tr("fromPrice", { price: formatMoney(p.unitPrice, recCurrency, locale) })}
+                        {tType(p.type)}
+                        {p.priceBand ? ` · ${tr("priceBand", { band: p.priceBand })}` : ""}
                         {p.reach > 0 ? ` · ${p.reach.toLocaleString(locale)} ${t("reach")}` : ""}
                       </div>
                       {p.reasonText ? (

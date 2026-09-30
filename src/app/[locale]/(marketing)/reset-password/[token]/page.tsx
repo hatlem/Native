@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import { getTranslations } from "next-intl/server";
 import { Link } from "@/i18n/navigation";
 import { resetPassword } from "@/app/password-actions";
@@ -6,6 +7,20 @@ import { prisma } from "@/lib/prisma";
 import { hashToken } from "@/lib/tokens";
 
 export const dynamic = "force-dynamic";
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ locale: string; token: string }>;
+}): Promise<Metadata> {
+  const { locale } = await params;
+  const t = await getTranslations({ locale, namespace: "auth" });
+  return {
+    title: t("resetTitle"),
+    // One-off, token- or flow-bound page: nothing to index.
+    robots: { index: false, follow: false },
+  };
+}
 
 export default async function ResetPasswordPage({
   params,
@@ -47,6 +62,14 @@ export default async function ResetPasswordPage({
   }
 
   const errorKind = sp.error;
+  const errorMessage =
+    errorKind === "rate"
+      ? t("attemptsRateLimited")
+      : errorKind === "password_length"
+        ? t("regPasswordTooShort")
+        : errorKind === "expired"
+          ? t("resetExpired")
+          : null;
 
   return (
     <LandingShell locale={locale} screenLabel="Reset password">
@@ -56,14 +79,9 @@ export default async function ResetPasswordPage({
             <h2>{t("resetTitle")}</h2>
           </div>
 
-          {errorKind === "rate" || errorKind === "1" ? (
+          {errorMessage ? (
             <div className="banner-error" role="alert">
-              <span>{t("failed")}</span>
-            </div>
-          ) : null}
-          {errorKind === "expired" ? (
-            <div className="banner-error" role="alert">
-              <span>{t("resetExpired")}</span>
+              <span>{errorMessage}</span>
             </div>
           ) : null}
 

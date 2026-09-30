@@ -1,17 +1,35 @@
+import type { Metadata } from "next";
 import { getTranslations } from "next-intl/server";
 import { MarketCode } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
-import { indicativeFromRules, toRateRules, formatMoney, intlLocale } from "@/lib/money";
-import { arePricesVisible } from "@/lib/pricing/visibility";
+import { formatMoney, intlLocale } from "@/lib/money";
+import { plannablePrice, productBand } from "@/lib/pricing/display-price";
+import { bandLabel } from "@/lib/pricing/bands";
+import { loadPricingDefaults } from "@/lib/content-fee";
+import { localizeVertical } from "@/lib/taxonomy-i18n";
+import type { AppLocale } from "@/i18n/routing";
 import { EmptyState } from "@/app/empty-state";
 import { recommendMix, type Candidate } from "@/lib/recommend";
 import { addRecommendedPlan } from "@/app/plan-actions";
 import { LandingShell } from "@/app/landing-shell";
 import { SubmitButton } from "@/components";
+import { SUPPORTED_MARKETS, isSupportedMarket } from "@/lib/markets";
 
 export const dynamic = "force-dynamic";
 
-const MARKET_CODES = Object.values(MarketCode);
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ locale: string }>;
+}): Promise<Metadata> {
+  const { locale } = await params;
+  const t = await getTranslations({ locale, namespace: "recommend" });
+  return {
+    title: t("title"),
+  };
+}
+
+const MARKET_CODES = SUPPORTED_MARKETS;
 
 export default async function RecommendPage({
   params,
@@ -29,16 +47,19 @@ export default async function RecommendPage({
 
   const marketCode =
     typeof sp.market === "string" &&
-    (MARKET_CODES as string[]).includes(sp.market)
+    isSupportedMarket(sp.market)
       ? (sp.market as MarketCode)
       : undefined;
   const budget = Math.trunc(Number(sp.budget)) || 0;
   const category =
     typeof sp.category === "string" && sp.category ? sp.category : undefined;
 
-  let candidates: Candidate[] = [];
+  const candidates: Candidate[] = [];
   let currency = "EUR";
   let categories: string[] = [];
+  // Public page: every price shown is a band (display-price.ts), never the
+  // figure. The exact customer price is used only to fit the budget.
+  const bandByProduct = new Map<string, string>();
 
   if (marketCode) {
     const market = await prisma.market.findUnique({
@@ -47,34 +68,55 @@ export default async function RecommendPage({
     });
     currency = market?.currency ?? "EUR";
 
-    const products = await prisma.product.findMany({
-      where: {
-        active: true,
-        bookable: true,
-        confirmedAt: { not: null },
-        title: { active: true, market: { code: marketCode } },
-      },
-      include: {
-        title: { include: { publisher: { select: { pricesPublic: true } } } },
-        priceRules: true,
-      },
-    });
+    const [products, defaults] = await Promise.all([
+      prisma.product.findMany({
+        where: {
+          active: true,
+          bookable: true,
+          confirmedAt: { not: null },
+          title: { active: true, market: { code: marketCode } },
+        },
+        include: {
+          title: {
+            include: {
+              publisher: { select: { pricesPublic: true } },
+              market: { select: { code: true } },
+            },
+          },
+          priceRules: true,
+        },
+      }),
+      loadPricingDefaults(),
+    ]);
 
-    candidates = products
-      .filter((p) => arePricesVisible(p.title))
-      .map((p) => ({
+    for (const p of products) {
+      // FLAT, price-visible products only: a CPM/CPC rate is not a
+      // placement price and can't be fitted into a budget.
+      const unitPrice = plannablePrice(p, p.title, defaults);
+      const band = productBand(p, p.title, defaults);
+      if (unitPrice === null || !band) continue;
+      bandByProduct.set(p.id, bandLabel(band, p.currency));
+      candidates.push({
         productId: p.id,
         titleId: p.titleId,
         titleName: p.title.name,
-        category: p.title.category,
+        // `vertical` is the catalog's audience vocabulary (the same one the
+        // catalog and plan filters use). `category` is free text from the
+        // source sheets, in whichever language each sheet was written.
+        category: p.title.vertical ?? "",
         type: p.type,
-        reach: p.title.monthlyReach ?? 0,
-        unitPrice: indicativeFromRules(
-          Number(p.basePrice),
-          toRateRules(p.priceRules),
+        reach: p.title.digitalReach ?? p.title.monthlyReach ?? 0,
+        unitPrice,
+      });
+    }
+    categories = [...new Set(candidates.map((c) => c.category))]
+      .filter((c) => c.length > 0)
+      .sort((a, b) =>
+        localizeVertical(a, locale as AppLocale).localeCompare(
+          localizeVertical(b, locale as AppLocale),
+          intlLocale(locale),
         ),
-      }));
-    categories = [...new Set(candidates.map((c) => c.category))].sort();
+      );
   }
 
   const result =
@@ -129,7 +171,7 @@ export default async function RecommendPage({
                 <option value="">{t("anyCategory")}</option>
                 {categories.map((cat) => (
                   <option key={cat} value={cat}>
-                    {cat}
+                    {localizeVertical(cat, locale as AppLocale)}
                   </option>
                 ))}
               </select>
@@ -155,24 +197,16 @@ export default async function RecommendPage({
                     <div className="delta">{t("reachSub")}</div>
                   </div>
                   <div className="kpi">
-                    <div className="label">{t("cost")}</div>
-                    <div className="value">
-                      {formatMoney(result.totalCost, currency, locale)}
-                    </div>
+                    <div className="label">{t("titles")}</div>
+                    <div className="value">{result.picks.length}</div>
                     <div className="delta">
-                      {t("ofBudget", {
+                      {t("fitsBudget", {
                         budget: formatMoney(budget, currency, locale),
                       })}
                     </div>
                   </div>
-                  <div className="kpi">
-                    <div className="label">{t("remaining")}</div>
-                    <div className="value">
-                      {formatMoney(result.remaining, currency, locale)}
-                    </div>
-                    <div className="delta">{t("remainingSub")}</div>
-                  </div>
                 </div>
+                <p className="muted small">{t("bandNote")}</p>
 
                 <div className="section-head">
                   <div>
@@ -199,13 +233,18 @@ export default async function RecommendPage({
                     <article className="card" key={p.productId}>
                       <span className="tag">{tType(p.type)}</span>
                       <h3>{p.titleName}</h3>
-                      <p className="muted small">{p.category}</p>
+                      {p.category ? (
+                        <p className="muted small">
+                          {localizeVertical(p.category, locale as AppLocale)}
+                        </p>
+                      ) : null}
                       <p className="muted small">
-                        {t("reach")}: {p.reach.toLocaleString(intlLocale(locale))}
+                        {t("reach")}:{" "}
+                        {p.reach > 0
+                          ? p.reach.toLocaleString(intlLocale(locale))
+                          : t("reachUnknown")}
                       </p>
-                      <div className="price">
-                        {formatMoney(p.unitPrice, currency, locale)}
-                      </div>
+                      <div className="price">≈ {bandByProduct.get(p.productId)}</div>
                     </article>
                   ))}
                 </div>

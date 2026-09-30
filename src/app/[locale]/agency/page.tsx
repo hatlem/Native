@@ -1,16 +1,16 @@
 import { getTranslations } from "next-intl/server";
 import { redirect } from "next/navigation";
-import { MarketCode } from "@prisma/client";
 import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
 import { formatMoney } from "@/lib/money";
 import { getWorkspace } from "@/lib/workspace";
 import { createClient, selectClient } from "@/app/agency-actions";
 import { MailLink, SubmitButton } from "@/components";
+import { SUPPORTED_MARKETS } from "@/lib/markets";
 
 export const dynamic = "force-dynamic";
 
-const MARKET_CODES = Object.values(MarketCode);
+const MARKET_CODES = SUPPORTED_MARKETS;
 
 export default async function AgencyPage({
   params,

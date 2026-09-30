@@ -13,12 +13,31 @@
 // submitted (Plan.name is stored data, not a message key).
 
 import type { BuyerLocale } from "@/lib/market-locale";
+import en from "@/messages/en.json";
+import no from "@/messages/no.json";
+import sv from "@/messages/sv.json";
+import da from "@/messages/da.json";
+import fi from "@/messages/fi.json";
+import de from "@/messages/de.json";
 
-/** System-generated SavedList names — never a buyer's choice. Kept in step
- *  with: the SavedList.name column default and list-actions/favorites
- *  ("Untitled list"), lists.ts basket import ("Imported list") and the
- *  reorder action in plan-actions.ts ("Reordered campaign"). */
-const SYSTEM_LIST_NAMES = new Set(["untitled list", "imported list", "reordered campaign"]);
+/** System-generated SavedList names — never a buyer's choice: the legacy
+ *  English defaults (the SavedList.name column default "Untitled list",
+ *  "Imported list", "Reordered campaign") plus the localized defaults new
+ *  lists get in their creator's language (listNames.* in the messages, see
+ *  @/lib/list-names). Read from the message files so a copy edit there can
+ *  never turn a system name into a "real" plan name here. */
+const SYSTEM_LIST_NAMES = new Set(
+  [
+    "untitled list",
+    "imported list",
+    "reordered campaign",
+    ...[en, no, sv, da, fi, de].flatMap((m) => [
+      m.listNames.untitled,
+      m.listNames.imported,
+      m.listNames.reordered,
+    ]),
+  ].map((n) => n.trim().toLowerCase()),
+);
 
 const CAMPAIGN_WORD: Record<BuyerLocale, string> = {
   en: "campaign",

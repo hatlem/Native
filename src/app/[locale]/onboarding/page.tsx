@@ -1,15 +1,15 @@
 import { getTranslations } from "next-intl/server";
 import { redirect } from "next/navigation";
-import { MarketCode } from "@prisma/client";
 import { auth } from "@/auth";
 import { loadOnboardingState, safeNext } from "@/lib/onboarding-gate";
 import { saveOnboarding } from "@/app/onboarding-actions";
 import { LandingShell } from "@/app/landing-shell";
 import { SubmitButton } from "@/components";
+import { SUPPORTED_MARKETS } from "@/lib/markets";
 
 export const dynamic = "force-dynamic";
 
-const MARKET_CODES = Object.values(MarketCode);
+const MARKET_CODES = SUPPORTED_MARKETS;
 
 // Post-signup onboarding. Two questions the user couldn't be bothered
 // answering at signup but the platform genuinely needs before they can
@@ -73,7 +73,7 @@ export default async function OnboardingPage({
   const errorCode = typeof sp.error === "string" ? sp.error : undefined;
 
   return (
-    <LandingShell locale={locale} screenLabel="Onboarding">
+    <LandingShell locale={locale} screenLabel="Onboarding" withFooter={false}>
       <section className="auth-shell">
         <div className="marketing">
           <span className="eyebrow accent">{t("eyebrow")}</span>
