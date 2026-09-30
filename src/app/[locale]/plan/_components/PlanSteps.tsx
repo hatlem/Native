@@ -5,11 +5,23 @@ export type PlanStep = 2 | 3 | 4;
 // Four-step progress rail: "Find titles" is always done by the time a buyer
 // has lines on /plan, so currentStep only ever varies across the remaining
 // three — derived in page.tsx from whether a Request/Quote/Order exists yet
-// for the active list's most recent submission.
-export async function PlanSteps({ locale, currentStep }: { locale: string; currentStep: PlanStep }) {
+// for the active list's most recent submission. An instant order (every line
+// firm-priced, viewer may order) has no quote step: it is confirmed and then
+// runs, so the rail says so.
+export async function PlanSteps({
+  locale,
+  currentStep,
+  instant = false,
+}: {
+  locale: string;
+  currentStep: PlanStep;
+  instant?: boolean;
+}) {
   const t = await getTranslations({ locale, namespace: "plan.steps" });
   const steps = [1, 2, 3, 4] as const;
-  const labels = [t("find"), t("build"), t("quote"), t("approve")];
+  const labels = instant
+    ? [t("find"), t("build"), t("confirm"), t("run")]
+    : [t("find"), t("build"), t("quote"), t("approve")];
 
   return (
     <>

@@ -77,6 +77,8 @@ if (!RUN_DB_IT) {
         targetContext: "transport",
         targetVerticals: "transport,anlegg",
         note: "internal note",
+        briefText: "Fleet telematics for hauliers",
+        briefTiming: "2026-Q4",
       },
     });
     await addProductItem(list.id, productId, true);
@@ -114,6 +116,9 @@ if (!RUN_DB_IT) {
     assert.equal(w2.targetVerticals, "transport,anlegg");
     assert.equal(w2.targetAudience, "fleet-managers");
     assert.equal(w2.note, "internal note");
+    // The brief text carries over; the timing pick belongs to wave 1's dates.
+    assert.equal(w2.briefText, "Fleet telematics for hauliers");
+    assert.equal(w2.briefTiming, null);
     assert.equal(w2.items.length, 1);
     assert.equal(w2.items[0].productId, productId);
     assert.equal(w2.items[0].withContent, true);
@@ -151,6 +156,7 @@ if (!RUN_DB_IT) {
       spacingWeeks: 6,
       rationaleKey: "default",
       now,
+      waveName: (name, n) => `${name} · Runde ${n}`,
     });
 
     const waves = await prisma.savedList.findMany({
@@ -158,15 +164,18 @@ if (!RUN_DB_IT) {
       orderBy: { waveNumber: "asc" },
       include: { items: true },
     });
-    // Wave 1 IS the source list — untouched, still unscheduled.
-    assert.equal(waves[0].items[0].scheduleStart, null);
-    // Waves 2..N land on exactly the dates the /plan form previewed
-    // (planWaveDates with no first start → current period + k·spacing).
+    // Named in the creator's language.
+    assert.deepEqual(waves.map((w) => w.name), ["Unscheduled · Runde 1", "Unscheduled · Runde 2", "Unscheduled · Runde 3"]);
+    // Every wave, wave 1 (the source list itself) included, lands on exactly
+    // the dates the /plan form previewed (planWaveDates with no first start →
+    // the NEXT period start + k·spacing), none of them in the past.
     const unit = (await prisma.product.findUniqueOrThrow({
       where: { id: productId },
       select: { bookingUnit: true },
     })).bookingUnit;
     const previewed = planWaveDates(null, 3, 6, unit, now);
+    assert.equal(waves[0].items[0].scheduleStart!.toISOString(), previewed[0]!.toISOString());
+    assert.ok(waves[0].items[0].scheduleStart!.getTime() >= Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate()));
     assert.equal(waves[1].items[0].scheduleStart!.toISOString(), previewed[1]!.toISOString());
     assert.equal(waves[2].items[0].scheduleStart!.toISOString(), previewed[2]!.toISOString());
     // Length stays open — the publisher's minimum run applies downstream.

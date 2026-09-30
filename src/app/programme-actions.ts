@@ -1,12 +1,15 @@
 "use server";
 
 import { redirect } from "next/navigation";
+import { getTranslations } from "next-intl/server";
 import type { UserRole } from "@prisma/client";
+import { safeLocale } from "@/i18n/routing";
 import { prisma } from "@/lib/prisma";
 import { recordAudit } from "@/lib/audit";
-import { loadScope, canActOnOrg } from "@/lib/scope";
+import { loadScope } from "@/lib/scope";
 import { requireOrgArticleAccess } from "@/lib/writers/guard";
-import { writeActiveListId } from "@/lib/lists";
+import { alignActivePlan, resolvePlanTarget } from "@/lib/plan-target";
+import { planPath } from "@/lib/plan-path";
 import {
   createProgramme,
   dissolveProgramme as dissolveProgrammeLists,
@@ -20,20 +23,19 @@ function str(formData: FormData, key: string): string {
   return typeof v === "string" ? v.trim() : "";
 }
 
-// Guard shared by both actions: the list must exist, be unarchived, and
-// belong to an org the caller may act on. Anything else bounces to /plan —
-// no leaking of list structure across orgs.
+// Guard shared by every programme action: the posted list (the plan the page
+// shows, never the active-list cookie) must exist, be unarchived, and belong
+// to an org the caller's workspace reaches (lib/plan-target.ts). Anything else
+// bounces to /plan, with no leaking of list structure across orgs. The plan
+// acted on becomes the active one again, and each action lands on its own
+// /plan/<listId>.
 async function ownList(locale: string, listId: string) {
   const scope = await loadScope();
   if (!scope.userId) redirect(`/${locale}/signin`);
-  const list = await prisma.savedList.findUnique({
-    where: { id: listId },
-    select: { id: true, organizationId: true, archivedAt: true },
-  });
-  if (!list || list.archivedAt || !canActOnOrg(scope, list.organizationId)) {
-    redirect(`/${locale}/plan`);
-  }
-  return { scope, list };
+  const target = await resolvePlanTarget(scope.workspace, listId);
+  if (!scope.workspace || !target.ok) redirect(planPath(locale, null, { error: "plan-unavailable" }));
+  await alignActivePlan(scope.workspace, target.list);
+  return { scope, list: target.list };
 }
 
 // "Run this as a programme" — turn the active list into wave 1 and create
@@ -52,6 +54,8 @@ export async function startProgramme(formData: FormData) {
   const autoSend = formData.get("autoSend") === "1";
 
   try {
+    // Waves are named in the creator's language ("Spring · Runde 2").
+    const t = await getTranslations({ locale: safeLocale(locale), namespace: "plan.programme" });
     const result = await createProgramme({
       sourceListId: list.id,
       organizationId: list.organizationId,
@@ -60,6 +64,7 @@ export async function startProgramme(formData: FormData) {
       spacingWeeks,
       rationaleKey,
       autoSend,
+      waveName: (name, n) => t("waveName", { name, n }),
     });
     await recordAudit(scope.userId ?? null, "programme.create", `CampaignProgramme:${result.programmeId}`, {
       sourceListId: list.id,
@@ -72,17 +77,17 @@ export async function startProgramme(formData: FormData) {
     // list with lines) — a tampered/replayed POST just lands back on /plan.
     if (e instanceof ProgrammeError) {
       console.warn("programme.blocked", { reason: e.code, listId: list.id });
-      redirect(`/${locale}/plan`);
+      redirect(planPath(locale, list.id));
     }
     throw e;
   }
-  await writeActiveListId(list.id);
-  // Plain /plan, never /plan?programme=…: this action is posted FROM /plan,
-  // and a same-route redirect that only changes searchParams trips the RSC
-  // "router state header" 503 in prod (see CatalogSort.tsx) — the form would
-  // sit on "Creating…" forever with the programme already made. The wave
-  // strip that replaces the form is the confirmation.
-  redirect(`/${locale}/plan`);
+  // The plan's own address, never /plan/<id>?programme=…: this action is
+  // posted FROM that page, and a same-route redirect that only changes
+  // searchParams trips the RSC "router state header" 503 in prod (see
+  // CatalogSort.tsx) — the form would sit on "Creating…" forever with the
+  // programme already made. The wave strip that replaces the form is the
+  // confirmation.
+  redirect(planPath(locale, list.id));
 }
 
 // "Dissolve programme" from the wave strip — the undo for startProgramme.
@@ -99,15 +104,15 @@ export async function dissolveProgramme(formData: FormData) {
   });
   // Not a wave (already dissolved in another tab, or a tampered POST) —
   // nothing to do, land back on /plan which now shows a plain list.
-  if (!wave?.programmeId) redirect(`/${locale}/plan`);
+  if (!wave?.programmeId) redirect(planPath(locale, list.id));
   const { kept, archived } = await dissolveProgrammeLists(wave.programmeId);
   await recordAudit(scope.userId ?? null, "programme.dissolve", `CampaignProgramme:${wave.programmeId}`, {
     listId: list.id,
     kept,
     archived,
   });
-  // Plain /plan for the same RSC same-route reason as startProgramme above.
-  redirect(`/${locale}/plan`);
+  // The plan's own address, for the same RSC reason as startProgramme above.
+  redirect(planPath(locale, list.id));
 }
 
 // Link an existing (unlinked-elsewhere-or-not) article to this wave —
@@ -121,7 +126,7 @@ export async function linkWaveArticleAction(formData: FormData) {
     where: { id: articleId },
     select: { organizationId: true },
   });
-  if (!article || article.organizationId !== list.organizationId) redirect(`/${locale}/plan`);
+  if (!article || article.organizationId !== list.organizationId) redirect(planPath(locale, list.id));
   try {
     await linkWaveArticle(list.id, articleId);
   } catch (e) {
@@ -130,12 +135,12 @@ export async function linkWaveArticleAction(formData: FormData) {
     // deleted between the two checks) now lands here instead of a 500.
     if (e instanceof ProgrammeError) {
       console.warn("programme.wave_article_link.blocked", { reason: e.code, listId: list.id });
-      redirect(`/${locale}/plan`);
+      redirect(planPath(locale, list.id));
     }
     throw e;
   }
   await recordAudit(scope.userId ?? null, "programme.wave_article_link", `SavedList:${list.id}`, { articleId });
-  redirect(`/${locale}/plan`);
+  redirect(planPath(locale, list.id));
 }
 
 export async function unlinkWaveArticleAction(formData: FormData) {
@@ -144,7 +149,7 @@ export async function unlinkWaveArticleAction(formData: FormData) {
   const { scope, list } = await ownList(locale, listId);
   await unlinkWaveArticle(list.id);
   await recordAudit(scope.userId ?? null, "programme.wave_article_unlink", `SavedList:${list.id}`);
-  redirect(`/${locale}/plan`);
+  redirect(planPath(locale, list.id));
 }
 
 // Create a brand-new article and link it to this wave in one step — the
@@ -158,7 +163,7 @@ export async function createAndLinkWaveArticle(formData: FormData) {
   const title = str(formData, "title");
   const { list } = await ownList(locale, listId);
   const { userId, role } = await requireOrgArticleAccess(list.organizationId, locale);
-  if (!title) redirect(`/${locale}/plan`);
+  if (!title) redirect(planPath(locale, list.id));
   const article = await prisma.article.create({
     data: {
       organizationId: list.organizationId,

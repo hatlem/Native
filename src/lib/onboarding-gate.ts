@@ -2,7 +2,7 @@ import { redirect } from "next/navigation";
 import type { Session } from "next-auth";
 import type { MarketCode } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
-import { getWorkspace } from "@/lib/workspace";
+import { getWorkspace, loadWorkspace } from "@/lib/workspace";
 
 // Re-exported: onboarding was the first user of the same-origin `next` check.
 export { safeNext } from "@/lib/auth-gate";
@@ -47,8 +47,11 @@ export type OnboardingState = OnboardingNeeds & {
   org: { id: string; name: string; marketCode: MarketCode | null } | null;
 };
 
-export async function loadOnboardingState(userId: string): Promise<OnboardingState> {
-  const ws = await getWorkspace(userId);
+// `orgId` names the org explicitly (checkout acts on the org of the plan it
+// submits, which a stale tab may not have switched to); by default it is the
+// org the user is working in.
+export async function loadOnboardingState(userId: string, orgId?: string): Promise<OnboardingState> {
+  const ws = orgId ? await loadWorkspace(userId, orgId) : await getWorkspace(userId);
   const [user, org] = await Promise.all([
     prisma.user.findUnique({ where: { id: userId }, select: { phone: true } }),
     ws?.activeOrgId
@@ -78,10 +81,11 @@ export async function requireOnboardingBeforeBuy(
   session: Session | null,
   locale: string,
   returnTo: string,
+  orgId?: string,
 ): Promise<void> {
   if (!session?.user?.id) return;
   if (session.user.role && session.user.role !== "BUYER") return;
-  const state = await loadOnboardingState(session.user.id);
+  const state = await loadOnboardingState(session.user.id, orgId);
   if (!state.complete) {
     const next = encodeURIComponent(returnTo);
     redirect(`/${locale}/onboarding?next=${next}`);

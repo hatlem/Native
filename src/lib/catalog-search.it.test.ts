@@ -1,7 +1,7 @@
 import { test, before, after } from "node:test";
 import assert from "node:assert/strict";
 import { prisma } from "./prisma";
-import { searchTitleIds } from "./catalog-search";
+import { resolveCatalogSearch, searchTitleIds } from "./catalog-search";
 
 // Index side (the generated "searchTsv", migration
 // 20260924120000_fts_split_separators) and query side (buildTsQuery) must
@@ -20,6 +20,9 @@ const TITLES = [
   { key: "merged", name: "StrategicRISK", aliases: ["Strategic Risk"], url: "https://www.strategic-risk-global.com" },
   { key: "installer", name: "Installatøren", aliases: [], url: "https://www.fts-it-installer.example" },
   { key: "semi", name: "Semitrailer Nytt", aliases: [], url: "https://www.fts-it-semi.example" },
+  // Unique made-up words so the assertions don't depend on the rest of the DB.
+  { key: "zq", name: "Zqøyvik Budstikke", aliases: ["Qwxasker og Qwxbærums Budstikke"], url: "https://www.fts-it-zq.example" },
+  { key: "zq2", name: "Qwxasker Posten", aliases: [], url: "https://www.fts-it-zq2.example" },
 ] as const;
 
 const ids: Record<string, string> = {};
@@ -89,4 +92,38 @@ test("FTS: trade vocabulary reaches titles named with a synonym", { skip: !RUN_D
   // "semitrailer" sits past the per-word synonym cap in the transport group;
   // the searched word itself must still be queried.
   assert.ok(await finds("semitrailer", "semi"));
+});
+
+async function resolves(query: string, key: string): Promise<{ found: boolean; match: string | undefined }> {
+  const search = await resolveCatalogSearch(query);
+  const hits = search
+    ? await prisma.title.findMany({ where: { AND: [search.where, { id: { startsWith: PREFIX } }] }, select: { id: true } })
+    : [];
+  return { found: hits.some((h) => h.id === ids[key]), match: search?.match };
+}
+
+test("search: a multi-word query matches EVERY word (filler words aside), not any", { skip: !RUN_DB_IT }, async () => {
+  // Before: "og" alone matched (OR per word), flooding the results.
+  const both = await resolves("Qwxasker og Qwxbærum", "zq");
+  assert.deepEqual(both, { found: true, match: "all" });
+  // A title with only one of the words is not an all-words match.
+  assert.equal((await resolves("Qwxasker og Qwxbærum", "zq2")).found, false);
+});
+
+test("search: widens to ANY word only when nothing matches them all, and says so", { skip: !RUN_DB_IT }, async () => {
+  const widened = await resolves("Qwxasker Nonexistentword", "zq2");
+  assert.deepEqual(widened, { found: true, match: "some" });
+});
+
+test("search: a publisher's name finds its titles (the index has no publisher column)", { skip: !RUN_DB_IT }, async () => {
+  const pub = await prisma.title.findUniqueOrThrow({ where: { id: ids.zq }, select: { publisher: { select: { name: true } } } });
+  const hits = await resolveCatalogSearch(pub.publisher.name);
+  const found = await prisma.title.findMany({ where: { AND: [hits!.where, { id: ids.zq }] }, select: { id: true } });
+  assert.equal(found.length, 1);
+});
+
+test("search: ASCII spellings find æ/ø/å names", { skip: !RUN_DB_IT }, async () => {
+  assert.ok((await resolves("zqoyvik", "zq")).found, "ø typed as o");
+  assert.ok((await resolves("qwxbaerums", "zq")).found, "æ typed as ae");
+  assert.ok((await resolves("Zqøyvik", "zq")).found, "as written");
 });

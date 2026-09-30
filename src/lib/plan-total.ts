@@ -147,3 +147,30 @@ export function estimateListTotals(items: EstimableListItem[], pricing: PlanPric
     return { ...total, totalInclVat, vat: totalInclVat - total.amount };
   });
 }
+
+export type PlanBarSummary = {
+  // Product ids on the plan (alternatives excluded): drives each catalog row's
+  // "On plan" state.
+  productIds: string[];
+  // Lines on the plan, placements and not-yet-placed titles alike (the count
+  // /plan's header shows).
+  count: number;
+  totals: Array<{ currency: string; amount: number; itemCount: number }>;
+};
+
+// The catalog's sticky plan bar: the same totals as /plan (estimateListTotals,
+// the order's pricing: customer price and content fees), never a figure
+// computed in the browser from a product's net base price.
+export function planBarSummary(
+  items: Array<EstimableListItem & { titleId: string | null }>,
+  pricing: PlanPricing,
+): PlanBarSummary {
+  const committed = items.filter((i) => !i.isAlternative);
+  return {
+    productIds: committed.map((i) => i.productId).filter((id): id is string => id !== null),
+    count: committed.filter((i) => i.productId || i.titleId).length,
+    totals: estimateListTotals(committed, pricing)
+      .filter((r) => r.hasVisible)
+      .map((r) => ({ currency: r.currency, amount: r.amount, itemCount: r.itemCount })),
+  };
+}

@@ -1,6 +1,6 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { estimateListTotals, placementLineTotal, contentFeeFor, type PlanPricing } from "./plan-total";
+import { estimateListTotals, placementLineTotal, contentFeeFor, planBarSummary, type PlanPricing } from "./plan-total";
 import {
   computeContentFeeLines,
   computeQuoteLines,
@@ -212,4 +212,29 @@ test("placementLineTotal and contentFeeFor expose the per-line figures", () => {
   assert.equal(placementLineTotal(product, 2, [{ marketCode: "NO", marginPct: 10, active: true }]), 2200);
   assert.equal(contentFeeFor("NATIVE_DISPLAY", "NO", NO_FEES), 8000);
   assert.equal(contentFeeFor("NATIVE_DISPLAY", "SE", NO_FEES), 0);
+});
+
+// ── The catalog's plan bar ──────────────────────────────────────────────────
+
+test("planBarSummary: the customer price (never the net base price), fees in, alternatives out", () => {
+  const withTitle = (i: FakeItem, titleId: string | null = null) => ({ ...i, titleId });
+  const items = [
+    withTitle(fakeItem({ productId: "p1", basePrice: 1000 })),
+    withTitle(fakeItem({ productId: "p2", basePrice: 10000, withContent: true, type: "NATIVE_DISPLAY" })),
+    withTitle({ ...fakeItem({ productId: "p3", basePrice: 5000 }), isAlternative: true } as FakeItem),
+    withTitle(fakeItem({ productId: null }), "title-1"),
+  ];
+  const summary = planBarSummary(items, { feeRules: NO_FEES, marginRules: [] });
+  assert.deepEqual(summary.productIds, ["p1", "p2"]);
+  // Two placements + one not-yet-placed title; the alternative isn't on the plan.
+  assert.equal(summary.count, 3);
+  // 1 150 + 11 500 + 8 000 article: what /plan shows. The net 1 000 would be
+  // a margin leak on a browse surface.
+  assert.deepEqual(summary.totals, [{ currency: "NOK", amount: 20650, itemCount: 2 }]);
+});
+
+test("planBarSummary: hidden-price lines add no figure", () => {
+  const summary = planBarSummary([{ ...fakeItem({ pricesPublic: false }), titleId: null }], NO_PRICING);
+  assert.equal(summary.count, 1);
+  assert.deepEqual(summary.totals, []);
 });

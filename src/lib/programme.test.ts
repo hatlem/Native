@@ -6,6 +6,9 @@ import {
   shiftScheduleStart,
   anglesFor,
   clampCadence,
+  nextPeriodStart,
+  waveOneStart,
+  stripWaveSuffix,
   dueWaveFromView,
   WAVE_OPTIONS,
   SPACING_OPTIONS,
@@ -82,9 +85,48 @@ test("planWaveDates: from an explicit first start", () => {
   assert.deepEqual(dates.map(iso), ["2026-09-01", "2026-11-01", "2027-01-01"]);
 });
 
-test("planWaveDates: no first start → next period from base", () => {
-  const dates = planWaveDates(null, 2, 4, "WEEK", new Date("2026-08-18T00:00:00Z")); // Tue → Mon 17 Aug
-  assert.deepEqual(dates.map(iso), ["2026-08-17", "2026-09-14"]);
+test("planWaveDates: no first start → the NEXT period from base, never the current one", () => {
+  // Tue 18 Aug: this week began Mon 17 Aug (past), so wave 1 is Mon 24 Aug.
+  const dates = planWaveDates(null, 2, 4, "WEEK", new Date("2026-08-18T00:00:00Z"));
+  assert.deepEqual(dates.map(iso), ["2026-08-24", "2026-09-21"]);
+});
+
+test("planWaveDates: 30 Sep, monthly, 4 weeks apart → 1 Oct, 1 Nov, 1 Dec (the E2E repro)", () => {
+  // Before: wave 1 anchored at 1 Sep (already started) and wave 2 on 1 Oct —
+  // "due tomorrow" the moment the programme existed.
+  const dates = planWaveDates(null, 3, 4, "MONTH", new Date("2026-09-30T10:00:00Z"));
+  assert.deepEqual(dates.map(iso), ["2026-10-01", "2026-11-01", "2026-12-01"]);
+});
+
+test("planWaveDates: a first start already in the past is replaced by the next period", () => {
+  const dates = planWaveDates(new Date("2026-09-01T00:00:00Z"), 2, 8, "MONTH", new Date("2026-09-30T00:00:00Z"));
+  assert.deepEqual(dates.map(iso), ["2026-10-01", "2026-12-01"]);
+});
+
+test("nextPeriodStart: today when today is a period start, else the next one", () => {
+  assert.equal(iso(nextPeriodStart("MONTH", new Date("2026-10-01T15:00:00Z"))), "2026-10-01");
+  assert.equal(iso(nextPeriodStart("MONTH", new Date("2026-10-02T00:00:00Z"))), "2026-11-01");
+  assert.equal(iso(nextPeriodStart("MONTH", new Date("2026-12-15T00:00:00Z"))), "2027-01-01");
+  assert.equal(iso(nextPeriodStart("WEEK", new Date("2026-08-17T09:00:00Z"))), "2026-08-17"); // Monday
+  assert.equal(iso(nextPeriodStart("WEEK", new Date("2026-08-23T09:00:00Z"))), "2026-08-24"); // Sunday
+});
+
+test("waveOneStart: keeps a future start, replaces a missing or past one", () => {
+  const base = new Date("2026-09-30T00:00:00Z");
+  assert.equal(iso(waveOneStart(new Date("2027-02-01T00:00:00Z"), "MONTH", base)), "2027-02-01");
+  assert.equal(iso(waveOneStart(null, "MONTH", base)), "2026-10-01");
+  assert.equal(iso(waveOneStart(new Date("2026-09-01T00:00:00Z"), "MONTH", base)), "2026-10-01");
+});
+
+test("stripWaveSuffix: recognises every UI language's wave word", () => {
+  assert.equal(stripWaveSuffix("Spring · Wave 2"), "Spring");
+  assert.equal(stripWaveSuffix("Vår · Runde 3"), "Vår");
+  assert.equal(stripWaveSuffix("Vår · Omgång 1"), "Vår");
+  assert.equal(stripWaveSuffix("Kevät · Kierros 4"), "Kevät");
+  assert.equal(stripWaveSuffix("Frühling · Welle 2"), "Frühling");
+  // Not a wave suffix: left alone.
+  assert.equal(stripWaveSuffix("Q4 · Oslo 2"), "Q4 · Oslo 2");
+  assert.equal(stripWaveSuffix("Plain plan"), "Plain plan");
 });
 
 // ---------- dueWaveFromView (pure due filter behind findDueWaves / auto-send) ----------

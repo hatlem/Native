@@ -41,9 +41,10 @@ const TAXONOMY: TaxonomyMap = {
   b2c: { no: "B2C", sv: "B2C", da: "B2C", de: "B2C", fi: "B2C" },
 };
 
-// Vertical/audience translations: only translate the common buckets the
-// CSV uses. Everything else (publisher-specific terms, single-title
-// niches) falls through.
+// Vertical/audience translations. Title.vertical is a closed research
+// taxonomy (VERTICALS in the test pins it), so every value is translated;
+// Title.audience is freer text, where only the common buckets are and the
+// rest (publisher-specific terms, single-title niches) falls through.
 const VERTICAL: TaxonomyMap = {
   "business & finance": { no: "Næringsliv og finans", sv: "Näringsliv och finans", da: "Erhverv og finans", de: "Wirtschaft & Finanzen", fi: "Liiketoiminta ja talous" },
   "business decision-makers": { no: "Næringslivs-beslutningstagere", sv: "Affärsbeslutsfattare", da: "Forretningsbeslutningstagere", de: "Geschäftsentscheider", fi: "Liiketoimintapäätökset" },
@@ -69,6 +70,78 @@ const VERTICAL: TaxonomyMap = {
   "science": { no: "Vitenskap", sv: "Vetenskap", da: "Videnskab", de: "Wissenschaft", fi: "Tiede" },
   "food & drink": { no: "Mat og drikke", sv: "Mat och dryck", da: "Mad og drikke", de: "Essen & Trinken", fi: "Ruoka ja juoma" },
   "religious (christian)": { no: "Religiøs (kristen)", sv: "Religiös (kristen)", da: "Religiøs (kristen)", de: "Religiös (christlich)", fi: "Uskonnollinen (kristillinen)" },
+  // Every other Title.vertical the catalog shows, so the "Who reads it?"
+  // filter, the plan's targeting picker and the title page never fall back
+  // to the English research value. taxonomy-i18n.test.ts guards the list.
+  "news (general)": { no: "Nyheter (generelt)", sv: "Nyheter (allmänt)", da: "Nyheder (generelt)", de: "Nachrichten (allgemein)", fi: "Uutiset (yleinen)" },
+  "news (national)": { no: "Nyheter (riksdekkende)", sv: "Nyheter (rikstäckande)", da: "Nyheder (landsdækkende)", de: "Nachrichten (überregional)", fi: "Uutiset (valtakunnallinen)" },
+  "news (national quality)": { no: "Nyheter (riksdekkende kvalitetsavis)", sv: "Nyheter (rikstäckande kvalitetstidning)", da: "Nyheder (landsdækkende kvalitetsavis)", de: "Nachrichten (überregionale Qualitätszeitung)", fi: "Uutiset (valtakunnallinen laatulehti)" },
+  "news (national tabloid)": { no: "Nyheter (riksdekkende tabloid)", sv: "Nyheter (rikstäckande kvällstidning)", da: "Nyheder (landsdækkende tabloid)", de: "Nachrichten (überregionales Boulevardblatt)", fi: "Uutiset (valtakunnallinen iltapäivälehti)" },
+  "news (national mid-market)": { no: "Nyheter (riksdekkende, mellomsegment)", sv: "Nyheter (rikstäckande, mellansegment)", da: "Nyheder (landsdækkende, mellemsegment)", de: "Nachrichten (überregional, Mittelsegment)", fi: "Uutiset (valtakunnallinen, keskisegmentti)" },
+  "news (higher education)": { no: "Nyheter (høyere utdanning)", sv: "Nyheter (högre utbildning)", da: "Nyheder (videregående uddannelse)", de: "Nachrichten (Hochschule)", fi: "Uutiset (korkeakoulutus)" },
+  "community press": { no: "Lokalsamfunnspresse", sv: "Lokalpress", da: "Lokalpresse", de: "Gemeindepresse", fi: "Paikallislehdistö" },
+  "b2b – energy & utilities": { no: "B2B – energi og forsyning", sv: "B2B – energi och försörjning", da: "B2B – energi og forsyning", de: "B2B – Energie & Versorgung", fi: "B2B – energia ja yhdyskuntahuolto" },
+  "b2b – engineering": { no: "B2B – ingeniørfag", sv: "B2B – teknik och ingenjörskap", da: "B2B – ingeniørfag", de: "B2B – Ingenieurwesen", fi: "B2B – insinööriala" },
+  "b2b – finance & insurance": { no: "B2B – finans og forsikring", sv: "B2B – finans och försäkring", da: "B2B – finans og forsikring", de: "B2B – Finanzen & Versicherung", fi: "B2B – rahoitus ja vakuutus" },
+  "b2b – hospitality": { no: "B2B – hotell og restaurant", sv: "B2B – hotell och restaurang", da: "B2B – hotel og restauration", de: "B2B – Hotellerie & Gastronomie", fi: "B2B – hotelli- ja ravintola-ala" },
+  "b2b – hr & management": { no: "B2B – HR og ledelse", sv: "B2B – HR och ledarskap", da: "B2B – HR og ledelse", de: "B2B – HR & Management", fi: "B2B – HR ja johtaminen" },
+  "b2b – it & tech": { no: "B2B – IT og teknologi", sv: "B2B – IT och teknik", da: "B2B – IT og teknologi", de: "B2B – IT & Technologie", fi: "B2B – IT ja teknologia" },
+  "b2b – journalism": { no: "B2B – journalistikk", sv: "B2B – journalistik", da: "B2B – journalistik", de: "B2B – Journalismus", fi: "B2B – journalismi" },
+  "b2b – legal": { no: "B2B – juss", sv: "B2B – juridik", da: "B2B – jura", de: "B2B – Recht", fi: "B2B – oikeusala" },
+  "b2b – maritime": { no: "B2B – maritim", sv: "B2B – sjöfart", da: "B2B – maritim", de: "B2B – Schifffahrt", fi: "B2B – merenkulku" },
+  "b2b – music industry": { no: "B2B – musikkbransjen", sv: "B2B – musikbranschen", da: "B2B – musikbranchen", de: "B2B – Musikbranche", fi: "B2B – musiikkiala" },
+  "b2b – other trade press": { no: "B2B – annen fagpresse", sv: "B2B – övrig fackpress", da: "B2B – anden fagpresse", de: "B2B – sonstige Fachpresse", fi: "B2B – muu ammattilehdistö" },
+  "b2b – public sector": { no: "B2B – offentlig sektor", sv: "B2B – offentlig sektor", da: "B2B – offentlig sektor", de: "B2B – öffentlicher Sektor", fi: "B2B – julkinen sektori" },
+  "b2b – publishing": { no: "B2B – forlag og medier", sv: "B2B – förlag och medier", da: "B2B – forlag og medier", de: "B2B – Verlagswesen", fi: "B2B – kustannusala" },
+  "b2b – retail": { no: "B2B – handel", sv: "B2B – handel", da: "B2B – detailhandel", de: "B2B – Handel", fi: "B2B – kauppa" },
+  "b2b – sme": { no: "B2B – små og mellomstore bedrifter", sv: "B2B – små och medelstora företag", da: "B2B – små og mellemstore virksomheder", de: "B2B – Mittelstand", fi: "B2B – pk-yritykset" },
+  "b2b – trade union": { no: "B2B – fagforening", sv: "B2B – fackförbund", da: "B2B – fagforening", de: "B2B – Gewerkschaft", fi: "B2B – ammattiliitto" },
+  "b2b – transport & logistics": { no: "B2B – transport og logistikk", sv: "B2B – transport och logistik", da: "B2B – transport og logistik", de: "B2B – Transport & Logistik", fi: "B2B – kuljetus ja logistiikka" },
+  "b2b – travel trade": { no: "B2B – reiselivsbransjen", sv: "B2B – resebranschen", da: "B2B – rejsebranchen", de: "B2B – Reisebranche", fi: "B2B – matkailuala" },
+  "b2b – defense & police": { no: "B2B – forsvar og politi", sv: "B2B – försvar och polis", da: "B2B – forsvar og politi", de: "B2B – Verteidigung & Polizei", fi: "B2B – puolustus ja poliisi" },
+  "b2b – charity & third sector": { no: "B2B – frivillig sektor", sv: "B2B – ideell sektor", da: "B2B – frivillig sektor", de: "B2B – gemeinnütziger Sektor", fi: "B2B – kolmas sektori" },
+  "b2b – beauty trade": { no: "B2B – skjønnhetsbransjen", sv: "B2B – skönhetsbranschen", da: "B2B – skønhedsbranchen", de: "B2B – Beautybranche", fi: "B2B – kauneusala" },
+  "affluent lifestyle": { no: "Kjøpesterk livsstil", sv: "Köpstark livsstil", da: "Købestærk livsstil", de: "Gehobener Lifestyle", fi: "Varakas elämäntyyli" },
+  "men's lifestyle": { no: "Menn og livsstil", sv: "Livsstil för män", da: "Livsstil til mænd", de: "Männer & Lifestyle", fi: "Miesten lifestyle" },
+  "family & parenting": { no: "Familie og foreldre", sv: "Familj och föräldraskap", da: "Familie og forældre", de: "Familie & Eltern", fi: "Perhe ja vanhemmuus" },
+  "children & kids": { no: "Barn", sv: "Barn", da: "Børn", de: "Kinder", fi: "Lapset" },
+  "children – comics & tv": { no: "Barn – tegneserier og TV", sv: "Barn – serier och TV", da: "Børn – tegneserier og TV", de: "Kinder – Comics & TV", fi: "Lapset – sarjakuvat ja TV" },
+  "youth & teens": { no: "Ungdom", sv: "Ungdom", da: "Unge", de: "Jugend", fi: "Nuoret" },
+  "seniors 55+": { no: "Seniorer 55+", sv: "Seniorer 55+", da: "Seniorer 55+", de: "Senioren 55+", fi: "Seniorit 55+" },
+  "education – student press": { no: "Utdanning – studentpresse", sv: "Utbildning – studentpress", da: "Uddannelse – studenterpresse", de: "Bildung – Studentenpresse", fi: "Koulutus – opiskelijamedia" },
+  "celebrity & gossip": { no: "Kjendis og sladder", sv: "Kändisar och skvaller", da: "Kendte og sladder", de: "Promis & Klatsch", fi: "Julkkikset ja juorut" },
+  "real-life weeklies": { no: "Ukeblader (virkelige historier)", sv: "Veckotidningar (verkliga öden)", da: "Ugeblade (virkelige historier)", de: "Wochenzeitschriften (wahre Geschichten)", fi: "Viikkolehdet (tositarinat)" },
+  "general consumer magazine": { no: "Allment forbrukermagasin", sv: "Allmänt konsumentmagasin", da: "Almindeligt forbrugermagasin", de: "Publikumszeitschrift", fi: "Yleinen kuluttajalehti" },
+  "membership/customer magazine": { no: "Medlems- og kundemagasin", sv: "Medlems- och kundtidning", da: "Medlems- og kundeblad", de: "Mitglieder- & Kundenmagazin", fi: "Jäsen- ja asiakaslehti" },
+  "fashion": { no: "Mote", sv: "Mode", da: "Mode", de: "Mode", fi: "Muoti" },
+  "travel": { no: "Reise", sv: "Resor", da: "Rejser", de: "Reisen", fi: "Matkailu" },
+  "garden": { no: "Hage", sv: "Trädgård", da: "Have", de: "Garten", fi: "Puutarha" },
+  "pets": { no: "Kjæledyr", sv: "Husdjur", da: "Kæledyr", de: "Haustiere", fi: "Lemmikit" },
+  "history": { no: "Historie", sv: "Historia", da: "Historie", de: "Geschichte", fi: "Historia" },
+  "religion": { no: "Religion", sv: "Religion", da: "Religion", de: "Religion", fi: "Uskonto" },
+  "music": { no: "Musikk", sv: "Musik", da: "Musik", de: "Musik", fi: "Musiikki" },
+  "film": { no: "Film", sv: "Film", da: "Film", de: "Film", fi: "Elokuva" },
+  "photography": { no: "Foto", sv: "Foto", da: "Foto", de: "Fotografie", fi: "Valokuvaus" },
+  "gaming": { no: "Gaming", sv: "Gaming", da: "Gaming", de: "Gaming", fi: "Pelaaminen" },
+  "arts & culture": { no: "Kunst og kultur", sv: "Konst och kultur", da: "Kunst og kultur", de: "Kunst & Kultur", fi: "Taide ja kulttuuri" },
+  "literature & books": { no: "Litteratur og bøker", sv: "Litteratur och böcker", da: "Litteratur og bøger", de: "Literatur & Bücher", fi: "Kirjallisuus ja kirjat" },
+  "antiques & collecting": { no: "Antikviteter og samling", sv: "Antikviteter och samlande", da: "Antikviteter og samlerobjekter", de: "Antiquitäten & Sammeln", fi: "Antiikki ja keräily" },
+  "craft & diy": { no: "Håndarbeid og gjør det selv", sv: "Hantverk och gör det själv", da: "Håndarbejde og gør det selv", de: "Handarbeit & Heimwerken", fi: "Käsityöt ja tee se itse" },
+  "hobby & leisure": { no: "Hobby og fritid", sv: "Hobby och fritid", da: "Hobby og fritid", de: "Hobby & Freizeit", fi: "Harrastukset ja vapaa-aika" },
+  "hunting & fishing": { no: "Jakt og fiske", sv: "Jakt och fiske", da: "Jagt og fiskeri", de: "Jagd & Angeln", fi: "Metsästys ja kalastus" },
+  "outdoor & adventure": { no: "Friluftsliv og eventyr", sv: "Friluftsliv och äventyr", da: "Friluftsliv og eventyr", de: "Outdoor & Abenteuer", fi: "Ulkoilu ja seikkailu" },
+  "boating & sailing": { no: "Båt og seiling", sv: "Båt och segling", da: "Både og sejlads", de: "Boote & Segeln", fi: "Veneily ja purjehdus" },
+  "camping & caravan": { no: "Camping og campingvogn", sv: "Camping och husvagn", da: "Camping og campingvogn", de: "Camping & Caravaning", fi: "Retkeily ja matkailuvaunut" },
+  "motorcycle": { no: "Motorsykkel", sv: "Motorcykel", da: "Motorcykel", de: "Motorrad", fi: "Moottoripyörät" },
+  "tech & gadgets": { no: "Teknologi og dingser", sv: "Teknik och prylar", da: "Teknologi og gadgets", de: "Technik & Gadgets", fi: "Teknologia ja vempaimet" },
+  "tv & listings": { no: "TV og programoversikt", sv: "TV och tablåer", da: "TV og programoversigt", de: "TV & Programm", fi: "TV ja ohjelmatiedot" },
+  "sports – cycling": { no: "Sport – sykling", sv: "Sport – cykling", da: "Sport – cykling", de: "Sport – Radsport", fi: "Urheilu – pyöräily" },
+  "sports – equestrian": { no: "Sport – hestesport", sv: "Sport – hästsport", da: "Sport – hestesport", de: "Sport – Pferdesport", fi: "Urheilu – hevosurheilu" },
+  "sports – football/hockey": { no: "Sport – fotball og hockey", sv: "Sport – fotboll och hockey", da: "Sport – fodbold og hockey", de: "Sport – Fußball & Hockey", fi: "Urheilu – jalkapallo ja jääkiekko" },
+  "sports – golf": { no: "Sport – golf", sv: "Sport – golf", da: "Sport – golf", de: "Sport – Golf", fi: "Urheilu – golf" },
+  "sports – running": { no: "Sport – løping", sv: "Sport – löpning", da: "Sport – løb", de: "Sport – Laufen", fi: "Urheilu – juoksu" },
+  "lgbtq+": { no: "LHBTQ+", sv: "HBTQ+", da: "LGBTQ+", de: "LGBTQ+", fi: "HLBTQ+" },
+  "adult": { no: "Voksen", sv: "Vuxen", da: "Voksen", de: "Erwachsene", fi: "Aikuisviihde" },
   // Audiences (Title.audience)
   "general consumer": { no: "Bredt publikum", sv: "Bred publik", da: "Bredt publikum", de: "Breites Publikum", fi: "Suuri yleisö" },
   "regional consumer": { no: "Regionalt publikum", sv: "Regional publik", da: "Regionalt publikum", de: "Regionales Publikum", fi: "Alueellinen yleisö" },
@@ -212,4 +285,10 @@ export function localizeVertical(value: string, locale: AppLocale): string {
 
 export function localizeCategory(value: string, locale: AppLocale): string {
   return lookup(CATEGORY, value, locale);
+}
+
+/** True when `value` has a translation in every UI language. */
+export function hasVerticalTranslation(value: string): boolean {
+  const entry = VERTICAL[value.trim().toLowerCase()];
+  return !!entry && (["no", "sv", "da", "fi", "de"] as const).every((l) => !!entry[l]);
 }

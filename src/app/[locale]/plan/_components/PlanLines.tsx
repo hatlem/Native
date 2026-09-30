@@ -7,8 +7,8 @@ import { formatMoney, intlLocale } from "@/lib/money";
 import { titleDisplayName } from "@/lib/title-display";
 import { removeFromPlan, setQuantity, setContentProduction, setLineNote, setLineAlternative } from "@/app/plan-actions";
 import { LINE_NOTE_MAX } from "@/lib/line-note";
-import { resolveTitleLine } from "@/app/list-actions";
-import { pickContentFeeRule, contentFeeAmount, type ContentFeeRuleSpec } from "@/lib/money";
+import { resolveTitleLine, setItemSchedule } from "@/app/list-actions";
+import { upcomingPeriods, type BookingUnit } from "@/lib/campaign-schedule";
 import { PlanLineBoard, type PlanBoardEntry } from "./PlanLineBoard";
 
 type PlanProduct = Prisma.ProductGetPayload<{
@@ -27,6 +27,11 @@ export type PlanLine = {
   quantity: number;
   priceVisible: boolean;
   withContent: boolean;
+  // What the order charges for this line: placementTotal (all runs) plus, for
+  // "We write it", contentFee (ONE article per line, whatever the quantity,
+  // as the order prices it). lineTotal = placementTotal + contentFee.
+  placementTotal: number;
+  contentFee: number;
   lineTotal: number;
   // Product deactivated since it was added — flagged so the buyer removes it
   // (submit refuses while it's present, instead of silently dropping it).
@@ -50,6 +55,9 @@ export type PlanTitleLine = {
   itemId: string;
   titleId: string;
   titleName: string;
+  // Sorts "By publisher" among the product lines (an empty name sorted every
+  // placeholder first).
+  publisherName: string;
   quantity: number;
   placements: { id: string; label: string }[];
   notes: string | null;
@@ -74,41 +82,105 @@ function periodLabel(
 }
 
 // The transparency the single total figure lacks: what the line total is
-// actually made of. Only the pieces we can compute indicatively pre-quote —
-// the content fee is desk-owned pricing looked up the same way the formal
-// quote will (pickContentFeeRule), not invented here.
-function breakdown(
-  l: PlanLine,
-  feeRules: ContentFeeRuleSpec[],
-  locale: string,
-  t: Awaited<ReturnType<typeof getTranslations>>,
-): string {
+// actually made of. The content fee comes from the page (contentFeeFor, the
+// desk-owned rule the order prices with), so the parts always add up to the
+// line total shown beside them. It is charged once per line: one article,
+// used for every run of the placement.
+function breakdown(l: PlanLine, locale: string, t: Awaited<ReturnType<typeof getTranslations>>): string {
   if (!l.priceVisible) return t("breakdownUnpriced");
+  const money = (n: number) => formatMoney(n, l.product.currency, locale);
+  if (l.withContent && l.contentFee > 0) {
+    return l.quantity > 1
+      ? t("breakdownQtyWithArticleFee", {
+          n: l.quantity,
+          unit: money(l.placementTotal / l.quantity),
+          article: money(l.contentFee),
+        })
+      : t("breakdownWithArticle", { placement: money(l.placementTotal), article: money(l.contentFee) });
+  }
   if (l.withContent) {
-    const rule = pickContentFeeRule(feeRules, l.product.type, l.product.title.market.code);
-    if (rule) {
-      const fee = Math.round(contentFeeAmount(rule));
-      const placement = l.lineTotal;
-      return t("breakdownWithArticle", {
-        placement: formatMoney(placement, l.product.currency, locale),
-        article: formatMoney(fee, l.product.currency, locale),
-      });
-    }
-    if (l.quantity > 1) {
-      return t("breakdownQtyWithArticle", {
-        n: l.quantity,
-        unit: formatMoney(l.lineTotal / l.quantity, l.product.currency, locale),
-      });
-    }
-    return t("breakdownArticleIncluded");
+    // "We write it" with no fee rule: production is included in the price.
+    return l.quantity > 1
+      ? t("breakdownQtyWithArticle", { n: l.quantity, unit: money(l.placementTotal / l.quantity) })
+      : t("breakdownArticleIncluded");
   }
   if (l.quantity > 1) {
-    return t("breakdownQty", {
-      n: l.quantity,
-      unit: formatMoney(l.lineTotal / l.quantity, l.product.currency, locale),
-    });
+    return t("breakdownQty", { n: l.quantity, unit: money(l.placementTotal / l.quantity) });
   }
   return "";
+}
+
+// How many start periods the inline date picker offers (months or weeks).
+const SCHEDULE_PERIODS = 12;
+
+// "Set dates" on a line: a native <details> disclosure with the line's start
+// period and run length, saved through the same action the campaign flow's
+// Schedule step uses. It lives on the plan itself, so it works whether or not
+// the campaign flow is switched on (it used to link to /campaign, a 404 while
+// that flag is off).
+function LineSchedule({
+  locale,
+  l,
+  blockedPeriods,
+  label,
+  tCampaign,
+}: {
+  locale: string;
+  l: PlanLine;
+  blockedPeriods: ReadonlySet<string>;
+  label: string;
+  tCampaign: Awaited<ReturnType<typeof getTranslations>>;
+}) {
+  const unit = l.product.bookingUnit as BookingUnit;
+  const min = l.product.minDurationUnits ?? 1;
+  const periods = upcomingPeriods(unit, SCHEDULE_PERIODS, new Date());
+  const current = l.scheduleStart ? new Date(l.scheduleStart).toISOString().slice(0, 10) : "";
+  const fmt = new Intl.DateTimeFormat(intlLocale(locale), {
+    ...(unit === "WEEK" ? { day: "numeric", month: "short" } : { month: "long", year: "numeric" }),
+    timeZone: "UTC",
+  });
+  return (
+    <details className="plan-line-card__schedule">
+      <summary>
+        <Calendar size={14} strokeWidth={1.7} aria-hidden="true" />
+        {label}
+      </summary>
+      <form action={setItemSchedule} className="plan-line-card__schedule-form">
+        <input type="hidden" name="locale" value={locale} />
+        <input type="hidden" name="itemId" value={l.itemId} />
+        <label>
+          <span className="label">{tCampaign("scheduleStartLabel")}</span>
+          <select name="scheduleStart" defaultValue={current} required>
+            <option value="" disabled>
+              {tCampaign("scheduleStartPlaceholder")}
+            </option>
+            {/* A saved start that has scrolled out of the offered window stays selectable. */}
+            {current && !periods.some((p) => p.iso === current) ? (
+              <option value={current}>{fmt.format(new Date(`${current}T00:00:00Z`))}</option>
+            ) : null}
+            {periods.map((p) => {
+              const soldOut = blockedPeriods.has(`${l.product.id}:${p.year}-${p.month}`);
+              return (
+                <option key={p.iso} value={p.iso} disabled={soldOut}>
+                  {fmt.format(new Date(`${p.iso}T00:00:00Z`))}
+                  {soldOut ? ` (${tCampaign("soldOut")})` : ""}
+                </option>
+              );
+            })}
+          </select>
+        </label>
+        <label>
+          <span className="label">
+            {unit === "WEEK" ? tCampaign("scheduleWeeksLabel") : tCampaign("scheduleMonthsLabel")}
+          </span>
+          <input type="number" name="scheduleUnits" min={min} defaultValue={l.scheduleUnits ?? min} />
+        </label>
+        <button type="submit" className="btn small">
+          {tCampaign("scheduleSave")}
+        </button>
+      </form>
+    </details>
+  );
 }
 
 // The customer-visible line note plus its inline editor. A native <details>
@@ -192,7 +264,7 @@ export async function PlanLines({
   altLines = [],
   altTitleLines = [],
   hasHiddenPrice,
-  feeRules,
+  blockedPeriods = new Set<string>(),
 }: {
   locale: string;
   listId: string;
@@ -201,7 +273,8 @@ export async function PlanLines({
   altLines?: PlanLine[];
   altTitleLines?: PlanTitleLine[];
   hasHiddenPrice: boolean;
-  feeRules: ContentFeeRuleSpec[];
+  // Sold-out / closed periods for the date picker, keyed "productId:YYYY-M".
+  blockedPeriods?: ReadonlySet<string>;
 }) {
   const t = await getTranslations({ locale, namespace: "plan" });
   const tType = await getTranslations({ locale, namespace: "productType" });
@@ -225,8 +298,8 @@ export async function PlanLines({
   const titleEntry = (tl: PlanTitleLine, node: ReactNode): PlanBoardEntry => ({
     id: tl.itemId,
     position: tl.position,
-    search: [tl.titleName, tl.notes ?? ""].join(" "),
-    sort: { id: tl.itemId, title: tl.titleName, publisher: "", price: null },
+    search: [tl.titleName, tl.publisherName, tl.notes ?? ""].join(" "),
+    sort: { id: tl.itemId, title: tl.titleName, publisher: tl.publisherName, price: null },
     node,
   });
 
@@ -291,10 +364,13 @@ export async function PlanLines({
                   </button>
                 </form>
               </div>
-              <Link href="/campaign?step=schedule" className="plan-line-card__schedule">
-                <Calendar size={14} strokeWidth={1.7} aria-hidden="true" />
-                {period ?? t("setDates")}
-              </Link>
+              <LineSchedule
+                locale={locale}
+                l={l}
+                blockedPeriods={blockedPeriods}
+                label={period ?? t("setDates")}
+                tCampaign={tCampaign}
+              />
             </div>
           </div>
 
@@ -304,7 +380,7 @@ export async function PlanLines({
             ) : (
               <span className="plan-line-card__total plan-line-card__total--muted">{tv("requestPrice")}</span>
             )}
-            <span className="plan-line-card__breakdown">{breakdown(l, feeRules, locale, t)}</span>
+            <span className="plan-line-card__breakdown">{breakdown(l, locale, t)}</span>
           </div>
 
           <div className="plan-line-card__actions">

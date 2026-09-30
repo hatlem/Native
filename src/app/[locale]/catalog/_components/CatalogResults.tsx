@@ -8,7 +8,7 @@ import { titleBand, titleRate } from "@/lib/pricing/display-price";
 import { loadPricingDefaults } from "@/lib/content-fee";
 import { titleDisplayName } from "@/lib/title-display";
 import { EmptyState } from "@/app/empty-state";
-import { localizeCategory } from "@/lib/taxonomy-i18n";
+import { localizeCategory, localizeVertical } from "@/lib/taxonomy-i18n";
 import type { ProductInclusions } from "@/lib/pricing/inclusions";
 import type { AppLocale } from "@/i18n/routing";
 import { CompareSelectionProvider, TitleSelector } from "./CompareSelection";
@@ -206,7 +206,9 @@ function CatalogListRow({
     ? title.description.length > 160
       ? `${title.description.slice(0, 160)}…`
       : title.description
-    : title.vertical;
+    : title.vertical
+      ? localizeVertical(title.vertical, locale as AppLocale)
+      : null;
 
   return (
     <div className="catalog-row">
@@ -297,14 +299,6 @@ function CatalogListRow({
           <ShortlistButton
             productId={addableProduct.id}
             titleName={titleDisplayName(title)}
-            amount={
-              fromBand
-                ? Number(fromBand.product.basePrice)
-                : fromRate
-                  ? Number(fromRate.product.basePrice)
-                  : null
-            }
-            currency={addableProduct.currency}
             withContent={false}
             hasPrice={hasPrice}
             addLabel={tr("addToPlan")}
@@ -398,7 +392,7 @@ function CatalogCard({
         </div>
       ) : title.vertical ? (
         <div className="muted" style={{ marginTop: 8 }}>
-          {title.vertical}
+          {localizeVertical(title.vertical, locale as AppLocale)}
         </div>
       ) : null}
       {reach ? (

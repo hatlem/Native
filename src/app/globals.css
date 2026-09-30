@@ -3238,7 +3238,11 @@ select:disabled {
   font-variant-numeric: tabular-nums;
 }
 
+/* "Set dates": a <details> whose summary is the pill; the form opens below. */
 .plan-line-card__schedule {
+  min-width: 0;
+}
+.plan-line-card__schedule > summary {
   display: inline-flex;
   align-items: center;
   gap: 6px;
@@ -3249,9 +3253,32 @@ select:disabled {
   border-radius: var(--r-sm);
   color: var(--text);
   font-size: 0.8rem;
+  cursor: pointer;
+  list-style: none;
 }
-.plan-line-card__schedule:hover {
+.plan-line-card__schedule > summary::-webkit-details-marker {
+  display: none;
+}
+.plan-line-card__schedule > summary:hover,
+.plan-line-card__schedule[open] > summary {
   border-color: var(--muted);
+}
+.plan-line-card__schedule-form {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: var(--s-2);
+  margin-top: var(--s-2);
+}
+.plan-line-card__schedule-form label {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-size: 0.8rem;
+  min-width: 0;
+}
+.plan-line-card__schedule-form input[type="number"] {
+  width: 6rem;
 }
 
 .plan-line-card__price {
@@ -6626,7 +6653,8 @@ footer a:hover {
     width: 36px;
     height: 36px;
   }
-  .plan-line-card__schedule {
+  .plan-line-card__schedule > summary {
+    display: flex;
     width: 100%;
     justify-content: center;
     min-height: 40px;
@@ -7210,6 +7238,8 @@ footer a:hover {
 .wave-strip__card--btn {
   cursor: pointer;
   appearance: none;
+  text-decoration: none;
+  box-sizing: border-box;
 }
 .wave-strip__card--btn:hover {
   border-color: var(--accent);

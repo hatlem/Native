@@ -1,6 +1,5 @@
 "use client";
 
-import { useState } from "react";
 import { useTranslations } from "next-intl";
 import { formatMoney } from "@/lib/money";
 
@@ -8,14 +7,17 @@ import { formatMoney } from "@/lib/money";
 // basket rather than let them discover the mismatch only after submitting.
 const WARNING_THRESHOLD = 0.7;
 
+// Controlled by PlanBriefFields, which saves the brief on the plan.
 export function BudgetField({
   locale,
-  defaultValue,
+  value,
+  onChange,
   currency,
   total,
 }: {
   locale: string;
-  defaultValue: string;
+  value: string;
+  onChange: (value: string) => void;
   // Null when the basket is empty, has no visible-price lines, or spans
   // more than one currency — comparing a single budget number against a
   // mixed-currency basket would be a guess, so the warning stays off.
@@ -23,7 +25,6 @@ export function BudgetField({
   total: number;
 }) {
   const t = useTranslations("rfq");
-  const [value, setValue] = useState(defaultValue);
   const numeric = Number(value);
   const showWarning =
     currency != null && numeric > 0 && total > 0 && numeric < total * WARNING_THRESHOLD;
@@ -37,7 +38,7 @@ export function BudgetField({
         type="number"
         min="0"
         value={value}
-        onChange={(e) => setValue(e.target.value)}
+        onChange={(e) => onChange(e.target.value)}
       />
       {showWarning ? (
         <p className="warn" role="status">

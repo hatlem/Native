@@ -13,14 +13,13 @@ import { useTranslations } from "next-intl";
 import { Link } from "@/i18n/navigation";
 import { formatMoney } from "@/lib/money";
 import { addProductToActiveList } from "@/app/list-actions";
+import type { PlanBarSummary } from "@/lib/plan-total";
 
-type LineTotal = { currency: string; amount: number; itemCount: number };
+type LineTotal = PlanBarSummary["totals"][number];
 
 type ShortlistItem = {
   productId: string;
   titleName: string;
-  amount: number | null;
-  currency: string | null;
 };
 
 type Ctx = {
@@ -38,32 +37,39 @@ export function useShortlist(): Ctx {
 }
 
 // Optimistic cross-row state for "Add to plan": a row's CTA flips to added
-// immediately and the sticky bar's count/total increment in the same tick,
-// while addProductToActiveList runs in the background — same architecture
-// as CompareSelectionProvider (a client Context + a bar the provider
-// renders itself), but this one calls a real server action instead of only
-// touching local/localStorage state, so it needs a revert path on failure.
+// and the sticky bar's count goes up in the same tick, while
+// addProductToActiveList runs in the background — same architecture as
+// CompareSelectionProvider (a client Context + a bar the provider renders
+// itself), but this one calls a real server action, so it needs a revert path
+// on failure.
+//
+// Money is never computed here. The bar's total is the server's
+// (planBarSummary: the plan's own pricing, as /plan shows it), from the page
+// render or from the add action's result. Adding a product's price in the
+// browser used its NET base price (a margin leak) and, once the page
+// re-rendered with the new line, counted it twice.
 export function ShortlistProvider({
   locale,
   planName,
-  initialCount,
-  initialProductIds,
-  initialTotals,
+  initialPlan,
   children,
 }: {
   locale: string;
   planName: string;
-  initialCount: number;
-  initialProductIds: string[];
-  initialTotals: LineTotal[];
+  initialPlan: PlanBarSummary;
   children: ReactNode;
 }) {
   const t = useTranslations("catalog.shortlist");
-  const [added, setAdded] = useState<ShortlistItem[]>([]);
-  const [addedIds, setAddedIds] = useState<Set<string>>(() => new Set());
-  const [pendingIds, setPendingIds] = useState<Set<string>>(() => new Set());
+  // The plan as the server last described it: the page's render, replaced by
+  // each successful add's result (whichever is newer).
+  const [plan, setPlan] = useState<PlanBarSummary>(initialPlan);
+  useEffect(() => setPlan(initialPlan), [initialPlan]);
+  // Adds still in flight: counted optimistically, not yet priced.
+  const [inFlight, setInFlight] = useState<ShortlistItem[]>([]);
+  // Titles added on this page, most recent last (the bar's chips).
+  const [recent, setRecent] = useState<string[]>([]);
   const [error, setError] = useState<string | null>(null);
-  const initialIds = useMemo(() => new Set(initialProductIds), [initialProductIds]);
+  const onPlanIds = useMemo(() => new Set(plan.productIds), [plan]);
 
   useEffect(() => {
     if (!error) return;
@@ -71,36 +77,26 @@ export function ShortlistProvider({
     return () => clearTimeout(id);
   }, [error]);
 
-  const isOnPlan = useCallback(
-    (productId: string) => initialIds.has(productId) || addedIds.has(productId),
-    [initialIds, addedIds],
+  const isPending = useCallback(
+    (productId: string) => inFlight.some((i) => i.productId === productId),
+    [inFlight],
   );
-  const isPending = useCallback((productId: string) => pendingIds.has(productId), [pendingIds]);
+  const isOnPlan = useCallback(
+    (productId: string) => onPlanIds.has(productId) || isPending(productId),
+    [onPlanIds, isPending],
+  );
 
   const add = useCallback(
     async (item: ShortlistItem, withContent: boolean) => {
-      setPendingIds((p) => new Set(p).add(item.productId));
-      setAddedIds((s) => new Set(s).add(item.productId));
-      setAdded((a) => [...a, item]);
-
-      const result = await addProductToActiveList(item.productId, withContent, locale);
-
-      setPendingIds((p) => {
-        const next = new Set(p);
-        next.delete(item.productId);
-        return next;
-      });
-
-      if (!result.ok) {
-        setAddedIds((s) => {
-          const next = new Set(s);
-          next.delete(item.productId);
-          return next;
-        });
-        setAdded((a) => a.filter((i) => i.productId !== item.productId));
-        setError(result.reason === "no-client" ? t("errorNoClient") : t("errorGeneric"));
+      setInFlight((f) => [...f, item]);
+      const result = await addProductToActiveList(item.productId, withContent, locale).catch(() => null);
+      setInFlight((f) => f.filter((i) => i.productId !== item.productId));
+      if (!result?.ok) {
+        setError(result?.reason === "no-client" ? t("errorNoClient") : t("errorGeneric"));
         return false;
       }
+      setPlan(result.plan);
+      setRecent((r) => [...r, item.titleName]);
       return true;
     },
     [locale, t],
@@ -108,25 +104,9 @@ export function ShortlistProvider({
 
   const value = useMemo<Ctx>(() => ({ isOnPlan, isPending, add }), [isOnPlan, isPending, add]);
 
-  const count = initialCount + added.length;
-  const totals = useMemo(() => {
-    const byCurrency = new Map<string, { amount: number; itemCount: number }>();
-    for (const line of initialTotals) {
-      const entry = byCurrency.get(line.currency) ?? { amount: 0, itemCount: 0 };
-      entry.amount += line.amount;
-      entry.itemCount += line.itemCount;
-      byCurrency.set(line.currency, entry);
-    }
-    for (const item of added) {
-      if (item.amount != null && item.currency) {
-        const entry = byCurrency.get(item.currency) ?? { amount: 0, itemCount: 0 };
-        entry.amount += item.amount;
-        entry.itemCount += 1;
-        byCurrency.set(item.currency, entry);
-      }
-    }
-    return Array.from(byCurrency, ([currency, r]) => ({ currency, amount: r.amount, itemCount: r.itemCount }));
-  }, [initialTotals, added]);
+  // An in-flight add of a product already on the plan (a re-add bumps the
+  // quantity) isn't a new line.
+  const count = plan.count + inFlight.filter((i) => !onPlanIds.has(i.productId)).length;
 
   return (
     <ShortlistCtx.Provider value={value}>
@@ -136,8 +116,9 @@ export function ShortlistProvider({
           locale={locale}
           planName={planName}
           count={count}
-          totals={totals}
-          recentTitles={added.map((a) => a.titleName)}
+          totals={plan.totals}
+          pricing={inFlight.length > 0}
+          recentTitles={[...recent, ...inFlight.map((i) => i.titleName)]}
         />
       ) : null}
       {error ? (
@@ -157,12 +138,15 @@ function ShortlistBar({
   planName,
   count,
   totals,
+  pricing,
   recentTitles,
 }: {
   locale: string;
   planName: string;
   count: number;
   totals: LineTotal[];
+  // An add is still on its way: the total shown is the one before it.
+  pricing: boolean;
   recentTitles: string[];
 }) {
   const t = useTranslations("catalog.shortlist");
@@ -191,7 +175,7 @@ function ShortlistBar({
       <div className="shortlist-bar__right">
         <div className="shortlist-bar__total">
           <span className="shortlist-bar__total-label">{t("totalLabel")}</span>
-          <span className="shortlist-bar__total-amount">
+          <span className="shortlist-bar__total-amount" aria-busy={pricing}>
             {totals.length
               ? totals.length > 1
                 ? totals
@@ -217,8 +201,6 @@ function ShortlistBar({
 export function ShortlistButton({
   productId,
   titleName,
-  amount,
-  currency,
   withContent,
   hasPrice,
   addLabel,
@@ -227,8 +209,6 @@ export function ShortlistButton({
 }: {
   productId: string;
   titleName: string;
-  amount: number | null;
-  currency: string | null;
   withContent: boolean;
   hasPrice: boolean;
   addLabel: string;
@@ -245,7 +225,7 @@ export function ShortlistButton({
       className={`btn small catalog-row__cta${onPlan ? " is-added" : ""}`}
       disabled={onPlan || pending}
       aria-busy={pending}
-      onClick={() => add({ productId, titleName, amount, currency }, withContent)}
+      onClick={() => add({ productId, titleName }, withContent)}
     >
       {onPlan ? `✓ ${addedLabel}` : hasPrice ? addLabel : askLabel}
     </button>

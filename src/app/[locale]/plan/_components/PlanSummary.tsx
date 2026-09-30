@@ -1,6 +1,6 @@
 import { getTranslations } from "next-intl/server";
 import { Link } from "@/i18n/navigation";
-import type { PlanBrief } from "@/lib/basket";
+import type { PlanBriefValues, TimingOption } from "@/lib/plan-brief";
 import { formatMoney } from "@/lib/money";
 import type { ListTotal } from "@/lib/plan-total";
 import { submitRequest } from "@/app/checkout-actions";
@@ -20,6 +20,7 @@ import { PlanBriefFields } from "./PlanBriefFields";
 // the commitment.
 export async function PlanSummary({
   locale,
+  listId,
   totals,
   hasHiddenPrice,
   allFirm,
@@ -28,9 +29,13 @@ export async function PlanSummary({
   lineCount,
   needsClient,
   activeOrg,
-  briefDraft,
+  brief,
+  timingOptions,
 }: {
   locale: string;
+  // The plan this page shows. Submit acts on it, never on the active-list
+  // cookie, which may name a plan another tab opened since (lib/plan-target.ts).
+  listId: string;
   totals: ListTotal[];
   hasHiddenPrice: boolean;
   allFirm: boolean;
@@ -42,7 +47,8 @@ export async function PlanSummary({
   lineCount: number;
   needsClient: boolean;
   activeOrg: { name: string } | null;
-  briefDraft: PlanBrief;
+  brief: PlanBriefValues;
+  timingOptions: TimingOption[];
 }) {
   const t = await getTranslations({ locale, namespace: "plan" });
   const tf = await getTranslations({ locale, namespace: "firm" });
@@ -77,6 +83,9 @@ export async function PlanSummary({
 
   const submitLabel = instant ? tf("planSubmit") : rfqInstead ? tf("sendAsRfq") : tr("submit");
   const reassurance = instant ? tf("reassurance") : t("reassurance");
+  // A plan whose every line sits among the alternatives has nothing to send:
+  // say so at the button instead of letting the submit bounce.
+  const nothingToSend = lineCount === 0;
 
   return (
     <>
@@ -138,13 +147,16 @@ export async function PlanSummary({
       ) : activeOrg ? (
         <form id="plan-request-form" action={submitRequest} className="product-form">
           <input type="hidden" name="locale" value={locale} />
+          <input type="hidden" name="listId" value={listId} />
           {rfqInstead ? <input type="hidden" name="mode" value="rfq" /> : null}
           <p className="muted small">
             {tr("requestingAs")}: <strong>{activeOrg.name}</strong>
           </p>
           <PlanBriefFields
             locale={locale}
-            briefDraft={briefDraft}
+            listId={listId}
+            initial={brief}
+            timingOptions={timingOptions}
             currency={singleTotal ? singleTotal.currency : null}
             total={singleTotal ? singleTotal.amount : 0}
           />
@@ -158,8 +170,9 @@ export async function PlanSummary({
             label={submitLabel}
             pendingLabel={instant ? tf("planSubmitting") : tr("submitting")}
             className="btn block plan-summary-submit-desktop"
+            disabled={nothingToSend}
           />
-          <p className="plan-summary-reassurance">{reassurance}</p>
+          <p className="plan-summary-reassurance">{nothingToSend ? t("nothingToSend") : reassurance}</p>
         </form>
       ) : (
         <div className="auth-fallback">
@@ -190,10 +203,10 @@ export async function PlanSummary({
                 : t("pricingOnRequest")}
           </span>
         </div>
-        <button type="submit" form="plan-request-form" className="btn block">
+        <button type="submit" form="plan-request-form" className="btn block" disabled={nothingToSend}>
           {submitLabel}
         </button>
-        <p className="plan-mobile-submit-bar__reassurance">{reassurance}</p>
+        <p className="plan-mobile-submit-bar__reassurance">{nothingToSend ? t("nothingToSend") : reassurance}</p>
       </div>
     ) : null}
     </>

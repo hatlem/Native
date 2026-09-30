@@ -166,7 +166,8 @@
   },
   "home": {
     "title": "Köp native-innehåll i premium tidningar och magasin",
-    "subtitle": "En transparent katalog över varje titel som erbjuder native över 9 marknader. Ge oss en brief — vi skriver det och bokar det, även där programmatiskt inte är möjligt."
+    "subtitle": "En transparent katalog över varje titel som erbjuder native över 9 marknader. Ge oss en brief — vi skriver det och bokar det, även där programmatiskt inte är möjligt.",
+    "nextWaveBodyDateNear": "Omgång {n} är planerad från {date} – skicka den nu så att desken hinner boka."
   },
   "catalog": {
     "eyebrow": "Utforska",
@@ -292,7 +293,9 @@
       "unpricedNote": "{count, plural, =1 {1 titel till finns i katalogen utan publicerat pris. Vår desk kan prissätta den åt er.} other {# titlar till finns i katalogen utan publicerat pris. Vår desk kan prissätta dem åt er.}}",
       "advancedToggle": "{count, plural, =0 {Avancerade filter} other {Avancerade filter (#)}}",
       "mobileFilters": "Filter",
-      "marketCountAll": "Alla {total} marknader"
+      "marketCountAll": "Alla {total} marknader",
+      "formatHeading": "Vilket format?",
+      "formatHint": "Native-artikel, advertorial, display, video …"
     },
     "shortlist": {
       "untitledPlan": "din plan",
@@ -316,7 +319,9 @@
       "addToPlan": "Lägg till i planen",
       "onPlan": "I planen",
       "askForPrice": "Be om pris"
-    }
+    },
+    "noMatchHeading": "Inga träffar",
+    "searchSomeWords": "Ingen titel matchar alla ord i ”{q}”, så de här matchar några av dem."
   },
   "lists": {
     "title": "Sparade listor",
@@ -330,7 +335,9 @@
     "open": "Öppna",
     "rename": "Byt namn",
     "duplicate": "Duplicera",
-    "archive": "Arkivera"
+    "archive": "Arkivera",
+    "emptyCta": "Utforska katalogen",
+    "emptySecondaryCta": "Starta en plan"
   },
   "favorites": {
     "title": "Favoriter",
@@ -393,7 +400,7 @@
     "unavailable": "För närvarande inte tillgänglig för bokning.",
     "formatsEyebrow": "Tillgängliga format",
     "formatsHeading": "Välj ett format och lägg det till din plan",
-    "bookableSummary": "{count, plural, =0 {Ingen direktbeställning} =1 {1 med direktbeställning} other {# med direktbeställning}}",
+    "bookableSummary": "{count, plural, =0 {Ingen omedelbar beställning} =1 {1 med omedelbar beställning} other {# med omedelbar beställning}}",
     "offersNative": "✓ Annonsörsinnehåll",
     "keywordsHeading": "Nyckelord",
     "keyFacts": "Nyckeltal",
@@ -453,7 +460,7 @@
       "minSpend": "Lägsta budget {currency} {amount, number}"
     },
     "publisherLinkHelp": "Se alla titlar från {name}",
-    "factVertical": "Vertical",
+    "factVertical": "Ämnesområde",
     "factReaderProfile": "Läsarprofil",
     "availabilityTitle": "Tillgänglighet",
     "avail_open": "Ledig",
@@ -464,7 +471,7 @@
   "plan": {
     "eyebrow": "Plan",
     "title": "Din plan",
-    "lead": "Gå igenom dina placeringar och skicka briefen till desk för en fast offert — eller lägg en direktbeställning om varje rad stödjer det.",
+    "lead": "Gå igenom dina placeringar och skicka briefen till desk för en fast offert — eller lägg en omedelbar beställning om varje rad stödjer det.",
     "empty": "Din plan är tom.",
     "browse": "Se katalogen",
     "remove": "Ta bort",
@@ -479,7 +486,7 @@
     "totalForItems": "{amount} för {count, plural, =1 {1 titel} other {# titlar}}",
     "multiCurrencyNote": "Titlar faktureras i utgivarens egen valuta — båda beloppen ska betalas, det här är inte ett val av valuta.",
     "rfqTitle": "Begär en fast offert",
-    "error": "Lägg till minst en placering och fyll i företag, e-post och marknad.",
+    "error": "Något gick fel när planen skulle skickas. Se över den och försök igen.",
     "linesEyebrow": "Valt",
     "linesHeading": "Dina placeringar",
     "scheduledPeriod": "Från {date} · {n} {unit}",
@@ -542,17 +549,17 @@
     "sublineNoOrg": "{count, plural, =1 {1 placering} other {# placeringar}} · senast ändrad {edited}",
     "addMoreTitles": "+ Lägg till fler titlar",
     "needsPrice": "Behöver pris",
-    "instantBook": "Direktbeställning",
+    "instantBook": "Omedelbar beställning",
     "readers": "{count} läsare",
     "setDates": "Ange datum",
     "weWriteIt": "Vi skriver den",
     "needsPriceNote": "Den här utgivaren har inte publicerat listpris. Att skicka planen ber vår desk att prissätta den — resten av planen påverkas inte.",
     "breakdownUnpriced": "Bekräftas inom 24 timmar",
-    "breakdownWithArticle": "{placement} placering + {article} artikel",
+    "breakdownWithArticle": "{placement} placering + {article} per artikel",
     "breakdownQtyWithArticle": "{n} × {unit}, artikel ingår",
     "breakdownArticleIncluded": "Artikel ingår",
     "breakdownQty": "{n} × {unit}",
-    "firmOfTotal": "⚡ {firm} av {total} med direktbeställning",
+    "firmOfTotal": "⚡ {firm} av {total} med omedelbar beställning",
     "plusDeskPriced": "Dessutom tillkommer en eller flera titlar som prissätts av vår desk. Ditt fasta pris kan bli lägre — vi förhandlar på volym.",
     "reassurance": "Inget är bokat än. Du godkänner offerten innan något körs.",
     "briefQ1": "Vad säljer ni, och till vem?",
@@ -561,19 +568,19 @@
     "briefAdvancedToggle": "Lägg till budget, målgrupper och geografi",
     "reviewFavorites": "Se dem",
     "timing": {
-      "q3": "Q3 2026",
-      "q4": "Q4 2026",
       "flexible": "Flexibelt",
-      "q3Sentence": "Önskad tidpunkt: Q3 2026.",
-      "q4Sentence": "Önskad tidpunkt: Q4 2026.",
-      "flexibleSentence": "Tidpunkten är flexibel."
+      "flexibleSentence": "Tidpunkten är flexibel.",
+      "quarter": "Q{quarter} {year}",
+      "quarterSentence": "Önskad tidpunkt: Q{quarter} {year}."
     },
     "steps": {
       "label": "Planens framsteg",
       "find": "Hitta titlar",
       "build": "Bygg planen",
       "quote": "Få en fast offert",
-      "approve": "Godkänn och kör"
+      "approve": "Godkänn och kör",
+      "confirm": "Bekräfta beställningen",
+      "run": "Produceras och körs"
     },
     "next": {
       "heading": "Vad händer sen",
@@ -613,7 +620,6 @@
         "awareness": "Kännedom byggs långsamt – omgångarna ligger lite glesare så att varje artikel får landa för sig."
       },
       "preview": "från {date}",
-      "previewFirst": "den här planen, som schemalagd",
       "start": "Skapa program",
       "starting": "Skapar…",
       "stripTitle": "{name} – omgång {n} av {of}",
@@ -643,7 +649,8 @@
       "overlapWarning": "{title} går i omgång {a} och omgång {b} samtidigt – sprid ut dem, eller välj en annan titel.",
       "dissolveSummary": "Lös upp programmet …",
       "dissolveBody": "Varje omgång blir en vanlig plan igen. Omgångar ni aldrig skickat in arkiveras, så att de inte skräpar ner bland era planer – allt som redan skickats till desken rörs inte.",
-      "dissolveConfirm": "Lös upp programmet"
+      "dissolveConfirm": "Lös upp programmet",
+      "waveName": "{name} · Omgång {n}"
     },
     "share": {
       "summary": "Dela med kunden",
@@ -657,7 +664,9 @@
       "approvedBadge": "Kunden godkände",
       "engagementApproved": "Kunden godkände planen {date}.",
       "engagementViewed": "Senast öppnad {date} · {count, plural, =1 {1 visning} other {# visningar}}.",
-      "engagementNone": "Inte öppnad ännu."
+      "engagementNone": "Inte öppnad ännu.",
+      "staleBadge": "Godkänd före ändringar",
+      "engagementStale": "Kunden godkände en tidigare version {date}. Planen har ändrats sedan dess, så be dem titta på den igen."
     },
     "lineNoteLabel": "Kommentar",
     "lineNoteAdd": "Lägg till kommentar",
@@ -684,7 +693,24 @@
     "lineDragInstructions": "Flytta en rad: tryck mellanslag för att lyfta den, flytta med piltangenterna och tryck mellanslag igen för att släppa. Escape avbryter.",
     "lineSearchBlocksDrag": "töm sökningen för att ändra ordningen",
     "lineOrderSaveFailed": "Ordningen kunde inte sparas – laddar om planen.",
-    "lineMovedAnnouncement": "Flyttad till plats {position} av {total}"
+    "lineMovedAnnouncement": "Flyttad till plats {position} av {total}",
+    "errorEmpty": "Lägg minst en placering i planen innan du skickar den. Alternativ skickas inte.",
+    "errorPlanUnavailable": "Den planen är inte längre tillgänglig. Den har arkiverats, eller så har du inte längre åtkomst till den.",
+    "nothingToSend": "Flytta minst en rad in i planen för att skicka den. Alternativ skickas inte.",
+    "briefSaving": "Sparar …",
+    "briefSaved": "Sparat i den här planen.",
+    "briefSaveFailed": "Det gick inte att spara just nu. Din text finns kvar och följer med när du skickar planen.",
+    "briefAutosaveHint": "Sparas i planen medan du skriver.",
+    "nextInstant": {
+      "heading": "Vad händer sedan",
+      "item1Title": "Beställningen bekräftas direkt",
+      "item1Body": "Alla rader har fast pris, så när du bekräftar är beställningen lagd. Du behöver inte vänta på någon offert.",
+      "item2Title": "Vi briefar utgivarna",
+      "item2Body": "Varje utgivare får bokningen och din brief. Behöver du ändra något ordnar desken det tillsammans med dig.",
+      "item3Title": "Vi skriver, placerar och rapporterar",
+      "item3Body": "Utkast skickas till dig för godkännande. Länkar och resultat hamnar i Rapporter."
+    },
+    "breakdownQtyWithArticleFee": "{n} × {unit} placering + {article} per artikel (en artikel för alla {n})"
   },
   "rfq": {
     "org": "Företag",
@@ -1329,7 +1355,7 @@
     "colCustomer": "Kund"
   },
   "firm": {
-    "badge": "Direktbeställning",
+    "badge": "Omedelbar beställning",
     "planTitle": "Bekräfta din order",
     "planNote": "Alla poster har fast pris — att skicka in bekräftar din order direkt, ingen väntan på inköpsteamet.",
     "planSubmit": "Bekräfta order",
@@ -1348,7 +1374,7 @@
     "kpiActiveTitles": "Aktiva titlar",
     "kpiActiveTitlesSub": "I den publika katalogen",
     "kpiActiveProducts": "Native-produkter",
-    "kpiBookable": "{count} med direktbeställning",
+    "kpiBookable": "{count} med omedelbar beställning",
     "kpiIncomingOrders": "Aktiva beställningar",
     "kpiNoOrders": "Inget inkommande just nu",
     "kpiBlockedMonths": "Blockerade månader",
@@ -1382,7 +1408,7 @@
     "leadTime": "Ledtid (dagar)",
     "save": "Spara",
     "saving": "Sparar…",
-    "firm": "Fast (direktbeställning)",
+    "firm": "Fast (omedelbar beställning)",
     "indicative": "Vägledande (förfrågan)",
     "status": "Orderstatus",
     "booking": "Bokningsstatus",
@@ -1416,7 +1442,7 @@
     "ratesPriceOnlyNote": "Den här sidan ändrar endast priser. Katalogstatus — aktiv, bokningsbar, synlighet — hanteras av NativeSpin-desken.",
     "changePriceOnRates": "Ändra på prissidan",
     "notBookable": "Inte bokningsbar",
-    "catalogStatusNote": "Priser ändrar du på prissidan. Katalogstatus (bokningsbar, och om en produkt kan direktbeställas) hanteras av NativeSpin-desken."
+    "catalogStatusNote": "Priser ändrar du på prissidan. Katalogstatus (bokningsbar, och om en produkt kan beställas omedelbart) hanteras av NativeSpin-desken."
   },
   "formats": {
     "metaTitle": "Native-format — NativeSpin",
@@ -1795,7 +1821,7 @@
     "step5Title": "Gå live och rapportera",
     "step5Body": "Utgivaren bokar och publicerar. Ni får live-URL, spårning och en faktura med rätt moms för er marknad.",
     "modesTitle": "Två bokningslägen",
-    "modeFirmTag": "Direkt",
+    "modeFirmTag": "Omedelbar",
     "modeFirmTitle": "Fastpris — självservice",
     "modeFirmBody": "Produkter med publikt fastpris kan bokas direkt från planen. Ingen desk-överlämning, ingen väntetid.",
     "modeRfqTitle": "Prisförfrågan — hanterad",
@@ -2240,7 +2266,7 @@
     },
     "pubs": {
       "labelText": "Utgivare",
-      "meta": "{publishers, number}+ utgivare · {titles, number}+ titlar katalogiserade · {active, number} verifierade för direktbeställning",
+      "meta": "{publishers, number}+ utgivare · {titles, number}+ titlar katalogiserade · {active, number} verifierade för omedelbar beställning",
       "foot": "Det ni ser här är bara en bråkdel av katalogen.",
       "footMore": "Berätta vad ni letar efter"
     },
@@ -2435,7 +2461,7 @@
   "priceVisibility": {
     "requestPrice": "Kontakta för pris",
     "requestPriceHelp": "Pris sätts efter en brief — vi återkommer med tillgänglighet och fast pris.",
-    "planRfqOnly": "En eller flera titlar i din plan kräver offert — direktbeställning är inaktiverad tills priset är bekräftat.",
+    "planRfqOnly": "En eller flera titlar i din plan kräver offert — omedelbar beställning är inaktiverad tills priset är bekräftat.",
     "listIndicative": "Listpris (indikativt)",
     "listIndicativeHelp": "Indikativt listpris — det slutliga priset bekräftas efter en kort brief.",
     "productionIncluded": "Färdigskriven artikel ingår",
@@ -2447,7 +2473,7 @@
     "publishedRateCardHelp": "Utgivarens officiella listpris för en standardplacering. Visas som överstruket ankare på offerter till annonsör.",
     "publishedRateCurrency": "Valuta",
     "pricesPublic": "Visa priser för annonsör",
-    "pricesPublicHelp": "Av = katalogen visar 'Kontakta för pris' istället för siffror. Direktbeställning är också inaktiverad.",
+    "pricesPublicHelp": "Av = katalogen visar 'Kontakta för pris' istället för siffror. Omedelbar beställning är också inaktiverad.",
     "publisherPricesPublic": "Synlighet för hela utgivaren",
     "publisherPricesPublicOn": "Utgivarens priser är offentliga",
     "publisherPricesPublicOff": "Utgivarens priser är dolda — åsidosätter alla titlar",
@@ -3218,7 +3244,9 @@
     "approvedAt": "Planen godkändes {date}. Din kontakt tar det vidare härifrån.",
     "noteLabel": "Kommentar",
     "alternativesHeading": "Alternativ – ingår inte i totalen",
-    "alternativesIntro": "Titlar vi också rekommenderar. De ingår inte i planen eller totalen."
+    "alternativesIntro": "Titlar vi också rekommenderar. De ingår inte i planen eller totalen.",
+    "changedSinceApproval": "Du godkände en tidigare version av planen {date}. Den har ändrats sedan dess, så titta igenom den och godkänn igen.",
+    "approveAgainCta": "Godkänn den uppdaterade planen"
   },
   "quotePdf": {
     "documentTitle": "Offert {quoteNumber}",

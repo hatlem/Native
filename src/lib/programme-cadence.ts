@@ -112,17 +112,49 @@ export function currentPeriodStart(unit: BookingUnit, base: Date): Date {
   return new Date(`${upcomingPeriods(unit, 1, base)[0].iso}T00:00:00Z`);
 }
 
-/** Anchor dates for each wave. Wave 1 = firstStart, or the current period
- *  when the source list has no schedule yet. */
+/** The first period anchor that hasn't started yet: today when today IS a
+ *  period start (the 1st / a Monday), else the next one. Never in the past —
+ *  the current period's anchor usually is (on 30 Sep, the month began 1 Sep). */
+export function nextPeriodStart(unit: BookingUnit, base: Date): Date {
+  const today = Date.UTC(base.getUTCFullYear(), base.getUTCMonth(), base.getUTCDate());
+  const current = currentPeriodStart(unit, base);
+  if (current.getTime() >= today) return current;
+  return new Date(`${upcomingPeriods(unit, 2, base)[1].iso}T00:00:00Z`);
+}
+
+/** Where a line of wave 1 starts: its own scheduled start while that is still
+ *  ahead, else the next period start. A plan with no dates (or stale ones)
+ *  therefore anchors the programme at the next period, not at a past one. */
+export function waveOneStart(scheduleStart: Date | null, unit: BookingUnit, base: Date): Date {
+  const next = nextPeriodStart(unit, base);
+  return scheduleStart && scheduleStart.getTime() >= next.getTime() ? scheduleStart : next;
+}
+
+/** Anchor dates for each wave: wave 1 at waveOneStart(firstStart), each later
+ *  wave `spacingWeeks` after the previous one on the unit's grid. */
 export function planWaveDates(
   firstStart: Date | null,
   waves: number,
   spacingWeeks: number,
   unit: BookingUnit,
   base: Date,
-): Array<Date | null> {
-  const first = firstStart ?? currentPeriodStart(unit, base);
+): Date[] {
+  const first = waveOneStart(firstStart, unit, base);
   return Array.from({ length: waves }, (_, i) =>
     i === 0 ? first : shiftScheduleStart(first, spacingWeeks * i, unit),
   );
+}
+
+// ---------- pure: wave names ----------
+
+// The word each UI language uses for a wave in a plan name ("Spring · Runde 2").
+// Programme plans are named in the language of whoever created them; every
+// spelling is recognised when a name is taken apart again (dissolve, "plan
+// next wave"), including plans named in English before this was localized.
+const WAVE_WORDS = ["Wave", "Runde", "Omgång", "Kierros", "Welle"] as const;
+const WAVE_SUFFIX = new RegExp(`\\s*·\\s*(?:${WAVE_WORDS.join("|")}) \\d+$`, "iu");
+
+/** "Spring · Runde 2" → "Spring". Names without a wave suffix are unchanged. */
+export function stripWaveSuffix(name: string): string {
+  return name.replace(WAVE_SUFFIX, "");
 }

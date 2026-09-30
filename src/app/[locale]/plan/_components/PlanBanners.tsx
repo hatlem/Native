@@ -18,6 +18,8 @@ export async function PlanBanners({
   // rate-limited / permission-denied / list-changed buyer.
   const ERROR_KEYS: Record<string, string> = {
     "1": "error",
+    empty: "errorEmpty",
+    "plan-unavailable": "errorPlanUnavailable",
     client: "errorClient",
     rate: "errorRate",
     forbidden: "errorForbidden",

@@ -60,6 +60,7 @@ export default async function TitleDetailPage({
   const tf = await getTranslations({ locale, namespace: "firm" });
   const tType = await getTranslations({ locale, namespace: "productType" });
   const tMarket = await getTranslations({ locale, namespace: "market" });
+  const tFit = await getTranslations({ locale, namespace: "nativeFit" });
   const tFormats = await getTranslations({ locale, namespace: "formats" });
   const tv = await getTranslations({
     locale,
@@ -235,7 +236,9 @@ export default async function TitleDetailPage({
               {title.offersNativeContent ? (
                 <span className="tag">{t("offersNative")}</span>
               ) : null}
-              {title.reach ? <span className="tag">{title.reach}</span> : null}
+              {title.reach ? (
+                <span className="tag">{localizeTaxonomy(title.reach, locale as AppLocale)}</span>
+              ) : null}
               {title.keywords.map((k) => (
                 <span className="tag" key={k}>
                   {k}
@@ -304,19 +307,19 @@ export default async function TitleDetailPage({
             {title.nativeFit ? (
               <>
                 <dt>{t("factNativeFit")}</dt>
-                <dd>{title.nativeFit}</dd>
+                <dd>{tFit.has(title.nativeFit) ? tFit(title.nativeFit) : title.nativeFit}</dd>
               </>
             ) : null}
             {title.vertical ? (
               <>
                 <dt>{t("factVertical")}</dt>
-                <dd>{localizeTaxonomy(title.vertical, locale as AppLocale)}</dd>
+                <dd>{localizeVertical(title.vertical, locale as AppLocale)}</dd>
               </>
             ) : null}
             {title.audience ? (
               <>
                 <dt>{t("factReaderProfile")}</dt>
-                <dd>{title.audience}</dd>
+                <dd>{localizeVertical(title.audience, locale as AppLocale)}</dd>
               </>
             ) : null}
             <dt>{t("factCategory")}</dt>

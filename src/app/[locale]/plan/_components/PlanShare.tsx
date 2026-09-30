@@ -1,7 +1,7 @@
 import { getTranslations } from "next-intl/server";
 import { Link2 } from "lucide-react";
 import { shareList, unshareList } from "@/app/list-actions";
-import { shareUrl } from "@/lib/list-share";
+import { shareUrl, type ApprovalState } from "@/lib/list-share";
 import { appUrl } from "@/lib/url";
 import { intlLocale } from "@/lib/money";
 
@@ -15,14 +15,17 @@ export async function PlanShare({
   shareToken,
   shareViewedAt,
   shareViewCount,
-  clientApprovedAt,
+  approval,
 }: {
   locale: string;
   listId: string;
   shareToken: string | null;
   shareViewedAt: Date | null;
   shareViewCount: number;
-  clientApprovedAt: Date | null;
+  // The client's approval measured against the plan as it stands: an approval
+  // of an earlier version shows as "approved before changes", never as a
+  // current approval the buyer could forward to the desk.
+  approval: ApprovalState;
 }) {
   const t = await getTranslations({ locale, namespace: "plan.share" });
   const dateFmt = new Intl.DateTimeFormat(intlLocale(locale), {
@@ -37,8 +40,10 @@ export async function PlanShare({
       <summary className="plan-share__summary">
         <Link2 size={15} strokeWidth={1.8} aria-hidden="true" />
         <span>{t("summary")}</span>
-        {clientApprovedAt ? (
+        {approval.kind === "current" ? (
           <span className="badge badge-success dotless">{t("approvedBadge")}</span>
+        ) : approval.kind === "stale" ? (
+          <span className="badge badge-warning dotless">{t("staleBadge")}</span>
         ) : shareToken ? (
           <span className="badge badge-success dotless">{t("activeBadge")}</span>
         ) : null}
@@ -48,9 +53,11 @@ export async function PlanShare({
           <>
             <p className="muted small">{t("activeHint")}</p>
             <p className="muted small plan-share__engagement">
-              {clientApprovedAt
-                ? t("engagementApproved", { date: dateFmt.format(clientApprovedAt) })
-                : shareViewedAt
+              {approval.kind === "current"
+                ? t("engagementApproved", { date: dateFmt.format(approval.approvedAt) })
+                : approval.kind === "stale"
+                  ? t("engagementStale", { date: dateFmt.format(approval.approvedAt) })
+                  : shareViewedAt
                   ? t("engagementViewed", { date: dateFmt.format(shareViewedAt), count: shareViewCount })
                   : t("engagementNone")}
             </p>

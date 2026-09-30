@@ -3,11 +3,10 @@
 // cookie names another list (a bookmark, a shared link, "Open" on Saved
 // lists) and by deep links such as the placement-ready notification.
 //
-// Why a Route Handler: /plan is not read-only. "Send til desk"
-// (submitRequest, checkout-actions) and every add-from-catalog resolve their
-// list from the active-list cookie — never from the URL. Server Components
-// can't write cookies; Route Handlers can. Switching here keeps the rendered
-// plan and the submitted plan the same list, by construction.
+// Why a Route Handler: Server Components can't write cookies; Route Handlers
+// can. The plan page's own forms post their listId (lib/plan-target.ts), but
+// the catalog's "Add to plan" and other off-page adds still target the active
+// list, so opening a plan makes it the one those adds land on.
 //
 // Access is checked here, not deferred to the render: /plan/[listId] sends any
 // cookie mismatch back to this handler, so writing an id the page would then
@@ -18,10 +17,8 @@
 
 import { type NextRequest, NextResponse } from "next/server";
 import { auth } from "@/auth";
-import { prisma } from "@/lib/prisma";
 import { getWorkspace } from "@/lib/workspace";
-import { writeActiveListId } from "@/lib/lists";
-import { switchActiveOrg } from "@/lib/active-org";
+import { alignActivePlan, resolvePlanTarget } from "@/lib/plan-target";
 import { planPath } from "@/lib/plan-path";
 import { appUrl } from "@/lib/url";
 
@@ -36,23 +33,12 @@ export async function GET(
   const { list: listId, ...rest } = search;
   const session = await auth();
   const ws = await getWorkspace(session?.user?.id);
-
-  const list = listId
-    ? await prisma.savedList.findUnique({
-        where: { id: listId },
-        select: { id: true, organizationId: true, archivedAt: true },
-      })
-    : null;
-  const canOpen = !!ws && !!list && !list.archivedAt && ws.scopeOrgIds.includes(list.organizationId);
+  const target = await resolvePlanTarget(ws, listId);
 
   // appUrl(), not request.url: behind Railway's proxy the inbound URL can carry
   // an internal host, and every other redirect in this app builds from appUrl().
-  if (!canOpen) return NextResponse.redirect(new URL(planPath(locale, null, rest), appUrl()));
+  if (!ws || !target.ok) return NextResponse.redirect(new URL(planPath(locale, null, rest), appUrl()));
 
-  if (list.organizationId !== ws.activeOrgId) {
-    await switchActiveOrg(list.organizationId, { activeListId: list.id });
-  } else {
-    await writeActiveListId(list.id);
-  }
-  return NextResponse.redirect(new URL(planPath(locale, list.id, rest), appUrl()));
+  await alignActivePlan(ws, target.list);
+  return NextResponse.redirect(new URL(planPath(locale, target.list.id, rest), appUrl()));
 }

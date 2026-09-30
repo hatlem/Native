@@ -5,11 +5,10 @@ import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
 import { requireOnboardingBeforeBuy } from "@/lib/onboarding-gate";
 import { getWorkspace } from "@/lib/workspace";
-import {
-  planBriefHasContent,
-  writePlanBrief,
-} from "@/lib/basket";
-import { readActiveListId, ensureActiveList, committedItems } from "@/lib/lists";
+import { readActiveListId, ensureActiveListId, loadListWithItems, committedItems } from "@/lib/lists";
+import { alignActivePlan, resolvePlanTarget } from "@/lib/plan-target";
+import { planPath } from "@/lib/plan-path";
+import { saveListBrief } from "@/lib/plan-brief";
 import { isProductPriceShown } from "@/lib/pricing-visibility";
 import { withWaveAngle } from "@/lib/programme";
 import {
@@ -55,58 +54,80 @@ export async function submitRequest(formData: FormData) {
   // client) so only they, their agency, and the desk can view/accept it.
   const session = await auth();
   const ws = await getWorkspace(session?.user?.id);
-  if (!ws?.activeOrgId) {
-    redirect(ws?.isAgency ? `/${locale}/agency` : `/${locale}/signin`);
-  }
+  if (!ws) redirect(`/${locale}/signin`);
 
-  // Stash the brief draft before the onboarding gate may detour the
-  // user away — /plan rehydrates the form from this cookie on return
-  // so the buyer doesn't have to re-type budget/audience/goal/brief.
-  // Cleared at the end of this action on success.
-  const briefDraft = {
-    budget: budgetRaw,
-    audience,
-    goal,
-    brief,
-    targetGeo,
-    targetAudience,
-    targetContext,
-  };
-  if (planBriefHasContent(briefDraft)) {
-    await writePlanBrief(briefDraft);
+  // Submit the plan the page shows: /plan/<listId> posts its listId. Never the
+  // active-list cookie — that names the plan opened last in ANY tab, so a
+  // "Send" in the tab showing plan A would submit plan B (lib/plan-target.ts).
+  // A form without a listId (rendered before this field existed) keeps the old
+  // cookie behaviour for the active org.
+  const postedListId = str(formData, "listId");
+  let listId: string;
+  let orgId: string;
+  if (postedListId) {
+    const target = await resolvePlanTarget(ws, postedListId);
+    if (!target.ok) {
+      console.warn("checkout.blocked", { reason: `list-${target.reason}`, userId: ws.userId, listId: postedListId });
+      redirect(planPath(locale, null, { error: "plan-unavailable" }));
+    }
+    listId = target.list.id;
+    orgId = target.list.organizationId;
+    // Every redirect below lands on this plan's own address; making it the
+    // active plan first means /plan/<listId> renders without a detour.
+    await alignActivePlan(ws, target.list);
+  } else {
+    if (!ws.activeOrgId) redirect(ws.isAgency ? `/${locale}/agency` : `/${locale}/signin`);
+    orgId = ws.activeOrgId;
+    listId = await ensureActiveListId(orgId, await readActiveListId());
   }
+  const back = (error?: string) => planPath(locale, listId, error ? { error } : undefined);
+
+  // The brief belongs to the plan: persist what was typed before anything can
+  // bounce the buyer (onboarding, a refused submit), so it's still there when
+  // they come back, and a programme's later waves inherit it.
+  await saveListBrief(listId, {
+    // A form rendered before briefText existed only posts the composed brief.
+    briefText: formData.has("briefText") ? str(formData, "briefText") : brief,
+    briefTiming: str(formData, "briefTiming"),
+    budget: budgetRaw,
+    budgetCurrency: str(formData, "budgetCurrency"),
+    targetAudience,
+    targetGeo,
+    targetContext,
+  });
 
   // Buyer onboarding is deferred to the moment of buying intent: the
   // desk needs a reachable phone number, and the billing market drives
   // VAT + invoice currency on the Quote we're about to mint. Bounces
-  // to /onboarding?next=/plan so the user lands back on the basket
-  // with brief intact (cookie-backed) after filling in the two fields.
-  await requireOnboardingBeforeBuy(session, locale, `/${locale}/plan`);
+  // to /onboarding?next=/plan/<listId> so the user lands back on this plan
+  // with the brief intact after filling in the two fields.
+  await requireOnboardingBeforeBuy(session, locale, back(), orgId);
 
-  if (!(await rfqLimiter.check(`rfq:${ws.activeOrgId}`)).ok) {
-    console.warn("checkout.blocked", { reason: "rate", orgId: ws.activeOrgId });
-    redirect(`/${locale}/plan?error=rate`);
+  if (!(await rfqLimiter.check(`rfq:${orgId}`)).ok) {
+    console.warn("checkout.blocked", { reason: "rate", orgId });
+    redirect(back("rate"));
   }
 
   const org = await prisma.organization.findUnique({
-    where: { id: ws.activeOrgId },
+    where: { id: orgId },
   });
   if (!org) {
     redirect(`/${locale}/signin`);
   }
 
-  // Submit the active saved list — the durable replacement for the basket
-  // cookie. It can hold product lines (productId set) and Title placeholders
-  // (titleId set, productId null). The list is NOT consumed on submit.
-  const list = await ensureActiveList(org.id, await readActiveListId());
+  // The saved list is the durable replacement for the basket cookie. It can
+  // hold product lines (productId set) and Title placeholders (titleId set,
+  // productId null). The list is NOT consumed on submit.
+  const list = await loadListWithItems(listId);
+  if (!list) redirect(back("plan-unavailable"));
   // Recommended alternatives are never part of a submit or an order.
   const planItems = committedItems(list.items);
-  if (planItems.length === 0) redirect(`/${locale}/plan?error=1`);
+  if (planItems.length === 0) redirect(back("empty"));
 
   // A wave of a programme carries its own article angle — put it at the top
   // of the desk-facing brief so the desk and the writer start from THIS
   // wave's idea, not a rerun of the last one. The buyer's own text is kept
-  // verbatim below it (and stays untouched in the cookie draft). The active
+  // verbatim below it (and stays untouched in the plan's saved brief). The
   // list's own include (lists.ts) doesn't hydrate the article relation, so
   // it's fetched here — nested, to match RfqSourceList's shape below.
   const article = list.articleId
@@ -137,7 +158,7 @@ export async function submitRequest(formData: FormData) {
   );
   if (deactivatedLines.length > 0) {
     console.warn("checkout.blocked", { reason: "unavailable", orgId: org.id, lines: deactivatedLines.length });
-    redirect(`/${locale}/plan?error=unavailable`);
+    redirect(back("unavailable"));
   }
 
   const productItems = planItems.filter(
@@ -146,7 +167,7 @@ export async function submitRequest(formData: FormData) {
   );
   const titleItems = planItems.filter((i) => !i.productId && i.titleId);
   if (productItems.length === 0 && titleItems.length === 0) {
-    redirect(`/${locale}/plan?error=1`);
+    redirect(back("empty"));
   }
 
   // Fingerprint the item set at load; re-checked just before we write (below) so
@@ -214,7 +235,7 @@ export async function submitRequest(formData: FormData) {
     const scope = await loadScope();
     if (!canCommitOnOrg(scope, org.id)) {
       console.warn("checkout.blocked", { reason: "forbidden", orgId: org.id });
-      redirect(`/${locale}/plan?error=forbidden`);
+      redirect(back("forbidden"));
     }
   }
 
@@ -234,7 +255,7 @@ export async function submitRequest(formData: FormData) {
     });
     if (blocked) {
       console.warn("checkout.blocked", { reason: "availability", orgId: org.id, productId: blocked.productId });
-      redirect(`/${locale}/plan?error=availability`);
+      redirect(back("availability"));
     }
   }
 
@@ -247,7 +268,7 @@ export async function submitRequest(formData: FormData) {
   });
   if (fingerprintListItems(freshItems) !== loadedFingerprint) {
     console.warn("checkout.blocked", { reason: "changed", orgId: org.id, listId: list.id });
-    redirect(`/${locale}/plan?error=changed`);
+    redirect(back("changed"));
   }
 
   let request: { id: string };
@@ -282,13 +303,13 @@ export async function submitRequest(formData: FormData) {
       // bounce the buyer to review rather than instant-charge a stale basket.
       if (e instanceof FirmOrderStaleError) {
         console.warn("checkout.blocked", { reason: "unavailable", orgId: org.id, via: "firmOrderStale", listId: list.id });
-        redirect(`/${locale}/plan?error=unavailable`);
+        redirect(back("unavailable"));
       }
       // The list was edited (another seat/tab) after our pre-flight fingerprint
       // check — same buyer outcome as the pre-flight catch: review & resubmit.
       if (e instanceof FirmOrderChangedError) {
         console.warn("checkout.blocked", { reason: "changed", orgId: org.id, via: "firmOrderChanged", listId: list.id });
-        redirect(`/${locale}/plan?error=changed`);
+        redirect(back("changed"));
       }
       throw e;
     }
@@ -317,8 +338,8 @@ export async function submitRequest(formData: FormData) {
       auditIp: await clientIp(),
     });
     if (rfq.outcome === "duplicate") redirect(`/${locale}/requests/${rfq.requestId}`);
-    if (rfq.outcome === "unavailable") redirect(`/${locale}/plan?error=unavailable`);
-    if (rfq.outcome === "empty") redirect(`/${locale}/plan?error=1`);
+    if (rfq.outcome === "unavailable") redirect(back("unavailable"));
+    if (rfq.outcome === "empty") redirect(back("empty"));
     request = { id: rfq.requestId };
   }
 

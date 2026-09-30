@@ -68,3 +68,16 @@ export function sortLines(lines: readonly SortableLine[], key: SortKey, locale: 
   });
   return indexed.map((x) => x.line.id);
 }
+
+/**
+ * Which one-click sort the plan's saved order matches, so the "Sort by" select
+ * shows it again after a reload instead of snapping back to "Your order".
+ * "custom" when no sort reproduces the order, or when there are fewer than
+ * two lines to tell sorts apart.
+ */
+export function detectSortKey(lines: readonly SortableLine[], locale: string): SortKey | "custom" {
+  if (lines.length < 2) return "custom";
+  const current = lines.map((l) => l.id).join(",");
+  const keys: SortKey[] = ["title", "publisher", "price"];
+  return keys.find((key) => sortLines(lines, key, locale).join(",") === current) ?? "custom";
+}
