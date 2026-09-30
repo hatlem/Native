@@ -13,8 +13,10 @@ import { QuoteSection } from "./_components/QuoteSection";
 import {
   RENEWAL_REQUEST_COOLDOWN_MS,
   RENEWAL_REQUESTED_AUDIT_ACTION,
+  buyerVisibleQuoteWhere,
   isQuoteExpired,
 } from "@/lib/commerce/quote-validity";
+import { lineOrder } from "@/lib/commerce/line-order";
 import { reconcileExpiredQuotesInBackground } from "@/lib/commerce/quote-expiry";
 import { OrderSection } from "./_components/OrderSection";
 
@@ -33,14 +35,19 @@ export default async function RequestPage({
     include: {
       organization: true,
       plan: { include: { items: true } },
+      // The buyer's view of the request: a DRAFT is the desk's work in
+      // progress and stays off this page until the desk sends it (the desk
+      // works it on /desk/[requestId]).
       quotes: {
+        where: buyerVisibleQuoteWhere(),
         orderBy: { createdAt: "desc" },
         include: {
-          lines: true,
+          lines: { orderBy: lineOrder() },
           order: {
             include: {
               invoices: true,
               lines: {
+                orderBy: lineOrder(),
                 include: {
                   articlePlacement: {
                     include: {
@@ -220,6 +227,9 @@ export default async function RequestPage({
         <OrderSection
           locale={locale}
           orders={orders}
+          orderLinks={quotes.flatMap((q) =>
+            q.order ? [{ id: q.order.id, currency: q.currency }] : [],
+          )}
           byId={byId}
           orderInvoice={orderInvoice}
         />

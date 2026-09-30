@@ -1,6 +1,7 @@
 import { getTranslations } from "next-intl/server";
 import { notFound } from "next/navigation";
 import { prisma } from "@/lib/prisma";
+import { lineOrder } from "@/lib/commerce/line-order";
 import { formatMoney } from "@/lib/money";
 import { loadScope, canActOnOrg } from "@/lib/scope";
 import { StatusBadge } from "@/app/status-badge";
@@ -17,7 +18,7 @@ export default async function InvoicePage({
 
   const invoice = await prisma.invoice.findUnique({
     where: { id },
-    include: { organization: true, lines: true },
+    include: { organization: true, lines: { orderBy: lineOrder() } },
   });
   if (!invoice) notFound();
 

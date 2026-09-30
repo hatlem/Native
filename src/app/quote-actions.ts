@@ -17,13 +17,16 @@ import {
   RENEWAL_REQUESTED_AUDIT_ACTION,
   isQuoteAcceptable,
   isQuoteExpired,
-  quoteValidUntilFrom,
+  parseQuoteValidUntil,
 } from "@/lib/commerce/quote-validity";
 import { reconcileExpiredQuotes } from "@/lib/commerce/quote-expiry";
-import { uniquePublisherIdsForProducts } from "@/lib/commerce/publishers";
+import { lineOrder } from "@/lib/commerce/line-order";
+import { buildQuoteSentNotice } from "@/lib/commerce/quote-notices";
+import { notifyQuoteAccepted, sendDraftQuotes } from "@/lib/commerce/quote-lifecycle";
+import { marketDefaultLocale } from "@/lib/market-locale";
 import { groupItemsByMarket } from "@/lib/quote-grouping";
 import { recordAudit } from "@/lib/audit";
-import { notifyDesk, notifyOrg, notifyPublisher } from "@/lib/notify";
+import { notifyDesk, notifyOrg } from "@/lib/notify";
 import { loadScope, canActOnOrg, canCommitOnOrg } from "@/lib/scope";
 import { generateQuotePdf as renderQuotePdf } from "@/lib/pdf/generate-quote-pdf";
 import { normalizeLineNote, noteByProductId } from "@/lib/line-note";
@@ -32,6 +35,7 @@ function str(formData: FormData, key: string): string {
   const v = formData.get(key);
   return typeof v === "string" ? v.trim() : "";
 }
+
 
 // The atomic accept gate refused: either a concurrent click already accepted
 // these quotes (a double-submit — land on the request quietly, it's done) or
@@ -102,7 +106,6 @@ export async function generateQuote(formData: FormData) {
   // Fee rules and margin defaults come from the same load so the quote
   // agrees with the catalog band the buyer saw (display-price.ts).
   const defaults = await loadPricingDefaults();
-  const validUntil = quoteValidUntilFrom(new Date());
 
   // A line quoted off an unconfirmed (blueprint-estimated) product price
   // must not present the estimate as a firm figure — it goes out as
@@ -119,13 +122,13 @@ export async function generateQuote(formData: FormData) {
   // The buyer-facing line note travels from the plan line onto the quote line.
   const noteByProduct = noteByProductId(productItems);
 
+  // The quote is generated as a DRAFT: the desk prices the "on request"
+  // lines, adjusts notes and sets the validity first, then sends it
+  // (sendQuote). Nothing here is visible to the buyer or notifies them —
+  // previously the buyer was emailed "Total 0 NOK" the moment the desk
+  // clicked "generate", before a single line was priced.
   const created = await prisma.$transaction(async (tx) => {
-    const quotes: {
-      id: string;
-      currency: string;
-      total: number;
-      onRequestCount: number;
-    }[] = [];
+    const quotes: { id: string; currency: string; total: number }[] = [];
     for (const group of groups) {
       const inventoryLines = computeQuoteLines(
         group.items
@@ -154,30 +157,32 @@ export async function generateQuote(formData: FormData) {
           line.description.replace(/^Content production — /, ""),
         ),
       }));
-      const lines = [...inventoryLines, ...feeLines];
+      // Generation order is the display order (lib/commerce/line-order.ts).
+      const lines = [...inventoryLines, ...feeLines].map((l, position) => ({
+        ...l,
+        position,
+      }));
       const { subtotal, total } = quoteTotals(lines, group.vatPct);
       const quote = await tx.quote.create({
         data: {
           requestId: request.id,
-          status: "SENT",
+          status: "DRAFT",
           currency: group.currency,
           subtotal,
           vatPct: group.vatPct,
           total,
-          validUntil,
+          // Set when the desk sends it — a draft makes no offer yet.
+          validUntil: null,
           lines: { create: lines },
         },
       });
-      quotes.push({
-        id: quote.id,
-        currency: group.currency,
-        total,
-        onRequestCount: lines.filter((l) => l.priceOnRequest).length,
-      });
+      quotes.push({ id: quote.id, currency: group.currency, total });
     }
+    // The desk has picked the request up and is pricing it; QUOTED only
+    // once the quote actually goes out.
     await tx.request.update({
       where: { id: request.id },
-      data: { status: "QUOTED" },
+      data: { status: "IN_REVIEW" },
     });
     return quotes;
   });
@@ -185,31 +190,40 @@ export async function generateQuote(formData: FormData) {
   for (const q of created) {
     await recordAudit(scope.userId, "quote.create", `Quote:${q.id}`, {
       requestId,
+      status: "DRAFT",
       total: q.total,
       currency: q.currency,
     });
   }
-  // One QUOTE_READY notification per request — body summarises totals
-  // across the currencies so the buyer sees a single inbox entry even
-  // for a multi-market campaign.
-  const totalsBody = created
-    .map((q) => `${q.total} ${q.currency}`)
-    .join(" + ");
-  const onRequestTotal = created.reduce((s, q) => s + q.onRequestCount, 0);
-  await notifyOrg(request.organizationId, {
-    kind: "QUOTE_READY",
-    title:
-      created.length === 1
-        ? "Your quote is ready"
-        : `Your ${created.length} quotes are ready`,
-    body: `Total ${totalsBody}${
-      onRequestTotal > 0
-        ? ` (${onRequestTotal} line${onRequestTotal === 1 ? "" : "s"} priced on request)`
-        : ""
-    }, valid until ${validUntil.toISOString().slice(0, 10)}.`,
-    link: `/${locale}/requests/${request.id}`,
-  });
 
+  redirect(`/${locale}/desk/${requestId}`);
+}
+
+// Desk sends the request's draft quote(s) to the buyer, with the validity
+// the desk chose (defaults to QUOTE_VALIDITY_DAYS). The send itself — the
+// DRAFT→SENT flip and the buyer's notification with the real total — lives
+// in lib/commerce/quote-lifecycle.ts.
+export async function sendQuote(formData: FormData) {
+  const locale = str(formData, "locale") || "en";
+  const requestId = str(formData, "requestId");
+
+  const scope = await loadScope();
+  if (!scope.isDesk || !scope.userId) redirect(`/${locale}/signin`);
+
+  const parsed = parseQuoteValidUntil(str(formData, "validUntil"));
+  if (!parsed.ok) {
+    redirect(`/${locale}/desk/${requestId}?error=valid-until-${parsed.reason}`);
+  }
+
+  const result = await sendDraftQuotes({
+    requestId,
+    validUntil: parsed.validUntil,
+    actorUserId: scope.userId,
+  });
+  if (result.outcome === "unpriced") {
+    redirect(`/${locale}/desk/${requestId}?error=send-unpriced`);
+  }
+  // "none" / "already-sent": the page shows what went out.
   redirect(`/${locale}/desk/${requestId}`);
 }
 
@@ -379,9 +393,14 @@ export async function acceptQuote(formData: FormData) {
   const quote = await prisma.quote.findUnique({
     where: { id: quoteId },
     include: {
-      lines: true,
+      lines: { orderBy: lineOrder() },
       order: true,
-      request: { include: { plan: { include: { items: true } } } },
+      request: {
+        include: {
+          plan: { include: { items: true } },
+          organization: { select: { name: true, marketCode: true } },
+        },
+      },
     },
   });
   if (!quote) redirect(`/${locale}/catalog`);
@@ -395,6 +414,11 @@ export async function acceptQuote(formData: FormData) {
     redirect(`/${locale}/signin`);
   }
   if (quote.order) {
+    redirect(`/${locale}/requests/${quote.requestId}`);
+  }
+  // A draft is not on offer — the buyer can't see it, so there is nothing
+  // to explain; land on the request as if the quote weren't there.
+  if (quote.status === "DRAFT") {
     redirect(`/${locale}/requests/${quote.requestId}`);
   }
   // A firm offer is only firm inside its window: an expired quote must be
@@ -434,29 +458,19 @@ export async function acceptQuote(formData: FormData) {
     if (!(err instanceof QuoteNotAcceptableError)) throw err;
     return redirectAfterRefusedAccept(locale, quote.requestId, [quote.id]);
   }
-  const { orderId, productIds } = accepted;
-
   await recordAudit(scope.userId, "quote.accept", `Quote:${quote.id}`, {
     requestId: quote.requestId,
-    orderId,
+    orderId: accepted.orderId,
   });
-  await notifyDesk({
-    kind: "QUOTE_ACCEPTED",
-    title: "Quote accepted",
-    body: "A buyer accepted a quote — order is now confirmed.",
-    link: `/${locale}/desk/orders/${orderId}`,
+  await notifyQuoteAccepted({
+    organizationId: quote.request.organizationId,
+    orgName: quote.request.organization.name,
+    marketCode: quote.request.organization.marketCode,
+    planName: quote.request.plan.name,
+    requestId: quote.requestId,
+    orders: [accepted],
+    actorLocale: locale,
   });
-  const pubIds = await uniquePublisherIdsForProducts(productIds);
-  await Promise.all(
-    pubIds.map((pid) =>
-      notifyPublisher(pid, {
-        kind: "BOOKING_NEW",
-        title: "New booking",
-        body: "A confirmed order requires booking on your end.",
-        link: `/${locale}/publisher/orders`,
-      }),
-    ),
-  );
 
   redirect(`/${locale}/requests/${quote.requestId}`);
 }
@@ -475,7 +489,8 @@ export async function acceptAllQuotesForRequest(formData: FormData) {
     where: { id: requestId },
     include: {
       plan: { include: { items: true } },
-      quotes: { include: { lines: true, order: true } },
+      organization: { select: { name: true, marketCode: true } },
+      quotes: { include: { lines: { orderBy: lineOrder() }, order: true } },
     },
   });
   if (!request) redirect(`/${locale}/catalog`);
@@ -536,27 +551,15 @@ export async function acceptAllQuotesForRequest(formData: FormData) {
       requestId: request.id,
     });
   }
-  await notifyDesk({
-    kind: "QUOTE_ACCEPTED",
-    title:
-      createdOrders.length === 1
-        ? "Quote accepted"
-        : `${createdOrders.length} quotes accepted`,
-    body: "A buyer accepted a multi-market campaign — orders confirmed.",
-    link: `/${locale}/desk/orders`,
+  await notifyQuoteAccepted({
+    organizationId: request.organizationId,
+    orgName: request.organization.name,
+    marketCode: request.organization.marketCode,
+    planName: request.plan.name,
+    requestId: request.id,
+    orders: createdOrders,
+    actorLocale: locale,
   });
-  const allProductIds = createdOrders.flatMap((o) => o.productIds);
-  const pubIds = await uniquePublisherIdsForProducts(allProductIds);
-  await Promise.all(
-    pubIds.map((pid) =>
-      notifyPublisher(pid, {
-        kind: "BOOKING_NEW",
-        title: "New booking",
-        body: "A confirmed order requires booking on your end.",
-        link: `/${locale}/publisher/orders`,
-      }),
-    ),
-  );
 
   redirect(`/${locale}/requests/${request.id}`);
 }
@@ -634,7 +637,14 @@ export async function renewQuote(formData: FormData) {
       total: true,
       currency: true,
       order: { select: { id: true } },
-      request: { select: { organizationId: true } },
+      lines: { select: { priceOnRequest: true } },
+      request: {
+        select: {
+          organizationId: true,
+          organization: { select: { marketCode: true } },
+          plan: { select: { name: true } },
+        },
+      },
     },
   });
   if (!quote || quote.requestId !== requestId) redirect(`/${locale}/desk`);
@@ -642,7 +652,12 @@ export async function renewQuote(formData: FormData) {
     redirect(`/${locale}/desk/${requestId}`);
   }
 
-  const validUntil = quoteValidUntilFrom(new Date());
+  // Same validity field as sending; blank keeps the default window.
+  const parsed = parseQuoteValidUntil(str(formData, "validUntil"));
+  if (!parsed.ok) {
+    redirect(`/${locale}/desk/${requestId}?error=valid-until-${parsed.reason}`);
+  }
+  const { validUntil } = parsed;
   await prisma.quote.update({
     where: { id: quote.id },
     data: { status: "SENT", validUntil },
@@ -653,11 +668,21 @@ export async function renewQuote(formData: FormData) {
     previousValidUntil: quote.validUntil?.toISOString() ?? null,
     validUntil: validUntil.toISOString(),
   });
+  const marketCode = quote.request.organization.marketCode;
+  const buyerLocale = marketCode ? marketDefaultLocale(marketCode) : "en";
+  const notice = buildQuoteSentNotice({
+    locale: buyerLocale,
+    planName: quote.request.plan.name,
+    quotes: [{ total: Number(quote.total), currency: quote.currency }],
+    onRequestCount: quote.lines.filter((l) => l.priceOnRequest).length,
+    validUntil,
+    renewed: true,
+  });
   await notifyOrg(quote.request.organizationId, {
     kind: "QUOTE_READY",
-    title: "Your quote has been renewed",
-    body: `Total ${quote.total} ${quote.currency}, valid until ${validUntil.toISOString().slice(0, 10)}.`,
-    link: `/${locale}/requests/${requestId}`,
+    title: notice.title,
+    body: notice.body,
+    link: `/${buyerLocale}/requests/${requestId}`,
   });
 
   redirect(`/${locale}/desk/${requestId}`);

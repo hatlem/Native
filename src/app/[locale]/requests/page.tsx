@@ -10,7 +10,7 @@ import { EmptyState } from "@/app/empty-state";
 import { formatMoney, intlLocale } from "@/lib/money";
 import { timeAgo } from "@/lib/time-ago";
 import { deriveStage, type CampaignStage } from "@/lib/campaign-stage";
-import { effectiveQuoteStatus } from "@/lib/commerce/quote-validity";
+import { buyerVisibleQuoteWhere, effectiveQuoteStatus } from "@/lib/commerce/quote-validity";
 import { monthsWindow, intersectsMonth, draftWindow, orderWindow, type RunWindow } from "@/lib/campaign-timeline";
 import { CampaignRow, type RowAction } from "./_components/CampaignRow";
 import { TimelineView, type TimelineEntry, type TimelineMonthGroup } from "./_components/TimelineView";
@@ -98,7 +98,10 @@ export default async function RequestsPage({
         sourceList: {
           select: { waveNumber: true, programme: { select: { plannedWaves: true } } },
         },
+        // Drafts are desk-internal: until the desk sends the quote the row
+        // stays at "sent to the desk" (see buyerVisibleQuoteWhere).
         quotes: {
+          where: buyerVisibleQuoteWhere(),
           orderBy: { createdAt: "desc" },
           take: 1,
           include: {

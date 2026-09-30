@@ -4,6 +4,7 @@
 import { NextResponse } from "next/server";
 import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
+import { lineOrder } from "@/lib/commerce/line-order";
 import { csv } from "@/lib/csv";
 import { recordAudit } from "@/lib/audit";
 import { clicksByOrderLine } from "@/lib/metrics/store";
@@ -26,6 +27,7 @@ export async function GET(
     where: { id: orderId },
     include: {
       lines: {
+        orderBy: lineOrder(),
         include: {
           booking: {
             include: {

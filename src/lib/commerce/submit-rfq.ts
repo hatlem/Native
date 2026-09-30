@@ -20,6 +20,7 @@ import { groupItemsByMarket, type QuoteGroupingProduct } from "@/lib/quote-group
 import { recordAudit } from "@/lib/audit";
 import { notifyDesk } from "@/lib/notify";
 import type { AuthorshipMode } from "@/lib/authorship";
+import { planNameFor } from "@/lib/plan-name";
 
 /** What a list item must carry to be submitted — the checkout action's
  *  ActiveList items are a structural superset of this. */
@@ -42,6 +43,8 @@ export type RfqListItem = {
 export type RfqSourceList = {
   id: string;
   organizationId: string;
+  // The buyer's name for the plan — becomes Plan.name (see planNameFor).
+  name: string;
   // Wave membership — withWaveAngle prefixes the desk brief for waves and
   // passes plain lists through unchanged. Nested (not a flat articleTitle)
   // to match what RFQ_LIST_INCLUDE actually hydrates via Prisma; flattened
@@ -230,7 +233,7 @@ export async function submitListAsRfq(input: {
     const plan = await tx.plan.create({
       data: {
         organizationId: org.id,
-        name: `${org.name} — campaign`,
+        name: planNameFor({ listName: list.name, orgName: org.name, locale }),
         budget: brief.budget,
         currency: planCurrency,
         startDate: flight.start,

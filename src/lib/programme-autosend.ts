@@ -13,6 +13,7 @@ import { submitListAsRfq, RFQ_LIST_INCLUDE } from "@/lib/commerce/submit-rfq";
 import { notifyOrg } from "@/lib/notify";
 import { recordAudit } from "@/lib/audit";
 import { buildAutoSendNotice } from "@/lib/programme-autosend-notice";
+import { marketDefaultLocale } from "@/lib/market-locale";
 
 export type AutoSendSweepResult = { sent: number; skipped: number; failed: number };
 
@@ -58,6 +59,10 @@ async function sendDueWave(wave: DueWave): Promise<"sent" | "skipped"> {
       targetContext: list.targetContext,
     },
     actorUserId: null, // system actor — recorded as "system" in the audit log
+    // No buyer session here: the org's home market decides the language of
+    // anything written for the buyer (the plan-name fallback), as for the
+    // auto-send notice below.
+    locale: marketDefaultLocale(list.organization.marketCode),
   });
   if (result.outcome !== "submitted") return "skipped";
 

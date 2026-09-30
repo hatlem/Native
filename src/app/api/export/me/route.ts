@@ -9,6 +9,8 @@ import { prisma } from "@/lib/prisma";
 import { getWorkspace } from "@/lib/workspace";
 import { recordAudit } from "@/lib/audit";
 import { exportLimiter } from "@/lib/rate-limit";
+import { buyerVisibleQuoteWhere } from "@/lib/commerce/quote-validity";
+import { lineOrder } from "@/lib/commerce/line-order";
 
 export const dynamic = "force-dynamic";
 
@@ -85,7 +87,14 @@ export async function GET(req: NextRequest) {
     }),
     prisma.request.findMany({
       where: { organizationId: { in: orgIds } },
-      include: { quotes: { include: { lines: true } } },
+      // A buyer's export holds what was sent to them; the desk's unsent
+      // DRAFT pricing only appears in a desk-run export.
+      include: {
+        quotes: {
+          where: isDesk ? undefined : buyerVisibleQuoteWhere(),
+          include: { lines: { orderBy: lineOrder() } },
+        },
+      },
     }),
     prisma.order.findMany({
       where: { organizationId: { in: orgIds } },
@@ -95,6 +104,7 @@ export async function GET(req: NextRequest) {
       // ContentAsset hangs off Article instead of ContentBrief.
       include: {
         lines: {
+          orderBy: lineOrder(),
           include: {
             brief: true,
             articlePlacement: { include: { article: { include: { versions: true } } } },
@@ -105,7 +115,7 @@ export async function GET(req: NextRequest) {
     }),
     prisma.invoice.findMany({
       where: { organizationId: { in: orgIds } },
-      include: { lines: true },
+      include: { lines: { orderBy: lineOrder() } },
     }),
   ]);
 

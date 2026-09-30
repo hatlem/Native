@@ -1,6 +1,7 @@
 import { getTranslations } from "next-intl/server";
 import { notFound } from "next/navigation";
 import { prisma } from "@/lib/prisma";
+import { lineOrder } from "@/lib/commerce/line-order";
 import { Link } from "@/i18n/navigation";
 import { clicksByOrderLine } from "@/lib/metrics/store";
 import { OrderHeader } from "./order-header";
@@ -32,6 +33,7 @@ export default async function DeskOrderPage({
       invoices: true,
       creditNotes: true,
       lines: {
+        orderBy: lineOrder(),
         include: {
           brief: true,
           articlePlacement: {

@@ -1,6 +1,7 @@
 import { getTranslations } from "next-intl/server";
 import { notFound } from "next/navigation";
 import { prisma } from "@/lib/prisma";
+import { lineOrder } from "@/lib/commerce/line-order";
 import { Link } from "@/i18n/navigation";
 import { formatMoney, intlLocale } from "@/lib/money";
 import { loadScope, canActOnOrg } from "@/lib/scope";
@@ -34,6 +35,7 @@ export default async function MyOrderPage({
       quote: true,
       invoices: { select: { id: true, status: true } },
       lines: {
+        orderBy: lineOrder(),
         include: {
           articlePlacement: {
             select: {
