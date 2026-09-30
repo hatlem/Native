@@ -754,7 +754,16 @@
     "runPeriod": "{range} · {unit, select, WEEK {{n, plural, one {# uge} other {# uger}}} other {{n, plural, one {# måned} other {# måneder}}}}",
     "orderedTitle": "Bestilt {date}",
     "orderedBody": "Denne plan er bestilt, og ændringer her ændrer ikke ordren. Vil du booke de samme placeringer igen, planlægger du næste runde: så kopieres planen til en ny, som du kan redigere og bestille.",
-    "orderedView": "Se ordren"
+    "orderedView": "Se ordren",
+    "download": {
+      "heading": "Download plan",
+      "hint": "En kopi til at dele internt, fx med en kollega eller din chef.",
+      "liveHint": "Skal den til kunden? Brug »Del med kunden« herunder – linket viser altid den nyeste version.",
+      "pdf": "PDF",
+      "word": "Word",
+      "pdfLabel": "Download planen som PDF",
+      "wordLabel": "Download planen som Word-dokument"
+    }
   },
   "rfq": {
     "org": "Virksomhed",
@@ -3392,7 +3401,15 @@
     "alternativesHeading": "Alternativer – ikke med i totalen",
     "alternativesIntro": "Titler vi også anbefaler. De er ikke med i planen eller totalen.",
     "changedSinceApproval": "Du godkendte en tidligere version af planen {date}. Den er ændret siden, så se den igennem og godkend igen.",
-    "approveAgainCta": "Godkend den opdaterede plan"
+    "approveAgainCta": "Godkend den opdaterede plan",
+    "download": {
+      "heading": "Download planen",
+      "hint": "En kopi, du kan gemme eller sende videre. Denne side viser altid den nyeste version.",
+      "pdf": "PDF",
+      "word": "Word",
+      "pdfLabel": "Download planen som PDF",
+      "wordLabel": "Download planen som Word-dokument"
+    }
   },
   "quotePdf": {
     "documentTitle": "Tilbud {quoteNumber}",
@@ -3917,5 +3934,43 @@
     "audience": "Målgruppe",
     "geo": "Geografi",
     "context": "Redaktionel kontekst"
+  },
+  "planDocument": {
+    "documentTitle": "Medieplan: {name}",
+    "eyebrow": "Medieplan",
+    "preparedFor": "Udarbejdet til {org} · {date}",
+    "intro": "Dette er en kopi af planen, som den så ud {date}. Priserne følger de samme regler som i NativeSpin – hvordan de fungerer, står til sidst.",
+    "linkShare": "Den nyeste version af planen ligger online. Alle med linket kan åbne den uden login:",
+    "linkPlan": "Den nyeste version af planen ligger i NativeSpin (kræver login):",
+    "linkInvite": "Kolleger uden adgang kan inviteres under Konto → Team.",
+    "briefHeading": "Brief",
+    "briefCampaign": "Kampagne",
+    "briefTiming": "Tidspunkt",
+    "briefBudget": "Budget",
+    "briefAudience": "Målgrupper",
+    "briefGeo": "Geografisk fokus",
+    "briefContext": "Redaktionel kontekst",
+    "briefTargeting": "Målretning",
+    "planHeading": "Publikationer i planen",
+    "colPublication": "Publikation",
+    "colReach": "Rækkevidde",
+    "colPrice": "Pris",
+    "colStatus": "Status",
+    "reachValue": "{count} læsere/md.",
+    "statusExact": "Bekræftet pris",
+    "statusOnRequest": "Desken sætter prisen",
+    "statusPlaceholder": "Desken foreslår placering",
+    "priceOnRequest": "Pris på forespørgsel",
+    "totalHeading": "I alt",
+    "pricesHeading": "Sådan fungerer priserne",
+    "pricesVat": "Priserne er i {currencies} ekskl. moms.",
+    "pricesExact": "»{label}« er udgiverens bekræftede pris: disse linjer kan bestilles til præcis denne pris.",
+    "pricesIndicative": "»{label}« vises som prisinterval (≈). Desken bekræfter den præcise pris i tilbuddet ud fra volumen og sæson.",
+    "pricesOnRequest": "»{label}«: desken prissætter disse linjer, når planen sendes, som regel inden for 24 timer. De er ikke med i totalen.",
+    "pricesContent": "»{label}« betyder, at artiklen er med i prisen. Når udgiveren skriver den, lægger NativeSpin ikke et honorar oveni.",
+    "pricesAlternatives": "Alternativerne er kun anbefalinger og er ikke med i planen eller totalen.",
+    "pricesNothingBooked": "Intet bliver booket, før et tilbud er godkendt.",
+    "footerLink": "Åbn planen",
+    "pageOf": "Side {page} af {pages}"
   }
 }

@@ -754,7 +754,16 @@
     "runPeriod": "{range} · {unit, select, WEEK {{n, plural, one {# vecka} other {# veckor}}} other {{n, plural, one {# månad} other {# månader}}}}",
     "orderedTitle": "Beställd {date}",
     "orderedBody": "Den här planen är beställd, och ändringar här påverkar inte ordern. Vill du boka samma placeringar igen planerar du nästa omgång: planen kopieras då till en ny som du kan ändra och beställa.",
-    "orderedView": "Visa ordern"
+    "orderedView": "Visa ordern",
+    "download": {
+      "heading": "Ladda ner plan",
+      "hint": "En kopia att dela internt, till exempel med en kollega eller din chef.",
+      "liveHint": "Ska den till kunden? Använd ”Dela med kunden” nedan – länken visar alltid den senaste versionen.",
+      "pdf": "PDF",
+      "word": "Word",
+      "pdfLabel": "Ladda ner planen som PDF",
+      "wordLabel": "Ladda ner planen som Word-dokument"
+    }
   },
   "rfq": {
     "org": "Företag",
@@ -3391,7 +3400,15 @@
     "alternativesHeading": "Alternativ – ingår inte i totalen",
     "alternativesIntro": "Titlar vi också rekommenderar. De ingår inte i planen eller totalen.",
     "changedSinceApproval": "Du godkände en tidigare version av planen {date}. Den har ändrats sedan dess, så titta igenom den och godkänn igen.",
-    "approveAgainCta": "Godkänn den uppdaterade planen"
+    "approveAgainCta": "Godkänn den uppdaterade planen",
+    "download": {
+      "heading": "Ladda ner planen",
+      "hint": "En kopia att spara eller skicka vidare. Den här sidan visar alltid den senaste versionen.",
+      "pdf": "PDF",
+      "word": "Word",
+      "pdfLabel": "Ladda ner planen som PDF",
+      "wordLabel": "Ladda ner planen som Word-dokument"
+    }
   },
   "quotePdf": {
     "documentTitle": "Offert {quoteNumber}",
@@ -3916,5 +3933,43 @@
     "audience": "Målgrupp",
     "geo": "Geografi",
     "context": "Redaktionell kontext"
+  },
+  "planDocument": {
+    "documentTitle": "Medieplan: {name}",
+    "eyebrow": "Medieplan",
+    "preparedFor": "Framtagen för {org} · {date}",
+    "intro": "Det här är en kopia av planen som den såg ut {date}. Priserna följer samma regler som i NativeSpin – hur de fungerar står i slutet.",
+    "linkShare": "Den senaste versionen av planen finns online. Alla med länken kan öppna den, utan inloggning:",
+    "linkPlan": "Den senaste versionen av planen finns i NativeSpin (kräver inloggning):",
+    "linkInvite": "Kollegor som saknar åtkomst kan bjudas in under Konto → Team.",
+    "briefHeading": "Brief",
+    "briefCampaign": "Kampanj",
+    "briefTiming": "Tidpunkt",
+    "briefBudget": "Budget",
+    "briefAudience": "Målgrupper",
+    "briefGeo": "Geografiskt fokus",
+    "briefContext": "Redaktionellt sammanhang",
+    "briefTargeting": "Inriktning",
+    "planHeading": "Publikationer i planen",
+    "colPublication": "Publikation",
+    "colReach": "Räckvidd",
+    "colPrice": "Pris",
+    "colStatus": "Status",
+    "reachValue": "{count} läsare/mån",
+    "statusExact": "Bekräftat pris",
+    "statusOnRequest": "Desken sätter priset",
+    "statusPlaceholder": "Desken föreslår placering",
+    "priceOnRequest": "Pris på förfrågan",
+    "totalHeading": "Totalt",
+    "pricesHeading": "Så fungerar priserna",
+    "pricesVat": "Priserna är i {currencies} exklusive moms.",
+    "pricesExact": "”{label}” är utgivarens bekräftade pris: de här raderna kan beställas till exakt det priset.",
+    "pricesIndicative": "”{label}” visas som prisintervall (≈). Desken bekräftar det exakta priset i offerten, utifrån volym och säsong.",
+    "pricesOnRequest": "”{label}”: desken prissätter de här raderna när planen skickas, oftast inom 24 timmar. De ingår inte i totalen.",
+    "pricesContent": "”{label}” betyder att artikeln ingår i priset. När utgivaren skriver den tillkommer ingen avgift från NativeSpin.",
+    "pricesAlternatives": "Alternativen är bara rekommendationer och ingår inte i planen eller totalen.",
+    "pricesNothingBooked": "Inget bokas förrän en offert har godkänts.",
+    "footerLink": "Öppna planen",
+    "pageOf": "Sida {page} av {pages}"
   }
 }

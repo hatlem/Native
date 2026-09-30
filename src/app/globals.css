@@ -7757,6 +7757,42 @@ footer a:hover {
   flex-wrap: wrap;
 }
 
+/* "Download plan" (PDF / Word): the same quiet card as the share control it
+   sits above on /plan, and a card of its own on the share page. */
+.plan-download {
+  margin-top: var(--s-3);
+  padding: var(--s-3) var(--s-4);
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  border-radius: var(--r-sm);
+  display: grid;
+  gap: var(--s-2);
+}
+.plan-download__heading {
+  display: flex;
+  align-items: center;
+  gap: var(--s-2);
+  margin: 0;
+  font-weight: 600;
+  font-size: 0.9rem;
+  color: var(--heading);
+}
+.plan-download__heading svg {
+  color: var(--accent);
+  flex: none;
+}
+.plan-download p {
+  margin: 0;
+}
+.plan-download__actions {
+  display: flex;
+  gap: var(--s-2);
+  flex-wrap: wrap;
+}
+.share-list .plan-download {
+  margin-top: var(--s-5);
+}
+
 .share-list {
   max-width: 720px;
   margin: 0 auto;

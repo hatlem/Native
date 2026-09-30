@@ -894,7 +894,16 @@
     "runPeriod": "{range} · {unit, select, WEEK {{n, plural, one {# Woche} other {# Wochen}}} other {{n, plural, one {# Monat} other {# Monate}}}}",
     "orderedTitle": "Bestellt am {date}",
     "orderedBody": "Dieser Plan wurde bestellt; Änderungen hier ändern die Bestellung nicht. Um dieselben Platzierungen erneut zu buchen, planen Sie die nächste Welle: Sie kopiert diesen Plan in einen neuen, den Sie bearbeiten und bestellen können.",
-    "orderedView": "Bestellung ansehen"
+    "orderedView": "Bestellung ansehen",
+    "download": {
+      "heading": "Plan herunterladen",
+      "hint": "Eine Kopie zum Weitergeben im eigenen Team, etwa an Kollegen oder die Führungskraft.",
+      "liveHint": "Geht der Plan an den Kunden? Dann besser „Mit dem Kunden teilen“ unten nutzen – der Link zeigt immer die aktuelle Version.",
+      "pdf": "PDF",
+      "word": "Word",
+      "pdfLabel": "Plan als PDF herunterladen",
+      "wordLabel": "Plan als Word-Dokument herunterladen"
+    }
   },
   "rfq": {
     "org": "Firma",
@@ -3260,7 +3269,15 @@
     "alternativesHeading": "Alternativen – nicht in der Summe enthalten",
     "alternativesIntro": "Titel, die wir ebenfalls empfehlen. Sie gehören nicht zum Plan oder zur Summe.",
     "changedSinceApproval": "Sie haben am {date} eine frühere Version dieses Plans freigegeben. Er hat sich seitdem geändert. Bitte prüfen Sie ihn und geben Sie ihn erneut frei.",
-    "approveAgainCta": "Aktualisierten Plan freigeben"
+    "approveAgainCta": "Aktualisierten Plan freigeben",
+    "download": {
+      "heading": "Plan herunterladen",
+      "hint": "Eine Kopie zum Speichern oder Weitergeben. Diese Seite zeigt immer die aktuelle Version.",
+      "pdf": "PDF",
+      "word": "Word",
+      "pdfLabel": "Plan als PDF herunterladen",
+      "wordLabel": "Plan als Word-Dokument herunterladen"
+    }
   },
   "quotePdf": {
     "documentTitle": "Angebot {quoteNumber}",
@@ -3785,5 +3802,43 @@
     "audience": "Zielgruppe",
     "geo": "Region",
     "context": "Redaktioneller Kontext"
+  },
+  "planDocument": {
+    "documentTitle": "Mediaplan: {name}",
+    "eyebrow": "Mediaplan",
+    "preparedFor": "Erstellt für {org} · {date}",
+    "intro": "Dies ist eine Kopie des Plans mit Stand vom {date}. Die Preise folgen denselben Regeln wie in NativeSpin – wie sie funktionieren, steht am Ende.",
+    "linkShare": "Die aktuelle Version des Plans ist online. Jeder mit dem Link kann sie ohne Anmeldung öffnen:",
+    "linkPlan": "Die aktuelle Version des Plans liegt in NativeSpin (Anmeldung erforderlich):",
+    "linkInvite": "Kolleginnen und Kollegen ohne Zugang lassen sich unter Konto → Team einladen.",
+    "briefHeading": "Briefing",
+    "briefCampaign": "Kampagne",
+    "briefTiming": "Zeitraum",
+    "briefBudget": "Budget",
+    "briefAudience": "Zielgruppen",
+    "briefGeo": "Geografischer Fokus",
+    "briefContext": "Redaktioneller Kontext",
+    "briefTargeting": "Ausrichtung",
+    "planHeading": "Publikationen im Plan",
+    "colPublication": "Publikation",
+    "colReach": "Reichweite",
+    "colPrice": "Preis",
+    "colStatus": "Status",
+    "reachValue": "{count} Leser/Monat",
+    "statusExact": "Bestätigter Preis",
+    "statusOnRequest": "Preis kommt vom Desk",
+    "statusPlaceholder": "Desk schlägt Platzierung vor",
+    "priceOnRequest": "Preis auf Anfrage",
+    "totalHeading": "Gesamt",
+    "pricesHeading": "So funktionieren die Preise",
+    "pricesVat": "Alle Preise in {currencies}, zzgl. MwSt.",
+    "pricesExact": "„{label}“ ist der vom Verlag bestätigte Preis: Diese Zeilen können genau zu diesem Preis bestellt werden.",
+    "pricesIndicative": "„{label}“ wird als Preisspanne (≈) angezeigt. Der Desk bestätigt den genauen Preis im Angebot, abhängig von Volumen und Saison.",
+    "pricesOnRequest": "„{label}“: Der Desk bepreist diese Zeilen, sobald der Plan gesendet wird, meist innerhalb von 24 Stunden. Sie sind nicht in der Summe enthalten.",
+    "pricesContent": "„{label}“ bedeutet, dass das Schreiben des Artikels im Preis enthalten ist. Schreibt der Verlag ihn, fällt keine NativeSpin-Gebühr an.",
+    "pricesAlternatives": "Die Alternativen sind nur Empfehlungen und weder Teil des Plans noch der Summe.",
+    "pricesNothingBooked": "Gebucht wird erst, wenn ein Angebot freigegeben ist.",
+    "footerLink": "Plan öffnen",
+    "pageOf": "Seite {page} von {pages}"
   }
 }

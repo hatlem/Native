@@ -11,7 +11,29 @@
 // indicative figure; callers add their own "excl. VAT" / "incl. VAT" copy.
 
 import { formatMoney } from "@/lib/money";
-import { rangeLabel } from "./bands";
+import type { LineDisplay } from "@/lib/plan-total";
+import { bandLabel, rangeLabel } from "./bands";
+
+// One plan line's figure (lib/plan-total.ts lineDisplay), printed the same way
+// on /plan, the share page and the downloaded plan, so a forwarded document
+// can't word a price differently from the screen it came from:
+//
+//   "45 000 kr"        exact: an instant-orderable line
+//   "≈ 40–60k NOK"     band: the line's price band, never its estimate
+//   "≈ 395 NOK CPM"    rate: a volume-priced line's unit rate
+//   onRequest          no shown price, in the caller's own words
+export function lineFigureLabel(display: LineDisplay, currency: string, locale: string, onRequest: string): string {
+  switch (display.kind) {
+    case "exact":
+      return formatMoney(display.total, currency, locale);
+    case "band":
+      return `≈ ${bandLabel(display.band, currency)}`;
+    case "rate":
+      return `≈ ${display.rate} ${currency} ${display.unit}`;
+    case "onRequest":
+      return onRequest;
+  }
+}
 
 type Figure = {
   currency: string;

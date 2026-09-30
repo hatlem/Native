@@ -23,4 +23,9 @@ Font.register({
   ],
 });
 
+// react-pdf hyphenates with English rules, which split Nordic words at random
+// ("ar-tikkel") in narrow table cells. Break lines between words only. Global
+// to react-pdf, so it is set here, once, for every document.
+Font.registerHyphenationCallback((word) => [word]);
+
 export const PDF_FONT_FAMILY = "Inter";

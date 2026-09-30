@@ -894,7 +894,16 @@
     "runPeriod": "{range} · {unit, select, WEEK {{n, plural, one {# viikko} other {# viikkoa}}} other {{n, plural, one {# kuukausi} other {# kuukautta}}}}",
     "orderedTitle": "Tilattu {date}",
     "orderedBody": "Tämä suunnitelma on tilattu, eivätkä muutokset tässä muuta tilausta. Jos haluat varata samat sijoittelut uudelleen, suunnittele seuraava kierros: suunnitelma kopioidaan uudeksi, jota voit muokata ja jonka voit tilata.",
-    "orderedView": "Näytä tilaus"
+    "orderedView": "Näytä tilaus",
+    "download": {
+      "heading": "Lataa suunnitelma",
+      "hint": "Kopio jaettavaksi tiimin sisällä, esimerkiksi kollegalle tai esihenkilöllesi.",
+      "liveHint": "Lähetätkö sen asiakkaalle? Käytä alta ”Jaa asiakkaalle” – linkki näyttää aina uusimman version.",
+      "pdf": "PDF",
+      "word": "Word",
+      "pdfLabel": "Lataa suunnitelma PDF-tiedostona",
+      "wordLabel": "Lataa suunnitelma Word-tiedostona"
+    }
   },
   "rfq": {
     "org": "Yritys",
@@ -3391,7 +3400,15 @@
     "alternativesHeading": "Vaihtoehdot – eivät sisälly kokonaissummaan",
     "alternativesIntro": "Nimikkeet, joita suosittelemme myös. Ne eivät kuulu suunnitelmaan tai kokonaissummaan.",
     "changedSinceApproval": "Hyväksyit suunnitelman aiemman version {date}. Se on muuttunut sen jälkeen, joten tarkista se ja hyväksy uudelleen.",
-    "approveAgainCta": "Hyväksy päivitetty suunnitelma"
+    "approveAgainCta": "Hyväksy päivitetty suunnitelma",
+    "download": {
+      "heading": "Lataa suunnitelma",
+      "hint": "Kopio tallennettavaksi tai edelleen lähetettäväksi. Tämä sivu näyttää aina uusimman version.",
+      "pdf": "PDF",
+      "word": "Word",
+      "pdfLabel": "Lataa suunnitelma PDF-tiedostona",
+      "wordLabel": "Lataa suunnitelma Word-tiedostona"
+    }
   },
   "quotePdf": {
     "documentTitle": "Tarjous {quoteNumber}",
@@ -3916,5 +3933,43 @@
     "audience": "Kohderyhmä",
     "geo": "Maantiede",
     "context": "Toimituksellinen konteksti"
+  },
+  "planDocument": {
+    "documentTitle": "Mediasuunnitelma: {name}",
+    "eyebrow": "Mediasuunnitelma",
+    "preparedFor": "Asiakas: {org} · {date}",
+    "intro": "Tämä on kopio suunnitelmasta sellaisena kuin se oli {date}. Hinnat noudattavat samoja sääntöjä kuin NativeSpinissä – niiden toiminta selitetään lopussa.",
+    "linkShare": "Suunnitelman uusin versio on verkossa. Kuka tahansa linkin saanut voi avata sen ilman kirjautumista:",
+    "linkPlan": "Suunnitelman uusin versio on NativeSpinissä (vaatii kirjautumisen):",
+    "linkInvite": "Kollegat, joilla ei ole pääsyä, voi kutsua kohdassa Tili → Tiimi.",
+    "briefHeading": "Brief",
+    "briefCampaign": "Kampanja",
+    "briefTiming": "Ajoitus",
+    "briefBudget": "Budjetti",
+    "briefAudience": "Kohderyhmät",
+    "briefGeo": "Maantieteellinen painopiste",
+    "briefContext": "Toimituksellinen konteksti",
+    "briefTargeting": "Kohdennus",
+    "planHeading": "Suunnitelman julkaisut",
+    "colPublication": "Julkaisu",
+    "colReach": "Tavoittavuus",
+    "colPrice": "Hinta",
+    "colStatus": "Tila",
+    "reachValue": "{count} lukijaa/kk",
+    "statusExact": "Vahvistettu hinta",
+    "statusOnRequest": "Desk hinnoittelee",
+    "statusPlaceholder": "Desk ehdottaa sijoittelua",
+    "priceOnRequest": "Hinta pyynnöstä",
+    "totalHeading": "Yhteensä",
+    "pricesHeading": "Näin hinnat toimivat",
+    "pricesVat": "Hinnat on ilmoitettu valuutassa {currencies} ilman arvonlisäveroa.",
+    "pricesExact": "”{label}” on julkaisijan vahvistama hinta: nämä rivit voi tilata juuri tähän hintaan.",
+    "pricesIndicative": "”{label}” näytetään hintahaarukkana (≈). Desk vahvistaa tarkan hinnan tarjouksessa volyymin ja sesongin mukaan.",
+    "pricesOnRequest": "”{label}”: desk hinnoittelee nämä rivit, kun suunnitelma lähetetään, yleensä 24 tunnin kuluessa. Ne eivät sisälly yhteissummaan.",
+    "pricesContent": "”{label}” tarkoittaa, että artikkelin kirjoittaminen sisältyy hintaan. Kun julkaisija kirjoittaa sen, NativeSpin ei lisää palkkiota.",
+    "pricesAlternatives": "Vaihtoehdot ovat vain suosituksia, eivätkä ne sisälly suunnitelmaan tai yhteissummaan.",
+    "pricesNothingBooked": "Mitään ei varata ennen kuin tarjous on hyväksytty.",
+    "footerLink": "Avaa suunnitelma",
+    "pageOf": "Sivu {page}/{pages}"
   }
 }

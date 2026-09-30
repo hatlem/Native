@@ -122,3 +122,7 @@ export const outreachLimiter = new RateLimiter(8, 8 / 3600);
 // path per IP; over-limit callers still get a (free) template article, so
 // abuse can't run up model cost. ~15/hour.
 export const previewLimiter = new RateLimiter(15, 15 / 3600);
+// Plan download from a public share link (PDF/DOCX rendered per request, no
+// sign-in). Per IP: a client saving both formats a few times is nowhere near
+// it; a script hammering the renderer is. 10 per minute.
+export const shareDownloadLimiter = new RateLimiter(10, 10 / 60);

@@ -8,10 +8,10 @@ import { formatMoney, intlLocale } from "@/lib/money";
 import { titleDisplayName } from "@/lib/title-display";
 import { loadPricingDefaults } from "@/lib/content-fee";
 import { estimateListTotals, hasFigure, hasUnpricedLines, lineDisplay } from "@/lib/plan-total";
-import { bandLabel } from "@/lib/pricing/bands";
-import { totalLabel } from "@/lib/pricing/total-label";
+import { lineFigureLabel, totalLabel } from "@/lib/pricing/total-label";
 import { formatRunRange, runBounds } from "@/lib/run-period";
 import { publisherCanWrite } from "@/lib/authorship";
+import { PlanDownload } from "@/components/plan-download";
 
 export const dynamic = "force-dynamic";
 
@@ -78,15 +78,7 @@ export default async function SharedListPage({
       const p = i.product;
       // Exact only for an instant-orderable line; otherwise the band, the
       // rate, or "on request" — never a 0 (lib/plan-total.ts lineDisplay).
-      const display = lineDisplay(i, pricing);
-      const figure =
-        display.kind === "exact"
-          ? money(display.total, p.currency)
-          : display.kind === "band"
-            ? `≈ ${bandLabel(display.band, p.currency)}`
-            : display.kind === "rate"
-              ? `≈ ${display.rate} ${p.currency} ${display.unit}`
-              : tv("requestPrice");
+      const figure = lineFigureLabel(lineDisplay(i, pricing), p.currency, locale, tv("requestPrice"));
       return (
         <div className="share-list__line" key={i.id}>
           <div className="share-list__line-main">
@@ -213,6 +205,14 @@ export default async function SharedListPage({
           </button>
         </form>
       )}
+
+      {/* The same plan as a file to keep or forward: addressed by the same
+          token, so a disabled or rotated link stops the download too. */}
+      <PlanDownload
+        locale={locale}
+        basePath={`/api/export/shared-plan/${encodeURIComponent(token)}`}
+        variant="share"
+      />
 
       <footer className="share-list__footer">
         <span className="muted small">{t("footer")}</span>
