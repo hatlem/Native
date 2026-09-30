@@ -35,7 +35,7 @@ export async function LandingShell({
   const nonce = (await headers()).get("x-nonce") ?? undefined;
   const t = await getTranslations({ locale, namespace: "landing" });
 
-  const rootClass = ["bn", inter.variable, rootClassName]
+  const rootClass = ["bn", inter.variable, withFooter ? null : "bn--bare", rootClassName]
     .filter(Boolean)
     .join(" ");
 

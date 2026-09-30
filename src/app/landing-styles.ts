@@ -301,6 +301,10 @@ body:has(.bn) .drawer-link:hover { background: rgba(20,17,12,0.06) !important; }
 .bn .section {
   padding: clamp(56px, 6vw, 96px) 0;
   border-bottom: 1px solid var(--hair);
+  /* The app stylesheet's .section adds margin-top: var(--s-7); marketing
+     sections are spaced by their own padding + rule, so that margin only
+     showed up as an empty band under the header (/preview, /recommend). */
+  margin-top: 0;
 }
 .bn .section:last-of-type { border-bottom: 2px solid var(--rule); }
 .bn .section > .wrap > .section-head + * { margin-top: clamp(28px, 3vw, 40px); }
@@ -430,6 +434,13 @@ body:has(.bn) .drawer-link:hover { background: rgba(20,17,12,0.06) !important; }
 .bn .table-wrap {
   width: 100%;
   overflow-x: auto;
+  /* Reset the app stylesheet's card chrome (.table-wrap: surface, border,
+     radius). Marketing tables are editorial — a rule above, cells flush
+     with the text column; inside the leaked card box the first column sat
+     flush against the card's left edge instead. */
+  background: none;
+  border: 0;
+  border-radius: 0;
   border-top: 2px solid var(--rule);
 }
 .bn .table {
@@ -935,6 +946,11 @@ body:has(.bn) .drawer-link:hover { background: rgba(20,17,12,0.06) !important; }
 }
 .bn .auth-card .field [aria-invalid="true"] { border-color: var(--NO); }
 .bn .contact-sent { align-self: start; }
+.bn .onboarding-call__skip { margin: clamp(24px, 3vw, 36px) 0 0; }
+/* Footerless shells (onboarding steps, loading) still fill the viewport
+   below the 64px site header, so a short page doesn't end in a band of
+   the app's grey body background. */
+.bn.bn--bare { min-height: calc(100dvh - 64px); }
 
 /* — Skeleton lines (marketing loading) — */
 .bn .skel {
@@ -1277,6 +1293,23 @@ body:has(.bn) .drawer-link:hover { background: rgba(20,17,12,0.06) !important; }
 .bn .bq-qrow .qp { font-weight:700; font-variant-numeric:tabular-nums; color:var(--ink); }
 .bn .bq-total { display:flex; justify-content:space-between; margin-top:12px; padding-top:12px; border-top:2px solid var(--ink); font-weight:700; font-size:14px; }
 
+/* Native-vs-display table on phones: three columns at 375px left ~90px per
+   cell and broke words mid-word ("annonseblindhe|t"). Each row becomes a
+   block — the spec as a heading, then the two sides stacked, each carrying
+   its column name (data-label) since the header row is hidden. */
+@media (max-width: 600px) {
+  .bn .vs-table, .bn .vs-table tbody, .bn .vs-table tr, .bn .vs-table td { display: block; width: auto; }
+  .bn .vs-table thead { display: none; }
+  .bn .vs-table tbody tr { padding: 20px 0; border-bottom: 1px solid var(--hair); }
+  .bn .vs-table tbody tr:last-child { border-bottom: none; }
+  .bn .vs-table tbody td { padding: 0; border-bottom: none; overflow-wrap: normal; hyphens: auto; }
+  .bn .vs-table tbody td.spec { font-size: 11px; margin-bottom: 12px; }
+  .bn .vs-table tbody td.native { margin-bottom: 12px; }
+  .bn .vs-table tbody td[data-label]::before {
+    content: attr(data-label); display: block; margin-bottom: 4px;
+    font-size: 10px; text-transform: uppercase; letter-spacing: 0.16em; font-weight: 600; color: var(--ink-mute);
+  }
+}
 @media (max-width: 860px) {
   .bn .vsd { grid-template-columns:1fr; }
   .bn .bq-flow { grid-template-columns:1fr; }
@@ -1290,7 +1323,9 @@ body:has(.bn) .drawer-link:hover { background: rgba(20,17,12,0.06) !important; }
 .bn .pv-field label { font-size:10.5px; text-transform:uppercase; letter-spacing:.13em; font-weight:700; color:var(--ink); }
 .bn .pv-field input, .bn .pv-field textarea, .bn .pv-field select { font:inherit; font-size:14px; padding:10px 12px; border:1.5px solid var(--ink); border-radius:3px; background:#faf8f1; color:var(--ink); width:100%; }
 .bn .pv-field textarea { resize:vertical; min-height:72px; }
-.bn .pv-row2 { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
+/* Market and tone stack: side by side in the 360px control column each
+   select got ~175px and cut the tone off ("Varm og menneskeli…"). */
+.bn .pv-row2 { display:grid; grid-template-columns:1fr; gap:16px; }
 .bn .pv-gen { font:inherit; font-size:13px; text-transform:uppercase; letter-spacing:.12em; font-weight:700; background:var(--ink); color:var(--paper); border:2px solid var(--ink); border-radius:3px; padding:14px; cursor:pointer; box-shadow:5px 5px 0 0 var(--ink-mute); transition:transform .12s; }
 .bn .pv-gen:hover { transform:translateY(-1px); box-shadow:7px 7px 0 0 var(--ink-mute); }
 .bn .pv-gen:disabled { opacity:.5; cursor:wait; transform:none; box-shadow:none; }

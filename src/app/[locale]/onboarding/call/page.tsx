@@ -36,14 +36,23 @@ export default async function OnboardingCallPage({
   const t = await getTranslations({ locale, namespace: "onboarding" });
 
   return (
-    <LandingShell locale={locale} screenLabel="Onboarding">
-      <section className="onboarding-call wrap">
-        <h1>{t("callHeading")}</h1>
-        <p className="lead">{t("callBody")}</p>
-        <GetTalkBooking mode="inline" text={t("callCta")} />
-        <p>
-          <a href={next}>{t("callSkip")}</a>
-        </p>
+    // Signed-in flow step: no marketing footer (newsletter, publisher links).
+    <LandingShell locale={locale} screenLabel="Onboarding" withFooter={false}>
+      <header className="page-hero">
+        <div className="wrap">
+          <h1>{t("callHeading")}</h1>
+          <p className="lead">{t("callBody")}</p>
+        </div>
+      </header>
+      <section className="section onboarding-call">
+        <div className="wrap">
+          <GetTalkBooking mode="inline" text={t("callCta")} />
+          <p className="onboarding-call__skip">
+            <a href={next} className="btn">
+              {t("callSkip")}
+            </a>
+          </p>
+        </div>
       </section>
     </LandingShell>
   );

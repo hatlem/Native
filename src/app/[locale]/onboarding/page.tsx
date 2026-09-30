@@ -59,7 +59,7 @@ export default async function OnboardingPage({
   const errorCode = typeof sp.error === "string" ? sp.error : undefined;
 
   return (
-    <LandingShell locale={locale} screenLabel="Onboarding">
+    <LandingShell locale={locale} screenLabel="Onboarding" withFooter={false}>
       <section className="auth-shell">
         <div className="marketing">
           <span className="eyebrow accent">{t("eyebrow")}</span>

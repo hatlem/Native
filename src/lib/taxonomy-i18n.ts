@@ -54,6 +54,13 @@ const VERTICAL: TaxonomyMap = {
   "culture": { no: "Kultur", sv: "Kultur", da: "Kultur", de: "Kultur", fi: "Kulttuuri" },
   "news": { no: "Nyheter", sv: "Nyheter", da: "Nyheder", de: "Nachrichten", fi: "Uutiset" },
   // Verticals (Title.vertical)
+  "news (national)": { no: "Nyheter (riks)", sv: "Nyheter (riks)", da: "Nyheder (landsdækkende)", de: "Nachrichten (überregional)", fi: "Uutiset (valtakunnallinen)" },
+  "news (national tabloid)": { no: "Nyheter (riks, tabloid)", sv: "Nyheter (kvällspress)", da: "Nyheder (tabloid)", de: "Nachrichten (Boulevard)", fi: "Uutiset (iltapäivälehti)" },
+  "news (national quality)": { no: "Nyheter (riks, kvalitet)", sv: "Nyheter (rikstäckande kvalitet)", da: "Nyheder (landsdækkende kvalitet)", de: "Nachrichten (Qualitätspresse)", fi: "Uutiset (valtakunnallinen laatulehti)" },
+  "news (general)": { no: "Nyheter (generelt)", sv: "Nyheter (allmänt)", da: "Nyheder (generelt)", de: "Nachrichten (allgemein)", fi: "Uutiset (yleiset)" },
+  "affluent lifestyle": { no: "Kjøpesterk livsstil", sv: "Köpstark livsstil", da: "Købestærk livsstil", de: "Premium-Lifestyle", fi: "Ostovoimainen lifestyle" },
+  "celebrity & gossip": { no: "Kjendis og sladder", sv: "Kändisar och skvaller", da: "Kendte og sladder", de: "Promis & Klatsch", fi: "Julkkikset ja juorut" },
+  "outdoor & adventure": { no: "Friluftsliv og eventyr", sv: "Friluftsliv och äventyr", da: "Friluftsliv og eventyr", de: "Outdoor & Abenteuer", fi: "Ulkoilu ja seikkailu" },
   "news (regional)": { no: "Nyheter (regional)", sv: "Nyheter (regional)", da: "Nyheder (regional)", de: "Nachrichten (regional)", fi: "Uutiset (alueellinen)" },
   "news (local)": { no: "Nyheter (lokal)", sv: "Nyheter (lokal)", da: "Nyheder (lokal)", de: "Nachrichten (lokal)", fi: "Uutiset (paikallinen)" },
   "politics & current affairs": { no: "Politikk og samfunn", sv: "Politik och samhälle", da: "Politik og samfund", de: "Politik & Zeitgeschehen", fi: "Politiikka ja yhteiskunta" },

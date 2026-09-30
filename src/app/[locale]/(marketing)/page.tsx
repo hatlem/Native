@@ -266,8 +266,12 @@ export default async function HomePage({
               ).map((k) => (
                 <tr key={k}>
                   <td className="spec">{t(`vs.${k}Spec`)}</td>
-                  <td className="native">{t(`vs.${k}Native`)}</td>
-                  <td className="display">{t(`vs.${k}Display`)}</td>
+                  <td className="native" data-label={t("vs.thNative")}>
+                    {t(`vs.${k}Native`)}
+                  </td>
+                  <td className="display" data-label={t("vs.thDisplay")}>
+                    {t(`vs.${k}Display`)}
+                  </td>
                 </tr>
               ))}
             </tbody>
