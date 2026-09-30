@@ -100,9 +100,17 @@ if (!RUN_DB_IT) {
     // The sweep is system-wide and this suite shares its database with every
     // other .it.test.ts file, so its counters are global: assert ">= 1" plus
     // the per-item evidence below, never an exact global count.
-    const first = await runPlacementReadySweep();
-    assert.ok(first.notified >= 1, "the sweep notified at least this item");
-    assert.equal(first.failed, 0, "no item failed");
+    // Each tick is capped (MAX_NOTIFICATIONS_PER_SWEEP); tick until this
+    // item's turn, the way production catches up across ticks.
+    const notifiedYet = () =>
+      prisma.auditLog.findFirst({
+        where: { entity: `SavedListItem:${item.id}`, action: "placement-ready.notified" },
+      });
+    for (let tick = 0; tick < 25 && !(await notifiedYet()); tick++) {
+      const res = await runPlacementReadySweep();
+      assert.equal(res.failed, 0, "no item failed");
+    }
+    assert.ok(await notifiedYet(), "the sweep notified this item");
 
     const buyerNotifs = await prisma.notification.findMany({
       where: { userId: buyerUserId, kind: "TITLE_PRODUCT_READY" },
