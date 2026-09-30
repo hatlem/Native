@@ -15,6 +15,7 @@ import { Link } from "@/i18n/navigation";
 import { auth } from "@/auth";
 import { logout } from "@/app/auth-actions";
 import { GtmScripts, GtmNoscript } from "@/app/gtm";
+import { GetCookiesScripts } from "@/app/getcookies";
 import { NavShell } from "@/app/nav-shell";
 import { PublicHeader } from "@/app/public-header";
 import { BrandWordmark } from "@/app/brand";
@@ -206,6 +207,7 @@ export default async function LocaleLayout({
     <html lang={locale} className={inter.variable}>
       <body>
         <GtmNoscript />
+        <GetCookiesScripts nonce={nonce} />
         <GtmScripts nonce={nonce} />
         <NextIntlClientProvider messages={messages}>
           {signedIn ? (

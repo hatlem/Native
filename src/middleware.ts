@@ -30,6 +30,12 @@ export function buildCsp(nonce: string): string {
   const getTalkFrame = process.env.NEXT_PUBLIC_GETTALK_USERNAME
     ? " https://gettalk.co"
     : "";
+  // GetCookies consent banner (app/getcookies.tsx): widget.js is inserted by a
+  // nonce'd loader (allowed by 'strict-dynamic'), but its config, region and
+  // consent-log calls are fetches, which need connect-src.
+  const getCookiesConnect = process.env.NEXT_PUBLIC_GETCOOKIES_DOMAIN_ID
+    ? " https://getcookies.co"
+    : "";
   // Next.js dev wraps every module in eval() (eval-source-map), so without
   // 'unsafe-eval' the React bootstrap silently fails and the page never
   // hydrates. Production uses static chunks and doesn't need this.
@@ -52,7 +58,7 @@ export function buildCsp(nonce: string): string {
     `font-src 'self' data:`,
     // Article/rate-card uploads go straight from the browser to R2 with
     // a presigned PUT (fetch), so the bucket host must be connectable.
-    `connect-src 'self' https://*.r2.cloudflarestorage.com${gtmConnect}`,
+    `connect-src 'self' https://*.r2.cloudflarestorage.com${gtmConnect}${getCookiesConnect}`,
     `frame-src 'self'${gtmFrame}${getTalkFrame}`,
     `frame-ancestors 'none'`,
     `base-uri 'self'`,
