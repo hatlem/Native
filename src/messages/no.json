@@ -108,7 +108,8 @@
     "basis_win-rate": "fra vinnerrate",
     "basis_category-median": "kategorimedian",
     "basis_default": "standard",
-    "exportInvoicesCsv": "Eksporter fakturaer (CSV)"
+    "exportInvoicesCsv": "Eksporter fakturaer (CSV)",
+    "exportAccountingJson": "Regnskapseksport (JSON)"
   },
   "agency": {
     "eyebrow": "Byrå",
@@ -318,7 +319,9 @@
       "addToPlan": "Legg til i planen",
       "onPlan": "I planen",
       "askForPrice": "Be om pris"
-    }
+    },
+    "exportCsv": "Last ned katalogen (CSV)",
+    "exportCsvMarket": "Last ned titler i {market} (CSV)"
   },
   "lists": {
     "title": "Lagrede lister",

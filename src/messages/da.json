@@ -108,7 +108,8 @@
     "basis_win-rate": "fra vinderrate",
     "basis_category-median": "kategorimedian",
     "basis_default": "standard",
-    "exportInvoicesCsv": "Eksportér fakturaer (CSV)"
+    "exportInvoicesCsv": "Eksportér fakturaer (CSV)",
+    "exportAccountingJson": "Regnskabseksport (JSON)"
   },
   "agency": {
     "eyebrow": "Bureau",
@@ -318,7 +319,9 @@
       "addToPlan": "Tilføj til plan",
       "onPlan": "I planen",
       "askForPrice": "Bed om pris"
-    }
+    },
+    "exportCsv": "Download kataloget (CSV)",
+    "exportCsvMarket": "Download titler i {market} (CSV)"
   },
   "lists": {
     "title": "Gemte lister",

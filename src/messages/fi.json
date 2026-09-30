@@ -246,7 +246,8 @@
     "basis_win-rate": "voittoprosentista",
     "basis_category-median": "kategorian mediaani",
     "basis_default": "oletus",
-    "exportInvoicesCsv": "Vie laskut (CSV)"
+    "exportInvoicesCsv": "Vie laskut (CSV)",
+    "exportAccountingJson": "Kirjanpitovienti (JSON)"
   },
   "agency": {
     "eyebrow": "Toimisto",
@@ -456,7 +457,9 @@
       "addToPlan": "Lisää suunnitelmaan",
       "onPlan": "Suunnitelmassa",
       "askForPrice": "Pyydä hintaa"
-    }
+    },
+    "exportCsv": "Lataa luettelo (CSV)",
+    "exportCsvMarket": "Lataa julkaisut: {market} (CSV)"
   },
   "lists": {
     "title": "Tallennetut listat",

@@ -246,7 +246,8 @@
     "basis_win-rate": "from win rate",
     "basis_category-median": "category median",
     "basis_default": "default",
-    "exportInvoicesCsv": "Export invoices (CSV)"
+    "exportInvoicesCsv": "Export invoices (CSV)",
+    "exportAccountingJson": "Accounting export (JSON)"
   },
   "agency": {
     "eyebrow": "Agency",
@@ -456,7 +457,9 @@
     "bookCallTitle": "Want a hand buying native?",
     "bookCallBody": "Book a free 15-minute call — our desk helps you scope, pick titles and place the campaign.",
     "bookCallCta": "Book a call",
-    "bookCallDismiss": "Dismiss"
+    "bookCallDismiss": "Dismiss",
+    "exportCsv": "Download catalog (CSV)",
+    "exportCsvMarket": "Download {market} titles (CSV)"
   },
   "titleDetail": {
     "back": "Back to catalog",

@@ -686,6 +686,19 @@ export default async function CatalogPage({
               <div className="catalog-results-controls">
                 <CatalogSort initial={sort ?? ""} />
                 <CatalogDensityToggle initial={density} />
+                {/* The CSV export (bands only, like the page) had no way in
+                    from the UI. It filters by one market at most, so the
+                    link carries the market only when exactly one is picked.
+                    Plain <a download>: it's a file, not a page. */}
+                <a
+                  className="small-link"
+                  href={`/api/export/catalog.csv${markets.length === 1 ? `?market=${markets[0]}` : ""}`}
+                  download
+                >
+                  {markets.length === 1
+                    ? t("exportCsvMarket", { market: tMarket(markets[0]) })
+                    : t("exportCsv")}
+                </a>
               </div>
             </div>
 

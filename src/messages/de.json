@@ -246,7 +246,8 @@
     "basis_win-rate": "aus Gewinnrate",
     "basis_category-median": "Kategorie-Median",
     "basis_default": "Standard",
-    "exportInvoicesCsv": "Rechnungen exportieren (CSV)"
+    "exportInvoicesCsv": "Rechnungen exportieren (CSV)",
+    "exportAccountingJson": "Buchhaltungsexport (JSON)"
   },
   "agency": {
     "eyebrow": "Agentur",
@@ -456,7 +457,9 @@
       "addToPlan": "Zum Plan hinzufügen",
       "onPlan": "Im Plan",
       "askForPrice": "Preis anfragen"
-    }
+    },
+    "exportCsv": "Katalog herunterladen (CSV)",
+    "exportCsvMarket": "Titel in {market} herunterladen (CSV)"
   },
   "lists": {
     "title": "Gespeicherte Listen",
