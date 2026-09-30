@@ -6,11 +6,17 @@
 //
 // Curation gate: a brand-new title is created inactive; the super-admin
 // activates it before it reaches the public catalog. Updates never flip
-// `active` — only the desk does that.
+// `active` — only the desk does that — and never write a product's
+// desk-owned fields (price, visibility, bookable; lib/ingest.ts).
 
 import { prisma } from "@/lib/prisma";
-import { fireWebhook } from "@/lib/webhooks";
-import { ingestionSlug, type IngestPayload } from "@/lib/ingest";
+import {
+  NEW_PRODUCT_DEFAULTS,
+  deskOwnedFieldChanges,
+  ingestionSlug,
+  type DeskOwnedRefusal,
+  type IngestPayload,
+} from "@/lib/ingest";
 
 export type IngestSummary = {
   titlesCreated: number;
@@ -22,6 +28,44 @@ export type IngestSummary = {
   skipped: { externalRef: string; reason: string }[];
   results: { externalRef: string; titleId: string; productId: string }[];
 };
+
+/**
+ * Every desk-owned field the payload would change, across the whole batch —
+ * checked before anything is written, so a refused call changes nothing. The
+ * stored product is looked up the same way applyIngestion resolves it: by the
+ * title's externalRef within this publisher, then the product's externalRef.
+ */
+export async function findDeskOwnedFieldChanges(
+  publisherId: string,
+  payload: IngestPayload,
+): Promise<DeskOwnedRefusal[]> {
+  const stored = await prisma.product.findMany({
+    where: {
+      externalRef: { in: payload.products.map((p) => p.externalRef) },
+      title: {
+        publisherId,
+        externalRef: { in: payload.products.map((p) => p.title.externalRef) },
+      },
+    },
+    select: {
+      externalRef: true,
+      basePrice: true,
+      visibility: true,
+      bookable: true,
+      title: { select: { externalRef: true } },
+    },
+  });
+  const key = (titleRef: string | null, productRef: string | null) => `${titleRef}\u0000${productRef}`;
+  const byRef = new Map(
+    stored.map((s) => [
+      key(s.title.externalRef, s.externalRef),
+      { basePrice: Number(s.basePrice), visibility: s.visibility, bookable: s.bookable },
+    ]),
+  );
+  return payload.products.flatMap((p, i) =>
+    deskOwnedFieldChanges(p, byRef.get(key(p.title.externalRef, p.externalRef)) ?? null, i),
+  );
+}
 
 export async function applyIngestion(
   publisherId: string,
@@ -70,7 +114,6 @@ export async function applyIngestion(
       });
 
       let titleId: string;
-      let titleActive: boolean;
       let titleCreated = false;
       if (existingTitle) {
         // Never touch slug (stable for links/SEO) or `active` (desk-owned).
@@ -87,7 +130,6 @@ export async function applyIngestion(
           },
         });
         titleId = existingTitle.id;
-        titleActive = existingTitle.active;
       } else {
         const created = await tx.title.create({
           data: {
@@ -105,7 +147,6 @@ export async function applyIngestion(
           },
         });
         titleId = created.id;
-        titleActive = false;
         titleCreated = true;
       }
 
@@ -118,20 +159,19 @@ export async function applyIngestion(
 
       let productId: string;
       let productCreated = false;
-      let priceChanged = false;
       if (existingProduct) {
-        priceChanged = Number(existingProduct.basePrice) !== p.basePrice;
+        // basePrice / visibility / bookable are desk-owned and never written
+        // on an update (lib/ingest deskOwnedFieldChanges): the route refuses a
+        // payload that would change them, and a desk edit landing between that
+        // check and this write must not be overwritten either.
         await tx.product.update({
           where: { id: existingProduct.id },
           data: {
             type: p.type,
             name: p.name,
             description: p.description ?? existingProduct.description,
-            basePrice: p.basePrice,
             currency: p.currency,
             leadTimeDays: p.leadTimeDays ?? existingProduct.leadTimeDays,
-            visibility: p.visibility ?? existingProduct.visibility,
-            bookable: p.bookable ?? existingProduct.bookable,
           },
         });
         productId = existingProduct.id;
@@ -143,11 +183,15 @@ export async function applyIngestion(
             type: p.type,
             name: p.name,
             description: p.description ?? null,
+            // The opening rate card. It stays unconfirmed (confirmedAt null),
+            // so nothing is quoted off it until the desk confirms it.
             basePrice: p.basePrice,
             currency: p.currency,
             leadTimeDays: p.leadTimeDays ?? null,
-            visibility: p.visibility ?? "INDICATIVE",
-            bookable: p.bookable ?? true,
+            // Desk-owned from the start: a new product never arrives firm
+            // (instantly orderable) or pulled — those are the desk's calls.
+            visibility: NEW_PRODUCT_DEFAULTS.visibility,
+            bookable: NEW_PRODUCT_DEFAULTS.bookable,
           },
         });
         productId = created.id;
@@ -182,7 +226,7 @@ export async function applyIngestion(
         });
       }
 
-      return { titleId, productId, titleCreated, productCreated, priceChanged, titleActive };
+      return { titleId, productId, titleCreated, productCreated };
     });
 
     if (outcome.titleCreated) summary.titlesCreated++;
@@ -194,17 +238,9 @@ export async function applyIngestion(
       titleId: outcome.titleId,
       productId: outcome.productId,
     });
-
-    // Notify partners of a price move only on already-public titles, and
-    // only after the write committed.
-    if (outcome.priceChanged && outcome.titleActive) {
-      fireWebhook("title.price_changed", {
-        title_id: outcome.titleId,
-        product_id: outcome.productId,
-        base_price: p.basePrice,
-        currency: p.currency,
-      });
-    }
+    // No title.price_changed webhook from here any more: an ingestion can no
+    // longer move an existing product's price (it is desk-owned), so there is
+    // no price change to announce.
   }
 
   return summary;

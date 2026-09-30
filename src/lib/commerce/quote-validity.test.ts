@@ -3,10 +3,15 @@ import assert from "node:assert/strict";
 import {
   QUOTE_VALIDITY_DAYS,
   QUOTE_VALIDITY_MAX_DAYS,
+  acceptableQuoteWhere,
   buyerVisibleQuoteWhere,
+  editableQuoteWhere,
   effectiveQuoteStatus,
+  expiredSentQuoteWhere,
   isQuoteAcceptable,
+  isQuoteEditable,
   isQuoteExpired,
+  isQuoteRevisable,
   parseQuoteValidUntil,
   quoteValidUntilFrom,
   quoteValidUntilInputValue,
@@ -98,4 +103,40 @@ test("malformed or impossible dates are refused, blank falls back to the default
 
 test("buyers never see DRAFT quotes", () => {
   assert.deepEqual(buyerVisibleQuoteWhere(), { status: { not: "DRAFT" } });
+});
+
+// ─── Immutability and revisions ──────────────────────────────────────────────
+
+test("only an unordered DRAFT is editable; a sent offer is locked", () => {
+  assert.equal(isQuoteEditable({ status: "DRAFT", order: null }), true);
+  assert.equal(isQuoteEditable({ status: "DRAFT", order: { id: "o1" } }), false);
+  for (const status of ["SENT", "EXPIRED", "ACCEPTED", "DECLINED", "SUPERSEDED"] as const) {
+    assert.equal(isQuoteEditable({ status, order: null }), false, status);
+  }
+  assert.deepEqual(editableQuoteWhere(), { status: "DRAFT", order: null });
+});
+
+test("a SENT or EXPIRED offer may be revised once; nothing else may", () => {
+  assert.equal(isQuoteRevisable({ status: "SENT", order: null, nextRevision: null }), true);
+  assert.equal(isQuoteRevisable({ status: "EXPIRED", order: null, nextRevision: null }), true);
+  assert.equal(
+    isQuoteRevisable({ status: "SENT", order: null, nextRevision: { id: "r2" } }),
+    false,
+    "already revised — revise the newest revision instead",
+  );
+  assert.equal(isQuoteRevisable({ status: "SENT", order: { id: "o1" }, nextRevision: null }), false);
+  for (const status of ["DRAFT", "ACCEPTED", "DECLINED", "SUPERSEDED"] as const) {
+    assert.equal(isQuoteRevisable({ status, order: null, nextRevision: null }), false, status);
+  }
+});
+
+test("a SUPERSEDED quote is never acceptable, never 'expired', and reads as SUPERSEDED", () => {
+  const q = { status: "SUPERSEDED" as const, validUntil: future };
+  assert.equal(isQuoteAcceptable(q, NOW), false);
+  assert.equal(isQuoteExpired({ ...q, validUntil: past }, NOW), false);
+  assert.equal(effectiveQuoteStatus({ ...q, validUntil: past }, NOW), "SUPERSEDED");
+  // The query forms pin status SENT, so neither the accept CAS nor the expiry
+  // sweep can ever match a superseded row.
+  assert.equal(acceptableQuoteWhere(NOW).status, "SENT");
+  assert.equal(expiredSentQuoteWhere(NOW).status, "SENT");
 });

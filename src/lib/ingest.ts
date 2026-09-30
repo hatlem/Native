@@ -67,9 +67,9 @@ export const IngestProductSchema = z
     basePrice: z.number().nonnegative().max(1_000_000_000),
     currency: z.string().trim().length(3),
     leadTimeDays: z.number().int().positive().max(365).optional(),
-    // Publishers may push an indicative or firm price; defaults to
-    // INDICATIVE so a fresh price never auto-enables self-serve checkout
-    // before the desk has reviewed it.
+    // Desk-owned (see deskOwnedFieldChanges): accepted only when equal to
+    // the stored value, or to the new-product default (INDICATIVE / bookable)
+    // — so a fresh price never auto-enables self-serve checkout.
     visibility: z.enum(["INDICATIVE", "FIRM"]).optional(),
     bookable: z.boolean().optional(),
     title: IngestTitleSchema,
@@ -105,6 +105,64 @@ export function parseIngestPayload(raw: unknown): IngestParseResult {
     message: i.message,
   }));
   return { ok: false, errors };
+}
+
+// ─── Desk-owned fields ───────────────────────────────────────────────────────
+//
+// The ingestion API follows the publisher portal's rule. The portal lets a
+// publisher set lead times, specs and availability, and change a price only
+// through its rates page (provenance stamp + the desk is notified —
+// lib/publisher-rates.ts). Catalog status is the desk's: visibility (FIRM means
+// instant order), bookable, and the price once a product exists. The API used
+// to write all three straight onto the product, so a publisher could make its
+// own inventory instantly orderable, or silently move a live price, with no one
+// at the desk told. Now a change to any of them is refused (422), naming the
+// field, before anything is written; a value equal to what is stored (e.g. a
+// GET response sent back unchanged) is accepted as a no-op.
+
+export const DESK_OWNED_FIELDS = ["basePrice", "visibility", "bookable"] as const;
+export type DeskOwnedField = (typeof DESK_OWNED_FIELDS)[number];
+
+/** What a brand-new product starts with. Desk-owned from then on. */
+export const NEW_PRODUCT_DEFAULTS = { visibility: "INDICATIVE", bookable: true } as const;
+
+export type StoredDeskFields = {
+  basePrice: number;
+  visibility: "INDICATIVE" | "FIRM";
+  bookable: boolean;
+};
+
+export type DeskOwnedRefusal = { path: string; field: DeskOwnedField; message: string };
+
+const REFUSAL_MESSAGE: Record<DeskOwnedField, string> = {
+  basePrice:
+    "basePrice is managed by the NativeSpin desk once a product exists. Send the current value (see GET), or update the rate on the Rates page of the publisher portal, where the desk is notified.",
+  visibility:
+    "visibility is managed by the NativeSpin desk (FIRM makes a product instantly orderable) and can't be changed through the API.",
+  bookable: "bookable is managed by the NativeSpin desk and can't be changed through the API.",
+};
+
+/**
+ * The desk-owned fields product `index` of a payload would change. `stored`
+ * is the existing product (null when the call would create it): an existing
+ * product may only repeat its stored values; a new one may set its opening
+ * price but only the default visibility and bookable state.
+ */
+export function deskOwnedFieldChanges(
+  product: IngestProduct,
+  stored: StoredDeskFields | null,
+  index: number,
+): DeskOwnedRefusal[] {
+  const refusals: DeskOwnedRefusal[] = [];
+  const refuse = (field: DeskOwnedField) =>
+    refusals.push({ path: `products.${index}.${field}`, field, message: REFUSAL_MESSAGE[field] });
+
+  const visibility = stored?.visibility ?? NEW_PRODUCT_DEFAULTS.visibility;
+  const bookable = stored?.bookable ?? NEW_PRODUCT_DEFAULTS.bookable;
+  if (stored && product.basePrice !== stored.basePrice) refuse("basePrice");
+  if (product.visibility !== undefined && product.visibility !== visibility) refuse("visibility");
+  if (product.bookable !== undefined && product.bookable !== bookable) refuse("bookable");
+  return refusals;
 }
 
 // A slug must be stable and unique per title. We derive it from the

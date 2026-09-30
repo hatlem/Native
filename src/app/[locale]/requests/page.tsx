@@ -72,6 +72,10 @@ export default async function RequestsPage({
   const scope = await loadScope();
   if (!scope.workspace) redirect(`/${locale}/signin`);
   const ws = scope.workspace;
+  // A view-only (RESTRICTED) seat follows every campaign but starts or sends
+  // none: no "new campaign" CTA, and a draft plan row reads "View", not
+  // "Finish & send".
+  const canEdit = viewOrgIds(ws).some((id) => ws.editOrgIds.includes(id));
 
   const tabRaw = typeof sp.tab === "string" ? sp.tab : "";
   const explicitView: View | null = (VIEWS as readonly string[]).includes(tabRaw) ? (tabRaw as View) : null;
@@ -161,7 +165,7 @@ export default async function RequestsPage({
       tab: "inProgress",
       totalLabel,
       qualifier: t("qualifierIndicative"),
-      action: { kind: "select-list", listId: list.id, locale, label: t("actionFinishSend") },
+      action: { kind: "select-list", listId: list.id, locale, label: canEdit ? t("actionFinishSend") : t("actionView") },
       footerNote: waveFooter(list),
       // Unused by CampaignRow for a select-list action (it renders the
       // whole row as a form against that action instead, so every click —
@@ -369,9 +373,11 @@ export default async function RequestsPage({
           <Link href="/invoices" className="btn secondary">
             {tInvoice("listTitle")}
           </Link>
-          <Link href="/catalog" className="btn">
-            {t("newCampaignCta")}
-          </Link>
+          {canEdit ? (
+            <Link href="/catalog" className="btn">
+              {t("newCampaignCta")}
+            </Link>
+          ) : null}
         </div>
       </div>
 
@@ -408,8 +414,8 @@ export default async function RequestsPage({
       ) : visibleRows.length === 0 ? (
         <EmptyState
           title={t("noneForTab")}
-          primaryHref="/catalog"
-          primaryLabel={tOrders("newOrderCta")}
+          primaryHref={canEdit ? "/catalog" : undefined}
+          primaryLabel={canEdit ? tOrders("newOrderCta") : undefined}
         />
       ) : (
         <div className="campaign-row-list">

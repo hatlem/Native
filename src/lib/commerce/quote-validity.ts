@@ -78,7 +78,45 @@ export function buyerVisibleQuoteWhere(): Prisma.QuoteWhereInput {
   return { status: { not: "DRAFT" } };
 }
 
-/** A SENT quote whose validity window has closed. */
+// ─── Immutability ────────────────────────────────────────────────────────────
+//
+// A quote's lines and totals change only while it is the desk's DRAFT. Once
+// SENT it is the offer the buyer holds — the numbers they may accept — and it
+// never changes under them again: repricing means a revision
+// (lib/commerce/quote-revision.ts), which the buyer is told about when it is
+// sent. Every line-edit action gates on this (and re-checks it atomically with
+// editableQuoteWhere), so the rule can't be bypassed by posting to an action
+// the page no longer shows.
+
+type QuoteEditFields = { status: QuoteStatus; order?: { id: string } | null };
+
+/** Only an unsent, unordered DRAFT may have its lines, prices or notes changed. */
+export function isQuoteEditable(q: QuoteEditFields): boolean {
+  return q.status === "DRAFT" && !q.order;
+}
+
+/** Prisma filter for quotes whose lines may still change — isQuoteEditable,
+ *  for the compare-and-set that guards a line edit against a concurrent send. */
+export function editableQuoteWhere(): Prisma.QuoteWhereInput {
+  return { status: "DRAFT", order: null };
+}
+
+/**
+ * May the desk open a revision of this quote? Only an offer the buyer holds
+ * and hasn't taken: SENT (or EXPIRED — a lapsed offer is repriced the same
+ * way), not ordered, and not already revised (a quote has at most one
+ * revision; revise the newest one). A DRAFT is simply edited; an ACCEPTED
+ * quote is an order and can't be revised; DECLINED/SUPERSEDED are closed.
+ */
+export function isQuoteRevisable(
+  q: QuoteEditFields & { nextRevision?: { id: string } | null },
+): boolean {
+  if (q.order || q.nextRevision) return false;
+  return q.status === "SENT" || q.status === "EXPIRED";
+}
+
+/** A SENT quote whose validity window has closed. A SUPERSEDED quote is never
+ *  "expired": it was replaced, and the revision carries its own window. */
 export function isQuoteExpired(q: QuoteValidityFields, now: Date = new Date()): boolean {
   if (q.status === "EXPIRED") return true;
   return q.status === "SENT" && q.validUntil !== null && q.validUntil.getTime() <= now.getTime();
@@ -98,6 +136,8 @@ export function effectiveQuoteStatus(q: QuoteValidityFields, now: Date = new Dat
  * Prisma filter for quotes that are still acceptable at `now` — the same rule
  * as isQuoteAcceptable, for queries (buyer home "needs you") and for the
  * compare-and-set that guards acceptance against a quote expiring mid-click.
+ * Pinned to status SENT, so a quote superseded by a revision (SUPERSEDED)
+ * can never be accepted, even by a click that raced the revision's send.
  */
 export function acceptableQuoteWhere(now: Date = new Date()): Prisma.QuoteWhereInput {
   return {
@@ -106,7 +146,8 @@ export function acceptableQuoteWhere(now: Date = new Date()): Prisma.QuoteWhereI
   };
 }
 
-/** Prisma filter for SENT quotes whose window has closed. */
+/** Prisma filter for SENT quotes whose window has closed. The expiry sweep
+ *  uses it, so a SUPERSEDED quote is never flipped to EXPIRED. */
 export function expiredSentQuoteWhere(now: Date = new Date()): Prisma.QuoteWhereInput {
   return { status: "SENT", validUntil: { lte: now } };
 }

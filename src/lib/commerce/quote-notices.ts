@@ -14,6 +14,9 @@ import type { BuyerLocale } from "@/lib/market-locale";
 type BuyerStrings = {
   sentTitle: (plan: string) => string;
   renewedTitle: (plan: string) => string;
+  revisedTitle: (plan: string, revision: number) => string;
+  // First sentence of a revised quote's body: the earlier one is gone.
+  revisedNote: string;
   // `amounts` is one formatted total per market quote, joined with " + ".
   totals: (amounts: string, date: string) => string;
   onRequest: (count: number) => string;
@@ -24,6 +27,8 @@ type BuyerStrings = {
 const en: BuyerStrings = {
   sentTitle: (p) => `Your quote is ready: ${p}`,
   renewedTitle: (p) => `Your quote has been renewed: ${p}`,
+  revisedTitle: (p, n) => `Your quote has been revised (revision ${n}): ${p}`,
+  revisedNote: "It replaces the quote you received earlier, which can no longer be accepted.",
   totals: (a, d) => `Total ${a} incl. VAT, valid until ${d}.`,
   onRequest: (n) =>
     n === 1
@@ -37,6 +42,8 @@ const en: BuyerStrings = {
 const no: BuyerStrings = {
   sentTitle: (p) => `Tilbudet ditt er klart: ${p}`,
   renewedTitle: (p) => `Tilbudet ditt er fornyet: ${p}`,
+  revisedTitle: (p, n) => `Tilbudet ditt er revidert (revisjon ${n}): ${p}`,
+  revisedNote: "Det erstatter tilbudet du fikk tidligere, som ikke lenger kan aksepteres.",
   totals: (a, d) => `Totalt ${a} inkl. mva., gyldig til ${d}.`,
   onRequest: (n) =>
     n === 1
@@ -50,6 +57,8 @@ const no: BuyerStrings = {
 const sv: BuyerStrings = {
   sentTitle: (p) => `Din offert är klar: ${p}`,
   renewedTitle: (p) => `Din offert har förnyats: ${p}`,
+  revisedTitle: (p, n) => `Din offert har reviderats (version ${n}): ${p}`,
+  revisedNote: "Den ersätter offerten du fick tidigare, som inte längre kan godkännas.",
   totals: (a, d) => `Totalt ${a} inkl. moms, giltig till ${d}.`,
   onRequest: (n) =>
     n === 1
@@ -63,6 +72,8 @@ const sv: BuyerStrings = {
 const da: BuyerStrings = {
   sentTitle: (p) => `Dit tilbud er klar: ${p}`,
   renewedTitle: (p) => `Dit tilbud er fornyet: ${p}`,
+  revisedTitle: (p, n) => `Dit tilbud er revideret (version ${n}): ${p}`,
+  revisedNote: "Det erstatter det tilbud, du fik tidligere, som ikke længere kan accepteres.",
   totals: (a, d) => `I alt ${a} inkl. moms, gyldigt til ${d}.`,
   onRequest: (n) =>
     n === 1
@@ -76,6 +87,8 @@ const da: BuyerStrings = {
 const fi: BuyerStrings = {
   sentTitle: (p) => `Tarjouksesi on valmis: ${p}`,
   renewedTitle: (p) => `Tarjouksesi on uusittu: ${p}`,
+  revisedTitle: (p, n) => `Tarjoustasi on päivitetty (versio ${n}): ${p}`,
+  revisedNote: "Se korvaa aiemmin saamasi tarjouksen, jota ei voi enää hyväksyä.",
   totals: (a, d) => `Yhteensä ${a} sis. alv, voimassa ${d} asti.`,
   onRequest: (n) =>
     n === 1
@@ -89,6 +102,8 @@ const fi: BuyerStrings = {
 const de: BuyerStrings = {
   sentTitle: (p) => `Ihr Angebot ist fertig: ${p}`,
   renewedTitle: (p) => `Ihr Angebot wurde verlängert: ${p}`,
+  revisedTitle: (p, n) => `Ihr Angebot wurde überarbeitet (Version ${n}): ${p}`,
+  revisedNote: "Es ersetzt das Angebot, das Sie zuvor erhalten haben; dieses kann nicht mehr angenommen werden.",
   totals: (a, d) => `Gesamt ${a} inkl. MwSt., gültig bis ${d}.`,
   onRequest: (n) =>
     n === 1
@@ -121,6 +136,9 @@ export function buildQuoteSentNotice(input: {
   onRequestCount: number;
   validUntil: Date;
   renewed?: boolean;
+  // Set when the send replaces an earlier quote (a revision): the newest
+  // revision number going out.
+  revision?: number;
 }): { title: string; body: string } {
   const s = stringsFor(input.locale);
   const amounts = input.quotes
@@ -130,16 +148,20 @@ export function buildQuoteSentNotice(input: {
     dateStyle: "long",
     timeZone: "UTC",
   }).format(input.validUntil);
+  const revised = input.revision !== undefined;
   const body = [
+    revised ? s.revisedNote : null,
     s.totals(amounts, date),
     input.onRequestCount > 0 ? s.onRequest(input.onRequestCount) : null,
   ]
     .filter(Boolean)
     .join(" ");
-  return {
-    title: input.renewed ? s.renewedTitle(input.planName) : s.sentTitle(input.planName),
-    body,
-  };
+  const title = revised
+    ? s.revisedTitle(input.planName, input.revision as number)
+    : input.renewed
+      ? s.renewedTitle(input.planName)
+      : s.sentTitle(input.planName);
+  return { title, body };
 }
 
 /** The buyer org's confirmation that accepting the quote created the order. */

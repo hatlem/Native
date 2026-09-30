@@ -15,7 +15,7 @@ import {
 import { rehomeSavedListItems } from "./commerce/rehome-saved-list-items";
 import { catalogVisibleTitleWhere } from "./catalog-visibility";
 import { toggleFavorite } from "./favorites";
-import { canActOnOrg, type Scope } from "./scope";
+import { canEditOnOrg, type Scope } from "./scope";
 
 let orgId = "";
 let productId = "";
@@ -528,7 +528,7 @@ test("setListTitleMembership remove-flow: deletes both a title placeholder row a
   assert.equal(await prisma.savedListItem.count({ where: { listId } }), 0);
 });
 
-test("canActOnOrg rejects a listId belonging to another org (the guard setListTitleMembership/createListWithTitle rely on)", async () => {
+test("canEditOnOrg rejects a listId belonging to another org (the guard setListTitleMembership/createListWithTitle rely on)", async () => {
   const other = await prisma.organization.create({
     data: { name: "Other Org Membership Guard", type: "ADVERTISER", marketCode: "NO" },
   });
@@ -547,13 +547,15 @@ test("canActOnOrg rejects a listId belonging to another org (the guard setListTi
       homeRole: null,
       activeOrgId: orgId,
       scopeOrgIds: [orgId],
+      editOrgIds: [orgId],
       commitOrgIds: [orgId],
       activeRole: null,
       activeCanCommit: true,
+      activeCanEdit: true,
     },
   };
-  assert.equal(canActOnOrg(scope, theirList.organizationId), false, "must not be able to act on another org's list");
-  assert.equal(canActOnOrg(scope, orgId), true, "must still be able to act on its own scoped org");
+  assert.equal(canEditOnOrg(scope, theirList.organizationId), false, "must not be able to act on another org's list");
+  assert.equal(canEditOnOrg(scope, orgId), true, "must still be able to act on its own scoped org");
   await prisma.savedList.delete({ where: { id: theirList.id } });
   await prisma.organization.delete({ where: { id: other.id } });
 });

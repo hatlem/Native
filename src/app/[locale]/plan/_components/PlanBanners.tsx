@@ -40,7 +40,11 @@ export async function PlanBanners({
       ? "noticePlanArchived"
       : noticeCode === "plan-unavailable"
         ? "noticePlanUnavailable"
-        : null;
+        : // A view-only seat posted a change (lib/plan-target: in scope, not
+          // editable): nothing happened, and this says why.
+          noticeCode === "plan-read-only"
+          ? "noticePlanReadOnly"
+          : null;
 
   return (
     <>

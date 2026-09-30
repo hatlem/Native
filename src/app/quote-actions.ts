@@ -4,7 +4,6 @@ import { redirect } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import {
   computeQuoteLines,
-  marginPctFromSell,
   quoteTotals,
   resolveDefaultMarginPct,
   type QuotableItem,
@@ -22,12 +21,19 @@ import {
 import { reconcileExpiredQuotes } from "@/lib/commerce/quote-expiry";
 import { lineOrder } from "@/lib/commerce/line-order";
 import { notifyQuoteAccepted, sendDraftQuotes } from "@/lib/commerce/quote-lifecycle";
+import {
+  updateQuoteLineNote,
+  updateQuoteLinePrice,
+  type LinePriceChange,
+} from "@/lib/commerce/quote-edits";
+import { discardQuoteRevision, reviseQuote } from "@/lib/commerce/quote-revision";
 import { marketDefaultLocale } from "@/lib/market-locale";
 import { groupItemsByMarket } from "@/lib/quote-grouping";
 import { recordAudit } from "@/lib/audit";
 import { notifyDesk, notifyOrg } from "@/lib/notify";
-import { loadScope, canActOnOrg, canCommitOnOrg } from "@/lib/scope";
+import { loadScope, canActOnOrg, canCommitOnOrg, canEditOnOrg } from "@/lib/scope";
 import { generateQuotePdf as renderQuotePdf } from "@/lib/pdf/generate-quote-pdf";
+import { QuoteSupersededError } from "@/lib/pdf/quote-pdf-data";
 import {
   StorageNotConfiguredError,
   isStorageConfigured,
@@ -205,8 +211,8 @@ export async function generateQuote(formData: FormData) {
 
 // Desk sends the request's draft quote(s) to the buyer, with the validity
 // the desk chose (defaults to QUOTE_VALIDITY_DAYS). The send itself — the
-// DRAFT→SENT flip and the buyer's notification with the real total — lives
-// in lib/commerce/quote-lifecycle.ts.
+// DRAFT→SENT flip, superseding a revision's predecessor, and the buyer's one
+// notification with the real total — lives in lib/commerce/quote-lifecycle.ts.
 export async function sendQuote(formData: FormData) {
   const locale = str(formData, "locale") || "en";
   const requestId = str(formData, "requestId");
@@ -227,6 +233,9 @@ export async function sendQuote(formData: FormData) {
   if (result.outcome === "unpriced") {
     redirect(`/${locale}/desk/${requestId}?error=send-unpriced`);
   }
+  if (result.outcome === "predecessor-closed") {
+    redirect(`/${locale}/desk/${requestId}?error=revision-predecessor-closed`);
+  }
   // "none" / "already-sent": the page shows what went out.
   redirect(`/${locale}/desk/${requestId}`);
 }
@@ -235,9 +244,10 @@ export async function sendQuote(formData: FormData) {
 //   intent=set     — give the line a concrete customer total (prices a
 //                    "pris på forespørsel" line, or reprices a priced one)
 //   intent=onRequest — send the line out without an amount instead
-// Only while the quote has no order: once a buyer accepted, the numbers
-// they accepted are immutable. Every change stamps priceSetBy/At on the
-// line and lands in AuditLog with the before/after amounts.
+// Only while the quote is a DRAFT: a SENT quote is the offer the buyer holds
+// and is changed through a revision (reviseQuoteAction). The lock is enforced
+// in lib/commerce/quote-edits.ts, atomically. Every change stamps
+// priceSetBy/At on the line and lands in AuditLog with the before/after amounts.
 export async function setQuoteLinePrice(formData: FormData) {
   const locale = str(formData, "locale") || "en";
   const requestId = str(formData, "requestId");
@@ -248,85 +258,44 @@ export async function setQuoteLinePrice(formData: FormData) {
   const scope = await loadScope();
   if (!scope.isDesk || !scope.userId) redirect(`/${locale}/signin`);
 
-  const quote = await prisma.quote.findUnique({
-    where: { id: quoteId },
-    include: { lines: true, order: true },
-  });
-  if (!quote || quote.requestId !== requestId) {
-    redirect(`/${locale}/desk/${requestId}`);
-  }
-  const line = quote.lines.find((l) => l.id === lineId);
-  if (!line || quote.order) {
-    redirect(`/${locale}/desk/${requestId}`);
-  }
-
-  let update: {
-    priceOnRequest: boolean;
-    lineTotal?: number;
-    marginPct?: number;
-  };
+  let change: LinePriceChange;
   if (intent === "onRequest") {
-    update = { priceOnRequest: true };
+    change = { intent: "onRequest" };
   } else {
     // Accept "25 000", "25000.50", "25 000,50" — digits, spaces, one
     // decimal separator. Reject anything non-positive or unparseable.
-    const raw = str(formData, "lineTotal").replace(/[\s ]/g, "").replace(",", ".");
+    const raw = str(formData, "lineTotal").replace(/[\s ]/g, "").replace(",", ".");
     const lineTotal = Number(raw);
     if (!Number.isFinite(lineTotal) || lineTotal <= 0) {
       redirect(`/${locale}/desk/${requestId}?error=bad-price`);
     }
-    update = {
-      priceOnRequest: false,
-      lineTotal: Math.round(lineTotal),
-      marginPct: marginPctFromSell(
-        Number(line.unitCost),
-        line.quantity,
-        Math.round(lineTotal),
-      ),
-    };
+    change = { intent: "set", lineTotal };
   }
 
-  await prisma.$transaction(async (tx) => {
-    await tx.quoteLine.update({
-      where: { id: line.id },
-      data: {
-        ...update,
-        priceSetById: scope.userId,
-        priceSetAt: new Date(),
-      },
-    });
-    const lines = quote.lines.map((l) =>
-      l.id === line.id
-        ? {
-            lineTotal: update.lineTotal ?? Number(l.lineTotal),
-            priceOnRequest: update.priceOnRequest,
-          }
-        : {
-            lineTotal: Number(l.lineTotal),
-            priceOnRequest: l.priceOnRequest,
-          },
-    );
-    const { subtotal, total } = quoteTotals(lines, Number(quote.vatPct));
-    await tx.quote.update({
-      where: { id: quote.id },
-      data: { subtotal, total },
-    });
-  });
-
-  await recordAudit(scope.userId, "quote.line.price", `QuoteLine:${line.id}`, {
-    quoteId: quote.id,
+  const result = await updateQuoteLinePrice({
     requestId,
-    intent: update.priceOnRequest ? "onRequest" : "set",
-    previousLineTotal: Number(line.lineTotal),
-    previousPriceOnRequest: line.priceOnRequest,
-    ...(update.lineTotal != null ? { lineTotal: update.lineTotal } : {}),
+    quoteId,
+    lineId,
+    change,
+    actorUserId: scope.userId,
+  });
+  if (result.outcome === "locked") redirect(`/${locale}/desk/${requestId}?error=quote-locked`);
+  if (result.outcome !== "updated") redirect(`/${locale}/desk/${requestId}`);
+
+  await recordAudit(scope.userId, "quote.line.price", `QuoteLine:${lineId}`, {
+    quoteId,
+    requestId,
+    intent: change.intent,
+    previousLineTotal: result.previous.lineTotal,
+    previousPriceOnRequest: result.previous.priceOnRequest,
+    ...(result.lineTotal != null ? { lineTotal: result.lineTotal } : {}),
   });
 
   redirect(`/${locale}/desk/${requestId}`);
 }
 
-// Desk edits the customer-visible note on one quote line. Allowed until the
-// quote has become an order — after that the order is the record.
+// Desk edits the customer-visible note on one quote line. Same lock as the
+// price: only while the quote is a DRAFT — the note is part of the offer.
 export async function setQuoteLineNote(formData: FormData) {
   const locale = str(formData, "locale") || "en";
   const requestId = str(formData, "requestId");
@@ -336,29 +305,60 @@ export async function setQuoteLineNote(formData: FormData) {
   const scope = await loadScope();
   if (!scope.isDesk || !scope.userId) redirect(`/${locale}/signin`);
 
-  const line = await prisma.quoteLine.findUnique({
-    where: { id: lineId },
-    select: {
-      id: true,
-      customerNote: true,
-      quote: { select: { id: true, requestId: true, order: { select: { id: true } } } },
-    },
-  });
-  if (!line || line.quote.id !== quoteId || line.quote.requestId !== requestId || line.quote.order) {
-    redirect(`/${locale}/desk/${requestId}`);
-  }
-
   const parsed = normalizeLineNote(formData.get("note"));
   if (!parsed.ok) redirect(`/${locale}/desk/${requestId}?error=note-too-long`);
 
-  await prisma.quoteLine.update({ where: { id: line.id }, data: { customerNote: parsed.note } });
-  await recordAudit(scope.userId, "quote.line.note", `QuoteLine:${line.id}`, {
+  const result = await updateQuoteLineNote({ requestId, quoteId, lineId, note: parsed.note });
+  if (result.outcome === "locked") redirect(`/${locale}/desk/${requestId}?error=quote-locked`);
+  if (result.outcome !== "updated") redirect(`/${locale}/desk/${requestId}`);
+
+  await recordAudit(scope.userId, "quote.line.note", `QuoteLine:${lineId}`, {
     quoteId,
     requestId,
-    hadNote: line.customerNote !== null,
+    hadNote: result.hadNote,
     cleared: parsed.note === null,
   });
 
+  redirect(`/${locale}/desk/${requestId}`);
+}
+
+// "Revider tilbud": open a DRAFT revision of a quote the buyer holds (SENT or
+// EXPIRED, not accepted). The desk edits and sends it like any draft; sending
+// supersedes this one and tells the buyer (lib/commerce/quote-revision.ts).
+export async function reviseQuoteAction(formData: FormData) {
+  const locale = str(formData, "locale") || "en";
+  const requestId = str(formData, "requestId");
+  const quoteId = str(formData, "quoteId");
+
+  const scope = await loadScope();
+  if (!scope.isDesk || !scope.userId) redirect(`/${locale}/signin`);
+
+  const quote = await prisma.quote.findUnique({ where: { id: quoteId }, select: { requestId: true } });
+  if (!quote || quote.requestId !== requestId) redirect(`/${locale}/desk`);
+
+  const result = await reviseQuote({ quoteId, actorUserId: scope.userId });
+  if (result.outcome === "not-revisable") {
+    redirect(`/${locale}/desk/${requestId}?error=quote-not-revisable`);
+  }
+  // Created, or already open ("exists"): land on the revision to edit it.
+  redirect(`/${locale}/desk/${requestId}#quote-${result.quoteId}`);
+}
+
+// Throw away an unsent revision; the quote it would have replaced stays the
+// live offer.
+export async function discardQuoteRevisionAction(formData: FormData) {
+  const locale = str(formData, "locale") || "en";
+  const requestId = str(formData, "requestId");
+  const quoteId = str(formData, "quoteId");
+
+  const scope = await loadScope();
+  if (!scope.isDesk || !scope.userId) redirect(`/${locale}/signin`);
+
+  const quote = await prisma.quote.findUnique({ where: { id: quoteId }, select: { requestId: true } });
+  if (!quote || quote.requestId !== requestId) redirect(`/${locale}/desk`);
+
+  await discardQuoteRevision({ quoteId, actorUserId: scope.userId });
+  // "not-discardable" (already sent, or gone): the page shows the state.
   redirect(`/${locale}/desk/${requestId}`);
 }
 
@@ -380,7 +380,7 @@ export async function generateQuotePdf(formData: FormData) {
     redirect(`/${locale}/desk/${requestId}?pdf=storage-unavailable`);
   }
 
-  let outcome: "ok" | "storage-unavailable" | "failed";
+  let outcome: "ok" | "storage-unavailable" | "superseded" | "failed";
   try {
     const doc = await renderQuotePdf({
       quoteId,
@@ -400,7 +400,12 @@ export async function generateQuotePdf(formData: FormData) {
     // redirect() must stay outside the try (it throws by design); map the
     // failure to a desk-visible message and keep the details in the log.
     console.error("quote.pdf.generate_failed", { quoteId, err });
-    outcome = err instanceof StorageNotConfiguredError ? "storage-unavailable" : "failed";
+    outcome =
+      err instanceof StorageNotConfiguredError
+        ? "storage-unavailable"
+        : err instanceof QuoteSupersededError
+          ? "superseded"
+          : "failed";
   }
 
   redirect(
@@ -614,6 +619,11 @@ export async function requestQuoteRenewal(formData: FormData) {
   if (!canActOnOrg(scope, request.organizationId)) {
     redirect(`/${locale}/signin`);
   }
+  // Asking the desk to act is a change on the org's behalf: a view-only seat
+  // sees the expired quote but can't ask for a renewal (the page says why).
+  if (!canEditOnOrg(scope, request.organizationId)) {
+    redirect(`/${locale}/requests/${request.id}`);
+  }
 
   const expired = request.quotes.filter((q) => !q.order && isQuoteExpired(q));
   if (expired.length === 0) {
@@ -645,8 +655,9 @@ export async function requestQuoteRenewal(formData: FormData) {
 }
 
 // Desk side: give an expired (or about-to-expire) quote a fresh validity
-// window. Prices are kept as they are — the desk reprices individual lines
-// with setQuoteLinePrice first if rates have moved.
+// window. The offer itself is unchanged — same lines, same prices, which is
+// why renewing doesn't need a revision. If rates have moved, the desk revises
+// the quote instead (reviseQuoteAction) and sends the revision.
 export async function renewQuote(formData: FormData) {
   const locale = str(formData, "locale") || "en";
   const requestId = str(formData, "requestId");

@@ -43,6 +43,7 @@ export async function PlanProgramme({
   unit,
   pacing,
   warnings = [],
+  readOnly = false,
 }: {
   locale: string;
   listId: string;
@@ -52,11 +53,16 @@ export async function PlanProgramme({
   unit: BookingUnit;
   pacing?: ProgrammePacing | null;
   warnings?: ScheduleOverlapWarning[];
+  // View-only seat: the wave strip and pacing are shown; starting, dissolving
+  // and linking articles are not offered.
+  readOnly?: boolean;
 }) {
   const t = await getTranslations({ locale, namespace: "plan.programme" });
   const tArticles = await getTranslations({ locale, namespace: "articles" });
   const dateFmt = new Intl.DateTimeFormat(intlLocale(locale), { day: "numeric", month: "short" });
 
+  // Not a programme yet: the panel is only the offer to start one.
+  if (!view && readOnly) return null;
   if (!view) {
     return (
       <details className="plan-programme">
@@ -92,7 +98,7 @@ export async function PlanProgramme({
   // Only queried when this wave has no article yet — no need to hit the DB
   // for the "linked" view, or when there's no current wave at all.
   const otherArticles =
-    current && !current.articleId
+    current && !current.articleId && !readOnly
       ? await (async () => {
           const list = await prisma.savedList.findUnique({
             where: { id: listId },
@@ -188,7 +194,15 @@ export async function PlanProgramme({
             : null}
         </p>
       ) : null}
-      {current ? (
+      {current && readOnly ? (
+        current.articleId ? (
+          <div className="plan-programme__angle-row">
+            <a href={`/${locale}/articles/${current.articleId}`} className="link">
+              {current.articleTitle ?? t("viewArticle")}
+            </a>
+          </div>
+        ) : null
+      ) : current ? (
         <div className="plan-programme__angle-form">
           {current.articleId ? (
             <div className="plan-programme__angle-row">
@@ -243,6 +257,7 @@ export async function PlanProgramme({
       {/* The undo. A native disclosure keeps the destructive-looking option
           out of the default view without any client JS — opening it IS the
           "are you sure" step, so no browser confirm dialog on submit. */}
+      {readOnly ? null : (
       <details className="plan-programme__dissolve">
         <summary>{t("dissolveSummary")}</summary>
         <div className="plan-programme__dissolve-body">
@@ -256,6 +271,7 @@ export async function PlanProgramme({
           </form>
         </div>
       </details>
+      )}
     </section>
   );
 }

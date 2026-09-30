@@ -37,6 +37,7 @@ export async function CatalogResults({
   favoriteLists,
   listMembership,
   noOrg = false,
+  readOnly = false,
 }: {
   locale: string;
   titles: CatalogTitleRow[];
@@ -47,6 +48,8 @@ export async function CatalogResults({
   listMembership: Record<string, string[]>;
   /** Agency session with no client selected — no org to scope lists to. */
   noOrg?: boolean;
+  /** View-only seat: no list checklist or "new list" (org data it can't change). */
+  readOnly?: boolean;
 }) {
   const t = await getTranslations({ locale, namespace: "catalog" });
   const tf = await getTranslations({ locale, namespace: "firm" });
@@ -133,6 +136,7 @@ export async function CatalogResults({
               favoriteLists={favoriteLists}
               listMembership={listMembership}
               noOrg={noOrg}
+              readOnly={readOnly}
             />
           ))}
         </div>
@@ -153,6 +157,7 @@ export async function CatalogResults({
               favoriteLists={favoriteLists}
               listMembership={listMembership}
               noOrg={noOrg}
+              readOnly={readOnly}
             />
           ))}
         </div>
@@ -192,6 +197,7 @@ function CatalogListRow({
   favoriteLists,
   listMembership,
   noOrg,
+  readOnly,
 }: {
   row: Row;
   locale: string;
@@ -204,6 +210,7 @@ function CatalogListRow({
   favoriteLists: FavListOption[];
   listMembership: Record<string, string[]>;
   noOrg: boolean;
+  readOnly: boolean;
 }) {
   const { title, fromBand, bandWithArticle, fromRate, hasPrice, instantBook, addableProduct, articleState, reach } =
     row;
@@ -305,6 +312,7 @@ function CatalogListRow({
           lists={favoriteLists}
           inListIds={listMembership[title.id] ?? []}
           noOrg={noOrg}
+          readOnly={readOnly}
         />
         <Link href={`/catalog/${title.slug}`} className="btn small secondary catalog-row__preview">
           {tr("preview")}
@@ -341,6 +349,7 @@ function CatalogCard({
   favoriteLists,
   listMembership,
   noOrg,
+  readOnly,
 }: {
   row: Row;
   locale: string;
@@ -354,6 +363,7 @@ function CatalogCard({
   favoriteLists: FavListOption[];
   listMembership: Record<string, string[]>;
   noOrg: boolean;
+  readOnly: boolean;
 }) {
   const { title, visibleProducts, anyHidden, fromBand, bandWithArticle, fromRate, needsQuote, reach } = row;
   return (
@@ -366,6 +376,7 @@ function CatalogCard({
         lists={favoriteLists}
         inListIds={listMembership[title.id] ?? []}
         noOrg={noOrg}
+        readOnly={readOnly}
       />
       <h3>
         <Link className="card-link" href={`/catalog/${title.slug}`}>

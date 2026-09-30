@@ -177,6 +177,9 @@ export async function updateUserOrg(formData: FormData) {
         // …and always carries commit authority (lib/membership commitGrantFor;
         // a DB CHECK rejects an ADMIN seat without it).
         ...(orgRole === "ADMIN" ? { expiresAt: null, canCommit: true } : {}),
+        // A view-only seat never commits (commitGrantFor; a DB CHECK rejects
+        // a RESTRICTED seat that still carries the grant from a former role).
+        ...(orgRole === "RESTRICTED" ? { canCommit: false } : {}),
       },
     });
   }

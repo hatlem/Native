@@ -33,12 +33,30 @@ export async function loadScope(): Promise<Scope> {
   };
 }
 
-// "May this scope read/write things belonging to orgId?" — true for the
-// desk, for the owning org itself, and for an agency that has the org
-// as a managed client.
+// "May this scope READ things belonging to orgId?" — true for the desk, for
+// any active seat in the org (view-only seats included), and for an agency
+// that has the org as a managed client. Never use this to guard a write:
+// that is canEditOnOrg.
 export function canActOnOrg(scope: Scope, organizationId: string): boolean {
   if (scope.isDesk) return true;
   return !!scope.workspace?.scopeOrgIds.includes(organizationId);
+}
+
+/**
+ * May this scope CHANGE things belonging to `organizationId` — create, edit,
+ * submit, share, archive or restore a plan, ask the desk for a renewal,
+ * approve an article, upload, or run a programme? The one write guard every
+ * buyer-side mutating server action and API route goes through.
+ *
+ * Read access (canActOnOrg) is wider: a RESTRICTED seat is a view-only seat
+ * that sees everything its org has and changes none of it. The rule lives in
+ * lib/membership roleCanEdit and is resolved per org into
+ * Workspace.editOrgIds, so this — like canCommitOnOrg — follows the user's
+ * seat in THAT org, not which org happens to be switched to.
+ */
+export function canEditOnOrg(scope: Scope, organizationId: string): boolean {
+  if (scope.isDesk) return true;
+  return !!scope.workspace?.editOrgIds.includes(organizationId);
 }
 
 /**

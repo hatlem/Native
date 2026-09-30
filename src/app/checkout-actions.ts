@@ -78,6 +78,12 @@ export async function submitRequest(formData: FormData) {
     await alignActivePlan(ws, target.list);
   } else {
     if (!ws.activeOrgId) redirect(ws.isAgency ? `/${locale}/agency` : `/${locale}/signin`);
+    // Sending a plan to the desk is a write: never for a view-only seat
+    // (the posted-listId path gets the same answer from resolvePlanTarget).
+    if (!ws.editOrgIds.includes(ws.activeOrgId)) {
+      console.warn("checkout.blocked", { reason: "list-read-only", userId: ws.userId });
+      redirect(planPath(locale, null, { notice: "plan-read-only" }));
+    }
     orgId = ws.activeOrgId;
     listId = await ensureActiveListId(orgId, await readActiveListId(), undefined, (await listNames(locale)).untitled);
   }

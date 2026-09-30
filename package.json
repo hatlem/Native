@@ -25,7 +25,7 @@
     "issue-publisher-key": "tsx scripts/issue-publisher-key.ts",
     "issue-pricing-admin-key": "tsx scripts/issue-pricing-admin-key.ts",
     "seed-playbooks": "tsx scripts/seed-playbooks.ts",
-    "test:it": "ALLOW_LOCAL_DB=1 tsx --test \"src/**/*.it.test.ts\""
+    "test:it": "ALLOW_LOCAL_DB=1 tsx --experimental-test-module-mocks --test \"src/**/*.it.test.ts\""
   },
   "prisma": {
     "seed": "tsx prisma/seed.ts"

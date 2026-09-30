@@ -34,6 +34,7 @@ export async function PlanSummary({
   activeOrg,
   brief,
   timingOptions,
+  readOnly = false,
 }: {
   locale: string;
   // The plan this page shows. Submit acts on it, never on the active-list
@@ -52,6 +53,9 @@ export async function PlanSummary({
   activeOrg: { name: string } | null;
   brief: PlanBriefValues;
   timingOptions: TimingOption[];
+  // View-only seat: the totals are shown, the brief form and the send/order
+  // button are not (submitRequest refuses a view-only seat anyway).
+  readOnly?: boolean;
 }) {
   const t = await getTranslations({ locale, namespace: "plan" });
   const tf = await getTranslations({ locale, namespace: "firm" });
@@ -142,6 +146,8 @@ export async function PlanSummary({
       </div>
       {hasHiddenPrice ? <p className="plan-summary-note">{t("plusDeskPriced")}</p> : null}
 
+      {readOnly ? null : (
+      <>
       <div className="plan-summary-divider" />
 
       <h3>{instant ? tf("planTitle") : t("rfqTitle")}</h3>
@@ -203,9 +209,11 @@ export async function PlanSummary({
           </div>
         </div>
       )}
+      </>
+      )}
     </aside>
 
-    {!needsClient && activeOrg ? (
+    {!needsClient && activeOrg && !readOnly ? (
       <div className="plan-mobile-submit-bar">
         <div className="plan-mobile-submit-bar__total">
           <span className="plan-mobile-submit-bar__label">

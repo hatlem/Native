@@ -24,6 +24,9 @@ export async function createClient(formData: FormData) {
   if (!ws?.isAgency || !ws.agencyOrgId) {
     redirect(`/${locale}/signin`);
   }
+  // Adding a client changes the agency: not for a view-only agency seat
+  // (lib/workspace editOrgIds — the rule behind lib/scope canEditOnOrg).
+  if (!ws.editOrgIds.includes(ws.agencyOrgId)) redirect(`/${locale}/agency`);
 
   const name = field(formData, "name");
   const marketCode = field(formData, "market");
@@ -63,6 +66,8 @@ export async function createClientsBulk(formData: FormData) {
   if (!ws?.isAgency || !ws.agencyOrgId) {
     redirect(`/${locale}/signin`);
   }
+  // Same rule as createClient: not for a view-only agency seat.
+  if (!ws.editOrgIds.includes(ws.agencyOrgId)) redirect(`/${locale}/agency`);
 
   const raw = field(formData, "rows");
   if (!raw) redirect(`/${locale}/agency?error=empty`);

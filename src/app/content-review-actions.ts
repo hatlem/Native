@@ -3,7 +3,7 @@
 import { redirect } from "next/navigation";
 import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
-import { loadScope, canActOnOrg } from "@/lib/scope";
+import { loadScope, canEditOnOrg } from "@/lib/scope";
 import { recordAudit } from "@/lib/audit";
 import { notifyDesk } from "@/lib/notify";
 import { supersedeOlderVersions } from "@/lib/content/versions";
@@ -45,7 +45,7 @@ export async function approveContentAsset(formData: FormData) {
   if (
     !asset ||
     asset.status !== "IN_REVIEW" ||
-    !canActOnOrg(scope, asset.article.organizationId)
+    !canEditOnOrg(scope, asset.article.organizationId)
   ) {
     redirect(`/${locale}/articles/${asset?.article.id ?? ""}`);
   }
@@ -82,7 +82,7 @@ export async function requestContentChanges(formData: FormData) {
   if (
     !asset ||
     asset.status !== "IN_REVIEW" ||
-    !canActOnOrg(scope, asset.article.organizationId)
+    !canEditOnOrg(scope, asset.article.organizationId)
   ) {
     redirect(`/${locale}/articles/${asset?.article.id ?? ""}`);
   }

@@ -273,12 +273,16 @@ function LineNote({
   itemId,
   notes,
   t,
+  readOnly,
 }: {
   locale: string;
   itemId: string;
   notes: string | null;
   t: Awaited<ReturnType<typeof getTranslations>>;
+  // View-only seat: the note is shown, never offered for editing.
+  readOnly: boolean;
 }) {
+  if (readOnly && !notes) return null;
   return (
     <div className="line-note">
       {notes ? (
@@ -287,6 +291,7 @@ function LineNote({
           {notes}
         </p>
       ) : null}
+      {readOnly ? null : (
       <details className="line-note__edit">
         <summary>{notes ? t("lineNoteEdit") : t("lineNoteAdd")}</summary>
         <form action={setLineNote} className="line-note__form">
@@ -306,6 +311,7 @@ function LineNote({
           </button>
         </form>
       </details>
+      )}
     </div>
   );
 }
@@ -348,6 +354,7 @@ export async function PlanLines({
   altTitleLines = [],
   hasHiddenPrice,
   blockedPeriods = new Set<string>(),
+  readOnly = false,
 }: {
   locale: string;
   listId: string;
@@ -358,6 +365,10 @@ export async function PlanLines({
   hasHiddenPrice: boolean;
   // Sold-out / closed periods for the date picker, keyed "productId:YYYY-M".
   blockedPeriods?: ReadonlySet<string>;
+  // View-only (RESTRICTED) seat: the lines render as a read-out — quantity,
+  // dates, notes, prices — with every editing control left out. The server
+  // refuses those writes anyway (lib/scope canEditOnOrg).
+  readOnly?: boolean;
 }) {
   const t = await getTranslations({ locale, namespace: "plan" });
   const tType = await getTranslations({ locale, namespace: "productType" });
@@ -417,7 +428,13 @@ export async function PlanLines({
                 {t("lineUnavailable")}
               </div>
             ) : null}
-            <LineNote locale={locale} itemId={l.itemId} notes={l.notes} t={t} />
+            <LineNote locale={locale} itemId={l.itemId} notes={l.notes} t={t} readOnly={readOnly} />
+            {readOnly ? (
+              <div className="plan-line-card__controls">
+                <span className="muted small">× {l.quantity}</span>
+                {period ? <span className="muted small">{period}</span> : null}
+              </div>
+            ) : (
             <div className="plan-line-card__controls">
               <div className="plan-qty-stepper">
                 {/* At quantity 1 the minus removes the line (cart
@@ -455,6 +472,7 @@ export async function PlanLines({
                 tCampaign={tCampaign}
               />
             </div>
+            )}
           </div>
 
           <div className="plan-line-card__price">
@@ -462,6 +480,7 @@ export async function PlanLines({
             <span className="plan-line-card__breakdown">{breakdown(l, locale, t, tv)}</span>
           </div>
 
+          {readOnly ? null : (
           <div className="plan-line-card__actions">
             <WriteToggle locale={locale} itemId={l.itemId} withContent={l.withContent} label={t("weWriteIt")} />
             <AlternativeToggle
@@ -479,6 +498,7 @@ export async function PlanLines({
               </button>
             </form>
           </div>
+          )}
 
           {needsPrice ? (
             <div className="plan-line-card__price-note">{t("needsPriceNote")}</div>
@@ -498,9 +518,11 @@ export async function PlanLines({
               </span>
             </div>
             <div className="plan-line-card__meta">{t("titlePlaceholderNote")}</div>
-            <LineNote locale={locale} itemId={tl.itemId} notes={tl.notes} t={t} />
+            <LineNote locale={locale} itemId={tl.itemId} notes={tl.notes} t={t} readOnly={readOnly} />
             <div className="plan-line-card__controls">
-              {tl.placements.length > 0 ? (
+              {readOnly ? (
+                <span className="muted small">× {tl.quantity}</span>
+              ) : tl.placements.length > 0 ? (
                 <form action={resolveTitleLine} className="plan-line-card__resolve">
                   <input type="hidden" name="locale" value={locale} />
                   <input type="hidden" name="itemId" value={tl.itemId} />
@@ -526,6 +548,7 @@ export async function PlanLines({
           <div className="plan-line-card__price">
             <span className="plan-line-card__total plan-line-card__total--muted">{tv("requestPrice")}</span>
           </div>
+          {readOnly ? null : (
           <div className="plan-line-card__actions">
             {/* The desk quotes the article with the placement it proposes, so
                 the placeholder carries the same "We write it" choice. */}
@@ -545,6 +568,7 @@ export async function PlanLines({
               </button>
             </form>
           </div>
+          )}
         </div>,
       ),
     ),
@@ -563,11 +587,12 @@ export async function PlanLines({
             <div className="plan-line-card__meta">
               {tType(l.product.type)} · {l.product.title.publisher.name}
             </div>
-            <LineNote locale={locale} itemId={l.itemId} notes={l.notes} t={t} />
+            <LineNote locale={locale} itemId={l.itemId} notes={l.notes} t={t} readOnly={readOnly} />
           </div>
           <div className="plan-line-card__price">
             <LineFigure l={l} locale={locale} onRequest={tv("requestPrice")} />
           </div>
+          {readOnly ? null : (
           <div className="plan-line-card__actions">
             <AlternativeToggle
               locale={locale}
@@ -584,6 +609,7 @@ export async function PlanLines({
               </button>
             </form>
           </div>
+          )}
         </div>,
       ),
     ),
@@ -597,11 +623,12 @@ export async function PlanLines({
               <span className="badge badge-neutral dotless plan-line-card__pill">{t("alternativeBadge")}</span>
             </div>
             <div className="plan-line-card__meta">{t("titlePlaceholderNote")}</div>
-            <LineNote locale={locale} itemId={tl.itemId} notes={tl.notes} t={t} />
+            <LineNote locale={locale} itemId={tl.itemId} notes={tl.notes} t={t} readOnly={readOnly} />
           </div>
           <div className="plan-line-card__price">
             <span className="plan-line-card__total plan-line-card__total--muted">{tv("requestPrice")}</span>
           </div>
+          {readOnly ? null : (
           <div className="plan-line-card__actions">
             <AlternativeToggle
               locale={locale}
@@ -618,6 +645,7 @@ export async function PlanLines({
               </button>
             </form>
           </div>
+          )}
         </div>,
       ),
     ),
@@ -627,9 +655,11 @@ export async function PlanLines({
     <div>
       <div className="plan-lines-head">
         <span className="plan-lines-eyebrow">{t("itemCount", { count: planEntries.length })}</span>
-        <Link href="/catalog" className="btn small secondary">
-          {t("addMoreTitles")}
-        </Link>
+        {readOnly ? null : (
+          <Link href="/catalog" className="btn small secondary">
+            {t("addMoreTitles")}
+          </Link>
+        )}
       </div>
       {hasHiddenPrice ? (
         <div className="banner-info" role="status">
@@ -639,6 +669,7 @@ export async function PlanLines({
       <PlanLineBoard
         listId={listId}
         locale={intl}
+        readOnly={readOnly}
         plan={planEntries}
         alternatives={altEntries}
         alternativesHeader={

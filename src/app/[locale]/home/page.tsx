@@ -14,6 +14,7 @@ import { selectActiveList } from "@/app/list-actions";
 import { acceptableQuoteWhere } from "@/lib/commerce/quote-validity";
 import { reconcileExpiredQuotesInBackground } from "@/lib/commerce/quote-expiry";
 import { JoinedNotice } from "@/app/joined-notice";
+import { ViewOnlyNote } from "@/components/view-only-note";
 import { viewOrgIds } from "@/lib/workspace";
 import { landingForRole } from "@/lib/roles";
 import { logout } from "@/app/auth-actions";
@@ -117,7 +118,11 @@ export default async function HomePage({
   // can act).
   const myQuotes = pendingQuotes.filter((q) => ws.commitOrgIds.includes(q.request.organizationId));
   const teamQuotes = pendingQuotes.filter((q) => !ws.commitOrgIds.includes(q.request.organizationId));
-  const needsCount = myQuotes.length + pendingContent.length + dueWaves.length;
+  // A view-only (RESTRICTED) seat can't approve a draft or send a wave, so
+  // those are shown but never counted as waiting on them, and the "start a
+  // campaign" CTAs give way to the view-only note.
+  const canEdit = orgIds.some((id) => ws.editOrgIds.includes(id));
+  const needsCount = myQuotes.length + (canEdit ? pendingContent.length + dueWaves.length : 0);
   const runningCount = orders.length;
   const dateFmt = new Intl.DateTimeFormat(intlLocale(locale), { day: "numeric", month: "short" });
 
@@ -290,20 +295,26 @@ export default async function HomePage({
 
         <div className="home-start-card">
           <h2>{t("startHeading")}</h2>
-          <Link href={startHref} className="btn block home-start-btn">
-            <PenLine size={17} strokeWidth={1.7} aria-hidden="true" />
-            {t("startDescribe")}
-          </Link>
+          {canEdit ? (
+            <Link href={startHref} className="btn block home-start-btn">
+              <PenLine size={17} strokeWidth={1.7} aria-hidden="true" />
+              {t("startDescribe")}
+            </Link>
+          ) : (
+            <ViewOnlyNote locale={locale} />
+          )}
           <Link href="/catalog" className="btn secondary block home-start-btn">
             <Search size={17} strokeWidth={1.7} aria-hidden="true" />
             {t("startBrowse")}
           </Link>
           {/* Finished campaigns live on the Done tab; each order there offers
               "Plan next wave" (a full copy of the list, ready to edit). */}
-          <Link href="/requests?tab=done" className="btn secondary block home-start-btn">
-            <RotateCcw size={17} strokeWidth={1.7} aria-hidden="true" />
-            {t("startRepeat")}
-          </Link>
+          {canEdit ? (
+            <Link href="/requests?tab=done" className="btn secondary block home-start-btn">
+              <RotateCcw size={17} strokeWidth={1.7} aria-hidden="true" />
+              {t("startRepeat")}
+            </Link>
+          ) : null}
         </div>
       </div>
     </section>

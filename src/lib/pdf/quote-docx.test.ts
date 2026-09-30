@@ -54,6 +54,7 @@ const data: QuotePdfData = {
   preparedByEmail: "desk@nativespin.com",
   onlineUrl,
   paymentTermsDays: 30,
+  revision: null,
   rows: [
     {
       ...row,
@@ -96,4 +97,15 @@ test("renderQuoteDocx: every hyperlink targets the live quote page", async () =>
   const targets = [...rels.matchAll(/Target="([^"]+)"\s+TargetMode="External"/g)].map((m) => m[1]);
   assert.ok(targets.length >= 3, `expected >=3 external links, got ${targets.length}`);
   for (const target of targets) assert.equal(target, onlineUrl);
+});
+
+test("renderQuoteDocx: a revision says which revision it is and which quote it replaces", async () => {
+  const first = zipEntry(await renderQuoteDocx(data, "en", quoteMessagesFor("en")), "word/document.xml");
+  assert.doesNotMatch(first, /replaces quote/, "a first quote carries no revision line");
+  const revised = { ...data, quoteNumber: "EFGH5678", revision: { number: 2, replacesQuoteNumber: "ABCD1234" } };
+  const body = zipEntry(await renderQuoteDocx(revised, "en", quoteMessagesFor("en")), "word/document.xml");
+  assert.match(body, /REVISION/);
+  assert.match(body, /2 — replaces quote ABCD1234/);
+  const sv = zipEntry(await renderQuoteDocx(revised, "sv", quoteMessagesFor("sv")), "word/document.xml");
+  assert.match(sv, /ersätter offert ABCD1234/);
 });

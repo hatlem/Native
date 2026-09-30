@@ -166,8 +166,8 @@ export const OPENAPI_SPEC = {
       Quote: {
         type: "object",
         description:
-          "A quote the desk has sent (drafts are never visible). Money fields are decimal strings in `currency`, excluding VAT unless named `total`.",
-        required: ["id", "request_id", "status", "currency", "subtotal", "vat_pct", "total", "lines"],
+          "A quote the desk has sent (drafts are never visible). Money fields are decimal strings in `currency`, excluding VAT unless named `total`. A sent quote never changes: to change it the desk sends a new revision, and this one becomes SUPERSEDED (no longer acceptable) with `superseded_by_quote_id` naming the quote that counts now.",
+        required: ["id", "request_id", "status", "currency", "subtotal", "vat_pct", "total", "revision", "lines"],
         properties: {
           id: { type: "string" },
           request_id: { type: "string" },
@@ -180,6 +180,22 @@ export const OPENAPI_SPEC = {
           vat_pct: { type: "string" },
           total: { type: "string" },
           valid_until: { type: "string", format: "date-time", nullable: true },
+          revision: {
+            type: "integer",
+            minimum: 1,
+            description: "1 for the first quote; each sent revision counts up.",
+          },
+          supersedes_quote_id: {
+            type: "string",
+            nullable: true,
+            description: "The earlier quote this revision replaced. Null on a first quote.",
+          },
+          superseded_by_quote_id: {
+            type: "string",
+            nullable: true,
+            description: "Set once status is SUPERSEDED: the revision that replaced this quote.",
+          },
+          superseded_at: { type: "string", format: "date-time", nullable: true },
           notes: { type: "string", nullable: true },
           lines: {
             type: "array",
@@ -305,15 +321,24 @@ export const OPENAPI_SPEC = {
                 type: { type: "string", enum: Object.values(ProductType) },
                 name: { type: "string" },
                 description: { type: "string", nullable: true },
-                basePrice: { type: "number", description: "Publisher rate-card cost." },
+                basePrice: {
+                  type: "number",
+                  description:
+                    "Publisher rate-card cost. Sets a NEW product's opening price (unconfirmed until the desk confirms it). For an existing product it is desk-owned: send the stored value (see GET) or update it on the portal's Rates page; a different value is refused with DESK_OWNED_FIELD.",
+                },
                 currency: { type: "string", description: "ISO 4217, 3 letters." },
                 leadTimeDays: { type: "integer", nullable: true },
                 visibility: {
                   type: "string",
                   enum: ["INDICATIVE", "FIRM"],
-                  description: "Defaults to INDICATIVE on create.",
+                  description:
+                    "Desk-owned (FIRM makes a product instantly orderable). Optional; if sent it must equal the stored value, or INDICATIVE for a new product. Anything else is refused with DESK_OWNED_FIELD.",
                 },
-                bookable: { type: "boolean" },
+                bookable: {
+                  type: "boolean",
+                  description:
+                    "Desk-owned. Optional; if sent it must equal the stored value, or true for a new product. Anything else is refused with DESK_OWNED_FIELD.",
+                },
                 title: {
                   type: "object",
                   required: ["externalRef", "name", "marketCode", "category"],
@@ -406,6 +431,7 @@ export const OPENAPI_SPEC = {
                   "NOT_FOUND",
                   "NOT_PUBLISHER_KEY",
                   "VALIDATION_FAILED",
+                  "DESK_OWNED_FIELD",
                   "INGEST_FAILED",
                   "NO_ORG",
                   "BAD_JSON",
@@ -426,12 +452,17 @@ export const OPENAPI_SPEC = {
               details: {
                 type: "array",
                 description:
-                  "Present on BAD_PARAM (one entry per invalid query parameter: `param`, `message`) and VALIDATION_FAILED (one per invalid field: `path`, `message`).",
+                  "Present on BAD_PARAM (one entry per invalid query parameter: `param`, `message`), VALIDATION_FAILED (one per invalid field: `path`, `message`) and DESK_OWNED_FIELD (one per refused field: `path`, `field`, `message`).",
                 items: {
                   type: "object",
                   properties: {
                     param: { type: "string" },
                     path: { type: "string" },
+                    field: {
+                      type: "string",
+                      enum: ["basePrice", "visibility", "bookable"],
+                      description: "DESK_OWNED_FIELD only: the desk-owned field the payload would change.",
+                    },
                     message: { type: "string" },
                   },
                 },
@@ -608,7 +639,7 @@ export const OPENAPI_SPEC = {
     "/api/v1/publisher/products": {
       put: {
         summary:
-          "Upsert the calling publisher's inventory (titles/products/prices/specs/availability). Idempotent on externalRef. Requires a catalog:write key bound to a publisher. New titles land inactive until NativeSpin activates them.",
+          "Upsert the calling publisher's inventory (titles/products/specs/availability/lead times, and a new product's opening price). Idempotent on externalRef. Requires a catalog:write key bound to a publisher. New titles land inactive until NativeSpin activates them. Price (once a product exists), visibility and bookable are managed by the NativeSpin desk: a payload that would change one is refused with 422 DESK_OWNED_FIELD and nothing is written; sending the stored value back unchanged is accepted.",
         security: [{ bearerAuth: [] }],
         requestBody: {
           required: true,
@@ -636,7 +667,8 @@ export const OPENAPI_SPEC = {
             content: { "application/json": { schema: { $ref: "#/components/schemas/Error" } } },
           },
           "422": {
-            description: "Payload failed validation (VALIDATION_FAILED; see error.details).",
+            description:
+              "Payload failed validation (VALIDATION_FAILED), or would change a desk-owned field (DESK_OWNED_FIELD: basePrice of an existing product, visibility, bookable). error.message names the fields; error.details lists each as { path, field, message }. Nothing was written.",
             content: { "application/json": { schema: { $ref: "#/components/schemas/Error" } } },
           },
           "429": {

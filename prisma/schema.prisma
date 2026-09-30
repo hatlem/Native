@@ -135,6 +135,8 @@ enum QuoteStatus {
   ACCEPTED
   EXPIRED
   DECLINED
+  // Replaced by a sent revision (Quote.nextRevision) — never acceptable.
+  SUPERSEDED
 }
 
 enum OrderStatus {
@@ -1249,6 +1251,18 @@ model Quote {
   total       Decimal     @db.Decimal(12, 2)
   validUntil  DateTime?
   notes       String?
+  // Revisions. A SENT quote is immutable (lib/commerce/quote-revision.ts): to
+  // change it the desk opens a new DRAFT revision that copies its lines, with
+  // the next revision number and a link back here. Sending the revision
+  // flips this predecessor to SUPERSEDED (supersededAt) — no longer
+  // acceptable, and the buyer's page points at the revision instead.
+  // previousQuoteId is unique, so a quote has at most one revision: two desk
+  // users revising at once can't fork the chain.
+  revision        Int       @default(1)
+  previousQuoteId String?   @unique
+  previousQuote   Quote?    @relation("QuoteRevision", fields: [previousQuoteId], references: [id])
+  nextRevision    Quote?    @relation("QuoteRevision")
+  supersededAt    DateTime?
   createdAt   DateTime    @default(now())
   updatedAt   DateTime    @updatedAt
 

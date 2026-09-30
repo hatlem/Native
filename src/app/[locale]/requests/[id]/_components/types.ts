@@ -12,6 +12,7 @@ export type ProductWithTitle = Prisma.ProductGetPayload<{
 export type QuoteWithOrder = Prisma.QuoteGetPayload<{
   include: {
     lines: true;
+    nextRevision: { select: { id: true; revision: true } };
     order: {
       include: {
         invoices: true;
@@ -34,3 +35,13 @@ export type QuoteWithOrder = Prisma.QuoteGetPayload<{
 }>;
 
 export type OrderWithDetails = NonNullable<QuoteWithOrder["order"]>;
+
+// A quote a sent revision replaced — shown as history, never as an offer.
+export type SupersededQuote = {
+  id: string;
+  revision: number;
+  currency: string;
+  total: number;
+  supersededAt: Date | null;
+  replacedBy: { id: string; revision: number } | null;
+};

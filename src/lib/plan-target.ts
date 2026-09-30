@@ -22,13 +22,23 @@ export type PlanTarget =
   | { ok: true; list: PlanTargetList }
   // missing: no id posted or no such list; archived: the plan was archived
   // (possibly in another tab); forbidden: the list lives in an org outside
-  // the viewer's workspace (a tampered post, or access revoked since).
-  | { ok: false; reason: "missing" | "archived" | "forbidden" };
+  // the viewer's workspace (a tampered post, or access revoked since);
+  // read-only: the viewer sees the plan but holds a view-only seat in its org.
+  | { ok: false; reason: "missing" | "archived" | "forbidden" | "read-only" };
+
+/**
+ * What the caller is about to do with the plan. Almost every plan action
+ * changes it ("edit" — the default, so a new action is guarded unless it says
+ * otherwise); only opening a plan to look at it is a "view", which a
+ * view-only (RESTRICTED) seat may do too.
+ */
+export type PlanIntent = "view" | "edit";
 
 /** Resolve a posted listId to a plan the viewer may act on. */
 export async function resolvePlanTarget(
-  ws: Pick<Workspace, "scopeOrgIds"> | null,
+  ws: Pick<Workspace, "scopeOrgIds" | "editOrgIds"> | null,
   listId: string | null | undefined,
+  intent: PlanIntent = "edit",
 ): Promise<PlanTarget> {
   if (!listId) return { ok: false, reason: "missing" };
   const list = await prisma.savedList.findUnique({
@@ -40,18 +50,26 @@ export async function resolvePlanTarget(
   // exists or was archived.
   if (!ws || !ws.scopeOrgIds.includes(list.organizationId)) return { ok: false, reason: "forbidden" };
   if (list.archivedAt) return { ok: false, reason: "archived" };
+  if (intent === "edit" && !ws.editOrgIds.includes(list.organizationId)) {
+    return { ok: false, reason: "read-only" };
+  }
   return { ok: true, list: { id: list.id, organizationId: list.organizationId } };
 }
 
 /**
  * The /plan notice explaining why the viewer landed on another plan than the
- * one they asked for (PlanBanners: ?notice=). Archived gets its own wording;
- * unknown and out-of-scope share one, so the notice can't probe other orgs
- * (resolvePlanTarget only reports "archived" for a plan in the viewer's scope).
+ * one they asked for, or why nothing happened (PlanBanners: ?notice=).
+ * Archived and read-only get their own wording; unknown and out-of-scope share
+ * one, so the notice can't probe other orgs (resolvePlanTarget only reports
+ * "archived"/"read-only" for a plan in the viewer's scope).
  */
-export function refusalNotice(target: PlanTarget): { notice: "plan-archived" | "plan-unavailable" } | undefined {
+export function refusalNotice(
+  target: PlanTarget,
+): { notice: "plan-archived" | "plan-unavailable" | "plan-read-only" } | undefined {
   if (target.ok) return undefined;
-  return { notice: target.reason === "archived" ? "plan-archived" : "plan-unavailable" };
+  if (target.reason === "archived") return { notice: "plan-archived" };
+  if (target.reason === "read-only") return { notice: "plan-read-only" };
+  return { notice: "plan-unavailable" };
 }
 
 /**
