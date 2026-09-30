@@ -65,6 +65,8 @@ if (!RUN_DB_IT) {
       data: { email: `${REF}@example.test`, organizationId: org.id },
     });
     buyerId = buyer.id;
+    // Org notices go to ACTIVE seats (lib/notify.ts), like access does.
+    await prisma.membership.create({ data: { userId: buyer.id, organizationId: org.id, role: "ADMIN", canCommit: true } });
   });
 
   after(async () => {

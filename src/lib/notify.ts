@@ -22,6 +22,7 @@ import { renderNotice, type NoticeTemplate, type RenderedNotice } from "@/lib/no
 import { asNoticeLocale } from "@/lib/notices/messages";
 import { noticeEmail } from "@/lib/notices/email";
 import { prisma } from "@/lib/prisma";
+import { activeMembershipWhere } from "@/lib/membership";
 
 export type EmailMessage = {
   to: string;
@@ -126,7 +127,17 @@ export async function notifyDesk(input: NotifyInput) {
 export async function notifyOrg(organizationId: string, input: NotifyInput) {
   const [org, users] = await Promise.all([
     prisma.organization.findUnique({ where: { id: organizationId }, select: { marketCode: true } }),
-    prisma.user.findMany({ where: { organizationId }, select: RECIPIENT_SELECT }),
+    // Recipients are the org's ACTIVE seats, the same rule that grants access
+    // (lib/workspace.ts). The home-org column no longer means membership:
+    // a revoked member must stop getting the org's quotes and invoices, and
+    // someone who belongs only through a seat must start getting them.
+    prisma.user.findMany({
+      where: {
+        deactivatedAt: null,
+        memberships: { some: { organizationId, ...activeMembershipWhere() } },
+      },
+      select: RECIPIENT_SELECT,
+    }),
   ]);
   // marketCode is nullable until onboarding completes; English is the safe
   // default (a wrong-language notice is worse than an English one).

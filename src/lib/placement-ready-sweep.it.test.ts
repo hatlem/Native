@@ -24,6 +24,8 @@ before(async () => {
     data: { email: `sweep-buyer-${org.id}@example.com`, organizationId: orgId },
   });
   buyerUserId = buyer.id;
+  // Org notices go to ACTIVE seats (lib/notify.ts), like access does.
+  await prisma.membership.create({ data: { userId: buyer.id, organizationId: orgId, role: "ADMIN", canCommit: true } });
   const desk = await prisma.user.create({
     data: { email: `sweep-desk-${org.id}@example.com`, role: "DESK" },
   });
@@ -222,12 +224,19 @@ if (!RUN_DB_IT) {
     const item = await prisma.savedListItem.create({ data: { listId, titleId } });
     await addProduct(titleId, { active: true, bookable: true, confirmed: true });
 
-    const res = await runPlacementReadySweepWithLock();
-    assert.ok(res, "lock was acquired and the sweep ran");
-    assert.ok(res!.notified >= 1, "the sweep ran inside the lock and notified");
-    const marker = await prisma.auditLog.findFirst({
-      where: { entity: `SavedListItem:${item.id}`, action: "placement-ready.notified" },
-    });
+    // Each tick is capped (MAX_NOTIFICATIONS_PER_SWEEP), and other suites'
+    // leftover placeholders in a shared DB can fill a tick, so tick through
+    // the locked path until this item's turn, the way production catches up.
+    const findMarker = () =>
+      prisma.auditLog.findFirst({
+        where: { entity: `SavedListItem:${item.id}`, action: "placement-ready.notified" },
+      });
+    let marker = null;
+    for (let tick = 0; tick < 25 && !marker; tick++) {
+      const res = await runPlacementReadySweepWithLock();
+      assert.ok(res, "lock was acquired and the sweep ran");
+      marker = await findMarker();
+    }
     assert.ok(marker, "this item was notified through the locked path");
   });
 }

@@ -17,6 +17,15 @@ export function isMembershipActive(m: MembershipRow, now: Date = new Date()): bo
   return true;
 }
 
+/** The same rule as isMembershipActive, as a Prisma filter, for queries that
+ *  pick people by their seat (recipients, rosters) instead of loading rows. */
+export function activeMembershipWhere(now: Date = new Date()) {
+  return {
+    status: "ACTIVE" as const,
+    OR: [{ expiresAt: null }, { expiresAt: { gt: now } }],
+  };
+}
+
 export function activeScopeOrgIds(
   memberships: MembershipRow[],
   now: Date = new Date(),
