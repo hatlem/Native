@@ -110,3 +110,59 @@ test("agency without a client selected has no active org", () => {
   )!;
   assert.equal(agency.activeOrgId, null);
 });
+
+// ─── View-only (RESTRICTED) seats ─────────────────────────────────────────────
+
+test("a RESTRICTED seat reads its org but may not change or commit anything", () => {
+  // canCommit=true models a row written before the DB CHECK existed: the role
+  // alone must still deny the grant.
+  const ws = resolveWorkspace(input({ memberships: [seat("home", { role: "RESTRICTED", canCommit: true })] }))!;
+  assert.deepEqual(ws.scopeOrgIds, ["home"], "view-only still sees the org");
+  assert.deepEqual(ws.editOrgIds, []);
+  assert.deepEqual(ws.commitOrgIds, []);
+  assert.equal(ws.activeCanEdit, false);
+  assert.equal(ws.activeCanCommit, false);
+});
+
+test("edit rights follow the seat in each org, not the switched-to org", () => {
+  const memberships = [seat("viewer", { role: "RESTRICTED" }), seat("home", { role: "MEMBER" })];
+  const inHome = resolveWorkspace(input({ memberships }))!;
+  assert.deepEqual(inHome.editOrgIds, ["home"]);
+  assert.equal(inHome.activeCanEdit, true);
+  const inViewer = resolveWorkspace(input({ memberships, selectedOrgId: "viewer" }))!;
+  assert.equal(inViewer.activeOrgId, "viewer");
+  assert.equal(inViewer.activeCanEdit, false);
+  assert.deepEqual(inViewer.editOrgIds, ["home"], "switching orgs grants nothing the seat doesn't have");
+});
+
+test("members and admins may edit; edit rights never exceed read scope", () => {
+  const ws = resolveWorkspace(
+    input({ memberships: [seat("home", { role: "ADMIN", canCommit: true }), seat("b", { role: "MEMBER" })] }),
+  )!;
+  assert.deepEqual([...ws.editOrgIds].sort(), ["b", "home"]);
+  for (const id of ws.editOrgIds) assert.ok(ws.scopeOrgIds.includes(id));
+  for (const id of ws.commitOrgIds) assert.ok(ws.editOrgIds.includes(id));
+});
+
+test("agency: a view-only seat in the agency makes its whole client reach read-only", () => {
+  const agency = resolveWorkspace(
+    input({
+      homeOrg: { id: "ag", type: "AGENCY" },
+      memberships: [seat("ag", { role: "RESTRICTED" })],
+      agencyClientIds: ["c1"],
+      selectedOrgId: "c1",
+    }),
+  )!;
+  assert.deepEqual(agency.scopeOrgIds, ["ag", "c1"], "still sees every client");
+  assert.deepEqual(agency.editOrgIds, []);
+  assert.deepEqual(agency.commitOrgIds, []);
+  assert.equal(agency.activeCanEdit, false);
+});
+
+test("agency: a full agency seat (or none) keeps full control over its clients", () => {
+  const agency = resolveWorkspace(
+    input({ homeOrg: { id: "ag", type: "AGENCY" }, agencyClientIds: ["c1"], selectedOrgId: "c1" }),
+  )!;
+  assert.deepEqual(agency.editOrgIds, agency.scopeOrgIds);
+  assert.equal(agency.activeCanEdit, true);
+});

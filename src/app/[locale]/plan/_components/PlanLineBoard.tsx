@@ -89,6 +89,7 @@ export function PlanLineBoard({
   alternatives,
   alternativesHeader,
   labels,
+  readOnly = false,
 }: {
   listId: string;
   locale: string;
@@ -96,6 +97,9 @@ export function PlanLineBoard({
   alternatives: PlanBoardEntry[];
   alternativesHeader: ReactNode;
   labels: Labels;
+  // View-only seat: the order is the team's to set, so no drag handles and no
+  // sort select (both save the order). Search stays — it only reads.
+  readOnly?: boolean;
 }) {
   const [query, setQuery] = useState("");
   // The saved order may be the result of an earlier one-click sort: show that
@@ -185,15 +189,17 @@ export function PlanLineBoard({
               autoComplete="off"
             />
           </label>
-          <label className="plan-board__sort" htmlFor={sortId}>
-            <span className="muted small">{labels.sortBy}</span>
-            <select id={sortId} value={sortKey} onChange={(e) => applySort(e.target.value as SortKey | "custom")}>
-              <option value="custom">{labels.sortCustom}</option>
-              <option value="title">{labels.sortTitle}</option>
-              <option value="publisher">{labels.sortPublisher}</option>
-              <option value="price">{labels.sortPrice}</option>
-            </select>
-          </label>
+          {readOnly ? null : (
+            <label className="plan-board__sort" htmlFor={sortId}>
+              <span className="muted small">{labels.sortBy}</span>
+              <select id={sortId} value={sortKey} onChange={(e) => applySort(e.target.value as SortKey | "custom")}>
+                <option value="custom">{labels.sortCustom}</option>
+                <option value="title">{labels.sortTitle}</option>
+                <option value="publisher">{labels.sortPublisher}</option>
+                <option value="price">{labels.sortPrice}</option>
+              </select>
+            </label>
+          )}
         </div>
       ) : null}
       <p className="plan-board__status muted small" role="status" aria-live="polite">
@@ -208,7 +214,7 @@ export function PlanLineBoard({
       <SortableSection
         section="plan"
         entries={shownPlan}
-        disabled={searching}
+        disabled={searching || readOnly}
         labels={labels}
         onMove={move}
       />
@@ -219,7 +225,7 @@ export function PlanLineBoard({
           <SortableSection
             section="alternatives"
             entries={shownAlt}
-            disabled={searching}
+            disabled={searching || readOnly}
             labels={labels}
             onMove={move}
           />

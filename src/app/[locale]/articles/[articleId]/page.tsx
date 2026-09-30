@@ -2,7 +2,8 @@ import { getTranslations } from "next-intl/server";
 import { redirect } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import { requireArticleWriter } from "@/lib/writers/guard";
-import { loadScope, canActOnOrg } from "@/lib/scope";
+import { loadScope, canActOnOrg, canEditOnOrg } from "@/lib/scope";
+import { ViewOnlyNote } from "@/components/view-only-note";
 import { StatusBadge } from "@/app/status-badge";
 import { saveDraft, saveUploadedDraft, setAssetStatus } from "@/app/desk-content-actions";
 import { linkArticleToOrderLine, unlinkArticleFromOrderLine } from "@/app/article-library-actions";
@@ -31,7 +32,9 @@ export default async function ArticleDetailPage({
   const t = await getTranslations({ locale, namespace: "articles" });
   const tOrders = await getTranslations({ locale, namespace: "orders" });
   const tType = await getTranslations({ locale, namespace: "productType" });
-  const { role, writerProfileId } = await requireArticleWriter(articleId, locale); // redirects if not allowed
+  // Opening the article is a read: a view-only seat may see it (its forms are
+  // hidden, and every action re-checks with intent "edit").
+  const { role, writerProfileId } = await requireArticleWriter(articleId, locale, "view"); // redirects if not allowed
   const scope = await loadScope();
 
   const article = await prisma.article.findUnique({
@@ -82,9 +85,14 @@ export default async function ArticleDetailPage({
   // not the writer). On an article NativeSpin writes, the buyer reviews —
   // they never edit the writer's copy in place.
   const isBuyerSide = !isDesk && role !== "CONTENT" && canActOnOrg(scope, article.organizationId);
-  const authorSide = isDesk || isAssignedWriter || (isBuyerSide && !nativeSpinWritten);
+  // A view-only (RESTRICTED) seat reads the article and its placements but
+  // gets no write/upload/link forms and no approve/request-changes; the
+  // actions refuse it anyway (lib/scope canEditOnOrg).
+  const buyerCanEdit = isBuyerSide && canEditOnOrg(scope, article.organizationId);
+  const buyerViewOnly = isBuyerSide && !buyerCanEdit;
+  const authorSide = isDesk || isAssignedWriter || (buyerCanEdit && !nativeSpinWritten);
   const canEdit = authorSide && (!latest || EDITABLE_STATUSES.has(latest.status));
-  const canReview = isBuyerSide && latest?.status === "IN_REVIEW";
+  const canReview = buyerCanEdit && latest?.status === "IN_REVIEW";
 
   const headline = articleHeadline(latest?.body) ?? article.title;
   const createdBy = await prisma.user.findUnique({
@@ -174,6 +182,8 @@ export default async function ArticleDetailPage({
           {authorName ? <span className="muted small">{t("byAuthor", { name: authorName })}</span> : null}
         </p>
       </header>
+
+      {buyerViewOnly ? <ViewOnlyNote locale={locale} /> : null}
 
       {latest?.status === "CHANGES_REQUESTED" && latest.reviewNotes ? (
         <div className="banner-info" role="status">

@@ -14,13 +14,13 @@ import { deriveStage, type CampaignStage } from "@/lib/campaign-stage";
 import { buyerVisibleQuoteWhere, effectiveQuoteStatus } from "@/lib/commerce/quote-validity";
 import { monthsWindow, intersectsMonth, draftWindow, orderWindow, type RunWindow } from "@/lib/campaign-timeline";
 import { CampaignRow, type RowAction } from "./_components/CampaignRow";
+import { tabForRow, type RowTab } from "@/lib/request-tab";
 import { TimelineView, type TimelineEntry, type TimelineMonthGroup } from "./_components/TimelineView";
 
 export const dynamic = "force-dynamic";
 
 const TABS = ["needsYou", "inProgress", "live", "done", "all"] as const;
 type Tab = (typeof TABS)[number];
-
 // "timeline" is a VIEW over the same campaigns (bucketed by run month), not
 // a status filter — it never has a count badge and never participates in the
 // default-tab fallback; it only activates via an explicit ?tab=timeline.
@@ -33,26 +33,13 @@ type Row = {
   statusValue: string;
   meta: string;
   stage: CampaignStage;
-  tab: Exclude<Tab, "all">;
+  tab: RowTab;
   totalLabel: string | null;
   qualifier: string;
   action: RowAction;
   href: string;
   footerNote?: string;
 };
-
-// Everything that isn't awaiting the buyer and isn't live/done yet — plan
-// built, sent to the desk, or approved and in production.
-function tabForRow(orderStatus: string | null, quoteStatus: string | null, requestStatus: string): Exclude<Tab, "all"> {
-  if (orderStatus === "CANCELLED") return "done";
-  if (orderStatus === "LIVE") return "live";
-  if (orderStatus === "COMPLETED" || orderStatus === "INVOICED") return "done";
-  if (orderStatus) return "inProgress";
-  if (quoteStatus === "SENT") return "needsYou";
-  if (quoteStatus === "EXPIRED" || quoteStatus === "DECLINED") return "done";
-  if (requestStatus === "CLOSED") return "done";
-  return "inProgress";
-}
 
 export default async function RequestsPage({
   params,
@@ -72,6 +59,10 @@ export default async function RequestsPage({
   const scope = await loadScope();
   if (!scope.workspace) redirect(`/${locale}/signin`);
   const ws = scope.workspace;
+  // A view-only (RESTRICTED) seat follows every campaign but starts or sends
+  // none: no "new campaign" CTA, and a draft plan row reads "View", not
+  // "Finish & send".
+  const canEdit = viewOrgIds(ws).some((id) => ws.editOrgIds.includes(id));
 
   const tabRaw = typeof sp.tab === "string" ? sp.tab : "";
   const explicitView: View | null = (VIEWS as readonly string[]).includes(tabRaw) ? (tabRaw as View) : null;
@@ -175,7 +166,11 @@ export default async function RequestsPage({
         kind: "select-list",
         listId: list.id,
         locale,
-        label: placements > 0 ? t("actionFinishSend") : t("actionContinuePlan"),
+        label: !canEdit
+          ? t("actionView")
+          : placements > 0
+            ? t("actionFinishSend")
+            : t("actionContinuePlan"),
       },
       footerNote: waveFooter(list),
       // Unused by CampaignRow for a select-list action (it renders the
@@ -221,7 +216,10 @@ export default async function RequestsPage({
       quoteStatus,
       orderStatus: order?.status ?? null,
     });
-    const tab = tabForRow(order?.status ?? null, quoteStatus, r.status);
+    const canCommit = ws.commitOrgIds.includes(r.organizationId);
+    const tab = tabForRow(order?.status ?? null, quoteStatus, r.status, canCommit);
+    // A sent quote this viewer can't accept: say who it waits on.
+    const awaitingTeam = quoteStatus === "SENT" && !canCommit;
 
     let qualifier: string;
     if (order) {
@@ -229,7 +227,9 @@ export default async function RequestsPage({
       else if (invoiceStatus === "ISSUED" || invoiceStatus === "OVERDUE") qualifier = t("qualifierInvoiced");
       else qualifier = t("qualifierConfirmed");
     } else if (quote) {
-      if (quoteStatus === "SENT") {
+      if (awaitingTeam) {
+        qualifier = t("qualifierAwaitingTeam");
+      } else if (quoteStatus === "SENT") {
         qualifier = quote.validUntil
           ? t("qualifierFirmExpires", { date: dateFmt.format(quote.validUntil) })
           : t("qualifierFirm");
@@ -255,7 +255,9 @@ export default async function RequestsPage({
           ? { kind: "link", href: orderHref, label: t("actionSeePlacements"), primary: false }
           : stage >= 5
             ? { kind: "link", href: orderHref, label: t("actionOpenReport"), primary: false }
-            : { kind: "link", href: detailHref, label: t("actionView"), primary: false };
+            : awaitingTeam
+              ? { kind: "link", href: detailHref, label: t("actionSeeQuote"), primary: false }
+              : { kind: "link", href: detailHref, label: t("actionView"), primary: false };
 
     const wave = r.sourceList?.programme && r.sourceList.waveNumber
       ? { n: r.sourceList.waveNumber, of: r.sourceList.programme.plannedWaves }
@@ -384,9 +386,11 @@ export default async function RequestsPage({
           <Link href="/invoices" className="btn secondary">
             {tInvoice("listTitle")}
           </Link>
-          <Link href="/catalog" className="btn">
-            {t("newCampaignCta")}
-          </Link>
+          {canEdit ? (
+            <Link href="/catalog" className="btn">
+              {t("newCampaignCta")}
+            </Link>
+          ) : null}
         </div>
       </div>
 
@@ -423,8 +427,8 @@ export default async function RequestsPage({
       ) : visibleRows.length === 0 ? (
         <EmptyState
           title={t("noneForTab")}
-          primaryHref="/catalog"
-          primaryLabel={tOrders("newOrderCta")}
+          primaryHref={canEdit ? "/catalog" : undefined}
+          primaryLabel={canEdit ? tOrders("newOrderCta") : undefined}
         />
       ) : (
         <div className="campaign-row-list">

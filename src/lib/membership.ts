@@ -65,12 +65,25 @@ export function wouldRemoveLastAdmin(
 }
 
 /**
+ * May a seat with this role change anything in its org? RESTRICTED is a
+ * view-only seat: it reads the org's plans, requests, quotes, orders, reports,
+ * articles and invoices, and changes none of them. Every write authority
+ * (lib/workspace editOrgIds, and through it lib/scope canEditOnOrg) derives
+ * from this one rule.
+ */
+export function roleCanEdit(role: MembershipRole): boolean {
+  return role !== "RESTRICTED";
+}
+
+/**
  * Commit authority (accept quotes, place orders) for a seat. An ADMIN always
  * has it: an admin can grant it to anyone, themselves included, so an admin
  * without it was never a real restriction, only a wall the first time they
- * tried to accept a quote. Enforced in the database too (CHECK constraints on
- * Membership and OrgInvite), so every writer must route through this.
+ * tried to accept a quote. A view-only (RESTRICTED) seat never has it, whatever
+ * was asked for. Enforced in the database too (CHECK constraints on Membership
+ * and OrgInvite), so every writer must route through this.
  */
 export function commitGrantFor(role: MembershipRole, requested: boolean): boolean {
+  if (!roleCanEdit(role)) return false;
   return role === "ADMIN" || requested;
 }

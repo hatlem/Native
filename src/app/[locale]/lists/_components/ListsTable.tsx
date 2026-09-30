@@ -22,9 +22,12 @@ type Props = {
   lists: ListRow[];
   heading: string;
   emptyLabel: string;
+  // View-only (RESTRICTED) seat: names are shown as text and only "Open" is
+  // offered — no rename, duplicate or archive (the server refuses them anyway).
+  readOnly?: boolean;
 };
 
-export async function ListsTable({ locale, lists, heading, emptyLabel }: Props) {
+export async function ListsTable({ locale, lists, heading, emptyLabel, readOnly = false }: Props) {
   const t = await getTranslations({ locale, namespace: "lists" });
   const dateFmt = new Intl.DateTimeFormat(intlLocale(locale), {
     year: "numeric",
@@ -64,6 +67,9 @@ export async function ListsTable({ locale, lists, heading, emptyLabel }: Props) 
                 return (
                   <tr key={list.id}>
                     <td data-label={t("name")}>
+                      {readOnly ? (
+                        <strong>{list.name}</strong>
+                      ) : (
                       <form action={renameList} className="cluster tight">
                         <input type="hidden" name="listId" value={list.id} />
                         <input type="hidden" name="locale" value={locale} />
@@ -78,6 +84,7 @@ export async function ListsTable({ locale, lists, heading, emptyLabel }: Props) 
                           {t("rename")}
                         </button>
                       </form>
+                      )}
                     </td>
                     <td data-label={t("items")} className="num">
                       {t("placementCount", { count: list._count.items })}
@@ -100,6 +107,8 @@ export async function ListsTable({ locale, lists, heading, emptyLabel }: Props) 
                         <a href={`/${locale}/plan/${list.id}`} className="link">
                           {t("open")}
                         </a>
+                        {readOnly ? null : (
+                        <>
                         <form action={duplicateList}>
                           <input type="hidden" name="listId" value={list.id} />
                           <input type="hidden" name="locale" value={locale} />
@@ -114,6 +123,8 @@ export async function ListsTable({ locale, lists, heading, emptyLabel }: Props) 
                             {t("archive")}
                           </button>
                         </form>
+                        </>
+                        )}
                       </div>
                     </td>
                   </tr>

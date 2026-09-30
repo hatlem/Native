@@ -4,6 +4,7 @@ import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
 import { formatMoney } from "@/lib/money";
 import { getWorkspace } from "@/lib/workspace";
+import { ViewOnlyNote } from "@/components/view-only-note";
 import { createClient, selectClient } from "@/app/agency-actions";
 import { MailLink, SubmitButton } from "@/components";
 import { SUPPORTED_MARKETS } from "@/lib/markets";
@@ -189,6 +190,11 @@ export default async function AgencyPage({
         )}
       </section>
 
+      {/* Adding a client changes the agency: a view-only seat in the agency
+          (lib/workspace editOrgIds) sees its clients but can't add one. */}
+      {!ws.editOrgIds.includes(ws.agencyOrgId) ? (
+        <ViewOnlyNote locale={locale} />
+      ) : (
       <section className="section">
         <div className="section-head">
           <div>
@@ -226,6 +232,7 @@ export default async function AgencyPage({
           </div>
         </form>
       </section>
+      )}
     </>
   );
 }

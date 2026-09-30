@@ -9,6 +9,11 @@
 // other publisher's inventory — the publisherId comes from the key, never
 // the request body. Brand-new titles land inactive until the super-admin
 // activates them (the catalog curation gate).
+//
+// Same rule as the publisher portal: a publisher sets lead times, specs and
+// availability; price (once a product exists), visibility and bookable are
+// the desk's. A PUT that would change one is refused with 422
+// DESK_OWNED_FIELD naming the field (lib/ingest deskOwnedFieldChanges).
 
 import { NextResponse, type NextRequest } from "next/server";
 import { prisma } from "@/lib/prisma";
@@ -16,7 +21,7 @@ import { authenticateRequest } from "@/lib/api-auth";
 import { rfqLimiter } from "@/lib/rate-limit";
 import { recordAudit } from "@/lib/audit";
 import { parseIngestPayload } from "@/lib/ingest";
-import { applyIngestion } from "@/lib/ingest-apply";
+import { applyIngestion, findDeskOwnedFieldChanges } from "@/lib/ingest-apply";
 
 export const dynamic = "force-dynamic";
 
@@ -89,6 +94,20 @@ export async function PUT(req: NextRequest) {
   const parsed = parseIngestPayload(body);
   if (!parsed.ok) {
     return errJson(422, "VALIDATION_FAILED", "Payload failed validation.", parsed.errors);
+  }
+
+  // The portal rule (lib/ingest deskOwnedFieldChanges): price, visibility and
+  // bookable are the desk's once a product exists. Refuse the whole batch,
+  // naming each field, before anything is written.
+  const deskOwned = await findDeskOwnedFieldChanges(a.publisherId, parsed.data);
+  if (deskOwned.length > 0) {
+    const fields = [...new Set(deskOwned.map((r) => r.field))].join(", ");
+    return errJson(
+      422,
+      "DESK_OWNED_FIELD",
+      `Managed by the NativeSpin desk, not changeable through the API: ${fields}. Nothing was written.`,
+      deskOwned,
+    );
   }
 
   let summary;

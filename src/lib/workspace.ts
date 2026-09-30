@@ -6,6 +6,7 @@ import {
   activeScopeOrgIds,
   isMembershipActive,
   resolveOrgMembership,
+  roleCanEdit,
 } from "@/lib/membership";
 
 export const CLIENT_COOKIE = "nativespin_client";
@@ -30,13 +31,22 @@ export type Workspace = {
   // Org ids this user may read: every org with an active seat plus, for an
   // agency, all of its client orgs. Used for request/quote/report scoping.
   scopeOrgIds: string[];
+  // Orgs where this user may CHANGE anything (create/edit/submit/share/archive
+  // plans, approve articles, upload, …): an active seat that is not view-only
+  // (lib/membership roleCanEdit), or — for an agency — every org in scope,
+  // unless the agency seat itself is view-only. Always a subset of scopeOrgIds.
+  editOrgIds: string[];
   // Orgs where this user may commit (accept a quote, place an order): an
-  // active seat with canCommit, or — for an agency — every org in scope.
+  // active, editable seat with canCommit, or — for an agency — every org it
+  // may edit. Always a subset of editOrgIds.
   commitOrgIds: string[];
   // Resolved authority for activeOrgId from the membership row (null when there
   // is no active membership for the active org, e.g. pure agency path).
   activeRole: MembershipRole | null;
   activeCanCommit: boolean;
+  // May this user change things in activeOrgId? False for a view-only seat —
+  // the UI hides its editing controls and shows the view-only note instead.
+  activeCanEdit: boolean;
 };
 
 // Exported (only) so it's independently testable without a Next.js request
@@ -100,19 +110,27 @@ export function resolveWorkspace(input: WorkspaceInputs): Workspace | null {
       input.selectedOrgId && clientIds.includes(input.selectedOrgId) ? input.selectedOrgId : null;
     const active = activeOrgId ? resolveOrgMembership(memberships, activeOrgId, now) : null;
     const scopeOrgIds = Array.from(new Set([homeOrg.id, ...clientIds, ...seatOrgIds]));
+    const homeRole = resolveOrgMembership(memberships, homeOrg.id, now)?.role ?? null;
+    // Agencies retain full control (including commit) over every org in their
+    // scope — the pre-existing agency access path — unless the desk gave this
+    // user a view-only seat in the agency itself: then the agency's reach is
+    // read-only too, and only their own editable seats (if any) grant writes.
+    const agencyEdits = homeRole === null || roleCanEdit(homeRole);
+    const editOrgIds = agencyEdits ? scopeOrgIds : editableSeatOrgIds(memberships, now);
+    const commitOrgIds = agencyEdits ? scopeOrgIds : committableSeatOrgIds(memberships, now);
     return {
       userId,
       isAgency: true,
       agencyOrgId: homeOrg.id,
       homeOrgId: homeOrg.id,
-      homeRole: resolveOrgMembership(memberships, homeOrg.id, now)?.role ?? null,
+      homeRole,
       activeOrgId,
       scopeOrgIds,
-      // Agencies retain full control (including commit) over every org in
-      // their scope — the pre-existing agency access path.
-      commitOrgIds: scopeOrgIds,
+      editOrgIds,
+      commitOrgIds,
       activeRole: active?.role ?? null,
       activeCanCommit: active?.canCommit ?? false,
+      activeCanEdit: activeOrgId !== null && editOrgIds.includes(activeOrgId),
     };
   }
 
@@ -126,13 +144,7 @@ export function resolveWorkspace(input: WorkspaceInputs): Workspace | null {
       ? input.selectedOrgId
       : (homeOrgId ?? seatOrgIds[0]);
   const active = resolveOrgMembership(memberships, activeOrgId, now);
-  const commitOrgIds = Array.from(
-    new Set(
-      memberships
-        .filter((m) => m.canCommit && isMembershipActive(m, now))
-        .map((m) => m.organizationId),
-    ),
-  );
+  const editOrgIds = editableSeatOrgIds(memberships, now);
   return {
     userId,
     isAgency: false,
@@ -141,10 +153,36 @@ export function resolveWorkspace(input: WorkspaceInputs): Workspace | null {
     homeRole: homeOrgId ? (resolveOrgMembership(memberships, homeOrgId, now)?.role ?? null) : null,
     activeOrgId,
     scopeOrgIds: seatOrgIds,
-    commitOrgIds,
+    editOrgIds,
+    commitOrgIds: committableSeatOrgIds(memberships, now),
     activeRole: active?.role ?? null,
-    activeCanCommit: active?.canCommit ?? false,
+    // The DB CHECK keeps canCommit off view-only seats; the role test here
+    // makes a row written before that constraint grant nothing either.
+    activeCanCommit: !!active && active.canCommit && roleCanEdit(active.role),
+    activeCanEdit: editOrgIds.includes(activeOrgId),
   };
+}
+
+// Orgs where an active, non-view-only seat lets this user change things.
+function editableSeatOrgIds(memberships: MembershipRow[], now: Date): string[] {
+  return Array.from(
+    new Set(
+      memberships
+        .filter((m) => isMembershipActive(m, now) && roleCanEdit(m.role))
+        .map((m) => m.organizationId),
+    ),
+  );
+}
+
+// Orgs where an active, editable seat also carries commit authority.
+function committableSeatOrgIds(memberships: MembershipRow[], now: Date): string[] {
+  return Array.from(
+    new Set(
+      memberships
+        .filter((m) => m.canCommit && isMembershipActive(m, now) && roleCanEdit(m.role))
+        .map((m) => m.organizationId),
+    ),
+  );
 }
 
 // Orgs an overview page (home, requests, orders, reports) lists. A member of

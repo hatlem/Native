@@ -1,7 +1,7 @@
 import { getTranslations } from "next-intl/server";
 import { notFound } from "next/navigation";
 import { prisma } from "@/lib/prisma";
-import { loadScope, canActOnOrg, canCommitOnOrg } from "@/lib/scope";
+import { loadScope, canActOnOrg, canCommitOnOrg, canEditOnOrg } from "@/lib/scope";
 import { DataLayerEvent } from "@/app/data-layer-event";
 import { formatMoney } from "@/lib/money";
 import { paymentTermsDaysFor } from "@/lib/payment-terms";
@@ -43,6 +43,9 @@ export default async function RequestPage({
         orderBy: { createdAt: "desc" },
         include: {
           lines: { orderBy: lineOrder() },
+          // A superseded quote points the buyer at the revision that replaced
+          // it (always sent — superseding happens on the revision's send).
+          nextRevision: { select: { id: true, revision: true } },
           order: {
             include: {
               invoices: true,
@@ -73,6 +76,8 @@ export default async function RequestPage({
   // Whether THIS viewer may accept the quote (ordering rights in the request's
   // org). Without them the accept button is replaced by who can act.
   const canAccept = canCommitOnOrg(scope, request.organizationId);
+  // A view-only seat sees the quote but can't ask the desk for anything.
+  const canEdit = canEditOnOrg(scope, request.organizationId);
 
   // Plan items split into product lines and Title placeholders (productId
   // null). Fetch products for the former and bare title names for the
@@ -125,9 +130,15 @@ export default async function RequestPage({
   // Multi-currency requests carry one Quote per placement market.
   // Sort by currency so the buyer reads them in a stable order across
   // page loads (alphabetical by ISO code).
-  const quotes = [...request.quotes].sort((a, b) =>
-    a.currency.localeCompare(b.currency),
-  );
+  // A quote replaced by a revision is history, not an offer: it leaves the
+  // totals, the accept flow and the "all accepted" check, and is listed
+  // separately with a pointer to the revision that replaced it.
+  const quotes = request.quotes
+    .filter((q) => q.status !== "SUPERSEDED")
+    .sort((a, b) => a.currency.localeCompare(b.currency));
+  const supersededQuotes = request.quotes
+    .filter((q) => q.status === "SUPERSEDED")
+    .sort((a, b) => a.currency.localeCompare(b.currency) || a.revision - b.revision);
   const orders = quotes.flatMap((q) => (q.order ? [q.order] : []));
   const allAccepted = quotes.length > 0 && orders.length === quotes.length;
   // Catch stored quote status up with the clock (bookkeeping), and show
@@ -225,6 +236,15 @@ export default async function RequestPage({
           orders={orders}
           renewalRequested={renewalRequested}
           canAccept={canAccept}
+          canEdit={canEdit}
+          supersededQuotes={supersededQuotes.map((q) => ({
+            id: q.id,
+            revision: q.revision,
+            currency: q.currency,
+            total: Number(q.total),
+            supersededAt: q.supersededAt,
+            replacedBy: q.nextRevision,
+          }))}
         />
       )}
 

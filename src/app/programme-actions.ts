@@ -25,8 +25,9 @@ function str(formData: FormData, key: string): string {
 
 // Guard shared by every programme action: the posted list (the plan the page
 // shows, never the active-list cookie) must exist, be unarchived, and belong
-// to an org the caller's workspace reaches (lib/plan-target.ts). Anything else
-// bounces to /plan, with no leaking of list structure across orgs. The plan
+// to an org the caller may edit (lib/plan-target.ts; a view-only seat is
+// refused). Anything else bounces to /plan, with no leaking of list structure
+// across orgs. The plan
 // acted on becomes the active one again, and each action lands on its own
 // /plan/<listId>.
 async function ownList(locale: string, listId: string) {

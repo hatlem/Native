@@ -9,7 +9,7 @@ import { planPath } from "@/lib/plan-path";
 import { revalidatePath } from "next/cache";
 import { cookies } from "next/headers";
 import { prisma } from "@/lib/prisma";
-import { loadScope, canActOnOrg } from "@/lib/scope";
+import { loadScope, canActOnOrg, canEditOnOrg } from "@/lib/scope";
 import { recordAudit } from "@/lib/audit";
 import { readBasket } from "@/lib/basket";
 import { catalogVisibleTitleWhere } from "@/lib/catalog-visibility";
@@ -34,7 +34,13 @@ import { enableListShare, disableListShare } from "@/lib/list-share";
 import { normalizeLineNote } from "@/lib/line-note";
 import { contentIntent } from "@/lib/authorship";
 import { reorderSection, ReorderMismatchError } from "@/lib/plan-reorder";
-import { alignActivePlan, refusalNotice, resolvePlanTarget, type PlanTargetList } from "@/lib/plan-target";
+import {
+  alignActivePlan,
+  refusalNotice,
+  resolvePlanTarget,
+  type PlanIntent,
+  type PlanTargetList,
+} from "@/lib/plan-target";
 import { saveListBrief, type RawListBrief } from "@/lib/plan-brief";
 import type { Scope } from "@/lib/scope";
 import { listNames } from "@/lib/list-names";
@@ -69,6 +75,9 @@ async function requireActiveOrg(locale: string) {
     console.warn("checkout.blocked", { reason: "client", userId: scope.userId });
     redirect(`/${locale}/plan?error=client`);
   }
+  // Every caller creates or adds to a plan in the active org — a write. A
+  // view-only seat lands on /plan with the reason instead.
+  if (!canEditOnOrg(scope, orgId)) redirect(planPath(locale, null, { notice: "plan-read-only" }));
   return { scope, orgId };
 }
 
@@ -139,7 +148,7 @@ export async function addProductToList(formData: FormData) {
 // every priced title — our publisher cost, un-marked-up) to its total.
 export type ShortlistAddResult =
   | { ok: true; listId: string; count: number; totals: BarTotal[] }
-  | { ok: false; reason: "signin" | "no-client" | "invalid-product" };
+  | { ok: false; reason: "signin" | "no-client" | "invalid-product" | "read-only" };
 
 // Client-invoked counterpart to addProductToList: same validation and
 // upsert, but returns a result instead of redirecting. The catalog's
@@ -159,6 +168,7 @@ export async function addProductToActiveList(
   if (!scope.userId) return { ok: false, reason: "signin" };
   const orgId = scope.workspace?.activeOrgId;
   if (!orgId) return { ok: false, reason: "no-client" };
+  if (!canEditOnOrg(scope, orgId)) return { ok: false, reason: "read-only" };
 
   const valid = await prisma.product.findFirst({
     where: { id: productId, active: true, bookable: true },
@@ -253,7 +263,7 @@ export async function setListTitleMembership(formData: FormData) {
       where: { id: listId },
       select: { organizationId: true, archivedAt: true },
     });
-    if (list && !list.archivedAt && canActOnOrg(scope, list.organizationId)) {
+    if (list && !list.archivedAt && canEditOnOrg(scope, list.organizationId)) {
       if (member) {
         const valid = await prisma.title.findFirst({
           where: { id: titleId, ...catalogVisibleTitleWhere },
@@ -282,7 +292,7 @@ export async function createListWithTitle(formData: FormData) {
   const titleId = str(formData, "titleId");
   const scope = await loadScope();
   const orgId = scope.workspace?.activeOrgId;
-  if (scope.userId && orgId && titleId) {
+  if (scope.userId && orgId && titleId && canEditOnOrg(scope, orgId)) {
     const valid = await prisma.title.findFirst({
       where: { id: titleId, ...catalogVisibleTitleWhere },
       select: { id: true },
@@ -318,11 +328,16 @@ async function ownItem(locale: string, itemId: string) {
         },
       })
     : null;
-  if (!item || item.list.archivedAt || !canActOnOrg(scope, item.list.organizationId)) {
-    // The /plan notice says why (archived only for a plan in the viewer's own
-    // scope, so the notice can't probe other orgs).
-    const archived = !!item?.list.archivedAt && canActOnOrg(scope, item.list.organizationId);
-    redirect(planPath(locale, null, { notice: archived ? "plan-archived" : "plan-unavailable" }));
+  if (!item || item.list.archivedAt || !canEditOnOrg(scope, item.list.organizationId)) {
+    // The /plan notice says why (archived / view-only only for a plan in the
+    // viewer's own scope, so the notice can't probe other orgs).
+    const visible = !!item && canActOnOrg(scope, item.list.organizationId);
+    const notice = !visible
+      ? "plan-unavailable"
+      : item.list.archivedAt
+        ? "plan-archived"
+        : "plan-read-only";
+    redirect(planPath(locale, null, { notice }));
   }
   return { scope, item, list: { id: item.list.id, organizationId: item.list.organizationId } };
 }
@@ -336,11 +351,12 @@ async function alignLinePlan(scope: Scope, list: PlanTargetList) {
 }
 
 /** Guard for actions addressed by a posted listId (rename, targeting, share,
- *  brief): the same rules as submit (lib/plan-target.ts). */
-async function ownList(locale: string, listId: string) {
+ *  brief): the same rules as submit (lib/plan-target.ts). Every caller edits
+ *  the plan except "open this plan", which passes intent "view". */
+async function ownList(locale: string, listId: string, intent: PlanIntent = "edit") {
   const scope = await loadScope();
   if (!scope.userId) redirect(signinPath(locale, await refererPath()));
-  const target = await resolvePlanTarget(scope.workspace, listId);
+  const target = await resolvePlanTarget(scope.workspace, listId, intent);
   if (!target.ok) redirect(planPath(locale, null, refusalNotice(target)));
   return { scope, list: target.list };
 }
@@ -424,7 +440,7 @@ export async function reorderListItems(input: {
       items: { select: { id: true, sortOrder: true, createdAt: true, isAlternative: true } },
     },
   });
-  if (!list || list.archivedAt || !canActOnOrg(scope, list.organizationId)) return { ok: false };
+  if (!list || list.archivedAt || !canEditOnOrg(scope, list.organizationId)) return { ok: false };
   const sectionIds = list.items
     .filter((i) => i.isAlternative === (input.section === "alternatives"))
     .map((i) => i.id);
@@ -505,7 +521,8 @@ export async function createList(formData: FormData) {
 
 export async function selectActiveList(formData: FormData) {
   const locale = str(formData, "locale") || "en";
-  const { scope, list } = await ownList(locale, str(formData, "listId"));
+  // Switching which plan is shown is a read — a view-only seat may browse plans.
+  const { scope, list } = await ownList(locale, str(formData, "listId"), "view");
   await alignLinePlan(scope, list);
   redirect(planPath(locale, list.id));
 }
@@ -555,7 +572,7 @@ export async function archiveList(formData: FormData) {
   const listId = str(formData, "listId");
   const scope = await loadScope();
   const list = await prisma.savedList.findUnique({ where: { id: listId }, select: { organizationId: true } });
-  if (list && canActOnOrg(scope, list.organizationId)) {
+  if (list && canEditOnOrg(scope, list.organizationId)) {
     await prisma.savedList.update({ where: { id: listId }, data: { archivedAt: new Date() } });
     await recordAudit(scope.userId ?? null, "list.archive", `SavedList:${listId}`, {});
     if ((await readActiveListId()) === listId) await clearActiveListId();
@@ -577,7 +594,7 @@ export async function restoreList(formData: FormData) {
     where: { id: listId },
     select: { organizationId: true, archivedAt: true },
   });
-  if (list?.archivedAt && canActOnOrg(scope, list.organizationId)) {
+  if (list?.archivedAt && canEditOnOrg(scope, list.organizationId)) {
     await prisma.savedList.update({
       where: { id: listId },
       data: { archivedAt: null, shareToken: null, shareCreatedAt: null },
@@ -614,7 +631,7 @@ export async function duplicateList(formData: FormData) {
   const listId = str(formData, "listId");
   const scope = await loadScope();
   const source = await prisma.savedList.findUnique({ where: { id: listId }, include: { items: true } });
-  if (!source || !canActOnOrg(scope, source.organizationId)) redirect(`/${locale}/lists`);
+  if (!source || !canEditOnOrg(scope, source.organizationId)) redirect(`/${locale}/lists`);
   // The copy's name is stored data the buyer sees everywhere, so it is
   // written in their UI language ("… (kopi)"), not a hard-coded English suffix.
   const t = await getTranslations({ locale, namespace: "lists" });

@@ -114,6 +114,15 @@ export async function renderQuoteDocx(
             [
               ...metaBlock(t(messages, "preparedFor"), data.organizationName),
               ...metaBlock(t(messages, "quoteNumber"), data.quoteNumber),
+              ...(data.revision
+                ? metaBlock(
+                    t(messages, "revision"),
+                    t(messages, "revisionValue", {
+                      revision: data.revision.number,
+                      previous: data.revision.replacesQuoteNumber,
+                    }),
+                  )
+                : []),
             ],
             60,
           ),

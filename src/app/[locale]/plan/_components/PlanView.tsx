@@ -21,6 +21,7 @@ import { recommendForBrief } from "@/lib/campaign-recommend";
 import { loadPricingDefaults } from "@/lib/content-fee";
 import { timeAgo } from "@/lib/time-ago";
 import { loadVerticalOptions, localizedVerticalOptions } from "@/lib/catalog-taxonomy";
+import { ViewOnlyNote } from "@/components/view-only-note";
 import { PlanBanners } from "./PlanBanners";
 import { PlanShare } from "./PlanShare";
 import { displayTimeZone } from "@/lib/time-zone";
@@ -298,6 +299,10 @@ export async function PlanView({
   // The instant path creates a confirmed order, so it needs ordering rights on
   // the active org (the same canCommitOnOrg gate submitRequest enforces).
   const canCommit = ws?.activeOrgId ? canCommitOnOrg(await loadScope(), ws.activeOrgId) : false;
+  // A view-only (RESTRICTED) seat in the active org sees the plan as a
+  // read-out: every editing control is left out and the view-only note says
+  // why. The server refuses those writes regardless (lib/scope canEditOnOrg).
+  const readOnly = !!ws?.activeOrgId && !ws.activeCanEdit;
 
   // Step rail: "Find titles" is always done by the time there are lines on
   // /plan. The remaining three steps come from the most recent Request this
@@ -490,6 +495,7 @@ export async function PlanView({
         duplicate={sp.duplicate}
         notice={sp.notice}
       />
+      {readOnly ? <ViewOnlyNote locale={locale} /> : null}
 
       {needsWorkspace ? (
         // No active org → requireActiveOrg bounced an "Add to plan" here.
@@ -532,18 +538,23 @@ export async function PlanView({
               orgName={activeOrg?.name ?? null}
               lastEdited={lastEdited}
               lists={lists}
+              readOnly={readOnly}
             />
           ) : null}
-        <PlanStart
-          locale={locale}
-          listId={activeList?.id ?? null}
-          recBriefRaw={recBriefRaw}
-          recMarket={recMarket}
-          recBudgetRaw={recBudgetRaw}
-          homeMarket={homeMarket}
-          rec={rec}
-          briefMatched={briefMatched}
-        />
+        {/* The start screen is a recommender whose every result is an "Add":
+            nothing a view-only seat can use. */}
+        {readOnly ? null : (
+          <PlanStart
+            locale={locale}
+            listId={activeList?.id ?? null}
+            recBriefRaw={recBriefRaw}
+            recMarket={recMarket}
+            recBudgetRaw={recBudgetRaw}
+            homeMarket={homeMarket}
+            rec={rec}
+            briefMatched={briefMatched}
+          />
+        )}
         </>
       ) : (
         <>
@@ -556,12 +567,14 @@ export async function PlanView({
             orgName={activeOrg?.name ?? null}
             lastEdited={lastEdited}
             lists={lists}
+            readOnly={readOnly}
           />
           <PlanTargeting
             locale={locale}
             activeListId={activeList?.id}
             verticalOptions={verticalOptions}
             selected={targetVerticals}
+            readOnly={readOnly}
           />
           {activeList ? (
             <PlanProgramme
@@ -573,6 +586,7 @@ export async function PlanView({
               unit={previewUnit}
               pacing={pacing}
               warnings={overlapWarnings}
+              readOnly={readOnly}
             />
           ) : null}
           <div className="split">
@@ -586,8 +600,9 @@ export async function PlanView({
                 altTitleLines={altTitleLines}
                 hasHiddenPrice={hasHiddenPrice}
                 blockedPeriods={blockedPeriods}
+                readOnly={readOnly}
               />
-              {favoriteCount > 0 ? (
+              {favoriteCount > 0 && !readOnly ? (
                 <div className="plan-favorites-bridge">
                   <span>{t("favoritesStripTitle", { count: favoriteCount })}</span>
                   <Link href="/favorites" className="btn small secondary">
@@ -610,9 +625,12 @@ export async function PlanView({
                 activeOrg={activeOrg}
                 brief={planBriefValues(activeList!)}
                 timingOptions={timingOptions(new Date())}
+                readOnly={readOnly}
               />
-              <WhatHappensNext locale={locale} instant={allFirm && canCommit} />
-              {activeList ? (
+              {readOnly ? null : <WhatHappensNext locale={locale} instant={allFirm && canCommit} />}
+              {/* Sharing mints/kills a client link — a change a view-only seat
+                  can't make, so the whole control is left out. */}
+              {activeList && !readOnly ? (
                 <PlanShare
                   locale={locale}
                   listId={activeList.id}

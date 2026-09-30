@@ -3,7 +3,7 @@
 import { redirect } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import { recordAudit } from "@/lib/audit";
-import { loadScope, canActOnOrg } from "@/lib/scope";
+import { loadScope, canEditOnOrg } from "@/lib/scope";
 import { writeActiveListId } from "@/lib/lists";
 import { clampQuantity } from "@/lib/basket";
 import { contentIntent, mergeContentIntent, type ContentIntent } from "@/lib/authorship";
@@ -107,7 +107,8 @@ export async function duplicatePlan(formData: FormData) {
   if (!order) {
     redirect(`/${locale}/orders`);
   }
-  if (!canActOnOrg(scope, order.organizationId)) {
+  // Duplicating creates a new plan in that org — an edit, not for a view-only seat.
+  if (!canEditOnOrg(scope, order.organizationId)) {
     redirect(`/${locale}/orders`);
   }
 

@@ -27,6 +27,9 @@ type Ctx = {
   isOnPlan: (productId: string) => boolean;
   isPending: (productId: string) => boolean;
   add: (item: ShortlistItem, withContent: boolean) => Promise<boolean>;
+  // View-only (RESTRICTED) seat: no "Add to plan" buttons at all — the
+  // server would refuse the add (reason "read-only").
+  readOnly: boolean;
 };
 
 const ShortlistCtx = createContext<Ctx | null>(null);
@@ -49,6 +52,7 @@ export function ShortlistProvider({
   initialCount,
   initialProductIds,
   initialTotals,
+  readOnly = false,
   children,
 }: {
   locale: string;
@@ -56,9 +60,11 @@ export function ShortlistProvider({
   initialCount: number;
   initialProductIds: string[];
   initialTotals: LineTotal[];
+  readOnly?: boolean;
   children: ReactNode;
 }) {
   const t = useTranslations("catalog.shortlist");
+  const tView = useTranslations("viewOnly");
   const [added, setAdded] = useState<ShortlistItem[]>([]);
   const [addedIds, setAddedIds] = useState<Set<string>>(() => new Set());
   const [pendingIds, setPendingIds] = useState<Set<string>>(() => new Set());
@@ -101,7 +107,13 @@ export function ShortlistProvider({
           return next;
         });
         setAdded((a) => a.filter((i) => i.productId !== item.productId));
-        setError(result.reason === "no-client" ? t("errorNoClient") : t("errorGeneric"));
+        setError(
+          result.reason === "no-client"
+            ? t("errorNoClient")
+            : result.reason === "read-only"
+              ? tView("body")
+              : t("errorGeneric"),
+        );
         return false;
       }
       // Concurrent adds resolve in any order; the one with the most lines is
@@ -111,10 +123,13 @@ export function ShortlistProvider({
       );
       return true;
     },
-    [locale, t],
+    [locale, t, tView],
   );
 
-  const value = useMemo<Ctx>(() => ({ isOnPlan, isPending, add }), [isOnPlan, isPending, add]);
+  const value = useMemo<Ctx>(
+    () => ({ isOnPlan, isPending, add, readOnly }),
+    [isOnPlan, isPending, add, readOnly],
+  );
 
   // Optimistic count for adds still in flight; the total only ever shows a
   // server-priced figure (the last one known while an add is pending).
@@ -224,9 +239,10 @@ export function ShortlistButton({
   addedLabel: string;
   askLabel: string;
 }) {
-  const { isOnPlan, isPending, add } = useShortlist();
+  const { isOnPlan, isPending, add, readOnly } = useShortlist();
   const onPlan = isOnPlan(productId);
   const pending = isPending(productId);
+  if (readOnly) return null;
 
   return (
     <button

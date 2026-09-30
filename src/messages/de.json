@@ -866,7 +866,8 @@
       "item3Title": "Wir schreiben, platzieren und berichten",
       "item3Body": "Entwürfe kommen zur Freigabe zu Ihnen. Links und Ergebnisse landen in den Berichten."
     },
-    "breakdownQtyWithArticleFee": "{n} × {unit} Platzierung + {article} pro Artikel (ein Artikel für alle {n})"
+    "breakdownQtyWithArticleFee": "{n} × {unit} Platzierung + {article} pro Artikel (ein Artikel für alle {n})",
+    "noticePlanReadOnly": "Sie haben für diesen Plan nur Leserechte, daher wurde nichts geändert."
   },
   "rfq": {
     "org": "Firma",
@@ -991,7 +992,11 @@
     "renewalRequested": "Der Desk wurde gebeten, das Angebot zu erneuern. Sie erhalten eine Benachrichtigung, sobald Sie es annehmen können.",
     "lineNoteLabel": "Hinweis",
     "noCommitTitle": "Sie können dieses Angebot nicht selbst annehmen.",
-    "noCommitBody": "Die Annahme ist eine verbindliche Bestellung für {org} und erfordert Bestellrecht. Bitten Sie einen Administrator, das Angebot anzunehmen oder Ihnen unter Konto → Team Bestellrecht zu geben."
+    "noCommitBody": "Die Annahme ist eine verbindliche Bestellung für {org} und erfordert Bestellrecht. Bitten Sie einen Administrator, das Angebot anzunehmen oder Ihnen unter Konto → Team Bestellrecht zu geben.",
+    "quoteRevisionNote": "Version {revision} – ersetzt das Angebot, das Sie zuvor erhalten haben.",
+    "supersededEyebrow": "Frühere Versionen",
+    "supersededRow": "Version {revision} ({total}) ist nicht mehr gültig.",
+    "supersededBy": "Zu Version {revision} →"
   },
   "desk": {
     "eyebrow": "Interner Desk",
@@ -1092,7 +1097,7 @@
     "quoteNoExpiry": "Kein Ablaufdatum",
     "renewQuote": "Angebot erneuern",
     "renewingQuote": "Wird erneuert …",
-    "renewQuoteHint": "Der Kunde kann ein abgelaufenes Angebot nicht annehmen. Die Erneuerung hält diese Preise bis zum gewählten Datum – passen Sie zuerst Positionen an, falls sich Preise geändert haben.",
+    "renewQuoteHint": "Der Kunde kann ein abgelaufenes Angebot nicht annehmen. Die Erneuerung hält diese Preise bis zum gewählten Datum. Haben sich die Preise geändert, überarbeiten Sie das Angebot stattdessen.",
     "quoteDraftBadge": "Entwurf – nicht gesendet",
     "quoteDraftHint": "Der Kunde sieht dieses Angebot noch nicht. Bepreisen Sie die Positionen und senden Sie es unten ab.",
     "sendTitle": "An den Kunden senden",
@@ -1113,7 +1118,22 @@
     "lineNoteHint": "Wird dem Kunden auf der Angebotsseite und im PDF angezeigt.",
     "lineNoteTooLong": "Der Hinweis ist zu lang. Bitte unter {max} Zeichen bleiben.",
     "pdfStorageUnavailable": "Dateispeicher (R2) ist in dieser Umgebung nicht eingerichtet, daher kann das PDF nicht gespeichert werden. Laden Sie stattdessen die Word-Version herunter.",
-    "pdfFailed": "Das PDF konnte nicht erstellt werden. Versuchen Sie es erneut oder laden Sie die Word-Version herunter."
+    "pdfFailed": "Das PDF konnte nicht erstellt werden. Versuchen Sie es erneut oder laden Sie die Word-Version herunter.",
+    "pdfSuperseded": "Dieses Angebot wurde durch eine neue Version ersetzt, daher werden daraus keine neuen Dokumente erstellt. Verwenden Sie das PDF der neuen Version.",
+    "reviseQuote": "Angebot überarbeiten",
+    "revisingQuote": "Überarbeitung wird geöffnet …",
+    "reviseQuoteHint": "Ein gesendetes Angebot ist gesperrt. Eine Überarbeitung öffnet eine bearbeitbare Kopie; sobald Sie sie senden, ersetzt sie dieses Angebot, und der Kunde wird einmal mit der neuen Summe benachrichtigt.",
+    "quoteRevisionBadge": "Version {revision}",
+    "quoteSupersededBadge": "Ersetzt",
+    "quoteSupersededBy": "Ersetzt durch Version {revision}. Der Kunde kann es nicht mehr annehmen.",
+    "quoteRevisionPending": "Version {revision} ist in Arbeit – bis Sie sie senden, gilt für den Kunden dieses Angebot.",
+    "quoteRevisionDraftHint": "Der Kunde hält noch Version {previous} und kann sie annehmen, bis Sie diese senden. Das Senden ersetzt sie, und der Kunde wird einmal mit der neuen Summe benachrichtigt.",
+    "discardRevision": "Überarbeitung verwerfen",
+    "discardingRevision": "Wird verworfen …",
+    "quoteLocked": "Dieses Angebot wurde gesendet, die Positionen sind daher gesperrt. Überarbeiten Sie es, um Preise oder Hinweise zu ändern.",
+    "quoteNotRevisable": "Dieses Angebot kann nicht überarbeitet werden: Es wurde angenommen oder ist abgeschlossen.",
+    "revisionPredecessorClosed": "Nicht gesendet: Das Angebot, das diese Überarbeitung ersetzen sollte, ist nicht mehr offen – der Kunde hat es womöglich gerade angenommen. Verwerfen Sie die Überarbeitung.",
+    "sendRevisionNote": "Das Senden ersetzt das frühere Angebot: Der Kunde kann es nicht mehr annehmen und erhält eine Benachrichtigung mit der neuen Summe."
   },
   "deskTitles": {
     "eyebrow": "Super-Admin · Titel",
@@ -2723,7 +2743,9 @@
     "errDelegationPast": "Das Enddatum der Delegation muss in der Zukunft liegen.",
     "canCommitAdminNote": "Administratoren haben immer Bestellrecht.",
     "statusRevoked": "Entfernt",
-    "errEmailDomain": "Für diese Domain finden wir keinen Mailserver. Bitte die Adresse auf Tippfehler prüfen."
+    "errEmailDomain": "Für diese Domain finden wir keinen Mailserver. Bitte die Adresse auf Tippfehler prüfen.",
+    "roleHelp": "Administratoren verwalten das Team und können alles. Mitglieder erstellen Pläne, senden Anfragen und nehmen – mit Bestellrecht – Angebote an. Eingeschränkt heißt nur lesen: sieht Pläne, Anfragen, Angebote, Bestellungen, Berichte, Artikel und Rechnungen des Teams, kann aber nichts ändern, senden, annehmen oder teilen.",
+    "canCommitRestrictedNote": "Eingeschränkte Benutzer können nur lesen und erhalten kein Bestellrecht."
   },
   "rateCard": {
     "pageTitle": "Rate-Card-Anfrage",
@@ -3169,6 +3191,8 @@
   "quotePdf": {
     "documentTitle": "Angebot {quoteNumber}",
     "quoteNumber": "Angebotsnummer",
+    "revision": "Version",
+    "revisionValue": "{revision} – ersetzt Angebot {previous}",
     "date": "Datum",
     "validUntil": "Gültig bis",
     "preparedBy": "Erstellt von",
@@ -3505,5 +3529,9 @@
     "untitled": "Neuer Plan",
     "imported": "Importierter Plan",
     "reordered": "Erneut bestellte Kampagne"
+  },
+  "viewOnly": {
+    "title": "Nur Lesezugriff",
+    "body": "Sie sehen alles, was Ihr Team hier hat, können es aber nicht ändern. Wenden Sie sich an einen Administrator, wenn Sie etwas bearbeiten, senden oder annehmen müssen."
   }
 }

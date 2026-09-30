@@ -44,7 +44,8 @@ function PubCard({
   locale: string;
   pub: FavoritePublication;
   publishedBy: string;
-  addToPlanLabel: string;
+  // Null for a view-only seat: adding to a plan changes the org's plans.
+  addToPlanLabel: string | null;
   removeMode: RemoveMode;
   removeLabel?: string;
   listId?: string;
@@ -64,11 +65,13 @@ function PubCard({
       <div className="cluster" style={{ marginTop: 8, gap: 6, flexWrap: "wrap" }}>
         {/* A per-viewer buying action — adds the publication to the viewer's own
             plan for desk pricing. Works even from a teammate's read-only list. */}
-        <form action={saveTitleToList}>
-          <input type="hidden" name="locale" value={locale} />
-          <input type="hidden" name="titleId" value={pub.titleId} />
-          <button type="submit" className="btn ghost small">{addToPlanLabel}</button>
-        </form>
+        {addToPlanLabel ? (
+          <form action={saveTitleToList}>
+            <input type="hidden" name="locale" value={locale} />
+            <input type="hidden" name="titleId" value={pub.titleId} />
+            <button type="submit" className="btn ghost small">{addToPlanLabel}</button>
+          </form>
+        ) : null}
         {removeMode === "list" && listId ? (
           <form action={removeFavoriteFromList}>
             <input type="hidden" name="locale" value={locale} />
@@ -245,6 +248,7 @@ export function FavoritesView({
   sharedLists,
   openList,
   listUnavailable = false,
+  readOnly = false,
 }: {
   locale: string;
   favorites: FavoritePublication[];
@@ -252,10 +256,13 @@ export function FavoritesView({
   sharedLists: FavoriteListSummary[];
   openList: FavoriteListDetail | null;
   listUnavailable?: boolean;
+  // View-only (RESTRICTED) seat: favorites and collections stay personal and
+  // editable, but "Add to plan" and sharing with the team are left out.
+  readOnly?: boolean;
 }) {
   const t = useTranslations("favorites");
   const tc = useTranslations("catalog");
-  const addToPlanLabel = tc("savePublication");
+  const addToPlanLabel = readOnly ? null : tc("savePublication");
   const publishedBy = (pub: FavoritePublication) =>
     t("publishedBy", { publisher: pub.publisherName, market: pub.marketCode });
 
@@ -366,7 +373,7 @@ export function FavoritesView({
                 <div className="cluster" style={{ gap: 6, flexWrap: "wrap" }}>
                   {/* Sharing needs a home org to share within; hide the toggle
                       entirely for a no-org list rather than offer a dead no-op. */}
-                  {l.organizationId ? (
+                  {l.organizationId && !readOnly ? (
                     <form action={setFavoriteListShared}>
                       <input type="hidden" name="locale" value={locale} />
                       <input type="hidden" name="listId" value={l.id} />

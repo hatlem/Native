@@ -2,7 +2,8 @@
 
 import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
-import { loadScope } from "@/lib/scope";
+import { prisma } from "@/lib/prisma";
+import { loadScope, canEditOnOrg } from "@/lib/scope";
 import {
   toggleFavorite as toggleFavoriteLib,
   addFavoriteToList as addFavoriteToListLib,
@@ -145,6 +146,20 @@ export async function setFavoriteListShared(formData: FormData) {
   const listId = str(formData, "listId");
   const shared = str(formData, "shared") === "1";
   const scope = await requireUser(locale);
+  // Hearts and collections are personal and stay usable on a view-only seat,
+  // but publishing a collection to the team is sharing into the org: not for
+  // a view-only (RESTRICTED) seat. Un-sharing only narrows who sees it, so
+  // it stays allowed.
+  if (listId && shared) {
+    const list = await prisma.favoriteList.findUnique({
+      where: { id: listId },
+      select: { organizationId: true },
+    });
+    if (list?.organizationId && !canEditOnOrg(scope, list.organizationId)) {
+      revalidatePath(`/${locale}/favorites`, "page");
+      return;
+    }
+  }
   if (listId)
     await setFavoriteListSharedLib(scope.userId!, listId, shared).catch((e) =>
       console.error("favorites.set_shared_failed", e),

@@ -5,6 +5,7 @@ import {
   activeScopeOrgIds,
   resolveOrgMembership,
   commitGrantFor,
+  roleCanEdit,
   wouldRemoveLastAdmin,
   type MembershipRow,
 } from "./membership";
@@ -97,4 +98,14 @@ test("commitGrantFor: an ADMIN always commits; other roles keep the requested gr
   assert.equal(commitGrantFor("MEMBER", false), false);
   assert.equal(commitGrantFor("MEMBER", true), true);
   assert.equal(commitGrantFor("RESTRICTED", false), false);
+});
+
+test("commitGrantFor: a view-only (RESTRICTED) seat never commits, even when asked", () => {
+  assert.equal(commitGrantFor("RESTRICTED", true), false);
+});
+
+test("roleCanEdit: only RESTRICTED is view-only", () => {
+  assert.equal(roleCanEdit("ADMIN"), true);
+  assert.equal(roleCanEdit("MEMBER"), true);
+  assert.equal(roleCanEdit("RESTRICTED"), false);
 });
