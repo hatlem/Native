@@ -1,8 +1,7 @@
 import { getTranslations } from "next-intl/server";
 import { redirect } from "next/navigation";
 import { auth } from "@/auth";
-import { prisma } from "@/lib/prisma";
-import { safeNext } from "@/lib/onboarding-gate";
+import { loadOnboardingState, safeNext } from "@/lib/onboarding-gate";
 import { LandingShell } from "@/app/landing-shell";
 import { GetTalkBooking } from "@/components";
 
@@ -21,11 +20,7 @@ export default async function OnboardingCallPage({
   if (!session?.user?.id) redirect(`/${locale}/signin`);
 
   // Reachable only after onboarding proper (market + phone) is complete.
-  const user = await prisma.user.findUnique({
-    where: { id: session.user.id },
-    select: { phone: true, organization: { select: { marketCode: true } } },
-  });
-  if (!user?.organization?.marketCode || !user.phone) {
+  if (!(await loadOnboardingState(session.user.id)).complete) {
     redirect(`/${locale}/onboarding`);
   }
 

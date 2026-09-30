@@ -1,6 +1,6 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import middleware, { buildCsp, mergeMiddlewareHeaders } from "./middleware";
+import middleware, { buildCsp, mergeMiddlewareHeaders, signedOutRedirect } from "./middleware";
 import { NextRequest } from "next/server";
 
 test("mergeMiddlewareHeaders drops every internal x-middleware-* directive header but keeps client-visible headers", () => {
@@ -79,4 +79,27 @@ test("CSP regression: buildCsp still emits the nonce and the same directive shap
   assert.match(csp, /form-action 'self'/);
   assert.match(csp, /object-src 'none'/);
   assert.match(csp, /upgrade-insecure-requests/);
+});
+
+test("signed out on a protected page: a real 307 to sign-in that remembers the page", () => {
+  const req = new NextRequest(new URL("https://nativespin.com/no/requests?tab=orders"));
+  const res = middleware(req);
+  assert.equal(res.status, 307);
+  const location = new URL(res.headers.get("location")!);
+  assert.equal(location.pathname, "/no/signin");
+  assert.equal(location.searchParams.get("next"), "/no/requests?tab=orders");
+  assert.ok(res.headers.get("content-security-policy"));
+});
+
+test("signedOutRedirect: session cookie, public pages, claim pages and POSTs pass through", () => {
+  const url = (path: string) => new URL(`https://nativespin.com${path}`);
+  assert.equal(signedOutRedirect(new NextRequest(url("/no/plan"))), "/no/signin?next=%2Fno%2Fplan");
+  const withSession = new NextRequest(url("/no/plan"), {
+    headers: { cookie: "__Secure-authjs.session-token=abc" },
+  });
+  assert.equal(signedOutRedirect(withSession), null);
+  assert.equal(signedOutRedirect(new NextRequest(url("/no/catalog"))), null);
+  assert.equal(signedOutRedirect(new NextRequest(url("/no/publisher/claim/tok"))), null);
+  assert.equal(signedOutRedirect(new NextRequest(url("/no/pricing"))), null);
+  assert.equal(signedOutRedirect(new NextRequest(url("/no/plan"), { method: "POST" })), null);
 });

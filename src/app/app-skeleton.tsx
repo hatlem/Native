@@ -1,6 +1,12 @@
-// Skeleton loading state for [locale] routes. Renders the shape of a
-// typical page so navigation feels instant while server work completes.
-export default function Loading() {
+// Skeleton of a typical app page (header, KPI row, cards), shown by the
+// loading.tsx of data-heavy leaf pages while their server work completes.
+//
+// Deliberately NOT a [locale]-wide loading.tsx: a loading boundary wraps
+// every page beneath it in Suspense, so the 200 shell streams before the page
+// runs — and every notFound() / redirect() below it degraded to a soft 404
+// (HTTP 200) or a meta-refresh redirect. Keep loading boundaries on pages
+// that neither 404 nor redirect, and never above a detail route.
+export function AppSkeleton() {
   return (
     <div aria-busy="true" aria-live="polite">
       <div className="page-header">

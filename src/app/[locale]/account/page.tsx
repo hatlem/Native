@@ -4,6 +4,7 @@ import { MarketCode } from "@prisma/client";
 import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
 import { loadScope } from "@/lib/scope";
+import { companySeat } from "@/lib/workspace";
 import {
   updateCompany,
   updateProfile,
@@ -47,9 +48,17 @@ export default async function AccountPage({
 
   const scope = await loadScope();
   const ws = scope.workspace;
-  // Company info is admin-only to edit (server-enforced in updateCompany);
-  // non-admin seats see it read-only.
-  const isOrgAdmin = ws?.activeRole === "ADMIN";
+  // Company card = the org the user is working in (the switched-to org for a
+  // member of several; an agency's own company) — the same org updateCompany
+  // writes. Admin-only to edit (server-enforced); other seats see it read-only.
+  const seat = ws ? companySeat(ws) : null;
+  const isOrgAdmin = !!seat?.isAdmin;
+  const company = seat?.orgId
+    ? await prisma.organization.findUnique({
+        where: { id: seat.orgId },
+        select: { name: true, marketCode: true },
+      })
+    : null;
 
   const user = await prisma.user.findUnique({
     where: { id: session.user.id },
@@ -59,7 +68,6 @@ export default async function AccountPage({
       name: true,
       phone: true,
       passwordHash: true,
-      organization: { select: { name: true, marketCode: true } },
     },
   });
   if (!user) redirect(`/${locale}/signin`);
@@ -209,7 +217,7 @@ export default async function AccountPage({
       {/* Desk, publisher and writer accounts have no organisation of their
           own — updateCompany refuses for them, so rendering an empty,
           permanently-disabled company card was pure confusion. */}
-      {user.organization ? (
+      {company ? (
       <section className="section" id="company">
         <div className="section-head">
           <div>
@@ -227,7 +235,7 @@ export default async function AccountPage({
               autoComplete="organization"
               required
               disabled={!isOrgAdmin}
-              defaultValue={user.organization?.name ?? ""}
+              defaultValue={company.name}
             />
           </div>
           <div className="field">
@@ -235,7 +243,7 @@ export default async function AccountPage({
             <select
               id="acc-market"
               name="market"
-              defaultValue={user.organization?.marketCode ?? ""}
+              defaultValue={company.marketCode ?? ""}
               required
               disabled={!isOrgAdmin}
             >

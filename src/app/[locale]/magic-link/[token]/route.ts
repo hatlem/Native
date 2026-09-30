@@ -20,6 +20,7 @@ import { signIn } from "@/auth";
 import { prisma } from "@/lib/prisma";
 import { hashToken } from "@/lib/tokens";
 import { landingForRole } from "@/lib/roles";
+import { safeNext } from "@/lib/auth-gate";
 import { recordSignIn } from "@/lib/auth-events";
 import { recordAudit } from "@/lib/audit";
 import { appUrl, appName } from "@/lib/url";
@@ -66,7 +67,12 @@ export async function GET(
     );
   }
 
-  const landing = landingForRole(row.user.role, locale);
+  // Where the visitor was headed when they asked for the link, if anywhere
+  // (auth-actions requestMagicLink appends it); otherwise their role's home.
+  const landing = safeNext(
+    req.nextUrl.searchParams.get("next"),
+    landingForRole(row.user.role, locale),
+  );
 
   // signIn with redirectTo: on success it throws NEXT_REDIRECT (which we
   // re-throw so Next.js serves the 307 with the session cookie set).

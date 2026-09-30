@@ -17,7 +17,7 @@ import { notifyDesk } from "@/lib/notify";
 import type { BookingUnit, PricingModel, ProductType } from "@prisma/client";
 
 export class PublisherRatesError extends Error {
-  constructor(public code: "not-found" | "invalid-price") {
+  constructor(public code: "not-found" | "invalid-price" | "invalid-lead-time") {
     super(`publisher-rates:${code}`);
     this.name = "PublisherRatesError";
   }
@@ -108,7 +108,18 @@ export async function loadPublisherRateCard(
   }));
 }
 
-// Ownership guard shared by both mutations. Resolves the product ONLY via
+// Lead time is the publisher's own operational fact (how many days they need
+// before a placement can run), so it stays self-serve — but capped, so a stray
+// extra digit can't silently push a title out of every campaign window.
+export const MAX_LEAD_TIME_DAYS = 365;
+
+export function parseLeadTimeDays(raw: string): number | null {
+  if (!/^\d+$/.test(raw.trim())) return null;
+  const n = Number(raw);
+  return Number.isInteger(n) && n >= 1 && n <= MAX_LEAD_TIME_DAYS ? n : null;
+}
+
+// Ownership guard shared by every mutation. Resolves the product ONLY via
 // the (publisherId, productId) pair — the posted id is never trusted on
 // its own, so one publisher can never stamp or reprice another's product.
 // A miss is indistinguishable from "no such product" by design.
@@ -194,4 +205,49 @@ export async function updateProductPrice(args: {
     body: `${product.title.name}: ${from} → ${args.basePrice} ${product.currency} (confirmed by the publisher)`,
     link: `/${locale}/desk/titles/${product.titleId}`,
   });
+}
+
+// "We now need N days' notice." The only catalog field besides the price a
+// publisher edits from the portal. Visibility (FIRM = instant order) and
+// bookable are the desk's call — the rates page tells publishers exactly that
+// — so they are deliberately not parameters here. The desk hears about the
+// change: a longer lead time can make an already-planned flight unbookable.
+export async function updateProductLeadTime(args: {
+  publisherId: string;
+  productId: string;
+  leadTimeDays: number;
+  actorUserId: string;
+  locale?: string;
+}): Promise<{ changed: boolean }> {
+  if (
+    !Number.isInteger(args.leadTimeDays) ||
+    args.leadTimeDays < 1 ||
+    args.leadTimeDays > MAX_LEAD_TIME_DAYS
+  ) {
+    throw new PublisherRatesError("invalid-lead-time");
+  }
+  const product = await ownProduct(args.publisherId, args.productId);
+  const current = await prisma.product.findUniqueOrThrow({
+    where: { id: product.id },
+    select: { leadTimeDays: true },
+  });
+  if (current.leadTimeDays === args.leadTimeDays) return { changed: false };
+  await prisma.product.update({
+    where: { id: product.id },
+    data: { leadTimeDays: args.leadTimeDays },
+  });
+  await recordAudit(
+    args.actorUserId,
+    "product.lead_time_update",
+    `Product:${product.id}`,
+    { publisherId: args.publisherId, from: current.leadTimeDays, to: args.leadTimeDays },
+  );
+  const locale = args.locale ?? "en";
+  await notifyDesk({
+    kind: "QUOTE_READY",
+    title: "Publisher updated a lead time",
+    body: `${product.title.name}: ${current.leadTimeDays ?? "–"} → ${args.leadTimeDays} days (set by the publisher)`,
+    link: `/${locale}/desk/titles/${product.titleId}`,
+  });
+  return { changed: true };
 }

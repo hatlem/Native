@@ -1,6 +1,8 @@
 import createMiddleware from "next-intl/middleware";
 import { NextRequest, NextResponse } from "next/server";
 import { routing } from "./i18n/routing";
+import { hasSessionCookie, requiresSession, signinPath } from "./lib/auth-gate";
+import { appUrl } from "./lib/url";
 
 const intlMiddleware = createMiddleware(routing);
 
@@ -86,9 +88,33 @@ export function mergeMiddlewareHeaders(
   return passthrough;
 }
 
+// Where a signed-out page view must go instead (lib/auth-gate), or null to
+// carry on. Only for GET/HEAD page loads: a POST here is a server action whose
+// own guard answers it, and a 307 would replay the POST against /signin.
+export function signedOutRedirect(req: NextRequest): string | null {
+  if (req.method !== "GET" && req.method !== "HEAD") return null;
+  const { pathname, search } = req.nextUrl;
+  const m = pathname.match(/^\/([^/]+)(?:\/(.*))?$/);
+  if (!m || !(routing.locales as readonly string[]).includes(m[1])) return null;
+  if (!requiresSession(m[2] ?? "")) return null;
+  if (hasSessionCookie(req.cookies.getAll().map((c) => c.name))) return null;
+  return signinPath(m[1], pathname + search);
+}
+
 export default function middleware(req: NextRequest) {
   const nonce = generateNonce();
   const csp = buildCsp(nonce);
+
+  // Signed out on a protected page: a real 307 to sign-in, decided before
+  // anything renders (a page-level redirect streams as 200 + meta refresh).
+  // appUrl(), not req.url: behind Railway's proxy the inbound URL can carry
+  // an internal host.
+  const signin = signedOutRedirect(req);
+  if (signin) {
+    const res = NextResponse.redirect(new URL(signin, appUrl()), 307);
+    res.headers.set("Content-Security-Policy", csp);
+    return res;
+  }
 
   // Let next-intl resolve the locale (may redirect for "/" → "/en", etc.,
   // and internally rewrite locale-prefixed paths so [locale] segments

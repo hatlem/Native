@@ -2,7 +2,6 @@
 
 import { AuthError } from "next-auth";
 import { redirect } from "next/navigation";
-import { cookies } from "next/headers";
 import bcrypt from "bcryptjs";
 import { signIn } from "@/auth";
 import { prisma } from "@/lib/prisma";
@@ -24,7 +23,8 @@ import {
   validateClaimForm,
 } from "@/lib/org-invite";
 import { passwordlessSignIn } from "@/lib/passwordless-signin";
-import { CLIENT_COOKIE } from "@/lib/workspace";
+import { createAccountFromInvite, grantSeatFromInvite, hasActiveSeat, revokeSeat } from "@/lib/org-seats";
+import { switchActiveOrg } from "@/lib/active-org";
 import { inviteLandingPath } from "@/lib/invite-landing";
 
 const LOCALES = ["en", "no", "sv", "da", "fi", "de"] as const;
@@ -160,14 +160,8 @@ export async function revokeMembership(formData: FormData) {
   const targetUserId = String(formData.get("userId") || "");
   if (!targetUserId) redirect(`/${locale}/account?error=1#team`);
 
-  const rows = await loadOrgMembershipsForGuard(orgId);
-  if (wouldRemoveLastAdmin(rows, targetUserId, new Date())) {
-    redirect(`/${locale}/account?error=last_admin#team`);
-  }
-  await prisma.membership.updateMany({
-    where: { organizationId: orgId, userId: targetUserId },
-    data: { status: "REVOKED" },
-  });
+  const result = await revokeSeat(orgId, targetUserId);
+  if (!result.ok) redirect(`/${locale}/account?error=${result.reason}#team`);
   await recordAudit(session.user!.id, "org.membership_revoked", `Organization:${orgId}`, {
     targetUserId,
   });
@@ -227,13 +221,7 @@ export async function revokeInvite(formData: FormData) {
 // already belongs to another org would otherwise keep seeing that org — and
 // land them on the new team's plans (lib/invite-landing.ts).
 async function landInJoinedOrg(locale: string, organizationId: string): Promise<never> {
-  const store = await cookies();
-  store.set(CLIENT_COOKIE, organizationId, {
-    httpOnly: true,
-    sameSite: "lax",
-    path: "/",
-    maxAge: 60 * 60 * 24 * 30,
-  });
+  await switchActiveOrg(organizationId);
   const planCount = await prisma.savedList.count({ where: { organizationId, archivedAt: null } });
   redirect(inviteLandingPath(locale, planCount));
 }
@@ -269,20 +257,10 @@ export async function claimOrgInvite(formData: FormData) {
     },
   });
 
-  // Determine whether the logged-in user is already a member of this org.
-  let isAlreadyMember = false;
-  if (session?.user?.id && invite) {
-    const m = await prisma.membership.findUnique({
-      where: {
-        userId_organizationId: {
-          userId: session.user.id,
-          organizationId: invite.organizationId,
-        },
-      },
-      select: { id: true },
-    });
-    isAlreadyMember = !!m;
-  }
+  // Only a CURRENT seat makes the invite redundant. A removed (REVOKED) or
+  // lapsed (EXPIRED) row is exactly what a re-invite exists to bring back.
+  const isAlreadyMember =
+    !!session?.user?.id && !!invite && (await hasActiveSeat(session.user.id, invite.organizationId));
 
   const verdict = validateOrgClaim(
     invite
@@ -297,22 +275,7 @@ export async function claimOrgInvite(formData: FormData) {
   const inv = invite!;
 
   if (verdict.mode === "existing") {
-    await prisma.$transaction(async (tx) => {
-      await tx.membership.create({
-        data: {
-          userId: session!.user!.id,
-          organizationId: inv.organizationId,
-          role: inv.role,
-          canCommit: commitGrantFor(inv.role, inv.canCommit),
-          expiresAt: inv.delegationExpiresAt,
-          invitedById: inv.createdById ?? null,
-        },
-      });
-      await tx.orgInvite.update({
-        where: { id: inv.id },
-        data: { claimedAt: new Date(), claimedByUserId: session!.user!.id },
-      });
-    });
+    await prisma.$transaction((tx) => grantSeatFromInvite(tx, inv, session!.user!.id));
     await recordAudit(
       session!.user!.id,
       "org.invite_claimed",
@@ -333,35 +296,7 @@ export async function claimOrgInvite(formData: FormData) {
 
   let createdUserId: string | null = null;
   try {
-    createdUserId = await prisma.$transaction(async (tx) => {
-      const user = await tx.user.create({
-        data: {
-          email: inv.email,
-          name: name || null,
-          role: "BUYER",
-          passwordHash,
-          organizationId: inv.organizationId,
-          // Invite link was clicked from the invited mailbox — proof of
-          // ownership, so the account starts verified.
-          emailVerifiedAt: new Date(),
-        },
-      });
-      await tx.membership.create({
-        data: {
-          userId: user.id,
-          organizationId: inv.organizationId,
-          role: inv.role,
-          canCommit: commitGrantFor(inv.role, inv.canCommit),
-          expiresAt: inv.delegationExpiresAt,
-          invitedById: inv.createdById ?? null,
-        },
-      });
-      await tx.orgInvite.update({
-        where: { id: inv.id },
-        data: { claimedAt: new Date(), claimedByUserId: user.id },
-      });
-      return user.id;
-    });
+    createdUserId = await createAccountFromInvite(inv, { name: name || null, passwordHash });
   } catch {
     // Unique-email violation: the address already has an account.
     // Send them to sign-in — their existing session pairs them to the org.

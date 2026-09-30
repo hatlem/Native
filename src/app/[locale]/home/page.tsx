@@ -14,6 +14,9 @@ import { selectActiveList } from "@/app/list-actions";
 import { acceptableQuoteWhere } from "@/lib/commerce/quote-validity";
 import { reconcileExpiredQuotesInBackground } from "@/lib/commerce/quote-expiry";
 import { JoinedNotice } from "@/app/joined-notice";
+import { viewOrgIds } from "@/lib/workspace";
+import { landingForRole } from "@/lib/roles";
+import { logout } from "@/app/auth-actions";
 
 export const dynamic = "force-dynamic";
 
@@ -27,10 +30,35 @@ export default async function HomePage({
   const { locale } = await params;
   const joined = (await searchParams).joined === "1";
   const scope = await loadScope();
-  if (!scope.workspace) redirect(`/${locale}/signin`);
-  const orgIds = scope.workspace.scopeOrgIds;
-
   const t = await getTranslations({ locale, namespace: "buyerHome" });
+  if (!scope.workspace) {
+    if (!scope.session?.user) redirect(`/${locale}/signin`);
+    // Staff consoles live elsewhere. Sending anyone else to /signin would
+    // loop straight back here (signin forwards a signed-in buyer to /home),
+    // so a buyer with no workspace — their seat was removed or their
+    // delegation ran out — gets told what happened instead.
+    const landing = landingForRole(scope.role, locale);
+    if (landing !== `/${locale}/home`) redirect(landing);
+    const ta = await getTranslations({ locale, namespace: "auth" });
+    return (
+      <section className="section">
+        <header className="page-header">
+          <h1>{t("noAccessTitle")}</h1>
+          <p className="lead">{t("noAccessBody")}</p>
+        </header>
+        <form action={logout}>
+          <input type="hidden" name="locale" value={locale} />
+          <button type="submit" className="btn secondary">
+            {ta("signout")}
+          </button>
+        </form>
+      </section>
+    );
+  }
+  const ws = scope.workspace;
+  // The org the user is working in (all clients for an agency) — the org
+  // switcher decides, and the nav badge in layout.tsx counts the same set.
+  const orgIds = viewOrgIds(ws);
 
   // "Needs you": quotes sent by the desk awaiting the buyer's approval —
   // only while still inside their validity window; an expired quote can't be
@@ -50,7 +78,7 @@ export default async function HomePage({
         total: true,
         currency: true,
         validUntil: true,
-        request: { select: { id: true, plan: { select: { name: true } } } },
+        request: { select: { id: true, organizationId: true, plan: { select: { name: true } } } },
       },
     }),
     prisma.contentAsset.findMany({
@@ -80,10 +108,16 @@ export default async function HomePage({
     // this wave's start is close. Scoped to the ACTIVE org only, because the
     // CTA switches the active list (selectActiveList → /plan), which only
     // ever renders the active org's lists.
-    scope.workspace.activeOrgId ? findDueWaves([scope.workspace.activeOrgId], new Date()) : Promise.resolve([]),
+    ws.activeOrgId ? findDueWaves([ws.activeOrgId], new Date()) : Promise.resolve([]),
   ]);
 
-  const needsCount = pendingQuotes.length + pendingContent.length + dueWaves.length;
+  // A quote only "needs you" if you can accept it. For a member without
+  // ordering rights it is waiting on a colleague: shown, but not counted and
+  // not worded as if the next move were theirs (the request page says who
+  // can act).
+  const myQuotes = pendingQuotes.filter((q) => ws.commitOrgIds.includes(q.request.organizationId));
+  const teamQuotes = pendingQuotes.filter((q) => !ws.commitOrgIds.includes(q.request.organizationId));
+  const needsCount = myQuotes.length + pendingContent.length + dueWaves.length;
   const runningCount = orders.length;
   const dateFmt = new Intl.DateTimeFormat(intlLocale(locale), { day: "numeric", month: "short" });
 
@@ -91,7 +125,7 @@ export default async function HomePage({
 
   return (
     <section>
-      {joined ? <JoinedNotice locale={locale} organizationId={scope.workspace.activeOrgId} variant="home" /> : null}
+      {joined ? <JoinedNotice locale={locale} organizationId={ws.activeOrgId} variant="home" /> : null}
       <h1>
         {needsCount > 0
           ? t("headingNeeds", { count: needsCount })
@@ -107,7 +141,7 @@ export default async function HomePage({
 
       {needsCount > 0 ? (
         <div className="home-needs-list">
-          {pendingQuotes.map((q) => (
+          {myQuotes.map((q) => (
             <div className="home-needs-card home-needs-card--accent" key={`quote-${q.id}`}>
               <span className="home-needs-card__icon" aria-hidden="true">
                 <FileCheck size={19} strokeWidth={1.7} />
@@ -184,6 +218,32 @@ export default async function HomePage({
               </div>
             );
           })}
+        </div>
+      ) : null}
+
+      {teamQuotes.length > 0 ? (
+        <div className="home-needs-list">
+          <div className="home-section-head">
+            <h2>{t("awaitingTeamHeading")}</h2>
+          </div>
+          {teamQuotes.map((q) => (
+            <div className="home-needs-card" key={`team-quote-${q.id}`}>
+              <span className="home-needs-card__icon" aria-hidden="true">
+                <FileCheck size={19} strokeWidth={1.7} />
+              </span>
+              <div className="home-needs-card__body">
+                <div className="home-needs-card__title-row">
+                  <span className="home-needs-card__title">{q.request.plan.name}</span>
+                </div>
+                <p className="home-needs-card__desc">
+                  {t("quoteAwaitingTeamBody", { amount: formatMoney(Number(q.total), q.currency, locale) })}
+                </p>
+              </div>
+              <Link href={`/requests/${q.request.id}`} className="btn small secondary">
+                {t("viewQuote")}
+              </Link>
+            </div>
+          ))}
         </div>
       ) : null}
 

@@ -2,7 +2,7 @@ import { getTranslations } from "next-intl/server";
 import { redirect } from "next/navigation";
 import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
-import { getWorkspace } from "@/lib/workspace";
+import { getWorkspace, viewOrgIds } from "@/lib/workspace";
 import { Link } from "@/i18n/navigation";
 import { formatMoney } from "@/lib/money";
 import { tally, averageOrderValue } from "@/lib/reporting";
@@ -25,7 +25,7 @@ export default async function MyReportsPage({
   if (!ws) redirect(`/${locale}/signin`);
 
   const orders = await prisma.order.findMany({
-    where: { organizationId: { in: ws.scopeOrgIds } },
+    where: { organizationId: { in: viewOrgIds(ws) } },
     select: {
       status: true,
       quote: { select: { currency: true, total: true } },
