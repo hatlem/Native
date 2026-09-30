@@ -83,7 +83,6 @@ test("CSP regression: buildCsp still emits the nonce and the same directive shap
   assert.match(csp, /upgrade-insecure-requests/);
 });
 
-<<<<<<< HEAD
 test("signed out on a protected page: a real 307 to sign-in that remembers the page", () => {
   const req = new NextRequest(new URL("https://nativespin.com/no/requests?tab=orders"));
   const res = middleware(req);
