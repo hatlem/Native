@@ -171,17 +171,27 @@ if (!RUN_DB_IT) {
     assert.equal(failing.length, 1);
     assert.deepEqual(failing[0].evaluation.result.failures, [
       { rule: "disclosure", label: "Annonsørinnhold" },
-      // The format's image minimum is enforced too, not just listed.
-      { rule: "tooFewImages", images: 0, min: 1 },
     ]);
+    // The image minimum is reported alongside, as a warning.
+    assert.deepEqual(failing[0].evaluation.result.warnings, [{ rule: "tooFewImages", images: 0, min: 1 }]);
     // The check persisted its verdict for the desk.
     const p1 = await prisma.articlePlacement.findUniqueOrThrow({ where: { id: placementId } });
     assert.equal(p1.specPassed, false);
+    assert.match(p1.specNotes ?? "", /Warning: Too few images: 0 < 1/);
+
+    // Labelled but still without an image: the warning alone never blocks.
+    const noImage = await prisma.contentAsset.create({
+      data: { articleId, version: 2, status: "DRAFT", body: "Annonsørinnhold — labelled, but no picture yet." },
+    });
+    assert.deepEqual(await specFailuresForSubmission({ articleId, assetId: noImage.id }), []);
+    const pWarn = await prisma.articlePlacement.findUniqueOrThrow({ where: { id: placementId } });
+    assert.equal(pWarn.specPassed, true);
+    assert.match(pWarn.specNotes ?? "", /^Spec passed .*; Warning: Too few images/);
 
     const good = await prisma.contentAsset.create({
       data: {
         articleId,
-        version: 2,
+        version: 3,
         status: "DRAFT",
         body: "Annonsørinnhold — a draft that is labelled properly.\n\n![The fleet](https://cdn.example.com/fleet.jpg)",
       },

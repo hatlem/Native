@@ -3654,8 +3654,9 @@
       "failDisclosure": "Märkningen ”{label}” saknas. Läsarna måste se att det här är betalt innehåll.",
       "failTooShort": "För kort: {words} ord, formatet kräver minst {min}.",
       "failTooLong": "För lång: {words} ord, formatet tillåter högst {max}.",
-      "failTooFewImages": "För få bilder: {images, plural, =0 {inga ännu} other {#}}, formatet kräver minst {min}. Lägg in varje bild som ![bildtext](https://länk-till-bild).",
-      "imagesHow": "Lägg in bilder i utkastet som ![bildtext](https://länk-till-bild)."
+      "imagesHow": "Lägg in bilder i utkastet som ![bildtext](https://länk-till-bild).",
+      "warnTooFewImages": "För få bilder: {images, plural, =0 {inga ännu} other {#}}, formatet vill ha minst {min}. Det hindrar inte att du skickar för granskning, men lägg in dem om du kan, var och en som ![bildtext](https://länk-till-bild).",
+      "warningsLabel": "Värt att åtgärda:"
     },
     "profile": {
       "title": "Min profil",

@@ -3523,8 +3523,9 @@
       "failDisclosure": "Die Kennzeichnung „{label}“ fehlt. Leser:innen müssen sehen, dass es sich um bezahlte Inhalte handelt.",
       "failTooShort": "Zu kurz: {words} Wörter, das Format verlangt mindestens {min}.",
       "failTooLong": "Zu lang: {words} Wörter, das Format erlaubt höchstens {max}.",
-      "failTooFewImages": "Zu wenige Bilder: {images, plural, =0 {noch keine} other {#}}, das Format verlangt mindestens {min}. Fügen Sie jedes Bild als ![Bildunterschrift](https://link-zum-bild) ein.",
-      "imagesHow": "Fügen Sie Bilder im Entwurf als ![Bildunterschrift](https://link-zum-bild) ein."
+      "imagesHow": "Fügen Sie Bilder im Entwurf als ![Bildunterschrift](https://link-zum-bild) ein.",
+      "warnTooFewImages": "Zu wenige Bilder: {images, plural, =0 {noch keine} other {#}}, das Format sieht mindestens {min} vor. Das hält die Übergabe zur Prüfung nicht auf, aber fügen Sie sie nach Möglichkeit ein, jeweils als ![Bildunterschrift](https://link-zum-bild).",
+      "warningsLabel": "Sollten Sie beheben:"
     },
     "profile": {
       "title": "Mein Profil",

@@ -3654,8 +3654,9 @@
       "failDisclosure": "The disclosure label “{label}” is missing. Readers must see that this is paid content.",
       "failTooShort": "Too short: {words} words, the format needs at least {min}.",
       "failTooLong": "Too long: {words} words, the format allows at most {max}.",
-      "failTooFewImages": "Too few images: {images, plural, =0 {none yet} other {#}}, the format needs at least {min}. Add each one as ![caption](https://link-to-image).",
-      "imagesHow": "Add images in the draft as ![caption](https://link-to-image)."
+      "imagesHow": "Add images in the draft as ![caption](https://link-to-image).",
+      "warnTooFewImages": "Too few images: {images, plural, =0 {none yet} other {#}}, the format asks for at least {min}. This doesn't block sending for review, but add them if you can, each as ![caption](https://link-to-image).",
+      "warningsLabel": "Worth fixing:"
     },
     "profile": {
       "title": "My profile",

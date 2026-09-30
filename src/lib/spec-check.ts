@@ -31,17 +31,28 @@ export type SpecInput = {
 // One failed rule, structured so each surface can explain it in the
 // reader's language (the writer portal localizes these); `issues` below
 // keeps the English sentence form persisted to ArticlePlacement.specNotes.
+// Failures block handing the draft over for review.
 export type SpecFailure =
   | { rule: "disclosure"; label: string }
   | { rule: "tooShort"; words: number; min: number }
-  | { rule: "tooLong"; words: number; max: number }
-  | { rule: "tooFewImages"; images: number; min: number };
+  | { rule: "tooLong"; words: number; max: number };
+
+// A rule the draft misses that is reported but never blocks. The image
+// minimum is one: the writer portal has no upload, images are only ever
+// linked, and Spec.imagesMin defaults to 1, so as a gate it would hold
+// back nearly every submission. It's shown with its reason so the writer
+// (and the desk, via specNotes) can act on it.
+export type SpecWarning = { rule: "tooFewImages"; images: number; min: number };
 
 export type SpecResult = {
+  // False only on failures; warnings never fail a draft.
   passed: boolean;
   words: number;
   issues: string[];
   failures: SpecFailure[];
+  warnings: SpecWarning[];
+  // English sentence form of `warnings`, like `issues`.
+  warningNotes: string[];
 };
 
 export function describeSpecFailure(f: SpecFailure): string {
@@ -52,8 +63,13 @@ export function describeSpecFailure(f: SpecFailure): string {
       return `Too short: ${f.words} < ${f.min} words`;
     case "tooLong":
       return `Too long: ${f.words} > ${f.max} words`;
+  }
+}
+
+export function describeSpecWarning(w: SpecWarning): string {
+  switch (w.rule) {
     case "tooFewImages":
-      return `Too few images: ${f.images} < ${f.min}`;
+      return `Too few images: ${w.images} < ${w.min}`;
   }
 }
 
@@ -108,6 +124,7 @@ export function specCheck(input: SpecInput): SpecResult {
   const words = prose ? prose.split(/\s+/).length : 0;
   const images = countImages(body);
   const failures: SpecFailure[] = [];
+  const warnings: SpecWarning[] = [];
 
   const requiredLabels = new Set<string>();
   if (input.titleDisclosure) requiredLabels.add(input.titleDisclosure);
@@ -126,7 +143,7 @@ export function specCheck(input: SpecInput): SpecResult {
     failures.push({ rule: "tooLong", words, max: input.wordCountMax });
   }
   if (input.imagesMin && images < input.imagesMin) {
-    failures.push({ rule: "tooFewImages", images, min: input.imagesMin });
+    warnings.push({ rule: "tooFewImages", images, min: input.imagesMin });
   }
 
   return {
@@ -134,5 +151,7 @@ export function specCheck(input: SpecInput): SpecResult {
     words,
     issues: failures.map(describeSpecFailure),
     failures,
+    warnings,
+    warningNotes: warnings.map(describeSpecWarning),
   };
 }

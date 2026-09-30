@@ -3655,8 +3655,9 @@
       "failDisclosure": "Mærkningen »{label}« mangler. Læserne skal kunne se, at det er betalt indhold.",
       "failTooShort": "For kort: {words} ord, formatet kræver mindst {min}.",
       "failTooLong": "For lang: {words} ord, formatet tillader højst {max}.",
-      "failTooFewImages": "For få billeder: {images, plural, =0 {ingen endnu} other {#}}, formatet kræver mindst {min}. Indsæt hvert billede som ![billedtekst](https://link-til-billede).",
-      "imagesHow": "Indsæt billeder i udkastet som ![billedtekst](https://link-til-billede)."
+      "imagesHow": "Indsæt billeder i udkastet som ![billedtekst](https://link-til-billede).",
+      "warnTooFewImages": "For få billeder: {images, plural, =0 {ingen endnu} other {#}}, formatet beder om mindst {min}. Det stopper ikke indsendelsen til gennemsyn, men indsæt dem, hvis du kan, hvert som ![billedtekst](https://link-til-billede).",
+      "warningsLabel": "Værd at rette:"
     },
     "profile": {
       "title": "Min profil",

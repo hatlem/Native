@@ -3654,8 +3654,9 @@
       "failDisclosure": "Merkintä ”{label}” puuttuu. Lukijan on nähtävä, että kyse on maksetusta sisällöstä.",
       "failTooShort": "Liian lyhyt: {words} sanaa, formaatti vaatii vähintään {min}.",
       "failTooLong": "Liian pitkä: {words} sanaa, formaatti sallii enintään {max}.",
-      "failTooFewImages": "Liian vähän kuvia: {images, plural, =0 {ei vielä yhtään} other {#}}, formaatti vaatii vähintään {min}. Lisää jokainen kuva muodossa ![kuvateksti](https://linkki-kuvaan).",
-      "imagesHow": "Lisää kuvat luonnokseen muodossa ![kuvateksti](https://linkki-kuvaan)."
+      "imagesHow": "Lisää kuvat luonnokseen muodossa ![kuvateksti](https://linkki-kuvaan).",
+      "warnTooFewImages": "Liian vähän kuvia: {images, plural, =0 {ei vielä yhtään} other {#}}, formaatti edellyttää vähintään {min}. Tämä ei estä lähettämästä tarkistukseen, mutta lisää kuvat jos voit, jokainen muodossa ![kuvateksti](https://linkki-kuvaan).",
+      "warningsLabel": "Kannattaa korjata:"
     },
     "profile": {
       "title": "Oma profiili",

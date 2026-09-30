@@ -152,23 +152,32 @@ test("reports each failed rule as a structured failure", () => {
   assert.deepEqual(r.issues, r.failures.map(describeSpecFailure));
 });
 
-test("enforces the format's image minimum, counting Markdown images", () => {
+test("the image minimum is checked as a warning with its reason, never a failure", () => {
   const body = "Annonse. Words enough here ![Fleet at dawn](https://cdn.example.com/a.jpg)";
   const one = specCheck({ body, imagesMin: 2 });
-  assert.equal(one.passed, false);
-  assert.deepEqual(one.failures, [{ rule: "tooFewImages", images: 1, min: 2 }]);
-  assert.match(one.issues[0], /Too few images: 1 < 2/);
+  // Writers can only link images, so a short count must not block review.
+  assert.equal(one.passed, true);
+  assert.deepEqual(one.failures, []);
+  assert.deepEqual(one.warnings, [{ rule: "tooFewImages", images: 1, min: 2 }]);
+  assert.deepEqual(one.warningNotes, ["Too few images: 1 < 2"]);
 
   const two = specCheck({ body: `${body}\n\n![Depot](https://cdn.example.com/b.jpg)`, imagesMin: 2 });
-  assert.equal(two.passed, true);
+  assert.deepEqual(two.warnings, []);
   // No minimum set: images are optional.
-  assert.equal(specCheck({ body: "Plain text only", imagesMin: null }).passed, true);
+  assert.deepEqual(specCheck({ body: "Plain text only", imagesMin: null }).warnings, []);
+});
+
+test("a blocking failure and an image warning are reported side by side", () => {
+  const r = specCheck({ body: "Too short", wordCountMin: 5, imagesMin: 1 });
+  assert.equal(r.passed, false);
+  assert.deepEqual(r.failures, [{ rule: "tooShort", words: 2, min: 5 }]);
+  assert.deepEqual(r.warnings, [{ rule: "tooFewImages", images: 0, min: 1 }]);
 });
 
 test("an image the preview wouldn't show doesn't count, and image markup isn't prose", () => {
   // javascript: / relative sources render as caption text only.
   const unsafe = specCheck({ body: "![x](javascript:alert(1)) ![y](/local.png)", imagesMin: 1 });
-  assert.deepEqual(unsafe.failures, [{ rule: "tooFewImages", images: 0, min: 1 }]);
+  assert.deepEqual(unsafe.warnings, [{ rule: "tooFewImages", images: 0, min: 1 }]);
   // "![A long caption here](url)" adds nothing to the word count.
   const r = specCheck({ body: "one two ![A long caption here](https://x.test/i.png) three" });
   assert.equal(r.words, 3);

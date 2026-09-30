@@ -3654,8 +3654,9 @@
       "failDisclosure": "Merkingen «{label}» mangler. Leserne må se at dette er betalt innhold.",
       "failTooShort": "For kort: {words} ord, formatet krever minst {min}.",
       "failTooLong": "For langt: {words} ord, formatet tillater høyst {max}.",
-      "failTooFewImages": "For få bilder: {images, plural, =0 {ingen ennå} other {#}}, formatet krever minst {min}. Legg inn hvert bilde som ![bildetekst](https://lenke-til-bilde).",
-      "imagesHow": "Legg inn bilder i utkastet som ![bildetekst](https://lenke-til-bilde)."
+      "imagesHow": "Legg inn bilder i utkastet som ![bildetekst](https://lenke-til-bilde).",
+      "warnTooFewImages": "For få bilder: {images, plural, =0 {ingen ennå} other {#}}, formatet ber om minst {min}. Det stopper ikke innsendingen til gjennomgang, men legg dem inn hvis du kan, hvert som ![bildetekst](https://lenke-til-bilde).",
+      "warningsLabel": "Verdt å fikse:"
     },
     "profile": {
       "title": "Profilen min",
