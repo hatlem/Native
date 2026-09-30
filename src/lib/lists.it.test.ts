@@ -561,3 +561,17 @@ test("deleting a list with lines still cascades (trigger tolerates the parent go
   await prisma.savedList.delete({ where: { id: listId } });
   assert.equal(await prisma.savedListItem.count({ where: { listId } }), 0);
 });
+
+test("the line-change trigger stamps UTC, not the session time zone", async () => {
+  const listId = await freshList();
+  // SET LOCAL scopes the zone to this transaction's connection, which is the
+  // one the trigger fires on.
+  await prisma.$transaction(async (tx) => {
+    await tx.$executeRawUnsafe(`SET LOCAL TIME ZONE 'Pacific/Kiritimati'`); // UTC+14
+    await tx.savedListItem.create({ data: { listId, productId, quantity: 1 } });
+  });
+  const { updatedAt } = await prisma.savedList.findUniqueOrThrow({ where: { id: listId }, select: { updatedAt: true } });
+  const skewMin = Math.abs(updatedAt.getTime() - Date.now()) / 60_000;
+  assert.ok(skewMin < 5, `updatedAt is ${Math.round(skewMin)} min off now`);
+  await prisma.savedList.delete({ where: { id: listId } });
+});
