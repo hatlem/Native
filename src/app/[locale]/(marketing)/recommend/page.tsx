@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import { getTranslations } from "next-intl/server";
 import { MarketCode } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
@@ -5,6 +6,8 @@ import { formatMoney, intlLocale } from "@/lib/money";
 import { plannablePrice, productBand } from "@/lib/pricing/display-price";
 import { bandLabel } from "@/lib/pricing/bands";
 import { loadPricingDefaults } from "@/lib/content-fee";
+import { localizeVertical } from "@/lib/taxonomy-i18n";
+import type { AppLocale } from "@/i18n/routing";
 import { EmptyState } from "@/app/empty-state";
 import { recommendMix, type Candidate } from "@/lib/recommend";
 import { addRecommendedPlan } from "@/app/plan-actions";
@@ -13,6 +16,18 @@ import { SubmitButton } from "@/components";
 import { SUPPORTED_MARKETS, isSupportedMarket } from "@/lib/markets";
 
 export const dynamic = "force-dynamic";
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ locale: string }>;
+}): Promise<Metadata> {
+  const { locale } = await params;
+  const t = await getTranslations({ locale, namespace: "recommend" });
+  return {
+    title: t("title"),
+  };
+}
 
 const MARKET_CODES = SUPPORTED_MARKETS;
 
@@ -96,7 +111,12 @@ export default async function RecommendPage({
     }
     categories = [...new Set(candidates.map((c) => c.category))]
       .filter((c) => c.length > 0)
-      .sort();
+      .sort((a, b) =>
+        localizeVertical(a, locale as AppLocale).localeCompare(
+          localizeVertical(b, locale as AppLocale),
+          intlLocale(locale),
+        ),
+      );
   }
 
   const result =
@@ -151,7 +171,7 @@ export default async function RecommendPage({
                 <option value="">{t("anyCategory")}</option>
                 {categories.map((cat) => (
                   <option key={cat} value={cat}>
-                    {cat}
+                    {localizeVertical(cat, locale as AppLocale)}
                   </option>
                 ))}
               </select>
@@ -213,7 +233,11 @@ export default async function RecommendPage({
                     <article className="card" key={p.productId}>
                       <span className="tag">{tType(p.type)}</span>
                       <h3>{p.titleName}</h3>
-                      {p.category ? <p className="muted small">{p.category}</p> : null}
+                      {p.category ? (
+                        <p className="muted small">
+                          {localizeVertical(p.category, locale as AppLocale)}
+                        </p>
+                      ) : null}
                       <p className="muted small">
                         {t("reach")}:{" "}
                         {p.reach > 0

@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import { getTranslations } from "next-intl/server";
 import { Link } from "@/i18n/navigation";
 import { resetPassword } from "@/app/password-actions";
@@ -6,6 +7,20 @@ import { prisma } from "@/lib/prisma";
 import { hashToken } from "@/lib/tokens";
 
 export const dynamic = "force-dynamic";
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ locale: string; token: string }>;
+}): Promise<Metadata> {
+  const { locale } = await params;
+  const t = await getTranslations({ locale, namespace: "auth" });
+  return {
+    title: t("resetTitle"),
+    // One-off, token- or flow-bound page: nothing to index.
+    robots: { index: false, follow: false },
+  };
+}
 
 export default async function ResetPasswordPage({
   params,

@@ -1,8 +1,23 @@
+import type { Metadata } from "next";
 import { getTranslations } from "next-intl/server";
 import { Link } from "@/i18n/navigation";
 import { LandingShell } from "@/app/landing-shell";
 
 export const dynamic = "force-dynamic";
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ locale: string }>;
+}): Promise<Metadata> {
+  const { locale } = await params;
+  const t = await getTranslations({ locale, namespace: "auth" });
+  return {
+    title: t("checkTitle"),
+    // One-off, token- or flow-bound page: nothing to index.
+    robots: { index: false, follow: false },
+  };
+}
 
 export default async function CheckEmailPage({
   params,

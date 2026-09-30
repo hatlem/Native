@@ -1,4 +1,5 @@
 import type { ReactNode } from "react";
+import type { Metadata } from "next";
 import { redirect } from "next/navigation";
 import { getTranslations } from "next-intl/server";
 import { ProductType } from "@prisma/client";
@@ -6,6 +7,7 @@ import { auth } from "@/auth";
 import { landingForRole } from "@/lib/roles";
 import { Link } from "@/i18n/navigation";
 import { prisma } from "@/lib/prisma";
+import { catalogTitleCount, titleCountFloor } from "@/lib/catalog-stats";
 import { intlLocale } from "@/lib/money";
 import { LandingShell } from "@/app/landing-shell";
 import { MailLink } from "@/components";
@@ -17,9 +19,25 @@ import { BriefToQuote } from "./_components/BriefToQuote";
 
 const DESK_SUBJECT = "Talk to the NativeSpin desk";
 
-export const metadata = {
-  title: "NativeSpin — One brief. 3,000+ titles across 9 markets. Firm quote in 24 hours.",
-};
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ locale: string }>;
+}): Promise<Metadata> {
+  const { locale } = await params;
+  const t = await getTranslations({ locale, namespace: "landing" });
+  const tc = await getTranslations({ locale, namespace: "common" });
+  const count = titleCountFloor(await catalogTitleCount());
+  // `absolute`: the home title leads with the brand itself, so the layout's
+  // "%s · NativeSpin" template would print it twice.
+  return {
+    title: {
+      absolute: `${tc("appName")} — ${t("hero.metaTitle", {
+        totalCount: count.toLocaleString(intlLocale(locale)),
+      })}`,
+    },
+  };
+}
 
 export const dynamic = "force-dynamic";
 
@@ -66,14 +84,14 @@ export default async function HomePage({
 
   const t = await getTranslations({ locale, namespace: "landing" });
 
-  // Catalog reach: report the full catalogued size (3,000+ titles across
-  // all 9 markets — NO, SE, DK, FI, DE, AT, CH, UK, IE), not only the
-  // small subset already verified for instant booking. The sample table
-  // still pulls from active titles with indicative pricing.
+  // Catalog reach: the one shared count (@/lib/catalog-stats) — what a
+  // verified buyer can browse across all 9 markets, the same number the
+  // catalog gate and the page title quote. "{n}+" copy uses the rounded-down
+  // figure so the "+" stays true; the stats strip shows it exactly. The
+  // sample table still pulls from active titles with indicative pricing.
   const [
     sampleTitles,
     publishersRaw,
-    totalActiveTitles,
     totalTitles,
     totalPublishers,
   ] = await Promise.all([
@@ -81,8 +99,12 @@ export default async function HomePage({
       where: {
         active: true,
         products: { some: { active: true, visibility: "INDICATIVE" } },
+        monthlyReach: { not: null },
       },
-      orderBy: [{ monthlyReach: "desc" }, { name: "asc" }],
+      // Biggest audiences first. Postgres sorts NULLs FIRST on DESC, which
+      // filled this strip with the alphabetically-first titles that have no
+      // reach figure ("Aamuset — readers"); the showcase needs the number.
+      orderBy: [{ monthlyReach: { sort: "desc", nulls: "last" } }, { name: "asc" }],
       take: 8,
       include: {
         publisher: { select: { name: true } },
@@ -107,12 +129,12 @@ export default async function HomePage({
         },
       },
     }),
-    prisma.title.count({ where: { active: true } }),
-    prisma.title.count(),
+    catalogTitleCount(),
     prisma.publisher.count(),
   ]);
 
   const featuredId = sampleTitles[2]?.id;
+  const titlesFloor = titleCountFloor(totalTitles).toLocaleString(intlLocale(locale));
 
   const topPublishers = publishersRaw
     .map((p) => {
@@ -144,7 +166,7 @@ export default async function HomePage({
           <h1 className="headline">
             <span className="row">{t("hero.h1Line1")}</span>
             <span className="row">{t("hero.h1Line2")}</span>
-            <span className="row ink-mute">{t("hero.h1Line3", { totalCount: totalTitles })}</span>
+            <span className="row ink-mute">{t("hero.h1Line3", { totalCount: titlesFloor })}</span>
             <span className="row ink-mute">{t("hero.h1Line4")}</span>
           </h1>
 
@@ -204,7 +226,7 @@ export default async function HomePage({
               <div className="ix">{t("why.colCIx")}</div>
               <h3>{t("why.colCH3")}</h3>
               <p>{t.rich("why.colCBody", richTags)}</p>
-              <div className="pull">{t("why.colCPull", { totalCount: totalTitles })}</div>
+              <div className="pull">{t("why.colCPull", { totalCount: titlesFloor })}</div>
             </div>
           </div>
         </div>
@@ -278,8 +300,7 @@ export default async function HomePage({
             <div className="meta">
               {t("pubs.meta", {
                 publishers: totalPublishers,
-                titles: totalTitles,
-                active: totalActiveTitles,
+                titles: titlesFloor,
               })}
             </div>
           </div>
@@ -323,7 +344,7 @@ export default async function HomePage({
               <h2>{t("catalog.h2")}</h2>
             </div>
             <a href="#request" className="ask">
-              {t("catalog.ask", { totalCount: totalTitles })}
+              {t("catalog.ask", { totalCount: totalTitles.toLocaleString(intlLocale(locale)) })}
             </a>
           </div>
 
@@ -355,9 +376,10 @@ export default async function HomePage({
                       <div className="pub">{title.publisher.name}</div>
                     </td>
                     <td className="hide-md">
-                      <span className="cat-tag">
-                        {title.category}
-                      </span>
+                      {/* The column is "Publisher"; it used to print the
+                          free-text source category ("LOCAL", "Riks") in
+                          whatever language the source sheet used. */}
+                      <span className="cat-tag">{title.publisher.name}</span>
                     </td>
                     <td>
                       <span className={`flag ${marketCode}`}></span>
@@ -377,7 +399,7 @@ export default async function HomePage({
           </table>
 
           <div className="cat-foot">
-            <div>{t("catalog.footBody", { totalCount: totalTitles })}</div>
+            <div>{t("catalog.footBody", { totalCount: titlesFloor })}</div>
           </div>
         </div>
       </section>

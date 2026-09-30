@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import { getTranslations } from "next-intl/server";
 import { redirect } from "next/navigation";
 import { auth } from "@/auth";
@@ -5,8 +6,22 @@ import { Link } from "@/i18n/navigation";
 import { register } from "@/app/signup-actions";
 import { LandingShell } from "@/app/landing-shell";
 import { SubmitButton } from "@/components";
+import { catalogTitleCount, titleCountFloor } from "@/lib/catalog-stats";
+import { intlLocale } from "@/lib/money";
 
 export const dynamic = "force-dynamic";
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ locale: string }>;
+}): Promise<Metadata> {
+  const { locale } = await params;
+  const t = await getTranslations({ locale, namespace: "auth" });
+  return {
+    title: t("signupTitle"),
+  };
+}
 
 export default async function SignUpPage({
   params,
@@ -51,7 +66,11 @@ export default async function SignUpPage({
         <div className="marketing">
           <span className="eyebrow accent">{appName}</span>
           <h1>{t("signupHeadline")}</h1>
-          <p className="lead">{t("signupLead")}</p>
+          <p className="lead">
+            {t("signupLead", {
+              count: titleCountFloor(await catalogTitleCount()).toLocaleString(intlLocale(locale)),
+            })}
+          </p>
           <ul className="signup-bullets">
             <li>{t("bulletCatalog")}</li>
             <li>{t("bulletDesk")}</li>

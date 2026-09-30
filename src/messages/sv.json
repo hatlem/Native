@@ -1025,7 +1025,7 @@
     "signupTitle": "Skapa konto",
     "signupSubtitle": "Fem fält. Vi frågar om resten när du behöver det.",
     "signupHeadline": "Gratis konto. Varje native-titel vi täcker.",
-    "signupLead": "3 000+ titlar över 9 marknader, transparent prissättning, fast offert inom 24 timmar. Du förbinder dig till ingenting förrän briefen är skickad.",
+    "signupLead": "{count}+ titlar över 9 marknader, transparent prissättning, fast offert inom 24 timmar. Du förbinder dig till ingenting förrän briefen är skickad.",
     "bulletCatalog": "Native lever där läsare lägger tid: 3–5× uppehållstid vs display, lånad trovärdighet från titeln, indexerad och bestående i sök.",
     "bulletDesk": "Hela katalogen öppen, transparent prissättning. Inga telefonrundor, inga PDF-prislistor, inga fyra veckors förhandlingar.",
     "bulletReports": "Brief en gång. Desken förhandlar, skriver, kvalitetssäkrar, publicerar. Du godkänner.",
@@ -1273,7 +1273,7 @@
     "ratesPriceOnlyNote": "Den här sidan ändrar endast priser. Katalogstatus — aktiv, bokningsbar, synlighet — hanteras av NativeSpin-desken."
   },
   "formats": {
-    "metaTitle": "Native-format — NativeSpin",
+    "metaTitle": "Native-format",
     "eyebrow": "Format",
     "title": "Fyra sätt att köra native — välj det som passar.",
     "lead": "Varje titel i vår katalog stödjer ett eller flera av dessa fyra format. Skillnaden är vems röst du betalar för och hur framträdande varumärket är.",
@@ -1648,7 +1648,7 @@
   },
   "about": {
     "eyebrow": "Om oss",
-    "metaTitle": "Om NativeSpin",
+    "metaTitle": "Om oss",
     "title": "Native är operativt jobbigt. Vi fixar det.",
     "lead": "NativeSpin är en marknadsplats för att köpa native-innehåll och native-annonsering i tidningar och tidskrifter — inklusive de många som inte säljer programmatiskt.",
     "missionTitle": "Mission",
@@ -1840,7 +1840,7 @@
     "faqTitle": "Vanliga frågor"
   },
   "contact": {
-    "metaTitle": "Kontakta NativeSpin",
+    "metaTitle": "Kontakt",
     "eyebrow": "Kontakt",
     "title": "Hör av er",
     "lead": "Välj rätt kanal nedan, eller använd formuläret. Vi svarar på alla meddelanden inom en arbetsdag.",
@@ -2174,8 +2174,8 @@
     }
   },
   "apiDocs": {
-    "metaTitle": "NativeSpin API",
-    "eyebrow": "Developers",
+    "metaTitle": "API",
+    "eyebrow": "Utvecklare",
     "title": "NativeSpins offentliga katalog-API",
     "lead": "Ett läs-API över NativeSpins titelkatalog — byggt för byråverktyg (Atlas-stil) och adtech-partner som behöver normaliserade utbudsdata för redaktionellt native över våra 9 marknader — Norge, Sverige, Danmark, Finland, Tyskland, Österrike, Schweiz, Storbritannien och Irland.",
     "authTitle": "Autentisering",
@@ -2187,11 +2187,11 @@
     "queryParams": "Frågeparametrar",
     "detailBody": "Per-titel-detaljer: utgivare, marknad (med moms + märkningsregler), och varje aktiv produkt med specifikation och prisregel-steg.",
     "detailIncludes": "Inkluderar ordantalsgränser, mall för märkningsetikett, ledtid och vägledande grundpris i marknadens valuta.",
-    "paginationTitle": "Pagination",
+    "paginationTitle": "Paginering",
     "paginationBody": "Markörbaserad på titel-id. Stabil sortering på namn + id så att du kan köra en full synk utan att missa rader när nya titlar aktiveras mitt i synken.",
     "limitsTitle": "Hastighetsgränser",
     "limitsBody": "Per-nyckel-bursts jämnas ut genom samma bucket som RFQ-flödet använder. Ett 429-svar inkluderar en ungefärlig retry-after i meddelandets brödtext. Långvariga hög-genomströmnings-partner får högre gränser — fråga när du frågar efter en nyckel.",
-    "errorsTitle": "Errors",
+    "errorsTitle": "Fel",
     "errorsBody": "Fel returneras som JSON med en stabil kod och ett mänskligt meddelande. Koder idag: MISSING, INVALID, EXPIRED, REVOKED, SCOPE, RATE_LIMITED, NOT_FOUND.",
     "ctaTitle": "Behöver du en nyckel?",
     "ctaBody": "Vi tillhandahåller inte API:t automatiskt — partnerintegrationer har kommersiella implikationer som vi vill prata igenom först. Hör av dig, så får du en fungerande nyckel inom en arbetsdag.",

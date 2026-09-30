@@ -1025,7 +1025,7 @@
     "signupTitle": "Opprett konto",
     "signupSubtitle": "Fem felter. Vi spør om resten når du trenger det.",
     "signupHeadline": "Gratis konto. Hver native-tittel vi dekker.",
-    "signupLead": "3 000+ titler på tvers av 9 markeder, transparent pris, fast tilbud på 24 timer. Du forplikter deg ingenting før brief er sendt.",
+    "signupLead": "{count}+ titler på tvers av 9 markeder, transparent pris, fast tilbud på 24 timer. Du forplikter deg ingenting før brief er sendt.",
     "bulletCatalog": "Native lever der lesere bruker tid: 3–5× dvelletid vs display, lånt troverdighet fra tittelen, indeksert og varig i søk.",
     "bulletDesk": "Hele katalogen åpen, transparent pris. Ingen telefonrunder, ingen PDF-prislister, ingen fire ukers tau-trekking.",
     "bulletReports": "Brief én gang. Desken forhandler, skriver, kvalitetssikrer, publiserer. Du godkjenner.",
@@ -1273,7 +1273,7 @@
     "ratesPriceOnlyNote": "Denne siden endrer kun priser. Katalogstatus — aktiv, bookbar, synlighet — håndteres av NativeSpin-desken."
   },
   "formats": {
-    "metaTitle": "Native-formater — NativeSpin",
+    "metaTitle": "Native-formater",
     "eyebrow": "Formater",
     "title": "Fire måter å kjøre native — velg den som passer.",
     "lead": "Hver tittel i katalogen vår støtter ett eller flere av disse fire formatene. Forskjellen er hvem sin stemme du betaler for og hvor synlig merket er.",
@@ -1648,7 +1648,7 @@
   },
   "about": {
     "eyebrow": "Om oss",
-    "metaTitle": "Om NativeSpin",
+    "metaTitle": "Om oss",
     "title": "Native er operasjonelt vondt. Vi fikser det.",
     "lead": "NativeSpin er et marked for kjøp av native innhold og native annonsering i aviser og magasiner — inkludert de mange som ikke selger programmatisk.",
     "missionTitle": "Misjon",
@@ -1840,7 +1840,7 @@
     "faqTitle": "Ofte stilte spørsmål"
   },
   "contact": {
-    "metaTitle": "Kontakt NativeSpin",
+    "metaTitle": "Kontakt",
     "eyebrow": "Kontakt",
     "title": "Ta kontakt",
     "lead": "Velg riktig kanal under, eller bruk skjemaet. Vi svarer på alle henvendelser innen én virkedag.",
@@ -2174,8 +2174,8 @@
     }
   },
   "apiDocs": {
-    "metaTitle": "NativeSpin API",
-    "eyebrow": "Developers",
+    "metaTitle": "API",
+    "eyebrow": "Utviklere",
     "title": "NativeSpins offentlige katalog-API",
     "lead": "Et lese-API over NativeSpin-tittelkatalogen — laget for byråverktøy (Atlas-stil) og adtech-partnere som trenger normaliserte tilbudsdata for redaksjonelt native på tvers av våre 9 markeder — Norge, Sverige, Danmark, Finland, Tyskland, Østerrike, Sveits, Storbritannia og Irland.",
     "authTitle": "Autentisering",
@@ -2187,18 +2187,18 @@
     "queryParams": "Spørringsparametere",
     "detailBody": "Per-tittel-detaljer: utgiver, marked (med MVA + merkingsregler), og hvert aktive produkt med spesifikasjon og pris­regel-trinn.",
     "detailIncludes": "Inkluderer ordtellingsgrenser, mal for merkingslabel, ledetid og indikativ grunnpris i markedets valuta.",
-    "paginationTitle": "Pagination",
+    "paginationTitle": "Paginering",
     "paginationBody": "Markørbasert på tittel-id. Stabil sortering på navn + id slik at du kan kjøre en full synkronisering uten å miste rader når nye titler aktiveres midt i prosessen.",
     "limitsTitle": "Hastighets­grenser",
     "limitsBody": "Per-nøkkel-bursts jevnes ut gjennom samme bøtte som RFQ-flyten bruker. En 429-respons inkluderer en omtrentlig retry-after i meldingsteksten. Vedvarende høy-volum-partnere får høyere grenser — spør når du ber om en nøkkel.",
-    "errorsTitle": "Errors",
+    "errorsTitle": "Feil",
     "errorsBody": "Feil returneres som JSON med en stabil kode og en lesbar melding. Koder i dag: MISSING, INVALID, EXPIRED, REVOKED, SCOPE, RATE_LIMITED, NOT_FOUND.",
     "ctaTitle": "Trenger du en nøkkel?",
     "ctaBody": "Vi auto-tildeler ikke API-en — partner-integrasjoner har kommersielle implikasjoner vi vil avklare først. Ta kontakt, så får du en fungerende nøkkel innen én arbeidsdag.",
     "ctaContact": "Snakk med partnerskaps­teamet",
     "selfServeEyebrow": "Selvbetjening",
     "selfServeTitle": "Kjøp som programmatisk — på navngitte premiumtitler",
-    "selfServeBody": "Finn beholdning gjennom katalog-API-et, og bestill fastprisede plasseringer i ett kall — via API eller i appen. Ingen auksjon, ingen skjult beholdning: hver tittel er navngitt, hver pris er publisistens egen. RFQ-titler forblir desk-styrte med vilje — API-et bestiller kun fastprisede selvbetjente plasseringer.",
+    "selfServeBody": "Finn beholdning gjennom katalog-API-et, og bestill fastprisede plasseringer i ett kall — via API eller i appen. Ingen auksjon, ingen skjult beholdning: hver tittel er navngitt, hver pris er utgiverens egen. RFQ-titler forblir desk-styrte med vilje — API-et bestiller kun fastprisede selvbetjente plasseringer.",
     "ordersBody": "Legg inn en fastpriset selvbetjent ordre. Send fastprisede produkter og få en bekreftet ordre tilbake i ett kall. Krever orders:write-tilgang og en nøkkel knyttet til organisasjonen din; RFQ-produkter gir 422 RFQ_ONLY.",
     "ordersRequest": "curl -X POST https://nativespin.com/api/v1/orders \\\n  -H \"Authorization: Bearer DIN_NØKKEL\" \\\n  -H \"Content-Type: application/json\" \\\n  -d '{\"items\":[{\"productId\":\"PRODUKT_ID\",\"quantity\":1}]}'"
   },

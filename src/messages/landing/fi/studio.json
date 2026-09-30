@@ -31,5 +31,6 @@
   "fallbackStandfirst": "Kirjoita brändi, valitse markkina ja luo esimerkkinatiiviartikkeli.",
   "fallbackByline": "Toimitus · 8 min lukuaika",
   "fallbackBody1": "Tämä on paikkamerkkiteksti. Paina Luo artikkeli, niin tiimimme tekoäly kirjoittaa esimerkkiartikkelin julkaisun äänellä käyttäen brändiäsi ja sitä, mitä haluat nostaa esiin.",
-  "fallbackBody2": "Natiivimainonta luetaan kuin sivu, jolla se on — siinä on koko idea. Esikatselu näyttää tarkalleen, miten lukija sen kohtaisi."
+  "fallbackBody2": "Natiivimainonta luetaan kuin sivu, jolla se on — siinä on koko idea. Esikatselu näyttää tarkalleen, miten lukija sen kohtaisi.",
+  "metaTitle": "Esikatsele omaa natiivimainostasi"
 }

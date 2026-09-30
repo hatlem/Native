@@ -31,5 +31,6 @@
   "fallbackStandfirst": "Skriv inn merkevaren, velg et marked, og lag en eksempel-native-artikkel.",
   "fallbackByline": "Av redaksjonen · 8 min lesetid",
   "fallbackBody1": "Dette er en plassholdertekst. Trykk på Lag artikkelen, så skriver AI-en på desken en eksempelartikkel i publikasjonens stemme, med merkevaren din og det du vil fremme.",
-  "fallbackBody2": "Native-annonsering leses som siden den ligger på — det er hele poenget. Forhåndsvisningen viser deg nøyaktig hvordan en leser ville møtt den."
+  "fallbackBody2": "Native-annonsering leses som siden den ligger på — det er hele poenget. Forhåndsvisningen viser deg nøyaktig hvordan en leser ville møtt den.",
+  "metaTitle": "Se din egen native-annonse"
 }

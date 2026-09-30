@@ -1025,7 +1025,7 @@
     "signupTitle": "Opret konto",
     "signupSubtitle": "Fem felter. Vi spørger om resten, når du har brug for det.",
     "signupHeadline": "Gratis konto. Hver native-titel vi dækker.",
-    "signupLead": "3.000+ titler på tværs af 9 markeder, transparent pris, fast tilbud på 24 timer. Du forpligter dig intet, før briefen er sendt.",
+    "signupLead": "{count}+ titler på tværs af 9 markeder, transparent pris, fast tilbud på 24 timer. Du forpligter dig intet, før briefen er sendt.",
     "bulletCatalog": "Native lever der, hvor læsere bruger tid: 3–5× opholdstid vs display, lånt troværdighed fra titlen, indekseret og varig i søgning.",
     "bulletDesk": "Hele kataloget åbent, transparent pris. Ingen telefonrunder, ingen PDF-prislister, ingen fire ugers forhandling.",
     "bulletReports": "Brief én gang. Desken forhandler, skriver, kvalitetssikrer, udgiver. Du godkender.",
@@ -1273,7 +1273,7 @@
     "ratesPriceOnlyNote": "Denne side ændrer kun priser. Katalogstatus — aktiv, bookbar, synlighed — håndteres af NativeSpin-desken."
   },
   "formats": {
-    "metaTitle": "Native-formater — NativeSpin",
+    "metaTitle": "Native-formater",
     "eyebrow": "Formater",
     "title": "Fire måder at køre native — vælg den der passer.",
     "lead": "Hver titel i vores katalog understøtter ét eller flere af disse fire formater. Forskellen er hvis stemme du betaler for og hvor synlig brandet er.",
@@ -1648,7 +1648,7 @@
   },
   "about": {
     "eyebrow": "Om os",
-    "metaTitle": "Om NativeSpin",
+    "metaTitle": "Om os",
     "title": "Native er operationelt hårdt. Det fikser vi.",
     "lead": "NativeSpin er en markedsplads til at købe native indhold og native annoncering i aviser og magasiner — også de mange der ikke sælger programmatisk.",
     "missionTitle": "Mission",
@@ -1841,7 +1841,7 @@
     "faqTitle": "Ofte stillede spørgsmål"
   },
   "contact": {
-    "metaTitle": "Kontakt NativeSpin",
+    "metaTitle": "Kontakt",
     "eyebrow": "Kontakt",
     "title": "Tag fat i os",
     "lead": "Vælg den rette kanal nedenfor, eller brug formularen. Vi svarer på alle henvendelser inden for én arbejdsdag.",
@@ -2175,8 +2175,8 @@
     }
   },
   "apiDocs": {
-    "metaTitle": "NativeSpin API",
-    "eyebrow": "Developers",
+    "metaTitle": "API",
+    "eyebrow": "Udviklere",
     "title": "NativeSpins offentlige katalog-API",
     "lead": "Et læse-API over NativeSpins titelkatalog — designet til bureau-værktøjer (Atlas-stil) og adtech-partnere, der har brug for normaliserede udbudsdata for redaktionelt native på tværs af vores 9 markeder — Norge, Sverige, Danmark, Finland, Tyskland, Østrig, Schweiz, Storbritannien og Irland.",
     "authTitle": "Autentificering",
@@ -2188,11 +2188,11 @@
     "queryParams": "Query-parametre",
     "detailBody": "Per-titel-detaljer: udgiver, marked (med moms + mærkningsregler), og hvert aktivt produkt med specifikation og prisregel-trin.",
     "detailIncludes": "Inkluderer ord-antals-grænser, skabelon for mærkningsmærkat, leveringstid og vejledende grundpris i markedets valuta.",
-    "paginationTitle": "Pagination",
+    "paginationTitle": "Paginering",
     "paginationBody": "Markørbaseret på titel-id. Stabil sortering på navn + id, så du kan køre en fuld synk uden at miste rækker, når nye titler aktiveres midt i synken.",
     "limitsTitle": "Hastighedsgrænser",
     "limitsBody": "Per-nøgle-bursts udjævnes gennem samme bucket som RFQ-flowet bruger. Et 429-svar inkluderer en omtrentlig retry-after i meddelelsesteksten. Vedholdende høj-gennemstrømnings-partnere får højere grænser — spørg, når du beder om en nøgle.",
-    "errorsTitle": "Errors",
+    "errorsTitle": "Fejl",
     "errorsBody": "Fejl returneres som JSON med en stabil kode og en menneskelig læsbar besked. Koder i dag: MISSING, INVALID, EXPIRED, REVOKED, SCOPE, RATE_LIMITED, NOT_FOUND.",
     "ctaTitle": "Brug for en nøgle?",
     "ctaBody": "Vi auto-tildeler ikke API'et — partnerintegrationer har kommercielle implikationer, som vi gerne vil tale igennem først. Ræk ud, så får du en fungerende nøgle inden for en arbejdsdag.",

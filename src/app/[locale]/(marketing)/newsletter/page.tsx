@@ -1,7 +1,20 @@
+import type { Metadata } from "next";
 import { getTranslations } from "next-intl/server";
 import { Link } from "@/i18n/navigation";
 import { LandingShell } from "@/app/landing-shell";
 import { NewsletterSignup } from "../_components/NewsletterSignup";
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ locale: string }>;
+}): Promise<Metadata> {
+  const { locale } = await params;
+  const t = await getTranslations({ locale, namespace: "landing" });
+  return {
+    title: t("newsletter.statusEyebrow"),
+  };
+}
 
 type Status = "confirmed" | "unsubscribed" | "invalid";
 const KNOWN: Status[] = ["confirmed", "unsubscribed", "invalid"];

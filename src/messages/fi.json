@@ -1150,7 +1150,7 @@
     "signupTitle": "Luo tili",
     "signupSubtitle": "Viisi kenttää. Kysymme lopuista, kun tarvitset niitä.",
     "signupHeadline": "Ilmainen tili. Jokainen natiivititteli, jonka katamme.",
-    "signupLead": "3 000+ titteliä 9 markkinalla, läpinäkyvä hinta, kiinteä tarjous 24 tunnissa. Et sitoudu mihinkään ennen kuin lähetät briefin.",
+    "signupLead": "{count}+ titteliä 9 markkinalla, läpinäkyvä hinta, kiinteä tarjous 24 tunnissa. Et sitoudu mihinkään ennen kuin lähetät briefin.",
     "bulletCatalog": "Natiivi elää siellä, missä lukijat viettävät aikaa: 3–5× lukuaika vs display, lainattu uskottavuus tittelistä, indeksoitu ja pysyvä haussa.",
     "bulletDesk": "Koko katalogi auki, läpinäkyvä hinta. Ei puhelinkierroksia, ei PDF-hinnastoja, ei neljän viikon neuvotteluja.",
     "bulletReports": "Yksi brief. Desk neuvottelee, kirjoittaa, laaduntarkistaa, julkaisee. Sinä hyväksyt.",
@@ -1398,7 +1398,7 @@
     "ratesPriceOnlyNote": "Tällä sivulla muutetaan vain hintoja. Katalogin tila — aktiivinen, varattavissa, näkyvyys — on NativeSpin-deskin hallinnassa."
   },
   "formats": {
-    "metaTitle": "Natiiviformaatit — NativeSpin",
+    "metaTitle": "Natiiviformaatit",
     "eyebrow": "Formaatit",
     "title": "Neljä tapaa tehdä natiivia — valitse sopiva.",
     "lead": "Jokainen julkaisu katalogissamme tukee yhtä tai useampaa näistä neljästä formaatista. Ero on siinä, kenen ääntä maksat ja kuinka näkyvä brändi on.",
@@ -1648,7 +1648,7 @@
   },
   "about": {
     "eyebrow": "Tietoa",
-    "metaTitle": "Tietoa NativeSpinsta",
+    "metaTitle": "Meistä",
     "title": "Natiivi on operatiivisesti tuskallista. Me korjaamme sen.",
     "lead": "NativeSpin on markkinapaikka natiivisisällön ja natiivimainonnan ostamiseen sanoma- ja aikakauslehdistä — mukaan lukien ne monet, jotka eivät myy programmaattisesti.",
     "missionTitle": "Missio",
@@ -1840,7 +1840,7 @@
     "faqTitle": "Usein kysytyt kysymykset"
   },
   "contact": {
-    "metaTitle": "Yhteys NativeSpinen",
+    "metaTitle": "Yhteystiedot",
     "eyebrow": "Yhteystiedot",
     "title": "Ota yhteyttä",
     "lead": "Valitse oikea kanava alta tai käytä lomaketta. Vastaamme jokaiseen viestiin arkipäivän kuluessa.",
@@ -2174,8 +2174,8 @@
     }
   },
   "apiDocs": {
-    "metaTitle": "NativeSpin API",
-    "eyebrow": "Developers",
+    "metaTitle": "API",
+    "eyebrow": "Kehittäjät",
     "title": "NativeSpinin julkinen luettelo-API",
     "lead": "Luku-API NativeSpinin julkaisuluettelon päällä — suunniteltu toimistojen suunnittelutyökaluille (Atlas-tyyliin) ja adtech-kumppaneille, jotka tarvitsevat normalisoidut tarjontatiedot toimitukselliselle natiivisisällölle 9 markkinallamme — Norja, Ruotsi, Tanska, Suomi, Saksa, Itävalta, Sveitsi, Iso-Britannia ja Irlanti.",
     "authTitle": "Tunnistautuminen",
@@ -2187,11 +2187,11 @@
     "queryParams": "Kyselyparametrit",
     "detailBody": "Julkaisukohtainen tieto: kustantaja, markkina (ALV + mainosmerkintäsäännöt) ja jokainen aktiivinen tuote spesifikaatioineen ja hinnoittelusääntöineen.",
     "detailIncludes": "Sisältää spesifikaation sanamääräarvot, mainosmerkinnän mallin, toimitusajan ja suuntaa-antavan perushinnan markkinan valuutassa.",
-    "paginationTitle": "Pagination",
+    "paginationTitle": "Sivutus",
     "paginationBody": "Kursoripohjainen julkaisu-id:n mukaan. Vakaa lajittelu nimellä + id:llä, jotta voit suorittaa täyden synkronoinnin menettämättä rivejä, kun uudet julkaisut aktivoidaan kesken synkronoinnin.",
     "limitsTitle": "Nopeusrajat",
     "limitsBody": "Avainkohtaiset purskeet tasoittuvat saman ämpärin kautta, jota RFQ-virtaus käyttää. 429-vastaus sisältää likimääräisen retry-after-arvon viestin rungossa. Jatkuvasti suurivolyymisille integraatiokumppaneille myönnetään korkeammat rajat — kysy avainta hakiessasi.",
-    "errorsTitle": "Errors",
+    "errorsTitle": "Virheet",
     "errorsBody": "Virheet palautetaan JSON-muodossa pysyvällä koodilla ja luettavalla viestillä. Koodit tällä hetkellä: MISSING, INVALID, EXPIRED, REVOKED, SCOPE, RATE_LIMITED, NOT_FOUND.",
     "ctaTitle": "Tarvitsetko avaimen?",
     "ctaBody": "Emme automaattisesti myönnä API-pääsyä — kumppani-integraatioilla on kaupallisia vaikutuksia, jotka haluamme keskustella ensin. Ota yhteyttä, niin saat toimivan avaimen yhden työpäivän kuluessa.",

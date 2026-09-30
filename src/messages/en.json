@@ -1150,7 +1150,7 @@
     "signupTitle": "Create account",
     "signupSubtitle": "Five fields. We ask for the rest when you need it.",
     "signupHeadline": "Free account. Every native title we cover.",
-    "signupLead": "3,000+ titles across 9 markets, transparent pricing, firm quote in 24 hours. You commit to nothing until you send a brief.",
+    "signupLead": "{count}+ titles across 9 markets, transparent pricing, firm quote in 24 hours. You commit to nothing until you send a brief.",
     "bulletCatalog": "Native lives where readers spend time: 3–5× dwell time vs display, borrowed credibility from the title, indexed and permanent in search.",
     "bulletDesk": "Whole catalog open, transparent pricing. No calling around publishers, no PDF rate cards, no four-week negotiations.",
     "bulletReports": "One brief. The desk negotiates, writes, QAs, publishes. You approve.",
@@ -1398,7 +1398,7 @@
     "ratesPriceOnlyNote": "This page changes prices only. Catalog status — active, bookable, visibility — is managed by the NativeSpin desk."
   },
   "formats": {
-    "metaTitle": "Native formats — NativeSpin",
+    "metaTitle": "Native formats",
     "eyebrow": "Formats",
     "title": "Four ways to run native — pick the one that fits.",
     "lead": "Every title in our catalog supports one or more of these four formats. The difference is whose voice you're paying for and how prominent the brand is.",
@@ -1648,7 +1648,7 @@
   },
   "about": {
     "eyebrow": "About",
-    "metaTitle": "About NativeSpin",
+    "metaTitle": "About us",
     "title": "Native is operationally painful. We fix that.",
     "lead": "NativeSpin is a marketplace for buying native content and native advertising across newspapers and magazines — including the many that don't sell programmatically.",
     "missionTitle": "Mission",
@@ -1840,7 +1840,7 @@
     "faqTitle": "Frequently asked questions"
   },
   "contact": {
-    "metaTitle": "Contact NativeSpin",
+    "metaTitle": "Contact",
     "eyebrow": "Contact",
     "title": "Get in touch",
     "lead": "Pick the right channel below, or use the form. We answer every message within a working day.",
@@ -2174,7 +2174,7 @@
     }
   },
   "apiDocs": {
-    "metaTitle": "NativeSpin API",
+    "metaTitle": "API",
     "eyebrow": "Developers",
     "title": "NativeSpin public catalog API",
     "lead": "A read API over the NativeSpin title catalog — designed for agency planning tools (Atlas-style) and adtech partners that need normalised supply data for editorial native across our 9 markets — Norway, Sweden, Denmark, Finland, Germany, Austria, Switzerland, the UK and Ireland.",

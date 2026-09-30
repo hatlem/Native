@@ -1150,7 +1150,7 @@
     "signupTitle": "Konto erstellen",
     "signupSubtitle": "Fünf Felder. Den Rest fragen wir, wenn Sie ihn brauchen.",
     "signupHeadline": "Kostenloses Konto. Jeder Native-Titel, den wir abdecken.",
-    "signupLead": "3.000+ Titel in 9 Märkten, transparente Preise, festes Angebot in 24 Stunden. Sie verpflichten sich zu nichts, bis Sie ein Brief senden.",
+    "signupLead": "{count}+ Titel in 9 Märkten, transparente Preise, festes Angebot in 24 Stunden. Sie verpflichten sich zu nichts, bis Sie ein Brief senden.",
     "bulletCatalog": "Native lebt dort, wo Leser Zeit verbringen: 3–5× Verweildauer vs. Display, geliehene Glaubwürdigkeit vom Titel, indexiert und dauerhaft in der Suche.",
     "bulletDesk": "Ganzer Katalog offen, transparente Preise. Keine Telefonrunden, keine PDF-Preislisten, keine vierwöchigen Verhandlungen.",
     "bulletReports": "Ein Brief. Der Desk verhandelt, schreibt, prüft, veröffentlicht. Sie genehmigen.",
@@ -1398,7 +1398,7 @@
     "ratesPriceOnlyNote": "Diese Seite ändert nur Preise. Der Katalogstatus — aktiv, buchbar, Sichtbarkeit — wird vom NativeSpin-Desk verwaltet."
   },
   "formats": {
-    "metaTitle": "Native-Formate — NativeSpin",
+    "metaTitle": "Native-Formate",
     "eyebrow": "Formate",
     "title": "Vier Wege, Native zu fahren — wählen Sie den passenden.",
     "lead": "Jeder Titel in unserem Katalog unterstützt eines oder mehrere dieser vier Formate. Der Unterschied liegt darin, wessen Stimme Sie bezahlen — und wie prominent die Marke auftritt.",
@@ -1648,7 +1648,7 @@
   },
   "about": {
     "eyebrow": "Über uns",
-    "metaTitle": "Über NativeSpin",
+    "metaTitle": "Über uns",
     "title": "Native ist operativ schmerzhaft. Wir lösen das.",
     "lead": "NativeSpin ist ein Marktplatz für den Einkauf von Native Content und Native Advertising in Zeitungen und Magazinen — auch in den vielen, die nicht programmatisch verkaufen.",
     "missionTitle": "Mission",
@@ -1840,7 +1840,7 @@
     "faqTitle": "Häufige Fragen"
   },
   "contact": {
-    "metaTitle": "NativeSpin kontaktieren",
+    "metaTitle": "Kontakt",
     "eyebrow": "Kontakt",
     "title": "Kontakt aufnehmen",
     "lead": "Wählen Sie unten den passenden Kanal oder nutzen Sie das Formular. Wir antworten innerhalb eines Werktags auf jede Nachricht.",
@@ -2031,7 +2031,7 @@
     "contactBody": "Fragen zu diesen Bedingungen — schreiben Sie an"
   },
   "apiDocs": {
-    "metaTitle": "NativeSpin API",
+    "metaTitle": "API",
     "eyebrow": "Entwickler",
     "title": "NativeSpins öffentliche Katalog-API",
     "lead": "Eine Lese-API über den NativeSpin-Titelkatalog — entwickelt für Agentur-Planungstools (Atlas-Stil) und Adtech-Partner, die normalisierte Bestandsdaten für redaktionelles Native über unsere 9 Märkte hinweg benötigen — Norwegen, Schweden, Dänemark, Finnland, Deutschland, Österreich, Schweiz, Großbritannien und Irland.",
@@ -2044,7 +2044,7 @@
     "queryParams": "Query-Parameter",
     "detailBody": "Per-Titel-Detail: Verlag, Markt (mit MwSt. + Kennzeichnungsregeln) und jedes aktive Produkt mit Spec- und Preisregel-Stufen.",
     "detailIncludes": "Enthält Wortzahlgrenzen der Specs, Vorlage für das Kennzeichnungs-Label, Vorlaufzeit und Richt-Grundpreis in der Marktwährung.",
-    "paginationTitle": "Pagination",
+    "paginationTitle": "Paginierung",
     "paginationBody": "Cursor-basiert auf der Titel-ID. Stabile Sortierung nach Name + ID, sodass Sie eine vollständige Synchronisierung durchführen können, ohne Zeilen zu verpassen, wenn neue Titel mitten in der Synchronisierung aktiviert werden.",
     "limitsTitle": "Rate Limits",
     "limitsBody": "Pro-Schlüssel-Bursts werden über denselben Bucket geglättet, den der RFQ-Flow verwendet. Eine 429-Antwort enthält ein ungefähres retry-after im Nachrichtentext. Daueranbietern mit hohem Durchsatz werden höhere Limits gewährt — fragen Sie danach, wenn Sie einen Schlüssel anfordern.",
