@@ -326,13 +326,14 @@
     "exportCsv": "Last ned katalogen (CSV)",
     "exportCsvMarket": "Last ned titler i {market} (CSV)",
     "noMatchHeading": "Ingen treff",
-    "searchSomeWords": "Ingen titler matcher alle ordene i «{q}», så disse matcher noen av dem."
+    "searchSomeWords": "Ingen titler matcher alle ordene i «{q}», så disse matcher noen av dem.",
+    "exportCsvFiltered": "{count, plural, =0 {Last ned treffene (CSV)} one {Last ned denne tittelen (CSV)} other {Last ned disse # titlene (CSV)}}"
   },
   "lists": {
     "title": "Lagrede lister",
     "empty": "Ingen lagrede lister ennå. Legg til en publikasjon eller plassering for å starte en.",
     "name": "Liste",
-    "items": "Elementer",
+    "items": "Plasseringer",
     "lastSubmittedHeading": "Sist sendt",
     "itemCount": "{count, plural, =0 {0 elementer} =1 {1 element} other {# elementer}}",
     "lastSubmitted": "Sist sendt {date}",
@@ -348,7 +349,9 @@
     "archivedOn": "arkivert {date}",
     "restore": "Gjenopprett",
     "emptyCta": "Utforsk katalogen",
-    "emptySecondaryCta": "Start en plan"
+    "emptySecondaryCta": "Start en plan",
+    "placementCount": "{count, plural, =0 {Ingen plasseringer} one {# plassering} other {# plasseringer}}",
+    "alternativeCount": "+ {count, plural, one {# alternativ} other {# alternativer}}"
   },
   "favorites": {
     "title": "Favoritter",
@@ -384,7 +387,13 @@
     "sharedCollectionsHeading": "Samlinger delt med deg",
     "collectionUnavailable": "Den samlingen er ikke lenger tilgjengelig.",
     "addToCollection": "Samling",
-    "addToCollectionSubmit": "Legg i samling"
+    "addToCollectionSubmit": "Legg i samling",
+    "inCollections": "I:",
+    "removeFromCollection": "Fjern fra {name}",
+    "inAllCollections": "Ligger i alle samlingene dine.",
+    "addedToCollection": "Lagt i {name}.",
+    "alreadyInCollection": "Ligger allerede i {name}.",
+    "collectionAddFailed": "Det gikk ikke. Last inn siden på nytt og prøv igjen."
   },
   "titleDetail": {
     "back": "Tilbake til katalogen",
@@ -634,7 +643,9 @@
         "monthlyCycle": "Planen inneholder månedstitler, så rundene ligger åtte uker fra hverandre – omtrent annenhver utgave.",
         "weeklyCycle": "Alle titlene dine kommer ut ukentlig, så rundene kan ligge fire uker fra hverandre uten å slite seg ut.",
         "launch": "Dette ser ut som en lansering: fire tettere runder bygger fart rundt datoen.",
-        "awareness": "Kjennskap bygges sakte – rundene ligger litt lenger fra hverandre så hver artikkel får lande for seg selv."
+        "awareness": "Kjennskap bygges sakte – rundene ligger litt lenger fra hverandre så hver artikkel får lande for seg selv.",
+        "custom": "Du har valgt {waves} runder med {weeks} ukers mellomrom. Forslaget vårt for denne planen var {recWaves} runder med {recWeeks} ukers mellomrom.",
+        "monthRounding": "Månedstitler bookes i hele måneder, så rundene starter {months, plural, one {én måned} other {# måneder}} fra hverandre."
       },
       "preview": "fra {date}",
       "start": "Opprett program",
@@ -729,7 +740,8 @@
       "item3Body": "Utkast sendes til deg for godkjenning. Lenker og resultater havner i Rapporter."
     },
     "breakdownQtyWithArticleFee": "{n} × {unit} plassering + {article} per artikkel (én artikkel for alle {n})",
-    "noticePlanReadOnly": "Du har bare lesetilgang til denne planen, så ingenting ble endret."
+    "noticePlanReadOnly": "Du har bare lesetilgang til denne planen, så ingenting ble endret.",
+    "runPeriod": "{range} · {unit, select, WEEK {{n, plural, one {# uke} other {# uker}}} other {{n, plural, one {# måned} other {# måneder}}}}"
   },
   "rfq": {
     "org": "Selskap",
@@ -858,7 +870,11 @@
     "quoteRevisionNote": "Revisjon {revision} – erstatter tilbudet du fikk tidligere.",
     "supersededEyebrow": "Tidligere versjoner",
     "supersededRow": "Revisjon {revision} ({total}) gjelder ikke lenger.",
-    "supersededBy": "Se revisjon {revision} →"
+    "supersededBy": "Se revisjon {revision} →",
+    "metaPlanAlternativesOnly": "Ingen plasseringer ennå · {alternatives, plural, one {# alternativ} other {# alternativer}} · redigert {age}",
+    "actionContinuePlan": "Fortsett planen",
+    "qualifierAwaitingTeam": "venter på noen med bestillingsrett",
+    "actionSeeQuote": "Se tilbudet"
   },
   "desk": {
     "eyebrow": "Internt desk",
@@ -2480,7 +2496,15 @@
     "scope_catalog_write": "laste opp utgiverens egne titler og produkter",
     "scope_orders_write": "legge inn faste bestillinger for organisasjonen",
     "scope_pricing_admin": "interne prisverktøy (MCP) — kun plattform",
-    "boundPublisher": "{name} (utgiver)"
+    "boundPublisher": "{name} (utgiver)",
+    "bindingPlatformGroup": "Plattform",
+    "bindingSearchPlaceholder": "Søk etter organisasjon eller utgiver på navn, marked eller tittel",
+    "bindingNoMatch": "Ingen treff.",
+    "bindingMore": "{count, plural, one {# treff til} other {# treff til}} – skriv mer for å snevre inn",
+    "bindingAdvertiser": "Annonsør",
+    "bindingAgency": "Byrå",
+    "bindingMoreTitles": "+{count} til",
+    "bindingNoTitles": "ingen titler ennå"
   },
   "quoteNarrative": {
     "sectionCampaign": "Din kampanje",
@@ -3309,7 +3333,6 @@
     "plusOnRequest": "+ linjer prises på forespørsel",
     "disclaimer": "Veiledende priser – et fast tilbud bekrefter endelig pris før noe bestilles.",
     "footer": "Laget med NativeSpin – native annonsering i ledende aviser og fagpresse.",
-    "from": "Fra {date}",
     "approveHint": "Fornøyd med titler, timing og budsjett? Godkjenning gir kontakten din beskjed om å sende planen videre – ingenting bestilles eller belastes av dette.",
     "approveCta": "Godkjenn planen",
     "approvedAt": "Planen ble godkjent {date}. Kontakten din tar det videre herfra.",
@@ -3664,5 +3687,10 @@
   "viewOnly": {
     "title": "Bare lesetilgang",
     "body": "Du ser alt teamet ditt har her, men kan ikke endre noe. Spør en administrator hvis du trenger å redigere, sende eller godta."
+  },
+  "briefTargeting": {
+    "audience": "Målgruppe",
+    "geo": "Geografi",
+    "context": "Redaksjonell kontekst"
   }
 }

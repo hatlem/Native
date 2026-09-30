@@ -326,13 +326,14 @@
     "exportCsv": "Ladda ner katalogen (CSV)",
     "exportCsvMarket": "Ladda ner titlar i {market} (CSV)",
     "noMatchHeading": "Inga träffar",
-    "searchSomeWords": "Ingen titel matchar alla ord i ”{q}”, så de här matchar några av dem."
+    "searchSomeWords": "Ingen titel matchar alla ord i ”{q}”, så de här matchar några av dem.",
+    "exportCsvFiltered": "{count, plural, =0 {Ladda ner träffarna (CSV)} one {Ladda ner den här titeln (CSV)} other {Ladda ner de här # titlarna (CSV)}}"
   },
   "lists": {
     "title": "Sparade listor",
     "empty": "Inga sparade listor ännu. Lägg till en publikation eller placering för att börja.",
     "name": "Lista",
-    "items": "Objekt",
+    "items": "Placeringar",
     "lastSubmittedHeading": "Senast skickad",
     "itemCount": "{count, plural, =0 {0 objekt} =1 {1 objekt} other {# objekt}}",
     "lastSubmitted": "Senast skickad {date}",
@@ -348,7 +349,9 @@
     "archivedOn": "arkiverad {date}",
     "restore": "Återställ",
     "emptyCta": "Utforska katalogen",
-    "emptySecondaryCta": "Starta en plan"
+    "emptySecondaryCta": "Starta en plan",
+    "placementCount": "{count, plural, =0 {Inga placeringar} one {# placering} other {# placeringar}}",
+    "alternativeCount": "+ {count, plural, one {# alternativ} other {# alternativ}}"
   },
   "favorites": {
     "title": "Favoriter",
@@ -384,7 +387,13 @@
     "sharedCollectionsHeading": "Samlingar som delats med dig",
     "collectionUnavailable": "Den samlingen är inte längre tillgänglig.",
     "addToCollection": "Samling",
-    "addToCollectionSubmit": "Lägg i samling"
+    "addToCollectionSubmit": "Lägg i samling",
+    "inCollections": "I:",
+    "removeFromCollection": "Ta bort från {name}",
+    "inAllCollections": "Finns i alla dina samlingar.",
+    "addedToCollection": "Tillagd i {name}.",
+    "alreadyInCollection": "Finns redan i {name}.",
+    "collectionAddFailed": "Det gick inte. Ladda om sidan och försök igen."
   },
   "titleDetail": {
     "back": "Tillbaka till katalogen",
@@ -634,7 +643,9 @@
         "monthlyCycle": "Planen innehåller månadstitlar, så omgångarna ligger åtta veckor isär – ungefär varannan utgåva.",
         "weeklyCycle": "Alla era titlar utkommer varje vecka, så omgångarna kan ligga fyra veckor isär utan att slitas ut.",
         "launch": "Det här ser ut som en lansering: fyra tätare omgångar bygger fart kring datumet.",
-        "awareness": "Kännedom byggs långsamt – omgångarna ligger lite glesare så att varje artikel får landa för sig."
+        "awareness": "Kännedom byggs långsamt – omgångarna ligger lite glesare så att varje artikel får landa för sig.",
+        "custom": "Du har valt {waves} omgångar med {weeks} veckors mellanrum. Vårt förslag för den här planen var {recWaves} omgångar med {recWeeks} veckors mellanrum.",
+        "monthRounding": "Månadstitlar bokas i hela månader, så omgångarna startar med {months, plural, one {en månads} other {# månaders}} mellanrum."
       },
       "preview": "från {date}",
       "start": "Skapa program",
@@ -729,7 +740,8 @@
       "item3Body": "Utkast skickas till dig för godkännande. Länkar och resultat hamnar i Rapporter."
     },
     "breakdownQtyWithArticleFee": "{n} × {unit} placering + {article} per artikel (en artikel för alla {n})",
-    "noticePlanReadOnly": "Du har bara läsbehörighet till den här planen, så inget ändrades."
+    "noticePlanReadOnly": "Du har bara läsbehörighet till den här planen, så inget ändrades.",
+    "runPeriod": "{range} · {unit, select, WEEK {{n, plural, one {# vecka} other {# veckor}}} other {{n, plural, one {# månad} other {# månader}}}}"
   },
   "rfq": {
     "org": "Företag",
@@ -858,7 +870,11 @@
     "quoteRevisionNote": "Version {revision} – ersätter offerten du fick tidigare.",
     "supersededEyebrow": "Tidigare versioner",
     "supersededRow": "Version {revision} ({total}) gäller inte längre.",
-    "supersededBy": "Se version {revision} →"
+    "supersededBy": "Se version {revision} →",
+    "metaPlanAlternativesOnly": "Inga placeringar än · {alternatives, plural, one {# alternativ} other {# alternativ}} · ändrad {age}",
+    "actionContinuePlan": "Fortsätt planera",
+    "qualifierAwaitingTeam": "väntar på någon med beställningsrätt",
+    "actionSeeQuote": "Visa offerten"
   },
   "desk": {
     "eyebrow": "Internt desk",
@@ -2480,7 +2496,15 @@
     "scope_catalog_write": "ladda upp utgivarens egna titlar och produkter",
     "scope_orders_write": "lägga fasta beställningar för organisationen",
     "scope_pricing_admin": "interna prisverktyg (MCP) — endast plattform",
-    "boundPublisher": "{name} (utgivare)"
+    "boundPublisher": "{name} (utgivare)",
+    "bindingPlatformGroup": "Plattform",
+    "bindingSearchPlaceholder": "Sök organisation eller utgivare på namn, marknad eller titel",
+    "bindingNoMatch": "Inga träffar.",
+    "bindingMore": "{count, plural, one {# träff till} other {# träffar till}} – skriv mer för att snäva in",
+    "bindingAdvertiser": "Annonsör",
+    "bindingAgency": "Byrå",
+    "bindingMoreTitles": "+{count} till",
+    "bindingNoTitles": "inga titlar än"
   },
   "quoteNarrative": {
     "sectionCampaign": "Din kampanj",
@@ -3309,7 +3333,6 @@
     "plusOnRequest": "+ rader prissätts på förfrågan",
     "disclaimer": "Riktpriser – en fast offert bekräftar slutligt pris innan något bokas.",
     "footer": "Skapad med NativeSpin – native advertising i ledande tidningar och fackpress.",
-    "from": "Från {date}",
     "approveHint": "Nöjd med titlar, timing och budget? Ett godkännande säger till din kontakt att skicka planen vidare – inget bokas eller debiteras av detta.",
     "approveCta": "Godkänn planen",
     "approvedAt": "Planen godkändes {date}. Din kontakt tar det vidare härifrån.",
@@ -3664,5 +3687,10 @@
   "viewOnly": {
     "title": "Endast läsbehörighet",
     "body": "Du ser allt ditt team har här, men kan inte ändra något. Fråga en administratör om du behöver redigera, skicka eller godkänna."
+  },
+  "briefTargeting": {
+    "audience": "Målgrupp",
+    "geo": "Geografi",
+    "context": "Redaktionell kontext"
   }
 }

@@ -464,7 +464,8 @@
     "exportCsv": "Download catalog (CSV)",
     "exportCsvMarket": "Download {market} titles (CSV)",
     "noMatchHeading": "No titles match",
-    "searchSomeWords": "No title matches every word of “{q}”, so these match some of them."
+    "searchSomeWords": "No title matches every word of “{q}”, so these match some of them.",
+    "exportCsvFiltered": "{count, plural, =0 {Download results (CSV)} one {Download this title (CSV)} other {Download these # titles (CSV)}}"
   },
   "titleDetail": {
     "back": "Back to catalog",
@@ -569,7 +570,7 @@
     "title": "Saved lists",
     "empty": "No saved lists yet. Add a publication or placement to start one.",
     "name": "List",
-    "items": "Items",
+    "items": "Placements",
     "lastSubmittedHeading": "Last submitted",
     "itemCount": "{count, plural, =0 {0 items} =1 {1 item} other {# items}}",
     "lastSubmitted": "Last submitted {date}",
@@ -585,7 +586,9 @@
     "archivedOn": "archived {date}",
     "restore": "Restore",
     "emptyCta": "Browse the catalog",
-    "emptySecondaryCta": "Start a plan"
+    "emptySecondaryCta": "Start a plan",
+    "placementCount": "{count, plural, =0 {No placements} one {# placement} other {# placements}}",
+    "alternativeCount": "+ {count, plural, one {# alternative} other {# alternatives}}"
   },
   "favorites": {
     "title": "Favorites",
@@ -621,7 +624,13 @@
     "sharedCollectionsHeading": "Collections shared with you",
     "collectionUnavailable": "That collection is no longer available.",
     "addToCollection": "Collection",
-    "addToCollectionSubmit": "Add to collection"
+    "addToCollectionSubmit": "Add to collection",
+    "inCollections": "In:",
+    "removeFromCollection": "Remove from {name}",
+    "inAllCollections": "In all your collections.",
+    "addedToCollection": "Added to {name}.",
+    "alreadyInCollection": "Already in {name}.",
+    "collectionAddFailed": "Couldn't add it. Reload the page and try again."
   },
   "plan": {
     "eyebrow": "Plan",
@@ -772,7 +781,9 @@
         "monthlyCycle": "Your plan includes monthly titles, so waves are spaced eight weeks apart — roughly every second issue.",
         "weeklyCycle": "All your titles publish weekly, so waves can sit four weeks apart without wearing out.",
         "launch": "This reads like a launch: four tighter waves build momentum around the date.",
-        "awareness": "Awareness builds slowly — waves are spaced a little wider so each article lands on its own."
+        "awareness": "Awareness builds slowly — waves are spaced a little wider so each article lands on its own.",
+        "custom": "You've picked {waves} waves, {weeks} weeks apart. Our suggestion for this plan was {recWaves} waves, {recWeeks} weeks apart.",
+        "monthRounding": "Monthly titles are booked in whole months, so the waves start {months, plural, one {one month} other {# months}} apart."
       },
       "preview": "from {date}",
       "start": "Create programme",
@@ -867,7 +878,8 @@
       "item3Body": "Drafts come to you for approval. Live links and performance land in Reports."
     },
     "breakdownQtyWithArticleFee": "{n} × {unit} placement + {article} per article (one article for all {n})",
-    "noticePlanReadOnly": "You have view-only access to this plan, so nothing was changed."
+    "noticePlanReadOnly": "You have view-only access to this plan, so nothing was changed.",
+    "runPeriod": "{range} · {unit, select, WEEK {{n, plural, one {# week} other {# weeks}}} other {{n, plural, one {# month} other {# months}}}}"
   },
   "rfq": {
     "org": "Company",
@@ -996,7 +1008,11 @@
     "quoteRevisionNote": "Revision {revision} — replaces the quote you received earlier.",
     "supersededEyebrow": "Earlier versions",
     "supersededRow": "Revision {revision} ({total}) is no longer valid.",
-    "supersededBy": "See revision {revision} →"
+    "supersededBy": "See revision {revision} →",
+    "metaPlanAlternativesOnly": "No placements yet · {alternatives, plural, one {# alternative} other {# alternatives}} · edited {age}",
+    "actionContinuePlan": "Continue planning",
+    "qualifierAwaitingTeam": "waiting on someone with ordering rights",
+    "actionSeeQuote": "See quote"
   },
   "desk": {
     "eyebrow": "Internal desk",
@@ -2480,7 +2496,15 @@
     "scope_catalog_write": "upload the publisher's own titles and products",
     "scope_orders_write": "place firm orders for the organisation",
     "scope_pricing_admin": "internal pricing tools (MCP) — platform only",
-    "boundPublisher": "{name} (publisher)"
+    "boundPublisher": "{name} (publisher)",
+    "bindingPlatformGroup": "Platform",
+    "bindingSearchPlaceholder": "Search organisations and publishers by name, market or title",
+    "bindingNoMatch": "Nothing matches that.",
+    "bindingMore": "{count, plural, one {# more match} other {# more matches}} — keep typing to narrow it down",
+    "bindingAdvertiser": "Advertiser",
+    "bindingAgency": "Agency",
+    "bindingMoreTitles": "+{count} more",
+    "bindingNoTitles": "no titles yet"
   },
   "quoteNarrative": {
     "sectionCampaign": "Your campaign",
@@ -3309,7 +3333,6 @@
     "plusOnRequest": "+ items priced on request",
     "disclaimer": "Indicative prices — a firm quote confirms final pricing before anything is booked.",
     "footer": "Prepared with NativeSpin — native advertising in premium newspapers and trade press.",
-    "from": "From {date}",
     "approveHint": "Happy with titles, timing and budget? Approving tells your contact to send the plan on — nothing is booked or charged by this.",
     "approveCta": "Approve this plan",
     "approvedAt": "Plan approved {date}. Your contact takes it from here.",
@@ -3664,5 +3687,10 @@
   "viewOnly": {
     "title": "View-only access",
     "body": "You can see everything your team has here, but not change it. Ask an administrator if you need to edit, send or accept."
+  },
+  "briefTargeting": {
+    "audience": "Audience",
+    "geo": "Geography",
+    "context": "Editorial context"
   }
 }

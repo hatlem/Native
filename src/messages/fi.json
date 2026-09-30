@@ -464,13 +464,14 @@
     "exportCsv": "Lataa luettelo (CSV)",
     "exportCsvMarket": "Lataa julkaisut: {market} (CSV)",
     "noMatchHeading": "Ei osumia",
-    "searchSomeWords": "Mikään julkaisu ei vastaa kaikkia hakusanoja ”{q}”, joten nämä vastaavat osaa niistä."
+    "searchSomeWords": "Mikään julkaisu ei vastaa kaikkia hakusanoja ”{q}”, joten nämä vastaavat osaa niistä.",
+    "exportCsvFiltered": "{count, plural, =0 {Lataa tulokset (CSV)} one {Lataa tämä julkaisu (CSV)} other {Lataa nämä # julkaisua (CSV)}}"
   },
   "lists": {
     "title": "Tallennetut listat",
     "empty": "Ei tallennettuja listoja vielä. Aloita lisäämällä julkaisu tai mainospaikka.",
     "name": "Lista",
-    "items": "Kohteet",
+    "items": "Sijoittelut",
     "lastSubmittedHeading": "Viimeksi lähetetty",
     "itemCount": "{count, plural, =0 {0 kohdetta} =1 {1 kohde} other {# kohdetta}}",
     "lastSubmitted": "Viimeksi lähetetty {date}",
@@ -486,7 +487,9 @@
     "archivedOn": "arkistoitu {date}",
     "restore": "Palauta",
     "emptyCta": "Selaa katalogia",
-    "emptySecondaryCta": "Aloita suunnitelma"
+    "emptySecondaryCta": "Aloita suunnitelma",
+    "placementCount": "{count, plural, =0 {Ei sijoitteluja} one {# sijoittelu} other {# sijoittelua}}",
+    "alternativeCount": "+ {count, plural, one {# vaihtoehto} other {# vaihtoehtoa}}"
   },
   "favorites": {
     "title": "Suosikit",
@@ -522,7 +525,13 @@
     "sharedCollectionsHeading": "Sinulle jaetut kokoelmat",
     "collectionUnavailable": "Kokoelma ei ole enää saatavilla.",
     "addToCollection": "Kokoelma",
-    "addToCollectionSubmit": "Lisää kokoelmaan"
+    "addToCollectionSubmit": "Lisää kokoelmaan",
+    "inCollections": "Kokoelmissa:",
+    "removeFromCollection": "Poista kokoelmasta {name}",
+    "inAllCollections": "On jo kaikissa kokoelmissasi.",
+    "addedToCollection": "Lisätty kokoelmaan {name}.",
+    "alreadyInCollection": "On jo kokoelmassa {name}.",
+    "collectionAddFailed": "Lisääminen ei onnistunut. Lataa sivu uudelleen ja yritä uudestaan."
   },
   "titleDetail": {
     "back": "Takaisin katalogiin",
@@ -772,7 +781,9 @@
         "monthlyCycle": "Suunnitelmassa on kuukausijulkaisuja, joten kierrokset ovat kahdeksan viikon välein – noin joka toinen numero.",
         "weeklyCycle": "Kaikki julkaisunne ilmestyvät viikoittain, joten kierrokset voivat olla neljän viikon välein kulumatta.",
         "launch": "Tämä näyttää lanseeraukselta: neljä tiheämpää kierrosta rakentaa vauhtia päivämäärän ympärille.",
-        "awareness": "Tunnettuus rakentuu hitaasti – kierrokset ovat hieman harvemmassa, jotta jokainen artikkeli saa laskeutua omillaan."
+        "awareness": "Tunnettuus rakentuu hitaasti – kierrokset ovat hieman harvemmassa, jotta jokainen artikkeli saa laskeutua omillaan.",
+        "custom": "Valitsit {waves} kierrosta {weeks} viikon välein. Ehdotimme tälle suunnitelmalle {recWaves} kierrosta {recWeeks} viikon välein.",
+        "monthRounding": "Kuukausijulkaisut varataan kokonaisina kuukausina, joten kierrokset alkavat {months, plural, one {kuukauden} other {# kuukauden}} välein."
       },
       "preview": "alkaen {date}",
       "start": "Luo ohjelma",
@@ -867,7 +878,8 @@
       "item3Body": "Luonnokset tulevat sinulle hyväksyttäviksi. Linkit ja tulokset löytyvät Raporteista."
     },
     "breakdownQtyWithArticleFee": "{n} × {unit} sijoittelu + {article} / artikkeli (yksi artikkeli kaikkiin {n})",
-    "noticePlanReadOnly": "Sinulla on tähän suunnitelmaan vain lukuoikeus, joten mitään ei muutettu."
+    "noticePlanReadOnly": "Sinulla on tähän suunnitelmaan vain lukuoikeus, joten mitään ei muutettu.",
+    "runPeriod": "{range} · {unit, select, WEEK {{n, plural, one {# viikko} other {# viikkoa}}} other {{n, plural, one {# kuukausi} other {# kuukautta}}}}"
   },
   "rfq": {
     "org": "Yritys",
@@ -996,7 +1008,11 @@
     "quoteRevisionNote": "Versio {revision} – korvaa aiemmin saamasi tarjouksen.",
     "supersededEyebrow": "Aiemmat versiot",
     "supersededRow": "Versio {revision} ({total}) ei ole enää voimassa.",
-    "supersededBy": "Katso versio {revision} →"
+    "supersededBy": "Katso versio {revision} →",
+    "metaPlanAlternativesOnly": "Ei vielä sijoitteluja · {alternatives, plural, one {# vaihtoehto} other {# vaihtoehtoa}} · muokattu {age}",
+    "actionContinuePlan": "Jatka suunnittelua",
+    "qualifierAwaitingTeam": "odottaa tilausoikeudellista henkilöä",
+    "actionSeeQuote": "Näytä tarjous"
   },
   "desk": {
     "eyebrow": "Sisäinen desk",
@@ -2480,7 +2496,15 @@
     "scope_catalog_write": "ladata kustantajan omat julkaisut ja tuotteet",
     "scope_orders_write": "tehdä sitovia tilauksia organisaation puolesta",
     "scope_pricing_admin": "sisäiset hinnoittelutyökalut (MCP) — vain alusta",
-    "boundPublisher": "{name} (kustantaja)"
+    "boundPublisher": "{name} (kustantaja)",
+    "bindingPlatformGroup": "Alusta",
+    "bindingSearchPlaceholder": "Hae organisaatiota tai kustantajaa nimellä, markkinalla tai julkaisulla",
+    "bindingNoMatch": "Ei osumia.",
+    "bindingMore": "{count, plural, one {# osuma lisää} other {# osumaa lisää}} – tarkenna hakua",
+    "bindingAdvertiser": "Mainostaja",
+    "bindingAgency": "Toimisto",
+    "bindingMoreTitles": "+{count} muuta",
+    "bindingNoTitles": "ei vielä julkaisuja"
   },
   "quoteNarrative": {
     "sectionCampaign": "Kampanjasi",
@@ -3309,7 +3333,6 @@
     "plusOnRequest": "+ rivejä hinnoitellaan pyynnöstä",
     "disclaimer": "Suuntaa antavat hinnat – kiinteä tarjous vahvistaa lopullisen hinnan ennen varauksia.",
     "footer": "Tehty NativeSpinillä – native-mainontaa johtavissa lehdissä ja ammattimediassa.",
-    "from": "Alkaen {date}",
     "approveHint": "Tyytyväinen julkaisuihin, ajoitukseen ja budjettiin? Hyväksyntä kertoo yhteyshenkilöllesi, että suunnitelman voi lähettää eteenpäin – mitään ei varata eikä veloiteta tästä.",
     "approveCta": "Hyväksy suunnitelma",
     "approvedAt": "Suunnitelma hyväksyttiin {date}. Yhteyshenkilösi jatkaa tästä.",
@@ -3664,5 +3687,10 @@
   "viewOnly": {
     "title": "Vain lukuoikeus",
     "body": "Näet kaiken, mitä tiimilläsi on täällä, mutta et voi muuttaa sitä. Pyydä ylläpitäjää, jos sinun täytyy muokata, lähettää tai hyväksyä."
+  },
+  "briefTargeting": {
+    "audience": "Kohderyhmä",
+    "geo": "Maantiede",
+    "context": "Toimituksellinen konteksti"
   }
 }

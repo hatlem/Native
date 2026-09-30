@@ -159,7 +159,9 @@ function CollectionControl({
       ) : (
         <p className="muted small">{t("inAllCollections")}</p>
       )}
-      {state ? (
+      {/* "Added to X" only while it is still in X: removing it from the
+          chip afterwards must not leave a stale confirmation behind. */}
+      {state && (state.outcome === "unavailable" || (state.listId && member.has(state.listId))) ? (
         <p
           className={`favorite-collections__status${state.outcome === "unavailable" ? " is-error" : ""}`}
           role="status"

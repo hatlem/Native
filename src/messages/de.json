@@ -464,13 +464,14 @@
     "exportCsv": "Katalog herunterladen (CSV)",
     "exportCsvMarket": "Titel in {market} herunterladen (CSV)",
     "noMatchHeading": "Keine Treffer",
-    "searchSomeWords": "Kein Titel passt zu allen Wörtern von „{q}“, diese passen zu einigen davon."
+    "searchSomeWords": "Kein Titel passt zu allen Wörtern von „{q}“, diese passen zu einigen davon.",
+    "exportCsvFiltered": "{count, plural, =0 {Treffer herunterladen (CSV)} one {Diesen Titel herunterladen (CSV)} other {Diese # Titel herunterladen (CSV)}}"
   },
   "lists": {
     "title": "Gespeicherte Listen",
     "empty": "Noch keine gespeicherten Listen. Fügen Sie eine Publikation oder Platzierung hinzu, um zu beginnen.",
     "name": "Liste",
-    "items": "Elemente",
+    "items": "Platzierungen",
     "lastSubmittedHeading": "Zuletzt gesendet",
     "itemCount": "{count, plural, =0 {0 Elemente} =1 {1 Element} other {# Elemente}}",
     "lastSubmitted": "Zuletzt gesendet {date}",
@@ -486,7 +487,9 @@
     "archivedOn": "archiviert am {date}",
     "restore": "Wiederherstellen",
     "emptyCta": "Katalog durchsuchen",
-    "emptySecondaryCta": "Plan beginnen"
+    "emptySecondaryCta": "Plan beginnen",
+    "placementCount": "{count, plural, =0 {Keine Platzierungen} one {# Platzierung} other {# Platzierungen}}",
+    "alternativeCount": "+ {count, plural, one {# Alternative} other {# Alternativen}}"
   },
   "favorites": {
     "title": "Favoriten",
@@ -522,7 +525,13 @@
     "sharedCollectionsHeading": "Mit Ihnen geteilte Sammlungen",
     "collectionUnavailable": "Diese Sammlung ist nicht mehr verfügbar.",
     "addToCollection": "Sammlung",
-    "addToCollectionSubmit": "Zur Sammlung hinzufügen"
+    "addToCollectionSubmit": "Zur Sammlung hinzufügen",
+    "inCollections": "In:",
+    "removeFromCollection": "Aus {name} entfernen",
+    "inAllCollections": "In all Ihren Sammlungen.",
+    "addedToCollection": "Zu {name} hinzugefügt.",
+    "alreadyInCollection": "Schon in {name}.",
+    "collectionAddFailed": "Das hat nicht geklappt. Laden Sie die Seite neu und versuchen Sie es noch einmal."
   },
   "titleDetail": {
     "back": "Zurück zum Katalog",
@@ -772,7 +781,9 @@
         "monthlyCycle": "Ihr Plan enthält Monatstitel, deshalb liegen die Wellen acht Wochen auseinander – etwa jede zweite Ausgabe.",
         "weeklyCycle": "Alle Ihre Titel erscheinen wöchentlich, deshalb können die Wellen vier Wochen auseinanderliegen, ohne sich abzunutzen.",
         "launch": "Das klingt nach einem Launch: vier dichtere Wellen bauen Schwung rund um den Termin auf.",
-        "awareness": "Bekanntheit wächst langsam – die Wellen liegen etwas weiter auseinander, damit jeder Artikel für sich landet."
+        "awareness": "Bekanntheit wächst langsam – die Wellen liegen etwas weiter auseinander, damit jeder Artikel für sich landet.",
+        "custom": "Sie haben {waves} Wellen im Abstand von {weeks} Wochen gewählt. Unser Vorschlag für diesen Plan waren {recWaves} Wellen im Abstand von {recWeeks} Wochen.",
+        "monthRounding": "Monatstitel werden in ganzen Monaten gebucht, deshalb starten die Wellen im Abstand von {months, plural, one {einem Monat} other {# Monaten}}."
       },
       "preview": "ab {date}",
       "start": "Programm anlegen",
@@ -867,7 +878,8 @@
       "item3Body": "Entwürfe kommen zur Freigabe zu Ihnen. Links und Ergebnisse landen in den Berichten."
     },
     "breakdownQtyWithArticleFee": "{n} × {unit} Platzierung + {article} pro Artikel (ein Artikel für alle {n})",
-    "noticePlanReadOnly": "Sie haben für diesen Plan nur Leserechte, daher wurde nichts geändert."
+    "noticePlanReadOnly": "Sie haben für diesen Plan nur Leserechte, daher wurde nichts geändert.",
+    "runPeriod": "{range} · {unit, select, WEEK {{n, plural, one {# Woche} other {# Wochen}}} other {{n, plural, one {# Monat} other {# Monate}}}}"
   },
   "rfq": {
     "org": "Firma",
@@ -996,7 +1008,11 @@
     "quoteRevisionNote": "Version {revision} – ersetzt das Angebot, das Sie zuvor erhalten haben.",
     "supersededEyebrow": "Frühere Versionen",
     "supersededRow": "Version {revision} ({total}) ist nicht mehr gültig.",
-    "supersededBy": "Zu Version {revision} →"
+    "supersededBy": "Zu Version {revision} →",
+    "metaPlanAlternativesOnly": "Noch keine Platzierungen · {alternatives, plural, one {# Alternative} other {# Alternativen}} · bearbeitet {age}",
+    "actionContinuePlan": "Weiter planen",
+    "qualifierAwaitingTeam": "wartet auf jemanden mit Bestellberechtigung",
+    "actionSeeQuote": "Angebot ansehen"
   },
   "desk": {
     "eyebrow": "Interner Desk",
@@ -2337,7 +2353,15 @@
     "scope_catalog_write": "eigene Titel und Produkte des Verlags hochladen",
     "scope_orders_write": "verbindliche Bestellungen für die Organisation aufgeben",
     "scope_pricing_admin": "interne Preis-Tools (MCP) — nur Plattform",
-    "boundPublisher": "{name} (Verlag)"
+    "boundPublisher": "{name} (Verlag)",
+    "bindingPlatformGroup": "Plattform",
+    "bindingSearchPlaceholder": "Organisation oder Verlag nach Name, Markt oder Titel suchen",
+    "bindingNoMatch": "Keine Treffer.",
+    "bindingMore": "{count, plural, one {# weiterer Treffer} other {# weitere Treffer}} – weiter tippen, um einzugrenzen",
+    "bindingAdvertiser": "Werbetreibender",
+    "bindingAgency": "Agentur",
+    "bindingMoreTitles": "+{count} weitere",
+    "bindingNoTitles": "noch keine Titel"
   },
   "quoteNarrative": {
     "sectionCampaign": "Ihre Kampagne",
@@ -3178,7 +3202,6 @@
     "plusOnRequest": "+ Positionen auf Anfrage",
     "disclaimer": "Richtpreise – ein verbindliches Angebot bestätigt den Endpreis, bevor etwas gebucht wird.",
     "footer": "Erstellt mit NativeSpin – Native Advertising in führenden Zeitungen und Fachmedien.",
-    "from": "Ab {date}",
     "approveHint": "Zufrieden mit Titeln, Timing und Budget? Die Freigabe signalisiert Ihrem Kontakt, den Plan weiterzuschicken – nichts wird dadurch gebucht oder berechnet.",
     "approveCta": "Plan freigeben",
     "approvedAt": "Plan am {date} freigegeben. Ihr Kontakt übernimmt ab hier.",
@@ -3533,5 +3556,10 @@
   "viewOnly": {
     "title": "Nur Lesezugriff",
     "body": "Sie sehen alles, was Ihr Team hier hat, können es aber nicht ändern. Wenden Sie sich an einen Administrator, wenn Sie etwas bearbeiten, senden oder annehmen müssen."
+  },
+  "briefTargeting": {
+    "audience": "Zielgruppe",
+    "geo": "Region",
+    "context": "Redaktioneller Kontext"
   }
 }

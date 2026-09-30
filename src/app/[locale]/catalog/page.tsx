@@ -608,13 +608,15 @@ export default async function CatalogPage({
                 {/* The CSV export (bands only, like the page) holds exactly
                     the titles on screen: same filters, search and sort, all
                     pages. Plain <a download>: it's a file, not a page. */}
-                <a className="small-link" href={exportHref} download>
-                  {filtersNarrow
-                    ? t("exportCsvFiltered", { count: totalCount })
-                    : markets.length === 1
-                      ? t("exportCsvMarket", { market: tMarket(markets[0]) })
-                      : t("exportCsv")}
-                </a>
+                {totalCount > 0 ? (
+                  <a className="small-link" href={exportHref} download>
+                    {filtersNarrow
+                      ? t("exportCsvFiltered", { count: totalCount })
+                      : markets.length === 1
+                        ? t("exportCsvMarket", { market: tMarket(markets[0]) })
+                        : t("exportCsv")}
+                  </a>
+                ) : null}
               </div>
             </div>
 

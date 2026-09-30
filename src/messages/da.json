@@ -326,13 +326,14 @@
     "exportCsv": "Download kataloget (CSV)",
     "exportCsvMarket": "Download titler i {market} (CSV)",
     "noMatchHeading": "Ingen resultater",
-    "searchSomeWords": "Ingen titler matcher alle ord i »{q}«, så disse matcher nogle af dem."
+    "searchSomeWords": "Ingen titler matcher alle ord i »{q}«, så disse matcher nogle af dem.",
+    "exportCsvFiltered": "{count, plural, =0 {Download resultaterne (CSV)} one {Download denne titel (CSV)} other {Download disse # titler (CSV)}}"
   },
   "lists": {
     "title": "Gemte lister",
     "empty": "Ingen gemte lister endnu. Tilføj en publikation eller placering for at starte en.",
     "name": "Liste",
-    "items": "Elementer",
+    "items": "Placeringer",
     "lastSubmittedHeading": "Senest sendt",
     "itemCount": "{count, plural, =0 {0 elementer} =1 {1 element} other {# elementer}}",
     "lastSubmitted": "Senest sendt {date}",
@@ -348,7 +349,9 @@
     "archivedOn": "arkiveret {date}",
     "restore": "Gendan",
     "emptyCta": "Gå på opdagelse i kataloget",
-    "emptySecondaryCta": "Start en plan"
+    "emptySecondaryCta": "Start en plan",
+    "placementCount": "{count, plural, =0 {Ingen placeringer} one {# placering} other {# placeringer}}",
+    "alternativeCount": "+ {count, plural, one {# alternativ} other {# alternativer}}"
   },
   "favorites": {
     "title": "Favoritter",
@@ -384,7 +387,13 @@
     "sharedCollectionsHeading": "Samlinger delt med dig",
     "collectionUnavailable": "Den samling er ikke længere tilgængelig.",
     "addToCollection": "Samling",
-    "addToCollectionSubmit": "Føj til samling"
+    "addToCollectionSubmit": "Føj til samling",
+    "inCollections": "I:",
+    "removeFromCollection": "Fjern fra {name}",
+    "inAllCollections": "Ligger i alle dine samlinger.",
+    "addedToCollection": "Føjet til {name}.",
+    "alreadyInCollection": "Ligger allerede i {name}.",
+    "collectionAddFailed": "Det lykkedes ikke. Genindlæs siden, og prøv igen."
   },
   "titleDetail": {
     "back": "Tilbage til kataloget",
@@ -634,7 +643,9 @@
         "monthlyCycle": "Planen indeholder månedstitler, så runderne ligger otte uger fra hinanden – cirka hver anden udgave.",
         "weeklyCycle": "Alle jeres titler udkommer ugentligt, så runderne kan ligge fire uger fra hinanden uden at slide sig op.",
         "launch": "Det ligner en lancering: fire tættere runder bygger fart omkring datoen.",
-        "awareness": "Kendskab bygges langsomt – runderne ligger lidt længere fra hinanden, så hver artikel lander for sig selv."
+        "awareness": "Kendskab bygges langsomt – runderne ligger lidt længere fra hinanden, så hver artikel lander for sig selv.",
+        "custom": "Du har valgt {waves} runder med {weeks} ugers mellemrum. Vores forslag til denne plan var {recWaves} runder med {recWeeks} ugers mellemrum.",
+        "monthRounding": "Månedstitler bookes i hele måneder, så runderne starter {months, plural, one {én måned} other {# måneder}} fra hinanden."
       },
       "preview": "fra {date}",
       "start": "Opret program",
@@ -729,7 +740,8 @@
       "item3Body": "Udkast sendes til dig til godkendelse. Links og resultater lander i Rapporter."
     },
     "breakdownQtyWithArticleFee": "{n} × {unit} placering + {article} pr. artikel (én artikel til alle {n})",
-    "noticePlanReadOnly": "Du har kun læseadgang til denne plan, så intet blev ændret."
+    "noticePlanReadOnly": "Du har kun læseadgang til denne plan, så intet blev ændret.",
+    "runPeriod": "{range} · {unit, select, WEEK {{n, plural, one {# uge} other {# uger}}} other {{n, plural, one {# måned} other {# måneder}}}}"
   },
   "rfq": {
     "org": "Virksomhed",
@@ -858,7 +870,11 @@
     "quoteRevisionNote": "Version {revision} – erstatter det tilbud, du fik tidligere.",
     "supersededEyebrow": "Tidligere versioner",
     "supersededRow": "Version {revision} ({total}) gælder ikke længere.",
-    "supersededBy": "Se version {revision} →"
+    "supersededBy": "Se version {revision} →",
+    "metaPlanAlternativesOnly": "Ingen placeringer endnu · {alternatives, plural, one {# alternativ} other {# alternativer}} · redigeret {age}",
+    "actionContinuePlan": "Fortsæt planen",
+    "qualifierAwaitingTeam": "venter på en med bestillingsret",
+    "actionSeeQuote": "Se tilbuddet"
   },
   "desk": {
     "eyebrow": "Internt desk",
@@ -2481,7 +2497,15 @@
     "scope_catalog_write": "uploade udgiverens egne titler og produkter",
     "scope_orders_write": "afgive faste ordrer for organisationen",
     "scope_pricing_admin": "interne prisværktøjer (MCP) — kun platform",
-    "boundPublisher": "{name} (udgiver)"
+    "boundPublisher": "{name} (udgiver)",
+    "bindingPlatformGroup": "Platform",
+    "bindingSearchPlaceholder": "Søg efter organisation eller udgiver på navn, marked eller titel",
+    "bindingNoMatch": "Ingen resultater.",
+    "bindingMore": "{count, plural, one {# resultat mere} other {# resultater mere}} – skriv mere for at indsnævre",
+    "bindingAdvertiser": "Annoncør",
+    "bindingAgency": "Bureau",
+    "bindingMoreTitles": "+{count} mere",
+    "bindingNoTitles": "ingen titler endnu"
   },
   "quoteNarrative": {
     "sectionCampaign": "Din kampagne",
@@ -3310,7 +3334,6 @@
     "plusOnRequest": "+ linjer prissættes på forespørgsel",
     "disclaimer": "Vejledende priser – et fast tilbud bekræfter endelig pris, før noget bookes.",
     "footer": "Lavet med NativeSpin – native annoncering i førende aviser og fagpresse.",
-    "from": "Fra {date}",
     "approveHint": "Tilfreds med titler, timing og budget? En godkendelse fortæller din kontakt, at planen kan sendes videre – intet bookes eller opkræves af dette.",
     "approveCta": "Godkend planen",
     "approvedAt": "Planen blev godkendt {date}. Din kontakt tager den videre herfra.",
@@ -3665,5 +3688,10 @@
   "viewOnly": {
     "title": "Kun læseadgang",
     "body": "Du kan se alt, dit team har her, men ikke ændre det. Spørg en administrator, hvis du skal redigere, sende eller acceptere."
+  },
+  "briefTargeting": {
+    "audience": "Målgruppe",
+    "geo": "Geografi",
+    "context": "Redaktionel kontekst"
   }
 }

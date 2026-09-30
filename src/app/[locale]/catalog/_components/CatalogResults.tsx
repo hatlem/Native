@@ -225,14 +225,18 @@ function CatalogListRow({
               selector used to render only on cards, so ticking
               "Compare" in list view did nothing visible. */}
           <TitleSelector id={title.id} name={titleDisplayName(title)} />
-          <Link className="catalog-row__title" href={`/catalog/${title.slug}`}>
-            {titleDisplayName(title)}
-          </Link>
-          {instantBook ? (
-            <span className="badge badge-success dotless catalog-row__instant">
-              ⚡ {tf("badge")}
-            </span>
-          ) : null}
+          {/* Title and badge wrap together, beside the checkbox: a flat
+              nowrap row squeezed the title to ~32px next to the badge. */}
+          <span className="catalog-row__title-group">
+            <Link className="catalog-row__title" href={`/catalog/${title.slug}`}>
+              {titleDisplayName(title)}
+            </Link>
+            {instantBook ? (
+              <span className="badge badge-success dotless catalog-row__instant">
+                ⚡ {tf("badge")}
+              </span>
+            ) : null}
+          </span>
         </div>
         <div className="catalog-row__meta">
           {/* Plain <a>, not <Link>: same-route RSC soft navigation is
