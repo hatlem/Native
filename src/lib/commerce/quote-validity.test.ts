@@ -5,6 +5,7 @@ import {
   QUOTE_VALIDITY_MAX_DAYS,
   acceptableQuoteWhere,
   buyerVisibleQuoteWhere,
+  formatQuoteValidUntil,
   editableQuoteWhere,
   effectiveQuoteStatus,
   expiredSentQuoteWhere,
@@ -61,19 +62,44 @@ test("a renewal is firm for QUOTE_VALIDITY_DAYS from now", () => {
   assert.equal(until.getTime() - NOW.getTime(), QUOTE_VALIDITY_DAYS * 86_400_000);
 });
 
-test("the desk's date field defaults to today + QUOTE_VALIDITY_DAYS (UTC day)", () => {
+test("the desk's date field defaults to today + QUOTE_VALIDITY_DAYS, on the buyer's calendar", () => {
   assert.equal(quoteValidUntilInputValue(NOW), "2026-10-09");
   assert.equal(quoteValidUntilInputValue(NOW, NOW), "2026-09-25");
+  // 23:30 UTC is already tomorrow in Oslo and Helsinki, still today in London.
+  const lateUtc = new Date("2026-09-25T23:30:00Z");
+  assert.equal(quoteValidUntilInputValue(lateUtc, lateUtc, "Europe/Oslo"), "2026-09-26");
+  assert.equal(quoteValidUntilInputValue(lateUtc, lateUtc, "Europe/Helsinki"), "2026-09-26");
+  assert.equal(quoteValidUntilInputValue(lateUtc, lateUtc, "Europe/London"), "2026-09-26");
+  assert.equal(quoteValidUntilInputValue(lateUtc, lateUtc, "UTC"), "2026-09-25");
 });
 
-test("a chosen validity date is valid through the end of that UTC day", () => {
-  const parsed = parseQuoteValidUntil("2026-10-09", NOW);
-  assert.deepEqual(parsed, { ok: true, validUntil: new Date("2026-10-09T23:59:59.999Z") });
+test("a chosen validity date is valid through the end of that day in the buyer's zone", () => {
+  const parsed = parseQuoteValidUntil("2026-10-09", NOW, "Europe/Oslo");
+  // 23:59:59.999 Oslo summer time (UTC+2), not 23:59 UTC (01:59 next day there).
+  assert.deepEqual(parsed, { ok: true, validUntil: new Date("2026-10-09T21:59:59.999Z") });
   // Still acceptable late on the day itself, lapsed a millisecond after.
   if (!parsed.ok) throw new Error("unreachable");
   const q = { status: "SENT" as const, validUntil: parsed.validUntil };
-  assert.equal(isQuoteAcceptable(q, new Date("2026-10-09T23:00:00Z")), true);
-  assert.equal(isQuoteAcceptable(q, new Date("2026-10-10T00:00:00Z")), false);
+  assert.equal(isQuoteAcceptable(q, new Date("2026-10-09T21:30:00Z")), true);
+  assert.equal(isQuoteAcceptable(q, new Date("2026-10-09T22:00:00Z")), false);
+  // Every surface prints the same day for it, whatever the server's zone.
+  assert.equal(quoteValidUntilInputValue(NOW, parsed.validUntil, "Europe/Oslo"), "2026-10-09");
+  assert.equal(formatQuoteValidUntil(parsed.validUntil, "en", "Europe/Oslo"), "9 October 2026");
+  assert.equal(formatQuoteValidUntil(parsed.validUntil, "no", "Europe/Oslo"), "9. oktober 2026");
+});
+
+test("the day end follows each market's zone and the clock change", () => {
+  const end = (raw: string, zone: string) => {
+    const r = parseQuoteValidUntil(raw, NOW, zone);
+    if (!r.ok) throw new Error(r.reason);
+    return r.validUntil.toISOString();
+  };
+  assert.equal(end("2026-10-09", "Europe/London"), "2026-10-09T22:59:59.999Z");
+  assert.equal(end("2026-10-09", "Europe/Helsinki"), "2026-10-09T20:59:59.999Z");
+  // After the October change Oslo is UTC+1; the change day itself (25 Oct)
+  // already ends on winter time.
+  assert.equal(end("2026-10-25", "Europe/Oslo"), "2026-10-25T22:59:59.999Z");
+  assert.equal(end("2026-11-02", "Europe/Oslo"), "2026-11-02T22:59:59.999Z");
 });
 
 test("today is a valid (same-day) validity; yesterday is not", () => {
@@ -98,7 +124,8 @@ test("malformed or impossible dates are refused, blank falls back to the default
   for (const raw of ["tomorrow", "2026-13-01", "2026-02-31", "09/10/2026"]) {
     assert.deepEqual(parseQuoteValidUntil(raw, NOW), { ok: false, reason: "invalid" }, raw);
   }
-  assert.deepEqual(parseQuoteValidUntil("  ", NOW), { ok: true, validUntil: quoteValidUntilFrom(NOW) });
+  // Blank = the default window, through the end of its last day.
+  assert.deepEqual(parseQuoteValidUntil("  ", NOW), parseQuoteValidUntil("2026-10-09", NOW));
 });
 
 test("buyers never see DRAFT quotes", () => {

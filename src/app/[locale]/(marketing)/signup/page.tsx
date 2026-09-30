@@ -8,6 +8,8 @@ import { LandingShell } from "@/app/landing-shell";
 import { SubmitButton } from "@/components";
 import { catalogTitleCount, titleCountFloor } from "@/lib/catalog-stats";
 import { intlLocale } from "@/lib/money";
+import { emailDomain, suggestEmailDomain } from "@/lib/email-policy";
+import { EmailTypoPrompt } from "./email-typo-prompt";
 
 export const dynamic = "force-dynamic";
 
@@ -51,7 +53,9 @@ export default async function SignUpPage({
             ? t("regEmailNoMailServer")
             : errorCode === "password_length"
               ? t("regPasswordTooShort")
-              : errorCode
+              : errorCode === "email_typo"
+                ? null
+                : errorCode
                 ? t("regFailed")
                 : null;
   const sParam = (key: string) =>
@@ -59,6 +63,11 @@ export default async function SignUpPage({
   const initialName = sParam("name");
   const initialOrgName = sParam("orgName");
   const initialEmail = sParam("email");
+  // Typo prompt: recomputed from the preserved address, never read from
+  // the URL, so a link can't suggest an address of someone else's choosing.
+  const typoSuggestion =
+    errorCode === "email_typo" ? suggestEmailDomain(initialEmail) : null;
+  const typedDomain = typoSuggestion ? emailDomain(initialEmail) : null;
 
   return (
     <LandingShell locale={locale} screenLabel="Sign up">
@@ -132,7 +141,23 @@ export default async function SignUpPage({
                 autoComplete="email"
                 required
                 defaultValue={initialEmail}
+                aria-invalid={typoSuggestion ? true : undefined}
+                aria-describedby={typoSuggestion ? "email-typo" : undefined}
               />
+              {typoSuggestion && typedDomain ? (
+                <EmailTypoPrompt
+                  id="email-typo"
+                  inputId="email"
+                  suggestion={typoSuggestion}
+                  typedDomain={typedDomain}
+                  question={t.rich("regEmailTypoQuestion", {
+                    email: typoSuggestion,
+                    b: (chunks) => <strong>{chunks}</strong>,
+                  })}
+                  useLabel={t("regEmailTypoUse", { email: typoSuggestion })}
+                  keepHint={t("regEmailTypoKeep", { domain: typedDomain })}
+                />
+              ) : null}
             </div>
 
             {/* Password is now optional. The disclosure default-closed

@@ -12,7 +12,10 @@
 //
 // Supported: ATX headings (#–######), paragraphs, unordered (- * +) and
 // ordered (1. / 1)) lists, blockquotes (>), horizontal rules, and inline
-// **strong**/__strong__, *em*/_em_, `code` and [text](url).
+// **strong**/__strong__, *em*/_em_, `code`, [text](url) and ![caption](url)
+// images. Image sources are absolute http(s) URLs only: the writer portal
+// has no upload, so a draft's images are links to where they're hosted,
+// and they count towards the format's image minimum (spec-check).
 
 import { safeExternalUrl } from "@/lib/security";
 
@@ -21,7 +24,8 @@ export type Inline =
   | { type: "strong"; children: Inline[] }
   | { type: "em"; children: Inline[] }
   | { type: "code"; value: string }
-  | { type: "link"; href: string; children: Inline[] };
+  | { type: "link"; href: string; children: Inline[] }
+  | { type: "image"; src: string; alt: string };
 
 export type Block =
   | { type: "heading"; level: 1 | 2 | 3 | 4 | 5 | 6; children: Inline[] }
@@ -42,6 +46,16 @@ const QUOTE = /^>\s?(.*)$/;
 type InlineRule = { re: RegExp; build: (m: RegExpExecArray) => Inline };
 const INLINE_RULES: InlineRule[] = [
   { re: /`([^`\n]+)`/, build: (m) => ({ type: "code", value: m[1] }) },
+  // Before links: "![a](b)" starts one character earlier than the "[a](b)"
+  // inside it, so the leftmost-match rule picks the image.
+  {
+    re: /!\[([^\]\n]*)\]\(([^)\s]+)\)/,
+    build: (m) => {
+      const src = safeImageUrl(m[2]);
+      // Not an absolute http(s) URL: keep the caption as text, no image.
+      return src ? { type: "image", src, alt: m[1].trim() } : { type: "text", value: m[1] };
+    },
+  },
   {
     re: /\[([^\]\n]+)\]\(([^)\s]+)\)/,
     build: (m) => {
@@ -58,6 +72,13 @@ const INLINE_RULES: InlineRule[] = [
   // Word-boundary guarded so snake_case_words stay literal.
   { re: /(?<![\w])_(?=\S)([^_\n]+?)_(?![\w])/, build: (m) => ({ type: "em", children: parseInline(m[1]) }) },
 ];
+
+// Images load from wherever the writer hosts them, so only absolute
+// http(s) sources: no data: payloads, no relative paths into our own app.
+function safeImageUrl(raw: string): string | null {
+  const href = safeExternalUrl(raw);
+  return href && /^https?:\/\//i.test(href) ? href : null;
+}
 
 export function parseInline(text: string): Inline[] {
   const out: Inline[] = [];
@@ -164,8 +185,44 @@ export function parseMarkdown(source: string): Block[] {
 
 function inlineText(nodes: Inline[]): string {
   return nodes
-    .map((n) => (n.type === "text" || n.type === "code" ? n.value : inlineText(n.children)))
+    .map((n) =>
+      n.type === "text" || n.type === "code"
+        ? n.value
+        : n.type === "image"
+          ? n.alt
+          : inlineText(n.children),
+    )
     .join("");
+}
+
+function countInlineImages(nodes: Inline[]): number {
+  return nodes.reduce(
+    (sum, n) =>
+      sum +
+      (n.type === "image"
+        ? 1
+        : n.type === "strong" || n.type === "em" || n.type === "link"
+          ? countInlineImages(n.children)
+          : 0),
+    0,
+  );
+}
+
+// Images a reader would see in the draft: the same parse the preview
+// renders, so an image the preview drops (unsafe source) doesn't count.
+export function countImages(body: string): number {
+  return parseMarkdown(body).reduce((sum, block) => {
+    switch (block.type) {
+      case "heading":
+      case "paragraph":
+      case "quote":
+        return sum + countInlineImages(block.children);
+      case "list":
+        return sum + block.items.reduce((s, item) => s + countInlineImages(item), 0);
+      case "rule":
+        return sum;
+    }
+  }, 0);
 }
 
 const HEADLINE_MAX = 140;

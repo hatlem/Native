@@ -179,3 +179,31 @@ test("anchorDiscountPct returns null when price is at or above anchor", () => {
   );
   assert.equal(anchorDiscountPct(out.lines[0]), null);
 });
+
+test("a content-fee line is labelled with the title of the placement it writes for", () => {
+  const out = buildQuoteNarrative(
+    input({
+      quote: {
+        currency: "NOK",
+        lines: [
+          { id: "l1", productId: "p1", description: "Financial Daily — Native article", lineTotal: 18000, quantity: 1 },
+          { id: "l2", productId: "p2", description: "Local Weekly — Advertorial", lineTotal: 5000, quantity: 1 },
+          { id: "f1", kind: "CONTENT_FEE", productId: null, description: "Content production — Financial Daily — Native article", lineTotal: 12000, quantity: 1 },
+          { id: "f2", kind: "CONTENT_FEE", productId: null, description: "Content production — Local Weekly — Advertorial", lineTotal: 8000, quantity: 1 },
+          { id: "f3", kind: "CONTENT_FEE", productId: null, description: "Content production — Gone Title", lineTotal: 1, quantity: 1 },
+        ],
+      },
+    }),
+  );
+  const fees = out.lines.filter((l) => l.kind === "CONTENT_FEE");
+  assert.deepEqual(
+    fees.map((l) => [l.titleName, l.productType, l.productId]),
+    [
+      ["Financial Daily", "CONTENT_FEE", null],
+      ["Local Weekly", "CONTENT_FEE", null],
+      // No matching placement: empty, never a raw id or description.
+      ["", "CONTENT_FEE", null],
+    ],
+  );
+  assert.equal(out.lines[0].productId, "p1");
+});

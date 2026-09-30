@@ -12,7 +12,12 @@ import { emailAdapter } from "@/lib/notify";
 import { magicLinkEmail } from "@/lib/mail/templates/magic-link";
 import { welcomeEmail } from "@/lib/mail/templates/welcome";
 import { accountExistsEmail } from "@/lib/mail/templates/account-exists";
-import { checkBusinessEmailWithMx, emailPolicyErrorCode } from "@/lib/email-policy";
+import {
+  checkBusinessEmailWithMx,
+  emailDomain,
+  emailPolicyErrorCode,
+  suggestEmailDomain,
+} from "@/lib/email-policy";
 import { appUrl, appName } from "@/lib/url";
 import { clientIp } from "@/lib/client-ip";
 
@@ -21,6 +26,9 @@ export async function register(formData: FormData) {
   const email = String(formData.get("email") || "")
     .toLowerCase()
     .trim();
+  // The domain the user already confirmed on the typo prompt: resubmitting
+  // it unchanged means "yes, this is really our domain".
+  const confirmedDomain = String(formData.get("confirmedDomain") || "").toLowerCase().trim();
   const password = String(formData.get("password") || "");
   const name = String(formData.get("name") || "").trim();
   const orgName = String(formData.get("orgName") || "").trim();
@@ -51,6 +59,22 @@ export async function register(formData: FormData) {
   }
   if (!passwordlessSignup && password.length < 8) {
     redirect(`/${locale}/signup?error=password_length${tail}`);
+  }
+
+  // Lookalike of a big mail provider ("gnail.com"): ask before mailing a
+  // magic link there. Squatted lookalikes pass the MX check below, so
+  // this is the only thing between a typo and a stranger's inbox. It's a
+  // prompt, not a block: a company that owns such a domain confirms once.
+  const suggestion = suggestEmailDomain(email);
+  if (suggestion && confirmedDomain !== emailDomain(email)) {
+    await recordAudit(email, "auth.signup_email_typo_prompted", `User:${email}`, {
+      ip,
+      suggestion,
+    });
+    // The page recomputes the suggestion from the preserved address rather
+    // than reading one from the URL, so a crafted link can't prompt
+    // someone to "correct" their email to an attacker's.
+    redirect(`/${locale}/signup?error=email_typo${tail}`);
   }
 
   // Company-email gate: reject free providers (gmail, yahoo, …),

@@ -151,3 +151,25 @@ test("reports each failed rule as a structured failure", () => {
   // The persisted English notes stay in sync with the structured form.
   assert.deepEqual(r.issues, r.failures.map(describeSpecFailure));
 });
+
+test("enforces the format's image minimum, counting Markdown images", () => {
+  const body = "Annonse. Words enough here ![Fleet at dawn](https://cdn.example.com/a.jpg)";
+  const one = specCheck({ body, imagesMin: 2 });
+  assert.equal(one.passed, false);
+  assert.deepEqual(one.failures, [{ rule: "tooFewImages", images: 1, min: 2 }]);
+  assert.match(one.issues[0], /Too few images: 1 < 2/);
+
+  const two = specCheck({ body: `${body}\n\n![Depot](https://cdn.example.com/b.jpg)`, imagesMin: 2 });
+  assert.equal(two.passed, true);
+  // No minimum set: images are optional.
+  assert.equal(specCheck({ body: "Plain text only", imagesMin: null }).passed, true);
+});
+
+test("an image the preview wouldn't show doesn't count, and image markup isn't prose", () => {
+  // javascript: / relative sources render as caption text only.
+  const unsafe = specCheck({ body: "![x](javascript:alert(1)) ![y](/local.png)", imagesMin: 1 });
+  assert.deepEqual(unsafe.failures, [{ rule: "tooFewImages", images: 0, min: 1 }]);
+  // "![A long caption here](url)" adds nothing to the word count.
+  const r = specCheck({ body: "one two ![A long caption here](https://x.test/i.png) three" });
+  assert.equal(r.words, 3);
+});

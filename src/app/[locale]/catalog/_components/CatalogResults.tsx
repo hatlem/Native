@@ -8,7 +8,7 @@ import { bandIncludesArticle, titleBand, titleRate } from "@/lib/pricing/display
 import { loadPricingDefaults } from "@/lib/content-fee";
 import { titleDisplayName } from "@/lib/title-display";
 import { EmptyState } from "@/app/empty-state";
-import { localizeCategory, localizeVertical } from "@/lib/taxonomy-i18n";
+import { localizeVertical, titleCategoryLabel } from "@/lib/taxonomy-i18n";
 import type { ProductInclusions } from "@/lib/pricing/inclusions";
 import type { AppLocale } from "@/i18n/routing";
 import { CompareSelectionProvider, TitleSelector } from "./CompareSelection";
@@ -214,12 +214,16 @@ function CatalogListRow({
 }) {
   const { title, fromBand, bandWithArticle, fromRate, hasPrice, instantBook, addableProduct, articleState, reach } =
     row;
+  const categoryLabel = titleCategoryLabel(title, locale as AppLocale);
+  const verticalLabel = title.vertical ? localizeVertical(title.vertical, locale as AppLocale) : null;
   const description = title.description
     ? title.description.length > 160
       ? `${title.description.slice(0, 160)}…`
       : title.description
-    : title.vertical
-      ? localizeVertical(title.vertical, locale as AppLocale)
+    : // The category tag already falls back to the vertical when the source
+      // category isn't readable in this locale; don't print it twice.
+      verticalLabel !== categoryLabel
+      ? verticalLabel
       : null;
 
   return (
@@ -255,7 +259,7 @@ function CatalogListRow({
         </div>
         {description ? <p className="catalog-row__desc">{description}</p> : null}
         <div className="catalog-row__tags">
-          <span className="tag">{localizeCategory(title.category, locale as AppLocale)}</span>
+          <span className="tag">{categoryLabel}</span>
           {title.offersNativeContent ? <span className="tag">{t("card.offersNative")}</span> : null}
           {title.b2bB2c ? <span className="tag">{title.b2bB2c}</span> : null}
         </div>
@@ -366,6 +370,8 @@ function CatalogCard({
   readOnly: boolean;
 }) {
   const { title, visibleProducts, anyHidden, fromBand, bandWithArticle, fromRate, needsQuote, reach } = row;
+  const categoryLabel = titleCategoryLabel(title, locale as AppLocale);
+  const verticalLabel = title.vertical ? localizeVertical(title.vertical, locale as AppLocale) : null;
   return (
     <article className="card catalog-card">
       <TitleSelector id={title.id} name={titleDisplayName(title)} />
@@ -391,7 +397,7 @@ function CatalogCard({
         · {tMarket(title.market.code)}
       </div>
       <div>
-        <span className="tag">{localizeCategory(title.category, locale as AppLocale)}</span>
+        <span className="tag">{categoryLabel}</span>
         {title.offersNativeContent ? <span className="tag">{t("card.offersNative")}</span> : null}
         {[...new Set(title.products.map((p) => p.type))].map((type) => (
           <span className="tag" key={type}>
@@ -414,9 +420,9 @@ function CatalogCard({
         <div className="muted" style={{ marginTop: 8 }}>
           {title.description.length > 140 ? `${title.description.slice(0, 140)}…` : title.description}
         </div>
-      ) : title.vertical ? (
+      ) : verticalLabel && verticalLabel !== categoryLabel ? (
         <div className="muted" style={{ marginTop: 8 }}>
-          {localizeVertical(title.vertical, locale as AppLocale)}
+          {verticalLabel}
         </div>
       ) : null}
       {reach ? (

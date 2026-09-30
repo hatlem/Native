@@ -864,7 +864,9 @@
     "quoteRevisionNote": "Version {revision} – ersätter offerten du fick tidigare.",
     "supersededEyebrow": "Tidigare versioner",
     "supersededRow": "Version {revision} ({total}) gäller inte längre.",
-    "supersededBy": "Se version {revision} →"
+    "supersededBy": "Se version {revision} →",
+    "quoteDownloadPdf": "Ladda ner PDF",
+    "quoteDownloadDocx": "Ladda ner Word (.docx)"
   },
   "desk": {
     "eyebrow": "Internt desk",
@@ -1249,7 +1251,10 @@
     "emailRequired": "Fyll i din e-postadress först.",
     "attemptsRateLimited": "För många försök. Vänta en minut och försök igen.",
     "checkSignupTitle": "Bekräfta din e-postadress",
-    "checkSignupLead": "Vi har skickat en länk till adressen du angav. Öppna den för att bekräfta adressen och logga in; den går ut om 15 minuter. Om adressen redan hade ett konto förklarar mejlet hur du kommer in igen."
+    "checkSignupLead": "Vi har skickat en länk till adressen du angav. Öppna den för att bekräfta adressen och logga in; den går ut om 15 minuter. Om adressen redan hade ett konto förklarar mejlet hur du kommer in igen.",
+    "regEmailTypoQuestion": "Menade du <b>{email}</b>?",
+    "regEmailTypoUse": "Använd {email}",
+    "regEmailTypoKeep": "Stämmer {domain}? Tryck på Skapa konto igen."
   },
   "order": {
     "title": "Order",
@@ -1504,7 +1509,10 @@
     "ratesPriceOnlyNote": "Den här sidan ändrar endast priser. Katalogstatus — aktiv, bokningsbar, synlighet — hanteras av NativeSpin-desken.",
     "changePriceOnRates": "Ändra på prissidan",
     "notBookable": "Inte bokningsbar",
-    "catalogStatusNote": "Priser ändrar du på prissidan. Katalogstatus (bokningsbar, och om en produkt kan beställas omedelbart) hanteras av NativeSpin-desken."
+    "catalogStatusNote": "Priser ändrar du på prissidan. Katalogstatus (bokningsbar, och om en produkt kan beställas omedelbart) hanteras av NativeSpin-desken.",
+    "leadTimeSaved": "Ledtiden är sparad: {days, plural, =1 {1 dag} other {# dagar}}. Desken har fått veta.",
+    "leadTimeUnchanged": "Ingen ändring: ledtiden är redan {days, plural, =1 {1 dag} other {# dagar}}.",
+    "leadTimeInvalid": "Ange ett helt antal dagar från 1 till {max}. Inget sparades."
   },
   "formats": {
     "metaTitle": "Native-format",
@@ -2512,18 +2520,17 @@
     "anchorNote": "Utgivarens offentliga listpris för placeringen. Ditt totalpris inkluderar innehållsproduktion, placering, revideringar och rapportering.",
     "whyThisPrice": "NativeSpin har direkta redaktionella relationer med alla titlar i offerten. Vi förhandlar placeringen, anlitar en branschspecialiserad skribent, hanterar redaktionell granskning med utgivaren och rapporterar på resultatet. Du får en ansvarig partner och ett totalpris — inte en mediafaktura, en skribentfaktura och ett byråarvode.",
     "termsCancellation": "Full återbetalning innan artikelbriefen är godkänd; 50 % återbetalning innan första utkastet; ingen återbetalning efter att utgivarens slot är bekräftad.",
-    "termsValidity": "Offerten gäller i 14 dagar. Tillgänglighet hos utgivaren bekräftas vid godkännande.",
     "bullets": {
       "NATIVE_ARTICLE": [
         "Förhandlad placering på {titleName}, skriven i titelns redaktionella röst",
-        "Artikel (1 200–1 500 ord) skriven av en branschspecialiserad journalist",
+        "Artikel{length} skriven av en branschspecialiserad journalist",
         "Två revideringsomgångar och ditt godkännande innan publicering",
         "Distribution i {titleName}s native-flöde och nyhetsbrev",
         "Klickspårning på varje länk vi lägger in, rapporterat vid överenskomna tidpunkter"
       ],
       "ADVERTORIAL": [
         "Förhandlad placering på {titleName}, tydligt märkt som betalt innehåll",
-        "Varumärkesledd artikel (800–1 200 ord) skriven enligt utgivarens redaktionella standard",
+        "Varumärkesledd artikel{length} skriven enligt utgivarens redaktionella standard",
         "En revideringsomgång och ditt godkännande innan publicering",
         "Distribution i {titleName}s innehållsflöde",
         "Klickspårning på varje länk vi lägger in, rapporterat vid överenskomna tidpunkter"
@@ -2535,12 +2542,17 @@
         "Klickspårning på varje länk vi lägger in, plus rapporterade visningar, vid överenskomna tidpunkter"
       ],
       "PACKAGE": [
-        "Redaktionell artikel på {titleName} (1 200–1 500 ord)",
+        "Redaktionell artikel på {titleName}{length}",
         "Native-displayförstärkning i samma titel",
         "Gemensam redaktionell granskning och gemensam publiceringsdag",
         "Klickspårning på varje länk vi lägger in, rapporterat vid överenskomna tidpunkter"
       ]
-    }
+    },
+    "termsValidUntil": "Offerten gäller till och med {date}. Tillgänglighet hos utgivaren bekräftas vid godkännande.",
+    "termsAvailability": "Tillgänglighet hos utgivaren bekräftas vid godkännande.",
+    "wordsRange": "{min, number}–{max, number} ord",
+    "wordsMin": "minst {min, number} ord",
+    "wordsMax": "högst {max, number} ord"
   },
   "priceVisibility": {
     "requestPrice": "Kontakta för pris",
@@ -3602,7 +3614,7 @@
       "inReviewNote": "Det här utkastet ligger hos kunden för granskning. Sparar du nu blir det en ny version – skicka den för granskning när den är klar.",
       "draftLabel": "Artikeltext",
       "draftPlaceholder": "# Rubrik\n\nIngress…",
-      "draftHint": "Ren text med enkel Markdown: # för rubriker, **fet**, *kursiv*, - för listor, [text](länk). Glöm inte märkningen.",
+      "draftHint": "Ren text med enkel Markdown: # för rubriker, **fet**, *kursiv*, - för listor, [text](länk), ![bildtext](bildlänk) för bilder. Glöm inte märkningen.",
       "saveDraft": "Spara utkast",
       "saving": "Sparar…",
       "submit": "Skicka för granskning",
@@ -3641,7 +3653,9 @@
       "passedDetail": "Utkastet uppfyller formatkraven ({words} ord).",
       "failDisclosure": "Märkningen ”{label}” saknas. Läsarna måste se att det här är betalt innehåll.",
       "failTooShort": "För kort: {words} ord, formatet kräver minst {min}.",
-      "failTooLong": "För lång: {words} ord, formatet tillåter högst {max}."
+      "failTooLong": "För lång: {words} ord, formatet tillåter högst {max}.",
+      "failTooFewImages": "För få bilder: {images, plural, =0 {inga ännu} other {#}}, formatet kräver minst {min}. Lägg in varje bild som ![bildtext](https://länk-till-bild).",
+      "imagesHow": "Lägg in bilder i utkastet som ![bildtext](https://länk-till-bild)."
     },
     "profile": {
       "title": "Min profil",
@@ -3818,5 +3832,40 @@
     "claim": "Skapa kontot här (länken går ut om {days} dagar):",
     "ignore": "Om du inte väntade dig det här mejlet kan du bortse från det – länken kan bara användas en gång.",
     "signoff": "– NativeSpin"
+  },
+  "pageTitle": {
+    "catalog": "Katalog",
+    "catalogCompare": "Jämför titlar",
+    "home": "Hem",
+    "plan": "Din plan",
+    "lists": "Sparade listor",
+    "favorites": "Favoriter",
+    "requests": "Förfrågningar",
+    "orders": "Beställningar",
+    "invoices": "Fakturor",
+    "articles": "Artiklar",
+    "reports": "Rapporter",
+    "campaign": "Planera kampanj",
+    "notifications": "Inkorg",
+    "account": "Konto",
+    "agency": "Byrå",
+    "onboarding": "Kom igång",
+    "onboardingCall": "Prata med desken",
+    "invite": "Gå med i teamet",
+    "writer": "Skribentportal",
+    "publisher": "Utgivarportal",
+    "desk": "Desk",
+    "deskRequest": "Förfrågan",
+    "deskOrders": "Beställningar",
+    "deskTitles": "Titlar",
+    "deskUsers": "Användare",
+    "deskWriters": "Skribenter",
+    "deskPriceQuotes": "Prisofferter",
+    "deskPublisherContacts": "Utgivarkontakter",
+    "deskReports": "Rapporter",
+    "deskPlaybooks": "Spelböcker",
+    "deskContentFees": "Innehållsavgifter",
+    "deskApiKeys": "API-nycklar",
+    "deskMetricsNeedsContact": "Saknar mätvärden"
   }
 }

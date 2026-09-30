@@ -45,6 +45,7 @@ export async function evaluateSpecForPlacement(
     body: asset.body,
     wordCountMin: product?.spec?.wordCountMin ?? null,
     wordCountMax: product?.spec?.wordCountMax ?? null,
+    imagesMin: product?.spec?.imagesMin ?? null,
     titleDisclosure: product?.spec?.disclosureLabel ?? null,
     marketDisclosure: product?.title.market.disclosureLabel ?? null,
   });

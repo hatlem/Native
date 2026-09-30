@@ -69,7 +69,7 @@ if (!RUN_DB_IT) {
         basePrice: 10000,
         currency: "NOK",
         confirmedAt: new Date(),
-        spec: { create: { wordCountMin: 5, disclosureLabel: "Annonsørinnhold" } },
+        spec: { create: { wordCountMin: 5, imagesMin: 1, disclosureLabel: "Annonsørinnhold" } },
       },
     });
     productId = product.id;
@@ -171,13 +171,20 @@ if (!RUN_DB_IT) {
     assert.equal(failing.length, 1);
     assert.deepEqual(failing[0].evaluation.result.failures, [
       { rule: "disclosure", label: "Annonsørinnhold" },
+      // The format's image minimum is enforced too, not just listed.
+      { rule: "tooFewImages", images: 0, min: 1 },
     ]);
     // The check persisted its verdict for the desk.
     const p1 = await prisma.articlePlacement.findUniqueOrThrow({ where: { id: placementId } });
     assert.equal(p1.specPassed, false);
 
     const good = await prisma.contentAsset.create({
-      data: { articleId, version: 2, status: "DRAFT", body: "Annonsørinnhold — a draft that is labelled properly." },
+      data: {
+        articleId,
+        version: 2,
+        status: "DRAFT",
+        body: "Annonsørinnhold — a draft that is labelled properly.\n\n![The fleet](https://cdn.example.com/fleet.jpg)",
+      },
     });
     assert.deepEqual(await specFailuresForSubmission({ articleId, assetId: good.id }), []);
     const p2 = await prisma.articlePlacement.findUniqueOrThrow({ where: { id: placementId } });

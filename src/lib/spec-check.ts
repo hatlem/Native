@@ -14,10 +14,16 @@
 // "Producerat för Hud & Glöd av NativeSpin redaktion" where the
 // producer-credit suffix is per playbook).
 
+import { countImages } from "@/lib/content/markdown";
+
 export type SpecInput = {
   body: string;
   wordCountMin?: number | null;
   wordCountMax?: number | null;
+  // The format's image minimum (Spec.imagesMin). Images are Markdown
+  // ![caption](https://…) references in the draft, counted by the same
+  // parser the review preview renders with.
+  imagesMin?: number | null;
   titleDisclosure?: string | null;
   marketDisclosure?: string | null;
 };
@@ -28,7 +34,8 @@ export type SpecInput = {
 export type SpecFailure =
   | { rule: "disclosure"; label: string }
   | { rule: "tooShort"; words: number; min: number }
-  | { rule: "tooLong"; words: number; max: number };
+  | { rule: "tooLong"; words: number; max: number }
+  | { rule: "tooFewImages"; images: number; min: number };
 
 export type SpecResult = {
   passed: boolean;
@@ -45,8 +52,12 @@ export function describeSpecFailure(f: SpecFailure): string {
       return `Too short: ${f.words} < ${f.min} words`;
     case "tooLong":
       return `Too long: ${f.words} > ${f.max} words`;
+    case "tooFewImages":
+      return `Too few images: ${f.images} < ${f.min}`;
   }
 }
+
+const IMAGE_MARKUP = /!\[[^\]\n]*\]\([^)\s]+\)/g;
 
 // Tokens we treat as "fill-this-in" placeholders. Both square-bracket
 // and curly-brace conventions are recognised so neither publisher
@@ -91,7 +102,11 @@ export function labelMatcher(label: string | null | undefined): RegExp | null {
 
 export function specCheck(input: SpecInput): SpecResult {
   const body = (input.body ?? "").trim();
-  const words = body ? body.split(/\s+/).length : 0;
+  // Image markup isn't prose: "![Fleet at dawn](https://…)" shouldn't add
+  // three words to the count.
+  const prose = body.replace(IMAGE_MARKUP, " ").trim();
+  const words = prose ? prose.split(/\s+/).length : 0;
+  const images = countImages(body);
   const failures: SpecFailure[] = [];
 
   const requiredLabels = new Set<string>();
@@ -109,6 +124,9 @@ export function specCheck(input: SpecInput): SpecResult {
   }
   if (input.wordCountMax && words > input.wordCountMax) {
     failures.push({ rule: "tooLong", words, max: input.wordCountMax });
+  }
+  if (input.imagesMin && images < input.imagesMin) {
+    failures.push({ rule: "tooFewImages", images, min: input.imagesMin });
   }
 
   return {

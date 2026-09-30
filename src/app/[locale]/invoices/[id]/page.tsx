@@ -60,7 +60,7 @@ export default async function InvoicePage({
             {t("title")} #{invoiceNumber(invoice.id)}
           </h1>
         </div>
-        <div style={{ display: "flex", gap: 12, alignItems: "center" }}>
+        <div className="invoice-head__actions">
           <StatusBadge value={invoice.status} />
           {sellerIncomplete.length === 0 ? (
             // Plain <a>: a route handler download, not a page navigation.

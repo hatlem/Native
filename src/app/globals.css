@@ -218,6 +218,23 @@ h5 {
   text-wrap: balance;
   margin: 0 0 0.4em;
   font-weight: 660;
+  /* Last resort for a word wider than the viewport (see the phone rule
+     below): break it rather than scroll the page sideways. */
+  overflow-wrap: break-word;
+}
+
+/* German and the Nordic languages build long compounds
+   ("Marktplatz-Nutzungsbedingungen") that don't fit a phone line at display
+   sizes. Hyphenate them by the page's lang, only on phones and only for
+   long words, so desktop headlines never pick up a stray hyphen. */
+@media (max-width: 640px) {
+  h1,
+  h2,
+  h3 {
+    -webkit-hyphens: auto;
+    hyphens: auto;
+    hyphenate-limit-chars: 10 4 4;
+  }
 }
 
 h1 {
@@ -2843,16 +2860,35 @@ select:disabled {
   margin: 0 auto;
 }
 
+/* Wraps at phone width: the title block and the status + download pair
+   used to share one row at 375px, squeezing "Download PDF" onto three lines
+   and pushing the page 2px wide. */
 .invoice-head {
   display: flex;
+  flex-wrap: wrap;
   justify-content: space-between;
   align-items: flex-start;
-  gap: var(--s-4);
+  gap: var(--s-3) var(--s-4);
   margin-bottom: var(--s-5);
+}
+
+.invoice-head > :first-child {
+  min-width: 0;
 }
 
 .invoice-head h1 {
   margin: 0;
+}
+
+.invoice-head__actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px;
+}
+
+.invoice-head__actions .btn {
+  white-space: nowrap;
 }
 
 .invoice-meta {
@@ -4085,6 +4121,13 @@ select:disabled {
 .qn-investment .quote-totals {
   padding: 0;
   background: transparent;
+}
+
+.qn-downloads {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--s-2);
+  margin-top: var(--s-3);
 }
 
 .qn-why p {
@@ -6787,9 +6830,16 @@ footer a:hover {
   border-radius: var(--r-sm);
   font-size: 0.86rem;
   line-height: 1.55;
-  white-space: pre-wrap;
   color: var(--text);
 }
+/* The draft renders through ArticlePreview; scale its reading type down
+   to the compact review box. */
+.content-review__body .article-preview { font-size: inherit; line-height: inherit; }
+.content-review__body .article-preview h2 { font-size: 1.15rem; }
+.content-review__body .article-preview h3 { font-size: 1.02rem; }
+.content-review__body .article-preview h4,
+.content-review__body .article-preview h5,
+.content-review__body .article-preview h6 { font-size: 0.95rem; }
 
 .content-review__actions {
   display: flex;
@@ -7862,6 +7912,14 @@ fieldset.field > legend {
   color: var(--accent);
   text-decoration: underline;
   text-underline-offset: 2px;
+}
+.article-preview__image {
+  display: block;
+  max-width: 100%;
+  height: auto;
+  margin: 0.5em 0;
+  border-radius: var(--r-xs);
+  background: var(--surface-2);
 }
 
 /* ---------- Disabled buttons ---------- */

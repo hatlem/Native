@@ -11,6 +11,7 @@ export async function GET(req: NextRequest) {
     const locale = newsletterFallbackLocale(
       req.nextUrl.searchParams.get("lang"),
       req.cookies.get("NEXT_LOCALE")?.value,
+      req.headers.get("accept-language"),
     );
     return NextResponse.redirect(`${origin}/${locale}/newsletter?status=invalid`);
   }

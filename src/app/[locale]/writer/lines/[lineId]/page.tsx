@@ -68,6 +68,8 @@ export default async function WriterLine({
         return t("spec.failTooShort", { words: f.words, min: f.min });
       case "tooLong":
         return t("spec.failTooLong", { words: f.words, max: f.max });
+      case "tooFewImages":
+        return t("spec.failTooFewImages", { images: f.images, min: f.min });
     }
   };
 
@@ -151,9 +153,14 @@ export default async function WriterLine({
               <dd>{wordRange ?? <span className="muted">{t("spec.notSpecified")}</span>}</dd>
               <dt>{t("spec.images")}</dt>
               <dd>
-                {spec?.imagesMin
-                  ? t("spec.imagesMin", { count: spec.imagesMin })
-                  : <span className="muted">{t("spec.notSpecified")}</span>}
+                {spec?.imagesMin ? (
+                  <>
+                    {t("spec.imagesMin", { count: spec.imagesMin })}
+                    <span className="hint">{t("spec.imagesHow")}</span>
+                  </>
+                ) : (
+                  <span className="muted">{t("spec.notSpecified")}</span>
+                )}
               </dd>
               <dt>{t("spec.disclosure")}</dt>
               <dd>{disclosureLabel ? <strong>{disclosureLabel}</strong> : <span className="muted">{t("spec.notSpecified")}</span>}</dd>

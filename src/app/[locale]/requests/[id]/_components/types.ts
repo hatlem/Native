@@ -6,7 +6,7 @@ import type { Prisma } from "@prisma/client";
 // ---------------------------------------------------------------------------
 
 export type ProductWithTitle = Prisma.ProductGetPayload<{
-  include: { title: { include: { market: true } } };
+  include: { title: { include: { market: true } }; spec: true };
 }>;
 
 export type QuoteWithOrder = Prisma.QuoteGetPayload<{

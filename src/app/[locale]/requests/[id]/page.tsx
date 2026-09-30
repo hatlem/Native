@@ -19,6 +19,7 @@ import {
 import { lineOrder } from "@/lib/commerce/line-order";
 import { reconcileExpiredQuotesInBackground } from "@/lib/commerce/quote-expiry";
 import { OrderSection } from "./_components/OrderSection";
+import { marketTimeZone } from "@/lib/markets";
 
 export const dynamic = "force-dynamic";
 
@@ -87,7 +88,8 @@ export default async function RequestPage({
     .filter((id): id is string => !!id);
   const products = await prisma.product.findMany({
     where: { id: { in: productIds } },
-    include: { title: { include: { market: true } } },
+    // spec: the quote's "what you get" states the format's word count.
+    include: { title: { include: { market: true } }, spec: true },
   });
   const byId = new Map(products.map((p) => [p.id, p]));
 
@@ -224,6 +226,7 @@ export default async function RequestPage({
       ) : (
         <QuoteSection
           locale={locale}
+          timeZone={marketTimeZone(request.organization.marketCode)}
           quotes={quotes}
           products={products}
           byId={byId}

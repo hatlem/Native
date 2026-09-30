@@ -1,5 +1,6 @@
 import crypto from "node:crypto";
 import { safeLocale, type AppLocale } from "@/i18n/routing";
+import { localeFromAcceptLanguage } from "@/i18n/accept-language";
 
 // Newsletter link tokens and redirect locale.
 //
@@ -42,13 +43,20 @@ export function newsletterLinks(args: {
 }
 
 // Locale for a redirect when no subscriber row tells us better: the link's
-// own `lang`, then the visitor's NEXT_LOCALE cookie, then the default. Never
-// a hard-coded /en — a Norwegian subscriber clicking a stale link should
-// read the explanation in Norwegian.
+// own `lang`, then the visitor's NEXT_LOCALE cookie, then the browser's
+// Accept-Language, then the default. Never a hard-coded /en: a Norwegian
+// subscriber clicking a stale link (every mail sent before links carried
+// `lang`) should read the explanation in Norwegian.
 export function newsletterFallbackLocale(
   lang: string | null,
   cookieLocale: string | undefined,
+  acceptLanguage?: string | null,
 ): AppLocale {
-  if (lang && safeLocale(lang) === lang) return lang as AppLocale;
-  return safeLocale(cookieLocale);
+  if (isAppLocale(lang)) return lang;
+  if (isAppLocale(cookieLocale)) return cookieLocale;
+  return localeFromAcceptLanguage(acceptLanguage) ?? safeLocale(undefined);
+}
+
+function isAppLocale(value: string | null | undefined): value is AppLocale {
+  return !!value && safeLocale(value) === value;
 }

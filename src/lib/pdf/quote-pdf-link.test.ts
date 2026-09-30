@@ -33,6 +33,7 @@ test("QuoteDocument: renders with a price-on-request line and links back online"
     total: 21562.5,
     validUntil: null,
     createdAt: new Date("2026-09-23T00:00:00Z"),
+    timeZone: "Europe/Oslo",
     organizationName: "ABAX Sverige",
     preparedByName: "Desk",
     preparedByEmail: "desk@nativespin.com",

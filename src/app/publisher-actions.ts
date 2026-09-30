@@ -14,6 +14,7 @@ import {
   parseLeadTimeDays,
   updateProductLeadTime,
   PublisherRatesError,
+  type LeadTimeSaveStatus,
 } from "@/lib/publisher-rates";
 
 function field(formData: FormData, key: string): string {
@@ -49,23 +50,34 @@ async function requirePublisher(
 export async function updateProduct(formData: FormData) {
   const locale = field(formData, "locale") || "en";
   const { publisherId, userId } = await requirePublisher(locale);
+  const productId = field(formData, "productId");
   const leadTimeDays = parseLeadTimeDays(field(formData, "leadTimeDays"));
 
-  if (leadTimeDays !== null) {
-    try {
-      await updateProductLeadTime({
-        publisherId,
-        productId: field(formData, "productId"),
-        leadTimeDays,
-        actorUserId: userId,
-      });
-    } catch (err) {
-      // Same fail-silent contract as the rates actions: never reveal whether
-      // a foreign product id exists.
-      if (!(err instanceof PublisherRatesError)) throw err;
-    }
+  // Every outcome is reported back on the product's own card: a save used
+  // to reload the page with no word either way, and an out-of-range value
+  // was dropped just as silently, so "did it take?" had no answer.
+  const back = (status: LeadTimeSaveStatus): never => {
+    const id = encodeURIComponent(productId);
+    redirect(`/${locale}/publisher?leadTime=${status}&product=${id}#product-${id}`);
+  };
+
+  if (leadTimeDays === null) return back("invalid");
+
+  let changed: boolean;
+  try {
+    ({ changed } = await updateProductLeadTime({
+      publisherId,
+      productId,
+      leadTimeDays,
+      actorUserId: userId,
+    }));
+  } catch (err) {
+    // Same fail-silent contract as the rates actions: never reveal whether
+    // a foreign product id exists.
+    if (!(err instanceof PublisherRatesError)) throw err;
+    redirect(`/${locale}/publisher`);
   }
-  redirect(`/${locale}/publisher`);
+  back(changed ? "saved" : "unchanged");
 }
 
 function intOrNull(formData: FormData, key: string): number | null {
