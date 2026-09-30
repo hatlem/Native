@@ -70,7 +70,9 @@ test("CSP regression: buildCsp still emits the nonce and the same directive shap
   assert.match(csp, /script-src 'self' 'nonce-abc123==' 'strict-dynamic'/);
   assert.match(csp, /default-src 'self'/);
   assert.match(csp, /style-src 'self' 'unsafe-inline'/);
-  assert.match(csp, /img-src 'self' data: https:/);
+  // blob: lets /preview show the visitor's own photo (URL.createObjectURL);
+  // BUG-prod-api-29 was the upload silently blocked by img-src.
+  assert.match(csp, /img-src 'self' data: blob: https:(;|$)/);
   assert.match(csp, /font-src 'self' data:/);
   // Browser uploads PUT straight to R2 with a presigned url.
   assert.match(csp, /connect-src 'self' https:\/\/\*\.r2\.cloudflarestorage\.com/);
@@ -81,6 +83,7 @@ test("CSP regression: buildCsp still emits the nonce and the same directive shap
   assert.match(csp, /upgrade-insecure-requests/);
 });
 
+<<<<<<< HEAD
 test("signed out on a protected page: a real 307 to sign-in that remembers the page", () => {
   const req = new NextRequest(new URL("https://nativespin.com/no/requests?tab=orders"));
   const res = middleware(req);
@@ -102,4 +105,10 @@ test("signedOutRedirect: session cookie, public pages, claim pages and POSTs pas
   assert.equal(signedOutRedirect(new NextRequest(url("/no/publisher/claim/tok"))), null);
   assert.equal(signedOutRedirect(new NextRequest(url("/no/pricing"))), null);
   assert.equal(signedOutRedirect(new NextRequest(url("/no/plan"), { method: "POST" })), null);
+});
+
+test("CSP stays tight: blob: is allowed for images only", () => {
+  const directives = buildCsp("n").split("; ");
+  const withBlob = directives.filter((d) => d.includes("blob:")).map((d) => d.split(" ")[0]);
+  assert.deepEqual(withBlob, ["img-src"]);
 });
