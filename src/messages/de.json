@@ -594,6 +594,9 @@
     "decrementRemoves": "Titel aus dem Plan entfernen",
     "increment": "Menge erhöhen",
     "estTotal": "Geschätzter Richtwert",
+    "exVat": "zzgl. MwSt.",
+    "inclVatLine": "{amount} inkl. MwSt.",
+    "includesContentFees": "Inklusive {amount} für die Content-Produktion.",
     "totalForItems": "{amount} für {count, plural, =1 {1 Titel} other {# Titel}}",
     "multiCurrencyNote": "Titel werden in der Währung des jeweiligen Verlags abgerechnet — beide Beträge sind fällig, das ist keine Wahl der Zahlungswährung.",
     "rfqTitle": "Festes Angebot anfordern",
@@ -1314,7 +1317,12 @@
     "planTitle": "Bestellung bestätigen",
     "planNote": "Alle Positionen sind festpreisig — mit dem Absenden wird Ihre Bestellung sofort bestätigt, keine Wartezeit beim Einkaufs-Desk.",
     "planSubmit": "Bestellung bestätigen",
-    "planSubmitting": "Bestellung wird aufgegeben…"
+    "planSubmitting": "Bestellung wird aufgegeben…",
+    "orderTotal": "Bestellsumme",
+    "commitAmount": "Sie bestellen für {amount} inkl. MwSt.",
+    "reassurance": "Mit der Bestätigung geben Sie eine verbindliche Bestellung zu diesem Preis auf — ein separates Angebot zur Freigabe gibt es nicht.",
+    "noCommitNote": "Ihre Rolle umfasst keine Bestellberechtigung, daher können Sie die Bestellung nicht selbst bestätigen. Senden Sie sie stattdessen als Angebotsanfrage — ein Admin in Ihrem Team kann das Angebot annehmen.",
+    "sendAsRfq": "Als Angebotsanfrage senden"
   },
   "publisher": {
     "title": "Verlagsportal",
@@ -2547,6 +2555,9 @@
   },
   "invite": {
     "title": "Treten Sie {org} bei",
+    "lead": "Ihr Team plant und bucht Native Advertising auf NativeSpin. Treten Sie bei und arbeiten Sie in denselben Plänen, Angeboten und Bestellungen.",
+    "acceptTitle": "Ein Klick, und Sie sind dabei",
+    "createTitle": "Konto erstellen",
     "invitationFor": "Einladung für {email}",
     "accept": "Einladung annehmen",
     "createAndJoin": "Konto erstellen und beitreten",

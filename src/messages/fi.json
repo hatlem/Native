@@ -594,6 +594,9 @@
     "decrementRemoves": "Poista julkaisu suunnitelmasta",
     "increment": "Lisää määrää",
     "estTotal": "Arvioitu suuntaa-antava yhteissumma",
+    "exVat": "alv 0 %",
+    "inclVatLine": "{amount} sis. alv",
+    "includesContentFees": "Sisältää sisällöntuotantoa {amount}.",
     "totalForItems": "{amount}, {count, plural, =1 {1 julkaisu} other {# julkaisua}}",
     "multiCurrencyNote": "Julkaisut laskutetaan kustantajan omassa valuutassa — molemmat summat erääntyvät, tämä ei ole valuutan valinta.",
     "rfqTitle": "Pyydä kiinteä tarjous",
@@ -1314,7 +1317,12 @@
     "planTitle": "Vahvista tilauksesi",
     "planNote": "Kaikilla riveillä on kiinteä hinta — lähettäminen vahvistaa tilauksesi heti, ei deskin odotusta.",
     "planSubmit": "Vahvista tilaus",
-    "planSubmitting": "Tilaus tehdään…"
+    "planSubmitting": "Tilaus tehdään…",
+    "orderTotal": "Tilauksen yhteissumma",
+    "commitAmount": "Tilaat yhteensä {amount} (sis. alv).",
+    "reassurance": "Vahvistamalla teet sitovan tilauksen tähän hintaan — erillistä tarjousta ei tule hyväksyttäväksi.",
+    "noCommitNote": "Roolillasi ei ole tilausoikeutta, joten et voi vahvistaa tilausta itse. Lähetä se tarjouspyyntönä — tiimisi ylläpitäjä voi hyväksyä tarjouksen.",
+    "sendAsRfq": "Lähetä tarjouspyyntönä"
   },
   "publisher": {
     "title": "Kustantajaportaali",
@@ -2690,6 +2698,9 @@
   },
   "invite": {
     "title": "Liity organisaatioon {org}",
+    "lead": "Tiimisi suunnittelee ja ostaa natiivimainontaa NativeSpinissä. Liity mukaan ja työskentele samoissa suunnitelmissa, tarjouksissa ja tilauksissa.",
+    "acceptTitle": "Yksi klikkaus, ja olet mukana",
+    "createTitle": "Luo tilisi",
     "invitationFor": "Kutsu osoitteelle {email}",
     "accept": "Hyväksy kutsu",
     "createAndJoin": "Luo tili ja liity",

@@ -3545,6 +3545,15 @@ select:disabled {
   margin: 0;
 }
 
+/* The amount the instant-order click commits to, right above that button. */
+.plan-summary-commit {
+  margin: 0;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--heading);
+  font-variant-numeric: tabular-nums;
+}
+
 .plan-summary-reassurance {
   margin: 4px 0 0;
   text-align: center;
