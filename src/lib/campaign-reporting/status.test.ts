@@ -5,6 +5,7 @@ import {
   isOrderEligibleForScan,
   groupBookingsByPublisher,
   resolveRecipient,
+  canRequestMetricsNow,
 } from "./status";
 
 test("computeRequestStatus: COMPLETE when every booking has impressions", () => {
@@ -63,4 +64,22 @@ test("resolveRecipient: prefers isPrimary, then first by email", () => {
     { email: "a@x.no", name: "A" },
   );
   assert.equal(resolveRecipient([]), null);
+});
+
+test("canRequestMetricsNow: only once the flight's last day is over, no grace day", () => {
+  const end = new Date("2026-09-30T00:00:00Z");
+  const order = { status: "LIVE" as const, flightEndDate: end };
+  // Still inside the last flight day.
+  assert.equal(canRequestMetricsNow(order, new Date("2026-09-30T18:00:00Z")), false);
+  // The next morning — the sweep would still wait a grace day; the desk needn't.
+  assert.equal(canRequestMetricsNow(order, new Date("2026-10-01T06:00:00Z")), true);
+});
+
+test("canRequestMetricsNow: never without a flight end, or for quoted/cancelled orders", () => {
+  const after = new Date("2026-12-01T00:00:00Z");
+  assert.equal(canRequestMetricsNow({ status: "COMPLETED", flightEndDate: null }, after), false);
+  const end = new Date("2026-09-30T00:00:00Z");
+  assert.equal(canRequestMetricsNow({ status: "CANCELLED", flightEndDate: end }, after), false);
+  assert.equal(canRequestMetricsNow({ status: "QUOTED", flightEndDate: end }, after), false);
+  assert.equal(canRequestMetricsNow({ status: "INVOICED", flightEndDate: end }, after), true);
 });

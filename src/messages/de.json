@@ -178,10 +178,6 @@
     "detailSaveDraft": "Entwurf speichern",
     "detailUploading": "Wird hochgeladen…",
     "detailDownloadFile": "Datei herunterladen",
-    "detailStatus": "Status",
-    "detailSpecPassed": "spec ✓",
-    "detailSpecFailed": "spec ✗",
-    "detailRunSpecCheck": "Spec-Prüfung ausführen",
     "detailSubmitForReview": "Zur Prüfung einreichen",
     "detailReviewNotes": "Anmerkungen",
     "linkHeading": "Mit einer Platzierung verknüpfen",
@@ -191,9 +187,22 @@
     "placementRetracted": "Zurückgezogen",
     "unlinkCta": "Verknüpfung entfernen",
     "sharedArticleWarning": "Dieser Artikel ist mit {count} weiteren Platzierungen verknüpft — deine Änderungen wirken sich auf alle aus.",
-    "specNotChecked": "nicht geprüft",
     "detailUploadFailed": "Hochladen fehlgeschlagen. Versuchen Sie eine andere Datei.",
-    "detailUploadUnavailable": "Datei-Uploads sind gerade nicht verfügbar. Fügen Sie den Text stattdessen im Editor ein."
+    "detailUploadUnavailable": "Datei-Uploads sind gerade nicht verfügbar. Fügen Sie den Text stattdessen im Editor ein.",
+    "backToArticles": "Alle Artikel",
+    "versionLabel": "Version {version}",
+    "byAuthor": "Von {name}",
+    "previewHeading": "Vorschau",
+    "previewEmpty": "Noch kein Text.",
+    "awaitingReview": "Wartet auf die Freigabe durch den Kunden.",
+    "placementsHeading": "Platzierungen",
+    "specPassed": "Vorgaben erfüllt",
+    "specFailed": "Abweichungen von den Vorgaben",
+    "saving": "Speichern…",
+    "orderRef": "Auftrag {ref}",
+    "draftLabel": "Artikeltext",
+    "draftHint": "Reiner Text mit einfachem Markdown: # für Überschriften, **fett**, *kursiv*, - für Listen, [Text](Link).",
+    "submitBlockedSpec": "Die Formatvorgaben einer Platzierung sind noch nicht erfüllt – prüfen Sie die Platzierungen oben."
   },
   "reports": {
     "title": "Berichte",
@@ -1103,7 +1112,8 @@
       "all": "Alle",
       "unverified": "Noch nicht geprüft",
       "active": "Native verfügbar",
-      "no-native": "Kein Native"
+      "no-native": "Kein Native",
+      "awaitingPrice": "Wartet auf bestätigten Preis"
     },
     "reach": "Monatliche Reichweite",
     "circulation": "Auflage",
@@ -1123,7 +1133,8 @@
       "deactivate": "Deaktivieren",
       "edit": "Bearbeiten",
       "marking": "Wird markiert…",
-      "deactivating": "Wird deaktiviert…"
+      "deactivating": "Wird deaktiviert…",
+      "resetVerification": "Auf „nicht geprüft“ zurücksetzen"
     },
     "freshness": {
       "column": "Preisaktualität",
@@ -1161,7 +1172,55 @@
     "active": "Aktiv",
     "inactive": "Inaktiv",
     "assignments": "{active} aktiv",
-    "assignmentsOf": "{active} / {max} aktiv"
+    "assignmentsOf": "{active} / {max} aktiv",
+    "inviteLanguage": {
+      "en": "Englisch",
+      "no": "Norwegisch",
+      "sv": "Schwedisch",
+      "da": "Dänisch",
+      "fi": "Finnisch",
+      "de": "Deutsch"
+    },
+    "emailPlaceholder": "autorin@beispiel.de",
+    "inviteLanguageLabel": "Sprache der E-Mail",
+    "inviteLanguageHint": "Einladung und Kontoseite erscheinen in dieser Sprache.",
+    "inviteSent": "Einladung an <addr></addr> gesendet.",
+    "inviteNotSent": "Die Einladung für <addr></addr> wurde angelegt, aber die E-Mail ging nicht raus. Senden Sie sie unten erneut oder teilen Sie den Link selbst.",
+    "errorInvalidEmail": "Geben Sie eine gültige E-Mail-Adresse ein.",
+    "errorExistingAccount": "Für diese Adresse gibt es bereits ein NativeSpin-Konto, daher kann sie keine Autoreneinladung annehmen. Bitten Sie einen Superadmin, stattdessen die Rolle des Kontos zu ändern.",
+    "colEmail": "E-Mail",
+    "colLanguage": "Sprache",
+    "colDelivery": "Versand",
+    "emailedOn": "Gesendet am {date}",
+    "notEmailed": "Nicht gesendet",
+    "resend": "Erneut senden",
+    "colName": "Name",
+    "colLanguages": "Sprachen",
+    "colSpecialties": "Fachgebiete",
+    "colStatus": "Status",
+    "colLoad": "Auslastung",
+    "panel": {
+      "eyebrow": "Produktion",
+      "title": "Autor:innen für diesen Auftrag",
+      "lead": "Sortiert nach Sprache ({language}) und Fachgebiet ({topics}). Nehmen Sie Kandidat:innen in den Pool dieses Auftrags auf und weisen Sie unten jeder Zeile eine Person zu.",
+      "empty": "Noch keine Autor:innen – laden Sie jemanden unter „Autor:innen“ ein.",
+      "colWriter": "Autor:in",
+      "colLanguages": "Sprachen",
+      "colSpecialties": "Fachgebiete",
+      "colLoad": "Auslastung",
+      "inPool": "Im Pool",
+      "inactive": "Nimmt keine Aufträge an",
+      "overCapacity": "Über Kapazität",
+      "none": "Keine Angabe",
+      "loadOf": "{active} / {max} aktiv",
+      "load": "{active} aktiv",
+      "add": "Zum Pool hinzufügen",
+      "remove": "Entfernen",
+      "saving": "Speichern…",
+      "writerLabel": "Autor:in",
+      "unassigned": "— Nicht zugewiesen —",
+      "assign": "Zuweisen"
+    }
   },
   "auth": {
     "title": "Anmelden",
@@ -1248,7 +1307,9 @@
     "deactivatedSignin": "Dieses Konto wurde deaktiviert. Wenden Sie sich an das Desk, wenn es wieder aktiviert werden soll.",
     "emailChangedOk": "E-Mail-Adresse aktualisiert — melden Sie sich mit der neuen Adresse an.",
     "deactivatedTitle": "Dieses Konto ist deaktiviert",
-    "deactivatedBody": "Ihr Konto wurde abgeschaltet, hier gibt es also nichts zu tun. Melden Sie sich unten ab und wenden Sie sich an das Desk, falls das ein Versehen ist."
+    "deactivatedBody": "Ihr Konto wurde abgeschaltet, hier gibt es also nichts zu tun. Melden Sie sich unten ab und wenden Sie sich an das Desk, falls das ein Versehen ist.",
+    "writerClaimSubmit": "Autorenkonto anlegen",
+    "writerClaimSubmitting": "Wird angelegt…"
   },
   "order": {
     "title": "Bestellung",
@@ -1268,7 +1329,7 @@
     "deskLead": "Alle Bestellungen aller Kunden — Produktion, Planung und Live-Platzierung.",
     "customer": "Kunde",
     "total": "Total",
-    "created": "Created",
+    "created": "Erstellt",
     "kpiInProgress": "In Bearbeitung",
     "kpiLive": "Live",
     "kpiCompleted": "Abgeschlossen",
@@ -1285,7 +1346,7 @@
     "cancelBlocked": "Diese Bestellung kann nicht mehr storniert werden.",
     "cancelError": "Stornierung abgelehnt",
     "cancelledAtLabel": "Storniert",
-    "cancelledByLabel": "Von",
+    "cancelledByLabel": "Storniert von",
     "cancelledReasonLabel": "Grund",
     "creditNoteButton": "Gutschrift ausstellen",
     "creditNoteTitle": "Rechnung erstatten",
@@ -1333,7 +1394,13 @@
       "unconfirmed": "Setzen Sie das Häkchen, um fortzufahren, während Platzierungen noch unveröffentlicht sind.",
       "moved": "Der Auftrag hat inzwischen den Status gewechselt. Prüfen Sie ihn und versuchen Sie es erneut."
     },
-    "unknownPlacement": "Unbenannte Platzierung"
+    "unknownPlacement": "Unbenannte Platzierung",
+    "cancelledByRole": {
+      "DESK": "NativeSpin-Desk",
+      "SUPERADMIN": "NativeSpin (Admin)",
+      "PUBLISHER": "Der Verlag",
+      "BUYER": "Der Kunde"
+    }
   },
   "production": {
     "brief": "Brief",
@@ -2154,19 +2221,19 @@
     "nameLabel": "Name / Partner",
     "orgLabel": "Eigentümer-Organisation (optional)",
     "orgPlatform": "NativeSpin-Plattform-Schlüssel (keine Org)",
-    "scopesLabel": "Scopes",
+    "scopesLabel": "Berechtigungen (Scopes)",
     "scopesHint": "Kommagetrennt. Optionen: catalog:read, orders:write (orders:write muss an eine Organisation gebunden sein). pricing:admin ist nur intern.",
     "ttlLabel": "Läuft ab in (Tagen)",
     "ttlPlaceholder": "Kein Ablauf",
     "ttlHint": "Leer lassen für kein Ablaufdatum; maximal 1825 Tage (5 Jahre).",
     "issueSubmit": "Schlüssel generieren",
     "issuing": "Wird generiert…",
-    "listEyebrow": "Bestehend",
+    "listEyebrow": "Bestehende",
     "listTitle": "Alle Schlüssel",
     "colName": "Name",
-    "colOrg": "Org",
-    "colScopes": "Scopes",
-    "colCreated": "Created",
+    "colOrg": "Organisation",
+    "colScopes": "Berechtigungen",
+    "colCreated": "Erstellt",
     "colLastUsed": "Zuletzt verwendet",
     "colStatus": "Status",
     "status_active": "Aktiv",
@@ -2177,11 +2244,8 @@
     "revokeConfirm": "Dies kann nicht rückgängig gemacht werden. Bestehende Integrationen, die diesen Schlüssel verwenden, funktionieren sofort nicht mehr.",
     "revokeConfirmCta": "Ja, Schlüssel zurückziehen",
     "docsHintPrefix": "Öffentliche Dokumentation verfügbar unter",
-    "deniedTitle": "API-Schlüssel (nur SUPERADMIN)",
-    "deniedLead": "Diese Seite ist für NativeSpin-Plattform-Admins.",
     "deniedBody": "Öffentliche Katalog-API-Schlüssel werden von NativeSpin-Superadmins ausgestellt. Wenn Ihre Rolle die Schlüssel-Ausstellung legitim benötigt — oder Sie ein Partner sind, der einen Schlüssel benötigt — kontaktieren Sie das Desk, wir richten es ein.",
-    "deniedCta": "An das Desk schreiben",
-    "deniedBack": "Zurück zu /desk"
+    "orgPlatformShort": "NativeSpin-Plattform"
   },
   "quoteNarrative": {
     "sectionCampaign": "Ihre Kampagne",
@@ -2268,7 +2332,9 @@
     "inviteSent": "Einladung gesendet.",
     "inviteInvalidEmail": "Das sieht nicht nach einer gültigen E-Mail-Adresse aus.",
     "inviteBusinessEmail": "Verwenden Sie eine Firmenadresse — kostenlose und Wegwerf-Anbieter werden nicht akzeptiert.",
-    "inviteNotFound": "Diesen Verlag gibt es nicht mehr — laden Sie die Seite neu."
+    "inviteNotFound": "Diesen Verlag gibt es nicht mehr — laden Sie die Seite neu.",
+    "priceUnconfirmed": "Preis nicht bestätigt",
+    "productInactive": "inaktiv"
   },
   "salesContacts": {
     "title": "Vertriebskontakte",
@@ -2858,7 +2924,21 @@
     "overrideHint": " — Desk-Korrektur",
     "saveOverride": "Korrektur speichern",
     "frozenNoEdit": "Die Zahlen sind gesperrt und können nicht bearbeitet werden.",
-    "unknownPublisher": "Unbekannter Verlag"
+    "unknownPublisher": "Unbekannter Verlag",
+    "metricsNowTitle": "Kennzahlen-Anfragen",
+    "metricsNowNotEnded": "Verlage werden nach Ende der Laufzeit um ihre Zahlen gebeten. Legen Sie oben das Enddatum fest; der tägliche Lauf verschickt die Anfragen am Tag danach.",
+    "metricsNowNothing": "Alle Verlage dieses Auftrags haben bereits eine Kennzahlen-Anfrage – den Status sehen Sie unten.",
+    "metricsNowHint": "{count, plural, =1 {1 Verlag wurde noch nicht angefragt.} other {# Verlage wurden noch nicht angefragt.}} Der tägliche Lauf würde morgen senden.",
+    "metricsNowButton": "Kennzahlen jetzt anfragen",
+    "metricsNowNoPublisher": "{count, plural, =1 {1 Buchung hat} other {# Buchungen haben}} keinen hinterlegten Verlag, daher kann dafür keine Anfrage gesendet werden.",
+    "requestStatusValue": {
+      "NEEDS_CONTACT": "Kontakt fehlt",
+      "PENDING": "Wartet auf Zahlen",
+      "PARTIAL": "Teilweise gemeldet",
+      "COMPLETE": "Gemeldet",
+      "EXPIRED": "Abgelaufen",
+      "CANCELLED": "Abgebrochen"
+    }
   },
   "rateCards": {
     "title": "Preislisten / Mediadaten",
@@ -3132,7 +3212,8 @@
     "SCHEDULED": "Geplant",
     "SENT": "Gesendet",
     "SUBMITTED": "Eingereicht",
-    "VOID": "Ungültig"
+    "VOID": "Ungültig",
+    "SUPERSEDED": "Ersetzt"
   },
   "joinedNotice": {
     "lists": "Willkommen bei {org}. Das sind die Pläne Ihres Teams – öffnen Sie einen, um Titel, Preise und Hinweise zu sehen.",
@@ -3140,5 +3221,207 @@
   },
   "paymentTerms": {
     "line": "{days, plural, one {Zahlungsbedingungen: netto # Tag ab Rechnungsdatum.} other {Zahlungsbedingungen: netto # Tage ab Rechnungsdatum.}}"
+  },
+  "superadminOnly": {
+    "eyebrow": "Nur für Superadmins",
+    "lead": "Diese Seite ist für die Plattform-Admins von NativeSpin.",
+    "body": "Ihr Konto hat Desk-Zugriff, diese Seite erfordert aber die Superadmin-Rolle. Wenn Sie sie für Ihre Arbeit brauchen, schreiben Sie dem Desk – ein Superadmin hilft Ihnen weiter oder schaltet den Zugang frei.",
+    "cta": "E-Mail an den Desk",
+    "back": "Zurück zum Desk",
+    "mailSubject": "Zugriffsanfrage: {area} — NativeSpin"
+  },
+  "publisherContacts": {
+    "eyebrow": "Desk · Outreach",
+    "title": "Verlagskontakte",
+    "lead": "Prüfen Sie gesammelte Anzeigenkontakte, bevor sie verwendet werden, und starten Sie dann die Preisanfrage-Kampagne.",
+    "tabsLabel": "Ansichten",
+    "tabReview": "Kandidaten prüfen",
+    "tabCampaign": "Preiskampagne",
+    "ok": {
+      "approved": "Kontakt freigegeben.",
+      "rejected": "Kontakt abgelehnt.",
+      "bulk": "{approved} freigegeben, {failed} fehlgeschlagen.",
+      "built": "Kampagne aktualisiert: {created} neue Anfragen, {skipped} übersprungen.",
+      "sent": "{count, plural, =0 {Keine E-Mails gesendet.} =1 {1 E-Mail gesendet.} other {# E-Mails gesendet.}}",
+      "one": "E-Mail gesendet."
+    },
+    "errorGeneric": "Das hat nicht geklappt: {detail}",
+    "working": "Wird ausgeführt…",
+    "buildCampaign": "Kampagne erstellen / aktualisieren",
+    "batchSizeLabel": "Anzahl pro Durchgang",
+    "sendBatch": "Durchgang senden (als Nächstes fällig)",
+    "kpiTotal": "Anfragen",
+    "state": {
+      "draft": "Entwurf",
+      "inFlight": "Unterwegs",
+      "responded": "Beantwortet",
+      "cancelled": "Abgebrochen"
+    },
+    "noRequests": "Noch keine Preisanfragen — erstellen Sie die Kampagne, um sie anzulegen.",
+    "colRecipient": "Empfänger",
+    "colTitles": "Titel",
+    "colLocale": "Sprache",
+    "colStep": "Schritt",
+    "colStatus": "Status",
+    "colNextDue": "Nächster Termin",
+    "stepOf": "{sent}/{max}",
+    "sendOne": "Senden",
+    "candidateStatus": {
+      "PENDING": "Wartet auf Prüfung",
+      "APPROVED": "Freigegeben",
+      "REJECTED": "Abgelehnt"
+    },
+    "titlesByChannel": "Titel nach Vertriebsweg:",
+    "channel": {
+      "DIRECT": "Direkt",
+      "IN_HOUSE": "Hauseigene Vermarktung",
+      "REP": "Vermarkter",
+      "MIXED": "Gemischt",
+      "UNKNOWN": "Unbekannt"
+    },
+    "pendingEyebrow": "Prüfung",
+    "pendingTitle": "Kandidaten, die auf Prüfung warten",
+    "bulkApproveLabel": "Alle freigeben mit Konfidenz ≥",
+    "bulkApprove": "Alle freigeben",
+    "noCandidates": "Keine Kandidaten warten auf Prüfung.",
+    "colPublisher": "Verlag",
+    "colMarket": "Markt",
+    "colChannel": "Vertriebsweg",
+    "colCandidate": "Kandidat",
+    "colConfidence": "Konfidenz",
+    "colSource": "Quelle",
+    "viewSource": "Ansehen",
+    "approve": "Freigeben",
+    "reject": "Ablehnen"
+  },
+  "writerEnums": {
+    "language": {
+      "NO": "Norwegisch",
+      "SV": "Schwedisch",
+      "DA": "Dänisch",
+      "FI": "Finnisch",
+      "DE": "Deutsch",
+      "EN": "Englisch"
+    },
+    "topic": {
+      "FINANCE": "Finanzen",
+      "HEALTH": "Gesundheit",
+      "TECH": "Technik",
+      "LIFESTYLE": "Lifestyle",
+      "B2B": "B2B",
+      "TRAVEL": "Reisen",
+      "FOOD": "Essen & Trinken",
+      "CULTURE": "Kultur",
+      "SUSTAINABILITY": "Nachhaltigkeit",
+      "OTHER": "Sonstiges"
+    },
+    "proficiency": {
+      "NATIVE": "Muttersprache",
+      "FLUENT": "Fließend",
+      "WORKING": "Gute Kenntnisse"
+    }
+  },
+  "writer": {
+    "eyebrow": "Autorenportal",
+    "backToAssignments": "Meine Aufträge",
+    "untitledAssignment": "Auftrag",
+    "status": {
+      "notStarted": "Nicht begonnen"
+    },
+    "home": {
+      "title": "Meine Aufträge",
+      "lead": "Alles, was der Desk Ihnen zugewiesen hat. Öffnen Sie einen Auftrag, um Briefing, Formatvorgaben und Playbook zu sehen, schreiben Sie den Text und reichen Sie ihn zur Freigabe ein.",
+      "profileCta": "Mein Profil bearbeiten",
+      "emptyTitle": "Noch keine Aufträge",
+      "emptyBody": "Sobald der Desk Ihnen einen Artikel zuweist, erscheint er hier und Sie erhalten eine E-Mail.",
+      "colTitle": "Titel",
+      "colFormat": "Format",
+      "colMarket": "Markt",
+      "colStatus": "Status",
+      "colAssigned": "Zugewiesen",
+      "open": "Öffnen"
+    },
+    "line": {
+      "notReady": "Das Briefing für diesen Auftrag ist noch nicht fertig. Der Desk meldet sich, sobald es so weit ist.",
+      "changesRequested": "Änderungen gewünscht:",
+      "closed": "Dieser Auftrag ist abgeschlossen – der Auftrag wurde storniert, die Platzierung zurückgezogen oder der Artikel ist final. Hier gibt es nichts mehr zu schreiben.",
+      "draftEyebrow": "Ihr Entwurf",
+      "draftHeading": "Artikel schreiben",
+      "inReviewNote": "Dieser Entwurf liegt beim Kunden zur Freigabe. Wenn Sie jetzt speichern, entsteht eine neue Version – reichen Sie diese ein, sobald sie fertig ist.",
+      "draftLabel": "Artikeltext",
+      "draftPlaceholder": "# Überschrift\n\nEinleitung…",
+      "draftHint": "Reiner Text mit einfachem Markdown: # für Überschriften, **fett**, *kursiv*, - für Listen, [Text](Link). Denken Sie an die Kennzeichnung.",
+      "saveDraft": "Entwurf speichern",
+      "saving": "Speichern…",
+      "submit": "Zur Freigabe einreichen",
+      "submitBlocked": "Beheben Sie die Abweichungen oben, speichern Sie und reichen Sie dann ein.",
+      "awaitingReview": "Zur Freigabe eingereicht – Sie erfahren es, wenn der Kunde Änderungen wünscht."
+    },
+    "brief": {
+      "heading": "Briefing",
+      "message": "Kernbotschaft",
+      "messageMissing": "Noch keine Kernbotschaft – fragen Sie den Desk, bevor Sie beginnen.",
+      "audience": "Zielgruppe",
+      "do": "Bitte so",
+      "dont": "Bitte nicht",
+      "references": "Referenzen"
+    },
+    "spec": {
+      "heading": "Formatvorgaben",
+      "words": "Länge",
+      "wordsRange": "{min}–{max} Wörter",
+      "wordsMin": "Mindestens {min} Wörter",
+      "wordsMax": "Höchstens {max} Wörter",
+      "notSpecified": "Nicht angegeben",
+      "images": "Bilder",
+      "imagesMin": "{count, plural, =1 {Mindestens 1 Bild} other {Mindestens # Bilder}}",
+      "disclosure": "Kennzeichnung (Pflicht)",
+      "fileFormats": "Dateiformate",
+      "videoLength": "Videolänge",
+      "videoSeconds": "Bis zu {seconds} Sekunden",
+      "shoppable": "Produktlinks",
+      "shoppableMax": "{count, plural, =1 {Bis zu 1 Produkt} other {Bis zu # Produkte}}",
+      "requirements": "Weitere Vorgaben",
+      "checkHeading": "Formatprüfung",
+      "passed": "Erfüllt",
+      "failed": "Nachbessern",
+      "notChecked": "Speichern Sie den Entwurf als Text, um ihn gegen die Formatvorgaben zu prüfen.",
+      "passedDetail": "Der Entwurf erfüllt die Formatvorgaben ({words} Wörter).",
+      "failDisclosure": "Die Kennzeichnung „{label}“ fehlt. Leser:innen müssen sehen, dass es sich um bezahlte Inhalte handelt.",
+      "failTooShort": "Zu kurz: {words} Wörter, das Format verlangt mindestens {min}.",
+      "failTooLong": "Zu lang: {words} Wörter, das Format erlaubt höchstens {max}."
+    },
+    "profile": {
+      "title": "Mein Profil",
+      "lead": "Der Desk ordnet Briefings nach Sprache, Fachgebiet und Kapazität zu – halten Sie Ihr Profil aktuell.",
+      "noProfile": "Dieses Konto hat kein Autorenprofil.",
+      "saved": "Profil gespeichert.",
+      "fixErrors": "Nichts gespeichert – korrigieren Sie die markierten Felder und versuchen Sie es erneut.",
+      "bio": "Über Sie",
+      "bioPlaceholder": "Themen, über die Sie schreiben, Medien, für die Sie tätig waren, Ihr typischer Ton …",
+      "languages": "Sprachen, in denen Sie schreiben",
+      "languagesHint": "Wählen Sie für jede Sprache, in der Sie schreiben, Ihr Niveau. Mindestens eine ist erforderlich.",
+      "languageNone": "Schreibe ich nicht",
+      "specialties": "Fachgebiete",
+      "ratePerArticle": "Honorar pro Artikel",
+      "ratePerWord": "Honorar pro Wort",
+      "currency": "Währung",
+      "currencyNone": "— Auswählen —",
+      "maxActiveAssignments": "Max. aktive Aufträge",
+      "maxActiveAssignmentsHint": "Leer lassen für keine Begrenzung.",
+      "portfolioUrl": "Link zum Portfolio",
+      "active": "Verfügbar für neue Aufträge",
+      "save": "Profil speichern",
+      "saving": "Speichern…",
+      "errors": {
+        "bio": "Bitte unter 2.000 Zeichen bleiben.",
+        "languages": "Wählen Sie mindestens eine Sprache.",
+        "ratePerArticle": "Geben Sie einen Betrag über 0 ein, z. B. 4500.",
+        "ratePerWord": "Geben Sie einen Betrag über 0 ein, z. B. 3,5.",
+        "currency": "Wählen Sie die Währung für Ihre Honorare.",
+        "maxActiveAssignments": "Geben Sie eine ganze Zahl von 1 bis 50 ein oder lassen Sie das Feld leer.",
+        "portfolioUrl": "Geben Sie einen vollständigen Link ein, der mit https:// beginnt."
+      }
+    }
   }
 }

@@ -6,6 +6,7 @@ import {
   markTitleNative,
   markTitleNoNative,
   deactivateTitle,
+  resetTitleVerification,
 } from "@/app/title-actions";
 import { createPriceRequestsBulkAction } from "@/app/price-actions";
 import { SubmitButton } from "@/components";
@@ -186,6 +187,11 @@ export async function TitlesGrid({ locale, byMarket }: Props) {
                   }}
                 >
                   <span className="tag">{statusLabel}</span>
+                  {/* Offers native but no confirmed price yet: the title is
+                      live for "price on request", nothing is bookable. */}
+                  {verified && hasNative && !title.products.some((p) => p.confirmedAt) ? (
+                    <span className="tag">{t("status.awaitingPrice")}</span>
+                  ) : null}
                   {title.urlStatus ? (
                     <span className="tag">{title.urlStatus}</span>
                   ) : null}
@@ -234,6 +240,9 @@ export async function TitlesGrid({ locale, byMarket }: Props) {
                   >
                     {t("actions.edit")}
                   </Link>
+                  {/* Every verdict stays correctable: native ⇄ no native in
+                      both directions, and any recorded verdict can be reset
+                      to "not checked yet". */}
                   {!hasNative ? (
                     <form action={markTitleNative}>
                       <input type="hidden" name="locale" value={locale} />
@@ -241,16 +250,18 @@ export async function TitlesGrid({ locale, byMarket }: Props) {
                       <SubmitButton
                         label={t("actions.markNative")}
                         pendingLabel={t("actions.marking")}
+                        className="btn small"
                       />
                     </form>
                   ) : null}
-                  {!declined && !hasNative ? (
+                  {!declined ? (
                     <form action={markTitleNoNative}>
                       <input type="hidden" name="locale" value={locale} />
                       <input type="hidden" name="titleId" value={title.id} />
                       <SubmitButton
                         label={t("actions.markNoNative")}
                         pendingLabel={t("actions.marking")}
+                        className="btn small secondary"
                       />
                     </form>
                   ) : null}
@@ -261,6 +272,18 @@ export async function TitlesGrid({ locale, byMarket }: Props) {
                       <SubmitButton
                         label={t("actions.deactivate")}
                         pendingLabel={t("actions.deactivating")}
+                        className="btn small ghost"
+                      />
+                    </form>
+                  ) : null}
+                  {verified ? (
+                    <form action={resetTitleVerification}>
+                      <input type="hidden" name="locale" value={locale} />
+                      <input type="hidden" name="titleId" value={title.id} />
+                      <SubmitButton
+                        label={t("actions.resetVerification")}
+                        pendingLabel={t("actions.marking")}
+                        className="btn small ghost"
                       />
                     </form>
                   ) : null}

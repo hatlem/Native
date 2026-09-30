@@ -1,6 +1,7 @@
 import { getTranslations } from "next-intl/server";
-import { notFound, redirect } from "next/navigation";
-import { auth } from "@/auth";
+import { notFound } from "next/navigation";
+import { superadminPageGate } from "@/lib/desk-guard";
+import { SuperadminOnly } from "@/components/superadmin-only";
 import { prisma } from "@/lib/prisma";
 import { Link } from "@/i18n/navigation";
 import {
@@ -146,9 +147,10 @@ export default async function DeskTitleEditPage({
 }) {
   const { locale, id } = await params;
   const sp = await searchParams;
-  const session = await auth();
-  if (session?.user?.role !== "SUPERADMIN") {
-    redirect(`/${locale}/desk`);
+  const gate = await superadminPageGate(locale);
+  if (!gate.allowed) {
+    const tTitles = await getTranslations({ locale, namespace: "deskTitles" });
+    return <SuperadminOnly locale={locale} area={tTitles("title")} />;
   }
 
   const title = await prisma.title.findUnique({
@@ -179,6 +181,7 @@ export default async function DeskTitleEditPage({
   const feeRules = await loadContentFeeRules();
 
   const t = await getTranslations({ locale, namespace: "titleAdmin" });
+  const tType = await getTranslations({ locale, namespace: "productType" });
   const tMarket = await getTranslations({ locale, namespace: "market" });
 
   const saved = typeof sp.saved === "string" ? sp.saved : null;
@@ -482,12 +485,15 @@ export default async function DeskTitleEditPage({
                 >
                   <strong>{product.name}</strong>{" "}
                   <span className="muted small">
-                    {product.type} · {Number(product.basePrice)}{" "}
-                    {product.currency}
-                    {product.pricingModel !== "FLAT"
-                      ? ` ${product.pricingModel}`
-                      : ""}
-                    {product.active ? "" : " · inactive"}
+                    {tType(product.type)} ·{" "}
+                    {/* An unconfirmed row (e.g. a blueprint skeleton at 0)
+                        has no price to show — say so instead of "0 NOK". */}
+                    {product.confirmedAt && Number(product.basePrice) > 0
+                      ? `${Number(product.basePrice)} ${product.currency}${
+                          product.pricingModel !== "FLAT" ? ` ${product.pricingModel}` : ""
+                        }`
+                      : t("priceUnconfirmed")}
+                    {product.active ? "" : ` · ${t("productInactive")}`}
                   </span>
                   {/* Hvem produserer artikkelen — avgjør om vi må legge ut
                       for skribent. Hardkodet norsk som resten av

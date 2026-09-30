@@ -1,7 +1,7 @@
 import { getTranslations } from "next-intl/server";
-import { redirect } from "next/navigation";
+import { superadminPageGate } from "@/lib/desk-guard";
 import { Prisma, UserRole } from "@prisma/client";
-import { auth } from "@/auth";
+import { SuperadminOnly } from "@/components/superadmin-only";
 import { prisma } from "@/lib/prisma";
 import { Link } from "@/i18n/navigation";
 import { SubmitButton } from "@/components";
@@ -53,13 +53,10 @@ export default async function DeskUsersPage({
 }) {
   const { locale } = await params;
   const sp = await searchParams;
-  const session = await auth();
-  if (session?.user?.role !== "SUPERADMIN") {
-    redirect(`/${locale}/desk`);
-  }
-  const actorId = session.user.id;
-
   const t = await getTranslations({ locale, namespace: "deskUsers" });
+  const gate = await superadminPageGate(locale);
+  if (!gate.allowed) return <SuperadminOnly locale={locale} area={t("title")} />;
+  const actorId = gate.userId;
 
   const q = str(sp, "q");
   const editId = str(sp, "edit");

@@ -20,7 +20,7 @@
 // rate cards. They're meant to be tuned by Ingrid via /desk/titles as
 // catalog coverage grows; this module is the single place to do so.
 
-import { MarketCode, ProductType, PriceVisibility } from "@prisma/client";
+import { MarketCode, ProductType, PriceVisibility, type Prisma } from "@prisma/client";
 
 export type BlueprintRow = {
   type: ProductType;
@@ -80,9 +80,11 @@ const MARKET_OVERRIDES: Partial<
   [MarketCode.IE]: { perThousandFactor: 1.2, floor: 900 }, // EUR
 };
 
-// Compute the seed base price for a single product type, given a
-// title's monthly reach and target market. Pure — title-actions
-// remains the only writer, so this helper stays unit-testable.
+// Reach-based price ESTIMATE for a single product type, given a title's
+// monthly reach and target market. Desk guidance only (what to expect
+// when negotiating) — it is never written to Product.basePrice: the
+// catalog data standard (docs/catalog-data-standard.md) says prices are
+// confirmed, never guessed, so a blueprint product starts unpriced.
 export function basePriceFor(
   reach: number,
   blueprint: BlueprintRow,
@@ -113,4 +115,76 @@ export function marketAdjustments(market: MarketCode): {
   return (
     MARKET_OVERRIDES[market] ?? { perThousandFactor: 1.0, floor: 0 }
   );
+}
+
+// Internal (desk-side) product name for a blueprint row. Product.name is
+// desk-internal text — buyers see localized display names — but it still
+// shows on desk surfaces and in the writer portal, so it reads as words,
+// never as a raw enum ("Aftenposten — NATIVE_DISPLAY").
+const BLUEPRINT_NAME: Partial<Record<ProductType, string>> = {
+  [ProductType.NATIVE_ARTICLE]: "Native article",
+  [ProductType.ADVERTORIAL]: "Advertorial",
+  [ProductType.NATIVE_DISPLAY]: "Native display",
+};
+
+// Marks a product as a blueprint skeleton in Product.confirmedSource while
+// confirmedAt stays null — provenance for "created by Mark: offers native,
+// no price yet", distinct from a publisher- or quote-confirmed row.
+export const BLUEPRINT_SOURCE = "blueprint";
+
+// The row markTitleNative creates for one blueprint entry. It records the
+// verified fact — this title sells this native format — and nothing we
+// have not confirmed: no price (0 = "on request", the same sentinel quote
+// generation treats as unpriced), no confirmation stamp, and inactive +
+// unbookable, so it can't surface as a catalog band or be instant-ordered.
+// Applying a confirmed PriceQuote (or the publisher confirming a rate)
+// stamps confirmedAt, after which activateQuoteProducts puts it live.
+//
+// The spec carries only the market's disclosure label, which is a
+// regulatory fact; word counts, image counts and file formats are the
+// publisher's to state, so they stay empty rather than invented (the
+// writer spec check would otherwise fail drafts against a guess).
+export function blueprintProductData(args: {
+  titleId: string;
+  titleName: string;
+  currency: string;
+  disclosureLabel: string | null;
+  row: BlueprintRow;
+}): Prisma.ProductUncheckedCreateInput {
+  const { row } = args;
+  return {
+    titleId: args.titleId,
+    type: row.type,
+    name: `${args.titleName} — ${BLUEPRINT_NAME[row.type] ?? row.type}`,
+    currency: args.currency,
+    basePrice: 0,
+    visibility: PriceVisibility.INDICATIVE,
+    // Lead time is the publisher's to state (see Product.leadTimeDays).
+    leadTimeDays: null,
+    active: false,
+    bookable: false,
+    confirmedAt: null,
+    confirmedSource: BLUEPRINT_SOURCE,
+    priceRules: {
+      create: {
+        label: "standard",
+        minVolume: 1,
+        marginPct: row.marginPct,
+        seasonalMultiplier: row.seasonalMultiplier,
+      },
+    },
+    spec: {
+      create: {
+        disclosureLabel: args.disclosureLabel,
+        imagesMin: null,
+      },
+    },
+  };
+}
+
+// Which of a title's products may go (back) live when the desk marks it
+// as offering native: only rows with a confirmed, non-zero price. Anything
+// else waits for a price confirmation instead of resurfacing unpriced.
+export function reactivatableProductsWhere(titleId: string): Prisma.ProductWhereInput {
+  return { titleId, confirmedAt: { not: null }, basePrice: { gt: 0 } };
 }

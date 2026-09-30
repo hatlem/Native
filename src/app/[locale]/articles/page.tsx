@@ -6,6 +6,7 @@ import { Link } from "@/i18n/navigation";
 import { loadScope } from "@/lib/scope";
 import { EmptyState } from "@/app/empty-state";
 import { StatusBadge } from "@/app/status-badge";
+import { articleHeadline } from "@/lib/content/markdown";
 
 export const dynamic = "force-dynamic";
 
@@ -24,7 +25,16 @@ export default async function ArticlesPage({
     where: { organizationId: { in: viewOrgIds(scope.workspace) } },
     orderBy: { updatedAt: "desc" },
     include: {
-      versions: { orderBy: { version: "desc" }, take: 1, select: { status: true } },
+      versions: {
+        orderBy: { version: "desc" },
+        take: 1,
+        select: {
+          status: true,
+          body: true,
+          authorWriter: { select: { user: { select: { name: true, email: true } } } },
+        },
+      },
+      assignedWriter: { select: { user: { select: { name: true, email: true } } } },
       placements: {
         select: {
           orderLine: {
@@ -57,6 +67,15 @@ export default async function ArticlesPage({
       })
     : [];
   const authorNameById = new Map(authors.map((u) => [u.id, u.name ?? u.email]));
+  // The author is whoever actually wrote the text — the latest version's
+  // writer, else the assigned writer — and only then whoever created the
+  // Article row (for writer-produced articles that is the desk user who
+  // staffed the line, not the author).
+  const authorOf = (a: (typeof articles)[number]): string | null => {
+    const writer = a.versions[0]?.authorWriter?.user ?? a.assignedWriter?.user;
+    if (writer) return writer.name ?? writer.email.split("@")[0];
+    return authorNameById.get(a.createdByUserId) ?? null;
+  };
 
   return (
     <>
@@ -101,17 +120,24 @@ export default async function ArticlesPage({
                   return (
                     <tr key={a.id}>
                       <td data-label={t("colTitle")}>
-                        <Link href={`/articles/${a.id}`}>{a.title}</Link>
+                        {/* Headline from the draft; the Article.title is the
+                            publication the piece was born for. */}
+                        <Link href={`/articles/${a.id}`}>
+                          {articleHeadline(a.versions[0]?.body) ?? a.title}
+                        </Link>
+                        {articleHeadline(a.versions[0]?.body) ? (
+                          <div className="muted small">{a.title}</div>
+                        ) : null}
                       </td>
                       <td data-label={t("colStatus")}>
                         <StatusBadge value={status} />
                       </td>
                       <td data-label={t("colAuthor")}>
-                        {authorNameById.get(a.createdByUserId) ?? "—"}
+                        {authorOf(a) ?? "—"}
                       </td>
                       <td data-label={t("colPlacement")}>
                         {a.placements.length > 0 ? (
-                          <ul className="cluster tight list-none p-0">
+                          <ul className="cluster tight" style={{ listStyle: "none", padding: 0, margin: 0 }}>
                             {a.placements.map((p, i) => (
                               <li key={i}>
                                 <Link href={`/orders/${p.orderLine.orderId}`}>

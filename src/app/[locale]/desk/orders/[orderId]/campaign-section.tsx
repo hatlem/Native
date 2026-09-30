@@ -4,7 +4,9 @@ import {
   saveFlightWindow,
   saveBookingMetricOverride,
   resendMetricsRequest,
+  sendMetricsRequestNow,
 } from "@/app/desk-reporting-actions";
+import { canRequestMetricsNow } from "@/lib/campaign-reporting/status";
 import { SubmitButton } from "@/components";
 import { safeExternalUrl } from "@/lib/security";
 
@@ -153,6 +155,26 @@ export async function CampaignSection({ locale, order, metricsRequests, clicks }
     metricsRequests.map((r) => [r.publisherId, r]),
   );
 
+  // What "send metrics request now" would do: publishers with a live booking
+  // but no request yet, plus requests whose first email hasn't gone out.
+  const canSendNow = canRequestMetricsNow(order);
+  const livePublisherIds = new Set(
+    linesWithBooking
+      .map((l) => l.booking!)
+      .filter((b) => b.status !== "CANCELLED" && b.publisherId)
+      .map((b) => b.publisherId as string),
+  );
+  const unrequestedPublishers = [...livePublisherIds].filter(
+    (id) => !requestByPublisherId.has(id),
+  ).length;
+  const unsentRequests = metricsRequests.filter(
+    (r) => r.sentCount === 0 && r.recipientEmail && (r.status === "PENDING" || r.status === "PARTIAL"),
+  ).length;
+  // Bookings with no publisher can never get a request (grouped by publisher).
+  const bookingsWithoutPublisher = linesWithBooking.filter(
+    (l) => l.booking!.status !== "CANCELLED" && !l.booking!.publisherId,
+  ).length;
+
   return (
     <section className="section">
       <div className="section-head">
@@ -203,6 +225,39 @@ export async function CampaignSection({ locale, order, metricsRequests, clicks }
         </form>
       </div>
 
+      {/* Metrics requests go out with the daily sweep a day after the
+          flight ends; the desk can send them as soon as it has ended. */}
+      <div className="card" style={{ marginBottom: "1.5rem" }}>
+        <h3 style={{ marginBottom: "0.5rem" }}>{t("metricsNowTitle")}</h3>
+        {!canSendNow ? (
+          <p className="muted small">{t("metricsNowNotEnded")}</p>
+        ) : unrequestedPublishers + unsentRequests === 0 ? (
+          <p className="muted small">{t("metricsNowNothing")}</p>
+        ) : (
+          <form
+            action={async () => {
+              "use server";
+              await sendMetricsRequestNow(order.id);
+            }}
+            className="cluster"
+          >
+            <span className="muted small">
+              {t("metricsNowHint", { count: unrequestedPublishers + unsentRequests })}
+            </span>
+            <SubmitButton
+              label={t("metricsNowButton")}
+              pendingLabel={t("sending")}
+              className="btn small"
+            />
+          </form>
+        )}
+        {bookingsWithoutPublisher > 0 ? (
+          <p className="muted small" style={{ marginTop: 8 }}>
+            {t("metricsNowNoPublisher", { count: bookingsWithoutPublisher })}
+          </p>
+        ) : null}
+      </div>
+
       {/* No bookings yet */}
       {linesWithBooking.length === 0 ? (
         <p className="muted small">{t("noBookings")}</p>
@@ -221,7 +276,7 @@ export async function CampaignSection({ locale, order, metricsRequests, clicks }
                     <h3>{publisherName}</h3>
                     {request ? (
                       <span className={statusBadgeClass(request.status)}>
-                        {t("requestStatus")}: {request.status}
+                        {t("requestStatus")}: {t(`requestStatusValue.${request.status}`)}
                       </span>
                     ) : (
                       <span className="badge">{t("noRequest")}</span>

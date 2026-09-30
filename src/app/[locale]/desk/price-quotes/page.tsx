@@ -1,6 +1,6 @@
 import { getTranslations } from "next-intl/server";
-import { redirect } from "next/navigation";
-import { auth } from "@/auth";
+import { superadminPageGate } from "@/lib/desk-guard";
+import { SuperadminOnly } from "@/components/superadmin-only";
 import { listPendingQuotes } from "@/lib/pricing/quotes";
 import { applyQuoteAction, rejectQuoteAction } from "@/app/price-actions";
 import { Link } from "@/i18n/navigation";
@@ -16,11 +16,9 @@ export default async function DeskPriceQuotesPage({
 }) {
   const { locale } = await params;
   const sp = await searchParams;
-  const session = await auth();
-  if (session?.user?.role !== "SUPERADMIN") {
-    redirect(`/${locale}/desk`);
-  }
   const t = await getTranslations({ locale, namespace: "pendingQuotes" });
+  const gate = await superadminPageGate(locale);
+  if (!gate.allowed) return <SuperadminOnly locale={locale} area={t("title")} />;
 
   const quotes = await listPendingQuotes({
     marketCode: typeof sp.market === "string" ? sp.market : undefined,

@@ -976,7 +976,8 @@
       "all": "Alle",
       "unverified": "Ikke tjekket endnu",
       "active": "Tilbyder native",
-      "no-native": "Tilbyder ikke native"
+      "no-native": "Tilbyder ikke native",
+      "awaitingPrice": "Afventer bekræftet pris"
     },
     "reach": "Månedlig rækkevidde",
     "circulation": "Oplag",
@@ -996,7 +997,8 @@
       "deactivate": "Deaktivér",
       "edit": "Rediger",
       "marking": "Markerer…",
-      "deactivating": "Deaktiverer…"
+      "deactivating": "Deaktiverer…",
+      "resetVerification": "Nulstil til ikke tjekket"
     },
     "freshness": {
       "column": "Prisfriskhed",
@@ -1034,7 +1036,55 @@
     "active": "Aktiv",
     "inactive": "Inaktiv",
     "assignments": "{active} aktive",
-    "assignmentsOf": "{active} / {max} aktive"
+    "assignmentsOf": "{active} / {max} aktive",
+    "inviteLanguage": {
+      "en": "Engelsk",
+      "no": "Norsk",
+      "sv": "Svensk",
+      "da": "Dansk",
+      "fi": "Finsk",
+      "de": "Tysk"
+    },
+    "emailPlaceholder": "skribent@eksempel.dk",
+    "inviteLanguageLabel": "Sprog i e-mailen",
+    "inviteLanguageHint": "Invitationen og kontosiden åbnes på dette sprog.",
+    "inviteSent": "Invitationen er sendt til <addr></addr>.",
+    "inviteNotSent": "Invitationen til <addr></addr> er oprettet, men e-mailen blev ikke sendt. Send den igen nedenfor, eller del linket selv.",
+    "errorInvalidEmail": "Indtast en gyldig e-mailadresse.",
+    "errorExistingAccount": "Denne adresse har allerede en NativeSpin-konto og kan ikke tage imod en skribentinvitation. Bed en superadministrator om at ændre kontoens rolle i stedet.",
+    "colEmail": "E-mail",
+    "colLanguage": "Sprog",
+    "colDelivery": "Udsendelse",
+    "emailedOn": "Sendt {date}",
+    "notEmailed": "Ikke sendt",
+    "resend": "Send igen",
+    "colName": "Navn",
+    "colLanguages": "Sprog",
+    "colSpecialties": "Fagområder",
+    "colStatus": "Status",
+    "colLoad": "Belastning",
+    "panel": {
+      "eyebrow": "Produktion",
+      "title": "Skribenter til denne ordre",
+      "lead": "Rangeret efter sprog ({language}) og fagområde ({topics}). Føj kandidater til puljen for denne ordre, og tildel så én pr. linje nedenfor.",
+      "empty": "Ingen skribenter endnu – invitér én under Skribenter.",
+      "colWriter": "Skribent",
+      "colLanguages": "Sprog",
+      "colSpecialties": "Fagområder",
+      "colLoad": "Belastning",
+      "inPool": "I puljen",
+      "inactive": "Tager ikke opgaver",
+      "overCapacity": "Over kapacitet",
+      "none": "Ikke angivet",
+      "loadOf": "{active} / {max} aktive",
+      "load": "{active} aktive",
+      "add": "Føj til puljen",
+      "remove": "Fjern",
+      "saving": "Gemmer…",
+      "writerLabel": "Skribent",
+      "unassigned": "— Ikke tildelt —",
+      "assign": "Tildel"
+    }
   },
   "auth": {
     "title": "Log ind",
@@ -1121,7 +1171,9 @@
     "deactivatedSignin": "Denne konto er deaktiveret. Kontakt desken, hvis den skal tændes igen.",
     "emailChangedOk": "E-mailadressen er opdateret — log ind med din nye adresse.",
     "deactivatedTitle": "Denne konto er deaktiveret",
-    "deactivatedBody": "Din konto er slukket, så der er intet at bruge her. Log ud nedenfor, og kontakt desken, hvis du tror, det er en fejl."
+    "deactivatedBody": "Din konto er slukket, så der er intet at bruge her. Log ud nedenfor, og kontakt desken, hvis du tror, det er en fejl.",
+    "writerClaimSubmit": "Opret skribentkonto",
+    "writerClaimSubmitting": "Opretter…"
   },
   "order": {
     "title": "Ordre",
@@ -1158,7 +1210,7 @@
     "cancelBlocked": "Denne ordre kan ikke længere annulleres.",
     "cancelError": "Annullering afvist",
     "cancelledAtLabel": "Annulleret",
-    "cancelledByLabel": "By",
+    "cancelledByLabel": "Annulleret af",
     "cancelledReasonLabel": "Årsag",
     "creditNoteButton": "Udsted kreditnota",
     "creditNoteTitle": "Refunder fakturaen",
@@ -1206,7 +1258,13 @@
       "unconfirmed": "Sæt flueben i bekræftelsen for at fortsætte, mens placeringer stadig er upublicerede.",
       "moved": "Ordren har skiftet status i mellemtiden. Tjek den, og prøv igen."
     },
-    "unknownPlacement": "Placering uden navn"
+    "unknownPlacement": "Placering uden navn",
+    "cancelledByRole": {
+      "DESK": "NativeSpins desk",
+      "SUPERADMIN": "NativeSpin (administrator)",
+      "PUBLISHER": "Udgiveren",
+      "BUYER": "Kunden"
+    }
   },
   "production": {
     "brief": "Brief",
@@ -1581,10 +1639,6 @@
     "detailSaveDraft": "Gem udkast",
     "detailUploading": "Uploader…",
     "detailDownloadFile": "Hent filen",
-    "detailStatus": "Status",
-    "detailSpecPassed": "spec ✓",
-    "detailSpecFailed": "spec ✗",
-    "detailRunSpecCheck": "Kør spec-tjek",
     "detailSubmitForReview": "Send til gennemgang",
     "detailReviewNotes": "Kommentarer",
     "linkHeading": "Kobl til en placering",
@@ -1594,9 +1648,22 @@
     "placementRetracted": "Trukket tilbage",
     "unlinkCta": "Fjern kobling",
     "sharedArticleWarning": "Denne artikel er koblet til {count} andre placeringer — dine ændringer påvirker dem alle.",
-    "specNotChecked": "ikke tjekket",
     "detailUploadFailed": "Upload mislykkedes. Prøv en anden fil.",
-    "detailUploadUnavailable": "Filupload er ikke tilgængelig lige nu. Indsæt teksten i editoren i stedet."
+    "detailUploadUnavailable": "Filupload er ikke tilgængelig lige nu. Indsæt teksten i editoren i stedet.",
+    "backToArticles": "Alle artikler",
+    "versionLabel": "Version {version}",
+    "byAuthor": "Skrevet af {name}",
+    "previewHeading": "Forhåndsvisning",
+    "previewEmpty": "Ingen tekst endnu.",
+    "awaitingReview": "Afventer kundens gennemsyn.",
+    "placementsHeading": "Placeringer",
+    "specPassed": "Formatkrav opfyldt",
+    "specFailed": "Afvigelser fra formatkrav",
+    "saving": "Gemmer…",
+    "orderRef": "ordre {ref}",
+    "draftLabel": "Artikeltekst",
+    "draftHint": "Ren tekst med enkel Markdown: # til overskrifter, **fed**, *kursiv*, - til lister, [tekst](link).",
+    "submitBlockedSpec": "Formatkravene for en placering er ikke opfyldt endnu – tjek placeringerne ovenfor."
   },
   "marketing": {
     "howCta": "Sådan virker det",
@@ -2293,39 +2360,36 @@
     "errorScopes": "Mindst ét gyldigt scope kræves (catalog:read, catalog:*, orders:write, pricing:admin).",
     "errorInternalOnly": "pricing:admin er kun internt — kan kun udstedes som en NativeSpin-platformnøgle (uden organisation).",
     "errorOrgRequired": "orders:write skal være knyttet til en organisation — vælg en ejende organisation ovenfor.",
-    "issueEyebrow": "Issue",
+    "issueEyebrow": "Udsted",
     "issueTitle": "Udsted en ny nøgle",
     "nameLabel": "Navn / partner",
     "orgLabel": "Ejer-organisation (valgfrit)",
     "orgPlatform": "NativeSpin-platformsnøgle (ingen org)",
-    "scopesLabel": "Scopes",
+    "scopesLabel": "Adgange (scopes)",
     "scopesHint": "Kommaadskilte. Muligheder: catalog:read, orders:write (orders:write skal knyttes til en organisation). pricing:admin er kun internt.",
     "ttlLabel": "Udløber om (dage)",
     "ttlPlaceholder": "Ingen udløb",
     "ttlHint": "Lad stå tomt for ingen udløb; maks. 1825 dage (5 år).",
     "issueSubmit": "Generér nøgle",
     "issuing": "Genererer…",
-    "listEyebrow": "Existing",
+    "listEyebrow": "Eksisterende",
     "listTitle": "Alle nøgler",
-    "colName": "Name",
-    "colOrg": "Org",
-    "colScopes": "Scopes",
-    "colCreated": "Created",
+    "colName": "Navn",
+    "colOrg": "Organisation",
+    "colScopes": "Adgange",
+    "colCreated": "Oprettet",
     "colLastUsed": "Senest brugt",
     "colStatus": "Status",
-    "status_active": "Active",
-    "status_expired": "Expired",
-    "status_revoked": "Revoked",
-    "revoke": "Revoke",
+    "status_active": "Aktiv",
+    "status_expired": "Udløbet",
+    "status_revoked": "Tilbagekaldt",
+    "revoke": "Tilbagekald",
     "revoking": "Tilbagekalder…",
     "revokeConfirm": "Dette kan ikke fortrydes. Eksisterende integrationer der bruger denne nøgle holder op med at virke med det samme.",
     "revokeConfirmCta": "Ja, tilbagekald nøglen",
     "docsHintPrefix": "Offentlig dokumentation er tilgængelig på",
-    "deniedTitle": "API-nøgler (kun SUPERADMIN)",
-    "deniedLead": "Denne side er for NativeSpins platform-administratorer.",
     "deniedBody": "Offentlige katalog-API-nøgler udstedes af NativeSpin-superadmins. Hvis din rolle legitimt har brug for nøgle-udstedelse — eller du er partner der har brug for en nøgle — kontakt desken så ordner vi det.",
-    "deniedCta": "Skriv til desken",
-    "deniedBack": "Tilbage til /desk"
+    "orgPlatformShort": "NativeSpin-platformen"
   },
   "quoteNarrative": {
     "sectionCampaign": "Din kampagne",
@@ -2412,7 +2476,9 @@
     "inviteSent": "Invitationen er sendt.",
     "inviteInvalidEmail": "Det ligner ikke en gyldig e-mailadresse.",
     "inviteBusinessEmail": "Brug en firmaadresse — gratis- og engangstjenester accepteres ikke.",
-    "inviteNotFound": "Forlaget findes ikke længere — genindlæs siden."
+    "inviteNotFound": "Forlaget findes ikke længere — genindlæs siden.",
+    "priceUnconfirmed": "pris ikke bekræftet",
+    "productInactive": "inaktiv"
   },
   "salesContacts": {
     "title": "Salgskontakter",
@@ -2954,7 +3020,7 @@
     "noData": "—",
     "pending": "Afventer rapportering",
     "coverageCaveat": "{n} af {m} placeringer har rapporteret visninger. De øvrige opdateres, når udgiveren indsender tal.",
-    "downloadCsv": "Download CSV",
+    "downloadCsv": "Hent CSV",
     "reachDisclaimer": "Visninger er rapporteret af udgiver. Egne klik spores via vores link.",
     "pageTitle": "Kampagnerapportskema",
     "statusNotFound": "Dette link er ikke gyldigt eller er udløbet.",
@@ -2990,7 +3056,21 @@
     "overrideHint": " — desk-korrektion",
     "saveOverride": "Gem korrektion",
     "frozenNoEdit": "Tallene er låst og kan ikke redigeres.",
-    "unknownPublisher": "Ukendt udgiver"
+    "unknownPublisher": "Ukendt udgiver",
+    "metricsNowTitle": "Forespørgsler om tal",
+    "metricsNowNotEnded": "Udgiverne bliver bedt om deres tal, når kampagneperioden er slut. Angiv slutdatoen ovenfor; den daglige kørsel sender forespørgslerne dagen efter.",
+    "metricsNowNothing": "Alle udgivere på denne ordre har allerede en forespørgsel om tal – se status for hver af dem nedenfor.",
+    "metricsNowHint": "{count, plural, =1 {1 udgiver har ikke fået forespørgslen endnu.} other {# udgivere har ikke fået forespørgslen endnu.}} Den daglige kørsel ville sende den i morgen.",
+    "metricsNowButton": "Send forespørgsel om tal nu",
+    "metricsNowNoPublisher": "{count, plural, =1 {1 booking mangler} other {# bookinger mangler}} udgiver, så der kan ikke sendes forespørgsel for {count, plural, =1 {den} other {dem}}.",
+    "requestStatusValue": {
+      "NEEDS_CONTACT": "Mangler kontakt",
+      "PENDING": "Afventer tal",
+      "PARTIAL": "Delvist rapporteret",
+      "COMPLETE": "Rapporteret",
+      "EXPIRED": "Udløbet",
+      "CANCELLED": "Annulleret"
+    }
   },
   "rateCards": {
     "title": "Prislister / mediekit",
@@ -3264,7 +3344,8 @@
     "SCHEDULED": "Planlagt",
     "SENT": "Sendt",
     "SUBMITTED": "Indsendt",
-    "VOID": "Annulleret"
+    "VOID": "Annulleret",
+    "SUPERSEDED": "Erstattet"
   },
   "joinedNotice": {
     "lists": "Velkommen til {org}. Her er dit teams planer – åbn en for at se titler, priser og bemærkninger.",
@@ -3272,5 +3353,207 @@
   },
   "paymentTerms": {
     "line": "{days, plural, one {Betalingsbetingelser: netto # dag fra fakturadato.} other {Betalingsbetingelser: netto # dage fra fakturadato.}}"
+  },
+  "superadminOnly": {
+    "eyebrow": "Kun for superadministratorer",
+    "lead": "Denne side er for NativeSpins platformadministratorer.",
+    "body": "Din konto har desk-adgang, men denne side kræver superadmin-rollen. Har du brug for den i dit arbejde, så skriv til desken, så hjælper en superadministrator dig eller giver dig adgang.",
+    "cta": "Skriv til desken",
+    "back": "Tilbage til desken",
+    "mailSubject": "Anmodning om adgang: {area} — NativeSpin"
+  },
+  "publisherContacts": {
+    "eyebrow": "Desk · opsøgende salg",
+    "title": "Udgiverkontakter",
+    "lead": "Gennemgå indsamlede annoncekontakter, før de tages i brug, og kør derefter kampagnen med prisforespørgsler.",
+    "tabsLabel": "Visninger",
+    "tabReview": "Gennemgå kandidater",
+    "tabCampaign": "Priskampagne",
+    "ok": {
+      "approved": "Kontakten er godkendt.",
+      "rejected": "Kontakten er afvist.",
+      "bulk": "{approved} godkendt, {failed} mislykkedes.",
+      "built": "Kampagnen er opdateret: {created} nye forespørgsler, {skipped} sprunget over.",
+      "sent": "{count, plural, =0 {Ingen e-mails sendt.} =1 {1 e-mail sendt.} other {# e-mails sendt.}}",
+      "one": "E-mailen er sendt."
+    },
+    "errorGeneric": "Det lykkedes ikke: {detail}",
+    "working": "Arbejder…",
+    "buildCampaign": "Byg / opdater kampagnen",
+    "batchSizeLabel": "Antal i omgangen",
+    "sendBatch": "Send omgang (næste i køen)",
+    "kpiTotal": "Forespørgsler",
+    "state": {
+      "draft": "Kladde",
+      "inFlight": "I gang",
+      "responded": "Besvaret",
+      "cancelled": "Annulleret"
+    },
+    "noRequests": "Ingen prisforespørgsler endnu — byg kampagnen for at oprette dem.",
+    "colRecipient": "Modtager",
+    "colTitles": "Titler",
+    "colLocale": "Sprog",
+    "colStep": "Trin",
+    "colStatus": "Status",
+    "colNextDue": "Næste gang",
+    "stepOf": "{sent}/{max}",
+    "sendOne": "Send",
+    "candidateStatus": {
+      "PENDING": "Afventer gennemgang",
+      "APPROVED": "Godkendt",
+      "REJECTED": "Afvist"
+    },
+    "titlesByChannel": "Titler pr. salgskanal:",
+    "channel": {
+      "DIRECT": "Direkte",
+      "IN_HOUSE": "Eget salgsselskab",
+      "REP": "Salgshus",
+      "MIXED": "Blandet",
+      "UNKNOWN": "Ukendt"
+    },
+    "pendingEyebrow": "Gennemgang",
+    "pendingTitle": "Kandidater, der venter",
+    "bulkApproveLabel": "Godkend alle med sikkerhed ≥",
+    "bulkApprove": "Godkend alle",
+    "noCandidates": "Ingen kandidater afventer gennemgang.",
+    "colPublisher": "Udgiver",
+    "colMarket": "Marked",
+    "colChannel": "Kanal",
+    "colCandidate": "Kandidat",
+    "colConfidence": "Sikkerhed",
+    "colSource": "Kilde",
+    "viewSource": "Vis",
+    "approve": "Godkend",
+    "reject": "Afvis"
+  },
+  "writerEnums": {
+    "language": {
+      "NO": "Norsk",
+      "SV": "Svensk",
+      "DA": "Dansk",
+      "FI": "Finsk",
+      "DE": "Tysk",
+      "EN": "Engelsk"
+    },
+    "topic": {
+      "FINANCE": "Økonomi",
+      "HEALTH": "Sundhed",
+      "TECH": "Teknologi",
+      "LIFESTYLE": "Livsstil",
+      "B2B": "B2B",
+      "TRAVEL": "Rejser",
+      "FOOD": "Mad og drikke",
+      "CULTURE": "Kultur",
+      "SUSTAINABILITY": "Bæredygtighed",
+      "OTHER": "Andet"
+    },
+    "proficiency": {
+      "NATIVE": "Modersmål",
+      "FLUENT": "Flydende",
+      "WORKING": "Arbejdsniveau"
+    }
+  },
+  "writer": {
+    "eyebrow": "Skribentportal",
+    "backToAssignments": "Mine opgaver",
+    "untitledAssignment": "Opgave",
+    "status": {
+      "notStarted": "Ikke påbegyndt"
+    },
+    "home": {
+      "title": "Mine opgaver",
+      "lead": "Alt, hvad desken har givet dig. Åbn en opgave for at se briefet, formatkravene og playbooken, skriv teksten og send den til gennemsyn.",
+      "profileCta": "Redigér min profil",
+      "emptyTitle": "Ingen opgaver endnu",
+      "emptyBody": "Når desken giver dig en artikel, dukker den op her, og du får en e-mail.",
+      "colTitle": "Medie",
+      "colFormat": "Format",
+      "colMarket": "Marked",
+      "colStatus": "Status",
+      "colAssigned": "Tildelt",
+      "open": "Åbn"
+    },
+    "line": {
+      "notReady": "Briefet til denne opgave er ikke klar endnu. Desken giver besked, når det er.",
+      "changesRequested": "Ændringer ønskes:",
+      "closed": "Denne opgave er afsluttet – ordren er annulleret, placeringen trukket tilbage eller artiklen færdig. Der er ikke mere at skrive her.",
+      "draftEyebrow": "Dit udkast",
+      "draftHeading": "Skriv artiklen",
+      "inReviewNote": "Dette udkast ligger hos kunden til gennemsyn. Gemmer du nu, bliver det en ny version – send den til gennemsyn, når den er klar.",
+      "draftLabel": "Artikeltekst",
+      "draftPlaceholder": "# Overskrift\n\nIndledning…",
+      "draftHint": "Ren tekst med enkel Markdown: # til overskrifter, **fed**, *kursiv*, - til lister, [tekst](link). Husk mærkningen.",
+      "saveDraft": "Gem udkast",
+      "saving": "Gemmer…",
+      "submit": "Send til gennemsyn",
+      "submitBlocked": "Ret afvigelserne ovenfor, gem, og send derefter til gennemsyn.",
+      "awaitingReview": "Sendt til gennemsyn – du får besked, hvis kunden beder om ændringer."
+    },
+    "brief": {
+      "heading": "Brief",
+      "message": "Budskab",
+      "messageMissing": "Intet budskab endnu – spørg desken, før du går i gang.",
+      "audience": "Målgruppe",
+      "do": "Gør",
+      "dont": "Undgå",
+      "references": "Referencer"
+    },
+    "spec": {
+      "heading": "Formatkrav",
+      "words": "Længde",
+      "wordsRange": "{min}–{max} ord",
+      "wordsMin": "Mindst {min} ord",
+      "wordsMax": "Højst {max} ord",
+      "notSpecified": "Ikke angivet",
+      "images": "Billeder",
+      "imagesMin": "{count, plural, =1 {Mindst 1 billede} other {Mindst # billeder}}",
+      "disclosure": "Mærkning (påkrævet)",
+      "fileFormats": "Filformater",
+      "videoLength": "Videolængde",
+      "videoSeconds": "Op til {seconds} sekunder",
+      "shoppable": "Produktlinks",
+      "shoppableMax": "{count, plural, =1 {Op til 1 produkt} other {Op til # produkter}}",
+      "requirements": "Andre krav",
+      "checkHeading": "Formattjek",
+      "passed": "Godkendt",
+      "failed": "Skal rettes",
+      "notChecked": "Gem udkastet som tekst for at tjekke det mod formatkravene.",
+      "passedDetail": "Udkastet opfylder formatkravene ({words} ord).",
+      "failDisclosure": "Mærkningen »{label}« mangler. Læserne skal kunne se, at det er betalt indhold.",
+      "failTooShort": "For kort: {words} ord, formatet kræver mindst {min}.",
+      "failTooLong": "For lang: {words} ord, formatet tillader højst {max}."
+    },
+    "profile": {
+      "title": "Min profil",
+      "lead": "Desken matcher skribenter med briefs efter sprog, fagområde og kapacitet – hold profilen opdateret.",
+      "noProfile": "Denne konto har ingen skribentprofil.",
+      "saved": "Profilen er gemt.",
+      "fixErrors": "Intet blev gemt – ret de markerede felter, og prøv igen.",
+      "bio": "Om dig",
+      "bioPlaceholder": "Emner du dækker, medier du har skrevet for, tonen du er kendt for …",
+      "languages": "Sprog du skriver på",
+      "languagesHint": "Vælg niveau for hvert sprog, du kan skrive på. Mindst ét er påkrævet.",
+      "languageNone": "Skriver ikke på det",
+      "specialties": "Fagområder",
+      "ratePerArticle": "Pris pr. artikel",
+      "ratePerWord": "Pris pr. ord",
+      "currency": "Valuta",
+      "currencyNone": "— Vælg —",
+      "maxActiveAssignments": "Maks. aktive opgaver",
+      "maxActiveAssignmentsHint": "Lad feltet stå tomt for ingen grænse.",
+      "portfolioUrl": "Link til portefølje",
+      "active": "Ledig til nye opgaver",
+      "save": "Gem profilen",
+      "saving": "Gemmer…",
+      "errors": {
+        "bio": "Hold det under 2.000 tegn.",
+        "languages": "Vælg mindst ét sprog.",
+        "ratePerArticle": "Indtast et beløb over 0, fx 4500.",
+        "ratePerWord": "Indtast et beløb over 0, fx 3,5.",
+        "currency": "Vælg valuta for dine priser.",
+        "maxActiveAssignments": "Indtast et helt tal fra 1 til 50, eller lad feltet stå tomt.",
+        "portfolioUrl": "Indtast et fuldt link, der starter med https://"
+      }
+    }
   }
 }

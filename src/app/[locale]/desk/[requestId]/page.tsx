@@ -26,6 +26,7 @@ import {
   quoteValidUntilInputValue,
 } from "@/lib/commerce/quote-validity";
 import { lineOrder } from "@/lib/commerce/line-order";
+import { invoiceLineLabel } from "@/lib/invoice-line-label";
 import {
   generateQuote,
   generateQuotePdf,
@@ -60,6 +61,10 @@ export default async function DeskRequestPage({
   const t = await getTranslations({ locale, namespace: "desk" });
   const tr = await getTranslations({ locale, namespace: "requests" });
   const tType = await getTranslations({ locale, namespace: "productType" });
+  const lineLabelDeps = {
+    formatLabel: (type: string) => (tType.has(type) ? tType(type) : type),
+    contentProduction: tType("CONTENT_FEE"),
+  };
   // Cost-vs-sell (unitCost/margin) is publisher-sensitive commercial data —
   // gated to SUPERADMIN only. This page otherwise stays open to any desk
   // role, so we scope the check to the one span that needs it below rather
@@ -542,7 +547,13 @@ export default async function DeskRequestPage({
                       <Fragment key={l.id}>
                         <div className="quote-line">
                           <span>
-                            {l.description}{" "}
+                            {/* The description is a snapshot of the product name
+                                at quoting time; older ones end in a raw type enum
+                                ("… — NATIVE_DISPLAY"), relabelled for display only. */}
+                            {invoiceLineLabel(
+                              { description: l.description, kind: l.kind },
+                              lineLabelDeps,
+                            )}{" "}
                             <span className="muted">
                               × {l.quantity}
                               {l.priceOnRequest

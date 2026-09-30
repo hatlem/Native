@@ -1,7 +1,7 @@
 import { getTranslations } from "next-intl/server";
-import { redirect } from "next/navigation";
+import { superadminPageGate } from "@/lib/desk-guard";
 import { MarketCode, Prisma } from "@prisma/client";
-import { auth } from "@/auth";
+import { SuperadminOnly } from "@/components/superadmin-only";
 import { prisma } from "@/lib/prisma";
 import { Link } from "@/i18n/navigation";
 import {
@@ -39,12 +39,9 @@ export default async function DeskTitlesPage({
 }) {
   const { locale } = await params;
   const sp = await searchParams;
-  const session = await auth();
-  if (session?.user?.role !== "SUPERADMIN") {
-    redirect(`/${locale}/desk`);
-  }
-
   const t = await getTranslations({ locale, namespace: "deskTitles" });
+  const gate = await superadminPageGate(locale);
+  if (!gate.allowed) return <SuperadminOnly locale={locale} area={t("title")} />;
   const td = await getTranslations({ locale, namespace: "desk" });
 
   const market = asMarket(str(sp, "market") || undefined);

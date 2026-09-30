@@ -1,4 +1,5 @@
 import { randomBytes } from "node:crypto";
+import { appUrl } from "@/lib/url";
 
 const TOKEN_BYTES = 24;
 export const DEFAULT_METRICS_TTL_DAYS = 45;
@@ -25,7 +26,11 @@ export function checkMetricsRequest(req: MetricsRequestShape | null | undefined,
   return { ok: true };
 }
 
+// Absolute link for the publisher's metrics email. Built from the app's
+// canonical origin (appUrl: AUTH_URL → NEXTAUTH_URL → NEXT_PUBLIC_SITE_URL)
+// like every other emailed link, so a deploy that only sets AUTH_URL no
+// longer mails publishers a localhost link.
 export function metricsReportLink(token: string, locale = "en"): string {
-  const origin = process.env.NEXT_PUBLIC_SITE_URL?.replace(/\/+$/, "") ?? "http://localhost:3000";
+  const origin = appUrl().replace(/\/+$/, "");
   return `${origin}/${locale}/campaign-report/${encodeURIComponent(token)}`;
 }

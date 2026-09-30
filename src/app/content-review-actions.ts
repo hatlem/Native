@@ -6,6 +6,7 @@ import { prisma } from "@/lib/prisma";
 import { loadScope, canActOnOrg } from "@/lib/scope";
 import { recordAudit } from "@/lib/audit";
 import { notifyDesk } from "@/lib/notify";
+import { supersedeOlderVersions } from "@/lib/content/versions";
 
 // Buyer-side counterpart to desk-content-actions.ts's setAssetStatus: a
 // buyer may only move a draft from IN_REVIEW to APPROVED or
@@ -26,6 +27,7 @@ async function loadAssetForBuyer(assetId: string) {
     select: {
       id: true,
       status: true,
+      version: true,
       article: { select: { id: true, organizationId: true } },
     },
   });
@@ -48,7 +50,13 @@ export async function approveContentAsset(formData: FormData) {
     redirect(`/${locale}/articles/${asset?.article.id ?? ""}`);
   }
 
-  await prisma.contentAsset.update({ where: { id: assetId }, data: { status: "APPROVED" } });
+  // Approve this version and retire every older open one in the same
+  // transaction, so the desk never sees a stale "in review" v1 next to
+  // an approved v2.
+  await prisma.$transaction(async (tx) => {
+    await tx.contentAsset.update({ where: { id: assetId }, data: { status: "APPROVED" } });
+    await supersedeOlderVersions(tx, { articleId: asset.article.id, version: asset.version });
+  });
   await recordAudit(session.user.id, "asset.status", `ContentAsset:${assetId}`, { status: "APPROVED" });
   await notifyDesk({
     kind: "ASSET_REVIEW",

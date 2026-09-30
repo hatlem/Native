@@ -4,12 +4,23 @@ import { prisma } from "@/lib/prisma";
 import { requireArticleWriter } from "@/lib/writers/guard";
 import { loadScope, canActOnOrg } from "@/lib/scope";
 import { StatusBadge } from "@/app/status-badge";
-import { saveDraft, saveUploadedDraft, runSpecCheck, setAssetStatus } from "@/app/desk-content-actions";
+import { saveDraft, saveUploadedDraft, setAssetStatus } from "@/app/desk-content-actions";
 import { linkArticleToOrderLine, unlinkArticleFromOrderLine } from "@/app/article-library-actions";
 import { presignDownloadOrNull } from "@/lib/storage/r2";
 import { approveContentAsset, requestContentChanges } from "@/app/content-review-actions";
 import { resolveEffectiveAsset } from "@/lib/writers/placement";
+import { evaluateSpecForPlacement } from "@/lib/spec-check-runner";
+import { articleHeadline } from "@/lib/content/markdown";
+import { linkableLinesWhere, linkOptionLabels, orderRef } from "@/lib/content/article-linking";
+import { Link } from "@/i18n/navigation";
+import { SubmitButton } from "@/components";
+import { ArticlePreview } from "@/components/article-preview";
 import { UploadForm } from "./upload-form";
+
+export const dynamic = "force-dynamic";
+
+// Versions the author side may still change and hand over for review.
+const EDITABLE_STATUSES = new Set(["DRAFT", "CHANGES_REQUESTED"]);
 
 export default async function ArticleDetailPage({
   params,
@@ -19,7 +30,8 @@ export default async function ArticleDetailPage({
   const { locale, articleId } = await params;
   const t = await getTranslations({ locale, namespace: "articles" });
   const tOrders = await getTranslations({ locale, namespace: "orders" });
-  await requireArticleWriter(articleId, locale); // redirects if not allowed
+  const tType = await getTranslations({ locale, namespace: "productType" });
+  const { role, writerProfileId } = await requireArticleWriter(articleId, locale); // redirects if not allowed
   const scope = await loadScope();
 
   const article = await prisma.article.findUnique({
@@ -28,6 +40,9 @@ export default async function ArticleDetailPage({
       id: true,
       title: true,
       organizationId: true,
+      assignedWriterId: true,
+      createdByUserId: true,
+      assignedWriter: { select: { user: { select: { name: true, email: true } } } },
       placements: {
         select: {
           id: true,
@@ -41,7 +56,15 @@ export default async function ArticleDetailPage({
       versions: {
         orderBy: { version: "desc" },
         take: 1,
-        select: { id: true, status: true, body: true, bodyUrl: true, reviewNotes: true },
+        select: {
+          id: true,
+          version: true,
+          status: true,
+          body: true,
+          bodyUrl: true,
+          reviewNotes: true,
+          authorWriter: { select: { user: { select: { name: true, email: true } } } },
+        },
       },
     },
   });
@@ -50,219 +73,304 @@ export default async function ArticleDetailPage({
   // The article's own latest version — what the write/upload forms edit and
   // what a newly-linked placement would start from. Individual placements
   // may instead be showing an older, locked version (see below).
-  const latestArticleVersion = article.versions[0];
+  const latest = article.versions[0];
 
-  const downloadUrl = latestArticleVersion?.bodyUrl
-    ? await presignDownloadOrNull({ key: latestArticleVersion.bodyUrl })
-    : null;
+  const isDesk = role === "DESK" || role === "SUPERADMIN";
+  const isAssignedWriter = role === "CONTENT" && writerProfileId !== null && writerProfileId === article.assignedWriterId;
+  const nativeSpinWritten = article.assignedWriterId !== null;
+  // Buyer side = anyone acting for the client organization (not the desk,
+  // not the writer). On an article NativeSpin writes, the buyer reviews —
+  // they never edit the writer's copy in place.
+  const isBuyerSide = !isDesk && role !== "CONTENT" && canActOnOrg(scope, article.organizationId);
+  const authorSide = isDesk || isAssignedWriter || (isBuyerSide && !nativeSpinWritten);
+  const canEdit = authorSide && (!latest || EDITABLE_STATUSES.has(latest.status));
+  const canReview = isBuyerSide && latest?.status === "IN_REVIEW";
 
-  // Resolve each placement's own effective asset (locked version if it has
-  // one, otherwise the article's latest) and its title/product name.
-  const placementProductIds = article.placements
+  const headline = articleHeadline(latest?.body) ?? article.title;
+  const createdBy = await prisma.user.findUnique({
+    where: { id: article.createdByUserId },
+    select: { name: true, email: true },
+  });
+  const author =
+    latest?.authorWriter?.user ?? article.assignedWriter?.user ?? createdBy ?? null;
+  const authorName = author ? (author.name ?? author.email.split("@")[0]) : null;
+
+  const downloadUrl = latest?.bodyUrl ? await presignDownloadOrNull({ key: latest.bodyUrl }) : null;
+
+  // Each placement's own effective asset (locked version if it has one,
+  // otherwise the article's latest), plus a label a reader can tell apart.
+  const productIds = article.placements
     .map((p) => p.orderLine.productId)
     .filter((id): id is string => !!id);
-  const placementProducts = placementProductIds.length
-    ? await prisma.product.findMany({
-        where: { id: { in: placementProductIds } },
-        select: { id: true, title: { select: { name: true } } },
+  const linkedOrderIds = [...new Set(article.placements.map((p) => p.orderLine.orderId))];
+  const eligibleLines = canEdit
+    ? await prisma.orderLine.findMany({
+        where: linkableLinesWhere({
+          organizationId: article.organizationId,
+          linkedOrderIds,
+          nativeSpinWritten,
+        }),
+        select: { id: true, orderId: true, productId: true },
+        orderBy: [{ orderId: "asc" }, { id: "asc" }],
       })
     : [];
-  const titleByProductId = new Map(placementProducts.map((p) => [p.id, p.title.name]));
-  const placementsWithAsset = await Promise.all(
+  const allProductIds = [
+    ...new Set([...productIds, ...eligibleLines.map((l) => l.productId).filter((id): id is string => !!id)]),
+  ];
+  const products = allProductIds.length
+    ? await prisma.product.findMany({
+        where: { id: { in: allProductIds } },
+        select: { id: true, type: true, title: { select: { name: true } } },
+      })
+    : [];
+  const productById = new Map(products.map((p) => [p.id, p]));
+  const lineLabel = (productId: string | null, orderId: string) => {
+    const p = productId ? productById.get(productId) : undefined;
+    const ref = t("orderRef", { ref: orderRef(orderId) });
+    return p ? `${p.title.name} · ${tType(p.type)} · ${ref}` : `${t("colPlacement")} · ${ref}`;
+  };
+
+  const placements = await Promise.all(
     article.placements.map(async (p) => ({
       ...p,
       effectiveAsset: await resolveEffectiveAsset({ articleId: article.id, lockedAssetId: p.lockedAssetId }),
-      label: p.orderLine.productId
-        ? (titleByProductId.get(p.orderLine.productId) ?? t("colPlacement"))
-        : t("colPlacement"),
+      label: lineLabel(p.orderLine.productId, p.orderLine.orderId),
     })),
   );
-
-  const eligibleLines = await prisma.orderLine.findMany({
-    where: {
-      kind: "INVENTORY",
-      articlePlacement: null,
-      order: { organizationId: article.organizationId },
-    },
-    select: { id: true, productId: true },
-  });
-  const eligibleProductIds = eligibleLines.map((l) => l.productId).filter((id): id is string => !!id);
-  const eligibleProducts = eligibleProductIds.length
-    ? await prisma.product.findMany({
-        where: { id: { in: eligibleProductIds } },
-        select: { id: true, title: { select: { name: true } } },
-      })
-    : [];
-  const titleByEligibleProductId = new Map(eligibleProducts.map((p) => [p.id, p.title.name]));
+  const linkOptions = linkOptionLabels(
+    eligibleLines.map((l) => ({ id: l.id, base: lineLabel(l.productId, l.orderId) })),
+  );
+  // Handing over for review is blocked while a placement showing the latest
+  // version fails its spec (setAssetStatus enforces the same for non-desk).
+  // Evaluated live: the stored result comes from an async job and can lag
+  // the draft that was just saved.
+  const specChecks =
+    canEdit && latest?.body
+      ? await Promise.all(
+          placements
+            .filter((p) => !p.lockedAssetId && !p.retractedAt)
+            .map((p) => evaluateSpecForPlacement(p.id)),
+        )
+      : [];
+  const failingSpec = specChecks.filter(
+    (e) => e !== null && e.assetId === latest?.id && !e.result.passed,
+  );
+  const canSubmit = canEdit && !!latest && (isDesk || failingSpec.length === 0);
+  const orderHref = (orderId: string) => (isDesk ? `/desk/orders/${orderId}` : `/orders/${orderId}`);
 
   return (
-    <div className="mx-auto max-w-3xl space-y-6 p-6">
-      <h1 className="text-lg font-semibold">{article.title}</h1>
+    <>
+      <p className="small" style={{ marginBottom: 8 }}>
+        <Link href="/articles" className="link">
+          ← {t("backToArticles")}
+        </Link>
+      </p>
+      <header className="page-header">
+        <span className="eyebrow accent">{article.title}</span>
+        <h1>{headline}</h1>
+        <p className="lead cluster tight">
+          {latest ? <StatusBadge value={latest.status} /> : null}
+          {latest ? <span className="muted small">{t("versionLabel", { version: latest.version })}</span> : null}
+          {authorName ? <span className="muted small">{t("byAuthor", { name: authorName })}</span> : null}
+        </p>
+      </header>
 
-      <section className="space-y-2 rounded border p-4">
-        <h2 className="text-sm font-semibold">{t("linkHeading")}</h2>
-        {placementsWithAsset.length > 0 ? (
-          <ul className="space-y-1 text-sm">
-            {placementsWithAsset.map((p) => (
-              <li key={p.id} className="flex items-center gap-2">
-                <a href={`/${locale}/orders/${p.orderLine.orderId}`} className="underline">
-                  {p.label}
-                </a>
-                {p.retractedAt ? (
-                  <span className="badge badge-danger dotless">{t("placementRetracted")}</span>
-                ) : null}
-                <form action={unlinkArticleFromOrderLine}>
+      {latest?.status === "CHANGES_REQUESTED" && latest.reviewNotes ? (
+        <div className="banner-info" role="status">
+          <span>
+            <strong>{t("detailReviewNotes")}:</strong> “{latest.reviewNotes}”
+          </span>
+        </div>
+      ) : null}
+
+      {canReview && latest ? (
+        <section className="section">
+          <article className="card content-review" style={{ borderTop: 0, marginTop: 0 }}>
+            <h2 className="content-review__heading">{tOrders("draftReviewHeading")}</h2>
+            {latest.body ? (
+              <ArticlePreview body={latest.body} />
+            ) : downloadUrl ? (
+              <a href={downloadUrl} target="_blank" rel="noreferrer noopener" className="link">
+                {tOrders("draftReviewOpenFile")} ↗
+              </a>
+            ) : null}
+            <div className="content-review__actions">
+              <form action={approveContentAsset}>
+                <input type="hidden" name="locale" value={locale} />
+                <input type="hidden" name="assetId" value={latest.id} />
+                <SubmitButton
+                  label={tOrders("draftApprove")}
+                  pendingLabel={tOrders("draftApproving")}
+                  className="btn small"
+                />
+              </form>
+              <details className="content-review__changes">
+                <summary className="btn small secondary content-review__changes-toggle">
+                  {tOrders("draftRequestChanges")}
+                </summary>
+                <form action={requestContentChanges} className="content-review__changes-form">
                   <input type="hidden" name="locale" value={locale} />
-                  <input type="hidden" name="articleId" value={articleId} />
-                  <input type="hidden" name="placementId" value={p.id} />
-                  <button type="submit" className="text-xs underline text-gray-500">
-                    {t("unlinkCta")}
-                  </button>
+                  <input type="hidden" name="assetId" value={latest.id} />
+                  <textarea
+                    name="note"
+                    rows={3}
+                    placeholder={tOrders("draftChangesPlaceholder")}
+                    required
+                  />
+                  <SubmitButton
+                    label={tOrders("draftSendChanges")}
+                    pendingLabel={tOrders("draftApproving")}
+                    className="btn small secondary"
+                  />
                 </form>
-              </li>
-            ))}
-          </ul>
-        ) : (
-          <p className="text-xs text-gray-500">{t("linkHint")}</p>
-        )}
-        {eligibleLines.length === 0 ? (
-          placementsWithAsset.length === 0 ? <p className="text-xs text-gray-500">{t("linkEmpty")}</p> : null
-        ) : (
-          <form action={linkArticleToOrderLine} className="flex items-center gap-2">
-            <input type="hidden" name="locale" value={locale} />
-            <input type="hidden" name="articleId" value={articleId} />
-            <select name="orderLineId" className="rounded border p-2 text-sm">
-              {eligibleLines.map((l) => (
-                <option key={l.id} value={l.id}>
-                  {l.productId ? (titleByEligibleProductId.get(l.productId) ?? l.id) : l.id}
-                </option>
+              </details>
+            </div>
+          </article>
+        </section>
+      ) : latest ? (
+        <section className="section">
+          <article className="card">
+            <h2 style={{ marginTop: 0 }}>{t("previewHeading")}</h2>
+            {latest.body ? (
+              <ArticlePreview body={latest.body} />
+            ) : downloadUrl ? (
+              <a href={downloadUrl} target="_blank" rel="noreferrer noopener" className="link">
+                {t("detailDownloadFile")} ↗
+              </a>
+            ) : (
+              <p className="muted">{t("previewEmpty")}</p>
+            )}
+            {latest.status === "IN_REVIEW" && !canReview ? (
+              <p className="muted small" style={{ marginTop: 12 }}>{t("awaitingReview")}</p>
+            ) : null}
+          </article>
+        </section>
+      ) : null}
+
+      <section className="section">
+        <article className="card">
+          <h2 style={{ marginTop: 0 }}>{t("placementsHeading")}</h2>
+          {placements.length > 0 ? (
+            <ul className="stack-2" style={{ listStyle: "none", padding: 0, margin: 0 }}>
+              {placements.map((p) => (
+                <li key={p.id} className="cluster tight">
+                  <Link href={orderHref(p.orderLine.orderId)} className="link">
+                    {p.label}
+                  </Link>
+                  {p.retractedAt ? (
+                    <span className="badge badge-danger dotless">{t("placementRetracted")}</span>
+                  ) : p.effectiveAsset && p.specPassed === true ? (
+                    <span className="badge badge-success dotless">{t("specPassed")}</span>
+                  ) : p.effectiveAsset && p.specPassed === false ? (
+                    <span className="badge badge-warning dotless" title={p.specNotes ?? undefined}>
+                      {t("specFailed")}
+                    </span>
+                  ) : null}
+                  {canEdit && !p.retractedAt ? (
+                    <form action={unlinkArticleFromOrderLine}>
+                      <input type="hidden" name="locale" value={locale} />
+                      <input type="hidden" name="articleId" value={articleId} />
+                      <input type="hidden" name="placementId" value={p.id} />
+                      <button type="submit" className="btn small ghost">
+                        {t("unlinkCta")}
+                      </button>
+                    </form>
+                  ) : null}
+                </li>
               ))}
-            </select>
-            <button type="submit" className="rounded bg-black px-3 py-1.5 text-sm text-white">
-              {t("linkCta")}
-            </button>
-          </form>
-        )}
+            </ul>
+          ) : (
+            <p className="muted small">{t("linkHint")}</p>
+          )}
+          {placements.length > 1 && canEdit ? (
+            <p className="muted small" style={{ marginTop: 12 }}>
+              {t("sharedArticleWarning", { count: placements.length - 1 })}
+            </p>
+          ) : null}
+          {canEdit ? (
+            linkOptions.length === 0 ? (
+              placements.length === 0 ? <p className="muted small">{t("linkEmpty")}</p> : null
+            ) : (
+              <form action={linkArticleToOrderLine} className="cluster tight" style={{ marginTop: 12 }}>
+                <input type="hidden" name="locale" value={locale} />
+                <input type="hidden" name="articleId" value={articleId} />
+                <label className="sr-only" htmlFor={`link-${articleId}`}>
+                  {t("linkHeading")}
+                </label>
+                <select id={`link-${articleId}`} name="orderLineId">
+                  {linkOptions.map((o) => (
+                    <option key={o.id} value={o.id}>
+                      {o.label}
+                    </option>
+                  ))}
+                </select>
+                <SubmitButton label={t("linkCta")} pendingLabel={t("saving")} className="btn small secondary" />
+              </form>
+            )
+          ) : null}
+        </article>
       </section>
 
-      {placementsWithAsset.length > 0 ? (
-        <div className="space-y-2">
-          {placementsWithAsset.map((p) =>
-            p.effectiveAsset ? (
-              <div key={`spec-${p.id}`} className="flex items-center gap-3 text-sm">
-                <span>
-                  {p.label}:
-                  {p.specPassed === true
-                    ? ` ${t("detailSpecPassed")}`
-                    : p.specPassed === false
-                      ? ` ${t("detailSpecFailed")}${p.specNotes ? `: ${p.specNotes}` : ""}`
-                      : ` ${t("specNotChecked")}`}
-                </span>
-                <form action={runSpecCheck}>
-                  <input type="hidden" name="locale" value={locale} />
-                  <input type="hidden" name="placementId" value={p.id} />
-                  <button type="submit" className="underline">
-                    {t("detailRunSpecCheck")}
-                  </button>
-                </form>
+      {canEdit ? (
+        <section className="section">
+          <div className="section-head">
+            <h2>{t("detailWriteHeading")}</h2>
+          </div>
+          <div className="card stack-4">
+            <form action={saveDraft} className="product-form">
+              <input type="hidden" name="locale" value={locale} />
+              <input type="hidden" name="articleId" value={articleId} />
+              <div className="field">
+                <label htmlFor={`body-${articleId}`}>{t("draftLabel")}</label>
+                <textarea
+                  id={`body-${articleId}`}
+                  name="body"
+                  defaultValue={latest?.bodyUrl ? "" : (latest?.body ?? "")}
+                  rows={18}
+                  style={{ fontFamily: "var(--font-mono, ui-monospace, monospace)" }}
+                />
+                <span className="hint">{t("draftHint")}</span>
               </div>
-            ) : null,
-          )}
-        </div>
-      ) : null}
-
-      {placementsWithAsset.length > 1 ? (
-        <p className="text-xs text-amber-700">
-          {t("sharedArticleWarning", { count: placementsWithAsset.length - 1 })}
-        </p>
-      ) : null}
-
-      <form action={saveDraft} className="space-y-2">
-        <input type="hidden" name="locale" value={locale} />
-        <input type="hidden" name="articleId" value={articleId} />
-        <label className="block text-sm font-medium">{t("detailWriteHeading")}</label>
-        <textarea
-          name="body"
-          defaultValue={latestArticleVersion?.bodyUrl ? "" : (latestArticleVersion?.body ?? "")}
-          rows={18}
-          className="w-full rounded border p-2 font-mono text-sm"
-        />
-        <button type="submit" className="rounded bg-black px-3 py-1.5 text-sm text-white">
-          {t("detailSaveDraft")}
-        </button>
-      </form>
-
-      <UploadForm
-        articleId={articleId}
-        locale={locale}
-        saveDraftAction={saveUploadedDraft}
-        labels={{
-          heading: t("detailUploadHeading"),
-          hint: t("detailUploadHint"),
-          uploading: t("detailUploading"),
-          save: t("detailSaveDraft"),
-          failed: t("detailUploadFailed"),
-          unavailable: t("detailUploadUnavailable"),
-        }}
-      />
-
-      {downloadUrl ? (
-        <p className="text-sm">
-          <a href={downloadUrl} target="_blank" rel="noreferrer noopener" className="underline">
-            {t("detailDownloadFile")} ↗
-          </a>
-        </p>
-      ) : null}
-
-      {latestArticleVersion ? (
-        <div className="flex items-center gap-4 text-sm">
-          <span>
-            {t("detailStatus")}: <StatusBadge value={latestArticleVersion.status} />
-          </span>
-          <form action={setAssetStatus}>
-            <input type="hidden" name="locale" value={locale} />
-            <input type="hidden" name="assetId" value={latestArticleVersion.id} />
-            <input type="hidden" name="target" value="IN_REVIEW" />
-            <button type="submit" className="underline">
-              {t("detailSubmitForReview")}
-            </button>
-          </form>
-        </div>
-      ) : null}
-
-      {latestArticleVersion?.reviewNotes ? (
-        <p className="text-sm text-amber-700">
-          {t("detailReviewNotes")}: {latestArticleVersion.reviewNotes}
-        </p>
-      ) : null}
-
-      {latestArticleVersion?.status === "IN_REVIEW" && canActOnOrg(scope, article.organizationId) ? (
-        <section className="space-y-2 rounded border p-4">
-          <h2 className="text-sm font-semibold">{tOrders("draftReviewHeading")}</h2>
-          <div className="flex items-center gap-3">
-            <form action={approveContentAsset}>
-              <input type="hidden" name="locale" value={locale} />
-              <input type="hidden" name="assetId" value={latestArticleVersion.id} />
-              <button type="submit" className="rounded bg-black px-3 py-1.5 text-sm text-white">
-                {tOrders("draftApprove")}
-              </button>
+              <div className="actions">
+                <SubmitButton label={t("detailSaveDraft")} pendingLabel={t("saving")} className="btn secondary" />
+              </div>
             </form>
-            <form action={requestContentChanges} className="flex items-center gap-2">
-              <input type="hidden" name="locale" value={locale} />
-              <input type="hidden" name="assetId" value={latestArticleVersion.id} />
-              <input
-                type="text"
-                name="note"
-                placeholder={tOrders("draftChangesPlaceholder")}
-                className="rounded border p-2 text-sm"
-              />
-              <button type="submit" className="rounded border px-3 py-1.5 text-sm">
-                {tOrders("draftSendChanges")}
-              </button>
-            </form>
+
+            <UploadForm
+              articleId={articleId}
+              locale={locale}
+              saveDraftAction={saveUploadedDraft}
+              labels={{
+                heading: t("detailUploadHeading"),
+                hint: t("detailUploadHint"),
+                uploading: t("detailUploading"),
+                save: t("detailSaveDraft"),
+                failed: t("detailUploadFailed"),
+                unavailable: t("detailUploadUnavailable"),
+              }}
+            />
+
+            {latest ? (
+              <form action={setAssetStatus} className="cluster">
+                <input type="hidden" name="locale" value={locale} />
+                <input type="hidden" name="assetId" value={latest.id} />
+                <input type="hidden" name="target" value="IN_REVIEW" />
+                <button
+                  type="submit"
+                  className="btn primary"
+                  disabled={!canSubmit}
+                  aria-disabled={!canSubmit}
+                >
+                  {t("detailSubmitForReview")}
+                </button>
+                {canSubmit ? null : (
+                  <span className="muted small">{t("submitBlockedSpec")}</span>
+                )}
+              </form>
+            ) : null}
           </div>
         </section>
       ) : null}
-    </div>
+    </>
   );
 }

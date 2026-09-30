@@ -1,24 +1,19 @@
 "use server";
 
 import { redirect } from "next/navigation";
+import { revalidatePath } from "next/cache";
 import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
 import { recordAudit } from "@/lib/audit";
 import {
-  ContentLanguage,
-  ContentTopic,
-  LanguageProficiency,
-} from "@prisma/client";
+  parseWriterProfileForm,
+  submittedProfileValues,
+  type WriterProfileState,
+} from "@/lib/writers/profile";
 
 function field(formData: FormData, key: string): string {
   const v = formData.get(key);
   return typeof v === "string" ? v.trim() : "";
-}
-
-function decimalOrNull(raw: string): string | null {
-  if (!raw) return null;
-  const n = Number(raw.replace(",", "."));
-  return Number.isFinite(n) ? String(n) : null;
 }
 
 async function requireWriter(
@@ -36,49 +31,47 @@ async function requireWriter(
   return { userId: session.user.id, writerId: profile.id };
 }
 
-export async function updateWriterProfile(formData: FormData) {
+// Validated on the server (the form's own constraints are only a hint) and
+// driven by useActionState, so the writer sees exactly which fields to fix,
+// or a saved confirmation — never a silent no-op or a silently cleared
+// value.
+export async function updateWriterProfile(
+  _prev: WriterProfileState,
+  formData: FormData,
+): Promise<WriterProfileState> {
   const locale = field(formData, "locale") || "en";
   const { userId, writerId } = await requireWriter(locale);
 
-  const languages = formData
-    .getAll("languages")
-    .filter((v): v is string => typeof v === "string")
-    .filter((v) => v in ContentLanguage) as ContentLanguage[];
-  const topics = formData
-    .getAll("specialties")
-    .filter((v): v is string => typeof v === "string")
-    .filter((v) => v in ContentTopic) as ContentTopic[];
-  const proficiencyRaw = field(formData, "proficiency");
-  const proficiency: LanguageProficiency =
-    proficiencyRaw in LanguageProficiency
-      ? (proficiencyRaw as LanguageProficiency)
-      : "FLUENT";
+  const parsed = parseWriterProfileForm(formData);
+  if (!parsed.ok) {
+    return { status: "error", fields: parsed.fields, values: submittedProfileValues(formData) };
+  }
+  const d = parsed.data;
 
   await prisma.$transaction([
     prisma.writerProfile.update({
       where: { id: writerId },
       data: {
-        bio: field(formData, "bio") || null,
-        portfolioUrl: field(formData, "portfolioUrl") || null,
-        currency: field(formData, "currency") || null,
-        ratePerArticle: decimalOrNull(field(formData, "ratePerArticle")),
-        ratePerWord: decimalOrNull(field(formData, "ratePerWord")),
-        maxActiveAssignments: field(formData, "maxActiveAssignments")
-          ? Number(field(formData, "maxActiveAssignments"))
-          : null,
-        active: field(formData, "active") === "on",
+        bio: d.bio,
+        portfolioUrl: d.portfolioUrl,
+        currency: d.currency,
+        ratePerArticle: d.ratePerArticle,
+        ratePerWord: d.ratePerWord,
+        maxActiveAssignments: d.maxActiveAssignments,
+        active: d.active,
       },
     }),
     prisma.writerLanguage.deleteMany({ where: { writerId } }),
     prisma.writerSpecialty.deleteMany({ where: { writerId } }),
     prisma.writerLanguage.createMany({
-      data: languages.map((language) => ({ writerId, language, proficiency })),
+      data: d.languages.map((l) => ({ writerId, language: l.language, proficiency: l.proficiency })),
     }),
     prisma.writerSpecialty.createMany({
-      data: topics.map((topic) => ({ writerId, topic })),
+      data: d.specialties.map((topic) => ({ writerId, topic })),
     }),
   ]);
   await recordAudit(userId, "writer.profile_update", `WriterProfile:${writerId}`);
 
-  redirect(`/${locale}/writer/profile`);
+  revalidatePath(`/${locale}/writer/profile`);
+  return { status: "saved" };
 }

@@ -3,9 +3,13 @@ import { getTranslations } from "next-intl/server";
 import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
 import { loadRoster } from "@/lib/writers/roster";
+import { writerClaimPath } from "@/lib/writers/invite";
+import { appUrl } from "@/lib/url";
+import { intlLocale } from "@/lib/money";
 import { SubmitButton } from "@/components";
-import { createWriterInvite } from "@/app/writer-invite-actions";
+import { resendWriterInvite } from "@/app/writer-invite-actions";
 import { SafeEmail } from "@/components/safe-email";
+import { InviteWriterForm } from "./invite-writer-form";
 
 export const dynamic = "force-dynamic";
 
@@ -22,6 +26,9 @@ export default async function DeskWriters({
   }
 
   const t = await getTranslations({ locale, namespace: "deskWriters" });
+  const tEnum = await getTranslations({ locale, namespace: "writerEnums" });
+  const dateFmt = new Intl.DateTimeFormat(intlLocale(locale), { dateStyle: "medium" });
+  const origin = appUrl().replace(/\/+$/, "");
 
   const [roster, pendingInvites] = await Promise.all([
     loadRoster(),
@@ -39,32 +46,13 @@ export default async function DeskWriters({
         <p className="lead">{t("lead")}</p>
       </header>
 
-      {/* Invite form */}
       <section className="section">
         <div className="section-head">
           <h2>{t("inviteHeading")}</h2>
         </div>
-        <form action={createWriterInvite} className="card stack-4">
-          <input type="hidden" name="locale" value={locale} />
-          <label className="field">
-            <span>{t("emailLabel")}</span>
-            <input
-              name="email"
-              type="email"
-              required
-              autoComplete="off"
-              placeholder="writer@example.com"
-            />
-          </label>
-          <SubmitButton
-            className="btn primary"
-            label={t("inviteButton")}
-            pendingLabel={t("inviting")}
-          />
-        </form>
+        <InviteWriterForm locale={locale} />
       </section>
 
-      {/* Pending invites */}
       <section className="section">
         <div className="section-head">
           <h2>{t("pendingHeading")}</h2>
@@ -76,22 +64,54 @@ export default async function DeskWriters({
             <table className="table">
               <thead>
                 <tr>
-                  <th>Email</th>
+                  <th>{t("colEmail")}</th>
+                  <th>{t("colLanguage")}</th>
+                  <th>{t("colDelivery")}</th>
                   <th>{t("expires")}</th>
                   <th>{t("claimLink")}</th>
+                  <th></th>
                 </tr>
               </thead>
               <tbody>
                 {pendingInvites.map((invite) => (
                   <tr key={invite.id}>
-                    <td><SafeEmail address={invite.email} /></td>
-                    <td className="muted small">
-                      {invite.expiresAt.toLocaleDateString()}
+                    <td data-label={t("colEmail")}>
+                      <SafeEmail address={invite.email} />
                     </td>
-                    <td>
-                      <code className="small">
-                        {`/${locale}/writer/claim/${invite.token}`}
-                      </code>
+                    <td data-label={t("colLanguage")}>{t(`inviteLanguage.${invite.locale}`)}</td>
+                    <td data-label={t("colDelivery")}>
+                      {invite.emailedAt ? (
+                        <span className="badge badge-success dotless">
+                          {t("emailedOn", { date: dateFmt.format(invite.emailedAt) })}
+                        </span>
+                      ) : (
+                        <span className="badge badge-warning dotless">{t("notEmailed")}</span>
+                      )}
+                    </td>
+                    <td className="muted small" data-label={t("expires")}>
+                      {dateFmt.format(invite.expiresAt)}
+                    </td>
+                    <td data-label={t("claimLink")}>
+                      {/* Absolute and selectable, so the desk can still share
+                          it by hand if the email bounced. */}
+                      <input
+                        readOnly
+                        aria-label={t("claimLink")}
+                        value={`${origin}${writerClaimPath(invite.locale, invite.token)}`}
+                        className="small"
+                        style={{ width: "100%", minWidth: 220 }}
+                      />
+                    </td>
+                    <td className="actions-col">
+                      <form action={resendWriterInvite}>
+                        <input type="hidden" name="locale" value={locale} />
+                        <input type="hidden" name="inviteId" value={invite.id} />
+                        <SubmitButton
+                          label={t("resend")}
+                          pendingLabel={t("inviting")}
+                          className="btn small ghost"
+                        />
+                      </form>
                     </td>
                   </tr>
                 ))}
@@ -101,7 +121,6 @@ export default async function DeskWriters({
         )}
       </section>
 
-      {/* Roster */}
       <section className="section">
         <div className="section-head">
           <h2>{t("rosterHeading")}</h2>
@@ -114,38 +133,41 @@ export default async function DeskWriters({
             <table className="table">
               <thead>
                 <tr>
-                  <th>Name</th>
-                  <th>Languages</th>
-                  <th>Specialties</th>
-                  <th>Status</th>
-                  <th>Load</th>
+                  <th>{t("colName")}</th>
+                  <th>{t("colLanguages")}</th>
+                  <th>{t("colSpecialties")}</th>
+                  <th>{t("colStatus")}</th>
+                  <th>{t("colLoad")}</th>
                 </tr>
               </thead>
               <tbody>
                 {roster.map((w) => (
                   <tr key={w.id}>
-                    <td>{w.name ?? <SafeEmail address={w.email} />}</td>
-                    <td>
+                    <td data-label={t("colName")}>
+                      {w.name ?? <SafeEmail address={w.email} />}
+                    </td>
+                    <td data-label={t("colLanguages")}>
                       {w.languages.length > 0
                         ? w.languages
-                            .map(
-                              (l) =>
-                                `${l.language}${l.proficiency ? ` (${l.proficiency})` : ""}`,
+                            .map((l) =>
+                              l.proficiency
+                                ? `${tEnum(`language.${l.language}`)} (${tEnum(`proficiency.${l.proficiency}`)})`
+                                : tEnum(`language.${l.language}`),
                             )
                             .join(", ")
                         : <span className="muted">—</span>}
                     </td>
-                    <td>
+                    <td data-label={t("colSpecialties")}>
                       {w.specialties.length > 0
-                        ? w.specialties.map((s) => s.topic).join(", ")
+                        ? w.specialties.map((s) => tEnum(`topic.${s.topic}`)).join(", ")
                         : <span className="muted">—</span>}
                     </td>
-                    <td>
-                      <span className={w.active ? "badge green" : "badge muted"}>
+                    <td data-label={t("colStatus")}>
+                      <span className={w.active ? "badge badge-success" : "badge badge-neutral"}>
                         {w.active ? t("active") : t("inactive")}
                       </span>
                     </td>
-                    <td className="num">
+                    <td className="num" data-label={t("colLoad")}>
                       {w.maxActiveAssignments != null
                         ? t("assignmentsOf", {
                             active: w.activeAssignments,
