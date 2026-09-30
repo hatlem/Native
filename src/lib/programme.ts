@@ -10,6 +10,7 @@ import { prisma } from "@/lib/prisma";
 import { deriveStage } from "@/lib/campaign-stage";
 import { clampCadence, currentPeriodStart, shiftScheduleStart } from "@/lib/programme-cadence";
 import type { BookingUnit } from "@/lib/campaign-schedule";
+import { contentIntent } from "@/lib/authorship";
 
 export * from "@/lib/programme-cadence";
 
@@ -100,8 +101,7 @@ export async function copyListForNewWave(
           productId: i.productId,
           titleId: i.titleId,
           quantity: i.quantity,
-          withContent: i.withContent,
-          authorshipMode: i.authorshipMode,
+          ...contentIntent(i.withContent, i.authorshipMode),
           notes: i.notes,
           isAlternative: i.isAlternative,
           sortOrder: i.sortOrder,

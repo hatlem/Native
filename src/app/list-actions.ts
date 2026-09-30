@@ -16,6 +16,7 @@ import {
   resolveTitleItem,
   removeItem,
   setItemQuantity,
+  setItemContent,
   setItemAlternative,
   readActiveListId,
   writeActiveListId,
@@ -24,6 +25,7 @@ import {
 } from "@/lib/lists";
 import { enableListShare, disableListShare } from "@/lib/list-share";
 import { normalizeLineNote } from "@/lib/line-note";
+import { contentIntent } from "@/lib/authorship";
 import { reorderSection, ReorderMismatchError } from "@/lib/plan-reorder";
 
 function str(formData: FormData, key: string): string {
@@ -276,11 +278,7 @@ export async function setListItemContent(formData: FormData) {
   const locale = str(formData, "locale") || "en";
   const itemId = str(formData, "itemId");
   await ownItem(locale, itemId);
-  // updateMany no-ops (no P2025) if the row was concurrently removed.
-  await prisma.savedListItem.updateMany({
-    where: { id: itemId },
-    data: { withContent: str(formData, "withContent") === "1" },
-  });
+  await setItemContent(itemId, str(formData, "withContent") === "1");
   redirect(`/${locale}/plan`);
 }
 
@@ -508,8 +506,7 @@ export async function duplicateList(formData: FormData) {
           productId: i.productId,
           titleId: i.titleId,
           quantity: i.quantity,
-          withContent: i.withContent,
-          authorshipMode: i.authorshipMode,
+          ...contentIntent(i.withContent, i.authorshipMode),
           notes: i.notes,
           isAlternative: i.isAlternative,
           sortOrder: i.sortOrder,
