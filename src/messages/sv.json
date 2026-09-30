@@ -108,7 +108,8 @@
     "basis_win-rate": "från vinstandel",
     "basis_category-median": "kategorimedian",
     "basis_default": "standard",
-    "exportInvoicesCsv": "Exportera fakturor (CSV)"
+    "exportInvoicesCsv": "Exportera fakturor (CSV)",
+    "exportAccountingJson": "Bokföringsexport (JSON)"
   },
   "agency": {
     "eyebrow": "Byrå",
@@ -213,7 +214,9 @@
     "compareBar": {
       "label": "{count, plural, =1 {1 titel vald} other {# titlar valda}}",
       "open": "Jämför →",
-      "clear": "Rensa"
+      "clear": "Rensa",
+      "select": "Jämför {name}",
+      "region": "Titlar valda för jämförelse"
     },
     "card": {
       "from": "Från",
@@ -316,7 +319,9 @@
       "addToPlan": "Lägg till i planen",
       "onPlan": "I planen",
       "askForPrice": "Be om pris"
-    }
+    },
+    "exportCsv": "Ladda ner katalogen (CSV)",
+    "exportCsvMarket": "Ladda ner titlar i {market} (CSV)"
   },
   "lists": {
     "title": "Sparade listor",
@@ -330,21 +335,25 @@
     "open": "Öppna",
     "rename": "Byt namn",
     "duplicate": "Duplicera",
-    "archive": "Arkivera"
+    "archive": "Arkivera",
+    "copyName": "{name} (kopia)",
+    "archivedNotice": "”{name}” är arkiverad.",
+    "undo": "Ångra",
+    "archivedHeading": "Arkiverade ({count})",
+    "archivedOn": "arkiverad {date}",
+    "restore": "Återställ"
   },
   "favorites": {
     "title": "Favoriter",
     "lead": "Publikationer du har sparat. Öppna en för att lägga ett format i en plan.",
     "add": "Lägg till i favoriter",
     "remove": "Ta bort från favoriter",
-    "addToList": "Lägg till i en lista",
+    "addToList": "Lägg till i en sparad lista",
     "noLists": "Inga listor ännu.",
     "noOrgHint": "Välj en kund för att se och skapa listor.",
     "newListPlaceholder": "Namn på ny lista",
-    "createList": "Skapa lista",
+    "createList": "Ny sparad lista",
     "allHeading": "Alla favoriter",
-    "listsHeading": "Dina listor",
-    "sharedHeading": "Delat med dig",
     "empty": "Inga favoriter ännu. Bläddra i katalogen och tryck på hjärtat på en publikation.",
     "browseCta": "Bläddra i katalogen",
     "itemCount": "{count, plural, =0 {Inga publikationer} =1 {1 publikation} other {# publikationer}}",
@@ -352,7 +361,6 @@
     "unshare": "Sluta dela",
     "sharedBadge": "Delad",
     "rename": "Byt namn",
-    "delete": "Ta bort lista",
     "open": "Öppna",
     "removeFromList": "Ta bort",
     "byOwner": "av {owner}",
@@ -360,7 +368,16 @@
     "sharedByReadOnly": "Delad av {owner} · skrivskyddad",
     "confirmDelete": "Bekräfta",
     "cancelDelete": "Avbryt",
-    "listUnavailable": "Den listan är inte längre tillgänglig."
+    "collectionsHeading": "Dina samlingar",
+    "collectionsLead": "Gruppera favoriter efter tema eller kund och dela en samling med ditt team. Vill du prissätta placeringar lägger du dem i en sparad lista.",
+    "newCollectionPlaceholder": "Namn på ny samling",
+    "createCollection": "Skapa samling",
+    "noCollections": "Inga samlingar ännu.",
+    "deleteCollection": "Radera samling",
+    "sharedCollectionsHeading": "Samlingar som delats med dig",
+    "collectionUnavailable": "Den samlingen är inte längre tillgänglig.",
+    "addToCollection": "Samling",
+    "addToCollectionSubmit": "Lägg i samling"
   },
   "titleDetail": {
     "back": "Tillbaka till katalogen",
@@ -684,7 +701,9 @@
     "lineDragInstructions": "Flytta en rad: tryck mellanslag för att lyfta den, flytta med piltangenterna och tryck mellanslag igen för att släppa. Escape avbryter.",
     "lineSearchBlocksDrag": "töm sökningen för att ändra ordningen",
     "lineOrderSaveFailed": "Ordningen kunde inte sparas – laddar om planen.",
-    "lineMovedAnnouncement": "Flyttad till plats {position} av {total}"
+    "lineMovedAnnouncement": "Flyttad till plats {position} av {total}",
+    "noticePlanArchived": "Den planen är arkiverad, så du ser din nuvarande plan i stället. Du kan återställa den under Sparade listor.",
+    "noticePlanUnavailable": "Vi kunde inte öppna den planen — länken kan vara inaktuell, eller så tillhör planen en annan arbetsyta. Det här är din nuvarande plan."
   },
   "rfq": {
     "org": "Företag",
@@ -1648,7 +1667,7 @@
     "placementRetracted": "Indragen",
     "unlinkCta": "Ta bort koppling",
     "sharedArticleWarning": "Den här artikeln är kopplad till {count} andra placeringar — dina ändringar påverkar alla.",
-    "detailUploadFailed": "Uppladdningen misslyckades. Prova en annan fil.",
+    "detailUploadFailed": "Uppladdningen gick inte igenom. Kontrollera anslutningen och försök igen.",
     "detailUploadUnavailable": "Filuppladdning är inte tillgänglig just nu. Klistra in texten i redigeraren i stället.",
     "backToArticles": "Alla artiklar",
     "versionLabel": "Version {version}",
@@ -1663,7 +1682,9 @@
     "orderRef": "beställning {ref}",
     "draftLabel": "Artikeltext",
     "draftHint": "Ren text med enkel Markdown: # för rubriker, **fet**, *kursiv*, - för listor, [text](länk).",
-    "submitBlockedSpec": "Formatkraven för en placering är inte uppfyllda ännu – kontrollera placeringarna ovan."
+    "submitBlockedSpec": "Formatkraven för en placering är inte uppfyllda ännu – kontrollera placeringarna ovan.",
+    "detailUploadWrongType": "Den filtypen stöds inte. Ladda upp en PDF, Word-fil (.docx) eller ren text.",
+    "detailUploadTooLarge": "Filen är tom eller större än 25 MB. Ladda upp en mindre fil, eller klistra in texten i redigeraren."
   },
   "marketing": {
     "howCta": "Så funkar det",
@@ -2331,16 +2352,16 @@
     "authRequest": "Skicka en strukturerad förfrågan till partners@nativespin.com — berätta om integrationens form och vilka marknader du bryr dig om, så utfärdar vi en nyckel.",
     "endpointsEyebrow": "v1-endpoints",
     "endpointsTitle": "Vad som är tillgängligt idag",
-    "listBody": "Paginerad kataloglistning av alla aktiva titlar med minst en aktiv produkt. Filtrera på marknad (NO/SE/DK/FI/DE/AT/CH/UK/IE) och format (NATIVE_ARTICLE/ADVERTORIAL/NATIVE_DISPLAY/PACKAGE).",
+    "listBody": "Paginerad lista över alla aktiva titlar i katalogen, med aktiva produkter och prisintervall. Filtrera på marknad (NO/SE/DK/FI/DE/AT/CH/UK/IE) och format (en produkttyp, till exempel NATIVE_ARTICLE).",
     "queryParams": "Frågeparametrar",
-    "detailBody": "Per-titel-detaljer: utgivare, marknad (med moms + märkningsregler), och varje aktiv produkt med specifikation och prisregel-steg.",
-    "detailIncludes": "Inkluderar ordantalsgränser, mall för märkningsetikett, ledtid och vägledande grundpris i marknadens valuta.",
+    "detailBody": "Detaljer per titel: utgivare, marknad (med momssats och annonsmärkning) och varje aktiv produkt med innehållskrav, ledtid och prisintervall.",
+    "detailIncludes": "Priser anges som intervall (till exempel ”25–40k NOK”), aldrig som exakta belopp: det fasta priset kommer i en offert. Innehållskraven omfattar ordgränser, minsta antal bilder och annonsmärkningen.",
     "paginationTitle": "Pagination",
-    "paginationBody": "Markörbaserad på titel-id. Stabil sortering på namn + id så att du kan köra en full synk utan att missa rader när nya titlar aktiveras mitt i synken.",
+    "paginationBody": "Markörbaserad. Skicka tillbaka page.nextCursor som cursor tills den är null: först då är synken klar. Sorteringen är stabil (namn + id), så en full synk missar aldrig rader även om titlar aktiveras eller inaktiveras under tiden.",
     "limitsTitle": "Hastighetsgränser",
     "limitsBody": "Per-nyckel-bursts jämnas ut genom samma bucket som RFQ-flödet använder. Ett 429-svar inkluderar en ungefärlig retry-after i meddelandets brödtext. Långvariga hög-genomströmnings-partner får högre gränser — fråga när du frågar efter en nyckel.",
     "errorsTitle": "Errors",
-    "errorsBody": "Fel returneras som JSON med en stabil kod och ett mänskligt meddelande. Koder idag: MISSING, INVALID, EXPIRED, REVOKED, SCOPE, RATE_LIMITED, NOT_FOUND.",
+    "errorsBody": "Fel returneras som JSON med en stabil kod och ett läsbart meddelande. En ogiltig parameter ger 400 BAD_PARAM, där error.details namnger var och en; inget ignoreras i tysthet. Alla koder finns i OpenAPI-specifikationen på /api/openapi.json.",
     "ctaTitle": "Behöver du en nyckel?",
     "ctaBody": "Vi tillhandahåller inte API:t automatiskt — partnerintegrationer har kommersiella implikationer som vi vill prata igenom först. Hör av dig, så får du en fungerande nyckel inom en arbetsdag.",
     "ctaContact": "Prata med partnerskapsteamet",
@@ -2348,7 +2369,8 @@
     "selfServeTitle": "Köp som programmatiskt — på namngivna premiumtitlar",
     "selfServeBody": "Hitta lager via katalog-API:t och boka fastprissatta placeringar i ett anrop — via API eller i appen. Ingen auktion, inget dolt lager: varje titel är namngiven, varje pris är utgivarens eget. RFQ-titlar förblir desk-styrda med avsikt — API:t bokar endast fastprissatt självbetjäningslager.",
     "ordersBody": "Lägg en fastprissatt självbetjäningsorder. Skicka fastprissatta produkter och få en bekräftad order tillbaka i ett anrop. Kräver orders:write-behörighet och en nyckel kopplad till din organisation; RFQ-produkter ger 422 RFQ_ONLY.",
-    "ordersRequest": "curl -X POST https://nativespin.com/api/v1/orders \\\n  -H \"Authorization: Bearer DIN_NYCKEL\" \\\n  -H \"Content-Type: application/json\" \\\n  -d '{\"items\":[{\"productId\":\"PRODUKT_ID\",\"quantity\":1}]}'"
+    "ordersRequest": "curl -X POST https://nativespin.com/api/v1/orders \\\n  -H \"Authorization: Bearer DIN_NYCKEL\" \\\n  -H \"Content-Type: application/json\" \\\n  -d '{\"items\":[{\"productId\":\"PRODUKT_ID\",\"quantity\":1}]}'",
+    "quotesBody": "Status, rader och totaler för en offert som desken har skickat. En nyckel kopplad till en organisation ser bara den organisationens offerter."
   },
   "apiKeys": {
     "eyebrow": "Superadmin",
@@ -2356,16 +2378,14 @@
     "lead": "Utfärda + återkalla publika katalog-API-nycklar. Den råa token visas EN gång vid utfärdandet — lagra den i partnerns hemlighetsförvaltning innan du navigerar bort.",
     "createdLabel": "Ny nyckel utfärdad",
     "copyNow": "Kopiera denna token nu; den visas bara en gång.",
-    "errorScopes": "Minst ett giltigt scope krävs (catalog:read, catalog:*, orders:write, pricing:admin).",
-    "errorInternalOnly": "pricing:admin är endast internt — kan bara utfärdas som en NativeSpin-plattformsnyckel (utan organisation).",
-    "errorOrgRequired": "orders:write måste vara kopplad till en organisation — välj en ägande organisation ovan.",
+    "errorScopes": "Välj minst ett scope.",
+    "errorInternalOnly": "pricing:admin är endast för internt bruk — den kan bara utfärdas som en NativeSpin-plattformsnyckel.",
+    "errorOrgRequired": "orders:write lägger beställningar för en organisation — koppla nyckeln till en under ”Agerar för”.",
     "issueEyebrow": "Utfärda",
     "issueTitle": "Utfärda en ny nyckel",
     "nameLabel": "Namn / partner",
-    "orgLabel": "Ägar-organisation (valfritt)",
-    "orgPlatform": "NativeSpin-plattformsnyckel (ingen org)",
+    "orgPlatform": "NativeSpin-plattformen (ingen organisation eller utgivare)",
     "scopesLabel": "Behörigheter (scopes)",
-    "scopesHint": "Kommaseparerade. Alternativ: catalog:read, orders:write (orders:write måste kopplas till en organisation). pricing:admin är endast internt.",
     "ttlLabel": "Förfaller om (dagar)",
     "ttlPlaceholder": "Inget utgångsdatum",
     "ttlHint": "Lämna tomt för inget utgångsdatum; max 1825 dagar (5 år).",
@@ -2374,7 +2394,7 @@
     "listEyebrow": "Befintliga",
     "listTitle": "Alla nycklar",
     "colName": "Namn",
-    "colOrg": "Organisation",
+    "colOrg": "Agerar för",
     "colScopes": "Behörigheter",
     "colCreated": "Skapad",
     "colLastUsed": "Senast använd",
@@ -2388,7 +2408,19 @@
     "revokeConfirmCta": "Ja, återkalla nyckeln",
     "docsHintPrefix": "Offentlig dokumentation finns på",
     "deniedBody": "Offentliga katalog-API-nycklar utfärdas av NativeSpin-superadmins. Om din roll legitimt behöver nyckel-utfärdande — eller du är partner som behöver en nyckel — kontakta desken så ordnar vi det.",
-    "orgPlatformShort": "NativeSpin-plattformen"
+    "orgPlatformShort": "NativeSpin-plattformen",
+    "errorPublisherRequired": "catalog:write laddar upp en utgivares eget utbud — koppla nyckeln till den utgivaren under ”Agerar för”.",
+    "errorBinding": "Den organisationen eller utgivaren finns inte längre. Ladda om sidan och välj igen.",
+    "namePlaceholder": "t.ex. GroupM Atlas",
+    "bindingLabel": "Agerar för",
+    "bindingOrgs": "Organisationer (köpare)",
+    "bindingPublishers": "Utgivare (uppladdning av utbud)",
+    "bindingHint": "En nyckel agerar för plattformen, en organisation eller en utgivare. orders:write kräver en organisation, catalog:write en utgivare och pricing:admin plattformen.",
+    "scope_catalog_read": "läsa katalogen (prisintervall) och skickade offerter",
+    "scope_catalog_write": "ladda upp utgivarens egna titlar och produkter",
+    "scope_orders_write": "lägga fasta beställningar för organisationen",
+    "scope_pricing_admin": "interna prisverktyg (MCP) — endast plattform",
+    "boundPublisher": "{name} (utgivare)"
   },
   "quoteNarrative": {
     "sectionCampaign": "Din kampanj",
@@ -2806,7 +2838,7 @@
     "uploadHint": "PDF, PPTX eller bild, max 25 MB",
     "uploading": "Laddar upp…",
     "uploadDone": "Fil uppladdad.",
-    "uploadFailed": "Uppladdning misslyckades: {error}",
+    "uploadFailed": "Uppladdningen gick inte igenom. Kontrollera anslutningen och försök igen — eller klistra in en länk nedan i stället.",
     "urlLabel": "Eller klistra in en länk till rate card / media kit",
     "urlPlaceholder": "https://…",
     "ratesLabel": "Eller ange priser per titel",
@@ -2852,7 +2884,9 @@
     "content_advertiser": "Annonsören kan leverera egna artiklar",
     "content_publisher": "Artiklarna måste skrivas av er avdelning",
     "content_both": "Båda är möjliga",
-    "uploadUnavailable": "Filuppladdning är inte tillgänglig just nu. Klistra in en länk till prislista eller mediakit nedan i stället."
+    "uploadUnavailable": "Filuppladdning är inte tillgänglig just nu. Klistra in en länk till prislista eller mediakit nedan i stället.",
+    "uploadWrongType": "Den filtypen tas inte emot. Ladda upp en PDF, PowerPoint, PNG eller JPG.",
+    "uploadTooLarge": "Filen är tom eller större än 25 MB. Ladda upp en mindre fil, eller klistra in en länk nedan i stället."
   },
   "invite": {
     "title": "Gå med i {org}",

@@ -15,7 +15,7 @@ import {
 } from "@/lib/pricing/display-price";
 import { bandLabel, priceBand } from "@/lib/pricing/bands";
 import { StatusBadge } from "@/app/status-badge";
-import { SubmitButton } from "@/components";
+import { MailLink, SafeEmail, SubmitButton, withSafeEmails } from "@/components";
 import { canSeeCostVsSell } from "@/lib/roles";
 import { isStorageConfigured, presignDownload } from "@/lib/storage/r2";
 import { intlLocale } from "@/lib/money";
@@ -296,7 +296,10 @@ export default async function DeskRequestPage({
     if (!contact) return <p className="muted small">{t("salesContactMissing")}</p>;
     return (
       <p className="muted small">
-        {contact.name} · <a href={`mailto:${contact.email}`}>{contact.email}</a>
+        {contact.name} ·{" "}
+        <MailLink to={contact.email}>
+          <SafeEmail address={contact.email} />
+        </MailLink>
         {contact.phone ? ` · ${contact.phone}` : ""}
       </p>
     );
@@ -576,16 +579,20 @@ export default async function DeskRequestPage({
                         ) : null}
                         {l.priceSetAt ? (
                           <div className="muted small">
-                            {t("linePriceSetBy", {
-                              name:
-                                l.priceSetBy?.name ??
-                                l.priceSetBy?.email ??
-                                t("linePriceSetByUnknown"),
-                              date: new Intl.DateTimeFormat(intlLocale(locale), {
-                                dateStyle: "medium",
-                                timeStyle: "short",
-                              }).format(l.priceSetAt),
-                            })}
+                            {/* The name may fall back to an address: route it
+                                through SafeEmail (Cloudflare obfuscation). */}
+                            {withSafeEmails(
+                              t("linePriceSetBy", {
+                                name:
+                                  l.priceSetBy?.name ??
+                                  l.priceSetBy?.email ??
+                                  t("linePriceSetByUnknown"),
+                                date: new Intl.DateTimeFormat(intlLocale(locale), {
+                                  dateStyle: "medium",
+                                  timeStyle: "short",
+                                }).format(l.priceSetAt),
+                              }),
+                            )}
                           </div>
                         ) : null}
                         {isSuperadmin && !l.priceOnRequest ? (

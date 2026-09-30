@@ -7,6 +7,8 @@ import { EmptyState } from "@/app/empty-state";
 import { markAllRead } from "@/app/notification-actions";
 import { SubmitButton } from "@/components";
 import { timeAgo } from "@/lib/time-ago";
+import { safeLocale } from "@/i18n/routing";
+import { renderStoredNotice } from "@/lib/notice-template";
 
 export const dynamic = "force-dynamic";
 
@@ -30,6 +32,7 @@ export default async function NotificationsPage({
   });
 
   const unread = rows.filter((n) => !n.readAt).length;
+  const viewerLocale = safeLocale(locale);
 
   return (
     <>
@@ -69,18 +72,24 @@ export default async function NotificationsPage({
       ) : (
         <div className="action-list">
           {rows.map((n) => {
+            // A templated notice re-renders in the VIEWER's language (its
+            // stored strings are in the org market's language — Swedish for
+            // a Norwegian user in a Swedish-market org). Legacy and free-text
+            // rows fall back to what was stored. lib/notice-template.ts.
+            const shown = renderStoredNotice(n.messageKey, n.messageParams, viewerLocale) ?? {
+              title: n.title,
+              body: n.body,
+              link: n.link,
+            };
             // Defence-in-depth: any pre-existing publisher-controlled URLs
             // (e.g. liveUrl) saved before the write-side sanitiser would
             // otherwise reach the buyer's <a href>.
-            // Plain <a>, not next-intl's <Link>: n.link is a stored,
-            // already-complete path (e.g. "/no/plan/open?list=x") built by
-            // the notice's own locale (an org's home-market language, not
-            // whatever locale the viewer's UI happens to be in right now).
-            // next-intl's <Link> always prepends the CURRENT locale to any
-            // local href it's given, with no awareness a href might already
-            // carry one — that both double-prefixes the URL (404) and would
-            // silently override the notice's intended language.
-            const safeLink = safeExternalUrl(n.link);
+            // Plain <a>, not next-intl's <Link>: the link is an
+            // already-complete path (e.g. "/no/plan/<id>") that carries its
+            // locale. next-intl's <Link> always prepends the CURRENT locale to
+            // any local href it's given, with no awareness a href might
+            // already carry one — that would double-prefix the URL (404).
+            const safeLink = safeExternalUrl(shown.link);
             const inner = (
               <>
                 <span
@@ -88,8 +97,8 @@ export default async function NotificationsPage({
                   aria-hidden
                 />
                 <div>
-                  <div className="title">{n.title}</div>
-                  {n.body ? <div className="sub">{n.body}</div> : null}
+                  <div className="title">{shown.title}</div>
+                  {shown.body ? <div className="sub">{shown.body}</div> : null}
                   <div className="muted small mt-1">
                     {timeAgo(n.createdAt, locale)}
                   </div>

@@ -77,7 +77,7 @@ Authorization: Bearer atn_<your-token>`}
               <p className="muted">{t("listBody")}</p>
               <p className="muted small">
                 <strong>{t("queryParams")}:</strong> market, format, limit
-                (1–100), cursor.
+                (≤ 100), cursor.
               </p>
             </article>
 
@@ -85,6 +85,11 @@ Authorization: Bearer atn_<your-token>`}
               <h3>GET /api/v1/catalog/titles/{`{id}`}</h3>
               <p className="muted">{t("detailBody")}</p>
               <p className="muted small">{t("detailIncludes")}</p>
+            </article>
+
+            <article className="card">
+              <h3>GET /api/v1/quotes/{`{id}`}</h3>
+              <p className="muted">{t("quotesBody")}</p>
             </article>
 
             <article className="card">
@@ -102,7 +107,7 @@ Authorization: Bearer atn_<your-token>`}
           <pre className="prose" style={{ whiteSpace: "pre-wrap" }}>
 {`{
   "data": [ ... ],
-  "page": { "limit": 50, "hasMore": true, "nextCursor": "cm12abc..." }
+  "page": { "limit": 50, "hasMore": true, "nextCursor": "WyJBZnRlbnBvc3Rlbi..." }
 }`}
           </pre>
         </div>

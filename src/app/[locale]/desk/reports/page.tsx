@@ -341,9 +341,16 @@ export default async function DeskReportsPage({
           <div className="section-head">
             <h2>{t("invoices")}</h2>
             {/* Desk-only route; a plain <a> because it's a file download. */}
-            <a className="small-link" href="/api/export/invoices.csv" download>
-              {t("exportInvoicesCsv")}
-            </a>
+            <span className="cluster tight">
+              <a className="small-link" href="/api/export/invoices.csv" download>
+                {t("exportInvoicesCsv")}
+              </a>
+              {/* The accounting-system export (lines, VAT, customer ids) had
+                  no way in from the UI either. */}
+              <a className="small-link" href="/api/export/invoices/accounting.json" download>
+                {t("exportAccountingJson")}
+              </a>
+            </span>
           </div>
           <BreakdownList
             rows={invoiceRows.map((r) => ({ key: r.group, count: r.amount }))}

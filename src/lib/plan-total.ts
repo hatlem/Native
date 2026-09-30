@@ -91,6 +91,47 @@ export function contentFeeFor(
   );
 }
 
+// How many lines the plan shows: priced placements AND unresolved title
+// placeholders — both are things the buyer asked for — but never the
+// recommended alternatives beside it. The catalog's plan bar used to count
+// product ids only and said "3 titles" for a 6-line plan.
+export function planLineCount(items: { isAlternative?: boolean }[]): number {
+  return items.filter((i) => !i.isAlternative).length;
+}
+
+// The catalog plan bar's figure: per-currency totals of the priced lines,
+// computed server-side by the same engine as /plan. Currencies with nothing
+// priced yet are dropped (the bar says "priced by the desk" instead of 0).
+export type BarTotal = { currency: string; amount: number; itemCount: number };
+
+export function barTotals(items: EstimableListItem[], pricing: PlanPricing): BarTotal[] {
+  return estimateListTotals(items, pricing)
+    .filter((t) => t.hasVisible)
+    .map(({ currency, amount, itemCount }) => ({ currency, amount, itemCount }));
+}
+
+// One priced line, split the way the order charges it: the placement
+// (per-line rounded, market default margin) plus — for "We write it" — one
+// content fee. `total` is the line's figure wherever a line is shown (/plan,
+// the share page), so a line never reads less than its share of the total.
+// Null when the line has no concrete product or its price is not shown: the
+// caller renders "on request", never a 0.
+export type LinePrice = { placement: number; contentFee: number; total: number };
+
+export function linePrice(
+  item: Pick<EstimableListItem, "productId" | "product" | "quantity" | "withContent">,
+  pricing: PlanPricing,
+): LinePrice | null {
+  const product = item.product;
+  if (!item.productId || !product) return null;
+  if (!isProductPriceShown(product, product.title)) return null;
+  const placement = placementLineTotal(product, item.quantity, pricing.marginRules);
+  const contentFee = item.withContent
+    ? contentFeeFor(product.type, product.title.market.code, pricing.feeRules)
+    : 0;
+  return { placement, contentFee, total: placement + contentFee };
+}
+
 // Per-currency total for a saved list: what the buyer commits to if the list
 // is ordered as it stands. Shared by /plan's summary, the Kampanjer drafts hub
 // and the catalog shortlist, so no surface shows a figure the order won't.
@@ -123,15 +164,14 @@ export function estimateListTotals(items: EstimableListItem[], pricing: PlanPric
       byMarket: new Map(),
     };
     entry.itemCount += 1;
-    if (isProductPriceShown(product, product.title)) {
+    const price = linePrice(item, pricing);
+    if (price) {
       const market = product.title.market;
-      const placement = placementLineTotal(product, item.quantity, pricing.marginRules);
-      const fee = item.withContent ? contentFeeFor(product.type, market.code, pricing.feeRules) : 0;
-      entry.amount += placement + fee;
-      entry.contentFees += fee;
+      entry.amount += price.total;
+      entry.contentFees += price.contentFee;
       entry.hasVisible = true;
       const m = entry.byMarket.get(market.code) ?? { subtotal: 0, vatPct: Number(market.vatRatePct) };
-      m.subtotal += placement + fee;
+      m.subtotal += price.total;
       entry.byMarket.set(market.code, m);
     } else {
       entry.hasHidden = true;

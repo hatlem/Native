@@ -9,9 +9,7 @@ import { recordAudit } from "@/lib/audit";
 import { notifyOrg, notifyPublisher } from "@/lib/notify";
 import { requireDesk } from "@/lib/desk-guard";
 import { findDueWaves } from "@/lib/programme";
-import { marketDefaultLocale } from "@/lib/market-locale";
-import { buildOrderCompletedNotice } from "@/lib/order-completed-notice";
-import { buildOrderLiveNotice } from "@/lib/order-live-notice";
+import { marketDefaultLocale, type BuyerLocale } from "@/lib/market-locale";
 import { deliveryGap, nextOrderStatus } from "@/lib/order-lifecycle";
 import {
   canCancelOrder,
@@ -87,39 +85,37 @@ export async function advanceOrder(formData: FormData) {
         // list, ready to edit).
         const planName = await orderPlanName(order.id);
         const due = (await findDueWaves([order.organizationId], new Date()))[0] ?? null;
-        const buyerLocale = await orgLocale(order.organizationId);
-        const notice = buildOrderCompletedNotice({
-          locale: buyerLocale,
-          planName,
-          due: due
-            ? {
-                waveNumber: due.waveNumber,
-                plannedWaves: due.plannedWaves,
-                articleTitle: due.articleTitle,
-              }
-            : null,
-          delivery,
-        });
+        // Templated (lib/notice-template.ts): the email in the org's market
+        // language, the inbox row in each reader's own.
         await notifyOrg(order.organizationId, {
           kind: "ORDER_COMPLETED",
-          title: notice.title,
-          body: notice.body,
-          link: due ? `/${buyerLocale}/home` : `/${buyerLocale}/orders/${order.id}`,
+          locale: await orgLocale(order.organizationId),
+          template: {
+            key: "orderCompleted",
+            params: {
+              planName,
+              orderId: order.id,
+              due: due
+                ? {
+                    waveNumber: due.waveNumber,
+                    plannedWaves: due.plannedWaves,
+                    articleTitle: due.articleTitle,
+                  }
+                : null,
+              delivery,
+            },
+          },
         });
       } else if (next === "LIVE") {
         // Copy built from the evidence, not the status: "published" only
         // when every placement has a published link.
-        const buyerLocale = await orgLocale(order.organizationId);
-        const notice = buildOrderLiveNotice({
-          locale: buyerLocale,
-          planName: await orderPlanName(order.id),
-          ...delivery,
-        });
         await notifyOrg(order.organizationId, {
           kind: "ASSET_REVIEW",
-          title: notice.title,
-          body: notice.body,
-          link: `/${buyerLocale}/orders/${order.id}`,
+          locale: await orgLocale(order.organizationId),
+          template: {
+            key: "orderLive",
+            params: { planName: await orderPlanName(order.id), orderId: order.id, ...delivery },
+          },
         });
       } else {
         await notifyOrg(order.organizationId, {
@@ -137,7 +133,7 @@ export async function advanceOrder(formData: FormData) {
 // locale come from the org's home market, not from the desk associate's UI
 // language (which previously leaked into the buyer's inbox). marketCode is
 // nullable until onboarding completes; English is the safe default.
-async function orgLocale(organizationId: string): Promise<string> {
+async function orgLocale(organizationId: string): Promise<BuyerLocale> {
   const org = await prisma.organization.findUnique({
     where: { id: organizationId },
     select: { marketCode: true },

@@ -2,6 +2,7 @@
 
 import { redirect } from "next/navigation";
 import { headers } from "next/headers";
+import { getTranslations } from "next-intl/server";
 import { signinPath } from "@/lib/auth-gate";
 import { appUrl } from "@/lib/url";
 import { planPath } from "@/lib/plan-path";
@@ -25,7 +26,10 @@ import {
   writeActiveListId,
   clearActiveListId,
   migrateLegacyBasket,
+  resolveActiveList,
 } from "@/lib/lists";
+import { barTotals, planLineCount, type BarTotal } from "@/lib/plan-total";
+import { loadPricingDefaults } from "@/lib/content-fee";
 import { enableListShare, disableListShare } from "@/lib/list-share";
 import { normalizeLineNote } from "@/lib/line-note";
 import { contentIntent } from "@/lib/authorship";
@@ -108,8 +112,12 @@ export async function addProductToList(formData: FormData) {
   redirect(safeReturnTo(formData, locale, "/plan"));
 }
 
+// On success the result carries the plan's line count and totals as the
+// SERVER prices them, so the catalog bar never computes a figure itself.
+// It used to add each row's raw net basePrice (shipped to the client for
+// every priced title — our publisher cost, un-marked-up) to its total.
 export type ShortlistAddResult =
-  | { ok: true; listId: string }
+  | { ok: true; listId: string; count: number; totals: BarTotal[] }
   | { ok: false; reason: "signin" | "no-client" | "invalid-product" };
 
 // Client-invoked counterpart to addProductToList: same validation and
@@ -153,7 +161,14 @@ export async function addProductToActiveList(
   await addProductItem(listId, productId, withContent);
   revalidatePath(`/${locale}/plan`, "layout");
   revalidatePath(`/${locale}/requests`);
-  return { ok: true, listId };
+  const list = await resolveActiveList(orgId, listId);
+  const items = list?.id === listId ? list.items : [];
+  return {
+    ok: true,
+    listId,
+    count: planLineCount(items),
+    totals: barTotals(items, await loadPricingDefaults()),
+  };
 }
 
 export async function addRecommendedToList(formData: FormData) {
@@ -475,6 +490,30 @@ export async function archiveList(formData: FormData) {
     await prisma.savedList.update({ where: { id: listId }, data: { archivedAt: new Date() } });
     await recordAudit(scope.userId ?? null, "list.archive", `SavedList:${listId}`, {});
     if ((await readActiveListId()) === listId) await clearActiveListId();
+    // One click archives, so the next page offers the undo (and /lists keeps
+    // an "Archived" section to restore from later).
+    redirect(`/${locale}/lists?archived=${encodeURIComponent(listId)}`);
+  }
+  redirect(`/${locale}/lists`);
+}
+
+// Undo for archiveList. The share link stays dead: archiving revoked it, and
+// restoring must not silently revive a URL that may have circulated since
+// (same rule as shareList — a re-share always mints a fresh token).
+export async function restoreList(formData: FormData) {
+  const locale = str(formData, "locale") || "en";
+  const listId = str(formData, "listId");
+  const scope = await loadScope();
+  const list = await prisma.savedList.findUnique({
+    where: { id: listId },
+    select: { organizationId: true, archivedAt: true },
+  });
+  if (list?.archivedAt && canActOnOrg(scope, list.organizationId)) {
+    await prisma.savedList.update({
+      where: { id: listId },
+      data: { archivedAt: null, shareToken: null, shareCreatedAt: null },
+    });
+    await recordAudit(scope.userId ?? null, "list.restore", `SavedList:${listId}`, {});
   }
   redirect(`/${locale}/lists`);
 }
@@ -513,10 +552,13 @@ export async function duplicateList(formData: FormData) {
   const scope = await loadScope();
   const source = await prisma.savedList.findUnique({ where: { id: listId }, include: { items: true } });
   if (!source || !canActOnOrg(scope, source.organizationId)) redirect(`/${locale}/lists`);
+  // The copy's name is stored data the buyer sees everywhere, so it is
+  // written in their UI language ("… (kopi)"), not a hard-coded English suffix.
+  const t = await getTranslations({ locale, namespace: "lists" });
   const copy = await prisma.savedList.create({
     data: {
       organizationId: source.organizationId,
-      name: `${source.name} (copy)`,
+      name: t("copyName", { name: source.name }),
       note: source.note,
       createdById: scope.userId ?? null,
       items: {

@@ -57,21 +57,27 @@ async function freshTitleWithProduct(
       category: "test",
     },
   });
-  if (opts) {
-    await prisma.product.create({
-      data: {
-        titleId: title.id,
-        type: "NATIVE_ARTICLE",
-        name: "Sweep Test Product",
-        basePrice: 1000,
-        currency: market!.currency,
-        active: opts.active ?? true,
-        bookable: opts.bookable ?? true,
-        confirmedAt: opts.confirmed === false ? null : new Date(),
-      },
-    });
-  }
+  if (opts) await addProduct(title.id, opts);
   return title.id;
+}
+
+async function addProduct(
+  titleId: string,
+  opts: { active?: boolean; bookable?: boolean; confirmed?: boolean },
+): Promise<void> {
+  const market = await prisma.market.findUnique({ where: { code: marketCode } });
+  await prisma.product.create({
+    data: {
+      titleId,
+      type: "NATIVE_ARTICLE",
+      name: "Sweep Test Product",
+      basePrice: 1000,
+      currency: market!.currency,
+      active: opts.active ?? true,
+      bookable: opts.bookable ?? true,
+      confirmedAt: opts.confirmed === false ? null : new Date(),
+    },
+  });
 }
 
 async function freshList(): Promise<string> {
@@ -83,9 +89,11 @@ if (!RUN_DB_IT) {
   test("placement-ready-sweep integration (skipped — set RUN_DB_IT=1)", { skip: true }, () => {});
 } else {
   test("notifies buyer + desk once when a placeholder's title gains a bookable product, then stays quiet on rerun", async () => {
-    const titleId = await freshTitleWithProduct({ active: true, bookable: true, confirmed: true });
+    // Placeholder first, THEN the price lands — the "gains" in the name.
+    const titleId = await freshTitleWithProduct(null);
     const listId = await freshList();
     const item = await prisma.savedListItem.create({ data: { listId, titleId } });
+    await addProduct(titleId, { active: true, bookable: true, confirmed: true });
 
     // The sweep is system-wide and this suite shares its database with every
     // other .it.test.ts file, so its counters are global: assert ">= 1" plus
@@ -99,6 +107,13 @@ if (!RUN_DB_IT) {
     });
     assert.equal(buyerNotifs.length, 1);
     assert.ok(buyerNotifs[0].link?.endsWith(`/plan/${listId}`), "link deep-links to the plan's own address");
+    // Stored as a template, so /notifications renders it in the reader's language.
+    assert.equal(buyerNotifs[0].messageKey, "placementReady");
+    assert.deepEqual(buyerNotifs[0].messageParams, {
+      titleName: (await prisma.title.findUniqueOrThrow({ where: { id: titleId } })).name,
+      listName: (await prisma.savedList.findUniqueOrThrow({ where: { id: listId } })).name,
+      listId,
+    });
 
     const deskNotifs = await prisma.notification.findMany({
       where: { userId: deskUserId, kind: "TITLE_PRODUCT_READY" },
@@ -123,6 +138,24 @@ if (!RUN_DB_IT) {
       await prisma.notification.count({ where: { userId: deskUserId, kind: "TITLE_PRODUCT_READY" } }),
       1,
       "no duplicate desk notification",
+    );
+  });
+
+  // BUG-prod-api-18: "Arkitektur har nu ett pris" fired seconds after the
+  // buyer added a placeholder for a title that already had a price.
+  test("stays quiet for a placeholder added to a title that was already priced", async () => {
+    const titleId = await freshTitleWithProduct({ active: true, bookable: true, confirmed: true });
+    const listId = await freshList();
+    const item = await prisma.savedListItem.create({ data: { listId, titleId } });
+
+    await runPlacementReadySweep();
+
+    assert.equal(
+      await prisma.auditLog.count({
+        where: { entity: `SavedListItem:${item.id}`, action: "placement-ready.notified" },
+      }),
+      0,
+      "nothing changed since the placeholder was added — no 'now has a price'",
     );
   });
 
@@ -184,9 +217,10 @@ if (!RUN_DB_IT) {
   });
 
   test("runPlacementReadySweepWithLock delegates to the sweep when uncontended", async () => {
-    const titleId = await freshTitleWithProduct({ active: true, bookable: true, confirmed: true });
+    const titleId = await freshTitleWithProduct(null);
     const listId = await freshList();
     const item = await prisma.savedListItem.create({ data: { listId, titleId } });
+    await addProduct(titleId, { active: true, bookable: true, confirmed: true });
 
     const res = await runPlacementReadySweepWithLock();
     assert.ok(res, "lock was acquired and the sweep ran");

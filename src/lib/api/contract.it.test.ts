@@ -7,6 +7,9 @@ import { generateApiToken, hashApiToken } from "@/lib/api-key";
 import { POST as postOrder } from "@/app/api/v1/orders/route";
 import { GET as getTitles } from "@/app/api/v1/catalog/titles/route";
 import { GET as getTitle } from "@/app/api/v1/catalog/titles/[id]/route";
+import { GET as getQuote } from "@/app/api/v1/quotes/[id]/route";
+import { OPENAPI_SPEC } from "@/lib/api/openapi-spec";
+import { conformanceErrors, responseSchema } from "@/lib/api/openapi-conformance";
 import { buildMcpServerForToken } from "@/lib/mcp/server";
 import { readToolDefinitions } from "@/lib/mcp/tools-read";
 import { mutateToolDefinitions } from "@/lib/mcp/tools-mutate";
@@ -57,6 +60,9 @@ if (!RUN_DB_IT) {
   let revokedToken: string;
   let catalogToken: string;
   let pricingAdminToken: string;
+  // Own key for the catalog param/contract tests: the per-key rate limit
+  // (20/min) would otherwise be shared with the tests above.
+  let paramsToken: string;
 
   async function mintKey(opts: {
     scopes: string;
@@ -162,6 +168,7 @@ if (!RUN_DB_IT) {
     });
     catalogToken = await mintKey({ scopes: "catalog:read" });
     pricingAdminToken = await mintKey({ scopes: "pricing:admin" });
+    paramsToken = await mintKey({ scopes: "catalog:read" });
   });
 
   after(async () => {
@@ -381,7 +388,9 @@ if (!RUN_DB_IT) {
       const body = await res.json();
       found = body.data.find((t: { id: string }) => t.id === titleId) ?? null;
       if (found) foundPageJson = JSON.stringify(body);
-      cursor = body.nextCursor;
+      // page.nextCursor — this walk read a top-level `nextCursor` (the shape
+      // the old spec promised), got undefined and only ever saw page 1.
+      cursor = body.page.nextCursor;
       if (!cursor) break;
     }
     assert.ok(found, "seeded title should appear in the NO catalog");
@@ -413,11 +422,111 @@ if (!RUN_DB_IT) {
     assert.equal(hidden.visibility, "INDICATIVE");
   });
 
-  test("catalog: limit is clamped to [1, 100]", async () => {
-    const res = await getTitles(titlesReq(catalogToken, "?limit=0"));
+  test("catalog: limit above 100 is clamped and echoed in page.limit", async () => {
+    const res = await getTitles(titlesReq(paramsToken, "?limit=1000"));
     assert.equal(res.status, 200);
     const body = await res.json();
-    assert.ok(body.data.length <= 1);
+    assert.equal(body.page.limit, 100);
+    assert.ok(body.data.length <= 100);
+  });
+
+  // BUG-prod-api-23/24: `limit=abc` was a 500 with an empty body; invalid
+  // filters and junk cursors silently returned unfiltered / empty pages.
+  for (const [qs, param] of [
+    ["?limit=abc", "limit"],
+    ["?limit=-5", "limit"],
+    ["?market=XX", "market"],
+    ["?format=BOGUS", "format"],
+    ["?cursor=doesnotexist", "cursor"],
+    // Well-formed legacy id that names no title.
+    ["?cursor=cm0000000000000000000000z", "cursor"],
+  ] as const) {
+    test(`catalog: ${qs} → 400 BAD_PARAM naming ${param}`, async () => {
+      const res = await getTitles(titlesReq(paramsToken, qs));
+      assert.equal(res.status, 400);
+      const body = await res.json();
+      assert.equal(body.error.code, "BAD_PARAM");
+      assert.equal(body.error.details[0].param, param);
+      assert.deepEqual(
+        conformanceErrors(OPENAPI_SPEC, responseSchema(OPENAPI_SPEC, "/api/v1/catalog/titles", "get", 400), body),
+        [],
+      );
+    });
+  }
+
+  test("catalog: keyset cursor survives the cursor title being deactivated mid-sync", async () => {
+    // End a page on a title that sorts just before the seeded one ("Tital" <
+    // "Title"), then deactivate it — the row the cursor points at. The next
+    // page must continue with the seeded title, not come back empty (which a
+    // partner reads as "sync complete"; Prisma's `cursor: { id }` did that).
+    const market = await prisma.market.findFirstOrThrow({ where: { code: "NO" } });
+    const prev = await prisma.title.create({
+      data: {
+        name: "API-IT Tital",
+        slug: `api-it-before-${Date.now()}`,
+        publisherId,
+        countryCode: market.code,
+        marketId: market.id,
+        category: "business",
+        active: true,
+      },
+    });
+    const first = await (await getTitles(titlesReq(paramsToken, "?market=NO&limit=100"))).json();
+    const idx = first.data.findIndex((t: { id: string }) => t.id === prev.id);
+    assert.ok(idx >= 0, "the 'before' title is on the first NO page");
+    assert.equal(first.data[idx + 1]?.id, titleId, "and sorts immediately before the seeded title");
+    const page = await (await getTitles(titlesReq(paramsToken, `?market=NO&limit=${idx + 1}`))).json();
+    assert.equal(page.data.at(-1).id, prev.id);
+    await prisma.title.update({ where: { id: prev.id }, data: { active: false } });
+    const next = await (
+      await getTitles(titlesReq(paramsToken, `?market=NO&limit=1&cursor=${page.page.nextCursor}`))
+    ).json();
+    assert.equal(next.data[0]?.id, titleId);
+  });
+
+  // BUG-prod-api-22: pin every live response to the published spec, including
+  // "no undocumented fields" (openapi-conformance.ts).
+  test("contract: list, detail and quote responses conform to the OpenAPI spec", async () => {
+    const list = await getTitles(titlesReq(paramsToken, "?market=NO&limit=5"));
+    assert.equal(list.status, 200);
+    assert.deepEqual(
+      conformanceErrors(OPENAPI_SPEC, responseSchema(OPENAPI_SPEC, "/api/v1/catalog/titles", "get", 200), await list.json()),
+      [],
+    );
+
+    const detail = await getTitle(
+      new NextRequest(`http://localhost/api/v1/catalog/titles/${titleId}`, {
+        headers: { authorization: `Bearer ${paramsToken}` },
+      }),
+      { params: Promise.resolve({ id: titleId }) },
+    );
+    assert.equal(detail.status, 200);
+    assert.deepEqual(
+      conformanceErrors(
+        OPENAPI_SPEC,
+        responseSchema(OPENAPI_SPEC, "/api/v1/catalog/titles/{id}", "get", 200),
+        await detail.json(),
+      ),
+      [],
+    );
+
+    // The FIRM order placed above produced a SENT/ACCEPTED quote for the org.
+    const quote = await prisma.quote.findFirst({
+      where: { request: { organizationId: orgId }, status: { not: "DRAFT" } },
+      select: { id: true },
+    });
+    assert.ok(quote, "the order tests leave a quote behind");
+    const q = await getQuote(
+      new NextRequest(`http://localhost/api/v1/quotes/${quote.id}`, {
+        headers: { authorization: `Bearer ${paramsToken}` },
+      }),
+      { params: Promise.resolve({ id: quote.id }) },
+    );
+    assert.equal(q.status, 200);
+    assert.deepEqual(
+      conformanceErrors(OPENAPI_SPEC, responseSchema(OPENAPI_SPEC, "/api/v1/quotes/{id}", "get", 200), await q.json()),
+      [],
+    );
   });
 
   // ---- GET /api/v1/catalog/titles/[id] ----

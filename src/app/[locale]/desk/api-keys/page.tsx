@@ -6,6 +6,7 @@ import { prisma } from "@/lib/prisma";
 import { Link } from "@/i18n/navigation";
 import { createApiKey, revokeApiKey } from "@/app/admin-actions";
 import { SubmitButton } from "@/components";
+import { ISSUABLE_SCOPES } from "@/lib/api-key";
 
 export const dynamic = "force-dynamic";
 
@@ -55,20 +56,42 @@ export default async function ApiKeysPage({
     }
   }
   const errCode = typeof sp.error === "string" ? sp.error : null;
+  // Never show a token next to an error: the actions clear the cookie, and
+  // this guard keeps a stale one (another tab) from reading as the result
+  // of the attempt that just failed.
+  const showToken = Boolean(tokenOnce && created && !errCode);
+  const errMessage =
+    errCode === "internal_only_scope"
+      ? t("errorInternalOnly")
+      : errCode === "org_required_scope"
+        ? t("errorOrgRequired")
+        : errCode === "publisher_required_scope"
+          ? t("errorPublisherRequired")
+          : errCode === "binding"
+            ? t("errorBinding")
+            : t("errorScopes");
 
   const keys = await prisma.apiKey.findMany({
     orderBy: { createdAt: "desc" },
     take: 100,
     include: {
       organization: { select: { name: true } },
+      publisher: { select: { name: true } },
     },
   });
 
-  const orgs = await prisma.organization.findMany({
-    orderBy: { name: "asc" },
-    select: { id: true, name: true },
-    take: 200,
-  });
+  const [orgs, publishers] = await Promise.all([
+    prisma.organization.findMany({
+      orderBy: { name: "asc" },
+      select: { id: true, name: true },
+      take: 500,
+    }),
+    prisma.publisher.findMany({
+      orderBy: { name: "asc" },
+      select: { id: true, name: true },
+      take: 2000,
+    }),
+  ]);
 
   return (
     <>
@@ -78,7 +101,7 @@ export default async function ApiKeysPage({
         <p className="lead">{t("lead")}</p>
       </header>
 
-      {tokenOnce && created ? (
+      {showToken ? (
         <div className="banner-info" role="status">
           <span>
             <strong>{t("createdLabel")}:</strong> <code>{tokenOnce}</code>{" "}
@@ -89,13 +112,7 @@ export default async function ApiKeysPage({
 
       {errCode ? (
         <div className="banner-error" role="alert">
-          <span>
-            {errCode === "internal_only_scope"
-              ? t("errorInternalOnly")
-              : errCode === "org_required_scope"
-                ? t("errorOrgRequired")
-                : t("errorScopes")}
-          </span>
+          <span>{errMessage}</span>
         </div>
       ) : null}
 
@@ -114,30 +131,46 @@ export default async function ApiKeysPage({
               id="key-name"
               name="name"
               required
-              placeholder="e.g. GroupM Atlas"
+              placeholder={t("namePlaceholder")}
             />
           </div>
           <div className="field">
-            <label htmlFor="key-org">{t("orgLabel")}</label>
-            <select id="key-org" name="organizationId" defaultValue="">
+            <label htmlFor="key-binding">{t("bindingLabel")}</label>
+            {/* One select for the binding: a key acts for the platform, ONE
+                organization or ONE publisher — never two at once. */}
+            <select id="key-binding" name="binding" defaultValue="">
               <option value="">— {t("orgPlatform")} —</option>
-              {orgs.map((o) => (
-                <option key={o.id} value={o.id}>
-                  {o.name}
-                </option>
-              ))}
+              <optgroup label={t("bindingOrgs")}>
+                {orgs.map((o) => (
+                  <option key={o.id} value={`org:${o.id}`}>
+                    {o.name}
+                  </option>
+                ))}
+              </optgroup>
+              <optgroup label={t("bindingPublishers")}>
+                {publishers.map((p) => (
+                  <option key={p.id} value={`pub:${p.id}`}>
+                    {p.name}
+                  </option>
+                ))}
+              </optgroup>
             </select>
+            <span className="hint">{t("bindingHint")}</span>
           </div>
-          <div className="field">
-            <label htmlFor="key-scopes">{t("scopesLabel")}</label>
-            <input
-              id="key-scopes"
-              name="scopes"
-              defaultValue="catalog:read"
-              required
-            />
-            <span className="hint">{t("scopesHint")}</span>
-          </div>
+          <fieldset className="field checkbox-fieldset">
+            <legend>{t("scopesLabel")}</legend>
+            {ISSUABLE_SCOPES.map((scope) => (
+              <label key={scope} className="checkbox-row">
+                <input
+                  type="checkbox"
+                  name="scopes"
+                  value={scope}
+                  defaultChecked={scope === "catalog:read"}
+                />{" "}
+                <code>{scope}</code> — {t(`scope_${scope.replace(":", "_")}`)}
+              </label>
+            ))}
+          </fieldset>
           <div className="field">
             <label htmlFor="key-ttl">{t("ttlLabel")}</label>
             <input
@@ -192,7 +225,10 @@ export default async function ApiKeysPage({
                   <tr key={k.id}>
                     <td data-label={t("colName")}>{k.name}</td>
                     <td className="muted" data-label={t("colOrg")}>
-                      {k.organization?.name ?? t("orgPlatformShort")}
+                      {k.organization?.name ??
+                        (k.publisher
+                          ? t("boundPublisher", { name: k.publisher.name })
+                          : t("orgPlatformShort"))}
                     </td>
                     <td className="muted small" data-label={t("colScopes")}>{k.scopes}</td>
                     <td className="muted small" data-label={t("colCreated")}>

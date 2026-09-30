@@ -8,7 +8,9 @@ import { recordAudit } from "@/lib/audit";
 import {
   generateApiToken,
   hashApiToken,
+  parseKeyBinding,
   parseScopes,
+  validateKeyGrant,
 } from "@/lib/api-key";
 
 // One-time flash cookie for surfacing a freshly issued API token.
@@ -33,82 +35,55 @@ async function requireSuperadmin(locale: string): Promise<string> {
   return session.user.id;
 }
 
-// Server-side allowlist of API-key scopes. Anything not in this set is
-// rejected at issuance — that's how we keep a typo'd "catlog:read" or a
-// hand-rolled "admin:*" from silently landing in the DB.
-//
-// `pricing:admin` is internal-only — it grants global mutation across
-// every publisher's pricing graph via the MCP server (no per-publisher
-// scoping in the v1 schema). The createApiKey action refuses to mint a
-// pricing:admin key for any organization other than the NativeSpin
-// platform itself (organizationId === null) so a misclicked "issue key
-// for Acme Corp" can't accidentally hand a partner ring-0 pricing
-// powers.
-const VALID_SCOPES: ReadonlySet<string> = new Set([
-  "catalog:read",
-  "catalog:*",
-  "orders:write",
-  "pricing:admin",
-]);
-const INTERNAL_ONLY_SCOPES: ReadonlySet<string> = new Set(["pricing:admin"]);
-// `orders:write` is the inverse of an internal-only scope: it places
-// firm orders against the issuing organization, so POST /api/v1/orders
-// returns NO_ORG for a platform (org-less) key. Requiring an org at
-// issuance turns that runtime dead-end into a clear up-front error.
-const ORG_REQUIRED_SCOPES: ReadonlySet<string> = new Set(["orders:write"]);
+// A previous issuance's token must never outlive the next action: the flash
+// cookie lives 120 s, so an error redirect straight after a successful issue
+// showed the OLD token beside the new error — reading as if the failed
+// attempt had produced a key. Every action on the page clears it first.
+async function clearIssuedKey(locale: string) {
+  const cookieStore = await cookies();
+  cookieStore.delete({ name: ISSUED_KEY_COOKIE, path: `/${locale}/desk/api-keys` });
+}
 
-// Issue a new public-catalog API key. The raw token is surfaced
-// exactly once via an httpOnly flash cookie — NOT a URL query string,
-// which would leak the bearer into browser history, server access
-// logs, and outbound Referer headers. The page reads the cookie on
-// first render, displays the value, and clears the cookie so a refresh
-// shows nothing.
+// Issue a new API key. The raw token is surfaced exactly once via an
+// httpOnly flash cookie — NOT a URL query string, which would leak the
+// bearer into browser history, server access logs, and outbound Referer
+// headers.
 //
-// Closes Tobias's "no API key auth" gap. Scopes are kept minimal in
-// v1: "catalog:read" is the only documented value; the form accepts
-// the more permissive "catalog:*" / "*" for future expansion but the
-// UI doesn't surface them yet.
+// Scope/binding rules live in lib/api-key.ts (validateKeyGrant) so a key
+// can't be minted that its own endpoint would refuse: pricing:admin is
+// platform-only (global pricing mutation via MCP, no tenant scoping),
+// orders:write needs an organization, catalog:write a publisher.
 export async function createApiKey(formData: FormData) {
   const locale = field(formData, "locale") || "en";
   const userId = await requireSuperadmin(locale);
-  const name = field(formData, "name") || "untitled";
-  const organizationId = field(formData, "organizationId") || null;
-  const scopesRaw = field(formData, "scopes") || "catalog:read";
-  const ttlDaysRaw = field(formData, "ttlDays");
+  await clearIssuedKey(locale);
+  const fail = (code: string): never => redirect(`/${locale}/desk/api-keys?error=${code}`);
 
-  // Validate scopes upfront so a typo fails loudly rather than at
-  // first request when the partner wonders why their key 403s.
-  const scopeSet = parseScopes(scopesRaw);
-  if (scopeSet.size === 0) {
-    redirect(`/${locale}/desk/api-keys?error=scopes`);
-  }
-  // Reject any scope not in the allowlist. Keeps "admin:*"-shaped typos
-  // and undocumented wildcards out of the DB.
-  for (const s of scopeSet) {
-    if (!VALID_SCOPES.has(s)) {
-      redirect(`/${locale}/desk/api-keys?error=scopes`);
-    }
-  }
-  // Internal-only scopes (pricing:admin) MUST be platform keys — the
-  // MCP mutation surface has no per-publisher scoping, so handing a
-  // pricing:admin key to a customer org would give them mutation
-  // power across every publisher in the catalog.
-  if (organizationId !== null) {
-    for (const s of scopeSet) {
-      if (INTERNAL_ONLY_SCOPES.has(s)) {
-        redirect(`/${locale}/desk/api-keys?error=internal_only_scope`);
-      }
-    }
-  }
-  // Org-required scopes (orders:write) MUST be bound to an organization —
-  // a platform key would only ever get NO_ORG from the orders endpoint.
-  if (organizationId === null) {
-    for (const s of scopeSet) {
-      if (ORG_REQUIRED_SCOPES.has(s)) {
-        redirect(`/${locale}/desk/api-keys?error=org_required_scope`);
-      }
-    }
-  }
+  const name = field(formData, "name") || "untitled";
+  const ttlDaysRaw = field(formData, "ttlDays");
+  // Checkboxes post one "scopes" entry each; a comma list still parses.
+  const scopeSet = parseScopes(
+    formData
+      .getAll("scopes")
+      .filter((v): v is string => typeof v === "string")
+      .join(","),
+  );
+  const binding = parseKeyBinding(field(formData, "binding"));
+  if (!binding) return fail("binding");
+
+  const grantError = validateKeyGrant(scopeSet, binding);
+  if (grantError) return fail(grantError);
+
+  // The bound org/publisher must exist — a stale option from a page loaded
+  // before a delete would otherwise FK-fail as an unhandled 500.
+  const organizationId = binding.kind === "organization" ? binding.id : null;
+  const publisherId = binding.kind === "publisher" ? binding.id : null;
+  const bindingExists =
+    binding.kind === "platform" ||
+    (organizationId !== null &&
+      (await prisma.organization.count({ where: { id: organizationId } })) > 0) ||
+    (publisherId !== null && (await prisma.publisher.count({ where: { id: publisherId } })) > 0);
+  if (!bindingExists) return fail("binding");
 
   let expiresAt: Date | null = null;
   if (ttlDaysRaw) {
@@ -126,6 +101,7 @@ export async function createApiKey(formData: FormData) {
     data: {
       name,
       organizationId,
+      publisherId,
       scopes: Array.from(scopeSet).join(","),
       tokenHash,
       createdBy: userId,
@@ -136,6 +112,7 @@ export async function createApiKey(formData: FormData) {
   await recordAudit(userId, "api_key.create", `ApiKey:${created.id}`, {
     name,
     organizationId,
+    publisherId,
     scopes: Array.from(scopeSet),
     expiresAt: expiresAt?.toISOString() ?? null,
   });
@@ -156,6 +133,7 @@ export async function createApiKey(formData: FormData) {
 export async function revokeApiKey(formData: FormData) {
   const locale = field(formData, "locale") || "en";
   const userId = await requireSuperadmin(locale);
+  await clearIssuedKey(locale);
   const keyId = field(formData, "keyId");
 
   const key = await prisma.apiKey.findUnique({ where: { id: keyId } });

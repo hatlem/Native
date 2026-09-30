@@ -11,7 +11,9 @@ idempotently.
   single publisher** (`ApiKey.publisherId`). A key can only ever read or
   write that publisher's inventory — the publisher is taken from the key,
   never from the request body. There is no cross-publisher access.
-- Issue a key (super-admin / ops):
+- Issue a key (super-admin): `/desk/api-keys` → "Acts for" = the publisher,
+  scope `catalog:write`. The form refuses `catalog:write` on any key not
+  bound to a publisher. Or from a shell (ops):
   ```bash
   pnpm tsx scripts/issue-publisher-key.ts "<publisher name or id>" "Schibsted ingestion"
   ```

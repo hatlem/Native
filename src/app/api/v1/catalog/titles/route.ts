@@ -2,24 +2,30 @@
 // integration partners (Tobias's GroupM scenario). Auth via Bearer API
 // key with the catalog:read scope.
 //
-// Pagination is cursor-based on Title.id (stable sort by name + id
-// ascending so a partner doing a full sync doesn't miss rows when a
-// new title is activated mid-sync).
+// Pagination is keyset-based on (name, id) — a stable sort, so a partner
+// doing a full sync doesn't miss rows when a title is activated or
+// deactivated mid-sync. The cursor is opaque (lib/api/catalog-query.ts).
 //
-// Query params:
+// Query params (validated; anything invalid is a 400 BAD_PARAM):
 //   - market (NO/SE/DK/FI/DE/AT/CH/UK/IE): filter by market
-//   - limit (1..100, default 50): page size
-//   - cursor: opaque pagination token returned in the previous response
-//   - format (NATIVE_ARTICLE|ADVERTORIAL|NATIVE_DISPLAY|PACKAGE): only
-//     return titles that have at least one active product of this type
+//   - limit (positive integer, default 50, clamped to 100): page size
+//   - cursor: opaque pagination token returned in page.nextCursor
+//   - format (a ProductType): only return titles that have at least one
+//     active product of this type
 //
-// Response shape is the public contract — keep it tight and stable.
-// Anything mutable (publisher commercial terms, internal margin) is
-// deliberately omitted.
+// Response shape is the public contract, documented in
+// src/app/api/openapi.json/route.ts and pinned by contract.it.test.ts —
+// keep it tight and stable. Anything mutable (publisher commercial terms,
+// internal margin) is deliberately omitted.
 
 import { NextResponse, type NextRequest } from "next/server";
-import { MarketCode, ProductType } from "@prisma/client";
+import type { Prisma } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
+import {
+  describeParamErrors,
+  encodeCatalogCursor,
+  parseCatalogQuery,
+} from "@/lib/api/catalog-query";
 import { authenticateRequest } from "@/lib/api-auth";
 import { isProductPriceShown } from "@/lib/pricing/visibility";
 import { bandLabel } from "@/lib/pricing/bands";
@@ -29,13 +35,11 @@ import { rfqLimiter } from "@/lib/rate-limit";
 
 export const dynamic = "force-dynamic";
 
-const MAX_LIMIT = 100;
-const DEFAULT_LIMIT = 50;
-const MARKET_CODES = Object.values(MarketCode) as string[];
-const PRODUCT_TYPES = Object.values(ProductType) as string[];
-
-function errJson(status: number, code: string, message: string) {
-  return NextResponse.json({ error: { code, message } }, { status });
+function errJson(status: number, code: string, message: string, details?: unknown) {
+  return NextResponse.json(
+    { error: { code, message, ...(details ? { details } : {}) } },
+    { status },
+  );
 }
 
 export async function GET(req: NextRequest) {
@@ -62,31 +66,39 @@ export async function GET(req: NextRequest) {
     return errJson(429, "RATE_LIMITED", "Slow down — retry after " + Math.ceil(limited.retryAfterMs / 1000) + "s.");
   }
 
+  const parsed = parseCatalogQuery(new URL(req.url).searchParams);
+  if (!parsed.ok) {
+    return errJson(400, "BAD_PARAM", describeParamErrors(parsed.errors), parsed.errors);
+  }
+  const { market, format, limit, cursor } = parsed.query;
+
+  // Resume strictly after the cursor's (name, id). A legacy bare-id cursor
+  // (minted before the keyset token) is resolved to its name first; an id
+  // that names no title is as invalid as any other junk cursor.
+  let after: { name: string; id: string } | null = null;
+  if (cursor?.kind === "keyset") after = cursor;
+  if (cursor?.kind === "legacy") {
+    const row = await prisma.title.findUnique({
+      where: { id: cursor.id },
+      select: { name: true, id: true },
+    });
+    if (!row) {
+      const errors = [{ param: "cursor", message: "does not match any page of this listing" }];
+      return errJson(400, "BAD_PARAM", describeParamErrors(errors), errors);
+    }
+    after = row;
+  }
+
   const pricing = await loadPricingDefaults();
 
-  const url = new URL(req.url);
-  const limit = Math.max(
-    1,
-    Math.min(MAX_LIMIT, Number(url.searchParams.get("limit") ?? DEFAULT_LIMIT)),
-  );
-  const cursor = url.searchParams.get("cursor");
-  const marketParam = url.searchParams.get("market");
-  const formatParam = url.searchParams.get("format");
-
-  const market =
-    marketParam && MARKET_CODES.includes(marketParam)
-      ? (marketParam as MarketCode)
-      : undefined;
-  const format =
-    formatParam && PRODUCT_TYPES.includes(formatParam)
-      ? (formatParam as ProductType)
-      : undefined;
-
-  const where = {
+  const where: Prisma.TitleWhereInput = {
     active: true,
     ...(market ? { market: { code: market } } : {}),
     ...(format
       ? { products: { some: { active: true, type: format } } }
+      : {}),
+    ...(after
+      ? { OR: [{ name: { gt: after.name } }, { name: after.name, id: { gt: after.id } }] }
       : {}),
   };
 
@@ -94,7 +106,6 @@ export async function GET(req: NextRequest) {
     where,
     orderBy: [{ name: "asc" }, { id: "asc" }],
     take: limit + 1, // peek one extra to know if there's a next page
-    ...(cursor ? { cursor: { id: cursor }, skip: 1 } : {}),
     include: {
       publisher: {
         select: { id: true, name: true, pricesPublic: true },
@@ -123,7 +134,8 @@ export async function GET(req: NextRequest) {
 
   const hasMore = titles.length > limit;
   const page = hasMore ? titles.slice(0, limit) : titles;
-  const nextCursor = hasMore ? page[page.length - 1]?.id : null;
+  const last = page[page.length - 1];
+  const nextCursor = hasMore && last ? encodeCatalogCursor(last.name, last.id) : null;
 
   return NextResponse.json({
     data: page.map((t) => {

@@ -187,7 +187,7 @@
     "placementRetracted": "Peruutettu",
     "unlinkCta": "Poista linkitys",
     "sharedArticleWarning": "Tämä artikkeli on linkitetty {count} muuhun sijoitteluun — muutoksesi vaikuttavat kaikkiin.",
-    "detailUploadFailed": "Lataus epäonnistui. Kokeile toista tiedostoa.",
+    "detailUploadFailed": "Lataus ei onnistunut. Tarkista yhteys ja yritä uudelleen.",
     "detailUploadUnavailable": "Tiedostojen lataus ei ole juuri nyt käytettävissä. Liitä teksti editoriin.",
     "backToArticles": "Kaikki artikkelit",
     "versionLabel": "Versio {version}",
@@ -202,7 +202,9 @@
     "orderRef": "tilaus {ref}",
     "draftLabel": "Artikkelin teksti",
     "draftHint": "Pelkkää tekstiä ja kevyttä Markdownia: # otsikoille, **lihavointi**, *kursiivi*, - listoille, [teksti](linkki).",
-    "submitBlockedSpec": "Jonkin sijoituksen formaattivaatimukset eivät vielä täyty – tarkista sijoitukset yllä."
+    "submitBlockedSpec": "Jonkin sijoituksen formaattivaatimukset eivät vielä täyty – tarkista sijoitukset yllä.",
+    "detailUploadWrongType": "Tätä tiedostotyyppiä ei tueta. Lataa PDF, Word-tiedosto (.docx) tai pelkkä teksti.",
+    "detailUploadTooLarge": "Tiedosto on tyhjä tai yli 25 Mt. Lataa pienempi tiedosto tai liitä teksti editoriin."
   },
   "reports": {
     "title": "Raportit",
@@ -244,7 +246,8 @@
     "basis_win-rate": "voittoprosentista",
     "basis_category-median": "kategorian mediaani",
     "basis_default": "oletus",
-    "exportInvoicesCsv": "Vie laskut (CSV)"
+    "exportInvoicesCsv": "Vie laskut (CSV)",
+    "exportAccountingJson": "Kirjanpitovienti (JSON)"
   },
   "agency": {
     "eyebrow": "Toimisto",
@@ -349,7 +352,9 @@
     "compareBar": {
       "label": "{count, plural, =1 {1 julkaisu valittu} other {# julkaisua valittu}}",
       "open": "Vertaile →",
-      "clear": "Tyhjennä"
+      "clear": "Tyhjennä",
+      "select": "Vertaa: {name}",
+      "region": "Vertailuun valitut julkaisut"
     },
     "card": {
       "from": "Alkaen",
@@ -452,7 +457,9 @@
       "addToPlan": "Lisää suunnitelmaan",
       "onPlan": "Suunnitelmassa",
       "askForPrice": "Pyydä hintaa"
-    }
+    },
+    "exportCsv": "Lataa luettelo (CSV)",
+    "exportCsvMarket": "Lataa julkaisut: {market} (CSV)"
   },
   "lists": {
     "title": "Tallennetut listat",
@@ -466,21 +473,25 @@
     "open": "Avaa",
     "rename": "Nimeä uudelleen",
     "duplicate": "Monista",
-    "archive": "Arkistoi"
+    "archive": "Arkistoi",
+    "copyName": "{name} (kopio)",
+    "archivedNotice": "”{name}” on arkistoitu.",
+    "undo": "Kumoa",
+    "archivedHeading": "Arkistoidut ({count})",
+    "archivedOn": "arkistoitu {date}",
+    "restore": "Palauta"
   },
   "favorites": {
     "title": "Suosikit",
     "lead": "Tallentamasi julkaisut. Avaa julkaisu lisätäksesi muodon suunnitelmaan.",
     "add": "Lisää suosikkeihin",
     "remove": "Poista suosikeista",
-    "addToList": "Lisää listalle",
+    "addToList": "Lisää tallennetulle listalle",
     "noLists": "Ei listoja vielä.",
     "noOrgHint": "Valitse asiakas nähdäksesi ja luodaksesi listoja.",
     "newListPlaceholder": "Uuden listan nimi",
-    "createList": "Luo lista",
+    "createList": "Uusi tallennettu lista",
     "allHeading": "Kaikki suosikit",
-    "listsHeading": "Omat listat",
-    "sharedHeading": "Jaettu kanssasi",
     "empty": "Ei suosikkeja vielä. Selaa katalogia ja napauta julkaisun sydäntä.",
     "browseCta": "Selaa katalogia",
     "itemCount": "{count, plural, =0 {Ei julkaisuja} =1 {1 julkaisu} other {# julkaisua}}",
@@ -488,7 +499,6 @@
     "unshare": "Lopeta jakaminen",
     "sharedBadge": "Jaettu",
     "rename": "Nimeä uudelleen",
-    "delete": "Poista lista",
     "open": "Avaa",
     "removeFromList": "Poista",
     "byOwner": "jakanut {owner}",
@@ -496,7 +506,16 @@
     "sharedByReadOnly": "Jakanut {owner} · vain luku",
     "confirmDelete": "Vahvista",
     "cancelDelete": "Peruuta",
-    "listUnavailable": "Listaa ei ole enää saatavilla."
+    "collectionsHeading": "Kokoelmasi",
+    "collectionsLead": "Ryhmittele suosikit teeman tai asiakkaan mukaan ja jaa kokoelma tiimillesi. Hinnoittelua varten lisää sijoittelut tallennetulle listalle.",
+    "newCollectionPlaceholder": "Uuden kokoelman nimi",
+    "createCollection": "Luo kokoelma",
+    "noCollections": "Ei vielä kokoelmia.",
+    "deleteCollection": "Poista kokoelma",
+    "sharedCollectionsHeading": "Sinulle jaetut kokoelmat",
+    "collectionUnavailable": "Kokoelma ei ole enää saatavilla.",
+    "addToCollection": "Kokoelma",
+    "addToCollectionSubmit": "Lisää kokoelmaan"
   },
   "titleDetail": {
     "back": "Takaisin katalogiin",
@@ -820,7 +839,9 @@
     "lineDragInstructions": "Siirrä riviä: nosta välilyönnillä, siirrä nuolinäppäimillä ja pudota välilyönnillä. Esc peruuttaa.",
     "lineSearchBlocksDrag": "tyhjennä haku muuttaaksesi järjestystä",
     "lineOrderSaveFailed": "Järjestystä ei voitu tallentaa – ladataan suunnitelma uudelleen.",
-    "lineMovedAnnouncement": "Siirretty kohtaan {position}/{total}"
+    "lineMovedAnnouncement": "Siirretty kohtaan {position}/{total}",
+    "noticePlanArchived": "Suunnitelma on arkistoitu, joten näet sen sijaan nykyisen suunnitelmasi. Voit palauttaa sen kohdasta Tallennetut listat.",
+    "noticePlanUnavailable": "Emme saaneet suunnitelmaa auki — linkki voi olla vanhentunut, tai suunnitelma kuuluu toiseen työtilaan. Tämä on nykyinen suunnitelmasi."
   },
   "rfq": {
     "org": "Yritys",
@@ -2331,16 +2352,16 @@
     "authRequest": "Lähetä jäsennelty pyyntö osoitteeseen partners@nativespin.com — kerro integraation muodosta ja kiinnostavista markkinoista, niin myönnämme avaimen.",
     "endpointsEyebrow": "v1-päätepisteet",
     "endpointsTitle": "Mitä on saatavilla tänään",
-    "listBody": "Sivutettu luetteloluettelo jokaisesta aktiivisesta julkaisusta, jolla on vähintään yksi aktiivinen tuote. Suodata markkinan (NO/SE/DK/FI/DE/AT/CH/UK/IE) ja formaatin (NATIVE_ARTICLE/ADVERTORIAL/NATIVE_DISPLAY/PACKAGE) mukaan.",
+    "listBody": "Sivutettu lista kaikista luettelon aktiivisista julkaisuista, niiden aktiivisista tuotteista ja hintahaarukoista. Suodata markkinan (NO/SE/DK/FI/DE/AT/CH/UK/IE) ja formaatin (tuotetyyppi, esimerkiksi NATIVE_ARTICLE) mukaan.",
     "queryParams": "Kyselyparametrit",
-    "detailBody": "Julkaisukohtainen tieto: kustantaja, markkina (ALV + mainosmerkintäsäännöt) ja jokainen aktiivinen tuote spesifikaatioineen ja hinnoittelusääntöineen.",
-    "detailIncludes": "Sisältää spesifikaation sanamääräarvot, mainosmerkinnän mallin, toimitusajan ja suuntaa-antavan perushinnan markkinan valuutassa.",
+    "detailBody": "Julkaisukohtaiset tiedot: kustantaja, markkina (ALV-kanta ja mainosmerkintä) sekä jokainen aktiivinen tuote sisältövaatimuksineen, toimitusaikoineen ja hintahaarukoineen.",
+    "detailIncludes": "Hinnat ilmoitetaan haarukoina (esimerkiksi ”25–40k NOK”), ei koskaan tarkkoina summina: kiinteä hinta tulee tarjouksessa. Sisältövaatimuksiin kuuluvat sanamäärärajat, kuvien vähimmäismäärä ja mainosmerkintä.",
     "paginationTitle": "Pagination",
-    "paginationBody": "Kursoripohjainen julkaisu-id:n mukaan. Vakaa lajittelu nimellä + id:llä, jotta voit suorittaa täyden synkronoinnin menettämättä rivejä, kun uudet julkaisut aktivoidaan kesken synkronoinnin.",
+    "paginationBody": "Kursoripohjainen. Lähetä page.nextCursor takaisin cursor-parametrina, kunnes se on null: vasta silloin synkronointi on valmis. Lajittelu on vakaa (nimi + id), joten täysi synkronointi ei ohita rivejä, vaikka julkaisuja aktivoitaisiin tai poistettaisiin käytöstä kesken ajon.",
     "limitsTitle": "Nopeusrajat",
     "limitsBody": "Avainkohtaiset purskeet tasoittuvat saman ämpärin kautta, jota RFQ-virtaus käyttää. 429-vastaus sisältää likimääräisen retry-after-arvon viestin rungossa. Jatkuvasti suurivolyymisille integraatiokumppaneille myönnetään korkeammat rajat — kysy avainta hakiessasi.",
     "errorsTitle": "Errors",
-    "errorsBody": "Virheet palautetaan JSON-muodossa pysyvällä koodilla ja luettavalla viestillä. Koodit tällä hetkellä: MISSING, INVALID, EXPIRED, REVOKED, SCOPE, RATE_LIMITED, NOT_FOUND.",
+    "errorsBody": "Virheet palautetaan JSON-muodossa pysyvällä koodilla ja luettavalla viestillä. Virheellinen parametri palauttaa 400 BAD_PARAM -virheen, jonka error.details nimeää jokaisen; mitään ei ohiteta hiljaa. Kaikki koodit löytyvät OpenAPI-määrittelystä osoitteesta /api/openapi.json.",
     "ctaTitle": "Tarvitsetko avaimen?",
     "ctaBody": "Emme automaattisesti myönnä API-pääsyä — kumppani-integraatioilla on kaupallisia vaikutuksia, jotka haluamme keskustella ensin. Ota yhteyttä, niin saat toimivan avaimen yhden työpäivän kuluessa.",
     "ctaContact": "Keskustele kumppanuustiimin kanssa",
@@ -2348,7 +2369,8 @@
     "selfServeTitle": "Osta kuin ohjelmallisesti — nimetyistä premium-julkaisuista",
     "selfServeBody": "Löydä tarjonta luettelo-API:n kautta ja varaa kiinteähintaiset sijoittelut yhdellä kutsulla — API:n kautta tai sovelluksessa. Ei huutokauppaa, ei piilotettua tarjontaa: jokainen julkaisu on nimetty, jokainen hinta on julkaisijan oma. RFQ-julkaisut pysyvät tarkoituksella deskin välittäminä — API varaa vain kiinteähintaista itsepalvelutarjontaa.",
     "ordersBody": "Tee kiinteähintainen itsepalvelutilaus. Lähetä kiinteähintaiset tuotteet ja saat vahvistetun tilauksen takaisin yhdellä kutsulla. Vaatii orders:write-oikeuden ja organisaatioosi sidotun avaimen; RFQ-tuotteet palauttavat 422 RFQ_ONLY.",
-    "ordersRequest": "curl -X POST https://nativespin.com/api/v1/orders \\\n  -H \"Authorization: Bearer AVAIMESI\" \\\n  -H \"Content-Type: application/json\" \\\n  -d '{\"items\":[{\"productId\":\"TUOTE_ID\",\"quantity\":1}]}'"
+    "ordersRequest": "curl -X POST https://nativespin.com/api/v1/orders \\\n  -H \"Authorization: Bearer AVAIMESI\" \\\n  -H \"Content-Type: application/json\" \\\n  -d '{\"items\":[{\"productId\":\"TUOTE_ID\",\"quantity\":1}]}'",
+    "quotesBody": "Deskin lähettämän tarjouksen tila, rivit ja summat. Organisaatioon sidottu avain näkee vain oman organisaationsa tarjoukset."
   },
   "apiKeys": {
     "eyebrow": "Superadmin",
@@ -2356,25 +2378,23 @@
     "lead": "Myönnä + peruuta julkisia luettelo-API-avaimia. Raaka token näytetään KERRAN myöntämisen yhteydessä — tallenna se kumppanin salaisuuksien hallintaan ennen kuin siirryt pois sivulta.",
     "createdLabel": "Uusi avain myönnetty",
     "copyNow": "Kopioi tämä token nyt; se näytetään vain kerran.",
-    "errorScopes": "Vähintään yksi kelvollinen scope vaaditaan (catalog:read, catalog:*, orders:write, pricing:admin).",
-    "errorInternalOnly": "pricing:admin on vain sisäinen — se voidaan myöntää vain NativeSpin-alusta-avaimena (ilman organisaatiota).",
-    "errorOrgRequired": "orders:write on sidottava organisaatioon — valitse omistava organisaatio yltä.",
+    "errorScopes": "Valitse vähintään yksi scope.",
+    "errorInternalOnly": "pricing:admin on vain sisäiseen käyttöön — sen voi myöntää vain NativeSpin-alustan avaimena.",
+    "errorOrgRequired": "orders:write tekee tilauksia organisaation puolesta — sido avain organisaatioon kohdassa ”Toimii puolesta”.",
     "issueEyebrow": "Myönnä",
     "issueTitle": "Myönnä uusi avain",
     "nameLabel": "Nimi / kumppani",
-    "orgLabel": "Omistava organisaatio (valinnainen)",
-    "orgPlatform": "NativeSpin-alustaavain (ei organisaatiota)",
+    "orgPlatform": "NativeSpin-alusta (ei organisaatiota eikä kustantajaa)",
     "scopesLabel": "Oikeudet (scopes)",
-    "scopesHint": "Pilkuilla erotettuna. Vaihtoehdot: catalog:read, orders:write (orders:write on sidottava organisaatioon). pricing:admin on vain sisäinen.",
     "ttlLabel": "Vanhenee (päivissä)",
     "ttlPlaceholder": "Ei vanhenemista",
     "ttlHint": "Jätä tyhjäksi, jos vanhenemista ei ole; enintään 1825 päivää (5 vuotta).",
     "issueSubmit": "Luo avain",
     "issuing": "Luodaan…",
-    "listEyebrow": "Olemassa olevat",
+    "listEyebrow": "Nykyiset",
     "listTitle": "Kaikki avaimet",
     "colName": "Nimi",
-    "colOrg": "Organisaatio",
+    "colOrg": "Toimii puolesta",
     "colScopes": "Oikeudet",
     "colCreated": "Luotu",
     "colLastUsed": "Viimeksi käytetty",
@@ -2388,7 +2408,19 @@
     "revokeConfirmCta": "Kyllä, peruuta avain",
     "docsHintPrefix": "Julkinen dokumentaatio saatavilla osoitteessa",
     "deniedBody": "Julkisen luettelon API-avaimet myöntää NativeSpin-superadmin. Jos roolisi tarvitsee laillisesti avaimen myöntämistä — tai olet kumppani joka tarvitsee avaimen — ota yhteyttä deskiin niin järjestämme sen.",
-    "orgPlatformShort": "NativeSpin-alusta"
+    "orgPlatformShort": "NativeSpin-alusta",
+    "errorPublisherRequired": "catalog:write lataa kustantajan oman valikoiman — sido avain kyseiseen kustantajaan kohdassa ”Toimii puolesta”.",
+    "errorBinding": "Organisaatiota tai kustantajaa ei enää ole. Lataa sivu uudelleen ja valitse uudestaan.",
+    "namePlaceholder": "esim. GroupM Atlas",
+    "bindingLabel": "Toimii puolesta",
+    "bindingOrgs": "Organisaatiot (ostajat)",
+    "bindingPublishers": "Kustantajat (valikoiman lataus)",
+    "bindingHint": "Avain toimii alustan, yhden organisaation tai yhden kustantajan puolesta. orders:write vaatii organisaation, catalog:write kustantajan ja pricing:admin alustan.",
+    "scope_catalog_read": "lukea luetteloa (hintahaarukat) ja lähetettyjä tarjouksia",
+    "scope_catalog_write": "ladata kustantajan omat julkaisut ja tuotteet",
+    "scope_orders_write": "tehdä sitovia tilauksia organisaation puolesta",
+    "scope_pricing_admin": "sisäiset hinnoittelutyökalut (MCP) — vain alusta",
+    "boundPublisher": "{name} (kustantaja)"
   },
   "quoteNarrative": {
     "sectionCampaign": "Kampanjasi",
@@ -2806,7 +2838,7 @@
     "uploadHint": "PDF, PPTX tai kuva, enintään 25 Mt",
     "uploading": "Ladataan…",
     "uploadDone": "Tiedosto ladattu.",
-    "uploadFailed": "Lataus epäonnistui: {error}",
+    "uploadFailed": "Lataus ei onnistunut. Tarkista yhteys ja yritä uudelleen — tai liitä linkki alle.",
     "urlLabel": "Tai liitä linkki rate cardiin / media kittiin",
     "urlPlaceholder": "https://…",
     "ratesLabel": "Tai syötä hinnat julkaisukohtaisesti",
@@ -2852,7 +2884,9 @@
     "content_advertiser": "Mainostaja voi toimittaa omat artikkelinsa",
     "content_publisher": "Artikkelit on kirjoitettava osastonne toimesta",
     "content_both": "Molemmat ovat mahdollisia",
-    "uploadUnavailable": "Tiedoston lataus ei ole juuri nyt käytettävissä. Liitä alle linkki hinnastoon tai mediakorttiin."
+    "uploadUnavailable": "Tiedoston lataus ei ole juuri nyt käytettävissä. Liitä alle linkki hinnastoon tai mediakorttiin.",
+    "uploadWrongType": "Tätä tiedostotyyppiä ei hyväksytä. Lataa PDF, PowerPoint, PNG tai JPG.",
+    "uploadTooLarge": "Tiedosto on tyhjä tai yli 25 Mt. Lataa pienempi tiedosto tai liitä linkki alle."
   },
   "invite": {
     "title": "Liity organisaatioon {org}",

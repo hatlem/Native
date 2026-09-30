@@ -11,7 +11,7 @@ import { loadScope } from "@/lib/scope";
 import { loadRelevanceSignals } from "@/lib/catalog-relevance";
 import { loadVerticalOptions } from "@/lib/catalog-taxonomy";
 import { readActiveListId, resolveActiveList } from "@/lib/lists";
-import { estimateListTotals } from "@/lib/plan-total";
+import { barTotals, planLineCount } from "@/lib/plan-total";
 import { loadPricingDefaults } from "@/lib/content-fee";
 import { titleDisplayName } from "@/lib/title-display";
 import { CatalogRail } from "./_components/CatalogRail";
@@ -403,9 +403,10 @@ export default async function CatalogPage({
   const shortlistProductIds = (activeList?.items ?? [])
     .map((i) => i.productId)
     .filter((id): id is string => id !== null);
-  const shortlistTotals = activeList
-    ? estimateListTotals(activeList.items, await loadPricingDefaults())
-    : [];
+  // Every line the plan shows (placeholders included), priced server-side —
+  // the same count and totals the "Add to plan" action returns.
+  const shortlistCount = planLineCount(activeList?.items ?? []);
+  const shortlistTotals = activeList ? barTotals(activeList.items, await loadPricingDefaults()) : [];
   const planName = activeList?.name ?? t("shortlist.untitledPlan");
 
   // "42 more titles without published pricing" — only meaningful once
@@ -601,7 +602,7 @@ export default async function CatalogPage({
     <ShortlistProvider
       locale={locale}
       planName={planName}
-      initialCount={shortlistProductIds.length}
+      initialCount={shortlistCount}
       initialProductIds={shortlistProductIds}
       initialTotals={shortlistTotals}
     >
@@ -685,6 +686,19 @@ export default async function CatalogPage({
               <div className="catalog-results-controls">
                 <CatalogSort initial={sort ?? ""} />
                 <CatalogDensityToggle initial={density} />
+                {/* The CSV export (bands only, like the page) had no way in
+                    from the UI. It filters by one market at most, so the
+                    link carries the market only when exactly one is picked.
+                    Plain <a download>: it's a file, not a page. */}
+                <a
+                  className="small-link"
+                  href={`/api/export/catalog.csv${markets.length === 1 ? `?market=${markets[0]}` : ""}`}
+                  download
+                >
+                  {markets.length === 1
+                    ? t("exportCsvMarket", { market: tMarket(markets[0]) })
+                    : t("exportCsv")}
+                </a>
               </div>
             </div>
 

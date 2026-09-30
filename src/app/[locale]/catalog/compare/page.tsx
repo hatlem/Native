@@ -1,3 +1,4 @@
+import type { ReactNode } from "react";
 import { getTranslations } from "next-intl/server";
 import { redirect } from "next/navigation";
 import { auth } from "@/auth";
@@ -11,6 +12,8 @@ import { loadPricingDefaults } from "@/lib/content-fee";
 import { EmptyState } from "@/app/empty-state";
 import { localizeCategory } from "@/lib/taxonomy-i18n";
 import type { AppLocale } from "@/i18n/routing";
+import { titleDisplayName } from "@/lib/title-display";
+import { titleLeadTime } from "@/lib/lead-time";
 
 export const dynamic = "force-dynamic";
 
@@ -34,6 +37,7 @@ export default async function ComparePage({
   const tc = await getTranslations({ locale, namespace: "catalog" });
   const tMarket = await getTranslations({ locale, namespace: "market" });
   const tType = await getTranslations({ locale, namespace: "productType" });
+  const tDetail = await getTranslations({ locale, namespace: "titleDetail" });
   const tv = await getTranslations({
     locale,
     namespace: "priceVisibility",
@@ -87,21 +91,89 @@ export default async function ComparePage({
         <Link href="/catalog">← {t("back")}</Link>
       </p>
 
-      {/* Precompute per-title row values so the table body is just a
-          map over a row spec. Avoids inline ternaries per cell. */}
       {(() => {
-        const rows = ordered.map((title) => {
-          const anyHidden = title.products.some(
-            (p) => !isProductPriceShown(p, title),
-          );
-          const fromBand = titleBand(title.products, title, pricing);
-          // Only publisher-stated lead times count; null = not stated.
-          const leadTimes = title.products
-            .map((p) => p.leadTimeDays)
-            .filter((d): d is number => d != null);
-          const leadMin = leadTimes.length ? Math.min(...leadTimes) : null;
-          return { title, anyHidden, fromBand, leadMin };
-        });
+        const numberFmt = new Intl.NumberFormat(intlLocale(locale));
+        const rows = ordered.map((title) => ({
+          title,
+          name: titleDisplayName(title),
+          anyHidden: title.products.some((p) => !isProductPriceShown(p, title)),
+          fromBand: titleBand(title.products, title, pricing),
+          // Same reach figure as the catalog card (digital first) and the
+          // same lead time as the detail page (stated, else estimated) — a
+          // title must not read "122 000" on one surface and "—" here.
+          reach: title.digitalReach ?? title.monthlyReach ?? null,
+          lead: titleLeadTime(title.products),
+        }));
+        type CompareRow = (typeof rows)[number];
+
+        // One spec per attribute; the table body is a map over it. Every
+        // value cell carries its title's name as data-label: below 640px
+        // `.table-wrap.responsive` stacks each attribute into a card, and
+        // without the label a card read "Norway / United Kingdom / Norway"
+        // with no way to tell which title each value belonged to.
+        const attributes: { key: string; label: string; className?: string; cell: (r: CompareRow) => ReactNode }[] = [
+          { key: "publisher", label: t("rowPublisher"), cell: (r) => r.title.publisher.name },
+          { key: "market", label: t("rowMarket"), cell: (r) => tMarket(r.title.market.code) },
+          {
+            key: "category",
+            label: t("rowCategory"),
+            className: "muted",
+            cell: (r) => localizeCategory(r.title.category, locale as AppLocale),
+          },
+          {
+            key: "reach",
+            label: t("rowReach"),
+            className: "num",
+            cell: (r) => (r.reach ? numberFmt.format(r.reach) : "—"),
+          },
+          {
+            key: "lead",
+            label: t("rowLeadTime"),
+            className: "num",
+            cell: (r) =>
+              r.lead.estimated
+                ? tDetail("leadTimeEstimated", { days: r.lead.days })
+                : `${r.lead.days} ${tc("card.days")}`,
+          },
+          {
+            key: "formats",
+            label: t("rowFormats"),
+            cell: (r) =>
+              r.title.products.length === 0 ? (
+                <span className="muted">—</span>
+              ) : (
+                <span className="cluster tight">
+                  {[...new Set(r.title.products.map((p) => p.type))].map((type) => (
+                    <span className="tag" key={type}>
+                      {tType(type)}
+                    </span>
+                  ))}
+                </span>
+              ),
+          },
+          {
+            key: "price",
+            label: t("rowFromPrice"),
+            className: "num",
+            cell: (r) =>
+              r.fromBand ? (
+                <span className="price">≈ {bandLabel(r.fromBand.band, r.fromBand.product.currency)}</span>
+              ) : r.anyHidden ? (
+                <span className="muted">{tv("requestPrice")}</span>
+              ) : (
+                <span className="muted">—</span>
+              ),
+          },
+          {
+            key: "action",
+            label: t("rowAction"),
+            cell: (r) => (
+              <Link href={`/catalog/${r.title.slug}`} className="link">
+                {t("view")} →
+              </Link>
+            ),
+          },
+        ];
 
         return (
           <div className="table-wrap responsive">
@@ -109,117 +181,26 @@ export default async function ComparePage({
               <thead>
                 <tr>
                   <th>{t("rowAttribute")}</th>
-                  {rows.map(({ title }) => (
-                    <th key={title.id}>
-                      <Link href={`/catalog/${title.slug}`}>{title.name}</Link>
+                  {rows.map((r) => (
+                    <th key={r.title.id}>
+                      <Link href={`/catalog/${r.title.slug}`}>{r.name}</Link>
                     </th>
                   ))}
                 </tr>
               </thead>
               <tbody>
-                <tr>
-                  <td>
-                    <strong>{t("rowPublisher")}</strong>
-                  </td>
-                  {rows.map(({ title }) => (
-                    <td key={title.id}>{title.publisher.name}</td>
-                  ))}
-                </tr>
-                <tr>
-                  <td>
-                    <strong>{t("rowMarket")}</strong>
-                  </td>
-                  {rows.map(({ title }) => (
-                    <td key={title.id}>{tMarket(title.market.code)}</td>
-                  ))}
-                </tr>
-                <tr>
-                  <td>
-                    <strong>{t("rowCategory")}</strong>
-                  </td>
-                  {rows.map(({ title }) => (
-                    <td key={title.id} className="muted">
-                      {localizeCategory(title.category, locale as AppLocale)}
+                {attributes.map((a) => (
+                  <tr key={a.key}>
+                    <td>
+                      <strong>{a.label}</strong>
                     </td>
-                  ))}
-                </tr>
-                <tr>
-                  <td>
-                    <strong>{t("rowReach")}</strong>
-                  </td>
-                  {rows.map(({ title }) => (
-                    <td key={title.id} className="num">
-                      {title.monthlyReach
-                        ? new Intl.NumberFormat(intlLocale(locale)).format(title.monthlyReach)
-                        : "—"}
-                    </td>
-                  ))}
-                </tr>
-                <tr>
-                  <td>
-                    <strong>{t("rowLeadTime")}</strong>
-                  </td>
-                  {rows.map(({ title, leadMin }) => (
-                    <td key={title.id} className="num">
-                      {leadMin !== null
-                        ? `${leadMin} ${tc("card.days")}`
-                        : "—"}
-                    </td>
-                  ))}
-                </tr>
-                <tr>
-                  <td>
-                    <strong>{t("rowFormats")}</strong>
-                  </td>
-                  {rows.map(({ title }) => (
-                    <td key={title.id}>
-                      {title.products.length === 0 ? (
-                        <span className="muted">—</span>
-                      ) : (
-                        <span className="cluster tight">
-                          {title.products.map((p) => (
-                            <span className="tag" key={p.id}>
-                              {tType(p.type)}
-                            </span>
-                          ))}
-                        </span>
-                      )}
-                    </td>
-                  ))}
-                </tr>
-                <tr>
-                  <td>
-                    <strong>{t("rowFromPrice")}</strong>
-                  </td>
-                  {rows.map(({ title, fromBand, anyHidden }) => (
-                    <td key={title.id} className="num">
-                      {fromBand ? (
-                        <span className="price">
-                          ≈ {bandLabel(fromBand.band, fromBand.product.currency)}
-                        </span>
-                      ) : anyHidden ? (
-                        <span className="muted">{tv("requestPrice")}</span>
-                      ) : (
-                        <span className="muted">—</span>
-                      )}
-                    </td>
-                  ))}
-                </tr>
-                <tr>
-                  <td>
-                    <strong>{t("rowAction")}</strong>
-                  </td>
-                  {rows.map(({ title }) => (
-                    <td key={title.id}>
-                      <Link
-                        href={`/catalog/${title.slug}`}
-                        className="link"
-                      >
-                        {t("view")} →
-                      </Link>
-                    </td>
-                  ))}
-                </tr>
+                    {rows.map((r) => (
+                      <td key={r.title.id} className={a.className} data-label={r.name}>
+                        {a.cell(r)}
+                      </td>
+                    ))}
+                  </tr>
+                ))}
               </tbody>
             </table>
           </div>

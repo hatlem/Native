@@ -7,7 +7,7 @@ import {
   sendMetricsRequestNow,
 } from "@/app/desk-reporting-actions";
 import { canRequestMetricsNow } from "@/lib/campaign-reporting/status";
-import { SubmitButton } from "@/components";
+import { SafeEmail, SubmitButton } from "@/components";
 import { safeExternalUrl } from "@/lib/security";
 
 // ---------------------------------------------------------------------------
@@ -298,7 +298,8 @@ export async function CampaignSection({ locale, order, metricsRequests, clicks }
 
                 {request?.recipientEmail ? (
                   <p className="muted small" style={{ marginBottom: "0.75rem" }}>
-                    {t("recipient")}: {request.recipientEmail} · {t("sentCount", { count: request.sentCount })}
+                    {t("recipient")}: <SafeEmail address={request.recipientEmail} /> ·{" "}
+                    {t("sentCount", { count: request.sentCount })}
                   </p>
                 ) : null}
 

@@ -16,11 +16,11 @@ import { addProductToActiveList } from "@/app/list-actions";
 
 type LineTotal = { currency: string; amount: number; itemCount: number };
 
+// No price on the client: the bar's count and total come back from the
+// server action (lib/plan-total.ts), priced exactly as /plan prices them.
 type ShortlistItem = {
   productId: string;
   titleName: string;
-  amount: number | null;
-  currency: string | null;
 };
 
 type Ctx = {
@@ -63,6 +63,9 @@ export function ShortlistProvider({
   const [addedIds, setAddedIds] = useState<Set<string>>(() => new Set());
   const [pendingIds, setPendingIds] = useState<Set<string>>(() => new Set());
   const [error, setError] = useState<string | null>(null);
+  // The server's latest word on the plan (count + totals); null until the
+  // first add on this page returns.
+  const [server, setServer] = useState<{ count: number; totals: LineTotal[] } | null>(null);
   const initialIds = useMemo(() => new Set(initialProductIds), [initialProductIds]);
 
   useEffect(() => {
@@ -101,6 +104,11 @@ export function ShortlistProvider({
         setError(result.reason === "no-client" ? t("errorNoClient") : t("errorGeneric"));
         return false;
       }
+      // Concurrent adds resolve in any order; the one with the most lines is
+      // the latest state of the plan (adds only ever grow it).
+      setServer((prev) =>
+        prev && prev.count > result.count ? prev : { count: result.count, totals: result.totals },
+      );
       return true;
     },
     [locale, t],
@@ -108,25 +116,10 @@ export function ShortlistProvider({
 
   const value = useMemo<Ctx>(() => ({ isOnPlan, isPending, add }), [isOnPlan, isPending, add]);
 
-  const count = initialCount + added.length;
-  const totals = useMemo(() => {
-    const byCurrency = new Map<string, { amount: number; itemCount: number }>();
-    for (const line of initialTotals) {
-      const entry = byCurrency.get(line.currency) ?? { amount: 0, itemCount: 0 };
-      entry.amount += line.amount;
-      entry.itemCount += line.itemCount;
-      byCurrency.set(line.currency, entry);
-    }
-    for (const item of added) {
-      if (item.amount != null && item.currency) {
-        const entry = byCurrency.get(item.currency) ?? { amount: 0, itemCount: 0 };
-        entry.amount += item.amount;
-        entry.itemCount += 1;
-        byCurrency.set(item.currency, entry);
-      }
-    }
-    return Array.from(byCurrency, ([currency, r]) => ({ currency, amount: r.amount, itemCount: r.itemCount }));
-  }, [initialTotals, added]);
+  // Optimistic count for adds still in flight; the total only ever shows a
+  // server-priced figure (the last one known while an add is pending).
+  const count = server ? server.count + pendingIds.size : initialCount + added.length;
+  const totals = server?.totals ?? initialTotals;
 
   return (
     <ShortlistCtx.Provider value={value}>
@@ -217,8 +210,6 @@ function ShortlistBar({
 export function ShortlistButton({
   productId,
   titleName,
-  amount,
-  currency,
   withContent,
   hasPrice,
   addLabel,
@@ -227,8 +218,6 @@ export function ShortlistButton({
 }: {
   productId: string;
   titleName: string;
-  amount: number | null;
-  currency: string | null;
   withContent: boolean;
   hasPrice: boolean;
   addLabel: string;
@@ -245,7 +234,7 @@ export function ShortlistButton({
       className={`btn small catalog-row__cta${onPlan ? " is-added" : ""}`}
       disabled={onPlan || pending}
       aria-busy={pending}
-      onClick={() => add({ productId, titleName, amount, currency }, withContent)}
+      onClick={() => add({ productId, titleName }, withContent)}
     >
       {onPlan ? `✓ ${addedLabel}` : hasPrice ? addLabel : askLabel}
     </button>

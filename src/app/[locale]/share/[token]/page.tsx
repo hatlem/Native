@@ -3,8 +3,9 @@ import { getTranslations } from "next-intl/server";
 import { notFound } from "next/navigation";
 import { loadSharedList, recordShareView } from "@/lib/list-share";
 import { approveSharedPlan } from "@/app/share-actions";
-import { formatMoney, indicativeFromRules, toRateRules, intlLocale } from "@/lib/money";
-import { isProductPriceShown } from "@/lib/pricing-visibility";
+import { formatMoney, intlLocale } from "@/lib/money";
+import { loadPricingDefaults } from "@/lib/content-fee";
+import { estimateListTotals, linePrice } from "@/lib/plan-total";
 import { titleDisplayName } from "@/lib/title-display";
 
 export const dynamic = "force-dynamic";
@@ -45,17 +46,17 @@ export default async function SharedListPage({
     timeZone: "UTC",
   });
 
-  // Same price maths and visibility rules as /plan: visible-price lines show
-  // their indicative total, hidden-price lines say "on request" — the client
-  // sees what their agency sees, never more.
+  // The SAME price engine as /plan (lib/plan-total.ts): market default margin,
+  // per-line rounding and the "We write it" content fee. This page used to
+  // run its own lookalike maths (global margin, no fee), so the client's
+  // figure drifted from the one their agency saw. Hidden-price lines say "on
+  // request" — the client sees what their agency sees, never more.
+  const pricing = await loadPricingDefaults();
   const allLines = list.items
     .filter((i) => i.productId && i.product)
     .map((i) => {
       const p = i.product!;
-      const priceVisible = isProductPriceShown(p, p.title);
-      const unit = priceVisible
-        ? indicativeFromRules(Number(p.basePrice), toRateRules(p.priceRules), i.quantity)
-        : 0;
+      const price = linePrice(i, pricing);
       return {
         id: i.id,
         name: titleDisplayName(p.title),
@@ -66,9 +67,9 @@ export default async function SharedListPage({
         scheduleStart: i.scheduleStart,
         notes: i.notes,
         isAlternative: i.isAlternative,
-        priceVisible,
+        priceVisible: price !== null,
         currency: p.currency,
-        lineTotal: unit * i.quantity,
+        lineTotal: price?.total ?? 0,
       };
     });
   const allPlaceholders = list.items.filter((i) => !i.productId && i.title);
@@ -78,15 +79,14 @@ export default async function SharedListPage({
   const altPlaceholders = allPlaceholders.filter((i) => i.isAlternative);
   const placeholders = allPlaceholders.filter((i) => !i.isAlternative);
 
-  const totals = new Map<string, number>();
-  let hasHidden = placeholders.length > 0;
-  for (const l of lines) {
-    if (!l.priceVisible) {
-      hasHidden = true;
-      continue;
-    }
-    totals.set(l.currency, (totals.get(l.currency) ?? 0) + l.lineTotal);
-  }
+  // Excl. VAT, like every other line figure on this page. Alternatives are
+  // skipped inside estimateListTotals.
+  const totals = new Map(
+    estimateListTotals(list.items, pricing)
+      .filter((tot) => tot.hasVisible)
+      .map((tot) => [tot.currency, tot.amount] as const),
+  );
+  const hasHidden = placeholders.length > 0 || lines.some((l) => !l.priceVisible);
 
   return (
     <article className="share-list">

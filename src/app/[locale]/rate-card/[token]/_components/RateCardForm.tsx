@@ -3,8 +3,17 @@
 import { useState, useTransition } from "react";
 import { useTranslations } from "next-intl";
 import { presignRateCardUpload } from "../actions";
+import { RATE_CARD_TYPES, fileProblem, type UploadProblem } from "@/lib/storage/upload-rules";
 
 type Title = { titleId: string; name: string; marketCode: string };
+
+// rateCard.* message per upload problem ("storage-unavailable" has its own
+// notice pointing at the link field).
+const UPLOAD_MESSAGE = {
+  "file-type": "uploadWrongType",
+  "file-size": "uploadTooLarge",
+  "upload-failed": "uploadFailed",
+} as const;
 
 const CURRENCIES = ["NOK", "SEK", "DKK", "EUR", "GBP", "CHF"];
 
@@ -40,6 +49,20 @@ export default function RateCardForm({
     setUploadUnavailable(false);
     setObjectKey(null);
     setFileName(file.name);
+    // A localized message per cause — never the raw error code, which is
+    // what publishers used to see ("Upload failed: content_type_not_allowed…").
+    const fail = (problem: UploadProblem) => {
+      if (problem === "storage-unavailable") {
+        // Point the publisher at the link field instead of an error they
+        // can't act on.
+        setFileName(null);
+        setUploadUnavailable(true);
+      } else {
+        setUploadError(t(UPLOAD_MESSAGE[problem]));
+      }
+    };
+    const problem = fileProblem(file, RATE_CARD_TYPES);
+    if (problem) return fail(problem);
     setUploading(true);
     try {
       const presigned = await presignRateCardUpload({
@@ -48,13 +71,7 @@ export default function RateCardForm({
         contentType: file.type,
         bytes: file.size,
       });
-      if (!presigned.ok) {
-        // Storage isn't configured: point the publisher at the link field
-        // instead of showing an error they can't act on.
-        setFileName(null);
-        setUploadUnavailable(true);
-        return;
-      }
+      if (!presigned.ok) return fail(presigned.reason);
       const res = await fetch(presigned.url, {
         method: "PUT",
         body: file,
@@ -62,8 +79,8 @@ export default function RateCardForm({
       });
       if (!res.ok) throw new Error(`upload_failed_${res.status}`);
       setObjectKey(presigned.key);
-    } catch (err) {
-      setUploadError((err as Error).message);
+    } catch {
+      fail("upload-failed");
     } finally {
       setUploading(false);
     }
@@ -108,7 +125,7 @@ export default function RateCardForm({
           <span className="hint">{t("uploadHint")}</span>
           {uploading && <span className="hint">{t("uploading")}</span>}
           {objectKey && <span className="rc-ok">{t("uploadDone")}</span>}
-          {uploadError && <span className="err">{t("uploadFailed", { error: uploadError })}</span>}
+          {uploadError && <span className="err" role="alert">{uploadError}</span>}
           {uploadUnavailable && <span className="err">{t("uploadUnavailable")}</span>}
         </div>
 

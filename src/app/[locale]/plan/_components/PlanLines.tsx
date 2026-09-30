@@ -8,7 +8,6 @@ import { titleDisplayName } from "@/lib/title-display";
 import { removeFromPlan, setQuantity, setContentProduction, setLineNote, setLineAlternative } from "@/app/plan-actions";
 import { LINE_NOTE_MAX } from "@/lib/line-note";
 import { resolveTitleLine } from "@/app/list-actions";
-import { pickContentFeeRule, contentFeeAmount, type ContentFeeRuleSpec } from "@/lib/money";
 import { PlanLineBoard, type PlanBoardEntry } from "./PlanLineBoard";
 
 type PlanProduct = Prisma.ProductGetPayload<{
@@ -27,6 +26,10 @@ export type PlanLine = {
   quantity: number;
   priceVisible: boolean;
   withContent: boolean;
+  // lib/plan-total.ts linePrice(): lineTotal = placementTotal + contentFee —
+  // the figure the summary total adds up. All 0 when the price isn't shown.
+  placementTotal: number;
+  contentFee: number;
   lineTotal: number;
   // Product deactivated since it was added — flagged so the buyer removes it
   // (submit refuses while it's present, instead of silently dropping it).
@@ -75,39 +78,27 @@ function periodLabel(
 
 // The transparency the single total figure lacks: what the line total is
 // actually made of. Only the pieces we can compute indicatively pre-quote —
-// the content fee is desk-owned pricing looked up the same way the formal
-// quote will (pickContentFeeRule), not invented here.
+// the content fee is desk-owned pricing resolved by the same rule the order
+// applies (lib/plan-total.ts linePrice), and it is already inside the line
+// total above this text — the breakdown explains the figure, never adds to it.
 function breakdown(
   l: PlanLine,
-  feeRules: ContentFeeRuleSpec[],
   locale: string,
   t: Awaited<ReturnType<typeof getTranslations>>,
 ): string {
   if (!l.priceVisible) return t("breakdownUnpriced");
+  const unit = formatMoney(l.placementTotal / l.quantity, l.product.currency, locale);
   if (l.withContent) {
-    const rule = pickContentFeeRule(feeRules, l.product.type, l.product.title.market.code);
-    if (rule) {
-      const fee = Math.round(contentFeeAmount(rule));
-      const placement = l.lineTotal;
+    if (l.contentFee > 0) {
       return t("breakdownWithArticle", {
-        placement: formatMoney(placement, l.product.currency, locale),
-        article: formatMoney(fee, l.product.currency, locale),
+        placement: formatMoney(l.placementTotal, l.product.currency, locale),
+        article: formatMoney(l.contentFee, l.product.currency, locale),
       });
     }
-    if (l.quantity > 1) {
-      return t("breakdownQtyWithArticle", {
-        n: l.quantity,
-        unit: formatMoney(l.lineTotal / l.quantity, l.product.currency, locale),
-      });
-    }
+    if (l.quantity > 1) return t("breakdownQtyWithArticle", { n: l.quantity, unit });
     return t("breakdownArticleIncluded");
   }
-  if (l.quantity > 1) {
-    return t("breakdownQty", {
-      n: l.quantity,
-      unit: formatMoney(l.lineTotal / l.quantity, l.product.currency, locale),
-    });
-  }
+  if (l.quantity > 1) return t("breakdownQty", { n: l.quantity, unit });
   return "";
 }
 
@@ -192,7 +183,6 @@ export async function PlanLines({
   altLines = [],
   altTitleLines = [],
   hasHiddenPrice,
-  feeRules,
 }: {
   locale: string;
   listId: string;
@@ -201,7 +191,6 @@ export async function PlanLines({
   altLines?: PlanLine[];
   altTitleLines?: PlanTitleLine[];
   hasHiddenPrice: boolean;
-  feeRules: ContentFeeRuleSpec[];
 }) {
   const t = await getTranslations({ locale, namespace: "plan" });
   const tType = await getTranslations({ locale, namespace: "productType" });
@@ -304,7 +293,7 @@ export async function PlanLines({
             ) : (
               <span className="plan-line-card__total plan-line-card__total--muted">{tv("requestPrice")}</span>
             )}
-            <span className="plan-line-card__breakdown">{breakdown(l, feeRules, locale, t)}</span>
+            <span className="plan-line-card__breakdown">{breakdown(l, locale, t)}</span>
           </div>
 
           <div className="plan-line-card__actions">

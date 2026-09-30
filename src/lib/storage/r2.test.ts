@@ -12,6 +12,7 @@ import {
   presignDownload,
   presignUploadResult,
 } from "./r2";
+import { fileProblem } from "./upload-rules";
 
 test("missingStorageEnv lists every unset R2 variable; isStorageConfigured needs all four", () => {
   assert.deepEqual(missingStorageEnv({}), [
@@ -48,6 +49,32 @@ test("storage calls without configuration fail with the typed error / result", a
     bytes: 1000,
   });
   assert.deepEqual(r, { ok: false, reason: "storage-unavailable" });
+});
+
+// BUG-prod-api-30: a rejected file used to throw, which the browser saw as a
+// generic server-action error ("Upload failed. Try a different file." / a raw
+// error code). It is a result the form can word — and it's reported before
+// the storage check, so the user learns what's wrong with THEIR file.
+test("presignUploadResult reports the file's own problem as data", async () => {
+  const base = { prefix: "articles/a1", filename: "x", allowedTypes: ARTICLE_TYPES };
+  assert.deepEqual(await presignUploadResult({ ...base, contentType: "image/gif", bytes: 10 }), {
+    ok: false,
+    reason: "file-type",
+  });
+  assert.deepEqual(
+    await presignUploadResult({ ...base, contentType: "application/pdf", bytes: 26 * 1024 * 1024 }),
+    { ok: false, reason: "file-size" },
+  );
+  assert.deepEqual(await presignUploadResult({ ...base, contentType: "application/pdf", bytes: 0 }), {
+    ok: false,
+    reason: "file-size",
+  });
+});
+
+test("fileProblem: type is reported before size", () => {
+  assert.equal(fileProblem({ type: "image/gif", size: 0 }, ARTICLE_TYPES), "file-type");
+  assert.equal(fileProblem({ type: "text/plain", size: 0 }, ARTICLE_TYPES), "file-size");
+  assert.equal(fileProblem({ type: "TEXT/PLAIN", size: 5 }, ARTICLE_TYPES), null);
 });
 
 test("validateContentType: defaults to the rate-card type set when no override given", () => {

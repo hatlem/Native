@@ -1,6 +1,14 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { estimateListTotals, placementLineTotal, contentFeeFor, type PlanPricing } from "./plan-total";
+import {
+  barTotals,
+  contentFeeFor,
+  estimateListTotals,
+  linePrice,
+  placementLineTotal,
+  planLineCount,
+  type PlanPricing,
+} from "./plan-total";
 import {
   computeContentFeeLines,
   computeQuoteLines,
@@ -212,4 +220,69 @@ test("placementLineTotal and contentFeeFor expose the per-line figures", () => {
   assert.equal(placementLineTotal(product, 2, [{ marketCode: "NO", marginPct: 10, active: true }]), 2200);
   assert.equal(contentFeeFor("NATIVE_DISPLAY", "NO", NO_FEES), 8000);
   assert.equal(contentFeeFor("NATIVE_DISPLAY", "SE", NO_FEES), 0);
+});
+
+// BUG-prod-api-10: "We write it" showed "17 250 placement + 2 000 article"
+// under a line figure of 17 250. The line figure is placement + fee, and the
+// plan total is exactly the sum of the line figures.
+test("linePrice: a We-write-it line's total includes its content fee", () => {
+  const pricing: PlanPricing = { feeRules: NO_FEES, marginRules: [] };
+  assert.deepEqual(linePrice(fakeItem({ basePrice: 15000, withContent: true }), pricing), {
+    placement: 17250,
+    contentFee: 12000,
+    total: 29250,
+  });
+  assert.deepEqual(linePrice(fakeItem({ basePrice: 15000 }), pricing), {
+    placement: 17250,
+    contentFee: 0,
+    total: 17250,
+  });
+});
+
+test("linePrice: one content fee per line whatever the quantity", () => {
+  const pricing: PlanPricing = { feeRules: NO_FEES, marginRules: [] };
+  assert.deepEqual(linePrice(fakeItem({ basePrice: 1000, quantity: 3, withContent: true }), pricing), {
+    placement: 3450,
+    contentFee: 12000,
+    total: 15450,
+  });
+});
+
+test("linePrice: null for hidden prices and placeholders, never a 0 figure", () => {
+  const pricing: PlanPricing = { feeRules: NO_FEES, marginRules: [] };
+  assert.equal(linePrice(fakeItem({ confirmedAt: null, withContent: true }), pricing), null);
+  assert.equal(linePrice(fakeItem({ productId: null }), pricing), null);
+});
+
+// BUG-prod-api-7: the catalog bar said "3 titles" for a 6-line plan.
+test("planLineCount counts placeholders, never alternatives", () => {
+  const items = [
+    fakeItem({}),
+    fakeItem({ productId: null }),
+    { ...fakeItem({}), isAlternative: true },
+  ];
+  assert.equal(planLineCount(items), 2);
+});
+
+test("barTotals: server-priced totals, nothing for a currency with no priced line", () => {
+  const pricing: PlanPricing = { feeRules: NO_FEES, marginRules: [] };
+  const items = [
+    fakeItem({ basePrice: 15000, withContent: true }),
+    fakeItem({ currency: "SEK", confirmedAt: null }),
+  ];
+  assert.deepEqual(barTotals(items, pricing), [{ currency: "NOK", amount: 29250, itemCount: 1 }]);
+});
+
+test("estimateListTotals is exactly the sum of the linePrice totals", () => {
+  const pricing: PlanPricing = { feeRules: NO_FEES, marginRules: [] };
+  const items = [
+    fakeItem({ basePrice: 15000, withContent: true }),
+    fakeItem({ basePrice: 9000, quantity: 2, type: "NATIVE_DISPLAY", withContent: true }),
+    fakeItem({ basePrice: 4000 }),
+    fakeItem({ confirmedAt: null, withContent: true }),
+  ];
+  const lineSum = items.reduce((sum, i) => sum + (linePrice(i, pricing)?.total ?? 0), 0);
+  const [total] = estimateListTotals(items, pricing);
+  assert.equal(total.amount, lineSum);
+  assert.equal(total.contentFees, 12000 + 8000);
 });
