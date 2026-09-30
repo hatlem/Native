@@ -34,14 +34,17 @@ export function PlanBriefFields({
   initial,
   timingOptions,
   currency,
-  total,
+  totalFloor,
+  totalLabel,
 }: {
   locale: string;
   listId: string;
   initial: PlanBriefValues;
   timingOptions: TimingOption[];
   currency: string | null;
-  total: number;
+  // The plan total's lower bound and its printed form (BudgetField).
+  totalFloor: number;
+  totalLabel: string;
 }) {
   const t = useTranslations("plan");
   const tr = useTranslations("rfq");
@@ -166,7 +169,8 @@ export function PlanBriefFields({
           value={budget}
           onChange={edit(setBudget)}
           currency={currency}
-          total={total}
+          totalFloor={totalFloor}
+          totalLabel={totalLabel}
         />
         <div className="field">
           <label>{tr("targetAudienceLabel")}</label>

@@ -12,14 +12,17 @@ import type { ProgrammeView, CadencePlan } from "@/lib/programme";
 import type { ScheduleOverlapWarning } from "@/lib/programme-warnings";
 import type { BookingUnit } from "@/lib/campaign-schedule";
 import { intlLocale, formatMoney } from "@/lib/money";
+import type { TotalFigure } from "@/lib/plan-total";
+import { totalLabel } from "@/lib/pricing/total-label";
 import { ProgrammeForm } from "./ProgrammeForm";
 
 // Budget picture across the programme, computed by /plan's page from a lean
-// per-wave item query: indicative totals per wave (priced lines only), the
+// per-wave item query: indicative totals per wave (priced lines only — exact
+// for instant-orderable lines, a band range for the rest), the
 // programme-wide sum per currency, and the list's per-wave budget when set.
 export type ProgrammePacing = {
-  perWave: Array<{ listId: string; totals: Array<{ currency: string; amount: number }> }>;
-  programmeTotals: Array<{ currency: string; amount: number }>;
+  perWave: Array<{ listId: string; totals: TotalFigure[] }>;
+  programmeTotals: TotalFigure[];
   budget: { amount: number; currency: string } | null;
 };
 
@@ -107,8 +110,11 @@ export async function PlanProgramme({
 
   // "12 000 kr + €900" — multi-currency waves join with "+" so the figure
   // reads as two charges that both apply, never a choice (the Erlend rule).
-  const joinTotals = (totals: Array<{ currency: string; amount: number }>) =>
-    totals.map((tot) => formatMoney(tot.amount, tot.currency, locale)).join(" + ");
+  const joinTotals = (totals: TotalFigure[]) =>
+    totals
+      .map((tot) => totalLabel(tot, locale))
+      .filter((label): label is string => label !== null)
+      .join(" + ");
   const totalsByList = new Map(
     (pacing?.perWave ?? []).map((w) => [w.listId, w.totals] as const),
   );

@@ -140,7 +140,7 @@
     "rowReach": "Monatliche Reichweite",
     "rowLeadTime": "Vorlaufzeit",
     "rowFormats": "Verfügbare Formate",
-    "rowFromPrice": "Ab Preis",
+    "rowFromPrice": "Preisspanne",
     "rowAction": "Aktion"
   },
   "availability": {
@@ -348,7 +348,8 @@
       "publisher": "Verlag",
       "densityLabel": "Ansicht",
       "densityList": "Liste",
-      "densityCards": "Karten"
+      "densityCards": "Karten",
+      "price": "Preis"
     },
     "compareBar": {
       "label": "{count, plural, =1 {1 Titel ausgewählt} other {# Titel ausgewählt}}",
@@ -436,7 +437,9 @@
       "mobileFilters": "Filter",
       "marketCountAll": "Alle {total} Märkte",
       "formatHeading": "Welches Format?",
-      "formatHint": "Native-Artikel, Advertorial, Display, Video …"
+      "formatHint": "Native-Artikel, Advertorial, Display, Video …",
+      "priceHeading": "Wie viel möchten Sie pro Platzierung ausgeben?",
+      "priceHint": "Preisspanne pro Platzierung, inkl. Artikel."
     },
     "shortlist": {
       "untitledPlan": "deinen Plan",
@@ -866,7 +869,10 @@
       "item3Title": "Wir schreiben, platzieren und berichten",
       "item3Body": "Entwürfe kommen zur Freigabe zu Ihnen. Links und Ergebnisse landen in den Berichten."
     },
-    "breakdownQtyWithArticleFee": "{n} × {unit} Platzierung + {article} pro Artikel (ein Artikel für alle {n})"
+    "breakdownQtyWithArticleFee": "{n} × {unit} Platzierung + {article} pro Artikel (ein Artikel für alle {n})",
+    "inclVatFirmPart": "{amount} inkl. MwSt. für die sofort bestellbaren Positionen",
+    "estimateNote": "≈ steht für eine Preisspanne. Den genauen Preis erhalten Sie mit dem Angebot.",
+    "breakdownPlacements": "{n} Platzierungen"
   },
   "rfq": {
     "org": "Firma",
@@ -1514,7 +1520,19 @@
     "emptyTitle": "Noch keine Rechnungen",
     "emptyHint": "Rechnungen erscheinen hier, sobald eine Kampagne gelaufen ist und abgerechnet wurde.",
     "emptyCta": "Zu Ihren Kampagnen",
-    "colCustomer": "Kunde"
+    "colCustomer": "Kunde",
+    "seller": "Von",
+    "sellerOrgNumber": "Org.-Nr.",
+    "sellerVatNumber": "USt-IdNr.",
+    "paymentHeading": "Zahlungsinformationen",
+    "bankAccount": "Kontonummer",
+    "paymentReference": "Verwendungszweck",
+    "pdfUnavailableHeading": "PDF noch nicht verfügbar",
+    "pdfUnavailable": "Wir stellen das Rechnungsdokument gerade fertig. Die Beträge unten sind endgültig — melden Sie sich, wenn Sie das PDF sofort brauchen.",
+    "pdfUnavailableDesk": "Das PDF lässt sich erst erzeugen, wenn die Firmendaten von NativeSpin in der Serverumgebung gesetzt sind. Setzen Sie diese Variablen und deployen Sie neu:",
+    "sellerVarMissing": "nicht gesetzt",
+    "sellerVarInvalid": "gesetzt, aber die Prüfziffer stimmt nicht",
+    "pdfPending": "Ansehen"
   },
   "firm": {
     "badge": "Sofortbestellung",
@@ -2367,7 +2385,7 @@
     "planRfqOnly": "Mindestens ein Titel im Plan erfordert ein Angebot — die Sofortbestellung ist deaktiviert, bis der Preis bestätigt ist.",
     "listIndicative": "Listenpreis (indikativ)",
     "listIndicativeHelp": "Indikativer Listenpreis — der endgültige Preis wird nach einem kurzen Briefing bestätigt.",
-    "productionIncluded": "Fertig geschriebener Artikel inklusive",
+    "productionIncluded": "inkl. Artikel",
     "firmTurnaround": "Festpreis in der Regel innerhalb von 24 Stunden"
   },
   "titleAdmin": {

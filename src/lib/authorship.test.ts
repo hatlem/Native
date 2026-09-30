@@ -9,7 +9,9 @@ import {
   writerStaffableLine,
   authorshipForOrderLine,
   contentIntent,
+  defaultContentIntent,
   mergeContentIntent,
+  publisherProducesContent,
   type AuthorshipMode,
 } from "./authorship";
 
@@ -141,4 +143,36 @@ test("mergeContentIntent keeps a content request from either side", () => {
     mergeContentIntent(contentIntent(false, "PUBLISHER_PRODUCED"), off).authorshipMode,
     "PUBLISHER_PRODUCED",
   );
+});
+
+// A catalog/title-page/compare/recommender add starts with "We write it" on:
+// the band the buyer saw includes the article.
+test("defaultContentIntent: a new line is NativeSpin-written by default", () => {
+  assert.deepEqual(defaultContentIntent({ inclusions: null, productionFee: null, title: null }), {
+    withContent: true,
+    authorshipMode: "NATIVESPIN_PRODUCED",
+  });
+  // A title placeholder (no product yet) takes the same default.
+  assert.deepEqual(defaultContentIntent(null), { withContent: true, authorshipMode: "NATIVESPIN_PRODUCED" });
+});
+
+test("defaultContentIntent: where the publisher writes it, content doesn't apply", () => {
+  const publisher = { withContent: false, authorshipMode: "PUBLISHER_PRODUCED" };
+  assert.deepEqual(defaultContentIntent({ inclusions: { production: "PUBLISHER" } }), publisher);
+  // Schema: an explicit 0 production fee = "publisher includes production".
+  assert.deepEqual(defaultContentIntent({ productionFee: 0 }), publisher);
+  assert.deepEqual(defaultContentIntent({ productionFee: null, title: { productionFeeDefault: 0 } }), publisher);
+});
+
+test("publisherProducesContent: an offer-level fee overrides the publication default", () => {
+  assert.equal(publisherProducesContent({ productionFee: 5000, title: { productionFeeDefault: 0 } }), false);
+  assert.equal(publisherProducesContent({ productionFee: null, title: { productionFeeDefault: 3000 } }), false);
+  assert.equal(publisherProducesContent({ inclusions: { production: "ADVERTISER" } }), false);
+});
+
+test("every default intent satisfies withContent ⇔ NATIVESPIN_PRODUCED", () => {
+  for (const src of [null, {}, { productionFee: 0 }, { inclusions: { production: "PUBLISHER" } }]) {
+    const r = defaultContentIntent(src);
+    assert.equal(r.withContent, r.authorshipMode === "NATIVESPIN_PRODUCED");
+  }
 });

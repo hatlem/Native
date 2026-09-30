@@ -9,7 +9,7 @@ import { readActiveListId, ensureActiveListId, loadListWithItems, committedItems
 import { alignActivePlan, refusalNotice, resolvePlanTarget } from "@/lib/plan-target";
 import { planPath } from "@/lib/plan-path";
 import { saveListBrief } from "@/lib/plan-brief";
-import { isProductPriceShown } from "@/lib/pricing-visibility";
+import { isInstantOrderable } from "@/lib/pricing/visibility";
 import { withWaveAngle } from "@/lib/programme";
 import {
   createFirmOrder,
@@ -222,9 +222,7 @@ export async function submitRequest(formData: FormData) {
     items.length > 0 &&
     items.every((i) => {
       const product = byId.get(i.productId);
-      if (!product) return false;
-      if (product.visibility !== "FIRM") return false;
-      return isProductPriceShown(product, product.title);
+      return !!product && isInstantOrderable(product, product.title);
     });
 
   // Commit gate: the all-firm path creates a CONFIRMED order immediately —

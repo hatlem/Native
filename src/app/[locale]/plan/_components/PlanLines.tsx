@@ -4,6 +4,8 @@ import type { ReactNode } from "react";
 import type { Prisma } from "@prisma/client";
 import { Link } from "@/i18n/navigation";
 import { formatMoney, intlLocale } from "@/lib/money";
+import { bandLabel } from "@/lib/pricing/bands";
+import { lineSortValue, type LineDisplay } from "@/lib/plan-total";
 import { titleDisplayName } from "@/lib/title-display";
 import { removeFromPlan, setQuantity, setContentProduction, setLineNote, setLineAlternative } from "@/app/plan-actions";
 import { LINE_NOTE_MAX } from "@/lib/line-note";
@@ -25,13 +27,11 @@ export type PlanLine = {
   itemId: string;
   product: PlanProduct;
   quantity: number;
-  priceVisible: boolean;
   withContent: boolean;
-  // lib/plan-total.ts linePrice(): lineTotal = placementTotal + contentFee —
-  // the figure the summary total adds up. All 0 when the price isn't shown.
-  placementTotal: number;
-  contentFee: number;
-  lineTotal: number;
+  // lib/plan-total.ts lineDisplay(): the exact figure (instant-orderable
+  // lines: placement + content fee, what the summary adds up), the price band
+  // (every other shown price), the unit rate (CPM/CPC) or "on request".
+  display: LineDisplay;
   // Product deactivated since it was added — flagged so the buyer removes it
   // (submit refuses while it's present, instead of silently dropping it).
   unavailable: boolean;
@@ -58,6 +58,10 @@ export type PlanTitleLine = {
   // placeholder first).
   publisherName: string;
   quantity: number;
+  // "We write it" on the placeholder: carried onto the RFQ so the desk quotes
+  // the article with the placement it proposes, and onto the product line
+  // when the buyer resolves it.
+  withContent: boolean;
   placements: { id: string; label: string }[];
   notes: string | null;
   isAlternative: boolean;
@@ -81,32 +85,112 @@ function periodLabel(
 }
 
 // The transparency the single total figure lacks: what the line total is
-// actually made of. The parts come from lib/plan-total.ts linePrice() (the
-// rule the order prices with), so they always add up to the line total shown
-// beside them; the breakdown explains the figure, never adds to it. The
+// actually made of. For an exact line the parts come from lib/plan-total.ts
+// (the rule the order prices with), so they always add up to the line total
+// shown beside them; the breakdown explains the figure, never adds to it. The
 // content fee is charged once per line: one article, used for every run.
-function breakdown(l: PlanLine, locale: string, t: Awaited<ReturnType<typeof getTranslations>>): string {
-  if (!l.priceVisible) return t("breakdownUnpriced");
+//
+// A banded line gets no exact parts — they would give away the figure the band
+// stands in for — only what the band covers: the quantity and whether the
+// article is in it.
+function breakdown(
+  l: PlanLine,
+  locale: string,
+  t: Awaited<ReturnType<typeof getTranslations>>,
+  tv: Awaited<ReturnType<typeof getTranslations>>,
+): string {
+  const d = l.display;
+  if (d.kind === "onRequest") return t("breakdownUnpriced");
+  if (d.kind === "rate") return tv("listIndicative");
+  if (d.kind === "band") {
+    const parts = [
+      l.quantity > 1 ? t("breakdownPlacements", { n: l.quantity }) : null,
+      d.withContent ? tv("productionIncluded") : null,
+      tv("listIndicative"),
+    ];
+    return parts.filter(Boolean).join(" · ");
+  }
   const money = (n: number) => formatMoney(n, l.product.currency, locale);
-  if (l.withContent && l.contentFee > 0) {
+  if (l.withContent && d.contentFee > 0) {
     return l.quantity > 1
       ? t("breakdownQtyWithArticleFee", {
           n: l.quantity,
-          unit: money(l.placementTotal / l.quantity),
-          article: money(l.contentFee),
+          unit: money(d.placement / l.quantity),
+          article: money(d.contentFee),
         })
-      : t("breakdownWithArticle", { placement: money(l.placementTotal), article: money(l.contentFee) });
+      : t("breakdownWithArticle", { placement: money(d.placement), article: money(d.contentFee) });
   }
   if (l.withContent) {
     // "We write it" with no fee rule: production is included in the price.
     return l.quantity > 1
-      ? t("breakdownQtyWithArticle", { n: l.quantity, unit: money(l.placementTotal / l.quantity) })
+      ? t("breakdownQtyWithArticle", { n: l.quantity, unit: money(d.placement / l.quantity) })
       : t("breakdownArticleIncluded");
   }
   if (l.quantity > 1) {
-    return t("breakdownQty", { n: l.quantity, unit: money(l.placementTotal / l.quantity) });
+    return t("breakdownQty", { n: l.quantity, unit: money(d.placement / l.quantity) });
   }
   return "";
+}
+
+// The line's figure, by kind: exact money, "≈ 40–60k NOK", "≈ 395 NOK CPM" or
+// "Contact for price".
+function LineFigure({
+  l,
+  locale,
+  onRequest,
+}: {
+  l: PlanLine;
+  locale: string;
+  onRequest: string;
+}) {
+  const d = l.display;
+  const currency = l.product.currency;
+  switch (d.kind) {
+    case "exact":
+      return <span className="plan-line-card__total">{formatMoney(d.total, currency, locale)}</span>;
+    case "band":
+      return <span className="plan-line-card__total">≈ {bandLabel(d.band, currency)}</span>;
+    case "rate":
+      return (
+        <span className="plan-line-card__total">
+          ≈ {d.rate} {currency} {d.unit}
+        </span>
+      );
+    case "onRequest":
+      return <span className="plan-line-card__total plan-line-card__total--muted">{onRequest}</span>;
+  }
+}
+
+// "We write it": a real submit <button>, not an <input type="checkbox"> — this
+// file is server-only (form actions, no client JS), and a genuine checkbox
+// would need an onChange handler to submit on click. Styled with a
+// checkbox-shaped indicator instead. Lines added from the catalog start with it
+// on (the catalog band includes the article — lib/authorship.ts); this is
+// where the buyer switches it off.
+function WriteToggle({
+  locale,
+  itemId,
+  withContent,
+  label,
+}: {
+  locale: string;
+  itemId: string;
+  withContent: boolean;
+  label: string;
+}) {
+  return (
+    <form action={setContentProduction}>
+      <input type="hidden" name="locale" value={locale} />
+      <input type="hidden" name="itemId" value={itemId} />
+      <input type="hidden" name="withContent" value={withContent ? "0" : "1"} />
+      <button type="submit" className="plan-line-card__write-check" aria-pressed={withContent}>
+        <span className="plan-line-card__write-check-box" aria-hidden="true">
+          {withContent ? "✓" : ""}
+        </span>
+        {label}
+      </button>
+    </form>
+  );
 }
 
 // How many start periods the inline date picker offers (months or weeks).
@@ -290,7 +374,7 @@ export async function PlanLines({
       id: l.itemId,
       title: titleDisplayName(l.product.title),
       publisher: l.product.title.publisher.name,
-      price: l.priceVisible ? l.lineTotal : null,
+      price: lineSortValue(l.display),
     },
     node,
   });
@@ -306,21 +390,21 @@ export async function PlanLines({
     ...lines.map((l) => {
       const reach = l.product.title.digitalReach ?? l.product.title.monthlyReach ?? null;
       const period = periodLabel(l, tCampaign, locale);
-      const isFirm = l.product.visibility === "FIRM";
+      const needsPrice = l.display.kind === "onRequest";
       return productEntry(
         l,
         <div
           className={`plan-line-card${l.unavailable ? " plan-line-card--unavailable" : ""}${
-            !l.priceVisible ? " plan-line-card--needs-price" : ""
+            needsPrice ? " plan-line-card--needs-price" : ""
           }`}
           key={l.itemId}
         >
           <div className="plan-line-card__main">
             <div className="plan-line-card__title-row">
               <span className="plan-line-card__title">{titleDisplayName(l.product.title)}</span>
-              {!l.priceVisible ? (
+              {needsPrice ? (
                 <span className="badge badge-warning dotless plan-line-card__pill">{t("needsPrice")}</span>
-              ) : isFirm ? (
+              ) : l.display.kind === "exact" ? (
                 <span className="badge badge-success dotless plan-line-card__pill">⚡ {t("instantBook")}</span>
               ) : null}
             </div>
@@ -374,34 +458,12 @@ export async function PlanLines({
           </div>
 
           <div className="plan-line-card__price">
-            {l.priceVisible ? (
-              <span className="plan-line-card__total">{formatMoney(l.lineTotal, l.product.currency, locale)}</span>
-            ) : (
-              <span className="plan-line-card__total plan-line-card__total--muted">{tv("requestPrice")}</span>
-            )}
-            <span className="plan-line-card__breakdown">{breakdown(l, locale, t)}</span>
+            <LineFigure l={l} locale={locale} onRequest={tv("requestPrice")} />
+            <span className="plan-line-card__breakdown">{breakdown(l, locale, t, tv)}</span>
           </div>
 
           <div className="plan-line-card__actions">
-            <form action={setContentProduction}>
-              <input type="hidden" name="locale" value={locale} />
-              <input type="hidden" name="itemId" value={l.itemId} />
-              <input type="hidden" name="withContent" value={l.withContent ? "0" : "1"} />
-              {/* A real submit <button>, not an <input type="checkbox"> — this
-                  file is server-only (form actions, no client JS), and a
-                  genuine checkbox would need an onChange handler to submit
-                  on click. Styled with a checkbox-shaped indicator instead. */}
-              <button
-                type="submit"
-                className="plan-line-card__write-check"
-                aria-pressed={l.withContent}
-              >
-                <span className="plan-line-card__write-check-box" aria-hidden="true">
-                  {l.withContent ? "✓" : ""}
-                </span>
-                {t("weWriteIt")}
-              </button>
-            </form>
+            <WriteToggle locale={locale} itemId={l.itemId} withContent={l.withContent} label={t("weWriteIt")} />
             <AlternativeToggle
               locale={locale}
               itemId={l.itemId}
@@ -418,7 +480,7 @@ export async function PlanLines({
             </form>
           </div>
 
-          {!l.priceVisible ? (
+          {needsPrice ? (
             <div className="plan-line-card__price-note">{t("needsPriceNote")}</div>
           ) : null}
         </div>,
@@ -465,6 +527,9 @@ export async function PlanLines({
             <span className="plan-line-card__total plan-line-card__total--muted">{tv("requestPrice")}</span>
           </div>
           <div className="plan-line-card__actions">
+            {/* The desk quotes the article with the placement it proposes, so
+                the placeholder carries the same "We write it" choice. */}
+            <WriteToggle locale={locale} itemId={tl.itemId} withContent={tl.withContent} label={t("weWriteIt")} />
             <AlternativeToggle
               locale={locale}
               itemId={tl.itemId}
@@ -501,11 +566,7 @@ export async function PlanLines({
             <LineNote locale={locale} itemId={l.itemId} notes={l.notes} t={t} />
           </div>
           <div className="plan-line-card__price">
-            {l.priceVisible ? (
-              <span className="plan-line-card__total">{formatMoney(l.lineTotal, l.product.currency, locale)}</span>
-            ) : (
-              <span className="plan-line-card__total plan-line-card__total--muted">{tv("requestPrice")}</span>
-            )}
+            <LineFigure l={l} locale={locale} onRequest={tv("requestPrice")} />
           </div>
           <div className="plan-line-card__actions">
             <AlternativeToggle

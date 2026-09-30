@@ -4,6 +4,7 @@ import type { InvoicePdfData } from "./invoice-pdf-data";
 import { qt as t, type QuoteMessages } from "./quote-messages";
 import { paymentTermsLine } from "@/lib/payment-terms-text";
 import { PDF_FONT_FAMILY } from "./fonts";
+import { sellerAddressLines, type SellerDetails } from "@/lib/seller";
 
 // Customer-facing invoice document. Visual language matches QuoteDocument
 // so a buyer's quote and invoice read as one set.
@@ -49,6 +50,11 @@ const styles = StyleSheet.create({
     borderRadius: 3,
   },
   creditHeading: { fontSize: 9, fontWeight: 700, marginBottom: 2 },
+  seller: { alignItems: "flex-end", fontSize: 8, color: "#444", lineHeight: 1.35 },
+  sellerName: { fontSize: 9, fontWeight: 700, color: "#1a1a1a" },
+  payment: { marginTop: 16, padding: 8, border: "0.5pt solid #ddd", borderRadius: 3 },
+  paymentHeading: { fontSize: 7, color: "#666", textTransform: "uppercase", marginBottom: 3 },
+  paymentText: { fontSize: 9, marginBottom: 1 },
   creditText: { fontSize: 8.5, color: "#444", lineHeight: 1.4 },
   footer: {
     position: "absolute",
@@ -68,22 +74,58 @@ function formatDate(date: Date, locale: string): string {
   return new Intl.DateTimeFormat(intlLocale(locale), { dateStyle: "medium" }).format(date);
 }
 
+// The seller's registration line: "Org.nr. 974 760 673 MVA · Foretaksregisteret".
+function registrationLine(seller: SellerDetails, messages: QuoteMessages): string {
+  return [
+    seller.orgNumber ? `${t(messages, "sellerOrgNumber")} ${seller.orgNumber}` : null,
+    seller.registry,
+  ]
+    .filter(Boolean)
+    .join(" · ");
+}
+
+// The render route only calls this with a seller that passed sellerGaps()
+// for the invoice's currency (lib/seller.ts) — a legally complete invoice.
 export function InvoiceDocument({
   data,
+  seller,
   locale,
   messages,
 }: {
   data: InvoicePdfData;
+  seller: SellerDetails;
   locale: string;
   messages: QuoteMessages;
 }) {
   const money = (amount: number) => formatMoney(amount, data.currency, locale);
+  // A NOK invoice shows the domestic account (when set); IBAN + BIC follow
+  // for everyone else — sellerGaps() guarantees them on non-NOK invoices.
+  const domestic = data.currency === "NOK" && !!seller.bankAccount;
 
   return (
     <Document title={t(messages, "documentTitle", { number: data.number })}>
       <Page size="A4" style={styles.page}>
-        <Text style={styles.brand}>NativeSpin</Text>
-        <Text style={styles.brandSub}>nativespin.com</Text>
+        <View style={styles.headRow}>
+          <View>
+            <Text style={styles.brand}>NativeSpin</Text>
+            <Text style={styles.brandSub}>nativespin.com</Text>
+          </View>
+          {/* The seller of record — name, address and registration, as a
+              Norwegian sales document must state them. */}
+          <View style={styles.seller}>
+            <Text style={styles.sellerName}>{seller.legalName}</Text>
+            {sellerAddressLines(seller).map((line, i) => (
+              <Text key={i}>{line}</Text>
+            ))}
+            <Text>{registrationLine(seller, messages)}</Text>
+            {seller.vatNumber ? (
+              <Text>
+                {t(messages, "sellerVatNumber")} {seller.vatNumber}
+              </Text>
+            ) : null}
+            {seller.email ? <Text>{seller.email}</Text> : null}
+          </View>
+        </View>
         <Text style={styles.docTitle}>{t(messages, "documentTitle", { number: data.number })}</Text>
 
         <View style={styles.headRow}>
@@ -162,6 +204,20 @@ export function InvoiceDocument({
           <Text style={styles.terms}>{paymentTermsLine(locale, data.paymentTermsDays)}</Text>
         ) : null}
 
+        <View style={styles.payment} wrap={false}>
+          <Text style={styles.paymentHeading}>{t(messages, "paymentHeading")}</Text>
+          {domestic ? (
+            <Text style={styles.paymentText}>
+              {t(messages, "bankAccount")}: {seller.bankAccount}
+            </Text>
+          ) : null}
+          {seller.iban ? <Text style={styles.paymentText}>IBAN: {seller.iban}</Text> : null}
+          {seller.bic ? <Text style={styles.paymentText}>BIC/SWIFT: {seller.bic}</Text> : null}
+          <Text style={styles.paymentText}>
+            {t(messages, "paymentReference")}: {data.number}
+          </Text>
+        </View>
+
         {data.credit ? (
           <View style={styles.credit}>
             <Text style={styles.creditHeading}>{t(messages, "creditedHeading")}</Text>
@@ -178,7 +234,11 @@ export function InvoiceDocument({
         ) : null}
 
         <View style={styles.footer} fixed>
-          <Text>{data.customer.name}</Text>
+          <Text>
+            {[seller.legalName, seller.orgNumber ? `${t(messages, "sellerOrgNumber")} ${seller.orgNumber}` : null]
+              .filter(Boolean)
+              .join(" · ")}
+          </Text>
           <Text
             render={({ pageNumber, totalPages }) =>
               t(messages, "pageOf", { page: pageNumber, pages: totalPages })

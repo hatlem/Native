@@ -28,7 +28,7 @@ import {
   migrateLegacyBasket,
   resolveActiveList,
 } from "@/lib/lists";
-import { barTotals, planLineCount, type BarTotal } from "@/lib/plan-total";
+import { barTotals, planLineCount, type TotalFigure } from "@/lib/plan-total";
 import { loadPricingDefaults } from "@/lib/content-fee";
 import { enableListShare, disableListShare } from "@/lib/list-share";
 import { normalizeLineNote } from "@/lib/line-note";
@@ -125,7 +125,10 @@ export async function addProductToList(formData: FormData) {
     });
     if (valid) {
       const { listId } = await activeList(locale, str(formData, "listId"));
-      await addProductItem(listId, productId, str(formData, "withContent") === "1");
+      // A form that offers the choice posts "1"/"0"; one that doesn't (the
+      // catalog, title page, recommenders) leaves it to the add default.
+      const posted = str(formData, "withContent");
+      await addProductItem(listId, productId, posted === "" ? undefined : posted === "1");
       if (!str(formData, "returnTo")) redirect(planPath(locale, listId));
     }
   }
@@ -137,7 +140,7 @@ export async function addProductToList(formData: FormData) {
 // It used to add each row's raw net basePrice (shipped to the client for
 // every priced title — our publisher cost, un-marked-up) to its total.
 export type ShortlistAddResult =
-  | { ok: true; listId: string; count: number; totals: BarTotal[] }
+  | { ok: true; listId: string; count: number; totals: TotalFigure[] }
   | { ok: false; reason: "signin" | "no-client" | "invalid-product" };
 
 // Client-invoked counterpart to addProductToList: same validation and
@@ -149,9 +152,12 @@ export type ShortlistAddResult =
 // failure, which is exactly the behavior this needs to not have, and
 // duplicating a few lines here is safer than changing a helper several
 // other (redirecting) actions in this file depend on.
+//
+// No "We write it" argument: the catalog row offers no choice, so the new
+// line takes the add default (on — the band it showed includes the article;
+// lib/authorship.ts defaultContentIntent). The buyer switches it off on /plan.
 export async function addProductToActiveList(
   productId: string,
-  withContent: boolean,
   locale: string,
 ): Promise<ShortlistAddResult> {
   const scope = await loadScope();
@@ -178,7 +184,7 @@ export async function addProductToActiveList(
   }
   const listId = await ensureActiveListId(orgId, activeId, scope.userId, (await listNames(locale)).untitled);
   await writeActiveListId(listId);
-  await addProductItem(listId, productId, withContent);
+  await addProductItem(listId, productId);
   revalidatePath(`/${locale}/plan`, "layout");
   revalidatePath(`/${locale}/requests`);
   const list = await resolveActiveList(orgId, listId);

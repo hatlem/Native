@@ -4,7 +4,7 @@ import { Link } from "@/i18n/navigation";
 import { intlLocale } from "@/lib/money";
 import { isProductPriceShown } from "@/lib/pricing/visibility";
 import { bandLabel } from "@/lib/pricing/bands";
-import { titleBand, titleRate } from "@/lib/pricing/display-price";
+import { bandIncludesArticle, titleBand, titleRate } from "@/lib/pricing/display-price";
 import { loadPricingDefaults } from "@/lib/content-fee";
 import { titleDisplayName } from "@/lib/title-display";
 import { EmptyState } from "@/app/empty-state";
@@ -79,6 +79,8 @@ export async function CatalogResults({
     // confirmed pricing — show the cheapest unit rate instead of a
     // misleading "Contact for price".
     const fromRate = fromBand ? null : titleRate(title.products, title, pricing);
+    // "incl. article" beside the band — the one rule every band surface uses.
+    const bandWithArticle = fromBand ? bandIncludesArticle(fromBand.product, title, pricing) : false;
     const needsQuote = title.products.length === 0;
     const hasPrice = Boolean(fromBand || fromRate);
     const instantBook = visibleProducts.some((p) => p.visibility === "FIRM");
@@ -102,6 +104,7 @@ export async function CatalogResults({
       visibleProducts,
       anyHidden,
       fromBand,
+      bandWithArticle,
       fromRate,
       needsQuote,
       hasPrice,
@@ -165,6 +168,7 @@ type Row = {
   visibleProducts: CatalogTitleRow["products"];
   anyHidden: boolean;
   fromBand: ReturnType<typeof titleBand>;
+  bandWithArticle: boolean;
   fromRate: ReturnType<typeof titleRate>;
   needsQuote: boolean;
   hasPrice: boolean;
@@ -201,7 +205,8 @@ function CatalogListRow({
   listMembership: Record<string, string[]>;
   noOrg: boolean;
 }) {
-  const { title, fromBand, fromRate, hasPrice, instantBook, addableProduct, articleState, reach } = row;
+  const { title, fromBand, bandWithArticle, fromRate, hasPrice, instantBook, addableProduct, articleState, reach } =
+    row;
   const description = title.description
     ? title.description.length > 160
       ? `${title.description.slice(0, 160)}…`
@@ -255,7 +260,12 @@ function CatalogListRow({
             <div className="catalog-row__amount">
               ≈ {bandLabel(fromBand.band, fromBand.product.currency)}
             </div>
-            <div className="catalog-row__price-note">{tv("listIndicative")}</div>
+            {/* The band is all-in (display-price.ts customerPrice adds the
+                production fee), so it says so — as every band surface does. */}
+            <div className="catalog-row__price-note">
+              {bandWithArticle ? `${tv("productionIncluded")} · ` : ""}
+              {tv("listIndicative")}
+            </div>
           </>
         ) : fromRate ? (
           <>
@@ -303,7 +313,6 @@ function CatalogListRow({
           <ShortlistButton
             productId={addableProduct.id}
             titleName={titleDisplayName(title)}
-            withContent={false}
             hasPrice={hasPrice}
             addLabel={tr("addToPlan")}
             addedLabel={tr("onPlan")}
@@ -346,7 +355,7 @@ function CatalogCard({
   listMembership: Record<string, string[]>;
   noOrg: boolean;
 }) {
-  const { title, visibleProducts, anyHidden, fromBand, fromRate, needsQuote, reach } = row;
+  const { title, visibleProducts, anyHidden, fromBand, bandWithArticle, fromRate, needsQuote, reach } = row;
   return (
     <article className="card catalog-card">
       <TitleSelector id={title.id} name={titleDisplayName(title)} />
@@ -413,7 +422,7 @@ function CatalogCard({
               · {tv("listIndicative")}
             </span>
           </div>
-          <div className="muted">✓ {tv("productionIncluded")}</div>
+          {bandWithArticle ? <div className="muted">✓ {tv("productionIncluded")}</div> : null}
         </>
       ) : fromRate ? (
         <div className="price">
