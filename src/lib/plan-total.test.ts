@@ -4,9 +4,12 @@ import {
   barTotals,
   contentFeeFor,
   estimateListTotals,
+  lineDisplay,
   linePrice,
+  lineSortValue,
   placementLineTotal,
   planLineCount,
+  sumTotalFigures,
   type PlanPricing,
 } from "./plan-total";
 import {
@@ -16,6 +19,10 @@ import {
   type ContentFeeRuleSpec,
 } from "./money";
 import type { UnsentList } from "./lists";
+import { defaultContentIntent } from "./authorship";
+import { customerPrice, productBand } from "./pricing/display-price";
+import { contentFeeLinesFor } from "./pricing/production-fee";
+import { priceBand } from "./pricing/bands";
 
 type FakeItem = UnsentList["items"][number];
 
@@ -41,6 +48,8 @@ function fakeItem(overrides: {
   marketCode?: string;
   vatRatePct?: number;
   priceRules?: { marginPct: number; seasonalMultiplier: number; minVolume: number }[];
+  visibility?: "FIRM" | "INDICATIVE";
+  pricingModel?: "FLAT" | "CPM" | "CPC";
 }): FakeItem {
   const {
     productId = "prod-1",
@@ -55,6 +64,10 @@ function fakeItem(overrides: {
     marketCode = "NO",
     vatRatePct = 25,
     priceRules = [],
+    // FIRM by default: the arithmetic tests below are about the exact figure,
+    // which only an instant-orderable line shows. Banding has its own tests.
+    visibility = "FIRM",
+    pricingModel = "FLAT",
   } = overrides;
   return {
     productId,
@@ -67,8 +80,11 @@ function fakeItem(overrides: {
           basePrice,
           active,
           confirmedAt,
+          visibility,
+          pricingModel,
+          productionFee: null,
           priceRules,
-          title: { pricesPublic, publisher: null, market: { code: marketCode, vatRatePct } },
+          title: { pricesPublic, publisher: null, productionFeeDefault: null, market: { code: marketCode, vatRatePct } },
         }
       : null,
   } as unknown as FakeItem;
@@ -84,8 +100,8 @@ test("sums visible-price lines into a single currency total", () => {
   assert.equal(totals[0].currency, "NOK");
   // Default 15 % margin, rounded per line like the order: 2 300 + 575.
   assert.equal(totals[0].amount, 2875);
-  assert.equal(totals[0].hasHidden, false);
-  assert.equal(totals[0].hasVisible, true);
+  assert.equal(totals[0].hasOnRequest, false);
+  assert.equal(totals[0].hasExact, true);
 });
 
 test("splits totals by currency", () => {
@@ -103,15 +119,15 @@ test("a hidden-price line registers its currency without adding to amount", () =
   const totals = estimateListTotals(items, NO_PRICING);
   assert.equal(totals.length, 1);
   assert.equal(totals[0].amount, 0);
-  assert.equal(totals[0].hasHidden, true);
-  assert.equal(totals[0].hasVisible, false);
+  assert.equal(totals[0].hasOnRequest, true);
+  assert.equal(totals[0].hasExact, false);
 });
 
 test("an unconfirmed product counts as hidden, not visible", () => {
   const items = [fakeItem({ confirmedAt: null })];
   const totals = estimateListTotals(items, NO_PRICING);
   assert.equal(totals[0].amount, 0);
-  assert.equal(totals[0].hasHidden, true);
+  assert.equal(totals[0].hasOnRequest, true);
 });
 
 test("a title placeholder line (no product) is skipped entirely", () => {
@@ -218,8 +234,82 @@ test("placementLineTotal and contentFeeFor expose the per-line figures", () => {
   const product = { basePrice: 1000, priceRules: [], title: { market: { code: "NO" } } };
   assert.equal(placementLineTotal(product, 2, []), 2300);
   assert.equal(placementLineTotal(product, 2, [{ marketCode: "NO", marginPct: 10, active: true }]), 2200);
-  assert.equal(contentFeeFor("NATIVE_DISPLAY", "NO", NO_FEES), 8000);
-  assert.equal(contentFeeFor("NATIVE_DISPLAY", "SE", NO_FEES), 0);
+  assert.equal(contentFeeFor({ type: "NATIVE_DISPLAY" }, "NO", NO_FEES), 8000);
+  assert.equal(contentFeeFor({ type: "NATIVE_DISPLAY" }, "SE", NO_FEES), 0);
+});
+
+test("contentFeeFor follows the cascade: offer fee, then publication fee, then the desk rule", () => {
+  assert.equal(contentFeeFor({ type: "NATIVE_ARTICLE", productionFee: 5000 }, "NO", NO_FEES), 5000);
+  assert.equal(
+    contentFeeFor({ type: "NATIVE_ARTICLE", productionFee: null, title: { productionFeeDefault: 4000 } }, "NO", NO_FEES),
+    4000,
+  );
+  // Explicit 0 = the publisher includes production: no fee, not the rule's.
+  assert.equal(contentFeeFor({ type: "NATIVE_ARTICLE", productionFee: 0 }, "NO", NO_FEES), 0);
+});
+
+// BUG-buyer-plan-r2-2: the catalog showed Aftenposten's Native display as
+// "≈ 25–40k NOK, article included" while the plan and the instant order
+// charged 17 741 kr without an article. The band, the plan line (with the
+// catalog-add "We write it" default) and the order must price the same thing
+// with the same helpers — and the band must contain that price.
+test("the catalog band contains the plan line and the order total for the same product + content choice", () => {
+  const pricing: PlanPricing = {
+    feeRules: NO_FEES,
+    marginRules: [{ marketCode: "NO", marginPct: 20, active: true }],
+  };
+  const cases = [
+    { type: "NATIVE_DISPLAY", basePrice: 14784, productionFee: null, productionFeeDefault: null },
+    { type: "NATIVE_ARTICLE", basePrice: 30500, productionFee: null, productionFeeDefault: null },
+    { type: "NATIVE_ARTICLE", basePrice: 30500, productionFee: 3000, productionFeeDefault: null },
+    { type: "ADVERTORIAL", basePrice: 21240, productionFee: null, productionFeeDefault: 6500 },
+    { type: "NATIVE_ARTICLE", basePrice: 30500, productionFee: 0, productionFeeDefault: null },
+    { type: "NATIVE_ARTICLE", basePrice: 30500, productionFee: null, productionFeeDefault: null, publisherWrites: true },
+  ];
+  for (const c of cases) {
+    const title = {
+      pricesPublic: true,
+      publisher: null,
+      productionFeeDefault: c.productionFeeDefault,
+      market: { code: "NO", vatRatePct: 25 },
+    };
+    const product = {
+      id: "p",
+      name: "p",
+      type: c.type,
+      currency: "NOK",
+      basePrice: c.basePrice,
+      active: true,
+      confirmedAt: new Date("2026-01-01"),
+      visibility: "FIRM",
+      pricingModel: "FLAT",
+      productionFee: c.productionFee,
+      inclusions: c.publisherWrites ? { production: "PUBLISHER" } : null,
+      priceRules: [],
+      title,
+    };
+    // The line a catalog add creates: "We write it" per the add default.
+    const intent = defaultContentIntent(product);
+    const item = { productId: "p", quantity: 1, withContent: intent.withContent, product } as unknown as FakeItem;
+
+    const band = productBand(product, title, pricing);
+    const plan = linePrice(item, pricing);
+    assert.ok(band && plan, c.type);
+    const order = [
+      ...computeQuoteLines([{ productId: "p", name: "p", quantity: 1, basePrice: c.basePrice, rules: [] }], 20),
+      ...contentFeeLinesFor(
+        [{ productId: "p", withContent: intent.withContent, authorshipMode: intent.authorshipMode }],
+        new Map([["p", product]]),
+        "NO",
+        NO_FEES,
+      ),
+    ].reduce((sum, l) => sum + l.lineTotal, 0);
+
+    const label = JSON.stringify(c);
+    assert.equal(plan.total, order, `plan = order for ${label}`);
+    assert.equal(customerPrice(product, title, pricing), plan.total, `band basis = plan for ${label}`);
+    assert.deepEqual(priceBand(plan.total, "NOK"), band, `band contains the plan price for ${label}`);
+  }
 });
 
 // BUG-prod-api-10: "We write it" showed "17 250 placement + 2 000 article"
@@ -270,7 +360,106 @@ test("barTotals: server-priced totals, nothing for a currency with no priced lin
     fakeItem({ basePrice: 15000, withContent: true }),
     fakeItem({ currency: "SEK", confirmedAt: null }),
   ];
-  assert.deepEqual(barTotals(items, pricing), [{ currency: "NOK", amount: 29250, itemCount: 1 }]);
+  assert.deepEqual(barTotals(items, pricing), [
+    { currency: "NOK", amount: 29250, hasExact: true, estimate: null, itemCount: 1 },
+  ]);
+});
+
+// ── Exact vs band: the price-display rule before a quote ───────────────────
+
+test("lineDisplay: an instant-orderable (FIRM, shown) line is exact", () => {
+  const pricing: PlanPricing = { feeRules: NO_FEES, marginRules: [] };
+  assert.deepEqual(lineDisplay(fakeItem({ basePrice: 15000, withContent: true }), pricing), {
+    kind: "exact",
+    placement: 17250,
+    contentFee: 12000,
+    total: 29250,
+  });
+});
+
+test("lineDisplay: a shown INDICATIVE line is its band, never the figure", () => {
+  const pricing: PlanPricing = { feeRules: NO_FEES, marginRules: [] };
+  // 17 250 + 12 000 article = 29 250 → the 25–40k NOK band, article included.
+  const d = lineDisplay(fakeItem({ basePrice: 15000, withContent: true, visibility: "INDICATIVE" }), pricing);
+  assert.deepEqual(d, {
+    kind: "band",
+    band: { kind: "range", low: 25000, high: 40000 },
+    range: { low: 25000, high: 40000 },
+    withContent: true,
+  });
+  // Switching "We write it" off drops the article from the band too.
+  const off = lineDisplay(fakeItem({ basePrice: 15000, visibility: "INDICATIVE" }), pricing);
+  assert.equal(off.kind, "band");
+  assert.deepEqual(off.kind === "band" && off.band, { kind: "range", low: 15000, high: 25000 });
+});
+
+test("lineDisplay: a FIRM line whose price is hidden is on request, not exact", () => {
+  assert.deepEqual(lineDisplay(fakeItem({ pricesPublic: false }), NO_PRICING), { kind: "onRequest" });
+  assert.deepEqual(lineDisplay(fakeItem({ confirmedAt: null }), NO_PRICING), { kind: "onRequest" });
+  assert.deepEqual(lineDisplay(fakeItem({ productId: null }), NO_PRICING), { kind: "onRequest" });
+});
+
+test("lineDisplay: an INDICATIVE CPM line shows its rate, never a band", () => {
+  const d = lineDisplay(fakeItem({ basePrice: 300, pricingModel: "CPM", visibility: "INDICATIVE" }), NO_PRICING);
+  // 300 × 1.15 = 345 → rounded to the nearest 5.
+  assert.deepEqual(d, { kind: "rate", rate: 345, unit: "CPM" });
+});
+
+test("lineSortValue: exact figure for exact lines, the band's middle for banded ones", () => {
+  assert.equal(lineSortValue({ kind: "exact", placement: 100, contentFee: 0, total: 100 }), 100);
+  assert.equal(
+    lineSortValue({
+      kind: "band",
+      band: { kind: "range", low: 25000, high: 40000 },
+      range: { low: 25000, high: 40000 },
+      withContent: false,
+    }),
+    32500,
+  );
+  assert.equal(lineSortValue({ kind: "onRequest" }), null);
+});
+
+test("a mixed plan totals the firm lines exactly and bands the rest", () => {
+  const pricing: PlanPricing = { feeRules: NO_FEES, marginRules: [] };
+  const firm = fakeItem({ productId: "firm", basePrice: 15000 }); // 17 250 exact
+  const banded = fakeItem({ productId: "ind", basePrice: 30000, visibility: "INDICATIVE" }); // 34 500 → 25–40k
+  const top = fakeItem({ productId: "top", basePrice: 90000, visibility: "INDICATIVE" }); // 103 500 → 90k+
+  const hidden = fakeItem({ productId: "hid", confirmedAt: null });
+
+  const [mixed] = estimateListTotals([firm, banded], pricing);
+  assert.equal(mixed.amount, 17250);
+  assert.equal(mixed.hasExact, true);
+  assert.deepEqual(mixed.estimate, { low: 25000, high: 40000 });
+  // VAT is exact arithmetic on the exact part only.
+  assert.equal(mixed.totalInclVat, Math.round(17250 * 1.25));
+  assert.equal(mixed.itemCount, 2);
+
+  const [open] = estimateListTotals([banded, top, hidden], pricing);
+  assert.equal(open.hasExact, false);
+  assert.equal(open.amount, 0);
+  assert.deepEqual(open.estimate, { low: 115000, high: null });
+  assert.equal(open.hasOnRequest, true);
+});
+
+test("barTotals never carries a banded line's exact estimate", () => {
+  const items = [fakeItem({ basePrice: 30000, visibility: "INDICATIVE" })];
+  assert.deepEqual(barTotals(items, NO_PRICING), [
+    { currency: "NOK", amount: 0, hasExact: false, estimate: { low: 25000, high: 40000 }, itemCount: 1 },
+  ]);
+});
+
+test("sumTotalFigures adds exact parts and band ranges per currency", () => {
+  const sum = sumTotalFigures([
+    [{ currency: "NOK", amount: 1000, hasExact: true, estimate: { low: 15000, high: 25000 }, itemCount: 2 }],
+    [
+      { currency: "NOK", amount: 0, hasExact: false, estimate: { low: 0, high: 15000 }, itemCount: 1 },
+      { currency: "SEK", amount: 500, hasExact: true, estimate: null, itemCount: 1 },
+    ],
+  ]);
+  assert.deepEqual(sum, [
+    { currency: "NOK", amount: 1000, hasExact: true, estimate: { low: 15000, high: 40000 }, itemCount: 3 },
+    { currency: "SEK", amount: 500, hasExact: true, estimate: null, itemCount: 1 },
+  ]);
 });
 
 test("estimateListTotals is exactly the sum of the linePrice totals", () => {

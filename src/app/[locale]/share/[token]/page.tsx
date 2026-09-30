@@ -7,7 +7,9 @@ import { approveSharedPlan } from "@/app/share-actions";
 import { formatMoney, intlLocale } from "@/lib/money";
 import { titleDisplayName } from "@/lib/title-display";
 import { loadPricingDefaults } from "@/lib/content-fee";
-import { estimateListTotals, linePrice } from "@/lib/plan-total";
+import { estimateListTotals, hasFigure, lineDisplay } from "@/lib/plan-total";
+import { bandLabel } from "@/lib/pricing/bands";
+import { totalLabel } from "@/lib/pricing/total-label";
 import { formatRunRange, runBounds } from "@/lib/run-period";
 
 export const dynamic = "force-dynamic";
@@ -26,9 +28,11 @@ export const metadata: Metadata = {
 // org-internal (no internal list note, no margins, no emails: Cloudflare rewrites SSR'd emails and cascades React
 // hydration errors, see SafeEmail).
 //
-// Prices and totals come from the same engine as /plan (lib/plan-total.ts,
-// the order's own pricing), content fees and VAT included, so the client
-// sees the figure the buyer sees. Lines keep the buyer's order.
+// Prices and totals come from the same engine and the same exact-vs-band rule
+// as /plan (lib/plan-total.ts lineDisplay, the order's own pricing), content
+// fees included, so the client sees exactly what the buyer sees: exact figures
+// for instant-orderable lines, price bands for the rest. Lines keep the
+// buyer's order.
 export default async function SharedListPage({
   params,
 }: {
@@ -56,10 +60,11 @@ export default async function SharedListPage({
 
   const pricing = await loadPricingDefaults();
   const allTotals = estimateListTotals(list.items, pricing);
-  const totals = allTotals.filter((r) => r.hasVisible);
+  const totals = allTotals.filter(hasFigure);
+  const anyEstimate = totals.some((r) => r.estimate !== null);
   // Hidden-price lines and not-yet-placed titles add to the total later.
   const hasHidden =
-    allTotals.some((r) => r.hasHidden) || list.items.some((i) => !i.isAlternative && !i.productId);
+    allTotals.some((r) => r.hasOnRequest) || list.items.some((i) => !i.isAlternative && !i.productId);
 
   // The version of the plan this page shows: the approve form posts it, so a
   // client only ever approves the lines they saw (lib/list-share.ts).
@@ -71,8 +76,17 @@ export default async function SharedListPage({
   const row = (i: (typeof list.items)[number], inTotal: boolean): ReactNode => {
     if (i.productId && i.product) {
       const p = i.product;
-      // Null when the price isn't shown: "on request", never a 0.
-      const price = linePrice(i, pricing);
+      // Exact only for an instant-orderable line; otherwise the band, the
+      // rate, or "on request" — never a 0 (lib/plan-total.ts lineDisplay).
+      const display = lineDisplay(i, pricing);
+      const figure =
+        display.kind === "exact"
+          ? money(display.total, p.currency)
+          : display.kind === "band"
+            ? `≈ ${bandLabel(display.band, p.currency)}`
+            : display.kind === "rate"
+              ? `≈ ${display.rate} ${p.currency} ${display.unit}`
+              : tv("requestPrice");
       return (
         <div className="share-list__line" key={i.id}>
           <div className="share-list__line-main">
@@ -100,9 +114,7 @@ export default async function SharedListPage({
               </p>
             ) : null}
           </div>
-          <div className="share-list__line-price">
-            {price ? money(price.total, p.currency) : tv("requestPrice")}
-          </div>
+          <div className="share-list__line-price">{figure}</div>
         </div>
       );
     }
@@ -147,20 +159,29 @@ export default async function SharedListPage({
           totals.map((r) => (
             <div key={r.currency}>
               <strong>
-                {money(r.amount, r.currency)} <span className="muted small">{tPlan("exVat")}</span>
+                {totalLabel(r, locale)} <span className="muted small">{tPlan("exVat")}</span>
               </strong>
-              {r.contentFees > 0 ? (
+              {/* Same presentation as /plan's summary: the fee split and VAT
+                  are exact arithmetic on the instant-orderable part only. */}
+              {r.hasExact && !r.estimate && r.contentFees > 0 ? (
                 <p className="muted small">
                   {tPlan("includesContentFees", { amount: money(r.contentFees, r.currency) })}
                 </p>
               ) : null}
-              <p className="muted small">{tPlan("inclVatLine", { amount: money(r.totalInclVat, r.currency) })}</p>
+              {r.hasExact ? (
+                <p className="muted small">
+                  {r.estimate
+                    ? tPlan("inclVatFirmPart", { amount: money(r.totalInclVat, r.currency) })
+                    : tPlan("inclVatLine", { amount: money(r.totalInclVat, r.currency) })}
+                </p>
+              ) : null}
             </div>
           ))
         ) : (
           <strong>{tv("requestPrice")}</strong>
         )}
         {hasHidden && totals.length > 0 ? <span className="muted small">{t("plusOnRequest")}</span> : null}
+        {anyEstimate ? <p className="muted small">{tPlan("estimateNote")}</p> : null}
       </div>
       {altItems.length > 0 ? (
         <section className="share-list__alternatives">

@@ -2,6 +2,7 @@ import { prisma } from "@/lib/prisma";
 import { emailAdapter } from "@/lib/notify";
 import { newSigninAlertEmail } from "@/lib/mail/templates/new-signin-alert";
 import { recordAudit } from "@/lib/audit";
+import { asNoticeLocale } from "@/lib/notices/messages";
 
 // Pure decision — extracted so the policy is unit-testable.
 // "unknown" / "" mean we couldn't read the IP (e.g. dev box, no proxy
@@ -26,8 +27,10 @@ export type RecordSignInArgs = {
 
 // Called from server actions after a successful sign-in. Compares the
 // current IP to user.lastSignInIp, fires the alert email if it differs,
-// and updates both lastSignInIp and lastSignInAt. Best-effort: any failure
-// here is logged and swallowed.
+// and updates lastSignInIp, lastSignInAt and the user's language (the UI
+// locale they signed in from — what every email and notice to them is
+// written in, see lib/notify.ts). Best-effort: any failure here is logged
+// and swallowed.
 export async function recordSignIn(args: RecordSignInArgs): Promise<void> {
   try {
     const user = await prisma.user.findUnique({
@@ -36,10 +39,16 @@ export async function recordSignIn(args: RecordSignInArgs): Promise<void> {
     });
     const now = new Date();
     const alert = shouldAlertOnNewSignin(user?.lastSignInIp ?? null, args.ip);
+    // An unknown locale leaves the stored one alone.
+    const signedInLocale = asNoticeLocale(args.locale);
 
     await prisma.user.update({
       where: { id: args.userId },
-      data: { lastSignInIp: args.ip, lastSignInAt: now },
+      data: {
+        lastSignInIp: args.ip,
+        lastSignInAt: now,
+        ...(signedInLocale ? { locale: signedInLocale } : {}),
+      },
     });
 
     if (alert) {

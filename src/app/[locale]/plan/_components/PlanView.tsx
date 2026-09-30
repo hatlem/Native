@@ -12,7 +12,7 @@ import { readActiveListId, resolveActiveList } from "@/lib/lists";
 import { titleDisplayName } from "@/lib/title-display";
 import { intlLocale } from "@/lib/money";
 import { bandLabel } from "@/lib/pricing/bands";
-import { productBand, unitRate } from "@/lib/pricing/display-price";
+import { bandIncludesArticle, productBand, unitRate } from "@/lib/pricing/display-price";
 import { productDisplayNames } from "@/lib/pricing/display-name";
 import type { ProductInclusions } from "@/lib/pricing/inclusions";
 import { catalogVisibleTitleWhere } from "@/lib/catalog-visibility";
@@ -35,7 +35,7 @@ import { PlanSummary } from "./PlanSummary";
 import { WhatHappensNext } from "./WhatHappensNext";
 import { PlanProgramme, type ProgrammePacing } from "./PlanProgramme";
 import { loadProgrammeForList, recommendCadence } from "@/lib/programme";
-import { estimateListTotals, linePrice } from "@/lib/plan-total";
+import { estimateListTotals, hasFigure, lineDisplay, sumTotalFigures } from "@/lib/plan-total";
 import { scheduleOverlapWarnings, type ScheduleOverlapWarning } from "@/lib/programme-warnings";
 import type { BookingUnit } from "@/lib/campaign-schedule";
 import { SUPPORTED_MARKETS } from "@/lib/markets";
@@ -137,19 +137,16 @@ export async function PlanView({
     .map((i) => {
       if (!i.productId || !i.product) return null;
       const p = i.product;
-      // The same per-line split the summary total adds up (lib/plan-total.ts):
-      // a "We write it" line's figure includes its content fee, so the line
-      // and the total can never disagree.
-      const price = linePrice(i, pricing);
+      // Exact figure or band, by the one rule the summary total adds up
+      // (lib/plan-total.ts lineDisplay): a "We write it" line includes its
+      // content fee, so the line and the total can never disagree.
+      const display = lineDisplay(i, pricing);
       return {
         itemId: i.id,
         product: p,
         quantity: i.quantity,
-        priceVisible: price !== null,
+        display,
         withContent: i.withContent,
-        placementTotal: price?.placement ?? 0,
-        contentFee: price?.contentFee ?? 0,
-        lineTotal: price?.total ?? 0,
         // A product deactivated since it was added: still shown, but flagged so
         // the buyer removes it (submit refuses while it's present — see E).
         unavailable: !p.active || !p.bookable,
@@ -222,7 +219,9 @@ export async function PlanView({
       const band = productBand(p, p.title, pricing);
       const rate = band ? null : unitRate(p, p.title, pricing);
       const price = band
-        ? `≈ ${bandLabel(band, p.currency)}`
+        ? `≈ ${bandLabel(band, p.currency)}${
+            bandIncludesArticle(p, p.title, pricing) ? ` ${tv("productionIncluded")}` : ""
+          }`
         : rate
           ? `≈ ${rate.rate} ${p.currency} ${rate.unit}`
           : tv("requestPrice");
@@ -248,6 +247,7 @@ export async function PlanView({
     titleName: titleDisplayName(i.title!),
     publisherName: i.title!.publisher.name,
     quantity: i.quantity,
+    withContent: i.withContent,
     placements: placementsByTitle.get(i.titleId as string) ?? [],
     notes: i.notes,
     isAlternative: i.isAlternative,
@@ -256,7 +256,7 @@ export async function PlanView({
   const titleLines = allTitleLines.filter((l) => !l.isAlternative);
   const altTitleLines = allTitleLines.filter((l) => l.isAlternative);
 
-  const hasHiddenPrice = lines.some((l) => !l.priceVisible);
+  const hasHiddenPrice = lines.some((l) => l.display.kind === "onRequest");
 
   // Sold-out / editorially closed periods, so the lines' inline date picker
   // disables them (same data the campaign flow's Schedule step reads).
@@ -271,23 +271,23 @@ export async function PlanView({
       : [],
   );
 
-  // Per-currency totals, content fees and VAT included — the amount the plan
-  // commits to (lib/plan-total.ts, the order's own pricing engine). Locked-price
-  // lines still register their currency so a tri-Nordic basket shows NOK + SEK
-  // + DKK rows up front — even when only one of them has a visible total
-  // today. Hiding the locked currencies entirely was the Erlend bug: the CFO
-  // defense relies on seeing all three lines. Render order: visible-price
-  // currencies first, so the "real number" lines lead.
+  // Per-currency totals, content fees included: the exact sum of the
+  // instant-orderable lines plus the band range of the rest (lib/plan-total.ts,
+  // the order's own pricing engine). Locked-price lines still register their
+  // currency so a tri-Nordic basket shows NOK + SEK + DKK rows up front — even
+  // when only one of them has a figure today. Hiding the locked currencies
+  // entirely was the Erlend bug: the CFO defense relies on seeing all three
+  // lines. Render order: currencies with a figure first.
   const totals = estimateListTotals(listItems, pricing).sort(
-    (a, b) => Number(!a.hasVisible) - Number(!b.hasVisible),
+    (a, b) => Number(!hasFigure(a)) - Number(!hasFigure(b)),
   );
 
   // A line is instant-orderable only when it is firm-priced AND its price is
-  // shown — the exact per-line test submitRequest applies (checkout-actions).
+  // shown — isInstantOrderable, the per-line test submitRequest applies
+  // (checkout-actions), which lineDisplay reports as its "exact" kind.
   // Counting FIRM alone claimed "1 of 2 available as instant order" on a plan
   // whose every line read "Contact for price".
-  const instantOrderable = (l: (typeof lines)[number]) =>
-    l.product.visibility === "FIRM" && l.priceVisible;
+  const instantOrderable = (l: (typeof lines)[number]) => l.display.kind === "exact";
 
   // Any line that isn't instant-orderable — or any unresolved title
   // placeholder — forces the whole basket onto the RFQ path. We can't checkout
@@ -395,6 +395,9 @@ export async function PlanView({
             basePrice: true,
             active: true,
             confirmedAt: true,
+            visibility: true,
+            pricingModel: true,
+            productionFee: true,
             bookingUnit: true,
             titleId: true,
             priceRules: { select: { marginPct: true, seasonalMultiplier: true, minVolume: true } },
@@ -402,6 +405,7 @@ export async function PlanView({
               select: {
                 name: true,
                 pricesPublic: true,
+                productionFeeDefault: true,
                 publisher: { select: { pricesPublic: true } },
                 market: { select: { code: true, vatRatePct: true } },
               },
@@ -416,27 +420,17 @@ export async function PlanView({
       arr.push(i);
       itemsByList.set(i.listId, arr);
     }
-    // Per-wave indicative totals; only priced lines produce an amount, so a
-    // wave of hidden-price titles shows no figure rather than a misleading 0.
+    // Per-wave indicative totals (exact part + band range, like the plan
+    // summary); only priced lines produce a figure, so a wave of hidden-price
+    // titles shows none rather than a misleading 0.
     const perWave = programmeView.waves.map((w) => ({
       listId: w.listId,
-      totals: estimateListTotals(itemsByList.get(w.listId) ?? [], pricing)
-        .filter((tot) => tot.amount > 0)
-        .map((tot) => ({ currency: tot.currency, amount: tot.amount })),
+      totals: estimateListTotals(itemsByList.get(w.listId) ?? [], pricing).filter(hasFigure),
     }));
-    const programmeByCurrency = new Map<string, number>();
-    for (const w of perWave) {
-      for (const tot of w.totals) {
-        programmeByCurrency.set(tot.currency, (programmeByCurrency.get(tot.currency) ?? 0) + tot.amount);
-      }
-    }
     const budgetAmount = activeList?.budget != null ? Number(activeList.budget) : 0;
     pacing = {
       perWave,
-      programmeTotals: [...programmeByCurrency.entries()].map(([currency, amount]) => ({
-        currency,
-        amount,
-      })),
+      programmeTotals: sumTotalFigures(perWave.map((w) => w.totals)),
       // A list budget is per plan — i.e. per wave — so the comparison line
       // reads "vs your budget of X per wave", not "X for the programme".
       budget:

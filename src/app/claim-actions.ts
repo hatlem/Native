@@ -10,6 +10,7 @@ import { recordAudit } from "@/lib/audit";
 import { clientIp } from "@/lib/client-ip";
 import { validateClaimForm } from "@/lib/org-invite";
 import { passwordlessSignIn } from "@/lib/passwordless-signin";
+import { asNoticeLocale } from "@/lib/notices/messages";
 
 // Claim a publisher-invite token: validate it (single-use, time-limited),
 // create a User in PUBLISHER role bound to the pre-existing Publisher
@@ -50,6 +51,7 @@ export async function claimPublisherInvite(formData: FormData) {
       publisherId: true,
       expiresAt: true,
       claimedAt: true,
+      locale: true,
     },
   });
   if (
@@ -77,6 +79,8 @@ export async function claimPublisherInvite(formData: FormData) {
           role: "PUBLISHER",
           passwordHash,
           publisherId: invite.publisherId,
+          // The language the desk invited them in, until they sign in.
+          locale: asNoticeLocale(invite.locale),
           // Reaching this point requires clicking the invite link in
           // the invited mailbox — that's proof of ownership, so the
           // account starts verified and bypasses the credentials gate.
@@ -151,7 +155,7 @@ export async function claimWriterInviteSignup(formData: FormData) {
 
   const invite = await prisma.writerInvite.findUnique({
     where: { token },
-    select: { id: true, email: true, expiresAt: true, claimedAt: true },
+    select: { id: true, email: true, expiresAt: true, claimedAt: true, locale: true },
   });
   if (!invite || invite.claimedAt || invite.expiresAt.getTime() <= Date.now()) {
     redirect(`/${locale}/writer/claim/${token}`);
@@ -171,6 +175,9 @@ export async function claimWriterInviteSignup(formData: FormData) {
           name: name || null,
           role: "CONTENT",
           passwordHash,
+          // The language the desk picked for the invite — their assignment
+          // emails follow it (BUG-desk-lifecycle-r2-3) until they sign in.
+          locale: asNoticeLocale(invite.locale),
           // Clicking the invite link proves mailbox ownership — account
           // starts verified and bypasses the email-confirmation gate.
           emailVerifiedAt: new Date(),

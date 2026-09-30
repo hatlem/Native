@@ -140,7 +140,7 @@
     "rowReach": "Monthly reach",
     "rowLeadTime": "Lead time",
     "rowFormats": "Available formats",
-    "rowFromPrice": "From price",
+    "rowFromPrice": "Price band",
     "rowAction": "Action"
   },
   "availability": {
@@ -355,7 +355,8 @@
       "publisher": "Publisher",
       "densityLabel": "Layout",
       "densityList": "List",
-      "densityCards": "Cards"
+      "densityCards": "Cards",
+      "price": "Price"
     },
     "rail": {
       "heading": "Narrow it down",
@@ -383,7 +384,9 @@
       "advancedToggle": "{count, plural, =0 {Advanced filters} other {Advanced filters (#)}}",
       "mobileFilters": "Filters",
       "formatHeading": "Which format?",
-      "formatHint": "Native article, advertorial, display, video …"
+      "formatHint": "Native article, advertorial, display, video …",
+      "priceHeading": "What's your budget per placement?",
+      "priceHint": "Price band per placement, article included."
     },
     "shortlist": {
       "untitledPlan": "your plan",
@@ -878,6 +881,9 @@
       "item3Body": "Drafts come to you for approval. Live links and performance land in Reports."
     },
     "breakdownQtyWithArticleFee": "{n} × {unit} placement + {article} per article (one article for all {n})",
+    "inclVatFirmPart": "{amount} incl. VAT for the instant-order lines",
+    "estimateNote": "≈ marks a price band. The desk confirms the exact price in your quote.",
+    "breakdownPlacements": "{n} placements",
     "noticePlanReadOnly": "You have view-only access to this plan, so nothing was changed.",
     "runPeriod": "{range} · {unit, select, WEEK {{n, plural, one {# week} other {# weeks}}} other {{n, plural, one {# month} other {# months}}}}"
   },
@@ -1550,7 +1556,19 @@
     "emptyTitle": "No invoices yet",
     "emptyHint": "Invoices appear here once a campaign has run and been billed.",
     "emptyCta": "See your campaigns",
-    "colCustomer": "Customer"
+    "colCustomer": "Customer",
+    "seller": "From",
+    "sellerOrgNumber": "Org. no.",
+    "sellerVatNumber": "VAT no.",
+    "paymentHeading": "Payment details",
+    "bankAccount": "Bank account",
+    "paymentReference": "Reference",
+    "pdfUnavailableHeading": "PDF not available yet",
+    "pdfUnavailable": "We're finishing the invoice document. The amounts below are final — contact us if you need the PDF now.",
+    "pdfUnavailableDesk": "The PDF won't render until NativeSpin's legal details are set in the server environment. Set these variables and redeploy:",
+    "sellerVarMissing": "not set",
+    "sellerVarInvalid": "set, but fails its checksum",
+    "pdfPending": "View"
   },
   "firm": {
     "badge": "Instant order",
@@ -2554,7 +2572,7 @@
     "planRfqOnly": "One or more titles in your plan require a quote — instant order is disabled until we confirm pricing.",
     "listIndicative": "List price (indicative)",
     "listIndicativeHelp": "Indicative list rate — the final price is confirmed after a short brief.",
-    "productionIncluded": "Includes written article",
+    "productionIncluded": "incl. article",
     "firmTurnaround": "Firm price typically within 24 hours"
   },
   "titleAdmin": {
@@ -2593,7 +2611,9 @@
     "inviteBusinessEmail": "Use a company address — free and disposable providers aren't accepted.",
     "inviteNotFound": "That publisher no longer exists — reload the page.",
     "priceUnconfirmed": "price not confirmed",
-    "productInactive": "inactive"
+    "productInactive": "inactive",
+    "inviteLanguageLabel": "Email language",
+    "inviteLanguageHint": "The invitation, the claim page and the portal account use this language. Defaults to the title's market."
   },
   "salesContacts": {
     "title": "Sales contacts",
@@ -3687,6 +3707,140 @@
   "viewOnly": {
     "title": "View-only access",
     "body": "You can see everything your team has here, but not change it. Ask an administrator if you need to edit, send or accept."
+  },
+  "notices": {
+    "email": {
+      "cta": "Open in NativeSpin",
+      "linkLine": "Open in NativeSpin: {url}",
+      "footer": "This is an automated notification from NativeSpin."
+    },
+    "orderInProduction": {
+      "title": "Your order is in production: {plan}",
+      "body": "We're booking {count, plural, one {the placement} other {the # placements}} with the publishers and getting the content under way. We'll let you know when there's a draft for you to review."
+    },
+    "orderScheduled": {
+      "title": "Your campaign is scheduled: {plan}",
+      "bodyRange": "Publishing is booked for {start} – {end}. We'll let you know as soon as the first placement is live.",
+      "bodyFrom": "Publishing is booked from {start}. We'll let you know as soon as the first placement is live.",
+      "bodyUndated": "Every placement has a slot with its publisher. We'll let you know as soon as the first one is live."
+    },
+    "orderCancelled": {
+      "title": "Order cancelled: {plan}",
+      "body": "The NativeSpin desk has cancelled this order. Reason: {reason}"
+    },
+    "draftReady": {
+      "title": "Draft ready for review: {article}",
+      "body": "Version {version} of “{article}” is ready. Read it, then approve it or ask for changes."
+    },
+    "draftSentBack": {
+      "title": "Draft sent back for changes: {article}",
+      "body": "Our desk has asked for changes to version {version} of “{article}”. You'll get the revised draft to review when it's ready."
+    },
+    "invoiceIssued": {
+      "title": "Invoice issued: {plan}",
+      "body": "Total {amount} incl. VAT, due {due}. Open the invoice to download the PDF."
+    },
+    "creditNoteIssued": {
+      "title": "Credit note issued: {plan}",
+      "body": "The invoice of {amount} has been credited in full. Reason: {reason}"
+    },
+    "bookingConfirmed": {
+      "title": "{title} confirmed your booking",
+      "body": "{title} has confirmed the placement in {plan}. We'll let you know when it's live."
+    },
+    "placementLive": {
+      "title": "Your placement is live on {title}",
+      "body": "The placement in {plan} is published on {title}. Open it to see it the way readers do."
+    },
+    "editorialVeto": {
+      "title": "{title} can't run this draft",
+      "body": "{title} has declined to publish the draft in {plan} on editorial grounds: {reason}. Our desk will be in touch about the next step."
+    },
+    "placementProposed": {
+      "title": "The desk picked a placement on {title}",
+      "body": "You asked us to propose a placement on {title}. We've chosen {format} — you'll find it on your request."
+    },
+    "placeholderRemoved": {
+      "title": "{title} was removed from your request",
+      "body": "{title} has no placement we can book right now, so our desk took it off your request. The rest of the request is unaffected."
+    },
+    "rfqSubmitted": {
+      "title": "New request from {org}: {plan}",
+      "intro": "{org} submitted “{plan}” with {count, plural, one {# line} other {# lines}}.",
+      "budget": "Budget: {amount}",
+      "brief": "Brief:",
+      "noBrief": "No brief was written.",
+      "lines": "Lines:",
+      "line": "{title} — {format} × {quantity}",
+      "lineWithContent": "{title} — {format} × {quantity}, written by NativeSpin",
+      "linePlaceholder": "{title} — the desk proposes the placement",
+      "moreLines": "…and {count} more"
+    },
+    "quoteAccepted": {
+      "title": "{count, plural, one {Quote accepted} other {# quotes accepted}}: {plan}",
+      "body": "{count, plural, one {{org} accepted the quote for {plan}. The order is confirmed.} other {{org} accepted a #-market campaign ({plan}). # orders are confirmed.}}"
+    },
+    "quoteRenewal": {
+      "title": "Quote renewal requested: {plan}",
+      "body": "{org} wants to go ahead, but the quote has expired. Renew it (and reprice lines if rates have moved) to reopen acceptance."
+    },
+    "deskBookingConfirmed": {
+      "title": "{title} confirmed a booking",
+      "body": "{title} confirmed its placement on {org}'s order “{plan}”."
+    },
+    "deskPlacementLive": {
+      "title": "Placement live on {title}",
+      "body": "{title} published the placement on {org}'s order “{plan}”."
+    },
+    "deskEditorialVeto": {
+      "title": "{title} invoked its editorial veto",
+      "body": "{title} won't run the draft on {org}'s order “{plan}”. Reason: {reason}"
+    },
+    "deskDraftApproved": {
+      "title": "{org} approved a draft: {article}",
+      "body": "Version {version} of “{article}” is approved. Finalise it to lock it to its placements."
+    },
+    "deskChangesRequested": {
+      "title": "{org} requested changes: {article}",
+      "body": "{org} sent version {version} of “{article}” back for changes.",
+      "comment": "Their comment: “{comment}”",
+      "noComment": "They didn't leave a comment."
+    },
+    "publisherPrice": {
+      "title": "Price updated by the publisher: {title}",
+      "body": "{title}, {format}: {from} → {to}, confirmed by the publisher."
+    },
+    "publisherLeadTime": {
+      "title": "Lead time updated by the publisher: {title}",
+      "body": "{title}, {format}: notice changed from {from} to {to}. Check planned flights that now start too soon.",
+      "days": "{count, plural, one {# day} other {# days}}",
+      "unset": "not set"
+    },
+    "bookingNew": {
+      "title": "New booking from {org}",
+      "bodyInstant": "{org} placed an instant order that includes your titles. Confirm each booking in the publisher portal.",
+      "bodyQuote": "{org} accepted a quote that includes your titles. Confirm each booking in the publisher portal."
+    },
+    "publisherOrderCancelled": {
+      "title": "Order cancelled: {org}",
+      "body": "The NativeSpin desk has cancelled {org}'s order. Bookings on your titles that hadn't run are cancelled. Reason: {reason}"
+    },
+    "writerChangesRequested": {
+      "title": "Changes requested: {article}",
+      "bodyClient": "The client sent version {version} of “{article}” back for changes.",
+      "bodyDesk": "The NativeSpin desk sent version {version} of “{article}” back for changes.",
+      "comment": "Comment: “{comment}”"
+    }
+  },
+  "publisherInviteEmail": {
+    "subject": "Partnership invitation for {publisher} — NativeSpin",
+    "greeting": "Hi,",
+    "added": "{inviter} has added {publisher} to the NativeSpin catalog and invited you to claim a publisher portal account.",
+    "inviterFallback": "The NativeSpin team",
+    "portal": "In the portal you keep rate cards, specs, availability and bookings up to date for the titles NativeSpin buyers can book through us.",
+    "claim": "Claim the account here (the link expires in {days} days):",
+    "ignore": "If you weren't expecting this, you can ignore this message — the link can only be used once.",
+    "signoff": "— NativeSpin"
   },
   "briefTargeting": {
     "audience": "Audience",

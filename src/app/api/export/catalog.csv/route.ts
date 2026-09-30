@@ -5,9 +5,9 @@
 //
 // Auth: any signed-in user. The file is "what the catalog shows me": the
 // same query params as /catalog (market, types, vertical, region, b2bB2c,
-// search q, …, sort), parsed by the same parseCatalogParams and filtered
-// by the same buildCatalogWhere, visibility guard included. All pages, one
-// file. Price is shown as a band label (e.g. "25–40k NOK") using the same
+// price band, search q, …, sort), parsed by the same parseCatalogParams
+// and filtered by the same buildCatalogWhere, visibility guard included.
+// All pages, one file. Price is shown as a band label (e.g. "25–40k NOK") using the same
 // helper as the catalog card — never the net basePrice or exact figure.
 
 import { NextResponse, type NextRequest } from "next/server";
@@ -19,6 +19,7 @@ import { titleBand } from "@/lib/pricing/display-price";
 import { loadPricingDefaults } from "@/lib/content-fee";
 import { recordAudit } from "@/lib/audit";
 import { resolveCatalogSearch } from "@/lib/catalog-search";
+import { refreshStaleTitlePriceBands } from "@/lib/pricing/title-band";
 import { parseCatalogParams } from "@/app/[locale]/catalog/filters";
 import { buildCatalogWhere, catalogOrderBy } from "@/app/[locale]/catalog/catalog-where";
 
@@ -31,6 +32,9 @@ export async function GET(req: NextRequest) {
   }
 
   const filters = parseCatalogParams(Object.fromEntries(req.nextUrl.searchParams));
+  // A price-band filter reads the stored band: bring any band a recent
+  // write invalidated up to date first, exactly as the catalog page does.
+  if (filters.priceTiers.length) await refreshStaleTitlePriceBands();
   const search = await resolveCatalogSearch(filters.q);
 
   const titles = await prisma.title.findMany({

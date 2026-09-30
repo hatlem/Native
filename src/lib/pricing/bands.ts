@@ -61,3 +61,91 @@ export function bandLabel(band: Band, currency: string): string {
       return `${k(band.low)}–${k(band.high)}k ${currency}`;
   }
 }
+
+// ---------------------------------------------------------------------------
+// Band RANGES — what banded lines contribute to a total that mixes several of
+// them (the /plan summary, the catalog plan bar, the share page). A range is a
+// sum of bucket boundaries, so it is never narrower than the buckets it came
+// from and never reveals an exact price. `high: null` = open-ended (a line
+// sits in the top "90k+" bucket) and renders as "from".
+// ---------------------------------------------------------------------------
+
+export type BandRange = { low: number; high: number | null };
+
+export function bandRange(band: Band): BandRange {
+  switch (band.kind) {
+    case "under":
+      return { low: 0, high: band.high };
+    case "range":
+      return { low: band.low, high: band.high };
+    case "over":
+      return { low: band.low, high: null };
+  }
+}
+
+export function addRanges(a: BandRange | null, b: BandRange): BandRange {
+  if (!a) return b;
+  return {
+    low: a.low + b.low,
+    high: a.high === null || b.high === null ? null : a.high + b.high,
+  };
+}
+
+// Same locale-neutral shape as bandLabel: "15–40k NOK", "< 40k NOK" (every
+// banded line sits in the bottom bucket), "90k+ NOK" (open-ended).
+export function rangeLabel(range: BandRange, currency: string): string {
+  if (range.high === null) return `${k(range.low)}k+ ${currency}`;
+  if (range.low === 0) return `< ${k(range.high)}k ${currency}`;
+  return `${k(range.low)}–${k(range.high)}k ${currency}`;
+}
+
+// ---------------------------------------------------------------------------
+// Band TIERS — the currency-neutral index of a band: 0 is the bottom "under"
+// bucket, BAND_TIER_COUNT - 1 the open top one. Every currency has the same
+// number of buckets, so tier 2 means "25–40k NOK" and "2.5–4k EUR" alike.
+// Stored on Title.priceBandTier so the catalog filters and pages on the band
+// in the database (lib/pricing/title-band.ts).
+// ---------------------------------------------------------------------------
+
+function bucketsFor(currency: string): number[] {
+  return BUCKETS[currency] ?? FALLBACK_BUCKETS;
+}
+
+export const BAND_TIER_COUNT = FALLBACK_BUCKETS.length + 1;
+
+export function bandTier(band: Band, currency: string): number {
+  const buckets = bucketsFor(currency);
+  switch (band.kind) {
+    case "under":
+      return 0;
+    case "over":
+      return buckets.length;
+    case "range":
+      return buckets.indexOf(band.low) + 1;
+  }
+}
+
+export function tierBand(tier: number, currency: string): Band {
+  const buckets = bucketsFor(currency);
+  if (tier <= 0) return { kind: "under", high: buckets[0] };
+  if (tier >= buckets.length) return { kind: "over", low: buckets[buckets.length - 1] };
+  return { kind: "range", low: buckets[tier - 1], high: buckets[tier] };
+}
+
+export function isBandTier(n: number): boolean {
+  return Number.isInteger(n) && n >= 0 && n < BAND_TIER_COUNT;
+}
+
+// A tier's label for the catalog filter, in every currency the buyer is
+// browsing: currencies on the same bucket scale share one label
+// ("25–40k NOK/SEK/DKK · 2.5–4k EUR/GBP/CHF"; "25–40k NOK" for Norway alone).
+export function tierLabel(tier: number, currencies: string[]): string {
+  const byScale = new Map<string, string[]>();
+  for (const currency of [...new Set(currencies)]) {
+    const key = bucketsFor(currency).join(",");
+    byScale.set(key, [...(byScale.get(key) ?? []), currency]);
+  }
+  return [...byScale.values()]
+    .map((group) => bandLabel(tierBand(tier, group[0]), group.join("/")))
+    .join(" · ");
+}

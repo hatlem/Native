@@ -13,6 +13,7 @@ import { InvoiceDocument } from "@/lib/pdf/InvoiceDocument";
 import { loadInvoicePdfData } from "@/lib/pdf/invoice-pdf-data";
 import { invoiceMessagesFor } from "@/lib/pdf/invoice-messages";
 import { qt } from "@/lib/pdf/quote-messages";
+import { loadSellerDetails, sellerGaps } from "@/lib/seller";
 
 export const dynamic = "force-dynamic";
 
@@ -39,8 +40,28 @@ export async function GET(
   const locale = safeLocale(new URL(req.url).searchParams.get("locale"));
   const data = await loadInvoicePdfData(invoiceId, locale);
   if (!data) return NextResponse.json({ error: "not_found" }, { status: 404 });
+
+  // Never issue a legally incomplete invoice: without the seller's org/VAT
+  // number, address and payment details the document is not a valid sales
+  // document. The invoice pages hide the download (and tell the desk which
+  // variables to set) in this state; this is the backstop for direct hits.
+  const seller = loadSellerDetails();
+  const gaps = sellerGaps(seller, data.currency);
+  if (gaps.length > 0) {
+    console.error("invoice.pdf.seller_incomplete", { invoiceId, gaps });
+    return NextResponse.json(
+      {
+        error: "seller_details_incomplete",
+        message: "The invoice PDF is unavailable until NativeSpin's seller details are configured.",
+        // Variable names only (never values) — and only to the desk.
+        ...(scope.isDesk ? { missing: gaps } : {}),
+      },
+      { status: 503, headers: { "Cache-Control": "no-store" } },
+    );
+  }
+
   const messages = invoiceMessagesFor(locale);
-  const buffer = await renderToBuffer(InvoiceDocument({ data, locale, messages }));
+  const buffer = await renderToBuffer(InvoiceDocument({ data, seller, locale, messages }));
 
   await recordAudit(scope.userId, "invoice.pdf.download", `Invoice:${invoiceId}`, { locale });
 

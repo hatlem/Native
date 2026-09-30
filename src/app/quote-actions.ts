@@ -497,11 +497,9 @@ export async function acceptQuote(formData: FormData) {
   await notifyQuoteAccepted({
     organizationId: quote.request.organizationId,
     orgName: quote.request.organization.name,
-    marketCode: quote.request.organization.marketCode,
     planName: quote.request.plan.name,
     requestId: quote.requestId,
     orders: [accepted],
-    actorLocale: locale,
   });
 
   redirect(`/${locale}/requests/${quote.requestId}`);
@@ -587,11 +585,9 @@ export async function acceptAllQuotesForRequest(formData: FormData) {
   await notifyQuoteAccepted({
     organizationId: request.organizationId,
     orgName: request.organization.name,
-    marketCode: request.organization.marketCode,
     planName: request.plan.name,
     requestId: request.id,
     orders: createdOrders,
-    actorLocale: locale,
   });
 
   redirect(`/${locale}/requests/${request.id}`);
@@ -610,6 +606,7 @@ export async function requestQuoteRenewal(formData: FormData) {
       id: true,
       organizationId: true,
       organization: { select: { name: true } },
+      plan: { select: { name: true } },
       quotes: { select: { id: true, status: true, validUntil: true, order: { select: { id: true } } } },
     },
   });
@@ -645,9 +642,10 @@ export async function requestQuoteRenewal(formData: FormData) {
     });
     await notifyDesk({
       kind: "QUOTE_RENEWAL_REQUESTED",
-      title: "Quote renewal requested",
-      body: `${request.organization.name} wants to go ahead, but the quote has expired. Renew it (and reprice lines if rates moved) to reopen acceptance.`,
-      link: `/${locale}/desk/${request.id}`,
+      template: {
+        key: "deskQuoteRenewal",
+        params: { orgName: request.organization.name, planName: request.plan.name, requestId: request.id },
+      },
     });
   }
 
@@ -680,7 +678,6 @@ export async function renewQuote(formData: FormData) {
       request: {
         select: {
           organizationId: true,
-          organization: { select: { marketCode: true } },
           plan: { select: { name: true } },
         },
       },
@@ -707,12 +704,9 @@ export async function renewQuote(formData: FormData) {
     previousValidUntil: quote.validUntil?.toISOString() ?? null,
     validUntil: validUntil.toISOString(),
   });
-  const marketCode = quote.request.organization.marketCode;
-  // Email in the org's market language; the inbox row re-renders in each
-  // reader's own (lib/notice-template.ts).
+  // Each recipient reads it in their own language (lib/notify.ts).
   await notifyOrg(quote.request.organizationId, {
     kind: "QUOTE_READY",
-    locale: marketCode ? marketDefaultLocale(marketCode) : "en",
     template: {
       key: "quoteSent",
       params: {

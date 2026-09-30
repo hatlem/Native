@@ -1,15 +1,21 @@
-// Email to writers: the pool invite and new line assignments. Writers have
-// no in-app inbox of their own yet, so email is how they learn there is
-// work waiting. Both senders swallow and log delivery failures — the invite
-// or assignment itself is already committed, and the desk UI shows what to
-// do when an invite email didn't go out (emailedAt stays null).
+// Messages to writers: the pool invite, new line assignments and change
+// requests on their drafts. The assignment goes out as its own designed email
+// plus an inbox row; a change request is a regular notice (email + inbox).
+// Every sender swallows and logs delivery failures — the invite or
+// assignment itself is already committed, and the desk UI shows what to do
+// when an invite email didn't go out (emailedAt stays null).
+//
+// Language: the writer's User.locale (set from the invite language when they
+// claimed it, then from each sign-in), else the profile heuristic in
+// writerEmailLocale.
 
-import { getTranslations } from "next-intl/server";
 import { prisma } from "@/lib/prisma";
-import { emailAdapter } from "@/lib/notify";
+import { emailAdapter, notifyUser, recipientLocale } from "@/lib/notify";
 import { appName, appUrl } from "@/lib/url";
 import { DEFAULT_INVITE_TTL_DAYS } from "@/lib/publisher-invite";
 import { writerAssignedEmail, writerInviteEmail } from "@/lib/mail/templates/writer";
+import { productTypeLabel } from "@/lib/notices/messages";
+import type { BuyerLocale } from "@/lib/market-locale";
 import { asEmailLocale, writerEmailLocale } from "./email-locale";
 import { languageForCountry } from "./criteria";
 import { writerClaimPath } from "./invite";
@@ -50,8 +56,8 @@ export async function sendWriterInviteEmail(args: {
   return true;
 }
 
-// Tells a writer they've been assigned a line, in the language they'll be
-// writing in when their profile lists it (see writerEmailLocale).
+// Tells a writer they've been assigned a line — email and inbox row — in
+// their own language (see the header).
 export async function sendWriterAssignedEmail(args: {
   orderLineId: string;
   writerId: string;
@@ -59,7 +65,7 @@ export async function sendWriterAssignedEmail(args: {
   const writer = await prisma.writerProfile.findUnique({
     where: { id: args.writerId },
     select: {
-      user: { select: { email: true, deactivatedAt: true } },
+      user: { select: { id: true, email: true, locale: true, deactivatedAt: true } },
       languages: { select: { language: true, proficiency: true } },
     },
   });
@@ -77,14 +83,14 @@ export async function sendWriterAssignedEmail(args: {
     : null;
   if (!product) return;
 
-  const locale = writerEmailLocale({
+  const fallbackLocale = writerEmailLocale({
     languages: writer.languages,
     contentLanguage: languageForCountry(product.title.countryCode),
   });
-  const tType = await getTranslations({ locale, namespace: "productType" });
+  const locale = recipientLocale(writer.user.locale, fallbackLocale);
   const built = writerAssignedEmail({
     locale,
-    format: tType(product.type),
+    format: productTypeLabel(product.type, locale),
     titleName: product.title.name,
     url: absolute(`/${locale}/writer/lines/${args.orderLineId}`),
     appName: appName(),
@@ -94,4 +100,26 @@ export async function sendWriterAssignedEmail(args: {
   } catch (err) {
     console.error("writer_assigned.email_failed", { orderLineId: args.orderLineId, err });
   }
+  // The inbox row: the same copy, re-rendered in whatever language the
+  // writer reads /notifications in. The email above already went out.
+  await notifyUser(
+    writer.user.id,
+    {
+      kind: "ASSET_REVIEW",
+      template: {
+        key: "writerAssigned",
+        params: { titleName: product.title.name, productType: product.type, orderLineId: args.orderLineId },
+      },
+    },
+    { fallbackLocale, email: false },
+  );
+}
+
+/** The language to fall back to for a writer who has never signed in. */
+export async function writerFallbackLocale(writerId: string): Promise<BuyerLocale> {
+  const languages = await prisma.writerLanguage.findMany({
+    where: { writerId },
+    select: { language: true, proficiency: true },
+  });
+  return writerEmailLocale({ languages });
 }

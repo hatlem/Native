@@ -5,7 +5,11 @@ import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
 import { loadScope, canEditOnOrg } from "@/lib/scope";
 import { recordAudit } from "@/lib/audit";
-import { notifyDesk } from "@/lib/notify";
+import {
+  draftNoticeContext,
+  notifyChangesRequested,
+  notifyDraftApprovedByBuyer,
+} from "@/lib/content/review-notices";
 import { supersedeOlderVersions } from "@/lib/content/versions";
 
 // Buyer-side counterpart to desk-content-actions.ts's setAssetStatus: a
@@ -58,13 +62,11 @@ export async function approveContentAsset(formData: FormData) {
     await supersedeOlderVersions(tx, { articleId: asset.article.id, version: asset.version });
   });
   await recordAudit(session.user.id, "asset.status", `ContentAsset:${assetId}`, { status: "APPROVED" });
-  await notifyDesk({
-    kind: "ASSET_REVIEW",
-    title: "Buyer approved a draft",
-    // An unlinked article has no desk order page to point at; the article
-    // detail page is reachable for desk/superadmin too (canWriteArticle).
-    link: orderId ? `/${locale}/desk/orders/${orderId}` : `/${locale}/articles/${asset.article.id}`,
-  });
+  // Links to the desk order (from the form, else the article's placement);
+  // an unplaced article's detail page is reachable for desk/superadmin too
+  // (canWriteArticle).
+  const ctx = await draftNoticeContext(assetId, orderId);
+  if (ctx) await notifyDraftApprovedByBuyer(ctx);
 
   redirect(orderId ? `/${locale}/orders/${orderId}` : `/${locale}/articles/${asset.article.id}`);
 }
@@ -94,12 +96,10 @@ export async function requestContentChanges(formData: FormData) {
   await recordAudit(session.user.id, "asset.status", `ContentAsset:${assetId}`, {
     status: "CHANGES_REQUESTED",
   });
-  await notifyDesk({
-    kind: "ASSET_REVIEW",
-    title: "Buyer requested changes to a draft",
-    // See approveContentAsset: no /desk/articles route exists.
-    link: orderId ? `/${locale}/desk/orders/${orderId}` : `/${locale}/articles/${asset.article.id}`,
-  });
+  // The desk gets the buyer's comment; the assigned writer, who does the
+  // rewrite, is told directly (see approveContentAsset for the links).
+  const ctx = await draftNoticeContext(assetId, orderId);
+  if (ctx) await notifyChangesRequested(ctx, "client", note || null);
 
   redirect(orderId ? `/${locale}/orders/${orderId}` : `/${locale}/articles/${asset.article.id}`);
 }

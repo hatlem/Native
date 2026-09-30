@@ -404,6 +404,21 @@ model Title {
   // Publication-level default for the content-production fee. Null =
   // inherit from the desk ContentFeeRule price list.
   productionFeeDefault Decimal? @db.Decimal(12, 2)
+  // Stored catalog price band, so the catalog can filter and page on it in
+  // the database: the currency-neutral tier (lib/pricing/bands.ts bandTier,
+  // 0 = the bottom "under" bucket … 5 = the open top one) of the band the
+  // catalog card shows (display-price.ts titleBand). Null = no band ("Contact
+  // for price", or rate-priced only). Computed in TypeScript by
+  // lib/pricing/title-band.ts — never written by hand.
+  priceBandTier        Int?
+  // Invalidation counter: DB triggers bump priceBandRev on every write that
+  // can move the band (product price/visibility/activeness/fee, price rules,
+  // title/publisher price visibility, desk margin and fee rules), whichever
+  // code path, script or raw SQL made it. priceBandTier is current exactly
+  // when priceBandComputedRev = priceBandRev (migration
+  // 20260930231000_title_price_band).
+  priceBandRev         Int      @default(1)
+  priceBandComputedRev Int      @default(0)
   // ---------- CSV import fields (research catalog) ----------
   // Populated from prisma/data/medier_alle.csv. These are descriptive
   // metadata used to power filtering/search in the catalog UI; they do
@@ -506,6 +521,7 @@ model Title {
   @@index([salesChannel])
   @@index([city])
   @@index([region])
+  @@index([priceBandTier])
   @@unique([publisherId, externalRef])
 }
 
@@ -760,6 +776,11 @@ model User {
   // under; bumping it (password reset or change) ends every older session
   // on its next request. See src/lib/session-version.ts.
   sessionVersion  Int       @default(0)
+  // The language this user reads NativeSpin in: the UI locale of their
+  // latest sign-in, or the language their invite was sent in. Every email
+  // and notice addressed to them renders in it (src/lib/notify.ts). Null
+  // until they first sign in; senders then fall back to the org's market.
+  locale          String?
 
   notifications          Notification[]
   magicLinkTokens        MagicLinkToken[]
@@ -797,6 +818,10 @@ model PublisherInvite {
   claimedByUserId String?
   createdBy       String
   createdAt       DateTime  @default(now())
+  // Language the invite email (and claim link) went out in — chosen by the
+  // desk, defaulting to the publisher's market language. Becomes the portal
+  // user's User.locale when claimed.
+  locale          String    @default("en")
 
   @@index([publisherId])
   @@index([email])

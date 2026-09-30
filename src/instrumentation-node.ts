@@ -1,4 +1,5 @@
-// In-app job scheduling (autosend + metrics sweeps) for the Node server
+// In-app job scheduling (autosend, metrics, placement-ready and price-band
+// sweeps) for the Node server
 // runtime. Split out of instrumentation.ts so the edge/middleware compile of
 // the instrumentation hook never sees this module's import graph — it pulls
 // node:crypto (campaign-reporting/tokens.ts), which webpack's edge target
@@ -9,6 +10,7 @@ const SWEEP_EVERY_MS = 60 * 60_000;
 const BOOT_DELAY_MS = 2 * 60_000; // off the deploy's hot path
 const METRICS_OFFSET_MS = 5 * 60_000; // stagger so the two jobs never contend
 const PLACEMENT_READY_OFFSET_MS = 10 * 60_000; // stagger clear of autosend (0) and metrics (5min)
+const PRICE_BAND_OFFSET_MS = 60_000; // soon after boot: the first tick backfills a new deploy
 
 export async function startSchedules(): Promise<void> {
   // Dev hot-reload can re-evaluate this module; keep exactly one schedule.
@@ -49,6 +51,15 @@ export async function startSchedules(): Promise<void> {
       if (!res.ran) return "sweep skipped: already ran today (latch)";
       return `sweep done: created=${res.built?.requests_created ?? 0} frozen=${res.frozen ?? 0} sent=${res.sent ?? 0} skipped=${JSON.stringify(res.skipped ?? {})}`;
     });
+  }
+
+  if (process.env.PRICE_BAND_SWEEP !== "0") {
+    // Recomputes the stored catalog price bands the DB triggers invalidated
+    // (lib/pricing/title-band.ts). Its first tick after a deploy is also the
+    // backfill of the migration that introduced the column. No lock: the
+    // writes are revision-guarded, so two instances only duplicate work.
+    const { runTitlePriceBandSweep } = await import("@/lib/pricing/title-band");
+    schedule("price-bands", PRICE_BAND_OFFSET_MS, runTitlePriceBandSweep);
   }
 
   if (process.env.PLACEMENT_READY_SWEEP !== "0") {

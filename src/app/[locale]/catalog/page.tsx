@@ -6,7 +6,6 @@ import { prisma } from "@/lib/prisma";
 import { getFavoritedTitleIds } from "@/lib/favorites";
 import { resolveCatalogSearch } from "@/lib/catalog-search";
 import { redirect } from "next/navigation";
-import { catalogVisibleTitleWhere } from "@/lib/catalog-visibility";
 import { savedListMembershipMap } from "@/lib/saved-list-membership";
 import { loadScope } from "@/lib/scope";
 import { loadRelevanceSignals } from "@/lib/catalog-relevance";
@@ -15,6 +14,8 @@ import { localizeVertical } from "@/lib/taxonomy-i18n";
 import { safeLocale } from "@/i18n/routing";
 import { readActiveListId, resolveActiveList } from "@/lib/lists";
 import { barTotals, planLineCount } from "@/lib/plan-total";
+import { refreshStaleTitlePriceBands } from "@/lib/pricing/title-band";
+import { BAND_TIER_COUNT, tierLabel } from "@/lib/pricing/bands";
 import { loadPricingDefaults } from "@/lib/content-fee";
 import { titleDisplayName } from "@/lib/title-display";
 import { CatalogRail } from "./_components/CatalogRail";
@@ -71,6 +72,7 @@ export default async function CatalogPage({
     nativeFit,
     b2bB2c,
     reach,
+    priceTiers,
     sort,
     onlyPriced,
     publisher,
@@ -82,6 +84,12 @@ export default async function CatalogPage({
     q,
     page,
   } = filters;
+
+  // The price-band filter reads the stored Title.priceBandTier. Bring any
+  // band a recent write invalidated up to date first (usually nothing to do:
+  // one probe of the stale-rows index), so the filter always agrees with the
+  // band the cards below render (lib/pricing/title-band.ts).
+  if (priceTiers.length) await refreshStaleTitlePriceBands();
 
   // FTS-first: titles matching every word of the query (FTS, then ILIKE),
   // widened to titles matching any word only when none match them all
@@ -97,6 +105,21 @@ export default async function CatalogPage({
 
   // The buyable formats for the rail's format filter (?types=).
   const formatOptions = FORMAT_KEYS.map((k) => ({ value: k, label: tType(k) }));
+
+  // The price-band filter (?price=): one option per band tier, labelled in
+  // the currencies of the markets being browsed (all markets when none is
+  // picked) — "25–40k NOK" for Norway, both scales across markets.
+  const bandCurrencies = (
+    await prisma.market.findMany({
+      where: { code: { in: markets.length ? markets : [...MARKET_CODES] } },
+      select: { currency: true },
+      orderBy: { code: "asc" },
+    })
+  ).map((m) => m.currency);
+  const priceBandOptions = Array.from({ length: BAND_TIER_COUNT }, (_, tier) => ({
+    value: String(tier),
+    label: tierLabel(tier, bandCurrencies),
+  }));
 
   // Labels in the buyer's language; values stay the stored taxonomy terms.
   const verticalOptions = localizedVerticalOptions(await loadVerticalOptions(), locale);
@@ -250,6 +273,7 @@ export default async function CatalogPage({
     !!nativeFit ||
     !!b2bB2c ||
     !!reach ||
+    priceTiers.length > 0 ||
     onlyPriced ||
     producedForYou ||
     guaranteedReach ||
@@ -376,10 +400,11 @@ export default async function CatalogPage({
     | "guaranteedReach"
     | "newsletterIncluded"
     | "videoIncluded"
+    | "price"
     | "q";
   const filterHref = (
     except: FilterKey,
-    extra?: { dropType?: ProductType; dropMarket?: MarketCode; dropVertical?: string },
+    extra?: { dropType?: ProductType; dropMarket?: MarketCode; dropVertical?: string; dropPrice?: number },
   ) => {
     const params = new URLSearchParams();
     if (except !== "market") {
@@ -399,6 +424,10 @@ export default async function CatalogPage({
         ? verticals.filter((v) => v !== extra.dropVertical)
         : verticals;
       if (keep.length) params.set("vertical", keep.join(","));
+    }
+    if (except !== "price") {
+      const keep = extra?.dropPrice !== undefined ? priceTiers.filter((p) => p !== extra.dropPrice) : priceTiers;
+      if (keep.length) params.set("price", keep.join(","));
     }
     if (nativeFit && except !== "nativeFit") params.set("nativeFit", nativeFit);
     if (b2bB2c && except !== "b2bB2c") params.set("b2bB2c", b2bB2c);
@@ -451,6 +480,13 @@ export default async function CatalogPage({
       key: `vertical-${v}`,
       label: `${t("filters.category")}: ${localizeVertical(v, safeLocale(locale))}`,
       href: filterHref("vertical", { dropVertical: v }),
+    });
+  }
+  for (const tier of priceTiers) {
+    activeFilters.push({
+      key: `price-${tier}`,
+      label: `${t("filters.price")}: ${priceBandOptions[tier].label}`,
+      href: filterHref("price", { dropPrice: tier }),
     });
   }
   if (nativeFit)
@@ -528,6 +564,7 @@ export default async function CatalogPage({
           reaches={REACH_VALUES.map((v) => ({ value: v, label: tReach(v) }))}
           categories={verticalOptions}
           regions={regionOptions.map((r) => ({ value: r.value, label: `${r.value} (${tMarket(r.country)})` }))}
+          priceBands={priceBandOptions}
           unpricedCount={unpricedCount}
           initial={{
             q,
@@ -556,6 +593,7 @@ export default async function CatalogPage({
             reaches={REACH_VALUES.map((v) => ({ value: v, label: tReach(v) }))}
             categories={verticalOptions}
             regions={regionOptions.map((r) => ({ value: r.value, label: `${r.value} (${tMarket(r.country)})` }))}
+            priceBands={priceBandOptions}
             unpricedCount={unpricedCount}
             initial={{
               q,

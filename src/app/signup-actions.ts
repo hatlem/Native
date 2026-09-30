@@ -4,6 +4,7 @@ import { redirect } from "next/navigation";
 import { after } from "next/server";
 import bcrypt from "bcryptjs";
 import { prisma } from "@/lib/prisma";
+import { asNoticeLocale } from "@/lib/notices/messages";
 import { authLimiter } from "@/lib/rate-limit";
 import { recordAudit } from "@/lib/audit";
 import { generateToken, hashToken, tokenExpiry } from "@/lib/tokens";
@@ -110,6 +111,8 @@ export async function register(formData: FormData) {
           role: "BUYER",
           passwordHash,
           organizationId: org.id,
+          // The language they signed up in; emails and notices follow it.
+          locale: asNoticeLocale(locale),
         },
       });
       // The org creator is its first, permanent ADMIN. Membership is the

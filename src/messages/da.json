@@ -210,7 +210,8 @@
       "publisher": "Udgiver",
       "densityLabel": "Visning",
       "densityList": "Liste",
-      "densityCards": "Kort"
+      "densityCards": "Kort",
+      "price": "Pris"
     },
     "compareBar": {
       "label": "{count, plural, =1 {1 titel valgt} other {# titler valgt}}",
@@ -298,7 +299,9 @@
       "mobileFilters": "Filtre",
       "marketCountAll": "Alle {total} markeder",
       "formatHeading": "Hvilket format?",
-      "formatHint": "Native-artikel, advertorial, display, video …"
+      "formatHint": "Native-artikel, advertorial, display, video …",
+      "priceHeading": "Hvad vil du bruge pr. placering?",
+      "priceHint": "Prisinterval pr. placering, inkl. artikel."
     },
     "shortlist": {
       "untitledPlan": "din plan",
@@ -740,6 +743,9 @@
       "item3Body": "Udkast sendes til dig til godkendelse. Links og resultater lander i Rapporter."
     },
     "breakdownQtyWithArticleFee": "{n} × {unit} placering + {article} pr. artikel (én artikel til alle {n})",
+    "inclVatFirmPart": "{amount} inkl. moms for de linjer, du kan bestille med det samme",
+    "estimateNote": "≈ er et prisinterval. Den nøjagtige pris får du i tilbuddet.",
+    "breakdownPlacements": "{n} placeringer",
     "noticePlanReadOnly": "Du har kun læseadgang til denne plan, så intet blev ændret.",
     "runPeriod": "{range} · {unit, select, WEEK {{n, plural, one {# uge} other {# uger}}} other {{n, plural, one {# måned} other {# måneder}}}}"
   },
@@ -1412,7 +1418,19 @@
     "emptyTitle": "Ingen fakturaer endnu",
     "emptyHint": "Fakturaer vises her, når en kampagne er kørt og faktureret.",
     "emptyCta": "Se dine kampagner",
-    "colCustomer": "Kunde"
+    "colCustomer": "Kunde",
+    "seller": "Fra",
+    "sellerOrgNumber": "Org.nr.",
+    "sellerVatNumber": "Momsnr.",
+    "paymentHeading": "Betalingsoplysninger",
+    "bankAccount": "Kontonummer",
+    "paymentReference": "Reference",
+    "pdfUnavailableHeading": "PDF'en er ikke klar endnu",
+    "pdfUnavailable": "Vi gør fakturadokumentet færdigt. Beløbene nedenfor er endelige — kontakt os, hvis du har brug for PDF'en nu.",
+    "pdfUnavailableDesk": "PDF'en kan ikke dannes, før NativeSpins selskabsoplysninger er sat i servermiljøet. Sæt disse variabler, og deploy igen:",
+    "sellerVarMissing": "ikke sat",
+    "sellerVarInvalid": "sat, men kontrolcifferet passer ikke",
+    "pdfPending": "Vis"
   },
   "firm": {
     "badge": "Øjeblikkelig bestilling",
@@ -1687,7 +1705,7 @@
     "rowReach": "Månedlig rækkevidde",
     "rowLeadTime": "Leveringstid",
     "rowFormats": "Tilgængelige formater",
-    "rowFromPrice": "Fra pris",
+    "rowFromPrice": "Prisinterval",
     "rowAction": "Handling"
   },
   "availability": {
@@ -2555,7 +2573,7 @@
     "planRfqOnly": "En eller flere titler i din plan kræver et tilbud — øjeblikkelig bestilling er deaktiveret, indtil prisen er bekræftet.",
     "listIndicative": "Listepris (vejledende)",
     "listIndicativeHelp": "Vejledende listepris — den endelige pris bekræftes efter en kort brief.",
-    "productionIncluded": "Færdigskrevet artikel inkluderet",
+    "productionIncluded": "inkl. artikel",
     "firmTurnaround": "Fast pris typisk inden for 24 timer"
   },
   "titleAdmin": {
@@ -2594,7 +2612,9 @@
     "inviteBusinessEmail": "Brug en firmaadresse — gratis- og engangstjenester accepteres ikke.",
     "inviteNotFound": "Forlaget findes ikke længere — genindlæs siden.",
     "priceUnconfirmed": "pris ikke bekræftet",
-    "productInactive": "inaktiv"
+    "productInactive": "inaktiv",
+    "inviteLanguageLabel": "Sprog i mailen",
+    "inviteLanguageHint": "Invitationen, oprettelsessiden og portalkontoen bruger dette sprog. Standard er titlens marked."
   },
   "salesContacts": {
     "title": "Salgskontakter",
@@ -3688,6 +3708,140 @@
   "viewOnly": {
     "title": "Kun læseadgang",
     "body": "Du kan se alt, dit team har her, men ikke ændre det. Spørg en administrator, hvis du skal redigere, sende eller acceptere."
+  },
+  "notices": {
+    "email": {
+      "cta": "Åbn i NativeSpin",
+      "linkLine": "Åbn i NativeSpin: {url}",
+      "footer": "Dette er en automatisk besked fra NativeSpin."
+    },
+    "orderInProduction": {
+      "title": "Ordren er i produktion: {plan}",
+      "body": "Vi booker {count, plural, one {placeringen} other {de # placeringer}} hos udgiverne og sætter indholdet i gang. Du hører fra os, når der er et udkast, du kan gennemse."
+    },
+    "orderScheduled": {
+      "title": "Kampagnen er planlagt: {plan}",
+      "bodyRange": "Udgivelsen er booket {start}–{end}. Vi giver besked, så snart den første placering er ude.",
+      "bodyFrom": "Udgivelsen er booket fra {start}. Vi giver besked, så snart den første placering er ude.",
+      "bodyUndated": "Alle placeringer har fået en plads hos deres udgiver. Vi giver besked, så snart den første er ude."
+    },
+    "orderCancelled": {
+      "title": "Ordren er annulleret: {plan}",
+      "body": "NativeSpin-desken har annulleret denne ordre. Årsag: {reason}"
+    },
+    "draftReady": {
+      "title": "Udkast klar til gennemsyn: {article}",
+      "body": "Version {version} af “{article}” er klar. Læs den, og godkend den eller bed om ændringer."
+    },
+    "draftSentBack": {
+      "title": "Udkastet er sendt tilbage til ændringer: {article}",
+      "body": "Desken har bedt om ændringer i version {version} af “{article}”. Du får det reviderede udkast til gennemsyn, når det er klar."
+    },
+    "invoiceIssued": {
+      "title": "Faktura udstedt: {plan}",
+      "body": "I alt {amount} inkl. moms, forfalder {due}. Åbn fakturaen for at downloade PDF'en."
+    },
+    "creditNoteIssued": {
+      "title": "Kreditnota udstedt: {plan}",
+      "body": "Fakturaen på {amount} er krediteret fuldt ud. Årsag: {reason}"
+    },
+    "bookingConfirmed": {
+      "title": "{title} har bekræftet din booking",
+      "body": "{title} har bekræftet placeringen i {plan}. Vi giver besked, når den er ude."
+    },
+    "placementLive": {
+      "title": "Din placering er ude hos {title}",
+      "body": "Placeringen i {plan} er publiceret hos {title}. Åbn den for at se den, som læserne gør."
+    },
+    "editorialVeto": {
+      "title": "{title} kan ikke bringe dette udkast",
+      "body": "{title} har af redaktionelle grunde takket nej til at bringe udkastet i {plan}: {reason}. Desken kontakter dig om det næste skridt."
+    },
+    "placementProposed": {
+      "title": "Desken har valgt en placering hos {title}",
+      "body": "Du bad os foreslå en placering hos {title}. Vi har valgt {format} – du finder den på din forespørgsel."
+    },
+    "placeholderRemoved": {
+      "title": "{title} er fjernet fra din forespørgsel",
+      "body": "{title} har ingen placering, vi kan booke lige nu, så desken har taget den af forespørgslen. Resten af forespørgslen er uændret."
+    },
+    "rfqSubmitted": {
+      "title": "Ny forespørgsel fra {org}: {plan}",
+      "intro": "{org} har indsendt “{plan}” med {count, plural, one {# linje} other {# linjer}}.",
+      "budget": "Budget: {amount}",
+      "brief": "Brief:",
+      "noBrief": "Der er ikke skrevet noget brief.",
+      "lines": "Linjer:",
+      "line": "{title} – {format} × {quantity}",
+      "lineWithContent": "{title} – {format} × {quantity}, skrevet af NativeSpin",
+      "linePlaceholder": "{title} – desken foreslår placering",
+      "moreLines": "…og {count} mere"
+    },
+    "quoteAccepted": {
+      "title": "{count, plural, one {Tilbud accepteret} other {# tilbud accepteret}}: {plan}",
+      "body": "{count, plural, one {{org} har accepteret tilbuddet på {plan}. Ordren er bekræftet.} other {{org} har accepteret en kampagne på # markeder ({plan}). # ordrer er bekræftet.}}"
+    },
+    "quoteRenewal": {
+      "title": "Fornyet tilbud ønskes: {plan}",
+      "body": "{org} vil gerne videre, men tilbuddet er udløbet. Forny det (og justér priserne, hvis taksterne har ændret sig), så det kan accepteres igen."
+    },
+    "deskBookingConfirmed": {
+      "title": "{title} har bekræftet en booking",
+      "body": "{title} har bekræftet sin placering på ordren “{plan}” fra {org}."
+    },
+    "deskPlacementLive": {
+      "title": "Placering publiceret hos {title}",
+      "body": "{title} har publiceret placeringen på ordren “{plan}” fra {org}."
+    },
+    "deskEditorialVeto": {
+      "title": "{title} har brugt sit redaktionelle veto",
+      "body": "{title} vil ikke bringe udkastet på ordren “{plan}” fra {org}. Årsag: {reason}"
+    },
+    "deskDraftApproved": {
+      "title": "{org} har godkendt et udkast: {article}",
+      "body": "Version {version} af “{article}” er godkendt. Færdiggør den for at låse den til placeringerne."
+    },
+    "deskChangesRequested": {
+      "title": "{org} beder om ændringer: {article}",
+      "body": "{org} har sendt version {version} af “{article}” tilbage til ændringer.",
+      "comment": "Deres kommentar: “{comment}”",
+      "noComment": "De skrev ingen kommentar."
+    },
+    "publisherPrice": {
+      "title": "Udgiveren har ændret en pris: {title}",
+      "body": "{title}, {format}: {from} → {to}, bekræftet af udgiveren."
+    },
+    "publisherLeadTime": {
+      "title": "Udgiveren har ændret leveringstiden: {title}",
+      "body": "{title}, {format}: varslet er ændret fra {from} til {to}. Tjek planlagte kampagner, der nu starter for tidligt.",
+      "days": "{count, plural, one {# dag} other {# dage}}",
+      "unset": "ikke angivet"
+    },
+    "bookingNew": {
+      "title": "Ny booking fra {org}",
+      "bodyInstant": "{org} har afgivet en direkte ordre, der omfatter jeres titler. Bekræft hver booking i udgiverportalen.",
+      "bodyQuote": "{org} har accepteret et tilbud, der omfatter jeres titler. Bekræft hver booking i udgiverportalen."
+    },
+    "publisherOrderCancelled": {
+      "title": "Ordre annulleret: {org}",
+      "body": "NativeSpin-desken har annulleret ordren fra {org}. Bookinger på jeres titler, der ikke er kørt, er annulleret. Årsag: {reason}"
+    },
+    "writerChangesRequested": {
+      "title": "Ændringer ønskes: {article}",
+      "bodyClient": "Kunden har sendt version {version} af “{article}” tilbage til ændringer.",
+      "bodyDesk": "NativeSpin-desken har sendt version {version} af “{article}” tilbage til ændringer.",
+      "comment": "Kommentar: “{comment}”"
+    }
+  },
+  "publisherInviteEmail": {
+    "subject": "Invitation til samarbejde for {publisher} – NativeSpin",
+    "greeting": "Hej,",
+    "added": "{inviter} har tilføjet {publisher} til NativeSpins katalog og inviteret dig til at oprette en konto i udgiverportalen.",
+    "inviterFallback": "NativeSpin-teamet",
+    "portal": "I portalen holder du prislister, specifikationer, tilgængelighed og bookinger opdateret for de titler, NativeSpins kunder kan booke gennem os.",
+    "claim": "Opret kontoen her (linket udløber om {days} dage):",
+    "ignore": "Hvis du ikke ventede denne mail, kan du se bort fra den – linket kan kun bruges én gang.",
+    "signoff": "– NativeSpin"
   },
   "briefTargeting": {
     "audience": "Målgruppe",

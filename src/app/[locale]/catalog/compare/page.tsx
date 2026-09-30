@@ -7,7 +7,7 @@ import { Link } from "@/i18n/navigation";
 import { intlLocale } from "@/lib/money";
 import { isProductPriceShown } from "@/lib/pricing/visibility";
 import { bandLabel } from "@/lib/pricing/bands";
-import { titleBand } from "@/lib/pricing/display-price";
+import { bandIncludesArticle, titleBand } from "@/lib/pricing/display-price";
 import { loadPricingDefaults } from "@/lib/content-fee";
 import { EmptyState } from "@/app/empty-state";
 import { catalogVisibleTitleWhere } from "@/lib/catalog-visibility";
@@ -95,17 +95,21 @@ export default async function ComparePage({
 
       {(() => {
         const numberFmt = new Intl.NumberFormat(intlLocale(locale));
-        const rows = ordered.map((title) => ({
+        const rows = ordered.map((title) => {
+          const fromBand = titleBand(title.products, title, pricing);
+          return {
           title,
           name: titleDisplayName(title),
           anyHidden: title.products.some((p) => !isProductPriceShown(p, title)),
-          fromBand: titleBand(title.products, title, pricing),
+          fromBand,
+          bandWithArticle: fromBand ? bandIncludesArticle(fromBand.product, title, pricing) : false,
           // Same reach figure as the catalog card (digital first) and the
           // same lead time as the detail page (stated, else estimated) — a
           // title must not read "122 000" on one surface and "—" here.
           reach: title.digitalReach ?? title.monthlyReach ?? null,
           lead: titleLeadTime(title.products),
-        }));
+          };
+        });
         type CompareRow = (typeof rows)[number];
 
         // One spec per attribute; the table body is a map over it. Every
@@ -159,7 +163,15 @@ export default async function ComparePage({
             className: "num",
             cell: (r) =>
               r.fromBand ? (
-                <span className="price">≈ {bandLabel(r.fromBand.band, r.fromBand.product.currency)}</span>
+                <span className="price">
+                  ≈ {bandLabel(r.fromBand.band, r.fromBand.product.currency)}
+                  {r.bandWithArticle ? (
+                    <>
+                      {" "}
+                      <span className="muted small">{tv("productionIncluded")}</span>
+                    </>
+                  ) : null}
+                </span>
               ) : r.anyHidden ? (
                 <span className="muted">{tv("requestPrice")}</span>
               ) : (

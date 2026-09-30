@@ -3,10 +3,12 @@
 // The token is a 128-bit cuid-like random — cryptographically strong
 // enough for a single-use, time-limited link, and short enough to land
 // in an email without wrapping. We don't reuse the User invite token
-// scheme (we don't have one yet) and we keep this module pure so the
-// claim-page guards can be tested without spinning Prisma.
+// scheme (we don't have one yet) and we keep this module free of Prisma so
+// the claim-page guards can be tested without a database.
 
 import { randomBytes } from "node:crypto";
+import type { BuyerLocale } from "@/lib/market-locale";
+import { publisherInviteT } from "@/lib/notices/messages";
 
 // Defaults — kept here so any future change (e.g. lengthening expiry
 // after partnership feedback) is one number, not a search-and-replace.
@@ -70,25 +72,30 @@ export function claimLink(token: string, locale: string = "en"): string {
   return `${siteOrigin()}/${locale}/publisher/claim/${encodeURIComponent(token)}`;
 }
 
+// The portal invitation, in the language the desk picked for it (default:
+// the publisher's market language). Copy: `publisherInviteEmail` in
+// src/messages/<locale>.json.
 export function inviteEmail(args: {
   publisherName: string;
   inviterName?: string | null;
   link: string;
+  locale?: BuyerLocale;
 }): { subject: string; text: string } {
-  const subject = `NativeSpin — partnership invitation for ${args.publisherName}`;
+  const t = publisherInviteT(args.locale ?? "en");
+  const publisher = args.publisherName;
   const lines = [
-    `Hi,`,
-    ``,
-    `${args.inviterName ?? "The NativeSpin team"} has added ${args.publisherName} to the NativeSpin catalog and invited you to claim a publisher portal account.`,
-    ``,
-    `The portal lets you maintain rate cards, specs, availability, and bookings for the titles NativeSpin buyers can book through us.`,
-    ``,
-    `Claim the account here (link expires in ${DEFAULT_INVITE_TTL_DAYS} days):`,
+    t("greeting"),
+    "",
+    t("added", { inviter: args.inviterName ?? t("inviterFallback"), publisher }),
+    "",
+    t("portal"),
+    "",
+    t("claim", { days: DEFAULT_INVITE_TTL_DAYS }),
     args.link,
-    ``,
-    `If you weren't expecting this, you can ignore the message — the link is single-use.`,
-    ``,
-    `— NativeSpin`,
+    "",
+    t("ignore"),
+    "",
+    t("signoff"),
   ];
-  return { subject, text: lines.join("\n") };
+  return { subject: t("subject", { publisher }), text: lines.join("\n") };
 }

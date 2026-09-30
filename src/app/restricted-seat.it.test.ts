@@ -245,7 +245,7 @@ if (!RUN_DB_IT || !CAN_MOCK) {
       { ok: false },
     );
     assert.deepEqual(await lists.savePlanBrief(listId, { briefText: "Hacked brief" }), { ok: false });
-    assert.deepEqual(await lists.addProductToActiveList(productId, false, "en"), { ok: false, reason: "read-only" });
+    assert.deepEqual(await lists.addProductToActiveList(productId, "en"), { ok: false, reason: "read-only" });
     await lists.setListTitleMembership(form({ listId, titleId, member: "0" }));
 
     assert.deepEqual(await listState(), before, "the plan is exactly as it was");

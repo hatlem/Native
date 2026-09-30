@@ -10,6 +10,7 @@ import { noopProvider, type AccountingProvider, type PushResult } from "@/lib/ac
 import { loadInvoicePdfData } from "@/lib/pdf/invoice-pdf-data";
 import { InvoiceDocument } from "@/lib/pdf/InvoiceDocument";
 import { invoiceMessagesFor } from "@/lib/pdf/invoice-messages";
+import { loadSellerDetails, sellerGaps } from "@/lib/seller";
 
 // DB-mutating integration test — skipped unless RUN_DB_IT=1, and only
 // against a DISPOSABLE database. Covers the billing tail end to end:
@@ -308,9 +309,27 @@ if (!RUN_DB_IT) {
     assert.doesNotMatch(data.rows[0].label, /NATIVE_ARTICLE/);
     assert.ok(data.credit);
 
+    // A complete seller (public reference values, not NativeSpin's): the
+    // route refuses to render without one (lib/seller.ts sellerGaps).
+    const seller = loadSellerDetails({
+      SELLER_ORG_NUMBER: "974760673",
+      SELLER_VAT_NUMBER: "NO 974 760 673 MVA",
+      SELLER_ADDRESS_LINE1: "Testveien 1",
+      SELLER_POSTAL_CODE: "0150",
+      SELLER_BANK_ACCOUNT: "1234.56.78903",
+      SELLER_IBAN: "NO9386011117947",
+      SELLER_BIC: "DNBANOKK",
+    });
+    assert.deepEqual(sellerGaps(seller, data.currency), []);
     const pdf = await renderToBuffer(
-      InvoiceDocument({ data, locale: "no", messages: invoiceMessagesFor("no") }),
+      InvoiceDocument({ data, seller, locale: "no", messages: invoiceMessagesFor("no") }),
     );
     assert.equal(Buffer.from(pdf).subarray(0, 4).toString(), "%PDF");
+  });
+
+  test("an unconfigured seller makes every invoice legally incomplete", async () => {
+    const gaps = sellerGaps(loadSellerDetails({}), "NOK").map((g) => g.variable);
+    assert.ok(gaps.includes("SELLER_ORG_NUMBER"));
+    assert.ok(gaps.includes("SELLER_BANK_ACCOUNT"));
   });
 }

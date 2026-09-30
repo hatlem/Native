@@ -2,7 +2,7 @@ import { NextResponse, type NextRequest } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { authenticateRequest } from "@/lib/api-auth";
 import { rfqLimiter } from "@/lib/rate-limit";
-import { isProductPriceShown } from "@/lib/pricing-visibility";
+import { isInstantOrderable } from "@/lib/pricing/visibility";
 import { parseOrderRequest } from "@/lib/api/order-request";
 import {
   completeIdempotencyKey,
@@ -188,7 +188,7 @@ export async function POST(req: NextRequest) {
           `Product not found or not bookable: ${it.productId}`,
         );
       }
-      if (p.visibility !== "FIRM" || !isProductPriceShown(p, p.title)) {
+      if (!isInstantOrderable(p, p.title)) {
         return fail(
           422,
           "RFQ_ONLY",

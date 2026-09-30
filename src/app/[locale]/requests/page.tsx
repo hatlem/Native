@@ -4,7 +4,8 @@ import { redirect } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import { loadScope } from "@/lib/scope";
 import { loadUnsentLists } from "@/lib/lists";
-import { estimateListTotals, planLineCount } from "@/lib/plan-total";
+import { estimateListTotals, hasFigure, planLineCount } from "@/lib/plan-total";
+import { totalLabel as planTotalLabel } from "@/lib/pricing/total-label";
 import { loadPricingDefaults } from "@/lib/content-fee";
 import { Link } from "@/i18n/navigation";
 import { EmptyState } from "@/app/empty-state";
@@ -132,20 +133,21 @@ export default async function RequestsPage({
     // and its submit, so an alternatives-only plan has nothing to send yet.
     const placements = planLineCount(list.items);
     const alternatives = list.items.length - placements;
-    // Currencies with nothing priced yet drop out: their lines are "price on
-    // request", never "0 kr".
-    const totals = estimateListTotals(list.items, pricing).filter((tot) => tot.hasVisible);
+    // Exact for instant-orderable lines, a band range for the rest — the
+    // same figure /plan shows (lib/plan-total.ts, lib/pricing/total-label.ts).
+    // A currency with nothing priced drops out: "price on request", never 0.
+    const totals = estimateListTotals(list.items, pricing).filter(hasFigure);
     const totalLabel = totals.length
       ? totals.length > 1
         ? totals
             .map((tot) =>
               tPlan("totalForItems", {
-                amount: formatMoney(tot.amount, tot.currency, locale),
+                amount: planTotalLabel(tot, locale) ?? "",
                 count: tot.itemCount,
               }),
             )
             .join(" + ")
-        : formatMoney(totals[0].amount, totals[0].currency, locale)
+        : planTotalLabel(totals[0], locale)
       : placements > 0
         ? tv("requestPrice")
         : null;

@@ -11,13 +11,16 @@ import {
 } from "react";
 import { useTranslations } from "next-intl";
 import { Link } from "@/i18n/navigation";
-import { formatMoney } from "@/lib/money";
 import { addProductToActiveList } from "@/app/list-actions";
+import type { TotalFigure } from "@/lib/plan-total";
+import { totalLabel } from "@/lib/pricing/total-label";
 
-type LineTotal = { currency: string; amount: number; itemCount: number };
+type LineTotal = TotalFigure;
 
 // No price on the client: the bar's count and total come back from the
-// server action (lib/plan-total.ts), priced exactly as /plan prices them.
+// server action (lib/plan-total.ts), priced exactly as /plan prices them —
+// the exact sum of instant-orderable lines plus the band range of the rest,
+// so no banded line's exact estimate ever reaches the browser.
 type ShortlistItem = {
   productId: string;
   titleName: string;
@@ -26,7 +29,7 @@ type ShortlistItem = {
 type Ctx = {
   isOnPlan: (productId: string) => boolean;
   isPending: (productId: string) => boolean;
-  add: (item: ShortlistItem, withContent: boolean) => Promise<boolean>;
+  add: (item: ShortlistItem) => Promise<boolean>;
   // View-only (RESTRICTED) seat: no "Add to plan" buttons at all — the
   // server would refuse the add (reason "read-only").
   readOnly: boolean;
@@ -87,12 +90,14 @@ export function ShortlistProvider({
   const isPending = useCallback((productId: string) => pendingIds.has(productId), [pendingIds]);
 
   const add = useCallback(
-    async (item: ShortlistItem, withContent: boolean) => {
+    async (item: ShortlistItem) => {
       setPendingIds((p) => new Set(p).add(item.productId));
       setAddedIds((s) => new Set(s).add(item.productId));
       setAdded((a) => [...a, item]);
 
-      const result = await addProductToActiveList(item.productId, withContent, locale);
+      // "We write it" is decided server-side (on by default for a catalog
+      // add — the band includes the article; lib/authorship.ts).
+      const result = await addProductToActiveList(item.productId, locale);
 
       setPendingIds((p) => {
         const next = new Set(p);
@@ -205,12 +210,12 @@ function ShortlistBar({
                 ? totals
                     .map((line) =>
                       tPlan("totalForItems", {
-                        amount: formatMoney(line.amount, line.currency, locale),
+                        amount: totalLabel(line, locale) ?? "",
                         count: line.itemCount,
                       }),
                     )
                     .join(" + ")
-                : formatMoney(totals[0].amount, totals[0].currency, locale)
+                : totalLabel(totals[0], locale)
               : t("totalPending")}
           </span>
         </div>
@@ -225,7 +230,6 @@ function ShortlistBar({
 export function ShortlistButton({
   productId,
   titleName,
-  withContent,
   hasPrice,
   addLabel,
   addedLabel,
@@ -233,7 +237,6 @@ export function ShortlistButton({
 }: {
   productId: string;
   titleName: string;
-  withContent: boolean;
   hasPrice: boolean;
   addLabel: string;
   addedLabel: string;
@@ -250,7 +253,7 @@ export function ShortlistButton({
       className={`btn small catalog-row__cta${onPlan ? " is-added" : ""}`}
       disabled={onPlan || pending}
       aria-busy={pending}
-      onClick={() => add({ productId, titleName }, withContent)}
+      onClick={() => add({ productId, titleName })}
     >
       {onPlan ? `✓ ${addedLabel}` : hasPrice ? addLabel : askLabel}
     </button>

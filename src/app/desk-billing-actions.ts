@@ -9,6 +9,7 @@ import { requireDesk } from "@/lib/desk-guard";
 import { normaliseReason, type CancelActor } from "@/lib/cancellation";
 import { issueFullCreditNote, issueInvoiceForOrder } from "@/lib/billing";
 import { syncCreditNoteToAccounting, syncInvoiceToAccounting } from "@/lib/accounting-sync";
+import { orderNoticeContext } from "@/lib/notice-context";
 
 // Desk billing: issue the invoice for a completed order, credit it in full,
 // and retry an accounting push that failed. The DB rules live in
@@ -39,15 +40,19 @@ export async function issueInvoice(formData: FormData) {
   const result = await issueInvoiceForOrder({ orderId, actorId: userId });
   if (result.ok) {
     await syncInvoiceToAccounting(result.invoiceId, { actorId: userId });
-    const order = await prisma.order.findUniqueOrThrow({
-      where: { id: orderId },
-      select: { organizationId: true },
-    });
-    await notifyOrg(order.organizationId, {
+    const { organizationId, planName } = await orderNoticeContext(orderId);
+    await notifyOrg(organizationId, {
       kind: "INVOICE_ISSUED",
-      title: "Invoice issued",
-      body: `Total ${result.total} ${result.currency}, due ${result.dueAt.toISOString().slice(0, 10)}.`,
-      link: `/${locale}/invoices/${result.invoiceId}`,
+      template: {
+        key: "invoiceIssued",
+        params: {
+          planName,
+          invoiceId: result.invoiceId,
+          total: result.total,
+          currency: result.currency,
+          dueAt: result.dueAt.toISOString(),
+        },
+      },
     });
     revalidatePath(orderPath(locale, orderId));
   }
@@ -74,23 +79,25 @@ export async function issueCreditNote(formData: FormData) {
 
   await syncCreditNoteToAccounting(result.creditNoteId, { actorId: userId });
 
-  const order = await prisma.order.findUniqueOrThrow({
-    where: { id: orderId },
-    select: { organizationId: true },
-  });
-  await notifyOrg(order.organizationId, {
+  const { organizationId, orgName, planName } = await orderNoticeContext(orderId);
+  await notifyOrg(organizationId, {
     kind: "INVOICE_ISSUED",
-    title: "Credit note issued",
-    body: `${result.amount} ${result.currency} credited — ${reason}`,
-    link: `/${locale}/invoices/${result.invoiceId}`,
+    template: {
+      key: "creditNoteIssued",
+      params: {
+        planName,
+        invoiceId: result.invoiceId,
+        amount: result.amount,
+        currency: result.currency,
+        reason,
+      },
+    },
   });
   await Promise.all(
     result.publisherIds.map((pid) =>
       notifyPublisher(pid, {
         kind: "ORDER_CANCELLED",
-        title: "Order cancelled by NativeSpin desk",
-        body: reason,
-        link: `/${locale}/publisher/orders`,
+        template: { key: "publisherOrderCancelled", params: { orgName, reason } },
       }),
     ),
   );

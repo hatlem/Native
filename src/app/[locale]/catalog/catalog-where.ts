@@ -7,6 +7,7 @@
 
 import type { Prisma } from "@prisma/client";
 import { catalogVisibleTitleWhere } from "@/lib/catalog-visibility";
+import { priceBandWhere } from "@/lib/pricing/title-band";
 import type { CatalogSearch } from "@/lib/catalog-search";
 import type { CatalogParams } from "./filters";
 
@@ -78,6 +79,9 @@ export function buildCatalogWhere(
     ...(nativeFit ? { nativeFit } : {}),
     ...(b2bB2c ? { b2bB2c } : {}),
     ...(reach ? { reach } : {}),
+    // Stored, indexed band tier — the database filters and pages on it. The
+    // caller refreshes stale bands first (refreshStaleTitlePriceBands).
+    ...priceBandWhere(f.priceTiers),
     // AND-composed rather than spread: catalogVisibleTitleWhere and the
     // search fallback (buildIlikeFallbackWhere) can each independently
     // produce a top-level `OR` key. Spreading them into the same object

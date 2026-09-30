@@ -70,7 +70,6 @@ export async function savePrice(formData: FormData) {
         productId,
         basePrice,
         actorUserId: userId,
-        locale,
       });
     } catch (err) {
       if (!(err instanceof PublisherRatesError)) throw err;

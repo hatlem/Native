@@ -3,7 +3,7 @@ import { getTranslations } from "next-intl/server";
 import { MarketCode } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
 import { formatMoney, intlLocale } from "@/lib/money";
-import { plannablePrice, productBand } from "@/lib/pricing/display-price";
+import { bandIncludesArticle, plannablePrice, productBand } from "@/lib/pricing/display-price";
 import { bandLabel } from "@/lib/pricing/bands";
 import { loadPricingDefaults } from "@/lib/content-fee";
 import { localizeVertical } from "@/lib/taxonomy-i18n";
@@ -44,6 +44,7 @@ export default async function RecommendPage({
   const tType = await getTranslations({ locale, namespace: "productType" });
   const tMarket = await getTranslations({ locale, namespace: "market" });
   const tm = await getTranslations({ locale, namespace: "marketing" });
+  const tv = await getTranslations({ locale, namespace: "priceVisibility" });
 
   const marketCode =
     typeof sp.market === "string" &&
@@ -60,6 +61,8 @@ export default async function RecommendPage({
   // Public page: every price shown is a band (display-price.ts), never the
   // figure. The exact customer price is used only to fit the budget.
   const bandByProduct = new Map<string, string>();
+  // Products whose band includes the article ("incl. article", display-price.ts).
+  const articleIncluded = new Set<string>();
 
   if (marketCode) {
     const market = await prisma.market.findUnique({
@@ -96,6 +99,7 @@ export default async function RecommendPage({
       const band = productBand(p, p.title, defaults);
       if (unitPrice === null || !band) continue;
       bandByProduct.set(p.id, bandLabel(band, p.currency));
+      if (bandIncludesArticle(p, p.title, defaults)) articleIncluded.add(p.id);
       candidates.push({
         productId: p.id,
         titleId: p.titleId,
@@ -244,7 +248,15 @@ export default async function RecommendPage({
                           ? p.reach.toLocaleString(intlLocale(locale))
                           : t("reachUnknown")}
                       </p>
-                      <div className="price">≈ {bandByProduct.get(p.productId)}</div>
+                      <div className="price">
+                        ≈ {bandByProduct.get(p.productId)}
+                        {articleIncluded.has(p.productId) ? (
+                          <>
+                            {" "}
+                            <span className="muted small">{tv("productionIncluded")}</span>
+                          </>
+                        ) : null}
+                      </div>
                     </article>
                   ))}
                 </div>

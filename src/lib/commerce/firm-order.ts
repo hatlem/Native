@@ -64,8 +64,14 @@ export type FirmOrderProduct = ProductWithRules & {
   // flight window. Optional: the public API's product query may not hydrate
   // it, in which case MONTH (the catalog default) is assumed.
   bookingUnit?: BookingUnit;
+  // The offer's / publication's own article fee — the production-fee
+  // cascade the catalog band and the plan line price "We write it" with
+  // (pricing/production-fee.ts). Both callers hydrate them; absent, the
+  // CONTENT_FEE line falls back to the desk rule.
+  productionFee?: unknown;
   title: {
     marketId: string;
+    productionFeeDefault?: unknown;
     market: { code: string; currency: string; vatRatePct: unknown };
   };
 };

@@ -1,5 +1,6 @@
 import { MarketCode, ProductType } from "@prisma/client";
 import { SUPPORTED_MARKETS } from "@/lib/markets";
+import { isBandTier } from "@/lib/pricing/bands";
 
 export const MARKET_CODES = SUPPORTED_MARKETS;
 export const PRODUCT_TYPES = Object.values(ProductType);
@@ -27,6 +28,16 @@ export function asEnum<T extends string>(
   return value && (allowed as readonly string[]).includes(value)
     ? (value as T)
     : undefined;
+}
+
+export function parsePriceTiers(raw: string): number[] {
+  const tiers = raw
+    .split(",")
+    .map((s) => s.trim())
+    .filter((s) => /^\d+$/.test(s))
+    .map(Number)
+    .filter(isBandTier);
+  return [...new Set(tiers)].sort((a, b) => a - b);
 }
 
 export function parseCatalogParams(
@@ -73,6 +84,11 @@ export function parseCatalogParams(
     typeof sp.reach === "string" ? sp.reach : undefined,
     REACH_VALUES,
   );
+  // `price` is multi-select (CSV) of band tiers (lib/pricing/bands.ts:
+  // 0 = the bottom "under" bucket … 5 = the open top one), filtered on the
+  // stored Title.priceBandTier. Junk values drop out; sorted and deduped so
+  // equivalent URLs build the same query.
+  const priceTiers = parsePriceTiers(typeof sp.price === "string" ? sp.price : "");
   const sort = asEnum(
     typeof sp.sort === "string" ? sp.sort : undefined,
     SORT_VALUES,
@@ -109,6 +125,7 @@ export function parseCatalogParams(
     nativeFit,
     b2bB2c,
     reach,
+    priceTiers,
     sort,
     onlyPriced,
     publisher,
@@ -138,6 +155,7 @@ export function catalogFilterParams(f: CatalogParams): URLSearchParams {
   if (f.nativeFit) params.set("nativeFit", f.nativeFit);
   if (f.b2bB2c) params.set("b2bB2c", f.b2bB2c);
   if (f.reach) params.set("reach", f.reach);
+  if (f.priceTiers.length) params.set("price", f.priceTiers.join(","));
   if (f.onlyPriced) params.set("onlyPriced", "1");
   if (f.publisher) params.set("publisher", f.publisher);
   if (f.producedForYou) params.set("producedForYou", "1");
