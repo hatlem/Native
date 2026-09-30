@@ -1,6 +1,7 @@
 import { getTranslations } from "next-intl/server";
 import type { Prisma } from "@prisma/client";
 import { intlLocale } from "@/lib/money";
+import { SafeEmail } from "@/components/safe-email";
 
 type AssignedBuyer = Prisma.UserGetPayload<{
   select: { name: true; email: true };
@@ -33,8 +34,11 @@ export async function PendingQuoteSection({
             <dt>{t("pendingBuyerLabel")}</dt>
             <dd>
               {assignedBuyer?.name ??
-                assignedBuyer?.email ??
-                t("pendingBuyerUnassigned")}
+                (assignedBuyer?.email ? (
+                  <SafeEmail address={assignedBuyer.email} />
+                ) : (
+                  t("pendingBuyerUnassigned")
+                ))}
             </dd>
           </div>
           <div>

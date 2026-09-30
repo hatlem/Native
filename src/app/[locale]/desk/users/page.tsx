@@ -177,7 +177,7 @@ export default async function DeskUsersPage({
           <div className="section-head">
             <div>
               <span className="eyebrow">{t("editEyebrow")}</span>
-              <h2>{editing.name || editing.email}</h2>
+              <h2>{editing.name || <SafeEmail address={editing.email} />}</h2>
             </div>
             <Link href={listHref({ edit: "" })}>{t("editClose")}</Link>
           </div>

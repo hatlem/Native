@@ -11,6 +11,7 @@ import {
   removeFavoriteFromList,
   toggleFavorite,
   createFavoriteList,
+  addFavoriteToList,
 } from "@/app/favorites-actions";
 import { saveTitleToList } from "@/app/list-actions";
 import type {
@@ -37,6 +38,7 @@ function PubCard({
   removeMode,
   removeLabel,
   listId,
+  collections,
 }: {
   locale: string;
   pub: FavoritePublication;
@@ -45,6 +47,10 @@ function PubCard({
   removeMode: RemoveMode;
   removeLabel?: string;
   listId?: string;
+  // The viewer's own collections, offered as "Add to collection" — the only
+  // way a favorite gets into one (the catalog heart's menu adds to saved
+  // lists, i.e. plans). Omitted inside a collection view.
+  collections?: { options: { id: string; name: string }[]; label: string; submit: string };
 }) {
   return (
     <article className="card">
@@ -77,6 +83,27 @@ function PubCard({
           </form>
         ) : null}
       </div>
+      {collections && collections.options.length > 0 ? (
+        <form action={addFavoriteToList} className="cluster tight" style={{ marginTop: 8 }}>
+          <input type="hidden" name="locale" value={locale} />
+          <input type="hidden" name="titleId" value={pub.titleId} />
+          <select
+            name="listId"
+            aria-label={collections.label}
+            defaultValue={collections.options[0].id}
+            style={{ width: "auto", minWidth: 0, flex: "1 1 140px" }}
+          >
+            {collections.options.map((c) => (
+              <option key={c.id} value={c.id}>
+                {c.name}
+              </option>
+            ))}
+          </select>
+          <button type="submit" className="btn ghost small">
+            {collections.submit}
+          </button>
+        </form>
+      ) : null}
     </article>
   );
 }
@@ -210,7 +237,7 @@ export function FavoritesView({
     <section style={{ display: "grid", gap: 28 }}>
       {listUnavailable ? (
         <div className="banner-info" role="status">
-          <span>{t("listUnavailable")}</span>
+          <span>{t("collectionUnavailable")}</span>
         </div>
       ) : null}
 
@@ -236,27 +263,38 @@ export function FavoritesView({
                 addToPlanLabel={addToPlanLabel}
                 removeMode="heart"
                 removeLabel={t("remove")}
+                collections={{
+                  options: lists.map((l) => ({ id: l.id, name: l.name })),
+                  label: t("addToCollection"),
+                  submit: t("addToCollectionSubmit"),
+                }}
               />
             ))}
           </div>
         )}
       </div>
 
+      {/* "Collections", not "lists": the catalog heart's "Add to a list" menu
+          adds to SAVED lists (plans), and both used to be called "lists" with
+          the same "Create list" button — while nothing could ever put a
+          favorite into one of these. They now have their own name and an
+          "Add to collection" control on every favorite above. */}
       <div>
-        <h2>{t("listsHeading")}</h2>
+        <h2>{t("collectionsHeading")}</h2>
+        <p className="muted">{t("collectionsLead")}</p>
         <form action={createFavoriteList} className="cluster" style={{ gap: 6, marginBottom: 12 }}>
           <input type="hidden" name="locale" value={locale} />
           <input
             name="name"
-            placeholder={t("newListPlaceholder")}
-            aria-label={t("newListPlaceholder")}
+            placeholder={t("newCollectionPlaceholder")}
+            aria-label={t("newCollectionPlaceholder")}
             maxLength={80}
             required
           />
-          <button type="submit" className="btn ghost small">{t("createList")}</button>
+          <button type="submit" className="btn ghost small">{t("createCollection")}</button>
         </form>
         {lists.length === 0 ? (
-          <p className="muted">{t("noLists")}</p>
+          <p className="muted">{t("noCollections")}</p>
         ) : (
           <ul style={UL_RESET}>
             {lists.map((l) => (
@@ -282,7 +320,7 @@ export function FavoritesView({
                   <DeleteListForm
                     locale={locale}
                     listId={l.id}
-                    label={t("delete")}
+                    label={t("deleteCollection")}
                     confirmLabel={t("confirmDelete")}
                     cancelLabel={t("cancelDelete")}
                   />
@@ -295,7 +333,7 @@ export function FavoritesView({
 
       {sharedLists.length > 0 ? (
         <div>
-          <h2>{t("sharedHeading")}</h2>
+          <h2>{t("sharedCollectionsHeading")}</h2>
           <ul style={UL_RESET}>
             {sharedLists.map((l) => (
               <li key={l.id} className="card">

@@ -347,6 +347,8 @@ export default async function ArticleDetailPage({
                 save: t("detailSaveDraft"),
                 failed: t("detailUploadFailed"),
                 unavailable: t("detailUploadUnavailable"),
+                wrongType: t("detailUploadWrongType"),
+                tooLarge: t("detailUploadTooLarge"),
               }}
             />
 

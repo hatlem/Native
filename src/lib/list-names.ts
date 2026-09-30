@@ -10,7 +10,6 @@ export type ListNames = {
   untitled: string;
   imported: string;
   reordered: string;
-  copyOf: (name: string) => string;
 };
 
 export async function listNames(locale: string): Promise<ListNames> {
@@ -19,6 +18,5 @@ export async function listNames(locale: string): Promise<ListNames> {
     untitled: t("untitled"),
     imported: t("imported"),
     reordered: t("reordered"),
-    copyOf: (name: string) => t("copyOf", { name }),
   };
 }

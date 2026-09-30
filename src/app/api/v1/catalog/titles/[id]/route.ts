@@ -109,6 +109,9 @@ export async function GET(
         return {
           id: p.id,
           type: p.type,
+          // Same product fields as the list endpoint: without pricingModel a
+          // client can't tell a null band on a CPM product from a hidden price.
+          pricingModel: p.pricingModel,
           priceBand: band ? bandLabel(band, p.currency) : null,
           currency: p.currency,
           visibility: band ? p.visibility : "INDICATIVE",

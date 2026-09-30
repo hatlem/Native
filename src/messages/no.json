@@ -108,7 +108,8 @@
     "basis_win-rate": "fra vinnerrate",
     "basis_category-median": "kategorimedian",
     "basis_default": "standard",
-    "exportInvoicesCsv": "Eksporter fakturaer (CSV)"
+    "exportInvoicesCsv": "Eksporter fakturaer (CSV)",
+    "exportAccountingJson": "Regnskapseksport (JSON)"
   },
   "agency": {
     "eyebrow": "Byrå",
@@ -213,7 +214,9 @@
     "compareBar": {
       "label": "{count, plural, =1 {1 tittel valgt} other {# titler valgt}}",
       "open": "Sammenlign →",
-      "clear": "Fjern"
+      "clear": "Fjern",
+      "select": "Sammenlign {name}",
+      "region": "Titler valgt for sammenligning"
     },
     "card": {
       "from": "Fra",
@@ -316,7 +319,9 @@
       "addToPlan": "Legg til i planen",
       "onPlan": "I planen",
       "askForPrice": "Be om pris"
-    }
+    },
+    "exportCsv": "Last ned katalogen (CSV)",
+    "exportCsvMarket": "Last ned titler i {market} (CSV)"
   },
   "lists": {
     "title": "Lagrede lister",
@@ -330,21 +335,25 @@
     "open": "Åpne",
     "rename": "Gi nytt navn",
     "duplicate": "Dupliser",
-    "archive": "Arkiver"
+    "archive": "Arkiver",
+    "copyName": "{name} (kopi)",
+    "archivedNotice": "«{name}» er arkivert.",
+    "undo": "Angre",
+    "archivedHeading": "Arkivert ({count})",
+    "archivedOn": "arkivert {date}",
+    "restore": "Gjenopprett"
   },
   "favorites": {
     "title": "Favoritter",
     "lead": "Publikasjoner du har lagret. Åpne en for å legge et format i en plan.",
     "add": "Legg til i favoritter",
     "remove": "Fjern fra favoritter",
-    "addToList": "Legg til i en liste",
+    "addToList": "Legg til i en lagret liste",
     "noLists": "Ingen lister ennå.",
     "noOrgHint": "Velg en kunde for å se og opprette lister.",
     "newListPlaceholder": "Navn på ny liste",
-    "createList": "Opprett liste",
+    "createList": "Ny lagret liste",
     "allHeading": "Alle favoritter",
-    "listsHeading": "Dine lister",
-    "sharedHeading": "Delt med deg",
     "empty": "Ingen favoritter ennå. Bla i katalogen og trykk på hjertet på en publikasjon.",
     "browseCta": "Bla i katalogen",
     "itemCount": "{count, plural, =0 {Ingen publikasjoner} =1 {1 publikasjon} other {# publikasjoner}}",
@@ -352,7 +361,6 @@
     "unshare": "Slutt å dele",
     "sharedBadge": "Delt",
     "rename": "Gi nytt navn",
-    "delete": "Slett liste",
     "open": "Åpne",
     "removeFromList": "Fjern",
     "byOwner": "av {owner}",
@@ -360,7 +368,16 @@
     "sharedByReadOnly": "Delt av {owner} · skrivebeskyttet",
     "confirmDelete": "Bekreft",
     "cancelDelete": "Avbryt",
-    "listUnavailable": "Den listen er ikke lenger tilgjengelig."
+    "collectionsHeading": "Samlingene dine",
+    "collectionsLead": "Grupper favoritter etter tema eller kunde, og del en samling med teamet ditt. Vil du prise plasseringer, legger du dem i en lagret liste.",
+    "newCollectionPlaceholder": "Navn på ny samling",
+    "createCollection": "Opprett samling",
+    "noCollections": "Ingen samlinger ennå.",
+    "deleteCollection": "Slett samling",
+    "sharedCollectionsHeading": "Samlinger delt med deg",
+    "collectionUnavailable": "Den samlingen er ikke lenger tilgjengelig.",
+    "addToCollection": "Samling",
+    "addToCollectionSubmit": "Legg i samling"
   },
   "titleDetail": {
     "back": "Tilbake til katalogen",
@@ -684,7 +701,9 @@
     "lineDragInstructions": "For å flytte en linje: trykk mellomrom for å løfte den, flytt med piltastene og trykk mellomrom igjen for å slippe. Escape avbryter.",
     "lineSearchBlocksDrag": "tøm søket for å endre rekkefølgen",
     "lineOrderSaveFailed": "Rekkefølgen ble ikke lagret – laster planen på nytt.",
-    "lineMovedAnnouncement": "Flyttet til plass {position} av {total}"
+    "lineMovedAnnouncement": "Flyttet til plass {position} av {total}",
+    "noticePlanArchived": "Den planen er arkivert, så du ser den gjeldende planen din i stedet. Du kan gjenopprette den under Lagrede lister.",
+    "noticePlanUnavailable": "Vi fikk ikke åpnet den planen — lenken kan være utdatert, eller planen tilhører et annet arbeidsområde. Dette er den gjeldende planen din."
   },
   "rfq": {
     "org": "Selskap",
@@ -1654,7 +1673,7 @@
     "placementRetracted": "Trukket tilbake",
     "unlinkCta": "Fjern kobling",
     "sharedArticleWarning": "Denne artikkelen er koblet til {count} andre plasseringer — endringene dine påvirker alle.",
-    "detailUploadFailed": "Opplastingen feilet. Prøv en annen fil.",
+    "detailUploadFailed": "Opplastingen gikk ikke gjennom. Sjekk nettforbindelsen og prøv igjen.",
     "detailUploadUnavailable": "Filopplasting er ikke tilgjengelig akkurat nå. Lim inn teksten i editoren i stedet.",
     "backToArticles": "Alle artikler",
     "versionLabel": "Versjon {version}",
@@ -1669,7 +1688,9 @@
     "orderRef": "bestilling {ref}",
     "draftLabel": "Artikkeltekst",
     "draftHint": "Ren tekst med enkel Markdown: # for titler, **fet**, *kursiv*, - for lister, [tekst](lenke).",
-    "submitBlockedSpec": "Formatkravene for en plassering er ikke oppfylt ennå – sjekk plasseringene over."
+    "submitBlockedSpec": "Formatkravene for en plassering er ikke oppfylt ennå – sjekk plasseringene over.",
+    "detailUploadWrongType": "Den filtypen støttes ikke. Last opp en PDF, Word-fil (.docx) eller ren tekst.",
+    "detailUploadTooLarge": "Filen er tom eller større enn 25 MB. Last opp en mindre fil, eller lim inn teksten i editoren."
   },
   "marketing": {
     "howCta": "Slik fungerer det",
@@ -2346,16 +2367,16 @@
     "authRequest": "Send en strukturert henvendelse til partners@nativespin.com — fortell oss om integrasjonsformen og hvilke markeder du bryr deg om, så utsteder vi en nøkkel.",
     "endpointsEyebrow": "v1-endepunkter",
     "endpointsTitle": "Hva som er tilgjengelig i dag",
-    "listBody": "Paginert kataloglisting av alle aktive titler med minst ett aktivt produkt. Filtrer på marked (NO/SE/DK/FI/DE/AT/CH/UK/IE) og format (NATIVE_ARTICLE/ADVERTORIAL/NATIVE_DISPLAY/PACKAGE).",
+    "listBody": "Paginert liste over alle aktive titler i katalogen, med aktive produkter og prisintervaller. Filtrer på marked (NO/SE/DK/FI/DE/AT/CH/UK/IE) og format (en produkttype, for eksempel NATIVE_ARTICLE).",
     "queryParams": "Spørringsparametere",
-    "detailBody": "Per-tittel-detaljer: utgiver, marked (med MVA + merkingsregler), og hvert aktive produkt med spesifikasjon og pris­regel-trinn.",
-    "detailIncludes": "Inkluderer ordtellingsgrenser, mal for merkingslabel, ledetid og indikativ grunnpris i markedets valuta.",
+    "detailBody": "Detaljer per tittel: utgiver, marked (med MVA-sats og merking) og hvert aktive produkt med innholdskrav, ledetid og prisintervall.",
+    "detailIncludes": "Priser oppgis som intervaller (for eksempel «25–40k NOK»), aldri som eksakte beløp: den faste prisen kommer i et tilbud. Innholdskravene omfatter ordgrenser, minste antall bilder og merkingen.",
     "paginationTitle": "Paginering",
-    "paginationBody": "Markørbasert på tittel-id. Stabil sortering på navn + id slik at du kan kjøre en full synkronisering uten å miste rader når nye titler aktiveres midt i prosessen.",
+    "paginationBody": "Markørbasert. Send page.nextCursor tilbake som cursor til den er null: først da er synkroniseringen ferdig. Sorteringen er stabil (navn + id), så en full synkronisering mister aldri rader selv om titler aktiveres eller deaktiveres underveis.",
     "limitsTitle": "Hastighets­grenser",
     "limitsBody": "Per-nøkkel-bursts jevnes ut gjennom samme bøtte som RFQ-flyten bruker. En 429-respons inkluderer en omtrentlig retry-after i meldingsteksten. Vedvarende høy-volum-partnere får høyere grenser — spør når du ber om en nøkkel.",
     "errorsTitle": "Feil",
-    "errorsBody": "Feil returneres som JSON med en stabil kode og en lesbar melding. Koder i dag: MISSING, INVALID, EXPIRED, REVOKED, SCOPE, RATE_LIMITED, NOT_FOUND.",
+    "errorsBody": "Feil returneres som JSON med en stabil kode og en lesbar melding. En ugyldig parameter gir 400 BAD_PARAM, der error.details navngir hver enkelt; ingenting ignoreres i stillhet. Alle koder står i OpenAPI-spesifikasjonen på /api/openapi.json.",
     "ctaTitle": "Trenger du en nøkkel?",
     "ctaBody": "Vi auto-tildeler ikke API-en — partner-integrasjoner har kommersielle implikasjoner vi vil avklare først. Ta kontakt, så får du en fungerende nøkkel innen én arbeidsdag.",
     "ctaContact": "Snakk med partnerskaps­teamet",
@@ -2363,7 +2384,8 @@
     "selfServeTitle": "Kjøp som programmatisk — på navngitte premiumtitler",
     "selfServeBody": "Finn beholdning gjennom katalog-API-et, og bestill fastprisede plasseringer i ett kall — via API eller i appen. Ingen auksjon, ingen skjult beholdning: hver tittel er navngitt, hver pris er utgiverens egen. RFQ-titler forblir desk-styrte med vilje — API-et bestiller kun fastprisede selvbetjente plasseringer.",
     "ordersBody": "Legg inn en fastpriset selvbetjent ordre. Send fastprisede produkter og få en bekreftet ordre tilbake i ett kall. Krever orders:write-tilgang og en nøkkel knyttet til organisasjonen din; RFQ-produkter gir 422 RFQ_ONLY.",
-    "ordersRequest": "curl -X POST https://nativespin.com/api/v1/orders \\\n  -H \"Authorization: Bearer DIN_NØKKEL\" \\\n  -H \"Content-Type: application/json\" \\\n  -d '{\"items\":[{\"productId\":\"PRODUKT_ID\",\"quantity\":1}]}'"
+    "ordersRequest": "curl -X POST https://nativespin.com/api/v1/orders \\\n  -H \"Authorization: Bearer DIN_NØKKEL\" \\\n  -H \"Content-Type: application/json\" \\\n  -d '{\"items\":[{\"productId\":\"PRODUKT_ID\",\"quantity\":1}]}'",
+    "quotesBody": "Status, linjer og totaler for et tilbud desken har sendt. En nøkkel knyttet til en organisasjon ser bare den organisasjonens tilbud."
   },
   "apiKeys": {
     "eyebrow": "Superadmin",
@@ -2371,16 +2393,14 @@
     "lead": "Utsted + tilbakekall offentlige katalog-API-nøkler. Råtoken vises ÉN gang ved utstedelse — lagre den i hemmelighetshåndteringen til partneren før du navigerer videre.",
     "createdLabel": "Ny nøkkel utstedt",
     "copyNow": "Kopier denne token nå; den vises kun én gang.",
-    "errorScopes": "Minst ett gyldig scope kreves (catalog:read, catalog:*, orders:write, pricing:admin).",
-    "errorInternalOnly": "pricing:admin er kun internt — kan bare utstedes som en NativeSpin-plattformnøkkel (uten organisasjon).",
-    "errorOrgRequired": "orders:write må være knyttet til en organisasjon — velg en eier-organisasjon over.",
+    "errorScopes": "Velg minst ett scope.",
+    "errorInternalOnly": "pricing:admin er kun for intern bruk — den kan bare utstedes som en NativeSpin-plattformnøkkel.",
+    "errorOrgRequired": "orders:write legger inn bestillinger for en organisasjon — knytt nøkkelen til en under «Handler på vegne av».",
     "issueEyebrow": "Utsted",
     "issueTitle": "Utsted en ny nøkkel",
     "nameLabel": "Navn / partner",
-    "orgLabel": "Eier-organisasjon (valgfritt)",
-    "orgPlatform": "NativeSpin-plattform­nøkkel (ingen org)",
+    "orgPlatform": "NativeSpin-plattformen (ingen organisasjon eller utgiver)",
     "scopesLabel": "Tilganger (scopes)",
-    "scopesHint": "Kommaseparert. Alternativer: catalog:read, orders:write (orders:write må knyttes til en organisasjon). pricing:admin er kun internt.",
     "ttlLabel": "Utløper om (dager)",
     "ttlPlaceholder": "Ingen utløp",
     "ttlHint": "La stå tomt for ingen utløp; maks 1825 dager (5 år).",
@@ -2389,7 +2409,7 @@
     "listEyebrow": "Eksisterende",
     "listTitle": "Alle nøkler",
     "colName": "Navn",
-    "colOrg": "Organisasjon",
+    "colOrg": "Handler for",
     "colScopes": "Tilganger",
     "colCreated": "Opprettet",
     "colLastUsed": "Sist brukt",
@@ -2403,7 +2423,19 @@
     "revokeConfirmCta": "Ja, tilbakekall nøkkelen",
     "docsHintPrefix": "Offentlig dokumentasjon er tilgjengelig på",
     "deniedBody": "Offentlige katalog-API-nøkler utstedes av NativeSpin-superadmins. Hvis rollen din legitimt trenger nøkkel-utstedelse — eller du er partner som trenger en nøkkel — ta kontakt med desken så ordner vi det.",
-    "orgPlatformShort": "NativeSpin-plattformen"
+    "orgPlatformShort": "NativeSpin-plattformen",
+    "errorPublisherRequired": "catalog:write laster opp en utgivers eget produktutvalg — knytt nøkkelen til den utgiveren under «Handler på vegne av».",
+    "errorBinding": "Den organisasjonen eller utgiveren finnes ikke lenger. Last inn siden på nytt og velg igjen.",
+    "namePlaceholder": "f.eks. GroupM Atlas",
+    "bindingLabel": "Handler på vegne av",
+    "bindingOrgs": "Organisasjoner (kjøpere)",
+    "bindingPublishers": "Utgivere (opplasting av produkter)",
+    "bindingHint": "En nøkkel handler på vegne av plattformen, én organisasjon eller én utgiver. orders:write krever en organisasjon, catalog:write en utgiver og pricing:admin plattformen.",
+    "scope_catalog_read": "lese katalogen (prisintervaller) og sendte tilbud",
+    "scope_catalog_write": "laste opp utgiverens egne titler og produkter",
+    "scope_orders_write": "legge inn faste bestillinger for organisasjonen",
+    "scope_pricing_admin": "interne prisverktøy (MCP) — kun plattform",
+    "boundPublisher": "{name} (utgiver)"
   },
   "quoteNarrative": {
     "sectionCampaign": "Din kampanje",
@@ -2709,7 +2741,7 @@
     "uploadHint": "PDF, PPTX eller bilde, maks 25 MB",
     "uploading": "Laster opp…",
     "uploadDone": "Fil lastet opp.",
-    "uploadFailed": "Opplasting feilet: {error}",
+    "uploadFailed": "Opplastingen gikk ikke gjennom. Sjekk nettforbindelsen og prøv igjen — eller lim inn en lenke nedenfor i stedet.",
     "urlLabel": "Eller lim inn en lenke til rate card / media kit",
     "urlPlaceholder": "https://…",
     "ratesLabel": "Eller skriv inn priser per tittel",
@@ -2755,7 +2787,9 @@
     "content_advertiser": "Annonsøren kan levere egne artikler",
     "content_publisher": "Artiklene må skrives av deres avdeling",
     "content_both": "Begge deler er mulig",
-    "uploadUnavailable": "Filopplasting er ikke tilgjengelig akkurat nå. Lim inn en lenke til prisliste eller mediekit nedenfor i stedet."
+    "uploadUnavailable": "Filopplasting er ikke tilgjengelig akkurat nå. Lim inn en lenke til prisliste eller mediekit nedenfor i stedet.",
+    "uploadWrongType": "Den filtypen tas ikke imot. Last opp en PDF, PowerPoint, PNG eller JPG.",
+    "uploadTooLarge": "Filen er tom eller større enn 25 MB. Last opp en mindre fil, eller lim inn en lenke nedenfor i stedet."
   },
   "account": {
     "eyebrow": "Konto",
@@ -3574,7 +3608,6 @@
   "listNames": {
     "untitled": "Ny plan",
     "imported": "Importert plan",
-    "reordered": "Bestilt på nytt",
-    "copyOf": "{name} (kopi)"
+    "reordered": "Bestilt på nytt"
   }
 }

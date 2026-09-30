@@ -2411,7 +2411,9 @@ select:disabled {
 }
 
 @media (max-width: 880px) {
-  .split { grid-template-columns: 1fr; }
+  /* minmax(0, …): a bare 1fr track is minmax(auto, 1fr) — it grows to its
+     widest child's min-content and pushed /plan 16px past a 375px viewport. */
+  .split { grid-template-columns: minmax(0, 1fr); }
 }
 
 .kpi-grid {
@@ -3545,7 +3547,7 @@ select:disabled {
    the collapse at matching specificity so mobile still gets one column. */
 @media (max-width: 880px) {
   .split:has(.plan-summary-col) {
-    grid-template-columns: 1fr;
+    grid-template-columns: minmax(0, 1fr);
   }
 }
 
@@ -4610,6 +4612,9 @@ select:disabled {
   cursor: pointer;
 }
 .catalog-rail__check input[type="checkbox"] {
+  /* flex: none — as a shrinkable flex item the box got squeezed whenever
+     its label wrapped to more lines than its siblings' did. */
+  flex: none;
   margin-top: 2px;
   width: 16px;
   height: 16px;
@@ -4718,6 +4723,14 @@ select:disabled {
   color: var(--muted-strong);
   font-weight: 600;
 }
+@media (max-width: 640px) {
+  .catalog-results-head h1 {
+    font-size: 1.75rem;
+  }
+  .catalog-results-sub {
+    font-size: 0.84rem;
+  }
+}
 
 .catalog-results-controls {
   display: flex;
@@ -4768,7 +4781,11 @@ select:disabled {
 
 .catalog-row {
   display: grid;
-  grid-template-columns: 1fr 190px 284px;
+  /* The actions column sizes to its content (heart + menu + preview + CTA
+     measure ~310px in the longer locales). A fixed 284px track made the
+     no-wrap group overflow leftwards over the price column, cutting off
+     "Desken bekrefter innen 24 timer" under the heart. */
+  grid-template-columns: minmax(0, 1fr) minmax(150px, 190px) auto;
   gap: 20px;
   align-items: center;
   padding: 18px 20px;
@@ -4890,6 +4907,22 @@ select:disabled {
   position: relative;
   top: auto;
   right: auto;
+}
+/* Same for the compare checkbox: inline before the title, not in a corner.
+   The line stops wrapping in compare mode so a long title wraps its own
+   text beside the checkbox instead of dropping below it. */
+.catalog-row .title-selector {
+  position: relative;
+  top: auto;
+  right: auto;
+  flex: none;
+}
+.catalog-row__title-line:has(> .title-selector) {
+  flex-wrap: nowrap;
+  align-items: flex-start;
+}
+.catalog-row__title-line:has(> .title-selector) .catalog-row__title {
+  min-width: 0;
 }
 
 /* ---------- Catalog "not sure what fits" prompt ---------- */
@@ -5022,13 +5055,28 @@ select:disabled {
   background: color-mix(in srgb, var(--primary-contrast) 90%, var(--ink));
 }
 
+/* Phones: ONE row — count, total, CTA. The two-row bar (plan name +
+   total label) took ~115px of an 800px screen and, with the booking banner
+   and search bar above, left no result above the fold. The plan name is
+   still one tap away behind the CTA. */
 @media (max-width: 640px) {
   .shortlist-bar {
-    flex-wrap: wrap;
-    padding: 12px 16px calc(12px + env(safe-area-inset-bottom));
+    flex-wrap: nowrap;
+    gap: 12px;
+    padding: 10px 16px calc(10px + env(safe-area-inset-bottom));
   }
-  .shortlist-bar__chips {
+  .shortlist-bar__chips,
+  .shortlist-bar__summary,
+  .shortlist-bar__total-label {
     display: none;
+  }
+  .shortlist-bar__right {
+    flex: 1;
+    justify-content: space-between;
+    gap: 12px;
+  }
+  .shortlist-bar__total {
+    text-align: left;
   }
 }
 
@@ -5141,7 +5189,17 @@ select:disabled {
 /* On the detail header the heart sits inline beside the H1 (not floated to the
    card corner), but it still needs a positioning context for its popover, and
    must not be squeezed when a long title name takes the rest of the row. */
-.detail-head .fav-btn { position: relative; flex-shrink: 0; }
+/* top/right reset too: on a position:relative element the inherited
+   top:12px / right:12px still apply as offsets, which slid the heart 12px
+   left over the end of the H1. */
+.detail-head .fav-btn { position: relative; top: auto; right: auto; flex-shrink: 0; }
+.detail-head__title {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+}
+.detail-head__title h1 { min-width: 0; overflow-wrap: anywhere; }
 .title-selector {
   position: absolute;
   top: 12px;
@@ -5560,6 +5618,22 @@ body:has(.compare-bar) {
   accent-color: var(--accent);
 }
 
+/* A labelled group of checkbox rows inside a form (e.g. API-key scopes):
+   a <fieldset> for the a11y grouping, without the browser's box. */
+.checkbox-fieldset {
+  border: 0;
+  padding: 0;
+  margin: 0;
+  min-width: 0;
+  display: grid;
+  gap: 6px;
+}
+.checkbox-fieldset legend {
+  padding: 0;
+  margin-bottom: 4px;
+  font-weight: 600;
+}
+
 /* Equal-width tracks so rows break at the same point regardless of an
    individual label's length — a flex-wrap of intrinsic-width items (the
    previous, undefined ".checkbox-grid") wraps short labels two-per-line and
@@ -5952,6 +6026,16 @@ footer a:hover {
 .book-call-banner p { margin:4px 0 0; font-size:0.9rem; }
 .book-call-banner-actions { display:flex; align-items:center; gap:10px; }
 .book-call-banner-dismiss { background:none; border:none; font-size:20px; line-height:1; cursor:pointer; color:var(--ink-mute,#5b5648); }
+/* Phones: heading + CTA on one compact row, body copy dropped — the full
+   banner was ~220px tall with its button squeezed to three lines. */
+@media (max-width: 640px) {
+  .book-call-banner { padding:10px 12px; gap:10px; }
+  .book-call-banner strong { font-size:0.9rem; }
+  .book-call-banner p { display:none; }
+  .book-call-banner-actions { flex:none; gap:4px; }
+  /* Our fallback link and the GetTalk embed's injected button alike. */
+  .book-call-banner-actions :where(a, button):not(.book-call-banner-dismiss) { white-space:nowrap; min-height:40px; padding:8px 12px; font-size:0.85rem; }
+}
 
 /* Guided campaign flow — step progress indicator */
 .campaign-step-counter { margin: 0 0 var(--s-2); font-size: 0.85rem; }
@@ -6381,19 +6465,30 @@ footer a:hover {
 
 /* ---------- Quotes & orders (merged campaign pipeline) ---------- */
 
+/* Six tabs don't fit a phone: the row scrolls sideways on its own instead of
+   dragging the whole page (it made /requests 564px wide at 375). The base
+   line is an inset shadow, not a border + negative-margin overlap, because
+   an overflow container would clip that overlap. */
 .campaign-tabs {
   display: flex;
   gap: var(--s-1);
   margin-top: var(--s-4);
-  border-bottom: 1px solid var(--border);
+  box-shadow: inset 0 -1px 0 var(--border);
+  overflow-x: auto;
+  scrollbar-width: none;
+  overscroll-behavior-x: contain;
+}
+.campaign-tabs::-webkit-scrollbar {
+  display: none;
 }
 
 .campaign-tab {
   display: inline-flex;
+  flex: none;
+  white-space: nowrap;
   align-items: center;
   gap: 6px;
   padding: 10px 14px;
-  margin-bottom: -1px;
   border-bottom: 2px solid transparent;
   font-size: 0.9rem;
   font-weight: 500;
@@ -7734,4 +7829,32 @@ fieldset.field > legend {
   opacity: 0.45;
   cursor: not-allowed;
   pointer-events: none;
+}
+
+/* /lists "Archived (n)" shelf: restore what one click archived. */
+.lists-archived {
+  margin-top: var(--s-5);
+}
+.lists-archived summary {
+  cursor: pointer;
+  font-weight: 600;
+  color: var(--muted-strong);
+}
+.lists-archived__list {
+  list-style: none;
+  margin: var(--s-3) 0 0;
+  padding: 0;
+  display: grid;
+  gap: 8px;
+}
+.lists-archived__row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--s-3);
+  flex-wrap: wrap;
+  padding: 10px 14px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--r-sm);
 }
