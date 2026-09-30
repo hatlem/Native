@@ -62,6 +62,7 @@ export default async function ArticleDetailPage({
         select: {
           id: true,
           version: true,
+          reviewRound: true,
           status: true,
           body: true,
           bodyUrl: true,
@@ -93,6 +94,17 @@ export default async function ArticleDetailPage({
   const authorSide = isDesk || isAssignedWriter || (buyerCanEdit && !nativeSpinWritten);
   const canEdit = authorSide && (!latest || EDITABLE_STATUSES.has(latest.status));
   const canReview = buyerCanEdit && latest?.status === "IN_REVIEW";
+
+  // The version number in the header. A client reviewing an article
+  // NativeSpin writes counts review rounds — the drafts actually sent to them
+  // (the first is "Version 1", however often the writer saved) — and sees no
+  // number on a draft not sent yet. The authors (desk, writer, a buyer
+  // writing their own article) count their saves.
+  const shownVersion = latest
+    ? isBuyerSide && nativeSpinWritten
+      ? latest.reviewRound
+      : latest.version
+    : null;
 
   const headline = articleHeadline(latest?.body) ?? article.title;
   const createdBy = await prisma.user.findUnique({
@@ -178,7 +190,7 @@ export default async function ArticleDetailPage({
         <h1>{headline}</h1>
         <p className="lead cluster tight">
           {latest ? <StatusBadge value={latest.status} /> : null}
-          {latest ? <span className="muted small">{t("versionLabel", { version: latest.version })}</span> : null}
+          {shownVersion ? <span className="muted small">{t("versionLabel", { version: shownVersion })}</span> : null}
           {authorName ? <span className="muted small">{t("byAuthor", { name: authorName })}</span> : null}
         </p>
       </header>

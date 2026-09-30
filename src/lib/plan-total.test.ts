@@ -9,6 +9,7 @@ import {
   lineSortValue,
   placementLineTotal,
   planLineCount,
+  planTitleIds,
   sumTotalFigures,
   type PlanPricing,
 } from "./plan-total";
@@ -352,6 +353,19 @@ test("planLineCount counts placeholders, never alternatives", () => {
     { ...fakeItem({}), isAlternative: true },
   ];
   assert.equal(planLineCount(items), 2);
+});
+
+// BUG-final-local-13: three formats of one title read "3 titles".
+test("planTitleIds counts each title once, placeholders included, alternatives never", () => {
+  const items = [
+    { product: { titleId: "aftenposten" }, titleId: null },
+    { product: { titleId: "aftenposten" }, titleId: null },
+    { product: { titleId: "aftenposten" }, titleId: null },
+    { product: null, titleId: "budstikka" },
+    { product: { titleId: "vg" }, titleId: null, isAlternative: true },
+  ];
+  assert.deepEqual(planTitleIds(items).sort(), ["aftenposten", "budstikka"]);
+  assert.equal(planLineCount(items), 4);
 });
 
 test("barTotals: server-priced totals, nothing for a currency with no priced line", () => {

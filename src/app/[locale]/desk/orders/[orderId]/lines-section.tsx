@@ -13,6 +13,7 @@ import { pickPlaybook } from "@/lib/playbook";
 import { PlaybookCard } from "@/components/playbook-card";
 import { SubmitButton } from "@/components";
 import { nextAssetStatuses } from "@/lib/content/versions";
+import { lineBrief } from "@/lib/writers/line-brief";
 
 type ProductWithTitle = Prisma.ProductGetPayload<{
   include: { title: true };
@@ -50,6 +51,8 @@ type Props = {
   order: OrderForLines;
   byId: Map<string, ProductWithTitle>;
   matchablePlaybooks: MatchablePlaybook[];
+  // The buyer's request brief (Request.briefSummary) — see lineBrief().
+  requestBrief: string | null;
 };
 
 export async function LinesSection({
@@ -57,6 +60,7 @@ export async function LinesSection({
   order,
   byId,
   matchablePlaybooks,
+  requestBrief,
 }: Props) {
   const t = await getTranslations({ locale, namespace: "order" });
   const tp = await getTranslations({ locale, namespace: "production" });
@@ -78,6 +82,8 @@ export async function LinesSection({
           const isContentFee = line.kind === "CONTENT_FEE";
           const assets = line.articlePlacement?.article.versions ?? [];
           const latest = assets[0];
+          // Placement lines carry a brief; content-fee lines never do.
+          const brief = line.brief ? lineBrief(line.brief, requestBrief) : null;
           const pb = p
             ? pickPlaybook(
                 matchablePlaybooks,
@@ -142,18 +148,18 @@ export async function LinesSection({
 
               {pb ? <PlaybookCard locale={locale} playbook={pb} /> : null}
 
-              {line.brief?.audience || line.brief?.message ? (
+              {brief?.audience || brief?.message ? (
                 <dl className="spec-grid">
-                  {line.brief.audience ? (
+                  {brief.audience ? (
                     <>
                       <dt>{tp("audience")}</dt>
-                      <dd>{line.brief.audience}</dd>
+                      <dd>{brief.audience}</dd>
                     </>
                   ) : null}
-                  {line.brief.message ? (
+                  {brief.message ? (
                     <>
                       <dt>{tp("brief")}</dt>
-                      <dd>{line.brief.message}</dd>
+                      <dd>{brief.message}</dd>
                     </>
                   ) : null}
                 </dl>
@@ -170,6 +176,8 @@ export async function LinesSection({
                         <div className="timeline-head">
                           <span className="timeline-label">
                             {tp("version")} {a.version}
+                            {/* The number the client and the notices use. */}
+                            {a.reviewRound ? ` · ${tp("reviewRound", { round: a.reviewRound })}` : ""}
                           </span>
                           <StatusBadge value={a.status} />
                           {/* specPassed now lives on the placement, not the

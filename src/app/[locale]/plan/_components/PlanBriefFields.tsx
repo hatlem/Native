@@ -24,10 +24,12 @@ type SaveState = "idle" | "saving" | "saved" | "error";
 //
 // The two visible fields don't map 1:1 onto submitRequest's field names, so
 // this composes them into hidden inputs the action already reads: the free
-// text goes out as both `brief` and `audience` (the desk reads either as
-// prose), and the timing pick is folded into the same brief text as a
-// trailing sentence. The raw text and timing are posted too (briefText,
-// briefTiming), which is what the plan stores.
+// text goes out as `brief`, with the timing pick folded in as a trailing
+// sentence. The raw text and timing are posted too (briefText, briefTiming),
+// which is what the plan stores. It is NOT also posted as `audience`: that
+// lands in every line's ContentBrief.audience, and the writer and desk then
+// saw the whole brief twice, under "Message" and "Audience" (the per-line
+// message already falls back to this brief — lib/writers/line-brief.ts).
 export function PlanBriefFields({
   locale,
   listId,
@@ -164,7 +166,6 @@ export function PlanBriefFields({
   return (
     <>
       <input type="hidden" name="brief" value={composed} />
-      <input type="hidden" name="audience" value={composed} />
       <input type="hidden" name="briefText" value={campaignText} />
       <input type="hidden" name="briefTiming" value={timing ?? ""} />
       {currency ? <input type="hidden" name="budgetCurrency" value={currency} /> : null}

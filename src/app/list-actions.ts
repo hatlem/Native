@@ -28,7 +28,7 @@ import {
   migrateLegacyBasket,
   resolveActiveList,
 } from "@/lib/lists";
-import { barTotals, planLineCount, type TotalFigure } from "@/lib/plan-total";
+import { barTotals, planLineCount, planTitleIds, type TotalFigure } from "@/lib/plan-total";
 import { loadPricingDefaults } from "@/lib/content-fee";
 import { enableListShare, disableListShare } from "@/lib/list-share";
 import { normalizeLineNote } from "@/lib/line-note";
@@ -150,7 +150,7 @@ export async function addProductToList(formData: FormData) {
 // It used to add each row's raw net basePrice (shipped to the client for
 // every priced title — our publisher cost, un-marked-up) to its total.
 export type ShortlistAddResult =
-  | { ok: true; listId: string; count: number; totals: TotalFigure[] }
+  | { ok: true; listId: string; count: number; titleIds: string[]; totals: TotalFigure[] }
   | { ok: false; reason: "signin" | "no-client" | "invalid-product" | "read-only" };
 
 // Client-invoked counterpart to addProductToList: same validation and
@@ -204,6 +204,7 @@ export async function addProductToActiveList(
     ok: true,
     listId,
     count: planLineCount(items),
+    titleIds: planTitleIds(items),
     totals: barTotals(items, await loadPricingDefaults()),
   };
 }

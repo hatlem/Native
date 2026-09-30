@@ -1,4 +1,6 @@
 import { intlLocale } from "@/lib/money";
+import { safeLocale } from "@/i18n/routing";
+import { localizeTaxonomy, localizeVertical } from "@/lib/taxonomy-i18n";
 import type { QuotePdfRow } from "./quote-pdf-data";
 import daMessages from "@/messages/da.json";
 import deMessages from "@/messages/de.json";
@@ -46,22 +48,26 @@ export function qt(
 }
 
 // The small grey facts line under each title (reach, vertical, audience,
-// frequency). Null when the title has none of them.
+// frequency). Null when the title has none of them. The taxonomy values are
+// stored in English research-sheet form ("News (National)"), so they go
+// through the same display mapping the catalog title page uses — a Norwegian
+// quote must not print English labels next to Norwegian headings.
 export function quoteRowBlurb(
   row: QuotePdfRow,
   messages: QuoteMessages,
   locale: string,
 ): string | null {
   const n = (v: number) => v.toLocaleString(intlLocale(locale));
+  const appLocale = safeLocale(locale);
   const parts = [
     row.digitalReach
       ? `${qt(messages, "digitalReach")}: ${n(row.digitalReach)}`
       : row.circulation
         ? `${qt(messages, "circulation")}: ${n(row.circulation)}`
         : null,
-    row.vertical ? `${qt(messages, "vertical")}: ${row.vertical}` : null,
-    row.audience ? `${qt(messages, "audience")}: ${row.audience}` : null,
-    row.frequency ? `${qt(messages, "frequency")}: ${row.frequency}` : null,
+    row.vertical ? `${qt(messages, "vertical")}: ${localizeVertical(row.vertical, appLocale)}` : null,
+    row.audience ? `${qt(messages, "audience")}: ${localizeVertical(row.audience, appLocale)}` : null,
+    row.frequency ? `${qt(messages, "frequency")}: ${localizeTaxonomy(row.frequency, appLocale)}` : null,
   ].filter(Boolean);
   return parts.length > 0 ? parts.join(" · ") : null;
 }

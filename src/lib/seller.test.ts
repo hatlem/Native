@@ -94,5 +94,14 @@ test("checksum helpers", () => {
 });
 
 test("sellerAddressLines prints the block in order", () => {
-  assert.deepEqual(sellerAddressLines(loadSellerDetails(COMPLETE)), ["Testveien 1", "0150 Oslo", "Norway"]);
+  assert.deepEqual(sellerAddressLines(loadSellerDetails(COMPLETE), "en"), ["Testveien 1", "0150 Oslo", "Norway"]);
+});
+
+test("sellerAddressLines prints the country in the document's language", () => {
+  const seller = loadSellerDetails(COMPLETE);
+  assert.equal(sellerAddressLines(seller, "no").at(-1), "Norge");
+  assert.equal(sellerAddressLines(seller, "de").at(-1), "Norwegen");
+  // A country we can't map stays exactly as the seller wrote it.
+  const odd = loadSellerDetails({ ...COMPLETE, SELLER_COUNTRY: "Svalbard" });
+  assert.equal(sellerAddressLines(odd, "no").at(-1), "Svalbard");
 });

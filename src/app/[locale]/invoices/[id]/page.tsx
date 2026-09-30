@@ -96,7 +96,7 @@ export default async function InvoicePage({
           <dt>{t("seller")}</dt>
           <dd>
             {seller.legalName}
-            {sellerAddressLines(seller).map((line) => (
+            {sellerAddressLines(seller, locale).map((line) => (
               <span key={line} className="muted small" style={{ display: "block" }}>
                 {line}
               </span>

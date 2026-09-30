@@ -307,6 +307,7 @@
       "untitledPlan": "din plan",
       "barLabel": "Udvalg",
       "summaryCount": "{count, plural, =1 {1 titel på} other {# titler på}}",
+      "summaryCountFormats": "{titles, plural, =1 {1 titel} other {# titler}} · {formats, plural, =1 {1 format} other {# formater}} på",
       "totalLabel": "Vejledende totalsum",
       "totalPending": "Prissættes af os",
       "reviewPlan": "Se planen",
@@ -1368,6 +1369,7 @@
     "audience": "Målgruppe",
     "noAssets": "Intet indhold endnu.",
     "version": "Version",
+    "reviewRound": "sendt til kunden som version {round}",
     "status": "Status",
     "specPass": "Specifikation godkendt",
     "specFail": "Specifikationsafvigelser",
@@ -1420,6 +1422,7 @@
     "pageOf": "Side {page} af {pages}",
     "listTitle": "Fakturaer",
     "listLead": "Alle fakturaer for din organisation. Åbn en for at se linjerne, eller download PDF'en.",
+    "listLeadNoPdf": "Alle fakturaer for din organisation. Åbn en for at se linjerne, og hvordan du betaler.",
     "emptyTitle": "Ingen fakturaer endnu",
     "emptyHint": "Fakturaer vises her, når en kampagne er kørt og faktureret.",
     "emptyCta": "Se dine kampagner",
@@ -1439,6 +1442,7 @@
   },
   "firm": {
     "badge": "Øjeblikkelig bestilling",
+    "badgeSomeFormats": "Øjeblikkelig bestilling på udvalgte formater",
     "planTitle": "Bekræft din ordre",
     "planNote": "Alle poster har fast pris — at indsende bekræfter din ordre med det samme, ingen ventetid på indkøbsteamet.",
     "planSubmit": "Bekræft ordre",
@@ -1492,6 +1496,7 @@
     "save": "Gem",
     "saving": "Gemmer…",
     "firm": "Fast (øjeblikkelig bestilling)",
+    "firmNotInstant": "Fast (via forespørgsel, indtil prisen er bekræftet og offentlig)",
     "indicative": "Vejledende (forespørgsel)",
     "status": "Ordrestatus",
     "booking": "Bookingstatus",
@@ -2848,7 +2853,7 @@
     "languageEyebrow": "Indstillinger",
     "languageTitle": "Sprog",
     "languageLabel": "Visningssprog",
-    "languageHint": "Ændrer sproget i hele NativeSpin. Gemmes i denne browser.",
+    "languageHint": "Ændrer sproget i hele NativeSpin, også i de mails og notifikationer, vi sender dig.",
     "companyEyebrow": "Virksomhed",
     "companyTitle": "Virksomhedsinfo",
     "orgLabel": "Virksomhedsnavn",
@@ -3754,7 +3759,8 @@
     },
     "invoiceIssued": {
       "title": "Faktura udstedt: {plan}",
-      "body": "I alt {amount} inkl. moms, forfalder {due}. Åbn fakturaen for at downloade PDF'en."
+      "body": "I alt {amount} inkl. moms, forfalder {due}. Åbn fakturaen for at downloade PDF'en.",
+      "bodyNoPdf": "I alt {amount} inkl. moms, forfalder {due}. Åbn fakturaen for at se linjerne, og hvordan du betaler."
     },
     "creditNoteIssued": {
       "title": "Kreditnota udstedt: {plan}",

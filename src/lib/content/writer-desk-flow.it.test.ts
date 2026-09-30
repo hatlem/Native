@@ -2,7 +2,8 @@ import { test, before, after } from "node:test";
 import assert from "node:assert/strict";
 import { prisma } from "@/lib/prisma";
 import { emailAdapter, setEmailAdapter, type EmailMessage } from "@/lib/notify";
-import { supersedeOlderVersions } from "./versions";
+import { nextReviewRound, supersedeOlderVersions } from "./versions";
+import { draftNoticeContext } from "./review-notices";
 import { specFailuresForSubmission } from "@/lib/spec-check-runner";
 import { activateQuoteProducts } from "@/lib/pricing/quotes";
 import { confirmProductPrice, PublisherRatesError } from "@/lib/publisher-rates";
@@ -159,6 +160,33 @@ if (!RUN_DB_IT) {
       select: { status: true },
     });
     assert.deepEqual(rows.map((r) => r.status), ["FINAL", "SUPERSEDED", "APPROVED", "APPROVED"]);
+    await prisma.contentAsset.deleteMany({ where: { articleId: a.id } });
+    await prisma.article.delete({ where: { id: a.id } });
+  });
+
+  // BUG-final-local-16: five writer saves made the first review "Version 5".
+  test("review rounds count hand-overs, not saves, and the draft notice names the round", async () => {
+    const a = await prisma.article.create({
+      data: { organizationId: orgId, title: "Rounds", createdByUserId: actorId, createdByRole: "DESK" },
+    });
+    for (let v = 1; v <= 5; v++) {
+      await prisma.contentAsset.create({ data: { articleId: a.id, version: v, status: "DRAFT", body: "x" } });
+    }
+    const handOver = async (version: number) => {
+      const asset = await prisma.contentAsset.findFirstOrThrow({ where: { articleId: a.id, version } });
+      const round = await prisma.$transaction((tx) => nextReviewRound(tx, a.id));
+      await prisma.contentAsset.update({ where: { id: asset.id }, data: { status: "IN_REVIEW", reviewRound: round } });
+      return asset.id;
+    };
+
+    const first = await handOver(5);
+    assert.equal((await draftNoticeContext(first))?.version, 1, "the first review is version 1");
+    // Sent back, reworked over two more saves, then handed over again.
+    await prisma.contentAsset.create({ data: { articleId: a.id, version: 6, status: "DRAFT", body: "x" } });
+    await prisma.contentAsset.create({ data: { articleId: a.id, version: 7, status: "DRAFT", body: "x" } });
+    const second = await handOver(7);
+    assert.equal((await draftNoticeContext(second))?.version, 2);
+
     await prisma.contentAsset.deleteMany({ where: { articleId: a.id } });
     await prisma.article.delete({ where: { id: a.id } });
   });

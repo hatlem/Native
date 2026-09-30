@@ -206,6 +206,18 @@ test("invoice notice formats the amount and due date for the reader", () => {
   assert.equal(no.link, "/no/invoices/inv1");
 });
 
+test("invoice notice promises the PDF only when it can be downloaded (BUG-final-local-10)", () => {
+  const params = SAMPLES.invoiceIssued;
+  const withPdf = renderNotice({ key: "invoiceIssued", params: { ...params, pdfAvailable: true } }, "no");
+  assert.match(withPdf.body, /laste ned PDF-en/);
+  const withoutPdf = renderNotice({ key: "invoiceIssued", params: { ...params, pdfAvailable: false } }, "no");
+  assert.doesNotMatch(withoutPdf.body, /PDF/);
+  assert.match(withoutPdf.body, /hvordan du betaler/);
+  assert.equal(withoutPdf.link, "/no/invoices/inv1");
+  // A notice stored before the flag existed never over-promises.
+  assert.doesNotMatch(renderNotice({ key: "invoiceIssued", params }, "en").body, /PDF/);
+});
+
 test("a revised quote goes through the same template, per reader", () => {
   const revised: NoticeTemplate = { key: "quoteSent", params: { ...SAMPLES.quoteSent, revision: 2 } };
   const no = renderNotice(revised, "no");

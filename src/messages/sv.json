@@ -307,6 +307,7 @@
       "untitledPlan": "din plan",
       "barLabel": "Urval",
       "summaryCount": "{count, plural, =1 {1 titel i} other {# titlar i}}",
+      "summaryCountFormats": "{titles, plural, =1 {1 titel} other {# titlar}} · {formats, plural, =1 {1 format} other {# format}} i",
       "totalLabel": "Vägledande totalsumma",
       "totalPending": "Prissätts av oss",
       "reviewPlan": "Granska planen",
@@ -1368,6 +1369,7 @@
     "audience": "Målgrupp",
     "noAssets": "Inget innehåll än.",
     "version": "Version",
+    "reviewRound": "skickad till kunden som version {round}",
     "status": "Status",
     "specPass": "Specifikation godkänd",
     "specFail": "Specifikationsavvikelser",
@@ -1420,6 +1422,7 @@
     "pageOf": "Sida {page} av {pages}",
     "listTitle": "Fakturor",
     "listLead": "Alla fakturor för din organisation. Öppna en för att se raderna, eller ladda ner PDF:en.",
+    "listLeadNoPdf": "Alla fakturor för din organisation. Öppna en för att se raderna och hur du betalar.",
     "emptyTitle": "Inga fakturor än",
     "emptyHint": "Fakturor visas här när en kampanj har gått och fakturerats.",
     "emptyCta": "Se dina kampanjer",
@@ -1439,6 +1442,7 @@
   },
   "firm": {
     "badge": "Omedelbar beställning",
+    "badgeSomeFormats": "Omedelbar beställning för vissa format",
     "planTitle": "Bekräfta din order",
     "planNote": "Alla poster har fast pris — att skicka in bekräftar din order direkt, ingen väntan på inköpsteamet.",
     "planSubmit": "Bekräfta order",
@@ -1492,6 +1496,7 @@
     "save": "Spara",
     "saving": "Sparar…",
     "firm": "Fast (omedelbar beställning)",
+    "firmNotInstant": "Fast (via förfrågan tills priset är bekräftat och publikt)",
     "indicative": "Vägledande (förfrågan)",
     "status": "Orderstatus",
     "booking": "Bokningsstatus",
@@ -2847,7 +2852,7 @@
     "languageEyebrow": "Inställningar",
     "languageTitle": "Språk",
     "languageLabel": "Visningsspråk",
-    "languageHint": "Ändrar språket i hela NativeSpin. Sparas i den här webbläsaren.",
+    "languageHint": "Ändrar språket i hela NativeSpin, även i mejlen och aviseringarna vi skickar dig.",
     "companyEyebrow": "Företag",
     "companyTitle": "Företagsinfo",
     "orgLabel": "Företagsnamn",
@@ -3753,7 +3758,8 @@
     },
     "invoiceIssued": {
       "title": "Faktura utfärdad: {plan}",
-      "body": "Totalt {amount} inkl. moms, förfaller {due}. Öppna fakturan för att ladda ned pdf:en."
+      "body": "Totalt {amount} inkl. moms, förfaller {due}. Öppna fakturan för att ladda ned pdf:en.",
+      "bodyNoPdf": "Totalt {amount} inkl. moms, förfaller {due}. Öppna fakturan för att se raderna och hur du betalar."
     },
     "creditNoteIssued": {
       "title": "Kreditnota utfärdad: {plan}",

@@ -6,6 +6,7 @@ import { Link } from "@/i18n/navigation";
 import { updateProduct, updateSpec } from "@/app/publisher-actions";
 import { SubmitButton } from "@/components";
 import { formatMoney } from "@/lib/money";
+import { isInstantOrderable } from "@/lib/pricing/visibility";
 import { MAX_LEAD_TIME_DAYS, parseLeadTimeSaveStatus } from "@/lib/publisher-rates";
 
 export const dynamic = "force-dynamic";
@@ -51,13 +52,25 @@ export default async function PublisherDashboard({
   const productIds = publisher.titles.flatMap((title) =>
     title.products.map((p) => p.id),
   );
-  const [activeProducts, bookableProducts, ordersCount, blockedCount] =
+  // "Instant order" means what the buyer's checkout means by it: a bookable
+  // product (the plan only takes those) that isInstantOrderable — FIRM, active,
+  // confirmed, with prices public on the title and the publisher. Counting
+  // the bookable flag alone told a publisher "3 available as instant order"
+  // while two of the three were indicative, quote-only formats.
+  const instantOrderable = (
+    p: (typeof publisher.titles)[number]["products"][number],
+    title: (typeof publisher.titles)[number],
+  ) =>
+    p.bookable &&
+    isInstantOrderable(p, { pricesPublic: title.pricesPublic, publisher: { pricesPublic: publisher.pricesPublic } });
+  const instantProducts = publisher.titles.reduce(
+    (n, title) => n + title.products.filter((p) => instantOrderable(p, title)).length,
+    0,
+  );
+  const [activeProducts, ordersCount, blockedCount] =
     await Promise.all([
       prisma.product.count({
         where: { titleId: { in: titleIds }, active: true },
-      }),
-      prisma.product.count({
-        where: { titleId: { in: titleIds }, bookable: true, active: true },
       }),
       prisma.orderLine.count({
         where: {
@@ -94,7 +107,7 @@ export default async function PublisherDashboard({
           <div className="label">{t("kpiActiveProducts")}</div>
           <div className="value">{activeProducts}</div>
           <div className="delta">
-            {t("kpiBookable", { count: bookableProducts })}
+            {t("kpiBookable", { count: instantProducts })}
           </div>
         </div>
         <div className="kpi">
@@ -177,7 +190,14 @@ export default async function PublisherDashboard({
                           <div>
                             <h4>{tType(p.type)}</h4>
                             <p className="muted small">
-                              {p.visibility === "FIRM" ? t("firm") : t("indicative")}
+                              {/* Same rule as the KPI: a FIRM price that isn't
+                                  confirmed or public yet is still ordered
+                                  through a request. */}
+                              {instantOrderable(p, title)
+                                ? t("firm")
+                                : p.visibility === "FIRM"
+                                  ? t("firmNotInstant")
+                                  : t("indicative")}
                               {` · ${p.bookable ? t("bookable") : t("notBookable")}`}
                             </p>
                           </div>

@@ -2,7 +2,7 @@ import { getTranslations } from "next-intl/server";
 import { Prisma } from "@prisma/client";
 import { Link } from "@/i18n/navigation";
 import { intlLocale } from "@/lib/money";
-import { isProductPriceShown } from "@/lib/pricing/visibility";
+import { catalogInstantBadge, isProductPriceShown, type CatalogInstantBadge } from "@/lib/pricing/visibility";
 import { bandLabel } from "@/lib/pricing/bands";
 import { bandIncludesArticle, titleBand, titleRate } from "@/lib/pricing/display-price";
 import { loadPricingDefaults } from "@/lib/content-fee";
@@ -86,13 +86,16 @@ export async function CatalogResults({
     const bandWithArticle = fromBand ? bandIncludesArticle(fromBand.product, title, pricing) : false;
     const needsQuote = title.products.length === 0;
     const hasPrice = Boolean(fromBand || fromRate);
-    const instantBook = visibleProducts.some((p) => p.visibility === "FIRM");
     // What "Add to plan" actually adds: the priced product the band/rate
     // figure came from, else any visible-priced product, else — for a
     // hidden-price title the desk still needs to quote — the first active
     // product at all. Null only when the title has no products yet.
     const addableProduct =
       fromBand?.product ?? fromRate?.product ?? visibleProducts[0] ?? title.products[0] ?? null;
+    // ⚡ describes that product (instant checkout at an exact price), or says
+    // only some formats are instant — never a flat "Instant order" over a
+    // button that adds a quote line.
+    const instantBadge = catalogInstantBadge(addableProduct, title.products, title);
     const inclusions = addableProduct?.inclusions as ProductInclusions | null | undefined;
     const articleState: "written" | "supplied" | "unknown" =
       inclusions?.production === "PUBLISHER"
@@ -111,7 +114,7 @@ export async function CatalogResults({
       fromRate,
       needsQuote,
       hasPrice,
-      instantBook,
+      instantBadge,
       addableProduct,
       articleState,
       reach,
@@ -177,7 +180,7 @@ type Row = {
   fromRate: ReturnType<typeof titleRate>;
   needsQuote: boolean;
   hasPrice: boolean;
-  instantBook: boolean;
+  instantBadge: CatalogInstantBadge;
   addableProduct: CatalogTitleRow["products"][number] | null;
   articleState: "written" | "supplied" | "unknown";
   reach: number | null;
@@ -212,7 +215,7 @@ function CatalogListRow({
   noOrg: boolean;
   readOnly: boolean;
 }) {
-  const { title, fromBand, bandWithArticle, fromRate, hasPrice, instantBook, addableProduct, articleState, reach } =
+  const { title, fromBand, bandWithArticle, fromRate, hasPrice, instantBadge, addableProduct, articleState, reach } =
     row;
   const categoryLabel = titleCategoryLabel(title, locale as AppLocale);
   const verticalLabel = title.vertical ? localizeVertical(title.vertical, locale as AppLocale) : null;
@@ -240,9 +243,13 @@ function CatalogListRow({
             <Link className="catalog-row__title" href={`/catalog/${title.slug}`}>
               {titleDisplayName(title)}
             </Link>
-            {instantBook ? (
+            {instantBadge === "addable" ? (
               <span className="badge badge-success dotless catalog-row__instant">
                 ⚡ {tf("badge")}
+              </span>
+            ) : instantBadge === "someFormats" ? (
+              <span className="badge badge-neutral dotless catalog-row__instant">
+                ⚡ {tf("badgeSomeFormats")}
               </span>
             ) : null}
           </span>
@@ -328,6 +335,7 @@ function CatalogListRow({
         {addableProduct ? (
           <ShortlistButton
             productId={addableProduct.id}
+            titleId={title.id}
             titleName={titleDisplayName(title)}
             hasPrice={hasPrice}
             addLabel={tr("addToPlan")}
@@ -373,7 +381,7 @@ function CatalogCard({
   noOrg: boolean;
   readOnly: boolean;
 }) {
-  const { title, visibleProducts, anyHidden, fromBand, bandWithArticle, fromRate, needsQuote, reach } = row;
+  const { title, anyHidden, fromBand, bandWithArticle, fromRate, needsQuote, instantBadge, reach } = row;
   const categoryLabel = titleCategoryLabel(title, locale as AppLocale);
   const verticalLabel = title.vertical ? localizeVertical(title.vertical, locale as AppLocale) : null;
   return (
@@ -408,8 +416,10 @@ function CatalogCard({
             {tType(type)}
           </span>
         ))}
-        {visibleProducts.some((p) => p.visibility === "FIRM") ? (
-          <span className="tag">⚡ {tf("badge")}</span>
+        {/* Same rule as the list row: the band shown below is the headline
+            product's, so ⚡ alone must mean that product is instant. */}
+        {instantBadge ? (
+          <span className="tag">⚡ {instantBadge === "addable" ? tf("badge") : tf("badgeSomeFormats")}</span>
         ) : null}
         {needsQuote ? <span className="tag">{t("card.requestQuote")}</span> : null}
         {anyHidden ? <span className="tag">{tv("requestPrice")}</span> : null}
