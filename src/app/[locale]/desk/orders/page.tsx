@@ -1,5 +1,6 @@
 import { getTranslations } from "next-intl/server";
 import { prisma } from "@/lib/prisma";
+import { PLACEMENT_LINE_WHERE } from "@/lib/commerce/placements";
 import { Link } from "@/i18n/navigation";
 import { formatMoney, intlLocale } from "@/lib/money";
 import { StatusBadge } from "@/app/status-badge";
@@ -64,7 +65,8 @@ export default async function DeskOrdersPage({
     include: {
       organization: true,
       quote: { select: { currency: true, total: true } },
-      _count: { select: { lines: true } },
+      // Placements only — the article fees are billed with them.
+      _count: { select: { lines: { where: PLACEMENT_LINE_WHERE } } },
     },
   });
 
@@ -152,7 +154,7 @@ export default async function DeskOrdersPage({
                   </th>
                   <th aria-sort={ariaSort("lines")} className="num">
                     <Link href={sortHref("lines")} className="th-sort">
-                      {t("lines")}
+                      {t("placements")}
                       {arrow("lines")}
                     </Link>
                   </th>
@@ -180,7 +182,7 @@ export default async function DeskOrdersPage({
                     <td data-label={t("customer")}>
                       <Link href={`/desk/orders/${o.id}`}>{o.organization.name}</Link>
                     </td>
-                    <td data-label={t("lines")} className="num">
+                    <td data-label={t("placements")} className="num">
                       {o._count.lines}
                     </td>
                     <td data-label={t("total")} className="num">

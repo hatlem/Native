@@ -1243,6 +1243,14 @@ model Request {
   assignedDeskUserId String?
   sourceListId   String?
   sourceList     SavedList? @relation(fields: [sourceListId], references: [id], onDelete: SetNull)
+  // Instant (self-serve) orders only: the SavedList this request ordered.
+  // Unique, so a plan has at most ONE live instant order — a double click, a
+  // second tab or a stale "Confirm order" can't book and charge it twice
+  // (lib/commerce/list-commit.ts). An ordered plan is spent: booking the same
+  // lines again goes through a new plan ("Plan next wave" copies it). Cleared
+  // when every order of the request is cancelled, which releases the plan.
+  // A soft reference like createdById: plans are archived, not deleted.
+  instantOrderListId String? @unique
   createdAt      DateTime      @default(now())
   updatedAt      DateTime      @updatedAt
 

@@ -9,6 +9,7 @@
 
 import { OrderStatus, type ProductType } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
+import { releaseInstantOrderList } from "@/lib/commerce/list-commit";
 import { recordAudit } from "@/lib/audit";
 import { invoiceDueAt, paymentTermsDaysFor } from "@/lib/payment-terms";
 import { lineOrder } from "@/lib/commerce/line-order";
@@ -186,6 +187,8 @@ export async function issueFullCreditNote(args: {
       },
       data: { status: "CANCELLED" },
     });
+    // Nothing of an instant order left live: its plan may be ordered again.
+    await releaseInstantOrderList(tx, order.id);
     return note;
   });
   // The invoice CAS lost: a concurrent submit credited it first.

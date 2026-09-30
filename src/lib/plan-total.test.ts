@@ -235,18 +235,32 @@ test("placementLineTotal and contentFeeFor expose the per-line figures", () => {
   const product = { basePrice: 1000, priceRules: [], title: { market: { code: "NO" } } };
   assert.equal(placementLineTotal(product, 2, []), 2300);
   assert.equal(placementLineTotal(product, 2, [{ marketCode: "NO", marginPct: 10, active: true }]), 2200);
-  assert.equal(contentFeeFor({ type: "NATIVE_DISPLAY" }, "NO", NO_FEES), 8000);
-  assert.equal(contentFeeFor({ type: "NATIVE_DISPLAY" }, "SE", NO_FEES), 0);
+  assert.equal(contentFeeFor({ type: "NATIVE_DISPLAY", inclusions: null }, "NO", NO_FEES), 8000);
+  assert.equal(contentFeeFor({ type: "NATIVE_DISPLAY", inclusions: null }, "SE", NO_FEES), 0);
 });
 
 test("contentFeeFor follows the cascade: offer fee, then publication fee, then the desk rule", () => {
-  assert.equal(contentFeeFor({ type: "NATIVE_ARTICLE", productionFee: 5000 }, "NO", NO_FEES), 5000);
+  assert.equal(contentFeeFor({ type: "NATIVE_ARTICLE", inclusions: null, productionFee: 5000 }, "NO", NO_FEES), 5000);
   assert.equal(
-    contentFeeFor({ type: "NATIVE_ARTICLE", productionFee: null, title: { productionFeeDefault: 4000 } }, "NO", NO_FEES),
+    contentFeeFor(
+      { type: "NATIVE_ARTICLE", inclusions: null, productionFee: null, title: { productionFeeDefault: 4000 } },
+      "NO",
+      NO_FEES,
+    ),
     4000,
   );
   // Explicit 0 = the publisher includes production: no fee, not the rule's.
-  assert.equal(contentFeeFor({ type: "NATIVE_ARTICLE", productionFee: 0 }, "NO", NO_FEES), 0);
+  assert.equal(contentFeeFor({ type: "NATIVE_ARTICLE", inclusions: null, productionFee: 0 }, "NO", NO_FEES), 0);
+});
+
+// BUG-final-prod-1: Tungt.no's offer says the publisher's studio writes the
+// article (inclusions.production = PUBLISHER) but sets no fee of its own, so
+// the desk rule priced a "We write it" line at +2 000 kr — our fee for an
+// article the publisher already produces. No layer of the cascade applies.
+test("contentFeeFor charges nothing on a publisher-produced placement, whatever the desk rule says", () => {
+  const publisherWrites = { type: "NATIVE_DISPLAY", inclusions: { production: "PUBLISHER" } };
+  assert.equal(contentFeeFor(publisherWrites, "NO", NO_FEES), 0);
+  assert.equal(contentFeeFor({ ...publisherWrites, productionFee: 5000 }, "NO", NO_FEES), 0);
 });
 
 // BUG-buyer-plan-r2-2: the catalog showed Aftenposten's Native display as

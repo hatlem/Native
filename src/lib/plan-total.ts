@@ -50,6 +50,9 @@ export type EstimableListItem = {
         // priced "We write it" from the desk rule while the catalog band used
         // the offer's fee — the band and the plan disagreed (BUG-r2-2).
         productionFee: unknown;
+        // Required for the same reason: "production": "PUBLISHER" means the
+        // publisher writes the article and no fee of ours is added.
+        inclusions: unknown;
         priceRules: { marginPct: unknown; seasonalMultiplier: unknown; minVolume: number }[];
         title: TitleWithVisibility & {
           productionFeeDefault: unknown;
@@ -272,6 +275,19 @@ export function estimateListTotals(items: EstimableListItem[], pricing: PlanPric
     );
     return { ...total, totalInclVat, vat: totalInclVat - total.amount };
   });
+}
+
+// Whether a plan has lines its total can't include yet: a line with no shown
+// figure (hidden or unconfirmed price, a CPM/CPC rate) or a title not placed
+// yet (no product). Such lines are priced later, so every surface that shows
+// the total says "+ items priced on request" beside it — /plan's summary and
+// the share page ask this one helper, so the two can't disagree about it
+// (BUG-final-local-12: /plan hid a placeholder the share page announced).
+export function hasUnpricedLines(
+  items: readonly { isAlternative?: boolean; productId: string | null }[],
+  totals: readonly Pick<ListTotal, "hasOnRequest">[],
+): boolean {
+  return totals.some((r) => r.hasOnRequest) || items.some((i) => !i.isAlternative && !i.productId);
 }
 
 // The catalog plan bar's figure: per-currency totals computed server-side by

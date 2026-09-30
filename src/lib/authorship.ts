@@ -98,6 +98,22 @@ export function defaultContentIntent(product: ContentDefaultSource | null): Cont
   return contentIntent(true);
 }
 
+// The intent a placement is ORDERED with: the row's own choice, except on a
+// placement the publisher's studio writes, which is PUBLISHER_PRODUCED
+// whatever the row says. /plan offers no toggle there and the fee engine bills
+// nothing for it (pricing/production-fee.ts), so an order line must not claim
+// NativeSpin writes it (that would staff one of our writers on it) — nor
+// BUYER_SUPPLIED, which asks the buyer for copy the publisher produces.
+export function placementContentIntent(
+  withContent: boolean,
+  product: ContentDefaultSource | null | undefined,
+): ContentIntent {
+  if (product && publisherProducesContent(product)) {
+    return { withContent: false, authorshipMode: "PUBLISHER_PRODUCED" };
+  }
+  return contentIntent(withContent);
+}
+
 // Two lines folding into one (same product added twice, a placeholder resolved
 // onto an existing line, a catalog merge): if either asked us to write it, the
 // survivor does — dropping a content request silently loses a paid service the

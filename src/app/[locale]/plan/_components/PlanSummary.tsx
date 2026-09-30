@@ -6,7 +6,9 @@ import { hasFigure, type ListTotal } from "@/lib/plan-total";
 import { totalFloor, totalLabel } from "@/lib/pricing/total-label";
 import { submitRequest } from "@/app/checkout-actions";
 import { SubmitButton } from "@/components";
+import type { ListOrder } from "@/lib/commerce/list-commit";
 import { PlanBriefFields } from "./PlanBriefFields";
+import { PlanOrdered } from "./PlanOrdered";
 
 // Right column, top card: per-currency totals, the instant-book split, and
 // the brief form that submits the basket as a firm plan or RFQ. The
@@ -25,7 +27,7 @@ export async function PlanSummary({
   locale,
   listId,
   totals,
-  hasHiddenPrice,
+  hasUnpriced,
   allFirm,
   canCommit,
   firmLineCount,
@@ -34,6 +36,8 @@ export async function PlanSummary({
   activeOrg,
   brief,
   timingOptions,
+  ordered = null,
+  timeZone,
   readOnly = false,
 }: {
   locale: string;
@@ -41,7 +45,10 @@ export async function PlanSummary({
   // cookie, which may name a plan another tab opened since (lib/plan-target.ts).
   listId: string;
   totals: ListTotal[];
-  hasHiddenPrice: boolean;
+  // Lines the total can't include yet — a hidden/unconfirmed price, a rate, or
+  // a title not placed yet (lib/plan-total.ts hasUnpricedLines, the same test
+  // the share page makes).
+  hasUnpriced: boolean;
   allFirm: boolean;
   // Whether the viewer may commit the active org to an order (canCommitOnOrg).
   // A member without it gets the RFQ path for an all-firm plan instead of a
@@ -53,6 +60,12 @@ export async function PlanSummary({
   activeOrg: { name: string } | null;
   brief: PlanBriefValues;
   timingOptions: TimingOption[];
+  // The live order this plan already has (lib/commerce/list-commit.ts). An
+  // ordered plan is spent: "Ordered" and a link replace the send/order form,
+  // so a second click can't book it twice.
+  ordered?: ListOrder | null;
+  // The buyer's zone, for the order date.
+  timeZone: string;
   // View-only seat: the totals are shown, the brief form and the send/order
   // button are not (submitRequest refuses a view-only seat anyway).
   readOnly?: boolean;
@@ -117,7 +130,6 @@ export async function PlanSummary({
           <div key={r.currency}>
             <div className="price">
               {label(r)} <span className="muted small">{t("exVat")}</span>
-              {r.hasOnRequest ? <span className="muted small"> + {tv("requestPrice")}</span> : null}
             </div>
             {/* The content-fee split and the VAT-inclusive figure are exact
                 arithmetic, so they only describe the exact (instant-orderable)
@@ -136,17 +148,25 @@ export async function PlanSummary({
             ) : null}
           </div>
         ))}
+        {hasUnpriced && visibleTotals.length > 0 ? (
+          <p className="plan-summary-note">{tv("plusOnRequest")}</p>
+        ) : null}
         {anyEstimate ? <p className="plan-summary-note">{t("estimateNote")}</p> : null}
         {visibleTotals.length > 1 ? (
           <p className="plan-summary-note">{t("multiCurrencyNote")}</p>
         ) : null}
-        {hasHiddenPrice && visibleTotals.length === 0 ? (
+        {hasUnpriced && visibleTotals.length === 0 ? (
           <div className="muted small">{t("pricingOnRequest")}</div>
         ) : null}
       </div>
-      {hasHiddenPrice ? <p className="plan-summary-note">{t("plusDeskPriced")}</p> : null}
+      {hasUnpriced ? <p className="plan-summary-note">{t("plusDeskPriced")}</p> : null}
 
-      {readOnly ? null : (
+      {ordered ? (
+        <>
+          <div className="plan-summary-divider" />
+          <PlanOrdered locale={locale} ordered={ordered} timeZone={timeZone} canEdit={!readOnly} />
+        </>
+      ) : readOnly ? null : (
       <>
       <div className="plan-summary-divider" />
 
@@ -213,7 +233,7 @@ export async function PlanSummary({
       )}
     </aside>
 
-    {!needsClient && activeOrg && !readOnly ? (
+    {!needsClient && activeOrg && !readOnly && !ordered ? (
       <div className="plan-mobile-submit-bar">
         <div className="plan-mobile-submit-bar__total">
           <span className="plan-mobile-submit-bar__label">

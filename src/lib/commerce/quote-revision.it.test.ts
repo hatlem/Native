@@ -3,6 +3,7 @@ import assert from "node:assert/strict";
 import { OrgType } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
 import { createOrderFromQuote, QuoteNotAcceptableError } from "@/lib/commerce/accept-quote";
+import { quoteFingerprint } from "@/lib/commerce/quote-offer";
 import { sendDraftQuotes } from "@/lib/commerce/quote-lifecycle";
 import { updateQuoteLineNote, updateQuoteLinePrice } from "@/lib/commerce/quote-edits";
 import { discardQuoteRevision, reviseQuote } from "@/lib/commerce/quote-revision";
@@ -141,7 +142,12 @@ if (!RUN_DB_IT) {
     });
     const plan = await prisma.plan.findUniqueOrThrow({ where: { id: planId }, include: { items: true } });
     return prisma.$transaction((tx) =>
-      createOrderFromQuote(tx, { organizationId: orgId, quote: { id: quoteId, lines: quote.lines }, plan }),
+      createOrderFromQuote(tx, {
+        organizationId: orgId,
+        quote: { id: quoteId, lines: quote.lines },
+        offerFingerprint: quoteFingerprint(quote),
+        plan,
+      }),
     );
   };
 

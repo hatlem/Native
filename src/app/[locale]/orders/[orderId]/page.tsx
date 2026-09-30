@@ -2,6 +2,7 @@ import { getTranslations } from "next-intl/server";
 import { notFound } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import { lineOrder } from "@/lib/commerce/line-order";
+import { placementCount } from "@/lib/commerce/placements";
 import { Link } from "@/i18n/navigation";
 import { formatMoney, intlLocale } from "@/lib/money";
 import { loadScope, canActOnOrg, canEditOnOrg } from "@/lib/scope";
@@ -152,8 +153,8 @@ export default async function MyOrderPage({
             </span>
           </div>
           <div className="meta-row">
-            <span className="muted small">{t("lines")}</span>
-            <span className="value">{order.lines.length}</span>
+            <span className="muted small">{t("placements")}</span>
+            <span className="value">{placementCount(order.lines)}</span>
           </div>
           <div className="meta-row">
             <span className="muted small">{t("total")}</span>
@@ -224,6 +225,9 @@ export default async function MyOrderPage({
                   </div>
                 </div>
 
+                {isContentFee ? (
+                  <p className="muted small">{t("contentFeeNote")}</p>
+                ) : (
                 <dl className="spec-grid">
                   <dt>{tp("status")}</dt>
                   <dd>
@@ -249,6 +253,7 @@ export default async function MyOrderPage({
                     </>
                   ) : null}
                 </dl>
+                )}
 
                 {(() => {
                   const safe = safeExternalUrl(line.booking?.liveUrl);

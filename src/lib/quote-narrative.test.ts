@@ -206,4 +206,30 @@ test("a content-fee line is labelled with the title of the placement it writes f
     ],
   );
   assert.equal(out.lines[0].productId, "p1");
+  // Each fee names the format it writes for, so two fees on one title differ.
+  assert.deepEqual(
+    fees.map((l) => l.forProductType),
+    ["NATIVE_ARTICLE", "ADVERTORIAL", null],
+  );
+  assert.equal(out.lines[0].forProductType, null);
+});
+
+// BUG-final-local-5: 2 placements with 2 article fees read "4 editorial-grade
+// native placements" in the outcome line.
+test("itemCount counts placements, not the article fees billed with them", () => {
+  const out = buildQuoteNarrative(
+    input({
+      quote: {
+        currency: "NOK",
+        lines: [
+          { id: "l1", kind: "INVENTORY", productId: "p1", description: "A", lineTotal: 18000, quantity: 1 },
+          { id: "l2", kind: "INVENTORY", productId: "p2", description: "B", lineTotal: 5000, quantity: 1 },
+          { id: "f1", kind: "CONTENT_FEE", productId: null, description: "Content production — A", lineTotal: 12000, quantity: 1 },
+          { id: "f2", kind: "CONTENT_FEE", productId: null, description: "Content production — B", lineTotal: 8000, quantity: 1 },
+        ],
+      },
+    }),
+  );
+  assert.equal(out.itemCount, 2);
+  assert.equal(out.lines.length, 4);
 });

@@ -21,7 +21,7 @@ import {
   type ContentFeeRuleSpec,
   type QuoteLineComputation,
 } from "../money";
-import { nativeSpinProduces, type AuthorshipMode } from "../authorship";
+import { nativeSpinProduces, publisherProducesContent, type AuthorshipMode } from "../authorship";
 
 export function resolveProductionFee(args: {
   productFee: number | null | undefined;
@@ -40,6 +40,12 @@ export function resolveProductionFee(args: {
 export type FeeProduct = {
   type: string;
   productionFee?: unknown;
+  // Curated deliverables (pricing/inclusions.ts). REQUIRED, not optional:
+  // "production": "PUBLISHER" means the publisher's studio writes the article,
+  // so no fee of ours applies — a select that forgot it charged our fee on an
+  // article the publisher already produces (BUG-final-prod-1). Forcing the key
+  // makes such a select fail typecheck instead of overcharging.
+  inclusions: unknown;
   title?: { productionFeeDefault?: unknown } | null;
 };
 
@@ -52,8 +58,11 @@ export function offerProductionFee(product: FeeProduct): number | null {
 }
 
 // The article fee for one placement, by the order's own line builder: 0 when
-// no fee applies.
+// no fee applies — and always 0 on a publisher-produced placement: the
+// publisher's studio writes that article, so there is nothing for us to write
+// or bill, whatever the desk rule for the format says.
 export function articleFee(product: FeeProduct, marketCode: string, rules: ContentFeeRuleSpec[]): number {
+  if (publisherProducesContent(product)) return 0;
   return computeContentFeeLines(
     [{ name: "", productType: product.type, fee: offerProductionFee(product) }],
     rules,
@@ -63,7 +72,9 @@ export function articleFee(product: FeeProduct, marketCode: string, rules: Conte
 
 // CONTENT_FEE lines for one market group of an order or quote: the items
 // NativeSpin writes (authorshipMode when present, else the legacy withContent
-// toggle — the two are kept in sync), each priced by the cascade above.
+// toggle — the two are kept in sync), each priced by the cascade above. A
+// publisher-produced placement never gets one, even if a stale row still asks
+// for "We write it": the fee would bill an article the publisher writes.
 export function contentFeeLinesFor(
   groupItems: { productId: string; withContent?: boolean; authorshipMode?: AuthorshipMode }[],
   byId: Map<string, FeeProduct & { name: string }>,
@@ -73,7 +84,7 @@ export function contentFeeLinesFor(
   const feeItems = groupItems
     .filter((i) => (i.authorshipMode ? nativeSpinProduces(i.authorshipMode) : !!i.withContent))
     .map((i) => byId.get(i.productId))
-    .filter((p): p is FeeProduct & { name: string } => !!p)
+    .filter((p): p is FeeProduct & { name: string } => !!p && !publisherProducesContent(p))
     .map((p) => ({ name: p.name, productType: p.type, fee: offerProductionFee(p) }));
   return computeContentFeeLines(feeItems, rules, marketCode);
 }

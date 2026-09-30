@@ -2,6 +2,7 @@ import { test, before, after, mock } from "node:test";
 import assert from "node:assert/strict";
 import { OrgType } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
+import { offerToken } from "@/lib/commerce/quote-offer";
 
 // DB-mutating integration test — skipped unless RUN_DB_IT=1, and only against
 // a DISPOSABLE database. A RESTRICTED seat is view-only (lib/scope
@@ -327,7 +328,9 @@ if (!RUN_DB_IT || !CAN_MOCK) {
     assert.deepEqual(await lists.savePlanBrief(listId, { briefText: "Member brief" }), { ok: true });
     await redirectOf(articles.createArticle(form({ organizationId: orgId, title: "Member article" })));
     assert.equal(await prisma.article.count({ where: { organizationId: orgId } }), 1);
-    await redirectOf(quotes.acceptAllQuotesForRequest(form({ requestId })));
+    // The accept form posts the offer the page shows (lib/commerce/quote-offer.ts).
+    const shown = await prisma.quote.findUniqueOrThrow({ where: { id: quoteId }, include: { lines: true } });
+    await redirectOf(quotes.acceptAllQuotesForRequest(form({ requestId, offer: offerToken(shown) })));
     assert.equal((await prisma.quote.findUniqueOrThrow({ where: { id: quoteId } })).status, "ACCEPTED");
   });
 

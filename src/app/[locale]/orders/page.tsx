@@ -2,6 +2,7 @@ import { getTranslations } from "next-intl/server";
 import { viewOrgIds } from "@/lib/workspace";
 import { redirect } from "next/navigation";
 import { prisma } from "@/lib/prisma";
+import { placementCount } from "@/lib/commerce/placements";
 import { Link } from "@/i18n/navigation";
 import { formatMoney, intlLocale } from "@/lib/money";
 import { loadScope } from "@/lib/scope";
@@ -180,7 +181,7 @@ export default async function MyOrdersPage({
                   </th>
                   <th aria-sort={ariaSort("lines")} className="num">
                     <Link href={sortHref("lines")} className="th-sort">
-                      {t("lines")}
+                      {t("placements")}
                       {arrow("lines")}
                     </Link>
                   </th>
@@ -213,8 +214,8 @@ export default async function MyOrdersPage({
                       <td data-label={t("organization")}>
                         <Link href={`/orders/${o.id}`}>{o.organization.name}</Link>
                       </td>
-                      <td data-label={t("lines")} className="num">
-                        {o.lines.length}
+                      <td data-label={t("placements")} className="num">
+                        {placementCount(o.lines)}
                       </td>
                       <td data-label={t("total")} className="num">
                         {formatMoney(

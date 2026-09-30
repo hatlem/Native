@@ -10,6 +10,7 @@ import {
 } from "@/lib/commerce/firm-order";
 import { submitListAsRfq, RFQ_LIST_INCLUDE } from "@/lib/commerce/submit-rfq";
 import { createOrderFromQuote, QuoteNotAcceptableError } from "@/lib/commerce/accept-quote";
+import { quoteFingerprint } from "@/lib/commerce/quote-offer";
 import { reconcileExpiredQuotes } from "@/lib/commerce/quote-expiry";
 
 // DB-mutating integration test — skipped unless RUN_DB_IT=1, and only
@@ -365,6 +366,7 @@ if (!RUN_DB_IT) {
       const result = await createOrderFromQuote(tx, {
         organizationId: orgId,
         quote: { id: seeded.quote.id, lines: seeded.quote.lines },
+        offerFingerprint: quoteFingerprint(seeded.quote),
         plan: seeded.plan,
       });
       await tx.request.update({
@@ -450,6 +452,7 @@ if (!RUN_DB_IT) {
       createOrderFromQuote(tx, {
         organizationId: orgId,
         quote: { id: seeded.quote.id, lines: seeded.quote.lines },
+        offerFingerprint: quoteFingerprint(seeded.quote),
         plan: seeded.plan,
       }),
     );
