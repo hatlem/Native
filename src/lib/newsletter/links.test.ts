@@ -24,3 +24,13 @@ test("fallback locale: link hint, then cookie, then default", () => {
   assert.equal(newsletterFallbackLocale(null, "de"), "de");
   assert.equal(newsletterFallbackLocale("xx", undefined), "en");
 });
+
+test("fallback locale: an old link without lang follows the browser language", () => {
+  assert.equal(newsletterFallbackLocale(null, undefined, "nb-NO,nb;q=0.9,en;q=0.8"), "no");
+  assert.equal(newsletterFallbackLocale(null, undefined, "fr-FR,de;q=0.7"), "de");
+  // An explicit choice (the cookie) still beats the browser default.
+  assert.equal(newsletterFallbackLocale(null, "sv", "nb-NO"), "sv");
+  // A junk cookie doesn't mask the browser language.
+  assert.equal(newsletterFallbackLocale(null, "xx", "da"), "da");
+  assert.equal(newsletterFallbackLocale(null, undefined, "fr-FR"), "en");
+});

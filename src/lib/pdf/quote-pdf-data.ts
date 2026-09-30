@@ -1,6 +1,7 @@
 import { prisma } from "@/lib/prisma";
 import { lineOrder } from "@/lib/commerce/line-order";
 import { paymentTermsDaysFor } from "@/lib/payment-terms";
+import { marketTimeZone } from "@/lib/markets";
 import { quoteOnlineUrl } from "./quote-online-url";
 
 // Everything a customer-facing quote PDF is allowed to render. No cost,
@@ -34,6 +35,9 @@ export type QuotePdfData = {
   total: number;
   validUntil: Date | null;
   createdAt: Date;
+  // The buyer organisation's zone (marketTimeZone): the document prints its
+  // dates as days on the buyer's calendar, like the quote page does.
+  timeZone: string;
   organizationName: string;
   preparedByName: string;
   preparedByEmail: string;
@@ -85,7 +89,9 @@ export async function loadQuotePdfData(
     include: {
       lines: { orderBy: lineOrder() },
       request: {
-        include: { organization: { select: { name: true, paymentTermsDays: true } } },
+        include: {
+          organization: { select: { name: true, paymentTermsDays: true, marketCode: true } },
+        },
       },
     },
   });
@@ -165,6 +171,7 @@ export async function loadQuotePdfData(
     total: Number(quote.total),
     validUntil: quote.validUntil,
     createdAt: quote.createdAt,
+    timeZone: marketTimeZone(quote.request.organization.marketCode),
     organizationName: quote.request.organization.name,
     preparedByName: preparedBy.name ?? "NativeSpin desk",
     preparedByEmail: preparedBy.email,

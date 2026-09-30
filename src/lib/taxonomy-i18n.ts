@@ -287,6 +287,49 @@ export function localizeCategory(value: string, locale: AppLocale): string {
   return lookup(CATEGORY, value, locale);
 }
 
+// Title.category is the research sheet's free-text label, written in the
+// language of the market's source sheet: Norwegian for NO ("Abonnementsavis
+// riks"), Swedish, Danish and Finnish for SE/DK/FI, English everywhere else
+// ("Auto club" for DE). The canonical values in CATEGORY translate; the long
+// composite tail doesn't, and is only readable in its own language.
+const CATEGORY_SOURCE_LOCALE: Readonly<Partial<Record<string, AppLocale>>> = {
+  NO: "no",
+  SE: "sv",
+  DK: "da",
+  FI: "fi",
+};
+
+export function categorySourceLocale(marketCode: string): AppLocale {
+  return CATEGORY_SOURCE_LOCALE[marketCode] ?? "en";
+}
+
+// The category in the viewer's language, or null when it can't be: an
+// untranslated source label shown to a reader of another language
+// ("Næringsliv digital" on /de). A display mapping, not a data change,
+// so the research sheet stays the source of truth.
+export function readableCategory(
+  category: string,
+  marketCode: string,
+  locale: AppLocale,
+): string | null {
+  const entry = CATEGORY[category.trim().toLowerCase()];
+  if (entry) return locale === "en" ? category : (entry[locale] ?? category);
+  return categorySourceLocale(marketCode) === locale ? category : null;
+}
+
+// One short label for a catalog card: the category when the viewer can
+// read it, else the title's vertical (a closed taxonomy, translated in
+// full), else the raw category as the last resort.
+export function titleCategoryLabel(
+  title: { category: string; vertical: string | null; market: { code: string } },
+  locale: AppLocale,
+): string {
+  return (
+    readableCategory(title.category, title.market.code, locale) ??
+    (title.vertical ? localizeVertical(title.vertical, locale) : title.category)
+  );
+}
+
 /** True when `value` has a translation in every UI language. */
 export function hasVerticalTranslation(value: string): boolean {
   const entry = VERTICAL[value.trim().toLowerCase()];

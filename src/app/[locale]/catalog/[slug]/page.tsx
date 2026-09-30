@@ -20,7 +20,7 @@ import { loadPricingDefaults } from "@/lib/content-fee";
 import { addToPlan } from "@/app/plan-actions";
 import { saveTitleToList } from "@/app/list-actions";
 import { SubmitButton } from "@/components";
-import { localizeCategory, localizeTaxonomy, localizeVertical } from "@/lib/taxonomy-i18n";
+import { localizeTaxonomy, localizeVertical, readableCategory } from "@/lib/taxonomy-i18n";
 import type { AppLocale } from "@/i18n/routing";
 import { ESTIMATED_LEAD_TIME_DAYS } from "@/lib/lead-time";
 
@@ -171,6 +171,12 @@ export default async function TitleDetailPage({
   // publisher line so a title reads "Anlegg & Transport" · AT.no rather than
   // only the (sometimes generic) editorial name.
   const domain = titleDomain(title);
+  // The source category is free text in the market's own language. A reader
+  // of another language gets the (translated) vertical row instead of an
+  // untranslatable label; with no vertical, the raw label beats nothing.
+  const categoryText =
+    readableCategory(title.category, title.market.code, locale as AppLocale) ??
+    (title.vertical ? null : title.category);
 
   return (
     <section>
@@ -331,8 +337,12 @@ export default async function TitleDetailPage({
                 <dd>{localizeVertical(title.audience, locale as AppLocale)}</dd>
               </>
             ) : null}
-            <dt>{t("factCategory")}</dt>
-            <dd>{prettyCategory(localizeCategory(title.category, locale as AppLocale))}</dd>
+            {categoryText ? (
+              <>
+                <dt>{t("factCategory")}</dt>
+                <dd>{prettyCategory(categoryText)}</dd>
+              </>
+            ) : null}
           </dl>
         </aside>
       </div>

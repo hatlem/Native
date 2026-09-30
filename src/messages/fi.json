@@ -1002,7 +1002,9 @@
     "quoteRevisionNote": "Versio {revision} – korvaa aiemmin saamasi tarjouksen.",
     "supersededEyebrow": "Aiemmat versiot",
     "supersededRow": "Versio {revision} ({total}) ei ole enää voimassa.",
-    "supersededBy": "Katso versio {revision} →"
+    "supersededBy": "Katso versio {revision} →",
+    "quoteDownloadPdf": "Lataa PDF",
+    "quoteDownloadDocx": "Lataa Word (.docx)"
   },
   "desk": {
     "eyebrow": "Sisäinen desk",
@@ -1387,7 +1389,10 @@
     "emailRequired": "Kirjoita ensin sähköpostiosoitteesi.",
     "attemptsRateLimited": "Liian monta yritystä. Odota hetki ja yritä uudelleen.",
     "checkSignupTitle": "Vahvista sähköpostiosoitteesi",
-    "checkSignupLead": "Lähetimme linkin antamaasi osoitteeseen. Avaa se vahvistaaksesi osoitteen ja kirjautuaksesi; linkki vanhenee 15 minuutissa. Jos osoitteella oli jo tili, viestissä kerrotaan, miten pääset takaisin sisään."
+    "checkSignupLead": "Lähetimme linkin antamaasi osoitteeseen. Avaa se vahvistaaksesi osoitteen ja kirjautuaksesi; linkki vanhenee 15 minuutissa. Jos osoitteella oli jo tili, viestissä kerrotaan, miten pääset takaisin sisään.",
+    "regEmailTypoQuestion": "Tarkoititko <b>{email}</b>?",
+    "regEmailTypoUse": "Käytä osoitetta {email}",
+    "regEmailTypoKeep": "Jos {domain} on oikein, paina Luo tili uudelleen."
   },
   "order": {
     "title": "Tilaus",
@@ -1642,7 +1647,10 @@
     "ratesPriceOnlyNote": "Tällä sivulla muutetaan vain hintoja. Katalogin tila — aktiivinen, varattavissa, näkyvyys — on NativeSpin-deskin hallinnassa.",
     "changePriceOnRates": "Muuta hintasivulla",
     "notBookable": "Ei varattavissa",
-    "catalogStatusNote": "Hintoja muutetaan hintasivulla. Luettelotilasta (varattavuus ja se, voiko tuotteen tilata heti) vastaa NativeSpinin desk."
+    "catalogStatusNote": "Hintoja muutetaan hintasivulla. Luettelotilasta (varattavuus ja se, voiko tuotteen tilata heti) vastaa NativeSpinin desk.",
+    "leadTimeSaved": "Toimitusaika tallennettu: {days, plural, =1 {1 päivä} other {# päivää}}. Desk on saanut tiedon.",
+    "leadTimeUnchanged": "Ei muutosta: toimitusaika on jo {days, plural, =1 {1 päivä} other {# päivää}}.",
+    "leadTimeInvalid": "Anna kokonainen määrä päiviä väliltä 1–{max}. Mitään ei tallennettu."
   },
   "formats": {
     "metaTitle": "Natiiviformaatit",
@@ -2512,18 +2520,17 @@
     "anchorNote": "Julkaisijan virallinen listahinta tälle julkaisulle. Kokonaishintaasi sisältyy sisällöntuotanto, julkaisu, korjaukset ja raportointi.",
     "whyThisPrice": "NativeSpinllä on suorat toimitukselliset suhteet kaikkiin tarjouksen medioihin. Neuvottelemme julkaisun, palkkaamme toimialaa tuntevan toimittajan, hoidamme toimituksellisen tarkistuksen julkaisijan kanssa ja toimitamme raportoinnin. Saat yhden vastuullisen kumppanin ja yhden kokonaishinnan — emme erikseen medialaskua, kirjoittajalaskua ja toimistopalkkiota.",
     "termsCancellation": "Täysi palautus ennen artikkelibrieffin hyväksyntää; 50 % palautus ennen ensimmäistä luonnosta; ei palautusta enää julkaisijan paikan vahvistuksen jälkeen.",
-    "termsValidity": "Tarjous voimassa 14 päivää. Julkaisijan saatavuus vahvistetaan hyväksynnän yhteydessä.",
     "bullets": {
       "NATIVE_ARTICLE": [
         "Neuvoteltu julkaisu mediassa {titleName}, kirjoitettu median toimituksellisella äänellä",
-        "Artikkeli (1 200–1 500 sanaa) toimialaa tuntevan toimittajan kirjoittama",
+        "Artikkeli{length} toimialaa tuntevan toimittajan kirjoittama",
         "Kaksi korjauskierrosta ja hyväksyntäsi ennen julkaisua",
         "Levitys {titleName}-median native-syötteessä ja uutiskirjeessä",
         "Klikkiseuranta jokaiselle lisäämällemme linkille, raportoituna sovittuina ajankohtina"
       ],
       "ADVERTORIAL": [
         "Neuvoteltu julkaisu mediassa {titleName}, selkeästi merkittynä maksetuksi sisällöksi",
-        "Brändijohtoinen artikkeli (800–1 200 sanaa) julkaisijan toimituksellisten standardien mukaan",
+        "Brändijohtoinen artikkeli{length} julkaisijan toimituksellisten standardien mukaan",
         "Yksi korjauskierros ja hyväksyntäsi ennen julkaisua",
         "Levitys {titleName}-median sisältösyötteessä",
         "Klikkiseuranta jokaiselle lisäämällemme linkille, raportoituna sovittuina ajankohtina"
@@ -2535,12 +2542,17 @@
         "Klikkiseuranta jokaiselle lisäämällemme linkille sekä raportoidut näytöt, sovittuina ajankohtina"
       ],
       "PACKAGE": [
-        "Toimituksellinen artikkeli mediassa {titleName} (1 200–1 500 sanaa)",
+        "Toimituksellinen artikkeli mediassa {titleName}{length}",
         "Native-display-vahvistus samassa mediassa",
         "Yhteinen toimituksellinen tarkistus ja yhteinen julkaisupäivä",
         "Klikkiseuranta jokaiselle lisäämällemme linkille, raportoituna sovittuina ajankohtina"
       ]
-    }
+    },
+    "termsValidUntil": "Tarjous on voimassa {date} asti. Julkaisijan saatavuus vahvistetaan hyväksynnän yhteydessä.",
+    "termsAvailability": "Julkaisijan saatavuus vahvistetaan hyväksynnän yhteydessä.",
+    "wordsRange": "{min, number}–{max, number} sanaa",
+    "wordsMin": "vähintään {min, number} sanaa",
+    "wordsMax": "enintään {max, number} sanaa"
   },
   "priceVisibility": {
     "requestPrice": "Kysy hintaa",
@@ -3602,7 +3614,7 @@
       "inReviewNote": "Tämä luonnos on asiakkaalla tarkastettavana. Jos tallennat nyt, syntyy uusi versio – lähetä se tarkastettavaksi, kun se on valmis.",
       "draftLabel": "Artikkelin teksti",
       "draftPlaceholder": "# Otsikko\n\nIngressi…",
-      "draftHint": "Pelkkää tekstiä ja kevyttä Markdownia: # otsikoille, **lihavointi**, *kursiivi*, - listoille, [teksti](linkki). Muista merkintä.",
+      "draftHint": "Pelkkää tekstiä ja kevyttä Markdownia: # otsikoille, **lihavointi**, *kursiivi*, - listoille, [teksti](linkki), ![kuvateksti](kuvalinkki) kuville. Muista merkintä.",
       "saveDraft": "Tallenna luonnos",
       "saving": "Tallennetaan…",
       "submit": "Lähetä tarkastettavaksi",
@@ -3641,7 +3653,10 @@
       "passedDetail": "Luonnos täyttää formaatin vaatimukset ({words} sanaa).",
       "failDisclosure": "Merkintä ”{label}” puuttuu. Lukijan on nähtävä, että kyse on maksetusta sisällöstä.",
       "failTooShort": "Liian lyhyt: {words} sanaa, formaatti vaatii vähintään {min}.",
-      "failTooLong": "Liian pitkä: {words} sanaa, formaatti sallii enintään {max}."
+      "failTooLong": "Liian pitkä: {words} sanaa, formaatti sallii enintään {max}.",
+      "imagesHow": "Lisää kuvat luonnokseen muodossa ![kuvateksti](https://linkki-kuvaan).",
+      "warnTooFewImages": "Liian vähän kuvia: {images, plural, =0 {ei vielä yhtään} other {#}}, formaatti edellyttää vähintään {min}. Tämä ei estä lähettämästä tarkistukseen, mutta lisää kuvat jos voit, jokainen muodossa ![kuvateksti](https://linkki-kuvaan).",
+      "warningsLabel": "Kannattaa korjata:"
     },
     "profile": {
       "title": "Oma profiili",
@@ -3818,5 +3833,40 @@
     "claim": "Luo tili tästä (linkki vanhenee {days} päivän kuluttua):",
     "ignore": "Jos et odottanut tätä viestiä, voit jättää sen huomiotta – linkkiä voi käyttää vain kerran.",
     "signoff": "– NativeSpin"
+  },
+  "pageTitle": {
+    "catalog": "Katalogi",
+    "catalogCompare": "Vertaa julkaisuja",
+    "home": "Etusivu",
+    "plan": "Suunnitelmasi",
+    "lists": "Tallennetut listat",
+    "favorites": "Suosikit",
+    "requests": "Pyynnöt",
+    "orders": "Tilaukset",
+    "invoices": "Laskut",
+    "articles": "Artikkelit",
+    "reports": "Raportit",
+    "campaign": "Suunnittele kampanja",
+    "notifications": "Saapuneet",
+    "account": "Tili",
+    "agency": "Toimisto",
+    "onboarding": "Aloitus",
+    "onboardingCall": "Keskustele deskin kanssa",
+    "invite": "Liity tiimiin",
+    "writer": "Kirjoittajaportaali",
+    "publisher": "Kustantajaportaali",
+    "desk": "Desk",
+    "deskRequest": "Pyyntö",
+    "deskOrders": "Tilaukset",
+    "deskTitles": "Julkaisut",
+    "deskUsers": "Käyttäjät",
+    "deskWriters": "Kirjoittajat",
+    "deskPriceQuotes": "Hintatarjoukset",
+    "deskPublisherContacts": "Kustantajien yhteyshenkilöt",
+    "deskReports": "Raportit",
+    "deskPlaybooks": "Pelikirjat",
+    "deskContentFees": "Sisältömaksut",
+    "deskApiKeys": "API-avaimet",
+    "deskMetricsNeedsContact": "Mittarit puuttuvat"
   }
 }

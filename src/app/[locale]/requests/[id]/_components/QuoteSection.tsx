@@ -1,11 +1,11 @@
 import { getTranslations } from "next-intl/server";
-import { formatMoney, intlLocale } from "@/lib/money";
+import { formatMoney } from "@/lib/money";
 import {
   buildQuoteNarrative,
   anchorDiscountPct,
 } from "@/lib/quote-narrative";
 import { acceptAllQuotesForRequest, requestQuoteRenewal } from "@/app/quote-actions";
-import { isQuoteExpired } from "@/lib/commerce/quote-validity";
+import { formatQuoteValidUntil, isQuoteExpired } from "@/lib/commerce/quote-validity";
 import { StatusBadge } from "@/app/status-badge";
 import { SectionHead, SubmitButton } from "@/components";
 import { ViewOnlyNote } from "@/components/view-only-note";
@@ -22,6 +22,7 @@ import type {
 // open quote's validity window has closed).
 export async function QuoteSection({
   locale,
+  timeZone,
   quotes,
   products,
   byId,
@@ -37,6 +38,8 @@ export async function QuoteSection({
   supersededQuotes = [],
 }: {
   locale: string;
+  // The buyer organisation's zone: validity dates are days on its calendar.
+  timeZone: string;
   quotes: QuoteWithOrder[];
   products: ProductWithTitle[];
   byId: Map<string, ProductWithTitle>;
@@ -86,6 +89,7 @@ export async function QuoteSection({
           id: l.id,
           kind: l.kind,
           productId: l.productId,
+          description: l.description,
           lineTotal: l.lineTotal,
           quantity: l.quantity,
           priceOnRequest: l.priceOnRequest,
@@ -119,19 +123,36 @@ export async function QuoteSection({
     .map((q) => q.validUntil)
     .filter((d): d is Date => !!d)
     .sort((a, b) => a.getTime() - b.getTime())[0];
-  const expiredOn = firstLapse
-    ? new Intl.DateTimeFormat(intlLocale(locale), { dateStyle: "long" }).format(firstLapse)
+  const expiredOn = firstLapse ? formatQuoteValidUntil(firstLapse, locale, timeZone) : null;
+  const validUntilLabel = earliestValidUntil
+    ? formatQuoteValidUntil(earliestValidUntil, locale, timeZone)
     : null;
+  // The format's length from the product spec, as it goes into a bullet's
+  // "{length}" slot: " (500–900 words)", or nothing when the spec is silent.
+  // Hard-coded counts here used to contradict the catalog and writer brief.
+  const lengthFor = (productId: string | null): string => {
+    const spec = productId ? byId.get(productId)?.spec : null;
+    const min = spec?.wordCountMin ?? null;
+    const max = spec?.wordCountMax ?? null;
+    const words =
+      min && max
+        ? tn("wordsRange", { min, max })
+        : min
+          ? tn("wordsMin", { min })
+          : max
+            ? tn("wordsMax", { max })
+            : null;
+    return words ? ` (${words})` : "";
+  };
   return (
     <section className="section">
       <SectionHead
         eyebrow={t("quoteEyebrow")}
         title={t("quote")}
         trailing={
-          earliestValidUntil ? (
+          validUntilLabel ? (
             <span className="muted small">
-              {t("validUntil")}:{" "}
-              {earliestValidUntil.toISOString().slice(0, 10)}
+              {t("validUntil")}: {validUntilLabel}
             </span>
           ) : null
         }
@@ -173,12 +194,12 @@ export async function QuoteSection({
                     const bullets = tn.has(bulletsKey)
                       ? (tn.raw(bulletsKey) as unknown)
                       : null;
+                    const length = lengthFor(line.productId);
                     const items = Array.isArray(bullets)
                       ? (bullets as string[]).map((b) =>
-                          b.replaceAll(
-                            "{titleName}",
-                            line.titleName,
-                          ),
+                          b
+                            .replaceAll("{titleName}", line.titleName)
+                            .replaceAll("{length}", length),
                         )
                       : [];
                     const discount = anchorDiscountPct(line);
@@ -294,6 +315,25 @@ export async function QuoteSection({
                     {t("priceOnRequestNote")}
                   </p>
                 ) : null}
+                {/* The offer as a document, for internal approval. Plain
+                    <a>: route-handler downloads, rendered on demand, so
+                    they never depend on a stored PDF version. */}
+                <div className="qn-downloads">
+                  <a
+                    className="btn small secondary"
+                    href={`/api/export/quote-pdf/${q.id}?locale=${locale}`}
+                    download
+                  >
+                    {t("quoteDownloadPdf")}
+                  </a>
+                  <a
+                    className="btn small ghost"
+                    href={`/api/export/quote-docx/${q.id}?locale=${locale}`}
+                    download
+                  >
+                    {t("quoteDownloadDocx")}
+                  </a>
+                </div>
               </div>
             </div>
           );
@@ -330,7 +370,13 @@ export async function QuoteSection({
           <ul className="qn-terms-list">
             <li>{tPay("line", { days: paymentTermsDays })}</li>
             <li>{tn("termsCancellation")}</li>
-            <li>{tn("termsValidity")}</li>
+            {/* The real deadline, not a fixed "valid for 14 days": the
+                desk picks the validity per quote. */}
+            <li>
+              {validUntilLabel
+                ? tn("termsValidUntil", { date: validUntilLabel })
+                : tn("termsAvailability")}
+            </li>
           </ul>
         </div>
 

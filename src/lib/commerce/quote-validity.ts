@@ -8,6 +8,9 @@
 // catches the stored row up opportunistically (bookkeeping for reports).
 
 import type { Prisma, QuoteStatus } from "@prisma/client";
+import { HOUSE_TIME_ZONE } from "@/lib/markets";
+import { intlLocale } from "@/lib/money";
+import { zonedDateString, zonedEndOfDay } from "@/lib/time-zone";
 
 /** How long a newly issued or renewed quote stays firm. */
 export const QUOTE_VALIDITY_DAYS = 14;
@@ -33,10 +36,14 @@ export function quoteValidUntilFrom(now: Date): Date {
 }
 
 /** The desk's "valid until" date field: YYYY-MM-DD, prefilled with the
- *  default window. Dates are UTC calendar days — the same day the buyer's
- *  quote page and the email print (toISOString().slice(0, 10)). */
-export function quoteValidUntilInputValue(now: Date, date: Date = quoteValidUntilFrom(now)): string {
-  return date.toISOString().slice(0, 10);
+ *  default window. The day is a calendar day in the buyer organisation's
+ *  time zone (marketTimeZone), the zone every surface prints it in. */
+export function quoteValidUntilInputValue(
+  now: Date,
+  date: Date = quoteValidUntilFrom(now),
+  timeZone: string = HOUSE_TIME_ZONE,
+): string {
+  return zonedDateString(date, timeZone);
 }
 
 export type ParsedValidUntil =
@@ -44,28 +51,49 @@ export type ParsedValidUntil =
   | { ok: false; reason: "invalid" | "past" | "too-far" };
 
 /**
- * Parse the desk's chosen validity date. The quote is valid THROUGH that day:
- * validUntil is its last millisecond (UTC), so "valid until 14 Oct" never
- * lapses on the morning of the 14th. Today is allowed (a same-day offer);
- * anything past QUOTE_VALIDITY_MAX_DAYS is refused. A blank field falls back
- * to the default window.
+ * Parse the desk's chosen validity date. The quote is valid THROUGH that day
+ * on the buyer's calendar: validUntil is the last millisecond of the day in
+ * `timeZone` (the buyer organisation's, see marketTimeZone), so "valid until
+ * 14 Oct" never lapses on the morning of the 14th, and doesn't run on into
+ * the 15th either (23:59 UTC is already 01:59 on the 15th in Oslo). Today is
+ * allowed (a same-day offer); anything past QUOTE_VALIDITY_MAX_DAYS is
+ * refused. A blank field means the default window, through its last day.
  */
-export function parseQuoteValidUntil(raw: string, now: Date = new Date()): ParsedValidUntil {
-  const value = raw.trim();
-  if (value === "") return { ok: true, validUntil: quoteValidUntilFrom(now) };
+export function parseQuoteValidUntil(
+  raw: string,
+  now: Date = new Date(),
+  timeZone: string = HOUSE_TIME_ZONE,
+): ParsedValidUntil {
+  const value = raw.trim() || quoteValidUntilInputValue(now, quoteValidUntilFrom(now), timeZone);
   const match = /^(\d{4})-(\d{2})-(\d{2})$/.exec(value);
   if (!match) return { ok: false, reason: "invalid" };
   const [, y, m, d] = match.map(Number);
-  const endOfDay = new Date(Date.UTC(y, m - 1, d, 23, 59, 59, 999));
   // Date.UTC rolls 2026-02-31 over to March — reject instead of guessing.
-  if (endOfDay.getUTCMonth() !== m - 1 || endOfDay.getUTCDate() !== d) {
+  const calendarDay = new Date(Date.UTC(y, m - 1, d));
+  if (calendarDay.getUTCMonth() !== m - 1 || calendarDay.getUTCDate() !== d) {
     return { ok: false, reason: "invalid" };
   }
+  const endOfDay = zonedEndOfDay(y, m, d, timeZone);
   if (endOfDay.getTime() <= now.getTime()) return { ok: false, reason: "past" };
   if (endOfDay.getTime() > now.getTime() + (QUOTE_VALIDITY_MAX_DAYS + 1) * DAY_MS) {
     return { ok: false, reason: "too-far" };
   }
   return { ok: true, validUntil: endOfDay };
+}
+
+/**
+ * A quote's validity date as the buyer reads it: the calendar day in their
+ * organisation's zone, in the viewer's language. Every surface (desk, buyer
+ * page, PDF) formats through this so they can't print different days for
+ * one deadline, whatever zone the server runs in.
+ */
+export function formatQuoteValidUntil(
+  validUntil: Date,
+  locale: string,
+  timeZone: string,
+  dateStyle: "long" | "medium" = "long",
+): string {
+  return new Intl.DateTimeFormat(intlLocale(locale), { dateStyle, timeZone }).format(validUntil);
 }
 
 /**

@@ -100,7 +100,8 @@ export async function renderQuoteDocx(
   messages: QuoteMessages,
 ): Promise<Buffer> {
   const money = (amount: number) => formatMoney(amount, data.currency, locale);
-  const date = (d: Date) => new Intl.DateTimeFormat(intlLocale(locale), { dateStyle: "medium" }).format(d);
+  const date = (d: Date) =>
+    new Intl.DateTimeFormat(intlLocale(locale), { dateStyle: "medium", timeZone: data.timeZone }).format(d);
   const hasOnRequest = data.rows.some((r) => r.priceOnRequest);
 
   const header = new Table({

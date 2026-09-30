@@ -1,6 +1,10 @@
 import type { ReactNode } from "react";
 import { redirect } from "next/navigation";
 import { auth } from "@/auth";
+import { sectionTitleMetadata } from "@/lib/page-title";
+
+// "Desk · NativeSpin" here, "Orders · Desk · NativeSpin" in the sub-pages.
+export const generateMetadata = sectionTitleMetadata("desk");
 
 export default async function DeskLayout({
   children,

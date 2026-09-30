@@ -12,6 +12,7 @@ import {
   specFailuresForSubmission,
 } from "@/lib/spec-check-runner";
 import {
+  canMoveAsset,
   isTerminalAssetStatus,
   supersedeOlderVersions,
   supersedesOlderVersions,
@@ -295,8 +296,12 @@ export async function setAssetStatus(formData: FormData) {
       where: { id: assetId },
       include: { article: { select: { organizationId: true } } },
     });
-    // A superseded version is history — nothing may move it again.
-    if (asset && isTerminalAssetStatus(asset.status)) redirect(back);
+    // A superseded version is history — nothing may move it again — and
+    // every other move must be a step forward from where the version is
+    // (a stale form can't send an approved article back into review).
+    if (asset && (isTerminalAssetStatus(asset.status) || !canMoveAsset(asset.status, target))) {
+      redirect(back);
+    }
 
     // Handing a draft over for review is gated on the spec (disclosure
     // label, word count). The desk drives the full machine and may still

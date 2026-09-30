@@ -12,6 +12,7 @@ import { StatusBadge } from "@/app/status-badge";
 import { pickPlaybook } from "@/lib/playbook";
 import { PlaybookCard } from "@/components/playbook-card";
 import { SubmitButton } from "@/components";
+import { nextAssetStatuses } from "@/lib/content/versions";
 
 type ProductWithTitle = Prisma.ProductGetPayload<{
   include: { title: true };
@@ -215,6 +216,9 @@ export async function LinesSection({
                       {tp("specCheck")}
                     </button>
                   </form>
+                  {/* Only the steps forward from the version's status
+                      (versions.ts nextAssetStatuses): an approved article
+                      offers "Finalize", not another review round. */}
                   {(
                     [
                       ["IN_REVIEW", tp("submitReview")],
@@ -222,7 +226,9 @@ export async function LinesSection({
                       ["FINAL", tp("finalize")],
                       ["CHANGES_REQUESTED", tp("requestChanges")],
                     ] as const
-                  ).map(([target, label]) => (
+                  )
+                    .filter(([target]) => nextAssetStatuses(latest.status).includes(target))
+                    .map(([target, label]) => (
                     <form action={setAssetStatus} key={target}>
                       <input type="hidden" name="locale" value={locale} />
                       <input type="hidden" name="assetId" value={latest.id} />

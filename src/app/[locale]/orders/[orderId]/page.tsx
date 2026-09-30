@@ -12,6 +12,7 @@ import { duplicatePlan } from "@/app/plan-actions";
 import { clicksByOrderLine } from "@/lib/metrics/store";
 import { ctrPct } from "@/lib/reporting";
 import { SubmitButton } from "@/components";
+import { ArticlePreview } from "@/components/article-preview";
 import { approveContentAsset, requestContentChanges } from "@/app/content-review-actions";
 import { presignDownloadOrNull } from "@/lib/storage/r2";
 import { resolveEffectiveAsset } from "@/lib/writers/placement";
@@ -267,7 +268,11 @@ export default async function MyOrderPage({
                   <div className="content-review">
                     <h4 className="content-review__heading">{t("draftReviewHeading")}</h4>
                     {latest.body ? (
-                      <div className="content-review__body">{latest.body}</div>
+                      // The same safe renderer as the article page: the buyer
+                      // approves the article as it will read, not its Markdown.
+                      <div className="content-review__body">
+                        <ArticlePreview body={latest.body} />
+                      </div>
                     ) : draftDownloadUrls.get(latest.id) ? (
                       <a
                         href={draftDownloadUrls.get(latest.id)}

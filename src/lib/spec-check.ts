@@ -14,10 +14,16 @@
 // "Producerat för Hud & Glöd av NativeSpin redaktion" where the
 // producer-credit suffix is per playbook).
 
+import { countImages } from "@/lib/content/markdown";
+
 export type SpecInput = {
   body: string;
   wordCountMin?: number | null;
   wordCountMax?: number | null;
+  // The format's image minimum (Spec.imagesMin). Images are Markdown
+  // ![caption](https://…) references in the draft, counted by the same
+  // parser the review preview renders with.
+  imagesMin?: number | null;
   titleDisclosure?: string | null;
   marketDisclosure?: string | null;
 };
@@ -25,16 +31,28 @@ export type SpecInput = {
 // One failed rule, structured so each surface can explain it in the
 // reader's language (the writer portal localizes these); `issues` below
 // keeps the English sentence form persisted to ArticlePlacement.specNotes.
+// Failures block handing the draft over for review.
 export type SpecFailure =
   | { rule: "disclosure"; label: string }
   | { rule: "tooShort"; words: number; min: number }
   | { rule: "tooLong"; words: number; max: number };
 
+// A rule the draft misses that is reported but never blocks. The image
+// minimum is one: the writer portal has no upload, images are only ever
+// linked, and Spec.imagesMin defaults to 1, so as a gate it would hold
+// back nearly every submission. It's shown with its reason so the writer
+// (and the desk, via specNotes) can act on it.
+export type SpecWarning = { rule: "tooFewImages"; images: number; min: number };
+
 export type SpecResult = {
+  // False only on failures; warnings never fail a draft.
   passed: boolean;
   words: number;
   issues: string[];
   failures: SpecFailure[];
+  warnings: SpecWarning[];
+  // English sentence form of `warnings`, like `issues`.
+  warningNotes: string[];
 };
 
 export function describeSpecFailure(f: SpecFailure): string {
@@ -47,6 +65,15 @@ export function describeSpecFailure(f: SpecFailure): string {
       return `Too long: ${f.words} > ${f.max} words`;
   }
 }
+
+export function describeSpecWarning(w: SpecWarning): string {
+  switch (w.rule) {
+    case "tooFewImages":
+      return `Too few images: ${w.images} < ${w.min}`;
+  }
+}
+
+const IMAGE_MARKUP = /!\[[^\]\n]*\]\([^)\s]+\)/g;
 
 // Tokens we treat as "fill-this-in" placeholders. Both square-bracket
 // and curly-brace conventions are recognised so neither publisher
@@ -91,8 +118,13 @@ export function labelMatcher(label: string | null | undefined): RegExp | null {
 
 export function specCheck(input: SpecInput): SpecResult {
   const body = (input.body ?? "").trim();
-  const words = body ? body.split(/\s+/).length : 0;
+  // Image markup isn't prose: "![Fleet at dawn](https://…)" shouldn't add
+  // three words to the count.
+  const prose = body.replace(IMAGE_MARKUP, " ").trim();
+  const words = prose ? prose.split(/\s+/).length : 0;
+  const images = countImages(body);
   const failures: SpecFailure[] = [];
+  const warnings: SpecWarning[] = [];
 
   const requiredLabels = new Set<string>();
   if (input.titleDisclosure) requiredLabels.add(input.titleDisclosure);
@@ -110,11 +142,16 @@ export function specCheck(input: SpecInput): SpecResult {
   if (input.wordCountMax && words > input.wordCountMax) {
     failures.push({ rule: "tooLong", words, max: input.wordCountMax });
   }
+  if (input.imagesMin && images < input.imagesMin) {
+    warnings.push({ rule: "tooFewImages", images, min: input.imagesMin });
+  }
 
   return {
     passed: failures.length === 0,
     words,
     issues: failures.map(describeSpecFailure),
     failures,
+    warnings,
+    warningNotes: warnings.map(describeSpecWarning),
   };
 }

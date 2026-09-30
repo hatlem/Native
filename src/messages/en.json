@@ -1002,7 +1002,9 @@
     "quoteRevisionNote": "Revision {revision} — replaces the quote you received earlier.",
     "supersededEyebrow": "Earlier versions",
     "supersededRow": "Revision {revision} ({total}) is no longer valid.",
-    "supersededBy": "See revision {revision} →"
+    "supersededBy": "See revision {revision} →",
+    "quoteDownloadPdf": "Download PDF",
+    "quoteDownloadDocx": "Download Word (.docx)"
   },
   "desk": {
     "eyebrow": "Internal desk",
@@ -1387,7 +1389,10 @@
     "emailRequired": "Enter your email address first.",
     "attemptsRateLimited": "Too many attempts. Wait a minute and try again.",
     "checkSignupTitle": "Confirm your email",
-    "checkSignupLead": "We've sent a link to the address you gave. Open it to confirm the address and sign in; it expires in 15 minutes. If that address already had an account, the email explains how to get back in."
+    "checkSignupLead": "We've sent a link to the address you gave. Open it to confirm the address and sign in; it expires in 15 minutes. If that address already had an account, the email explains how to get back in.",
+    "regEmailTypoQuestion": "Did you mean <b>{email}</b>?",
+    "regEmailTypoUse": "Use {email}",
+    "regEmailTypoKeep": "If {domain} is right, press Create account again."
   },
   "order": {
     "title": "Order",
@@ -1642,7 +1647,10 @@
     "ratesPriceOnlyNote": "This page changes prices only. Catalog status — active, bookable, visibility — is managed by the NativeSpin desk.",
     "changePriceOnRates": "Change on the rates page",
     "notBookable": "Not bookable",
-    "catalogStatusNote": "Prices change on the rates page. Catalog status (bookable, and whether a product can be ordered instantly) is managed by the NativeSpin desk."
+    "catalogStatusNote": "Prices change on the rates page. Catalog status (bookable, and whether a product can be ordered instantly) is managed by the NativeSpin desk.",
+    "leadTimeSaved": "Lead time saved: {days, plural, =1 {1 day} other {# days}}. The desk has been told.",
+    "leadTimeUnchanged": "No change: the lead time is already {days, plural, =1 {1 day} other {# days}}.",
+    "leadTimeInvalid": "Enter a whole number of days from 1 to {max}. Nothing was saved."
   },
   "formats": {
     "metaTitle": "Native formats",
@@ -2512,18 +2520,17 @@
     "anchorNote": "The publisher's public rate card for this placement. Your all-in price includes editorial production, placement, revisions and reporting.",
     "whyThisPrice": "NativeSpin maintains direct editorial relationships with every title in your quote. We negotiate placement, commission a vertical-specialist writer, manage editorial review with the publisher, and report on performance. You get one accountable partner and one all-in price — not a media invoice, a writer invoice and an agency retainer.",
     "termsCancellation": "Full refund before the article brief is approved; 50% refund before first draft; non-refundable once the publisher slot is confirmed.",
-    "termsValidity": "Quote valid for 14 days. Publisher availability confirmed at acceptance.",
     "bullets": {
       "NATIVE_ARTICLE": [
         "Negotiated placement on {titleName}, written in the title's editorial voice",
-        "Article (1,200–1,500 words) written by a vertical-specialist journalist",
+        "Article{length} written by a vertical-specialist journalist",
         "Two rounds of revisions and your sign-off before publish",
         "Distribution across {titleName}'s native feed and newsletter",
         "Click-through tracking on every link we place, reported at agreed checkpoints"
       ],
       "ADVERTORIAL": [
         "Negotiated placement on {titleName}, clearly labelled as paid content",
-        "Brand-led article (800–1,200 words) written to the publisher's editorial standard",
+        "Brand-led article{length} written to the publisher's editorial standard",
         "One round of revisions and your sign-off before publish",
         "Distribution in {titleName}'s content feed",
         "Click-through tracking on every link we place, reported at agreed checkpoints"
@@ -2535,12 +2542,17 @@
         "Click-through tracking on every link we place, plus reported impressions, at agreed checkpoints"
       ],
       "PACKAGE": [
-        "Editorial article on {titleName} (1,200–1,500 words)",
+        "Editorial article on {titleName}{length}",
         "Native display amplification across the same title",
         "Single editorial review and single publication date",
         "Click-through tracking on every link we place, reported at agreed checkpoints"
       ]
-    }
+    },
+    "termsValidUntil": "Quote valid until {date}. Publisher availability confirmed at acceptance.",
+    "termsAvailability": "Publisher availability confirmed at acceptance.",
+    "wordsRange": "{min, number}–{max, number} words",
+    "wordsMin": "at least {min, number} words",
+    "wordsMax": "up to {max, number} words"
   },
   "priceVisibility": {
     "requestPrice": "Contact for price",
@@ -3602,7 +3614,7 @@
       "inReviewNote": "This draft is with the client for review. Saving now creates a new version; send that for review when it's ready.",
       "draftLabel": "Article text",
       "draftPlaceholder": "# Headline\n\nIntro…",
-      "draftHint": "Plain text with light Markdown: # for headings, **bold**, *italic*, - for lists, [text](link). Include the disclosure label.",
+      "draftHint": "Plain text with light Markdown: # for headings, **bold**, *italic*, - for lists, [text](link), ![caption](image link) for images. Include the disclosure label.",
       "saveDraft": "Save draft",
       "saving": "Saving…",
       "submit": "Send for review",
@@ -3641,7 +3653,10 @@
       "passedDetail": "The draft meets the format spec ({words} words).",
       "failDisclosure": "The disclosure label “{label}” is missing. Readers must see that this is paid content.",
       "failTooShort": "Too short: {words} words, the format needs at least {min}.",
-      "failTooLong": "Too long: {words} words, the format allows at most {max}."
+      "failTooLong": "Too long: {words} words, the format allows at most {max}.",
+      "imagesHow": "Add images in the draft as ![caption](https://link-to-image).",
+      "warnTooFewImages": "Too few images: {images, plural, =0 {none yet} other {#}}, the format asks for at least {min}. This doesn't block sending for review, but add them if you can, each as ![caption](https://link-to-image).",
+      "warningsLabel": "Worth fixing:"
     },
     "profile": {
       "title": "My profile",
@@ -3818,5 +3833,40 @@
     "claim": "Claim the account here (the link expires in {days} days):",
     "ignore": "If you weren't expecting this, you can ignore this message — the link can only be used once.",
     "signoff": "— NativeSpin"
+  },
+  "pageTitle": {
+    "catalog": "Catalog",
+    "catalogCompare": "Compare titles",
+    "home": "Home",
+    "plan": "Your plan",
+    "lists": "Saved lists",
+    "favorites": "Favorites",
+    "requests": "Requests",
+    "orders": "Orders",
+    "invoices": "Invoices",
+    "articles": "Articles",
+    "reports": "Reports",
+    "campaign": "Plan a campaign",
+    "notifications": "Inbox",
+    "account": "Account",
+    "agency": "Agency",
+    "onboarding": "Get started",
+    "onboardingCall": "Talk to the desk",
+    "invite": "Join your team",
+    "writer": "Writer portal",
+    "publisher": "Publisher portal",
+    "desk": "Desk",
+    "deskRequest": "Request",
+    "deskOrders": "Orders",
+    "deskTitles": "Titles",
+    "deskUsers": "Users",
+    "deskWriters": "Writers",
+    "deskPriceQuotes": "Price quotes",
+    "deskPublisherContacts": "Publisher contacts",
+    "deskReports": "Reports",
+    "deskPlaybooks": "Playbooks",
+    "deskContentFees": "Content fees",
+    "deskApiKeys": "API keys",
+    "deskMetricsNeedsContact": "Metrics needed"
   }
 }

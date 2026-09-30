@@ -2,7 +2,7 @@ import { getTranslations } from "next-intl/server";
 import { requireLineWriter } from "@/lib/writers/guard";
 import { loadWriterLineView } from "@/lib/writers/line-view";
 import { evaluateSpecForPlacement } from "@/lib/spec-check-runner";
-import type { SpecFailure } from "@/lib/spec-check";
+import type { SpecFailure, SpecWarning } from "@/lib/spec-check";
 import { saveDraft, setAssetStatus } from "@/app/desk-content-actions";
 import { Link } from "@/i18n/navigation";
 import { StatusBadge } from "@/app/status-badge";
@@ -68,6 +68,12 @@ export default async function WriterLine({
         return t("spec.failTooShort", { words: f.words, min: f.min });
       case "tooLong":
         return t("spec.failTooLong", { words: f.words, max: f.max });
+    }
+  };
+  const warningText = (w: SpecWarning): string => {
+    switch (w.rule) {
+      case "tooFewImages":
+        return t("spec.warnTooFewImages", { images: w.images, min: w.min });
     }
   };
 
@@ -151,9 +157,14 @@ export default async function WriterLine({
               <dd>{wordRange ?? <span className="muted">{t("spec.notSpecified")}</span>}</dd>
               <dt>{t("spec.images")}</dt>
               <dd>
-                {spec?.imagesMin
-                  ? t("spec.imagesMin", { count: spec.imagesMin })
-                  : <span className="muted">{t("spec.notSpecified")}</span>}
+                {spec?.imagesMin ? (
+                  <>
+                    {t("spec.imagesMin", { count: spec.imagesMin })}
+                    <span className="hint">{t("spec.imagesHow")}</span>
+                  </>
+                ) : (
+                  <span className="muted">{t("spec.notSpecified")}</span>
+                )}
               </dd>
               <dt>{t("spec.disclosure")}</dt>
               <dd>{disclosureLabel ? <strong>{disclosureLabel}</strong> : <span className="muted">{t("spec.notSpecified")}</span>}</dd>
@@ -253,6 +264,15 @@ export default async function WriterLine({
                 ))}
               </ul>
             )}
+            {/* Reported, never blocking: sending for review stays open. */}
+            {specResult && specResult.warnings.length > 0 ? (
+              <div className="banner-info" role="status" style={{ marginTop: 8 }}>
+                <span>
+                  <strong>{t("spec.warningsLabel")}</strong>{" "}
+                  {specResult.warnings.map(warningText).join(" ")}
+                </span>
+              </div>
+            ) : null}
 
             {SUBMITTABLE.has(latest.status) && !closed ? (
               <form action={setAssetStatus} className="cluster" style={{ marginTop: 16 }}>
