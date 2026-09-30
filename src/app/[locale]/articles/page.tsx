@@ -7,6 +7,8 @@ import { loadScope } from "@/lib/scope";
 import { EmptyState } from "@/app/empty-state";
 import { StatusBadge } from "@/app/status-badge";
 import { articleHeadline } from "@/lib/content/markdown";
+import { SafeEmail } from "@/components/safe-email";
+import type { ReactNode } from "react";
 
 export const dynamic = "force-dynamic";
 
@@ -66,12 +68,16 @@ export default async function ArticlesPage({
         select: { id: true, name: true, email: true },
       })
     : [];
-  const authorNameById = new Map(authors.map((u) => [u.id, u.name ?? u.email]));
+  // A name, or the address through SafeEmail — never a bare SSR email text
+  // node (Cloudflare obfuscation breaks hydration, see safe-email.tsx).
+  const authorNameById = new Map(
+    authors.map((u) => [u.id, u.name ?? <SafeEmail address={u.email} />] as const),
+  );
   // The author is whoever actually wrote the text — the latest version's
   // writer, else the assigned writer — and only then whoever created the
   // Article row (for writer-produced articles that is the desk user who
   // staffed the line, not the author).
-  const authorOf = (a: (typeof articles)[number]): string | null => {
+  const authorOf = (a: (typeof articles)[number]): ReactNode => {
     const writer = a.versions[0]?.authorWriter?.user ?? a.assignedWriter?.user;
     if (writer) return writer.name ?? writer.email.split("@")[0];
     return authorNameById.get(a.createdByUserId) ?? null;
