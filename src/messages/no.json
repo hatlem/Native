@@ -332,7 +332,13 @@
     "open": "Åpne",
     "rename": "Gi nytt navn",
     "duplicate": "Dupliser",
-    "archive": "Arkiver"
+    "archive": "Arkiver",
+    "copyName": "{name} (kopi)",
+    "archivedNotice": "«{name}» er arkivert.",
+    "undo": "Angre",
+    "archivedHeading": "Arkivert ({count})",
+    "archivedOn": "arkivert {date}",
+    "restore": "Gjenopprett"
   },
   "favorites": {
     "title": "Favoritter",
@@ -686,7 +692,9 @@
     "lineDragInstructions": "For å flytte en linje: trykk mellomrom for å løfte den, flytt med piltastene og trykk mellomrom igjen for å slippe. Escape avbryter.",
     "lineSearchBlocksDrag": "tøm søket for å endre rekkefølgen",
     "lineOrderSaveFailed": "Rekkefølgen ble ikke lagret – laster planen på nytt.",
-    "lineMovedAnnouncement": "Flyttet til plass {position} av {total}"
+    "lineMovedAnnouncement": "Flyttet til plass {position} av {total}",
+    "noticePlanArchived": "Den planen er arkivert, så du ser den gjeldende planen din i stedet. Du kan gjenopprette den under Lagrede lister.",
+    "noticePlanUnavailable": "Vi fikk ikke åpnet den planen — lenken kan være utdatert, eller planen tilhører et annet arbeidsområde. Dette er den gjeldende planen din."
   },
   "rfq": {
     "org": "Selskap",

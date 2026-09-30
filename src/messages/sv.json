@@ -332,7 +332,13 @@
     "open": "Öppna",
     "rename": "Byt namn",
     "duplicate": "Duplicera",
-    "archive": "Arkivera"
+    "archive": "Arkivera",
+    "copyName": "{name} (kopia)",
+    "archivedNotice": "”{name}” är arkiverad.",
+    "undo": "Ångra",
+    "archivedHeading": "Arkiverade ({count})",
+    "archivedOn": "arkiverad {date}",
+    "restore": "Återställ"
   },
   "favorites": {
     "title": "Favoriter",
@@ -686,7 +692,9 @@
     "lineDragInstructions": "Flytta en rad: tryck mellanslag för att lyfta den, flytta med piltangenterna och tryck mellanslag igen för att släppa. Escape avbryter.",
     "lineSearchBlocksDrag": "töm sökningen för att ändra ordningen",
     "lineOrderSaveFailed": "Ordningen kunde inte sparas – laddar om planen.",
-    "lineMovedAnnouncement": "Flyttad till plats {position} av {total}"
+    "lineMovedAnnouncement": "Flyttad till plats {position} av {total}",
+    "noticePlanArchived": "Den planen är arkiverad, så du ser din nuvarande plan i stället. Du kan återställa den under Sparade listor.",
+    "noticePlanUnavailable": "Vi kunde inte öppna den planen — länken kan vara inaktuell, eller så tillhör planen en annan arbetsyta. Det här är din nuvarande plan."
   },
   "rfq": {
     "org": "Företag",

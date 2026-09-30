@@ -11,6 +11,11 @@ import { Link } from "@/i18n/navigation";
 import { readPlanBrief } from "@/lib/basket";
 import { readActiveListId, resolveActiveList } from "@/lib/lists";
 import { titleDisplayName } from "@/lib/title-display";
+import { intlLocale } from "@/lib/money";
+import { bandLabel } from "@/lib/pricing/bands";
+import { productBand, unitRate } from "@/lib/pricing/display-price";
+import { productDisplayNames } from "@/lib/pricing/display-name";
+import type { ProductInclusions } from "@/lib/pricing/inclusions";
 import { catalogVisibleTitleWhere } from "@/lib/catalog-visibility";
 import type { Candidate, SupplementaryTitle } from "@/lib/recommend";
 import { recommendForBrief } from "@/lib/campaign-recommend";
@@ -108,7 +113,9 @@ export async function PlanView({
   const activeList = ws?.activeOrgId
     ? await resolveActiveList(ws.activeOrgId, await readActiveListId())
     : null;
-  if (expectedListId && activeList?.id !== expectedListId) redirect(planPath(locale, null, sp));
+  if (expectedListId && activeList?.id !== expectedListId) {
+    redirect(planPath(locale, null, { ...sp, notice: "plan-unavailable" }));
+  }
   const listItems = activeList?.items ?? [];
   const verticalOptions = activeList ? await loadVerticalOptions() : [];
   const targetVerticals = (activeList?.targetVerticals ?? "")
@@ -173,14 +180,69 @@ export async function PlanView({
   const placementProducts = placeholderTitleIds.length
     ? await prisma.product.findMany({
         where: { titleId: { in: placeholderTitleIds }, active: true, bookable: true },
-        select: { id: true, type: true, titleId: true },
+        orderBy: [{ type: "asc" }, { basePrice: "asc" }],
+        select: {
+          id: true,
+          type: true,
+          titleId: true,
+          active: true,
+          confirmedAt: true,
+          basePrice: true,
+          currency: true,
+          pricingModel: true,
+          productionFee: true,
+          inclusions: true,
+          priceRules: { select: { marginPct: true, seasonalMultiplier: true, minVolume: true } },
+          title: {
+            select: {
+              pricesPublic: true,
+              productionFeeDefault: true,
+              publisher: { select: { pricesPublic: true } },
+              market: { select: { code: true } },
+            },
+          },
+        },
       })
     : [];
+  // Options must be tellable apart: "Native-artikkel, Native-artikkel,
+  // Advertorial, Advertorial" gave the buyer nothing to choose on. Same
+  // generated names as the title page's format cards (type + inclusions,
+  // never the raw publisher offer text) plus the band — never an exact
+  // figure before a quote.
+  const tDetail = await getTranslations({ locale, namespace: "titleDetail" });
+  const tv = await getTranslations({ locale, namespace: "priceVisibility" });
+  const numberFormat = new Intl.NumberFormat(intlLocale(locale));
   const placementsByTitle = new Map<string, { id: string; label: string }[]>();
-  for (const p of placementProducts) {
-    const arr = placementsByTitle.get(p.titleId) ?? [];
-    arr.push({ id: p.id, label: tType(p.type) });
-    placementsByTitle.set(p.titleId, arr);
+  for (const titleId of placeholderTitleIds) {
+    const products = placementProducts.filter((p) => p.titleId === titleId);
+    const names = productDisplayNames(
+      products.map((p) => ({ typeLabel: tType(p.type), inclusions: p.inclusions as ProductInclusions | null })),
+      (n) => numberFormat.format(n),
+      tDetail,
+    );
+    const labels = products.map((p, i) => {
+      const band = productBand(p, p.title, pricing);
+      const rate = band ? null : unitRate(p, p.title, pricing);
+      const price = band
+        ? `≈ ${bandLabel(band, p.currency)}`
+        : rate
+          ? `≈ ${rate.rate} ${p.currency} ${rate.unit}`
+          : tv("requestPrice");
+      return `${names[i]} · ${price}`;
+    });
+    // Still identical (same type, no inclusions, same band)? Number them so
+    // the choice is at least stable and nameable.
+    const seen = new Map<string, number>();
+    const total = new Map<string, number>();
+    for (const l of labels) total.set(l, (total.get(l) ?? 0) + 1);
+    placementsByTitle.set(
+      titleId,
+      products.map((p, i) => {
+        const n = (seen.get(labels[i]) ?? 0) + 1;
+        seen.set(labels[i], n);
+        return { id: p.id, label: (total.get(labels[i]) ?? 1) > 1 ? `${labels[i]} (${n})` : labels[i] };
+      }),
+    );
   }
   const allTitleLines: PlanTitleLine[] = placeholderItems.map((i) => ({
     itemId: i.id,
@@ -414,6 +476,7 @@ export async function PlanView({
         locale={locale}
         error={needsWorkspace ? undefined : sp.error}
         duplicate={sp.duplicate}
+        notice={sp.notice}
       />
 
       {needsWorkspace ? (

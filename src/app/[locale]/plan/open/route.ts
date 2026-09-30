@@ -47,7 +47,14 @@ export async function GET(
 
   // appUrl(), not request.url: behind Railway's proxy the inbound URL can carry
   // an internal host, and every other redirect in this app builds from appUrl().
-  if (!canOpen) return NextResponse.redirect(new URL(planPath(locale, null, rest), appUrl()));
+  // Say WHY the viewer lands on another plan: a stale bookmark silently showing
+  // a different plan read as "my plan changed". Archived gets its own wording;
+  // unknown and out-of-scope share one, so the notice can't probe other orgs.
+  if (!canOpen) {
+    const ownArchived = !!list?.archivedAt && !!ws?.scopeOrgIds.includes(list.organizationId);
+    const notice = listId ? { notice: ownArchived ? "plan-archived" : "plan-unavailable" } : {};
+    return NextResponse.redirect(new URL(planPath(locale, null, { ...rest, ...notice }), appUrl()));
+  }
 
   if (list.organizationId !== ws.activeOrgId) {
     await switchActiveOrg(list.organizationId, { activeListId: list.id });

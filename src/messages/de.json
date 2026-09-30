@@ -468,7 +468,13 @@
     "open": "Öffnen",
     "rename": "Umbenennen",
     "duplicate": "Duplizieren",
-    "archive": "Archivieren"
+    "archive": "Archivieren",
+    "copyName": "{name} (Kopie)",
+    "archivedNotice": "„{name}“ ist archiviert.",
+    "undo": "Rückgängig",
+    "archivedHeading": "Archiviert ({count})",
+    "archivedOn": "archiviert am {date}",
+    "restore": "Wiederherstellen"
   },
   "favorites": {
     "title": "Favoriten",
@@ -822,7 +828,9 @@
     "lineDragInstructions": "Position verschieben: Leertaste zum Aufnehmen, Pfeiltasten zum Bewegen, Leertaste zum Ablegen. Escape bricht ab.",
     "lineSearchBlocksDrag": "Suche leeren, um die Reihenfolge zu ändern",
     "lineOrderSaveFailed": "Die Reihenfolge konnte nicht gespeichert werden – Plan wird neu geladen.",
-    "lineMovedAnnouncement": "Verschoben auf Position {position} von {total}"
+    "lineMovedAnnouncement": "Verschoben auf Position {position} von {total}",
+    "noticePlanArchived": "Dieser Plan ist archiviert, deshalb sehen Sie stattdessen Ihren aktuellen Plan. Sie können ihn unter Gespeicherte Listen wiederherstellen.",
+    "noticePlanUnavailable": "Wir konnten diesen Plan nicht öffnen — der Link ist vielleicht veraltet, oder der Plan gehört zu einem anderen Arbeitsbereich. Das ist Ihr aktueller Plan."
   },
   "rfq": {
     "org": "Firma",

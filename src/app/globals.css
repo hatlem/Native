@@ -7830,3 +7830,31 @@ fieldset.field > legend {
   cursor: not-allowed;
   pointer-events: none;
 }
+
+/* /lists "Archived (n)" shelf: restore what one click archived. */
+.lists-archived {
+  margin-top: var(--s-5);
+}
+.lists-archived summary {
+  cursor: pointer;
+  font-weight: 600;
+  color: var(--muted-strong);
+}
+.lists-archived__list {
+  list-style: none;
+  margin: var(--s-3) 0 0;
+  padding: 0;
+  display: grid;
+  gap: 8px;
+}
+.lists-archived__row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--s-3);
+  flex-wrap: wrap;
+  padding: 10px 14px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--r-sm);
+}

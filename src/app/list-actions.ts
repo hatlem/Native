@@ -2,6 +2,7 @@
 
 import { redirect } from "next/navigation";
 import { headers } from "next/headers";
+import { getTranslations } from "next-intl/server";
 import { signinPath } from "@/lib/auth-gate";
 import { appUrl } from "@/lib/url";
 import { planPath } from "@/lib/plan-path";
@@ -489,6 +490,30 @@ export async function archiveList(formData: FormData) {
     await prisma.savedList.update({ where: { id: listId }, data: { archivedAt: new Date() } });
     await recordAudit(scope.userId ?? null, "list.archive", `SavedList:${listId}`, {});
     if ((await readActiveListId()) === listId) await clearActiveListId();
+    // One click archives, so the next page offers the undo (and /lists keeps
+    // an "Archived" section to restore from later).
+    redirect(`/${locale}/lists?archived=${encodeURIComponent(listId)}`);
+  }
+  redirect(`/${locale}/lists`);
+}
+
+// Undo for archiveList. The share link stays dead: archiving revoked it, and
+// restoring must not silently revive a URL that may have circulated since
+// (same rule as shareList — a re-share always mints a fresh token).
+export async function restoreList(formData: FormData) {
+  const locale = str(formData, "locale") || "en";
+  const listId = str(formData, "listId");
+  const scope = await loadScope();
+  const list = await prisma.savedList.findUnique({
+    where: { id: listId },
+    select: { organizationId: true, archivedAt: true },
+  });
+  if (list?.archivedAt && canActOnOrg(scope, list.organizationId)) {
+    await prisma.savedList.update({
+      where: { id: listId },
+      data: { archivedAt: null, shareToken: null, shareCreatedAt: null },
+    });
+    await recordAudit(scope.userId ?? null, "list.restore", `SavedList:${listId}`, {});
   }
   redirect(`/${locale}/lists`);
 }
@@ -527,10 +552,13 @@ export async function duplicateList(formData: FormData) {
   const scope = await loadScope();
   const source = await prisma.savedList.findUnique({ where: { id: listId }, include: { items: true } });
   if (!source || !canActOnOrg(scope, source.organizationId)) redirect(`/${locale}/lists`);
+  // The copy's name is stored data the buyer sees everywhere, so it is
+  // written in their UI language ("… (kopi)"), not a hard-coded English suffix.
+  const t = await getTranslations({ locale, namespace: "lists" });
   const copy = await prisma.savedList.create({
     data: {
       organizationId: source.organizationId,
-      name: `${source.name} (copy)`,
+      name: t("copyName", { name: source.name }),
       note: source.note,
       createdById: scope.userId ?? null,
       items: {

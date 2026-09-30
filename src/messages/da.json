@@ -332,7 +332,13 @@
     "open": "Åbn",
     "rename": "Omdøb",
     "duplicate": "Duplikér",
-    "archive": "Arkivér"
+    "archive": "Arkivér",
+    "copyName": "{name} (kopi)",
+    "archivedNotice": "»{name}« er arkiveret.",
+    "undo": "Fortryd",
+    "archivedHeading": "Arkiveret ({count})",
+    "archivedOn": "arkiveret {date}",
+    "restore": "Gendan"
   },
   "favorites": {
     "title": "Favoritter",
@@ -686,7 +692,9 @@
     "lineDragInstructions": "Flyt en linje: tryk mellemrum for at løfte den, flyt med piletasterne, og tryk mellemrum igen for at slippe. Escape annullerer.",
     "lineSearchBlocksDrag": "ryd søgningen for at ændre rækkefølgen",
     "lineOrderSaveFailed": "Rækkefølgen kunne ikke gemmes – genindlæser planen.",
-    "lineMovedAnnouncement": "Flyttet til plads {position} af {total}"
+    "lineMovedAnnouncement": "Flyttet til plads {position} af {total}",
+    "noticePlanArchived": "Den plan er arkiveret, så du ser din nuværende plan i stedet. Du kan gendanne den under Gemte lister.",
+    "noticePlanUnavailable": "Vi kunne ikke åbne den plan — linket kan være forældet, eller planen hører til et andet arbejdsområde. Dette er din nuværende plan."
   },
   "rfq": {
     "org": "Virksomhed",

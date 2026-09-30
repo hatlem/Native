@@ -468,7 +468,13 @@
     "open": "Avaa",
     "rename": "Nimeä uudelleen",
     "duplicate": "Monista",
-    "archive": "Arkistoi"
+    "archive": "Arkistoi",
+    "copyName": "{name} (kopio)",
+    "archivedNotice": "”{name}” on arkistoitu.",
+    "undo": "Kumoa",
+    "archivedHeading": "Arkistoidut ({count})",
+    "archivedOn": "arkistoitu {date}",
+    "restore": "Palauta"
   },
   "favorites": {
     "title": "Suosikit",
@@ -822,7 +828,9 @@
     "lineDragInstructions": "Siirrä riviä: nosta välilyönnillä, siirrä nuolinäppäimillä ja pudota välilyönnillä. Esc peruuttaa.",
     "lineSearchBlocksDrag": "tyhjennä haku muuttaaksesi järjestystä",
     "lineOrderSaveFailed": "Järjestystä ei voitu tallentaa – ladataan suunnitelma uudelleen.",
-    "lineMovedAnnouncement": "Siirretty kohtaan {position}/{total}"
+    "lineMovedAnnouncement": "Siirretty kohtaan {position}/{total}",
+    "noticePlanArchived": "Suunnitelma on arkistoitu, joten näet sen sijaan nykyisen suunnitelmasi. Voit palauttaa sen kohdasta Tallennetut listat.",
+    "noticePlanUnavailable": "Emme saaneet suunnitelmaa auki — linkki voi olla vanhentunut, tai suunnitelma kuuluu toiseen työtilaan. Tämä on nykyinen suunnitelmasi."
   },
   "rfq": {
     "org": "Yritys",

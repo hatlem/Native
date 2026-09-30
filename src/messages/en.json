@@ -567,7 +567,13 @@
     "open": "Open",
     "rename": "Rename",
     "duplicate": "Duplicate",
-    "archive": "Archive"
+    "archive": "Archive",
+    "copyName": "{name} (copy)",
+    "archivedNotice": "“{name}” is archived.",
+    "undo": "Undo",
+    "archivedHeading": "Archived ({count})",
+    "archivedOn": "archived {date}",
+    "restore": "Restore"
   },
   "favorites": {
     "title": "Favorites",
@@ -822,7 +828,9 @@
     "lineDragInstructions": "To reorder, press Space to pick up the line, use the arrow keys to move it, and Space again to drop it. Escape cancels.",
     "lineSearchBlocksDrag": "clear the search to reorder",
     "lineOrderSaveFailed": "The order could not be saved — reloading the plan.",
-    "lineMovedAnnouncement": "Moved to position {position} of {total}"
+    "lineMovedAnnouncement": "Moved to position {position} of {total}",
+    "noticePlanArchived": "That plan is archived, so you're looking at your current plan instead. You can restore it under Saved lists.",
+    "noticePlanUnavailable": "We couldn't open that plan — the link may be out of date, or the plan belongs to another workspace. This is your current plan."
   },
   "rfq": {
     "org": "Company",
