@@ -1,12 +1,13 @@
 import { getTranslations } from "next-intl/server";
-import { MarketCode, ProductType } from "@prisma/client";
+import { ProductType } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
 import { SubmitButton } from "@/components";
 import { createPlaybook, togglePlaybook, updatePlaybook } from "./actions";
+import { SUPPORTED_MARKETS } from "@/lib/markets";
 
 export const dynamic = "force-dynamic";
 
-const MARKET_CODES = Object.values(MarketCode);
+const MARKET_CODES = SUPPORTED_MARKETS;
 const PRODUCT_TYPES = Object.values(ProductType);
 
 export default async function DeskPlaybooksPage({

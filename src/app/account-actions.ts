@@ -14,8 +14,9 @@ import {
 } from "@/lib/membership";
 import { canDeactivateSelf } from "@/lib/user-admin";
 import { normaliseEmail } from "@/lib/email-change";
+import { SUPPORTED_MARKETS } from "@/lib/markets";
 
-const MARKET_CODES = Object.values(MarketCode) as string[];
+const MARKET_CODES: readonly string[] = SUPPORTED_MARKETS;
 
 // Same lenient phone validator as onboarding — keep both in sync.
 function normalisePhone(raw: string): string {

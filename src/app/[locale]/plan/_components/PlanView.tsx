@@ -1,7 +1,6 @@
 import { getTranslations } from "next-intl/server";
 import { redirect } from "next/navigation";
 import { planPath } from "@/lib/plan-path";
-import { MarketCode } from "@prisma/client";
 import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
 import { getWorkspace } from "@/lib/workspace";
@@ -31,8 +30,9 @@ import { loadProgrammeForList, recommendCadence } from "@/lib/programme";
 import { estimateListTotals } from "@/lib/plan-total";
 import { scheduleOverlapWarnings, type ScheduleOverlapWarning } from "@/lib/programme-warnings";
 import type { BookingUnit } from "@/lib/campaign-schedule";
+import { SUPPORTED_MARKETS } from "@/lib/markets";
 
-const MARKET_CODES = Object.values(MarketCode);
+const MARKET_CODES = SUPPORTED_MARKETS;
 
 // The plan page body, shared by /plan (no active list yet: start/empty states)
 // and /plan/[listId] (the canonical, shareable address of one plan). The list

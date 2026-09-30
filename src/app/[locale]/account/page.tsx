@@ -1,6 +1,5 @@
 import { getTranslations } from "next-intl/server";
 import { redirect } from "next/navigation";
-import { MarketCode } from "@prisma/client";
 import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
 import { loadScope } from "@/lib/scope";
@@ -15,10 +14,11 @@ import { accountOkKey, accountErrorKey } from "@/lib/account-messages";
 import { SubmitButton } from "@/components";
 import { TeamSection } from "./team-section";
 import { LocaleSwitcher } from "./locale-switcher";
+import { SUPPORTED_MARKETS } from "@/lib/markets";
 
 export const dynamic = "force-dynamic";
 
-const MARKET_CODES = Object.values(MarketCode);
+const MARKET_CODES = SUPPORTED_MARKETS;
 
 // Authenticated-user account/profile page. One section per concern, each
 // scoped to its own form + server action:

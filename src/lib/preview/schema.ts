@@ -1,7 +1,9 @@
 import { z } from "zod";
+import { SUPPORTED_MARKETS, type SupportedMarket } from "@/lib/markets";
 
-export const MARKET_CODES = ["NO", "SE", "DK", "FI", "DE", "AT", "CH", "UK", "IE"] as const;
-export type MarketCode = (typeof MARKET_CODES)[number];
+// The preview tool offers exactly the markets we sell in.
+export const MARKET_CODES = SUPPORTED_MARKETS;
+export type MarketCode = SupportedMarket;
 
 export const TONES = ["warm", "investigative", "aspirational", "plain"] as const;
 export type Tone = (typeof TONES)[number];

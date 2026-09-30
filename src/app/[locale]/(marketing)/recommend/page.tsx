@@ -8,10 +8,11 @@ import { recommendMix, type Candidate } from "@/lib/recommend";
 import { addRecommendedPlan } from "@/app/plan-actions";
 import { LandingShell } from "@/app/landing-shell";
 import { SubmitButton } from "@/components";
+import { SUPPORTED_MARKETS, isSupportedMarket } from "@/lib/markets";
 
 export const dynamic = "force-dynamic";
 
-const MARKET_CODES = Object.values(MarketCode);
+const MARKET_CODES = SUPPORTED_MARKETS;
 
 export default async function RecommendPage({
   params,
@@ -29,7 +30,7 @@ export default async function RecommendPage({
 
   const marketCode =
     typeof sp.market === "string" &&
-    (MARKET_CODES as string[]).includes(sp.market)
+    isSupportedMarket(sp.market)
       ? (sp.market as MarketCode)
       : undefined;
   const budget = Math.trunc(Number(sp.budget)) || 0;

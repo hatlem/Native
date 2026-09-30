@@ -5,8 +5,9 @@ import { formatMoney } from "@/lib/money";
 import type { Candidate, SupplementaryTitle } from "@/lib/recommend";
 import { addToPlan } from "@/app/plan-actions";
 import { SubmitButton } from "@/components";
+import { SUPPORTED_MARKETS } from "@/lib/markets";
 
-const MARKET_CODES = Object.values(MarketCode);
+const MARKET_CODES = SUPPORTED_MARKETS;
 
 // Empty-basket start screen: brief + budget recommender form, with the
 // tiered title suggestions rendered alongside once a market is chosen.
