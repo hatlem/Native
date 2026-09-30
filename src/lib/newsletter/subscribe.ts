@@ -3,13 +3,14 @@
 import { headers } from "next/headers";
 import { prisma } from "@/lib/prisma";
 import { emailAdapter } from "@/lib/notify";
-import { appUrl } from "@/lib/url";
+import { appUrl, appName } from "@/lib/url";
 import { RateLimiter } from "@/lib/rate-limit";
 import { isSuppressed } from "@/lib/outreach/suppression";
 import { parseSubscribeInput } from "./validate";
 import { classifySubscribe } from "./classify";
 import { buildConfirmEmail } from "./email";
 import { upsertPendingSubscriber } from "./store";
+import { newsletterLinks } from "./links";
 
 export type SubscribeState = { status: "idle" | "ok" | "error"; message?: string };
 
@@ -73,17 +74,25 @@ export async function subscribeNewsletter(
     const okToSend = emailCheck.ok && ipCheck.ok;
 
     if (okToSend) {
-      const { confirmRaw } = await upsertPendingSubscriber({
+      const { confirmRaw, unsubRaw } = await upsertPendingSubscriber({
         email: parsed.email,
         locale,
         source: parsed.source,
       });
-      const origin = appUrl(); // sync, returns origin (no trailing slash)
-      const confirmUrl = `${origin}/api/newsletter/confirm?token=${confirmRaw}`;
-      const unsubUrl = `${origin}/api/newsletter/unsubscribe?token=${confirmRaw}`;
-      const msg = buildConfirmEmail({ confirmUrl, unsubUrl });
+      const { confirmUrl, unsubUrl } = newsletterLinks({
+        origin: appUrl(), // sync, returns origin (no trailing slash)
+        confirmRaw,
+        unsubRaw,
+        locale,
+      });
+      const msg = buildConfirmEmail({ confirmUrl, unsubUrl, locale, appName: appName() });
       try {
-        await emailAdapter({ to: parsed.email, from: NEWSLETTER_FROM, ...msg });
+        await emailAdapter({
+          to: parsed.email,
+          from: NEWSLETTER_FROM,
+          ...msg,
+          headers: { "List-Unsubscribe": `<${unsubUrl}>` },
+        });
       } catch (err) {
         // Row persists as PENDING; user still sees success and can re-submit
         // later to re-trigger the confirm send.

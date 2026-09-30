@@ -14,6 +14,9 @@ export type LayoutArgs = {
   body: string;
   cta?: { label: string; url: string };
   footer: string;
+  // Optional link appended to the footer line — e.g. a newsletter's
+  // unsubscribe, which must be a real link, not a bare URL in the text.
+  footerLink?: { label: string; url: string };
   appName: string;
 };
 
@@ -41,6 +44,9 @@ export function layout(args: LayoutArgs): string {
         </td></tr>
        </table>`
     : "";
+  const footerLink = args.footerLink
+    ? ` <a href="${escapeHtml(args.footerLink.url)}" style="color:${COLOR_MUTED};text-decoration:underline;">${escapeHtml(args.footerLink.label)}</a>`
+    : "";
   return `<!doctype html>
 <html><head><meta charset="utf-8"><meta name="color-scheme" content="light only"><title>${escapeHtml(args.heading)}</title></head>
 <body style="margin:0;padding:24px;background:${COLOR_PAGE};font-family:-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,sans-serif;color:${COLOR_INK};">
@@ -54,7 +60,7 @@ export function layout(args: LayoutArgs): string {
       <h1 style="margin:0 0 12px;font-size:22px;line-height:1.3;color:${COLOR_INK};">${escapeHtml(args.heading)}</h1>
       <p style="margin:0;font-size:15px;line-height:1.55;color:${COLOR_INK};">${escapeHtml(args.body)}</p>
       ${cta}
-      <p style="margin:24px 0 0;font-size:13px;color:${COLOR_MUTED};line-height:1.5;">${escapeHtml(args.footer)}</p>
+      <p style="margin:24px 0 0;font-size:13px;color:${COLOR_MUTED};line-height:1.5;">${escapeHtml(args.footer)}${footerLink}</p>
     </td></tr>
     <tr><td style="padding:16px 4px;color:${COLOR_MUTED};font-size:12px;">${escapeHtml(args.appName)}</td></tr>
   </table>
