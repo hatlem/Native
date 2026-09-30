@@ -63,7 +63,8 @@
     "campaign": "Planlæg kampagne",
     "campaigns": "Kampagner",
     "rates": "Priser",
-    "users": "Brugere"
+    "users": "Brugere",
+    "invoices": "Fakturaer"
   },
   "reports": {
     "title": "Rapporter",
@@ -104,7 +105,8 @@
     "suggestedMargin": "Foreslået",
     "basis_win-rate": "fra vinderrate",
     "basis_category-median": "kategorimedian",
-    "basis_default": "standard"
+    "basis_default": "standard",
+    "exportInvoicesCsv": "Eksportér fakturaer (CSV)"
   },
   "agency": {
     "eyebrow": "Bureau",
@@ -923,7 +925,9 @@
     "lineNoteEdit": "Rediger bemærkning til kunden",
     "lineNoteSave": "Gem bemærkning",
     "lineNoteHint": "Vises for kunden på tilbudssiden og i PDF’en.",
-    "lineNoteTooLong": "Bemærkningen er for lang. Hold den under {max} tegn."
+    "lineNoteTooLong": "Bemærkningen er for lang. Hold den under {max} tegn.",
+    "pdfStorageUnavailable": "Fillagring (R2) er ikke sat op i dette miljø, så PDF'en kan ikke gemmes. Download Word-versionen i stedet.",
+    "pdfFailed": "PDF'en kunne ikke oprettes. Prøv igen, eller download Word-versionen."
   },
   "deskTitles": {
     "eyebrow": "Superadmin · titler",
@@ -1154,12 +1158,51 @@
     "cancelledReasonLabel": "Årsag",
     "creditNoteButton": "Udsted kreditnota",
     "creditNoteTitle": "Refunder fakturaen",
-    "creditNoteHint": "Refunder {amount} mod den udstedte faktura. Årsagen logges på kreditnotaen og vises til køberen.",
+    "creditNoteHint": "Refunderer {amount} fuldt ud og annullerer ordren. Årsagen logges på kreditnotaen og vises til køberen.",
     "creditNoteReasonLabel": "Årsag",
-    "creditNoteReasonPlaceholder": "f.eks. Ordre annulleret efter fakturaudstedelse; redaktionelt veto fra udgiver.",
+    "creditNoteReasonPlaceholder": "f.eks. Placeringen kørte ikke som aftalt; køberen gjorde indsigelse mod fakturaen.",
     "creditNoteSubmit": "Udsted kreditnota",
     "issuingCreditNote": "Udsteder…",
-    "creditNoteIssuedLabel": "Kreditnota udstedt"
+    "creditNoteIssuedLabel": "Kreditnota udstedt",
+    "cancelBlock": {
+      "ran": "Kampagnen er kørt, så ordren kan ikke annulleres. Fakturér den, og udsted en kreditnota, hvis køberen ikke skal betale.",
+      "invoiced": "Fakturaen er udstedt. Udsted en kreditnota for at refundere den – så annulleres ordren også.",
+      "cancelled": "Ordren er allerede annulleret.",
+      "other": "Ordren kan ikke annulleres i sin nuværende status."
+    },
+    "cancelErrors": {
+      "reasonRequired": "Angiv en årsag, før du annullerer.",
+      "notFound": "Ordren blev ikke fundet.",
+      "blocked": "Denne ordre kan ikke længere annulleres."
+    },
+    "creditError": "Kreditnotaen blev ikke udstedt",
+    "creditErrors": {
+      "reasonRequired": "Angiv en årsag – den står på kreditnotaen.",
+      "notFound": "Ordren blev ikke fundet.",
+      "noInvoice": "Der er ingen udstedt faktura at kreditere.",
+      "alreadyCredited": "Denne faktura er allerede krediteret.",
+      "wrongOrderStatus": "Kun en faktureret ordre kan krediteres."
+    },
+    "accountingSynced": "{doc} er synkroniseret til {provider} (nr. {number}).",
+    "accountingSyncedNoNumber": "{doc} er synkroniseret til {provider}.",
+    "accountingLocalOnly": "{doc} ligger kun i NativeSpin – der er ingen regnskabsintegration sat op.",
+    "accountingFailed": "{doc} kunne ikke synkroniseres til {provider}: {error}",
+    "accountingNotSent": "{doc} er ikke sendt til regnskab.",
+    "accountingRetry": "Prøv synkronisering igen",
+    "accountingRetrying": "Synkroniserer…",
+    "accountingDocInvoice": "Fakturaen",
+    "accountingDocCreditNote": "Kreditnotaen",
+    "advanceGuardTitle": "{missing, plural, =1 {1 placering mangler} other {# placeringer mangler}} et publiceret link",
+    "advanceGuardLeadLive": "Når ordren sættes live, får køberen besked om, at kampagnen er publiceret. Disse placeringer har intet publiceret link endnu:",
+    "advanceGuardLeadCompleted": "Når ordren afsluttes, får køberen besked om, at kampagnen er kørt. Disse placeringer har intet publiceret link endnu:",
+    "advanceGuardConfirm": "Jeg har tjekket disse placeringer og vil fortsætte alligevel",
+    "advanceGuardNote": "Mailen til køberen tæller kun placeringer, der faktisk er publiceret.",
+    "advanceError": "Status blev ikke ændret",
+    "advanceErrors": {
+      "unconfirmed": "Sæt flueben i bekræftelsen for at fortsætte, mens placeringer stadig er upublicerede.",
+      "moved": "Ordren har skiftet status i mellemtiden. Tjek den, og prøv igen."
+    },
+    "unknownPlacement": "Placering uden navn"
   },
   "production": {
     "brief": "Brief",
@@ -1200,7 +1243,28 @@
     "currency": "Valuta",
     "subtotal": "Subtotal",
     "vat": "Moms",
-    "total": "Total"
+    "total": "Total",
+    "number": "Fakturanummer",
+    "download": "Download PDF",
+    "documentTitle": "Faktura {number}",
+    "colDescription": "Beskrivelse",
+    "colQty": "Antal",
+    "colUnitPrice": "Stykpris",
+    "colAmount": "Beløb",
+    "vatWithPct": "Moms ({pct} %)",
+    "vatId": "CVR/momsnr.",
+    "contentProduction": "Indholdsproduktion",
+    "creditedHeading": "Krediteret",
+    "creditedBody": "Fakturaen blev krediteret fuldt ud {date} ({amount}).",
+    "creditedReason": "Årsag: {reason}",
+    "accountingRef": "Regnskabsref.",
+    "pageOf": "Side {page} af {pages}",
+    "listTitle": "Fakturaer",
+    "listLead": "Alle fakturaer for din organisation. Åbn en for at se linjerne, eller download PDF'en.",
+    "emptyTitle": "Ingen fakturaer endnu",
+    "emptyHint": "Fakturaer vises her, når en kampagne er kørt og faktureret.",
+    "emptyCta": "Se dine kampagner",
+    "colCustomer": "Kunde"
   },
   "firm": {
     "badge": "Øjeblikkelig bestilling",
@@ -1523,7 +1587,9 @@
     "placementRetracted": "Trukket tilbage",
     "unlinkCta": "Fjern kobling",
     "sharedArticleWarning": "Denne artikel er koblet til {count} andre placeringer — dine ændringer påvirker dem alle.",
-    "specNotChecked": "ikke tjekket"
+    "specNotChecked": "ikke tjekket",
+    "detailUploadFailed": "Upload mislykkedes. Prøv en anden fil.",
+    "detailUploadUnavailable": "Filupload er ikke tilgængelig lige nu. Indsæt teksten i editoren i stedet."
   },
   "marketing": {
     "howCta": "Sådan virker det",
@@ -2018,7 +2084,7 @@
     },
     "fees": {
       "title": "Gebyrer og betaling",
-      "body": "Prissætning følger gældende gebyrplan (se /pricing). Fakturaer udstedes i køberens markedsvaluta med moms per lokal lov. Betalingsbetingelser er netto 30 dage, medmindre andet er aftalt."
+      "body": "Prissætning følger gældende gebyrplan (se /pricing). Fakturaer udstedes i køberens markedsvaluta med moms per lokal lov. Betalingsbetingelser er netto 14 dage, medmindre andet er aftalt."
     },
     "liability": {
       "title": "Ansvar",
@@ -2265,7 +2331,6 @@
     "anchorSavings": "−{pct}% mod listepris",
     "anchorNote": "Udgiverens offentlige listepris for placeringen. Din samlede pris inkluderer indholdsproduktion, placering, revisioner og rapportering.",
     "whyThisPrice": "NativeSpin har direkte redaktionelle relationer med alle titler i tilbuddet. Vi forhandler placeringen, hyrer en brancheekspert som skribent, varetager redaktionel gennemgang med udgiveren og rapporterer på resultatet. Du får én ansvarlig partner og én samlet pris — ikke en mediefaktura, en skribentfaktura og et bureauhonorar.",
-    "termsPayment": "50 % ved accept, 50 % ved udgivelse.",
     "termsCancellation": "Fuld refusion før artikelbriefen er godkendt; 50 % refusion før første udkast; ingen refusion efter at udgiverens slot er bekræftet.",
     "termsValidity": "Tilbuddet er gyldigt i 14 dage. Tilgængelighed hos udgiveren bekræftes ved accept.",
     "bullets": {
@@ -2710,7 +2775,8 @@
     "contentProductionLabel": "Hvem skriver indholdet?",
     "content_advertiser": "Annoncøren kan levere egne artikler",
     "content_publisher": "Artiklerne skal skrives af jeres afdeling",
-    "content_both": "Begge dele er mulige"
+    "content_both": "Begge dele er mulige",
+    "uploadUnavailable": "Filupload er ikke tilgængelig lige nu. Indsæt et link til prisliste eller mediekit nedenfor i stedet."
   },
   "invite": {
     "title": "Tilmeld dig {org}",
@@ -3074,7 +3140,6 @@
     "vat": "Moms ({pct}%)",
     "total": "Total",
     "vatStatus": "Priser er angivet eksklusive moms, medmindre andet er angivet ovenfor.",
-    "paymentTerms": "Betalingsbetingelser: netto 14 dage fra fakturadato.",
     "footnote": "Linjer mærket \"pris på forespørgsel\" kommer i tillæg til totalen ovenfor og bekræftes separat før booking.",
     "circulation": "Oplag",
     "digitalReach": "Digital rækkevidde/md",
@@ -3141,7 +3206,17 @@
     "errRole": "Den rolle genkender vi ikke.",
     "errDeactivatedTarget": "Kontoen er deaktiveret. Aktivér den først — en login-e-mail, den ikke kan bruge, forvirrer kun modtageren.",
     "errEmailFailed": "E-mailen kunne ikke sendes. Intet andet blev ændret.",
-    "errGeneric": "Noget gik galt, og intet blev gemt. Prøv igen."
+    "errGeneric": "Noget gik galt, og intet blev gemt. Prøv igen.",
+    "termsHeading": "Betalingsbetingelser pr. kunde",
+    "termsLead": "Netto dage fra fakturadato. Gælder nye tilbud og fakturaer; udstedte fakturaer beholder deres betingelser. Standard er {days} dage.",
+    "termsOrgLabel": "Kunde",
+    "termsDaysLabel": "Betalingsfrist (dage)",
+    "termsSave": "Gem betingelser",
+    "termsCustomHeading": "Kunder med afvigende betingelser",
+    "termsNoneCustom": "Alle kunder har standardbetingelserne.",
+    "termsDaysValue": "{days, plural, one {netto # dag} other {netto # dage}}",
+    "okTerms": "Betalingsbetingelserne er gemt.",
+    "errTerms": "Angiv hele dage mellem 1 og 120."
   },
   "status": {
     "ACCEPTED": "Accepteret",
@@ -3175,5 +3250,8 @@
   "joinedNotice": {
     "lists": "Velkommen til {org}. Her er dit teams planer – åbn en for at se titler, priser og bemærkninger.",
     "home": "Velkommen til {org}. Nu er du med i teamet på NativeSpin."
+  },
+  "paymentTerms": {
+    "line": "{days, plural, one {Betalingsbetingelser: netto # dag fra fakturadato.} other {Betalingsbetingelser: netto # dage fra fakturadato.}}"
   }
 }

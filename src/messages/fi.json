@@ -63,7 +63,8 @@
     "campaign": "Suunnittele kampanja",
     "campaigns": "Kampanjat",
     "rates": "Hinnat",
-    "users": "Käyttäjät"
+    "users": "Käyttäjät",
+    "invoices": "Laskut"
   },
   "orders": {
     "eyebrow": "Tilaukset",
@@ -188,7 +189,9 @@
     "placementRetracted": "Peruutettu",
     "unlinkCta": "Poista linkitys",
     "sharedArticleWarning": "Tämä artikkeli on linkitetty {count} muuhun sijoitteluun — muutoksesi vaikuttavat kaikkiin.",
-    "specNotChecked": "ei tarkistettu"
+    "specNotChecked": "ei tarkistettu",
+    "detailUploadFailed": "Lataus epäonnistui. Kokeile toista tiedostoa.",
+    "detailUploadUnavailable": "Tiedostojen lataus ei ole juuri nyt käytettävissä. Liitä teksti editoriin."
   },
   "reports": {
     "title": "Raportit",
@@ -229,7 +232,8 @@
     "suggestedMargin": "Ehdotettu",
     "basis_win-rate": "voittoprosentista",
     "basis_category-median": "kategorian mediaani",
-    "basis_default": "oletus"
+    "basis_default": "oletus",
+    "exportInvoicesCsv": "Vie laskut (CSV)"
   },
   "agency": {
     "eyebrow": "Toimisto",
@@ -1048,7 +1052,9 @@
     "lineNoteEdit": "Muokkaa huomautusta asiakkaalle",
     "lineNoteSave": "Tallenna huomautus",
     "lineNoteHint": "Näytetään asiakkaalle tarjoussivulla ja PDF:ssä.",
-    "lineNoteTooLong": "Huomautus on liian pitkä. Pidä se alle {max} merkissä."
+    "lineNoteTooLong": "Huomautus on liian pitkä. Pidä se alle {max} merkissä.",
+    "pdfStorageUnavailable": "Tiedostotallennusta (R2) ei ole määritetty tähän ympäristöön, joten PDF:ää ei voi tallentaa. Lataa Word-versio sen sijaan.",
+    "pdfFailed": "PDF:n luonti epäonnistui. Yritä uudelleen tai lataa Word-versio."
   },
   "deskTitles": {
     "eyebrow": "Pääkäyttäjä · julkaisut",
@@ -1279,12 +1285,51 @@
     "cancelledReasonLabel": "Syy",
     "creditNoteButton": "Anna hyvityslasku",
     "creditNoteTitle": "Palauta lasku",
-    "creditNoteHint": "Palauta {amount} annettua laskua vastaan. Syy kirjataan hyvityslaskulle ja näytetään ostajalle.",
+    "creditNoteHint": "Hyvittää {amount} kokonaan ja peruuttaa tilauksen. Syy kirjataan hyvityslaskulle ja näytetään ostajalle.",
     "creditNoteReasonLabel": "Syy",
-    "creditNoteReasonPlaceholder": "esim. Tilaus peruutettu laskutuksen jälkeen; kustantajan toimituksellinen veto.",
+    "creditNoteReasonPlaceholder": "esim. Sijoittelu ei toteutunut sovitusti; ostaja kiisti laskun.",
     "creditNoteSubmit": "Anna hyvityslasku",
     "issuingCreditNote": "Annetaan…",
-    "creditNoteIssuedLabel": "Hyvityslasku annettu"
+    "creditNoteIssuedLabel": "Hyvityslasku annettu",
+    "cancelBlock": {
+      "ran": "Kampanja on jo pyörinyt, joten tilausta ei voi peruuttaa. Laskuta se ja anna hyvityslasku, jos ostajan ei kuulu maksaa.",
+      "invoiced": "Lasku on lähetetty. Anna hyvityslasku sen hyvittämiseksi – samalla tilaus peruutetaan.",
+      "cancelled": "Tilaus on jo peruutettu.",
+      "other": "Tilausta ei voi peruuttaa sen nykyisessä tilassa."
+    },
+    "cancelErrors": {
+      "reasonRequired": "Lisää syy ennen peruutusta.",
+      "notFound": "Tilausta ei löytynyt.",
+      "blocked": "Tätä tilausta ei voi enää peruuttaa."
+    },
+    "creditError": "Hyvityslaskua ei annettu",
+    "creditErrors": {
+      "reasonRequired": "Lisää syy – se tulostuu hyvityslaskulle.",
+      "notFound": "Tilausta ei löytynyt.",
+      "noInvoice": "Hyvitettävää lähetettyä laskua ei ole.",
+      "alreadyCredited": "Tämä lasku on jo hyvitetty.",
+      "wrongOrderStatus": "Vain laskutetun tilauksen voi hyvittää."
+    },
+    "accountingSynced": "{doc} on synkronoitu palveluun {provider} (nro {number}).",
+    "accountingSyncedNoNumber": "{doc} on synkronoitu palveluun {provider}.",
+    "accountingLocalOnly": "{doc} on vain NativeSpinissä – kirjanpitointegraatiota ei ole määritetty.",
+    "accountingFailed": "{doc} ei synkronoitunut palveluun {provider}: {error}",
+    "accountingNotSent": "{doc} ei ole vielä mennyt kirjanpitoon.",
+    "accountingRetry": "Yritä synkronointia uudelleen",
+    "accountingRetrying": "Synkronoidaan…",
+    "accountingDocInvoice": "Lasku",
+    "accountingDocCreditNote": "Hyvityslasku",
+    "advanceGuardTitle": "{missing, plural, =1 {1 sijoittelulta puuttuu} other {# sijoittelulta puuttuu}} julkaistu linkki",
+    "advanceGuardLeadLive": "Kun tilaus merkitään liveksi, ostaja saa tiedon, että kampanja on julkaistu. Näillä sijoitteluilla ei ole vielä julkaistua linkkiä:",
+    "advanceGuardLeadCompleted": "Kun tilaus merkitään valmiiksi, ostaja saa tiedon, että kampanja on pyörinyt. Näillä sijoitteluilla ei ole vielä julkaistua linkkiä:",
+    "advanceGuardConfirm": "Olen tarkistanut nämä sijoittelut ja haluan jatkaa silti",
+    "advanceGuardNote": "Ostajan sähköposti laskee vain oikeasti julkaistut sijoittelut.",
+    "advanceError": "Tilaa ei muutettu",
+    "advanceErrors": {
+      "unconfirmed": "Rastita vahvistus jatkaaksesi, vaikka sijoitteluja on vielä julkaisematta.",
+      "moved": "Tilauksen tila muuttui välillä. Tarkista se ja yritä uudelleen."
+    },
+    "unknownPlacement": "Nimetön sijoittelu"
   },
   "production": {
     "brief": "Brief",
@@ -1325,7 +1370,28 @@
     "currency": "Valuutta",
     "subtotal": "Välisumma",
     "vat": "ALV",
-    "total": "Yhteensä"
+    "total": "Yhteensä",
+    "number": "Laskun numero",
+    "download": "Lataa PDF",
+    "documentTitle": "Lasku {number}",
+    "colDescription": "Kuvaus",
+    "colQty": "Määrä",
+    "colUnitPrice": "Yksikköhinta",
+    "colAmount": "Summa",
+    "vatWithPct": "ALV ({pct} %)",
+    "vatId": "ALV-tunnus",
+    "contentProduction": "Sisällöntuotanto",
+    "creditedHeading": "Hyvitetty",
+    "creditedBody": "Lasku hyvitettiin kokonaan {date} ({amount}).",
+    "creditedReason": "Syy: {reason}",
+    "accountingRef": "Kirjanpitoviite",
+    "pageOf": "Sivu {page}/{pages}",
+    "listTitle": "Laskut",
+    "listLead": "Kaikki organisaatiosi laskut. Avaa lasku nähdäksesi rivit tai lataa PDF.",
+    "emptyTitle": "Ei vielä laskuja",
+    "emptyHint": "Laskut näkyvät täällä, kun kampanja on pyörinyt ja laskutettu.",
+    "emptyCta": "Katso kampanjasi",
+    "colCustomer": "Asiakas"
   },
   "firm": {
     "badge": "Pikatilaus",
@@ -2017,7 +2083,7 @@
     },
     "fees": {
       "title": "Maksut ja maksaminen",
-      "body": "Hinnoittelu noudattaa voimassa olevaa hinnastoa (ks. /pricing). Laskut laaditaan ostajan markkinan valuutassa, ja ALV sovelletaan paikallisen lain mukaan. Maksuehto on oletuksena netto 30 päivää, ellei toisin sovita."
+      "body": "Hinnoittelu noudattaa voimassa olevaa hinnastoa (ks. /pricing). Laskut laaditaan ostajan markkinan valuutassa, ja ALV sovelletaan paikallisen lain mukaan. Maksuehto on oletuksena netto 14 päivää, ellei toisin sovita."
     },
     "liability": {
       "title": "Vastuu",
@@ -2264,7 +2330,6 @@
     "anchorSavings": "−{pct}% listahintaan verrattuna",
     "anchorNote": "Julkaisijan virallinen listahinta tälle julkaisulle. Kokonaishintaasi sisältyy sisällöntuotanto, julkaisu, korjaukset ja raportointi.",
     "whyThisPrice": "NativeSpinllä on suorat toimitukselliset suhteet kaikkiin tarjouksen medioihin. Neuvottelemme julkaisun, palkkaamme toimialaa tuntevan toimittajan, hoidamme toimituksellisen tarkistuksen julkaisijan kanssa ja toimitamme raportoinnin. Saat yhden vastuullisen kumppanin ja yhden kokonaishinnan — emme erikseen medialaskua, kirjoittajalaskua ja toimistopalkkiota.",
-    "termsPayment": "50 % hyväksynnän yhteydessä, 50 % julkaisun yhteydessä.",
     "termsCancellation": "Täysi palautus ennen artikkelibrieffin hyväksyntää; 50 % palautus ennen ensimmäistä luonnosta; ei palautusta enää julkaisijan paikan vahvistuksen jälkeen.",
     "termsValidity": "Tarjous voimassa 14 päivää. Julkaisijan saatavuus vahvistetaan hyväksynnän yhteydessä.",
     "bullets": {
@@ -2709,7 +2774,8 @@
     "contentProductionLabel": "Kuka kirjoittaa sisällön?",
     "content_advertiser": "Mainostaja voi toimittaa omat artikkelinsa",
     "content_publisher": "Artikkelit on kirjoitettava osastonne toimesta",
-    "content_both": "Molemmat ovat mahdollisia"
+    "content_both": "Molemmat ovat mahdollisia",
+    "uploadUnavailable": "Tiedoston lataus ei ole juuri nyt käytettävissä. Liitä alle linkki hinnastoon tai mediakorttiin."
   },
   "invite": {
     "title": "Liity organisaatioon {org}",
@@ -3073,7 +3139,6 @@
     "vat": "ALV ({pct}%)",
     "total": "Yhteensä",
     "vatStatus": "Hinnat ovat ilman ALV:tä, ellei yllä toisin mainita.",
-    "paymentTerms": "Maksuehdot: netto 14 päivää laskun päiväyksestä.",
     "footnote": "Rivit, joissa lukee \"hinta pyynnöstä\", tulevat yllä olevan summan lisäksi ja vahvistetaan erikseen ennen varausta.",
     "circulation": "Levikki",
     "digitalReach": "Digitaalinen kattavuus/kk",
@@ -3140,7 +3205,17 @@
     "errRole": "Emme tunnista tätä roolia.",
     "errDeactivatedTarget": "Tili on poistettu käytöstä. Ota se ensin käyttöön — kirjautumisviesti, jota ei voi käyttää, vain hämmentää vastaanottajaa.",
     "errEmailFailed": "Sähköpostia ei voitu lähettää. Mitään muuta ei muutettu.",
-    "errGeneric": "Jokin meni pieleen eikä mitään tallennettu. Yritä uudelleen."
+    "errGeneric": "Jokin meni pieleen eikä mitään tallennettu. Yritä uudelleen.",
+    "termsHeading": "Asiakaskohtaiset maksuehdot",
+    "termsLead": "Netto päivää laskun päiväyksestä. Koskee uusia tarjouksia ja laskuja; lähetetyt laskut säilyttävät ehtonsa. Oletus on {days} päivää.",
+    "termsOrgLabel": "Asiakas",
+    "termsDaysLabel": "Maksuaika (päivää)",
+    "termsSave": "Tallenna ehdot",
+    "termsCustomHeading": "Asiakkaat, joilla on poikkeavat ehdot",
+    "termsNoneCustom": "Kaikilla asiakkailla on oletusehdot.",
+    "termsDaysValue": "{days, plural, one {netto # päivä} other {netto # päivää}}",
+    "okTerms": "Maksuehdot tallennettu.",
+    "errTerms": "Anna kokonaisia päiviä väliltä 1–120."
   },
   "status": {
     "ACCEPTED": "Hyväksytty",
@@ -3174,5 +3249,8 @@
   "joinedNotice": {
     "lists": "Tervetuloa, {org}. Tässä ovat tiimisi suunnitelmat – avaa yksi nähdäksesi julkaisut, hinnat ja huomautukset.",
     "home": "Tervetuloa, {org}. Olet nyt mukana tiimissä NativeSpinissä."
+  },
+  "paymentTerms": {
+    "line": "{days, plural, one {Maksuehdot: netto # päivä laskun päiväyksestä.} other {Maksuehdot: netto # päivää laskun päiväyksestä.}}"
   }
 }

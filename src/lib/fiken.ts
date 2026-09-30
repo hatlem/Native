@@ -11,9 +11,10 @@
 // the knowledge cutoff. It MUST be confirmed against a Fiken *sandbox*
 // company before being enabled in production — Fiken amounts are integer
 // minor units (øre) and the vatType enum / required fields can change.
-// Until verified, callers run with the noop provider (the default).
+// Until verified, leave FIKEN_API_TOKEN unset (or ACCOUNTING_PROVIDER=noop)
+// so callers run with the noop provider.
 
-import type { AccountingInvoice, PushResult } from "@/lib/accounting";
+import type { AccountingCreditNote, AccountingInvoice, PushResult } from "@/lib/accounting";
 
 const FIKEN_BASE = "https://api.fiken.no/api/v2";
 
@@ -154,8 +155,90 @@ export async function fikenPushInvoice(
       return { ok: false, provider: "fiken", error: `Fiken invoice POST ${res.status}: ${body.slice(0, 300)}` };
     }
     // Fiken returns the created invoice id in the Location header.
-    const ref = res.headers.get("Location")?.split("/").pop() ?? null;
-    return { ok: true, provider: "fiken", externalRef: ref };
+    const ref = locationId(res);
+    const externalNumber = ref
+      ? await fetchNumber(cfg, `/invoices/${ref}`, "invoiceNumber")
+      : null;
+    return { ok: true, provider: "fiken", externalRef: ref, externalNumber };
+  } catch (err) {
+    return { ok: false, provider: "fiken", error: err instanceof Error ? err.message : String(err) };
+  }
+}
+
+function locationId(res: Response): string | null {
+  return res.headers.get("Location")?.split("/").pop() || null;
+}
+
+// Best-effort read of the number Fiken assigned. The document already
+// exists at this point, so a failed lookup must not turn the push into a
+// failure (a retry would then create a duplicate) — the number is just
+// left empty and the desk still has the Fiken id.
+async function fetchNumber(
+  cfg: FikenConfig,
+  path: string,
+  field: "invoiceNumber" | "creditNoteNumber",
+): Promise<string | null> {
+  try {
+    const res = await fikenFetch(cfg, path);
+    if (!res.ok) return null;
+    const body = (await res.json()) as Record<string, unknown>;
+    const n = body[field];
+    return typeof n === "number" || typeof n === "string" ? String(n) : null;
+  } catch {
+    return null;
+  }
+}
+
+export type FikenFullCreditNotePayload = {
+  issueDate: string; // YYYY-MM-DD
+  invoiceId: number;
+  creditNoteText: string;
+};
+
+// Pure: body for Fiken's "full credit note" endpoint, which credits the
+// whole referenced invoice (amounts and VAT are taken from the invoice, so
+// nothing here can drift from what was billed).
+export function toFikenFullCreditNotePayload(
+  doc: AccountingCreditNote,
+): FikenFullCreditNotePayload | null {
+  const invoiceId = Number(doc.invoiceExternalRef);
+  if (!doc.invoiceExternalRef || !Number.isInteger(invoiceId) || invoiceId <= 0) {
+    return null;
+  }
+  return {
+    issueDate: dateOnly(doc.issuedAt),
+    invoiceId,
+    // Fiken prints this on the credit note; keep it to a sane length.
+    creditNoteText: doc.reason.slice(0, 500),
+  };
+}
+
+export async function fikenPushCreditNote(
+  doc: AccountingCreditNote,
+  cfg: FikenConfig,
+): Promise<PushResult> {
+  const payload = toFikenFullCreditNotePayload(doc);
+  if (!payload) {
+    return {
+      ok: false,
+      provider: "fiken",
+      error: "The invoice is not in Fiken yet — sync the invoice first, then retry the credit note.",
+    };
+  }
+  try {
+    const res = await fikenFetch(cfg, `/creditNotes/full`, {
+      method: "POST",
+      body: JSON.stringify(payload),
+    });
+    if (!res.ok) {
+      const body = await res.text();
+      return { ok: false, provider: "fiken", error: `Fiken credit note POST ${res.status}: ${body.slice(0, 300)}` };
+    }
+    const ref = locationId(res);
+    const externalNumber = ref
+      ? await fetchNumber(cfg, `/creditNotes/${ref}`, "creditNoteNumber")
+      : null;
+    return { ok: true, provider: "fiken", externalRef: ref, externalNumber };
   } catch (err) {
     return { ok: false, provider: "fiken", error: err instanceof Error ? err.message : String(err) };
   }

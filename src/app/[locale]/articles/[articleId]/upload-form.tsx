@@ -13,7 +13,14 @@ export function UploadForm({
   articleId: string;
   locale: string;
   saveDraftAction: typeof saveUploadedDraft;
-  labels: { heading: string; hint: string; uploading: string; save: string };
+  labels: {
+    heading: string;
+    hint: string;
+    uploading: string;
+    save: string;
+    failed: string;
+    unavailable: string;
+  };
 }) {
   const [busy, setBusy] = useState(false);
   const [file, setFile] = useState<File | null>(null);
@@ -27,18 +34,28 @@ export function UploadForm({
     if (!f) return;
     setBusy(true);
     try {
-      const { url, key: objectKey } = await presignArticleUpload({
+      const presigned = await presignArticleUpload({
         articleId,
         locale,
         filename: f.name,
         contentType: f.type,
         bytes: f.size,
       });
-      const res = await fetch(url, { method: "PUT", body: f, headers: { "Content-Type": f.type } });
+      if (!presigned.ok) {
+        // Storage isn't configured: no other file would work either, so
+        // don't send the user off trying one.
+        setError(labels.unavailable);
+        return;
+      }
+      const res = await fetch(presigned.url, {
+        method: "PUT",
+        body: f,
+        headers: { "Content-Type": f.type },
+      });
       if (!res.ok) throw new Error(`upload_failed:${res.status}`);
-      setKey(objectKey);
+      setKey(presigned.key);
     } catch {
-      setError("Upload failed. Try a different file.");
+      setError(labels.failed);
     } finally {
       setBusy(false);
     }

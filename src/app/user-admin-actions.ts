@@ -11,6 +11,7 @@ import { magicLinkEmail } from "@/lib/mail/templates/magic-link";
 import { passwordResetEmail } from "@/lib/mail/templates/password-reset";
 import { appUrl, appName } from "@/lib/url";
 import { clientIp } from "@/lib/client-ip";
+import { canSetPaymentTerms, parsePaymentTermsDays } from "@/lib/payment-terms";
 import {
   canChangeRole,
   canRebind,
@@ -330,4 +331,40 @@ export async function sendUserSignInLink(formData: FormData) {
   }
   await recordAudit(actorId, "user.signin_link_sent", `User:${targetId}`, { ip });
   back(locale, formData, { ok: "link_sent" });
+}
+
+// Set a customer organization's payment terms (net days from invoice date).
+// SUPERADMIN-only: terms are a commercial agreement, so neither the order
+// desk nor the buyer can change them (lib/payment-terms.ts
+// canSetPaymentTerms — the same rule the page uses to render the control).
+// New quotes and invoices pick the value up; issued invoices keep the terms
+// they were issued under.
+export async function setOrgPaymentTerms(formData: FormData) {
+  const locale = field(formData, "locale") || "en";
+  const session = await auth();
+  if (!session?.user || !canSetPaymentTerms(session.user.role)) {
+    redirect(`/${locale}/signin`);
+  }
+  const actorId = session.user.id;
+  const organizationId = field(formData, "organizationId");
+  const days = parsePaymentTermsDays(field(formData, "paymentTermsDays"));
+  if (days === null) back(locale, formData, { error: "terms" });
+
+  const org = await prisma.organization.findUnique({
+    where: { id: organizationId },
+    select: { id: true, paymentTermsDays: true },
+  });
+  if (!org) back(locale, formData, { error: "not_found" });
+
+  if (org.paymentTermsDays !== days) {
+    await prisma.organization.update({
+      where: { id: org.id },
+      data: { paymentTermsDays: days },
+    });
+    await recordAudit(actorId, "org.payment_terms_set", `Organization:${org.id}`, {
+      from: org.paymentTermsDays,
+      to: days,
+    });
+  }
+  back(locale, formData, { ok: "terms" });
 }

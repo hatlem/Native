@@ -53,6 +53,7 @@ const data: QuotePdfData = {
   preparedByName: "Desk",
   preparedByEmail: "desk@nativespin.com",
   onlineUrl,
+  paymentTermsDays: 30,
   rows: [
     {
       ...row,
@@ -81,6 +82,9 @@ test("renderQuoteDocx: valid docx with localized copy, rows and the POR footnote
   // The customer-visible line note renders once, labelled, under its row.
   assert.match(body, /Kommentar: Finns även som 1 vecka för 15 000 SEK\./);
   assert.equal(body.match(/Kommentar:/g)?.length, 1);
+  // Payment terms come from the customer's setting, not a fixed string.
+  assert.match(body, /netto 30 dagar/);
+  assert.doesNotMatch(body, /netto 14/);
 });
 
 test("renderQuoteDocx: every hyperlink targets the live quote page", async () => {

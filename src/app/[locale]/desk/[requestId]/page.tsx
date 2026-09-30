@@ -17,7 +17,7 @@ import { bandLabel, priceBand } from "@/lib/pricing/bands";
 import { StatusBadge } from "@/app/status-badge";
 import { SubmitButton } from "@/components";
 import { canSeeCostVsSell } from "@/lib/roles";
-import { presignDownload } from "@/lib/storage/r2";
+import { isStorageConfigured, presignDownload } from "@/lib/storage/r2";
 import { intlLocale } from "@/lib/money";
 import {
   QUOTE_VALIDITY_DAYS,
@@ -47,6 +47,16 @@ export default async function DeskRequestPage({
   const { locale, requestId } = await params;
   const sp = await searchParams;
   const errorCode = typeof sp.error === "string" ? sp.error : "";
+  // Quote-PDF outcome (quote-actions.ts generateQuotePdf). Storage is also
+  // checked on render so the desk sees why no PDF can be made before
+  // clicking, not after.
+  const storageReady = isStorageConfigured();
+  const pdfNotice: "pdfStorageUnavailable" | "pdfFailed" | null = !storageReady ||
+    sp.pdf === "storage-unavailable"
+    ? "pdfStorageUnavailable"
+    : sp.pdf === "failed"
+      ? "pdfFailed"
+      : null;
   const t = await getTranslations({ locale, namespace: "desk" });
   const tr = await getTranslations({ locale, namespace: "requests" });
   const tType = await getTranslations({ locale, namespace: "productType" });
@@ -723,17 +733,26 @@ export default async function DeskRequestPage({
                       ))}
                     </ul>
                   )}
+                  {pdfNotice ? (
+                    <p className="banner-error" role="alert">
+                      {t(pdfNotice)}
+                    </p>
+                  ) : null}
                   <div className="quote-pdf-actions">
-                    <form action={generateQuotePdf}>
-                      <input type="hidden" name="locale" value={locale} />
-                      <input type="hidden" name="requestId" value={request.id} />
-                      <input type="hidden" name="quoteId" value={quote.id} />
-                      <SubmitButton
-                        label={t("pdfGenerate")}
-                        pendingLabel={t("pdfGenerating")}
-                        className="btn small"
-                      />
-                    </form>
+                    {/* Without object storage a PDF version can't be saved,
+                        so the button would only ever fail — explain up front. */}
+                    {storageReady ? (
+                      <form action={generateQuotePdf}>
+                        <input type="hidden" name="locale" value={locale} />
+                        <input type="hidden" name="requestId" value={request.id} />
+                        <input type="hidden" name="quoteId" value={quote.id} />
+                        <SubmitButton
+                          label={t("pdfGenerate")}
+                          pendingLabel={t("pdfGenerating")}
+                          className="btn small"
+                        />
+                      </form>
+                    ) : null}
                     <a
                       className="btn small ghost"
                       href={`/api/export/quote-docx/${quote.id}?locale=${locale}`}

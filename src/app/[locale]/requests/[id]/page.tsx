@@ -5,6 +5,7 @@ import { prisma } from "@/lib/prisma";
 import { getWorkspace } from "@/lib/workspace";
 import { DataLayerEvent } from "@/app/data-layer-event";
 import { formatMoney } from "@/lib/money";
+import { paymentTermsDaysFor } from "@/lib/payment-terms";
 import { StatusBadge } from "@/app/status-badge";
 import { Breadcrumb, DetailHead, MetaRow } from "@/components";
 import { PlanItemsSection } from "./_components/PlanItemsSection";
@@ -215,6 +216,7 @@ export default async function RequestPage({
           products={products}
           byId={byId}
           organizationName={request.organization.name}
+          paymentTermsDays={paymentTermsDaysFor(request.organization)}
           requestId={request.id}
           totalQuoteLines={totalQuoteLines}
           allAccepted={allAccepted}

@@ -1,100 +1,34 @@
 "use server";
 
 import { redirect } from "next/navigation";
-import { OrderStatus } from "@prisma/client";
+import { revalidatePath } from "next/cache";
+import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
-import { lineOrder } from "@/lib/commerce/line-order";
-import { recordAudit } from "@/lib/audit";
-import { notifyOrg } from "@/lib/notify";
+import { notifyOrg, notifyPublisher } from "@/lib/notify";
 import { requireDesk } from "@/lib/desk-guard";
-import { normaliseReason } from "@/lib/cancellation";
+import { normaliseReason, type CancelActor } from "@/lib/cancellation";
+import { issueFullCreditNote, issueInvoiceForOrder } from "@/lib/billing";
+import { syncCreditNoteToAccounting, syncInvoiceToAccounting } from "@/lib/accounting-sync";
+
+// Desk billing: issue the invoice for a completed order, credit it in full,
+// and retry an accounting push that failed. The DB rules live in
+// lib/billing.ts (compare-and-set, testable); this file adds the session
+// guard, notifications, the accounting push and the redirect.
+//
+// Lifecycle (lib/order-lifecycle.ts):
+//   COMPLETED ──issueInvoice──→ INVOICED ──issueCreditNote──→ CANCELLED
+//
+// Accounting: the push runs after the local write and never blocks it. Its
+// outcome is stored on the invoice / credit note and shown on the desk
+// order page, with a retry when it failed.
 
 function field(formData: FormData, key: string): string {
   const v = formData.get(key);
   return typeof v === "string" ? v.trim() : "";
 }
 
-// Issue a credit note against the order's invoice. The supported v1
-// shape is full-credit: we refund the invoice total, mark the invoice
-// CREDITED, and record the reason. Partial credits are a real need
-// (e.g. publisher refunds line A but the customer still pays for line
-// B) but they introduce per-line accounting that wants its own design
-// pass; v1 keeps the surface tight.
-//
-// Required preconditions:
-//   - Order has a CANCELLED status (the typical credit-note trigger)
-//   - Order has exactly one issued (or paid) invoice with status
-//     ISSUED / PAID / OVERDUE — not DRAFT, not already CREDITED/VOID.
-//
-// Side effects:
-//   - CreditNote row written
-//   - Invoice.status → CREDITED
-//   - Audit row records actor + reason + amount
-//   - Buyer org notified
-export async function issueCreditNote(formData: FormData) {
-  const locale = field(formData, "locale") || "en";
-  const orderId = field(formData, "orderId");
-  const reason = normaliseReason(field(formData, "reason"));
-  const userId = await requireDesk(locale);
-
-  if (!reason) {
-    redirect(`/${locale}/desk/orders/${orderId}?credit=reason-required`);
-  }
-
-  const order = await prisma.order.findUnique({
-    where: { id: orderId },
-    include: { invoices: true, creditNotes: true },
-  });
-  if (!order) {
-    redirect(`/${locale}/desk/orders/${orderId}?credit=not-found`);
-  }
-  if (order.status !== OrderStatus.CANCELLED) {
-    redirect(
-      `/${locale}/desk/orders/${orderId}?credit=only-cancelled-orders`,
-    );
-  }
-  if (order.creditNotes.length > 0) {
-    redirect(`/${locale}/desk/orders/${orderId}?credit=already-issued`);
-  }
-  const invoice = order.invoices.find((i) =>
-    ["ISSUED", "PAID", "OVERDUE"].includes(i.status),
-  );
-  if (!invoice) {
-    redirect(`/${locale}/desk/orders/${orderId}?credit=no-eligible-invoice`);
-  }
-
-  await prisma.$transaction([
-    prisma.creditNote.create({
-      data: {
-        invoiceId: invoice.id,
-        orderId: order.id,
-        currency: invoice.currency,
-        amount: invoice.total,
-        reason,
-        issuedBy: userId,
-      },
-    }),
-    prisma.invoice.update({
-      where: { id: invoice.id },
-      data: { status: "CREDITED" },
-    }),
-  ]);
-
-  await recordAudit(userId, "credit_note.issue", `Invoice:${invoice.id}`, {
-    orderId: order.id,
-    amount: Number(invoice.total),
-    currency: invoice.currency,
-    reason,
-  });
-
-  await notifyOrg(order.organizationId, {
-    kind: "INVOICE_ISSUED",
-    title: "Credit note issued",
-    body: `${Number(invoice.total)} ${invoice.currency} credited — ${reason}`,
-    link: `/${locale}/invoices/${invoice.id}`,
-  });
-
-  redirect(`/${locale}/desk/orders/${order.id}`);
+function orderPath(locale: string, orderId: string): string {
+  return `/${locale}/desk/orders/${orderId}`;
 }
 
 export async function issueInvoice(formData: FormData) {
@@ -102,63 +36,92 @@ export async function issueInvoice(formData: FormData) {
   const orderId = field(formData, "orderId");
   const userId = await requireDesk(locale);
 
-  const order = await prisma.order.findUnique({
-    where: { id: orderId },
-    include: {
-      quote: { include: { lines: { orderBy: lineOrder() } } },
-      invoices: true,
-      lines: true,
-    },
-  });
-
-  if (order && order.invoices.length === 0) {
-    const q = order.quote;
-    const dueAt = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000);
-    const [invoice] = await prisma.$transaction([
-      prisma.invoice.create({
-        data: {
-          organizationId: order.organizationId,
-          orderId: order.id,
-          status: "ISSUED",
-          currency: q.currency,
-          subtotal: q.subtotal,
-          vatPct: q.vatPct,
-          total: q.total,
-          issuedAt: new Date(),
-          dueAt,
-          lines: {
-            // Only what the buyer accepted is billed: "price on request"
-            // lines never became order lines and are excluded from the
-            // quote total, so they must not appear on the invoice either.
-            // Invoice lines keep the quote's display order.
-            create: q.lines
-              .filter((l) => !l.priceOnRequest)
-              .map((l) => ({
-                description: l.description,
-                quantity: l.quantity,
-                unitAmount: l.lineTotal,
-                lineTotal: l.lineTotal,
-                position: l.position,
-              })),
-          },
-        },
-      }),
-      prisma.order.update({
-        where: { id: order.id },
-        data: { status: "INVOICED" },
-      }),
-    ]);
-    await recordAudit(userId, "invoice.issue", `Invoice:${invoice.id}`, {
-      orderId: order.id,
-      total: Number(q.total),
-      currency: q.currency,
+  const result = await issueInvoiceForOrder({ orderId, actorId: userId });
+  if (result.ok) {
+    await syncInvoiceToAccounting(result.invoiceId, { actorId: userId });
+    const order = await prisma.order.findUniqueOrThrow({
+      where: { id: orderId },
+      select: { organizationId: true },
     });
     await notifyOrg(order.organizationId, {
       kind: "INVOICE_ISSUED",
       title: "Invoice issued",
-      body: `Total ${Number(q.total)} ${q.currency}, due ${dueAt.toISOString().slice(0, 10)}.`,
-      link: `/${locale}/invoices/${invoice.id}`,
+      body: `Total ${result.total} ${result.currency}, due ${result.dueAt.toISOString().slice(0, 10)}.`,
+      link: `/${locale}/invoices/${result.invoiceId}`,
     });
+    revalidatePath(orderPath(locale, orderId));
   }
-  redirect(`/${locale}/desk/orders/${orderId}`);
+  // A refused issue (already invoiced / not completed) lands back on the
+  // order, whose header shows the current state and what's possible.
+  redirect(orderPath(locale, orderId));
+}
+
+// Full credit note against the order's issued invoice: the invoice becomes
+// CREDITED, the order ends CANCELLED, the buyer (and any publisher with a
+// placement that hadn't run) is told why.
+export async function issueCreditNote(formData: FormData) {
+  const locale = field(formData, "locale") || "en";
+  const orderId = field(formData, "orderId");
+  const reason = normaliseReason(field(formData, "reason"));
+  const userId = await requireDesk(locale);
+
+  if (!reason) redirect(`${orderPath(locale, orderId)}?credit=reason-required`);
+
+  const session = await auth();
+  const actorRole: CancelActor = session?.user?.role === "SUPERADMIN" ? "SUPERADMIN" : "DESK";
+  const result = await issueFullCreditNote({ orderId, actorId: userId, actorRole, reason });
+  if (!result.ok) redirect(`${orderPath(locale, orderId)}?credit=${result.reason}`);
+
+  await syncCreditNoteToAccounting(result.creditNoteId, { actorId: userId });
+
+  const order = await prisma.order.findUniqueOrThrow({
+    where: { id: orderId },
+    select: { organizationId: true },
+  });
+  await notifyOrg(order.organizationId, {
+    kind: "INVOICE_ISSUED",
+    title: "Credit note issued",
+    body: `${result.amount} ${result.currency} credited — ${reason}`,
+    link: `/${locale}/invoices/${result.invoiceId}`,
+  });
+  await Promise.all(
+    result.publisherIds.map((pid) =>
+      notifyPublisher(pid, {
+        kind: "ORDER_CANCELLED",
+        title: "Order cancelled by NativeSpin desk",
+        body: reason,
+        link: `/${locale}/publisher/orders`,
+      }),
+    ),
+  );
+
+  revalidatePath(orderPath(locale, orderId));
+  redirect(orderPath(locale, orderId));
+}
+
+// Re-run the accounting push for an invoice or credit note whose last push
+// failed (or never ran). Already-synced documents are left alone by the
+// sync itself, so this can't create duplicates in the ledger.
+export async function retryAccountingSync(formData: FormData) {
+  const locale = field(formData, "locale") || "en";
+  const orderId = field(formData, "orderId");
+  const invoiceId = field(formData, "invoiceId");
+  const creditNoteId = field(formData, "creditNoteId");
+  const userId = await requireDesk(locale);
+
+  // Only documents belonging to the order on screen — the ids round-trip
+  // through the browser.
+  if (invoiceId) {
+    const inv = await prisma.invoice.findFirst({ where: { id: invoiceId, orderId }, select: { id: true } });
+    if (inv) await syncInvoiceToAccounting(inv.id, { actorId: userId });
+  }
+  if (creditNoteId) {
+    const note = await prisma.creditNote.findFirst({
+      where: { id: creditNoteId, orderId },
+      select: { id: true },
+    });
+    if (note) await syncCreditNoteToAccounting(note.id, { actorId: userId });
+  }
+  revalidatePath(orderPath(locale, orderId));
+  redirect(orderPath(locale, orderId));
 }

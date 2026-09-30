@@ -63,7 +63,8 @@
     "campaign": "Kampagne planen",
     "campaigns": "Kampagnen",
     "rates": "Preise",
-    "users": "Benutzer"
+    "users": "Benutzer",
+    "invoices": "Rechnungen"
   },
   "orders": {
     "eyebrow": "Bestellungen",
@@ -188,7 +189,9 @@
     "placementRetracted": "Zurückgezogen",
     "unlinkCta": "Verknüpfung entfernen",
     "sharedArticleWarning": "Dieser Artikel ist mit {count} weiteren Platzierungen verknüpft — deine Änderungen wirken sich auf alle aus.",
-    "specNotChecked": "nicht geprüft"
+    "specNotChecked": "nicht geprüft",
+    "detailUploadFailed": "Hochladen fehlgeschlagen. Versuchen Sie eine andere Datei.",
+    "detailUploadUnavailable": "Datei-Uploads sind gerade nicht verfügbar. Fügen Sie den Text stattdessen im Editor ein."
   },
   "reports": {
     "title": "Berichte",
@@ -229,7 +232,8 @@
     "suggestedMargin": "Empfohlen",
     "basis_win-rate": "aus Gewinnrate",
     "basis_category-median": "Kategorie-Median",
-    "basis_default": "Standard"
+    "basis_default": "Standard",
+    "exportInvoicesCsv": "Rechnungen exportieren (CSV)"
   },
   "agency": {
     "eyebrow": "Agentur",
@@ -1048,7 +1052,9 @@
     "lineNoteEdit": "Hinweis an den Kunden bearbeiten",
     "lineNoteSave": "Hinweis speichern",
     "lineNoteHint": "Wird dem Kunden auf der Angebotsseite und im PDF angezeigt.",
-    "lineNoteTooLong": "Der Hinweis ist zu lang. Bitte unter {max} Zeichen bleiben."
+    "lineNoteTooLong": "Der Hinweis ist zu lang. Bitte unter {max} Zeichen bleiben.",
+    "pdfStorageUnavailable": "Dateispeicher (R2) ist in dieser Umgebung nicht eingerichtet, daher kann das PDF nicht gespeichert werden. Laden Sie stattdessen die Word-Version herunter.",
+    "pdfFailed": "Das PDF konnte nicht erstellt werden. Versuchen Sie es erneut oder laden Sie die Word-Version herunter."
   },
   "deskTitles": {
     "eyebrow": "Super-Admin · Titel",
@@ -1279,12 +1285,51 @@
     "cancelledReasonLabel": "Grund",
     "creditNoteButton": "Gutschrift ausstellen",
     "creditNoteTitle": "Rechnung erstatten",
-    "creditNoteHint": "Erstatten Sie {amount} gegen die ausgestellte Rechnung. Der Grund wird auf der Gutschrift protokolliert und dem Käufer angezeigt.",
+    "creditNoteHint": "Erstattet {amount} vollständig und storniert die Bestellung. Der Grund wird auf der Gutschrift protokolliert und dem Käufer angezeigt.",
     "creditNoteReasonLabel": "Grund",
-    "creditNoteReasonPlaceholder": "z.B. Bestellung nach Rechnungsstellung storniert; redaktionelles Veto des Verlags.",
+    "creditNoteReasonPlaceholder": "z. B. Platzierung lief nicht wie vereinbart; Käufer hat die Rechnung beanstandet.",
     "creditNoteSubmit": "Gutschrift ausstellen",
     "issuingCreditNote": "Wird ausgestellt…",
-    "creditNoteIssuedLabel": "Gutschrift ausgestellt"
+    "creditNoteIssuedLabel": "Gutschrift ausgestellt",
+    "cancelBlock": {
+      "ran": "Die Kampagne ist gelaufen, daher kann die Bestellung nicht storniert werden. Stellen Sie die Rechnung und danach eine Gutschrift aus, falls der Käufer nicht zahlen soll.",
+      "invoiced": "Die Rechnung ist ausgestellt. Stellen Sie eine Gutschrift aus, um sie zu erstatten – damit wird auch die Bestellung storniert.",
+      "cancelled": "Die Bestellung ist bereits storniert.",
+      "other": "Die Bestellung kann in ihrem aktuellen Status nicht storniert werden."
+    },
+    "cancelErrors": {
+      "reasonRequired": "Geben Sie vor dem Stornieren einen Grund an.",
+      "notFound": "Bestellung nicht gefunden.",
+      "blocked": "Diese Bestellung kann nicht mehr storniert werden."
+    },
+    "creditError": "Gutschrift nicht ausgestellt",
+    "creditErrors": {
+      "reasonRequired": "Geben Sie einen Grund an – er steht auf der Gutschrift.",
+      "notFound": "Bestellung nicht gefunden.",
+      "noInvoice": "Es gibt keine ausgestellte Rechnung, die gutgeschrieben werden kann.",
+      "alreadyCredited": "Diese Rechnung wurde bereits gutgeschrieben.",
+      "wrongOrderStatus": "Nur eine in Rechnung gestellte Bestellung kann gutgeschrieben werden."
+    },
+    "accountingSynced": "{doc} ist mit {provider} synchronisiert (Nr. {number}).",
+    "accountingSyncedNoNumber": "{doc} ist mit {provider} synchronisiert.",
+    "accountingLocalOnly": "{doc} liegt nur in NativeSpin – es ist keine Buchhaltungsintegration eingerichtet.",
+    "accountingFailed": "{doc} konnte nicht mit {provider} synchronisiert werden: {error}",
+    "accountingNotSent": "{doc} wurde noch nicht an die Buchhaltung übermittelt.",
+    "accountingRetry": "Synchronisierung wiederholen",
+    "accountingRetrying": "Synchronisiere…",
+    "accountingDocInvoice": "Die Rechnung",
+    "accountingDocCreditNote": "Die Gutschrift",
+    "advanceGuardTitle": "{missing, plural, =1 {1 Platzierung hat} other {# Platzierungen haben}} keinen veröffentlichten Link",
+    "advanceGuardLeadLive": "Wenn der Auftrag live gesetzt wird, erfährt der Käufer, dass die Kampagne veröffentlicht ist. Diese Platzierungen haben noch keinen veröffentlichten Link:",
+    "advanceGuardLeadCompleted": "Wenn der Auftrag abgeschlossen wird, erfährt der Käufer, dass die Kampagne gelaufen ist. Diese Platzierungen haben noch keinen veröffentlichten Link:",
+    "advanceGuardConfirm": "Ich habe diese Platzierungen geprüft und möchte trotzdem fortfahren",
+    "advanceGuardNote": "Die E-Mail an den Käufer zählt nur tatsächlich veröffentlichte Platzierungen.",
+    "advanceError": "Status nicht geändert",
+    "advanceErrors": {
+      "unconfirmed": "Setzen Sie das Häkchen, um fortzufahren, während Platzierungen noch unveröffentlicht sind.",
+      "moved": "Der Auftrag hat inzwischen den Status gewechselt. Prüfen Sie ihn und versuchen Sie es erneut."
+    },
+    "unknownPlacement": "Unbenannte Platzierung"
   },
   "production": {
     "brief": "Brief",
@@ -1325,7 +1370,28 @@
     "currency": "Währung",
     "subtotal": "Zwischensumme",
     "vat": "MwSt.",
-    "total": "Gesamt"
+    "total": "Gesamt",
+    "number": "Rechnungsnummer",
+    "download": "PDF herunterladen",
+    "documentTitle": "Rechnung {number}",
+    "colDescription": "Beschreibung",
+    "colQty": "Menge",
+    "colUnitPrice": "Einzelpreis",
+    "colAmount": "Betrag",
+    "vatWithPct": "MwSt. ({pct} %)",
+    "vatId": "USt-IdNr.",
+    "contentProduction": "Content-Produktion",
+    "creditedHeading": "Gutgeschrieben",
+    "creditedBody": "Diese Rechnung wurde am {date} vollständig gutgeschrieben ({amount}).",
+    "creditedReason": "Grund: {reason}",
+    "accountingRef": "Buchhaltungsref.",
+    "pageOf": "Seite {page} von {pages}",
+    "listTitle": "Rechnungen",
+    "listLead": "Alle Rechnungen Ihrer Organisation. Öffnen Sie eine, um die Positionen zu sehen, oder laden Sie das PDF herunter.",
+    "emptyTitle": "Noch keine Rechnungen",
+    "emptyHint": "Rechnungen erscheinen hier, sobald eine Kampagne gelaufen ist und abgerechnet wurde.",
+    "emptyCta": "Zu Ihren Kampagnen",
+    "colCustomer": "Kunde"
   },
   "firm": {
     "badge": "Sofortbestellung",
@@ -2017,7 +2083,7 @@
     },
     "fees": {
       "title": "Gebühren und Zahlung",
-      "body": "Die Preisgestaltung folgt der aktuellen Gebührenordnung (siehe /pricing). Rechnungen werden in der Marktwährung des Käufers ausgestellt; die Umsatzsteuer wird nach lokalem Recht ausgewiesen. Zahlungsziel ist standardmäßig 30 Tage netto, sofern nicht anders vereinbart."
+      "body": "Die Preisgestaltung folgt der aktuellen Gebührenordnung (siehe /pricing). Rechnungen werden in der Marktwährung des Käufers ausgestellt; die Umsatzsteuer wird nach lokalem Recht ausgewiesen. Zahlungsziel ist standardmäßig 14 Tage netto, sofern nicht anders vereinbart."
     },
     "liability": {
       "title": "Haftung",
@@ -2121,7 +2187,6 @@
     "anchorSavings": "−{pct}% gegenüber Listenpreis",
     "anchorNote": "Der öffentliche Listenpreis des Verlags für diese Platzierung. Ihr Komplettpreis enthält Inhaltsproduktion, Platzierung, Revisionen und Reporting.",
     "whyThisPrice": "NativeSpin pflegt direkte redaktionelle Beziehungen zu allen Titeln in Ihrem Angebot. Wir verhandeln die Platzierung, beauftragen eine fachkundige Autorin oder einen fachkundigen Autor, koordinieren die redaktionelle Abnahme mit dem Verlag und liefern das Reporting. Sie haben einen verantwortlichen Partner und einen Komplettpreis — keine getrennte Medienrechnung, Autorenrechnung und Agenturpauschale.",
-    "termsPayment": "50 % bei Annahme, 50 % bei Veröffentlichung.",
     "termsCancellation": "Volle Rückerstattung vor Freigabe des Briefings; 50 % Rückerstattung vor dem ersten Entwurf; nach Bestätigung des Slots beim Verlag nicht erstattungsfähig.",
     "termsValidity": "Angebot gilt 14 Tage. Verfügbarkeit beim Verlag wird bei Annahme bestätigt.",
     "bullets": {
@@ -2566,7 +2631,8 @@
     "contentProductionLabel": "Wer schreibt die Inhalte?",
     "content_advertiser": "Der Werbetreibende kann eigene Artikel liefern",
     "content_publisher": "Artikel müssen von Ihrer Abteilung verfasst werden",
-    "content_both": "Beides ist möglich"
+    "content_both": "Beides ist möglich",
+    "uploadUnavailable": "Datei-Upload ist gerade nicht verfügbar. Fügen Sie stattdessen unten einen Link zu Preisliste oder Mediadaten ein."
   },
   "invite": {
     "title": "Treten Sie {org} bei",
@@ -2942,7 +3008,6 @@
     "vat": "MwSt. ({pct}%)",
     "total": "Gesamt",
     "vatStatus": "Preise verstehen sich zzgl. MwSt., sofern oben nicht anders angegeben.",
-    "paymentTerms": "Zahlungsbedingungen: netto 14 Tage ab Rechnungsdatum.",
     "footnote": "Mit \"Preis auf Anfrage\" markierte Positionen kommen zur obigen Summe hinzu und werden separat vor der Buchung bestätigt.",
     "circulation": "Auflage",
     "digitalReach": "Digitale Reichweite/Monat",
@@ -3009,7 +3074,17 @@
     "errRole": "Diese Rolle kennen wir nicht.",
     "errDeactivatedTarget": "Dieses Konto ist deaktiviert. Reaktivieren Sie es zuerst — eine Anmelde-E-Mail, die nicht funktioniert, verwirrt den Empfänger nur.",
     "errEmailFailed": "Die E-Mail konnte nicht gesendet werden. Sonst wurde nichts geändert.",
-    "errGeneric": "Etwas ist schiefgelaufen, es wurde nichts gespeichert. Versuchen Sie es erneut."
+    "errGeneric": "Etwas ist schiefgelaufen, es wurde nichts gespeichert. Versuchen Sie es erneut.",
+    "termsHeading": "Zahlungsbedingungen je Kunde",
+    "termsLead": "Netto-Tage ab Rechnungsdatum. Gilt für neue Angebote und Rechnungen; ausgestellte Rechnungen behalten ihre Bedingungen. Standard sind {days} Tage.",
+    "termsOrgLabel": "Kunde",
+    "termsDaysLabel": "Zahlungsziel (Tage)",
+    "termsSave": "Bedingungen speichern",
+    "termsCustomHeading": "Kunden mit abweichenden Bedingungen",
+    "termsNoneCustom": "Alle Kunden haben die Standardbedingungen.",
+    "termsDaysValue": "{days, plural, one {netto # Tag} other {netto # Tage}}",
+    "okTerms": "Zahlungsbedingungen gespeichert.",
+    "errTerms": "Geben Sie ganze Tage zwischen 1 und 120 an."
   },
   "status": {
     "ACCEPTED": "Angenommen",
@@ -3043,5 +3118,8 @@
   "joinedNotice": {
     "lists": "Willkommen bei {org}. Das sind die Pläne Ihres Teams – öffnen Sie einen, um Titel, Preise und Hinweise zu sehen.",
     "home": "Willkommen bei {org}. Sie gehören jetzt zum Team auf NativeSpin."
+  },
+  "paymentTerms": {
+    "line": "{days, plural, one {Zahlungsbedingungen: netto # Tag ab Rechnungsdatum.} other {Zahlungsbedingungen: netto # Tage ab Rechnungsdatum.}}"
   }
 }

@@ -1,27 +1,10 @@
-import path from "node:path";
-import { Document, Page, View, Text, Link, StyleSheet, Font } from "@react-pdf/renderer";
+import { Document, Page, View, Text, Link, StyleSheet } from "@react-pdf/renderer";
 import { formatMoney, intlLocale } from "@/lib/money";
 import type { QuotePdfData } from "./quote-pdf-data";
 import { qt as t, quoteFormatLabel, quoteRowBlurb, type QuoteMessages } from "./quote-messages";
-
-// react-pdf's built-in Helvetica has no Nordic glyphs (æ/ø/å, etc.) — every
-// quote must render Norwegian text correctly, so we register a real
-// Unicode font instead of leaving that to the default. Self-hosted from
-// public/fonts/ rather than fetched from Google's CDN at render time —
-// gstatic's per-version file hashes rotate and go stale (the original
-// hardcoded v13 URL 404'd in production), so PDF generation must not depend
-// on a live external fetch succeeding.
-const FONTS_DIR = path.join(process.cwd(), "public", "fonts");
-Font.register({
-  family: "Inter",
-  fonts: [
-    { src: path.join(FONTS_DIR, "Inter-Regular.ttf") },
-    {
-      src: path.join(FONTS_DIR, "Inter-Bold.ttf"),
-      fontWeight: 700,
-    },
-  ],
-});
+import { paymentTermsLine } from "@/lib/payment-terms-text";
+// Registers the Inter font family (Nordic glyphs) before any render.
+import "./fonts";
 
 const styles = StyleSheet.create({
   page: { fontFamily: "Inter", fontSize: 9, padding: 40, color: "#1a1a1a" },
@@ -209,7 +192,7 @@ export function QuoteDocument({
 
         <View style={styles.notes}>
           <Text>{t(messages, "vatStatus")}</Text>
-          <Text>{t(messages, "paymentTerms")}</Text>
+          <Text>{paymentTermsLine(locale, data.paymentTermsDays)}</Text>
         </View>
 
         {onRequest.length > 0 ? (
