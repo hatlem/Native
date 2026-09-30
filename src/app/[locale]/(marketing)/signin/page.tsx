@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import { getTranslations } from "next-intl/server";
 import { redirect } from "next/navigation";
 import { auth } from "@/auth";
@@ -10,6 +11,18 @@ import { PasswordSignInForm, MagicLinkForm } from "./signin-forms";
 import { withSafeEmails } from "@/components/safe-email";
 
 export const dynamic = "force-dynamic";
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ locale: string }>;
+}): Promise<Metadata> {
+  const { locale } = await params;
+  const t = await getTranslations({ locale, namespace: "auth" });
+  return {
+    title: t("title"),
+  };
+}
 
 const DEMO_ACCOUNTS: DemoAccount[] = [
   { key: "buyer", label: "Buyer", email: "buyer@nativespin.com", password: "nativespin-buyer" },
@@ -46,7 +59,9 @@ export default async function SignInPage({
         ? t("magicLinkExpired")
         : errorCode === "deactivated"
           ? t("deactivatedSignin")
-          : errorCode
+          : errorCode === "magic_empty"
+            ? t("emailRequired")
+            : errorCode
             ? t("failed")
             : null;
   // The email-change confirmation lands here signed out (the route clears the

@@ -1,7 +1,6 @@
 import { getTranslations } from "next-intl/server";
 import { redirect } from "next/navigation";
 import { planPath } from "@/lib/plan-path";
-import { MarketCode } from "@prisma/client";
 import { auth } from "@/auth";
 import { loadScope, canCommitOnOrg } from "@/lib/scope";
 import { signinPath } from "@/lib/auth-gate";
@@ -37,8 +36,9 @@ import { loadProgrammeForList, recommendCadence } from "@/lib/programme";
 import { estimateListTotals, linePrice } from "@/lib/plan-total";
 import { scheduleOverlapWarnings, type ScheduleOverlapWarning } from "@/lib/programme-warnings";
 import type { BookingUnit } from "@/lib/campaign-schedule";
+import { SUPPORTED_MARKETS } from "@/lib/markets";
 
-const MARKET_CODES = Object.values(MarketCode);
+const MARKET_CODES = SUPPORTED_MARKETS;
 
 // The plan page body, shared by /plan (no active list yet: start/empty states)
 // and /plan/[listId] (the canonical, shareable address of one plan). The list
@@ -329,7 +329,6 @@ export async function PlanView({
   const homeMarket = activeOrg?.marketCode ?? null;
 
   let rec: { picks: Candidate[]; supplementary: SupplementaryTitle[] } | null = null;
-  let recCurrency = "EUR";
   // True when the results were ranked by the brief (drives the heading +
   // reason chips); false = plain budget recommender.
   let briefMatched = false;
@@ -344,7 +343,6 @@ export async function PlanView({
       locale,
     });
     rec = { picks: result.picks, supplementary: result.supplementary };
-    recCurrency = result.currency;
     briefMatched = result.briefMatched;
   }
 
@@ -543,7 +541,6 @@ export async function PlanView({
           recBudgetRaw={recBudgetRaw}
           homeMarket={homeMarket}
           rec={rec}
-          recCurrency={recCurrency}
           briefMatched={briefMatched}
         />
         </>

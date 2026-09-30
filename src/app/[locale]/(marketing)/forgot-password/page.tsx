@@ -1,9 +1,22 @@
+import type { Metadata } from "next";
 import { getTranslations } from "next-intl/server";
 import { Link } from "@/i18n/navigation";
 import { requestPasswordReset } from "@/app/password-actions";
 import { LandingShell } from "@/app/landing-shell";
 
 export const dynamic = "force-dynamic";
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ locale: string }>;
+}): Promise<Metadata> {
+  const { locale } = await params;
+  const t = await getTranslations({ locale, namespace: "auth" });
+  return {
+    title: t("forgotTitle"),
+  };
+}
 
 export default async function ForgotPasswordPage({
   params,
@@ -16,7 +29,12 @@ export default async function ForgotPasswordPage({
   const sp = await searchParams;
   const t = await getTranslations({ locale, namespace: "auth" });
 
-  const rateLimited = sp.error === "rate";
+  const errorMessage =
+    sp.error === "rate"
+      ? t("attemptsRateLimited")
+      : sp.error === "empty"
+        ? t("emailRequired")
+        : null;
 
   return (
     <LandingShell locale={locale} screenLabel="Forgot password">
@@ -27,9 +45,9 @@ export default async function ForgotPasswordPage({
             <p>{t("forgotLead")}</p>
           </div>
 
-          {rateLimited ? (
+          {errorMessage ? (
             <div className="banner-error" role="alert">
-              <span>{t("failed")}</span>
+              <span>{errorMessage}</span>
             </div>
           ) : null}
 

@@ -1,11 +1,10 @@
 import { getTranslations } from "next-intl/server";
-import { MarketCode } from "@prisma/client";
 import { Link } from "@/i18n/navigation";
-import { formatMoney } from "@/lib/money";
 import { addProductToList } from "@/app/list-actions";
 import { summarizeReasons, type CampaignRecommendation } from "@/lib/campaign-recommend";
+import { SUPPORTED_MARKETS } from "@/lib/markets";
 
-const MARKET_CODES = Object.values(MarketCode);
+const MARKET_CODES = SUPPORTED_MARKETS;
 
 type Props = {
   locale: string;
@@ -32,7 +31,6 @@ export async function DiscoverStep({ locale, market, budget, brief, recommendati
 
   const picks = recommendation?.picks ?? [];
   const supplementary = recommendation?.supplementary ?? [];
-  const currency = recommendation?.currency ?? "EUR";
   const briefMatched = recommendation?.briefMatched ?? false;
 
   return (
@@ -103,10 +101,8 @@ export async function DiscoverStep({ locale, market, budget, brief, recommendati
                             <Link href={`/catalog`}>{p.titleName}</Link>
                           </div>
                           <div className="sub muted small">
-                            {tType(p.type)} ·{" "}
-                            {t("fromPrice", {
-                              price: formatMoney(p.unitPrice, currency, locale),
-                            })}
+                            {tType(p.type)}
+                            {p.priceBand ? ` · ${t("priceBand", { band: p.priceBand })}` : ""}
                             {p.reach > 0 ? ` · ${p.reach.toLocaleString(locale)} ${t("reach")}` : ""}
                           </div>
                           {p.reasonText ? (

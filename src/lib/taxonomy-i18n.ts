@@ -55,6 +55,13 @@ const VERTICAL: TaxonomyMap = {
   "culture": { no: "Kultur", sv: "Kultur", da: "Kultur", de: "Kultur", fi: "Kulttuuri" },
   "news": { no: "Nyheter", sv: "Nyheter", da: "Nyheder", de: "Nachrichten", fi: "Uutiset" },
   // Verticals (Title.vertical)
+  "news (national)": { no: "Nyheter (riks)", sv: "Nyheter (riks)", da: "Nyheder (landsdækkende)", de: "Nachrichten (überregional)", fi: "Uutiset (valtakunnallinen)" },
+  "news (national tabloid)": { no: "Nyheter (riks, tabloid)", sv: "Nyheter (kvällspress)", da: "Nyheder (tabloid)", de: "Nachrichten (Boulevard)", fi: "Uutiset (iltapäivälehti)" },
+  "news (national quality)": { no: "Nyheter (riks, kvalitet)", sv: "Nyheter (rikstäckande kvalitet)", da: "Nyheder (landsdækkende kvalitet)", de: "Nachrichten (Qualitätspresse)", fi: "Uutiset (valtakunnallinen laatulehti)" },
+  "news (general)": { no: "Nyheter (generelt)", sv: "Nyheter (allmänt)", da: "Nyheder (generelt)", de: "Nachrichten (allgemein)", fi: "Uutiset (yleiset)" },
+  "affluent lifestyle": { no: "Kjøpesterk livsstil", sv: "Köpstark livsstil", da: "Købestærk livsstil", de: "Premium-Lifestyle", fi: "Ostovoimainen lifestyle" },
+  "celebrity & gossip": { no: "Kjendis og sladder", sv: "Kändisar och skvaller", da: "Kendte og sladder", de: "Promis & Klatsch", fi: "Julkkikset ja juorut" },
+  "outdoor & adventure": { no: "Friluftsliv og eventyr", sv: "Friluftsliv och äventyr", da: "Friluftsliv og eventyr", de: "Outdoor & Abenteuer", fi: "Ulkoilu ja seikkailu" },
   "news (regional)": { no: "Nyheter (regional)", sv: "Nyheter (regional)", da: "Nyheder (regional)", de: "Nachrichten (regional)", fi: "Uutiset (alueellinen)" },
   "news (local)": { no: "Nyheter (lokal)", sv: "Nyheter (lokal)", da: "Nyheder (lokal)", de: "Nachrichten (lokal)", fi: "Uutiset (paikallinen)" },
   "politics & current affairs": { no: "Politikk og samfunn", sv: "Politik och samhälle", da: "Politik og samfund", de: "Politik & Zeitgeschehen", fi: "Politiikka ja yhteiskunta" },
@@ -73,10 +80,6 @@ const VERTICAL: TaxonomyMap = {
   // Every other Title.vertical the catalog shows, so the "Who reads it?"
   // filter, the plan's targeting picker and the title page never fall back
   // to the English research value. taxonomy-i18n.test.ts guards the list.
-  "news (general)": { no: "Nyheter (generelt)", sv: "Nyheter (allmänt)", da: "Nyheder (generelt)", de: "Nachrichten (allgemein)", fi: "Uutiset (yleinen)" },
-  "news (national)": { no: "Nyheter (riksdekkende)", sv: "Nyheter (rikstäckande)", da: "Nyheder (landsdækkende)", de: "Nachrichten (überregional)", fi: "Uutiset (valtakunnallinen)" },
-  "news (national quality)": { no: "Nyheter (riksdekkende kvalitetsavis)", sv: "Nyheter (rikstäckande kvalitetstidning)", da: "Nyheder (landsdækkende kvalitetsavis)", de: "Nachrichten (überregionale Qualitätszeitung)", fi: "Uutiset (valtakunnallinen laatulehti)" },
-  "news (national tabloid)": { no: "Nyheter (riksdekkende tabloid)", sv: "Nyheter (rikstäckande kvällstidning)", da: "Nyheder (landsdækkende tabloid)", de: "Nachrichten (überregionales Boulevardblatt)", fi: "Uutiset (valtakunnallinen iltapäivälehti)" },
   "news (national mid-market)": { no: "Nyheter (riksdekkende, mellomsegment)", sv: "Nyheter (rikstäckande, mellansegment)", da: "Nyheder (landsdækkende, mellemsegment)", de: "Nachrichten (überregional, Mittelsegment)", fi: "Uutiset (valtakunnallinen, keskisegmentti)" },
   "news (higher education)": { no: "Nyheter (høyere utdanning)", sv: "Nyheter (högre utbildning)", da: "Nyheder (videregående uddannelse)", de: "Nachrichten (Hochschule)", fi: "Uutiset (korkeakoulutus)" },
   "community press": { no: "Lokalsamfunnspresse", sv: "Lokalpress", da: "Lokalpresse", de: "Gemeindepresse", fi: "Paikallislehdistö" },
@@ -101,7 +104,6 @@ const VERTICAL: TaxonomyMap = {
   "b2b – defense & police": { no: "B2B – forsvar og politi", sv: "B2B – försvar och polis", da: "B2B – forsvar og politi", de: "B2B – Verteidigung & Polizei", fi: "B2B – puolustus ja poliisi" },
   "b2b – charity & third sector": { no: "B2B – frivillig sektor", sv: "B2B – ideell sektor", da: "B2B – frivillig sektor", de: "B2B – gemeinnütziger Sektor", fi: "B2B – kolmas sektori" },
   "b2b – beauty trade": { no: "B2B – skjønnhetsbransjen", sv: "B2B – skönhetsbranschen", da: "B2B – skønhedsbranchen", de: "B2B – Beautybranche", fi: "B2B – kauneusala" },
-  "affluent lifestyle": { no: "Kjøpesterk livsstil", sv: "Köpstark livsstil", da: "Købestærk livsstil", de: "Gehobener Lifestyle", fi: "Varakas elämäntyyli" },
   "men's lifestyle": { no: "Menn og livsstil", sv: "Livsstil för män", da: "Livsstil til mænd", de: "Männer & Lifestyle", fi: "Miesten lifestyle" },
   "family & parenting": { no: "Familie og foreldre", sv: "Familj och föräldraskap", da: "Familie og forældre", de: "Familie & Eltern", fi: "Perhe ja vanhemmuus" },
   "children & kids": { no: "Barn", sv: "Barn", da: "Børn", de: "Kinder", fi: "Lapset" },
@@ -109,7 +111,6 @@ const VERTICAL: TaxonomyMap = {
   "youth & teens": { no: "Ungdom", sv: "Ungdom", da: "Unge", de: "Jugend", fi: "Nuoret" },
   "seniors 55+": { no: "Seniorer 55+", sv: "Seniorer 55+", da: "Seniorer 55+", de: "Senioren 55+", fi: "Seniorit 55+" },
   "education – student press": { no: "Utdanning – studentpresse", sv: "Utbildning – studentpress", da: "Uddannelse – studenterpresse", de: "Bildung – Studentenpresse", fi: "Koulutus – opiskelijamedia" },
-  "celebrity & gossip": { no: "Kjendis og sladder", sv: "Kändisar och skvaller", da: "Kendte og sladder", de: "Promis & Klatsch", fi: "Julkkikset ja juorut" },
   "real-life weeklies": { no: "Ukeblader (virkelige historier)", sv: "Veckotidningar (verkliga öden)", da: "Ugeblade (virkelige historier)", de: "Wochenzeitschriften (wahre Geschichten)", fi: "Viikkolehdet (tositarinat)" },
   "general consumer magazine": { no: "Allment forbrukermagasin", sv: "Allmänt konsumentmagasin", da: "Almindeligt forbrugermagasin", de: "Publikumszeitschrift", fi: "Yleinen kuluttajalehti" },
   "membership/customer magazine": { no: "Medlems- og kundemagasin", sv: "Medlems- och kundtidning", da: "Medlems- og kundeblad", de: "Mitglieder- & Kundenmagazin", fi: "Jäsen- ja asiakaslehti" },
@@ -129,7 +130,6 @@ const VERTICAL: TaxonomyMap = {
   "craft & diy": { no: "Håndarbeid og gjør det selv", sv: "Hantverk och gör det själv", da: "Håndarbejde og gør det selv", de: "Handarbeit & Heimwerken", fi: "Käsityöt ja tee se itse" },
   "hobby & leisure": { no: "Hobby og fritid", sv: "Hobby och fritid", da: "Hobby og fritid", de: "Hobby & Freizeit", fi: "Harrastukset ja vapaa-aika" },
   "hunting & fishing": { no: "Jakt og fiske", sv: "Jakt och fiske", da: "Jagt og fiskeri", de: "Jagd & Angeln", fi: "Metsästys ja kalastus" },
-  "outdoor & adventure": { no: "Friluftsliv og eventyr", sv: "Friluftsliv och äventyr", da: "Friluftsliv og eventyr", de: "Outdoor & Abenteuer", fi: "Ulkoilu ja seikkailu" },
   "boating & sailing": { no: "Båt og seiling", sv: "Båt och segling", da: "Både og sejlads", de: "Boote & Segeln", fi: "Veneily ja purjehdus" },
   "camping & caravan": { no: "Camping og campingvogn", sv: "Camping och husvagn", da: "Camping og campingvogn", de: "Camping & Caravaning", fi: "Retkeily ja matkailuvaunut" },
   "motorcycle": { no: "Motorsykkel", sv: "Motorcykel", da: "Motorcykel", de: "Motorrad", fi: "Moottoripyörät" },

@@ -13,6 +13,7 @@ import {
   deleteFavoriteList as deleteFavoriteListLib,
   setFavoriteListShared as setFavoriteListSharedLib,
 } from "@/lib/favorites";
+import { listNames } from "@/lib/list-names";
 
 function str(formData: FormData, key: string): string {
   const v = formData.get(key);
@@ -98,7 +99,7 @@ export async function createFavoriteList(formData: FormData) {
   // Share scope is the user's OWN team (home org), never the volatile selected
   // client — otherwise an agency user's list would land under the client org.
   const orgId = scope.workspace?.homeOrgId ?? null;
-  const list = await createFavoriteListLib(scope.userId!, orgId, name || "Untitled list");
+  const list = await createFavoriteListLib(scope.userId!, orgId, name || (await listNames(locale)).untitled);
   if (titleId) {
     await addFavoriteToListLib(scope.userId!, titleId, list.id).catch((e) =>
       console.error("favorites.create_list_add_failed", e),

@@ -81,7 +81,14 @@ export type ActiveList = NonNullable<Awaited<ReturnType<typeof loadList>>>;
  * creating its own and orphaning the loser (and the item just added to it).
  * The caller persists the returned id into the cookie.
  */
-export async function ensureActiveListId(orgId: string, activeId: string | null, createdById?: string): Promise<string> {
+export async function ensureActiveListId(
+  orgId: string,
+  activeId: string | null,
+  createdById?: string,
+  // Name for a list this call has to create — callers pass the localized
+  // default (see @/lib/list-names); the schema default is the last resort.
+  name?: string,
+): Promise<string> {
   if (activeId) {
     const existing = await prisma.savedList.findUnique({
       where: { id: activeId },
@@ -100,7 +107,7 @@ export async function ensureActiveListId(orgId: string, activeId: string | null,
     });
     if (adopted) return adopted.id;
     const created = await tx.savedList.create({
-      data: { organizationId: orgId, createdById: createdById ?? null },
+      data: { organizationId: orgId, createdById: createdById ?? null, ...(name ? { name } : {}) },
       select: { id: true },
     });
     return created.id;
@@ -108,8 +115,13 @@ export async function ensureActiveListId(orgId: string, activeId: string | null,
 }
 
 /** As `ensureActiveListId` but returns the full list (with items) for render/submit. */
-export async function ensureActiveList(orgId: string, activeId: string | null, createdById?: string) {
-  const id = await ensureActiveListId(orgId, activeId, createdById);
+export async function ensureActiveList(
+  orgId: string,
+  activeId: string | null,
+  createdById?: string,
+  name?: string,
+) {
+  const id = await ensureActiveListId(orgId, activeId, createdById, name);
   return (await loadList(id))!;
 }
 
@@ -161,6 +173,7 @@ export async function migrateLegacyBasket(
   orgId: string,
   basket: Array<{ productId: string; quantity: number; withContent?: boolean }>,
   createdById: string | null,
+  name = "Imported list",
 ) {
   if (basket.length === 0) return null;
   const valid = await prisma.product.findMany({
@@ -173,7 +186,7 @@ export async function migrateLegacyBasket(
   return prisma.savedList.create({
     data: {
       organizationId: orgId,
-      name: "Imported list",
+      name,
       createdById,
       items: {
         create: rows.map((b, idx) => ({

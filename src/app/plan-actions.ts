@@ -17,6 +17,7 @@ import {
   setListItemNote,
   setListItemAlternative,
 } from "@/app/list-actions";
+import { listNames } from "@/lib/list-names";
 
 function str(formData: FormData, key: string): string {
   const v = formData.get(key);
@@ -190,7 +191,7 @@ export async function duplicatePlan(formData: FormData) {
   const created = await prisma.savedList.create({
     data: {
       organizationId: order.organizationId,
-      name: "Reordered campaign",
+      name: (await listNames(locale)).reordered,
       createdById: scope.userId ?? null,
       items: {
         create: lines.map(([productId, l], idx) => ({

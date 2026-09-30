@@ -8,8 +8,9 @@ import { prisma } from "@/lib/prisma";
 import { getWorkspace } from "@/lib/workspace";
 import { switchActiveOrg } from "@/lib/active-org";
 import { recordAudit } from "@/lib/audit";
+import { SUPPORTED_MARKETS } from "@/lib/markets";
 
-const MARKET_CODES = Object.values(MarketCode) as string[];
+const MARKET_CODES: readonly string[] = SUPPORTED_MARKETS;
 
 function field(formData: FormData, key: string): string {
   const v = formData.get(key);

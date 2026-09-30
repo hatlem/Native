@@ -283,12 +283,10 @@
     "subtitle": "Get a suggested title mix for your market and budget.",
     "market": "Market",
     "budget": "Budget",
-    "category": "Category",
-    "anyCategory": "Any category",
+    "category": "Audience",
+    "anyCategory": "Any audience",
     "suggest": "Suggest a mix",
     "reach": "Reach",
-    "cost": "Cost",
-    "remaining": "Budget left",
     "none": "No mix fits that budget — try a higher budget or another market.",
     "addAll": "Add all to plan",
     "addingAll": "Adding…",
@@ -298,10 +296,12 @@
     "hintTitle": "Tell us your market and budget",
     "marketPlaceholder": "Choose a market",
     "reachSub": "Combined monthly reach",
-    "ofBudget": "of {budget} budget",
-    "remainingSub": "Headroom for more lines",
     "mixEyebrow": "Suggested mix",
-    "mixHeading": "Titles that fit your brief"
+    "mixHeading": "Titles that fit your brief",
+    "titles": "Titles",
+    "fitsBudget": "All within your {budget} budget",
+    "bandNote": "Prices are shown as ranges. The desk confirms exact prices in your quote.",
+    "reachUnknown": "not published"
   },
   "home": {
     "title": "Buy native content in premium newspapers and magazines",
@@ -883,12 +883,12 @@
     "requestingAs": "Requesting as",
     "loginRequired": "Sign in or create an account to request a quote:",
     "selectClient": "Select a client to act for in the",
-    "fromPrice": "from {price}",
     "targetAudienceLabel": "Audience segments (optional)",
     "targetGeoLabel": "Geographic focus (optional)",
     "targetGeoPlaceholder": "e.g. NO, SE — or Vestlandet, Oslo",
     "targetContextLabel": "Editorial context (optional)",
-    "targetContextPlaceholder": "e.g. business, lifestyle, sport"
+    "targetContextPlaceholder": "e.g. business, lifestyle, sport",
+    "priceBand": "≈ {band}"
   },
   "requests": {
     "title": "Request",
@@ -1283,7 +1283,7 @@
     "signupTitle": "Create account",
     "signupSubtitle": "Five fields. We ask for the rest when you need it.",
     "signupHeadline": "Free account. Every native title we cover.",
-    "signupLead": "3,000+ titles across 9 markets, transparent pricing, firm quote in 24 hours. You commit to nothing until you send a brief.",
+    "signupLead": "{count}+ titles across 9 markets, transparent pricing, firm quote in 24 hours. You commit to nothing until you send a brief.",
     "bulletCatalog": "Native lives where readers spend time: 3–5× dwell time vs display, borrowed credibility from the title, indexed and permanent in search.",
     "bulletDesk": "Whole catalog open, transparent pricing. No calling around publishers, no PDF rate cards, no four-week negotiations.",
     "bulletReports": "One brief. The desk negotiates, writes, QAs, publishes. You approve.",
@@ -1305,7 +1305,7 @@
     "pwHint": "At least 8 characters.",
     "noAccount": "No account?",
     "haveAccount": "Already have an account?",
-    "regFailed": "Please fill in all required fields (password min. 8 characters).",
+    "regFailed": "Fill in your company name and work email.",
     "regRateLimited": "Too many signup attempts — wait a minute and try again.",
     "regExists": "An account with that email already exists.",
     "inviteInvalidTitle": "This invite is no longer valid",
@@ -1346,15 +1346,22 @@
     "backToSignin": "Back to sign in",
     "signupSubtitleShort": "Three fields. We'll ask the rest once you're in.",
     "setPasswordSummary": "Set a password (optional)",
-    "pwHintOptional": "At least 8 characters. Leave blank to sign in via magic-link only.",
-    "magicLinkSignupNote": "Skip the password and we'll send you a magic-link to sign in.",
+    "pwHintOptional": "At least 8 characters. Leave it blank to sign in with an emailed link instead.",
+    "magicLinkSignupNote": "Skip the password and we'll email you a sign-in link.",
     "regPasswordTooShort": "Password must be at least 8 characters.",
     "deactivatedSignin": "This account has been deactivated. Contact the desk if you need it switched back on.",
     "emailChangedOk": "Email address updated — sign in with your new address.",
     "deactivatedTitle": "This account is deactivated",
     "deactivatedBody": "Your account has been switched off, so there's nothing here to use. Sign out below, and contact the desk if you think this is a mistake.",
     "writerClaimSubmit": "Create writer account",
-    "writerClaimSubmitting": "Creating…"
+    "writerClaimSubmitting": "Creating…",
+    "regEmailBusiness": "Use your work email. Personal addresses (Gmail, Yahoo and the like) and disposable inboxes aren't accepted.",
+    "regEmailInvalid": "That email address doesn't look right. Check it for typos.",
+    "regEmailNoMailServer": "We couldn't find a mail server for that domain, so mail to it would never arrive. Check the address for typos.",
+    "emailRequired": "Enter your email address first.",
+    "attemptsRateLimited": "Too many attempts. Wait a minute and try again.",
+    "checkSignupTitle": "Confirm your email",
+    "checkSignupLead": "We've sent a link to the address you gave. Open it to confirm the address and sign in; it expires in 15 minutes. If that address already had an account, the email explains how to get back in."
   },
   "order": {
     "title": "Order",
@@ -1600,7 +1607,7 @@
     "catalogStatusNote": "Prices change on the rates page. Catalog status (bookable, and whether a product can be ordered instantly) is managed by the NativeSpin desk."
   },
   "formats": {
-    "metaTitle": "Native formats — NativeSpin",
+    "metaTitle": "Native formats",
     "eyebrow": "Formats",
     "title": "Four ways to run native — pick the one that fits.",
     "lead": "Every title in our catalog supports one or more of these four formats. The difference is whose voice you're paying for and how prominent the brand is.",
@@ -1850,7 +1857,7 @@
   },
   "about": {
     "eyebrow": "About",
-    "metaTitle": "About NativeSpin",
+    "metaTitle": "About us",
     "title": "Native is operationally painful. We fix that.",
     "lead": "NativeSpin is a marketplace for buying native content and native advertising across newspapers and magazines — including the many that don't sell programmatically.",
     "missionTitle": "Mission",
@@ -2042,7 +2049,7 @@
     "faqTitle": "Frequently asked questions"
   },
   "contact": {
-    "metaTitle": "Contact NativeSpin",
+    "metaTitle": "Contact",
     "eyebrow": "Contact",
     "title": "Get in touch",
     "lead": "Pick the right channel below, or use the form. We answer every message within a working day.",
@@ -2081,7 +2088,16 @@
     "messagePlaceholder": "What are you trying to do, and when?",
     "submit": "Send message",
     "altPrefix": "Curious who's behind NativeSpin?",
-    "altLink": "Read about us →"
+    "altLink": "Read about us →",
+    "sending": "Sending…",
+    "sentTitle": "Message sent",
+    "sentBody": "Thanks. It's with the team now, and we'll reply by email within a working day.",
+    "errRequired": "Required.",
+    "errInvalid": "Choose one of the options.",
+    "errEmail": "That email address doesn't look right.",
+    "errTooLong": "That's longer than we can take. Please shorten it.",
+    "errRate": "You've sent several messages in a short time. Wait a while and try again.",
+    "errSend": "Your message didn't go through on our side. Try again in a minute, or email hello@nativespin.com directly."
   },
   "security": {
     "metaTitle": "Security",
@@ -2367,7 +2383,7 @@
     }
   },
   "apiDocs": {
-    "metaTitle": "NativeSpin API",
+    "metaTitle": "API",
     "eyebrow": "Developers",
     "title": "NativeSpin public catalog API",
     "lead": "A read API over the NativeSpin title catalog — designed for agency planning tools (Atlas-style) and adtech partners that need normalised supply data for editorial native across our 9 markets — Norway, Sweden, Denmark, Finland, Germany, Austria, Switzerland, the UK and Ireland.",
@@ -2846,7 +2862,7 @@
     "currentPasswordLabel": "Current password",
     "newPasswordLabel": "New password",
     "pwHint": "At least 8 characters.",
-    "passwordlessNote": "You currently sign in via magic-link only. Set a password if you want both options.",
+    "passwordlessNote": "You currently sign in with emailed links only. Set a password if you want both options.",
     "savePasswordSet": "Set password",
     "savePasswordChange": "Change password",
     "saveMember": "Save",
@@ -2926,7 +2942,8 @@
     "errDelegation": "That delegation end date isn't a valid date.",
     "errDelegationPast": "The delegation end date has to be in the future.",
     "canCommitAdminNote": "Administrators can always commit.",
-    "statusRevoked": "Removed"
+    "statusRevoked": "Removed",
+    "errEmailDomain": "We couldn't find a mail server for that domain. Check the address for typos."
   },
   "invite": {
     "title": "Join {org}",
@@ -3170,7 +3187,6 @@
     "resultsAlsoConsider": "Also worth considering",
     "resultsEmpty": "No matching titles yet — try a broader brief or a different market.",
     "whyFits": "Why this fits:",
-    "fromPrice": "from {price}",
     "reach": "reach/mo",
     "requestPrice": "Request price",
     "addToShortlist": "Add to shortlist",
@@ -3225,7 +3241,8 @@
     "kycAddress2": "Address line 2",
     "kycPostal": "Postal code",
     "kycCity": "City",
-    "kycSave": "Save details"
+    "kycSave": "Save details",
+    "priceBand": "≈ {band}"
   },
   "buyerHome": {
     "headingNeeds": "{count, plural, =1 {1 thing needs you} other {# things need you}}",
@@ -3614,5 +3631,10 @@
         "portfolioUrl": "Enter a full link starting with https://"
       }
     }
+  },
+  "listNames": {
+    "untitled": "New plan",
+    "imported": "Imported plan",
+    "reordered": "Reordered campaign"
   }
 }

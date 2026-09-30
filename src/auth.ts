@@ -1,15 +1,61 @@
-import NextAuth from "next-auth";
+import NextAuth, { CredentialsSignin } from "next-auth";
 import Credentials from "next-auth/providers/credentials";
+import type { JWT } from "next-auth/jwt";
 import { headers } from "next/headers";
 import bcrypt from "bcryptjs";
-import type { UserRole } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
 import { assertSecret } from "@/lib/security";
 import { authLimiter } from "@/lib/rate-limit";
 import "@/lib/mail";
 import { consumeMagicLinkToken } from "@/lib/auth-tokens";
+import {
+  reconcileSessionToken,
+  type SessionUserState,
+} from "@/lib/session-version";
+import { SIGNIN_RATE_LIMITED } from "@/lib/auth-errors";
 
 assertSecret();
+
+// Thrown (not returned as null) by the credentials provider when the sign-in
+// limiter trips, so the `authenticate()` server action can tell "slow down"
+// apart from "wrong password". Auth.js re-throws AuthError subclasses from
+// authorize() untouched, and `code` survives to the caller.
+class SignInRateLimited extends CredentialsSignin {
+  code = SIGNIN_RATE_LIMITED;
+}
+
+// Current revocation state for a session's user: one primary-key read per
+// session check. A lookup failure keeps the token as-is (logged): the page
+// behind it needs the same database, so failing closed would only turn a DB
+// blip into a mass sign-out without protecting anything.
+async function reconcileWithDb(token: JWT): Promise<JWT | null> {
+  if (!token.uid) return null;
+  let state: SessionUserState | null;
+  try {
+    const row = await prisma.user.findUnique({
+      where: { id: token.uid },
+      select: {
+        sessionVersion: true,
+        deactivatedAt: true,
+        role: true,
+        organization: { select: { id: true, type: true } },
+      },
+    });
+    state = row
+      ? {
+          sessionVersion: row.sessionVersion,
+          deactivatedAt: row.deactivatedAt,
+          role: row.role,
+          orgId: row.organization?.id ?? null,
+          orgType: row.organization?.type ?? null,
+        }
+      : null;
+  } catch (err) {
+    console.error("auth.session_reconcile_failed", { uid: token.uid, err });
+    return token;
+  }
+  return reconcileSessionToken(token, state);
+}
 
 async function authClientIp(): Promise<string> {
   // headers() throws outside a request scope (e.g. in tests). Best-effort.
@@ -47,15 +93,17 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         const password = String(credentials?.password ?? "");
         if (!email || !password) return null;
 
-        // Rate-limit at the provider so direct POSTs to
-        // /api/auth/callback/credentials can't bypass the limiter that
-        // sits in the `authenticate()` server action.
+        // The ONE sign-in rate limit. It lives here rather than in the
+        // `authenticate()` server action so direct POSTs to
+        // /api/auth/callback/credentials can't bypass it, and only here so
+        // one attempt costs one token (a second check in the action halved
+        // the budget and surfaced this one's trip as "wrong password").
         const ip = await authClientIp();
         const [ipCheck, emailCheck] = await Promise.all([
           authLimiter.check(`signin:ip:${ip}`),
           authLimiter.check(`signin:email:${email}`),
         ]);
-        if (!ipCheck.ok || !emailCheck.ok) return null;
+        if (!ipCheck.ok || !emailCheck.ok) throw new SignInRateLimited();
 
         const user = await prisma.user.findUnique({
           where: { email },
@@ -89,6 +137,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
           role: user.role,
           orgId: user.organization?.id ?? null,
           orgType: user.organization?.type ?? null,
+          sessionVersion: user.sessionVersion,
         };
       },
     }),
@@ -119,32 +168,31 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
           role: user.role,
           orgId: user.orgId,
           orgType: user.orgType,
+          sessionVersion: user.sessionVersion,
         };
       },
     }),
   ],
   callbacks: {
-    jwt({ token, user }) {
+    async jwt({ token, user }) {
       if (user) {
-        const u = user as {
-          id: string;
-          role?: UserRole;
-          orgId?: string | null;
-          orgType?: string | null;
-        };
-        token.uid = u.id;
-        token.role = u.role;
-        token.orgId = u.orgId ?? null;
-        token.orgType = u.orgType ?? null;
+        // Sign-in: the provider just read the row, so its claims are fresh.
+        token.uid = user.id;
+        token.role = user.role;
+        token.orgId = user.orgId ?? null;
+        token.orgType = user.orgType ?? null;
+        token.sv = user.sessionVersion ?? 0;
+        return token;
       }
-      return token;
+      // Every later read: end revoked sessions, refresh role/org claims.
+      return reconcileWithDb(token);
     },
     session({ session, token }) {
       if (session.user) {
-        session.user.id = (token.uid as string) ?? "";
-        session.user.role = (token.role as UserRole) ?? "BUYER";
-        session.user.orgId = (token.orgId as string | null) ?? null;
-        session.user.orgType = (token.orgType as string | null) ?? null;
+        session.user.id = token.uid ?? "";
+        session.user.role = token.role ?? "BUYER";
+        session.user.orgId = token.orgId ?? null;
+        session.user.orgType = token.orgType ?? null;
       }
       return session;
     },

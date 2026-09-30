@@ -27,6 +27,7 @@ import { isAudienceSegment } from "@/lib/targeting/segments";
 import { rfqLimiter } from "@/lib/rate-limit";
 import { loadScope, canCommitOnOrg } from "@/lib/scope";
 import { clientIp } from "@/lib/client-ip";
+import { listNames } from "@/lib/list-names";
 
 function str(formData: FormData, key: string): string {
   const v = formData.get(key);
@@ -78,7 +79,7 @@ export async function submitRequest(formData: FormData) {
   } else {
     if (!ws.activeOrgId) redirect(ws.isAgency ? `/${locale}/agency` : `/${locale}/signin`);
     orgId = ws.activeOrgId;
-    listId = await ensureActiveListId(orgId, await readActiveListId());
+    listId = await ensureActiveListId(orgId, await readActiveListId(), undefined, (await listNames(locale)).untitled);
   }
   const back = (error?: string) => planPath(locale, listId, error ? { error } : undefined);
 

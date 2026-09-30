@@ -1,6 +1,7 @@
 import { MarketCode, ProductType } from "@prisma/client";
+import { SUPPORTED_MARKETS } from "@/lib/markets";
 
-export const MARKET_CODES = Object.values(MarketCode);
+export const MARKET_CODES = SUPPORTED_MARKETS;
 export const PRODUCT_TYPES = Object.values(ProductType);
 // Catalog format filter highlights the buyable formats — research-only enum
 // members (CONTEXTUAL, OTHER) intentionally don't show in the filter.

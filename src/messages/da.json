@@ -145,12 +145,10 @@
     "subtitle": "Få et forslag til titelmiks for dit marked og budget.",
     "market": "Marked",
     "budget": "Budget",
-    "category": "Kategori",
-    "anyCategory": "Alle kategorier",
+    "category": "Målgruppe",
+    "anyCategory": "Alle målgrupper",
     "suggest": "Foreslå en miks",
     "reach": "Rækkevidde",
-    "cost": "Omkostning",
-    "remaining": "Budget tilbage",
     "none": "Ingen miks passer til det budget — prøv et højere budget eller et andet marked.",
     "addAll": "Føj alle til planen",
     "addingAll": "Tilføjer…",
@@ -160,10 +158,12 @@
     "hintTitle": "Fortæl os marked og budget",
     "marketPlaceholder": "Vælg et marked",
     "reachSub": "Samlet månedlig rækkevidde",
-    "ofBudget": "af {budget} budget",
-    "remainingSub": "Plads til flere linjer",
     "mixEyebrow": "Foreslået miks",
-    "mixHeading": "Titler der passer til briefen"
+    "mixHeading": "Titler der passer til briefen",
+    "titles": "Titler",
+    "fitsBudget": "Alt inden for budgettet på {budget}",
+    "bandNote": "Priserne vises som intervaller. Desken bekræfter de præcise priser i dit tilbud.",
+    "reachUnknown": "ikke oplyst"
   },
   "home": {
     "title": "Køb native-indhold i premium aviser og magasiner",
@@ -745,12 +745,12 @@
     "requestingAs": "Bestiller som",
     "loginRequired": "Log ind eller opret en konto for at anmode om tilbud:",
     "selectClient": "Vælg en kunde at handle for i",
-    "fromPrice": "fra {price}",
     "targetAudienceLabel": "Målgruppesegmenter (valgfrit)",
     "targetGeoLabel": "Geografisk fokus (valgfrit)",
     "targetGeoPlaceholder": "f.eks. NO, SE — eller Midtjylland, København",
     "targetContextLabel": "Redaktionel kontekst (valgfrit)",
-    "targetContextPlaceholder": "f.eks. erhverv, livsstil, sport"
+    "targetContextPlaceholder": "f.eks. erhverv, livsstil, sport",
+    "priceBand": "≈ {band}"
   },
   "requests": {
     "title": "Anmodning",
@@ -1145,7 +1145,7 @@
     "signupTitle": "Opret konto",
     "signupSubtitle": "Fem felter. Vi spørger om resten, når du har brug for det.",
     "signupHeadline": "Gratis konto. Hver native-titel vi dækker.",
-    "signupLead": "3.000+ titler på tværs af 9 markeder, transparent pris, fast tilbud på 24 timer. Du forpligter dig intet, før briefen er sendt.",
+    "signupLead": "{count}+ titler på tværs af 9 markeder, transparent pris, fast tilbud på 24 timer. Du forpligter dig intet, før briefen er sendt.",
     "bulletCatalog": "Native lever der, hvor læsere bruger tid: 3–5× opholdstid vs display, lånt troværdighed fra titlen, indekseret og varig i søgning.",
     "bulletDesk": "Hele kataloget åbent, transparent pris. Ingen telefonrunder, ingen PDF-prislister, ingen fire ugers forhandling.",
     "bulletReports": "Brief én gang. Desken forhandler, skriver, kvalitetssikrer, udgiver. Du godkender.",
@@ -1167,7 +1167,7 @@
     "pwHint": "Mindst 8 tegn.",
     "noAccount": "Ingen konto?",
     "haveAccount": "Har du allerede en konto?",
-    "regFailed": "Udfyld alle påkrævede felter (adgangskode min. 8 tegn).",
+    "regFailed": "Udfyld firmanavn og arbejdsmail.",
     "regRateLimited": "For mange registreringsforsøg — vent et minut og prøv igen.",
     "regEmailBusiness": "Brug din arbejds-e-mail — personlig e-mail (gmail, yahoo m.fl.) og midlertidige e-mailtjenester er ikke tilladt.",
     "regExists": "Der findes allerede en konto med den e-mail.",
@@ -1209,15 +1209,21 @@
     "backToSignin": "Tilbage til login",
     "signupSubtitleShort": "Tre felter. Vi spørger om resten når du er inde.",
     "setPasswordSummary": "Sæt et kodeord (valgfrit)",
-    "pwHintOptional": "Mindst 8 tegn. Lad stå tomt for at logge ind med magic-link.",
-    "magicLinkSignupNote": "Spring kodeordet over, så sender vi en magic-link til login.",
+    "pwHintOptional": "Mindst 8 tegn. Lad feltet stå tomt, så logger du ind med et link på mail i stedet.",
+    "magicLinkSignupNote": "Spring adgangskoden over, så sender vi dig et login-link på mail.",
     "regPasswordTooShort": "Kodeordet skal være mindst 8 tegn.",
     "deactivatedSignin": "Denne konto er deaktiveret. Kontakt desken, hvis den skal tændes igen.",
     "emailChangedOk": "E-mailadressen er opdateret — log ind med din nye adresse.",
     "deactivatedTitle": "Denne konto er deaktiveret",
     "deactivatedBody": "Din konto er slukket, så der er intet at bruge her. Log ud nedenfor, og kontakt desken, hvis du tror, det er en fejl.",
     "writerClaimSubmit": "Opret skribentkonto",
-    "writerClaimSubmitting": "Opretter…"
+    "writerClaimSubmitting": "Opretter…",
+    "regEmailInvalid": "Den e-mailadresse ser ikke rigtig ud. Tjek, om den er stavet rigtigt.",
+    "regEmailNoMailServer": "Vi kan ikke finde en mailserver for det domæne, så mails dertil vil aldrig nå frem. Tjek, om adressen er stavet rigtigt.",
+    "emailRequired": "Skriv din e-mailadresse først.",
+    "attemptsRateLimited": "For mange forsøg. Vent et minut og prøv igen.",
+    "checkSignupTitle": "Bekræft din e-mailadresse",
+    "checkSignupLead": "Vi har sendt et link til den adresse, du opgav. Åbn det for at bekræfte adressen og logge ind; det udløber om 15 minutter. Havde adressen allerede en konto, forklarer mailen, hvordan du kommer ind igen."
   },
   "order": {
     "title": "Ordre",
@@ -1463,7 +1469,7 @@
     "catalogStatusNote": "Priser ændrer du på prissiden. Katalogstatus (om et produkt kan bookes, og om det kan bestilles med det samme) håndteres af NativeSpin-desken."
   },
   "formats": {
-    "metaTitle": "Native-formater — NativeSpin",
+    "metaTitle": "Native-formater",
     "eyebrow": "Formater",
     "title": "Fire måder at køre native — vælg den der passer.",
     "lead": "Hver titel i vores katalog understøtter ét eller flere af disse fire formater. Forskellen er hvis stemme du betaler for og hvor synlig brandet er.",
@@ -1851,7 +1857,7 @@
   },
   "about": {
     "eyebrow": "Om os",
-    "metaTitle": "Om NativeSpin",
+    "metaTitle": "Om os",
     "title": "Native er operationelt hårdt. Det fikser vi.",
     "lead": "NativeSpin er en markedsplads til at købe native indhold og native annoncering i aviser og magasiner — også de mange der ikke sælger programmatisk.",
     "missionTitle": "Mission",
@@ -2044,7 +2050,7 @@
     "faqTitle": "Ofte stillede spørgsmål"
   },
   "contact": {
-    "metaTitle": "Kontakt NativeSpin",
+    "metaTitle": "Kontakt",
     "eyebrow": "Kontakt",
     "title": "Tag fat i os",
     "lead": "Vælg den rette kanal nedenfor, eller brug formularen. Vi svarer på alle henvendelser inden for én arbejdsdag.",
@@ -2083,7 +2089,16 @@
     "messagePlaceholder": "Hvad prøver I at opnå, og hvornår?",
     "submit": "Send besked",
     "altPrefix": "Nysgerrig efter, hvem der står bag NativeSpin?",
-    "altLink": "Læs om os →"
+    "altLink": "Læs om os →",
+    "sending": "Sender …",
+    "sentTitle": "Beskeden er sendt",
+    "sentBody": "Tak. Beskeden ligger hos teamet nu, og vi svarer på mail inden for én arbejdsdag.",
+    "errRequired": "Skal udfyldes.",
+    "errInvalid": "Vælg en af mulighederne.",
+    "errEmail": "Den e-mailadresse ser ikke rigtig ud.",
+    "errTooLong": "Det er længere, end vi kan modtage. Gør det lidt kortere.",
+    "errRate": "Du har sendt flere beskeder på kort tid. Vent lidt, og prøv igen.",
+    "errSend": "Beskeden nåede ikke frem til os. Prøv igen om et minut, eller skriv direkte til hello@nativespin.com."
   },
   "security": {
     "metaTitle": "Sikkerhed",
@@ -2369,8 +2384,8 @@
     }
   },
   "apiDocs": {
-    "metaTitle": "NativeSpin API",
-    "eyebrow": "Developers",
+    "metaTitle": "API",
+    "eyebrow": "Udviklere",
     "title": "NativeSpins offentlige katalog-API",
     "lead": "Et læse-API over NativeSpins titelkatalog — designet til bureau-værktøjer (Atlas-stil) og adtech-partnere, der har brug for normaliserede udbudsdata for redaktionelt native på tværs af vores 9 markeder — Norge, Sverige, Danmark, Finland, Tyskland, Østrig, Schweiz, Storbritannien og Irland.",
     "authTitle": "Autentificering",
@@ -2382,11 +2397,11 @@
     "queryParams": "Query-parametre",
     "detailBody": "Detaljer pr. titel: udgiver, marked (med momssats og annoncemærkning) og hvert aktivt produkt med indholdskrav, leveringstid og prisinterval.",
     "detailIncludes": "Priser vises som intervaller (fx »25–40k NOK«), aldrig som præcise beløb: den faste pris kommer i et tilbud. Indholdskravene omfatter ordgrænser, mindste antal billeder og annoncemærkningen.",
-    "paginationTitle": "Pagination",
+    "paginationTitle": "Paginering",
     "paginationBody": "Markørbaseret. Send page.nextCursor tilbage som cursor, indtil den er null: først da er synkroniseringen færdig. Sorteringen er stabil (navn + id), så en fuld synk aldrig mister rækker, selv hvis titler aktiveres eller deaktiveres undervejs.",
     "limitsTitle": "Hastighedsgrænser",
     "limitsBody": "Per-nøgle-bursts udjævnes gennem samme bucket som RFQ-flowet bruger. Et 429-svar inkluderer en omtrentlig retry-after i meddelelsesteksten. Vedholdende høj-gennemstrømnings-partnere får højere grænser — spørg, når du beder om en nøgle.",
-    "errorsTitle": "Errors",
+    "errorsTitle": "Fejl",
     "errorsBody": "Fejl returneres som JSON med en stabil kode og en læsbar besked. En ugyldig parameter giver 400 BAD_PARAM, hvor error.details nævner hver enkelt; intet ignoreres i stilhed. Alle koder står i OpenAPI-specifikationen på /api/openapi.json.",
     "ctaTitle": "Brug for en nøgle?",
     "ctaBody": "Vi auto-tildeler ikke API'et — partnerintegrationer har kommercielle implikationer, som vi gerne vil tale igennem først. Ræk ud, så får du en fungerende nøgle inden for en arbejdsdag.",
@@ -2771,7 +2786,7 @@
     "currentPasswordLabel": "Nuværende kodeord",
     "newPasswordLabel": "Nyt kodeord",
     "pwHint": "Mindst 8 tegn.",
-    "passwordlessNote": "Du logger nu kun ind med magic-link. Sæt et kodeord hvis du vil have begge muligheder.",
+    "passwordlessNote": "Du logger nu kun ind med links på mail. Opret en adgangskode, hvis du vil have begge muligheder.",
     "savePasswordSet": "Sæt kodeord",
     "savePasswordChange": "Skift kodeord",
     "saveMember": "Gem",
@@ -2851,7 +2866,8 @@
     "errDelegation": "Slutdatoen for delegeringen er ikke en gyldig dato.",
     "errDelegationPast": "Slutdatoen for delegeringen skal ligge i fremtiden.",
     "canCommitAdminNote": "Administratorer har altid bestillingsret.",
-    "statusRevoked": "Fjernet"
+    "statusRevoked": "Fjernet",
+    "errEmailDomain": "Vi kan ikke finde en mailserver for det domæne. Tjek, om adressen er stavet rigtigt."
   },
   "rateCard": {
     "pageTitle": "Rate card-anmodning",
@@ -3172,7 +3188,6 @@
     "resultsAlsoConsider": "Også værd at overveje",
     "resultsEmpty": "Ingen match endnu – prøv et bredere brief eller et andet marked.",
     "whyFits": "Derfor passer den:",
-    "fromPrice": "fra {price}",
     "reach": "rækkevidde/md.",
     "requestPrice": "Bed om pris",
     "addToShortlist": "Føj til udvalg",
@@ -3227,7 +3242,8 @@
     "kycAddress2": "Adresselinje 2",
     "kycPostal": "Postnummer",
     "kycCity": "By",
-    "kycSave": "Gem oplysninger"
+    "kycSave": "Gem oplysninger",
+    "priceBand": "≈ {band}"
   },
   "buyerHome": {
     "headingNeeds": "{count, plural, =1 {1 ting har brug for dig} other {# ting har brug for dig}}",
@@ -3616,5 +3632,10 @@
         "portfolioUrl": "Indtast et fuldt link, der starter med https://"
       }
     }
+  },
+  "listNames": {
+    "untitled": "Ny plan",
+    "imported": "Importeret plan",
+    "reordered": "Bestilt igen"
   }
 }

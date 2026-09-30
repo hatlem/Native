@@ -31,5 +31,6 @@
   "fallbackStandfirst": "Skriv dit brand, vælg et marked, og lav en eksempel-native-artikel.",
   "fallbackByline": "Af redaktionen · 8 min læsning",
   "fallbackBody1": "Det her er en pladsholdertekst. Tryk på Lav artiklen, så skriver desks AI en eksempelartikel i publikationens stemme, med dit brand og det, du vil fremhæve.",
-  "fallbackBody2": "Native-annoncering læses som siden, den ligger på — det er hele pointen. Forhåndsvisningen viser præcis, hvordan en læser ville møde den."
+  "fallbackBody2": "Native-annoncering læses som siden, den ligger på — det er hele pointen. Forhåndsvisningen viser præcis, hvordan en læser ville møde den.",
+  "metaTitle": "Se din egen native-annonce"
 }

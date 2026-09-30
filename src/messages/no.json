@@ -145,12 +145,10 @@
     "subtitle": "Få et forslag til tittelmiks for markedet og budsjettet ditt.",
     "market": "Marked",
     "budget": "Budsjett",
-    "category": "Kategori",
-    "anyCategory": "Alle kategorier",
+    "category": "Målgruppe",
+    "anyCategory": "Alle målgrupper",
     "suggest": "Foreslå en miks",
     "reach": "Rekkevidde",
-    "cost": "Kostnad",
-    "remaining": "Budsjett igjen",
     "none": "Ingen miks passer det budsjettet — prøv høyere budsjett eller et annet marked.",
     "addAll": "Legg alle i planen",
     "addingAll": "Legger til…",
@@ -160,10 +158,12 @@
     "hintTitle": "Fortell oss marked og budsjett",
     "marketPlaceholder": "Velg et marked",
     "reachSub": "Samlet månedlig rekkevidde",
-    "ofBudget": "av {budget} budsjett",
-    "remainingSub": "Rom for flere linjer",
     "mixEyebrow": "Foreslått miks",
-    "mixHeading": "Titler som passer briefen"
+    "mixHeading": "Titler som passer briefen",
+    "titles": "Titler",
+    "fitsBudget": "Alt innenfor budsjettet på {budget}",
+    "bandNote": "Prisene vises som intervaller. Desken bekrefter eksakte priser i tilbudet ditt.",
+    "reachUnknown": "ikke oppgitt"
   },
   "home": {
     "title": "Kjøp native-innhold i premium aviser og magasiner",
@@ -745,12 +745,12 @@
     "requestingAs": "Bestiller som",
     "loginRequired": "Logg inn eller opprett en konto for å be om tilbud:",
     "selectClient": "Velg en kunde å handle for i",
-    "fromPrice": "fra {price}",
     "targetAudienceLabel": "Målgruppesegmenter (valgfritt)",
     "targetGeoLabel": "Geografisk fokus (valgfritt)",
     "targetGeoPlaceholder": "f.eks. NO, SE — eller Vestlandet, Oslo",
     "targetContextLabel": "Redaksjonell kontekst (valgfritt)",
-    "targetContextPlaceholder": "f.eks. næringsliv, livsstil, sport"
+    "targetContextPlaceholder": "f.eks. næringsliv, livsstil, sport",
+    "priceBand": "≈ {band}"
   },
   "requests": {
     "title": "Forespørsel",
@@ -1145,7 +1145,7 @@
     "signupTitle": "Opprett konto",
     "signupSubtitle": "Fem felter. Vi spør om resten når du trenger det.",
     "signupHeadline": "Gratis konto. Hver native-tittel vi dekker.",
-    "signupLead": "3 000+ titler på tvers av 9 markeder, transparent pris, fast tilbud på 24 timer. Du forplikter deg ingenting før brief er sendt.",
+    "signupLead": "{count}+ titler på tvers av 9 markeder, transparent pris, fast tilbud på 24 timer. Du forplikter deg ingenting før brief er sendt.",
     "bulletCatalog": "Native lever der lesere bruker tid: 3–5× dvelletid vs display, lånt troverdighet fra tittelen, indeksert og varig i søk.",
     "bulletDesk": "Hele katalogen åpen, transparent pris. Ingen telefonrunder, ingen PDF-prislister, ingen fire ukers tau-trekking.",
     "bulletReports": "Brief én gang. Desken forhandler, skriver, kvalitetssikrer, publiserer. Du godkjenner.",
@@ -1167,7 +1167,7 @@
     "pwHint": "Minst 8 tegn.",
     "noAccount": "Ingen konto?",
     "haveAccount": "Har du allerede en konto?",
-    "regFailed": "Fyll ut alle obligatoriske felt (passord min. 8 tegn).",
+    "regFailed": "Fyll inn firmanavn og jobb-e-post.",
     "regRateLimited": "For mange registreringsforsøk — vent et minutt og prøv igjen.",
     "regEmailBusiness": "Bruk jobb-e-posten din — personlig e-post (gmail, yahoo, osv.) og engangs-/midlertidige e-posttjenester er ikke tillatt.",
     "regExists": "Det finnes allerede en konto med den e-posten.",
@@ -1209,15 +1209,21 @@
     "backToSignin": "Tilbake til innlogging",
     "signupSubtitleShort": "Tre felter. Vi spør om resten når du er inne.",
     "setPasswordSummary": "Sett et passord (valgfritt)",
-    "pwHintOptional": "Minst 8 tegn. La stå tomt for å logge inn med magic-link.",
-    "magicLinkSignupNote": "Hopp over passord, så sender vi deg en magic-link for innlogging.",
+    "pwHintOptional": "Minst 8 tegn. La feltet stå tomt, så logger du inn med en lenke på e-post i stedet.",
+    "magicLinkSignupNote": "Hopp over passordet, så sender vi deg en innloggingslenke på e-post.",
     "regPasswordTooShort": "Passordet må være minst 8 tegn.",
     "deactivatedSignin": "Denne kontoen er deaktivert. Kontakt desken hvis den skal slås på igjen.",
     "emailChangedOk": "E-postadressen er oppdatert — logg inn med den nye adressen.",
     "deactivatedTitle": "Denne kontoen er deaktivert",
     "deactivatedBody": "Kontoen din er slått av, så det er ingenting å bruke her. Logg ut under, og kontakt desken hvis du tror dette er en feil.",
     "writerClaimSubmit": "Opprett skribentkonto",
-    "writerClaimSubmitting": "Oppretter…"
+    "writerClaimSubmitting": "Oppretter…",
+    "regEmailInvalid": "Den e-postadressen ser ikke riktig ut. Sjekk om den er skrevet feil.",
+    "regEmailNoMailServer": "Vi finner ingen e-postserver for det domenet, så e-post dit kommer aldri frem. Sjekk om adressen er skrevet feil.",
+    "emailRequired": "Skriv inn e-postadressen din først.",
+    "attemptsRateLimited": "For mange forsøk. Vent et minutt og prøv igjen.",
+    "checkSignupTitle": "Bekreft e-postadressen din",
+    "checkSignupLead": "Vi har sendt en lenke til adressen du oppga. Åpne den for å bekrefte adressen og logge inn; den utløper om 15 minutter. Hadde adressen allerede en konto, forklarer e-posten hvordan du kommer inn igjen."
   },
   "order": {
     "title": "Bestilling",
@@ -1463,7 +1469,7 @@
     "catalogStatusNote": "Priser endrer du på prissiden. Katalogstatus (bookbar, og om et produkt kan bestilles øyeblikkelig) håndteres av NativeSpin-desken."
   },
   "formats": {
-    "metaTitle": "Native-formater — NativeSpin",
+    "metaTitle": "Native-formater",
     "eyebrow": "Formater",
     "title": "Fire måter å kjøre native — velg den som passer.",
     "lead": "Hver tittel i katalogen vår støtter ett eller flere av disse fire formatene. Forskjellen er hvem sin stemme du betaler for og hvor synlig merket er.",
@@ -1851,7 +1857,7 @@
   },
   "about": {
     "eyebrow": "Om oss",
-    "metaTitle": "Om NativeSpin",
+    "metaTitle": "Om oss",
     "title": "Native er operasjonelt vondt. Vi fikser det.",
     "lead": "NativeSpin er et marked for kjøp av native innhold og native annonsering i aviser og magasiner — inkludert de mange som ikke selger programmatisk.",
     "missionTitle": "Misjon",
@@ -2043,7 +2049,7 @@
     "faqTitle": "Ofte stilte spørsmål"
   },
   "contact": {
-    "metaTitle": "Kontakt NativeSpin",
+    "metaTitle": "Kontakt",
     "eyebrow": "Kontakt",
     "title": "Ta kontakt",
     "lead": "Velg riktig kanal under, eller bruk skjemaet. Vi svarer på alle henvendelser innen én virkedag.",
@@ -2082,7 +2088,16 @@
     "messagePlaceholder": "Hva prøver du å få til, og når?",
     "submit": "Send melding",
     "altPrefix": "Nysgjerrig på hvem som står bak NativeSpin?",
-    "altLink": "Les om oss →"
+    "altLink": "Les om oss →",
+    "sending": "Sender …",
+    "sentTitle": "Meldingen er sendt",
+    "sentBody": "Takk. Meldingen ligger hos teamet nå, og vi svarer på e-post innen én virkedag.",
+    "errRequired": "Må fylles ut.",
+    "errInvalid": "Velg ett av alternativene.",
+    "errEmail": "Den e-postadressen ser ikke riktig ut.",
+    "errTooLong": "Det er lengre enn vi kan ta imot. Kort det ned litt.",
+    "errRate": "Du har sendt flere meldinger på kort tid. Vent litt og prøv igjen.",
+    "errSend": "Meldingen kom ikke frem hos oss. Prøv igjen om et minutt, eller send e-post direkte til hello@nativespin.com."
   },
   "security": {
     "metaTitle": "Sikkerhet",
@@ -2368,8 +2383,8 @@
     }
   },
   "apiDocs": {
-    "metaTitle": "NativeSpin API",
-    "eyebrow": "Developers",
+    "metaTitle": "API",
+    "eyebrow": "Utviklere",
     "title": "NativeSpins offentlige katalog-API",
     "lead": "Et lese-API over NativeSpin-tittelkatalogen — laget for byråverktøy (Atlas-stil) og adtech-partnere som trenger normaliserte tilbudsdata for redaksjonelt native på tvers av våre 9 markeder — Norge, Sverige, Danmark, Finland, Tyskland, Østerrike, Sveits, Storbritannia og Irland.",
     "authTitle": "Autentisering",
@@ -2381,18 +2396,18 @@
     "queryParams": "Spørringsparametere",
     "detailBody": "Detaljer per tittel: utgiver, marked (med MVA-sats og merking) og hvert aktive produkt med innholdskrav, ledetid og prisintervall.",
     "detailIncludes": "Priser oppgis som intervaller (for eksempel «25–40k NOK»), aldri som eksakte beløp: den faste prisen kommer i et tilbud. Innholdskravene omfatter ordgrenser, minste antall bilder og merkingen.",
-    "paginationTitle": "Pagination",
+    "paginationTitle": "Paginering",
     "paginationBody": "Markørbasert. Send page.nextCursor tilbake som cursor til den er null: først da er synkroniseringen ferdig. Sorteringen er stabil (navn + id), så en full synkronisering mister aldri rader selv om titler aktiveres eller deaktiveres underveis.",
     "limitsTitle": "Hastighets­grenser",
     "limitsBody": "Per-nøkkel-bursts jevnes ut gjennom samme bøtte som RFQ-flyten bruker. En 429-respons inkluderer en omtrentlig retry-after i meldingsteksten. Vedvarende høy-volum-partnere får høyere grenser — spør når du ber om en nøkkel.",
-    "errorsTitle": "Errors",
+    "errorsTitle": "Feil",
     "errorsBody": "Feil returneres som JSON med en stabil kode og en lesbar melding. En ugyldig parameter gir 400 BAD_PARAM, der error.details navngir hver enkelt; ingenting ignoreres i stillhet. Alle koder står i OpenAPI-spesifikasjonen på /api/openapi.json.",
     "ctaTitle": "Trenger du en nøkkel?",
     "ctaBody": "Vi auto-tildeler ikke API-en — partner-integrasjoner har kommersielle implikasjoner vi vil avklare først. Ta kontakt, så får du en fungerende nøkkel innen én arbeidsdag.",
     "ctaContact": "Snakk med partnerskaps­teamet",
     "selfServeEyebrow": "Selvbetjening",
     "selfServeTitle": "Kjøp som programmatisk — på navngitte premiumtitler",
-    "selfServeBody": "Finn beholdning gjennom katalog-API-et, og bestill fastprisede plasseringer i ett kall — via API eller i appen. Ingen auksjon, ingen skjult beholdning: hver tittel er navngitt, hver pris er publisistens egen. RFQ-titler forblir desk-styrte med vilje — API-et bestiller kun fastprisede selvbetjente plasseringer.",
+    "selfServeBody": "Finn beholdning gjennom katalog-API-et, og bestill fastprisede plasseringer i ett kall — via API eller i appen. Ingen auksjon, ingen skjult beholdning: hver tittel er navngitt, hver pris er utgiverens egen. RFQ-titler forblir desk-styrte med vilje — API-et bestiller kun fastprisede selvbetjente plasseringer.",
     "ordersBody": "Legg inn en fastpriset selvbetjent ordre. Send fastprisede produkter og få en bekreftet ordre tilbake i ett kall. Krever orders:write-tilgang og en nøkkel knyttet til organisasjonen din; RFQ-produkter gir 422 RFQ_ONLY.",
     "ordersRequest": "curl -X POST https://nativespin.com/api/v1/orders \\\n  -H \"Authorization: Bearer DIN_NØKKEL\" \\\n  -H \"Content-Type: application/json\" \\\n  -d '{\"items\":[{\"productId\":\"PRODUKT_ID\",\"quantity\":1}]}'",
     "quotesBody": "Status, linjer og totaler for et tilbud desken har sendt. En nøkkel knyttet til en organisasjon ser bare den organisasjonens tilbud."
@@ -2831,7 +2846,7 @@
     "currentPasswordLabel": "Nåværende passord",
     "newPasswordLabel": "Nytt passord",
     "pwHint": "Minst 8 tegn.",
-    "passwordlessNote": "Du logger nå inn med kun magic-link. Sett et passord hvis du vil ha begge muligheter.",
+    "passwordlessNote": "Du logger nå bare inn med lenker på e-post. Sett et passord hvis du vil ha begge mulighetene.",
     "savePasswordSet": "Sett passord",
     "savePasswordChange": "Endre passord",
     "saveMember": "Lagre",
@@ -2911,7 +2926,8 @@
     "errDelegation": "Sluttdatoen for delegeringen er ikke en gyldig dato.",
     "errDelegationPast": "Sluttdatoen for delegeringen må være frem i tid.",
     "canCommitAdminNote": "Administratorer har alltid bestillingsrett.",
-    "statusRevoked": "Fjernet"
+    "statusRevoked": "Fjernet",
+    "errEmailDomain": "Vi finner ingen e-postserver for det domenet. Sjekk om adressen er skrevet feil."
   },
   "invite": {
     "title": "Bli med i {org}",
@@ -3171,7 +3187,6 @@
     "resultsAlsoConsider": "Også verdt å vurdere",
     "resultsEmpty": "Ingen treff ennå – prøv en bredere brief eller et annet marked.",
     "whyFits": "Derfor passer den:",
-    "fromPrice": "fra {price}",
     "reach": "rekkevidde/mnd",
     "requestPrice": "Be om pris",
     "addToShortlist": "Legg i utvalget",
@@ -3226,7 +3241,8 @@
     "kycAddress2": "Adresselinje 2",
     "kycPostal": "Postnummer",
     "kycCity": "Poststed",
-    "kycSave": "Lagre opplysninger"
+    "kycSave": "Lagre opplysninger",
+    "priceBand": "≈ {band}"
   },
   "buyerHome": {
     "headingNeeds": "{count, plural, =1 {1 ting trenger deg} other {# ting trenger deg}}",
@@ -3615,5 +3631,10 @@
         "portfolioUrl": "Skriv inn en fullstendig lenke som starter med https://"
       }
     }
+  },
+  "listNames": {
+    "untitled": "Ny plan",
+    "imported": "Importert plan",
+    "reordered": "Bestilt på nytt"
   }
 }

@@ -34,3 +34,13 @@ test("system-name detection ignores case and surrounding space", () => {
   assert.equal(isSystemListName(" untitled LIST "), true);
   assert.equal(isSystemListName("Untitled launch"), false);
 });
+
+test("localized default plan names count as system names too", () => {
+  for (const n of ["Ny plan", "Neuer Plan", "Uusi suunnitelma", "Importert plan", "Bestilt på nytt"]) {
+    assert.equal(isSystemListName(n), true, n);
+  }
+  assert.equal(
+    planNameFor({ listName: "Ny plan", orgName: "Acme AS", locale: "no" }),
+    "Acme AS — kampanje",
+  );
+});

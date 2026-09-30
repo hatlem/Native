@@ -283,12 +283,10 @@
     "subtitle": "Vorschlag für einen Titelmix passend zu Markt und Budget.",
     "market": "Markt",
     "budget": "Budget",
-    "category": "Kategorie",
-    "anyCategory": "Alle Kategorien",
+    "category": "Zielgruppe",
+    "anyCategory": "Alle Zielgruppen",
     "suggest": "Mix vorschlagen",
     "reach": "Reichweite",
-    "cost": "Kosten",
-    "remaining": "Verbleibendes Budget",
     "none": "Kein Mix passt zu diesem Budget — versuchen Sie ein höheres Budget oder einen anderen Markt.",
     "addAll": "Alle zum Plan hinzufügen",
     "addingAll": "Wird hinzugefügt…",
@@ -298,10 +296,12 @@
     "hintTitle": "Markt und Budget angeben",
     "marketPlaceholder": "Markt wählen",
     "reachSub": "Gesamte monatliche Reichweite",
-    "ofBudget": "von {budget} Budget",
-    "remainingSub": "Spielraum für weitere Positionen",
     "mixEyebrow": "Empfohlener Mix",
-    "mixHeading": "Titel, die zu Ihrem Brief passen"
+    "mixHeading": "Titel, die zu Ihrem Brief passen",
+    "titles": "Titel",
+    "fitsBudget": "Alles innerhalb Ihres Budgets von {budget}",
+    "bandNote": "Preise werden als Spannen angezeigt. Der Desk bestätigt die genauen Preise in Ihrem Angebot.",
+    "reachUnknown": "nicht angegeben"
   },
   "home": {
     "title": "Native-Inhalte in Premium-Zeitungen und Magazinen kaufen",
@@ -883,12 +883,12 @@
     "requestingAs": "Anfrage als",
     "loginRequired": "Melden Sie sich an oder erstellen Sie ein Konto, um ein Angebot anzufordern:",
     "selectClient": "Wählen Sie einen Kunden, in dessen Namen Sie handeln, im",
-    "fromPrice": "ab {price}",
     "targetAudienceLabel": "Zielgruppensegmente (optional)",
     "targetGeoLabel": "Geografischer Fokus (optional)",
     "targetGeoPlaceholder": "z. B. NO, SE — oder Bayern, München",
     "targetContextLabel": "Redaktioneller Kontext (optional)",
-    "targetContextPlaceholder": "z. B. Wirtschaft, Lifestyle, Sport"
+    "targetContextPlaceholder": "z. B. Wirtschaft, Lifestyle, Sport",
+    "priceBand": "≈ {band}"
   },
   "requests": {
     "title": "Anfrage",
@@ -1283,7 +1283,7 @@
     "signupTitle": "Konto erstellen",
     "signupSubtitle": "Fünf Felder. Den Rest fragen wir, wenn Sie ihn brauchen.",
     "signupHeadline": "Kostenloses Konto. Jeder Native-Titel, den wir abdecken.",
-    "signupLead": "3.000+ Titel in 9 Märkten, transparente Preise, festes Angebot in 24 Stunden. Sie verpflichten sich zu nichts, bis Sie ein Brief senden.",
+    "signupLead": "{count}+ Titel in 9 Märkten, transparente Preise, festes Angebot in 24 Stunden. Sie verpflichten sich zu nichts, bis Sie ein Brief senden.",
     "bulletCatalog": "Native lebt dort, wo Leser Zeit verbringen: 3–5× Verweildauer vs. Display, geliehene Glaubwürdigkeit vom Titel, indexiert und dauerhaft in der Suche.",
     "bulletDesk": "Ganzer Katalog offen, transparente Preise. Keine Telefonrunden, keine PDF-Preislisten, keine vierwöchigen Verhandlungen.",
     "bulletReports": "Ein Brief. Der Desk verhandelt, schreibt, prüft, veröffentlicht. Sie genehmigen.",
@@ -1305,7 +1305,7 @@
     "pwHint": "Mindestens 8 Zeichen.",
     "noAccount": "Noch kein Konto?",
     "haveAccount": "Schon ein Konto?",
-    "regFailed": "Bitte alle Pflichtfelder ausfüllen (Passwort mind. 8 Zeichen).",
+    "regFailed": "Bitte Firmennamen und geschäftliche E-Mail-Adresse angeben.",
     "regRateLimited": "Zu viele Registrierungsversuche — bitte eine Minute warten und erneut versuchen.",
     "regEmailBusiness": "Bitte verwenden Sie Ihre geschäftliche E-Mail-Adresse — private E-Mails (gmail, yahoo usw.) und Wegwerf-Dienste sind nicht erlaubt.",
     "regExists": "Ein Konto mit dieser E-Mail existiert bereits.",
@@ -1347,15 +1347,21 @@
     "backToSignin": "Zurück zur Anmeldung",
     "signupSubtitleShort": "Drei Felder. Den Rest fragen wir nach dem Login.",
     "setPasswordSummary": "Passwort setzen (optional)",
-    "pwHintOptional": "Mindestens 8 Zeichen. Leer lassen für Magic-Link-only Anmeldung.",
-    "magicLinkSignupNote": "Passwort überspringen — wir senden einen Magic-Link zur Anmeldung.",
+    "pwHintOptional": "Mindestens 8 Zeichen. Leer lassen, dann melden Sie sich stattdessen über einen Link per E-Mail an.",
+    "magicLinkSignupNote": "Passwort überspringen, dann schicken wir Ihnen einen Anmeldelink per E-Mail.",
     "regPasswordTooShort": "Das Passwort muss mindestens 8 Zeichen lang sein.",
     "deactivatedSignin": "Dieses Konto wurde deaktiviert. Wenden Sie sich an das Desk, wenn es wieder aktiviert werden soll.",
     "emailChangedOk": "E-Mail-Adresse aktualisiert — melden Sie sich mit der neuen Adresse an.",
     "deactivatedTitle": "Dieses Konto ist deaktiviert",
     "deactivatedBody": "Ihr Konto wurde abgeschaltet, hier gibt es also nichts zu tun. Melden Sie sich unten ab und wenden Sie sich an das Desk, falls das ein Versehen ist.",
     "writerClaimSubmit": "Autorenkonto anlegen",
-    "writerClaimSubmitting": "Wird angelegt…"
+    "writerClaimSubmitting": "Wird angelegt…",
+    "regEmailInvalid": "Diese E-Mail-Adresse sieht nicht richtig aus. Bitte auf Tippfehler prüfen.",
+    "regEmailNoMailServer": "Für diese Domain finden wir keinen Mailserver, E-Mails dorthin kämen also nie an. Bitte die Adresse auf Tippfehler prüfen.",
+    "emailRequired": "Bitte zuerst Ihre E-Mail-Adresse eingeben.",
+    "attemptsRateLimited": "Zu viele Versuche. Bitte eine Minute warten und erneut versuchen.",
+    "checkSignupTitle": "Bestätigen Sie Ihre E-Mail-Adresse",
+    "checkSignupLead": "Wir haben einen Link an die angegebene Adresse geschickt. Öffnen Sie ihn, um die Adresse zu bestätigen und sich anzumelden; er läuft in 15 Minuten ab. Gab es für die Adresse schon ein Konto, erklärt die E-Mail, wie Sie wieder hineinkommen."
   },
   "order": {
     "title": "Bestellung",
@@ -1601,7 +1607,7 @@
     "catalogStatusNote": "Preise ändern Sie auf der Preisseite. Den Katalogstatus (buchbar und ob ein Produkt sofort bestellbar ist) verwaltet das NativeSpin-Desk."
   },
   "formats": {
-    "metaTitle": "Native-Formate — NativeSpin",
+    "metaTitle": "Native-Formate",
     "eyebrow": "Formate",
     "title": "Vier Wege, Native zu fahren — wählen Sie den passenden.",
     "lead": "Jeder Titel in unserem Katalog unterstützt eines oder mehrere dieser vier Formate. Der Unterschied liegt darin, wessen Stimme Sie bezahlen — und wie prominent die Marke auftritt.",
@@ -1851,7 +1857,7 @@
   },
   "about": {
     "eyebrow": "Über uns",
-    "metaTitle": "Über NativeSpin",
+    "metaTitle": "Über uns",
     "title": "Native ist operativ schmerzhaft. Wir lösen das.",
     "lead": "NativeSpin ist ein Marktplatz für den Einkauf von Native Content und Native Advertising in Zeitungen und Magazinen — auch in den vielen, die nicht programmatisch verkaufen.",
     "missionTitle": "Mission",
@@ -2043,7 +2049,7 @@
     "faqTitle": "Häufige Fragen"
   },
   "contact": {
-    "metaTitle": "NativeSpin kontaktieren",
+    "metaTitle": "Kontakt",
     "eyebrow": "Kontakt",
     "title": "Kontakt aufnehmen",
     "lead": "Wählen Sie unten den passenden Kanal oder nutzen Sie das Formular. Wir antworten innerhalb eines Werktags auf jede Nachricht.",
@@ -2082,7 +2088,16 @@
     "messagePlaceholder": "Was wollen Sie erreichen und bis wann?",
     "submit": "Nachricht senden",
     "altPrefix": "Neugierig, wer hinter NativeSpin steht?",
-    "altLink": "Über uns lesen →"
+    "altLink": "Über uns lesen →",
+    "sending": "Wird gesendet …",
+    "sentTitle": "Nachricht gesendet",
+    "sentBody": "Danke. Ihre Nachricht liegt jetzt beim Team, und wir antworten innerhalb eines Werktags per E-Mail.",
+    "errRequired": "Pflichtfeld.",
+    "errInvalid": "Bitte eine der Optionen wählen.",
+    "errEmail": "Diese E-Mail-Adresse sieht nicht richtig aus.",
+    "errTooLong": "Das ist zu lang. Bitte etwas kürzen.",
+    "errRate": "Sie haben in kurzer Zeit mehrere Nachrichten gesendet. Bitte warten Sie etwas und versuchen Sie es erneut.",
+    "errSend": "Ihre Nachricht ist bei uns nicht angekommen. Versuchen Sie es in einer Minute erneut oder schreiben Sie direkt an hello@nativespin.com."
   },
   "security": {
     "metaTitle": "Sicherheit",
@@ -2225,7 +2240,7 @@
     "contactBody": "Fragen zu diesen Bedingungen — schreiben Sie an"
   },
   "apiDocs": {
-    "metaTitle": "NativeSpin API",
+    "metaTitle": "API",
     "eyebrow": "Entwickler",
     "title": "NativeSpins öffentliche Katalog-API",
     "lead": "Eine Lese-API über den NativeSpin-Titelkatalog — entwickelt für Agentur-Planungstools (Atlas-Stil) und Adtech-Partner, die normalisierte Bestandsdaten für redaktionelles Native über unsere 9 Märkte hinweg benötigen — Norwegen, Schweden, Dänemark, Finnland, Deutschland, Österreich, Schweiz, Großbritannien und Irland.",
@@ -2238,7 +2253,7 @@
     "queryParams": "Query-Parameter",
     "detailBody": "Details pro Titel: Verlag, Markt (mit MwSt.-Satz und Kennzeichnung) und jedes aktive Produkt mit Content-Vorgaben, Vorlaufzeit und Preisspanne.",
     "detailIncludes": "Preise kommen als Spannen (zum Beispiel „25–40k NOK“), nie als exakte Beträge: Den verbindlichen Preis gibt es im Angebot. Die Vorgaben umfassen Wortzahlgrenzen, die Mindestzahl an Bildern und die Kennzeichnung.",
-    "paginationTitle": "Pagination",
+    "paginationTitle": "Paginierung",
     "paginationBody": "Cursor-basiert. Geben Sie page.nextCursor als cursor zurück, bis er null ist: Erst dann ist die Synchronisierung vollständig. Die Sortierung ist stabil (Name + ID), sodass eine vollständige Synchronisierung keine Zeilen verpasst, auch wenn Titel währenddessen aktiviert oder deaktiviert werden.",
     "limitsTitle": "Rate Limits",
     "limitsBody": "Pro-Schlüssel-Bursts werden über denselben Bucket geglättet, den der RFQ-Flow verwendet. Eine 429-Antwort enthält ein ungefähres retry-after im Nachrichtentext. Daueranbietern mit hohem Durchsatz werden höhere Limits gewährt — fragen Sie danach, wenn Sie einen Schlüssel anfordern.",
@@ -2627,7 +2642,7 @@
     "currentPasswordLabel": "Aktuelles Passwort",
     "newPasswordLabel": "Neues Passwort",
     "pwHint": "Mindestens 8 Zeichen.",
-    "passwordlessNote": "Sie melden sich derzeit nur per Magic-Link an. Setzen Sie ein Passwort, wenn Sie beide Optionen wünschen.",
+    "passwordlessNote": "Sie melden sich derzeit nur über Links per E-Mail an. Legen Sie ein Passwort fest, wenn Sie beide Optionen möchten.",
     "savePasswordSet": "Passwort setzen",
     "savePasswordChange": "Passwort ändern",
     "saveMember": "Speichern",
@@ -2707,7 +2722,8 @@
     "errDelegation": "Das Enddatum der Delegation ist kein gültiges Datum.",
     "errDelegationPast": "Das Enddatum der Delegation muss in der Zukunft liegen.",
     "canCommitAdminNote": "Administratoren haben immer Bestellrecht.",
-    "statusRevoked": "Entfernt"
+    "statusRevoked": "Entfernt",
+    "errEmailDomain": "Für diese Domain finden wir keinen Mailserver. Bitte die Adresse auf Tippfehler prüfen."
   },
   "rateCard": {
     "pageTitle": "Rate-Card-Anfrage",
@@ -3040,7 +3056,6 @@
     "resultsAlsoConsider": "Ebenfalls einen Blick wert",
     "resultsEmpty": "Noch keine Treffer – versuchen Sie ein breiteres Briefing oder einen anderen Markt.",
     "whyFits": "Warum das passt:",
-    "fromPrice": "ab {price}",
     "reach": "Reichweite/Mon.",
     "requestPrice": "Preis anfragen",
     "addToShortlist": "Zur Auswahl hinzufügen",
@@ -3095,7 +3110,8 @@
     "kycAddress2": "Adresszeile 2",
     "kycPostal": "Postleitzahl",
     "kycCity": "Stadt",
-    "kycSave": "Daten speichern"
+    "kycSave": "Daten speichern",
+    "priceBand": "≈ {band}"
   },
   "buyerHome": {
     "headingNeeds": "{count, plural, =1 {1 Sache braucht dich} other {# Dinge brauchen dich}}",
@@ -3484,5 +3500,10 @@
         "portfolioUrl": "Geben Sie einen vollständigen Link ein, der mit https:// beginnt."
       }
     }
+  },
+  "listNames": {
+    "untitled": "Neuer Plan",
+    "imported": "Importierter Plan",
+    "reordered": "Erneut bestellte Kampagne"
   }
 }

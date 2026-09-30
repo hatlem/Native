@@ -3,7 +3,6 @@ import { notFound, redirect } from "next/navigation";
 import { auth } from "@/auth";
 import { PageHeader } from "@/components";
 import { campaignFlowEnabled } from "@/lib/flags";
-import { MarketCode } from "@prisma/client";
 import { recommendForBrief } from "@/lib/campaign-recommend";
 import { getWorkspace } from "@/lib/workspace";
 import { prisma } from "@/lib/prisma";
@@ -17,10 +16,11 @@ import { DiscoverStep } from "./_components/DiscoverStep";
 import { ScheduleStep } from "./_components/ScheduleStep";
 import { ProposalStep } from "./_components/ProposalStep";
 import { ShortlistRail } from "./_components/ShortlistRail";
+import { SUPPORTED_MARKETS } from "@/lib/markets";
 
 export const dynamic = "force-dynamic";
 
-const MARKET_CODES = Object.values(MarketCode) as string[];
+const MARKET_CODES: readonly string[] = SUPPORTED_MARKETS;
 
 function firstParam(raw: string | string[] | undefined): string {
   return (Array.isArray(raw) ? raw[0] : raw) ?? "";

@@ -168,6 +168,6 @@ describe("localizeVertical covers the whole vertical taxonomy", () => {
   it("uses natural labels for the trade verticals buyers filter on", () => {
     assert.equal(localizeVertical("B2B – Transport & Logistics", "no"), "B2B – transport og logistikk");
     assert.equal(localizeVertical("B2B – Legal", "sv"), "B2B – juridik");
-    assert.equal(localizeVertical("News (National)", "no"), "Nyheter (riksdekkende)");
+    assert.equal(localizeVertical("News (National)", "no"), "Nyheter (riks)");
   });
 });
