@@ -111,3 +111,21 @@ test("CSP stays tight: blob: is allowed for images only", () => {
   const withBlob = directives.filter((d) => d.includes("blob:")).map((d) => d.split(" ")[0]);
   assert.deepEqual(withBlob, ["img-src"]);
 });
+
+test("CSP: the GetCookies banner only opens connect-src, and only when configured", () => {
+  const prev = process.env.NEXT_PUBLIC_GETCOOKIES_DOMAIN_ID;
+  try {
+    delete process.env.NEXT_PUBLIC_GETCOOKIES_DOMAIN_ID;
+    assert.ok(!buildCsp("n").includes("getcookies.co"), "unset: no GetCookies host anywhere");
+
+    process.env.NEXT_PUBLIC_GETCOOKIES_DOMAIN_ID = "00000000-0000-0000-0000-000000000000";
+    const directives = buildCsp("n").split("; ");
+    const withHost = directives.filter((d) => d.includes("https://getcookies.co")).map((d) => d.split(" ")[0]);
+    // widget.js is inserted by a nonce'd loader ('strict-dynamic' trusts it),
+    // so script-src must NOT list the host; fetches from the widget need connect-src.
+    assert.deepEqual(withHost, ["connect-src"]);
+  } finally {
+    if (prev === undefined) delete process.env.NEXT_PUBLIC_GETCOOKIES_DOMAIN_ID;
+    else process.env.NEXT_PUBLIC_GETCOOKIES_DOMAIN_ID = prev;
+  }
+});
