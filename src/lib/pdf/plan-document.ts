@@ -91,6 +91,9 @@ export type PlanDocumentRow = {
   subtitle: string;
   // Quantity, who writes the article, the booked run.
   details: string | null;
+  // Who the details say writes the article; null where they say nothing (an
+  // alternative, a placeholder). The price legend explains only these labels.
+  author: Authorship | null;
   note: string | null;
   reach: string;
   price: string;
@@ -136,6 +139,8 @@ export type PlanDocument = {
 
 type Item = SharedList["items"][number];
 
+type Authorship = "nativespin" | "publisher";
+
 // Characters no file system (or mail client) takes in a name, plus control
 // characters; the plan name is the buyer's own free text.
 const UNSAFE_FILENAME = /[\\/:*?"<>|\u0000-\u001f\u007f]/g;
@@ -176,10 +181,17 @@ export function buildPlanDocument(input: PlanDocumentInput): PlanDocument {
       const reach = p.title.digitalReach ?? p.title.monthlyReach ?? null;
       // What the plan lines and the share page say about a line in the plan;
       // an alternative is shown bare, as on both pages.
+      const author: Authorship | null = !inPlan
+        ? null
+        : i.withContent
+          ? "nativespin"
+          : canWrite
+            ? "publisher"
+            : null;
       const details = inPlan
         ? [
             i.quantity > 1 ? tShare("qty", { count: i.quantity }) : null,
-            i.withContent ? tShare("weWriteIt") : canWrite ? tShare("publisherWritesIt") : null,
+            author === "nativespin" ? tShare("weWriteIt") : author === "publisher" ? tShare("publisherWritesIt") : null,
             i.scheduleStart
               ? tPlan("runPeriod", {
                   range: formatRunRange(i.scheduleStart, i.scheduleUnits, p.bookingUnit, locale),
@@ -206,6 +218,7 @@ export function buildPlanDocument(input: PlanDocumentInput): PlanDocument {
         title: titleDisplayName(p.title),
         subtitle: `${tType(p.type)} · ${p.title.publisher.name}`,
         details: details.length ? details.join(" · ") : null,
+        author,
         note: i.notes,
         reach: reach ? td("reachValue", { count: number.format(reach) }) : "–",
         price: lineFigureLabel(display, p.currency, locale, priceOnRequest),
@@ -228,6 +241,7 @@ export function buildPlanDocument(input: PlanDocumentInput): PlanDocument {
       title: titleDisplayName(i.title),
       subtitle: `${i.title.publisher.name} · ${tShare("placementTbd")}`,
       details: null,
+      author: null,
       note: i.notes,
       reach: "–",
       price: priceOnRequest,
@@ -266,9 +280,14 @@ export function buildPlanDocument(input: PlanDocumentInput): PlanDocument {
     totals.length > 1 ? tPlan("multiCurrencyNote") : null,
   ].filter((n): n is string => n !== null);
 
+  // "How the prices work" explains only what the document actually prints:
+  // each line is keyed on a label some row carries, so a plan with no rate
+  // line never explains rates, and one where every article is the
+  // publisher's never mentions NativeSpin's writing.
   const allRows = sections.flatMap((s) => s.rows);
   const has = (kind: LineDisplay["kind"] | "placeholder") =>
     allRows.some((r) => (r.display ? r.display.kind === kind : kind === "placeholder"));
+  const hasAuthor = (author: Authorship) => allRows.some((r) => r.author === author);
   const currencies = [...new Set(list.items.flatMap((i) => (i.product ? [i.product.currency] : [])))];
   const pricesLines = [
     currencies.length
@@ -277,11 +296,11 @@ export function buildPlanDocument(input: PlanDocumentInput): PlanDocument {
         })
       : null,
     has("exact") ? td("pricesExact", { label: td("statusExact") }) : null,
-    has("band") || has("rate") ? td("pricesIndicative", { label: tv("listIndicative") }) : null,
+    has("band") ? td("pricesIndicative", { label: tv("listIndicative") }) : null,
+    has("rate") ? td("pricesRate", { label: tv("listIndicative") }) : null,
     has("onRequest") || has("placeholder") ? td("pricesOnRequest", { label: priceOnRequest }) : null,
-    planItems.some((i) => i.product && (i.withContent || publisherCanWrite(i.product)))
-      ? td("pricesContent", { label: tShare("weWriteIt") })
-      : null,
+    hasAuthor("nativespin") ? td("pricesContent", { label: tShare("weWriteIt") }) : null,
+    hasAuthor("publisher") ? td("pricesPublisherWrites", { label: tShare("publisherWritesIt") }) : null,
     altItems.length > 0 ? td("pricesAlternatives") : null,
     td("pricesNothingBooked"),
   ].filter((l): l is string => l !== null);

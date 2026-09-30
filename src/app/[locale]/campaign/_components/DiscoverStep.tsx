@@ -19,6 +19,7 @@ type Props = {
 // rationale ("why this fits") — the piece Acast's recommender lacks.
 export async function DiscoverStep({ locale, market, budget, brief, recommendation }: Props) {
   const t = await getTranslations({ locale, namespace: "campaign" });
+  const tv = await getTranslations({ locale, namespace: "priceVisibility" });
   const tMarket = await getTranslations({ locale, namespace: "market" });
   const tType = await getTranslations({ locale, namespace: "productType" });
 
@@ -141,7 +142,7 @@ export async function DiscoverStep({ locale, market, budget, brief, recommendati
                       <div>
                         <div className="title">{s.titleName}</div>
                         <div className="sub muted small">
-                          {t("requestPrice")}
+                          {tv("priceOnRequest")}
                           {s.reach > 0 ? ` · ${s.reach.toLocaleString(locale)} ${t("reach")}` : ""}
                         </div>
                       </div>

@@ -3,6 +3,8 @@
 // Publicly we only ever show an *indicative* "from" price; the firm price is
 // produced by the desk via a Quote.
 
+import { contentFeeDescription } from "@/lib/commerce/placements";
+
 // next-intl URL slug → BCP 47 language tag. The URL-locale slugs `at`,
 // `ch`, `uk`, `ie` are country codes that Intl.NumberFormat /
 // Date.toLocaleString reject with RangeError if passed directly. Map
@@ -208,7 +210,7 @@ export function computeContentFeeLines(
     lines.push({
       kind: "CONTENT_FEE",
       productId: null,
-      description: `Content production — ${item.name}`,
+      description: contentFeeDescription(item.name),
       quantity: 1,
       unitCost: 0,
       marginPct: 0,

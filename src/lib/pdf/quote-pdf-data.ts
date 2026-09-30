@@ -1,5 +1,6 @@
 import { prisma } from "@/lib/prisma";
 import { lineOrder } from "@/lib/commerce/line-order";
+import { feePlacementDescription } from "@/lib/commerce/placements";
 import { paymentTermsDaysFor } from "@/lib/payment-terms";
 import { marketTimeZone } from "@/lib/markets";
 import { quoteOnlineUrl } from "./quote-online-url";
@@ -63,8 +64,7 @@ export function quoteNumberFor(quoteId: string): string {
 // same productName the sibling INVENTORY line was priced under
 // (computeQuoteLines). That's the only link between the two rows at the
 // data layer, so folding the fee into the customer-facing unit price means
-// matching on that description convention.
-const CONTENT_FEE_PREFIX = "Content production — ";
+// matching on that description convention (lib/commerce/placements.ts).
 
 /**
  * The quote was replaced by a sent revision (SUPERSEDED): it is no longer an
@@ -123,8 +123,8 @@ export async function loadQuotePdfData(
 
   const contentFeeByProductName = new Map<string, number>();
   for (const line of quote.lines) {
-    if (line.kind !== "CONTENT_FEE" || !line.description.startsWith(CONTENT_FEE_PREFIX)) continue;
-    const productName = line.description.slice(CONTENT_FEE_PREFIX.length);
+    const productName = line.kind === "CONTENT_FEE" ? feePlacementDescription(line.description) : null;
+    if (productName === null) continue;
     contentFeeByProductName.set(
       productName,
       (contentFeeByProductName.get(productName) ?? 0) + Number(line.lineTotal),

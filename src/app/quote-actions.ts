@@ -27,6 +27,7 @@ import {
 } from "@/lib/commerce/quote-validity";
 import { reconcileExpiredQuotes } from "@/lib/commerce/quote-expiry";
 import { lineOrder } from "@/lib/commerce/line-order";
+import { feePlacementDescription } from "@/lib/commerce/placements";
 import { notifyQuoteAccepted, sendDraftQuotes } from "@/lib/commerce/quote-lifecycle";
 import {
   updateQuoteLineNote,
@@ -195,7 +196,7 @@ export async function generateQuote(formData: FormData) {
       ).map((line) => ({
         ...line,
         priceOnRequest: onRequestNames.has(
-          line.description.replace(/^Content production — /, ""),
+          feePlacementDescription(line.description) ?? "",
         ),
       }));
       // Generation order is the display order (lib/commerce/line-order.ts).

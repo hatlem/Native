@@ -21,6 +21,7 @@ type Props = {
 // band for the rest — the same figure /plan shows for this list.
 export async function ShortlistRail({ locale, items }: Props) {
   const t = await getTranslations({ locale, namespace: "campaign" });
+  const tv = await getTranslations({ locale, namespace: "priceVisibility" });
   const tType = await getTranslations({ locale, namespace: "productType" });
 
   const rows = items.map((i) => {
@@ -94,8 +95,8 @@ export async function ShortlistRail({ locale, items }: Props) {
             <div key={tot.currency} className="shortlist-estimate-row">
               <span>{tot.currency}</span>
               <span>
-                {totalLabel(tot, locale) ?? t("requestPrice")}
-                {hasFigure(tot) && tot.hasOnRequest ? ` + ${t("plusRequest")}` : ""}
+                {totalLabel(tot, locale) ?? tv("priceOnRequest")}
+                {hasFigure(tot) && tot.hasOnRequest ? ` ${tv("plusOnRequest")}` : ""}
               </span>
             </div>
           ))

@@ -173,7 +173,7 @@ export default async function ComparePage({
                   ) : null}
                 </span>
               ) : r.anyHidden ? (
-                <span className="muted">{tv("requestPrice")}</span>
+                <span className="muted">{tv("priceOnRequest")}</span>
               ) : (
                 <span className="muted">—</span>
               ),

@@ -322,3 +322,60 @@ test("no hidden exact figure leaks into the model, the Word file or the PDF", as
     }
   }
 });
+
+// "How the prices work" explains the labels the document prints, and only
+// those: a legend line for a label no row carries reads as if the plan had
+// such a line (a client asking "which one is written by NativeSpin?").
+test("the price legend explains only the labels the document carries", () => {
+  const pd = en.planDocument;
+  const fill = (template: string, label: string) => template.replace("{label}", label);
+  const legend = {
+    exact: fill(pd.pricesExact, pd.statusExact),
+    band: fill(pd.pricesIndicative, en.priceVisibility.listIndicative),
+    rate: fill(pd.pricesRate, en.priceVisibility.listIndicative),
+    onRequest: fill(pd.pricesOnRequest, pd.priceOnRequest),
+    nativespin: fill(pd.pricesContent, en.shareList.weWriteIt),
+    publisher: fill(pd.pricesPublisherWrites, en.shareList.publisherWritesIt),
+    alternatives: pd.pricesAlternatives,
+  };
+  const vat = pd.pricesVat.replace("{currencies}", "NOK");
+  const legendOf = (planItems: Item[]) =>
+    buildPlanDocument(input({ list: { ...list, items: planItems } })).prices.lines;
+
+  // Every kind of line: every explanation, in the document's order.
+  assert.deepEqual(legendOf(items), [
+    vat,
+    legend.exact,
+    legend.band,
+    legend.rate,
+    legend.onRequest,
+    legend.nativespin,
+    legend.publisher,
+    legend.alternatives,
+    pd.pricesNothingBooked,
+  ]);
+
+  // Only a publisher-written, instant-orderable line: nothing about bands,
+  // rates, lines on request, alternatives or NativeSpin's writing.
+  assert.deepEqual(legendOf([publisherWrites]), [vat, legend.exact, legend.publisher, pd.pricesNothingBooked]);
+
+  // A banded line we write: the band is explained, a rate is not.
+  assert.deepEqual(legendOf([band]), [vat, legend.band, legend.nativespin, pd.pricesNothingBooked]);
+
+  // A rate line is explained as a rate, not as a price band.
+  assert.deepEqual(legendOf([rate]), [vat, legend.rate, legend.nativespin, pd.pricesNothingBooked]);
+
+  // A title the desk still places: "on request", no currency (no product yet)
+  // and no authorship.
+  assert.deepEqual(legendOf([placeholder]), [legend.onRequest, pd.pricesNothingBooked]);
+
+  // An alternative carries its price label but says nothing about who writes
+  // it (the pages show it bare), so it adds no authorship line.
+  assert.deepEqual(legendOf([onRequest, alternative]), [
+    vat,
+    legend.band,
+    legend.onRequest,
+    legend.alternatives,
+    pd.pricesNothingBooked,
+  ]);
+});

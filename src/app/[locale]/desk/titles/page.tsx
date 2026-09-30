@@ -3,6 +3,7 @@ import { superadminPageGate } from "@/lib/desk-guard";
 import { MarketCode, Prisma } from "@prisma/client";
 import { SuperadminOnly } from "@/components/superadmin-only";
 import { prisma } from "@/lib/prisma";
+import { rankByNameMatch } from "@/lib/title-name-rank";
 import { Link } from "@/i18n/navigation";
 import {
   latestConfirmedAtAcrossProducts,
@@ -110,25 +111,37 @@ export default async function DeskTitlesPage({
       : {}),
   };
 
-  const [filteredCount, titles] = await Promise.all([
-    prisma.title.count({ where }),
-    prisma.title.findMany({
-      where,
-      include: {
-        publisher: true,
-        market: true,
-        _count: { select: { products: true } },
-        products: { select: { confirmedAt: true } },
-      },
-      orderBy: [
-        { market: { code: "asc" } },
-        { publisher: { name: "asc" } },
-        { name: "asc" },
-      ],
-      take: PAGE_SIZE,
-      skip: (page - 1) * PAGE_SIZE,
-    }),
-  ]);
+  const include = {
+    publisher: true,
+    market: true,
+    _count: { select: { products: true } },
+    products: { select: { confirmedAt: true } },
+  } satisfies Prisma.TitleInclude;
+  const catalogOrder: Prisma.TitleOrderByWithRelationInput[] = [
+    { market: { code: "asc" } },
+    { publisher: { name: "asc" } },
+    { name: "asc" },
+  ];
+  const skip = (page - 1) * PAGE_SIZE;
+
+  // Browsing pages in catalog order in the database. A search ranks the
+  // name matches first — exact, then prefix, then the rest, each in catalog
+  // order (lib/title-name-rank.ts) — which SQL can't order by here, so it
+  // ranks the matching ids and names, then loads just the page it shows.
+  const [filteredCount, titles] = q
+    ? await (async () => {
+        const matches = await prisma.title.findMany({ where, select: { id: true, name: true }, orderBy: catalogOrder });
+        const pageIds = rankByNameMatch(matches, q)
+          .slice(skip, skip + PAGE_SIZE)
+          .map((m) => m.id);
+        const rows = await prisma.title.findMany({ where: { id: { in: pageIds } }, include });
+        const byId = new Map(rows.map((r) => [r.id, r]));
+        return [matches.length, pageIds.flatMap((id) => byId.get(id) ?? [])] as const;
+      })()
+    : await Promise.all([
+        prisma.title.count({ where }),
+        prisma.title.findMany({ where, include, orderBy: catalogOrder, take: PAGE_SIZE, skip }),
+      ]);
 
   const counts = await prisma.title.groupBy({
     by: ["active"],

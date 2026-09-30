@@ -78,7 +78,7 @@ export default async function SharedListPage({
       const p = i.product;
       // Exact only for an instant-orderable line; otherwise the band, the
       // rate, or "on request" — never a 0 (lib/plan-total.ts lineDisplay).
-      const figure = lineFigureLabel(lineDisplay(i, pricing), p.currency, locale, tv("requestPrice"));
+      const figure = lineFigureLabel(lineDisplay(i, pricing), p.currency, locale, tv("priceOnRequest"));
       return (
         <div className="share-list__line" key={i.id}>
           <div className="share-list__line-main">
@@ -124,7 +124,7 @@ export default async function SharedListPage({
             </p>
           ) : null}
         </div>
-        <div className="share-list__line-price">{tv("requestPrice")}</div>
+        <div className="share-list__line-price">{tv("priceOnRequest")}</div>
       </div>
     );
   };
@@ -171,7 +171,7 @@ export default async function SharedListPage({
             </div>
           ))
         ) : (
-          <strong>{tv("requestPrice")}</strong>
+          <strong>{tv("priceOnRequest")}</strong>
         )}
         {hasHidden && totals.length > 0 ? <span className="muted small">{tv("plusOnRequest")}</span> : null}
         {anyEstimate ? <p className="muted small">{tPlan("estimateNote")}</p> : null}

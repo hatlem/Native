@@ -80,7 +80,7 @@ export async function CatalogResults({
     const fromBand = titleBand(title.products, title, pricing);
     // CPM/CPC-only titles (Adresseavisen) have no flat band but DO have
     // confirmed pricing — show the cheapest unit rate instead of a
-    // misleading "Contact for price".
+    // misleading "Price on request".
     const fromRate = fromBand ? null : titleRate(title.products, title, pricing);
     // "incl. article" beside the band — the one rule every band surface uses.
     const bandWithArticle = fromBand ? bandIncludesArticle(fromBand.product, title, pricing) : false;
@@ -422,7 +422,7 @@ function CatalogCard({
           <span className="tag">⚡ {instantBadge === "addable" ? tf("badge") : tf("badgeSomeFormats")}</span>
         ) : null}
         {needsQuote ? <span className="tag">{t("card.requestQuote")}</span> : null}
-        {anyHidden ? <span className="tag">{tv("requestPrice")}</span> : null}
+        {anyHidden ? <span className="tag">{tv("priceOnRequest")}</span> : null}
         {title.nativeFit ? (
           <span className="tag">
             {t("card.nativeFit", { value: tFit(title.nativeFit as "High" | "Medium" | "Low") })}

@@ -124,7 +124,7 @@ export async function PlanStart({
                     <div>
                       <div className="title">{s.titleName}</div>
                       <div className="sub muted small">
-                        {tv("requestPrice")}
+                        {tv("priceOnRequest")}
                         {s.reach > 0 ? ` · ${s.reach.toLocaleString(locale)} ${t("reach")}` : ""}
                       </div>
                     </div>

@@ -13,6 +13,7 @@ import { releaseInstantOrderList } from "@/lib/commerce/list-commit";
 import { recordAudit } from "@/lib/audit";
 import { invoiceDueAt, paymentTermsDaysFor } from "@/lib/payment-terms";
 import { lineOrder } from "@/lib/commerce/line-order";
+import { feePlacementDescription } from "@/lib/commerce/placements";
 import {
   ORDER_STATUS_AFTER_FULL_CREDIT,
   canIssueInvoice,
@@ -20,9 +21,6 @@ import {
   type CreditNoteBlock,
 } from "@/lib/order-lifecycle";
 
-// Same description convention as money.ts computeContentFeeLines — the only
-// link between a CONTENT_FEE line and the placement it was priced for.
-const CONTENT_FEE_PREFIX = "Content production — ";
 
 export type IssueInvoiceResult =
   | { ok: true; invoiceId: string; total: number; currency: string; dueAt: Date }
@@ -66,7 +64,8 @@ export async function issueInvoiceForOrder(args: {
   const lines = billable.map((l) => {
     const product =
       l.kind === "CONTENT_FEE"
-        ? productByName.get(l.description.replace(CONTENT_FEE_PREFIX, ""))
+        ? // The fee names the placement it was priced for (lib/commerce/placements.ts).
+          productByName.get(feePlacementDescription(l.description) ?? "")
         : l.productId
           ? productById.get(l.productId)
           : undefined;
