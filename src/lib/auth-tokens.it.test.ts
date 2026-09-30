@@ -6,6 +6,7 @@ import {
   consumeMagicLinkToken,
   consumePasswordResetToken,
 } from "@/lib/auth-tokens";
+import { reconcileSessionToken } from "@/lib/session-version";
 
 // DB-mutating integration test — skipped unless RUN_DB_IT=1, and only
 // against a DISPOSABLE database. Proves the single-use token semantics
@@ -109,6 +110,41 @@ if (!RUN_DB_IT) {
     assert.equal(replay.ok, false);
     const after2 = await prisma.user.findUniqueOrThrow({ where: { id: userId } });
     assert.equal(after2.passwordHash, "x-new-hash");
+  });
+
+  test("password-reset consume ends every session opened before it", async () => {
+    // A session minted now carries the current version (what the jwt
+    // callback in src/auth.ts stamps at sign-in).
+    const before2 = await prisma.user.findUniqueOrThrow({
+      where: { id: userId },
+      select: { sessionVersion: true, deactivatedAt: true, role: true },
+    });
+    const oldSession = { uid: userId, sv: before2.sessionVersion };
+    const stateOf = async () => {
+      const u = await prisma.user.findUniqueOrThrow({
+        where: { id: userId },
+        select: { sessionVersion: true, deactivatedAt: true, role: true },
+      });
+      return { ...u, orgId: null, orgType: null };
+    };
+    assert.ok(reconcileSessionToken(oldSession, await stateOf()), "session valid before the reset");
+
+    const outcome = await consumePasswordResetToken(await mintResetToken(), "x-reset-hash");
+    assert.ok(outcome.ok);
+
+    const afterReset = await stateOf();
+    assert.equal(afterReset.sessionVersion, before2.sessionVersion + 1);
+    assert.equal(
+      reconcileSessionToken(oldSession, afterReset),
+      null,
+      "a session from before the reset must end",
+    );
+    // A fresh sign-in after the reset picks up the new version and is valid.
+    assert.ok(reconcileSessionToken({ uid: userId, sv: afterReset.sessionVersion }, afterReset));
+
+    // An expired token changes nothing — no version bump, no sign-out.
+    await consumePasswordResetToken(await mintResetToken(new Date(Date.now() - 1000)), "x-nope");
+    assert.equal((await stateOf()).sessionVersion, afterReset.sessionVersion);
   });
 
   test("password-reset consume rejects expired tokens without touching the hash", async () => {

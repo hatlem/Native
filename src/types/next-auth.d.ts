@@ -14,6 +14,7 @@ declare module "next-auth" {
     role?: UserRole;
     orgId?: string | null;
     orgType?: string | null;
+    sessionVersion?: number;
   }
 }
 
@@ -23,5 +24,7 @@ declare module "next-auth/jwt" {
     role?: UserRole;
     orgId?: string | null;
     orgType?: string | null;
+    // User.sessionVersion at mint time — see src/lib/session-version.ts.
+    sv?: number;
   }
 }

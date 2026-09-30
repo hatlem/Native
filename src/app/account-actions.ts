@@ -3,7 +3,8 @@
 import { redirect } from "next/navigation";
 import bcrypt from "bcryptjs";
 import { MarketCode } from "@prisma/client";
-import { auth } from "@/auth";
+import { AuthError } from "next-auth";
+import { auth, signIn, signOut } from "@/auth";
 import { prisma } from "@/lib/prisma";
 import { recordAudit } from "@/lib/audit";
 import {
@@ -12,7 +13,6 @@ import {
   type MembershipRow,
 } from "@/lib/membership";
 import { canDeactivateSelf } from "@/lib/user-admin";
-import { signOut } from "@/auth";
 import { normaliseEmail } from "@/lib/email-change";
 
 const MARKET_CODES = Object.values(MarketCode) as string[];
@@ -131,14 +131,26 @@ export async function setPassword(formData: FormData) {
     }
   }
 
+  // Bumping the session version ends every other session on the account —
+  // including a stolen one, which is usually why people change a password.
+  // It ends this browser's session too, so re-mint it straight away with the
+  // password the user just chose (see @/lib/session-version).
   const hash = await bcrypt.hash(next, 10);
   await prisma.user.update({
     where: { id: user.id },
-    data: { passwordHash: hash },
+    data: { passwordHash: hash, sessionVersion: { increment: 1 } },
   });
   await recordAudit(user.id, "user.password_set", `User:${user.id}`, {
     hadPasswordBefore: !!user.passwordHash,
   });
+  try {
+    await signIn("credentials", { email: user.email, password: next, redirect: false });
+  } catch (error) {
+    // The change itself is saved; only the re-mint failed (e.g. the sign-in
+    // limiter). Signing in again with the new password is the honest way on.
+    if (error instanceof AuthError) redirect(`/${locale}/signin`);
+    throw error;
+  }
   redirect(`/${locale}/account?ok=password#password`);
 }
 

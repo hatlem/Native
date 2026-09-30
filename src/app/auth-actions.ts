@@ -1,6 +1,6 @@
 "use server";
 
-import { AuthError } from "next-auth";
+import { AuthError, CredentialsSignin } from "next-auth";
 import { cookies } from "next/headers";
 import { after } from "next/server";
 import bcrypt from "bcryptjs";
@@ -8,6 +8,7 @@ import { signIn, signOut } from "@/auth";
 import { prisma } from "@/lib/prisma";
 import { landingForRole } from "@/lib/roles";
 import { authLimiter } from "@/lib/rate-limit";
+import { SIGNIN_RATE_LIMITED } from "@/lib/auth-errors";
 import { recordAudit } from "@/lib/audit";
 import { generateToken, hashToken, tokenExpiry } from "@/lib/tokens";
 import { emailAdapter } from "@/lib/notify";
@@ -32,21 +33,21 @@ export async function authenticate(formData: FormData): Promise<{ redirectTo: st
     .trim();
   const password = String(formData.get("password") || "");
 
-  // Rate-limit on the email AND the source IP — the attacker controls both
-  // independently so we want either to slow them down.
   const ip = await clientIp();
-  const [ipCheck, emailCheck] = await Promise.all([
-    authLimiter.check(`signin:ip:${ip}`),
-    authLimiter.check(`signin:email:${email}`),
-  ]);
   const emailParam = email ? `&email=${encodeURIComponent(email)}` : "";
-  if (!ipCheck.ok || !emailCheck.ok) {
-    return { redirectTo: `/${locale}/signin?error=rate${emailParam}` };
-  }
 
+  // No rate-limit check here: the credentials provider (src/auth.ts) owns
+  // the sign-in limiter, per email AND per IP, so every route in is covered
+  // and one attempt spends one token. It throws a coded CredentialsSignin
+  // when it trips, which must read "too many attempts" — never "wrong
+  // password", which would send someone with the right password to reset it.
   try {
     await signIn("credentials", { email, password, redirect: false });
   } catch (error) {
+    if (error instanceof CredentialsSignin && error.code === SIGNIN_RATE_LIMITED) {
+      await recordAudit(email || "anonymous", "auth.signin_rate_limited", `User:${email}`, { ip });
+      return { redirectTo: `/${locale}/signin?error=rate${emailParam}` };
+    }
     if (error instanceof AuthError) {
       // Disambiguate the "valid password, just unverified" case from
       // truly-wrong credentials. Telling that user "Invalid email or
