@@ -46,21 +46,50 @@ test("buildAccountingInvoice falls back to id and null dates", () => {
   assert.equal(doc.customer.vatId, null);
 });
 
-test("getAccountingProvider defaults to noop and opts in to fiken", () => {
+const creds = { FIKEN_API_TOKEN: "tok", FIKEN_COMPANY_SLUG: "acme" };
+
+test("getAccountingProvider: noop without a token, Fiken once its credentials are set", () => {
   assert.equal(getAccountingProvider({}).name, "noop");
   assert.equal(getAccountingProvider({ ACCOUNTING_PROVIDER: "nope" }).name, "noop");
+  // Configuring the credentials is the opt-in.
+  assert.equal(getAccountingProvider(creds).name, "fiken");
+  // A token without the company slug can't push anywhere.
+  assert.equal(getAccountingProvider({ FIKEN_API_TOKEN: "tok" }).name, "noop");
+  // Explicit selection wins both ways; noop is the kill switch.
   assert.equal(getAccountingProvider({ ACCOUNTING_PROVIDER: "fiken" }).name, "fiken");
+  assert.equal(getAccountingProvider({ ...creds, ACCOUNTING_PROVIDER: "noop" }).name, "noop");
+  assert.equal(getAccountingProvider(creds).live, true);
+  assert.equal(getAccountingProvider({}).live, false);
 });
 
-test("noopProvider succeeds with a null ref", async () => {
+test("noopProvider succeeds with a null ref for invoices and credit notes", async () => {
   const doc = buildAccountingInvoice(invoice, org);
-  const r = await noopProvider.pushInvoice(doc);
+  assert.deepEqual(await noopProvider.pushInvoice(doc), { ok: true, provider: "noop", externalRef: null });
+  const r = await noopProvider.pushCreditNote({
+    creditNoteId: "cn_1",
+    invoiceId: "inv_1",
+    invoiceExternalRef: null,
+    issuedAt: "2026-06-01T00:00:00.000Z",
+    currency: "NOK",
+    amount: 50000,
+    reason: "Placement didn't run",
+  });
   assert.deepEqual(r, { ok: true, provider: "noop", externalRef: null });
 });
 
 test("fikenProvider reports not-configured rather than failing silently", async () => {
-  // No FIKEN_API_TOKEN in the test env.
-  const r = await fikenProvider().pushInvoice(buildAccountingInvoice(invoice, org));
+  const provider = fikenProvider({});
+  const r = await provider.pushInvoice(buildAccountingInvoice(invoice, org));
   assert.equal(r.ok, false);
   if (!r.ok) assert.match(r.error, /not configured/i);
+  const c = await provider.pushCreditNote({
+    creditNoteId: "cn_1",
+    invoiceId: "inv_1",
+    invoiceExternalRef: "123",
+    issuedAt: "2026-06-01T00:00:00.000Z",
+    currency: "NOK",
+    amount: 1,
+    reason: "x",
+  });
+  assert.equal(c.ok, false);
 });

@@ -64,6 +64,7 @@
     "campaigns": "Campaigns",
     "rates": "Rates",
     "users": "Users",
+    "invoices": "Invoices",
     "orgSwitcherLabel": "Organisation",
     "orgSwitchTo": "Switch to {org}"
   },
@@ -190,7 +191,9 @@
     "placementRetracted": "Retracted",
     "unlinkCta": "Unlink",
     "sharedArticleWarning": "This article is linked to {count} other placements — your changes will affect all of them.",
-    "specNotChecked": "not checked"
+    "specNotChecked": "not checked",
+    "detailUploadFailed": "Upload failed. Try a different file.",
+    "detailUploadUnavailable": "File uploads aren't available right now. Paste the text into the editor instead."
   },
   "reports": {
     "title": "Reports",
@@ -231,7 +234,8 @@
     "suggestedMargin": "Suggested",
     "basis_win-rate": "from win rate",
     "basis_category-median": "category median",
-    "basis_default": "default"
+    "basis_default": "default",
+    "exportInvoicesCsv": "Export invoices (CSV)"
   },
   "agency": {
     "eyebrow": "Agency",
@@ -1052,7 +1056,9 @@
     "lineNoteEdit": "Edit note to customer",
     "lineNoteSave": "Save note",
     "lineNoteHint": "Shown to the customer on the quote page and in the PDF.",
-    "lineNoteTooLong": "The note is too long. Keep it under {max} characters."
+    "lineNoteTooLong": "The note is too long. Keep it under {max} characters.",
+    "pdfStorageUnavailable": "File storage (R2) isn't configured in this environment, so the PDF can't be saved. Download the Word version instead.",
+    "pdfFailed": "The PDF couldn't be generated. Try again, or download the Word version."
   },
   "deskTitles": {
     "eyebrow": "Super-admin · titles",
@@ -1282,12 +1288,51 @@
     "cancelledReasonLabel": "Reason",
     "creditNoteButton": "Issue credit note",
     "creditNoteTitle": "Refund the invoice",
-    "creditNoteHint": "Refund {amount} against the issued invoice. The reason is logged on the credit note and shown to the buyer.",
+    "creditNoteHint": "Refunds {amount} in full and cancels the order. The reason is logged on the credit note and shown to the buyer.",
     "creditNoteReasonLabel": "Reason",
-    "creditNoteReasonPlaceholder": "e.g. Order cancelled after invoice issued; publisher editorial veto.",
+    "creditNoteReasonPlaceholder": "e.g. Placement didn't run as agreed; buyer disputed the invoice.",
     "creditNoteSubmit": "Issue credit note",
     "issuingCreditNote": "Issuing…",
-    "creditNoteIssuedLabel": "Credit note issued"
+    "creditNoteIssuedLabel": "Credit note issued",
+    "cancelBlock": {
+      "ran": "The campaign has run, so the order can't be cancelled. Invoice it, then issue a credit note if the buyer shouldn't pay.",
+      "invoiced": "The invoice is issued. Issue a credit note to refund it; that also cancels the order.",
+      "cancelled": "The order is already cancelled.",
+      "other": "The order can't be cancelled in its current state."
+    },
+    "cancelErrors": {
+      "reasonRequired": "Add a reason before cancelling.",
+      "notFound": "Order not found.",
+      "blocked": "This order can no longer be cancelled."
+    },
+    "creditError": "Credit note not issued",
+    "creditErrors": {
+      "reasonRequired": "Add a reason; it goes on the credit note.",
+      "notFound": "Order not found.",
+      "noInvoice": "There's no issued invoice to credit.",
+      "alreadyCredited": "This invoice has already been credited.",
+      "wrongOrderStatus": "Only an invoiced order can be credited."
+    },
+    "accountingSynced": "{doc} is synced to {provider} (no. {number}).",
+    "accountingSyncedNoNumber": "{doc} is synced to {provider}.",
+    "accountingLocalOnly": "{doc} is kept in NativeSpin only: no accounting integration is configured.",
+    "accountingFailed": "{doc} couldn't be synced to {provider}: {error}",
+    "accountingNotSent": "{doc} hasn't been sent to accounting.",
+    "accountingRetry": "Retry sync",
+    "accountingRetrying": "Syncing…",
+    "accountingDocInvoice": "The invoice",
+    "accountingDocCreditNote": "The credit note",
+    "advanceGuardTitle": "{missing, plural, =1 {1 placement has} other {# placements have}} no published link",
+    "advanceGuardLeadLive": "Marking the order live tells the buyer their campaign is published. These placements have no published link yet:",
+    "advanceGuardLeadCompleted": "Completing the order tells the buyer the campaign has run. These placements have no published link yet:",
+    "advanceGuardConfirm": "I've checked these placements and want to advance anyway",
+    "advanceGuardNote": "The buyer's email only counts placements that are actually published.",
+    "advanceError": "Status not changed",
+    "advanceErrors": {
+      "unconfirmed": "Tick the confirmation to advance while placements are still unpublished.",
+      "moved": "The order changed status in the meantime. Check it and try again."
+    },
+    "unknownPlacement": "Unnamed placement"
   },
   "production": {
     "brief": "Brief",
@@ -1328,7 +1373,28 @@
     "currency": "Currency",
     "subtotal": "Subtotal",
     "vat": "VAT",
-    "total": "Total"
+    "total": "Total",
+    "number": "Invoice number",
+    "download": "Download PDF",
+    "documentTitle": "Invoice {number}",
+    "colDescription": "Description",
+    "colQty": "Qty",
+    "colUnitPrice": "Unit price",
+    "colAmount": "Amount",
+    "vatWithPct": "VAT ({pct}%)",
+    "vatId": "VAT ID",
+    "contentProduction": "Content production",
+    "creditedHeading": "Credited",
+    "creditedBody": "This invoice was credited in full on {date} ({amount}).",
+    "creditedReason": "Reason: {reason}",
+    "accountingRef": "Accounting ref.",
+    "pageOf": "Page {page} of {pages}",
+    "listTitle": "Invoices",
+    "listLead": "Every invoice for your organization. Open one to see the lines, or download the PDF.",
+    "emptyTitle": "No invoices yet",
+    "emptyHint": "Invoices appear here once a campaign has run and been billed.",
+    "emptyCta": "See your campaigns",
+    "colCustomer": "Customer"
   },
   "firm": {
     "badge": "Instant order",
@@ -2023,7 +2089,7 @@
     },
     "fees": {
       "title": "Fees and payment",
-      "body": "Pricing follows the active fee schedule (see /pricing). Invoices are issued in the buyer's market currency, with VAT applied per local law. Payment terms default to net 30 days unless otherwise agreed."
+      "body": "Pricing follows the active fee schedule (see /pricing). Invoices are issued in the buyer's market currency, with VAT applied per local law. Payment terms default to net 14 days unless otherwise agreed."
     },
     "liability": {
       "title": "Liability",
@@ -2270,7 +2336,6 @@
     "anchorSavings": "−{pct}% vs rate card",
     "anchorNote": "The publisher's public rate card for this placement. Your all-in price includes editorial production, placement, revisions and reporting.",
     "whyThisPrice": "NativeSpin maintains direct editorial relationships with every title in your quote. We negotiate placement, commission a vertical-specialist writer, manage editorial review with the publisher, and report on performance. You get one accountable partner and one all-in price — not a media invoice, a writer invoice and an agency retainer.",
-    "termsPayment": "50% on acceptance, 50% on publish.",
     "termsCancellation": "Full refund before the article brief is approved; 50% refund before first draft; non-refundable once the publisher slot is confirmed.",
     "termsValidity": "Quote valid for 14 days. Publisher availability confirmed at acceptance.",
     "bullets": {
@@ -2623,7 +2688,8 @@
     "contentProductionLabel": "Who writes the content?",
     "content_advertiser": "The advertiser can deliver their own articles",
     "content_publisher": "Articles must be written by your department",
-    "content_both": "Both are possible"
+    "content_both": "Both are possible",
+    "uploadUnavailable": "File upload isn't available right now. Paste a link to your rate card or media kit below instead."
   },
   "account": {
     "eyebrow": "Account",
@@ -3091,7 +3157,6 @@
     "vat": "VAT ({pct}%)",
     "total": "Total",
     "vatStatus": "Prices are shown excluding VAT unless stated otherwise above.",
-    "paymentTerms": "Payment terms: net 14 days from invoice date.",
     "footnote": "Lines marked \"price on request\" are additional to the total above and are confirmed separately before booking.",
     "circulation": "Circulation",
     "digitalReach": "Digital reach/month",
@@ -3158,7 +3223,17 @@
     "errRole": "That role isn't one we recognise.",
     "errDeactivatedTarget": "That account is deactivated. Reactivate it first — a sign-in email it can't use only confuses the recipient.",
     "errEmailFailed": "The email couldn't be sent. Nothing else was changed.",
-    "errGeneric": "Something went wrong and nothing was saved. Try again."
+    "errGeneric": "Something went wrong and nothing was saved. Try again.",
+    "termsHeading": "Customer payment terms",
+    "termsLead": "Net days from the invoice date. Applies to new quotes and invoices; issued invoices keep their terms. The default is {days} days.",
+    "termsOrgLabel": "Customer",
+    "termsDaysLabel": "Payment terms (days)",
+    "termsSave": "Save terms",
+    "termsCustomHeading": "Customers with non-default terms",
+    "termsNoneCustom": "Every customer is on the default terms.",
+    "termsDaysValue": "{days, plural, one {net # day} other {net # days}}",
+    "okTerms": "Payment terms saved.",
+    "errTerms": "Enter whole days between 1 and 120."
   },
   "status": {
     "ACCEPTED": "Accepted",
@@ -3192,5 +3267,8 @@
   "joinedNotice": {
     "lists": "Welcome to {org}. These are your team's plans — open one to see the titles, prices and notes.",
     "home": "Welcome to {org}. You're now part of the team on NativeSpin."
+  },
+  "paymentTerms": {
+    "line": "{days, plural, one {Payment terms: net # day from invoice date.} other {Payment terms: net # days from invoice date.}}"
   }
 }

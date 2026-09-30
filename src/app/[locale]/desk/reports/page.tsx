@@ -338,6 +338,10 @@ export default async function DeskReportsPage({
         <section>
           <div className="section-head">
             <h2>{t("invoices")}</h2>
+            {/* Desk-only route; a plain <a> because it's a file download. */}
+            <a className="small-link" href="/api/export/invoices.csv" download>
+              {t("exportInvoicesCsv")}
+            </a>
           </div>
           <BreakdownList
             rows={invoiceRows.map((r) => ({ key: r.group, count: r.amount }))}

@@ -27,21 +27,25 @@ export function canCancelOrder(status: OrderStatus): boolean {
   return CANCELLABLE_ORDER_STATUSES.has(status);
 }
 
-// Why this status is locked, in a form the desk UI can render verbatim.
-// Empty string when cancellation IS allowed.
-export function cancelBlockReason(status: OrderStatus): string {
-  if (canCancelOrder(status)) return "";
+// Why this status is locked, as a key under the `order.cancelBlock`
+// message namespace (the desk UI translates it). Null when cancellation IS
+// allowed. The keys point at the path that is actually reachable from each
+// state (order-lifecycle.ts): a run campaign is invoiced and then credited;
+// an invoiced one is credited directly.
+export type CancelBlockKey = "ran" | "invoiced" | "cancelled" | "other";
+
+export function cancelBlockKey(status: OrderStatus): CancelBlockKey | null {
+  if (canCancelOrder(status)) return null;
   switch (status) {
     case OrderStatus.LIVE:
-      return "Placement is already live — issue a credit note instead.";
     case OrderStatus.COMPLETED:
-      return "Order is completed — issue a credit note instead.";
+      return "ran";
     case OrderStatus.INVOICED:
-      return "Invoice is issued — issue a credit note against it instead.";
+      return "invoiced";
     case OrderStatus.CANCELLED:
-      return "Order is already cancelled.";
+      return "cancelled";
     default:
-      return "Order cannot be cancelled in its current state.";
+      return "other";
   }
 }
 

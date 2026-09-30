@@ -66,6 +66,7 @@ export default async function RequestsPage({
   const t = await getTranslations({ locale, namespace: "requests" });
   const tOrders = await getTranslations({ locale, namespace: "orders" });
   const tPlan = await getTranslations({ locale, namespace: "plan" });
+  const tInvoice = await getTranslations({ locale, namespace: "invoice" });
 
   const scope = await loadScope();
   if (!scope.workspace) redirect(`/${locale}/signin`);
@@ -361,9 +362,14 @@ export default async function RequestsPage({
           <h1>{t("pipelineTitle")}</h1>
           <p className="lead">{t("pipelineLead")}</p>
         </div>
-        <Link href="/catalog" className="btn">
-          {t("newCampaignCta")}
-        </Link>
+        <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+          <Link href="/invoices" className="btn secondary">
+            {tInvoice("listTitle")}
+          </Link>
+          <Link href="/catalog" className="btn">
+            {t("newCampaignCta")}
+          </Link>
+        </div>
       </div>
 
       <nav className="campaign-tabs" aria-label={t("tabsLabel")}>

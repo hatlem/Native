@@ -29,6 +29,11 @@ import { recordAudit } from "@/lib/audit";
 import { notifyDesk, notifyOrg } from "@/lib/notify";
 import { loadScope, canActOnOrg, canCommitOnOrg } from "@/lib/scope";
 import { generateQuotePdf as renderQuotePdf } from "@/lib/pdf/generate-quote-pdf";
+import {
+  StorageNotConfiguredError,
+  isStorageConfigured,
+  missingStorageEnv,
+} from "@/lib/storage/r2";
 import { normalizeLineNote, noteByProductId } from "@/lib/line-note";
 
 function str(formData: FormData, key: string): string {
@@ -368,22 +373,42 @@ export async function generateQuotePdf(formData: FormData) {
   const scope = await loadScope();
   if (!scope.isDesk || !scope.userId) redirect(`/${locale}/signin`);
 
-  const doc = await renderQuotePdf({
-    quoteId,
-    locale,
-    generatedById: scope.userId,
-    preparedBy: {
-      name: scope.session?.user?.name ?? null,
-      email: scope.session?.user?.email ?? "desk@nativespin.com",
-    },
-  });
+  // A PDF version only exists once it is stored, so without object storage
+  // there is nothing to generate — say so instead of rendering and then
+  // failing the upload with an unhandled 500.
+  if (!isStorageConfigured()) {
+    console.error("quote.pdf.storage_not_configured", { quoteId, missing: missingStorageEnv() });
+    redirect(`/${locale}/desk/${requestId}?pdf=storage-unavailable`);
+  }
 
-  await recordAudit(scope.userId, "quote.pdf.generate", `Quote:${quoteId}`, {
-    documentId: doc.id,
-    version: doc.version,
-  });
+  let outcome: "ok" | "storage-unavailable" | "failed";
+  try {
+    const doc = await renderQuotePdf({
+      quoteId,
+      locale,
+      generatedById: scope.userId,
+      preparedBy: {
+        name: scope.session?.user?.name ?? null,
+        email: scope.session?.user?.email ?? "desk@nativespin.com",
+      },
+    });
+    await recordAudit(scope.userId, "quote.pdf.generate", `Quote:${quoteId}`, {
+      documentId: doc.id,
+      version: doc.version,
+    });
+    outcome = "ok";
+  } catch (err) {
+    // redirect() must stay outside the try (it throws by design); map the
+    // failure to a desk-visible message and keep the details in the log.
+    console.error("quote.pdf.generate_failed", { quoteId, err });
+    outcome = err instanceof StorageNotConfiguredError ? "storage-unavailable" : "failed";
+  }
 
-  redirect(`/${locale}/desk/${requestId}`);
+  redirect(
+    outcome === "ok"
+      ? `/${locale}/desk/${requestId}`
+      : `/${locale}/desk/${requestId}?pdf=${outcome}`,
+  );
 }
 
 export async function acceptQuote(formData: FormData) {

@@ -37,6 +37,7 @@ test("QuoteDocument: renders with a price-on-request line and links back online"
     preparedByName: "Desk",
     preparedByEmail: "desk@nativespin.com",
     onlineUrl,
+    paymentTermsDays: 14,
     rows: [
       {
         titleName: "Trailer",

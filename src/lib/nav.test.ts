@@ -1,6 +1,6 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { navItemsFor, audienceFor, paletteItemsFor } from "./nav";
+import { navItemsFor, audienceFor, paletteItemsFor, userMenuItemsFor } from "./nav";
 
 const t = (k: string) => k; // identity translator — assert on keys
 
@@ -101,4 +101,20 @@ test("the user console is super-admin only — desk staff can't reach it from th
     .map((i) => i.key);
   assert.ok(superPalette.includes("deskUsers"));
   assert.ok(!deskPalette.includes("deskUsers"));
+});
+
+test("buyers reach their invoices from the user menu and palette, not the capped top bar", () => {
+  for (const audience of ["advertiser", "agency"] as const) {
+    const menu = userMenuItemsFor(audience, t);
+    assert.deepEqual(
+      menu.find((i) => i.key === "invoices"),
+      { key: "invoices", label: "invoices", href: "/invoices" },
+    );
+    const palette = paletteItemsFor(audience, t).flatMap((s) => s.items).map((i) => i.key);
+    assert.ok(palette.includes("invoices"), audience);
+    assert.ok(!navItemsFor(audience, t).some((i) => i.key === "invoices"), audience);
+  }
+  for (const audience of ["publisher", "writer", "desk"] as const) {
+    assert.ok(!userMenuItemsFor(audience, t).some((i) => i.key === "invoices"), audience);
+  }
 });

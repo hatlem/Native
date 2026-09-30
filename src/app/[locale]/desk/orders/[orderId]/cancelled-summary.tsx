@@ -1,11 +1,11 @@
 import { getTranslations } from "next-intl/server";
 import type { Invoice, Prisma } from "@prisma/client";
 import { formatMoney } from "@/lib/money";
-import { issueCreditNote } from "@/app/desk-billing-actions";
-import { SubmitButton } from "@/components";
+import { creditNoteEligibility } from "@/lib/order-lifecycle";
+import { CreditNoteForm } from "./credit-note-form";
 
 type OrderForCancelledSummary = Prisma.OrderGetPayload<{
-  include: { creditNotes: true };
+  include: { creditNotes: true; invoices: true };
 }>;
 
 type Props = {
@@ -17,6 +17,11 @@ type Props = {
 export async function CancelledSummary({ locale, order, invoice }: Props) {
   if (!(order.status === "CANCELLED" && order.cancelledAt)) return null;
   const t = await getTranslations({ locale, namespace: "order" });
+  const credit = order.creditNotes[0];
+  // A cancelled order normally has no open invoice (a full credit note is
+  // what cancels an invoiced one), but legacy data can — let the desk put
+  // it right here.
+  const eligibility = creditNoteEligibility(order.status, order.invoices, order.creditNotes);
 
   return (
     <section className="cancelled-summary">
@@ -38,59 +43,13 @@ export async function CancelledSummary({ locale, order, invoice }: Props) {
         ) : null}
       </dl>
 
-      {/* Credit-note affordance — only renders once invoice exists,
-          order is CANCELLED, and no credit note has been issued. */}
-      {invoice &&
-      ["ISSUED", "PAID", "OVERDUE"].includes(invoice.status) &&
-      order.creditNotes.length === 0 ? (
-        <details className="spec-details">
-          <summary>
-            <span className="btn secondary">{t("creditNoteButton")}</span>
-          </summary>
-          <form action={issueCreditNote} className="product-form">
-            <input type="hidden" name="locale" value={locale} />
-            <input type="hidden" name="orderId" value={order.id} />
-            <h4 style={{ margin: "12px 0 4px" }}>{t("creditNoteTitle")}</h4>
-            <p className="muted small">
-              {t("creditNoteHint", {
-                amount: formatMoney(
-                  Number(invoice.total),
-                  invoice.currency,
-                  locale,
-                ),
-              })}
-            </p>
-            <div className="field">
-              <label htmlFor={`credit-reason-${order.id}`}>
-                {t("creditNoteReasonLabel")}
-              </label>
-              <textarea
-                id={`credit-reason-${order.id}`}
-                name="reason"
-                rows={3}
-                required
-                placeholder={t("creditNoteReasonPlaceholder")}
-              />
-            </div>
-            <div className="actions">
-              <SubmitButton
-                label={t("creditNoteSubmit")}
-                pendingLabel={t("issuingCreditNote")}
-                className="btn"
-              />
-            </div>
-          </form>
-        </details>
-      ) : order.creditNotes.length > 0 ? (
+      {credit ? (
         <p className="muted small">
           <strong>{t("creditNoteIssuedLabel")}:</strong>{" "}
-          {formatMoney(
-            Number(order.creditNotes[0].amount),
-            order.creditNotes[0].currency,
-            locale,
-          )}{" "}
-          · {order.creditNotes[0].reason}
+          {formatMoney(Number(credit.amount), credit.currency, locale)} · {credit.reason}
         </p>
+      ) : eligibility.ok && invoice ? (
+        <CreditNoteForm locale={locale} orderId={order.id} invoice={eligibility.invoice} />
       ) : null}
     </section>
   );

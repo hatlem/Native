@@ -705,6 +705,9 @@ model Organization {
   addressLine2  String?
   postalCode    String?
   city          String?
+  // Payment terms agreed with this customer: net N days from invoice date
+  // (lib/payment-terms.ts). Set by SUPERADMIN only; DB CHECK keeps 1–120.
+  paymentTermsDays Int @default(14)
   parentOrgId   String?
   parentOrg     Organization?  @relation("AgencyClients", fields: [parentOrgId], references: [id])
   clients       Organization[] @relation("AgencyClients")
@@ -1470,6 +1473,19 @@ model Invoice {
   total          Decimal       @db.Decimal(12, 2)
   issuedAt       DateTime?
   dueAt          DateTime?
+  // Payment terms (net days) this invoice was issued under — a snapshot of
+  // Organization.paymentTermsDays, so the invoice keeps stating the terms
+  // its dueAt came from. Null on invoices issued before terms existed.
+  paymentTermsDays Int?
+  // Accounting sync (lib/accounting-sync.ts). Provider is "noop" when no
+  // accounting integration is configured; ref/number are the provider's
+  // own id and invoice number; error holds the last failed push and is
+  // shown to the desk until a retry succeeds.
+  accountingProvider String?
+  accountingRef      String?
+  accountingNumber   String?
+  accountingSyncedAt DateTime?
+  accountingError    String?
   createdAt      DateTime      @default(now())
   updatedAt      DateTime      @updatedAt
 
@@ -1482,6 +1498,14 @@ model InvoiceLine {
   invoiceId   String
   invoice     Invoice @relation(fields: [invoiceId], references: [id])
   description String
+  // Snapshot of what the line bills, so documents render a human label
+  // ("VG — Native article") instead of the raw product name/enum. Null on
+  // legacy rows, which fall back to parsing `description`
+  // (lib/invoice-line-label.ts).
+  kind        LineKind     @default(INVENTORY)
+  productId   String?
+  titleName   String?
+  productType ProductType?
   quantity    Int     @default(1)
   unitAmount  Decimal @db.Decimal(12, 2)
   lineTotal   Decimal @db.Decimal(12, 2)
@@ -1511,6 +1535,12 @@ model CreditNote {
   reason     String
   issuedAt   DateTime @default(now())
   issuedBy   String
+  // Accounting sync — same semantics as on Invoice.
+  accountingProvider String?
+  accountingRef      String?
+  accountingNumber   String?
+  accountingSyncedAt DateTime?
+  accountingError    String?
   createdAt  DateTime @default(now())
 
   @@index([invoiceId])
