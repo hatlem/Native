@@ -213,7 +213,9 @@
     "compareBar": {
       "label": "{count, plural, =1 {1 titel vald} other {# titlar valda}}",
       "open": "Jämför →",
-      "clear": "Rensa"
+      "clear": "Rensa",
+      "select": "Jämför {name}",
+      "region": "Titlar valda för jämförelse"
     },
     "card": {
       "from": "Från",

@@ -213,7 +213,9 @@
     "compareBar": {
       "label": "{count, plural, =1 {1 tittel valgt} other {# titler valgt}}",
       "open": "Sammenlign →",
-      "clear": "Fjern"
+      "clear": "Fjern",
+      "select": "Sammenlign {name}",
+      "region": "Titler valgt for sammenligning"
     },
     "card": {
       "from": "Fra",

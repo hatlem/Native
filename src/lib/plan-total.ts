@@ -91,6 +91,25 @@ export function contentFeeFor(
   );
 }
 
+// How many lines the plan shows: priced placements AND unresolved title
+// placeholders — both are things the buyer asked for — but never the
+// recommended alternatives beside it. The catalog's plan bar used to count
+// product ids only and said "3 titles" for a 6-line plan.
+export function planLineCount(items: { isAlternative?: boolean }[]): number {
+  return items.filter((i) => !i.isAlternative).length;
+}
+
+// The catalog plan bar's figure: per-currency totals of the priced lines,
+// computed server-side by the same engine as /plan. Currencies with nothing
+// priced yet are dropped (the bar says "priced by the desk" instead of 0).
+export type BarTotal = { currency: string; amount: number; itemCount: number };
+
+export function barTotals(items: EstimableListItem[], pricing: PlanPricing): BarTotal[] {
+  return estimateListTotals(items, pricing)
+    .filter((t) => t.hasVisible)
+    .map(({ currency, amount, itemCount }) => ({ currency, amount, itemCount }));
+}
+
 // One priced line, split the way the order charges it: the placement
 // (per-line rounded, market default margin) plus — for "We write it" — one
 // content fee. `total` is the line's figure wherever a line is shown (/plan,

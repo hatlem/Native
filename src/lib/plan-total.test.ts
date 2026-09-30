@@ -1,6 +1,14 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { estimateListTotals, placementLineTotal, contentFeeFor, linePrice, type PlanPricing } from "./plan-total";
+import {
+  barTotals,
+  contentFeeFor,
+  estimateListTotals,
+  linePrice,
+  placementLineTotal,
+  planLineCount,
+  type PlanPricing,
+} from "./plan-total";
 import {
   computeContentFeeLines,
   computeQuoteLines,
@@ -244,6 +252,25 @@ test("linePrice: null for hidden prices and placeholders, never a 0 figure", () 
   const pricing: PlanPricing = { feeRules: NO_FEES, marginRules: [] };
   assert.equal(linePrice(fakeItem({ confirmedAt: null, withContent: true }), pricing), null);
   assert.equal(linePrice(fakeItem({ productId: null }), pricing), null);
+});
+
+// BUG-prod-api-7: the catalog bar said "3 titles" for a 6-line plan.
+test("planLineCount counts placeholders, never alternatives", () => {
+  const items = [
+    fakeItem({}),
+    fakeItem({ productId: null }),
+    { ...fakeItem({}), isAlternative: true },
+  ];
+  assert.equal(planLineCount(items), 2);
+});
+
+test("barTotals: server-priced totals, nothing for a currency with no priced line", () => {
+  const pricing: PlanPricing = { feeRules: NO_FEES, marginRules: [] };
+  const items = [
+    fakeItem({ basePrice: 15000, withContent: true }),
+    fakeItem({ currency: "SEK", confirmedAt: null }),
+  ];
+  assert.deepEqual(barTotals(items, pricing), [{ currency: "NOK", amount: 29250, itemCount: 1 }]);
 });
 
 test("estimateListTotals is exactly the sum of the linePrice totals", () => {

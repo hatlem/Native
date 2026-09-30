@@ -349,7 +349,9 @@
     "compareBar": {
       "label": "{count, plural, =1 {1 Titel ausgewählt} other {# Titel ausgewählt}}",
       "open": "Vergleichen →",
-      "clear": "Zurücksetzen"
+      "clear": "Zurücksetzen",
+      "select": "{name} vergleichen",
+      "region": "Zum Vergleich ausgewählte Titel"
     },
     "card": {
       "from": "Ab",

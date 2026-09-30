@@ -90,14 +90,15 @@ function useCompare(): Ctx {
   return ctx;
 }
 
-export function TitleSelector({ id }: { id: string }) {
+export function TitleSelector({ id, name }: { id: string; name: string }) {
   const { enabled, selected, toggle } = useCompare();
+  const t = useTranslations("catalog.compareBar");
   if (!enabled) return null;
   const checked = selected.has(id);
   return (
     <label
       className="title-selector"
-      aria-label="Select for compare"
+      aria-label={t("select", { name })}
       onClick={(e) => e.stopPropagation()}
     >
       <input
@@ -117,7 +118,7 @@ function CompareBar() {
   if (count < 2) return null;
   const href = `/catalog/compare?ids=${Array.from(selected).join(",")}`;
   return (
-    <div className="compare-bar" role="region" aria-label="Compare selection">
+    <div className="compare-bar" role="region" aria-label={t("region")}>
       <div className="compare-bar__inner">
         <span className="compare-bar__count">{t("label", { count })}</span>
         <div className="compare-bar__actions">

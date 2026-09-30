@@ -25,7 +25,10 @@ import {
   writeActiveListId,
   clearActiveListId,
   migrateLegacyBasket,
+  resolveActiveList,
 } from "@/lib/lists";
+import { barTotals, planLineCount, type BarTotal } from "@/lib/plan-total";
+import { loadPricingDefaults } from "@/lib/content-fee";
 import { enableListShare, disableListShare } from "@/lib/list-share";
 import { normalizeLineNote } from "@/lib/line-note";
 import { contentIntent } from "@/lib/authorship";
@@ -108,8 +111,12 @@ export async function addProductToList(formData: FormData) {
   redirect(safeReturnTo(formData, locale, "/plan"));
 }
 
+// On success the result carries the plan's line count and totals as the
+// SERVER prices them, so the catalog bar never computes a figure itself.
+// It used to add each row's raw net basePrice (shipped to the client for
+// every priced title — our publisher cost, un-marked-up) to its total.
 export type ShortlistAddResult =
-  | { ok: true; listId: string }
+  | { ok: true; listId: string; count: number; totals: BarTotal[] }
   | { ok: false; reason: "signin" | "no-client" | "invalid-product" };
 
 // Client-invoked counterpart to addProductToList: same validation and
@@ -153,7 +160,14 @@ export async function addProductToActiveList(
   await addProductItem(listId, productId, withContent);
   revalidatePath(`/${locale}/plan`, "layout");
   revalidatePath(`/${locale}/requests`);
-  return { ok: true, listId };
+  const list = await resolveActiveList(orgId, listId);
+  const items = list?.id === listId ? list.items : [];
+  return {
+    ok: true,
+    listId,
+    count: planLineCount(items),
+    totals: barTotals(items, await loadPricingDefaults()),
+  };
 }
 
 export async function addRecommendedToList(formData: FormData) {

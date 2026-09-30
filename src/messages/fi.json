@@ -349,7 +349,9 @@
     "compareBar": {
       "label": "{count, plural, =1 {1 julkaisu valittu} other {# julkaisua valittu}}",
       "open": "Vertaile →",
-      "clear": "Tyhjennä"
+      "clear": "Tyhjennä",
+      "select": "Vertaa: {name}",
+      "region": "Vertailuun valitut julkaisut"
     },
     "card": {
       "from": "Alkaen",

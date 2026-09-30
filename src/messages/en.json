@@ -405,7 +405,9 @@
     "compareBar": {
       "label": "{count, plural, =1 {1 title selected} other {# titles selected}}",
       "open": "Compare →",
-      "clear": "Clear"
+      "clear": "Clear",
+      "select": "Compare {name}",
+      "region": "Titles selected for comparison"
     },
     "card": {
       "from": "From",
