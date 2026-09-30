@@ -400,6 +400,38 @@ test("setItemContent off leaves a publisher-produced line alone", async () => {
   assert.deepEqual(await pair(item.id), { withContent: false, authorshipMode: "PUBLISHER_PRODUCED" });
 });
 
+// BUG-final-prod-1: ticking "We write it" on a line the publisher's studio
+// writes added our content fee for an article the publisher already produces.
+test("setItemContent can't switch 'We write it' on for a publisher-produced placement", async () => {
+  const listId = await freshList();
+  const studio = await prisma.product.create({
+    data: {
+      titleId,
+      type: "NATIVE_DISPLAY",
+      name: "Lists IT studio display",
+      basePrice: 10000,
+      currency: "NOK",
+      inclusions: { production: "PUBLISHER" },
+    },
+  });
+  try {
+    const item = await addProductItem(listId, studio.id);
+    await setItemContent(item.id, true);
+    assert.deepEqual(await pair(item.id), { withContent: false, authorshipMode: "PUBLISHER_PRODUCED" });
+    // A row an earlier toggle left on (or on and off again) is set right by
+    // the next post, whatever it asks for.
+    await prisma.savedListItem.update({
+      where: { id: item.id },
+      data: { withContent: true, authorshipMode: "NATIVESPIN_PRODUCED" },
+    });
+    await setItemContent(item.id, false);
+    assert.deepEqual(await pair(item.id), { withContent: false, authorshipMode: "PUBLISHER_PRODUCED" });
+  } finally {
+    await prisma.savedListItem.deleteMany({ where: { productId: studio.id } });
+    await prisma.product.delete({ where: { id: studio.id } });
+  }
+});
+
 test("the RFQ snapshot of a toggled line carries NativeSpin authorship", async () => {
   const listId = await freshList();
   const item = await addProductItem(listId, productId);

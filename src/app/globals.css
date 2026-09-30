@@ -3387,6 +3387,12 @@ select:disabled {
   border-color: var(--accent);
   background: var(--accent-soft);
 }
+/* Publisher-produced placement: a statement where the toggle would be — the
+   publisher's studio writes the article, so there is nothing to switch. */
+.plan-line-card__write-note {
+  font-size: 0.8rem;
+  color: var(--muted);
+}
 .plan-line-card__remove {
   background: transparent;
   border: 0;
@@ -3689,6 +3695,20 @@ select:disabled {
   text-align: center;
   font-size: 0.78rem;
   color: var(--muted);
+}
+
+/* An ordered plan: the order stands where the send/order form was. */
+.plan-ordered {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.plan-ordered p {
+  margin: 0;
+}
+.plan-ordered__title {
+  font-weight: 600;
+  color: var(--success);
 }
 
 .plan-timing-options {

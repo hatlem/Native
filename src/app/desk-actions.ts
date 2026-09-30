@@ -5,6 +5,7 @@ import { revalidatePath } from "next/cache";
 import { OrderStatus, BookingStatus } from "@prisma/client";
 import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
+import { releaseInstantOrderList } from "@/lib/commerce/list-commit";
 import { recordAudit } from "@/lib/audit";
 import { notifyOrg, notifyPublisher } from "@/lib/notify";
 import { requireDesk } from "@/lib/desk-guard";
@@ -279,6 +280,8 @@ export async function cancelOrder(formData: FormData) {
       },
       data: { status: BookingStatus.CANCELLED },
     }),
+    // Nothing of an instant order left live: its plan may be ordered again.
+    releaseInstantOrderList(prisma, order.id),
   ]);
 
   await recordAudit(userId, "order.cancel", `Order:${order.id}`, {

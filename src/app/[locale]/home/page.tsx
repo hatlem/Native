@@ -1,6 +1,7 @@
 import { getTranslations } from "next-intl/server";
 import { redirect } from "next/navigation";
 import { prisma } from "@/lib/prisma";
+import { PLACEMENT_LINE_WHERE } from "@/lib/commerce/placements";
 import { loadScope } from "@/lib/scope";
 import { Link } from "@/i18n/navigation";
 import { StatusBadge } from "@/app/status-badge";
@@ -102,7 +103,8 @@ export default async function HomePage({
         flightEndDate: true,
         organization: { select: { name: true } },
         quote: { select: { currency: true, total: true, request: { select: { plan: { select: { name: true } } } } } },
-        lines: { select: { id: true } },
+        // Placements only — the article fees are billed with them.
+        lines: { where: PLACEMENT_LINE_WHERE, select: { id: true } },
       },
     }),
     // Programme waves whose turn it is: the previous wave is live/finished, or
@@ -278,7 +280,7 @@ export default async function HomePage({
                     </div>
                     <div className="home-running-row__metric">
                       <div className="home-running-row__metric-value">{formatMoney(total, currency, locale)}</div>
-                      <div className="home-running-row__metric-label">{t("lines", { count: o.lines.length })}</div>
+                      <div className="home-running-row__metric-label">{t("placements", { count: o.lines.length })}</div>
                     </div>
                     <div className="home-running-row__date">
                       {o.flightEndDate ? dateFmt.format(o.flightEndDate) : ""}

@@ -84,8 +84,10 @@ export const SHARED_LIST_SELECT = {
           // its rate.
           visibility: true,
           pricingModel: true,
-          // The article fee's offer/publication layers (production-fee.ts).
+          // The article fee's offer/publication layers (production-fee.ts),
+          // and whether the publisher writes the article (no fee of ours).
           productionFee: true,
+          inclusions: true,
           // Only the rate-card fields the price engine reads (lib/plan-total.ts).
           priceRules: { select: { marginPct: true, seasonalMultiplier: true, minVolume: true } },
           title: {

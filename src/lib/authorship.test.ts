@@ -12,6 +12,7 @@ import {
   defaultContentIntent,
   mergeContentIntent,
   publisherProducesContent,
+  placementContentIntent,
   type AuthorshipMode,
 } from "./authorship";
 
@@ -175,4 +176,17 @@ test("every default intent satisfies withContent ⇔ NATIVESPIN_PRODUCED", () =>
     const r = defaultContentIntent(src);
     assert.equal(r.withContent, r.authorshipMode === "NATIVESPIN_PRODUCED");
   }
+});
+
+// BUG-final-prod-1: a publisher-produced line toggled to "We write it" (or
+// never toggled, which the firm path used to order as BUYER_SUPPLIED) must be
+// ordered as PUBLISHER_PRODUCED: no content fee, no writer, no copy asked of
+// the buyer.
+test("placementContentIntent: the publisher's studio wins over the row's toggle", () => {
+  const studio = { inclusions: { production: "PUBLISHER" } };
+  const publisher = { withContent: false, authorshipMode: "PUBLISHER_PRODUCED" };
+  assert.deepEqual(placementContentIntent(true, studio), publisher);
+  assert.deepEqual(placementContentIntent(false, studio), publisher);
+  assert.deepEqual(placementContentIntent(true, { inclusions: null }), contentIntent(true));
+  assert.deepEqual(placementContentIntent(false, null), contentIntent(false));
 });

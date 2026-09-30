@@ -17,18 +17,23 @@ import {
   isQuoteExpired,
 } from "@/lib/commerce/quote-validity";
 import { lineOrder } from "@/lib/commerce/line-order";
+import { placementCount } from "@/lib/commerce/placements";
 import { reconcileExpiredQuotesInBackground } from "@/lib/commerce/quote-expiry";
 import { OrderSection } from "./_components/OrderSection";
+import { AcceptRefusedBanner } from "./_components/AcceptRefusedBanner";
 import { marketTimeZone } from "@/lib/markets";
 
 export const dynamic = "force-dynamic";
 
 export default async function RequestPage({
   params,
+  searchParams,
 }: {
   params: Promise<{ locale: string; id: string }>;
+  searchParams: Promise<Record<string, string | string[] | undefined>>;
 }) {
   const { locale, id } = await params;
+  const sp = await searchParams;
   const t = await getTranslations({ locale, namespace: "requests" });
 
   const request = await prisma.request.findUnique({
@@ -158,9 +163,10 @@ export default async function RequestPage({
     : false;
   const orderInvoice = orders[0]?.invoices[0];
 
-  // Aggregate item count across quotes for the campaign-banner outcome
-  // line ("3 editorial-grade native placements" rather than per-quote).
-  const totalQuoteLines = quotes.reduce((s, q) => s + q.lines.length, 0);
+  // Aggregate placement count across quotes for the campaign-banner outcome
+  // line ("3 editorial-grade native placements" rather than per-quote). The
+  // article fees are billed with their placements, not counted as ones.
+  const totalQuoteLines = quotes.reduce((s, q) => s + placementCount(q.lines), 0);
 
   return (
     <>
@@ -208,6 +214,8 @@ export default async function RequestPage({
           </>
         }
       />
+
+      <AcceptRefusedBanner locale={locale} sp={sp} />
 
       <PlanItemsSection
         locale={locale}

@@ -16,8 +16,10 @@ import {
   FirmOrderStaleError,
   FirmOrderChangedError,
   fingerprintListItems,
+  type FirmOrderResult,
 } from "@/lib/commerce/firm-order";
 import { submitListAsRfq } from "@/lib/commerce/submit-rfq";
+import { liveOrderForList } from "@/lib/commerce/list-commit";
 import { planNameFor } from "@/lib/plan-name";
 import { uniquePublisherIdsForProducts } from "@/lib/commerce/publishers";
 import { groupItemsByMarket } from "@/lib/quote-grouping";
@@ -88,6 +90,16 @@ export async function submitRequest(formData: FormData) {
     listId = await ensureActiveListId(orgId, await readActiveListId(), undefined, (await listNames(locale)).untitled);
   }
   const back = (error?: string) => planPath(locale, listId, error ? { error } : undefined);
+
+  // An ordered plan is spent (lib/commerce/list-commit.ts): /plan shows
+  // "Ordered" instead of the button, but a page left open — or a second tab —
+  // can still post. Neither path may commit it again: land on the order that
+  // exists. Booking the same lines again is a new plan ("Plan next wave").
+  const ordered = await liveOrderForList(prisma, listId);
+  if (ordered) {
+    console.warn("checkout.blocked", { reason: "already-ordered", userId: ws.userId, listId });
+    redirect(`/${locale}/requests/${ordered.requestId}?notice=already-ordered`);
+  }
 
   // The brief belongs to the plan: persist what was typed before anything can
   // bounce the buyer (onboarding, a refused submit), so it's still there when
@@ -286,7 +298,7 @@ export async function submitRequest(formData: FormData) {
     // — the single source of truth the POST /api/v1/orders endpoint also
     // uses. It mints the plan, an auto-accepted quote per market, and a
     // CONFIRMED order with briefs + publisher bookings.
-    let result: { requestId: string; orderIds: string[] };
+    let result: FirmOrderResult;
     try {
       result = await createFirmOrder({
         organizationId: org.id,
@@ -322,6 +334,10 @@ export async function submitRequest(formData: FormData) {
       }
       throw e;
     }
+    // Another click (double submit, second tab) ordered this plan while this
+    // one waited on the order lock: nothing new was booked, so nothing to
+    // announce — show the buyer the order that exists.
+    if (result.alreadyOrdered) redirect(`/${locale}/requests/${result.requestId}?notice=already-ordered`);
     request = { id: result.requestId };
     firmOrderIds = result.orderIds;
   } else {

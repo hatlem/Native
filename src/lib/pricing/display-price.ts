@@ -70,11 +70,11 @@ function feeSource(product: DisplayProduct, title: DisplayTitle) {
 // The article fee this product's band folds in: the fee a line added from the
 // catalog is charged, because that line starts with "We write it" on
 // (authorship.ts defaultContentIntent) — unless the publisher's own studio
-// writes it, where the line starts PUBLISHER_PRODUCED and no fee is charged.
+// writes it, where the line starts PUBLISHER_PRODUCED and no fee is charged
+// (articleFee itself returns 0 for those, so the band, the plan and the order
+// can't disagree about it).
 function bandArticleFee(product: DisplayProduct, title: DisplayTitle, defaults: PricingDefaults): number {
-  const source = feeSource(product, title);
-  if (publisherProducesContent(source)) return 0;
-  return articleFee(source, title.market.code, defaults.feeRules);
+  return articleFee(feeSource(product, title), title.market.code, defaults.feeRules);
 }
 
 // All-in customer price of ONE placement as a line added from the catalog is

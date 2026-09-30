@@ -6,6 +6,7 @@ import {
 } from "@/lib/quote-narrative";
 import { acceptAllQuotesForRequest, requestQuoteRenewal } from "@/app/quote-actions";
 import { formatQuoteValidUntil, isQuoteExpired } from "@/lib/commerce/quote-validity";
+import { isOpenOffer, offerToken } from "@/lib/commerce/quote-offer";
 import { StatusBadge } from "@/app/status-badge";
 import { SectionHead, SubmitButton } from "@/components";
 import { ViewOnlyNote } from "@/components/view-only-note";
@@ -213,6 +214,7 @@ export async function QuoteSection({
                             <h3>{line.titleName}</h3>
                             <p className="muted small">
                               {tType(line.productType)}
+                              {line.forProductType ? ` · ${tType(line.forProductType)}` : ""}
                               {line.quantity > 1
                                 ? ` · × ${line.quantity}`
                                 : ""}
@@ -424,6 +426,12 @@ export async function QuoteSection({
               name="requestId"
               value={requestId}
             />
+            {/* The offer this page shows, one token per open quote: the
+                server accepts exactly these, unchanged, or refuses and says
+                which revision replaced them (lib/commerce/quote-offer.ts). */}
+            {quotes.filter(isOpenOffer).map((q) => (
+              <input key={q.id} type="hidden" name="offer" value={offerToken(q)} />
+            ))}
             <SubmitButton
               label={t("accept")}
               pendingLabel={t("accepting")}

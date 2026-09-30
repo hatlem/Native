@@ -4,6 +4,7 @@ import { OrgType } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
 import { submitListAsRfq, RFQ_LIST_INCLUDE } from "@/lib/commerce/submit-rfq";
 import { createOrderFromQuote, QuoteNotAcceptableError } from "@/lib/commerce/accept-quote";
+import { quoteFingerprint } from "@/lib/commerce/quote-offer";
 import { notifyQuoteAccepted, sendDraftQuotes } from "@/lib/commerce/quote-lifecycle";
 import { acceptableQuoteWhere, buyerVisibleQuoteWhere } from "@/lib/commerce/quote-validity";
 import { lineOrder } from "@/lib/commerce/line-order";
@@ -163,7 +164,12 @@ if (!RUN_DB_IT) {
     })).plan;
     await assert.rejects(
       prisma.$transaction((tx) =>
-        createOrderFromQuote(tx, { organizationId: orgId, quote: { id: quoteId, lines: quote.lines }, plan }),
+        createOrderFromQuote(tx, {
+          organizationId: orgId,
+          quote: { id: quoteId, lines: quote.lines },
+          offerFingerprint: quoteFingerprint(quote),
+          plan,
+        }),
       ),
       QuoteNotAcceptableError,
     );
@@ -240,7 +246,12 @@ if (!RUN_DB_IT) {
       select: { plan: { include: { items: true } } },
     })).plan;
     const accepted = await prisma.$transaction((tx) =>
-      createOrderFromQuote(tx, { organizationId: orgId, quote: { id: quoteId, lines: quote.lines }, plan }),
+      createOrderFromQuote(tx, {
+          organizationId: orgId,
+          quote: { id: quoteId, lines: quote.lines },
+          offerFingerprint: quoteFingerprint(quote),
+          plan,
+        }),
     );
 
     const order = await prisma.order.findUniqueOrThrow({

@@ -7,7 +7,7 @@ import { approveSharedPlan } from "@/app/share-actions";
 import { formatMoney, intlLocale } from "@/lib/money";
 import { titleDisplayName } from "@/lib/title-display";
 import { loadPricingDefaults } from "@/lib/content-fee";
-import { estimateListTotals, hasFigure, lineDisplay } from "@/lib/plan-total";
+import { estimateListTotals, hasFigure, hasUnpricedLines, lineDisplay } from "@/lib/plan-total";
 import { bandLabel } from "@/lib/pricing/bands";
 import { totalLabel } from "@/lib/pricing/total-label";
 import { formatRunRange, runBounds } from "@/lib/run-period";
@@ -63,8 +63,7 @@ export default async function SharedListPage({
   const totals = allTotals.filter(hasFigure);
   const anyEstimate = totals.some((r) => r.estimate !== null);
   // Hidden-price lines and not-yet-placed titles add to the total later.
-  const hasHidden =
-    allTotals.some((r) => r.hasOnRequest) || list.items.some((i) => !i.isAlternative && !i.productId);
+  const hasHidden = hasUnpricedLines(list.items, allTotals);
 
   // The version of the plan this page shows: the approve form posts it, so a
   // client only ever approves the lines they saw (lib/list-share.ts).
@@ -180,7 +179,7 @@ export default async function SharedListPage({
         ) : (
           <strong>{tv("requestPrice")}</strong>
         )}
-        {hasHidden && totals.length > 0 ? <span className="muted small">{t("plusOnRequest")}</span> : null}
+        {hasHidden && totals.length > 0 ? <span className="muted small">{tv("plusOnRequest")}</span> : null}
         {anyEstimate ? <p className="muted small">{tPlan("estimateNote")}</p> : null}
       </div>
       {altItems.length > 0 ? (

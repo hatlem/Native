@@ -12,6 +12,13 @@ import { loadPricingDefaults, contentFeeLinesForGroup } from "@/lib/content-fee"
 import { toQuotable } from "@/lib/commerce/firm-order";
 import { createOrderFromQuote, QuoteNotAcceptableError } from "@/lib/commerce/accept-quote";
 import {
+  checkOffer,
+  parseOfferTokens,
+  quoteFingerprint,
+  type OfferCheck,
+  type OfferToken,
+} from "@/lib/commerce/quote-offer";
+import {
   RENEWAL_REQUEST_COOLDOWN_MS,
   RENEWAL_REQUESTED_AUDIT_ACTION,
   isQuoteAcceptable,
@@ -48,18 +55,41 @@ function str(formData: FormData, key: string): string {
 }
 
 
-// The atomic accept gate refused: either a concurrent click already accepted
-// these quotes (a double-submit — land on the request quietly, it's done) or
-// they expired mid-click (catch the stored status up, tell the buyer).
+// The request's quotes as the offer check reads them (quote-offer.ts).
+const OFFER_QUOTE_INCLUDE = {
+  lines: { orderBy: lineOrder() },
+  order: { select: { id: true } },
+} as const;
+
+// The posted offer is not the current one: nothing was ordered. A double
+// submit (everything already accepted) lands on the request quietly; a
+// replaced quote names the revision to review; any other change asks the
+// buyer to look again. The request page renders the ?error= banner.
+function redirectForRefusedOffer(
+  locale: string,
+  requestId: string,
+  check: Exclude<OfferCheck, { ok: true }>,
+): never {
+  const base = `/${locale}/requests/${requestId}`;
+  if (check.reason === "accepted") redirect(base);
+  console.warn("quote.accept.refused", { requestId, reason: check.reason });
+  if (check.reason === "replaced") redirect(`${base}?error=quote-replaced&revision=${check.revision}`);
+  redirect(`${base}?error=quote-changed`);
+}
+
+// The atomic accept gate refused inside the transaction. Re-read the request
+// to say why: a concurrent click already accepted these quotes, a revision was
+// sent between the check and the write, or — the offer still standing — the
+// quote expired mid-click (catch the stored status up, tell the buyer).
 async function redirectAfterRefusedAccept(
   locale: string,
   requestId: string,
-  quoteIds: string[],
+  posted: OfferToken[],
+  scope: "all" | "one",
 ): Promise<never> {
-  const alreadyAccepted = await prisma.quote.count({
-    where: { id: { in: quoteIds }, status: "ACCEPTED" },
-  });
-  if (alreadyAccepted === quoteIds.length) redirect(`/${locale}/requests/${requestId}`);
+  const quotes = await prisma.quote.findMany({ where: { requestId }, include: OFFER_QUOTE_INCLUDE });
+  const check = checkOffer(posted, quotes, scope);
+  if (!check.ok) redirectForRefusedOffer(locale, requestId, check);
   await reconcileExpiredQuotes({ requestId });
   redirect(`/${locale}/requests/${requestId}?error=quote-expired`);
 }
@@ -426,9 +456,16 @@ export async function generateQuotePdf(formData: FormData) {
   );
 }
 
+// Accept ONE named quote (desk-side single-quote operations; the buyer's page
+// accepts the whole request below). The form posts the quote's offer token
+// (lib/commerce/quote-offer.ts): only that quote, only while it is still SENT,
+// current and unchanged, becomes an order.
 export async function acceptQuote(formData: FormData) {
   const locale = str(formData, "locale") || "en";
   const quoteId = str(formData, "quoteId");
+  // Only a token for the named quote counts: a form can't name one quote and
+  // carry the offer of another.
+  const posted = parseOfferTokens(formData.getAll("offer")).filter((t) => t.quoteId === quoteId);
 
   const quote = await prisma.quote.findUnique({
     where: { id: quoteId },
@@ -439,6 +476,7 @@ export async function acceptQuote(formData: FormData) {
         include: {
           plan: { include: { items: true } },
           organization: { select: { name: true, marketCode: true } },
+          quotes: { include: OFFER_QUOTE_INCLUDE },
         },
       },
     },
@@ -464,6 +502,10 @@ export async function acceptQuote(formData: FormData) {
   if (quote.status === "DRAFT") {
     redirect(`/${locale}/requests/${quote.requestId}`);
   }
+  // The quote must still be the offer the form showed: not replaced by a
+  // revision, not changed.
+  const check = checkOffer(posted, quote.request.quotes, "one");
+  if (!check.ok) redirectForRefusedOffer(locale, quote.requestId, check);
   // A firm offer is only firm inside its window: an expired quote must be
   // renewed by the desk before it can become an order.
   if (!isQuoteAcceptable(quote)) {
@@ -473,22 +515,21 @@ export async function acceptQuote(formData: FormData) {
 
   // "Pris på forespørsel" lines carry no agreed amount — the buyer is
   // accepting the priced lines only; the rest is confirmed separately by
-  // the desk. A quote with nothing priced has nothing to accept.
+  // the desk. (checkOffer only passes a quote with at least one priced line.)
   const pricedLines = quote.lines.filter((l) => !l.priceOnRequest);
-  if (pricedLines.length === 0) {
-    redirect(`/${locale}/requests/${quote.requestId}`);
-  }
 
   // Order/brief/booking creation + quote ACCEPTED live in the shared
   // accept-quote helper; the request close rides in the same transaction.
-  // The helper re-checks validity atomically, so a quote that expires
-  // between the check above and this write still can't be accepted.
+  // The helper re-checks validity and the offer atomically, so a quote that
+  // expires or is revised between the checks above and this write still
+  // can't be accepted.
   let accepted: { orderId: string; productIds: string[] };
   try {
     accepted = await prisma.$transaction(async (tx) => {
       const result = await createOrderFromQuote(tx, {
         organizationId: quote.request.organizationId,
         quote: { id: quote.id, lines: pricedLines },
+        offerFingerprint: posted[0].fingerprint,
         plan: quote.request.plan,
       });
       await tx.request.update({
@@ -499,7 +540,7 @@ export async function acceptQuote(formData: FormData) {
     });
   } catch (err) {
     if (!(err instanceof QuoteNotAcceptableError)) throw err;
-    return redirectAfterRefusedAccept(locale, quote.requestId, [quote.id]);
+    return redirectAfterRefusedAccept(locale, quote.requestId, posted, "one");
   }
   await recordAudit(scope.userId, "quote.accept", `Quote:${quote.id}`, {
     requestId: quote.requestId,
@@ -521,17 +562,23 @@ export async function acceptQuote(formData: FormData) {
 // placement market). A single buyer click maps the entire campaign
 // from "quotes ready" to "orders confirmed" — partial failures roll
 // the whole thing back so the buyer never gets half a campaign live.
-// Existing acceptQuote stays for desk-side single-quote operations.
+//
+// The click binds the buyer to the quotes the page SHOWED: the form posts one
+// offer token per quote (lib/commerce/quote-offer.ts), and the accept goes
+// through only if those are exactly the request's open quotes, unchanged. A
+// page left open while the desk sent a revision used to accept the revision —
+// a price the buyer never saw (BUG-final-local-1).
 export async function acceptAllQuotesForRequest(formData: FormData) {
   const locale = str(formData, "locale") || "en";
   const requestId = str(formData, "requestId");
+  const posted = parseOfferTokens(formData.getAll("offer"));
 
   const request = await prisma.request.findUnique({
     where: { id: requestId },
     include: {
       plan: { include: { items: true } },
       organization: { select: { name: true, marketCode: true } },
-      quotes: { include: { lines: { orderBy: lineOrder() }, order: true } },
+      quotes: { include: OFFER_QUOTE_INCLUDE },
     },
   });
   if (!request) redirect(`/${locale}/catalog`);
@@ -545,20 +592,17 @@ export async function acceptAllQuotesForRequest(formData: FormData) {
     redirect(`/${locale}/requests/${request.id}`);
   }
 
-  // Same rule as acceptQuote: only priced lines become order lines; a
-  // quote whose every line is still "pris på forespørsel" is skipped
-  // (nothing agreed to accept on it yet).
-  // Declined/draft quotes are not on offer; an expired one is on offer but
-  // can't be taken — and a multi-market campaign is all-or-nothing, so one
-  // expired market blocks the whole accept until the desk renews it.
+  // Nothing on offer any more (all accepted, declined or still drafts): a
+  // retried click lands on the request as it now stands.
+  const check = checkOffer(posted, request.quotes, "all");
+  if (!check.ok) redirectForRefusedOffer(locale, request.id, check);
+
+  // Same rule as acceptQuote: only priced lines become order lines
+  // (checkOffer only counts quotes with one on offer). An expired quote is on
+  // offer but can't be taken — and a multi-market campaign is all-or-nothing,
+  // so one expired market blocks the whole accept until the desk renews it.
   const now = new Date();
-  const openQuotes = request.quotes
-    .filter((q) => !q.order && (q.status === "SENT" || q.status === "EXPIRED"))
-    .map((q) => ({ ...q, lines: q.lines.filter((l) => !l.priceOnRequest) }))
-    .filter((q) => q.lines.length > 0);
-  if (openQuotes.length === 0) {
-    redirect(`/${locale}/requests/${request.id}`);
-  }
+  const openQuotes = request.quotes.filter((q) => check.quoteIds.includes(q.id));
   if (openQuotes.some((q) => !isQuoteAcceptable(q, now))) {
     await reconcileExpiredQuotes({ requestId: request.id }, now);
     redirect(`/${locale}/requests/${request.id}?error=quote-expired`);
@@ -572,7 +616,8 @@ export async function acceptAllQuotesForRequest(formData: FormData) {
         orders.push(
           await createOrderFromQuote(tx, {
             organizationId: request.organizationId,
-            quote: { id: quote.id, lines: quote.lines },
+            quote: { id: quote.id, lines: quote.lines.filter((l) => !l.priceOnRequest) },
+            offerFingerprint: quoteFingerprint(quote),
             plan: request.plan,
           }),
         );
@@ -585,7 +630,7 @@ export async function acceptAllQuotesForRequest(formData: FormData) {
     });
   } catch (err) {
     if (!(err instanceof QuoteNotAcceptableError)) throw err;
-    return redirectAfterRefusedAccept(locale, request.id, openQuotes.map((q) => q.id));
+    return redirectAfterRefusedAccept(locale, request.id, posted, "all");
   }
 
   for (const o of createdOrders) {

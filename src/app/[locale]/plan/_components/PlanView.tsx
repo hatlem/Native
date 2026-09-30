@@ -22,6 +22,8 @@ import { loadPricingDefaults } from "@/lib/content-fee";
 import { timeAgo } from "@/lib/time-ago";
 import { loadVerticalOptions, localizedVerticalOptions } from "@/lib/catalog-taxonomy";
 import { ViewOnlyNote } from "@/components/view-only-note";
+import { publisherProducesContent } from "@/lib/authorship";
+import { liveOrderForList } from "@/lib/commerce/list-commit";
 import { PlanBanners } from "./PlanBanners";
 import { PlanShare } from "./PlanShare";
 import { displayTimeZone } from "@/lib/time-zone";
@@ -35,7 +37,13 @@ import { PlanSummary } from "./PlanSummary";
 import { WhatHappensNext } from "./WhatHappensNext";
 import { PlanProgramme, type ProgrammePacing } from "./PlanProgramme";
 import { loadProgrammeForList, recommendCadence } from "@/lib/programme";
-import { estimateListTotals, hasFigure, lineDisplay, sumTotalFigures } from "@/lib/plan-total";
+import {
+  estimateListTotals,
+  hasFigure,
+  hasUnpricedLines,
+  lineDisplay,
+  sumTotalFigures,
+} from "@/lib/plan-total";
 import { scheduleOverlapWarnings, type ScheduleOverlapWarning } from "@/lib/programme-warnings";
 import type { BookingUnit } from "@/lib/campaign-schedule";
 import { SUPPORTED_MARKETS } from "@/lib/markets";
@@ -147,6 +155,7 @@ export async function PlanView({
         quantity: i.quantity,
         display,
         withContent: i.withContent,
+        publisherWrites: publisherProducesContent(p),
         // A product deactivated since it was added: still shown, but flagged so
         // the buyer removes it (submit refuses while it's present — see E).
         unavailable: !p.active || !p.bookable,
@@ -321,7 +330,11 @@ export async function PlanView({
         },
       })
     : null;
-  const hasOrder = !!submittedRequest?.quotes[0]?.order;
+  // The live order this plan already has, by either path: an ordered plan is
+  // spent, so the summary shows it instead of the send/order form
+  // (lib/commerce/list-commit.ts).
+  const ordered = activeList ? await liveOrderForList(prisma, activeList.id) : null;
+  const hasOrder = !!ordered || !!submittedRequest?.quotes[0]?.order;
   const currentStep: PlanStep = hasOrder ? 4 : submittedRequest ? 3 : 2;
 
   // Empty-state recommendation: budget + market → tiered title suggestions.
@@ -398,6 +411,7 @@ export async function PlanView({
             visibility: true,
             pricingModel: true,
             productionFee: true,
+            inclusions: true,
             bookingUnit: true,
             titleId: true,
             priceRules: { select: { marginPct: true, seasonalMultiplier: true, minVolume: true } },
@@ -610,7 +624,7 @@ export async function PlanView({
                 locale={locale}
                 listId={activeList!.id}
                 totals={totals}
-                hasHiddenPrice={hasHiddenPrice}
+                hasUnpriced={hasUnpricedLines(listItems, totals)}
                 allFirm={allFirm}
                 canCommit={canCommit}
                 firmLineCount={firmLineCount}
@@ -619,9 +633,11 @@ export async function PlanView({
                 activeOrg={activeOrg}
                 brief={planBriefValues(activeList!)}
                 timingOptions={timingOptions(new Date())}
+                ordered={ordered}
+                timeZone={displayTimeZone({ marketCode: activeOrg?.marketCode, locale })}
                 readOnly={readOnly}
               />
-              {readOnly ? null : <WhatHappensNext locale={locale} instant={allFirm && canCommit} />}
+              {readOnly || ordered ? null : <WhatHappensNext locale={locale} instant={allFirm && canCommit} />}
               {/* Sharing mints/kills a client link — a change a view-only seat
                   can't make, so the whole control is left out. */}
               {activeList && !readOnly ? (

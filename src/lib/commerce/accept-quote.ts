@@ -5,7 +5,8 @@
 //
 // The caller owns the surrounding gates (scope, commit authority,
 // already-ordered check) and the request-level status update; the
-// quote-validity gate (SENT + unexpired) is enforced here, atomically.
+// quote-validity gate (SENT + unexpired) and the offer gate (the quote is
+// still the one the buyer looked at) are enforced here, atomically.
 
 import type { Prisma } from "@prisma/client";
 import {
@@ -13,12 +14,15 @@ import {
   type AuthorshipMode,
 } from "@/lib/authorship";
 import { acceptableQuoteWhere } from "@/lib/commerce/quote-validity";
+import { quoteFingerprint } from "@/lib/commerce/quote-offer";
 import { createPublisherBookings } from "@/lib/commerce/bookings";
 
 /**
  * The quote was no longer acceptable when the transaction ran: it expired,
- * or it isn't SENT (already accepted by a concurrent click, declined, or a
- * draft). Nothing was written; the caller rolls back and tells the buyer.
+ * it isn't SENT (already accepted by a concurrent click, superseded by a
+ * revision, declined, or a draft), or its content no longer matches the offer
+ * the buyer accepted. Nothing was written; the caller rolls back and tells
+ * the buyer why (quote-offer.ts checkOffer on fresh data).
  */
 export class QuoteNotAcceptableError extends Error {
   constructor(readonly quoteId: string) {
@@ -65,13 +69,21 @@ export function authorshipByProduct(
 //
 // The ACCEPTED flip runs first as a compare-and-set on "SENT and still inside
 // validUntil": a quote that expired between page load and click — or was
-// already accepted by a concurrent request — throws QuoteNotAcceptableError
-// before any order row exists, so the caller's transaction rolls back clean.
+// already accepted by a concurrent request, or superseded by a revision sent
+// meanwhile — throws QuoteNotAcceptableError before any order row exists, so
+// the caller's transaction rolls back clean.
+//
+// `offerFingerprint` is the fingerprint of the quote the buyer accepted
+// (quote-offer.ts). It is re-computed from the claimed row inside the
+// transaction: the claim holds the quote's row lock and a SENT quote's lines
+// only change through a revision, so a match here means the order is built
+// from exactly the offer the buyer saw.
 export async function createOrderFromQuote(
   tx: Prisma.TransactionClient,
   args: {
     organizationId: string;
     quote: { id: string; lines: AcceptableQuoteLine[] };
+    offerFingerprint: string;
     plan: AcceptablePlan;
     now?: Date;
   },
@@ -84,6 +96,19 @@ export async function createOrderFromQuote(
     data: { status: "ACCEPTED" },
   });
   if (claimed.count !== 1) throw new QuoteNotAcceptableError(quote.id);
+  const current = await tx.quote.findUniqueOrThrow({
+    where: { id: quote.id },
+    select: {
+      id: true,
+      revision: true,
+      currency: true,
+      subtotal: true,
+      vatPct: true,
+      total: true,
+      lines: { select: { id: true, kind: true, productId: true, quantity: true, lineTotal: true, priceOnRequest: true } },
+    },
+  });
+  if (quoteFingerprint(current) !== args.offerFingerprint) throw new QuoteNotAcceptableError(quote.id);
 
   const order = await tx.order.create({
     data: {

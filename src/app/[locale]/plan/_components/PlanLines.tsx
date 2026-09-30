@@ -29,6 +29,10 @@ export type PlanLine = {
   product: PlanProduct;
   quantity: number;
   withContent: boolean;
+  // The publisher's own studio writes this placement's article
+  // (lib/authorship.ts publisherProducesContent): no "We write it" toggle, no
+  // fee of ours — the line says who writes it instead.
+  publisherWrites: boolean;
   // lib/plan-total.ts lineDisplay(): the exact figure (instant-orderable
   // lines: placement + content fee, what the summary adds up), the price band
   // (every other shown price), the unit rate (CPM/CPC) or "on request".
@@ -484,7 +488,11 @@ export async function PlanLines({
 
           {readOnly ? null : (
           <div className="plan-line-card__actions">
-            <WriteToggle locale={locale} itemId={l.itemId} withContent={l.withContent} label={t("weWriteIt")} />
+            {l.publisherWrites ? (
+              <span className="plan-line-card__write-note">✓ {t("publisherWritesIt")}</span>
+            ) : (
+              <WriteToggle locale={locale} itemId={l.itemId} withContent={l.withContent} label={t("weWriteIt")} />
+            )}
             <AlternativeToggle
               locale={locale}
               itemId={l.itemId}

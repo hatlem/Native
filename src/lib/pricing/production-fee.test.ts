@@ -1,6 +1,6 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { resolveProductionFee } from "./production-fee";
+import { articleFee, contentFeeLinesFor, resolveProductionFee } from "./production-fee";
 import type { ContentFeeRuleSpec } from "../money";
 
 const RULES: ContentFeeRuleSpec[] = [
@@ -97,4 +97,29 @@ test("no matching rule → 0 (band still renders)", () => {
     rules: RULES,
   });
   assert.equal(fee, 0);
+});
+
+// BUG-final-prod-1: a "We write it" line on a publisher-produced placement
+// (the publisher's studio writes the article) was billed the desk rule's fee.
+// The order/quote line builder must skip it even when a stale row still asks
+// for our article, while a sibling placement we do write keeps its fee.
+test("contentFeeLinesFor never bills a publisher-produced placement", () => {
+  const byId = new Map([
+    ["studio", { name: "Studio article", type: "NATIVE_ARTICLE", inclusions: { production: "PUBLISHER" } }],
+    ["ours", { name: "Our article", type: "NATIVE_ARTICLE", inclusions: null }],
+  ]);
+  const lines = contentFeeLinesFor(
+    [
+      { productId: "studio", withContent: true, authorshipMode: "NATIVESPIN_PRODUCED" },
+      { productId: "ours", withContent: true, authorshipMode: "NATIVESPIN_PRODUCED" },
+    ],
+    byId,
+    "NO",
+    RULES,
+  );
+  assert.equal(lines.length, 1);
+  assert.equal(lines[0].description, "Content production — Our article");
+  assert.equal(lines[0].lineTotal, 2000);
+  assert.equal(articleFee(byId.get("studio")!, "NO", RULES), 0);
+  assert.equal(articleFee(byId.get("ours")!, "NO", RULES), 2000);
 });

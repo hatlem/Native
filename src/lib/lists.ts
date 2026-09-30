@@ -371,8 +371,23 @@ export async function removeItem(itemId: string) {
  * Turning it off only touches a line that is on: a publisher-produced line is
  * already off, and a stale "off" post must not rewrite it to buyer-supplied.
  * Idempotent: updateMany no-ops if the row was concurrently removed.
+ *
+ * A placement the publisher's own studio writes has no toggle (/plan shows
+ * "The publisher writes the article"): whatever is posted, the line is
+ * (re)set to PUBLISHER_PRODUCED. Turning "We write it" on there would bill our
+ * content fee for an article the publisher already produces (BUG-final-prod-1).
  */
 export async function setItemContent(itemId: string, withContent: boolean) {
+  const row = await prisma.savedListItem.findUnique({
+    where: { id: itemId },
+    select: { product: { select: CONTENT_DEFAULT_SELECT } },
+  });
+  if (row?.product && publisherProducesContent(row.product)) {
+    return prisma.savedListItem.updateMany({
+      where: { id: itemId },
+      data: defaultContentIntent(row.product),
+    });
+  }
   return prisma.savedListItem.updateMany({
     where: withContent ? { id: itemId } : { id: itemId, withContent: true },
     data: contentIntent(withContent),

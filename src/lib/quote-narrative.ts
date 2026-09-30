@@ -15,6 +15,8 @@
 // the existing i18n layer. Anchor amounts scale with line quantity so
 // the discount framing stays correct on multi-unit lines.
 
+import { placementCount } from "@/lib/commerce/placements";
+
 export type QuoteAnchor = {
   rateCard: number;
   currency: string;
@@ -30,6 +32,10 @@ export type QuoteNarrativeLine = {
   // article for, so the buyer can tell two "Content production" lines apart.
   titleName: string;
   productType: string;
+  // For a content-fee line: the format of the placement it writes for, so two
+  // fee lines on the same title ("Aftenposten · Content production") can be
+  // told apart. Null on a placement line, or when no placement matches.
+  forProductType: string | null;
   quantity: number;
   lineTotal: number;
   // "Pris på forespørsel" — the line is part of the offer but carries no
@@ -90,17 +96,17 @@ export function buildQuoteNarrative(
 ): QuoteNarrativeData {
   const { quote, organization, productsById } = input;
 
-  // Placement description → its title's name, to label the fee lines.
-  const titleByPlacementDescription = new Map<string, string>();
+  // Placement description → its product, to label the fee lines.
+  const placementByDescription = new Map<string, NarrativeProduct>();
   for (const line of quote.lines) {
     if ((line.kind ?? "INVENTORY") !== "INVENTORY" || !line.productId || !line.description) continue;
-    const title = productsById.get(line.productId)?.title;
-    if (title) titleByPlacementDescription.set(line.description, title.name);
+    const product = productsById.get(line.productId);
+    if (product) placementByDescription.set(line.description, product);
   }
-  const feeTitleName = (line: NarrativeQuoteLine): string =>
+  const feePlacement = (line: NarrativeQuoteLine): NarrativeProduct | undefined =>
     line.description?.startsWith(CONTENT_FEE_PREFIX)
-      ? (titleByPlacementDescription.get(line.description.slice(CONTENT_FEE_PREFIX.length)) ?? "")
-      : "";
+      ? placementByDescription.get(line.description.slice(CONTENT_FEE_PREFIX.length))
+      : undefined;
 
   const lines: QuoteNarrativeLine[] = quote.lines.map((line) => {
     const kind = line.kind ?? "INVENTORY";
@@ -108,6 +114,7 @@ export function buildQuoteNarrative(
     const title = product?.title;
     const rateCardPerUnit =
       title?.publishedRateCard != null ? Number(title.publishedRateCard) : null;
+    const placement = kind === "CONTENT_FEE" ? feePlacement(line) : undefined;
 
     // Content-fee lines carry no product or rate-card anchor — the page
     // labels them from productType ("CONTENT_FEE") under the title of the
@@ -117,9 +124,10 @@ export function buildQuoteNarrative(
       lineId: line.id,
       kind,
       productId: kind === "INVENTORY" ? line.productId : null,
-      titleName: title?.name ?? (kind === "CONTENT_FEE" ? feeTitleName(line) : (line.productId ?? "")),
+      titleName: title?.name ?? (kind === "CONTENT_FEE" ? (placement?.title.name ?? "") : (line.productId ?? "")),
       productType:
         product?.type ?? (kind === "CONTENT_FEE" ? "CONTENT_FEE" : "NATIVE_ARTICLE"),
+      forProductType: placement?.type ?? null,
       quantity: line.quantity,
       lineTotal: Number(line.lineTotal),
       priceOnRequest: line.priceOnRequest ?? false,
@@ -138,7 +146,9 @@ export function buildQuoteNarrative(
 
   return {
     orgName: organization.name,
-    itemCount: quote.lines.length,
+    // Placements only: a content-fee line bills the article for a placement
+    // and is not one itself (lib/commerce/placements.ts).
+    itemCount: placementCount(quote.lines),
     lines,
   };
 }

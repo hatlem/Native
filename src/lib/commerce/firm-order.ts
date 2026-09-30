@@ -21,11 +21,12 @@ import { loadPricingDefaults, contentFeeLinesForGroup } from "@/lib/content-fee"
 import { planWindowFromItems, type BookingUnit } from "@/lib/campaign-schedule";
 import { fingerprintListItems } from "@/lib/commerce/list-fingerprint";
 import {
-  authorshipFromWithContent,
   authorshipForOrderLine,
+  placementContentIntent,
   type AuthorshipMode,
 } from "@/lib/authorship";
 import { createPublisherBookings } from "@/lib/commerce/bookings";
+import { isInstantOrderListConflict, liveOrderForList } from "@/lib/commerce/list-commit";
 import { planNameFor } from "@/lib/plan-name";
 
 // Minimal product shape the quote engine needs. Both the self-serve basket
@@ -69,6 +70,9 @@ export type FirmOrderProduct = ProductWithRules & {
   // (pricing/production-fee.ts). Both callers hydrate them; absent, the
   // CONTENT_FEE line falls back to the desk rule.
   productionFee?: unknown;
+  // Required: "production": "PUBLISHER" means no content fee of ours
+  // (pricing/production-fee.ts), so every caller must hydrate it.
+  inclusions: unknown;
   title: {
     marketId: string;
     productionFeeDefault?: unknown;
@@ -123,6 +127,11 @@ export type FirmOrderBrief = {
   targetContext?: string | null;
 };
 
+// What createFirmOrder did. `alreadyOrdered`: the source plan already had a
+// live order, so nothing new was booked and the ids are that order's — a
+// double click, a second tab or a stale "Confirm order" (list-commit.ts).
+export type FirmOrderResult = { requestId: string; orderIds: string[]; alreadyOrdered: boolean };
+
 // Creates a CONFIRMED, auto-accepted order for an all-FIRM basket and
 // returns the created Request id + order ids. Caller must have verified
 // FIRM-visibility / availability / commit authority first.
@@ -141,7 +150,7 @@ export async function createFirmOrder(args: {
   // Plan.name — the buyer's own name for the campaign (see planNameFor).
   // Omitted by the public API, which has no list: an English org fallback.
   planName?: string;
-}): Promise<{ requestId: string; orderIds: string[] }> {
+}): Promise<FirmOrderResult> {
   const { organizationId, orgName, items, byId, brief, sourceListId, listGuard, planName } = args;
   const goal = brief?.goal ?? null;
   const audience = brief?.audience ?? null;
@@ -161,180 +170,193 @@ export async function createFirmOrder(args: {
   const defaults = await loadPricingDefaults();
 
   // Per-product authorship intent (projected from the buyer's withContent
-  // toggle), used to stamp both the PlanItem and the eventual OrderLine.
+  // toggle; PUBLISHER_PRODUCED where the publisher's studio writes it), used to
+  // stamp both the PlanItem and the eventual OrderLine.
+  const intentByProduct = new Map(
+    items.map((i) => [i.productId, placementContentIntent(!!i.withContent, byId.get(i.productId))]),
+  );
   const authorshipByProduct = new Map<string, AuthorshipMode>(
-    items.map((i) => [i.productId, authorshipFromWithContent(i.withContent)]),
+    [...intentByProduct].map(([productId, intent]) => [productId, intent.authorshipMode]),
   );
 
-  return prisma.$transaction(async (tx) => {
-    // Serialize firm-order creation per org so two simultaneous submits can't
-    // both mint a charged order — the second blocks here, then the dedup below
-    // short-circuits it. Transaction-scoped lock, auto-released on commit.
-    await tx.$executeRaw`SELECT pg_advisory_xact_lock(hashtext(${organizationId}))`;
+  try {
+    return await prisma.$transaction(async (tx) => {
+      // Serialize firm-order creation per org so two simultaneous submits can't
+      // both mint a charged order — the second blocks here, then the check below
+      // short-circuits it. Transaction-scoped lock, auto-released on commit.
+      await tx.$executeRaw`SELECT pg_advisory_xact_lock(hashtext(${organizationId}))`;
 
-    // Idempotency: a retried / concurrent submit of the SAME saved list within a
-    // short window returns the order the first submit created — never a second
-    // charge. (Only /plan checkout passes sourceListId; the public API doesn't.)
-    if (sourceListId) {
-      const existing = await tx.request.findFirst({
-        where: { sourceListId, organizationId, createdAt: { gt: new Date(Date.now() - 30_000) } },
-        orderBy: { createdAt: "desc" },
-        select: { id: true, quotes: { select: { order: { select: { id: true } } } } },
-      });
-      if (existing) {
-        console.warn("firmorder.dedup_hit", { organizationId, sourceListId, requestId: existing.id });
-        return {
-          requestId: existing.id,
-          orderIds: existing.quotes.map((q) => q.order?.id).filter((id): id is string => !!id),
-        };
+      // Idempotency: an ordered plan is spent. A retried, double-clicked or
+      // second-tab submit of the SAME saved list — at any time, not only within
+      // a short window — returns the order the plan already has, never a second
+      // charge. (Only /plan checkout passes sourceListId; the public API has its
+      // own Idempotency-Key.)
+      if (sourceListId) {
+        const live = await liveOrderForList(tx, sourceListId);
+        if (live) {
+          console.warn("firmorder.already_ordered", { organizationId, sourceListId, requestId: live.requestId });
+          return { requestId: live.requestId, orderIds: live.orderIds, alreadyOrdered: true };
+        }
       }
-    }
 
-    // Re-check the source list against the caller's fingerprint now that we
-    // hold the per-org lock: an edit from another seat/tab that landed after
-    // the caller's pre-flight check must invalidate this submit, not get
-    // silently charged from the stale snapshot.
-    if (listGuard) {
-      const freshRows = await tx.savedListItem.findMany({
-        where: { listId: listGuard.listId, isAlternative: false },
-        select: { id: true, quantity: true, productId: true, titleId: true, withContent: true },
-      });
-      if (fingerprintListItems(freshRows) !== listGuard.fingerprint) {
-        console.warn("firmorder.changed", { organizationId, listId: listGuard.listId });
-        throw new FirmOrderChangedError();
+      // Re-check the source list against the caller's fingerprint now that we
+      // hold the per-org lock: an edit from another seat/tab that landed after
+      // the caller's pre-flight check must invalidate this submit, not get
+      // silently charged from the stale snapshot.
+      if (listGuard) {
+        const freshRows = await tx.savedListItem.findMany({
+          where: { listId: listGuard.listId, isAlternative: false },
+          select: { id: true, quantity: true, productId: true, titleId: true, withContent: true },
+        });
+        if (fingerprintListItems(freshRows) !== listGuard.fingerprint) {
+          console.warn("firmorder.changed", { organizationId, listId: listGuard.listId });
+          throw new FirmOrderChangedError();
+        }
       }
-    }
 
-    // Re-validate against FRESH data inside the transaction: a product
-    // deactivated/unbooked after the caller's snapshot must not be instant-
-    // charged. We still price from the snapshot (the price the buyer saw), but
-    // refuse to charge for anything no longer purchasable.
-    const productIds = [...new Set(items.map((i) => i.productId))];
-    const liveCount = await tx.product.count({
-      where: { id: { in: productIds }, active: true, bookable: true },
-    });
-    if (liveCount !== productIds.length) {
-      console.warn("firmorder.stale", { organizationId, expected: productIds.length, live: liveCount });
-      throw new FirmOrderStaleError("A selected product is no longer available.");
-    }
-
-    const flight = planWindowFromItems(
-      items.map((i) => ({
-        scheduleStart: i.scheduleStart ?? null,
-        scheduleUnits: i.scheduleUnits ?? null,
-        bookingUnit: byId.get(i.productId)?.bookingUnit ?? "MONTH",
-      })),
-    );
-    const plan = await tx.plan.create({
-      data: {
-        organizationId,
-        name: planName ?? planNameFor({ listName: null, orgName, locale: "en" }),
-        budget: brief?.budget ?? null,
-        currency: brief?.currency ?? planCurrency,
-        startDate: flight.start,
-        endDate: flight.end,
-        goal,
-        audienceNote: audience,
-        targetGeo,
-        targetAudience,
-        targetContext,
-        items: {
-          create: items.map((i) => ({
-            productId: i.productId,
-            quantity: i.quantity,
-            withContent: i.withContent ?? false,
-            authorshipMode: authorshipByProduct.get(i.productId)!,
-            scheduleStart: i.scheduleStart ?? null,
-            scheduleUnits: i.scheduleUnits ?? null,
-          })),
-        },
-      },
-    });
-
-    // The buyer's own words only. Targeting stays in the Plan columns and
-    // renders with localized labels (BriefTargeting); folding it in here as
-    // English "Audience: b2b-decision-makers" lines showed raw keys.
-    const briefSummary = brief?.briefText || null;
-
-    const req = await tx.request.create({
-      data: {
-        organizationId,
-        planId: plan.id,
-        status: "CLOSED",
-        briefSummary,
-        sourceListId: sourceListId ?? null,
-      },
-    });
-
-    const orderIds: string[] = [];
-    for (const group of groups) {
-      const generated = [
-        ...computeQuoteLines(
-          group.items.map((i) =>
-            toQuotable(byId.get(i.productId)!, i.quantity),
-          ),
-          resolveDefaultMarginPct(defaults.marginRules, group.marketCode),
-        ),
-        ...contentFeeLinesForGroup(
-          group.items,
-          byId,
-          group.marketCode,
-          defaults.feeRules,
-        ),
-      ];
-      // Generation order is the display order (see lib/commerce/line-order.ts).
-      const lines = generated.map((l, position) => ({ ...l, position }));
-      const { subtotal, total } = quoteTotals(lines, group.vatPct);
-
-      const quote = await tx.quote.create({
-        data: {
-          requestId: req.id,
-          status: "ACCEPTED",
-          currency: group.currency,
-          subtotal,
-          vatPct: group.vatPct,
-          total,
-          validUntil: new Date(Date.now() + 14 * 24 * 60 * 60 * 1000),
-          lines: { create: lines },
-        },
+      // Re-validate against FRESH data inside the transaction: a product
+      // deactivated/unbooked after the caller's snapshot must not be instant-
+      // charged. We still price from the snapshot (the price the buyer saw), but
+      // refuse to charge for anything no longer purchasable.
+      const productIds = [...new Set(items.map((i) => i.productId))];
+      const liveCount = await tx.product.count({
+        where: { id: { in: productIds }, active: true, bookable: true },
       });
-      const order = await tx.order.create({
+      if (liveCount !== productIds.length) {
+        console.warn("firmorder.stale", { organizationId, expected: productIds.length, live: liveCount });
+        throw new FirmOrderStaleError("A selected product is no longer available.");
+      }
+
+      const flight = planWindowFromItems(
+        items.map((i) => ({
+          scheduleStart: i.scheduleStart ?? null,
+          scheduleUnits: i.scheduleUnits ?? null,
+          bookingUnit: byId.get(i.productId)?.bookingUnit ?? "MONTH",
+        })),
+      );
+      const plan = await tx.plan.create({
         data: {
           organizationId,
-          quoteId: quote.id,
-          status: "CONFIRMED",
-          flightStartDate: plan.startDate ?? null,
-          flightEndDate: plan.endDate ?? null,
-          lines: {
-            create: lines.map((l) => ({
-              kind: l.kind,
-              authorshipMode: authorshipForOrderLine(l, authorshipByProduct),
-              productId: l.productId,
-              quantity: l.quantity,
-              lineTotal: l.lineTotal,
-              position: l.position,
+          name: planName ?? planNameFor({ listName: null, orgName, locale: "en" }),
+          budget: brief?.budget ?? null,
+          currency: brief?.currency ?? planCurrency,
+          startDate: flight.start,
+          endDate: flight.end,
+          goal,
+          audienceNote: audience,
+          targetGeo,
+          targetAudience,
+          targetContext,
+          items: {
+            create: items.map((i) => ({
+              productId: i.productId,
+              quantity: i.quantity,
+              withContent: intentByProduct.get(i.productId)!.withContent,
+              authorshipMode: authorshipByProduct.get(i.productId)!,
+              scheduleStart: i.scheduleStart ?? null,
+              scheduleUnits: i.scheduleUnits ?? null,
             })),
           },
         },
-        include: { lines: true },
       });
-      orderIds.push(order.id);
-      // Briefs and publisher bookings attach only to inventory lines —
-      // a CONTENT_FEE line is a billing line for production work that
-      // is briefed/fulfilled against the placement line itself.
-      const placementLines = order.lines.filter((l) => l.kind === "INVENTORY");
-      await tx.contentBrief.createMany({
-        data: placementLines.map((l) => ({
-          orderLineId: l.id,
-          message: goal,
-          audience,
-        })),
-      });
-      // Each booking is anchored to its title/publisher at creation (the
-      // campaign report and metrics sweep group by it).
-      await createPublisherBookings(tx, placementLines);
-    }
 
-    return { requestId: req.id, orderIds };
-  });
+      // The buyer's own words only. Targeting stays in the Plan columns and
+      // renders with localized labels (BriefTargeting); folding it in here as
+      // English "Audience: b2b-decision-makers" lines showed raw keys.
+      const briefSummary = brief?.briefText || null;
+
+      const req = await tx.request.create({
+        data: {
+          organizationId,
+          planId: plan.id,
+          status: "CLOSED",
+          briefSummary,
+          sourceListId: sourceListId ?? null,
+          // The database's own guarantee that this plan is ordered once.
+          instantOrderListId: sourceListId ?? null,
+        },
+      });
+
+      const orderIds: string[] = [];
+      for (const group of groups) {
+        const generated = [
+          ...computeQuoteLines(
+            group.items.map((i) =>
+              toQuotable(byId.get(i.productId)!, i.quantity),
+            ),
+            resolveDefaultMarginPct(defaults.marginRules, group.marketCode),
+          ),
+          ...contentFeeLinesForGroup(
+            group.items,
+            byId,
+            group.marketCode,
+            defaults.feeRules,
+          ),
+        ];
+        // Generation order is the display order (see lib/commerce/line-order.ts).
+        const lines = generated.map((l, position) => ({ ...l, position }));
+        const { subtotal, total } = quoteTotals(lines, group.vatPct);
+
+        const quote = await tx.quote.create({
+          data: {
+            requestId: req.id,
+            status: "ACCEPTED",
+            currency: group.currency,
+            subtotal,
+            vatPct: group.vatPct,
+            total,
+            validUntil: new Date(Date.now() + 14 * 24 * 60 * 60 * 1000),
+            lines: { create: lines },
+          },
+        });
+        const order = await tx.order.create({
+          data: {
+            organizationId,
+            quoteId: quote.id,
+            status: "CONFIRMED",
+            flightStartDate: plan.startDate ?? null,
+            flightEndDate: plan.endDate ?? null,
+            lines: {
+              create: lines.map((l) => ({
+                kind: l.kind,
+                authorshipMode: authorshipForOrderLine(l, authorshipByProduct),
+                productId: l.productId,
+                quantity: l.quantity,
+                lineTotal: l.lineTotal,
+                position: l.position,
+              })),
+            },
+          },
+          include: { lines: true },
+        });
+        orderIds.push(order.id);
+        // Briefs and publisher bookings attach only to inventory lines —
+        // a CONTENT_FEE line is a billing line for production work that
+        // is briefed/fulfilled against the placement line itself.
+        const placementLines = order.lines.filter((l) => l.kind === "INVENTORY");
+        await tx.contentBrief.createMany({
+          data: placementLines.map((l) => ({
+            orderLineId: l.id,
+            message: goal,
+            audience,
+          })),
+        });
+        // Each booking is anchored to its title/publisher at creation (the
+        // campaign report and metrics sweep group by it).
+        await createPublisherBookings(tx, placementLines);
+      }
+
+      return { requestId: req.id, orderIds, alreadyOrdered: false };
+    });
+  } catch (err) {
+    // A plan is ordered once (list-commit.ts). The unique key on
+    // Request.instantOrderListId refusing this order means a concurrent
+    // writer that got past the lock ordered the plan first: answer with its
+    // order, exactly as the in-transaction check does.
+    if (!sourceListId || !isInstantOrderListConflict(err)) throw err;
+    const live = await liveOrderForList(prisma, sourceListId);
+    if (!live) throw err;
+    console.warn("firmorder.already_ordered", { organizationId, sourceListId, requestId: live.requestId, via: "unique" });
+    return { requestId: live.requestId, orderIds: live.orderIds, alreadyOrdered: true };
+  }
 }
