@@ -16,6 +16,10 @@ export const dynamic = "force-dynamic";
 //   2. Logged in as the invited email → one-click Accept form.
 //   3. Logged in as a different email → mismatch notice + sign-out form.
 //   4. Not logged in → account-creation form (email pinned, name + password).
+// States 2 and 4 use the auth two-column layout: the marketing column carries
+// the "Join {org}" headline, the card names the step (accept / create
+// account) — the same split as the publisher claim page, so the headline
+// isn't printed twice.
 export default async function OrgInvitePage({
   params,
   searchParams,
@@ -29,6 +33,7 @@ export default async function OrgInvitePage({
 
   const t = await getTranslations({ locale, namespace: "invite" });
   const ta = await getTranslations({ locale, namespace: "auth" });
+  const tc = await getTranslations({ locale, namespace: "common" });
 
   const invite = await prisma.orgInvite.findUnique({
     where: { token },
@@ -101,13 +106,14 @@ export default async function OrgInvitePage({
       <LandingShell locale={locale} screenLabel="Accept invitation">
         <section className="auth-shell">
           <div className="marketing">
+            <span className="eyebrow accent">{tc("appName")}</span>
             <h1>{t("title", { org: orgName })}</h1>
-            <p className="lead">{withSafeEmails(t("invitationFor", { email: invite!.email }))}</p>
+            <p className="lead">{t("lead")}</p>
           </div>
 
           <div className="auth-card">
             <div className="head">
-              <h2>{t("title", { org: orgName })}</h2>
+              <h2>{t("acceptTitle")}</h2>
               <p>{withSafeEmails(t("invitationFor", { email: invite!.email }))}</p>
             </div>
 
@@ -138,13 +144,14 @@ export default async function OrgInvitePage({
     <LandingShell locale={locale} screenLabel="Create account">
       <section className="auth-shell">
         <div className="marketing">
+          <span className="eyebrow accent">{tc("appName")}</span>
           <h1>{t("title", { org: orgName })}</h1>
-          <p className="lead">{withSafeEmails(t("invitationFor", { email: invite!.email }))}</p>
+          <p className="lead">{t("lead")}</p>
         </div>
 
         <div className="auth-card">
           <div className="head">
-            <h2>{t("title", { org: orgName })}</h2>
+            <h2>{t("createTitle")}</h2>
             <p>{withSafeEmails(t("invitationFor", { email: invite!.email }))}</p>
           </div>
 

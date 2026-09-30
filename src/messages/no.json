@@ -469,6 +469,9 @@
     "decrementRemoves": "Fjern tittelen fra planen",
     "increment": "Øk antall",
     "estTotal": "Estimert veiledende total",
+    "exVat": "ekskl. mva.",
+    "inclVatLine": "{amount} inkl. mva.",
+    "includesContentFees": "Inkluderer {amount} til innholdsproduksjon.",
     "totalForItems": "{amount} for {count, plural, =1 {1 tittel} other {# titler}}",
     "multiCurrencyNote": "Titler faktureres i utgiverens egen valuta — begge beløpene skal betales, dette er ikke et valg av valuta.",
     "rfqTitle": "Be om et fast tilbud",
@@ -1189,7 +1192,12 @@
     "planTitle": "Bekreft bestillingen",
     "planNote": "Alle elementer har fast pris — innsending bekrefter bestillingen umiddelbart, uten venting på kjøpsteamet.",
     "planSubmit": "Bekreft bestilling",
-    "planSubmitting": "Legger inn bestilling…"
+    "planSubmitting": "Legger inn bestilling…",
+    "orderTotal": "Totalt for bestillingen",
+    "commitAmount": "Du bestiller for {amount} inkl. mva.",
+    "reassurance": "Når du bekrefter, legger du inn en bindende bestilling til denne prisen — det kommer ikke noe eget tilbud å godkjenne.",
+    "noCommitNote": "Rollen din gir ikke bestillingsrett, så du kan ikke bekrefte bestillingen selv. Send den som en tilbudsforespørsel i stedet — en administrator i teamet kan godta tilbudet.",
+    "sendAsRfq": "Send som tilbudsforespørsel"
   },
   "publisher": {
     "title": "Utgiverportal",
@@ -2690,6 +2698,9 @@
   },
   "invite": {
     "title": "Bli med i {org}",
+    "lead": "Teamet ditt planlegger og kjøper native annonsering i NativeSpin. Bli med og jobb i de samme planene, tilbudene og bestillingene.",
+    "acceptTitle": "Ett klikk, så er du med",
+    "createTitle": "Opprett kontoen din",
     "invitationFor": "Invitasjon til {email}",
     "accept": "Godta invitasjon",
     "createAndJoin": "Opprett konto og bli med",

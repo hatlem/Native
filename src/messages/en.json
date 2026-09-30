@@ -594,6 +594,9 @@
     "decrementRemoves": "Remove this title from the plan",
     "increment": "Increase quantity",
     "estTotal": "Estimated indicative total",
+    "exVat": "excl. VAT",
+    "inclVatLine": "{amount} incl. VAT",
+    "includesContentFees": "Includes {amount} for content production.",
     "totalForItems": "{amount} for {count, plural, =1 {1 title} other {# titles}}",
     "multiCurrencyNote": "Titles bill in their publisher's own currency — both amounts are due, this isn't a choice of currency to pay in.",
     "rfqTitle": "Request a firm quote",
@@ -1313,7 +1316,12 @@
     "planTitle": "Confirm your order",
     "planNote": "All items are firm-priced — submitting confirms your order instantly, no buying-desk wait.",
     "planSubmit": "Confirm order",
-    "planSubmitting": "Placing order…"
+    "planSubmitting": "Placing order…",
+    "orderTotal": "Order total",
+    "commitAmount": "You're ordering for {amount} incl. VAT.",
+    "reassurance": "Confirming places a binding order at this price — there's no separate quote to approve.",
+    "noCommitNote": "Your role doesn't include ordering rights, so you can't confirm this order yourself. Send it as a quote request instead — an admin on your team can accept the quote.",
+    "sendAsRfq": "Send as quote request"
   },
   "publisher": {
     "title": "Publisher portal",
@@ -2705,6 +2713,9 @@
   },
   "invite": {
     "title": "Join {org}",
+    "lead": "Your team plans and buys native advertising on NativeSpin. Join to work in the same plans, quotes and orders.",
+    "acceptTitle": "One click and you're in",
+    "createTitle": "Create your account",
     "invitationFor": "Invitation for {email}",
     "accept": "Accept invitation",
     "createAndJoin": "Create account & join",

@@ -1148,6 +1148,10 @@ model SavedListItem {
   titleId   String?
   title     Title?    @relation(fields: [titleId], references: [id], onDelete: Cascade)
   quantity  Int       @default(1)
+  // "We write it": the buyer's toggle (withContent) and the authorship it
+  // implies are written as one pair via lib/authorship.ts contentIntent().
+  // DB CHECK SavedListItem_authorship_matches_content enforces
+  // withContent ⇔ authorshipMode = NATIVESPIN_PRODUCED.
   withContent    Boolean        @default(false)
   authorshipMode AuthorshipMode @default(BUYER_SUPPLIED)
   // Campaign schedule chosen in the flow's Schedule step: first period and how
