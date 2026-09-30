@@ -1879,7 +1879,16 @@
     "messagePlaceholder": "Hva prøver du å få til, og når?",
     "submit": "Send melding",
     "altPrefix": "Nysgjerrig på hvem som står bak NativeSpin?",
-    "altLink": "Les om oss →"
+    "altLink": "Les om oss →",
+    "sending": "Sender …",
+    "sentTitle": "Meldingen er sendt",
+    "sentBody": "Takk. Meldingen ligger hos teamet nå, og vi svarer på e-post innen én virkedag.",
+    "errRequired": "Må fylles ut.",
+    "errInvalid": "Velg ett av alternativene.",
+    "errEmail": "Den e-postadressen ser ikke riktig ut.",
+    "errTooLong": "Det er lengre enn vi kan ta imot. Kort det ned litt.",
+    "errRate": "Du har sendt flere meldinger på kort tid. Vent litt og prøv igjen.",
+    "errSend": "Meldingen kom ikke frem hos oss. Prøv igjen om et minutt, eller send e-post direkte til hello@nativespin.com."
   },
   "security": {
     "metaTitle": "Sikkerhet",

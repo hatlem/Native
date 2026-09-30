@@ -1879,7 +1879,16 @@
     "messagePlaceholder": "Mitä yrität tehdä ja milloin?",
     "submit": "Lähetä viesti",
     "altPrefix": "Kiinnostaa kuka on NativeSpinn takana?",
-    "altLink": "Lue meistä →"
+    "altLink": "Lue meistä →",
+    "sending": "Lähetetään…",
+    "sentTitle": "Viesti lähetetty",
+    "sentBody": "Kiitos. Viesti on nyt tiimillä, ja vastaamme sähköpostitse yhden työpäivän kuluessa.",
+    "errRequired": "Pakollinen kenttä.",
+    "errInvalid": "Valitse jokin vaihtoehdoista.",
+    "errEmail": "Sähköpostiosoite ei näytä oikealta.",
+    "errTooLong": "Teksti on liian pitkä. Lyhennä sitä hieman.",
+    "errRate": "Olet lähettänyt useita viestejä lyhyessä ajassa. Odota hetki ja yritä uudelleen.",
+    "errSend": "Viesti ei mennyt perille. Yritä uudelleen hetken päästä tai lähetä sähköpostia suoraan osoitteeseen hello@nativespin.com."
   },
   "security": {
     "metaTitle": "Tietoturva",

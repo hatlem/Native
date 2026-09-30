@@ -930,6 +930,11 @@ body:has(.bn) .drawer-link:hover { background: rgba(20,17,12,0.06) !important; }
 
 /* Contact shell uses auth-shell layout */
 .bn .contact-shell { min-height: 0; }
+.bn .auth-card .field .err {
+  font-size: 12px; font-weight: 600; color: var(--NO); margin-top: 2px;
+}
+.bn .auth-card .field [aria-invalid="true"] { border-color: var(--NO); }
+.bn .contact-sent { align-self: start; }
 
 /* — Skeleton lines (marketing loading) — */
 .bn .skel {

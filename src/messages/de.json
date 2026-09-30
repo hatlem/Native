@@ -1879,7 +1879,16 @@
     "messagePlaceholder": "Was wollen Sie erreichen und bis wann?",
     "submit": "Nachricht senden",
     "altPrefix": "Neugierig, wer hinter NativeSpin steht?",
-    "altLink": "Über uns lesen →"
+    "altLink": "Über uns lesen →",
+    "sending": "Wird gesendet …",
+    "sentTitle": "Nachricht gesendet",
+    "sentBody": "Danke. Ihre Nachricht liegt jetzt beim Team, und wir antworten innerhalb eines Werktags per E-Mail.",
+    "errRequired": "Pflichtfeld.",
+    "errInvalid": "Bitte eine der Optionen wählen.",
+    "errEmail": "Diese E-Mail-Adresse sieht nicht richtig aus.",
+    "errTooLong": "Das ist zu lang. Bitte etwas kürzen.",
+    "errRate": "Sie haben in kurzer Zeit mehrere Nachrichten gesendet. Bitte warten Sie etwas und versuchen Sie es erneut.",
+    "errSend": "Ihre Nachricht ist bei uns nicht angekommen. Versuchen Sie es in einer Minute erneut oder schreiben Sie direkt an hello@nativespin.com."
   },
   "security": {
     "metaTitle": "Sicherheit",

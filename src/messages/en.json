@@ -1879,7 +1879,16 @@
     "messagePlaceholder": "What are you trying to do, and when?",
     "submit": "Send message",
     "altPrefix": "Curious who's behind NativeSpin?",
-    "altLink": "Read about us →"
+    "altLink": "Read about us →",
+    "sending": "Sending…",
+    "sentTitle": "Message sent",
+    "sentBody": "Thanks. It's with the team now, and we'll reply by email within a working day.",
+    "errRequired": "Required.",
+    "errInvalid": "Choose one of the options.",
+    "errEmail": "That email address doesn't look right.",
+    "errTooLong": "That's longer than we can take. Please shorten it.",
+    "errRate": "You've sent several messages in a short time. Wait a while and try again.",
+    "errSend": "Your message didn't go through on our side. Try again in a minute, or email hello@nativespin.com directly."
   },
   "security": {
     "metaTitle": "Security",
