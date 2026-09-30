@@ -8,6 +8,7 @@ import { formatMoney } from "@/lib/money";
 import { estimateListTotals, lineDisplay, linePrice, type PlanPricing } from "@/lib/plan-total";
 import { lineBreakdown } from "@/lib/plan-line-text";
 import { lineFigureLabel, totalLabel } from "@/lib/pricing/total-label";
+import { DEFAULT_EXTRA_WORK_RATES } from "@/lib/pricing/extra-work";
 import enMessages from "@/messages/en.json";
 import noMessages from "@/messages/no.json";
 import { buildPlanDocument, planDocumentFilename, type PlanDocumentInput } from "./plan-document";
@@ -157,6 +158,7 @@ const input = (overrides: Partial<PlanDocumentInput> = {}): PlanDocumentInput =>
   link: { kind: "plan", url: "https://www.nativespin.com/en/plan/list-1" },
   generatedAt: new Date("2026-09-30T10:00:00Z"),
   timeZone: "Europe/Oslo",
+  extraWorkRates: DEFAULT_EXTRA_WORK_RATES,
   ...overrides,
 });
 
@@ -236,6 +238,47 @@ test("the total is the page's total, and the exact part's VAT only", () => {
     en.plan.inclVatFirmPart.replace("{amount}", formatMoney(total.totalInclVat, "NOK", "en")),
   ]);
   assert.deepEqual(doc.total.notes, [en.priceVisibility.plusOnRequest, en.plan.estimateNote]);
+});
+
+test("article scope: listed once when NativeSpin writes a line, typical length without a spec", () => {
+  const doc = buildPlanDocument(input());
+  assert.equal(doc.articleScope?.heading, en.articleScope.heading);
+  assert.deepEqual(doc.articleScope?.lines, [
+    "An average native article (about 600–900 words)",
+    "Your brief plus one revision round before approval",
+    "Labelled following the publication's rules for advertiser content",
+    `Interviews, images, extra revision rounds and other extra work are billed per hour: ${formatMoney(1650, "NOK", "en")}/hour`,
+  ]);
+
+  // No line we write (the buyer or the publisher writes every one): no block.
+  const noneWritten = { ...list, items: [onRequest, publisherWrites] } as unknown as SharedList;
+  assert.equal(buildPlanDocument(input({ list: noneWritten })).articleScope, null);
+});
+
+test("article scope: the format's spec sets the length and the marking; stated rounds win", async () => {
+  const spec = { wordCountMin: 500, wordCountMax: 700, disclosureLabel: "Annonsørinnhold" };
+  const written = item({
+    product: {
+      ...product({ basePrice: 40000, name: "Anlegg & Transport", domain: "at.no", inclusions: { revisionRounds: 2 } }),
+      spec,
+    } as unknown as ReturnType<typeof product>,
+  });
+  const withSpec = { ...list, items: [written] } as unknown as SharedList;
+  const doc = buildPlanDocument(input({ list: withSpec, locale: "no" }));
+  assert.deepEqual(doc.articleScope?.lines.slice(0, 3), [
+    "En gjennomsnittlig native-artikkel (500–700 ord)",
+    "Brief og 2 revisjonsrunder før godkjenning",
+    "Merket «Annonsørinnhold» etter publikasjonens regler for annonsørinnhold",
+  ]);
+
+  // Both renderers print it.
+  const docx = zipEntry(await renderPlanDocx(doc), "word/document.xml");
+  assert.ok(docx.includes(noMessages.articleScope.heading));
+  assert.ok(docx.includes("500–700 ord"));
+  const parser = new PDFParse({ data: new Uint8Array(await renderToBuffer(PlanDocumentPdf({ doc }))) });
+  const pdf = (await parser.getText()).text;
+  await parser.destroy();
+  assert.ok(pdf.includes(noMessages.articleScope.heading));
 });
 
 test("the brief is the team's; the client's copy is the share page, with the share link", () => {

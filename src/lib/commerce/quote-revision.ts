@@ -66,6 +66,9 @@ export async function reviseQuote(input: {
           priceSetAt: true,
           customerNote: true,
           position: true,
+          // An extra-work line carries its hours × rate into the revision.
+          hours: true,
+          hourlyRate: true,
         },
       },
     },

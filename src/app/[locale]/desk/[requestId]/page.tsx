@@ -17,7 +17,7 @@ import { bandLabel, priceBand } from "@/lib/pricing/bands";
 import { StatusBadge } from "@/app/status-badge";
 import { BriefTargeting } from "@/app/brief-targeting";
 import { briefWithoutFoldedTargeting } from "@/lib/brief-targeting";
-import { MailLink, SafeEmail, SubmitButton, withSafeEmails } from "@/components";
+import { ExtraWorkForm, MailLink, SafeEmail, SubmitButton, withSafeEmails } from "@/components";
 import { canSeeCostVsSell } from "@/lib/roles";
 import { isStorageConfigured, presignDownload } from "@/lib/storage/r2";
 import { intlLocale } from "@/lib/money";
@@ -43,7 +43,11 @@ import {
   sendQuote,
   setQuoteLineNote,
   setQuoteLinePrice,
+  addQuoteExtraWork,
+  removeQuoteExtraWork,
 } from "@/app/quote-actions";
+import { loadExtraWorkRates } from "@/lib/content-fee";
+import { extraWorkHourlyRate } from "@/lib/pricing/extra-work";
 
 export const dynamic = "force-dynamic";
 
@@ -78,13 +82,28 @@ export default async function DeskRequestPage({
         : errorCode === "revision-predecessor-closed"
           ? "revisionPredecessorClosed"
           : null;
+  // The extra-work form's own refusals (quote-actions addQuoteExtraWork).
+  const extraWorkError =
+    errorCode === "extra-work-invalid"
+      ? "errorInvalid"
+      : errorCode === "extra-work-no-rate"
+        ? "errorNoRate"
+        : null;
   const t = await getTranslations({ locale, namespace: "desk" });
   const tr = await getTranslations({ locale, namespace: "requests" });
   const tType = await getTranslations({ locale, namespace: "productType" });
-  const lineLabelDeps = {
+  const tExtra = await getTranslations({ locale, namespace: "extraWork" });
+  const tScope = await getTranslations({ locale, namespace: "articleScope" });
+  const extraWorkRates = await loadExtraWorkRates();
+  // Per quote: an extra-work line prints its hours × rate in the quote's
+  // currency.
+  const lineLabelDeps = (currency: string) => ({
     formatLabel: (type: string) => (tType.has(type) ? tType(type) : type),
     contentProduction: tType("CONTENT_FEE"),
-  };
+    extraWork: tScope("extraWorkTitle"),
+    extraWorkDetail: (hours: number, rate: number) =>
+      tScope("extraWorkDetail", { hours, rate: formatMoney(rate, currency, locale) }),
+  });
   // Cost-vs-sell (unitCost/margin) is publisher-sensitive commercial data —
   // gated to SUPERADMIN only. This page otherwise stays open to any desk
   // role, so we scope the check to the one span that needs it below rather
@@ -652,12 +671,17 @@ export default async function DeskRequestPage({
                                 at quoting time; older ones end in a raw type enum
                                 ("… — NATIVE_DISPLAY"), relabelled for display only. */}
                             {invoiceLineLabel(
-                              { description: l.description, kind: l.kind },
-                              lineLabelDeps,
+                              {
+                                description: l.description,
+                                kind: l.kind,
+                                hours: l.hours,
+                                hourlyRate: l.hourlyRate,
+                              },
+                              lineLabelDeps(quote.currency),
                             )}{" "}
                             <span className="muted">
                               × {l.quantity}
-                              {l.priceOnRequest
+                              {l.priceOnRequest || l.kind === "EXTRA_WORK"
                                 ? ""
                                 : ` · margin ${Number(l.marginPct)}%`}
                             </span>
@@ -736,7 +760,21 @@ export default async function DeskRequestPage({
                             </form>
                           </details>
                         ) : null}
-                        {editable ? (
+                        {editable && l.kind === "EXTRA_WORK" ? (
+                          // Priced by its hours: removed and re-added, never
+                          // repriced by hand (quote-edits.ts).
+                          <form action={removeQuoteExtraWork}>
+                            <input type="hidden" name="locale" value={locale} />
+                            <input type="hidden" name="requestId" value={request.id} />
+                            <input type="hidden" name="quoteId" value={quote.id} />
+                            <input type="hidden" name="lineId" value={l.id} />
+                            <SubmitButton
+                              label={tExtra("remove")}
+                              pendingLabel={tExtra("removing")}
+                              className="btn small ghost"
+                            />
+                          </form>
+                        ) : editable ? (
                           <div className="resolve-line">
                             <form action={setQuoteLinePrice} className="resolve-line">
                               <input type="hidden" name="locale" value={locale} />
@@ -781,6 +819,36 @@ export default async function DeskRequestPage({
                     );
                   })}
                 </div>
+                {isQuoteEditable(quote)
+                  ? (() => {
+                      const rate = extraWorkHourlyRate(extraWorkRates, quote.currency);
+                      return (
+                        <ExtraWorkForm
+                          action={addQuoteExtraWork}
+                          hidden={{ locale, requestId: request.id, quoteId: quote.id }}
+                          lead={
+                            rate === null
+                              ? null
+                              : tExtra("quoteLead", {
+                                  rate: formatMoney(rate, quote.currency, locale),
+                                  currency: quote.currency,
+                                })
+                          }
+                          noRate={tExtra("noRate", { currency: quote.currency })}
+                          error={extraWorkError && sp.ewQuote === quote.id ? tExtra(extraWorkError) : null}
+                          labels={{
+                            heading: tExtra("heading"),
+                            hours: tExtra("hoursLabel"),
+                            hoursHint: tExtra("hoursHint"),
+                            description: tExtra("descriptionLabel"),
+                            descriptionPlaceholder: tExtra("descriptionPlaceholder"),
+                            add: tExtra("add"),
+                            adding: tExtra("adding"),
+                          }}
+                        />
+                      );
+                    })()
+                  : null}
                 <div className="quote-totals">
                   <div className="quote-row">
                     <span className="muted">{t("subtotal")}</span>

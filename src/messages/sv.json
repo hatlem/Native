@@ -588,7 +588,7 @@
     "whoWritesIt": "Vem skriver artikeln",
     "needsPriceNote": "Den här utgivaren har inte publicerat listpris. Att skicka planen ber vår desk att prissätta den — resten av planen påverkas inte.",
     "breakdownUnpriced": "Bekräftas inom 24 timmar",
-    "breakdownWithArticle": "{placement} placering + {article} per artikel",
+    "breakdownWithArticle": "{placement} placering · Artikel skriven av NativeSpin · från {article}",
     "breakdownQtyWithArticle": "{n} × {unit}, artikel ingår",
     "breakdownArticleIncluded": "Artikel ingår",
     "breakdownQty": "{n} × {unit}",
@@ -746,7 +746,7 @@
       "item3Title": "Vi skriver, placerar och rapporterar",
       "item3Body": "Utkast skickas till dig för godkännande. Länkar och resultat hamnar i Rapporter."
     },
-    "breakdownQtyWithArticleFee": "{n} × {unit} placering + {article} per artikel (en artikel för alla {n})",
+    "breakdownQtyWithArticleFee": "{n} × {unit} placering · Artikel skriven av NativeSpin · från {article} (en artikel för alla {n})",
     "inclVatFirmPart": "{amount} inkl. moms för raderna du kan beställa direkt",
     "estimateNote": "≈ är ett prisintervall. Det exakta priset får du i offerten.",
     "breakdownPlacements": "{n} placeringar",
@@ -1457,7 +1457,9 @@
     "pdfUnavailableDesk": "PDF:en kan inte skapas förrän NativeSpins bolagsuppgifter är satta i servermiljön. Sätt de här variablerna och deploya igen:",
     "sellerVarMissing": "inte satt",
     "sellerVarInvalid": "satt, men kontrollsiffran stämmer inte",
-    "pdfPending": "Visa"
+    "pdfPending": "Visa",
+    "extraWork": "Extraarbete",
+    "extraWorkDetail": "{hours} h × {rate}/h"
   },
   "firm": {
     "badge": "Omedelbar beställning",
@@ -2574,14 +2576,14 @@
       "NATIVE_ARTICLE": [
         "Förhandlad placering på {titleName}, skriven i titelns redaktionella röst",
         "Artikel{length} skriven av en branschspecialiserad journalist",
-        "Två revideringsomgångar och ditt godkännande innan publicering",
+        "Ditt godkännande innan publicering",
         "Distribution i {titleName}s native-flöde och nyhetsbrev",
         "Klickspårning på varje länk vi lägger in, rapporterat vid överenskomna tidpunkter"
       ],
       "ADVERTORIAL": [
         "Förhandlad placering på {titleName}, tydligt märkt som betalt innehåll",
         "Varumärkesledd artikel{length} skriven enligt utgivarens redaktionella standard",
-        "En revideringsomgång och ditt godkännande innan publicering",
+        "Ditt godkännande innan publicering",
         "Distribution i {titleName}s innehållsflöde",
         "Klickspårning på varje länk vi lägger in, rapporterat vid överenskomna tidpunkter"
       ],
@@ -3440,7 +3442,11 @@
     "preparedFor": "Offert till",
     "viewOnline": "Se offerten online, godkänn den och följ kampanjen i NativeSpin:",
     "footerLink": "Öppna i NativeSpin",
-    "noteLabel": "Kommentar"
+    "noteLabel": "Kommentar",
+    "articleScopeHeading": "Det här ingår i en artikel skriven av NativeSpin",
+    "extraWork": "Extraarbete / revision",
+    "inclArticle": "Inkl. artikel skriven av NativeSpin · från {amount}",
+    "extraWorkDetail": "{hours} h × {rate}/h"
   },
   "deskUsers": {
     "eyebrow": "Administration",
@@ -3971,5 +3977,52 @@
     "pricesNothingBooked": "Inget bokas förrän en offert har godkänts.",
     "footerLink": "Öppna planen",
     "pageOf": "Sida {page} av {pages}"
+  },
+  "articleScope": {
+    "feeLabel": "Artikel skriven av NativeSpin · från {amount}",
+    "heading": "Det här ingår i artikeln",
+    "average": "En genomsnittlig native-artikel ({words})",
+    "wordsTypical": "cirka {min, number}–{max, number} ord",
+    "wordsRange": "{min, number}–{max, number} ord",
+    "wordsMin": "minst {min, number} ord",
+    "wordsMax": "upp till {max, number} ord",
+    "rounds": "{rounds, plural, one {Brief och en revideringsomgång före godkännande} other {Brief och # revideringsomgångar före godkännande}}",
+    "marking": "Märkt ”{label}” enligt publikationens regler för annonsörsinnehåll",
+    "markingGeneric": "Märkt enligt publikationens regler för annonsörsinnehåll",
+    "hourly": "Intervjuer, bilder, extra revideringsomgångar och annat extraarbete debiteras per timme: {rate}/timme",
+    "hourlyNoRate": "Intervjuer, bilder, extra revideringsomgångar och annat extraarbete debiteras per timme",
+    "extraWorkTitle": "Extraarbete / revision",
+    "extraWorkDetail": "{hours, number} h × {rate}/h"
+  },
+  "extraWork": {
+    "heading": "Extraarbete / revision",
+    "quoteLead": "Debitera timmar utöver artikelns avtalade omfattning på det här utkastet, till {rate}/timme ({currency}).",
+    "orderLead": "Timmar som avtalats efter att offerten accepterades, till {rate}/timme ({currency}). De kommer med på fakturan när den utfärdas.",
+    "noRate": "Inget timpris är satt för {currency}. En superadmin sätter det under Innehållsavgifter innan timmar kan debiteras.",
+    "hoursLabel": "Timmar",
+    "hoursHint": "Kvartstimmar, t.ex. 1,5",
+    "descriptionLabel": "Beskrivning",
+    "descriptionPlaceholder": "t.ex. Tredje revideringsomgången, intervju med vd",
+    "add": "Lägg till extraarbete",
+    "adding": "Lägger till …",
+    "remove": "Ta bort",
+    "removing": "Tar bort …",
+    "invoiced": "Fakturerat",
+    "toBeInvoiced": "Kommer på nästa faktura",
+    "orderLocked": "Fakturan är utfärdad, så inget mer extraarbete kan läggas på den här ordern.",
+    "orderClosed": "Ordern är avbruten, så inget extraarbete kan läggas till.",
+    "errorInvalid": "Ange timmar i kvartstimmar (till exempel 1,5) och en kort beskrivning.",
+    "errorNoRate": "Det finns inget timpris för den här valutan ännu.",
+    "errorLocked": "Det här kan inte ändras längre: offerten är skickad eller ordern fakturerad.",
+    "buyerHeading": "Extraarbete",
+    "buyerLead": "Arbete utöver artikelns avtalade omfattning, debiterat per timme.",
+    "ratesHeading": "Timpris för extraarbete",
+    "ratesLead": "Debiteras för intervjuer, bilder, extra revideringsomgångar och annat arbete utöver artikelns avtalade omfattning. Köparna ser timpriset där artikelavgiften förklaras. En ändring prissätter aldrig om rader som redan debiterats.",
+    "ratesCurrency": "Valuta",
+    "ratesRate": "Pris per timme",
+    "ratesSave": "Spara timpriser",
+    "ratesSaving": "Sparar …",
+    "ratesReadOnly": "Bara en superadmin kan ändra timpriserna.",
+    "ratesError": "Ange ett timpris över 0 för varje valuta."
   }
 }

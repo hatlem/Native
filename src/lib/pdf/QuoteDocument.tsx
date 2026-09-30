@@ -1,7 +1,14 @@
 import { Document, Page, View, Text, Link, StyleSheet } from "@react-pdf/renderer";
 import { formatMoney, intlLocale } from "@/lib/money";
 import type { QuotePdfData } from "./quote-pdf-data";
-import { qt as t, quoteFormatLabel, quoteRowBlurb, type QuoteMessages } from "./quote-messages";
+import {
+  qt as t,
+  quoteFormatLabel,
+  quoteRowBlurb,
+  quoteRowDetail,
+  quoteRowTitle,
+  type QuoteMessages,
+} from "./quote-messages";
 import { paymentTermsLine } from "@/lib/payment-terms-text";
 // Registers the Inter font family (Nordic glyphs) before any render.
 import "./fonts";
@@ -65,6 +72,11 @@ const styles = StyleSheet.create({
   footnote: { marginTop: 8, fontSize: 7.5, color: "#888" },
   // No italic Inter face is registered, so the note is set apart by colour.
   lineNote: { marginTop: 2, fontSize: 7.5, color: "#2f4a6d" },
+  rowDetail: { fontSize: 7.5, color: "#444", marginTop: 2 },
+  scope: { marginTop: 16, padding: 8, backgroundColor: "#f4f4f4", borderRadius: 3 },
+  scopeHeading: { fontSize: 8.5, fontWeight: 700, marginBottom: 4 },
+  scopeTitles: { fontSize: 7.5, color: "#666", marginTop: 4, marginBottom: 2 },
+  scopeLine: { fontSize: 8, color: "#333", marginBottom: 2, lineHeight: 1.35 },
   footer: {
     position: "absolute",
     bottom: 20,
@@ -157,11 +169,13 @@ export function QuoteDocument({
           </View>
           {data.rows.map((row, i) => {
             const blurb = quoteRowBlurb(row, messages, locale);
+            const detail = quoteRowDetail(row, messages, locale, data.currency);
             return (
               <View key={i} style={styles.tRow}>
                 <View style={styles.colTitle}>
-                  <Text style={styles.tCell}>{row.titleName}</Text>
+                  <Text style={styles.tCell}>{quoteRowTitle(row, messages)}</Text>
                   {blurb ? <Text style={styles.blurb}>{blurb}</Text> : null}
+                  {detail ? <Text style={styles.rowDetail}>{detail}</Text> : null}
                   {row.customerNote ? (
                     <Text style={styles.lineNote}>
                       {t(messages, "noteLabel")}: {row.customerNote}
@@ -200,6 +214,25 @@ export function QuoteDocument({
             <Text style={styles.grandTotalValue}>{money(data.total)}</Text>
           </View>
         </View>
+
+        {/* What an article we write includes, and what is billed per hour. */}
+        {data.articleScopes.length > 0 ? (
+          <View style={styles.scope} wrap={false}>
+            <Text style={styles.scopeHeading}>{t(messages, "articleScopeHeading")}</Text>
+            {data.articleScopes.map((scope, i) => (
+              <View key={i}>
+                {data.articleScopes.length > 1 ? (
+                  <Text style={styles.scopeTitles}>{scope.titles.join(", ")}</Text>
+                ) : null}
+                {scope.lines.map((line, j) => (
+                  <Text key={j} style={styles.scopeLine}>
+                    • {line}
+                  </Text>
+                ))}
+              </View>
+            ))}
+          </View>
+        ) : null}
 
         <View style={styles.notes}>
           <Text>{t(messages, "vatStatus")}</Text>

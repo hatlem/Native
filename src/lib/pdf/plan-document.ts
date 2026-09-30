@@ -14,6 +14,8 @@ import {
 import { lineBreakdown, type Translate } from "@/lib/plan-line-text";
 import { lineFigureLabel, totalLabel } from "@/lib/pricing/total-label";
 import { publisherCanWrite } from "@/lib/authorship";
+import { articleScope, articleScopeLines } from "@/lib/article-scope";
+import type { ExtraWorkRateSpec } from "@/lib/pricing/extra-work";
 import { formatRunRange, runBounds } from "@/lib/run-period";
 import { localizeVertical } from "@/lib/taxonomy-i18n";
 import { titleDisplayName } from "@/lib/title-display";
@@ -80,6 +82,9 @@ export type PlanDocumentInput = {
   generatedAt: Date;
   // The org market's zone: the date on the document is the org's calendar day.
   timeZone: string;
+  // The hourly rate per currency for work beyond an article's included scope
+  // (lib/content-fee.ts loadExtraWorkRates), quoted in the article-scope block.
+  extraWorkRates: readonly ExtraWorkRateSpec[];
 };
 
 export type PlanDocumentRow = {
@@ -129,6 +134,10 @@ export type PlanDocument = {
   sections: PlanDocumentSection[];
   total: { heading: string; label: string; rows: PlanDocumentTotal[]; empty: string | null; notes: string[] };
   prices: { heading: string; lines: string[] };
+  // What an article NativeSpin writes includes, and what is billed per hour
+  // on top (lib/article-scope.ts) — the list /plan and the share page show
+  // under a line we write. Null when the plan has no such line.
+  articleScope: { heading: string; lines: string[] } | null;
   footer: { org: string; linkLabel: string; pageOf: string };
   // "NativeSpin – <plan name> – <YYYY-MM-DD>", without the extension.
   filename: string;
@@ -337,10 +346,28 @@ export function buildPlanDocument(input: PlanDocumentInput): PlanDocument {
       notes: totalNotes,
     },
     prices: { heading: td("pricesHeading"), lines: pricesLines },
+    articleScope: articleScopeBlock(planItems, input.extraWorkRates, locale),
     // The raw "Page {page} of {pages}" template: the page numbers are only
     // known to the renderer (the PDF's render prop, Word's page fields).
     footer: { org: list.organization.name, linkLabel: td("footerLink"), pageOf: MESSAGES[locale].planDocument.pageOf },
     filename: planDocumentFilename(list.name, input.generatedAt, input.timeZone),
+  };
+}
+
+// The article-scope block: one list for the whole document, from the first
+// line NativeSpin writes (its format's word count and marking, its currency's
+// hourly rate) — the same list that line shows on /plan.
+function articleScopeBlock(
+  planItems: Item[],
+  rates: readonly ExtraWorkRateSpec[],
+  locale: AppLocale,
+): PlanDocument["articleScope"] {
+  const written = planItems.find((i) => i.withContent && i.product)?.product;
+  if (!written) return null;
+  const t = translator(locale, "articleScope");
+  return {
+    heading: t("heading"),
+    lines: articleScopeLines(articleScope(written, written.currency, rates), t, locale),
   };
 }
 

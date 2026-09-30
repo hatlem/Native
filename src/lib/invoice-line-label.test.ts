@@ -6,7 +6,24 @@ import { quoteFormatLabel } from "./pdf/quote-messages";
 const no = {
   formatLabel: (type: string) => quoteFormatLabel(type, "no"),
   contentProduction: "Innholdsproduksjon",
+  extraWork: "Ekstra arbeid",
+  extraWorkDetail: (hours: number, rate: number) => `${hours} t × ${rate} kr/t`,
 };
+
+test("an extra-work line: the desk's description, then hours × rate", () => {
+  assert.equal(
+    invoiceLineLabel(
+      { description: "Tredje revisjonsrunde", kind: "EXTRA_WORK", hours: 2.5, hourlyRate: 1650 },
+      no,
+    ),
+    "Ekstra arbeid: Tredje revisjonsrunde (2.5 t × 1650 kr/t)",
+  );
+  // A legacy-shaped row without hours still reads as extra work.
+  assert.equal(
+    invoiceLineLabel({ description: "Intervju", kind: "EXTRA_WORK" }, no),
+    "Ekstra arbeid: Intervju",
+  );
+});
 
 test("snapshot fields: title + translated format, never the enum", () => {
   const label = invoiceLineLabel(

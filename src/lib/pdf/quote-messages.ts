@@ -1,4 +1,4 @@
-import { intlLocale } from "@/lib/money";
+import { formatMoney, intlLocale } from "@/lib/money";
 import { safeLocale } from "@/i18n/routing";
 import { localizeTaxonomy, localizeVertical } from "@/lib/taxonomy-i18n";
 import type { QuotePdfRow } from "./quote-pdf-data";
@@ -45,6 +45,37 @@ export function qt(
     for (const [k, v] of Object.entries(values)) s = s.replaceAll(`{${k}}`, String(v));
   }
   return s;
+}
+
+// The row's main text: the title, or "Extra work / revision" for billed hours
+// (whose description then goes into the detail line).
+export function quoteRowTitle(row: QuotePdfRow, messages: QuoteMessages): string {
+  return row.kind === "EXTRA_WORK" ? qt(messages, "extraWork") : row.titleName;
+}
+
+// The pricing detail under a row, shared by the PDF and the DOCX: an extra
+// work row's description and hours × rate ("Third revision round · 2.5 h ×
+// NOK 1,650/h"), or the article fee folded into a placement row ("Incl.
+// article written by NativeSpin · from NOK 2,000"). Null when neither.
+export function quoteRowDetail(
+  row: QuotePdfRow,
+  messages: QuoteMessages,
+  locale: string,
+  currency: string,
+): string | null {
+  if (row.kind === "EXTRA_WORK") {
+    const hours =
+      row.hours != null && row.hourlyRate != null
+        ? qt(messages, "extraWorkDetail", {
+            hours: new Intl.NumberFormat(intlLocale(locale)).format(row.hours),
+            rate: formatMoney(row.hourlyRate, currency, locale),
+          })
+        : null;
+    return [row.titleName, hours].filter(Boolean).join(" · ") || null;
+  }
+  return row.articleFee != null
+    ? qt(messages, "inclArticle", { amount: formatMoney(row.articleFee, currency, locale) })
+    : null;
 }
 
 // The small grey facts line under each title (reach, vertical, audience,

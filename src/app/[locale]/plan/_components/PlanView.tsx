@@ -18,7 +18,7 @@ import type { ProductInclusions } from "@/lib/pricing/inclusions";
 import { catalogVisibleTitleWhere } from "@/lib/catalog-visibility";
 import type { Candidate, SupplementaryTitle } from "@/lib/recommend";
 import { recommendForBrief } from "@/lib/campaign-recommend";
-import { loadPricingDefaults } from "@/lib/content-fee";
+import { loadExtraWorkRates, loadPricingDefaults } from "@/lib/content-fee";
 import { timeAgo } from "@/lib/time-ago";
 import { loadVerticalOptions, localizedVerticalOptions } from "@/lib/catalog-taxonomy";
 import { ViewOnlyNote } from "@/components/view-only-note";
@@ -136,6 +136,8 @@ export async function PlanView({
   // PlanLines' breakdown ("38 000 placement + 7 000 article") are all priced
   // from the same load the order uses, so /plan shows what the order charges.
   const pricing = await loadPricingDefaults();
+  // The per-currency hourly rate the article-scope list quotes.
+  const extraWorkRates = await loadExtraWorkRates();
 
   // PRODUCT lines: concrete placements. Same price logic as before, but
   // keyed on the SavedListItem id so edits target the row, not the product.
@@ -610,6 +612,7 @@ export async function PlanView({
                 hasHiddenPrice={hasHiddenPrice}
                 blockedPeriods={blockedPeriods}
                 readOnly={readOnly}
+                extraWorkRates={extraWorkRates}
               />
               {favoriteCount > 0 && !readOnly ? (
                 <div className="plan-favorites-bridge">

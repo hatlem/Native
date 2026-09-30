@@ -7,6 +7,7 @@ import { prisma } from "@/lib/prisma";
 import { recordAudit } from "@/lib/audit";
 import { loadScope } from "@/lib/scope";
 import { isSupportedMarket } from "@/lib/markets";
+import { saveExtraWorkRates } from "@/lib/pricing/extra-work-rates";
 
 function field(formData: FormData, key: string): string {
   const v = formData.get(key);
@@ -229,6 +230,25 @@ export async function toggleMarginRule(formData: FormData) {
   }
   revalidatePath(`/${locale}/desk/content-fees`);
   redirect(`/${locale}/desk/content-fees`);
+}
+
+// The hourly rate for extra work, one per billing currency — SUPERADMIN only
+// (lib/pricing/extra-work-rates.ts has the rule and the audit). Inputs are
+// named r_<CURRENCY> for the currencies listed in `currencies`.
+export async function updateExtraWorkRates(formData: FormData) {
+  const locale = field(formData, "locale") || "en";
+  const scope = await loadScope();
+  const result = await saveExtraWorkRates({
+    actor: { userId: scope.userId, role: scope.role },
+    rates: field(formData, "currencies")
+      .split(",")
+      .filter(Boolean)
+      .map((currency) => ({ currency, hourlyRate: field(formData, `r_${currency}`) })),
+  });
+  if (result.outcome === "forbidden") redirect(`/${locale}/signin`);
+  if (result.outcome === "invalid") redirect(`/${locale}/desk/content-fees?error=rates#extra-work-rates`);
+  revalidatePath(`/${locale}/desk/content-fees`);
+  redirect(`/${locale}/desk/content-fees#extra-work-rates`);
 }
 
 // Flip active on/off so a rule can be retired without losing its history

@@ -29,6 +29,10 @@ export type ProductInclusions = {
   // (e.g. Schibsted/FT partner content). A gross commercial floor the
   // publisher quotes openly — safe to surface, unlike marked-up net rates.
   minSpend?: number;
+  // Revision rounds before approval when the offer states them (e.g. "two
+  // rounds of corrections"). Unset = the standard one round of an article we
+  // write (lib/article-scope.ts).
+  revisionRounds?: number;
 };
 
 // Minimal shape next-intl's translator satisfies — avoids importing the
@@ -111,4 +115,5 @@ export const inclusionsSchema = z.strictObject({
   photographer: z.boolean().optional(),
   translation: z.boolean().optional(),
   minSpend: positiveInt.optional(),
+  revisionRounds: z.number().int().min(1).max(5).optional(),
 }) satisfies z.ZodType<ProductInclusions>;

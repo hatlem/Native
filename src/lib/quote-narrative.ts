@@ -24,7 +24,7 @@ export type QuoteAnchor = {
 
 export type QuoteNarrativeLine = {
   lineId: string;
-  kind: "INVENTORY" | "CONTENT_FEE";
+  kind: "INVENTORY" | "CONTENT_FEE" | "EXTRA_WORK";
   // The placement's product; null on a content-fee line. The page reads
   // the format's spec (word count) through it.
   productId: string | null;
@@ -36,6 +36,14 @@ export type QuoteNarrativeLine = {
   // fee lines on the same title ("Aftenposten · Content production") can be
   // told apart. Null on a placement line, or when no placement matches.
   forProductType: string | null;
+  // For a content-fee line: the placement product it writes the article for,
+  // so the page can state that article's scope (word count from its spec,
+  // revision rounds, marking — lib/article-scope.ts). Null otherwise.
+  forProductId: string | null;
+  // For an EXTRA_WORK line: the hours billed and the rate they were billed at
+  // (titleName carries the desk's description). Null on every other kind.
+  hours: number | null;
+  hourlyRate: number | null;
   quantity: number;
   lineTotal: number;
   // "Pris på forespørsel" — the line is part of the offer but carries no
@@ -53,7 +61,7 @@ export type QuoteNarrativeData = {
 
 type NarrativeQuoteLine = {
   id: string;
-  kind?: "INVENTORY" | "CONTENT_FEE";
+  kind?: "INVENTORY" | "CONTENT_FEE" | "EXTRA_WORK";
   // Null for CONTENT_FEE lines (production service, no placement).
   productId: string | null;
   // "Content production — <product name>" on a content-fee line (money.ts
@@ -62,6 +70,9 @@ type NarrativeQuoteLine = {
   lineTotal: unknown;
   quantity: number;
   priceOnRequest?: boolean;
+  // EXTRA_WORK only (QuoteLine.hours / hourlyRate).
+  hours?: unknown;
+  hourlyRate?: unknown;
 };
 
 // The content-fee description convention (money.ts computeContentFeeLines,
@@ -97,19 +108,38 @@ export function buildQuoteNarrative(
   const { quote, organization, productsById } = input;
 
   // Placement description → its product, to label the fee lines.
-  const placementByDescription = new Map<string, NarrativeProduct>();
+  const placementByDescription = new Map<string, { productId: string; product: NarrativeProduct }>();
   for (const line of quote.lines) {
     if ((line.kind ?? "INVENTORY") !== "INVENTORY" || !line.productId || !line.description) continue;
     const product = productsById.get(line.productId);
-    if (product) placementByDescription.set(line.description, product);
+    if (product) placementByDescription.set(line.description, { productId: line.productId, product });
   }
-  const feePlacement = (line: NarrativeQuoteLine): NarrativeProduct | undefined =>
+  const feePlacement = (line: NarrativeQuoteLine): { productId: string; product: NarrativeProduct } | undefined =>
     line.description?.startsWith(CONTENT_FEE_PREFIX)
       ? placementByDescription.get(line.description.slice(CONTENT_FEE_PREFIX.length))
       : undefined;
 
   const lines: QuoteNarrativeLine[] = quote.lines.map((line) => {
     const kind = line.kind ?? "INVENTORY";
+    // Desk-billed hours: no product, no bullets, no anchor. The desk's
+    // description is the line's name.
+    if (kind === "EXTRA_WORK") {
+      return {
+        lineId: line.id,
+        kind,
+        productId: null,
+        titleName: line.description ?? "",
+        productType: "EXTRA_WORK",
+        forProductType: null,
+        forProductId: null,
+        hours: line.hours != null ? Number(line.hours) : null,
+        hourlyRate: line.hourlyRate != null ? Number(line.hourlyRate) : null,
+        quantity: line.quantity,
+        lineTotal: Number(line.lineTotal),
+        priceOnRequest: line.priceOnRequest ?? false,
+        anchor: null,
+      };
+    }
     const product = line.productId ? productsById.get(line.productId) : undefined;
     const title = product?.title;
     const rateCardPerUnit =
@@ -124,10 +154,14 @@ export function buildQuoteNarrative(
       lineId: line.id,
       kind,
       productId: kind === "INVENTORY" ? line.productId : null,
-      titleName: title?.name ?? (kind === "CONTENT_FEE" ? (placement?.title.name ?? "") : (line.productId ?? "")),
+      titleName:
+        title?.name ?? (kind === "CONTENT_FEE" ? (placement?.product.title.name ?? "") : (line.productId ?? "")),
       productType:
         product?.type ?? (kind === "CONTENT_FEE" ? "CONTENT_FEE" : "NATIVE_ARTICLE"),
-      forProductType: placement?.type ?? null,
+      forProductType: placement?.product.type ?? null,
+      forProductId: placement?.productId ?? null,
+      hours: null,
+      hourlyRate: null,
       quantity: line.quantity,
       lineTotal: Number(line.lineTotal),
       priceOnRequest: line.priceOnRequest ?? false,

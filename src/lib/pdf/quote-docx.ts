@@ -13,7 +13,14 @@ import {
 import { formatMoney, intlLocale } from "@/lib/money";
 import { paymentTermsLine } from "@/lib/payment-terms-text";
 import type { QuotePdfData, QuotePdfRow } from "./quote-pdf-data";
-import { qt as t, quoteFormatLabel, quoteRowBlurb, type QuoteMessages } from "./quote-messages";
+import {
+  qt as t,
+  quoteFormatLabel,
+  quoteRowBlurb,
+  quoteRowDetail,
+  quoteRowTitle,
+  type QuoteMessages,
+} from "./quote-messages";
 import {
   A4_PAGE,
   COLOR,
@@ -123,6 +130,7 @@ export async function renderQuoteDocx(
       }),
       ...data.rows.map((row) => {
         const blurb = quoteRowBlurb(row, messages, locale);
+        const detail = quoteRowDetail(row, messages, locale, data.currency);
         const values = [
           row.marketCode,
           quoteFormatLabel(row.format, locale),
@@ -135,8 +143,9 @@ export async function renderQuoteDocx(
           children: [
             cell(
               [
-                para([run(row.titleName)]),
+                para([run(quoteRowTitle(row, messages))]),
                 ...(blurb ? [para([run(blurb, { size: SIZE.small, color: COLOR.muted })])] : []),
+                ...(detail ? [para([run(detail, { size: SIZE.small, color: "444444" })])] : []),
                 ...(row.customerNote
                   ? [
                       para([
@@ -159,6 +168,21 @@ export async function renderQuoteDocx(
       }),
     ],
   });
+
+  // What an article we write includes, and what is billed per hour (same
+  // block as the PDF).
+  const scopeBlock = data.articleScopes.length
+    ? [
+        para([run(t(messages, "articleScopeHeading"), { bold: true, size: 17 })], { after: 80 }),
+        ...data.articleScopes.flatMap((scope) => [
+          ...(data.articleScopes.length > 1
+            ? [para([run(scope.titles.join(", "), { size: SIZE.small, color: COLOR.muted })])]
+            : []),
+          ...scope.lines.map((line) => para([run(`• ${line}`, { size: 16 })])),
+        ]),
+        para([], { after: 200 }),
+      ]
+    : [];
 
   const totalLine = (label: string, value: string, bold = false, top?: IBorderOptions) =>
     new TableRow({
@@ -226,6 +250,7 @@ export async function renderQuoteDocx(
           para([], { after: 200 }),
           totals,
           para([], { after: 320 }),
+          ...scopeBlock,
           para([run(t(messages, "vatStatus"), { size: 16, color: "555555" })]),
           para([run(paymentTermsLine(locale, data.paymentTermsDays), { size: 16, color: "555555" })], {
             after: 160,

@@ -6,6 +6,8 @@ import { Link } from "@/i18n/navigation";
 import { intlLocale } from "@/lib/money";
 import { lineFigureLabel } from "@/lib/pricing/total-label";
 import { lineBreakdown } from "@/lib/plan-line-text";
+import { articleScope, articleScopeLines } from "@/lib/article-scope";
+import type { ExtraWorkRateSpec } from "@/lib/pricing/extra-work";
 import { lineSortValue, type LineDisplay } from "@/lib/plan-total";
 import { titleDisplayName } from "@/lib/title-display";
 import { removeFromPlan, setQuantity, setContentProduction, setLineNote, setLineAlternative } from "@/app/plan-actions";
@@ -19,6 +21,7 @@ type PlanProduct = Prisma.ProductGetPayload<{
   include: {
     title: { include: { publisher: true; market: true } };
     priceRules: true;
+    spec: true;
   };
 }>;
 
@@ -342,6 +345,7 @@ export async function PlanLines({
   hasHiddenPrice,
   blockedPeriods = new Set<string>(),
   readOnly = false,
+  extraWorkRates,
 }: {
   locale: string;
   listId: string;
@@ -356,8 +360,13 @@ export async function PlanLines({
   // dates, notes, prices — with every editing control left out. The server
   // refuses those writes anyway (lib/scope canEditOnOrg).
   readOnly?: boolean;
+  // The hourly rate per currency for work beyond the article's scope
+  // (lib/content-fee.ts loadExtraWorkRates), for the "What the article
+  // includes" list on a line we write.
+  extraWorkRates: readonly ExtraWorkRateSpec[];
 }) {
   const t = await getTranslations({ locale, namespace: "plan" });
+  const tScope = await getTranslations({ locale, namespace: "articleScope" });
   const tType = await getTranslations({ locale, namespace: "productType" });
   const tReq = await getTranslations({ locale, namespace: "requests" });
   const tCampaign = await getTranslations({ locale, namespace: "campaign" });
@@ -467,6 +476,22 @@ export async function PlanLines({
             <span className="plan-line-card__breakdown">
               {lineBreakdown({ ...l, currency: l.product.currency }, locale, t, tv)}
             </span>
+            {/* A line we write: what its article fee buys, and what is
+                billed per hour on top (lib/article-scope.ts). */}
+            {l.withContent ? (
+              <details className="article-scope plan-line-card__scope">
+                <summary>{tScope("heading")}</summary>
+                <ul>
+                  {articleScopeLines(
+                    articleScope(l.product, l.product.currency, extraWorkRates),
+                    tScope,
+                    locale,
+                  ).map((line) => (
+                    <li key={line}>{line}</li>
+                  ))}
+                </ul>
+              </details>
+            ) : null}
           </div>
 
           {readOnly ? null : (

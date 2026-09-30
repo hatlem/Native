@@ -69,6 +69,32 @@ export function canIssueInvoice(
   );
 }
 
+// ---------- Extra work (billed hours after acceptance) ----------
+
+// Extra work agreed after the quote was accepted goes onto the order's
+// invoice when it is issued (lib/billing.ts). So it can be added, or removed
+// again, from confirmation until that invoice exists: never on a cancelled
+// order, and never after invoicing (the invoice is the "what was billed"
+// record; a later correction is a credit note, not a new line).
+const EXTRA_WORK_ORDER_STATUSES: ReadonlySet<OrderStatus> = new Set<OrderStatus>([
+  ...ORDER_FLOW,
+]);
+
+export type ExtraWorkBlock = "invoiced" | "closed";
+
+export function extraWorkBlock(
+  status: OrderStatus,
+  invoices: readonly InvoiceLike[],
+): ExtraWorkBlock | null {
+  if (status === OrderStatus.INVOICED || invoices.some((i) => OPEN_INVOICE_STATUSES.has(i.status))) {
+    return "invoiced";
+  }
+  return EXTRA_WORK_ORDER_STATUSES.has(status) ? null : "closed";
+}
+
+/** Order statuses extra work may be written against (the DB-side guard). */
+export const EXTRA_WORK_ORDER_STATUS_LIST: OrderStatus[] = [...EXTRA_WORK_ORDER_STATUSES];
+
 export type CreditNoteBlock =
   | "no-invoice"
   | "already-credited"
@@ -117,7 +143,7 @@ export const DELIVERY_GATED_STATUSES: ReadonlySet<OrderStatus> = new Set<OrderSt
 
 export type DeliveryLine = {
   id: string;
-  kind: "INVENTORY" | "CONTENT_FEE";
+  kind: "INVENTORY" | "CONTENT_FEE" | "EXTRA_WORK";
   label: string;
   booking: { status: BookingStatus; liveUrl: string | null } | null;
 };

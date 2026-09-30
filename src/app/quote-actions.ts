@@ -8,7 +8,7 @@ import {
   resolveDefaultMarginPct,
   type QuotableItem,
 } from "@/lib/money";
-import { loadPricingDefaults, contentFeeLinesForGroup } from "@/lib/content-fee";
+import { loadPricingDefaults, contentFeeLinesForGroup, loadExtraWorkRates } from "@/lib/content-fee";
 import { toQuotable } from "@/lib/commerce/firm-order";
 import { createOrderFromQuote, QuoteNotAcceptableError } from "@/lib/commerce/accept-quote";
 import {
@@ -29,10 +29,13 @@ import { reconcileExpiredQuotes } from "@/lib/commerce/quote-expiry";
 import { lineOrder } from "@/lib/commerce/line-order";
 import { notifyQuoteAccepted, sendDraftQuotes } from "@/lib/commerce/quote-lifecycle";
 import {
+  addQuoteExtraWorkLine,
+  removeQuoteExtraWorkLine,
   updateQuoteLineNote,
   updateQuoteLinePrice,
   type LinePriceChange,
 } from "@/lib/commerce/quote-edits";
+import { parseExtraWorkInput } from "@/lib/pricing/extra-work";
 import { discardQuoteRevision, reviseQuote } from "@/lib/commerce/quote-revision";
 import { marketDefaultLocale } from "@/lib/market-locale";
 import { marketTimeZone } from "@/lib/markets";
@@ -361,6 +364,65 @@ export async function setQuoteLineNote(formData: FormData) {
   });
 
   redirect(`/${locale}/desk/${requestId}`);
+}
+
+// "Ekstra arbeid / revisjon" on a DRAFT quote: hours × the quote currency's
+// hourly rate, with the desk's description. Locked like every other line
+// edit (quote-edits.ts): once sent, extra work goes on the order instead.
+export async function addQuoteExtraWork(formData: FormData) {
+  const locale = str(formData, "locale") || "en";
+  const requestId = str(formData, "requestId");
+  const quoteId = str(formData, "quoteId");
+
+  const scope = await loadScope();
+  if (!scope.isDesk || !scope.userId) redirect(`/${locale}/signin`);
+
+  const input = parseExtraWorkInput({
+    hours: formData.get("hours"),
+    description: formData.get("description"),
+  });
+  if (!input.ok) redirect(`/${locale}/desk/${requestId}?error=extra-work-invalid&ewQuote=${quoteId}#quote-${quoteId}`);
+
+  const result = await addQuoteExtraWorkLine({
+    requestId,
+    quoteId,
+    hours: input.value.hours,
+    description: input.value.description,
+    rates: await loadExtraWorkRates(),
+  });
+  if (result.outcome === "locked") redirect(`/${locale}/desk/${requestId}?error=quote-locked`);
+  if (result.outcome === "no-rate") redirect(`/${locale}/desk/${requestId}?error=extra-work-no-rate&ewQuote=${quoteId}#quote-${quoteId}`);
+  if (result.outcome !== "added") redirect(`/${locale}/desk/${requestId}`);
+
+  await recordAudit(scope.userId, "quote.line.extra_work", `QuoteLine:${result.lineId}`, {
+    quoteId,
+    requestId,
+    hours: input.value.hours,
+    hourlyRate: result.hourlyRate,
+    lineTotal: result.lineTotal,
+  });
+  redirect(`/${locale}/desk/${requestId}#quote-${quoteId}`);
+}
+
+export async function removeQuoteExtraWork(formData: FormData) {
+  const locale = str(formData, "locale") || "en";
+  const requestId = str(formData, "requestId");
+  const quoteId = str(formData, "quoteId");
+  const lineId = str(formData, "lineId");
+
+  const scope = await loadScope();
+  if (!scope.isDesk || !scope.userId) redirect(`/${locale}/signin`);
+
+  const result = await removeQuoteExtraWorkLine({ requestId, quoteId, lineId });
+  if (result.outcome === "locked") redirect(`/${locale}/desk/${requestId}?error=quote-locked`);
+  if (result.outcome !== "removed") redirect(`/${locale}/desk/${requestId}`);
+
+  await recordAudit(scope.userId, "quote.line.extra_work_remove", `QuoteLine:${lineId}`, {
+    quoteId,
+    requestId,
+    lineTotal: result.lineTotal,
+  });
+  redirect(`/${locale}/desk/${requestId}#quote-${quoteId}`);
 }
 
 // "Revider tilbud": open a DRAFT revision of a quote the buyer holds (SENT or

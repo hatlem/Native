@@ -728,7 +728,7 @@
     "whoWritesIt": "Wer schreibt den Artikel",
     "needsPriceNote": "Dieser Verlag hat noch keinen Listenpreis veröffentlicht. Das Senden des Plans bittet unseren Desk, ihn zu bepreisen — der Rest deines Plans bleibt unberührt.",
     "breakdownUnpriced": "Wird innerhalb von 24 Stunden bestätigt",
-    "breakdownWithArticle": "{placement} Platzierung + {article} pro Artikel",
+    "breakdownWithArticle": "{placement} Platzierung · Artikel von NativeSpin geschrieben · ab {article}",
     "breakdownQtyWithArticle": "{n} × {unit}, Artikel inbegriffen",
     "breakdownArticleIncluded": "Artikel inbegriffen",
     "breakdownQty": "{n} × {unit}",
@@ -886,7 +886,7 @@
       "item3Title": "Wir schreiben, platzieren und berichten",
       "item3Body": "Entwürfe kommen zur Freigabe zu Ihnen. Links und Ergebnisse landen in den Berichten."
     },
-    "breakdownQtyWithArticleFee": "{n} × {unit} Platzierung + {article} pro Artikel (ein Artikel für alle {n})",
+    "breakdownQtyWithArticleFee": "{n} × {unit} Platzierung · Artikel von NativeSpin geschrieben · ab {article} (ein Artikel für alle {n})",
     "inclVatFirmPart": "{amount} inkl. MwSt. für die sofort bestellbaren Positionen",
     "estimateNote": "≈ steht für eine Preisspanne. Den genauen Preis erhalten Sie mit dem Angebot.",
     "breakdownPlacements": "{n} Platzierungen",
@@ -1597,7 +1597,9 @@
     "pdfUnavailableDesk": "Das PDF lässt sich erst erzeugen, wenn die Firmendaten von NativeSpin in der Serverumgebung gesetzt sind. Setzen Sie diese Variablen und deployen Sie neu:",
     "sellerVarMissing": "nicht gesetzt",
     "sellerVarInvalid": "gesetzt, aber die Prüfziffer stimmt nicht",
-    "pdfPending": "Ansehen"
+    "pdfPending": "Ansehen",
+    "extraWork": "Mehrarbeit",
+    "extraWorkDetail": "{hours} Std. × {rate}/Std."
   },
   "firm": {
     "badge": "Sofortbestellung",
@@ -2431,14 +2433,14 @@
       "NATIVE_ARTICLE": [
         "Verhandelte Platzierung in {titleName}, geschrieben in der redaktionellen Stimme des Titels",
         "Artikel{length} verfasst von einer fachkundigen Journalistin oder einem fachkundigen Journalisten",
-        "Zwei Korrekturrunden und Ihre Freigabe vor Veröffentlichung",
+        "Ihre Freigabe vor Veröffentlichung",
         "Distribution im Native-Feed und Newsletter von {titleName}",
         "Klick-Tracking auf jedem von uns gesetzten Link, berichtet zu vereinbarten Zeitpunkten"
       ],
       "ADVERTORIAL": [
         "Verhandelte Platzierung in {titleName}, klar als bezahlter Inhalt gekennzeichnet",
         "Markenführender Artikel{length} nach den redaktionellen Standards des Verlags",
-        "Eine Korrekturrunde und Ihre Freigabe vor Veröffentlichung",
+        "Ihre Freigabe vor Veröffentlichung",
         "Distribution im Content-Feed von {titleName}",
         "Klick-Tracking auf jedem von uns gesetzten Link, berichtet zu vereinbarten Zeitpunkten"
       ],
@@ -3309,7 +3311,11 @@
     "preparedFor": "Angebot für",
     "viewOnline": "Angebot online ansehen, freigeben und die Kampagne in NativeSpin verfolgen:",
     "footerLink": "In NativeSpin öffnen",
-    "noteLabel": "Hinweis"
+    "noteLabel": "Hinweis",
+    "articleScopeHeading": "Das ist in einem von NativeSpin geschriebenen Artikel enthalten",
+    "extraWork": "Mehrarbeit / Korrektur",
+    "inclArticle": "Inkl. Artikel von NativeSpin geschrieben · ab {amount}",
+    "extraWorkDetail": "{hours} Std. × {rate}/Std."
   },
   "deskUsers": {
     "eyebrow": "Administration",
@@ -3840,5 +3846,52 @@
     "pricesNothingBooked": "Gebucht wird erst, wenn ein Angebot freigegeben ist.",
     "footerLink": "Plan öffnen",
     "pageOf": "Seite {page} von {pages}"
+  },
+  "articleScope": {
+    "feeLabel": "Artikel von NativeSpin geschrieben · ab {amount}",
+    "heading": "Das ist im Artikel enthalten",
+    "average": "Ein durchschnittlicher Native-Artikel ({words})",
+    "wordsTypical": "ca. {min, number}–{max, number} Wörter",
+    "wordsRange": "{min, number}–{max, number} Wörter",
+    "wordsMin": "mindestens {min, number} Wörter",
+    "wordsMax": "bis zu {max, number} Wörter",
+    "rounds": "{rounds, plural, one {Briefing plus eine Korrekturrunde vor der Freigabe} other {Briefing plus # Korrekturrunden vor der Freigabe}}",
+    "marking": "Gekennzeichnet als „{label}“ nach den Regeln der Publikation für Werbeinhalte",
+    "markingGeneric": "Gekennzeichnet nach den Regeln der Publikation für Werbeinhalte",
+    "hourly": "Interviews, Bilder, zusätzliche Korrekturrunden und sonstige Mehrarbeit werden nach Stunden abgerechnet: {rate}/Stunde",
+    "hourlyNoRate": "Interviews, Bilder, zusätzliche Korrekturrunden und sonstige Mehrarbeit werden nach Stunden abgerechnet",
+    "extraWorkTitle": "Mehrarbeit / Korrektur",
+    "extraWorkDetail": "{hours, number} Std. × {rate}/Std."
+  },
+  "extraWork": {
+    "heading": "Mehrarbeit / Korrektur",
+    "quoteLead": "Stunden über den vereinbarten Umfang des Artikels hinaus auf diesem Entwurf abrechnen, zu {rate}/Stunde ({currency}).",
+    "orderLead": "Nach Annahme des Angebots vereinbarte Stunden, zu {rate}/Stunde ({currency}). Sie kommen auf die Rechnung, sobald sie gestellt wird.",
+    "noRate": "Für {currency} ist kein Stundensatz hinterlegt. Ein Superadmin legt ihn unter Content-Gebühren fest, bevor Stunden abgerechnet werden können.",
+    "hoursLabel": "Stunden",
+    "hoursHint": "In Viertelstunden, z. B. 1,5",
+    "descriptionLabel": "Beschreibung",
+    "descriptionPlaceholder": "z. B. Dritte Korrekturrunde, Interview mit der Geschäftsführung",
+    "add": "Mehrarbeit hinzufügen",
+    "adding": "Wird hinzugefügt …",
+    "remove": "Entfernen",
+    "removing": "Wird entfernt …",
+    "invoiced": "Abgerechnet",
+    "toBeInvoiced": "Kommt auf die nächste Rechnung",
+    "orderLocked": "Die Rechnung ist gestellt, daher kann diesem Auftrag keine Mehrarbeit mehr hinzugefügt werden.",
+    "orderClosed": "Der Auftrag ist storniert, daher kann keine Mehrarbeit hinzugefügt werden.",
+    "errorInvalid": "Geben Sie die Stunden in Viertelstunden an (zum Beispiel 1,5) und eine kurze Beschreibung.",
+    "errorNoRate": "Für diese Währung gibt es noch keinen Stundensatz.",
+    "errorLocked": "Das lässt sich nicht mehr ändern: Das Angebot wurde versendet oder der Auftrag abgerechnet.",
+    "buyerHeading": "Mehrarbeit",
+    "buyerLead": "Arbeit über den vereinbarten Umfang des Artikels hinaus, nach Stunden abgerechnet.",
+    "ratesHeading": "Stundensatz für Mehrarbeit",
+    "ratesLead": "Abgerechnet für Interviews, Bilder, zusätzliche Korrekturrunden und sonstige Arbeit über den vereinbarten Umfang eines Artikels hinaus. Käufer sehen den Satz überall dort, wo der Artikelpreis erklärt wird. Eine Änderung bepreist bereits abgerechnete Positionen nie neu.",
+    "ratesCurrency": "Währung",
+    "ratesRate": "Preis pro Stunde",
+    "ratesSave": "Stundensätze speichern",
+    "ratesSaving": "Wird gespeichert …",
+    "ratesReadOnly": "Nur ein Superadmin kann die Stundensätze ändern.",
+    "ratesError": "Geben Sie für jede Währung einen Stundensatz über 0 an."
   }
 }

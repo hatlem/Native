@@ -12,6 +12,8 @@ import { WritersPanel } from "./writers-panel";
 import { CampaignSection } from "./campaign-section";
 import { ProgrammePanel } from "./programme-panel";
 import { AccountingStatus } from "./accounting-status";
+import { ExtraWorkPanel } from "./extra-work-panel";
+import { loadExtraWorkRates } from "@/lib/content-fee";
 import { cancelBlockKey } from "@/lib/cancellation";
 import { deliveryGap, nextOrderStatus } from "@/lib/order-lifecycle";
 
@@ -47,10 +49,17 @@ export default async function DeskOrderPage({
     where: { id: orderId },
     include: {
       organization: true,
-      // The buyer's request brief: the per-line brief falls back to it.
-      quote: { include: { request: { select: { briefSummary: true } } } },
+      // The buyer's request brief: the per-line brief falls back to it. The
+      // quote's extra-work lines show beside the hours added since.
+      quote: {
+        include: {
+          request: { select: { briefSummary: true } },
+          lines: { where: { kind: "EXTRA_WORK" }, orderBy: lineOrder() },
+        },
+      },
       invoices: true,
       creditNotes: true,
+      extraWork: { orderBy: [{ createdAt: "asc" }, { id: "asc" }] },
       lines: {
         orderBy: lineOrder(),
         include: {
@@ -92,6 +101,7 @@ export default async function DeskOrderPage({
     },
   });
   const clicks = await clicksByOrderLine(order.lines.map((l) => l.id));
+  const extraWorkRates = await loadExtraWorkRates();
 
   const products = await prisma.product.findMany({
     where: {
@@ -227,6 +237,20 @@ export default async function DeskOrderPage({
         byId={byId}
         matchablePlaybooks={matchablePlaybooks}
         requestBrief={order.quote.request.briefSummary}
+      />
+
+      <ExtraWorkPanel
+        locale={locale}
+        order={{
+          id: order.id,
+          status: order.status,
+          currency: order.quote.currency,
+          invoices: order.invoices,
+        }}
+        entries={order.extraWork}
+        quoteLines={order.quote.lines}
+        rates={extraWorkRates}
+        errorCode={typeof sp.extraWork === "string" ? sp.extraWork : undefined}
       />
 
       <CampaignSection

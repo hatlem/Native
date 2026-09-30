@@ -1,5 +1,7 @@
 import { getTranslations } from "next-intl/server";
 import { formatMoney } from "@/lib/money";
+import { articleFeeLabel, articleScope, articleScopeLines, extraWorkDetail } from "@/lib/article-scope";
+import { loadExtraWorkRates } from "@/lib/content-fee";
 import {
   buildQuoteNarrative,
   anchorDiscountPct,
@@ -66,6 +68,9 @@ export async function QuoteSection({
   const tn = await getTranslations({ locale, namespace: "quoteNarrative" });
   const tMarket = await getTranslations({ locale, namespace: "market" });
   const tPay = await getTranslations({ locale, namespace: "paymentTerms" });
+  const tScope = await getTranslations({ locale, namespace: "articleScope" });
+  // The extra-work hourly rate, stated in every article's scope.
+  const extraWorkRates = await loadExtraWorkRates();
 
   // One narrative per quote — anchors, bullets and line totals
   // stay scoped to a single currency.
@@ -94,6 +99,8 @@ export async function QuoteSection({
           lineTotal: l.lineTotal,
           quantity: l.quantity,
           priceOnRequest: l.priceOnRequest,
+          hours: l.hours,
+          hourlyRate: l.hourlyRate,
         })),
       },
       organization: { name: organizationName },
@@ -204,6 +211,22 @@ export async function QuoteSection({
                         )
                       : [];
                     const discount = anchorDiscountPct(line);
+                    const isExtraWork = line.kind === "EXTRA_WORK";
+                    // An article we write: the fee reads "from" (work beyond
+                    // the included scope is billed per hour) and the scope is
+                    // listed, from the placement's own spec and offer.
+                    const scopeLines =
+                      line.kind === "CONTENT_FEE"
+                        ? articleScopeLines(
+                            articleScope(
+                              line.forProductId ? byId.get(line.forProductId) : null,
+                              q.currency,
+                              extraWorkRates,
+                            ),
+                            tScope,
+                            locale,
+                          )
+                        : [];
                     return (
                       <article
                         className="qn-line"
@@ -211,14 +234,38 @@ export async function QuoteSection({
                       >
                         <header>
                           <div>
-                            <h3>{line.titleName}</h3>
-                            <p className="muted small">
-                              {tType(line.productType)}
-                              {line.forProductType ? ` · ${tType(line.forProductType)}` : ""}
-                              {line.quantity > 1
-                                ? ` · × ${line.quantity}`
-                                : ""}
-                            </p>
+                            {isExtraWork ? (
+                              <>
+                                <h3>{tScope("extraWorkTitle")}</h3>
+                                <p className="muted small">
+                                  {line.titleName}
+                                  {line.hours != null && line.hourlyRate != null
+                                    ? ` · ${extraWorkDetail(
+                                        { hours: line.hours, hourlyRate: line.hourlyRate },
+                                        q.currency,
+                                        locale,
+                                        tScope,
+                                      )}`
+                                    : ""}
+                                </p>
+                              </>
+                            ) : (
+                              <>
+                                <h3>{line.titleName}</h3>
+                                <p className="muted small">
+                                  {tType(line.productType)}
+                                  {line.forProductType ? ` · ${tType(line.forProductType)}` : ""}
+                                  {line.quantity > 1
+                                    ? ` · × ${line.quantity}`
+                                    : ""}
+                                </p>
+                              </>
+                            )}
+                            {line.kind === "CONTENT_FEE" && !line.priceOnRequest ? (
+                              <p className="muted small">
+                                {articleFeeLabel(line.lineTotal, q.currency, locale, tScope)}
+                              </p>
+                            ) : null}
                           </div>
                           <div className="qn-line-price">
                             {line.anchor ? (
@@ -257,6 +304,16 @@ export async function QuoteSection({
                               <li key={i}>{b}</li>
                             ))}
                           </ul>
+                        ) : null}
+                        {scopeLines.length > 0 ? (
+                          <div className="qn-scope">
+                            <span className="eyebrow">{tScope("heading")}</span>
+                            <ul className="qn-bullets">
+                              {scopeLines.map((b, i) => (
+                                <li key={i}>{b}</li>
+                              ))}
+                            </ul>
+                          </div>
                         ) : null}
                         {noteByLineId.get(line.lineId) ? (
                           <p className="line-note__text">

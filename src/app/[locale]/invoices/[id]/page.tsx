@@ -40,6 +40,12 @@ export default async function InvoicePage({
   const labelDeps = {
     formatLabel: (type: string) => (tType.has(type) ? tType(type) : type),
     contentProduction: t("contentProduction"),
+    extraWork: t("extraWork"),
+    extraWorkDetail: (hours: number, rate: number) =>
+      t("extraWorkDetail", {
+        hours: new Intl.NumberFormat(intlLocale(locale)).format(hours),
+        rate: formatMoney(rate, invoice.currency, locale),
+      }),
   };
   const date = (d: Date) =>
     new Intl.DateTimeFormat(intlLocale(locale), { dateStyle: "medium" }).format(d);

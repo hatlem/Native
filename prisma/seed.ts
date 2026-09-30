@@ -8,6 +8,8 @@ import {
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
 import bcrypt from "bcryptjs";
+import { defaultContentFeeRules } from "../src/lib/pricing/default-fee-rules";
+import { DEFAULT_EXTRA_WORK_RATES } from "../src/lib/pricing/extra-work";
 
 const prisma = new PrismaClient();
 
@@ -645,39 +647,22 @@ function assertSeedCredentials() {
   );
 }
 
-// Seed placeholder content-production fees so the CONTENT_FEE quote line
-// is live out of the box. Per market: one global rule (any product type)
-// plus a richer NATIVE_ARTICLE override. Amounts are PLACEHOLDERS — the
-// desk tunes them in /desk/content-fees once real production costs are
-// known. Major-currency markets use a smaller nominal than the Nordic
-// krone markets so the figures stay sane across NOK/SEK/DKK vs EUR/GBP/CHF.
+// Content-production fees so the CONTENT_FEE quote line is live out of the
+// box: one rule per market, the same article fee for every format (print
+// and digital alike) — lib/pricing/default-fee-rules.ts. The desk tunes them
+// in /desk/content-fees. Plus the extra-work hourly rates the article scope
+// quotes (lib/pricing/extra-work.ts).
 async function seedContentFeeRules() {
-  const rows = MARKETS.flatMap((m) => {
-    const krone = m.currency === "NOK" || m.currency === "SEK" || m.currency === "DKK";
-    const globalGreen = krone ? 8000 : 800;
-    const globalAdapt = krone ? 4000 : 400;
-    const articleGreen = krone ? 12000 : 1200;
-    const articleAdapt = krone ? 6000 : 600;
-    return [
-      {
-        marketCode: m.code,
-        productType: null,
-        currency: m.currency,
-        greenfieldFee: globalGreen,
-        adaptationFee: globalAdapt,
-        note: "Seed placeholder — set real production cost in /desk/content-fees.",
-      },
-      {
-        marketCode: m.code,
-        productType: ProductType.NATIVE_ARTICLE,
-        currency: m.currency,
-        greenfieldFee: articleGreen,
-        adaptationFee: articleAdapt,
-        note: "Seed placeholder — editorial native article.",
-      },
-    ];
+  await prisma.contentFeeRule.createMany({
+    data: defaultContentFeeRules(MARKETS).map((r) => ({ ...r, marketCode: r.marketCode as MarketCode })),
   });
-  await prisma.contentFeeRule.createMany({ data: rows });
+  for (const r of DEFAULT_EXTRA_WORK_RATES) {
+    await prisma.extraWorkRate.upsert({
+      where: { currency: r.currency },
+      create: { currency: r.currency, hourlyRate: r.hourlyRate },
+      update: {},
+    });
+  }
 }
 
 async function main() {

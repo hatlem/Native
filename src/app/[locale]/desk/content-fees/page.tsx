@@ -10,8 +10,13 @@ import {
   createMarginRule,
   toggleMarginRule,
   bulkUpdateMarginRules,
+  updateExtraWorkRates,
 } from "./actions";
 import { SUPPORTED_MARKETS } from "@/lib/markets";
+import { loadScope } from "@/lib/scope";
+import { loadExtraWorkRates } from "@/lib/content-fee";
+import { DEFAULT_EXTRA_WORK_RATES, extraWorkHourlyRate } from "@/lib/pricing/extra-work";
+import { formatMoney } from "@/lib/money";
 
 export const dynamic = "force-dynamic";
 
@@ -42,6 +47,23 @@ export default async function DeskContentFeesPage({
     orderBy: [{ active: "desc" }, { marketCode: "asc" }],
   });
 
+  // Extra-work hourly rates: every currency a market bills in, plus any
+  // stored row, so a missing rate shows as an empty field to fill in.
+  const tExtra = await getTranslations({ locale, namespace: "extraWork" });
+  const scope = await loadScope();
+  const canEditRates = scope.role === "SUPERADMIN";
+  const [storedRates, marketCurrencies] = await Promise.all([
+    loadExtraWorkRates(),
+    prisma.market.findMany({ select: { currency: true }, distinct: ["currency"] }),
+  ]);
+  const rateCurrencies = [
+    ...new Set([
+      ...DEFAULT_EXTRA_WORK_RATES.map((r) => r.currency),
+      ...marketCurrencies.map((m) => m.currency),
+      ...storedRates.map((r) => r.currency),
+    ]),
+  ];
+
   return (
     <>
       <header className="page-header">
@@ -50,7 +72,84 @@ export default async function DeskContentFeesPage({
         <p className="lead">{t("lead")}</p>
       </header>
 
-      {error ? <p className="form-error">{t("errorInvalid")}</p> : null}
+      {error && error !== "rates" ? <p className="form-error">{t("errorInvalid")}</p> : null}
+
+      <section className="section" id="extra-work-rates">
+        <div className="section-head">
+          <h2>{tExtra("ratesHeading")}</h2>
+        </div>
+        <p className="muted">{tExtra("ratesLead")}</p>
+        {error === "rates" ? (
+          <p className="form-error" role="alert">
+            {tExtra("ratesError")}
+          </p>
+        ) : null}
+        {canEditRates ? (
+          <form action={updateExtraWorkRates} className="card stack-4">
+            <input type="hidden" name="locale" value={locale} />
+            <input type="hidden" name="currencies" value={rateCurrencies.join(",")} />
+            <div className="table-wrap">
+              <table className="table">
+                <thead>
+                  <tr>
+                    <th>{tExtra("ratesCurrency")}</th>
+                    <th>{tExtra("ratesRate")}</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {rateCurrencies.map((currency) => (
+                    <tr key={currency}>
+                      <td>{currency}</td>
+                      <td>
+                        <input
+                          name={`r_${currency}`}
+                          type="number"
+                          min="0.01"
+                          step="0.01"
+                          required
+                          defaultValue={extraWorkHourlyRate(storedRates, currency) ?? ""}
+                          style={{ width: "10ch" }}
+                          aria-label={`${tExtra("ratesRate")} ${currency}`}
+                        />
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+            <SubmitButton
+              className="btn primary"
+              label={tExtra("ratesSave")}
+              pendingLabel={tExtra("ratesSaving")}
+            />
+          </form>
+        ) : (
+          <div className="card">
+            <div className="table-wrap">
+              <table className="table">
+                <thead>
+                  <tr>
+                    <th>{tExtra("ratesCurrency")}</th>
+                    <th>{tExtra("ratesRate")}</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {rateCurrencies.map((currency) => {
+                    const rate = extraWorkHourlyRate(storedRates, currency);
+                    return (
+                      <tr key={currency}>
+                        <td>{currency}</td>
+                        <td>{rate === null ? "—" : formatMoney(rate, currency, locale)}</td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+            </div>
+            <p className="muted small">{tExtra("ratesReadOnly")}</p>
+          </div>
+        )}
+      </section>
 
       <section className="section">
         <div className="section-head">

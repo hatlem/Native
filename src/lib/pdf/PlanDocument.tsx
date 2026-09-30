@@ -159,6 +159,18 @@ export function PlanDocumentPdf({ doc }: { doc: PlanDocumentModel }) {
           ))}
         </View>
 
+        {/* What an article NativeSpin writes includes (lib/article-scope.ts). */}
+        {doc.articleScope ? (
+          <View wrap={false}>
+            <Text style={styles.h2}>{doc.articleScope.heading}</Text>
+            {doc.articleScope.lines.map((l) => (
+              <Text key={l} style={styles.pricesLine}>
+                • {l}
+              </Text>
+            ))}
+          </View>
+        ) : null}
+
         {doc.sections.slice(1).map((s) => (
           <Section key={s.key} section={s} doc={doc} />
         ))}

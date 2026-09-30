@@ -212,6 +212,47 @@ test("a content-fee line is labelled with the title of the placement it writes f
     ["NATIVE_ARTICLE", "ADVERTORIAL", null],
   );
   assert.equal(out.lines[0].forProductType, null);
+  // ...and the placement product, so the page states that article's scope.
+  assert.deepEqual(
+    fees.map((l) => l.forProductId),
+    ["p1", "p2", null],
+  );
+  assert.equal(out.lines[0].forProductId, null);
+});
+
+test("an extra-work line carries its description, hours and rate, never an anchor", () => {
+  const out = buildQuoteNarrative(
+    input({
+      quote: {
+        currency: "NOK",
+        lines: [
+          { id: "l1", kind: "INVENTORY", productId: "p1", description: "A", lineTotal: 18000, quantity: 1 },
+          {
+            id: "x1",
+            kind: "EXTRA_WORK",
+            productId: null,
+            description: "Third revision round",
+            lineTotal: 4125,
+            quantity: 1,
+            hours: "2.50",
+            hourlyRate: "1650.00",
+          },
+        ],
+      },
+    }),
+  );
+  const extra = out.lines[1];
+  assert.equal(extra.kind, "EXTRA_WORK");
+  assert.equal(extra.titleName, "Third revision round");
+  assert.equal(extra.productType, "EXTRA_WORK");
+  assert.equal(extra.hours, 2.5);
+  assert.equal(extra.hourlyRate, 1650);
+  assert.equal(extra.lineTotal, 4125);
+  assert.equal(extra.anchor, null);
+  assert.equal(extra.forProductId, null);
+  // Billed hours are not a placement.
+  assert.equal(out.itemCount, 1);
+  assert.equal(out.lines[0].hours, null);
 });
 
 // BUG-final-local-5: 2 placements with 2 article fees read "4 editorial-grade

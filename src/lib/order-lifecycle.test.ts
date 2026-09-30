@@ -6,6 +6,7 @@ import {
   canIssueInvoice,
   creditNoteEligibility,
   deliveryGap,
+  extraWorkBlock,
   isPlacementPublished,
   nextOrderStatus,
   type DeliveryLine,
@@ -124,4 +125,22 @@ test("deliveryGap needs no confirmation when every placement is published", () =
   );
   assert.equal(gap.needsConfirmation, false);
   assert.equal(gap.published.length, 2);
+});
+
+test("extra work: billable from confirmation until the invoice exists", () => {
+  for (const status of [
+    OrderStatus.CONFIRMED,
+    OrderStatus.IN_PRODUCTION,
+    OrderStatus.SCHEDULED,
+    OrderStatus.LIVE,
+    OrderStatus.COMPLETED,
+  ]) {
+    assert.equal(extraWorkBlock(status, []), null, status);
+  }
+  assert.equal(extraWorkBlock(OrderStatus.INVOICED, []), "invoiced");
+  // An open invoice locks it even before the status flips.
+  assert.equal(extraWorkBlock(OrderStatus.COMPLETED, [{ id: "i1", status: "ISSUED" }]), "invoiced");
+  // A credited invoice no longer bills the order, but a cancelled order is closed.
+  assert.equal(extraWorkBlock(OrderStatus.CANCELLED, [{ id: "i1", status: "CREDITED" }]), "closed");
+  assert.equal(extraWorkBlock(OrderStatus.QUOTED, []), "closed");
 });

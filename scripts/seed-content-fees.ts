@@ -5,25 +5,18 @@
 //
 //   pnpm tsx scripts/seed-content-fees.ts
 //
-// Amounts are PLACEHOLDERS — tune them in /desk/content-fees.
+// One rule per market, the same article fee for every format (print and
+// digital alike) — src/lib/pricing/default-fee-rules.ts. Tune the amounts in
+// /desk/content-fees.
 
-import { PrismaClient, MarketCode, ProductType } from "@prisma/client";
+import { PrismaClient, MarketCode } from "@prisma/client";
+import { MARKET_CURRENCIES, defaultContentFeeRules } from "../src/lib/pricing/default-fee-rules";
 
 const prisma = new PrismaClient();
 
-const MARKET_CURRENCY: Record<MarketCode, string> = {
-  NO: "NOK",
-  SE: "SEK",
-  DK: "DKK",
-  FI: "EUR",
-  DE: "EUR",
-  AT: "EUR",
-  CH: "CHF",
-  UK: "GBP",
-  IE: "EUR",
-  NL: "EUR",
-  BE: "EUR",
-};
+// Every market code in the schema, so a newly added market fails to typecheck
+// here until it has a currency.
+const MARKET_CURRENCY: Record<MarketCode, string> = MARKET_CURRENCIES;
 
 async function main() {
   const existing = await prisma.contentFeeRule.count();
@@ -32,28 +25,9 @@ async function main() {
     return;
   }
 
-  const rows = (Object.keys(MARKET_CURRENCY) as MarketCode[]).flatMap((code) => {
-    const currency = MARKET_CURRENCY[code];
-    const krone = currency === "NOK" || currency === "SEK" || currency === "DKK";
-    return [
-      {
-        marketCode: code,
-        productType: null,
-        currency,
-        greenfieldFee: krone ? 8000 : 800,
-        adaptationFee: krone ? 4000 : 400,
-        note: "Seed placeholder — set real production cost in /desk/content-fees.",
-      },
-      {
-        marketCode: code,
-        productType: ProductType.NATIVE_ARTICLE,
-        currency,
-        greenfieldFee: krone ? 12000 : 1200,
-        adaptationFee: krone ? 6000 : 600,
-        note: "Seed placeholder — editorial native article.",
-      },
-    ];
-  });
+  const rows = defaultContentFeeRules(
+    (Object.keys(MARKET_CURRENCY) as MarketCode[]).map((code) => ({ code, currency: MARKET_CURRENCY[code] })),
+  ).map((r) => ({ ...r, marketCode: r.marketCode as MarketCode }));
 
   await prisma.contentFeeRule.createMany({ data: rows });
   console.log(`Inserted ${rows.length} content-fee rules.`);
