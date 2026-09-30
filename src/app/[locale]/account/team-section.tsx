@@ -60,8 +60,9 @@ export async function TeamSection({ locale, orgId, isAdmin }: Props) {
         </div>
       </div>
 
-      {/* Members table */}
-      <div className="table-wrap" style={{ overflowX: "auto" }}>
+      {/* Members table. `responsive` stacks each row into a labelled card on
+          phones — six columns plus the admin controls can't fit 375px. */}
+      <div className="table-wrap responsive team-table">
         <table className="table">
           <thead>
             <tr>
@@ -101,28 +102,40 @@ export async function TeamSection({ locale, orgId, isAdmin }: Props) {
                   : m.role === "MEMBER"
                     ? t("roleMember")
                     : t("roleRestricted");
+              // "Removed" and "Expired" are different stories for an admin:
+              // one was their decision, the other a delegation running out.
+              const statusLabel = deactivated
+                ? t("statusDeactivated")
+                : active
+                  ? t("statusActive")
+                  : m.status === "REVOKED"
+                    ? t("statusRevoked")
+                    : t("statusExpired");
               return (
                 <tr key={m.userId}>
-                  <td>{m.user?.name ?? "—"}</td>
-                  <td>{m.user?.email ?? "—"}</td>
-                  <td>{roleLabel}</td>
-                  <td>{m.canCommit ? t("yes") : t("no")}</td>
-                  <td>
+                  <td data-label={t("colName")}>{m.user?.name ?? "—"}</td>
+                  <td data-label={t("colEmail")}>
+                    {m.user?.email ? <SafeEmail address={m.user.email} /> : "—"}
+                  </td>
+                  <td data-label={t("colRole")}>{roleLabel}</td>
+                  <td data-label={t("colCommit")}>{m.canCommit ? t("yes") : t("no")}</td>
+                  <td data-label={t("colStatus")}>
                     <span
                       className={
                         active && !deactivated ? "badge-active" : "badge-muted"
                       }
                     >
-                      {deactivated
-                        ? t("statusDeactivated")
-                        : active
-                          ? t("statusActive")
-                          : t("statusExpired")}
+                      {statusLabel}
                     </span>
                   </td>
-                  <td>{expires ?? "—"}</td>
-                  {isAdmin && (
-                    <td>
+                  <td data-label={t("colExpires")}>{expires ?? "—"}</td>
+                  {/* Only a live seat has anything to edit or remove. A
+                      removed or lapsed member comes back through a new
+                      invite, which reactivates their seat on the invite's
+                      terms (lib/org-seats grantSeatFromInvite). */}
+                  {isAdmin && !active && <td className="team-table__actions" />}
+                  {isAdmin && active && (
+                    <td className="team-table__actions">
                       <div
                         style={{
                           display: "flex",
@@ -254,7 +267,7 @@ export async function TeamSection({ locale, orgId, isAdmin }: Props) {
           {pendingInvites.length === 0 ? (
             <p className="muted small">{t("pendingNone")}</p>
           ) : (
-            <div className="table-wrap" style={{ overflowX: "auto" }}>
+            <div className="table-wrap responsive">
               <table className="table">
                 <thead>
                   <tr>
@@ -278,10 +291,10 @@ export async function TeamSection({ locale, orgId, isAdmin }: Props) {
                       : null;
                     return (
                       <tr key={inv.id}>
-                        <td><SafeEmail address={inv.email} /></td>
-                        <td>{roleLabel}</td>
-                        <td>{inv.canCommit ? t("yes") : t("no")}</td>
-                        <td>{expires ?? "—"}</td>
+                        <td data-label={t("colEmail")}><SafeEmail address={inv.email} /></td>
+                        <td data-label={t("colRole")}>{roleLabel}</td>
+                        <td data-label={t("colCommit")}>{inv.canCommit ? t("yes") : t("no")}</td>
+                        <td data-label={t("colExpires")}>{expires ?? "—"}</td>
                         <td>
                           <form action={revokeInvite}>
                             <input type="hidden" name="locale" value={locale} />

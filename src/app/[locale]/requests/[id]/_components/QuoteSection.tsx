@@ -30,6 +30,7 @@ export async function QuoteSection({
   allAccepted,
   orders,
   renewalRequested = false,
+  canAccept = true,
 }: {
   locale: string;
   quotes: QuoteWithOrder[];
@@ -43,6 +44,9 @@ export async function QuoteSection({
   allAccepted: boolean;
   orders: OrderWithDetails[];
   renewalRequested?: boolean;
+  // False for a member without ordering rights: the accept form would only
+  // be refused server-side (quote-actions canCommitOnOrg), so say who can act.
+  canAccept?: boolean;
 }) {
   const t = await getTranslations({ locale, namespace: "requests" });
   const tType = await getTranslations({ locale, namespace: "productType" });
@@ -315,6 +319,12 @@ export async function QuoteSection({
                 />
               </form>
             )}
+          </div>
+        ) : !canAccept ? (
+          <div className="banner-info" role="status">
+            <span>
+              <strong>{t("noCommitTitle")}</strong> {t("noCommitBody", { org: organizationName })}
+            </span>
           </div>
         ) : (
           <form

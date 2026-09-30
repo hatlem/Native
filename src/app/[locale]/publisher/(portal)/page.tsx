@@ -1,15 +1,14 @@
 import { getTranslations } from "next-intl/server";
 import { redirect } from "next/navigation";
-import { PriceVisibility } from "@prisma/client";
 import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
 import { Link } from "@/i18n/navigation";
 import { updateProduct, updateSpec } from "@/app/publisher-actions";
 import { SubmitButton } from "@/components";
+import { formatMoney } from "@/lib/money";
+import { MAX_LEAD_TIME_DAYS } from "@/lib/publisher-rates";
 
 export const dynamic = "force-dynamic";
-
-const VISIBILITIES = Object.values(PriceVisibility);
 
 export default async function PublisherDashboard({
   params,
@@ -172,7 +171,7 @@ export default async function PublisherDashboard({
                             <h4>{tType(p.type)}</h4>
                             <p className="muted small">
                               {p.visibility === "FIRM" ? t("firm") : t("indicative")}
-                              {p.bookable ? ` · ${t("bookable")}` : ""}
+                              {` · ${p.bookable ? t("bookable") : t("notBookable")}`}
                             </p>
                           </div>
                           <span
@@ -184,59 +183,39 @@ export default async function PublisherDashboard({
                           </span>
                         </header>
 
+                        {/* Price and catalog status are read-only here:
+                            prices change on the rates page (provenance +
+                            desk notification), and visibility/bookable are
+                            the desk's call. Lead time is the publisher's. */}
+                        <dl className="product-facts">
+                          <div>
+                            <dt>{t("basePrice")}</dt>
+                            <dd>
+                              {formatMoney(Number(p.basePrice), p.currency, locale)}{" "}
+                              <Link href="/publisher/rates" className="small">
+                                {t("changePriceOnRates")}
+                              </Link>
+                            </dd>
+                          </div>
+                        </dl>
                         <form action={updateProduct} className="product-form">
                           <input type="hidden" name="locale" value={locale} />
                           <input type="hidden" name="productId" value={p.id} />
-                          <div className="grid-2">
-                            <div className="field">
-                              <label htmlFor={`bp-${p.id}`}>
-                                {t("basePrice")}
-                              </label>
-                              <input
-                                id={`bp-${p.id}`}
-                                name="basePrice"
-                                type="number"
-                                min="0"
-                                defaultValue={Number(p.basePrice)}
-                              />
-                            </div>
-                            <div className="field">
-                              <label htmlFor={`lt-${p.id}`}>
-                                {t("leadTime")}
-                              </label>
-                              <input
-                                id={`lt-${p.id}`}
-                                name="leadTimeDays"
-                                type="number"
-                                min="1"
-                                defaultValue={p.leadTimeDays ?? ""}
-                              />
-                            </div>
-                          </div>
                           <div className="field">
-                            <label htmlFor={`vis-${p.id}`}>
-                              {t("visibility")}
+                            <label htmlFor={`lt-${p.id}`}>
+                              {t("leadTime")}
                             </label>
-                            <select
-                              id={`vis-${p.id}`}
-                              name="visibility"
-                              defaultValue={p.visibility}
-                            >
-                              {VISIBILITIES.map((v) => (
-                                <option key={v} value={v}>
-                                  {v === "FIRM" ? t("firm") : t("indicative")}
-                                </option>
-                              ))}
-                            </select>
-                          </div>
-                          <label className="checkbox-row">
                             <input
-                              name="bookable"
-                              type="checkbox"
-                              defaultChecked={p.bookable}
+                              id={`lt-${p.id}`}
+                              name="leadTimeDays"
+                              type="number"
+                              min="1"
+                              max={MAX_LEAD_TIME_DAYS}
+                              required
+                              defaultValue={p.leadTimeDays ?? ""}
                             />
-                            <span>{t("bookable")}</span>
-                          </label>
+                            <span className="hint">{t("catalogStatusNote")}</span>
+                          </div>
                           <div className="actions">
                             <SubmitButton
                               label={t("save")}

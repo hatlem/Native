@@ -1,4 +1,5 @@
 import { getTranslations } from "next-intl/server";
+import { viewOrgIds } from "@/lib/workspace";
 import { redirect } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import { loadScope } from "@/lib/scope";
@@ -91,7 +92,7 @@ export default async function RequestsPage({
     // lists, so a different client's draft here would resolve wrong.
     ws.activeOrgId ? loadUnsentLists(ws.activeOrgId) : Promise.resolve([]),
     prisma.request.findMany({
-      where: { organizationId: { in: ws.scopeOrgIds } },
+      where: { organizationId: { in: viewOrgIds(ws) } },
       orderBy: { updatedAt: "desc" },
       include: {
         organization: { select: { name: true } },

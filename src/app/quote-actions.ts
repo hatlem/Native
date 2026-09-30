@@ -436,7 +436,10 @@ export async function acceptQuote(formData: FormData) {
     redirect(`/${locale}/signin`);
   }
   if (!canCommitOnOrg(scope, quote.request.organizationId)) {
-    redirect(`/${locale}/signin`);
+    // A member without ordering rights: back to the request, which explains
+    // who can accept (QuoteSection) — not to /signin, which bounced them to
+    // Home with no word about why nothing happened.
+    redirect(`/${locale}/requests/${quote.requestId}`);
   }
   if (quote.order) {
     redirect(`/${locale}/requests/${quote.requestId}`);
@@ -525,7 +528,8 @@ export async function acceptAllQuotesForRequest(formData: FormData) {
     redirect(`/${locale}/signin`);
   }
   if (!canCommitOnOrg(scope, request.organizationId)) {
-    redirect(`/${locale}/signin`);
+    // Same as acceptQuote: the request page explains who can accept.
+    redirect(`/${locale}/requests/${request.id}`);
   }
 
   // Same rule as acceptQuote: only priced lines become order lines; a

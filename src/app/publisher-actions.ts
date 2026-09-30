@@ -1,7 +1,7 @@
 "use server";
 
 import { redirect } from "next/navigation";
-import { PriceVisibility, BookingStatus } from "@prisma/client";
+import { BookingStatus } from "@prisma/client";
 import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
 import { recordAudit } from "@/lib/audit";
@@ -9,6 +9,11 @@ import { notifyDesk, notifyOrg } from "@/lib/notify";
 import { safeExternalUrl } from "@/lib/security";
 import { normaliseReason } from "@/lib/cancellation";
 import { parseImpressions } from "@/lib/metrics/validate";
+import {
+  parseLeadTimeDays,
+  updateProductLeadTime,
+  PublisherRatesError,
+} from "@/lib/publisher-rates";
 
 function field(formData: FormData, key: string): string {
   const v = formData.get(key);
@@ -33,46 +38,32 @@ async function requirePublisher(
   return { publisherId: me.publisherId, userId: session.user.id };
 }
 
+// The product card on the portal home. Publishers edit their lead time here;
+// the price goes through the rates page (lib/publisher-rates: provenance
+// stamp + desk notification), and catalog status — visibility (FIRM means
+// instant order), bookable, active — is the desk's. Those fields used to be
+// accepted here with no desk notification, which let a publisher make their
+// own inventory instantly orderable, contradicting the rates page's own copy.
+// Anything else a tampered form posts is ignored.
 export async function updateProduct(formData: FormData) {
   const locale = field(formData, "locale") || "en";
   const { publisherId, userId } = await requirePublisher(locale);
-  const productId = field(formData, "productId");
-  const basePrice = Number(field(formData, "basePrice"));
-  const leadTimeDays = Number(field(formData, "leadTimeDays"));
-  const visibility = field(formData, "visibility") as PriceVisibility;
+  const leadTimeDays = parseLeadTimeDays(field(formData, "leadTimeDays"));
 
-  const product = await prisma.product.findUnique({
-    where: { id: productId },
-    include: { title: { select: { publisherId: true } } },
-  });
-
-  if (
-    product &&
-    product.title.publisherId === publisherId &&
-    Number.isFinite(basePrice) &&
-    basePrice >= 0 &&
-    Object.values(PriceVisibility).includes(visibility)
-  ) {
-    const before = {
-      basePrice: Number(product.basePrice),
-      visibility: product.visibility,
-      bookable: product.bookable,
-      leadTimeDays: product.leadTimeDays,
-    };
-    const next = {
-      basePrice,
-      visibility,
-      bookable: formData.get("bookable") === "on",
-      leadTimeDays:
-        Number.isFinite(leadTimeDays) && leadTimeDays > 0
-          ? Math.trunc(leadTimeDays)
-          : product.leadTimeDays,
-    };
-    await prisma.product.update({ where: { id: product.id }, data: next });
-    await recordAudit(userId, "product.update", `Product:${product.id}`, {
-      before,
-      after: next,
-    });
+  if (leadTimeDays !== null) {
+    try {
+      await updateProductLeadTime({
+        publisherId,
+        productId: field(formData, "productId"),
+        leadTimeDays,
+        actorUserId: userId,
+        locale,
+      });
+    } catch (err) {
+      // Same fail-silent contract as the rates actions: never reveal whether
+      // a foreign product id exists.
+      if (!(err instanceof PublisherRatesError)) throw err;
+    }
   }
   redirect(`/${locale}/publisher`);
 }

@@ -64,7 +64,9 @@
     "campaigns": "Campaigns",
     "rates": "Rates",
     "users": "Users",
-    "invoices": "Invoices"
+    "invoices": "Invoices",
+    "orgSwitcherLabel": "Organisation",
+    "orgSwitchTo": "Switch to {org}"
   },
   "orders": {
     "eyebrow": "Orders",
@@ -932,7 +934,9 @@
     "requestRenewal": "Ask for a renewed offer",
     "requestingRenewal": "Sending…",
     "renewalRequested": "The desk has been asked to renew it. You will get a notification when it is ready to accept.",
-    "lineNoteLabel": "Note"
+    "lineNoteLabel": "Note",
+    "noCommitTitle": "You can't accept this quote yourself.",
+    "noCommitBody": "Accepting it places a binding order for {org}, which takes ordering rights. Ask an administrator to accept it, or to give you ordering rights under Account → Team."
   },
   "desk": {
     "eyebrow": "Internal desk",
@@ -1477,7 +1481,10 @@
     "ratesUnitWeek": "Week",
     "ratesUnitMonth": "Month",
     "ratesMinUnits": "Minimum booking: {count}",
-    "ratesPriceOnlyNote": "This page changes prices only. Catalog status — active, bookable, visibility — is managed by the NativeSpin desk."
+    "ratesPriceOnlyNote": "This page changes prices only. Catalog status — active, bookable, visibility — is managed by the NativeSpin desk.",
+    "changePriceOnRates": "Change on the rates page",
+    "notBookable": "Not bookable",
+    "catalogStatusNote": "Prices change on the rates page. Catalog status (bookable, and whether a product can be ordered instantly) is managed by the NativeSpin desk."
   },
   "formats": {
     "metaTitle": "Native formats — NativeSpin",
@@ -2620,7 +2627,10 @@
     "callHeading": "One last thing — let's help you buy native",
     "callBody": "Book a free 15-minute call and our desk will help you scope and place your first native campaign.",
     "callCta": "Book a call",
-    "callSkip": "Skip for now →"
+    "callSkip": "Skip for now →",
+    "marketBlocked": "{org} has no billing market yet. An administrator of {org} needs to set it under Account before the team can send requests.",
+    "blockedTitle": "{org} isn't set up for billing yet",
+    "blockedBack": "Back to the plan"
   },
   "rateCard": {
     "pageTitle": "Rate card request",
@@ -2790,7 +2800,8 @@
     "deactivating": "Deactivating…",
     "errDelegation": "That delegation end date isn't a valid date.",
     "errDelegationPast": "The delegation end date has to be in the future.",
-    "canCommitAdminNote": "Administrators can always commit."
+    "canCommitAdminNote": "Administrators can always commit.",
+    "statusRevoked": "Removed"
   },
   "invite": {
     "title": "Join {org}",
@@ -2808,7 +2819,10 @@
     "wrongAccountTitle": "Wrong account",
     "wrongAccountBody": "This invite is for {inviteEmail}. You're signed in as {authedEmail}.",
     "signOut": "Sign out",
-    "genericError": "Something went wrong. Check your details and try again."
+    "genericError": "Something went wrong. Check your details and try again.",
+    "alreadyMemberTitle": "You're already in {org}",
+    "alreadyMemberBody": "Your seat on this team is active, so there's nothing to accept.",
+    "alreadyMemberCta": "Go to your workspace"
   },
   "contentFees": {
     "eyebrow": "Desk",
@@ -3100,7 +3114,12 @@
     "nextWaveBodyPreviousDone": "Wave {prev} has finished. Send wave {n} to keep the story going.",
     "nextWaveBodyDateNear": "Wave {n} is scheduled from {date}. Send it now so the desk has time to book it.",
     "nextWaveAngle": "Angle: {angle}",
-    "openWave": "Open wave"
+    "openWave": "Open wave",
+    "awaitingTeamHeading": "Waiting on someone with ordering rights",
+    "quoteAwaitingTeamBody": "A firm quote for {amount} is ready. Someone on your team with ordering rights needs to accept it.",
+    "viewQuote": "View quote",
+    "noAccessTitle": "You're not on a team right now",
+    "noAccessBody": "Your access to your organisation's workspace has ended: an administrator removed it, or it was time-limited and has expired. Ask an administrator to invite you again; the new invite brings back your team's plans and requests."
   },
   "shareList": {
     "eyebrow": "Media plan from {org}",

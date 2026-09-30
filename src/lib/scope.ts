@@ -43,15 +43,13 @@ export function canActOnOrg(scope: Scope, organizationId: string): boolean {
 
 /**
  * May this user *commit* the org — accept a quote / place an order — on `organizationId`?
- * Commit authority is per-ACTIVE-org and never inferred from the (possibly stale) JWT role.
+ * Commit authority comes from the user's own active seat in THAT org (or an
+ * agency's reach over it) and is never inferred from the (possibly stale) JWT
+ * role. It deliberately does not depend on which org is switched to: a member
+ * of two orgs who opens a quote link for the other one holds the same
+ * authority there either way, and the accept actions carry the org explicitly.
  */
 export function canCommitOnOrg(scope: Scope, organizationId: string): boolean {
   if (scope.isDesk) return true;
-  const ws = scope.workspace;
-  if (!ws) return false;
-  // Agencies retain full control (including commit) over orgs in their scope —
-  // the pre-existing agency access path, unchanged by membership gating.
-  if (ws.isAgency) return ws.scopeOrgIds.includes(organizationId);
-  // Advertiser-org members: commit only on the active org, and only with the grant.
-  return ws.activeOrgId === organizationId && ws.activeCanCommit === true;
+  return !!scope.workspace?.commitOrgIds.includes(organizationId);
 }

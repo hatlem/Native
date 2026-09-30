@@ -64,7 +64,9 @@
     "campaigns": "Kampanjer",
     "rates": "Priser",
     "users": "Brukere",
-    "invoices": "Fakturaer"
+    "invoices": "Fakturaer",
+    "orgSwitcherLabel": "Organisasjon",
+    "orgSwitchTo": "Bytt til {org}"
   },
   "reports": {
     "title": "Rapporter",
@@ -805,7 +807,9 @@
     "requestRenewal": "Be om fornyet tilbud",
     "requestingRenewal": "Sender …",
     "renewalRequested": "Desken har fått beskjed om å fornye tilbudet. Du får et varsel når du kan godta det.",
-    "lineNoteLabel": "Merknad"
+    "lineNoteLabel": "Merknad",
+    "noCommitTitle": "Du kan ikke godta dette tilbudet selv.",
+    "noCommitBody": "Å godta det legger inn en bindende bestilling for {org}, og det krever bestillingsrett. Be en administrator godta tilbudet, eller gi deg bestillingsrett under Konto → Team."
   },
   "desk": {
     "eyebrow": "Internt desk",
@@ -1351,7 +1355,10 @@
     "ratesUnitWeek": "Uke",
     "ratesUnitMonth": "Måned",
     "ratesMinUnits": "Minste booking: {count}",
-    "ratesPriceOnlyNote": "Denne siden endrer kun priser. Katalogstatus — aktiv, bookbar, synlighet — håndteres av NativeSpin-desken."
+    "ratesPriceOnlyNote": "Denne siden endrer kun priser. Katalogstatus — aktiv, bookbar, synlighet — håndteres av NativeSpin-desken.",
+    "changePriceOnRates": "Endre på prissiden",
+    "notBookable": "Ikke bookbar",
+    "catalogStatusNote": "Priser endrer du på prissiden. Katalogstatus (bookbar, og om et produkt kan bestilles øyeblikkelig) håndteres av NativeSpin-desken."
   },
   "formats": {
     "metaTitle": "Native-formater — NativeSpin",
@@ -2605,7 +2612,10 @@
     "callHeading": "Én siste ting — la oss hjelpe deg å kjøpe native",
     "callBody": "Book en gratis 15-minutters samtale, så hjelper desken deg å sette opp og plassere din første native-kampanje.",
     "callCta": "Book en samtale",
-    "callSkip": "Hopp over nå →"
+    "callSkip": "Hopp over nå →",
+    "marketBlocked": "{org} har ikke valgt faktureringsmarked ennå. En administrator i {org} må velge det under Konto før teamet kan sende forespørsler.",
+    "blockedTitle": "{org} er ikke satt opp for fakturering ennå",
+    "blockedBack": "Tilbake til planen"
   },
   "rateCard": {
     "pageTitle": "Rate card-forespørsel",
@@ -2775,7 +2785,8 @@
     "deactivating": "Deaktiverer…",
     "errDelegation": "Sluttdatoen for delegeringen er ikke en gyldig dato.",
     "errDelegationPast": "Sluttdatoen for delegeringen må være frem i tid.",
-    "canCommitAdminNote": "Administratorer har alltid bestillingsrett."
+    "canCommitAdminNote": "Administratorer har alltid bestillingsrett.",
+    "statusRevoked": "Fjernet"
   },
   "invite": {
     "title": "Bli med i {org}",
@@ -2793,7 +2804,10 @@
     "wrongAccountTitle": "Feil konto",
     "wrongAccountBody": "Invitasjonen gjelder {inviteEmail}. Du er logget inn som {authedEmail}.",
     "signOut": "Logg ut",
-    "genericError": "Noe gikk galt. Sjekk opplysningene og prøv igjen."
+    "genericError": "Noe gikk galt. Sjekk opplysningene og prøv igjen.",
+    "alreadyMemberTitle": "Du er allerede med i {org}",
+    "alreadyMemberBody": "Du har allerede tilgang til dette teamet, så det er ingenting å godta.",
+    "alreadyMemberCta": "Gå til arbeidsområdet"
   },
   "contentFees": {
     "eyebrow": "Desk",
@@ -3101,7 +3115,12 @@
     "nextWaveBodyPreviousDone": "Runde {prev} er ferdig. Send runde {n} for å holde historien i gang.",
     "nextWaveBodyDateNear": "Runde {n} er planlagt fra {date}. Send den nå så desken rekker å booke.",
     "nextWaveAngle": "Vinkel: {angle}",
-    "openWave": "Åpne runden"
+    "openWave": "Åpne runden",
+    "awaitingTeamHeading": "Venter på noen med bestillingsrett",
+    "quoteAwaitingTeamBody": "Et fast tilbud på {amount} er klart. Noen i teamet med bestillingsrett må godta det.",
+    "viewQuote": "Se tilbudet",
+    "noAccessTitle": "Du er ikke med i noe team nå",
+    "noAccessBody": "Tilgangen din til organisasjonens arbeidsområde er avsluttet: en administrator har fjernet den, eller den var tidsbegrenset og har utløpt. Be en administrator om å invitere deg på nytt, så får du tilbake teamets planer og forespørsler."
   },
   "shareList": {
     "eyebrow": "Medieplan fra {org}",
