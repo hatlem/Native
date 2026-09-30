@@ -22,7 +22,31 @@ export type SpecInput = {
   marketDisclosure?: string | null;
 };
 
-export type SpecResult = { passed: boolean; words: number; issues: string[] };
+// One failed rule, structured so each surface can explain it in the
+// reader's language (the writer portal localizes these); `issues` below
+// keeps the English sentence form persisted to ArticlePlacement.specNotes.
+export type SpecFailure =
+  | { rule: "disclosure"; label: string }
+  | { rule: "tooShort"; words: number; min: number }
+  | { rule: "tooLong"; words: number; max: number };
+
+export type SpecResult = {
+  passed: boolean;
+  words: number;
+  issues: string[];
+  failures: SpecFailure[];
+};
+
+export function describeSpecFailure(f: SpecFailure): string {
+  switch (f.rule) {
+    case "disclosure":
+      return `Missing disclosure label "${f.label}"`;
+    case "tooShort":
+      return `Too short: ${f.words} < ${f.min} words`;
+    case "tooLong":
+      return `Too long: ${f.words} > ${f.max} words`;
+  }
+}
 
 // Tokens we treat as "fill-this-in" placeholders. Both square-bracket
 // and curly-brace conventions are recognised so neither publisher
@@ -68,7 +92,7 @@ export function labelMatcher(label: string | null | undefined): RegExp | null {
 export function specCheck(input: SpecInput): SpecResult {
   const body = (input.body ?? "").trim();
   const words = body ? body.split(/\s+/).length : 0;
-  const issues: string[] = [];
+  const failures: SpecFailure[] = [];
 
   const requiredLabels = new Set<string>();
   if (input.titleDisclosure) requiredLabels.add(input.titleDisclosure);
@@ -77,15 +101,20 @@ export function specCheck(input: SpecInput): SpecResult {
   for (const label of requiredLabels) {
     const matcher = labelMatcher(label);
     if (matcher && !matcher.test(body)) {
-      issues.push(`Missing disclosure label "${label}"`);
+      failures.push({ rule: "disclosure", label });
     }
   }
   if (input.wordCountMin && words < input.wordCountMin) {
-    issues.push(`Too short: ${words} < ${input.wordCountMin} words`);
+    failures.push({ rule: "tooShort", words, min: input.wordCountMin });
   }
   if (input.wordCountMax && words > input.wordCountMax) {
-    issues.push(`Too long: ${words} > ${input.wordCountMax} words`);
+    failures.push({ rule: "tooLong", words, max: input.wordCountMax });
   }
 
-  return { passed: issues.length === 0, words, issues };
+  return {
+    passed: failures.length === 0,
+    words,
+    issues: failures.map(describeSpecFailure),
+    failures,
+  };
 }

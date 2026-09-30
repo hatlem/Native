@@ -27,7 +27,27 @@ export function canCancelOrder(status: OrderStatus): boolean {
   return CANCELLABLE_ORDER_STATUSES.has(status);
 }
 
-// Why this status is locked, in a form the desk UI can render verbatim.
+export type CancelBlockCode = "live" | "completed" | "invoiced" | "cancelled" | "other";
+
+// Why this status is locked, as a stable code the desk UI localizes
+// (order.cancelBlock.<code>). Null when cancellation IS allowed.
+export function cancelBlockCode(status: OrderStatus): CancelBlockCode | null {
+  if (canCancelOrder(status)) return null;
+  switch (status) {
+    case OrderStatus.LIVE:
+      return "live";
+    case OrderStatus.COMPLETED:
+      return "completed";
+    case OrderStatus.INVOICED:
+      return "invoiced";
+    case OrderStatus.CANCELLED:
+      return "cancelled";
+    default:
+      return "other";
+  }
+}
+
+// English form of the same reason, for audit rows and logs.
 // Empty string when cancellation IS allowed.
 export function cancelBlockReason(status: OrderStatus): string {
   if (canCancelOrder(status)) return "";

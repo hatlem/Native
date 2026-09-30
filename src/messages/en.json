@@ -175,10 +175,6 @@
     "detailSaveDraft": "Save draft",
     "detailUploading": "Uploading…",
     "detailDownloadFile": "Download the file",
-    "detailStatus": "Status",
-    "detailSpecPassed": "spec ✓",
-    "detailSpecFailed": "spec ✗",
-    "detailRunSpecCheck": "Run spec check",
     "detailSubmitForReview": "Submit for review",
     "detailReviewNotes": "Review notes",
     "linkHeading": "Link to a placement",
@@ -188,7 +184,21 @@
     "placementRetracted": "Retracted",
     "unlinkCta": "Unlink",
     "sharedArticleWarning": "This article is linked to {count} other placements — your changes will affect all of them.",
-    "specNotChecked": "not checked"
+    "backToArticles": "All articles",
+    "versionLabel": "Version {version}",
+    "byAuthor": "By {name}",
+    "previewHeading": "Preview",
+    "previewEmpty": "No text yet.",
+    "awaitingReview": "Waiting for the client's review.",
+    "placementsHeading": "Placements",
+    "specPassed": "Spec OK",
+    "specFailed": "Spec issues",
+    "saving": "Saving…",
+    "orderRef": "order {ref}",
+    "draftLabel": "Article text",
+    "draftHint": "Plain text with light Markdown: # for headings, **bold**, *italic*, - for lists, [text](link).",
+    "uploadFailed": "Upload failed. Try a different file.",
+    "submitBlockedSpec": "A placement's format spec isn't met yet — check the placements above."
   },
   "reports": {
     "title": "Reports",
@@ -1075,7 +1085,8 @@
       "all": "All",
       "unverified": "Not yet checked",
       "active": "Native available",
-      "no-native": "No native offered"
+      "no-native": "No native offered",
+      "awaitingPrice": "Awaiting confirmed price"
     },
     "reach": "Monthly reach",
     "circulation": "Circulation",
@@ -1095,7 +1106,8 @@
       "deactivate": "Deactivate",
       "edit": "Edit",
       "marking": "Marking…",
-      "deactivating": "Deactivating…"
+      "deactivating": "Deactivating…",
+      "resetVerification": "Reset to not checked"
     },
     "freshness": {
       "column": "Price freshness",
@@ -1133,7 +1145,55 @@
     "active": "Active",
     "inactive": "Inactive",
     "assignments": "{active} active",
-    "assignmentsOf": "{active} / {max} active"
+    "assignmentsOf": "{active} / {max} active",
+    "inviteLanguage": {
+      "en": "English",
+      "no": "Norwegian",
+      "sv": "Swedish",
+      "da": "Danish",
+      "fi": "Finnish",
+      "de": "German"
+    },
+    "emailPlaceholder": "writer@example.com",
+    "inviteLanguageLabel": "Email language",
+    "inviteLanguageHint": "The invite and the account page open in this language.",
+    "inviteSent": "Invite emailed to <addr></addr>.",
+    "inviteNotSent": "The invite for <addr></addr> was created, but the email didn't go out. Resend it below or share the link by hand.",
+    "errorInvalidEmail": "Enter a valid email address.",
+    "errorExistingAccount": "This address already has a NativeSpin account, so it can't claim a writer invite. Ask a superadmin to change the account's role instead.",
+    "colEmail": "Email",
+    "colLanguage": "Language",
+    "colDelivery": "Delivery",
+    "emailedOn": "Sent {date}",
+    "notEmailed": "Not sent",
+    "resend": "Resend",
+    "colName": "Name",
+    "colLanguages": "Languages",
+    "colSpecialties": "Specialties",
+    "colStatus": "Status",
+    "colLoad": "Load",
+    "panel": {
+      "eyebrow": "Production",
+      "title": "Writers for this order",
+      "lead": "Ranked by language ({language}) and specialty ({topics}). Add candidates to this order's pool, then assign one per line below.",
+      "empty": "No writers in the roster yet — invite one under Writers.",
+      "colWriter": "Writer",
+      "colLanguages": "Languages",
+      "colSpecialties": "Specialties",
+      "colLoad": "Load",
+      "inPool": "In pool",
+      "inactive": "Not taking work",
+      "overCapacity": "Over capacity",
+      "none": "None given",
+      "loadOf": "{active} / {max} active",
+      "load": "{active} active",
+      "add": "Add to pool",
+      "remove": "Remove",
+      "saving": "Saving…",
+      "writerLabel": "Writer",
+      "unassigned": "— Not assigned —",
+      "assign": "Assign"
+    }
   },
   "auth": {
     "title": "Sign in",
@@ -1219,7 +1279,9 @@
     "deactivatedSignin": "This account has been deactivated. Contact the desk if you need it switched back on.",
     "emailChangedOk": "Email address updated — sign in with your new address.",
     "deactivatedTitle": "This account is deactivated",
-    "deactivatedBody": "Your account has been switched off, so there's nothing here to use. Sign out below, and contact the desk if you think this is a mistake."
+    "deactivatedBody": "Your account has been switched off, so there's nothing here to use. Sign out below, and contact the desk if you think this is a mistake.",
+    "writerClaimSubmit": "Create writer account",
+    "writerClaimSubmitting": "Creating…"
   },
   "order": {
     "title": "Order",
@@ -1256,7 +1318,7 @@
     "cancelBlocked": "This order can no longer be cancelled.",
     "cancelError": "Cancellation refused",
     "cancelledAtLabel": "Cancelled",
-    "cancelledByLabel": "By",
+    "cancelledByLabel": "Cancelled by",
     "cancelledReasonLabel": "Reason",
     "creditNoteButton": "Issue credit note",
     "creditNoteTitle": "Refund the invoice",
@@ -1265,7 +1327,20 @@
     "creditNoteReasonPlaceholder": "e.g. Order cancelled after invoice issued; publisher editorial veto.",
     "creditNoteSubmit": "Issue credit note",
     "issuingCreditNote": "Issuing…",
-    "creditNoteIssuedLabel": "Credit note issued"
+    "creditNoteIssuedLabel": "Credit note issued",
+    "cancelBlock": {
+      "live": "The placement is already live — issue a credit note instead.",
+      "completed": "The order is completed — issue a credit note instead.",
+      "invoiced": "The invoice is issued — issue a credit note against it instead.",
+      "cancelled": "The order is already cancelled.",
+      "other": "The order can't be cancelled in its current state."
+    },
+    "cancelledByRole": {
+      "DESK": "NativeSpin desk",
+      "SUPERADMIN": "NativeSpin (admin)",
+      "PUBLISHER": "The publisher",
+      "BUYER": "The buyer"
+    }
   },
   "production": {
     "brief": "Brief",
@@ -2210,7 +2285,7 @@
     "listEyebrow": "Existing",
     "listTitle": "All keys",
     "colName": "Name",
-    "colOrg": "Org",
+    "colOrg": "Organization",
     "colScopes": "Scopes",
     "colCreated": "Created",
     "colLastUsed": "Last used",
@@ -2223,11 +2298,8 @@
     "revokeConfirm": "This cannot be undone. Existing integrations using this key will stop working immediately.",
     "revokeConfirmCta": "Yes, revoke key",
     "docsHintPrefix": "Public docs available at",
-    "deniedTitle": "API keys (SUPERADMIN only)",
-    "deniedLead": "This page is for NativeSpin platform admins.",
     "deniedBody": "Public-catalog API keys are issued by NativeSpin superadmins. If your role legitimately needs API-key issuance — or you're a partner trying to get a key — reach out to the desk and we'll wire you up.",
-    "deniedCta": "Email the desk",
-    "deniedBack": "Back to /desk"
+    "orgPlatformShort": "NativeSpin platform"
   },
   "quoteNarrative": {
     "sectionCampaign": "Your campaign",
@@ -2315,7 +2387,9 @@
     "inviteSent": "Invitation sent.",
     "inviteInvalidEmail": "That doesn't look like a valid email address.",
     "inviteBusinessEmail": "Use a company address — free and disposable providers aren't accepted.",
-    "inviteNotFound": "That publisher no longer exists — reload the page."
+    "inviteNotFound": "That publisher no longer exists — reload the page.",
+    "priceUnconfirmed": "price not confirmed",
+    "productInactive": "inactive"
   },
   "salesContacts": {
     "title": "Sales contacts",
@@ -2898,7 +2972,21 @@
     "overrideHint": " — desk correction",
     "saveOverride": "Save override",
     "frozenNoEdit": "Metrics are frozen and cannot be edited.",
-    "unknownPublisher": "Unknown publisher"
+    "unknownPublisher": "Unknown publisher",
+    "metricsNowTitle": "Metrics requests",
+    "metricsNowNotEnded": "Publishers are asked for their numbers once the flight has ended. Set the flight end date above; the daily sweep sends requests the day after it.",
+    "metricsNowNothing": "Every publisher on this order already has a metrics request — see each one's status below.",
+    "metricsNowHint": "{count, plural, =1 {1 publisher hasn't been asked yet.} other {# publishers haven't been asked yet.}} The daily sweep would send it tomorrow.",
+    "metricsNowButton": "Send metrics request now",
+    "metricsNowNoPublisher": "{count, plural, =1 {1 booking has} other {# bookings have}} no publisher on record, so no request can be sent for {count, plural, =1 {it} other {them}}.",
+    "requestStatusValue": {
+      "NEEDS_CONTACT": "Needs a contact",
+      "PENDING": "Waiting for numbers",
+      "PARTIAL": "Partly reported",
+      "COMPLETE": "Reported",
+      "EXPIRED": "Expired",
+      "CANCELLED": "Cancelled"
+    }
   },
   "campaign": {
     "eyebrow": "Plan a campaign",
@@ -3142,10 +3230,213 @@
     "SCHEDULED": "Scheduled",
     "SENT": "Sent",
     "SUBMITTED": "Submitted",
-    "VOID": "Void"
+    "VOID": "Void",
+    "SUPERSEDED": "Superseded"
   },
   "joinedNotice": {
     "lists": "Welcome to {org}. These are your team's plans — open one to see the titles, prices and notes.",
     "home": "Welcome to {org}. You're now part of the team on NativeSpin."
+  },
+  "superadminOnly": {
+    "eyebrow": "Superadmins only",
+    "lead": "This page is for NativeSpin platform admins.",
+    "body": "Your account has desk access, but this page needs the superadmin role. If you need it for your work, email the desk and a superadmin will help you or grant access.",
+    "cta": "Email the desk",
+    "back": "Back to the desk",
+    "mailSubject": "Access request: {area} — NativeSpin"
+  },
+  "publisherContacts": {
+    "eyebrow": "Desk · outreach",
+    "title": "Publisher contacts",
+    "lead": "Review harvested ad-sales contacts before they are used, then run the rate-card request campaign.",
+    "tabsLabel": "Views",
+    "tabReview": "Review candidates",
+    "tabCampaign": "Rate-card campaign",
+    "ok": {
+      "approved": "Contact approved.",
+      "rejected": "Contact rejected.",
+      "bulk": "{approved} approved, {failed} failed.",
+      "built": "Campaign refreshed: {created} new requests, {skipped} skipped.",
+      "sent": "{count, plural, =0 {No emails sent.} =1 {1 email sent.} other {# emails sent.}}",
+      "one": "Email sent."
+    },
+    "errorGeneric": "That didn't work: {detail}",
+    "working": "Working…",
+    "buildCampaign": "Build / refresh campaign",
+    "batchSizeLabel": "Batch size",
+    "sendBatch": "Send batch (next due)",
+    "kpiTotal": "Requests",
+    "state": {
+      "draft": "Draft",
+      "inFlight": "In flight",
+      "responded": "Responded",
+      "cancelled": "Cancelled"
+    },
+    "noRequests": "No rate-card requests yet — build the campaign to create them.",
+    "colRecipient": "Recipient",
+    "colTitles": "Titles",
+    "colLocale": "Language",
+    "colStep": "Step",
+    "colStatus": "Status",
+    "colNextDue": "Next due",
+    "stepOf": "{sent}/{max}",
+    "sendOne": "Send",
+    "candidateStatus": {
+      "PENDING": "Pending review",
+      "APPROVED": "Approved",
+      "REJECTED": "Rejected"
+    },
+    "titlesByChannel": "Titles by sales channel:",
+    "channel": {
+      "DIRECT": "Direct",
+      "IN_HOUSE": "In-house arm",
+      "REP": "Rep house",
+      "MIXED": "Mixed",
+      "UNKNOWN": "Unknown"
+    },
+    "pendingEyebrow": "Review",
+    "pendingTitle": "Candidates waiting for review",
+    "bulkApproveLabel": "Approve all with confidence ≥",
+    "bulkApprove": "Bulk-approve",
+    "noCandidates": "No candidates waiting for review.",
+    "colPublisher": "Publisher",
+    "colMarket": "Market",
+    "colChannel": "Channel",
+    "colCandidate": "Candidate",
+    "colConfidence": "Confidence",
+    "colSource": "Source",
+    "viewSource": "View",
+    "approve": "Approve",
+    "reject": "Reject"
+  },
+  "writerEnums": {
+    "language": {
+      "NO": "Norwegian",
+      "SV": "Swedish",
+      "DA": "Danish",
+      "FI": "Finnish",
+      "DE": "German",
+      "EN": "English"
+    },
+    "topic": {
+      "FINANCE": "Finance",
+      "HEALTH": "Health",
+      "TECH": "Tech",
+      "LIFESTYLE": "Lifestyle",
+      "B2B": "B2B",
+      "TRAVEL": "Travel",
+      "FOOD": "Food & drink",
+      "CULTURE": "Culture",
+      "SUSTAINABILITY": "Sustainability",
+      "OTHER": "Other"
+    },
+    "proficiency": {
+      "NATIVE": "Native",
+      "FLUENT": "Fluent",
+      "WORKING": "Working"
+    }
+  },
+  "writer": {
+    "eyebrow": "Writer portal",
+    "backToAssignments": "My assignments",
+    "untitledAssignment": "Assignment",
+    "status": {
+      "notStarted": "Not started"
+    },
+    "home": {
+      "title": "My assignments",
+      "lead": "Everything the desk has assigned to you. Open one to see the brief, the format spec and the playbook, then write and send it for review.",
+      "profileCta": "Edit my profile",
+      "emptyTitle": "No assignments yet",
+      "emptyBody": "When the desk assigns you an article, it shows up here and you get an email.",
+      "colTitle": "Publication",
+      "colFormat": "Format",
+      "colMarket": "Market",
+      "colStatus": "Status",
+      "colAssigned": "Assigned",
+      "open": "Open"
+    },
+    "line": {
+      "notReady": "The brief for this assignment isn't ready yet. The desk will let you know when it is.",
+      "changesRequested": "Changes requested:",
+      "closed": "This assignment is closed — the order was cancelled, the placement withdrawn, or the article is final. Nothing more to write here.",
+      "draftEyebrow": "Your draft",
+      "draftHeading": "Write the article",
+      "inReviewNote": "This draft is with the client for review. Saving now creates a new version; send that for review when it's ready.",
+      "draftLabel": "Article text",
+      "draftPlaceholder": "# Headline\n\nIntro…",
+      "draftHint": "Plain text with light Markdown: # for headings, **bold**, *italic*, - for lists, [text](link). Include the disclosure label.",
+      "saveDraft": "Save draft",
+      "saving": "Saving…",
+      "submit": "Send for review",
+      "submitBlocked": "Fix the spec issues above, save, and then send it for review.",
+      "awaitingReview": "Sent for review — you'll be notified if the client asks for changes."
+    },
+    "brief": {
+      "heading": "Brief",
+      "message": "Campaign message",
+      "messageMissing": "No campaign message yet — ask the desk before you start.",
+      "audience": "Audience",
+      "do": "Do",
+      "dont": "Don't",
+      "references": "References"
+    },
+    "spec": {
+      "heading": "Format spec",
+      "words": "Length",
+      "wordsRange": "{min}–{max} words",
+      "wordsMin": "At least {min} words",
+      "wordsMax": "At most {max} words",
+      "notSpecified": "Not specified",
+      "images": "Images",
+      "imagesMin": "{count, plural, =1 {At least 1 image} other {At least # images}}",
+      "disclosure": "Disclosure label (required)",
+      "fileFormats": "File formats",
+      "videoLength": "Video length",
+      "videoSeconds": "Up to {seconds} seconds",
+      "shoppable": "Product links",
+      "shoppableMax": "{count, plural, =1 {Up to 1 product} other {Up to # products}}",
+      "requirements": "Other requirements",
+      "checkHeading": "Spec check",
+      "passed": "Passes",
+      "failed": "Needs fixing",
+      "notChecked": "Save the draft as text to check it against the format spec.",
+      "passedDetail": "The draft meets the format spec ({words} words).",
+      "failDisclosure": "The disclosure label “{label}” is missing. Readers must see that this is paid content.",
+      "failTooShort": "Too short: {words} words, the format needs at least {min}.",
+      "failTooLong": "Too long: {words} words, the format allows at most {max}."
+    },
+    "profile": {
+      "title": "My profile",
+      "lead": "The desk matches writers to briefs on language, specialty and capacity — keep this up to date.",
+      "noProfile": "This account has no writer profile.",
+      "saved": "Profile saved.",
+      "fixErrors": "Nothing was saved — fix the highlighted fields and try again.",
+      "bio": "About you",
+      "bioPlaceholder": "Beats you cover, publications you've written for, tone you're known for…",
+      "languages": "Languages you write in",
+      "languagesHint": "Set your level for each language you can write in. At least one is required.",
+      "languageNone": "Don't write in it",
+      "specialties": "Specialties",
+      "ratePerArticle": "Rate per article",
+      "ratePerWord": "Rate per word",
+      "currency": "Currency",
+      "currencyNone": "— Choose —",
+      "maxActiveAssignments": "Max active assignments",
+      "maxActiveAssignmentsHint": "Leave empty for no limit.",
+      "portfolioUrl": "Portfolio link",
+      "active": "Available for new work",
+      "save": "Save profile",
+      "saving": "Saving…",
+      "errors": {
+        "bio": "Keep it under 2,000 characters.",
+        "languages": "Choose at least one language.",
+        "ratePerArticle": "Enter an amount greater than 0, like 4500.",
+        "ratePerWord": "Enter an amount greater than 0, like 3.5.",
+        "currency": "Choose the currency for your rates.",
+        "maxActiveAssignments": "Enter a whole number from 1 to 50, or leave it empty.",
+        "portfolioUrl": "Enter a full link starting with https://"
+      }
+    }
   }
 }

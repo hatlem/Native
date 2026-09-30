@@ -154,6 +154,10 @@ enum ContentAssetStatus {
   CHANGES_REQUESTED
   APPROVED
   FINAL
+  // Replaced by a newer version before it was approved — terminal. Set by
+  // supersedeOlderVersions (src/lib/content/versions.ts) so a stale
+  // version never reads as still awaiting review.
+  SUPERSEDED
 }
 
 enum BookingStatus {
@@ -2016,6 +2020,12 @@ model WriterInvite {
   claimedByUserId String?
   createdBy       String
   createdAt       DateTime  @default(now())
+  // Language the invite email (and claim link) was sent in — chosen by the
+  // desk, since a not-yet-registered writer has no profile to read it from.
+  locale          String    @default("en")
+  // When the invite email last went out; null = sending failed, so the
+  // desk knows to resend or share the link by hand.
+  emailedAt       DateTime?
 
   @@index([email])
 }

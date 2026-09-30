@@ -5,7 +5,7 @@ import { formatMoney } from "@/lib/money";
 import { advanceOrder, cancelOrder } from "@/app/desk-actions";
 import { issueInvoice } from "@/app/desk-billing-actions";
 import { StatusBadge } from "@/app/status-badge";
-import { canCancelOrder, cancelBlockReason } from "@/lib/cancellation";
+import { canCancelOrder, cancelBlockCode } from "@/lib/cancellation";
 import { SubmitButton } from "@/components";
 
 const NON_ADVANCEABLE = ["COMPLETED", "INVOICED", "CANCELLED"];
@@ -116,7 +116,7 @@ export async function OrderHeader({ locale, order, invoice }: Props) {
             </details>
           ) : order.status !== "CANCELLED" ? (
             <p className="muted small">
-              {t("cancelBlocked")} {cancelBlockReason(order.status)}
+              {t("cancelBlocked")} {t(`cancelBlock.${cancelBlockCode(order.status) ?? "other"}`)}
             </p>
           ) : null}
         </div>

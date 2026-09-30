@@ -2,7 +2,6 @@
 
 import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
-import { ProductType, PriceVisibility } from "@prisma/client";
 import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
 import { recordAudit } from "@/lib/audit";
@@ -13,7 +12,11 @@ import {
   claimLink,
   inviteEmail,
 } from "@/lib/publisher-invite";
-import { blueprintFor, basePriceFor } from "@/lib/activation-blueprint";
+import {
+  blueprintFor,
+  blueprintProductData,
+  reactivatableProductsWhere,
+} from "@/lib/activation-blueprint";
 import { checkBusinessEmailWithMx } from "@/lib/email-policy";
 import { fireWebhook } from "@/lib/webhooks";
 
@@ -34,8 +37,14 @@ async function requireSuperadmin(locale: string): Promise<string> {
 // can be unit-tested and so the per-market overrides (Ingrid's gap)
 // have a single home.
 
-// Verified that the title offers native. Creates default products from
-// the blueprint (only if none exist yet) and activates the title.
+// Verified that the title offers native. Records that fact (title live,
+// lastVerifiedAt stamped) and — only when the title has no products yet —
+// creates the blueprint formats as unpriced, inactive skeletons (see
+// blueprintProductData). Buyers see the title and can put it in a plan
+// "for price"; no product goes live or bookable until its price is
+// confirmed. On a title that already has products, only confirmed-price
+// rows come back on: the catalog data standard is "confirmed, never
+// guessed", so an estimate must never become a bookable price.
 export async function markTitleNative(formData: FormData) {
   const locale = field(formData, "locale") || "en";
   const titleId = field(formData, "titleId");
@@ -52,53 +61,26 @@ export async function markTitleNative(formData: FormData) {
   });
   if (!title) redirect(`/${locale}/desk/titles`);
 
+  let createdSkeletons = 0;
+  let reactivated = 0;
   if (title._count.products === 0) {
-    const reach = title.monthlyReach ?? 100_000;
-    const blueprint = blueprintFor(title.market.code);
-    for (const bp of blueprint) {
-      const basePrice = basePriceFor(reach, bp, title.market.code);
+    for (const row of blueprintFor(title.market.code)) {
       await prisma.product.create({
-        data: {
+        data: blueprintProductData({
           titleId: title.id,
-          type: bp.type,
-          name: `${title.name} — ${bp.type}`,
+          titleName: title.name,
           currency: title.market.currency,
-          basePrice,
-          visibility: bp.visibility,
-          leadTimeDays: bp.leadTimeDays,
-          active: true,
-          bookable: true,
-          priceRules: {
-            create: {
-              label: "standard",
-              minVolume: 1,
-              marginPct: bp.marginPct,
-              seasonalMultiplier: bp.seasonalMultiplier,
-            },
-          },
-          spec: {
-            create: {
-              wordCountMin:
-                bp.type === ProductType.NATIVE_DISPLAY ? null : 500,
-              wordCountMax:
-                bp.type === ProductType.NATIVE_DISPLAY ? null : 900,
-              imagesMin: 2,
-              disclosureLabel: title.market.disclosureLabel,
-              fileFormats: "JPG, PNG",
-              requirements:
-                "Clearly marked as paid; editorial-quality copy aligned to the title's house style.",
-            },
-          },
-        },
+          disclosureLabel: title.market.disclosureLabel,
+          row,
+        }),
       });
+      createdSkeletons++;
     }
   } else {
-    // Re-activating an existing magazine: flip any inactive products
-    // back on so the catalog actually has something to show.
-    await prisma.product.updateMany({
-      where: { titleId: title.id },
+    ({ count: reactivated } = await prisma.product.updateMany({
+      where: reactivatableProductsWhere(title.id),
       data: { active: true },
-    });
+    }));
   }
 
   await prisma.title.update({
@@ -108,6 +90,8 @@ export async function markTitleNative(formData: FormData) {
   await recordAudit(userId, "title.mark_native", `Title:${title.id}`, {
     name: title.name,
     market: title.marketId,
+    createdSkeletons,
+    reactivated,
   });
   // Fire partner webhook (v0) — receivers subscribed to title.activated
   // get a signed POST so they can refresh their catalog cache without
@@ -121,8 +105,10 @@ export async function markTitleNative(formData: FormData) {
   redirect(`/${locale}/desk/titles`);
 }
 
-// Verified that the title does not offer native — record the check but
-// keep it out of the catalog.
+// Verified that the title does not offer native — record the check and
+// take it (and every product) out of the catalog. Also the way to correct
+// an earlier "offers native" call, so a live title fires the same
+// deactivation webhook deactivateTitle does.
 export async function markTitleNoNative(formData: FormData) {
   const locale = field(formData, "locale") || "en";
   const titleId = field(formData, "titleId");
@@ -141,7 +127,54 @@ export async function markTitleNoNative(formData: FormData) {
   });
   await recordAudit(userId, "title.mark_no_native", `Title:${title.id}`, {
     name: title.name,
+    wasActive: title.active,
   });
+  if (title.active) {
+    fireWebhook("title.deactivated", {
+      title_id: title.id,
+      slug: title.slug,
+      name: title.name,
+      market_id: title.marketId,
+    });
+  }
+  redirect(`/${locale}/desk/titles`);
+}
+
+// Undo a native / no-native verdict: back to "not checked yet". Clears
+// lastVerifiedAt (the verdict) and hides the title's unconfirmed products;
+// confirmed-price products keep their state, since their price is a
+// publisher-confirmed fact independent of the verdict being undone. Rows
+// are deactivated, never deleted — history stays intact (catalog data
+// standard §4), and a later "offers native" won't duplicate the skeletons.
+export async function resetTitleVerification(formData: FormData) {
+  const locale = field(formData, "locale") || "en";
+  const titleId = field(formData, "titleId");
+  const userId = await requireSuperadmin(locale);
+
+  const title = await prisma.title.findUnique({ where: { id: titleId } });
+  if (!title) redirect(`/${locale}/desk/titles`);
+
+  await prisma.title.update({
+    where: { id: title.id },
+    data: { active: false, lastVerifiedAt: null },
+  });
+  await prisma.product.updateMany({
+    where: { titleId: title.id, confirmedAt: null },
+    data: { active: false, bookable: false },
+  });
+  await recordAudit(userId, "title.reset_verification", `Title:${title.id}`, {
+    name: title.name,
+    previousVerifiedAt: title.lastVerifiedAt?.toISOString() ?? null,
+    wasActive: title.active,
+  });
+  if (title.active) {
+    fireWebhook("title.deactivated", {
+      title_id: title.id,
+      slug: title.slug,
+      name: title.name,
+      market_id: title.marketId,
+    });
+  }
   redirect(`/${locale}/desk/titles`);
 }
 

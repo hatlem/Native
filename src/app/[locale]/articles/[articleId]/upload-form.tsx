@@ -13,7 +13,7 @@ export function UploadForm({
   articleId: string;
   locale: string;
   saveDraftAction: typeof saveUploadedDraft;
-  labels: { heading: string; hint: string; uploading: string; save: string };
+  labels: { heading: string; hint: string; uploading: string; save: string; failed: string };
 }) {
   const [busy, setBusy] = useState(false);
   const [file, setFile] = useState<File | null>(null);
@@ -38,31 +38,32 @@ export function UploadForm({
       if (!res.ok) throw new Error(`upload_failed:${res.status}`);
       setKey(objectKey);
     } catch {
-      setError("Upload failed. Try a different file.");
+      setError(labels.failed);
     } finally {
       setBusy(false);
     }
   }
 
   return (
-    <div className="space-y-2">
-      <label className="block text-sm font-medium">{labels.heading}</label>
-      <p className="text-xs text-gray-500">{labels.hint}</p>
+    <div className="field">
+      <label htmlFor={`upload-${articleId}`}>{labels.heading}</label>
+      <span className="hint">{labels.hint}</span>
       <input
+        id={`upload-${articleId}`}
         type="file"
         accept=".pdf,.docx,.txt,application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document,text/plain"
         onChange={(e) => handleFileChange(e.target.files?.[0] ?? null)}
       />
-      {error ? <p className="text-sm text-red-700">{error}</p> : null}
-      <form action={saveDraftAction}>
+      {error ? (
+        <p className="err" role="alert">
+          {error}
+        </p>
+      ) : null}
+      <form action={saveDraftAction} className="actions" style={{ marginTop: 8 }}>
         <input type="hidden" name="locale" value={locale} />
         <input type="hidden" name="articleId" value={articleId} />
         <input type="hidden" name="bodyUrl" value={key ?? ""} />
-        <button
-          type="submit"
-          disabled={busy || !key}
-          className="rounded bg-black px-3 py-1.5 text-sm text-white disabled:opacity-50"
-        >
+        <button type="submit" disabled={busy || !key} className="btn small secondary">
           {busy ? labels.uploading : labels.save}
         </button>
       </form>

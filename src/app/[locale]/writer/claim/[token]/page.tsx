@@ -125,8 +125,8 @@ export default async function ClaimWriterInvitePage({
             </div>
             <div className="actions">
               <SubmitButton
-                label={t("claimSubmit")}
-                pendingLabel={t("claimSubmitting")}
+                label={t("writerClaimSubmit")}
+                pendingLabel={t("writerClaimSubmitting")}
               />
             </div>
           </form>

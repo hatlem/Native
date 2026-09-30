@@ -31,6 +31,20 @@ export function isOrderEligibleForScan(
   return now.getTime() > scanThreshold(order.flightEndDate, graceDays).getTime();
 }
 
+// The desk can ask for metrics as soon as an order's flight has ended,
+// without waiting for the once-a-day sweep and its one-day grace period.
+// Pure so the page (button state) and the action agree.
+export function canRequestMetricsNow(
+  order: { status: OrderStatus; flightEndDate: Date | null },
+  now: Date = new Date(),
+): boolean {
+  if (order.flightEndDate === null) return false;
+  if (order.status === "QUOTED" || order.status === "CANCELLED") return false;
+  // The flight runs through its end date (UTC), so "ended" is after that
+  // day — the same threshold the sweep uses, minus its grace day.
+  return now.getTime() > scanThreshold(order.flightEndDate, 0).getTime();
+}
+
 export function groupBookingsByPublisher(
   bookings: { id: string; publisherId: string | null; status: BookingStatus }[],
 ): { publisherId: string; bookingIds: string[] }[] {

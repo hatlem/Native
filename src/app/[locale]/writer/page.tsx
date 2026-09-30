@@ -1,8 +1,14 @@
 import { redirect } from "next/navigation";
-import Link from "next/link";
+import { getTranslations } from "next-intl/server";
 import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
+import { Link } from "@/i18n/navigation";
 import { resolveEffectiveAsset } from "@/lib/writers/placement";
+import { StatusBadge } from "@/app/status-badge";
+import { EmptyState } from "@/app/empty-state";
+import { intlLocale } from "@/lib/money";
+
+export const dynamic = "force-dynamic";
 
 export default async function WriterHome({
   params,
@@ -19,6 +25,10 @@ export default async function WriterHome({
     redirect(`/${locale}/signin`);
   }
 
+  const t = await getTranslations({ locale, namespace: "writer" });
+  const tType = await getTranslations({ locale, namespace: "productType" });
+  const tMarket = await getTranslations({ locale, namespace: "market" });
+
   const profile = await prisma.writerProfile.findUnique({
     where: { userId: session.user.id },
     select: { id: true },
@@ -30,14 +40,14 @@ export default async function WriterHome({
         select: {
           id: true,
           productId: true,
-          brief: { select: { message: true } },
+          assignedAt: true,
           articlePlacement: {
             select: {
               articleId: true,
               lockedAssetId: true,
             },
           },
-          order: { select: { id: true } },
+          order: { select: { status: true } },
         },
         orderBy: { assignedAt: "desc" },
       })
@@ -64,43 +74,86 @@ export default async function WriterHome({
           where: { id: { in: productIds } },
           select: {
             id: true,
-            name: true,
+            type: true,
             title: { select: { name: true, countryCode: true } },
           },
         })
       : [];
   const productById = new Map(products.map((p) => [p.id, p]));
+  const dateFmt = new Intl.DateTimeFormat(intlLocale(locale), { dateStyle: "medium" });
+  const marketLabel = (code: string) => (tMarket.has(code) ? tMarket(code) : code);
 
   return (
-    <div className="mx-auto max-w-3xl p-6">
-      <h1 className="text-lg font-semibold">My assignments</h1>
-      {lines.length === 0 ? (
-        <p className="mt-4 text-sm text-neutral-500">
-          No assignments yet. The desk will assign you articles here.
+    <>
+      <header className="page-header">
+        <span className="eyebrow accent">{t("eyebrow")}</span>
+        <h1>{t("home.title")}</h1>
+        <p className="lead">{t("home.lead")}</p>
+        <p className="cluster" style={{ marginTop: 12 }}>
+          <Link href="/writer/profile" className="btn small secondary">
+            {t("home.profileCta")}
+          </Link>
         </p>
-      ) : (
-        <ul className="mt-4 divide-y divide-neutral-100">
-          {lines.map((line) => {
-            const product = line.productId
-              ? productById.get(line.productId)
-              : undefined;
-            return (
-              <li key={line.id} className="py-3">
-                <Link
-                  href={`/${locale}/writer/lines/${line.id}`}
-                  className="font-medium underline"
-                >
-                  {product?.title.name ?? "Article"} — {product?.name}
-                </Link>
-                <div className="text-xs text-neutral-500">
-                  {product?.title.countryCode} ·{" "}
-                  {effectiveAssets.get(line.id)?.status ?? "NOT STARTED"}
-                </div>
-              </li>
-            );
-          })}
-        </ul>
-      )}
-    </div>
+      </header>
+
+      <section className="section">
+        {lines.length === 0 ? (
+          <EmptyState title={t("home.emptyTitle")} hint={t("home.emptyBody")} />
+        ) : (
+          <div className="table-wrap responsive">
+            <table className="table">
+              <thead>
+                <tr>
+                  <th>{t("home.colTitle")}</th>
+                  <th>{t("home.colFormat")}</th>
+                  <th>{t("home.colMarket")}</th>
+                  <th>{t("home.colStatus")}</th>
+                  <th>{t("home.colAssigned")}</th>
+                  <th></th>
+                </tr>
+              </thead>
+              <tbody>
+                {lines.map((line) => {
+                  const product = line.productId ? productById.get(line.productId) : undefined;
+                  const asset = effectiveAssets.get(line.id);
+                  return (
+                    <tr key={line.id}>
+                      <td data-label={t("home.colTitle")}>
+                        <Link href={`/writer/lines/${line.id}`}>
+                          <strong>{product?.title.name ?? t("untitledAssignment")}</strong>
+                        </Link>
+                      </td>
+                      <td data-label={t("home.colFormat")}>
+                        {product ? tType(product.type) : "—"}
+                      </td>
+                      <td data-label={t("home.colMarket")}>
+                        {product ? marketLabel(product.title.countryCode) : "—"}
+                      </td>
+                      <td data-label={t("home.colStatus")}>
+                        {line.order.status === "CANCELLED" ? (
+                          <StatusBadge value="CANCELLED" />
+                        ) : asset ? (
+                          <StatusBadge value={asset.status} />
+                        ) : (
+                          <span className="badge badge-neutral">{t("status.notStarted")}</span>
+                        )}
+                      </td>
+                      <td className="muted small" data-label={t("home.colAssigned")}>
+                        {line.assignedAt ? dateFmt.format(line.assignedAt) : "—"}
+                      </td>
+                      <td className="actions-col">
+                        <Link href={`/writer/lines/${line.id}`} className="link">
+                          {t("home.open")}
+                        </Link>
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
+        )}
+      </section>
+    </>
   );
 }

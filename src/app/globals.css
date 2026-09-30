@@ -7571,3 +7571,91 @@ footer a:hover {
   flex-wrap: wrap;
   margin-bottom: var(--s-2);
 }
+
+/* ---------- Fieldset variant of .field (grouped controls) ---------- */
+
+fieldset.field {
+  border: 0;
+  padding: 0;
+  margin: 0;
+  min-width: 0;
+}
+fieldset.field > legend {
+  padding: 0;
+  margin-bottom: 6px;
+  font-size: 0.85rem;
+  font-weight: 540;
+  color: var(--heading);
+}
+
+/* ---------- Article preview (rendered draft, see ArticlePreview) ---------- */
+
+.article-preview {
+  max-width: 70ch;
+  color: var(--text);
+  font-size: 1rem;
+  line-height: 1.65;
+  overflow-wrap: anywhere;
+}
+.article-preview > :first-child {
+  margin-top: 0;
+}
+.article-preview > :last-child {
+  margin-bottom: 0;
+}
+.article-preview h2,
+.article-preview h3,
+.article-preview h4,
+.article-preview h5,
+.article-preview h6 {
+  margin: 1.4em 0 0.5em;
+  color: var(--heading);
+  line-height: 1.25;
+}
+.article-preview h2 { font-size: 1.55rem; }
+.article-preview h3 { font-size: 1.25rem; }
+.article-preview h4,
+.article-preview h5,
+.article-preview h6 { font-size: 1.05rem; }
+.article-preview p,
+.article-preview ul,
+.article-preview ol,
+.article-preview blockquote {
+  margin: 0 0 1em;
+}
+.article-preview ul,
+.article-preview ol {
+  padding-left: 1.4em;
+}
+.article-preview blockquote {
+  padding-left: var(--s-3);
+  border-left: 3px solid var(--border-strong);
+  color: var(--muted-strong);
+  font-style: italic;
+}
+.article-preview hr {
+  border: 0;
+  border-top: 1px solid var(--border);
+  margin: 1.5em 0;
+}
+.article-preview code {
+  padding: 0.1em 0.35em;
+  border-radius: var(--r-xs);
+  background: var(--surface-3);
+  font-size: 0.9em;
+}
+.article-preview a {
+  color: var(--accent);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+/* ---------- Disabled buttons ---------- */
+/* A disabled action (e.g. "Send for review" while the spec check fails)
+   must look unavailable, not just ignore the click. */
+.btn:disabled,
+.btn[aria-disabled="true"] {
+  opacity: 0.45;
+  cursor: not-allowed;
+  pointer-events: none;
+}

@@ -7,6 +7,7 @@ import { recordAudit } from "@/lib/audit";
 import { loadScope, canActOnOrg } from "@/lib/scope";
 import { requireOrgArticleAccess, requireArticleWriter } from "@/lib/writers/guard";
 import { presignUpload, ARTICLE_TYPES } from "@/lib/storage/r2";
+import { linkableLinesWhere } from "@/lib/content/article-linking";
 
 function field(formData: FormData, key: string): string {
   const v = formData.get(key);
@@ -71,22 +72,28 @@ export async function linkArticleToOrderLine(formData: FormData) {
     where: { id: articleId },
     select: {
       organizationId: true,
+      assignedWriterId: true,
+      placements: { select: { orderLine: { select: { orderId: true } } } },
       versions: { orderBy: { version: "desc" }, take: 1, select: { id: true, status: true } },
     },
   });
   if (!article) redirect(`/${locale}/articles/${articleId}`);
 
-  const line = await prisma.orderLine.findUnique({
-    where: { id: orderLineId },
-    select: { kind: true, order: { select: { organizationId: true } } },
+  // Same rule the page's dropdown is built from, so a tampered form can't
+  // link a line the page would never offer.
+  const line = await prisma.orderLine.findFirst({
+    where: {
+      id: orderLineId,
+      ...linkableLinesWhere({
+        organizationId: article.organizationId,
+        linkedOrderIds: [...new Set(article.placements.map((p) => p.orderLine.orderId))],
+        nativeSpinWritten: article.assignedWriterId !== null,
+      }),
+    },
+    select: { id: true },
   });
   const scope = await loadScope();
-  if (
-    !line ||
-    line.kind !== "INVENTORY" ||
-    line.order.organizationId !== article.organizationId ||
-    !canActOnOrg(scope, article.organizationId)
-  ) {
+  if (!line || !canActOnOrg(scope, article.organizationId)) {
     redirect(`/${locale}/articles/${articleId}?error=link`);
   }
 

@@ -139,6 +139,12 @@ export async function confirmProductPrice(args: {
   actorUserId: string;
 }): Promise<void> {
   const product = await ownProduct(args.publisherId, args.productId);
+  // "Still right" only means something for a real price. A blueprint
+  // skeleton carries basePrice 0 (unpriced) — confirming that would stamp
+  // a 0 kr price as publisher-confirmed; the publisher must enter the rate.
+  if (!isValidBasePrice(Number(product.basePrice))) {
+    throw new PublisherRatesError("invalid-price");
+  }
   await prisma.product.update({
     where: { id: product.id },
     data: {

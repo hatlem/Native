@@ -12,3 +12,23 @@ export async function requireDesk(locale: string): Promise<string> {
   }
   return session.user.id;
 }
+
+export type SuperadminPageGate =
+  | { allowed: true; userId: string }
+  | { allowed: false };
+
+// Gate for a SUPERADMIN-only desk *page*. Signed-out visitors go to
+// sign-in (so the callback lands them back here). A signed-in user with
+// any other role is NOT redirected: the caller renders <SuperadminOnly />
+// instead. A silent bounce to /desk made DESK users conclude the link was
+// broken — an explicit "this page is for superadmins" state tells them
+// the page exists, why they can't see it, and who to ask.
+//
+//   const gate = await superadminPageGate(locale);
+//   if (!gate.allowed) return <SuperadminOnly locale={locale} area={t("title")} />;
+export async function superadminPageGate(locale: string): Promise<SuperadminPageGate> {
+  const session = await auth();
+  if (!session?.user?.id) redirect(`/${locale}/signin`);
+  if (session.user.role !== "SUPERADMIN") return { allowed: false };
+  return { allowed: true, userId: session.user.id };
+}

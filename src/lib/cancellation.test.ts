@@ -4,6 +4,7 @@ import { OrderStatus } from "@prisma/client";
 import {
   canCancelOrder,
   cancelBlockReason,
+  cancelBlockCode,
   normaliseReason,
 } from "./cancellation";
 
@@ -47,4 +48,12 @@ test("normaliseReason caps absurdly long input at a defensible length", () => {
   const out = normaliseReason(tooLong);
   assert.ok(out);
   assert.equal(out.length, 2000);
+});
+
+test("cancelBlockCode gives the desk UI a stable, localizable reason", () => {
+  assert.equal(cancelBlockCode(OrderStatus.CONFIRMED), null);
+  assert.equal(cancelBlockCode(OrderStatus.LIVE), "live");
+  assert.equal(cancelBlockCode(OrderStatus.COMPLETED), "completed");
+  assert.equal(cancelBlockCode(OrderStatus.INVOICED), "invoiced");
+  assert.equal(cancelBlockCode(OrderStatus.CANCELLED), "cancelled");
 });

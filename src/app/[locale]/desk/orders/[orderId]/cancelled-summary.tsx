@@ -27,7 +27,12 @@ export async function CancelledSummary({ locale, order, invoice }: Props) {
         {order.cancelledBy ? (
           <>
             <dt>{t("cancelledByLabel")}</dt>
-            <dd>{order.cancelledBy}</dd>
+            {/* cancelledBy records the acting role (see CancelActor). */}
+            <dd>
+              {t.has(`cancelledByRole.${order.cancelledBy}`)
+                ? t(`cancelledByRole.${order.cancelledBy}`)
+                : order.cancelledBy}
+            </dd>
           </>
         ) : null}
         {order.cancelReason ? (
