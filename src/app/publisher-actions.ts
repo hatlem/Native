@@ -6,6 +6,7 @@ import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
 import { recordAudit } from "@/lib/audit";
 import { notifyDesk, notifyOrg } from "@/lib/notify";
+import { orderNoticeContext } from "@/lib/notice-context";
 import { safeExternalUrl } from "@/lib/security";
 import { normaliseReason } from "@/lib/cancellation";
 import { parseImpressions } from "@/lib/metrics/validate";
@@ -57,7 +58,6 @@ export async function updateProduct(formData: FormData) {
         productId: field(formData, "productId"),
         leadTimeDays,
         actorUserId: userId,
-        locale,
       });
     } catch (err) {
       // Same fail-silent contract as the rates actions: never reveal whether
@@ -133,7 +133,7 @@ export async function updateBooking(formData: FormData) {
       // Bookings only exist on inventory lines, so productId is present;
       // the ?? "" satisfies the type and yields no product otherwise.
       where: { id: booking.orderLine.productId ?? "" },
-      include: { title: { select: { publisherId: true } } },
+      include: { title: { select: { publisherId: true, name: true } } },
     });
     if (product?.title.publisherId === publisherId) {
       await prisma.publisherBooking.update({
@@ -150,21 +150,22 @@ export async function updateBooking(formData: FormData) {
         liveUrl: safeLiveUrl,
       });
       if (status === "CONFIRMED" || status === "PUBLISHED") {
+        const orderId = booking.orderLine.order.id;
+        const { orgName, planName } = await orderNoticeContext(orderId);
+        const titleName = product.title.name;
         await notifyDesk({
           kind: "BOOKING_CONFIRMED",
-          title:
+          template:
             status === "CONFIRMED"
-              ? "Publisher confirmed a booking"
-              : "Placement is live",
-          link: `/${locale}/desk/orders/${booking.orderLine.order.id}`,
+              ? { key: "deskBookingConfirmed", params: { titleName, orgName, planName, orderId } }
+              : { key: "deskPlacementLive", params: { titleName, orgName, planName, orderId } },
         });
         await notifyOrg(booking.orderLine.order.organizationId, {
           kind: "BOOKING_CONFIRMED",
-          title:
+          template:
             status === "PUBLISHED"
-              ? "Your placement is live"
-              : "Publisher confirmed your booking",
-          link: safeLiveUrl ?? `/${locale}/orders/${booking.orderLine.order.id}`,
+              ? { key: "placementLive", params: { titleName, planName, orderId, liveUrl: safeLiveUrl } }
+              : { key: "bookingConfirmed", params: { titleName, planName, orderId } },
         });
       }
     }
@@ -278,9 +279,9 @@ export async function rejectAsset(formData: FormData) {
   const product = await prisma.product.findUnique({
     // Briefs only attach to inventory lines, so productId is present.
     where: { id: placement.orderLine.productId ?? "" },
-    select: { title: { select: { publisherId: true } } },
+    select: { title: { select: { publisherId: true, name: true } } },
   });
-  if (product?.title.publisherId !== publisherId) {
+  if (!product || product.title.publisherId !== publisherId) {
     redirect(`/${locale}/publisher/orders`);
   }
 
@@ -305,17 +306,15 @@ export async function rejectAsset(formData: FormData) {
   const orderId = placement.orderLine.order.id;
   const orgId = placement.orderLine.order.organizationId;
 
+  const { orgName, planName } = await orderNoticeContext(orderId);
+  const titleName = product.title.name;
   await notifyDesk({
     kind: "EDITORIAL_VETO",
-    title: "Publisher invoked editorial veto",
-    body: reason,
-    link: `/${locale}/desk/orders/${orderId}`,
+    template: { key: "deskEditorialVeto", params: { titleName, orgName, planName, orderId, reason } },
   });
   await notifyOrg(orgId, {
     kind: "EDITORIAL_VETO",
-    title: "Publisher cannot run this draft",
-    body: reason,
-    link: `/${locale}/orders/${orderId}`,
+    template: { key: "editorialVeto", params: { titleName, planName, orderId, reason } },
   });
 
   redirect(`/${locale}/publisher/orders`);

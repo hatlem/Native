@@ -6,6 +6,8 @@ import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
 import { recordAudit } from "@/lib/audit";
 import { emailAdapter } from "@/lib/notify";
+import { marketDefaultLocale } from "@/lib/market-locale";
+import { asNoticeLocale } from "@/lib/notices/messages";
 import {
   newInviteToken,
   expiryFromNow,
@@ -256,11 +258,16 @@ export async function sendPublisherInvite(formData: FormData) {
 
   const publisher = await prisma.publisher.findUnique({
     where: { id: publisherId },
-    select: { id: true, name: true },
+    select: { id: true, name: true, countryCode: true },
   });
   if (!publisher) {
     redirect(`${backTo}?invite=not-found`);
   }
+  // The language the invitation, its claim page and the portal account use:
+  // the desk's pick, else the publisher's market language — never the desk
+  // associate's own UI language.
+  const inviteLocale =
+    asNoticeLocale(field(formData, "inviteLocale")) ?? marketDefaultLocale(publisher.countryCode);
 
   const session = await auth();
   const inviterName = session?.user?.name ?? null;
@@ -275,18 +282,21 @@ export async function sendPublisherInvite(formData: FormData) {
       token,
       expiresAt,
       createdBy: userId,
+      locale: inviteLocale,
     },
   });
   await recordAudit(userId, "publisher.invite", `Publisher:${publisher.id}`, {
     email: rawEmail,
     expiresAt: expiresAt.toISOString(),
+    locale: inviteLocale,
   });
 
-  const link = claimLink(token, locale);
+  const link = claimLink(token, inviteLocale);
   const { subject, text } = inviteEmail({
     publisherName: publisher.name,
     inviterName,
     link,
+    locale: inviteLocale,
   });
   try {
     await emailAdapter({ to: rawEmail, subject, text });

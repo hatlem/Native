@@ -2569,7 +2569,9 @@
     "inviteBusinessEmail": "Använd en företagsadress — gratis- och engångstjänster godtas inte.",
     "inviteNotFound": "Förlaget finns inte längre — ladda om sidan.",
     "priceUnconfirmed": "pris ej bekräftat",
-    "productInactive": "inaktiv"
+    "productInactive": "inaktiv",
+    "inviteLanguageLabel": "Språk i mejlet",
+    "inviteLanguageHint": "Inbjudan, registreringssidan och portalkontot använder det här språket. Standard är titelns marknad."
   },
   "salesContacts": {
     "title": "Säljkontakter",
@@ -3664,5 +3666,139 @@
   "viewOnly": {
     "title": "Endast läsbehörighet",
     "body": "Du ser allt ditt team har här, men kan inte ändra något. Fråga en administratör om du behöver redigera, skicka eller godkänna."
+  },
+  "notices": {
+    "email": {
+      "cta": "Öppna i NativeSpin",
+      "linkLine": "Öppna i NativeSpin: {url}",
+      "footer": "Det här är en automatisk avisering från NativeSpin."
+    },
+    "orderInProduction": {
+      "title": "Ordern är i produktion: {plan}",
+      "body": "Vi bokar {count, plural, one {placeringen} other {de # placeringarna}} hos publicisterna och drar i gång innehållet. Du hör av oss när det finns ett utkast att granska."
+    },
+    "orderScheduled": {
+      "title": "Kampanjen är schemalagd: {plan}",
+      "bodyRange": "Publiceringen är bokad {start}–{end}. Vi hör av oss så snart den första placeringen är ute.",
+      "bodyFrom": "Publiceringen är bokad från {start}. Vi hör av oss så snart den första placeringen är ute.",
+      "bodyUndated": "Alla placeringar har fått en plats hos sin publicist. Vi hör av oss så snart den första är ute."
+    },
+    "orderCancelled": {
+      "title": "Ordern har avbokats: {plan}",
+      "body": "NativeSpin-desken har avbokat den här ordern. Orsak: {reason}"
+    },
+    "draftReady": {
+      "title": "Utkast klart att granska: {article}",
+      "body": "Version {version} av ”{article}” är klar. Läs den och godkänn den eller be om ändringar."
+    },
+    "draftSentBack": {
+      "title": "Utkastet har skickats tillbaka för ändringar: {article}",
+      "body": "Desken har bett om ändringar i version {version} av ”{article}”. Du får det reviderade utkastet att granska när det är klart."
+    },
+    "invoiceIssued": {
+      "title": "Faktura utfärdad: {plan}",
+      "body": "Totalt {amount} inkl. moms, förfaller {due}. Öppna fakturan för att ladda ned pdf:en."
+    },
+    "creditNoteIssued": {
+      "title": "Kreditnota utfärdad: {plan}",
+      "body": "Fakturan på {amount} har krediterats i sin helhet. Orsak: {reason}"
+    },
+    "bookingConfirmed": {
+      "title": "{title} har bekräftat din bokning",
+      "body": "{title} har bekräftat placeringen i {plan}. Vi hör av oss när den är ute."
+    },
+    "placementLive": {
+      "title": "Din placering är ute hos {title}",
+      "body": "Placeringen i {plan} är publicerad hos {title}. Öppna den för att se den som läsarna gör."
+    },
+    "editorialVeto": {
+      "title": "{title} kan inte publicera det här utkastet",
+      "body": "{title} har av redaktionella skäl tackat nej till att publicera utkastet i {plan}: {reason}. Desken hör av sig om nästa steg."
+    },
+    "placementProposed": {
+      "title": "Desken har valt en placering hos {title}",
+      "body": "Du bad oss föreslå en placering hos {title}. Vi har valt {format} – du hittar den på din förfrågan."
+    },
+    "placeholderRemoved": {
+      "title": "{title} har tagits bort från din förfrågan",
+      "body": "{title} har ingen placering vi kan boka just nu, så desken har tagit bort den från förfrågan. Resten av förfrågan påverkas inte."
+    },
+    "rfqSubmitted": {
+      "title": "Ny förfrågan från {org}: {plan}",
+      "intro": "{org} skickade in ”{plan}” med {count, plural, one {# rad} other {# rader}}.",
+      "budget": "Budget: {amount}",
+      "brief": "Brief:",
+      "noBrief": "Ingen brief har skrivits.",
+      "lines": "Rader:",
+      "line": "{title} – {format} × {quantity}",
+      "lineWithContent": "{title} – {format} × {quantity}, skriven av NativeSpin",
+      "linePlaceholder": "{title} – desken föreslår placering",
+      "moreLines": "…och {count} till"
+    },
+    "quoteAccepted": {
+      "title": "{count, plural, one {Offert accepterad} other {# offerter accepterade}}: {plan}",
+      "body": "{count, plural, one {{org} accepterade offerten för {plan}. Ordern är bekräftad.} other {{org} accepterade en kampanj på # marknader ({plan}). # ordrar är bekräftade.}}"
+    },
+    "quoteRenewal": {
+      "title": "Förnyad offert önskas: {plan}",
+      "body": "{org} vill gå vidare, men offerten har gått ut. Förnya den (och justera priserna om taxorna har ändrats) så att den kan accepteras igen."
+    },
+    "deskBookingConfirmed": {
+      "title": "{title} har bekräftat en bokning",
+      "body": "{title} har bekräftat sin placering i ordern ”{plan}” från {org}."
+    },
+    "deskPlacementLive": {
+      "title": "Placering publicerad hos {title}",
+      "body": "{title} har publicerat placeringen i ordern ”{plan}” från {org}."
+    },
+    "deskEditorialVeto": {
+      "title": "{title} har använt sitt redaktionella veto",
+      "body": "{title} publicerar inte utkastet i ordern ”{plan}” från {org}. Orsak: {reason}"
+    },
+    "deskDraftApproved": {
+      "title": "{org} har godkänt ett utkast: {article}",
+      "body": "Version {version} av ”{article}” är godkänd. Färdigställ den för att låsa den till placeringarna."
+    },
+    "deskChangesRequested": {
+      "title": "{org} ber om ändringar: {article}",
+      "body": "{org} har skickat tillbaka version {version} av ”{article}” för ändringar.",
+      "comment": "Deras kommentar: ”{comment}”",
+      "noComment": "De lämnade ingen kommentar."
+    },
+    "publisherPrice": {
+      "title": "Publicisten har ändrat ett pris: {title}",
+      "body": "{title}, {format}: {from} → {to}, bekräftat av publicisten."
+    },
+    "publisherLeadTime": {
+      "title": "Publicisten har ändrat ledtiden: {title}",
+      "body": "{title}, {format}: framförhållningen har ändrats från {from} till {to}. Kontrollera planerade kampanjer som nu startar för tidigt.",
+      "days": "{count, plural, one {# dag} other {# dagar}}",
+      "unset": "inte angiven"
+    },
+    "bookingNew": {
+      "title": "Ny bokning från {org}",
+      "bodyInstant": "{org} har lagt en direktbeställning som omfattar era titlar. Bekräfta varje bokning i publicistportalen.",
+      "bodyQuote": "{org} har accepterat en offert som omfattar era titlar. Bekräfta varje bokning i publicistportalen."
+    },
+    "publisherOrderCancelled": {
+      "title": "Order avbokad: {org}",
+      "body": "NativeSpin-desken har avbokat ordern från {org}. Bokningar på era titlar som inte har publicerats är avbokade. Orsak: {reason}"
+    },
+    "writerChangesRequested": {
+      "title": "Ändringar önskas: {article}",
+      "bodyClient": "Kunden har skickat tillbaka version {version} av ”{article}” för ändringar.",
+      "bodyDesk": "NativeSpin-desken har skickat tillbaka version {version} av ”{article}” för ändringar.",
+      "comment": "Kommentar: ”{comment}”"
+    }
+  },
+  "publisherInviteEmail": {
+    "subject": "Inbjudan till samarbete för {publisher} – NativeSpin",
+    "greeting": "Hej,",
+    "added": "{inviter} har lagt till {publisher} i NativeSpins katalog och bjudit in dig att skapa ett konto i publicistportalen.",
+    "inviterFallback": "NativeSpin-teamet",
+    "portal": "I portalen håller du prislistor, specifikationer, tillgänglighet och bokningar uppdaterade för de titlar som NativeSpins kunder kan boka genom oss.",
+    "claim": "Skapa kontot här (länken går ut om {days} dagar):",
+    "ignore": "Om du inte väntade dig det här mejlet kan du bortse från det – länken kan bara användas en gång.",
+    "signoff": "– NativeSpin"
   }
 }

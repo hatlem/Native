@@ -279,6 +279,10 @@ export async function submitRequest(formData: FormData) {
   }
 
   let request: { id: string };
+  // The instant path's orders (one per placement market), for its buyer
+  // confirmation; the RFQ path has none yet.
+  let firmOrderIds: string[] = [];
+  const planName = planNameFor({ listName: list.name, orgName: org.name, locale });
   if (allFirm) {
     // Self-serve: hand the cleared FIRM basket to the shared order factory
     // — the single source of truth the POST /api/v1/orders endpoint also
@@ -289,7 +293,7 @@ export async function submitRequest(formData: FormData) {
       result = await createFirmOrder({
         organizationId: org.id,
         orgName: org.name,
-        planName: planNameFor({ listName: list.name, orgName: org.name, locale }),
+        planName,
         items,
         byId,
         listGuard: { listId: list.id, fingerprint: loadedFingerprint },
@@ -321,6 +325,7 @@ export async function submitRequest(formData: FormData) {
       throw e;
     }
     request = { id: result.requestId };
+    firmOrderIds = result.orderIds;
   } else {
     // RFQ: extracted to the lib so the programme auto-send sweep can submit
     // a due wave through the exact same path (plan snapshot, flight window,
@@ -360,20 +365,24 @@ export async function submitRequest(formData: FormData) {
     });
     // Self-serve confirmation: notify the buying org and every publisher
     // whose products are in the order so they see the booking instantly.
+    // The same confirmation an accepted quote sends (quote-lifecycle.ts).
     await notifyOrg(org.id, {
       kind: "QUOTE_ACCEPTED",
-      title: "Order confirmed",
-      body: "Your firm-priced order has been confirmed.",
-      link: `/${locale}/requests/${request.id}`,
+      template: {
+        key: "orderConfirmed",
+        params: {
+          planName,
+          requestId: request.id,
+          orderId: firmOrderIds.length === 1 ? firmOrderIds[0] : null,
+        },
+      },
     });
     const pubIds = await uniquePublisherIdsForProducts(items.map((i) => i.productId));
     await Promise.all(
       pubIds.map((pid) =>
         notifyPublisher(pid, {
           kind: "BOOKING_NEW",
-          title: "New booking",
-          body: `${org.name} confirmed an instant-book order.`,
-          link: `/${locale}/publisher/orders`,
+          template: { key: "bookingNew", params: { orgName: org.name, via: "instant" } },
         }),
       ),
     );

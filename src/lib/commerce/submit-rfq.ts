@@ -19,6 +19,8 @@ import { withWaveAngle } from "@/lib/programme";
 import { groupItemsByMarket, type QuoteGroupingProduct } from "@/lib/quote-grouping";
 import { recordAudit } from "@/lib/audit";
 import { notifyDesk } from "@/lib/notify";
+import type { NoticeTemplate } from "@/lib/notice-template";
+import { RFQ_LINES_LISTED } from "@/lib/notices/desk-notices";
 import type { AuthorshipMode } from "@/lib/authorship";
 import { planNameFor } from "@/lib/plan-name";
 
@@ -110,8 +112,9 @@ export async function submitListAsRfq(input: {
   brief: RfqBrief;
   // Who to attribute the audit row to; null = system (auto-send sweep).
   actorUserId: string | null;
-  // Locale for the desk notification link; defaults to "en" for callers
-  // without a request locale (the sweep).
+  // Language of the submitter, for the plan-name fallback ("<org> — campaign")
+  // written into Plan.name; defaults to "en" for callers without a request
+  // locale. (The desk notice is rendered per desk user — lib/notify.ts.)
   locale?: string;
   // Best-effort client IP for the audit row; server actions pass it, the
   // sweep has none so the key is simply omitted.
@@ -285,10 +288,66 @@ export async function submitListAsRfq(input: {
   });
   await notifyDesk({
     kind: "RFQ_SUBMITTED",
-    title: "New RFQ",
-    body: `${org.name} submitted ${productItems.length + titleItems.length} item(s).`,
-    link: `/${locale}/desk/${request.id}`,
+    template: { key: "rfqSubmitted", params: await rfqNoticeParams(request.id, org.name) },
   });
 
   return { outcome: "submitted", requestId: request.id };
+}
+
+/**
+ * What the desk's "new request" notice carries, read back from what was
+ * committed (the snapshotted Plan, not the list, which the buyer may already
+ * be editing): the plan name, budget, the desk-facing brief and the lines —
+ * enough to triage from the email without opening the request.
+ */
+async function rfqNoticeParams(
+  requestId: string,
+  orgName: string,
+): Promise<Extract<NoticeTemplate, { key: "rfqSubmitted" }>["params"]> {
+  const req = await prisma.request.findUniqueOrThrow({
+    where: { id: requestId },
+    select: {
+      briefSummary: true,
+      plan: {
+        select: {
+          name: true,
+          budget: true,
+          currency: true,
+          items: { select: { productId: true, titleId: true, quantity: true, withContent: true } },
+        },
+      },
+    },
+  });
+  const items = req.plan.items;
+  const listed = items.slice(0, RFQ_LINES_LISTED);
+  const [products, titles] = await Promise.all([
+    prisma.product.findMany({
+      where: { id: { in: listed.map((i) => i.productId).filter((v): v is string => !!v) } },
+      select: { id: true, type: true, title: { select: { name: true } } },
+    }),
+    prisma.title.findMany({
+      where: { id: { in: listed.map((i) => i.titleId).filter((v): v is string => !!v) } },
+      select: { id: true, name: true },
+    }),
+  ]);
+  const productById = new Map(products.map((p) => [p.id, p]));
+  const titleById = new Map(titles.map((t) => [t.id, t]));
+  return {
+    orgName,
+    planName: req.plan.name,
+    requestId,
+    brief: req.briefSummary,
+    budget:
+      req.plan.budget != null ? { amount: Number(req.plan.budget), currency: req.plan.currency } : null,
+    lineCount: items.length,
+    lines: listed.map((i) => {
+      const product = i.productId ? productById.get(i.productId) : undefined;
+      return {
+        titleName: product?.title.name ?? (i.titleId ? titleById.get(i.titleId)?.name : undefined) ?? "",
+        productType: product?.type ?? null,
+        quantity: i.quantity,
+        withContent: i.withContent,
+      };
+    }),
+  };
 }

@@ -98,7 +98,13 @@ export default async function NotificationsPage({
                 />
                 <div>
                   <div className="title">{shown.title}</div>
-                  {shown.body ? <div className="sub">{shown.body}</div> : null}
+                  {/* Multi-paragraph bodies (a request's brief and lines, a
+                      reviewer's comment) keep their line breaks. */}
+                  {shown.body ? (
+                    <div className="sub" style={{ whiteSpace: "pre-line" }}>
+                      {shown.body}
+                    </div>
+                  ) : null}
                   <div className="muted small mt-1">
                     {timeAgo(n.createdAt, locale)}
                   </div>

@@ -95,6 +95,23 @@ test("inviteEmail falls back to a generic inviter when none is supplied", () => 
   assert.match(text, /NativeSpin team/i);
 });
 
+// BUG-roles-team-r2-3: the invitation was English whatever the publisher's
+// market; it goes out in the language the desk picked.
+test("inviteEmail is written in the invite's language", () => {
+  const no = inviteEmail({
+    publisherName: "Nettavisen",
+    inviterName: "Super Admin",
+    link: "https://example.test/no/publisher/claim/abc",
+    locale: "no",
+  });
+  assert.match(no.subject, /Invitasjon til samarbeid for Nettavisen/);
+  assert.match(no.text, /Super Admin har lagt til Nettavisen i NativeSpin-katalogen/);
+  assert.match(no.text, /lenken utløper om 14 dager/);
+  assert.ok(!/partnership invitation|Claim the account/i.test(no.subject + no.text));
+  const de = inviteEmail({ publisherName: "Stilhaus", inviterName: null, link: "x", locale: "de" });
+  assert.match(de.text, /Das NativeSpin-Team hat Stilhaus/);
+});
+
 test("claimLink encodes the token + honours the locale", () => {
   // Token may contain - or _ but should not require encoding;
   // we still call encodeURIComponent for safety against any future

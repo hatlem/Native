@@ -1,5 +1,6 @@
 import type { Prisma } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
+import { asNoticeLocale } from "@/lib/notices/messages";
 import {
   commitGrantFor,
   resolveOrgMembership,
@@ -92,7 +93,8 @@ export async function grantSeatFromInvite(
 // already has an account".
 export async function createAccountFromInvite(
   invite: ClaimableInvite,
-  account: { name: string | null; passwordHash: string | null },
+  // locale: the language the invite was opened in (User.locale).
+  account: { name: string | null; passwordHash: string | null; locale?: string | null },
   now: Date = new Date(),
 ): Promise<string> {
   return prisma.$transaction(async (tx) => {
@@ -103,6 +105,7 @@ export async function createAccountFromInvite(
         role: "BUYER",
         passwordHash: account.passwordHash,
         organizationId: invite.organizationId,
+        locale: asNoticeLocale(account.locale),
         // The invite link was opened from the invited mailbox — proof of
         // ownership, so the account starts verified.
         emailVerifiedAt: now,

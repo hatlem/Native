@@ -67,11 +67,10 @@ async function sendDueWave(wave: DueWave): Promise<"sent" | "skipped"> {
   if (result.outcome !== "submitted") return "skipped";
 
   // Tell the buying org their wave went out — with a link to the request so
-  // they land where the quote will appear. Localized by the org's market,
-  // same convention as the ORDER_COMPLETED notice.
+  // they land where the quote will appear. Each member reads it in their own
+  // language (lib/notify.ts).
   await notifyOrg(list.organizationId, {
     kind: "RFQ_SUBMITTED",
-    locale: marketDefaultLocale(list.organization.marketCode),
     template: {
       key: "programmeAutoSend",
       params: {

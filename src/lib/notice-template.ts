@@ -1,17 +1,19 @@
-// Notification templates: a notice stored as (key, params) as well as a
-// finished string, so the in-app inbox can render it in the VIEWER's language.
+// Notification templates: every notice is a template key + params, stored as
+// such as well as a finished string, so the in-app inbox can render it in the
+// VIEWER's language and each email goes out in its RECIPIENT's language.
 //
-// Why: notices were written once, in the org's home-market language (there is
-// no per-user locale). A Norwegian user in a Swedish-market org read Swedish
-// "har nu ett pris" on a Norwegian UI, and a desk user read whatever the
-// sender picked. The email still goes out in the market language at write
-// time (an email can't be re-rendered); the inbox row re-renders from its
-// template in whatever locale the page is viewed in, links included.
+// Why: notices were once written as finished English (or org-market) strings.
+// A Norwegian user in a Swedish-market org read Swedish, the desk read
+// English, and a Norwegian writer got "New assignment". notify*() now only
+// accepts a template (src/lib/notify.ts) and renders it per recipient
+// (User.locale, falling back to the org's market); the inbox row re-renders
+// from its template in whatever locale the page is viewed in, links included.
 //
-// The copy itself stays where it lives and is tested — the per-notice builder
-// modules. This registry only maps a key to (params schema, builder call), and
-// params are validated on READ too: a row written by an older deploy with a
-// different shape falls back to its stored strings instead of throwing.
+// The copy lives with its builders: the older per-notice modules below keep
+// their tested in-code tables, and everything newer is in the `notices`
+// namespace of src/messages/<locale>.json (src/lib/notices/*). This registry
+// only maps a key to (params schema, render). notice-template.test.ts renders
+// every key in all six locales, so a template can't ship half-translated.
 
 import { z } from "zod";
 import type { BuyerLocale } from "@/lib/market-locale";
@@ -21,20 +23,14 @@ import { buildOrderCompletedNotice } from "@/lib/order-completed-notice";
 import { buildOrderLiveNotice } from "@/lib/order-live-notice";
 import { buildAutoSendNotice } from "@/lib/programme-autosend-notice";
 import { buildClientApprovalNotice } from "@/lib/client-approval-notice";
+import { defineTemplate, id, type RenderedNotice, type Template } from "@/lib/notices/define";
+import { ORDER_TEMPLATES } from "@/lib/notices/order-notices";
+import { CONTENT_TEMPLATES } from "@/lib/notices/content-notices";
+import { DESK_TEMPLATES } from "@/lib/notices/desk-notices";
+import { PUBLISHER_TEMPLATES } from "@/lib/notices/publisher-notices";
 
-export type RenderedNotice = { title: string; body: string; link: string };
+export type { RenderedNotice } from "@/lib/notices/define";
 
-type Template<S extends z.ZodType> = {
-  params: S;
-  render: (params: z.infer<S>, locale: BuyerLocale) => RenderedNotice;
-};
-
-// Identity helper: ties each render's parameter type to its own schema.
-function defineTemplate<S extends z.ZodType>(t: Template<S>): Template<S> {
-  return t;
-}
-
-const id = z.string().min(1);
 // Delivery evidence (order-lifecycle.ts deliveryGap): published of total.
 const delivery = z.object({ published: z.number().int().min(0), total: z.number().int().min(0) });
 
@@ -108,7 +104,14 @@ const TEMPLATES = {
     params: z.object({ planName: z.string(), listId: id }),
     render: (p, locale) => buildClientApprovalNotice({ marketCode: null, ...p, locale }),
   }),
+  ...ORDER_TEMPLATES,
+  ...CONTENT_TEMPLATES,
+  ...DESK_TEMPLATES,
+  ...PUBLISHER_TEMPLATES,
 };
+
+/** Every registered key — the test renders each one in every locale. */
+export const NOTICE_KEYS = Object.keys(TEMPLATES) as NoticeKey[];
 
 type Templates = typeof TEMPLATES;
 export type NoticeKey = keyof Templates;
@@ -137,5 +140,6 @@ export function renderStoredNotice(
   const entry = TEMPLATES[messageKey as NoticeKey] as Template<z.ZodType>;
   const parsed = entry.params.safeParse(messageParams);
   if (!parsed.success) return null;
-  return entry.render(parsed.data, locale);
+  const { title, body, link } = entry.render(parsed.data, locale);
+  return { title, body, link };
 }

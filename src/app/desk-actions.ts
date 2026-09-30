@@ -9,7 +9,7 @@ import { recordAudit } from "@/lib/audit";
 import { notifyOrg, notifyPublisher } from "@/lib/notify";
 import { requireDesk } from "@/lib/desk-guard";
 import { findDueWaves } from "@/lib/programme";
-import { marketDefaultLocale, type BuyerLocale } from "@/lib/market-locale";
+import { orderNoticeContext } from "@/lib/notice-context";
 import { deliveryGap, nextOrderStatus } from "@/lib/order-lifecycle";
 import {
   canCancelOrder,
@@ -83,13 +83,12 @@ export async function advanceOrder(formData: FormData) {
         // would show whichever list happens to be active); otherwise to the
         // finished order, which offers "Plan next wave" (a full copy of the
         // list, ready to edit).
-        const planName = await orderPlanName(order.id);
+        const { planName } = await orderNoticeContext(order.id);
         const due = (await findDueWaves([order.organizationId], new Date()))[0] ?? null;
-        // Templated (lib/notice-template.ts): the email in the org's market
-        // language, the inbox row in each reader's own.
+        // Templated (lib/notice-template.ts): each email and inbox row in
+        // its reader's own language.
         await notifyOrg(order.organizationId, {
           kind: "ORDER_COMPLETED",
-          locale: await orgLocale(order.organizationId),
           template: {
             key: "orderCompleted",
             params: {
@@ -109,19 +108,37 @@ export async function advanceOrder(formData: FormData) {
       } else if (next === "LIVE") {
         // Copy built from the evidence, not the status: "published" only
         // when every placement has a published link.
+        const { planName } = await orderNoticeContext(order.id);
         await notifyOrg(order.organizationId, {
           kind: "ASSET_REVIEW",
-          locale: await orgLocale(order.organizationId),
+          template: { key: "orderLive", params: { planName, orderId: order.id, ...delivery } },
+        });
+      } else if (next === "IN_PRODUCTION") {
+        const { planName } = await orderNoticeContext(order.id);
+        await notifyOrg(order.organizationId, {
+          kind: "ASSET_REVIEW",
           template: {
-            key: "orderLive",
-            params: { planName: await orderPlanName(order.id), orderId: order.id, ...delivery },
+            key: "orderInProduction",
+            params: { planName, orderId: order.id, placements: gap.total },
           },
         });
-      } else {
+      } else if (next === "SCHEDULED") {
+        // The body names the flight window the desk set on the order, else
+        // the span of the publishers' placement dates, else says there is
+        // no date yet — never a bare "Order scheduled".
+        const { planName } = await orderNoticeContext(order.id);
+        const window = await scheduledWindow(order.id);
         await notifyOrg(order.organizationId, {
           kind: "ASSET_REVIEW",
-          title: `Order ${next.toLowerCase().replace(/_/g, " ")}`,
-          link: `/${locale}/orders/${order.id}`,
+          template: {
+            key: "orderScheduled",
+            params: {
+              planName,
+              orderId: order.id,
+              startsOn: window.start?.toISOString() ?? null,
+              endsOn: window.end?.toISOString() ?? null,
+            },
+          },
         });
       }
     }
@@ -129,24 +146,25 @@ export async function advanceOrder(formData: FormData) {
   redirect(back);
 }
 
-// Buyer-facing notifications are read by the BUYER org, so copy and link
-// locale come from the org's home market, not from the desk associate's UI
-// language (which previously leaked into the buyer's inbox). marketCode is
-// nullable until onboarding completes; English is the safe default.
-async function orgLocale(organizationId: string): Promise<BuyerLocale> {
-  const org = await prisma.organization.findUnique({
-    where: { id: organizationId },
-    select: { marketCode: true },
-  });
-  return org?.marketCode ? marketDefaultLocale(org.marketCode) : "en";
-}
-
-async function orderPlanName(orderId: string): Promise<string> {
-  const o = await prisma.order.findUnique({
+// The window a SCHEDULED order runs in: the flight dates on the order when
+// the desk set them, else the span of the placement dates publishers booked.
+async function scheduledWindow(orderId: string): Promise<{ start: Date | null; end: Date | null }> {
+  const order = await prisma.order.findUniqueOrThrow({
     where: { id: orderId },
-    select: { quote: { select: { request: { select: { plan: { select: { name: true } } } } } } },
+    select: {
+      flightStartDate: true,
+      flightEndDate: true,
+      lines: { select: { booking: { select: { placementDate: true } } } },
+    },
   });
-  return o?.quote.request.plan.name ?? "your campaign";
+  if (order.flightStartDate) {
+    return { start: order.flightStartDate, end: order.flightEndDate };
+  }
+  const dates = order.lines
+    .map((l) => l.booking?.placementDate?.getTime())
+    .filter((t): t is number => typeof t === "number");
+  if (dates.length === 0) return { start: null, end: null };
+  return { start: new Date(Math.min(...dates)), end: new Date(Math.max(...dates)) };
 }
 
 // Update the post-order follow-up commitment note on the order. Lets
@@ -269,11 +287,10 @@ export async function cancelOrder(formData: FormData) {
     actor,
   });
 
+  const { planName, orgName } = await orderNoticeContext(order.id);
   await notifyOrg(order.organizationId, {
     kind: "ORDER_CANCELLED",
-    title: "Order cancelled",
-    body: reason,
-    link: `/${locale}/orders/${order.id}`,
+    template: { key: "orderCancelled", params: { planName, orderId: order.id, reason } },
   });
   // Notify each distinct publisher whose title was on the order so
   // their portal stops showing the booking as in-flight.
@@ -281,9 +298,7 @@ export async function cancelOrder(formData: FormData) {
     publisherIds.map((pid) =>
       notifyPublisher(pid, {
         kind: "ORDER_CANCELLED",
-        title: "Order cancelled by NativeSpin desk",
-        body: reason,
-        link: `/${locale}/publisher/orders`,
+        template: { key: "publisherOrderCancelled", params: { orgName, reason } },
       }),
     ),
   );
@@ -313,7 +328,7 @@ export async function resolvePlanTitleItem(formData: FormData) {
   if (item && !item.productId && item.titleId) {
     const product = await prisma.product.findFirst({
       where: { id: productId, titleId: item.titleId, active: true, bookable: true },
-      select: { id: true },
+      select: { id: true, type: true, title: { select: { name: true } } },
     });
     if (product) {
       await prisma.planItem.update({
@@ -333,9 +348,10 @@ export async function resolvePlanTitleItem(formData: FormData) {
       if (req) {
         await notifyOrg(req.organizationId, {
           kind: "PLACEMENT_PROPOSED",
-          title: "A placement was proposed for your request",
-          body: "Our desk selected a specific placement for a publication you asked it to propose. Review it on your request.",
-          link: `/${locale}/requests/${requestId}`,
+          template: {
+            key: "placementProposed",
+            params: { titleName: product.title.name, productType: product.type, requestId },
+          },
         });
       }
     }
@@ -360,6 +376,7 @@ export async function removePlanTitleItem(formData: FormData) {
     select: { productId: true, titleId: true },
   });
   if (item && !item.productId && item.titleId) {
+    const title = await prisma.title.findUnique({ where: { id: item.titleId }, select: { name: true } });
     await prisma.planItem.deleteMany({ where: { id: planItemId } });
     await recordAudit(userId, "plan.removeTitle", `PlanItem:${planItemId}`, { requestId });
     const req = await prisma.request.findUnique({
@@ -369,9 +386,10 @@ export async function removePlanTitleItem(formData: FormData) {
     if (req) {
       await notifyOrg(req.organizationId, {
         kind: "PLACEMENT_PROPOSED",
-        title: "A placeholder was removed from your request",
-        body: "Our desk removed a publication placeholder that had no bookable placement. The rest of your request is unaffected.",
-        link: `/${locale}/requests/${requestId}`,
+        template: {
+          key: "placeholderRemoved",
+          params: { titleName: title?.name ?? "", requestId },
+        },
       });
     }
   }

@@ -4,7 +4,7 @@ import { redirect } from "next/navigation";
 import { ContentAssetStatus, type UserRole } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
 import { recordAudit } from "@/lib/audit";
-import { notifyOrg } from "@/lib/notify";
+import { draftNoticeContext, notifyChangesRequested, notifyDraftReady } from "@/lib/content/review-notices";
 import { enqueue } from "@/lib/jobs";
 import {
   runSpecCheckForPlacement,
@@ -345,21 +345,19 @@ export async function setAssetStatus(formData: FormData) {
       });
       if (target === "IN_REVIEW" || target === "CHANGES_REQUESTED") {
         const hintOrderId = orderLineIdHint
-          ? (await prisma.orderLine.findUnique({
+          ? ((await prisma.orderLine.findUnique({
               where: { id: orderLineIdHint },
               select: { orderId: true },
-            }))?.orderId
+            }))?.orderId ?? null)
           : null;
-        await notifyOrg(asset.article.organizationId, {
-          kind: "ASSET_REVIEW",
-          title:
-            target === "IN_REVIEW"
-              ? "Content draft ready for review"
-              : "Content changes requested",
-          link: hintOrderId
-            ? `/${locale}/orders/${hintOrderId}`
-            : `/${locale}/articles/${articleId}`,
-        });
+        const ctx = await draftNoticeContext(asset.id, hintOrderId);
+        if (ctx && target === "IN_REVIEW") await notifyDraftReady(ctx);
+        // Sent back from the desk: the writer reworks it, and the buyer
+        // knows why the draft they were waiting for isn't there yet. (This
+        // form takes no comment; the desk's notes live on the line.)
+        if (ctx && target === "CHANGES_REQUESTED") {
+          await notifyChangesRequested(ctx, "desk", null);
+        }
       }
     }
   }

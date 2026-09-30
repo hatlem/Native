@@ -230,9 +230,14 @@ if (!RUN_DB_IT) {
     assert.equal(p.confirmedAt?.getTime(), before.confirmedAt?.getTime());
 
     const note = await prisma.notification.findFirst({
-      where: { link: { contains: `/desk/titles/${titleAId}` }, title: "Publisher updated a lead time" },
+      where: { link: { contains: `/desk/titles/${titleAId}` }, messageKey: "publisherLeadTimeUpdated" },
     });
     assert.ok(note, "the desk hears about it");
+    // What changed, not just that something did (BUG-roles-team-r2-3).
+    assert.deepEqual(
+      { from: (note.messageParams as { from: unknown }).from, to: (note.messageParams as { to: unknown }).to },
+      { from: before.leadTimeDays, to: 12 },
+    );
 
     // Same value again: no write, no second notification.
     assert.deepEqual(

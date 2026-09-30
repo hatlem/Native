@@ -16,7 +16,6 @@
 import { prisma } from "@/lib/prisma";
 import { recordAudit } from "@/lib/audit";
 import { notifyOrg, notifyDesk } from "@/lib/notify";
-import { marketDefaultLocale } from "@/lib/market-locale";
 
 const NOTIFIED_ACTION = "placement-ready.notified";
 const entityFor = (itemId: string) => `SavedListItem:${itemId}`;
@@ -47,7 +46,6 @@ export async function runPlacementReadySweep(): Promise<PlacementReadySweepResul
           id: true,
           name: true,
           organizationId: true,
-          organization: { select: { marketCode: true } },
         },
       },
       title: { select: { name: true } },
@@ -92,22 +90,16 @@ export async function runPlacementReadySweep(): Promise<PlacementReadySweepResul
       });
       if (!product) continue;
 
-      // Stored as a template, so each inbox renders it in its reader's
-      // language; the emails go out in the org's market language (buyer) and
-      // English, the source language (desk — there is no per-user locale).
+      // A template: every email and inbox row in its reader's own language
+      // (lib/notify.ts).
       const template = {
         key: "placementReady",
         params: { titleName: item.title!.name, listName: item.list.name, listId: item.list.id },
       } as const;
-      const marketCode = item.list.organization.marketCode;
 
       await Promise.all([
-        notifyOrg(item.list.organizationId, {
-          kind: "TITLE_PRODUCT_READY",
-          template,
-          locale: marketCode ? marketDefaultLocale(marketCode) : "en",
-        }),
-        notifyDesk({ kind: "TITLE_PRODUCT_READY", template, locale: "en" }),
+        notifyOrg(item.list.organizationId, { kind: "TITLE_PRODUCT_READY", template }),
+        notifyDesk({ kind: "TITLE_PRODUCT_READY", template }),
       ]);
       await recordAudit(null, NOTIFIED_ACTION, entity, { productId: product.id });
       notified++;
