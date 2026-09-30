@@ -13,7 +13,7 @@ import { loadVerticalOptions, localizedVerticalOptions } from "@/lib/catalog-tax
 import { localizeVertical } from "@/lib/taxonomy-i18n";
 import { safeLocale } from "@/i18n/routing";
 import { readActiveListId, resolveActiveList } from "@/lib/lists";
-import { barTotals, planLineCount } from "@/lib/plan-total";
+import { barTotals, planLineCount, planTitleIds } from "@/lib/plan-total";
 import { refreshStaleTitlePriceBands } from "@/lib/pricing/title-band";
 import { BAND_TIER_COUNT, tierLabel } from "@/lib/pricing/bands";
 import { loadPricingDefaults } from "@/lib/content-fee";
@@ -343,6 +343,7 @@ export default async function CatalogPage({
   // Every line the plan shows (placeholders included), priced server-side —
   // the same count and totals the "Add to plan" action returns.
   const shortlistCount = planLineCount(activeList?.items ?? []);
+  const shortlistTitleIds = planTitleIds(activeList?.items ?? []);
   const shortlistTotals = activeList ? barTotals(activeList.items, await loadPricingDefaults()) : [];
   const planName = activeList?.name ?? t("shortlist.untitledPlan");
 
@@ -549,6 +550,7 @@ export default async function CatalogPage({
       locale={locale}
       planName={planName}
       initialCount={shortlistCount}
+      initialTitleIds={shortlistTitleIds}
       initialProductIds={shortlistProductIds}
       initialTotals={shortlistTotals}
       readOnly={readOnly}

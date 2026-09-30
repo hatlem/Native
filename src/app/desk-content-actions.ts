@@ -14,6 +14,7 @@ import {
 import {
   canMoveAsset,
   isTerminalAssetStatus,
+  nextReviewRound,
   supersedeOlderVersions,
   supersedesOlderVersions,
 } from "@/lib/content/versions";
@@ -329,9 +330,16 @@ export async function setAssetStatus(formData: FormData) {
     }
 
     if (asset) {
-      await prisma.contentAsset.update({
-        where: { id: asset.id },
-        data: { status: target },
+      // A hand-over to the client opens the next review round — the number
+      // the buyer and the draft notices show (versions.ts nextReviewRound).
+      // Read and written in one transaction (nextReviewRound locks the article).
+      await prisma.$transaction(async (tx) => {
+        const reviewRound =
+          target === "IN_REVIEW" ? await nextReviewRound(tx, asset.articleId) : undefined;
+        await tx.contentAsset.update({
+          where: { id: asset.id },
+          data: { status: target, ...(reviewRound ? { reviewRound } : {}) },
+        });
       });
       if (supersedesOlderVersions(target)) {
         await supersedeOlderVersions(prisma, {

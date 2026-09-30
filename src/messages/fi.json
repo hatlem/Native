@@ -445,6 +445,7 @@
       "untitledPlan": "suunnitelmasi",
       "barLabel": "Valinnat",
       "summaryCount": "{count, plural, =1 {1 julkaisu suunnitelmassa nimeltä} other {# julkaisua suunnitelmassa nimeltä}}",
+      "summaryCountFormats": "{titles, plural, =1 {1 julkaisu} other {# julkaisua}} · {formats, plural, =1 {1 formaatti} other {# formaattia}} suunnitelmassa nimeltä",
       "totalLabel": "Suuntaa-antava summa",
       "totalPending": "Deskimme hinnoittelee",
       "reviewPlan": "Tarkista suunnitelma",
@@ -1506,6 +1507,7 @@
     "audience": "Yleisö",
     "noAssets": "Ei vielä sisältöä.",
     "version": "Versio",
+    "reviewRound": "lähetetty asiakkaalle versiona {round}",
     "status": "Tila",
     "specPass": "Spesifikaatio läpäisty",
     "specFail": "Spesifikaatio-ongelmia",
@@ -1558,6 +1560,7 @@
     "pageOf": "Sivu {page}/{pages}",
     "listTitle": "Laskut",
     "listLead": "Kaikki organisaatiosi laskut. Avaa lasku nähdäksesi rivit tai lataa PDF.",
+    "listLeadNoPdf": "Kaikki organisaatiosi laskut. Avaa lasku nähdäksesi rivit ja maksutiedot.",
     "emptyTitle": "Ei vielä laskuja",
     "emptyHint": "Laskut näkyvät täällä, kun kampanja on pyörinyt ja laskutettu.",
     "emptyCta": "Katso kampanjasi",
@@ -1577,6 +1580,7 @@
   },
   "firm": {
     "badge": "Pikatilaus",
+    "badgeSomeFormats": "Pikatilaus osalle formaateista",
     "planTitle": "Vahvista tilauksesi",
     "planNote": "Kaikilla riveillä on kiinteä hinta — lähettäminen vahvistaa tilauksesi heti, ei deskin odotusta.",
     "planSubmit": "Vahvista tilaus",
@@ -1630,6 +1634,7 @@
     "save": "Tallenna",
     "saving": "Tallennetaan…",
     "firm": "Kiinteä (pikatilaus)",
+    "firmNotInstant": "Kiinteä (tarjouspyynnöllä, kunnes hinta on vahvistettu ja julkinen)",
     "indicative": "Suuntaa-antava (tarjouspyyntö)",
     "status": "Tilauksen tila",
     "booking": "Varauksen tila",
@@ -2847,7 +2852,7 @@
     "languageEyebrow": "Asetukset",
     "languageTitle": "Kieli",
     "languageLabel": "Näyttökieli",
-    "languageHint": "Vaihtaa kielen koko NativeSpinissä. Tallennetaan tähän selaimeen.",
+    "languageHint": "Vaihtaa kielen koko NativeSpinissä, myös sinulle lähettämissämme sähköposteissa ja ilmoituksissa.",
     "companyEyebrow": "Yritys",
     "companyTitle": "Yritystiedot",
     "orgLabel": "Yrityksen nimi",
@@ -3753,7 +3758,8 @@
     },
     "invoiceIssued": {
       "title": "Lasku lähetetty: {plan}",
-      "body": "Yhteensä {amount} sis. alv, eräpäivä {due}. Avaa lasku ladataksesi PDF-tiedoston."
+      "body": "Yhteensä {amount} sis. alv, eräpäivä {due}. Avaa lasku ladataksesi PDF-tiedoston.",
+      "bodyNoPdf": "Yhteensä {amount} sis. alv, eräpäivä {due}. Avaa lasku nähdäksesi rivit ja maksutiedot."
     },
     "creditNoteIssued": {
       "title": "Hyvityslasku lähetetty: {plan}",

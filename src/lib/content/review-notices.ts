@@ -12,6 +12,7 @@ import { writerFallbackLocale } from "@/lib/writers/notify";
 export type DraftNoticeContext = {
   articleId: string;
   articleTitle: string;
+  // The review round the client knows the draft by (see below).
   version: number;
   organizationId: string;
   orgName: string;
@@ -32,6 +33,7 @@ export async function draftNoticeContext(
     where: { id: assetId },
     select: {
       version: true,
+      reviewRound: true,
       article: {
         select: {
           id: true,
@@ -66,7 +68,10 @@ export async function draftNoticeContext(
   return {
     articleId: article.id,
     articleTitle: article.title,
-    version: asset.version,
+    // Every notice here is about a draft handed to the client, so it names
+    // the review round ("version 1" for the first review), not the save
+    // count; a version from before rounds were recorded keeps its own.
+    version: asset.reviewRound ?? asset.version,
     organizationId: article.organizationId,
     orgName: article.organization.name,
     orderId: orderIdHint ?? placements[0]?.orderLine.orderId ?? null,

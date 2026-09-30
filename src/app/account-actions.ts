@@ -12,6 +12,7 @@ import { canDeactivateSelf } from "@/lib/user-admin";
 import { companySeat, getWorkspace } from "@/lib/workspace";
 import { normaliseEmail } from "@/lib/email-change";
 import { SUPPORTED_MARKETS } from "@/lib/markets";
+import { asNoticeLocale } from "@/lib/notices/messages";
 
 const MARKET_CODES: readonly string[] = SUPPORTED_MARKETS;
 
@@ -49,6 +50,33 @@ export async function updateProfile(formData: FormData) {
     fields: ["name", "phone"],
   });
   redirect(`/${locale}/account?ok=profile#profile`);
+}
+
+// Persist the language picked under Account → Language as the user's stored
+// language (User.locale). The URL prefix and NEXT_LOCALE cookie only steer
+// this browser; every email and notice addressed to the user renders in
+// User.locale (lib/notify.ts), so without this write the switch would reach
+// their inbox only after the next sign-in. Called by the client switcher
+// before it re-navigates — it returns rather than redirects so the switcher
+// keeps control of the navigation. An unknown locale is ignored.
+export async function saveLanguagePreference(locale: string): Promise<{ ok: boolean }> {
+  const session = await auth();
+  if (!session?.user?.id) return { ok: false };
+  const next = asNoticeLocale(locale);
+  if (!next) return { ok: false };
+
+  const res = await prisma.user.updateMany({
+    // Only when it changes (NULL never equals, hence the explicit null arm),
+    // so re-picking the current language writes no audit row.
+    where: { id: session.user.id, OR: [{ locale: null }, { NOT: { locale: next } }] },
+    data: { locale: next },
+  });
+  if (res.count > 0) {
+    await recordAudit(session.user.id, "user.locale_updated", `User:${session.user.id}`, {
+      locale: next,
+    });
+  }
+  return { ok: true };
 }
 
 export async function updateCompany(formData: FormData) {

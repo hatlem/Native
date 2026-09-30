@@ -95,6 +95,21 @@ export function planLineCount(items: { isAlternative?: boolean }[]): number {
   return items.filter((i) => !i.isAlternative).length;
 }
 
+// The distinct titles behind those lines — a placement's title or a
+// placeholder's own. Three formats of one title are one title: the bar read
+// "3 titles" for Aftenposten ×3 when it counted lines as titles.
+export function planTitleIds(
+  items: { isAlternative?: boolean; titleId?: string | null; product?: { titleId: string } | null }[],
+): string[] {
+  const ids = new Set<string>();
+  for (const i of items) {
+    if (i.isAlternative) continue;
+    const id = i.product?.titleId ?? i.titleId;
+    if (id) ids.add(id);
+  }
+  return [...ids];
+}
+
 // One priced line, split the way the order charges it: the placement
 // (per-line rounded, market default margin) plus — for "We write it" — one
 // content fee. Null when the line has no concrete product or its price is not

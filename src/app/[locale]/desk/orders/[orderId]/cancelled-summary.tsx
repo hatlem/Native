@@ -1,6 +1,7 @@
 import { getTranslations } from "next-intl/server";
 import type { Invoice, Prisma } from "@prisma/client";
 import { formatMoney } from "@/lib/money";
+import { formatZonedDateTime } from "@/lib/time-zone";
 import { creditNoteEligibility } from "@/lib/order-lifecycle";
 import { CreditNoteForm } from "./credit-note-form";
 
@@ -12,9 +13,12 @@ type Props = {
   locale: string;
   order: OrderForCancelledSummary;
   invoice: Invoice | undefined;
+  // The customer org's zone (house zone until it has a market) — the same
+  // clock the rest of the order's dates are read on.
+  timeZone: string;
 };
 
-export async function CancelledSummary({ locale, order, invoice }: Props) {
+export async function CancelledSummary({ locale, order, invoice, timeZone }: Props) {
   if (!(order.status === "CANCELLED" && order.cancelledAt)) return null;
   const t = await getTranslations({ locale, namespace: "order" });
   const credit = order.creditNotes[0];
@@ -28,7 +32,7 @@ export async function CancelledSummary({ locale, order, invoice }: Props) {
       <h2>{t("cancelledAtLabel")}</h2>
       <dl className="spec-grid">
         <dt>{t("cancelledAtLabel")}</dt>
-        <dd>{order.cancelledAt.toISOString().slice(0, 16).replace("T", " ")}</dd>
+        <dd>{formatZonedDateTime(order.cancelledAt, locale, timeZone)}</dd>
         {order.cancelledBy ? (
           <>
             <dt>{t("cancelledByLabel")}</dt>

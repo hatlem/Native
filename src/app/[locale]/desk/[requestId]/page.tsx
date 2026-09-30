@@ -21,6 +21,7 @@ import { MailLink, SafeEmail, SubmitButton, withSafeEmails } from "@/components"
 import { canSeeCostVsSell } from "@/lib/roles";
 import { isStorageConfigured, presignDownload } from "@/lib/storage/r2";
 import { intlLocale } from "@/lib/money";
+import { formatZonedDateTime } from "@/lib/time-zone";
 import {
   QUOTE_VALIDITY_DAYS,
   QUOTE_VALIDITY_MAX_DAYS,
@@ -684,10 +685,7 @@ export default async function DeskRequestPage({
                                   l.priceSetBy?.name ??
                                   l.priceSetBy?.email ??
                                   t("linePriceSetByUnknown"),
-                                date: new Intl.DateTimeFormat(intlLocale(locale), {
-                                  dateStyle: "medium",
-                                  timeStyle: "short",
-                                }).format(l.priceSetAt),
+                                date: formatZonedDateTime(l.priceSetAt, locale, buyerTimeZone),
                               }),
                             )}
                           </div>
@@ -830,18 +828,13 @@ export default async function DeskRequestPage({
                             <a href={d.url} target="_blank" rel="noreferrer">
                               {t("pdfVersionRow", {
                                 version: d.version,
-                                date: new Intl.DateTimeFormat(intlLocale(locale), {
-                                  dateStyle: "medium",
-                                  timeStyle: "short",
-                                }).format(d.generatedAt),
+                                date: formatZonedDateTime(d.generatedAt, locale, buyerTimeZone),
                               })}
                             </a>
                           ) : (
                             t("pdfVersionRow", {
                               version: d.version,
-                              date: new Intl.DateTimeFormat(intlLocale(locale)).format(
-                                d.generatedAt,
-                              ),
+                              date: formatZonedDateTime(d.generatedAt, locale, buyerTimeZone),
                             })
                           )}
                         </li>

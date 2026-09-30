@@ -110,3 +110,15 @@ test("renderQuoteDocx: a revision says which revision it is and which quote it r
   const sv = zipEntry(await renderQuoteDocx(revised, "sv", quoteMessagesFor("sv")), "word/document.xml");
   assert.match(sv, /ersätter offert ABCD1234/);
 });
+
+test("renderQuoteDocx: a Norwegian quote prints the title taxonomy in Norwegian", async () => {
+  const nb = {
+    ...data,
+    rows: [{ ...data.rows[0], vertical: "News (National)", audience: "General consumer", frequency: "Daily" }],
+  };
+  const body = zipEntry(await renderQuoteDocx(nb, "no", quoteMessagesFor("no")), "word/document.xml");
+  assert.match(body, /Nyheter \(riks\)/);
+  assert.match(body, /Bredt publikum/);
+  assert.match(body, /Daglig/);
+  assert.doesNotMatch(body, /News \(National\)|General consumer/);
+});

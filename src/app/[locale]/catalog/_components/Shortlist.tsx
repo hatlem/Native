@@ -6,6 +6,7 @@ import {
   useContext,
   useEffect,
   useMemo,
+  useRef,
   useState,
   type ReactNode,
 } from "react";
@@ -23,6 +24,7 @@ type LineTotal = TotalFigure;
 // so no banded line's exact estimate ever reaches the browser.
 type ShortlistItem = {
   productId: string;
+  titleId: string;
   titleName: string;
 };
 
@@ -53,6 +55,7 @@ export function ShortlistProvider({
   locale,
   planName,
   initialCount,
+  initialTitleIds,
   initialProductIds,
   initialTotals,
   readOnly = false,
@@ -61,6 +64,9 @@ export function ShortlistProvider({
   locale: string;
   planName: string;
   initialCount: number;
+  // The distinct titles on the plan (lib/plan-total planTitleIds), so the bar
+  // can tell "1 title · 3 formats" from "3 titles".
+  initialTitleIds: string[];
   initialProductIds: string[];
   initialTotals: LineTotal[];
   readOnly?: boolean;
@@ -74,7 +80,9 @@ export function ShortlistProvider({
   const [error, setError] = useState<string | null>(null);
   // The server's latest word on the plan (count + totals); null until the
   // first add on this page returns.
-  const [server, setServer] = useState<{ count: number; totals: LineTotal[] } | null>(null);
+  const [server, setServer] = useState<{ count: number; titleIds: string[]; totals: LineTotal[] } | null>(
+    null,
+  );
   const initialIds = useMemo(() => new Set(initialProductIds), [initialProductIds]);
 
   useEffect(() => {
@@ -124,7 +132,9 @@ export function ShortlistProvider({
       // Concurrent adds resolve in any order; the one with the most lines is
       // the latest state of the plan (adds only ever grow it).
       setServer((prev) =>
-        prev && prev.count > result.count ? prev : { count: result.count, totals: result.totals },
+        prev && prev.count > result.count
+          ? prev
+          : { count: result.count, titleIds: result.titleIds, totals: result.totals },
       );
       return true;
     },
@@ -139,6 +149,13 @@ export function ShortlistProvider({
   // Optimistic count for adds still in flight; the total only ever shows a
   // server-priced figure (the last one known while an add is pending).
   const count = server ? server.count + pendingIds.size : initialCount + added.length;
+  // Titles: the server's set plus the titles of adds still in flight — a
+  // second format of a title already on the plan adds a line, not a title.
+  const titleCount = useMemo(() => {
+    const ids = new Set(server?.titleIds ?? initialTitleIds);
+    for (const a of added) if (pendingIds.has(a.productId) || !server) ids.add(a.titleId);
+    return ids.size;
+  }, [server, initialTitleIds, added, pendingIds]);
   const totals = server?.totals ?? initialTotals;
 
   return (
@@ -149,6 +166,7 @@ export function ShortlistProvider({
           locale={locale}
           planName={planName}
           count={count}
+          titleCount={titleCount}
           totals={totals}
           recentTitles={added.map((a) => a.titleName)}
         />
@@ -169,27 +187,53 @@ function ShortlistBar({
   locale,
   planName,
   count,
+  titleCount,
   totals,
   recentTitles,
 }: {
   locale: string;
   planName: string;
   count: number;
+  titleCount: number;
   totals: LineTotal[];
   recentTitles: string[];
 }) {
   const t = useTranslations("catalog.shortlist");
   const tPlan = useTranslations("plan");
   // "up to four title chips" — most-recently-added first reads as
-  // confirmation of what you just did, not an arbitrary slice.
-  const chips = recentTitles.slice(-4).reverse();
+  // confirmation of what you just did, not an arbitrary slice. One chip per
+  // title: three formats of Aftenposten are one Aftenposten.
+  const chips = [...new Set([...recentTitles].reverse())].slice(0, 4);
+
+  // Publish the bar's height so the floating compare pill (globals.css
+  // .compare-bar) can sit above it rather than over the plan total. Measured,
+  // not assumed: the bar wraps to more rows on narrow screens.
+  const barRef = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    const el = barRef.current;
+    if (!el) return;
+    const root = document.documentElement;
+    const publish = () => root.style.setProperty("--shortlist-bar-h", `${el.offsetHeight}px`);
+    publish();
+    const observer = new ResizeObserver(publish);
+    observer.observe(el);
+    return () => {
+      observer.disconnect();
+      root.style.removeProperty("--shortlist-bar-h");
+    };
+  }, []);
 
   return (
-    <div className="shortlist-bar" role="region" aria-label={t("barLabel")}>
+    <div ref={barRef} className="shortlist-bar" role="region" aria-label={t("barLabel")}>
       <div className="shortlist-bar__left">
         <span className="shortlist-bar__count">{count}</span>
         <span className="shortlist-bar__summary">
-          {t("summaryCount", { count })} <strong>{planName}</strong>
+          {/* Lines and titles only differ when a title is on the plan in
+              more than one format; then say both ("1 title · 3 formats"). */}
+          {titleCount > 0 && titleCount < count
+            ? t("summaryCountFormats", { titles: titleCount, formats: count })
+            : t("summaryCount", { count })}{" "}
+          <strong>{planName}</strong>
         </span>
         {chips.length ? (
           <div className="shortlist-bar__chips">
@@ -229,6 +273,7 @@ function ShortlistBar({
 
 export function ShortlistButton({
   productId,
+  titleId,
   titleName,
   hasPrice,
   addLabel,
@@ -236,6 +281,7 @@ export function ShortlistButton({
   askLabel,
 }: {
   productId: string;
+  titleId: string;
   titleName: string;
   hasPrice: boolean;
   addLabel: string;
@@ -253,7 +299,7 @@ export function ShortlistButton({
       className={`btn small catalog-row__cta${onPlan ? " is-added" : ""}`}
       disabled={onPlan || pending}
       aria-busy={pending}
-      onClick={() => add({ productId, titleName })}
+      onClick={() => add({ productId, titleId, titleName })}
     >
       {onPlan ? `✓ ${addedLabel}` : hasPrice ? addLabel : askLabel}
     </button>

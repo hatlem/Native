@@ -6,6 +6,7 @@
 import { prisma } from "@/lib/prisma";
 import { loadPlaybookFor } from "@/lib/playbook";
 import { resolveEffectiveAsset, type EffectiveAsset } from "./placement";
+import { lineBrief } from "./line-brief";
 
 export async function loadWriterLineView(lineId: string) {
   const line = await prisma.orderLine.findUnique({
@@ -67,11 +68,9 @@ export async function loadWriterLineView(lineId: string) {
     ? await loadPlaybookFor(product.type, product.title.category, product.title.countryCode)
     : null;
 
-  // The desk's per-line brief message is copied from the plan's goal, which
-  // is optional — fall back to the buyer's own brief for the request so
-  // the writer still sees what the campaign is about.
-  const message =
-    line.brief?.message?.trim() || line.order.quote.request.briefSummary?.trim() || null;
+  // Message falls back to the buyer's request brief; an audience that only
+  // repeats it is dropped (lib/writers/line-brief.ts).
+  const { message, audience } = lineBrief(line.brief, line.order.quote.request.briefSummary);
 
   return {
     lineId: line.id,
@@ -79,7 +78,7 @@ export async function loadWriterLineView(lineId: string) {
     product,
     brief: {
       message,
-      audience: line.brief?.audience?.trim() || null,
+      audience,
       references: line.brief?.references?.trim() || null,
       doNotes: line.brief?.doNotes?.trim() || null,
       dontNotes: line.brief?.dontNotes?.trim() || null,

@@ -53,3 +53,20 @@ export function isInstantOrderable(
   return product.visibility === "FIRM" && isProductPriceShown(product, title);
 }
 
+// The ⚡ badge on a catalog row describes what that row's "Add to plan"
+// adds. "addable": the product the button adds is instant-orderable, so the
+// plan line gets the exact price and the instant checkout. "someFormats":
+// that product needs a quote but another format of the title can be ordered
+// instantly (from the title page) — a flat "Instant order" there promised
+// something the added line didn't do. Null: no instant format at all.
+export type CatalogInstantBadge = "addable" | "someFormats" | null;
+
+export function catalogInstantBadge<P extends ProductWithConfirmation & { id: string; visibility: string }>(
+  addable: P | null,
+  products: readonly P[],
+  title: TitleWithVisibility,
+): CatalogInstantBadge {
+  if (addable && isInstantOrderable(addable, title)) return "addable";
+  return products.some((p) => isInstantOrderable(p, title)) ? "someFormats" : null;
+}
+
