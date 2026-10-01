@@ -163,6 +163,13 @@ test("publisherCanWrite: the studio flag or an explicit 0 fee offers the publish
   assert.equal(publisherCanWrite({ productionFee: 5000, title: { productionFeeDefault: 0 } }), false);
   assert.equal(publisherCanWrite({ productionFee: null, title: { productionFeeDefault: 3000 } }), false);
   assert.equal(publisherCanWrite({ inclusions: { production: "ADVERTISER" } }), false);
+  // "The advertiser delivers the copy" wins over a 0 fee: that 0 means there
+  // is nothing to produce, not that the publisher's studio writes it.
+  assert.equal(publisherCanWrite({ inclusions: { production: "ADVERTISER" }, productionFee: 0 }), false);
+  assert.equal(
+    publisherCanWrite({ inclusions: { production: "ADVERTISER" }, productionFee: null, title: { productionFeeDefault: 0 } }),
+    false,
+  );
   assert.equal(publisherCanWrite({}), false);
 });
 
