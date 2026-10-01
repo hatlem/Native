@@ -298,15 +298,17 @@ export async function sendPublisherInvite(formData: FormData) {
     link,
     locale: inviteLocale,
   });
+  let emailed = true;
   try {
     await emailAdapter({ to: rawEmail, subject, text });
   } catch (err) {
     // Adapter failure shouldn't block the invite — it's recorded in DB
     // and the super-admin can resend.
+    emailed = false;
     console.error("publisher.invite_email_failed", { publisherId, err });
   }
 
-  redirect(`${backTo}?invite=sent`);
+  redirect(`${backTo}?invite=${emailed ? "sent" : "email-failed"}`);
 }
 
 // Update the buyer-facing pricing fields on a Title: publishedRateCard

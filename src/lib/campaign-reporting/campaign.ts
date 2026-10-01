@@ -138,7 +138,7 @@ export async function buildMetricsCampaign(args: {
 
 export type MetricsNowResult =
   | { ok: false; reason: "not_found" | "not_ended" }
-  | { ok: true; created: number; needsContact: number; sent: number; skipped: number };
+  | { ok: true; created: number; needsContact: number; sent: number; skipped: number; failed: number };
 
 // Desk "send metrics request now" for one order: build any missing requests,
 // then send the first email of every request that hasn't had one yet.
@@ -167,13 +167,18 @@ export async function sendMetricsRequestsNow(args: {
     },
     select: { id: true },
   });
-  let sent = 0, skipped = 0;
+  let sent = 0, skipped = 0, failed = 0;
   for (const r of unsent) {
-    const res = await sendMetricsRequestStep({ requestId: r.id, actorId: args.actorId });
-    if ("sent" in res) sent++;
-    else skipped++;
+    try {
+      const res = await sendMetricsRequestStep({ requestId: r.id, actorId: args.actorId });
+      if ("sent" in res) sent++;
+      else skipped++;
+    } catch (err) {
+      console.error("metrics_request.send_failed", { requestId: r.id, err });
+      failed++;
+    }
   }
-  return { ok: true, created, needsContact, sent, skipped };
+  return { ok: true, created, needsContact, sent, skipped, failed };
 }
 
 // ---------- Select batch ----------

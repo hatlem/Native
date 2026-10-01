@@ -36,6 +36,7 @@ export type MetricsSweepResult = {
   built?: { requests_created: number; needs_contact: number; orders_scanned: number };
   frozen?: number;
   sent?: number;
+  failed?: number;
   skipped?: Record<string, number>;
 };
 
@@ -71,9 +72,17 @@ export async function runMetricsSweep(now: Date = new Date()): Promise<MetricsSw
   const cap = Number(process.env.METRICS_DAILY_CAP ?? 30);
   const batch = await selectMetricsBatchForSend({ limit: Number.isFinite(cap) && cap > 0 ? cap : 30 });
   let sent = 0;
+  let failed = 0;
   const skipped: Record<string, number> = {};
   for (const r of batch) {
-    const res = await sendMetricsRequestStep({ requestId: r.id, actorId: operator?.id ?? "system" });
+    let res: Awaited<ReturnType<typeof sendMetricsRequestStep>>;
+    try {
+      res = await sendMetricsRequestStep({ requestId: r.id, actorId: operator?.id ?? "system" });
+    } catch (err) {
+      console.error("[metrics] send failed", { requestId: r.id, err });
+      failed++;
+      continue;
+    }
     if ("sent" in res) {
       sent++;
     } else {
@@ -83,7 +92,7 @@ export async function runMetricsSweep(now: Date = new Date()): Promise<MetricsSw
       if (res.skipped === "rate_limited") break;
     }
   }
-  return { ran: true, built, frozen, sent, skipped };
+  return { ran: true, built, frozen, sent, failed, skipped };
 }
 
 /** The sweep behind the same xact-scoped advisory-lock pattern as

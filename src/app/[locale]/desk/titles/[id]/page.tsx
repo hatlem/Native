@@ -244,6 +244,10 @@ export default async function DeskTitleEditPage({
         <div className="banner-error" role="alert">
           <span>{t("inviteNotFound")}</span>
         </div>
+      ) : invite === "email-failed" ? (
+        <div className="banner-error" role="alert">
+          <span>{t("inviteEmailFailed")}</span>
+        </div>
       ) : null}
       {error === "invalid-rate" ? (
         <div className="banner-error" role="alert">

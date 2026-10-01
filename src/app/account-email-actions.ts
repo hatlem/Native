@@ -126,9 +126,10 @@ export async function requestEmailChange(formData: FormData) {
     appName: appName(),
   });
 
-  // Both sends are best-effort and independent: a bounce at the old address
-  // must not stop the user changing away from it, which is often exactly why
-  // they're here (lost mailbox, changed employer).
+  // The two sends are independent: a bounce at the old address must not stop
+  // the user changing away from it, which is often exactly why they're here
+  // (lost mailbox, changed employer).
+  let confirmSent = true;
   try {
     await emailAdapter({
       to: newEmail,
@@ -137,7 +138,11 @@ export async function requestEmailChange(formData: FormData) {
       html: confirm.html,
     });
   } catch (err) {
+    confirmSent = false;
     console.error("user.email_change_confirm_failed", { userId, err });
+  }
+  if (!confirmSent) {
+    redirect(`/${locale}/account?error=email_send_failed#email`);
   }
   try {
     await emailAdapter({

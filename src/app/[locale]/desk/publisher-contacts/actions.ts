@@ -93,18 +93,42 @@ export async function sendBatchAction(formData: FormData) {
   const limit = parseInt(f(formData, "limit") || "20", 10);
   const batch = await selectBatchForSend({ limit });
   let sent = 0;
+  let failed = 0;
+  let firstError = "";
   for (const r of batch) {
-    const result = await sendRateCardStep({ requestId: r.id, actorId: userId });
+    let result: Awaited<ReturnType<typeof sendRateCardStep>>;
+    try {
+      result = await sendRateCardStep({ requestId: r.id, actorId: userId });
+    } catch (err) {
+      console.error("outreach.send_failed", { requestId: r.id, err });
+      failed++;
+      firstError ||= errorDetail(err);
+      continue;
+    }
     if ("sent" in result) sent++;
     if ("skipped" in result && result.skipped === "rate_limited") break;
   }
-  redirect(`/${locale}/desk/publisher-contacts?tab=campaign&ok=sent&n=${sent}`);
+  const failure = failed
+    ? `&err=${encodeURIComponent(`${failed} not sent (${firstError})`)}`
+    : "";
+  redirect(`/${locale}/desk/publisher-contacts?tab=campaign&ok=sent&n=${sent}${failure}`);
+}
+
+function errorDetail(err: unknown): string {
+  return err instanceof Error ? err.message : String(err);
 }
 
 export async function sendOneAction(formData: FormData) {
   const locale = f(formData, "locale") || "en";
   const userId = await requireSuperadmin(locale);
   const requestId = f(formData, "requestId");
-  await sendRateCardStep({ requestId, actorId: userId });
+  let failure = "";
+  try {
+    await sendRateCardStep({ requestId, actorId: userId });
+  } catch (err) {
+    console.error("outreach.send_failed", { requestId, err });
+    failure = errorDetail(err);
+  }
+  if (failure) redirect(`/${locale}/desk/publisher-contacts?tab=campaign&err=${encodeURIComponent(failure)}`);
   redirect(`/${locale}/desk/publisher-contacts?tab=campaign&ok=one`);
 }

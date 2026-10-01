@@ -113,15 +113,18 @@ export async function inviteToOrg(formData: FormData) {
     role,
     delegationExpiresAt,
   });
+  let emailed = true;
   try {
     await emailAdapter({ to: email, subject: built.subject, text: built.text });
   } catch (err) {
+    emailed = false;
     console.error("org_invite.email_failed", { orgId, email, err });
   }
 
   await recordAudit(session.user.id, "org.invite_sent", `Organization:${orgId}`, {
-    email, role, canCommit, delegationExpiresAt,
+    email, role, canCommit, delegationExpiresAt, emailed,
   });
+  if (!emailed) redirect(`/${locale}/account?error=invite_email_failed#team`);
   redirect(`/${locale}/account?ok=invited#team`);
 }
 

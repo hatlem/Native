@@ -49,7 +49,7 @@ export async function startSchedules(): Promise<void> {
       const res = await runMetricsSweepWithLock();
       if (!res) return "sweep skipped: another instance holds the lock";
       if (!res.ran) return "sweep skipped: already ran today (latch)";
-      return `sweep done: created=${res.built?.requests_created ?? 0} frozen=${res.frozen ?? 0} sent=${res.sent ?? 0} skipped=${JSON.stringify(res.skipped ?? {})}`;
+      return `sweep done: created=${res.built?.requests_created ?? 0} frozen=${res.frozen ?? 0} sent=${res.sent ?? 0} failed=${res.failed ?? 0} skipped=${JSON.stringify(res.skipped ?? {})}`;
     });
   }
 

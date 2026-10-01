@@ -46,6 +46,8 @@ export const ACCOUNT_ERROR_KEYS: Readonly<Record<string, string>> = {
   email_same: "errEmailSame",
   email_password: "errEmailPassword",
   email_expired: "errEmailExpired",
+  email_send_failed: "errEmailSendFailed",
+  invite_email_failed: "errInviteEmailFailed",
   email_business: "errEmailBusiness",
   email_domain: "errEmailDomain",
   rate: "errRate",
