@@ -1,8 +1,6 @@
 import Script from "next/script";
 
 export const GETCOOKIES_DOMAIN_ID = process.env.NEXT_PUBLIC_GETCOOKIES_DOMAIN_ID;
-// Bumped by GetCookies when the banner configuration changes (cache buster).
-const GETCOOKIES_WIDGET_VERSION = process.env.NEXT_PUBLIC_GETCOOKIES_WIDGET_VERSION ?? "1";
 export const GETCOOKIES_ORIGIN = "https://getcookies.co";
 
 // The consent banner (GetCookies CMP). It renders the cookie banner, stores the
@@ -15,15 +13,22 @@ export const GETCOOKIES_ORIGIN = "https://getcookies.co";
 // re-applied before tags fire (GTM waits `wait_for_update` ms for it).
 //
 // Ships nothing unless a domain id is configured — dev, tests and previews
-// carry no third-party code. The loader is the snippet GetCookies generates,
-// nonce'd because the CSP is 'strict-dynamic': the script element it creates
-// inherits trust from this nonce'd script, so getcookies.co needs no
-// script-src entry (connect-src does need it — see middleware.ts buildCsp).
+// carry no third-party code. getcookies.co needs no script-src entry (the
+// nonce covers the loader and 'strict-dynamic' what it inserts); its
+// config/consent fetches need connect-src — see middleware.ts buildCsp.
 export function GetCookiesScripts({ nonce }: { nonce?: string }) {
   if (!GETCOOKIES_DOMAIN_ID) return null;
+  // The official 1 KB loader (GetCookies → Innebyggingskode → "Standard
+  // Website"). It re-applies a stored choice as consent defaults, then inserts
+  // the full widget from getcookies.co itself; 'strict-dynamic' trusts that
+  // insertion because this tag carries the nonce.
   return (
-    <Script id="getcookies-loader" strategy="afterInteractive" nonce={nonce}>
-      {`(function(){window.getCookiesConfig={domainId:'${GETCOOKIES_DOMAIN_ID}',version:${Number(GETCOOKIES_WIDGET_VERSION) || 1}};var s=document.createElement('script');s.src='${GETCOOKIES_ORIGIN}/static/widget.js?v=${Number(GETCOOKIES_WIDGET_VERSION) || 1}';s.async=true;document.head.appendChild(s);})();`}
-    </Script>
+    <Script
+      id="getcookies-loader"
+      src={`${GETCOOKIES_ORIGIN}/api/v1/widget/loader.js`}
+      data-domain-id={GETCOOKIES_DOMAIN_ID}
+      strategy="afterInteractive"
+      nonce={nonce}
+    />
   );
 }
