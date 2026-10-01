@@ -88,6 +88,11 @@ function isExplicitZero(v: unknown): boolean {
 export function publisherCanWrite(product: ContentDefaultSource): boolean {
   const inclusions = product.inclusions as { production?: unknown } | null | undefined;
   if (inclusions?.production === "PUBLISHER") return true;
+  // An explicit "the advertiser delivers the copy" is the publisher saying
+  // they do NOT write it — a 0 fee there means "nothing to produce", not
+  // "production included" (Cafe's "Native (färdig text)", Trailer's
+  // "kunde leverer materiale").
+  if (inclusions?.production === "ADVERTISER") return false;
   // First set fee wins, as in resolveProductionFee: an offer-level fee (even a
   // non-zero one) overrides the publication default.
   if (product.productionFee != null) return isExplicitZero(product.productionFee);
