@@ -18,6 +18,7 @@ const ws = (over: Partial<Workspace>): Workspace => ({
   userId: "u1", isAgency: false, agencyOrgId: null, homeOrgId: "o1", homeRole: "MEMBER",
   activeOrgId: "o1", scopeOrgIds: ["o1"], editOrgIds: ["o1"], commitOrgIds: ["o1"],
   activeRole: "MEMBER" as const, activeCanCommit: true, activeCanEdit: true,
+  viewingAsOrgId: null,
   ...over,
 });
 

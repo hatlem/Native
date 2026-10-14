@@ -903,7 +903,8 @@
       "word": "Word",
       "pdfLabel": "Plan als PDF herunterladen",
       "wordLabel": "Plan als Word-Dokument herunterladen"
-    }
+    },
+    "errorViewAsConfirm": "Bestätigen Sie vor dem Senden, dass Sie im Namen des Kunden bestellen."
   },
   "rfq": {
     "org": "Firma",
@@ -3384,7 +3385,8 @@
     "termsNoneCustom": "Alle Kunden haben die Standardbedingungen.",
     "termsDaysValue": "{days, plural, one {netto # Tag} other {netto # Tage}}",
     "okTerms": "Zahlungsbedingungen gespeichert.",
-    "errTerms": "Geben Sie ganze Tage zwischen 1 und 120 an."
+    "errTerms": "Geben Sie ganze Tage zwischen 1 und 120 an.",
+    "errViewAsOrg": "Dieser Werbetreibende wurde nicht gefunden."
   },
   "status": {
     "ACCEPTED": "Angenommen",
@@ -3898,5 +3900,16 @@
     "ratesSaving": "Wird gespeichert …",
     "ratesReadOnly": "Nur ein Superadmin kann die Stundensätze ändern.",
     "ratesError": "Geben Sie für jede Währung einen Stundensatz über 0 an."
+  },
+  "viewAs": {
+    "bannerTitle": "Sie sehen {org} als Kunde.",
+    "bannerBody": "Das ist das echte Konto des Kunden. Bestellungen hier sind verbindlich.",
+    "stop": "Beenden",
+    "confirmCommit": "Ich bestelle im Namen von {org}. Das wird eine verbindliche Bestellung.",
+    "deskHeading": "Als Kunde ansehen",
+    "deskLead": "Öffnen Sie die Plattform so, wie ein Werbetreibender sie sieht, mit seinen Listen, Anfragen und Bestellungen. Dem Team des Kunden wird kein Nutzer hinzugefügt. Die Ansicht endet nach 8 Stunden.",
+    "deskOrgLabel": "Kunde",
+    "deskStart": "Als Kunde öffnen",
+    "deskStarting": "Wird geöffnet …"
   }
 }

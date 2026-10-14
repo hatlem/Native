@@ -903,7 +903,8 @@
       "word": "Word",
       "pdfLabel": "Lataa suunnitelma PDF-tiedostona",
       "wordLabel": "Lataa suunnitelma Word-tiedostona"
-    }
+    },
+    "errorViewAsConfirm": "Vahvista ennen lähettämistä, että tilaat asiakkaan puolesta."
   },
   "rfq": {
     "org": "Yritys",
@@ -3515,7 +3516,8 @@
     "termsNoneCustom": "Kaikilla asiakkailla on oletusehdot.",
     "termsDaysValue": "{days, plural, one {netto # päivä} other {netto # päivää}}",
     "okTerms": "Maksuehdot tallennettu.",
-    "errTerms": "Anna kokonaisia päiviä väliltä 1–120."
+    "errTerms": "Anna kokonaisia päiviä väliltä 1–120.",
+    "errViewAsOrg": "Mainostajaa ei löytynyt."
   },
   "status": {
     "ACCEPTED": "Hyväksytty",
@@ -4029,5 +4031,16 @@
     "ratesSaving": "Tallennetaan …",
     "ratesReadOnly": "Vain superadmin voi muuttaa tuntihintoja.",
     "ratesError": "Anna jokaiselle valuutalle nollaa suurempi tuntihinta."
+  },
+  "viewAs": {
+    "bannerTitle": "Katselet tiliä {org} asiakkaana.",
+    "bannerBody": "Tämä on asiakkaan oikea tili. Täällä tehdyt tilaukset ovat oikeita.",
+    "stop": "Lopeta",
+    "confirmCommit": "Tilaan asiakkaan {org} puolesta. Tästä tulee oikea tilaus.",
+    "deskHeading": "Katso asiakkaana",
+    "deskLead": "Avaa alusta niin kuin mainostaja sen näkee: listat, tarjouspyynnöt ja tilaukset. Asiakkaan tiimiin ei lisätä käyttäjää. Näkymä päättyy 8 tunnin kuluttua.",
+    "deskOrgLabel": "Asiakas",
+    "deskStart": "Avaa asiakkaana",
+    "deskStarting": "Avataan …"
   }
 }

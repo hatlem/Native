@@ -903,7 +903,8 @@
       "word": "Word",
       "pdfLabel": "Download the plan as a PDF",
       "wordLabel": "Download the plan as a Word document"
-    }
+    },
+    "errorViewAsConfirm": "Confirm that you are ordering on behalf of the customer before sending."
   },
   "rfq": {
     "org": "Company",
@@ -3515,7 +3516,8 @@
     "termsNoneCustom": "Every customer is on the default terms.",
     "termsDaysValue": "{days, plural, one {net # day} other {net # days}}",
     "okTerms": "Payment terms saved.",
-    "errTerms": "Enter whole days between 1 and 120."
+    "errTerms": "Enter whole days between 1 and 120.",
+    "errViewAsOrg": "That advertiser could not be found."
   },
   "status": {
     "ACCEPTED": "Accepted",
@@ -4029,5 +4031,16 @@
     "ratesSaving": "Saving…",
     "ratesReadOnly": "Only a superadmin can change the hourly rates.",
     "ratesError": "Enter a rate greater than 0 for each currency."
+  },
+  "viewAs": {
+    "bannerTitle": "You are viewing {org} as the customer.",
+    "bannerBody": "This is the customer's real account. Orders placed here are real.",
+    "stop": "Exit",
+    "confirmCommit": "I am ordering on behalf of {org}. This becomes a real order.",
+    "deskHeading": "View as customer",
+    "deskLead": "Open the platform as an advertiser sees it, with their lists, requests and orders. No user is added to the customer's team. The view ends after 8 hours.",
+    "deskOrgLabel": "Customer",
+    "deskStart": "Open as customer",
+    "deskStarting": "Opening…"
   }
 }

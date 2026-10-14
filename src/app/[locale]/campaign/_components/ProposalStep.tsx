@@ -4,6 +4,7 @@ import { Link } from "@/i18n/navigation";
 import { submitRequest } from "@/app/checkout-actions";
 import { saveKyc } from "@/app/campaign-actions";
 import { SubmitButton } from "@/components";
+import { ViewAsConfirm } from "@/app/view-as-confirm";
 import type { ActiveList } from "@/lib/lists";
 import { kycComplete, type KycFields } from "@/lib/campaign-kyc";
 
@@ -104,6 +105,9 @@ export async function ProposalStep({ locale, items, kyc }: Props) {
           <textarea name="brief" rows={4} maxLength={4000} placeholder={t("proposalMessagePlaceholder")} />
         </label>
         <p className="muted small">{t("proposalNote")}</p>
+        {/* submitRequest may place an instant order from here, so a
+            superadmin viewing as the customer confirms first. */}
+        <ViewAsConfirm locale={locale} />
         <div className="proposal-actions">
           <Link href="/campaign?step=schedule" className="btn ghost small">
             {t("back")}

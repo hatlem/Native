@@ -6,6 +6,7 @@ import { hasFigure, type ListTotal } from "@/lib/plan-total";
 import { totalFloor, totalLabel } from "@/lib/pricing/total-label";
 import { submitRequest } from "@/app/checkout-actions";
 import { SubmitButton } from "@/components";
+import { ViewAsConfirm } from "@/app/view-as-confirm";
 import type { ListOrder } from "@/lib/commerce/list-commit";
 import { PlanBriefFields } from "./PlanBriefFields";
 import { PlanOrdered } from "./PlanOrdered";
@@ -205,6 +206,7 @@ export async function PlanSummary({
           {commitAmount ? (
             <p className="plan-summary-commit">{tf("commitAmount", { amount: commitAmount })}</p>
           ) : null}
+          {instant ? <ViewAsConfirm locale={locale} orgName={activeOrg.name} /> : null}
           {/* Mobile-only submit lives in the sticky bottom bar below (same
               form, via the form="" attribute) — this one stays for desktop,
               where there's no fixed bottom bar to duplicate it into. */}

@@ -11,6 +11,7 @@ import { formatQuoteValidUntil, isQuoteExpired } from "@/lib/commerce/quote-vali
 import { isOpenOffer, offerToken } from "@/lib/commerce/quote-offer";
 import { StatusBadge } from "@/app/status-badge";
 import { SectionHead, SubmitButton } from "@/components";
+import { ViewAsConfirm } from "@/app/view-as-confirm";
 import { ViewOnlyNote } from "@/components/view-only-note";
 import type {
   OrderWithDetails,
@@ -489,6 +490,7 @@ export async function QuoteSection({
             {quotes.filter(isOpenOffer).map((q) => (
               <input key={q.id} type="hidden" name="offer" value={offerToken(q)} />
             ))}
+            <ViewAsConfirm locale={locale} orgName={organizationName} />
             <SubmitButton
               label={t("accept")}
               pendingLabel={t("accepting")}

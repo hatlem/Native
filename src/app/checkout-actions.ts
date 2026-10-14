@@ -28,6 +28,7 @@ import { notifyOrg, notifyPublisher } from "@/lib/notify";
 import { isAudienceSegment } from "@/lib/targeting/segments";
 import { rfqLimiter } from "@/lib/rate-limit";
 import { loadScope, canCommitOnOrg } from "@/lib/scope";
+import { viewAsCommitConfirmed } from "@/lib/view-as";
 import { clientIp } from "@/lib/client-ip";
 import { listNames } from "@/lib/list-names";
 
@@ -253,6 +254,12 @@ export async function submitRequest(formData: FormData) {
     if (!canCommitOnOrg(scope, org.id)) {
       console.warn("checkout.blocked", { reason: "forbidden", orgId: org.id });
       redirect(back("forbidden"));
+    }
+    // A superadmin viewing as the customer places a real order: only with
+    // the confirmation the form asks for (lib/view-as).
+    if (!viewAsCommitConfirmed(scope.workspace, org.id, formData)) {
+      console.warn("checkout.blocked", { reason: "view-as-confirm", orgId: org.id });
+      redirect(back("view-as-confirm"));
     }
   }
 
