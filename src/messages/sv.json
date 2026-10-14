@@ -763,7 +763,8 @@
       "word": "Word",
       "pdfLabel": "Ladda ner planen som PDF",
       "wordLabel": "Ladda ner planen som Word-dokument"
-    }
+    },
+    "errorViewAsConfirm": "Bekräfta att du beställer för kunden innan du skickar."
   },
   "rfq": {
     "org": "Företag",
@@ -3515,7 +3516,8 @@
     "termsNoneCustom": "Alla kunder har standardvillkoren.",
     "termsDaysValue": "{days, plural, one {netto # dag} other {netto # dagar}}",
     "okTerms": "Betalningsvillkoren är sparade.",
-    "errTerms": "Ange hela dagar mellan 1 och 120."
+    "errTerms": "Ange hela dagar mellan 1 och 120.",
+    "errViewAsOrg": "Annonsören hittades inte."
   },
   "status": {
     "ACCEPTED": "Accepterad",
@@ -4029,5 +4031,16 @@
     "ratesSaving": "Sparar …",
     "ratesReadOnly": "Bara en superadmin kan ändra timpriserna.",
     "ratesError": "Ange ett timpris över 0 för varje valuta."
+  },
+  "viewAs": {
+    "bannerTitle": "Du ser {org} som kund.",
+    "bannerBody": "Det här är kundens riktiga konto. Beställningar blir riktiga ordrar.",
+    "stop": "Avsluta",
+    "confirmCommit": "Jag beställer för {org}. Det blir en riktig order.",
+    "deskHeading": "Se som kund",
+    "deskLead": "Öppna plattformen som en annonsör ser den, med kundens listor, förfrågningar och beställningar. Ingen användare läggs till i kundens team. Visningen avslutas efter 8 timmar.",
+    "deskOrgLabel": "Kund",
+    "deskStart": "Öppna som kund",
+    "deskStarting": "Öppnar …"
   }
 }

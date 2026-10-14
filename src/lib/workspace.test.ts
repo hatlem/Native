@@ -166,3 +166,41 @@ test("agency: a full agency seat (or none) keeps full control over its clients",
   assert.deepEqual(agency.editOrgIds, agency.scopeOrgIds);
   assert.equal(agency.activeCanEdit, true);
 });
+
+// "Se som kunde" (lib/view-as): a superadmin viewing as a customer gets that
+// org's ADMIN workspace, from no seat at all, and nothing of their own.
+test("view-as: the viewed org is the whole workspace, as its ADMIN", () => {
+  const ws = resolveWorkspace(
+    input({
+      memberships: [seat("home", { role: "ADMIN", canCommit: true }), seat("other")],
+      selectedOrgId: "other",
+      viewAsOrgId: "customer",
+    }),
+  )!;
+  assert.equal(ws.viewingAsOrgId, "customer");
+  assert.equal(ws.activeOrgId, "customer");
+  assert.equal(ws.homeOrgId, "customer");
+  assert.equal(ws.activeRole, "ADMIN");
+  assert.equal(ws.activeCanCommit, true);
+  assert.equal(ws.activeCanEdit, true);
+  assert.deepEqual(ws.scopeOrgIds, ["customer"]);
+  assert.deepEqual(ws.editOrgIds, ["customer"]);
+  assert.deepEqual(ws.commitOrgIds, ["customer"]);
+  assert.deepEqual(viewOrgIds(ws), ["customer"]);
+});
+
+test("view-as works without any seat and sets aside an agency home org", () => {
+  const ws = resolveWorkspace(
+    input({ homeOrg: { id: "agency", type: "AGENCY" }, agencyClientIds: ["c1"], viewAsOrgId: "customer" }),
+  )!;
+  assert.equal(ws.isAgency, false);
+  assert.equal(ws.agencyOrgId, null);
+  assert.deepEqual(ws.scopeOrgIds, ["customer"]);
+});
+
+test("without view-as, viewingAsOrgId is null on every path", () => {
+  const advertiser = resolveWorkspace(input({ memberships: [seat("home")] }))!;
+  const agency = resolveWorkspace(input({ homeOrg: { id: "a", type: "AGENCY" }, agencyClientIds: ["c1"] }))!;
+  assert.equal(advertiser.viewingAsOrgId, null);
+  assert.equal(agency.viewingAsOrgId, null);
+});

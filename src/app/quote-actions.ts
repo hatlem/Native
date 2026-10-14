@@ -44,6 +44,7 @@ import { groupItemsByMarket } from "@/lib/quote-grouping";
 import { recordAudit } from "@/lib/audit";
 import { notifyDesk, notifyOrg } from "@/lib/notify";
 import { loadScope, canActOnOrg, canCommitOnOrg, canEditOnOrg } from "@/lib/scope";
+import { viewAsCommitConfirmed } from "@/lib/view-as";
 import { generateQuotePdf as renderQuotePdf } from "@/lib/pdf/generate-quote-pdf";
 import { QuoteSupersededError } from "@/lib/pdf/quote-pdf-data";
 import {
@@ -652,6 +653,12 @@ export async function acceptAllQuotesForRequest(formData: FormData) {
   }
   if (!canCommitOnOrg(scope, request.organizationId)) {
     // Same as acceptQuote: the request page explains who can accept.
+    redirect(`/${locale}/requests/${request.id}`);
+  }
+  // A superadmin viewing as the customer accepts for real: only with the
+  // confirmation the form asks for (lib/view-as). The checkbox is required,
+  // so this only catches a stale or hand-built post.
+  if (!viewAsCommitConfirmed(scope.workspace, request.organizationId, formData)) {
     redirect(`/${locale}/requests/${request.id}`);
   }
 

@@ -8,6 +8,7 @@ import { prisma } from "@/lib/prisma";
 import { getWorkspace, viewOrgIds } from "@/lib/workspace";
 import { acceptableQuoteWhere } from "@/lib/commerce/quote-validity";
 import { OrgSwitcher, switchableOrgs } from "@/app/org-switcher";
+import { ViewAsBanner } from "@/app/view-as-banner";
 import { countUnsentLists } from "@/lib/lists";
 import { inter } from "@/fonts";
 import { routing } from "@/i18n/routing";
@@ -124,12 +125,20 @@ export default async function LocaleLayout({
   // inline <script>/<style> that the strict policy would otherwise block.
   const nonce = (await headers()).get("x-nonce") ?? undefined;
 
-  const audience = audienceFor(session);
   // Staff (desk/superadmin) who also hold a buyer-org Membership — e.g.
   // helping a client build their plan directly — otherwise have no way
   // back into the buyer flow from a desk-only session; see NavOptions.
   // Resolved once per render and shared by every block below.
   const workspace = await getWorkspace(session?.user?.id);
+  // A superadmin viewing as a customer (lib/view-as) gets the customer's nav,
+  // so the page matches what the customer sees; the banner below leads back.
+  const viewingAs = workspace?.viewingAsOrgId
+    ? await prisma.organization.findUnique({
+        where: { id: workspace.viewingAsOrgId },
+        select: { name: true },
+      })
+    : null;
+  const audience = viewingAs ? "advertiser" : audienceFor(session);
   // A member of several orgs sees which one is active in the header itself,
   // not only inside the avatar menu: every buyer page is scoped to it.
   const switchOrgs = await switchableOrgs(workspace);
@@ -250,6 +259,10 @@ export default async function LocaleLayout({
               authActions={{ signIn: ta("signin"), signUp: ta("signup") }}
             />
           )}
+
+          {viewingAs ? (
+            <ViewAsBanner locale={locale} orgName={viewingAs.name} />
+          ) : null}
 
           <main id="main" className="container">
             {deactivated ? (

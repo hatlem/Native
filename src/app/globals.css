@@ -2116,6 +2116,43 @@ form:not(.filters):not(.cmdk-form) button[type="submit"]:not(.btn):hover {
   gap: 8px;
 }
 
+/* "Se som kunde" (lib/view-as): a superadmin is on a customer's real account.
+   In the page flow under the header, never fixed, so it can't cover content. */
+.view-as-banner {
+  background: var(--warning-soft);
+  color: var(--ink);
+  border-bottom: 1px solid color-mix(in srgb, var(--warning) 40%, transparent);
+  font-size: 0.9rem;
+}
+
+.view-as-banner__inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding-block: 8px;
+  flex-wrap: wrap;
+}
+
+/* Confirmation a superadmin ticks before committing for the customer. */
+.view-as-confirm {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  padding: 10px 12px;
+  margin-block: 8px;
+  background: var(--warning-soft);
+  border: 1px solid color-mix(in srgb, var(--warning) 40%, transparent);
+  border-radius: var(--r-sm);
+  font-size: 0.9rem;
+  font-weight: 500;
+}
+
+.view-as-confirm input {
+  margin-top: 3px;
+  flex-shrink: 0;
+}
+
 /* ---------- Forms (filters + global field styling) ---------- */
 
 label {

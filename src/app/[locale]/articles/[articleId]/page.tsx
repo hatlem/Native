@@ -79,7 +79,10 @@ export default async function ArticleDetailPage({
   // may instead be showing an older, locked version (see below).
   const latest = article.versions[0];
 
-  const isDesk = role === "DESK" || role === "SUPERADMIN";
+  // A superadmin viewing as this customer (lib/view-as) sees the buyer side.
+  const isDesk =
+    (role === "DESK" || role === "SUPERADMIN") &&
+    scope.workspace?.viewingAsOrgId !== article.organizationId;
   const isAssignedWriter = role === "CONTENT" && writerProfileId !== null && writerProfileId === article.assignedWriterId;
   const nativeSpinWritten = article.assignedWriterId !== null;
   // Buyer side = anyone acting for the client organization (not the desk,

@@ -26,6 +26,7 @@ export const DESK_USERS_ERROR_KEYS: Readonly<Record<string, string>> = {
   deactivated_target: "errDeactivatedTarget",
   email_failed: "errEmailFailed",
   terms: "errTerms",
+  view_as_org: "errViewAsOrg",
 };
 
 const GENERIC_ERROR_KEY = "errGeneric";

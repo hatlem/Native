@@ -10,6 +10,10 @@ import {
 } from "@/lib/membership";
 
 export const CLIENT_COOKIE = "nativespin_client";
+// A SUPERADMIN looking at the platform as one customer org sees it (lib/view-as).
+// Holds that org's id. Read here, but it only counts once loadWorkspace has
+// checked that the account is still a SUPERADMIN and the org is an advertiser.
+export const VIEW_AS_COOKIE = "nativespin_view_as";
 
 export type Workspace = {
   userId: string;
@@ -47,6 +51,11 @@ export type Workspace = {
   // May this user change things in activeOrgId? False for a view-only seat —
   // the UI hides its editing controls and shows the view-only note instead.
   activeCanEdit: boolean;
+  // Set while a SUPERADMIN views the platform as this customer org ("Se som
+  // kunde"). The workspace is then exactly that org's ADMIN workspace, built
+  // without a Membership row, so the customer's team list never shows it.
+  // Commit actions require an explicit confirmation in this mode (lib/view-as).
+  viewingAsOrgId: string | null;
 };
 
 // Exported (only) so it's independently testable without a Next.js request
@@ -82,6 +91,9 @@ export type WorkspaceInputs = {
   agencyClientIds: string[];
   // Raw CLIENT_COOKIE value: a selection, validated here, never trusted.
   selectedOrgId: string | null;
+  // An advertiser org a SUPERADMIN is viewing as. Already validated by the
+  // caller (loadWorkspace): never pass a raw cookie value here.
+  viewAsOrgId?: string | null;
   now: Date;
 };
 
@@ -102,6 +114,29 @@ export type WorkspaceInputs = {
 // is kept exactly as it was.
 export function resolveWorkspace(input: WorkspaceInputs): Workspace | null {
   const { userId, homeOrg, memberships, now } = input;
+
+  // Viewing as a customer: the superadmin's own seats and agency reach are set
+  // aside so every page shows that one org exactly as its ADMIN sees it. The
+  // desk itself is unaffected: desk pages are gated on the session role.
+  if (input.viewAsOrgId) {
+    const orgId = input.viewAsOrgId;
+    return {
+      userId,
+      isAgency: false,
+      agencyOrgId: null,
+      homeOrgId: orgId,
+      homeRole: "ADMIN",
+      activeOrgId: orgId,
+      scopeOrgIds: [orgId],
+      editOrgIds: [orgId],
+      commitOrgIds: [orgId],
+      activeRole: "ADMIN",
+      activeCanCommit: true,
+      activeCanEdit: true,
+      viewingAsOrgId: orgId,
+    };
+  }
+
   const seatOrgIds = activeScopeOrgIds(memberships, now);
 
   if (homeOrg?.type === "AGENCY") {
@@ -131,6 +166,7 @@ export function resolveWorkspace(input: WorkspaceInputs): Workspace | null {
       activeRole: active?.role ?? null,
       activeCanCommit: active?.canCommit ?? false,
       activeCanEdit: activeOrgId !== null && editOrgIds.includes(activeOrgId),
+      viewingAsOrgId: null,
     };
   }
 
@@ -160,6 +196,7 @@ export function resolveWorkspace(input: WorkspaceInputs): Workspace | null {
     // makes a row written before that constraint grant nothing either.
     activeCanCommit: !!active && active.canCommit && roleCanEdit(active.role),
     activeCanEdit: editOrgIds.includes(activeOrgId),
+    viewingAsOrgId: null,
   };
 }
 
@@ -209,12 +246,14 @@ export async function loadWorkspace(
   userId: string,
   selectedOrgId: string | null,
   now: Date = new Date(),
+  viewAsCookie: string | null = null,
 ): Promise<Workspace | null> {
   const [user, memberships] = await Promise.all([
     prisma.user.findUnique({
       where: { id: userId },
       select: {
         deactivatedAt: true,
+        role: true,
         organization: { select: { id: true, type: true } },
       },
     }),
@@ -227,6 +266,18 @@ export async function loadWorkspace(
   // actions included — not just the page render the layout guards. Costs
   // nothing: the row was already being read.
   if (!user || user.deactivatedAt) return null;
+
+  // The role comes from the row just read, not the JWT: an account demoted
+  // mid-session stops seeing the customer's org on its next request.
+  const viewAsOrgId =
+    viewAsCookie && user.role === "SUPERADMIN"
+      ? ((
+          await prisma.organization.findFirst({
+            where: { id: viewAsCookie, type: "ADVERTISER" },
+            select: { id: true },
+          })
+        )?.id ?? null)
+      : null;
 
   // Opportunistic, on-action reconciliation (no cron/worker): once a membership
   // crosses its expiry, flip its stored status so audit/reporting stays accurate.
@@ -265,6 +316,7 @@ export async function loadWorkspace(
     memberships,
     agencyClientIds,
     selectedOrgId,
+    viewAsOrgId,
     now,
   });
 }
@@ -277,5 +329,10 @@ export async function getWorkspace(
 ): Promise<Workspace | null> {
   if (!userId) return null;
   const store = await cookies();
-  return loadWorkspace(userId, store.get(CLIENT_COOKIE)?.value ?? null);
+  return loadWorkspace(
+    userId,
+    store.get(CLIENT_COOKIE)?.value ?? null,
+    new Date(),
+    store.get(VIEW_AS_COOKIE)?.value ?? null,
+  );
 }

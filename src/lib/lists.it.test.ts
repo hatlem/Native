@@ -607,6 +607,7 @@ test("canEditOnOrg rejects a listId belonging to another org (the guard setListT
       activeRole: null,
       activeCanCommit: true,
       activeCanEdit: true,
+      viewingAsOrgId: null,
     },
   };
   assert.equal(canEditOnOrg(scope, theirList.organizationId), false, "must not be able to act on another org's list");

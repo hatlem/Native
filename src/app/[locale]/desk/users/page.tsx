@@ -5,6 +5,7 @@ import { SuperadminOnly } from "@/components/superadmin-only";
 import { prisma } from "@/lib/prisma";
 import { Link } from "@/i18n/navigation";
 import { SubmitButton } from "@/components";
+import { startViewAs } from "@/app/view-as-actions";
 import { SafeEmail } from "@/components/safe-email";
 import { deskUsersOkKey, deskUsersErrorKey } from "@/lib/desk-users-messages";
 import {
@@ -54,6 +55,7 @@ export default async function DeskUsersPage({
   const { locale } = await params;
   const sp = await searchParams;
   const t = await getTranslations({ locale, namespace: "deskUsers" });
+  const tv = await getTranslations({ locale, namespace: "viewAs" });
   const gate = await superadminPageGate(locale);
   if (!gate.allowed) return <SuperadminOnly locale={locale} area={t("title")} />;
   const actorId = gate.userId;
@@ -96,7 +98,7 @@ export default async function DeskUsersPage({
       take: PAGE_SIZE,
     }),
     prisma.organization.findMany({
-      select: { id: true, name: true, paymentTermsDays: true },
+      select: { id: true, name: true, type: true, paymentTermsDays: true },
       orderBy: { name: "asc" },
       take: PICKER_LIMIT,
     }),
@@ -283,6 +285,39 @@ export default async function DeskUsersPage({
           )}
         </section>
       ) : null}
+
+      {/* "Se som kunde" (lib/view-as): open the buyer side as one advertiser
+          org, e.g. to demo a customer's own lists to them. No seat is
+          written, so the customer's team list doesn't change. */}
+      <section className="section" id="view-as">
+        <div className="section-head">
+          <div>
+            <h2>{tv("deskHeading")}</h2>
+            <p className="muted small">{tv("deskLead")}</p>
+          </div>
+        </div>
+        <div className="card">
+          <form action={startViewAs} className="product-form">
+            <input type="hidden" name="locale" value={locale} />
+            <div className="field">
+              <label htmlFor="view-as-org">{tv("deskOrgLabel")}</label>
+              <select id="view-as-org" name="organizationId" required defaultValue="">
+                <option value="" disabled>
+                  —
+                </option>
+                {orgs
+                  .filter((o) => o.type === "ADVERTISER")
+                  .map((o) => (
+                    <option key={o.id} value={o.id}>
+                      {o.name}
+                    </option>
+                  ))}
+              </select>
+            </div>
+            <SubmitButton className="btn" label={tv("deskStart")} pendingLabel={tv("deskStarting")} />
+          </form>
+        </div>
+      </section>
 
       {/* Per-customer payment terms — one source of truth for quote text,
           quote documents and invoice due dates (lib/payment-terms.ts).
