@@ -246,20 +246,24 @@ export type CatalogSearch = {
   // "all": titles matching every word. "some": nothing matched every word, so
   // these match at least one; the catalog says so above the results.
   // "similar": nothing matched even one word, so these are titles whose NAME
-  // is spelled like a word of the query (typos: "aftenpsoten").
+  // or alias or publisher is spelled like a word of the query (typos: "aftenpsoten").
   match: "all" | "some" | "similar";
 };
 
 /**
- * Typo-tolerant last resort: titles whose name has a word that trigram-matches
- * every query word of 4+ letters (pg_trgm `<%`, served by the name trigram
+ * Typo-tolerant last resort: titles whose name, alias or publisher has a word
+ * that trigram-matches every query word of 4+ letters (pg_trgm `<%`, served by the name trigram
  * index of migration 20261020000000_title_name_trgm). Returns [] when
  * pg_trgm is not installed rather than failing the whole search.
  */
 export async function searchFuzzyTitleIds(query: string): Promise<string[]> {
   const words = significantWords(query).filter((w) => w.length >= 4);
   if (words.length === 0) return [];
-  const conds = words.map((w) => Prisma.sql`${w} <% "name"`);
+  const conds = words.map(
+    (w) => Prisma.sql`(${w} <% "name"
+      OR EXISTS (SELECT 1 FROM unnest("aliases") a WHERE ${w} <% a)
+      OR "publisherId" IN (SELECT id FROM "Publisher" WHERE ${w} <% "name"))`,
+  );
   try {
     const rows = await prisma.$queryRaw<{ id: string }[]>(
       Prisma.sql`SELECT id FROM "Title" WHERE ${Prisma.join(conds, " AND ")} LIMIT 500`,
