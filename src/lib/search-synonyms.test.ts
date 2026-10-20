@@ -82,3 +82,18 @@ test("expandTerm covers the trades ABAX sells to", () => {
   assert.ok(expandTerm("renovasjon").includes("avfall"));
   assert.ok(expandTerm("kommune").includes("municipality"));
 });
+
+test("expandTerm carries bygg across the construction and property vocabulary", () => {
+  assert.ok(expandTerm("bygg").includes("entreprenør"));
+  assert.ok(expandTerm("bygg").includes("construction"));
+  assert.ok(expandTerm("eiendom").includes("bolig"));
+  assert.ok(expandTerm("maskin").includes("gravemaskin"));
+});
+
+test("expandTerm covers the wider sector vocabulary", () => {
+  assert.ok(expandTerm("energi").includes("olje"));
+  assert.ok(expandTerm("helse").includes("health"));
+  assert.ok(expandTerm("reise").includes("tourism"));
+  assert.ok(expandTerm("handel").includes("retail"));
+  assert.ok(expandTerm("teknologi").includes("software"));
+});

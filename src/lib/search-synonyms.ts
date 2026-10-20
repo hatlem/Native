@@ -32,11 +32,17 @@ export const SYNONYM_GROUPS: readonly (readonly string[])[] = [
     "fleet", "buss", "bus", "spedisjon", "kuljetus", "tungtransport",
     "tungt", "vogntog", "trailer", "semitrailer",
   ],
-  // Construction & heavy machinery.
+  // Construction. Prefix matching already carries "bygg" to byggeri,
+  // byggevare, byggenæring …, so only genuinely different words go here.
   [
-    "anlegg", "anleggsmaskin", "entreprenad", "entreprenør", "entreprenor",
-    "bygg", "byggeri", "construction", "maskin", "maskiner", "gravemaskin",
-    "bau", "baumaschinen", "rakennus",
+    "bygg", "byggeri", "anlegg", "anleggsmaskin", "entreprenør", "entreprenor",
+    "entreprenad", "construction", "contractor", "building", "bau", "bouw",
+    "rakennus",
+  ],
+  // Machinery & equipment.
+  [
+    "maskin", "maskiner", "gravemaskin", "machinery", "baumaschinen",
+    "koneet", "maskinpark",
   ],
   // Aquaculture / seafood / maritime.
   [
@@ -93,6 +99,123 @@ export const SYNONYM_GROUPS: readonly (readonly string[])[] = [
   [
     "event", "events", "arrangement", "evenemang", "konsert", "concert",
     "konzert", "arena", "festival", "scene", "live",
+  ],
+  // Property & real estate.
+  [
+    "eiendom", "eiendomsmegler", "megler", "bolig", "boliger", "boligmarked",
+    "fastighet", "fastigheter", "ejendom", "ejendomme", "property",
+    "immobilien", "kiinteistö", "kiinteisto", "housing",
+  ],
+  // Interior, furniture & home.
+  [
+    "interiør", "interior", "innredning", "møbler", "mobler", "möbler",
+    "møbel", "furniture", "kjøkken", "kjokken", "köök", "sisustus",
+  ],
+  // Architecture & design.
+  [
+    "arkitektur", "arkitekt", "architecture", "architect", "arkitektura",
+    "arkkitehtuuri", "design",
+  ],
+  // Energy, power & oil/gas.
+  [
+    "energi", "energy", "energie", "energia", "kraft", "fornybar",
+    "renewable", "solenergi", "vindkraft", "olje", "oil", "gass", "offshore",
+  ],
+  // Industry & manufacturing.
+  [
+    "industri", "industry", "industrie", "teollisuus", "produksjon",
+    "produktion", "manufacturing", "verksted", "verkstad", "fabrikk",
+  ],
+  // Technology, IT & software.
+  [
+    "teknologi", "technology", "teknik", "tech", "data", "digital",
+    "programvare", "software", "ikt", "informatik", "tietotekniikka",
+  ],
+  // Business & economy.
+  [
+    "økonomi", "okonomi", "ekonomi", "economy", "finans", "finance",
+    "næringsliv", "naeringsliv", "näringsliv", "erhverv", "business",
+    "wirtschaft", "talous", "børs", "bors",
+  ],
+  // Accounting.
+  [
+    "regnskap", "redovisning", "revisjon", "accounting", "bokføring",
+    "bokforing", "bookkeeping",
+  ],
+  // Health & care.
+  [
+    "helse", "hälsa", "halsa", "sundhed", "health", "gesundheit", "terveys",
+    "medisin", "medicine", "sykehus", "omsorg", "farmasi", "apotek",
+  ],
+  // Education & research.
+  [
+    "utdanning", "utbildning", "uddannelse", "education", "bildung",
+    "koulutus", "skole", "school", "student", "forskning", "research",
+    "universitet",
+  ],
+  // Cars & motoring.
+  [
+    "motor", "auto", "automotive", "biler", "bilar", "elbil", "kjøretøy",
+    "kjoretoy", "fordon", "vehicle", "fahrzeug", "ajoneuvo", "motorsport",
+  ],
+  // Food & restaurants.
+  [
+    "restaurant", "restaurang", "ravintola", "servering", "gastronomi",
+    "gastronomy", "kokk", "food", "matvarer",
+  ],
+  // Retail & commerce.
+  [
+    "handel", "detaljhandel", "retail", "butikk", "butik", "nettbutikk",
+    "ehandel", "ecommerce", "dagligvare", "dagligvarer", "grocery",
+    "einzelhandel",
+  ],
+  // Travel & tourism.
+  [
+    "reise", "reiseliv", "resor", "rejser", "travel", "turisme", "turism",
+    "tourism", "tourismus", "matkailu", "ferie", "hotell", "hotel",
+  ],
+  // Sports & outdoors.
+  [
+    "sport", "idrett", "idrott", "idræt", "urheilu", "trening", "fitness",
+    "friluftsliv", "friluft", "outdoor", "jakt", "hunting",
+  ],
+  // Careers & recruitment.
+  [
+    "karriere", "career", "rekruttering", "recruitment", "bemanning",
+    "staffing", "jobb", "jobs", "stillinger", "arbeidsliv", "arbeidsmarked",
+  ],
+  // Law.
+  ["juridisk", "juridik", "advokat", "lawyer", "legal"],
+  // Families & children.
+  [
+    "barn", "familie", "foreldre", "children", "kids", "family", "parents",
+    "kinder", "lapset", "perhe", "børn",
+  ],
+  // Women.
+  ["kvinne", "kvinner", "dame", "women", "woman", "frauen", "naiset", "kvinder"],
+  // Culture & arts.
+  [
+    "kultur", "culture", "kunst", "musikk", "music", "musik", "teater",
+    "theatre", "film", "litteratur", "taide",
+  ],
+  // Local press.
+  [
+    "lokal", "local", "paikallis", "lokalzeitung", "hyperlokal", "distrikt",
+  ],
+  // Pets & horses.
+  [
+    "kjæledyr", "kjaeledyr", "kæledyr", "husdyr", "pets", "lemmikki", "hest",
+    "horse",
+  ],
+  // Boating.
+  [
+    "båt", "båter", "båtliv", "batliv", "boat", "boating", "yacht", "segling",
+    "sailing", "veneily",
+  ],
+  // Fashion, beauty & lifestyle.
+  [
+    "mote", "fashion", "skjønnhet", "skjonnhet", "beauty", "kosmetikk",
+    "cosmetics", "livsstil", "lifestyle", "muoti",
   ],
 ];
 
