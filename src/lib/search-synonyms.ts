@@ -266,6 +266,28 @@ export function spellingVariants(word: string): string[] {
   return [...out].slice(0, MAX_SPELLING_VARIANTS);
 }
 
+// ---------- inflections ----------
+
+// Norwegian/Swedish/Danish endings (no bare "e"/"s": "title" is not a stem), longest first. A buyer types
+// "avisen", "bygget" or "butikker"; the index holds "avis", "bygg", "butikk".
+// Prefix matching only works stem → inflected, so the other direction needs
+// the stem. One stem per word, and never shorter than 4 letters.
+const ENDINGS = ["ene", "ane", "ere", "er", "ar", "en", "et"] as const;
+const MIN_STEM = 4;
+
+/** The stem of a word with a common ending, or null (short words, words
+ *  without such an ending). "butikker" → "butikk", "bygget" → "bygg". */
+export function stemOf(word: string): string | null {
+  const w = normalizeSynonymTerm(word);
+  if (w.length < MIN_STEM + 1) return null;
+  for (const end of ENDINGS) {
+    if (w.endsWith(end) && w.length - end.length >= MIN_STEM) {
+      return w.slice(0, w.length - end.length);
+    }
+  }
+  return null;
+}
+
 let index: Map<string, readonly string[]> | null = null;
 
 function buildIndex(): Map<string, readonly string[]> {

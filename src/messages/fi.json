@@ -471,6 +471,7 @@
     "exportCsvMarket": "Lataa julkaisut: {market} (CSV)",
     "noMatchHeading": "Ei osumia",
     "searchSomeWords": "Mikään julkaisu ei vastaa kaikkia hakusanoja ”{q}”, joten nämä vastaavat osaa niistä.",
+    "searchSimilar": "Ei tuloksia haulle ”{q}”, joten nämä ovat samankaltaisen nimisiä julkaisuja.",
     "exportCsvFiltered": "{count, plural, =0 {Lataa tulokset (CSV)} one {Lataa tämä julkaisu (CSV)} other {Lataa nämä # julkaisua (CSV)}}"
   },
   "lists": {

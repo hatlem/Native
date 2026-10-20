@@ -639,7 +639,9 @@ export default async function CatalogPage({
                 <p className="catalog-results-sub">
                   {search?.match === "some" && totalCount > 0
                     ? t("searchSomeWords", { q })
-                    : t("resultsSubline")}
+                    : search?.match === "similar" && totalCount > 0
+                      ? t("searchSimilar", { q })
+                      : t("resultsSubline")}
                 </p>
               </div>
               <div className="catalog-results-controls">

@@ -331,6 +331,7 @@
     "exportCsvMarket": "Last ned titler i {market} (CSV)",
     "noMatchHeading": "Ingen treff",
     "searchSomeWords": "Ingen titler matcher alle ordene i «{q}», så disse matcher noen av dem.",
+    "searchSimilar": "Ingen treff på «{q}», så dette er titler med lignende navn.",
     "exportCsvFiltered": "{count, plural, =0 {Last ned treffene (CSV)} one {Last ned denne tittelen (CSV)} other {Last ned disse # titlene (CSV)}}"
   },
   "lists": {
