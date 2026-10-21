@@ -471,6 +471,7 @@
     "exportCsvMarket": "Titel in {market} herunterladen (CSV)",
     "noMatchHeading": "Keine Treffer",
     "searchSomeWords": "Kein Titel passt zu allen Wörtern von „{q}“, diese passen zu einigen davon.",
+    "searchSimilar": "Keine Treffer für „{q}“, daher sind dies Titel mit ähnlichen Namen.",
     "exportCsvFiltered": "{count, plural, =0 {Treffer herunterladen (CSV)} one {Diesen Titel herunterladen (CSV)} other {Diese # Titel herunterladen (CSV)}}"
   },
   "lists": {

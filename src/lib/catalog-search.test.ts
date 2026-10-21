@@ -218,3 +218,15 @@ test("buildTsQuery: an ASCII query asks for the æ/ø/å spelling too", () => {
   assert.ok(buildTsQuery("tromso").includes("tromsø:*"));
   assert.ok(buildTsQuery("baerum").includes("bærum:*"));
 });
+
+test("wordVariants: an inflected word also asks for its stem and the stem's synonyms", () => {
+  assert.ok(wordVariants("butikker").includes("butikk"));
+  const v = wordVariants("bygget");
+  assert.equal(v[0], "bygget");
+  assert.ok(v.includes("bygg"));
+  assert.ok(v.includes("construction"));
+});
+
+test("buildTsQuery: a word without a stem is untouched", () => {
+  assert.equal(buildTsQuery("title"), "title:*");
+});

@@ -17,7 +17,7 @@
 
 import { Prisma } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
-import { expandTerm, spellingVariants } from "@/lib/search-synonyms";
+import { expandTerm, spellingVariants, stemOf } from "@/lib/search-synonyms";
 import { catalogVisibleTitleWhere } from "@/lib/catalog-visibility";
 
 // Guard against pathological input blowing up the tsquery (a title with a
@@ -99,6 +99,10 @@ export function wordVariants(w: string): string[] {
   const all = new Set<string>([w, ...spellings, ...expandTerm(w).slice(0, MAX_SYNONYMS_PER_WORD)]);
   // A spelling that is itself a known term ("rørlegger") brings its group.
   for (const s of spellings) for (const syn of expandTerm(s).slice(0, MAX_SYNONYMS_PER_WORD)) all.add(syn);
+  // An inflected word ("bygget", "avisen") also matches its stem and the
+  // stem's synonyms.
+  const stem = stemOf(w);
+  if (stem) for (const syn of expandTerm(stem).slice(0, MAX_SYNONYMS_PER_WORD)) all.add(syn);
   return [...all];
 }
 
@@ -241,14 +245,41 @@ export type CatalogSearch = {
   where: Prisma.TitleWhereInput;
   // "all": titles matching every word. "some": nothing matched every word, so
   // these match at least one; the catalog says so above the results.
-  match: "all" | "some";
+  // "similar": nothing matched even one word, so these are titles whose NAME
+  // or alias or publisher is spelled like a word of the query (typos: "aftenpsoten").
+  match: "all" | "some" | "similar";
 };
+
+/**
+ * Typo-tolerant last resort: titles whose name, alias or publisher has a word
+ * that trigram-matches every query word of 4+ letters (pg_trgm `<%`, served by the name trigram
+ * index of migration 20261020000000_title_name_trgm). Returns [] when
+ * pg_trgm is not installed rather than failing the whole search.
+ */
+export async function searchFuzzyTitleIds(query: string): Promise<string[]> {
+  const words = significantWords(query).filter((w) => w.length >= 4);
+  if (words.length === 0) return [];
+  const conds = words.map(
+    (w) => Prisma.sql`(${w} <% "name"
+      OR EXISTS (SELECT 1 FROM unnest("aliases") a WHERE ${w} <% a)
+      OR "publisherId" IN (SELECT id FROM "Publisher" WHERE ${w} <% "name"))`,
+  );
+  try {
+    const rows = await prisma.$queryRaw<{ id: string }[]>(
+      Prisma.sql`SELECT id FROM "Title" WHERE ${Prisma.join(conds, " AND ")} LIMIT 500`,
+    );
+    return rows.map((r) => r.id);
+  } catch {
+    return [];
+  }
+}
 
 /**
  * The catalog's search clause, tiered so titles matching EVERY word always
  * win and the search only widens when there are none:
  *   1. FTS, all words        2. ILIKE, all words
  *   3. FTS, any word         4. ILIKE, any word   (multi-word queries only)
+ *   5. trigram-similar names (typos)
  * Tiers are decided against the titles the catalog can show at all. Null for
  * an empty query.
  */
@@ -276,6 +307,11 @@ export async function resolveCatalogSearch(query: string): Promise<CatalogSearch
     }
     const someWhere = buildIlikeFallbackWhere(q, "some");
     if (await hits(someWhere)) return { where: someWhere, match: "some" };
+  }
+  const similarIds = await searchFuzzyTitleIds(q);
+  if (similarIds.length > 0) {
+    const where = { id: { in: similarIds } };
+    if (await hits(where)) return { where, match: "similar" };
   }
   // Nothing anywhere: keep the strict clause (the page shows its no-match state).
   return { where: allWhere, match: "all" };

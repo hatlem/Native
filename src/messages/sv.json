@@ -331,6 +331,7 @@
     "exportCsvMarket": "Ladda ner titlar i {market} (CSV)",
     "noMatchHeading": "Inga träffar",
     "searchSomeWords": "Ingen titel matchar alla ord i ”{q}”, så de här matchar några av dem.",
+    "searchSimilar": "Inga träffar på ”{q}”, så det här är titlar med liknande namn.",
     "exportCsvFiltered": "{count, plural, =0 {Ladda ner träffarna (CSV)} one {Ladda ner den här titeln (CSV)} other {Ladda ner de här # titlarna (CSV)}}"
   },
   "lists": {

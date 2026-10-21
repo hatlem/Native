@@ -1,6 +1,6 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { SYNONYM_GROUPS, expandTerm, normalizeSynonymTerm } from "./search-synonyms";
+import { SYNONYM_GROUPS, expandTerm, normalizeSynonymTerm, stemOf } from "./search-synonyms";
 
 test("every synonym-group term is pre-normalized (lowercase letters/numbers only)", () => {
   const shape = /^[\p{Letter}\p{Number}]+$/u;
@@ -81,4 +81,29 @@ test("expandTerm covers the trades ABAX sells to", () => {
   assert.ok(expandTerm("skogbruk").includes("forestry"));
   assert.ok(expandTerm("renovasjon").includes("avfall"));
   assert.ok(expandTerm("kommune").includes("municipality"));
+});
+
+test("expandTerm carries bygg across the construction and property vocabulary", () => {
+  assert.ok(expandTerm("bygg").includes("entreprenør"));
+  assert.ok(expandTerm("bygg").includes("construction"));
+  assert.ok(expandTerm("eiendom").includes("bolig"));
+  assert.ok(expandTerm("maskin").includes("gravemaskin"));
+});
+
+test("expandTerm covers the wider sector vocabulary", () => {
+  assert.ok(expandTerm("energi").includes("olje"));
+  assert.ok(expandTerm("helse").includes("health"));
+  assert.ok(expandTerm("reise").includes("tourism"));
+  assert.ok(expandTerm("handel").includes("retail"));
+  assert.ok(expandTerm("teknologi").includes("software"));
+});
+
+test("stemOf strips common endings, keeps short words and stems of 4+ letters", () => {
+  assert.equal(stemOf("butikker"), "butikk");
+  assert.equal(stemOf("bygget"), "bygg");
+  assert.equal(stemOf("avisen"), "avis");
+  assert.equal(stemOf("aviser"), "avis");
+  assert.equal(stemOf("bygg"), null);
+  assert.equal(stemOf("hage"), null);
+  assert.equal(stemOf("xyz"), null);
 });
