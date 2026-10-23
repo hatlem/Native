@@ -9,6 +9,7 @@ import type { Prisma } from "@prisma/client";
 import { catalogVisibleTitleWhere } from "@/lib/catalog-visibility";
 import { priceBandWhere } from "@/lib/pricing/title-band";
 import type { CatalogSearch } from "@/lib/catalog-search";
+import { verticalFilterWhere } from "@/lib/vertical-families";
 import type { CatalogParams } from "./filters";
 
 // "Priced titles only" = a buyer can actually see a figure. Mirrors
@@ -66,6 +67,7 @@ export function buildCatalogWhere(
   { includeOnlyPriced = true }: { includeOnlyPriced?: boolean } = {},
 ): Prisma.TitleWhereInput {
   const { markets, types, verticals, regions, publisher, nativeFit, b2bB2c, reach } = f;
+  const verticalWhere = verticalFilterWhere(verticals);
   return {
     ...(markets.length
       ? markets.length === 1
@@ -73,7 +75,6 @@ export function buildCatalogWhere(
         : { market: { code: { in: markets } } }
       : {}),
     ...(types.length ? { products: { some: { type: { in: types }, active: true } } } : {}),
-    ...(verticals.length ? { vertical: { in: verticals } } : {}),
     ...(regions.length ? { region: { in: regions } } : {}),
     ...(publisher ? { publisherId: publisher } : {}),
     ...(nativeFit ? { nativeFit } : {}),
@@ -101,6 +102,8 @@ export function buildCatalogWhere(
       // an empty one falls through to the synonym-aware ILIKE fallback
       // instead of pinning `id IN ()`.
       search?.where ?? {},
+      // Exact verticals and whole families ("All B2B", lib/vertical-families).
+      ...(verticalWhere ? [verticalWhere] : []),
       ...(includeOnlyPriced && f.onlyPriced ? ONLY_PRICED_CONDITIONS : []),
       ...semanticConditions(f),
     ],

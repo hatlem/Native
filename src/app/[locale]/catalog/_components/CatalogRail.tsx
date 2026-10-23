@@ -1,8 +1,15 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useMemo, useRef, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import { useTranslations } from "next-intl";
+import { Search } from "lucide-react";
+import {
+  isVerticalSelected,
+  matchesCategoryFilter,
+  toggleVerticalSelection,
+  verticalFamilies,
+} from "@/lib/vertical-families";
 
 type Option = { value: string; label: string };
 
@@ -42,7 +49,8 @@ type Props = {
   onDraftChange?: (draft: URLSearchParams) => void;
 };
 
-const SEARCH_DEBOUNCE_MS = 300;
+// A long category list gets a box to type in.
+const CATEGORY_FILTER_MIN = 8;
 
 const list = (v: string | null) => (v ?? "").split(",").filter(Boolean);
 
@@ -77,6 +85,7 @@ export function CatalogRail({
   const [marketOpen, setMarketOpen] = useState(false);
   const [formatOpen, setFormatOpen] = useState(false);
   const [categoryOpen, setCategoryOpen] = useState(false);
+  const [categoryQuery, setCategoryQuery] = useState("");
   const [priceOpen, setPriceOpen] = useState(false);
   const [advancedOpen, setAdvancedOpen] = useState(false);
   const marketRef = useRef<HTMLDivElement>(null);
@@ -98,17 +107,20 @@ export function CatalogRail({
     window.location.href = `${window.location.pathname}?${next.toString()}`;
   }
 
-  function debouncedSearch(value: string) {
+  function applySearch(value: string) {
+    commit((p) => {
+      const v = value.trim();
+      if (v) p.set("q", v);
+      else p.delete("q");
+    });
+  }
+
+  // Every search reloads the page (see commit), so a live rail searches on
+  // Enter rather than on a typing pause: a reload mid-word cut the title off.
+  // Clearing the box searches at once; a staged draft takes every keystroke.
+  function onSearchChange(value: string) {
     setQ(value);
-    const apply = () =>
-      commit((p) => {
-        if (value) p.set("q", value);
-        else p.delete("q");
-      });
-    // A staged draft takes the text at once; a live rail waits for a pause.
-    if (staged) return apply();
-    window.clearTimeout((debouncedSearch as { _t?: number })._t);
-    (debouncedSearch as { _t?: number })._t = window.setTimeout(apply, SEARCH_DEBOUNCE_MS);
+    if (staged || (value === "" && initial.q !== "")) applySearch(value);
   }
 
   function toggleIn(key: string, value: string) {
@@ -120,7 +132,15 @@ export function CatalogRail({
     });
   }
   const toggleMarket = (value: string) => toggleIn("market", value);
-  const toggleCategory = (value: string) => toggleIn("vertical", value);
+  const families = useMemo(() => verticalFamilies(categories), [categories]);
+  function toggleCategory(value: string) {
+    const family = families.find((f) => f.members.some((m) => m.value === value));
+    const next = toggleVerticalSelection(list(params.get("vertical")), value, family);
+    commit((p) => {
+      if (next.length) p.set("vertical", next.join(","));
+      else p.delete("vertical");
+    });
+  }
   const togglePrice = (value: string) => toggleIn("price", value);
   const toggleFormat = (value: string) => {
     // Reads the legacy single `type` param too (old shared links), and
@@ -190,8 +210,17 @@ export function CatalogRail({
   const primaryMarket = firstLabel(markets, view.markets);
   const selectedFormats = new Set(view.types);
   const primaryFormat = firstLabel(formats, view.types);
-  const selectedCategories = new Set(view.verticals);
-  const primaryCategory = firstLabel(categories, view.verticals);
+  const familyOptions = families.map((f) => ({
+    value: f.token,
+    label: t("categoryFamilyAll", { family: f.label }),
+  }));
+  const primaryCategory = firstLabel([...familyOptions, ...categories], view.verticals);
+  const shownFamilies = families.filter(
+    (f) =>
+      matchesCategoryFilter({ value: f.head, label: f.label }, categoryQuery) ||
+      f.members.some((m) => matchesCategoryFilter(m, categoryQuery)),
+  );
+  const shownCategories = categories.filter((c) => matchesCategoryFilter(c, categoryQuery));
   const selectedPrices = new Set(view.priceTiers);
   // Cheapest selected tier first, whatever order they were ticked in.
   const primaryPrice = firstLabel(
@@ -208,15 +237,30 @@ export function CatalogRail({
         </button>
       </div>
 
-      <input
-        type="search"
-        className="catalog-rail__search"
-        value={q}
-        onChange={(e) => debouncedSearch(e.target.value)}
-        placeholder={t("searchPlaceholder")}
-        aria-label={tf("search")}
-        autoComplete="off"
-      />
+      <form
+        className="catalog-rail__search-form"
+        role="search"
+        onSubmit={(e) => {
+          e.preventDefault();
+          applySearch(q);
+        }}
+      >
+        <input
+          type="search"
+          className="catalog-rail__search"
+          value={q}
+          onChange={(e) => onSearchChange(e.target.value)}
+          placeholder={t("searchPlaceholder")}
+          aria-label={tf("search")}
+          enterKeyHint="search"
+          autoComplete="off"
+        />
+        {staged ? null : (
+          <button type="submit" className="catalog-rail__search-submit" aria-label={t("searchSubmit")}>
+            <Search size={15} strokeWidth={1.8} aria-hidden="true" />
+          </button>
+        )}
+      </form>
 
       <div className="catalog-rail__group">
         <h3>{t("whereHeading")}</h3>
@@ -308,17 +352,47 @@ export function CatalogRail({
             <span aria-hidden="true">⌄</span>
           </button>
           {categoryOpen ? (
-            <div className="catalog-rail__popover" role="dialog">
-              {categories.map((c) => (
+            <div className="catalog-rail__popover" role="dialog" aria-label={tf("category")}>
+              {categories.length >= CATEGORY_FILTER_MIN ? (
+                <input
+                  type="search"
+                  className="catalog-rail__popover-filter"
+                  value={categoryQuery}
+                  onChange={(e) => setCategoryQuery(e.target.value)}
+                  placeholder={t("categoryFilterPlaceholder")}
+                  aria-label={t("categoryFilterPlaceholder")}
+                  autoComplete="off"
+                  autoFocus
+                />
+              ) : null}
+              {shownFamilies.length > 0 ? (
+                <div className="catalog-rail__popover-families">
+                  {shownFamilies.map((f) => (
+                    <label key={f.token} className="catalog-rail__popover-row catalog-rail__popover-row--family">
+                      <input
+                        type="checkbox"
+                        checked={view.verticals.includes(f.token)}
+                        onChange={() => toggleCategory(f.token)}
+                      />
+                      <span>{t("categoryFamilyAll", { family: f.label })}</span>
+                      <small>{f.members.length}</small>
+                    </label>
+                  ))}
+                </div>
+              ) : null}
+              {shownCategories.map((c) => (
                 <label key={c.value} className="catalog-rail__popover-row">
                   <input
                     type="checkbox"
-                    checked={selectedCategories.has(c.value)}
+                    checked={isVerticalSelected(c.value, view.verticals)}
                     onChange={() => toggleCategory(c.value)}
                   />
                   <span>{c.label}</span>
                 </label>
               ))}
+              {shownFamilies.length === 0 && shownCategories.length === 0 ? (
+                <p className="catalog-rail__popover-empty">{t("categoryFilterEmpty")}</p>
+              ) : null}
             </div>
           ) : null}
         </div>

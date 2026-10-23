@@ -110,9 +110,35 @@ export function signedOutRedirect(req: NextRequest): string | null {
   return signinPath(m[1], pathname + search);
 }
 
+// www.<host> → <host>, for page loads only (a POST is a server action that
+// must not be replayed cross-origin). Browser storage is per origin: the
+// cookie banner's stored choice (GetCookies keeps it in localStorage), the
+// session cookie and the catalog's compare selection given on one host were
+// missing on the other, and the sign-in redirect (appUrl) already moves every
+// www visitor to the apex — so the banner asked again.
+export function canonicalHostRedirect(req: NextRequest, canonical: string): string | null {
+  if (req.method !== "GET" && req.method !== "HEAD") return null;
+  let canonicalUrl: URL;
+  try {
+    canonicalUrl = new URL(canonical);
+  } catch {
+    return null;
+  }
+  const host = (req.headers.get("x-forwarded-host") ?? req.headers.get("host") ?? "")
+    .split(",")[0]
+    .trim()
+    .toLowerCase();
+  if (host !== `www.${canonicalUrl.host.toLowerCase()}`) return null;
+  const { pathname, search } = req.nextUrl;
+  return `${canonicalUrl.origin}${pathname}${search}`;
+}
+
 export default function middleware(req: NextRequest) {
   const nonce = generateNonce();
   const csp = buildCsp(nonce);
+
+  const canonicalHost = canonicalHostRedirect(req, appUrl());
+  if (canonicalHost) return NextResponse.redirect(canonicalHost, 308);
 
   // Signed out on a protected page: a real 307 to sign-in, decided before
   // anything renders (a page-level redirect streams as 200 + meta refresh).

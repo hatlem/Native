@@ -441,7 +441,11 @@
       "formatHeading": "Mikä formaatti?",
       "formatHint": "Natiiviartikkeli, advertoriaali, display, video …",
       "priceHeading": "Paljonko haluat käyttää sijoittelua kohden?",
-      "priceHint": "Hintahaarukka sijoittelua kohden, artikkeli mukaan lukien."
+      "priceHint": "Hintahaarukka sijoittelua kohden, artikkeli mukaan lukien.",
+      "searchSubmit": "Hae",
+      "categoryFamilyAll": "Kaikki: {family}",
+      "categoryFilterPlaceholder": "Etsi kategoria",
+      "categoryFilterEmpty": "Ei osuvia kategorioita."
     },
     "shortlist": {
       "untitledPlan": "suunnitelmasi",

@@ -1,6 +1,6 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import middleware, { buildCsp, mergeMiddlewareHeaders, signedOutRedirect } from "./middleware";
+import middleware, { buildCsp, canonicalHostRedirect, mergeMiddlewareHeaders, signedOutRedirect } from "./middleware";
 import { NextRequest } from "next/server";
 
 test("mergeMiddlewareHeaders drops every internal x-middleware-* directive header but keeps client-visible headers", () => {
@@ -128,4 +128,34 @@ test("CSP: the GetCookies banner only opens connect-src, and only when configure
     if (prev === undefined) delete process.env.NEXT_PUBLIC_GETCOOKIES_DOMAIN_ID;
     else process.env.NEXT_PUBLIC_GETCOOKIES_DOMAIN_ID = prev;
   }
+});
+
+test("canonicalHostRedirect sends a www page load to the apex, path and query kept", () => {
+  const req = new NextRequest("https://www.nativespin.com/no/catalog?q=vg", {
+    headers: { host: "www.nativespin.com" },
+  });
+  assert.equal(
+    canonicalHostRedirect(req, "https://nativespin.com"),
+    "https://nativespin.com/no/catalog?q=vg",
+  );
+});
+
+test("canonicalHostRedirect reads the proxy's forwarded host", () => {
+  const req = new NextRequest("http://internal:8080/no", {
+    headers: { host: "internal:8080", "x-forwarded-host": "www.nativespin.com" },
+  });
+  assert.equal(canonicalHostRedirect(req, "https://nativespin.com"), "https://nativespin.com/no");
+});
+
+test("canonicalHostRedirect leaves the apex, other hosts and non-GET requests alone", () => {
+  const apex = new NextRequest("https://nativespin.com/no", { headers: { host: "nativespin.com" } });
+  assert.equal(canonicalHostRedirect(apex, "https://nativespin.com"), null);
+  const other = new NextRequest("https://www.example.com/no", { headers: { host: "www.example.com" } });
+  assert.equal(canonicalHostRedirect(other, "https://nativespin.com"), null);
+  const post = new NextRequest("https://www.nativespin.com/no", {
+    method: "POST",
+    headers: { host: "www.nativespin.com" },
+  });
+  assert.equal(canonicalHostRedirect(post, "https://nativespin.com"), null);
+  assert.equal(canonicalHostRedirect(apex, "not a url"), null);
 });

@@ -7,6 +7,8 @@ import {
   domainOf,
   searchWhereFor,
   significantWords,
+  titleNameStartsWhere,
+  titleNameWhere,
   wordVariants,
 } from "./catalog-search";
 import { spellingVariants } from "./search-synonyms";
@@ -130,8 +132,9 @@ test("buildTsQuery: slash-joined names split into AND-ed words", () => {
   // Pairs with the index splitting "/" (20260924120000_fts_split_separators):
   // "Bärgslagsbladet/Arboga Tidning" must be findable by "Arboga Tidning".
   const q = buildTsQuery("Bärgslagsbladet/Arboga");
-  // "arboga" also asks for its å/ä spellings; the word itself comes first.
-  assert.match(q, /^bärgslagsbladet:\* & \(arboga:\* \| [^&]+\)$/u);
+  // "arboga" also asks for its å/ä spellings and "bärgslagsbladet" for its
+  // stem (stemOf); each word itself comes first in its group.
+  assert.match(q, /^\(bärgslagsbladet:\* \| [^&]+\) & \(arboga:\* \| [^&]+\)$/u);
 });
 
 test("domainOf: only host-shaped chunks qualify", () => {
@@ -229,4 +232,20 @@ test("wordVariants: an inflected word also asks for its stem and the stem's syno
 
 test("buildTsQuery: a word without a stem is untouched", () => {
   assert.equal(buildTsQuery("title"), "title:*");
+});
+
+test("titleNameWhere: every word must appear in the name, mid-word too, with its æ/ø/å spellings", () => {
+  const where = titleNameWhere("posten") as { AND: { OR: { name: { contains: string } }[] }[] };
+  assert.equal(where.AND.length, 1);
+  const contains = where.AND[0].OR.map((c) => c.name.contains);
+  assert.equal(contains[0], "posten");
+  const tromso = titleNameWhere("tromso") as { AND: { OR: { name: { contains: string } }[] }[] };
+  assert.ok(tromso.AND[0].OR.some((c) => c.name.contains === "tromsø"));
+  assert.equal((titleNameWhere("dagens og næringsliv") as { AND: unknown[] }).AND.length, 2);
+  assert.equal(titleNameWhere("  "), null);
+});
+
+test("titleNameStartsWhere matches the name's start as typed", () => {
+  assert.deepEqual(titleNameStartsWhere(" Aftenp "), { name: { startsWith: "Aftenp", mode: "insensitive" } });
+  assert.equal(titleNameStartsWhere(""), null);
 });
