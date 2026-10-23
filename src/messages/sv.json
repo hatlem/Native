@@ -301,7 +301,11 @@
       "formatHeading": "Vilket format?",
       "formatHint": "Native-artikel, advertorial, display, video …",
       "priceHeading": "Vad vill du lägga per placering?",
-      "priceHint": "Prisintervall per placering, inkl. artikel."
+      "priceHint": "Prisintervall per placering, inkl. artikel.",
+      "searchSubmit": "Sök",
+      "categoryFamilyAll": "Alla {family}",
+      "categoryFilterPlaceholder": "Hitta kategori",
+      "categoryFilterEmpty": "Inga kategorier matchar."
     },
     "shortlist": {
       "untitledPlan": "din plan",

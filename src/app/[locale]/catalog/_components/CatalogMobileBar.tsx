@@ -6,8 +6,6 @@ import { useTranslations } from "next-intl";
 import { SlidersHorizontal, X } from "lucide-react";
 import { CatalogRail } from "./CatalogRail";
 
-const SEARCH_DEBOUNCE_MS = 300;
-
 type Option = { value: string; label: string };
 type RailInitial = ComponentProps<typeof CatalogRail>["initial"];
 
@@ -96,30 +94,44 @@ export function CatalogMobileBar({
     window.location.href = `${window.location.pathname}?${next.toString()}`;
   }
 
+  // On Enter (the keyboard's search key), not on a typing pause: every
+  // search is a full reload, and one mid-word cut the title off.
   function commitSearch(value: string) {
+    const next = new URLSearchParams(sp.toString());
+    const v = value.trim();
+    if (v) next.set("q", v);
+    else next.delete("q");
+    next.delete("page");
+    window.location.href = `${window.location.pathname}?${next.toString()}`;
+  }
+
+  function onSearchChange(value: string) {
     setQ(value);
-    window.clearTimeout((commitSearch as { _t?: number })._t);
-    (commitSearch as { _t?: number })._t = window.setTimeout(() => {
-      const next = new URLSearchParams(sp.toString());
-      if (value) next.set("q", value);
-      else next.delete("q");
-      next.delete("page");
-      window.location.href = `${window.location.pathname}?${next.toString()}`;
-    }, SEARCH_DEBOUNCE_MS);
+    if (value === "" && initial.q !== "") commitSearch(value);
   }
 
   return (
     <>
       <div className="catalog-mobile-bar">
-        <input
-          type="search"
-          className="catalog-mobile-bar__search"
-          value={q}
-          onChange={(e) => commitSearch(e.target.value)}
-          placeholder={t("searchPlaceholder")}
-          aria-label={tf("search")}
-          autoComplete="off"
-        />
+        <form
+          className="catalog-mobile-bar__search-form"
+          role="search"
+          onSubmit={(e) => {
+            e.preventDefault();
+            commitSearch(q);
+          }}
+        >
+          <input
+            type="search"
+            className="catalog-mobile-bar__search"
+            value={q}
+            onChange={(e) => onSearchChange(e.target.value)}
+            placeholder={t("searchPlaceholder")}
+            aria-label={tf("search")}
+            enterKeyHint="search"
+            autoComplete="off"
+          />
+        </form>
         <button
           type="button"
           className="catalog-mobile-bar__filters-btn"

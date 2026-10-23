@@ -1,4 +1,5 @@
 import Script from "next/script";
+import { GetCookiesDismissAsReject } from "./getcookies-dismiss";
 
 export const GETCOOKIES_DOMAIN_ID = process.env.NEXT_PUBLIC_GETCOOKIES_DOMAIN_ID;
 export const GETCOOKIES_ORIGIN = "https://getcookies.co";
@@ -23,12 +24,15 @@ export function GetCookiesScripts({ nonce }: { nonce?: string }) {
   // the full widget from getcookies.co itself; 'strict-dynamic' trusts that
   // insertion because this tag carries the nonce.
   return (
-    <Script
-      id="getcookies-loader"
-      src={`${GETCOOKIES_ORIGIN}/api/v1/widget/loader.js`}
-      data-domain-id={GETCOOKIES_DOMAIN_ID}
-      strategy="afterInteractive"
-      nonce={nonce}
-    />
+    <>
+      <Script
+        id="getcookies-loader"
+        src={`${GETCOOKIES_ORIGIN}/api/v1/widget/loader.js`}
+        data-domain-id={GETCOOKIES_DOMAIN_ID}
+        strategy="afterInteractive"
+        nonce={nonce}
+      />
+      <GetCookiesDismissAsReject />
+    </>
   );
 }

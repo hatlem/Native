@@ -4,13 +4,15 @@ import { Link } from "@/i18n/navigation";
 import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
 import { getFavoritedTitleIds } from "@/lib/favorites";
-import { resolveCatalogSearch } from "@/lib/catalog-search";
+import { resolveCatalogSearch, titleNameStartsWhere, titleNameWhere } from "@/lib/catalog-search";
+import { tierSlices } from "@/lib/catalog-tiers";
 import { redirect } from "next/navigation";
 import { savedListMembershipMap } from "@/lib/saved-list-membership";
 import { loadScope } from "@/lib/scope";
 import { loadRelevanceSignals } from "@/lib/catalog-relevance";
 import { loadVerticalOptions, localizedVerticalOptions } from "@/lib/catalog-taxonomy";
 import { localizeVertical } from "@/lib/taxonomy-i18n";
+import { familyOfToken, isFamilyToken, verticalFamilies } from "@/lib/vertical-families";
 import { safeLocale } from "@/i18n/routing";
 import { readActiveListId, resolveActiveList } from "@/lib/lists";
 import { barTotals, planLineCount, planTitleIds } from "@/lib/plan-total";
@@ -217,43 +219,45 @@ export default async function CatalogPage({
     }
   }
 
+  // Searching for a title by name puts it first: titles whose name starts
+  // with the query, then titles whose name contains every word, then the
+  // personalized tier, then the rest — each tier excluding the ones before.
+  // An explicit sort is the buyer's own order and skips the name tiers.
+  type Tier = { where: Prisma.TitleWhereInput; orderBy: Prisma.TitleOrderByWithRelationInput[] };
+  const tierFilters: Tier[] = [];
+  if (q && sort === undefined) {
+    const starts = titleNameStartsWhere(q);
+    const contains = titleNameWhere(q);
+    if (starts) tierFilters.push({ where: starts, orderBy });
+    if (contains) tierFilters.push({ where: contains, orderBy });
+  }
+  if (relevanceOr.length > 0) tierFilters.push({ where: { OR: relevanceOr }, orderBy: relevantOrderBy });
+
   let totalCount: number;
   let titles: Prisma.TitleGetPayload<{ include: typeof titleInclude }>[];
 
-  if (relevanceOr.length > 0) {
-    const whereRelevant: Prisma.TitleWhereInput = { AND: [where, { OR: relevanceOr }] };
-    const whereRest: Prisma.TitleWhereInput = { AND: [where, { NOT: { OR: relevanceOr } }] };
-    const [countRelevant, countRest] = await Promise.all([
-      prisma.title.count({ where: whereRelevant }),
-      prisma.title.count({ where: whereRest }),
-    ]);
-    totalCount = countRelevant + countRest;
-
-    const rows: Prisma.TitleGetPayload<{ include: typeof titleInclude }>[] = [];
-    if (skip < countRelevant) {
-      rows.push(
-        ...(await prisma.title.findMany({
-          where: whereRelevant,
+  if (tierFilters.length > 0) {
+    const tiers: Tier[] = [
+      ...tierFilters.map((tier, i) => ({
+        where: { AND: [where, tier.where, ...tierFilters.slice(0, i).map((prev) => ({ NOT: prev.where }))] },
+        orderBy: tier.orderBy,
+      })),
+      { where: { AND: [where, ...tierFilters.map((prev) => ({ NOT: prev.where }))] }, orderBy },
+    ];
+    const counts = await Promise.all(tiers.map((tier) => prisma.title.count({ where: tier.where })));
+    totalCount = counts.reduce((a, b) => a + b, 0);
+    const pages = await Promise.all(
+      tierSlices(counts, skip, PAGE_SIZE).map((slice) =>
+        prisma.title.findMany({
+          where: tiers[slice.tier].where,
           include: titleInclude,
-          orderBy: relevantOrderBy,
-          take: Math.min(PAGE_SIZE, countRelevant - skip),
-          skip,
-        })),
-      );
-    }
-    const remaining = PAGE_SIZE - rows.length;
-    if (remaining > 0) {
-      rows.push(
-        ...(await prisma.title.findMany({
-          where: whereRest,
-          include: titleInclude,
-          orderBy,
-          take: remaining,
-          skip: Math.max(0, skip - countRelevant),
-        })),
-      );
-    }
-    titles = rows;
+          orderBy: tiers[slice.tier].orderBy,
+          take: slice.take,
+          skip: slice.skip,
+        }),
+      ),
+    );
+    titles = pages.flat();
   } else {
     [totalCount, titles] = await Promise.all([
       prisma.title.count({ where }),
@@ -476,10 +480,15 @@ export default async function CatalogPage({
       label: `${t("filters.publisher")}: ${publisherRow?.name ?? publisher}`,
       href: filterHref("publisher"),
     });
+  const familyLabels = new Map(verticalFamilies(verticalOptions).map((f) => [f.token, f.label]));
   for (const v of verticals) {
     activeFilters.push({
       key: `vertical-${v}`,
-      label: `${t("filters.category")}: ${localizeVertical(v, safeLocale(locale))}`,
+      label: `${t("filters.category")}: ${
+        isFamilyToken(v)
+          ? t("rail.categoryFamilyAll", { family: familyLabels.get(v) ?? familyOfToken(v) })
+          : localizeVertical(v, safeLocale(locale))
+      }`,
       href: filterHref("vertical", { dropVertical: v }),
     });
   }

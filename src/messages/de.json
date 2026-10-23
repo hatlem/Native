@@ -441,7 +441,11 @@
       "formatHeading": "Welches Format?",
       "formatHint": "Native-Artikel, Advertorial, Display, Video …",
       "priceHeading": "Wie viel möchten Sie pro Platzierung ausgeben?",
-      "priceHint": "Preisspanne pro Platzierung, inkl. Artikel."
+      "priceHint": "Preisspanne pro Platzierung, inkl. Artikel.",
+      "searchSubmit": "Suchen",
+      "categoryFamilyAll": "Alle {family}",
+      "categoryFilterPlaceholder": "Kategorie finden",
+      "categoryFilterEmpty": "Keine passenden Kategorien."
     },
     "shortlist": {
       "untitledPlan": "deinen Plan",

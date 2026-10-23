@@ -206,6 +206,28 @@ function publisherWhere(q: string): Prisma.TitleWhereInput {
   };
 }
 
+/** Titles whose NAME holds every significant word of the query anywhere,
+ *  as typed or in its æ/ø/å spelling ("posten" finds Aftenposten, which the
+ *  word-prefix FTS index cannot: its lexeme is "aftenposten"). Null when the
+ *  query has no words. */
+export function titleNameWhere(q: string): Prisma.TitleWhereInput | null {
+  const words = significantWords(q.trim());
+  if (words.length === 0) return null;
+  return {
+    AND: words.map((w) => ({
+      OR: [w, ...spellingVariants(w)].map((v) => ({ name: { contains: v, mode: "insensitive" as const } })),
+    })),
+  };
+}
+
+/** Titles whose name starts with the query as typed ("aftenp" → Aftenposten):
+ *  the strongest sign the buyer is looking for that one title. */
+export function titleNameStartsWhere(q: string): Prisma.TitleWhereInput | null {
+  const trimmed = q.trim();
+  if (!trimmed) return null;
+  return { name: { startsWith: trimmed, mode: "insensitive" } };
+}
+
 function unique<T>(v: T, i: number, arr: T[]): boolean {
   return arr.indexOf(v) === i;
 }
@@ -290,10 +312,14 @@ export async function resolveCatalogSearch(query: string): Promise<CatalogSearch
     (await prisma.title.count({ where: { AND: [catalogVisibleTitleWhere, where] }, take: 1 })) > 0;
 
   // FTS hits, plus every title of a publisher whose name has all the words
-  // (the index doesn't cover publisher names; "Amedia" lists Amedia's titles).
+  // (the index doesn't cover publisher names; "Amedia" lists Amedia's titles),
+  // plus every title whose name contains them mid-word.
   const allIds = await searchTitleIds(q, "all");
   if (allIds && allIds.length > 0) {
-    const where: Prisma.TitleWhereInput = { OR: [{ id: { in: allIds } }, publisherWhere(q)] };
+    const byName = titleNameWhere(q);
+    const where: Prisma.TitleWhereInput = {
+      OR: [{ id: { in: allIds } }, publisherWhere(q), ...(byName ? [byName] : [])],
+    };
     if (await hits(where)) return { where, match: "all" };
   }
   const allWhere = buildIlikeFallbackWhere(q, "all");

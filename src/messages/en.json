@@ -388,7 +388,11 @@
       "formatHeading": "Which format?",
       "formatHint": "Native article, advertorial, display, video …",
       "priceHeading": "What's your budget per placement?",
-      "priceHint": "Price band per placement, article included."
+      "priceHint": "Price band per placement, article included.",
+      "searchSubmit": "Search",
+      "categoryFamilyAll": "All {family}",
+      "categoryFilterPlaceholder": "Find a category",
+      "categoryFilterEmpty": "No categories match."
     },
     "shortlist": {
       "untitledPlan": "your plan",
