@@ -186,7 +186,7 @@ export async function POST(req: NextRequest) {
         return fail(
           422,
           "RFQ_ONLY",
-          `Product ${it.productId} is not self-serve — submit an RFQ via the desk.`,
+          `Product ${it.productId} is not self-serve — submit a request via the desk.`,
         );
       }
     }

@@ -29,6 +29,7 @@ export function validateOnboarding(
 ): OnboardingState["errors"] {
   const errors: OnboardingState["errors"] = {};
   if (!marketCodes.includes(input.market)) errors.market = true;
-  if (!isValidPhone(input.phone)) errors.phone = true;
+  // Phone is optional; when one is given it must still look like a number.
+  if (input.phone !== "" && !isValidPhone(input.phone)) errors.phone = true;
   return errors;
 }

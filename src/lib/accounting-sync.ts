@@ -79,9 +79,36 @@ async function safePush(
   }
 }
 
+type SyncOptions = {
+  provider?: AccountingProvider;
+  actorId?: string | null;
+  now?: Date;
+  // Set by the queued retry itself, so a failing retry is rescheduled by the
+  // queue's backoff instead of queueing a second chain.
+  fromQueue?: boolean;
+};
+
+// A refused push is retried in the background (lib/jobs) on top of the desk's
+// manual retry button: one chain per document per day, starting in five
+// minutes. Only for the real provider — an injected one is a test.
+async function queueRetry(kind: string, payload: Record<string, string>, id: string, opts: SyncOptions): Promise<void> {
+  if (opts.fromQueue || opts.provider) return;
+  try {
+    const { enqueue } = await import("@/lib/jobs");
+    const day = (opts.now ?? new Date()).toISOString().slice(0, 10);
+    await enqueue(kind, payload, {
+      idempotencyKey: `${kind}:${id}:${day}`,
+      runAt: new Date(Date.now() + 5 * 60_000),
+      kick: false,
+    });
+  } catch (err) {
+    log.error("accounting.retry_enqueue_failed", { kind, id, err });
+  }
+}
+
 export async function syncInvoiceToAccounting(
   invoiceId: string,
-  opts: { provider?: AccountingProvider; actorId?: string | null; now?: Date } = {},
+  opts: SyncOptions = {},
 ): Promise<SyncOutcome> {
   const provider = opts.provider ?? getAccountingProvider();
   const now = opts.now ?? new Date();
@@ -104,13 +131,14 @@ export async function syncInvoiceToAccounting(
   await recordAudit(opts.actorId ?? null, "invoice.accounting_sync", `Invoice:${invoice.id}`, outcome);
   if (outcome.status === "failed") {
     log.error("accounting.push_failed", { invoiceId: invoice.id, ...outcome });
+    await queueRetry("accounting.sync-invoice", { invoiceId: invoice.id }, invoice.id, opts);
   }
   return outcome;
 }
 
 export async function syncCreditNoteToAccounting(
   creditNoteId: string,
-  opts: { provider?: AccountingProvider; actorId?: string | null; now?: Date } = {},
+  opts: SyncOptions = {},
 ): Promise<SyncOutcome> {
   const provider = opts.provider ?? getAccountingProvider();
   const now = opts.now ?? new Date();
@@ -145,6 +173,7 @@ export async function syncCreditNoteToAccounting(
   await recordAudit(opts.actorId ?? null, "credit_note.accounting_sync", `CreditNote:${note.id}`, outcome);
   if (outcome.status === "failed") {
     log.error("accounting.push_failed", { creditNoteId: note.id, ...outcome });
+    await queueRetry("accounting.sync-credit-note", { creditNoteId: note.id }, note.id, opts);
   }
   return outcome;
 }

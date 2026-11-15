@@ -4,7 +4,10 @@ import { readFileSync } from "node:fs";
 import { accountErrorFieldId } from "./account-error-field";
 
 test("field errors map to an input that exists on the account page", () => {
-  const page = readFileSync("src/app/[locale]/account/page.tsx", "utf8");
+  // The inputs live in the page (company) and in its client forms.
+  const page =
+    readFileSync("src/app/[locale]/account/page.tsx", "utf8") +
+    readFileSync("src/app/[locale]/account/account-forms.tsx", "utf8");
   for (const code of [
     "phone",
     "company",

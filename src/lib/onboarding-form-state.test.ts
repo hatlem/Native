@@ -14,4 +14,7 @@ test("validateOnboarding reports each failing field", () => {
   assert.deepEqual(validateOnboarding({ market: "NO", phone: "+47 400 00 000" }, markets), {});
   assert.deepEqual(validateOnboarding({ market: "", phone: "+47 400 00 000" }, markets), { market: true });
   assert.deepEqual(validateOnboarding({ market: "XX", phone: "12" }, markets), { market: true, phone: true });
+  // Phone is optional: empty passes, a malformed one still fails.
+  assert.deepEqual(validateOnboarding({ market: "NO", phone: "" }, markets), {});
+  assert.deepEqual(validateOnboarding({ market: "NO", phone: "12" }, markets), { phone: true });
 });

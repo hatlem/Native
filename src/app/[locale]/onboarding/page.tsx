@@ -16,7 +16,7 @@ const MARKET_CODES = SUPPORTED_MARKETS;
 // Post-signup onboarding. Two questions the user couldn't be bothered
 // answering at signup but the platform genuinely needs before they can
 // transact: their billing market (drives VAT + invoice currency) and a
-// phone number (drives desk-side reachability for time-pressured RFQs).
+// phone number (drives desk-side reachability for time-pressured requests; optional).
 // The buy gate (lib/onboarding-gate) sends users here; only someone who may
 // set the org's market (onboardingNeeds) is asked for it.
 export default async function OnboardingPage({

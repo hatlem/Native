@@ -27,10 +27,34 @@ export function servesArchivedPdf(invoice: { status: string; pdfObjectKey: strin
 }
 
 // Render the invoice in the customer's language and store it. Returns the
-// object key, or null when nothing was archived. Never throws.
+// object key, or null when nothing was archived. Never throws: a failure
+// (storage down, renderer error) is logged and retried in the background by
+// the job queue ("invoice.archive"), so the original is still captured.
 export async function archiveInvoicePdf(invoiceId: string): Promise<string | null> {
-  if (!isStorageConfigured()) return null;
   try {
+    return await archiveInvoicePdfOrThrow(invoiceId);
+  } catch (err) {
+    log.error("invoice.archive_failed", { invoiceId, err });
+    try {
+      const { enqueue } = await import("@/lib/jobs");
+      await enqueue(
+        "invoice.archive",
+        { invoiceId },
+        { idempotencyKey: `invoice.archive:${invoiceId}`, runAt: new Date(Date.now() + 60_000), kick: false },
+      );
+    } catch (enqueueErr) {
+      log.error("invoice.archive_enqueue_failed", { invoiceId, err: enqueueErr });
+    }
+    return null;
+  }
+}
+
+// The same, but a failure throws — what the queued retry runs. Null still
+// means "nothing to archive" (no storage, no such invoice, seller details
+// incomplete), which is not an error.
+export async function archiveInvoicePdfOrThrow(invoiceId: string): Promise<string | null> {
+  if (!isStorageConfigured()) return null;
+  {
     const invoice = await prisma.invoice.findUnique({
       where: { id: invoiceId },
       select: {
@@ -82,9 +106,6 @@ export async function archiveInvoicePdf(invoiceId: string): Promise<string | nul
       return existing?.pdfObjectKey ?? null;
     }
     return key;
-  } catch (err) {
-    log.error("invoice.archive_failed", { invoiceId, err });
-    return null;
   }
 }
 

@@ -103,15 +103,45 @@ export type SweepOutcome = { name: SweepName; ok: boolean; summary: string; fail
 // only visible to someone reading the logs.
 export async function runSweep(def: SweepDef, via: "timer" | "cron"): Promise<SweepOutcome> {
   const started = Date.now();
+  let outcome: SweepOutcome;
   try {
     const { summary, failed } = await def.run();
     const ms = Date.now() - started;
     if (failed > 0) log.error("sweep.partial_failure", { sweep: def.name, via, summary, failed, ms });
     else log.info("sweep.done", { sweep: def.name, via, summary, ms });
-    return { name: def.name, ok: failed === 0, summary, failed, ms };
+    outcome = { name: def.name, ok: failed === 0, summary, failed, ms };
   } catch (err) {
     const ms = Date.now() - started;
     log.error("sweep.crashed", { sweep: def.name, via, err, ms });
-    return { name: def.name, ok: false, summary: "crashed", failed: 1, ms };
+    outcome = { name: def.name, ok: false, summary: "crashed", failed: 1, ms };
+  }
+  await recordSweepRun(outcome, via, started);
+  return outcome;
+}
+
+// Run history (SweepRun), read by /desk/jobs and /api/health/deep. Ticks that
+// did nothing because another instance held the lock or the daily latch was
+// set are not stored — they would bury the real runs.
+export function isSkippedSweep(summary: string): boolean {
+  return summary.startsWith("skipped:");
+}
+
+async function recordSweepRun(o: SweepOutcome, via: "timer" | "cron", startedMs: number): Promise<void> {
+  if (o.ok && isSkippedSweep(o.summary)) return;
+  try {
+    const { prisma } = await import("@/lib/prisma");
+    await prisma.sweepRun.create({
+      data: {
+        name: o.name,
+        via,
+        startedAt: new Date(startedMs),
+        finishedAt: new Date(startedMs + o.ms),
+        ok: o.ok,
+        failed: o.failed,
+        summary: o.summary.slice(0, 1000),
+      },
+    });
+  } catch (err) {
+    log.warn("sweep.history_write_failed", { sweep: o.name, err });
   }
 }

@@ -61,6 +61,24 @@ export function setEmailAdapter(next: EmailAdapter) {
   emailAdapter = next;
 }
 
+// Send through whatever adapter is installed; throws on failure. This is what
+// the queued "email.send" job runs.
+export async function sendEmailNow(msg: EmailMessage): Promise<void> {
+  await emailAdapter(msg);
+}
+
+// A notice email that failed to send is not dropped: it goes on the job queue
+// (lib/jobs) and is retried with backoff for about an hour; after that it is
+// dead-lettered and shows on /desk/jobs. The inbox row was written either way.
+async function queueEmailRetry(msg: EmailMessage, userId: string): Promise<void> {
+  try {
+    const { enqueue } = await import("@/lib/jobs");
+    await enqueue("email.send", msg, { runAt: new Date(Date.now() + 60_000), kick: false });
+  } catch (err) {
+    log.error("notify.email_retry_enqueue_failed", { userId, err });
+  }
+}
+
 export type NotifyInput = {
   kind: NotificationKind;
   template: NoticeTemplate;
@@ -117,10 +135,12 @@ async function deliver(
       // The inbox row above is always written; a muted category (account →
       // notifications) only stops the email copy.
       if (r.email && opts.email !== false && emailEnabledFor(input.kind, r.emailMutedCategories)) {
+        const msg = noticeEmail(r.email, n, locale);
         try {
-          await emailAdapter(noticeEmail(r.email, n, locale));
+          await emailAdapter(msg);
         } catch (err) {
           log.error("notify.email_failed", { userId: r.id, err });
+          await queueEmailRetry(msg, r.id);
         }
       }
     }),

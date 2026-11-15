@@ -28,15 +28,19 @@ export function isRetryableStatus(status: number): boolean {
   return status === 408 || status === 429 || status >= 500;
 }
 
-type AttemptResult = { ok: true } | { ok: false; retryable: boolean; error: string };
+export type AttemptResult = { ok: true } | { ok: false; retryable: boolean; error: string };
 
-async function attempt(
+// One delivery attempt. `deliveryId` is stable across the retries of one
+// event to one receiver (X-NativeSpin-Delivery-Id), so a receiver can dedupe
+// on it without parsing the body. Exported for the queued delivery job.
+export async function attempt(
   id: string,
   url: string,
   secret: string,
   body: string,
   attemptNo: number,
-  fetchImpl: typeof fetch,
+  fetchImpl: typeof fetch = fetch,
+  deliveryId?: string,
 ): Promise<AttemptResult> {
   try {
     const res = await fetchImpl(url, {
@@ -46,6 +50,7 @@ async function attempt(
         ...signatureHeaders(secret, body, Math.floor(Date.now() / 1000)),
         "X-NativeSpin-Webhook-Id": id,
         "X-NativeSpin-Delivery-Attempt": String(attemptNo),
+        ...(deliveryId ? { "X-NativeSpin-Delivery-Id": deliveryId } : {}),
       },
       body,
       signal: AbortSignal.timeout(DELIVERY_TIMEOUT_MS),

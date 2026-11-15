@@ -133,9 +133,14 @@ export async function GET(req: NextRequest) {
     }),
   ]);
 
-  await recordAudit(session.user.id, "data.export", `Organization:${orgIds.join(",")}`, {
-    asked: askedOrg ?? null,
-  });
+  // One row per organisation, so each org's own audit trail (/audit) shows
+  // that its data was exported, and by whom.
+  for (const orgId of orgIds) {
+    await recordAudit(session.user.id, "data.export", `Organization:${orgId}`, {
+      asked: askedOrg ?? null,
+      organizations: orgIds.length,
+    });
+  }
 
   return NextResponse.json(
     {

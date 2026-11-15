@@ -71,7 +71,6 @@ export function OnboardingForm({
           autoComplete="tel"
           key={`phone-${phone}`}
           defaultValue={phone}
-          required
           placeholder={t("phonePlaceholder")}
           aria-invalid={state.errors.phone ? true : undefined}
           aria-describedby={state.errors.phone ? "phone-err" : "phone-hint"}

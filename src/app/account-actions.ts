@@ -16,6 +16,7 @@ import { companySeat, getWorkspace } from "@/lib/workspace";
 import { normaliseEmail } from "@/lib/email-change";
 import { SUPPORTED_MARKETS } from "@/lib/markets";
 import { asNoticeLocale } from "@/lib/notices/messages";
+import { accountFail, type AccountFormState } from "@/lib/account-form-state";
 
 const MARKET_CODES: readonly string[] = SUPPORTED_MARKETS;
 
@@ -29,7 +30,14 @@ function isValidPhone(raw: string): boolean {
   return raw.length <= 32 && digits >= 6;
 }
 
-export async function updateProfile(formData: FormData) {
+// updateProfile, setPassword and deactivateOwnAccount are useActionState
+// actions: a validation failure RETURNS the error code and what was typed
+// (never a password), so the form shows it next to the field and keeps the
+// input. Success and "not signed in" still redirect.
+export async function updateProfile(
+  _prev: AccountFormState,
+  formData: FormData,
+): Promise<AccountFormState> {
   const locale = String(formData.get("locale") || "en");
   const session = await auth();
   if (!session?.user?.id) redirect(`/${locale}/signin`);
@@ -39,7 +47,7 @@ export async function updateProfile(formData: FormData) {
   const phone = normalisePhone(phoneRaw);
 
   if (!isValidPhone(phone)) {
-    redirect(`/${locale}/account?error=phone#profile`);
+    return accountFail("phone", { name, phone: phoneRaw });
   }
 
   await prisma.user.update({
@@ -125,7 +133,10 @@ export async function updateCompany(formData: FormData) {
 // link and has no password yet, currentPassword is not required. If a
 // password already exists, we verify the current one before accepting
 // the new one — same UX as resetPassword but in the signed-in flow.
-export async function setPassword(formData: FormData) {
+export async function setPassword(
+  _prev: AccountFormState,
+  formData: FormData,
+): Promise<AccountFormState> {
   const locale = String(formData.get("locale") || "en");
   const session = await auth();
   if (!session?.user?.id) redirect(`/${locale}/signin`);
@@ -133,7 +144,7 @@ export async function setPassword(formData: FormData) {
   const current = String(formData.get("currentPassword") || "");
   const next = String(formData.get("newPassword") || "");
   if (next.length < 8) {
-    redirect(`/${locale}/account?error=password_length#password`);
+    return accountFail("password_length");
   }
 
   const user = await prisma.user.findUnique({
@@ -146,7 +157,7 @@ export async function setPassword(formData: FormData) {
     // Existing-password users must prove they know it.
     const ok = await bcrypt.compare(current, user.passwordHash);
     if (!ok) {
-      redirect(`/${locale}/account?error=current_password#password`);
+      return accountFail("current_password");
     }
   }
 
@@ -193,7 +204,10 @@ export async function setPassword(formData: FormData) {
 //     back in, including them)
 //   - the last admin of an org can't either, or that org's team, billing and
 //     seats become unmanageable for everyone in it
-export async function deactivateOwnAccount(formData: FormData) {
+export async function deactivateOwnAccount(
+  _prev: AccountFormState,
+  formData: FormData,
+): Promise<AccountFormState> {
   const locale = String(formData.get("locale") || "en");
   const session = await auth();
   if (!session?.user?.id) redirect(`/${locale}/signin`);
@@ -207,16 +221,22 @@ export async function deactivateOwnAccount(formData: FormData) {
   if (user.deactivatedAt) {
     // Already off-boarded in another tab: nothing to do but end the session.
     await signOut({ redirectTo: `/${locale}` });
-    return;
+    return accountFail("1");
   }
 
   // Typed confirmation. The one destructive control on this page that isn't
   // undoable by the user themselves, so it asks for the address rather than
   // trusting a single click — the pattern the desk's order-cancel form uses
   // for the same reason.
-  const typed = normaliseEmail(String(formData.get("confirmEmail") || ""));
+  const typedRaw = String(formData.get("confirmEmail") || "");
+  const typed = normaliseEmail(typedRaw);
+  // What to put back in the form when a guard below refuses.
+  const kept = {
+    confirmEmail: typedRaw,
+    eraseData: formData.get("eraseData") === "on" ? "on" : "",
+  };
   if (typed !== normaliseEmail(user.email)) {
-    redirect(`/${locale}/account?error=confirm#danger`);
+    return accountFail("confirm", kept);
   }
 
   const allUsers = await prisma.user.findMany({
@@ -224,13 +244,13 @@ export async function deactivateOwnAccount(formData: FormData) {
     select: { id: true, role: true, deactivatedAt: true },
   });
   if (!canDeactivateSelf(user, allUsers).ok) {
-    redirect(`/${locale}/account?error=last_superadmin#danger`);
+    return accountFail("last_superadmin", kept);
   }
 
   // Last-admin check and the write happen in one locked transaction, so two
   // admins leaving at the same moment can't both pass the check.
   const outcome = await deactivateUserUnlessLastAdmin(userId);
-  if (!outcome.ok) redirect(`/${locale}/account?error=last_admin#danger`);
+  if (!outcome.ok) return accountFail("last_admin", kept);
   // "Also erase my personal data": the account is anonymised, not just
   // switched off (lib/retention.ts). Orders and invoices stay.
   const erase = formData.get("eraseData") === "on";
@@ -244,4 +264,5 @@ export async function deactivateOwnAccount(formData: FormData) {
   }
 
   await signOut({ redirectTo: `/${locale}` });
+  return accountFail("1"); // unreachable: signOut redirects
 }

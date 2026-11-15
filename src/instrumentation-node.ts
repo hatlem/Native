@@ -18,6 +18,16 @@ export async function startSchedules(): Promise<void> {
   const { validateEnvAtBoot } = await import("@/lib/env");
   validateEnvAtBoot();
 
+  // The durable job queue (lib/jobs) is polled in this process unless
+  // JOB_WORKER=0 — independent of the sweep timers, because queued webhook
+  // and email retries need a tick every few seconds, not every hour.
+  // /api/cron/sweeps drains the queue too.
+  if (!(globalThis as { __jobWorkerStarted?: boolean }).__jobWorkerStarted) {
+    (globalThis as { __jobWorkerStarted?: boolean }).__jobWorkerStarted = true;
+    const { startJobWorker } = await import("@/lib/jobs");
+    startJobWorker();
+  }
+
   if (process.env.IN_PROCESS_SWEEPS === "0") return;
 
   // Dev hot-reload can re-evaluate this module; keep exactly one schedule.

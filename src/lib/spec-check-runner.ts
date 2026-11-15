@@ -5,7 +5,6 @@
 // the same article can have different product requirements.
 
 import { prisma } from "@/lib/prisma";
-import { registerJob } from "@/lib/jobs";
 import { specCheck, type SpecResult } from "@/lib/spec-check";
 import { resolveEffectiveAsset } from "@/lib/writers/placement";
 
@@ -100,11 +99,6 @@ export async function specFailuresForSubmission(args: {
   return failing;
 }
 
-let registered = false;
-export function registerSpecCheckJob(): void {
-  if (registered) return;
-  registered = true;
-  registerJob<{ placementId: string }>("spec.check", async ({ placementId }) => {
-    await runSpecCheckForPlacement(placementId);
-  });
-}
+// The "spec.check" job is registered with every other kind in
+// lib/jobs/handlers.ts; kept as a no-op so existing callers stay valid.
+export function registerSpecCheckJob(): void {}

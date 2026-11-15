@@ -5,13 +5,8 @@ import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
 import { loadScope } from "@/lib/scope";
 import { companySeat } from "@/lib/workspace";
-import {
-  updateCompany,
-  updateProfile,
-  setPassword,
-  deactivateOwnAccount,
-} from "@/app/account-actions";
-import { requestEmailChange } from "@/app/account-email-actions";
+import { updateCompany } from "@/app/account-actions";
+import { DeactivateForm, EmailChangeForm, PasswordForm, ProfileForm } from "./account-forms";
 import { accountOkKey, accountErrorKey } from "@/lib/account-messages";
 import { SubmitButton } from "@/components";
 import { TeamSection } from "./team-section";
@@ -36,8 +31,10 @@ const MARKET_CODES = SUPPORTED_MARKETS;
 //   - Data & account (export, deactivate)
 //
 // Lives in the same authenticated layout as /catalog, /plan etc. so
-// users get the standard nav around it. Banner messages on success
-// or per-field error keyed by ?ok= / ?error= query params + anchor.
+// users get the standard nav around it. Profile, email, password and
+// deactivation are useActionState forms (./account-forms): their errors
+// render at the field and keep the input. Success banners, and errors from
+// the forms that still redirect (company, team), are keyed by ?ok= / ?error=.
 export default async function AccountPage({
   params,
   searchParams,
@@ -122,44 +119,12 @@ export default async function AccountPage({
             <h2>{t("profileTitle")}</h2>
           </div>
         </div>
-        <form action={updateProfile} className="product-form card">
-          <input type="hidden" name="locale" value={locale} />
-          <div className="field">
-            <label htmlFor="acc-email">{t("emailLabel")}</label>
-            <input id="acc-email" type="email" value={user.email} disabled readOnly />
-            <span className="hint">{t("emailHint")}</span>
-          </div>
-          <div className="field">
-            <label htmlFor="acc-name">
-              {t("nameLabel")}{" "}
-              <span className="optional">({t("optional")})</span>
-            </label>
-            <input
-              id="acc-name"
-              name="name"
-              autoComplete="name"
-              defaultValue={user.name ?? ""}
-            />
-          </div>
-          <div className="field">
-            <label htmlFor="acc-phone">{t("phoneLabel")}</label>
-            <input
-              id="acc-phone"
-              name="phone"
-              type="tel"
-              autoComplete="tel"
-              defaultValue={user.phone ?? ""}
-              placeholder="+47 ..."
-            />
-            <span className="hint">{t("phoneHint")}</span>
-          </div>
-          <div className="actions">
-            <SubmitButton
-              label={t("saveProfile")}
-              pendingLabel={t("saving")}
-            />
-          </div>
-        </form>
+        <ProfileForm
+          locale={locale}
+          email={user.email}
+          name={user.name ?? ""}
+          phone={user.phone ?? ""}
+        />
       </section>
 
       <section className="section" id="language">
@@ -189,39 +154,7 @@ export default async function AccountPage({
             <h2>{t("emailTitle")}</h2>
           </div>
         </div>
-        <form action={requestEmailChange} className="product-form card">
-          <input type="hidden" name="locale" value={locale} />
-          <div className="field">
-            <label htmlFor="acc-new-email">{t("newEmailLabel")}</label>
-            <input
-              id="acc-new-email"
-              name="newEmail"
-              type="email"
-              autoComplete="email"
-              required
-              placeholder={t("newEmailPlaceholder")}
-            />
-            <span className="hint">{t("emailChangeHint")}</span>
-          </div>
-          {user.passwordHash ? (
-            <div className="field">
-              <label htmlFor="acc-email-pw">{t("currentPasswordLabel")}</label>
-              <input
-                id="acc-email-pw"
-                name="currentPassword"
-                type="password"
-                autoComplete="current-password"
-                required
-              />
-            </div>
-          ) : null}
-          <div className="actions">
-            <SubmitButton
-              label={t("saveEmail")}
-              pendingLabel={t("saving")}
-            />
-          </div>
-        </form>
+        <EmailChangeForm locale={locale} hasPassword={!!user.passwordHash} />
       </section>
 
       {/* Desk, publisher and writer accounts have no organisation of their
@@ -289,41 +222,7 @@ export default async function AccountPage({
             </h2>
           </div>
         </div>
-        <form action={setPassword} className="product-form card">
-          <input type="hidden" name="locale" value={locale} />
-          {user.passwordHash ? (
-            <div className="field">
-              <label htmlFor="acc-pw-current">{t("currentPasswordLabel")}</label>
-              <input
-                id="acc-pw-current"
-                name="currentPassword"
-                type="password"
-                autoComplete="current-password"
-                required
-              />
-            </div>
-          ) : (
-            <p className="muted small">{t("passwordlessNote")}</p>
-          )}
-          <div className="field">
-            <label htmlFor="acc-pw-new">{t("newPasswordLabel")}</label>
-            <input
-              id="acc-pw-new"
-              name="newPassword"
-              type="password"
-              autoComplete="new-password"
-              minLength={8}
-              required
-            />
-            <span className="hint">{t("pwHint")}</span>
-          </div>
-          <div className="actions">
-            <SubmitButton
-              label={user.passwordHash ? t("savePasswordChange") : t("savePasswordSet")}
-              pendingLabel={t("saving")}
-            />
-          </div>
-        </form>
+        <PasswordForm locale={locale} hasPassword={!!user.passwordHash} />
       </section>
 
       {/* Two-factor lives on its own page (/account/security): staff are sent
@@ -392,40 +291,7 @@ export default async function AccountPage({
           <summary>
             <span className="btn secondary block">{t("deactivateSummary")}</span>
           </summary>
-          <form action={deactivateOwnAccount} className="product-form">
-            <input type="hidden" name="locale" value={locale} />
-            <h3 style={{ margin: "12px 0 4px" }}>{t("deactivateTitle")}</h3>
-            <p className="muted small">{t("deactivateHint")}</p>
-            <div className="field">
-              <label htmlFor="acc-deactivate-confirm">
-                {t("deactivateConfirmLabel")}
-              </label>
-              <input
-                id="acc-deactivate-confirm"
-                name="confirmEmail"
-                type="email"
-                autoComplete="off"
-                required
-                placeholder={user.email}
-              />
-            </div>
-            {/* Erasure: off by default — a deactivated account can be
-                switched back on, an erased one cannot. */}
-            <div className="field">
-              <label className="checkbox" htmlFor="acc-erase-data">
-                <input id="acc-erase-data" name="eraseData" type="checkbox" />{" "}
-                {t("eraseDataLabel")}
-              </label>
-              <p className="muted small">{t("eraseDataHint")}</p>
-            </div>
-            <div className="actions">
-              <SubmitButton
-                label={t("deactivateButton")}
-                pendingLabel={t("deactivating")}
-                className="btn danger block"
-              />
-            </div>
-          </form>
+          <DeactivateForm locale={locale} email={user.email} />
         </details>
       </section>
     </>

@@ -18,6 +18,7 @@ const PROTECTED_SEGMENTS = new Set([
   "account",
   "agency",
   "articles",
+  "audit",
   "campaign",
   "desk",
   "favorites",

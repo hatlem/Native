@@ -65,16 +65,16 @@ export async function saveOnboarding(
       where: { id: state.org.id, marketCode: null },
       data: { marketCode: market as MarketCode },
     }),
-    prisma.user.update({
-      where: { id: state.userId },
-      data: { phone },
-    }),
+    // Phone is optional: an empty field leaves whatever number is on file.
+    ...(phone
+      ? [prisma.user.update({ where: { id: state.userId }, data: { phone } })]
+      : []),
   ]);
 
   await recordAudit(state.userId, "user.onboarding_completed", `User:${state.userId}`, {
     organizationId: state.org.id,
     market,
-    hasPhone: true,
+    hasPhone: phone !== "",
   });
 
   redirect(`/${locale}/onboarding/call?next=${encodeURIComponent(next)}`);

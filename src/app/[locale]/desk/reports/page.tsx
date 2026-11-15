@@ -4,7 +4,19 @@ import { prisma } from "@/lib/prisma";
 import { buyerVisibleQuoteWhere } from "@/lib/commerce/quote-validity";
 import { Link } from "@/i18n/navigation";
 import { formatMoney } from "@/lib/money";
-import { tally, sumByGroup, conversionPct, deskRevenueByCurrency } from "@/lib/reporting";
+import { conversionPct } from "@/lib/reporting";
+import {
+  deskRevenueByCurrencySql,
+  invoiceStatusTally,
+  orderCategoryTally,
+  orderStatusTally,
+} from "@/lib/desk-report-sql";
+import {
+  REPORT_PERIOD_PRESETS,
+  parseReportPeriod,
+  periodDateFilter,
+  periodInputDays,
+} from "@/lib/report-period";
 import {
   benchmarkBy,
   suggestMargin,
@@ -18,8 +30,10 @@ const DECIDED = ["ACCEPTED", "DECLINED", "EXPIRED"] as const;
 
 export default async function DeskReportsPage({
   params,
+  searchParams,
 }: {
   params: Promise<{ locale: string }>;
+  searchParams: Promise<Record<string, string | string[] | undefined>>;
 }) {
   const { locale } = await params;
   // The desk layout guard alone is not an authorization boundary: the page
@@ -31,51 +45,39 @@ export default async function DeskReportsPage({
   const tStatus = await getTranslations({ locale, namespace: "status" });
   const statusLabel = (key: string) => (tStatus.has(key) ? tStatus(key) : key);
 
-  const [requestCount, quotedRequestCount, orders, orderLines, invoices] =
+  // The window everything on this page is counted in, from the URL
+  // (lib/report-period.ts) — default the last 12 months.
+  const period = parseReportPeriod(await searchParams);
+  const created = periodDateFilter(period);
+  const inWindow = created ? { createdAt: created } : {};
+  const periodDays = periodInputDays(period);
+
+  // Aggregated in the database (lib/desk-report-sql.ts): a few rows back,
+  // whatever the order volume.
+  const [requestCount, quotedRequestCount, orderCount, revenue, statusRows, categoryRows, invoiceTally] =
     await Promise.all([
-      prisma.request.count(),
+      prisma.request.count({ where: inWindow }),
       // Requests that reached the quote stage at least once — a relational
       // count (not `status: "QUOTED"`) so a request that later moved on to
       // CLOSED without ordering still counts as having passed through
       // "quoted" for the funnel below.
       // A DRAFT the desk hasn't sent doesn't count as quoted.
-      prisma.request.count({ where: { quotes: { some: buyerVisibleQuoteWhere() } } }),
-      prisma.order.findMany({
-        select: {
-          status: true,
-          quote: {
-            select: {
-              currency: true,
-              total: true,
-              vatPct: true,
-              lines: {
-                select: {
-                  kind: true,
-                  unitCost: true,
-                  quantity: true,
-                  lineTotal: true,
-                  priceOnRequest: true,
-                },
-              },
-            },
-          },
-          // Billed on top of the accepted quote, and refunded against it.
-          extraWork: { select: { lineTotal: true } },
-          creditNotes: { select: { amount: true } },
-        },
-      }),
+      prisma.request.count({ where: { ...inWindow, quotes: { some: buyerVisibleQuoteWhere() } } }),
+      prisma.order.count({ where: inWindow }),
+      // GMV and the margin / content-fee split per currency — the rules
+      // (cancelled orders out, credit notes off, extra work in, unpriced
+      // lines ignored) are pinned in lib/reporting.ts.
+      deskRevenueByCurrencySql(period),
+      orderStatusTally(period),
       // Cancelled orders' placements never ran: not part of the mix.
-      prisma.orderLine.findMany({
-        where: { order: { status: { not: "CANCELLED" } } },
-        select: { productId: true },
-      }),
-      prisma.invoice.findMany({ select: { status: true } }),
+      orderCategoryTally(period),
+      invoiceStatusTally(period),
     ]);
 
   // Pricing intelligence: benchmark + suggested margin per category, from
   // decided (won/lost) quote inventory lines.
   const decidedQuotes = await prisma.quote.findMany({
-    where: { status: { in: [...DECIDED] } },
+    where: { status: { in: [...DECIDED] }, ...inWindow },
     select: {
       status: true,
       lines: {
@@ -129,53 +131,9 @@ export default async function DeskReportsPage({
     };
   });
 
-  // GMV and the margin / content-fee split per currency — the rules
-  // (cancelled orders out, credit notes off, extra work in, unpriced lines
-  // ignored) live in lib/reporting.ts.
-  const revenue = deskRevenueByCurrency(
-    orders.map((o) => ({
-      status: o.status,
-      currency: o.quote.currency,
-      quoteTotal: Number(o.quote.total),
-      vatPct: Number(o.quote.vatPct),
-      lines: o.quote.lines.map((l) => ({
-        kind: l.kind,
-        unitCost: Number(l.unitCost),
-        quantity: l.quantity,
-        lineTotal: Number(l.lineTotal),
-        priceOnRequest: l.priceOnRequest,
-      })),
-      extraWork: o.extraWork.map((e) => Number(e.lineTotal)),
-      credited: o.creditNotes.map((c) => Number(c.amount)),
-    })),
-  );
   const kpis = revenue;
   const revenueByCurrency = revenue.filter((r) => r.split.totalRevenue !== 0);
-
-  const statusRows = tally(orders.map((o) => o.status));
-
-  const products = orderLines.length
-    ? await prisma.product.findMany({
-        where: {
-          id: {
-            in: orderLines
-              .map((l) => l.productId)
-              .filter((id): id is string => !!id),
-          },
-        },
-        select: { id: true, title: { select: { category: true } } },
-      })
-    : [];
-  const catById = new Map(products.map((p) => [p.id, p.title.category]));
-  const categoryRows = tally(
-    orderLines
-      .map((l) => (l.productId ? catById.get(l.productId) : undefined))
-      .filter((c): c is string => !!c),
-  );
-
-  const invoiceRows = sumByGroup(
-    invoices.map((i) => ({ group: i.status, amount: 1 })),
-  );
+  const invoiceRows = invoiceTally.map((r) => ({ group: r.key, amount: r.count }));
 
   return (
     <>
@@ -191,6 +149,37 @@ export default async function DeskReportsPage({
         <p className="lead">{t("subtitle")}</p>
       </header>
 
+      {/* GET form: the period lives in the URL, so a view can be shared. */}
+      <form method="get" className="product-form" aria-label={t("periodLabel")}>
+        <div className="grid">
+          <div className="field">
+            <label htmlFor="report-period">{t("periodLabel")}</label>
+            <select id="report-period" name="period" defaultValue={period.preset === "custom" ? "" : period.preset}>
+              {period.preset === "custom" ? <option value="">{t("periodCustom")}</option> : null}
+              {REPORT_PERIOD_PRESETS.map((p) => (
+                <option key={p} value={p}>
+                  {t(`period_${p}`)}
+                </option>
+              ))}
+            </select>
+          </div>
+          <div className="field">
+            <label htmlFor="report-from">{t("periodFrom")}</label>
+            <input id="report-from" type="date" name="from" defaultValue={periodDays.from} />
+          </div>
+          <div className="field">
+            <label htmlFor="report-to">{t("periodTo")}</label>
+            <input id="report-to" type="date" name="to" defaultValue={periodDays.to} />
+          </div>
+        </div>
+        <div className="actions">
+          <button type="submit" className="btn primary">
+            {t("periodApply")}
+          </button>
+          <span className="muted small">{t("periodHint")}</span>
+        </div>
+      </form>
+
       <div className="kpi-grid">
         <div className="kpi">
           <div className="label">{t("requests")}</div>
@@ -205,11 +194,11 @@ export default async function DeskReportsPage({
         </div>
         <div className="kpi">
           <div className="label">{to("orders")}</div>
-          <div className="value">{orders.length}</div>
+          <div className="value">{orderCount}</div>
         </div>
         <div className="kpi">
           <div className="label">{t("conversion")}</div>
-          <div className="value">{conversionPct(requestCount, orders.length)}%</div>
+          <div className="value">{conversionPct(requestCount, orderCount)}%</div>
           <div className="delta">{t("conversionSub")}</div>
         </div>
       </div>

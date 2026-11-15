@@ -15,6 +15,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { checkCronAuth } from "@/lib/cron-auth";
 import { enabledSweeps, runSweep, type SweepOutcome } from "@/lib/sweeps";
+import { drainPending, purgeFinishedJobs, type DrainResult } from "@/lib/jobs";
+import { log } from "@/lib/log";
 
 export const dynamic = "force-dynamic";
 // The metrics sweep sends mail in a loop; give the batch room.
@@ -35,9 +37,24 @@ async function handle(req: NextRequest): Promise<NextResponse> {
   const results: SweepOutcome[] = [];
   for (const def of defs) results.push(await runSweep(def, "cron"));
 
-  const ok = results.every((r) => r.ok);
+  // Also run whatever is due on the job queue (lib/jobs) — queued webhook
+  // deliveries, email retries, invoice archiving — so a deployment with
+  // JOB_WORKER=0 still drains it. `?only=jobs` runs just this part, which is
+  // what a every-minute cron should call.
+  let jobs: DrainResult | null = null;
+  if (only.length === 0 || only.includes("jobs")) {
+    try {
+      jobs = await drainPending(100);
+      await purgeFinishedJobs();
+    } catch (err) {
+      log.error("cron.jobs_drain_failed", { err });
+      jobs = { ran: 0, done: 0, retried: 0, dead: -1 };
+    }
+  }
+
+  const ok = results.every((r) => r.ok) && (jobs === null || jobs.dead === 0);
   // 500 on any failure so the scheduler's own run history shows it red.
-  return NextResponse.json({ ok, results }, { status: ok ? 200 : 500, headers: { "Cache-Control": "no-store" } });
+  return NextResponse.json({ ok, results, jobs }, { status: ok ? 200 : 500, headers: { "Cache-Control": "no-store" } });
 }
 
 export const GET = handle;

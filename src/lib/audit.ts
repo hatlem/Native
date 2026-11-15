@@ -5,6 +5,7 @@ import { log } from "@/lib/log";
 // row is the durable record), so we swallow + console.error here.
 
 import { prisma } from "@/lib/prisma";
+import { resolveAuditOrganizationId } from "@/lib/audit-org";
 
 export type AuditActor = string | { userId?: string | null } | null | undefined;
 
@@ -76,7 +77,9 @@ export async function recordAudit(
         actor: actorId(actor),
         action,
         entity,
-        organizationId: auditOrganizationId(detail),
+        // Named by the caller, or looked up from the record the row is about
+        // (lib/audit-org.ts) — the customer's own trail filters on this.
+        organizationId: auditOrganizationId(detail) ?? (await resolveAuditOrganizationId(entity)),
         detail:
           detail == null
             ? null
@@ -107,7 +110,7 @@ export async function auditRowData(
     actor: actorId(actor),
     action,
     entity,
-    organizationId: auditOrganizationId(detail),
+    organizationId: auditOrganizationId(detail) ?? (await resolveAuditOrganizationId(entity)),
     detail: detail == null ? null : typeof detail === "string" ? detail : JSON.stringify(detail),
   };
 }

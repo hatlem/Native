@@ -89,6 +89,20 @@ test("every /account ?error= code an action emits has a message", () => {
   }
 });
 
+// The useActionState actions (profile, email, password, deactivation) return
+// their code with accountFail("code", …) instead of redirecting with it.
+test("every code an account action returns with accountFail has a message", () => {
+  const codes: string[] = [];
+  for (const file of ["app/account-actions.ts", "app/account-email-actions.ts"]) {
+    codes.push(...[...read(file).matchAll(/accountFail\("([A-Za-z0-9_]+)"/g)].map((m) => m[1]));
+  }
+  assert.ok(codes.length >= 8, "scanner found too few codes — did the actions move?");
+  // Interpolated: emailPolicyErrorCode(policy.reason) and verdict.reason.
+  for (const code of [...codes, "email_business", "email_domain", "email_invalid", "email_same"]) {
+    assert.ok(ACCOUNT_ERROR_KEYS[code], `accountFail("${code}") has no entry in ACCOUNT_ERROR_KEYS`);
+  }
+});
+
 test("the codes that used to render silence are mapped", () => {
   for (const code of ["no_org", "role", "1", "email", "delegation", "delegation_past"]) {
     assert.ok(ACCOUNT_ERROR_KEYS[code], `${code} must map to a message`);
