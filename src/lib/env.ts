@@ -93,6 +93,7 @@ export const envSchema = z.object({
 
   // --- Jobs & operations ---
   IN_PROCESS_SWEEPS: flag,
+  JOB_WORKER: flag,
   AUTOSEND_SWEEP: flag,
   METRICS_SWEEP: flag,
   PRICE_BAND_SWEEP: flag,
@@ -150,6 +151,8 @@ export function checkEnv(env: NodeJS.ProcessEnv = process.env): EnvReport {
       warnings.push("NEXT_PUBLIC_SITE_URL/AUTH_URL unset: absolute links fall back to http://localhost:3000");
     if (values.ACCOUNTING_PROVIDER === "fiken" && (!values.FIKEN_API_TOKEN || !values.FIKEN_COMPANY_SLUG))
       warnings.push("ACCOUNTING_PROVIDER=fiken but FIKEN_API_TOKEN/FIKEN_COMPANY_SLUG unset");
+    if (values.JOB_WORKER === "0" && !values.CRON_SECRET)
+      warnings.push("JOB_WORKER=0 without CRON_SECRET: nothing drains the job queue (/api/cron/sweeps is off)");
     if (values.IN_PROCESS_SWEEPS === "0" && !values.CRON_SECRET)
       warnings.push("IN_PROCESS_SWEEPS=0 without CRON_SECRET: no scheduler can run the sweeps");
     if (!values.ERROR_WEBHOOK_URL) warnings.push("ERROR_WEBHOOK_URL unset: errors are logged but nobody is alerted");

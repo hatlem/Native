@@ -48,6 +48,9 @@ export type NavOptions = {
   // Without this, the buyer flow is unreachable from a staff session: it's
   // absent from both the desk top nav and, by default, the palette too.
   hasOrgAccess?: boolean;
+  // True when the signed-in buyer is an ADMIN of the active organisation:
+  // they may read that organisation's own audit trail (/audit).
+  orgAdmin?: boolean;
 };
 
 // The guided-flow front door, prepended to the buyer nav when the
@@ -174,6 +177,7 @@ export function navItemsFor(
 export function userMenuItemsFor(
   audience: Audience,
   t: (key: string) => string,
+  opts: NavOptions = {},
 ): NavItem[] {
   if (audience === "public") return [];
   // Buyers are billed; invoices are a "find it when I need it" destination,
@@ -183,6 +187,8 @@ export function userMenuItemsFor(
   return [
     { key: "notifications", label: t("notifications"), href: "/notifications" },
     ...billing,
+    // Organisation admins only: who did what in their organisation.
+    ...(opts.orgAdmin ? [{ key: "audit", label: t("audit"), href: "/audit" }] : []),
     { key: "account", label: t("account"), href: "/account" },
     // Support is one click from anywhere in the app (FAQ, response time, contact).
     { key: "help", label: t("help"), href: "/help" },
@@ -212,6 +218,7 @@ export function paletteItemsFor(
           articlesItem(t),
           { key: "reports", label: t("reports"), href: "/reports" },
           invoicesItem(t),
+          ...(opts.orgAdmin ? [{ key: "audit", label: t("audit"), href: "/audit" }] : []),
           ...(audience === "agency"
             ? [{ key: "agency", label: t("agency"), href: "/agency" }]
             : []),
@@ -238,6 +245,8 @@ export function paletteItemsFor(
           { key: "deskOrders", label: t("orders"), href: "/desk/orders" },
           { key: "deskContentFees", label: t("contentFees"), href: "/desk/content-fees" },
           { key: "deskReports", label: t("reports"), href: "/desk/reports" },
+          // Background jobs and sweep history: palette only, the top bar is full.
+          { key: "deskJobs", label: t("jobs"), href: "/desk/jobs" },
           ...(audience === "superadmin"
             ? [
                 { key: "deskTitles", label: t("titles"), href: "/desk/titles" },

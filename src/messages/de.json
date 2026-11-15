@@ -142,7 +142,8 @@
     "paletteOrders": "Aufträge",
     "paletteRequests": "Anfragen",
     "paletteTitles": "Titel",
-    "paletteSearching": "Suche…"
+    "paletteSearching": "Suche…",
+    "jobs": "Jobs"
   },
   "orders": {
     "eyebrow": "Bestellungen",
@@ -325,7 +326,18 @@
     "basis_category-median": "Kategorie-Median",
     "basis_default": "Standard",
     "exportInvoicesCsv": "Rechnungen exportieren (CSV)",
-    "exportAccountingJson": "Buchhaltungsexport (JSON)"
+    "exportAccountingJson": "Buchhaltungsexport (JSON)",
+    "periodLabel": "Zeitraum",
+    "periodCustom": "Eigene Daten",
+    "periodFrom": "Von",
+    "periodTo": "Bis",
+    "periodApply": "Anwenden",
+    "periodHint": "Ausgefüllte Daten haben Vorrang vor dem Zeitraum.",
+    "period_30d": "Letzte 30 Tage",
+    "period_90d": "Letzte 90 Tage",
+    "period_12m": "Letzte 12 Monate",
+    "period_ytd": "Dieses Jahr",
+    "period_all": "Gesamter Zeitraum"
   },
   "agency": {
     "eyebrow": "Agentur",
@@ -2358,11 +2370,11 @@
     "pillar1Title": "Standardmäßig minimale Rechte",
     "pillar1Body": "Rollenbasierte Zugriffsrechte scopen jede Seite und jede Datenbankabfrage. Agenturen sehen nur ihre Kunden; Verlage nur ihre Titel.",
     "pillar2Title": "Datensparsamkeit",
-    "pillar2Body": "Wir speichern, was wir für den Marktplatz brauchen — und nicht mehr. Keine Tracking-Pixel, keine Schattenprofile, kein Enrichment.",
+    "pillar2Body": "Wir speichern, was wir für den Betrieb des Marktplatzes brauchen — und nicht mehr. Keine Tracking-Pixel in unseren E-Mails, keine Schattenprofile von Kunden, keine von Datenhändlern gekauften Daten. Links in veröffentlichten Artikeln zählen Klicks nur in Summe, ohne Leser zu identifizieren. Geschäftliche Kontaktdaten der Anzeigenabteilungen von Verlagen stammen von den öffentlichen Seiten der Verlage; die Datenschutzerklärung erläutert das.",
     "pillar3Title": "Verschlüsselung im Transit und at Rest",
-    "pillar3Body": "TLS 1.2+ überall. Datenbank-Disks und Backups sind at Rest verschlüsselt. Secrets liegen in einem Managed Vault, nicht im Code.",
+    "pillar3Body": "TLS auf jeder Verbindung. Datenbankfestplatten und Backups werden von unserem Hosting-Anbieter im Ruhezustand verschlüsselt. Geheimnisse liegen im verschlüsselten Secret-Speicher des Hosting-Anbieters, nicht im Code; Passwörter, Anmeldelinks und API-Schlüssel werden nur als Hashes gespeichert.",
     "pillar4Title": "Auditierbar by Design",
-    "pillar4Body": "Jede Bestellung, jedes Angebot und jedes Content-Asset hat einen unveränderlichen Audit-Trail. Wir können nachweisen, wer wann was getan hat — und Sie auch.",
+    "pillar4Body": "Bestellungen, Angebote, Rechnungen, Änderungen im Team und Zugriffe unserer Mitarbeitenden auf Ihren Arbeitsbereich werden protokolliert: wer hat was wann getan. Die Administratoren einer Organisation können ihr eigenes Protokoll in der App lesen und exportieren. IP- und E-Mail-Adressen werden nach 90 Tagen aus den Einträgen entfernt.",
     "complianceTitle": "Compliance & Haltung",
     "complianceLead": "Wir sind ein junges Unternehmen. Wir sagen offen, was live ist und was auf der Roadmap steht.",
     "colArea": "Bereich",
@@ -2373,13 +2385,13 @@
     "statusRoadmap": "Roadmap",
     "statusPlan": "Geplant",
     "gdprArea": "DSGVO",
-    "gdprNote": "AV-Vertrag (DPA) auf Anfrage; wir sind Verantwortliche:r für Marktplatzdaten.",
+    "gdprNote": "Auftragsverarbeitungsvertrag auf Anfrage; die Unterauftragsverarbeiter sind öffentlich aufgeführt. Für Marktplatzdaten sind wir Verantwortlicher.",
     "dataResArea": "Datenstandort",
     "dataResNote": "Alle Kundendaten in der EU gehostet (Stockholm-Region).",
     "encryptionArea": "Verschlüsselung",
-    "encryptionNote": "TLS 1.2+ im Transit, AES-256 at Rest, Managed Key Vault.",
+    "encryptionNote": "TLS bei der Übertragung; Verschlüsselung im Ruhezustand und Schlüsselverwaltung durch den Hosting-Anbieter.",
     "ssoArea": "SSO (SAML / OIDC)",
-    "ssoNote": "Auf Managed- und Agentur-Plänen auf Anfrage verfügbar.",
+    "ssoNote": "Noch nicht verfügbar. Die Zwei-Faktor-Authentifizierung sichert die Anmeldung heute ab; sagen Sie uns, wenn SSO eine Beschaffungsanforderung ist.",
     "auditArea": "SOC 2 Type I",
     "auditNote": "Ziel: Ende 2026.",
     "disclosureTitle": "Responsible Disclosure",
@@ -2389,21 +2401,23 @@
     "ctaBody": "Wir gehen gerne konkrete Kontrollen durch, teilen unseren AV-Vertrag oder besprechen Beschaffungsanforderungen.",
     "ctaContact": "Kontakt aufnehmen",
     "pillarsEyebrow": "Prinzipien",
-    "complianceEyebrow": "Compliance"
+    "complianceEyebrow": "Compliance",
+    "mfaArea": "Zwei-Faktor-Authentifizierung",
+    "mfaNote": "Codes aus einer Authenticator-App (TOTP) mit Wiederherstellungscodes, für jedes Konto verfügbar und für NativeSpin-Mitarbeitende erzwingbar."
   },
   "privacy": {
     "metaTitle": "Datenschutz",
     "eyebrow": "Datenschutz",
     "title": "Datenschutzerklärung",
     "lead": "Wie NativeSpin personenbezogene Daten erhebt, nutzt und schützt — in verständlicher Sprache.",
-    "lastUpdated": "Stand: 22. Mai 2026",
+    "lastUpdated": "Zuletzt aktualisiert: 15. November 2026",
     "controller": {
       "title": "Wer ist Verantwortlicher",
-      "body": "Getia AS ist Verantwortliche:r für personenbezogene Daten, die über diesen Marktplatz verarbeitet werden. Wir sitzen in Norwegen und verarbeiten alle Daten innerhalb der EU/des EWR."
+      "body": "Getia AS ist Verantwortlicher für die über diesen Marktplatz verarbeiteten personenbezogenen Daten. Wir haben unseren Sitz in Norwegen. Wo jeder unserer Unterauftragsverarbeiter Daten verarbeitet, steht auf der Seite zu den Unterauftragsverarbeitern."
     },
     "data": {
       "title": "Welche Daten wir erheben",
-      "body": "Kontodaten (Name, Geschäfts-E-Mail, Rolle, Organisation), Marktplatzaktivität (Anfragen, Bestellungen, Pläne) sowie minimale Telemetrie für den Betrieb (Login-Ereignisse, Fehlerberichte). Auf unseren Marketingseiten setzen wir keine Werbe- oder Behavioral-Tracking-Pixel von Drittanbietern ein."
+      "body": "Kontodaten (Name, geschäftliche E-Mail, Rolle, Organisation), Marktplatzaktivität (Anfragen, Bestellungen, Pläne und die Briefings, die Sie schreiben) und die für den Betrieb nötige Telemetrie (Anmeldeereignisse mit IP-Adresse, Fehlerberichte). Für Verlage speichern wir außerdem geschäftliche Kontaktdaten von Mitarbeitenden in Anzeigen- und Vertriebsabteilungen, erhoben von den öffentlichen Seiten der Verlage — siehe „Verlagskontakte“ unten. Auf unseren Marketingseiten setzen wir keine Werbung Dritter und kein verhaltensbasiertes Tracking ein."
     },
     "purpose": {
       "title": "Wofür wir sie nutzen",
@@ -2411,15 +2425,15 @@
     },
     "legal": {
       "title": "Rechtsgrundlage",
-      "body": "Vertragserfüllung (Kontoinhaber:innen), berechtigtes Interesse (Sicherheit, Betrugsprävention, Produktverbesserung) und Einwilligung (optionaler Newsletter)."
+      "body": "Vertragserfüllung (Kontoinhaber), berechtigtes Interesse (Sicherheit, Betrugsprävention, Produktverbesserung und Kontaktaufnahme mit den Anzeigenabteilungen von Verlagen zu deren Preislisten), rechtliche Verpflichtung (Buchhaltungsunterlagen) und Einwilligung (optionaler Newsletter, Analyse-Cookies)."
     },
     "retention": {
       "title": "Speicherdauer",
-      "body": "Kontodaten so lange das Konto besteht; transaktionale Daten sieben Jahre (Aufbewahrungspflicht); Telemetrie nach 90 Tagen zu Aggregaten zusammengeführt."
+      "body": "Kontodaten, solange das Konto besteht; Sie können Ihr Konto deaktivieren und Ihre personenbezogenen Daten auf der Kontoseite löschen lassen. Rechnungen und Bestellungen werden so lange aufbewahrt, wie es das Buchhaltungsrecht verlangt. IP- und E-Mail-Adressen werden nach 90 Tagen aus den Einträgen des Audit-Protokolls entfernt. Verwendete oder abgelaufene Anmeldelinks, Links zum Zurücksetzen des Passworts und nicht angenommene Einladungen werden nach 30 Tagen gelöscht."
     },
     "sharing": {
       "title": "Mit wem wir Daten teilen",
-      "body": "Verlage sehen Käuferorganisation und Bestelldetails für die bei ihnen platzierten Bestellungen. Unterauftragsverarbeiter (Hosting, E-Mail, Zahlungen) sind in unserem AV-Vertrag aufgeführt, alle EU-ansässig oder mit angemessenen Garantien."
+      "body": "Verlage sehen die einkaufende Organisation und die Bestelldetails der bei ihnen aufgegebenen Bestellungen. Unsere Unterauftragsverarbeiter (Hosting, E-Mail-Versand, Dateispeicher, KI-Verarbeitung und, sofern aktiviert, Buchhaltung und Analyse) stehen auf der Seite zu den Unterauftragsverarbeitern."
     },
     "transfers": {
       "title": "Drittlandübermittlungen",
@@ -2438,21 +2452,29 @@
       "body": "Wesentliche Änderungen veröffentlichen wir hier und informieren Kontoinhaber:innen per E-Mail. Das Datum oben spiegelt stets die aktuelle Version wider."
     },
     "contactTitle": "Datenschutzkontakt",
-    "contactBody": "Fragen, Anliegen oder Beschwerden — schreiben Sie an"
+    "contactBody": "Fragen, Anliegen oder Beschwerden — schreiben Sie an",
+    "ai": {
+      "title": "Einsatz von KI",
+      "body": "Wenn Sie eine Kampagne beschreiben, kann der Briefing-Text über unseren KI-Anbieter an ein KI-Modell gesendet werden, um passende Titel vorzuschlagen und Beispieltexte zu entwerfen; von KI verfasste Vorschläge sind gekennzeichnet. Wir verwenden Ihre Daten nicht zum Training von Modellen. Der KI-Anbieter steht auf der Seite zu den Unterauftragsverarbeitern. Briefings werden ohne Ihren Namen oder Ihre E-Mail-Adresse gesendet."
+    },
+    "publisherContacts": {
+      "title": "Verlagskontakte",
+      "body": "Wenn Sie im Anzeigenverkauf eines Verlags arbeiten, speichern wir möglicherweise Ihren Namen, Ihre geschäftliche E-Mail-Adresse, Ihre Telefonnummer und Ihre Funktion. Wir haben sie von der öffentlichen Website oder dem Mediakit Ihres Arbeitgebers oder von einem Vermarkter erhoben, der den Titel vertritt — nicht bei Ihnen. Wir nutzen sie nur, um nach Preislisten und Buchungen für Ihre Titel zu fragen, auf Grundlage unseres berechtigten Interesses am Betrieb eines Marktplatzes für diese Werbung. Jede solche E-Mail enthält einen Abmeldelink, und eine abgemeldete Adresse wird nicht erneut kontaktiert. Sie können jederzeit Auskunft, Berichtigung oder Löschung verlangen oder widersprechen (privacy@nativespin.com) und sich bei Ihrer Datenschutzaufsichtsbehörde beschweren."
+    }
   },
   "terms": {
     "metaTitle": "Nutzungsbedingungen",
     "eyebrow": "AGB",
     "title": "Marktplatz-Nutzungsbedingungen",
     "lead": "Diese Bedingungen regeln Ihre Nutzung von NativeSpin als Werbetreibend, Agentur oder Verlag.",
-    "lastUpdated": "Stand: 22. Mai 2026",
+    "lastUpdated": "Zuletzt aktualisiert: 15. November 2026",
     "scope": {
       "title": "Geltungsbereich",
       "body": "NativeSpin ist ein Marktplatz, der Werbetreibende und Agenturen mit Zeitungs- und Magazinverlagen verbindet, die Native Content und Native Advertising anbieten. Diese Bedingungen gelten für alle Nutzer:innen des Marktplatzes."
     },
     "accounts": {
       "title": "Konten",
-      "body": "Sie müssen korrekte Registrierungsdaten angeben, Zugangsdaten vertraulich behandeln und uns über unbefugten Zugriff informieren. Konten sind an eine einzige Organisation gebunden; organisationsübergreifende Nutzung erfordert den Agentur-Workspace."
+      "body": "Sie müssen korrekte Registrierungsdaten angeben, Zugangsdaten vertraulich behandeln und uns über unbefugte Zugriffe informieren. Ein Konto kann Plätze in mehr als einer Organisation haben; die Administratoren einer Organisation vergeben und entziehen sie."
     },
     "roles": {
       "title": "Rollen und Zugriff",
@@ -4034,7 +4056,9 @@
     "deskPlaybooks": "Playbooks",
     "deskContentFees": "Content-Gebühren",
     "deskApiKeys": "API-Schlüssel",
-    "deskMetricsNeedsContact": "Kennzahlen fehlen"
+    "deskMetricsNeedsContact": "Kennzahlen fehlen",
+    "audit": "Audit-Protokoll",
+    "deskJobs": "Hintergrundjobs"
   },
   "briefTargeting": {
     "audience": "Zielgruppe",
@@ -4230,5 +4254,150 @@
         "body": "Eine neue Hilfeseite beantwortet häufige Fragen, und nach Abschluss einer Kampagne können Sie bewerten, wie sie lief."
       }
     }
+  },
+  "customerAudit": {
+    "eyebrow": "Konto",
+    "title": "Audit-Protokoll",
+    "lead": "Was in Ihrer Organisation geschehen ist, wer es getan hat und wann — auch wenn NativeSpin-Mitarbeitende Ihren Arbeitsbereich geöffnet haben.",
+    "filterCategory": "Bereich",
+    "allCategories": "Alles",
+    "filterFrom": "Von",
+    "filterTo": "Bis",
+    "filterButton": "Filtern",
+    "clear": "Zurücksetzen",
+    "exportCsv": "Als CSV exportieren",
+    "colWhen": "Wann",
+    "colWho": "Wer",
+    "colWhat": "Was",
+    "colDetail": "Details",
+    "none": "Keine Einträge entsprechen diesen Filtern.",
+    "resultCount": "{count, plural, =0 {Keine Einträge} =1 {1 Eintrag} other {# Einträge}}",
+    "retentionNote": "Das Protokoll zeigt Vorgänge ab November 2026. E-Mail-Adressen werden aus Einträgen entfernt, die älter als 90 Tage sind.",
+    "adminsOnlyTitle": "Für Administratoren der Organisation",
+    "adminsOnlyBody": "Das Audit-Protokoll nennt Kolleginnen und Kollegen und ihre Handlungen, daher können es nur Administratoren der Organisation lesen. Bitten Sie einen Administrator in Ihrem Team, wenn ein Eintrag nachgeschlagen werden soll.",
+    "actorStaff": "NativeSpin Desk",
+    "actorSystem": "NativeSpin (automatisch)",
+    "actorOther": "Jemand außerhalb Ihrer Organisation",
+    "actions": {
+      "request_submit": "Anfrage gesendet",
+      "request_withdrawn_by_buyer": "Anfrage zurückgezogen",
+      "api_order_create": "Bestellung über die API aufgegeben",
+      "quote_send": "Angebot erhalten",
+      "quote_accept": "Angebot angenommen",
+      "quote_declined_by_buyer": "Angebot abgelehnt",
+      "quote_revise": "Angebot überarbeitet",
+      "quote_renew": "Angebot erneuert",
+      "quote_renewal_requested": "Erneuerung des Angebots angefragt",
+      "quote_pdf_download": "Angebots-PDF heruntergeladen",
+      "quote_pdf_generate": "Angebots-PDF erstellt",
+      "quote_docx_export": "Angebot nach Word exportiert",
+      "order_advance": "Bestellstatus geändert",
+      "order_cancel": "Bestellung storniert",
+      "order_cancellation_requested": "Stornierung angefragt",
+      "order_extra_work_add": "Zusatzarbeit zur Bestellung hinzugefügt",
+      "order_extra_work_remove": "Zusatzarbeit aus der Bestellung entfernt",
+      "order_feedback_submitted": "Feedback zur Bestellung abgegeben",
+      "order_flight_window_save": "Kampagnenzeitraum geändert",
+      "invoice_issue": "Rechnung ausgestellt",
+      "credit_note_issue": "Gutschrift ausgestellt",
+      "invoice_pdf_download": "Rechnungs-PDF heruntergeladen",
+      "org_invite_sent": "Team-Einladung gesendet",
+      "org_invite_revoked": "Team-Einladung widerrufen",
+      "org_membership_updated": "Zugriff eines Mitglieds geändert",
+      "org_membership_revoked": "Mitglied entfernt",
+      "organization_updated": "Unternehmensdaten aktualisiert",
+      "org_payment_terms_set": "Zahlungsbedingungen geändert",
+      "api_key_create": "API-Schlüssel erstellt",
+      "api_key_revoke": "API-Schlüssel widerrufen",
+      "superadmin_view_as_start": "NativeSpin-Mitarbeitende haben Ihren Arbeitsbereich geöffnet",
+      "superadmin_view_as_end": "NativeSpin-Mitarbeitende haben Ihren Arbeitsbereich verlassen",
+      "data_export": "Organisationsdaten exportiert",
+      "list_create": "Gespeicherte Liste erstellt",
+      "list_archive": "Gespeicherte Liste archiviert",
+      "list_restore": "Gespeicherte Liste wiederhergestellt",
+      "list_duplicate": "Gespeicherte Liste dupliziert",
+      "list_share_enable": "Listenfreigabe aktiviert",
+      "list_share_disable": "Listenfreigabe deaktiviert",
+      "list_client_approved": "Geteilte Liste freigegeben",
+      "plan_duplicate": "Plan aus einer Bestellung dupliziert",
+      "article_create": "Artikel erstellt",
+      "article_link": "Artikel mit einer Platzierung verknüpft",
+      "article_unlink": "Artikel von einer Platzierung getrennt"
+    },
+    "categories": {
+      "request": "Anfragen",
+      "quote": "Angebote",
+      "order": "Bestellungen",
+      "invoice": "Rechnungen",
+      "team": "Team",
+      "access": "Zugriff",
+      "export": "Datenexport",
+      "list": "Pläne und Listen",
+      "article": "Artikel"
+    },
+    "fields": {
+      "reason": "Grund",
+      "total": "Summe",
+      "currency": "Währung",
+      "from": "Von",
+      "to": "Bis",
+      "start": "Beginn",
+      "end": "Ende",
+      "number": "Nummer",
+      "amount": "Betrag",
+      "email": "E-Mail",
+      "role": "Rolle",
+      "name": "Name"
+    }
+  },
+  "deskJobs": {
+    "eyebrow": "Betrieb",
+    "title": "Hintergrundjobs",
+    "lead": "Eingereihte Arbeit, die außerhalb eines Seitenaufrufs läuft: Webhook-Zustellungen, erneute E-Mail-Versuche, Rechnungsarchivierung, Übertragung an die Buchhaltung — und die geplanten Läufe.",
+    "statPending": "Wartend",
+    "statRunning": "Laufend",
+    "statDead": "Endgültig fehlgeschlagen",
+    "statOldest": "Ältester wartender",
+    "oldestNone": "Nichts überfällig",
+    "deadTitle": "Fehlgeschlagene Jobs",
+    "deadLead": "Diese haben ihre Versuche aufgebraucht. Erneut versuchen stellt den Job mit neuen Versuchen zurück in die Warteschlange; Verwerfen gibt ihn auf.",
+    "deadNone": "Keine fehlgeschlagenen Jobs.",
+    "colKind": "Job",
+    "colAttempts": "Versuche",
+    "colLastError": "Letzter Fehler",
+    "colCreated": "Erstellt",
+    "colFinished": "Beendet",
+    "retry": "Erneut versuchen",
+    "discard": "Verwerfen",
+    "confirmDiscard": "Diesen Job verwerfen?",
+    "superadminOnly": "Nur ein Super-Admin kann erneut versuchen oder verwerfen.",
+    "recentTitle": "Letzte Jobs",
+    "recentNone": "Noch keine Jobs.",
+    "colStatus": "Status",
+    "colRunAt": "Läuft um",
+    "sweepsTitle": "Geplante Läufe",
+    "sweepsLead": "Die letzten Läufe jedes Jobs. Läufe, die nichts zu tun hatten, werden nicht aufgeführt.",
+    "sweepsNone": "Noch ist kein geplanter Lauf gelaufen.",
+    "colSweep": "Lauf",
+    "colVia": "Gestartet von",
+    "colWhen": "Wann",
+    "colResult": "Ergebnis",
+    "colDuration": "Dauer",
+    "ok": "OK",
+    "failed": "Fehlgeschlagen",
+    "viaTimer": "Timer",
+    "viaCron": "Planer",
+    "flashRetried": "Der Job ist wieder in der Warteschlange.",
+    "flashDiscarded": "Der Job wurde verworfen.",
+    "flashGone": "Dieser Job steht nicht mehr in der Liste der fehlgeschlagenen.",
+    "status": {
+      "PENDING": "Wartend",
+      "RUNNING": "Laufend",
+      "DONE": "Erledigt",
+      "FAILED": "Fehlgeschlagen",
+      "DISCARDED": "Verworfen"
+    },
+    "working": "Wird ausgeführt…",
+    "cancel": "Abbrechen"
   }
 }

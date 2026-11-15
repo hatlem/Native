@@ -142,7 +142,8 @@
     "paletteOrders": "Ordrar",
     "paletteRequests": "Förfrågningar",
     "paletteTitles": "Titlar",
-    "paletteSearching": "Söker…"
+    "paletteSearching": "Söker…",
+    "jobs": "Jobb"
   },
   "reports": {
     "title": "Rapporter",
@@ -185,7 +186,18 @@
     "basis_category-median": "kategorimedian",
     "basis_default": "standard",
     "exportInvoicesCsv": "Exportera fakturor (CSV)",
-    "exportAccountingJson": "Bokföringsexport (JSON)"
+    "exportAccountingJson": "Bokföringsexport (JSON)",
+    "periodLabel": "Period",
+    "periodCustom": "Egna datum",
+    "periodFrom": "Från",
+    "periodTo": "Till",
+    "periodApply": "Använd",
+    "periodHint": "Ifyllda datum går före perioden.",
+    "period_30d": "Senaste 30 dagarna",
+    "period_90d": "Senaste 90 dagarna",
+    "period_12m": "Senaste 12 månaderna",
+    "period_ytd": "I år",
+    "period_all": "Hela perioden"
   },
   "agency": {
     "eyebrow": "Byrå",
@@ -2358,11 +2370,11 @@
     "pillar1Title": "Minsta privilegium som standard",
     "pillar1Body": "Rollbaserad åtkomst avgränsar varje sida och varje databasfråga. Byråer ser bara sina kunder; utgivare ser bara sina titlar.",
     "pillar2Title": "Dataminimering",
-    "pillar2Body": "Vi lagrar det vi behöver för att driva marknadsplatsen — och inget mer. Inga spårningspixlar, inga skuggprofiler, ingen berikning.",
+    "pillar2Body": "Vi lagrar det vi behöver för att driva marknadsplatsen — och inget mer. Inga spårningspixlar i våra mejl, inga skuggprofiler av kunder, inga uppgifter köpta från datamäklare. Länkar i publicerade artiklar räknar klick sammanlagt, utan att identifiera läsare. Kontaktuppgifter till utgivares annonsavdelningar hämtas från utgivarnas egna offentliga sidor; integritetspolicyn förklarar hur.",
     "pillar3Title": "Kryptering i transit och i vila",
-    "pillar3Body": "TLS 1.2+ överallt. Databasskivor och backup krypterade i vila. Hemligheter ligger i en hanterad vault, inte i koden.",
+    "pillar3Body": "TLS på alla anslutningar. Databasdiskar och säkerhetskopior krypteras i vila av vår driftleverantör. Hemligheter ligger i driftleverantörens krypterade hemlighetslager, inte i koden; lösenord, inloggningslänkar och API-nycklar lagras bara som hashar.",
     "pillar4Title": "Spårbar i designen",
-    "pillar4Body": "Varje beställning, offert och innehållstillgång har en oföränderlig logg. Vi kan svara på vem som gjorde vad, när — och det kan ni också.",
+    "pillar4Body": "Beställningar, offerter, fakturor, ändringar i teamet och personalens åtkomst till er arbetsyta loggas: vem gjorde vad, och när. Organisationens administratörer kan läsa och exportera sin egen logg i appen. IP- och e-postadresser tas bort från posterna efter 90 dagar.",
     "complianceTitle": "Compliance och hållning",
     "complianceLead": "Vi är ett ungt företag. Vi är ärliga om vad som är live och vad som är på roadmappen.",
     "colArea": "Område",
@@ -2373,13 +2385,13 @@
     "statusRoadmap": "Roadmap",
     "statusPlan": "Planerat",
     "gdprArea": "GDPR",
-    "gdprNote": "DPA tillgängligt på begäran; vi är personuppgiftsansvariga för marknadsplatsdata.",
+    "gdprNote": "Personuppgiftsbiträdesavtal på begäran; underleverantörerna listas offentligt. Vi är personuppgiftsansvarig för marknadsplatsdata.",
     "dataResArea": "Dataresiliens",
     "dataResNote": "All kunddata lagras i EU (Stockholm-regionen).",
     "encryptionArea": "Kryptering",
-    "encryptionNote": "TLS 1.2+ i transit, AES-256 i vila, hanterad nyckelvault.",
+    "encryptionNote": "TLS under överföring; kryptering i vila och nyckelhantering hos driftleverantören.",
     "ssoArea": "SSO (SAML / OIDC)",
-    "ssoNote": "Tillgängligt på Hanterad och Byrå-planerna på begäran.",
+    "ssoNote": "Inte tillgängligt ännu. Tvåfaktorsautentisering skyddar inloggningen i dag; hör av er om SSO är ett upphandlingskrav.",
     "auditArea": "SOC 2 Type I",
     "auditNote": "Målsatt sent 2026.",
     "disclosureTitle": "Ansvarsfull rapportering",
@@ -2389,21 +2401,23 @@
     "ctaBody": "Vi går gärna igenom specifika kontroller, delar DPA eller diskuterar upphandlingskrav.",
     "ctaContact": "Kontakta oss",
     "pillarsEyebrow": "Principer",
-    "complianceEyebrow": "Compliance"
+    "complianceEyebrow": "Compliance",
+    "mfaArea": "Tvåfaktorsautentisering",
+    "mfaNote": "Koder från autentiseringsapp (TOTP) med återställningskoder, tillgängligt för alla konton och kan göras obligatoriskt för NativeSpins personal."
   },
   "privacy": {
     "metaTitle": "Integritet",
     "eyebrow": "Integritet",
     "title": "Integritetspolicy",
     "lead": "Så samlar, använder och skyddar NativeSpin personuppgifter — på enkel svenska.",
-    "lastUpdated": "Senast uppdaterad: 22 maj 2026",
+    "lastUpdated": "Senast uppdaterad: 15 november 2026",
     "controller": {
       "title": "Vem är personuppgiftsansvarig",
-      "body": "Getia AS är personuppgiftsansvarig för personuppgifter som behandlas via marknadsplatsen. Vi har bas i Norge och behandlar all data inom EU/EES."
+      "body": "Getia AS är personuppgiftsansvarig för personuppgifter som behandlas via denna marknadsplats. Vi finns i Norge. Var var och en av våra underleverantörer behandlar data framgår av sidan om underleverantörer."
     },
     "data": {
       "title": "Vilka uppgifter vi samlar",
-      "body": "Kontodata (namn, jobbmejl, roll, organisation), marknadsplatsaktivitet (förfrågningar, beställningar, planer), och minimal telemetri som krävs för att driva tjänsten (inloggningar, felrapporter). Vi kör inga tredjeparts annons- eller beteendespårpixlar på våra marknadsföringssidor."
+      "body": "Kontouppgifter (namn, jobbmejl, roll, organisation), aktivitet på marknadsplatsen (förfrågningar, beställningar, planer och de briefer du skriver) och den telemetri som behövs för att driva tjänsten (inloggningshändelser med IP-adress, felrapporter). För utgivare har vi även kontaktuppgifter till anställda på annons- och säljavdelningar, hämtade från utgivarnas egna offentliga sidor — se ”Utgivarkontakter” nedan. Vi kör ingen tredjepartsannonsering eller beteendespårning på våra marknadssidor."
     },
     "purpose": {
       "title": "Hur vi använder dem",
@@ -2411,15 +2425,15 @@
     },
     "legal": {
       "title": "Rättslig grund",
-      "body": "Avtalsuppfyllelse (kontoinnehavare), berättigat intresse (säkerhet, bedrägeriförebyggande, produktförbättring) och samtycke (valfritt nyhetsbrev)."
+      "body": "Fullgörande av avtal (kontoinnehavare), berättigat intresse (säkerhet, förebyggande av bedrägeri, produktförbättring och kontakt med utgivares annonsavdelningar om deras prislistor), rättslig förpliktelse (räkenskapsmaterial) och samtycke (valfritt nyhetsbrev, analyscookies)."
     },
     "retention": {
       "title": "Hur länge vi sparar",
-      "body": "Kontodata så länge kontot finns; transaktionsdata i sju år (bokföringslag); telemetri aggregerat efter 90 dagar."
+      "body": "Kontouppgifter så länge kontot finns; du kan inaktivera kontot och få dina personuppgifter raderade från kontosidan. Fakturor och beställningar sparas så länge bokföringslagstiftningen kräver. IP- och e-postadresser tas bort från poster i granskningsloggen efter 90 dagar. Använda eller utgångna inloggningslänkar, länkar för lösenordsåterställning och outnyttjade inbjudningar raderas efter 30 dagar."
     },
     "sharing": {
       "title": "Vem vi delar data med",
-      "body": "Utgivare ser köparorganisationen och orderdetaljer för beställningar placerade hos dem. Underbiträden (hosting, e-post, betalning) listas i vår DPA, alla EU-baserade eller med tillräckliga skyddsåtgärder."
+      "body": "Utgivare ser köparorganisationen och detaljerna för beställningar som lagts hos dem. Våra underleverantörer (drift, e-postutskick, fillagring, AI-behandling och, när det är aktiverat, bokföring och analys) listas på sidan om underleverantörer."
     },
     "transfers": {
       "title": "Internationella överföringar",
@@ -2438,21 +2452,29 @@
       "body": "Vi publicerar väsentliga ändringar här och meddelar kontoinnehavare via e-post. Senast uppdaterad-datumet ovan speglar alltid aktuell version."
     },
     "contactTitle": "Dataskyddskontakt",
-    "contactBody": "Frågor, förfrågningar eller klagomål — skriv till"
+    "contactBody": "Frågor, förfrågningar eller klagomål — skriv till",
+    "ai": {
+      "title": "Användning av AI",
+      "body": "När du beskriver en kampanj kan brieftexten skickas till en AI-modell via vår AI-leverantör för att föreslå passande titlar och ta fram exempeltext; förslag skrivna av AI är märkta. Vi använder inte dina uppgifter för att träna modeller. AI-leverantören listas på sidan om underleverantörer. Briefer skickas utan ditt namn eller din e-postadress."
+    },
+    "publisherContacts": {
+      "title": "Utgivarkontakter",
+      "body": "Om du arbetar med annonsförsäljning hos en utgivare kan vi ha ditt namn, din jobbmejl, ditt telefonnummer och din befattning. Vi har hämtat dem från din arbetsgivares offentliga webbplats eller mediekit, eller från ett säljbolag som representerar titeln — inte från dig. Vi använder dem bara för att fråga om prislistor och bokningar för dina titlar, med stöd av vårt berättigade intresse av att driva en marknadsplats för sådan annonsering. Varje sådant mejl har en avregistreringslänk, och en avregistrerad adress kontaktas inte igen. Du kan när som helst begära tillgång, rättelse eller radering, eller invända, på privacy@nativespin.com, och du kan klaga hos din dataskyddsmyndighet (i Sverige: Integritetsskyddsmyndigheten)."
+    }
   },
   "terms": {
     "metaTitle": "Användarvillkor",
     "eyebrow": "Villkor",
     "title": "Marknadsplatsens användarvillkor",
     "lead": "Dessa villkor reglerar er användning av NativeSpin som annonsör, byrå eller utgivare.",
-    "lastUpdated": "Senast uppdaterad: 22 maj 2026",
+    "lastUpdated": "Senast uppdaterad: 15 november 2026",
     "scope": {
       "title": "Omfattning",
       "body": "NativeSpin är en marknadsplats som kopplar annonsörer och byråer med tidnings- och magasin-utgivare som erbjuder native-innehåll och native-annonsering. Dessa villkor gäller för alla användare."
     },
     "accounts": {
       "title": "Konton",
-      "body": "Ni måste ange korrekt registreringsinformation, hålla inloggningsuppgifter konfidentiella och meddela oss om obehörig åtkomst. Konton är knutna till en organisation; delning över organisationer kräver byråarbetsytan."
+      "body": "Du måste lämna korrekta registreringsuppgifter, hålla inloggningsuppgifterna hemliga och meddela oss om obehörig åtkomst. Ett konto kan ha plats i flera organisationer; organisationens administratörer ger och tar bort åtkomsten."
     },
     "roles": {
       "title": "Roller och åtkomst",
@@ -4034,7 +4056,9 @@
     "deskPlaybooks": "Spelböcker",
     "deskContentFees": "Innehållsavgifter",
     "deskApiKeys": "API-nycklar",
-    "deskMetricsNeedsContact": "Saknar mätvärden"
+    "deskMetricsNeedsContact": "Saknar mätvärden",
+    "audit": "Granskningslogg",
+    "deskJobs": "Bakgrundsjobb"
   },
   "briefTargeting": {
     "audience": "Målgrupp",
@@ -4230,5 +4254,150 @@
         "body": "En ny hjälpsida svarar på vanliga frågor, och när en kampanj är klar kan du betygsätta hur det gick."
       }
     }
+  },
+  "customerAudit": {
+    "eyebrow": "Konto",
+    "title": "Granskningslogg",
+    "lead": "Vad som har hänt i er organisation, vem som gjorde det och när — även när NativeSpins personal har öppnat er arbetsyta.",
+    "filterCategory": "Område",
+    "allCategories": "Allt",
+    "filterFrom": "Från",
+    "filterTo": "Till",
+    "filterButton": "Filtrera",
+    "clear": "Rensa",
+    "exportCsv": "Exportera som CSV",
+    "colWhen": "När",
+    "colWho": "Vem",
+    "colWhat": "Vad",
+    "colDetail": "Detaljer",
+    "none": "Inga poster matchar filtren.",
+    "resultCount": "{count, plural, =0 {Inga poster} =1 {1 post} other {# poster}}",
+    "retentionNote": "Loggen visar händelser från november 2026 och framåt. E-postadresser tas bort från poster som är äldre än 90 dagar.",
+    "adminsOnlyTitle": "För organisationens administratörer",
+    "adminsOnlyBody": "Granskningsloggen namnger kollegor och vad de har gjort, så bara organisationens administratörer kan läsa den. Be en administratör i teamet om du behöver få en post uppslagen.",
+    "actorStaff": "NativeSpin desk",
+    "actorSystem": "NativeSpin (automatiskt)",
+    "actorOther": "Någon utanför er organisation",
+    "actions": {
+      "request_submit": "Förfrågan skickad",
+      "request_withdrawn_by_buyer": "Förfrågan återkallad",
+      "api_order_create": "Beställning lagd via API",
+      "quote_send": "Offert mottagen",
+      "quote_accept": "Offert accepterad",
+      "quote_declined_by_buyer": "Offert avböjd",
+      "quote_revise": "Offert reviderad",
+      "quote_renew": "Offert förnyad",
+      "quote_renewal_requested": "Förnyelse av offert begärd",
+      "quote_pdf_download": "Offert-PDF nedladdad",
+      "quote_pdf_generate": "Offert-PDF skapad",
+      "quote_docx_export": "Offert exporterad till Word",
+      "order_advance": "Beställningsstatus ändrad",
+      "order_cancel": "Beställning avbruten",
+      "order_cancellation_requested": "Avbokning begärd",
+      "order_extra_work_add": "Extraarbete tillagt på beställning",
+      "order_extra_work_remove": "Extraarbete borttaget från beställning",
+      "order_feedback_submitted": "Återkoppling på beställning skickad",
+      "order_flight_window_save": "Kampanjdatum ändrade",
+      "invoice_issue": "Faktura utfärdad",
+      "credit_note_issue": "Kreditnota utfärdad",
+      "invoice_pdf_download": "Faktura-PDF nedladdad",
+      "org_invite_sent": "Teaminbjudan skickad",
+      "org_invite_revoked": "Teaminbjudan återkallad",
+      "org_membership_updated": "Medlems åtkomst ändrad",
+      "org_membership_revoked": "Medlem borttagen",
+      "organization_updated": "Företagsuppgifter uppdaterade",
+      "org_payment_terms_set": "Betalningsvillkor ändrade",
+      "api_key_create": "API-nyckel skapad",
+      "api_key_revoke": "API-nyckel återkallad",
+      "superadmin_view_as_start": "NativeSpins personal öppnade er arbetsyta",
+      "superadmin_view_as_end": "NativeSpins personal lämnade er arbetsyta",
+      "data_export": "Organisationsdata exporterad",
+      "list_create": "Sparad lista skapad",
+      "list_archive": "Sparad lista arkiverad",
+      "list_restore": "Sparad lista återställd",
+      "list_duplicate": "Sparad lista duplicerad",
+      "list_share_enable": "Listdelning aktiverad",
+      "list_share_disable": "Listdelning avstängd",
+      "list_client_approved": "Delad lista godkänd",
+      "plan_duplicate": "Plan duplicerad från en beställning",
+      "article_create": "Artikel skapad",
+      "article_link": "Artikel kopplad till en placering",
+      "article_unlink": "Artikel bortkopplad från en placering"
+    },
+    "categories": {
+      "request": "Förfrågningar",
+      "quote": "Offerter",
+      "order": "Beställningar",
+      "invoice": "Fakturor",
+      "team": "Team",
+      "access": "Åtkomst",
+      "export": "Dataexport",
+      "list": "Planer och listor",
+      "article": "Artiklar"
+    },
+    "fields": {
+      "reason": "Anledning",
+      "total": "Summa",
+      "currency": "Valuta",
+      "from": "Från",
+      "to": "Till",
+      "start": "Start",
+      "end": "Slut",
+      "number": "Nummer",
+      "amount": "Belopp",
+      "email": "E-post",
+      "role": "Roll",
+      "name": "Namn"
+    }
+  },
+  "deskJobs": {
+    "eyebrow": "Drift",
+    "title": "Bakgrundsjobb",
+    "lead": "Köat arbete som körs utanför en sidförfrågan: webhook-leveranser, nya e-postförsök, arkivering av fakturor, överföring till bokföringen — och de schemalagda körningarna.",
+    "statPending": "Väntar",
+    "statRunning": "Körs",
+    "statDead": "Misslyckade för gott",
+    "statOldest": "Äldsta väntande",
+    "oldestNone": "Inget försenat",
+    "deadTitle": "Misslyckade jobb",
+    "deadLead": "Dessa har förbrukat sina försök. Försök igen lägger tillbaka jobbet i kön med nya försök; kassera ger upp det.",
+    "deadNone": "Inga misslyckade jobb.",
+    "colKind": "Jobb",
+    "colAttempts": "Försök",
+    "colLastError": "Senaste fel",
+    "colCreated": "Skapad",
+    "colFinished": "Klar",
+    "retry": "Försök igen",
+    "discard": "Kassera",
+    "confirmDiscard": "Kassera det här jobbet?",
+    "superadminOnly": "Bara en superadministratör kan försöka igen eller kassera.",
+    "recentTitle": "Senaste jobb",
+    "recentNone": "Inga jobb ännu.",
+    "colStatus": "Status",
+    "colRunAt": "Körs",
+    "sweepsTitle": "Schemalagda körningar",
+    "sweepsLead": "De senaste körningarna av varje jobb. Körningar som inte hade något att göra visas inte.",
+    "sweepsNone": "Ingen schemalagd körning har gått ännu.",
+    "colSweep": "Körning",
+    "colVia": "Startad av",
+    "colWhen": "När",
+    "colResult": "Resultat",
+    "colDuration": "Tog",
+    "ok": "OK",
+    "failed": "Misslyckades",
+    "viaTimer": "Timer",
+    "viaCron": "Schemaläggare",
+    "flashRetried": "Jobbet ligger i kön igen.",
+    "flashDiscarded": "Jobbet kasserades.",
+    "flashGone": "Det jobbet finns inte längre bland de misslyckade.",
+    "status": {
+      "PENDING": "Väntar",
+      "RUNNING": "Körs",
+      "DONE": "Klar",
+      "FAILED": "Misslyckad",
+      "DISCARDED": "Kasserad"
+    },
+    "working": "Arbetar…",
+    "cancel": "Avbryt"
   }
 }

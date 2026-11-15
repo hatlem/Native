@@ -1,6 +1,6 @@
 # Security contact for NativeSpin (RFC 9116).
 # Please report suspected vulnerabilities here rather than in public channels.
-Contact: mailto:privacy@nativespin.com
+Contact: mailto:security@nativespin.com
 Expires: 2027-11-01T00:00:00.000Z
 Preferred-Languages: en, no
 Canonical: https://nativespin.com/.well-known/security.txt

@@ -2,7 +2,7 @@
 
 ## Reporting a vulnerability
 
-Email **privacy@nativespin.com** with:
+Email **security@nativespin.com** with:
 
 - what you found and where (URL, endpoint, or file),
 - the steps to reproduce it, and

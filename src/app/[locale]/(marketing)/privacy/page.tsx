@@ -31,6 +31,8 @@ export default async function PrivacyPage({
     "legal",
     "retention",
     "sharing",
+    "ai",
+    "publisherContacts",
     "transfers",
     "rights",
     "cookies",

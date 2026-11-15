@@ -8,6 +8,7 @@ Step-by-step procedures for production incidents on NativeSpin
 | [backup-restore.md](./backup-restore.md) | Data was lost or corrupted; or for the quarterly restore drill |
 | [rollback.md](./rollback.md) | A deploy broke production and must be undone |
 | [incident.md](./incident.md) | Anything is on fire: who does what, in which order, who must be told |
+| [monitoring.md](./monitoring.md) | Setting up uptime checks and alerts; what each alert means and what to do |
 
 **Status of these documents.** They were written from the repository
 (`railway.json`, the Prisma migrations, the code) — not from a rehearsal.

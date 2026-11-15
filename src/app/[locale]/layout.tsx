@@ -149,10 +149,15 @@ export default async function LocaleLayout({
   const activeOrgName = switchOrgs?.find((o) => o.id === workspace?.activeOrgId)?.name ?? null;
   const staffHasOrgAccess =
     (audience === "desk" || audience === "superadmin") && workspace !== null;
-  const navOpts = { campaignFlow: campaignFlowEnabled(), hasOrgAccess: staffHasOrgAccess };
+  const navOpts = {
+    campaignFlow: campaignFlowEnabled(),
+    hasOrgAccess: staffHasOrgAccess,
+    // Admins of the active organisation get its audit trail (/audit).
+    orgAdmin: workspace?.activeOrgId != null && workspace.activeRole === "ADMIN",
+  };
   let nav = navItemsFor(audience, t, navOpts);
   const palette = paletteItemsFor(audience, t, navOpts);
-  const userMenu = userMenuItemsFor(audience, t);
+  const userMenu = userMenuItemsFor(audience, t, navOpts);
 
   // The campaign-flow buyer nav collapses to 2 links (Planlegg kampanje +
   // Kampanjer) — Catalog/Lists/Favorites/Orders/Reports only survive via

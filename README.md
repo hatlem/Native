@@ -219,10 +219,26 @@ changes follow expand/contract — see [`CONTRIBUTING.md`](./CONTRIBUTING.md).
   hourly, then set `IN_PROCESS_SWEEPS=0`. The endpoint answers 500 when any
   sweep fails, so the scheduler shows the run as failed. Running both at once
   is safe (advisory locks / daily latch).
-- **Partner webhooks** are retried up to 3 times with backoff and carry a
-  timestamped signature (`X-NativeSpin-Signature-V1` over
-  `<timestamp>.<body>`) next to the original body-only one — see
-  [`src/lib/webhooks.ts`](./src/lib/webhooks.ts).
+- **Job queue.** Work that must survive a deploy — partner-webhook
+  deliveries, retries of failed notice emails, invoice-PDF archiving, retries
+  of refused accounting pushes — is persisted in the `Job` table and run by
+  [`src/lib/jobs`](./src/lib/jobs/index.ts): claimed with `FOR UPDATE SKIP
+  LOCKED` (several instances never run the same job), retried with
+  exponential backoff, dead-lettered when attempts run out. The web process
+  polls every 10 s (`JOB_WORKER=0` turns that off); `/api/cron/sweeps` drains
+  it too (`?only=jobs`). `/desk/jobs` shows the queue, the dead letters (a
+  super admin can retry or discard) and the sweep run history; a dead-lettered
+  job is an error-level log line, so it alerts through `ERROR_WEBHOOK_URL`.
+- **Partner webhooks** are queued per receiver and retried for about two hours
+  (8 attempts) with backoff. They carry a timestamped signature
+  (`X-NativeSpin-Signature-V1` over `<timestamp>.<body>`) next to the original
+  body-only one, and `X-NativeSpin-Delivery-Id`, stable across retries, for
+  receiver-side dedup — see [`src/lib/webhooks.ts`](./src/lib/webhooks.ts).
+- **Monitoring.** `/api/health` is the public liveness probe.
+  `/api/health/deep` (`Authorization: Bearer $CRON_SECRET`) also checks
+  pending migrations, queue lag, dead letters and sweep freshness — see
+  [`docs/runbooks/monitoring.md`](./docs/runbooks/monitoring.md) for the
+  monitors to set up and the suggested SLOs.
 - **Runbooks.** [`docs/runbooks/`](./docs/runbooks/): backup & restore,
   rollback, incident response. Architecture decisions are recorded in
   [`docs/adr/`](./docs/adr/).

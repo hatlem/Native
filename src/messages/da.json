@@ -142,7 +142,8 @@
     "paletteOrders": "Ordrer",
     "paletteRequests": "Forespørgsler",
     "paletteTitles": "Titler",
-    "paletteSearching": "Søger…"
+    "paletteSearching": "Søger…",
+    "jobs": "Job"
   },
   "reports": {
     "title": "Rapporter",
@@ -185,7 +186,18 @@
     "basis_category-median": "kategorimedian",
     "basis_default": "standard",
     "exportInvoicesCsv": "Eksportér fakturaer (CSV)",
-    "exportAccountingJson": "Regnskabseksport (JSON)"
+    "exportAccountingJson": "Regnskabseksport (JSON)",
+    "periodLabel": "Periode",
+    "periodCustom": "Egne datoer",
+    "periodFrom": "Fra",
+    "periodTo": "Til",
+    "periodApply": "Anvend",
+    "periodHint": "Udfyldte datoer går forud for perioden.",
+    "period_30d": "Seneste 30 dage",
+    "period_90d": "Seneste 90 dage",
+    "period_12m": "Seneste 12 måneder",
+    "period_ytd": "I år",
+    "period_all": "Hele perioden"
   },
   "agency": {
     "eyebrow": "Bureau",
@@ -2359,11 +2371,11 @@
     "pillar1Title": "Mindste privilegium som standard",
     "pillar1Body": "Rollebaseret adgang afgrænser hver side og hver databasespørgsmål. Bureauer ser kun deres kunder; udgivere ser kun deres titler.",
     "pillar2Title": "Dataminimering",
-    "pillar2Body": "Vi gemmer det, vi har brug for, til at drive markedspladsen — og intet mere. Ingen sporingspixler, ingen skyggeprofiler, ingen berigelse.",
+    "pillar2Body": "Vi gemmer det, vi har brug for til at drive markedspladsen — og ikke mere. Ingen sporingspixels i vores e-mails, ingen skyggeprofiler af kunder, ingen data købt fra datamæglere. Links i publicerede artikler tæller klik samlet uden at identificere læsere. Kontaktoplysninger til udgiveres annonceafdelinger hentes fra udgivernes egne offentlige sider; privatlivspolitikken forklarer hvordan.",
     "pillar3Title": "Kryptering i transit og i hvile",
-    "pillar3Body": "TLS 1.2+ overalt. Databasediske og backup er krypterede i hvile. Hemmeligheder ligger i en administreret vault, ikke i koden.",
+    "pillar3Body": "TLS på alle forbindelser. Databasediske og sikkerhedskopier krypteres i hvile af vores driftsleverandør. Hemmeligheder ligger i driftsleverandørens krypterede hemmelighedslager, ikke i koden; adgangskoder, login-links og API-nøgler gemmes kun som hashes.",
     "pillar4Title": "Sporbar i designet",
-    "pillar4Body": "Hver bestilling, hvert tilbud og hver indholdsressource har et uforanderligt spor. Vi kan svare på, hvem der gjorde hvad, hvornår — og det kan I også.",
+    "pillar4Body": "Ordrer, tilbud, fakturaer, ændringer i teamet og medarbejderes adgang til jeres arbejdsområde logges: hvem gjorde hvad, og hvornår. Organisationens administratorer kan læse og eksportere deres egen log i appen. IP- og e-mailadresser fjernes fra posterne efter 90 dage.",
     "complianceTitle": "Compliance og position",
     "complianceLead": "Vi er et ungt firma. Vi er ærlige om, hvad der er live, og hvad der er på roadmappen.",
     "colArea": "Område",
@@ -2374,13 +2386,13 @@
     "statusRoadmap": "Roadmap",
     "statusPlan": "Planlagt",
     "gdprArea": "GDPR",
-    "gdprNote": "DPA tilgængelig på forespørgsel; vi er dataansvarlige for markedsplads-data.",
+    "gdprNote": "Databehandleraftale på forespørgsel; underleverandørerne er offentligt listet. Vi er dataansvarlig for markedspladsdata.",
     "dataResArea": "Dataresidens",
     "dataResNote": "Alle kundedata hostes i EU (Stockholm-regionen).",
     "encryptionArea": "Kryptering",
-    "encryptionNote": "TLS 1.2+ i transit, AES-256 i hvile, administreret nøglevault.",
+    "encryptionNote": "TLS under overførsel; kryptering i hvile og nøglehåndtering hos driftsleverandøren.",
     "ssoArea": "SSO (SAML / OIDC)",
-    "ssoNote": "Tilgængelig på Administreret og Bureau-planerne på forespørgsel.",
+    "ssoNote": "Ikke tilgængeligt endnu. Tofaktorgodkendelse sikrer login i dag; sig til, hvis SSO er et indkøbskrav.",
     "auditArea": "SOC 2 Type I",
     "auditNote": "Målrettet sent 2026.",
     "disclosureTitle": "Ansvarlig fremlæggelse",
@@ -2390,21 +2402,23 @@
     "ctaBody": "Vi tager gerne en gennemgang af specifikke kontroller, deler DPA eller diskuterer indkøbskrav.",
     "ctaContact": "Kontakt os",
     "pillarsEyebrow": "Principper",
-    "complianceEyebrow": "Compliance"
+    "complianceEyebrow": "Compliance",
+    "mfaArea": "Tofaktorgodkendelse",
+    "mfaNote": "Koder fra godkendelsesapp (TOTP) med gendannelseskoder, tilgængeligt for alle konti og kan gøres obligatorisk for NativeSpins medarbejdere."
   },
   "privacy": {
     "metaTitle": "Privatliv",
     "eyebrow": "Privatliv",
     "title": "Privatlivspolitik",
     "lead": "Sådan indsamler, bruger og beskytter NativeSpin persondata — på almindelig dansk.",
-    "lastUpdated": "Sidst opdateret: 22. maj 2026",
+    "lastUpdated": "Sidst opdateret: 15. november 2026",
     "controller": {
       "title": "Hvem er dataansvarlig",
-      "body": "Getia AS er dataansvarlig for persondata, der behandles via denne markedsplads. Vi har base i Norge og behandler alle data inden for EU/EØS."
+      "body": "Getia AS er dataansvarlig for personoplysninger, der behandles via denne markedsplads. Vi holder til i Norge. Hvor hver af vores underleverandører behandler data, fremgår af siden om underleverandører."
     },
     "data": {
       "title": "Hvilke data vi indsamler",
-      "body": "Kontodata (navn, arbejdsmail, rolle, organisation), markedsplads-aktivitet (forespørgsler, bestillinger, planer), og minimal telemetri til at drive tjenesten (login-hændelser, fejlrapporter). Vi kører ingen tredjeparts annonce- eller adfærdssporingspixler på vores marketingsider."
+      "body": "Kontodata (navn, arbejdsmail, rolle, organisation), aktivitet på markedspladsen (forespørgsler, ordrer, planer og de briefs, du skriver) og den telemetri, der er nødvendig for at drive tjenesten (loginhændelser med IP-adresse, fejlrapporter). For udgivere har vi også kontaktoplysninger på medarbejdere i annonce- og salgsafdelinger, hentet fra udgivernes egne offentlige sider — se »Udgiverkontakter« nedenfor. Vi kører ikke tredjepartsannoncering eller adfærdssporing på vores markedsføringssider."
     },
     "purpose": {
       "title": "Hvordan vi bruger dem",
@@ -2412,15 +2426,15 @@
     },
     "legal": {
       "title": "Retsgrundlag",
-      "body": "Aftaleopfyldelse (kontoindehavere), berettiget interesse (sikkerhed, svindelforebyggelse, produktforbedring) og samtykke (valgfrit nyhedsbrev)."
+      "body": "Opfyldelse af kontrakt (kontoindehavere), legitim interesse (sikkerhed, forebyggelse af svindel, produktforbedring og kontakt til udgiveres annonceafdelinger om deres prislister), retlig forpligtelse (regnskabsmateriale) og samtykke (valgfrit nyhedsbrev, analysecookies)."
     },
     "retention": {
       "title": "Hvor længe vi opbevarer",
-      "body": "Kontodata så længe kontoen findes; transaktionsdata i syv år (bogføringsloven); telemetri aggregeret efter 90 dage."
+      "body": "Kontodata, så længe kontoen findes; du kan deaktivere kontoen og få dine personoplysninger slettet fra kontosiden. Fakturaer og ordrer opbevares, så længe regnskabslovgivningen kræver. IP- og e-mailadresser fjernes fra poster i revisionsloggen efter 90 dage. Brugte eller udløbne login-links, links til nulstilling af adgangskode og ubrugte invitationer slettes efter 30 dage."
     },
     "sharing": {
       "title": "Hvem vi deler data med",
-      "body": "Udgivere ser køberens organisation og ordredetaljer for bestillinger lagt hos dem. Underdatabehandlere (hosting, e-mail, betaling) er listet i vores DPA, alle EU-baserede eller med tilstrækkelige garantier."
+      "body": "Udgivere ser køberorganisationen og ordredetaljerne for ordrer, der er afgivet hos dem. Vores underleverandører (drift, e-mailudsendelse, fillagring, AI-behandling og, når det er slået til, regnskab og analyse) fremgår af siden om underleverandører."
     },
     "transfers": {
       "title": "Internationale overførsler",
@@ -2439,21 +2453,29 @@
       "body": "Vi publicerer væsentlige ændringer her og giver kontoindehavere besked via e-mail. Sidst opdateret-datoen ovenfor afspejler altid den aktuelle version."
     },
     "contactTitle": "Kontakt for databeskyttelse",
-    "contactBody": "Spørgsmål, anmodninger eller klager — skriv til"
+    "contactBody": "Spørgsmål, anmodninger eller klager — skriv til",
+    "ai": {
+      "title": "Brug af AI",
+      "body": "Når du beskriver en kampagne, kan briefteksten blive sendt til en AI-model via vores AI-leverandør for at foreslå passende titler og lave eksempeltekst; forslag skrevet af AI er mærket. Vi bruger ikke dine data til at træne modeller. AI-leverandøren fremgår af siden om underleverandører. Briefs sendes uden dit navn eller din e-mailadresse."
+    },
+    "publisherContacts": {
+      "title": "Udgiverkontakter",
+      "body": "Hvis du arbejder med annoncesalg hos en udgiver, kan vi have dit navn, din arbejdsmail, dit telefonnummer og din stillingsbetegnelse. Vi har hentet dem fra din arbejdsgivers offentlige hjemmeside eller mediekit eller fra et salgshus, der repræsenterer titlen — ikke fra dig. Vi bruger dem kun til at spørge om prislister og bookinger for dine titler, på grundlag af vores legitime interesse i at drive en markedsplads for sådan annoncering. Hver sådan e-mail har et afmeldingslink, og en afmeldt adresse kontaktes ikke igen. Du kan til enhver tid bede om indsigt, berigtigelse eller sletning eller gøre indsigelse på privacy@nativespin.com, og du kan klage til din databeskyttelsesmyndighed (i Danmark: Datatilsynet)."
+    }
   },
   "terms": {
     "metaTitle": "Brugervilkår",
     "eyebrow": "Vilkår",
     "title": "Markedspladsens brugervilkår",
     "lead": "Disse vilkår regulerer jeres brug af NativeSpin som annoncør, bureau eller udgiver.",
-    "lastUpdated": "Sidst opdateret: 22. maj 2026",
+    "lastUpdated": "Sidst opdateret: 15. november 2026",
     "scope": {
       "title": "Omfang",
       "body": "NativeSpin er en markedsplads, der forbinder annoncører og bureauer med avis- og magasin-udgivere, der tilbyder native-indhold og native-annoncering. Disse vilkår gælder for alle brugere."
     },
     "accounts": {
       "title": "Konti",
-      "body": "I skal angive korrekt registreringsoplysninger, holde loginoplysninger fortrolige og give os besked om uautoriseret adgang. Konti er knyttet til én organisation; deling på tværs af organisationer kræver bureau-arbejdsområdet."
+      "body": "Du skal give korrekte registreringsoplysninger, holde loginoplysninger fortrolige og give os besked om uautoriseret adgang. En konto kan have plads i flere organisationer; organisationens administratorer giver og fjerner adgangen."
     },
     "roles": {
       "title": "Roller og adgang",
@@ -4035,7 +4057,9 @@
     "deskPlaybooks": "Spillebøger",
     "deskContentFees": "Indholdsgebyrer",
     "deskApiKeys": "API-nøgler",
-    "deskMetricsNeedsContact": "Mangler tal"
+    "deskMetricsNeedsContact": "Mangler tal",
+    "audit": "Revisionslog",
+    "deskJobs": "Baggrundsjob"
   },
   "briefTargeting": {
     "audience": "Målgruppe",
@@ -4231,5 +4255,150 @@
         "body": "En ny hjælpeside besvarer almindelige spørgsmål, og når en kampagne er afsluttet, kan du bedømme, hvordan det gik."
       }
     }
+  },
+  "customerAudit": {
+    "eyebrow": "Konto",
+    "title": "Revisionslog",
+    "lead": "Hvad der er sket i jeres organisation, hvem der gjorde det, og hvornår — også når NativeSpins medarbejdere har åbnet jeres arbejdsområde.",
+    "filterCategory": "Område",
+    "allCategories": "Alt",
+    "filterFrom": "Fra",
+    "filterTo": "Til",
+    "filterButton": "Filtrer",
+    "clear": "Ryd",
+    "exportCsv": "Eksportér som CSV",
+    "colWhen": "Hvornår",
+    "colWho": "Hvem",
+    "colWhat": "Hvad",
+    "colDetail": "Detaljer",
+    "none": "Ingen poster matcher filtrene.",
+    "resultCount": "{count, plural, =0 {Ingen poster} =1 {1 post} other {# poster}}",
+    "retentionNote": "Loggen viser handlinger fra november 2026 og frem. E-mailadresser fjernes fra poster, der er ældre end 90 dage.",
+    "adminsOnlyTitle": "For organisationens administratorer",
+    "adminsOnlyBody": "Revisionsloggen nævner kolleger og hvad de har gjort, så kun organisationens administratorer kan læse den. Spørg en administrator i teamet, hvis du har brug for at få slået en post op.",
+    "actorStaff": "NativeSpin desk",
+    "actorSystem": "NativeSpin (automatisk)",
+    "actorOther": "En person uden for jeres organisation",
+    "actions": {
+      "request_submit": "Anmodning sendt",
+      "request_withdrawn_by_buyer": "Anmodning trukket tilbage",
+      "api_order_create": "Ordre afgivet via API",
+      "quote_send": "Tilbud modtaget",
+      "quote_accept": "Tilbud accepteret",
+      "quote_declined_by_buyer": "Tilbud afslået",
+      "quote_revise": "Tilbud revideret",
+      "quote_renew": "Tilbud fornyet",
+      "quote_renewal_requested": "Fornyelse af tilbud anmodet",
+      "quote_pdf_download": "Tilbuds-PDF downloadet",
+      "quote_pdf_generate": "Tilbuds-PDF genereret",
+      "quote_docx_export": "Tilbud eksporteret til Word",
+      "order_advance": "Ordrestatus ændret",
+      "order_cancel": "Ordre annulleret",
+      "order_cancellation_requested": "Annullering anmodet",
+      "order_extra_work_add": "Ekstraarbejde føjet til ordre",
+      "order_extra_work_remove": "Ekstraarbejde fjernet fra ordre",
+      "order_feedback_submitted": "Feedback på ordre indsendt",
+      "order_flight_window_save": "Kampagnedatoer ændret",
+      "invoice_issue": "Faktura udstedt",
+      "credit_note_issue": "Kreditnota udstedt",
+      "invoice_pdf_download": "Faktura-PDF downloadet",
+      "org_invite_sent": "Teaminvitation sendt",
+      "org_invite_revoked": "Teaminvitation trukket tilbage",
+      "org_membership_updated": "Medlemsadgang ændret",
+      "org_membership_revoked": "Medlem fjernet",
+      "organization_updated": "Virksomhedsoplysninger opdateret",
+      "org_payment_terms_set": "Betalingsbetingelser ændret",
+      "api_key_create": "API-nøgle oprettet",
+      "api_key_revoke": "API-nøgle tilbagekaldt",
+      "superadmin_view_as_start": "NativeSpins medarbejder åbnede jeres arbejdsområde",
+      "superadmin_view_as_end": "NativeSpins medarbejder forlod jeres arbejdsområde",
+      "data_export": "Organisationsdata eksporteret",
+      "list_create": "Gemt liste oprettet",
+      "list_archive": "Gemt liste arkiveret",
+      "list_restore": "Gemt liste gendannet",
+      "list_duplicate": "Gemt liste duplikeret",
+      "list_share_enable": "Listedeling slået til",
+      "list_share_disable": "Listedeling slået fra",
+      "list_client_approved": "Delt liste godkendt",
+      "plan_duplicate": "Plan duplikeret fra en ordre",
+      "article_create": "Artikel oprettet",
+      "article_link": "Artikel knyttet til en placering",
+      "article_unlink": "Artikel fjernet fra en placering"
+    },
+    "categories": {
+      "request": "Anmodninger",
+      "quote": "Tilbud",
+      "order": "Ordrer",
+      "invoice": "Fakturaer",
+      "team": "Team",
+      "access": "Adgang",
+      "export": "Dataeksport",
+      "list": "Planer og lister",
+      "article": "Artikler"
+    },
+    "fields": {
+      "reason": "Begrundelse",
+      "total": "Total",
+      "currency": "Valuta",
+      "from": "Fra",
+      "to": "Til",
+      "start": "Start",
+      "end": "Slut",
+      "number": "Nummer",
+      "amount": "Beløb",
+      "email": "E-mail",
+      "role": "Rolle",
+      "name": "Navn"
+    }
+  },
+  "deskJobs": {
+    "eyebrow": "Drift",
+    "title": "Baggrundsjob",
+    "lead": "Arbejde i kø, der kører uden for en sideforespørgsel: webhook-leveringer, nye e-mailforsøg, arkivering af fakturaer, overførsel til regnskab — og de planlagte kørsler.",
+    "statPending": "Venter",
+    "statRunning": "Kører",
+    "statDead": "Fejlet endeligt",
+    "statOldest": "Ældste ventende",
+    "oldestNone": "Intet forsinket",
+    "deadTitle": "Fejlede job",
+    "deadLead": "Disse har brugt deres forsøg. Prøv igen lægger jobbet tilbage i køen med nye forsøg; kassér opgiver det.",
+    "deadNone": "Ingen fejlede job.",
+    "colKind": "Job",
+    "colAttempts": "Forsøg",
+    "colLastError": "Seneste fejl",
+    "colCreated": "Oprettet",
+    "colFinished": "Færdig",
+    "retry": "Prøv igen",
+    "discard": "Kassér",
+    "confirmDiscard": "Kassér dette job?",
+    "superadminOnly": "Kun en superadministrator kan prøve igen eller kassere.",
+    "recentTitle": "Seneste job",
+    "recentNone": "Ingen job endnu.",
+    "colStatus": "Status",
+    "colRunAt": "Køres",
+    "sweepsTitle": "Planlagte kørsler",
+    "sweepsLead": "De seneste kørsler af hvert job. Kørsler, der ikke havde noget at lave, vises ikke.",
+    "sweepsNone": "Ingen planlagt kørsel har kørt endnu.",
+    "colSweep": "Kørsel",
+    "colVia": "Startet af",
+    "colWhen": "Hvornår",
+    "colResult": "Resultat",
+    "colDuration": "Tog",
+    "ok": "OK",
+    "failed": "Fejlet",
+    "viaTimer": "Timer",
+    "viaCron": "Planlægger",
+    "flashRetried": "Jobbet er tilbage i køen.",
+    "flashDiscarded": "Jobbet blev kasseret.",
+    "flashGone": "Det job står ikke længere på listen over fejlede.",
+    "status": {
+      "PENDING": "Venter",
+      "RUNNING": "Kører",
+      "DONE": "Færdig",
+      "FAILED": "Fejlet",
+      "DISCARDED": "Kasseret"
+    },
+    "working": "Arbejder…",
+    "cancel": "Annuller"
   }
 }

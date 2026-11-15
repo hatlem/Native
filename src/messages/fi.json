@@ -142,7 +142,8 @@
     "paletteOrders": "Tilaukset",
     "paletteRequests": "Pyynnöt",
     "paletteTitles": "Nimikkeet",
-    "paletteSearching": "Haetaan…"
+    "paletteSearching": "Haetaan…",
+    "jobs": "Työt"
   },
   "orders": {
     "eyebrow": "Tilaukset",
@@ -325,7 +326,18 @@
     "basis_category-median": "kategorian mediaani",
     "basis_default": "oletus",
     "exportInvoicesCsv": "Vie laskut (CSV)",
-    "exportAccountingJson": "Kirjanpitovienti (JSON)"
+    "exportAccountingJson": "Kirjanpitovienti (JSON)",
+    "periodLabel": "Ajanjakso",
+    "periodCustom": "Omat päivämäärät",
+    "periodFrom": "Alkaen",
+    "periodTo": "Päättyen",
+    "periodApply": "Käytä",
+    "periodHint": "Täytetyt päivämäärät ohittavat ajanjakson.",
+    "period_30d": "Viimeiset 30 päivää",
+    "period_90d": "Viimeiset 90 päivää",
+    "period_12m": "Viimeiset 12 kuukautta",
+    "period_ytd": "Tämä vuosi",
+    "period_all": "Koko aika"
   },
   "agency": {
     "eyebrow": "Toimisto",
@@ -2358,11 +2370,11 @@
     "pillar1Title": "Vähimmän oikeuden periaate oletuksena",
     "pillar1Body": "Roolipohjainen käyttöoikeus rajaa jokaisen sivun ja jokaisen tietokantakyselyn. Toimistot näkevät vain asiakkaansa; kustantajat näkevät vain omat julkaisunsa.",
     "pillar2Title": "Tietojen minimointi",
-    "pillar2Body": "Säilytämme vain sen mitä markkinapaikan toiminta vaatii — emmekä mitään muuta. Ei seurantapikseleitä, ei varjoprofiileja, ei rikastusta.",
+    "pillar2Body": "Tallennamme sen, mitä markkinapaikan ylläpito vaatii — emme enempää. Ei seurantapikseleitä sähköposteissamme, ei varjoprofiileja asiakkaista, ei tiedonvälittäjiltä ostettuja tietoja. Julkaistujen artikkelien linkit laskevat klikkaukset yhteenlaskettuina tunnistamatta lukijoita. Kustantajien ilmoitusmyynnin yhteystiedot kerätään kustantajien omilta julkisilta sivuilta; tietosuojaseloste kertoo miten.",
     "pillar3Title": "Salaus siirrossa ja levossa",
-    "pillar3Body": "TLS 1.2+ kaikkialla. Tietokantalevyt ja varmuuskopiot ovat salattuja levossa. Salaisuudet asuvat hallinnoidussa holvissa, ei koodissa.",
+    "pillar3Body": "TLS kaikissa yhteyksissä. Palveluntarjoajamme salaa tietokantalevyt ja varmuuskopiot levossa. Salaisuudet ovat palveluntarjoajan salatussa salaisuusvarastossa, eivät koodissa; salasanat, kirjautumislinkit ja API-avaimet tallennetaan vain tiivisteinä.",
     "pillar4Title": "Auditoitavissa suunnittelusta lähtien",
-    "pillar4Body": "Jokaisella tilauksella, tarjouksella ja sisältöaineistolla on muuttumaton jälki. Voimme vastata kuka teki mitä ja milloin — ja niin voit sinäkin.",
+    "pillar4Body": "Tilaukset, tarjoukset, laskut, tiimin muutokset ja henkilökuntamme pääsy työtilaanne kirjataan lokiin: kuka teki mitä ja milloin. Organisaation ylläpitäjät voivat lukea ja viedä oman lokinsa sovelluksessa. IP- ja sähköpostiosoitteet poistetaan merkinnöistä 90 päivän kuluttua.",
     "complianceTitle": "Vaatimustenmukaisuus & tilanne",
     "complianceLead": "Olemme nuori yritys. Olemme rehellisiä siitä, mikä on käytössä ja mikä on tiekartalla.",
     "colArea": "Alue",
@@ -2373,13 +2385,13 @@
     "statusRoadmap": "Tiekartalla",
     "statusPlan": "Suunnitteilla",
     "gdprArea": "GDPR",
-    "gdprNote": "DPA saatavilla pyynnöstä; olemme rekisterinpitäjä markkinapaikan tiedoille.",
+    "gdprNote": "Tietojenkäsittelysopimus pyynnöstä; alikäsittelijät on lueteltu julkisesti. Olemme markkinapaikan tietojen rekisterinpitäjä.",
     "dataResArea": "Tietojen sijainti",
     "dataResNote": "Kaikki asiakastieto isännöidään EU:ssa (Tukholman alue).",
     "encryptionArea": "Salaus",
-    "encryptionNote": "TLS 1.2+ siirrossa, AES-256 levossa, hallinnoitu avainholvi.",
+    "encryptionNote": "TLS siirrossa; levossa olevan datan salaus ja avaintenhallinta palveluntarjoajalla.",
     "ssoArea": "SSO (SAML / OIDC)",
-    "ssoNote": "Saatavilla Hallinnoitu- ja Toimisto-paketeissa pyynnöstä.",
+    "ssoNote": "Ei vielä saatavilla. Kaksivaiheinen tunnistautuminen suojaa kirjautumisen tänään; kerro, jos SSO on hankintavaatimus.",
     "auditArea": "SOC 2 Type I",
     "auditNote": "Tavoitteena loppuvuosi 2026.",
     "disclosureTitle": "Vastuullinen ilmoittaminen",
@@ -2389,21 +2401,23 @@
     "ctaBody": "Käymme mielellämme läpi yksittäisiä kontrolleja, jaamme DPA:n tai keskustelemme hankintavaatimuksista.",
     "ctaContact": "Ota yhteyttä",
     "pillarsEyebrow": "Periaatteet",
-    "complianceEyebrow": "Vaatimustenmukaisuus"
+    "complianceEyebrow": "Vaatimustenmukaisuus",
+    "mfaArea": "Kaksivaiheinen tunnistautuminen",
+    "mfaNote": "Todennussovelluksen koodit (TOTP) ja palautuskoodit, saatavilla kaikille tileille ja pakotettavissa NativeSpinin henkilökunnalle."
   },
   "privacy": {
     "metaTitle": "Tietosuoja",
     "eyebrow": "Tietosuoja",
     "title": "Tietosuojakäytäntö",
     "lead": "Näin NativeSpin kerää, käyttää ja suojaa henkilötietoja — selkokielellä.",
-    "lastUpdated": "Päivitetty viimeksi: 22. toukokuuta 2026",
+    "lastUpdated": "Päivitetty viimeksi: 15. marraskuuta 2026",
     "controller": {
       "title": "Kuka on rekisterinpitäjä",
-      "body": "Getia AS on rekisterinpitäjä tämän markkinapaikan kautta käsiteltäville henkilötiedoille. Sijaitsemme Norjassa ja käsittelemme kaikki tiedot EU:n/ETA:n sisällä."
+      "body": "Getia AS on tämän markkinapaikan kautta käsiteltävien henkilötietojen rekisterinpitäjä. Toimimme Norjassa. Se, missä kukin alikäsittelijämme käsittelee tietoja, kerrotaan alikäsittelijäsivulla."
     },
     "data": {
       "title": "Mitä tietoja keräämme",
-      "body": "Tilitietoja (nimi, työsähköposti, rooli, organisaatio), markkinapaikan aktiivisuutta (pyynnöt, tilaukset, suunnitelmat) ja palvelun toiminnan kannalta välttämätöntä minimitelemetriaa (kirjautumistapahtumat, virheraportit). Emme käytä kolmannen osapuolen mainontaa tai käyttäytymisseurantapikseleitä markkinointisivuillamme."
+      "body": "Tilitiedot (nimi, työsähköposti, rooli, organisaatio), toiminta markkinapaikalla (pyynnöt, tilaukset, suunnitelmat ja kirjoittamasi briefit) sekä palvelun ylläpitoon tarvittava telemetria (kirjautumistapahtumat IP-osoitteineen, virheraportit). Kustantajista meillä on lisäksi ilmoitus- ja myyntiosastojen työntekijöiden yhteystietoja, jotka on kerätty kustantajien omilta julkisilta sivuilta — katso ”Kustantajien yhteyshenkilöt” alla. Emme käytä markkinointisivuillamme kolmannen osapuolen mainontaa tai käyttäytymisseurantaa."
     },
     "purpose": {
       "title": "Miten käytämme tietoja",
@@ -2411,15 +2425,15 @@
     },
     "legal": {
       "title": "Oikeusperuste",
-      "body": "Sopimuksen täytäntöönpano (tilinhaltijat), oikeutettu etu (turvallisuus, petostorjunta, tuotekehitys) ja suostumus (valinnainen uutiskirje)."
+      "body": "Sopimuksen täyttäminen (tilinhaltijat), oikeutettu etu (tietoturva, petosten ehkäisy, tuotekehitys ja yhteydenotot kustantajien ilmoitusosastoihin heidän hinnastoistaan), lakisääteinen velvoite (kirjanpitoaineisto) ja suostumus (valinnainen uutiskirje, analytiikkaevästeet)."
     },
     "retention": {
       "title": "Miten kauan säilytämme tietoja",
-      "body": "Tilitietoja niin kauan kuin tili on olemassa; transaktiotietoja seitsemän vuotta (kirjanpitolaki); telemetria koostetaan summiksi 90 päivän kuluttua."
+      "body": "Tilitiedot niin kauan kuin tili on olemassa; voit poistaa tilin käytöstä ja pyytää henkilötietojesi poistamista tilisivulta. Laskut ja tilaukset säilytetään niin kauan kuin kirjanpitolainsäädäntö edellyttää. IP- ja sähköpostiosoitteet poistetaan tarkastuslokin merkinnöistä 90 päivän kuluttua. Käytetyt tai vanhentuneet kirjautumislinkit, salasanan palautuslinkit ja käyttämättömät kutsut poistetaan 30 päivän kuluttua."
     },
     "sharing": {
       "title": "Kenelle jaamme tietoja",
-      "body": "Kustantajat näkevät ostajan organisaation ja tilaustiedot heille tehdyistä tilauksista. Alikäsittelijät (isännöinti, sähköposti, maksut) on lueteltu DPA:ssamme, kaikki EU-pohjaisia tai riittävin suojaustoimin."
+      "body": "Kustantajat näkevät ostajaorganisaation ja heille tehtyjen tilausten tiedot. Alikäsittelijämme (palvelinympäristö, sähköpostin lähetys, tiedostojen tallennus, tekoälykäsittely sekä käytössä ollessaan kirjanpito ja analytiikka) on lueteltu alikäsittelijäsivulla."
     },
     "transfers": {
       "title": "Kansainväliset siirrot",
@@ -2438,21 +2452,29 @@
       "body": "Julkaisemme olennaiset muutokset täällä ja ilmoitamme tilinhaltijoille sähköpostitse. Yllä oleva päivityspäivä heijastaa aina nykyistä versiota."
     },
     "contactTitle": "Tietosuojayhteys",
-    "contactBody": "Kysymykset, pyynnöt tai valitukset — kirjoita osoitteeseen"
+    "contactBody": "Kysymykset, pyynnöt tai valitukset — kirjoita osoitteeseen",
+    "ai": {
+      "title": "Tekoälyn käyttö",
+      "body": "Kun kuvaat kampanjan, briefin teksti voidaan lähettää tekoälymallille tekoälytoimittajamme kautta sopivien nimikkeiden ehdottamiseksi ja esimerkkitekstin luonnostelemiseksi; tekoälyn kirjoittamat ehdotukset on merkitty. Emme käytä tietojasi mallien kouluttamiseen. Tekoälytoimittaja on lueteltu alikäsittelijäsivulla. Briefit lähetetään ilman nimeäsi tai sähköpostiosoitettasi."
+    },
+    "publisherContacts": {
+      "title": "Kustantajien yhteyshenkilöt",
+      "body": "Jos työskentelet kustantajan ilmoitusmyynnissä, meillä voi olla nimesi, työsähköpostisi, puhelinnumerosi ja tehtävänimikkeesi. Olemme keränneet ne työnantajasi julkiselta verkkosivulta tai mediakortista tai nimikettä edustavalta myyntiyhtiöltä — emme sinulta. Käytämme niitä vain kysyäksemme nimikkeidesi hinnastoista ja varauksista, oikeutetun etumme perusteella ylläpitää markkinapaikkaa tällaiselle mainonnalle. Jokaisessa tällaisessa sähköpostissa on peruutuslinkki, eikä peruutettuun osoitteeseen oteta enää yhteyttä. Voit milloin tahansa pyytää pääsyä tietoihisi, niiden oikaisua tai poistoa tai vastustaa käsittelyä osoitteessa privacy@nativespin.com, ja voit tehdä valituksen tietosuojaviranomaisellesi (Suomessa: tietosuojavaltuutettu)."
+    }
   },
   "terms": {
     "metaTitle": "Käyttöehdot",
     "eyebrow": "Ehdot",
     "title": "Markkinapaikan käyttöehdot",
     "lead": "Nämä ehdot säätelevät NativeSpinn käyttöäsi mainostajana, toimistona tai kustantajana.",
-    "lastUpdated": "Päivitetty viimeksi: 22. toukokuuta 2026",
+    "lastUpdated": "Päivitetty viimeksi: 15. marraskuuta 2026",
     "scope": {
       "title": "Soveltamisala",
       "body": "NativeSpin on markkinapaikka, joka yhdistää mainostajat ja toimistot sanomalehti- ja aikakauslehtikustantajiin, jotka tarjoavat natiivisisältöä ja natiivimainontaa. Nämä ehdot koskevat kaikkia markkinapaikan käyttäjiä."
     },
     "accounts": {
       "title": "Tilit",
-      "body": "Sinun on annettava tarkat rekisteröintitiedot, pidettävä tunnuksesi luottamuksellisina ja ilmoitettava meille luvattomasta käytöstä. Tilit on sidottu yhteen organisaatioon; jakaminen organisaatioiden välillä edellyttää toimistotyötilaa."
+      "body": "Sinun on annettava oikeat rekisteröintitiedot, pidettävä tunnuksesi salassa ja ilmoitettava meille luvattomasta käytöstä. Tilillä voi olla paikka useammassa organisaatiossa; organisaation ylläpitäjät myöntävät ja poistavat ne."
     },
     "roles": {
       "title": "Roolit ja käyttöoikeus",
@@ -4034,7 +4056,9 @@
     "deskPlaybooks": "Pelikirjat",
     "deskContentFees": "Sisältömaksut",
     "deskApiKeys": "API-avaimet",
-    "deskMetricsNeedsContact": "Mittarit puuttuvat"
+    "deskMetricsNeedsContact": "Mittarit puuttuvat",
+    "audit": "Tarkastusloki",
+    "deskJobs": "Taustatyöt"
   },
   "briefTargeting": {
     "audience": "Kohderyhmä",
@@ -4230,5 +4254,150 @@
         "body": "Uusi ohjesivu vastaa yleisiin kysymyksiin, ja kampanjan valmistuttua voit arvioida, miten se sujui."
       }
     }
+  },
+  "customerAudit": {
+    "eyebrow": "Tili",
+    "title": "Tarkastusloki",
+    "lead": "Mitä organisaatiossanne on tapahtunut, kuka sen teki ja milloin — myös silloin, kun NativeSpinin henkilökunta on avannut työtilanne.",
+    "filterCategory": "Alue",
+    "allCategories": "Kaikki",
+    "filterFrom": "Alkaen",
+    "filterTo": "Päättyen",
+    "filterButton": "Suodata",
+    "clear": "Tyhjennä",
+    "exportCsv": "Vie CSV-tiedostona",
+    "colWhen": "Milloin",
+    "colWho": "Kuka",
+    "colWhat": "Mitä",
+    "colDetail": "Tiedot",
+    "none": "Suodattimia vastaavia merkintöjä ei ole.",
+    "resultCount": "{count, plural, =0 {Ei merkintöjä} =1 {1 merkintä} other {# merkintää}}",
+    "retentionNote": "Loki näyttää tapahtumat marraskuusta 2026 alkaen. Sähköpostiosoitteet poistetaan yli 90 päivää vanhoista merkinnöistä.",
+    "adminsOnlyTitle": "Organisaation ylläpitäjille",
+    "adminsOnlyBody": "Tarkastusloki nimeää kollegat ja heidän toimensa, joten vain organisaation ylläpitäjät voivat lukea sitä. Pyydä tiimisi ylläpitäjää, jos tarvitset jonkin merkinnän tarkistamista.",
+    "actorStaff": "NativeSpin desk",
+    "actorSystem": "NativeSpin (automaattinen)",
+    "actorOther": "Joku organisaationne ulkopuolelta",
+    "actions": {
+      "request_submit": "Pyyntö lähetetty",
+      "request_withdrawn_by_buyer": "Pyyntö peruttu",
+      "api_order_create": "Tilaus tehty API:n kautta",
+      "quote_send": "Tarjous vastaanotettu",
+      "quote_accept": "Tarjous hyväksytty",
+      "quote_declined_by_buyer": "Tarjous hylätty",
+      "quote_revise": "Tarjousta muutettu",
+      "quote_renew": "Tarjous uusittu",
+      "quote_renewal_requested": "Tarjouksen uusimista pyydetty",
+      "quote_pdf_download": "Tarjouksen PDF ladattu",
+      "quote_pdf_generate": "Tarjouksen PDF luotu",
+      "quote_docx_export": "Tarjous viety Wordiin",
+      "order_advance": "Tilauksen tila muuttui",
+      "order_cancel": "Tilaus peruttu",
+      "order_cancellation_requested": "Peruutusta pyydetty",
+      "order_extra_work_add": "Lisätyö lisätty tilaukseen",
+      "order_extra_work_remove": "Lisätyö poistettu tilauksesta",
+      "order_feedback_submitted": "Tilauksen palaute lähetetty",
+      "order_flight_window_save": "Kampanjan päivämääriä muutettu",
+      "invoice_issue": "Lasku laadittu",
+      "credit_note_issue": "Hyvityslasku laadittu",
+      "invoice_pdf_download": "Laskun PDF ladattu",
+      "org_invite_sent": "Tiimikutsu lähetetty",
+      "org_invite_revoked": "Tiimikutsu peruttu",
+      "org_membership_updated": "Jäsenen käyttöoikeutta muutettu",
+      "org_membership_revoked": "Jäsen poistettu",
+      "organization_updated": "Yrityksen tiedot päivitetty",
+      "org_payment_terms_set": "Maksuehtoja muutettu",
+      "api_key_create": "API-avain luotu",
+      "api_key_revoke": "API-avain mitätöity",
+      "superadmin_view_as_start": "NativeSpinin henkilökunta avasi työtilanne",
+      "superadmin_view_as_end": "NativeSpinin henkilökunta poistui työtilastanne",
+      "data_export": "Organisaation tiedot viety",
+      "list_create": "Tallennettu lista luotu",
+      "list_archive": "Tallennettu lista arkistoitu",
+      "list_restore": "Tallennettu lista palautettu",
+      "list_duplicate": "Tallennettu lista monistettu",
+      "list_share_enable": "Listan jakaminen otettu käyttöön",
+      "list_share_disable": "Listan jakaminen poistettu käytöstä",
+      "list_client_approved": "Jaettu lista hyväksytty",
+      "plan_duplicate": "Suunnitelma monistettu tilauksesta",
+      "article_create": "Artikkeli luotu",
+      "article_link": "Artikkeli liitetty sijoitteluun",
+      "article_unlink": "Artikkeli irrotettu sijoittelusta"
+    },
+    "categories": {
+      "request": "Pyynnöt",
+      "quote": "Tarjoukset",
+      "order": "Tilaukset",
+      "invoice": "Laskut",
+      "team": "Tiimi",
+      "access": "Käyttöoikeudet",
+      "export": "Tietojen vienti",
+      "list": "Suunnitelmat ja listat",
+      "article": "Artikkelit"
+    },
+    "fields": {
+      "reason": "Syy",
+      "total": "Summa",
+      "currency": "Valuutta",
+      "from": "Mistä",
+      "to": "Mihin",
+      "start": "Alku",
+      "end": "Loppu",
+      "number": "Numero",
+      "amount": "Määrä",
+      "email": "Sähköposti",
+      "role": "Rooli",
+      "name": "Nimi"
+    }
+  },
+  "deskJobs": {
+    "eyebrow": "Ylläpito",
+    "title": "Taustatyöt",
+    "lead": "Jonossa oleva työ, joka ajetaan sivupyynnön ulkopuolella: webhook-toimitukset, sähköpostien uudelleenyritykset, laskujen arkistointi, siirrot kirjanpitoon — sekä ajastetut ajot.",
+    "statPending": "Odottaa",
+    "statRunning": "Käynnissä",
+    "statDead": "Epäonnistui lopullisesti",
+    "statOldest": "Vanhin odottava",
+    "oldestNone": "Ei myöhässä olevia",
+    "deadTitle": "Epäonnistuneet työt",
+    "deadLead": "Näiden yritykset on käytetty. Yritä uudelleen palauttaa työn jonoon uusin yrityksin; hylkää luopuu siitä.",
+    "deadNone": "Ei epäonnistuneita töitä.",
+    "colKind": "Työ",
+    "colAttempts": "Yritykset",
+    "colLastError": "Viimeisin virhe",
+    "colCreated": "Luotu",
+    "colFinished": "Valmistui",
+    "retry": "Yritä uudelleen",
+    "discard": "Hylkää",
+    "confirmDiscard": "Hylätäänkö tämä työ?",
+    "superadminOnly": "Vain pääylläpitäjä voi yrittää uudelleen tai hylätä.",
+    "recentTitle": "Viimeisimmät työt",
+    "recentNone": "Ei vielä töitä.",
+    "colStatus": "Tila",
+    "colRunAt": "Ajetaan",
+    "sweepsTitle": "Ajastetut ajot",
+    "sweepsLead": "Kunkin ajon viimeisimmät suoritukset. Ajoja, joilla ei ollut tehtävää, ei näytetä.",
+    "sweepsNone": "Yhtään ajastettua ajoa ei ole vielä suoritettu.",
+    "colSweep": "Ajo",
+    "colVia": "Käynnistäjä",
+    "colWhen": "Milloin",
+    "colResult": "Tulos",
+    "colDuration": "Kesto",
+    "ok": "OK",
+    "failed": "Epäonnistui",
+    "viaTimer": "Ajastin",
+    "viaCron": "Ajastuspalvelu",
+    "flashRetried": "Työ on taas jonossa.",
+    "flashDiscarded": "Työ hylättiin.",
+    "flashGone": "Työ ei ole enää epäonnistuneiden listalla.",
+    "status": {
+      "PENDING": "Odottaa",
+      "RUNNING": "Käynnissä",
+      "DONE": "Valmis",
+      "FAILED": "Epäonnistui",
+      "DISCARDED": "Hylätty"
+    },
+    "working": "Käsitellään…",
+    "cancel": "Peruuta"
   }
 }

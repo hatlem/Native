@@ -142,7 +142,8 @@
     "paletteOrders": "Orders",
     "paletteRequests": "Requests",
     "paletteTitles": "Titles",
-    "paletteSearching": "Searching…"
+    "paletteSearching": "Searching…",
+    "jobs": "Jobs"
   },
   "orders": {
     "eyebrow": "Orders",
@@ -325,7 +326,18 @@
     "basis_category-median": "category median",
     "basis_default": "default",
     "exportInvoicesCsv": "Export invoices (CSV)",
-    "exportAccountingJson": "Accounting export (JSON)"
+    "exportAccountingJson": "Accounting export (JSON)",
+    "periodLabel": "Period",
+    "periodCustom": "Custom dates",
+    "periodFrom": "From",
+    "periodTo": "To",
+    "periodApply": "Apply",
+    "periodHint": "Dates, when filled in, take precedence over the period.",
+    "period_30d": "Last 30 days",
+    "period_90d": "Last 90 days",
+    "period_12m": "Last 12 months",
+    "period_ytd": "This year",
+    "period_all": "All time"
   },
   "agency": {
     "eyebrow": "Agency",
@@ -2358,11 +2370,11 @@
     "pillar1Title": "Least privilege by default",
     "pillar1Body": "Role-based access scopes every page and every database query. Agencies only see their clients; publishers only see their titles.",
     "pillar2Title": "Data minimisation",
-    "pillar2Body": "We store what we need to operate the marketplace — and nothing more. No tracking pixels, no shadow profiles, no enrichment.",
+    "pillar2Body": "We store what we need to operate the marketplace — and nothing more. No tracking pixels in our emails, no shadow profiles of customers, no data bought from brokers. Links in published articles count clicks in aggregate, without identifying readers. Business contact details for publishers are collected from the publishers' own public pages; the privacy policy explains how.",
     "pillar3Title": "Encryption in transit and at rest",
-    "pillar3Body": "TLS 1.2+ everywhere. Database disks and backups are encrypted at rest. Secrets live in a managed vault, not in code.",
+    "pillar3Body": "TLS on every connection. Database disks and backups are encrypted at rest by our hosting provider. Secrets are kept in the hosting provider's encrypted secret store, not in code; passwords, sign-in tokens and API keys are stored only as hashes.",
     "pillar4Title": "Auditable by design",
-    "pillar4Body": "Every order, quote and content asset has an immutable trail. We can answer who did what, when — and so can you.",
+    "pillar4Body": "Orders, quotes, invoices, team changes and staff access to your workspace are recorded in an audit trail: who did what, and when. Organisation admins can read and export their own trail in the app. IP and email addresses are removed from entries after 90 days.",
     "complianceTitle": "Compliance & posture",
     "complianceLead": "We're a young company. We're honest about what's live and what's on the roadmap.",
     "colArea": "Area",
@@ -2373,13 +2385,13 @@
     "statusRoadmap": "Roadmap",
     "statusPlan": "Planned",
     "gdprArea": "GDPR",
-    "gdprNote": "DPA available on request; we are data controller for marketplace data.",
+    "gdprNote": "DPA available on request; subprocessors are listed publicly. We are data controller for marketplace data.",
     "dataResArea": "Data residency",
     "dataResNote": "All customer data hosted in the EU (Stockholm region).",
     "encryptionArea": "Encryption",
-    "encryptionNote": "TLS 1.2+ in transit, AES-256 at rest, managed key vault.",
+    "encryptionNote": "TLS in transit; encryption at rest and key management by our hosting provider.",
     "ssoArea": "SSO (SAML / OIDC)",
-    "ssoNote": "Available on Managed and Agency plans on request.",
+    "ssoNote": "Not available yet. Two-factor authentication covers sign-in security today; tell us if SSO is a procurement requirement.",
     "auditArea": "SOC 2 Type I",
     "auditNote": "Targeted for late 2026.",
     "disclosureTitle": "Responsible disclosure",
@@ -2389,21 +2401,23 @@
     "ctaBody": "We're happy to walk through specific controls, share our DPA, or discuss procurement requirements.",
     "ctaContact": "Contact us",
     "pillarsEyebrow": "Principles",
-    "complianceEyebrow": "Compliance"
+    "complianceEyebrow": "Compliance",
+    "mfaArea": "Two-factor authentication",
+    "mfaNote": "Authenticator-app codes (TOTP) with recovery codes, available to every account and enforceable for NativeSpin staff."
   },
   "privacy": {
     "metaTitle": "Privacy",
     "eyebrow": "Privacy",
     "title": "Privacy policy",
     "lead": "How NativeSpin collects, uses and protects personal data — in plain language.",
-    "lastUpdated": "Last updated: 22 May 2026",
+    "lastUpdated": "Last updated: 15 November 2026",
     "controller": {
       "title": "Who is the data controller",
-      "body": "Getia AS is the data controller for personal data processed via this marketplace. We are based in Norway and process all data inside the EU/EEA."
+      "body": "Getia AS is the data controller for personal data processed via this marketplace. We are based in Norway. Where each of our subprocessors processes data is listed on the subprocessors page."
     },
     "data": {
       "title": "What data we collect",
-      "body": "Account data (name, work email, role, organisation), marketplace activity (requests, orders, plans), and minimal telemetry needed to operate the service (login events, error reports). We do not run third-party advertising or behavioural tracking pixels on our marketing pages."
+      "body": "Account data (name, work email, role, organisation), marketplace activity (requests, orders, plans, and the briefs you write), and the telemetry needed to operate the service (sign-in events with IP address, error reports). For publishers we also hold business contact details of advertising and sales staff, collected from the publishers' own public pages — see “Publisher contacts” below. We do not run third-party advertising or behavioural tracking pixels on our marketing pages."
     },
     "purpose": {
       "title": "How we use it",
@@ -2411,15 +2425,15 @@
     },
     "legal": {
       "title": "Legal basis",
-      "body": "Performance of contract (account holders), legitimate interest (security, fraud prevention, product improvement), and consent (optional newsletter)."
+      "body": "Performance of contract (account holders), legitimate interest (security, fraud prevention, product improvement, and contacting publishers' advertising departments about their rate cards), legal obligation (accounting records) and consent (optional newsletter, analytics cookies)."
     },
     "retention": {
       "title": "How long we keep data",
-      "body": "Account data for as long as the account exists; transactional data for seven years (accounting law); telemetry rolled up to aggregates after 90 days."
+      "body": "Account data for as long as the account exists; you can deactivate your account and have your personal details erased from the account page. Invoices and orders are kept for the period accounting law requires. IP and email addresses are removed from audit-log entries after 90 days. Used or expired sign-in links, password-reset links and unclaimed invitations are deleted after 30 days."
     },
     "sharing": {
       "title": "Who we share data with",
-      "body": "Publishers see the buyer organisation and order details for orders placed with them. Subprocessors (hosting, email, payments) are listed in our DPA, all EU-based or with adequate safeguards."
+      "body": "Publishers see the buyer organisation and order details for orders placed with them. Our subprocessors (hosting, email delivery, file storage, AI processing and, when enabled, accounting and analytics) are listed on the subprocessors page."
     },
     "transfers": {
       "title": "International transfers",
@@ -2438,21 +2452,29 @@
       "body": "We'll post material changes here and notify account holders by email. The last-updated date above always reflects the current version."
     },
     "contactTitle": "Data protection contact",
-    "contactBody": "Questions, requests or complaints — write to"
+    "contactBody": "Questions, requests or complaints — write to",
+    "ai": {
+      "title": "Use of AI",
+      "body": "When you describe a campaign, the brief text may be sent to an AI model through our AI provider to suggest matching titles and to draft example copy; suggestions written by AI are labelled. We do not use your data to train models. The AI provider is listed on the subprocessors page. Briefs are sent without your name or email address."
+    },
+    "publisherContacts": {
+      "title": "Publisher contacts",
+      "body": "If you work with advertising sales at a publisher, we may hold your name, work email, phone number and job title. We collected them from your employer's public website or media kit, or from a sales house that represents the title — not from you. We use them only to ask about rate cards and bookings for your titles, on the basis of our legitimate interest in running a marketplace for that advertising. Every such email has an unsubscribe link, and an unsubscribed address is not contacted again. You can ask what we hold, have it corrected or deleted, or object at any time at privacy@nativespin.com, and you can complain to your data protection authority (in Norway: Datatilsynet)."
+    }
   },
   "terms": {
     "metaTitle": "Terms of service",
     "eyebrow": "Terms",
     "title": "Marketplace terms of service",
     "lead": "These terms govern your use of NativeSpin as an advertiser, agency or publisher.",
-    "lastUpdated": "Last updated: 22 May 2026",
+    "lastUpdated": "Last updated: 15 November 2026",
     "scope": {
       "title": "Scope",
       "body": "NativeSpin is a marketplace connecting advertisers and agencies with newspaper and magazine publishers offering native content and native advertising. These terms apply to all users of the marketplace."
     },
     "accounts": {
       "title": "Accounts",
-      "body": "You must provide accurate registration information, keep credentials confidential, and notify us of any unauthorised access. Accounts are tied to a single organisation; sharing across organisations requires the agency workspace."
+      "body": "You must provide accurate registration information, keep credentials confidential, and notify us of any unauthorised access. An account can hold seats in more than one organisation; an organisation's admins grant and remove them."
     },
     "roles": {
       "title": "Roles and access",
@@ -4034,7 +4056,9 @@
     "deskPlaybooks": "Playbooks",
     "deskContentFees": "Content fees",
     "deskApiKeys": "API keys",
-    "deskMetricsNeedsContact": "Metrics needed"
+    "deskMetricsNeedsContact": "Metrics needed",
+    "audit": "Audit log",
+    "deskJobs": "Background jobs"
   },
   "briefTargeting": {
     "audience": "Audience",
@@ -4230,5 +4254,150 @@
         "body": "A new Help page answers common questions, and after a campaign completes you can rate how it went."
       }
     }
+  },
+  "customerAudit": {
+    "eyebrow": "Account",
+    "title": "Audit log",
+    "lead": "What happened in your organisation, who did it, and when — including when NativeSpin staff opened your workspace.",
+    "filterCategory": "Area",
+    "allCategories": "Everything",
+    "filterFrom": "From",
+    "filterTo": "To",
+    "filterButton": "Filter",
+    "clear": "Clear",
+    "exportCsv": "Export as CSV",
+    "colWhen": "When",
+    "colWho": "Who",
+    "colWhat": "What",
+    "colDetail": "Details",
+    "none": "No entries match these filters.",
+    "resultCount": "{count, plural, =0 {No entries} =1 {1 entry} other {# entries}}",
+    "retentionNote": "Entries record actions from November 2026 onwards. Email addresses are removed from entries older than 90 days.",
+    "adminsOnlyTitle": "For organisation admins",
+    "adminsOnlyBody": "The audit log names colleagues and what they did, so only admins of the organisation can read it. Ask an admin in your team if you need an entry looked up.",
+    "actorStaff": "NativeSpin desk",
+    "actorSystem": "NativeSpin (automatic)",
+    "actorOther": "Someone outside your organisation",
+    "actions": {
+      "request_submit": "Request sent",
+      "request_withdrawn_by_buyer": "Request withdrawn",
+      "api_order_create": "Order placed through the API",
+      "quote_send": "Quote received",
+      "quote_accept": "Quote accepted",
+      "quote_declined_by_buyer": "Quote declined",
+      "quote_revise": "Quote revised",
+      "quote_renew": "Quote renewed",
+      "quote_renewal_requested": "Quote renewal requested",
+      "quote_pdf_download": "Quote PDF downloaded",
+      "quote_pdf_generate": "Quote PDF generated",
+      "quote_docx_export": "Quote exported to Word",
+      "order_advance": "Order status changed",
+      "order_cancel": "Order cancelled",
+      "order_cancellation_requested": "Cancellation requested",
+      "order_extra_work_add": "Extra work added to order",
+      "order_extra_work_remove": "Extra work removed from order",
+      "order_feedback_submitted": "Order feedback submitted",
+      "order_flight_window_save": "Campaign dates changed",
+      "invoice_issue": "Invoice issued",
+      "credit_note_issue": "Credit note issued",
+      "invoice_pdf_download": "Invoice PDF downloaded",
+      "org_invite_sent": "Team invitation sent",
+      "org_invite_revoked": "Team invitation revoked",
+      "org_membership_updated": "Member access changed",
+      "org_membership_revoked": "Member removed",
+      "organization_updated": "Company details updated",
+      "org_payment_terms_set": "Payment terms changed",
+      "api_key_create": "API key created",
+      "api_key_revoke": "API key revoked",
+      "superadmin_view_as_start": "NativeSpin staff opened your workspace",
+      "superadmin_view_as_end": "NativeSpin staff left your workspace",
+      "data_export": "Organisation data exported",
+      "list_create": "Saved list created",
+      "list_archive": "Saved list archived",
+      "list_restore": "Saved list restored",
+      "list_duplicate": "Saved list duplicated",
+      "list_share_enable": "List sharing turned on",
+      "list_share_disable": "List sharing turned off",
+      "list_client_approved": "Shared list approved",
+      "plan_duplicate": "Plan duplicated from an order",
+      "article_create": "Article created",
+      "article_link": "Article linked to a placement",
+      "article_unlink": "Article unlinked from a placement"
+    },
+    "categories": {
+      "request": "Requests",
+      "quote": "Quotes",
+      "order": "Orders",
+      "invoice": "Invoices",
+      "team": "Team",
+      "access": "Access",
+      "export": "Data export",
+      "list": "Plans and lists",
+      "article": "Articles"
+    },
+    "fields": {
+      "reason": "Reason",
+      "total": "Total",
+      "currency": "Currency",
+      "from": "From",
+      "to": "To",
+      "start": "Start",
+      "end": "End",
+      "number": "Number",
+      "amount": "Amount",
+      "email": "Email",
+      "role": "Role",
+      "name": "Name"
+    }
+  },
+  "deskJobs": {
+    "eyebrow": "Operations",
+    "title": "Background jobs",
+    "lead": "Queued work that runs outside a page request: webhook deliveries, email retries, invoice archiving, accounting pushes — and the scheduled sweeps.",
+    "statPending": "Waiting",
+    "statRunning": "Running",
+    "statDead": "Failed for good",
+    "statOldest": "Oldest waiting",
+    "oldestNone": "Nothing overdue",
+    "deadTitle": "Failed jobs",
+    "deadLead": "These ran out of attempts. Retry puts a job back in the queue with a fresh set of attempts; discard gives up on it.",
+    "deadNone": "No failed jobs.",
+    "colKind": "Job",
+    "colAttempts": "Attempts",
+    "colLastError": "Last error",
+    "colCreated": "Created",
+    "colFinished": "Finished",
+    "retry": "Retry",
+    "discard": "Discard",
+    "confirmDiscard": "Discard this job?",
+    "superadminOnly": "Only a super admin can retry or discard.",
+    "recentTitle": "Recent jobs",
+    "recentNone": "No jobs yet.",
+    "colStatus": "Status",
+    "colRunAt": "Runs at",
+    "sweepsTitle": "Scheduled sweeps",
+    "sweepsLead": "The latest runs of each sweep. Ticks that had nothing to do are not listed.",
+    "sweepsNone": "No sweep has run yet.",
+    "colSweep": "Sweep",
+    "colVia": "Started by",
+    "colWhen": "When",
+    "colResult": "Result",
+    "colDuration": "Took",
+    "ok": "OK",
+    "failed": "Failed",
+    "viaTimer": "Timer",
+    "viaCron": "Scheduler",
+    "flashRetried": "The job is back in the queue.",
+    "flashDiscarded": "The job was discarded.",
+    "flashGone": "That job is no longer in the failed list.",
+    "status": {
+      "PENDING": "Waiting",
+      "RUNNING": "Running",
+      "DONE": "Done",
+      "FAILED": "Failed",
+      "DISCARDED": "Discarded"
+    },
+    "working": "Working…",
+    "cancel": "Cancel"
   }
 }

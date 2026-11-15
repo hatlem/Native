@@ -98,6 +98,13 @@ export default async function SecurityPage({
                   <td className="muted">{t("encryptionNote")}</td>
                 </tr>
                 <tr>
+                  <td>{t("mfaArea")}</td>
+                  <td>
+                    <span className="badge badge-success">{t("statusYes")}</span>
+                  </td>
+                  <td className="muted">{t("mfaNote")}</td>
+                </tr>
+                <tr>
                   <td>{t("ssoArea")}</td>
                   <td>
                     <span className="badge badge-info">{t("statusRoadmap")}</span>
