@@ -1,5 +1,5 @@
 import { getTranslations } from "next-intl/server";
-import { prisma } from "@/lib/prisma";
+import type { SuperadminContext } from "@/lib/desk-guard";
 import { listForTitle } from "@/lib/pricing/contact-log";
 import { listContactsForTitle } from "@/lib/pricing/contacts";
 import {
@@ -11,13 +11,19 @@ import {
 import { SubmitButton, ConfirmSubmit } from "@/components";
 import { intlLocale } from "@/lib/money";
 import { SafeEmail, withSafeEmails } from "@/components/safe-email";
+import {
+  loadContactHistoryProducts,
+  loadContactHistoryTitleRow,
+} from "@/lib/data/desk/titles";
 
 const CHANNELS = ["EMAIL", "PHONE", "WEB_FORM", "LINKEDIN", "OTHER"] as const;
 
 export async function ContactHistoryPanel({
+  ctx,
   locale,
   titleId,
 }: {
+  ctx: SuperadminContext;
   locale: string;
   titleId: string;
 }) {
@@ -26,15 +32,8 @@ export async function ContactHistoryPanel({
   const [entries, contacts, products, titleRow] = await Promise.all([
     listForTitle(titleId),
     listContactsForTitle(titleId),
-    prisma.product.findMany({
-      where: { titleId, active: true },
-      select: { id: true, name: true, currency: true },
-      orderBy: { name: "asc" },
-    }),
-    prisma.title.findUnique({
-      where: { id: titleId },
-      select: { market: { select: { currency: true } } },
-    }),
+    loadContactHistoryProducts(ctx, { titleId }),
+    loadContactHistoryTitleRow(ctx, { titleId }),
   ]);
 
   const fallbackCurrency = products[0]?.currency ?? titleRow?.market?.currency ?? "";

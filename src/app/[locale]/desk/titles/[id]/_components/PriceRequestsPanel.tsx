@@ -1,5 +1,5 @@
 import { getTranslations } from "next-intl/server";
-import { prisma } from "@/lib/prisma";
+import type { SuperadminContext } from "@/lib/desk-guard";
 import { requestStatus } from "@/lib/pricing/requests";
 import {
   createAndSendRequestAction,
@@ -10,22 +10,23 @@ import {
 import { listContactsForTitle } from "@/lib/pricing/contacts";
 import { SubmitButton } from "@/components";
 import { SafeEmail } from "@/components/safe-email";
+import {
+  loadPriceRequestsRequests,
+  loadPriceRequestsProducts,
+} from "@/lib/data/desk/titles";
 
 export async function PriceRequestsPanel({
+  ctx,
   locale,
   titleId,
 }: {
+  ctx: SuperadminContext;
   locale: string;
   titleId: string;
 }) {
   const t = await getTranslations({ locale, namespace: "priceRequests" });
   const [requests, contacts] = await Promise.all([
-    prisma.priceRequest.findMany({
-      where: { titleId },
-      include: { salesContact: true },
-      orderBy: { createdAt: "desc" },
-      take: 20,
-    }),
+    loadPriceRequestsRequests(ctx, { titleId }),
     listContactsForTitle(titleId),
   ]);
 
@@ -157,6 +158,7 @@ export async function PriceRequestsPanel({
                               {t("logManual")}
                             </summary>
                             <ManualLogForm
+                              ctx={ctx}
                               locale={locale}
                               titleId={titleId}
                               priceRequestId={r.id}
@@ -177,19 +179,18 @@ export async function PriceRequestsPanel({
 }
 
 async function ManualLogForm({
+  ctx,
   locale,
   titleId,
   priceRequestId,
 }: {
+  ctx: SuperadminContext;
   locale: string;
   titleId: string;
   priceRequestId: string;
 }) {
   const t = await getTranslations({ locale, namespace: "priceRequests" });
-  const products = await prisma.product.findMany({
-    where: { titleId, active: true },
-    select: { id: true, name: true, type: true, currency: true },
-  });
+  const products = await loadPriceRequestsProducts(ctx, { titleId });
   return (
     <form
       action={logManualResponseAction}

@@ -45,6 +45,7 @@ import { groupItemsByMarket } from "@/lib/quote-grouping";
 import { quoteVatColumns, quoteVatFor } from "@/lib/vat-buyer";
 import { recordAudit } from "@/lib/audit";
 import { notifyDesk, notifyOrg } from "@/lib/notify";
+import { requireDesk } from "@/lib/desk-guard";
 import { loadScope, canActOnOrg, canCommitOnOrg, canEditOnOrg } from "@/lib/scope";
 import { viewAsCommitConfirmed } from "@/lib/view-as";
 import { generateQuotePdf as renderQuotePdf } from "@/lib/pdf/generate-quote-pdf";
@@ -106,6 +107,8 @@ export async function generateQuote(formData: FormData) {
   const requestId = str(formData, "requestId");
 
   // Only the desk can produce a quote — previously any caller could POST.
+  // Role + staff two-factor (MFA_REQUIRED_FOR_STAFF), like every desk page.
+  await requireDesk(locale);
   const scope = await loadScope();
   if (!scope.isDesk) redirect(`/${locale}/signin`);
 
@@ -262,6 +265,8 @@ export async function sendQuote(formData: FormData) {
   const locale = str(formData, "locale") || "en";
   const requestId = str(formData, "requestId");
 
+  // Role + staff two-factor (MFA_REQUIRED_FOR_STAFF), like every desk page.
+  await requireDesk(locale);
   const scope = await loadScope();
   if (!scope.isDesk || !scope.userId) redirect(`/${locale}/signin`);
 
@@ -312,6 +317,8 @@ export async function setQuoteLinePrice(formData: FormData) {
   const lineId = str(formData, "lineId");
   const intent = str(formData, "intent");
 
+  // Role + staff two-factor (MFA_REQUIRED_FOR_STAFF), like every desk page.
+  await requireDesk(locale);
   const scope = await loadScope();
   if (!scope.isDesk || !scope.userId) redirect(`/${locale}/signin`);
 
@@ -359,6 +366,8 @@ export async function setQuoteLineNote(formData: FormData) {
   const quoteId = str(formData, "quoteId");
   const lineId = str(formData, "lineId");
 
+  // Role + staff two-factor (MFA_REQUIRED_FOR_STAFF), like every desk page.
+  await requireDesk(locale);
   const scope = await loadScope();
   if (!scope.isDesk || !scope.userId) redirect(`/${locale}/signin`);
 
@@ -387,6 +396,8 @@ export async function addQuoteExtraWork(formData: FormData) {
   const requestId = str(formData, "requestId");
   const quoteId = str(formData, "quoteId");
 
+  // Role + staff two-factor (MFA_REQUIRED_FOR_STAFF), like every desk page.
+  await requireDesk(locale);
   const scope = await loadScope();
   if (!scope.isDesk || !scope.userId) redirect(`/${locale}/signin`);
 
@@ -423,6 +434,8 @@ export async function removeQuoteExtraWork(formData: FormData) {
   const quoteId = str(formData, "quoteId");
   const lineId = str(formData, "lineId");
 
+  // Role + staff two-factor (MFA_REQUIRED_FOR_STAFF), like every desk page.
+  await requireDesk(locale);
   const scope = await loadScope();
   if (!scope.isDesk || !scope.userId) redirect(`/${locale}/signin`);
 
@@ -446,6 +459,8 @@ export async function reviseQuoteAction(formData: FormData) {
   const requestId = str(formData, "requestId");
   const quoteId = str(formData, "quoteId");
 
+  // Role + staff two-factor (MFA_REQUIRED_FOR_STAFF), like every desk page.
+  await requireDesk(locale);
   const scope = await loadScope();
   if (!scope.isDesk || !scope.userId) redirect(`/${locale}/signin`);
 
@@ -467,6 +482,8 @@ export async function discardQuoteRevisionAction(formData: FormData) {
   const requestId = str(formData, "requestId");
   const quoteId = str(formData, "quoteId");
 
+  // Role + staff two-factor (MFA_REQUIRED_FOR_STAFF), like every desk page.
+  await requireDesk(locale);
   const scope = await loadScope();
   if (!scope.isDesk || !scope.userId) redirect(`/${locale}/signin`);
 
@@ -485,6 +502,8 @@ export async function generateQuotePdf(formData: FormData) {
   const quoteId = str(formData, "quoteId");
   const requestId = str(formData, "requestId");
 
+  // Role + staff two-factor (MFA_REQUIRED_FOR_STAFF), like every desk page.
+  await requireDesk(locale);
   const scope = await loadScope();
   if (!scope.isDesk || !scope.userId) redirect(`/${locale}/signin`);
 
@@ -798,6 +817,8 @@ export async function renewQuote(formData: FormData) {
   const requestId = str(formData, "requestId");
   const quoteId = str(formData, "quoteId");
 
+  // Role + staff two-factor (MFA_REQUIRED_FOR_STAFF), like every desk page.
+  await requireDesk(locale);
   const scope = await loadScope();
   if (!scope.isDesk || !scope.userId) redirect(`/${locale}/signin`);
 

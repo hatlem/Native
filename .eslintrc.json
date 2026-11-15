@@ -13,5 +13,83 @@
         ]
       }
     ]
-  }
+  },
+  "overrides": [
+    {
+      // Pages, layouts and components never query the database themselves.
+      // They call a loader in src/lib/data, and every loader takes the
+      // caller's authorisation context first (a DeskContext from
+      // lib/desk-guard, or the buyer's scope) — so a page cannot read data
+      // without having run its guard. A desk page that relied on its layout
+      // for that check once leaked every organisation's requests.
+      "files": ["src/app/**/*.tsx"],
+      "rules": {
+        "no-restricted-imports": [
+          "error",
+          {
+            "paths": [
+              {
+                "name": "next/font/google",
+                "message": "Use @/fonts (self-hosted) — next/font/google breaks Turbopack builds (vercel/next.js#99114)"
+              },
+              {
+                "name": "@/lib/prisma",
+                "message": "Load data through a loader in src/lib/data (it takes the authorisation context first) instead of querying Prisma from a page or component."
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      // Not migrated yet: these still import Prisma directly. The list is
+      // the debt — shrink it, never add to it. New files are covered by the
+      // rule above.
+      "files": [
+        "src/app/\\[locale\\]/\\(marketing\\)/page.tsx",
+        "src/app/\\[locale\\]/\\(marketing\\)/preview/page.tsx",
+        "src/app/\\[locale\\]/catalog/_components/CatalogMarketing.tsx",
+        "src/app/\\[locale\\]/\\(marketing\\)/recommend/page.tsx",
+        "src/app/\\[locale\\]/\\(marketing\\)/reset-password/\\[token\\]/page.tsx",
+        "src/app/\\[locale\\]/account/notification-prefs-section.tsx",
+        "src/app/\\[locale\\]/account/page.tsx",
+        "src/app/\\[locale\\]/account/security/page.tsx",
+        "src/app/\\[locale\\]/account/team-section.tsx",
+        "src/app/\\[locale\\]/agency/page.tsx",
+        "src/app/\\[locale\\]/campaign/_components/ScheduleStep.tsx",
+        "src/app/\\[locale\\]/campaign/page.tsx",
+        "src/app/\\[locale\\]/catalog/\\[slug\\]/page.tsx",
+        "src/app/\\[locale\\]/catalog/_components/AvailabilityStrip.tsx",
+        "src/app/\\[locale\\]/catalog/compare/page.tsx",
+        "src/app/\\[locale\\]/catalog/page.tsx",
+        "src/app/\\[locale\\]/invite/\\[token\\]/page.tsx",
+        "src/app/\\[locale\\]/layout.tsx",
+        "src/app/\\[locale\\]/publisher/\\(portal\\)/availability/page.tsx",
+        "src/app/\\[locale\\]/publisher/\\(portal\\)/orders/page.tsx",
+        "src/app/\\[locale\\]/publisher/\\(portal\\)/page.tsx",
+        "src/app/\\[locale\\]/publisher/\\(portal\\)/rates/page.tsx",
+        "src/app/\\[locale\\]/publisher/claim/\\[token\\]/page.tsx",
+        "src/app/\\[locale\\]/writer/claim/\\[token\\]/page.tsx",
+        "src/app/\\[locale\\]/writer/page.tsx",
+        "src/app/\\[locale\\]/writer/profile/page.tsx",
+        "src/app/activation-events.tsx",
+        "src/app/joined-notice.tsx",
+        "src/app/org-switcher.tsx",
+        "src/app/view-as-confirm.tsx"
+      ],
+      "rules": {
+        "no-restricted-imports": [
+          "error",
+          {
+            "paths": [
+              {
+                "name": "next/font/google",
+                "message": "Use @/fonts (self-hosted) — next/font/google breaks Turbopack builds (vercel/next.js#99114)"
+              }
+            ]
+          }
+        ]
+      }
+    }
+  ]
 }

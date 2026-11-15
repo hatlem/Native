@@ -2,7 +2,7 @@ import { getTranslations } from "next-intl/server";
 import { notFound } from "next/navigation";
 import { superadminPageGate } from "@/lib/desk-guard";
 import { SuperadminOnly } from "@/components/superadmin-only";
-import { prisma } from "@/lib/prisma";
+import type { Title } from "@prisma/client";
 import { Link } from "@/i18n/navigation";
 import {
   updateTitlePricing,
@@ -23,6 +23,11 @@ import { SubmitButton } from "@/components";
 import { withSafeEmails } from "@/components/safe-email";
 import { marketDefaultLocale } from "@/lib/market-locale";
 import { NOTICE_LOCALES } from "@/lib/notices/messages";
+import {
+  loadDetailTitle,
+  loadDetailPendingInvite,
+  loadDetailPortalUsers,
+} from "@/lib/data/desk/titles";
 
 export const dynamic = "force-dynamic";
 
@@ -35,7 +40,7 @@ export const dynamic = "force-dynamic";
 function CommercialProfileCard({
   title,
 }: {
-  title: Awaited<ReturnType<typeof prisma.title.findUnique>> & object;
+  title: Title;
 }) {
   const t = title as Record<string, unknown>;
   const yesNo = (v: unknown) =>
@@ -154,26 +159,9 @@ export default async function DeskTitleEditPage({
     const tTitles = await getTranslations({ locale, namespace: "deskTitles" });
     return <SuperadminOnly locale={locale} area={tTitles("title")} />;
   }
+  const ctx = gate.ctx;
 
-  const title = await prisma.title.findUnique({
-    where: { id },
-    include: {
-      publisher: true,
-      market: true,
-      // priceRules included so the per-product margin override renders
-      // the rule updateProductPricing targets: the first by minVolume
-      // asc, createdAt asc — regardless of label (blank = inherit).
-      products: {
-        include: {
-          priceRules: {
-            orderBy: [{ minVolume: "asc" }, { createdAt: "asc" }],
-            take: 1,
-          },
-        },
-        orderBy: { createdAt: "asc" },
-      },
-    },
-  });
+  const title = await loadDetailTitle(ctx, { id });
   if (!title) notFound();
 
   // Production responsibility per product: explicit 0 = the publisher
@@ -196,12 +184,8 @@ export default async function DeskTitleEditPage({
   // panel below reads very differently depending on the answer — "invite them"
   // vs "they were invited on the 3rd and haven't clicked yet".
   const [pendingInvite, portalUsers] = await Promise.all([
-    prisma.publisherInvite.findFirst({
-      where: { publisherId: title.publisher.id, claimedAt: null },
-      orderBy: { createdAt: "desc" },
-      select: { email: true, expiresAt: true },
-    }),
-    prisma.user.count({ where: { publisherId: title.publisher.id } }),
+    loadDetailPendingInvite(ctx, { titlePublisherId: title.publisher.id }),
+    loadDetailPortalUsers(ctx, { titlePublisherId: title.publisher.id }),
   ]);
 
   return (
@@ -641,13 +625,13 @@ export default async function DeskTitleEditPage({
         publisherId={title.publisher.id}
       />
 
-      <PriceRequestsPanel locale={locale} titleId={title.id} />
+      <PriceRequestsPanel ctx={ctx} locale={locale} titleId={title.id} />
 
-      <PendingQuotesPanel locale={locale} titleId={title.id} />
+      <PendingQuotesPanel ctx={ctx} locale={locale} titleId={title.id} />
 
-      <ContactHistoryPanel locale={locale} titleId={title.id} />
+      <ContactHistoryPanel ctx={ctx} locale={locale} titleId={title.id} />
 
-      <RateCardsPanel locale={locale} titleId={title.id} />
+      <RateCardsPanel ctx={ctx} locale={locale} titleId={title.id} />
     </section>
   );
 }

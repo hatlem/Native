@@ -1,7 +1,6 @@
 import { getTranslations } from "next-intl/server";
 import { Prisma, RequestStatus } from "@prisma/client";
-import { requireDesk } from "@/lib/desk-guard";
-import { prisma } from "@/lib/prisma";
+import { requireDeskContext } from "@/lib/desk-guard";
 import { intlLocale } from "@/lib/money";
 import { Link } from "@/i18n/navigation";
 import { StatusBadge } from "@/app/status-badge";
@@ -13,6 +12,10 @@ import {
   deskRequestsHref,
   DESK_REQUEST_STATUSES,
 } from "@/lib/desk-requests-query";
+import {
+  loadTotal,
+  loadRequests,
+} from "@/lib/data/desk/requests";
 
 export const dynamic = "force-dynamic";
 
@@ -27,7 +30,7 @@ export default async function DeskRequestsPage({
   searchParams: Promise<Record<string, string | string[] | undefined>>;
 }) {
   const { locale } = await params;
-  await requireDesk(locale);
+  const ctx = await requireDeskContext(locale);
   const sp = await searchParams;
   const t = await getTranslations({ locale, namespace: "desk" });
   const ts = await getTranslations({ locale, namespace: "status" });
@@ -54,24 +57,8 @@ export default async function DeskRequestsPage({
   };
 
   const [total, requests] = await Promise.all([
-    prisma.request.count({ where }),
-    prisma.request.findMany({
-      where,
-      // Oldest first for the open queue (the longest-waiting buyer is the
-      // most urgent), newest activity first otherwise.
-      orderBy: status === "open" ? { createdAt: "asc" } : { updatedAt: "desc" },
-      skip: (page - 1) * DESK_REQUESTS_PAGE_SIZE,
-      take: DESK_REQUESTS_PAGE_SIZE,
-      select: {
-        id: true,
-        status: true,
-        briefSummary: true,
-        updatedAt: true,
-        organization: { select: { name: true } },
-        _count: { select: { quotes: true } },
-        plan: { select: { _count: { select: { items: true } } } },
-      },
-    }),
+    loadTotal(ctx, { where }),
+    loadRequests(ctx, { where, status, page }),
   ]);
   const pageCount = Math.max(1, Math.ceil(total / DESK_REQUESTS_PAGE_SIZE));
   const dateFmt = new Intl.DateTimeFormat(intlLocale(locale), {

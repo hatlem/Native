@@ -1,10 +1,12 @@
-import { requireDesk } from "@/lib/desk-guard";
+import { requireDeskContext } from "@/lib/desk-guard";
 import { getTranslations } from "next-intl/server";
 import { ProductType } from "@prisma/client";
-import { prisma } from "@/lib/prisma";
 import { SubmitButton } from "@/components";
 import { createPlaybook, togglePlaybook, updatePlaybook } from "./actions";
 import { SUPPORTED_MARKETS } from "@/lib/markets";
+import {
+  loadPlaybooks,
+} from "@/lib/data/desk/playbooks";
 
 export const dynamic = "force-dynamic";
 
@@ -21,14 +23,12 @@ export default async function DeskPlaybooksPage({
   const { locale } = await params;
   // The desk layout guard alone is not an authorization boundary: the page
   // renders alongside it, so its RSC payload reached non-desk users.
-  await requireDesk(locale);
+  const ctx = await requireDeskContext(locale);
   const { error } = await searchParams;
   const t = await getTranslations({ locale, namespace: "playbooks" });
   const tType = await getTranslations({ locale, namespace: "productType" });
 
-  const playbooks = await prisma.playbook.findMany({
-    orderBy: [{ active: "desc" }, { productType: "asc" }, { category: "asc" }],
-  });
+  const playbooks = await loadPlaybooks(ctx);
 
   return (
     <>

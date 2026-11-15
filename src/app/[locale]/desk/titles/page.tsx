@@ -2,7 +2,6 @@ import { getTranslations } from "next-intl/server";
 import { superadminPageGate } from "@/lib/desk-guard";
 import { MarketCode, Prisma } from "@prisma/client";
 import { SuperadminOnly } from "@/components/superadmin-only";
-import { prisma } from "@/lib/prisma";
 import { rankByNameMatch } from "@/lib/title-name-rank";
 import { Link } from "@/i18n/navigation";
 import {
@@ -28,6 +27,14 @@ import { TitlesFilterBar } from "./_components/TitlesFilterBar";
 import { FreshnessChips } from "./_components/FreshnessChips";
 import { TitlesGrid, type TitleWithFreshness } from "./_components/TitlesGrid";
 import { TitlesPagination } from "./_components/TitlesPagination";
+import {
+  loadListMatches,
+  loadListRows,
+  loadListFilteredCount,
+  loadListPage,
+  loadListCounts,
+  loadListUnverifiedCount,
+} from "@/lib/data/desk/titles";
 
 export const dynamic = "force-dynamic";
 
@@ -43,6 +50,7 @@ export default async function DeskTitlesPage({
   const t = await getTranslations({ locale, namespace: "deskTitles" });
   const gate = await superadminPageGate(locale);
   if (!gate.allowed) return <SuperadminOnly locale={locale} area={t("title")} />;
+  const ctx = gate.ctx;
   const td = await getTranslations({ locale, namespace: "desk" });
 
   const market = asMarket(str(sp, "market") || undefined);
@@ -130,28 +138,23 @@ export default async function DeskTitlesPage({
   // ranks the matching ids and names, then loads just the page it shows.
   const [filteredCount, titles] = q
     ? await (async () => {
-        const matches = await prisma.title.findMany({ where, select: { id: true, name: true }, orderBy: catalogOrder });
+        const matches = await loadListMatches(ctx, { where, catalogOrder });
         const pageIds = rankByNameMatch(matches, q)
           .slice(skip, skip + PAGE_SIZE)
           .map((m) => m.id);
-        const rows = await prisma.title.findMany({ where: { id: { in: pageIds } }, include });
+        const rows = await loadListRows(ctx, { pageIds, include });
         const byId = new Map(rows.map((r) => [r.id, r]));
         return [matches.length, pageIds.flatMap((id) => byId.get(id) ?? [])] as const;
       })()
     : await Promise.all([
-        prisma.title.count({ where }),
-        prisma.title.findMany({ where, include, orderBy: catalogOrder, take: PAGE_SIZE, skip }),
+        loadListFilteredCount(ctx, { where }),
+        loadListPage(ctx, { where, include, catalogOrder, skip }),
       ]);
 
-  const counts = await prisma.title.groupBy({
-    by: ["active"],
-    _count: { _all: true },
-  });
+  const counts = await loadListCounts(ctx);
   const totalActive = counts.find((c) => c.active)?._count._all ?? 0;
   const totalInactive = counts.find((c) => !c.active)?._count._all ?? 0;
-  const unverifiedCount = await prisma.title.count({
-    where: { lastVerifiedAt: null },
-  });
+  const unverifiedCount = await loadListUnverifiedCount(ctx);
 
   // Compute freshness for every title, then optionally filter in-memory.
   const titlesWithFreshness: TitleWithFreshness[] = titles.map((title) => {

@@ -1,9 +1,8 @@
 import { Suspense } from "react";
-import { requireDesk } from "@/lib/desk-guard";
+import { requireDeskContext, type DeskContext } from "@/lib/desk-guard";
 import { getTranslations } from "next-intl/server";
 import { intlLocale } from "@/lib/money";
 import { auth } from "@/auth";
-import { prisma } from "@/lib/prisma";
 import { Link } from "@/i18n/navigation";
 import { StatusBadge } from "@/app/status-badge";
 import { EmptyState } from "@/app/empty-state";
@@ -15,6 +14,16 @@ import {
   ActionList,
   ActionListItem,
 } from "@/components";
+import {
+  loadSubmittedCount,
+  loadInReviewCount,
+  loadQuotedCount,
+  loadActiveOrderCount,
+  loadPendingTitleCount,
+  loadUnconfirmedCount,
+  loadNewBriefs,
+  loadActiveRequests,
+} from "@/lib/data/desk/console";
 
 export const dynamic = "force-dynamic";
 
@@ -59,23 +68,27 @@ function KpiSkeleton() {
   );
 }
 
-async function DeskKpis({ locale, isSuperadmin }: { locale: string; isSuperadmin: boolean }) {
+async function DeskKpis({
+  ctx,
+  locale,
+  isSuperadmin,
+}: {
+  ctx: DeskContext;
+  locale: string;
+  isSuperadmin: boolean;
+}) {
   const t = await getTranslations({ locale, namespace: "desk" });
   const to = await getTranslations({ locale, namespace: "order" });
   const tt = await getTranslations({ locale, namespace: "deskTitles" });
   const [submittedCount, inReviewCount, quotedCount, activeOrderCount, pendingTitleCount, unconfirmedCount] =
     await Promise.all([
-      prisma.request.count({ where: { status: "SUBMITTED" } }),
-      prisma.request.count({ where: { status: "IN_REVIEW" } }),
-      prisma.request.count({ where: { status: "QUOTED" } }),
-      prisma.order.count({
-        where: {
-          status: { in: ["CONFIRMED", "IN_PRODUCTION", "SCHEDULED", "LIVE"] },
-        },
-      }),
-      isSuperadmin ? prisma.title.count({ where: { active: false } }) : Promise.resolve(0),
+      loadSubmittedCount(ctx),
+      loadInReviewCount(ctx),
+      loadQuotedCount(ctx),
+      loadActiveOrderCount(ctx),
+      isSuperadmin ? loadPendingTitleCount(ctx) : Promise.resolve(0),
       isSuperadmin
-        ? prisma.product.count({ where: { active: true, confirmedAt: null } })
+        ? loadUnconfirmedCount(ctx)
         : Promise.resolve(0),
     ]);
   const needsAttention = submittedCount + inReviewCount;
@@ -135,21 +148,13 @@ async function DeskKpis({ locale, isSuperadmin }: { locale: string; isSuperadmin
   );
 }
 
-async function NewBriefsList({ locale }: { locale: string }) {
+async function NewBriefsList({ ctx, locale }: { ctx: DeskContext; locale: string }) {
   const t = await getTranslations({ locale, namespace: "desk" });
   const to = await getTranslations({ locale, namespace: "order" });
   const tr = await getTranslations({ locale, namespace: "reports" });
   const [newBriefs, submittedCount] = await Promise.all([
-    prisma.request.findMany({
-      where: { status: "SUBMITTED" },
-      orderBy: { createdAt: "desc" },
-      take: 8,
-      include: {
-        organization: true,
-        plan: { include: { _count: { select: { items: true } } } },
-      },
-    }),
-    prisma.request.count({ where: { status: "SUBMITTED" } }),
+    loadNewBriefs(ctx),
+    loadSubmittedCount(ctx),
   ]);
   if (newBriefs.length === 0) {
     return (
@@ -196,18 +201,9 @@ async function NewBriefsList({ locale }: { locale: string }) {
   );
 }
 
-async function ActiveRequestsList({ locale }: { locale: string }) {
+async function ActiveRequestsList({ ctx, locale }: { ctx: DeskContext; locale: string }) {
   const t = await getTranslations({ locale, namespace: "desk" });
-  const activeRequests = await prisma.request.findMany({
-    where: { status: { in: ["IN_REVIEW", "QUOTED"] } },
-    orderBy: { updatedAt: "desc" },
-    take: 8,
-    include: {
-      organization: true,
-      _count: { select: { quotes: true } },
-      plan: { include: { _count: { select: { items: true } } } },
-    },
-  });
+  const activeRequests = await loadActiveRequests(ctx);
   if (activeRequests.length === 0) return <p className="muted">{t("nothingActive")}</p>;
   return (
     <ActionList>
@@ -237,7 +233,7 @@ export default async function DeskListPage({
   // The desk layout guard alone is not an authorization boundary: the page
   // renders alongside it, so its RSC payload reached non-desk users. This
   // runs before anything streams, so the redirect is still a real 307.
-  await requireDesk(locale);
+  const ctx = await requireDeskContext(locale);
   const t = await getTranslations({ locale, namespace: "desk" });
   const to = await getTranslations({ locale, namespace: "order" });
   const tr = await getTranslations({ locale, namespace: "reports" });
@@ -258,13 +254,13 @@ export default async function DeskListPage({
       />
 
       <Suspense fallback={<KpiSkeleton />}>
-        <DeskKpis locale={locale} isSuperadmin={isSuperadmin} />
+        <DeskKpis ctx={ctx} locale={locale} isSuperadmin={isSuperadmin} />
       </Suspense>
 
       <section className="section" id="new-briefs">
         <SectionHead eyebrow={t("sectionInbox")} title={t("newBriefsTitle")} />
         <Suspense fallback={<SectionSkeleton />}>
-          <NewBriefsList locale={locale} />
+          <NewBriefsList ctx={ctx} locale={locale} />
         </Suspense>
       </section>
 
@@ -279,7 +275,7 @@ export default async function DeskListPage({
           }
         />
         <Suspense fallback={<SectionSkeleton />}>
-          <ActiveRequestsList locale={locale} />
+          <ActiveRequestsList ctx={ctx} locale={locale} />
         </Suspense>
       </section>
 

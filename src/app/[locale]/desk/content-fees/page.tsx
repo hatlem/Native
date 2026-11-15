@@ -1,7 +1,6 @@
-import { requireDesk } from "@/lib/desk-guard";
+import { requireDeskContext } from "@/lib/desk-guard";
 import { getTranslations } from "next-intl/server";
 import { ProductType } from "@prisma/client";
-import { prisma } from "@/lib/prisma";
 import { SubmitButton } from "@/components";
 import {
   createContentFeeRule,
@@ -18,6 +17,11 @@ import { loadScope } from "@/lib/scope";
 import { loadExtraWorkRates } from "@/lib/content-fee";
 import { DEFAULT_EXTRA_WORK_RATES, extraWorkHourlyRate } from "@/lib/pricing/extra-work";
 import { formatMoney } from "@/lib/money";
+import {
+  loadRules,
+  loadMarginRules,
+  loadMarketCurrencies,
+} from "@/lib/data/desk/content-fees";
 
 export const dynamic = "force-dynamic";
 
@@ -34,22 +38,14 @@ export default async function DeskContentFeesPage({
   const { locale } = await params;
   // The desk layout guard alone is not an authorization boundary: the page
   // renders alongside it, so its RSC payload reached non-desk users.
-  await requireDesk(locale);
+  const ctx = await requireDeskContext(locale);
   const { error } = await searchParams;
   const t = await getTranslations({ locale, namespace: "contentFees" });
   const tType = await getTranslations({ locale, namespace: "productType" });
 
-  const rules = await prisma.contentFeeRule.findMany({
-    orderBy: [
-      { active: "desc" },
-      { productType: "asc" },
-      { marketCode: "asc" },
-    ],
-  });
+  const rules = await loadRules(ctx);
 
-  const marginRules = await prisma.marginRule.findMany({
-    orderBy: [{ active: "desc" }, { marketCode: "asc" }],
-  });
+  const marginRules = await loadMarginRules(ctx);
 
   // Extra-work hourly rates: every currency a market bills in, plus any
   // stored row, so a missing rate shows as an empty field to fill in.
@@ -58,7 +54,7 @@ export default async function DeskContentFeesPage({
   const canEditRates = scope.role === "SUPERADMIN";
   const [storedRates, marketCurrencies] = await Promise.all([
     loadExtraWorkRates(),
-    prisma.market.findMany({ select: { currency: true }, distinct: ["currency"] }),
+    loadMarketCurrencies(ctx),
   ]);
   const rateCurrencies = [
     ...new Set([

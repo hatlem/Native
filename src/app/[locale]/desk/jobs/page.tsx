@@ -1,12 +1,16 @@
 import { getTranslations } from "next-intl/server";
 import { auth } from "@/auth";
-import { requireDesk } from "@/lib/desk-guard";
-import { prisma } from "@/lib/prisma";
+import { requireDeskContext } from "@/lib/desk-guard";
 import { Link } from "@/i18n/navigation";
 import { intlLocale } from "@/lib/money";
 import { queueStats } from "@/lib/jobs";
 import { SubmitButton, ConfirmSubmit } from "@/components";
 import { retryJob, discardJob } from "@/app/job-actions";
+import {
+  loadDead,
+  loadRecent,
+  loadSweeps,
+} from "@/lib/data/desk/jobs";
 
 export const dynamic = "force-dynamic";
 
@@ -33,7 +37,7 @@ export default async function DeskJobsPage({
 }) {
   const { locale } = await params;
   // The desk layout guard alone is not an authorization boundary.
-  await requireDesk(locale);
+  const ctx = await requireDeskContext(locale);
   const t = await getTranslations({ locale, namespace: "deskJobs" });
   const td = await getTranslations({ locale, namespace: "desk" });
   const session = await auth();
@@ -43,21 +47,9 @@ export default async function DeskJobsPage({
 
   const [stats, dead, recent, sweeps] = await Promise.all([
     queueStats(),
-    prisma.job.findMany({
-      where: { status: "FAILED" },
-      orderBy: [{ finishedAt: "desc" }, { id: "desc" }],
-      take: DEAD_SHOWN,
-      select: { id: true, kind: true, attempts: true, lastError: true, createdAt: true, finishedAt: true },
-    }),
-    prisma.job.findMany({
-      orderBy: [{ createdAt: "desc" }, { id: "desc" }],
-      take: RECENT,
-      select: { id: true, kind: true, status: true, attempts: true, maxAttempts: true, runAt: true, createdAt: true },
-    }),
-    prisma.sweepRun.findMany({
-      orderBy: [{ startedAt: "desc" }, { id: "desc" }],
-      take: SWEEP_RUNS,
-    }),
+    loadDead(ctx, { DEAD_SHOWN }),
+    loadRecent(ctx, { RECENT }),
+    loadSweeps(ctx, { SWEEP_RUNS }),
   ]);
 
   const when = new Intl.DateTimeFormat(intlLocale(locale), { dateStyle: "medium", timeStyle: "short" });

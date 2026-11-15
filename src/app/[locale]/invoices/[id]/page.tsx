@@ -1,7 +1,5 @@
 import { getTranslations } from "next-intl/server";
 import { notFound } from "next/navigation";
-import { prisma } from "@/lib/prisma";
-import { lineOrder } from "@/lib/commerce/line-order";
 import { formatMoney, formatMoneyExact, intlLocale } from "@/lib/money";
 import { loadScope, canActOnOrg } from "@/lib/scope";
 import { invoiceLineLabel } from "@/lib/invoice-line-label";
@@ -9,6 +7,9 @@ import { invoiceNumber } from "@/lib/pdf/invoice-pdf-data";
 import { loadSellerDetails, sellerAddressLines, sellerGaps } from "@/lib/seller";
 import { documentNumber, sellerForInvoice } from "@/lib/invoice-snapshot";
 import { StatusBadge } from "@/app/status-badge";
+import {
+  loadDetailInvoice,
+} from "@/lib/data/buyer/invoices";
 
 export const dynamic = "force-dynamic";
 
@@ -22,20 +23,15 @@ export default async function InvoicePage({
   const tType = await getTranslations({ locale, namespace: "productType" });
   const tPay = await getTranslations({ locale, namespace: "paymentTerms" });
 
-  const invoice = await prisma.invoice.findUnique({
-    where: { id },
-    include: {
-      organization: true,
-      lines: { orderBy: lineOrder() },
-      creditNotes: { orderBy: { issuedAt: "asc" }, take: 1 },
-    },
-  });
+  // The loader answers null for another organisation's invoice, so "not
+  // yours" and "not found" are the same 404.
+  const scope = await loadScope();
+  const invoice = await loadDetailInvoice(scope, { id });
   if (!invoice) notFound();
 
   // Multi-tenant guard: only the billed organization, its agency, or the
   // desk may view an invoice. Anonymous callers always 404 (same response
   // as a non-existent invoice — don't leak existence).
-  const scope = await loadScope();
   if (!canActOnOrg(scope, invoice.organizationId)) notFound();
 
   const labelDeps = {

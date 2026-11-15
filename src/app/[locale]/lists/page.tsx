@@ -1,6 +1,6 @@
 import { PendingButton } from "@/components/submit-button";
+import { buyerScope } from "@/lib/data/buyer/guard";
 import { auth } from "@/auth";
-import { prisma } from "@/lib/prisma";
 import { getWorkspace } from "@/lib/workspace";
 import { getTranslations } from "next-intl/server";
 import { intlLocale } from "@/lib/money";
@@ -8,6 +8,10 @@ import { restoreList } from "@/app/list-actions";
 import { ListsTable } from "./_components/ListsTable";
 import { JoinedNotice } from "@/app/joined-notice";
 import { ViewOnlyNote } from "@/components/view-only-note";
+import {
+  loadArchivedLists,
+  loadLists,
+} from "@/lib/data/buyer/lists";
 
 export const dynamic = "force-dynamic";
 
@@ -31,36 +35,14 @@ export default async function ListsPage({
   const session = await auth();
   const ws = await getWorkspace(session?.user?.id);
   const orgId = ws?.activeOrgId ?? null;
+  const scope = buyerScope(session?.user, ws);
   // A view-only seat sees the org's plans but can't rename, duplicate,
   // archive or restore them (lib/scope canEditOnOrg refuses those actions).
   const readOnly = !!orgId && !ws?.activeCanEdit;
   const [lists, archived] = orgId
     ? await Promise.all([
-        prisma.savedList.findMany({
-          where: { organizationId: orgId, archivedAt: null },
-          orderBy: { updatedAt: "desc" },
-          select: {
-            id: true,
-            name: true,
-            updatedAt: true,
-            // Placements and recommended alternatives are counted apart: an
-            // alternatives-only plan has nothing to send (lib/lists.ts).
-            _count: { select: { items: { where: { isAlternative: false } } } },
-            items: { where: { isAlternative: true }, select: { id: true } },
-            requests: { select: { createdAt: true }, orderBy: { createdAt: "desc" }, take: 1 },
-          },
-        }),
-        prisma.savedList.findMany({
-          where: { organizationId: orgId, archivedAt: { not: null } },
-          orderBy: { archivedAt: "desc" },
-          take: ARCHIVED_SHOWN,
-          select: {
-            id: true,
-            name: true,
-            archivedAt: true,
-            _count: { select: { items: { where: { isAlternative: false } } } },
-          },
-        }),
+        loadLists(scope, { orgId }),
+        loadArchivedLists(scope, { orgId, ARCHIVED_SHOWN }),
       ])
     : [[], []];
   // Only an archive in the viewer's own org earns the undo banner — the id

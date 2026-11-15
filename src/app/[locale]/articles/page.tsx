@@ -1,7 +1,6 @@
 import { getTranslations } from "next-intl/server";
 import { viewOrgIds } from "@/lib/workspace";
 import { redirect } from "next/navigation";
-import { prisma } from "@/lib/prisma";
 import { Link } from "@/i18n/navigation";
 import { loadScope } from "@/lib/scope";
 import { ViewOnlyNote } from "@/components/view-only-note";
@@ -10,6 +9,11 @@ import { StatusBadge } from "@/app/status-badge";
 import { articleHeadline } from "@/lib/content/markdown";
 import { SafeEmail } from "@/components/safe-email";
 import type { ReactNode } from "react";
+import {
+  loadListArticles,
+  loadListProducts,
+  loadListAuthors,
+} from "@/lib/data/buyer/articles";
 
 export const dynamic = "force-dynamic";
 
@@ -28,50 +32,19 @@ export default async function ArticlesPage({
   const ws = scope.workspace;
   const canCreate = viewOrgIds(ws).some((id) => ws.editOrgIds.includes(id));
 
-  const articles = await prisma.article.findMany({
-    where: { organizationId: { in: viewOrgIds(scope.workspace) } },
-    orderBy: { updatedAt: "desc" },
-    include: {
-      versions: {
-        orderBy: { version: "desc" },
-        take: 1,
-        select: {
-          status: true,
-          body: true,
-          authorWriter: { select: { user: { select: { name: true, email: true } } } },
-        },
-      },
-      assignedWriter: { select: { user: { select: { name: true, email: true } } } },
-      placements: {
-        select: {
-          orderLine: {
-            select: {
-              orderId: true,
-              productId: true,
-            },
-          },
-        },
-      },
-    },
-  });
+  const articles = await loadListArticles(scope);
 
   const productIds = articles
     .flatMap((a) => a.placements.map((p) => p.orderLine.productId))
     .filter((id): id is string => !!id);
   const products = productIds.length
-    ? await prisma.product.findMany({
-        where: { id: { in: productIds } },
-        select: { id: true, title: { select: { name: true } } },
-      })
+    ? await loadListProducts(scope, { productIds })
     : [];
   const titleByProductId = new Map(products.map((p) => [p.id, p.title.name]));
 
   const authorIds = [...new Set(articles.map((a) => a.createdByUserId))];
   const authors = authorIds.length
-    ? await prisma.user.findMany({
-        where: { id: { in: authorIds } },
-        select: { id: true, name: true, email: true },
-      })
+    ? await loadListAuthors(scope, { authorIds })
     : [];
   // A name, or the address through SafeEmail — never a bare SSR email text
   // node (Cloudflare obfuscation breaks hydration, see safe-email.tsx).

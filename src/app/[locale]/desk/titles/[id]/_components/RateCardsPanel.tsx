@@ -1,8 +1,11 @@
 import { getTranslations } from "next-intl/server";
-import { prisma } from "@/lib/prisma";
+import type { SuperadminContext } from "@/lib/desk-guard";
 import { rateCardDownloadUrl } from "@/lib/ratecard/store";
 import { publicationCompleteness } from "@/lib/ratecard/extract";
 import { withSafeEmails } from "@/components/safe-email";
+import {
+  loadRateCardsDocs,
+} from "@/lib/data/desk/titles";
 
 type Translator = Awaited<ReturnType<typeof getTranslations>>;
 
@@ -28,25 +31,18 @@ function ocrStatusLabel(t: Translator, status: string): string {
 // PendingQuotesPanel styling. Read-only for now (ingestion happens via
 // the lib / scripts); actions can be layered on later.
 export async function RateCardsPanel({
+  ctx,
   locale,
   titleId,
 }: {
+  ctx: SuperadminContext;
   locale: string;
   titleId: string;
 }) {
   const t = await getTranslations({ locale, namespace: "rateCards" });
 
   const [docs, completeness] = await Promise.all([
-    prisma.rateCardDocument.findMany({
-      where: { titleId },
-      orderBy: { receivedAt: "desc" },
-      include: {
-        quotes: {
-          include: { product: true },
-          orderBy: { recordedAt: "desc" },
-        },
-      },
-    }),
+    loadRateCardsDocs(ctx, { titleId }),
     publicationCompleteness(titleId),
   ]);
 

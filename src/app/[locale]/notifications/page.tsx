@@ -1,7 +1,7 @@
 import { getTranslations } from "next-intl/server";
+import { buyerScope } from "@/lib/data/buyer/guard";
 import { redirect } from "next/navigation";
 import { auth } from "@/auth";
-import { prisma } from "@/lib/prisma";
 import { safeExternalUrl } from "@/lib/security";
 import { EmptyState } from "@/app/empty-state";
 import { markAllRead } from "@/app/notification-actions";
@@ -11,6 +11,11 @@ import { safeLocale } from "@/i18n/routing";
 import { renderStoredNotice } from "@/lib/notice-template";
 import { Pager } from "@/components/pager";
 import { pageHref, pageWindow, parsePageParam } from "@/lib/pagination";
+import {
+  loadTotal,
+  loadUnread,
+  loadRows,
+} from "@/lib/data/buyer/notifications";
 
 const PAGE_SIZE = 50;
 
@@ -34,18 +39,14 @@ export default async function NotificationsPage({
 
   // Paged (newest first) instead of a hard cap at 100: older notices used to
   // be unreachable. Counts come from the database so they cover every page.
-  const where = { userId: session.user.id };
+  // The loaders key every query on the caller's own id.
+  const scope = buyerScope(session.user, null);
   const [total, unread] = await Promise.all([
-    prisma.notification.count({ where }),
-    prisma.notification.count({ where: { ...where, readAt: null } }),
+    loadTotal(scope),
+    loadUnread(scope),
   ]);
   const { page, pageCount, skip, take } = pageWindow(parsePageParam(sp.page), total, PAGE_SIZE);
-  const rows = await prisma.notification.findMany({
-    where,
-    orderBy: [{ createdAt: "desc" }, { id: "desc" }],
-    skip,
-    take,
-  });
+  const rows = await loadRows(scope, { skip, take });
 
   const viewerLocale = safeLocale(locale);
 

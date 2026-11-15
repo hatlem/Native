@@ -1,4 +1,5 @@
 import { PendingButton } from "@/components/submit-button";
+import type { BuyerScope } from "@/lib/data/buyer/guard";
 import { getTranslations } from "next-intl/server";
 import { Repeat } from "lucide-react";
 import { planPath } from "@/lib/plan-path";
@@ -8,7 +9,6 @@ import {
   createAndLinkWaveArticle,
   dissolveProgramme,
 } from "@/app/programme-actions";
-import { prisma } from "@/lib/prisma";
 import type { ProgrammeView, CadencePlan } from "@/lib/programme";
 import type { ScheduleOverlapWarning } from "@/lib/programme-warnings";
 import type { BookingUnit } from "@/lib/campaign-schedule";
@@ -16,6 +16,10 @@ import { intlLocale, formatMoney } from "@/lib/money";
 import type { TotalFigure } from "@/lib/plan-total";
 import { totalLabel } from "@/lib/pricing/total-label";
 import { ProgrammeForm } from "./ProgrammeForm";
+import {
+  loadProgrammeList,
+  loadProgrammeOtherArticles,
+} from "@/lib/data/buyer/plan";
 
 // Budget picture across the programme, computed by /plan's page from a lean
 // per-wave item query: indicative totals per wave (priced lines only — exact
@@ -36,6 +40,7 @@ export type ProgrammePacing = {
 //    article linkable/creatable/unlinkable in place.
 // Native <details> for the disclosure — same pattern as PlanTargeting.
 export async function PlanProgramme({
+  scope,
   locale,
   listId,
   view,
@@ -46,6 +51,7 @@ export async function PlanProgramme({
   warnings = [],
   readOnly = false,
 }: {
+  scope: BuyerScope;
   locale: string;
   listId: string;
   view: ProgrammeView | null;
@@ -101,17 +107,9 @@ export async function PlanProgramme({
   const otherArticles =
     current && !current.articleId && !readOnly
       ? await (async () => {
-          const list = await prisma.savedList.findUnique({
-            where: { id: listId },
-            select: { organizationId: true },
-          });
+          const list = await loadProgrammeList(scope, { listId });
           if (!list) return [];
-          return prisma.article.findMany({
-            where: { organizationId: list.organizationId },
-            orderBy: { updatedAt: "desc" },
-            take: 20,
-            select: { id: true, title: true },
-          });
+          return loadProgrammeOtherArticles(scope, { listOrganizationId: list.organizationId });
         })()
       : [];
 

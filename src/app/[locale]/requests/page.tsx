@@ -2,8 +2,7 @@ import { getTranslations } from "next-intl/server";
 import { Suspense } from "react";
 import { viewOrgIds, type Workspace } from "@/lib/workspace";
 import { redirect } from "next/navigation";
-import { prisma } from "@/lib/prisma";
-import { loadScope } from "@/lib/scope";
+import { loadScope, type Scope } from "@/lib/scope";
 import { loadUnsentLists } from "@/lib/lists";
 import { estimateListTotals, hasFigure, planLineCount } from "@/lib/plan-total";
 import { totalLabel as planTotalLabel } from "@/lib/pricing/total-label";
@@ -13,11 +12,14 @@ import { EmptyState } from "@/app/empty-state";
 import { formatMoney, intlLocale } from "@/lib/money";
 import { timeAgo } from "@/lib/time-ago";
 import { deriveStage, type CampaignStage } from "@/lib/campaign-stage";
-import { buyerVisibleQuoteWhere, effectiveQuoteStatus } from "@/lib/commerce/quote-validity";
+import { effectiveQuoteStatus } from "@/lib/commerce/quote-validity";
 import { monthsWindow, intersectsMonth, draftWindow, orderWindow, type RunWindow } from "@/lib/campaign-timeline";
 import { CampaignRow, type RowAction } from "./_components/CampaignRow";
 import { tabForRow, type RowTab } from "@/lib/request-tab";
 import { TimelineView, type TimelineEntry, type TimelineMonthGroup } from "./_components/TimelineView";
+import {
+  loadListRequests,
+} from "@/lib/data/buyer/requests";
 
 export const dynamic = "force-dynamic";
 
@@ -88,7 +90,7 @@ export default async function RequestsPage({
       </div>
 
       <Suspense fallback={<PipelineSkeleton label={t("pipelineTitle")} />}>
-        <RequestsPipeline locale={locale} sp={sp} ws={ws} canEdit={canEdit} />
+        <RequestsPipeline scope={scope} locale={locale} sp={sp} ws={ws} canEdit={canEdit} />
       </Suspense>
     </>
   );
@@ -119,11 +121,13 @@ function PipelineSkeleton({ label }: { label: string }) {
 // the timeline view). Same queries and scoping as before — only moved behind
 // the Suspense boundary above.
 async function RequestsPipeline({
+  scope,
   locale,
   sp,
   ws,
   canEdit,
 }: {
+  scope: Scope;
   locale: string;
   sp: Record<string, string | string[] | undefined>;
   ws: Workspace;
@@ -153,29 +157,7 @@ async function RequestsPipeline({
     // selectActiveList -> /plan, which only ever renders the active org's
     // lists, so a different client's draft here would resolve wrong.
     ws.activeOrgId ? loadUnsentLists(ws.activeOrgId) : Promise.resolve([]),
-    prisma.request.findMany({
-      where: { organizationId: { in: viewOrgIds(ws) } },
-      orderBy: { updatedAt: "desc" },
-      include: {
-        organization: { select: { name: true } },
-        plan: { select: { name: true, _count: { select: { items: true } } } },
-        sourceList: {
-          select: { waveNumber: true, programme: { select: { plannedWaves: true } } },
-        },
-        // Drafts are desk-internal: until the desk sends the quote the row
-        // stays at "sent to the desk" (see buyerVisibleQuoteWhere).
-        quotes: {
-          where: buyerVisibleQuoteWhere(),
-          orderBy: { createdAt: "desc" },
-          take: 1,
-          include: {
-            order: {
-              include: { invoices: { orderBy: { createdAt: "desc" }, take: 1, select: { status: true } } },
-            },
-          },
-        },
-      },
-    }),
+    loadListRequests(scope),
   ]);
 
   const rows: Row[] = [];

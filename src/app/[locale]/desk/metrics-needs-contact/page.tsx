@@ -1,8 +1,9 @@
-import { redirect } from "next/navigation";
 import { getTranslations } from "next-intl/server";
-import { auth } from "@/auth";
-import { prisma } from "@/lib/prisma";
+import { requireDeskContext } from "@/lib/desk-guard";
 import { Link } from "@/i18n/navigation";
+import {
+  loadRows,
+} from "@/lib/data/desk/metrics";
 
 export const dynamic = "force-dynamic";
 
@@ -12,23 +13,11 @@ export default async function MetricsNeedsContactPage({
   params: Promise<{ locale: string }>;
 }) {
   const { locale } = await params;
-  const session = await auth();
-  const role = session?.user?.role;
-  if (!session?.user || (role !== "DESK" && role !== "SUPERADMIN")) {
-    redirect(`/${locale}/signin`);
-  }
+  const ctx = await requireDeskContext(locale);
 
   const t = await getTranslations({ locale, namespace: "desk" });
 
-  const rows = await prisma.metricsRequest.findMany({
-    where: { status: "NEEDS_CONTACT" },
-    include: {
-      publisher: { select: { name: true } },
-      order: { select: { id: true } },
-      _count: { select: { bookings: true } },
-    },
-    orderBy: { createdAt: "desc" },
-  });
+  const rows = await loadRows(ctx);
 
   return (
     <>

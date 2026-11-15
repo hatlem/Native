@@ -1,6 +1,5 @@
 import { getTranslations } from "next-intl/server";
 import { redirect } from "next/navigation";
-import { prisma } from "@/lib/prisma";
 import { Link } from "@/i18n/navigation";
 import { formatMoney, intlLocale, formatMoneyExact } from "@/lib/money";
 import { loadScope } from "@/lib/scope";
@@ -10,6 +9,10 @@ import { EmptyState } from "@/app/empty-state";
 import { StatusBadge } from "@/app/status-badge";
 import { Pager } from "@/components/pager";
 import { pageHref, pageWindow, parsePageParam } from "@/lib/pagination";
+import {
+  loadListTotal,
+  loadListInvoices,
+} from "@/lib/data/buyer/invoices";
 
 const PAGE_SIZE = 50;
 
@@ -33,26 +36,9 @@ export default async function InvoicesPage({
   if (!scope.workspace) redirect(`/${locale}/signin`);
   const orgIds = scope.workspace.scopeOrgIds;
 
-  const where = { organizationId: { in: orgIds } };
-  const total = await prisma.invoice.count({ where });
+  const total = await loadListTotal(scope);
   const { page, pageCount, skip, take } = pageWindow(parsePageParam(sp.page), total, PAGE_SIZE);
-  const invoices = await prisma.invoice.findMany({
-    where,
-    // id as the final tiebreaker keeps page boundaries stable.
-    orderBy: [{ issuedAt: "desc" }, { createdAt: "desc" }, { id: "desc" }],
-    skip,
-    take,
-    select: {
-      id: true,
-      number: true,
-      status: true,
-      currency: true,
-      total: true,
-      issuedAt: true,
-      dueAt: true,
-      organization: { select: { name: true } },
-    },
-  });
+  const invoices = await loadListInvoices(scope, { skip, take });
   // Agencies bill several clients; name the customer only when it varies.
   const showCustomer = orgIds.length > 1;
   const seller = loadSellerDetails();

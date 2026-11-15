@@ -2,9 +2,14 @@ import { getTranslations } from "next-intl/server";
 import type { Prisma } from "@prisma/client";
 import { superadminPageGate } from "@/lib/desk-guard";
 import { SuperadminOnly } from "@/components/superadmin-only";
-import { prisma } from "@/lib/prisma";
 import { Link } from "@/i18n/navigation";
 import { intlLocale } from "@/lib/money";
+import {
+  loadTotal,
+  loadRows,
+  loadUsers,
+  loadOrgs,
+} from "@/lib/data/desk/audit";
 
 export const dynamic = "force-dynamic";
 
@@ -32,6 +37,7 @@ export default async function DeskAuditPage({
   const t = await getTranslations({ locale, namespace: "deskAudit" });
   const gate = await superadminPageGate(locale);
   if (!gate.allowed) return <SuperadminOnly locale={locale} area={t("title")} />;
+  const ctx = gate.ctx;
 
   const sp = await searchParams;
   const actor = str(sp, "actor");
@@ -48,13 +54,8 @@ export default async function DeskAuditPage({
   };
 
   const [total, rows] = await Promise.all([
-    prisma.auditLog.count({ where }),
-    prisma.auditLog.findMany({
-      where,
-      orderBy: [{ createdAt: "desc" }, { id: "desc" }],
-      skip: (page - 1) * PAGE_SIZE,
-      take: PAGE_SIZE,
-    }),
+    loadTotal(ctx, { where }),
+    loadRows(ctx, { where, page, PAGE_SIZE }),
   ]);
   const pageCount = Math.max(1, Math.ceil(total / PAGE_SIZE));
 
@@ -63,10 +64,10 @@ export default async function DeskAuditPage({
   const orgIds = [...new Set(rows.map((r) => r.organizationId).filter((id): id is string => !!id))];
   const [users, orgs] = await Promise.all([
     userIds.length
-      ? prisma.user.findMany({ where: { id: { in: userIds } }, select: { id: true, name: true, email: true } })
+      ? loadUsers(ctx, { userIds })
       : [],
     orgIds.length
-      ? prisma.organization.findMany({ where: { id: { in: orgIds } }, select: { id: true, name: true } })
+      ? loadOrgs(ctx, { orgIds })
       : [],
   ]);
   const userById = new Map(users.map((u) => [u.id, u.name || u.email]));

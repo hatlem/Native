@@ -1,9 +1,8 @@
-import { requireDesk } from "@/lib/desk-guard";
+import { requireDeskContext } from "@/lib/desk-guard";
 import { Fragment } from "react";
 import { getTranslations } from "next-intl/server";
 import { notFound } from "next/navigation";
 import { auth } from "@/auth";
-import { prisma } from "@/lib/prisma";
 import { Link } from "@/i18n/navigation";
 import { formatMoney, formatMoneyExact } from "@/lib/money";
 import { quoteVatFor } from "@/lib/vat-buyer";
@@ -34,7 +33,6 @@ import {
   quoteValidUntilInputValue,
 } from "@/lib/commerce/quote-validity";
 import { marketTimeZone } from "@/lib/markets";
-import { lineOrder } from "@/lib/commerce/line-order";
 import { invoiceLineLabel } from "@/lib/invoice-line-label";
 import {
   discardQuoteRevisionAction,
@@ -50,6 +48,14 @@ import {
 } from "@/app/quote-actions";
 import { loadExtraWorkRates } from "@/lib/content-fee";
 import { extraWorkHourlyRate } from "@/lib/pricing/extra-work";
+import {
+  loadRequest,
+  loadProducts,
+  loadPrimaryContacts,
+  loadTitles,
+  loadPlacementProducts,
+  loadRefProducts,
+} from "@/lib/data/desk/request-detail";
 
 export const dynamic = "force-dynamic";
 
@@ -63,7 +69,7 @@ export default async function DeskRequestPage({
   const { locale, requestId } = await params;
   // The desk layout guard alone is not an authorization boundary: the page
   // renders alongside it, so its RSC payload reached non-desk users.
-  await requireDesk(locale);
+  const ctx = await requireDeskContext(locale);
   const sp = await searchParams;
   const errorCode = typeof sp.error === "string" ? sp.error : "";
   // Quote-PDF outcome (quote-actions.ts generateQuotePdf). Storage is also
@@ -117,29 +123,7 @@ export default async function DeskRequestPage({
   const session = await auth();
   const isSuperadmin = canSeeCostVsSell(session?.user?.role);
 
-  const request = await prisma.request.findUnique({
-    where: { id: requestId },
-    include: {
-      organization: true,
-      plan: { include: { items: true } },
-      quotes: {
-        orderBy: { createdAt: "desc" },
-        include: {
-          lines: {
-            orderBy: lineOrder(),
-            include: {
-              priceSetBy: { select: { name: true, email: true } },
-            },
-          },
-          order: true,
-          documents: { orderBy: { version: "desc" } },
-          // Revision chain (lib/commerce/quote-revision.ts).
-          nextRevision: { select: { id: true, revision: true, status: true } },
-          previousQuote: { select: { id: true, revision: true } },
-        },
-      },
-    },
-  });
+  const request = await loadRequest(ctx, { requestId });
   if (!request) notFound();
   // The buyer's own words; targeting renders from the plan (BriefTargeting).
   const briefText = briefWithoutFoldedTargeting(request.briefSummary);
@@ -150,10 +134,7 @@ export default async function DeskRequestPage({
   const productIds = request.plan.items
     .map((i) => i.productId)
     .filter((id): id is string => !!id);
-  const products = await prisma.product.findMany({
-    where: { id: { in: productIds } },
-    include: { title: true },
-  });
+  const products = await loadProducts(ctx, { productIds });
   const byId = new Map(products.map((p) => [p.id, p]));
 
   // Primary sales contact per title, for the resolve/quote line cards below —
@@ -169,13 +150,7 @@ export default async function DeskRequestPage({
     ]),
   ];
   const primaryContacts = allTitleIds.length
-    ? await prisma.salesContactTitle.findMany({
-        where: { titleId: { in: allTitleIds }, isPrimary: true },
-        select: {
-          titleId: true,
-          salesContact: { select: { name: true, email: true, phone: true } },
-        },
-      })
+    ? await loadPrimaryContacts(ctx, { allTitleIds })
     : [];
   const contactByTitleId = new Map(primaryContacts.map((c) => [c.titleId, c.salesContact]));
 
@@ -183,10 +158,7 @@ export default async function DeskRequestPage({
     .map((i) => i.titleId)
     .filter((id): id is string => !!id);
   const titles = titleIds.length
-    ? await prisma.title.findMany({
-        where: { id: { in: titleIds } },
-        select: { id: true, name: true },
-      })
+    ? await loadTitles(ctx, { titleIds })
     : [];
   const titleById = new Map(titles.map((t) => [t.id, t]));
 
@@ -197,29 +169,7 @@ export default async function DeskRequestPage({
   const pricing =
     titleIds.length || request.quotes.length ? await loadPricingDefaults() : null;
   const placementProducts = titleIds.length
-    ? await prisma.product.findMany({
-        where: { titleId: { in: titleIds }, active: true, bookable: true },
-        select: {
-          id: true,
-          type: true,
-          titleId: true,
-          active: true,
-          confirmedAt: true,
-          pricingModel: true,
-          basePrice: true,
-          currency: true,
-          productionFee: true,
-          priceRules: { select: { marginPct: true, seasonalMultiplier: true, minVolume: true } },
-          title: {
-            select: {
-              pricesPublic: true,
-              productionFeeDefault: true,
-              market: { select: { code: true } },
-              publisher: { select: { pricesPublic: true } },
-            },
-          },
-        },
-      })
+    ? await loadPlacementProducts(ctx, { titleIds })
     : [];
   const placementsByTitle = new Map<string, { id: string; label: string }[]>();
   for (const p of placementProducts) {
@@ -258,28 +208,7 @@ export default async function DeskRequestPage({
   ];
   const referenceByProductId = new Map<string, string>();
   if (quoteLineProductIds.length && pricing) {
-    const refProducts = await prisma.product.findMany({
-      where: { id: { in: quoteLineProductIds } },
-      select: {
-        id: true,
-        type: true,
-        active: true,
-        confirmedAt: true,
-        pricingModel: true,
-        basePrice: true,
-        currency: true,
-        productionFee: true,
-        priceRules: {
-          select: { marginPct: true, seasonalMultiplier: true, minVolume: true },
-        },
-        title: {
-          select: {
-            productionFeeDefault: true,
-            market: { select: { code: true } },
-          },
-        },
-      },
-    });
+    const refProducts = await loadRefProducts(ctx, { quoteLineProductIds });
     for (const p of refProducts) {
       const deskTitle = {
         ...p.title,

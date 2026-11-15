@@ -1,9 +1,7 @@
-import { requireDesk } from "@/lib/desk-guard";
+import { requireDeskContext } from "@/lib/desk-guard";
 import { getTranslations } from "next-intl/server";
 import { intlLocale } from "@/lib/money";
 import { notFound } from "next/navigation";
-import { prisma } from "@/lib/prisma";
-import { lineOrder } from "@/lib/commerce/line-order";
 import { orderFeePlacements } from "@/lib/commerce/placements";
 import { marketTimeZone } from "@/lib/markets";
 import { Link } from "@/i18n/navigation";
@@ -19,6 +17,13 @@ import { ExtraWorkPanel } from "./extra-work-panel";
 import { loadExtraWorkRates } from "@/lib/content-fee";
 import { cancelBlockKey } from "@/lib/cancellation";
 import { deliveryGap, nextOrderStatus } from "@/lib/order-lifecycle";
+import {
+  loadDetailOrder,
+  loadDetailMetricsRequests,
+  loadDetailOrderFeedback,
+  loadDetailProducts,
+  loadDetailPlaybooks,
+} from "@/lib/data/desk/orders";
 
 // ?credit= codes from desk-billing-actions issueCreditNote → `order`
 // message keys. Unknown codes render nothing rather than raw text.
@@ -46,97 +51,24 @@ export default async function DeskOrderPage({
   const { locale, orderId } = await params;
   // The desk layout guard alone is not an authorization boundary: the page
   // renders alongside it, so its RSC payload reached non-desk users.
-  await requireDesk(locale);
+  const ctx = await requireDeskContext(locale);
   const sp = await searchParams;
   const cancelError = typeof sp.cancel === "string" ? sp.cancel : undefined;
   const t = await getTranslations({ locale, namespace: "order" });
 
-  const order = await prisma.order.findUnique({
-    where: { id: orderId },
-    include: {
-      organization: true,
-      // The buyer's request brief: the per-line brief falls back to it. The
-      // quote's lines tell which placement each content fee writes for, and
-      // its extra-work lines show beside the hours added since.
-      quote: {
-        include: {
-          request: { select: { briefSummary: true } },
-          lines: {
-            orderBy: lineOrder(),
-            select: {
-              id: true,
-              kind: true,
-              description: true,
-              productId: true,
-              position: true,
-              hours: true,
-              hourlyRate: true,
-              lineTotal: true,
-            },
-          },
-        },
-      },
-      invoices: true,
-      creditNotes: true,
-      extraWork: { orderBy: [{ createdAt: "asc" }, { id: "asc" }] },
-      lines: {
-        orderBy: lineOrder(),
-        include: {
-          brief: true,
-          articlePlacement: {
-            include: { article: { include: { versions: { orderBy: { version: "desc" } } } } },
-          },
-          trackedLinks: true,
-          booking: {
-            include: {
-              metrics: true,
-              publisher: { select: { name: true } },
-              title: { select: { name: true } },
-            },
-          },
-        },
-      },
-      writerPool: {
-        select: {
-          writerId: true,
-          writer: {
-            select: { user: { select: { name: true, email: true } } },
-          },
-        },
-      },
-    },
-  });
+  const order = await loadDetailOrder(ctx, { orderId });
   if (!order) notFound();
 
-  const metricsRequests = await prisma.metricsRequest.findMany({
-    where: { orderId: order.id },
-    select: {
-      id: true,
-      publisherId: true,
-      status: true,
-      recipientEmail: true,
-      sentCount: true,
-      token: true,
-    },
-  });
+  const metricsRequests = await loadDetailMetricsRequests(ctx, { orderId: order.id });
   const clicks = await clicksByOrderLine(order.lines.map((l) => l.id));
-  const orderFeedback = await prisma.orderFeedback.findUnique({
-    where: { orderId: order.id },
-    select: { score: true, comment: true },
-  });
+  const orderFeedback = await loadDetailOrderFeedback(ctx, { orderId: order.id });
   const extraWorkRates = await loadExtraWorkRates();
 
   const feePlacements = orderFeePlacements(order.lines, order.quote.lines);
-  const products = await prisma.product.findMany({
-    where: {
-      id: {
-        in: [...order.lines, ...feePlacements.values()]
-          .map((l) => l.productId)
-          .filter((id): id is string => !!id),
-      },
-    },
-    include: { title: true },
-  });
+  const lineProductIds = [...order.lines, ...feePlacements.values()]
+    .map((l) => l.productId)
+    .filter((id): id is string => !!id);
+  const products = await loadDetailProducts(ctx, { lineProductIds });
   const byId = new Map(products.map((p) => [p.id, p]));
   // The order's current invoice: an open one if any, else the latest
   // (a credited invoice stays visible with its credit note).
@@ -195,7 +127,7 @@ export default async function DeskOrderPage({
 
   // Phase-4 playbooks: load active playbooks once and match per placement
   // line so the writer sees the relevant guidance inline.
-  const playbooks = await prisma.playbook.findMany({ where: { active: true } });
+  const playbooks = await loadDetailPlaybooks(ctx);
   const matchablePlaybooks = playbooks.map((p) => ({
     ...p,
     productType: p.productType as string | null,
@@ -266,7 +198,7 @@ export default async function DeskOrderPage({
         timeZone={marketTimeZone(order.organization.marketCode)}
       />
 
-      <ProgrammePanel locale={locale} orderId={order.id} />
+      <ProgrammePanel ctx={ctx} locale={locale} orderId={order.id} />
 
       {["CONFIRMED", "IN_PRODUCTION", "SCHEDULED", "LIVE", "COMPLETED"].includes(order.status) ? (
         <WritersPanel

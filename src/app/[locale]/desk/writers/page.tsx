@@ -1,7 +1,5 @@
-import { redirect } from "next/navigation";
 import { getTranslations } from "next-intl/server";
-import { auth } from "@/auth";
-import { prisma } from "@/lib/prisma";
+import { requireDeskContext } from "@/lib/desk-guard";
 import { loadRoster } from "@/lib/writers/roster";
 import { writerClaimPath } from "@/lib/writers/invite";
 import { appUrl } from "@/lib/url";
@@ -10,6 +8,9 @@ import { SubmitButton } from "@/components";
 import { resendWriterInvite } from "@/app/writer-invite-actions";
 import { SafeEmail } from "@/components/safe-email";
 import { InviteWriterForm } from "./invite-writer-form";
+import {
+  loadPendingInvites,
+} from "@/lib/data/desk/writers";
 
 export const dynamic = "force-dynamic";
 
@@ -19,11 +20,7 @@ export default async function DeskWriters({
   params: Promise<{ locale: string }>;
 }) {
   const { locale } = await params;
-  const session = await auth();
-  const role = session?.user?.role;
-  if (!session?.user || (role !== "DESK" && role !== "SUPERADMIN")) {
-    redirect(`/${locale}/signin`);
-  }
+  const ctx = await requireDeskContext(locale);
 
   const t = await getTranslations({ locale, namespace: "deskWriters" });
   const tEnum = await getTranslations({ locale, namespace: "writerEnums" });
@@ -32,10 +29,7 @@ export default async function DeskWriters({
 
   const [roster, pendingInvites] = await Promise.all([
     loadRoster(),
-    prisma.writerInvite.findMany({
-      where: { claimedAt: null, expiresAt: { gt: new Date() } },
-      orderBy: { createdAt: "desc" },
-    }),
+    loadPendingInvites(ctx),
   ]);
 
   return (

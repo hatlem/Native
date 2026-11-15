@@ -1,7 +1,5 @@
-import { requireDesk } from "@/lib/desk-guard";
+import { requireDeskContext } from "@/lib/desk-guard";
 import { getTranslations } from "next-intl/server";
-import { prisma } from "@/lib/prisma";
-import { buyerVisibleQuoteWhere } from "@/lib/commerce/quote-validity";
 import { Link } from "@/i18n/navigation";
 import { formatMoney } from "@/lib/money";
 import { conversionPct } from "@/lib/reporting";
@@ -23,6 +21,13 @@ import {
   median,
   type BenchmarkRow,
 } from "@/lib/pricing-intelligence";
+import {
+  loadRequestCount,
+  loadQuotedRequestCount,
+  loadOrderCount,
+  loadDecidedQuotes,
+  loadBenchProducts,
+} from "@/lib/data/desk/reports";
 
 export const dynamic = "force-dynamic";
 
@@ -38,7 +43,7 @@ export default async function DeskReportsPage({
   const { locale } = await params;
   // The desk layout guard alone is not an authorization boundary: the page
   // renders alongside it, so its RSC payload reached non-desk users.
-  await requireDesk(locale);
+  const ctx = await requireDeskContext(locale);
   const t = await getTranslations({ locale, namespace: "reports" });
   const to = await getTranslations({ locale, namespace: "order" });
   const td = await getTranslations({ locale, namespace: "desk" });
@@ -56,14 +61,14 @@ export default async function DeskReportsPage({
   // whatever the order volume.
   const [requestCount, quotedRequestCount, orderCount, revenue, statusRows, categoryRows, invoiceTally] =
     await Promise.all([
-      prisma.request.count({ where: inWindow }),
+      loadRequestCount(ctx, { inWindow }),
       // Requests that reached the quote stage at least once — a relational
       // count (not `status: "QUOTED"`) so a request that later moved on to
       // CLOSED without ordering still counts as having passed through
       // "quoted" for the funnel below.
       // A DRAFT the desk hasn't sent doesn't count as quoted.
-      prisma.request.count({ where: { ...inWindow, quotes: { some: buyerVisibleQuoteWhere() } } }),
-      prisma.order.count({ where: inWindow }),
+      loadQuotedRequestCount(ctx, { inWindow }),
+      loadOrderCount(ctx, { inWindow }),
       // GMV and the margin / content-fee split per currency — the rules
       // (cancelled orders out, credit notes off, extra work in, unpriced
       // lines ignored) are pinned in lib/reporting.ts.
@@ -76,16 +81,7 @@ export default async function DeskReportsPage({
 
   // Pricing intelligence: benchmark + suggested margin per category, from
   // decided (won/lost) quote inventory lines.
-  const decidedQuotes = await prisma.quote.findMany({
-    where: { status: { in: [...DECIDED] }, ...inWindow },
-    select: {
-      status: true,
-      lines: {
-        where: { kind: "INVENTORY" },
-        select: { productId: true, marginPct: true, lineTotal: true },
-      },
-    },
-  });
+  const decidedQuotes = await loadDecidedQuotes(ctx, { DECIDED, inWindow });
   const benchProductIds = [
     ...new Set(
       decidedQuotes.flatMap((q) =>
@@ -94,10 +90,7 @@ export default async function DeskReportsPage({
     ),
   ];
   const benchProducts = benchProductIds.length
-    ? await prisma.product.findMany({
-        where: { id: { in: benchProductIds } },
-        select: { id: true, title: { select: { category: true } } },
-      })
+    ? await loadBenchProducts(ctx, { benchProductIds })
     : [];
   const catByProduct = new Map(
     benchProducts.map((p) => [p.id, p.title.category]),

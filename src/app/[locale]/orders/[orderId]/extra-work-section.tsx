@@ -1,7 +1,10 @@
 import { getTranslations } from "next-intl/server";
-import { prisma } from "@/lib/prisma";
+import type { BuyerScope } from "@/lib/data/buyer/guard";
 import { formatMoney } from "@/lib/money";
-import { lineOrder } from "@/lib/commerce/line-order";
+import {
+  loadExtraWorkQuoteLines,
+  loadExtraWorkEntries,
+} from "@/lib/data/buyer/orders";
 
 // The buyer's view of extra work on their order: hours agreed on the quote
 // and hours the desk added after acceptance (OrderExtraWork), each with its
@@ -9,27 +12,21 @@ import { lineOrder } from "@/lib/commerce/line-order";
 // its own rows so the order page only has to place it. Renders nothing when
 // there is none.
 export async function OrderExtraWorkSection({
+  scope,
   locale,
   orderId,
   quoteId,
   currency,
 }: {
+  scope: BuyerScope;
   locale: string;
   orderId: string;
   quoteId: string;
   currency: string;
 }) {
   const [quoteLines, entries] = await Promise.all([
-    prisma.quoteLine.findMany({
-      where: { quoteId, kind: "EXTRA_WORK" },
-      orderBy: lineOrder(),
-      select: { id: true, description: true, hours: true, hourlyRate: true, lineTotal: true },
-    }),
-    prisma.orderExtraWork.findMany({
-      where: { orderId },
-      orderBy: [{ createdAt: "asc" }, { id: "asc" }],
-      select: { id: true, description: true, hours: true, hourlyRate: true, lineTotal: true, invoiceId: true },
-    }),
+    loadExtraWorkQuoteLines(scope, { quoteId }),
+    loadExtraWorkEntries(scope, { orderId }),
   ]);
   if (quoteLines.length === 0 && entries.length === 0) return null;
 
