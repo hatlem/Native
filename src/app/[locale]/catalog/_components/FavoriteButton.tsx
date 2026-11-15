@@ -1,5 +1,7 @@
 "use client";
 
+
+import { PendingButton } from "@/components/submit-button";
 import { useState, useTransition, useRef, useEffect } from "react";
 import { useTranslations } from "next-intl";
 import { toggleFavorite } from "@/app/favorites-actions";
@@ -187,9 +189,9 @@ export function FavoriteButton({
                   maxLength={80}
                   required
                 />
-                <button type="submit" className="btn ghost small">
+                <PendingButton className="btn ghost small">
                   {t("createList")}
-                </button>
+                </PendingButton>
               </form>
             </>
           )}

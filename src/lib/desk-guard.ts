@@ -1,5 +1,6 @@
 import { redirect } from "next/navigation";
 import { auth } from "@/auth";
+import { enforceStaffMfa } from "@/lib/mfa/enforce";
 
 // Gate a desk-only server action: anyone without the DESK or SUPERADMIN
 // role is bounced to sign-in. Returns the acting user id for audit rows.
@@ -10,6 +11,8 @@ export async function requireDesk(locale: string): Promise<string> {
   if (!session?.user || (role !== "DESK" && role !== "SUPERADMIN")) {
     redirect(`/${locale}/signin`);
   }
+  // MFA_REQUIRED_FOR_STAFF=1: staff without two-factor are sent to enrol.
+  await enforceStaffMfa(session.user.id, role, locale);
   return session.user.id;
 }
 
@@ -30,5 +33,33 @@ export async function superadminPageGate(locale: string): Promise<SuperadminPage
   const session = await auth();
   if (!session?.user?.id) redirect(`/${locale}/signin`);
   if (session.user.role !== "SUPERADMIN") return { allowed: false };
+  await enforceStaffMfa(session.user.id, session.user.role, locale);
   return { allowed: true, userId: session.user.id };
+}
+
+// Gate a SUPERADMIN-only server action. Anyone else is bounced to
+// `redirectTo` (sign-in by default). Returns the acting user id for audit
+// rows. The one definition of this check — it used to be copy-pasted into
+// each actions file, which is how a guard goes missing.
+export async function requireSuperadmin(
+  locale: string,
+  redirectTo: string = `/${locale}/signin`,
+): Promise<string> {
+  const session = await auth();
+  if (!session?.user?.id || session.user.role !== "SUPERADMIN") {
+    redirect(redirectTo);
+  }
+  await enforceStaffMfa(session.user.id, session.user.role, locale);
+  return session.user.id;
+}
+
+// requireDesk for callers that need the whole session user (name, email).
+export async function requireDeskSession(locale: string) {
+  const session = await auth();
+  const role = session?.user?.role;
+  if (!session?.user || (role !== "DESK" && role !== "SUPERADMIN")) {
+    redirect(`/${locale}/signin`);
+  }
+  await enforceStaffMfa(session.user.id, role, locale);
+  return session.user;
 }

@@ -1,5 +1,7 @@
 "use client";
 
+
+import { PendingButton } from "@/components/submit-button";
 import { useActionState, useState } from "react";
 import { useTranslations } from "next-intl";
 import { Link } from "@/i18n/navigation";
@@ -69,7 +71,7 @@ function PubCard({
           <form action={saveTitleToList}>
             <input type="hidden" name="locale" value={locale} />
             <input type="hidden" name="titleId" value={pub.titleId} />
-            <button type="submit" className="btn ghost small">{addToPlanLabel}</button>
+            <PendingButton className="btn ghost small">{addToPlanLabel}</PendingButton>
           </form>
         ) : null}
         {removeMode === "list" && listId ? (
@@ -77,13 +79,13 @@ function PubCard({
             <input type="hidden" name="locale" value={locale} />
             <input type="hidden" name="listId" value={listId} />
             <input type="hidden" name="favoriteId" value={pub.favoriteId} />
-            <button type="submit" className="btn ghost small">{removeLabel}</button>
+            <PendingButton className="btn ghost small">{removeLabel}</PendingButton>
           </form>
         ) : removeMode === "heart" ? (
           <form action={toggleFavorite}>
             <input type="hidden" name="locale" value={locale} />
             <input type="hidden" name="titleId" value={pub.titleId} />
-            <button type="submit" className="btn ghost small">{removeLabel}</button>
+            <PendingButton className="btn ghost small">{removeLabel}</PendingButton>
           </form>
         ) : null}
       </div>
@@ -126,9 +128,9 @@ function CollectionControl({
               <input type="hidden" name="listId" value={c.id} />
               <input type="hidden" name="member" value="0" />
               <span>{c.name}</span>
-              <button type="submit" aria-label={t("removeFromCollection", { name: c.name })}>
+              <PendingButton aria-label={t("removeFromCollection", { name: c.name })}>
                 ×
-              </button>
+              </PendingButton>
             </form>
           ))}
         </div>
@@ -152,9 +154,9 @@ function CollectionControl({
               </option>
             ))}
           </select>
-          <button type="submit" className="btn ghost small" disabled={pending}>
+          <PendingButton className="btn ghost small" disabled={pending}>
             {t("addToCollectionSubmit")}
-          </button>
+          </PendingButton>
         </form>
       ) : (
         <p className="muted small">{t("inAllCollections")}</p>
@@ -201,7 +203,7 @@ function RenameForm({
       <input type="hidden" name="locale" value={locale} />
       <input type="hidden" name="listId" value={listId} />
       <input name="name" defaultValue={current} maxLength={80} required />
-      <button type="submit" className="btn ghost small">{label}</button>
+      <PendingButton className="btn ghost small">{label}</PendingButton>
     </form>
   );
 }
@@ -234,7 +236,7 @@ function DeleteListForm({
       <form action={deleteFavoriteList}>
         <input type="hidden" name="locale" value={locale} />
         <input type="hidden" name="listId" value={listId} />
-        <button type="submit" className="btn small danger">{confirmLabel}</button>
+        <PendingButton className="btn small danger">{confirmLabel}</PendingButton>
       </form>
       <button type="button" className="btn ghost small" onClick={() => setConfirming(false)}>
         {cancelLabel}
@@ -360,7 +362,7 @@ export function FavoritesView({
             maxLength={80}
             required
           />
-          <button type="submit" className="btn ghost small">{t("createCollection")}</button>
+          <PendingButton className="btn ghost small">{t("createCollection")}</PendingButton>
         </form>
         {lists.length === 0 ? (
           <p className="muted">{t("noCollections")}</p>
@@ -380,9 +382,9 @@ export function FavoritesView({
                       <input type="hidden" name="locale" value={locale} />
                       <input type="hidden" name="listId" value={l.id} />
                       <input type="hidden" name="shared" value={l.sharedWithOrg ? "0" : "1"} />
-                      <button type="submit" className="btn ghost small">
+                      <PendingButton className="btn ghost small">
                         {l.sharedWithOrg ? t("unshare") : t("share")}
-                      </button>
+                      </PendingButton>
                     </form>
                   ) : null}
                   <RenameForm locale={locale} listId={l.id} current={l.name} label={t("rename")} />

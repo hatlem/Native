@@ -1,3 +1,4 @@
+import { log } from "@/lib/log";
 // Request-time API-key authentication for /api/v1/*. Lives separate
 // from src/lib/api-key.ts (pure helpers) so DB access stays out of
 // anything the test suite would want to import.
@@ -71,7 +72,7 @@ export async function authenticateRequest(
   prisma.apiKey
     .update({ where: { id: key.id }, data: { lastUsedAt: new Date() } })
     .catch((err) => {
-      console.error("api_key.lastUsedAt_failed", { keyId: key.id, err });
+      log.error("api_key.lastUsedAt_failed", { keyId: key.id, err });
     });
 
   return {

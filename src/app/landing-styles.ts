@@ -61,16 +61,16 @@ body:has(.bn) .mega-panel {
 }
 body:has(.bn) .mega-item { color: #14110C !important; }
 body:has(.bn) .mega-item:hover { background: rgba(20,17,12,0.06) !important; }
-body:has(.bn) .mega-item-icon { color: #6B6452 !important; }
+body:has(.bn) .mega-item-icon { color: #5E5847 !important; }
 body:has(.bn) .mega-item-title { color: #14110C !important; }
-body:has(.bn) .mega-item-desc { color: #6B6452 !important; }
+body:has(.bn) .mega-item-desc { color: #5E5847 !important; }
 body:has(.bn) .mega-featured {
   background: rgba(20,17,12,0.04) !important;
   border-top: 1px solid rgba(20,17,12,0.12) !important;
 }
 body:has(.bn) .mega-featured-icon { color: #14110C !important; }
 body:has(.bn) .mega-featured-title { color: #14110C !important; }
-body:has(.bn) .mega-featured-desc { color: #6B6452 !important; }
+body:has(.bn) .mega-featured-desc { color: #5E5847 !important; }
 /* Header action buttons — Sign in (ghost) + Sign up (filled) */
 body:has(.bn) header.site-header .nav-actions .btn {
   border: 2px solid #14110C !important;
@@ -124,7 +124,7 @@ body:has(.bn) .drawer-link:hover { background: rgba(20,17,12,0.06) !important; }
   --paper-2: #E4DECB;
   --ink: #14110C;
   --ink-soft: #3A3528;
-  --ink-mute: #6B6452;
+  --ink-mute: #5E5847;
   --rule: #14110C;
   --hair: rgba(20,17,12,.18);
   --accent: #14110C;
@@ -133,7 +133,7 @@ body:has(.bn) .drawer-link:hover { background: rgba(20,17,12,0.06) !important; }
      ink on cream. */
   --heading: #14110C;
   --text: #14110C;
-  --muted: #6B6452;
+  --muted: #5E5847;
   --muted-strong: #3A3528;
   --bg: #EDE8DB;
   --surface: #EDE8DB;

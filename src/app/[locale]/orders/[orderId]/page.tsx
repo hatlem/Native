@@ -5,7 +5,7 @@ import { lineOrder } from "@/lib/commerce/line-order";
 import { orderFeePlacements, placementCount } from "@/lib/commerce/placements";
 import { Link } from "@/i18n/navigation";
 import { formatMoney, intlLocale } from "@/lib/money";
-import { loadScope, canActOnOrg, canEditOnOrg } from "@/lib/scope";
+import { loadScope, canActOnOrg, canCommitOnOrg, canEditOnOrg } from "@/lib/scope";
 import { ViewOnlyNote } from "@/components/view-only-note";
 import { safeExternalUrl } from "@/lib/security";
 import { StatusBadge } from "@/app/status-badge";
@@ -18,15 +18,23 @@ import { approveContentAsset, requestContentChanges } from "@/app/content-review
 import { presignDownloadOrNull } from "@/lib/storage/r2";
 import { resolveEffectiveAsset } from "@/lib/writers/placement";
 import { OrderExtraWorkSection } from "./extra-work-section";
+import {
+  OrderCancelRequestSection,
+  OrderCsatSection,
+  OrderSelfServiceNotice,
+} from "./self-service-section";
 
 export const dynamic = "force-dynamic";
 
 export default async function MyOrderPage({
   params,
+  searchParams,
 }: {
   params: Promise<{ locale: string; orderId: string }>;
+  searchParams: Promise<Record<string, string | string[] | undefined>>;
 }) {
   const { locale, orderId } = await params;
+  const sp = await searchParams;
   const t = await getTranslations({ locale, namespace: "orders" });
   const to = await getTranslations({ locale, namespace: "order" });
   const tp = await getTranslations({ locale, namespace: "production" });
@@ -40,6 +48,7 @@ export default async function MyOrderPage({
       // writes for (orderFeePlacements); the order's own lines are below.
       quote: { include: { lines: { select: { kind: true, description: true, productId: true, position: true } } } },
       invoices: { select: { id: true, status: true } },
+      feedback: { select: { score: true } },
       lines: {
         orderBy: lineOrder(),
         include: {
@@ -69,6 +78,7 @@ export default async function MyOrderPage({
   // A view-only (RESTRICTED) seat follows the order but can't copy it into a
   // new plan or approve / send back an article draft (the actions refuse it).
   const canEdit = canEditOnOrg(scope, order.organizationId);
+  const canCommit = canCommitOnOrg(scope, order.organizationId);
 
   const tperf = await getTranslations({ locale, namespace: "performance" });
   const tcr = await getTranslations({ locale, namespace: "campaignReport" });
@@ -198,6 +208,8 @@ export default async function MyOrderPage({
           ) : null}
         </aside>
       </header>
+
+      <OrderSelfServiceNotice locale={locale} notice={typeof sp.notice === "string" ? sp.notice : undefined} />
 
       <section className="section">
         <div className="section-head">
@@ -357,7 +369,7 @@ export default async function MyOrderPage({
                     {line.booking?.metrics?.impressions != null ? (
                       <>
                         <dt>{tperf("impressions")}</dt>
-                        <dd>{line.booking.metrics.impressions.toLocaleString()}</dd>
+                        <dd>{line.booking.metrics.impressions.toLocaleString(intlLocale(locale))}</dd>
                       </>
                     ) : (
                       <>
@@ -519,6 +531,9 @@ export default async function MyOrderPage({
           </p>
         </section>
       )}
+
+      <OrderCsatSection locale={locale} order={order} feedback={order.feedback} canEdit={canEdit} />
+      <OrderCancelRequestSection locale={locale} order={order} canCommit={canCommit} />
     </>
   );
 }

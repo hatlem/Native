@@ -1,4 +1,5 @@
 "use server";
+import { log } from "@/lib/log";
 
 import { emailAdapter } from "@/lib/notify";
 import { RateLimiter } from "@/lib/rate-limit";
@@ -73,7 +74,7 @@ export async function sendContactMessage(
   } catch (err) {
     // Say so: a form that swallows a failed send is how the mailto: version
     // lost messages silently.
-    console.error("contact.send_failed", { err });
+    log.error("contact.send_failed", { err });
     return { status: "error", error: "send_failed", values };
   }
 

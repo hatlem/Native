@@ -1,5 +1,7 @@
 "use client";
 
+
+import { PendingButton } from "@/components/submit-button";
 import { useActionState, type ReactNode } from "react";
 import { useLocale, useTranslations } from "next-intl";
 import { sendContactMessage, type ContactFormState } from "@/app/contact-actions";
@@ -124,9 +126,9 @@ export function ContactForm({ children }: { children?: ReactNode }) {
       </Field>
 
       <div className="actions">
-        <button type="submit" className="btn primary block" disabled={pending}>
+        <PendingButton className="btn primary block" disabled={pending}>
           {pending ? t("sending") : t("submit")}
-        </button>
+        </PendingButton>
       </div>
       {children}
     </form>

@@ -1,4 +1,63 @@
 {
+  "mfa": {
+    "stepTitle": "Two-factor verification",
+    "stepHeadline": "One more step.",
+    "stepLead": "Your account is protected with two-factor authentication. Enter the code from your authenticator app to finish signing in.",
+    "stepSubtitle": "Password accepted. Now enter your 6-digit code.",
+    "stepSubtitleMagic": "Email link accepted. Now enter your 6-digit code.",
+    "codeLabel": "Authentication code",
+    "codeHint": "Lost your phone? Enter one of your recovery codes instead.",
+    "verify": "Verify and sign in",
+    "verifying": "Verifying…",
+    "cancel": "Back to sign in",
+    "errorInvalid": "That code isn't right. Check your authenticator app and try again.",
+    "errorReplay": "That code has already been used. Wait for the next one and try again.",
+    "errorRate": "Too many attempts. Wait a few minutes and try again.",
+    "errorPassword": "That password isn't right.",
+    "sessionExpired": "Your sign-in timed out before the second step. Please sign in again.",
+    "pageTitle": "Two-factor authentication",
+    "eyebrow": "Security",
+    "lead": "Add a second step when you sign in: a code from an authenticator app on your phone, on top of your password or email link.",
+    "requiredBanner": "Your role requires two-factor authentication. Set it up to continue to the desk.",
+    "noticeDisabled": "Two-factor authentication is now off.",
+    "noticeRecoveryUsed": "You signed in with a recovery code. If you've lost your phone, turn two-factor off and set it up again on your new device.",
+    "codeOrRecoveryLabel": "Authentication or recovery code",
+    "passwordLabel": "Password",
+    "working": "Working…",
+    "recoveryTitle": "Save your recovery codes",
+    "recoveryLead": "Each code works once if you can't use your phone. Store them somewhere safe. They will not be shown again.",
+    "recoveryDone": "I've saved them",
+    "statusEyebrow": "Status",
+    "statusOn": "Two-factor authentication is on",
+    "statusOff": "Two-factor authentication is off",
+    "enabledSince": "Turned on {date}.",
+    "recoveryLeft": "Unused recovery codes: {count}",
+    "recoveryEyebrow": "Recovery",
+    "regenerateTitle": "New recovery codes",
+    "regenerateLead": "Enter a current code to generate a new set. The old codes stop working.",
+    "regenerate": "Generate new codes",
+    "disableEyebrow": "Turn off",
+    "disableTitle": "Turn off two-factor authentication",
+    "disableLead": "Confirm with your password or a current code. Your other devices will be signed out.",
+    "disableLeadStaff": "Confirm with your password or a current code. Your role requires two-factor, so you will be asked to set it up again before you can use the desk.",
+    "disableCodeHint": "Leave the password empty to confirm with a code instead.",
+    "disable": "Turn off two-factor",
+    "setupTitle": "Set up your authenticator app",
+    "step1": "Open your authenticator app (Google Authenticator, Microsoft Authenticator, 1Password, Authy) and add a new account.",
+    "step2": "Type in this setup key, or open the link on the phone that has the app.",
+    "step3": "Enter the 6-digit code the app shows to confirm.",
+    "setupKeyLabel": "Setup key",
+    "openInApp": "Open in authenticator app",
+    "confirm": "Turn on two-factor",
+    "cancelSetup": "Cancel setup",
+    "offBody": "With two-factor on, signing in takes your password or email link plus a 6-digit code from an app on your phone. A stolen password alone is no longer enough.",
+    "setupButton": "Set up authenticator app",
+    "backToAccount": "Back to account settings",
+    "accountSectionTitle": "Two-factor authentication",
+    "accountSectionBodyOn": "On. Signing in needs a code from your authenticator app.",
+    "accountSectionBodyOff": "Off. Add a code from an authenticator app as a second step when you sign in.",
+    "manage": "Manage two-factor"
+  },
   "common": {
     "appName": "NativeSpin",
     "feedback": {
@@ -14,6 +73,17 @@
       "sendFailed": "Couldn't send that. Try again?",
       "enterFeedback": "Write something first.",
       "close": "Close"
+    },
+    "a11y": {
+      "primaryNav": "Primary",
+      "menu": "Menu",
+      "mobileNav": "Mobile",
+      "breadcrumb": "Breadcrumb",
+      "language": "Language"
+    },
+    "confirm": {
+      "yes": "Yes, confirm",
+      "cancel": "Cancel"
     }
   },
   "nav": {
@@ -64,9 +134,15 @@
     "campaigns": "Campaigns",
     "rates": "Rates",
     "users": "Users",
+    "audit": "Audit log",
     "invoices": "Invoices",
     "orgSwitcherLabel": "Organisation",
-    "orgSwitchTo": "Switch to {org}"
+    "orgSwitchTo": "Switch to {org}",
+    "help": "Help",
+    "paletteOrders": "Orders",
+    "paletteRequests": "Requests",
+    "paletteTitles": "Titles",
+    "paletteSearching": "Searching…"
   },
   "orders": {
     "eyebrow": "Orders",
@@ -1047,9 +1123,31 @@
     "metaPlanAlternativesOnly": "No placements yet · {alternatives, plural, one {# alternative} other {# alternatives}} · edited {age}",
     "actionContinuePlan": "Continue planning",
     "qualifierAwaitingTeam": "waiting on someone with ordering rights",
-    "actionSeeQuote": "See quote"
+    "actionSeeQuote": "See quote",
+    "selfService": {
+      "heading": "Not going ahead?",
+      "lead": "You can decline a quote or withdraw the whole request here. Nothing is charged, and you can send a new request any time.",
+      "declineOpen": "Decline the {currency} quote",
+      "declineSubmit": "Decline quote",
+      "withdrawOpen": "Withdraw this request",
+      "withdrawSubmit": "Withdraw request",
+      "reasonLabel": "Why? (optional — it helps us do better)",
+      "pending": "Sending…",
+      "needsOrderingRights": "Declining a quote needs ordering rights in your organisation.",
+      "withdrawnBanner": "You withdrew this request on {date}.",
+      "noticeQuoteDeclined": "The quote is declined. We've told the desk.",
+      "noticeRequestWithdrawn": "The request is withdrawn. We've told the desk.",
+      "noticeUnavailable": "That's no longer possible — the request has changed since you opened this page.",
+      "noticeNotAllowed": "Your seat doesn't allow that. Ask an admin in your organisation.",
+      "deskDeclined": "Declined by the customer on {date}.",
+      "deskWithdrawn": "Withdrawn by the customer on {date}.",
+      "deskReason": "Reason: {reason}"
+    }
   },
   "desk": {
+    "vatWarnCountryUnknown": "This customer has no home country on file, so Norwegian VAT ({pct}%) was applied. If they are established outside Norway, set their market on the organisation and regenerate the quote before sending.",
+    "vatWarnVatIdMissing": "Reverse charge applies (no Norwegian VAT), but the customer has no VAT ID on file. Add it before sending — the invoice must state it.",
+    "vatReverseCharge": "Reverse charge — no Norwegian VAT",
     "eyebrow": "Internal desk",
     "title": "Desk console",
     "subtitle": "What needs your attention today — new briefs, quotes in motion and live orders.",
@@ -1184,7 +1282,23 @@
     "quoteLocked": "This quote has been sent, so its lines are locked. Revise it to change prices or notes.",
     "quoteNotRevisable": "This quote can’t be revised: it has been accepted, or it is closed.",
     "revisionPredecessorClosed": "Not sent: the quote this revision would replace is no longer open — the customer may just have accepted it. Discard the revision.",
-    "sendRevisionNote": "Sending replaces the earlier quote: the customer can no longer accept it, and gets one notification with the new total."
+    "sendRevisionNote": "Sending replaces the earlier quote: the customer can no longer accept it, and gets one notification with the new total.",
+    "requestsTitle": "All requests",
+    "requestsLead": "Every request in the queue. Filter by status or search by organisation.",
+    "requestsSearchLabel": "Search organisation or brief",
+    "requestsSearchButton": "Search",
+    "requestsStatusLabel": "Status",
+    "requestsStatusAll": "All statuses",
+    "requestsStatusOpen": "Open (needs the desk)",
+    "requestsEmpty": "No requests match this filter.",
+    "requestsCount": "{count, plural, one {# request} other {# requests}}",
+    "requestsColUpdated": "Updated",
+    "requestsColQuotes": "Quotes",
+    "requestsPrev": "Previous",
+    "requestsNext": "Next",
+    "requestsPageOf": "Page {page} of {pages}",
+    "requestsViewAll": "View all requests",
+    "requestsPaginationLabel": "Pagination"
   },
   "deskTitles": {
     "eyebrow": "Super-admin · titles",
@@ -1435,7 +1549,9 @@
     "checkSignupLead": "We've sent a link to the address you gave. Open it to confirm the address and sign in; it expires in 15 minutes. If that address already had an account, the email explains how to get back in.",
     "regEmailTypoQuestion": "Did you mean <b>{email}</b>?",
     "regEmailTypoUse": "Use {email}",
-    "regEmailTypoKeep": "If {domain} is right, press Create account again."
+    "regEmailTypoKeep": "If {domain} is right, press Create account again.",
+    "regOrgRequired": "Enter your company or organisation name.",
+    "regEmailRequired": "Enter your work email address."
   },
   "order": {
     "title": "Order",
@@ -1529,6 +1645,34 @@
       "SUPERADMIN": "NativeSpin (admin)",
       "PUBLISHER": "The publisher",
       "BUYER": "The buyer"
+    },
+    "cancelRequest": {
+      "heading": "Need to cancel?",
+      "lead": "Tell us why and the desk will check the publisher bookings and get back to you. Placements that are already booked or live can carry a cancellation cost — we'll confirm before anything is final.",
+      "open": "Request cancellation",
+      "reasonLabel": "Reason for cancelling",
+      "submit": "Send cancellation request",
+      "pending": "Sending…",
+      "requested": "Cancellation requested on {date}. The desk will get back to you — the order stays active until they confirm.",
+      "noticeRequested": "Your cancellation request is sent to the desk.",
+      "noticeReasonRequired": "Please give a reason so the desk can act on it.",
+      "noticeUnavailable": "This order can't be cancelled from here any more.",
+      "noticeNotAllowed": "Asking to cancel needs ordering rights in your organisation.",
+      "deskBanner": "The customer asked to cancel this order on {date}.",
+      "deskReason": "Reason: {reason}"
+    },
+    "csat": {
+      "heading": "How did this campaign go?",
+      "question": "How satisfied are you with NativeSpin on this order?",
+      "scale": "{score} of 5",
+      "low": "Not satisfied",
+      "high": "Very satisfied",
+      "commentLabel": "Anything we should know? (optional)",
+      "submit": "Send feedback",
+      "pending": "Sending…",
+      "thanks": "Thanks — you rated this order {score} of 5.",
+      "deskHeading": "Customer feedback",
+      "deskScore": "Satisfaction: {score} of 5"
     }
   },
   "production": {
@@ -1562,6 +1706,7 @@
     "vetoSharedWarning": "This article also runs on {count} other placement(s) — they will not be affected by this retraction."
   },
   "invoice": {
+    "vatNoteHeading": "VAT note",
     "title": "Invoice",
     "eyebrow": "Invoice",
     "status": "Status",
@@ -1838,7 +1983,14 @@
     "footerSolutions": "Solutions",
     "footerCompany": "Company",
     "footerAbout": "About",
-    "footerContact": "Contact"
+    "footerContact": "Contact",
+    "footerHelp": "Help",
+    "footerChangelog": "What's new",
+    "footerLegal": "Legal",
+    "footerPrivacy": "Privacy",
+    "footerTerms": "Terms",
+    "footerSecurity": "Security",
+    "footerSubprocessors": "Subprocessors"
   },
   "advertisers": {
     "eyebrow": "For advertisers",
@@ -2337,149 +2489,6 @@
     "contactTitle": "Legal contact",
     "contactBody": "Questions about these terms — write to"
   },
-  "landing": {
-    "hero": {
-      "labelText": "NativeSpin · Native marketplace",
-      "pain": "Most premium native isn't sold programmatically. It's sold by a phone call, a PDF rate-card, and a four-week back-and-forth. <strong>We replace that with one brief and a 24-hour firm quote.</strong>",
-      "h1Line1": "One brief.",
-      "h1Line2": "3,000+ titles.",
-      "h1Line3": "Firm quote in 24 hours.",
-      "ctaPrimary": "Send a brief",
-      "ctaSecondary": "How it works",
-      "ctaMeta": "No call required. We reply in writing, on the record.",
-      "sideAria": "Why native",
-      "sideBody": "Sponsored articles consistently out-perform display on attention and brand lift. Pay for what you publish, not for what's blocked."
-    },
-    "why": {
-      "labelText": "Why native",
-      "h2": "Native does the job display can't.",
-      "lead": "Display buys impressions in the gutter. Native buys editorial time inside the article itself. Different real-estate, different reader behaviour, different result.",
-      "colAIx": "I.",
-      "colAH3": "Attention you can't ad-block",
-      "colABody": "A sponsored article lives where the reader is already paying attention. <strong>No banner blindness, no skip button</strong> — the unit is the content.",
-      "colAPull": "<strong>3–5×</strong> dwell time vs comparable display",
-      "colBIx": "II.",
-      "colBH3": "Trust transferred from the title",
-      "colBBody": "When a reader sees your story under a title they trust, some of that trust transfers. <strong>Disclosure stays clear</strong> — credibility comes from the editorial frame.",
-      "colBPull": "<strong>+18pp</strong> brand consideration lift (industry avg.)",
-      "colCIx": "III.",
-      "colCH3": "Longevity past the campaign",
-      "colCBody": "A published article keeps earning impressions and search referrals after the campaign ends. <strong>Display disappears the moment you stop paying.</strong>",
-      "colCPull": "Lives on the publisher's domain. Indexed. Permanent."
-    },
-    "vs": {
-      "labelText": "Native vs display",
-      "h2": "Same budget. Very different outcome.",
-      "thNative": "Native (sponsored article)",
-      "thDisplay": "Display banner",
-      "primaryJobSpec": "Primary job",
-      "primaryJobNative": "Tell a story the reader chose to read",
-      "primaryJobDisplay": "Interrupt and redirect to your site",
-      "readerBehaviourSpec": "Reader behaviour",
-      "readerBehaviourNative": "Reads. Scrolls. Lingers.",
-      "readerBehaviourDisplay": "Scrolls past. Ad-blocks. Forgets.",
-      "realEstateSpec": "Real estate",
-      "realEstateNative": "Inside the editorial flow",
-      "realEstateDisplay": "Gutter, header, between paragraphs",
-      "trustTransferSpec": "Trust transfer",
-      "trustTransferNative": "Borrowed from the title",
-      "trustTransferDisplay": "None — readers know it's an ad",
-      "longevitySpec": "Longevity",
-      "longevityNative": "Indexed, searchable, permanent",
-      "longevityDisplay": "Disappears at campaign end",
-      "bestFitSpec": "Best fit",
-      "bestFitNative": "Considered purchase, B2B, brand build",
-      "bestFitDisplay": "Performance retargeting, simple offers"
-    },
-    "rule": {
-      "labelIx": "The golden rule",
-      "h2": "If it isn't useful to the reader, it isn't native — it's a press release in disguise.",
-      "body": "Every article we ship has to earn the reader's time on its own. <strong>Editorial standards, the publisher's spec, the market's disclosure label</strong> — non-negotiable. That's how the trust transfer actually works.",
-      "sig": "— The NativeSpin desk"
-    },
-    "pubs": {
-      "labelText": "Publishers",
-      "meta": "{publishers, number}+ publishers · {titles, number}+ titles catalogued · {active, number} verified for instant order",
-      "foot": "What you see here is a sliver of the catalog.",
-      "footMore": "Tell us what you're after"
-    },
-    "catalog": {
-      "labelText": "A taste of the catalog",
-      "h2": "Live titles, indicative pricing.",
-      "ask": "Ask for the full list",
-      "thTitle": "Title",
-      "thPublisher": "Category",
-      "thMarket": "Market",
-      "thFormat": "Format",
-      "thAudience": "Reach",
-      "thFrom": "From",
-      "fmtNativeArticle": "Native article",
-      "fmtSponsoredArticle": "Sponsored article",
-      "fmtSponsoredContent": "Sponsored content",
-      "fmtSponsoredArticleAds": "Article + amplification",
-      "readersSuffix": "readers/mo",
-      "footBody": "Indicative prices. The desk confirms firm pricing based on availability, season and volume.",
-      "footInd": "Indicative · ex. VAT"
-    },
-    "stats": {
-      "v240Label": "Titles catalogued",
-      "v240Sub": "NO · SE · DK · FI · DE · AT · CH · UK · IE",
-      "v12Label": "Publishers in network",
-      "v12Sub": "Daily papers, magazines, niche titles",
-      "v24Unit": "h",
-      "v24Label": "Firm quote",
-      "v24Sub": "Average desk turnaround",
-      "v3Label": "Markets covered",
-      "v3Sub": "NO, SE, DK, FI, DE, AT, CH, UK, IE"
-    },
-    "how": {
-      "labelText": "How it works",
-      "h2": "Three steps. Most of the work is on our side.",
-      "s1Num": "01",
-      "s1H3": "Send a brief",
-      "s1Body": "Target market, budget, audience, a sentence about the goal. That's enough for the desk to scope. No deck required.",
-      "s1Time": "5 minutes",
-      "s2Num": "02",
-      "s2H3": "Firm quote in 24h",
-      "s2Body": "We come back with a title shortlist, firm pricing per publisher, content production scope, and a go-live date. Written, not on a call.",
-      "s2Time": "Within one working day",
-      "s3Num": "03",
-      "s3H3": "We publish, you review",
-      "s3Body": "We write the article to the title's spec, run the spec-check, hand you the draft for approval, then the publisher publishes. You get the live URL and an invoice.",
-      "s3Time": "10–25 days, depending on title"
-    },
-    "obj": {
-      "h2": "What people ask before they brief us.",
-      "q1": "Why not just buy display? It's cheaper.",
-      "a1": "Per impression, yes. Per <strong>attention-second</strong>, native wins by a wide margin. If you're building consideration, the unit price isn't what matters.",
-      "q2": "Native feels slow. We need this in market next week.",
-      "a2": "Most titles publish within 10–25 days of brief. Some same-week. The 24-hour firm quote tells you exactly when, per title, before you commit.",
-      "q3": "We don't have the operational capacity for native.",
-      "a3": "<strong>That's the entire point of the desk.</strong> Brief in, finished article and live placement out. Our team handles publisher negotiation, content production, spec-checking, and invoicing.",
-      "q4": "How do we measure it?",
-      "a4": "We track click-throughs on every link inside your article — counted first-party. Reach (impressions) is reported by the publisher where available. We don't claim viewability or panel-based brand-lift we can't measure.",
-      "q5": "What about brand safety and disclosure?",
-      "a5": "Disclosure is encoded per market (<strong>Annonsørinnhold / Annons / Annonce</strong>) and applied automatically. Spec-check has to pass before anything reaches the publisher."
-    },
-    "endCta": {
-      "h2": "Send us a brief.",
-      "body": "One paragraph is enough. We come back in writing, with a firm quote, within 24 hours.",
-      "ctaPrimary": "Email the desk",
-      "ctaSecondary": "Create an account",
-      "qualPrefix": "Or you're a publisher and want to be listed —",
-      "qualLink": "talk to us"
-    },
-    "foot": {
-      "tagline": "Native content and native advertising across every title we cover in NO, SE, DK, FI, DE, AT, CH, UK and IE — and a growing catalog.",
-      "copy": "Getia AS · Oslo",
-      "navAdv": "For advertisers",
-      "navAgy": "For agencies",
-      "navPub": "For publishers",
-      "navAbout": "About",
-      "navContact": "Contact",
-      "navCreativeSpecs": "Creative specs"
-    }
-  },
   "apiDocs": {
     "metaTitle": "API",
     "eyebrow": "Developers",
@@ -2558,6 +2567,9 @@
     "scope_catalog_write": "upload the publisher's own titles and products",
     "scope_orders_write": "place firm orders for the organisation",
     "scope_pricing_admin": "internal pricing tools (MCP) — platform only",
+    "scope_pricing_read": "MCP: read desk pricing data only",
+    "scope_pricing_draft": "MCP: read + record drafts (contacts, quote drafts, unsent price requests)",
+    "scope_pricing_apply": "MCP: drafts + apply quotes to live prices and send email",
     "boundPublisher": "{name} (publisher)",
     "bindingPlatformGroup": "Platform",
     "bindingSearchPlaceholder": "Search organisations and publishers by name, market or title",
@@ -2663,7 +2675,11 @@
     "priceUnconfirmed": "price not confirmed",
     "productInactive": "inactive",
     "inviteLanguageLabel": "Email language",
-    "inviteLanguageHint": "The invitation, the claim page and the portal account use this language. Defaults to the title's market."
+    "inviteLanguageHint": "The invitation, the claim page and the portal account use this language. Defaults to the title's market.",
+    "aliasLabel": "Search aliases",
+    "aliasHint": "Comma-separated. Brand names and alternative names the catalog search should match. Search strips full stops, so also add a form without them (e.g. “ATno” for “AT.no”).",
+    "aliasSave": "Save aliases",
+    "aliasSaving": "Saving…"
   },
   "salesContacts": {
     "title": "Sales contacts",
@@ -2883,7 +2899,9 @@
     "callSkip": "Skip for now →",
     "marketBlocked": "{org} has no billing market yet. An administrator of {org} needs to set it under Account before the team can send requests.",
     "blockedTitle": "{org} isn't set up for billing yet",
-    "blockedBack": "Back to the plan"
+    "blockedBack": "Back to the plan",
+    "marketError": "Choose the market your company is invoiced in.",
+    "phoneError": "Enter a phone number with at least 6 digits."
   },
   "rateCard": {
     "pageTitle": "Rate card request",
@@ -3054,6 +3072,8 @@
     "deactivateHint": "Your account stops working immediately — every way of signing in is refused. Orders, quotes and invoices you signed are kept, because they're financial records. A super admin can switch the account back on if you return.",
     "deactivateConfirmLabel": "Type your email address to confirm",
     "deactivateButton": "Deactivate my account",
+    "eraseDataLabel": "Also erase my personal data",
+    "eraseDataHint": "Your name, email address, phone number, sign-in details and inbox are deleted and you leave your organisations. This cannot be undone, not even by a super admin. Orders, quotes and invoices stay, without your personal details.",
     "deactivating": "Deactivating…",
     "errDelegation": "That delegation end date isn't a valid date.",
     "errDelegationPast": "The delegation end date has to be in the future.",
@@ -3061,7 +3081,35 @@
     "statusRevoked": "Removed",
     "errEmailDomain": "We couldn't find a mail server for that domain. Check the address for typos.",
     "roleHelp": "Admins manage the team and can do everything. Members build plans, send requests and — with “Can commit” — accept quotes. Restricted is view-only: sees the team’s plans, requests, quotes, orders, reports, articles and invoices, but can’t change, send, accept or share anything.",
-    "canCommitRestrictedNote": "Restricted members are view-only and can’t commit."
+    "canCommitRestrictedNote": "Restricted members are view-only and can’t commit.",
+    "notifications": {
+      "eyebrow": "Notifications",
+      "title": "Email notifications",
+      "lead": "Choose which notices we also send by email. Everything always appears in your inbox in NativeSpin.",
+      "save": "Save preferences",
+      "saving": "Saving…",
+      "saved": "Your notification preferences are saved.",
+      "quotes": {
+        "label": "Requests and quotes",
+        "hint": "A quote is ready, accepted, declined or needs renewing."
+      },
+      "orders": {
+        "label": "Orders and bookings",
+        "hint": "An order is confirmed, completed or cancelled."
+      },
+      "content": {
+        "label": "Content and reviews",
+        "hint": "A draft is ready for your review, or a publisher sent one back."
+      },
+      "billing": {
+        "label": "Invoices",
+        "hint": "A new invoice has been issued."
+      },
+      "planning": {
+        "label": "Planning updates",
+        "hint": "The desk proposed a placement, a title got a price, or a client approved a shared plan."
+      }
+    }
   },
   "invite": {
     "title": "Join {org}",
@@ -3305,6 +3353,8 @@
     "resultsAlsoConsider": "Also worth considering",
     "resultsEmpty": "No matching titles yet — try a broader brief or a different market.",
     "whyFits": "Why this fits:",
+    "aiWritten": "AI",
+    "aiWrittenHint": "This explanation was written by AI from the title's catalog details. Check it against the title before you rely on it.",
     "reach": "reach/mo",
     "addToShortlist": "Add to shortlist",
     "titlePlaceholder": "Title · desk to price",
@@ -3422,6 +3472,7 @@
     }
   },
   "quotePdf": {
+    "customerVatId": "Customer VAT ID: {vatId}",
     "documentTitle": "Quote {quoteNumber}",
     "quoteNumber": "Quote number",
     "revision": "Revision",
@@ -3456,6 +3507,30 @@
     "extraWork": "Extra work / revision",
     "inclArticle": "Incl. article written by NativeSpin · from {amount}",
     "extraWorkDetail": "{hours} h × {rate}/h"
+  },
+  "deskAudit": {
+    "eyebrow": "Admin",
+    "title": "Audit log",
+    "lead": "Who did what, to which record, and when. Filter by person, action or organisation.",
+    "filterActor": "Actor",
+    "filterActorPlaceholder": "User id or \"system\"",
+    "filterAction": "Action",
+    "filterActionPlaceholder": "e.g. invoice.issue or auth.",
+    "filterOrg": "Organisation id",
+    "filterButton": "Filter",
+    "clear": "Clear",
+    "colWhen": "When",
+    "colActor": "Actor",
+    "colAction": "Action",
+    "colEntity": "Record",
+    "colOrg": "Organisation",
+    "colDetail": "Detail",
+    "resultCount": "{count, plural, =0 {No entries} =1 {1 entry} other {# entries}}",
+    "none": "No audit entries match these filters.",
+    "prev": "Previous",
+    "next": "Next",
+    "pageOf": "Page {page} of {pages}",
+    "retentionNote": "IP and email addresses are removed from entries older than 90 days."
   },
   "deskUsers": {
     "eyebrow": "Admin",
@@ -3522,7 +3597,8 @@
     "termsDaysValue": "{days, plural, one {net # day} other {net # days}}",
     "okTerms": "Payment terms saved.",
     "errTerms": "Enter whole days between 1 and 120.",
-    "errViewAsOrg": "That advertiser could not be found."
+    "errViewAsOrg": "That advertiser could not be found.",
+    "errViewAsReason": "Give a short reason for viewing as the customer."
   },
   "status": {
     "ACCEPTED": "Accepted",
@@ -3898,7 +3974,21 @@
       "bodyClient": "The client sent version {version} of “{article}” back for changes.",
       "bodyDesk": "The NativeSpin desk sent version {version} of “{article}” back for changes.",
       "comment": "Comment: “{comment}”"
-    }
+    },
+    "quoteDeclined": {
+      "title": "Quote declined: {plan}",
+      "body": "{org} has declined the quote."
+    },
+    "requestWithdrawn": {
+      "title": "Request withdrawn: {plan}",
+      "body": "{org} has withdrawn the request. No further work is needed on it."
+    },
+    "cancellationRequested": {
+      "title": "Cancellation requested: {plan}",
+      "body": "{org} has asked to cancel this order. Check the publisher bookings, then cancel the order or reply to the customer."
+    },
+    "selfServiceReason": "Reason given: {reason}",
+    "selfServiceNoReason": "No reason was given."
   },
   "publisherInviteEmail": {
     "subject": "Partnership invitation for {publisher} — NativeSpin",
@@ -3936,6 +4026,7 @@
     "deskOrders": "Orders",
     "deskTitles": "Titles",
     "deskUsers": "Users",
+    "deskAudit": "Audit log",
     "deskWriters": "Writers",
     "deskPriceQuotes": "Price quotes",
     "deskPublisherContacts": "Publisher contacts",
@@ -4045,7 +4136,99 @@
     "deskHeading": "View as customer",
     "deskLead": "Open the platform as an advertiser sees it, with their lists, requests and orders. No user is added to the customer's team. The view ends after 8 hours.",
     "deskOrgLabel": "Customer",
+    "deskReasonLabel": "Reason",
+    "deskReasonHint": "Why you are opening this customer's account (kept in the audit log), e.g. a support request.",
     "deskStart": "Open as customer",
     "deskStarting": "Opening…"
+  },
+  "subprocessors": {
+    "metaTitle": "Subprocessors",
+    "eyebrow": "Trust",
+    "title": "Subprocessors",
+    "lead": "The third parties that process personal data on our behalf when you use NativeSpin, and what each one does.",
+    "lastUpdated": "Last updated: {date}",
+    "colName": "Subprocessor",
+    "colPurpose": "Purpose",
+    "colData": "Data involved",
+    "colLocation": "Processing location",
+    "locationTbc": "To be confirmed",
+    "optional": "Only when enabled",
+    "railway": {
+      "purpose": "Application hosting and the database",
+      "data": "All account, order and content data"
+    },
+    "resend": {
+      "purpose": "Sending transactional and notification email",
+      "data": "Email address, name, message content"
+    },
+    "r2": {
+      "purpose": "File storage (uploaded documents, quote PDFs, article files)",
+      "data": "Files you or we upload"
+    },
+    "ai": {
+      "purpose": "AI-assisted matching of a campaign brief to titles, and the ad preview",
+      "data": "The brief text you enter",
+      "name": "AI gateway and model provider"
+    },
+    "gtm": {
+      "purpose": "Tag management for analytics, loaded only after consent",
+      "data": "Usage events, IP address, cookie identifiers"
+    },
+    "getcookies": {
+      "purpose": "Cookie consent banner and consent records",
+      "data": "Consent choice, IP address"
+    },
+    "fiken": {
+      "purpose": "Accounting: invoices are posted to our accounting system",
+      "data": "Organisation name, VAT ID, invoice lines"
+    },
+    "changesTitle": "Changes to this list",
+    "changesBody": "We update this page before a new subprocessor starts processing personal data. A data processing agreement (DPA) is available on request.",
+    "contact": "Questions:",
+    "linkLabel": "See our subprocessors"
+  },
+  "help": {
+    "metaTitle": "Help",
+    "eyebrow": "Support",
+    "title": "Help",
+    "lead": "Answers to the most common questions, and how to reach a person.",
+    "faqTitle": "Common questions",
+    "q1": "How do I get a price?",
+    "a1": "Add placements from the catalog to your plan and send it as a request. Catalog prices are indicative; the desk replies with a firm quote, normally within 24 working hours.",
+    "q2": "Can I decline a quote or withdraw a request?",
+    "a2": "Yes. Open the request and use “Not going ahead?” at the bottom. Nothing is charged until you accept a quote.",
+    "q3": "How do I cancel an order?",
+    "a3": "Open the order and choose “Request cancellation”. The desk checks the publisher bookings and confirms any cost before the cancellation is final.",
+    "q4": "Where are my invoices?",
+    "a4": "Under Invoices, where each one can be downloaded as a PDF.",
+    "q5": "How do I invite colleagues or change who can order?",
+    "a5": "An organisation admin manages members, roles and ordering rights under Account → Team.",
+    "q6": "How do I export my data or close my account?",
+    "a6": "Both are under Account → Data & account. You can also change which emails you receive there.",
+    "contactTitle": "Talk to the desk",
+    "contactBody": "Write to us and a person on the desk replies within one working day.",
+    "contactCta": "Contact us",
+    "changelogLink": "What's new",
+    "navLabel": "Help"
+  },
+  "changelog": {
+    "metaTitle": "What's new",
+    "eyebrow": "Changelog",
+    "title": "What's new in NativeSpin",
+    "lead": "Product changes that affect how you work, newest first.",
+    "entries": {
+      "selfService": {
+        "title": "Decline, withdraw and cancel on your own",
+        "body": "You can now decline a quote, withdraw a request and ask for an order to be cancelled directly from the request and order pages."
+      },
+      "notificationPrefs": {
+        "title": "Choose which emails you get",
+        "body": "Account settings now have email notification preferences per category. Your in-app inbox still shows everything."
+      },
+      "help": {
+        "title": "Help and feedback in one place",
+        "body": "A new Help page answers common questions, and after a campaign completes you can rate how it went."
+      }
+    }
   }
 }

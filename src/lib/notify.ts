@@ -1,3 +1,4 @@
+import { log } from "@/lib/log";
 // Notifications — writes one row per recipient into the in-DB inbox
 // (the source of truth read by /[locale]/notifications) and fans out to
 // an email adapter. The adapter is a console logger by default;
@@ -23,6 +24,7 @@ import { asNoticeLocale } from "@/lib/notices/messages";
 import { noticeEmail } from "@/lib/notices/email";
 import { prisma } from "@/lib/prisma";
 import { activeMembershipWhere } from "@/lib/membership";
+import { emailEnabledFor } from "@/lib/notification-prefs";
 
 export type EmailMessage = {
   to: string;
@@ -64,9 +66,14 @@ export type NotifyInput = {
   template: NoticeTemplate;
 };
 
-type Recipient = { id: string; email: string | null; locale: string | null };
+type Recipient = {
+  id: string;
+  email: string | null;
+  locale: string | null;
+  emailMutedCategories?: string[];
+};
 
-const RECIPIENT_SELECT = { id: true, email: true, locale: true } as const;
+const RECIPIENT_SELECT = { id: true, email: true, locale: true, emailMutedCategories: true } as const;
 
 /** The language a notice to this user is written in. */
 export function recipientLocale(userLocale: string | null | undefined, fallback: BuyerLocale): BuyerLocale {
@@ -107,11 +114,13 @@ async function deliver(
           messageParams: input.template.params as Prisma.InputJsonValue,
         },
       });
-      if (r.email && opts.email !== false) {
+      // The inbox row above is always written; a muted category (account →
+      // notifications) only stops the email copy.
+      if (r.email && opts.email !== false && emailEnabledFor(input.kind, r.emailMutedCategories)) {
         try {
           await emailAdapter(noticeEmail(r.email, n, locale));
         } catch (err) {
-          console.error("notify.email_failed", { userId: r.id, err });
+          log.error("notify.email_failed", { userId: r.id, err });
         }
       }
     }),

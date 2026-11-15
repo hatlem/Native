@@ -1,7 +1,8 @@
 "use server";
+import { requireSuperadmin } from "@/lib/desk-guard";
+import { log } from "@/lib/log";
 
 import { redirect } from "next/navigation";
-import { auth } from "@/auth";
 import {
   approveCandidate,
   rejectCandidate,
@@ -13,13 +14,6 @@ import {
   sendRateCardStep,
 } from "@/lib/outreach/campaign";
 
-async function requireSuperadmin(locale: string): Promise<string> {
-  const session = await auth();
-  if (!session?.user?.id || session.user.role !== "SUPERADMIN") {
-    redirect(`/${locale}/desk/titles`);
-  }
-  return session.user.id;
-}
 
 function f(formData: FormData, key: string): string {
   const v = formData.get(key);
@@ -28,7 +22,7 @@ function f(formData: FormData, key: string): string {
 
 export async function approveCandidateAction(formData: FormData) {
   const locale = f(formData, "locale") || "en";
-  const userId = await requireSuperadmin(locale);
+  const userId = await requireSuperadmin(locale, `/${locale}/desk/titles`);
   const candidateId = f(formData, "candidateId");
   if (!candidateId) redirect(`/${locale}/desk/publisher-contacts?err=missing-id`);
 
@@ -55,7 +49,7 @@ export async function approveCandidateAction(formData: FormData) {
 
 export async function rejectCandidateAction(formData: FormData) {
   const locale = f(formData, "locale") || "en";
-  const userId = await requireSuperadmin(locale);
+  const userId = await requireSuperadmin(locale, `/${locale}/desk/titles`);
   const candidateId = f(formData, "candidateId");
   await rejectCandidate({
     candidateId,
@@ -67,7 +61,7 @@ export async function rejectCandidateAction(formData: FormData) {
 
 export async function bulkApproveAction(formData: FormData) {
   const locale = f(formData, "locale") || "en";
-  const userId = await requireSuperadmin(locale);
+  const userId = await requireSuperadmin(locale, `/${locale}/desk/titles`);
   const min = parseInt(f(formData, "minConfidence") || "80", 10);
   const result = await bulkApproveAboveConfidence({
     minConfidence: min,
@@ -80,7 +74,7 @@ export async function bulkApproveAction(formData: FormData) {
 
 export async function buildCampaignAction(formData: FormData) {
   const locale = f(formData, "locale") || "en";
-  const userId = await requireSuperadmin(locale);
+  const userId = await requireSuperadmin(locale, `/${locale}/desk/titles`);
   const result = await buildRateCardCampaign({ createdById: userId });
   redirect(
     `/${locale}/desk/publisher-contacts?tab=campaign&ok=built&created=${result.requests_created}&skipped=${result.requests_skipped}`,
@@ -89,7 +83,7 @@ export async function buildCampaignAction(formData: FormData) {
 
 export async function sendBatchAction(formData: FormData) {
   const locale = f(formData, "locale") || "en";
-  const userId = await requireSuperadmin(locale);
+  const userId = await requireSuperadmin(locale, `/${locale}/desk/titles`);
   const limit = parseInt(f(formData, "limit") || "20", 10);
   const batch = await selectBatchForSend({ limit });
   let sent = 0;
@@ -100,7 +94,7 @@ export async function sendBatchAction(formData: FormData) {
     try {
       result = await sendRateCardStep({ requestId: r.id, actorId: userId });
     } catch (err) {
-      console.error("outreach.send_failed", { requestId: r.id, err });
+      log.error("outreach.send_failed", { requestId: r.id, err });
       failed++;
       firstError ||= errorDetail(err);
       continue;
@@ -120,13 +114,13 @@ function errorDetail(err: unknown): string {
 
 export async function sendOneAction(formData: FormData) {
   const locale = f(formData, "locale") || "en";
-  const userId = await requireSuperadmin(locale);
+  const userId = await requireSuperadmin(locale, `/${locale}/desk/titles`);
   const requestId = f(formData, "requestId");
   let failure = "";
   try {
     await sendRateCardStep({ requestId, actorId: userId });
   } catch (err) {
-    console.error("outreach.send_failed", { requestId, err });
+    log.error("outreach.send_failed", { requestId, err });
     failure = errorDetail(err);
   }
   if (failure) redirect(`/${locale}/desk/publisher-contacts?tab=campaign&err=${encodeURIComponent(failure)}`);

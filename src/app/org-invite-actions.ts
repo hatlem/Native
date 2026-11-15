@@ -1,17 +1,20 @@
 "use server";
+import { inviteTokenCandidates, storedInviteToken } from "@/lib/tokens";
+import { hashPassword } from "@/lib/password";
+import { log } from "@/lib/log";
 
 import { AuthError } from "next-auth";
 import { redirect } from "next/navigation";
-import bcrypt from "bcryptjs";
 import { signIn } from "@/auth";
 import { prisma } from "@/lib/prisma";
+import { isUniqueViolation } from "@/lib/prisma-errors";
 import { auth } from "@/auth";
 import { recordAudit } from "@/lib/audit";
 import { emailAdapter } from "@/lib/notify";
 import { loadScope } from "@/lib/scope";
 import { authLimiter } from "@/lib/rate-limit";
 import { clientIp } from "@/lib/client-ip";
-import { resolveOrgMembership, wouldRemoveLastAdmin, commitGrantFor, type MembershipRole } from "@/lib/membership";
+import { resolveOrgMembership, commitGrantFor, type MembershipRole } from "@/lib/membership";
 import {
   newInviteToken,
   expiryFromNow,
@@ -23,7 +26,7 @@ import {
   validateClaimForm,
 } from "@/lib/org-invite";
 import { passwordlessSignIn } from "@/lib/passwordless-signin";
-import { createAccountFromInvite, grantSeatFromInvite, hasActiveSeat, revokeSeat } from "@/lib/org-seats";
+import { changeSeat, createAccountFromInvite, grantSeatFromInvite, hasActiveSeat, revokeSeat } from "@/lib/org-seats";
 import { switchActiveOrg } from "@/lib/active-org";
 import { inviteLandingPath } from "@/lib/invite-landing";
 
@@ -90,7 +93,8 @@ export async function inviteToOrg(formData: FormData) {
         role,
         canCommit,
         delegationExpiresAt,
-        token,
+        // Only the hash is stored; the raw token goes out in the email.
+        token: storedInviteToken(token),
         expiresAt: expiryFromNow(),
         createdById: session.user.id,
       },
@@ -118,7 +122,7 @@ export async function inviteToOrg(formData: FormData) {
     await emailAdapter({ to: email, subject: built.subject, text: built.text });
   } catch (err) {
     emailed = false;
-    console.error("org_invite.email_failed", { orgId, email, err });
+    log.error("org_invite.email_failed", { orgId, err });
   }
 
   await recordAudit(session.user.id, "org.invite_sent", `Organization:${orgId}`, {
@@ -139,20 +143,6 @@ async function requireActiveAdmin(locale: Locale) {
     redirect(`/${locale}/account?error=forbidden#team`);
   }
   return { session, orgId: ws.activeOrgId };
-}
-
-async function loadOrgMembershipsForGuard(orgId: string) {
-  return prisma.membership.findMany({
-    where: { organizationId: orgId },
-    select: {
-      userId: true,
-      organizationId: true,
-      role: true,
-      canCommit: true,
-      expiresAt: true,
-      status: true,
-    },
-  });
 }
 
 // ─── New management actions ───────────────────────────────────────────────────
@@ -182,20 +172,10 @@ export async function updateMembership(formData: FormData) {
     redirect(`/${locale}/account?error=role#team`);
   }
 
-  // Demoting the last admin away from ADMIN is forbidden.
-  if (role !== "ADMIN") {
-    const rows = await loadOrgMembershipsForGuard(orgId);
-    if (wouldRemoveLastAdmin(rows, targetUserId, new Date())) {
-      redirect(`/${locale}/account?error=last_admin#team`);
-    }
-  }
-  // Admins are always permanent: clear any expiry when promoting to ADMIN
-  // so the membership can never silently expire and leave the org with
-  // zero active admins.
-  await prisma.membership.updateMany({
-    where: { organizationId: orgId, userId: targetUserId },
-    data: role === "ADMIN" ? { role, canCommit, expiresAt: null } : { role, canCommit },
-  });
+  // Demoting the last admin away from ADMIN is forbidden — checked and
+  // written in one locked transaction (see changeSeat).
+  const changed = await changeSeat(orgId, targetUserId, role, canCommit);
+  if (!changed.ok) redirect(`/${locale}/account?error=last_admin#team`);
   await recordAudit(session.user!.id, "org.membership_updated", `Organization:${orgId}`, {
     targetUserId,
     role,
@@ -245,8 +225,8 @@ export async function claimOrgInvite(formData: FormData) {
     redirect(`/${locale}/invite/${token}?error=rate`);
   }
 
-  const invite = await prisma.orgInvite.findUnique({
-    where: { token },
+  const invite = await prisma.orgInvite.findFirst({
+    where: { token: { in: inviteTokenCandidates(token) } },
     select: {
       id: true,
       organizationId: true,
@@ -295,14 +275,20 @@ export async function claimOrgInvite(formData: FormData) {
   if (!form.ok) {
     redirect(`/${locale}/invite/${token}?error=form`);
   }
-  const passwordHash = form.passwordless ? null : await bcrypt.hash(password, 10);
+  const passwordHash = form.passwordless ? null : await hashPassword(password);
 
   let createdUserId: string | null = null;
   try {
     createdUserId = await createAccountFromInvite(inv, { name: name || null, passwordHash, locale });
-  } catch {
+  } catch (err) {
     // Unique-email violation: the address already has an account.
     // Send them to sign-in — their existing session pairs them to the org.
+    // Anything else (database down, transaction timeout) is a real failure
+    // and must not be disguised as "you already have an account".
+    if (!isUniqueViolation(err)) {
+      log.error("org_invite.claim_failed", { inviteId: inv.id, err });
+      throw err;
+    }
     redirect(`/${locale}/signin`);
   }
 

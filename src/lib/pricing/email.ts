@@ -1,5 +1,6 @@
 import type { MarketCode } from "@prisma/client";
 import { emailAdapter } from "@/lib/notify";
+import { optOutLine } from "@/lib/outreach/email";
 
 type Locale = "en" | "no" | "sv" | "da" | "fi" | "de";
 
@@ -34,6 +35,8 @@ type EmailArgs = {
   link: string;
   inviterName: string;
   ttlDays?: number;
+  // Where the contact opts out of further requests; appended as a footer.
+  unsubscribeLink?: string;
 };
 
 type Built = { subject: string; text: string };
@@ -165,6 +168,12 @@ function de(a: EmailArgs): Built {
 }
 
 export function buildPriceRequestEmail(args: EmailArgs): Built {
+  const built = buildBody(args);
+  if (!args.unsubscribeLink) return built;
+  return { ...built, text: `${built.text}\n\n${optOutLine(args.locale, args.unsubscribeLink)}` };
+}
+
+function buildBody(args: EmailArgs): Built {
   switch (args.locale) {
     case "no":
       return no(args);
@@ -191,5 +200,13 @@ export async function sendPriceRequestEmail(
     ...(args.replyTo ? { replyTo: args.replyTo } : {}),
     subject: built.subject,
     text: built.text,
+    ...(args.unsubscribeLink
+      ? {
+          headers: {
+            "List-Unsubscribe": `<${args.unsubscribeLink}>`,
+            "List-Unsubscribe-Post": "List-Unsubscribe=One-Click",
+          },
+        }
+      : {}),
   });
 }

@@ -21,6 +21,7 @@ import { placementCount } from "@/lib/commerce/placements";
 import { reconcileExpiredQuotesInBackground } from "@/lib/commerce/quote-expiry";
 import { OrderSection } from "./_components/OrderSection";
 import { AcceptRefusedBanner } from "./_components/AcceptRefusedBanner";
+import { BackOutNotice, BackOutSection } from "./_components/BackOutSection";
 import { marketTimeZone } from "@/lib/markets";
 
 export const dynamic = "force-dynamic";
@@ -173,6 +174,17 @@ export default async function RequestPage({
       <Breadcrumb href="/requests">{t("listTitle")}</Breadcrumb>
 
       <DataLayerEvent event="rfq_submitted" id={request.id} />
+      {quotes
+        .filter((q) => q.status === "ACCEPTED")
+        .map((q) => (
+          <DataLayerEvent
+            key={`qa-${q.id}`}
+            event="quote_accepted"
+            id={q.id}
+            value={Number(q.total)}
+            currency={q.currency}
+          />
+        ))}
       {orders.map((o) => {
         const q = quotes.find((x) => x.order?.id === o.id)!;
         return (
@@ -216,6 +228,7 @@ export default async function RequestPage({
       />
 
       <AcceptRefusedBanner locale={locale} sp={sp} />
+      <BackOutNotice locale={locale} notice={typeof sp.notice === "string" ? sp.notice : undefined} />
 
       <PlanItemsSection
         locale={locale}
@@ -258,6 +271,21 @@ export default async function RequestPage({
           }))}
         />
       )}
+
+      <BackOutSection
+        locale={locale}
+        requestId={request.id}
+        requestStatus={request.status}
+        withdrawnAt={request.withdrawnAt}
+        quotes={quotes.map((q) => ({
+          id: q.id,
+          status: q.status,
+          currency: q.currency,
+          order: q.order ? { id: q.order.id } : null,
+        }))}
+        canAccept={canAccept}
+        canEdit={canEdit}
+      />
 
       {orders.length > 0 ? (
         <OrderSection

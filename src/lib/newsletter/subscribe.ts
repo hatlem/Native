@@ -1,4 +1,5 @@
 "use server";
+import { log } from "@/lib/log";
 
 import { headers } from "next/headers";
 import { prisma } from "@/lib/prisma";
@@ -91,12 +92,16 @@ export async function subscribeNewsletter(
           to: parsed.email,
           from: NEWSLETTER_FROM,
           ...msg,
-          headers: { "List-Unsubscribe": `<${unsubUrl}>` },
+          headers: {
+            "List-Unsubscribe": `<${unsubUrl}>`,
+            // RFC 8058 one-click: mailbox providers POST to the same URL.
+            "List-Unsubscribe-Post": "List-Unsubscribe=One-Click",
+          },
         });
       } catch (err) {
         // Row persists as PENDING; user still sees success and can re-submit
         // later to re-trigger the confirm send.
-        console.error("newsletter.confirm_send_failed", err);
+        log.error("newsletter.confirm_send_failed", { err: err });
       }
     }
   }

@@ -21,6 +21,7 @@ export async function signInitiateAction(
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ provider, signerEmail, returnUrl }),
+        signal: AbortSignal.timeout(15_000),
       }
     );
     const data = (await res.json()) as { signingUrl?: string; error?: string };

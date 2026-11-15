@@ -34,6 +34,7 @@ function isActive(pathname: string, href: string): boolean {
 export function PublicHeader({ brand, authActions }: Props) {
   const t = useTranslations("publicNav");
   const tNav = useTranslations("nav");
+  const ta11y = useTranslations("common.a11y");
   const pathname = usePathname();
   const [openMega, setOpenMega] = useState<string | null>(null);
   const [drawerOpen, setDrawerOpen] = useState(false);
@@ -107,7 +108,7 @@ export function PublicHeader({ brand, authActions }: Props) {
           <nav
             ref={navRef}
             className="nav-mega"
-            aria-label="Primary"
+            aria-label={ta11y("primaryNav")}
           >
             {PUBLIC_NAV_ITEMS.map((item) => {
               if (item.kind === "link") {
@@ -170,7 +171,7 @@ export function PublicHeader({ brand, authActions }: Props) {
         aria-hidden={!drawerOpen}
       >
         <div className="scrim" onClick={closeDrawer} />
-        <aside className="sheet" aria-label="Menu">
+        <aside className="sheet" aria-label={ta11y("menu")}>
           <div className="head">
             {drawerSection ? (
               <button
@@ -203,7 +204,7 @@ export function PublicHeader({ brand, authActions }: Props) {
               onClose={closeDrawer}
             />
           ) : (
-            <nav aria-label="Mobile" className="drawer-top">
+            <nav aria-label={ta11y("mobileNav")} className="drawer-top">
               {PUBLIC_NAV_ITEMS.map((item) => {
                 if (item.kind === "link") {
                   return (

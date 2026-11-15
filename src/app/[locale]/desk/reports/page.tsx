@@ -4,13 +4,7 @@ import { prisma } from "@/lib/prisma";
 import { buyerVisibleQuoteWhere } from "@/lib/commerce/quote-validity";
 import { Link } from "@/i18n/navigation";
 import { formatMoney } from "@/lib/money";
-import {
-  tally,
-  sumByGroup,
-  averageOrderValue,
-  conversionPct,
-  revenueSplit,
-} from "@/lib/reporting";
+import { tally, sumByGroup, conversionPct, deskRevenueByCurrency } from "@/lib/reporting";
 import {
   benchmarkBy,
   suggestMargin,
@@ -37,7 +31,7 @@ export default async function DeskReportsPage({
   const tStatus = await getTranslations({ locale, namespace: "status" });
   const statusLabel = (key: string) => (tStatus.has(key) ? tStatus(key) : key);
 
-  const [requestCount, quotedRequestCount, orders, orderLines, markets, invoices] =
+  const [requestCount, quotedRequestCount, orders, orderLines, invoices] =
     await Promise.all([
       prisma.request.count(),
       // Requests that reached the quote stage at least once — a relational
@@ -53,21 +47,28 @@ export default async function DeskReportsPage({
             select: {
               currency: true,
               total: true,
-              subtotal: true,
+              vatPct: true,
               lines: {
                 select: {
                   kind: true,
                   unitCost: true,
                   quantity: true,
                   lineTotal: true,
+                  priceOnRequest: true,
                 },
               },
             },
           },
+          // Billed on top of the accepted quote, and refunded against it.
+          extraWork: { select: { lineTotal: true } },
+          creditNotes: { select: { amount: true } },
         },
       }),
-      prisma.orderLine.findMany({ select: { productId: true } }),
-      prisma.market.findMany({ select: { currency: true } }),
+      // Cancelled orders' placements never ran: not part of the mix.
+      prisma.orderLine.findMany({
+        where: { order: { status: { not: "CANCELLED" } } },
+        select: { productId: true },
+      }),
       prisma.invoice.findMany({ select: { status: true } }),
     ]);
 
@@ -128,39 +129,30 @@ export default async function DeskReportsPage({
     };
   });
 
-  const currencies = [...new Set(markets.map((m) => m.currency))];
-  const kpis = currencies
-    .map((cur) => {
-      const inCur = orders.filter((o) => o.quote.currency === cur);
-      const gmv = inCur.reduce((s, o) => s + Number(o.quote.total), 0);
-      return {
-        currency: cur,
-        count: inCur.length,
-        gmv,
-        aov: averageOrderValue(gmv, inCur.length),
-      };
-    })
-    .filter((k) => k.count > 0);
+  // GMV and the margin / content-fee split per currency — the rules
+  // (cancelled orders out, credit notes off, extra work in, unpriced lines
+  // ignored) live in lib/reporting.ts.
+  const revenue = deskRevenueByCurrency(
+    orders.map((o) => ({
+      status: o.status,
+      currency: o.quote.currency,
+      quoteTotal: Number(o.quote.total),
+      vatPct: Number(o.quote.vatPct),
+      lines: o.quote.lines.map((l) => ({
+        kind: l.kind,
+        unitCost: Number(l.unitCost),
+        quantity: l.quantity,
+        lineTotal: Number(l.lineTotal),
+        priceOnRequest: l.priceOnRequest,
+      })),
+      extraWork: o.extraWork.map((e) => Number(e.lineTotal)),
+      credited: o.creditNotes.map((c) => Number(c.amount)),
+    })),
+  );
+  const kpis = revenue;
+  const revenueByCurrency = revenue.filter((r) => r.split.totalRevenue !== 0);
 
   const statusRows = tally(orders.map((o) => o.status));
-
-  // Revenue split (margin vs content fee) per currency — the "emphasis"
-  // view. Computed from realized order quote lines.
-  const revenueByCurrency = currencies
-    .map((cur) => {
-      const lines = orders
-        .filter((o) => o.quote.currency === cur)
-        .flatMap((o) =>
-          o.quote.lines.map((l) => ({
-            kind: l.kind,
-            unitCost: Number(l.unitCost),
-            quantity: l.quantity,
-            lineTotal: Number(l.lineTotal),
-          })),
-        );
-      return { currency: cur, split: revenueSplit(lines) };
-    })
-    .filter((r) => r.split.totalRevenue !== 0);
 
   const products = orderLines.length
     ? await prisma.product.findMany({

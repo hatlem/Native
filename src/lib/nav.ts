@@ -157,6 +157,8 @@ export function navItemsFor(
         // Super-admin only: /desk/users grants and revokes access, which is a
         // different kind of authority from running the order desk.
         { key: "deskUsers", label: t("users"), href: "/desk/users" },
+        // Super-admin only: the audit trail holds every tenant's activity.
+        { key: "deskAudit", label: t("audit"), href: "/desk/audit" },
         { key: "deskContentFees", label: t("contentFees"), href: "/desk/content-fees" },
         { key: "deskPlaybooks", label: t("playbooks"), href: "/desk/playbooks" },
         { key: "deskWriters", label: t("writers"), href: "/desk/writers" },
@@ -182,6 +184,8 @@ export function userMenuItemsFor(
     { key: "notifications", label: t("notifications"), href: "/notifications" },
     ...billing,
     { key: "account", label: t("account"), href: "/account" },
+    // Support is one click from anywhere in the app (FAQ, response time, contact).
+    { key: "help", label: t("help"), href: "/help" },
   ];
 }
 
@@ -238,6 +242,7 @@ export function paletteItemsFor(
             ? [
                 { key: "deskTitles", label: t("titles"), href: "/desk/titles" },
                 { key: "deskUsers", label: t("users"), href: "/desk/users" },
+                { key: "deskAudit", label: t("audit"), href: "/desk/audit" },
               ]
             : []),
           { key: "catalog", label: t("catalog"), href: "/catalog" },

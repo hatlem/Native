@@ -15,6 +15,7 @@
 // so callers run with the noop provider.
 
 import type { AccountingCreditNote, AccountingInvoice, PushResult } from "@/lib/accounting";
+import { fetchWithTimeout } from "@/lib/fetch-timeout";
 
 const FIKEN_BASE = "https://api.fiken.no/api/v2";
 
@@ -29,7 +30,19 @@ export type FikenConfig = {
 // Map our VAT percentage to Fiken's vatType enum. NO standard rate (25%)
 // is HIGH; 15% MEDIUM, 12% LOW; 0% EXEMPT. Anything else → EXEMPT with a
 // flag so the desk reviews it rather than silently mis-coding tax.
-export function fikenVatType(vatPct: number): { vatType: string; uncertain: boolean } {
+//
+// A REVERSE_CHARGE invoice (lib/vat.ts: a business buyer outside Norway, 0 %)
+// is an export of services, which Fiken codes as EXEMPT_IMPORT_EXPORT rather
+// than the domestic-exemption EXEMPT. That code is part of the still
+// unverified field mapping (see the header), so it is flagged `uncertain`
+// until an accountant has confirmed it against a Fiken sandbox company.
+export function fikenVatType(
+  vatPct: number,
+  vatTreatment?: "DOMESTIC" | "REVERSE_CHARGE" | null,
+): { vatType: string; uncertain: boolean } {
+  if (vatTreatment === "REVERSE_CHARGE") {
+    return { vatType: "EXEMPT_IMPORT_EXPORT", uncertain: true };
+  }
   switch (Math.round(vatPct)) {
     case 25:
       return { vatType: "HIGH", uncertain: false };
@@ -53,7 +66,7 @@ export type FikenInvoicePayload = {
   bankAccountCode: string;
   lines: {
     description: string;
-    unitPrice: number; // minor units (øre), VAT-inclusive gross per unit
+    unitPrice: number; // minor units (øre), NET per unit — VAT is added by vatType
     quantity: number;
     vatType: string;
   }[];
@@ -62,15 +75,18 @@ export type FikenInvoicePayload = {
 const toOre = (major: number) => Math.round(major * 100);
 const dateOnly = (iso: string | null) => (iso ? iso.slice(0, 10) : "");
 
-// Pure: build the Fiken invoice body. Lines carry gross unit price in øre
-// and a VAT type; we pass the line gross (lineTotal/quantity) so totals
-// reconcile with what the customer was billed.
+// Pure: build the Fiken invoice body. Lines carry the NET unit price in øre
+// plus a VAT type: InvoiceLine.lineTotal is ex-VAT (the invoice subtotal is
+// the sum of the line totals and VAT is added on top), so lineTotal/quantity
+// is the net price per unit and Fiken applies the VAT from vatType. Whether
+// Fiken expects net here is part of the still-unverified field mapping
+// (see the header) — confirm against a sandbox company before going live.
 export function toFikenInvoicePayload(
   doc: AccountingInvoice,
   customerId: number,
   bankAccountCode: string,
 ): FikenInvoicePayload {
-  const { vatType } = fikenVatType(doc.vatPct);
+  const { vatType } = fikenVatType(doc.vatPct, doc.vatTreatment);
   return {
     issueDate: dateOnly(doc.issuedAt),
     dueDate: dateOnly(doc.dueAt),
@@ -92,7 +108,7 @@ async function fikenFetch(
   path: string,
   init?: RequestInit,
 ): Promise<Response> {
-  return fetch(`${FIKEN_BASE}/companies/${cfg.companySlug}${path}`, {
+  return fetchWithTimeout(`${FIKEN_BASE}/companies/${cfg.companySlug}${path}`, {
     ...init,
     headers: {
       Authorization: `Bearer ${cfg.token}`,

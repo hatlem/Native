@@ -5,7 +5,8 @@ import { notFound } from "next/navigation";
 import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
 import { Link } from "@/i18n/navigation";
-import { formatMoney } from "@/lib/money";
+import { formatMoney, formatMoneyExact } from "@/lib/money";
+import { quoteVatFor } from "@/lib/vat-buyer";
 import { LINE_NOTE_MAX } from "@/lib/line-note";
 import { resolvePlanTitleItem, removePlanTitleItem } from "@/app/desk-actions";
 import { loadPricingDefaults } from "@/lib/content-fee";
@@ -18,7 +19,7 @@ import { bandLabel, priceBand } from "@/lib/pricing/bands";
 import { StatusBadge } from "@/app/status-badge";
 import { BriefTargeting } from "@/app/brief-targeting";
 import { briefWithoutFoldedTargeting } from "@/lib/brief-targeting";
-import { ExtraWorkForm, MailLink, SafeEmail, SubmitButton, withSafeEmails } from "@/components";
+import { ExtraWorkForm, MailLink, SafeEmail, SubmitButton, PendingButton, withSafeEmails } from "@/components";
 import { canSeeCostVsSell } from "@/lib/roles";
 import { isStorageConfigured, presignDownload } from "@/lib/storage/r2";
 import { intlLocale } from "@/lib/money";
@@ -323,6 +324,8 @@ export default async function DeskRequestPage({
   // the date field, the parse in quote-actions and the "valid until" line
   // all use it, so the desk and the buyer print the same day.
   const buyerTimeZone = marketTimeZone(request.organization.marketCode);
+  // What the buyer's VAT decision is still missing (country, VAT id).
+  const vatWarnings = quoteVatFor(request.organization).warnings;
   const validityInput = {
     defaultValue: quoteValidUntilInputValue(now, undefined, buyerTimeZone),
     min: quoteValidUntilInputValue(now, now, buyerTimeZone),
@@ -358,6 +361,8 @@ export default async function DeskRequestPage({
     );
   }
 
+  const selfServiceDate = new Intl.DateTimeFormat(intlLocale(locale), { dateStyle: "medium" });
+
   return (
     <>
       <nav className="breadcrumb">
@@ -365,6 +370,17 @@ export default async function DeskRequestPage({
           ← {t("title")}
         </Link>
       </nav>
+
+      {request.withdrawnAt ? (
+        <div className="banner-info" role="status">
+          <span>
+            {tr("selfService.deskWithdrawn", { date: selfServiceDate.format(request.withdrawnAt) })}
+            {request.withdrawReason
+              ? ` ${tr("selfService.deskReason", { reason: request.withdrawReason })}`
+              : ""}
+          </span>
+        </div>
+      ) : null}
 
       <header className="detail-head">
         <div>
@@ -445,9 +461,9 @@ export default async function DeskRequestPage({
                           </option>
                         ))}
                       </select>
-                      <button type="submit" className="btn small">
+                      <PendingButton className="btn small">
                         {t("resolveUse")}
-                      </button>
+                      </PendingButton>
                     </form>
                   ) : (
                     <p className="muted small">{t("resolveNoPlacements")}</p>
@@ -459,9 +475,9 @@ export default async function DeskRequestPage({
                     <input type="hidden" name="locale" value={locale} />
                     <input type="hidden" name="requestId" value={request.id} />
                     <input type="hidden" name="planItemId" value={item.id} />
-                    <button type="submit" className="btn small ghost">
+                    <PendingButton className="btn small ghost">
                       {t("resolveRemove")}
-                    </button>
+                    </PendingButton>
                   </form>
                 </article>
               );
@@ -558,6 +574,18 @@ export default async function DeskRequestPage({
                 ) : null}
               </div>
               <article className="card quote-card">
+                {quote.status === "DECLINED" && quote.declinedAt ? (
+                  // Declined by the buyer themselves (buyer-self-service-actions),
+                  // with their reason — win/loss signal for the desk.
+                  <div className="banner-info" role="status">
+                    <span>
+                      {tr("selfService.deskDeclined", { date: selfServiceDate.format(quote.declinedAt) })}
+                      {quote.declineReason
+                        ? ` ${tr("selfService.deskReason", { reason: quote.declineReason })}`
+                        : ""}
+                    </span>
+                  </div>
+                ) : null}
                 {errorCode === "bad-price" ? (
                   <div className="banner-warn" role="alert">
                     <span>{t("linePriceInvalid")}</span>
@@ -758,9 +786,9 @@ export default async function DeskRequestPage({
                                 aria-label={t("lineNoteLabel")}
                               />
                               <p className="muted small">{t("lineNoteHint")}</p>
-                              <button type="submit" className="btn small">
+                              <PendingButton className="btn small">
                                 {t("lineNoteSave")}
-                              </button>
+                              </PendingButton>
                             </form>
                           </details>
                         ) : null}
@@ -797,9 +825,9 @@ export default async function DeskRequestPage({
                                   currency: quote.currency,
                                 })}
                               />
-                              <button type="submit" className="btn small">
+                              <PendingButton className="btn small">
                                 {t("linePriceSave")}
-                              </button>
+                              </PendingButton>
                             </form>
                             {!l.priceOnRequest ? (
                               <form action={setQuoteLinePrice}>
@@ -812,9 +840,9 @@ export default async function DeskRequestPage({
                                 <input type="hidden" name="quoteId" value={quote.id} />
                                 <input type="hidden" name="lineId" value={l.id} />
                                 <input type="hidden" name="intent" value="onRequest" />
-                                <button type="submit" className="btn small ghost">
+                                <PendingButton className="btn small ghost">
                                   {t("linePriceMarkOnRequest")}
-                                </button>
+                                </PendingButton>
                               </form>
                             ) : null}
                           </div>
@@ -865,7 +893,7 @@ export default async function DeskRequestPage({
                       {t("vat")} ({Number(quote.vatPct)}%)
                     </span>
                     <span className="num">
-                      {formatMoney(
+                      {formatMoneyExact(
                         Number(quote.total) - Number(quote.subtotal),
                         quote.currency,
                         locale,
@@ -875,10 +903,27 @@ export default async function DeskRequestPage({
                   <div className="quote-row total">
                     <span>{t("total")}</span>
                     <span className="num">
-                      {formatMoney(Number(quote.total), quote.currency, locale)}
+                      {formatMoneyExact(Number(quote.total), quote.currency, locale)}
                     </span>
                   </div>
                 </div>
+                {/* VAT follows the buyer's country (lib/vat.ts). The note is
+                    what the customer's document prints; the warnings tell the
+                    desk what is still missing before this goes out. */}
+                {quote.vatTreatment === "REVERSE_CHARGE" ? (
+                  <p className="muted small">
+                    <strong>{t("vatReverseCharge")}.</strong> {quote.vatNote}
+                  </p>
+                ) : null}
+                {quote.status === "DRAFT" && quote.vatTreatment
+                  ? vatWarnings.map((w) => (
+                      <div key={w} className="banner-info" role="status">
+                        {w === "BUYER_COUNTRY_UNKNOWN"
+                          ? t("vatWarnCountryUnknown", { pct: Number(quote.vatPct) })
+                          : t("vatWarnVatIdMissing")}
+                      </div>
+                    ))
+                  : null}
                 {quote.order ? (
                   <div className="banner-success" role="status">
                     ✓ {t("acceptedOrder")}

@@ -1,4 +1,5 @@
 "use server";
+import { log } from "@/lib/log";
 
 import { redirect } from "next/navigation";
 import { headers } from "next/headers";
@@ -72,7 +73,7 @@ async function requireActiveOrg(locale: string) {
   if (!scope.userId) redirect(signinPath(locale, await refererPath()));
   if (!orgId) {
     // Agency with no client selected hit a list action — the no-client funnel.
-    console.warn("checkout.blocked", { reason: "client", userId: scope.userId });
+    log.warn("checkout.blocked", { reason: "client", userId: scope.userId });
     redirect(`/${locale}/plan?error=client`);
   }
   // Every caller creates or adds to a plan in the active org — a write. A

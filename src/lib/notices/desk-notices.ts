@@ -100,6 +100,48 @@ export const DESK_TEMPLATES = {
       };
     },
   }),
+  deskQuoteDeclined: defineTemplate({
+    params: z.object({ orgName: z.string(), planName: z.string(), requestId: id, reason: freeText.nullable() }),
+    render: (p, locale) => {
+      const t = noticeT(locale);
+      return {
+        title: t("quoteDeclined.title", { plan: p.planName }),
+        body: paragraphs(
+          t("quoteDeclined.body", { org: p.orgName }),
+          p.reason ? t("selfServiceReason", { reason: p.reason }) : t("selfServiceNoReason"),
+        ),
+        link: `/${locale}/desk/${p.requestId}`,
+      };
+    },
+  }),
+  deskRequestWithdrawn: defineTemplate({
+    params: z.object({ orgName: z.string(), planName: z.string(), requestId: id, reason: freeText.nullable() }),
+    render: (p, locale) => {
+      const t = noticeT(locale);
+      return {
+        title: t("requestWithdrawn.title", { plan: p.planName }),
+        body: paragraphs(
+          t("requestWithdrawn.body", { org: p.orgName }),
+          p.reason ? t("selfServiceReason", { reason: p.reason }) : t("selfServiceNoReason"),
+        ),
+        link: `/${locale}/desk/${p.requestId}`,
+      };
+    },
+  }),
+  deskCancellationRequested: defineTemplate({
+    params: z.object({ orgName: z.string(), planName: z.string(), orderId: id, reason: freeText }),
+    render: (p, locale) => {
+      const t = noticeT(locale);
+      return {
+        title: t("cancellationRequested.title", { plan: p.planName }),
+        body: paragraphs(
+          t("cancellationRequested.body", { org: p.orgName }),
+          t("selfServiceReason", { reason: p.reason }),
+        ),
+        link: deskOrderLink(locale, p.orderId),
+      };
+    },
+  }),
   deskBookingConfirmed: defineTemplate({
     params: z.object({ titleName: z.string(), orgName: z.string(), planName: z.string(), orderId: id }),
     render: (p, locale) => {

@@ -5,10 +5,65 @@ on:
     branches: ["**"]
   pull_request:
 
-jobs:
-  build:
-    runs-on: ubuntu-latest
+# The checks run as parallel jobs (they used to be one serial job), so a PR
+# gets its lint/type verdict in a couple of minutes and one failing stage no
+# longer hides the others. Every job is meant to be a required status check
+# on main (see CONTRIBUTING.md).
+env:
+  DATABASE_URL: "postgresql://atnative:atnative@127.0.0.1:5432/atnative?schema=public"
+  # ≥24 chars: the production server refuses shorter secrets (src/lib/security.ts).
+  AUTH_SECRET: "ci-only-secret-not-used-anywhere-else-0000"
+  AUTH_TRUST_HOST: "true"
 
+# A newer push to the same branch/PR supersedes the run in progress.
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  lint:
+    name: lint + typecheck
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: "pnpm"
+
+      - run: pnpm install --frozen-lockfile
+
+      - run: pnpm prisma generate
+
+      - run: pnpm lint
+
+      - run: pnpm typecheck
+
+  unit:
+    name: unit tests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: "pnpm"
+
+      - run: pnpm install --frozen-lockfile
+
+      - run: pnpm prisma generate
+
+      - run: pnpm test
+
+  integration:
+    name: integration tests
+    runs-on: ubuntu-latest
     services:
       postgres:
         image: postgres:16
@@ -23,10 +78,6 @@ jobs:
           --health-interval 10s
           --health-timeout 5s
           --health-retries 5
-
-    env:
-      DATABASE_URL: "postgresql://atnative:atnative@127.0.0.1:5432/atnative?schema=public"
-      AUTH_SECRET: "ci-test-secret"
 
     steps:
       - uses: actions/checkout@v4
@@ -46,12 +97,6 @@ jobs:
 
       - run: pnpm db:seed
 
-      - run: pnpm lint
-
-      - run: pnpm typecheck
-
-      - run: pnpm test
-
       # DB-backed integration tests (*.it.test.ts) — they need the seeded
       # Postgres service above + ALLOW_LOCAL_DB=1 (set by the test:it script).
       # RUN_DB_IT=1 un-gates the 7 heavier suites (checkout / content-fee /
@@ -63,4 +108,93 @@ jobs:
         env:
           RUN_DB_IT: "1"
 
+  # Production build, then the browser smoke suite (e2e/) against the built
+  # app on a seeded database: sign-in, catalog, and the cross-tenant and
+  # desk-data isolation checks.
+  build:
+    name: build + e2e smoke
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: atnative
+          POSTGRES_PASSWORD: atnative
+          POSTGRES_DB: atnative
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U atnative"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    env:
+      ALLOW_LOCAL_DB: "1"
+      AUTH_TRUST_HOST: "true"
+      NEXT_PUBLIC_SITE_URL: "http://localhost:3000"
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: "pnpm"
+
+      - run: pnpm install --frozen-lockfile
+
+      - run: pnpm prisma generate
+
+      - run: pnpm prisma migrate deploy
+
+      - run: pnpm db:seed
+
       - run: pnpm build
+
+      # playwright-core ships no browser; install the one it expects.
+      - run: pnpm exec playwright-core install --with-deps chromium
+
+      - name: Start the app
+        run: |
+          pnpm exec next start -p 3000 > next.log 2>&1 &
+          for i in $(seq 1 60); do
+            curl -fsS http://localhost:3000/api/health > /dev/null && exit 0
+            sleep 2
+          done
+          echo "app did not become healthy"; cat next.log; exit 1
+
+      - run: pnpm test:e2e
+        env:
+          E2E_BASE_URL: "http://localhost:3000"
+
+      - name: App log (on failure)
+        if: failure()
+        run: cat next.log
+
+  # Security checks run as their own job so a new advisory or a leaked
+  # credential fails loudly without hiding (or being hidden by) a test failure.
+  security:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          # gitleaks scans the commits in the push/PR range, so it needs history.
+          fetch-depth: 0
+
+      - uses: pnpm/action-setup@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      # Known-vulnerable dependencies (lockfile only — no install needed).
+      # High and critical fail the build; lower severities are reported by
+      # Dependabot (.github/dependabot.yml).
+      - run: pnpm audit --audit-level high
+
+      # Secrets committed to the repository.
+      - uses: gitleaks/gitleaks-action@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

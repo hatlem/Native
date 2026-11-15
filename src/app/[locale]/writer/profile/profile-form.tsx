@@ -1,5 +1,7 @@
 "use client";
 
+
+import { PendingButton } from "@/components/submit-button";
 import { startTransition, useActionState, type FormEvent } from "react";
 import { useTranslations } from "next-intl";
 import { updateWriterProfile } from "@/app/writer-profile-actions";
@@ -204,9 +206,9 @@ export function WriterProfileForm({
       </label>
 
       <div className="actions">
-        <button type="submit" className="btn primary" disabled={pending} aria-disabled={pending}>
+        <PendingButton className="btn primary" disabled={pending} aria-disabled={pending}>
           {pending ? t("saving") : t("save")}
-        </button>
+        </PendingButton>
       </div>
     </form>
   );

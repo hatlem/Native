@@ -1,3 +1,4 @@
+import { inviteTokenCandidates } from "@/lib/tokens";
 import { getTranslations } from "next-intl/server";
 import { redirect } from "next/navigation";
 import { auth } from "@/auth";
@@ -39,8 +40,8 @@ export default async function ClaimPublisherInvitePage({
   const ti = await getTranslations({ locale, namespace: "invite" });
   const te = await getTranslations({ locale, namespace: "errors" });
 
-  const invite = await prisma.publisherInvite.findUnique({
-    where: { token },
+  const invite = await prisma.publisherInvite.findFirst({
+    where: { token: { in: inviteTokenCandidates(token) } },
     include: { publisher: { select: { name: true } } },
   });
   const verdict = checkInvite(invite);

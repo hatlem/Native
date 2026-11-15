@@ -1,3 +1,4 @@
+import { log } from "@/lib/log";
 // Opportunistic, on-read reconciliation of quote expiry (no cron/worker) —
 // the same pattern workspace.ts uses for memberships. Views and the accept
 // gate already derive expiry from validUntil (quote-validity.ts), so this is
@@ -28,6 +29,6 @@ export function reconcileExpiredQuotesInBackground(
   scope: Parameters<typeof reconcileExpiredQuotes>[0],
 ): void {
   void reconcileExpiredQuotes(scope).catch((err) =>
-    console.error("quote.reconcile_expired_failed", { scope, err }),
+    log.error("quote.reconcile_expired_failed", { scope, err }),
   );
 }

@@ -118,7 +118,8 @@ export const SHARED_LIST_SELECT = {
   },
   programme: { select: { name: true, plannedWaves: true } },
   // The market sets the time zone the downloaded plan is dated in.
-  organization: { select: { name: true, marketCode: true } },
+  // …and, with the VAT id, the VAT rate the plan's total is shown with (lib/vat.ts).
+  organization: { select: { name: true, marketCode: true, vatId: true } },
 } satisfies Prisma.SavedListSelect;
 
 /** The list behind a share token — null for unknown tokens and for lists

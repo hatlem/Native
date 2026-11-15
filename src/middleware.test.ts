@@ -159,3 +159,19 @@ test("canonicalHostRedirect leaves the apex, other hosts and non-GET requests al
   assert.equal(canonicalHostRedirect(post, "https://nativespin.com"), null);
   assert.equal(canonicalHostRedirect(apex, "not a url"), null);
 });
+
+test("request id: minted when absent, echoed on the response, sane upstream ids reused", async () => {
+  const { requestIdFor } = await import("./middleware");
+  assert.match(requestIdFor(null), /^[0-9a-f-]{36}$/);
+  assert.equal(requestIdFor("abc12345-railway-id"), "abc12345-railway-id");
+  // Header-injection shaped or oversized values are replaced, not trusted.
+  assert.notEqual(requestIdFor("x\r\nSet-Cookie: a=b"), "x\r\nSet-Cookie: a=b");
+  assert.notEqual(requestIdFor("short"), "short");
+
+  const res = middleware(new NextRequest("http://localhost:3000/en/pricing"));
+  assert.match(res.headers.get("x-request-id") ?? "", /^[0-9a-f-]{36}$/);
+  const passed = middleware(
+    new NextRequest("http://localhost:3000/en/pricing", { headers: { "x-request-id": "upstream-id-0001" } }),
+  );
+  assert.equal(passed.headers.get("x-request-id"), "upstream-id-0001");
+});

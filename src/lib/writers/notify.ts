@@ -1,3 +1,4 @@
+import { log } from "@/lib/log";
 // Messages to writers: the pool invite, new line assignments and change
 // requests on their drafts. The assignment goes out as its own designed email
 // plus an inbox row; a change request is a regular notice (email + inbox).
@@ -46,7 +47,7 @@ export async function sendWriterInviteEmail(args: {
   try {
     await emailAdapter({ to: invite.email, ...built });
   } catch (err) {
-    console.error("writer_invite.email_failed", { inviteId: invite.id, err });
+    log.error("writer_invite.email_failed", { inviteId: invite.id, err });
     return false;
   }
   await prisma.writerInvite.update({
@@ -98,7 +99,7 @@ export async function sendWriterAssignedEmail(args: {
   try {
     await emailAdapter({ to: writer.user.email, ...built });
   } catch (err) {
-    console.error("writer_assigned.email_failed", { orderLineId: args.orderLineId, err });
+    log.error("writer_assigned.email_failed", { orderLineId: args.orderLineId, err });
   }
   // The inbox row: the same copy, re-rendered in whatever language the
   // writer reads /notifications in. The email above already went out.

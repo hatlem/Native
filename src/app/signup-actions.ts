@@ -1,8 +1,9 @@
 "use server";
+import { hashPassword } from "@/lib/password";
+import { log } from "@/lib/log";
 
 import { redirect } from "next/navigation";
 import { after } from "next/server";
-import bcrypt from "bcryptjs";
 import { prisma } from "@/lib/prisma";
 import { asNoticeLocale } from "@/lib/notices/messages";
 import { authLimiter } from "@/lib/rate-limit";
@@ -20,8 +21,9 @@ import {
 } from "@/lib/email-policy";
 import { appUrl, appName } from "@/lib/url";
 import { clientIp } from "@/lib/client-ip";
+import type { SignupState } from "@/lib/signup-form-state";
 
-export async function register(formData: FormData) {
+export async function register(_prev: SignupState, formData: FormData): Promise<SignupState> {
   const locale = String(formData.get("locale") || "en");
   const email = String(formData.get("email") || "")
     .toLowerCase()
@@ -34,18 +36,20 @@ export async function register(formData: FormData) {
   const orgName = String(formData.get("orgName") || "").trim();
 
   const ip = await clientIp();
-  // Preserve form input on validation error. Password is deliberately
-  // never echoed back; market + phone now live in onboarding so they
-  // don't appear here anymore.
-  const preservedParams = new URLSearchParams();
-  if (name) preservedParams.set("name", name);
-  if (orgName) preservedParams.set("orgName", orgName);
-  if (email) preservedParams.set("email", email);
-  const preservedQs = preservedParams.toString();
-  const tail = preservedQs ? `&${preservedQs}` : "";
+  // A validation failure goes back to the form as action state (rendered
+  // next to the field it belongs to), with what the person typed. It used to
+  // be a redirect to /signup?error=…&name=…&email=…, which put their name,
+  // organisation and email address in the URL, history and access logs.
+  // The password is deliberately never echoed back.
+  const fail = (error: string, typo?: { suggestion: string; typedDomain: string }): SignupState => ({
+    error,
+    values: { name, orgName, email },
+    typoSuggestion: typo?.suggestion ?? null,
+    typedDomain: typo?.typedDomain ?? null,
+  });
 
   if (!(await authLimiter.check(`signup:ip:${ip}`)).ok) {
-    redirect(`/${locale}/signup?error=rate${tail}`);
+    return fail("rate");
   }
 
   // Signup gate is now: email + orgName + (password OR consent to use
@@ -55,10 +59,10 @@ export async function register(formData: FormData) {
   // magic-link-only signin path and triggers a magic-link email.
   const passwordlessSignup = password.length === 0;
   if (!email || !orgName) {
-    redirect(`/${locale}/signup?error=1${tail}`);
+    return fail("1");
   }
   if (!passwordlessSignup && password.length < 8) {
-    redirect(`/${locale}/signup?error=password_length${tail}`);
+    return fail("password_length");
   }
 
   // Lookalike of a big mail provider ("gnail.com"): ask before mailing a
@@ -71,10 +75,10 @@ export async function register(formData: FormData) {
       ip,
       suggestion,
     });
-    // The page recomputes the suggestion from the preserved address rather
-    // than reading one from the URL, so a crafted link can't prompt
-    // someone to "correct" their email to an attacker's.
-    redirect(`/${locale}/signup?error=email_typo${tail}`);
+    // The suggestion is computed here from the submitted address and
+    // returned as action state — never read from a URL — so a crafted link
+    // can't prompt someone to "correct" their email to an attacker's.
+    return fail("email_typo", { suggestion, typedDomain: emailDomain(email) ?? "" });
   }
 
   // Company-email gate: reject free providers (gmail, yahoo, …),
@@ -87,14 +91,14 @@ export async function register(formData: FormData) {
       ip,
       reason: policy.reason,
     });
-    redirect(`/${locale}/signup?error=${emailPolicyErrorCode(policy.reason)}${tail}`);
+    return fail(emailPolicyErrorCode(policy.reason));
   }
 
   // Per-address cap on top of the per-IP one: every signup for an existing
   // address mails its owner (below), so without it the form doubles as a
   // way to flood someone's inbox from rotating IPs.
   if (!(await authLimiter.check(`signup:email:${email}`)).ok) {
-    redirect(`/${locale}/signup?error=rate${tail}`);
+    return fail("rate");
   }
 
   // Hash before the existence check so both branches below pay the bcrypt
@@ -102,7 +106,7 @@ export async function register(formData: FormData) {
   // telling an enumerator which branch ran.
   const passwordHash = passwordlessSignup
     ? null
-    : await bcrypt.hash(password, 10);
+    : await hashPassword(password);
 
   // No account enumeration: an address that already has an account gets
   // the same /check-email answer as a new one. The OWNER is the one told —
@@ -178,7 +182,7 @@ export async function register(formData: FormData) {
     try {
       await emailAdapter({ to: email, subject: welcome.subject, text: welcome.text, html: welcome.html });
     } catch (err) {
-      console.error("auth.welcome_email_failed", { userId: welcomeUserId, err });
+      log.error("auth.welcome_email_failed", { userId: welcomeUserId, err });
     }
   });
 
@@ -206,7 +210,7 @@ export async function register(formData: FormData) {
     try {
       await emailAdapter({ to: email, subject: msg.subject, text: msg.text, html: msg.html });
     } catch (err) {
-      console.error("auth.magic_link_email_failed_on_signup", { userId: newUserId, err });
+      log.error("auth.magic_link_email_failed_on_signup", { userId: newUserId, err });
     }
     await recordAudit(
       newUserId,
@@ -260,7 +264,7 @@ async function notifyExistingAccount(
     try {
       await emailAdapter({ to: email, subject: msg.subject, text: msg.text, html: msg.html });
     } catch (err) {
-      console.error("auth.account_exists_email_failed", { userId: user.id, err });
+      log.error("auth.account_exists_email_failed", { userId: user.id, err });
     }
     await recordAudit(user.id, "auth.signup_existing_account", `User:${email}`, { ip });
   });

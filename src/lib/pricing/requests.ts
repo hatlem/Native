@@ -4,7 +4,10 @@ import {
   newPriceRequestToken,
   expiryFromNow,
   priceRequestLink,
+  priceRequestUnsubscribeLink,
 } from "./tokens";
+import { addSuppression, isSuppressed } from "@/lib/outreach/suppression";
+import { outreachDailyCap, outreachSentToday } from "@/lib/outreach/campaign";
 import {
   localeForMarketCode,
   sendPriceRequestEmail,
@@ -82,10 +85,21 @@ export async function createPriceRequest(args: {
   return req;
 }
 
+export type SendPriceRequestResult =
+  | { sent: true }
+  | { skipped: "suppressed" | "already_sent" | "daily_cap" };
+
+// A price request is outreach to a publisher contact, so it obeys the same
+// rules as the rate-card campaign: never mail a suppressed (unsubscribed /
+// bounced) address, never mail the same request twice by accident, stay
+// under the shared daily cap, and always say how to opt out.
 export async function sendPriceRequest(args: {
   priceRequestId: string;
   actorId: string;
-}) {
+  // A deliberate desk "resend" (resendPriceRequest) — the only way a
+  // request that already went out is mailed again.
+  resend?: boolean;
+}): Promise<SendPriceRequestResult> {
   const req = await prisma.priceRequest.findUnique({
     where: { id: args.priceRequestId },
     include: {
@@ -98,26 +112,71 @@ export async function sendPriceRequest(args: {
   if (req.cancelledAt) throw new Error("price_request.cancelled");
   if (req.respondedAt) throw new Error("price_request.already_responded");
 
+  if (await isSuppressed(req.salesContact.email)) {
+    await recordAudit(args.actorId, "price_request.skipped_suppressed", `PriceRequest:${req.id}`, {
+      to: req.salesContact.email,
+    });
+    return { skipped: "suppressed" };
+  }
+  if (req.sentAt && !args.resend) return { skipped: "already_sent" };
+  if ((await outreachSentToday()) >= outreachDailyCap()) return { skipped: "daily_cap" };
+
+  // Claim before sending, so a double-submitted form or two parallel bulk
+  // runs mail the request once.
+  const now = new Date();
+  const claimed = await prisma.priceRequest.updateMany({
+    where: { id: req.id, sentAt: req.sentAt, cancelledAt: null, respondedAt: null },
+    data: { sentAt: now },
+  });
+  if (claimed.count !== 1) return { skipped: "already_sent" };
+
   const locale = localeForMarketCode(req.title.market.code);
   const link = priceRequestLink(req.token, locale);
-  await sendPriceRequestEmail({
-    to: req.salesContact.email,
-    replyTo: req.requestedBy.email ?? undefined,
-    locale,
-    contactName: req.salesContact.name,
-    titleName: req.title.name,
-    publisherName: req.title.publisher.name,
-    link,
-    inviterName: req.requestedBy.name ?? "The NativeSpin team",
-  });
+  try {
+    await sendPriceRequestEmail({
+      to: req.salesContact.email,
+      replyTo: req.requestedBy.email ?? undefined,
+      locale,
+      contactName: req.salesContact.name,
+      titleName: req.title.name,
+      publisherName: req.title.publisher.name,
+      link,
+      inviterName: req.requestedBy.name ?? "The NativeSpin team",
+      unsubscribeLink: priceRequestUnsubscribeLink(req.token, locale),
+    });
+  } catch (err) {
+    // Nothing went out: release the claim so it can be sent again.
+    await prisma.priceRequest.updateMany({
+      where: { id: req.id, sentAt: now },
+      data: { sentAt: req.sentAt },
+    });
+    throw err;
+  }
 
-  await prisma.priceRequest.update({
-    where: { id: req.id },
-    data: { sentAt: new Date() },
-  });
   await recordAudit(args.actorId, "price_request.send", `PriceRequest:${req.id}`, {
     to: req.salesContact.email,
   });
+  return { sent: true };
+}
+
+// The contact asked not to be contacted again: cancel the request and put
+// the address on the outreach suppression list (shared with the rate-card
+// campaign, so neither flow mails it again).
+export async function unsubscribePriceRequest(token: string): Promise<void> {
+  const req = await prisma.priceRequest.findUnique({
+    where: { token },
+    include: { salesContact: { select: { email: true } } },
+  });
+  if (!req) return;
+  if (!req.cancelledAt && !req.respondedAt) {
+    await prisma.priceRequest.update({ where: { id: req.id }, data: { cancelledAt: new Date() } });
+  }
+  await addSuppression({ email: req.salesContact.email, reason: "unsubscribe" });
+  await recordAudit(
+    `salescontact:${req.salesContact.email}`,
+    "outreach.unsubscribe",
+    `PriceRequest:${req.id}`,
+  );
 }
 
 export async function createPriceRequestsBulk(args: {
@@ -128,7 +187,11 @@ export async function createPriceRequestsBulk(args: {
 }): Promise<{
   created: Array<{ priceRequestId: string; titleId: string; salesContactId: string }>;
   skipped: Array<{ titleId: string; reason: "no_primary_contact" }>;
+  // Requests that were created but not mailed (suppressed address, daily
+  // cap) — only present when send was asked for.
+  notSent: Array<{ priceRequestId: string; titleId: string; reason: string }>;
 }> {
+  const notSent: Array<{ priceRequestId: string; titleId: string; reason: string }> = [];
   const created: Array<{ priceRequestId: string; titleId: string; salesContactId: string }> = [];
   const skipped: Array<{ titleId: string; reason: "no_primary_contact" }> = [];
 
@@ -148,12 +211,15 @@ export async function createPriceRequestsBulk(args: {
       ttlDays: args.ttlDays,
     });
     if (args.send) {
-      await sendPriceRequest({ priceRequestId: req.id, actorId: args.requestedById });
+      const outcome = await sendPriceRequest({ priceRequestId: req.id, actorId: args.requestedById });
+      if ("skipped" in outcome) {
+        notSent.push({ priceRequestId: req.id, titleId, reason: outcome.skipped });
+      }
     }
     created.push({ priceRequestId: req.id, titleId, salesContactId: primary.id });
   }
 
-  return { created, skipped };
+  return { created, skipped, notSent };
 }
 
 export async function markRequestOpened(token: string) {
@@ -186,7 +252,11 @@ export async function resendPriceRequest(args: {
     where: { id: args.priceRequestId },
     data: { expiresAt: expiryFromNow() },
   });
-  await sendPriceRequest({ priceRequestId: args.priceRequestId, actorId: args.actorId });
+  return sendPriceRequest({
+    priceRequestId: args.priceRequestId,
+    actorId: args.actorId,
+    resend: true,
+  });
 }
 
 export async function findRequestByToken(token: string) {

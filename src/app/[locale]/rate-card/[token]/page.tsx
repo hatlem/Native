@@ -1,4 +1,5 @@
 import { getTranslations } from "next-intl/server";
+import { intlLocale } from "@/lib/money";
 import { findRateCardRequestByToken, markRateCardOpened } from "@/lib/outreach/campaign";
 import { checkRateCardRequest } from "@/lib/outreach/tokens";
 import { submitRateCardAction } from "./actions";
@@ -60,7 +61,7 @@ export default async function RateCardPage({
       <h1 className="text-2xl font-semibold">{t("pageTitle")}</h1>
       <p className="mt-2 text-slate-700">
         {t("intro", { count: req.titles.length })}{" "}
-        {t("linkValidUntil", { date: req.expiresAt.toISOString().slice(0, 10) })}
+        {t("linkValidUntil", { date: new Intl.DateTimeFormat(intlLocale(locale), { dateStyle: "medium" }).format(req.expiresAt) })}
       </p>
       {sp.error === "empty" && (
         <p className="mt-2 text-red-700">{t("errorEmpty")}</p>

@@ -1,5 +1,7 @@
 "use client";
 
+
+import { PendingButton } from "@/components/submit-button";
 import { useMemo, useRef, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import { useTranslations } from "next-intl";
@@ -256,9 +258,9 @@ export function CatalogRail({
           autoComplete="off"
         />
         {staged ? null : (
-          <button type="submit" className="catalog-rail__search-submit" aria-label={t("searchSubmit")}>
+          <PendingButton className="catalog-rail__search-submit" aria-label={t("searchSubmit")}>
             <Search size={15} strokeWidth={1.8} aria-hidden="true" />
-          </button>
+          </PendingButton>
         )}
       </form>
 
@@ -277,7 +279,7 @@ export function CatalogRail({
             <span aria-hidden="true">⌄</span>
           </button>
           {marketOpen ? (
-            <div className="catalog-rail__popover" role="dialog">
+            <div className="catalog-rail__popover" role="group" aria-label={t("whereHeading")}>
               {markets.map((m) => (
                 <label key={m.value} className="catalog-rail__popover-row">
                   <input
@@ -321,7 +323,7 @@ export function CatalogRail({
             <span aria-hidden="true">⌄</span>
           </button>
           {formatOpen ? (
-            <div className="catalog-rail__popover" role="dialog">
+            <div className="catalog-rail__popover" role="group" aria-label={t("formatHeading")}>
               {formats.map((f) => (
                 <label key={f.value} className="catalog-rail__popover-row">
                   <input

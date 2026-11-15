@@ -1,4 +1,63 @@
 {
+  "mfa": {
+    "stepTitle": "Tofaktorbekreftelse",
+    "stepHeadline": "Ett steg til.",
+    "stepLead": "Kontoen din er beskyttet med tofaktorautentisering. Skriv inn koden fra autentiseringsappen for å fullføre innloggingen.",
+    "stepSubtitle": "Passordet er godkjent. Skriv inn den sekssifrede koden.",
+    "stepSubtitleMagic": "E-postlenken er godkjent. Skriv inn den sekssifrede koden.",
+    "codeLabel": "Autentiseringskode",
+    "codeHint": "Mistet telefonen? Skriv inn en av gjenopprettingskodene dine i stedet.",
+    "verify": "Bekreft og logg inn",
+    "verifying": "Bekrefter…",
+    "cancel": "Tilbake til innlogging",
+    "errorInvalid": "Koden stemmer ikke. Sjekk autentiseringsappen og prøv igjen.",
+    "errorReplay": "Den koden er allerede brukt. Vent på neste kode og prøv igjen.",
+    "errorRate": "For mange forsøk. Vent noen minutter og prøv igjen.",
+    "errorPassword": "Passordet stemmer ikke.",
+    "sessionExpired": "Innloggingen ble tidsavbrutt før det andre steget. Logg inn på nytt.",
+    "pageTitle": "Tofaktorautentisering",
+    "eyebrow": "Sikkerhet",
+    "lead": "Legg til et ekstra steg når du logger inn: en kode fra en autentiseringsapp på telefonen, i tillegg til passord eller e-postlenke.",
+    "requiredBanner": "Rollen din krever tofaktorautentisering. Sett den opp for å fortsette til desken.",
+    "noticeDisabled": "Tofaktorautentisering er nå slått av.",
+    "noticeRecoveryUsed": "Du logget inn med en gjenopprettingskode. Har du mistet telefonen, slå av tofaktor og sett den opp på nytt på den nye enheten.",
+    "codeOrRecoveryLabel": "Autentiserings- eller gjenopprettingskode",
+    "passwordLabel": "Passord",
+    "working": "Jobber…",
+    "recoveryTitle": "Lagre gjenopprettingskodene",
+    "recoveryLead": "Hver kode virker én gang hvis du ikke kan bruke telefonen. Oppbevar dem et trygt sted. De vises ikke igjen.",
+    "recoveryDone": "Jeg har lagret dem",
+    "statusEyebrow": "Status",
+    "statusOn": "Tofaktorautentisering er på",
+    "statusOff": "Tofaktorautentisering er av",
+    "enabledSince": "Slått på {date}.",
+    "recoveryLeft": "Ubrukte gjenopprettingskoder: {count}",
+    "recoveryEyebrow": "Gjenoppretting",
+    "regenerateTitle": "Nye gjenopprettingskoder",
+    "regenerateLead": "Skriv inn en gjeldende kode for å lage et nytt sett. De gamle kodene slutter å virke.",
+    "regenerate": "Lag nye koder",
+    "disableEyebrow": "Slå av",
+    "disableTitle": "Slå av tofaktorautentisering",
+    "disableLead": "Bekreft med passordet ditt eller en gjeldende kode. De andre enhetene dine blir logget ut.",
+    "disableLeadStaff": "Bekreft med passordet ditt eller en gjeldende kode. Rollen din krever tofaktor, så du må sette den opp på nytt før du kan bruke desken.",
+    "disableCodeHint": "La passordfeltet stå tomt for å bekrefte med en kode i stedet.",
+    "disable": "Slå av tofaktor",
+    "setupTitle": "Sett opp autentiseringsappen",
+    "step1": "Åpne autentiseringsappen (Google Authenticator, Microsoft Authenticator, 1Password, Authy) og legg til en ny konto.",
+    "step2": "Skriv inn denne oppsettsnøkkelen, eller åpne lenken på telefonen som har appen.",
+    "step3": "Skriv inn den sekssifrede koden appen viser for å bekrefte.",
+    "setupKeyLabel": "Oppsettsnøkkel",
+    "openInApp": "Åpne i autentiseringsappen",
+    "confirm": "Slå på tofaktor",
+    "cancelSetup": "Avbryt oppsettet",
+    "offBody": "Med tofaktor på trenger du passord eller e-postlenke pluss en sekssifret kode fra en app på telefonen for å logge inn. Et stjålet passord er ikke lenger nok.",
+    "setupButton": "Sett opp autentiseringsapp",
+    "backToAccount": "Tilbake til kontoinnstillinger",
+    "accountSectionTitle": "Tofaktorautentisering",
+    "accountSectionBodyOn": "På. Innlogging krever en kode fra autentiseringsappen.",
+    "accountSectionBodyOff": "Av. Legg til en kode fra en autentiseringsapp som et ekstra steg ved innlogging.",
+    "manage": "Administrer tofaktor"
+  },
   "common": {
     "appName": "NativeSpin",
     "feedback": {
@@ -14,6 +73,17 @@
       "sendFailed": "Klarte ikke å sende. Prøv igjen?",
       "enterFeedback": "Skriv noe først.",
       "close": "Lukk"
+    },
+    "a11y": {
+      "primaryNav": "Hovedmeny",
+      "menu": "Meny",
+      "mobileNav": "Mobilmeny",
+      "breadcrumb": "Brødsmulesti",
+      "language": "Språk"
+    },
+    "confirm": {
+      "yes": "Ja, bekreft",
+      "cancel": "Avbryt"
     }
   },
   "nav": {
@@ -64,9 +134,15 @@
     "campaigns": "Kampanjer",
     "rates": "Priser",
     "users": "Brukere",
+    "audit": "Revisjonslogg",
     "invoices": "Fakturaer",
     "orgSwitcherLabel": "Organisasjon",
-    "orgSwitchTo": "Bytt til {org}"
+    "orgSwitchTo": "Bytt til {org}",
+    "help": "Hjelp",
+    "paletteOrders": "Ordrer",
+    "paletteRequests": "Forespørsler",
+    "paletteTitles": "Titler",
+    "paletteSearching": "Søker…"
   },
   "reports": {
     "title": "Rapporter",
@@ -907,9 +983,31 @@
     "metaPlanAlternativesOnly": "Ingen plasseringer ennå · {alternatives, plural, one {# alternativ} other {# alternativer}} · redigert {age}",
     "actionContinuePlan": "Fortsett planen",
     "qualifierAwaitingTeam": "venter på noen med bestillingsrett",
-    "actionSeeQuote": "Se tilbudet"
+    "actionSeeQuote": "Se tilbudet",
+    "selfService": {
+      "heading": "Går dere ikke videre?",
+      "lead": "Her kan du avslå et tilbud eller trekke hele forespørselen. Ingenting belastes, og du kan sende en ny forespørsel når som helst.",
+      "declineOpen": "Avslå tilbudet i {currency}",
+      "declineSubmit": "Avslå tilbud",
+      "withdrawOpen": "Trekk denne forespørselen",
+      "withdrawSubmit": "Trekk forespørsel",
+      "reasonLabel": "Hvorfor? (valgfritt – det hjelper oss å bli bedre)",
+      "pending": "Sender…",
+      "needsOrderingRights": "Du trenger bestillingsrett i organisasjonen for å avslå et tilbud.",
+      "withdrawnBanner": "Du trakk denne forespørselen {date}.",
+      "noticeQuoteDeclined": "Tilbudet er avslått. Vi har gitt beskjed til desken.",
+      "noticeRequestWithdrawn": "Forespørselen er trukket. Vi har gitt beskjed til desken.",
+      "noticeUnavailable": "Det er ikke lenger mulig – forespørselen er endret siden du åpnet siden.",
+      "noticeNotAllowed": "Tilgangen din tillater ikke det. Spør en administrator i organisasjonen.",
+      "deskDeclined": "Avslått av kunden {date}.",
+      "deskWithdrawn": "Trukket av kunden {date}.",
+      "deskReason": "Årsak: {reason}"
+    }
   },
   "desk": {
+    "vatWarnCountryUnknown": "Kunden har ikke registrert hjemland, så norsk mva. ({pct} %) er lagt til. Er kunden etablert utenfor Norge, sett markedet på organisasjonen og lag tilbudet på nytt før det sendes.",
+    "vatWarnVatIdMissing": "Omvendt avgiftsplikt gjelder (ingen norsk mva.), men kunden har ikke registrert mva.-nummer. Legg det inn før tilbudet sendes – fakturaen må oppgi det.",
+    "vatReverseCharge": "Omvendt avgiftsplikt – ingen norsk mva.",
     "eyebrow": "Internt desk",
     "title": "Desk-konsoll",
     "subtitle": "Hva som krever oppmerksomheten din i dag — nye briefer, tilbud i bevegelse og aktive bestillinger.",
@@ -1044,7 +1142,23 @@
     "quoteLocked": "Tilbudet er sendt, så linjene er låst. Revider tilbudet for å endre priser eller merknader.",
     "quoteNotRevisable": "Tilbudet kan ikke revideres: det er godtatt eller avsluttet.",
     "revisionPredecessorClosed": "Ikke sendt: tilbudet denne revisjonen skulle erstatte, er ikke lenger åpent – kunden kan nettopp ha godtatt det. Forkast revisjonen.",
-    "sendRevisionNote": "Når du sender, erstattes det forrige tilbudet: kunden kan ikke lenger godta det, og får én varsling med ny totalsum."
+    "sendRevisionNote": "Når du sender, erstattes det forrige tilbudet: kunden kan ikke lenger godta det, og får én varsling med ny totalsum.",
+    "requestsTitle": "Alle forespørsler",
+    "requestsLead": "Alle forespørsler i køen. Filtrer på status eller søk på organisasjon.",
+    "requestsSearchLabel": "Søk i organisasjon eller brief",
+    "requestsSearchButton": "Søk",
+    "requestsStatusLabel": "Status",
+    "requestsStatusAll": "Alle statuser",
+    "requestsStatusOpen": "Åpne (trenger desken)",
+    "requestsEmpty": "Ingen forespørsler passer dette filteret.",
+    "requestsCount": "{count, plural, one {# forespørsel} other {# forespørsler}}",
+    "requestsColUpdated": "Oppdatert",
+    "requestsColQuotes": "Tilbud",
+    "requestsPrev": "Forrige",
+    "requestsNext": "Neste",
+    "requestsPageOf": "Side {page} av {pages}",
+    "requestsViewAll": "Se alle forespørsler",
+    "requestsPaginationLabel": "Sidenavigasjon"
   },
   "deskTitles": {
     "eyebrow": "Superadmin · titler",
@@ -1295,7 +1409,9 @@
     "checkSignupLead": "Vi har sendt en lenke til adressen du oppga. Åpne den for å bekrefte adressen og logge inn; den utløper om 15 minutter. Hadde adressen allerede en konto, forklarer e-posten hvordan du kommer inn igjen.",
     "regEmailTypoQuestion": "Mente du <b>{email}</b>?",
     "regEmailTypoUse": "Bruk {email}",
-    "regEmailTypoKeep": "Er {domain} riktig, trykker du bare Opprett konto igjen."
+    "regEmailTypoKeep": "Er {domain} riktig, trykker du bare Opprett konto igjen.",
+    "regOrgRequired": "Skriv inn navnet på selskapet eller organisasjonen.",
+    "regEmailRequired": "Skriv inn jobb-e-postadressen din."
   },
   "order": {
     "title": "Bestilling",
@@ -1389,6 +1505,34 @@
       "SUPERADMIN": "NativeSpin (administrator)",
       "PUBLISHER": "Utgiveren",
       "BUYER": "Kunden"
+    },
+    "cancelRequest": {
+      "heading": "Må dere kansellere?",
+      "lead": "Fortell oss hvorfor, så sjekker desken bookingene hos utgiverne og kommer tilbake til deg. Plasseringer som allerede er booket eller publisert kan ha en kanselleringskostnad – vi bekrefter før noe er endelig.",
+      "open": "Be om kansellering",
+      "reasonLabel": "Årsak til kanselleringen",
+      "submit": "Send forespørsel om kansellering",
+      "pending": "Sender…",
+      "requested": "Kansellering ble forespurt {date}. Desken kommer tilbake til deg – ordren er aktiv til de bekrefter.",
+      "noticeRequested": "Forespørselen om kansellering er sendt til desken.",
+      "noticeReasonRequired": "Oppgi en årsak, så desken kan følge det opp.",
+      "noticeUnavailable": "Denne ordren kan ikke lenger kanselleres herfra.",
+      "noticeNotAllowed": "Du trenger bestillingsrett i organisasjonen for å be om kansellering.",
+      "deskBanner": "Kunden ba om å kansellere denne ordren {date}.",
+      "deskReason": "Årsak: {reason}"
+    },
+    "csat": {
+      "heading": "Hvordan gikk denne kampanjen?",
+      "question": "Hvor fornøyd er du med NativeSpin på denne ordren?",
+      "scale": "{score} av 5",
+      "low": "Ikke fornøyd",
+      "high": "Svært fornøyd",
+      "commentLabel": "Noe vi bør vite? (valgfritt)",
+      "submit": "Send tilbakemelding",
+      "pending": "Sender…",
+      "thanks": "Takk – du ga denne ordren {score} av 5.",
+      "deskHeading": "Tilbakemelding fra kunden",
+      "deskScore": "Tilfredshet: {score} av 5"
     }
   },
   "production": {
@@ -1422,6 +1566,7 @@
     "vetoSharedWarning": "Denne artikkelen kjører også på {count} andre plassering(er) — de påvirkes ikke av denne tilbaketrekningen."
   },
   "invoice": {
+    "vatNoteHeading": "Mva.-merknad",
     "title": "Faktura",
     "eyebrow": "Faktura",
     "status": "Status",
@@ -1838,7 +1983,14 @@
     "footerSolutions": "Løsninger",
     "footerCompany": "Selskap",
     "footerAbout": "Om oss",
-    "footerContact": "Kontakt"
+    "footerContact": "Kontakt",
+    "footerHelp": "Hjelp",
+    "footerChangelog": "Nyheter",
+    "footerLegal": "Juridisk",
+    "footerPrivacy": "Personvern",
+    "footerTerms": "Vilkår",
+    "footerSecurity": "Sikkerhet",
+    "footerSubprocessors": "Underleverandører"
   },
   "advertisers": {
     "eyebrow": "For annonsører",
@@ -2337,149 +2489,6 @@
     "contactTitle": "Juridisk kontakt",
     "contactBody": "Spørsmål om disse vilkårene — skriv til"
   },
-  "landing": {
-    "hero": {
-      "labelText": "NativeSpin · Native-markedsplass",
-      "pain": "Det meste av premium native selges ikke programmatisk. Det selges over telefon, med en PDF-prisliste og fire ukers tau-trekking. <strong>Vi erstatter det med én brief og et fast tilbud på 24 timer.</strong>",
-      "h1Line1": "Én brief.",
-      "h1Line2": "3 000+ titler.",
-      "h1Line3": "Fast tilbud på 24 timer.",
-      "ctaPrimary": "Send en brief",
-      "ctaSecondary": "Slik fungerer det",
-      "ctaMeta": "Ingen telefon nødvendig. Vi svarer skriftlig, på protokollen.",
-      "sideAria": "Hvorfor native",
-      "sideBody": "Sponsede artikler slår display gjennomgående på oppmerksomhet og merkeløft. Du betaler for det som blir publisert, ikke for det som blir blokkert."
-    },
-    "why": {
-      "labelText": "Hvorfor native",
-      "h2": "Native gjør jobben display ikke kan.",
-      "lead": "Display kjøper visninger i margen. Native kjøper redaksjonell tid inne i artikkelen. Annet areal, annen leseradferd, annet resultat.",
-      "colAIx": "I.",
-      "colAH3": "Oppmerksomhet du ikke kan ad-blokke",
-      "colABody": "En sponset artikkel lever der leseren allerede er konsentrert. <strong>Ingen bannerblindhet, ingen skipp-knapp</strong> — enheten er innholdet.",
-      "colAPull": "<strong>3–5×</strong> dvelletid vs. sammenlignbar display",
-      "colBIx": "II.",
-      "colBH3": "Tillit overført fra tittelen",
-      "colBBody": "Når en leser ser historien din under en tittel de stoler på, overføres noe av den tilliten. <strong>Merkingen står klart</strong> — troverdigheten kommer fra den redaksjonelle rammen.",
-      "colBPull": "<strong>+18 prosentpoeng</strong> merkevareløft (bransjegjennomsnitt)",
-      "colCIx": "III.",
-      "colCH3": "Lever videre etter kampanjen",
-      "colCBody": "En publisert artikkel fortsetter å generere visninger og søketreff lenge etter at kampanjen er over. <strong>Display forsvinner i det øyeblikket du slutter å betale.</strong>",
-      "colCPull": "Ligger på utgiverens domene. Indeksert. Permanent."
-    },
-    "vs": {
-      "labelText": "Native vs display",
-      "h2": "Samme budsjett. Helt ulikt utfall.",
-      "thNative": "Native (sponset artikkel)",
-      "thDisplay": "Display-banner",
-      "primaryJobSpec": "Primær jobb",
-      "primaryJobNative": "Fortelle en historie leseren valgte å lese",
-      "primaryJobDisplay": "Avbryte og lede til ditt nettsted",
-      "readerBehaviourSpec": "Leseradferd",
-      "readerBehaviourNative": "Leser. Scroller. Blir værende.",
-      "readerBehaviourDisplay": "Scroller forbi. Ad-blokker. Glemmer.",
-      "realEstateSpec": "Areal",
-      "realEstateNative": "Inne i den redaksjonelle flyten",
-      "realEstateDisplay": "Marg, header, mellom avsnitt",
-      "trustTransferSpec": "Tillitsoverføring",
-      "trustTransferNative": "Lånt fra tittelen",
-      "trustTransferDisplay": "Ingen — leserne ser at det er en annonse",
-      "longevitySpec": "Varighet",
-      "longevityNative": "Indeksert, søkbar, permanent",
-      "longevityDisplay": "Forsvinner ved kampanjeslutt",
-      "bestFitSpec": "Best egnet for",
-      "bestFitNative": "Vurderingskjøp, B2B, merkevarebygging",
-      "bestFitDisplay": "Performance-retargeting, enkle tilbud"
-    },
-    "rule": {
-      "labelIx": "Den gylne regel",
-      "h2": "Er det ikke nyttig for leseren, er det ikke native — det er en pressemelding i forkledning.",
-      "body": "Hver artikkel vi leverer må fortjene leserens tid på egen hånd. <strong>Redaksjonelle standarder, tittelens spesifikasjon, markedets merkekrav</strong> — ikke til forhandling. Det er slik tillitsoverføringen faktisk virker.",
-      "sig": "— NativeSpin-desken"
-    },
-    "pubs": {
-      "labelText": "Utgivere",
-      "meta": "{publishers, number}+ utgivere · {titles, number}+ titler katalogisert · {active, number} verifisert for øyeblikkelig bestilling",
-      "foot": "Det du ser her er bare en flik av katalogen.",
-      "footMore": "Fortell oss hva du leter etter"
-    },
-    "catalog": {
-      "labelText": "Et utdrag av katalogen",
-      "h2": "Live titler, veiledende priser.",
-      "ask": "Be om hele listen",
-      "thTitle": "Tittel",
-      "thPublisher": "Kategori",
-      "thMarket": "Marked",
-      "thFormat": "Format",
-      "thAudience": "Rekkevidde",
-      "thFrom": "Fra",
-      "fmtNativeArticle": "Native-artikkel",
-      "fmtSponsoredArticle": "Sponset artikkel",
-      "fmtSponsoredContent": "Sponset innhold",
-      "fmtSponsoredArticleAds": "Artikkel + forsterkning",
-      "readersSuffix": "lesere/mnd",
-      "footBody": "Veiledende priser. Desken bekrefter fast pris basert på tilgjengelighet, sesong og volum.",
-      "footInd": "Veiledende · ekskl. mva."
-    },
-    "stats": {
-      "v240Label": "Titler i katalogen",
-      "v240Sub": "NO · SE · DK · FI · DE · AT · CH · UK · IE",
-      "v12Label": "Utgivere i nettverket",
-      "v12Sub": "Dagsaviser, magasiner, nisjetitler",
-      "v24Unit": "t",
-      "v24Label": "Fast tilbud",
-      "v24Sub": "Gjennomsnittlig svartid fra desken",
-      "v3Label": "Markeder dekket",
-      "v3Sub": "NO, SE, DK, FI, DE, AT, CH, UK, IE"
-    },
-    "how": {
-      "labelText": "Slik fungerer det",
-      "h2": "Tre steg. Mesteparten av jobben er på vår side.",
-      "s1Num": "01",
-      "s1H3": "Send en brief",
-      "s1Body": "Marked, budsjett, målgruppe, én setning om målet. Det er nok for desken til å scope. Ingen deck nødvendig.",
-      "s1Time": "5 minutter",
-      "s2Num": "02",
-      "s2H3": "Fast tilbud på 24 timer",
-      "s2Body": "Vi kommer tilbake med tittelshortlist, fast pris per utgiver, omfang av innholdsproduksjon og publiseringsdato. Skriftlig, ikke på telefon.",
-      "s2Time": "Innen én virkedag",
-      "s3Num": "03",
-      "s3H3": "Vi publiserer, du godkjenner",
-      "s3Body": "Vi skriver artikkelen til tittelens spesifikasjon, kjører spec-sjekken, gir deg utkastet til godkjenning, så publiserer utgiveren. Du får live-URL og faktura.",
-      "s3Time": "10–25 dager, avhengig av tittel"
-    },
-    "obj": {
-      "h2": "Det folk spør om før de sender en brief.",
-      "q1": "Hvorfor ikke bare kjøpe display? Det er billigere.",
-      "a1": "Per visning, ja. Per <strong>oppmerksomhetssekund</strong> vinner native med stor margin. Bygger du vurdering, er ikke enhetsprisen det viktigste.",
-      "q2": "Native føles tregt. Vi trenger dette i markedet neste uke.",
-      "a2": "De fleste titler publiserer innen 10–25 dager etter brief. Noen samme uke. Det faste tilbudet på 24 timer forteller deg nøyaktig når, per tittel, før du forplikter deg.",
-      "q3": "Vi har ikke operasjonell kapasitet for native.",
-      "a3": "<strong>Det er hele poenget med desken.</strong> Brief inn, ferdig artikkel og live plassering ut. Teamet vårt håndterer forhandlinger med utgiver, innholdsproduksjon, spec-sjekk og fakturering.",
-      "q4": "Hvordan måler vi det?",
-      "a4": "Vi sporer klikk på hver lenke inne i artikkelen din — målt førsteparts. Rekkevidde (visninger) rapporteres av utgiveren der det er tilgjengelig. Vi lover ikke viewability eller panelbasert brand lift vi ikke kan måle.",
-      "q5": "Hva med brand safety og merking?",
-      "a5": "Merking er kodet per marked (<strong>Annonsørinnhold / Annons / Annonce</strong>) og påføres automatisk. Spec-sjekken må bestå før noe når utgiveren."
-    },
-    "endCta": {
-      "h2": "Send oss en brief.",
-      "body": "Ett avsnitt holder. Vi svarer skriftlig, med fast tilbud, innen 24 timer.",
-      "ctaPrimary": "Skriv til desken",
-      "ctaSecondary": "Opprett konto",
-      "qualPrefix": "Eller du er utgiver og vil bli listet —",
-      "qualLink": "ta kontakt"
-    },
-    "foot": {
-      "tagline": "Native-innhold og annonsørinnhold på tvers av hver tittel vi dekker i NO, SE, DK, FI, DE, AT, CH, UK og IE — og en voksende katalog.",
-      "copy": "Getia AS · Oslo",
-      "navAdv": "For annonsører",
-      "navAgy": "For byråer",
-      "navPub": "For utgivere",
-      "navAbout": "Om oss",
-      "navContact": "Kontakt",
-      "navCreativeSpecs": "Annonsespesifikasjoner"
-    }
-  },
   "apiDocs": {
     "metaTitle": "API",
     "eyebrow": "Utviklere",
@@ -2558,6 +2567,9 @@
     "scope_catalog_write": "laste opp utgiverens egne titler og produkter",
     "scope_orders_write": "legge inn faste bestillinger for organisasjonen",
     "scope_pricing_admin": "interne prisverktøy (MCP) — kun plattform",
+    "scope_pricing_read": "MCP: kun lese desk-prisdata",
+    "scope_pricing_draft": "MCP: lese + registrere utkast (kontakter, tilbudsutkast, usendte prisforespørsler)",
+    "scope_pricing_apply": "MCP: utkast + ta i bruk tilbud på gjeldende priser og sende e-post",
     "boundPublisher": "{name} (utgiver)",
     "bindingPlatformGroup": "Plattform",
     "bindingSearchPlaceholder": "Søk etter organisasjon eller utgiver på navn, marked eller tittel",
@@ -2663,7 +2675,11 @@
     "priceUnconfirmed": "pris ikke bekreftet",
     "productInactive": "inaktiv",
     "inviteLanguageLabel": "Språk i e-posten",
-    "inviteLanguageHint": "Invitasjonen, registreringssiden og portalkontoen bruker dette språket. Standard er markedet til tittelen."
+    "inviteLanguageHint": "Invitasjonen, registreringssiden og portalkontoen bruker dette språket. Standard er markedet til tittelen.",
+    "aliasLabel": "Søke-alias",
+    "aliasHint": "Kommaseparert. Merkenavn og alternative navn katalogsøket skal treffe. Søket fjerner punktum, så legg også til en punktumfri form (f.eks. «ATno» for «AT.no»).",
+    "aliasSave": "Lagre alias",
+    "aliasSaving": "Lagrer…"
   },
   "salesContacts": {
     "title": "Salgskontakter",
@@ -2867,7 +2883,9 @@
     "callSkip": "Hopp over nå →",
     "marketBlocked": "{org} har ikke valgt faktureringsmarked ennå. En administrator i {org} må velge det under Konto før teamet kan sende forespørsler.",
     "blockedTitle": "{org} er ikke satt opp for fakturering ennå",
-    "blockedBack": "Tilbake til planen"
+    "blockedBack": "Tilbake til planen",
+    "marketError": "Velg markedet selskapet faktureres i.",
+    "phoneError": "Skriv inn et telefonnummer med minst 6 sifre."
   },
   "rateCard": {
     "pageTitle": "Rate card-forespørsel",
@@ -3038,6 +3056,8 @@
     "deactivateHint": "Kontoen slutter å virke umiddelbart — alle innloggingsmåter avvises. Ordrer, tilbud og fakturaer du har signert beholdes, fordi de er regnskapsdokumenter. En superadministrator kan slå kontoen på igjen hvis du kommer tilbake.",
     "deactivateConfirmLabel": "Skriv e-postadressen din for å bekrefte",
     "deactivateButton": "Deaktiver kontoen min",
+    "eraseDataLabel": "Slett også personopplysningene mine",
+    "eraseDataHint": "Navn, e-postadresse, telefonnummer, innloggingsdetaljer og innboks slettes, og du fjernes fra organisasjonene dine. Dette kan ikke angres, heller ikke av en superadmin. Ordrer, tilbud og fakturaer beholdes uten personopplysningene dine.",
     "deactivating": "Deaktiverer…",
     "errDelegation": "Sluttdatoen for delegeringen er ikke en gyldig dato.",
     "errDelegationPast": "Sluttdatoen for delegeringen må være frem i tid.",
@@ -3045,7 +3065,35 @@
     "statusRevoked": "Fjernet",
     "errEmailDomain": "Vi finner ingen e-postserver for det domenet. Sjekk om adressen er skrevet feil.",
     "roleHelp": "Administratorer styrer teamet og kan gjøre alt. Medlemmer bygger planer, sender forespørsler og – med bestillingsrett – godtar tilbud. Begrenset gir bare lesetilgang: ser teamets planer, forespørsler, tilbud, bestillinger, rapporter, artikler og fakturaer, men kan ikke endre, sende, godta eller dele noe.",
-    "canCommitRestrictedNote": "Brukere med begrenset tilgang kan bare lese og kan ikke få bestillingsrett."
+    "canCommitRestrictedNote": "Brukere med begrenset tilgang kan bare lese og kan ikke få bestillingsrett.",
+    "notifications": {
+      "eyebrow": "Varsler",
+      "title": "E-postvarsler",
+      "lead": "Velg hvilke varsler vi også sender på e-post. Alt vises alltid i innboksen din i NativeSpin.",
+      "save": "Lagre innstillinger",
+      "saving": "Lagrer…",
+      "saved": "Varselinnstillingene dine er lagret.",
+      "quotes": {
+        "label": "Forespørsler og tilbud",
+        "hint": "Et tilbud er klart, akseptert, avslått eller må fornyes."
+      },
+      "orders": {
+        "label": "Ordrer og bookinger",
+        "hint": "En ordre er bekreftet, fullført eller kansellert."
+      },
+      "content": {
+        "label": "Innhold og gjennomgang",
+        "hint": "Et utkast er klart for gjennomgang, eller en utgiver har sendt et tilbake."
+      },
+      "billing": {
+        "label": "Fakturaer",
+        "hint": "En ny faktura er utstedt."
+      },
+      "planning": {
+        "label": "Planoppdateringer",
+        "hint": "Desken har foreslått en plassering, en tittel har fått pris, eller en kunde har godkjent en delt plan."
+      }
+    }
   },
   "invite": {
     "title": "Bli med i {org}",
@@ -3305,6 +3353,8 @@
     "resultsAlsoConsider": "Også verdt å vurdere",
     "resultsEmpty": "Ingen treff ennå – prøv en bredere brief eller et annet marked.",
     "whyFits": "Derfor passer den:",
+    "aiWritten": "AI",
+    "aiWrittenHint": "Denne forklaringen er skrevet av AI ut fra tittelens katalogopplysninger. Sjekk den mot tittelen før du baserer deg på den.",
     "reach": "rekkevidde/mnd",
     "addToShortlist": "Legg i utvalget",
     "titlePlaceholder": "Tittel · desken priser",
@@ -3422,6 +3472,7 @@
     }
   },
   "quotePdf": {
+    "customerVatId": "Kundens mva.-nummer: {vatId}",
     "documentTitle": "Tilbud {quoteNumber}",
     "quoteNumber": "Tilbudsnummer",
     "revision": "Revisjon",
@@ -3456,6 +3507,30 @@
     "extraWork": "Ekstra arbeid / revisjon",
     "inclArticle": "Inkl. artikkel skrevet av NativeSpin · fra {amount}",
     "extraWorkDetail": "{hours} t × {rate}/t"
+  },
+  "deskAudit": {
+    "eyebrow": "Admin",
+    "title": "Revisjonslogg",
+    "lead": "Hvem gjorde hva, med hvilken oppføring, og når. Filtrer på person, handling eller organisasjon.",
+    "filterActor": "Aktør",
+    "filterActorPlaceholder": "Bruker-ID eller «system»",
+    "filterAction": "Handling",
+    "filterActionPlaceholder": "f.eks. invoice.issue eller auth.",
+    "filterOrg": "Organisasjons-ID",
+    "filterButton": "Filtrer",
+    "clear": "Nullstill",
+    "colWhen": "Når",
+    "colActor": "Aktør",
+    "colAction": "Handling",
+    "colEntity": "Oppføring",
+    "colOrg": "Organisasjon",
+    "colDetail": "Detaljer",
+    "resultCount": "{count, plural, =0 {Ingen oppføringer} =1 {1 oppføring} other {# oppføringer}}",
+    "none": "Ingen oppføringer i revisjonsloggen samsvarer med filtrene.",
+    "prev": "Forrige",
+    "next": "Neste",
+    "pageOf": "Side {page} av {pages}",
+    "retentionNote": "IP- og e-postadresser fjernes fra oppføringer som er eldre enn 90 dager."
   },
   "deskUsers": {
     "eyebrow": "Administrasjon",
@@ -3522,7 +3597,8 @@
     "termsDaysValue": "{days, plural, one {netto # dag} other {netto # dager}}",
     "okTerms": "Betalingsbetingelsene er lagret.",
     "errTerms": "Oppgi hele dager mellom 1 og 120.",
-    "errViewAsOrg": "Fant ikke den annonsøren."
+    "errViewAsOrg": "Fant ikke den annonsøren.",
+    "errViewAsReason": "Oppgi en kort begrunnelse for å se som kunden."
   },
   "status": {
     "ACCEPTED": "Godtatt",
@@ -3898,7 +3974,21 @@
       "bodyClient": "Kunden har sendt versjon {version} av «{article}» tilbake for endringer.",
       "bodyDesk": "NativeSpin-desken har sendt versjon {version} av «{article}» tilbake for endringer.",
       "comment": "Kommentar: «{comment}»"
-    }
+    },
+    "quoteDeclined": {
+      "title": "Tilbud avslått: {plan}",
+      "body": "{org} har avslått tilbudet."
+    },
+    "requestWithdrawn": {
+      "title": "Forespørsel trukket: {plan}",
+      "body": "{org} har trukket forespørselen. Det trengs ikke mer arbeid på den."
+    },
+    "cancellationRequested": {
+      "title": "Kansellering ønsket: {plan}",
+      "body": "{org} har bedt om å kansellere denne ordren. Sjekk bookingene hos utgiverne, og kanseller deretter ordren eller svar kunden."
+    },
+    "selfServiceReason": "Oppgitt årsak: {reason}",
+    "selfServiceNoReason": "Ingen årsak ble oppgitt."
   },
   "publisherInviteEmail": {
     "subject": "Invitasjon til samarbeid for {publisher} – NativeSpin",
@@ -3936,6 +4026,7 @@
     "deskOrders": "Bestillinger",
     "deskTitles": "Titler",
     "deskUsers": "Brukere",
+    "deskAudit": "Revisjonslogg",
     "deskWriters": "Skribenter",
     "deskPriceQuotes": "Pristilbud",
     "deskPublisherContacts": "Utgiverkontakter",
@@ -4045,7 +4136,99 @@
     "deskHeading": "Se som kunde",
     "deskLead": "Åpne plattformen som en annonsør ser den, med kundens lister, forespørsler og bestillinger. Ingen bruker legges til i kundens team. Visningen avsluttes etter 8 timer.",
     "deskOrgLabel": "Kunde",
+    "deskReasonLabel": "Begrunnelse",
+    "deskReasonHint": "Hvorfor du åpner kundens konto (lagres i revisjonsloggen), f.eks. en supporthenvendelse.",
     "deskStart": "Åpne som kunde",
     "deskStarting": "Åpner …"
+  },
+  "subprocessors": {
+    "metaTitle": "Underleverandører",
+    "eyebrow": "Tillit",
+    "title": "Underleverandører (underdatabehandlere)",
+    "lead": "Tredjepartene som behandler personopplysninger på våre vegne når du bruker NativeSpin, og hva hver av dem gjør.",
+    "lastUpdated": "Sist oppdatert: {date}",
+    "colName": "Underleverandør",
+    "colPurpose": "Formål",
+    "colData": "Berørte data",
+    "colLocation": "Behandlingssted",
+    "locationTbc": "Bekreftes",
+    "optional": "Kun når aktivert",
+    "railway": {
+      "purpose": "Drift av applikasjonen og databasen",
+      "data": "Alle konto-, ordre- og innholdsdata"
+    },
+    "resend": {
+      "purpose": "Utsending av transaksjons- og varsel-e-post",
+      "data": "E-postadresse, navn, meldingsinnhold"
+    },
+    "r2": {
+      "purpose": "Fillagring (opplastede dokumenter, tilbuds-PDF-er, artikkelfiler)",
+      "data": "Filer du eller vi laster opp"
+    },
+    "ai": {
+      "purpose": "AI-assistert matching av kampanjebrief mot titler, og annonseforhåndsvisningen",
+      "data": "Brief-teksten du skriver inn",
+      "name": "AI-gateway og modelleverandør"
+    },
+    "gtm": {
+      "purpose": "Tag-håndtering for analyse, lastes kun etter samtykke",
+      "data": "Brukshendelser, IP-adresse, cookie-identifikatorer"
+    },
+    "getcookies": {
+      "purpose": "Samtykkebanner for informasjonskapsler og samtykkelogg",
+      "data": "Samtykkevalg, IP-adresse"
+    },
+    "fiken": {
+      "purpose": "Regnskap: fakturaer bokføres i regnskapssystemet vårt",
+      "data": "Organisasjonsnavn, MVA-nummer, fakturalinjer"
+    },
+    "changesTitle": "Endringer i denne listen",
+    "changesBody": "Vi oppdaterer denne siden før en ny underleverandør begynner å behandle personopplysninger. Databehandleravtale (DPA) er tilgjengelig på forespørsel.",
+    "contact": "Spørsmål:",
+    "linkLabel": "Se underleverandørene våre"
+  },
+  "help": {
+    "metaTitle": "Hjelp",
+    "eyebrow": "Support",
+    "title": "Hjelp",
+    "lead": "Svar på de vanligste spørsmålene, og hvordan du når et menneske.",
+    "faqTitle": "Vanlige spørsmål",
+    "q1": "Hvordan får jeg en pris?",
+    "a1": "Legg plasseringer fra katalogen i planen din og send den som en forespørsel. Katalogprisene er veiledende; desken svarer med et bindende tilbud, normalt innen 24 arbeidstimer.",
+    "q2": "Kan jeg avslå et tilbud eller trekke en forespørsel?",
+    "a2": "Ja. Åpne forespørselen og bruk «Går dere ikke videre?» nederst. Ingenting belastes før du aksepterer et tilbud.",
+    "q3": "Hvordan kansellerer jeg en ordre?",
+    "a3": "Åpne ordren og velg «Be om kansellering». Desken sjekker bookingene hos utgiverne og bekrefter eventuelle kostnader før kanselleringen er endelig.",
+    "q4": "Hvor finner jeg fakturaene mine?",
+    "a4": "Under Fakturaer, der hver enkelt kan lastes ned som PDF.",
+    "q5": "Hvordan inviterer jeg kolleger eller endrer hvem som kan bestille?",
+    "a5": "En administrator i organisasjonen styrer medlemmer, roller og bestillingsrett under Konto → Team.",
+    "q6": "Hvordan eksporterer jeg dataene mine eller avslutter kontoen?",
+    "a6": "Begge deler ligger under Konto → Data og konto. Der kan du også endre hvilke e-poster du får.",
+    "contactTitle": "Snakk med desken",
+    "contactBody": "Skriv til oss, så svarer et menneske på desken innen én arbeidsdag.",
+    "contactCta": "Kontakt oss",
+    "changelogLink": "Nyheter",
+    "navLabel": "Hjelp"
+  },
+  "changelog": {
+    "metaTitle": "Nyheter",
+    "eyebrow": "Endringslogg",
+    "title": "Nytt i NativeSpin",
+    "lead": "Produktendringer som påvirker hvordan du jobber, nyeste først.",
+    "entries": {
+      "selfService": {
+        "title": "Avslå, trekk og kanseller selv",
+        "body": "Du kan nå avslå et tilbud, trekke en forespørsel og be om kansellering av en ordre direkte fra forespørsels- og ordresidene."
+      },
+      "notificationPrefs": {
+        "title": "Velg hvilke e-poster du får",
+        "body": "Kontoinnstillingene har nå e-postvarsler per kategori. Innboksen i appen viser fortsatt alt."
+      },
+      "help": {
+        "title": "Hjelp og tilbakemelding på ett sted",
+        "body": "En ny hjelpeside svarer på vanlige spørsmål, og etter at en kampanje er fullført kan du gi en vurdering av hvordan det gikk."
+      }
+    }
   }
 }

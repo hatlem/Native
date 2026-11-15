@@ -6,7 +6,7 @@ import type { SpecFailure, SpecWarning } from "@/lib/spec-check";
 import { saveDraft, setAssetStatus } from "@/app/desk-content-actions";
 import { Link } from "@/i18n/navigation";
 import { StatusBadge } from "@/app/status-badge";
-import { SubmitButton } from "@/components";
+import { SubmitButton, PendingButton } from "@/components";
 import { PlaybookCard } from "@/components/playbook-card";
 
 export const dynamic = "force-dynamic";
@@ -280,15 +280,14 @@ export default async function WriterLine({
                 <input type="hidden" name="assetId" value={latest.id} />
                 <input type="hidden" name="orderLineId" value={view.lineId} />
                 <input type="hidden" name="target" value="IN_REVIEW" />
-                <button
-                  type="submit"
+                <PendingButton
                   className="btn primary"
                   disabled={!canSubmit}
                   aria-disabled={!canSubmit}
                   aria-describedby={canSubmit ? undefined : "submit-blocked"}
                 >
                   {t("line.submit")}
-                </button>
+                </PendingButton>
                 {canSubmit ? null : (
                   <span id="submit-blocked" className="muted small">
                     {t("line.submitBlocked")}

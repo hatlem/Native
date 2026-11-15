@@ -1,3 +1,4 @@
+import { PendingButton } from "@/components/submit-button";
 import { Link } from "@/i18n/navigation";
 import { StatusBadge } from "@/app/status-badge";
 import { selectActiveList } from "@/app/list-actions";
@@ -50,12 +51,11 @@ function Entry({ entry }: { entry: TimelineEntry }) {
       <form className="requests-timeline__form" action={selectActiveList}>
         <input type="hidden" name="listId" value={entry.action.listId} />
         <input type="hidden" name="locale" value={entry.action.locale} />
-        <button
-          type="submit"
+        <PendingButton
           className="requests-timeline__entry requests-timeline__entry--btn"
         >
           <EntryBody entry={entry} />
-        </button>
+        </PendingButton>
       </form>
     );
   }

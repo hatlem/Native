@@ -1,3 +1,4 @@
+import { PendingButton } from "@/components/submit-button";
 import { getTranslations } from "next-intl/server";
 import { redirect } from "next/navigation";
 import { prisma } from "@/lib/prisma";
@@ -61,12 +62,11 @@ export default async function NewArticlePage({
             className="w-full rounded border p-2 text-sm"
           />
         </div>
-        <button
-          type="submit"
+        <PendingButton
           className="rounded bg-black px-3 py-1.5 text-sm text-white"
         >
           {t("createCta")}
-        </button>
+        </PendingButton>
       </form>
     </div>
   );

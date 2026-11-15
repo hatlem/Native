@@ -1,5 +1,7 @@
 "use client";
 
+
+import { PendingButton } from "@/components/submit-button";
 import { useState } from "react";
 import { presignArticleUpload } from "@/app/article-library-actions";
 import { saveUploadedDraft } from "@/app/desk-content-actions";
@@ -97,9 +99,9 @@ export function UploadForm({
         <input type="hidden" name="locale" value={locale} />
         <input type="hidden" name="articleId" value={articleId} />
         <input type="hidden" name="bodyUrl" value={key ?? ""} />
-        <button type="submit" disabled={busy || !key} className="btn small secondary">
+        <PendingButton disabled={busy || !key} className="btn small secondary">
           {busy ? labels.uploading : labels.save}
-        </button>
+        </PendingButton>
       </form>
     </div>
   );

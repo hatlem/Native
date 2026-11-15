@@ -1,11 +1,11 @@
 import { getTranslations } from "next-intl/server";
 import { Link } from "@/i18n/navigation";
 import type { PlanBriefValues, TimingOption } from "@/lib/plan-brief";
-import { formatMoney } from "@/lib/money";
+import { formatMoney, formatMoneyExact } from "@/lib/money";
 import { hasFigure, type ListTotal } from "@/lib/plan-total";
 import { totalFloor, totalLabel } from "@/lib/pricing/total-label";
 import { submitRequest } from "@/app/checkout-actions";
-import { SubmitButton } from "@/components";
+import { SubmitButton, PendingButton } from "@/components";
 import { ViewAsConfirm } from "@/app/view-as-confirm";
 import type { ListOrder } from "@/lib/commerce/list-commit";
 import { PlanBriefFields } from "./PlanBriefFields";
@@ -104,7 +104,7 @@ export async function PlanSummary({
         : null;
   // The instant path only exists when every line is exact, so the commitment
   // is always an exact, VAT-inclusive figure.
-  const commitAmount = instant ? joinTotals((r) => money(r.totalInclVat, r.currency)) : null;
+  const commitAmount = instant ? joinTotals((r) => formatMoneyExact(r.totalInclVat, r.currency, locale)) : null;
   const anyEstimate = visibleTotals.some((r) => r.estimate !== null);
 
   const submitLabel = instant ? tf("planSubmit") : rfqInstead ? tf("sendAsRfq") : tr("submit");
@@ -143,8 +143,8 @@ export async function PlanSummary({
             {r.hasExact ? (
               <p className="plan-summary-note">
                 {r.estimate
-                  ? t("inclVatFirmPart", { amount: money(r.totalInclVat, r.currency) })
-                  : t("inclVatLine", { amount: money(r.totalInclVat, r.currency) })}
+                  ? t("inclVatFirmPart", { amount: formatMoneyExact(r.totalInclVat, r.currency, locale) })
+                  : t("inclVatLine", { amount: formatMoneyExact(r.totalInclVat, r.currency, locale) })}
               </p>
             ) : null}
           </div>
@@ -249,9 +249,9 @@ export async function PlanSummary({
                 : t("pricingOnRequest")}
           </span>
         </div>
-        <button type="submit" form="plan-request-form" className="btn block" disabled={nothingToSend}>
+        <PendingButton form="plan-request-form" className="btn block" disabled={nothingToSend}>
           {submitLabel}
-        </button>
+        </PendingButton>
         <p className="plan-mobile-submit-bar__reassurance">{nothingToSend ? t("nothingToSend") : reassurance}</p>
       </div>
     ) : null}

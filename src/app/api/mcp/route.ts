@@ -1,3 +1,4 @@
+import { requestIp } from "@/lib/client-ip";
 import { NextRequest, NextResponse } from "next/server";
 import { createHash } from "node:crypto";
 import { WebStandardStreamableHTTPServerTransport } from "@modelcontextprotocol/sdk/server/webStandardStreamableHttp.js";
@@ -16,11 +17,7 @@ function extractToken(req: NextRequest): string {
 }
 
 function clientIp(req: NextRequest): string {
-  return (
-    req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ||
-    req.headers.get("x-real-ip") ||
-    "unknown"
-  );
+  return requestIp(req.headers);
 }
 
 async function handle(req: NextRequest): Promise<Response> {

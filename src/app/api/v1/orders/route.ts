@@ -1,3 +1,4 @@
+import { log } from "@/lib/log";
 import { NextResponse, type NextRequest } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { authenticateRequest } from "@/lib/api-auth";
@@ -15,6 +16,7 @@ import { createFirmOrder, FirmOrderStaleError } from "@/lib/commerce/firm-order"
 import { recordAudit } from "@/lib/audit";
 import { planNameFor } from "@/lib/plan-name";
 import { marketDefaultLocale } from "@/lib/market-locale";
+import { errJson, rateLimitedJson } from "@/lib/api/errors";
 
 export const dynamic = "force-dynamic";
 
@@ -23,10 +25,6 @@ export const dynamic = "force-dynamic";
 // mystery supply. The key must carry `orders:write` and be bound to the
 // buying organization. RFQ-only inventory is rejected by design — those
 // titles stay desk-mediated.
-function errJson(status: number, code: string, message: string) {
-  return NextResponse.json({ error: { code, message } }, { status });
-}
-
 function authMessage(reason: string): string {
   switch (reason) {
     case "missing_token":
@@ -62,11 +60,7 @@ export async function POST(req: NextRequest) {
   const organizationId = auth.organizationId;
   const limited = await rfqLimiter.check(`api:orders:${keyId}`);
   if (!limited.ok) {
-    return errJson(
-      429,
-      "RATE_LIMITED",
-      `Retry after ${Math.ceil(limited.retryAfterMs / 1000)}s.`,
-    );
+    return rateLimitedJson(limited.retryAfterMs, `Retry after ${Math.ceil(limited.retryAfterMs / 1000)}s.`);
   }
 
   // Optional Idempotency-Key: when present, a byte-identical retry of this
@@ -143,7 +137,7 @@ export async function POST(req: NextRequest) {
       } catch (err) {
         // Best effort: the reservation stays "pending" (retries → 409, never
         // a double charge), but this request's response is still correct.
-        console.warn("api.orders.idempotency_complete_failed", { keyId, err });
+        log.warn("api.orders.idempotency_complete_failed", { keyId, err });
       }
     }
     return NextResponse.json(jsonBody, { status });
@@ -156,7 +150,7 @@ export async function POST(req: NextRequest) {
   } catch (e) {
     if (idem) {
       await releaseIdempotencyKey(idem).catch((err) =>
-        console.warn("api.orders.idempotency_release_failed", { keyId, err }),
+        log.warn("api.orders.idempotency_release_failed", { keyId, err }),
       );
     }
     throw e;

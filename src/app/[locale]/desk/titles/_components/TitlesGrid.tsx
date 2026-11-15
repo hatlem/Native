@@ -9,7 +9,7 @@ import {
   resetTitleVerification,
 } from "@/app/title-actions";
 import { createPriceRequestsBulkAction } from "@/app/price-actions";
-import { SubmitButton } from "@/components";
+import { SubmitButton, ConfirmSubmit } from "@/components";
 import type { FreshnessBucket } from "@/lib/pricing/freshness";
 
 // Mirrors the include shape of the page's prisma.title.findMany query,
@@ -33,6 +33,7 @@ type Props = {
 
 export async function TitlesGrid({ locale, byMarket }: Props) {
   const t = await getTranslations({ locale, namespace: "deskTitles" });
+  const tc = await getTranslations({ locale, namespace: "common" });
   const tMarket = await getTranslations({ locale, namespace: "market" });
 
   return (
@@ -269,10 +270,11 @@ export async function TitlesGrid({ locale, byMarket }: Props) {
                     <form action={deactivateTitle}>
                       <input type="hidden" name="locale" value={locale} />
                       <input type="hidden" name="titleId" value={title.id} />
-                      <SubmitButton
+                      <ConfirmSubmit
                         label={t("actions.deactivate")}
+                        confirmLabel={tc("confirm.yes")}
+                        cancelLabel={tc("confirm.cancel")}
                         pendingLabel={t("actions.deactivating")}
-                        className="btn small ghost"
                       />
                     </form>
                   ) : null}

@@ -177,7 +177,7 @@ if (!RUN_DB_IT) {
     pricingAdminToken = await mintKey({ scopes: "pricing:admin" });
     paramsToken = await mintKey({ scopes: "catalog:read" });
     publisherToken = await mintKey({ scopes: "catalog:write", publisherId });
-    quotesToken = await mintKey({ scopes: "catalog:read" });
+    quotesToken = await mintKey({ scopes: "catalog:read", organizationId: orgId });
   });
 
   after(async () => {
@@ -528,12 +528,20 @@ if (!RUN_DB_IT) {
       select: { id: true },
     });
     assert.ok(quote, "the order tests leave a quote behind");
-    const q = await getQuote(
-      new NextRequest(`http://localhost/api/v1/quotes/${quote.id}`, {
-        headers: { authorization: `Bearer ${paramsToken}` },
-      }),
-      { params: Promise.resolve({ id: quote.id }) },
-    );
+    const readAs = (token: string) =>
+      getQuote(
+        new NextRequest(`http://localhost/api/v1/quotes/${quote.id}`, {
+          headers: { authorization: `Bearer ${token}` },
+        }),
+        { params: Promise.resolve({ id: quote.id }) },
+      );
+    // Quotes are tenant data: a key with no organization binding (a bare
+    // platform catalog:read key, a publisher key) gets the same 404 as a
+    // missing id. Only the org's own key — or the internal pricing:admin
+    // platform key — reads it.
+    assert.equal((await readAs(paramsToken)).status, 404);
+    assert.equal((await readAs(publisherToken)).status, 403); // catalog:write only
+    const q = await readAs(quotesToken);
     assert.equal(q.status, 200);
     assert.deepEqual(
       conformanceErrors(OPENAPI_SPEC, responseSchema(OPENAPI_SPEC, "/api/v1/quotes/{id}", "get", 200), await q.json()),

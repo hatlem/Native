@@ -37,6 +37,7 @@ export const PAGE_TITLE_KEYS = [
   "deskOrders",
   "deskTitles",
   "deskUsers",
+  "deskAudit",
   "deskWriters",
   "deskPriceQuotes",
   "deskPublisherContacts",

@@ -1,5 +1,7 @@
 "use client";
 
+
+import { PendingButton } from "@/components/submit-button";
 import { useActionState } from "react";
 import { useTranslations } from "next-intl";
 import { createWriterInvite } from "@/app/writer-invite-actions";
@@ -45,9 +47,9 @@ export function InviteWriterForm({ locale }: { locale: string }) {
         </label>
       </div>
       <div className="cluster">
-        <button type="submit" className="btn primary" disabled={pending} aria-disabled={pending}>
+        <PendingButton className="btn primary" disabled={pending} aria-disabled={pending}>
           {pending ? t("inviting") : t("inviteButton")}
-        </button>
+        </PendingButton>
       </div>
       <div aria-live="polite">
         {state.status === "sent" ? (

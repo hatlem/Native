@@ -45,6 +45,7 @@ import {
   lineDisplay,
   sumTotalFigures,
 } from "@/lib/plan-total";
+import { quoteVatFor } from "@/lib/vat-buyer";
 import { scheduleOverlapWarnings, type ScheduleOverlapWarning } from "@/lib/programme-warnings";
 import type { BookingUnit } from "@/lib/campaign-schedule";
 import { SUPPORTED_MARKETS } from "@/lib/markets";
@@ -57,6 +58,7 @@ const MARKET_CODES = SUPPORTED_MARKETS;
 // its address first (via /plan/open). Every form here posts that list's id and
 // the actions act on it (lib/plan-target.ts), so another tab moving the cookie
 // on afterwards can't make "Send" or a line edit land on a different plan.
+import { DataLayerEvent } from "@/app/data-layer-event";
 export async function PlanView({
   locale,
   sp,
@@ -93,7 +95,7 @@ export async function PlanView({
   const activeOrg = ws?.activeOrgId
     ? await prisma.organization.findUnique({
         where: { id: ws.activeOrgId },
-        select: { name: true, marketCode: true },
+        select: { name: true, marketCode: true, vatId: true },
       })
     : null;
   const needsClient = !!ws?.isAgency && !ws.activeOrgId;
@@ -135,7 +137,8 @@ export async function PlanView({
   // Desk-owned fee + margin rules: the per-line figures, the summary total and
   // PlanLines' breakdown ("38 000 placement + 7 000 article") are all priced
   // from the same load the order uses, so /plan shows what the order charges.
-  const pricing = await loadPricingDefaults();
+  // …at the VAT rate THIS buyer is charged (lib/vat.ts).
+  const pricing = { ...(await loadPricingDefaults()), vatPct: quoteVatFor(activeOrg).vatPct };
   // The per-currency hourly rate the article-scope list quotes.
   const extraWorkRates = await loadExtraWorkRates();
 
@@ -363,6 +366,8 @@ export async function PlanView({
       budget: recBudget,
       brief: recBriefRaw,
       locale,
+      // Budgets and attributes the LLM calls (lib/ai-usage.ts).
+      organizationId: ws?.activeOrgId ?? null,
     });
     rec = { picks: result.picks, supplementary: result.supplementary };
     briefMatched = result.briefMatched;
@@ -485,6 +490,11 @@ export async function PlanView({
 
   return (
     <>
+      {/* Activation signal: this plan has its first placement(s). Deduped per
+          plan per browser session by DataLayerEvent. */}
+      {activeList && listItems.length > 0 ? (
+        <DataLayerEvent event="plan_first_item" id={activeList.id} />
+      ) : null}
       {/* A named plan keeps its own title block (name, rename, "Switch plan")
           even while empty, so a buyer who just created one can see which plan
           is active and switch back. The generic header is for no plan at all. */}

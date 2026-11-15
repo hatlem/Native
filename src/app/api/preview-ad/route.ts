@@ -1,19 +1,11 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { previewLimiter } from "@/lib/rate-limit";
+import { requestIp } from "@/lib/client-ip";
 import { parsePreviewInput } from "@/lib/preview/schema";
 import { resolvePreview } from "@/lib/preview/resolve";
 import { generatePreviewArticle, generationAvailable } from "@/lib/preview/generate";
 
 export const dynamic = "force-dynamic";
-
-function clientIp(req: NextRequest | Request): string {
-  const h = req.headers;
-  return (
-    h.get("x-forwarded-for")?.split(",")[0]?.trim() ||
-    h.get("x-real-ip") ||
-    "unknown"
-  );
-}
 
 // POST /api/preview-ad — generate a sample native-ad article for the public
 // preview tool. Always returns 200 with an article (AI when available + under
@@ -31,7 +23,9 @@ export async function POST(req: NextRequest | Request) {
     return NextResponse.json({ error: parsed.error }, { status: 400 });
   }
 
-  const ip = clientIp(req);
+  // The trusted proxy hop, not whatever the client put first in
+  // X-Forwarded-For (lib/client-ip.ts) — the limiter gates model spend.
+  const ip = requestIp(req.headers);
   const rate = await previewLimiter.check(`preview:${ip}`);
 
   const result = await resolvePreview({

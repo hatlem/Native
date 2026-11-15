@@ -82,3 +82,42 @@ test("ctrPct: clicks/impressions to one decimal; guards zero/null denominator", 
   assert.equal(ctrPct(10, null), null);
   assert.equal(ctrPct(0, 1000), 0);
 });
+
+test("deskRevenueByCurrency: cancelled out, credits off, extra work in, unpriced lines ignored", async () => {
+  const { deskRevenueByCurrency } = await import("./reporting");
+  const inv = (lineTotal: number, unitCost: number, extra = {}) => ({
+    kind: "INVENTORY" as const,
+    unitCost,
+    quantity: 1,
+    lineTotal,
+    ...extra,
+  });
+  const rows = deskRevenueByCurrency([
+    // Live order: 10 000 net + 25% VAT, 2 000 margin; 1 000 net extra work.
+    {
+      status: "INVOICED",
+      currency: "NOK",
+      quoteTotal: 12500,
+      vatPct: 25,
+      lines: [
+        inv(10000, 8000),
+        // Never agreed: neither revenue nor a 5 000 negative margin.
+        inv(0, 5000, { priceOnRequest: true }),
+      ],
+      extraWork: [1000],
+      credited: [],
+    },
+    // Cancelled (e.g. fully credited): earns nothing.
+    { status: "CANCELLED", currency: "NOK", quoteTotal: 50000, vatPct: 25, lines: [inv(40000, 30000)], extraWork: [], credited: [50000] },
+    // Still live but partly credited.
+    { status: "COMPLETED", currency: "SEK", quoteTotal: 2500, vatPct: 25, lines: [inv(2000, 1500)], extraWork: [], credited: [500] },
+  ]);
+  assert.deepEqual(rows.map((r) => r.currency), ["NOK", "SEK"]);
+  const [nok, sek] = rows;
+  assert.equal(nok.count, 1);
+  assert.equal(nok.gmv, 12500 + 1250);
+  assert.equal(nok.split.marginRevenue, 2000);
+  assert.equal(nok.split.contentFeeRevenue, 1000);
+  assert.equal(sek.gmv, 2000);
+  assert.equal(sek.aov, 2000);
+});

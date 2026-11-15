@@ -30,6 +30,7 @@ export async function GET() {
     currency: inv.currency,
     subtotal: Number(inv.subtotal),
     vat_pct: Number(inv.vatPct),
+    vat_treatment: inv.vatTreatment ?? "",
     total: Number(inv.total),
     org_name: inv.organization.name,
     org_vat_id: inv.organization.vatId ?? "",

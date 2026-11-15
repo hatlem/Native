@@ -1,3 +1,4 @@
+import { PendingButton } from "@/components/submit-button";
 import { getTranslations } from "next-intl/server";
 import { EmptyState } from "@/app/empty-state";
 import { intlLocale } from "@/lib/money";
@@ -80,9 +81,9 @@ export async function ListsTable({ locale, lists, heading, emptyLabel, readOnly 
                           aria-label={t("rename")}
                           className="input"
                         />
-                        <button type="submit" className="link">
+                        <PendingButton className="link">
                           {t("rename")}
-                        </button>
+                        </PendingButton>
                       </form>
                       )}
                     </td>
@@ -112,16 +113,16 @@ export async function ListsTable({ locale, lists, heading, emptyLabel, readOnly 
                         <form action={duplicateList}>
                           <input type="hidden" name="listId" value={list.id} />
                           <input type="hidden" name="locale" value={locale} />
-                          <button type="submit" className="link">
+                          <PendingButton className="link">
                             {t("duplicate")}
-                          </button>
+                          </PendingButton>
                         </form>
                         <form action={archiveList}>
                           <input type="hidden" name="listId" value={list.id} />
                           <input type="hidden" name="locale" value={locale} />
-                          <button type="submit" className="link">
+                          <PendingButton className="link">
                             {t("archive")}
-                          </button>
+                          </PendingButton>
                         </form>
                         </>
                         )}

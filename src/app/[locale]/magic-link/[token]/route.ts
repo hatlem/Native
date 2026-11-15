@@ -14,6 +14,7 @@
 //      redirect to /signin?error=magic_expired so the inline banner
 //      shows up on the next page.
 
+import { requestIp } from "@/lib/client-ip";
 import { type NextRequest, NextResponse } from "next/server";
 import { isRedirectError } from "next/dist/client/components/redirect-error";
 import { signIn } from "@/auth";
@@ -24,13 +25,13 @@ import { safeNext } from "@/lib/auth-gate";
 import { recordSignIn } from "@/lib/auth-events";
 import { recordAudit } from "@/lib/audit";
 import { appUrl, appName } from "@/lib/url";
+import { consumeMagicLinkToken } from "@/lib/auth-tokens";
+import { authLimiter } from "@/lib/rate-limit";
+import { mfaStepPath } from "@/lib/mfa/signin";
+import { MFA_PENDING_COOKIE, pendingCookieOptions, signPending } from "@/lib/mfa/tickets";
 
 function clientIp(req: NextRequest): string {
-  return (
-    req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ||
-    req.headers.get("x-real-ip") ||
-    "unknown"
-  );
+  return requestIp(req.headers);
 }
 
 export async function GET(
@@ -51,7 +52,7 @@ export async function GET(
     select: {
       consumedAt: true,
       expiresAt: true,
-      user: { select: { id: true, email: true, role: true } },
+      user: { select: { id: true, email: true, role: true, mfaEnabledAt: true } },
     },
   });
 
@@ -73,6 +74,31 @@ export async function GET(
     req.nextUrl.searchParams.get("next"),
     landingForRole(row.user.role, locale),
   );
+
+  // Two-factor account: the link proves the mailbox, which is only the FIRST
+  // factor. Spend the token here (same atomic single-use consume the provider
+  // uses — which itself refuses these links, see src/auth.ts) and continue at
+  // the code prompt. No session exists until the code is verified.
+  if (row.user.mfaEnabledAt) {
+    const limit = await authLimiter.check(`magic-consume:ip:${ip}`);
+    const consumed = limit.ok ? await consumeMagicLinkToken(token) : null;
+    if (!consumed) {
+      await recordAudit("anonymous", "auth.magic_link_invalid", "Token", { ip, reason: "signin_failed" });
+      return NextResponse.redirect(
+        new URL(`/${locale}/signin?error=magic_expired`, appUrl()),
+      );
+    }
+    const explicitNext = safeNext(req.nextUrl.searchParams.get("next"), "");
+    const res = NextResponse.redirect(new URL(mfaStepPath(locale), appUrl()));
+    res.cookies.set(
+      MFA_PENDING_COOKIE,
+      signPending({ uid: consumed.id, next: explicitNext, via: "magic" }),
+      pendingCookieOptions(),
+    );
+    void recordAudit(consumed.id, "auth.magic_link_consumed", `User:${consumed.email}`, { ip, mfa: true });
+    void recordAudit(consumed.id, "auth.mfa_challenged", `User:${consumed.email}`, { ip, via: "magic" });
+    return res;
+  }
 
   // signIn with redirectTo: on success it throws NEXT_REDIRECT (which we
   // re-throw so Next.js serves the 307 with the session cookie set).

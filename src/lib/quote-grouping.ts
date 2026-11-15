@@ -1,14 +1,16 @@
 // Multi-currency basket support. A single Plan can span placements
 // across several markets (a Norwegian agency buying NO + SE + DE
-// titles in one campaign). Each market has its own VAT regime and
-// invoicing currency, so we materialize one Quote per market —
+// titles in one campaign). Each market has its own invoicing currency,
+// publisher and margin/fee rules, so we materialize one Quote per market —
 // Request.quotes[] is already plural in the schema, this module
 // just gives us a clean grouping helper to drive the split.
 //
-// Grouping key is Title.marketId (NOT product.currency) because the
-// Eurozone has multiple markets sharing EUR with different VAT rates:
-// DE 19%, AT 20%, IE 23%, FI 25%. Grouping by currency would merge
-// them and apply one VAT to all four — wrong.
+// Grouping key is Title.marketId (NOT product.currency): Eurozone markets
+// share EUR but are priced and fulfilled separately.
+//
+// VAT is NOT decided here. The rate follows the BUYER's country, not the
+// publication's market (lib/vat.ts) — callers resolve it once per buyer and
+// apply it to every group.
 //
 // Pure module: no DB calls. Caller hydrates the product map (with
 // title→market relations) and passes it in.
@@ -20,7 +22,6 @@ export type QuoteGroupingProduct = {
     market: {
       code: string;
       currency: string;
-      vatRatePct: unknown; // Prisma Decimal or string at runtime
     };
   };
 };
@@ -34,7 +35,6 @@ export type QuoteGroup<TItem extends QuoteGroupingItem = QuoteGroupingItem> = {
   marketId: string;
   marketCode: string;
   currency: string;
-  vatPct: number;
   items: TItem[];
 };
 
@@ -58,7 +58,6 @@ export function groupItemsByMarket<TItem extends QuoteGroupingItem>(
         marketId: key,
         marketCode: product.title.market.code,
         currency: product.title.market.currency,
-        vatPct: Number(product.title.market.vatRatePct),
         items: [],
       };
       groups.set(key, group);

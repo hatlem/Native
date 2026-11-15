@@ -1,3 +1,4 @@
+import { PendingButton } from "@/components/submit-button";
 import { getTranslations } from "next-intl/server";
 import { prisma } from "@/lib/prisma";
 import type { Workspace } from "@/lib/workspace";
@@ -49,10 +50,10 @@ export async function OrgSwitcher({
           <form key={org.id} action={switchOrg}>
             <input type="hidden" name="locale" value={locale} />
             <input type="hidden" name="organizationId" value={org.id} />
-            <button type="submit" className="menu-item" aria-label={t("orgSwitchTo", { org: org.name })}>
+            <PendingButton className="menu-item" aria-label={t("orgSwitchTo", { org: org.name })}>
               <span aria-hidden="true" className="org-switcher__spacer" />
               {org.name}
-            </button>
+            </PendingButton>
           </form>
         ),
       )}

@@ -1,4 +1,63 @@
 {
+  "mfa": {
+    "stepTitle": "Tofaktorbekræftelse",
+    "stepHeadline": "Ét trin mere.",
+    "stepLead": "Din konto er beskyttet med tofaktorgodkendelse. Indtast koden fra din godkendelsesapp for at fuldføre login.",
+    "stepSubtitle": "Adgangskoden er godkendt. Indtast nu din sekscifrede kode.",
+    "stepSubtitleMagic": "E-mail-linket er godkendt. Indtast nu din sekscifrede kode.",
+    "codeLabel": "Godkendelseskode",
+    "codeHint": "Mistet telefonen? Indtast en af dine gendannelseskoder i stedet.",
+    "verify": "Bekræft og log ind",
+    "verifying": "Bekræfter…",
+    "cancel": "Tilbage til login",
+    "errorInvalid": "Koden er ikke rigtig. Tjek din godkendelsesapp, og prøv igen.",
+    "errorReplay": "Den kode er allerede brugt. Vent på den næste, og prøv igen.",
+    "errorRate": "For mange forsøg. Vent et par minutter, og prøv igen.",
+    "errorPassword": "Adgangskoden er ikke rigtig.",
+    "sessionExpired": "Dit login udløb før det andet trin. Log ind igen.",
+    "pageTitle": "Tofaktorgodkendelse",
+    "eyebrow": "Sikkerhed",
+    "lead": "Tilføj et ekstra trin, når du logger ind: en kode fra en godkendelsesapp på din telefon, oven i adgangskode eller e-mail-link.",
+    "requiredBanner": "Din rolle kræver tofaktorgodkendelse. Sæt den op for at fortsætte til desken.",
+    "noticeDisabled": "Tofaktorgodkendelse er nu slået fra.",
+    "noticeRecoveryUsed": "Du loggede ind med en gendannelseskode. Har du mistet din telefon, så slå tofaktor fra og sæt den op igen på din nye enhed.",
+    "codeOrRecoveryLabel": "Godkendelses- eller gendannelseskode",
+    "passwordLabel": "Adgangskode",
+    "working": "Arbejder…",
+    "recoveryTitle": "Gem dine gendannelseskoder",
+    "recoveryLead": "Hver kode virker én gang, hvis du ikke kan bruge telefonen. Opbevar dem et sikkert sted. De vises ikke igen.",
+    "recoveryDone": "Jeg har gemt dem",
+    "statusEyebrow": "Status",
+    "statusOn": "Tofaktorgodkendelse er slået til",
+    "statusOff": "Tofaktorgodkendelse er slået fra",
+    "enabledSince": "Slået til {date}.",
+    "recoveryLeft": "Ubrugte gendannelseskoder: {count}",
+    "recoveryEyebrow": "Gendannelse",
+    "regenerateTitle": "Nye gendannelseskoder",
+    "regenerateLead": "Indtast en aktuel kode for at lave et nyt sæt. De gamle koder holder op med at virke.",
+    "regenerate": "Lav nye koder",
+    "disableEyebrow": "Slå fra",
+    "disableTitle": "Slå tofaktorgodkendelse fra",
+    "disableLead": "Bekræft med din adgangskode eller en aktuel kode. Dine andre enheder bliver logget ud.",
+    "disableLeadStaff": "Bekræft med din adgangskode eller en aktuel kode. Din rolle kræver tofaktor, så du skal sætte den op igen, før du kan bruge desken.",
+    "disableCodeHint": "Lad adgangskoden stå tom for at bekræfte med en kode i stedet.",
+    "disable": "Slå tofaktor fra",
+    "setupTitle": "Sæt din godkendelsesapp op",
+    "step1": "Åbn din godkendelsesapp (Google Authenticator, Microsoft Authenticator, 1Password, Authy), og tilføj en ny konto.",
+    "step2": "Indtast denne opsætningsnøgle, eller åbn linket på telefonen med appen.",
+    "step3": "Indtast den sekscifrede kode, som appen viser, for at bekræfte.",
+    "setupKeyLabel": "Opsætningsnøgle",
+    "openInApp": "Åbn i godkendelsesappen",
+    "confirm": "Slå tofaktor til",
+    "cancelSetup": "Annuller opsætningen",
+    "offBody": "Med tofaktor slået til kræver login din adgangskode eller dit e-mail-link plus en sekscifret kode fra en app på telefonen. En stjålet adgangskode er ikke længere nok.",
+    "setupButton": "Sæt godkendelsesapp op",
+    "backToAccount": "Tilbage til kontoindstillinger",
+    "accountSectionTitle": "Tofaktorgodkendelse",
+    "accountSectionBodyOn": "Slået til. Login kræver en kode fra din godkendelsesapp.",
+    "accountSectionBodyOff": "Slået fra. Tilføj en kode fra en godkendelsesapp som et ekstra trin ved login.",
+    "manage": "Administrer tofaktor"
+  },
   "common": {
     "appName": "NativeSpin",
     "feedback": {
@@ -14,6 +73,17 @@
       "sendFailed": "Kunne ikke sende. Prøv igen?",
       "enterFeedback": "Skriv noget først.",
       "close": "Luk"
+    },
+    "a11y": {
+      "primaryNav": "Hovedmenu",
+      "menu": "Menu",
+      "mobileNav": "Mobilmenu",
+      "breadcrumb": "Brødkrummesti",
+      "language": "Sprog"
+    },
+    "confirm": {
+      "yes": "Ja, bekræft",
+      "cancel": "Annuller"
     }
   },
   "nav": {
@@ -64,9 +134,15 @@
     "campaigns": "Kampagner",
     "rates": "Priser",
     "users": "Brugere",
+    "audit": "Revisionslog",
     "invoices": "Fakturaer",
     "orgSwitcherLabel": "Organisation",
-    "orgSwitchTo": "Skift til {org}"
+    "orgSwitchTo": "Skift til {org}",
+    "help": "Hjælp",
+    "paletteOrders": "Ordrer",
+    "paletteRequests": "Forespørgsler",
+    "paletteTitles": "Titler",
+    "paletteSearching": "Søger…"
   },
   "reports": {
     "title": "Rapporter",
@@ -907,9 +983,31 @@
     "metaPlanAlternativesOnly": "Ingen placeringer endnu · {alternatives, plural, one {# alternativ} other {# alternativer}} · redigeret {age}",
     "actionContinuePlan": "Fortsæt planen",
     "qualifierAwaitingTeam": "venter på en med bestillingsret",
-    "actionSeeQuote": "Se tilbuddet"
+    "actionSeeQuote": "Se tilbuddet",
+    "selfService": {
+      "heading": "Går I ikke videre?",
+      "lead": "Her kan du afslå et tilbud eller trække hele forespørgslen tilbage. Der opkræves ikke noget, og du kan sende en ny forespørgsel når som helst.",
+      "declineOpen": "Afslå tilbuddet i {currency}",
+      "declineSubmit": "Afslå tilbud",
+      "withdrawOpen": "Træk denne forespørgsel tilbage",
+      "withdrawSubmit": "Træk forespørgsel tilbage",
+      "reasonLabel": "Hvorfor? (valgfrit – det hjælper os med at blive bedre)",
+      "pending": "Sender…",
+      "needsOrderingRights": "Du skal have bestillingsret i organisationen for at afslå et tilbud.",
+      "withdrawnBanner": "Du trak denne forespørgsel tilbage {date}.",
+      "noticeQuoteDeclined": "Tilbuddet er afslået. Vi har givet desken besked.",
+      "noticeRequestWithdrawn": "Forespørgslen er trukket tilbage. Vi har givet desken besked.",
+      "noticeUnavailable": "Det er ikke længere muligt – forespørgslen er ændret, siden du åbnede siden.",
+      "noticeNotAllowed": "Din adgang tillader ikke det. Spørg en administrator i organisationen.",
+      "deskDeclined": "Afslået af kunden {date}.",
+      "deskWithdrawn": "Trukket tilbage af kunden {date}.",
+      "deskReason": "Årsag: {reason}"
+    }
   },
   "desk": {
+    "vatWarnCountryUnknown": "Kunden har ikke et registreret hjemland, så norsk moms ({pct} %) er lagt til. Er kunden etableret uden for Norge, så angiv markedet på organisationen og opret tilbuddet igen, før det sendes.",
+    "vatWarnVatIdMissing": "Omvendt betalingspligt gælder (ingen norsk moms), men kunden har ikke et registreret momsnummer. Tilføj det, før tilbuddet sendes – fakturaen skal oplyse det.",
+    "vatReverseCharge": "Omvendt betalingspligt – ingen norsk moms",
     "eyebrow": "Internt desk",
     "title": "Desk-konsol",
     "subtitle": "Hvad der kræver din opmærksomhed i dag — nye briefer, tilbud i bevægelse og aktive ordrer.",
@@ -1044,7 +1142,23 @@
     "quoteLocked": "Tilbuddet er sendt, så linjerne er låst. Revidér det for at ændre priser eller noter.",
     "quoteNotRevisable": "Tilbuddet kan ikke revideres: det er accepteret eller afsluttet.",
     "revisionPredecessorClosed": "Ikke sendt: tilbuddet, som revisionen skulle erstatte, er ikke længere åbent – kunden har måske lige accepteret det. Kassér revisionen.",
-    "sendRevisionNote": "Når du sender, erstattes det tidligere tilbud: kunden kan ikke længere acceptere det og får én notifikation med den nye total."
+    "sendRevisionNote": "Når du sender, erstattes det tidligere tilbud: kunden kan ikke længere acceptere det og får én notifikation med den nye total.",
+    "requestsTitle": "Alle forespørgsler",
+    "requestsLead": "Alle forespørgsler i køen. Filtrér på status, eller søg på organisation.",
+    "requestsSearchLabel": "Søg i organisation eller brief",
+    "requestsSearchButton": "Søg",
+    "requestsStatusLabel": "Status",
+    "requestsStatusAll": "Alle statusser",
+    "requestsStatusOpen": "Åbne (kræver desken)",
+    "requestsEmpty": "Ingen forespørgsler matcher filteret.",
+    "requestsCount": "{count, plural, one {# forespørgsel} other {# forespørgsler}}",
+    "requestsColUpdated": "Opdateret",
+    "requestsColQuotes": "Tilbud",
+    "requestsPrev": "Forrige",
+    "requestsNext": "Næste",
+    "requestsPageOf": "Side {page} af {pages}",
+    "requestsViewAll": "Se alle forespørgsler",
+    "requestsPaginationLabel": "Sidenavigation"
   },
   "deskTitles": {
     "eyebrow": "Superadmin · titler",
@@ -1295,7 +1409,9 @@
     "checkSignupLead": "Vi har sendt et link til den adresse, du opgav. Åbn det for at bekræfte adressen og logge ind; det udløber om 15 minutter. Havde adressen allerede en konto, forklarer mailen, hvordan du kommer ind igen.",
     "regEmailTypoQuestion": "Mente du <b>{email}</b>?",
     "regEmailTypoUse": "Brug {email}",
-    "regEmailTypoKeep": "Er {domain} korrekt, så tryk på Opret konto igen."
+    "regEmailTypoKeep": "Er {domain} korrekt, så tryk på Opret konto igen.",
+    "regOrgRequired": "Angiv virksomhedens eller organisationens navn.",
+    "regEmailRequired": "Angiv din arbejdsmail."
   },
   "order": {
     "title": "Ordre",
@@ -1389,6 +1505,34 @@
       "SUPERADMIN": "NativeSpin (administrator)",
       "PUBLISHER": "Udgiveren",
       "BUYER": "Kunden"
+    },
+    "cancelRequest": {
+      "heading": "Har I brug for at annullere?",
+      "lead": "Fortæl os hvorfor, så tjekker desken bookingerne hos udgiverne og vender tilbage. Placeringer, der allerede er booket eller publiceret, kan medføre en annulleringsomkostning – vi bekræfter, før noget er endeligt.",
+      "open": "Anmod om annullering",
+      "reasonLabel": "Årsag til annulleringen",
+      "submit": "Send anmodning om annullering",
+      "pending": "Sender…",
+      "requested": "Annullering blev anmodet {date}. Desken vender tilbage – ordren er aktiv, indtil de bekræfter.",
+      "noticeRequested": "Din anmodning om annullering er sendt til desken.",
+      "noticeReasonRequired": "Angiv en årsag, så desken kan følge op.",
+      "noticeUnavailable": "Denne ordre kan ikke længere annulleres herfra.",
+      "noticeNotAllowed": "Du skal have bestillingsret i organisationen for at anmode om annullering.",
+      "deskBanner": "Kunden bad om at annullere denne ordre {date}.",
+      "deskReason": "Årsag: {reason}"
+    },
+    "csat": {
+      "heading": "Hvordan gik denne kampagne?",
+      "question": "Hvor tilfreds er du med NativeSpin på denne ordre?",
+      "scale": "{score} af 5",
+      "low": "Ikke tilfreds",
+      "high": "Meget tilfreds",
+      "commentLabel": "Noget, vi bør vide? (valgfrit)",
+      "submit": "Send feedback",
+      "pending": "Sender…",
+      "thanks": "Tak – du gav denne ordre {score} af 5.",
+      "deskHeading": "Feedback fra kunden",
+      "deskScore": "Tilfredshed: {score} af 5"
     }
   },
   "production": {
@@ -1422,6 +1566,7 @@
     "vetoSharedWarning": "Denne artikel kører også på {count} andre placering(er) — de påvirkes ikke af denne tilbagetrækning."
   },
   "invoice": {
+    "vatNoteHeading": "Momsnote",
     "title": "Faktura",
     "eyebrow": "Faktura",
     "status": "Status",
@@ -1838,7 +1983,14 @@
     "footerSolutions": "Løsninger",
     "footerCompany": "Virksomhed",
     "footerAbout": "Om os",
-    "footerContact": "Kontakt"
+    "footerContact": "Kontakt",
+    "footerHelp": "Hjælp",
+    "footerChangelog": "Nyheder",
+    "footerLegal": "Juridisk",
+    "footerPrivacy": "Privatliv",
+    "footerTerms": "Vilkår",
+    "footerSecurity": "Sikkerhed",
+    "footerSubprocessors": "Underdatabehandlere"
   },
   "advertisers": {
     "eyebrow": "For annoncører",
@@ -2338,149 +2490,6 @@
     "contactTitle": "Juridisk kontakt",
     "contactBody": "Spørgsmål om disse vilkår — skriv til"
   },
-  "landing": {
-    "hero": {
-      "labelText": "NativeSpin · Native-markedsplads",
-      "pain": "Det meste af premium native sælges ikke programmatisk. Det sælges over telefon, med en PDF-prisliste og fire ugers tovtrækkeri. <strong>Vi erstatter det med én brief og fast tilbud inden for 24 timer.</strong>",
-      "h1Line1": "Én brief.",
-      "h1Line2": "3.000+ titler.",
-      "h1Line3": "Fast tilbud inden for 24 timer.",
-      "ctaPrimary": "Send en brief",
-      "ctaSecondary": "Sådan fungerer det",
-      "ctaMeta": "Intet opkald nødvendigt. Vi svarer skriftligt, på papir.",
-      "sideAria": "Hvorfor native",
-      "sideBody": "Sponsorerede artikler slår display konsekvent på opmærksomhed og brand lift. I betaler for det, der bliver publiceret, ikke for det, der bliver blokeret."
-    },
-    "why": {
-      "labelText": "Hvorfor native",
-      "h2": "Native gør det job, display ikke kan.",
-      "lead": "Display køber visninger i margenen. Native køber redaktionel tid inde i artiklen. Anden plads, anden læseradfærd, andet resultat.",
-      "colAIx": "I.",
-      "colAH3": "Opmærksomhed I ikke kan ad-blokere",
-      "colABody": "En sponsoreret artikel lever der, hvor læseren allerede er fokuseret. <strong>Ingen bannerblindhed, ingen skip-knap</strong> — enheden er indholdet.",
-      "colAPull": "<strong>3–5×</strong> dwell-tid sammenlignet med display",
-      "colBIx": "II.",
-      "colBH3": "Tillid overført fra titlen",
-      "colBBody": "Når en læser ser jeres historie under en titel, de stoler på, overføres en del af den tillid. <strong>Mærkningen står klart</strong> — troværdigheden kommer fra den redaktionelle ramme.",
-      "colBPull": "<strong>+18 procentpoint</strong> brand lift (branchegennemsnit)",
-      "colCIx": "III.",
-      "colCH3": "Lever videre efter kampagnen",
-      "colCBody": "En publiceret artikel fortsætter med at generere visninger og søgetræf længe efter kampagneslut. <strong>Display forsvinder i det øjeblik, I holder op med at betale.</strong>",
-      "colCPull": "Ligger på udgiverens domæne. Indekseret. Permanent."
-    },
-    "vs": {
-      "labelText": "Native vs display",
-      "h2": "Samme budget. Helt forskelligt udfald.",
-      "thNative": "Native (sponsoreret artikel)",
-      "thDisplay": "Display-banner",
-      "primaryJobSpec": "Primær opgave",
-      "primaryJobNative": "Fortælle en historie læseren valgte at læse",
-      "primaryJobDisplay": "Afbryde og lede til jeres side",
-      "readerBehaviourSpec": "Læseradfærd",
-      "readerBehaviourNative": "Læser. Scroller. Bliver hængende.",
-      "readerBehaviourDisplay": "Scroller forbi. Ad-blokerer. Glemmer.",
-      "realEstateSpec": "Plads",
-      "realEstateNative": "Inde i den redaktionelle flow",
-      "realEstateDisplay": "Margen, header, mellem afsnit",
-      "trustTransferSpec": "Tillidsoverførsel",
-      "trustTransferNative": "Lånt fra titlen",
-      "trustTransferDisplay": "Ingen — læsere ved, det er en annonce",
-      "longevitySpec": "Levetid",
-      "longevityNative": "Indekseret, søgbar, permanent",
-      "longevityDisplay": "Forsvinder ved kampagneslut",
-      "bestFitSpec": "Bedst egnet til",
-      "bestFitNative": "Overvejelseskøb, B2B, brand-opbygning",
-      "bestFitDisplay": "Performance-retargeting, simple tilbud"
-    },
-    "rule": {
-      "labelIx": "Den gyldne regel",
-      "h2": "Er det ikke nyttigt for læseren, er det ikke native — det er en pressemeddelelse i forklædning.",
-      "body": "Hver artikel, vi leverer, skal fortjene læserens tid på egen hånd. <strong>Redaktionelle standarder, titlens specifikation, markedets mærkning</strong> — ikke til forhandling. Det er sådan, tillidsoverførslen faktisk virker.",
-      "sig": "— NativeSpin-desken"
-    },
-    "pubs": {
-      "labelText": "Udgivere",
-      "meta": "{publishers, number}+ udgivere · {titles, number}+ titler katalogiseret · {active, number} verificeret til øjeblikkelig bestilling",
-      "foot": "Det, I ser her, er kun en flig af kataloget.",
-      "footMore": "Fortæl os hvad I leder efter"
-    },
-    "catalog": {
-      "labelText": "Et udsnit af kataloget",
-      "h2": "Live-titler, indikativ pris.",
-      "ask": "Bed om hele listen",
-      "thTitle": "Titel",
-      "thPublisher": "Kategori",
-      "thMarket": "Marked",
-      "thFormat": "Format",
-      "thAudience": "Rækkevidde",
-      "thFrom": "Fra",
-      "fmtNativeArticle": "Native-artikel",
-      "fmtSponsoredArticle": "Sponsoreret artikel",
-      "fmtSponsoredContent": "Sponsoreret indhold",
-      "fmtSponsoredArticleAds": "Artikel + forstærkning",
-      "readersSuffix": "læsere/md",
-      "footBody": "Indikative priser. Desken bekræfter fast pris baseret på tilgængelighed, sæson og volumen.",
-      "footInd": "Indikativ · ekskl. moms"
-    },
-    "stats": {
-      "v240Label": "Titler i kataloget",
-      "v240Sub": "NO · SE · DK · FI · DE · AT · CH · UK · IE",
-      "v12Label": "Udgivere i netværket",
-      "v12Sub": "Dagblade, magasiner, nichetitler",
-      "v24Unit": "t",
-      "v24Label": "Fast tilbud",
-      "v24Sub": "Gennemsnitlig svartid fra desken",
-      "v3Label": "Markeder dækket",
-      "v3Sub": "NO, SE, DK, FI, DE, AT, CH, UK, IE"
-    },
-    "how": {
-      "labelText": "Sådan fungerer det",
-      "h2": "Tre trin. Det meste af arbejdet er på vores side.",
-      "s1Num": "01",
-      "s1H3": "Send en brief",
-      "s1Body": "Marked, budget, målgruppe, én sætning om målet. Det er nok til at desken kan scope. Ingen deck nødvendigt.",
-      "s1Time": "5 minutter",
-      "s2Num": "02",
-      "s2H3": "Fast tilbud inden for 24t",
-      "s2Body": "Vi vender tilbage med en titel-shortlist, fast pris per udgiver, scope for indholdsproduktion og go-live-dato. Skriftligt, ikke på opkald.",
-      "s2Time": "Inden for én arbejdsdag",
-      "s3Num": "03",
-      "s3H3": "Vi publicerer, I godkender",
-      "s3Body": "Vi skriver artiklen til titlens spec, kører spec-tjekket, giver jer udkastet til godkendelse, så publicerer udgiveren. I får live-URL og faktura.",
-      "s3Time": "10–25 dage afhængigt af titel"
-    },
-    "obj": {
-      "h2": "Det folk spørger om, før de sender en brief.",
-      "q1": "Hvorfor ikke bare købe display? Det er billigere.",
-      "a1": "Per visning, ja. Per <strong>opmærksomhedssekund</strong> vinder native med bred margin. Bygger I overvejelse, er enhedsprisen ikke det vigtige.",
-      "q2": "Native føles langsomt. Vi har brug for det i markedet i næste uge.",
-      "a2": "De fleste titler publicerer inden for 10–25 dage efter brief. Nogle samme uge. Det faste tilbud på 24 timer fortæller jer præcis hvornår, per titel, før I binder jer.",
-      "q3": "Vi har ikke operationel kapacitet til native.",
-      "a3": "<strong>Det er hele pointen med desken.</strong> Brief ind, færdig artikel og live placering ud. Vores team håndterer forhandling med udgiver, indholdsproduktion, spec-tjek og fakturering.",
-      "q4": "Hvordan måler vi det?",
-      "a4": "Vi sporer klik på hvert link inde i din artikel — målt førsteparts. Rækkevidde (visninger) rapporteres af udgiveren, hvor det er muligt. Vi lover ikke viewability eller panelbaseret brand lift, vi ikke kan måle.",
-      "q5": "Hvad med brand safety og mærkning?",
-      "a5": "Mærkning er kodet per marked (<strong>Annonsørinnhold / Annons / Annonce</strong>) og påføres automatisk. Spec-tjekket skal passere, før noget når udgiveren."
-    },
-    "endCta": {
-      "h2": "Send os en brief.",
-      "body": "Ét afsnit er nok. Vi vender tilbage skriftligt, med fast tilbud, inden for 24 timer.",
-      "ctaPrimary": "Skriv til desken",
-      "ctaSecondary": "Opret konto",
-      "qualPrefix": "Eller I er udgiver og vil listes —",
-      "qualLink": "tag fat i os"
-    },
-    "foot": {
-      "tagline": "Native-indhold og native-annoncering på tværs af hver titel vi dækker i NO, SE, DK, FI, DE, AT, CH, UK og IE — og et voksende katalog.",
-      "copy": "Getia AS · Oslo",
-      "navAdv": "For annoncører",
-      "navAgy": "For bureauer",
-      "navPub": "For udgivere",
-      "navAbout": "Om os",
-      "navContact": "Kontakt",
-      "navCreativeSpecs": "Annoncespecifikationer"
-    }
-  },
   "apiDocs": {
     "metaTitle": "API",
     "eyebrow": "Udviklere",
@@ -2559,6 +2568,9 @@
     "scope_catalog_write": "uploade udgiverens egne titler og produkter",
     "scope_orders_write": "afgive faste ordrer for organisationen",
     "scope_pricing_admin": "interne prisværktøjer (MCP) — kun platform",
+    "scope_pricing_read": "MCP: kun læse deskens prisdata",
+    "scope_pricing_draft": "MCP: læse + registrere kladder (kontakter, tilbudskladder, ikke-sendte prisforespørgsler)",
+    "scope_pricing_apply": "MCP: kladder + anvende tilbud på gældende priser og sende e-mail",
     "boundPublisher": "{name} (udgiver)",
     "bindingPlatformGroup": "Platform",
     "bindingSearchPlaceholder": "Søg efter organisation eller udgiver på navn, marked eller titel",
@@ -2664,7 +2676,11 @@
     "priceUnconfirmed": "pris ikke bekræftet",
     "productInactive": "inaktiv",
     "inviteLanguageLabel": "Sprog i mailen",
-    "inviteLanguageHint": "Invitationen, oprettelsessiden og portalkontoen bruger dette sprog. Standard er titlens marked."
+    "inviteLanguageHint": "Invitationen, oprettelsessiden og portalkontoen bruger dette sprog. Standard er titlens marked.",
+    "aliasLabel": "Søgealias",
+    "aliasHint": "Kommasepareret. Brandnavne og alternative navne, som katalogsøgningen skal ramme. Søgningen fjerner punktummer, så tilføj også en form uden punktum (f.eks. »ATno« for »AT.no«).",
+    "aliasSave": "Gem alias",
+    "aliasSaving": "Gemmer…"
   },
   "salesContacts": {
     "title": "Salgskontakter",
@@ -2868,7 +2884,9 @@
     "callSkip": "Spring over for nu →",
     "marketBlocked": "{org} har endnu ikke valgt faktureringsmarked. En administrator i {org} skal vælge det under Konto, før teamet kan sende forespørgsler.",
     "blockedTitle": "{org} er ikke sat op til fakturering endnu",
-    "blockedBack": "Tilbage til planen"
+    "blockedBack": "Tilbage til planen",
+    "marketError": "Vælg det marked, virksomheden faktureres i.",
+    "phoneError": "Angiv et telefonnummer med mindst 6 cifre."
   },
   "account": {
     "eyebrow": "Konto",
@@ -2978,6 +2996,8 @@
     "deactivateHint": "Kontoen holder op med at virke med det samme — alle login-metoder afvises. Ordrer, tilbud og fakturaer, du har underskrevet, beholdes, fordi de er regnskabsdokumenter. En superadministrator kan tænde for kontoen igen, hvis du vender tilbage.",
     "deactivateConfirmLabel": "Skriv din e-mailadresse for at bekræfte",
     "deactivateButton": "Deaktivér min konto",
+    "eraseDataLabel": "Slet også mine personoplysninger",
+    "eraseDataHint": "Navn, e-mailadresse, telefonnummer, loginoplysninger og indbakke slettes, og du forlader dine organisationer. Det kan ikke fortrydes, heller ikke af en superadmin. Ordrer, tilbud og fakturaer bevares uden dine personoplysninger.",
     "deactivating": "Deaktiverer…",
     "errDelegation": "Slutdatoen for delegeringen er ikke en gyldig dato.",
     "errDelegationPast": "Slutdatoen for delegeringen skal ligge i fremtiden.",
@@ -2985,7 +3005,35 @@
     "statusRevoked": "Fjernet",
     "errEmailDomain": "Vi kan ikke finde en mailserver for det domæne. Tjek, om adressen er stavet rigtigt.",
     "roleHelp": "Administratorer styrer teamet og kan alt. Medlemmer bygger planer, sender forespørgsler og – med bestillingsret – accepterer tilbud. Begrænset giver kun læseadgang: ser teamets planer, forespørgsler, tilbud, ordrer, rapporter, artikler og fakturaer, men kan ikke ændre, sende, acceptere eller dele noget.",
-    "canCommitRestrictedNote": "Brugere med begrænset adgang kan kun læse og kan ikke få bestillingsret."
+    "canCommitRestrictedNote": "Brugere med begrænset adgang kan kun læse og kan ikke få bestillingsret.",
+    "notifications": {
+      "eyebrow": "Notifikationer",
+      "title": "E-mailnotifikationer",
+      "lead": "Vælg, hvilke notifikationer vi også sender på e-mail. Alt vises altid i din indbakke i NativeSpin.",
+      "save": "Gem indstillinger",
+      "saving": "Gemmer…",
+      "saved": "Dine notifikationsindstillinger er gemt.",
+      "quotes": {
+        "label": "Forespørgsler og tilbud",
+        "hint": "Et tilbud er klar, accepteret, afslået eller skal fornyes."
+      },
+      "orders": {
+        "label": "Ordrer og bookinger",
+        "hint": "En ordre er bekræftet, afsluttet eller annulleret."
+      },
+      "content": {
+        "label": "Indhold og gennemgang",
+        "hint": "Et udkast er klar til gennemgang, eller en udgiver har sendt et tilbage."
+      },
+      "billing": {
+        "label": "Fakturaer",
+        "hint": "En ny faktura er udstedt."
+      },
+      "planning": {
+        "label": "Planlægningsopdateringer",
+        "hint": "Desken har foreslået en placering, en titel har fået en pris, eller en kunde har godkendt en delt plan."
+      }
+    }
   },
   "rateCard": {
     "pageTitle": "Rate card-anmodning",
@@ -3306,6 +3354,8 @@
     "resultsAlsoConsider": "Også værd at overveje",
     "resultsEmpty": "Ingen match endnu – prøv et bredere brief eller et andet marked.",
     "whyFits": "Derfor passer den:",
+    "aiWritten": "AI",
+    "aiWrittenHint": "Denne forklaring er skrevet af AI ud fra titlens katalogoplysninger. Tjek den mod titlen, før du stoler på den.",
     "reach": "rækkevidde/md.",
     "addToShortlist": "Føj til udvalg",
     "titlePlaceholder": "Titel · desken prissætter",
@@ -3423,6 +3473,7 @@
     }
   },
   "quotePdf": {
+    "customerVatId": "Kundens momsnummer: {vatId}",
     "documentTitle": "Tilbud {quoteNumber}",
     "quoteNumber": "Tilbudsnummer",
     "revision": "Version",
@@ -3457,6 +3508,30 @@
     "extraWork": "Ekstraarbejde / revision",
     "inclArticle": "Inkl. artikel skrevet af NativeSpin · fra {amount}",
     "extraWorkDetail": "{hours} t × {rate}/t"
+  },
+  "deskAudit": {
+    "eyebrow": "Admin",
+    "title": "Revisionslog",
+    "lead": "Hvem gjorde hvad, ved hvilken post, og hvornår. Filtrér på person, handling eller organisation.",
+    "filterActor": "Aktør",
+    "filterActorPlaceholder": "Bruger-id eller »system«",
+    "filterAction": "Handling",
+    "filterActionPlaceholder": "f.eks. invoice.issue eller auth.",
+    "filterOrg": "Organisations-id",
+    "filterButton": "Filtrér",
+    "clear": "Nulstil",
+    "colWhen": "Hvornår",
+    "colActor": "Aktør",
+    "colAction": "Handling",
+    "colEntity": "Post",
+    "colOrg": "Organisation",
+    "colDetail": "Detaljer",
+    "resultCount": "{count, plural, =0 {Ingen poster} =1 {1 post} other {# poster}}",
+    "none": "Ingen poster i revisionsloggen matcher filtrene.",
+    "prev": "Forrige",
+    "next": "Næste",
+    "pageOf": "Side {page} af {pages}",
+    "retentionNote": "IP- og e-mailadresser fjernes fra poster, der er ældre end 90 dage."
   },
   "deskUsers": {
     "eyebrow": "Administration",
@@ -3523,7 +3598,8 @@
     "termsDaysValue": "{days, plural, one {netto # dag} other {netto # dage}}",
     "okTerms": "Betalingsbetingelserne er gemt.",
     "errTerms": "Angiv hele dage mellem 1 og 120.",
-    "errViewAsOrg": "Annoncøren blev ikke fundet."
+    "errViewAsOrg": "Annoncøren blev ikke fundet.",
+    "errViewAsReason": "Angiv en kort begrundelse for at se som kunden."
   },
   "status": {
     "ACCEPTED": "Accepteret",
@@ -3899,7 +3975,21 @@
       "bodyClient": "Kunden har sendt version {version} af “{article}” tilbage til ændringer.",
       "bodyDesk": "NativeSpin-desken har sendt version {version} af “{article}” tilbage til ændringer.",
       "comment": "Kommentar: “{comment}”"
-    }
+    },
+    "quoteDeclined": {
+      "title": "Tilbud afslået: {plan}",
+      "body": "{org} har afslået tilbuddet."
+    },
+    "requestWithdrawn": {
+      "title": "Forespørgsel trukket tilbage: {plan}",
+      "body": "{org} har trukket forespørgslen tilbage. Der skal ikke arbejdes mere på den."
+    },
+    "cancellationRequested": {
+      "title": "Annullering ønsket: {plan}",
+      "body": "{org} har bedt om at annullere denne ordre. Tjek bookingerne hos udgiverne, og annullér derefter ordren, eller svar kunden."
+    },
+    "selfServiceReason": "Angivet årsag: {reason}",
+    "selfServiceNoReason": "Der blev ikke angivet nogen årsag."
   },
   "publisherInviteEmail": {
     "subject": "Invitation til samarbejde for {publisher} – NativeSpin",
@@ -3937,6 +4027,7 @@
     "deskOrders": "Ordrer",
     "deskTitles": "Titler",
     "deskUsers": "Brugere",
+    "deskAudit": "Revisionslog",
     "deskWriters": "Skribenter",
     "deskPriceQuotes": "Pristilbud",
     "deskPublisherContacts": "Udgiverkontakter",
@@ -4046,7 +4137,99 @@
     "deskHeading": "Se som kunde",
     "deskLead": "Åbn platformen, som en annoncør ser den, med kundens lister, forespørgsler og bestillinger. Ingen bruger føjes til kundens team. Visningen afsluttes efter 8 timer.",
     "deskOrgLabel": "Kunde",
+    "deskReasonLabel": "Begrundelse",
+    "deskReasonHint": "Hvorfor du åbner kundens konto (gemmes i revisionsloggen), f.eks. en supporthenvendelse.",
     "deskStart": "Åbn som kunde",
     "deskStarting": "Åbner …"
+  },
+  "subprocessors": {
+    "metaTitle": "Underdatabehandlere",
+    "eyebrow": "Tillid",
+    "title": "Underdatabehandlere",
+    "lead": "De tredjeparter, der behandler personoplysninger på vores vegne, når du bruger NativeSpin, og hvad hver af dem gør.",
+    "lastUpdated": "Sidst opdateret: {date}",
+    "colName": "Underdatabehandler",
+    "colPurpose": "Formål",
+    "colData": "Berørte data",
+    "colLocation": "Behandlingssted",
+    "locationTbc": "Bekræftes",
+    "optional": "Kun når aktiveret",
+    "railway": {
+      "purpose": "Drift af applikationen og databasen",
+      "data": "Alle konto-, ordre- og indholdsdata"
+    },
+    "resend": {
+      "purpose": "Afsendelse af transaktions- og notifikationsmails",
+      "data": "E-mailadresse, navn, meddelelsesindhold"
+    },
+    "r2": {
+      "purpose": "Fillagring (uploadede dokumenter, tilbuds-PDF'er, artikelfiler)",
+      "data": "Filer, som du eller vi uploader"
+    },
+    "ai": {
+      "purpose": "AI-assisteret matchning af kampagnebrief med titler samt annonceforhåndsvisningen",
+      "data": "Den brieftekst, du indtaster",
+      "name": "AI-gateway og modelleverandør"
+    },
+    "gtm": {
+      "purpose": "Tag-håndtering til analyse, indlæses kun efter samtykke",
+      "data": "Brugshændelser, IP-adresse, cookie-identifikatorer"
+    },
+    "getcookies": {
+      "purpose": "Cookie-samtykkebanner og samtykkelog",
+      "data": "Samtykkevalg, IP-adresse"
+    },
+    "fiken": {
+      "purpose": "Regnskab: fakturaer bogføres i vores regnskabssystem",
+      "data": "Organisationsnavn, momsnummer, fakturalinjer"
+    },
+    "changesTitle": "Ændringer i denne liste",
+    "changesBody": "Vi opdaterer denne side, før en ny underdatabehandler begynder at behandle personoplysninger. En databehandleraftale (DPA) fås på forespørgsel.",
+    "contact": "Spørgsmål:",
+    "linkLabel": "Se vores underdatabehandlere"
+  },
+  "help": {
+    "metaTitle": "Hjælp",
+    "eyebrow": "Support",
+    "title": "Hjælp",
+    "lead": "Svar på de mest almindelige spørgsmål, og hvordan du får fat i et menneske.",
+    "faqTitle": "Almindelige spørgsmål",
+    "q1": "Hvordan får jeg en pris?",
+    "a1": "Læg placeringer fra kataloget i din plan, og send den som en forespørgsel. Katalogpriserne er vejledende; desken svarer med et bindende tilbud, normalt inden for 24 arbejdstimer.",
+    "q2": "Kan jeg afslå et tilbud eller trække en forespørgsel tilbage?",
+    "a2": "Ja. Åbn forespørgslen, og brug »Går I ikke videre?« nederst. Der opkræves intet, før du accepterer et tilbud.",
+    "q3": "Hvordan annullerer jeg en ordre?",
+    "a3": "Åbn ordren, og vælg »Anmod om annullering«. Desken tjekker bookingerne hos udgiverne og bekræfter eventuelle omkostninger, før annulleringen er endelig.",
+    "q4": "Hvor finder jeg mine fakturaer?",
+    "a4": "Under Fakturaer, hvor hver enkelt kan downloades som PDF.",
+    "q5": "Hvordan inviterer jeg kolleger eller ændrer, hvem der må bestille?",
+    "a5": "En administrator i organisationen styrer medlemmer, roller og bestillingsret under Konto → Team.",
+    "q6": "Hvordan eksporterer jeg mine data eller lukker min konto?",
+    "a6": "Begge dele ligger under Konto → Data og konto. Der kan du også ændre, hvilke mails du modtager.",
+    "contactTitle": "Tal med desken",
+    "contactBody": "Skriv til os, så svarer et menneske på desken inden for én arbejdsdag.",
+    "contactCta": "Kontakt os",
+    "changelogLink": "Nyheder",
+    "navLabel": "Hjælp"
+  },
+  "changelog": {
+    "metaTitle": "Nyheder",
+    "eyebrow": "Ændringslog",
+    "title": "Nyt i NativeSpin",
+    "lead": "Produktændringer, der påvirker, hvordan du arbejder, nyeste først.",
+    "entries": {
+      "selfService": {
+        "title": "Afslå, træk tilbage og annullér selv",
+        "body": "Du kan nu afslå et tilbud, trække en forespørgsel tilbage og anmode om annullering af en ordre direkte fra forespørgsels- og ordresiderne."
+      },
+      "notificationPrefs": {
+        "title": "Vælg, hvilke mails du får",
+        "body": "Kontoindstillingerne har nu e-mailnotifikationer pr. kategori. Indbakken i appen viser stadig alt."
+      },
+      "help": {
+        "title": "Hjælp og feedback ét sted",
+        "body": "En ny hjælpeside besvarer almindelige spørgsmål, og når en kampagne er afsluttet, kan du bedømme, hvordan det gik."
+      }
+    }
   }
 }

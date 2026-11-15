@@ -74,6 +74,9 @@ export default async function CampaignPage({
           budget: Number(recBudget) > 0 ? Number(recBudget) : undefined,
           brief: recBrief || undefined,
           locale,
+          // Budgets and attributes the LLM calls (lib/ai-usage.ts).
+          organizationId: session.user.orgId ?? null,
+          userId: session.user.id,
         })
       : null;
 

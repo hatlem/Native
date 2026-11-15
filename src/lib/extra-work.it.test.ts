@@ -175,7 +175,8 @@ if (!RUN_DB_IT) {
     });
     // 17 000 + 2 475 = 19 475, + 25% VAT = 24 343.75 → 24 344.
     assert.equal(Number(quote.subtotal), 19475);
-    assert.equal(Number(quote.total), 24344);
+    // 19 475 × 1.25, exact to the øre (lib/vat.ts) — no longer rounded to 24 344.
+    assert.equal(Number(quote.total), 24343.75);
     const line = quote.lines.at(-1)!;
     assert.equal(line.id, added.lineId);
     assert.equal(line.kind, "EXTRA_WORK");
@@ -267,8 +268,9 @@ if (!RUN_DB_IT) {
     // Accepted 17 000 + 1 650 (quote hours) = 18 650, + 4 125 after = 22 775;
     // + 25% VAT = 28 468.75 → 28 469.
     assert.equal(Number(invoice.subtotal), 22775);
-    assert.equal(Number(invoice.total), 28469);
-    assert.equal(issued.total, 28469);
+    // 22 775 × 1.25, exact to the øre — no longer rounded to 28 469.
+    assert.equal(Number(invoice.total), 28468.75);
+    assert.equal(issued.total, 28468.75);
     assert.deepEqual(
       invoice.lines.map((l) => [l.kind, l.description, Number(l.lineTotal), l.hours === null ? null : Number(l.hours)]),
       [

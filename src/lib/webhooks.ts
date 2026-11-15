@@ -1,26 +1,36 @@
-// Partner-webhook delivery (v0).
+// Partner-webhook delivery.
 //
 // Scope:
-//  - Single delivery attempt per event per receiver.
-//  - HMAC-SHA256 signature in `X-NativeSpin-Signature` header
-//    over the raw JSON body, with the receiver's secret as the key.
-//  - 5 s timeout; non-2xx → record `lastErrorAt` + `lastErrorBody`.
-//  - No retry queue, no replay endpoint, no deduplication. Receivers
-//    are expected to be idempotent on the `event_id` field in the body.
+//  - Up to MAX_ATTEMPTS delivery attempts per event per receiver, with
+//    exponential backoff (RETRY_DELAYS_MS in webhooks-core.ts), for network errors, timeouts,
+//    408, 429 and 5xx. Other 4xx are the receiver rejecting the payload and
+//    are not retried.
+//  - Signatures, both HMAC-SHA256 with the receiver's secret as the key:
+//      X-NativeSpin-Signature:    sha256=<hex of HMAC(body)>            (v0, unchanged)
+//      X-NativeSpin-Timestamp:    <unix seconds of this attempt>
+//      X-NativeSpin-Signature-V1: sha256=<hex of HMAC(`${timestamp}.${body}`)>
+//    New receivers should verify V1 and reject timestamps older than a few
+//    minutes (replay protection); the v0 header stays so existing receivers
+//    keep working.
+//  - X-NativeSpin-Delivery-Attempt: 1-based attempt number.
+//  - 5 s timeout per attempt; a final failure records `lastErrorAt` +
+//    `lastErrorBody` on the PartnerWebhook row and logs `webhook.delivery_failed`.
+//  - Delivery is therefore at-least-once: receivers must be idempotent on the
+//    `event_id` field in the body (it is stable across retries).
 //
-// What's NOT yet here (intentionally — tracked as Phase 3 follow-up):
-//  - Retry-with-exponential-backoff via the Job queue.
-//  - Signed replay endpoint (`POST /api/v1/webhooks/<id>/replay`).
-//  - At-least-once delivery semantics + a partner-side replay tool.
+// What's NOT here: retries are in-process (inside `after()`), so an event is
+// still lost if the process dies mid-backoff. A durable queue + a signed
+// replay endpoint (`POST /api/v1/webhooks/<id>/replay`) remain follow-ups.
 //
 // Use: fireWebhook("title.activated", { titleId, slug, name, marketCode }).
 // Returns immediately — delivery runs in `after()` so the caller's
-// response isn't blocked by a slow receiver. Errors are swallowed
-// here; observability is via the PartnerWebhook row's lastErrorAt/Body.
+// response isn't blocked by a slow receiver.
 
 import crypto from "node:crypto";
 import { after } from "next/server";
 import { prisma } from "@/lib/prisma";
+import { log } from "@/lib/log";
+import { deliverWithRetry } from "@/lib/webhooks-core";
 
 export type WebhookEventKind =
   | "title.activated"
@@ -28,13 +38,11 @@ export type WebhookEventKind =
   | "title.price_changed";
 
 export type WebhookPayload = {
-  event_id: string; // cuid; receivers dedupe on this
+  event_id: string; // uuid; receivers dedupe on this
   event_kind: WebhookEventKind;
   occurred_at: string; // ISO timestamp
   data: Record<string, unknown>;
 };
-
-const DELIVERY_TIMEOUT_MS = 5000;
 
 export function fireWebhook(
   kind: WebhookEventKind,
@@ -61,57 +69,43 @@ export function fireWebhook(
     if (targets.length === 0) return;
 
     await Promise.all(
-      targets.map((wh) => deliverOnce(wh.id, wh.targetUrl, wh.secretHash, body)),
+      targets.map((wh) => deliver(wh.id, wh.targetUrl, wh.secretHash, body, event)),
     );
   });
 }
 
-async function deliverOnce(
+async function deliver(
   id: string,
   url: string,
   secret: string,
   body: string,
+  event: WebhookPayload,
 ): Promise<void> {
-  const sig = crypto.createHmac("sha256", secret).update(body).digest("hex");
-  const ctrl = new AbortController();
-  const timer = setTimeout(() => ctrl.abort(), DELIVERY_TIMEOUT_MS);
+  const outcome = await deliverWithRetry(id, url, secret, body);
   try {
-    const res = await fetch(url, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "X-NativeSpin-Signature": `sha256=${sig}`,
-        "X-NativeSpin-Webhook-Id": id,
-      },
-      body,
-      signal: ctrl.signal,
-    });
-    if (!res.ok) {
-      const text = (await res.text().catch(() => "")).slice(0, 1000);
+    if (outcome.ok) {
       await prisma.partnerWebhook.update({
         where: { id },
-        data: {
-          lastErrorAt: new Date(),
-          lastErrorBody: `HTTP ${res.status}: ${text}`,
-        },
+        data: { lastDeliveryAt: new Date() },
       });
       return;
     }
-    await prisma.partnerWebhook.update({
-      where: { id },
-      data: { lastDeliveryAt: new Date() },
+    log.warn("webhook.delivery_failed", {
+      webhookId: id,
+      eventId: event.event_id,
+      eventKind: event.event_kind,
+      attempts: outcome.attempts,
+      reason: outcome.error,
     });
-  } catch (err) {
     await prisma.partnerWebhook.update({
       where: { id },
       data: {
         lastErrorAt: new Date(),
-        lastErrorBody: (err as Error).message?.slice(0, 1000) ?? "unknown",
+        lastErrorBody: `${outcome.error ?? "unknown"} (after ${outcome.attempts} attempt${outcome.attempts === 1 ? "" : "s"})`.slice(0, 1000),
       },
-    }).catch(() => {
-      /* swallow — we're already in error path */
     });
-  } finally {
-    clearTimeout(timer);
+  } catch (err) {
+    // Bookkeeping failure must not surface: we are in `after()`.
+    log.error("webhook.bookkeeping_failed", { webhookId: id, err });
   }
 }

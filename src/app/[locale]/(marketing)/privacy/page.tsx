@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { getTranslations } from "next-intl/server";
+import { Link } from "@/i18n/navigation";
 import { LandingShell } from "@/app/landing-shell";
 import { MailLink } from "@/components";
 import { withSafeEmails } from "@/components/safe-email";
@@ -21,6 +22,7 @@ export default async function PrivacyPage({
 }) {
   const { locale } = await params;
   const t = await getTranslations({ locale, namespace: "privacy" });
+  const tSub = await getTranslations({ locale, namespace: "subprocessors" });
 
   const sections = [
     "controller",
@@ -55,6 +57,13 @@ export default async function PrivacyPage({
           <section className="legal-section" key={s}>
             <h2>{t(`${s}.title`)}</h2>
             <p className="prose">{withSafeEmails(t(`${s}.body`))}</p>
+            {s === "sharing" ? (
+              <p className="prose">
+                <Link href="/subprocessors" className="link">
+                  {tSub("linkLabel")}
+                </Link>
+              </p>
+            ) : null}
           </section>
         ))}
 

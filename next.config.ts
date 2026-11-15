@@ -3,9 +3,9 @@ import createNextIntlPlugin from "next-intl/plugin";
 
 const withNextIntl = createNextIntlPlugin("./src/i18n/request.ts");
 
-// Conservative baseline security headers. No CSP yet — landing pages
-// inline <style> and we use third-party GTM, so a meaningful CSP needs
-// nonce wiring per route. Tracked as a follow-up.
+// Baseline security headers for every response. The Content-Security-Policy
+// is NOT set here: it needs a per-request nonce, so src/middleware.ts builds
+// it (nonce-based script-src with 'strict-dynamic') for every page route.
 const securityHeaders = [
   { key: "X-Frame-Options", value: "DENY" },
   { key: "X-Content-Type-Options", value: "nosniff" },

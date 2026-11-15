@@ -37,3 +37,15 @@ export async function GET(req: NextRequest) {
   }
   return NextResponse.redirect(`${origin}/${res.locale}/newsletter?status=unsubscribed`);
 }
+
+// RFC 8058 one-click unsubscribe: mailbox providers POST to the
+// List-Unsubscribe URL (token in the query string) and expect a plain 2xx,
+// not a redirect to a page.
+export async function POST(req: NextRequest) {
+  const token = req.nextUrl.searchParams.get("token");
+  if (!token) return new NextResponse(null, { status: 400 });
+  const res = await unsubscribeSubscriber(token);
+  // Same response either way: an unknown token must not be distinguishable.
+  void res;
+  return new NextResponse(null, { status: 200 });
+}

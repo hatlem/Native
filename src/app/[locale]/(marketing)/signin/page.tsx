@@ -49,6 +49,7 @@ export default async function SignInPage({
 
   const t = await getTranslations({ locale, namespace: "auth" });
   const tc = await getTranslations({ locale, namespace: "common" });
+  const tMfa = await getTranslations({ locale, namespace: "mfa" });
 
   const appName = tc("appName");
   const errorCode = typeof sp.error === "string" ? sp.error : undefined;
@@ -61,6 +62,8 @@ export default async function SignInPage({
           ? t("deactivatedSignin")
           : errorCode === "magic_empty"
             ? t("emailRequired")
+            : errorCode === "mfa_expired"
+            ? tMfa("sessionExpired")
             : errorCode
             ? t("failed")
             : null;

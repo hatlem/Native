@@ -1,7 +1,7 @@
 import { getTranslations } from "next-intl/server";
 import { prisma } from "@/lib/prisma";
 import { isMembershipActive } from "@/lib/membership";
-import { SubmitButton } from "@/components";
+import { SubmitButton, ConfirmSubmit } from "@/components";
 import { SafeEmail } from "@/components/safe-email";
 import {
   inviteToOrg,
@@ -22,6 +22,7 @@ type Props = {
 
 export async function TeamSection({ locale, orgId, isAdmin }: Props) {
   const t = await getTranslations({ locale, namespace: "account" });
+  const tc = await getTranslations({ locale, namespace: "common" });
 
   const [members, pendingInvites, org] = await Promise.all([
     prisma.membership.findMany({
@@ -210,8 +211,10 @@ export async function TeamSection({ locale, orgId, isAdmin }: Props) {
                             name="userId"
                             value={m.userId}
                           />
-                          <SubmitButton
+                          <ConfirmSubmit
                             label={t("revoke")}
+                            confirmLabel={tc("confirm.yes")}
+                            cancelLabel={tc("confirm.cancel")}
                             pendingLabel={t("saving")}
                           />
                         </form>

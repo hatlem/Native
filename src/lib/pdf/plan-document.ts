@@ -1,7 +1,7 @@
 import { createTranslator, type AbstractIntlMessages } from "next-intl";
 import { safeLocale, type AppLocale } from "@/i18n/routing";
 import type { SharedList } from "@/lib/list-share";
-import { formatMoney, intlLocale } from "@/lib/money";
+import { formatMoney, formatMoneyExact, intlLocale } from "@/lib/money";
 import { parseTiming, planBriefValues } from "@/lib/plan-brief";
 import {
   estimateListTotals,
@@ -357,8 +357,8 @@ export function buildPlanDocument(input: PlanDocumentInput): PlanDocument {
             : null,
           r.hasExact
             ? r.estimate
-              ? tPlan("inclVatFirmPart", { amount: money(r.totalInclVat, r.currency) })
-              : tPlan("inclVatLine", { amount: money(r.totalInclVat, r.currency) })
+              ? tPlan("inclVatFirmPart", { amount: formatMoneyExact(r.totalInclVat, r.currency, locale) })
+              : tPlan("inclVatLine", { amount: formatMoneyExact(r.totalInclVat, r.currency, locale) })
             : null,
         ].filter((n): n is string => n !== null),
       })),

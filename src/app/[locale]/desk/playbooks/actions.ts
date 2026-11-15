@@ -1,11 +1,11 @@
 "use server";
 
+import { requireDesk } from "@/lib/desk-guard";
 import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
 import { MarketCode, ProductType } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
 import { recordAudit } from "@/lib/audit";
-import { loadScope } from "@/lib/scope";
 import { isSupportedMarket } from "@/lib/markets";
 
 function field(formData: FormData, key: string): string {
@@ -13,13 +13,6 @@ function field(formData: FormData, key: string): string {
   return typeof v === "string" ? v.trim() : "";
 }
 
-async function requireDesk(locale: string): Promise<string | undefined> {
-  const scope = await loadScope();
-  if (scope.role !== "DESK" && scope.role !== "SUPERADMIN") {
-    redirect(`/${locale}/signin`);
-  }
-  return scope.userId;
-}
 
 function parseMarket(raw: string): MarketCode | null {
   return isSupportedMarket(raw)

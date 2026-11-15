@@ -22,6 +22,9 @@ let salesContactIds: string[] = [];
 const TEST_EMAILS = ["shared@saleshouse-test.example", "solo@publisher-test.example"];
 
 before(async () => {
+  // The daily cap is counted across the whole database; other suites send
+  // outreach too, so lift it here (the cap test sets its own).
+  process.env.OUTREACH_DAILY_CAP = "100000";
   // Defensive: clear any leftover state from an interrupted prior run so the
   // build-idempotency assertions start from a clean slate.
   const stale = await prisma.rateCardRequest.findMany({ where: { recipientEmail: { in: TEST_EMAILS } }, select: { id: true } });
@@ -106,9 +109,9 @@ test("sendRateCardStep happy path sends initial, bumps sentCount, sets nextStepA
   assert.deepEqual(result, { sent: "initial" });
   assert.equal(captured.length, 1);
   assert.equal(captured[0].to, "shared@saleshouse-test.example");
-  // The initial inquiry carries NO opt-out — List-Unsubscribe is reserved
-  // for the final bump2 breakaway email only.
-  assert.equal(captured[0].headers?.["List-Unsubscribe"], undefined);
+  // Every step carries the opt-out: header and body.
+  assert.ok(captured[0].headers?.["List-Unsubscribe"]);
+  assert.match(captured[0].text, /\/unsubscribe/);
 
   const after = await prisma.rateCardRequest.findUniqueOrThrow({ where: { id: req.id } });
   assert.equal(after.sentCount, 1);
@@ -116,7 +119,49 @@ test("sendRateCardStep happy path sends initial, bumps sentCount, sets nextStepA
   assert.ok(after.sentAt);
 });
 
-test("sendRateCardStep adds List-Unsubscribe only on the bump2 breakaway", async () => {
+test("sendRateCardStep: a concurrent double send mails the step once", async () => {
+  const captured: unknown[] = [];
+  setEmailAdapter(async (m) => { captured.push(m); });
+  const req = await prisma.rateCardRequest.findFirstOrThrow({ where: { recipientEmail: "solo@publisher-test.example" } });
+  const results = await Promise.all([
+    sendRateCardStep({ requestId: req.id, actorId: userId }),
+    sendRateCardStep({ requestId: req.id, actorId: userId }),
+  ]);
+  assert.equal(results.filter((r) => "sent" in r).length, 1);
+  assert.equal(captured.length, 1);
+  assert.equal((await prisma.rateCardRequest.findUniqueOrThrow({ where: { id: req.id } })).sentCount, 1);
+  // Back to unsent for the tests below.
+  await prisma.rateCardRequest.update({
+    where: { id: req.id },
+    data: { sentCount: 0, sentAt: null, lastStepAt: null, nextStepAt: null },
+  });
+});
+
+test("sendRateCardStep: a failed send hands the step back", async () => {
+  setEmailAdapter(async () => { throw new Error("smtp down"); });
+  const req = await prisma.rateCardRequest.findFirstOrThrow({ where: { recipientEmail: "solo@publisher-test.example" } });
+  await assert.rejects(sendRateCardStep({ requestId: req.id, actorId: userId }), /smtp down/);
+  const after = await prisma.rateCardRequest.findUniqueOrThrow({ where: { id: req.id } });
+  assert.equal(after.sentCount, 0);
+  assert.equal(after.sentAt, null);
+});
+
+test("sendRateCardStep stops at the DB-counted daily cap", async () => {
+  const captured: unknown[] = [];
+  setEmailAdapter(async (m) => { captured.push(m); });
+  const req = await prisma.rateCardRequest.findFirstOrThrow({ where: { recipientEmail: "solo@publisher-test.example" } });
+  const prev = process.env.OUTREACH_DAILY_CAP;
+  process.env.OUTREACH_DAILY_CAP = "1"; // shared@ was already sent today
+  try {
+    assert.deepEqual(await sendRateCardStep({ requestId: req.id, actorId: userId }), { skipped: "daily_cap" });
+    assert.equal(captured.length, 0);
+  } finally {
+    if (prev === undefined) delete process.env.OUTREACH_DAILY_CAP;
+    else process.env.OUTREACH_DAILY_CAP = prev;
+  }
+});
+
+test("sendRateCardStep keeps List-Unsubscribe on the bump2 breakaway", async () => {
   const captured: Array<{ headers?: Record<string, string> }> = [];
   setEmailAdapter(async (m) => { captured.push(m as any); });
 

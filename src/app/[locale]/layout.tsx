@@ -1,3 +1,4 @@
+import { PendingButton } from "@/components/submit-button";
 import type { ReactNode } from "react";
 import type { Metadata, Viewport } from "next";
 import { NextIntlClientProvider } from "next-intl";
@@ -5,6 +6,7 @@ import { getMessages, getTranslations } from "next-intl/server";
 import { headers } from "next/headers";
 import { notFound, redirect } from "next/navigation";
 import { prisma } from "@/lib/prisma";
+import { log } from "@/lib/log";
 import { getWorkspace, viewOrgIds } from "@/lib/workspace";
 import { acceptableQuoteWhere } from "@/lib/commerce/quote-validity";
 import { OrgSwitcher, switchableOrgs } from "@/app/org-switcher";
@@ -65,8 +67,10 @@ export async function generateMetadata({
       description,
       url: `/${loc}`,
       locale: loc,
+      images: [{ url: "/og-image.png", width: 1200, height: 630, alt: appName }],
     },
-    twitter: { card: "summary_large_image", title, description },
+    twitter: { card: "summary_large_image", title, description, images: ["/og-image.png"] },
+    icons: { apple: "/apple-touch-icon.png" },
     // No layout-level robots: "index, follow" is what crawlers assume
     // without one, and emitting it here put it next to the noindex Next adds
     // on every 404 (two conflicting robots metas). Pages that must stay out
@@ -160,7 +164,13 @@ export default async function LocaleLayout({
   // notification for unsent SavedLists.
   if (showCollapsedBuyerNav) {
     const ws = workspace;
-    const draftListCount = ws?.activeOrgId ? await countUnsentLists(ws.activeOrgId) : 0;
+    // Decorative: a failed count must not take the whole app shell down.
+    const draftListCount = ws?.activeOrgId
+      ? await countUnsentLists(ws.activeOrgId).catch((err) => {
+          log.warn("layout.badge_count_failed", { badge: "campaigns", err });
+          return 0;
+        })
+      : 0;
     if (draftListCount > 0) {
       nav = nav.map((item) =>
         item.key === "campaigns" ? { ...item, badge: draftListCount } : item,
@@ -177,6 +187,9 @@ export default async function LocaleLayout({
     if (ws) {
       const orgIds = viewOrgIds(ws);
       const quoteOrgIds = orgIds.filter((id) => ws.commitOrgIds.includes(id));
+      // The badge is decorative and this layout wraps every page, where no
+      // error boundary of its own segment can catch it: on a failed count,
+      // render without the badge instead of failing the request.
       const [quoteCount, contentCount] = await Promise.all([
         prisma.quote.count({
           where: { ...acceptableQuoteWhere(), order: null, request: { organizationId: { in: quoteOrgIds } } },
@@ -184,7 +197,10 @@ export default async function LocaleLayout({
         prisma.contentAsset.count({
           where: { status: "IN_REVIEW", article: { organizationId: { in: orgIds } } },
         }),
-      ]);
+      ]).catch((err) => {
+        log.warn("layout.badge_count_failed", { badge: "home", err });
+        return [0, 0] as const;
+      });
       const needsCount = quoteCount + contentCount;
       if (needsCount > 0) {
         nav = nav.map((item) => (item.key === "home" ? { ...item, badge: needsCount } : item));
@@ -227,6 +243,7 @@ export default async function LocaleLayout({
               menuItems={userMenu}
               signedIn={signedIn}
               showPaletteHint={showCollapsedBuyerNav}
+              entitySearch={audience === "desk" || audience === "superadmin"}
               user={
                 session?.user?.email
                   ? {
@@ -241,7 +258,7 @@ export default async function LocaleLayout({
               signOutAction={
                 <form action={logout}>
                   <input type="hidden" name="locale" value={locale} />
-                  <button type="submit">{ta("signout")}</button>
+                  <PendingButton>{ta("signout")}</PendingButton>
                 </form>
               }
               labels={{
@@ -273,9 +290,9 @@ export default async function LocaleLayout({
                 </header>
                 <form action={logout}>
                   <input type="hidden" name="locale" value={locale} />
-                  <button type="submit" className="btn primary">
+                  <PendingButton className="btn primary">
                     {ta("signout")}
-                  </button>
+                  </PendingButton>
                 </form>
               </section>
             ) : (
@@ -320,6 +337,17 @@ export default async function LocaleLayout({
                       {tm("footerContact")}
                     </MailLink>
                   </li>
+                  <li><Link href="/help">{tm("footerHelp")}</Link></li>
+                  <li><Link href="/changelog">{tm("footerChangelog")}</Link></li>
+                </ul>
+              </div>
+              <div className="col">
+                <h2 className="footer-col-head">{tm("footerLegal")}</h2>
+                <ul>
+                  <li><Link href="/privacy">{tm("footerPrivacy")}</Link></li>
+                  <li><Link href="/terms">{tm("footerTerms")}</Link></li>
+                  <li><Link href="/security">{tm("footerSecurity")}</Link></li>
+                  <li><Link href="/subprocessors">{tm("footerSubprocessors")}</Link></li>
                 </ul>
               </div>
             </div>

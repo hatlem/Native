@@ -1,4 +1,5 @@
 "use server";
+import { log } from "@/lib/log";
 
 import { redirect } from "next/navigation";
 import { getTranslations } from "next-intl/server";
@@ -77,7 +78,7 @@ export async function startProgramme(formData: FormData) {
     // Unreachable from the UI (the form only renders for a non-programme
     // list with lines) — a tampered/replayed POST just lands back on /plan.
     if (e instanceof ProgrammeError) {
-      console.warn("programme.blocked", { reason: e.code, listId: list.id });
+      log.warn("programme.blocked", { reason: e.code, listId: list.id });
       redirect(planPath(locale, list.id));
     }
     throw e;
@@ -135,7 +136,7 @@ export async function linkWaveArticleAction(formData: FormData) {
     // already agrees with linkWaveArticle's — but a race (the article gets
     // deleted between the two checks) now lands here instead of a 500.
     if (e instanceof ProgrammeError) {
-      console.warn("programme.wave_article_link.blocked", { reason: e.code, listId: list.id });
+      log.warn("programme.wave_article_link.blocked", { reason: e.code, listId: list.id });
       redirect(planPath(locale, list.id));
     }
     throw e;

@@ -1,5 +1,5 @@
 import { Document, Page, View, Text, Link, StyleSheet } from "@react-pdf/renderer";
-import { formatMoney, intlLocale } from "@/lib/money";
+import { formatMoneyExact, intlLocale } from "@/lib/money";
 import type { QuotePdfData } from "./quote-pdf-data";
 import {
   qt as t,
@@ -104,7 +104,7 @@ export function QuoteDocument({
   locale: string;
   messages: QuoteMessages;
 }) {
-  const money = (amount: number) => formatMoney(amount, data.currency, locale);
+  const money = (amount: number) => formatMoneyExact(amount, data.currency, locale);
   const onRequest = data.rows.filter((r) => r.priceOnRequest);
 
   return (
@@ -236,6 +236,10 @@ export function QuoteDocument({
 
         <View style={styles.notes}>
           <Text>{t(messages, "vatStatus")}</Text>
+          {data.vatNote ? <Text>{data.vatNote}</Text> : null}
+          {data.vatNote && data.customerVatId ? (
+            <Text>{t(messages, "customerVatId", { vatId: data.customerVatId })}</Text>
+          ) : null}
           <Text>{paymentTermsLine(locale, data.paymentTermsDays)}</Text>
         </View>
 

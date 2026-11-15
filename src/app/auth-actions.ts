@@ -1,4 +1,5 @@
 "use server";
+import { log } from "@/lib/log";
 
 import { AuthError, CredentialsSignin } from "next-auth";
 import { cookies } from "next/headers";
@@ -8,7 +9,8 @@ import { signIn, signOut } from "@/auth";
 import { prisma } from "@/lib/prisma";
 import { landingForRole } from "@/lib/roles";
 import { authLimiter } from "@/lib/rate-limit";
-import { SIGNIN_RATE_LIMITED } from "@/lib/auth-errors";
+import { SIGNIN_RATE_LIMITED, SIGNIN_MFA_REQUIRED } from "@/lib/auth-errors";
+import { beginMfaStep, userIdForEmail } from "@/lib/mfa/signin";
 import { recordAudit } from "@/lib/audit";
 import { generateToken, hashToken, tokenExpiry } from "@/lib/tokens";
 import { emailAdapter } from "@/lib/notify";
@@ -52,6 +54,15 @@ export async function authenticate(formData: FormData): Promise<{ redirectTo: st
     if (error instanceof CredentialsSignin && error.code === SIGNIN_RATE_LIMITED) {
       await recordAudit(email || "anonymous", "auth.signin_rate_limited", `User:${email}`, { ip });
       return { redirectTo: `/${locale}/signin?error=rate${emailParam}` };
+    }
+    // Right password, two-factor on: the provider issued NO session. Park
+    // "first factor passed" in a short-lived signed cookie and continue at
+    // the code prompt, which mints the session once the code checks out.
+    if (error instanceof CredentialsSignin && error.code === SIGNIN_MFA_REQUIRED) {
+      const userId = await userIdForEmail(email);
+      if (userId) {
+        return { redirectTo: await beginMfaStep({ userId, email, locale, next, via: "password", ip }) };
+      }
     }
     if (error instanceof AuthError) {
       // Disambiguate the "valid password, just unverified" case from
@@ -99,7 +110,7 @@ export async function authenticate(formData: FormData): Promise<{ redirectTo: st
             try {
               await emailAdapter({ to: email, subject: msg.subject, text: msg.text, html: msg.html });
             } catch (err) {
-              console.error("auth.verify_email_resend_failed", { userId: unverifiedUserId, err });
+              log.error("auth.verify_email_resend_failed", { userId: unverifiedUserId, err });
             }
             await recordAudit(unverifiedUserId, "auth.verify_email_resent", `User:${email}`, { ip });
           });
@@ -190,7 +201,7 @@ export async function requestMagicLink(formData: FormData): Promise<{ redirectTo
       try {
         await emailAdapter({ to: userEmail, subject: msg.subject, text: msg.text, html: msg.html });
       } catch (err) {
-        console.error("auth.magic_link_email_failed", { userId, err });
+        log.error("auth.magic_link_email_failed", { userId, err });
       }
       await recordAudit(userId, "auth.magic_link_requested", `User:${userEmail}`, { ip });
     });

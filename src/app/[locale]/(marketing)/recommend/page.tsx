@@ -12,7 +12,7 @@ import { EmptyState } from "@/app/empty-state";
 import { recommendMix, type Candidate } from "@/lib/recommend";
 import { addRecommendedPlan } from "@/app/plan-actions";
 import { LandingShell } from "@/app/landing-shell";
-import { SubmitButton } from "@/components";
+import { SubmitButton, PendingButton } from "@/components";
 import { SUPPORTED_MARKETS, isSupportedMarket } from "@/lib/markets";
 
 export const dynamic = "force-dynamic";
@@ -180,7 +180,7 @@ export default async function RecommendPage({
                 ))}
               </select>
             </div>
-            <button type="submit">{t("suggest")}</button>
+            <PendingButton>{t("suggest")}</PendingButton>
           </form>
 
           {result ? (

@@ -9,15 +9,22 @@ import { SubmitButton } from "@/components";
 import { timeAgo } from "@/lib/time-ago";
 import { safeLocale } from "@/i18n/routing";
 import { renderStoredNotice } from "@/lib/notice-template";
+import { Pager } from "@/components/pager";
+import { pageHref, pageWindow, parsePageParam } from "@/lib/pagination";
+
+const PAGE_SIZE = 50;
 
 export const dynamic = "force-dynamic";
 
 export default async function NotificationsPage({
   params,
+  searchParams,
 }: {
   params: Promise<{ locale: string }>;
+  searchParams: Promise<Record<string, string | string[] | undefined>>;
 }) {
   const { locale } = await params;
+  const sp = await searchParams;
   const t = await getTranslations({ locale, namespace: "notifications" });
   const tNav = await getTranslations({ locale, namespace: "nav" });
 
@@ -25,13 +32,21 @@ export default async function NotificationsPage({
 
   if (!session?.user?.id) redirect(`/${locale}/signin`);
 
+  // Paged (newest first) instead of a hard cap at 100: older notices used to
+  // be unreachable. Counts come from the database so they cover every page.
+  const where = { userId: session.user.id };
+  const [total, unread] = await Promise.all([
+    prisma.notification.count({ where }),
+    prisma.notification.count({ where: { ...where, readAt: null } }),
+  ]);
+  const { page, pageCount, skip, take } = pageWindow(parsePageParam(sp.page), total, PAGE_SIZE);
   const rows = await prisma.notification.findMany({
-    where: { userId: session.user.id },
-    orderBy: { createdAt: "desc" },
-    take: 100,
+    where,
+    orderBy: [{ createdAt: "desc" }, { id: "desc" }],
+    skip,
+    take,
   });
 
-  const unread = rows.filter((n) => !n.readAt).length;
   const viewerLocale = safeLocale(locale);
 
   return (
@@ -48,7 +63,7 @@ export default async function NotificationsPage({
             {t("unreadCount", { count: unread })}
           </strong>
           <span className="muted small">
-            {t("totalCount", { count: rows.length })}
+            {t("totalCount", { count: total })}
           </span>
         </div>
         {unread > 0 ? (
@@ -135,6 +150,12 @@ export default async function NotificationsPage({
           })}
         </div>
       )}
+      <Pager
+        locale={locale}
+        page={page}
+        pageCount={pageCount}
+        hrefFor={(p) => pageHref("/notifications", {}, p)}
+      />
     </>
   );
 }

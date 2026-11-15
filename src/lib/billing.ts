@@ -10,11 +10,18 @@
 import { OrderStatus, type ProductType } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
 import { releaseInstantOrderList } from "@/lib/commerce/list-commit";
-import { recordAudit } from "@/lib/audit";
+import { auditRowData } from "@/lib/audit";
+import { archiveInvoicePdf } from "@/lib/invoice-archive";
 import { invoiceDueAt, paymentTermsDaysFor } from "@/lib/payment-terms";
 import { lineOrder } from "@/lib/commerce/line-order";
 import { quoteTotals } from "@/lib/money";
 import { feePlacementDescription } from "@/lib/commerce/placements";
+import { loadSellerDetails } from "@/lib/seller";
+import {
+  allocateDocumentNumber,
+  customerSnapshotFrom,
+  sellerSnapshotFrom,
+} from "@/lib/invoice-snapshot";
 import {
   ORDER_STATUS_AFTER_FULL_CREDIT,
   canIssueInvoice,
@@ -24,7 +31,7 @@ import {
 
 
 export type IssueInvoiceResult =
-  | { ok: true; invoiceId: string; total: number; currency: string; dueAt: Date }
+  | { ok: true; invoiceId: string; number: number; total: number; currency: string; dueAt: Date }
   | { ok: false; reason: "not-found" | "not-invoiceable" };
 
 export async function issueInvoiceForOrder(args: {
@@ -38,7 +45,18 @@ export async function issueInvoiceForOrder(args: {
     include: {
       quote: { include: { lines: { orderBy: lineOrder() } } },
       invoices: true,
-      organization: { select: { paymentTermsDays: true } },
+      organization: {
+        select: {
+          paymentTermsDays: true,
+          name: true,
+          legalName: true,
+          vatId: true,
+          addressLine1: true,
+          addressLine2: true,
+          postalCode: true,
+          city: true,
+        },
+      },
     },
   });
   if (!order) return { ok: false, reason: "not-found" };
@@ -91,6 +109,12 @@ export async function issueInvoiceForOrder(args: {
   });
   const lastPosition = lines.reduce((max, l) => Math.max(max, l.position), -1);
 
+  // Resolved before the transaction (it reads outside it); the row itself is
+  // written inside, so an issued invoice always has its audit row.
+  const auditBase = await auditRowData(args.actorId, "invoice.issue", "Invoice:pending", {
+    organizationId: order.organizationId,
+  });
+
   const issued = await prisma.$transaction(async (tx) => {
     const claimed = await tx.order.updateMany({
       where: { id: order.id, status: OrderStatus.COMPLETED },
@@ -130,14 +154,26 @@ export async function issueInvoiceForOrder(args: {
             [{ lineTotal: Number(q.subtotal) }, ...extras.map((e) => ({ lineTotal: Number(e.lineTotal) }))],
             Number(q.vatPct),
           );
+    // Allocated only after the claim won, inside this transaction: the
+    // counter row stays locked until commit, so numbers are unique and a
+    // rolled-back issue leaves no gap.
+    const number = await allocateDocumentNumber(tx, "invoice");
     const invoice = await tx.invoice.create({
       data: {
+        number,
+        // The document as it stood when issued (lib/invoice-snapshot.ts).
+        customerSnapshot: customerSnapshotFrom(order.organization),
+        sellerSnapshot: sellerSnapshotFrom(loadSellerDetails()),
         organizationId: order.organizationId,
         orderId: order.id,
         status: "ISSUED",
         currency: q.currency,
         subtotal: totals.subtotal,
         vatPct: q.vatPct,
+        // The VAT treatment and note the quote was accepted under
+        // (lib/vat.ts) — copied, never recomputed. Null on legacy quotes.
+        vatTreatment: q.vatTreatment,
+        vatNote: q.vatNote,
         total: totals.total,
         issuedAt: now,
         dueAt,
@@ -151,19 +187,38 @@ export async function issueInvoiceForOrder(args: {
         data: { invoiceId: invoice.id },
       });
     }
+    await tx.auditLog.create({
+      data: {
+        ...auditBase,
+        entity: `Invoice:${invoice.id}`,
+        detail: JSON.stringify({
+          ...(auditBase.detail ? (JSON.parse(auditBase.detail) as Record<string, unknown>) : {}),
+          number: invoice.number,
+          orderId: order.id,
+          total: totals.total,
+          currency: q.currency,
+          paymentTermsDays,
+          vatTreatment: q.vatTreatment,
+          ...(extras.length > 0 ? { extraWorkLines: extras.length } : {}),
+        }),
+      },
+    });
     return { invoice, total: totals.total, extraWorkCount: extras.length };
   });
   if (!issued) return { ok: false, reason: "not-invoiceable" };
   const { invoice, total } = issued;
 
-  await recordAudit(args.actorId, "invoice.issue", `Invoice:${invoice.id}`, {
-    orderId: order.id,
+  // Keep the document as issued (no-op without object storage). After the
+  // commit and best-effort: an archive failure must not undo a valid invoice.
+  await archiveInvoicePdf(invoice.id);
+  return {
+    ok: true,
+    invoiceId: invoice.id,
+    number: invoice.number as number,
     total,
     currency: q.currency,
-    paymentTermsDays,
-    ...(issued.extraWorkCount > 0 ? { extraWorkLines: issued.extraWorkCount } : {}),
-  });
-  return { ok: true, invoiceId: invoice.id, total, currency: q.currency, dueAt };
+    dueAt,
+  };
 }
 
 export type IssueCreditNoteResult =
@@ -198,21 +253,46 @@ export async function issueFullCreditNote(args: {
   if (!eligibility.ok) return eligibility;
   const { invoice } = eligibility;
 
+  const auditBase = await auditRowData(args.actorId, "credit_note.issue", `Invoice:${invoice.id}`, {
+    organizationId: order.organizationId,
+  });
+
   const creditNote = await prisma.$transaction(async (tx) => {
     const claimed = await tx.invoice.updateMany({
       where: { id: invoice.id, status: { in: ["ISSUED", "PAID", "OVERDUE"] } },
       data: { status: "CREDITED" },
     });
     if (claimed.count !== 1) return null;
+    const number = await allocateDocumentNumber(tx, "credit_note");
     const note = await tx.creditNote.create({
       data: {
+        number,
         invoiceId: invoice.id,
         orderId: order.id,
         currency: invoice.currency,
         amount: invoice.total,
+        // Mirrors the invoice it credits (lib/vat.ts).
+        vatTreatment: invoice.vatTreatment,
+        vatNote: invoice.vatNote,
         reason: args.reason,
         issuedAt: now,
         issuedBy: args.actorId,
+      },
+    });
+    await tx.auditLog.create({
+      data: {
+        ...auditBase,
+        detail: JSON.stringify({
+          ...(auditBase.detail ? (JSON.parse(auditBase.detail) as Record<string, unknown>) : {}),
+          number,
+          orderId: order.id,
+          creditNoteId: note.id,
+          amount: Number(invoice.total),
+          currency: invoice.currency,
+          reason: args.reason,
+          orderStatusFrom: order.status,
+          orderStatusTo: ORDER_STATUS_AFTER_FULL_CREDIT,
+        }),
       },
     });
     if (order.status !== ORDER_STATUS_AFTER_FULL_CREDIT) {
@@ -239,16 +319,6 @@ export async function issueFullCreditNote(args: {
   });
   // The invoice CAS lost: a concurrent submit credited it first.
   if (!creditNote) return { ok: false, reason: "already-credited" };
-
-  await recordAudit(args.actorId, "credit_note.issue", `Invoice:${invoice.id}`, {
-    orderId: order.id,
-    creditNoteId: creditNote.id,
-    amount: Number(invoice.total),
-    currency: invoice.currency,
-    reason: args.reason,
-    orderStatusFrom: order.status,
-    orderStatusTo: ORDER_STATUS_AFTER_FULL_CREDIT,
-  });
 
   const products = await prisma.product.findMany({
     where: { id: { in: order.lines.map((l) => l.productId).filter((id): id is string => !!id) } },

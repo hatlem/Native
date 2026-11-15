@@ -16,7 +16,7 @@ export function passwordResetEmail(args: PasswordResetArgs): {
   return {
     subject: t.subject(args.appName),
     text: `${t.body}\n\n${args.url}\n\n${t.footer}`,
-    html: layout({
+    html: layout({ lang: args.locale,
       preheader: t.preheader,
       heading: t.heading,
       body: t.body,

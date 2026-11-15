@@ -14,7 +14,7 @@ import { evaluateSpecForPlacement } from "@/lib/spec-check-runner";
 import { articleHeadline } from "@/lib/content/markdown";
 import { linkableLinesWhere, linkOptionLabels, orderRef } from "@/lib/content/article-linking";
 import { Link } from "@/i18n/navigation";
-import { SubmitButton } from "@/components";
+import { SubmitButton, PendingButton } from "@/components";
 import { ArticlePreview } from "@/components/article-preview";
 import { UploadForm } from "./upload-form";
 
@@ -296,9 +296,9 @@ export default async function ArticleDetailPage({
                       <input type="hidden" name="locale" value={locale} />
                       <input type="hidden" name="articleId" value={articleId} />
                       <input type="hidden" name="placementId" value={p.id} />
-                      <button type="submit" className="btn small ghost">
+                      <PendingButton className="btn small ghost">
                         {t("unlinkCta")}
-                      </button>
+                      </PendingButton>
                     </form>
                   ) : null}
                 </li>
@@ -382,14 +382,13 @@ export default async function ArticleDetailPage({
                 <input type="hidden" name="locale" value={locale} />
                 <input type="hidden" name="assetId" value={latest.id} />
                 <input type="hidden" name="target" value="IN_REVIEW" />
-                <button
-                  type="submit"
+                <PendingButton
                   className="btn primary"
                   disabled={!canSubmit}
                   aria-disabled={!canSubmit}
                 >
                   {t("detailSubmitForReview")}
-                </button>
+                </PendingButton>
                 {canSubmit ? null : (
                   <span className="muted small">{t("submitBlockedSpec")}</span>
                 )}

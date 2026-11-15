@@ -30,17 +30,24 @@ export type AccountingInvoice = {
   subtotal: number;
   vatPct: number;
   vatAmount: number;
+  // How VAT applies (lib/vat.ts) and the statement the invoice prints for a
+  // reverse-charge sale. Null on invoices issued before the rule existed.
+  vatTreatment: "DOMESTIC" | "REVERSE_CHARGE" | null;
+  vatNote: string | null;
   total: number;
 };
 
 type InvoiceInput = {
   id: string;
-  number?: string | null;
+  // Invoice.number (the gap-free sequence, lib/invoice-snapshot.ts).
+  number?: string | number | null;
   issuedAt: Date | null;
   dueAt: Date | null;
   currency: string;
   subtotal: unknown; // Prisma Decimal at runtime
   vatPct: unknown;
+  vatTreatment?: "DOMESTIC" | "REVERSE_CHARGE" | null;
+  vatNote?: string | null;
   total: unknown;
   lines: {
     description: string;
@@ -63,7 +70,7 @@ export function buildAccountingInvoice(
   const total = Number(invoice.total);
   return {
     invoiceId: invoice.id,
-    number: invoice.number || invoice.id,
+    number: invoice.number != null && invoice.number !== "" ? String(invoice.number) : invoice.id,
     issuedAt: invoice.issuedAt ? invoice.issuedAt.toISOString() : null,
     dueAt: invoice.dueAt ? invoice.dueAt.toISOString() : null,
     currency: invoice.currency,
@@ -81,6 +88,8 @@ export function buildAccountingInvoice(
     subtotal,
     vatPct: Number(invoice.vatPct),
     vatAmount: Math.round((total - subtotal) * 100) / 100,
+    vatTreatment: invoice.vatTreatment ?? null,
+    vatNote: invoice.vatNote ?? null,
     total,
   };
 }

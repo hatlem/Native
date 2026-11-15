@@ -474,7 +474,7 @@ export default async function DeskTitleEditPage({
           <input type="hidden" name="locale" value={locale} />
           <input type="hidden" name="titleId" value={title.id} />
           <div className="field">
-            <label htmlFor="aliases">Søke-alias</label>
+            <label htmlFor="aliases">{t("aliasLabel")}</label>
             <input
               id="aliases"
               name="aliases"
@@ -482,13 +482,9 @@ export default async function DeskTitleEditPage({
               defaultValue={title.aliases.join(", ")}
               placeholder="AT.no, AT, ATno"
             />
-            <p className="muted small">
-              Kommaseparert. Merkenavn / alternative navn katalogsøket skal
-              treffe. Søket fjerner punktum, så legg også til en punktumfri form
-              (f.eks. «ATno» for «AT.no»).
-            </p>
+            <p className="muted small">{t("aliasHint")}</p>
           </div>
-          <SubmitButton label="Lagre alias" pendingLabel="Lagrer…" className="btn" />
+          <SubmitButton label={t("aliasSave")} pendingLabel={t("aliasSaving")} className="btn" />
         </form>
       </article>
 

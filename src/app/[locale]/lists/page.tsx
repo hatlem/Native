@@ -1,3 +1,4 @@
+import { PendingButton } from "@/components/submit-button";
 import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
 import { getWorkspace } from "@/lib/workspace";
@@ -77,9 +78,9 @@ export default async function ListsPage({
           <form action={restoreList}>
             <input type="hidden" name="listId" value={justArchived.id} />
             <input type="hidden" name="locale" value={locale} />
-            <button type="submit" className="btn small secondary">
+            <PendingButton className="btn small secondary">
               {t("undo")}
-            </button>
+            </PendingButton>
           </form>
         </div>
       ) : null}
@@ -101,9 +102,9 @@ export default async function ListsPage({
                   <form action={restoreList}>
                     <input type="hidden" name="listId" value={l.id} />
                     <input type="hidden" name="locale" value={locale} />
-                    <button type="submit" className="link">
+                    <PendingButton className="link">
                       {t("restore")}
-                    </button>
+                    </PendingButton>
                   </form>
                 )}
               </li>

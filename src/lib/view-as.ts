@@ -38,3 +38,14 @@ export function viewAsCommitConfirmed(
   if (!isViewingAs(ws, organizationId)) return true;
   return formData.get(VIEW_AS_CONFIRM_FIELD) === "1";
 }
+
+// Starting a view needs a stated reason, kept on the audit row: opening a
+// customer's account is an access the customer may later ask about.
+export const VIEW_AS_REASON_MIN = 5;
+export const VIEW_AS_REASON_MAX = 300;
+
+export function parseViewAsReason(raw: unknown): string | null {
+  const reason = typeof raw === "string" ? raw.replace(/\s+/g, " ").trim() : "";
+  if (reason.length < VIEW_AS_REASON_MIN) return null;
+  return reason.slice(0, VIEW_AS_REASON_MAX);
+}

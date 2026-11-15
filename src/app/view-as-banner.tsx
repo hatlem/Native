@@ -1,3 +1,4 @@
+import { PendingButton } from "@/components/submit-button";
 import { getTranslations } from "next-intl/server";
 import { stopViewAs } from "@/app/view-as-actions";
 
@@ -13,9 +14,9 @@ export async function ViewAsBanner({ locale, orgName }: { locale: string; orgNam
         </span>
         <form action={stopViewAs}>
           <input type="hidden" name="locale" value={locale} />
-          <button type="submit" className="btn small secondary">
+          <PendingButton className="btn small secondary">
             {t("stop")}
-          </button>
+          </PendingButton>
         </form>
       </div>
     </div>

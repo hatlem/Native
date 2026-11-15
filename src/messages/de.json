@@ -1,4 +1,63 @@
 {
+  "mfa": {
+    "stepTitle": "Zwei-Faktor-Bestätigung",
+    "stepHeadline": "Noch ein Schritt.",
+    "stepLead": "Ihr Konto ist mit Zwei-Faktor-Authentifizierung geschützt. Geben Sie den Code aus Ihrer Authenticator-App ein, um die Anmeldung abzuschließen.",
+    "stepSubtitle": "Passwort akzeptiert. Geben Sie jetzt Ihren sechsstelligen Code ein.",
+    "stepSubtitleMagic": "E-Mail-Link akzeptiert. Geben Sie jetzt Ihren sechsstelligen Code ein.",
+    "codeLabel": "Authentifizierungscode",
+    "codeHint": "Telefon verloren? Geben Sie stattdessen einen Ihrer Wiederherstellungscodes ein.",
+    "verify": "Bestätigen und anmelden",
+    "verifying": "Wird geprüft…",
+    "cancel": "Zurück zur Anmeldung",
+    "errorInvalid": "Dieser Code stimmt nicht. Prüfen Sie Ihre Authenticator-App und versuchen Sie es erneut.",
+    "errorReplay": "Dieser Code wurde bereits verwendet. Warten Sie auf den nächsten und versuchen Sie es erneut.",
+    "errorRate": "Zu viele Versuche. Warten Sie einige Minuten und versuchen Sie es erneut.",
+    "errorPassword": "Dieses Passwort stimmt nicht.",
+    "sessionExpired": "Ihre Anmeldung ist vor dem zweiten Schritt abgelaufen. Bitte melden Sie sich erneut an.",
+    "pageTitle": "Zwei-Faktor-Authentifizierung",
+    "eyebrow": "Sicherheit",
+    "lead": "Fügen Sie der Anmeldung einen zweiten Schritt hinzu: einen Code aus einer Authenticator-App auf Ihrem Telefon, zusätzlich zu Passwort oder E-Mail-Link.",
+    "requiredBanner": "Ihre Rolle erfordert Zwei-Faktor-Authentifizierung. Richten Sie sie ein, um zum Desk zu gelangen.",
+    "noticeDisabled": "Die Zwei-Faktor-Authentifizierung ist jetzt deaktiviert.",
+    "noticeRecoveryUsed": "Sie haben sich mit einem Wiederherstellungscode angemeldet. Wenn Sie Ihr Telefon verloren haben, deaktivieren Sie Zwei-Faktor und richten Sie es auf Ihrem neuen Gerät erneut ein.",
+    "codeOrRecoveryLabel": "Authentifizierungs- oder Wiederherstellungscode",
+    "passwordLabel": "Passwort",
+    "working": "Wird bearbeitet…",
+    "recoveryTitle": "Speichern Sie Ihre Wiederherstellungscodes",
+    "recoveryLead": "Jeder Code funktioniert einmal, falls Sie Ihr Telefon nicht nutzen können. Bewahren Sie sie sicher auf. Sie werden nicht noch einmal angezeigt.",
+    "recoveryDone": "Ich habe sie gespeichert",
+    "statusEyebrow": "Status",
+    "statusOn": "Zwei-Faktor-Authentifizierung ist aktiv",
+    "statusOff": "Zwei-Faktor-Authentifizierung ist nicht aktiv",
+    "enabledSince": "Aktiviert am {date}.",
+    "recoveryLeft": "Unbenutzte Wiederherstellungscodes: {count}",
+    "recoveryEyebrow": "Wiederherstellung",
+    "regenerateTitle": "Neue Wiederherstellungscodes",
+    "regenerateLead": "Geben Sie einen aktuellen Code ein, um einen neuen Satz zu erzeugen. Die alten Codes funktionieren dann nicht mehr.",
+    "regenerate": "Neue Codes erzeugen",
+    "disableEyebrow": "Deaktivieren",
+    "disableTitle": "Zwei-Faktor-Authentifizierung deaktivieren",
+    "disableLead": "Bestätigen Sie mit Ihrem Passwort oder einem aktuellen Code. Ihre anderen Geräte werden abgemeldet.",
+    "disableLeadStaff": "Bestätigen Sie mit Ihrem Passwort oder einem aktuellen Code. Ihre Rolle erfordert Zwei-Faktor, daher müssen Sie es erneut einrichten, bevor Sie den Desk nutzen können.",
+    "disableCodeHint": "Lassen Sie das Passwort leer, um stattdessen mit einem Code zu bestätigen.",
+    "disable": "Zwei-Faktor deaktivieren",
+    "setupTitle": "Authenticator-App einrichten",
+    "step1": "Öffnen Sie Ihre Authenticator-App (Google Authenticator, Microsoft Authenticator, 1Password, Authy) und fügen Sie ein neues Konto hinzu.",
+    "step2": "Geben Sie diesen Einrichtungsschlüssel ein oder öffnen Sie den Link auf dem Telefon mit der App.",
+    "step3": "Geben Sie zur Bestätigung den sechsstelligen Code ein, den die App anzeigt.",
+    "setupKeyLabel": "Einrichtungsschlüssel",
+    "openInApp": "In Authenticator-App öffnen",
+    "confirm": "Zwei-Faktor aktivieren",
+    "cancelSetup": "Einrichtung abbrechen",
+    "offBody": "Mit aktivem Zwei-Faktor benötigen Sie für die Anmeldung Ihr Passwort oder Ihren E-Mail-Link sowie einen sechsstelligen Code aus einer App auf Ihrem Telefon. Ein gestohlenes Passwort allein reicht nicht mehr.",
+    "setupButton": "Authenticator-App einrichten",
+    "backToAccount": "Zurück zu den Kontoeinstellungen",
+    "accountSectionTitle": "Zwei-Faktor-Authentifizierung",
+    "accountSectionBodyOn": "Aktiv. Die Anmeldung erfordert einen Code aus Ihrer Authenticator-App.",
+    "accountSectionBodyOff": "Nicht aktiv. Fügen Sie der Anmeldung einen Code aus einer Authenticator-App als zweiten Schritt hinzu.",
+    "manage": "Zwei-Faktor verwalten"
+  },
   "common": {
     "appName": "NativeSpin",
     "feedback": {
@@ -14,6 +73,17 @@
       "sendFailed": "Senden fehlgeschlagen. Nochmal versuchen?",
       "enterFeedback": "Schreib zuerst etwas.",
       "close": "Schließen"
+    },
+    "a11y": {
+      "primaryNav": "Hauptnavigation",
+      "menu": "Menü",
+      "mobileNav": "Mobile Navigation",
+      "breadcrumb": "Brotkrumennavigation",
+      "language": "Sprache"
+    },
+    "confirm": {
+      "yes": "Ja, bestätigen",
+      "cancel": "Abbrechen"
     }
   },
   "nav": {
@@ -64,9 +134,15 @@
     "campaigns": "Kampagnen",
     "rates": "Preise",
     "users": "Benutzer",
+    "audit": "Audit-Log",
     "invoices": "Rechnungen",
     "orgSwitcherLabel": "Organisation",
-    "orgSwitchTo": "Zu {org} wechseln"
+    "orgSwitchTo": "Zu {org} wechseln",
+    "help": "Hilfe",
+    "paletteOrders": "Aufträge",
+    "paletteRequests": "Anfragen",
+    "paletteTitles": "Titel",
+    "paletteSearching": "Suche…"
   },
   "orders": {
     "eyebrow": "Bestellungen",
@@ -1047,9 +1123,31 @@
     "metaPlanAlternativesOnly": "Noch keine Platzierungen · {alternatives, plural, one {# Alternative} other {# Alternativen}} · bearbeitet {age}",
     "actionContinuePlan": "Weiter planen",
     "qualifierAwaitingTeam": "wartet auf jemanden mit Bestellberechtigung",
-    "actionSeeQuote": "Angebot ansehen"
+    "actionSeeQuote": "Angebot ansehen",
+    "selfService": {
+      "heading": "Doch nicht weitermachen?",
+      "lead": "Hier können Sie ein Angebot ablehnen oder die gesamte Anfrage zurückziehen. Es entstehen keine Kosten, und Sie können jederzeit eine neue Anfrage senden.",
+      "declineOpen": "Angebot in {currency} ablehnen",
+      "declineSubmit": "Angebot ablehnen",
+      "withdrawOpen": "Diese Anfrage zurückziehen",
+      "withdrawSubmit": "Anfrage zurückziehen",
+      "reasonLabel": "Warum? (optional – es hilft uns, besser zu werden)",
+      "pending": "Wird gesendet…",
+      "needsOrderingRights": "Zum Ablehnen eines Angebots benötigen Sie Bestellrechte in Ihrer Organisation.",
+      "withdrawnBanner": "Sie haben diese Anfrage am {date} zurückgezogen.",
+      "noticeQuoteDeclined": "Das Angebot ist abgelehnt. Wir haben das Desk informiert.",
+      "noticeRequestWithdrawn": "Die Anfrage ist zurückgezogen. Wir haben das Desk informiert.",
+      "noticeUnavailable": "Das ist nicht mehr möglich – die Anfrage hat sich geändert, seit Sie die Seite geöffnet haben.",
+      "noticeNotAllowed": "Ihre Berechtigung erlaubt das nicht. Fragen Sie einen Admin Ihrer Organisation.",
+      "deskDeclined": "Vom Kunden abgelehnt am {date}.",
+      "deskWithdrawn": "Vom Kunden zurückgezogen am {date}.",
+      "deskReason": "Grund: {reason}"
+    }
   },
   "desk": {
+    "vatWarnCountryUnknown": "Für diesen Kunden ist kein Sitzland hinterlegt, daher wurde die norwegische Umsatzsteuer ({pct} %) berechnet. Ist der Kunde außerhalb Norwegens ansässig, hinterlegen Sie den Markt bei der Organisation und erstellen Sie das Angebot vor dem Versand neu.",
+    "vatWarnVatIdMissing": "Es gilt das Reverse-Charge-Verfahren (keine norwegische Umsatzsteuer), aber für den Kunden ist keine USt-IdNr. hinterlegt. Bitte vor dem Versand ergänzen – die Rechnung muss sie ausweisen.",
+    "vatReverseCharge": "Reverse Charge – keine norwegische Umsatzsteuer",
     "eyebrow": "Interner Desk",
     "title": "Desk-Konsole",
     "subtitle": "Was heute Ihre Aufmerksamkeit braucht — neue Briefs, laufende Angebote und aktive Bestellungen.",
@@ -1184,7 +1282,23 @@
     "quoteLocked": "Dieses Angebot wurde gesendet, die Positionen sind daher gesperrt. Überarbeiten Sie es, um Preise oder Hinweise zu ändern.",
     "quoteNotRevisable": "Dieses Angebot kann nicht überarbeitet werden: Es wurde angenommen oder ist abgeschlossen.",
     "revisionPredecessorClosed": "Nicht gesendet: Das Angebot, das diese Überarbeitung ersetzen sollte, ist nicht mehr offen – der Kunde hat es womöglich gerade angenommen. Verwerfen Sie die Überarbeitung.",
-    "sendRevisionNote": "Das Senden ersetzt das frühere Angebot: Der Kunde kann es nicht mehr annehmen und erhält eine Benachrichtigung mit der neuen Summe."
+    "sendRevisionNote": "Das Senden ersetzt das frühere Angebot: Der Kunde kann es nicht mehr annehmen und erhält eine Benachrichtigung mit der neuen Summe.",
+    "requestsTitle": "Alle Anfragen",
+    "requestsLead": "Alle Anfragen in der Warteschlange. Nach Status filtern oder nach Organisation suchen.",
+    "requestsSearchLabel": "Organisation oder Briefing suchen",
+    "requestsSearchButton": "Suchen",
+    "requestsStatusLabel": "Status",
+    "requestsStatusAll": "Alle Status",
+    "requestsStatusOpen": "Offen (Desk gefragt)",
+    "requestsEmpty": "Keine Anfragen passen zu diesem Filter.",
+    "requestsCount": "{count, plural, one {# Anfrage} other {# Anfragen}}",
+    "requestsColUpdated": "Aktualisiert",
+    "requestsColQuotes": "Angebote",
+    "requestsPrev": "Zurück",
+    "requestsNext": "Weiter",
+    "requestsPageOf": "Seite {page} von {pages}",
+    "requestsViewAll": "Alle Anfragen anzeigen",
+    "requestsPaginationLabel": "Seitennavigation"
   },
   "deskTitles": {
     "eyebrow": "Super-Admin · Titel",
@@ -1435,7 +1549,9 @@
     "checkSignupLead": "Wir haben einen Link an die angegebene Adresse geschickt. Öffnen Sie ihn, um die Adresse zu bestätigen und sich anzumelden; er läuft in 15 Minuten ab. Gab es für die Adresse schon ein Konto, erklärt die E-Mail, wie Sie wieder hineinkommen.",
     "regEmailTypoQuestion": "Meinten Sie <b>{email}</b>?",
     "regEmailTypoUse": "{email} verwenden",
-    "regEmailTypoKeep": "Ist {domain} richtig? Dann klicken Sie einfach erneut auf „Konto erstellen“."
+    "regEmailTypoKeep": "Ist {domain} richtig? Dann klicken Sie einfach erneut auf „Konto erstellen“.",
+    "regOrgRequired": "Geben Sie den Namen Ihres Unternehmens oder Ihrer Organisation ein.",
+    "regEmailRequired": "Geben Sie Ihre geschäftliche E-Mail-Adresse ein."
   },
   "order": {
     "title": "Bestellung",
@@ -1529,6 +1645,34 @@
       "SUPERADMIN": "NativeSpin (Admin)",
       "PUBLISHER": "Der Verlag",
       "BUYER": "Der Kunde"
+    },
+    "cancelRequest": {
+      "heading": "Müssen Sie stornieren?",
+      "lead": "Sagen Sie uns, warum – das Desk prüft die Buchungen bei den Verlagen und meldet sich. Bereits gebuchte oder veröffentlichte Platzierungen können Stornokosten verursachen – wir bestätigen, bevor etwas endgültig ist.",
+      "open": "Stornierung anfragen",
+      "reasonLabel": "Grund für die Stornierung",
+      "submit": "Stornierungsanfrage senden",
+      "pending": "Wird gesendet…",
+      "requested": "Stornierung angefragt am {date}. Das Desk meldet sich – der Auftrag bleibt aktiv, bis es bestätigt.",
+      "noticeRequested": "Ihre Stornierungsanfrage wurde an das Desk gesendet.",
+      "noticeReasonRequired": "Bitte geben Sie einen Grund an, damit das Desk handeln kann.",
+      "noticeUnavailable": "Dieser Auftrag kann hier nicht mehr storniert werden.",
+      "noticeNotAllowed": "Für eine Stornierungsanfrage benötigen Sie Bestellrechte in Ihrer Organisation.",
+      "deskBanner": "Der Kunde hat am {date} um Stornierung dieses Auftrags gebeten.",
+      "deskReason": "Grund: {reason}"
+    },
+    "csat": {
+      "heading": "Wie lief diese Kampagne?",
+      "question": "Wie zufrieden sind Sie mit NativeSpin bei diesem Auftrag?",
+      "scale": "{score} von 5",
+      "low": "Unzufrieden",
+      "high": "Sehr zufrieden",
+      "commentLabel": "Gibt es etwas, das wir wissen sollten? (optional)",
+      "submit": "Feedback senden",
+      "pending": "Wird gesendet…",
+      "thanks": "Danke – Sie haben diesen Auftrag mit {score} von 5 bewertet.",
+      "deskHeading": "Kundenfeedback",
+      "deskScore": "Zufriedenheit: {score} von 5"
     }
   },
   "production": {
@@ -1562,6 +1706,7 @@
     "vetoSharedWarning": "Dieser Artikel läuft auch auf {count} weiteren Platzierungen — sie sind von diesem Widerruf nicht betroffen."
   },
   "invoice": {
+    "vatNoteHeading": "Umsatzsteuerhinweis",
     "title": "Rechnung",
     "eyebrow": "Rechnung",
     "status": "Status",
@@ -1838,7 +1983,14 @@
     "footerSolutions": "Lösungen",
     "footerCompany": "Unternehmen",
     "footerAbout": "Über uns",
-    "footerContact": "Kontakt"
+    "footerContact": "Kontakt",
+    "footerHelp": "Hilfe",
+    "footerChangelog": "Neuigkeiten",
+    "footerLegal": "Rechtliches",
+    "footerPrivacy": "Datenschutz",
+    "footerTerms": "AGB",
+    "footerSecurity": "Sicherheit",
+    "footerSubprocessors": "Unterauftragsverarbeiter"
   },
   "advertisers": {
     "eyebrow": "Für Werbetreibende",
@@ -2415,6 +2567,9 @@
     "scope_catalog_write": "eigene Titel und Produkte des Verlags hochladen",
     "scope_orders_write": "verbindliche Bestellungen für die Organisation aufgeben",
     "scope_pricing_admin": "interne Preis-Tools (MCP) — nur Plattform",
+    "scope_pricing_read": "MCP: Desk-Preisdaten nur lesen",
+    "scope_pricing_draft": "MCP: lesen + Entwürfe erfassen (Kontakte, Angebotsentwürfe, nicht gesendete Preisanfragen)",
+    "scope_pricing_apply": "MCP: Entwürfe + Angebote auf Live-Preise anwenden und E-Mails senden",
     "boundPublisher": "{name} (Verlag)",
     "bindingPlatformGroup": "Plattform",
     "bindingSearchPlaceholder": "Organisation oder Verlag nach Name, Markt oder Titel suchen",
@@ -2520,7 +2675,11 @@
     "priceUnconfirmed": "Preis nicht bestätigt",
     "productInactive": "inaktiv",
     "inviteLanguageLabel": "Sprache der E-Mail",
-    "inviteLanguageHint": "Einladung, Registrierungsseite und Portalkonto verwenden diese Sprache. Standard ist der Markt des Titels."
+    "inviteLanguageHint": "Einladung, Registrierungsseite und Portalkonto verwenden diese Sprache. Standard ist der Markt des Titels.",
+    "aliasLabel": "Such-Aliasse",
+    "aliasHint": "Kommagetrennt. Markennamen und alternative Namen, die die Katalogsuche finden soll. Die Suche entfernt Punkte – daher auch eine Form ohne Punkt hinzufügen (z. B. „ATno“ für „AT.no“).",
+    "aliasSave": "Aliasse speichern",
+    "aliasSaving": "Speichern…"
   },
   "salesContacts": {
     "title": "Vertriebskontakte",
@@ -2724,7 +2883,9 @@
     "callSkip": "Jetzt überspringen →",
     "marketBlocked": "Für {org} ist noch kein Abrechnungsmarkt festgelegt. Ein Administrator von {org} muss ihn unter Konto einstellen, bevor das Team Anfragen senden kann.",
     "blockedTitle": "{org} ist noch nicht für die Abrechnung eingerichtet",
-    "blockedBack": "Zurück zum Plan"
+    "blockedBack": "Zurück zum Plan",
+    "marketError": "Wählen Sie den Markt, in dem Ihr Unternehmen fakturiert wird.",
+    "phoneError": "Geben Sie eine Telefonnummer mit mindestens 6 Ziffern ein."
   },
   "account": {
     "eyebrow": "Konto",
@@ -2834,6 +2995,8 @@
     "deactivateHint": "Ihr Konto funktioniert sofort nicht mehr — jede Anmeldung wird abgelehnt. Bestellungen, Angebote und Rechnungen, die Sie unterzeichnet haben, bleiben erhalten, denn sie sind Buchhaltungsunterlagen. Ein Super-Admin kann das Konto wieder aktivieren, wenn Sie zurückkommen.",
     "deactivateConfirmLabel": "Geben Sie zur Bestätigung Ihre E-Mail-Adresse ein",
     "deactivateButton": "Mein Konto deaktivieren",
+    "eraseDataLabel": "Auch meine personenbezogenen Daten löschen",
+    "eraseDataHint": "Name, E-Mail-Adresse, Telefonnummer, Anmeldedaten und Posteingang werden gelöscht, und Sie verlassen Ihre Organisationen. Das lässt sich nicht rückgängig machen, auch nicht durch einen Super-Admin. Aufträge, Angebote und Rechnungen bleiben ohne Ihre personenbezogenen Daten erhalten.",
     "deactivating": "Wird deaktiviert…",
     "errDelegation": "Das Enddatum der Delegation ist kein gültiges Datum.",
     "errDelegationPast": "Das Enddatum der Delegation muss in der Zukunft liegen.",
@@ -2841,7 +3004,35 @@
     "statusRevoked": "Entfernt",
     "errEmailDomain": "Für diese Domain finden wir keinen Mailserver. Bitte die Adresse auf Tippfehler prüfen.",
     "roleHelp": "Administratoren verwalten das Team und können alles. Mitglieder erstellen Pläne, senden Anfragen und nehmen – mit Bestellrecht – Angebote an. Eingeschränkt heißt nur lesen: sieht Pläne, Anfragen, Angebote, Bestellungen, Berichte, Artikel und Rechnungen des Teams, kann aber nichts ändern, senden, annehmen oder teilen.",
-    "canCommitRestrictedNote": "Eingeschränkte Benutzer können nur lesen und erhalten kein Bestellrecht."
+    "canCommitRestrictedNote": "Eingeschränkte Benutzer können nur lesen und erhalten kein Bestellrecht.",
+    "notifications": {
+      "eyebrow": "Benachrichtigungen",
+      "title": "E-Mail-Benachrichtigungen",
+      "lead": "Wählen Sie, welche Hinweise wir zusätzlich per E-Mail senden. Alles erscheint immer in Ihrem Posteingang in NativeSpin.",
+      "save": "Einstellungen speichern",
+      "saving": "Speichern…",
+      "saved": "Ihre Benachrichtigungseinstellungen wurden gespeichert.",
+      "quotes": {
+        "label": "Anfragen und Angebote",
+        "hint": "Ein Angebot ist bereit, angenommen, abgelehnt oder muss erneuert werden."
+      },
+      "orders": {
+        "label": "Aufträge und Buchungen",
+        "hint": "Ein Auftrag wurde bestätigt, abgeschlossen oder storniert."
+      },
+      "content": {
+        "label": "Inhalte und Freigaben",
+        "hint": "Ein Entwurf wartet auf Ihre Freigabe oder ein Verlag hat einen zurückgeschickt."
+      },
+      "billing": {
+        "label": "Rechnungen",
+        "hint": "Eine neue Rechnung wurde ausgestellt."
+      },
+      "planning": {
+        "label": "Planungs-Updates",
+        "hint": "Das Desk hat eine Platzierung vorgeschlagen, ein Titel hat einen Preis erhalten oder ein Kunde hat einen geteilten Plan freigegeben."
+      }
+    }
   },
   "rateCard": {
     "pageTitle": "Rate-Card-Anfrage",
@@ -3045,18 +3236,6 @@
     "impressionsLabel": "Impressionen (aus Ihrer Analyse)",
     "impressionsSave": "Speichern"
   },
-  "landing": {
-    "foot": {
-      "tagline": "Native-Content und Native-Werbung über jeden Titel, den wir in NO, SE, DK, FI, DE, AT, CH, UK und IE abdecken — und ein wachsender Katalog.",
-      "copy": "Getia AS · Oslo",
-      "navAdv": "Für Werbetreibende",
-      "navAgy": "Für Agenturen",
-      "navPub": "Für Publisher",
-      "navAbout": "Über uns",
-      "navContact": "Kontakt",
-      "navCreativeSpecs": "Anzeigenspezifikationen"
-    }
-  },
   "campaignReport": {
     "eyebrow": "Kampagnenbericht",
     "heading": "Kampagnenbericht",
@@ -3174,6 +3353,8 @@
     "resultsAlsoConsider": "Ebenfalls einen Blick wert",
     "resultsEmpty": "Noch keine Treffer – versuchen Sie ein breiteres Briefing oder einen anderen Markt.",
     "whyFits": "Warum das passt:",
+    "aiWritten": "KI",
+    "aiWrittenHint": "Diese Erklärung wurde von KI aus den Katalogangaben des Titels verfasst. Prüfen Sie sie am Titel, bevor Sie sich darauf verlassen.",
     "reach": "Reichweite/Mon.",
     "addToShortlist": "Zur Auswahl hinzufügen",
     "titlePlaceholder": "Titel · Desk erstellt Preis",
@@ -3291,6 +3472,7 @@
     }
   },
   "quotePdf": {
+    "customerVatId": "USt-IdNr. des Kunden: {vatId}",
     "documentTitle": "Angebot {quoteNumber}",
     "quoteNumber": "Angebotsnummer",
     "revision": "Version",
@@ -3325,6 +3507,30 @@
     "extraWork": "Mehrarbeit / Korrektur",
     "inclArticle": "Inkl. Artikel von NativeSpin geschrieben · ab {amount}",
     "extraWorkDetail": "{hours} Std. × {rate}/Std."
+  },
+  "deskAudit": {
+    "eyebrow": "Admin",
+    "title": "Audit-Log",
+    "lead": "Wer hat was an welchem Datensatz wann getan. Nach Person, Aktion oder Organisation filtern.",
+    "filterActor": "Akteur",
+    "filterActorPlaceholder": "Benutzer-ID oder „system“",
+    "filterAction": "Aktion",
+    "filterActionPlaceholder": "z. B. invoice.issue oder auth.",
+    "filterOrg": "Organisations-ID",
+    "filterButton": "Filtern",
+    "clear": "Zurücksetzen",
+    "colWhen": "Wann",
+    "colActor": "Akteur",
+    "colAction": "Aktion",
+    "colEntity": "Datensatz",
+    "colOrg": "Organisation",
+    "colDetail": "Details",
+    "resultCount": "{count, plural, =0 {Keine Einträge} =1 {1 Eintrag} other {# Einträge}}",
+    "none": "Keine Audit-Einträge entsprechen diesen Filtern.",
+    "prev": "Zurück",
+    "next": "Weiter",
+    "pageOf": "Seite {page} von {pages}",
+    "retentionNote": "IP- und E-Mail-Adressen werden aus Einträgen entfernt, die älter als 90 Tage sind."
   },
   "deskUsers": {
     "eyebrow": "Administration",
@@ -3391,7 +3597,8 @@
     "termsDaysValue": "{days, plural, one {netto # Tag} other {netto # Tage}}",
     "okTerms": "Zahlungsbedingungen gespeichert.",
     "errTerms": "Geben Sie ganze Tage zwischen 1 und 120 an.",
-    "errViewAsOrg": "Dieser Werbetreibende wurde nicht gefunden."
+    "errViewAsOrg": "Dieser Werbetreibende wurde nicht gefunden.",
+    "errViewAsReason": "Geben Sie eine kurze Begründung für die Kundenansicht an."
   },
   "status": {
     "ACCEPTED": "Angenommen",
@@ -3767,7 +3974,21 @@
       "bodyClient": "Der Kunde hat Version {version} von „{article}“ zur Überarbeitung zurückgegeben.",
       "bodyDesk": "Der NativeSpin-Desk hat Version {version} von „{article}“ zur Überarbeitung zurückgegeben.",
       "comment": "Kommentar: „{comment}“"
-    }
+    },
+    "quoteDeclined": {
+      "title": "Angebot abgelehnt: {plan}",
+      "body": "{org} hat das Angebot abgelehnt."
+    },
+    "requestWithdrawn": {
+      "title": "Anfrage zurückgezogen: {plan}",
+      "body": "{org} hat die Anfrage zurückgezogen. Es ist keine weitere Arbeit daran nötig."
+    },
+    "cancellationRequested": {
+      "title": "Stornierung angefragt: {plan}",
+      "body": "{org} möchte diesen Auftrag stornieren. Prüfen Sie die Buchungen bei den Verlagen und stornieren Sie dann den Auftrag oder antworten Sie dem Kunden."
+    },
+    "selfServiceReason": "Angegebener Grund: {reason}",
+    "selfServiceNoReason": "Es wurde kein Grund angegeben."
   },
   "publisherInviteEmail": {
     "subject": "Einladung zur Partnerschaft für {publisher} – NativeSpin",
@@ -3805,6 +4026,7 @@
     "deskOrders": "Bestellungen",
     "deskTitles": "Titel",
     "deskUsers": "Benutzer",
+    "deskAudit": "Audit-Log",
     "deskWriters": "Autoren",
     "deskPriceQuotes": "Preisangebote",
     "deskPublisherContacts": "Verlagskontakte",
@@ -3914,7 +4136,99 @@
     "deskHeading": "Als Kunde ansehen",
     "deskLead": "Öffnen Sie die Plattform so, wie ein Werbetreibender sie sieht, mit seinen Listen, Anfragen und Bestellungen. Dem Team des Kunden wird kein Nutzer hinzugefügt. Die Ansicht endet nach 8 Stunden.",
     "deskOrgLabel": "Kunde",
+    "deskReasonLabel": "Begründung",
+    "deskReasonHint": "Warum Sie das Konto dieses Kunden öffnen (wird im Audit-Protokoll gespeichert), z. B. eine Supportanfrage.",
     "deskStart": "Als Kunde öffnen",
     "deskStarting": "Wird geöffnet …"
+  },
+  "subprocessors": {
+    "metaTitle": "Unterauftragsverarbeiter",
+    "eyebrow": "Vertrauen",
+    "title": "Unterauftragsverarbeiter",
+    "lead": "Die Dritten, die in unserem Auftrag personenbezogene Daten verarbeiten, wenn Sie NativeSpin nutzen – und was jeder von ihnen tut.",
+    "lastUpdated": "Zuletzt aktualisiert: {date}",
+    "colName": "Unterauftragsverarbeiter",
+    "colPurpose": "Zweck",
+    "colData": "Betroffene Daten",
+    "colLocation": "Verarbeitungsort",
+    "locationTbc": "Wird noch bestätigt",
+    "optional": "Nur wenn aktiviert",
+    "railway": {
+      "purpose": "Hosting der Anwendung und der Datenbank",
+      "data": "Alle Konto-, Auftrags- und Inhaltsdaten"
+    },
+    "resend": {
+      "purpose": "Versand von Transaktions- und Benachrichtigungs-E-Mails",
+      "data": "E-Mail-Adresse, Name, Nachrichteninhalt"
+    },
+    "r2": {
+      "purpose": "Dateispeicher (hochgeladene Dokumente, Angebots-PDFs, Artikeldateien)",
+      "data": "Dateien, die Sie oder wir hochladen"
+    },
+    "ai": {
+      "purpose": "KI-gestützter Abgleich eines Kampagnenbriefings mit Titeln sowie die Anzeigenvorschau",
+      "data": "Der von Ihnen eingegebene Briefingtext",
+      "name": "KI-Gateway und Modellanbieter"
+    },
+    "gtm": {
+      "purpose": "Tag-Verwaltung für Analysen, wird nur nach Einwilligung geladen",
+      "data": "Nutzungsereignisse, IP-Adresse, Cookie-Kennungen"
+    },
+    "getcookies": {
+      "purpose": "Cookie-Einwilligungsbanner und Einwilligungsnachweise",
+      "data": "Einwilligungsentscheidung, IP-Adresse"
+    },
+    "fiken": {
+      "purpose": "Buchhaltung: Rechnungen werden in unser Buchhaltungssystem übertragen",
+      "data": "Name der Organisation, USt-IdNr., Rechnungspositionen"
+    },
+    "changesTitle": "Änderungen dieser Liste",
+    "changesBody": "Wir aktualisieren diese Seite, bevor ein neuer Unterauftragsverarbeiter personenbezogene Daten verarbeitet. Ein Auftragsverarbeitungsvertrag (AVV) ist auf Anfrage erhältlich.",
+    "contact": "Fragen:",
+    "linkLabel": "Unsere Unterauftragsverarbeiter ansehen"
+  },
+  "help": {
+    "metaTitle": "Hilfe",
+    "eyebrow": "Support",
+    "title": "Hilfe",
+    "lead": "Antworten auf die häufigsten Fragen – und wie Sie einen Menschen erreichen.",
+    "faqTitle": "Häufige Fragen",
+    "q1": "Wie erhalte ich einen Preis?",
+    "a1": "Fügen Sie Platzierungen aus dem Katalog Ihrem Plan hinzu und senden Sie ihn als Anfrage. Katalogpreise sind Richtwerte; das Desk antwortet mit einem verbindlichen Angebot, in der Regel innerhalb von 24 Arbeitsstunden.",
+    "q2": "Kann ich ein Angebot ablehnen oder eine Anfrage zurückziehen?",
+    "a2": "Ja. Öffnen Sie die Anfrage und nutzen Sie unten „Doch nicht weitermachen?“. Kosten entstehen erst, wenn Sie ein Angebot annehmen.",
+    "q3": "Wie storniere ich einen Auftrag?",
+    "a3": "Öffnen Sie den Auftrag und wählen Sie „Stornierung anfragen“. Das Desk prüft die Buchungen bei den Verlagen und bestätigt etwaige Kosten, bevor die Stornierung endgültig ist.",
+    "q4": "Wo finde ich meine Rechnungen?",
+    "a4": "Unter Rechnungen – dort lässt sich jede als PDF herunterladen.",
+    "q5": "Wie lade ich Kolleginnen und Kollegen ein oder ändere, wer bestellen darf?",
+    "a5": "Ein Admin der Organisation verwaltet Mitglieder, Rollen und Bestellrechte unter Konto → Team.",
+    "q6": "Wie exportiere ich meine Daten oder schließe mein Konto?",
+    "a6": "Beides finden Sie unter Konto → Daten & Konto. Dort können Sie auch festlegen, welche E-Mails Sie erhalten.",
+    "contactTitle": "Mit dem Desk sprechen",
+    "contactBody": "Schreiben Sie uns – ein Mensch am Desk antwortet innerhalb eines Werktags.",
+    "contactCta": "Kontakt aufnehmen",
+    "changelogLink": "Neuigkeiten",
+    "navLabel": "Hilfe"
+  },
+  "changelog": {
+    "metaTitle": "Neuigkeiten",
+    "eyebrow": "Änderungsprotokoll",
+    "title": "Neu in NativeSpin",
+    "lead": "Produktänderungen, die Ihre Arbeit betreffen – die neuesten zuerst.",
+    "entries": {
+      "selfService": {
+        "title": "Selbst ablehnen, zurückziehen und stornieren",
+        "body": "Sie können jetzt direkt auf den Anfrage- und Auftragsseiten ein Angebot ablehnen, eine Anfrage zurückziehen und die Stornierung eines Auftrags anfragen."
+      },
+      "notificationPrefs": {
+        "title": "Wählen Sie, welche E-Mails Sie erhalten",
+        "body": "In den Kontoeinstellungen gibt es jetzt E-Mail-Benachrichtigungen pro Kategorie. Der Posteingang in der App zeigt weiterhin alles."
+      },
+      "help": {
+        "title": "Hilfe und Feedback an einem Ort",
+        "body": "Eine neue Hilfeseite beantwortet häufige Fragen, und nach Abschluss einer Kampagne können Sie bewerten, wie sie lief."
+      }
+    }
   }
 }

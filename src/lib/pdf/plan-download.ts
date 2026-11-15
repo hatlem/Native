@@ -1,3 +1,4 @@
+import { quoteVatFor } from "@/lib/vat-buyer";
 import { NextResponse } from "next/server";
 import { renderToBuffer } from "@react-pdf/renderer";
 import { safeLocale } from "@/i18n/routing";
@@ -93,7 +94,9 @@ export async function planDownloadResponse(args: {
   actor: string | null;
 }): Promise<NextResponse> {
   const locale = safeLocale(args.locale);
-  const [pricing, extraWorkRates] = await Promise.all([loadPricingDefaults(), loadExtraWorkRates()]);
+  const [pricingDefaults, extraWorkRates] = await Promise.all([loadPricingDefaults(), loadExtraWorkRates()]);
+  // The plan owner's VAT rate (lib/vat.ts), so the document matches /plan.
+  const pricing = { ...pricingDefaults, vatPct: quoteVatFor(args.list.organization).vatPct };
   const doc = buildPlanDocument({
     list: args.list,
     brief: args.brief,

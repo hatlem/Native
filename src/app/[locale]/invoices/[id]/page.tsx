@@ -2,11 +2,12 @@ import { getTranslations } from "next-intl/server";
 import { notFound } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import { lineOrder } from "@/lib/commerce/line-order";
-import { formatMoney, intlLocale } from "@/lib/money";
+import { formatMoney, formatMoneyExact, intlLocale } from "@/lib/money";
 import { loadScope, canActOnOrg } from "@/lib/scope";
 import { invoiceLineLabel } from "@/lib/invoice-line-label";
 import { invoiceNumber } from "@/lib/pdf/invoice-pdf-data";
 import { loadSellerDetails, sellerAddressLines, sellerGaps } from "@/lib/seller";
+import { documentNumber, sellerForInvoice } from "@/lib/invoice-snapshot";
 import { StatusBadge } from "@/app/status-badge";
 
 export const dynamic = "force-dynamic";
@@ -54,7 +55,7 @@ export default async function InvoicePage({
   // The seller of record (lib/seller.ts). Until its legal details are
   // configured the PDF route refuses to render; say so here instead of
   // offering a download that fails — and tell the desk exactly what to set.
-  const seller = loadSellerDetails();
+  const seller = sellerForInvoice(invoice.sellerSnapshot, loadSellerDetails());
   const sellerIncomplete = sellerGaps(seller, invoice.currency);
 
   return (
@@ -63,7 +64,7 @@ export default async function InvoicePage({
         <div>
           <span className="eyebrow accent">{t("eyebrow")}</span>
           <h1>
-            {t("title")} #{invoiceNumber(invoice.id)}
+            {t("title")} #{invoiceNumber(invoice)}
           </h1>
         </div>
         <div className="invoice-head__actions">
@@ -168,7 +169,7 @@ export default async function InvoicePage({
               {t("vatWithPct", { pct: Number(invoice.vatPct) })}
             </span>
             <span className="num">
-              {formatMoney(
+              {formatMoneyExact(
                 Number(invoice.total) - Number(invoice.subtotal),
                 invoice.currency,
                 locale,
@@ -178,10 +179,16 @@ export default async function InvoicePage({
           <div className="quote-row total">
             <span>{t("total")}</span>
             <span className="num">
-              {formatMoney(Number(invoice.total), invoice.currency, locale)}
+              {formatMoneyExact(Number(invoice.total), invoice.currency, locale)}
             </span>
           </div>
         </div>
+        {/* Reverse-charge statement, as stored when issued (lib/vat.ts). */}
+        {invoice.vatNote ? (
+          <p className="muted small">
+            <strong>{t("vatNoteHeading")}:</strong> {invoice.vatNote}
+          </p>
+        ) : null}
         {invoice.paymentTermsDays ? (
           <p className="muted small">{tPay("line", { days: invoice.paymentTermsDays })}</p>
         ) : null}
@@ -192,7 +199,7 @@ export default async function InvoicePage({
               invoice.currency === "NOK" && seller.bankAccount ? `${t("bankAccount")} ${seller.bankAccount}` : null,
               seller.iban ? `IBAN ${seller.iban}` : null,
               seller.bic ? `BIC/SWIFT ${seller.bic}` : null,
-              `${t("paymentReference")} ${invoiceNumber(invoice.id)}`,
+              `${t("paymentReference")} ${invoiceNumber(invoice)}`,
             ]
               .filter(Boolean)
               .join(" · ")}
@@ -202,11 +209,13 @@ export default async function InvoicePage({
 
       {credit ? (
         <section className="banner-info" role="status" style={{ marginTop: 16, display: "block" }}>
-          <strong>{t("creditedHeading")}</strong>
+          <strong>
+            {t("creditedHeading")} #{documentNumber(credit)}
+          </strong>
           <p style={{ margin: "4px 0 0" }}>
             {t("creditedBody", {
               date: date(credit.issuedAt),
-              amount: formatMoney(Number(credit.amount), credit.currency, locale),
+              amount: formatMoneyExact(Number(credit.amount), credit.currency, locale),
             })}{" "}
             {t("creditedReason", { reason: credit.reason })}
           </p>

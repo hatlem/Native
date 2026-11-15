@@ -1,0 +1,27 @@
+# Review ownership. With branch protection's "Require review from Code
+# Owners", a change to these paths needs the listed owner's approval.
+# There is one maintainer today; add a second owner to the sensitive paths as
+# soon as there is one (see CONTRIBUTING.md, "Bus factor").
+
+*                                   @hatlem
+
+# Authentication, authorization and tenant scoping
+/src/auth.ts                        @hatlem
+/src/middleware.ts                  @hatlem
+/src/lib/scope.ts                   @hatlem
+/src/lib/roles.ts                   @hatlem
+/src/lib/membership.ts              @hatlem
+/src/lib/desk-guard.ts              @hatlem
+/src/lib/api-auth.ts                @hatlem
+/src/lib/api-key.ts                 @hatlem
+
+# Money
+/src/lib/billing.ts                 @hatlem
+/src/lib/money.ts                   @hatlem
+/src/lib/commerce/                  @hatlem
+/src/lib/accounting*.ts             @hatlem
+
+# Schema, migrations, deploy
+/prisma/                            @hatlem
+/railway.json                       @hatlem
+/.github/                           @hatlem

@@ -26,6 +26,8 @@ const data: QuotePdfData = {
   quoteNumber: "ABCD1234",
   currency: "SEK",
   vatPct: 25,
+  vatNote: null,
+  customerVatId: null,
   subtotal: 17250,
   total: 21562.5,
   validUntil: null,

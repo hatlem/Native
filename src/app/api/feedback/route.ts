@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@/auth";
+import { fetchWithTimeout } from "@/lib/fetch-timeout";
+import { log } from "@/lib/log";
 
 const GETPLATFORM_URL = process.env.GETPLATFORM_URL || "https://get-platform-production.up.railway.app";
 // Scoped, low-privilege key: can only create feedback rows on GetPlatform,
@@ -22,12 +24,12 @@ export async function POST(req: NextRequest) {
     (typeof body?.pageUrl === "string" && body.pageUrl.trim()) || req.headers.get("referer") || undefined;
 
   if (!FEEDBACK_INGEST_KEY) {
-    console.error("feedback.not_configured", "FEEDBACK_INGEST_KEY is not set — submission not delivered to GetPlatform");
+    log.warn("feedback.not_configured", { reason: "FEEDBACK_INGEST_KEY is not set" });
     return NextResponse.json({ error: "Feedback service is not configured" }, { status: 503 });
   }
 
   try {
-    const res = await fetch(`${GETPLATFORM_URL}/api/feedback`, {
+    const res = await fetchWithTimeout(`${GETPLATFORM_URL}/api/feedback`, {
       method: "POST",
       headers: { "Content-Type": "application/json", "X-API-Key": FEEDBACK_INGEST_KEY },
       body: JSON.stringify({
@@ -46,13 +48,13 @@ export async function POST(req: NextRequest) {
       }),
     });
     if (!res.ok) {
-      console.error("feedback.upstream_failed", res.status, await res.text());
+      log.error("feedback.upstream_failed", { status: res.status, body: (await res.text()).slice(0, 500) });
       return NextResponse.json({ error: "Failed to send feedback" }, { status: 502 });
     }
     const data = await res.json();
     return NextResponse.json({ success: true, id: data.id });
   } catch (error) {
-    console.error("feedback.error", error);
+    log.error("feedback.error", { err: error });
     return NextResponse.json({ error: "Failed to send feedback" }, { status: 500 });
   }
 }

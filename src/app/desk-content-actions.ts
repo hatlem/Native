@@ -121,11 +121,18 @@ export async function confirmTrackedLinks(formData: FormData) {
     .map((url) => ({ url, label: null }));
 
   if (chosen.length) {
-    const map = await ensureTrackedLinks(orderLineId, chosen);
-    const asset = await prisma.contentAsset.findUnique({
-      where: { id: assetId },
+    // The guard above authorizes the LINE; the asset id is posted separately,
+    // so it must belong to the article placed on that line — otherwise a
+    // writer on any line could rewrite the body of any asset.
+    const asset = await prisma.contentAsset.findFirst({
+      where: {
+        id: assetId,
+        article: { placements: { some: { orderLineId } } },
+      },
       select: { id: true, body: true },
     });
+    if (!asset) redirect(`/${locale}/desk/orders/${orderId}`);
+    const map = await ensureTrackedLinks(orderLineId, chosen);
     if (asset?.body) {
       await prisma.contentAsset.update({
         where: { id: asset.id },

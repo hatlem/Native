@@ -46,6 +46,8 @@ export async function reviseQuote(input: {
       currency: true,
       subtotal: true,
       vatPct: true,
+      vatTreatment: true,
+      vatNote: true,
       total: true,
       notes: true,
       revision: true,
@@ -86,6 +88,9 @@ export async function reviseQuote(input: {
         currency: source.currency,
         subtotal: source.subtotal,
         vatPct: source.vatPct,
+        // The revision keeps the VAT treatment the offer was made under.
+        vatTreatment: source.vatTreatment,
+        vatNote: source.vatNote,
         total: source.total,
         notes: source.notes,
         // A draft makes no offer yet; the send sets the window.

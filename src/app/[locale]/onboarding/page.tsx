@@ -7,6 +7,8 @@ import { LandingShell } from "@/app/landing-shell";
 import { SubmitButton } from "@/components";
 import { SUPPORTED_MARKETS } from "@/lib/markets";
 
+import { SignupCompletedEvent } from "@/app/activation-events";
+import { OnboardingForm } from "./onboarding-form";
 export const dynamic = "force-dynamic";
 
 const MARKET_CODES = SUPPORTED_MARKETS;
@@ -70,10 +72,9 @@ export default async function OnboardingPage({
     );
   }
 
-  const errorCode = typeof sp.error === "string" ? sp.error : undefined;
-
   return (
     <LandingShell locale={locale} screenLabel="Onboarding" withFooter={false}>
+      <SignupCompletedEvent userId={session.user.id} />
       <section className="auth-shell">
         <div className="marketing">
           <span className="eyebrow accent">{t("eyebrow")}</span>
@@ -92,56 +93,13 @@ export default async function OnboardingPage({
             <p>{t("formLead")}</p>
           </div>
 
-          {errorCode ? (
-            <div className="banner-error" role="alert">
-              <span>{t("error")}</span>
-            </div>
-          ) : null}
-
-          <form action={saveOnboarding} noValidate>
-            <input type="hidden" name="locale" value={locale} />
-            <input type="hidden" name="next" value={next} />
-            <div className="field">
-              <label htmlFor="market">{t("marketLabel")}</label>
-              <select
-                id="market"
-                name="market"
-                defaultValue={state.org.marketCode ?? ""}
-                required
-              >
-                <option value="" disabled>
-                  {t("marketPlaceholder")}
-                </option>
-                {MARKET_CODES.map((m) => (
-                  <option key={m} value={m}>
-                    {tMarket(m)}
-                  </option>
-                ))}
-              </select>
-              <span className="hint">{t("marketHint")}</span>
-            </div>
-
-            <div className="field">
-              <label htmlFor="phone">{t("phoneLabel")}</label>
-              <input
-                id="phone"
-                name="phone"
-                type="tel"
-                autoComplete="tel"
-                defaultValue={state.phone ?? ""}
-                required
-                placeholder={t("phonePlaceholder")}
-              />
-              <span className="hint">{t("phoneHint")}</span>
-            </div>
-
-            <div className="actions">
-              <SubmitButton
-                label={t("submit")}
-                pendingLabel={t("submitting")}
-              />
-            </div>
-          </form>
+          <OnboardingForm
+            locale={locale}
+            next={next}
+            markets={MARKET_CODES.map((m) => ({ value: m, label: tMarket(m) }))}
+            defaultMarket={state.org.marketCode ?? ""}
+            defaultPhone={state.phone ?? ""}
+          />
         </div>
       </section>
     </LandingShell>

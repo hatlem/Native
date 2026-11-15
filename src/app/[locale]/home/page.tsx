@@ -1,3 +1,4 @@
+import { PendingButton } from "@/components/submit-button";
 import { getTranslations } from "next-intl/server";
 import { redirect } from "next/navigation";
 import { prisma } from "@/lib/prisma";
@@ -20,6 +21,7 @@ import { viewOrgIds } from "@/lib/workspace";
 import { landingForRole } from "@/lib/roles";
 import { logout } from "@/app/auth-actions";
 
+import { SignupCompletedEvent } from "@/app/activation-events";
 export const dynamic = "force-dynamic";
 
 export default async function HomePage({
@@ -50,9 +52,9 @@ export default async function HomePage({
         </header>
         <form action={logout}>
           <input type="hidden" name="locale" value={locale} />
-          <button type="submit" className="btn secondary">
+          <PendingButton className="btn secondary">
             {ta("signout")}
-          </button>
+          </PendingButton>
         </form>
       </section>
     );
@@ -132,6 +134,7 @@ export default async function HomePage({
 
   return (
     <section>
+      {scope.session?.user?.id ? <SignupCompletedEvent userId={scope.session.user.id} /> : null}
       {joined ? <JoinedNotice locale={locale} organizationId={ws.activeOrgId} variant="home" /> : null}
       <h1>
         {needsCount > 0
@@ -200,9 +203,9 @@ export default async function HomePage({
               <form action={selectActiveList}>
                 <input type="hidden" name="locale" value={locale} />
                 <input type="hidden" name="listId" value={w.listId} />
-                <button type="submit" className="btn small">
+                <PendingButton className="btn small">
                   {t("openWave")}
-                </button>
+                </PendingButton>
               </form>
             </div>
           ))}

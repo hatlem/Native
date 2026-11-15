@@ -1,3 +1,4 @@
+import { log } from "@/lib/log";
 // Push an issued invoice / credit note to the accounting provider and
 // record the outcome on the row.
 //
@@ -102,7 +103,7 @@ export async function syncInvoiceToAccounting(
   await prisma.invoice.update({ where: { id: invoice.id }, data: syncFields(outcome, now) });
   await recordAudit(opts.actorId ?? null, "invoice.accounting_sync", `Invoice:${invoice.id}`, outcome);
   if (outcome.status === "failed") {
-    console.error("accounting.push_failed", { invoiceId: invoice.id, ...outcome });
+    log.error("accounting.push_failed", { invoiceId: invoice.id, ...outcome });
   }
   return outcome;
 }
@@ -143,7 +144,7 @@ export async function syncCreditNoteToAccounting(
   await prisma.creditNote.update({ where: { id: note.id }, data: syncFields(outcome, now) });
   await recordAudit(opts.actorId ?? null, "credit_note.accounting_sync", `CreditNote:${note.id}`, outcome);
   if (outcome.status === "failed") {
-    console.error("accounting.push_failed", { creditNoteId: note.id, ...outcome });
+    log.error("accounting.push_failed", { creditNoteId: note.id, ...outcome });
   }
   return outcome;
 }

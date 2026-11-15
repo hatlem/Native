@@ -1,3 +1,4 @@
+import { log } from "@/lib/log";
 // Single source of truth for self-serve (FIRM) order creation. The /plan
 // checkout action and the POST /api/v1/orders endpoint both call
 // createFirmOrder so the Plan→Request→Quote(s)→Order machinery — and its
@@ -17,6 +18,7 @@ import {
   type QuotableItem,
 } from "@/lib/money";
 import { groupItemsByMarket } from "@/lib/quote-grouping";
+import { VAT_BUYER_SELECT, quoteVatColumns, quoteVatFor } from "@/lib/vat-buyer";
 import { loadPricingDefaults, contentFeeLinesForGroup } from "@/lib/content-fee";
 import { planWindowFromItems, type BookingUnit } from "@/lib/campaign-schedule";
 import { fingerprintListItems } from "@/lib/commerce/list-fingerprint";
@@ -77,7 +79,7 @@ export type FirmOrderProduct = ProductWithRules & {
   title: {
     marketId: string;
     productionFeeDefault?: unknown;
-    market: { code: string; currency: string; vatRatePct: unknown };
+    market: { code: string; currency: string };
   };
 };
 
@@ -160,8 +162,8 @@ export async function createFirmOrder(args: {
   const targetContext = brief?.targetContext ?? null;
 
   // Multi-currency split: one Quote per placement market — grouping by
-  // market (not currency) keeps the EUR markets (DE/AT/IE/FI) apart since
-  // they share EUR but have different VAT rates.
+  // market (not currency) keeps the EUR markets (DE/AT/IE/FI) apart; they
+  // share EUR but are priced and fulfilled separately.
   const groups = groupItemsByMarket(items, byId);
   // Legacy Plan.currency: single-market basket keeps its one currency;
   // multi-market leaves it null (per-Quote currencies are the truth).
@@ -197,7 +199,7 @@ export async function createFirmOrder(args: {
       if (sourceListId) {
         const live = await liveOrderForList(tx, sourceListId);
         if (live) {
-          console.warn("firmorder.already_ordered", { organizationId, sourceListId, requestId: live.requestId });
+          log.warn("firmorder.already_ordered", { organizationId, sourceListId, requestId: live.requestId });
           return { requestId: live.requestId, orderIds: live.orderIds, alreadyOrdered: true };
         }
       }
@@ -212,7 +214,7 @@ export async function createFirmOrder(args: {
           select: { id: true, quantity: true, productId: true, titleId: true, withContent: true },
         });
         if (fingerprintListItems(freshRows) !== listGuard.fingerprint) {
-          console.warn("firmorder.changed", { organizationId, listId: listGuard.listId });
+          log.warn("firmorder.changed", { organizationId, listId: listGuard.listId });
           throw new FirmOrderChangedError();
         }
       }
@@ -226,7 +228,7 @@ export async function createFirmOrder(args: {
         where: { id: { in: productIds }, active: true, bookable: true },
       });
       if (liveCount !== productIds.length) {
-        console.warn("firmorder.stale", { organizationId, expected: productIds.length, live: liveCount });
+        log.warn("firmorder.stale", { organizationId, expected: productIds.length, live: liveCount });
         throw new FirmOrderStaleError("A selected product is no longer available.");
       }
 
@@ -280,6 +282,14 @@ export async function createFirmOrder(args: {
         },
       });
 
+      // VAT follows the buyer's country, not the placement's market
+      // (lib/vat.ts): one decision for every order of this submit.
+      const buyer = await tx.organization.findUnique({
+        where: { id: organizationId },
+        select: VAT_BUYER_SELECT,
+      });
+      const vat = quoteVatFor(buyer);
+
       const orderIds: string[] = [];
       for (const group of groups) {
         const generated = [
@@ -298,7 +308,7 @@ export async function createFirmOrder(args: {
         ];
         // Generation order is the display order (see lib/commerce/line-order.ts).
         const lines = generated.map((l, position) => ({ ...l, position }));
-        const { subtotal, total } = quoteTotals(lines, group.vatPct);
+        const { subtotal, total } = quoteTotals(lines, vat.vatPct);
 
         const quote = await tx.quote.create({
           data: {
@@ -306,7 +316,7 @@ export async function createFirmOrder(args: {
             status: "ACCEPTED",
             currency: group.currency,
             subtotal,
-            vatPct: group.vatPct,
+            ...quoteVatColumns(vat),
             total,
             validUntil: new Date(Date.now() + 14 * 24 * 60 * 60 * 1000),
             lines: { create: lines },
@@ -359,7 +369,7 @@ export async function createFirmOrder(args: {
     if (!sourceListId || !isInstantOrderListConflict(err)) throw err;
     const live = await liveOrderForList(prisma, sourceListId);
     if (!live) throw err;
-    console.warn("firmorder.already_ordered", { organizationId, sourceListId, requestId: live.requestId, via: "unique" });
+    log.warn("firmorder.already_ordered", { organizationId, sourceListId, requestId: live.requestId, via: "unique" });
     return { requestId: live.requestId, orderIds: live.orderIds, alreadyOrdered: true };
   }
 }

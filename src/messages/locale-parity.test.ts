@@ -14,8 +14,9 @@ import fi from "./fi.json";
 // down. This guards against shipping new UI strings without their
 // translations (as the saved-lists feature initially did).
 //
-// The `landing` namespace is EXCLUDED: the German landing copy has a known,
-// pre-existing gap that is tracked separately and out of scope for this guard.
+// The `landing` namespace does not live in these files: it is loaded per
+// section from src/messages/landing/<locale>/ (src/i18n/request.ts). The dead
+// copy that used to sit here too (with a 111-key German gap) was removed.
 const LOCALES: Record<string, unknown> = { no, sv, da, de, fi };
 
 /** Flatten a messages object into dot-path keys, dropping the `landing` tree. */

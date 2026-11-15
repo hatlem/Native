@@ -1,5 +1,5 @@
 import { Document, Page, View, Text, StyleSheet } from "@react-pdf/renderer";
-import { formatMoney, intlLocale } from "@/lib/money";
+import { formatMoneyExact, intlLocale } from "@/lib/money";
 import type { InvoicePdfData } from "./invoice-pdf-data";
 import { qt as t, type QuoteMessages } from "./quote-messages";
 import { paymentTermsLine } from "@/lib/payment-terms-text";
@@ -97,7 +97,8 @@ export function InvoiceDocument({
   locale: string;
   messages: QuoteMessages;
 }) {
-  const money = (amount: number) => formatMoney(amount, data.currency, locale);
+  // Exact to the minor unit: an invoice never prints a rounded VAT or total.
+  const money = (amount: number) => formatMoneyExact(amount, data.currency, locale);
   // A NOK invoice shows the domestic account (when set); IBAN + BIC follow
   // for everyone else — sellerGaps() guarantees them on non-NOK invoices.
   const domestic = data.currency === "NOK" && !!seller.bankAccount;
@@ -200,6 +201,9 @@ export function InvoiceDocument({
           </View>
         </View>
 
+        {/* Reverse-charge statement, exactly as stored at issue (lib/vat.ts). */}
+        {data.vatNote ? <Text style={styles.terms}>{data.vatNote}</Text> : null}
+
         {data.paymentTermsDays ? (
           <Text style={styles.terms}>{paymentTermsLine(locale, data.paymentTermsDays)}</Text>
         ) : null}
@@ -220,7 +224,9 @@ export function InvoiceDocument({
 
         {data.credit ? (
           <View style={styles.credit}>
-            <Text style={styles.creditHeading}>{t(messages, "creditedHeading")}</Text>
+            <Text style={styles.creditHeading}>
+              {t(messages, "creditedHeading")} #{data.credit.number}
+            </Text>
             <Text style={styles.creditText}>
               {t(messages, "creditedBody", {
                 date: formatDate(data.credit.issuedAt, locale),

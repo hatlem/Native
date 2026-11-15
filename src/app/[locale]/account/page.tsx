@@ -1,5 +1,6 @@
 import { getTranslations } from "next-intl/server";
 import { redirect } from "next/navigation";
+import { Link } from "@/i18n/navigation";
 import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
 import { loadScope } from "@/lib/scope";
@@ -17,6 +18,9 @@ import { TeamSection } from "./team-section";
 import { LocaleSwitcher } from "./locale-switcher";
 import { SUPPORTED_MARKETS } from "@/lib/markets";
 
+import { NotificationPrefsSection } from "./notification-prefs-section";
+import { FieldErrorLink } from "./field-error-link";
+import { accountErrorFieldId } from "@/lib/account-error-field";
 export const dynamic = "force-dynamic";
 
 const MARKET_CODES = SUPPORTED_MARKETS;
@@ -68,12 +72,14 @@ export default async function AccountPage({
       name: true,
       phone: true,
       passwordHash: true,
+      mfaEnabledAt: true,
     },
   });
   if (!user) redirect(`/${locale}/signin`);
 
   const t = await getTranslations({ locale, namespace: "account" });
   const tMarket = await getTranslations({ locale, namespace: "market" });
+  const tMfa = await getTranslations({ locale, namespace: "mfa" });
 
   // Banner copy comes from a lookup table (@/lib/account-messages), not the
   // ternary chain that used to live here — that chain had no branch for six of
@@ -85,6 +91,7 @@ export default async function AccountPage({
   );
   const okMessage = okKey ? t(okKey) : null;
   const errMessage = errKey ? t(errKey) : null;
+  const errFieldId = accountErrorFieldId(typeof sp.error === "string" ? sp.error : undefined);
 
   return (
     <>
@@ -100,9 +107,12 @@ export default async function AccountPage({
         </div>
       ) : null}
       {errMessage ? (
-        <div className="banner-error" role="alert">
+        <div className="banner-error" role="alert" id="account-error">
           <span>{errMessage}</span>
         </div>
+      ) : null}
+      {errMessage && errFieldId ? (
+        <FieldErrorLink fieldId={errFieldId} describedBy="account-error" />
       ) : null}
 
       <section className="section" id="profile">
@@ -316,6 +326,29 @@ export default async function AccountPage({
         </form>
       </section>
 
+      {/* Two-factor lives on its own page (/account/security): staff are sent
+          straight there when MFA_REQUIRED_FOR_STAFF is on. */}
+      <section className="section" id="two-factor">
+        <div className="section-head">
+          <div>
+            <span className="eyebrow">{tMfa("eyebrow")}</span>
+            <h2>{tMfa("accountSectionTitle")}</h2>
+          </div>
+        </div>
+        <div className="product-form card">
+          <p>
+            {user.mfaEnabledAt
+              ? tMfa("accountSectionBodyOn")
+              : tMfa("accountSectionBodyOff")}
+          </p>
+          <div className="actions">
+            <Link href="/account/security" className="btn secondary">
+              {tMfa("manage")}
+            </Link>
+          </div>
+        </div>
+      </section>
+
       {ws?.activeOrgId && (
         <TeamSection
           locale={locale}
@@ -323,6 +356,8 @@ export default async function AccountPage({
           isAdmin={ws.activeRole === "ADMIN"}
         />
       )}
+
+      <NotificationPrefsSection locale={locale} userId={user.id} saved={sp.prefs === "saved"} />
 
       {/* Data & account. The export endpoint has existed since the GDPR work
           landed but nothing linked to it, so in practice no user could reach
@@ -373,6 +408,15 @@ export default async function AccountPage({
                 required
                 placeholder={user.email}
               />
+            </div>
+            {/* Erasure: off by default — a deactivated account can be
+                switched back on, an erased one cannot. */}
+            <div className="field">
+              <label className="checkbox" htmlFor="acc-erase-data">
+                <input id="acc-erase-data" name="eraseData" type="checkbox" />{" "}
+                {t("eraseDataLabel")}
+              </label>
+              <p className="muted small">{t("eraseDataHint")}</p>
             </div>
             <div className="actions">
               <SubmitButton

@@ -1,4 +1,5 @@
 "use server";
+import { log } from "@/lib/log";
 
 import { redirect } from "next/navigation";
 import bcrypt from "bcryptjs";
@@ -139,7 +140,7 @@ export async function requestEmailChange(formData: FormData) {
     });
   } catch (err) {
     confirmSent = false;
-    console.error("user.email_change_confirm_failed", { userId, err });
+    log.error("user.email_change_confirm_failed", { userId, err });
   }
   if (!confirmSent) {
     redirect(`/${locale}/account?error=email_send_failed#email`);
@@ -152,7 +153,7 @@ export async function requestEmailChange(formData: FormData) {
       html: notice.html,
     });
   } catch (err) {
-    console.error("user.email_change_notice_failed", { userId, err });
+    log.error("user.email_change_notice_failed", { userId, err });
   }
 
   await recordAudit(userId, "user.email_change_requested", `User:${userId}`, {

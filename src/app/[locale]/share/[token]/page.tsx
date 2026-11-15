@@ -1,14 +1,16 @@
+import { PendingButton } from "@/components/submit-button";
 import type { Metadata } from "next";
 import type { ReactNode } from "react";
 import { getTranslations } from "next-intl/server";
 import { notFound } from "next/navigation";
 import { approvalState, loadSharedList, planVersion, recordShareView } from "@/lib/list-share";
 import { approveSharedPlan } from "@/app/share-actions";
-import { formatMoney, intlLocale } from "@/lib/money";
+import { formatMoney, formatMoneyExact, intlLocale } from "@/lib/money";
 import { titleDisplayName } from "@/lib/title-display";
 import { loadExtraWorkRates, loadPricingDefaults } from "@/lib/content-fee";
 import { articleFeeLabel, articleScope, articleScopeLines } from "@/lib/article-scope";
 import { estimateListTotals, hasFigure, hasUnpricedLines, lineDisplay } from "@/lib/plan-total";
+import { quoteVatFor } from "@/lib/vat-buyer";
 import { lineFigureLabel, totalLabel } from "@/lib/pricing/total-label";
 import { formatRunRange, runBounds } from "@/lib/run-period";
 import { publisherCanWrite } from "@/lib/authorship";
@@ -61,7 +63,9 @@ export default async function SharedListPage({
   });
   const money = (amount: number, currency: string) => formatMoney(amount, currency, locale);
 
-  const [pricing, extraWorkRates] = await Promise.all([loadPricingDefaults(), loadExtraWorkRates()]);
+  const [pricingDefaults, extraWorkRates] = await Promise.all([loadPricingDefaults(), loadExtraWorkRates()]);
+  // The plan owner's VAT rate (lib/vat.ts), so the shared total matches /plan.
+  const pricing = { ...pricingDefaults, vatPct: quoteVatFor(list.organization).vatPct };
   const allTotals = estimateListTotals(list.items, pricing);
   const totals = allTotals.filter(hasFigure);
   const anyEstimate = totals.some((r) => r.estimate !== null);
@@ -185,8 +189,8 @@ export default async function SharedListPage({
               {r.hasExact ? (
                 <p className="muted small">
                   {r.estimate
-                    ? tPlan("inclVatFirmPart", { amount: money(r.totalInclVat, r.currency) })
-                    : tPlan("inclVatLine", { amount: money(r.totalInclVat, r.currency) })}
+                    ? tPlan("inclVatFirmPart", { amount: formatMoneyExact(r.totalInclVat, r.currency, locale) })
+                    : tPlan("inclVatLine", { amount: formatMoneyExact(r.totalInclVat, r.currency, locale) })}
                 </p>
               ) : null}
             </div>
@@ -221,9 +225,9 @@ export default async function SharedListPage({
             </p>
           ) : null}
           <p className="muted small">{t("approveHint")}</p>
-          <button type="submit" className="btn">
+          <PendingButton className="btn">
             {approval.kind === "stale" ? t("approveAgainCta") : t("approveCta")}
-          </button>
+          </PendingButton>
         </form>
       )}
 

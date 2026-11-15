@@ -18,7 +18,7 @@ export function passwordChangedEmail(args: PasswordChangedArgs): {
   return {
     subject: t.subject(args.appName),
     text: `${body}\n\n${t.footer}`,
-    html: layout({
+    html: layout({ lang: args.locale,
       preheader: t.preheader,
       heading: t.heading,
       body,

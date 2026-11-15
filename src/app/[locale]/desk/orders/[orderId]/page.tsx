@@ -1,5 +1,6 @@
 import { requireDesk } from "@/lib/desk-guard";
 import { getTranslations } from "next-intl/server";
+import { intlLocale } from "@/lib/money";
 import { notFound } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import { lineOrder } from "@/lib/commerce/line-order";
@@ -119,6 +120,10 @@ export default async function DeskOrderPage({
     },
   });
   const clicks = await clicksByOrderLine(order.lines.map((l) => l.id));
+  const orderFeedback = await prisma.orderFeedback.findUnique({
+    where: { orderId: order.id },
+    select: { score: true, comment: true },
+  });
   const extraWorkRates = await loadExtraWorkRates();
 
   const feePlacements = orderFeePlacements(order.lines, order.quote.lines);
@@ -212,6 +217,29 @@ export default async function DeskOrderPage({
         next={next}
         gap={gap}
       />
+
+      {order.cancellationRequestedAt && order.status !== "CANCELLED" ? (
+        <div className="banner-warn" role="status">
+          <span>
+            {t("cancelRequest.deskBanner", {
+              date: new Intl.DateTimeFormat(intlLocale(locale), { dateStyle: "medium" }).format(
+                order.cancellationRequestedAt,
+              ),
+            })}
+            {order.cancellationRequestReason
+              ? ` ${t("cancelRequest.deskReason", { reason: order.cancellationRequestReason })}`
+              : ""}
+          </span>
+        </div>
+      ) : null}
+      {orderFeedback ? (
+        <div className="banner-info" role="status">
+          <span>
+            <strong>{t("csat.deskHeading")}:</strong> {t("csat.deskScore", { score: orderFeedback.score })}
+            {orderFeedback.comment ? ` — ${orderFeedback.comment}` : ""}
+          </span>
+        </div>
+      ) : null}
 
       {cancelMessage ? (
         <div className="banner-error" role="alert">

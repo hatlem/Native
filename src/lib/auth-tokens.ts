@@ -167,7 +167,14 @@ export async function consumeEmailChangeToken(
 
       await tx.user.update({
         where: { id: row.userId },
-        data: { email: row.newEmail, emailVerifiedAt: now },
+        // An identity change ends every session on the account (the bump
+        // revokes outstanding JWTs — see @/lib/session-version), not just
+        // the browser that clicked the link.
+        data: {
+          email: row.newEmail,
+          emailVerifiedAt: now,
+          sessionVersion: { increment: 1 },
+        },
       });
 
       await tx.emailChangeToken.updateMany({

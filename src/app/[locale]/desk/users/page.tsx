@@ -4,7 +4,7 @@ import { Prisma, UserRole } from "@prisma/client";
 import { SuperadminOnly } from "@/components/superadmin-only";
 import { prisma } from "@/lib/prisma";
 import { Link } from "@/i18n/navigation";
-import { SubmitButton } from "@/components";
+import { SubmitButton, PendingButton } from "@/components";
 import { startViewAs } from "@/app/view-as-actions";
 import { SafeEmail } from "@/components/safe-email";
 import { deskUsersOkKey, deskUsersErrorKey } from "@/lib/desk-users-messages";
@@ -169,9 +169,9 @@ export default async function DeskUsersPage({
             placeholder={t("searchPlaceholder")}
           />
         </div>
-        <button type="submit" className="btn secondary">
+        <PendingButton className="btn secondary">
           {t("searchButton")}
-        </button>
+        </PendingButton>
       </form>
 
       {editing ? (
@@ -313,6 +313,21 @@ export default async function DeskUsersPage({
                     </option>
                   ))}
               </select>
+            </div>
+            <div className="field">
+              <label htmlFor="view-as-reason">{tv("deskReasonLabel")}</label>
+              <input
+                id="view-as-reason"
+                name="reason"
+                type="text"
+                required
+                minLength={5}
+                maxLength={300}
+                aria-describedby="view-as-reason-hint"
+              />
+              <p id="view-as-reason-hint" className="muted small">
+                {tv("deskReasonHint")}
+              </p>
             </div>
             <SubmitButton className="btn" label={tv("deskStart")} pendingLabel={tv("deskStarting")} />
           </form>

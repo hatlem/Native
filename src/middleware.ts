@@ -1,8 +1,15 @@
+import {
+  ONE_CLICK_API_PATH,
+  ONE_CLICK_KIND_HEADER,
+  ONE_CLICK_TOKEN_HEADER,
+  oneClickUnsubscribeTarget,
+} from "./lib/outreach/one-click";
 import createMiddleware from "next-intl/middleware";
 import { NextRequest, NextResponse } from "next/server";
 import { routing } from "./i18n/routing";
 import { hasSessionCookie, requiresSession, signinPath } from "./lib/auth-gate";
 import { appUrl } from "./lib/url";
+import { REQUEST_ID_HEADER } from "./lib/log";
 
 const intlMiddleware = createMiddleware(routing);
 
@@ -16,6 +23,15 @@ function generateNonce(): string {
   let bin = "";
   for (const b of bytes) bin += String.fromCharCode(b);
   return btoa(bin);
+}
+
+// Correlation id for one request: reuse the edge proxy's id when it sends a
+// sane one (so our logs join up with Railway's), else mint one. It is set on
+// the request (server code reads it via lib/request-log) and echoed on the
+// response, so a user can quote it from the network tab.
+export function requestIdFor(incoming: string | null): string {
+  if (incoming && /^[A-Za-z0-9_.:-]{8,128}$/.test(incoming)) return incoming;
+  return crypto.randomUUID();
 }
 
 export function buildCsp(nonce: string): string {
@@ -136,6 +152,24 @@ export function canonicalHostRedirect(req: NextRequest, canonical: string): stri
 export default function middleware(req: NextRequest) {
   const nonce = generateNonce();
   const csp = buildCsp(nonce);
+  const requestId = requestIdFor(req.headers.get(REQUEST_ID_HEADER));
+
+  // A mailbox provider's one-click unsubscribe (RFC 8058) POSTs to the
+  // opt-out page URL named in List-Unsubscribe; the page only answers GET,
+  // so hand it to the API route (lib/outreach/one-click.ts).
+  const oneClick = oneClickUnsubscribeTarget({
+    method: req.method,
+    pathname: req.nextUrl.pathname,
+    isServerAction: req.headers.has("next-action"),
+  });
+  if (oneClick) {
+    // The rewritten handler still sees the ORIGINAL URL's query string, so
+    // the target travels as request headers (set here, never by the client).
+    const headers = new Headers(req.headers);
+    headers.set(ONE_CLICK_KIND_HEADER, oneClick.kind);
+    headers.set(ONE_CLICK_TOKEN_HEADER, encodeURIComponent(oneClick.token));
+    return NextResponse.rewrite(new URL(ONE_CLICK_API_PATH, req.url), { request: { headers } });
+  }
 
   const canonicalHost = canonicalHostRedirect(req, appUrl());
   if (canonicalHost) return NextResponse.redirect(canonicalHost, 308);
@@ -148,6 +182,7 @@ export default function middleware(req: NextRequest) {
   if (signin) {
     const res = NextResponse.redirect(new URL(signin, appUrl()), 307);
     res.headers.set("Content-Security-Policy", csp);
+    res.headers.set(REQUEST_ID_HEADER, requestId);
     return res;
   }
 
@@ -160,6 +195,7 @@ export default function middleware(req: NextRequest) {
   // will get a fresh middleware pass with its own nonce/headers.
   if (intlRes.headers.get("Location")) {
     intlRes.headers.set("Content-Security-Policy", csp);
+    intlRes.headers.set(REQUEST_ID_HEADER, requestId);
     return intlRes;
   }
 
@@ -170,6 +206,7 @@ export default function middleware(req: NextRequest) {
   // to downstream RSCs in Next.js 15.
   const reqHeaders = new Headers(req.headers);
   reqHeaders.set("x-nonce", nonce);
+  reqHeaders.set(REQUEST_ID_HEADER, requestId);
   // Fold next-intl's locale request header into the same override list
   // as x-nonce and collect the client-visible response headers to keep.
   // Internal x-middleware-* directives (including x-middleware-rewrite —
@@ -187,6 +224,7 @@ export default function middleware(req: NextRequest) {
     else res.headers.set(k, v);
   });
   res.headers.set("Content-Security-Policy", csp);
+  res.headers.set(REQUEST_ID_HEADER, requestId);
   return res;
 }
 

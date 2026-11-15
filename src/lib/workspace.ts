@@ -1,3 +1,4 @@
+import { log } from "@/lib/log";
 import { cookies } from "next/headers";
 import { prisma } from "@/lib/prisma";
 import {
@@ -296,7 +297,7 @@ export async function loadWorkspace(
         where: { userId, status: "ACTIVE", expiresAt: { not: null, lte: now } },
         data: { status: "EXPIRED" },
       })
-      .catch((err) => console.error("membership.reconcile_failed", { userId, err }));
+      .catch((err) => log.error("membership.reconcile_failed", { userId, err }));
   }
 
   const homeOrg = user.organization;

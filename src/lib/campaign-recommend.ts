@@ -21,6 +21,7 @@ import {
 } from "@/lib/brief-match";
 import { enrichBriefWithLLM, llmEnrichmentAvailable } from "@/lib/brief-match-llm";
 import { rerankBriefMatches, rerankAvailable } from "@/lib/brief-rerank-llm";
+import { aiScope } from "@/lib/ai-usage";
 import { titleDisplayName } from "@/lib/title-display";
 import {
   recommendTiered,
@@ -51,7 +52,12 @@ export async function recommendForBrief(input: {
   // Drives the language of the LLM rerank's grounded reasons. Defaults to
   // English when the caller (e.g. an older UI surface) doesn't pass one.
   locale?: string;
+  // Who is asking — the LLM calls are budgeted and attributed per
+  // organisation (lib/ai-usage.ts). Omitted = anonymous.
+  organizationId?: string | null;
+  userId?: string | null;
 }): Promise<CampaignRecommendation> {
+  const scope = aiScope(input);
   const budget = input.budget && input.budget > 0 ? input.budget : 0;
   const brief = (input.brief ?? "").slice(0, BRIEF_MAX);
   const locale = input.locale ?? "en";
@@ -109,7 +115,7 @@ export async function recommendForBrief(input: {
 
   let facets = brief ? extractFacets(brief) : null;
   if (facets && llmEnrichmentAvailable()) {
-    facets = mergeFacets(facets, await enrichBriefWithLLM(brief));
+    facets = mergeFacets(facets, await enrichBriefWithLLM(brief, scope));
   }
 
   if (facets && !facetsAreEmpty(facets)) {
@@ -171,6 +177,7 @@ export async function recommendForBrief(input: {
         }),
         locale,
         brief,
+        scope,
       );
       for (const c of top) {
         const reason = reasonMap.get(c.titleId);

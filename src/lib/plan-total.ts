@@ -1,3 +1,4 @@
+import { domesticVatRatePct } from "@/lib/vat";
 import { quoteTotals, type ContentFeeRuleSpec, type MarginRuleSpec } from "@/lib/money";
 import { articleFee, type FeeProduct } from "@/lib/pricing/production-fee";
 import { placementLineTotal as placementAt } from "@/lib/pricing/line-price";
@@ -17,12 +18,17 @@ import { unitRate } from "@/lib/pricing/display-price";
 export type PlanPricing = {
   feeRules: ContentFeeRuleSpec[];
   marginRules: MarginRuleSpec[];
+  // VAT rate the BUYER is charged (lib/vat.ts) — it follows the buyer's
+  // country, never the placement's market. Omitted (public surfaces with no
+  // known buyer) → the seller's domestic rate, the same safe default an order
+  // for a buyer of unknown country gets.
+  vatPct?: number;
 };
 
 // The minimal item shape the estimate needs — structural, so both the fully
 // hydrated UnsentList/ActiveList items AND lean per-wave selects (the /plan
 // programme strip loads only these fields for up to four wave lists) satisfy
-// it without casting. basePrice/marginPct/vatRatePct stay `unknown` because
+// it without casting. basePrice/marginPct stay `unknown` because
 // Prisma hands us Decimals and tests hand us numbers; Number() normalises
 // either.
 export type EstimableListItem = {
@@ -57,7 +63,7 @@ export type EstimableListItem = {
         priceRules: { marginPct: unknown; seasonalMultiplier: unknown; minVolume: number }[];
         title: TitleWithVisibility & {
           productionFeeDefault: unknown;
-          market: { code: string; vatRatePct: unknown };
+          market: { code: string };
         };
       })
     | null;
@@ -233,6 +239,7 @@ export function hasFigure(total: Pick<ListTotal, "hasExact" | "estimate">): bool
 }
 
 export function estimateListTotals(items: EstimableListItem[], pricing: PlanPricing): ListTotal[] {
+  const vatPct = pricing.vatPct ?? domesticVatRatePct();
   type Acc = ListTotal & { byMarket: Map<string, { subtotal: number; vatPct: number }> };
   const byCurrency = new Map<string, Acc>();
   for (const item of items) {
@@ -258,7 +265,7 @@ export function estimateListTotals(items: EstimableListItem[], pricing: PlanPric
       entry.amount += display.total;
       entry.contentFees += display.contentFee;
       entry.hasExact = true;
-      const m = entry.byMarket.get(market.code) ?? { subtotal: 0, vatPct: Number(market.vatRatePct) };
+      const m = entry.byMarket.get(market.code) ?? { subtotal: 0, vatPct };
       m.subtotal += display.total;
       entry.byMarket.set(market.code, m);
     } else if (display.kind === "band") {

@@ -23,6 +23,8 @@ const doc: AccountingInvoice = {
   subtotal: 40000,
   vatPct: 25,
   vatAmount: 10000,
+  vatTreatment: "DOMESTIC",
+  vatNote: null,
   total: 50000,
 };
 

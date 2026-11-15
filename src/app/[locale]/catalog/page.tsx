@@ -10,7 +10,8 @@ import { redirect } from "next/navigation";
 import { savedListMembershipMap } from "@/lib/saved-list-membership";
 import { loadScope } from "@/lib/scope";
 import { loadRelevanceSignals } from "@/lib/catalog-relevance";
-import { loadVerticalOptions, localizedVerticalOptions } from "@/lib/catalog-taxonomy";
+import { localizedVerticalOptions } from "@/lib/catalog-taxonomy";
+import { cachedMarketCurrencies, cachedRegionRows, cachedVerticalOptions } from "@/lib/catalog-facets";
 import { localizeVertical } from "@/lib/taxonomy-i18n";
 import { familyOfToken, isFamilyToken, verticalFamilies } from "@/lib/vertical-families";
 import { safeLocale } from "@/i18n/routing";
@@ -111,20 +112,19 @@ export default async function CatalogPage({
   // The price-band filter (?price=): one option per band tier, labelled in
   // the currencies of the markets being browsed (all markets when none is
   // picked) — "25–40k NOK" for Norway, both scales across markets.
-  const bandCurrencies = (
-    await prisma.market.findMany({
-      where: { code: { in: markets.length ? markets : [...MARKET_CODES] } },
-      select: { currency: true },
-      orderBy: { code: "asc" },
-    })
-  ).map((m) => m.currency);
+  // Facet lookups are cached across requests (lib/catalog-facets).
+  const currencyByMarket = await cachedMarketCurrencies();
+  const bandCurrencies = [...(markets.length ? markets : [...MARKET_CODES])]
+    .sort()
+    .map((code) => currencyByMarket[code])
+    .filter((c): c is string => !!c);
   const priceBandOptions = Array.from({ length: BAND_TIER_COUNT }, (_, tier) => ({
     value: String(tier),
     label: tierLabel(tier, bandCurrencies),
   }));
 
   // Labels in the buyer's language; values stay the stored taxonomy terms.
-  const verticalOptions = localizedVerticalOptions(await loadVerticalOptions(), locale);
+  const verticalOptions = localizedVerticalOptions(await cachedVerticalOptions(), locale);
 
   // Distinct regions present from the geo backfill — drives the region
   // multiselect. Null regions (national/unknown titles) don't appear.
@@ -134,15 +134,10 @@ export default async function CatalogPage({
   // it. distinct(["region"]) + ordering by countryCode picks one country
   // deterministically per region even in the (currently nonexistent) case
   // of a region name shared across markets.
-  const regionRows = await prisma.title.findMany({
-    where: { region: { not: null } },
-    select: { region: true, countryCode: true },
-    distinct: ["region"],
-    orderBy: [{ region: "asc" }, { countryCode: "asc" }],
-  });
-  const regionOptions = regionRows
-    .filter((r) => r.region && r.region.trim().length > 0)
-    .map((r) => ({ value: r.region!, country: r.countryCode as MarketCode }));
+  const regionOptions = (await cachedRegionRows()).map((r) => ({
+    value: r.region,
+    country: r.countryCode as MarketCode,
+  }));
 
   // Resolve the publisher-filter chip label (name, not cuid). Invalid id
   // simply matches nothing — no error path needed.

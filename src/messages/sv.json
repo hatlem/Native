@@ -1,4 +1,63 @@
 {
+  "mfa": {
+    "stepTitle": "Tvåfaktorsverifiering",
+    "stepHeadline": "Ett steg till.",
+    "stepLead": "Ditt konto skyddas med tvåfaktorsautentisering. Ange koden från din autentiseringsapp för att slutföra inloggningen.",
+    "stepSubtitle": "Lösenordet godkändes. Ange nu din sexsiffriga kod.",
+    "stepSubtitleMagic": "E-postlänken godkändes. Ange nu din sexsiffriga kod.",
+    "codeLabel": "Autentiseringskod",
+    "codeHint": "Tappat telefonen? Ange en av dina återställningskoder i stället.",
+    "verify": "Verifiera och logga in",
+    "verifying": "Verifierar…",
+    "cancel": "Tillbaka till inloggning",
+    "errorInvalid": "Koden stämmer inte. Kontrollera autentiseringsappen och försök igen.",
+    "errorReplay": "Den koden har redan använts. Vänta på nästa kod och försök igen.",
+    "errorRate": "För många försök. Vänta några minuter och försök igen.",
+    "errorPassword": "Lösenordet stämmer inte.",
+    "sessionExpired": "Inloggningen hann löpa ut före det andra steget. Logga in igen.",
+    "pageTitle": "Tvåfaktorsautentisering",
+    "eyebrow": "Säkerhet",
+    "lead": "Lägg till ett extra steg när du loggar in: en kod från en autentiseringsapp på telefonen, utöver lösenord eller e-postlänk.",
+    "requiredBanner": "Din roll kräver tvåfaktorsautentisering. Konfigurera den för att fortsätta till desken.",
+    "noticeDisabled": "Tvåfaktorsautentisering är nu avstängd.",
+    "noticeRecoveryUsed": "Du loggade in med en återställningskod. Om du har tappat telefonen, stäng av tvåfaktor och konfigurera den igen på din nya enhet.",
+    "codeOrRecoveryLabel": "Autentiserings- eller återställningskod",
+    "passwordLabel": "Lösenord",
+    "working": "Arbetar…",
+    "recoveryTitle": "Spara dina återställningskoder",
+    "recoveryLead": "Varje kod fungerar en gång om du inte kan använda telefonen. Förvara dem på ett säkert ställe. De visas inte igen.",
+    "recoveryDone": "Jag har sparat dem",
+    "statusEyebrow": "Status",
+    "statusOn": "Tvåfaktorsautentisering är på",
+    "statusOff": "Tvåfaktorsautentisering är av",
+    "enabledSince": "Aktiverad {date}.",
+    "recoveryLeft": "Oanvända återställningskoder: {count}",
+    "recoveryEyebrow": "Återställning",
+    "regenerateTitle": "Nya återställningskoder",
+    "regenerateLead": "Ange en aktuell kod för att skapa en ny uppsättning. De gamla koderna slutar fungera.",
+    "regenerate": "Skapa nya koder",
+    "disableEyebrow": "Stäng av",
+    "disableTitle": "Stäng av tvåfaktorsautentisering",
+    "disableLead": "Bekräfta med ditt lösenord eller en aktuell kod. Dina andra enheter loggas ut.",
+    "disableLeadStaff": "Bekräfta med ditt lösenord eller en aktuell kod. Din roll kräver tvåfaktor, så du måste konfigurera den igen innan du kan använda desken.",
+    "disableCodeHint": "Lämna lösenordet tomt för att bekräfta med en kod i stället.",
+    "disable": "Stäng av tvåfaktor",
+    "setupTitle": "Konfigurera din autentiseringsapp",
+    "step1": "Öppna din autentiseringsapp (Google Authenticator, Microsoft Authenticator, 1Password, Authy) och lägg till ett nytt konto.",
+    "step2": "Skriv in den här konfigurationsnyckeln, eller öppna länken på telefonen som har appen.",
+    "step3": "Ange den sexsiffriga koden som appen visar för att bekräfta.",
+    "setupKeyLabel": "Konfigurationsnyckel",
+    "openInApp": "Öppna i autentiseringsappen",
+    "confirm": "Aktivera tvåfaktor",
+    "cancelSetup": "Avbryt konfigurationen",
+    "offBody": "Med tvåfaktor aktiverad krävs lösenord eller e-postlänk plus en sexsiffrig kod från en app på telefonen för att logga in. Ett stulet lösenord räcker inte längre.",
+    "setupButton": "Konfigurera autentiseringsapp",
+    "backToAccount": "Tillbaka till kontoinställningar",
+    "accountSectionTitle": "Tvåfaktorsautentisering",
+    "accountSectionBodyOn": "På. Inloggning kräver en kod från din autentiseringsapp.",
+    "accountSectionBodyOff": "Av. Lägg till en kod från en autentiseringsapp som ett extra steg vid inloggning.",
+    "manage": "Hantera tvåfaktor"
+  },
   "common": {
     "appName": "NativeSpin",
     "feedback": {
@@ -14,6 +73,17 @@
       "sendFailed": "Kunde inte skicka. Försök igen?",
       "enterFeedback": "Skriv något först.",
       "close": "Stäng"
+    },
+    "a11y": {
+      "primaryNav": "Huvudmeny",
+      "menu": "Meny",
+      "mobileNav": "Mobilmeny",
+      "breadcrumb": "Brödsmulor",
+      "language": "Språk"
+    },
+    "confirm": {
+      "yes": "Ja, bekräfta",
+      "cancel": "Avbryt"
     }
   },
   "nav": {
@@ -64,9 +134,15 @@
     "campaigns": "Kampanjer",
     "rates": "Priser",
     "users": "Användare",
+    "audit": "Granskningslogg",
     "invoices": "Fakturor",
     "orgSwitcherLabel": "Organisation",
-    "orgSwitchTo": "Byt till {org}"
+    "orgSwitchTo": "Byt till {org}",
+    "help": "Hjälp",
+    "paletteOrders": "Ordrar",
+    "paletteRequests": "Förfrågningar",
+    "paletteTitles": "Titlar",
+    "paletteSearching": "Söker…"
   },
   "reports": {
     "title": "Rapporter",
@@ -907,9 +983,31 @@
     "metaPlanAlternativesOnly": "Inga placeringar än · {alternatives, plural, one {# alternativ} other {# alternativ}} · ändrad {age}",
     "actionContinuePlan": "Fortsätt planera",
     "qualifierAwaitingTeam": "väntar på någon med beställningsrätt",
-    "actionSeeQuote": "Visa offerten"
+    "actionSeeQuote": "Visa offerten",
+    "selfService": {
+      "heading": "Går ni inte vidare?",
+      "lead": "Här kan du avböja en offert eller återkalla hela förfrågan. Inget debiteras och du kan skicka en ny förfrågan när som helst.",
+      "declineOpen": "Avböj offerten i {currency}",
+      "declineSubmit": "Avböj offert",
+      "withdrawOpen": "Återkalla den här förfrågan",
+      "withdrawSubmit": "Återkalla förfrågan",
+      "reasonLabel": "Varför? (valfritt – det hjälper oss att bli bättre)",
+      "pending": "Skickar…",
+      "needsOrderingRights": "Du behöver beställningsrätt i organisationen för att avböja en offert.",
+      "withdrawnBanner": "Du återkallade den här förfrågan {date}.",
+      "noticeQuoteDeclined": "Offerten är avböjd. Vi har meddelat desken.",
+      "noticeRequestWithdrawn": "Förfrågan är återkallad. Vi har meddelat desken.",
+      "noticeUnavailable": "Det går inte längre – förfrågan har ändrats sedan du öppnade sidan.",
+      "noticeNotAllowed": "Din behörighet tillåter inte det. Fråga en administratör i organisationen.",
+      "deskDeclined": "Avböjd av kunden {date}.",
+      "deskWithdrawn": "Återkallad av kunden {date}.",
+      "deskReason": "Orsak: {reason}"
+    }
   },
   "desk": {
+    "vatWarnCountryUnknown": "Kunden saknar registrerat hemland, så norsk moms ({pct} %) har lagts på. Om kunden är etablerad utanför Norge: ange marknad på organisationen och skapa offerten på nytt innan den skickas.",
+    "vatWarnVatIdMissing": "Omvänd skattskyldighet gäller (ingen norsk moms), men kunden saknar registrerat momsnummer. Lägg in det innan offerten skickas – fakturan måste ange det.",
+    "vatReverseCharge": "Omvänd skattskyldighet – ingen norsk moms",
     "eyebrow": "Internt desk",
     "title": "Desk-konsol",
     "subtitle": "Vad som behöver din uppmärksamhet idag — nya briefer, offerter i rörelse och aktiva ordrar.",
@@ -1044,7 +1142,23 @@
     "quoteLocked": "Offerten är skickad, så raderna är låsta. Revidera den för att ändra priser eller anteckningar.",
     "quoteNotRevisable": "Offerten kan inte revideras: den är godkänd eller avslutad.",
     "revisionPredecessorClosed": "Inte skickad: offerten som revisionen skulle ersätta är inte längre öppen – kunden kan precis ha godkänt den. Släng revisionen.",
-    "sendRevisionNote": "När du skickar ersätts den tidigare offerten: kunden kan inte längre godkänna den och får en avisering med den nya totalen."
+    "sendRevisionNote": "När du skickar ersätts den tidigare offerten: kunden kan inte längre godkänna den och får en avisering med den nya totalen.",
+    "requestsTitle": "Alla förfrågningar",
+    "requestsLead": "Alla förfrågningar i kön. Filtrera på status eller sök på organisation.",
+    "requestsSearchLabel": "Sök organisation eller brief",
+    "requestsSearchButton": "Sök",
+    "requestsStatusLabel": "Status",
+    "requestsStatusAll": "Alla statusar",
+    "requestsStatusOpen": "Öppna (kräver desken)",
+    "requestsEmpty": "Inga förfrågningar matchar filtret.",
+    "requestsCount": "{count, plural, one {# förfrågan} other {# förfrågningar}}",
+    "requestsColUpdated": "Uppdaterad",
+    "requestsColQuotes": "Offerter",
+    "requestsPrev": "Föregående",
+    "requestsNext": "Nästa",
+    "requestsPageOf": "Sida {page} av {pages}",
+    "requestsViewAll": "Visa alla förfrågningar",
+    "requestsPaginationLabel": "Sidnavigering"
   },
   "deskTitles": {
     "eyebrow": "Superadmin · titlar",
@@ -1295,7 +1409,9 @@
     "checkSignupLead": "Vi har skickat en länk till adressen du angav. Öppna den för att bekräfta adressen och logga in; den går ut om 15 minuter. Om adressen redan hade ett konto förklarar mejlet hur du kommer in igen.",
     "regEmailTypoQuestion": "Menade du <b>{email}</b>?",
     "regEmailTypoUse": "Använd {email}",
-    "regEmailTypoKeep": "Stämmer {domain}? Tryck på Skapa konto igen."
+    "regEmailTypoKeep": "Stämmer {domain}? Tryck på Skapa konto igen.",
+    "regOrgRequired": "Ange företagets eller organisationens namn.",
+    "regEmailRequired": "Ange din jobbmejladress."
   },
   "order": {
     "title": "Order",
@@ -1389,6 +1505,34 @@
       "SUPERADMIN": "NativeSpin (administratör)",
       "PUBLISHER": "Publicisten",
       "BUYER": "Kunden"
+    },
+    "cancelRequest": {
+      "heading": "Behöver ni avboka?",
+      "lead": "Berätta varför, så kontrollerar desken bokningarna hos utgivarna och återkommer. Placeringar som redan är bokade eller publicerade kan medföra en avbokningskostnad – vi bekräftar innan något är slutgiltigt.",
+      "open": "Begär avbokning",
+      "reasonLabel": "Orsak till avbokningen",
+      "submit": "Skicka avbokningsbegäran",
+      "pending": "Skickar…",
+      "requested": "Avbokning begärdes {date}. Desken återkommer – ordern är aktiv tills de bekräftar.",
+      "noticeRequested": "Din avbokningsbegäran har skickats till desken.",
+      "noticeReasonRequired": "Ange en orsak så att desken kan agera.",
+      "noticeUnavailable": "Den här ordern kan inte längre avbokas härifrån.",
+      "noticeNotAllowed": "Du behöver beställningsrätt i organisationen för att begära avbokning.",
+      "deskBanner": "Kunden bad om att avboka den här ordern {date}.",
+      "deskReason": "Orsak: {reason}"
+    },
+    "csat": {
+      "heading": "Hur gick den här kampanjen?",
+      "question": "Hur nöjd är du med NativeSpin för den här ordern?",
+      "scale": "{score} av 5",
+      "low": "Inte nöjd",
+      "high": "Mycket nöjd",
+      "commentLabel": "Något vi bör veta? (valfritt)",
+      "submit": "Skicka feedback",
+      "pending": "Skickar…",
+      "thanks": "Tack – du gav den här ordern {score} av 5.",
+      "deskHeading": "Feedback från kunden",
+      "deskScore": "Nöjdhet: {score} av 5"
     }
   },
   "production": {
@@ -1422,6 +1566,7 @@
     "vetoSharedWarning": "Den här artikeln körs också på {count} andra placering(ar) — de påverkas inte av den här indragningen."
   },
   "invoice": {
+    "vatNoteHeading": "Momsnotering",
     "title": "Faktura",
     "eyebrow": "Faktura",
     "status": "Status",
@@ -1838,7 +1983,14 @@
     "footerSolutions": "Lösningar",
     "footerCompany": "Företag",
     "footerAbout": "Om oss",
-    "footerContact": "Kontakt"
+    "footerContact": "Kontakt",
+    "footerHelp": "Hjälp",
+    "footerChangelog": "Nyheter",
+    "footerLegal": "Juridiskt",
+    "footerPrivacy": "Integritet",
+    "footerTerms": "Villkor",
+    "footerSecurity": "Säkerhet",
+    "footerSubprocessors": "Underbiträden"
   },
   "advertisers": {
     "eyebrow": "För annonsörer",
@@ -2337,149 +2489,6 @@
     "contactTitle": "Juridisk kontakt",
     "contactBody": "Frågor om dessa villkor — skriv till"
   },
-  "landing": {
-    "hero": {
-      "labelText": "NativeSpin · Native-marknadsplats",
-      "pain": "Det mesta av premium-native säljs inte programmatiskt. Det säljs över telefon, med en PDF-prislista och fyra veckors fram-och-tillbaka. <strong>Vi ersätter det med en brief och fast offert inom 24 timmar.</strong>",
-      "h1Line1": "En brief.",
-      "h1Line2": "3 000+ titlar.",
-      "h1Line3": "Fast offert inom 24 timmar.",
-      "ctaPrimary": "Skicka en brief",
-      "ctaSecondary": "Så funkar det",
-      "ctaMeta": "Inget samtal krävs. Vi svarar skriftligt, på dokument.",
-      "sideAria": "Varför native",
-      "sideBody": "Sponsrade artiklar slår display konsekvent på uppmärksamhet och varumärkeslyft. Du betalar för det som publiceras, inte för det som blockeras."
-    },
-    "why": {
-      "labelText": "Varför native",
-      "h2": "Native gör jobbet display inte kan.",
-      "lead": "Display köper visningar i marginalen. Native köper redaktionell tid inuti artikeln. Annan yta, annat läsarbeteende, annat resultat.",
-      "colAIx": "I.",
-      "colAH3": "Uppmärksamhet du inte kan ad-blocka",
-      "colABody": "En sponsrad artikel lever där läsaren redan är koncentrerad. <strong>Ingen bannerblindhet, ingen skip-knapp</strong> — enheten är innehållet.",
-      "colAPull": "<strong>3–5×</strong> dwell-tid jämfört med display",
-      "colBIx": "II.",
-      "colBH3": "Förtroende överfört från titeln",
-      "colBBody": "När en läsare ser er historia under en titel de litar på, överförs en del av det förtroendet. <strong>Märkningen är tydlig</strong> — trovärdigheten kommer från den redaktionella ramen.",
-      "colBPull": "<strong>+18 procentenheter</strong> varumärkeslyft (branschsnitt)",
-      "colCIx": "III.",
-      "colCH3": "Lever vidare efter kampanjen",
-      "colCBody": "En publicerad artikel fortsätter generera visningar och sökträffar långt efter kampanjslut. <strong>Display försvinner i samma stund ni slutar betala.</strong>",
-      "colCPull": "Ligger på utgivarens domän. Indexerad. Permanent."
-    },
-    "vs": {
-      "labelText": "Native vs display",
-      "h2": "Samma budget. Helt olika utfall.",
-      "thNative": "Native (sponsrad artikel)",
-      "thDisplay": "Display-banner",
-      "primaryJobSpec": "Primärt jobb",
-      "primaryJobNative": "Berätta en historia läsaren valde att läsa",
-      "primaryJobDisplay": "Avbryta och leda till er sajt",
-      "readerBehaviourSpec": "Läsarbeteende",
-      "readerBehaviourNative": "Läser. Scrollar. Stannar kvar.",
-      "readerBehaviourDisplay": "Scrollar förbi. Ad-blockar. Glömmer.",
-      "realEstateSpec": "Yta",
-      "realEstateNative": "Inuti det redaktionella flödet",
-      "realEstateDisplay": "Marginal, header, mellan stycken",
-      "trustTransferSpec": "Förtroendeöverföring",
-      "trustTransferNative": "Lånad från titeln",
-      "trustTransferDisplay": "Ingen — läsare vet att det är annons",
-      "longevitySpec": "Livslängd",
-      "longevityNative": "Indexerad, sökbar, permanent",
-      "longevityDisplay": "Försvinner vid kampanjslut",
-      "bestFitSpec": "Bäst för",
-      "bestFitNative": "Övervägda köp, B2B, varumärkesbyggande",
-      "bestFitDisplay": "Performance-retargeting, enkla erbjudanden"
-    },
-    "rule": {
-      "labelIx": "Den gyllene regeln",
-      "h2": "Är det inte användbart för läsaren är det inte native — det är ett pressmeddelande i förklädnad.",
-      "body": "Varje artikel vi levererar måste förtjäna läsarens tid på egen hand. <strong>Redaktionella standarder, titelns specifikation, marknadens märkning</strong> — inget kompromissande. Det är så förtroendeöverföringen faktiskt fungerar.",
-      "sig": "— NativeSpin-desken"
-    },
-    "pubs": {
-      "labelText": "Utgivare",
-      "meta": "{publishers, number}+ utgivare · {titles, number}+ titlar katalogiserade · {active, number} verifierade för omedelbar beställning",
-      "foot": "Det ni ser här är bara en bråkdel av katalogen.",
-      "footMore": "Berätta vad ni letar efter"
-    },
-    "catalog": {
-      "labelText": "Ett smakprov ur katalogen",
-      "h2": "Live-titlar, indikativ prissättning.",
-      "ask": "Be om hela listan",
-      "thTitle": "Titel",
-      "thPublisher": "Kategori",
-      "thMarket": "Marknad",
-      "thFormat": "Format",
-      "thAudience": "Räckvidd",
-      "thFrom": "Från",
-      "fmtNativeArticle": "Native-artikel",
-      "fmtSponsoredArticle": "Sponsrad artikel",
-      "fmtSponsoredContent": "Sponsrat innehåll",
-      "fmtSponsoredArticleAds": "Artikel + förstärkning",
-      "readersSuffix": "läsare/mån",
-      "footBody": "Indikativa priser. Desken bekräftar fast pris baserat på tillgänglighet, säsong och volym.",
-      "footInd": "Indikativ · exkl. moms"
-    },
-    "stats": {
-      "v240Label": "Titlar i katalog",
-      "v240Sub": "NO · SE · DK · FI · DE · AT · CH · UK · IE",
-      "v12Label": "Utgivare i nätverket",
-      "v12Sub": "Dagstidningar, magasin, nischtitlar",
-      "v24Unit": "h",
-      "v24Label": "Fast offert",
-      "v24Sub": "Genomsnittlig svarstid från desken",
-      "v3Label": "Marknader täckta",
-      "v3Sub": "NO, SE, DK, FI, DE, AT, CH, UK, IE"
-    },
-    "how": {
-      "labelText": "Så funkar det",
-      "h2": "Tre steg. Det mesta av jobbet är på vår sida.",
-      "s1Num": "01",
-      "s1H3": "Skicka en brief",
-      "s1Body": "Marknad, budget, målgrupp, en mening om målet. Det räcker för desken att skopa. Ingen deck krävs.",
-      "s1Time": "5 minuter",
-      "s2Num": "02",
-      "s2H3": "Fast offert inom 24h",
-      "s2Body": "Vi kommer tillbaka med en titelshortlist, fast pris per utgivare, scope för innehållsproduktion och go-live-datum. Skriftligt, inte över samtal.",
-      "s2Time": "Inom en arbetsdag",
-      "s3Num": "03",
-      "s3H3": "Vi publicerar, ni godkänner",
-      "s3Body": "Vi skriver artikeln till titelns spec, kör spec-kollen, ger er utkastet för godkännande, sedan publicerar utgivaren. Ni får live-URL och faktura.",
-      "s3Time": "10–25 dagar beroende på titel"
-    },
-    "obj": {
-      "h2": "Det folk frågar innan de skickar en brief.",
-      "q1": "Varför inte bara köpa display? Det är billigare.",
-      "a1": "Per visning, ja. Per <strong>uppmärksamhetssekund</strong> vinner native med bred marginal. Bygger ni övervägande är inte enhetspriset det viktiga.",
-      "q2": "Native känns långsamt. Vi behöver detta på marknaden nästa vecka.",
-      "a2": "De flesta titlar publicerar inom 10–25 dagar efter brief. Vissa samma vecka. Den fasta offerten på 24 timmar berättar exakt när, per titel, innan ni binder er.",
-      "q3": "Vi har inte operativ kapacitet för native.",
-      "a3": "<strong>Det är hela poängen med desken.</strong> Brief in, färdig artikel och live placering ut. Vårt team sköter förhandling med utgivare, innehållsproduktion, spec-koll och fakturering.",
-      "q4": "Hur mäter vi det?",
-      "a4": "Vi spårar klick på varje länk inne i din artikel — mätt förstaparts. Räckvidd (visningar) rapporteras av utgivaren där det finns. Vi lovar inte viewability eller panelbaserad brand lift vi inte kan mäta.",
-      "q5": "Vad gäller brand safety och märkning?",
-      "a5": "Märkning är kodad per marknad (<strong>Annonsörsinnehåll / Annons / Annonce</strong>) och appliceras automatiskt. Spec-kollen måste passera innan något når utgivaren."
-    },
-    "endCta": {
-      "h2": "Skicka oss en brief.",
-      "body": "Ett stycke räcker. Vi kommer tillbaka skriftligt, med fast offert, inom 24 timmar.",
-      "ctaPrimary": "Mejla desken",
-      "ctaSecondary": "Skapa konto",
-      "qualPrefix": "Eller ni är utgivare och vill listas —",
-      "qualLink": "tala med oss"
-    },
-    "foot": {
-      "tagline": "Native-innehåll och native-annonsering över varje titel vi täcker i NO, SE, DK, FI, DE, AT, CH, UK och IE — och en växande katalog.",
-      "copy": "Getia AS · Oslo",
-      "navAdv": "För annonsörer",
-      "navAgy": "För byråer",
-      "navPub": "För utgivare",
-      "navAbout": "Om oss",
-      "navContact": "Kontakt",
-      "navCreativeSpecs": "Annonsspecifikationer"
-    }
-  },
   "apiDocs": {
     "metaTitle": "API",
     "eyebrow": "Utvecklare",
@@ -2558,6 +2567,9 @@
     "scope_catalog_write": "ladda upp utgivarens egna titlar och produkter",
     "scope_orders_write": "lägga fasta beställningar för organisationen",
     "scope_pricing_admin": "interna prisverktyg (MCP) — endast plattform",
+    "scope_pricing_read": "MCP: endast läsa deskens prisdata",
+    "scope_pricing_draft": "MCP: läsa + registrera utkast (kontakter, offertutkast, osända prisförfrågningar)",
+    "scope_pricing_apply": "MCP: utkast + tillämpa offerter på gällande priser och skicka e-post",
     "boundPublisher": "{name} (utgivare)",
     "bindingPlatformGroup": "Plattform",
     "bindingSearchPlaceholder": "Sök organisation eller utgivare på namn, marknad eller titel",
@@ -2663,7 +2675,11 @@
     "priceUnconfirmed": "pris ej bekräftat",
     "productInactive": "inaktiv",
     "inviteLanguageLabel": "Språk i mejlet",
-    "inviteLanguageHint": "Inbjudan, registreringssidan och portalkontot använder det här språket. Standard är titelns marknad."
+    "inviteLanguageHint": "Inbjudan, registreringssidan och portalkontot använder det här språket. Standard är titelns marknad.",
+    "aliasLabel": "Sökalias",
+    "aliasHint": "Kommaseparerat. Varumärken och alternativa namn som katalogsökningen ska träffa. Sökningen tar bort punkter, så lägg även till en form utan punkt (t.ex. ”ATno” för ”AT.no”).",
+    "aliasSave": "Spara alias",
+    "aliasSaving": "Sparar…"
   },
   "salesContacts": {
     "title": "Säljkontakter",
@@ -2867,7 +2883,9 @@
     "callSkip": "Hoppa över för nu →",
     "marketBlocked": "{org} har ingen faktureringsmarknad ännu. En administratör i {org} behöver välja den under Konto innan teamet kan skicka förfrågningar.",
     "blockedTitle": "{org} är inte konfigurerat för fakturering ännu",
-    "blockedBack": "Tillbaka till planen"
+    "blockedBack": "Tillbaka till planen",
+    "marketError": "Välj den marknad där företaget faktureras.",
+    "phoneError": "Ange ett telefonnummer med minst 6 siffror."
   },
   "account": {
     "eyebrow": "Konto",
@@ -2977,6 +2995,8 @@
     "deactivateHint": "Kontot slutar fungera omedelbart — alla sätt att logga in nekas. Ordrar, offerter och fakturor du signerat behålls, eftersom de är bokföringsunderlag. En superadministratör kan slå på kontot igen om du återvänder.",
     "deactivateConfirmLabel": "Skriv din e-postadress för att bekräfta",
     "deactivateButton": "Avaktivera mitt konto",
+    "eraseDataLabel": "Radera även mina personuppgifter",
+    "eraseDataHint": "Namn, e-postadress, telefonnummer, inloggningsuppgifter och inkorg raderas och du lämnar dina organisationer. Det går inte att ångra, inte ens av en superadmin. Ordrar, offerter och fakturor behålls utan dina personuppgifter.",
     "deactivating": "Avaktiverar…",
     "errDelegation": "Slutdatumet för delegeringen är inte ett giltigt datum.",
     "errDelegationPast": "Slutdatumet för delegeringen måste ligga i framtiden.",
@@ -2984,7 +3004,35 @@
     "statusRevoked": "Borttagen",
     "errEmailDomain": "Vi hittar ingen e-postserver för den domänen. Kolla att adressen är rätt skriven.",
     "roleHelp": "Administratörer hanterar teamet och kan göra allt. Medlemmar bygger planer, skickar förfrågningar och – med beställningsrätt – godkänner offerter. Begränsad ger bara läsbehörighet: ser teamets planer, förfrågningar, offerter, beställningar, rapporter, artiklar och fakturor, men kan inte ändra, skicka, godkänna eller dela något.",
-    "canCommitRestrictedNote": "Användare med begränsad åtkomst kan bara läsa och kan inte få beställningsrätt."
+    "canCommitRestrictedNote": "Användare med begränsad åtkomst kan bara läsa och kan inte få beställningsrätt.",
+    "notifications": {
+      "eyebrow": "Aviseringar",
+      "title": "E-postaviseringar",
+      "lead": "Välj vilka aviseringar vi också skickar via e-post. Allt visas alltid i din inkorg i NativeSpin.",
+      "save": "Spara inställningar",
+      "saving": "Sparar…",
+      "saved": "Dina aviseringsinställningar är sparade.",
+      "quotes": {
+        "label": "Förfrågningar och offerter",
+        "hint": "En offert är klar, accepterad, avböjd eller behöver förnyas."
+      },
+      "orders": {
+        "label": "Ordrar och bokningar",
+        "hint": "En order är bekräftad, slutförd eller avbokad."
+      },
+      "content": {
+        "label": "Innehåll och granskning",
+        "hint": "Ett utkast är klart för granskning, eller en utgivare har skickat tillbaka ett."
+      },
+      "billing": {
+        "label": "Fakturor",
+        "hint": "En ny faktura har utfärdats."
+      },
+      "planning": {
+        "label": "Planeringsuppdateringar",
+        "hint": "Desken har föreslagit en placering, en titel har fått ett pris eller en kund har godkänt en delad plan."
+      }
+    }
   },
   "rateCard": {
     "pageTitle": "Rate card-förfrågan",
@@ -3305,6 +3353,8 @@
     "resultsAlsoConsider": "Också värt att överväga",
     "resultsEmpty": "Inga träffar ännu – prova en bredare brief eller en annan marknad.",
     "whyFits": "Därför passar den:",
+    "aiWritten": "AI",
+    "aiWrittenHint": "Den här förklaringen är skriven av AI utifrån titelns kataloguppgifter. Kontrollera den mot titeln innan du förlitar dig på den.",
     "reach": "räckvidd/mån",
     "addToShortlist": "Lägg till i urvalet",
     "titlePlaceholder": "Titel · desken prissätter",
@@ -3422,6 +3472,7 @@
     }
   },
   "quotePdf": {
+    "customerVatId": "Kundens momsnummer: {vatId}",
     "documentTitle": "Offert {quoteNumber}",
     "quoteNumber": "Offertnummer",
     "revision": "Version",
@@ -3456,6 +3507,30 @@
     "extraWork": "Extraarbete / revision",
     "inclArticle": "Inkl. artikel skriven av NativeSpin · från {amount}",
     "extraWorkDetail": "{hours} h × {rate}/h"
+  },
+  "deskAudit": {
+    "eyebrow": "Admin",
+    "title": "Granskningslogg",
+    "lead": "Vem gjorde vad, med vilken post, och när. Filtrera på person, åtgärd eller organisation.",
+    "filterActor": "Aktör",
+    "filterActorPlaceholder": "Användar-ID eller ”system”",
+    "filterAction": "Åtgärd",
+    "filterActionPlaceholder": "t.ex. invoice.issue eller auth.",
+    "filterOrg": "Organisations-ID",
+    "filterButton": "Filtrera",
+    "clear": "Rensa",
+    "colWhen": "När",
+    "colActor": "Aktör",
+    "colAction": "Åtgärd",
+    "colEntity": "Post",
+    "colOrg": "Organisation",
+    "colDetail": "Detaljer",
+    "resultCount": "{count, plural, =0 {Inga poster} =1 {1 post} other {# poster}}",
+    "none": "Inga poster i granskningsloggen matchar filtren.",
+    "prev": "Föregående",
+    "next": "Nästa",
+    "pageOf": "Sida {page} av {pages}",
+    "retentionNote": "IP- och e-postadresser tas bort från poster som är äldre än 90 dagar."
   },
   "deskUsers": {
     "eyebrow": "Administration",
@@ -3522,7 +3597,8 @@
     "termsDaysValue": "{days, plural, one {netto # dag} other {netto # dagar}}",
     "okTerms": "Betalningsvillkoren är sparade.",
     "errTerms": "Ange hela dagar mellan 1 och 120.",
-    "errViewAsOrg": "Annonsören hittades inte."
+    "errViewAsOrg": "Annonsören hittades inte.",
+    "errViewAsReason": "Ange en kort anledning till att visa som kunden."
   },
   "status": {
     "ACCEPTED": "Accepterad",
@@ -3898,7 +3974,21 @@
       "bodyClient": "Kunden har skickat tillbaka version {version} av ”{article}” för ändringar.",
       "bodyDesk": "NativeSpin-desken har skickat tillbaka version {version} av ”{article}” för ändringar.",
       "comment": "Kommentar: ”{comment}”"
-    }
+    },
+    "quoteDeclined": {
+      "title": "Offert avböjd: {plan}",
+      "body": "{org} har avböjt offerten."
+    },
+    "requestWithdrawn": {
+      "title": "Förfrågan återkallad: {plan}",
+      "body": "{org} har återkallat förfrågan. Inget mer arbete behövs."
+    },
+    "cancellationRequested": {
+      "title": "Avbokning begärd: {plan}",
+      "body": "{org} har bett om att avboka den här ordern. Kontrollera bokningarna hos utgivarna och avboka sedan ordern eller svara kunden."
+    },
+    "selfServiceReason": "Angiven orsak: {reason}",
+    "selfServiceNoReason": "Ingen orsak angavs."
   },
   "publisherInviteEmail": {
     "subject": "Inbjudan till samarbete för {publisher} – NativeSpin",
@@ -3936,6 +4026,7 @@
     "deskOrders": "Beställningar",
     "deskTitles": "Titlar",
     "deskUsers": "Användare",
+    "deskAudit": "Granskningslogg",
     "deskWriters": "Skribenter",
     "deskPriceQuotes": "Prisofferter",
     "deskPublisherContacts": "Utgivarkontakter",
@@ -4045,7 +4136,99 @@
     "deskHeading": "Se som kund",
     "deskLead": "Öppna plattformen som en annonsör ser den, med kundens listor, förfrågningar och beställningar. Ingen användare läggs till i kundens team. Visningen avslutas efter 8 timmar.",
     "deskOrgLabel": "Kund",
+    "deskReasonLabel": "Anledning",
+    "deskReasonHint": "Varför du öppnar kundens konto (sparas i granskningsloggen), t.ex. ett supportärende.",
     "deskStart": "Öppna som kund",
     "deskStarting": "Öppnar …"
+  },
+  "subprocessors": {
+    "metaTitle": "Underbiträden",
+    "eyebrow": "Förtroende",
+    "title": "Underbiträden",
+    "lead": "De tredje parter som behandlar personuppgifter för vår räkning när du använder NativeSpin, och vad var och en gör.",
+    "lastUpdated": "Senast uppdaterad: {date}",
+    "colName": "Underbiträde",
+    "colPurpose": "Syfte",
+    "colData": "Berörda uppgifter",
+    "colLocation": "Behandlingsplats",
+    "locationTbc": "Bekräftas",
+    "optional": "Endast när aktiverad",
+    "railway": {
+      "purpose": "Drift av applikationen och databasen",
+      "data": "All konto-, order- och innehållsdata"
+    },
+    "resend": {
+      "purpose": "Utskick av transaktions- och aviseringsmejl",
+      "data": "E-postadress, namn, meddelandeinnehåll"
+    },
+    "r2": {
+      "purpose": "Fillagring (uppladdade dokument, offert-PDF:er, artikelfiler)",
+      "data": "Filer som du eller vi laddar upp"
+    },
+    "ai": {
+      "purpose": "AI-stödd matchning av kampanjbrief mot titlar, samt annonsförhandsvisningen",
+      "data": "Den brieftext du anger",
+      "name": "AI-gateway och modelleverantör"
+    },
+    "gtm": {
+      "purpose": "Tagghantering för analys, laddas endast efter samtycke",
+      "data": "Användningshändelser, IP-adress, cookie-identifierare"
+    },
+    "getcookies": {
+      "purpose": "Samtyckesbanner för kakor och samtyckeslogg",
+      "data": "Samtyckesval, IP-adress"
+    },
+    "fiken": {
+      "purpose": "Bokföring: fakturor bokförs i vårt ekonomisystem",
+      "data": "Organisationsnamn, momsnummer, fakturarader"
+    },
+    "changesTitle": "Ändringar i listan",
+    "changesBody": "Vi uppdaterar den här sidan innan ett nytt underbiträde börjar behandla personuppgifter. Personuppgiftsbiträdesavtal (DPA) finns på begäran.",
+    "contact": "Frågor:",
+    "linkLabel": "Se våra underbiträden"
+  },
+  "help": {
+    "metaTitle": "Hjälp",
+    "eyebrow": "Support",
+    "title": "Hjälp",
+    "lead": "Svar på de vanligaste frågorna och hur du når en människa.",
+    "faqTitle": "Vanliga frågor",
+    "q1": "Hur får jag ett pris?",
+    "a1": "Lägg placeringar från katalogen i din plan och skicka den som en förfrågan. Katalogpriserna är vägledande; desken svarar med en bindande offert, normalt inom 24 arbetstimmar.",
+    "q2": "Kan jag avböja en offert eller återkalla en förfrågan?",
+    "a2": "Ja. Öppna förfrågan och använd ”Går ni inte vidare?” längst ned. Inget debiteras förrän du accepterar en offert.",
+    "q3": "Hur avbokar jag en order?",
+    "a3": "Öppna ordern och välj ”Begär avbokning”. Desken kontrollerar bokningarna hos utgivarna och bekräftar eventuella kostnader innan avbokningen är slutgiltig.",
+    "q4": "Var hittar jag mina fakturor?",
+    "a4": "Under Fakturor, där varje faktura kan laddas ned som PDF.",
+    "q5": "Hur bjuder jag in kollegor eller ändrar vem som får beställa?",
+    "a5": "En administratör i organisationen hanterar medlemmar, roller och beställningsrätt under Konto → Team.",
+    "q6": "Hur exporterar jag mina uppgifter eller avslutar kontot?",
+    "a6": "Båda finns under Konto → Data och konto. Där kan du också ändra vilka mejl du får.",
+    "contactTitle": "Prata med desken",
+    "contactBody": "Skriv till oss så svarar en människa på desken inom en arbetsdag.",
+    "contactCta": "Kontakta oss",
+    "changelogLink": "Nyheter",
+    "navLabel": "Hjälp"
+  },
+  "changelog": {
+    "metaTitle": "Nyheter",
+    "eyebrow": "Ändringslogg",
+    "title": "Nytt i NativeSpin",
+    "lead": "Produktändringar som påverkar hur du arbetar, nyast först.",
+    "entries": {
+      "selfService": {
+        "title": "Avböj, återkalla och avboka själv",
+        "body": "Du kan nu avböja en offert, återkalla en förfrågan och begära avbokning av en order direkt från förfrågnings- och ordersidorna."
+      },
+      "notificationPrefs": {
+        "title": "Välj vilka mejl du får",
+        "body": "Kontoinställningarna har nu e-postaviseringar per kategori. Inkorgen i appen visar fortfarande allt."
+      },
+      "help": {
+        "title": "Hjälp och feedback på ett ställe",
+        "body": "En ny hjälpsida svarar på vanliga frågor, och när en kampanj är klar kan du betygsätta hur det gick."
+      }
+    }
   }
 }

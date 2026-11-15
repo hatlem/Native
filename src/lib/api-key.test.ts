@@ -121,3 +121,13 @@ test("validateKeyGrant: unknown or empty scopes are refused", () => {
   assert.equal(validateKeyGrant(parseScopes("catalog:*"), PLATFORM), null);
   assert.equal(validateKeyGrant(parseScopes("catalog:read"), ORG), null);
 });
+
+test("validateKeyGrant: the narrower pricing:* scopes are issuable, platform only", () => {
+  for (const scope of ["pricing:read", "pricing:draft", "pricing:apply"]) {
+    assert.equal(validateKeyGrant(parseScopes(scope), { kind: "platform" }), null);
+    assert.equal(
+      validateKeyGrant(parseScopes(scope), { kind: "organization", id: "o1" }),
+      "internal_only_scope",
+    );
+  }
+});

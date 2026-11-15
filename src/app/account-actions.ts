@@ -1,5 +1,7 @@
 "use server";
 
+import { isMfaRequiredError, reissueSessionFor } from "@/lib/mfa/session";
+import { hashPassword } from "@/lib/password";
 import { redirect } from "next/navigation";
 import bcrypt from "bcryptjs";
 import { MarketCode } from "@prisma/client";
@@ -7,7 +9,8 @@ import { AuthError } from "next-auth";
 import { auth, signIn, signOut } from "@/auth";
 import { prisma } from "@/lib/prisma";
 import { recordAudit } from "@/lib/audit";
-import { wouldRemoveLastAdmin, type MembershipRow } from "@/lib/membership";
+import { deactivateUserUnlessLastAdmin } from "@/lib/org-seats";
+import { anonymiseUser } from "@/lib/retention";
 import { canDeactivateSelf } from "@/lib/user-admin";
 import { companySeat, getWorkspace } from "@/lib/workspace";
 import { normaliseEmail } from "@/lib/email-change";
@@ -151,7 +154,7 @@ export async function setPassword(formData: FormData) {
   // including a stolen one, which is usually why people change a password.
   // It ends this browser's session too, so re-mint it straight away with the
   // password the user just chose (see @/lib/session-version).
-  const hash = await bcrypt.hash(next, 10);
+  const hash = await hashPassword(next);
   await prisma.user.update({
     where: { id: user.id },
     data: { passwordHash: hash, sessionVersion: { increment: 1 } },
@@ -162,6 +165,12 @@ export async function setPassword(formData: FormData) {
   try {
     await signIn("credentials", { email: user.email, password: next, redirect: false });
   } catch (error) {
+    // Two-factor account: the credentials provider won't mint a session on a
+    // password alone. This user is already fully signed in (and just proved
+    // the old password), so re-mint through the ticket provider instead.
+    if (isMfaRequiredError(error) && (await reissueSessionFor(user.id))) {
+      redirect(`/${locale}/account?ok=password#password`);
+    }
     // The change itself is saved; only the re-mint failed (e.g. the sign-in
     // limiter). Signing in again with the new password is the honest way on.
     if (error instanceof AuthError) redirect(`/${locale}/signin`);
@@ -218,49 +227,21 @@ export async function deactivateOwnAccount(formData: FormData) {
     redirect(`/${locale}/account?error=last_superadmin#danger`);
   }
 
-  // Org side: check every org where this user holds an active ADMIN seat.
-  const myMemberships = await prisma.membership.findMany({
-    where: { userId },
-    select: {
-      userId: true,
-      organizationId: true,
-      role: true,
-      canCommit: true,
-      expiresAt: true,
-      status: true,
-    },
-  });
-  const now = new Date();
-  const adminOrgIds = myMemberships
-    .filter((m) => m.role === "ADMIN")
-    .map((m) => m.organizationId);
-  if (adminOrgIds.length > 0) {
-    const peers = (await prisma.membership.findMany({
-      where: { organizationId: { in: adminOrgIds } },
-      select: {
-        userId: true,
-        organizationId: true,
-        role: true,
-        canCommit: true,
-        expiresAt: true,
-        status: true,
-      },
-    })) as MembershipRow[];
-    for (const orgId of adminOrgIds) {
-      const rows = peers.filter((m) => m.organizationId === orgId);
-      if (wouldRemoveLastAdmin(rows, userId, now)) {
-        redirect(`/${locale}/account?error=last_admin#danger`);
-      }
-    }
+  // Last-admin check and the write happen in one locked transaction, so two
+  // admins leaving at the same moment can't both pass the check.
+  const outcome = await deactivateUserUnlessLastAdmin(userId);
+  if (!outcome.ok) redirect(`/${locale}/account?error=last_admin#danger`);
+  // "Also erase my personal data": the account is anonymised, not just
+  // switched off (lib/retention.ts). Orders and invoices stay.
+  const erase = formData.get("eraseData") === "on";
+  if (erase) {
+    await anonymiseUser(userId);
+    await recordAudit(userId, "user.erased_self", `User:${userId}`);
+  } else {
+    await recordAudit(userId, "user.deactivated_self", `User:${userId}`, {
+      email: user.email,
+    });
   }
-
-  await prisma.user.update({
-    where: { id: userId },
-    data: { deactivatedAt: now },
-  });
-  await recordAudit(userId, "user.deactivated_self", `User:${userId}`, {
-    email: user.email,
-  });
 
   await signOut({ redirectTo: `/${locale}` });
 }

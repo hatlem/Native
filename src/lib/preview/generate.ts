@@ -1,7 +1,6 @@
 import { type Article, type PreviewInput, marketLanguageName } from "./schema";
 import { gatewayChat, gatewayConfigured } from "@/lib/gateway-chat";
 
-const MODEL = "claude-sonnet-4-6";
 // The gateway hop plus a 4-6 paragraph article measures ~20-26s end to end;
 // 12s aborted mid-flight, so every preview fell back to the template while the
 // gateway still billed for the completed generation.
@@ -71,8 +70,10 @@ export async function generatePreviewArticle(input: PreviewInput): Promise<Artic
   // Structured output via the gateway's Anthropic tool-use passthrough: the
   // model is forced to call write_article, so its input IS the article object.
   const result = await gatewayChat({
-    entityId: "nativespin-preview",
-    model: MODEL,
+    feature: "preview",
+    // Public and signed-out: one shared scope, plus the per-IP limiter at
+    // the route. The global daily budget caps what abuse can cost.
+    scope: "anon",
     system,
     messages: [{ role: "user", content: user }],
     maxTokens: 1500,

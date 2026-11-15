@@ -80,8 +80,19 @@ export function hasScope(scopes: Set<string>, required: string): boolean {
 //   catalog:read  — GET /api/v1/catalog/*, /api/v1/quotes/{id}
 //   catalog:write — PUT/GET /api/v1/publisher/products (ingestion)
 //   orders:write  — POST /api/v1/orders
-//   pricing:admin — the internal MCP server (/api/mcp)
-export const ISSUABLE_SCOPES = ["catalog:read", "catalog:write", "orders:write", "pricing:admin"] as const;
+//   pricing:admin — the internal MCP server (/api/mcp), everything
+//   pricing:read / pricing:draft / pricing:apply — the same MCP server at a
+//     narrower grant (lib/mcp/auth.ts mcpGrants): read only; read + record
+//     drafts; drafts + apply prices / send email
+export const ISSUABLE_SCOPES = [
+  "catalog:read",
+  "catalog:write",
+  "orders:write",
+  "pricing:read",
+  "pricing:draft",
+  "pricing:apply",
+  "pricing:admin",
+] as const;
 
 // Also accepted at issuance: the catalog wildcard older keys were minted
 // with. Anything else ("admin:*", a typo'd "catlog:read") is refused so it
@@ -114,14 +125,17 @@ export type KeyGrantError =
 
 // Every scope must be usable by the binding it's issued with — otherwise
 // the key is minted fine and dead-ends at runtime:
-//   pricing:admin → platform only (global pricing mutation, no tenant scoping)
+//   pricing:*     → platform only (global pricing data/mutation, no tenant scoping)
 //   orders:write  → an organization (POST /orders answers NO_ORG otherwise)
 //   catalog:write → a publisher (ingestion answers NOT_PUBLISHER_KEY otherwise;
 //                   the publisher comes from the key, never the body)
 export function validateKeyGrant(scopes: Set<string>, binding: KeyBinding): KeyGrantError | null {
   if (scopes.size === 0) return "scopes";
   for (const s of scopes) if (!VALID_SCOPES.has(s)) return "scopes";
-  if (scopes.has("pricing:admin") && binding.kind !== "platform") return "internal_only_scope";
+  // Every pricing:* scope is desk-internal: global catalog data, no tenant scoping.
+  for (const s of scopes) {
+    if (s.startsWith("pricing:") && binding.kind !== "platform") return "internal_only_scope";
+  }
   if (scopes.has("orders:write") && binding.kind !== "organization") return "org_required_scope";
   if (scopes.has("catalog:write") && binding.kind !== "publisher") return "publisher_required_scope";
   return null;

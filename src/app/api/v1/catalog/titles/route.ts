@@ -32,15 +32,9 @@ import { bandLabel } from "@/lib/pricing/bands";
 import { productBand } from "@/lib/pricing/display-price";
 import { loadPricingDefaults } from "@/lib/content-fee";
 import { rfqLimiter } from "@/lib/rate-limit";
+import { errJson, rateLimitedJson } from "@/lib/api/errors";
 
 export const dynamic = "force-dynamic";
-
-function errJson(status: number, code: string, message: string, details?: unknown) {
-  return NextResponse.json(
-    { error: { code, message, ...(details ? { details } : {}) } },
-    { status },
-  );
-}
 
 export async function GET(req: NextRequest) {
   const auth = await authenticateRequest(req, "catalog:read");
@@ -63,7 +57,7 @@ export async function GET(req: NextRequest) {
   // bursts during sync, then back off.
   const limited = await rfqLimiter.check(`api:catalog:${auth.keyId}`);
   if (!limited.ok) {
-    return errJson(429, "RATE_LIMITED", "Slow down — retry after " + Math.ceil(limited.retryAfterMs / 1000) + "s.");
+    return rateLimitedJson(limited.retryAfterMs, "Slow down — retry after " + Math.ceil(limited.retryAfterMs / 1000) + "s.");
   }
 
   const parsed = parseCatalogQuery(new URL(req.url).searchParams);

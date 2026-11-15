@@ -1,7 +1,8 @@
 // Optional LLM enrichment for the brief matcher (the "hybrid" half).
 //
 // The deterministic taxonomy in brief-match.ts only knows the vocabulary we
-// curated. This sends the brief to Claude (claude-sonnet-4-6) to catch
+// curated. This sends the brief to the configured model (lib/ai-config.ts,
+// "brief-match") to catch
 // phrasing the taxonomy misses and to expand to related terms, returning the
 // same Partial<BriefFacets> shape that mergeFacets() folds in.
 //
@@ -10,9 +11,10 @@
 // never throws to the caller.
 
 import type { BriefFacets, GeoScope } from "@/lib/brief-match";
+import { createHash } from "node:crypto";
 import { gatewayChat, gatewayConfigured } from "@/lib/gateway-chat";
+import { TtlCache } from "@/lib/ai-usage-cache";
 
-const MODEL = "claude-sonnet-4-6";
 // ~3.5s observed through the gateway; 10s leaves headroom without stalling
 // the campaign recommender, which stays deterministic-only on timeout.
 const TIMEOUT_MS = 10000;
@@ -68,12 +70,27 @@ export function llmEnrichmentAvailable(env: Record<string, string | undefined> =
   return gatewayConfigured(env);
 }
 
-export async function enrichBriefWithLLM(brief: string): Promise<Partial<BriefFacets>> {
+// The same brief yields the same facets, and the recommender re-runs on
+// every render of the campaign and plan pages: remember the answer for an
+// hour, keyed on a hash of the brief (the text itself is not kept as a key).
+const facetCache = new TtlCache<Partial<BriefFacets>>(60 * 60_000);
+
+export function briefHash(...parts: string[]): string {
+  return createHash("sha256").update(parts.join("\u0000")).digest("hex");
+}
+
+export async function enrichBriefWithLLM(
+  brief: string,
+  scope?: string,
+): Promise<Partial<BriefFacets>> {
   if (!brief.trim()) return {};
+  const key = briefHash(brief);
+  const cached = facetCache.get(key);
+  if (cached) return cached;
 
   const result = await gatewayChat({
-    entityId: "nativespin-system",
-    model: MODEL,
+    feature: "brief-match",
+    scope,
     system: SYSTEM,
     messages: [{ role: "user", content: brief.slice(0, 2000) }],
     maxTokens: 400,
@@ -83,7 +100,9 @@ export async function enrichBriefWithLLM(brief: string): Promise<Partial<BriefFa
 
   const json = extractJson(result.text);
   if (!json) return {};
-  return sanitizeLlmFacets(json);
+  const facets = sanitizeLlmFacets(json);
+  facetCache.set(key, facets);
+  return facets;
 }
 
 // Pull the first JSON object out of the model's text, tolerating stray prose

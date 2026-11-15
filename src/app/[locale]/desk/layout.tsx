@@ -1,6 +1,7 @@
 import type { ReactNode } from "react";
 import { redirect } from "next/navigation";
 import { auth } from "@/auth";
+import { enforceStaffMfa } from "@/lib/mfa/enforce";
 import { sectionTitleMetadata } from "@/lib/page-title";
 
 // "Desk · NativeSpin" here, "Orders · Desk · NativeSpin" in the sub-pages.
@@ -20,6 +21,9 @@ export default async function DeskLayout({
   if (!session?.user || (role !== "DESK" && role !== "SUPERADMIN")) {
     redirect(`/${locale}/signin`);
   }
+  // MFA_REQUIRED_FOR_STAFF=1: no desk without two-factor. The pages and
+  // actions enforce this themselves (desk-guard); this covers the shell.
+  await enforceStaffMfa(session.user.id, role, locale);
 
   return <>{children}</>;
 }

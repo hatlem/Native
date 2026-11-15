@@ -1,10 +1,13 @@
 "use server";
 
+import { inviteTokenCandidates } from "@/lib/tokens";
+import { hashPassword } from "@/lib/password";
 import { AuthError } from "next-auth";
 import { redirect } from "next/navigation";
-import bcrypt from "bcryptjs";
 import { signIn } from "@/auth";
 import { prisma } from "@/lib/prisma";
+import { log } from "@/lib/log";
+import { isUniqueViolation } from "@/lib/prisma-errors";
 import { authLimiter } from "@/lib/rate-limit";
 import { recordAudit } from "@/lib/audit";
 import { clientIp } from "@/lib/client-ip";
@@ -43,8 +46,8 @@ export async function claimPublisherInvite(formData: FormData) {
     redirect(`/${locale}/publisher/claim/${token}?error=1`);
   }
 
-  const invite = await prisma.publisherInvite.findUnique({
-    where: { token },
+  const invite = await prisma.publisherInvite.findFirst({
+    where: { token: { in: inviteTokenCandidates(token) } },
     select: {
       id: true,
       email: true,
@@ -67,7 +70,7 @@ export async function claimPublisherInvite(formData: FormData) {
     redirect(`/${locale}/publisher/claim/${token}?error=1`);
   }
 
-  const passwordHash = form.passwordless ? null : await bcrypt.hash(password, 10);
+  const passwordHash = form.passwordless ? null : await hashPassword(password);
 
   let createdUserId: string | null = null;
   try {
@@ -93,10 +96,15 @@ export async function claimPublisherInvite(formData: FormData) {
       });
       return user.id;
     });
-  } catch {
+  } catch (err) {
     // Unique-email violation (publisher tried to claim with an email
     // that already has a user). Send them to sign-in — if it's their
     // existing account, signing in pairs them with the publisher.
+    // Any other failure is real and must surface, not look like that.
+    if (!isUniqueViolation(err)) {
+      log.error("publisher.invite_claim_failed", { inviteId: invite.id, err });
+      throw err;
+    }
     redirect(`/${locale}/signin`);
   }
 
@@ -164,7 +172,7 @@ export async function claimWriterInviteSignup(formData: FormData) {
     redirect(`/${locale}/writer/claim/${token}?error=1`);
   }
 
-  const passwordHash = form.passwordless ? null : await bcrypt.hash(password, 10);
+  const passwordHash = form.passwordless ? null : await hashPassword(password);
 
   let createdUserId: string | null = null;
   try {
@@ -190,8 +198,13 @@ export async function claimWriterInviteSignup(formData: FormData) {
       });
       return user.id;
     });
-  } catch {
-    // Unique-email violation — send to sign-in.
+  } catch (err) {
+    // Unique-email violation — send to sign-in. Anything else is a real
+    // failure and is rethrown.
+    if (!isUniqueViolation(err)) {
+      log.error("writer.invite_claim_failed", { inviteId: invite.id, err });
+      throw err;
+    }
     redirect(`/${locale}/signin`);
   }
 

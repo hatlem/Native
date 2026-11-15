@@ -13,6 +13,8 @@ async function fetchPayload(token: string): Promise<PublicPayload | null> {
   try {
     const res = await fetch(`${BASE}/api/artifacts/public/${encodeURIComponent(token)}`, {
       cache: 'no-store',
+      // A hung GetPlatform must not hold the page render open.
+      signal: AbortSignal.timeout(10_000),
     });
     if (!res.ok) return null;
     return (await res.json()) as PublicPayload;

@@ -1,3 +1,4 @@
+import { inviteTokenCandidates } from "@/lib/tokens";
 import { getTranslations } from "next-intl/server";
 import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
@@ -6,7 +7,7 @@ import { checkOrgInvite } from "@/lib/org-invite";
 import { claimOrgInvite } from "@/app/org-invite-actions";
 import { logout } from "@/app/auth-actions";
 import { LandingShell } from "@/app/landing-shell";
-import { SubmitButton } from "@/components";
+import { SubmitButton, PendingButton } from "@/components";
 import { withSafeEmails } from "@/components/safe-email";
 import { hasActiveSeat } from "@/lib/org-seats";
 
@@ -37,8 +38,8 @@ export default async function OrgInvitePage({
   const tc = await getTranslations({ locale, namespace: "common" });
   const te = await getTranslations({ locale, namespace: "errors" });
 
-  const invite = await prisma.orgInvite.findUnique({
-    where: { token },
+  const invite = await prisma.orgInvite.findFirst({
+    where: { token: { in: inviteTokenCandidates(token) } },
     select: {
       email: true,
       expiresAt: true,
@@ -92,9 +93,9 @@ export default async function OrgInvitePage({
           <div className="cluster">
             <form action={logout}>
               <input type="hidden" name="locale" value={locale} />
-              <button type="submit" className="btn secondary">
+              <PendingButton className="btn secondary">
                 {t("signOut")}
-              </button>
+              </PendingButton>
             </form>
           </div>
         </div>

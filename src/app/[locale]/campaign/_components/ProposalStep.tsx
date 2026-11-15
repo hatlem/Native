@@ -3,7 +3,7 @@ import { BusinessType } from "@prisma/client";
 import { Link } from "@/i18n/navigation";
 import { submitRequest } from "@/app/checkout-actions";
 import { saveKyc } from "@/app/campaign-actions";
-import { SubmitButton } from "@/components";
+import { SubmitButton, PendingButton } from "@/components";
 import { ViewAsConfirm } from "@/app/view-as-confirm";
 import type { ActiveList } from "@/lib/lists";
 import { kycComplete, type KycFields } from "@/lib/campaign-kyc";
@@ -83,9 +83,9 @@ export async function ProposalStep({ locale, items, kyc }: Props) {
               <input type="text" name="city" defaultValue={kyc?.city ?? ""} />
             </label>
           </div>
-          <button type="submit" className="btn small">
+          <PendingButton className="btn small">
             {t("kycSave")}
-          </button>
+          </PendingButton>
         </form>
       ) : null}
 

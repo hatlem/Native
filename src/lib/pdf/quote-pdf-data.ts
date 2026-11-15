@@ -58,6 +58,10 @@ export type QuotePdfData = {
   quoteNumber: string;
   currency: string;
   vatPct: number;
+  // Reverse-charge statement stored on the quote (lib/vat.ts), and the
+  // customer's VAT id it refers to. Both null for a domestic sale.
+  vatNote: string | null;
+  customerVatId: string | null;
   subtotal: number;
   total: number;
   validUntil: Date | null;
@@ -128,7 +132,7 @@ export async function loadQuotePdfData(
       lines: { orderBy: lineOrder() },
       request: {
         include: {
-          organization: { select: { name: true, paymentTermsDays: true, marketCode: true } },
+          organization: { select: { name: true, paymentTermsDays: true, marketCode: true, vatId: true } },
         },
       },
     },
@@ -247,6 +251,8 @@ export async function loadQuotePdfData(
     quoteNumber: quoteNumberFor(quote.id),
     currency: quote.currency,
     vatPct: Number(quote.vatPct),
+    vatNote: quote.vatNote,
+    customerVatId: quote.vatNote ? (quote.request.organization.vatId ?? null) : null,
     subtotal: Number(quote.subtotal),
     total: Number(quote.total),
     validUntil: quote.validUntil,

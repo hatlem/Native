@@ -101,7 +101,7 @@ export function buildConfirmEmail({
     `${t.footer} ${t.unsubscribe}:`,
     unsubUrl,
   ].join("\n");
-  const html = layout({
+  const html = layout({ lang: locale,
     preheader: t.preheader,
     heading: t.heading,
     body,

@@ -7,7 +7,7 @@ import {
   sendMetricsRequestNow,
 } from "@/app/desk-reporting-actions";
 import { canRequestMetricsNow } from "@/lib/campaign-reporting/status";
-import { SafeEmail, SubmitButton } from "@/components";
+import { SafeEmail, SubmitButton, PendingButton } from "@/components";
 import { safeExternalUrl } from "@/lib/security";
 
 // ---------------------------------------------------------------------------
@@ -289,9 +289,9 @@ export async function CampaignSection({ locale, order, metricsRequests, clicks }
                         await resendMetricsRequest(request.id);
                       }}
                     >
-                      <button type="submit" className="btn small ghost">
+                      <PendingButton className="btn small ghost">
                         {t("resend")}
-                      </button>
+                      </PendingButton>
                     </form>
                   ) : null}
                 </div>

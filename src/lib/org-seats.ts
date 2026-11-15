@@ -33,13 +33,6 @@ const SEAT_SELECT = {
   status: true,
 } as const;
 
-async function orgSeats(organizationId: string): Promise<MembershipRow[]> {
-  return (await prisma.membership.findMany({
-    where: { organizationId },
-    select: SEAT_SELECT,
-  })) as MembershipRow[];
-}
-
 /** Does `userId` hold an active seat in `organizationId` right now? */
 export async function hasActiveSeat(
   userId: string,
@@ -126,12 +119,90 @@ export async function revokeSeat(
   targetUserId: string,
   now: Date = new Date(),
 ): Promise<RevokeResult> {
-  if (wouldRemoveLastAdmin(await orgSeats(organizationId), targetUserId, now)) {
-    return { ok: false, reason: "last_admin" };
-  }
-  await prisma.membership.updateMany({
-    where: { organizationId, userId: targetUserId },
-    data: { status: "REVOKED" },
+  return prisma.$transaction(async (tx) => {
+    await lockOrgSeats(tx, [organizationId]);
+    if (wouldRemoveLastAdmin(await orgSeatsIn(tx, organizationId), targetUserId, now)) {
+      return { ok: false, reason: "last_admin" } as const;
+    }
+    await tx.membership.updateMany({
+      where: { organizationId, userId: targetUserId },
+      data: { status: "REVOKED" },
+    });
+    return { ok: true } as const;
   });
-  return { ok: true };
+}
+
+export type SeatChangeResult = { ok: true } | { ok: false; reason: "last_admin" };
+
+// Change a member's role / commit right. Same lock + re-check as revokeSeat:
+// two admins demoting each other at the same moment must not both pass the
+// "is another admin left?" check and leave the org with none.
+export async function changeSeat(
+  organizationId: string,
+  targetUserId: string,
+  role: MembershipRole,
+  canCommit: boolean,
+  now: Date = new Date(),
+): Promise<SeatChangeResult> {
+  return prisma.$transaction(async (tx) => {
+    await lockOrgSeats(tx, [organizationId]);
+    if (
+      role !== "ADMIN" &&
+      wouldRemoveLastAdmin(await orgSeatsIn(tx, organizationId), targetUserId, now)
+    ) {
+      return { ok: false, reason: "last_admin" } as const;
+    }
+    // Admins are always permanent: clear any expiry when promoting to ADMIN
+    // so the membership can never silently expire and leave the org with
+    // zero active admins.
+    await tx.membership.updateMany({
+      where: { organizationId, userId: targetUserId },
+      data: role === "ADMIN" ? { role, canCommit, expiresAt: null } : { role, canCommit },
+    });
+    return { ok: true } as const;
+  });
+}
+
+export type DeactivateResult = { ok: true } | { ok: false; reason: "last_admin" };
+
+// Self-service deactivation. Refused while the user is the last active admin
+// of any org — checked and written under the same per-org locks as the seat
+// changes above, so it cannot race a concurrent demotion of the other admin.
+export async function deactivateUserUnlessLastAdmin(
+  userId: string,
+  now: Date = new Date(),
+): Promise<DeactivateResult> {
+  return prisma.$transaction(async (tx) => {
+    const mine = await tx.membership.findMany({
+      where: { userId, role: "ADMIN" },
+      select: { organizationId: true },
+    });
+    const orgIds = [...new Set(mine.map((m) => m.organizationId))];
+    await lockOrgSeats(tx, orgIds);
+    for (const orgId of orgIds) {
+      if (wouldRemoveLastAdmin(await orgSeatsIn(tx, orgId), userId, now)) {
+        return { ok: false, reason: "last_admin" } as const;
+      }
+    }
+    await tx.user.update({ where: { id: userId }, data: { deactivatedAt: now } });
+    return { ok: true } as const;
+  });
+}
+
+// Serialize seat changes per organization for the rest of the transaction.
+// Sorted so two transactions locking several orgs can't deadlock.
+async function lockOrgSeats(tx: Prisma.TransactionClient, organizationIds: string[]) {
+  for (const id of [...organizationIds].sort()) {
+    await tx.$executeRaw`SELECT pg_advisory_xact_lock(hashtext(${"org-seats:" + id}))`;
+  }
+}
+
+async function orgSeatsIn(
+  tx: Prisma.TransactionClient,
+  organizationId: string,
+): Promise<MembershipRow[]> {
+  return (await tx.membership.findMany({
+    where: { organizationId },
+    select: SEAT_SELECT,
+  })) as MembershipRow[];
 }

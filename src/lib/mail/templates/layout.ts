@@ -18,6 +18,9 @@ export type LayoutArgs = {
   // unsubscribe, which must be a real link, not a bare URL in the text.
   footerLink?: { label: string; url: string };
   appName: string;
+  // BCP-47 language of the message, set on <html lang> so screen readers
+  // pronounce a Norwegian or Finnish email correctly.
+  lang?: string;
 };
 
 const COLOR_PAGE = "#E4DECB"; // paper-2 — slightly deeper cream behind the card
@@ -48,7 +51,7 @@ export function layout(args: LayoutArgs): string {
     ? ` <a href="${escapeHtml(args.footerLink.url)}" style="color:${COLOR_MUTED};text-decoration:underline;">${escapeHtml(args.footerLink.label)}</a>`
     : "";
   return `<!doctype html>
-<html><head><meta charset="utf-8"><meta name="color-scheme" content="light only"><title>${escapeHtml(args.heading)}</title></head>
+<html${args.lang ? ` lang="${escapeHtml(args.lang)}"` : ""}><head><meta charset="utf-8"><meta name="color-scheme" content="light only"><title>${escapeHtml(args.heading)}</title></head>
 <body style="margin:0;padding:24px;background:${COLOR_PAGE};font-family:-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,sans-serif;color:${COLOR_INK};">
   <span style="display:none;visibility:hidden;opacity:0;height:0;width:0;overflow:hidden;">${escapeHtml(args.preheader)}</span>
   <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%" style="max-width:560px;margin:0 auto;">

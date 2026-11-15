@@ -1,3 +1,4 @@
+import { log } from "@/lib/log";
 import { S3Client, PutObjectCommand, GetObjectCommand } from "@aws-sdk/client-s3";
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 import { randomUUID } from "node:crypto";
@@ -108,7 +109,7 @@ export async function presignUploadResult(
   );
   if (problem) return { ok: false, reason: problem };
   if (!isStorageConfigured()) {
-    console.error("storage.not_configured", { missing: missingStorageEnv(), prefix: args.prefix });
+    log.error("storage.not_configured", { missing: missingStorageEnv(), prefix: args.prefix });
     return { ok: false, reason: "storage-unavailable" };
   }
   const { url, key } = await presignUpload(args);
@@ -155,7 +156,7 @@ export async function presignDownloadOrNull(args: {
   try {
     return await presignDownload(args);
   } catch (error) {
-    console.error("presign_download_failed", args.key, error);
+    log.error("r2.presign_download_failed", { key: args.key, err: error });
     return null;
   }
 }
@@ -188,4 +189,12 @@ export async function putObject(args: {
     }),
   );
   return { key, sizeBytes: args.body.byteLength };
+}
+
+// Server-side read of a stored object's bytes (e.g. an archived invoice PDF
+// served through an authorised route rather than a presigned link).
+export async function getObjectBytes(key: string): Promise<Uint8Array> {
+  const res = await client().send(new GetObjectCommand({ Bucket: bucket(), Key: key }));
+  if (!res.Body) throw new Error(`object_empty:${key}`);
+  return res.Body.transformToByteArray();
 }

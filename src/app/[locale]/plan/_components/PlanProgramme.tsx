@@ -1,3 +1,4 @@
+import { PendingButton } from "@/components/submit-button";
 import { getTranslations } from "next-intl/server";
 import { Repeat } from "lucide-react";
 import { planPath } from "@/lib/plan-path";
@@ -212,9 +213,9 @@ export async function PlanProgramme({
               <form action={unlinkWaveArticleAction}>
                 <input type="hidden" name="locale" value={locale} />
                 <input type="hidden" name="listId" value={listId} />
-                <button type="submit" className="btn small secondary">
+                <PendingButton className="btn small secondary">
                   {t("unlinkArticle")}
-                </button>
+                </PendingButton>
               </form>
             </div>
           ) : (
@@ -233,9 +234,9 @@ export async function PlanProgramme({
                       ))}
                     </select>
                   </label>
-                  <button type="submit" className="btn small secondary">
+                  <PendingButton className="btn small secondary">
                     {tArticles("linkCta")}
-                  </button>
+                  </PendingButton>
                 </form>
               ) : null}
               <form action={createAndLinkWaveArticle} className="plan-programme__angle-row">
@@ -245,9 +246,9 @@ export async function PlanProgramme({
                   <span className="sr-only">{t("anglePlaceholder")}</span>
                   <input type="text" name="title" placeholder={t("anglePlaceholder")} required />
                 </label>
-                <button type="submit" className="btn small secondary">
+                <PendingButton className="btn small secondary">
                   {t("createArticleForWave")}
-                </button>
+                </PendingButton>
               </form>
             </div>
           )}
@@ -265,9 +266,9 @@ export async function PlanProgramme({
           <form action={dissolveProgramme}>
             <input type="hidden" name="locale" value={locale} />
             <input type="hidden" name="listId" value={listId} />
-            <button type="submit" className="btn small secondary">
+            <PendingButton className="btn small secondary">
               {t("dissolveConfirm")}
-            </button>
+            </PendingButton>
           </form>
         </div>
       </details>

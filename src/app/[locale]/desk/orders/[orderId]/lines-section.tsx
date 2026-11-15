@@ -11,7 +11,7 @@ import { writerStaffableLine } from "@/lib/authorship";
 import { StatusBadge } from "@/app/status-badge";
 import { pickPlaybook } from "@/lib/playbook";
 import { PlaybookCard } from "@/components/playbook-card";
-import { SubmitButton } from "@/components";
+import { SubmitButton, PendingButton } from "@/components";
 import { nextAssetStatuses } from "@/lib/content/versions";
 import { lineBrief } from "@/lib/writers/line-brief";
 import { isPlacementLine } from "@/lib/commerce/placements";
@@ -233,9 +233,9 @@ export async function LinesSection({
                       name="placementId"
                       value={line.articlePlacement?.id ?? ""}
                     />
-                    <button type="submit" className="btn small secondary">
+                    <PendingButton className="btn small secondary">
                       {tp("specCheck")}
-                    </button>
+                    </PendingButton>
                   </form>
                   {/* Only the steps forward from the version's status
                       (versions.ts nextAssetStatuses): an approved article
@@ -254,9 +254,9 @@ export async function LinesSection({
                       <input type="hidden" name="locale" value={locale} />
                       <input type="hidden" name="assetId" value={latest.id} />
                       <input type="hidden" name="target" value={target} />
-                      <button type="submit" className="btn small ghost">
+                      <PendingButton className="btn small ghost">
                         {label}
-                      </button>
+                      </PendingButton>
                     </form>
                   ))}
                 </div>
@@ -287,9 +287,9 @@ export async function LinesSection({
                     />
                   </div>
                   <div className="actions">
-                    <button type="submit" className="btn small">
+                    <PendingButton className="btn small">
                       {tp("saveDraft")}
-                    </button>
+                    </PendingButton>
                   </div>
                 </form>
               </details>

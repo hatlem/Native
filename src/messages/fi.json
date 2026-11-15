@@ -1,4 +1,63 @@
 {
+  "mfa": {
+    "stepTitle": "Kaksivaiheinen vahvistus",
+    "stepHeadline": "Vielä yksi vaihe.",
+    "stepLead": "Tilisi on suojattu kaksivaiheisella tunnistautumisella. Viimeistele kirjautuminen antamalla todennussovelluksen koodi.",
+    "stepSubtitle": "Salasana hyväksytty. Anna nyt kuusinumeroinen koodi.",
+    "stepSubtitleMagic": "Sähköpostilinkki hyväksytty. Anna nyt kuusinumeroinen koodi.",
+    "codeLabel": "Todennuskoodi",
+    "codeHint": "Kadotitko puhelimen? Anna sen sijaan jokin palautuskoodeistasi.",
+    "verify": "Vahvista ja kirjaudu",
+    "verifying": "Vahvistetaan…",
+    "cancel": "Takaisin kirjautumiseen",
+    "errorInvalid": "Koodi ei täsmää. Tarkista todennussovellus ja yritä uudelleen.",
+    "errorReplay": "Koodi on jo käytetty. Odota seuraavaa koodia ja yritä uudelleen.",
+    "errorRate": "Liian monta yritystä. Odota muutama minuutti ja yritä uudelleen.",
+    "errorPassword": "Salasana ei täsmää.",
+    "sessionExpired": "Kirjautuminen vanheni ennen toista vaihetta. Kirjaudu uudelleen.",
+    "pageTitle": "Kaksivaiheinen tunnistautuminen",
+    "eyebrow": "Turvallisuus",
+    "lead": "Lisää kirjautumiseen toinen vaihe: puhelimen todennussovelluksen koodi salasanan tai sähköpostilinkin lisäksi.",
+    "requiredBanner": "Roolisi edellyttää kaksivaiheista tunnistautumista. Ota se käyttöön jatkaaksesi deskiin.",
+    "noticeDisabled": "Kaksivaiheinen tunnistautuminen on nyt pois käytöstä.",
+    "noticeRecoveryUsed": "Kirjauduit palautuskoodilla. Jos olet kadottanut puhelimesi, poista kaksivaiheinen tunnistautuminen käytöstä ja ota se uudelleen käyttöön uudessa laitteessa.",
+    "codeOrRecoveryLabel": "Todennus- tai palautuskoodi",
+    "passwordLabel": "Salasana",
+    "working": "Käsitellään…",
+    "recoveryTitle": "Tallenna palautuskoodisi",
+    "recoveryLead": "Jokainen koodi toimii kerran, jos et voi käyttää puhelintasi. Säilytä ne turvallisessa paikassa. Niitä ei näytetä uudelleen.",
+    "recoveryDone": "Olen tallentanut ne",
+    "statusEyebrow": "Tila",
+    "statusOn": "Kaksivaiheinen tunnistautuminen on käytössä",
+    "statusOff": "Kaksivaiheinen tunnistautuminen ei ole käytössä",
+    "enabledSince": "Otettu käyttöön {date}.",
+    "recoveryLeft": "Käyttämättömiä palautuskoodeja: {count}",
+    "recoveryEyebrow": "Palautus",
+    "regenerateTitle": "Uudet palautuskoodit",
+    "regenerateLead": "Luo uusi sarja antamalla voimassa oleva koodi. Vanhat koodit lakkaavat toimimasta.",
+    "regenerate": "Luo uudet koodit",
+    "disableEyebrow": "Poista käytöstä",
+    "disableTitle": "Poista kaksivaiheinen tunnistautuminen käytöstä",
+    "disableLead": "Vahvista salasanalla tai voimassa olevalla koodilla. Muut laitteesi kirjataan ulos.",
+    "disableLeadStaff": "Vahvista salasanalla tai voimassa olevalla koodilla. Roolisi edellyttää kaksivaiheista tunnistautumista, joten se on otettava uudelleen käyttöön ennen deskin käyttöä.",
+    "disableCodeHint": "Jätä salasana tyhjäksi, jos haluat vahvistaa koodilla.",
+    "disable": "Poista käytöstä",
+    "setupTitle": "Määritä todennussovellus",
+    "step1": "Avaa todennussovellus (Google Authenticator, Microsoft Authenticator, 1Password, Authy) ja lisää uusi tili.",
+    "step2": "Kirjoita tämä määritysavain tai avaa linkki puhelimessa, jossa sovellus on.",
+    "step3": "Vahvista antamalla sovelluksen näyttämä kuusinumeroinen koodi.",
+    "setupKeyLabel": "Määritysavain",
+    "openInApp": "Avaa todennussovelluksessa",
+    "confirm": "Ota käyttöön",
+    "cancelSetup": "Peruuta määritys",
+    "offBody": "Kun kaksivaiheinen tunnistautuminen on käytössä, kirjautumiseen tarvitaan salasana tai sähköpostilinkki sekä kuusinumeroinen koodi puhelimen sovelluksesta. Varastettu salasana ei enää yksin riitä.",
+    "setupButton": "Määritä todennussovellus",
+    "backToAccount": "Takaisin tilin asetuksiin",
+    "accountSectionTitle": "Kaksivaiheinen tunnistautuminen",
+    "accountSectionBodyOn": "Käytössä. Kirjautumiseen tarvitaan todennussovelluksen koodi.",
+    "accountSectionBodyOff": "Ei käytössä. Lisää kirjautumiseen toiseksi vaiheeksi todennussovelluksen koodi.",
+    "manage": "Hallitse kaksivaiheista tunnistautumista"
+  },
   "common": {
     "appName": "NativeSpin",
     "feedback": {
@@ -14,6 +73,17 @@
       "sendFailed": "Lähetys epäonnistui. Yritä uudelleen?",
       "enterFeedback": "Kirjoita ensin jotain.",
       "close": "Sulje"
+    },
+    "a11y": {
+      "primaryNav": "Päävalikko",
+      "menu": "Valikko",
+      "mobileNav": "Mobiilivalikko",
+      "breadcrumb": "Murupolku",
+      "language": "Kieli"
+    },
+    "confirm": {
+      "yes": "Kyllä, vahvista",
+      "cancel": "Peruuta"
     }
   },
   "nav": {
@@ -64,9 +134,15 @@
     "campaigns": "Kampanjat",
     "rates": "Hinnat",
     "users": "Käyttäjät",
+    "audit": "Tapahtumaloki",
     "invoices": "Laskut",
     "orgSwitcherLabel": "Organisaatio",
-    "orgSwitchTo": "Vaihda organisaatioon {org}"
+    "orgSwitchTo": "Vaihda organisaatioon {org}",
+    "help": "Ohje",
+    "paletteOrders": "Tilaukset",
+    "paletteRequests": "Pyynnöt",
+    "paletteTitles": "Nimikkeet",
+    "paletteSearching": "Haetaan…"
   },
   "orders": {
     "eyebrow": "Tilaukset",
@@ -1047,9 +1123,31 @@
     "metaPlanAlternativesOnly": "Ei vielä sijoitteluja · {alternatives, plural, one {# vaihtoehto} other {# vaihtoehtoa}} · muokattu {age}",
     "actionContinuePlan": "Jatka suunnittelua",
     "qualifierAwaitingTeam": "odottaa tilausoikeudellista henkilöä",
-    "actionSeeQuote": "Näytä tarjous"
+    "actionSeeQuote": "Näytä tarjous",
+    "selfService": {
+      "heading": "Ettekö jatka eteenpäin?",
+      "lead": "Voit hylätä tarjouksen tai perua koko pyynnön tässä. Mitään ei veloiteta, ja voit lähettää uuden pyynnön milloin tahansa.",
+      "declineOpen": "Hylkää {currency}-tarjous",
+      "declineSubmit": "Hylkää tarjous",
+      "withdrawOpen": "Peru tämä pyyntö",
+      "withdrawSubmit": "Peru pyyntö",
+      "reasonLabel": "Miksi? (valinnainen – se auttaa meitä parantamaan)",
+      "pending": "Lähetetään…",
+      "needsOrderingRights": "Tarjouksen hylkääminen edellyttää tilausoikeuksia organisaatiossasi.",
+      "withdrawnBanner": "Peruit tämän pyynnön {date}.",
+      "noticeQuoteDeclined": "Tarjous on hylätty. Olemme ilmoittaneet deskille.",
+      "noticeRequestWithdrawn": "Pyyntö on peruttu. Olemme ilmoittaneet deskille.",
+      "noticeUnavailable": "Se ei ole enää mahdollista – pyyntö on muuttunut sivun avaamisen jälkeen.",
+      "noticeNotAllowed": "Käyttöoikeutesi ei salli tätä. Kysy organisaatiosi ylläpitäjältä.",
+      "deskDeclined": "Asiakas hylkäsi {date}.",
+      "deskWithdrawn": "Asiakas perui {date}.",
+      "deskReason": "Syy: {reason}"
+    }
   },
   "desk": {
+    "vatWarnCountryUnknown": "Asiakkaalle ei ole tallennettu kotimaata, joten tarjoukseen lisättiin Norjan arvonlisävero ({pct} %). Jos asiakas on sijoittautunut Norjan ulkopuolelle, aseta organisaation markkina ja luo tarjous uudelleen ennen lähettämistä.",
+    "vatWarnVatIdMissing": "Käännetty verovelvollisuus on voimassa (ei Norjan arvonlisäveroa), mutta asiakkaalta puuttuu ALV-tunnus. Lisää se ennen lähettämistä – laskussa se on ilmoitettava.",
+    "vatReverseCharge": "Käännetty verovelvollisuus – ei Norjan arvonlisäveroa",
     "eyebrow": "Sisäinen desk",
     "title": "Desk-konsoli",
     "subtitle": "Mikä tarvitsee huomiotasi tänään — uudet briefit, liikkuvat tarjoukset ja live-tilaukset.",
@@ -1184,7 +1282,23 @@
     "quoteLocked": "Tarjous on lähetetty, joten sen rivit on lukittu. Päivitä tarjous muuttaaksesi hintoja tai huomautuksia.",
     "quoteNotRevisable": "Tarjousta ei voi päivittää: se on hyväksytty tai suljettu.",
     "revisionPredecessorClosed": "Ei lähetetty: tarjous, jonka tämä versio korvaisi, ei ole enää avoinna – asiakas on ehkä juuri hyväksynyt sen. Hylkää versio.",
-    "sendRevisionNote": "Lähettäminen korvaa aiemman tarjouksen: asiakas ei voi enää hyväksyä sitä ja saa yhden ilmoituksen uudesta kokonaissummasta."
+    "sendRevisionNote": "Lähettäminen korvaa aiemman tarjouksen: asiakas ei voi enää hyväksyä sitä ja saa yhden ilmoituksen uudesta kokonaissummasta.",
+    "requestsTitle": "Kaikki pyynnöt",
+    "requestsLead": "Kaikki jonon pyynnöt. Suodata tilan mukaan tai hae organisaation nimellä.",
+    "requestsSearchLabel": "Hae organisaatiota tai briiffiä",
+    "requestsSearchButton": "Hae",
+    "requestsStatusLabel": "Tila",
+    "requestsStatusAll": "Kaikki tilat",
+    "requestsStatusOpen": "Avoimet (vaatii deskiä)",
+    "requestsEmpty": "Yksikään pyyntö ei vastaa suodatinta.",
+    "requestsCount": "{count, plural, one {# pyyntö} other {# pyyntöä}}",
+    "requestsColUpdated": "Päivitetty",
+    "requestsColQuotes": "Tarjoukset",
+    "requestsPrev": "Edellinen",
+    "requestsNext": "Seuraava",
+    "requestsPageOf": "Sivu {page}/{pages}",
+    "requestsViewAll": "Näytä kaikki pyynnöt",
+    "requestsPaginationLabel": "Sivutus"
   },
   "deskTitles": {
     "eyebrow": "Pääkäyttäjä · julkaisut",
@@ -1435,7 +1549,9 @@
     "checkSignupLead": "Lähetimme linkin antamaasi osoitteeseen. Avaa se vahvistaaksesi osoitteen ja kirjautuaksesi; linkki vanhenee 15 minuutissa. Jos osoitteella oli jo tili, viestissä kerrotaan, miten pääset takaisin sisään.",
     "regEmailTypoQuestion": "Tarkoititko <b>{email}</b>?",
     "regEmailTypoUse": "Käytä osoitetta {email}",
-    "regEmailTypoKeep": "Jos {domain} on oikein, paina Luo tili uudelleen."
+    "regEmailTypoKeep": "Jos {domain} on oikein, paina Luo tili uudelleen.",
+    "regOrgRequired": "Anna yrityksen tai organisaation nimi.",
+    "regEmailRequired": "Anna työsähköpostiosoitteesi."
   },
   "order": {
     "title": "Tilaus",
@@ -1529,6 +1645,34 @@
       "SUPERADMIN": "NativeSpin (ylläpitäjä)",
       "PUBLISHER": "Julkaisija",
       "BUYER": "Asiakas"
+    },
+    "cancelRequest": {
+      "heading": "Pitääkö tilaus peruuttaa?",
+      "lead": "Kerro syy, niin desk tarkistaa varaukset julkaisijoilta ja palaa asiaan. Jo varatuista tai julkaistuista sijoitteluista voi aiheutua peruutuskuluja – vahvistamme ennen kuin mikään on lopullista.",
+      "open": "Pyydä peruutusta",
+      "reasonLabel": "Peruutuksen syy",
+      "submit": "Lähetä peruutuspyyntö",
+      "pending": "Lähetetään…",
+      "requested": "Peruutusta pyydettiin {date}. Desk palaa asiaan – tilaus pysyy voimassa, kunnes he vahvistavat.",
+      "noticeRequested": "Peruutuspyyntösi on lähetetty deskille.",
+      "noticeReasonRequired": "Anna syy, jotta desk voi toimia.",
+      "noticeUnavailable": "Tätä tilausta ei voi enää peruuttaa täältä.",
+      "noticeNotAllowed": "Peruutuksen pyytäminen edellyttää tilausoikeuksia organisaatiossasi.",
+      "deskBanner": "Asiakas pyysi tämän tilauksen peruuttamista {date}.",
+      "deskReason": "Syy: {reason}"
+    },
+    "csat": {
+      "heading": "Miten tämä kampanja sujui?",
+      "question": "Kuinka tyytyväinen olet NativeSpiniin tässä tilauksessa?",
+      "scale": "{score}/5",
+      "low": "En tyytyväinen",
+      "high": "Erittäin tyytyväinen",
+      "commentLabel": "Onko jotain, mitä meidän pitäisi tietää? (valinnainen)",
+      "submit": "Lähetä palaute",
+      "pending": "Lähetetään…",
+      "thanks": "Kiitos – annoit tälle tilaukselle arvosanan {score}/5.",
+      "deskHeading": "Asiakaspalaute",
+      "deskScore": "Tyytyväisyys: {score}/5"
     }
   },
   "production": {
@@ -1562,6 +1706,7 @@
     "vetoSharedWarning": "Tämä artikkeli on käytössä myös {count} muussa sijoittelussa — tämä peruutus ei vaikuta niihin."
   },
   "invoice": {
+    "vatNoteHeading": "ALV-huomautus",
     "title": "Lasku",
     "eyebrow": "Lasku",
     "status": "Tila",
@@ -1838,7 +1983,14 @@
     "footerSolutions": "Ratkaisut",
     "footerCompany": "Yritys",
     "footerAbout": "Tietoa",
-    "footerContact": "Yhteys"
+    "footerContact": "Yhteys",
+    "footerHelp": "Ohje",
+    "footerChangelog": "Uutta",
+    "footerLegal": "Juridiset tiedot",
+    "footerPrivacy": "Tietosuoja",
+    "footerTerms": "Ehdot",
+    "footerSecurity": "Tietoturva",
+    "footerSubprocessors": "Alikäsittelijät"
   },
   "advertisers": {
     "eyebrow": "Mainostajille",
@@ -2337,149 +2489,6 @@
     "contactTitle": "Lakiasiat",
     "contactBody": "Kysymyksiä näistä ehdoista — kirjoita osoitteeseen"
   },
-  "landing": {
-    "hero": {
-      "labelText": "NativeSpin · Natiivimarkkinapaikka",
-      "pain": "Suurinta osaa premium-natiivista ei myydä ohjelmallisesti. Sitä myydään puhelimessa, PDF-hinnastolla ja neljän viikon edestakaisin viestittelyllä. <strong>Korvaamme sen yhdellä briefillä ja 24 tunnin kiinteällä tarjouksella.</strong>",
-      "h1Line1": "Yksi brief.",
-      "h1Line2": "3 000+ julkaisua.",
-      "h1Line3": "Kiinteä tarjous 24 tunnissa.",
-      "ctaPrimary": "Lähetä brief",
-      "ctaSecondary": "Näin se toimii",
-      "ctaMeta": "Ei puhelua tarvita. Vastaamme kirjallisesti, todistettavasti.",
-      "sideAria": "Miksi natiivi",
-      "sideBody": "Sponsoroidut artikkelit voittavat display-mainonnan johdonmukaisesti huomion ja bränditarjouksen mittareilla. Maksa siitä, minkä julkaiset, ei siitä mikä estetään."
-    },
-    "why": {
-      "labelText": "Miksi natiivi",
-      "h2": "Natiivi tekee työn, johon display ei pysty.",
-      "lead": "Display ostaa näyttöjä reunoilta. Natiivi ostaa toimituksellista aikaa itse artikkelin sisältä. Eri paikka, eri lukijakäyttäytyminen, eri tulos.",
-      "colAIx": "I.",
-      "colAH3": "Huomio, jota ei voi adblokata",
-      "colABody": "Sponsoroitu artikkeli asuu siellä missä lukija jo kiinnittää huomiota. <strong>Ei bannerisokeutta, ei ohitusnappia</strong> — yksikkö on sisältö.",
-      "colAPull": "<strong>3–5×</strong> viipymäaika vrt. verrannolliseen displayhin",
-      "colBIx": "II.",
-      "colBH3": "Luottamus siirtyy julkaisulta",
-      "colBBody": "Kun lukija näkee tarinasi luottamansa julkaisun alla, osa siitä luottamuksesta siirtyy. <strong>Ilmoitus pysyy selvänä</strong> — uskottavuus tulee toimituksellisesta kehyksestä.",
-      "colBPull": "<strong>+18 prosenttiyksikköä</strong> bränditarjouksen nousu (toimialan keskiarvo)",
-      "colCIx": "III.",
-      "colCH3": "Pitkäikäisyys kampanjan jälkeen",
-      "colCBody": "Julkaistu artikkeli kerää näyttöjä ja hakukoneliikennettä kampanjan päätyttyäkin. <strong>Display katoaa heti, kun lopetat maksamisen.</strong>",
-      "colCPull": "Asuu kustantajan domainilla. Indeksoitu. Pysyvä."
-    },
-    "vs": {
-      "labelText": "Natiivi vs display",
-      "h2": "Sama budjetti. Hyvin erilainen lopputulos.",
-      "thNative": "Natiivi (sponsoroitu artikkeli)",
-      "thDisplay": "Display-banneri",
-      "primaryJobSpec": "Päätehtävä",
-      "primaryJobNative": "Kerro tarina, jonka lukija halusi lukea",
-      "primaryJobDisplay": "Keskeytä ja ohjaa sivustollesi",
-      "readerBehaviourSpec": "Lukijan käyttäytyminen",
-      "readerBehaviourNative": "Lukee. Selaa. Viipyy.",
-      "readerBehaviourDisplay": "Selaa ohi. Adblokkaa. Unohtaa.",
-      "realEstateSpec": "Sijoituspaikka",
-      "realEstateNative": "Toimituksellisen virran sisällä",
-      "realEstateDisplay": "Reunoilla, otsikon yläpuolella, kappaleiden välissä",
-      "trustTransferSpec": "Luottamuksen siirto",
-      "trustTransferNative": "Lainattu julkaisulta",
-      "trustTransferDisplay": "Ei mitään — lukijat tietävät sen mainokseksi",
-      "longevitySpec": "Pitkäikäisyys",
-      "longevityNative": "Indeksoitu, haettavissa, pysyvä",
-      "longevityDisplay": "Katoaa kampanjan päättyessä",
-      "bestFitSpec": "Sopivin tarkoitus",
-      "bestFitNative": "Harkittu osto, B2B, brändin rakentaminen",
-      "bestFitDisplay": "Performance-retargetointi, yksinkertaiset tarjoukset"
-    },
-    "rule": {
-      "labelIx": "Kultainen sääntö",
-      "h2": "Jos se ei ole lukijalle hyödyllistä, se ei ole natiivia — se on tiedote naamioituna.",
-      "body": "Jokaisen toimittamamme artikkelin pitää ansaita lukijan aika itse. <strong>Toimitukselliset standardit, kustantajan spesifikaatio, markkinan ilmoitusmerkintä</strong> — ei neuvoteltavissa. Näin luottamuksen siirto todella toimii.",
-      "sig": "— NativeSpin-desk"
-    },
-    "pubs": {
-      "labelText": "Kustantajat",
-      "meta": "{publishers, number}+ kustantajaa · {titles, number}+ luetteloitua julkaisua · {active, number} vahvistettu pikatilaukseen",
-      "foot": "Tämä on vain pieni siivu katalogista.",
-      "footMore": "Kerro mitä etsit"
-    },
-    "catalog": {
-      "labelText": "Maistiainen katalogista",
-      "h2": "Live-julkaisuja, suuntaa-antava hinnoittelu.",
-      "ask": "Pyydä koko lista",
-      "thTitle": "Julkaisu",
-      "thPublisher": "Kategoria",
-      "thMarket": "Markkina",
-      "thFormat": "Formaatti",
-      "thAudience": "Tavoittavuus",
-      "thFrom": "Alkaen",
-      "fmtNativeArticle": "Natiiviartikkeli",
-      "fmtSponsoredArticle": "Sponsoroitu artikkeli",
-      "fmtSponsoredContent": "Sponsoroitu sisältö",
-      "fmtSponsoredArticleAds": "Artikkeli + vahvistus",
-      "readersSuffix": "lukijaa/kk",
-      "footBody": "Suuntaa-antavat hinnat. Desk vahvistaa kiinteän hinnan saatavuuden, kauden ja volyymin perusteella.",
-      "footInd": "Suuntaa-antava · ilman ALV"
-    },
-    "stats": {
-      "v240Label": "Luetteloitua julkaisua",
-      "v240Sub": "NO · SE · DK · FI · DE · AT · CH · UK · IE",
-      "v12Label": "Kustantajaa verkostossa",
-      "v12Sub": "Päivälehdet, aikakauslehdet, niche-julkaisut",
-      "v24Unit": "h",
-      "v24Label": "Kiinteä tarjous",
-      "v24Sub": "Keskimääräinen deskin toimitusaika",
-      "v3Label": "Katettua markkinaa",
-      "v3Sub": "NO, SE, DK, FI, DE, AT, CH, UK, IE"
-    },
-    "how": {
-      "labelText": "Näin se toimii",
-      "h2": "Kolme askelta. Suurin osa työstä on meidän puolellamme.",
-      "s1Num": "01",
-      "s1H3": "Lähetä brief",
-      "s1Body": "Kohdemarkkina, budjetti, yleisö, lause tavoitteesta. Sillä desk pääsee jo alkuun. Esitystä ei tarvita.",
-      "s1Time": "5 minuuttia",
-      "s2Num": "02",
-      "s2H3": "Kiinteä tarjous 24 tunnissa",
-      "s2Body": "Palaamme julkaisujen lyhytlistalla, kiinteällä hinnoittelulla per kustantaja, sisällöntuotannon laajuudella ja julkaisupäivällä. Kirjallisesti, ei puhelimessa.",
-      "s2Time": "Arkipäivän sisällä",
-      "s3Num": "03",
-      "s3H3": "Me julkaisemme, sinä tarkastat",
-      "s3Body": "Kirjoitamme artikkelin julkaisun spesifikaation mukaan, ajamme spesifikaatiotarkistuksen, annamme luonnoksen hyväksyttäväksi, ja sitten kustantaja julkaisee. Saat live-URL:n ja laskun.",
-      "s3Time": "10–25 päivää, riippuen julkaisusta"
-    },
-    "obj": {
-      "h2": "Mitä ihmiset kysyvät ennen kuin briiffaavat meitä.",
-      "q1": "Miksei vain ostaa displayta? Se on halvempi.",
-      "a1": "Per näyttö kyllä. Per <strong>huomiosekunti</strong>, natiivi voittaa selvällä erolla. Jos rakennat harkintaa, yksikköhinta ei ratkaise.",
-      "q2": "Natiivi tuntuu hitaalta. Tarvitsemme tämän markkinoille ensi viikolla.",
-      "a2": "Useimmat julkaisut julkaisevat 10–25 päivän kuluttua briefistä. Osa saman viikon aikana. 24 tunnin kiinteä tarjous kertoo täsmälleen milloin, per julkaisu, ennen sitoutumista.",
-      "q3": "Meillä ei ole operatiivista kapasiteettia natiiviin.",
-      "a3": "<strong>Juuri sitä varten desk on olemassa.</strong> Brief sisään, valmis artikkeli ja live-sijoittelu ulos. Tiimimme hoitaa kustantajaneuvottelut, sisällöntuotannon, spesifikaatiotarkistuksen ja laskutuksen.",
-      "q4": "Miten mittaamme sitä?",
-      "a4": "Seuraamme klikkauksia jokaisesta artikkelisi linkistä — ensimmäisen osapuolen mittauksena. Tavoittavuuden (näytöt) raportoi julkaisija silloin kun se on saatavilla. Emme lupaa viewabilitya tai paneeliin perustuvaa brand liftiä, jota emme voi mitata.",
-      "q5": "Entä brändin turvallisuus ja ilmoittaminen?",
-      "a5": "Ilmoitus on koodattu per markkina (<strong>Annonsørinnhold / Annons / Annonce / Mainos / Werbung</strong>) ja sovelletaan automaattisesti. Spesifikaatiotarkistus on läpäistävä ennen kuin mikään päätyy kustantajalle."
-    },
-    "endCta": {
-      "h2": "Lähetä meille brief.",
-      "body": "Yksi kappale riittää. Palaamme kirjallisesti kiinteällä tarjouksella 24 tunnin sisällä.",
-      "ctaPrimary": "Lähetä deskille sähköpostia",
-      "ctaSecondary": "Luo tili",
-      "qualPrefix": "Tai olet kustantaja ja haluat päästä listalle —",
-      "qualLink": "ota yhteyttä"
-    },
-    "foot": {
-      "tagline": "Natiivisisältöä ja natiivimainontaa jokaisesta julkaisusta, jonka katamme markkinoilla NO, SE, DK, FI, DE, AT, CH, UK ja IE — ja kasvava katalogi.",
-      "copy": "Getia AS · Oslo",
-      "navAdv": "Mainostajille",
-      "navAgy": "Toimistoille",
-      "navPub": "Kustantajille",
-      "navAbout": "Tietoa",
-      "navContact": "Yhteystiedot",
-      "navCreativeSpecs": "Mainosmääritykset"
-    }
-  },
   "apiDocs": {
     "metaTitle": "API",
     "eyebrow": "Kehittäjät",
@@ -2558,6 +2567,9 @@
     "scope_catalog_write": "ladata kustantajan omat julkaisut ja tuotteet",
     "scope_orders_write": "tehdä sitovia tilauksia organisaation puolesta",
     "scope_pricing_admin": "sisäiset hinnoittelutyökalut (MCP) — vain alusta",
+    "scope_pricing_read": "MCP: vain deskin hintatietojen luku",
+    "scope_pricing_draft": "MCP: luku + luonnosten kirjaus (yhteyshenkilöt, tarjousluonnokset, lähettämättömät hintapyynnöt)",
+    "scope_pricing_apply": "MCP: luonnokset + tarjousten vienti voimassa oleviin hintoihin ja sähköpostin lähetys",
     "boundPublisher": "{name} (kustantaja)",
     "bindingPlatformGroup": "Alusta",
     "bindingSearchPlaceholder": "Hae organisaatiota tai kustantajaa nimellä, markkinalla tai julkaisulla",
@@ -2663,7 +2675,11 @@
     "priceUnconfirmed": "hintaa ei vahvistettu",
     "productInactive": "ei käytössä",
     "inviteLanguageLabel": "Sähköpostin kieli",
-    "inviteLanguageHint": "Kutsu, rekisteröitymissivu ja portaalitili ovat tällä kielellä. Oletuksena julkaisun markkinan kieli."
+    "inviteLanguageHint": "Kutsu, rekisteröitymissivu ja portaalitili ovat tällä kielellä. Oletuksena julkaisun markkinan kieli.",
+    "aliasLabel": "Hakualiakset",
+    "aliasHint": "Pilkuilla eroteltuna. Brändinimet ja vaihtoehtoiset nimet, joihin kataloghaun pitää osua. Haku poistaa pisteet, joten lisää myös pisteetön muoto (esim. ”ATno” nimelle ”AT.no”).",
+    "aliasSave": "Tallenna aliakset",
+    "aliasSaving": "Tallennetaan…"
   },
   "salesContacts": {
     "title": "Myyntiyhteystiedot",
@@ -2867,7 +2883,9 @@
     "callSkip": "Ohita toistaiseksi →",
     "marketBlocked": "Organisaatiolla {org} ei ole vielä laskutusmarkkinaa. Organisaation {org} ylläpitäjän on valittava se Tili-sivulla ennen kuin tiimi voi lähettää tarjouspyyntöjä.",
     "blockedTitle": "Organisaation {org} laskutusta ei ole vielä määritetty",
-    "blockedBack": "Takaisin suunnitelmaan"
+    "blockedBack": "Takaisin suunnitelmaan",
+    "marketError": "Valitse markkina, jossa yritystäsi laskutetaan.",
+    "phoneError": "Anna puhelinnumero, jossa on vähintään 6 numeroa."
   },
   "account": {
     "eyebrow": "Tili",
@@ -2977,6 +2995,8 @@
     "deactivateHint": "Tili lakkaa toimimasta välittömästi — kaikki kirjautumistavat estetään. Allekirjoittamasi tilaukset, tarjoukset ja laskut säilytetään, koska ne ovat kirjanpitoaineistoa. Pääkäyttäjä voi ottaa tilin uudelleen käyttöön, jos palaat.",
     "deactivateConfirmLabel": "Kirjoita sähköpostiosoitteesi vahvistaaksesi",
     "deactivateButton": "Poista tilini käytöstä",
+    "eraseDataLabel": "Poista myös henkilötietoni",
+    "eraseDataHint": "Nimesi, sähköpostiosoitteesi, puhelinnumerosi, kirjautumistietosi ja saapuneet-kansiosi poistetaan, ja sinut poistetaan organisaatioistasi. Tätä ei voi perua, ei edes pääkäyttäjä. Tilaukset, tarjoukset ja laskut säilyvät ilman henkilötietojasi.",
     "deactivating": "Poistetaan käytöstä…",
     "errDelegation": "Delegoinnin päättymispäivä ei ole kelvollinen päivämäärä.",
     "errDelegationPast": "Delegoinnin päättymispäivän on oltava tulevaisuudessa.",
@@ -2984,7 +3004,35 @@
     "statusRevoked": "Poistettu",
     "errEmailDomain": "Verkkotunnukselle ei löydy sähköpostipalvelinta. Tarkista osoite kirjoitusvirheiden varalta.",
     "roleHelp": "Ylläpitäjät hallitsevat tiimiä ja voivat tehdä kaiken. Jäsenet kokoavat suunnitelmia, lähettävät tarjouspyyntöjä ja – tilausoikeudella – hyväksyvät tarjouksia. Rajoitettu on pelkkä lukuoikeus: näkee tiimin suunnitelmat, pyynnöt, tarjoukset, tilaukset, raportit, artikkelit ja laskut, mutta ei voi muuttaa, lähettää, hyväksyä tai jakaa mitään.",
-    "canCommitRestrictedNote": "Rajoitetut käyttäjät voivat vain lukea, eikä heille voi antaa tilausoikeutta."
+    "canCommitRestrictedNote": "Rajoitetut käyttäjät voivat vain lukea, eikä heille voi antaa tilausoikeutta.",
+    "notifications": {
+      "eyebrow": "Ilmoitukset",
+      "title": "Sähköposti-ilmoitukset",
+      "lead": "Valitse, mitkä ilmoitukset lähetämme myös sähköpostitse. Kaikki näkyy aina NativeSpinin saapuneissa.",
+      "save": "Tallenna asetukset",
+      "saving": "Tallennetaan…",
+      "saved": "Ilmoitusasetuksesi on tallennettu.",
+      "quotes": {
+        "label": "Pyynnöt ja tarjoukset",
+        "hint": "Tarjous on valmis, hyväksytty, hylätty tai uusittava."
+      },
+      "orders": {
+        "label": "Tilaukset ja varaukset",
+        "hint": "Tilaus on vahvistettu, valmis tai peruttu."
+      },
+      "content": {
+        "label": "Sisältö ja tarkistukset",
+        "hint": "Luonnos odottaa tarkistustasi tai julkaisija on palauttanut sen."
+      },
+      "billing": {
+        "label": "Laskut",
+        "hint": "Uusi lasku on laadittu."
+      },
+      "planning": {
+        "label": "Suunnittelupäivitykset",
+        "hint": "Desk ehdotti sijoittelua, nimike sai hinnan tai asiakas hyväksyi jaetun suunnitelman."
+      }
+    }
   },
   "rateCard": {
     "pageTitle": "Rate card -pyyntö",
@@ -3305,6 +3353,8 @@
     "resultsAlsoConsider": "Myös harkitsemisen arvoisia",
     "resultsEmpty": "Ei osumia vielä – kokeile laajempaa briiffiä tai toista markkinaa.",
     "whyFits": "Miksi tämä sopii:",
+    "aiWritten": "Tekoäly",
+    "aiWrittenHint": "Tämän perustelun on kirjoittanut tekoäly julkaisun luettelotietojen pohjalta. Tarkista se julkaisusta ennen kuin luotat siihen.",
     "reach": "tavoittavuus/kk",
     "addToShortlist": "Lisää valintoihin",
     "titlePlaceholder": "Julkaisu · desk hinnoittelee",
@@ -3422,6 +3472,7 @@
     }
   },
   "quotePdf": {
+    "customerVatId": "Asiakkaan ALV-tunnus: {vatId}",
     "documentTitle": "Tarjous {quoteNumber}",
     "quoteNumber": "Tarjousnumero",
     "revision": "Versio",
@@ -3456,6 +3507,30 @@
     "extraWork": "Lisätyö / korjaus",
     "inclArticle": "Sis. NativeSpinin kirjoittaman artikkelin · alkaen {amount}",
     "extraWorkDetail": "{hours} h × {rate}/h"
+  },
+  "deskAudit": {
+    "eyebrow": "Admin",
+    "title": "Tapahtumaloki",
+    "lead": "Kuka teki mitä, mille tietueelle ja milloin. Suodata henkilön, toiminnon tai organisaation mukaan.",
+    "filterActor": "Tekijä",
+    "filterActorPlaceholder": "Käyttäjätunniste tai ”system”",
+    "filterAction": "Toiminto",
+    "filterActionPlaceholder": "esim. invoice.issue tai auth.",
+    "filterOrg": "Organisaation tunniste",
+    "filterButton": "Suodata",
+    "clear": "Tyhjennä",
+    "colWhen": "Milloin",
+    "colActor": "Tekijä",
+    "colAction": "Toiminto",
+    "colEntity": "Tietue",
+    "colOrg": "Organisaatio",
+    "colDetail": "Tiedot",
+    "resultCount": "{count, plural, =0 {Ei merkintöjä} =1 {1 merkintä} other {# merkintää}}",
+    "none": "Yksikään lokimerkintä ei vastaa suodattimia.",
+    "prev": "Edellinen",
+    "next": "Seuraava",
+    "pageOf": "Sivu {page}/{pages}",
+    "retentionNote": "IP- ja sähköpostiosoitteet poistetaan yli 90 päivää vanhoista merkinnöistä."
   },
   "deskUsers": {
     "eyebrow": "Hallinta",
@@ -3522,7 +3597,8 @@
     "termsDaysValue": "{days, plural, one {netto # päivä} other {netto # päivää}}",
     "okTerms": "Maksuehdot tallennettu.",
     "errTerms": "Anna kokonaisia päiviä väliltä 1–120.",
-    "errViewAsOrg": "Mainostajaa ei löytynyt."
+    "errViewAsOrg": "Mainostajaa ei löytynyt.",
+    "errViewAsReason": "Anna lyhyt syy asiakasnäkymän avaamiselle."
   },
   "status": {
     "ACCEPTED": "Hyväksytty",
@@ -3898,7 +3974,21 @@
       "bodyClient": "Asiakas palautti luonnoksen ”{article}” version {version} muokattavaksi.",
       "bodyDesk": "NativeSpinin desk palautti luonnoksen ”{article}” version {version} muokattavaksi.",
       "comment": "Kommentti: ”{comment}”"
-    }
+    },
+    "quoteDeclined": {
+      "title": "Tarjous hylätty: {plan}",
+      "body": "{org} on hylännyt tarjouksen."
+    },
+    "requestWithdrawn": {
+      "title": "Pyyntö peruttu: {plan}",
+      "body": "{org} on perunut pyynnön. Sen parissa ei tarvitse tehdä enempää."
+    },
+    "cancellationRequested": {
+      "title": "Peruutusta pyydetty: {plan}",
+      "body": "{org} on pyytänyt tämän tilauksen peruuttamista. Tarkista varaukset julkaisijoilta ja peruuta sitten tilaus tai vastaa asiakkaalle."
+    },
+    "selfServiceReason": "Ilmoitettu syy: {reason}",
+    "selfServiceNoReason": "Syytä ei ilmoitettu."
   },
   "publisherInviteEmail": {
     "subject": "Kumppanuuskutsu: {publisher} – NativeSpin",
@@ -3936,6 +4026,7 @@
     "deskOrders": "Tilaukset",
     "deskTitles": "Julkaisut",
     "deskUsers": "Käyttäjät",
+    "deskAudit": "Tapahtumaloki",
     "deskWriters": "Kirjoittajat",
     "deskPriceQuotes": "Hintatarjoukset",
     "deskPublisherContacts": "Kustantajien yhteyshenkilöt",
@@ -4045,7 +4136,99 @@
     "deskHeading": "Katso asiakkaana",
     "deskLead": "Avaa alusta niin kuin mainostaja sen näkee: listat, tarjouspyynnöt ja tilaukset. Asiakkaan tiimiin ei lisätä käyttäjää. Näkymä päättyy 8 tunnin kuluttua.",
     "deskOrgLabel": "Asiakas",
+    "deskReasonLabel": "Syy",
+    "deskReasonHint": "Miksi avaat asiakkaan tilin (tallennetaan valvontalokiin), esim. tukipyyntö.",
     "deskStart": "Avaa asiakkaana",
     "deskStarting": "Avataan …"
+  },
+  "subprocessors": {
+    "metaTitle": "Alikäsittelijät",
+    "eyebrow": "Luottamus",
+    "title": "Alikäsittelijät",
+    "lead": "Kolmannet osapuolet, jotka käsittelevät henkilötietoja puolestamme, kun käytät NativeSpiniä, ja mitä kukin niistä tekee.",
+    "lastUpdated": "Päivitetty viimeksi: {date}",
+    "colName": "Alikäsittelijä",
+    "colPurpose": "Tarkoitus",
+    "colData": "Käsiteltävät tiedot",
+    "colLocation": "Käsittelypaikka",
+    "locationTbc": "Vahvistetaan",
+    "optional": "Vain käytössä ollessaan",
+    "railway": {
+      "purpose": "Sovelluksen ja tietokannan isännöinti",
+      "data": "Kaikki tili-, tilaus- ja sisältötiedot"
+    },
+    "resend": {
+      "purpose": "Tapahtuma- ja ilmoitussähköpostien lähetys",
+      "data": "Sähköpostiosoite, nimi, viestin sisältö"
+    },
+    "r2": {
+      "purpose": "Tiedostojen tallennus (ladatut asiakirjat, tarjous-PDF:t, artikkelitiedostot)",
+      "data": "Sinun tai meidän lataamamme tiedostot"
+    },
+    "ai": {
+      "purpose": "Tekoälyavusteinen kampanjabriiffin ja nimikkeiden yhdistäminen sekä mainoksen esikatselu",
+      "data": "Kirjoittamasi briiffiteksti",
+      "name": "Tekoälyyhdyskäytävä ja mallintarjoaja"
+    },
+    "gtm": {
+      "purpose": "Tunnisteiden hallinta analytiikkaa varten, ladataan vain suostumuksen jälkeen",
+      "data": "Käyttötapahtumat, IP-osoite, evästetunnisteet"
+    },
+    "getcookies": {
+      "purpose": "Evästesuostumusbanneri ja suostumusrekisteri",
+      "data": "Suostumusvalinta, IP-osoite"
+    },
+    "fiken": {
+      "purpose": "Kirjanpito: laskut kirjataan kirjanpitojärjestelmäämme",
+      "data": "Organisaation nimi, ALV-tunnus, laskurivit"
+    },
+    "changesTitle": "Muutokset tähän luetteloon",
+    "changesBody": "Päivitämme tämän sivun ennen kuin uusi alikäsittelijä alkaa käsitellä henkilötietoja. Tietojenkäsittelysopimus (DPA) on saatavilla pyynnöstä.",
+    "contact": "Kysymykset:",
+    "linkLabel": "Katso alikäsittelijämme"
+  },
+  "help": {
+    "metaTitle": "Ohje",
+    "eyebrow": "Tuki",
+    "title": "Ohje",
+    "lead": "Vastaukset yleisimpiin kysymyksiin ja ohjeet ihmisen tavoittamiseen.",
+    "faqTitle": "Usein kysyttyä",
+    "q1": "Miten saan hinnan?",
+    "a1": "Lisää sijoitteluja katalogista suunnitelmaasi ja lähetä se pyyntönä. Katalogin hinnat ovat suuntaa-antavia; desk vastaa sitovalla tarjouksella yleensä 24 työtunnin kuluessa.",
+    "q2": "Voinko hylätä tarjouksen tai perua pyynnön?",
+    "a2": "Kyllä. Avaa pyyntö ja käytä alareunan kohtaa ”Ettekö jatka eteenpäin?”. Mitään ei veloiteta ennen kuin hyväksyt tarjouksen.",
+    "q3": "Miten peruutan tilauksen?",
+    "a3": "Avaa tilaus ja valitse ”Pyydä peruutusta”. Desk tarkistaa varaukset julkaisijoilta ja vahvistaa mahdolliset kulut ennen kuin peruutus on lopullinen.",
+    "q4": "Mistä löydän laskuni?",
+    "a4": "Laskut-osiosta, josta jokaisen voi ladata PDF-tiedostona.",
+    "q5": "Miten kutsun kollegoita tai muutan, kuka saa tilata?",
+    "a5": "Organisaation ylläpitäjä hallitsee jäseniä, rooleja ja tilausoikeuksia kohdassa Tili → Tiimi.",
+    "q6": "Miten vien tietoni tai suljen tilini?",
+    "a6": "Molemmat löytyvät kohdasta Tili → Tiedot ja tili. Sieltä voit myös muuttaa, mitä sähköposteja saat.",
+    "contactTitle": "Ota yhteyttä deskiin",
+    "contactBody": "Kirjoita meille, niin deskin työntekijä vastaa yhden työpäivän kuluessa.",
+    "contactCta": "Ota yhteyttä",
+    "changelogLink": "Uutta",
+    "navLabel": "Ohje"
+  },
+  "changelog": {
+    "metaTitle": "Uutta",
+    "eyebrow": "Muutosloki",
+    "title": "Uutta NativeSpinissä",
+    "lead": "Työskentelyysi vaikuttavat tuotemuutokset, uusimmat ensin.",
+    "entries": {
+      "selfService": {
+        "title": "Hylkää, peru ja peruuta itse",
+        "body": "Voit nyt hylätä tarjouksen, perua pyynnön ja pyytää tilauksen peruuttamista suoraan pyyntö- ja tilaussivuilta."
+      },
+      "notificationPrefs": {
+        "title": "Valitse, mitä sähköposteja saat",
+        "body": "Tiliasetuksissa on nyt sähköposti-ilmoitusten asetukset luokittain. Sovelluksen saapuneet näyttää edelleen kaiken."
+      },
+      "help": {
+        "title": "Ohje ja palaute yhdessä paikassa",
+        "body": "Uusi ohjesivu vastaa yleisiin kysymyksiin, ja kampanjan valmistuttua voit arvioida, miten se sujui."
+      }
+    }
   }
 }

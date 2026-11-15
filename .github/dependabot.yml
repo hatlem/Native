@@ -1,0 +1,24 @@
+# Weekly dependency update PRs. Security advisories additionally raise
+# Dependabot alerts/PRs as soon as they are published (enable "Dependabot
+# security updates" in the repository settings).
+version: 2
+updates:
+  - package-ecosystem: "npm"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+    open-pull-requests-limit: 10
+    groups:
+      # One PR for the routine minor/patch bumps instead of one per package.
+      minor-and-patch:
+        update-types: ["minor", "patch"]
+    ignore:
+      # next-auth is pinned to a specific v5 beta on purpose; upgrade by hand.
+      - dependency-name: "next-auth"
+
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "monday"

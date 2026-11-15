@@ -33,7 +33,7 @@ allow, programmatic.
 
 **Market (decided).** Launched **Nordic-first** — Norway, Sweden, Denmark — with
 the data model spanning 9 European markets (NO/SE/DK/FI/DE/AT/CH/UK/IE).
-Multi-language UI (en/no/sv/da/de/fi), multi-currency (NOK/SEK/DKK), per-market VAT.
+Multi-language UI (en/no/sv/da/de/fi), multi-currency (NOK/SEK/DKK), VAT by buyer country (see §13).
 
 **Stack (decided).** Single TypeScript codebase: **Next.js (App Router) +
 PostgreSQL via Prisma**, deployed on **Railway**. Optimized for a small team and
@@ -367,9 +367,15 @@ cost) and earns content margin.
   and key flows localized; content/specs may be per-title language.
 - **Currency:** NOK, SEK, DKK, plus EUR for cross-border agencies; store amounts
   with currency; FX policy for display vs. billing.
-- **VAT/tax:** per-market VAT rules on customer invoices; reverse-charge for
-  cross-border B2B; configurable rates; correct invoice legal fields per
-  country.
+- **VAT/tax:** VAT follows the **buyer's country**, never the publication's
+  market (`src/lib/vat.ts`): a Norwegian buyer pays Norwegian VAT (25 %,
+  `DOMESTIC`); a business buyer anywhere else is invoiced at 0 % under
+  `REVERSE_CHARGE` with the statutory note; an unknown buyer country falls back
+  to the domestic rate and warns the desk. The treatment and note are stored on
+  the quote and copied to the invoice and credit note, so issued documents are
+  immutable. VAT and totals are exact to the minor unit. Rates and note wording
+  live in one place and should be confirmed by an accountant before the first
+  cross-border invoice.
 - **Legal/advertising rules:** native/sponsored **disclosure labeling**
   requirements differ per market and per publisher — encode in Spec + content
   compliance checks.

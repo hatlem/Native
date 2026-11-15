@@ -1,4 +1,6 @@
 "use server";
+import { requireSuperadmin } from "@/lib/desk-guard";
+import { log } from "@/lib/log";
 
 import { redirect } from "next/navigation";
 import { UserRole } from "@prisma/client";
@@ -38,13 +40,6 @@ function field(formData: FormData, key: string): string {
   return typeof v === "string" ? v.trim() : "";
 }
 
-async function requireSuperadmin(locale: string): Promise<string> {
-  const session = await auth();
-  if (session?.user?.role !== "SUPERADMIN") {
-    redirect(`/${locale}/signin`);
-  }
-  return session.user.id;
-}
 
 // Every redirect keeps the list's search + page so an admin working through a
 // filtered list isn't thrown back to page 1 of everything after each save.
@@ -285,7 +280,7 @@ export async function sendUserPasswordReset(formData: FormData) {
       html: msg.html,
     });
   } catch (err) {
-    console.error("admin.password_reset_email_failed", { targetId, err });
+    log.error("admin.password_reset_email_failed", { targetId, err });
     back(locale, formData, { error: "email_failed" });
   }
   await recordAudit(actorId, "user.password_reset_sent", `User:${targetId}`, {
@@ -329,7 +324,7 @@ export async function sendUserSignInLink(formData: FormData) {
       html: msg.html,
     });
   } catch (err) {
-    console.error("admin.magic_link_email_failed", { targetId, err });
+    log.error("admin.magic_link_email_failed", { targetId, err });
     back(locale, formData, { error: "email_failed" });
   }
   await recordAudit(actorId, "user.signin_link_sent", `User:${targetId}`, { ip });

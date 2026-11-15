@@ -1,8 +1,8 @@
 "use server";
 
+import { requireSuperadmin } from "@/lib/desk-guard";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
-import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
 import { recordAudit } from "@/lib/audit";
 import {
@@ -27,13 +27,6 @@ function field(formData: FormData, key: string): string {
   return typeof v === "string" ? v.trim() : "";
 }
 
-async function requireSuperadmin(locale: string): Promise<string> {
-  const session = await auth();
-  if (session?.user?.role !== "SUPERADMIN") {
-    redirect(`/${locale}/signin`);
-  }
-  return session.user.id;
-}
 
 // A previous issuance's token must never outlive the next action: the flash
 // cookie lives 120 s, so an error redirect straight after a successful issue

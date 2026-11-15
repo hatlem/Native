@@ -1,3 +1,4 @@
+import { log } from "@/lib/log";
 // Async job queue — Phase 0 ships an in-process runner that persists
 // every job to the `Job` table so we keep observability + retry, but
 // runs the handler in the same process (best effort, fire-and-forget).
@@ -47,7 +48,7 @@ async function runOne(jobId: string) {
       where: { id: job.id },
       data: { status: "FAILED", lastError: message, finishedAt: new Date() },
     });
-    console.error("job.failed", { jobId, kind: job.kind, message });
+    log.error("job.failed", { jobId, kind: job.kind, message });
   }
 }
 

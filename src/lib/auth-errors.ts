@@ -3,3 +3,7 @@
 // "use server" sign-in action can import it without pulling in a non-async
 // export, and so both sides agree on one string.
 export const SIGNIN_RATE_LIMITED = "rate_limited";
+// Password was correct but the account has two-factor on: the credentials
+// provider refuses to mint a session and throws this instead, so the sign-in
+// action can hand the browser to the second step (src/lib/mfa).
+export const SIGNIN_MFA_REQUIRED = "mfa_required";
