@@ -1,3 +1,4 @@
+import { requireDesk } from "@/lib/desk-guard";
 import { Fragment } from "react";
 import { getTranslations } from "next-intl/server";
 import { notFound } from "next/navigation";
@@ -59,6 +60,9 @@ export default async function DeskRequestPage({
   searchParams: Promise<Record<string, string | string[] | undefined>>;
 }) {
   const { locale, requestId } = await params;
+  // The desk layout guard alone is not an authorization boundary: the page
+  // renders alongside it, so its RSC payload reached non-desk users.
+  await requireDesk(locale);
   const sp = await searchParams;
   const errorCode = typeof sp.error === "string" ? sp.error : "";
   // Quote-PDF outcome (quote-actions.ts generateQuotePdf). Storage is also

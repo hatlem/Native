@@ -1,3 +1,4 @@
+import { requireDesk } from "@/lib/desk-guard";
 import { getTranslations } from "next-intl/server";
 import { intlLocale } from "@/lib/money";
 import { auth } from "@/auth";
@@ -34,6 +35,9 @@ export default async function DeskListPage({
   params: Promise<{ locale: string }>;
 }) {
   const { locale } = await params;
+  // The desk layout guard alone is not an authorization boundary: the page
+  // renders alongside it, so its RSC payload reached non-desk users.
+  await requireDesk(locale);
   const t = await getTranslations({ locale, namespace: "desk" });
   const to = await getTranslations({ locale, namespace: "order" });
   const tr = await getTranslations({ locale, namespace: "reports" });

@@ -1,3 +1,4 @@
+import { requireDesk } from "@/lib/desk-guard";
 import { getTranslations } from "next-intl/server";
 import { prisma } from "@/lib/prisma";
 import { buyerVisibleQuoteWhere } from "@/lib/commerce/quote-validity";
@@ -27,6 +28,9 @@ export default async function DeskReportsPage({
   params: Promise<{ locale: string }>;
 }) {
   const { locale } = await params;
+  // The desk layout guard alone is not an authorization boundary: the page
+  // renders alongside it, so its RSC payload reached non-desk users.
+  await requireDesk(locale);
   const t = await getTranslations({ locale, namespace: "reports" });
   const to = await getTranslations({ locale, namespace: "order" });
   const td = await getTranslations({ locale, namespace: "desk" });

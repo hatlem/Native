@@ -1,3 +1,4 @@
+import { requireDesk } from "@/lib/desk-guard";
 import { getTranslations } from "next-intl/server";
 import { notFound } from "next/navigation";
 import { prisma } from "@/lib/prisma";
@@ -42,6 +43,9 @@ export default async function DeskOrderPage({
   searchParams: Promise<Record<string, string | string[] | undefined>>;
 }) {
   const { locale, orderId } = await params;
+  // The desk layout guard alone is not an authorization boundary: the page
+  // renders alongside it, so its RSC payload reached non-desk users.
+  await requireDesk(locale);
   const sp = await searchParams;
   const cancelError = typeof sp.cancel === "string" ? sp.cancel : undefined;
   const t = await getTranslations({ locale, namespace: "order" });

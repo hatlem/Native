@@ -1,3 +1,4 @@
+import { requireDesk } from "@/lib/desk-guard";
 import { getTranslations } from "next-intl/server";
 import { prisma } from "@/lib/prisma";
 import { PLACEMENT_LINE_WHERE } from "@/lib/commerce/placements";
@@ -49,6 +50,9 @@ export default async function DeskOrdersPage({
   searchParams: Promise<Record<string, string | string[] | undefined>>;
 }) {
   const { locale } = await params;
+  // The desk layout guard alone is not an authorization boundary: the page
+  // renders alongside it, so its RSC payload reached non-desk users.
+  await requireDesk(locale);
   const sp = await searchParams;
   const t = await getTranslations({ locale, namespace: "order" });
   const td = await getTranslations({ locale, namespace: "desk" });
