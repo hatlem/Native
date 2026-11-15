@@ -5,7 +5,7 @@ import { Link } from "@/i18n/navigation";
 import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
 import { getFavoritedTitleIds } from "@/lib/favorites";
-import { resolveCatalogSearch, titleNameStartsWhere, titleNameWhere } from "@/lib/catalog-search";
+import { resolveCatalogSearchFast, titleNameStartsWhere, titleNameWhere } from "@/lib/catalog-search";
 import { tierSlices } from "@/lib/catalog-tiers";
 import { redirect } from "next/navigation";
 import { savedListMembershipMap } from "@/lib/saved-list-membership";
@@ -98,7 +98,7 @@ export default async function CatalogPage({
   // FTS-first: titles matching every word of the query (FTS, then ILIKE),
   // widened to titles matching any word only when none match them all
   // (lib/catalog-search.ts resolveCatalogSearch).
-  const search = await resolveCatalogSearch(q);
+  const search = await resolveCatalogSearchFast(q);
 
   // Shared with the CSV export so "download" holds exactly these titles.
   const where = buildCatalogWhere(filters, search);

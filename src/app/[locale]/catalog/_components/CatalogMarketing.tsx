@@ -1,8 +1,6 @@
 import { getTranslations } from "next-intl/server";
-import { prisma } from "@/lib/prisma";
 import { catalogTitleCount } from "@/lib/catalog-stats";
-import { catalogVisibleTitleWhere } from "@/lib/catalog-visibility";
-import { SUPPORTED_MARKETS } from "@/lib/markets";
+import { cachedCatalogGate } from "@/lib/catalog-public";
 import { Link } from "@/i18n/navigation";
 import { intlLocale } from "@/lib/money";
 import { LandingShell } from "@/app/landing-shell";
@@ -16,36 +14,13 @@ export async function CatalogMarketing({ locale }: { locale: string }) {
   const tMarket = await getTranslations({ locale, namespace: "market" });
   const tType = await getTranslations({ locale, namespace: "productType" });
 
-  const [titleCount, productCount, distinctMarkets, featured] =
-    await Promise.all([
-      // Same count as the home page and page titles — see @/lib/catalog-stats.
-      catalogTitleCount(),
-      prisma.product.count({ where: { active: true } }),
-      // Markets the catalog actually sells in: the served nine that have
-      // titles. Prod still holds active titles in NL/BE (MarketCode enum
-      // leftovers, see @/lib/markets), which made this read "11 markets"
-      // next to every other surface's 9.
-      prisma.title
-        .findMany({
-          where: {
-            ...catalogVisibleTitleWhere,
-            market: { code: { in: [...SUPPORTED_MARKETS] } },
-          },
-          select: { marketId: true },
-          distinct: ["marketId"],
-        })
-        .then((rows) => rows.length),
-      prisma.title.findMany({
-        where: { active: true, monthlyReach: { not: null } },
-        // NULLS LAST: Postgres puts nulls first on DESC (see the home page).
-        orderBy: [{ monthlyReach: { sort: "desc", nulls: "last" } }, { name: "asc" }],
-        take: 6,
-        include: {
-          publisher: { select: { name: true } },
-          market: { select: { code: true } },
-        },
-      }),
-    ]);
+  // Shared across requests (lib/catalog-public): the gate shows the same
+  // figures and teaser titles to every signed-out visitor.
+  const [titleCount, { productCount, distinctMarkets, featured }] = await Promise.all([
+    // Same count as the home page and page titles — see @/lib/catalog-stats.
+    catalogTitleCount(),
+    cachedCatalogGate(),
+  ]);
 
   return (
     <LandingShell locale={locale} screenLabel="Catalog gate" withFooter={true}>
@@ -115,12 +90,15 @@ export async function CatalogMarketing({ locale }: { locale: string }) {
           <div className="grid">
             {featured.map((title) => (
               <article className="card title-card" key={title.id}>
-                <span className="tag">{tMarket(title.market.code)}</span>
+                <span className="tag">{tMarket(title.marketCode)}</span>
                 <h3>{title.name}</h3>
-                <p className="muted">{title.publisher.name}</p>
+                <p className="muted">{title.publisherName}</p>
                 {title.category ? (
                   <p className="muted small">
-                    {titleCategoryLabel(title, locale as AppLocale)}
+                    {titleCategoryLabel(
+                      { category: title.category, vertical: title.vertical, market: { code: title.marketCode } },
+                      locale as AppLocale,
+                    )}
                   </p>
                 ) : null}
                 <p className="muted small" style={{ marginTop: 12 }}>

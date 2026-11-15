@@ -175,3 +175,32 @@ test("request id: minted when absent, echoed on the response, sane upstream ids 
   );
   assert.equal(passed.headers.get("x-request-id"), "upstream-id-0001");
 });
+
+test("signed out on a public page: rewritten to the prerendered copy, which carries its own CSP", () => {
+  const req = new NextRequest(new URL("https://nativespin.com/en/pricing"));
+  const res = middleware(req);
+  assert.equal(res.headers.get("x-middleware-rewrite"), "https://nativespin.com/static/en/pricing");
+  // The cached page brings its hash-based policy; a second (nonce) policy
+  // here would be enforced too and block the page's scripts.
+  assert.equal(res.headers.get("content-security-policy"), null);
+  assert.equal(res.headers.get("cache-control"), "private, no-cache");
+  assert.match(res.headers.get("vary") ?? "", /Cookie/);
+});
+
+test("with a session cookie, or for a page outside the list, the [locale] page renders with the nonce CSP", () => {
+  const signedIn = new NextRequest(new URL("https://nativespin.com/en/pricing"), {
+    headers: { cookie: "authjs.session-token=abc" },
+  });
+  const a = middleware(signedIn);
+  assert.notEqual(a.headers.get("x-middleware-rewrite"), "https://nativespin.com/static/en/pricing");
+  assert.match(a.headers.get("content-security-policy") ?? "", /'nonce-/);
+
+  const signin = middleware(new NextRequest(new URL("https://nativespin.com/en/signin")));
+  assert.match(signin.headers.get("content-security-policy") ?? "", /'nonce-/);
+  assert.ok(!(signin.headers.get("x-middleware-rewrite") ?? "").includes("/static/"));
+});
+
+test("the prerendered tree is not reachable directly", () => {
+  const res = middleware(new NextRequest(new URL("https://nativespin.com/static/en/pricing")));
+  assert.equal(res.status, 404);
+});

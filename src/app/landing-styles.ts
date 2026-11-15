@@ -1,6 +1,6 @@
 // Shared editorial "Bone" design system used by every public marketing page.
-// Loaded once per page via <LandingShell> as a nonce'd <style> block so the
-// strict CSP from middleware.ts allows it.
+// Served as /landing.css (app/landing.css/route.ts) and linked from <LandingShell>
+// with a content hash, so browsers cache it instead of receiving it inline.
 //
 // The CSS is namespaced under `.bn` so it cannot collide with the
 // signed-in app shell, the desk console, or the publisher portal. Keep
@@ -1449,3 +1449,16 @@ body:has(.bn) .drawer-link:hover { background: rgba(var(--ink-rgb),0.06) !import
 .bn [contenteditable]:focus { outline:2px dashed rgba(var(--ink-rgb),.4); outline-offset:3px; border-radius:2px; }
 @media (max-width: 860px) { .bn .preview-studio { grid-template-columns:1fr; } .bn .pv-presets { grid-template-columns:repeat(5,1fr); } }
 `;
+
+// Content hash for the stylesheet URL (FNV-1a, 32-bit): any edit to STYLES
+// changes the href, so the long-lived cache on /landing.css never goes stale.
+function fnv1a(text: string): string {
+  let h = 0x811c9dc5;
+  for (let i = 0; i < text.length; i++) {
+    h ^= text.charCodeAt(i);
+    h = Math.imul(h, 0x01000193);
+  }
+  return (h >>> 0).toString(36);
+}
+
+export const STYLES_HREF = `/landing.css?v=${fnv1a(STYLES)}`;

@@ -1,7 +1,12 @@
 import { test, before, after } from "node:test";
 import assert from "node:assert/strict";
 import { prisma } from "./prisma";
-import { resolveCatalogSearch, searchTitleIds } from "./catalog-search";
+import {
+  normaliseCatalogQuery,
+  resolveCatalogSearch,
+  resolveCatalogSearchFast,
+  searchTitleIds,
+} from "./catalog-search";
 
 // Index side (the generated "searchTsv", migration
 // 20260924120000_fts_split_separators) and query side (buildTsQuery) must
@@ -160,5 +165,34 @@ test("search: a publisher name matches on word prefixes, never inside another na
   } finally {
     await prisma.title.deleteMany({ where: { id: { in: ["pubexact", "pubinside", "pubhyphen"].map((k) => `${PREFIX}${k}`) } } });
     await prisma.publisher.deleteMany({ where: { id: { startsWith: `${PREFIX}pub-` } } });
+  }
+});
+
+// The catalog page filters on a materialised id list instead of the search
+// clause (resolveCatalogSearchFast). It must name exactly the titles the
+// clause does, for every kind of match.
+test("fast path: the materialised ids are exactly the titles the search clause matches", { skip: !RUN_DB_IT }, async () => {
+  for (const q of ["Qwxasker", "Arboga", "vg.no", "Budstikke Zqøyvik", "qwxaskr", "no-such-title-zzqq"]) {
+    const slow = await resolveCatalogSearch(q);
+    const fast = await resolveCatalogSearchFast(q);
+    assert.equal(fast?.match, slow?.match, q);
+    const idsOf = async (where: object) =>
+      (await prisma.title.findMany({ where, select: { id: true }, orderBy: { id: "asc" } })).map((r) => r.id);
+    assert.deepEqual(await idsOf(fast!.where), await idsOf(slow!.where), q);
+  }
+  assert.equal(await resolveCatalogSearchFast("   "), null);
+});
+
+// The fast path's results are shared per normalised query (Next's data
+// cache), so the normalisation must not change what a query finds.
+test("fast path: case and spacing do not change the result", { skip: !RUN_DB_IT }, async () => {
+  assert.equal(normaliseCatalogQuery("  Budstikke   ZQØYVIK "), "budstikke zqøyvik");
+  for (const q of ["Qwxasker", "  ARBOGA ", "VG.no", "Budstikke   Zqøyvik", "QWXASKR"]) {
+    const raw = await resolveCatalogSearch(q);
+    const normalised = await resolveCatalogSearch(normaliseCatalogQuery(q));
+    assert.equal(normalised?.match, raw?.match, q);
+    const idsOf = async (where: object) =>
+      (await prisma.title.findMany({ where, select: { id: true }, orderBy: { id: "asc" } })).map((r) => r.id);
+    assert.deepEqual(await idsOf(normalised!.where), await idsOf(raw!.where), q);
   }
 });

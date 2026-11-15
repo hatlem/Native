@@ -12,6 +12,7 @@
 // a first-party confirmation is the strongest provenance we have.
 
 import { prisma } from "@/lib/prisma";
+import { invalidateCatalogTitles } from "@/lib/catalog-facets";
 import { recordAudit } from "@/lib/audit";
 import { notifyDesk } from "@/lib/notify";
 import type { BookingUnit, PricingModel, ProductType } from "@prisma/client";
@@ -177,6 +178,8 @@ export async function confirmProductPrice(args: {
     `Product:${product.id}`,
     { publisherId: args.publisherId, basePrice: Number(product.basePrice) },
   );
+  // The title page shows the confirmation (lib/catalog-public).
+  invalidateCatalogTitles();
 }
 
 // "The price changed." Updates basePrice and stamps the same first-party
@@ -207,6 +210,7 @@ export async function updateProductPrice(args: {
     `Product:${product.id}`,
     { publisherId: args.publisherId, from, to: args.basePrice },
   );
+  invalidateCatalogTitles();
   // QUOTE_READY is the least-bad existing kind: "fresh pricing is ready
   // for you to look at". Adding a dedicated enum value is a migration we
   // deliberately avoid here.
@@ -260,6 +264,7 @@ export async function updateProductLeadTime(args: {
     `Product:${product.id}`,
     { publisherId: args.publisherId, from: current.leadTimeDays, to: args.leadTimeDays },
   );
+  invalidateCatalogTitles();
   await notifyDesk({
     kind: "QUOTE_READY",
     template: {

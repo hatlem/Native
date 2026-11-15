@@ -10,6 +10,8 @@ import { routing } from "./i18n/routing";
 import { hasSessionCookie, requiresSession, signinPath } from "./lib/auth-gate";
 import { appUrl } from "./lib/url";
 import { REQUEST_ID_HEADER } from "./lib/log";
+import { buildNonceCsp } from "./lib/csp-policy.mjs";
+import { isStaticTreePath, staticPublicRewrite } from "./lib/static-public";
 
 const intlMiddleware = createMiddleware(routing);
 
@@ -34,54 +36,10 @@ export function requestIdFor(incoming: string | null): string {
   return crypto.randomUUID();
 }
 
+// The policy itself lives in lib/csp-policy.mjs, shared with the prerendered
+// pages' cache handler (lib/static-csp-cache-handler.mjs).
 export function buildCsp(nonce: string): string {
-  const hasGtm = !!process.env.NEXT_PUBLIC_GTM_ID;
-  const gtmScript = hasGtm ? " https://www.googletagmanager.com" : "";
-  const gtmConnect = hasGtm
-    ? " https://www.googletagmanager.com https://*.google-analytics.com https://*.analytics.google.com"
-    : "";
-  const gtmFrame = hasGtm ? " https://www.googletagmanager.com" : "";
-  // GetTalk booking embeds (onboarding call step + catalog banner popup)
-  // render an <iframe src="https://gettalk.co/...">.
-  const getTalkFrame = process.env.NEXT_PUBLIC_GETTALK_USERNAME
-    ? " https://gettalk.co"
-    : "";
-  // GetCookies consent banner (app/getcookies.tsx): widget.js is inserted by a
-  // nonce'd loader (allowed by 'strict-dynamic'), but its config, region and
-  // consent-log calls are fetches, which need connect-src.
-  const getCookiesConnect = process.env.NEXT_PUBLIC_GETCOOKIES_DOMAIN_ID
-    ? " https://getcookies.co"
-    : "";
-  // Next.js dev wraps every module in eval() (eval-source-map), so without
-  // 'unsafe-eval' the React bootstrap silently fails and the page never
-  // hydrates. Production uses static chunks and doesn't need this.
-  const devEval = process.env.NODE_ENV === "development" ? " 'unsafe-eval'" : "";
-
-  return [
-    `default-src 'self'`,
-    // 'strict-dynamic' lets the nonced bootstrap load Next's chunk
-    // graph without each chunk needing its own nonce. Drop modern
-    // browsers ignore the host allow-list once strict-dynamic is in
-    // effect — that's fine, the GTM bootstrap is what loads gtm.js.
-    `script-src 'self' 'nonce-${nonce}' 'strict-dynamic'${gtmScript}${devEval}`,
-    // Tailwind + React inline `style=` attributes are pervasive; a
-    // hash/nonce policy isn't feasible without a wholesale refactor.
-    `style-src 'self' 'unsafe-inline'`,
-    // blob: — the /preview tool shows a visitor's own hero photo straight
-    // from the file input via URL.createObjectURL (never uploaded). Only
-    // same-origin script can mint a blob: URL, so this admits no third party.
-    `img-src 'self' data: blob: https:`,
-    `font-src 'self' data:`,
-    // Article/rate-card uploads go straight from the browser to R2 with
-    // a presigned PUT (fetch), so the bucket host must be connectable.
-    `connect-src 'self' https://*.r2.cloudflarestorage.com${gtmConnect}${getCookiesConnect}`,
-    `frame-src 'self'${gtmFrame}${getTalkFrame}`,
-    `frame-ancestors 'none'`,
-    `base-uri 'self'`,
-    `form-action 'self'`,
-    `object-src 'none'`,
-    `upgrade-insecure-requests`,
-  ].join("; ");
+  return buildNonceCsp(nonce);
 }
 
 // Pure merge of next-intl's middleware response into ours, extracted so
@@ -174,6 +132,11 @@ export default function middleware(req: NextRequest) {
   const canonicalHost = canonicalHostRedirect(req, appUrl());
   if (canonicalHost) return NextResponse.redirect(canonicalHost, 308);
 
+  // The prerendered public tree is reached only through the rewrite below.
+  if (isStaticTreePath(req.nextUrl.pathname)) {
+    return new NextResponse(null, { status: 404, headers: { [REQUEST_ID_HEADER]: requestId } });
+  }
+
   // Signed out on a protected page: a real 307 to sign-in, decided before
   // anything renders (a page-level redirect streams as 200 + meta refresh).
   // appUrl(), not req.url: behind Railway's proxy the inbound URL can carry
@@ -197,6 +160,38 @@ export default function middleware(req: NextRequest) {
     intlRes.headers.set("Content-Security-Policy", csp);
     intlRes.headers.set(REQUEST_ID_HEADER, requestId);
     return intlRes;
+  }
+
+  // A public page for a visitor without a session: the prerendered copy
+  // (lib/static-public). Its Content-Security-Policy is stored with the page
+  // (lib/static-csp-cache-handler.mjs) — hashes of its inline scripts instead
+  // of a nonce — so none is set here: a second policy would also be enforced.
+  const staticPath = staticPublicRewrite({
+    method: req.method,
+    pathname: req.nextUrl.pathname,
+    locales: routing.locales,
+    hasSession: hasSessionCookie(req.cookies.getAll().map((c) => c.name)),
+    isServerAction: req.headers.has("next-action"),
+    dev: process.env.NODE_ENV === "development",
+  });
+  if (staticPath) {
+    const target = req.nextUrl.clone();
+    target.pathname = staticPath;
+    const reqHeaders = new Headers(req.headers);
+    reqHeaders.set(REQUEST_ID_HEADER, requestId);
+    const passthrough = mergeMiddlewareHeaders(intlRes.headers, reqHeaders);
+    const res = NextResponse.rewrite(target, { request: { headers: reqHeaders } });
+    passthrough.forEach((v, k) => {
+      if (k.toLowerCase() === "set-cookie") res.headers.append(k, v);
+      else res.headers.set(k, v);
+    });
+    // The same URL is a different page for a signed-in visitor: no shared
+    // (CDN) caching of the signed-out copy. Browsers revalidate (ETag).
+    res.headers.set("Cache-Control", "private, no-cache");
+    const vary = res.headers.get("vary");
+    res.headers.set("Vary", vary ? `${vary}, Cookie` : "Cookie");
+    res.headers.set(REQUEST_ID_HEADER, requestId);
+    return res;
   }
 
   // Both the passthrough case and the next-intl internal-rewrite case

@@ -5,7 +5,7 @@ import { log } from "@/lib/log";
 
 import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
-import { invalidateCatalogFacets } from "@/lib/catalog-facets";
+import { invalidateCatalogFacets, invalidateCatalogTitles } from "@/lib/catalog-facets";
 import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
 import { recordAudit } from "@/lib/audit";
@@ -373,6 +373,7 @@ export async function updateTitlePricing(formData: FormData) {
     publishedRateCurrency,
     pricesPublic,
   });
+  invalidateCatalogTitles();
   redirect(`/${locale}/desk/titles/${titleId}?saved=1`);
 }
 
@@ -448,6 +449,7 @@ export async function updateTitleProductionFee(formData: FormData) {
     `Title:${title.id}`,
     { name: title.name, productionFeeDefault },
   );
+  invalidateCatalogTitles();
   revalidatePath(`/${locale}/desk/titles/${titleId}`);
   redirect(`/${locale}/desk/titles/${titleId}?saved=1`);
 }
@@ -492,6 +494,7 @@ export async function updateTitleAliases(formData: FormData) {
     name: title.name,
     aliases,
   });
+  invalidateCatalogTitles();
   revalidatePath(`/${locale}/desk/titles/${titleId}`);
   redirect(`/${locale}/desk/titles/${titleId}?saved=1`);
 }
@@ -587,6 +590,7 @@ export async function updateProductPricing(formData: FormData) {
     `Product:${product.id}`,
     { name: product.name, marginPct, productionFee },
   );
+  invalidateCatalogTitles();
   revalidatePath(back);
   redirect(`${back}?saved=1`);
 }

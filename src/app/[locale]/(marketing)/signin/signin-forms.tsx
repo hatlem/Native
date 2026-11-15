@@ -1,7 +1,9 @@
 "use client";
 
 import { authenticate, requestMagicLink } from "@/app/auth-actions";
-import { SubmitButton } from "@/components";
+// Not the @/components barrel: it also pulls in ExtraWorkForm, whose zod
+// schemas are built on import and trip the CSP (zod probes eval).
+import { SubmitButton } from "@/components/submit-button";
 
 // Both forms below wrap the server action instead of passing it straight to
 // `action={...}`: the actions now return `{ redirectTo }` and we navigate

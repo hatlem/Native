@@ -4,6 +4,7 @@ import { notFound, redirect } from "next/navigation";
 import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
 import { getFavoritedTitleIds } from "@/lib/favorites";
+import { cachedTitlePageData } from "@/lib/catalog-public";
 import { loadScope } from "@/lib/scope";
 import { savedListMembershipMap } from "@/lib/saved-list-membership";
 import { titleDomain } from "@/lib/title-display";
@@ -67,17 +68,8 @@ export default async function TitleDetailPage({
     namespace: "priceVisibility",
   });
 
-  const title = await prisma.title.findUnique({
-    where: { slug },
-    include: {
-      publisher: true,
-      market: true,
-      products: {
-        where: { active: true },
-        include: { priceRules: true, spec: true },
-      },
-    },
-  });
+  // Shared across requests, expired on every catalog write (lib/catalog-public).
+  const title = await cachedTitlePageData(slug);
 
   if (!title) notFound();
   // Discontinued (nedlagt/duplikat) titles never render. Verified-no-native

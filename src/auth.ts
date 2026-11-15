@@ -1,6 +1,8 @@
 import { requestIp } from "@/lib/client-ip";
 import { log } from "@/lib/log";
+import { cache } from "react";
 import NextAuth, { CredentialsSignin } from "next-auth";
+import type { Session } from "next-auth";
 import Credentials from "next-auth/providers/credentials";
 import type { JWT } from "next-auth/jwt";
 import { headers } from "next/headers";
@@ -80,7 +82,7 @@ async function authClientIp(): Promise<string> {
   }
 }
 
-export const { handlers, auth, signIn, signOut } = NextAuth({
+const nextAuth = NextAuth({
   // `trustHost: true` makes Auth.js accept the Host / X-Forwarded-Host
   // headers as authoritative when building callback URLs. This is safe
   // only when a trusted reverse proxy (Vercel/Railway/Cloudflare in front
@@ -256,3 +258,18 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
     },
   },
 });
+
+export const { handlers, signIn, signOut } = nextAuth;
+
+// One session read per render. A page, its layout and the helpers they call
+// (loadScope, the guards, …) each ask for the session; unmemoised, every call
+// decrypted the cookie and re-read the user row. React's cache() scopes the
+// result to the current server render, so they share one lookup. Outside a
+// render (server actions, route handlers) cache() is a pass-through and every
+// call reads afresh, as before.
+const sessionForRender = cache((): Promise<Session | null> => nextAuth.auth() as Promise<Session | null>);
+
+export const auth = ((...args: unknown[]) =>
+  args.length === 0
+    ? sessionForRender()
+    : (nextAuth.auth as (...a: unknown[]) => unknown)(...args)) as typeof nextAuth.auth;

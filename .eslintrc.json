@@ -46,9 +46,7 @@
       // the debt — shrink it, never add to it. New files are covered by the
       // rule above.
       "files": [
-        "src/app/\\[locale\\]/\\(marketing\\)/page.tsx",
         "src/app/\\[locale\\]/\\(marketing\\)/preview/page.tsx",
-        "src/app/\\[locale\\]/catalog/_components/CatalogMarketing.tsx",
         "src/app/\\[locale\\]/\\(marketing\\)/recommend/page.tsx",
         "src/app/\\[locale\\]/\\(marketing\\)/reset-password/\\[token\\]/page.tsx",
         "src/app/\\[locale\\]/account/notification-prefs-section.tsx",

@@ -1,4 +1,5 @@
 import { prisma } from "@/lib/prisma";
+import { invalidateCatalogTitles } from "@/lib/catalog-facets";
 import { recordAudit } from "@/lib/audit";
 import { inclusionsSchema } from "@/lib/pricing/inclusions";
 import type { Prisma, ProductType, PriceResponseSource, PriceUnit } from "@prisma/client";
@@ -238,6 +239,8 @@ export async function applyQuote(args: {
   await recordAudit(args.actorUserId, "price_quote.apply", `PriceQuote:${args.quoteId}`, {
     productId: quote.productId,
   });
+  // The title page shows the applied price (lib/catalog-public).
+  invalidateCatalogTitles();
 }
 
 // Quote-created products land inactive on purpose — the desk reviews
@@ -272,6 +275,7 @@ export async function activateQuoteProducts(args: {
     where,
     data: { active: true, bookable: true },
   });
+  invalidateCatalogTitles();
 
   await recordAudit(args.actorUserId, "product.activate_quote_batch", `count:${products.length}`, {
     titleId: args.titleId ?? null,

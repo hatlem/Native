@@ -13,6 +13,9 @@ import { prisma } from "@/lib/prisma";
 import { loadVerticalOptions } from "@/lib/catalog-taxonomy";
 
 export const CATALOG_FACETS_TAG = "catalog-facets";
+// The title-page data (lib/catalog-public cachedTitlePageData): a title with
+// its publisher, market and active products with their prices.
+export const CATALOG_TITLES_TAG = "catalog-titles";
 const REVALIDATE_SECONDS = 300;
 const opts = { tags: [CATALOG_FACETS_TAG], revalidate: REVALIDATE_SECONDS };
 
@@ -52,9 +55,25 @@ export const cachedRegionRows = unstable_cache(
 
 // Call after a mutation that changes which titles the catalog shows.
 export function invalidateCatalogFacets(): void {
+  // Also refreshes everything else tagged with it: the public catalog figures
+  // and showcase (lib/catalog-public), the per-query search results
+  // (lib/catalog-search), the title-page data, and the prerendered landing
+  // page and catalog gate that read them (app/static).
   try {
     // "max": serve the stale list while the fresh one is computed.
     revalidateTag(CATALOG_FACETS_TAG, "max");
+  } catch {
+    // Outside a Next request scope (scripts, tests) there is no cache.
+  }
+  invalidateCatalogTitles();
+}
+
+// Call after a write to a title, its products or their prices. Expires the
+// cached title pages at once (not stale-while-revalidate): the next view
+// shows the new price, never the old one.
+export function invalidateCatalogTitles(): void {
+  try {
+    revalidateTag(CATALOG_TITLES_TAG, { expire: 0 });
   } catch {
     // Outside a Next request scope (scripts, tests) there is no cache.
   }

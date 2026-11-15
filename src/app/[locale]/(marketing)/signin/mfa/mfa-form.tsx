@@ -1,7 +1,9 @@
 "use client";
 
 import { completeMfaSignIn, cancelMfaSignIn } from "@/app/mfa-actions";
-import { SubmitButton } from "@/components";
+// Not the @/components barrel: it also pulls in ExtraWorkForm, whose zod
+// schemas are built on import and trip the CSP (zod probes eval).
+import { SubmitButton } from "@/components/submit-button";
 
 // Second sign-in step. Same navigation pattern as the first step's forms
 // (signin-forms.tsx): the action returns the destination and we do a full
