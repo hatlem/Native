@@ -2241,6 +2241,7 @@
     }
   },
   "pricing": {
+    "plansHeading": "Plans",
     "metaTitle": "Pricing",
     "eyebrow": "Pricing",
     "title": "Transparent pricing for every side of the marketplace",

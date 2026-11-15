@@ -189,6 +189,7 @@ export async function TeamSection({ locale, orgId, isAdmin }: Props) {
                               box locks live as the role changes. */}
                           <RoleCommitFields
                             variant="inline"
+                            roleLabel={t("colRole")}
                             defaultRole={m.role as MembershipRole}
                             defaultCanCommit={m.canCommit}
                             labels={{

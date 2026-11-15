@@ -2242,6 +2242,7 @@
     }
   },
   "pricing": {
+    "plansHeading": "Planer",
     "metaTitle": "Priser",
     "eyebrow": "Priser",
     "title": "Gennemsigtig prissætning for begge sider af markedspladsen",

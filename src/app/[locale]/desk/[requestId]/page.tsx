@@ -495,7 +495,7 @@ export default async function DeskRequestPage({
         </div>
       </section>
 
-      {quotesWithDownloadUrls.length === 0 ? (
+      {quotesWithDownloadUrls.length === 0 && !request.withdrawnAt ? (
         <section className="section">
           <div className="cta-block">
             <h2>{t("readyToQuoteTitle")}</h2>

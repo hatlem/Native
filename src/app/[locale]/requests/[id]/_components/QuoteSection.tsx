@@ -409,7 +409,7 @@ export async function QuoteSection({
                 <li key={s.id} className="muted small">
                   {t("supersededRow", {
                     revision: s.revision,
-                    total: formatMoney(s.total, s.currency, locale),
+                    total: formatMoneyExact(s.total, s.currency, locale),
                   })}{" "}
                   {s.replacedBy ? (
                     <a href={`#quote-${s.replacedBy.id}`}>

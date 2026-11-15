@@ -48,6 +48,7 @@ export function RoleCommitFields({
     <select
       id={roleSelectId}
       name="role"
+      aria-label={variant === "inline" ? roleLabel : undefined}
       value={role}
       onChange={(e) => setRole(e.target.value as MembershipRole)}
     >

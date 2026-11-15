@@ -164,6 +164,9 @@ export async function submitRequest(formData: FormData) {
     where: {
       sourceListId: list.id,
       organizationId: org.id,
+      // A withdrawn request is not a retry target: resubmitting right after a
+      // withdrawal must create a new request.
+      withdrawnAt: null,
       createdAt: { gt: new Date(Date.now() - 10_000) },
     },
     orderBy: { createdAt: "desc" },

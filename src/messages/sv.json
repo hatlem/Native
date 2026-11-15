@@ -2241,6 +2241,7 @@
     }
   },
   "pricing": {
+    "plansHeading": "Planer",
     "metaTitle": "Priser",
     "eyebrow": "Priser",
     "title": "Transparent prissättning för båda sidor av marknadsplatsen",

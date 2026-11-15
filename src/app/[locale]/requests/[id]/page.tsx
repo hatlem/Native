@@ -3,7 +3,7 @@ import { notFound } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import { loadScope, canActOnOrg, canCommitOnOrg, canEditOnOrg } from "@/lib/scope";
 import { DataLayerEvent } from "@/app/data-layer-event";
-import { formatMoney } from "@/lib/money";
+import { formatMoney, formatMoneyExact } from "@/lib/money";
 import { paymentTermsDaysFor } from "@/lib/payment-terms";
 import { StatusBadge } from "@/app/status-badge";
 import { Breadcrumb, DetailHead, MetaRow } from "@/components";
@@ -218,7 +218,7 @@ export default async function RequestPage({
               <MetaRow label={t("total")}>
                 {quotes
                   .map((q) =>
-                    formatMoney(Number(q.total), q.currency, locale),
+                    formatMoneyExact(Number(q.total), q.currency, locale),
                   )
                   .join(" · ")}
               </MetaRow>

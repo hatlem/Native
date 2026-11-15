@@ -118,6 +118,9 @@ export async function generateQuote(formData: FormData) {
     },
   });
   if (!request) redirect(`/${locale}/desk`);
+  // A request the buyer withdrew is closed: quoting it would reopen it behind
+  // their back.
+  if (request.withdrawnAt) redirect(`/${locale}/desk/${requestId}`);
   if (request.quotes.length > 0) {
     redirect(`/${locale}/desk/${requestId}`);
   }
@@ -266,8 +269,10 @@ export async function sendQuote(formData: FormData) {
   // in their organisation's zone, the zone every surface prints it in.
   const org = await prisma.request.findUnique({
     where: { id: requestId },
-    select: { organization: { select: { marketCode: true } } },
+    select: { withdrawnAt: true, organization: { select: { marketCode: true } } },
   });
+  // Never send a quote on a request the buyer has withdrawn.
+  if (org?.withdrawnAt) redirect(`/${locale}/desk/${requestId}`);
   const parsed = parseQuoteValidUntil(
     str(formData, "validUntil"),
     new Date(),

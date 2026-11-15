@@ -2241,6 +2241,7 @@
     }
   },
   "pricing": {
+    "plansHeading": "Paketit",
     "metaTitle": "Hinnoittelu",
     "eyebrow": "Hinnoittelu",
     "title": "Läpinäkyvä hinnoittelu kaikille markkinapaikan osapuolille",

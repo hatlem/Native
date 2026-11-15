@@ -44,6 +44,7 @@ export default async function InvoicesPage({
     take,
     select: {
       id: true,
+      number: true,
       status: true,
       currency: true,
       total: true,

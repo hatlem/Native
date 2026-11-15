@@ -856,7 +856,7 @@ body:has(.bn) .drawer-link:hover { background: rgba(var(--ink-rgb),0.06) !import
 }
 .bn .rule .label-ix {
   font-size: 11px; text-transform: uppercase; letter-spacing: 0.18em; font-weight: 600;
-  color: rgba(var(--paper-rgb),.55);
+  color: rgba(var(--paper-rgb),.8);
 }
 .bn .rule h2 {
   margin: 12px 0 0 0; font-weight: 600;
@@ -871,7 +871,7 @@ body:has(.bn) .drawer-link:hover { background: rgba(var(--ink-rgb),0.06) !import
 .bn .rule .body em { font-style: italic; color: var(--paper); }
 .bn .rule .sig {
   margin-top: 28px;
-  font-size: 11px; text-transform: uppercase; letter-spacing: 0.18em; color: rgba(var(--paper-rgb),.55); font-weight: 500;
+  font-size: 11px; text-transform: uppercase; letter-spacing: 0.18em; color: rgba(var(--paper-rgb),.8); font-weight: 500;
 }
 
 /* — Legal docs (privacy / terms) — */
@@ -1372,7 +1372,7 @@ body:has(.bn) .drawer-link:hover { background: rgba(var(--ink-rgb),0.06) !import
 
 /* golden rule excerpt (grain + .wrap layering folded into the base .bn .rule rules above) */
 .bn .rule-excerpt { background:rgba(var(--paper-rgb),.06); border-left:2px solid var(--paper); padding:18px 22px; border-radius:0 3px 3px 0; margin-top:24px; }
-.bn .rule-excerpt .re-tag { font-size:8.5px; text-transform:uppercase; letter-spacing:.16em; color:rgba(var(--paper-rgb),.55); font-weight:700; margin-bottom:10px; }
+.bn .rule-excerpt .re-tag { font-size:8.5px; text-transform:uppercase; letter-spacing:.16em; color:rgba(var(--paper-rgb),.8); font-weight:700; margin-bottom:10px; }
 .bn .rule-excerpt p { margin:0; font-family:Georgia,serif; font-size:15px; line-height:1.6; color:rgba(var(--paper-rgb),.92); }
 .bn .rule-excerpt p .re-cap { font-size:34px; float:left; line-height:.8; margin:4px 9px 0 0; font-weight:700; color:var(--paper); }
 
