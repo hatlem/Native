@@ -1,3 +1,4 @@
+import { PendingButton } from "@/components/submit-button";
 import type { Metadata } from "next";
 import { getTranslations } from "next-intl/server";
 import { Link } from "@/i18n/navigation";
@@ -101,9 +102,9 @@ export default async function ResetPasswordPage({
               />
             </div>
             <div className="actions">
-              <button type="submit" className="btn primary block">
+              <PendingButton className="btn primary block">
                 {t("resetButton")}
-              </button>
+              </PendingButton>
             </div>
           </form>
         </div>

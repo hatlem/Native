@@ -1,6 +1,5 @@
 import { getTranslations } from "next-intl/server";
 import { redirect } from "next/navigation";
-import { prisma } from "@/lib/prisma";
 import { requireArticleWriter } from "@/lib/writers/guard";
 import { loadScope, canActOnOrg, canEditOnOrg } from "@/lib/scope";
 import { ViewOnlyNote } from "@/components/view-only-note";
@@ -12,11 +11,17 @@ import { approveContentAsset, requestContentChanges } from "@/app/content-review
 import { resolveEffectiveAsset } from "@/lib/writers/placement";
 import { evaluateSpecForPlacement } from "@/lib/spec-check-runner";
 import { articleHeadline } from "@/lib/content/markdown";
-import { linkableLinesWhere, linkOptionLabels, orderRef } from "@/lib/content/article-linking";
+import { linkOptionLabels, orderRef } from "@/lib/content/article-linking";
 import { Link } from "@/i18n/navigation";
-import { SubmitButton } from "@/components";
+import { SubmitButton, PendingButton } from "@/components";
 import { ArticlePreview } from "@/components/article-preview";
 import { UploadForm } from "./upload-form";
+import {
+  loadDetailArticle,
+  loadDetailCreatedBy,
+  loadDetailEligibleLines,
+  loadDetailProducts,
+} from "@/lib/data/buyer/articles";
 
 export const dynamic = "force-dynamic";
 
@@ -37,41 +42,7 @@ export default async function ArticleDetailPage({
   const { role, writerProfileId } = await requireArticleWriter(articleId, locale, "view"); // redirects if not allowed
   const scope = await loadScope();
 
-  const article = await prisma.article.findUnique({
-    where: { id: articleId },
-    select: {
-      id: true,
-      title: true,
-      organizationId: true,
-      assignedWriterId: true,
-      createdByUserId: true,
-      assignedWriter: { select: { user: { select: { name: true, email: true } } } },
-      placements: {
-        select: {
-          id: true,
-          lockedAssetId: true,
-          specPassed: true,
-          specNotes: true,
-          retractedAt: true,
-          orderLine: { select: { orderId: true, productId: true } },
-        },
-      },
-      versions: {
-        orderBy: { version: "desc" },
-        take: 1,
-        select: {
-          id: true,
-          version: true,
-          reviewRound: true,
-          status: true,
-          body: true,
-          bodyUrl: true,
-          reviewNotes: true,
-          authorWriter: { select: { user: { select: { name: true, email: true } } } },
-        },
-      },
-    },
-  });
+  const article = await loadDetailArticle(scope, { articleId });
   if (!article) redirect(`/${locale}/articles`);
 
   // The article's own latest version — what the write/upload forms edit and
@@ -110,10 +81,7 @@ export default async function ArticleDetailPage({
     : null;
 
   const headline = articleHeadline(latest?.body) ?? article.title;
-  const createdBy = await prisma.user.findUnique({
-    where: { id: article.createdByUserId },
-    select: { name: true, email: true },
-  });
+  const createdBy = await loadDetailCreatedBy(scope, { articleCreatedByUserId: article.createdByUserId });
   const author =
     latest?.authorWriter?.user ?? article.assignedWriter?.user ?? createdBy ?? null;
   const authorName = author ? (author.name ?? author.email.split("@")[0]) : null;
@@ -127,24 +95,13 @@ export default async function ArticleDetailPage({
     .filter((id): id is string => !!id);
   const linkedOrderIds = [...new Set(article.placements.map((p) => p.orderLine.orderId))];
   const eligibleLines = canEdit
-    ? await prisma.orderLine.findMany({
-        where: linkableLinesWhere({
-          organizationId: article.organizationId,
-          linkedOrderIds,
-          nativeSpinWritten,
-        }),
-        select: { id: true, orderId: true, productId: true },
-        orderBy: [{ orderId: "asc" }, { id: "asc" }],
-      })
+    ? await loadDetailEligibleLines(scope, { articleOrganizationId: article.organizationId, linkedOrderIds, nativeSpinWritten })
     : [];
   const allProductIds = [
     ...new Set([...productIds, ...eligibleLines.map((l) => l.productId).filter((id): id is string => !!id)]),
   ];
   const products = allProductIds.length
-    ? await prisma.product.findMany({
-        where: { id: { in: allProductIds } },
-        select: { id: true, type: true, title: { select: { name: true } } },
-      })
+    ? await loadDetailProducts(scope, { allProductIds })
     : [];
   const productById = new Map(products.map((p) => [p.id, p]));
   const lineLabel = (productId: string | null, orderId: string) => {
@@ -296,9 +253,9 @@ export default async function ArticleDetailPage({
                       <input type="hidden" name="locale" value={locale} />
                       <input type="hidden" name="articleId" value={articleId} />
                       <input type="hidden" name="placementId" value={p.id} />
-                      <button type="submit" className="btn small ghost">
+                      <PendingButton className="btn small ghost">
                         {t("unlinkCta")}
-                      </button>
+                      </PendingButton>
                     </form>
                   ) : null}
                 </li>
@@ -382,14 +339,13 @@ export default async function ArticleDetailPage({
                 <input type="hidden" name="locale" value={locale} />
                 <input type="hidden" name="assetId" value={latest.id} />
                 <input type="hidden" name="target" value="IN_REVIEW" />
-                <button
-                  type="submit"
+                <PendingButton
                   className="btn primary"
                   disabled={!canSubmit}
                   aria-disabled={!canSubmit}
                 >
                   {t("detailSubmitForReview")}
-                </button>
+                </PendingButton>
                 {canSubmit ? null : (
                   <span className="muted small">{t("submitBlockedSpec")}</span>
                 )}

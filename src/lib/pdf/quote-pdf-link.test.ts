@@ -29,6 +29,8 @@ test("QuoteDocument: renders with a price-on-request line and links back online"
     quoteNumber: "ABCD1234",
     currency: "SEK",
     vatPct: 25,
+    vatNote: null,
+    customerVatId: null,
     subtotal: 17250,
     total: 21562.5,
     validUntil: null,

@@ -58,16 +58,25 @@ One recipient = one email thread = one token, regardless of how many titles they
 
 | Step | When | Content |
 |------|------|---------|
-| `initial` | day 0 | Advertiser inquiry + title list + reply-first CTA. No opt-out. |
-| `bump1` | day +5 (if no response) | Short reminder. No opt-out. |
-| `bump2` | day +12 (if no response) | Breakaway: "right person? / not interested?" — **only this email carries List-Unsubscribe + an opt-out link.** |
+| `initial` | day 0 | Advertiser inquiry + title list + reply-first CTA. One-line opt-out footer. |
+| `bump1` | day +5 (if no response) | Short reminder. One-line opt-out footer. |
+| `bump2` | day +12 (if no response) | Breakaway: "right person? / not interested?" with the opt-out worded into the body. |
 
 Sequence stops immediately on response, cancel, or suppression.
 
-**Why no opt-out on the first two:** unsubscribing on a "send us prices so we can sell
-your inventory" email is self-defeating — the publisher loses sales to our advertisers.
-At ≤20/day we're well below the bulk-sender threshold that would mandate List-Unsubscribe
-on every message. The breakaway (bump2) still offers a clean exit.
+**Every email carries an opt-out** — a link in the body and `List-Unsubscribe` /
+`List-Unsubscribe-Post` headers — on all three steps and on single-title price requests
+(`src/lib/pricing/requests.ts`). These are unsolicited emails to contacts we found
+ourselves, so each one has to say how to stop the next. Opting out puts the address on
+`OutreachSuppression`, which both the rate-card campaign and price requests check before
+every send. The legal-basis write-up is in [`outreach-legal-basis.md`](./outreach-legal-basis.md).
+
+**Send safety.** A step is *claimed* in the database before the email goes out
+(`sentCount n → n+1` compare-and-set), so two concurrent senders never mail the same step;
+a failed send hands the step back. The daily cap (`OUTREACH_DAILY_CAP`, default 20) is
+counted from the database across all processes — rate-card steps plus price requests sent
+since midnight UTC — so separate CLI runs or web instances cannot each start a fresh quota.
+The hourly limiter remains an in-process smoothing bucket.
 
 Copy lives in `src/lib/outreach/email.ts` (6 locales × 3 steps). Norwegian uses
 "annonsørinnhold" (the industry term); other locales use "advertorial". Signature is

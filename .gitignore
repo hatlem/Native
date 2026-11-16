@@ -30,8 +30,10 @@ next-env.d.ts
 sec-review.md
 sec-review-*.md
 
-# scenario fixtures (large binaries Ã¢ÂÂ kept out of git)
-test-fixtures/
+# scenario fixtures (large binaries - kept out of git), except the small HTML
+# pages the outreach scraper unit tests read (src/lib/outreach/*.test.ts).
+test-fixtures/*
+!test-fixtures/scraper/
 
 # local DB snapshots (pg_dump safety nets taken before destructive migrations)
 scripts/dev-backups/
@@ -59,3 +61,10 @@ docs/outreach-sources/_dl-*/
 .superpowers/
 .worktrees/
 .workflow-reports/
+
+# Outreach contact lists hold personal data (named publisher contacts) and must
+# not live in git. Keep them locally or in private storage; scripts read them
+# from data/outreach/ at runtime. To restore the last committed copies:
+#   git checkout 5423040 -- data/outreach outreach_send_batch_0609.json && git rm -r --cached data/outreach outreach_send_batch_0609.json
+data/outreach/
+outreach_send_batch_*.json

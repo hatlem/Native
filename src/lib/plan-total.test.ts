@@ -191,14 +191,22 @@ test("VAT is added per placement market and stated separately", () => {
   assert.equal(total.totalInclVat, 24375);
 });
 
-test("two EUR markets keep their own VAT rates", () => {
+test("VAT follows the buyer, not the placement's market", () => {
+  // Two EUR markets with different local VAT rates (DE 19 %, IE 23 %): the
+  // rate on the plan is the BUYER's (lib/vat.ts), the same for both.
   const items = [
     fakeItem({ currency: "EUR", basePrice: 1000, marketCode: "DE", vatRatePct: 19 }),
     fakeItem({ currency: "EUR", basePrice: 1000, marketCode: "IE", vatRatePct: 23 }),
   ];
-  const [total] = estimateListTotals(items, NO_PRICING);
-  assert.equal(total.amount, 2300);
-  assert.equal(total.totalInclVat, Math.round(1150 * 1.19) + Math.round(1150 * 1.23));
+  // No buyer known → the seller's domestic rate (25 %).
+  const [unknown] = estimateListTotals(items, NO_PRICING);
+  assert.equal(unknown.amount, 2300);
+  assert.equal(unknown.totalInclVat, 2875);
+  assert.equal(unknown.vat, 575);
+  // A buyer outside Norway: reverse charge, 0 %.
+  const [foreign] = estimateListTotals(items, { ...NO_PRICING, vatPct: 0 });
+  assert.equal(foreign.totalInclVat, 2300);
+  assert.equal(foreign.vat, 0);
 });
 
 test("the plan total equals what the firm order computes for the same lines", () => {
@@ -541,7 +549,7 @@ test("a mixed plan totals the firm lines exactly and bands the rest", () => {
   assert.equal(mixed.hasExact, true);
   assert.deepEqual(mixed.estimate, { low: 25000, high: 40000 });
   // VAT is exact arithmetic on the exact part only.
-  assert.equal(mixed.totalInclVat, Math.round(17250 * 1.25));
+  assert.equal(mixed.totalInclVat, 21562.5); // 17 250 × 1.25, to the øre
   assert.equal(mixed.itemCount, 2);
 
   const [open] = estimateListTotals([banded, top, hidden], pricing);

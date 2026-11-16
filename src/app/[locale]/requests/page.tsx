@@ -1,8 +1,8 @@
 import { getTranslations } from "next-intl/server";
-import { viewOrgIds } from "@/lib/workspace";
+import { Suspense } from "react";
+import { viewOrgIds, type Workspace } from "@/lib/workspace";
 import { redirect } from "next/navigation";
-import { prisma } from "@/lib/prisma";
-import { loadScope } from "@/lib/scope";
+import { loadScope, type Scope } from "@/lib/scope";
 import { loadUnsentLists } from "@/lib/lists";
 import { estimateListTotals, hasFigure, planLineCount } from "@/lib/plan-total";
 import { totalLabel as planTotalLabel } from "@/lib/pricing/total-label";
@@ -12,11 +12,14 @@ import { EmptyState } from "@/app/empty-state";
 import { formatMoney, intlLocale } from "@/lib/money";
 import { timeAgo } from "@/lib/time-ago";
 import { deriveStage, type CampaignStage } from "@/lib/campaign-stage";
-import { buyerVisibleQuoteWhere, effectiveQuoteStatus } from "@/lib/commerce/quote-validity";
+import { effectiveQuoteStatus } from "@/lib/commerce/quote-validity";
 import { monthsWindow, intersectsMonth, draftWindow, orderWindow, type RunWindow } from "@/lib/campaign-timeline";
 import { CampaignRow, type RowAction } from "./_components/CampaignRow";
 import { tabForRow, type RowTab } from "@/lib/request-tab";
 import { TimelineView, type TimelineEntry, type TimelineMonthGroup } from "./_components/TimelineView";
+import {
+  loadListRequests,
+} from "@/lib/data/buyer/requests";
 
 export const dynamic = "force-dynamic";
 
@@ -52,10 +55,7 @@ export default async function RequestsPage({
   const { locale } = await params;
   const sp = await searchParams;
   const t = await getTranslations({ locale, namespace: "requests" });
-  const tOrders = await getTranslations({ locale, namespace: "orders" });
-  const tPlan = await getTranslations({ locale, namespace: "plan" });
   const tInvoice = await getTranslations({ locale, namespace: "invoice" });
-  const tv = await getTranslations({ locale, namespace: "priceVisibility" });
 
   const scope = await loadScope();
   if (!scope.workspace) redirect(`/${locale}/signin`);
@@ -64,6 +64,79 @@ export default async function RequestsPage({
   // none: no "new campaign" CTA, and a draft plan row reads "View", not
   // "Finish & send".
   const canEdit = viewOrgIds(ws).some((id) => ws.editOrgIds.includes(id));
+
+
+  // The header and its links render at once; the pipeline (every request,
+  // its quotes, orders and invoices) streams in behind a skeleton. The
+  // sign-in redirect above runs before anything is sent, so the response
+  // status is unchanged.
+  return (
+    <>
+      <div className="section-head">
+        <div>
+          <h1>{t("pipelineTitle")}</h1>
+          <p className="lead">{t("pipelineLead")}</p>
+        </div>
+        <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+          <Link href="/invoices" className="btn secondary">
+            {tInvoice("listTitle")}
+          </Link>
+          {canEdit ? (
+            <Link href="/catalog" className="btn">
+              {t("newCampaignCta")}
+            </Link>
+          ) : null}
+        </div>
+      </div>
+
+      <Suspense fallback={<PipelineSkeleton label={t("pipelineTitle")} />}>
+        <RequestsPipeline scope={scope} locale={locale} sp={sp} ws={ws} canEdit={canEdit} />
+      </Suspense>
+    </>
+  );
+}
+
+// Placeholder for the tabs and campaign rows while their queries run.
+function PipelineSkeleton({ label }: { label: string }) {
+  return (
+    <div aria-busy="true" aria-live="polite" aria-label={label}>
+      <div className="campaign-tabs" aria-hidden="true">
+        {[0, 1, 2, 3].map((i) => (
+          <span className="skel" key={i} style={{ width: 96, height: 32, borderRadius: 999 }} />
+        ))}
+      </div>
+      <div className="campaign-row-list">
+        {[0, 1, 2].map((i) => (
+          <div className="card skel-card" key={i}>
+            <div className="skel skel-line" />
+            <div className="skel skel-line short" />
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+// The pipeline itself: the tabs with their counts, and the campaign rows (or
+// the timeline view). Same queries and scoping as before — only moved behind
+// the Suspense boundary above.
+async function RequestsPipeline({
+  scope,
+  locale,
+  sp,
+  ws,
+  canEdit,
+}: {
+  scope: Scope;
+  locale: string;
+  sp: Record<string, string | string[] | undefined>;
+  ws: Workspace;
+  canEdit: boolean;
+}) {
+  const t = await getTranslations({ locale, namespace: "requests" });
+  const tOrders = await getTranslations({ locale, namespace: "orders" });
+  const tPlan = await getTranslations({ locale, namespace: "plan" });
+  const tv = await getTranslations({ locale, namespace: "priceVisibility" });
 
   const tabRaw = typeof sp.tab === "string" ? sp.tab : "";
   const explicitView: View | null = (VIEWS as readonly string[]).includes(tabRaw) ? (tabRaw as View) : null;
@@ -84,29 +157,7 @@ export default async function RequestsPage({
     // selectActiveList -> /plan, which only ever renders the active org's
     // lists, so a different client's draft here would resolve wrong.
     ws.activeOrgId ? loadUnsentLists(ws.activeOrgId) : Promise.resolve([]),
-    prisma.request.findMany({
-      where: { organizationId: { in: viewOrgIds(ws) } },
-      orderBy: { updatedAt: "desc" },
-      include: {
-        organization: { select: { name: true } },
-        plan: { select: { name: true, _count: { select: { items: true } } } },
-        sourceList: {
-          select: { waveNumber: true, programme: { select: { plannedWaves: true } } },
-        },
-        // Drafts are desk-internal: until the desk sends the quote the row
-        // stays at "sent to the desk" (see buyerVisibleQuoteWhere).
-        quotes: {
-          where: buyerVisibleQuoteWhere(),
-          orderBy: { createdAt: "desc" },
-          take: 1,
-          include: {
-            order: {
-              include: { invoices: { orderBy: { createdAt: "desc" }, take: 1, select: { status: true } } },
-            },
-          },
-        },
-      },
-    }),
+    loadListRequests(scope),
   ]);
 
   const rows: Row[] = [];
@@ -384,23 +435,6 @@ export default async function RequestsPage({
 
   return (
     <>
-      <div className="section-head">
-        <div>
-          <h1>{t("pipelineTitle")}</h1>
-          <p className="lead">{t("pipelineLead")}</p>
-        </div>
-        <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
-          <Link href="/invoices" className="btn secondary">
-            {tInvoice("listTitle")}
-          </Link>
-          {canEdit ? (
-            <Link href="/catalog" className="btn">
-              {t("newCampaignCta")}
-            </Link>
-          ) : null}
-        </div>
-      </div>
-
       <nav className="campaign-tabs" aria-label={t("tabsLabel")}>
         {TABS.map((tab) => (
           <a

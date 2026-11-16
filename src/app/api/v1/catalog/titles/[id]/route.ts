@@ -9,12 +9,9 @@ import { bandLabel } from "@/lib/pricing/bands";
 import { productBand } from "@/lib/pricing/display-price";
 import { loadPricingDefaults } from "@/lib/content-fee";
 import { rfqLimiter } from "@/lib/rate-limit";
+import { errJson, rateLimitedJson } from "@/lib/api/errors";
 
 export const dynamic = "force-dynamic";
-
-function errJson(status: number, code: string, message: string) {
-  return NextResponse.json({ error: { code, message } }, { status });
-}
 
 export async function GET(
   req: NextRequest,
@@ -37,7 +34,7 @@ export async function GET(
 
   const limited = await rfqLimiter.check(`api:catalog:${auth.keyId}`);
   if (!limited.ok) {
-    return errJson(429, "RATE_LIMITED", "Slow down — retry after " + Math.ceil(limited.retryAfterMs / 1000) + "s.");
+    return rateLimitedJson(limited.retryAfterMs, "Slow down — retry after " + Math.ceil(limited.retryAfterMs / 1000) + "s.");
   }
 
   const pricing = await loadPricingDefaults();

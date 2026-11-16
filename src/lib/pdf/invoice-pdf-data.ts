@@ -4,6 +4,7 @@ import { invoiceLineLabel } from "@/lib/invoice-line-label";
 import { formatMoney, intlLocale } from "@/lib/money";
 import { qt, quoteFormatLabel } from "./quote-messages";
 import { invoiceMessagesFor } from "./invoice-messages";
+import { customerSnapshotFrom, documentNumber, readCustomerSnapshot } from "@/lib/invoice-snapshot";
 
 // Everything the invoice PDF may render. Built from the issued Invoice row
 // (never re-derived from the quote), so the document always matches what
@@ -22,6 +23,10 @@ export type InvoicePdfData = {
   currency: string;
   subtotal: number;
   vatPct: number;
+  // The treatment the invoice was issued under and the note it prints for a
+  // reverse-charge sale (lib/vat.ts). Null on invoices from before the rule.
+  vatTreatment: "DOMESTIC" | "REVERSE_CHARGE" | null;
+  vatNote: string | null;
   total: number;
   issuedAt: Date | null;
   dueAt: Date | null;
@@ -29,13 +34,17 @@ export type InvoicePdfData = {
   // The terms the invoice was issued under (null on legacy invoices).
   paymentTermsDays: number | null;
   customer: { name: string; vatId: string | null; addressLines: string[] };
+  // The seller block frozen at issue time (Invoice.sellerSnapshot), merged
+  // over today's configuration by sellerForInvoice at render.
+  sellerSnapshot: unknown;
   rows: InvoicePdfRow[];
-  credit: { issuedAt: Date; amount: number; reason: string } | null;
+  credit: { number: string; issuedAt: Date; amount: number; reason: string } | null;
 };
 
-// Same short form the invoice page shows.
-export function invoiceNumber(invoiceId: string): string {
-  return invoiceId.slice(-8).toUpperCase();
+// The invoice's sequence number (lib/invoice-snapshot.ts); a draft or a
+// row from before numbering falls back to the short id.
+export function invoiceNumber(invoice: { id: string; number?: number | null }): string {
+  return documentNumber(invoice);
 }
 
 export async function loadInvoicePdfData(
@@ -78,26 +87,22 @@ export async function loadInvoicePdfData(
 
   return {
     invoiceId: invoice.id,
-    number: invoiceNumber(invoice.id),
+    number: invoiceNumber(invoice),
     status: invoice.status,
     currency: invoice.currency,
     subtotal: Number(invoice.subtotal),
     vatPct: Number(invoice.vatPct),
+    vatTreatment: invoice.vatTreatment,
+    vatNote: invoice.vatNote,
     total: Number(invoice.total),
     issuedAt: invoice.issuedAt,
     dueAt: invoice.dueAt,
     accountingNumber: invoice.accountingNumber,
     paymentTermsDays: invoice.paymentTermsDays,
-    customer: {
-      // The billing block collected in the campaign flow, when present.
-      name: org.legalName || org.name,
-      vatId: org.vatId,
-      addressLines: [
-        org.addressLine1,
-        org.addressLine2,
-        [org.postalCode, org.city].filter(Boolean).join(" "),
-      ].filter((l): l is string => Boolean(l && l.trim())),
-    },
+    // The block frozen when the invoice was issued; live organisation data
+    // only for drafts and invoices issued before snapshots existed.
+    customer: readCustomerSnapshot(invoice.customerSnapshot) ?? customerSnapshotFrom(org),
+    sellerSnapshot: invoice.sellerSnapshot,
     rows: invoice.lines.map((l) => ({
       label: invoiceLineLabel(l, deps),
       quantity: l.quantity,
@@ -105,7 +110,12 @@ export async function loadInvoicePdfData(
       lineTotal: Number(l.lineTotal),
     })),
     credit: credit
-      ? { issuedAt: credit.issuedAt, amount: Number(credit.amount), reason: credit.reason }
+      ? {
+          number: documentNumber(credit),
+          issuedAt: credit.issuedAt,
+          amount: Number(credit.amount),
+          reason: credit.reason,
+        }
       : null,
   };
 }

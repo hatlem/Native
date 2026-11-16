@@ -3,7 +3,7 @@ import { MarketCode } from "@prisma/client";
 import { Link } from "@/i18n/navigation";
 import type { Candidate, SupplementaryTitle } from "@/lib/recommend";
 import { addToPlan } from "@/app/plan-actions";
-import { SubmitButton } from "@/components";
+import { SubmitButton, PendingButton } from "@/components";
 import { SUPPORTED_MARKETS } from "@/lib/markets";
 
 const MARKET_CODES = SUPPORTED_MARKETS;
@@ -94,7 +94,11 @@ export async function PlanStart({
                       </div>
                       {p.reasonText ? (
                         <div className="sub small" style={{ marginTop: "0.35rem" }}>
-                          <span className="muted">{tc("whyFits")}</span> {p.reasonText}
+                          <span className="muted">{tc("whyFits")}</span> {p.reasonText}{" "}
+                          {/* reasonText is model-written (brief-rerank-llm.ts). */}
+                          <span className="tag" title={tc("aiWrittenHint")}>
+                            {tc("aiWritten")}
+                          </span>
                         </div>
                       ) : p.reasons && p.reasons.length > 0 ? (
                         <div className="cluster tight" style={{ marginTop: "0.35rem" }}>
@@ -108,7 +112,7 @@ export async function PlanStart({
                       <input type="hidden" name="locale" value={locale} />
                       {listId ? <input type="hidden" name="listId" value={listId} /> : null}
                       <input type="hidden" name="productId" value={p.productId} />
-                      <button type="submit" className="btn small">{t("add")}</button>
+                      <PendingButton className="btn small">{t("add")}</PendingButton>
                     </form>
                   </div>
                 ))}
@@ -132,7 +136,7 @@ export async function PlanStart({
                       <input type="hidden" name="locale" value={locale} />
                       {listId ? <input type="hidden" name="listId" value={listId} /> : null}
                       <input type="hidden" name="productId" value={s.productId} />
-                      <button type="submit" className="btn small ghost">{t("add")}</button>
+                      <PendingButton className="btn small ghost">{t("add")}</PendingButton>
                     </form>
                   </div>
                 ))}

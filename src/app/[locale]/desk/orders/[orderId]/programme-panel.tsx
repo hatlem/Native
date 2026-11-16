@@ -1,17 +1,25 @@
 import { getTranslations } from "next-intl/server";
-import { prisma } from "@/lib/prisma";
+import type { DeskContext } from "@/lib/desk-guard";
 import { loadProgrammeForList } from "@/lib/programme";
 import { intlLocale } from "@/lib/money";
+import {
+  loadProgrammePanelOrder,
+} from "@/lib/data/desk/orders";
 
 // Read-only programme context for the desk: which wave this order is, what
 // the other waves are doing, and each wave's article angle — so the desk can
 // quote/produce THIS wave with the next one in view (and sell it proactively)
 // instead of parsing "Article angle (wave 2 of 3)" out of the brief prose.
-export async function ProgrammePanel({ locale, orderId }: { locale: string; orderId: string }) {
-  const order = await prisma.order.findUnique({
-    where: { id: orderId },
-    select: { quote: { select: { request: { select: { sourceListId: true } } } } },
-  });
+export async function ProgrammePanel({
+  ctx,
+  locale,
+  orderId,
+}: {
+  ctx: DeskContext;
+  locale: string;
+  orderId: string;
+}) {
+  const order = await loadProgrammePanelOrder(ctx, { orderId });
   const listId = order?.quote.request.sourceListId;
   if (!listId) return null;
   const view = await loadProgrammeForList(listId);

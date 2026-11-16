@@ -1,4 +1,5 @@
 "use server";
+import { log } from "@/lib/log";
 
 import { redirect } from "next/navigation";
 import { prisma } from "@/lib/prisma";
@@ -41,8 +42,10 @@ import { discardQuoteRevision, reviseQuote } from "@/lib/commerce/quote-revision
 import { marketDefaultLocale } from "@/lib/market-locale";
 import { marketTimeZone } from "@/lib/markets";
 import { groupItemsByMarket } from "@/lib/quote-grouping";
+import { quoteVatColumns, quoteVatFor } from "@/lib/vat-buyer";
 import { recordAudit } from "@/lib/audit";
 import { notifyDesk, notifyOrg } from "@/lib/notify";
+import { requireDesk } from "@/lib/desk-guard";
 import { loadScope, canActOnOrg, canCommitOnOrg, canEditOnOrg } from "@/lib/scope";
 import { viewAsCommitConfirmed } from "@/lib/view-as";
 import { generateQuotePdf as renderQuotePdf } from "@/lib/pdf/generate-quote-pdf";
@@ -77,7 +80,7 @@ function redirectForRefusedOffer(
 ): never {
   const base = `/${locale}/requests/${requestId}`;
   if (check.reason === "accepted") redirect(base);
-  console.warn("quote.accept.refused", { requestId, reason: check.reason });
+  log.warn("quote.accept.refused", { requestId, reason: check.reason });
   if (check.reason === "replaced") redirect(`${base}?error=quote-replaced&revision=${check.revision}`);
   redirect(`${base}?error=quote-changed`);
 }
@@ -104,6 +107,8 @@ export async function generateQuote(formData: FormData) {
   const requestId = str(formData, "requestId");
 
   // Only the desk can produce a quote — previously any caller could POST.
+  // Role + staff two-factor (MFA_REQUIRED_FOR_STAFF), like every desk page.
+  await requireDesk(locale);
   const scope = await loadScope();
   if (!scope.isDesk) redirect(`/${locale}/signin`);
 
@@ -116,6 +121,9 @@ export async function generateQuote(formData: FormData) {
     },
   });
   if (!request) redirect(`/${locale}/desk`);
+  // A request the buyer withdrew is closed: quoting it would reopen it behind
+  // their back.
+  if (request.withdrawnAt) redirect(`/${locale}/desk/${requestId}`);
   if (request.quotes.length > 0) {
     redirect(`/${locale}/desk/${requestId}`);
   }
@@ -128,7 +136,7 @@ export async function generateQuote(formData: FormData) {
   // resolvable and quotable later. Only block when NOTHING is quotable yet.
   const productItems = request.plan.items.filter((i) => i.productId);
   if (productItems.length === 0) {
-    console.warn("quote.blocked", { reason: "nothing-resolved", requestId });
+    log.warn("quote.blocked", { reason: "nothing-resolved", requestId });
     redirect(`/${locale}/desk/${requestId}?error=unresolved-titles`);
   }
   const products = await prisma.product.findMany({
@@ -148,6 +156,10 @@ export async function generateQuote(formData: FormData) {
     byId,
   );
   if (groups.length === 0) redirect(`/${locale}/desk/${requestId}?error=empty`);
+
+  // VAT follows the buyer's country, not the placement's market (lib/vat.ts):
+  // one decision for every quote of this request.
+  const vat = quoteVatFor(request.organization);
 
   // Fee rules and margin defaults come from the same load so the quote
   // agrees with the catalog band the buyer saw (display-price.ts).
@@ -208,14 +220,14 @@ export async function generateQuote(formData: FormData) {
         ...l,
         position,
       }));
-      const { subtotal, total } = quoteTotals(lines, group.vatPct);
+      const { subtotal, total } = quoteTotals(lines, vat.vatPct);
       const quote = await tx.quote.create({
         data: {
           requestId: request.id,
           status: "DRAFT",
           currency: group.currency,
           subtotal,
-          vatPct: group.vatPct,
+          ...quoteVatColumns(vat),
           total,
           // Set when the desk sends it — a draft makes no offer yet.
           validUntil: null,
@@ -253,6 +265,8 @@ export async function sendQuote(formData: FormData) {
   const locale = str(formData, "locale") || "en";
   const requestId = str(formData, "requestId");
 
+  // Role + staff two-factor (MFA_REQUIRED_FOR_STAFF), like every desk page.
+  await requireDesk(locale);
   const scope = await loadScope();
   if (!scope.isDesk || !scope.userId) redirect(`/${locale}/signin`);
 
@@ -260,8 +274,10 @@ export async function sendQuote(formData: FormData) {
   // in their organisation's zone, the zone every surface prints it in.
   const org = await prisma.request.findUnique({
     where: { id: requestId },
-    select: { organization: { select: { marketCode: true } } },
+    select: { withdrawnAt: true, organization: { select: { marketCode: true } } },
   });
+  // Never send a quote on a request the buyer has withdrawn.
+  if (org?.withdrawnAt) redirect(`/${locale}/desk/${requestId}`);
   const parsed = parseQuoteValidUntil(
     str(formData, "validUntil"),
     new Date(),
@@ -301,6 +317,8 @@ export async function setQuoteLinePrice(formData: FormData) {
   const lineId = str(formData, "lineId");
   const intent = str(formData, "intent");
 
+  // Role + staff two-factor (MFA_REQUIRED_FOR_STAFF), like every desk page.
+  await requireDesk(locale);
   const scope = await loadScope();
   if (!scope.isDesk || !scope.userId) redirect(`/${locale}/signin`);
 
@@ -348,6 +366,8 @@ export async function setQuoteLineNote(formData: FormData) {
   const quoteId = str(formData, "quoteId");
   const lineId = str(formData, "lineId");
 
+  // Role + staff two-factor (MFA_REQUIRED_FOR_STAFF), like every desk page.
+  await requireDesk(locale);
   const scope = await loadScope();
   if (!scope.isDesk || !scope.userId) redirect(`/${locale}/signin`);
 
@@ -376,6 +396,8 @@ export async function addQuoteExtraWork(formData: FormData) {
   const requestId = str(formData, "requestId");
   const quoteId = str(formData, "quoteId");
 
+  // Role + staff two-factor (MFA_REQUIRED_FOR_STAFF), like every desk page.
+  await requireDesk(locale);
   const scope = await loadScope();
   if (!scope.isDesk || !scope.userId) redirect(`/${locale}/signin`);
 
@@ -412,6 +434,8 @@ export async function removeQuoteExtraWork(formData: FormData) {
   const quoteId = str(formData, "quoteId");
   const lineId = str(formData, "lineId");
 
+  // Role + staff two-factor (MFA_REQUIRED_FOR_STAFF), like every desk page.
+  await requireDesk(locale);
   const scope = await loadScope();
   if (!scope.isDesk || !scope.userId) redirect(`/${locale}/signin`);
 
@@ -435,6 +459,8 @@ export async function reviseQuoteAction(formData: FormData) {
   const requestId = str(formData, "requestId");
   const quoteId = str(formData, "quoteId");
 
+  // Role + staff two-factor (MFA_REQUIRED_FOR_STAFF), like every desk page.
+  await requireDesk(locale);
   const scope = await loadScope();
   if (!scope.isDesk || !scope.userId) redirect(`/${locale}/signin`);
 
@@ -456,6 +482,8 @@ export async function discardQuoteRevisionAction(formData: FormData) {
   const requestId = str(formData, "requestId");
   const quoteId = str(formData, "quoteId");
 
+  // Role + staff two-factor (MFA_REQUIRED_FOR_STAFF), like every desk page.
+  await requireDesk(locale);
   const scope = await loadScope();
   if (!scope.isDesk || !scope.userId) redirect(`/${locale}/signin`);
 
@@ -474,6 +502,8 @@ export async function generateQuotePdf(formData: FormData) {
   const quoteId = str(formData, "quoteId");
   const requestId = str(formData, "requestId");
 
+  // Role + staff two-factor (MFA_REQUIRED_FOR_STAFF), like every desk page.
+  await requireDesk(locale);
   const scope = await loadScope();
   if (!scope.isDesk || !scope.userId) redirect(`/${locale}/signin`);
 
@@ -481,7 +511,7 @@ export async function generateQuotePdf(formData: FormData) {
   // there is nothing to generate — say so instead of rendering and then
   // failing the upload with an unhandled 500.
   if (!isStorageConfigured()) {
-    console.error("quote.pdf.storage_not_configured", { quoteId, missing: missingStorageEnv() });
+    log.error("quote.pdf.storage_not_configured", { quoteId, missing: missingStorageEnv() });
     redirect(`/${locale}/desk/${requestId}?pdf=storage-unavailable`);
   }
 
@@ -504,7 +534,7 @@ export async function generateQuotePdf(formData: FormData) {
   } catch (err) {
     // redirect() must stay outside the try (it throws by design); map the
     // failure to a desk-visible message and keep the details in the log.
-    console.error("quote.pdf.generate_failed", { quoteId, err });
+    log.error("quote.pdf.generate_failed", { quoteId, err });
     outcome =
       err instanceof StorageNotConfiguredError
         ? "storage-unavailable"
@@ -787,6 +817,8 @@ export async function renewQuote(formData: FormData) {
   const requestId = str(formData, "requestId");
   const quoteId = str(formData, "quoteId");
 
+  // Role + staff two-factor (MFA_REQUIRED_FOR_STAFF), like every desk page.
+  await requireDesk(locale);
   const scope = await loadScope();
   if (!scope.isDesk || !scope.userId) redirect(`/${locale}/signin`);
 

@@ -1,7 +1,6 @@
+import { PendingButton } from "@/components/submit-button";
 import { getTranslations } from "next-intl/server";
 import { redirect } from "next/navigation";
-import { prisma } from "@/lib/prisma";
-import { PLACEMENT_LINE_WHERE } from "@/lib/commerce/placements";
 import { loadScope } from "@/lib/scope";
 import { Link } from "@/i18n/navigation";
 import { StatusBadge } from "@/app/status-badge";
@@ -12,7 +11,6 @@ import { campaignFlowEnabled } from "@/lib/flags";
 import { FileCheck, PenLine, Search, RotateCcw, Repeat } from "lucide-react";
 import { findDueWaves } from "@/lib/programme";
 import { selectActiveList } from "@/app/list-actions";
-import { acceptableQuoteWhere } from "@/lib/commerce/quote-validity";
 import { reconcileExpiredQuotesInBackground } from "@/lib/commerce/quote-expiry";
 import { JoinedNotice } from "@/app/joined-notice";
 import { ViewOnlyNote } from "@/components/view-only-note";
@@ -20,6 +18,12 @@ import { viewOrgIds } from "@/lib/workspace";
 import { landingForRole } from "@/lib/roles";
 import { logout } from "@/app/auth-actions";
 
+import { SignupCompletedEvent } from "@/app/activation-events";
+import {
+  loadPendingQuotes,
+  loadPendingContent,
+  loadOrders,
+} from "@/lib/data/buyer/home";
 export const dynamic = "force-dynamic";
 
 export default async function HomePage({
@@ -50,9 +54,9 @@ export default async function HomePage({
         </header>
         <form action={logout}>
           <input type="hidden" name="locale" value={locale} />
-          <button type="submit" className="btn secondary">
+          <PendingButton className="btn secondary">
             {ta("signout")}
-          </button>
+          </PendingButton>
         </form>
       </section>
     );
@@ -71,42 +75,9 @@ export default async function HomePage({
   // article can back multiple placements.
   reconcileExpiredQuotesInBackground({ organizationIds: orgIds });
   const [pendingQuotes, pendingContent, orders, dueWaves] = await Promise.all([
-    prisma.quote.findMany({
-      where: { ...acceptableQuoteWhere(), order: null, request: { organizationId: { in: orgIds } } },
-      orderBy: { createdAt: "desc" },
-      take: 5,
-      select: {
-        id: true,
-        total: true,
-        currency: true,
-        validUntil: true,
-        request: { select: { id: true, organizationId: true, plan: { select: { name: true } } } },
-      },
-    }),
-    prisma.contentAsset.findMany({
-      where: { status: "IN_REVIEW", article: { organizationId: { in: orgIds } } },
-      orderBy: { updatedAt: "desc" },
-      take: 5,
-      select: {
-        id: true,
-        article: { select: { id: true } },
-      },
-    }),
-    prisma.order.findMany({
-      where: { organizationId: { in: orgIds }, status: { in: ["CONFIRMED", "IN_PRODUCTION", "SCHEDULED", "LIVE"] } },
-      orderBy: { updatedAt: "desc" },
-      take: 6,
-      select: {
-        id: true,
-        status: true,
-        flightStartDate: true,
-        flightEndDate: true,
-        organization: { select: { name: true } },
-        quote: { select: { currency: true, total: true, request: { select: { plan: { select: { name: true } } } } } },
-        // Placements only — the article fees are billed with them.
-        lines: { where: PLACEMENT_LINE_WHERE, select: { id: true } },
-      },
-    }),
+    loadPendingQuotes(scope),
+    loadPendingContent(scope),
+    loadOrders(scope),
     // Programme waves whose turn it is: the previous wave is live/finished, or
     // this wave's start is close. Scoped to the ACTIVE org only, because the
     // CTA switches the active list (selectActiveList → /plan), which only
@@ -132,6 +103,7 @@ export default async function HomePage({
 
   return (
     <section>
+      {scope.session?.user?.id ? <SignupCompletedEvent userId={scope.session.user.id} /> : null}
       {joined ? <JoinedNotice locale={locale} organizationId={ws.activeOrgId} variant="home" /> : null}
       <h1>
         {needsCount > 0
@@ -200,9 +172,9 @@ export default async function HomePage({
               <form action={selectActiveList}>
                 <input type="hidden" name="locale" value={locale} />
                 <input type="hidden" name="listId" value={w.listId} />
-                <button type="submit" className="btn small">
+                <PendingButton className="btn small">
                   {t("openWave")}
-                </button>
+                </PendingButton>
               </form>
             </div>
           ))}

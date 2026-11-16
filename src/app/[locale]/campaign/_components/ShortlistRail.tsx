@@ -1,3 +1,4 @@
+import { PendingButton } from "@/components/submit-button";
 import { getTranslations } from "next-intl/server";
 import { Link } from "@/i18n/navigation";
 import { removeListItem } from "@/app/list-actions";
@@ -75,13 +76,12 @@ export async function ShortlistRail({ locale, items }: Props) {
               <form action={removeListItem}>
                 <input type="hidden" name="locale" value={locale} />
                 <input type="hidden" name="itemId" value={r.key} />
-                <button
-                  type="submit"
+                <PendingButton
                   className="shortlist-remove"
                   aria-label={t("shortlistRemove")}
                 >
                   ×
-                </button>
+                </PendingButton>
               </form>
             </li>
           ))}

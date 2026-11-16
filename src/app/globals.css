@@ -16,6 +16,8 @@
   --surface-3: #f1f1ed;
   --border: #e6e4dd;
   --border-strong: #d2cfc4;
+  /* Form-control boundary: 3.6:1 on white (WCAG 1.4.11 needs 3:1). */
+  --border-input: #8a877f;
 
   /* Text */
   --text: #1b1d21;
@@ -35,11 +37,13 @@
   --ring: rgba(67, 50, 245, 0.32);
 
   /* Semantic */
-  --success: #0a8a5e;
+  --success: #077a52;
   --success-soft: #e2f4ec;
-  --warning: #a36a13;
+  --warning: #85560c;
   --warning-soft: #fbf0db;
-  --danger: #c93642;
+  --danger: #b02a36;
+  /* Text on a --danger fill (6.5:1 light; dark theme flips to near-black). */
+  --danger-contrast: #ffffff;
   --danger-soft: #fce6e9;
 
   /* Radius */
@@ -102,6 +106,7 @@
     --surface-3: #20232a;
     --border: #2a2d34;
     --border-strong: #3a3e48;
+  --border-input: #6b7180;
 
     --text: #e6e7ec;
     --heading: #f7f8fb;
@@ -124,6 +129,7 @@
     --warning: #e0a85d;
     --warning-soft: #2c2014;
     --danger: #f06e7a;
+    --danger-contrast: #1b0c0e;
     --danger-soft: #2e1418;
 
     --shadow-xs: 0 1px 0 rgba(0, 0, 0, 0.35);
@@ -142,6 +148,7 @@
   --surface-3: #20232a;
   --border: #2a2d34;
   --border-strong: #3a3e48;
+  --border-input: #6b7180;
 
   --text: #e6e7ec;
   --heading: #f7f8fb;
@@ -164,6 +171,7 @@
   --warning: #e0a85d;
   --warning-soft: #2c2014;
   --danger: #f06e7a;
+  --danger-contrast: #1b0c0e;
   --danger-soft: #2e1418;
 
   --shadow-xs: 0 1px 0 rgba(0, 0, 0, 0.35);
@@ -1434,12 +1442,12 @@ main.container {
 
 .btn.danger {
   background: var(--danger);
-  color: #fff;
+  color: var(--danger-contrast);
 }
 
 .btn.danger:hover {
   background: color-mix(in srgb, var(--danger) 88%, #000);
-  color: #fff;
+  color: var(--danger-contrast);
 }
 
 .btn.small {
@@ -2227,7 +2235,7 @@ textarea {
   font-size: 0.95rem;
   color: var(--text);
   background: var(--surface);
-  border: 1px solid var(--border-strong);
+  border: 1px solid var(--border-input);
   border-radius: var(--r-sm);
   padding: 10px 12px;
   min-width: 0;
@@ -5989,7 +5997,7 @@ footer {
 
 footer .container.footer-grid {
   display: grid;
-  grid-template-columns: 2fr 1fr 1fr 1fr;
+  grid-template-columns: 2fr 1fr 1fr 1fr 1fr;
   gap: var(--s-6);
   align-items: start;
   padding-top: var(--s-6);
@@ -6302,7 +6310,7 @@ footer a:hover {
 }
 .catalog-start li {
   font-size: 0.9rem;
-  color: var(--ink-mute, #5b5648);
+  color: var(--ink-mute, var(--muted-strong));
   line-height: 1.4;
 }
 
@@ -6310,7 +6318,7 @@ footer a:hover {
 .book-call-banner { display:flex; gap:16px; align-items:center; justify-content:space-between; margin:0 0 16px; padding:14px 18px; border:1px solid var(--line,#e3ddcd); border-radius:10px; background:var(--surface-2,#faf7ef); }
 .book-call-banner p { margin:4px 0 0; font-size:0.9rem; }
 .book-call-banner-actions { display:flex; align-items:center; gap:10px; }
-.book-call-banner-dismiss { background:none; border:none; font-size:20px; line-height:1; cursor:pointer; color:var(--ink-mute,#5b5648); }
+.book-call-banner-dismiss { background:none; border:none; font-size:20px; line-height:1; cursor:pointer; color:var(--muted-strong); }
 /* Phones: heading + CTA on one compact row, body copy dropped — the full
    banner was ~220px tall with its button squeezed to three lines. */
 @media (max-width: 640px) {
@@ -8358,4 +8366,21 @@ fieldset.field > legend {
 .binding-picker__empty,
 .binding-picker__more {
   padding: 6px 10px;
+}
+
+/* Pending submit (SubmitButton / PendingButton): visibly busy, not clickable. */
+.btn[aria-busy="true"],
+button[aria-busy="true"] {
+  cursor: progress;
+  opacity: 0.65;
+}
+
+/* A field the server sent back with an error: the boundary carries the
+   state too, not only the message under it (WCAG 1.4.1 — not colour alone:
+   the message text is always present alongside). */
+input[aria-invalid="true"],
+select[aria-invalid="true"],
+textarea[aria-invalid="true"] {
+  border-color: var(--danger);
+  box-shadow: 0 0 0 1px var(--danger);
 }

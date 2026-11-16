@@ -100,7 +100,18 @@ export async function sendRateCardStep(args: {
   actorId: string;
 }): Promise<
   | { sent: "initial" | "bump1" | "bump2" }
-  | { skipped: "responded" | "cancelled" | "expired" | "suppressed" | "rate_limited" | "max_steps" | "no_titles" }
+  | {
+      skipped:
+        | "responded"
+        | "cancelled"
+        | "expired"
+        | "suppressed"
+        | "rate_limited"
+        | "daily_cap"
+        | "already_sent"
+        | "max_steps"
+        | "no_titles";
+    }
 > {
   const req = await prisma.rateCardRequest.findUnique({
     where: { id: args.requestId },
@@ -128,6 +139,10 @@ export async function sendRateCardStep(args: {
     return { skipped: "suppressed" };
   }
 
+  // The daily cap is counted in the database, not in a per-process bucket:
+  // every CLI run and every web instance starts with a fresh in-memory
+  // limiter, so only a stored count actually holds across them.
+  if ((await outreachSentToday()) >= outreachDailyCap()) return { skipped: "daily_cap" };
   const limited = await outreachLimiter.check("outreach-send");
   if (!limited.ok) return { skipped: "rate_limited" };
 
@@ -143,31 +158,13 @@ export async function sendRateCardStep(args: {
     unsubscribeLink: unsubLink,
   });
 
-  // Only the final breakaway email (bump2) carries an opt-out. The initial
-  // inquiry and first nudge are pure business asks — surfacing unsubscribe
-  // there would let publishers opt out before we ever get prices, which
-  // costs them sales to our advertisers too. (At 20/day we're far below the
-  // bulk-sender threshold that would mandate List-Unsubscribe everywhere.)
-  await emailAdapter({
-    to: req.recipientEmail,
-    subject: built.subject,
-    text: built.text,
-    from: process.env.OUTREACH_FROM,
-    replyTo: process.env.OUTREACH_REPLY_TO,
-    ...(step === "bump2"
-      ? {
-          headers: {
-            "List-Unsubscribe": `<${unsubLink}>`,
-            "List-Unsubscribe-Post": "List-Unsubscribe=One-Click",
-          },
-        }
-      : {}),
-  });
-
+  // Claim the step BEFORE sending: the row moves from sentCount n to n+1
+  // only once, so two concurrent senders (two desk tabs, the CLI batch and
+  // the sweep) can never both mail the same step.
   const now = new Date();
   const next = nextStepDate(step, now);
-  await prisma.rateCardRequest.update({
-    where: { id: req.id },
+  const claimed = await prisma.rateCardRequest.updateMany({
+    where: { id: req.id, sentCount: req.sentCount, respondedAt: null, cancelledAt: null },
     data: {
       sentCount: req.sentCount + 1,
       lastStepAt: now,
@@ -175,11 +172,58 @@ export async function sendRateCardStep(args: {
       sentAt: req.sentAt ?? now,
     },
   });
+  if (claimed.count !== 1) return { skipped: "already_sent" };
+
+  // Every step carries the opt-out — in the body (lib/outreach/email.ts)
+  // and as List-Unsubscribe headers, so the mail client's own unsubscribe
+  // button works too.
+  try {
+    await emailAdapter({
+      to: req.recipientEmail,
+      subject: built.subject,
+      text: built.text,
+      from: process.env.OUTREACH_FROM,
+      replyTo: process.env.OUTREACH_REPLY_TO,
+      headers: {
+        "List-Unsubscribe": `<${unsubLink}>`,
+        "List-Unsubscribe-Post": "List-Unsubscribe=One-Click",
+      },
+    });
+  } catch (err) {
+    // Nothing went out: hand the step back so the next run retries it.
+    await prisma.rateCardRequest.updateMany({
+      where: { id: req.id, sentCount: req.sentCount + 1, lastStepAt: now },
+      data: {
+        sentCount: req.sentCount,
+        lastStepAt: req.lastStepAt,
+        nextStepAt: req.nextStepAt,
+        sentAt: req.sentAt,
+      },
+    });
+    throw err;
+  }
 
   await recordAudit(args.actorId, `rate_card_request.send.${step}`, `RateCardRequest:${req.id}`, {
     to: req.recipientEmail,
   });
   return { sent: step };
+}
+
+export function outreachDailyCap(env: Record<string, string | undefined> = process.env): number {
+  const n = Number(env.OUTREACH_DAILY_CAP);
+  return Number.isFinite(n) && n > 0 ? Math.floor(n) : 20;
+}
+
+// Outreach emails sent since midnight UTC, across every process: rate-card
+// steps (a request takes at most one step a day, so lastStepAt counts them)
+// plus price requests.
+export async function outreachSentToday(now: Date = new Date()): Promise<number> {
+  const dayStart = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate()));
+  const [steps, priceRequests] = await Promise.all([
+    prisma.rateCardRequest.count({ where: { lastStepAt: { gte: dayStart } } }),
+    prisma.priceRequest.count({ where: { sentAt: { gte: dayStart } } }),
+  ]);
+  return steps + priceRequests;
 }
 
 export async function selectBatchForSend(args: { limit: number; minConfidence?: number }) {

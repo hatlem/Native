@@ -27,7 +27,7 @@ export function noticeEmail(to: string, n: RenderedNotice, locale: BuyerLocale):
     to,
     subject: n.title,
     text: [n.body, link ? t("email.linkLine", { url: link }) : null].filter(Boolean).join("\n\n"),
-    html: layout({
+    html: layout({ lang: locale,
       preheader: n.body || n.title,
       heading: n.title,
       body: n.body,

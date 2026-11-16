@@ -1,7 +1,11 @@
 "use server";
+import { storedInviteToken } from "@/lib/tokens";
+import { requireSuperadmin } from "@/lib/desk-guard";
+import { log } from "@/lib/log";
 
 import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
+import { invalidateCatalogFacets, invalidateCatalogTitles } from "@/lib/catalog-facets";
 import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
 import { recordAudit } from "@/lib/audit";
@@ -27,13 +31,6 @@ function field(formData: FormData, key: string): string {
   return typeof v === "string" ? v.trim() : "";
 }
 
-async function requireSuperadmin(locale: string): Promise<string> {
-  const session = await auth();
-  if (session?.user?.role !== "SUPERADMIN") {
-    redirect(`/${locale}/signin`);
-  }
-  return session.user.id;
-}
 
 // Blueprint structure lives in src/lib/activation-blueprint.ts so it
 // can be unit-tested and so the per-market overrides (Ingrid's gap)
@@ -104,6 +101,7 @@ export async function markTitleNative(formData: FormData) {
     name: title.name,
     market_id: title.marketId,
   });
+  invalidateCatalogFacets();
   redirect(`/${locale}/desk/titles`);
 }
 
@@ -139,6 +137,7 @@ export async function markTitleNoNative(formData: FormData) {
       market_id: title.marketId,
     });
   }
+  invalidateCatalogFacets();
   redirect(`/${locale}/desk/titles`);
 }
 
@@ -177,6 +176,7 @@ export async function resetTitleVerification(formData: FormData) {
       market_id: title.marketId,
     });
   }
+  invalidateCatalogFacets();
   redirect(`/${locale}/desk/titles`);
 }
 
@@ -217,6 +217,7 @@ export async function verifyTitlePricing(formData: FormData) {
     previousVerifiedAt: title.lastVerifiedAt?.toISOString() ?? null,
   });
 
+  invalidateCatalogFacets();
   redirect(`/${locale}/desk/titles`);
 }
 
@@ -279,7 +280,8 @@ export async function sendPublisherInvite(formData: FormData) {
     data: {
       publisherId: publisher.id,
       email: rawEmail,
-      token,
+      // Only the hash is stored; the raw token goes out in the email.
+      token: storedInviteToken(token),
       expiresAt,
       createdBy: userId,
       locale: inviteLocale,
@@ -305,7 +307,7 @@ export async function sendPublisherInvite(formData: FormData) {
     // Adapter failure shouldn't block the invite — it's recorded in DB
     // and the super-admin can resend.
     emailed = false;
-    console.error("publisher.invite_email_failed", { publisherId, err });
+    log.error("publisher.invite_email_failed", { publisherId, err });
   }
 
   redirect(`${backTo}?invite=${emailed ? "sent" : "email-failed"}`);
@@ -371,6 +373,7 @@ export async function updateTitlePricing(formData: FormData) {
     publishedRateCurrency,
     pricesPublic,
   });
+  invalidateCatalogTitles();
   redirect(`/${locale}/desk/titles/${titleId}?saved=1`);
 }
 
@@ -406,6 +409,7 @@ export async function setPublisherPricesPublic(formData: FormData) {
   if (titleIdReturn) {
     redirect(`/${locale}/desk/titles/${titleIdReturn}?saved=publisher`);
   }
+  invalidateCatalogFacets();
   redirect(`/${locale}/desk/titles`);
 }
 
@@ -445,6 +449,7 @@ export async function updateTitleProductionFee(formData: FormData) {
     `Title:${title.id}`,
     { name: title.name, productionFeeDefault },
   );
+  invalidateCatalogTitles();
   revalidatePath(`/${locale}/desk/titles/${titleId}`);
   redirect(`/${locale}/desk/titles/${titleId}?saved=1`);
 }
@@ -489,6 +494,7 @@ export async function updateTitleAliases(formData: FormData) {
     name: title.name,
     aliases,
   });
+  invalidateCatalogTitles();
   revalidatePath(`/${locale}/desk/titles/${titleId}`);
   redirect(`/${locale}/desk/titles/${titleId}?saved=1`);
 }
@@ -584,6 +590,7 @@ export async function updateProductPricing(formData: FormData) {
     `Product:${product.id}`,
     { name: product.name, marginPct, productionFee },
   );
+  invalidateCatalogTitles();
   revalidatePath(back);
   redirect(`${back}?saved=1`);
 }
@@ -615,5 +622,6 @@ export async function deactivateTitle(formData: FormData) {
     name: title.name,
     market_id: title.marketId,
   });
+  invalidateCatalogFacets();
   redirect(`/${locale}/desk/titles`);
 }

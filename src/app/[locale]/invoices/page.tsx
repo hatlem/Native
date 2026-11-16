@@ -1,13 +1,20 @@
 import { getTranslations } from "next-intl/server";
 import { redirect } from "next/navigation";
-import { prisma } from "@/lib/prisma";
 import { Link } from "@/i18n/navigation";
-import { formatMoney, intlLocale } from "@/lib/money";
+import { formatMoney, intlLocale, formatMoneyExact } from "@/lib/money";
 import { loadScope } from "@/lib/scope";
 import { invoiceNumber } from "@/lib/pdf/invoice-pdf-data";
 import { invoicePdfAvailable, loadSellerDetails } from "@/lib/seller";
 import { EmptyState } from "@/app/empty-state";
 import { StatusBadge } from "@/app/status-badge";
+import { Pager } from "@/components/pager";
+import { pageHref, pageWindow, parsePageParam } from "@/lib/pagination";
+import {
+  loadListTotal,
+  loadListInvoices,
+} from "@/lib/data/buyer/invoices";
+
+const PAGE_SIZE = 50;
 
 export const dynamic = "force-dynamic";
 
@@ -16,29 +23,22 @@ export const dynamic = "force-dynamic";
 // as the requests hub, so a buyer never sees another org's billing.
 export default async function InvoicesPage({
   params,
+  searchParams,
 }: {
   params: Promise<{ locale: string }>;
+  searchParams: Promise<Record<string, string | string[] | undefined>>;
 }) {
   const { locale } = await params;
+  const sp = await searchParams;
   const t = await getTranslations({ locale, namespace: "invoice" });
 
   const scope = await loadScope();
   if (!scope.workspace) redirect(`/${locale}/signin`);
   const orgIds = scope.workspace.scopeOrgIds;
 
-  const invoices = await prisma.invoice.findMany({
-    where: { organizationId: { in: orgIds } },
-    orderBy: [{ issuedAt: "desc" }, { createdAt: "desc" }],
-    select: {
-      id: true,
-      status: true,
-      currency: true,
-      total: true,
-      issuedAt: true,
-      dueAt: true,
-      organization: { select: { name: true } },
-    },
-  });
+  const total = await loadListTotal(scope);
+  const { page, pageCount, skip, take } = pageWindow(parsePageParam(sp.page), total, PAGE_SIZE);
+  const invoices = await loadListInvoices(scope, { skip, take });
   // Agencies bill several clients; name the customer only when it varies.
   const showCustomer = orgIds.length > 1;
   const seller = loadSellerDetails();
@@ -79,7 +79,7 @@ export default async function InvoicesPage({
               {invoices.map((inv) => (
                 <tr key={inv.id}>
                   <td>
-                    <Link href={`/invoices/${inv.id}`}>#{invoiceNumber(inv.id)}</Link>
+                    <Link href={`/invoices/${inv.id}`}>#{invoiceNumber(inv)}</Link>
                   </td>
                   {showCustomer ? <td>{inv.organization.name}</td> : null}
                   <td>{date(inv.issuedAt)}</td>
@@ -87,7 +87,7 @@ export default async function InvoicesPage({
                   <td>
                     <StatusBadge value={inv.status} />
                   </td>
-                  <td className="num">{formatMoney(Number(inv.total), inv.currency, locale)}</td>
+                  <td className="num">{formatMoneyExact(Number(inv.total), inv.currency, locale)}</td>
                   <td>
                     {invoicePdfAvailable(inv.currency, seller) ? (
                       // Plain <a>: a route-handler download.
@@ -112,6 +112,12 @@ export default async function InvoicesPage({
           </table>
         </div>
       )}
+      <Pager
+        locale={locale}
+        page={page}
+        pageCount={pageCount}
+        hrefFor={(p) => pageHref("/invoices", {}, p)}
+      />
     </>
   );
 }

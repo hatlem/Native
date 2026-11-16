@@ -14,11 +14,11 @@
 import {
   gatewayChat,
   gatewayConfigured,
-  type GatewayModel,
   type GatewayTool,
 } from "@/lib/gateway-chat";
+import { TtlCache } from "@/lib/ai-usage-cache";
+import { briefHash } from "@/lib/brief-match-llm";
 
-const MODEL: GatewayModel = "claude-haiku-4-5";
 // Reasoning generation over an already-short candidate list; kept tight so a
 // slow gateway can't stall the campaign recommender — callers stay
 // deterministic-only (existing chip reasons) on timeout.
@@ -134,17 +134,25 @@ export function sanitizeRerankOutput(
 // Grounded per-title reasons for an already-ranked candidate list. Returns a
 // titleId -> reason Map; entries the model omitted (or that fail
 // sanitization) are simply absent — never throws, never reorders.
+// Same brief, same language, same candidates → same reasons: cached for an
+// hour so re-rendering the page does not re-run the model.
+const reasonCache = new TtlCache<Map<string, string>>(60 * 60_000);
+
 export async function rerankBriefMatches(
   candidates: RerankCandidate[],
   locale: string = "en",
   brief: string = "",
+  scope?: string,
 ): Promise<Map<string, string>> {
   if (candidates.length === 0) return new Map();
   const capped = candidates.slice(0, MAX_CANDIDATES);
+  const key = briefHash(brief, locale, ...capped.map((c) => c.titleId));
+  const cached = reasonCache.get(key);
+  if (cached) return new Map(cached);
 
   const result = await gatewayChat({
-    entityId: "nativespin-system",
-    model: MODEL,
+    feature: "brief-rerank",
+    scope,
     system: buildSystemPrompt(locale),
     messages: [{ role: "user", content: buildUserMessage(capped, brief) }],
     maxTokens: 1500,
@@ -153,5 +161,7 @@ export async function rerankBriefMatches(
   });
   if (!result || result.toolInput === undefined) return new Map(); // fail-open
 
-  return sanitizeRerankOutput(result.toolInput, new Set(capped.map((c) => c.titleId)));
+  const reasons = sanitizeRerankOutput(result.toolInput, new Set(capped.map((c) => c.titleId)));
+  if (reasons.size > 0) reasonCache.set(key, reasons);
+  return new Map(reasons);
 }

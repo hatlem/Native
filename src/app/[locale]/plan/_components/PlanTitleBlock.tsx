@@ -1,5 +1,7 @@
 "use client";
 
+
+import { PendingButton } from "@/components/submit-button";
 import { useRef, useState } from "react";
 import { useTranslations } from "next-intl";
 import { Link } from "@/i18n/navigation";
@@ -76,9 +78,9 @@ export function PlanTitleBlock({
               className="plan-title-block__rename-input"
               aria-label={t("rename")}
             />
-            <button type="submit" className="btn small">
+            <PendingButton className="btn small">
               {t("rename")}
-            </button>
+            </PendingButton>
             <button type="button" className="btn small ghost" onClick={() => setRenaming(false)}>
               {t("cancel")}
             </button>
@@ -115,9 +117,9 @@ export function PlanTitleBlock({
                     </option>
                   ))}
                 </select>
-                <button type="submit" className="btn small">
+                <PendingButton className="btn small">
                   {t("switchList")}
-                </button>
+                </PendingButton>
               </form>
               {readOnly ? null : (
               <form action={createList} className="plan-title-block__popover-form">
@@ -130,9 +132,9 @@ export function PlanTitleBlock({
                   placeholder={t("newListPlaceholder")}
                   required
                 />
-                <button type="submit" className="btn small secondary">
+                <PendingButton className="btn small secondary">
                   {t("newList")}
-                </button>
+                </PendingButton>
               </form>
               )}
             </div>

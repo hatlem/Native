@@ -1,4 +1,5 @@
 "use server";
+import { log } from "@/lib/log";
 
 import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
@@ -35,7 +36,7 @@ export async function toggleFavorite(formData: FormData) {
   const scope = await requireUser(locale);
   if (titleId)
     await toggleFavoriteLib(scope.userId!, titleId).catch((e) =>
-      console.error("favorites.toggle_failed", e),
+      log.error("favorites.toggle_failed", { err: e }),
     );
   // Revalidate wherever a heart may render. `page` form keeps it cheap.
   revalidatePath(`/${locale}/catalog`, "page");
@@ -59,7 +60,7 @@ export async function addFavoriteToCollection(
   // (DB error, etc.) is observable instead of vanishing. Same rationale for
   // every list-mutation catch below.
   const outcome = await addFavoriteToListLib(scope.userId!, titleId, listId).catch((e) => {
-    console.error("favorites.add_to_list_failed", e);
+    log.error("favorites.add_to_list_failed", { err: e });
     return "unavailable" as const;
   });
   revalidatePath(`/${locale}/catalog`, "page");
@@ -81,7 +82,7 @@ export async function setFavoriteListMembership(formData: FormData) {
     const op = member
       ? addFavoriteToListLib(scope.userId!, titleId, listId)
       : removeFavoriteFromListByTitleLib(scope.userId!, titleId, listId);
-    await op.catch((e) => console.error("favorites.set_membership_failed", e));
+    await op.catch((e) => log.error("favorites.set_membership_failed", { err: e }));
   }
   revalidatePath(`/${locale}/catalog`, "page");
   revalidatePath(`/${locale}/favorites`, "page");
@@ -94,7 +95,7 @@ export async function removeFavoriteFromList(formData: FormData) {
   const scope = await requireUser(locale);
   if (listId && favoriteId) {
     await removeFavoriteFromListLib(scope.userId!, listId, favoriteId).catch((e) =>
-      console.error("favorites.remove_from_list_failed", e),
+      log.error("favorites.remove_from_list_failed", { err: e }),
     );
   }
   revalidatePath(`/${locale}/favorites`, "page");
@@ -111,7 +112,7 @@ export async function createFavoriteList(formData: FormData) {
   const list = await createFavoriteListLib(scope.userId!, orgId, name || (await listNames(locale)).untitled);
   if (titleId) {
     await addFavoriteToListLib(scope.userId!, titleId, list.id).catch((e) =>
-      console.error("favorites.create_list_add_failed", e),
+      log.error("favorites.create_list_add_failed", { err: e }),
     );
   }
   revalidatePath(`/${locale}/catalog`, "page");
@@ -125,7 +126,7 @@ export async function renameFavoriteList(formData: FormData) {
   const scope = await requireUser(locale);
   if (listId)
     await renameFavoriteListLib(scope.userId!, listId, name).catch((e) =>
-      console.error("favorites.rename_list_failed", e),
+      log.error("favorites.rename_list_failed", { err: e }),
     );
   revalidatePath(`/${locale}/favorites`, "page");
 }
@@ -136,7 +137,7 @@ export async function deleteFavoriteList(formData: FormData) {
   const scope = await requireUser(locale);
   if (listId)
     await deleteFavoriteListLib(scope.userId!, listId).catch((e) =>
-      console.error("favorites.delete_list_failed", e),
+      log.error("favorites.delete_list_failed", { err: e }),
     );
   redirect(`/${locale}/favorites`);
 }
@@ -162,7 +163,7 @@ export async function setFavoriteListShared(formData: FormData) {
   }
   if (listId)
     await setFavoriteListSharedLib(scope.userId!, listId, shared).catch((e) =>
-      console.error("favorites.set_shared_failed", e),
+      log.error("favorites.set_shared_failed", { err: e }),
     );
   revalidatePath(`/${locale}/favorites`, "page");
 }

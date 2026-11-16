@@ -40,6 +40,7 @@ export default async function PricingPage({
 
       <section className="section">
         <div className="wrap">
+          <h2 className="sr-only">{t("plansHeading")}</h2>
           <div className="grid">
             {plans.map((p) => (
               <article

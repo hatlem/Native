@@ -1,22 +1,21 @@
 import { getTranslations } from "next-intl/server";
 import { redirect } from "next/navigation";
+import { Link } from "@/i18n/navigation";
 import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
 import { loadScope } from "@/lib/scope";
 import { companySeat } from "@/lib/workspace";
-import {
-  updateCompany,
-  updateProfile,
-  setPassword,
-  deactivateOwnAccount,
-} from "@/app/account-actions";
-import { requestEmailChange } from "@/app/account-email-actions";
+import { updateCompany } from "@/app/account-actions";
+import { DeactivateForm, EmailChangeForm, PasswordForm, ProfileForm } from "./account-forms";
 import { accountOkKey, accountErrorKey } from "@/lib/account-messages";
 import { SubmitButton } from "@/components";
 import { TeamSection } from "./team-section";
 import { LocaleSwitcher } from "./locale-switcher";
 import { SUPPORTED_MARKETS } from "@/lib/markets";
 
+import { NotificationPrefsSection } from "./notification-prefs-section";
+import { FieldErrorLink } from "./field-error-link";
+import { accountErrorFieldId } from "@/lib/account-error-field";
 export const dynamic = "force-dynamic";
 
 const MARKET_CODES = SUPPORTED_MARKETS;
@@ -32,8 +31,10 @@ const MARKET_CODES = SUPPORTED_MARKETS;
 //   - Data & account (export, deactivate)
 //
 // Lives in the same authenticated layout as /catalog, /plan etc. so
-// users get the standard nav around it. Banner messages on success
-// or per-field error keyed by ?ok= / ?error= query params + anchor.
+// users get the standard nav around it. Profile, email, password and
+// deactivation are useActionState forms (./account-forms): their errors
+// render at the field and keep the input. Success banners, and errors from
+// the forms that still redirect (company, team), are keyed by ?ok= / ?error=.
 export default async function AccountPage({
   params,
   searchParams,
@@ -68,12 +69,14 @@ export default async function AccountPage({
       name: true,
       phone: true,
       passwordHash: true,
+      mfaEnabledAt: true,
     },
   });
   if (!user) redirect(`/${locale}/signin`);
 
   const t = await getTranslations({ locale, namespace: "account" });
   const tMarket = await getTranslations({ locale, namespace: "market" });
+  const tMfa = await getTranslations({ locale, namespace: "mfa" });
 
   // Banner copy comes from a lookup table (@/lib/account-messages), not the
   // ternary chain that used to live here — that chain had no branch for six of
@@ -85,6 +88,7 @@ export default async function AccountPage({
   );
   const okMessage = okKey ? t(okKey) : null;
   const errMessage = errKey ? t(errKey) : null;
+  const errFieldId = accountErrorFieldId(typeof sp.error === "string" ? sp.error : undefined);
 
   return (
     <>
@@ -100,9 +104,12 @@ export default async function AccountPage({
         </div>
       ) : null}
       {errMessage ? (
-        <div className="banner-error" role="alert">
+        <div className="banner-error" role="alert" id="account-error">
           <span>{errMessage}</span>
         </div>
+      ) : null}
+      {errMessage && errFieldId ? (
+        <FieldErrorLink fieldId={errFieldId} describedBy="account-error" />
       ) : null}
 
       <section className="section" id="profile">
@@ -112,44 +119,12 @@ export default async function AccountPage({
             <h2>{t("profileTitle")}</h2>
           </div>
         </div>
-        <form action={updateProfile} className="product-form card">
-          <input type="hidden" name="locale" value={locale} />
-          <div className="field">
-            <label htmlFor="acc-email">{t("emailLabel")}</label>
-            <input id="acc-email" type="email" value={user.email} disabled readOnly />
-            <span className="hint">{t("emailHint")}</span>
-          </div>
-          <div className="field">
-            <label htmlFor="acc-name">
-              {t("nameLabel")}{" "}
-              <span className="optional">({t("optional")})</span>
-            </label>
-            <input
-              id="acc-name"
-              name="name"
-              autoComplete="name"
-              defaultValue={user.name ?? ""}
-            />
-          </div>
-          <div className="field">
-            <label htmlFor="acc-phone">{t("phoneLabel")}</label>
-            <input
-              id="acc-phone"
-              name="phone"
-              type="tel"
-              autoComplete="tel"
-              defaultValue={user.phone ?? ""}
-              placeholder="+47 ..."
-            />
-            <span className="hint">{t("phoneHint")}</span>
-          </div>
-          <div className="actions">
-            <SubmitButton
-              label={t("saveProfile")}
-              pendingLabel={t("saving")}
-            />
-          </div>
-        </form>
+        <ProfileForm
+          locale={locale}
+          email={user.email}
+          name={user.name ?? ""}
+          phone={user.phone ?? ""}
+        />
       </section>
 
       <section className="section" id="language">
@@ -179,39 +154,7 @@ export default async function AccountPage({
             <h2>{t("emailTitle")}</h2>
           </div>
         </div>
-        <form action={requestEmailChange} className="product-form card">
-          <input type="hidden" name="locale" value={locale} />
-          <div className="field">
-            <label htmlFor="acc-new-email">{t("newEmailLabel")}</label>
-            <input
-              id="acc-new-email"
-              name="newEmail"
-              type="email"
-              autoComplete="email"
-              required
-              placeholder={t("newEmailPlaceholder")}
-            />
-            <span className="hint">{t("emailChangeHint")}</span>
-          </div>
-          {user.passwordHash ? (
-            <div className="field">
-              <label htmlFor="acc-email-pw">{t("currentPasswordLabel")}</label>
-              <input
-                id="acc-email-pw"
-                name="currentPassword"
-                type="password"
-                autoComplete="current-password"
-                required
-              />
-            </div>
-          ) : null}
-          <div className="actions">
-            <SubmitButton
-              label={t("saveEmail")}
-              pendingLabel={t("saving")}
-            />
-          </div>
-        </form>
+        <EmailChangeForm locale={locale} hasPassword={!!user.passwordHash} />
       </section>
 
       {/* Desk, publisher and writer accounts have no organisation of their
@@ -279,41 +222,30 @@ export default async function AccountPage({
             </h2>
           </div>
         </div>
-        <form action={setPassword} className="product-form card">
-          <input type="hidden" name="locale" value={locale} />
-          {user.passwordHash ? (
-            <div className="field">
-              <label htmlFor="acc-pw-current">{t("currentPasswordLabel")}</label>
-              <input
-                id="acc-pw-current"
-                name="currentPassword"
-                type="password"
-                autoComplete="current-password"
-                required
-              />
-            </div>
-          ) : (
-            <p className="muted small">{t("passwordlessNote")}</p>
-          )}
-          <div className="field">
-            <label htmlFor="acc-pw-new">{t("newPasswordLabel")}</label>
-            <input
-              id="acc-pw-new"
-              name="newPassword"
-              type="password"
-              autoComplete="new-password"
-              minLength={8}
-              required
-            />
-            <span className="hint">{t("pwHint")}</span>
+        <PasswordForm locale={locale} hasPassword={!!user.passwordHash} />
+      </section>
+
+      {/* Two-factor lives on its own page (/account/security): staff are sent
+          straight there when MFA_REQUIRED_FOR_STAFF is on. */}
+      <section className="section" id="two-factor">
+        <div className="section-head">
+          <div>
+            <span className="eyebrow">{tMfa("eyebrow")}</span>
+            <h2>{tMfa("accountSectionTitle")}</h2>
           </div>
+        </div>
+        <div className="product-form card">
+          <p>
+            {user.mfaEnabledAt
+              ? tMfa("accountSectionBodyOn")
+              : tMfa("accountSectionBodyOff")}
+          </p>
           <div className="actions">
-            <SubmitButton
-              label={user.passwordHash ? t("savePasswordChange") : t("savePasswordSet")}
-              pendingLabel={t("saving")}
-            />
+            <Link href="/account/security" className="btn secondary">
+              {tMfa("manage")}
+            </Link>
           </div>
-        </form>
+        </div>
       </section>
 
       {ws?.activeOrgId && (
@@ -323,6 +255,8 @@ export default async function AccountPage({
           isAdmin={ws.activeRole === "ADMIN"}
         />
       )}
+
+      <NotificationPrefsSection locale={locale} userId={user.id} saved={sp.prefs === "saved"} />
 
       {/* Data & account. The export endpoint has existed since the GDPR work
           landed but nothing linked to it, so in practice no user could reach
@@ -357,31 +291,7 @@ export default async function AccountPage({
           <summary>
             <span className="btn secondary block">{t("deactivateSummary")}</span>
           </summary>
-          <form action={deactivateOwnAccount} className="product-form">
-            <input type="hidden" name="locale" value={locale} />
-            <h3 style={{ margin: "12px 0 4px" }}>{t("deactivateTitle")}</h3>
-            <p className="muted small">{t("deactivateHint")}</p>
-            <div className="field">
-              <label htmlFor="acc-deactivate-confirm">
-                {t("deactivateConfirmLabel")}
-              </label>
-              <input
-                id="acc-deactivate-confirm"
-                name="confirmEmail"
-                type="email"
-                autoComplete="off"
-                required
-                placeholder={user.email}
-              />
-            </div>
-            <div className="actions">
-              <SubmitButton
-                label={t("deactivateButton")}
-                pendingLabel={t("deactivating")}
-                className="btn danger block"
-              />
-            </div>
-          </form>
+          <DeactivateForm locale={locale} email={user.email} />
         </details>
       </section>
     </>

@@ -1,7 +1,10 @@
-// Invoice PDF — the buyer's copy of an issued invoice, rendered on demand
-// from the Invoice row (never stored, so it needs no object storage and
-// always matches what was billed). Readable by the billed organization, its
-// agency, and the desk — the same guard as the /invoices/[id] page.
+import { log } from "@/lib/log";
+// Invoice PDF — the buyer's copy of an issued invoice. When the document was
+// archived at issue (lib/invoice-archive.ts, needs object storage) that exact
+// file is served; otherwise it is rendered on demand from the Invoice row and
+// its frozen customer/seller blocks, so it always matches what was billed.
+// Readable by the billed organization, its agency, and the desk — the same
+// guard as the /invoices/[id] page.
 
 import { NextResponse } from "next/server";
 import { renderToBuffer } from "@react-pdf/renderer";
@@ -14,6 +17,8 @@ import { loadInvoicePdfData } from "@/lib/pdf/invoice-pdf-data";
 import { invoiceMessagesFor } from "@/lib/pdf/invoice-messages";
 import { qt } from "@/lib/pdf/quote-messages";
 import { loadSellerDetails, sellerGaps } from "@/lib/seller";
+import { documentNumber, sellerForInvoice } from "@/lib/invoice-snapshot";
+import { archiveInvoicePdf, readArchivedInvoicePdf, servesArchivedPdf } from "@/lib/invoice-archive";
 
 export const dynamic = "force-dynamic";
 
@@ -29,7 +34,7 @@ export async function GET(
 
   const owner = await prisma.invoice.findUnique({
     where: { id: invoiceId },
-    select: { organizationId: true },
+    select: { organizationId: true, status: true, pdfObjectKey: true, number: true, id: true },
   });
   // Another org's invoice answers exactly like a missing one — don't leak
   // that it exists.
@@ -38,6 +43,23 @@ export async function GET(
   }
 
   const locale = safeLocale(new URL(req.url).searchParams.get("locale"));
+
+  // The document as issued, when it was archived. A credited invoice is
+  // rendered live instead, so the copy also states the credit.
+  if (owner.pdfObjectKey && servesArchivedPdf(owner)) {
+    const archived = await readArchivedInvoicePdf(owner.pdfObjectKey);
+    if (archived) {
+      await recordAudit(scope.userId, "invoice.pdf.download", `Invoice:${invoiceId}`, {
+        locale,
+        archived: true,
+      });
+      return pdfResponse(
+        archived,
+        `${qt(invoiceMessagesFor(locale), "documentTitle", { number: documentNumber(owner) })}.pdf`,
+      );
+    }
+  }
+
   const data = await loadInvoicePdfData(invoiceId, locale);
   if (!data) return NextResponse.json({ error: "not_found" }, { status: 404 });
 
@@ -45,10 +67,11 @@ export async function GET(
   // number, address and payment details the document is not a valid sales
   // document. The invoice pages hide the download (and tell the desk which
   // variables to set) in this state; this is the backstop for direct hits.
-  const seller = loadSellerDetails();
+  // The seller block frozen at issue time, completed from today's config.
+  const seller = sellerForInvoice(data.sellerSnapshot, loadSellerDetails());
   const gaps = sellerGaps(seller, data.currency);
   if (gaps.length > 0) {
-    console.error("invoice.pdf.seller_incomplete", { invoiceId, gaps });
+    log.error("invoice.pdf.seller_incomplete", { invoiceId, gaps });
     return NextResponse.json(
       {
         error: "seller_details_incomplete",
@@ -65,9 +88,18 @@ export async function GET(
 
   await recordAudit(scope.userId, "invoice.pdf.download", `Invoice:${invoiceId}`, { locale });
 
-  const filename = `${qt(messages, "documentTitle", { number: data.number })}.pdf`;
+  // An issued invoice that was never archived (storage or seller details
+  // were not configured at issue) is archived now, on its first good render.
+  if (!owner.pdfObjectKey && servesArchivedPdf({ status: owner.status, pdfObjectKey: "pending" })) {
+    await archiveInvoicePdf(invoiceId);
+  }
+
+  return pdfResponse(new Uint8Array(buffer), `${qt(messages, "documentTitle", { number: data.number })}.pdf`);
+}
+
+function pdfResponse(bytes: Uint8Array, filename: string): NextResponse {
   const asciiFallback = filename.normalize("NFKD").replace(/[^\x20-\x7e]/g, "").replace(/"/g, "");
-  return new NextResponse(new Uint8Array(buffer), {
+  return new NextResponse(new Uint8Array(bytes), {
     headers: {
       "Content-Type": "application/pdf",
       "Content-Disposition": `attachment; filename="${asciiFallback}"; filename*=UTF-8''${encodeURIComponent(filename)}`,

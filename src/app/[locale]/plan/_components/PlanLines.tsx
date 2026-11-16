@@ -1,3 +1,4 @@
+import { PendingButton } from "@/components/submit-button";
 import { getTranslations } from "next-intl/server";
 import { Calendar } from "lucide-react";
 import type { ReactNode } from "react";
@@ -137,12 +138,12 @@ function WriteToggle({
       <input type="hidden" name="locale" value={locale} />
       <input type="hidden" name="itemId" value={itemId} />
       <input type="hidden" name="withContent" value={withContent ? "0" : "1"} />
-      <button type="submit" className="plan-line-card__write-check" aria-pressed={withContent}>
+      <PendingButton className="plan-line-card__write-check" aria-pressed={withContent}>
         <span className="plan-line-card__write-check-box" aria-hidden="true">
           {withContent ? "✓" : ""}
         </span>
         {label}
-      </button>
+      </PendingButton>
     </form>
   );
 }
@@ -169,10 +170,10 @@ function WriterChoice({
       <input type="hidden" name="locale" value={locale} />
       <input type="hidden" name="itemId" value={itemId} />
       <input type="hidden" name="withContent" value={ours ? "1" : "0"} />
-      <button type="submit" className="plan-line-card__writer-option" aria-pressed={withContent === ours}>
+      <PendingButton className="plan-line-card__writer-option" aria-pressed={withContent === ours}>
         <span className="plan-line-card__writer-dot" aria-hidden="true" />
         {label}
-      </button>
+      </PendingButton>
     </form>
   );
   return (
@@ -248,9 +249,9 @@ function LineSchedule({
           </span>
           <input type="number" name="scheduleUnits" min={min} defaultValue={l.scheduleUnits ?? min} />
         </label>
-        <button type="submit" className="btn small">
+        <PendingButton className="btn small">
           {tCampaign("scheduleSave")}
-        </button>
+        </PendingButton>
       </form>
     </details>
   );
@@ -296,9 +297,9 @@ function LineNote({
             aria-label={t("lineNoteLabel")}
           />
           <p className="muted small">{t("lineNoteHint")}</p>
-          <button type="submit" className="btn small">
+          <PendingButton className="btn small">
             {t("lineNoteSave")}
-          </button>
+          </PendingButton>
         </form>
       </details>
       )}
@@ -325,9 +326,9 @@ function AlternativeToggle({
       <input type="hidden" name="locale" value={locale} />
       <input type="hidden" name="itemId" value={itemId} />
       <input type="hidden" name="isAlternative" value={toAlternative ? "1" : "0"} />
-      <button type="submit" className={className}>
+      <PendingButton className={className}>
         {label}
-      </button>
+      </PendingButton>
     </form>
   );
 }
@@ -443,21 +444,20 @@ export async function PlanLines({
                   {l.quantity > 1 ? (
                     <input type="hidden" name="quantity" value={l.quantity - 1} />
                   ) : null}
-                  <button
-                    type="submit"
+                  <PendingButton
                     aria-label={l.quantity <= 1 ? t("decrementRemoves") : t("decrement")}
                   >
                     −
-                  </button>
+                  </PendingButton>
                 </form>
                 <span aria-live="polite">{l.quantity}</span>
                 <form action={setQuantity}>
                   <input type="hidden" name="locale" value={locale} />
                   <input type="hidden" name="itemId" value={l.itemId} />
                   <input type="hidden" name="quantity" value={l.quantity + 1} />
-                  <button type="submit" aria-label={t("increment")}>
+                  <PendingButton aria-label={t("increment")}>
                     +
-                  </button>
+                  </PendingButton>
                 </form>
               </div>
               <LineSchedule
@@ -516,9 +516,9 @@ export async function PlanLines({
             <form action={removeFromPlan}>
               <input type="hidden" name="locale" value={locale} />
               <input type="hidden" name="itemId" value={l.itemId} />
-              <button type="submit" className="plan-line-card__remove">
+              <PendingButton className="plan-line-card__remove">
                 {t("remove")}
-              </button>
+              </PendingButton>
             </form>
           </div>
           )}
@@ -559,9 +559,9 @@ export async function PlanLines({
                       </option>
                     ))}
                   </select>
-                  <button type="submit" className="btn small">
+                  <PendingButton className="btn small">
                     {t("resolve")}
-                  </button>
+                  </PendingButton>
                 </form>
               ) : (
                 <span className="muted small">{t("noPlacements")}</span>
@@ -586,9 +586,9 @@ export async function PlanLines({
             <form action={removeFromPlan}>
               <input type="hidden" name="locale" value={locale} />
               <input type="hidden" name="itemId" value={tl.itemId} />
-              <button type="submit" className="plan-line-card__remove">
+              <PendingButton className="plan-line-card__remove">
                 {t("remove")}
-              </button>
+              </PendingButton>
             </form>
           </div>
           )}
@@ -627,9 +627,9 @@ export async function PlanLines({
             <form action={removeFromPlan}>
               <input type="hidden" name="locale" value={locale} />
               <input type="hidden" name="itemId" value={l.itemId} />
-              <button type="submit" className="plan-line-card__remove">
+              <PendingButton className="plan-line-card__remove">
                 {t("remove")}
-              </button>
+              </PendingButton>
             </form>
           </div>
           )}
@@ -663,9 +663,9 @@ export async function PlanLines({
             <form action={removeFromPlan}>
               <input type="hidden" name="locale" value={locale} />
               <input type="hidden" name="itemId" value={tl.itemId} />
-              <button type="submit" className="plan-line-card__remove">
+              <PendingButton className="plan-line-card__remove">
                 {t("remove")}
-              </button>
+              </PendingButton>
             </form>
           </div>
           )}

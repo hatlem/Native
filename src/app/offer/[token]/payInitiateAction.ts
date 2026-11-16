@@ -20,6 +20,7 @@ export async function payInitiateAction(
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ method, signerEmail, returnUrl }),
+        signal: AbortSignal.timeout(15_000),
       }
     );
     const data = (await res.json()) as { hostedUrl?: string; error?: string };

@@ -1,11 +1,14 @@
+import path from "node:path";
 import type { NextConfig } from "next";
 import createNextIntlPlugin from "next-intl/plugin";
 
 const withNextIntl = createNextIntlPlugin("./src/i18n/request.ts");
 
-// Conservative baseline security headers. No CSP yet — landing pages
-// inline <style> and we use third-party GTM, so a meaningful CSP needs
-// nonce wiring per route. Tracked as a follow-up.
+// Baseline security headers for every response. The Content-Security-Policy
+// is NOT set here: src/middleware.ts builds it per request (nonce-based
+// script-src with 'strict-dynamic') for every dynamically rendered page, and
+// the prerendered public pages (app/static) carry their own, hash-based one
+// (lib/static-csp-cache-handler.mjs).
 const securityHeaders = [
   { key: "X-Frame-Options", value: "DENY" },
   { key: "X-Content-Type-Options", value: "nosniff" },
@@ -21,14 +24,34 @@ const securityHeaders = [
   },
 ];
 
+// Browser caching for files that are not content-hashed. (Next already sends
+// `public, max-age=31536000, immutable` for /_next/static, which covers the
+// self-hosted Inter font and every JS/CSS chunk; /landing.css carries a
+// content hash in its URL and sets its own immutable header.)
+const DAY = 86_400;
+const assetCacheHeaders = [
+  // Share image and home-screen icon: generated once at build, rarely change.
+  { source: "/og-image.png", value: `public, max-age=${DAY}, stale-while-revalidate=${7 * DAY}` },
+  { source: "/apple-touch-icon.png", value: `public, max-age=${DAY}, stale-while-revalidate=${7 * DAY}` },
+  { source: "/icon.svg", value: `public, max-age=${DAY}, stale-while-revalidate=${7 * DAY}` },
+  // The wordmark sprite every page header and footer references
+  // (app/brand.tsx) — it changes with a rebrand, not a deploy.
+  { source: "/brand/:file*", value: `public, max-age=${7 * DAY}, stale-while-revalidate=${30 * DAY}` },
+  // PDF fonts (lib/pdf/fonts.ts), never changed in place.
+  { source: "/fonts/:file*", value: `public, max-age=${30 * DAY}, immutable` },
+].map(({ source, value }) => ({ source, headers: [{ key: "Cache-Control", value }] }));
+
 const nextConfig: NextConfig = {
+  // Next's file-system ISR cache, plus the hash-based Content-Security-Policy
+  // for each prerendered public page, stored with the page itself.
+  cacheHandler: path.join(process.cwd(), "src/lib/static-csp-cache-handler.mjs"),
   // The floating Next.js "N" dev indicator overlaps form content at
   // mobile widths and ends up in every screenshot we take for design
   // review. Disable it — it's a dev-only overlay and we still get
   // build errors, type errors, and HMR feedback through the CLI.
   devIndicators: false,
   async headers() {
-    return [{ source: "/:path*", headers: securityHeaders }];
+    return [{ source: "/:path*", headers: securityHeaders }, ...assetCacheHeaders];
   },
   // /developers and /docs are conventional landing spots tech evaluators
   // try first (Tobias scenario). Send them to the real API docs at /api.

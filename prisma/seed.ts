@@ -626,8 +626,22 @@ async function activateCommerceTitles(
 // when the operator has supplied their own value via the *_PASSWORD env
 // vars (those values won't equal the literal default), or when they set
 // SEED_ALLOW_PRODUCTION=1 to acknowledge they really want demo accounts.
+//
+// "Production" here means any database that is not on this machine, not just
+// NODE_ENV=production: the app is operated against the production database
+// from developer shells, where NODE_ENV is unset and the old check waved the
+// README passwords straight through.
+function databaseIsLocal(): boolean {
+  try {
+    const host = new URL(process.env.DATABASE_URL ?? "").hostname;
+    return ["localhost", "127.0.0.1", "::1", "[::1]", "db", "postgres"].includes(host);
+  } catch {
+    return false;
+  }
+}
+
 function assertSeedCredentials() {
-  if (process.env.NODE_ENV !== "production") return;
+  if (process.env.NODE_ENV !== "production" && databaseIsLocal()) return;
   if (process.env.SEED_ALLOW_PRODUCTION === "1") return;
   const defaults: Array<[string, string]> = [
     [DESK_PASSWORD, "nativespin-desk"],
@@ -641,7 +655,7 @@ function assertSeedCredentials() {
     .map(([, def]) => def);
   if (stillDefault.length === 0) return;
   throw new Error(
-    `Refusing to seed demo users in production with the documented default passwords: ${stillDefault.join(", ")}. ` +
+    `Refusing to seed demo users into a non-local or production database with the documented default passwords: ${stillDefault.join(", ")}. ` +
       `Set DESK_ADMIN_PASSWORD / PUBLISHER_PASSWORD / BUYER_PASSWORD / AGENCY_PASSWORD / SUPERADMIN_PASSWORD before running seed, ` +
       `or set SEED_ALLOW_PRODUCTION=1 to override (not recommended).`,
   );
@@ -682,7 +696,7 @@ async function main() {
   const activeCount = await activateCommerceTitles(marketIds, titleIdBySlug);
   await seedContentFeeRules();
 
-  const passwordHash = await bcrypt.hash(DESK_PASSWORD, 10);
+  const passwordHash = await bcrypt.hash(DESK_PASSWORD, 12);
   await prisma.user.upsert({
     where: { email: DESK_EMAIL },
     update: { passwordHash, role: "DESK" },
@@ -694,7 +708,7 @@ async function main() {
     },
   });
 
-  const superadminHash = await bcrypt.hash(SUPERADMIN_PASSWORD, 10);
+  const superadminHash = await bcrypt.hash(SUPERADMIN_PASSWORD, 12);
   await prisma.user.upsert({
     where: { email: SUPERADMIN_EMAIL },
     update: { passwordHash: superadminHash, role: "SUPERADMIN" },
@@ -714,7 +728,7 @@ async function main() {
     select: { publisherId: true },
   });
   if (aftenposten) {
-    const pubHash = await bcrypt.hash(PUB_PASSWORD, 10);
+    const pubHash = await bcrypt.hash(PUB_PASSWORD, 12);
     await prisma.user.upsert({
       where: { email: PUB_EMAIL },
       update: {
@@ -738,7 +752,7 @@ async function main() {
   buyerOrg ??= await prisma.organization.create({
     data: { name: BUYER_ORG, type: "ADVERTISER", marketCode: MarketCode.NO },
   });
-  const buyerHash = await bcrypt.hash(BUYER_PASSWORD, 10);
+  const buyerHash = await bcrypt.hash(BUYER_PASSWORD, 12);
   const buyer = await prisma.user.upsert({
     where: { email: BUYER_EMAIL },
     update: {
@@ -762,7 +776,7 @@ async function main() {
   agencyOrg ??= await prisma.organization.create({
     data: { name: AGENCY_ORG, type: "AGENCY", marketCode: MarketCode.NO },
   });
-  const agencyHash = await bcrypt.hash(AGENCY_PASSWORD, 10);
+  const agencyHash = await bcrypt.hash(AGENCY_PASSWORD, 12);
   const agency = await prisma.user.upsert({
     where: { email: AGENCY_EMAIL },
     update: {
@@ -778,6 +792,17 @@ async function main() {
       organizationId: agencyOrg.id,
     },
   });
+  // Demo accounts are pre-verified: password sign-in refuses an unverified
+  // address (it mails a verification link instead), which made every README
+  // demo login a dead end on a fresh seed. Never overwrites an existing stamp.
+  await prisma.user.updateMany({
+    where: {
+      email: { in: [DESK_EMAIL, SUPERADMIN_EMAIL, PUB_EMAIL, BUYER_EMAIL, AGENCY_EMAIL] },
+      emailVerifiedAt: null,
+    },
+    data: { emailVerifiedAt: new Date() },
+  });
+
   const agencyClients: [string, MarketCode][] = [
     ["Client One AS", MarketCode.NO],
     ["Client Two AB", MarketCode.SE],

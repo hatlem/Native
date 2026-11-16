@@ -1,5 +1,7 @@
 "use client";
 
+
+import { PendingButton } from "@/components/submit-button";
 import { useActionState } from "react";
 import { useLocale, useTranslations } from "next-intl";
 import { subscribeNewsletter, type SubscribeState } from "@/lib/newsletter/subscribe";
@@ -49,9 +51,9 @@ export function NewsletterSignup({
         autoComplete="email"
         placeholder={t("newsletter.placeholder")}
       />
-      <button type="submit" className="btn primary" disabled={pending}>
+      <PendingButton className="btn primary" disabled={pending}>
         {pending ? t("newsletter.sending") : t("newsletter.button")}
-      </button>
+      </PendingButton>
       {state.status === "error" && (
         <p className="newsletter-err">{t("newsletter.error")}</p>
       )}

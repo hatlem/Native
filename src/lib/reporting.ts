@@ -87,6 +87,73 @@ export function revenueSplit(lines: RevenueLine[]): RevenueSplit {
   };
 }
 
+// ---------- Desk revenue report ----------
+// What the desk "GMV" and "margin vs content fee" cards add up, per
+// currency. Pure so the rules are pinned by tests:
+//   - a CANCELLED order earned nothing (a fully credited one ends
+//     CANCELLED too) and is left out;
+//   - credit notes on an order that is still live are subtracted;
+//   - extra work agreed after acceptance (OrderExtraWork) is revenue the
+//     accepted quote does not contain, so it is added — as production
+//     service, with the order's VAT in GMV;
+//   - "price on request" lines were never agreed or billed, so they are
+//     neither revenue nor (negative) margin.
+
+export type ReportOrder = {
+  status: string;
+  currency: string;
+  // The accepted quote's VAT-inclusive total and VAT rate.
+  quoteTotal: number;
+  vatPct: number;
+  lines: (RevenueLine & { priceOnRequest?: boolean })[];
+  // Net amounts of extra work added after acceptance.
+  extraWork: number[];
+  // VAT-inclusive amounts of credit notes issued against the order.
+  credited: number[];
+};
+
+export type CurrencyRevenue = {
+  currency: string;
+  count: number;
+  gmv: number;
+  aov: number;
+  split: RevenueSplit;
+};
+
+export function deskRevenueByCurrency(orders: ReportOrder[]): CurrencyRevenue[] {
+  const byCurrency = new Map<string, ReportOrder[]>();
+  for (const o of orders) {
+    if (o.status === "CANCELLED") continue;
+    byCurrency.set(o.currency, [...(byCurrency.get(o.currency) ?? []), o]);
+  }
+  return [...byCurrency.entries()]
+    .map(([currency, inCur]) => {
+      let gmv = 0;
+      const lines: RevenueLine[] = [];
+      for (const o of inCur) {
+        const extraNet = o.extraWork.reduce((s, a) => s + a, 0);
+        const credited = o.credited.reduce((s, a) => s + a, 0);
+        gmv += o.quoteTotal + extraNet * (1 + o.vatPct / 100) - credited;
+        for (const l of o.lines) {
+          if (l.priceOnRequest) continue;
+          lines.push({ kind: l.kind, unitCost: l.unitCost, quantity: l.quantity, lineTotal: l.lineTotal });
+        }
+        for (const amount of o.extraWork) {
+          lines.push({ kind: "EXTRA_WORK", unitCost: 0, quantity: 1, lineTotal: amount });
+        }
+      }
+      gmv = Math.round(gmv);
+      return {
+        currency,
+        count: inCur.length,
+        gmv,
+        aov: averageOrderValue(gmv, inCur.length),
+        split: revenueSplit(lines),
+      };
+    })
+    .sort((a, b) => a.currency.localeCompare(b.currency));
+}
+
 // Click-through rate as a percentage with one decimal. Returns null (not 0)
 // when impressions are missing/zero so the caller can show "—" instead of a
 // misleading 0%. Compute per publisher over bookings with reported impressions.

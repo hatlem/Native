@@ -102,13 +102,32 @@ test("computeQuoteLines applies the seasonal multiplier", () => {
   assert.equal(line.lineTotal, 12320);
 });
 
-test("quoteTotals sums lines and rounds VAT", () => {
-  const { subtotal, total } = quoteTotals(
+test("quoteTotals sums lines and keeps VAT exact to the minor unit", () => {
+  const { subtotal, vat, total } = quoteTotals(
     [{ lineTotal: 3540 }, { lineTotal: 1150 }],
     25,
   );
   assert.equal(subtotal, 4690);
-  assert.equal(total, 5863); // 4690 * 1.25 = 5862.5 -> 5863
+  // 4690 × 25 % = 1172.50 — stored as is, not rounded up to a whole krone
+  // (the total used to be 5863, which no longer reconciled with 25 %).
+  assert.equal(vat, 1172.5);
+  assert.equal(total, 5862.5);
+  assert.equal(total, subtotal + vat);
+});
+
+test("quoteTotals rounds VAT half-up to two decimals, once, on the subtotal", () => {
+  // 1001.01 × 25 % = 250.2525 → 250.25
+  assert.deepEqual(quoteTotals([{ lineTotal: 1001.01 }], 25), {
+    subtotal: 1001.01,
+    vat: 250.25,
+    total: 1251.26,
+  });
+  // 0.02 × 25 % = 0.005 → 0.01 (half away from zero, no float drift)
+  assert.equal(quoteTotals([{ lineTotal: 0.02 }], 25).vat, 0.01);
+  // Reverse charge: 0 % leaves the subtotal untouched.
+  assert.deepEqual(quoteTotals([{ lineTotal: 4690 }], 0), { subtotal: 4690, vat: 0, total: 4690 });
+  // A fractional rate (Finland's 25.5 %) stays exact.
+  assert.equal(quoteTotals([{ lineTotal: 1000 }], 25.5).total, 1255);
 });
 
 test("toRateRules coerces Decimal-like values to numbers", () => {

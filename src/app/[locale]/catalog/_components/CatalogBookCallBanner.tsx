@@ -2,7 +2,9 @@
 
 import { useEffect, useState } from "react";
 import { useTranslations } from "next-intl";
-import { GetTalkBooking } from "@/components";
+// Not the @/components barrel: it also pulls in ExtraWorkForm, whose zod
+// schemas are built on import and trip the CSP (zod probes eval).
+import { GetTalkBooking } from "@/components/get-talk-booking";
 import { dismissBookingPrompt } from "@/app/booking-prompt-actions";
 
 export function CatalogBookCallBanner() {

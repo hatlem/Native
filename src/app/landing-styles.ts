@@ -1,139 +1,50 @@
 // Shared editorial "Bone" design system used by every public marketing page.
-// Loaded once per page via <LandingShell> as a nonce'd <style> block so the
-// strict CSP from middleware.ts allows it.
+// Served as /landing.css (app/landing.css/route.ts) and linked from <LandingShell>
+// with a content hash, so browsers cache it instead of receiving it inline.
 //
 // The CSS is namespaced under `.bn` so it cannot collide with the
 // signed-in app shell, the desk console, or the publisher portal. Keep
 // new primitives namespaced the same way.
+//
+// THEME. The editorial palette has a light set (cream paper, ink text) and a
+// dark set (warm near-black paper, cream ink). Which one applies follows the
+// same switch as the app's tokens in globals.css: the OS colour scheme, with
+// <html data-theme="light|dark"> as an explicit override. Rules below use the
+// tokens only (--paper, --ink, --ink-soft, --ink-mute, --hair, …; for alpha,
+// rgba(var(--ink-rgb), a) / rgba(var(--paper-rgb), a)) — never a literal
+// cream or ink hex, or the dark theme breaks. Dark contrast ratios on
+// --paper: ink 15.2:1, ink-soft 11.1:1, ink-mute 7.1:1 (6.6:1 on --paper-2),
+// ok 9.8:1, warn 8.8:1, err 7.6:1, NO 5.6:1; the primary button (paper on
+// ink) 15.2:1; input borders 3.8:1 or better.
 
-export const STYLES = `
-/* Keep the locale layout's site mega menu; reset main padding & hide the layout footer (landing has its own). */
-body:has(.bn) > footer { display: none !important; }
-body:has(.bn) main.container {
-  max-width: none !important;
-  padding: 0 !important;
-  margin: 0 !important;
-}
+// Where the tokens are declared: the page, plus the site chrome that renders
+// outside .bn on these pages (header, mega panel, mobile drawer).
+const CHROME = ["header.site-header", ".mega-panel", ".drawer"].map((c) => `body:has(.bn) ${c}`);
+const scope = (prefix: string) => [".bn", ...CHROME].map((sel) => `${prefix}${sel}`).join(",\n");
 
-/* Reconcile the public mega header with the bone landing palette.
-   The header (PublicHeader for anon, NavShell for signed-in users) renders
-   outside the .bn wrapper, so the .bn token overrides don't reach it. The
-   header is ALWAYS cream here, so restate the ink palette tokens on it —
-   this fixes every token consumer at once: the SVG .brand-wordmark (reads
-   --heading) and the signed-in .nav-primary links (read --muted), which
-   otherwise inherit the global dark-mode tokens and render near-white on
-   the cream bar for visitors whose OS is in dark mode. */
-body:has(.bn) header.site-header {
-  background: rgba(237, 232, 219, 0.92) !important;
-  border-bottom: 2px solid #14110C !important;
-  color-scheme: light;
-  --heading: #14110C;
-  --text: #14110C;
-  --muted: #3A3528;
-  --muted-strong: #3A3528;
-  --ink: #14110C;
-}
-body:has(.bn) header.site-header .brand,
-body:has(.bn) header.site-header .brand:hover { color: #14110C !important; }
-/* Belt-and-suspenders for the SVG wordmark (its own color rule reads
-   --heading, now restated above) and both header link flavours. */
-body:has(.bn) header.site-header .brand-wordmark { color: #14110C !important; }
-body:has(.bn) header.site-header .nav-mega-link,
-body:has(.bn) header.site-header .nav-mega-trigger,
-body:has(.bn) header.site-header .nav-primary a {
-  color: #3A3528 !important;
-  background: transparent !important;
-}
-body:has(.bn) header.site-header .nav-mega-link:hover,
-body:has(.bn) header.site-header .nav-mega-trigger:hover,
-body:has(.bn) header.site-header .nav-mega-trigger[aria-expanded="true"],
-body:has(.bn) header.site-header .nav-mega-link[aria-current="page"],
-body:has(.bn) header.site-header .nav-primary a:hover,
-body:has(.bn) header.site-header .nav-primary a[aria-current="page"] {
-  color: #14110C !important;
-  background: rgba(20,17,12,0.06) !important;
-}
-/* Mega dropdown panel — cream surface, ink content */
-body:has(.bn) .mega-panel {
-  background: #EDE8DB !important;
-  border: 1px solid rgba(20,17,12,0.18) !important;
-  box-shadow: 6px 6px 0 0 rgba(20,17,12,0.18) !important;
-}
-body:has(.bn) .mega-item { color: #14110C !important; }
-body:has(.bn) .mega-item:hover { background: rgba(20,17,12,0.06) !important; }
-body:has(.bn) .mega-item-icon { color: #6B6452 !important; }
-body:has(.bn) .mega-item-title { color: #14110C !important; }
-body:has(.bn) .mega-item-desc { color: #6B6452 !important; }
-body:has(.bn) .mega-featured {
-  background: rgba(20,17,12,0.04) !important;
-  border-top: 1px solid rgba(20,17,12,0.12) !important;
-}
-body:has(.bn) .mega-featured-icon { color: #14110C !important; }
-body:has(.bn) .mega-featured-title { color: #14110C !important; }
-body:has(.bn) .mega-featured-desc { color: #6B6452 !important; }
-/* Header action buttons — Sign in (ghost) + Sign up (filled) */
-body:has(.bn) header.site-header .nav-actions .btn {
-  border: 2px solid #14110C !important;
-  border-radius: 2px !important;
-  text-transform: uppercase;
-  letter-spacing: 0.12em;
-  font-weight: 600;
-}
-body:has(.bn) header.site-header .nav-actions .btn.ghost {
-  background: transparent !important;
-  color: #14110C !important;
-}
-body:has(.bn) header.site-header .nav-actions .btn.ghost:hover {
-  background: rgba(20,17,12,0.06) !important;
-}
-body:has(.bn) header.site-header .nav-actions .btn:not(.ghost) {
-  background: #14110C !important;
-  color: #EDE8DB !important;
-}
-body:has(.bn) header.site-header .nav-actions .btn:not(.ghost):hover {
-  background: #3A3528 !important;
-  border-color: #3A3528 !important;
-}
-body:has(.bn) header.site-header .icon-btn {
-  color: #14110C !important;
-  background: transparent !important;
-  border: 1px solid rgba(20,17,12,0.32) !important;
-}
-body:has(.bn) header.site-header .icon-btn:hover {
-  background: rgba(20,17,12,0.06) !important;
-}
-/* Mobile drawer — cream sheet */
-body:has(.bn) .drawer .sheet {
-  background: #EDE8DB !important;
-  color: #14110C !important;
-  color-scheme: light;
-}
-body:has(.bn) .drawer .scrim { background: rgba(20,17,12,0.4) !important; }
-body:has(.bn) .drawer-link {
-  color: #14110C !important;
-  border-bottom-color: rgba(20,17,12,0.12) !important;
-}
-body:has(.bn) .drawer-link:hover { background: rgba(20,17,12,0.06) !important; }
+// Product mock-ups (browser frames, mini pages, booking panel) are pictures
+// of light pages: they keep the light tokens in either theme.
+const LIGHT_MOCKS = [".bn .na-frame", ".bn .vsd .mini", ".bn .vsd .popup", ".bn .bq-panel"].join(",\n");
 
-.bn {
-  /* Lock the editorial cream palette regardless of OS prefers-color-scheme.
-     globals.css flips --heading/--text/--muted to near-white in dark mode,
-     which would render unreadable on the cream paper background. */
+const LIGHT_TOKENS = `
   color-scheme: light;
   --paper: #EDE8DB;
   --paper-2: #E4DECB;
+  --paper-rgb: 237,232,219;
   --ink: #14110C;
   --ink-soft: #3A3528;
-  --ink-mute: #6B6452;
+  --ink-mute: #5E5847;
+  --ink-rgb: 20,17,12;
   --rule: #14110C;
   --hair: rgba(20,17,12,.18);
   --accent: #14110C;
-  /* Override the globals.css dark-mode tokens so any element that still
-     reads --heading/--text/--muted (h1/h2/h3, .lead, .muted) stays dark
-     ink on cream. */
+  --field: #faf8f1;
+  /* Override the globals.css tokens so any element that still reads
+     --heading/--text/--muted (h1/h2/h3, .lead, .muted) follows the
+     editorial palette. */
   --heading: #14110C;
   --text: #14110C;
-  --muted: #6B6452;
+  --muted: #5E5847;
   --muted-strong: #3A3528;
   --bg: #EDE8DB;
   --surface: #EDE8DB;
@@ -146,6 +57,7 @@ body:has(.bn) .drawer-link:hover { background: rgba(20,17,12,0.06) !important; }
   --ok: #1F6F3E;
   --info: #3A3528;
   --warn: #8B5A00;
+  --err: #c0392b;
   --NO: #BA0C2F;
   --SE: #006AA7;
   --DK: #C8102E;
@@ -155,6 +67,162 @@ body:has(.bn) .drawer-link:hover { background: rgba(20,17,12,0.06) !important; }
   --CH: #DA291C;
   --UK: #012169;
   --IE: #009A44;
+`;
+
+const DARK_TOKENS = `
+  color-scheme: dark;
+  --paper: #15130F;
+  --paper-2: #1E1B15;
+  --paper-rgb: 21,19,15;
+  --ink: #EDE8DB;
+  --ink-soft: #CFC8B5;
+  --ink-mute: #A8A08C;
+  --ink-rgb: 237,232,219;
+  --rule: #EDE8DB;
+  --hair: rgba(237,232,219,.22);
+  --accent: #EDE8DB;
+  --field: #1E1B15;
+  --heading: #EDE8DB;
+  --text: #EDE8DB;
+  --muted: #A8A08C;
+  --muted-strong: #CFC8B5;
+  --bg: #15130F;
+  --surface: #15130F;
+  --surface-2: #1E1B15;
+  --border: rgba(237,232,219,.22);
+  --border-strong: rgba(237,232,219,.4);
+  --primary: #EDE8DB;
+  --primary-hover: #CFC8B5;
+  --primary-contrast: #15130F;
+  --ok: #6FCF97;
+  --info: #CFC8B5;
+  --warn: #E0A85D;
+  --err: #F08A7B;
+  /* Flag colours, lifted so the small swatches and the red used for errors
+     stay visible on the dark paper. */
+  --NO: #F0596F;
+  --SE: #4FA3DC;
+  --DK: #F0596F;
+  --FI: #5B8FE0;
+  --DE: #B5B0A3;
+  --AT: #F0596F;
+  --CH: #F0596F;
+  --UK: #7289D9;
+  --IE: #3DBF73;
+`;
+
+export const STYLES = `
+/* — Editorial theme: light by default, dark by OS scheme or data-theme — */
+${scope("")},
+${LIGHT_MOCKS} {${LIGHT_TOKENS}}
+@media (prefers-color-scheme: dark) {
+${scope(':root:not([data-theme="light"]) ')} {${DARK_TOKENS}}
+}
+${scope(':root[data-theme="dark"] ')} {${DARK_TOKENS}}
+/* Mock-ups set their own text colour: they would otherwise inherit the
+   page's (cream, in dark) onto their white surface. */
+${LIGHT_MOCKS} { color: var(--ink); }
+
+/* Keep the locale layout's site mega menu; reset main padding & hide the layout footer (landing has its own). */
+body:has(.bn) > footer { display: none !important; }
+body:has(.bn) main.container {
+  max-width: none !important;
+  padding: 0 !important;
+  margin: 0 !important;
+}
+
+/* Reconcile the public mega header with the bone landing palette.
+   The header (PublicHeader for anon, NavShell for signed-in users) renders
+   outside the .bn wrapper, so the editorial theme block (top of this file)
+   names the header, the mega panel and the mobile drawer in its scope: they
+   read the same paper/ink tokens as the page, in light and in dark. */
+body:has(.bn) header.site-header {
+  background: rgba(var(--paper-rgb), 0.92) !important;
+  border-bottom: 2px solid var(--ink) !important;
+}
+body:has(.bn) header.site-header .brand,
+body:has(.bn) header.site-header .brand:hover { color: var(--ink) !important; }
+/* Belt-and-suspenders for the SVG wordmark (its own color rule reads
+   --heading, now restated above) and both header link flavours. */
+body:has(.bn) header.site-header .brand-wordmark { color: var(--ink) !important; }
+body:has(.bn) header.site-header .nav-mega-link,
+body:has(.bn) header.site-header .nav-mega-trigger,
+body:has(.bn) header.site-header .nav-primary a {
+  color: var(--ink-soft) !important;
+  background: transparent !important;
+}
+body:has(.bn) header.site-header .nav-mega-link:hover,
+body:has(.bn) header.site-header .nav-mega-trigger:hover,
+body:has(.bn) header.site-header .nav-mega-trigger[aria-expanded="true"],
+body:has(.bn) header.site-header .nav-mega-link[aria-current="page"],
+body:has(.bn) header.site-header .nav-primary a:hover,
+body:has(.bn) header.site-header .nav-primary a[aria-current="page"] {
+  color: var(--ink) !important;
+  background: rgba(var(--ink-rgb),0.06) !important;
+}
+/* Mega dropdown panel — cream surface, ink content */
+body:has(.bn) .mega-panel {
+  background: var(--paper) !important;
+  border: 1px solid rgba(var(--ink-rgb),0.18) !important;
+  box-shadow: 6px 6px 0 0 rgba(var(--ink-rgb),0.18) !important;
+}
+body:has(.bn) .mega-item { color: var(--ink) !important; }
+body:has(.bn) .mega-item:hover { background: rgba(var(--ink-rgb),0.06) !important; }
+body:has(.bn) .mega-item-icon { color: var(--ink-mute) !important; }
+body:has(.bn) .mega-item-title { color: var(--ink) !important; }
+body:has(.bn) .mega-item-desc { color: var(--ink-mute) !important; }
+body:has(.bn) .mega-featured {
+  background: rgba(var(--ink-rgb),0.04) !important;
+  border-top: 1px solid rgba(var(--ink-rgb),0.12) !important;
+}
+body:has(.bn) .mega-featured-icon { color: var(--ink) !important; }
+body:has(.bn) .mega-featured-title { color: var(--ink) !important; }
+body:has(.bn) .mega-featured-desc { color: var(--ink-mute) !important; }
+/* Header action buttons — Sign in (ghost) + Sign up (filled) */
+body:has(.bn) header.site-header .nav-actions .btn {
+  border: 2px solid var(--ink) !important;
+  border-radius: 2px !important;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  font-weight: 600;
+}
+body:has(.bn) header.site-header .nav-actions .btn.ghost {
+  background: transparent !important;
+  color: var(--ink) !important;
+}
+body:has(.bn) header.site-header .nav-actions .btn.ghost:hover {
+  background: rgba(var(--ink-rgb),0.06) !important;
+}
+body:has(.bn) header.site-header .nav-actions .btn:not(.ghost) {
+  background: var(--ink) !important;
+  color: var(--paper) !important;
+}
+body:has(.bn) header.site-header .nav-actions .btn:not(.ghost):hover {
+  background: var(--ink-soft) !important;
+  border-color: var(--ink-soft) !important;
+}
+body:has(.bn) header.site-header .icon-btn {
+  color: var(--ink) !important;
+  background: transparent !important;
+  border: 1px solid rgba(var(--ink-rgb),0.32) !important;
+}
+body:has(.bn) header.site-header .icon-btn:hover {
+  background: rgba(var(--ink-rgb),0.06) !important;
+}
+/* Mobile drawer — cream sheet */
+body:has(.bn) .drawer .sheet {
+  background: var(--paper) !important;
+  color: var(--ink) !important;
+}
+body:has(.bn) .drawer .scrim { background: rgba(var(--ink-rgb),0.4) !important; }
+body:has(.bn) .drawer-link {
+  color: var(--ink) !important;
+  border-bottom-color: rgba(var(--ink-rgb),0.12) !important;
+}
+body:has(.bn) .drawer-link:hover { background: rgba(var(--ink-rgb),0.06) !important; }
+
+.bn {
+  /* Colour tokens live in the theme blocks at the top (light + dark). */
   --max: 1280px;
   --pad: clamp(20px, 4vw, 56px);
 
@@ -589,7 +657,7 @@ body:has(.bn) .drawer-link:hover { background: rgba(20,17,12,0.06) !important; }
   border-bottom-color: var(--ink);
 }
 .bn .cat-table tbody tr.active .pub,
-.bn .cat-table tbody tr.active .cat-tag { color: rgba(237, 232, 219, .65); }
+.bn .cat-table tbody tr.active .cat-tag { color: rgba(var(--paper-rgb), .65); }
 .bn .cat-table tbody tr.active td:first-child { padding-left: 14px; }
 .bn .cat-table tbody tr.active td:last-child { padding-right: 14px; }
 
@@ -788,7 +856,7 @@ body:has(.bn) .drawer-link:hover { background: rgba(20,17,12,0.06) !important; }
 }
 .bn .rule .label-ix {
   font-size: 11px; text-transform: uppercase; letter-spacing: 0.18em; font-weight: 600;
-  color: rgba(237,232,219,.55);
+  color: rgba(var(--paper-rgb),.8);
 }
 .bn .rule h2 {
   margin: 12px 0 0 0; font-weight: 600;
@@ -797,13 +865,13 @@ body:has(.bn) .drawer-link:hover { background: rgba(20,17,12,0.06) !important; }
 }
 .bn .rule .body {
   margin: 0; font-size: clamp(16px, 1.4vw, 22px); line-height: 1.45;
-  color: rgba(237,232,219,.88); max-width: 44ch;
+  color: rgba(var(--paper-rgb),.88); max-width: 44ch;
   letter-spacing: -0.005em;
 }
 .bn .rule .body em { font-style: italic; color: var(--paper); }
 .bn .rule .sig {
   margin-top: 28px;
-  font-size: 11px; text-transform: uppercase; letter-spacing: 0.18em; color: rgba(237,232,219,.55); font-weight: 500;
+  font-size: 11px; text-transform: uppercase; letter-spacing: 0.18em; color: rgba(var(--paper-rgb),.8); font-weight: 500;
 }
 
 /* — Legal docs (privacy / terms) — */
@@ -986,7 +1054,7 @@ body:has(.bn) .drawer-link:hover { background: rgba(20,17,12,0.06) !important; }
 /* — Skeleton lines (marketing loading) — */
 .bn .skel {
   display: block;
-  background: linear-gradient(90deg, rgba(20,17,12,.08) 0%, rgba(20,17,12,.16) 50%, rgba(20,17,12,.08) 100%);
+  background: linear-gradient(90deg, rgba(var(--ink-rgb),.08) 0%, rgba(var(--ink-rgb),.16) 50%, rgba(var(--ink-rgb),.08) 100%);
   background-size: 200% 100%;
   border-radius: 2px;
   animation: bn-skel-shimmer 1.4s ease-in-out infinite;
@@ -1039,7 +1107,7 @@ body:has(.bn) .drawer-link:hover { background: rgba(20,17,12,0.06) !important; }
 .bn .grid .card.plan-card.is-featured .price,
 .bn .grid .card.plan-card.is-featured p,
 .bn .grid .card.plan-card.is-featured li { color: var(--paper); }
-.bn .grid .card.plan-card.is-featured .muted { color: rgba(237,232,219,.7); }
+.bn .grid .card.plan-card.is-featured .muted { color: rgba(var(--paper-rgb),.7); }
 .bn .grid .card.plan-card.is-featured .plan-badge {
   background: var(--paper); color: var(--ink); border-color: var(--paper);
 }
@@ -1056,14 +1124,14 @@ body:has(.bn) .drawer-link:hover { background: rgba(20,17,12,0.06) !important; }
 .bn .grid .card.plan-card .plan-features li {
   font-size: 13.5px; line-height: 1.5; color: var(--ink-soft); padding-left: 20px; position: relative;
 }
-.bn .grid .card.plan-card.is-featured .plan-features li { color: rgba(237,232,219,.85); }
+.bn .grid .card.plan-card.is-featured .plan-features li { color: rgba(var(--paper-rgb),.85); }
 .bn .grid .card.plan-card .plan-features li::before {
   content: ""; position: absolute; left: 0; top: 9px; width: 10px; height: 1px; background: var(--ink);
 }
 .bn .grid .card.plan-card.is-featured .plan-features li::before { background: var(--paper); }
 .bn .grid .card.plan-card .plan-cta { margin-top: auto; padding-top: 8px; }
 .bn .grid .card.plan-card.is-featured .plan-cta .btn {
-  background: var(--paper); color: var(--ink); border-color: var(--paper); box-shadow: 6px 6px 0 0 rgba(237,232,219,.35);
+  background: var(--paper); color: var(--ink); border-color: var(--paper); box-shadow: 6px 6px 0 0 rgba(var(--paper-rgb),.35);
 }
 
 /* — Filters bar (recommend page) — */
@@ -1184,7 +1252,7 @@ body:has(.bn) .drawer-link:hover { background: rgba(20,17,12,0.06) !important; }
 .bn .format-rule {
   margin: clamp(20px, 2vw, 28px) 0 0 0;
   padding: 16px 20px;
-  border-left: 2px solid var(--ink); background: rgba(20,17,12,.04);
+  border-left: 2px solid var(--ink); background: rgba(var(--ink-rgb),.04);
   font-size: 14px; line-height: 1.55; color: var(--ink-soft); max-width: 64ch;
   font-style: italic;
 }
@@ -1239,7 +1307,7 @@ body:has(.bn) .drawer-link:hover { background: rgba(20,17,12,0.06) !important; }
 .newsletter-form input[type=email]{flex:1;min-width:200px;padding:10px 12px;border:1px solid var(--ink-soft);border-radius:8px;font:inherit}
 .newsletter-hp{position:absolute!important;left:-9999px;width:1px;height:1px;overflow:hidden}
 .newsletter-ok{color:var(--accent);font-weight:500}
-.newsletter-err{color:#c0392b;flex-basis:100%;font-size:13px;margin:4px 0 0}
+.newsletter-err{color:var(--err);flex-basis:100%;font-size:13px;margin:4px 0 0}
 .sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);border:0}
 .foot-newsletter{flex-basis:100%;padding-bottom:24px;margin-bottom:8px;border-bottom:1px solid var(--line)}
 .foot-newsletter .copy{margin-bottom:10px}
@@ -1260,14 +1328,14 @@ body:has(.bn) .drawer-link:hover { background: rgba(20,17,12,0.06) !important; }
 .bn { --bn-grain: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.4'/%3E%3C/svg%3E"); }
 
 /* generic native-article frame */
-.bn .na-frame { background:#fff; border:1.5px solid var(--ink); border-radius:7px; overflow:hidden; box-shadow:0 18px 44px -26px rgba(20,17,12,.55); max-width:680px; }
+.bn .na-frame { background:#fff; border:1.5px solid var(--ink); border-radius:7px; overflow:hidden; box-shadow:0 18px 44px -26px rgba(var(--ink-rgb),.55); max-width:680px; }
 .bn .na-bar { display:flex; align-items:center; gap:7px; padding:9px 12px; background:var(--paper-2); border-bottom:1px solid var(--hair); }
 .bn .na-bar .dot { width:9px; height:9px; border-radius:50%; background:var(--ink-mute); opacity:.45; }
 .bn .na-bar .url { margin-left:8px; font-size:10.5px; color:var(--ink-mute); background:#fff; border:1px solid var(--hair); border-radius:20px; padding:3px 12px; }
-.bn .na-masthead { display:flex; justify-content:space-between; align-items:center; padding:13px 20px; border-bottom:2px solid #14110C; }
-.bn .na-masthead .na-name { font-family:Georgia,'Times New Roman',serif; font-size:20px; font-weight:700; color:#14110C; letter-spacing:.01em; }
+.bn .na-masthead { display:flex; justify-content:space-between; align-items:center; padding:13px 20px; border-bottom:2px solid var(--ink); }
+.bn .na-masthead .na-name { font-family:Georgia,'Times New Roman',serif; font-size:20px; font-weight:700; color:var(--ink); letter-spacing:.01em; }
 .bn .na-masthead .na-nav { display:flex; gap:12px; font-size:9px; text-transform:uppercase; letter-spacing:.14em; color:var(--ink-mute); font-weight:600; }
-.bn .na-art { padding:20px 26px 28px; color:#14110C; }
+.bn .na-art { padding:20px 26px 28px; color:var(--ink); }
 .bn .na-tag { display:inline-flex; align-items:center; gap:7px; font-size:9px; text-transform:uppercase; letter-spacing:.16em; font-weight:700; color:var(--ink-mute); border:1px solid var(--hair); padding:4px 9px; border-radius:2px; background:#f4f0e6; }
 .bn .na-art h3 { font-family:Georgia,serif; font-size:clamp(20px,2.4vw,28px); line-height:1.08; letter-spacing:-.01em; margin:13px 0 11px; font-weight:700; max-width:22ch; }
 .bn .na-art .na-standfirst { font-family:Georgia,serif; font-style:italic; font-size:15px; color:var(--ink-soft); line-height:1.5; margin:0 0 14px; max-width:46ch; }
@@ -1275,47 +1343,47 @@ body:has(.bn) .drawer-link:hover { background: rgba(20,17,12,0.06) !important; }
 .bn .na-photo { height:190px; border-radius:3px; position:relative; overflow:hidden; background:radial-gradient(120% 120% at 20% 10%,#c9b89a,#a8906b 40%,#6d5a40); }
 .bn .na-photo::after { content:""; position:absolute; inset:0; background-image:var(--bn-grain); mix-blend-mode:overlay; opacity:.45; }
 .bn .na-cols { column-count:2; column-gap:24px; margin-top:18px; }
-.bn .na-cols i { display:block; height:7px; border-radius:3px; background:rgba(20,17,12,.12); margin-bottom:9px; }
+.bn .na-cols i { display:block; height:7px; border-radius:3px; background:rgba(var(--ink-rgb),.12); margin-bottom:9px; }
 .bn .na-cols i.s { width:60%; }
-.bn .na-cols i.f { width:42%; background:rgba(20,17,12,.2); }
+.bn .na-cols i.f { width:42%; background:rgba(var(--ink-rgb),.2); }
 
 /* native vs display */
 .bn .vsd { display:grid; grid-template-columns:1fr 1fr; gap:22px; align-items:stretch; margin-bottom:clamp(20px,2.4vw,32px); }
 .bn .vsd .vsd-col { display:flex; flex-direction:column; }
 .bn .vsd .vsd-label { font-size:11px; text-transform:uppercase; letter-spacing:.14em; font-weight:700; margin-bottom:11px; display:flex; align-items:center; gap:8px; }
-.bn .vsd .vsd-tick { width:18px; height:18px; border-radius:50%; display:inline-flex; align-items:center; justify-content:center; color:#fff; font-size:11px; line-height:1; }
+.bn .vsd .vsd-tick { width:18px; height:18px; border-radius:50%; display:inline-flex; align-items:center; justify-content:center; color:var(--paper); font-size:11px; line-height:1; }
 .bn .vsd .good .vsd-tick { background:var(--ok); }
 .bn .vsd .bad .vsd-tick { background:var(--NO); }
 .bn .vsd .mini { background:#fff; border:1.5px solid var(--ink); border-radius:5px; overflow:hidden; flex:1; }
-.bn .vsd .mini .mini-head { padding:9px 14px; border-bottom:2px solid #14110C; font-family:Georgia,serif; font-weight:700; font-size:14px; color:#14110C; }
-.bn .vsd .mini .mini-body { padding:12px 14px; position:relative; color:#14110C; }
+.bn .vsd .mini .mini-head { padding:9px 14px; border-bottom:2px solid var(--ink); font-family:Georgia,serif; font-weight:700; font-size:14px; color:var(--ink); }
+.bn .vsd .mini .mini-body { padding:12px 14px; position:relative; color:var(--ink); }
 .bn .vsd .mini .mini-tag { font-size:8px; text-transform:uppercase; letter-spacing:.16em; font-weight:700; color:var(--ink-mute); border:1px solid var(--hair); padding:3px 7px; border-radius:2px; background:#f4f0e6; display:inline-block; }
 .bn .vsd .mini .mini-photo { height:90px; border-radius:2px; margin:10px 0; background:radial-gradient(120% 120% at 80% 0%,#9fb0bd,#6c8090 45%,#38454f); }
 .bn .vsd .mini h4 { margin:0 0 8px; font-family:Georgia,serif; font-size:15px; line-height:1.12; font-weight:700; }
-.bn .vsd .mini i { display:block; height:6px; border-radius:3px; background:rgba(20,17,12,.12); margin-bottom:7px; }
+.bn .vsd .mini i { display:block; height:6px; border-radius:3px; background:rgba(var(--ink-rgb),.12); margin-bottom:7px; }
 .bn .vsd .mini i.s { width:55%; }
 .bn .vsd .ad { background:repeating-linear-gradient(45deg,#d8d2c2,#d8d2c2 10px,#cfc8b5 10px,#cfc8b5 20px); border:1px dashed #9a917a; display:flex; align-items:center; justify-content:center; font-size:8px; text-transform:uppercase; letter-spacing:.14em; color:var(--ink-mute); font-weight:700; position:relative; }
-.bn .vsd .ad .adlbl { position:absolute; top:4px; right:5px; font-size:7px; background:rgba(20,17,12,.6); color:#fff; padding:1px 5px; border-radius:2px; }
-.bn .vsd .popup { position:absolute; inset:auto 16px 14px 16px; background:#fff; border:1.5px solid var(--ink); border-radius:4px; padding:12px; box-shadow:0 12px 28px -10px rgba(20,17,12,.5); text-align:center; }
+.bn .vsd .ad .adlbl { position:absolute; top:4px; right:5px; font-size:7px; background:rgba(var(--ink-rgb),.6); color:#fff; padding:1px 5px; border-radius:2px; }
+.bn .vsd .popup { position:absolute; inset:auto 16px 14px 16px; background:#fff; border:1.5px solid var(--ink); border-radius:4px; padding:12px; box-shadow:0 12px 28px -10px rgba(var(--ink-rgb),.5); text-align:center; }
 .bn .vsd .popup .x { position:absolute; top:4px; right:7px; font-size:11px; color:var(--ink-mute); }
 .bn .vsd .popup strong { display:block; font-size:12px; margin-bottom:7px; }
 .bn .vsd .popup .pbtn { display:inline-block; font-size:9px; text-transform:uppercase; letter-spacing:.1em; font-weight:700; background:var(--NO); color:#fff; padding:6px 13px; border-radius:3px; }
 .bn .vsd-caption { font-size:11px; text-transform:uppercase; letter-spacing:.14em; color:var(--ink-mute); font-weight:600; margin:0 0 clamp(28px,3vw,40px); }
 
 /* golden rule excerpt (grain + .wrap layering folded into the base .bn .rule rules above) */
-.bn .rule-excerpt { background:rgba(237,232,219,.06); border-left:2px solid var(--paper); padding:18px 22px; border-radius:0 3px 3px 0; margin-top:24px; }
-.bn .rule-excerpt .re-tag { font-size:8.5px; text-transform:uppercase; letter-spacing:.16em; color:rgba(237,232,219,.55); font-weight:700; margin-bottom:10px; }
-.bn .rule-excerpt p { margin:0; font-family:Georgia,serif; font-size:15px; line-height:1.6; color:rgba(237,232,219,.92); }
+.bn .rule-excerpt { background:rgba(var(--paper-rgb),.06); border-left:2px solid var(--paper); padding:18px 22px; border-radius:0 3px 3px 0; margin-top:24px; }
+.bn .rule-excerpt .re-tag { font-size:8.5px; text-transform:uppercase; letter-spacing:.16em; color:rgba(var(--paper-rgb),.8); font-weight:700; margin-bottom:10px; }
+.bn .rule-excerpt p { margin:0; font-family:Georgia,serif; font-size:15px; line-height:1.6; color:rgba(var(--paper-rgb),.92); }
 .bn .rule-excerpt p .re-cap { font-size:34px; float:left; line-height:.8; margin:4px 9px 0 0; font-weight:700; color:var(--paper); }
 
 /* brief -> quote */
 .bn .bq-flow { display:grid; grid-template-columns:1fr auto 1fr; gap:20px; align-items:center; margin-top:clamp(36px,4vw,56px); }
 .bn .bq-flow .bq-arrow { font-size:24px; color:var(--ink-mute); }
-.bn .bq-panel { background:#fff; border:1.5px solid var(--ink); border-radius:6px; padding:18px; box-shadow:0 14px 32px -22px rgba(20,17,12,.5); }
+.bn .bq-panel { background:#fff; border:1.5px solid var(--ink); border-radius:6px; padding:18px; box-shadow:0 14px 32px -22px rgba(var(--ink-rgb),.5); }
 .bn .bq-panel .bq-title { font-size:10px; text-transform:uppercase; letter-spacing:.14em; font-weight:700; color:var(--ink-mute); margin-bottom:14px; }
 .bn .bq-field { margin-bottom:11px; }
 .bn .bq-field .l { display:block; font-size:8.5px; text-transform:uppercase; letter-spacing:.12em; color:var(--ink-mute); font-weight:700; margin-bottom:4px; }
-.bn .bq-field .v { min-height:26px; border:1.5px solid var(--hair); border-radius:3px; background:#faf8f1; display:flex; align-items:center; padding:6px 9px; font-size:11px; color:var(--ink-soft); }
+.bn .bq-field .v { min-height:26px; border:1.5px solid var(--hair); border-radius:3px; background:var(--field); display:flex; align-items:center; padding:6px 9px; font-size:11px; color:var(--ink-soft); }
 .bn .bq-row2 { display:grid; grid-template-columns:1fr 1fr; gap:9px; }
 .bn .bq-badge { display:inline-block; font-size:8px; text-transform:uppercase; letter-spacing:.14em; font-weight:700; background:var(--ok); color:#fff; padding:3px 8px; border-radius:2px; margin-bottom:12px; }
 .bn .bq-qrow { display:flex; justify-content:space-between; align-items:center; padding:9px 0; border-bottom:1px solid var(--hair); font-size:12px; }
@@ -1352,7 +1420,7 @@ body:has(.bn) .drawer-link:hover { background: rgba(20,17,12,0.06) !important; }
 .bn .pv-controls { display:flex; flex-direction:column; gap:16px; }
 .bn .pv-field { display:flex; flex-direction:column; gap:6px; }
 .bn .pv-field label { font-size:10.5px; text-transform:uppercase; letter-spacing:.13em; font-weight:700; color:var(--ink); }
-.bn .pv-field input, .bn .pv-field textarea, .bn .pv-field select { font:inherit; font-size:14px; padding:10px 12px; border:1.5px solid var(--ink); border-radius:3px; background:#faf8f1; color:var(--ink); width:100%; }
+.bn .pv-field input, .bn .pv-field textarea, .bn .pv-field select { font:inherit; font-size:14px; padding:10px 12px; border:1.5px solid var(--ink); border-radius:3px; background:var(--field); color:var(--ink); width:100%; }
 .bn .pv-field textarea { resize:vertical; min-height:72px; }
 /* Market and tone stack: side by side in the 360px control column each
    select got ~175px and cut the tone off ("Varm og menneskeli…"). */
@@ -1371,13 +1439,26 @@ body:has(.bn) .drawer-link:hover { background: rgba(20,17,12,0.06) !important; }
 .bn .pv-upload { font-size:11px; text-transform:uppercase; letter-spacing:.1em; font-weight:700; border:1.5px dashed var(--ink); border-radius:3px; padding:10px; text-align:center; cursor:pointer; }
 .bn .pv-upload input { display:none; }
 .bn .pv-badge { display:inline-block; font-size:9px; text-transform:uppercase; letter-spacing:.14em; font-weight:700; padding:3px 9px; border-radius:2px; margin-bottom:10px; }
-.bn .pv-badge.ai { background:var(--ok); color:#fff; }
+.bn .pv-badge.ai { background:var(--ok); color:var(--paper); }
 .bn .pv-badge.tpl { background:transparent; color:var(--ink-mute); border:1px solid var(--hair); }
 .bn .pv-edithint { font-size:11px; color:var(--ink-mute); margin-top:10px; }
 .bn .pv-error { font-size:13px; color:var(--NO); margin-top:8px; }
 .bn .na-body { margin-top:18px; }
 .bn .na-art .na-body p { font-family:Georgia,serif; font-size:15px; line-height:1.62; color:#1d1a13; margin:0 0 12px; }
 .bn .na-art .na-body p:first-child::first-letter { font-size:42px; float:left; line-height:.8; margin:3px 8px 0 0; font-weight:700; }
-.bn [contenteditable]:focus { outline:2px dashed rgba(20,17,12,.4); outline-offset:3px; border-radius:2px; }
+.bn [contenteditable]:focus { outline:2px dashed rgba(var(--ink-rgb),.4); outline-offset:3px; border-radius:2px; }
 @media (max-width: 860px) { .bn .preview-studio { grid-template-columns:1fr; } .bn .pv-presets { grid-template-columns:repeat(5,1fr); } }
 `;
+
+// Content hash for the stylesheet URL (FNV-1a, 32-bit): any edit to STYLES
+// changes the href, so the long-lived cache on /landing.css never goes stale.
+function fnv1a(text: string): string {
+  let h = 0x811c9dc5;
+  for (let i = 0; i < text.length; i++) {
+    h ^= text.charCodeAt(i);
+    h = Math.imul(h, 0x01000193);
+  }
+  return (h >>> 0).toString(36);
+}
+
+export const STYLES_HREF = `/landing.css?v=${fnv1a(STYLES)}`;

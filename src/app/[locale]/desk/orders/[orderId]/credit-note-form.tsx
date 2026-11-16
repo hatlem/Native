@@ -1,6 +1,6 @@
 import { getTranslations } from "next-intl/server";
 import type { Invoice } from "@prisma/client";
-import { formatMoney } from "@/lib/money";
+import { formatMoney, formatMoneyExact } from "@/lib/money";
 import { issueCreditNote } from "@/app/desk-billing-actions";
 import { SubmitButton } from "@/components";
 
@@ -28,7 +28,7 @@ export async function CreditNoteForm({
         <h4 style={{ margin: "12px 0 4px" }}>{t("creditNoteTitle")}</h4>
         <p className="muted small">
           {t("creditNoteHint", {
-            amount: formatMoney(Number(invoice.total), invoice.currency, locale),
+            amount: formatMoneyExact(Number(invoice.total), invoice.currency, locale),
           })}
         </p>
         <div className="field">

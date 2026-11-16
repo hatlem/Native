@@ -1,16 +1,18 @@
+import { Suspense, type ComponentProps } from "react";
 import { getTranslations } from "next-intl/server";
 import { MarketCode, ProductType, Prisma } from "@prisma/client";
 import { Link } from "@/i18n/navigation";
 import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
 import { getFavoritedTitleIds } from "@/lib/favorites";
-import { resolveCatalogSearch, titleNameStartsWhere, titleNameWhere } from "@/lib/catalog-search";
+import { resolveCatalogSearchFast, titleNameStartsWhere, titleNameWhere } from "@/lib/catalog-search";
 import { tierSlices } from "@/lib/catalog-tiers";
 import { redirect } from "next/navigation";
 import { savedListMembershipMap } from "@/lib/saved-list-membership";
 import { loadScope } from "@/lib/scope";
 import { loadRelevanceSignals } from "@/lib/catalog-relevance";
-import { loadVerticalOptions, localizedVerticalOptions } from "@/lib/catalog-taxonomy";
+import { localizedVerticalOptions } from "@/lib/catalog-taxonomy";
+import { cachedMarketCurrencies, cachedRegionRows, cachedVerticalOptions } from "@/lib/catalog-facets";
 import { localizeVertical } from "@/lib/taxonomy-i18n";
 import { familyOfToken, isFamilyToken, verticalFamilies } from "@/lib/vertical-families";
 import { safeLocale } from "@/i18n/routing";
@@ -96,7 +98,7 @@ export default async function CatalogPage({
   // FTS-first: titles matching every word of the query (FTS, then ILIKE),
   // widened to titles matching any word only when none match them all
   // (lib/catalog-search.ts resolveCatalogSearch).
-  const search = await resolveCatalogSearch(q);
+  const search = await resolveCatalogSearchFast(q);
 
   // Shared with the CSV export so "download" holds exactly these titles.
   const where = buildCatalogWhere(filters, search);
@@ -111,20 +113,19 @@ export default async function CatalogPage({
   // The price-band filter (?price=): one option per band tier, labelled in
   // the currencies of the markets being browsed (all markets when none is
   // picked) — "25–40k NOK" for Norway, both scales across markets.
-  const bandCurrencies = (
-    await prisma.market.findMany({
-      where: { code: { in: markets.length ? markets : [...MARKET_CODES] } },
-      select: { currency: true },
-      orderBy: { code: "asc" },
-    })
-  ).map((m) => m.currency);
+  // Facet lookups are cached across requests (lib/catalog-facets).
+  const currencyByMarket = await cachedMarketCurrencies();
+  const bandCurrencies = [...(markets.length ? markets : [...MARKET_CODES])]
+    .sort()
+    .map((code) => currencyByMarket[code])
+    .filter((c): c is string => !!c);
   const priceBandOptions = Array.from({ length: BAND_TIER_COUNT }, (_, tier) => ({
     value: String(tier),
     label: tierLabel(tier, bandCurrencies),
   }));
 
   // Labels in the buyer's language; values stay the stored taxonomy terms.
-  const verticalOptions = localizedVerticalOptions(await loadVerticalOptions(), locale);
+  const verticalOptions = localizedVerticalOptions(await cachedVerticalOptions(), locale);
 
   // Distinct regions present from the geo backfill — drives the region
   // multiselect. Null regions (national/unknown titles) don't appear.
@@ -134,15 +135,10 @@ export default async function CatalogPage({
   // it. distinct(["region"]) + ordering by countryCode picks one country
   // deterministically per region even in the (currently nonexistent) case
   // of a region name shared across markets.
-  const regionRows = await prisma.title.findMany({
-    where: { region: { not: null } },
-    select: { region: true, countryCode: true },
-    distinct: ["region"],
-    orderBy: [{ region: "asc" }, { countryCode: "asc" }],
-  });
-  const regionOptions = regionRows
-    .filter((r) => r.region && r.region.trim().length > 0)
-    .map((r) => ({ value: r.region!, country: r.countryCode as MarketCode }));
+  const regionOptions = (await cachedRegionRows()).map((r) => ({
+    value: r.region,
+    country: r.countryCode as MarketCode,
+  }));
 
   // Resolve the publisher-filter chip label (name, not cuid). Invalid id
   // simply matches nothing — no error path needed.
@@ -233,8 +229,14 @@ export default async function CatalogPage({
   }
   if (relevanceOr.length > 0) tierFilters.push({ where: { OR: relevanceOr }, orderBy: relevantOrderBy });
 
+  // The count is awaited here: the heading, the pagination and the
+  // "page past the end" redirect below all need it before anything is sent.
+  // The rows themselves (and their per-row favourite / list state) start
+  // loading now but are awaited inside <CatalogResultsSection>, behind a
+  // Suspense boundary — the filters, heading and controls render without
+  // waiting for them. Same queries as before, only awaited later.
   let totalCount: number;
-  let titles: Prisma.TitleGetPayload<{ include: typeof titleInclude }>[];
+  let titlesPromise: Promise<CatalogTitle[]>;
 
   if (tierFilters.length > 0) {
     const tiers: Tier[] = [
@@ -246,7 +248,7 @@ export default async function CatalogPage({
     ];
     const counts = await Promise.all(tiers.map((tier) => prisma.title.count({ where: tier.where })));
     totalCount = counts.reduce((a, b) => a + b, 0);
-    const pages = await Promise.all(
+    titlesPromise = Promise.all(
       tierSlices(counts, skip, PAGE_SIZE).map((slice) =>
         prisma.title.findMany({
           where: tiers[slice.tier].where,
@@ -256,14 +258,16 @@ export default async function CatalogPage({
           skip: slice.skip,
         }),
       ),
-    );
-    titles = pages.flat();
+    ).then((pages) => pages.flat());
   } else {
-    [totalCount, titles] = await Promise.all([
-      prisma.title.count({ where }),
-      prisma.title.findMany({ where, include: titleInclude, orderBy, take: PAGE_SIZE, skip }),
-    ]);
+    const countPromise = prisma.title.count({ where });
+    titlesPromise = prisma.title.findMany({ where, include: titleInclude, orderBy, take: PAGE_SIZE, skip });
+    // Marked handled before the first await: if the count throws, or the
+    // redirect below fires, nobody awaits the rows.
+    titlesPromise.catch(() => {});
+    totalCount = await countPromise;
   }
+  titlesPromise.catch(() => {});
   const totalPages = Math.max(1, Math.ceil(totalCount / PAGE_SIZE));
   // Filters that narrow the catalog (search included): with any of them a
   // zero count means "no match", not "the catalog is empty".
@@ -290,38 +294,21 @@ export default async function CatalogPage({
   // separate (and for most buyers empty) FavoriteList model. session.user is
   // guaranteed here — the marketing splash returns above for guests.
   const userId = session.user.id;
-  const titleIds = titles.map((tt) => tt.id);
-  const [favoritedIds, savedLists, membershipRows, bookingUserRow] =
-    await Promise.all([
-      getFavoritedTitleIds(userId, titleIds),
-      orgId
-        ? prisma.savedList.findMany({
-            where: { organizationId: orgId, archivedAt: null },
-            orderBy: { updatedAt: "desc" },
-            select: { id: true, name: true },
-          })
-        : Promise.resolve([]),
-      orgId && titleIds.length
-        ? prisma.savedListItem.findMany({
-            where: {
-              list: { organizationId: orgId, archivedAt: null },
-              OR: [
-                { titleId: { in: titleIds } },
-                { product: { titleId: { in: titleIds } } },
-              ],
-            },
-            select: {
-              listId: true,
-              titleId: true,
-              product: { select: { titleId: true } },
-            },
-          })
-        : Promise.resolve([]),
-      prisma.user.findUnique({
-        where: { id: userId },
-        select: { bookingPromptDismissedAt: true },
-      }),
-    ]);
+  // The per-row halves of this (which titles are hearted, which lists hold
+  // them) depend on the rows and load with them in <CatalogResultsSection>.
+  const [savedLists, bookingUserRow] = await Promise.all([
+    orgId
+      ? prisma.savedList.findMany({
+          where: { organizationId: orgId, archivedAt: null },
+          orderBy: { updatedAt: "desc" },
+          select: { id: true, name: true },
+        })
+      : Promise.resolve([]),
+    prisma.user.findUnique({
+      where: { id: userId },
+      select: { bookingPromptDismissedAt: true },
+    }),
+  ]);
   const favoriteLists = savedLists;
   // An agency session with no client selected has no org to scope lists to —
   // show a "choose a client first" hint instead of the misleading "no lists".
@@ -329,8 +316,6 @@ export default async function CatalogPage({
   // A view-only (RESTRICTED) seat browses the catalog like anyone, but gets no
   // "Add to plan" or list checklist: both change the org's plans.
   const readOnly = !!orgId && !scope.workspace?.activeCanEdit;
-  const membershipMap = savedListMembershipMap(membershipRows);
-  const listMembership: Record<string, string[]> = Object.fromEntries(membershipMap);
   const dismissedAt = bookingUserRow?.bookingPromptDismissedAt ?? null;
   const showBookingBanner = shouldShowBookingBanner({
     audience: audienceFor(session),
@@ -673,17 +658,19 @@ export default async function CatalogPage({
 
             <ActiveFilterChips locale={locale} filters={activeFilters} />
 
-            <CatalogResults
-              locale={locale}
-              titles={titles}
-              density={density}
-              compareMode={compareMode}
-              favoritedIds={favoritedIds}
-              favoriteLists={favoriteLists}
-              listMembership={listMembership}
-              noOrg={noOrg}
-              readOnly={readOnly}
-            />
+            <Suspense fallback={<CatalogResultsSkeleton density={density} label={t("resultsSubline")} />}>
+              <CatalogResultsSection
+                titlesPromise={titlesPromise}
+                userId={userId}
+                orgId={orgId}
+                locale={locale}
+                density={density}
+                compareMode={compareMode}
+                favoriteLists={favoriteLists}
+                noOrg={noOrg}
+                readOnly={readOnly}
+              />
+            </Suspense>
 
             <CatalogPagination
               locale={locale}
@@ -705,5 +692,88 @@ export default async function CatalogPage({
         </div>
       </section>
     </ShortlistProvider>
+  );
+}
+
+// A row as <CatalogResults> takes it (the page's titleInclude shape).
+type CatalogTitle = ComponentProps<typeof CatalogResults>["titles"][number];
+
+// Placeholder rows while the result page's titles load.
+function CatalogResultsSkeleton({ density, label }: { density: Density; label: string }) {
+  return (
+    <div
+      className={density === "cards" ? "grid catalog-grid" : "catalog-list"}
+      aria-busy="true"
+      aria-live="polite"
+      aria-label={label}
+    >
+      {Array.from({ length: 6 }, (_, i) => (
+        <div className="card skel-card" key={i} style={{ minHeight: 88 }}>
+          <div className="skel skel-line" />
+          <div className="skel skel-line short" />
+        </div>
+      ))}
+    </div>
+  );
+}
+
+// The result rows: awaits the title query the page already started, then the
+// two per-row lookups that depend on it (which titles this buyer has hearted
+// and which saved lists hold them) — the same queries the page used to run
+// inline, scoped to the same user and organisation.
+async function CatalogResultsSection({
+  titlesPromise,
+  userId,
+  orgId,
+  locale,
+  density,
+  compareMode,
+  favoriteLists,
+  noOrg,
+  readOnly,
+}: {
+  titlesPromise: Promise<CatalogTitle[]>;
+  userId: string;
+  orgId: string | null | undefined;
+  locale: string;
+  density: Density;
+  compareMode: boolean;
+  favoriteLists: { id: string; name: string }[];
+  noOrg: boolean;
+  readOnly: boolean;
+}) {
+  const titles = await titlesPromise;
+  const titleIds = titles.map((tt) => tt.id);
+  const [favoritedIds, membershipRows] = await Promise.all([
+    getFavoritedTitleIds(userId, titleIds),
+    orgId && titleIds.length
+      ? prisma.savedListItem.findMany({
+          where: {
+            list: { organizationId: orgId, archivedAt: null },
+            OR: [{ titleId: { in: titleIds } }, { product: { titleId: { in: titleIds } } }],
+          },
+          select: {
+            listId: true,
+            titleId: true,
+            product: { select: { titleId: true } },
+          },
+        })
+      : Promise.resolve([]),
+  ]);
+  const listMembership: Record<string, string[]> = Object.fromEntries(
+    savedListMembershipMap(membershipRows),
+  );
+  return (
+    <CatalogResults
+      locale={locale}
+      titles={titles}
+      density={density}
+      compareMode={compareMode}
+      favoritedIds={favoritedIds}
+      favoriteLists={favoriteLists}
+      listMembership={listMembership}
+      noOrg={noOrg}
+      readOnly={readOnly}
+    />
   );
 }

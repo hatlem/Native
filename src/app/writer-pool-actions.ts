@@ -1,7 +1,7 @@
 "use server";
 
+import { requireDesk } from "@/lib/desk-guard";
 import { redirect } from "next/navigation";
-import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
 import { recordAudit } from "@/lib/audit";
 import { canAssignWriter } from "@/lib/writers/access";
@@ -14,20 +14,12 @@ function field(formData: FormData, key: string): string {
   return typeof v === "string" ? v.trim() : "";
 }
 
-async function requireDeskUser(locale: string): Promise<string> {
-  const session = await auth();
-  const role = session?.user?.role;
-  if (!session?.user || (role !== "DESK" && role !== "SUPERADMIN")) {
-    redirect(`/${locale}/signin`);
-  }
-  return session.user.id;
-}
 
 export async function addWriterToPool(formData: FormData) {
   const locale = field(formData, "locale") || "en";
   const orderId = field(formData, "orderId");
   const writerId = field(formData, "writerId");
-  const userId = await requireDeskUser(locale);
+  const userId = await requireDesk(locale);
 
   await prisma.orderWriterPool.upsert({
     where: { orderId_writerId: { orderId, writerId } },
@@ -43,7 +35,7 @@ export async function removeWriterFromPool(formData: FormData) {
   const locale = field(formData, "locale") || "en";
   const orderId = field(formData, "orderId");
   const writerId = field(formData, "writerId");
-  const userId = await requireDeskUser(locale);
+  const userId = await requireDesk(locale);
 
   // Clear any line assignments to this writer on this order, then drop the
   // pool row — atomically, so we never leave a line assigned to a writer
@@ -65,7 +57,7 @@ export async function assignWriterToLine(formData: FormData) {
   const orderId = field(formData, "orderId");
   const orderLineId = field(formData, "orderLineId");
   const writerId = field(formData, "writerId"); // "" → unassign
-  const userId = await requireDeskUser(locale);
+  const userId = await requireDesk(locale);
 
   if (writerId === "") {
     await prisma.orderLine.update({

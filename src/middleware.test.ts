@@ -159,3 +159,48 @@ test("canonicalHostRedirect leaves the apex, other hosts and non-GET requests al
   assert.equal(canonicalHostRedirect(post, "https://nativespin.com"), null);
   assert.equal(canonicalHostRedirect(apex, "not a url"), null);
 });
+
+test("request id: minted when absent, echoed on the response, sane upstream ids reused", async () => {
+  const { requestIdFor } = await import("./middleware");
+  assert.match(requestIdFor(null), /^[0-9a-f-]{36}$/);
+  assert.equal(requestIdFor("abc12345-railway-id"), "abc12345-railway-id");
+  // Header-injection shaped or oversized values are replaced, not trusted.
+  assert.notEqual(requestIdFor("x\r\nSet-Cookie: a=b"), "x\r\nSet-Cookie: a=b");
+  assert.notEqual(requestIdFor("short"), "short");
+
+  const res = middleware(new NextRequest("http://localhost:3000/en/pricing"));
+  assert.match(res.headers.get("x-request-id") ?? "", /^[0-9a-f-]{36}$/);
+  const passed = middleware(
+    new NextRequest("http://localhost:3000/en/pricing", { headers: { "x-request-id": "upstream-id-0001" } }),
+  );
+  assert.equal(passed.headers.get("x-request-id"), "upstream-id-0001");
+});
+
+test("signed out on a public page: rewritten to the prerendered copy, which carries its own CSP", () => {
+  const req = new NextRequest(new URL("https://nativespin.com/en/pricing"));
+  const res = middleware(req);
+  assert.equal(res.headers.get("x-middleware-rewrite"), "https://nativespin.com/static/en/pricing");
+  // The cached page brings its hash-based policy; a second (nonce) policy
+  // here would be enforced too and block the page's scripts.
+  assert.equal(res.headers.get("content-security-policy"), null);
+  assert.equal(res.headers.get("cache-control"), "private, no-cache");
+  assert.match(res.headers.get("vary") ?? "", /Cookie/);
+});
+
+test("with a session cookie, or for a page outside the list, the [locale] page renders with the nonce CSP", () => {
+  const signedIn = new NextRequest(new URL("https://nativespin.com/en/pricing"), {
+    headers: { cookie: "authjs.session-token=abc" },
+  });
+  const a = middleware(signedIn);
+  assert.notEqual(a.headers.get("x-middleware-rewrite"), "https://nativespin.com/static/en/pricing");
+  assert.match(a.headers.get("content-security-policy") ?? "", /'nonce-/);
+
+  const signin = middleware(new NextRequest(new URL("https://nativespin.com/en/signin")));
+  assert.match(signin.headers.get("content-security-policy") ?? "", /'nonce-/);
+  assert.ok(!(signin.headers.get("x-middleware-rewrite") ?? "").includes("/static/"));
+});
+
+test("the prerendered tree is not reachable directly", () => {
+  const res = middleware(new NextRequest(new URL("https://nativespin.com/static/en/pricing")));
+  assert.equal(res.status, 404);
+});

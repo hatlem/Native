@@ -38,3 +38,14 @@ test("tokenExpiry returns a date AUTH_TOKEN_TTL_MIN minutes in the future", () =
   assert.ok(exp - before >= expectedMs - 1000);
   assert.ok(exp - after <= expectedMs + 1000);
 });
+
+test("invite tokens: stored hashed, legacy raw rows still match, a leaked hash does not", async () => {
+  const { storedInviteToken, inviteTokenCandidates } = await import("./tokens");
+  const raw = "AbC-123_xyz";
+  const stored = storedInviteToken(raw);
+  assert.match(stored, /^sha256:[0-9a-f]{64}$/);
+  assert.deepEqual(inviteTokenCandidates(raw), [stored, raw]);
+  // Presenting the stored value as the token must not match the row holding it.
+  assert.equal(inviteTokenCandidates(stored).includes(stored), false);
+  assert.deepEqual(inviteTokenCandidates(""), []);
+});

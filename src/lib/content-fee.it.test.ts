@@ -1,3 +1,4 @@
+import { resolveVat } from "@/lib/vat";
 import { test, before, after } from "node:test";
 import assert from "node:assert/strict";
 import { OrgType, MarketCode } from "@prisma/client";
@@ -106,7 +107,9 @@ if (!RUN_DB_IT) {
     assert.equal(fee[0].lineTotal, expectedFee);
 
     // Persist quote + order + invoice the way the actions do.
-    const { subtotal, total } = quoteTotals(lines, group.vatPct);
+    // A Norwegian buyer (the org created below): domestic VAT (lib/vat.ts).
+    const vatPct = resolveVat({ buyerCountry: MarketCode.NO }).vatPct;
+    const { subtotal, total } = quoteTotals(lines, vatPct);
     const created = await prisma.$transaction(async (tx) => {
       const org = await tx.organization.create({
         data: { name: `CF-IT org ${Date.now()}`, type: OrgType.ADVERTISER, marketCode: MarketCode.NO },
@@ -129,7 +132,7 @@ if (!RUN_DB_IT) {
           status: "ACCEPTED",
           currency: group.currency,
           subtotal,
-          vatPct: group.vatPct,
+          vatPct,
           total,
           lines: { create: lines },
         },

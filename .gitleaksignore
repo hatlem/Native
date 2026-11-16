@@ -1,0 +1,2 @@
+# False positive: a warning string naming the RESEND_WEBHOOK_SECRET variable, not a secret.
+51ae29615a3bedc96707a1d4f28f4a18beb3dbdf:src/lib/env.ts:generic-api-key:144

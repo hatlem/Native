@@ -1,6 +1,5 @@
 import { cache } from "react";
-import { prisma } from "@/lib/prisma";
-import { catalogVisibleTitleWhere } from "@/lib/catalog-visibility";
+import { cachedCatalogTitleCount } from "@/lib/catalog-public";
 
 // The ONE title count every public surface quotes — the home hero, its
 // stats strip, the catalog gate, page titles. It counts exactly what a
@@ -9,9 +8,10 @@ import { catalogVisibleTitleWhere } from "@/lib/catalog-visibility";
 // ever imported (discontinued ones included) while the catalog gate
 // counted active titles only, and the page title hard-coded "3,000+":
 // three numbers for one catalog.
-export const catalogTitleCount = cache(
-  (): Promise<number> => prisma.title.count({ where: catalogVisibleTitleWhere }),
-);
+//
+// De-duplicated within a request (React cache) and shared across requests for
+// a few minutes (lib/catalog-public): it is quoted on every public page view.
+export const catalogTitleCount = cache((): Promise<number> => cachedCatalogTitleCount());
 
 // For "{n}+ titles" copy: round DOWN, so the "+" is always true and the
 // figure doesn't churn with every import (2,814 → "2,800+").

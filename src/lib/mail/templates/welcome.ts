@@ -17,7 +17,7 @@ export function welcomeEmail(args: WelcomeArgs): {
   return {
     subject: t.subject(args.appName),
     text: `${body}\n\n${args.catalogUrl}\n\n${t.footer}`,
-    html: layout({
+    html: layout({ lang: args.locale,
       preheader: t.preheader,
       heading: t.heading,
       body,

@@ -1,3 +1,4 @@
+import { PendingButton } from "@/components/submit-button";
 import { getTranslations } from "next-intl/server";
 import { prisma } from "@/lib/prisma";
 import { Link } from "@/i18n/navigation";
@@ -102,9 +103,9 @@ export async function ScheduleStep({ locale, items }: Props) {
                       defaultValue={currentUnits}
                     />
                   </label>
-                  <button type="submit" className="btn small">
+                  <PendingButton className="btn small">
                     {t("scheduleSave")}
-                  </button>
+                  </PendingButton>
                 </div>
                 {i.scheduleStart && i.scheduleUnits ? (
                   <div className="schedule-row-current small">

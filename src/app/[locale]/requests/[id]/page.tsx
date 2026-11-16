@@ -1,9 +1,8 @@
 import { getTranslations } from "next-intl/server";
 import { notFound } from "next/navigation";
-import { prisma } from "@/lib/prisma";
 import { loadScope, canActOnOrg, canCommitOnOrg, canEditOnOrg } from "@/lib/scope";
 import { DataLayerEvent } from "@/app/data-layer-event";
-import { formatMoney } from "@/lib/money";
+import { formatMoney, formatMoneyExact } from "@/lib/money";
 import { paymentTermsDaysFor } from "@/lib/payment-terms";
 import { StatusBadge } from "@/app/status-badge";
 import { Breadcrumb, DetailHead, MetaRow } from "@/components";
@@ -11,17 +10,21 @@ import { PlanItemsSection } from "./_components/PlanItemsSection";
 import { PendingQuoteSection } from "./_components/PendingQuoteSection";
 import { QuoteSection } from "./_components/QuoteSection";
 import {
-  RENEWAL_REQUEST_COOLDOWN_MS,
-  RENEWAL_REQUESTED_AUDIT_ACTION,
-  buyerVisibleQuoteWhere,
   isQuoteExpired,
 } from "@/lib/commerce/quote-validity";
-import { lineOrder } from "@/lib/commerce/line-order";
 import { placementCount } from "@/lib/commerce/placements";
 import { reconcileExpiredQuotesInBackground } from "@/lib/commerce/quote-expiry";
 import { OrderSection } from "./_components/OrderSection";
 import { AcceptRefusedBanner } from "./_components/AcceptRefusedBanner";
+import { BackOutNotice, BackOutSection } from "./_components/BackOutSection";
 import { marketTimeZone } from "@/lib/markets";
+import {
+  loadDetailRequest,
+  loadDetailProducts,
+  loadDetailTitles,
+  loadDetailAssignedBuyer,
+  loadDetailRenewalRequest,
+} from "@/lib/data/buyer/requests";
 
 export const dynamic = "force-dynamic";
 
@@ -36,48 +39,11 @@ export default async function RequestPage({
   const sp = await searchParams;
   const t = await getTranslations({ locale, namespace: "requests" });
 
-  const request = await prisma.request.findUnique({
-    where: { id },
-    include: {
-      organization: true,
-      plan: { include: { items: true } },
-      // The buyer's view of the request: a DRAFT is the desk's work in
-      // progress and stays off this page until the desk sends it (the desk
-      // works it on /desk/[requestId]).
-      quotes: {
-        where: buyerVisibleQuoteWhere(),
-        orderBy: { createdAt: "desc" },
-        include: {
-          lines: { orderBy: lineOrder() },
-          // A superseded quote points the buyer at the revision that replaced
-          // it (always sent — superseding happens on the revision's send).
-          nextRevision: { select: { id: true, revision: true } },
-          order: {
-            include: {
-              invoices: true,
-              lines: {
-                orderBy: lineOrder(),
-                include: {
-                  articlePlacement: {
-                    include: {
-                      article: {
-                        include: {
-                          versions: { orderBy: { version: "desc" }, take: 1 },
-                        },
-                      },
-                    },
-                  },
-                },
-              },
-            },
-          },
-        },
-      },
-    },
-  });
+  // The loader answers null for another organisation's request.
+  const scope = await loadScope();
+  const request = await loadDetailRequest(scope, { id });
   if (!request) notFound();
 
-  const scope = await loadScope();
   if (!canActOnOrg(scope, request.organizationId)) notFound();
   // Whether THIS viewer may accept the quote (ordering rights in the request's
   // org). Without them the accept button is replaced by who can act.
@@ -91,21 +57,14 @@ export default async function RequestPage({
   const productIds = request.plan.items
     .map((i) => i.productId)
     .filter((id): id is string => !!id);
-  const products = await prisma.product.findMany({
-    where: { id: { in: productIds } },
-    // spec: the quote's "what you get" states the format's word count.
-    include: { title: { include: { market: true } }, spec: true },
-  });
+  const products = await loadDetailProducts(scope, { productIds });
   const byId = new Map(products.map((p) => [p.id, p]));
 
   const titleIds = request.plan.items
     .map((i) => i.titleId)
     .filter((id): id is string => !!id);
   const titles = titleIds.length
-    ? await prisma.title.findMany({
-        where: { id: { in: titleIds } },
-        select: { id: true, name: true },
-      })
+    ? await loadDetailTitles(scope, { titleIds })
     : [];
   const titleById = new Map(titles.map((t) => [t.id, { name: t.name }]));
 
@@ -113,10 +72,7 @@ export default async function RequestPage({
   // surface accountability ("Hentet av Astrid"). Schema has the FK column
   // but no relation — fetch by ID.
   const assignedBuyer = request.assignedDeskUserId
-    ? await prisma.user.findUnique({
-        where: { id: request.assignedDeskUserId },
-        select: { name: true, email: true },
-      })
+    ? await loadDetailAssignedBuyer(scope, { requestAssignedDeskUserId: request.assignedDeskUserId })
     : null;
 
   // Marketing promise: a firm quote in ≤24 working hours. Surface the
@@ -152,14 +108,7 @@ export default async function RequestPage({
   // "renewal requested" while the buyer's last ask is inside its cooldown.
   reconcileExpiredQuotesInBackground({ requestId: request.id });
   const renewalRequested = quotes.some((q) => !q.order && isQuoteExpired(q))
-    ? !!(await prisma.auditLog.findFirst({
-        where: {
-          entity: `Request:${request.id}`,
-          action: RENEWAL_REQUESTED_AUDIT_ACTION,
-          createdAt: { gte: new Date(Date.now() - RENEWAL_REQUEST_COOLDOWN_MS) },
-        },
-        select: { id: true },
-      }))
+    ? !!(await loadDetailRenewalRequest(scope, { requestId: request.id }))
     : false;
   const orderInvoice = orders[0]?.invoices[0];
 
@@ -173,6 +122,17 @@ export default async function RequestPage({
       <Breadcrumb href="/requests">{t("listTitle")}</Breadcrumb>
 
       <DataLayerEvent event="rfq_submitted" id={request.id} />
+      {quotes
+        .filter((q) => q.status === "ACCEPTED")
+        .map((q) => (
+          <DataLayerEvent
+            key={`qa-${q.id}`}
+            event="quote_accepted"
+            id={q.id}
+            value={Number(q.total)}
+            currency={q.currency}
+          />
+        ))}
       {orders.map((o) => {
         const q = quotes.find((x) => x.order?.id === o.id)!;
         return (
@@ -206,7 +166,7 @@ export default async function RequestPage({
               <MetaRow label={t("total")}>
                 {quotes
                   .map((q) =>
-                    formatMoney(Number(q.total), q.currency, locale),
+                    formatMoneyExact(Number(q.total), q.currency, locale),
                   )
                   .join(" · ")}
               </MetaRow>
@@ -216,6 +176,7 @@ export default async function RequestPage({
       />
 
       <AcceptRefusedBanner locale={locale} sp={sp} />
+      <BackOutNotice locale={locale} notice={typeof sp.notice === "string" ? sp.notice : undefined} />
 
       <PlanItemsSection
         locale={locale}
@@ -258,6 +219,21 @@ export default async function RequestPage({
           }))}
         />
       )}
+
+      <BackOutSection
+        locale={locale}
+        requestId={request.id}
+        requestStatus={request.status}
+        withdrawnAt={request.withdrawnAt}
+        quotes={quotes.map((q) => ({
+          id: q.id,
+          status: q.status,
+          currency: q.currency,
+          order: q.order ? { id: q.order.id } : null,
+        }))}
+        canAccept={canAccept}
+        canEdit={canEdit}
+      />
 
       {orders.length > 0 ? (
         <OrderSection

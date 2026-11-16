@@ -1,12 +1,11 @@
 import type { ReactNode } from "react";
 import { inter2 as inter } from "@/fonts";
-import { headers } from "next/headers";
 import { getTranslations } from "next-intl/server";
 import { Link } from "@/i18n/navigation";
 import { BrandWordmark } from "@/app/brand";
 import { MailLink } from "@/components";
 import { NewsletterSignup } from "@/app/[locale]/(marketing)/_components/NewsletterSignup";
-import { STYLES } from "./landing-styles";
+import { STYLES_HREF } from "./landing-styles";
 
 const DESK_SUBJECT = "Talk to the NativeSpin desk";
 
@@ -30,9 +29,6 @@ export async function LandingShell({
   rootClassName,
   children,
 }: LandingShellProps) {
-  // Per-request CSP nonce minted by middleware.ts. The strict policy would
-  // otherwise block the inline <style> block below.
-  const nonce = (await headers()).get("x-nonce") ?? undefined;
   const t = await getTranslations({ locale, namespace: "landing" });
 
   const rootClass = ["bn", inter.variable, withFooter ? null : "bn--bare", rootClassName]
@@ -41,7 +37,11 @@ export async function LandingShell({
 
   return (
     <div className={rootClass} data-screen-label={screenLabel}>
-      <style nonce={nonce} dangerouslySetInnerHTML={{ __html: STYLES }} />
+      {/* A linked, hashed stylesheet (app/landing.css): cached by the browser
+          instead of inlined into every response. `precedence` makes React
+          hoist it into <head>, de-duplicate it and hold the first paint until
+          it has loaded, so there is no unstyled flash. */}
+      <link rel="stylesheet" href={STYLES_HREF} precedence="landing" />
       {children}
       {withFooter ? (
         <footer className="page-foot">

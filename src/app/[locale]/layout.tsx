@@ -1,3 +1,4 @@
+import { PendingButton } from "@/components/submit-button";
 import type { ReactNode } from "react";
 import type { Metadata, Viewport } from "next";
 import { NextIntlClientProvider } from "next-intl";
@@ -5,6 +6,7 @@ import { getMessages, getTranslations } from "next-intl/server";
 import { headers } from "next/headers";
 import { notFound, redirect } from "next/navigation";
 import { prisma } from "@/lib/prisma";
+import { log } from "@/lib/log";
 import { getWorkspace, viewOrgIds } from "@/lib/workspace";
 import { acceptableQuoteWhere } from "@/lib/commerce/quote-validity";
 import { OrgSwitcher, switchableOrgs } from "@/app/org-switcher";
@@ -12,15 +14,14 @@ import { ViewAsBanner } from "@/app/view-as-banner";
 import { countUnsentLists } from "@/lib/lists";
 import { inter } from "@/fonts";
 import { routing } from "@/i18n/routing";
-import { Link } from "@/i18n/navigation";
+import { pickClientMessages } from "@/i18n/client-messages";
 import { auth } from "@/auth";
 import { logout } from "@/app/auth-actions";
 import { GtmScripts, GtmNoscript } from "@/app/gtm";
 import { GetCookiesScripts } from "@/app/getcookies";
 import { NavShell } from "@/app/nav-shell";
 import { PublicHeader } from "@/app/public-header";
-import { BrandWordmark } from "@/app/brand";
-import { MailLink } from "@/components";
+import { SiteFooter, siteMetadata, siteViewport } from "@/app/site-chrome";
 import {
   audienceFor,
   navItemsFor,
@@ -35,54 +36,10 @@ export async function generateMetadata({
 }: {
   params: Promise<{ locale: string }>;
 }): Promise<Metadata> {
-  const { locale } = await params;
-  const loc = (routing.locales as readonly string[]).includes(locale)
-    ? locale
-    : routing.defaultLocale;
-  const tc = await getTranslations({ locale: loc, namespace: "common" });
-  const th = await getTranslations({ locale: loc, namespace: "home" });
-  const appName = tc("appName");
-  const title = `${appName} · ${th("title")}`;
-  const description = th("subtitle");
-
-  return {
-    metadataBase: new URL(
-      process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000",
-    ),
-    applicationName: appName,
-    title: { default: title, template: `%s · ${appName}` },
-    description,
-    alternates: {
-      canonical: `/${loc}`,
-      languages: Object.fromEntries(
-        routing.locales.map((l) => [l, `/${l}`]),
-      ),
-    },
-    openGraph: {
-      type: "website",
-      siteName: appName,
-      title,
-      description,
-      url: `/${loc}`,
-      locale: loc,
-    },
-    twitter: { card: "summary_large_image", title, description },
-    // No layout-level robots: "index, follow" is what crawlers assume
-    // without one, and emitting it here put it next to the noindex Next adds
-    // on every 404 (two conflicting robots metas). Pages that must stay out
-    // of the index (share links, auth pages) set their own.
-  };
+  return siteMetadata((await params).locale);
 }
 
-export const viewport: Viewport = {
-  width: "device-width",
-  initialScale: 1,
-  colorScheme: "light dark",
-  themeColor: [
-    { media: "(prefers-color-scheme: light)", color: "#f6f6f4" },
-    { media: "(prefers-color-scheme: dark)", color: "#0c0d10" },
-  ],
-};
+export const viewport: Viewport = siteViewport;
 
 function initialsFromEmail(email: string | null | undefined): string {
   if (!email) return "·";
@@ -115,12 +72,15 @@ export default async function LocaleLayout({
     notFound();
   }
 
-  const messages = await getMessages();
   const t = await getTranslations({ locale, namespace: "nav" });
   const tc = await getTranslations({ locale, namespace: "common" });
   const ta = await getTranslations({ locale, namespace: "auth" });
-  const tm = await getTranslations({ locale, namespace: "marketing" });
   const session = await auth();
+  // Only the namespaces client components read are serialised into the page
+  // (i18n/client-messages.ts); server components translate on the server. A
+  // visitor without a session can only open the public pages, which need a
+  // fraction of them.
+  const messages = pickClientMessages(await getMessages(), { signedIn: Boolean(session?.user) });
   // Per-request CSP nonce minted by middleware.ts. Threaded into any
   // inline <script>/<style> that the strict policy would otherwise block.
   const nonce = (await headers()).get("x-nonce") ?? undefined;
@@ -145,10 +105,15 @@ export default async function LocaleLayout({
   const activeOrgName = switchOrgs?.find((o) => o.id === workspace?.activeOrgId)?.name ?? null;
   const staffHasOrgAccess =
     (audience === "desk" || audience === "superadmin") && workspace !== null;
-  const navOpts = { campaignFlow: campaignFlowEnabled(), hasOrgAccess: staffHasOrgAccess };
+  const navOpts = {
+    campaignFlow: campaignFlowEnabled(),
+    hasOrgAccess: staffHasOrgAccess,
+    // Admins of the active organisation get its audit trail (/audit).
+    orgAdmin: workspace?.activeOrgId != null && workspace.activeRole === "ADMIN",
+  };
   let nav = navItemsFor(audience, t, navOpts);
   const palette = paletteItemsFor(audience, t, navOpts);
-  const userMenu = userMenuItemsFor(audience, t);
+  const userMenu = userMenuItemsFor(audience, t, navOpts);
 
   // The campaign-flow buyer nav collapses to 2 links (Planlegg kampanje +
   // Kampanjer) — Catalog/Lists/Favorites/Orders/Reports only survive via
@@ -160,7 +125,13 @@ export default async function LocaleLayout({
   // notification for unsent SavedLists.
   if (showCollapsedBuyerNav) {
     const ws = workspace;
-    const draftListCount = ws?.activeOrgId ? await countUnsentLists(ws.activeOrgId) : 0;
+    // Decorative: a failed count must not take the whole app shell down.
+    const draftListCount = ws?.activeOrgId
+      ? await countUnsentLists(ws.activeOrgId).catch((err) => {
+          log.warn("layout.badge_count_failed", { badge: "campaigns", err });
+          return 0;
+        })
+      : 0;
     if (draftListCount > 0) {
       nav = nav.map((item) =>
         item.key === "campaigns" ? { ...item, badge: draftListCount } : item,
@@ -177,6 +148,9 @@ export default async function LocaleLayout({
     if (ws) {
       const orgIds = viewOrgIds(ws);
       const quoteOrgIds = orgIds.filter((id) => ws.commitOrgIds.includes(id));
+      // The badge is decorative and this layout wraps every page, where no
+      // error boundary of its own segment can catch it: on a failed count,
+      // render without the badge instead of failing the request.
       const [quoteCount, contentCount] = await Promise.all([
         prisma.quote.count({
           where: { ...acceptableQuoteWhere(), order: null, request: { organizationId: { in: quoteOrgIds } } },
@@ -184,7 +158,10 @@ export default async function LocaleLayout({
         prisma.contentAsset.count({
           where: { status: "IN_REVIEW", article: { organizationId: { in: orgIds } } },
         }),
-      ]);
+      ]).catch((err) => {
+        log.warn("layout.badge_count_failed", { badge: "home", err });
+        return [0, 0] as const;
+      });
       const needsCount = quoteCount + contentCount;
       if (needsCount > 0) {
         nav = nav.map((item) => (item.key === "home" ? { ...item, badge: needsCount } : item));
@@ -227,6 +204,7 @@ export default async function LocaleLayout({
               menuItems={userMenu}
               signedIn={signedIn}
               showPaletteHint={showCollapsedBuyerNav}
+              entitySearch={audience === "desk" || audience === "superadmin"}
               user={
                 session?.user?.email
                   ? {
@@ -241,7 +219,7 @@ export default async function LocaleLayout({
               signOutAction={
                 <form action={logout}>
                   <input type="hidden" name="locale" value={locale} />
-                  <button type="submit">{ta("signout")}</button>
+                  <PendingButton>{ta("signout")}</PendingButton>
                 </form>
               }
               labels={{
@@ -273,9 +251,9 @@ export default async function LocaleLayout({
                 </header>
                 <form action={logout}>
                   <input type="hidden" name="locale" value={locale} />
-                  <button type="submit" className="btn primary">
+                  <PendingButton className="btn primary">
                     {ta("signout")}
-                  </button>
+                  </PendingButton>
                 </form>
               </section>
             ) : (
@@ -283,47 +261,7 @@ export default async function LocaleLayout({
             )}
           </main>
 
-          <footer>
-            <div className="container footer-grid">
-              <div className="brand-block">
-                <Link href="/" className="brand" aria-label={appName}>
-                  <BrandWordmark className="brand-wordmark" aria-label={appName} />
-                </Link>
-                <p>{tm("footerTagline")}</p>
-                <p className="copyright">
-                  © {new Date().getFullYear()} {appName}
-                </p>
-              </div>
-              <div className="col">
-                <h2 className="footer-col-head">{tm("footerProduct")}</h2>
-                <ul>
-                  <li><Link href="/catalog">{t("catalog")}</Link></li>
-                  <li><Link href="/formats">{t("formats")}</Link></li>
-                  <li><Link href="/recommend">{t("recommend")}</Link></li>
-                  <li><Link href="/how-it-works">{tm("howCta")}</Link></li>
-                </ul>
-              </div>
-              <div className="col">
-                <h2 className="footer-col-head">{tm("footerSolutions")}</h2>
-                <ul>
-                  <li><Link href="/for-advertisers">{tm("audAdvertiserTitle")}</Link></li>
-                  <li><Link href="/for-agencies">{tm("audAgencyTitle")}</Link></li>
-                  <li><Link href="/for-publishers">{tm("audPublisherTitle")}</Link></li>
-                </ul>
-              </div>
-              <div className="col">
-                <h2 className="footer-col-head">{tm("footerCompany")}</h2>
-                <ul>
-                  <li><Link href="/about">{tm("footerAbout")}</Link></li>
-                  <li>
-                    <MailLink to="hello@nativespin.com">
-                      {tm("footerContact")}
-                    </MailLink>
-                  </li>
-                </ul>
-              </div>
-            </div>
-          </footer>
+          <SiteFooter locale={locale} />
         </NextIntlClientProvider>
       </body>
     </html>

@@ -1,4 +1,5 @@
 "use server";
+import { log } from "@/lib/log";
 
 import { redirect } from "next/navigation";
 import { auth } from "@/auth";
@@ -71,7 +72,7 @@ export async function submitRequest(formData: FormData) {
   if (postedListId) {
     const target = await resolvePlanTarget(ws, postedListId);
     if (!target.ok) {
-      console.warn("checkout.blocked", { reason: `list-${target.reason}`, userId: ws.userId, listId: postedListId });
+      log.warn("checkout.blocked", { reason: `list-${target.reason}`, userId: ws.userId, listId: postedListId });
       redirect(planPath(locale, null, refusalNotice(target)));
     }
     listId = target.list.id;
@@ -84,7 +85,7 @@ export async function submitRequest(formData: FormData) {
     // Sending a plan to the desk is a write: never for a view-only seat
     // (the posted-listId path gets the same answer from resolvePlanTarget).
     if (!ws.editOrgIds.includes(ws.activeOrgId)) {
-      console.warn("checkout.blocked", { reason: "list-read-only", userId: ws.userId });
+      log.warn("checkout.blocked", { reason: "list-read-only", userId: ws.userId });
       redirect(planPath(locale, null, { notice: "plan-read-only" }));
     }
     orgId = ws.activeOrgId;
@@ -98,7 +99,7 @@ export async function submitRequest(formData: FormData) {
   // exists. Booking the same lines again is a new plan ("Plan next wave").
   const ordered = await liveOrderForList(prisma, listId);
   if (ordered) {
-    console.warn("checkout.blocked", { reason: "already-ordered", userId: ws.userId, listId });
+    log.warn("checkout.blocked", { reason: "already-ordered", userId: ws.userId, listId });
     redirect(`/${locale}/requests/${ordered.requestId}?notice=already-ordered`);
   }
 
@@ -124,7 +125,7 @@ export async function submitRequest(formData: FormData) {
   await requireOnboardingBeforeBuy(session, locale, back(), orgId);
 
   if (!(await rfqLimiter.check(`rfq:${orgId}`)).ok) {
-    console.warn("checkout.blocked", { reason: "rate", orgId });
+    log.warn("checkout.blocked", { reason: "rate", orgId });
     redirect(back("rate"));
   }
 
@@ -163,6 +164,9 @@ export async function submitRequest(formData: FormData) {
     where: {
       sourceListId: list.id,
       organizationId: org.id,
+      // A withdrawn request is not a retry target: resubmitting right after a
+      // withdrawal must create a new request.
+      withdrawnAt: null,
       createdAt: { gt: new Date(Date.now() - 10_000) },
     },
     orderBy: { createdAt: "desc" },
@@ -177,7 +181,7 @@ export async function submitRequest(formData: FormData) {
     (i) => i.productId && (!i.product || !i.product.active || !i.product.bookable),
   );
   if (deactivatedLines.length > 0) {
-    console.warn("checkout.blocked", { reason: "unavailable", orgId: org.id, lines: deactivatedLines.length });
+    log.warn("checkout.blocked", { reason: "unavailable", orgId: org.id, lines: deactivatedLines.length });
     redirect(back("unavailable"));
   }
 
@@ -252,13 +256,13 @@ export async function submitRequest(formData: FormData) {
   if (allFirm) {
     const scope = await loadScope();
     if (!canCommitOnOrg(scope, org.id)) {
-      console.warn("checkout.blocked", { reason: "forbidden", orgId: org.id });
+      log.warn("checkout.blocked", { reason: "forbidden", orgId: org.id });
       redirect(back("forbidden"));
     }
     // A superadmin viewing as the customer places a real order: only with
     // the confirmation the form asks for (lib/view-as).
     if (!viewAsCommitConfirmed(scope.workspace, org.id, formData)) {
-      console.warn("checkout.blocked", { reason: "view-as-confirm", orgId: org.id });
+      log.warn("checkout.blocked", { reason: "view-as-confirm", orgId: org.id });
       redirect(back("view-as-confirm"));
     }
   }
@@ -278,7 +282,7 @@ export async function submitRequest(formData: FormData) {
       select: { productId: true },
     });
     if (blocked) {
-      console.warn("checkout.blocked", { reason: "availability", orgId: org.id, productId: blocked.productId });
+      log.warn("checkout.blocked", { reason: "availability", orgId: org.id, productId: blocked.productId });
       redirect(back("availability"));
     }
   }
@@ -291,7 +295,7 @@ export async function submitRequest(formData: FormData) {
     select: { id: true, quantity: true, productId: true, titleId: true, withContent: true },
   });
   if (fingerprintListItems(freshItems) !== loadedFingerprint) {
-    console.warn("checkout.blocked", { reason: "changed", orgId: org.id, listId: list.id });
+    log.warn("checkout.blocked", { reason: "changed", orgId: org.id, listId: list.id });
     redirect(back("changed"));
   }
 
@@ -330,13 +334,13 @@ export async function submitRequest(formData: FormData) {
       // A product went unavailable between load and the committing transaction —
       // bounce the buyer to review rather than instant-charge a stale basket.
       if (e instanceof FirmOrderStaleError) {
-        console.warn("checkout.blocked", { reason: "unavailable", orgId: org.id, via: "firmOrderStale", listId: list.id });
+        log.warn("checkout.blocked", { reason: "unavailable", orgId: org.id, via: "firmOrderStale", listId: list.id });
         redirect(back("unavailable"));
       }
       // The list was edited (another seat/tab) after our pre-flight fingerprint
       // check — same buyer outcome as the pre-flight catch: review & resubmit.
       if (e instanceof FirmOrderChangedError) {
-        console.warn("checkout.blocked", { reason: "changed", orgId: org.id, via: "firmOrderChanged", listId: list.id });
+        log.warn("checkout.blocked", { reason: "changed", orgId: org.id, via: "firmOrderChanged", listId: list.id });
         redirect(back("changed"));
       }
       throw e;

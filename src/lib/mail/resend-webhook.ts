@@ -153,7 +153,9 @@ export async function handleResendWebhook(args: {
   secret: string | undefined;
   allowedDomains?: Set<string>;
   nowMs?: number;
-}): Promise<{ ok: true; suppressed: number; type: string; ignored?: "foreign_domain" }> {
+  // Replay dedup store; defaults to the WebhookReceipt table. Injectable for tests.
+  receipts?: ReceiptStore;
+}): Promise<{ ok: true; suppressed: number; type: string; ignored?: "foreign_domain" | "duplicate" }> {
   if (!args.secret) throw new WebhookError("missing_secret", 500);
 
   const svix = extractSvixHeaders(args.headers);
@@ -175,12 +177,46 @@ export async function handleResendWebhook(args: {
     return { ok: true, suppressed: 0, type: event.type ?? "unknown", ignored: "foreign_domain" };
   }
 
+  // Svix redelivers on timeouts and on manual replay, each time with the same
+  // svix-id. A delivery we already processed is acknowledged and skipped.
+  // (Suppressions are upserts, so even a lost race here is harmless, and
+  // nothing depends on the order events arrive in.)
+  const receipts = args.receipts ?? dbReceiptStore;
+  if (svix.id && (await receipts.seen(svix.id))) {
+    return { ok: true, suppressed: 0, type: event.type ?? "unknown", ignored: "duplicate" };
+  }
+
   const suppressions = suppressionsFromEvent(event);
   for (const s of suppressions) {
     await addSuppression(s);
   }
+  // Recorded only after the work succeeded, so a failed delivery is retried.
+  if (svix.id) await receipts.record(svix.id);
   return { ok: true, suppressed: suppressions.length, type: event.type ?? "unknown" };
 }
+
+export type ReceiptStore = {
+  seen(eventId: string): Promise<boolean>;
+  record(eventId: string): Promise<void>;
+};
+
+const dbReceiptStore: ReceiptStore = {
+  async seen(eventId) {
+    const { prisma } = await import("@/lib/prisma");
+    const row = await prisma.webhookReceipt.findUnique({
+      where: { provider_eventId: { provider: "resend", eventId } },
+      select: { id: true },
+    });
+    return row !== null;
+  },
+  async record(eventId) {
+    const { prisma } = await import("@/lib/prisma");
+    await prisma.webhookReceipt.createMany({
+      data: [{ provider: "resend", eventId }],
+      skipDuplicates: true,
+    });
+  },
+};
 
 export class WebhookError extends Error {
   constructor(message: string, readonly status: number) {

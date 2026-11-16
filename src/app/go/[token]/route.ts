@@ -1,3 +1,4 @@
+import { log } from "@/lib/log";
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { appUrl } from "@/lib/url";
@@ -28,7 +29,7 @@ export async function GET(
       where: { id: link.id },
       data: { clickCount: { increment: 1 } },
     })
-    .catch((err) => console.error("trackedlink.increment_failed", err));
+    .catch((err) => log.error("trackedlink.increment_failed", { err: err }));
 
   return NextResponse.redirect(link.targetUrl);
 }

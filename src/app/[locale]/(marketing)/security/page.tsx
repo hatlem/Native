@@ -21,6 +21,7 @@ export default async function SecurityPage({
 }) {
   const { locale } = await params;
   const t = await getTranslations({ locale, namespace: "security" });
+  const tSub = await getTranslations({ locale, namespace: "subprocessors" });
 
   const pillars = [1, 2, 3, 4].map((i) => ({
     title: t(`pillar${i}Title`),
@@ -97,6 +98,13 @@ export default async function SecurityPage({
                   <td className="muted">{t("encryptionNote")}</td>
                 </tr>
                 <tr>
+                  <td>{t("mfaArea")}</td>
+                  <td>
+                    <span className="badge badge-success">{t("statusYes")}</span>
+                  </td>
+                  <td className="muted">{t("mfaNote")}</td>
+                </tr>
+                <tr>
                   <td>{t("ssoArea")}</td>
                   <td>
                     <span className="badge badge-info">{t("statusRoadmap")}</span>
@@ -123,6 +131,11 @@ export default async function SecurityPage({
           <p className="prose">
             {t("disclosureMail")}{" "}
             <MailLink className="link" to="security@nativespin.com" />
+          </p>
+          <p className="prose">
+            <Link href="/subprocessors" className="link">
+              {tSub("linkLabel")}
+            </Link>
           </p>
         </div>
       </section>

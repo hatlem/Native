@@ -1,3 +1,4 @@
+import { log } from "@/lib/log";
 // Placement-ready sweep — finds SavedListItem placeholders (titleId set,
 // productId null) whose Title has since gained a confirmed, bookable
 // Product, and nudges the buyer's org + the desk to resolve it via the
@@ -58,7 +59,7 @@ export async function runPlacementReadySweep(): Promise<PlacementReadySweepResul
   let processed = 0;
   for (const item of placeholders) {
     if (notified >= MAX_NOTIFICATIONS_PER_SWEEP) {
-      console.warn("placement-ready.capped", { deferred: placeholders.length - processed });
+      log.warn("placement-ready.capped", { deferred: placeholders.length - processed });
       break;
     }
     processed++;
@@ -105,7 +106,7 @@ export async function runPlacementReadySweep(): Promise<PlacementReadySweepResul
       notified++;
     } catch (err) {
       failed++;
-      console.error("placement-ready.item_failed", { itemId: item.id, err });
+      log.error("placement-ready.item_failed", { itemId: item.id, err });
     }
   }
   return { notified, failed };

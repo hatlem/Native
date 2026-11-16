@@ -1,3 +1,4 @@
+import { log } from "@/lib/log";
 import { prisma } from "@/lib/prisma";
 import { emailAdapter } from "@/lib/notify";
 import { newSigninAlertEmail } from "@/lib/mail/templates/new-signin-alert";
@@ -67,7 +68,7 @@ export async function recordSignIn(args: RecordSignInArgs): Promise<void> {
           html: msg.html,
         });
       } catch (err) {
-        console.error("auth.new_signin_email_failed", { userId: args.userId, err });
+        log.error("auth.new_signin_email_failed", { userId: args.userId, err });
       }
       await recordAudit(args.userId, "auth.new_signin_alert", `User:${args.userEmail}`, {
         oldIp: user?.lastSignInIp ?? null,
@@ -75,6 +76,6 @@ export async function recordSignIn(args: RecordSignInArgs): Promise<void> {
       });
     }
   } catch (err) {
-    console.error("auth.record_signin_failed", { userId: args.userId, err });
+    log.error("auth.record_signin_failed", { userId: args.userId, err });
   }
 }

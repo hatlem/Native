@@ -1,3 +1,4 @@
+import { log } from "@/lib/log";
 import { NextRequest, NextResponse } from "next/server";
 import { handleResendWebhook, WebhookError } from "@/lib/mail/resend-webhook";
 
@@ -21,10 +22,10 @@ export async function POST(req: NextRequest): Promise<Response> {
     if (err instanceof WebhookError) {
       // 5xx for our own misconfiguration (missing secret) so Resend retries;
       // 4xx for a bad/forged request so it does not.
-      console.error("resend_webhook.rejected", { reason: err.message });
+      log.error("resend_webhook.rejected", { reason: err.message });
       return NextResponse.json({ error: err.message }, { status: err.status });
     }
-    console.error("resend_webhook.error", err);
+    log.error("resend_webhook.error", { err: err });
     return NextResponse.json({ error: "internal" }, { status: 500 });
   }
 }

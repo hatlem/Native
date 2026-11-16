@@ -1,5 +1,6 @@
 "use server";
 
+import { requireDesk } from "@/lib/desk-guard";
 import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
 import { MarketCode, ProductType } from "@prisma/client";
@@ -14,15 +15,6 @@ function field(formData: FormData, key: string): string {
   return typeof v === "string" ? v.trim() : "";
 }
 
-// Desk/superadmin only. The nav already gates the page, but actions are a
-// separate entry point so we re-check here.
-async function requireDesk(locale: string): Promise<string | undefined> {
-  const scope = await loadScope();
-  if (scope.role !== "DESK" && scope.role !== "SUPERADMIN") {
-    redirect(`/${locale}/signin`);
-  }
-  return scope.userId;
-}
 
 function parseFee(raw: string): number | null {
   const n = Number(raw);

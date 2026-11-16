@@ -1,5 +1,5 @@
 import { getTranslations } from "next-intl/server";
-import { formatMoney } from "@/lib/money";
+import { formatMoney, formatMoneyExact } from "@/lib/money";
 import { articleFeeLabel, articleScope, articleScopeLines, extraWorkDetail } from "@/lib/article-scope";
 import { loadExtraWorkRates } from "@/lib/content-fee";
 import {
@@ -356,13 +356,13 @@ export async function QuoteSection({
                       {t("vat")} ({Number(q.vatPct)}%)
                     </span>
                     <span className="num">
-                      {formatMoney(vatAmount, q.currency, locale)}
+                      {formatMoneyExact(vatAmount, q.currency, locale)}
                     </span>
                   </div>
                   <div className="quote-row total">
                     <span>{t("total")}</span>
                     <span className="num">
-                      {formatMoney(
+                      {formatMoneyExact(
                         Number(q.total),
                         q.currency,
                         locale,
@@ -370,6 +370,8 @@ export async function QuoteSection({
                     </span>
                   </div>
                 </div>
+                {/* Reverse-charge statement stored on the quote (lib/vat.ts). */}
+                {q.vatNote ? <p className="muted small">{q.vatNote}</p> : null}
                 {narrative.lines.some((l) => l.priceOnRequest) ? (
                   <p className="muted small">
                     {t("priceOnRequestNote")}
@@ -407,7 +409,7 @@ export async function QuoteSection({
                 <li key={s.id} className="muted small">
                   {t("supersededRow", {
                     revision: s.revision,
-                    total: formatMoney(s.total, s.currency, locale),
+                    total: formatMoneyExact(s.total, s.currency, locale),
                   })}{" "}
                   {s.replacedBy ? (
                     <a href={`#quote-${s.replacedBy.id}`}>

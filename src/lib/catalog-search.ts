@@ -15,10 +15,12 @@
 // word also matches its æ/ø/å spellings (search-synonyms.ts
 // spellingVariants: "tromso" finds iTromsø).
 
+import { unstable_cache } from "next/cache";
 import { Prisma } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
 import { expandTerm, spellingVariants, stemOf } from "@/lib/search-synonyms";
 import { catalogVisibleTitleWhere } from "@/lib/catalog-visibility";
+import { CATALOG_FACETS_TAG } from "@/lib/catalog-facets";
 
 // Guard against pathological input blowing up the tsquery (a title with a
 // huge synonym group, or a query with many words) — 15 synonyms per word is
@@ -341,4 +343,55 @@ export async function resolveCatalogSearch(query: string): Promise<CatalogSearch
   }
   // Nothing anywhere: keep the strict clause (the page shows its no-match state).
   return { where: allWhere, match: "all" };
+}
+
+// ---------------------------------------------------------------------------
+// The catalog page's fast path.
+//
+// resolveCatalogSearch answers with a WHERE clause — an OR of full-text ids
+// and ILIKEs over title and publisher names. The page then runs that clause
+// many times per view (one count per relevance tier, the tier pages, the
+// "broader" count), and every run re-scans the names: ~150 ms of database
+// time for one search view. Here the clause is run ONCE into the list of
+// matching ids, and the page filters on `id IN (…)`, an index lookup.
+//
+// The result is the same set of titles, and the same for every visitor and
+// locale, so it is shared across requests (Next's data cache) per normalised
+// query for a minute — paging, re-sorting and other buyers' identical
+// searches reuse it. It carries the catalog-facets tag, so a desk change to a
+// title's catalog visibility (invalidateCatalogFacets) refreshes it too; a
+// rename made elsewhere shows up in search within the minute. (The CSV export
+// keeps using resolveCatalogSearch directly.)
+const MATERIALISE_MAX_IDS = 2000; // above this the ILIKE clause is cheaper than a huge IN list
+const SEARCH_TTL_SECONDS = 60;
+
+/** Case and spacing never change what a search finds. */
+export function normaliseCatalogQuery(query: string): string {
+  return query.trim().replace(/\s+/g, " ").toLowerCase();
+}
+
+async function materialise(query: string): Promise<CatalogSearch | null> {
+  const search = await resolveCatalogSearch(query);
+  if (!search) return null;
+  const rows = await prisma.title.findMany({
+    where: search.where,
+    select: { id: true },
+    take: MATERIALISE_MAX_IDS + 1,
+  });
+  if (rows.length > MATERIALISE_MAX_IDS) return search;
+  return { where: { id: { in: rows.map((r) => r.id) } }, match: search.match };
+}
+
+// Cached values are JSON: both kinds of clause (an id list, or the ILIKE
+// clause of strings) survive the round trip.
+const cachedMaterialise = unstable_cache(materialise, ["catalog-search:materialised"], {
+  tags: [CATALOG_FACETS_TAG],
+  revalidate: SEARCH_TTL_SECONDS,
+});
+
+export function resolveCatalogSearchFast(query: string): Promise<CatalogSearch | null> {
+  const key = normaliseCatalogQuery(query);
+  if (!key) return Promise.resolve(null);
+  // Scripts and tests run without Next's cache.
+  return process.env.NEXT_RUNTIME ? cachedMaterialise(key) : materialise(key);
 }

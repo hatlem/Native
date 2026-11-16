@@ -2,13 +2,17 @@ import { cookies } from "next/headers";
 import { getTranslations } from "next-intl/server";
 import { superadminPageGate } from "@/lib/desk-guard";
 import { SuperadminOnly } from "@/components/superadmin-only";
-import { prisma } from "@/lib/prisma";
 import { Link } from "@/i18n/navigation";
 import { createApiKey, revokeApiKey } from "@/app/admin-actions";
 import { SubmitButton } from "@/components";
 import { ISSUABLE_SCOPES } from "@/lib/api-key";
 import { buildBindingOptions } from "@/lib/api-key-binding-options";
 import { BindingPicker } from "./BindingPicker";
+import {
+  loadKeys,
+  loadOrgs,
+  loadPublishers,
+} from "@/lib/data/desk/api-keys";
 
 export const dynamic = "force-dynamic";
 
@@ -33,6 +37,7 @@ export default async function ApiKeysPage({
   if (!gate.allowed) {
     return <SuperadminOnly locale={locale} area={t("title")} body={t("deniedBody")} />;
   }
+  const ctx = gate.ctx;
 
   // Read the one-time flash cookie set by createApiKey. We deliberately
   // do NOT clear it here — `cookies().set()` throws in Next.js 15 server
@@ -73,31 +78,14 @@ export default async function ApiKeysPage({
             ? t("errorBinding")
             : t("errorScopes");
 
-  const keys = await prisma.apiKey.findMany({
-    orderBy: { createdAt: "desc" },
-    take: 100,
-    include: {
-      organization: { select: { name: true } },
-      publisher: { select: { name: true } },
-    },
-  });
+  const keys = await loadKeys(ctx);
 
   // Every organisation and publisher: the picker searches them client-side.
   // Publishers carry their market and first titles, which is what tells the
   // three "AB"s apart (lib/api-key-binding-options.ts).
   const [orgs, publishers] = await Promise.all([
-    prisma.organization.findMany({
-      select: { id: true, name: true, type: true, marketCode: true },
-    }),
-    prisma.publisher.findMany({
-      select: {
-        id: true,
-        name: true,
-        countryCode: true,
-        _count: { select: { titles: true } },
-        titles: { orderBy: { name: "asc" }, take: 2, select: { name: true } },
-      },
-    }),
+    loadOrgs(ctx),
+    loadPublishers(ctx),
   ]);
   const bindingOptions = buildBindingOptions(
     {

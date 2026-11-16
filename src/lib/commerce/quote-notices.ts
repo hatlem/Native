@@ -7,7 +7,7 @@
 // The desk's "quote accepted" is the `deskQuoteAccepted` template
 // (lib/notices/desk-notices.ts).
 
-import { formatMoney, intlLocale } from "@/lib/money";
+import { formatMoney, intlLocale, formatMoneyExact } from "@/lib/money";
 import type { BuyerLocale } from "@/lib/market-locale";
 
 type BuyerStrings = {
@@ -141,7 +141,7 @@ export function buildQuoteSentNotice(input: {
 }): { title: string; body: string } {
   const s = stringsFor(input.locale);
   const amounts = input.quotes
-    .map((q) => formatMoney(q.total, q.currency, input.locale))
+    .map((q) => formatMoneyExact(q.total, q.currency, input.locale))
     .join(" + ");
   const date = new Intl.DateTimeFormat(intlLocale(input.locale), {
     dateStyle: "long",

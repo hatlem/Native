@@ -121,6 +121,14 @@ const SAMPLES: { [K in NoticeKey]: ParamsOf<K> } = {
   },
   deskQuoteAccepted: { orgName: "ABAX AS", planName: "Q4 trade press", orderCount: 2, orderId: null },
   deskQuoteRenewal: { orgName: "ABAX AS", planName: "Q4 trade press", requestId: "req1" },
+  deskQuoteDeclined: { orgName: "ABAX AS", planName: "Q4 trade press", requestId: "req1", reason: "Budget cut" },
+  deskRequestWithdrawn: { orgName: "ABAX AS", planName: "Q4 trade press", requestId: "req1", reason: null },
+  deskCancellationRequested: {
+    orgName: "ABAX AS",
+    planName: "Q4 trade press",
+    orderId: "ord1",
+    reason: "Campaign postponed",
+  },
   deskBookingConfirmed: {
     titleName: "Verdens Gang (VG)",
     orgName: "ABAX AS",

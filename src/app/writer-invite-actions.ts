@@ -1,8 +1,8 @@
 "use server";
 
+import { requireDeskSession } from "@/lib/desk-guard";
 import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
-import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
 import { recordAudit } from "@/lib/audit";
 import { newInviteToken, expiryFromNow } from "@/lib/publisher-invite";
@@ -14,14 +14,6 @@ function field(formData: FormData, key: string): string {
   return typeof v === "string" ? v.trim() : "";
 }
 
-async function requireDeskSession(locale: string) {
-  const session = await auth();
-  const role = session?.user?.role;
-  if (!session?.user || (role !== "DESK" && role !== "SUPERADMIN")) {
-    redirect(`/${locale}/signin`);
-  }
-  return session.user;
-}
 
 // The name a writer sees as "X has invited you" — the desk user's name,
 // falling back to the local part of their address, never a role.

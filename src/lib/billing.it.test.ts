@@ -11,6 +11,9 @@ import { loadInvoicePdfData } from "@/lib/pdf/invoice-pdf-data";
 import { InvoiceDocument } from "@/lib/pdf/InvoiceDocument";
 import { invoiceMessagesFor } from "@/lib/pdf/invoice-messages";
 import { loadSellerDetails, sellerGaps } from "@/lib/seller";
+import { VAT_NOTE_REVERSE_CHARGE_EU } from "@/lib/vat";
+import { archiveInvoicePdf } from "@/lib/invoice-archive";
+import { isStorageConfigured } from "@/lib/storage/r2";
 
 // DB-mutating integration test — skipped unless RUN_DB_IT=1, and only
 // against a DISPOSABLE database. Covers the billing tail end to end:
@@ -325,6 +328,159 @@ if (!RUN_DB_IT) {
       InvoiceDocument({ data, seller, locale: "no", messages: invoiceMessagesFor("no") }),
     );
     assert.equal(Buffer.from(pdf).subarray(0, 4).toString(), "%PDF");
+  });
+
+  test("invoice numbers: concurrent issues get unique, consecutive numbers", async () => {
+    const orders = await Promise.all([makeOrder(), makeOrder(), makeOrder(), makeOrder()]);
+    const before = await prisma.documentCounter.findUniqueOrThrow({ where: { series: "invoice" } });
+    const results = await Promise.all(
+      orders.map((o) => issueInvoiceForOrder({ orderId: o.id, actorId: "it" })),
+    );
+    const numbers = results.map((r) => (r.ok ? r.number : -1)).sort((a, b) => a - b);
+    assert.deepEqual(
+      numbers,
+      [0, 1, 2, 3].map((i) => before.next + i),
+      "gap-free and unique",
+    );
+    // A refused issue (already invoiced) burns no number.
+    assert.equal((await issueInvoiceForOrder({ orderId: orders[0].id, actorId: "it" })).ok, false);
+    const after = await prisma.documentCounter.findUniqueOrThrow({ where: { series: "invoice" } });
+    assert.equal(after.next, before.next + 4);
+
+    // Credit notes run in their own series.
+    const cnBefore = await prisma.documentCounter.findUniqueOrThrow({ where: { series: "credit_note" } });
+    const cn = await issueFullCreditNote({
+      orderId: orders[0].id,
+      actorId: "it",
+      actorRole: "DESK",
+      reason: "numbering",
+    });
+    assert.ok(cn.ok);
+    if (!cn.ok) return;
+    const note = await prisma.creditNote.findUniqueOrThrow({ where: { id: cn.creditNoteId } });
+    assert.equal(note.number, cnBefore.next);
+  });
+
+  test("an issued invoice keeps the customer block it was issued with", async () => {
+    const order = await makeOrder();
+    const inv = await issueInvoiceForOrder({ orderId: order.id, actorId: "it" });
+    assert.ok(inv.ok);
+    if (!inv.ok) return;
+    const beforeRename = await loadInvoicePdfData(inv.invoiceId, "en");
+    assert.equal(beforeRename?.number, String(inv.number));
+    const original = await prisma.organization.findUniqueOrThrow({ where: { id: orgId } });
+    await prisma.organization.update({ where: { id: orgId }, data: { name: "Renamed later", legalName: null } });
+    try {
+      const afterRename = await loadInvoicePdfData(inv.invoiceId, "en");
+      assert.deepEqual(afterRename?.customer, beforeRename?.customer);
+      assert.notEqual(afterRename?.customer.name, "Renamed later");
+    } finally {
+      await prisma.organization.update({
+        where: { id: orgId },
+        data: { name: original.name, legalName: original.legalName },
+      });
+    }
+  });
+
+  test("VAT follows the buyer: a Norwegian buyer pays 25 %, stored as DOMESTIC", async () => {
+    const order = await makeOrder();
+    const quote = await prisma.quote.findUniqueOrThrow({ where: { id: order.quoteId } });
+    assert.equal(Number(quote.vatPct), 25);
+    assert.equal(quote.vatTreatment, "DOMESTIC");
+    assert.equal(quote.vatNote, null);
+    assert.equal(Number(quote.total), Number(quote.subtotal) * 1.25);
+    const inv = await issueInvoiceForOrder({ orderId: order.id, actorId: "it" });
+    assert.ok(inv.ok);
+    if (!inv.ok) return;
+    const invoice = await prisma.invoice.findUniqueOrThrow({ where: { id: inv.invoiceId } });
+    assert.equal(invoice.vatTreatment, "DOMESTIC");
+    assert.equal(invoice.vatNote, null);
+  });
+
+  test("VAT follows the buyer: a buyer outside Norway is reverse-charged, on quote, invoice and credit note", async () => {
+    const original = await prisma.organization.findUniqueOrThrow({ where: { id: orgId } });
+    // Same Norwegian title, Swedish buyer: the placement's market must not
+    // decide the rate (it used to: 25 % from the NO market).
+    await prisma.organization.update({ where: { id: orgId }, data: { marketCode: "SE", vatId: "SE556000000001" } });
+    try {
+      const order = await makeOrder();
+      const quote = await prisma.quote.findUniqueOrThrow({ where: { id: order.quoteId } });
+      assert.equal(Number(quote.vatPct), 0);
+      assert.equal(quote.vatTreatment, "REVERSE_CHARGE");
+      assert.equal(quote.vatNote, VAT_NOTE_REVERSE_CHARGE_EU);
+      assert.equal(Number(quote.total), Number(quote.subtotal));
+
+      const inv = await issueInvoiceForOrder({ orderId: order.id, actorId: "it" });
+      assert.ok(inv.ok);
+      if (!inv.ok) return;
+      // The buyer moves home afterwards: the issued invoice does not follow.
+      await prisma.organization.update({ where: { id: orgId }, data: { marketCode: "NO" } });
+      const invoice = await prisma.invoice.findUniqueOrThrow({ where: { id: inv.invoiceId } });
+      assert.equal(Number(invoice.vatPct), 0);
+      assert.equal(invoice.vatTreatment, "REVERSE_CHARGE");
+      assert.equal(invoice.vatNote, VAT_NOTE_REVERSE_CHARGE_EU);
+      assert.equal(Number(invoice.total), Number(invoice.subtotal));
+
+      const pdf = await loadInvoicePdfData(inv.invoiceId, "en");
+      assert.equal(pdf?.vatTreatment, "REVERSE_CHARGE");
+      assert.equal(pdf?.vatNote, VAT_NOTE_REVERSE_CHARGE_EU);
+      assert.equal(pdf?.customer.vatId, "SE556000000001");
+
+      const credit = await issueFullCreditNote({ orderId: order.id, actorId: "it", actorRole: "DESK", reason: "it" });
+      assert.ok(credit.ok);
+      if (!credit.ok) return;
+      const note = await prisma.creditNote.findUniqueOrThrow({ where: { id: credit.creditNoteId } });
+      assert.equal(note.vatTreatment, "REVERSE_CHARGE");
+      assert.equal(note.vatNote, VAT_NOTE_REVERSE_CHARGE_EU);
+    } finally {
+      await prisma.organization.update({
+        where: { id: orgId },
+        data: { marketCode: original.marketCode, vatId: original.vatId },
+      });
+    }
+  });
+
+  test("the audit row is written with the invoice and the credit note, in the same transaction", async () => {
+    const actor = `it-audit-${REF}`; // unique per run: the DB may hold earlier runs
+    const order = await makeOrder();
+    const inv = await issueInvoiceForOrder({ orderId: order.id, actorId: actor });
+    assert.ok(inv.ok);
+    if (!inv.ok) return;
+    const issuedRows = await prisma.auditLog.findMany({
+      where: { action: "invoice.issue", entity: `Invoice:${inv.invoiceId}` },
+    });
+    assert.equal(issuedRows.length, 1);
+    assert.equal(issuedRows[0].actor, actor);
+    assert.equal(issuedRows[0].organizationId, orgId);
+    const detail = JSON.parse(issuedRows[0].detail ?? "{}") as Record<string, unknown>;
+    assert.equal(detail.number, inv.number);
+    assert.equal(detail.orderId, order.id);
+    assert.equal(detail.total, inv.total);
+
+    // A refused second issue (the order is INVOICED) writes no audit row.
+    const again = await issueInvoiceForOrder({ orderId: order.id, actorId: actor });
+    assert.equal(again.ok, false);
+    assert.equal(await prisma.auditLog.count({ where: { action: "invoice.issue", actor } }), 1);
+
+    const credit = await issueFullCreditNote({ orderId: order.id, actorId: actor, actorRole: "DESK", reason: "audit" });
+    assert.ok(credit.ok);
+    if (!credit.ok) return;
+    const creditRows = await prisma.auditLog.findMany({
+      where: { action: "credit_note.issue", entity: `Invoice:${inv.invoiceId}` },
+    });
+    assert.equal(creditRows.length, 1);
+    assert.equal((JSON.parse(creditRows[0].detail ?? "{}") as Record<string, unknown>).creditNoteId, credit.creditNoteId);
+  });
+
+  test("without object storage nothing is archived and the invoice still issues", async () => {
+    const order = await makeOrder();
+    const inv = await issueInvoiceForOrder({ orderId: order.id, actorId: "it" });
+    assert.ok(inv.ok);
+    if (!inv.ok) return;
+    if (isStorageConfigured()) return; // archived for real when R2 creds are set
+    const invoice = await prisma.invoice.findUniqueOrThrow({ where: { id: inv.invoiceId } });
+    assert.equal(invoice.pdfObjectKey, null);
+    assert.equal(await archiveInvoicePdf(inv.invoiceId), null);
   });
 
   test("an unconfigured seller makes every invoice legally incomplete", async () => {

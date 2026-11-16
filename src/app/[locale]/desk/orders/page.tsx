@@ -1,10 +1,18 @@
+import { requireDeskContext } from "@/lib/desk-guard";
 import { getTranslations } from "next-intl/server";
-import { prisma } from "@/lib/prisma";
-import { PLACEMENT_LINE_WHERE } from "@/lib/commerce/placements";
 import { Link } from "@/i18n/navigation";
 import { formatMoney, intlLocale } from "@/lib/money";
 import { StatusBadge } from "@/app/status-badge";
 import { EmptyState } from "@/app/empty-state";
+import { Pager } from "@/components/pager";
+import { pageHref, pageWindow, parsePageParam } from "@/lib/pagination";
+import {
+  loadListStatusCounts,
+  loadListOrders,
+} from "@/lib/data/desk/orders";
+
+// The desk order list grows without bound; render one page at a time.
+const PAGE_SIZE = 50;
 
 export const dynamic = "force-dynamic";
 
@@ -49,6 +57,9 @@ export default async function DeskOrdersPage({
   searchParams: Promise<Record<string, string | string[] | undefined>>;
 }) {
   const { locale } = await params;
+  // The desk layout guard alone is not an authorization boundary: the page
+  // renders alongside it, so its RSC payload reached non-desk users.
+  const ctx = await requireDeskContext(locale);
   const sp = await searchParams;
   const t = await getTranslations({ locale, namespace: "order" });
   const td = await getTranslations({ locale, namespace: "desk" });
@@ -60,15 +71,16 @@ export default async function DeskOrdersPage({
     : "created";
   const dir: SortDir = dirRaw === "asc" ? "asc" : "desc";
 
-  const orders = await prisma.order.findMany({
-    orderBy: buildOrderBy(sort, dir),
-    include: {
-      organization: true,
-      quote: { select: { currency: true, total: true } },
-      // Placements only — the article fees are billed with them.
-      _count: { select: { lines: { where: PLACEMENT_LINE_WHERE } } },
-    },
-  });
+  // Counts come from the database, not from the loaded page, so the KPI
+  // tiles and the total stay correct on every page.
+  const statusCounts = await loadListStatusCounts(ctx);
+  const countOf = (...statuses: string[]) =>
+    statusCounts.filter((c) => statuses.includes(c.status)).reduce((n, c) => n + c._count._all, 0);
+  const total = statusCounts.reduce((n, c) => n + c._count._all, 0);
+  const { page, pageCount, skip, take } = pageWindow(parsePageParam(sp.page), total, PAGE_SIZE);
+
+  const orderBy = buildOrderBy(sort, dir);
+  const orders = await loadListOrders(ctx, { orderBy, skip, take });
 
   const sortHref = (field: SortField) => {
     const nextDir: SortDir = field === sort && dir === "desc" ? "asc" : "desc";
@@ -83,11 +95,9 @@ export default async function DeskOrdersPage({
         : "descending"
       : "none";
 
-  const inProgress = orders.filter((o) =>
-    ["CONFIRMED", "IN_PRODUCTION", "SCHEDULED"].includes(o.status),
-  ).length;
-  const live = orders.filter((o) => o.status === "LIVE").length;
-  const completed = orders.filter((o) => o.status === "COMPLETED").length;
+  const inProgress = countOf("CONFIRMED", "IN_PRODUCTION", "SCHEDULED");
+  const live = countOf("LIVE");
+  const completed = countOf("COMPLETED");
 
   return (
     <>
@@ -103,7 +113,7 @@ export default async function DeskOrdersPage({
         <p className="lead">{t("deskLead")}</p>
       </header>
 
-      {orders.length > 0 ? (
+      {total > 0 ? (
         <div className="kpi-grid">
           <div className="kpi">
             <div className="label">{t("kpiInProgress")}</div>
@@ -126,10 +136,10 @@ export default async function DeskOrdersPage({
             <span className="eyebrow">{t("listEyebrow")}</span>
             <h2>{t("listHeading")}</h2>
           </div>
-          <span className="muted small">{t("totalCount", { count: orders.length })}</span>
+          <span className="muted small">{t("totalCount", { count: total })}</span>
         </div>
 
-        {orders.length === 0 ? (
+        {total === 0 ? (
           <EmptyState
             title={t("noOrders")}
             primaryHref="/desk"
@@ -200,6 +210,12 @@ export default async function DeskOrdersPage({
             </table>
           </div>
         )}
+        <Pager
+          locale={locale}
+          page={page}
+          pageCount={pageCount}
+          hrefFor={(p) => pageHref("/desk/orders", { sort: sortRaw && sort, dir: dirRaw && dir }, p)}
+        />
       </section>
     </>
   );

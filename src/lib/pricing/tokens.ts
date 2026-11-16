@@ -49,3 +49,8 @@ export function priceRequestLink(token: string, locale: string = "en"): string {
     process.env.NEXT_PUBLIC_SITE_URL?.replace(/\/+$/, "") ?? "http://localhost:3000";
   return `${origin}/${locale}/price-request/${encodeURIComponent(token)}`;
 }
+
+// Where the contact stops further price requests (suppression list).
+export function priceRequestUnsubscribeLink(token: string, locale: string = "en"): string {
+  return `${priceRequestLink(token, locale)}/unsubscribe`;
+}

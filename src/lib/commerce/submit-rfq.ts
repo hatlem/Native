@@ -1,3 +1,4 @@
+import { log } from "@/lib/log";
 // The RFQ submit path, extracted from the submitRequest server action so it
 // can run without a session: the checkout action calls it for any non-firm
 // basket, and the programme auto-send sweep (programme-autosend.ts) calls it
@@ -153,7 +154,7 @@ export async function submitListAsRfq(input: {
     (i) => i.productId && (!i.product || !i.product.active || !i.product.bookable),
   );
   if (deactivatedLines.length > 0) {
-    console.warn("rfq.blocked", { reason: "unavailable", orgId: org.id, lines: deactivatedLines.length });
+    log.warn("rfq.blocked", { reason: "unavailable", orgId: org.id, lines: deactivatedLines.length });
     return { outcome: "unavailable" };
   }
 
@@ -272,7 +273,7 @@ export async function submitListAsRfq(input: {
   // A deduped concurrent retry adopts the first submit's request — skip the
   // duplicate audit entry and desk notification.
   if (request.duped) {
-    console.warn("rfq.dedup_hit", { orgId: org.id, listId: list.id, requestId: request.id });
+    log.warn("rfq.dedup_hit", { orgId: org.id, listId: list.id, requestId: request.id });
     return { outcome: "duplicate", requestId: request.id };
   }
 

@@ -101,7 +101,7 @@ export const OPENAPI_SPEC = {
               code: { type: "string", enum: Object.values(MarketCode) },
               currency: { type: "string" },
               disclosureLabel: { type: "string", nullable: true },
-              vatRatePct: { type: "number", description: "Standard VAT rate in the market, e.g. 25." },
+              vatRatePct: { type: "number", description: "Standard VAT rate in the title's market, e.g. 25. Informational only: the VAT on a quote or order follows the buyer's country (domestic rate or reverse charge), not this value." },
             },
           },
           pricesVisible: { type: "boolean" },
@@ -603,7 +603,7 @@ export const OPENAPI_SPEC = {
       get: {
         summary: "Get one sent quote by id.",
         description:
-          "Requires the catalog:read scope. A key bound to an organization sees only that organization's quotes; any other quote (and any unsent draft) is a 404. Exact figures appear here because a quote is the one place they belong — the catalog endpoints only ever return bands.",
+          "Requires the catalog:read scope. The key must be bound to the quote's organization: any other quote (and any unsent draft) is a 404, and a key with no organization binding sees no quotes. Exact figures appear here because a quote is the one place they belong — the catalog endpoints only ever return bands.",
         parameters: [
           {
             name: "id",

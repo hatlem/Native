@@ -1,7 +1,5 @@
 import { getTranslations } from "next-intl/server";
-import { viewOrgIds } from "@/lib/workspace";
 import { redirect } from "next/navigation";
-import { prisma } from "@/lib/prisma";
 import { placementCount } from "@/lib/commerce/placements";
 import { Link } from "@/i18n/navigation";
 import { formatMoney, intlLocale } from "@/lib/money";
@@ -9,6 +7,9 @@ import { loadScope } from "@/lib/scope";
 import { safeExternalUrl } from "@/lib/security";
 import { EmptyState } from "@/app/empty-state";
 import { StatusBadge } from "@/app/status-badge";
+import {
+  loadListOrders,
+} from "@/lib/data/buyer/orders";
 
 export const dynamic = "force-dynamic";
 
@@ -67,16 +68,8 @@ export default async function MyOrdersPage({
     : "created";
   const dir: SortDir = dirRaw === "asc" ? "asc" : "desc";
 
-  const orders = await prisma.order.findMany({
-    where: { organizationId: { in: viewOrgIds(scope.workspace) } },
-    orderBy: buildOrderBy(sort, dir),
-    include: {
-      organization: { select: { name: true } },
-      quote: { select: { currency: true, total: true } },
-      invoices: { select: { id: true, status: true } },
-      lines: { include: { booking: true } },
-    },
-  });
+  const orderBy = buildOrderBy(sort, dir);
+  const orders = await loadListOrders(scope, { orderBy });
 
   // Toggle direction on the active column, default to desc on a new column.
   const sortHref = (field: SortField) => {

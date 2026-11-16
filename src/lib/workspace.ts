@@ -1,3 +1,5 @@
+import { log } from "@/lib/log";
+import { cache } from "react";
 import { cookies } from "next/headers";
 import { prisma } from "@/lib/prisma";
 import {
@@ -296,7 +298,7 @@ export async function loadWorkspace(
         where: { userId, status: "ACTIVE", expiresAt: { not: null, lte: now } },
         data: { status: "EXPIRED" },
       })
-      .catch((err) => console.error("membership.reconcile_failed", { userId, err }));
+      .catch((err) => log.error("membership.reconcile_failed", { userId, err }));
   }
 
   const homeOrg = user.organization;
@@ -324,7 +326,12 @@ export async function loadWorkspace(
 // Resolve the acting workspace for a signed-in user. Returns null when the
 // user holds no active seat and is not an agency (e.g. desk/publisher
 // accounts, or a member whose access was revoked or has lapsed).
-export async function getWorkspace(
+//
+// Memoised per server render (React cache): the layout, loadScope and the page
+// all resolve the same workspace, and each resolution is several queries.
+// Outside a render — server actions, route handlers — cache() is a
+// pass-through, so a mutation is never answered from a stale workspace.
+export const getWorkspace = cache(async function getWorkspace(
   userId: string | undefined,
 ): Promise<Workspace | null> {
   if (!userId) return null;
@@ -335,4 +342,4 @@ export async function getWorkspace(
     new Date(),
     store.get(VIEW_AS_COOKIE)?.value ?? null,
   );
-}
+});

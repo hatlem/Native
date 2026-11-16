@@ -1,3 +1,4 @@
+import { log } from "@/lib/log";
 // Rate-card OCR. Two-stage, best-effort text extraction from a PDF:
 //
 //   1. Digital text via pdf-parse `getText` — covers most modern media
@@ -40,7 +41,7 @@ async function extractDigitalText(buffer: Buffer): Promise<string> {
     const res = await parser.getText();
     return (res.text ?? "").trim();
   } catch (err) {
-    console.error("ratecard.ocr.digital_failed", err);
+    log.error("ratecard.ocr.digital_failed", { err: err });
     return "";
   } finally {
     await parser.destroy?.().catch(() => {});
@@ -60,7 +61,7 @@ async function extractImageOcr(buffer: Buffer): Promise<{ text: string; pages: n
       .filter((p) => p.data && p.data.length > 0)
       .map((p) => Buffer.from(p.data));
   } catch (err) {
-    console.error("ratecard.ocr.rasterise_failed", err);
+    log.error("ratecard.ocr.rasterise_failed", { err: err });
     return { text: "", pages: 0 };
   } finally {
     await parser.destroy?.().catch(() => {});
@@ -81,12 +82,12 @@ async function extractImageOcr(buffer: Buffer): Promise<{ text: string; pages: n
         const t = (data.text ?? "").trim();
         if (t) parts.push(t);
       } catch (err) {
-        console.error("ratecard.ocr.page_failed", err);
+        log.error("ratecard.ocr.page_failed", { err: err });
       }
     }
     return { text: parts.join("\n\f\n"), pages: pageImages.length };
   } catch (err) {
-    console.error("ratecard.ocr.engine_failed", err);
+    log.error("ratecard.ocr.engine_failed", { err: err });
     return { text: "", pages: 0 };
   } finally {
     await worker?.terminate().catch(() => {});

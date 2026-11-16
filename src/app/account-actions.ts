@@ -1,5 +1,7 @@
 "use server";
 
+import { isMfaRequiredError, reissueSessionFor } from "@/lib/mfa/session";
+import { hashPassword } from "@/lib/password";
 import { redirect } from "next/navigation";
 import bcrypt from "bcryptjs";
 import { MarketCode } from "@prisma/client";
@@ -7,12 +9,14 @@ import { AuthError } from "next-auth";
 import { auth, signIn, signOut } from "@/auth";
 import { prisma } from "@/lib/prisma";
 import { recordAudit } from "@/lib/audit";
-import { wouldRemoveLastAdmin, type MembershipRow } from "@/lib/membership";
+import { deactivateUserUnlessLastAdmin } from "@/lib/org-seats";
+import { anonymiseUser } from "@/lib/retention";
 import { canDeactivateSelf } from "@/lib/user-admin";
 import { companySeat, getWorkspace } from "@/lib/workspace";
 import { normaliseEmail } from "@/lib/email-change";
 import { SUPPORTED_MARKETS } from "@/lib/markets";
 import { asNoticeLocale } from "@/lib/notices/messages";
+import { accountFail, type AccountFormState } from "@/lib/account-form-state";
 
 const MARKET_CODES: readonly string[] = SUPPORTED_MARKETS;
 
@@ -26,7 +30,14 @@ function isValidPhone(raw: string): boolean {
   return raw.length <= 32 && digits >= 6;
 }
 
-export async function updateProfile(formData: FormData) {
+// updateProfile, setPassword and deactivateOwnAccount are useActionState
+// actions: a validation failure RETURNS the error code and what was typed
+// (never a password), so the form shows it next to the field and keeps the
+// input. Success and "not signed in" still redirect.
+export async function updateProfile(
+  _prev: AccountFormState,
+  formData: FormData,
+): Promise<AccountFormState> {
   const locale = String(formData.get("locale") || "en");
   const session = await auth();
   if (!session?.user?.id) redirect(`/${locale}/signin`);
@@ -36,7 +47,7 @@ export async function updateProfile(formData: FormData) {
   const phone = normalisePhone(phoneRaw);
 
   if (!isValidPhone(phone)) {
-    redirect(`/${locale}/account?error=phone#profile`);
+    return accountFail("phone", { name, phone: phoneRaw });
   }
 
   await prisma.user.update({
@@ -122,7 +133,10 @@ export async function updateCompany(formData: FormData) {
 // link and has no password yet, currentPassword is not required. If a
 // password already exists, we verify the current one before accepting
 // the new one — same UX as resetPassword but in the signed-in flow.
-export async function setPassword(formData: FormData) {
+export async function setPassword(
+  _prev: AccountFormState,
+  formData: FormData,
+): Promise<AccountFormState> {
   const locale = String(formData.get("locale") || "en");
   const session = await auth();
   if (!session?.user?.id) redirect(`/${locale}/signin`);
@@ -130,7 +144,7 @@ export async function setPassword(formData: FormData) {
   const current = String(formData.get("currentPassword") || "");
   const next = String(formData.get("newPassword") || "");
   if (next.length < 8) {
-    redirect(`/${locale}/account?error=password_length#password`);
+    return accountFail("password_length");
   }
 
   const user = await prisma.user.findUnique({
@@ -143,7 +157,7 @@ export async function setPassword(formData: FormData) {
     // Existing-password users must prove they know it.
     const ok = await bcrypt.compare(current, user.passwordHash);
     if (!ok) {
-      redirect(`/${locale}/account?error=current_password#password`);
+      return accountFail("current_password");
     }
   }
 
@@ -151,7 +165,7 @@ export async function setPassword(formData: FormData) {
   // including a stolen one, which is usually why people change a password.
   // It ends this browser's session too, so re-mint it straight away with the
   // password the user just chose (see @/lib/session-version).
-  const hash = await bcrypt.hash(next, 10);
+  const hash = await hashPassword(next);
   await prisma.user.update({
     where: { id: user.id },
     data: { passwordHash: hash, sessionVersion: { increment: 1 } },
@@ -162,6 +176,12 @@ export async function setPassword(formData: FormData) {
   try {
     await signIn("credentials", { email: user.email, password: next, redirect: false });
   } catch (error) {
+    // Two-factor account: the credentials provider won't mint a session on a
+    // password alone. This user is already fully signed in (and just proved
+    // the old password), so re-mint through the ticket provider instead.
+    if (isMfaRequiredError(error) && (await reissueSessionFor(user.id))) {
+      redirect(`/${locale}/account?ok=password#password`);
+    }
     // The change itself is saved; only the re-mint failed (e.g. the sign-in
     // limiter). Signing in again with the new password is the honest way on.
     if (error instanceof AuthError) redirect(`/${locale}/signin`);
@@ -184,7 +204,10 @@ export async function setPassword(formData: FormData) {
 //     back in, including them)
 //   - the last admin of an org can't either, or that org's team, billing and
 //     seats become unmanageable for everyone in it
-export async function deactivateOwnAccount(formData: FormData) {
+export async function deactivateOwnAccount(
+  _prev: AccountFormState,
+  formData: FormData,
+): Promise<AccountFormState> {
   const locale = String(formData.get("locale") || "en");
   const session = await auth();
   if (!session?.user?.id) redirect(`/${locale}/signin`);
@@ -198,16 +221,22 @@ export async function deactivateOwnAccount(formData: FormData) {
   if (user.deactivatedAt) {
     // Already off-boarded in another tab: nothing to do but end the session.
     await signOut({ redirectTo: `/${locale}` });
-    return;
+    return accountFail("1");
   }
 
   // Typed confirmation. The one destructive control on this page that isn't
   // undoable by the user themselves, so it asks for the address rather than
   // trusting a single click — the pattern the desk's order-cancel form uses
   // for the same reason.
-  const typed = normaliseEmail(String(formData.get("confirmEmail") || ""));
+  const typedRaw = String(formData.get("confirmEmail") || "");
+  const typed = normaliseEmail(typedRaw);
+  // What to put back in the form when a guard below refuses.
+  const kept = {
+    confirmEmail: typedRaw,
+    eraseData: formData.get("eraseData") === "on" ? "on" : "",
+  };
   if (typed !== normaliseEmail(user.email)) {
-    redirect(`/${locale}/account?error=confirm#danger`);
+    return accountFail("confirm", kept);
   }
 
   const allUsers = await prisma.user.findMany({
@@ -215,52 +244,25 @@ export async function deactivateOwnAccount(formData: FormData) {
     select: { id: true, role: true, deactivatedAt: true },
   });
   if (!canDeactivateSelf(user, allUsers).ok) {
-    redirect(`/${locale}/account?error=last_superadmin#danger`);
+    return accountFail("last_superadmin", kept);
   }
 
-  // Org side: check every org where this user holds an active ADMIN seat.
-  const myMemberships = await prisma.membership.findMany({
-    where: { userId },
-    select: {
-      userId: true,
-      organizationId: true,
-      role: true,
-      canCommit: true,
-      expiresAt: true,
-      status: true,
-    },
-  });
-  const now = new Date();
-  const adminOrgIds = myMemberships
-    .filter((m) => m.role === "ADMIN")
-    .map((m) => m.organizationId);
-  if (adminOrgIds.length > 0) {
-    const peers = (await prisma.membership.findMany({
-      where: { organizationId: { in: adminOrgIds } },
-      select: {
-        userId: true,
-        organizationId: true,
-        role: true,
-        canCommit: true,
-        expiresAt: true,
-        status: true,
-      },
-    })) as MembershipRow[];
-    for (const orgId of adminOrgIds) {
-      const rows = peers.filter((m) => m.organizationId === orgId);
-      if (wouldRemoveLastAdmin(rows, userId, now)) {
-        redirect(`/${locale}/account?error=last_admin#danger`);
-      }
-    }
+  // Last-admin check and the write happen in one locked transaction, so two
+  // admins leaving at the same moment can't both pass the check.
+  const outcome = await deactivateUserUnlessLastAdmin(userId);
+  if (!outcome.ok) return accountFail("last_admin", kept);
+  // "Also erase my personal data": the account is anonymised, not just
+  // switched off (lib/retention.ts). Orders and invoices stay.
+  const erase = formData.get("eraseData") === "on";
+  if (erase) {
+    await anonymiseUser(userId);
+    await recordAudit(userId, "user.erased_self", `User:${userId}`);
+  } else {
+    await recordAudit(userId, "user.deactivated_self", `User:${userId}`, {
+      email: user.email,
+    });
   }
-
-  await prisma.user.update({
-    where: { id: userId },
-    data: { deactivatedAt: now },
-  });
-  await recordAudit(userId, "user.deactivated_self", `User:${userId}`, {
-    email: user.email,
-  });
 
   await signOut({ redirectTo: `/${locale}` });
+  return accountFail("1"); // unreachable: signOut redirects
 }

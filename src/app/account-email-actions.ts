@@ -1,4 +1,5 @@
 "use server";
+import { log } from "@/lib/log";
 
 import { redirect } from "next/navigation";
 import bcrypt from "bcryptjs";
@@ -16,6 +17,7 @@ import {
 } from "@/lib/mail/templates/email-change";
 import { appUrl, appName } from "@/lib/url";
 import { clientIp } from "@/lib/client-ip";
+import { accountFail, type AccountFormState } from "@/lib/account-form-state";
 
 // Request a change of sign-in email. Nothing is written to User here — the
 // address moves only when the link in the NEW mailbox is clicked (see
@@ -27,11 +29,19 @@ import { clientIp } from "@/lib/client-ip";
 // this action talks straight to the user: they're authenticated, so telling
 // them "that address is already in use" leaks nothing they couldn't learn by
 // trying to sign up with it.
-export async function requestEmailChange(formData: FormData) {
+//
+// A useActionState action: a refusal RETURNS its code and the address typed
+// (never the password), so the form shows it at the field and keeps the input.
+export async function requestEmailChange(
+  _prev: AccountFormState,
+  formData: FormData,
+): Promise<AccountFormState> {
   const locale = String(formData.get("locale") || "en");
   const session = await auth();
   if (!session?.user?.id) redirect(`/${locale}/signin`);
   const userId = session.user.id;
+  const typedEmail = String(formData.get("newEmail") || "");
+  const kept = { newEmail: typedEmail };
 
   const ip = await clientIp();
   const [ipCheck, userCheck] = await Promise.all([
@@ -39,7 +49,7 @@ export async function requestEmailChange(formData: FormData) {
     authLimiter.check(`email-change:user:${userId}`),
   ]);
   if (!ipCheck.ok || !userCheck.ok) {
-    redirect(`/${locale}/account?error=rate#email`);
+    return accountFail("rate", kept);
   }
 
   const user = await prisma.user.findUnique({
@@ -48,12 +58,9 @@ export async function requestEmailChange(formData: FormData) {
   });
   if (!user) redirect(`/${locale}/signin`);
 
-  const verdict = validateEmailChange(
-    user.email,
-    String(formData.get("newEmail") || ""),
-  );
+  const verdict = validateEmailChange(user.email, typedEmail);
   if (!verdict.ok) {
-    redirect(`/${locale}/account?error=${verdict.reason}#email`);
+    return accountFail(verdict.reason, kept);
   }
   const newEmail = verdict.email;
 
@@ -67,7 +74,7 @@ export async function requestEmailChange(formData: FormData) {
       user.passwordHash,
     );
     if (!ok) {
-      redirect(`/${locale}/account?error=email_password#email`);
+      return accountFail("email_password", kept);
     }
   }
 
@@ -76,7 +83,7 @@ export async function requestEmailChange(formData: FormData) {
     select: { id: true },
   });
   if (taken) {
-    redirect(`/${locale}/account?error=email_taken#email`);
+    return accountFail("email_taken", kept);
   }
 
   // Same company-email gate as signup, applied to the same population: org-side
@@ -89,7 +96,7 @@ export async function requestEmailChange(formData: FormData) {
       await recordAudit(userId, "user.email_change_rejected", `User:${userId}`, {
         reason: policy.reason,
       });
-      redirect(`/${locale}/account?error=${emailPolicyErrorCode(policy.reason)}#email`);
+      return accountFail(emailPolicyErrorCode(policy.reason), kept);
     }
   }
 
@@ -139,10 +146,10 @@ export async function requestEmailChange(formData: FormData) {
     });
   } catch (err) {
     confirmSent = false;
-    console.error("user.email_change_confirm_failed", { userId, err });
+    log.error("user.email_change_confirm_failed", { userId, err });
   }
   if (!confirmSent) {
-    redirect(`/${locale}/account?error=email_send_failed#email`);
+    return accountFail("email_send_failed", kept);
   }
   try {
     await emailAdapter({
@@ -152,7 +159,7 @@ export async function requestEmailChange(formData: FormData) {
       html: notice.html,
     });
   } catch (err) {
-    console.error("user.email_change_notice_failed", { userId, err });
+    log.error("user.email_change_notice_failed", { userId, err });
   }
 
   await recordAudit(userId, "user.email_change_requested", `User:${userId}`, {

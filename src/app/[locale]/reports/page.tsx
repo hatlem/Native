@@ -1,12 +1,16 @@
 import { getTranslations } from "next-intl/server";
+import { buyerScope } from "@/lib/data/buyer/guard";
 import { redirect } from "next/navigation";
 import { auth } from "@/auth";
-import { prisma } from "@/lib/prisma";
-import { getWorkspace, viewOrgIds } from "@/lib/workspace";
+import { getWorkspace } from "@/lib/workspace";
 import { Link } from "@/i18n/navigation";
 import { formatMoney } from "@/lib/money";
 import { tally, averageOrderValue } from "@/lib/reporting";
 import { EmptyState } from "@/app/empty-state";
+import {
+  loadOrders,
+  loadProducts,
+} from "@/lib/data/buyer/reports";
 
 export const dynamic = "force-dynamic";
 
@@ -26,14 +30,8 @@ export default async function MyReportsPage({
   const ws = await getWorkspace(session?.user?.id);
   if (!ws) redirect(`/${locale}/signin`);
 
-  const orders = await prisma.order.findMany({
-    where: { organizationId: { in: viewOrgIds(ws) } },
-    select: {
-      status: true,
-      quote: { select: { currency: true, total: true } },
-      lines: { select: { productId: true } },
-    },
-  });
+  const scope = buyerScope(session?.user, ws);
+  const orders = await loadOrders(scope);
 
   const byCurrency = [...new Set(orders.map((o) => o.quote.currency))].map(
     (cur) => {
@@ -56,10 +54,7 @@ export default async function MyReportsPage({
     .flatMap((o) => o.lines.map((l) => l.productId))
     .filter((id): id is string => !!id);
   const products = productIds.length
-    ? await prisma.product.findMany({
-        where: { id: { in: productIds } },
-        select: { id: true, title: { select: { category: true } } },
-      })
+    ? await loadProducts(scope, { productIds })
     : [];
   const catById = new Map(products.map((p) => [p.id, p.title.category]));
   const categoryRows = tally(

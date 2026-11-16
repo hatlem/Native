@@ -1,5 +1,5 @@
 import { getTranslations } from "next-intl/server";
-import { prisma } from "@/lib/prisma";
+import type { SuperadminContext } from "@/lib/desk-guard";
 import { listForTitle } from "@/lib/pricing/contact-log";
 import { listContactsForTitle } from "@/lib/pricing/contacts";
 import {
@@ -8,31 +8,32 @@ import {
   editContactLogAction,
   recordOfferFromContactAction,
 } from "@/app/price-actions";
-import { SubmitButton } from "@/components";
+import { SubmitButton, ConfirmSubmit } from "@/components";
+import { intlLocale } from "@/lib/money";
 import { SafeEmail, withSafeEmails } from "@/components/safe-email";
+import {
+  loadContactHistoryProducts,
+  loadContactHistoryTitleRow,
+} from "@/lib/data/desk/titles";
 
 const CHANNELS = ["EMAIL", "PHONE", "WEB_FORM", "LINKEDIN", "OTHER"] as const;
 
 export async function ContactHistoryPanel({
+  ctx,
   locale,
   titleId,
 }: {
+  ctx: SuperadminContext;
   locale: string;
   titleId: string;
 }) {
   const t = await getTranslations({ locale, namespace: "contactLog" });
+  const tc = await getTranslations({ locale, namespace: "common" });
   const [entries, contacts, products, titleRow] = await Promise.all([
     listForTitle(titleId),
     listContactsForTitle(titleId),
-    prisma.product.findMany({
-      where: { titleId, active: true },
-      select: { id: true, name: true, currency: true },
-      orderBy: { name: "asc" },
-    }),
-    prisma.title.findUnique({
-      where: { id: titleId },
-      select: { market: { select: { currency: true } } },
-    }),
+    loadContactHistoryProducts(ctx, { titleId }),
+    loadContactHistoryTitleRow(ctx, { titleId }),
   ]);
 
   const fallbackCurrency = products[0]?.currency ?? titleRow?.market?.currency ?? "";
@@ -61,7 +62,7 @@ export async function ContactHistoryPanel({
                   </strong>{" "}
                   <span className="muted small">
                     {t(e.direction === "OUTBOUND" ? "outbound" : "inbound")} ·{" "}
-                    {e.contactedAt.toISOString().slice(0, 10)}
+                    {new Intl.DateTimeFormat(intlLocale(locale), { dateStyle: "medium" }).format(e.contactedAt)}
                     {e.salesContact ? ` · ${e.salesContact.name}` : ""}
                   </span>
                   {e.note && <div className="small" style={{ marginTop: 4 }}>{withSafeEmails(e.note)}</div>}
@@ -70,7 +71,12 @@ export async function ContactHistoryPanel({
                   <input type="hidden" name="locale" value={locale} />
                   <input type="hidden" name="titleId" value={titleId} />
                   <input type="hidden" name="id" value={e.id} />
-                  <SubmitButton label={t("delete")} pendingLabel={t("deleting")} className="btn small" />
+                  <ConfirmSubmit
+                    label={t("delete")}
+                    confirmLabel={tc("confirm.yes")}
+                    cancelLabel={tc("confirm.cancel")}
+                    pendingLabel={t("deleting")}
+                  />
                 </form>
               </div>
 

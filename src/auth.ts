@@ -1,4 +1,8 @@
+import { requestIp } from "@/lib/client-ip";
+import { log } from "@/lib/log";
+import { cache } from "react";
 import NextAuth, { CredentialsSignin } from "next-auth";
+import type { Session } from "next-auth";
 import Credentials from "next-auth/providers/credentials";
 import type { JWT } from "next-auth/jwt";
 import { headers } from "next/headers";
@@ -12,7 +16,9 @@ import {
   reconcileSessionToken,
   type SessionUserState,
 } from "@/lib/session-version";
-import { SIGNIN_RATE_LIMITED } from "@/lib/auth-errors";
+import { SIGNIN_RATE_LIMITED, SIGNIN_MFA_REQUIRED } from "@/lib/auth-errors";
+import { hashToken } from "@/lib/tokens";
+import { readSessionTicket } from "@/lib/mfa/tickets";
 
 assertSecret();
 
@@ -22,6 +28,16 @@ assertSecret();
 // authorize() untouched, and `code` survives to the caller.
 class SignInRateLimited extends CredentialsSignin {
   code = SIGNIN_RATE_LIMITED;
+}
+
+// Thrown by the credentials provider when the password is right but the
+// account has two-factor enabled. No session is issued: the `authenticate()`
+// server action turns this into the /signin/mfa step, and a direct POST to
+// /api/auth/callback/credentials just gets the error. A session for a
+// two-factor account is only ever minted by the "session-ticket" provider
+// below, after the second factor has been verified.
+class MfaRequired extends CredentialsSignin {
+  code = SIGNIN_MFA_REQUIRED;
 }
 
 // Current revocation state for a session's user: one primary-key read per
@@ -51,7 +67,7 @@ async function reconcileWithDb(token: JWT): Promise<JWT | null> {
         }
       : null;
   } catch (err) {
-    console.error("auth.session_reconcile_failed", { uid: token.uid, err });
+    log.error("auth.session_reconcile_failed", { uid: token.uid, err });
     return token;
   }
   return reconcileSessionToken(token, state);
@@ -60,18 +76,13 @@ async function reconcileWithDb(token: JWT): Promise<JWT | null> {
 async function authClientIp(): Promise<string> {
   // headers() throws outside a request scope (e.g. in tests). Best-effort.
   try {
-    const h = await headers();
-    return (
-      h.get("x-forwarded-for")?.split(",")[0]?.trim() ||
-      h.get("x-real-ip") ||
-      "unknown"
-    );
+    return requestIp(await headers());
   } catch {
     return "unknown";
   }
 }
 
-export const { handlers, auth, signIn, signOut } = NextAuth({
+const nextAuth = NextAuth({
   // `trustHost: true` makes Auth.js accept the Host / X-Forwarded-Host
   // headers as authoritative when building callback URLs. This is safe
   // only when a trusted reverse proxy (Vercel/Railway/Cloudflare in front
@@ -79,7 +90,10 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
   // strip attacker-supplied values. If you ever expose the Node process
   // directly to the public internet, set this to false and pin AUTH_URL.
   trustHost: true,
-  session: { strategy: "jwt" },
+  // 7 days, not the 30-day Auth.js default: a stolen cookie is useful for
+  // less time, and the token is re-issued on activity (updateAge) so people
+  // who use the product stay signed in.
+  session: { strategy: "jwt", maxAge: 7 * 24 * 60 * 60, updateAge: 24 * 60 * 60 },
   providers: [
     Credentials({
       credentials: {
@@ -130,6 +144,9 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         // genuinely-unverified accounts.
         if (!user.emailVerifiedAt) return null;
 
+        // Second-factor gate — see MfaRequired above.
+        if (user.mfaEnabledAt) throw new MfaRequired();
+
         return {
           id: user.id,
           email: user.email,
@@ -156,6 +173,17 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         const consume = await authLimiter.check(`magic-consume:ip:${ip}`);
         if (!consume.ok) return null;
 
+        // Second-factor gate: a mailbox alone must not sign in an account
+        // with two-factor on. The magic-link route consumes such a link
+        // itself and continues at /signin/mfa; this provider refuses it
+        // (without burning the token) so the callback endpoint can't be
+        // used to skip that step.
+        const owner = await prisma.magicLinkToken.findUnique({
+          where: { tokenHash: hashToken(raw) },
+          select: { user: { select: { mfaEnabledAt: true } } },
+        });
+        if (owner?.user.mfaEnabledAt) return null;
+
         // Atomic single-use consume + emailVerifiedAt stamp — see
         // @/lib/auth-tokens for the double-click race guarantee.
         const user = await consumeMagicLinkToken(raw);
@@ -168,6 +196,38 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
           role: user.role,
           orgId: user.orgId,
           orgType: user.orgType,
+          sessionVersion: user.sessionVersion,
+        };
+      },
+    }),
+    // Mints a session from a server-signed ticket (src/lib/mfa/tickets.ts).
+    // Tickets are created only by server actions that have just verified the
+    // caller — the second factor at sign-in, or an already-signed-in user
+    // whose session version was bumped by turning two-factor on/off — live
+    // 30 seconds and never reach the browser, so this endpoint is useless to
+    // anyone posting to it directly.
+    Credentials({
+      id: "session-ticket",
+      credentials: {
+        ticket: { label: "Ticket", type: "text" },
+      },
+      authorize: async (credentials) => {
+        const ticket = readSessionTicket(String(credentials?.ticket ?? ""));
+        if (!ticket) return null;
+        const user = await prisma.user.findUnique({
+          where: { id: ticket.uid },
+          include: { organization: { select: { id: true, type: true } } },
+        });
+        if (!user || user.deactivatedAt) return null;
+        // Minted for an older session version = revoked since: void.
+        if (user.sessionVersion !== ticket.sv) return null;
+        return {
+          id: user.id,
+          email: user.email,
+          name: user.name ?? undefined,
+          role: user.role,
+          orgId: user.organization?.id ?? null,
+          orgType: user.organization?.type ?? null,
           sessionVersion: user.sessionVersion,
         };
       },
@@ -198,3 +258,18 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
     },
   },
 });
+
+export const { handlers, signIn, signOut } = nextAuth;
+
+// One session read per render. A page, its layout and the helpers they call
+// (loadScope, the guards, …) each ask for the session; unmemoised, every call
+// decrypted the cookie and re-read the user row. React's cache() scopes the
+// result to the current server render, so they share one lookup. Outside a
+// render (server actions, route handlers) cache() is a pass-through and every
+// call reads afresh, as before.
+const sessionForRender = cache((): Promise<Session | null> => nextAuth.auth() as Promise<Session | null>);
+
+export const auth = ((...args: unknown[]) =>
+  args.length === 0
+    ? sessionForRender()
+    : (nextAuth.auth as (...a: unknown[]) => unknown)(...args)) as typeof nextAuth.auth;

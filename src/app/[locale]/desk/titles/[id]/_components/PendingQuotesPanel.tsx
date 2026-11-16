@@ -1,5 +1,5 @@
 import { getTranslations } from "next-intl/server";
-import { prisma } from "@/lib/prisma";
+import type { SuperadminContext } from "@/lib/desk-guard";
 import {
   applyQuoteAction,
   rejectQuoteAction,
@@ -7,33 +7,22 @@ import {
 } from "@/app/price-actions";
 import { SubmitButton } from "@/components";
 import { withSafeEmails } from "@/components/safe-email";
+import {
+  loadPendingQuotesQuotes,
+} from "@/lib/data/desk/titles";
 
 export async function PendingQuotesPanel({
+  ctx,
   locale,
   titleId,
 }: {
+  ctx: SuperadminContext;
   locale: string;
   titleId: string;
 }) {
   const t = await getTranslations({ locale, namespace: "pendingQuotes" });
 
-  const quotes = await prisma.priceQuote.findMany({
-    where: {
-      appliedAt: null,
-      rejectedAt: null,
-      OR: [
-        { product: { titleId } },
-        { priceRequest: { titleId } },
-        { contactLog: { titleId } },
-      ],
-    },
-    include: {
-      product: true,
-      priceRequest: { include: { salesContact: true } },
-      contactLog: { include: { salesContact: true } },
-    },
-    orderBy: { recordedAt: "desc" },
-  });
+  const quotes = await loadPendingQuotesQuotes(ctx, { titleId });
 
   if (quotes.length === 0) {
     return (

@@ -5,7 +5,10 @@ import { Link, usePathname } from "@/i18n/navigation";
 import { BrandWordmark } from "@/app/brand";
 import { SafeEmail } from "@/components/safe-email";
 import { FeedbackWidget } from "@/components/feedback-widget";
+import { useTranslations } from "next-intl";
 import type { NavItem } from "@/lib/nav";
+import type { DeskSearchHit } from "@/lib/desk-search";
+import { useFocusTrap } from "@/lib/use-focus-trap";
 
 type PaletteSection = { section: string; items: NavItem[] };
 
@@ -33,6 +36,9 @@ type Props = {
   // (the campaign-flow buyer nav). Desk/publisher/writer keep their full
   // nav, so they don't need it.
   showPaletteHint?: boolean;
+  // Desk / superadmin only: the palette also searches orders, requests and
+  // titles through /api/desk/search (role-checked server-side).
+  entitySearch?: boolean;
   labels: {
     skip: string;
     menu: string;
@@ -67,6 +73,7 @@ export function NavShell({
   authActions,
   labels,
   showPaletteHint = false,
+  entitySearch = false,
 }: Props) {
   const pathname = usePathname();
   const [drawerOpen, setDrawerOpen] = useState(false);
@@ -74,7 +81,13 @@ export function NavShell({
   const [paletteQuery, setPaletteQuery] = useState("");
   const [paletteIndex, setPaletteIndex] = useState(0);
   const [userMenuOpen, setUserMenuOpen] = useState(false);
+  const ta11y = useTranslations("common.a11y");
+  const tNav = useTranslations("nav");
+  const [entityHits, setEntityHits] = useState<DeskSearchHit[]>([]);
+  const [entityLoading, setEntityLoading] = useState(false);
   const paletteInputRef = useRef<HTMLInputElement>(null);
+  const palettePanelRef = useRef<HTMLDivElement>(null);
+  useFocusTrap(palettePanelRef, paletteOpen);
   const userMenuRef = useRef<HTMLDetailsElement>(null);
 
   const closeDrawer = useCallback(() => setDrawerOpen(false), []);
@@ -140,16 +153,56 @@ export function NavShell({
     }
   }, [drawerOpen, paletteOpen]);
 
+  // Entity search (desk): debounced, and a stale response never overwrites
+  // the hits for a newer query.
+  useEffect(() => {
+    const q = paletteQuery.trim();
+    if (!entitySearch || !paletteOpen || q.length < 2) {
+      setEntityHits([]);
+      setEntityLoading(false);
+      return;
+    }
+    const controller = new AbortController();
+    setEntityLoading(true);
+    const timer = setTimeout(async () => {
+      try {
+        const res = await fetch(`/api/desk/search?q=${encodeURIComponent(q)}`, {
+          signal: controller.signal,
+        });
+        const data = res.ok ? ((await res.json()) as { hits?: DeskSearchHit[] }) : {};
+        setEntityHits(data.hits ?? []);
+      } catch {
+        // Aborted (newer keystroke) or offline: keep what is shown.
+      } finally {
+        if (!controller.signal.aborted) setEntityLoading(false);
+      }
+    }, 200);
+    return () => {
+      clearTimeout(timer);
+      controller.abort();
+    };
+  }, [entitySearch, paletteOpen, paletteQuery]);
+
   const filteredPalette = useMemo(() => {
     const q = paletteQuery.trim().toLowerCase();
     if (!q) return palette;
-    return palette
+    const navSections = palette
       .map((section) => ({
         section: section.section,
         items: section.items.filter((it) => it.label.toLowerCase().includes(q)),
       }))
       .filter((section) => section.items.length > 0);
-  }, [palette, paletteQuery]);
+    const sectionLabel = { order: tNav("paletteOrders"), request: tNav("paletteRequests"), title: tNav("paletteTitles") };
+    const entitySections = (["order", "request", "title"] as const)
+      .map((kind) => ({
+        section: sectionLabel[kind],
+        items: entityHits
+          .filter((h) => h.kind === kind)
+          .map((h) => ({ key: `${h.kind}-${h.id}`, label: h.label, href: h.href, desc: h.sub })),
+      }))
+      .filter((section) => section.items.length > 0);
+    return [...entitySections, ...navSections];
+  }, [palette, paletteQuery, entityHits, tNav]);
 
   const flatItems = useMemo(
     () => filteredPalette.flatMap((s) => s.items),
@@ -168,7 +221,7 @@ export function NavShell({
             <BrandWordmark className="brand-wordmark" aria-label={brand} />
           </Link>
 
-          <nav className="nav-primary" aria-label="Primary">
+          <nav className="nav-primary" aria-label={ta11y("primaryNav")}>
             {nav.map((item) => (
               <Link
                 key={item.key}
@@ -253,7 +306,7 @@ export function NavShell({
         aria-hidden={!drawerOpen}
       >
         <div className="scrim" onClick={closeDrawer} />
-        <aside className="sheet" aria-label="Menu">
+        <aside className="sheet" aria-label={ta11y("menu")}>
           <div className="head">
             <Link href="/" className="brand" onClick={closeDrawer}>
               <BrandWordmark className="brand-wordmark" aria-label={brand} />
@@ -267,7 +320,7 @@ export function NavShell({
               <CloseIcon />
             </button>
           </div>
-          <nav aria-label="Mobile">
+          <nav aria-label={ta11y("mobileNav")}>
             {nav.map((item) => (
               <Link
                 key={item.key}
@@ -314,6 +367,7 @@ export function NavShell({
       {paletteOpen ? (
         <div className="cmdk-overlay" onClick={closePalette}>
           <div
+            ref={palettePanelRef}
             className="cmdk-panel"
             role="dialog"
             aria-modal="true"
@@ -323,6 +377,14 @@ export function NavShell({
             <input
               ref={paletteInputRef}
               className="cmdk-input"
+              role="combobox"
+              aria-expanded="true"
+              aria-controls="cmdk-listbox"
+              aria-autocomplete="list"
+              aria-label={labels.search}
+              aria-activedescendant={
+                flatItems[paletteIndex] ? `cmdk-opt-${flatItems[paletteIndex].key}` : undefined
+              }
               placeholder={labels.searchPlaceholder}
               value={paletteQuery}
               onChange={(e) => {
@@ -346,13 +408,15 @@ export function NavShell({
                 }
               }}
             />
-            <div className="cmdk-results">
+            <div className="cmdk-results" id="cmdk-listbox" role="listbox" aria-label={labels.search}>
               {filteredPalette.length === 0 ? (
-                <div className="cmdk-empty">{labels.noResults}</div>
+                <div className="cmdk-empty" role="status">
+                  {entityLoading ? tNav("paletteSearching") : labels.noResults}
+                </div>
               ) : (
                 filteredPalette.map((section) => (
-                  <div key={section.section}>
-                    <div className="cmdk-section">{section.section}</div>
+                  <div key={section.section} role="group" aria-label={section.section}>
+                    <div className="cmdk-section" aria-hidden="true">{section.section}</div>
                     {section.items.map((item) => {
                       const flatIdx = flatItems.indexOf(item);
                       const selected = flatIdx === paletteIndex;
@@ -360,13 +424,16 @@ export function NavShell({
                         <Link
                           key={item.key}
                           href={item.href}
+                          id={`cmdk-opt-${item.key}`}
+                          role="option"
+                          tabIndex={-1}
                           className="cmdk-item"
                           aria-selected={selected}
                           onMouseEnter={() => setPaletteIndex(flatIdx)}
                           onClick={closePalette}
                         >
                           <span>{item.label}</span>
-                          <span className="desc">{item.href}</span>
+                          <span className="desc">{"desc" in item && item.desc ? item.desc : item.href}</span>
                         </Link>
                       );
                     })}

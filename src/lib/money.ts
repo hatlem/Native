@@ -4,6 +4,7 @@
 // produced by the desk via a Quote.
 
 import { contentFeeDescription } from "@/lib/commerce/placements";
+import { vatAmounts } from "@/lib/vat";
 
 // next-intl URL slug → BCP 47 language tag. The URL-locale slugs `at`,
 // `ch`, `uk`, `ie` are country codes that Intl.NumberFormat /
@@ -47,6 +48,23 @@ export function formatMoney(
     style: "currency",
     currency,
     maximumFractionDigits: 0,
+  }).format(amount);
+}
+
+// For a document's VAT and total lines, which are exact to the minor unit
+// (lib/vat.ts): whole amounts print as before, fractional ones with their
+// two decimals — "1 251,25 kr", never a silently rounded "1 251 kr".
+export function formatMoneyExact(
+  amount: number,
+  currency: string,
+  locale: string,
+): string {
+  const digits = Number.isInteger(Math.round(amount * 100) / 100) ? 0 : 2;
+  return new Intl.NumberFormat(LOCALE_TO_INTL[locale] ?? "en-GB", {
+    style: "currency",
+    currency,
+    minimumFractionDigits: digits,
+    maximumFractionDigits: digits,
   }).format(amount);
 }
 
@@ -260,12 +278,14 @@ export function resolveDefaultMarginPct(
 export function quoteTotals(
   lines: { lineTotal: number; priceOnRequest?: boolean }[],
   vatPct: number,
-): { subtotal: number; total: number } {
-  const subtotal = lines.reduce(
+): { subtotal: number; vat: number; total: number } {
+  const net = lines.reduce(
     (s, l) => (l.priceOnRequest ? s : s + l.lineTotal),
     0,
   );
-  return { subtotal, total: Math.round(withVat(subtotal, vatPct)) };
+  // To the minor unit, VAT rounded once on the subtotal and the total built
+  // from it, so the stated rate always reconciles (lib/vat.ts).
+  return vatAmounts(net, vatPct);
 }
 
 // Inverse of firmLineTotal for a desk override: given the rate-card cost

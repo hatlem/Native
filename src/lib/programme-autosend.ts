@@ -1,3 +1,4 @@
+import { log } from "@/lib/log";
 // Auto-send sweep for campaign programmes that opted in (autoSendEnabled).
 // Finds due waves — same due rules the buyer-facing nudge uses — and submits
 // each one to the desk as a normal RFQ via submitListAsRfq. Nothing here
@@ -38,7 +39,7 @@ async function sendDueWave(wave: DueWave): Promise<"sent" | "skipped"> {
   // system submit can't detour the buyer through /onboarding, so an
   // un-onboarded org is skipped — the human nudge on Home still shows.
   if (!list.organization.marketCode) {
-    console.warn("programme.autosend_skipped", { reason: "onboarding", listId: wave.listId });
+    log.warn("programme.autosend_skipped", { reason: "onboarding", listId: wave.listId });
     return "skipped";
   }
 
@@ -104,14 +105,14 @@ export async function runAutoSendSweep(now: Date = new Date()): Promise<AutoSend
   const result: AutoSendSweepResult = { sent: 0, skipped: 0, failed: 0 };
   for (const wave of due) {
     if (result.sent >= MAX_SENDS_PER_SWEEP) {
-      console.warn("programme.autosend_capped", { deferred: due.length - result.sent - result.skipped - result.failed });
+      log.warn("programme.autosend_capped", { deferred: due.length - result.sent - result.skipped - result.failed });
       break;
     }
     try {
       result[await sendDueWave(wave)]++;
     } catch (err) {
       result.failed++;
-      console.error("programme.autosend_failed", { listId: wave.listId, programmeId: wave.programmeId, err });
+      log.error("programme.autosend_failed", { listId: wave.listId, programmeId: wave.programmeId, err });
     }
   }
   return result;

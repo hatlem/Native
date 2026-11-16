@@ -1,7 +1,7 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
-import { auth } from "@/auth";
+import { requireDeskContextOrThrow } from "@/lib/desk-guard";
 import { prisma } from "@/lib/prisma";
 import { recordAudit } from "@/lib/audit";
 import {
@@ -16,12 +16,7 @@ import {
 // redirecting — the caller surfaces the error.
 
 export async function saveFlightWindow(orderId: string, fd: FormData) {
-  const session = await auth();
-  const role = session?.user?.role;
-  if (!session?.user || (role !== "DESK" && role !== "SUPERADMIN")) {
-    throw new Error("forbidden");
-  }
-  const userId = session.user.id;
+  const { userId } = await requireDeskContextOrThrow();
   const start = String(fd.get("flightStartDate") ?? "").trim();
   const end = String(fd.get("flightEndDate") ?? "").trim();
   await prisma.order.update({
@@ -36,12 +31,7 @@ export async function saveFlightWindow(orderId: string, fd: FormData) {
 }
 
 export async function saveBookingMetricOverride(bookingId: string, fd: FormData) {
-  const session = await auth();
-  const role = session?.user?.role;
-  if (!session?.user || (role !== "DESK" && role !== "SUPERADMIN")) {
-    throw new Error("forbidden");
-  }
-  const userId = session.user.id;
+  const { userId } = await requireDeskContextOrThrow();
   const num = (k: string): number | null => {
     const v = String(fd.get(k) ?? "").trim();
     return v === "" ? null : /^\d+$/.test(v) ? Number(v) : null;
@@ -78,23 +68,15 @@ export async function saveBookingMetricOverride(bookingId: string, fd: FormData)
 // the once-a-day sweep. The campaign section re-renders with each
 // request's status (sent, or "needs contact" when no address is on file).
 export async function sendMetricsRequestNow(orderId: string) {
-  const session = await auth();
-  const role = session?.user?.role;
-  if (!session?.user || (role !== "DESK" && role !== "SUPERADMIN")) {
-    throw new Error("forbidden");
-  }
-  const result = await sendMetricsRequestsNow({ orderId, actorId: session.user.id });
-  await recordAudit(session.user.id, "metrics_request.send_now", `Order:${orderId}`, result);
+  const { userId } = await requireDeskContextOrThrow();
+  const result = await sendMetricsRequestsNow({ orderId, actorId: userId });
+  await recordAudit(userId, "metrics_request.send_now", `Order:${orderId}`, result);
   // The route is locale-prefixed; revalidate the page pattern so every
   // locale's copy of this order page refreshes.
   revalidatePath("/[locale]/desk/orders/[orderId]", "page");
 }
 
 export async function resendMetricsRequest(requestId: string) {
-  const session = await auth();
-  const role = session?.user?.role;
-  if (!session?.user || (role !== "DESK" && role !== "SUPERADMIN")) {
-    throw new Error("forbidden");
-  }
-  await sendMetricsRequestStep({ requestId, actorId: session.user.id });
+  const { userId } = await requireDeskContextOrThrow();
+  await sendMetricsRequestStep({ requestId, actorId: userId });
 }

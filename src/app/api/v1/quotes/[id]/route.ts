@@ -5,10 +5,11 @@
 //   - Auth: Bearer API key, scope `catalog:read` (re-used; we'll
 //     split into `quotes:read` if/when a customer asks for a
 //     per-scope-finer-grain key).
-//   - Org-scoped: if the API key is org-scoped (organizationId set),
-//     only quotes belonging to that org are returned. Platform keys
-//     (organizationId null) see any quote — that's the same
-//     visibility model the catalog read API uses.
+//   - Org-scoped: a key only sees quotes of the organization it is bound
+//     to. A key with no organization binding (a publisher key, or a
+//     platform key holding only `catalog:read`) sees none — quotes are
+//     tenant data, unlike the public catalog. The one exception is the
+//     internal platform `pricing:admin` key (desk tooling / MCP).
 //   - Rate-limited via the same RFQ bucket as catalog read so a
 //     partner sync can't hammer the desk's working set.
 //
@@ -25,12 +26,9 @@ import { prisma } from "@/lib/prisma";
 import { authenticateRequest } from "@/lib/api-auth";
 import { rfqLimiter } from "@/lib/rate-limit";
 import { lineOrder } from "@/lib/commerce/line-order";
+import { errJson, rateLimitedJson } from "@/lib/api/errors";
 
 export const dynamic = "force-dynamic";
-
-function errJson(status: number, code: string, message: string) {
-  return NextResponse.json({ error: { code, message } }, { status });
-}
 
 export async function GET(
   req: NextRequest,
@@ -53,11 +51,7 @@ export async function GET(
 
   const limited = await rfqLimiter.check(`api:quotes:${auth.keyId}`);
   if (!limited.ok) {
-    return errJson(
-      429,
-      "RATE_LIMITED",
-      "Slow down — retry after " + Math.ceil(limited.retryAfterMs / 1000) + "s.",
-    );
+    return rateLimitedJson(limited.retryAfterMs, "Slow down — retry after " + Math.ceil(limited.retryAfterMs / 1000) + "s.");
   }
 
   const { id } = await params;
@@ -87,12 +81,13 @@ export async function GET(
     return errJson(404, "NOT_FOUND", "Quote not found.");
   }
 
-  // Org-scoping: an org-scoped key can only see quotes for its own org.
-  // Platform keys (organizationId null) see any quote.
-  if (
-    auth.organizationId !== null &&
-    quote.request.organizationId !== auth.organizationId
-  ) {
+  // Tenant boundary: the key must be bound to the quote's organization.
+  // Only the internal platform pricing:admin key reads across tenants.
+  const internalPlatformKey =
+    auth.organizationId === null &&
+    auth.publisherId === null &&
+    auth.scopes.has("pricing:admin");
+  if (!internalPlatformKey && quote.request.organizationId !== auth.organizationId) {
     return errJson(404, "NOT_FOUND", "Quote not found.");
   }
 

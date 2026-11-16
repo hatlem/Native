@@ -1,3 +1,4 @@
+import { PendingButton } from "@/components/submit-button";
 import { Link } from "@/i18n/navigation";
 import { StatusBadge } from "@/app/status-badge";
 import { selectActiveList } from "@/app/list-actions";
@@ -59,9 +60,9 @@ export function CampaignRow({
         <button type="submit" className="campaign-row__click" aria-hidden="true" tabIndex={-1} />
         <div className="campaign-row__main">
           <div className="campaign-row__title-row">
-            <button type="submit" className="campaign-row__name campaign-row__name-btn">
+            <PendingButton className="campaign-row__name campaign-row__name-btn">
               {name}
-            </button>
+            </PendingButton>
             <StatusBadge value={statusValue} />
           </div>
           <div className="campaign-row__meta">{meta}</div>
@@ -75,9 +76,9 @@ export function CampaignRow({
         </div>
 
         <div className="campaign-row__action">
-          <button type="submit" className="btn small campaign-row__action-btn">
+          <PendingButton className="btn small campaign-row__action-btn">
             {action.label}
-          </button>
+          </PendingButton>
         </div>
 
         {footerNote ? <div className="campaign-row__footer">{footerNote}</div> : null}

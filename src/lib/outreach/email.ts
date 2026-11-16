@@ -28,9 +28,9 @@ export type BuildArgs = {
   recipientName: string | null;
   titles: TitleRef[];
   link: string;
-  // Only used by the final (bump2) breakaway email — initial + bump1 are
-  // pure business inquiries with no opt-out, since unsubscribing here means
-  // we never get prices and the publisher never gets sold to our advertisers.
+  // Every step carries an opt-out. bump2 words it into the body (the
+  // breakaway ask); initial + bump1 get the one-line footer below. An
+  // unsolicited business email has to say how to stop the next one.
   unsubscribeLink: string;
 };
 
@@ -434,7 +434,25 @@ const BUILDERS: Record<Locale, Record<SequenceStep, (a: BuildArgs) => Built>> = 
   en: { initial: en_initial, bump1: en_bump1, bump2: en_bump2 },
 };
 
+// The one-line opt-out footer, shared with the price-request email
+// (lib/pricing/email.ts) so every outreach message words it the same way.
+const OPT_OUT: Record<Locale, (link: string) => string> = {
+  no: (u) => `Ønsker dere ikke flere henvendelser fra oss? Meld fra her: ${u}`,
+  sv: (u) => `Vill ni inte ha fler förfrågningar från oss? Meddela oss här: ${u}`,
+  da: (u) => `Ønsker I ikke flere henvendelser fra os? Giv besked her: ${u}`,
+  fi: (u) => `Ettekö halua enempää yhteydenottoja meiltä? Ilmoittakaa tästä: ${u}`,
+  de: (u) => `Möchten Sie keine weiteren Anfragen von uns erhalten? Geben Sie uns hier Bescheid: ${u}`,
+  en: (u) => `Don't want further requests from us? Let us know here: ${u}`,
+};
+
+export function optOutLine(locale: string, link: string): string {
+  return (OPT_OUT[locale as Locale] ?? OPT_OUT.en)(link);
+}
+
 export function buildOutreachEmail(a: BuildArgs): Built {
   const locale = (BUILDERS as Record<string, unknown>)[a.locale] ? a.locale : ("en" as Locale);
-  return BUILDERS[locale][a.step](a);
+  const built = BUILDERS[locale][a.step](a);
+  // bump2 already asks "not interested? tell us here" in its body.
+  if (built.text.includes(a.unsubscribeLink)) return built;
+  return { ...built, text: `${built.text}\n\n${optOutLine(locale, a.unsubscribeLink)}` };
 }

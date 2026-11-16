@@ -1,3 +1,4 @@
+import { log } from "@/lib/log";
 // Publisher inventory ingestion API.
 //
 //   PUT /api/v1/publisher/products  — idempotent batch upsert of the
@@ -22,15 +23,9 @@ import { rfqLimiter } from "@/lib/rate-limit";
 import { recordAudit } from "@/lib/audit";
 import { parseIngestPayload } from "@/lib/ingest";
 import { applyIngestion, findDeskOwnedFieldChanges } from "@/lib/ingest-apply";
+import { errJson, rateLimitedJson } from "@/lib/api/errors";
 
 export const dynamic = "force-dynamic";
-
-function errJson(status: number, code: string, message: string, extra?: unknown) {
-  return NextResponse.json(
-    { error: { code, message, ...(extra ? { details: extra } : {}) } },
-    { status },
-  );
-}
 
 function authErrMessage(reason: string): string {
   switch (reason) {
@@ -70,11 +65,7 @@ async function authorize(req: NextRequest) {
   if (!limited.ok) {
     return {
       ok: false as const,
-      res: errJson(
-        429,
-        "RATE_LIMITED",
-        `Slow down — retry after ${Math.ceil(limited.retryAfterMs / 1000)}s.`,
-      ),
+      res: rateLimitedJson(limited.retryAfterMs, `Slow down — retry after ${Math.ceil(limited.retryAfterMs / 1000)}s.`),
     };
   }
   return { ok: true as const, keyId: auth.keyId, publisherId: auth.publisherId };
@@ -114,7 +105,7 @@ export async function PUT(req: NextRequest) {
   try {
     summary = await applyIngestion(a.publisherId, parsed.data);
   } catch (err) {
-    console.error("ingest.apply_failed", { keyId: a.keyId, err });
+    log.error("ingest.apply_failed", { keyId: a.keyId, err });
     return errJson(500, "INGEST_FAILED", "Could not apply the ingestion.");
   }
 

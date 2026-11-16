@@ -1,13 +1,16 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useTranslations } from "next-intl";
 import { FeedbackForm } from "@/components/feedback-form";
+import { useFocusTrap } from "@/lib/use-focus-trap";
 
 export function FeedbackWidget() {
   const t = useTranslations("common.feedback");
   const [open, setOpen] = useState(false);
   const [sent, setSent] = useState(false);
+  const panelRef = useRef<HTMLDivElement>(null);
+  useFocusTrap(panelRef, open);
 
   useEffect(() => {
     if (!open) return;
@@ -37,6 +40,8 @@ export function FeedbackWidget() {
       {open ? (
         <div className="cmdk-overlay" onClick={() => setOpen(false)}>
           <div
+            ref={panelRef}
+            tabIndex={-1}
             className="cmdk-panel feedback-panel"
             role="dialog"
             aria-modal="true"

@@ -1,5 +1,7 @@
 "use client";
 
+
+import { PendingButton } from "@/components/submit-button";
 import { useState } from "react";
 import { useTranslations } from "next-intl";
 
@@ -72,9 +74,9 @@ export function FeedbackForm({
       />
       {error ? <div className="feedback-error">{error}</div> : null}
       <div className="feedback-actions">
-        <button type="submit" className="btn primary" disabled={loading || !message.trim()}>
+        <PendingButton className="btn primary" disabled={loading || !message.trim()}>
           {loading ? t("sending") : t("send")}
-        </button>
+        </PendingButton>
       </div>
     </form>
   );

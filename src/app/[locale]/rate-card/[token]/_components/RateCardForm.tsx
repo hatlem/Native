@@ -1,5 +1,7 @@
 "use client";
 
+
+import { PendingButton } from "@/components/submit-button";
 import { useState, useTransition } from "react";
 import { useTranslations } from "next-intl";
 import { presignRateCardUpload } from "../actions";
@@ -248,9 +250,9 @@ export default function RateCardForm({
       </section>
 
       <div className="rc-actions">
-        <button type="submit" disabled={pending || uploading} className="btn large">
+        <PendingButton disabled={pending || uploading} className="btn large">
           {pending ? t("sending") : t("submitButton")}
-        </button>
+        </PendingButton>
       </div>
     </form>
   );

@@ -1,5 +1,6 @@
 "use server";
 
+import { requestIp } from "@/lib/client-ip";
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 import type { ProductType } from "@prisma/client";
@@ -15,12 +16,7 @@ function str(formData: FormData, key: string): string {
 
 async function clientIp(): Promise<string> {
   try {
-    const h = await headers();
-    return (
-      h.get("x-forwarded-for")?.split(",")[0]?.trim() ||
-      h.get("x-real-ip") ||
-      "unknown"
-    );
+    return requestIp(await headers());
   } catch {
     return "unknown";
   }

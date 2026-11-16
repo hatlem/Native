@@ -1,9 +1,12 @@
+import { PendingButton } from "@/components/submit-button";
 import { getTranslations } from "next-intl/server";
 import { redirect } from "next/navigation";
-import { prisma } from "@/lib/prisma";
 import { loadScope } from "@/lib/scope";
 import { ViewOnlyNote } from "@/components/view-only-note";
 import { createArticle } from "@/app/article-library-actions";
+import {
+  loadNewOrgs,
+} from "@/lib/data/buyer/articles";
 
 export default async function NewArticlePage({
   params,
@@ -18,10 +21,7 @@ export default async function NewArticlePage({
 
   // Only orgs the viewer may create in: a view-only (RESTRICTED) seat's org
   // is readable but not writable (createArticle refuses it).
-  const orgs = await prisma.organization.findMany({
-    where: { id: { in: scope.workspace.editOrgIds } },
-    select: { id: true, name: true },
-  });
+  const orgs = await loadNewOrgs(scope);
 
   if (orgs.length === 0) {
     return (
@@ -61,12 +61,11 @@ export default async function NewArticlePage({
             className="w-full rounded border p-2 text-sm"
           />
         </div>
-        <button
-          type="submit"
+        <PendingButton
           className="rounded bg-black px-3 py-1.5 text-sm text-white"
         >
           {t("createCta")}
-        </button>
+        </PendingButton>
       </form>
     </div>
   );

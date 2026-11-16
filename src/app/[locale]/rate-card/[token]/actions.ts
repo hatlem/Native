@@ -1,5 +1,6 @@
 "use server";
 
+import { requestIp } from "@/lib/client-ip";
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 import { prisma } from "@/lib/prisma";
@@ -9,6 +10,8 @@ import { addSuppression } from "@/lib/outreach/suppression";
 import { recordAudit } from "@/lib/audit";
 import { rfqLimiter } from "@/lib/rate-limit";
 import { presignUploadResult, RATE_CARD_TYPES } from "@/lib/storage/r2";
+import { safeExternalUrl } from "@/lib/security";
+import { pinnedRateCardKey, normalizeMediaKitUrl } from "@/lib/ratecard/submission";
 
 function f(fd: FormData, k: string): string {
   const v = fd.get(k);
@@ -16,8 +19,7 @@ function f(fd: FormData, k: string): string {
 }
 
 async function clientIp(): Promise<string> {
-  const h = await headers();
-  return h.get("x-forwarded-for")?.split(",")[0]?.trim() ?? h.get("x-real-ip") ?? "unknown";
+  return requestIp(await headers());
 }
 
 export async function presignRateCardUpload(args: {
@@ -61,8 +63,11 @@ export async function submitRateCardAction(formData: FormData) {
   });
   if (!verdict?.ok) redirect(`/${locale}/rate-card/${token}`);
 
-  const mediaKitUrl = f(formData, "mediaKitUrl") || null;
-  const mediaKitObjectKey = f(formData, "mediaKitObjectKey") || null;
+  // Both fields are posted by an anonymous token holder. The link must be a
+  // plain http(s) URL, and the object key must be one this token's own
+  // presign issued — never an arbitrary key in the bucket.
+  const mediaKitUrl = normalizeMediaKitUrl(f(formData, "mediaKitUrl"), safeExternalUrl);
+  const mediaKitObjectKey = pinnedRateCardKey(f(formData, "mediaKitObjectKey"), token);
   const responseNote = f(formData, "responseNote") || null;
   const contactName = f(formData, "contactName") || null;
   const contactEmail = f(formData, "contactEmail") || null;

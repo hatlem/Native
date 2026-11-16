@@ -9,7 +9,6 @@ function product(
   id: string,
   marketCode: string,
   currency: string,
-  vat: number,
 ): [string, QuoteGroupingProduct] {
   return [
     id,
@@ -20,7 +19,6 @@ function product(
         market: {
           code: marketCode,
           currency,
-          vatRatePct: vat,
         },
       },
     },
@@ -29,9 +27,9 @@ function product(
 
 test("splits a basket across multiple markets", () => {
   const products = new Map([
-    product("p-no", "NO", "NOK", 25),
-    product("p-se", "SE", "SEK", 25),
-    product("p-de", "DE", "EUR", 19),
+    product("p-no", "NO", "NOK"),
+    product("p-se", "SE", "SEK"),
+    product("p-de", "DE", "EUR"),
   ]);
   const groups = groupItemsByMarket(
     [
@@ -48,14 +46,13 @@ test("splits a basket across multiple markets", () => {
   );
   const de = groups.find((g) => g.marketCode === "DE")!;
   assert.equal(de.currency, "EUR");
-  assert.equal(de.vatPct, 19);
   assert.equal(de.items.length, 1);
 });
 
 test("keeps a single-market basket as one group", () => {
   const products = new Map([
-    product("p1", "NO", "NOK", 25),
-    product("p2", "NO", "NOK", 25),
+    product("p1", "NO", "NOK"),
+    product("p2", "NO", "NOK"),
   ]);
   const groups = groupItemsByMarket(
     [
@@ -69,12 +66,12 @@ test("keeps a single-market basket as one group", () => {
   assert.equal(groups[0].items.length, 2);
 });
 
-test("two EUR markets (DE 19%, FI 25%) stay separate", () => {
-  // Eurozone trap: grouping by currency would merge these and apply
-  // one VAT to both. We group by market so each retains its own rate.
+test("two EUR markets (DE, FI) stay separate", () => {
+  // Eurozone trap: grouping by currency would merge two markets that are
+  // priced and fulfilled separately. We group by market.
   const products = new Map([
-    product("p-de", "DE", "EUR", 19),
-    product("p-fi", "FI", "EUR", 25),
+    product("p-de", "DE", "EUR"),
+    product("p-fi", "FI", "EUR"),
   ]);
   const groups = groupItemsByMarket(
     [
@@ -88,12 +85,10 @@ test("two EUR markets (DE 19%, FI 25%) stay separate", () => {
   const fi = groups.find((g) => g.marketCode === "FI")!;
   assert.equal(de.currency, "EUR");
   assert.equal(fi.currency, "EUR");
-  assert.equal(de.vatPct, 19);
-  assert.equal(fi.vatPct, 25);
 });
 
 test("drops items whose product isn't in the map", () => {
-  const products = new Map([product("p1", "NO", "NOK", 25)]);
+  const products = new Map([product("p1", "NO", "NOK")]);
   const groups = groupItemsByMarket(
     [
       { productId: "p1", quantity: 1 },
@@ -105,28 +100,16 @@ test("drops items whose product isn't in the map", () => {
   assert.equal(groups[0].items.length, 1);
 });
 
-test("coerces vatRatePct from Decimal-like values", () => {
-  const products = new Map([
-    [
-      "p1",
-      {
-        id: "p1",
-        title: {
-          marketId: "m-no",
-          market: { code: "NO", currency: "NOK", vatRatePct: "25.00" },
-        },
-      } as QuoteGroupingProduct,
-    ],
-  ]);
-  const [g] = groupItemsByMarket(
-    [{ productId: "p1", quantity: 1 }],
-    products,
-  );
-  assert.equal(g.vatPct, 25);
+test("a group carries no VAT rate — VAT follows the buyer, not the market", () => {
+  // lib/vat.ts decides VAT from the buyer's country; the placement's market
+  // must not leak a rate into the quote.
+  const products = new Map([product("p-de", "DE", "EUR")]);
+  const [g] = groupItemsByMarket([{ productId: "p-de", quantity: 1 }], products);
+  assert.equal("vatPct" in g, false);
 });
 
 test("preserves arbitrary line metadata on items", () => {
-  const products = new Map([product("p1", "NO", "NOK", 25)]);
+  const products = new Map([product("p1", "NO", "NOK")]);
   const groups = groupItemsByMarket(
     [{ productId: "p1", quantity: 2, note: "rush" }],
     products,

@@ -1,3 +1,4 @@
+import { log } from "@/lib/log";
 import { prisma } from "@/lib/prisma";
 import { recordAudit } from "@/lib/audit";
 import { newMetricsToken, metricsExpiryFromNow, metricsReportLink } from "./tokens";
@@ -174,7 +175,7 @@ export async function sendMetricsRequestsNow(args: {
       if ("sent" in res) sent++;
       else skipped++;
     } catch (err) {
-      console.error("metrics_request.send_failed", { requestId: r.id, err });
+      log.error("metrics_request.send_failed", { requestId: r.id, err });
       failed++;
     }
   }

@@ -1,6 +1,7 @@
 "use client";
 
 import { useTransition } from "react";
+import { useTranslations } from "next-intl";
 import { useRouter, usePathname } from "@/i18n/navigation";
 import { routing } from "@/i18n/routing";
 import { saveLanguagePreference } from "@/app/account-actions";
@@ -27,12 +28,13 @@ const LOCALE_LABELS: Record<string, string> = {
 export function LocaleSwitcher({ current }: { current: string }) {
   const router = useRouter();
   const pathname = usePathname();
+  const ta11y = useTranslations("common.a11y");
   const [isPending, startTransition] = useTransition();
 
   return (
     <select
       id="acc-language"
-      aria-label="Language"
+      aria-label={ta11y("language")}
       value={current}
       disabled={isPending}
       onChange={(e) => {

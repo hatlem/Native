@@ -10,6 +10,7 @@ export async function respondAction(token: string, input: RespondInput): Promise
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(input),
+      signal: AbortSignal.timeout(15_000),
     });
     const data = (await res.json()) as RespondResult & { error?: unknown };
     if (!res.ok)

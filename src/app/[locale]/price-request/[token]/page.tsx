@@ -1,3 +1,4 @@
+import { PendingButton } from "@/components/submit-button";
 import { getTranslations } from "next-intl/server";
 import { notFound } from "next/navigation";
 import { findRequestByToken, markRequestOpened } from "@/lib/pricing/requests";
@@ -13,6 +14,7 @@ export default async function PriceRequestFormPage({
 }) {
   const { locale, token } = await params;
   const t = await getTranslations({ locale, namespace: "priceRequestForm" });
+  const tType = await getTranslations({ locale, namespace: "productType" });
 
   const req = await findRequestByToken(token);
   if (!req) notFound();
@@ -82,14 +84,14 @@ export default async function PriceRequestFormPage({
                 <label>{t("draft.type")}
                   <select name={`drafts[${i}].type`}>
                     <option value="">—</option>
-                    <option value="NATIVE_ARTICLE">Native article</option>
-                    <option value="ADVERTORIAL">Advertorial</option>
-                    <option value="NATIVE_DISPLAY">Native display</option>
-                    <option value="CONTEXTUAL">Contextual</option>
-                    <option value="PACKAGE">Package</option>
-                    <option value="NATIVE_PLUS">Native Plus</option>
-                    <option value="CONTENT_VIDEO">Content video</option>
-                    <option value="OTHER">Other</option>
+                    <option value="NATIVE_ARTICLE">{tType("NATIVE_ARTICLE")}</option>
+                    <option value="ADVERTORIAL">{tType("ADVERTORIAL")}</option>
+                    <option value="NATIVE_DISPLAY">{tType("NATIVE_DISPLAY")}</option>
+                    <option value="CONTEXTUAL">{tType("CONTEXTUAL")}</option>
+                    <option value="PACKAGE">{tType("PACKAGE")}</option>
+                    <option value="NATIVE_PLUS">{tType("NATIVE_PLUS")}</option>
+                    <option value="CONTENT_VIDEO">{tType("CONTENT_VIDEO")}</option>
+                    <option value="OTHER">{tType("OTHER")}</option>
                   </select>
                 </label>
                 <label>{t("draft.name")} <input name={`drafts[${i}].name`} /></label>
@@ -105,7 +107,7 @@ export default async function PriceRequestFormPage({
 
         <label>{t("note")} <textarea name="responseNote" rows={3} /></label>
 
-        <button type="submit">{t("submit")}</button>
+        <PendingButton>{t("submit")}</PendingButton>
       </form>
     </div>
   );

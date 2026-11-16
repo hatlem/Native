@@ -1,8 +1,8 @@
 "use server";
 
+import { requireSuperadmin } from "@/lib/desk-guard";
 import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
-import { auth } from "@/auth";
 import {
   createSalesContact,
   attachContactToTitle,
@@ -39,13 +39,6 @@ function optionalField(formData: FormData, key: string): string | undefined {
   return v.length ? v : undefined;
 }
 
-async function requireSuperadmin(locale: string): Promise<string> {
-  const session = await auth();
-  if (session?.user?.role !== "SUPERADMIN") {
-    redirect(`/${locale}/signin`);
-  }
-  return session.user.id;
-}
 
 // ---- Sales contacts ----
 

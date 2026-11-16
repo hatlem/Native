@@ -10,8 +10,8 @@ export { safeNext } from "@/lib/auth-gate";
 // Onboarding is first-time org setup, done once by whoever may set the org's
 // billing market: an ADMIN (in practice the org creator — signup makes them
 // its first admin) or an agency for a client it manages. It asks for the
-// market (VAT + invoice currency on every future quote) and the creator's
-// phone (so the desk can reach the org fast on time-sensitive RFQs).
+// market (VAT + invoice currency on every future quote) and, optionally, the
+// creator's phone (so the desk can reach the org fast on urgent requests).
 //
 // Once the org has a market it is onboarded, for everyone: a member invited
 // into it skips onboarding entirely — no questions, no phone (the creator's

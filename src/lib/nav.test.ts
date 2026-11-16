@@ -118,3 +118,34 @@ test("buyers reach their invoices from the user menu and palette, not the capped
     assert.ok(!userMenuItemsFor(audience, t).some((i) => i.key === "invoices"), audience);
   }
 });
+
+test("organisation admins get their audit log in the user menu and palette; others don't", () => {
+  for (const audience of ["advertiser", "agency"] as const) {
+    const asAdmin = { orgAdmin: true };
+    assert.ok(userMenuItemsFor(audience, t, asAdmin).some((i) => i.href === "/audit"), audience);
+    assert.ok(
+      paletteItemsFor(audience, t, asAdmin)
+        .flatMap((s) => s.items)
+        .some((i) => i.href === "/audit"),
+      audience,
+    );
+    assert.ok(!userMenuItemsFor(audience, t).some((i) => i.href === "/audit"), audience);
+    assert.ok(
+      !paletteItemsFor(audience, t)
+        .flatMap((s) => s.items)
+        .some((i) => i.href === "/audit"),
+      audience,
+    );
+  }
+});
+
+test("desk and superadmin reach the job queue from the palette", () => {
+  for (const audience of ["desk", "superadmin"] as const) {
+    assert.ok(
+      paletteItemsFor(audience, t)
+        .flatMap((s) => s.items)
+        .some((i) => i.href === "/desk/jobs"),
+      audience,
+    );
+  }
+});

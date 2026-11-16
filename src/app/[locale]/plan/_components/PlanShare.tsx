@@ -1,3 +1,4 @@
+import { PendingButton } from "@/components/submit-button";
 import { getTranslations } from "next-intl/server";
 import { Link2 } from "lucide-react";
 import { shareList, unshareList } from "@/app/list-actions";
@@ -76,16 +77,16 @@ export async function PlanShare({
               <form action={shareList}>
                 <input type="hidden" name="locale" value={locale} />
                 <input type="hidden" name="listId" value={listId} />
-                <button type="submit" className="btn small secondary">
+                <PendingButton className="btn small secondary">
                   {t("regenerate")}
-                </button>
+                </PendingButton>
               </form>
               <form action={unshareList}>
                 <input type="hidden" name="locale" value={locale} />
                 <input type="hidden" name="listId" value={listId} />
-                <button type="submit" className="btn small ghost">
+                <PendingButton className="btn small ghost">
                   {t("disable")}
-                </button>
+                </PendingButton>
               </form>
             </div>
           </>
@@ -95,9 +96,9 @@ export async function PlanShare({
             <form action={shareList}>
               <input type="hidden" name="locale" value={locale} />
               <input type="hidden" name="listId" value={listId} />
-              <button type="submit" className="btn small">
+              <PendingButton className="btn small">
                 {t("enable")}
-              </button>
+              </PendingButton>
             </form>
           </>
         )}

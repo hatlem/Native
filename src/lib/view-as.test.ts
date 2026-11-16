@@ -34,3 +34,12 @@ test("a wrong value is not a confirmation", () => {
   fd.set(VIEW_AS_CONFIRM_FIELD, "on");
   assert.equal(viewAsCommitConfirmed(ws("o1"), "o1", fd), false);
 });
+
+test("view-as needs a real reason", async () => {
+  const { parseViewAsReason } = await import("./view-as");
+  assert.equal(parseViewAsReason(""), null);
+  assert.equal(parseViewAsReason("  ok "), null);
+  assert.equal(parseViewAsReason(null), null);
+  assert.equal(parseViewAsReason("  support   ticket 42 "), "support ticket 42");
+  assert.equal(parseViewAsReason("x".repeat(500))?.length, 300);
+});

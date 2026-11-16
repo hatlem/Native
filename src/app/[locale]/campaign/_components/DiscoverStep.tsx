@@ -1,3 +1,4 @@
+import { PendingButton } from "@/components/submit-button";
 import { getTranslations } from "next-intl/server";
 import { Link } from "@/i18n/navigation";
 import { addProductToList } from "@/app/list-actions";
@@ -81,9 +82,9 @@ export async function DiscoverStep({ locale, market, budget, brief, recommendati
             placeholder={t("fieldBriefPlaceholder")}
           />
         </label>
-        <button type="submit" className="btn">
+        <PendingButton className="btn">
           {t("discoverRun")}
-        </button>
+        </PendingButton>
       </form>
 
       {recommendation ? (
@@ -109,7 +110,11 @@ export async function DiscoverStep({ locale, market, budget, brief, recommendati
                           {p.reasonText ? (
                             <div className="discover-why small">
                               <span className="discover-why-label">{t("whyFits")}</span>{" "}
-                              {p.reasonText}
+                              {p.reasonText}{" "}
+                              {/* reasonText is model-written (brief-rerank-llm.ts). */}
+                              <span className="tag" title={t("aiWrittenHint")}>
+                                {t("aiWritten")}
+                              </span>
                             </div>
                           ) : rationale ? (
                             <div className="discover-why small">
@@ -122,9 +127,9 @@ export async function DiscoverStep({ locale, market, budget, brief, recommendati
                           <input type="hidden" name="locale" value={locale} />
                           <input type="hidden" name="productId" value={p.productId} />
                           <input type="hidden" name="returnTo" value={returnTo} />
-                          <button type="submit" className="btn small">
+                          <PendingButton className="btn small">
                             {t("addToShortlist")}
-                          </button>
+                          </PendingButton>
                         </form>
                       </div>
                     );
@@ -150,9 +155,9 @@ export async function DiscoverStep({ locale, market, budget, brief, recommendati
                         <input type="hidden" name="locale" value={locale} />
                         <input type="hidden" name="productId" value={s.productId} />
                         <input type="hidden" name="returnTo" value={returnTo} />
-                        <button type="submit" className="btn small ghost">
+                        <PendingButton className="btn small ghost">
                           {t("addToShortlist")}
-                        </button>
+                        </PendingButton>
                       </form>
                     </div>
                   ))}

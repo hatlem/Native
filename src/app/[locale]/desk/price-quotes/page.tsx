@@ -1,3 +1,4 @@
+import { PendingButton } from "@/components/submit-button";
 import { getTranslations } from "next-intl/server";
 import { superadminPageGate } from "@/lib/desk-guard";
 import { SuperadminOnly } from "@/components/superadmin-only";
@@ -100,9 +101,9 @@ export default async function DeskPriceQuotesPage({
                               name="quoteId"
                               value={q.id}
                             />
-                            <button type="submit" className="btn small">
+                            <PendingButton className="btn small">
                               {t("apply")}
-                            </button>
+                            </PendingButton>
                           </form>
                           <form action={rejectQuoteAction}>
                             <input type="hidden" name="locale" value={locale} />
@@ -116,9 +117,9 @@ export default async function DeskPriceQuotesPage({
                               name="quoteId"
                               value={q.id}
                             />
-                            <button type="submit" className="btn small">
+                            <PendingButton className="btn small">
                               {t("reject")}
-                            </button>
+                            </PendingButton>
                           </form>
                         </div>
                       </td>

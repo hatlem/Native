@@ -36,8 +36,8 @@ test("initial NO email contains hook + title list + link + unsubscribe", () => {
   assert.match(built.text, /Aftenposten/);
   assert.match(built.text, /Bergens Tidende/);
   assert.match(built.text, /https:\/\/nativespin\.com\/no\/rate-card\/abc/);
-  // Initial inquiry must NOT offer an opt-out — only the bump2 breakaway does.
-  assert.doesNotMatch(built.text, /Avregistrer/);
+  // Every step says how to stop further contact.
+  assert.match(built.text, /Meld fra her: https:\/\/nativespin\.com\/no\/rate-card\/abc\/unsubscribe/);
 });
 
 test("bump1 is short, references the previous mail, contains link", () => {
@@ -88,4 +88,20 @@ test("renders 'and N more' when title list > 8", () => {
     unsubscribeLink: "https://x.test/u",
   });
   assert.match(built.text, /og \d+ til/);
+});
+
+test("every step in every locale carries the opt-out link exactly once", () => {
+  for (const locale of ["en", "no", "sv", "da", "fi", "de"] as const) {
+    for (const step of ["initial", "bump1", "bump2"] as const) {
+      const built = buildOutreachEmail({
+        step,
+        locale,
+        recipientName: null,
+        titles,
+        link: "https://x.test/r",
+        unsubscribeLink: "https://x.test/r/unsubscribe",
+      });
+      assert.equal(built.text.split("https://x.test/r/unsubscribe").length - 1, 1, `${locale}/${step}`);
+    }
+  }
 });

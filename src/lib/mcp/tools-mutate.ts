@@ -108,10 +108,10 @@ export const mutateToolDefinitions = (actorId: string) => ({
         salesContactId: a.salesContactId,
         requestedById: actorId,
       });
-      if (a.send) {
-        await sendPriceRequest({ priceRequestId: req.id, actorId });
-      }
-      return req;
+      // The send can be refused (suppressed address, daily cap): report it
+      // rather than letting the caller assume the email went out.
+      const send = a.send ? await sendPriceRequest({ priceRequestId: req.id, actorId }) : null;
+      return { ...req, send };
     },
   },
 
@@ -264,3 +264,33 @@ export const mutateToolDefinitions = (actorId: string) => ({
       cancelPriceRequest({ priceRequestId: a.priceRequestId, actorId }),
   },
 } as const);
+
+// Which grant each mutation needs (lib/mcp/auth.ts mcpGrants). "draft"
+// tools only record things for a human to review; "apply" tools change
+// live catalog prices or product availability. A tool missing here is
+// treated as "apply" — the strict default for anything added later.
+export const MUTATE_TOOL_LEVEL: Record<string, "draft" | "apply"> = {
+  native_create_sales_contact: "draft",
+  native_create_title: "draft",
+  native_attach_sales_contact: "draft",
+  native_create_price_request: "draft",
+  native_create_price_request_bulk: "draft",
+  native_log_quote: "draft",
+  native_log_quote_draft: "draft",
+  native_log_contact: "draft",
+  native_cancel_price_request: "draft",
+  native_apply_quote: "apply",
+  native_activate_quote_products: "apply",
+};
+
+// Draft-level tools whose `send: true` argument emails a publisher contact.
+// Sending is an "apply" action: a draft key may create the request, not
+// mail it.
+export const SEND_ARG_TOOLS: ReadonlySet<string> = new Set([
+  "native_create_price_request",
+  "native_create_price_request_bulk",
+]);
+
+export function mutateToolLevel(name: string): "draft" | "apply" {
+  return MUTATE_TOOL_LEVEL[name] ?? "apply";
+}

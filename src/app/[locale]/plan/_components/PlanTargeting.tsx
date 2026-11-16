@@ -1,3 +1,4 @@
+import { PendingButton } from "@/components/submit-button";
 import { getTranslations } from "next-intl/server";
 import { setListTargetVerticals } from "@/app/list-actions";
 import type { VerticalOption } from "@/lib/catalog-taxonomy";
@@ -65,9 +66,9 @@ export async function PlanTargeting({
             </label>
           ))}
         </div>
-        <button type="submit" className="btn small">
+        <PendingButton className="btn small">
           {t("targetingSave")}
-        </button>
+        </PendingButton>
       </form>
     </details>
   );

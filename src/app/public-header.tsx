@@ -5,6 +5,7 @@ import { useTranslations } from "next-intl";
 import { Link, usePathname } from "@/i18n/navigation";
 import { BrandWordmark } from "@/app/brand";
 import { PUBLIC_NAV_ITEMS } from "@/lib/public-nav";
+import { STATIC_TREE_PREFIX } from "@/lib/static-public";
 import { DrawerSection } from "@/app/public-header-drawer";
 import { MegaPanel } from "@/app/public-header-mega";
 import {
@@ -24,6 +25,11 @@ function normalizePath(p: string): string {
   return p.replace(/\/+$/, "") || "/";
 }
 
+function publicPathname(p: string): string {
+  const m = p.match(new RegExp(`^${STATIC_TREE_PREFIX}/[^/]+(/.*)?$`));
+  return m ? m[1] || "/" : p;
+}
+
 function isActive(pathname: string, href: string): boolean {
   const a = normalizePath(pathname);
   const b = normalizePath(href);
@@ -34,7 +40,11 @@ function isActive(pathname: string, href: string): boolean {
 export function PublicHeader({ brand, authActions }: Props) {
   const t = useTranslations("publicNav");
   const tNav = useTranslations("nav");
-  const pathname = usePathname();
+  const ta11y = useTranslations("common.a11y");
+  // A prerendered public page (app/static) is rendered at /static/<locale>/…
+  // and served at /<locale>/… — strip the internal prefix so the server and
+  // the browser agree on the active item.
+  const pathname = publicPathname(usePathname());
   const [openMega, setOpenMega] = useState<string | null>(null);
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [drawerSection, setDrawerSection] = useState<string | null>(null);
@@ -107,7 +117,7 @@ export function PublicHeader({ brand, authActions }: Props) {
           <nav
             ref={navRef}
             className="nav-mega"
-            aria-label="Primary"
+            aria-label={ta11y("primaryNav")}
           >
             {PUBLIC_NAV_ITEMS.map((item) => {
               if (item.kind === "link") {
@@ -170,7 +180,7 @@ export function PublicHeader({ brand, authActions }: Props) {
         aria-hidden={!drawerOpen}
       >
         <div className="scrim" onClick={closeDrawer} />
-        <aside className="sheet" aria-label="Menu">
+        <aside className="sheet" aria-label={ta11y("menu")}>
           <div className="head">
             {drawerSection ? (
               <button
@@ -203,7 +213,7 @@ export function PublicHeader({ brand, authActions }: Props) {
               onClose={closeDrawer}
             />
           ) : (
-            <nav aria-label="Mobile" className="drawer-top">
+            <nav aria-label={ta11y("mobileNav")} className="drawer-top">
               {PUBLIC_NAV_ITEMS.map((item) => {
                 if (item.kind === "link") {
                   return (

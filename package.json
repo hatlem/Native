@@ -2,6 +2,7 @@
   "name": "nativespin",
   "version": "0.0.1",
   "private": true,
+  "license": "UNLICENSED",
   "description": "NativeSpin — Nordic marketplace for buying native content and native advertising in newspapers and magazines.",
   "scripts": {
     "dev": "next dev",
@@ -25,7 +26,9 @@
     "issue-publisher-key": "tsx scripts/issue-publisher-key.ts",
     "issue-pricing-admin-key": "tsx scripts/issue-pricing-admin-key.ts",
     "seed-playbooks": "tsx scripts/seed-playbooks.ts",
-    "test:it": "ALLOW_LOCAL_DB=1 tsx --experimental-test-module-mocks --test-concurrency=1 --test \"src/**/*.it.test.ts\""
+    "test:it": "ALLOW_LOCAL_DB=1 tsx --experimental-test-module-mocks --test-concurrency=1 --test \"src/**/*.it.test.ts\"",
+    "test:e2e": "node --test --test-concurrency=1 e2e/*.test.mjs",
+    "loadtest": "node scripts/loadtest/run.mjs"
   },
   "prisma": {
     "seed": "tsx prisma/seed.ts"
@@ -43,21 +46,22 @@
       "postcss@<8.5.10": ">=8.5.10",
       "esbuild@<0.28.1": ">=0.28.1",
       "js-yaml@<4.3.2": ">=4.3.2 <5",
-      "hono@<4.13.11": ">=4.13.11 <5",
-      "undici@<7.28.0": ">=7.28.0 <8",
       "brace-expansion@<1.1.21": ">=1.1.21 <2",
       "brace-expansion@>=3.0.0 <5.0.12": ">=5.0.12 <6",
       "sharp@<0.35.0": ">=0.35.0",
-      "fast-uri@<3.1.6": ">=3.1.6 <4",
-      "@hono/node-server@<2.0.5": ">=2.0.5",
       "@auth/core@<0.41.3": ">=0.41.3",
-      "body-parser@<2.3.0": ">=2.3.0",
       "deepmerge-ts@<8.0.0": ">=8.0.0",
       "nanoid@<3.3.18": ">=3.3.18 <4",
-      "qs@<6.16.0": ">=6.16.0 <7",
       "ip-address@<10.7.4": ">=10.7.4 <11",
       "source-map-js@<1.2.2": ">=1.2.2 <2",
-      "proxy-addr@<2.0.8": ">=2.0.8 <3"
+      "proxy-addr@<2.0.8": ">=2.0.8 <3",
+      "undici@<7.30.1": ">=7.30.1 <8",
+      "body-parser@<2.4.0": ">=2.4.0",
+      "hono@<4.13.16": ">=4.13.16 <5",
+      "@hono/node-server@<2.1.6": ">=2.1.6",
+      "fast-uri@<3.1.9": ">=3.1.9 <4",
+      "qs@<6.16.1": ">=6.16.1 <7",
+      "minimatch@>=7.0.0 <11.0.1": ">=11.0.1"
     }
   },
   "dependencies": {

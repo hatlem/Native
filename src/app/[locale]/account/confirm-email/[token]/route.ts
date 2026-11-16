@@ -1,3 +1,5 @@
+import { requestIp } from "@/lib/client-ip";
+import { log } from "@/lib/log";
 // Email-change confirmation endpoint. A Route Handler rather than a Page for
 // the same reason as the magic-link one: it has to clear the session cookie,
 // which a Server Component can't do during render.
@@ -15,11 +17,7 @@ import { emailAdapter } from "@/lib/notify";
 import { appUrl, appName } from "@/lib/url";
 
 function clientIp(req: NextRequest): string {
-  return (
-    req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ||
-    req.headers.get("x-real-ip") ||
-    "unknown"
-  );
+  return requestIp(req.headers);
 }
 
 export async function GET(
@@ -66,7 +64,7 @@ export async function GET(
       html: notice.html,
     });
   } catch (err) {
-    console.error("user.email_changed_notice_failed", {
+    log.error("user.email_changed_notice_failed", {
       userId: outcome.userId,
       err,
     });
@@ -80,7 +78,7 @@ export async function GET(
   try {
     await signOut({ redirect: false });
   } catch (err) {
-    console.error("user.email_change_signout_failed", {
+    log.error("user.email_change_signout_failed", {
       userId: outcome.userId,
       err,
     });

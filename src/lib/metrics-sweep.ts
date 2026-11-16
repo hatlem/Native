@@ -1,3 +1,4 @@
+import { log } from "@/lib/log";
 // Daily campaign-metrics sweep — the scheduled replacement for running
 // `pnpm build-metrics-campaign` / `send-metrics-batch` / `freeze-metrics-campaigns`
 // by hand. One sweep: scan ended flights into MetricsRequests, freeze
@@ -66,7 +67,7 @@ export async function runMetricsSweep(now: Date = new Date()): Promise<MetricsSw
   const built = operator
     ? await buildMetricsCampaign({ createdById: operator.id, now })
     : undefined;
-  if (!operator) console.warn("[metrics] no SUPERADMIN operator — build step skipped");
+  if (!operator) log.warn("metrics.no_operator", { note: "no SUPERADMIN operator, build step skipped" });
   const { frozen } = await freezeDueCampaigns({ now });
 
   const cap = Number(process.env.METRICS_DAILY_CAP ?? 30);
@@ -79,7 +80,7 @@ export async function runMetricsSweep(now: Date = new Date()): Promise<MetricsSw
     try {
       res = await sendMetricsRequestStep({ requestId: r.id, actorId: operator?.id ?? "system" });
     } catch (err) {
-      console.error("[metrics] send failed", { requestId: r.id, err });
+      log.error("metrics.send_failed", { requestId: r.id, err });
       failed++;
       continue;
     }

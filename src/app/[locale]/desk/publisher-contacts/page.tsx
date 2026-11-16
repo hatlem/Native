@@ -1,6 +1,5 @@
 import { getTranslations } from "next-intl/server";
 import type { SalesChannel } from "@prisma/client";
-import { prisma } from "@/lib/prisma";
 import { Link } from "@/i18n/navigation";
 import { superadminPageGate } from "@/lib/desk-guard";
 import { SuperadminOnly } from "@/components/superadmin-only";
@@ -15,6 +14,12 @@ import {
   sendBatchAction,
   sendOneAction,
 } from "./actions";
+import {
+  loadRequests,
+  loadCandidates,
+  loadStatusCounts,
+  loadChannelCounts,
+} from "@/lib/data/desk/publisher-contacts";
 
 export const dynamic = "force-dynamic";
 
@@ -79,6 +84,7 @@ export default async function PublisherContactsPage({
   const t = await getTranslations({ locale, namespace: "publisherContacts" });
   const gate = await superadminPageGate(locale);
   if (!gate.allowed) return <SuperadminOnly locale={locale} area={t("title")} />;
+  const ctx = gate.ctx;
 
   const tab = str(sp, "tab") === "campaign" ? "campaign" : "review";
   const ok = str(sp, "ok");
@@ -139,11 +145,7 @@ export default async function PublisherContactsPage({
 
   // ── Campaign tab ──────────────────────────────────────────────────────────
   if (tab === "campaign") {
-    const requests = await prisma.rateCardRequest.findMany({
-      orderBy: { createdAt: "desc" },
-      take: 200,
-      include: { titles: true },
-    });
+    const requests = await loadRequests(ctx);
     const states = requests.map(requestState);
     const count = (s: RateCardRequestState) => states.filter((x) => x === s).length;
 
@@ -255,22 +257,9 @@ export default async function PublisherContactsPage({
 
   // ── Review tab (default) ──────────────────────────────────────────────────
   const [candidates, statusCounts, channelCounts] = await Promise.all([
-    prisma.contactCandidate.findMany({
-      where: { status: "PENDING" },
-      orderBy: [{ confidence: "desc" }, { createdAt: "asc" }],
-      take: 200,
-      include: {
-        publisher: {
-          select: {
-            name: true,
-            countryCode: true,
-            titles: { select: { id: true, salesChannel: true, adSales: true } },
-          },
-        },
-      },
-    }),
-    prisma.contactCandidate.groupBy({ by: ["status"], _count: { _all: true } }),
-    prisma.title.groupBy({ by: ["salesChannel"], _count: { _all: true } }),
+    loadCandidates(ctx),
+    loadStatusCounts(ctx),
+    loadChannelCounts(ctx),
   ]);
 
   return (

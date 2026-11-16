@@ -1,10 +1,10 @@
 import { getTranslations } from "next-intl/server";
+import { buyerScope } from "@/lib/data/buyer/guard";
 import { redirect } from "next/navigation";
 import { planPath } from "@/lib/plan-path";
 import { auth } from "@/auth";
 import { loadScope, canCommitOnOrg } from "@/lib/scope";
 import { signinPath } from "@/lib/auth-gate";
-import { prisma } from "@/lib/prisma";
 import { getWorkspace } from "@/lib/workspace";
 import { Link } from "@/i18n/navigation";
 import { planBriefValues, timingOptions } from "@/lib/plan-brief";
@@ -15,7 +15,6 @@ import { bandLabel } from "@/lib/pricing/bands";
 import { bandIncludesArticle, productBand, unitRate } from "@/lib/pricing/display-price";
 import { productDisplayNames } from "@/lib/pricing/display-name";
 import type { ProductInclusions } from "@/lib/pricing/inclusions";
-import { catalogVisibleTitleWhere } from "@/lib/catalog-visibility";
 import type { Candidate, SupplementaryTitle } from "@/lib/recommend";
 import { recommendForBrief } from "@/lib/campaign-recommend";
 import { loadExtraWorkRates, loadPricingDefaults } from "@/lib/content-fee";
@@ -24,7 +23,6 @@ import { loadVerticalOptions, localizedVerticalOptions } from "@/lib/catalog-tax
 import { ViewOnlyNote } from "@/components/view-only-note";
 import { PlanDownload } from "@/components/plan-download";
 import { publisherCanWrite } from "@/lib/authorship";
-import { liveOrderForList } from "@/lib/commerce/list-commit";
 import { PlanBanners } from "./PlanBanners";
 import { PlanShare } from "./PlanShare";
 import { displayTimeZone } from "@/lib/time-zone";
@@ -45,6 +43,7 @@ import {
   lineDisplay,
   sumTotalFigures,
 } from "@/lib/plan-total";
+import { quoteVatFor } from "@/lib/vat-buyer";
 import { scheduleOverlapWarnings, type ScheduleOverlapWarning } from "@/lib/programme-warnings";
 import type { BookingUnit } from "@/lib/campaign-schedule";
 import { SUPPORTED_MARKETS } from "@/lib/markets";
@@ -57,6 +56,17 @@ const MARKET_CODES = SUPPORTED_MARKETS;
 // its address first (via /plan/open). Every form here posts that list's id and
 // the actions act on it (lib/plan-target.ts), so another tab moving the cookie
 // on afterwards can't make "Send" or a line edit land on a different plan.
+import { DataLayerEvent } from "@/app/data-layer-event";
+import {
+  loadPlanActiveOrg,
+  loadPlanLists,
+  loadPlanPlacementProducts,
+  loadPlanBlockedDays,
+  loadPlanLiveOrder,
+  loadPlanSubmittedRequest,
+  loadPlanFavoriteCount,
+  loadPlanWaveItems,
+} from "@/lib/data/buyer/plan";
 export async function PlanView({
   locale,
   sp,
@@ -90,11 +100,9 @@ export async function PlanView({
     role === "PUBLISHER" ? "/publisher" : role === "CONTENT" ? "/writer" : "/desk";
 
   const ws = await getWorkspace(session?.user?.id);
+  const scope = buyerScope(session?.user, ws);
   const activeOrg = ws?.activeOrgId
-    ? await prisma.organization.findUnique({
-        where: { id: ws.activeOrgId },
-        select: { name: true, marketCode: true },
-      })
+    ? await loadPlanActiveOrg(scope, { wsActiveOrgId: ws.activeOrgId })
     : null;
   const needsClient = !!ws?.isAgency && !ws.activeOrgId;
   // requireActiveOrg() bounces ANY "Add to plan" with no active org back here
@@ -107,11 +115,7 @@ export async function PlanView({
   // The plan now operates on the active SavedList (not the legacy cookie
   // basket). The switcher needs every non-archived list for this org.
   const lists = ws?.activeOrgId
-    ? await prisma.savedList.findMany({
-        where: { organizationId: ws.activeOrgId, archivedAt: null },
-        orderBy: { updatedAt: "desc" },
-        select: { id: true, name: true, _count: { select: { items: true } } },
-      })
+    ? await loadPlanLists(scope, { wsActiveOrgId: ws.activeOrgId })
     : [];
   // The active list comes from the cookie, which /plan/[listId] has aligned
   // with its address (via /plan/open) before rendering. The page's forms post
@@ -135,7 +139,8 @@ export async function PlanView({
   // Desk-owned fee + margin rules: the per-line figures, the summary total and
   // PlanLines' breakdown ("38 000 placement + 7 000 article") are all priced
   // from the same load the order uses, so /plan shows what the order charges.
-  const pricing = await loadPricingDefaults();
+  // …at the VAT rate THIS buyer is charged (lib/vat.ts).
+  const pricing = { ...(await loadPricingDefaults()), vatPct: quoteVatFor(activeOrg).vatPct };
   // The per-currency hourly rate the article-scope list quotes.
   const extraWorkRates = await loadExtraWorkRates();
 
@@ -185,31 +190,7 @@ export async function PlanView({
     ...new Set(placeholderItems.map((i) => i.titleId as string)),
   ];
   const placementProducts = placeholderTitleIds.length
-    ? await prisma.product.findMany({
-        where: { titleId: { in: placeholderTitleIds }, active: true, bookable: true },
-        orderBy: [{ type: "asc" }, { basePrice: "asc" }],
-        select: {
-          id: true,
-          type: true,
-          titleId: true,
-          active: true,
-          confirmedAt: true,
-          basePrice: true,
-          currency: true,
-          pricingModel: true,
-          productionFee: true,
-          inclusions: true,
-          priceRules: { select: { marginPct: true, seasonalMultiplier: true, minVolume: true } },
-          title: {
-            select: {
-              pricesPublic: true,
-              productionFeeDefault: true,
-              publisher: { select: { pricesPublic: true } },
-              market: { select: { code: true } },
-            },
-          },
-        },
-      })
+    ? await loadPlanPlacementProducts(scope, { placeholderTitleIds })
     : [];
   // Options must be tellable apart: "Native-artikkel, Native-artikkel,
   // Advertorial, Advertorial" gave the buyer nothing to choose on. Same
@@ -275,10 +256,7 @@ export async function PlanView({
   const blockedPeriods = new Set(
     lines.length
       ? (
-          await prisma.availability.findMany({
-            where: { productId: { in: lines.map((l) => l.product.id) }, blocked: true },
-            select: { productId: true, year: true, month: true },
-          })
+          await loadPlanBlockedDays(scope, { productIds: lines.map((l) => l.product.id) })
         ).map((r) => `${r.productId}:${r.year}-${r.month}`)
       : [],
   );
@@ -321,22 +299,12 @@ export async function PlanView({
   // list has been submitted as (none yet = still building), its latest
   // Quote, and whether that quote has an Order (accepted).
   const submittedRequest = activeList
-    ? await prisma.request.findFirst({
-        where: { sourceListId: activeList.id },
-        orderBy: { createdAt: "desc" },
-        select: {
-          quotes: {
-            orderBy: { createdAt: "desc" },
-            take: 1,
-            select: { order: { select: { id: true } } },
-          },
-        },
-      })
+    ? await loadPlanSubmittedRequest(scope, { activeListId: activeList.id })
     : null;
   // The live order this plan already has, by either path: an ordered plan is
   // spent, so the summary shows it instead of the send/order form
   // (lib/commerce/list-commit.ts).
-  const ordered = activeList ? await liveOrderForList(prisma, activeList.id) : null;
+  const ordered = activeList ? await loadPlanLiveOrder(scope, { listId: activeList.id }) : null;
   const hasOrder = !!ordered || !!submittedRequest?.quotes[0]?.order;
   const currentStep: PlanStep = hasOrder ? 4 : submittedRequest ? 3 : 2;
 
@@ -363,6 +331,8 @@ export async function PlanView({
       budget: recBudget,
       brief: recBriefRaw,
       locale,
+      // Budgets and attributes the LLM calls (lib/ai-usage.ts).
+      organizationId: ws?.activeOrgId ?? null,
     });
     rec = { picks: result.picks, supplementary: result.supplementary };
     briefMatched = result.briefMatched;
@@ -375,13 +345,7 @@ export async function PlanView({
   for (const l of lines) listTitleIds.add(l.product.titleId);
   for (const tl of titleLines) listTitleIds.add(tl.titleId);
   const favoriteCount = session?.user?.id
-    ? await prisma.favorite.count({
-        where: {
-          userId: session.user.id,
-          title: catalogVisibleTitleWhere,
-          titleId: { notIn: [...listTitleIds] },
-        },
-      })
+    ? await loadPlanFavoriteCount(scope, { listTitleIds })
     : 0;
 
   // Programme panel inputs: the wave strip when this list is a wave, else the
@@ -395,42 +359,7 @@ export async function PlanView({
   let pacing: ProgrammePacing | null = null;
   let overlapWarnings: ScheduleOverlapWarning[] = [];
   if (programmeView) {
-    const waveItems = await prisma.savedListItem.findMany({
-      where: { listId: { in: programmeView.waves.map((w) => w.listId) }, isAlternative: false },
-      select: {
-        listId: true,
-        productId: true,
-        quantity: true,
-        withContent: true,
-        scheduleStart: true,
-        scheduleUnits: true,
-        product: {
-          select: {
-            type: true,
-            currency: true,
-            basePrice: true,
-            active: true,
-            confirmedAt: true,
-            visibility: true,
-            pricingModel: true,
-            productionFee: true,
-            inclusions: true,
-            bookingUnit: true,
-            titleId: true,
-            priceRules: { select: { marginPct: true, seasonalMultiplier: true, minVolume: true } },
-            title: {
-              select: {
-                name: true,
-                pricesPublic: true,
-                productionFeeDefault: true,
-                publisher: { select: { pricesPublic: true } },
-                market: { select: { code: true, vatRatePct: true } },
-              },
-            },
-          },
-        },
-      },
-    });
+    const waveItems = await loadPlanWaveItems(scope, { waveListIds: programmeView.waves.map((w) => w.listId) });
     const itemsByList = new Map<string, typeof waveItems>();
     for (const i of waveItems) {
       const arr = itemsByList.get(i.listId) ?? [];
@@ -485,6 +414,11 @@ export async function PlanView({
 
   return (
     <>
+      {/* Activation signal: this plan has its first placement(s). Deduped per
+          plan per browser session by DataLayerEvent. */}
+      {activeList && listItems.length > 0 ? (
+        <DataLayerEvent event="plan_first_item" id={activeList.id} />
+      ) : null}
       {/* A named plan keeps its own title block (name, rename, "Switch plan")
           even while empty, so a buyer who just created one can see which plan
           is active and switch back. The generic header is for no plan at all. */}
@@ -589,6 +523,7 @@ export async function PlanView({
           />
           {activeList ? (
             <PlanProgramme
+              scope={scope}
               locale={locale}
               listId={activeList.id}
               view={programmeView}

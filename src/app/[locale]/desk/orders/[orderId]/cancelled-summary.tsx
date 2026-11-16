@@ -1,6 +1,6 @@
 import { getTranslations } from "next-intl/server";
 import type { Invoice, Prisma } from "@prisma/client";
-import { formatMoney } from "@/lib/money";
+import { formatMoneyExact } from "@/lib/money";
 import { formatZonedDateTime } from "@/lib/time-zone";
 import { creditNoteEligibility } from "@/lib/order-lifecycle";
 import { CreditNoteForm } from "./credit-note-form";
@@ -55,7 +55,7 @@ export async function CancelledSummary({ locale, order, invoice, timeZone }: Pro
       {credit ? (
         <p className="muted small">
           <strong>{t("creditNoteIssuedLabel")}:</strong>{" "}
-          {formatMoney(Number(credit.amount), credit.currency, locale)} · {credit.reason}
+          {formatMoneyExact(Number(credit.amount), credit.currency, locale)} · {credit.reason}
         </p>
       ) : eligibility.ok && invoice ? (
         <CreditNoteForm locale={locale} orderId={order.id} invoice={eligibility.invoice} />

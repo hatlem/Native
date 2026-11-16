@@ -7,24 +7,15 @@ import { prisma } from "@/lib/prisma";
 import { loadOnboardingState, safeNext } from "@/lib/onboarding-gate";
 import { recordAudit } from "@/lib/audit";
 import { SUPPORTED_MARKETS } from "@/lib/markets";
+import {
+  normalisePhone,
+  validateOnboarding,
+  type OnboardingState,
+} from "@/lib/onboarding-form-state";
 
 const MARKET_CODES: readonly string[] = SUPPORTED_MARKETS;
 
-// Phone format: keep the validation forgiving — international users
-// type with spaces, country prefixes (+47, +46, +45, …), dashes, and
-// the Norwegian convention of grouping into 3-digit blocks. We accept
-// anything that has at least 6 digits in it and is at most 32 chars
-// total, then strip the user-visible whitespace for storage.
-const PHONE_DIGIT_RE = /\d/g;
-
-function normalisePhone(raw: string): string {
-  return raw.replace(/\s+/g, " ").trim();
-}
-
-function isValidPhone(raw: string): boolean {
-  const digits = raw.match(PHONE_DIGIT_RE)?.length ?? 0;
-  return raw.length <= 32 && digits >= 6;
-}
+// Phone / market validation lives in lib/onboarding-form-state (pure, tested).
 
 // Save first-time org onboarding: the billing market on the org being
 // onboarded plus the phone of the person onboarding it. Only someone allowed
@@ -34,7 +25,10 @@ function isValidPhone(raw: string): boolean {
 // never written. Onboarding is deferred: a user only lands here when they
 // trigger a buy/RFQ first, so on success we redirect back to wherever the
 // gate fired from (defaults to /catalog when arrived at directly).
-export async function saveOnboarding(formData: FormData) {
+export async function saveOnboarding(
+  _prev: OnboardingState,
+  formData: FormData,
+): Promise<OnboardingState> {
   const locale = String(formData.get("locale") || "en");
   const next = safeNext(
     String(formData.get("next") || ""),
@@ -59,11 +53,9 @@ export async function saveOnboarding(formData: FormData) {
 
   const market = String(formData.get("market") || "").trim();
   const phone = normalisePhone(String(formData.get("phone") || ""));
-  if (!MARKET_CODES.includes(market) || !isValidPhone(phone)) {
-    redirect(
-      `/${locale}/onboarding?error=1&next=${encodeURIComponent(next)}`,
-    );
-  }
+  // Field-level errors go back to the form in place, with what was typed.
+  const errors = validateOnboarding({ market, phone }, MARKET_CODES);
+  if (errors.market || errors.phone) return { errors, values: { market, phone } };
 
   await prisma.$transaction([
     // Conditional on the market still being unset: two admins racing through
@@ -73,16 +65,16 @@ export async function saveOnboarding(formData: FormData) {
       where: { id: state.org.id, marketCode: null },
       data: { marketCode: market as MarketCode },
     }),
-    prisma.user.update({
-      where: { id: state.userId },
-      data: { phone },
-    }),
+    // Phone is optional: an empty field leaves whatever number is on file.
+    ...(phone
+      ? [prisma.user.update({ where: { id: state.userId }, data: { phone } })]
+      : []),
   ]);
 
   await recordAudit(state.userId, "user.onboarding_completed", `User:${state.userId}`, {
     organizationId: state.org.id,
     market,
-    hasPhone: true,
+    hasPhone: phone !== "",
   });
 
   redirect(`/${locale}/onboarding/call?next=${encodeURIComponent(next)}`);

@@ -10,7 +10,7 @@ import {
   WidthType,
   type IBorderOptions,
 } from "docx";
-import { formatMoney, intlLocale } from "@/lib/money";
+import { formatMoneyExact, intlLocale } from "@/lib/money";
 import { paymentTermsLine } from "@/lib/payment-terms-text";
 import type { QuotePdfData, QuotePdfRow } from "./quote-pdf-data";
 import {
@@ -62,7 +62,7 @@ export async function renderQuoteDocx(
   locale: string,
   messages: QuoteMessages,
 ): Promise<Buffer> {
-  const money = (amount: number) => formatMoney(amount, data.currency, locale);
+  const money = (amount: number) => formatMoneyExact(amount, data.currency, locale);
   const date = (d: Date) =>
     new Intl.DateTimeFormat(intlLocale(locale), { dateStyle: "medium", timeZone: data.timeZone }).format(d);
   const hasOnRequest = data.rows.some((r) => r.priceOnRequest);
@@ -252,6 +252,10 @@ export async function renderQuoteDocx(
           para([], { after: 320 }),
           ...scopeBlock,
           para([run(t(messages, "vatStatus"), { size: 16, color: "555555" })]),
+          ...(data.vatNote ? [para([run(data.vatNote, { size: 16, color: "555555" })])] : []),
+          ...(data.vatNote && data.customerVatId
+            ? [para([run(t(messages, "customerVatId", { vatId: data.customerVatId }), { size: 16, color: "555555" })])]
+            : []),
           para([run(paymentTermsLine(locale, data.paymentTermsDays), { size: 16, color: "555555" })], {
             after: 160,
           }),

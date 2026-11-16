@@ -1,9 +1,12 @@
 "use server";
+import { isMfaRequiredError } from "@/lib/mfa/session";
+import { beginMfaStep } from "@/lib/mfa/signin";
+import { hashPassword } from "@/lib/password";
+import { log } from "@/lib/log";
 
 import { AuthError } from "next-auth";
 import { redirect } from "next/navigation";
 import { after } from "next/server";
-import bcrypt from "bcryptjs";
 import { signIn } from "@/auth";
 import { prisma } from "@/lib/prisma";
 import { landingForRole } from "@/lib/roles";
@@ -69,7 +72,7 @@ export async function requestPasswordReset(formData: FormData) {
       try {
         await emailAdapter({ to: userEmail, subject: msg.subject, text: msg.text, html: msg.html });
       } catch (err) {
-        console.error("auth.password_reset_email_failed", { userId, err });
+        log.error("auth.password_reset_email_failed", { userId, err });
       }
       await recordAudit(userId, "auth.password_reset_requested", `User:${userEmail}`, { ip });
     });
@@ -111,7 +114,7 @@ export async function resetPassword(formData: FormData) {
     redirect(`/${locale}/reset-password/${token}?error=password_length`);
   }
 
-  const passwordHash = await bcrypt.hash(newPassword, 10);
+  const passwordHash = await hashPassword(newPassword);
   const now = new Date();
 
   // Atomic single-use consume + password swap + sibling-token
@@ -134,12 +137,26 @@ export async function resetPassword(formData: FormData) {
   try {
     await emailAdapter({ to: outcome.email, subject: msg.subject, text: msg.text, html: msg.html });
   } catch (err) {
-    console.error("auth.password_changed_email_failed", { userId: outcome.userId, err });
+    log.error("auth.password_changed_email_failed", { userId: outcome.userId, err });
   }
 
   try {
     await signIn("credentials", { email: outcome.email, password: newPassword, redirect: false });
   } catch (error) {
+    // Two-factor account: a reset link + new password is still only the first
+    // factor. Continue at the code prompt instead of the sign-in form.
+    if (isMfaRequiredError(error)) {
+      redirect(
+        await beginMfaStep({
+          userId: outcome.userId,
+          email: outcome.email,
+          locale,
+          next: "",
+          via: "password",
+          ip,
+        }),
+      );
+    }
     if (error instanceof AuthError) {
       redirect(`/${locale}/signin`);
     }

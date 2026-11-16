@@ -1,11 +1,9 @@
 import { getTranslations } from "next-intl/server";
 import { notFound } from "next/navigation";
-import { prisma } from "@/lib/prisma";
-import { lineOrder } from "@/lib/commerce/line-order";
 import { orderFeePlacements, placementCount } from "@/lib/commerce/placements";
 import { Link } from "@/i18n/navigation";
 import { formatMoney, intlLocale } from "@/lib/money";
-import { loadScope, canActOnOrg, canEditOnOrg } from "@/lib/scope";
+import { loadScope, canActOnOrg, canCommitOnOrg, canEditOnOrg } from "@/lib/scope";
 import { ViewOnlyNote } from "@/components/view-only-note";
 import { safeExternalUrl } from "@/lib/security";
 import { StatusBadge } from "@/app/status-badge";
@@ -18,57 +16,43 @@ import { approveContentAsset, requestContentChanges } from "@/app/content-review
 import { presignDownloadOrNull } from "@/lib/storage/r2";
 import { resolveEffectiveAsset } from "@/lib/writers/placement";
 import { OrderExtraWorkSection } from "./extra-work-section";
+import {
+  OrderCancelRequestSection,
+  OrderCsatSection,
+  OrderSelfServiceNotice,
+} from "./self-service-section";
+import {
+  loadDetailOrder,
+  loadDetailProducts,
+} from "@/lib/data/buyer/orders";
 
 export const dynamic = "force-dynamic";
 
 export default async function MyOrderPage({
   params,
+  searchParams,
 }: {
   params: Promise<{ locale: string; orderId: string }>;
+  searchParams: Promise<Record<string, string | string[] | undefined>>;
 }) {
   const { locale, orderId } = await params;
+  const sp = await searchParams;
   const t = await getTranslations({ locale, namespace: "orders" });
   const to = await getTranslations({ locale, namespace: "order" });
   const tp = await getTranslations({ locale, namespace: "production" });
   const tType = await getTranslations({ locale, namespace: "productType" });
   const ti = await getTranslations({ locale, namespace: "invoice" });
 
-  const order = await prisma.order.findUnique({
-    where: { id: orderId },
-    include: {
-      // The quote's lines only to tell which placement each content fee
-      // writes for (orderFeePlacements); the order's own lines are below.
-      quote: { include: { lines: { select: { kind: true, description: true, productId: true, position: true } } } },
-      invoices: { select: { id: true, status: true } },
-      lines: {
-        orderBy: lineOrder(),
-        include: {
-          articlePlacement: {
-            select: {
-              id: true,
-              articleId: true,
-              lockedAssetId: true,
-              specPassed: true,
-            },
-          },
-          booking: {
-              include: {
-                metrics: true,
-                publisher: { select: { name: true } },
-                title: { select: { name: true } },
-              },
-            },
-        },
-      },
-    },
-  });
+  // The loader answers null for another organisation's order.
+  const scope = await loadScope();
+  const order = await loadDetailOrder(scope, { orderId });
   if (!order) notFound();
 
-  const scope = await loadScope();
   if (!canActOnOrg(scope, order.organizationId)) notFound();
   // A view-only (RESTRICTED) seat follows the order but can't copy it into a
   // new plan or approve / send back an article draft (the actions refuse it).
   const canEdit = canEditOnOrg(scope, order.organizationId);
+  const canCommit = canCommitOnOrg(scope, order.organizationId);
 
   const tperf = await getTranslations({ locale, namespace: "performance" });
   const tcr = await getTranslations({ locale, namespace: "campaignReport" });
@@ -104,16 +88,10 @@ export default async function MyOrderPage({
   // quote labels it: three bare "Content production" cards said nothing
   // about which article each one pays for (BUG-final-verify-2).
   const feePlacements = orderFeePlacements(order.lines, order.quote.lines);
-  const products = await prisma.product.findMany({
-    where: {
-      id: {
-        in: [...order.lines, ...feePlacements.values()]
-          .map((l) => l.productId)
-          .filter((id): id is string => !!id),
-      },
-    },
-    include: { title: true },
-  });
+  const lineProductIds = [...order.lines, ...feePlacements.values()]
+    .map((l) => l.productId)
+    .filter((id): id is string => !!id);
+  const products = await loadDetailProducts(scope, { lineProductIds });
   const byId = new Map(products.map((p) => [p.id, p]));
   const invoice = order.invoices[0];
 
@@ -198,6 +176,8 @@ export default async function MyOrderPage({
           ) : null}
         </aside>
       </header>
+
+      <OrderSelfServiceNotice locale={locale} notice={typeof sp.notice === "string" ? sp.notice : undefined} />
 
       <section className="section">
         <div className="section-head">
@@ -357,7 +337,7 @@ export default async function MyOrderPage({
                     {line.booking?.metrics?.impressions != null ? (
                       <>
                         <dt>{tperf("impressions")}</dt>
-                        <dd>{line.booking.metrics.impressions.toLocaleString()}</dd>
+                        <dd>{line.booking.metrics.impressions.toLocaleString(intlLocale(locale))}</dd>
                       </>
                     ) : (
                       <>
@@ -374,6 +354,7 @@ export default async function MyOrderPage({
       </section>
 
       <OrderExtraWorkSection
+        scope={scope}
         locale={locale}
         orderId={order.id}
         quoteId={order.quoteId}
@@ -519,6 +500,9 @@ export default async function MyOrderPage({
           </p>
         </section>
       )}
+
+      <OrderCsatSection locale={locale} order={order} feedback={order.feedback} canEdit={canEdit} />
+      <OrderCancelRequestSection locale={locale} order={order} canCommit={canCommit} />
     </>
   );
 }

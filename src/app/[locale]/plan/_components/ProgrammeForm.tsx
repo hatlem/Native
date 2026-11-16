@@ -1,5 +1,7 @@
 "use client";
 
+
+import { PendingButton } from "@/components/submit-button";
 import { useMemo, useState } from "react";
 import { useTranslations } from "next-intl";
 import { useFormStatus } from "react-dom";
@@ -17,9 +19,9 @@ import { intlLocale } from "@/lib/money";
 function SubmitButton({ label, pending }: { label: string; pending: string }) {
   const status = useFormStatus();
   return (
-    <button type="submit" className="btn" disabled={status.pending}>
+    <PendingButton className="btn" disabled={status.pending}>
       {status.pending ? pending : label}
-    </button>
+    </PendingButton>
   );
 }
 
