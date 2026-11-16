@@ -92,7 +92,7 @@
   },
   "devDependencies": {
     "@types/cheerio": "^1.0.0",
-    "@types/node": "^22.10.7",
+    "@types/node": "^26.6.6",
     "@types/react": "^19.0.7",
     "@types/react-dom": "^19.0.3",
     "domhandler": "^6.0.1",
