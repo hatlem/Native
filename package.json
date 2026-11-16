@@ -97,7 +97,7 @@
     "@types/react-dom": "^19.0.3",
     "domhandler": "^6.0.1",
     "eslint": "^8.57.1",
-    "eslint-config-next": "^15.1.6",
+    "eslint-config-next": "^15.5.29",
     "playwright-core": "^1.60.0",
     "prisma": "^6.2.1",
     "tsx": "^4.19.2",
