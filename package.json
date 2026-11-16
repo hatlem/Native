@@ -72,7 +72,7 @@
     "@dnd-kit/utilities": "^3.2.2",
     "@getplatform/artifact-viewer": "git+https://github.com/hatlem/artifact-viewer.git#v1.3.0",
     "@modelcontextprotocol/sdk": "^1.32.1",
-    "@prisma/client": "^6.2.1",
+    "@prisma/client": "^7.10.1",
     "@react-pdf/renderer": "^4.6.1",
     "bcryptjs": "^3.0.3",
     "cheerio": "^1.2.0",
