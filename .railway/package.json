@@ -1,0 +1,8 @@
+{
+  "name": "railway-iac",
+  "private": true,
+  "description": "Railway Infrastructure as Code for this repository. Not part of the application build.",
+  "devDependencies": {
+    "railway": "3.17.0"
+  }
+}
