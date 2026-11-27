@@ -10,8 +10,9 @@ export class EmailSendError extends Error {
     readonly code: string,
     readonly statusCode: number | null,
     message: string,
+    provider = "Resend",
   ) {
-    super(`Resend rejected email (${code}${statusCode ? ` ${statusCode}` : ""}): ${message}`);
+    super(`${provider} rejected email (${code}${statusCode ? ` ${statusCode}` : ""}): ${message}`);
     this.name = "EmailSendError";
   }
 }

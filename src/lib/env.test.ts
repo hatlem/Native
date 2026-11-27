@@ -12,7 +12,7 @@ test("checkEnv: an empty dev/CI environment is clean", () => {
 test("checkEnv: production requires DATABASE_URL and AUTH_SECRET", () => {
   const r = checkEnv(env({ NODE_ENV: "production" }));
   assert.deepEqual(r.missingRequired, ["DATABASE_URL", "AUTH_SECRET"]);
-  assert.ok(r.warnings.some((w) => w.startsWith("RESEND_API_KEY")));
+  assert.ok(r.warnings.some((w) => w.startsWith("GETMAILER_API_KEY and RESEND_API_KEY unset")));
 });
 
 test("checkEnv: malformed values are reported by name", () => {
@@ -30,6 +30,19 @@ test("checkEnv: partial R2 config and missing webhook secret are warnings in pro
   assert.deepEqual(r.missingRequired, []);
   assert.ok(r.warnings.some((w) => w.startsWith("RESEND_WEBHOOK_SECRET")));
   assert.ok(r.warnings.some((w) => w.startsWith("R2 partially configured")));
+});
+
+test("checkEnv: a GetMailer key satisfies the email warning and drops the Resend webhook warning", () => {
+  const r = checkEnv(
+    env({ NODE_ENV: "production", DATABASE_URL: "postgresql://x", AUTH_SECRET: "s".repeat(32), GETMAILER_API_KEY: "gm_x", RESEND_API_KEY: "re_x" }),
+  );
+  assert.ok(!r.warnings.some((w) => w.includes("emails are only logged")));
+  assert.ok(!r.warnings.some((w) => w.startsWith("RESEND_WEBHOOK_SECRET")));
+});
+
+test("checkEnv: GETMAILER_API_URL must be an http(s) URL", () => {
+  const r = checkEnv(env({ GETMAILER_API_URL: "api.getmailer.co" }));
+  assert.ok(r.invalid.some((i) => i.startsWith("GETMAILER_API_URL")));
 });
 
 test("validateEnvAtBoot: throws only for a production server missing required vars", () => {

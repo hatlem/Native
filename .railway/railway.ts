@@ -61,6 +61,8 @@ export default defineRailway((ctx) => {
       CAMPAIGN_FLOW: preserve(),
       DATABASE_URL: preserve(),
       FEEDBACK_INGEST_KEY: preserve(),
+      GETMAILER_API_KEY: preserve(),
+      GETMAILER_API_URL: preserve(),
       GETPLATFORM_AI_KEY: preserve(),
       GETPLATFORM_AI_URL: preserve(),
       NEXT_PUBLIC_APP_NAME: preserve(),

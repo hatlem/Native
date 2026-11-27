@@ -49,7 +49,9 @@ export const envSchema = z.object({
   NEXT_PUBLIC_SITE_URL: optionalUrl,
   NEXT_PUBLIC_APP_NAME: optionalString,
 
-  // --- Email (Resend) ---
+  // --- Email (GetMailer preferred, Resend fallback) ---
+  GETMAILER_API_KEY: optionalString,
+  GETMAILER_API_URL: optionalUrl,
   RESEND_API_KEY: optionalString,
   RESEND_WEBHOOK_SECRET: optionalString,
   AUTH_EMAIL_FROM: optionalString,
@@ -140,8 +142,9 @@ export function checkEnv(env: NodeJS.ProcessEnv = process.env): EnvReport {
     for (const key of ["DATABASE_URL", "AUTH_SECRET"]) {
       if (!values[key]) missingRequired.push(key);
     }
-    if (!values.RESEND_API_KEY) warnings.push("RESEND_API_KEY unset: emails are only logged, not sent");
-    if (values.RESEND_API_KEY && !values.RESEND_WEBHOOK_SECRET)
+    if (!values.GETMAILER_API_KEY && !values.RESEND_API_KEY)
+      warnings.push("GETMAILER_API_KEY and RESEND_API_KEY unset: emails are only logged, not sent");
+    if (!values.GETMAILER_API_KEY && values.RESEND_API_KEY && !values.RESEND_WEBHOOK_SECRET)
       warnings.push("RESEND_WEBHOOK_SECRET unset: bounce/complaint webhooks are rejected, suppression list will not update");
     const r2 = ["R2_ACCOUNT_ID", "R2_ACCESS_KEY_ID", "R2_SECRET_ACCESS_KEY", "R2_BUCKET"];
     const r2Set = r2.filter((k) => values[k]);
